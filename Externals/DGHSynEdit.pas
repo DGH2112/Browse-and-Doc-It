@@ -1,10 +1,14 @@
-{ -------------------------------------------------------------------------
+(**
 
-   This is a derived class from TSynEdit allowing me to override some of
-   the default properties and also add an number of extra WordStar style
-   keybindings to the editors.
+  This is a derived class from TSynEdit allowing me to override some of
+  the default properties and also add an number of extra WordStar style
+  keybindings to the editors.
 
-  -------------------------------------------------------------------------- }
+  @Version 1.0
+  @Author  David Hoyle
+  @Date    23 Oct 2004
+
+**)
 
 Unit DGHSynEdit;
 
@@ -15,14 +19,9 @@ Uses
 
 Type
 
-{ -------------------------------------------------------------------------
-
-   Derived class of TSynEdit. Some of the methods assume that the editor is
-   dymanically created as the first control of a TabSheet instance, hence
-   this editor controls the TabSheet caption based on the file loaded.
-
-  -------------------------------------------------------------------------- }
-
+  (** Derived class of TSynEdit. Some of the methods assume that the editor is
+      dymanically created as the first control of a TabSheet instance, hence
+      this editor controls the TabSheet caption based on the file loaded. **)
   TDGHSynEdit = Class(TSynEdit)
   Private
     FFileName: String;
@@ -41,28 +40,61 @@ Type
     Procedure UpperCaseWord;
     procedure LowerCaseWord;
     { Properties }
+    (**
+      This property returns an appropriate captions for the editor tab within
+      the main application.
+      @precon  None.
+      @postcon Returns an appropriate caption for the tab of the editor.
+      @return  a String
+    **)
     Property TabCaption : String Read GetTabCaption Write SetTabCaption;
+    (**
+      This property returns the filename for the editor.
+      @precon  None.
+      @postcon Returns the filename for the editor.
+      @return  a String
+    **)
     Property FileName : String Read FFileName Write SetFileName;
+    (**
+      This property returns the tab sheet that the editor is bound within.
+      @precon  None.
+      @postcon Returns the tab sheet that the editor is bound within.
+      @return  a TTabSheet
+    **)
     Property ParentTabSheet : TTabSheet Read GetParentTabSheet;
+    (**
+      This property returns the current date and time of the editor file.
+      @precon  None.
+      @postcon Returns the current date and time of the editor file.
+      @return  a TDateTime
+    **)
     Property FileDateTime : TDateTime read FFileDateTime write SetFileDateTime;
   Published
   End;
 
+  (** This is a record to represent a top line and column of an editor
+      window **)
   TWindowPosition = Record
     TopLine : Integer;
     LeftChar : Integer;
   End;
 
+  (** This is a record to describe a caret position. **)
   TCaretPosition = Record
     CaretX : Integer;
     CaretY : Integer;
   End;
 
+  (** This is a record to describe a block position with line and column
+      informatiom. **)
   TBlockPosition = Record
     Line : Integer;
     Column : Integer;
   End;
 
+  (** This is a record to describe the state of an editors window scroll
+      position, caret position, and start and end positions of any highlighted
+      blocks. **)
   TEditorState = Record
     Window : TWindowPosition;
     Caret : TCaretPosition;
@@ -71,11 +103,17 @@ Type
   End;
 
 Const
+  (** A constant to define the Find Wordstar key sequence. **)
   ecFind          = ecUserFirst + 1;
+  (** A constant to define the Find Again Wordstar key sequence. **)
   ecFindAgain     = ecUserFirst + 2;
+  (** A constant to define the Replace Wordstar key sequence. **)
   ecReplace       = ecUserFirst + 3;
+  (** A constant to define the Upper Word Wordstar key sequence. **)
   ecUppercaseWord = ecUserFirst + 4;
+  (** A constant to define the Lower Word Wordstar key sequence. **)
   ecLowercaseWord = ecUserFirst + 5;
+  (** A constant to define the Print Wordstar key sequence. **)
   ecPrint         = ecUserFirst + 6;
 
 Implementation
@@ -85,17 +123,18 @@ Implementation
 Uses
   Menus, Windows;
 
-{ -------------------------------------------------------------------------
+(**
 
-   This is the constructor for the class that essentially override some
-   of the default property values and then adds all the WordStar
-   keybindings.
+  This is the constructor method for the TDGHSynEdit class.
 
-   Create(
-   );
+  @precon  None.
+  @postcon This is the constructor for the class that essentially override some
+           of the default property values and then adds all the WordStar
+           keybindings.
 
-  -------------------------------------------------------------------------- }
+  @param   AOwner as a TComponent
 
+**)
 constructor TDGHSynEdit.Create(AOwner: TComponent);
 
 begin
@@ -180,28 +219,32 @@ begin
   AddKey(ecPrint, Ord('K'), [ssCtrl], Ord('P'), []);
 end;
 
-{ -------------------------------------------------------------------------
+(**
 
-   This method attempts to make the current editor the visible one on
-   the PageControl.
+  This method attempts to make the current editor the visible one on
+  the PageControl.
 
-   Display(
-   );
+  @precon  None.
+  @postcon This method makes this editor appear in the page control as the
+           active editor.
 
-  -------------------------------------------------------------------------- }
-
+**)
 procedure TDGHSynEdit.Display;
 begin
   If Parent Is TTabSheet Then
     (Parent As TTabsheet).PageControl.ActivePage := (Parent As TTabsheet);
 end;
 
-{ -------------------------------------------------------------------------
+(**
 
-   Getter method for the ParentTabSheet property.
+  This is a getter method for the ParentTabSheet property.
 
-  -------------------------------------------------------------------------- }
+  @precon  None.
+  @postcon Returns the tab sheet for this editor.
 
+  @return  a TTabSheet
+
+**)
 function TDGHSynEdit.GetParentTabSheet: TTabSheet;
 begin
   If Parent Is TTabSheet Then
@@ -210,30 +253,35 @@ begin
     Result := Nil;
 end;
 
-{ -------------------------------------------------------------------------
+(**
 
-   Getter method of the TabCaption property
+  This is a getter method for the TabCaption property.
 
-  -------------------------------------------------------------------------- }
+  @precon  None.
+  @postcon Returns the caption of the parent tab sheet.
 
+  @return  a String
+
+**)
 function TDGHSynEdit.GetTabCaption: String;
 begin
   If Parent Is TTabSheet Then
     Result := (Parent As TTabsheet).Caption;
 end;
 
-{ -------------------------------------------------------------------------
+(**
 
-   This is the preferred method for loading files in this editor as it
-   updates the parent TabSheet control with the files name as stores the
-   Filename for later reference.
+  This method loads a file from disk into the editor and update the file date
+  and time, filename, and tab caption.
 
-   LoadFromFile(
-     strFileName  // Name of the fies as a string
-   );
+  @precon  None.
+  @postcon This is the preferred method for loading files in this editor as it
+           updates the parent TabSheet control with the files name as stores the
+           Filename for later reference.
 
-  -------------------------------------------------------------------------- }
+  @param   strFileName as a String
 
+**)
 procedure TDGHSynEdit.LoadFromFile(strFileName: String);
 begin
   FileName := strFileName;
@@ -242,18 +290,19 @@ begin
   TabCaption := ExtractFileName(strFileName);
 end;
 
-{ -------------------------------------------------------------------------
+(**
 
-   This is the preferred method for saving files in this editor as it
-   updates the parent TabSheet control with the files name and stores the
-   filename for later reference.
+  This method saves the current editor edits to a disk file and updates the
+  filename, date and time and tab caption.
 
-   SaveToFile(
-     strFilename   // The name of the files as a string
-   );
+  @precon  None.
+  @postcon This is the preferred method for saving files in this editor as it
+           updates the parent TabSheet control with the files name and stores the
+           filename for later reference.
 
-  -------------------------------------------------------------------------- }
+  @param   strFileName as a String
 
+**)
 procedure TDGHSynEdit.SaveToFile(strFileName: String);
 begin
   FileName := strFileName;
@@ -263,39 +312,46 @@ begin
   TabCaption := ExtractFileName(strFileName);
 end;
 
-{ -------------------------------------------------------------------------
+(**
 
-   Setter method for th FileName property
+  This is a setter method for the FileName property.
 
-  -------------------------------------------------------------------------- }
+  @precon  None.
+  @postcon Sets the filename of the editor.
 
+  @param   Value as a String constant
+
+**)
 procedure TDGHSynEdit.SetFileName(const Value: String);
 begin
   If FFileName <> Value Then
     FFileName := Value;
 end;
 
-{ -------------------------------------------------------------------------
+(**
 
-   Setter method for the TabCaption property.
+  This is a setter method for the TabCaption property.
 
-  -------------------------------------------------------------------------- }
+  @precon  None.
+  @postcon Sets the caption of the parent tan sheet control.
 
+  @param   Value as a String constant
+
+**)
 procedure TDGHSynEdit.SetTabCaption(const Value: String);
 begin
   If Parent Is TTabSheet Then
     (Parent As TTabsheet).Caption := Value;
 end;
 
-{ -------------------------------------------------------------------------
+(**
 
-   This method makes the word currently under the cursor UPPERCASE.
+  This method makes the word currently under the cursor UPPERCASE.
 
-   UpperCaseWord(
-   );
+  @precon  None.
+  @postcon This method makes the word currently under the cursor UPPERCASE.
 
-  -------------------------------------------------------------------------- }
-
+**)
 procedure TDGHSynEdit.UpperCaseWord;
 
 Var
@@ -309,15 +365,14 @@ begin
   CaretXY := ptCaret;
 end;
 
-{ -------------------------------------------------------------------------
+(**
 
-   This method makes the word currently under the cursor lowercase.
+  This method makes the word currently under the cursor lowercase.
 
-   LowerCaseWord(
-   );
+  @precon  None.
+  @postcon This method makes the word currently under the cursor lowercase.
 
-  -------------------------------------------------------------------------- }
-
+**)
 procedure TDGHSynEdit.LowerCaseWord;
 
 Var
@@ -331,12 +386,16 @@ begin
   CaretXY := ptCaret;
 end;
 
-{ -------------------------------------------------------------------------
+(**
 
-   Setter method for the FileDateTime property.
+  This is a setter method for the FileDateTime property.
 
-  -------------------------------------------------------------------------- }
+  @precon  None.
+  @postcon Sets the files date and time.
 
+  @param   Value as a TDateTime constant
+
+**)
 procedure TDGHSynEdit.SetFileDateTime(const Value: TDateTime);
 begin
   If FFileDateTime <> Value Then

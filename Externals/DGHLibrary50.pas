@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    30 Apr 2005
+  @Date    04 Jun 2005
 
 **)
 Unit DGHLibrary50;
@@ -16,6 +16,14 @@ Uses
   SysUtils, Classes;
 
 Type
+  (** A record to describe the degrees, minutes and seconds of a bearing. **)
+  TBearing = Record
+    iDegrees : Integer;
+    iMinutes : Integer;
+    iSeconds : Integer;
+    iHundreds : Integer;
+  End;
+
   (** This is a record that describes a vector using a distance and a
       bearing. **)
   TVector = Record
@@ -23,31 +31,44 @@ Type
     dblBearing  : Double;
   End;
 
+  (** This is a custom Math Exception. **)
   EMathException = Class(Exception);
 
   (** This is a custom exception for an invalid Degree Minutes Seconds
       value. **)
   EInvalidDMSFormatException = Class(Exception);
 
+  (** This is an enumerate which defined the types of horizontal element that
+      can used in a horizontal alignment. **)
   TElementType = (etUnknown, etStraight, etCircular, etClothoid);
 
+  (** This is an enumerate which defined the way in which the below THInfo
+      record can be viewed. **)
   THInfoType = (itSetout, itMeasure, itCompare);
 
+  (** This is a custom exception for a zero length of negative error
+      condition. **)
   ELengthZeroOrNegativeException = Class(Exception);
+  (** This is a custom exception for a zero length radius. **)
   EZeroRadiusException = Class(Exception);
+  (** This is a custom exception for a zero length Radius * Length value. **)
   EZeroRLValueExecption = Class(Exception);
+  (** This is an custom exception for a before alignment start error **)
   EBeforeAlignmentStartException = Class(Exception);
+  (** This is an custom exception for an after alignment end error  **)
   EAfterAlignmentEndException = Class(Exception);
 
-  (*
-    THInfo Structure
+  (**
+
+    This THInfo Structure defined the return results from several of the methods
+    of the alignment classes. It is a record with different identities and can
+    therefore return different information as follows:
 
     Setout : Bearing, Easting,  Northing;  or
     Measure: Bearing, Chainage, Offset;    or
     Compare: Bearing, Chainage, Distance;
 
-  *)
-
+  **)
   THInfo = Record
     dblBearing : Double;
     Case THInfoType Of
@@ -59,6 +80,7 @@ Type
     );
   End;
 
+  (** This record defined the results of a compare method. **)
   THCompInfo = Record
     dblEasting  : Double;
     dblNorthing : Double;
@@ -67,16 +89,21 @@ Type
     dblDistance : Double;
   End;
 
+  (** This record defined information for a vertical alignment. **)
   TVInfo = Record
     dblLevel    : Double;
     dblGradient : Double;
   End;
 
+  (** This rcord defined information for both a vertical and horizontal
+      result. **)
   TInfo = Record
     HInfo : THInfo;
     VInfo : TVInfo;
   End;
 
+  (** This record defined information for a Horizontal element of an
+      alignment **)
   THElement = Record
     dblEasting  : Double;
     dblNorthing : Double;
@@ -88,6 +115,7 @@ Type
     dblStChainage : Double;
   End;
 
+  (** This record defines a vertical straight element of an alignment. **)
   TVStraight = Record
     dblLevel    : Double;
     dblGradient : Double;
@@ -95,6 +123,7 @@ Type
     dblLength   : Double;
   End;
 
+  (** This record defines a circular straight element of an alignment. **)
   TVCircular = Record
     dblLevel    : Double;
     dblGradient : Double;
@@ -103,6 +132,7 @@ Type
     dblRadius   : Double;
   End;
 
+  (** This record defined the results of a measure. **)
   TMeasureInfo = Record
     dblChainage : Double;
     dblOffset   : Double;
@@ -111,6 +141,7 @@ Type
     dblGradient : Double;
   End;
 
+  (** This record defined the results of a compare. **)
   TCompareInfo = Record
     dblEasting   : Double;
     dblNorthing  : Double;
@@ -123,6 +154,8 @@ Type
     dblGradient  : Double;
   End;
 
+  (** This class is the base class in the heiracrhy for the horizontal
+      alignments classes. **)
   THBaseElement = Class
   Private
     FEasting  : Double;
@@ -143,6 +176,7 @@ Type
       Virtual; Abstract;
   End;
 
+  (** This class defined a Straight Horizontal alignment element. **)
   THStraightElement = Class(THBaseElement)
   Protected
     Function ElementType : TElementType; Override;
@@ -156,6 +190,7 @@ Type
       dblLength : Double); Virtual;
   End;
 
+  (** This class defined a Circular Horizontal alignment element. **)
   THCircularElement = Class(THBaseElement)
   Private
     FRadius : Double;
@@ -171,6 +206,7 @@ Type
       dblLength, dblRadius : Double; bCentre : Boolean); Virtual;
   End;
 
+  (** This class defined a Clothoid Horizontal alignment element. **)
   THClothoidElement = Class(THBaseElement)
   Private
     FOChainage : Double;
@@ -192,6 +228,8 @@ Type
       dblBearing, dblLength, dblStRadius, dblEndRadius : Double); Virtual;
   End;
 
+  (** This class is the base class in the heiracrhy for the vertical
+      alignments classes. **)
   TVBaseElement = Class
   Private
     FLevel    : Double;
@@ -209,6 +247,7 @@ Type
       Abstract;
   End;
 
+  (** This class defined a Straight Vertical element of an alignment. **)
   TVStraightElement = Class(TVBaseElement)
   Private
   Protected
@@ -220,6 +259,7 @@ Type
     Function GetElementDetails : TVStraight;
   End;
 
+  (** This class defined a Circular Vertical element of an alignment. **)
   TVCircularElement = Class(TVBaseElement)
   Private
     FRadius : Double;
@@ -232,10 +272,13 @@ Type
     Function GetElementDetails : TVCircular;
   End;
 
+  (** Forward declaration of the class type THElements **)
   THElements = Class(TList);
 
+  (** Forward declaration of the class type TVElements **)
   TVElements = Class(TList);
 
+  (** This class represents a collection of horizontal alignment elements. **)
   THAlignmentCollection = Class
   Private
     FHElements : THElements;
@@ -286,12 +329,37 @@ Type
     Function Compare(dblEasting, dblNorthing, dblBearing : Double) : THCompInfo;
       Virtual;
     { Properties }
+    (**
+      A property to provide an event for the chnage of a horizontal alignment.
+      @precon  None.
+      @postcon Event hook for an OnChange event handler.
+      @return  a TNotifyEvent
+    **)
     Property OnChange : TNotifyEvent Read FOnChange Write FOnChange;
+    (**
+      A notification event handler fired if the horizontal alignment changes.
+      @precon  None.
+      @postcon Fires an event if the alignment changes.
+      @return  a Double
+    **)
     Property CoordinateError : Double read FCoordinateError write SetCoordinateError;
+    (**
+      A property for reading the tolerance in coordinate error allowed.
+      @precon  None.
+      @postcon Returns a coordinate error.
+      @return  a Double
+    **)
     Property BearingError : Double read FBearingError write SetBearingError;
+    (**
+      A property to reading the tolerance in bearing error allowed
+      @precon  None.
+      @postcon Returns the bearing error.
+      @return  a Boolean
+    **)
     Property Modified: Boolean read FModified write SetModified Default False;
   End;
 
+  (** This class represents a collection of vertical alignment elements. **)
   TVAlignmentCollection = Class
   Private
     FVElements : TVElements;
@@ -329,12 +397,38 @@ Type
     Procedure Clear;
     Function Setout(dblChainage : Double) : TVInfo; Virtual;
     { Properties }
+    (**
+      A property to notify of changes made to the class.
+      @precon  None.
+      @postcon Fires a notification of A change
+      @return  a TNotifyEvent
+    **)
     Property OnChange : TNotifyEvent read FOnChange Write FOnChange;
+    (**
+      A property to determine if the alignment has changed.
+      @precon  None.
+      @postcon Returns a boolean valud indicating if the alignment is modified.
+      @return  a Boolean
+    **)
     Property Modified: Boolean read FModified write SetModified Default False;
+    (**
+      A property to determine the tolerance of an error in the level
+      @precon  None.
+      @postcon Returns a level error.
+      @return  a Double
+    **)
     Property LevelError : Double read FLevelError write SetLevelError;
+    (**
+      A property to determine the tolerance of an error in the gradient.
+      @precon  None.
+      @postcon Returns a gradient error.
+      @return  a Double
+    **)
     Property GradientError : Double read FGradientError write SetGradientError;
   End;
 
+  (** This class represents a collection of both horizontal and vertical
+      alignment elements. **)
   TStringAlignment = Class
   Private
     FHAlignment : THAlignmentCollection;
@@ -350,57 +444,54 @@ Type
       Virtual;
     Function Compare(dblEasting, dblNorthing, dblBearing,
       dblLevel : Double) : TCompareInfo; Virtual;
+    (**
+      A property to define the horizontal alignment of the string line
+      @precon  None.
+      @postcon Returns the horizontal alignment within the string line
+      @return  a THAlignmentCollection
+    **)
     Property HAlignment : THAlignmentCollection Read FHAlignment;
+    (**
+      A property to define the vertical alignment of the string line
+      @precon  None.
+      @postcon Returns the vertical alignment within the string line
+      @return  a TVAlignmentCollection
+    **)
     Property VAlignment : TVAlignmentCollection Read FVAlignment;
   End;
 
-  Function DecimalToDMS(dblBearing : Double) : String;
+  Function AdjustBearing(dblBearing : Double) : Double;
+  Function BearingToString(recBearing : TBearing) : String;
+  Function BinToDec(sDisplayNumber : String) : String;
+  Function BinToHex(sDisplayNumber : String) : String;
+  Function BinToOct(sDisplayNumber : String) : String;
+  Function Capitalise(strText : String) : String;
+  Function CharCount(cChar : Char; strText : String) : Integer;
+  Function ConvertDate(Const strDate : String) : TDateTime;
+  Function DecimalToDMS(dblBearing : Double) : TBearing;
+  Function DecToBin(sDisplayNumber : String) : String;
+  Function DecToHex(sDisplayNumber : String) : String;
+  Function DecToOct(sDisplayNumber : String) : String;
   Function DMSToDecimal(strBearing : String) : Double;
   Function DMSAsDecToDecimal(dblBearingAsDec : Double) : Double;
-  Function AdjustBearing(dblBearing : Double) : Double;
-  Function GetVector(dblStE, dblStN, dblEndE, dblEndN : Double) : TVector;
-  Function ReduceBearing(dblBearing : Double) : Double;
   Function ExtractFileNameOnly(strFileName : String) : String;
-  Function PosOfNthChar(Ch : Char; strText : String; iIndex : Integer): Integer;
   Function GetField(strText : String; Ch : Char; iIndex : Integer): String;
+  Function GetVector(dblStE, dblStN, dblEndE, dblEndN : Double) : TVector;
+  Function HexToBin(sDisplayNumber : String) : String;
+  Function HexToDec(sDisplayNumber : String) : String;
+  Function HexToOct(sDisplayNumber : String) : String;
+  Function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
   Procedure MakeAssociation(Const strFileExt, strFileClass, strDescription,
     strDefaultIcon : String; bAlwaysShowExt, bQuickView : Boolean);
   Procedure MakeAssociatedVerb(const strFileExt, strVerb, strVerbCaption,
     strVerbCommand : String; bUseDDE : Boolean; Const strService, strTopic,
     strMacro, strMacroNotRunning : String);
-  Function Capitalise(strText : String) : String;
-  Function ConvertDate(Const strDate : String) : TDateTime;
-  Function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
-  Function CharCount(cChar : Char; strText : String) : Integer;
-
   Function OctToBin(sDisplayNumber : String) : String;
-  Function HexToBin(sDisplayNumber : String) : String;
-  Function DecToBin(sDisplayNumber : String) : String;
-  Function BinToOct(sDisplayNumber : String) : String;
-  Function HexToOct(sDisplayNumber : String) : String;
-  Function DecToOct(sDisplayNumber : String) : String;
-  Function BinToHex(sDisplayNumber : String) : String;
-  Function OctToHex(sDisplayNumber : String) : String;
-  Function DecToHex(sDisplayNumber : String) : String;
-  Function BinToDec(sDisplayNumber : String) : String;
   Function OctToDec(sDisplayNumber : String) : String;
-  Function HexToDec(sDisplayNumber : String) : String;
-
-Function Arcsin( X : Real ) : Real;    { Inverse Sine       }
-Function Arccos( X : Real ) : Real;    { Inverse Cosine     }
-Function Tan( X : Real ) : Real;       { Tan                }
-Function Deg( X : Real ) : Real;       { Radians to Degrees }
-Function Rad( X : Real ) : Real;       { Degrees to Radians }
-Function Sub1(Z : Real) : Real;        { DMS to Decimal   }
-Function DmsStr(X : Real) : String;    { Decimal to DMS as String }
-Function DmsNum(X : Real) : String;    { Decimal to DMS as String Number }
-Function DmsReal(X : Real) : Real;     { Decimal to DMS as Real   }
-Function Squareroot(X : Real) : Real;  { Square Root Routine }
-Function Pow(X, Y : Real) : Real;      { X to power of Y Routine }
-Function Exponent(X : Real) : Real;    { Exponent Routine }
-Function Lne(X : Real) : Real;         { Log(e) to Base (e) }
-Function Inverse(X : Real) : Real;     { Inverse 1/X }
-Function Log(X : Real) : Real;         { Log(10) to Base 10 }
+  Function OctToHex(sDisplayNumber : String) : String;
+  Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer): Integer;
+  Function Pow(X, Y : Real) : Real;
+  Function ReduceBearing(dblBearing : Double) : Double;
 
 { -------------------------------------------------------------------------
 
@@ -422,6 +513,19 @@ Implementation
 Uses
   Math, ComObj, ShlObj, IniFiles;
 
+Const
+  (** A constant to define the type of based that can be used with number in
+      eqautions. **)
+  Bases = ['B', 'O', 'H'];
+  (** The numeric number in base 2 **)
+  BinNums = ['-', '0', '1'];
+  (** The numeric number in base 8 **)
+  OctNums = BinNums + ['2', '3', '4', '5', '6', '7'];
+  (** The numeric number in base 16 **)
+  HexNums = OctNums + ['8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+  (** A list of valid equation delimiters. **)
+  ValidDelimiters = ['(',')','*','/','+','-'];
+
 (**
 
   This routine converts the decimal bearing into a text representation,
@@ -433,16 +537,12 @@ Uses
   @postcon Converts the decimal bearing into a text representation.
 
   @param   dblBearing as a Double
-  @return  a String
+  @return  a TBearing
 
 **)
-Function DecimalToDMS(dblBearing: Double): String;
+Function DecimalToDMS(dblBearing: Double): TBearing;
 
 Var
-  iDegrees : Integer;
-  iMinutes : Integer;
-  iSeconds : Integer;
-  iHundreds : Integer;
   strSign : String;
 
 begin
@@ -452,12 +552,11 @@ begin
       dblBearing := Abs(dblBearing);
     End Else
       strSign := '';
-  iDegrees := Trunc(dblBearing);
-  iMinutes := Trunc((dblBearing - iDegrees) * 60);
-  iSeconds := Trunc(((dblBearing - iDegrees) * 60 - iMinutes) * 60);
-  iHundreds := Trunc((((dblBearing - iDegrees) * 60 - iMinutes) * 60 - iSeconds) * 100);
-  Result := strSign + Format('%3d° %2.2d'' %2.2d.%2.2d"', [iDegrees, iMinutes,
-    iSeconds, iHundreds]);
+  Result.iDegrees := Trunc(dblBearing);
+  Result.iMinutes := Trunc((dblBearing - Result.iDegrees) * 60);
+  Result.iSeconds := Trunc(((dblBearing - Result.iDegrees) * 60 - Result.iMinutes) * 60);
+  Result.iHundreds := Trunc((((dblBearing - Result.iDegrees) * 60 - Result.iMinutes) * 60
+    - Result.iSeconds) * 100);
 end;
 
 (**
@@ -629,13 +728,13 @@ End;
   @postcon Returns the position of the Nth occurrance of the character
            in the text.
 
-  @param   Ch      as a Char
   @param   strText as a String
+  @param   Ch      as a Char
   @param   iIndex  as an Integer
   @return  an Integer
 
 **)
-Function PosOfNthChar(Ch : Char; strText : String; iIndex : Integer): Integer;
+Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer): Integer;
 
 Var
   i : Integer;
@@ -690,14 +789,14 @@ Begin
     End;
   If (iIndex > 1) And (iIndex < iNumOfFields) Then
     Begin
-      iStart := PosOfNthChar(Ch, strText, iIndex - 1);
-      iEnd := PosOfNthChar(Ch, strText, iIndex);
+      iStart := PosOfNthChar(strText, Ch, iIndex - 1);
+      iEnd := PosOfNthChar(strText, Ch, iIndex);
       Result := Copy(strText, iStart + 1, iEnd - iStart - 1);
       Exit;
     End;
   If iIndex = iNumOfFields Then
     Begin
-      iStart := PosOfNthChar(Ch, strText, iIndex - 1);
+      iStart := PosOfNthChar(strText, Ch, iIndex - 1);
       Result := Copy(strText, iStart + 1, Length(strText) - iStart);
       Exit;
     End;
@@ -1108,26 +1207,51 @@ Begin
   End;
 End;
 
-  var
-    iPreviousMode : Integer;
+(**
 
-Const
-  BinNums = ['-', '0', '1'];
-  OctNums = BinNums + ['2', '3', '4', '5', '6', '7'];
-  HexNums = OctNums + ['8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+  This function converts a base 8 number to a base 2 (binary) number.
 
+  @precon  The given number must be in base 8 else an exception is raised.
+  @postcon The returned number is in base 2 (binary).
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function OctToBin(sDisplayNumber : String) : String;
 
 Begin
   OctToBin := DecToBin(OctToDec(sDisplayNumber));
 End;
 
+(**
+
+  This function converts a base 16 number to base 2 (binary).
+
+  @precon  The given number must be in base 8 else an exception is raised.
+  @postcon The returned number is in base 2 (binary).
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function HexToBin(sDisplayNumber : String) : String;
 
 Begin
   HexToBin := DecToBin(HexToDec(sDisplayNumber));
 End;
 
+(**
+
+  This function converts a base 10 (decimal) number to base 2 (binary).
+
+  @precon  The number must be a decimal floating point number else a exception is raised.
+  @postcon the returned number is in base 2 (binary)
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function DecToBin(sDisplayNumber : String) : String;
 
 Var
@@ -1150,18 +1274,51 @@ Begin
   DecToBin := sReturnString;
 End;
 
+(**
+
+  This function converts a binary base 2 number to base 8.
+
+  @precon  The given number must be in base 2 else an exception is raised.
+  @postcon The returned number is in base 8.
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function BinToOct(sDisplayNumber : String) : String;
 
 Begin
   BinToOct := DecToOct(BinToDec(sDisplayNumber));
 End;
 
+(**
+
+  This function converts a base 16 number to base 8.
+
+  @precon  The given number must be in base 16 else an exception is raised.
+  @postcon The returned number is in base 8.
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function HexToOct(sDisplayNumber : String) : String;
 
 Begin
   HexToOct := DecToOct(HexToDec(sDisplayNumber));
 End;
 
+(**
+
+  This function converts a decimal base 10 number into base 8.
+
+  @precon  The given number must be in base 10 else an exception is raised.
+  @postcon The returned number is in base 8.
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function DecToOct(sDisplayNumber : String) : String;
 
 Var
@@ -1181,24 +1338,68 @@ Begin
   DecToOct := sReturnString;
 End;
 
+(**
+
+  This function converts a binary base 2 number into a base 16 (hexidecimal) number.
+
+  @precon  The given number must be in binary else an exception is raised.
+  @postcon The returned number is on bse 16.
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function BinToHex(sDisplayNumber : String) : String;
 
 Begin
   BinToHex := DecToHex(BinToDec(sDisplayNumber));
 End;
 
+(**
+
+  This function converts as base 8 number to base 16.
+
+  @precon  The given number must be in base 8.
+  @postcon The returned number is in base 16.
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function OctToHex(sDisplayNumber : String) : String;
 
 Begin
   OctToHex := DecToHex(OctToDec(sDisplayNumber));
 End;
 
+(**
+
+  This function converts as decimal number into a hexidecimal number (base 16).
+
+  @precon  The given number must be in base 10 else an exception is raised.
+  @postcon The returned number is in base 16.
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function DecToHex(sDisplayNumber : String) : String;
 
 Begin
   DecToHex := IntToHex(Trunc(StrToFloat(sDisplayNumber)),0);
 End;
 
+(**
+
+  This function converts a binary number (base 2) into a decimal number.
+
+  @precon  The given number must be in base 2 else an exception is raised.
+  @postcon The returned number is in base 10 (decimal).
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function BinToDec(sDisplayNumber : String) : String;
 
 Var
@@ -1232,6 +1433,17 @@ Begin
     BinToDec := IntToStr(iResult);
 End;
 
+(**
+
+  This function converts a base 8 number into a decimal number.
+
+  @precon  The given number must be a base 8 number else an exception is raised.
+  @postcon The returned number is a base 10 (decimal) number.
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function OctToDec(sDisplayNumber : String) : String;
 
 Var
@@ -1265,6 +1477,17 @@ Begin
     OctToDec := IntToStr(iResult);
 End;
 
+(**
+
+  This function converts a base 16 number into a decimal number.
+
+  @precon  The given number must be a base 16 number else an exception is raised.
+  @postcon The returned number is a base 10 (decimal) number.
+
+  @param   sDisplayNumber as a String
+  @return  a String
+
+**)
 Function HexToDec(sDisplayNumber : String) : String;
 
 Var
@@ -1305,168 +1528,24 @@ Begin
     HexToDec := IntToStr(iResult);
 End;
 
-Procedure MathError(MsgStr : String);
+(**
 
-Begin
-  Raise EMathException.Create(MsgStr);
-End;
+  This function raises the number x to the power of y.
 
-Function Arcsin( X : Real ) : Real;
+  @precon  X can not be 0 else a exception is raised.
+  @postcon The x to the power y is returned.
 
-Begin                          { Uses the relationship          }
-  If X=-1.0 Then               { ArcSin(x) = Arctan |    x    | }
-    Begin                      {                    |---------| }
-      Arcsin:=-PI/2;           {                    | û(1-xý) | }
-      Exit;
-    End;
-  If X=1.0 Then
-    Begin
-      Arcsin:=PI/2;
-      Exit;
-    End;
-  If X > 1 Then
-    Begin
-      MathError('Invalid real number passed to Arc Sine Routine.');
-      ArcSin := 0;
-      Exit;
-    End;
-  Arcsin:=Arctan(X/Sqrt(1-Sqr(X)));
-End;
+  @param   X as a Real
+  @param   Y as a Real
+  @return  a Real
 
-Function Arccos( X : Real ) : Real;
-
-Var
-  Q : Real;
-
-Begin                          { Uses the relationship          }
-  If X=0 Then                  { ArcCos(x) = Arctan | û(1-xý) | }
-    Begin                      {                    |---------| }
-      ArcCos:=PI/2;            {                    |    x    | }
-      Exit;
-    End;
-  If X > 1 Then
-    Begin
-      MathError('Invalid real number passed to Arc Cosine Routine.');
-      ArcCos := 0;
-      Exit;
-    End;
-  Q:=Arctan(Sqrt(1-Sqr(X))/X);
-  If Q< 0.0 Then
-    Q:=Q+PI;
-  If (Q = 0) And (X = -1) Then
-    Q := PI;
-  Arccos:=Q;
-End;
-
-Function Tan( X : Real ) : Real;
-
-Begin                                 { Uses the relationship }
-  If (X = PI/2) Or (X = 3*PI/2) Then  { Tan = | Sin |         }
-     Tan := 9E35                      {       |-----|         }
-  Else                                {       | Cos |         }
-      Tan:=Sin(X)/Cos(X);
-End;
-
-Function Rad( X : Real) : Real;
-Begin
-  Rad := X * PI / 180;           { Radians = Degrees * pi/ 180 }
-End;
-
-Function Deg( X : Real) : Real;
-Begin
-  Deg := X * 180 / PI;           { Degrees = Radians * 180 / pi}
-End;
-
-Function Sub1(Z : Real) : Real;
-
-Var
-  Z1,Z2,Z3,A : Real;
-
-Begin                            { Converts Degrees.Minutes+Seconds }
-  A:=Z+0.0000001;                {   a decimal of a degree into     }
-  Z1:=Int(A);
-  Z2:=Int((A-Z1)*100);
-  Z3:=(((A-Z1)*100-Z2)*100);
-  If (Z2>=60.0) Or (Z3>=60.0) Then
-    Begin
-      MathError('Invalid real number, Degrees.Minutes+Seconds.');
-      Sub1 := 0;
-      Exit;
-    End;
-  Sub1:=Z1+Z2/60+Z3/3600;
-End;
-
-{ X as a decimal of a degree }
-
-Function Dmsstr(X : Real) : String;
-
-Var
-  B1,B2,B3 : Real;
-  Dms1,Dms2,Dms3 : String[5];
-
-Begin                       { Converts a decimal of a degree into   }
-  B1:=Int(X);               {   Degrees.Minutes+Seconds as a String }
-  B2:=Int((X-B1)*60);
-  B3:=(((X-B1)*60-B2)*60);
-  Str(B1:4:0,Dms1);
-  Str(B2:2:0,Dms2);
-  Str(B3:5:2,Dms3);
-  Dmsstr:=Dms1+Chr(248)+Dms2+Chr(39)+Dms3+Chr(34);
-End;
-
-{ X as a decimal of a degree }
-
-Function DmsNum(X : Real) : String;
-
-Var
-  B1,B2,B3,B : Real;
-  Dms1 : String[12];
-
-Begin                          { Converts a decimal of a degree into        }
-  B1:=Int(X);                  {   Degrees.Minutes+Seconds as a real Number }
-  B2:=Int((X-B1)*60);
-  B3:=(((X-B1)*60-B2)*60);
-  If (B2>=60.0) Or (B3>=60.0) Then
-    Begin
-      MathError('Invalid real number, Degrees.Minutes+Seconds.');
-      DmsNum := '0';
-      Exit;
-    End;
-  B := B1 + B2/100 + B3/10000;
-  Str(B:4:6,Dms1);
-  DmsNum:=Dms1;
-End;
-
-Function DmsReal(X : Real) : Real;
-
-Var
-  B1,B2,B3,B : Real;
-
-  Begin                          { Converts a decimal of a degree into        }
-  B1:=Int(X);                  {   Degrees.Minutes+Seconds as a real Number }
-  B2:=Int((X-B1)*60);
-  B3:=(((X-B1)*60-B2)*60);
-  B := B1 + B2/100 + B3/10000;
-  DmsReal := B;
-End;
-
-Function SquareRoot(X : Real) : Real;
-
-Begin
-  If X < 0 Then
-    Begin
-      MathError('Invalid real number passed to Square Root Routine.');
-      SquareRoot := 0;
-    End Else
-      SquareRoot := Sqrt(X);
-End;
-
+**)
 Function Pow(X, Y : Real) : Real;
 
 Begin
   If X = 0 Then
     Begin
-      MathError('Invalid number passed to Power Routine.');
+      Raise EMathException.Create('Invalid number passed to Power Routine.');
       Pow := 0;
       Exit;
     End;
@@ -1476,64 +1555,20 @@ Begin
     Pow := Exp(Y * Ln(X));
 End;
 
-Function Exponent(X : Real) : Real;
+(**
 
-Begin
-  Exponent := Exp(X);
-End;
+  This routine finds the inner most pair of parenthesis and returns the
+  start and end positions
 
-Function Lne(X : Real) : Real;
+  @precon  Equation is the equation to parse, PStart return the start of the inner most
+           section and PEnd return the end of the inner most section.
+  @postcon Returns the evaluation of the defined inner most section of the equation.
 
-Begin
-  If X > 0 Then
-    Lne := Ln(X)
-  Else
-    Begin
-      MathError('Invalid number passed to Log(e) Routine.');
-      Lne := 0;
-    End;
-End;
+  @param   Equation as a String
+  @param   PStart   as an Integer as a reference
+  @param   PEnd     as an Integer as a reference
 
-Function Inverse(X : Real) : Real;
-
-Begin
-  If X <> 0 Then
-    Inverse := 1/X
-  Else
-    Begin
-      MathError('Divide by Zero in the Inverse Routine.');
-      Inverse := 0;
-    End;
-End;
-
-Function Log(X : Real) : Real;         { Log(10) to Base 10 }
-
-Begin
-  If X > 0 Then
-    Log := Ln(X)/Ln(10)
-  Else
-    Begin
-      MathError('Invalid number passed to Log(10) Routine.');
-      Log := 0;
-    End;
-End;
-
-Const
-  ValidDelimiters = ['(',')','*','/','+','-'];
-
-{ -------------------------------------------------------------------------
-
-   This routine finds the inner most pair of parenthesis and returns the
-   start and end positions
-
-   FindParenthesis(
-     Equation    // Equation to parse as a string
-     PStart      // Return the start of the inner most section as an integer
-     PEnd        // Return the end of the inner most section as an integer
-   );
-
-  -------------------------------------------------------------------------- }
-
+**)
 Procedure FindParenthesis(Equation : String; var PStart, PEnd : Integer);
 
 Var
@@ -1559,18 +1594,19 @@ Begin
     End;
 End;
 
-{ -------------------------------------------------------------------------
+(**
 
-   This is the main routine for breaking down the equation in to pieces and
-   evaluate those piece and substituting the result back into the eqaution
-   until all expressions have been calculated.
+  This is the main routine for breaking down the equation in to pieces and
+  evaluate those piece and substituting the result back into the eqaution
+  until all expressions have been calculated.
 
-   Evaluate(
-     EquStr    // The expression to calculate
-   );
+  @precon  None.
+  @postcon Returns the evaluation of the given equation else raises an error.
 
-  -------------------------------------------------------------------------- }
+  @param   EquStr as a String
+  @return  a String
 
+**)
 Function Evaluate(EquStr : String) : String;
 
 Const
@@ -1696,29 +1732,30 @@ Begin
   Evaluate := TempStr;
 End;
 
-{ -------------------------------------------------------------------------
+(**
 
-   If a function is suspected then the routine tries to evaluate the
-   function
+  If a function is suspected then the routine tries to evaluate the
+  function
 
-   GetFunction(
-     Funct    // Function name as a string
-     Number   // One or more comma delimited values for the function as a
-              //   string
-   );
+  @precon  Funct is the name of the function to undertaken in number Number.
+  @postcon The result if the function us returned else an exception is raised.
 
-  -------------------------------------------------------------------------- }
+  @param   Funct  as a String
+  @param   Number as a String
+  @return  a Double
 
+**)
 Function GetFunction(Funct, Number : String) : Double;
 
 Var
   RealNumber : Double;
-  ErrorCode : Integer;
+  iErrorCode : Integer;
   X, Y : Double;
+  recBearing : TBearing;
 
 Begin
-  Val(Number, RealNumber, ErrorCode);
-  If ErrorCode = 0 Then
+  Val(Number, RealNumber, iErrorCode);
+  If iErrorCode = 0 Then
     Begin
       If Funct = 'SIN' Then
         Result := Sin(RealNumber)
@@ -1735,25 +1772,30 @@ Begin
       Else If Funct = 'SQR' Then
         Result := Sqr(RealNumber)
       Else If Funct = 'SQRT' Then
-        Result := Squareroot(RealNumber)
+        Result := Sqrt(RealNumber)
       Else If Funct = 'RAD' Then
-        Result := Rad(RealNumber)
+        Result := DegToRad(RealNumber)
       Else If Funct = 'DEG' Then
-        Result := Deg(RealNumber)
+        Result := RadToDeg(RealNumber)
       Else If Funct = 'DMS' Then
-        Result := DmsReal(RealNumber)
+        Begin
+          recBearing := DecimalToDMS(RealNumber);
+          Val(Format('%d.%2.2d%2.2d%2.2d', [recBearing.iDegrees,
+            recBearing.iMinutes, recBearing.iSeconds, recBearing.iHundreds]), Result,
+            iErrorCode);
+        End
       Else If Funct = 'DEC' Then
-        Result := Sub1(RealNumber)
+        Result := DMSAsDecToDecimal(RealNumber)
       Else If Funct = 'EXP' Then
-        Result := Exponent(RealNumber)
+        Result := Exp(RealNumber)
       Else If Funct = 'LN' Then
-        Result := Lne(RealNumber)
+        Result := Log2(RealNumber)
       Else If Funct = 'INV' Then
-        Result := Inverse(RealNumber)
+        Result := 1.0 / RealNumber
       Else If Funct = 'INT' Then
         Result := Int(RealNumber)
       Else If Funct = 'LOG' Then
-        Result := LOG(RealNumber)
+        Result := Log10(RealNumber)
       Else If Funct = 'ABS' Then
         Result := Abs(RealNumber)
       Else If Funct = 'NOT' Then
@@ -1769,60 +1811,67 @@ Begin
     End Else
       If Funct = 'POW' Then
         Begin
-          Val(Copy(Number,1,Pos(',', Number) - 1), X, ErrorCode);
-          Val(Copy(Number,Pos(',', Number) + 1,Length(Number) - Pos(',', Number)), Y, ErrorCode);
+          Val(Copy(Number,1,Pos(',', Number) - 1), X, iErrorCode);
+          Val(Copy(Number,Pos(',', Number) + 1,Length(Number) - Pos(',', Number)), Y, iErrorCode);
           Result := Pow(X,Y);
         End
       Else If Funct = 'AND' Then
         Begin
-          Val(Copy(Number,1,Pos(',',Number)-1),X,ErrorCode);
-          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)),Y,ErrorCode);
+          Val(Copy(Number,1,Pos(',',Number)-1), X, iErrorCode);
+          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)), Y, iErrorCode);
           Result := (Trunc(X) And Trunc(Y));
         End
       Else If Funct = 'OR' Then
         Begin
-          Val(Copy(Number,1,Pos(',',Number)-1),X,ErrorCode);
-          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)),Y,ErrorCode);
+          Val(Copy(Number,1,Pos(',',Number)-1), X, iErrorCode);
+          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)), Y, iErrorCode);
           Result := (Trunc(X) Or Trunc(Y));
         End
       Else If Funct = 'XOR' Then
         Begin
-          Val(Copy(Number,1,Pos(',',Number)-1),X,ErrorCode);
-          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)),Y,ErrorCode);
+          Val(Copy(Number,1,Pos(',',Number)-1), X, iErrorCode);
+          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)), Y, iErrorCode);
           Result := (Trunc(X) Xor Trunc(Y));
         End
       Else If Funct = 'DIV' Then
         Begin
-          Val(Copy(Number,1,Pos(',',Number)-1),X,ErrorCode);
-          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)),Y,ErrorCode);
+          Val(Copy(Number,1,Pos(',',Number)-1), X, iErrorCode);
+          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)), Y, iErrorCode);
           Result := (Trunc(X) Div Trunc(Y));
         End
       Else If Funct = 'MOD' Then
         Begin
-          Val(Copy(Number,1,Pos(',',Number)-1),X,ErrorCode);
-          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)),Y,ErrorCode);
+          Val(Copy(Number,1,Pos(',',Number)-1), X, iErrorCode);
+          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)), Y, iErrorCode);
           Result := (Trunc(X) Mod Trunc(Y));
         End
       Else If Funct = 'SHL' Then
         Begin
-          Val(Copy(Number,1,Pos(',',Number)-1),X,ErrorCode);
-          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)),Y,ErrorCode);
+          Val(Copy(Number,1,Pos(',',Number)-1), X, iErrorCode);
+          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)), Y, iErrorCode);
           Result := (Trunc(X) Shl Trunc(Y));
         End
       Else If Funct = 'SHR' Then
         Begin
-          Val(Copy(Number,1,Pos(',',Number)-1),X,ErrorCode);
-          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)),Y,ErrorCode);
+          Val(Copy(Number,1,Pos(',',Number)-1), X, iErrorCode);
+          Val(Copy(Number,Pos(',',Number)+1,Length(Number)-Pos(',',Number)), Y, iErrorCode);
           Result := (Trunc(X) Shr Trunc(Y));
         End Else
           Raise Exception.CreateFmt('Invalid function [%s].', [Funct]);
 End;
 
-{ Main Equation Evaluation Engine }
 
-Const
-  Bases = ['B', 'O', 'H'];
+(**
 
+  This function determine whether there is a delimiter in the given string.
+
+  @precon  None.
+  @postcon Returns true if a delimiter is found.
+
+  @param   sString as a String
+  @return  a Boolean
+
+**)
 Function FindDelimiter(sString : String) : Boolean;
 
 Var
@@ -1838,17 +1887,18 @@ Begin
       End;
 End;
 
-{ -------------------------------------------------------------------------
+(**
 
-   This is the main entry point, pass a string representing an express and
-   a doube value is returned.
+  This is the main entry point, pass a string representing an express and
+  a doube value is returned.
 
-   EvauateEquation(
-     EquStr   // Expression to evaluate as a string
-   );         // Returns the result as a double
+  @precon  None.
+  @postcon Evaluates the given equation and returns the result as a double.
 
-  -------------------------------------------------------------------------- }
+  @param   strEquation as a String constant
+  @return  a Double
 
+**)
 Function EvaluateEquation(Const strEquation :String) : Double;
 
 Var
@@ -1944,23 +1994,63 @@ End;
 
   ------------------------------------------------------------------------- }
 
+(**
+
+  This is a getter method for the EndChainage property.
+
+  @precon  None.
+  @postcon Returns the EndChainage of a horizontal element.
+
+  @return  a Double
+
+**)
 function THBaseElement.GetEndChainage: Double;
 
 begin
   Result := FChainage + FLength;
 end;
 
+(**
+
+  This is a getter method for the EndPoint property.
+
+  @precon  None.
+  @postcon Returns the end coordinate and bearing of a horizontal element.
+
+  @return  a THInfo
+
+**)
 function THBaseElement.GetEndPoint: THInfo;
 begin
   Result := Setout(FChainage + FLength, 0);
 end;
 
+(**
+
+  This is a getter method for the StartChainage property.
+
+  @precon  None.
+  @postcon Returns the start chainage of the horizontal element.
+
+  @return  a Double
+
+**)
 function THBaseElement.GetStartChainage: Double;
 
 begin
   Result := FChainage;
 end;
 
+(**
+
+  This is a getter method for the StartPoint property.
+
+  @precon  None.
+  @postcon returns the start coordindate and bearing of the horizontal element.
+
+  @return  a THInfo
+
+**)
 function THBaseElement.GetStartPoint: THInfo;
 begin
   Result := Setout(FChainage, 0);
@@ -1972,6 +2062,21 @@ end;
 
   ------------------------------------------------------------------------- }
 
+(**
+
+  This function compares a line from the given coordinate with a given bearing and finds
+  the intersection point this this straight horizontal element.
+
+  @precon  None.
+  @postcon Returns a horizontal compare record containing the intersection information
+           for the compare.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @return  a THCompInfo
+
+**)
 function THStraightElement.Compare(dblEasting, dblNorthing,
   dblBearing: Double): THCompInfo;
 
@@ -1993,6 +2098,20 @@ begin
   Result.dblNorthing := rec.dblNorthing;
 end;
 
+(**
+
+  This is the constructor method for the THStraightElement class.
+
+  @precon  Requires the coordinates, chainage and bearing of the straight element.
+  @postcon The element is created.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+
+**)
 constructor THStraightElement.Create(dblEasting, dblNorthing, dblBearing,
   dblChainage, dblLength: Double);
 
@@ -2008,12 +2127,33 @@ begin
       'The length of an element can not be Zero or Negative.');
 end;
 
+(**
+
+  This function returns the type of element as a straight element.
+
+  @precon  None.
+  @postcon Returns the type of element as a straight element.
+
+  @return  a TElementType
+
+**)
 function THStraightElement.ElementType: TElementType;
 
 begin
   Result := etStraight;
 end;
 
+(**
+
+  This is a getter method for the ElementDetails property.
+
+  @precon  None.
+  @postcon Returns the details the make up the element information in a horizontal element
+           record.
+
+  @return  a THElement
+
+**)
 function THStraightElement.GetElementDetails: THElement;
 
 begin
@@ -2027,11 +2167,36 @@ begin
     End;
 end;
 
+(**
+
+  This is a getter method for the Radius property.
+
+  @precon  None.
+  @postcon Returns a dummy number as a straight line has no radius.
+
+  @param   dblChainage as a Double
+  @return  a Double
+
+**)
 function THStraightElement.GetRadius(dblChainage: Double): Double;
 begin
   Result := 999999.9000;
 end;
 
+(**
+
+  This function measures the offset and chainage of the given coordinates to this straight
+  line horizontal element.
+
+  @precon  None.
+  @postcon Returns the measure information for the chainage and offset of the given
+           coordinates to the straight element.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @return  a THInfo
+
+**)
 function THStraightElement.Measure(dblEasting, dblNorthing: Double): THInfo;
 
 Var
@@ -2046,6 +2211,20 @@ begin
   Result.dblBearing := FBearing;
 end;
 
+(**
+
+  This function returns the coordinates and bearing of the straight line at a given
+  chainage and offset.
+
+  @precon  None.
+  @postcon Returns the coordinates and bearing of the straight line at a given
+           chainage and offset.
+
+  @param   dblChainage as a Double
+  @param   dblOffset   as a Double
+  @return  a THInfo
+
+**)
 function THStraightElement.Setout(dblChainage, dblOffset: Double): THInfo;
 
 Var
@@ -2066,6 +2245,21 @@ end;
 
   ------------------------------------------------------------------------- }
 
+(**
+
+  This function finds the intersection of the given coordinates and bearing with this
+  circular curve.
+
+  @precon  The line must intersect with the curve else an exception is raised.
+  @postcon Finds the intersections of the coordinates and bearing and returns them in a
+           horizontal compare record.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @return  a THCompInfo
+
+**)
 function THCircularElement.Compare(dblEasting, dblNorthing,
   dblBearing: Double): THCompInfo;
 
@@ -2145,6 +2339,24 @@ begin
   Result.dblDistance := dblDist;
 end;
 
+(**
+
+  This is the constructor method for the THCircularElement class.
+
+  @precon  Requires either the centre of the circle or a point on its circumference,
+           a start chainage, bearing, length and radius. Positive radii are right hand
+           curves and negative radii are left hand curves.
+  @postcon A circular element is created.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblChainage as a Double
+  @param   dblBearing  as a Double
+  @param   dblLength   as a Double
+  @param   dblRadius   as a Double
+  @param   bCentre     as a Boolean
+
+**)
 constructor THCircularElement.Create(dblEasting, dblNorthing, dblChainage,
   dblBearing, dblLength, dblRadius: Double; bCentre: Boolean);
 
@@ -2178,11 +2390,31 @@ begin
     End;
 end;
 
+(**
+
+  This function returns an element type of circular.
+
+  @precon  None.
+  @postcon Returns an element type of circular.
+
+  @return  a TElementType
+
+**)
 function THCircularElement.ElementType: TElementType;
 begin
   Result := etCircular;
 end;
 
+(**
+
+  This is a getter method for the ElementDetails property.
+
+  @precon  None.
+  @postcon Returns the details about the elements construction.
+
+  @return  a THElement
+
+**)
 function THCircularElement.GetElementDetails: THElement;
 begin
   With Result Do
@@ -2196,11 +2428,34 @@ begin
     End;
 end;
 
+(**
+
+  This is a getter method for the Radius property.
+
+  @precon  None.
+  @postcon Returns the radius of the circular curve.
+
+  @param   dblChainage as a Double
+  @return  a Double
+
+**)
 function THCircularElement.GetRadius(dblChainage: Double): Double;
 begin
   Result := FRadius;
 end;
 
+(**
+
+  This method finds the chainage and offset to this curve for the given coordinates.
+
+  @precon  None.
+  @postcon Returns the chainage and offset for the given coordinate to this curve.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @return  a THInfo
+
+**)
 function THCircularElement.Measure(dblEasting, dblNorthing: Double): THInfo;
 
 Var
@@ -2239,6 +2494,20 @@ begin
     End;
 end;
 
+(**
+
+  This method returns the coordinates corresponding to the gven chanage and offset in this
+  curve.
+
+  @precon  None.
+  @postcon Returns the coordinates corresponding to the gven chanage and offset in this
+           curve.
+
+  @param   dblChainage as a Double
+  @param   dblOffset   as a Double
+  @return  a THInfo
+
+**)
 function THCircularElement.Setout(dblChainage, dblOffset: Double): THInfo;
 
 Var
@@ -2267,21 +2536,26 @@ end;
 
   ------------------------------------------------------------------------- }
 
-{ -------------------------------------------------------------------------
+(**
 
-   The principle of this procedure is to solve the intersection of the
-   straight line and the transition curve in a local coordinate system
-   around the origin of the transition curve.
+  The principle of this procedure is to solve the intersection of the
+  straight line and the transition curve in a local coordinate system
+  around the origin of the transition curve.
 
-   The first section of the code converts the global coordinates to the
-   local coordinate system and then the solution is sort by an iteration
-   using Newton-Raphson appling the straight line equation y=mx+c into
-   the standard transition formulea - see the end of file for them.
+  The first section of the code converts the global coordinates to the
+  local coordinate system and then the solution is sort by an iteration
+  using Newton-Raphson appling the straight line equation y=mx+c into
+  the standard transition formulea - see the end of file for them.
 
-   (
-   );
+  @precon  None.
+  @postcon Returns the compare information record for the given intersection.
 
-  -------------------------------------------------------------------------- }
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @return  a THCompInfo
+
+**)
 function THClothoidElement.Compare(dblEasting, dblNorthing,
   dblBearing: Double): THCompInfo;
 
@@ -2362,6 +2636,23 @@ begin
   Result.dblDistance := dblSS;
 end;
 
+(**
+
+  This is the constructor method for the THClothoidElement class.
+
+  @precon  Requires the original of the transition curve, its Radius * Length value,
+           origin bearing, start chainage and origin chainage
+  @postcon The class is created.
+
+  @param   dblOEasting   as a Double
+  @param   dblONorthing  as a Double
+  @param   dblOChainage  as a Double
+  @param   dblStChainage as a Double
+  @param   dblOBearing   as a Double
+  @param   dblLength     as a Double
+  @param   dblRLValue    as a Double
+
+**)
 constructor THClothoidElement.Create(dblOEasting, dblONorthing,
   dblOChainage, dblStChainage, dblOBearing, dblLength, dblRLValue: Double);
 begin
@@ -2381,6 +2672,22 @@ begin
       'A horizontal clothoid must have a non-zero RL value.');
 end;
 
+(**
+
+  This is the constructor method for the THClothoidElement class.
+
+  @precon  This constructor creates a transition element with a false origin.
+  @postcon The class is created.
+
+  @param   dblEasting   as a Double
+  @param   dblNorthing  as a Double
+  @param   dblChainage  as a Double
+  @param   dblBearing   as a Double
+  @param   dblLength    as a Double
+  @param   dblStRadius  as a Double
+  @param   dblEndRadius as a Double
+
+**)
 constructor THClothoidElement.CreateFalse(dblEasting, dblNorthing, dblChainage,
       dblBearing, dblLength, dblStRadius, dblEndRadius : Double);
 
@@ -2463,11 +2770,31 @@ begin
     End;
 end;
 
+(**
+
+  This function returns the type of element as Clothoid.
+
+  @precon  None.
+  @postcon Returns the type of element as Clothoid.
+
+  @return  a TElementType
+
+**)
 function THClothoidElement.ElementType: TElementType;
 begin
   Result := etClothoid;
 end;
 
+(**
+
+  This is a getter method for the ElementDetails property.
+
+  @precon  None.
+  @postcon Returns the horizontal elements details.
+
+  @return  a THElement
+
+**)
 function THClothoidElement.GetElementDetails: THElement;
 begin
   With Result Do
@@ -2482,6 +2809,17 @@ begin
     End;
 end;
 
+(**
+
+  This is a getter method for the Radius property.
+
+  @precon  Requires the chainage at which the radius is needed.
+  @postcon Returns the radius at the given chainage.
+
+  @param   dblChainage as a Double
+  @return  a Double
+
+**)
 function THClothoidElement.GetRadius(dblChainage: Double): Double;
 begin
   If dblChainage <> FOChainage Then
@@ -2490,11 +2828,34 @@ begin
     Result := 999999.9000;
 end;
 
+(**
+
+  This is a getter method for the Theta property.
+
+  @precon  Requires the chainage at which Theta (bearing change from origin) is required
+  @postcon Returns the given angle.
+
+  @param   dblDistance as a Double
+  @return  a Double
+
+**)
 function THClothoidElement.GetTheta(dblDistance : Double): Double;
 begin
   Result := Sqr(dblDistance) / ( 2 * FRLValue);
 end;
 
+(**
+
+  This is a getter method for the X property.
+
+  @precon  Requires the distance from the origin for which X (distance from the origin at
+           the origin bearing) must be calculated
+  @postcon The X coordinate is returned.
+
+  @param   dblDistance as a Double
+  @return  a Double
+
+**)
 function THClothoidElement.GetX(dblDistance : Double): Double;
 
 Var
@@ -2507,6 +2868,18 @@ begin
     Power(dblDistance, 11) / (42240 * Power(K, 5));
 end;
 
+(**
+
+  This is a getter method for the Y property.
+
+  @precon  Requires the distance from the origin for which Y (distance from the origin at
+           the origin bearing) must be calculated
+  @postcon The Y coordinate is returned.
+
+  @param   dblDistance as a Double
+  @return  a Double
+
+**)
 function THClothoidElement.GetY(dblDistance : Double): Double;
 
 Var
@@ -2518,6 +2891,18 @@ begin
     Power(dblDistance, 9) / (3456 * Power(K, 4));
 end;
 
+(**
+
+  This method returns the chainage and offset of the given coordinate to this curve.
+
+  @precon  None.
+  @postcon Returns the chainage and offset of the given coordinate to this curve.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @return  a THInfo
+
+**)
 function THClothoidElement.Measure(dblEasting, dblNorthing: Double): THInfo;
 
 Var
@@ -2547,6 +2932,18 @@ begin
     Result.dblOffset := -Vector.dblDistance;
 end;
 
+(**
+
+  This method finds the coordinates of the given chainage and offset to this curve.
+
+  @precon  None.
+  @postcon Returns the coordinates of the given chainage and offset to this curve.
+
+  @param   dblChainage as a Double
+  @param   dblOffset   as a Double
+  @return  a THInfo
+
+**)
 function THClothoidElement.Setout(dblChainage, dblOffset: Double): THInfo;
 
 Var
@@ -2580,21 +2977,61 @@ end;
 
  -------------------------------------------------------------------------- }
 
+(**
+
+  This is a getter method for the EndChainage property.
+
+  @precon  None.
+  @postcon Returns the end chainage of the vertical element.
+
+  @return  a Double
+
+**)
 function TVBaseElement.GetEndChainage: Double;
 begin
   Result := FChainage + FLength;
 end;
 
+(**
+
+  This is a getter method for the EndPoint property.
+
+  @precon  None.
+  @postcon Returns the end point information for the vertical element.
+
+  @return  a TVInfo
+
+**)
 function TVBaseElement.GetEndPoint: TVInfo;
 begin
   Result := Setout(FChainage + FLength);
 end;
 
+(**
+
+  This is a getter method for the StartChainage property.
+
+  @precon  None.
+  @postcon Returns the start chainage of the element.
+
+  @return  a Double
+
+**)
 function TVBaseElement.GetStartChainage: Double;
 begin
   Result := FChainage;
 end;
 
+(**
+
+  This is a getter method for the StartPoint property.
+
+  @precon  None.
+  @postcon Returns the start point information of the element.
+
+  @return  a TVInfo
+
+**)
 function TVBaseElement.GetStartPoint: TVInfo;
 begin
   Result := Setout(FChainage);
@@ -2606,6 +3043,19 @@ end;
 
  -------------------------------------------------------------------------- }
 
+(**
+
+  This is the constructor method for the TVStraightElement class.
+
+  @precon  Requires the level, gradient and chainage of the element start point.
+  @postcon the element is created.
+
+  @param   dblLevel    as a Double
+  @param   dblGradient as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+
+**)
 constructor TVStraightElement.Create(dblLevel, dblGradient, dblChainage,
   dblLength: Double);
 begin
@@ -2619,11 +3069,31 @@ begin
       'The length of an element can not be Zero or Negative.');
 end;
 
+(**
+
+  This function returns the element type as straight.
+
+  @precon  None.
+  @postcon Returns the element type as straight.
+
+  @return  a TElementType
+
+**)
 function TVStraightElement.ElementType: TElementType;
 begin
   Result := etStraight;
 end;
 
+(**
+
+  This is a getter method for the ElementDetails property.
+
+  @precon  None.
+  @postcon Returns the elements details.
+
+  @return  a TVStraight
+
+**)
 function TVStraightElement.GetElementDetails: TVStraight;
 begin
   With Result Do
@@ -2635,11 +3105,33 @@ begin
     End;
 end;
 
+(**
+
+  This is a getter method for the Radius property.
+
+  @precon  None.
+  @postcon Returns a dummy radius for the straight curve.
+
+  @param   dblChainage as a Double
+  @return  a Double
+
+**)
 function TVStraightElement.GetRadius(dblChainage: Double): Double;
 begin
   Result := 999999.9000;
 end;
 
+(**
+
+  This method gets the level and gradient of the curve at the given chainage.
+
+  @precon  None
+  @postcon Returns the level and gradient of the curve at the given chainage.
+
+  @param   dblChainage as a Double
+  @return  a TVInfo
+
+**)
 function TVStraightElement.Setout(dblChainage: Double): TVInfo;
 begin
   Result.dblLevel := FLevel + FGradient * (dblChainage - FChainage);
@@ -2652,6 +3144,21 @@ end;
 
  -------------------------------------------------------------------------- }
 
+(**
+
+  This is the constructor method for the TVCircularElement class.
+
+  @precon  Requires the level, gradient, chainage, length and radius of the curve start
+           point.
+  @postcon The class is created.
+
+  @param   dblLevel    as a Double
+  @param   dblGradient as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+  @param   dblRadius   as a Double
+
+**)
 constructor TVCircularElement.Create(dblLevel, dblGradient, dblChainage,
   dblLength, dblRadius: Double);
 begin
@@ -2669,11 +3176,31 @@ begin
       'curve can not be zero.');
 end;
 
+(**
+
+  This method returns the element type as Circular.
+
+  @precon  None.
+  @postcon Returns the element type as Circular.
+
+  @return  a TElementType
+
+**)
 function TVCircularElement.ElementType: TElementType;
 begin
   Result := etCircular;
 end;
 
+(**
+
+  This is a getter method for the ElementDetails property.
+
+  @precon  None.
+  @postcon Returns the details of the elements construction.
+
+  @return  a TVCircular
+
+**)
 function TVCircularElement.GetElementDetails: TVCircular;
 begin
   With Result Do
@@ -2686,11 +3213,33 @@ begin
     End;
 end;
 
+(**
+
+  This is a getter method for the Radius property.
+
+  @precon  None.
+  @postcon Returns the radius of the curve at the given point.
+
+  @param   dblChainage as a Double
+  @return  a Double
+
+**)
 function TVCircularElement.GetRadius(dblChainage: Double): Double;
 begin
   Result := FRadius;
 end;
 
+(**
+
+  This method gets the level and gradient of the curve at the given chainage.
+
+  @precon  None
+  @postcon Returns the level and gradient of the curve at the given chainage.
+
+  @param   dblChainage as a Double
+  @return  a TVInfo
+
+**)
 function TVCircularElement.Setout(dblChainage: Double): TVInfo;
 begin
   Result.dblLevel := FLevel + FGradient * (dblChainage - FChainage) +
@@ -2704,6 +3253,20 @@ end;
 
   ------------------------------------------------------------------------- }
 
+(**
+
+  A method to add a straight element to the end of the horizontal alignment.
+
+  @precon  Requires the information defining the straight line.
+  @postcon A straight element is added to the end of the collection.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+
+**)
 procedure THAlignmentCollection.AddStraight(dblEasting, dblNorthing,
   dblBearing, dblChainage, dblLength: Double);
 
@@ -2719,6 +3282,22 @@ begin
     OnChange(Self);
 end;
 
+(**
+
+  A method to add a circular element to the end of the horizontal alignment.
+
+  @precon  Requires the information defining the circular element.
+  @postcon A circular element is added to the end of the collection.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @param   dblChainage as a Double
+  @param   dblRadius   as a Double
+  @param   dblLength   as a Double
+  @param   bCentre     as a Boolean
+
+**)
 procedure THAlignmentCollection.AddCircular(dblEasting, dblNorthing,
   dblBearing, dblChainage, dblRadius, dblLength: Double; bCentre: Boolean);
 
@@ -2734,6 +3313,22 @@ begin
      OnChange(Self);
 end;
 
+(**
+
+  A method to add a clothoid element to the end of the horizontal alignment.
+
+  @precon  Requires the information defining the clothoid element.
+  @postcon A clothoid element is added to the end of the collection.
+
+  @param   dblEasting    as a Double
+  @param   dblNorthing   as a Double
+  @param   dblBearing    as a Double
+  @param   dblOChainage  as a Double
+  @param   dblStChainage as a Double
+  @param   dblRLValue    as a Double
+  @param   dblLength     as a Double
+
+**)
 procedure THAlignmentCollection.AddClothoid(dblEasting, dblNorthing,
   dblBearing, dblOChainage, dblStChainage, dblRLValue, dblLength: Double);
 
@@ -2749,6 +3344,23 @@ begin
      OnChange(Self);
 end;
 
+(**
+
+  A method to add a clothoid element with a false origin to the end of the horizontal
+  alignment.
+
+  @precon  Requires the information defining the clothoid element.
+  @postcon A clothoid element is added to the end of the collection.
+
+  @param   dblEasting   as a Double
+  @param   dblNorthing  as a Double
+  @param   dblBearing   as a Double
+  @param   dblChainage  as a Double
+  @param   dblLength    as a Double
+  @param   dblStRadius  as a Double
+  @param   dblEndRadius as a Double
+
+**)
 procedure THAlignmentCollection.AddClothoidFalse(dblEasting, dblNorthing,
   dblBearing, dblChainage, dblLength, dblStRadius, dblEndRadius: Double);
 
@@ -2764,12 +3376,30 @@ begin
      OnChange(Self);
 end;
 
+(**
+
+  This function returns the number of horizontal elements in the collection.
+
+  @precon  None.
+  @postcon Returns the number of horizontal elements in the collection.
+
+  @return  an Integer
+
+**)
 function THAlignmentCollection.Count: Integer;
 
 begin
   Result := FHElements.Count;
 end;
 
+(**
+
+  This is the constructor method for the THAlignmentCollection class.
+
+  @precon  None.
+  @postcon The horizontal alignment collection is created.
+
+**)
 constructor THAlignmentCollection.Create;
 begin
   Inherited Create;
@@ -2779,6 +3409,14 @@ begin
   FModified := False;
 end;
 
+(**
+
+  This is the destructor method for the THAlignmentCollection class.
+
+  @precon  Frees any allocated elements and the frees itself.
+  @postcon Class collection is destroyed.
+
+**)
 destructor THAlignmentCollection.Destroy;
 
 Var
@@ -2792,36 +3430,101 @@ begin
   Inherited;
 end;
 
+(**
+
+  This method returns the type of horizontal element corresponds to the indexed item.
+
+  @precon  The index must be a valid index between 1 and Count.
+  @postcon Returns the type of horizontal element corresponds to the indexed item.
+
+  @param   iElement as an Integer
+  @return  a TElementType
+
+**)
 function THAlignmentCollection.ElementType(iElement: Integer): TElementType;
 
 begin
   Result := THBaseElement(FHElements[iElement]).ElementType;
 end;
 
+(**
+
+  This method returns the start information for the indexed element.
+
+  @precon  The index must be a valid index between 1 and Count.
+  @postcon Returns the start information for the indexed element.
+
+  @param   iElement as an Integer
+  @return  a THInfo
+
+**)
 function THAlignmentCollection.GetElementStart(iElement: Integer): THInfo;
 
 begin
   Result := THBaseElement(FHElements[iElement]).GetStartPoint;
 end;
 
+(**
+
+  This method returns the end information for the indexed element.
+
+  @precon  The index must be a valid index between 1 and Count.
+  @postcon Returns the end information for the indexed element.
+
+  @param   iElement as an Integer
+  @return  a THInfo
+
+**)
 function THAlignmentCollection.GetElementEnd(iElement: Integer): THInfo;
 
 begin
   Result := THBaseElement(FHElements[iElement]).GetEndPoint;
 end;
 
+(**
+
+  This function returns the end chainage for the indexed element.
+
+  @precon  The index must be a valid index between 1 and Count.
+  @postcon Returns the end chainage for the indexed element.
+
+  @param   iElement as an Integer
+  @return  a Double
+
+**)
 function THAlignmentCollection.GetEndChainage(iElement: Integer): Double;
 
 begin
   Result := THBaseElement(FHElements[iElement]).GetEndChainage;
 end;
 
+(**
+
+  This function returns the start chainage for the indexed element.
+
+  @precon  The index must be a valid index between 1 and Count.
+  @postcon Returns the start chainage for the indexed element.
+
+  @param   iElement as an Integer
+  @return  a Double
+
+**)
 function THAlignmentCollection.GetStartChainage(iElement: Integer): Double;
 
 begin
   Result := THBaseElement(FHElements[iElement]).GetStartChainage;
 end;
 
+(**
+
+  This method loads a horizontal alignment from an INI type file.
+
+  @precon  None.
+  @postcon The horizontal alignment is loaded from the given filename.
+
+  @param   strFileName as a String
+
+**)
 procedure THAlignmentCollection.LoadFromFile(strFileName: String);
 
 Var
@@ -2871,6 +3574,16 @@ begin
   Modified := False;
 end;
 
+(**
+
+  This method saves the horzontal alignment to the given filename in an INI file type.
+
+  @precon  None.
+  @postcon Saves the horzontal alignment to the given filename in an INI file type.
+
+  @param   strFileName as a String
+
+**)
 procedure THAlignmentCollection.SaveToFile(strFileName: String);
 
 Var
@@ -2878,6 +3591,19 @@ Var
   iElement : Integer;
   recElement : THElement;
 
+  (**
+
+    This procedure writes a specific item (integer) of the horizontal element to the INI
+    file.
+
+    @precon  None.
+    @postcon The item (integer) is written to the INI file.
+
+    @param   iElement as an Integer
+    @param   strItem  as a String
+    @param   dblValue as a Double
+
+  **)
   Procedure WriteItem(iElement : Integer; strItem : String;
     dblValue : Double); Overload;
 
@@ -2885,6 +3611,19 @@ Var
     iniFile.WriteFloat(Format('HElement%d', [iElement + 1]), strItem, dblValue);
   End;
 
+  (**
+
+    This procedure writes a specific item (double) of the horizontal element to the INI
+    file.
+
+    @precon  None.
+    @postcon The item (double) is written to the INI file.
+
+    @param   iElement as an Integer
+    @param   strItem  as a String
+    @param   iValue   as an Integer
+
+  **)
   Procedure WriteItem(iElement : Integer; strItem : String;
     iValue : Integer); Overload;
 
@@ -2938,24 +3677,74 @@ begin
   Modified := False;
 end;
 
+(**
+
+  This method gets the circular element information for the given indexed element.
+
+  @precon  The index must be a valid index between 1 and Count.
+  @postcon Gets the circular element information for the given indexed element.
+
+  @param   iElement as an Integer
+  @return  a THElement
+
+**)
 function THAlignmentCollection.GetCircular(iElement: Integer): THElement;
 
 begin
   Result := THCircularElement(FHElements[iElement]).GetElementDetails;
 end;
 
+(**
+
+  This method gets the clothoid element information for the given indexed element.
+
+  @precon  The index must be a valid index between 1 and Count.
+  @postcon Gets the clothoid element information for the given indexed element.
+
+  @param   iElement as an Integer
+  @return  a THElement
+
+**)
 function THAlignmentCollection.GetClothoid(iElement: Integer): THElement;
 
 begin
   Result := THClothoidElement(FHElements[iElement]).GetElementDetails;
 end;
 
+(**
+
+  This method gets the straight element information for the given indexed element.
+
+  @precon  The index must be a valid index between 1 and Count.
+  @postcon Gets the straight element information for the given indexed element.
+
+  @param   iElement as an Integer
+  @return  a THElement
+
+**)
 function THAlignmentCollection.GetStraight(iElement: Integer): THElement;
 
 begin
   Result := THStraightElement(FHElements[iElement]).GetElementDetails;
 end;
 
+(**
+
+  This method updates an indexed circular horizontal element.
+
+  @precon  Requires the new information for the element.
+  @postcon Updates the indexed element.
+
+  @param   iELement    as an Integer
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @param   dblChainage as a Double
+  @param   dblRadius   as a Double
+  @param   dblLength   as a Double
+  @param   bCentre     as a Boolean
+
+**)
 procedure THAlignmentCollection.UpdateCircular(iELement : Integer; dblEasting,
   dblNorthing, dblBearing, dblChainage, dblRadius, dblLength: Double;
   bCentre: Boolean);
@@ -2980,6 +3769,22 @@ begin
    OnChange(Self);
 end;
 
+(**
+  This method updates an indexed clothoid horizontal element.
+
+  @precon  Requires the new information for the element.
+  @postcon Updates the indexed element.
+
+  @param   iElement      as an Integer
+  @param   dblEasting    as a Double
+  @param   dblNorthing   as a Double
+  @param   dblBearing    as a Double
+  @param   dblOChainage  as a Double
+  @param   dblStChainage as a Double
+  @param   dblRLValue    as a Double
+  @param   dblLength     as a Double
+
+**)
 procedure THAlignmentCollection.UpdateClothoid(iElement : Integer; dblEasting,
   dblNorthing, dblBearing, dblOChainage, dblStChainage, dblRLValue,
   dblLength: Double);
@@ -3004,6 +3809,21 @@ begin
    OnChange(Self);
 end;
 
+(**
+
+  This method updates an indexed straight horizontal element.
+
+  @precon  Requires the new information for the element.
+  @postcon Updates the indexed element.
+
+  @param   iElement    as an Integer
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+
+**)
 procedure THAlignmentCollection.UpdateStraight(iElement : Integer; dblEasting,
   dblNorthing, dblBearing, dblChainage, dblLength: Double);
 
@@ -3027,29 +3847,84 @@ begin
     OnChange(Self);
 end;
 
+(**
+
+  This is a getter method for the Radius property.
+
+  @precon  iElement must be a valid index for an element of the alignment.
+  @postcon Returns the radius at the given chainage.
+
+  @param   iElement    as an Integer
+  @param   dblChainage as a Double
+  @return  a Double
+
+**)
 function THAlignmentCollection.GetRadius(iElement: Integer;
   dblChainage: Double): Double;
 begin
   Result := THBaseElement(FHElements[iElement]).GetRadius(dblChainage);
 end;
 
+(**
+
+  This is a setter method for the CoordinateError property.
+
+  @precon  None.
+  @postcon Sets the Coordinate error tolerance.
+
+  @param   Value as a Double constant
+
+**)
 procedure THAlignmentCollection.SetCoordinateError(const Value: Double);
 begin
   If FCoordinateError <> Value Then
     FCoordinateError := Value;
 end;
 
+(**
+
+  This is a setter method for the BearingError property.
+
+  @precon  None.
+  @postcon Sets the bearing error tolerance.
+
+  @param   Value as a Double constant
+
+**)
 procedure THAlignmentCollection.SetBearingError(const Value: Double);
 begin
   If FBearingError <> Value Then
     FBearingError := Value;
 end;
 
+(**
+
+  This is a setter method for the Modified property.
+
+  @precon  None.
+  @postcon Sets whether the alignment has been modified.
+
+  @param   Value as a Boolean constant
+
+**)
 procedure THAlignmentCollection.SetModified(const Value: Boolean);
 begin
   FModified := Value;
 end;
 
+(**
+
+  This method finds the coordinates of the given chainage and offset to this alignment.
+
+  @precon  None.
+  @postcon Returns the coordinates and bearing of the coordinate correpsonding to the
+           given chainage and offset.
+
+  @param   dblChainage as a Double
+  @param   dblOffset   as a Double
+  @return  a THInfo
+
+**)
 function THAlignmentCollection.Setout(dblChainage, dblOffset: Double): THInfo;
 
 Var
@@ -3077,6 +3952,18 @@ begin
       End;
 end;
 
+(**
+
+  This method finds the chainage and offset corresponding to the given coordinates.
+
+  @precon  None.
+  @postcon Returns the chainage and offset corresponding to the given coordinates.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @return  a THinfo
+
+**)
 function THAlignmentCollection.Measure(dblEasting, dblNorthing: Double): THinfo;
 
 Var
@@ -3119,6 +4006,21 @@ begin
           [dblEasting, dblNorthing]);
 end;
 
+(**
+
+  This method finds the intersection of the given coordinates and bearing to the
+  alignment.
+
+  @precon  None.
+  @postcon Returns the intersection of the given coordinates and bearing to the
+           alignment.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @return  a THCompinfo
+
+**)
 function THAlignmentCollection.Compare(dblEasting, dblNorthing,
   dblBearing: Double): THCompinfo;
 
@@ -3158,7 +4060,7 @@ begin
 
       If (iElement = 0) And (dblChain < 0) Then
         Raise Exception.CreateFmt(strBeforeMsg, [dblEasting, dblNorthing,
-          DecimalToDMS(dblBearing)]);
+          BearingToString(DecimalToDMS(dblBearing))]);
 
       If dblChain <= dblDist Then
         Begin
@@ -3168,9 +4070,19 @@ begin
         End;
     End;
   Raise Exception.CreateFmt(strAfterMsg, [dblEasting, dblNorthing,
-    DecimalToDMS(dblBearing)]);
+    BearingToString(DecimalToDMS(dblBearing))]);
 end;
 
+(**
+
+  This method returns the end chainage of the alignment.
+
+  @precon  None.
+  @postcon Returns the end chainage of the alignment.
+
+  @return  a Double
+
+**)
 function THAlignmentCollection.EndChainage: Double;
 begin
   If Count <= 0 Then
@@ -3178,6 +4090,16 @@ begin
   Result := THBaseElement(FHElements[Count - 1]).GetEndChainage;
 end;
 
+(**
+
+  This method returns the start chainage of the alignment.
+
+  @precon  None.
+  @postcon Returns the start chainage of the alignment.
+
+  @return  a Double
+
+**)
 function THAlignmentCollection.StartChainage: Double;
 begin
   If Count <= 0 Then
@@ -3185,6 +4107,14 @@ begin
   Result := THBaseElement(FHElements[0]).GetStartChainage;
 end;
 
+(**
+
+  This method clears all the element from this horizontal alignment collection.
+
+  @precon  None.
+  @postcon Clears all the element from this horizontal alignment collection.
+
+**)
 procedure THAlignmentCollection.Clear;
 
 Var
@@ -3203,6 +4133,20 @@ end;
 
  -------------------------------------------------------------------------- }
 
+(**
+
+  This method adds a vertical circular element to the collection.
+
+  @precon  Requires the level, gradient, chainage, length and radius of the element.
+  @postcon The element is added to the end of the collection.
+
+  @param   dblLevel    as a Double
+  @param   dblGradient as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+  @param   dblRadius   as a Double
+
+**)
 procedure TVAlignmentCollection.AddCircular(dblLevel, dblGradient,
   dblChainage, dblLength, dblRadius: Double);
 
@@ -3218,6 +4162,19 @@ begin
     OnChange(Self);
 end;
 
+(**
+
+  This method adds a vertical straight element to the collection.
+
+  @precon  Requires the level, gradient, chainage, and length of the element.
+  @postcon The element is added to the end of the collection.
+
+  @param   dblLevel    as a Double
+  @param   dblGradient as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+
+**)
 procedure TVAlignmentCollection.AddStraight(dblLevel, dblGradient,
   dblChainage, dblLength: Double);
 
@@ -3233,6 +4190,14 @@ begin
     OnChange(Self);
 end;
 
+(**
+
+  This method clears all elements from the alignment collection.
+
+  @precon  None.
+  @postcon Clears all elements from the alignment collection.
+
+**)
 procedure TVAlignmentCollection.Clear;
 
 Var
@@ -3245,11 +4210,29 @@ begin
   FVElements.Clear;
 end;
 
+(**
+
+  This method returns the number of element in the collection.
+
+  @precon  None.
+  @postcon Returns the number of element in the collection.
+
+  @return  an Integer
+
+**)
 function TVAlignmentCollection.Count: Integer;
 begin
   Result := FVElements.Count;
 end;
 
+(**
+
+  This is the constructor method for the TVAlignmentCollection class.
+
+  @precon  None.
+  @postcon The collection is created.
+
+**)
 constructor TVAlignmentCollection.Create;
 begin
   Inherited Create;
@@ -3258,6 +4241,14 @@ begin
   FGradientError := 0.01; // 1% or 1 in 1000mm
 end;
 
+(**
+
+  This is the destructor method for the TVAlignmentCollection class.
+
+  @precon  None.
+  @postcon The collection is destroy along with any elements that it contained.
+
+**)
 destructor TVAlignmentCollection.Destroy;
 
 Var
@@ -3271,11 +4262,32 @@ begin
   inherited;
 end;
 
+(**
+
+  This method returns the type of the indexed element.
+
+  @precon  iElement must be a valid element index.
+  @postcon Returns the type of the indexed element.
+
+  @param   iElement as an Integer
+  @return  a TElementType
+
+**)
 function TVAlignmentCollection.ElementType(iElement: Integer): TElementType;
 begin
   Result := TVBaseElement(FVElements[iElement]).ElementType;
 end;
 
+(**
+
+  This method returns the end chainage of the vertical alignment.
+
+  @precon  None.
+  @postcon Returns the end chainage of the vertical alignment.
+
+  @return  a Double
+
+**)
 function TVAlignmentCollection.EndChainage: Double;
 begin
   If Count <= 0 Then
@@ -3283,42 +4295,130 @@ begin
   Result := TVBaseElement(FVElements[Count - 1]).GetEndChainage;
 end;
 
+(**
+
+  This method returns the details of the indexed circular element.
+
+  @precon  iElement must be a valid element index.
+  @postcon Returns the details of the indexed circular element.
+
+  @param   iElement as an Integer
+  @return  a TVCircular
+
+**)
 function TVAlignmentCollection.GetCircular(iElement: Integer): TVCircular;
 begin
   Result := TVCircularElement(FVElements[iElement]).GetElementDetails;
 end;
 
+(**
+
+  This method returns the level and gradient of the alignment end.
+
+  @precon  iElement must be a valid element index.
+  @postcon Returns the level and gradient of the alignment end.
+
+  @param   iElement as an Integer
+  @return  a TVInfo
+
+**)
 function TVAlignmentCollection.GetElementEnd(iElement: Integer): TVInfo;
 begin
   Result := TVBaseElement(FVElements[iElement]).GetEndPoint;
 end;
 
+(**
+
+  This method returns the level and gradient of the alignment start.
+
+  @precon  iElement must be a valid element index.
+  @postcon Returns the level and gradient of the alignment start.
+
+  @param   iElement as an Integer
+  @return  a TVInfo
+
+**)
 function TVAlignmentCollection.GetElementStart(iElement: Integer): TVInfo;
 begin
   Result := TVBaseElement(FVElements[iElement]).GetStartPoint;
 end;
 
+(**
+
+  This method returns the alignments end chainage.
+
+  @precon  None.
+  @postcon Returns the alignments end chainage.
+
+  @param   iElement as an Integer
+  @return  a Double
+
+**)
 function TVAlignmentCollection.GetEndChainage(iElement: Integer): Double;
 begin
   Result := TVBaseElement(FVElements[iElement]).GetEndChainage;
 end;
 
+(**
+
+  This method returns the radius of the indexed element at the given chainage.
+
+  @precon  iElement must be a valid element index.
+  @postcon Returns the radius of the indexed element at the given chainage.
+
+  @param   iElement    as an Integer
+  @param   dblChainage as a Double
+  @return  a Double
+
+**)
 function TVAlignmentCollection.GetRadius(iElement: Integer;
   dblChainage: Double): Double;
 begin
   Result := TVBaseElement(FVElements[iElement]).GetRadius(dblChainage);
 end;
 
+(**
+
+  This method returns the alignments start chainage.
+
+  @precon  None.
+  @postcon Returns the alignments start chainage.
+
+  @param   iElement as an Integer
+  @return  a Double
+
+**)
 function TVAlignmentCollection.GetStartChainage(iElement: Integer): Double;
 begin
   Result := TVBaseElement(FVElements[iElement]).GetStartChainage;
 end;
 
+(**
+
+  This method returns the straight element details for the given indexed element.
+
+  @precon  iElement must be a valid element index.
+  @postcon Returns the straight element details for the given indexed element.
+
+  @param   iElement as an Integer
+  @return  a TVStraight
+
+**)
 function TVAlignmentCollection.GetStraight(iElement: Integer): TVStraight;
 begin
   Result := TVStraightElement(FVElements[iElement]).GetElementDetails;
 end;
 
+(**
+
+  This method loads the vertical alignment from a given INI file.
+
+  @precon  None.
+  @postcon Loads the vertical alignment from a given INI file.
+
+  @param   strFileName as a String
+
+**)
 procedure TVAlignmentCollection.LoadFromFile(strFileName: String);
 
 Var
@@ -3354,9 +4454,18 @@ begin
     iniFile.Free;
   End;
   Modified := False;
-
 end;
 
+(**
+
+  This method save the vertical alignment to the given INI file.
+
+  @precon  None.
+  @postcon Save the vertical alignment to the given INI file.
+
+  @param   strFileName as a String
+
+**)
 procedure TVAlignmentCollection.SaveToFile(strFileName: String);
 
 Var
@@ -3365,6 +4474,18 @@ Var
   recStraight : TVStraight;
   recCircular : TVCircular;
 
+  (**
+
+    This procedure writes a double value to the INI file.
+
+    @precon  None.
+    @postcon Writes a double value to the INI file.
+
+    @param   iElement as an Integer
+    @param   strItem  as a String
+    @param   dblValue as a Double
+
+  **)
   Procedure WriteItem(iElement : Integer; strItem : String;
     dblValue : Double); Overload;
 
@@ -3372,6 +4493,18 @@ Var
     iniFile.WriteFloat(Format('VElement%d', [iElement + 1]), strItem, dblValue);
   End;
 
+  (**
+
+    This procedure writes an integer value to the INI file.
+
+    @precon  None.
+    @postcon Writes a an integer value to the INI file.
+
+    @param   iElement as an Integer
+    @param   strItem  as a String
+    @param   iValue   as an Integer
+
+  **)
   Procedure WriteItem(iElement : Integer; strItem : String;
     iValue : Integer); Overload;
 
@@ -3411,24 +4544,65 @@ begin
   Modified := False;
 end;
 
+(**
+
+  This is a setter method for the GradientError property.
+
+  @precon  None.
+  @postcon Sets the GradientError property.
+
+  @param   Value as a Double constant
+
+**)
 procedure TVAlignmentCollection.SetGradientError(const Value: Double);
 begin
   If FGradientError <> Value Then
     FGradientError := Value;
 end;
 
+(**
+
+  This is a setter method for the LevelError property.
+
+  @precon  None.
+  @postcon Sets the LevelError property.
+
+  @param   Value as a Double constant
+
+**)
 procedure TVAlignmentCollection.SetLevelError(const Value: Double);
 begin
   If FLevelError <> Value Then
     FLevelError := Value;
 end;
 
+(**
+
+  This is a setter method for the Modified property.
+
+  @precon  None.
+  @postcon Sets the Modified property.
+
+  @param   Value as a Boolean constant
+
+**)
 procedure TVAlignmentCollection.SetModified(const Value: Boolean);
 begin
   If FModified <> Value Then
     FModified := Value;
 end;
 
+(**
+
+  This method finds the gradient and level of the given alignment chainage.
+
+  @precon  None.
+  @postcon Returns the gradient and level of the given alignment chainage
+
+  @param   dblChainage as a Double
+  @return  a TVInfo
+
+**)
 function TVAlignmentCollection.Setout(dblChainage: Double): TVInfo;
 
 Var
@@ -3446,6 +4620,16 @@ begin
     End;
 end;
 
+(**
+
+  This method returns the start chainage of the alignment.
+
+  @precon  None.
+  @postcon Returns the start chainage of the alignment.
+
+  @return  a Double
+
+**)
 function TVAlignmentCollection.StartChainage: Double;
 begin
   If Count <= 0 Then
@@ -3453,6 +4637,21 @@ begin
   Result := TVBaseElement(FVElements[0]).GetStartChainage;
 end;
 
+(**
+
+  This method updates the indexed circular vertical curve.
+
+  @precon  Requires the new circular curves details.
+  @postcon The element is updated.
+
+  @param   iElement    as an Integer
+  @param   dblLevel    as a Double
+  @param   dblGradient as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+  @param   dblRadius   as a Double
+
+**)
 procedure TVAlignmentCollection.UpdateCircular(iElement : Integer; dblLevel,
   dblGradient, dblChainage, dblLength, dblRadius: Double);
 
@@ -3476,6 +4675,20 @@ begin
     OnChange(Self);
 end;
 
+(**
+
+  This method updates the indexed straight vertical curve.
+
+  @precon  Requires the new straight curves details.
+  @postcon The element is updated.
+
+  @param   iElement    as an Integer
+  @param   dblLevel    as a Double
+  @param   dblGradient as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+
+**)
 procedure TVAlignmentCollection.UpdateStraight(iElement : Integer; dblLevel,
   dblGradient, dblChainage, dblLength: Double);
 
@@ -3505,12 +4718,28 @@ end;
 
  -------------------------------------------------------------------------- }
 
+(**
+
+  This method clears both the horizontal and vertical alignment collections.
+
+  @precon  None.
+  @postcon Clears both the horizontal and vertical alignment collections.
+
+**)
 procedure TStringAlignment.Clear;
 begin
   HAlignment.Clear;
   VAlignment.Clear;
 end;
 
+(**
+
+  This is the constructor method for the TStringAlignment class.
+
+  @precon  None.
+  @postcon Both a horizontal and vertical alignments are created with in the class.
+
+**)
 constructor TStringAlignment.Create;
 begin
   Inherited Create;
@@ -3518,6 +4747,14 @@ begin
   FVAlignment := TVAlignmentCollection.Create;
 end;
 
+(**
+
+  This is the destructor method for the TStringAlignment class.
+
+  @precon  None.
+  @postcon Both horizontal and vertical alignments are freed.
+
+**)
 destructor TStringAlignment.Destroy;
 begin
   FVAlignment.Free;
@@ -3525,12 +4762,35 @@ begin
   inherited;
 end;
 
+(**
+
+  This method loads both the horizontal and vertical alignments from the given INI file.
+
+  @precon  None.
+  @postcon Loads both the horizontal and vertical alignments from the given INI file.
+
+  @param   strFileName as a String
+
+**)
 procedure TStringAlignment.LoadFromFile(strFileName : String);
 begin
   HAlignment.LoadFromFile(strFileName);
   VAlignment.LoadFromFile(strFileName);
 end;
 
+(**
+
+  This method finds the chainage and offset of the given coordinates to the alignment.
+
+  @precon  None.
+  @postcon Returns the chainage and offset of the given coordinates to the alignment.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblLevel    as a Double
+  @return  a TMeasureInfo
+
+**)
 function TStringAlignment.Measure(dblEasting, dblNorthing, dblLevel: Double): TMeasureInfo;
 
 Var
@@ -3547,6 +4807,22 @@ begin
   Result.dblGradient := VInfo.dblGradient;
 end;
 
+(**
+
+  This method finds the intersection of the given coordinates and bearing with the
+  alignment.
+
+  @precon  None.
+  @postcon Returns the intersection of the given coordinates and bearing with the
+           alignment.
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @param   dblLevel    as a Double
+  @return  a TCompareInfo
+
+**)
 function TStringAlignment.Compare(dblEasting, dblNorthing, dblBearing,
   dblLevel: Double): TCompareInfo;
 
@@ -3566,6 +4842,17 @@ begin
   Result.dblGradient := VInfo.dblGradient;
 end;
 
+(**
+
+  This method saves both the horizontal and vertical alignments to the given INI file.
+
+  @precon  None.
+  @postcon Saves both the horizontal and vertical alignments to the given INI file.
+
+
+  @param   strFileName as a String
+
+**)
 procedure TStringAlignment.SaveToFile(strFileName : String);
 begin
   If FileExists(strFileName) Then
@@ -3574,10 +4861,41 @@ begin
   VAlignment.SaveToFile(strFileName);
 end;
 
+(**
+
+  This method finds the coordinates and bearing of the given chainage and offset.
+
+  @precon  None.
+  @postcon Returns the coordinates and bearing of the given chainage and offset.
+
+  @param   dblChainage as a Double
+  @param   dblOffset   as a Double
+  @return  a TInfo
+
+**)
 function TStringAlignment.Setout(dblChainage, dblOffset: Double): TInfo;
 begin
   Result.HInfo := HAlignment.Setout(dblChainage, dblOffset);
   Result.VInfo := VAlignment.Setout(dblChainage);
 end;
+
+(**
+
+  This method returns a string representation of the given bearing record as
+  ###°##'##.##".
+
+  @precon  None.
+  @postcon Returns a string representation of the given bearing record as ###°##'##.##".
+
+  @param   recBearing as a TBearing
+  @return  a String
+
+**)
+Function BearingToString(recBearing : TBearing) : String;
+
+Begin
+  With recBearing Do
+    Result := Format('%d°%2.2d''%2.2d.%2.2d"', [iDegrees, iMinutes, iSeconds, iHundreds]);
+End;
 
 End.

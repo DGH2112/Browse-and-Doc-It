@@ -8,7 +8,7 @@
   @Date    04 Jun 2005
 
 **)
-Unit DGHLibrary50;
+Unit DGHLibrary;
 
 Interface
 

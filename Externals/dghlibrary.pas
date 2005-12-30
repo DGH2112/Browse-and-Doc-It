@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    04 Jun 2005
+  @Date    30 Dec 2005
 
 **)
 Unit DGHLibrary;
@@ -988,6 +988,7 @@ end;
 Function ConvertDate(Const strDate : String) : TDateTime;
 
 Type
+  (** This is a record that defined the date and time for a date. **)
   TDateRec = Record
     iDay, iMonth, iYear, iHour, iMinute, iSecond : Word;
   End;
@@ -1172,7 +1173,7 @@ Begin
           If IsKeyWord(sl[iIndex1], Months) Then
             Begin
               For i := Low(Months) To High(Months) Do
-                If AnsiCompareText(Months[i], sl[iIndex1]) = 0 Then
+                If SysUtils.AnsiCompareText(Months[i], sl[iIndex1]) = 0 Then
                   Begin
                     recDate.iMonth := MonthIndexes[i];
                     Break;
@@ -4856,7 +4857,7 @@ end;
 procedure TStringAlignment.SaveToFile(strFileName : String);
 begin
   If FileExists(strFileName) Then
-    DeleteFile(strFileName);
+    SysUtils.DeleteFile(strFileName);
   HAlignment.SaveToFile(strFileName);
   VAlignment.SaveToFile(strFileName);
 end;

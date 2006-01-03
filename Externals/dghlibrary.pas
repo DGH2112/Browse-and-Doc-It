@@ -13,7 +13,7 @@ Unit DGHLibrary;
 Interface
 
 Uses
-  SysUtils, Classes;
+  SysUtils, Classes, Windows;
 
 Type
   (** A record to describe the degrees, minutes and seconds of a bearing. **)

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    30 Dec 2005
+  @Date    07 Jan 2006
 
 **)
 Unit DGHLibrary;

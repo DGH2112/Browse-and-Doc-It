@@ -137,6 +137,8 @@ type
     **)
     Property OnSelectionChange : TSelectionChange Read FSelectionChange
       Write FSelectionChange;
+    Procedure LoadSettings;
+    Procedure SaveSettings;
   public
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
@@ -156,7 +158,7 @@ type
 implementation
 
 Uses
-  DeskUtil, (** @ debug ToolsAPIUtils **) ToolsAPIUtils;
+  DeskUtil, Registry;
 
 Const
   (** Icon index for a plane folder. **)
@@ -478,6 +480,7 @@ begin
   FExpandedNodes := TStringList.Create;
   FExpandedNodes.Sorted := True;
   FExpandedNodes.Duplicates := dupIgnore;
+  LoadSettings;
   FHintWin := TCustomHintWindow.Create(Self);
   FHintWin.Color := clInfoBk;
   FHintWin.Canvas.Font.Assign(tvExplorer.Font);
@@ -508,6 +511,7 @@ end;
 Destructor TfrmDockableModuleExplorer.Destroy;
 begin
   FHintWin.Free;
+  SaveSettings;
   FExpandedNodes.Free;
   FNodeInfo.Free;
   SaveStateNecessary := True;
@@ -778,7 +782,7 @@ begin
       End;
     End;
   If (DocConflictNode <> Nil) And (doShowConflicts In FOptions) Then
-    DocConflictNode.Expand(True);  
+    DocConflictNode.Expand(True);
 end;
 
 (**
@@ -804,6 +808,39 @@ Begin
     scPublished : If doShowPublisheds In FOptions Then Result := True;
   End;
 End;
+
+(**
+
+  This method loads the managed expanded nodes list from the registry.
+
+  @precon  None.
+  @postcon Loads the managed expanded nodes list from the registry.
+
+**)
+procedure TfrmDockableModuleExplorer.LoadSettings;
+
+Var
+  sl :  TStringList;
+  i : Integer;
+  iValue : Integer;
+
+begin
+  With TRegIniFile.Create() Do
+    Try
+      sl := TStringList.Create;
+      Try
+        ReadSection(strRegRootKey + 'ManagedExpandedNodes', sl);
+      Finally
+        For i := 0 To sl.Count - 1 Do
+          Begin
+            iValue := ReadInteger(strRegRootKey + 'ManagedExpandedNodes', sl[i], 0);
+            FExpandedNodes.AddObject(sl[i], TObject(iValue));
+          End;
+      End;
+    Finally
+      Free;
+    End;
+end;
 
 (**
 
@@ -878,6 +915,30 @@ Begin
         N.Delete;
     End;
 End;
+
+(**
+
+  This method saves the managed expand nodess list to the registry.
+
+  @precon  None.
+  @postcon Saves the managed expand nodess list to the registry.
+
+**)
+procedure TfrmDockableModuleExplorer.SaveSettings;
+
+Var
+  i : Integer;
+
+begin
+  With TRegIniFile.Create() Do
+    Try
+      For i := 0 To FExpandedNodes.Count - 1 Do
+        WriteInteger(strRegRootKey + 'ManagedExpandedNodes', FExpandedNodes[i],
+          Integer(FExpandedNodes.Objects[i]));
+    Finally
+      Free;
+    End;
+end;
 
 (**
 
@@ -1143,6 +1204,31 @@ Var
 
   (**
 
+    This routine manages the expanded node list. It increments the counter for
+    each node to indicate the age of the node and deletes nodes that are more
+    that iMaxRefreshes refreshes old.
+
+    @precon  None.
+    @postcon Keeps nodes alive which are not older than iMaxrefreshes.
+
+  **)
+  Procedure ManageExpanedNodes;
+
+  Var
+    iNode : Integer;
+
+  Begin
+    For iNode := FExpandedNodes.Count - 1 DownTo 0 Do
+      Begin
+        FExpandedNodes.Objects[iNode] := TObject(Integer(
+          FExpandedNodes.Objects[iNode]) + 1);
+        If Integer(FExpandedNodes.Objects[iNode]) > iMaxRefreshes Then
+          FExpandedNodes.Delete(iNode);
+      End;
+  End;
+  
+  (**
+
     This method returns the path of the specified tree node.
 
     @precon  Node is the tree node to be pathed.
@@ -1254,6 +1340,7 @@ Var
 
 Begin
   FOptions := DocExplorerOptions;
+  If doManageExpandedNodes In FOptions Then ManageExpanedNodes;
   FHintWin.ReleaseHandle; // Stop AV when refreshing the tree.
   With tvExplorer Do
     Begin

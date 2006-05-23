@@ -1,0 +1,99 @@
+(**
+  
+  This module defined a new package for testing a dockable form for the IDE.
+  This dockable form will eventually become the Module Explorer for a new
+  version of PascalDoc.
+
+  @Author  David Hoyle
+  @Date    23 May 2006
+  @Version 1.0
+
+**)
+package BrowseAndDocIt;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'Browse and Doc It'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocAbstractOutput\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocHTMLOutput\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\PascalDocChecker\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocWizardForm\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocTypes\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\ToolsAPIUtils\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocClasses\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\OptionsForm\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Comments\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\PascalDocModule\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\SpecialTagForm\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\ProgressForm\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DockableModuleExplorer\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\BrowseAndDocItWizard\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Indexer\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\ToolsAPIUtils\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Module Explorer Sequence Diagram.txvint'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Comments\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocWizardForm\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\OptionsForm\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\PascalDocChecker\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Indexer\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocAbstractOutput\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\PascalDocModule\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\ProgressForm\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocHTMLOutput\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocClasses\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\SpecialTagForm\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DockableModuleExplorer\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\BrowseAndDocItWizard\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocTypes\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\BaseLanguageModule\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\TokenForm\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Class Diagram.txvcls'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\BaseLanguageModule\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\TokenForm\default.txvpck'}
+
+requires
+  rtl,
+  designide,
+  vcl,
+  xmlrtl,
+  vclactnband,
+  vclx,
+  vcljpg;
+
+contains
+  BrowseAndDocItWizard in 'Source\BrowseAndDocItWizard.pas',
+  DockableModuleExplorer in 'Source\DockableModuleExplorer.pas',
+  PascalDocModule in 'Source\PascalDocModule.pas',
+  PascalDocChecker in 'Source\PascalDocChecker.pas',
+  OptionsForm in 'Source\OptionsForm.pas',
+  ToolsAPIUtils in 'Source\ToolsAPIUtils.pas',
+  SpecialTagForm in 'Source\SpecialTagForm.pas',
+  TokenForm in 'Source\TokenForm.pas',
+  ProgressForm in 'Source\ProgressForm.pas',
+  BaseLanguageModule in 'Source\BaseLanguageModule.pas';
+
+end.

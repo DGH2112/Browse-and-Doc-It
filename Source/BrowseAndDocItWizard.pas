@@ -3,7 +3,7 @@
   This mmodule contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    22 May 2006
+  @Date    23 May 2006
   @Version 1.0
 
 **)
@@ -127,8 +127,6 @@ Uses
   OptionsForm, Forms, Windows, ShellAPI, TokenForm;
 
 Resourcestring
-  (** The registry key for the wizards settings. **)
-  strKey = 'Software\Season''s Fall\Pascal Doc\';
   (** This is a text string of revision from nil and a to z. **)
   strRevision = ' abcdefghijklmnopqrstuvwxyz';
   (** This is a message string to appear in the BDS 2005/6 splash screen **)
@@ -382,12 +380,12 @@ Begin
   With TRegIniFile.Create() Do
     Try
       For j := Low(TDocOption) To High(TDocOption) Do
-        If ReadBool(strKey + 'DocExplorerOptions', DocOptionInfo[j].Description,
+        If ReadBool(strRegRootKey + 'DocExplorerOptions', DocOptionInfo[j].Description,
           DocOptionInfo[j].Enabled) Then
           FDocExplorerOptions := FDocExplorerOptions + [j];
-      iUpdateInterval := ReadInteger(strKey + 'ModuleExplorer', 'UpdateInterval', 1000);
-      FDocOption := ReadInteger(strKey + 'Setup', 'DocOption', 0);
-      iCount := ReadInteger(strKey + 'Setup', 'SpecialTagCount', 0);
+      iUpdateInterval := ReadInteger(strRegRootKey + 'ModuleExplorer', 'UpdateInterval', 1000);
+      FDocOption := ReadInteger(strRegRootKey + 'Setup', 'DocOption', 0);
+      iCount := ReadInteger(strregRootKey + 'Setup', 'SpecialTagCount', 0);
       If iCount = 0 Then
         Begin // Some default special tags
           SpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree And iAutoExpand));
@@ -401,12 +399,12 @@ Begin
         End Else
         Begin
           For k := 1 To iCount Do
-            SpecialTags.AddObject(ReadString(strKey + 'SpecialTags',
-              Format('SpecialTag%d', [k]), ''), TObject(ReadInteger(strKey + 'SpecialTags',
+            SpecialTags.AddObject(ReadString(strRegRootKey + 'SpecialTags',
+              Format('SpecialTag%d', [k]), ''), TObject(ReadInteger(strRegRootKey + 'SpecialTags',
               Format('SpecialTagOptions%d', [k]), 0)));
         End;
-      FDocHelpFile := ReadString(strKey + 'ModuleExplorer', 'HelpFile', '');
-      FBrowsePosition := TBrowsePosition(ReadInteger(strKey + 'Setup', 'BrowsePosition',
+      FDocHelpFile := ReadString(strRegRootKey + 'ModuleExplorer', 'HelpFile', '');
+      FBrowsePosition := TBrowsePosition(ReadInteger(strRegRootKey + 'Setup', 'BrowsePosition',
         Integer(bpIdentifierCentre)));
     Finally
       Free;
@@ -431,20 +429,20 @@ Begin
   With TRegIniFile.Create() Do
     Try
       For j := Low(TDocOption) To High(TDocOption) Do
-        WriteBool(strKey + 'DocExplorerOptions', DocOptionInfo[j].Description,
+        WriteBool(strRegRootKey + 'DocExplorerOptions', DocOptionInfo[j].Description,
           j In FDocExplorerOptions);
-      WriteInteger(strKey + 'ModuleExplorer', 'UpdateInterval', iUpdateInterval);
-      WriteInteger(strKey + 'Setup', 'DocOption', FDocOption);
-      WriteInteger(strKey + 'Setup', 'SpecialTagCount', SpecialTags.Count);
+      WriteInteger(strRegRootKey + 'ModuleExplorer', 'UpdateInterval', iUpdateInterval);
+      WriteInteger(strRegRootKey + 'Setup', 'DocOption', FDocOption);
+      WriteInteger(strRegRootKey + 'Setup', 'SpecialTagCount', SpecialTags.Count);
       For k := 1 To SpecialTags.Count Do
         Begin
-          WriteString(strKey + 'SpecialTags', Format('SpecialTag%d', [k]),
+          WriteString(strRegRootKey + 'SpecialTags', Format('SpecialTag%d', [k]),
             SpecialTags[k - 1]);
-          WriteInteger(strKey + 'SpecialTags', Format('SpecialTagOptions%d', [k]),
+          WriteInteger(strRegRootKey + 'SpecialTags', Format('SpecialTagOptions%d', [k]),
             Integer(SpecialTags.Objects[k - 1]));
         End;
-      WriteString(strKey + 'ModuleExplorer', 'HelpFile', FDocHelpFile);
-      WriteInteger(strKey + 'Setup', 'BrowsePosition', Integer(FBrowsePosition));
+      WriteString(strRegRootKey + 'ModuleExplorer', 'HelpFile', FDocHelpFile);
+      WriteInteger(strRegRootKey + 'Setup', 'BrowsePosition', Integer(FBrowsePosition));
     Finally
       Free;
     End;

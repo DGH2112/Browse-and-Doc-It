@@ -270,6 +270,108 @@ Var
 
 (**
 
+  This function returns a string list contains the tokenized representation of
+  the passed string with respect to some basic object pascal grammer.
+
+  @precon   strText si the line of text to be tokenised
+  @postcon  Returns a new string list of the tokenized string
+  @note     The string list returnsed must be destroyed be the calling method.
+
+  @param   strText as a String
+  @param   strReservedWords as an Array Of String
+  @param   strDirectives as an Array Of String
+  @return  a TStringList
+
+**)
+Function Tokenize(strText : String; strReservedWords,
+  strDirectives : Array Of String) : TStringList;
+
+Type
+  (** State machine for block types. **)
+  TBlockType = (btNoBlock, btStringLiteral);
+
+Const
+  (** Growth size of the token buffer. **)
+  iTokenCapacity = 25;
+
+Var
+  (** Token buffer. **)
+  strToken : String;
+  CurToken : TTokenType;
+  LastToken : TTokenType;
+  BlockType : TBlockType;
+  (** Token size **)
+  iTokenLen : Integer;
+  i : Integer;
+
+Begin
+  Result := TStringList.Create;
+  BlockType := btNoBlock;
+  strToken := '';
+  CurToken := ttUnknown;
+  strToken := '';
+
+  iTokenLen := 0;
+  SetLength(strToken, iTokenCapacity);
+
+  For i := 1 To Length(strText) Do
+    Begin
+      LastToken := CurToken;
+      CurToken := GetTokenType(strText[i], LastToken);
+
+      If (LastToken <> CurToken) Or (CurToken = ttSymbol) Then
+        Begin
+          If ((BlockType In [btStringLiteral]) And (CurToken <> ttLineEnd)) Then
+            Begin
+              Inc(iTokenLen);
+              If iTokenLen > Length(strToken) Then
+                SetLength(strToken, iTokenCapacity + Length(strToken));
+              strToken[iTokenLen] := strText[i];
+            End Else
+            Begin
+              SetLength(strToken, iTokenLen);
+              If iTokenLen > 0 Then
+                Begin
+                  If IsKeyWord(strToken, strReservedWords) Then
+                    LastToken := ttReservedWord;
+                  If IsKeyWord(strToken, strDirectives) Then
+                    LastToken := ttDirective;
+                  Result.AddObject(strToken, TObject(LastToken));
+                End;
+             BlockType := btNoBlock;
+             iTokenLen := 1;
+             SetLength(strToken, iTokenCapacity);
+             strToken[iTokenLen] := strText[i];
+            End;
+        End Else
+        Begin
+          Inc(iTokenLen);
+          If iTokenLen > Length(strToken) Then
+            SetLength(strToken, iTokenCapacity + Length(strToken));
+          strToken[iTokenLen] := strText[i];
+        End;
+
+      // Check for string literals
+      If CurToken = ttStringLiteral Then
+        If BlockType = btStringLiteral Then
+          BlockType := btNoBlock
+        Else If BlockType = btNoBlock Then
+          BlockType := btStringLiteral;
+
+    End;
+  If iTokenLen > 0 Then
+    Begin
+      SetLength(strToken, iTokenLen);
+      If IsKeyWord(strToken, strReservedWords) Then
+        CurToken := ttReservedWord;
+      If IsKeyWord(strToken, strDirectives) Then
+        CurToken := ttDirective;
+      Result.AddObject(strToken, TObject(CurToken));
+    End;
+End;
+
+(**
+
   This procedure sets the font of the passed canvas to the appropiate style and
   colour for the words stored in the string list.
 
@@ -1721,7 +1823,7 @@ begin
       Begin
         iOffset := GetScrollPos(Sender.Handle, SB_HORZ);
         //: @bug This needs fixing properly!!!
-        sl := TBaseLanguageModule.Tokenize(Node.Text, [], []);
+        sl := Tokenize(Node.Text, [], []);
         Try
           // Highlight selected item.
           If cdsSelected In State Then
@@ -1916,7 +2018,7 @@ Begin
       If FCustomDraw Then
         Begin
           //: @bug This needs fixing properly!!!
-          sl := TBaseLanguageModule.Tokenize(Caption, [], []);
+          sl := Tokenize(Caption, [], []);
           Try
             iPos := 2;
             For i := 0 To sl.Count - 1 Do
@@ -2042,7 +2144,7 @@ Begin
       // Need to amend the width of the rectangle for the custom drawing
       iPos := 5;
       //: @bug This needs to be fixed properly!!!
-      sl := TBaseLanguageModule.Tokenize(Node.Text, [], []);
+      sl := Tokenize(Node.Text, [], []);
       Try
         For i := 0 To sl.Count - 1 Do
           Begin

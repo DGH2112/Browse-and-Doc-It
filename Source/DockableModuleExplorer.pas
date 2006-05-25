@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    23 May 2006
+  @Date    25 May 2006
   @Version 1.0
 
 **)
@@ -14,7 +14,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, DockForm, ActnList, IniFiles, ImgList, ComCtrls, StdCtrls, ExtCtrls,
-  Contnrs, BaseLanguageModule, PascalDocModule;
+  Contnrs, BaseLanguageModule;
 
 type
   (** This class represents information about each nodes. Used in a collection
@@ -109,7 +109,7 @@ type
     procedure SetNodeIcon(Scope: TScope; iStartIndex: Integer;
       var Node: TTreeNode);
     { Private declarations }
-    procedure GetBodyCommentTags(M : TPascalDocModule);
+    procedure GetBodyCommentTags(M : TBaseLanguageModule);
     Function AddNode(P : TTreeNode; strText : String; iLine, iCol,
       iImageIndex : Integer; Comment : TComment) : TTreeNode;
     function GetTreeNodeInfo(iIndex: Integer): TTreeNodeInfo;
@@ -117,14 +117,14 @@ type
     function IsInOptions(Scope: TScope): Boolean;
     Function GetNodeComment(iLine, iCol : Integer; C : TComment) : Integer;
     procedure ExpandNodes;
-    procedure OutputModuleInfo(M : TPascalDocModule);
+    procedure OutputModuleInfo(M : TBaseLanguageModule);
     procedure DisplayClassMethods(Cls : TObjectDecl; S : TTreeNode);
     procedure DisplayClassProperties(Cls : TClassDecl; S : TTreeNode);
     procedure DisplayClassFields(Cls : TRecordDecl; S : TTreeNode);
-    Procedure DisplayErrors(M : TPascalDocModule);
+    Procedure DisplayErrors(M : TBaseLanguageModule);
     Procedure CMMouseLeave(var Msg : TMessage); Message CM_MOUSELEAVE;
-    procedure RenderModule(M : TPascalDocModule; DocExplorerOptions : TDocOptions);
-    Procedure DisplayDocumentConflicts(M : TPascalDocModule);
+    procedure RenderModule(M : TBaseLanguageModule; DocExplorerOptions : TDocOptions);
+    Procedure DisplayDocumentConflicts(M : TBaseLanguageModule);
     (**
       This property returns the indexed NodeInfo class for the collection.
       @param   iIndex as an Integer
@@ -146,7 +146,7 @@ type
     Class Procedure ShowDockableModuleExplorer;
     Class Procedure RemoveDockableModuleExplorer;
     Class Procedure CreateDockableModuleExplorer;
-    Class Procedure RenderDocumentTree(PascalDocModule : TPascalDocModule;
+    Class Procedure RenderDocumentTree(BaseLanguageModule : TBaseLanguageModule;
       DocExplorerOptions : TDocOptions);
     Class Procedure HookEventHandlers(SelectionChangeProc : TSelectionChange);
   end;
@@ -373,6 +373,8 @@ End;
 
   @param   FormVar  as   @param   FormName as a String constant
 
+  @bug     Procedure not rendered in explorer tree properly.
+
 **)
 Procedure UnRegisterDockableForm(var FormVar; Const FormName : String);
 Begin
@@ -555,16 +557,16 @@ end;
   @postcon If the form module explorer exists then the passed module is
            rendered.
 
-  @param   PascalDocModule    as a TPascalDocModule
+  @param   BaseLanguageModule    as a TBaseLanguageModule
   @param   DocExplorerOptions as a TDocOptions
 
 **)
 class procedure TfrmDockableModuleExplorer.RenderDocumentTree(
-  PascalDocModule: TPascalDocModule; DocExplorerOptions : TDocOptions);
+  BaseLanguageModule: TBaseLanguageModule; DocExplorerOptions : TDocOptions);
 begin
   If Assigned(FormInstance) Then
     If FormInstance.Visible Then
-      FormInstance.RenderModule(PascalDocModule, DocExplorerOptions);
+      FormInstance.RenderModule(BaseLanguageModule, DocExplorerOptions);
 end;
 
 (**
@@ -693,11 +695,11 @@ End;
   @precon  M must be a valid Pascal Doc Module.
   @postcon renders the docuemntation conflicts for the given module.
 
-  @param   M as a TPascalDocModule
+  @param   M as a TBaseLanguageModule
 
 **)
 procedure TfrmDockableModuleExplorer.DisplayDocumentConflicts(
-  M: TPascalDocModule);
+  M: TBaseLanguageModule);
 
 Var
   i : Integer;
@@ -1158,13 +1160,13 @@ end;
   This method retrieves comments from the body comment collection and adds them
   to the comment node of the tree view.
 
-  @precon  M is a valid instance of a TPascalDocModule that has been parsed.
+  @precon  M is a valid instance of a TBaseLanguageModule that has been parsed.
   @postcon This method cycles through the body comments extracting special tags.
 
-  @param   M as a TPascalDocModule
+  @param   M as a TBaseLanguageModule
 
 **)
-procedure TfrmDockableModuleExplorer.GetBodyCommentTags(M : TPascalDocModule);
+procedure TfrmDockableModuleExplorer.GetBodyCommentTags(M : TBaseLanguageModule);
 
 Var
   i, j, k : Integer;
@@ -1185,15 +1187,15 @@ End;
 
   This method displays the specified module in the treeview.
 
-  @precon  M is a valid instance of a TPascalDocModule that has been parsed and
+  @precon  M is a valid instance of a TBaseLanguageModule that has been parsed and
            strStatus is a text string to be displayed in the forms status bar.
   @postcon Renders the module information for the given module.
 
-  @param   M                  as a TPascalDocModule
+  @param   M                  as a TBaseLanguageModule
   @param   docExplorerOptions as a TDocOptions
 
 **)
-procedure TfrmDockableModuleExplorer.RenderModule(M : TPascalDocModule;
+procedure TfrmDockableModuleExplorer.RenderModule(M : TBaseLanguageModule;
   DocExplorerOptions : TDocOptions);
 
 Var
@@ -1424,13 +1426,13 @@ End;
 
   This method displays any errors found during the parsing of the module.
 
-  @precon  M is a valid instance of a TPascalDocModule that has been parsed.
+  @precon  M is a valid instance of a TBaseLanguageModule that has been parsed.
   @postcon Displays the error in the module.
 
-  @param   M as a TPascalDocModule
+  @param   M as a TBaseLanguageModule
 
 **)
-Procedure TfrmDockableModuleExplorer.DisplayErrors(M : TPascalDocModule);
+Procedure TfrmDockableModuleExplorer.DisplayErrors(M : TBaseLanguageModule);
 
 Var
   i : Integer;
@@ -1467,13 +1469,13 @@ End;
 
   This method outputs the modules information as items in the treeview.
 
-  @precon  M is a valid instance of a TPascalDocModule that has been parsed.
+  @precon  M is a valid instance of a TBaseLanguageModule that has been parsed.
   @postcon Outputs the different parts of the module.
 
-  @param   M as a TPascalDocModule
+  @param   M as a TBaseLanguageModule
 
 **)
-procedure TfrmDockableModuleExplorer.OutputModuleInfo(M : TPascalDocModule);
+procedure TfrmDockableModuleExplorer.OutputModuleInfo(M : TBaseLanguageModule);
 
 begin
   DisplayClause(M.UsesCls, FModule, strUses, iUnit, iUnitLabel);
@@ -1718,7 +1720,8 @@ begin
     If Not DefaultDraw Then
       Begin
         iOffset := GetScrollPos(Sender.Handle, SB_HORZ);
-        sl := Tokenize(Node.Text);
+        //: @bug This needs fixing properly!!!
+        sl := TBaseLanguageModule.Tokenize(Node.Text, [], []);
         Try
           // Highlight selected item.
           If cdsSelected In State Then
@@ -1912,7 +1915,8 @@ Begin
     Begin
       If FCustomDraw Then
         Begin
-          sl := Tokenize(Caption);
+          //: @bug This needs fixing properly!!!
+          sl := TBaseLanguageModule.Tokenize(Caption, [], []);
           Try
             iPos := 2;
             For i := 0 To sl.Count - 1 Do
@@ -2037,7 +2041,8 @@ Begin
     Begin
       // Need to amend the width of the rectangle for the custom drawing
       iPos := 5;
-      sl := Tokenize(Node.Text);
+      //: @bug This needs to be fixed properly!!!
+      sl := TBaseLanguageModule.Tokenize(Node.Text, [], []);
       Try
         For i := 0 To sl.Count - 1 Do
           Begin

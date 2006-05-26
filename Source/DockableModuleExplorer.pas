@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    25 May 2006
+  @Date    26 May 2006
   @Version 1.0
 
 **)
@@ -1036,6 +1036,7 @@ Var
 begin
   With TRegIniFile.Create() Do
     Try
+      EraseSection(strRegRootKey + 'ManagedExpandedNodes');
       For i := 0 To FExpandedNodes.Count - 1 Do
         WriteInteger(strRegRootKey + 'ManagedExpandedNodes', FExpandedNodes[i],
           Integer(FExpandedNodes.Objects[i]));

@@ -3,12 +3,9 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    23 may 2006
+  @Date    28 May 2006
   @Version 1.0
   @Author  David Hoyle
-
-  @todo    All the sort methods in the colections need to modified to use the
-           TObjectList.Sort method (Quick Sort).
 
 **)
 
@@ -49,7 +46,11 @@ Type
   TErrorType = (etWarning, etError);
 
   (** This is a list of options valable for the display of module information
-      with in the module explorer. **)
+      with in the module explorer.
+      @bug At the moment these option are not passed early enough for the
+           doManageExpandedNodes option to be available to the LoadSettings
+           and SaveSettings methods.
+  **)
   TDocOption = (
     doCustomDrawing,
     doShowCommentHints,
@@ -60,6 +61,7 @@ Type
     doShowPublisheds,
     doShowLocalProcs,
     doShowConflicts,
+    doManageExpandedNodes,
     doShowMissingProcDocs,
     doShowMissingDocDesc,
     doShowDiffParamCount,
@@ -81,7 +83,6 @@ Type
     doShowMissingModuleAuthor,
     doShowMissingPreCons,
     doShowMissingPostCons,
-    doUseSinglePrePostCondition,
     doShowMissingPropertyDoc,
     doShowMissingPropDocDesc,
     doShowDiffPropParamCount,
@@ -91,7 +92,6 @@ Type
     doShowIncorrectPropReturnType,
     doShowMissingPropPreCons,
     doShowMissingPropPostCons,
-    doUseSinglePrePostPropCondition,
     doCategoriesConflicts
   );
 
@@ -1156,12 +1156,243 @@ Type
       derived. **)
   TBaseLanguageModule = Class Abstract
   Private
+    FOwnedItems : TObjectList;
+    FTokens : TObjectList;
+    FTokenIndex : TTokenIndex;
+    FSourceStream : TStream;
+    FDocErrors: TDocErrorCollection;
+    FTickList : TStringList;
+    FModuleName : String;
+    FModuleType : TModuleType;
+    FModuleComment : TComment;
+    FExportedHeadings : TMethodCollection;
+    FImplementedMethods : TMethodCollection;
+    FConstantsCollection : TGenericContainerCollection;
+    FVarsCollection : TGenericContainerCollection;
+    FThreadVarsCollection : TGenericContainerCollection;
+    FTypeCollection : TGenericContainerCollection;
+    FRequiresClause : TIdentList;
+    FContainsClause : TIdentList;
+    FUsesClause : TIdentList;
+    FInitComment : TComment;
+    FFinalComment : TComment;
+    FResStrCollection: TGenericContainerCollection;
+    FExportsCollection : TGenericContainerCollection;
+    FBodyComment : TObjectList;
+    FModuleNameCol: Integer;
+    FModuleNameLine: Integer;
+    FSymbolTable: TGenericContainerCollection;
+    FFileName: String;
+    FModified : Boolean;
+    FDocumentConflicts: TObjectList;
+    Function GetTokenCount : Integer;
+    Function GetTokenInfo(iIndex : TTokenIndex) : TTokenInfo;
+    Function GetToken : TTokenInfo;
+    function GetOpTickCountName(iIndex: Integer): String;
+    function GetOpTickCountByIndex(iIndex: Integer): Integer;
+    function GetOpTickCounts: Integer;
+    function GetOpTickCount(strStart, strFinish : String): Integer;
+    Function GetBodyComment(iIndex : Integer) : TComment;
+    Function GetBodyCommentCount : Integer;
+    Function GetDocumentConflict(iIndex : Integer) : TDocumentConflict;
+    Function GetDocumentConflictCount : Integer;
+    Procedure TokenizeStream(strReservedWords, strDirectives : Array of String);
   Protected
+    Function PrevToken : TTokenInfo;
+    Procedure NextToken;
+    Function EndOfTokens : Boolean;
+    Procedure NextNonCommentToken;
+    Procedure RollBackToken;
+    Function GetComment : TComment;
+    Procedure SetTokenIndex(iIndex : TTokenIndex);
+    Procedure SortDocumentConflicts;
+    Procedure GetBodyCmt;
+    (**
+      Returns a refernce the to owned items collection. This is used to manage
+      the life time of all the ident lists and comments found in the module.
+      @return  a TObjectList
+    **)
+    Property OwnedItems : TObjectList Read FOwnedItems;
+    (**
+      Returns the current token with in the module. Also see
+      {@link TPascalDocModule.SetTokenIndex SetTokenIndex}.
+      @return  a TTokenInfo
+    **)
+    Property Token : TTokenInfo Read GetToken;
+    (**
+      Returns a reference to the body comments collection.
+      @return  a TObjectList
+    **)
+    Property BodyComments : TObjectList Read FBodyComment;
   Public
-    class function IsTokenWhiteSpace(strToken: String): Boolean;
+    Constructor Create(Source : TStream; strReservedWords,
+      strDirectives : Array of String; IsModified : Boolean; strFileName : String);
+    Destructor Destroy; Override;
+    Procedure AddTickCount(strLabel : String);
+    Procedure AddDocumentConflict(Const Args: Array of TVarRec; iIdentLine,
+      iIdentColumn, iCommentLine, iCommentCol  : Integer;
+      DocConflictType : TDocConflictType);
+    Function ConvertDate(Const strDate : String) : TDateTime;
+    { Properties }
+    (**
+      Returns a reference to the modules error collection.
+      @return  a TDocErrorCollection
+    **)
+    Property TokenCount : Integer Read GetTokenCount;
+    (**
+      Returns the token information for the specifically indexed token within
+      the module.
+      @param   iIndex as       a TTokenIndex
+      @return  a TTokenInfo
+    **)
+    Property TokenInfo[iIndex : TTokenIndex] : TTokenInfo Read GetTokenInfo;
+    (**
+      Returns the number of token within the module after tokenizing.
+      @return  an Integer
+    **)
+    Property Errors : TDocErrorCollection Read FDocErrors;
+    Property OpTickCount[strStart, strFinish : String] : Integer Read GetOpTickCount;
+    Property OpTickCounts : Integer Read GetOpTickCounts;
+    Property OpTickCountByIndex[iIndex : Integer] : Integer Read GetOpTickCountByIndex;
+    Property OpTickCountName[iIndex : Integer] : String Read GetOpTickCountName;
+    (**
+      Returns the module name as a string.
+      @return  a String
+    **)
+    Property ModuleName : String Read FModuleName Write FModuleName;
+    (**
+      Returns the type of the modules, Program, Unit, Package, etc.
+      @return  a TModuleType
+    **)
+    Property ModuleType : TModuleType Read FModuleType Write FModuleType;
+    (**
+      Returns a reference to the modules comment.
+      @return  a TComment
+    **)
+    Property ModuleComment : TComment Read FModuleComment Write FModuleComment;
+    (**
+      Returns a reference to the implemented methods collection.
+      @return  a TMethodCollection
+    **)
+    Property ImplementedMethods : TMethodCollection Read FImplementedMethods;
+    (**
+      Returns a reference to the constants clause collection.
+      @return  a TGenericContainerCollection
+    **)
+    Property Constants : TGenericContainerCollection Read FConstantsCollection;
+    (**
+      Returns a reference to the variables clause collection.
+      @return  a TGenericContainerCollection
+    **)
+    Property Vars : TGenericContainerCollection Read FVarsCollection;
+    (**
+      Returns a reference to the modules types clause collection.
+      @return  a TGenericContainerCollection
+    **)
+    Property Types : TGenericContainerCollection Read FTypeCollection;
+    (**
+      Returns the specific indexed body comment from the collection.
+      @param   iIndex as       an Integer
+      @return  a TComment
+    **)
+    Property BodyComment[iIndex : Integer] : TComment Read GetBodyComment;
+    (**
+      Returns a reference to the modules body comments collection.
+      @return  an Integer
+    **)
+    Property BodyCommentCount : Integer Read GetBodyCommentCount;
+    (**
+      Returns the line number of the modules name.
+      @return  an Integer
+    **)
+    Property ModuleNameLine : Integer Read FModuleNameLine Write FModuleNameLine;
+    (**
+      Returns the column number of the module name.
+      @return  an Integer
+    **)
+    Property ModuleNameCol : Integer Read FModuleNameCol Write FModuleNameCol;
+    (**
+      Returns a reference to the modules symbol table. All symbol in the module
+      are stored here and disposed of from here. Reference from other collections
+      like Types are purely reference only and those collection will not manage
+      the symbols life time.
+      @return  a TGenericContainerCollection
+    **)
+    Property SymbolTable : TGenericContainerCollection Read FSymbolTable;
+    (**
+      This property returns the file name of the module as passed to the
+      constructor.
+      @return  a String
+    **)
+    Property FileName : String Read FFileName;
+    (**
+      This property returns whether the source code is modified or not.
+      @return  a Boolean
+    **)
+    Property Modified : Boolean Read FModified;
+    (**
+      This property returns a reference to the classes document conflict list.
+      @return  a TStringList
+    **)
+    Property DocumentConflict[iIndex : Integer] : TDocumentConflict
+      Read GetDocumentConflict;
+    (**
+
+      @return  an Integer
+    **)
+    Property DocumentConflictCount : Integer Read GetDocumentConflictCount;
+    (**
+      Returns a reference to the requires clause collection.
+      @return  a TIdentList
+    **)
+    Property Requires : TIdentList Read FRequiresClause Write FRequiresClause;
+    (**
+      Returns a reference to the contains clause collection.
+      @return  a TIdentList
+    **)
+    Property Contains : TIdentList Read FContainsClause Write FContainsClause;
+    (**
+      Returns a reference to the uses clause collection.
+      @return  a TIdentList
+    **)
+    Property UsesCls : TIdentList Read FUsesClause Write FUsesClause;
+    (**
+      Returns a reference to the exported headings collection.
+      @return  a TMethodCollection
+    **)
+    Property ExportedHeadings : TMethodCollection Read FExportedHeadings;
+    (**
+      Returns a reference to the resource string clause collection.
+      @return  a TGenericContainerCollection
+    **)
+    Property ResourceStrings : TGenericContainerCollection Read FResStrCollection;
+    (**
+      Returns a reference to the ThreadVar clause collection.
+      @return  a TGenericContainerCollection
+    **)
+    Property ThreadVars : TGenericContainerCollection Read FThreadVarsCollection;
+    (**
+      Returns a reference to the modules Initialization comment.
+      @return  a TComment
+    **)
+    Property InitComment : TComment Read FInitComment Write FInitComment;
+    (**
+      Returns a reference to the modules Finalization comment.
+      @return  a TComment
+    **)
+    Property FinalComment : TComment Read FFinalComment Write FFinalComment;
+    (**
+      Returns a refernce to the modules exports collection.
+      @return  a TGenericContainerCollection
+    **)
+    Property ExportsClause : TGenericContainerCollection Read FExportsCollection
+      Write FExportsCollection;
   End;
 
 ResourceString
+  (** The registry key for the wizards settings. **)
+  strRegRootKey = 'Software\Season''s Fall\Pascal Doc\';
+
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
 
@@ -1428,7 +1659,53 @@ Const
     'out ');
 
   (** This is a string array representing the TDocOption enumerates.
-      @todo This needs to be expaned with descriptions for all the documentation conflicts.
+      @todo Moves the descriptions to resource strings and add some context. **)
+  DocOptionInfo : Array[Low(TDocOption)..High(TDocOption)] Of TDocOptionRec = (
+    (Description : 'Draw Syntax Highlighted Module Explorer'; Enabled : False),
+    (Description : 'Show comments in the hints'; Enabled : False),
+    (Description : 'Show local declarations in methods'; Enabled : False),
+    (Description : 'Show private declarations'; Enabled : True),
+    (Description : 'Show protected declarations'; Enabled : True),
+    (Description : 'Show public declarations'; Enabled : True),
+    (Description : 'Show published declarations'; Enabled : True),
+    (Description : 'Show local procedures and functions'; Enabled : True),
+    (Description : 'Show Documentation Conflicts'; Enabled : False),
+    (Description : 'Manage Expanded Nodes'; Enabled : True),
+    (Description : 'Show Missing Method Documentation'; Enabled : True),
+    (Description : 'Show Missing Method Documentation Description'; Enabled : True),
+    (Description : 'Show Different Method Parameter Count'; Enabled : True),
+    (Description : 'Show Undocumented Method Parameters'; Enabled : True),
+    (Description : 'Show Incorrect Method Parameter Type'; Enabled : True),
+    (Description : 'Show Undocumented Method Return'; Enabled : True),
+    (Description : 'Show Incorrect Method Return Type'; Enabled : True),
+    (Description : 'Show Undocumented Types'; Enabled : False),
+    (Description : 'Show Undocumented Records'; Enabled : False),
+    (Description : 'Show Undocumented Objects'; Enabled : False),
+    (Description : 'Show Undocumented Classes'; Enabled : False),
+    (Description : 'Show Undocumented Interfaces'; Enabled : False),
+    (Description : 'Show Undocumented Variables'; Enabled : False),
+    (Description : 'Show Undocumented Constants'; Enabled : False),
+    (Description : 'Show Undocumented Module'; Enabled : True),
+    (Description : 'Show Missing Module Date'; Enabled : False),
+    (Description : 'Show Check Module Date'; Enabled : False),
+    (Description : 'Show Missing Module Version'; Enabled : False),
+    (Description : 'Show Missing Module Author'; Enabled : False),
+    (Description : 'Show Missing Method Pre-Conditions'; Enabled : False),
+    (Description : 'Show Missing Method Post-Conditions'; Enabled : False),
+    (Description : 'Show Missing Property Documentation'; Enabled : False),
+    (Description : 'Show Missing Property Documentation Description'; Enabled : False),
+    (Description : 'Show Different Property Parameter Count'; Enabled : False),
+    (Description : 'Show Undocumented Property Parameter'; Enabled : False),
+    (Description : 'Show Incorrect Property Parameter Type'; Enabled : False),
+    (Description : 'Show Undocumented Property Return Type'; Enabled : False),
+    (Description : 'Show Incorrect Property Return Type'; Enabled : False),
+    (Description : 'Show Missing Property Pre-Conditions'; Enabled : False),
+    (Description : 'Show Missing Property Post-Conditions'; Enabled : False),
+    (Description : 'Categories Documentation Conflicts'; Enabled : False)
+  );
+
+  (** This is a string array representing the TDocOption enumerates.
+      @todo This needs to be expanded with descriptions for all the documentation conflicts.
   **)
   DocConflictInfo : Array[Low(TDocConflictType)..High(TDocConflictType)] Of TDocConflictTypeRec = (
     (Category: strModuleDocumentation;
@@ -1518,7 +1795,341 @@ Const
       MessageMask: strPropertyTooManyPostcons; Description: '' )
   );
 
+  (** A list of string representing the types of modules. **)
+  strModuleTypes : Array[mtProgram..mtUnit] Of String = ('Program', 'Package',
+    'Library', 'Unit');
+  (** This is a constant for special tag items to show in the tree **)
+  iShowInTree = $0001;
+  (** This is a constant for special tag items to auto expand in the tree **)
+  iAutoExpand = $0002;
+
+Var
+  (** This is a global string list containing the special tags list. **)
+  SpecialTags : TStringList;
+
+  Function GetTokenType(Ch : Char; LastToken : TTokenType) : TTokenType;
+  function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
+  Function IsTokenWhiteSpace(strToken : String) : Boolean;
+
 Implementation
+
+Uses
+  Windows;
+
+(**
+
+  This function returns the token type for a given character and last token
+  type.
+
+  @precon  Ch is the character for which the token type assessment needs to be
+           taken for and LastToken os the type of the last token as this has an
+           effect on some characters.
+  @postcon Returns the token type for the given character.
+
+  @param   Ch        as a Char
+  @param   LastToken as a TTokenType
+  @return  a TTokenType
+
+**)
+Function GetTokenType(Ch : Char; LastToken : TTokenType) : TTokenType;
+
+Begin
+  If ch In strWhiteSpace Then
+    Result := ttWhiteSpace
+  Else If ch In strTokenChars Then
+    Result := ttIdentifier
+  Else If ch In strNumbers Then
+    Begin
+      Result := ttNumber;
+      If LastToken = ttIdentifier Then
+        Result := ttIdentifier;
+    End
+  Else If ch In strLineEnd Then
+    Result := ttLineEnd
+  Else If ch In strQuote Then
+    Result := ttStringLiteral
+  Else If ch In strSymbols Then
+    Begin
+      Result := ttSymbol;
+      If (Ch = '.') And (LastToken = ttNumber) Then
+        Result := ttNumber;
+    End
+  Else
+    Result := ttUnknown;
+End;
+
+(**
+
+  This function returns true if the given word is in the supplied word list. It
+  uses a binary search, so the word lists need to be sorted.
+
+  @precon  strWord is the word to be searches for in the word list and
+           strWordList is a static array of words in lowercase and alphabetical
+           order.
+  @postcon Returns true if the word is found in the list.
+
+  @param   strWord     as a String
+  @param   strWordList as an Array Of String
+  @return  a Boolean
+
+**)
+function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
+
+Var
+  l, m, r : Integer;
+  str : String;
+
+begin
+  Result := False;
+  str := LowerCase(strWord);
+  l := 0;
+  r := High(strWordList);
+  While l <= r Do
+    Begin
+      m := (l + r) Div 2;
+      If strWordList[m] < str Then
+        l := Succ(m)
+      Else If strWordList[m] > str Then
+        r:= Pred(m)
+      Else
+        Begin
+          Result := True;
+          Exit;
+        End;
+    End;
+end;
+
+(**
+
+  This function converts a freeform text string representing dates and times
+  in standard formats in to a TDateTime value.
+
+  @precon  strDate is the string to convert into a date.
+  @postcon Returns a valid TDateTime value.
+
+  @param   strDate as a String
+  @return  a TDateTime
+
+**)
+Function TBaseLanguageModule.ConvertDate(Const strDate : String) : TDateTime;
+
+Type
+  TDateRec = Record
+    iDay, iMonth, iYear, iHour, iMinute, iSecond : Word;
+  End;
+
+Const
+  strErrMsg = 'Can not convert the date "%s" to a valid TDateTime value.';
+  Delimiters : Set Of Char = ['-', ' ', '\', '/', ':'];
+  Days : Array[1..7] Of String = ('fri', 'mon', 'sat', 'sun', 'thu', 'tue', 'wed');
+  Months : Array[1..24] Of String = (
+    'apr', 'april',
+    'aug', 'august',
+    'dec', 'december',
+    'feb', 'february',
+    'jan', 'january',
+    'jul', 'july',
+    'jun', 'june',
+    'mar', 'march',
+    'may', 'may',
+    'nov', 'november',
+    'oct', 'october',
+    'sep', 'september'
+    );
+  MonthIndexes : Array[1..24] Of Word = (
+    4, 4,
+    8, 8,
+    12, 12,
+    2, 2,
+    1, 1,
+    7, 7,
+    6, 6,
+    3, 3,
+    5, 5,
+    11, 11,
+    10, 10,
+    9, 9
+  );
+
+Var
+  i : Integer;
+  sl : TStringList;
+  strToken : String;
+  iTime : Integer;
+  recDate : TDateRec;
+  tmp : Word;
+  iIndex0, iIndex1, iIndex2 : Integer;
+
+  (**
+
+    This procedure adds the token to the specified string list and clears the
+    token.
+
+    @precon  StringList is the string list to add the token too and strToken is
+             the token to add to the list.
+    @postcon Adds the token to the specified string list and clears the
+             token.
+
+    @param   StringList as a TStringList
+    @param   strToken   as a String as a reference
+
+  **)
+  Procedure AddToken(StringList : TStringList; var strToken  : String);
+
+  Begin
+    If strToken <> '' Then
+      Begin
+        StringList.Add(strToken);
+        strToken := '';
+      End;
+  End;
+
+  (**
+
+    This procedure tries to extract the value from the indexed string list
+    item into the passed variable reference. It delete is true it remove the
+    item from the string list.
+
+    @precon  iIndex is the index of the item from the string list to extract,
+             iValue is a word variable to place the converted item into and
+             Delete determines whether the item is removed from the string list.
+    @postcon Tries to extract the value from the indexed string list
+             item into the passed variable reference.
+
+    @param   iIndex as an Integer
+    @param   iValue as a Word as a reference
+    @param   Delete as a Boolean
+
+  **)
+  Procedure ProcessValue(iIndex : Integer; var iValue : Word; Delete : Boolean);
+
+  Begin
+    If iIndex > sl.Count - 1 Then Exit;
+    Val(sl[iIndex], iValue, i);
+    If i <> 0 Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+    If Delete Then sl.Delete(iIndex);
+  End;
+
+  (**
+
+    This procedure assigns string list indexes to the three index values
+    according to the short date format and what information is supplied.
+
+    @precon  None.
+    @postcon Assigns string list indexes to the three index values according to
+             the short date format and what information is supplied.
+
+  **)
+  Procedure AssignIndexes();
+
+  Var
+    slFormat : TStringList;
+    str : String;
+    j : Integer;
+
+  Begin
+    iIndex0 := 0; // Default Day / Month / Year
+    iIndex1 := 1;
+    iIndex2 := 2;
+    slFormat := TstringList.Create;
+    Try
+      str := '';
+      For j := 1 To Length(ShortDateFormat) Do
+        If ShortDateFormat[j] In Delimiters Then
+          AddToken(slFormat, str)
+        Else
+          str := str + ShortDateFormat[j];
+      AddToken(slFormat, str);
+      // Remove day of week
+      For j := slFormat.Count - 1 DownTo 0 Do
+        If (slFormat[j][1] In ['d', 'D']) And (Length(slFormat[j]) > 2) Then
+          slFormat.Delete(j);
+      For j := 0 To slFormat.Count - 1 Do
+        Begin
+          If slFormat[j][1] In ['d', 'D'] Then iIndex0 := j;
+          If slFormat[j][1] In ['m', 'M'] Then iIndex1 := j;
+          If slFormat[j][1] In ['y', 'Y'] Then iIndex2 := j;
+        End;
+    Finally
+      slFormat.Free;
+    End;
+  End;
+
+Begin
+  Result := 0;
+  sl := TStringList.Create;
+  Try
+    strToken := '';
+    iTime := -1;
+    For i := 1 To Length(strDate) Do
+      If strDate[i] In Delimiters Then
+        Begin
+          AddToken(sl, strToken);
+          If (strDate[i] = ':') And (iTime = -1) Then iTime := sl.Count - 1;
+        End Else
+          strToken := strToken + strDate[i];
+    AddToken(sl, strToken);
+    FillChar(recDate, SizeOf(recDate), 0);
+    // Decode time
+    If iTime > -1 Then
+      Begin
+        ProcessValue(iTime,recDate.iHour, True);
+        ProcessValue(iTime,recDate.iMinute, True);
+        ProcessValue(iTime,recDate.iSecond, True);
+      End;
+    // Remove day value if present
+    For i := sl.Count - 1 DownTo 0 Do
+      If IsKeyWord(sl[i], Days) Then
+        sl.Delete(i);
+    // Decode date
+    Case sl.Count Of
+      1 :
+        Begin
+          DecodeDate(Now, recDate.iYear, recDate.iMonth, tmp);
+          ProcessValue(0, recDate.iDay, False); // Day only
+        End;
+      2, 3 : // Day and Month (Year)
+        Begin
+          DecodeDate(Now, recDate.iYear, tmp, tmp);
+          AssignIndexes;
+          ProcessValue(iIndex0, recDate.iDay, False); // Get day
+          If IsKeyWord(sl[iIndex1], Months) Then
+            Begin
+              For i := Low(Months) To High(Months) Do
+                If AnsiCompareText(Months[i], sl[iIndex1]) = 0 Then
+                  Begin
+                    recDate.iMonth := MonthIndexes[i];
+                    Break;
+                  End;
+            End Else
+              ProcessValue(iIndex1, recDate.iMonth, False); // Get Month
+            If sl.Count = 3 Then
+              Begin
+                ProcessValue(iIndex2, recDate.iYear, False); // Get Year
+                If recDate.iYear < 1900 Then Inc(recDate.iYear, 2000);
+              End;
+        End;
+    Else
+      If sl.Count <> 0 Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+    End;
+    // Output result.
+    With recDate Do
+      Begin
+        If Not (iHour In [0..23]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+        If Not (iMinute In [0..59]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+        If Not (iSecond In [0..59]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+        Result := EncodeTime(iHour, iMinute, iSecond, 0);
+        If iYear * iMonth * iDay <> 0 Then
+          Begin
+            If Not (iDay In [1..31]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+            If Not (iMonth In [1..12]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+            Result := Result + EncodeDate(iYear, iMonth, iDay);
+          End;
+      End;
+  Finally
+    sl.Free;
+  End;
+End;
 
 (**
 
@@ -1642,17 +2253,448 @@ End;
 
 (**
 
-  This function returns true if the token contains only whitespace or line
-  feeds / carriage returns.
+  This is a custom sort method for the DocConflictClass which allows the
+  internal sort method to sort the documentation conflicts.
 
-  @precon  strToken is the token to be check for white space.
-  @postcon Returns true if the token is all white space.
+  @precon  None.
+  @postcon Compares the 2 items and returns the comparison, If item12 < item2
+           then -1, if the same then 0, and if item1 > item 2 then +1.
+
+  @param   Item1 as a Pointer
+  @param   Item2 as a Pointer
+  @return  an Integer
+
+**)
+Function CompareDocConflicts(Item1, Item2 : Pointer) : Integer;
+
+Begin
+  Result := AnsiCompareText(
+    TDocumentConflict(Item1).Category + '.' + TDocumentConflict(Item1).Message,
+    TDocumentConflict(Item2).Category + '.' + TDocumentConflict(Item2).Message)
+
+End;
+
+(**
+
+  This method adds a specific documentation conflict to the Docuemntation
+  conflict collection.
+
+  @precon  None.
+  @postcon Adds a specific documentation conflict to the Docuemntation
+           conflict collection.
+
+  @param   Args            as an Array Of TVarRec constant
+  @param   iIdentLine      as an Integer
+  @param   iIdentColumn    as an Integer
+  @param   iCommentLine    as an Integer
+  @param   iCommentCol     as an Integer
+  @param   DocConflictType as a TDocConflictType
+
+**)
+procedure TBaseLanguageModule.AddDocumentConflict(Const Args: Array of TVarRec;
+  iIdentLine, iIdentColumn, iCommentLine, iCommentCol : Integer; DocConflictType: TDocConflictType);
+begin
+  FDocumentConflicts.Add(TDocumentConflict.Create(Args, iIdentLine,
+    iIdentColumn, iCommentLine, iCommentCol, DocConflictType));
+end;
+
+(**
+
+  This method adds a timer count to the modules OpTickCount collection. This
+  can be used to provide timing / profiling information on operations.
+
+  @precon  None.
+  @postcon Adds a timer count to the modules OpTickCount collection. This
+           can be used to provide timing / profiling information on operations.
+
+  @param   strLabel as a String
+
+**)
+procedure TBaseLanguageModule.AddTickCount(strLabel: String);
+begin
+  FTickList.AddObject(strLabel, TObject(GetTickCount));
+end;
+
+(**
+
+  This is the constructor method for the TBaseLanguageModule class.
+
+  @precon  None.
+  @postcon Initialise this base class and Tokensizes the passed stream of
+           characters.
+
+  @param   Source           as a TStream
+  @param   strReservedWords as an Array Of String
+  @param   strDirectives    as an Array Of String
+  @param   IsModified       as a Boolean
+  @param   strFileName      as a String
+
+**)
+constructor TBaseLanguageModule.Create(Source : TStream; strReservedWords,
+  strDirectives : Array of String; IsModified : Boolean; strFileName : String);
+begin
+  Inherited Create;
+  FFileName := strFileName;
+  FModified := IsModified;
+  FOwnedItems := TObjectList.Create(True);
+  FTokens := TObjectList.Create(True);
+  FTokenIndex := 0;
+  FSourceStream := Source;
+  FDocErrors := TDocErrorCollection.Create;
+  FTickList := TStringList.Create;
+  FExportedHeadings := TMethodCollection.Create;
+  FImplementedMethods := TMethodCollection.Create;
+  FConstantsCollection := TGenericContainerCollection.Create(True);
+  FResStrCollection := TGenericContainerCollection.Create(True);
+  FVarsCollection := TGenericContainerCollection.Create(True);
+  FThreadVarsCollection := TGenericContainerCollection.Create(True);
+  FTypeCollection := TGenericContainerCollection.Create(False);
+  FExportsCollection := TGenericContainerCollection.Create(True);
+  FBodyComment := TObjectList.Create(True);
+  FSymbolTable := TGenericContainerCollection.Create(True);
+  FDocumentConflicts :=  TObjectList.Create(True);
+  FContainsClause := Nil;
+  FFinalComment := Nil;
+  FInitComment := Nil;
+  FModuleComment := Nil;
+  FModuleName := '';
+  FModuleNameCol := 0;
+  FModuleNameLine := 0;
+  FModuleType := mtUnit;
+  FRequiresClause := Nil;
+  FUsesClause := Nil;
+  AddTickCount('Start');
+  TokenizeStream(strReservedWords, strDirectives);
+  AddTickCount('Tokenize');
+end;
+
+(**
+
+  This is the destructor method for the TBaseLanguageModule class.
+
+  @precon  None.
+  @postcon Frees the memory used by all the collections.
+
+**)
+destructor TBaseLanguageModule.Destroy;
+begin
+  FDocumentConflicts.Free;
+  FSymbolTable.Free;
+  FBodyComment.Free;
+  FExportsCollection.Free;
+  FTypeCollection.Free;
+  FThreadVarsCollection.Free;
+  FVarsCollection.Free;
+  FResStrCollection.Free;
+  FConstantsCollection.Free;
+  FImplementedMethods.Free;
+  FExportedHeadings.Free;
+  FTickList.Free;
+  FDocErrors.Free;
+  FTokens.Free;
+  FOwnedItems.Free;
+  inherited;
+end;
+
+(**
+
+  This method tries to get a document comment from the previous token and return
+  a TComment class to the calling routine.
+
+  @note    All comments found are automatically added to the comment collection
+           for disposal when the parser is destroyed.
+
+  @precon  None.
+  @postcon Returns the comment immediately before the current token else nil.
+
+  @return  a TComment
+
+**)
+Function TBaseLanguageModule.GetComment : TComment;
+
+Var
+  T : TTokenInfo;
+
+Begin
+  Result := Nil;
+  If FTokenIndex - 1 > -1 Then
+    Begin
+      T := FTokens[FTokenIndex - 1] As TTokenInfo;
+      If T.TokenType = ttComment Then
+        Begin
+          Result := TComment.CreateComment(T.Token, T.Line, T.Column);
+          OwnedItems.Add(Result);
+        End;
+    End;
+End;
+
+(**
+
+  This is a setter method for the TokenIndex property.
+
+  @precon  iIndex is the token index to set the parse to start at.
+  @postcon Sets the TokenIndex position.
+
+  @param   iIndex as a TTokenIndex
+
+**)
+Procedure TBaseLanguageModule.SetTokenIndex(iIndex : TTokenIndex);
+
+Begin
+  FTokenIndex := iIndex;
+End;
+
+(**
+
+  This method is a sort procedure for the Documentation Conflicts
+  collection.
+
+  @precon  None.
+  @postcon Sorts the documentation conflicts first by Category and then by
+           message.
+
+**)
+procedure TBaseLanguageModule.SortDocumentConflicts;
+begin
+  FDocumentConflicts.Sort(CompareDocConflicts);
+end;
+
+(**
+
+  This method tries to get a body comment from the previous token in the token
+  list and add it to the body comment list.
+
+  @precon  None.
+  @postcon Tries to get a body comment from the previous token in the token
+           list and add it to the body comment list.
+
+**)
+Procedure TBaseLanguageModule.GetBodyCmt;
+
+Var
+  T : TTokenInfo;
+  C : TComment;
+
+Begin
+  If FTokenIndex - 1 > -1 Then
+    Begin
+      T := FTokens[FTokenIndex - 1] As TTokenInfo;
+      If T.TokenType = ttComment Then
+        Begin
+          C := TComment.CreateComment(T.Token, T.Line, T.Column);
+          If C <> Nil Then BodyComments.Add(C);
+        End;
+    End;
+End;
+
+(**
+
+  This is a getter method for the BodyComment property.
+
+  @precon  iIndex is the index of the body comment required.
+  @postcon Return the requested comment object.
+
+  @param   iIndex as an Integer
+  @return  a TComment
+
+**)
+Function TBaseLanguageModule.GetBodyComment(iIndex : Integer) : TComment;
+
+Begin
+  Result := FBodyComment[iIndex] As TComment;
+End;
+
+(**
+
+  This is a getter method for the BodyCommentCount property.
+
+  @precon  None.
+  @postcon Returns the number of body comment in the collection.
+
+  @return  an Integer
+
+**)
+Function TBaseLanguageModule.GetBodyCommentCount : Integer;
+
+Begin
+  Result := FBodyComment.Count;
+End;
+
+(**
+
+  This is a getter method for the DocumentConflict property.
+
+  @precon  iIndex must be a valid integer index.
+  @postcon Returns the documentation conflict references by the passed index.
+
+  @param   iIndex as an Integer
+  @return  a TDocumentConflict
+
+**)
+function TBaseLanguageModule.GetDocumentConflict(
+  iIndex: Integer): TDocumentConflict;
+begin
+  Result := FDocumentConflicts.Items[iIndex] As TDocumentConflict;
+end;
+
+(**
+
+  This is a getter method for the DocumentConflictCount property.
+
+  @precon  None.
+  @postcon Returns the number of documenation conflicts in the collection.
+
+  @return  an Integer
+
+**)
+function TBaseLanguageModule.GetDocumentConflictCount: Integer;
+begin
+  Result := FDocumentConflicts.Count;
+end;
+
+(**
+
+  This is a getter method for the OpTickCount property.
+
+  @precon  None.
+  @postcon If both the start and end token are found in the collection of Tick
+           Counts then the number of Tick Counts between them are returned.
+
+  @param   strStart  as a String
+  @param   strFinish as a String
+  @return  an Integer
+
+**)
+function TBaseLanguageModule.GetOpTickCount(strStart, strFinish : String): Integer;
+
+Var
+  i : Integer;
+  iStart, iFinish : Integer;
+
+begin
+  Result := -1;
+  iStart := 0;
+  iFinish := 0;
+  For i := 0 To FTickList.Count - 1 Do
+    Begin
+      If AnsiComparetext(FTickList[i], strStart) = 0 Then iStart := i;
+      If AnsiComparetext(FTickList[i], strFinish) = 0 Then iFinish := i;
+    End;
+  If iStart * iFinish > 0 Then
+    Result := Integer(FTickList.Objects[iFinish]) - Integer(FTickList.Objects[iStart]);
+end;
+
+(**
+
+  This is a getter method for the OpTickCountByIndex property.
+
+  @precon  iIndex must be a valid index.
+  @postcon Returns the tick count associated with the passed index.
+
+  @param   iIndex as an Integer
+  @return  an Integer
+
+**)
+function TBaseLanguageModule.GetOpTickCountByIndex(iIndex: Integer): Integer;
+begin
+  Result := Integer(FTickList.Objects[iIndex]);
+end;
+
+(**
+
+  This is a getter method for the OpTickCountName property.
+
+  @precon  iIndex must be a valid integer index.
+  @postcon Returns the name of the OpTickCount references by the index passed.
+
+  @param   iIndex as an Integer
+  @return  a String
+
+**)
+function TBaseLanguageModule.GetOpTickCountName(iIndex: Integer): String;
+begin
+  Result := FTickList[iIndex];
+end;
+
+(**
+
+  This is a getter method for the OpTickCounts property.
+
+  @precon  None.
+  @postcon Returns the number of items in the OpTickCount collection.
+
+  @return  an Integer
+
+**)
+function TBaseLanguageModule.GetOpTickCounts: Integer;
+begin
+  Result := FTickList.Count;
+end;
+
+(**
+
+  This is a getter method for the TokenCount property.
+
+  @precon  None.
+  @postcon Returns the number of tokens in the collection.
+
+  @return  an Integer
+
+**)
+Function TBaseLanguageModule.GetTokenCount : Integer;
+
+Begin
+  Result := FTokens.Count;
+End;
+(**
+
+  This is a getter method for the TokenInfo property.
+
+  @precon  iIndex is the index of the token info object required.
+  @postcon Returns the token info object requested.
+
+  @param   iIndex as a TTokenIndex
+  @return  a TTokenInfo
+
+**)
+function TBaseLanguageModule.GetTokenInfo(iIndex: TTokenIndex): TTokenInfo;
+
+begin
+  Result := FTokens[iIndex] As TTokenInfo;
+end;
+
+(**
+
+  This is a getter method for the Token property.
+
+  @precon  None.
+  @postcon Returns a token info object for the current token.
+
+  @return  a TTokenInfo
+
+**)
+Function TBaseLanguageModule.GetToken : TTokenInfo;
+
+Begin
+  If FTokenIndex >= FTokens.Count Then
+    Raise EDocException.Create(strUnExpectedEndOfFile);
+  Result := FTokens[FTokenIndex] As TTokenInfo;
+End;
+
+(**
+
+  This method checks to see if the passed token if white space, if so returns
+  true.
+
+  @precon  None.
+  @postcon Checks to see if the passed token if white space, if so returns
+           true.
 
   @param   strToken as a String
   @return  a Boolean
 
 **)
-Class Function TBaseLanguageModule.IsTokenWhiteSpace(strToken : String) : Boolean;
+Function IsTokenWhiteSpace(strToken : String) : Boolean;
 
 Var
   i : Integer;
@@ -1663,6 +2705,290 @@ Begin
     If Not (strToken[i] In strWhiteSpace) And
       Not (strToken[i] In strLineEnd)Then
       Result := False;
+End;
+
+(**
+
+  This method moves the toke to the next token in the token list or raises an
+  EDocException.
+
+  @precon  None.
+  @postcon Moves the token to the next token in the token list or raises an
+           EDocException.
+
+**)
+Procedure TBaseLanguageModule.NextToken;
+
+begin
+  Inc(FTokenIndex);
+end;
+
+(**
+
+  This method checks for the end of the token list and returns true if it is
+  found.
+
+  @precon  None.
+  @postcon Returns true is we are beyond the end of the token collection.
+
+  @return  a Boolean
+
+**)
+Function TBaseLanguageModule.EndOfTokens : Boolean;
+
+Begin
+  Result := FTokenIndex >= FTokens.Count;
+End;
+
+(**
+
+  This method move the token position to the next non comment token.
+
+  @precon  None.
+  @postcon Move the token position to the next non comment token.
+
+**)
+procedure TBaseLanguageModule.NextNonCommentToken;
+begin
+  // Go to the next token
+  NextToken;
+  // Keep going if a comment
+  While (Token.TokenType In [ttComment, ttCompilerDirective]) And Not EndOfTokens Do
+    NextToken;
+end;
+
+(**
+
+  This method rolls back to the previous token in the token list skipping
+  comment tokens.
+
+  @precon  None.
+  @postcon Rolls back to the previous token in the token list skipping
+           comment tokens.
+
+**)
+Procedure TBaseLanguageModule.RollBackToken;
+
+Begin
+  Dec(FTokenIndex);
+  While (FTokenIndex > 0) And (TokenInfo[FTokenIndex].TokenType In [ttComment,
+    ttCompilerDirective]) Do
+    Dec(FTokenIndex);
+  If FTokenIndex < 0 Then
+    Raise EDocException.Create(strUnExpectedStartOfFile);
+End;
+
+(**
+
+  This method returns the previous token in the token list, else returns nil.
+
+  @precon  None.
+  @postcon Returns a token info object for the previous non comment token.
+
+  @return  a TTokenInfo
+
+**)
+Function TBaseLanguageModule.PrevToken : TTokenInfo;
+
+Var
+  i : Integer;
+
+begin
+  Result := Nil;
+  For i := FTokenIndex - 1 DownTo 0 Do
+    If Not ((FTokens[i] As TTokenInfo).TokenType In [ttComment,
+      ttCompilerDirective]) Then
+      Begin
+        Result := FTokens[i] As TTokenInfo;
+        Exit;
+      End;
+end;
+
+(**
+
+  This method tokenises the stream of text passed to the constructor and splits
+  it into tokens.
+
+  @precon  None.
+  @postcon Tokenises the stream of text passed to the constructor and splits
+           it into tokens.
+
+  @param   strReservedWords as an Array of String
+  @param   strDirectives    as an Array of String
+
+**)
+Procedure TBaseLanguageModule.TokenizeStream(strReservedWords,
+  strDirectives : Array of String);
+
+Type
+  (** State machine for block types. **)
+  TBlockType = (btNoBlock, btStringLiteral, btLineComment, btBraceComment,
+    btFullComment);
+
+Const
+  (** Growth size of the token buffer. **)
+  iTokenCapacity = 25;
+  test = 12.34;
+
+Var
+  boolEOF : Boolean;
+  (** Token buffer. **)
+  strToken : String;
+  CurToken : TTokenType;
+  LastToken : TTokenType;
+  BlockType : TBlockType;
+  (** Current line number **)
+  iLine : Integer;
+  (** Current column number **)
+  iColumn : Integer;
+  (** Token stream position. Fast to inc this than read the stream position. **)
+  iStreamPos : Integer;
+  (** Token line **)
+  iTokenLine : Integer;
+  (** Token column **)
+  iTokenColumn : Integer;
+  (** Current character position **)
+  iStreamCount : Integer;
+  Ch : Char;
+  LastChar : Char;
+  (** Token size **)
+  iTokenLen : Integer;
+
+Begin
+  BlockType := btNoBlock;
+  iStreamPos := 0;
+  iTokenLine := 1;
+  iTokenColumn := 1;
+  boolEOF := False;
+  CurToken := ttUnknown;
+  LastToken := ttUnknown;
+  iStreamCount := 0;
+  iLine := 1;
+  iColumn := 1;
+  Ch := #0;
+  LastChar := #0;
+  strToken := '';
+
+  iTokenLen := 0;
+  SetLength(strToken, iTokenCapacity);
+
+  Try
+    If FSourceStream <> Nil Then
+      Begin
+        Repeat
+          If FSourceStream.Read(ch, 1) > 0 Then
+            Begin
+              Inc(iStreamCount);
+              LastToken := CurToken;
+              CurToken := GetTokenType(Ch, LastToken);
+
+              // Check for full block comments
+              If (BlockType = btNoBlock) And (LastChar = '(') And (Ch = '*') Then
+                BlockType := btFullComment;
+
+              // Check for line comments
+              If (BlockType = btNoBlock) And (LastChar = '/') And (Ch = '/') Then
+                BlockType := btLineComment;
+
+              If (LastToken <> CurToken) Or (CurToken = ttSymbol) Then
+                Begin
+                  If ((BlockType In [btStringLiteral, btLineComment]) And
+                    (CurToken <> ttLineEnd)) Or
+                    (BlockType In [btBraceComment, btFullComment]) Then
+                    Begin
+                      Inc(iTokenLen);
+                      If iTokenLen > Length(strToken) Then
+                        SetLength(strToken, iTokenCapacity + Length(strToken));
+                      strToken[iTokenLen] := Ch;
+                    End Else
+                    Begin
+                      SetLength(strToken, iTokenLen);
+                      If Not IsTokenWhiteSpace(strToken) Then
+                        Begin
+                          If LastToken = ttIdentifier Then
+                            Begin
+                              If IsKeyWord(strToken, strReservedWords) Then
+                                LastToken := ttReservedWord;
+                              If IsKeyWord(strToken, strDirectives) Then
+                                LastToken := ttDirective;
+                            End;
+                          If BlockType = btLineComment Then
+                            LastToken := ttComment;
+                          If (LastToken = ttComment) And (Length(strToken) > 2) Then
+                            If (strToken[1] = '{') And (strToken[2] = '$') Then
+                              LastToken := ttCompilerDirective;
+                          FTokens.Add(TTokenInfo.Create(strToken, iStreamPos,
+                            iTokenLine, iTokenColumn, Length(strToken), LastToken));
+                          //Inc(iCounter);
+                        End;
+                     // Store Stream position, line number and column of
+                     // token start
+                     iStreamPos := iStreamCount;
+                     iTokenLine := iLine;
+                     iTokenColumn := iColumn;
+                     BlockType := btNoBlock;
+                     iTokenLen := 1;
+                     SetLength(strToken, iTokenCapacity);
+                     strToken[iTokenLen] := Ch;
+                    End;
+                End Else
+                Begin
+                  Inc(iTokenLen);
+                  If iTokenLen > Length(strToken) Then
+                    SetLength(strToken, iTokenCapacity + Length(strToken));
+                  strToken[iTokenLen] := Ch;
+                End;
+
+              // Check for the end of a block comment
+              If (BlockType = btFullComment) And (LastChar = '*') And (Ch = ')') Then
+                Begin
+                  BlockType := btNoBlock;
+                  CurToken := ttComment;
+                End;
+
+              // Check for string literals
+              If CurToken = ttStringLiteral Then
+                If BlockType = btStringLiteral Then
+                  BlockType := btNoBlock
+                Else If BlockType = btNoBlock Then
+                  BlockType := btStringLiteral;
+
+              // Check for block Comments
+              If (BlockType = btNoBlock) And (Ch = '{') Then
+                Begin
+                  CurToken := ttComment;
+                  BlockType := btBraceComment;
+                End;
+              If (BlockType = btBraceComment) And (Ch = '}') Then
+                Begin
+                  CurToken := ttComment;
+                  BlockType := btNoBlock;
+                End;
+
+              Inc(iColumn);
+              If Ch = #10 Then
+                Begin
+                  Inc(iLine);
+                  iColumn := 1;
+                  If BlockType In [btLineComment, btStringLiteral] Then
+                    BlockType := btNoBlock;
+                End;
+              LastChar := Ch;
+            End Else
+              boolEOF := True;
+        Until boolEOF;
+        If iTokenLen > 0 Then
+          Begin
+            SetLength(strToken, iTokenLen);
+            If Not IsTokenWhiteSpace(strToken) Then
+              FTokens.Add(TTokenInfo.Create(strToken, iStreamPos,
+                iTokenLine, iTokenColumn, Length(strToken), LastToken));
+          End;
+      End;
+  Except
+    On E : Exception Do
+      Errors.Add(E.Message, 0, 0, 'Exception during tokenizing.', etError);
+  End
 End;
 
 (**
@@ -1688,7 +3014,7 @@ end;
 
   @precon  strName is the name of the new tag to be created, iLine is the line
            number of the tag and iColumn is the column position of the tag.
-  @postcon 
+  @postcon Initialises the comment tag class.
 
   @param   strName as a String
   @param   iLine   as an Integer
@@ -1707,6 +3033,9 @@ end;
 (**
 
   This is the TTag class Destructor method. It disploses of the token list.
+
+  @precon  None.
+  @postcon Frees the tags tokens.
 
 **)
 destructor TTag.Destroy;
@@ -1762,6 +3091,7 @@ end;
   This is a getter method for the TokenCount property of the TTag class.
   It returns the number of tokens in the token list.
 
+  @precon  None.
   @postcon Returns the number of tokens in the collection.
 
   @return  an Integer
@@ -1794,6 +3124,7 @@ end;
   This is a setter method for the TagName property of the TTag class.
 
   @precon  Value is the new value of the TagName property.
+  @postcon Sets the TagName property.
 
   @param   Value as a String constant
 
@@ -1814,8 +3145,9 @@ end;
 
   This method added a token and its type to the token list.
 
-  @precon  strToken is a string to be added as a token.
-  @precon  iType is the token's type.
+  @precon  strToken is a string to be added as a token and iType is the token's
+           type.
+  @postcon Added a token and its type to the token list.
 
   @param   strToken as a String
   @param   iType    as a TTokenType
@@ -1824,7 +3156,7 @@ end;
 procedure TComment.AddToken(strToken: String; iType: TTokenType);
 
 begin
-  If strToken[1] = '@' Then
+  If (strToken[1] = '@') And (Copy(strToken, 1, 2) <> '@@') Then
     Begin
       FTagMode := True;
       FLastTag := TTag.Create(Copy(strToken, 2, Length(strToken) - 1),
@@ -1833,9 +3165,12 @@ begin
       Exit; // Don't add token identifier to token list
     End;
   If Not FTagMode Then
-    FTokens.AddObject(strToken, TObject(iType))
-  Else
-    FLastTag.AddToken(strToken, iType);
+    Begin
+      If (strToken[1] = '<') And (strToken[Length(strToken)] = '>') Then
+        iType := ttHTMLTag;
+      FTokens.AddObject(strToken, TObject(iType))
+    End Else
+      FLastTag.AddToken(strToken, iType);
 end;
 
 (**
@@ -1844,6 +3179,8 @@ end;
   comment.
 
   @precon  srcComment is a source comment to be assign to this comment.
+  @postcon Appends all the tokens and tags from the source comment to this
+           comment.
 
   @param   srcComment as a TComment
 
@@ -1877,6 +3214,9 @@ end;
   as a valid comment.
 
   @precon  strComment is a string of text to be parsed as a comment.
+  @postcon Assigns the str passed to the end of the token list. The string
+           has a pre and post fix added so that the ParseComment() method will
+           accept it as a valid comment.
 
   @param   strComment as a String
 
@@ -1892,10 +3232,9 @@ end;
   This method returns a string representation of the comment tokens with the
   specified indent and broken into lines by the max width parameter.
 
-  @precon  iIndent is the indent in space required of the comment.
-  @precon  iMaxWidth is the maximum width before the comment is broken onto
-           another line.
-  @precon  ShowHTML determines if the routine outputs the HTML Tags in the
+  @precon  iIndent is the indent in space required of the comment, iMaxWidth is
+           the maximum width before the comment is broken onto another line and
+           ShowHTML determines if the routine outputs the HTML Tags in the
            resulting string.
   @postcon Returns a string representation of the comment indented and broken
            into lines.
@@ -1916,7 +3255,7 @@ begin
   Result := '';
   str := StringOfChar(#32, iIndent);
   For i := 0 To TokenCount - 1 Do
-    If (TokenType[i] <> ttHTMLtag) Or ((TokenType[i] = ttHTMLtag) And ShowHTML) Then 
+    If (TokenType[i] <> ttHTMLtag) Or ((TokenType[i] = ttHTMLtag) And ShowHTML) Then
     Begin
       str := str + Token[i] + #32;
       If Length(str) > iMaxWidth Then
@@ -1937,9 +3276,11 @@ end;
   This is the TComment constructor. It create a token list and a tag list.
   Then it passes the comment to the comment parser.
 
-  @precon  strComment is a string of text to be parsed as a comment.
-  @precon  iLine is the line number of the comment.
-  @precon  iCol is the column number of the comment.
+  @precon  strComment is a string of text to be parsed as a comment, iLine is
+           the line number of the comment and iCol is the column number of the
+           comment.
+  @postcon It create a token list and a tag list. Then it passes the comment to
+           the comment parser.
 
   @param   strComment as a String
   @param   iLine      as an Integer
@@ -1964,9 +3305,9 @@ end;
   documentation comment and then creating an instance of a TComment class and
   parsing the comment via the constructor.
 
-  @precon  strComment is the full comment to be checked and parsed.
-  @precon  iLine is the line number of the comment.
-  @precon  iCol is the column number of the comment.
+  @precon  strComment is the full comment to be checked and parsed, iLine is the
+           line number of the comment and iCol is the column number of the
+           comment.
   @postcon Returns Nil if this is not a documentation comment or returns a valid
            TComment class.
 
@@ -2001,6 +3342,9 @@ end;
   This is the TComment class's destructor. It disposes of the token list and
   the tag list.
 
+  @precon  None.
+  @postcon Frees the classes internal lists.
+
 **)
 destructor TComment.Destroy;
 begin
@@ -2031,6 +3375,7 @@ end;
   This is a getter method for the TagCount property of the TComment class.
   It return the number of tag in the list.
 
+  @precon  None.
   @postcon Returns the number of tags in the collection.
 
   @return  an Integer
@@ -2048,7 +3393,7 @@ end;
 
   @precon  iTokenIndex is the index of the token required.
   @postcon Returns the token as a string.
-  
+
   @param   iTokenIndex as an Integer
   @return  a String
 
@@ -2063,6 +3408,7 @@ end;
   This is a getter method for the TokenCount property of the TComment class.
   It returns the number of tokens in the token list.
 
+  @precon  None.
   @postcon Returns the number of tokens in the collection.
 
   @return  an Integer
@@ -2096,6 +3442,8 @@ end;
   all the tags at the same time. Tag should be at the end of the comment.
 
   @precon  strComment is a string of text to be parsed as a comment.
+  @postcon Takes the given comment and parses it into tokens. It pulls out
+           all the tags at the same time. Tag should be at the end of the comment.
 
   @param   strComment as a String
 
@@ -2139,7 +3487,7 @@ begin
         (strComment[i] = '<') Then
         Begin
           SetLength(strToken, iTokenLen);
-          If Not TBaseLanguageModule.IsTokenWhiteSpace(strToken) Then
+          If Not IsTokenWhiteSpace(strToken) Then
             AddToken(strToken, LastToken);
           iTokenLen := 1;
           SetLength(strToken, iTokenCapacity);
@@ -2161,15 +3509,6 @@ begin
           CurToken := ttLinkTag;
         End;
 
-      If (BlockType = btNone) And (strToken[1] = '<') Then
-        BlockType := btHTML;
-
-      If (BlockType = btHTML) And (strToken[iTokenLen] = '>') Then
-        Begin
-          BlockType := btNone;
-          CurToken := ttHTMLTag;
-        End;
-
       If strComment[i] = #10 Then
         Begin
           FTagColumn := 1;
@@ -2180,7 +3519,7 @@ begin
   If (iTokenLen > 0) Then
     Begin
      SetLength(strToken, iTokenLen);
-      If Not TBaseLanguageModule.IsTokenWhiteSpace(strToken) Then
+      If Not IsTokenWhiteSpace(strToken) Then
         AddToken(strToken, LastToken);
     End;
 end;
@@ -2189,6 +3528,10 @@ end;
 
   This method resets the comment tag mode, i.e. the comment will accept text as
   tokens and not tag tokens.
+
+  @precon  None.
+  @postcon Resets the comment tag mode, i.e. the comment will accept text as
+           tokens and not tag tokens.
 
 **)
 procedure TComment.ResetTagMode;
@@ -2200,6 +3543,7 @@ end;
 
   This method is a getter method for the Line property.
 
+  @precon  None.
   @postcon Returns the line property value.
 
   @return  an Integer
@@ -2215,8 +3559,9 @@ End;
 
   This method is a getter method for the Column property.
 
+  @precon  None.
   @postcon Returns the column property value.
-  
+
   @return  an Integer
 
 **)
@@ -2258,12 +3603,12 @@ end;
   This is a constructor for the TTokenInfo class. It assigns values to all the
   properties.
 
-  @precon  strToken is a text token to create a token info object for.
-  @precon  iPos is the module buffer position of the token.
-  @precon  iLine is the line number of the token.
-  @precon  iCol is the column number of the token.
-  @precon  iLength is the length of the token.
-  @precon  TType is the enumerate type of the token (reserved word, identifier).
+  @precon  strToken is a text token to create a token info object for, iPos is
+           the module buffer position of the token, iLine is the line number of
+           the token, iCol is the column number of the token and iLength is the
+           length of the token and TType is the enumerate type of the token
+           (reserved word, identifier).
+  @postcon Initialises the class.
 
   @param   strToken as a String
   @param   iPos     as an Integer
@@ -2292,10 +3637,10 @@ end;
 
   This is the constructor method for the TIdent class.
 
-  @precon  strIdent is the name of the new identifier.
-  @precon  iLine is the line number of the identifier.
-  @precon  iCol is the column number of the identifier.
-  @precon  Comment is the comment associated with the identifier.
+  @precon  strIdent is the name of the new identifier, iLine is the line number
+           of the identifier, iCol is the column number of the identifier and
+           Comment is the comment associated with the identifier.
+  @postcon Create the Ident class.
 
   @param   strIdent as a String
   @param   iLine    as an Integer
@@ -2323,6 +3668,9 @@ end;
   This is the constructor for the TIdentList class. It creates an internal
   TStringlist for storing the identifiers.
 
+  @precon  None.
+  @postcon Initialises the class.
+
 **)
 Constructor TIdentList.Create;
 
@@ -2337,6 +3685,9 @@ End;
   This is the destructor for the TIdentList class and it free the internal
   StringList.
 
+  @precon  None.
+  @postcon Frees the memory allocated for the idents.
+
 **)
 destructor TIdentList.Destroy;
 begin
@@ -2348,6 +3699,7 @@ end;
 
   This method is a getter method for the Count property.
 
+  @precon  None.
   @postcon Returns the number of identifiers in the collection.
 
   @return  an Integer
@@ -2397,10 +3749,13 @@ end;
   line number in the lower 16 bits of the Data pointer and the column number
   in the upper 16 bits of the Data pointer.
 
-  @precon  strIdent is a text identifier to add to the collection.
-  @precon  iLine is the line number of the identifier.
-  @precon  iCol is the column number of the collection.
-  @precon  Comment is the comment to be associated with the identifier.
+  @precon  strIdent is a text identifier to add to the collection, iLine is the
+           line number of the identifier, iCol is the column number of the
+           collection and Comment is the comment to be associated with the
+           identifier.
+  @postcon Adds an identifier to the internal string list and stores the
+           line number in the lower 16 bits of the Data pointer and the column
+           number in the upper 16 bits of the Data pointer.
 
   @param   strIdent as a String
   @param   iLine    as an Integer
@@ -2420,6 +3775,7 @@ End;
   This method added the contents of the source ident list to this ident list.
 
   @precon  src is another valid identifier object to get identifiers from.
+  @postcon Added the contents of the source ident list to this ident list.
 
   @param   src as a TIdentList
 
@@ -2438,6 +3794,7 @@ End;
 
   This method returns the ident list as a comma separated list of tokens.
 
+  @precon  None.
   @postcon Returns a string representation of the identifiers comma separated.
 
   @return  a String
@@ -2469,6 +3826,9 @@ end;
   This is the constructor for the TConstant class. It creates an internal
   TStringList for the constants text.
 
+  @precon  None
+  @postcon It creates an internal StringList for the constants text.
+
 **)
 Constructor TGenericContainer.Create;
 
@@ -2488,10 +3848,11 @@ End;
   TStringList for the constants text and initialises the identifier, scope
   line and column attributes.
 
-  @precon  strIdentifier is a text identifier for the item to be created.
-  @precon  Scope is the scope of the item.
-  @precon  iLine is the line number of the item.
-  @precon  iCol is the column number of the item.
+  @precon  strIdentifier is a text identifier for the item to be created,
+           Scope is the scope of the item, iLine is the line number of the
+           item and iCol is the column number of the item.
+  @postcon It creates an internal StringList for the constants text and
+           initialises the identifier, scope line and column attributes.
 
   @param   strIdentifier as a String
   @param   Scope         as a TScope
@@ -2517,6 +3878,8 @@ End;
   line and column attributes.
 
   @precon  Ident is a identifier info create to create the item from.
+  @postcon It creates an internal TStringList for the constants text and
+           initialises the identifier, scope line and column attributes.
 
   @param   Ident as a TIdentInfo
 
@@ -2534,6 +3897,9 @@ end;
 
   This is the TConstant classes destructor. It frees the internal TStringList.
 
+  @precon  None.
+  @postcon It frees the internal TStringList.
+
 **)
 Destructor TGenericContainer.Destroy;
 
@@ -2547,6 +3913,7 @@ End;
   This method adds the passed token to the internal string list.
 
   @precon  strToken is a text token to add to the collection.
+  @postcon Adds the passed token to the internal string list.
 
   @param   strToken as a String
 
@@ -2578,6 +3945,7 @@ End;
 
   This is a getter method for the TokenCount property.
 
+  @precon  None.
   @postcon returns the number of tokens in the collection.
 
   @return  an Integer
@@ -2595,6 +3963,8 @@ End;
   the internal string list.
 
   @precon  src is another generic container collection to get tokens from.
+  @postcon Allows the contents of a source string list to be assigned to
+           the internal string list.
 
   @param   src as a TPersistent
 
@@ -2612,6 +3982,8 @@ End;
   container.
 
   @precon  src is another generic container collection to append tokens from.
+  @postcon Appends the tokens in the src container on to the end of this
+           container.
 
   @param   src as a TGenericContainer
 
@@ -2659,8 +4031,10 @@ end;
   This method allows the insertion of the given text in to the token collection
   at the given index.
 
-  @precon  strText is a string token to insert into the container.
-  @precon  iIndex is the position where the token should be inserted.
+  @precon  strText is a string token to insert into the container and iIndex is
+           the position where the token should be inserted.
+  @postcon Allows the insertion of the given text in to the token collection
+           at the given index.
 
   @param   strText as a String
   @param   iIndex  as an Integer
@@ -2700,6 +4074,8 @@ end;
   @precon  OwnItems tells the collection to dispose of the memory belonging to
            the items in the collection, else its the responsibility if the
            creator.
+  @postcon It creates a object list to hold and manage all the constants that
+           are added to the collection.
 
   @param   OwnItems as a Boolean
 
@@ -2717,6 +4093,9 @@ End;
   This is the constant collection destructor method. It frees the object list
   and in turn frees all the constants added.
 
+  @precon  None.
+  @postcon It frees the object list and in turn frees all the constants added.
+
 **)
 Destructor TGenericContainerCollection.Destroy;
 
@@ -2730,6 +4109,7 @@ End;
   This method adds the specified constant to the internal collection.
 
   @precon  AItem is generic container to add to the collection.
+  @postcon Adds the specified constant to the internal collection.
 
   @param   AItem as a TGenericContainer
 
@@ -2761,6 +4141,7 @@ End;
 
   This is a getter method for the Count property.
 
+  @precon  None.
   @postcon returns the number of items in the collection.
 
   @return  an Integer
@@ -2775,6 +4156,9 @@ End;
 (**
 
   This method removes any forward declarations from the types collection.
+
+  @precon  None.
+  @postcon Removes any forward declarations from the types collection.
 
 **)
 Procedure TGenericContainerCollection.RemoveForwardDecls;
@@ -2858,6 +4242,8 @@ end;
   Parameter can be assigned to another instance of the same class.
 
   @precon  Parameter is the parameter declaration to get information from.
+  @postcon A virtual assign procedure so that the properties of a Parameter can
+           be assigned to another instance of the same class.
 
   @param   Parameter as a TParameter
 
@@ -2881,14 +4267,14 @@ end;
   all the attributes of the classes on construction. It creates a string list
   to store the parameter type.
 
-  @precon  ParamMod is an enumerate identifying a const, var or out parameter.
-  @precon  Ident is the parameters identifier.
-  @precon  boolArrayOf indicate whether the parameter is an array.
-  @precon  AType is the type of the parameter.
-  @precon  Value is the constant value for the parameter is applicable.
-  @precon  Scope is the scope of the parameter.
-  @precon  iLine is the line number of the parameter.
-  @precon  iCol is the column number of the icon.
+  @precon  ParamMod is an enumerate identifying a const, var or out parameter,
+           Ident is the parameters identifier, boolArrayOf indicate whether the
+           parameter is an array, AType is the type of the parameter, Value is
+           the constant value for the parameter is applicable, Scope is the
+           scope of the parameter, iLine is the line number of the parameter
+           and iCol is the column number of the icon.
+  @postcon The constructor initialises all the attributes of the classes on
+           construction. It creates a string list to store the parameter type.
 
   @param   ParamMod    as a TParamModifier
   @param   Ident       as a String
@@ -2923,6 +4309,9 @@ End;
   This is the TParameters destructor method. If frees the parameter type string
   list.
 
+  @precon  None.
+  @postcon If frees the parameter type string list.
+
 **)
 destructor TParameter.Destroy;
 begin
@@ -2941,6 +4330,7 @@ end;
   This method adds a parameter to the parameter collection.
 
   @precon  Parameter is a parameter to be added to the property.
+  @postcon Adds a parameter to the parameter collection.
 
   @param   Parameter as a TParameter
 
@@ -2956,6 +4346,8 @@ end;
   Property can be assigned to another instance of the same class.
 
   @precon  Prop is the property declaration to get information from.
+  @postcon Virtual assign procedure so that the properties of a Property can be
+           assigned to another instance of the same class.
 
   @param   Prop as a TProperty
 
@@ -2997,10 +4389,11 @@ end;
   information for the class. If also creates a parameter collection for the
   storage of parameters.
 
-  @precon  strIdent is a text identifier for the property.
-  @precon  Scope is the scope of the property.
-  @precon  iLine is the line number of the icon.
-  @precon  iCol is the column number of the icon.
+  @precon  strIdent is a text identifier for the property, Scope is the scope of
+           the property, iLine is the line number of the icon and iCol is the
+           column number of the icon.
+  @postcon It initialises the basic information for the class. If also creates a
+           parameter collection for the storage of parameters.
 
   @param   strIdent as a String
   @param   Scope    as a TScope
@@ -3035,6 +4428,9 @@ end;
   This is the classes destructor. It frees the parameter collection and the
   parameters.
 
+  @precon  None.
+  @postcon It frees the parameter collection and the parameters.
+
 **)
 destructor TProperty.Destroy;
 begin
@@ -3047,6 +4443,7 @@ end;
   This is a getter method for the AsString property. It returns a string
   representation of the property.
 
+  @precon  None.
   @postcon Returns a string representation of the property.
 
   @return  a String
@@ -3119,6 +4516,7 @@ end;
 
   This is a getter method for the ParameterCount property.
 
+  @precon  None.
   @postcon Returns the number of parameters in the property.
 
   @return  an Integer
@@ -3134,6 +4532,7 @@ end;
   This is a setter method for the DefaultProperty property.
 
   @precon  Value is the new value to assign to the DefaultProperty property.
+  @postcon Sets the default property.
 
   @param   Value as a Boolean constant
 
@@ -3149,6 +4548,7 @@ end;
   This is a setter method for the DefaultSpec property.
 
   @precon  Value is the new value to assign to the DefaultSpec property.
+  @postcon Sets the default Spec property.
 
   @param   Value as a String constant
 
@@ -3164,6 +4564,7 @@ end;
   This is a setter method for the ImplementsSpec property.
 
   @precon  Value is the new value to assign to the ImplementsSpec property.
+  @postcon Sets the implementsSpec property.
 
   @param   Value as a String constant
 
@@ -3179,6 +4580,7 @@ end;
   This is a setter method for the IndexSpec property.
 
   @precon  Value is the new value to assign to the IndexSpec property.
+  @postcon Setst the indexspec property.
 
   @param   Value as a String constant
 
@@ -3194,6 +4596,7 @@ end;
   This is a setter method for the ReadSpec property.
 
   @precon  Value is the new value to assign to the ReadSpec property.
+  @postcon Sets the readspec property.
 
   @param   Value as a String constant
 
@@ -3209,6 +4612,7 @@ end;
   This is a setter method for the StoredSpec property.
 
   @precon  Value is the new value to assign to the StoredSpec property.
+  @postcon Sets the stored spec property.
 
   @param   Value as a String constant
 
@@ -3224,6 +4628,7 @@ end;
   This is a setter method for the TypeId property.
 
   @precon  Value is the new value to assign to the TyprId property.
+  @postcon Sets type id property.
 
   @param   Value as a String constant
 
@@ -3239,6 +4644,7 @@ end;
   This is a setter method for the WriteSpec property.
 
   @precon  Value is the new value to assign to the WriteSpec property.
+  @postcon Sets the write spec property.
 
   @param   Value as a String constant
 
@@ -3261,10 +4667,10 @@ end;
   type, scope and line and col information. If also creates a colection to
   store the parameter objects and a string list for the method directives.
 
-  @precon  MethodType is an enumerate indocating the type of the method.
-  @precon  Scope is the scope of the method.
-  @precon  iLine is the line number of the method.
-  @precon  iCol is the column number of the method.
+  @precon  MethodType is an enumerate indocating the type of the method, Scope
+           is the scope of the method, iLine is the line number of the method,
+           and iCol is the column number of the method.
+  @postcon It initialises the method type, scope and line and col information.
 
   @param   MethodType as a TMethodType
   @param   Scope      as a TScope
@@ -3303,6 +4709,9 @@ End;
   This is the destructor method for the TMethodDecl class. It frees the
   parameters collection, the parameter and the directives.
 
+  @precon  None.
+  @postcon It frees the parameters collection, the parameter and the directives.
+
 **)
 Destructor TMethodDecl.Destroy;
 
@@ -3323,6 +4732,8 @@ End;
   method can be assigned to another instance of the same class.
 
   @precon  Method is the method declaration to get information from.
+  @postcon Virtual assign procedure so that the properties of a method can be
+           assigned to another instance of the same class.
 
   @param   Method as a TMethodDecl
 
@@ -3365,6 +4776,7 @@ end;
   This is a setter method for the ClsName property.
 
   @precon  Value is the new value to assign to the ClsName property.
+  @postcon Setst the class name property.
 
   @param   Value as a String
 
@@ -3381,6 +4793,7 @@ End;
   This is a setter method for the Identifier property.
 
   @precon  Value is the new value to assign to the Identifier property.
+  @postcon Sets the identifier property.
 
   @param   Value as a String
 
@@ -3397,6 +4810,7 @@ End;
   This is a setter method for the ReturnType property.
 
   @precon  Value is the new value to assign to the ReturnType property.
+  @postcon Sets the return type property.
 
   @param   Value as a String
 
@@ -3413,6 +4827,7 @@ End;
   This method adds a parameter class to the parameters collection.
 
   @precon  Paremeter is a parameter to add to the method.
+  @postcon Adds a parameter class to the parameters collection.
 
   @param   Parameter as a TParameter
 
@@ -3427,6 +4842,7 @@ End;
 
   This is a getter method for the Count property.
 
+  @precon  None.
   @postcon Returns the number of parameters in the method.
 
   @return  an Integer
@@ -3459,6 +4875,7 @@ End;
 
   This method returns a fully qualified name for the method.
 
+  @precon  None.
   @postcon Returns a fully qualified name for the method.
 
   @return  a String
@@ -3479,6 +4896,7 @@ End;
 
   @precon  strDirective is a directive token to be added to the directives
            collection.
+  @postcon Adds a directive to the directives list.
 
   @param   strDirective as a String
 
@@ -3494,9 +4912,8 @@ End;
   This is a getter method for the AsString property.
 
   @precon  ShowClassName tell the routine to returns the class name in the
-           resultant string.
-  @precon  ShowMethodType tell the routine to returns the methods type in the
-           resultant string.
+           resultant string and ShowMethodType tell the routine to returns the
+           methods type in the resultant string.
   @postcon Returns a string representation of the method.
 
   @param   ShowClassName  as a Boolean
@@ -3560,7 +4977,7 @@ End;
   @postcon Returns true if the directive was found.
 
   @param   strDirective as a String
-  @return  a Boolean     
+  @return  a Boolean
 
 **)
 function TMethodDecl.HasDirective(strDirective: String): Boolean;
@@ -3583,6 +5000,7 @@ end;
   This is a setter method for the Msg property.
 
   @precon  Value is the new value to assign to the Msg property.
+  @postcon Sets the Message property for the method.
 
   @param   Value as a String constant
 
@@ -3598,6 +5016,7 @@ end;
   This is a setter method for the Ext property.
 
   @precon  Value is the new value to assign to the Ext property.
+  @postcon Setst the extension property for the method.
 
   @param   Value as a String constant
 
@@ -3619,6 +5038,9 @@ end;
   This is the constructor method for the TMethodCollection class. It creates
   a collection object to hold all the methods.
 
+  @precon  None.
+  @postcon It creates a collection object to hold all the methods.
+
 **)
 Constructor TMethodCollection.Create;
 
@@ -3632,6 +5054,9 @@ End;
   This is the destructor method for the TMethodCollection class. It frees the
   method collection and all the methods stored.
 
+  @precon  None.
+  @postcon It frees the method collection and all the methods stored.
+
 **)
 Destructor TMethodCollection.Destroy;
 
@@ -3644,7 +5069,8 @@ End;
 
   This method adds a TMethodDecl class to the methods collection.
 
-  @precon method is a method declaration to be added to the collection.
+  @precon  Method is a method declaration to be added to the collection.
+  @postcon Adds a TMethodDecl class to the methods collection.
 
   @param   Method as a TMethodDecl
 
@@ -3690,6 +5116,7 @@ end;
 
   This is a getter method for the Count property.
 
+  @precon  None.
   @postcon Returns the number of method in the collection.
 
   @return  an Integer
@@ -3738,6 +5165,7 @@ end;
   This method adds a parameter to the classes parameter collection.
 
   @precon  Parameter is a parameter to be added to the records field collection.
+  @postcon Adds a parameter to the classes parameter collection.
 
   @param   Parameter as a TParameter
 
@@ -3771,6 +5199,9 @@ End;
 
   This is the constructor method for the TRecordDecl class.
 
+  @precon  None.
+  @postcon Initialises the class.
+
 **)
 constructor TRecordDecl.Create;
 begin
@@ -3782,6 +5213,9 @@ end;
 (**
 
   This is the destructor method for the TRecordDecl class.
+
+  @precon  None.
+  @postcon Destroy the instance of the class.
 
 **)
 destructor TRecordDecl.Destroy;
@@ -3810,6 +5244,7 @@ end;
 
   This is a getter method for the ParameterCount property.
 
+  @precon  None.
   @postcon Returns the number of fields in the record.
 
   @return  an Integer
@@ -3844,7 +5279,8 @@ end;
 
   This method adds a method to the classes methods collection.
 
-  @precon  method is a method declaration to be added to the object.
+  @precon  Method is a method declaration to be added to the object.
+  @postcon Adds a method to the classes methods collection.
 
   @param   Method as a TMethodDecl
 
@@ -3860,6 +5296,8 @@ end;
   TObjectDecl can be assigned to another instance of the same class.
 
   @precon  AObject is the object declaration to get information from.
+  @postcon Virtual assign procedure so that the properties of a TObjectDecl can
+           be assigned to another instance of the same class.
 
   @param   AObject as a TObjectDecl
 
@@ -3915,6 +5353,9 @@ End;
 
   This is the constructor method for the TObjectDecl class.
 
+  @precon  None.
+  @postcon Initialises the class.
+
 **)
 constructor TObjectDecl.Create;
 begin
@@ -3926,6 +5367,9 @@ end;
 (**
 
   This is the destructor method for the TObjectDecl class.
+
+  @precon  None.
+  @postcon Destroy the instance of the class.
 
 **)
 destructor TObjectDecl.Destroy;
@@ -3966,6 +5410,7 @@ end;
 
   This is a getter method for the MethodCount property.
 
+  @precon  None.
   @postcon Returns the number of method in the object.
 
   @return  an Integer
@@ -4017,6 +5462,7 @@ end;
   This method adds a property to the classes property collection.
 
   @precon  Prop is a property to be added to the class.
+  @postcon Adds a property to the classes property collection.
 
   @param   Prop as a TProperty
 
@@ -4032,6 +5478,8 @@ end;
   TClassDecl can be assigned to another instance of the same class.
 
   @precon  AObject is the object declaration to get information from.
+  @postcon Virtual assign procedure so that the properties of a TClassDecl can
+           be assigned to another instance of the same class.
 
   @param   AObject as a TObjectDecl
 
@@ -4083,6 +5531,10 @@ End;
   classes identifier, scope and line and col information. It also creates
   collections for storing parameter (fields), properties and methods.
 
+  @precon  None.
+  @postcon This initialise the classes identifier, scope and line and col
+           information.
+
 **)
 constructor TClassDecl.Create;
 begin
@@ -4092,9 +5544,13 @@ end;
 
 (**
 
-  This is the destructor method for the TClassDecl class. Is frees the fields,
+  This is the destructor method for the TClassDecl class. It frees the fields,
   properties and methods collections and in turns al the fields (parameters),
   properties and methods held by the class.
+
+  @precon  None.
+  @postcon It frees the fields, properties and methods collections and in turns
+           al the fields (parameters), properties and methods held by the class.
 
 **)
 destructor TClassDecl.Destroy;
@@ -4123,6 +5579,7 @@ end;
 
   This is a getter method for the PropertyCount property.
 
+  @precon  None.
   @postcon Returns the number of properties in the class.
 
   @return  an Integer
@@ -4153,6 +5610,8 @@ end;
   TInterfaceDecl can be assigned to another instance of the same class.
 
   @precon  AObject is the object declaration to get information from.
+  @postcon Virtual assign procedure so that the properties of a TInterfaceDecl
+           can be assigned to another instance of the same class.
 
   @param   AObject as a TObjectDecl
 
@@ -4188,6 +5647,7 @@ End;
   This is a setter method for the GUID property.
 
   @precon  Value is the value to be assign to the GUID property.
+  @postcon Setst the GUID property.
 
   @param   Value as a String
 
@@ -4223,11 +5683,11 @@ end;
 
   This is the constructor method for the TDocError class.
 
-  @precon  strMsg is the error message to create a doc error for.
-  @precon  iLine is the line number of the error.
-  @precon  iCol is the column number for the message.
-  @precon  strExceptionMethod is the name of the method the exception occurred in.
-  @precon  ErrType determines if the mesage is a warning or an error.
+  @precon  strMsg is the error message to create a doc error for, iLine is the
+           line number of the error, iCol is the column number for the message,
+           strExceptionMethod is the name of the method the exception occurred
+           in and ErrType determines if the mesage is a warning or an error.
+  @postcon Initialises the class.
 
   @param   strMsg             as a String
   @param   iLine              as an Integer
@@ -4253,11 +5713,11 @@ End;
 
   This method adds an error to the error collection.
 
-  @precon  strMsg is the error message to add to the collection.
-  @precon  iLine is the line number of the error.
-  @precon  iCol is the column number for the message.
-  @precon  strExceptionMethod is the name of the method the exception occurred in.
-  @precon  ErrType determines if the message is a warning or an error.
+  @precon  strMsg is the error message to add to the collection, iLine is the
+           line number of the error, iCol is the column number for the message.
+           strExceptionMethod is the name of the method the exception occurred
+           in and ErrType determines if the message is a warning or an error.
+  @postcon Adds an error to the error collection.
 
   @param   strMsg        as a String
   @param   iLine         as an Integer
@@ -4276,6 +5736,9 @@ end;
 
   This is the constructor method for the TDocErrorCollection class.
 
+  @precon  None.
+  @postcon Creates the collection.
+
 **)
 constructor TDocErrorCollection.Create;
 begin
@@ -4285,6 +5748,9 @@ end;
 (**
 
   This is the destructor method for the TDocErrorCollection class.
+
+  @precon  None.
+  @postcon Destroy the collection.
 
 **)
 destructor TDocErrorCollection.Destroy;
@@ -4297,7 +5763,8 @@ end;
 
   This is a getter method for the Count property.
 
-  @postcon  Returns the number of errors in the collection.
+  @precon  None.
+  @postcon Returns the number of errors in the collection.
 
   @return  an Integer
 
@@ -4327,9 +5794,10 @@ end;
 
   This is the constructor method for the EDocException class.
 
-  @precon  strMsg is the text message of the exception.
-  @precon  Token is the token where the error occurred.
-  @precon  strMethodName is the name of the method where the exception occurred.
+  @precon  strMsg is the text message of the exception, Token is the token where
+           the error occurred and strMethodName is the name of the method where
+           the exception occurred.
+  @postcon Creates the exception.
 
   @param   strMsg        as a String
   @param   Token         as a TTokenInfo
@@ -4350,11 +5818,11 @@ End;
 
   This is the constructor method for the EDocException class.
 
-  @precon  strMsg is the text message of the exception.
-  @precon  strLiteral is the literal text that was expected when the exception
-           occurred.
-  @precon  Token is the token where the error occurred.
-  @precon  strMethodName is the name of the method where the exception occurred.
+  @precon  strMsg is the text message of the exception, strLiteral is the
+           literal text that was expected when the exception occurred, Token is
+           the token where the error occurred and strMethodName is the name of
+           the method where the exception occurred.
+  @postcon Creates the exception.
 
   @param   strMsg        as a String
   @param   strLiteral    as a String
@@ -4372,8 +5840,6 @@ Begin
   FCol := Token.Column;
   FExceptionMethod := strMethodName;
 End;
-
-{ TIdent }
 
 { TDocumentConflict }
 

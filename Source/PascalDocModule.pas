@@ -21,7 +21,7 @@
               specific token.
 
   @Version    1.0
-  @Date       23 May 2006
+  @Date       28 May 2006
   @Author     David Hoyle
 
 **)
@@ -30,7 +30,7 @@ Unit PascalDocModule;
 Interface
 
 Uses
-  Contnrs, Classes, Windows, BaseLanguageModule;
+  Contnrs, Classes, BaseLanguageModule;
 
 Type
   (**
@@ -42,65 +42,14 @@ Type
   **)
   TPascalDocModule = Class(TBaseLanguageModule)
   Private
-    FOwnedItems : TObjectList;
-    FSourceStream : TStream;
-    FTokens : TObjectList;
-    FExportedHeadings : TMethodCollection;
-    FImplementedMethods : TMethodCollection;
-    FConstantsCollection : TGenericContainerCollection;
-    FVarsCollection : TGenericContainerCollection;
-    FThreadVarsCollection : TGenericContainerCollection;
-    FTypeCollection : TGenericContainerCollection;
-    FTokenIndex : TTokenIndex;
-    FModuleName : String;
-    FModuleType : TModuleType;
-    FModuleComment : TComment;
-    FRequiresClause : TIdentList;
-    FContainsClause : TIdentList;
-    FUsesClause : TIdentList;
-    FInitComment : TComment;
-    FFinalComment : TComment;
-    FResStrCollection: TGenericContainerCollection;
-    FExportsCollection : TGenericContainerCollection;
-    FBodyComment : TObjectList;
-    FModuleNameCol: Integer;
-    FModuleNameLine: Integer;
-    FDocErrors: TDocErrorCollection;
-    FSymbolTable: TGenericContainerCollection;
-    FFileName: String;
-    FModified : Boolean;
-    FDocumentConflicts: TObjectList;
-    FTickList : TStringList;
-    function GetOpTickCountName(iIndex: Integer): String;
-    function GetOpTickCountByIndex(iIndex: Integer): Integer;
-    function GetOpTickCounts: Integer;
-    function GetOpTickCount(strStart, strFinish : String): Integer;
-    { Token methods }
-    Function GetTokenCount : Integer;
-    Function GetTokenInfo(iIndex : TTokenIndex) : TTokenInfo;
-    Function GetToken : TTokenInfo;
-    Procedure ParseStream;
-    Function GetBodyComment(iIndex : Integer) : TComment;
-    Function GetBodyCommentCount : Integer;
-    Function GetDocumentConflict(iIndex : Integer) : TDocumentConflict;
-    Function GetDocumentConflictCount : Integer;
-    (**
-      Returns a refernce the to owned items collection. This is used to manage
-      the life time of all the ident lists and comments found in the module.
-      @return  a TObjectList
-    **)
-    Property OwnedItems : TObjectList Read FOwnedItems;
-    (**
-      Returns a reference to the body comments collection.
-      @return  a TObjectList
-    **)
-    Property BodyComments : TObjectList Read FBodyComment;
     { Grammer Parsers }
+    Procedure Goal;
     Function OPProgram : Boolean;
     Function OPUnit : Boolean;
     Function OPPackage : Boolean;
     Function OPLibrary : Boolean;
     Procedure ProgramBlock;
+    procedure UsesClause;
     Procedure InterfaceSection;
     Procedure InterfaceDecl;
     Function ExportedHeading : Boolean;
@@ -114,252 +63,119 @@ Type
     Function ResourceStringDecl(Scope: TScope; Method : TMethodDecl): Boolean;
     Function TypeSection(Scope : TScope; Method : TMethodDecl) : Boolean;
     Function TypeDecl : TTypes;
+    Function TypedConstant(C: TGenericContainer) : Boolean;
+    // ArrayConstant;
+    // RecordConstant;
+    // RecordFieldConstant;
+    function OPType : TTypes;
+    function RestrictedType : TTypes;
     Function ClassRefType : TClassRefType;
     Function SimpleType : TTypes;
+    function RealType : TRealType;
+    function OrdinalType : TOrdinalType;
+    function OrdIdent : TOrdinalType ;
     Function VariantType : TVariantType;
+    function SubRangeType : TOrdinalType;
+    function EnumerateType : TOrdinalType;
     Function StringType : TStringType;
     Function StrucType : TTypes;
+    function ArrayType(boolPacked : Boolean): TArrayType;
     Function RecType(boolPacked : Boolean) : TRecordDecl;
     Procedure FieldList(Rec : TRecordDecl);
+    procedure FieldDecl(Rec: TRecordDecl);
+    procedure RecVariant(Rec: TRecordDecl);
+    function SetType(boolPacked: Boolean): TSetType;
+    function FileType(boolPacked: Boolean): TFileType;
+    Function VariantSection(Rec: TRecordDecl) : Boolean;
     Function PointerType : TPointerType;
     Function ProcedureType : TProcedureType;
     Function VarSection(Scope : TScope; Method : TMethodDecl) : Boolean;
     Function ThreadVarSection(Scope : TScope) : Boolean;
     Function ResStringSection(Scope: TScope; Method : TMethodDecl): Boolean;
     Function VarDecl(Scope : TScope; VarSection : TGenericContainerCollection) : Boolean;
+    // Expression;
+    // SimpleExpression;
+    // Term;
+    // Factor;
+    // RelOp;
+    // AddOp;
+    // MulOp;
+    // Designator;
+    // SetConstructor;
+    // SetElement;
+    // ExprList;
+    // Statement;
+    // StmtList;
+    // SimpleStatement;
+    // StructStmt;
     Procedure CompoundStmt;
-    Procedure SkipStatements(var iBlockCount : Integer);
+    // ConditionalStmt;
+    // IfStmt;
+    // CastStmt;
+    // CaseSelector;
+    // CaseLabel;
+    // LoopStmt;
+    // RepeatStmt;
+    // WhileStmt;
+    // ForStmt;
+    // WithStmt;
     Function ProcedureDeclSection(Scope : TScope; Method : TMethodDecl) : Boolean;
+    // ProcedureDecl;
+    // FunctionDecl;
+    Function FunctionHeading(Scope :TScope) : TMethodDecl;
+    Function ProcedureHeading(Scope : TScope) : TMethodDecl;
     Procedure FormalParameter(Method : TMethodDecl);
     Procedure FormalParam(Method : TMethodDecl);
     Procedure Parameter(Method : TMethodDecl; ParamMod : TParamModifier);
+    Procedure Directive(M : TMethodDecl);
     Function ObjectType : TObjectDecl;
-    Function ObjFieldList(Cls : TObjectDecl; Scope : TScope) : Boolean;
+    // ObjHeritage;
     Function MethodList(Cls : TObjectDecl; Scope : TScope) : Boolean;
+    function MethodHeading(Cls: TObjectDecl; Scope: TScope): Boolean;
+    Function ConstructorHeading(Scope :TScope) : TMethodDecl;
+    Function DestructorHeading(Scope :TScope) : TMethodDecl;
+    Function ObjFieldList(Cls : TObjectDecl; Scope : TScope) : Boolean;
     Procedure InitSection;
     Function ClassType : TClassDecl;
     Procedure ClassHeritage(Cls : TObjectDecl);
+    procedure ClassVisibility(var Scope : TScope);
     Function ClassFieldList(Cls : TObjectDecl; Scope : TScope) : Boolean;
     Function ClassMethodList(Cls : TObjectDecl; Scope : TScope) : Boolean;
     Function ClassPropertyList(Cls : TClassDecl; var Scope : TScope) : Boolean;
+    // PropertyList;
     Procedure PropertyInterface(Prop : TProperty);
     Procedure PropertyParameterList(Prop : TProperty);
     Procedure PropertySpecifiers(Prop : TProperty);
     Function InterfaceType : TInterfaceDecl;
-    procedure ClassVisibility(var Scope : TScope);
+    // InterfaceHeritage;
     Procedure RequiresClause;
-    Function IdentList(OwnList : Boolean): TIdentList;
     procedure ContainsClause;
-    procedure UsesClause;
-    Function ConstExpr(C: TGenericContainer) : Boolean;
-    Function TypedConstant(C: TGenericContainer) : Boolean;
+    Function IdentList(OwnList : Boolean): TIdentList;
+    // QualId;
     function TypeId: String;
-    function OPType : TTypes;
-    function RestrictedType : TTypes;
-    function RealType : TRealType;
-    function OrdinalType : TOrdinalType;
-    function EnumerateType : TOrdinalType;
-    function OrdIdent : TOrdinalType ;
-    function SubRangeType : TOrdinalType;
-    function ArrayType(boolPacked : Boolean): TArrayType;
-    function FileType(boolPacked: Boolean): TFileType;
-    function SetType(boolPacked: Boolean): TSetType;
-    Function VariantSection(Rec: TRecordDecl) : Boolean;
-    procedure FieldDecl(Rec: TRecordDecl);
-    procedure RecVariant(Rec: TRecordDecl);
-    function MethodHeading(Cls: TObjectDecl; Scope: TScope): Boolean;
+    // Ident;
+    Function ConstExpr(C: TGenericContainer) : Boolean;
+    // UnitId;
+    // LabelId;
+    // Number;
+    // OpString;
+    (* Helper method to the grammer parsers *)
     Function ProcedureBit(ProcType : TMethodType; Scope : TScope) : TMethodDecl;
     procedure ExportsEntry;
     procedure ExportsList;
-    Function PrevToken : TTokenInfo;
-    Procedure NextToken;
-    Procedure NextNonCommentToken;
-    Procedure RollBackToken;
-    Function EndOfTokens : Boolean;
-    Function GetComment : TComment;
-    Procedure SetTokenIndex(iIndex : TTokenIndex);
-    Procedure GetBodyCmt;
-    Function ConstructorHeading(Scope :TScope) : TMethodDecl;
-    Function DestructorHeading(Scope :TScope) : TMethodDecl;
-    Function FunctionHeading(Scope :TScope) : TMethodDecl;
-    Function ProcedureHeading(Scope : TScope) : TMethodDecl;
-    Procedure Directive(M : TMethodDecl);
+    Procedure SkipStatements(var iBlockCount : Integer);
     Procedure ScopeImplementedMethods;
-    Procedure Goal;
     procedure Sort;
     Function PropertyList(Cls : TClassDecl; var Scope : TScope) : Boolean;
+    Procedure ParseTokens;
   Public
-    Constructor Create(Source : TStream; FileName : String; IsModified : Boolean;
+    Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
       ModuleOptions : TModuleOptions; DocOptions : TDocOptions);
     Destructor Destroy; Override;
-    Procedure AddDocumentConflict(Const Args: Array of TVarRec; iIdentLine,
-      iIdentColumn, iCommentLine, iCommentCol  : Integer;
-      DocConflictType : TDocConflictType);
     Function FindMethodAtStreamPosition(iStreamPos : TStreamPosition;
       var recPosition : TTokenPosition) : TMethodDecl;
     Function FindPropertyAtStreamPosition(iStreamPos: TStreamPosition;
       var recPosition : TTokenPosition): TClassDecl;
-    Procedure AddTickCount(strLabel : String);
-    { Properties }
-    Property OpTickCount[strStart, strFinish : String] : Integer Read GetOpTickCount;
-    Property OpTickCounts : Integer Read GetOpTickCounts;
-    Property OpTickCountByIndex[iIndex : Integer] : Integer Read GetOpTickCountByIndex;
-    Property OpTickCountName[iIndex : Integer] : String Read GetOpTickCountName;
-    (**
-      Returns the number of token within the module after tokenizing.
-      @return  an Integer
-    **)
-    Property TokenCount : Integer Read GetTokenCount;
-    (**
-      Returns the token information for the specifically indexed token within
-      the module.
-      @param   iIndex as       a TTokenIndex
-      @return  a TTokenInfo
-    **)
-    Property TokenInfo[iIndex : TTokenIndex] : TTokenInfo Read GetTokenInfo;
-    (**
-      Returns the current token with in the module. Also see
-      {@link TPascalDocModule.SetTokenIndex SetTokenIndex}.
-      @return  a TTokenInfo
-    **)
-    Property Token : TTokenInfo Read GetToken;
-    (**
-      Returns the module name as a string.
-      @return  a String
-    **)
-    Property ModuleName : String Read FModuleName Write FModuleName;
-    (**
-      Returns the type of the modules, Program, Unit, Package, etc.
-      @return  a TModuleType
-    **)
-    Property ModuleType : TModuleType Read FModuleType Write FModuleType;
-    (**
-      Returns a reference to the modules comment.
-      @return  a TComment
-    **)
-    Property ModuleComment : TComment Read FModuleComment;
-    (**
-      Returns a reference to the requires clause collection.
-      @return  a TIdentList
-    **)
-    Property Requires : TIdentList Read FRequiresClause Write FRequiresClause;
-    (**
-      Returns a reference to the contains clause collection.
-      @return  a TIdentList
-    **)
-    Property Contains : TIdentList Read FContainsClause Write FContainsClause;
-    (**
-      Returns a reference to the uses clause collection.
-      @return  a TIdentList
-    **)
-    Property UsesCls : TIdentList Read FUsesClause Write FUsesClause;
-    (**
-      Returns a reference to the exported headings collection.
-      @return  a TMethodCollection
-    **)
-    Property ExportedHeadings : TMethodCollection Read FExportedHeadings;
-    (**
-      Returns a reference to the implemented methods collection.
-      @return  a TMethodCollection
-    **)
-    Property ImplementedMethods : TMethodCollection Read FImplementedMethods;
-    (**
-      Returns a reference to the constants clause collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property Constants : TGenericContainerCollection Read FConstantsCollection;
-    (**
-      Returns a reference to the resource string clause collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property ResourceStrings : TGenericContainerCollection Read FResStrCollection;
-    (**
-      Returns a reference to the variables clause collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property Vars : TGenericContainerCollection Read FVarsCollection;
-    (**
-      Returns a reference to the ThreadVar clause collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property ThreadVars : TGenericContainerCollection Read FThreadVarsCollection;
-    (**
-      Returns a reference to the modules types clause collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property Types : TGenericContainerCollection Read FTypeCollection;
-    (**
-      Returns a reference to the modules Initialization comment.
-      @return  a TComment
-    **)
-    Property InitComment : TComment Read FInitComment Write FInitComment;
-    (**
-      Returns a reference to the modules Finalization comment.
-      @return  a TComment
-    **)
-    Property FinalComment : TComment Read FFinalComment Write FFinalComment;
-    (**
-      Returns a refernce to the modules exports collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property ExportsClause : TGenericContainerCollection Read FExportsCollection
-      Write FExportsCollection;
-    (**
-      Returns the specific indexed body comment from the collection.
-      @param   iIndex as       an Integer
-      @return  a TComment
-    **)
-    Property BodyComment[iIndex : Integer] : TComment Read GetBodyComment;
-    (**
-      Returns a reference to the modules body comments collection.
-      @return  an Integer
-    **)
-    Property BodyCommentCount : Integer Read GetBodyCommentCount;
-    (**
-      Returns the line number of the modules name.
-      @return  an Integer
-    **)
-    Property ModuleNameLine : Integer Read FModuleNameLine Write FModuleNameLine;
-    (**
-      Returns the column number of the module name.
-      @return  an Integer
-    **)
-    Property ModuleNameCol : Integer Read FModuleNameCol Write FModuleNameCol;
-    (**
-      Returns a reference to the modules error collection.
-      @return  a TDocErrorCollection
-    **)
-    Property Errors : TDocErrorCollection Read FDocErrors;
-    (**
-      Returns a reference to the modules symbol table. All symbol in the module
-      are stored here and disposed of from here. Reference from other collections
-      like Types are purely reference only and those collection will not manage
-      the symbols life time.
-      @return  a TGenericContainerCollection
-    **)
-    Property SymbolTable : TGenericContainerCollection Read FSymbolTable;
-    (**
-      This property returns the file name of the module as passed to the
-      constructor.
-      @return  a String
-    **)
-    Property FileName : String Read FFileName;
-    (**
-      This property returns whether the source code is modified or not.
-      @return  a Boolean
-    **)
-    Property Modified : Boolean Read FModified;
-    (**
-      This property returns a reference to the classes document conflict list.
-      @return  a TStringList
-    **)
-    Property DocumentConflict[iIndex : Integer] : TDocumentConflict
-      Read GetDocumentConflict;
-    (**
-
-      @return  an Integer
-    **)
-    Property DocumentConflictCount : Integer Read GetDocumentConflictCount;
   End;
 
   (** This class is a collection class to contain and management the life time
@@ -444,64 +260,11 @@ Const
   strStrings  : Array[1..3] Of String = ('ansistring', 'string', 'widestring');
   (** A string representing the Array Of parameter type. **)
   strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
-  (** A list of string representing the types of modules. **)
-  strModuleTypes : Array[mtProgram..mtUnit] Of String = ('Program', 'Package',
-    'Library', 'Unit');
   (** This is a list of constant expression terminating reserved words. **)
   strTerminalWords : Array[1..5] Of String = ('end', 'private', 'protected',
     'public', 'published');
   (** This is a list of compound block statement start keywords. **)
   strBlockStarts : Array[1..4] Of String = ('asm', 'begin', 'case', 'try');
-  (** This is a constant for special tag items to show in the tree **)
-  iShowInTree = $0001;
-  (** This is a constant for special tag items to auto expand in the tree **)
-  iAutoExpand = $0002;
-
-  (** This is a string array representing the TDocOption enumerates. **)
-  DocOptionInfo : Array[Low(TDocOption)..High(TDocOption)] Of TDocOptionRec = (
-    (Description : 'Draw Syntax Highlighted Module Explorer'; Enabled : False),
-    (Description : 'Show comments in the hints'; Enabled : False),
-    (Description : 'Show local declarations in methods'; Enabled : False),
-    (Description : 'Show private declarations'; Enabled : True),
-    (Description : 'Show protected declarations'; Enabled : True),
-    (Description : 'Show public declarations'; Enabled : True),
-    (Description : 'Show published declarations'; Enabled : True),
-    (Description : 'Show local procedures and functions'; Enabled : True),
-    (Description : 'Show Documentation Conflicts'; Enabled : False),
-    (Description : 'Show Missing Method Documentation'; Enabled : True),
-    (Description : 'Show Missing Method Documentation Description'; Enabled : True),
-    (Description : 'Show Different Method Parameter Count'; Enabled : True),
-    (Description : 'Show Undocumented Method Parameters'; Enabled : True),
-    (Description : 'Show Incorrect Method Parameter Type'; Enabled : True),
-    (Description : 'Show Undocumented Method Return'; Enabled : True),
-    (Description : 'Show Incorrect Method Return Type'; Enabled : True),
-    (Description : 'Show Undocumented Types'; Enabled : False),
-    (Description : 'Show Undocumented Records'; Enabled : False),
-    (Description : 'Show Undocumented Objects'; Enabled : False),
-    (Description : 'Show Undocumented Classes'; Enabled : False),
-    (Description : 'Show Undocumented Interfaces'; Enabled : False),
-    (Description : 'Show Undocumented Variables'; Enabled : False),
-    (Description : 'Show Undocumented Constants'; Enabled : False),
-    (Description : 'Show Undocumented Module'; Enabled : True),
-    (Description : 'Show Missing Module Date'; Enabled : False),
-    (Description : 'Show Check Module Date'; Enabled : False),
-    (Description : 'Show Missing Module Version'; Enabled : False),
-    (Description : 'Show Missing Module Author'; Enabled : False),
-    (Description : 'Show Missing Method Pre-Conditions'; Enabled : False),
-    (Description : 'Show Missing Method Post-Conditions'; Enabled : False),
-    (Description : 'Use Single Pre and Post Method Conditions'; Enabled : True),
-    (Description : 'Show Missing Property Documentation'; Enabled : False),
-    (Description : 'Show Missing Property Documentation Description'; Enabled : False),
-    (Description : 'Show Different Property Parameter Count'; Enabled : False),
-    (Description : 'Show Undocumented Property Parameter'; Enabled : False),
-    (Description : 'Show Incorrect Property Parameter Type'; Enabled : False),
-    (Description : 'Show Undocumented Property Return Type'; Enabled : False),
-    (Description : 'Show Incorrect Property Return Type'; Enabled : False),
-    (Description : 'Show Missing Property Pre-Conditions'; Enabled : False),
-    (Description : 'Show Missing Property Post-Conditions'; Enabled : False),
-    (Description : 'Use Single Pre and Post Property Conditions'; Enabled : True),
-    (Description : 'Categories Documentation Conflicts'; Enabled : False)
-  );
 
   (** An array of parameter modifier phases. **)
   strModifier : Array[pmNone..pmOut] Of String = ('', ' as a reference',
@@ -511,65 +274,17 @@ Const
   (** A list of vowels. **)
   strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
 
-Var
-  (** This is a global string list containing the special tags list. **)
-  SpecialTags : TStringList;
-
-  Function Tokenize(strText : String) : TStringList;
-  Function ConvertDate(Const strDate : String) : TDateTime;
-
-  Implementation
+Implementation
 
 Uses
   PascalDocChecker, SysUtils;
 
 (**
 
-  This function returns true if the given word is in the supplied word list. It
-  uses a binary search, so the word lists need to be sorted.
-
-  @precon  strWord is the word to be searches for in the word list.
-  @precon  strWordList is a static array of words in lowercase and alphabetical
-           order.
-  @postcon Returns true if the word is found in the list.
-
-  @param   strWord     as a String
-  @param   strWordList as an Array Of String
-  @return  a Boolean
-
-**)
-function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
-
-Var
-  l, m, r : Integer;
-  str : String;
-
-begin
-  Result := False;
-  str := LowerCase(strWord);
-  l := 0;
-  r := High(strWordList);
-  While l <= r Do
-    Begin
-      m := (l + r) Div 2;
-      If strWordList[m] < str Then
-        l := Succ(m)
-      Else If strWordList[m] > str Then
-        r:= Pred(m)
-      Else
-        Begin
-          Result := True;
-          Exit;
-        End;
-    End;
-end;
-
-(**
-
   Thid method checks to see if the supplied tag is a special tag.
 
   @precon  strTagName is the name of a special tag to be checked.
-  @postcon Returns the index of the special tag or -1 is not found. 
+  @postcon Returns the index of the special tag or -1 is not found.
 
   @param   strTagName as a String
   @return  a Integer
@@ -592,447 +307,28 @@ End;
 
 (**
 
-  This function returns the token type for a given character and last token
-  type.
-
-  @precon  Ch is the character for which the token type assessment needs to be
-           taken for.
-  @precon  LastToken os the type of the last token as this has an effect on some
-           characters.
-  @postcon Returns the token type for the given character.
-
-  @param   Ch        as a Char
-  @param   LastToken as a TTokenType
-  @return  a TTokenType
-
-**)
-Function GetTokenType(Ch : Char; LastToken : TTokenType) : TTokenType;
-
-Begin
-  If ch In strWhiteSpace Then
-    Result := ttWhiteSpace
-  Else If ch In strTokenChars Then
-    Result := ttIdentifier
-  Else If ch In strNumbers Then
-    Begin
-      Result := ttNumber;
-      If LastToken = ttIdentifier Then
-        Result := ttIdentifier;
-    End
-  Else If ch In strLineEnd Then
-    Result := ttLineEnd
-  Else If ch In strQuote Then
-    Result := ttStringLiteral
-  Else If ch In strSymbols Then
-    Begin
-      Result := ttSymbol;
-      If (Ch = '.') And (LastToken = ttNumber) Then
-        Result := ttNumber;
-    End
-  Else
-    Result := ttUnknown;
-End;
-
-(**
-
-  This function returns a string list contains the tokenized representation of
-  the passed string with respect to some basic object pascal grammer.
-
-  @precon   strText si the line of text to be tokenised
-  @postcon  Returns a new string list of the tokenized string
-  @resource The string list returnsed must be destroyed be the calling method.
-
-  @param   strText as a String
-  @return  a TStringList
-
-**)
-Function Tokenize(strText : String) : TStringList;
-
-Type
-  (** State machine for block types. **)
-  TBlockType = (btNoBlock, btStringLiteral);
-
-Const
-  (** Growth size of the token buffer. **)
-  iTokenCapacity = 25;
-
-Var
-  (** Token buffer. **)
-  strToken : String;
-  CurToken : TTokenType;
-  LastToken : TTokenType;
-  BlockType : TBlockType;
-  (** Token size **)
-  iTokenLen : Integer;
-  i : Integer;
-
-Begin
-  Result := TStringList.Create;
-  BlockType := btNoBlock;
-  strToken := '';
-  CurToken := ttUnknown;
-  strToken := '';
-
-  iTokenLen := 0;
-  SetLength(strToken, iTokenCapacity);
-
-  For i := 1 To Length(strText) Do
-    Begin
-      LastToken := CurToken;
-      CurToken := GetTokenType(strText[i], LastToken);
-
-      If (LastToken <> CurToken) Or (CurToken = ttSymbol) Then
-        Begin
-          If ((BlockType In [btStringLiteral]) And (CurToken <> ttLineEnd)) Then
-            Begin
-              Inc(iTokenLen);
-              If iTokenLen > Length(strToken) Then
-                SetLength(strToken, iTokenCapacity + Length(strToken));
-              strToken[iTokenLen] := strText[i];
-            End Else
-            Begin
-              SetLength(strToken, iTokenLen);
-              If iTokenLen > 0 Then
-                Begin
-                  If IsKeyWord(strToken, strReservedWords) Then
-                    LastToken := ttReservedWord;
-                  If IsKeyWord(strToken, strDirectives) Then
-                    LastToken := ttDirective;
-                  Result.AddObject(strToken, TObject(LastToken));
-                End;
-             BlockType := btNoBlock;
-             iTokenLen := 1;
-             SetLength(strToken, iTokenCapacity);
-             strToken[iTokenLen] := strText[i];
-            End;
-        End Else
-        Begin
-          Inc(iTokenLen);
-          If iTokenLen > Length(strToken) Then
-            SetLength(strToken, iTokenCapacity + Length(strToken));
-          strToken[iTokenLen] := strText[i];
-        End;
-
-      // Check for string literals
-      If CurToken = ttStringLiteral Then
-        If BlockType = btStringLiteral Then
-          BlockType := btNoBlock
-        Else If BlockType = btNoBlock Then
-          BlockType := btStringLiteral;
-
-    End;
-  If iTokenLen > 0 Then
-    Begin
-      SetLength(strToken, iTokenLen);
-      If IsKeyWord(strToken, strReservedWords) Then
-        CurToken := ttReservedWord;
-      If IsKeyWord(strToken, strDirectives) Then
-        CurToken := ttDirective;
-      Result.AddObject(strToken, TObject(CurToken));
-    End;
-End;
-
-(**
-
-  This function converts a freeform text string representing dates and times
-  in standard formats in to a TDateTime value.
-
-  @precon  strDate is the string to convert into a date.
-  @postcon Returns a valid TDateTime value.
-
-  @param   strDate as a String
-  @return  a TDateTime
-
-**)
-Function ConvertDate(Const strDate : String) : TDateTime;
-
-Type
-  TDateRec = Record
-    iDay, iMonth, iYear, iHour, iMinute, iSecond : Word;
-  End;
-
-Const
-  strErrMsg = 'Can not convert the date "%s" to a valid TDateTime value.';
-  Delimiters : Set Of Char = ['-', ' ', '\', '/', ':'];
-  Days : Array[1..7] Of String = ('fri', 'mon', 'sat', 'sun', 'thu', 'tue', 'wed');
-  Months : Array[1..24] Of String = (
-    'apr', 'april',
-    'aug', 'august',
-    'dec', 'december',
-    'feb', 'february',
-    'jan', 'january',
-    'jul', 'july',
-    'jun', 'june',
-    'mar', 'march',
-    'may', 'may',
-    'nov', 'november',
-    'oct', 'october',
-    'sep', 'september'
-    );
-  MonthIndexes : Array[1..24] Of Word = (
-    4, 4,
-    8, 8,
-    12, 12,
-    2, 2,
-    1, 1,
-    7, 7,
-    6, 6,
-    3, 3,
-    5, 5,
-    11, 11,
-    10, 10,
-    9, 9
-  );
-
-Var
-  i : Integer;
-  sl : TStringList;
-  strToken : String;
-  iTime : Integer;
-  recDate : TDateRec;
-  tmp : Word;
-  iIndex0, iIndex1, iIndex2 : Integer;
-
-  (**
-
-    This procedure adds the token to the specified string list and clears the
-    token.
-
-    @precon  StringList is the string list to add the token too.
-    @precon  strToken is the token to add to the list.
-
-    @param   StringList as a TStringList
-    @param   strToken   as a String as a reference
-
-  **)
-  Procedure AddToken(StringList : TStringList; var strToken  : String);
-
-  Begin
-    If strToken <> '' Then
-      Begin
-        StringList.Add(strToken);
-        strToken := '';
-      End;
-  End;
-
-  (**
-
-    This procedure tries to extract the value from the indexed string list
-    item into the passed variable reference. It delete is true it remove the
-    item from the string list.
-
-    @precon  iIndex is the index of the item from the string list to extract.
-    @precon  iValue is a word variable to place the converted item into.
-    @precon  Delete determines whether the item is removed from the string list.
-
-    @param   iIndex as an Integer
-    @param   iValue as a Word as a reference
-    @param   Delete as a Boolean
-
-  **)
-  Procedure ProcessValue(iIndex : Integer; var iValue : Word; Delete : Boolean);
-
-  Begin
-    If iIndex > sl.Count - 1 Then Exit;
-    Val(sl[iIndex], iValue, i);
-    If i <> 0 Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-    If Delete Then sl.Delete(iIndex);
-  End;
-
-  (**
-
-    This procedure assigns string list indexes to the three index values
-    according to the short date format and what information is supplied.
-
-  **)
-  Procedure AssignIndexes();
-
-  Var
-    slFormat : TStringList;
-    str : String;
-    j : Integer;
-
-  Begin
-    iIndex0 := 0; // Default Day / Month / Year
-    iIndex1 := 1;
-    iIndex2 := 2;
-    slFormat := TstringList.Create;
-    Try
-      str := '';
-      For j := 1 To Length(ShortDateFormat) Do
-        If ShortDateFormat[j] In Delimiters Then
-          AddToken(slFormat, str)
-        Else
-          str := str + ShortDateFormat[j];
-      AddToken(slFormat, str);
-      // Remove day of week
-      For j := slFormat.Count - 1 DownTo 0 Do
-        If (slFormat[j][1] In ['d', 'D']) And (Length(slFormat[j]) > 2) Then
-          slFormat.Delete(j);
-      For j := 0 To slFormat.Count - 1 Do
-        Begin
-          If slFormat[j][1] In ['d', 'D'] Then iIndex0 := j;
-          If slFormat[j][1] In ['m', 'M'] Then iIndex1 := j;
-          If slFormat[j][1] In ['y', 'Y'] Then iIndex2 := j;
-        End;
-    Finally
-      slFormat.Free;
-    End;
-  End;
-
-Begin
-  Result := 0;
-  sl := TStringList.Create;
-  Try
-    strToken := '';
-    iTime := -1;
-    For i := 1 To Length(strDate) Do
-      If strDate[i] In Delimiters Then
-        Begin
-          AddToken(sl, strToken);
-          If (strDate[i] = ':') And (iTime = -1) Then iTime := sl.Count - 1;
-        End Else
-          strToken := strToken + strDate[i];
-    AddToken(sl, strToken);
-    FillChar(recDate, SizeOf(recDate), 0);
-    // Decode time
-    If iTime > -1 Then
-      Begin
-        ProcessValue(iTime,recDate.iHour, True);
-        ProcessValue(iTime,recDate.iMinute, True);
-        ProcessValue(iTime,recDate.iSecond, True);
-      End;
-    // Remove day value if present
-    For i := sl.Count - 1 DownTo 0 Do
-      If IsKeyWord(sl[i], Days) Then
-        sl.Delete(i);
-    // Decode date
-    Case sl.Count Of
-      1 :
-        Begin
-          DecodeDate(Now, recDate.iYear, recDate.iMonth, tmp);
-          ProcessValue(0, recDate.iDay, False); // Day only
-        End;
-      2, 3 : // Day and Month (Year)
-        Begin
-          DecodeDate(Now, recDate.iYear, tmp, tmp);
-          AssignIndexes;
-          ProcessValue(iIndex0, recDate.iDay, False); // Get day
-          If IsKeyWord(sl[iIndex1], Months) Then
-            Begin
-              For i := Low(Months) To High(Months) Do
-                If AnsiCompareText(Months[i], sl[iIndex1]) = 0 Then
-                  Begin
-                    recDate.iMonth := MonthIndexes[i];
-                    Break;
-                  End;
-            End Else
-              ProcessValue(iIndex1, recDate.iMonth, False); // Get Month
-            If sl.Count = 3 Then
-              Begin
-                ProcessValue(iIndex2, recDate.iYear, False); // Get Year
-                If recDate.iYear < 1900 Then Inc(recDate.iYear, 2000);
-              End;
-        End;
-    Else
-      If sl.Count <> 0 Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-    End;
-    // Output result.
-    With recDate Do
-      Begin
-        If Not (iHour In [0..23]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-        If Not (iMinute In [0..59]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-        If Not (iSecond In [0..59]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-        Result := EncodeTime(iHour, iMinute, iSecond, 0);
-        If iYear * iMonth * iDay <> 0 Then
-          Begin
-            If Not (iDay In [1..31]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-            If Not (iMonth In [1..12]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-            Result := Result + EncodeDate(iYear, iMonth, iDay);
-          End;
-      End;
-  Finally
-    sl.Free;
-  End;
-End;
-
-(**
-
-  This is a custom sort method for the DocConflictClass which allows the
-  internal sort method to sort the documentation conflicts.
-
-  @precon  None.
-  @postcon Compares the 2 items and returns the comparison, If item12 < item2
-           then -1, if the same then 0, and if item1 > item 2 then +1.
-
-  @param   Item1 as a Pointer
-  @param   Item2 as a Pointer
-  @return  an Integer
-
-**)
-Function CompareDocConflicts(Item1, Item2 : Pointer) : Integer;
-
-Begin
-  Result := AnsiCompareText(
-    TDocumentConflict(Item1).Category + '.' + TDocumentConflict(Item1).Message,
-    TDocumentConflict(Item2).Category + '.' + TDocumentConflict(Item2).Message)
-
-End;
-
-(**
-
   This is the constructor method for the TPascalDocModule class.
 
-  @precon  Source is a valid TStream descendant containing as stream of text
-           that is the contents of a source code module.
-  @precon  Filename is the file name of the module being parsed.
-  @precon  IsModified determines if the source code module has been modified
-           since the last save to disk.
+  @precon  Source is a valid TStream descendant containing as stream of text,
+           that is the contents of a source code module and Filename is the file
+           name of the module being parsed and IsModified determines if the
+           source code module has been modified since the last save to disk.
+  @postcon Creates an instance of the module parser.
 
   @param   Source        as a TStream
-  @param   FileName      as a String
+  @param   strFileName   as a String
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
   @param   DocOptions    as a TDocOptions
 
 **)
-Constructor TPascalDocModule.Create(Source : TStream; FileName : String;
+Constructor TPascalDocModule.Create(Source : TStream; strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions; DocOptions : TDocOptions);
 
 Begin
-  FTickList := TStringList.Create;
-  FSourceStream := Source;
-  FFileName := FileName;
-  FModified := IsModified;
-  FTokens := TObjectList.Create(True);
-  FOwnedItems := TObjectList.Create(True);
-  FExportedHeadings := TMethodCollection.Create;
-  FImplementedMethods := TMethodCollection.Create;
-  FConstantsCollection := TGenericContainerCollection.Create(True);
-  FResStrCollection := TGenericContainerCollection.Create(True);
-  FVarsCollection := TGenericContainerCollection.Create(True);
-  FThreadVarsCollection := TGenericContainerCollection.Create(True);
-  FTypeCollection := TGenericContainerCollection.Create(False);
-  FExportsCollection := TGenericContainerCollection.Create(True);
-  FBodyComment := TObjectList.Create(True);
-  FDocErrors := TDocErrorCollection.Create;
-  FSymbolTable := TGenericContainerCollection.Create(True);
-  FDocumentConflicts :=  TObjectList.Create(True);
-  FContainsClause := Nil;
-  FFinalComment := Nil;
-  FInitComment := Nil;
-  FModuleComment := Nil;
-  FModuleName := '';
-  FModuleNameCol := 0;
-  FModuleNameLine := 0;
-  FModuleType := mtUnit;
-  FRequiresClause := Nil;
-  FUsesClause := Nil;
-  FTokenIndex := 0;
-  AddTickCount('Start');
-  ParseStream;
-  AddTickCount('Tokenize');
-  If moParse In ModuleOptions Then Goal;
+  Inherited Create(Source, strReservedWords, strDirectives, IsModified,
+    strFileName);
+  If moParse In ModuleOptions Then ParseTokens;
   AddTickCount('Parse');
   Sort;
   AddTickCount('Sort');
@@ -1041,7 +337,7 @@ Begin
     With TPascalDocChecker.Create(Self, DocOptions) Do
       Try
         CheckDocumentForConflicts;
-        FDocumentConflicts.Sort(CompareDocConflicts);
+        SortDocumentConflicts;
       Finally
         Free;
       End;
@@ -1052,537 +348,17 @@ End;
 
   This is the destructor method for the TPascalDocModule class.
 
+  @precon  None.
+  @postcon Destroy the class instance.
+
 **)
 Destructor TPascalDocModule.Destroy;
 
 Begin
-  FDocumentConflicts.Free;
-  FSymbolTable.Free;
-  FDocErrors.Free;
-  FBodyComment.Free;
-  FExportsCollection.Free;
-  FTypeCollection.Free;
-  FThreadVarsCollection.Free;
-  FVarsCollection.Free;
-  FResStrCollection.Free;
-  FConstantsCollection.Free;
-  FImplementedMethods.Free;
-  FExportedHeadings.Free;
-  FOwnedItems.Free;
-  FTokens.Free;
-  FTickList.Free;
   Inherited Destroy;
 End;
 
-(**
 
-  This is a getter method for the TokenCount property.
-
-  @postcon Returns the number of tokens in the collection.
-
-  @return  an Integer
-
-**)
-Function TPascalDocModule.GetTokenCount : Integer;
-
-Begin
-  Result := FTokens.Count;
-End;
-
-(**
-
-  This method tokenises the stream of text passed to the constructor and splits
-  it into object pascal tokens.
-
-**)
-Procedure TPascalDocModule.ParseStream;
-
-Type
-  (** State machine for block types. **)
-  TBlockType = (btNoBlock, btStringLiteral, btLineComment, btBraceComment,
-    btFullComment);
-
-Const
-  (** Growth size of the token buffer. **)
-  iTokenCapacity = 25;
-  test = 12.34;
-
-Var
-  boolEOF : Boolean;
-  (** Token buffer. **)
-  strToken : String;
-  CurToken : TTokenType;
-  LastToken : TTokenType;
-  BlockType : TBlockType;
-  (** Current line number **)
-  iLine : Integer;
-  (** Current column number **)
-  iColumn : Integer;
-  (** Token stream position. Fast to inc this than read the stream position. **)
-  iStreamPos : Integer;
-  (** Token line **)
-  iTokenLine : Integer;
-  (** Token column **)
-  iTokenColumn : Integer;
-  (** Current character position **)
-  iStreamCount : Integer;
-  Ch : Char;
-  LastChar : Char;
-  (** Token size **)
-  iTokenLen : Integer;
-
-Begin
-  BlockType := btNoBlock;
-  iStreamPos := 0;
-  iTokenLine := 1;
-  iTokenColumn := 1;
-  boolEOF := False;
-  CurToken := ttUnknown;
-  LastToken := ttUnknown;
-  iStreamCount := 0;
-  iLine := 1;
-  iColumn := 1;
-  Ch := #0;
-  LastChar := #0;
-  strToken := '';
-
-  iTokenLen := 0;
-  SetLength(strToken, iTokenCapacity);
-
-  Try
-    If FSourceStream <> Nil Then
-      Begin
-        Repeat
-          If FSourceStream.Read(ch, 1) > 0 Then
-            Begin
-              Inc(iStreamCount);
-              LastToken := CurToken;
-              CurToken := GetTokenType(Ch, LastToken);
-
-              // Check for full block comments
-              If (BlockType = btNoBlock) And (LastChar = '(') And (Ch = '*') Then
-                BlockType := btFullComment;
-
-              // Check for line comments
-              If (BlockType = btNoBlock) And (LastChar = '/') And (Ch = '/') Then
-                BlockType := btLineComment;
-
-              If (LastToken <> CurToken) Or (CurToken = ttSymbol) Then
-                Begin
-                  If ((BlockType In [btStringLiteral, btLineComment]) And
-                    (CurToken <> ttLineEnd)) Or
-                    (BlockType In [btBraceComment, btFullComment]) Then
-                    Begin
-                      Inc(iTokenLen);
-                      If iTokenLen > Length(strToken) Then
-                        SetLength(strToken, iTokenCapacity + Length(strToken));
-                      strToken[iTokenLen] := Ch;
-                    End Else
-                    Begin
-                      SetLength(strToken, iTokenLen);
-                      If Not TBaseLanguageModule.IsTokenWhiteSpace(strToken) Then
-                        Begin
-                          If LastToken = ttIdentifier Then
-                            Begin
-                              If IsKeyWord(strToken, strReservedWords) Then
-                                LastToken := ttReservedWord;
-                              If IsKeyWord(strToken, strDirectives) Then
-                                LastToken := ttDirective;
-                            End;
-                          If BlockType = btLineComment Then
-                            LastToken := ttComment;
-                          If (LastToken = ttComment) And (Length(strToken) > 2) Then
-                            If (strToken[1] = '{') And (strToken[2] = '$') Then
-                              LastToken := ttCompilerDirective;
-                          FTokens.Add(TTokenInfo.Create(strToken, iStreamPos,
-                            iTokenLine, iTokenColumn, Length(strToken), LastToken));
-                          //Inc(iCounter);
-                        End;
-                     // Store Stream position, line number and column of
-                     // token start
-                     iStreamPos := iStreamCount;
-                     iTokenLine := iLine;
-                     iTokenColumn := iColumn;
-                     BlockType := btNoBlock;
-                     iTokenLen := 1;
-                     SetLength(strToken, iTokenCapacity);
-                     strToken[iTokenLen] := Ch;
-                    End;
-                End Else
-                Begin
-                  Inc(iTokenLen);
-                  If iTokenLen > Length(strToken) Then
-                    SetLength(strToken, iTokenCapacity + Length(strToken));
-                  strToken[iTokenLen] := Ch;
-                End;
-
-              // Check for the end of a block comment
-              If (BlockType = btFullComment) And (LastChar = '*') And (Ch = ')') Then
-                Begin
-                  BlockType := btNoBlock;
-                  CurToken := ttComment;
-                End;
-
-              // Check for string literals
-              If CurToken = ttStringLiteral Then
-                If BlockType = btStringLiteral Then
-                  BlockType := btNoBlock
-                Else If BlockType = btNoBlock Then
-                  BlockType := btStringLiteral;
-
-              // Check for block Comments
-              If (BlockType = btNoBlock) And (Ch = '{') Then
-                Begin
-                  CurToken := ttComment;
-                  BlockType := btBraceComment;
-                End;
-              If (BlockType = btBraceComment) And (Ch = '}') Then
-                Begin
-                  CurToken := ttComment;
-                  BlockType := btNoBlock;
-                End;
-
-              Inc(iColumn);
-              If Ch = #10 Then
-                Begin
-                  Inc(iLine);
-                  iColumn := 1;
-                  If BlockType In [btLineComment, btStringLiteral] Then
-                    BlockType := btNoBlock;
-                End;
-              LastChar := Ch;
-            End Else
-              boolEOF := True;
-        Until boolEOF;
-        If iTokenLen > 0 Then
-          Begin
-            SetLength(strToken, iTokenLen);
-            If Not IsTokenWhiteSpace(strToken) Then
-              FTokens.Add(TTokenInfo.Create(strToken, iStreamPos,
-                iTokenLine, iTokenColumn, Length(strToken), LastToken));
-          End;
-      End;
-  Except
-    On E : Exception Do
-      Errors.Add(E.Message, 0, 0, 'Exception during tokenizing.', etError);
-  End
-End;
-
-(**
-
-  This is a getter method for the TokenInfo property.
-
-  @precon  iIndex is the index of the token info object required.
-  @postcon Returns the token info object requested.
-
-  @param   iIndex as a TTokenIndex
-  @return  a TTokenInfo
-
-**)
-function TPascalDocModule.GetTokenInfo(iIndex: TTokenIndex): TTokenInfo;
-
-begin
-  Result := FTokens[iIndex] As TTokenInfo;
-end;
-
-(**
-
-  This is a getter method for the Token property.
-
-  @postcon Returns a token info object for the current token.
-
-  @return  a TTokenInfo
-
-**)
-Function TPascalDocModule.GetToken : TTokenInfo;
-
-Begin
-  If FTokenIndex >= FTokens.Count Then
-    Raise EDocException.Create(strUnExpectedEndOfFile);
-  Result := FTokens[FTokenIndex] As TTokenInfo;
-End;
-
-(**
-
-  This method returns the previous token in the token list, else returns nil.
-
-  @postcon Returns a token info object for the previous non comment token.
-
-  @return  a TTokenInfo
-
-**)
-Function TPascalDocModule.PrevToken : TTokenInfo;
-
-Var
-  i : Integer;
-
-begin
-  Result := Nil;
-  For i := FTokenIndex - 1 DownTo 0 Do
-    If Not ((FTokens[i] As TTokenInfo).TokenType In [ttComment,
-      ttCompilerDirective]) Then
-      Begin
-        Result := FTokens[i] As TTokenInfo;
-        Exit;
-      End;
-end;
-
-(**
-
-  This method moves the toke to the next token in the token list or raises an
-  EDocException.
-
-**)
-Procedure TPascalDocModule.NextToken;
-
-begin
-  Inc(FTokenIndex);
-end;
-
-(**
-
-  This method checks for the end of the token list and returns true if it is
-  found.
-
-  @postcon Returns true is we are beyond the end of the token collection.
-
-  @return  a Boolean
-
-**)
-Function TPascalDocModule.EndOfTokens : Boolean;
-
-Begin
-  Result := FTokenIndex >= FTokens.Count;
-End;
-
-(**
-
-  This method tries to get a document comment from the previous token and return
-  a TComment class to the calling routine.
-
-  @note    All comments found are automatically added to the comment collection
-           for disposal when the parser is destroyed.
-
-  @postcon Returns the comment immediately before the current token else nil.
-
-  @return  a TComment
-
-**)
-Function TPascalDocModule.GetComment : TComment;
-
-Var
-  T : TTokenInfo;
-
-Begin
-  Result := Nil;
-  If FTokenIndex - 1 > -1 Then
-    Begin
-      T := FTokens[FTokenIndex - 1] As TTokenInfo;
-      If T.TokenType = ttComment Then
-        Begin
-          Result := TComment.CreateComment(T.Token, T.Line, T.Column);
-          OwnedItems.Add(Result);
-        End;
-    End;
-End;
-
-(**
-
-  This is a getter method for the DocumentConflict property.
-
-  @precon  iIndex must be a valid integer index.
-  @postcon Returns the documentation conflict references by the passed index.
-
-  @param   iIndex as an Integer
-  @return  a TDocumentConflict
-
-**)
-function TPascalDocModule.GetDocumentConflict(
-  iIndex: Integer): TDocumentConflict;
-begin
-  Result := FDocumentConflicts.Items[iIndex] As TDocumentConflict;
-end;
-
-(**
-
-  This is a getter method for the DocumentConflictCount property.
-
-  @precon  None.
-  @postcon Returns the number of documenation conflicts in the collection.
-
-  @return  an Integer
-
-**)
-function TPascalDocModule.GetDocumentConflictCount: Integer;
-begin
-  Result := FDocumentConflicts.Count;
-end;
-
-(**
-
-  This is a getter method for the OpTickCount property.
-
-  @precon  None.
-  @postcon If both the start and end token are found in the collection of Tick
-           Counts then the number of Tick Counts between them are returned.
-
-  @param   strStart  as a String
-  @param   strFinish as a String
-  @return  an Integer  
-
-**)
-function TPascalDocModule.GetOpTickCount(strStart, strFinish : String): Integer;
-
-Var
-  i : Integer;
-  iStart, iFinish : Integer;
-
-begin
-  Result := -1;
-  iStart := 0;
-  iFinish := 0;
-  For i := 0 To FTickList.Count - 1 Do
-    Begin
-      If AnsiComparetext(FTickList[i], strStart) = 0 Then iStart := i;
-      If AnsiComparetext(FTickList[i], strFinish) = 0 Then iFinish := i;
-    End;
-  If iStart * iFinish > 0 Then
-    Result := Integer(FTickList.Objects[iFinish]) - Integer(FTickList.Objects[iStart]);
-end;
-
-(**
-
-  This is a getter method for the OpTickCountByIndex property.
-
-  @precon  iIndex must be a valid index.
-  @postcon Returns the tick count associated with the passed index.
-
-  @param   iIndex as an Integer
-  @return  an Integer
-
-**)
-function TPascalDocModule.GetOpTickCountByIndex(iIndex: Integer): Integer;
-begin
-  Result := Integer(FTickList.Objects[iIndex]);
-end;
-
-(**
-
-  This is a getter method for the OpTickCountName property.
-
-  @precon  iIndex must be a valid integer index.
-  @postcon Returns the name of the OpTickCount references by the index passed.
-
-  @param   iIndex as an Integer
-  @return  a String
-
-**)
-function TPascalDocModule.GetOpTickCountName(iIndex: Integer): String;
-begin
-  Result := FTickList[iIndex];
-end;
-
-(**
-
-  This is a getter method for the OpTickCounts property.
-
-  @precon  None.
-  @postcon Returns the number of items in the OpTickCount collection.
-
-  @return  an Integer
-
-**)
-function TPascalDocModule.GetOpTickCounts: Integer;
-begin
-  Result := FTickList.Count;
-end;
-
-(**
-
-  This method tries to get a body comment from the previous token in the token
-  list and add it to the body comment list.
-
-**)
-Procedure TPascalDocModule.GetBodyCmt;
-
-Var
-  T : TTokenInfo;
-  C : TComment;
-
-Begin
-  If FTokenIndex - 1 > -1 Then
-    Begin
-      T := FTokens[FTokenIndex - 1] As TTokenInfo;
-      If T.TokenType = ttComment Then
-        Begin
-          C := TComment.CreateComment(T.Token, T.Line, T.Column);
-          If C <> Nil Then BodyComments.Add(C);
-        End;
-    End;
-End;
-
-(**
-
-  This method move the token position to the next non comment token.
-
-**)
-procedure TPascalDocModule.NextNonCommentToken;
-begin
-  // Go to the next token
-  NextToken;
-  // Keep going if a comment
-  While (Token.TokenType In [ttComment, ttCompilerDirective]) And Not EndOfTokens Do
-    NextToken;
-end;
-
-(**
-
-  This method rolls back to the previous token in the token list skipping
-  comment tokens.
-
-**)
-Procedure TPascalDocModule.RollBackToken;
-
-Begin
-  Dec(FTokenIndex);
-  While (FTokenIndex > 0) And (TokenInfo[FTokenIndex].TokenType In [ttComment,
-    ttCompilerDirective]) Do
-    Dec(FTokenIndex);
-  If FTokenIndex < 0 Then
-    Raise EDocException.Create(strUnExpectedStartOfFile);
-End;
-
-(**
-
-  This is a getter method for the BodyComment property.
-
-  @precon  iIndex is the index of the body comment required.
-  @postcon Return the requested comment object.
-
-  @param   iIndex as an Integer
-  @return  a TComment
-
-**)
-Function TPascalDocModule.GetBodyComment(iIndex : Integer) : TComment;
-
-Begin
-  Result := FBodyComment[iIndex] As TComment;
-End;
-
-(**
-
-  This is a getter method for the BodyCommentCount property.
-
-  @postcon Returns the number of body comment in the collection.
-
-  @return  an Integer
-
-**)
-Function TPascalDocModule.GetBodyCommentCount : Integer;
-
-Begin
-  Result := FBodyComment.Count;
-End;
 
 (**
 
@@ -1707,24 +483,13 @@ Begin
     FreeAndNil(Result);
 End;
 
-(**
-
-  This is a setter method for the TokenIndex property.
-
-  @precon  iIndex is the token index to set the parse to start at.
-
-  @param   iIndex as a TTokenIndex
-
-**)
-Procedure TPascalDocModule.SetTokenIndex(iIndex : TTokenIndex);
-
-Begin
-  FTokenIndex := iIndex;
-End;
 
 (**
 
   This method sorts the structures items in alphanumeric order.
+
+  @precon  None.
+  @postcon Sorts all the collection held be the this class.
 
 **)
 Procedure TPascalDocModule.Sort;
@@ -1748,6 +513,10 @@ End;
 
   This method looks up the scope of the class method in the classes and updates
   the implemented method with the scope of the classes method.
+
+  @precon  None.
+  @postcon Looks up the scope of the class method in the classes and updates
+           the implemented method with the scope of the classes method.
 
 **)
 procedure TPascalDocModule.ScopeImplementedMethods;
@@ -1780,6 +549,11 @@ end;
   module. It finds the first non comment token and begins the grammer checking
   from their by deligating to the program, library, unit and package methods.
 
+  @precon  None.
+  @postcon It finds the first non comment token and begins the grammer checking
+           from their by deligating to the program, library, unit and package
+           methods.
+
   <P><B><U>Object Pascal Grammer</U></B></P>
   <TABLE>
     <TR>
@@ -1805,7 +579,7 @@ begin
       Raise EDocException.Create(strUnExpectedEndOfFile);
     // See if there is a module comment
     // Store comment for auto removal if not nil
-    FModuleComment := GetComment;
+    ModuleComment := GetComment;
     Repeat
       {Do Nothing}
     Until Not (OPProgram Or OPLibrary Or OPPackage Or OPUnit);
@@ -1837,6 +611,7 @@ end;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon Returns true is a program section was parsed.
 
   @return  a Boolean
@@ -1907,6 +682,7 @@ end;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon Returns true if a unit section was parsed.
 
   @return  a Boolean
@@ -1967,6 +743,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon Returns true is a package section was parsed.
 
   @return  a Boolean
@@ -2021,6 +798,7 @@ end;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon Returns true is a library section was parsed.
 
   @return  a Boolean
@@ -2069,6 +847,10 @@ end;
     </TR>
   </TABLE>
 
+  @precon  None.
+  @postcon Parses a program block from the current token position using the
+           following object pascal grammer.
+
 **)
 procedure TPascalDocModule.ProgramBlock;
 begin
@@ -2089,6 +871,10 @@ end;
       <TD>USES IdentList ';'</TD>
     </TR>
   </TABLE>
+
+  @precon  None.
+  @postcon Parses the Uses clause declaration from the current token position
+           using the following object pascal grammer.
 
 **)
 Procedure TPascalDocModule.UsesClause;
@@ -2143,6 +929,10 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
+  @postcon Parses an interface section from the current token position using
+           the following object pascal grammer.
+
 **)
 Procedure TPascalDocModule.InterfaceSection;
 
@@ -2184,6 +974,10 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
+  @postcon Parses an interface declaration from the current token position
+           using the following object pascal grammer.
+
 **)
 Procedure TPascalDocModule.InterfaceDecl;
 
@@ -2220,6 +1014,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns true if the current section was found to be
            an exported heading section.
   @return  a Boolean
@@ -2263,6 +1058,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  none.
   @postcon Returns true if an exported procedure was found.
 
   @return  a Boolean
@@ -2296,6 +1092,9 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
+  @postcon Parses an exports list from the current token position.
+
 **)
 Procedure TPascalDocModule.ExportsList();
 
@@ -2319,6 +1118,9 @@ End;
       <TD>Ident [ INDEX IntegerConstant [ NAME StringConstant ] [ RESIDENT ] ]</TD>
     </TR>
   </TABLE>
+
+  @precon  None.
+  @postcon Parses an exports entry from the current token position.
 
 **)
 Procedure TPascalDocModule.ExportsEntry;
@@ -2380,6 +1182,9 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
+  @postcon Parses an implementation section from the current token position.
+
 **)
 Procedure TPascalDocModule.ImplementationSection;
 
@@ -2413,10 +1218,11 @@ End;
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
-           the interface section.
-  @precon  The Method parameter is nil for methods in the implementation
-           section or a reference to a method for a local declaration section
-           with in a method.
+           the interface section and The Method parameter is nil for methods in
+           the implementation section or a reference to a method for a local
+           declaration section with in a method.
+  @postcon Parses a block section from the current token position
+
   @param   Scope  as a TScope
   @param   Method as a TMethodDecl
 
@@ -2464,10 +1270,11 @@ End;
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
-           the interface section.
-  @precon  The Method parameter is nil for methods in the implementation
-           section or a reference to a method for a local declaration section
-           with in a method.
+           the interface section and The Method parameter is nil for methods in
+           the implementation section or a reference to a method for a local
+           declaration section with in a method.
+  @postcon Parses a declaration section from the current token position.
+
   @param   Scope  as a TScope
   @param   Method as a TMethodDecl
 
@@ -2503,6 +1310,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method dicards the labels found and returns True if this method
            handles a label declaration section.
   @return  a Boolean
@@ -2540,12 +1348,12 @@ End;
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
-           the interface section.
-  @precon  The Method parameter is nil for methods in the implementation
-           section or a reference to a method for a local declaration section
-           with in a method.
+           the interface section and The Method parameter is nil for methods in
+           the implementation section or a reference to a method for a local
+           declaration section with in a method.
   @postcon This method returns True if this method handles a constant
            declaration section.
+
   @param   Scope  as a TScope
   @param   Method as a TMethodDecl
   @return  a Boolean
@@ -2603,12 +1411,12 @@ End;
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
-           the interface section.
-  @precon  The Method parameter is nil for methods in the implementation
-           section or a reference to a method for a local declaration section
-           with in a method.
+           the interface section and The Method parameter is nil for methods in
+           the implementation section or a reference to a method for a local
+           declaration section with in a method.
   @postcon This method returns True if this method handles a constant
            declaration section.
+
   @param   Scope  as a TScope
   @param   Method as a TMethodDecl
   @return  a Boolean
@@ -2667,12 +1475,12 @@ End;
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
-           the interface section.
-  @precon  The Method parameter is nil for methods in the implementation
-           section or a reference to a method for a local declaration section
-           with in a method.
+           the interface section and The Method parameter is nil for methods in
+           the implementation section or a reference to a method for a local
+           declaration section with in a method.
   @postcon This method returns True if this method handles a constant
            declaration section.
+
   @param   Scope  as a TScope
   @param   Method as a TMethodDecl
   @return  a Boolean
@@ -2723,12 +1531,12 @@ End;
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
-           the interface section.
-  @precon  The Method parameter is nil for methods in the implementation
-           section or a reference to a method for a local declaration section
-           with in a method.
+           the interface section and The Method parameter is nil for methods in
+           the implementation section or a reference to a method for a local
+           declaration section with in a method.
   @postcon This method returns True if this method handles a constant
            declaration section.
+           
   @param   Scope  as a TScope
   @param   Method as a TMethodDecl
   @return  a Boolean
@@ -2816,6 +1624,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TTypes
@@ -2859,6 +1668,7 @@ End;
 
   @precon  C is a valid instance of the constant to be populated with tokens.
   @postcon Returns false if this was not a typed constant an not handled.
+
   @param   C as a TGenericContainer
   @return  a Boolean
 
@@ -2919,6 +1729,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TTypes
@@ -2962,6 +1773,7 @@ End;
   @note    The simpleType() method is here to act as a catch all for types that
            have note been previously handled.
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TTypes
@@ -2990,6 +1802,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TClassRefType
@@ -3029,6 +1842,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TTypes
@@ -3085,6 +1899,7 @@ end;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TRealType
@@ -3115,6 +1930,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TOrdinalType
@@ -3197,6 +2013,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TOrdinalType
@@ -3232,6 +2049,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TVariantType
@@ -3265,6 +2083,7 @@ end;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon Returns an ordinal type if one was parsed else returns nil.
 
   @return  a TOrdinalType
@@ -3293,6 +2112,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon Returns an ordinal type if one was parsed else returns nil.
 
   @return  a TOrdinalType
@@ -3359,6 +2179,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TStringType
@@ -3402,6 +2223,7 @@ end;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TTypes
@@ -3427,47 +2249,6 @@ end;
 
 (**
 
-  This method adds a specific documentation conflict to the Docuemntation
-  conflict collection.
-
-  @precon  None.
-  @postcon Adds a specific documentation conflict to the Docuemntation
-           conflict collection.
-
-  @param   Args            as an Array Of TVarRec constant
-  @param   iIdentLine      as an Integer
-  @param   iIdentColumn    as an Integer
-  @param   iCommentLine    as an Integer
-  @param   iCommentCol     as an Integer
-  @param   DocConflictType as a TDocConflictType
-
-**)
-procedure TPascalDocModule.AddDocumentConflict(Const Args: Array of TVarRec;
-  iIdentLine, iIdentColumn, iCommentLine, iCommentCol : Integer; DocConflictType: TDocConflictType);
-begin
-  FDocumentConflicts.Add(TDocumentConflict.Create(Args, iIdentLine,
-    iIdentColumn, iCommentLine, iCommentCol, DocConflictType));
-end;
-
-(**
-
-  This method adds a timer count to the modules OpTickCount collection. This
-  can be used to provide timing / profiling information on operations.
-
-  @precon  None.
-  @postcon Adds a timer count to the modules OpTickCount collection. This
-           can be used to provide timing / profiling information on operations.
-
-  @param   strLabel as a String
-
-**)
-procedure TPascalDocModule.AddTickCount(strLabel: String);
-begin
-  FTickList.AddObject(strLabel, TObject(GetTickCount));
-end;
-
-(**
-
   This method parses an array type declaration from the current token position
   using the following object pascal grammer.
 
@@ -3480,9 +2261,9 @@ end;
     </TR>
   </TABLE>
 
+  @precon  boolPacked determines if the array type is packed or not.
   @postcon This method returns True if this method handles a constant
            declaration section.
-  @precon  boolPacked determines if the array type is packed or not.
 
   @param   boolPacked as a Boolean
   @return  a TArrayType
@@ -3668,6 +2449,9 @@ end;
 
   @precon  Rec in a valid instance of a record type to add fields / parameters
            too.
+  @postcon Parses a field list for classes, records and object declarations
+           from the current token position.
+
   @param   Rec as a TRecordDecl
 
 **)
@@ -3699,6 +2483,8 @@ end;
 
   @precon  Rec in a valid instance of a record type to add fields / parameters
            too.
+  @postcon Parses a records field declarations from the current token position
+
   @param   Rec as a TRecordDecl
 
 **)
@@ -3790,6 +2576,9 @@ End;
 
   @precon  Rec in a valid instance of a record type to add fields / parameters
            too.
+  @postcon Parses the record variant section of a record from the current
+           token position
+
   @param   Rec as a TRecordDecl
 
 **)
@@ -3837,6 +2626,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TPointerType
@@ -3869,6 +2659,7 @@ end;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
   @return  a TProcedureType
@@ -3936,12 +2727,12 @@ end;
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
-           the interface section.
-  @precon  The Method parameter is nil for methods in the implementation
-           section or a reference to a method for a local declaration section
-           with in a method.
+           the interface section and The Method parameter is nil for methods in
+           the implementation section or a reference to a method for a local
+           declaration section with in a method.
   @postcon This method returns True if this method handles a constant
            declaration section.
+
   @param   Scope  as a TScope
   @param   Method as a TMethodDecl
   @return  a Boolean
@@ -3989,6 +2780,7 @@ End;
            the interface section.
   @postcon This method returns True if this method handles a constant
            declaration section.
+
   @param   Scope as a TScope
   @return  a Boolean
 
@@ -4028,12 +2820,12 @@ End;
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
-           the interface section.
-  @precon  The Method parameter is nil for methods in the implementation
-           section or a reference to a method for a local declaration section
-           with in a method.
+           the interface section and The Method parameter is nil for methods in
+           the implementation section or a reference to a method for a local
+           declaration section with in a method.
   @postcon This method returns True if this method handles a constant
            declaration section.
+
   @param   Scope  as a TScope
   @param   Method as a TMethodDecl
   @return  a Boolean
@@ -4079,10 +2871,10 @@ End;
     </TR>
   </TABLE>
 
-  @precon  Scope defines the current scope of the variable.
-  @precon  VarSection is a valid variable container for the storage of the
-           variable declared.
+  @precon  Scope defines the current scope of the variable and VarSection is a
+           valid variable container for the storage of the variable declared.
   @postcon Returns true if a variable declaration was handled.
+
   @param   Scope      as a TScope
   @param   VarSection as a TGenericContainerCollection
   @return  a Boolean
@@ -4163,6 +2955,10 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
+  @postcon Parses the compound statement section of a procedure implementation
+           from the current token position
+
 **)
 procedure TPascalDocModule.CompoundStmt();
 
@@ -4192,7 +2988,9 @@ end;
   procedures and programs.
 
   @precon  iBlockCount is a referenced count er to the current level of
-           nested statement block. 
+           nested statement block.
+  @postcon Skips statements with in the implementation section of
+           procedures and programs.
 
   @param   iBlockCount as an Integer as a reference
 
@@ -4271,8 +3069,8 @@ end;
            here in the ProceduralDeclSection() instead and called all
            ####Heading() methods.
 
-  @precon  Scope is the current scope of the procedure declaration.
-  @precon  Method is the current method scoped else nil.
+  @precon  Scope is the current scope of the procedure declaration and Method
+           is the current method scoped else nil.
   @postcon Returns true is a procedure declaration was parsed.
 
   @param   Scope  as a TScope
@@ -4399,8 +3197,8 @@ End;
   This method does the donkey work for parsing the main portion of a method
   declaration on behalf of the ####Heading functions.
 
-  @precon  ProcType is the type if method the be handled, proedure, function, etc.
-  @precon  Scope is the scope of th method.
+  @precon  ProcType is the type if method the be handled, proedure, function,
+           etc and Scope is the scope of th method.
   @postcon Returns a method declaration object if parsed else returns nil.
 
   @param   ProcType as a TMethodType
@@ -4477,6 +3275,7 @@ End;
 
   @precon  Method is a valid method to which the formal parameters are to be
            added.
+  @postcon Parses a methods formal parameters from the current token position
 
   @param   Method as a TMethodDecl
 
@@ -4515,6 +3314,8 @@ End;
 
   @precon  Method is a valid method to which the formal parameters are to be
            added.
+  @postcon Parses a formal parameter for a method from the current token
+           position
 
   @param   Method as a TMethodDecl
 
@@ -4557,9 +3358,10 @@ End;
     </TR>
   </TABLE>
 
-  @precon  Method is a valid method to add a parameter too.
-  @precon  ParamMod is a parameter modifier for the parameter to signify a
-           const, var or out paramemter.
+  @precon  Method is a valid method to add a parameter too and ParamMod is a
+           parameter modifier for the parameter to signify a const, var or out
+           paramemter.
+  @postcon Parses a parameter list for a method from the current token position
 
   @param   Method   as a TMethodDecl
   @param   ParamMod as a TParamModifier
@@ -4618,6 +3420,20 @@ Begin
   End;
 End;
 
+
+(**
+
+  This is the method that should be called to parse the previously parse tokens.
+
+  @precon  None.
+  @postcon Attempts to parse the token list and check it grammatically for
+           Errors while providing delcaration elements for browsing.
+
+**)
+procedure TPascalDocModule.ParseTokens;
+begin
+  Goal;
+end;
 
 (**
 
@@ -4699,6 +3515,8 @@ End;
   </TABLE>
 
   @precon  M is a valid method declaration to add directives too.
+  @postcon Retrives the method directives after the method declaration from
+           the current token position
 
   @param   M as a TMethodDecl
 
@@ -4764,6 +3582,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon Returns an object declaration if one was parsed else nil.
 
   @return  a TObjectDecl
@@ -4819,8 +3638,8 @@ end;
     </TR>
   </TABLE>
 
-  @precon  Cls is an object declaration to add methods too.
-  @precon  Scopeis the current internal scope of the object.
+  @precon  Cls is an object declaration to add methods too and Scopeis the
+           current internal scope of the object.
   @postcon Returns true is a method declaration was parsed.
 
   @param   Cls   as a TObjectDecl
@@ -4863,8 +3682,8 @@ End;
     </TR>
   </TABLE>
 
-  @precon  Cls is an object declaration to add method declarations too.
-  @precon  Scope is the current scope inside the object declaration.
+  @precon  Cls is an object declaration to add method declarations too and
+           Scope is the current scope inside the object declaration.
   @postcon Returns true if a method declaration was parsed.
 
   @param   Cls   as a TObjectDecl
@@ -4975,9 +3794,9 @@ end;
     </TR>
   </TABLE>
 
-  @precon  Cls is an ibject delcaration to add fields too.
-  @precon  Scope is the current internal scope of the object.
-  @postcon Returns true is a field was parsed. 
+  @precon  Cls is an ibject delcaration to add fields too and Scope is the
+           current internal scope of the object.
+  @postcon Returns true is a field was parsed.
 
   @param   Cls   as a TObjectDecl
   @param   Scope as a TScope
@@ -5037,6 +3856,10 @@ end;
       <TD>END</TD>
     </TR>
   </TABLE>
+
+  @precon  None.
+  @postcon Parses the modules initialisation / finalisation section from the
+           current token position
 
 **)
 Procedure TPascalDocModule.InitSection;
@@ -5103,6 +3926,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon Returns a class declaration is a class was parsed else nil.
 
   @return  a TClassDecl
@@ -5160,6 +3984,7 @@ end;
   </TABLE>
 
   @precon  Cls is a valid object declaration to get a heritage for.
+  @postcon Parses a class heriage ist from the current token position
 
   @param   Cls as a TObjectDecl
 
@@ -5200,6 +4025,7 @@ end;
   </TABLE>
 
   @precon  Scope is the current internal scope of the class.
+  @postcon Parse the class visibility from the current token
 
   @param   Scope as a TScope as a reference
 
@@ -5234,8 +4060,8 @@ end;
     </TR>
   </TABLE>
 
-  @precon  Cls is a valid object declaration to add fields too.
-  @precon  Scope is the current scope of the class.
+  @precon  Cls is a valid object declaration to add fields too and Scope is the
+           current scope of the class.
   @postcon Returns true is field where handled and parsed.
 
   @param   Cls   as a TObjectDecl
@@ -5268,8 +4094,8 @@ End;
     </TR>
   </TABLE>
 
-  @precon  Cls is a valid object declaration to get method for.
-  @precon  Scope is the current scope of the class.
+  @precon  Cls is a valid object declaration to get method for and Scope is the
+           current scope of the class.
   @postcon Returns true is method were parsed.
 
   @param   Cls   as a TObjectDecl
@@ -5304,8 +4130,8 @@ End;
     </TR>
   </TABLE>
 
-  @precon  Cls is a valid class declaration to get method for.
-  @precon  Scope is the current scope of the class.
+  @precon  Cls is a valid class declaration to get method for and Scope is the
+           current scope of the class.
   @postcon Returns true is properties were parsed.
 
   @param   Cls   as a TClassDecl
@@ -5341,8 +4167,8 @@ End;
     </TR>
   </TABLE>
 
-  @precon  Cls is a valid class declaration to get method for.
-  @precon  Scope is the current scope of the class.
+  @precon  Cls is a valid class declaration to get method for and Scope is the
+           current scope of the class.
   @postcon Returns true is properties were parsed.
 
   @param   Cls   as a TClassDecl
@@ -5388,6 +4214,7 @@ end;
   </TABLE>
 
   @precon  Prop is a property to parse an interface for.
+  @postcon Parses the property interface from the current token position
 
   @param   Prop as a TProperty
 
@@ -5421,6 +4248,7 @@ End;
   </TABLE>
 
   @precon  Prop is a property to parse a parameter list for.
+  @postcon Parses a properties parameter list from the current token
 
   @param   Prop as a TProperty
 
@@ -5509,6 +4337,7 @@ End;
   </TABLE>
 
   @precon  Prop is a property to parse specifiers for.
+  @postcon Parses the property specifiers from the current token position
 
   @param   Prop as a TProperty
 
@@ -5641,6 +4470,7 @@ end;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon Returns an interface declaration if one was parsed else nil.
 
   @return  a TInterfaceDecl
@@ -5709,6 +4539,9 @@ end;
     </TR>
   </TABLE>
 
+  @precon  None.
+  @postcon Parses a requires clause from the current token position usnig
+
 **)
 Procedure TPascalDocModule.RequiresClause;
 
@@ -5741,6 +4574,9 @@ End;
       <TD>CONTAINS IdentList ... ';'</TD>
     </TR>
   </TABLE>
+
+  @precon  None.
+  @postcon Parses a contains clause fro the cutrrent token position
 
 **)
 Procedure TPascalDocModule.ContainsClause;
@@ -5830,6 +4666,7 @@ End;
     </TR>
   </TABLE>
 
+  @precon  None.
   @postcon Returns a type id as a string of text.
 
   @return  a String
@@ -5905,6 +4742,7 @@ End;
   This method add the source pascal doc module to the collection.
 
   @precon  Source is a valid instance of a TPascalDocModule class.
+  @postcon Add the source pascal doc module to the collection.
 
   @param   Source as a TPascalDocModule
 
@@ -5918,6 +4756,9 @@ end;
 
   This is the constructor method for the TPascalDocModuleList class.
 
+  @precon  None.
+  @postcon Initialises the collection.
+
 **)
 constructor TPascalDocModuleList.Create;
 begin
@@ -5929,6 +4770,7 @@ end;
   This method deletes the indexed module from the collection.
 
   @precon  iIndex is the index of the module to delete.
+  @postcon Deletes the indexed module from the collection.
 
   @param   iIndex as an Integer
 
@@ -5942,6 +4784,9 @@ end;
 
   This is the destructor method for the TPascalDocModuleList class.
 
+  @precon  None.
+  @postcon Destroys the collection.
+
 **)
 destructor TPascalDocModuleList.Destroy;
 begin
@@ -5953,6 +4798,7 @@ end;
 
   This is a getter method for the Count property.
 
+  @precon  None.
   @postcon Returns the number of modules in the collection.
 
   @return  an Integer

@@ -970,11 +970,10 @@ Type
     FLine: Integer;
     FCol: Integer;
     FMsg: String;
-    FExceptionMethod: String;
     FErrorType : TErrorType;
   Public
     Constructor Create(strMsg : String; iLine, iCol : Integer;
-      strExceptionMethod : String; ErrType : TErrorType); Overload;
+      ErrType : TErrorType); Overload;
     (**
       Returns the exception message.
       @return  a String
@@ -994,11 +993,6 @@ Type
       Returns the Exception method of the exception stored.
       @return  a String
     **)
-    Property ExceptionMethod : String Read FExceptionMethod;
-    (**
-      Returns the error type for the error.
-      @return  a TErrorType
-    **)
     Property ErrorType : TErrorType Read FErrorType Write FErrorType;
   End;
 
@@ -1011,8 +1005,7 @@ Type
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    Procedure Add(strMsg : String; iLine, iCol : Integer;
-      strMethodName : String; ErrType : TErrorType);
+    Procedure Add(strMsg : String; iLine, iCol : Integer; ErrType : TErrorType);
     (**
       Returns the number of errors in the collection.
       @return  an Integer
@@ -2987,7 +2980,7 @@ Begin
       End;
   Except
     On E : Exception Do
-      Errors.Add(E.Message, 0, 0, 'Exception during tokenizing.', etError);
+      Errors.Add(E.Message, 0, 0, etError);
   End
 End;
 
@@ -5697,13 +5690,12 @@ end;
 
 **)
 constructor TDocError.Create(strMsg: String; iLine, iCol: Integer;
-  strExceptionMethod : String; ErrType : TErrorType);
+  ErrType : TErrorType);
 
 begin
   FMsg := strMsg;
   FLine := iLine;
   FCol := iCol;
-  FExceptionMethod := strExceptionMethod;
   ErrorType := ErrType;
 End;
 
@@ -5727,9 +5719,9 @@ End;
 
 **)
 procedure TDocErrorCollection.Add(strMsg: String; iLine, iCol: Integer;
-  strMethodName : String; ErrType : TErrorType);
+  ErrType : TErrorType);
 begin
-  FErrors.Add(TDocError.Create(strMsg, iLine, iCol, strMethodName, ErrType));
+  FErrors.Add(TDocError.Create(strMsg, iLine, iCol, ErrType));
 end;
 
 (**

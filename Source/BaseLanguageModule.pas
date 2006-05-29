@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    28 May 2006
+  @Date    29 May 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -696,7 +696,7 @@ Type
     Constructor Create;
     Destructor Destroy; Override;
     Procedure Add(Method : TMethodDecl);
-    Function Find(strMethodName : String) : Integer;
+    Function Find(strClsName, strMethodName : String) : Integer;
     Procedure Sort;
     (**
       Returns the specifically indexed method from the methods collection.
@@ -882,34 +882,20 @@ Type
   definition **)
   TObjectDecl = Class(TRecordDecl)
   Private
-    FMethod : TObjectList;
+    FMethods : TMethodCollection;
     FHeritage : TIdentList;
-    Function GetMethodDecl(iIndex : Integer) : TMethodDecl;
-    Function GetMethodCount : Integer;
   Public
     Constructor Create; Override;
     Destructor Destroy; Override;
-    Procedure AddMethod(Method : TMethodDecl);
-    Function FindMethod(strMethodName : String) : Integer;
     Function AsString(ShowFirstToken : Boolean) : String; Override;
     Procedure Assign(AObject : TObjectDecl); Virtual;
     Procedure Sort; Override;
-    (**
-      Returns the indexed method in the objects methods collection.
-      @param   iIndex as       an Integer
-      @return  a TMethodDecl
-    **)
-    Property Method[iIndex : Integer] : TMethodDecl Read GetMethodDecl;
-    (**
-      Returns the number of method in the object methods collection.
-      @return  an Integer
-    **)
-    Property MethodCount : Integer Read GetMethodCount;
     (**
       Returns a reference to the object class heritage.
       @return  a TIdentList
     **)
     Property Heritage : TIdentList Read FHeritage;
+    Property Methods : TMethodCollection Read FMethods;
   End;
 
   (** This is a class the extends the object definition to handle an class
@@ -1618,6 +1604,11 @@ ResourceString
     'help file in the options dialogue.';
   (** An exception message for a missing help file **)
   strHelpFileNotFound = 'The help file "%s" was not found.';
+  (** An exception message for an undeclared class method. **)
+  strUndeclaredClassMethod = 'Class method "%s" has not been declared.';
+  (** An exception message for an unsatisfied forward reference. **)
+  strUnSatisfiedForwardReference = 'Class method "%s" has an unsatisfied ' +
+    'forward reference.';
 
 Const
   (** A set of characters for whitespace **)
@@ -4166,7 +4157,7 @@ Begin
     Begin
       If Items[i] is TClassDecl Then
         With Items[i] As TClassDecl Do
-          If Heritage.Count + ParameterCount + PropertyCount + MethodCount = 0 Then
+          If Heritage.Count + ParameterCount + PropertyCount + Methods.Count = 0 Then
             FItems.Delete(i);
     End;
 End;
@@ -5128,11 +5119,12 @@ End;
   @precon  strMethodName is the name of a method to find.
   @postcon Returns the index of the method if found else -1.
 
+  @param   strClsName    as a String
   @param   strMethodName as a String
   @return  an Integer
 
 **)
-function TMethodCollection.Find(strMethodName: String): Integer;
+function TMethodCollection.Find(strClsName, strMethodName: String): Integer;
 
 Var
   i : Integer;
@@ -5140,7 +5132,8 @@ Var
 begin
   Result := -1;
   For i := 0 To Count - 1 Do
-    If strMethodName = Method[i].Identifier Then
+    If (strClsName = Method[i].ClsName) And
+      (strMethodName = Method[i].Identifier) Then
       Begin
         Result := i;
         Exit;
@@ -5270,21 +5263,6 @@ end;
 
 (**
 
-  This method adds a method to the classes methods collection.
-
-  @precon  Method is a method declaration to be added to the object.
-  @postcon Adds a method to the classes methods collection.
-
-  @param   Method as a TMethodDecl
-
-**)
-procedure TObjectDecl.AddMethod(Method: TMethodDecl);
-begin
-  FMethod.Add(Method);
-end;
-
-(**
-
   This method is a virtual assign procedure so that the properties of a
   TObjectDecl can be assigned to another instance of the same class.
 
@@ -5312,11 +5290,11 @@ begin
       P.Assign(AObject.Parameter[i]);
       AddParameter(P);
     End;
-  For i := 0 To AObject.MethodCount - 1 Do
+  For i := 0 To AObject.Methods.Count - 1 Do
     Begin
       M := TMethodDecl.Create(mtProcedure, scPrivate, 0, 0);
-      M.Assign(AObject.Method[i]);
-      AddMethod(M);
+      M.Assign(AObject.Methods[i]);
+      Methods.Add(M);
     End;
 end;
 
@@ -5354,7 +5332,7 @@ constructor TObjectDecl.Create;
 begin
   inherited;
   FHeritage := TIdentList.Create;
-  FMethod := TObjectList.Create(True);
+  FMethods := TMethodCollection.Create;
 end;
 
 (**
@@ -5367,67 +5345,9 @@ end;
 **)
 destructor TObjectDecl.Destroy;
 begin
-  FMethod.Free;
+  FMethods.Free;
   FHeritage.Free;
   inherited;
-end;
-
-(**
-
-  This method find the index of the specified method in the method collection
-  else returns -1.
-
-  @precon  strMethodName is the method name to find the in the object.
-  @postcon Returns the index of the method if found else -1.
-
-  @param   strMethodName as a String
-  @return  an Integer
-
-**)
-function TObjectDecl.FindMethod(strMethodName: String): Integer;
-
-Var
-  i : Integer;
-
-begin
-  Result := -1;
-  For i := 0 To MethodCount - 1 Do
-    If strMethodName = Method[i].Identifier Then
-      Begin
-        Result := i;
-        Exit;
-      End;
-end;
-
-(**
-
-  This is a getter method for the MethodCount property.
-
-  @precon  None.
-  @postcon Returns the number of method in the object.
-
-  @return  an Integer
-
-**)
-function TObjectDecl.GetMethodCount: Integer;
-begin
-  Result := FMethod.Count;
-end;
-
-(**
-
-  This is a getter method for the MethodDecl array property.
-
-  @precon  iIndex is the index of the method required.
-  @postcon returns the method declaration object requested.
-
-  @param   iIndex as an Integer
-  @return  a TMethodDecl
-
-**)
-function TObjectDecl.GetMethodDecl(iIndex: Integer): TMethodDecl;
-begin
-  Result := FMethod[iIndex] As TMethodDecl;
 end;
 
 (**
@@ -5441,7 +5361,7 @@ end;
 procedure TObjectDecl.Sort;
 begin
   inherited;
-  FMethod.Sort(SortMethodDecl);
+  FMethods.Sort;
 end;
 
 (** ---------------------------------------------------------------------------
@@ -5685,7 +5605,6 @@ end;
   @param   strMsg             as a String
   @param   iLine              as an Integer
   @param   iCol               as an Integer
-  @param   strExceptionMethod as a String
   @param   ErrType            as a TErrorType
 
 **)
@@ -5714,7 +5633,6 @@ End;
   @param   strMsg        as a String
   @param   iLine         as an Integer
   @param   iCol          as an Integer
-  @param   strMethodName as a String
   @param   ErrType       as a TErrorType
 
 **)

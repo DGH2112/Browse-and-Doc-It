@@ -1605,9 +1605,9 @@ ResourceString
   (** An exception message for a missing help file **)
   strHelpFileNotFound = 'The help file "%s" was not found.';
   (** An exception message for an undeclared class method. **)
-  strUndeclaredClassMethod = 'Class method "%s" has not been declared.';
+  strUndeclaredClassMethod = 'Class method "%s.%s" has not been declared.';
   (** An exception message for an unsatisfied forward reference. **)
-  strUnSatisfiedForwardReference = 'Class method "%s" has an unsatisfied ' +
+  strUnSatisfiedForwardReference = 'Class method "%s.%s" has an unsatisfied ' +
     'forward reference.';
 
 Const

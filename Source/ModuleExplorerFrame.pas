@@ -1058,19 +1058,19 @@ Var
   j : Integer;
 
 begin
-  If Cls.MethodCount > 0 Then
+  If Cls.Methods.Count > 0 Then
     Begin
-      For j := 0 To Cls.MethodCount - 1 Do
-        If IsInOptions(Cls.Method[j].Scope) Then
+      For j := 0 To Cls.Methods.Count - 1 Do
+        If IsInOptions(Cls.Methods[j].Scope) Then
           Begin
-            F := AddNode(S, Cls.Method[j].GetAsString(True, False),
-              Cls.Method[j].Line, Cls.Method[j].Col, -1,
-              Cls.Method[j].Comment);
-            Case Cls.Method[j].MethodType Of
-              mtProcedure : SetNodeIcon(Cls.Method[j].Scope, iProcedure, F);
-              mtFunction : SetNodeIcon(Cls.Method[j].Scope, iFunction, F);
-              mtConstructor : SetNodeIcon(Cls.Method[j].Scope, iConstructor, F);
-              mtDestructor : SetNodeIcon(Cls.Method[j].Scope, iDestructor, F);
+            F := AddNode(S, Cls.Methods[j].GetAsString(True, False),
+              Cls.Methods[j].Line, Cls.Methods[j].Col, -1,
+              Cls.Methods[j].Comment);
+            Case Cls.Methods[j].MethodType Of
+              mtProcedure : SetNodeIcon(Cls.Methods[j].Scope, iProcedure, F);
+              mtFunction : SetNodeIcon(Cls.Methods[j].Scope, iFunction, F);
+              mtConstructor : SetNodeIcon(Cls.Methods[j].Scope, iConstructor, F);
+              mtDestructor : SetNodeIcon(Cls.Methods[j].Scope, iDestructor, F);
             End;
           End
     End;

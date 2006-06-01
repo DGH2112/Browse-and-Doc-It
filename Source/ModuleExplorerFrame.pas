@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    29 May 2006
+  @Date    01 Jun 2006
   @Author  David Hoyle
   @Version 1.0
   
@@ -1368,8 +1368,8 @@ Begin
     FError := AddNode(FModule, strErrorsAndWarnings, 0, 0, iErrorFolder, Nil);
   For i := 0 To M.Errors.Count - 1 Do
     Begin
-      N := AddNode(FError, M.Errors[i].Msg{ + ' [' +
-        M.Errors[i].ExceptionMethod + ']'}, M.Errors[i].Line,
+      N := AddNode(FError, M.Errors[i].Msg + ' [' +
+        M.Errors[i].Method + ']', M.Errors[i].Line,
         M.Errors[i].Col, -1, Nil);
       Case M.Errors[i].ErrorType Of
         etWarning :

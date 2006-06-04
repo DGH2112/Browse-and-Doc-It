@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    29 May 2006
+  @Date    04 Jun 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -957,8 +957,9 @@ Type
     FCol: Integer;
     FMsg: String;
     FErrorType : TErrorType;
+    FMethod : String;
   Public
-    Constructor Create(strMsg : String; iLine, iCol : Integer;
+    Constructor Create(strMsg, strMethod : String; iLine, iCol : Integer;
       ErrType : TErrorType); Overload;
     (**
       Returns the exception message.
@@ -976,10 +977,15 @@ Type
     **)
     Property Col : Integer Read FCol;
     (**
-      Returns the Exception method of the exception stored.
+      Returns the type of exception stored.
       @return  a String
     **)
-    Property ErrorType : TErrorType Read FErrorType Write FErrorType;
+    Property ErrorType : TErrorType Read FErrorType;
+    (**
+      Returns the  exception method of the exception stored.
+      @return  a String
+    **)
+    Property Method : String Read FMethod;
   End;
 
   (** This class provides a collection for the parsing errors. **)
@@ -991,7 +997,8 @@ Type
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    Procedure Add(strMsg : String; iLine, iCol : Integer; ErrType : TErrorType);
+    Procedure Add(strMsg, strMethod : String; iLine, iCol : Integer;
+      ErrType : TErrorType);
     (**
       Returns the number of errors in the collection.
       @return  an Integer
@@ -1591,6 +1598,8 @@ ResourceString
   strIdentExpected = 'Identifier expected but "%s" found at line %d column %d.';
   (** Exception message when an string is expected but something else is found. **)
   strStringExpected = 'String literal expected but "%s" found at line %d column %d.';
+  (** Exception message when an number is expected but something else is found. **)
+  strNumberExpected = 'Number expected but "%s" found at line %d column %d.';
   (** Exception message when an reserved word is expected but something else is
       found. **)
   strReservedWordExpected = 'Expected "%s" but "%s" found at line %d column %d.';
@@ -2971,7 +2980,7 @@ Begin
       End;
   Except
     On E : Exception Do
-      Errors.Add(E.Message, 0, 0, etError);
+      Errors.Add(E.Message, 'TokenizeStream', 0, 0, etError);
   End
 End;
 
@@ -5603,19 +5612,21 @@ end;
   @postcon Initialises the class.
 
   @param   strMsg             as a String
+  @param   strMethod          as a String
   @param   iLine              as an Integer
   @param   iCol               as an Integer
   @param   ErrType            as a TErrorType
 
 **)
-constructor TDocError.Create(strMsg: String; iLine, iCol: Integer;
+constructor TDocError.Create(strMsg, strMethod: String; iLine, iCol: Integer;
   ErrType : TErrorType);
 
 begin
   FMsg := strMsg;
   FLine := iLine;
   FCol := iCol;
-  ErrorType := ErrType;
+  FErrorType := ErrType;
+  FMethod := strMethod;
 End;
 
 { TDocErrorCollection }
@@ -5631,15 +5642,16 @@ End;
   @postcon Adds an error to the error collection.
 
   @param   strMsg        as a String
+  @param   strMethod     as a String
   @param   iLine         as an Integer
   @param   iCol          as an Integer
   @param   ErrType       as a TErrorType
 
 **)
-procedure TDocErrorCollection.Add(strMsg: String; iLine, iCol: Integer;
+procedure TDocErrorCollection.Add(strMsg, strMethod: String; iLine, iCol: Integer;
   ErrType : TErrorType);
 begin
-  FErrors.Add(TDocError.Create(strMsg, iLine, iCol, ErrType));
+  FErrors.Add(TDocError.Create(strMsg, strMethod, iLine, iCol, ErrType));
 end;
 
 (**

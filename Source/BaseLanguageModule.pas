@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    04 Jun 2006
+  @Date    06 Jun 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -322,9 +322,10 @@ Type
     Constructor Create;
     Destructor Destroy; Override;
     Procedure Add(strIdent : String; iLine, iCol : Integer; Comment : TComment);
+      Virtual;
     Procedure Assign(src : TIdentList);
     Procedure Sort;
-    Function AsString : String;
+    Function AsString : String; Virtual;
     (**
       Returns the specifically indexed identifier in the list.
       @param   iIndex as       an Integer
@@ -466,6 +467,20 @@ Type
       @return  an Integer
     **)
     Property Count : Integer Read GetCount;
+  End;
+  
+  (** A descendant class to the purposes of holding enumerates. **)
+  TIndexedEnumerateList = Class(TIdentList)
+  Private
+    FIndexInfo : TGenericContainerCollection;
+    Function GetIndexInfo(iIndex : Integer) : TGenericContainer;
+  Public
+    Constructor Create;
+    Destructor Destroy; Override;
+    Procedure Add(strIdent : String; iLine, iCol : Integer; Comment : TComment);
+      Override;
+    Property Indexinfo[iIndex : Integer] : TGenericContainer Read GetIndexInfo;
+    Function AsString : String; Override;
   End;
 
   (** This class represents a parameter of a method declaration. **)
@@ -2265,6 +2280,53 @@ Begin
     TDocumentConflict(Item1).Category + '.' + TDocumentConflict(Item1).Message,
     TDocumentConflict(Item2).Category + '.' + TDocumentConflict(Item2).Message)
 
+End;
+
+Procedure TIndexedEnumerateList.Add(strIdent : String; iLine, iCol : Integer;
+  Comment : TComment);
+
+Begin
+  Inherited Add(strIdent, iLine, iCol, Comment);
+  FIndexInfo.Add(TGenericContainer.Create);
+End;
+
+Function TIndexedEnumerateList.AsString : String;
+
+var
+  i : Integer;
+  str : String;
+
+Begin
+  Result := '';
+  For i := 0 To Count - 1 Do
+    Begin
+      If Result <> '' Then
+        Result := Result + ', ';
+      str := IndexInfo[i].AsString(True);
+      Result := Result + Idents[i].Ident;
+      If str <> '' Then
+        Result := Result + ' = ' + Indexinfo[i].AsString(True);
+    End;
+End;
+
+Constructor TIndexedEnumerateList.Create;
+
+Begin
+  Inherited Create;
+  FIndexInfo := TGenericContainerCollection.Create(True);
+End;
+
+Destructor TIndexedEnumerateList.Destroy;
+
+Begin
+  FIndexInfo.Free;
+  Inherited Destroy;
+End;
+
+Function TIndexedEnumerateList.GetIndexInfo(iIndex : Integer) : TGenericContainer;
+
+Begin
+  Result := FIndexInfo[iIndex];
 End;
 
 (**

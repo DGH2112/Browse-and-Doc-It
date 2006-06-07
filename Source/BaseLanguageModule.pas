@@ -1633,6 +1633,7 @@ ResourceString
   (** An exception message for an unsatisfied forward reference. **)
   strUnSatisfiedForwardReference = 'Class method "%s.%s" has an unsatisfied ' +
     'forward reference.';
+  strTypeNotFound = 'Type declaration missing but found "%s" at line %d column %d.';
 
 Const
   (** A set of characters for whitespace **)

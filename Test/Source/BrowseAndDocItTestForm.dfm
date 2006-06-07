@@ -42,9 +42,11 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Gutter.Font.Height = -11
     Gutter.Font.Name = 'Courier New'
     Gutter.Font.Style = []
+    Gutter.ShowLineNumbers = True
     Highlighter = SynPasSyn1
     Lines.Strings = (
       '')
+    Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoKeepCaretX, eoScrollPastEof, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabIndent, eoTabsToSpaces]
     OnChange = SynEdit1Change
   end
   object SynPasSyn1: TSynPasSyn

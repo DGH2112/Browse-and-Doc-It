@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    23 Oct 2004
+  @Date    08 Feb 2006
 
 **)
 
@@ -15,7 +15,7 @@ Unit DGHSynEdit;
 Interface
 
 Uses
-  SysUtils, Classes, ComCtrls, SynEdit, SynEditKeyCmds;
+  SysUtils, Classes, ComCtrls, SynEdit, SynEditTypes, SynEditKeyCmds;
 
 Type
 
@@ -285,7 +285,7 @@ end;
 procedure TDGHSynEdit.LoadFromFile(strFileName: String);
 begin
   FileName := strFileName;
-  FileDateTime := FileDateToDateTime(FileAge(strFileName));
+  FileAge(strFileName, FFileDateTime);
   Lines.LoadFromFile(strFileName);
   TabCaption := ExtractFileName(strFileName);
 end;
@@ -307,7 +307,7 @@ procedure TDGHSynEdit.SaveToFile(strFileName: String);
 begin
   FileName := strFileName;
   Lines.SaveToFile(strFileName);
-  FileDateTime := FileDateToDateTime(FileAge(strFileName));
+  FileAge(strFileName, FFileDateTime);
   Modified := False;
   TabCaption := ExtractFileName(strFileName);
 end;
@@ -355,7 +355,7 @@ end;
 procedure TDGHSynEdit.UpperCaseWord;
 
 Var
-  ptCaret : TPoint;
+  ptCaret : TBufferCoord;
 
 begin
   ptCaret := CaretXY;
@@ -376,7 +376,7 @@ end;
 procedure TDGHSynEdit.LowerCaseWord;
 
 Var
-  ptCaret : TPoint;
+  ptCaret : TBufferCoord;
 
 begin
   ptCaret := CaretXY;

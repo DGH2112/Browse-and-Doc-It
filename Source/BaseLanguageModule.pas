@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    06 Jun 2006
+  @Date    24 Jun 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -242,6 +242,7 @@ Type
   Public
     Constructor Create(strToken : String; iPos, iLine, iCol,
       iLength : Integer; TType : TTokenType); Overload;
+    Procedure Append(strToken : String);
     (**
       Returns the token as a string.
       @return  a String
@@ -405,38 +406,6 @@ Type
     Property Col : Integer Read FCol Write FCol;
   End;
 
-  (** This is a sub class for all types **)
-  TTypes = Class(TGenericContainer);
-  (** This is a sub class for Ordinal types **)
-  TOrdinalType = Class(TTypes);
-  (** This is a sub class for Real types **)
-  TRealType = Class(TTypes);
-  (** This is a sub class for Pointer types **)
-  TPointerType = Class(TTypes);
-  (** This is a sub class for String types **)
-  TStringType = Class(TTypes);
-  (** This is a sub class for Procedure types **)
-  TProcedureType = Class(TTypes);
-  (** This is a sub class for Variant types **)
-  TVariantType = Class(TTypes);
-  (** This is a sub class for Class Ref types **)
-  TClassRefType = Class(TTypes);
-  (** This is a sub class for Array types **)
-  TArrayType = Class(TTypes);
-  (** This is a sub class for Set types **)
-  TSetType = Class(TTypes);
-  (** This is a sub class for File types **)
-  TFileType = Class(TTypes);
-
-  (** This is a sub class for all constants. **)
-  TConstant = Class(TGenericContainer);
-  (** This is a sub class for all resource strings. **)
-  TResourceString = Class(TConstant);
-  (** This is a sub class for all variables. **)
-  TVar = Class(TGenericContainer);
-  (** This is a sub class for all thread variables. **)
-  TThreadVar = Class(TVar);
-
   (** This is a collaboration class for storing the constants. **)
   TGenericContainerCollection = Class
   Private
@@ -468,20 +437,29 @@ Type
     **)
     Property Count : Integer Read GetCount;
   End;
-  
-  (** A descendant class to the purposes of holding enumerates. **)
-  TIndexedEnumerateList = Class(TIdentList)
-  Private
-    FIndexInfo : TGenericContainerCollection;
-    Function GetIndexInfo(iIndex : Integer) : TGenericContainer;
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
-    Procedure Add(strIdent : String; iLine, iCol : Integer; Comment : TComment);
-      Override;
-    Property Indexinfo[iIndex : Integer] : TGenericContainer Read GetIndexInfo;
-    Function AsString : String; Override;
-  End;
+
+  (** This is a sub class for all types **)
+  TTypeDecl = Class(TGenericContainer);
+
+  (** This is a sub class for general type types **)
+  TTypes = Class(TTypeDecl);
+  (** This is a sub class for restricted type types **)
+  TRestrictedType = Class(TTypeDecl);
+
+  (** This is a sub class for typeid types **)
+  TTypeID = Class(TTypes);
+  (** This is a sub class for Simple Type types **)
+  TSimpleType = Class(TTypes);
+  (** This is a sub class for Structured Type types **)
+  TStrucType = Class(TTypes);
+  (** This is a sub class for String types **)
+  TStringType = Class(TTypes);
+  (** This is a sub class for Procedure types **)
+  TProcedureType = Class(TTypes);
+  (** This is a sub class for Variant types **)
+  TVariantType = Class(TTypes);
+  (** This is a sub class for Class Ref types **)
+  TClassRefType = Class(TTypes);
 
   (** This class represents a parameter of a method declaration. **)
   TParameter = Class
@@ -497,7 +475,7 @@ Type
     FCol: Integer;
   Public
     Constructor Create(ParamMod : TParamModifier; Ident : String;
-      boolArrayOf : Boolean; AType : TTypes; Value : String;
+      boolArrayOf : Boolean; AType : TTypeDecl; Value : String;
       Scope : TScope; iLine, iCol : Integer); Overload;
     Procedure Assign(Parameter : TParameter);
     Destructor Destroy; Override;
@@ -863,7 +841,7 @@ Type
   End;
 
   (** This is a class that represents a record definition. **)
-  TRecordDecl = Class(TTypes)
+  TRecordDecl = Class(TRestrictedType)
   Private
     FPacked : Boolean;
     FParameter : TObjectList;
@@ -964,6 +942,97 @@ Type
   Public
     Function AsString(ShowFirstToken : Boolean) : String; Override;
   End;
+
+  (** This is a sub class for Ordinal types **)
+  TOrdinalType = Class(TSimpleType);
+  (** This is a sub class for Real types **)
+  TRealType = Class(TSimpleType);
+  
+  (** This is a sub class for the Real48 type. **)
+  TReal48 = Class(TRealType);
+  (** This is a sub class for the Real type. **)
+  TReal = Class(TRealType);
+  (** This is a sub class for the Single type. **)
+  TSingle = Class(TRealType);
+  (** This is a sub class for the Double type. **)
+  TDouble = Class(TRealType);
+  (** This is a sub class for the Extended type. **)
+  TExtended = Class(TRealType);
+  (** This is a sub class for the Currency type. **)
+  TCurrency = Class(TRealType);
+  (** This is a sub class for the Complex type. **)
+  TComp = Class(TRealType);
+
+  (** This is a sub class for the SubRange type. **)
+  TSubRangeType = Class(TOrdinalType);
+  (** This is a sub class for the Enumerate type. **)
+  TEnumerateType = Class(TOrdinalType);
+  (** This is a sub class for the OrdIdent type. **)
+  TOrdIdent = Class(TOrdinalType);
+
+  (** This is a sub class for the ShortInt type. **)
+  TShortInt = Class(TOrdIdent);
+  (** This is a sub class for the SmallInt type. **)
+  TSmallInt = Class(TOrdIdent);
+  (** This is a sub class for the Integer type. **)
+  TInteger = Class(TOrdIdent);
+  (** This is a sub class for the Byte type. **)
+  TByte = Class(TOrdIdent);
+  (** This is a sub class for the LongInt type. **)
+  TLongInt = Class(TOrdIdent);
+  (** This is a sub class for the Int64 type. **)
+  TInt64 = Class(TOrdIdent);
+  (** This is a sub class for the Word type. **)
+  TWord = Class(TOrdIdent);
+  (** This is a sub class for the Boolean type. **)
+  TBoolean = Class(TOrdIdent);
+  (** This is a sub class for the Char type. **)
+  TChar = Class(TOrdIdent);
+  (** This is a sub class for the WideChar type. **)
+  TWideChar = Class(TOrdIdent);
+  (** This is a sub class for the LongWord type. **)
+  TLongWord = Class(TOrdIdent);
+  (** This is a sub class for the PChar type. **)
+  TPChar = Class(TOrdIdent);
+
+  (** This is a sub class for the Variant type. **)
+  TVariant = Class(TVariantType);
+  (** This is a sub class for the OLEVariant type. **)
+  TOLEVariant = Class(TVariantType);
+
+  (** This is a sub class for the String type. **)
+  TString = Class(TStringType);
+  (** This is a sub class for the AnsiString type. **)
+  TAnsiString = Class(TStringType);
+  (** This is a sub class for the WideString type. **)
+  TWideString = Class(TStringType);
+  (** This is a sub class for the ShortString type. **)
+  TShortString = Class(TStringType);
+
+  (** This is a sub class for Array types **)
+  TArrayType = Class(TStrucType)
+  Private
+    FDimensions : Integer;
+  Public
+    Procedure AddDimension;
+    Property Dimensions : Integer Read FDimensions;
+  End;
+
+  (** This is a sub class for Set types **)
+  TSetType = Class(TStrucType);
+  (** This is a sub class for File types **)
+  TFileType = Class(TStrucType);
+  (** This is a sub class for Pointer types **)
+  TPointerType = Class(TTypes);
+
+  (** This is a sub class for all constants. **)
+  TConstant = Class(TGenericContainer);
+  (** This is a sub class for all resource strings. **)
+  TResourceString = Class(TConstant);
+  (** This is a sub class for all variables. **)
+  TVar = Class(TGenericContainer);
+  (** This is a sub class for all thread variables. **)
+  TThreadVar = Class(TVar);
 
   (** This class defines a parsing error. **)
   TDocError = Class
@@ -1155,12 +1224,11 @@ Type
 
   (** This is an abtract class from which all language modules should be
       derived. **)
-  TBaseLanguageModule = Class Abstract
+  TBaseLanguageModule = Class //: @debug Abstract
   Private
     FOwnedItems : TObjectList;
     FTokens : TObjectList;
     FTokenIndex : TTokenIndex;
-    FSourceStream : TStream;
     FDocErrors: TDocErrorCollection;
     FTickList : TStringList;
     FModuleName : String;
@@ -1197,7 +1265,6 @@ Type
     Function GetBodyCommentCount : Integer;
     Function GetDocumentConflict(iIndex : Integer) : TDocumentConflict;
     Function GetDocumentConflictCount : Integer;
-    Procedure TokenizeStream(strReservedWords, strDirectives : Array of String);
   Protected
     Function PrevToken : TTokenInfo;
     Procedure NextToken;
@@ -1208,6 +1275,8 @@ Type
     Procedure SetTokenIndex(iIndex : TTokenIndex);
     Procedure SortDocumentConflicts;
     Procedure GetBodyCmt;
+    Procedure AddToken(AToken : TTokenInfo);
+    procedure AppendToLastToken(strToken : String);
     (**
       Returns a refernce the to owned items collection. This is used to manage
       the life time of all the ident lists and comments found in the module.
@@ -1226,8 +1295,7 @@ Type
     **)
     Property BodyComments : TObjectList Read FBodyComment;
   Public
-    Constructor Create(Source : TStream; strReservedWords,
-      strDirectives : Array of String; IsModified : Boolean; strFileName : String);
+    Constructor Create(IsModified : Boolean; strFileName : String);
     Destructor Destroy; Override;
     Procedure AddTickCount(strLabel : String);
     Procedure AddDocumentConflict(Const Args: Array of TVarRec; iIdentLine,
@@ -1392,7 +1460,7 @@ Type
 
 ResourceString
   (** The registry key for the wizards settings. **)
-  strRegRootKey = 'Software\Season''s Fall\Pascal Doc\';
+  strRegRootKey = 'Software\Season''s Fall\Browse and Doc It\';
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
@@ -1633,13 +1701,22 @@ ResourceString
   (** An exception message for an unsatisfied forward reference. **)
   strUnSatisfiedForwardReference = 'Class method "%s.%s" has an unsatisfied ' +
     'forward reference.';
+  (** An exception message for a type not found. **)
   strTypeNotFound = 'Type declaration missing but found "%s" at line %d column %d.';
+  (** An exception message when a TypeID is expected. **)
+  strTypeIDExpected = 'A TypeID was expected but found "%s" at line %d column %d.';
+  (** An execption message when a Expr conflict occurs in an expression **)
+  strExprConflict = 'The token "%s" conflicts with the TYPE of the preceeding ' +
+    'expression at line %d column %d.';
+  (** An exception message if a function is used in a constant expression **)
+  strConstExprDesignator = 'The token "%s" at line %d column %d is not allowed ' +
+    'in a Constant Expression.';
+  (** An exception message if the first none comment token is not Program,
+      Package, Unit or Library. **)
+  strModuleKeyWordNotfound = 'Module starting keyword PROGRAM, PACKAGE, UNIT ' +
+    'or LIBRARY not found.';
 
 Const
-  (** A set of characters for whitespace **)
-  strWhiteSpace : Set Of Char = [#32, #9];
-  (** A set of characters for line feed and carriage return **)
-  strLineEnd : Set of Char = [#10, #13];
   (** A set of characters for alpha characaters **)
   strTokenChars : Set Of Char = ['#', '_', 'a'..'z', 'A'..'Z'];
   (** A set of numbers **)
@@ -1649,9 +1726,10 @@ Const
     ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
   (** A set of characters for quotes **)
   strQuote : Set Of Char = [''''];
-  (** A set of characters that terminate a constant expression. **)
-  strConstExprTerminals : Set Of Char = ['&', ',', ':', ';', '<', '=', '>',
-    ']', '^', '{', '}'];
+  (** A set of characters for whitespace **)
+  strWhiteSpace : Set Of Char = [#32, #9];
+  (** A set of characters for line feed and carriage return **)
+  strLineEnd : Set of Char = [#10, #13];
   (** A list of strings representing the different types of token. **)
   strTypes : Array[ttUnknown..ttLinkTag] Of String = ('Unknown',
     'WhiteSpace', 'Keyword', 'Identifier', 'Number', 'Symbol', 'LineEnd',
@@ -1816,8 +1894,8 @@ Var
   (** This is a global string list containing the special tags list. **)
   SpecialTags : TStringList;
 
-  Function GetTokenType(Ch : Char; LastToken : TTokenType) : TTokenType;
-  function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
+  Function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
+  Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
   Function IsTokenWhiteSpace(strToken : String) : Boolean;
 
 Implementation
@@ -1835,22 +1913,27 @@ Uses
            effect on some characters.
   @postcon Returns the token type for the given character.
 
-  @param   Ch        as a Char
-  @param   LastToken as a TTokenType
+  @param   Ch           as a Char
+  @param   LastCharType as a TTokenType
   @return  a TTokenType
 
 **)
-Function GetTokenType(Ch : Char; LastToken : TTokenType) : TTokenType;
+Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
 
 Begin
   If ch In strWhiteSpace Then
     Result := ttWhiteSpace
   Else If ch In strTokenChars Then
-    Result := ttIdentifier
+    Begin
+      If (LastCharType = ttNumber) And (Ch In ['A'..'F', 'a'..'f']) Then
+        Result := ttNumber
+      Else
+        Result := ttIdentifier;
+    End
   Else If ch In strNumbers Then
     Begin
       Result := ttNumber;
-      If LastToken = ttIdentifier Then
+      If LastCharType = ttIdentifier Then
         Result := ttIdentifier;
     End
   Else If ch In strLineEnd Then
@@ -1858,13 +1941,35 @@ Begin
   Else If ch In strQuote Then
     Result := ttStringLiteral
   Else If ch In strSymbols Then
-    Begin
-      Result := ttSymbol;
-      If (Ch = '.') And (LastToken = ttNumber) Then
-        Result := ttNumber;
-    End
+    Result := ttSymbol
   Else
     Result := ttUnknown;
+End;
+
+(**
+
+  This method checks to see if the passed token if white space, if so returns
+  true.
+
+  @precon  None.
+  @postcon Checks to see if the passed token if white space, if so returns
+           true.
+
+  @param   strToken as a String
+  @return  a Boolean
+
+**)
+Function IsTokenWhiteSpace(strToken : String) : Boolean;
+
+Var
+  i : Integer;
+
+Begin
+  Result := True;
+  For i := 1 To Length(strToken) Do
+    If Not (strToken[i] In strWhiteSpace) And
+      Not (strToken[i] In strLineEnd)Then
+      Result := False;
 End;
 
 (**
@@ -2283,51 +2388,20 @@ Begin
 
 End;
 
-Procedure TIndexedEnumerateList.Add(strIdent : String; iLine, iCol : Integer;
-  Comment : TComment);
+(**
+
+  This method increments the internal count of the number of dimensions of the
+  array.
+
+  @precon  None.
+  @postcon Increments the internal count of the number of dimensions of the
+           array.
+
+**)
+Procedure TArrayType.AddDimension;
 
 Begin
-  Inherited Add(strIdent, iLine, iCol, Comment);
-  FIndexInfo.Add(TGenericContainer.Create);
-End;
-
-Function TIndexedEnumerateList.AsString : String;
-
-var
-  i : Integer;
-  str : String;
-
-Begin
-  Result := '';
-  For i := 0 To Count - 1 Do
-    Begin
-      If Result <> '' Then
-        Result := Result + ', ';
-      str := IndexInfo[i].AsString(True);
-      Result := Result + Idents[i].Ident;
-      If str <> '' Then
-        Result := Result + ' = ' + Indexinfo[i].AsString(True);
-    End;
-End;
-
-Constructor TIndexedEnumerateList.Create;
-
-Begin
-  Inherited Create;
-  FIndexInfo := TGenericContainerCollection.Create(True);
-End;
-
-Destructor TIndexedEnumerateList.Destroy;
-
-Begin
-  FIndexInfo.Free;
-  Inherited Destroy;
-End;
-
-Function TIndexedEnumerateList.GetIndexInfo(iIndex : Integer) : TGenericContainer;
-
-Begin
-  Result := FIndexInfo[iIndex];
+  Inc(FDimensions);
 End;
 
 (**
@@ -2348,7 +2422,9 @@ End;
 
 **)
 procedure TBaseLanguageModule.AddDocumentConflict(Const Args: Array of TVarRec;
-  iIdentLine, iIdentColumn, iCommentLine, iCommentCol : Integer; DocConflictType: TDocConflictType);
+  iIdentLine, iIdentColumn, iCommentLine, iCommentCol : Integer;
+  DocConflictType: TDocConflictType);
+  
 begin
   FDocumentConflicts.Add(TDocumentConflict.Create(Args, iIdentLine,
     iIdentColumn, iCommentLine, iCommentCol, DocConflictType));
@@ -2379,15 +2455,11 @@ end;
   @postcon Initialise this base class and Tokensizes the passed stream of
            characters.
 
-  @param   Source           as a TStream
-  @param   strReservedWords as an Array Of String
-  @param   strDirectives    as an Array Of String
   @param   IsModified       as a Boolean
   @param   strFileName      as a String
 
 **)
-constructor TBaseLanguageModule.Create(Source : TStream; strReservedWords,
-  strDirectives : Array of String; IsModified : Boolean; strFileName : String);
+constructor TBaseLanguageModule.Create(IsModified : Boolean; strFileName : String);
 begin
   Inherited Create;
   FFileName := strFileName;
@@ -2395,7 +2467,6 @@ begin
   FOwnedItems := TObjectList.Create(True);
   FTokens := TObjectList.Create(True);
   FTokenIndex := 0;
-  FSourceStream := Source;
   FDocErrors := TDocErrorCollection.Create;
   FTickList := TStringList.Create;
   FExportedHeadings := TMethodCollection.Create;
@@ -2419,9 +2490,6 @@ begin
   FModuleType := mtUnit;
   FRequiresClause := Nil;
   FUsesClause := Nil;
-  AddTickCount('Start');
-  TokenizeStream(strReservedWords, strDirectives);
-  AddTickCount('Tokenize');
 end;
 
 (**
@@ -2451,6 +2519,38 @@ begin
   FOwnedItems.Free;
   inherited;
 end;
+
+(**
+
+  This method adds the given token to the underlying token collection.
+  
+  @precon  AToken must be a valid instance of a TTokenInfo class..
+  @postcon Adds the given token to the underlying token collection.
+  
+  @param   AToken as a TTokenInfo
+  
+**)
+Procedure TBaseLanguageModule.AddToken(AToken : TTokenInfo);
+
+Begin
+  FTokens.Add(AToken);
+End;
+
+(**
+
+  This method appends the pased token string to the previous token.
+
+  @precon  None.
+  @postcon Appends the pased token string to the previous token.
+
+  @param   strToken as a String
+
+**)
+Procedure TBaseLanguageModule.AppendToLastToken(strToken : String);
+
+Begin
+  TokenInfo[TokenCount - 1].Append(strToken);
+End;
 
 (**
 
@@ -2739,32 +2839,6 @@ End;
 
 (**
 
-  This method checks to see if the passed token if white space, if so returns
-  true.
-
-  @precon  None.
-  @postcon Checks to see if the passed token if white space, if so returns
-           true.
-
-  @param   strToken as a String
-  @return  a Boolean
-
-**)
-Function IsTokenWhiteSpace(strToken : String) : Boolean;
-
-Var
-  i : Integer;
-
-Begin
-  Result := True;
-  For i := 1 To Length(strToken) Do
-    If Not (strToken[i] In strWhiteSpace) And
-      Not (strToken[i] In strLineEnd)Then
-      Result := False;
-End;
-
-(**
-
   This method moves the toke to the next token in the token list or raises an
   EDocException.
 
@@ -2859,193 +2933,6 @@ begin
         Exit;
       End;
 end;
-
-(**
-
-  This method tokenises the stream of text passed to the constructor and splits
-  it into tokens.
-
-  @precon  None.
-  @postcon Tokenises the stream of text passed to the constructor and splits
-           it into tokens.
-
-  @param   strReservedWords as an Array of String
-  @param   strDirectives    as an Array of String
-
-**)
-Procedure TBaseLanguageModule.TokenizeStream(strReservedWords,
-  strDirectives : Array of String);
-
-Type
-  (** State machine for block types. **)
-  TBlockType = (btNoBlock, btStringLiteral, btLineComment, btBraceComment,
-    btFullComment);
-
-Const
-  (** Growth size of the token buffer. **)
-  iTokenCapacity = 25;
-  test = 12.34;
-
-Var
-  boolEOF : Boolean;
-  (** Token buffer. **)
-  strToken : String;
-  CurToken : TTokenType;
-  LastToken : TTokenType;
-  BlockType : TBlockType;
-  (** Current line number **)
-  iLine : Integer;
-  (** Current column number **)
-  iColumn : Integer;
-  (** Token stream position. Fast to inc this than read the stream position. **)
-  iStreamPos : Integer;
-  (** Token line **)
-  iTokenLine : Integer;
-  (** Token column **)
-  iTokenColumn : Integer;
-  (** Current character position **)
-  iStreamCount : Integer;
-  Ch : Char;
-  LastChar : Char;
-  (** Token size **)
-  iTokenLen : Integer;
-
-Begin
-  BlockType := btNoBlock;
-  iStreamPos := 0;
-  iTokenLine := 1;
-  iTokenColumn := 1;
-  boolEOF := False;
-  CurToken := ttUnknown;
-  LastToken := ttUnknown;
-  iStreamCount := 0;
-  iLine := 1;
-  iColumn := 1;
-  Ch := #0;
-  LastChar := #0;
-  strToken := '';
-
-  iTokenLen := 0;
-  SetLength(strToken, iTokenCapacity);
-
-  Try
-    If FSourceStream <> Nil Then
-      Begin
-        Repeat
-          If FSourceStream.Read(ch, 1) > 0 Then
-            Begin
-              Inc(iStreamCount);
-              LastToken := CurToken;
-              CurToken := GetTokenType(Ch, LastToken);
-
-              // Check for full block comments
-              If (BlockType = btNoBlock) And (LastChar = '(') And (Ch = '*') Then
-                BlockType := btFullComment;
-
-              // Check for line comments
-              If (BlockType = btNoBlock) And (LastChar = '/') And (Ch = '/') Then
-                BlockType := btLineComment;
-
-              If (LastToken <> CurToken) Or (CurToken = ttSymbol) Then
-                Begin
-                  If ((BlockType In [btStringLiteral, btLineComment]) And
-                    (CurToken <> ttLineEnd)) Or
-                    (BlockType In [btBraceComment, btFullComment]) Then
-                    Begin
-                      Inc(iTokenLen);
-                      If iTokenLen > Length(strToken) Then
-                        SetLength(strToken, iTokenCapacity + Length(strToken));
-                      strToken[iTokenLen] := Ch;
-                    End Else
-                    Begin
-                      SetLength(strToken, iTokenLen);
-                      If Not IsTokenWhiteSpace(strToken) Then
-                        Begin
-                          If LastToken = ttIdentifier Then
-                            Begin
-                              If IsKeyWord(strToken, strReservedWords) Then
-                                LastToken := ttReservedWord;
-                              If IsKeyWord(strToken, strDirectives) Then
-                                LastToken := ttDirective;
-                            End;
-                          If BlockType = btLineComment Then
-                            LastToken := ttComment;
-                          If (LastToken = ttComment) And (Length(strToken) > 2) Then
-                            If (strToken[1] = '{') And (strToken[2] = '$') Then
-                              LastToken := ttCompilerDirective;
-                          FTokens.Add(TTokenInfo.Create(strToken, iStreamPos,
-                            iTokenLine, iTokenColumn, Length(strToken), LastToken));
-                          //Inc(iCounter);
-                        End;
-                     // Store Stream position, line number and column of
-                     // token start
-                     iStreamPos := iStreamCount;
-                     iTokenLine := iLine;
-                     iTokenColumn := iColumn;
-                     BlockType := btNoBlock;
-                     iTokenLen := 1;
-                     SetLength(strToken, iTokenCapacity);
-                     strToken[iTokenLen] := Ch;
-                    End;
-                End Else
-                Begin
-                  Inc(iTokenLen);
-                  If iTokenLen > Length(strToken) Then
-                    SetLength(strToken, iTokenCapacity + Length(strToken));
-                  strToken[iTokenLen] := Ch;
-                End;
-
-              // Check for the end of a block comment
-              If (BlockType = btFullComment) And (LastChar = '*') And (Ch = ')') Then
-                Begin
-                  BlockType := btNoBlock;
-                  CurToken := ttComment;
-                End;
-
-              // Check for string literals
-              If CurToken = ttStringLiteral Then
-                If BlockType = btStringLiteral Then
-                  BlockType := btNoBlock
-                Else If BlockType = btNoBlock Then
-                  BlockType := btStringLiteral;
-
-              // Check for block Comments
-              If (BlockType = btNoBlock) And (Ch = '{') Then
-                Begin
-                  CurToken := ttComment;
-                  BlockType := btBraceComment;
-                End;
-              If (BlockType = btBraceComment) And (Ch = '}') Then
-                Begin
-                  CurToken := ttComment;
-                  BlockType := btNoBlock;
-                End;
-
-              Inc(iColumn);
-              If Ch = #10 Then
-                Begin
-                  Inc(iLine);
-                  iColumn := 1;
-                  If BlockType In [btLineComment, btStringLiteral] Then
-                    BlockType := btNoBlock;
-                End;
-              LastChar := Ch;
-            End Else
-              boolEOF := True;
-        Until boolEOF;
-        If iTokenLen > 0 Then
-          Begin
-            SetLength(strToken, iTokenLen);
-            If Not IsTokenWhiteSpace(strToken) Then
-              FTokens.Add(TTokenInfo.Create(strToken, iStreamPos,
-                iTokenLine, iTokenColumn, Length(strToken), LastToken));
-          End;
-      End;
-  Except
-    On E : Exception Do
-      Errors.Add(E.Message, 'TokenizeStream', 0, 0, etError);
-  End
-End;
 
 (**
 
@@ -3688,6 +3575,24 @@ begin
   If FTokenType In [ttReservedWord, ttDirective] Then
     FUToken := UpperCase(strToken);
 end;
+
+(**
+
+  This method appends the given string to the end of the token.
+
+  @precon  None.
+  @postcon Appends the given string to the end of the token.
+
+  @param   strToken as a String
+
+**)
+Procedure TTokenInfo.Append(strToken : String);
+
+Begin
+  FToken := FToken + strToken;
+  If FTokenType In [ttReservedWord, ttDirective] Then
+    FUToken := FUtoken + UpperCase(strToken);
+End;
 
 (**
 
@@ -4335,7 +4240,7 @@ end;
   @param   ParamMod    as a TParamModifier
   @param   Ident       as a String
   @param   boolArrayOf as a Boolean
-  @param   AType       as a TTypes
+  @param   AType       as a TTypeDecl
   @param   Value       as a String
   @param   Scope       as a TScope
   @param   iLine       as an Integer
@@ -4343,7 +4248,7 @@ end;
 
 **)
 Constructor TParameter.Create(ParamMod : TParamModifier; Ident : String;
-  boolArrayOf : Boolean; AType : TTypes;
+  boolArrayOf : Boolean; AType : TTypeDecl;
   Value : String; Scope : TScope; iLine, iCol : Integer);
 
 Begin

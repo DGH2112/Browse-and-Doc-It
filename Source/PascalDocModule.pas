@@ -4,8 +4,6 @@
 
   @todo       Handle conditional compilation. Now there's a dilema here do I
               handle it at the token level or during the parsing of the source?
-  @todo       Allow for the handling of multiple errors - Whats the best way to
-              do this?
 
   @precon     Before this class con be constructed it requires an instance of a
               TStream decendant passed to the constructor which contains the
@@ -21,7 +19,7 @@
               specific token.
 
   @Version    1.0
-  @Date       05 Jun 2006
+  @Date       24 Jun 2006
   @Author     David Hoyle
 
 **)
@@ -33,11 +31,10 @@ Uses
   SysUtils, Windows, Contnrs, Classes, BaseLanguageModule;
 
 Type
-  (** This enumerate described the different type of ident list that can be
-      found in the language which have different behaviours. **)
-  TIdentListType = (iltStandIdentList, iltUsesClause, iltIndexedEnumerates);
-  
-  TConstExprType = (cetUnknown, cetString, cetNumeric);
+  (** This is an enumerate to describe the type of constant expression. **)
+  TExprType = (etUnknown, etConstExpr, etString, etNumeric);
+  (** This is a set of TExprType enumerates. **)
+  TExprTypes = Set of TExprType;
 
   (**
 
@@ -48,8 +45,8 @@ Type
   **)
   TPascalDocModule = Class(TBaseLanguageModule)
   Private
-    FConstExprType : TConstExprType;
-    { Grammer Parsers }
+    FSourceStream : TStream;
+    { Grammar Parsers }
     Procedure Goal;
     Function OPProgram : Boolean;
     Function OPUnit : Boolean;
@@ -57,12 +54,14 @@ Type
     Function OPLibrary : Boolean;
     Procedure ProgramBlock;
     procedure UsesClause;
+    Procedure PortabilityDirective;
     Procedure InterfaceSection;
     Procedure InterfaceDecl;
     Function ExportedHeading : Boolean;
-    Function ExportedProcs : Boolean;
     Procedure ImplementationSection;
     Procedure Block(Scope : TScope; Method : TMethodDecl);
+    Function ExportedStmt : Boolean;
+    procedure ExportsItem;
     Procedure DeclSection(Scope : TScope; Method : TMethodDecl);
     Function LabelDeclSection : Boolean;
     Function ConstSection(Scope : TScope; Method : TMethodDecl) : Boolean;
@@ -71,23 +70,24 @@ Type
     Function ResourceStringDecl(Scope: TScope; Method : TMethodDecl): Boolean;
     Function TypeSection(Scope : TScope; Method : TMethodDecl) : Boolean;
     Function TypeDecl(Scope : TScope; Method : TMethodDecl) : Boolean;
-    Function GetTypeDecl : TTypes;
-    Function TypedConstant(C: TGenericContainer) : Boolean;
+    Function GetTypeDecl : TTypeDecl;
+    Function TypedConstant(C: TGenericContainer; T : TTypeDecl) : Boolean;
     Function ArrayConstant(C: TGenericContainer) : Boolean;
     Function RecordConstant(C: TGenericContainer) : Boolean;
     Procedure RecordFieldConstant;
-    function OPType : TTypes;
-    function RestrictedType : TTypes;
+    function OPType : TTypeDecl;
+    function RestrictedType : TRestrictedType;
     Function ClassRefType : TClassRefType;
-    Function SimpleType : TTypes;
+    Function SimpleType : TSimpleType;
     function RealType : TRealType;
     function OrdinalType : TOrdinalType;
-    function OrdIdent : TOrdinalType ;
+    function OrdIdent : TOrdIdent;
     Function VariantType : TVariantType;
-    function SubRangeType : TOrdinalType;
-    function EnumerateType : TOrdinalType;
+    function SubRangeType : TSubRangeType;
+    function EnumerateType : TEnumerateType;
+    Procedure EnumerateElement(EnumerateType : TEnumerateType);
     Function StringType : TStringType;
-    Function StrucType : TTypes;
+    Function StrucType : TTypeDecl;
     function ArrayType(boolPacked : Boolean): TArrayType;
     Function RecType(boolPacked : Boolean) : TRecordDecl;
     Procedure FieldList(Rec : TRecordDecl);
@@ -101,32 +101,38 @@ Type
     Function VarSection(Scope : TScope; Method : TMethodDecl) : Boolean;
     Function ThreadVarSection(Scope : TScope) : Boolean;
     Function VarDecl(Scope : TScope; VarSection : TGenericContainerCollection) : Boolean;
-    Procedure Expression;
-    Procedure SimpleExpression;
-    Procedure Term;
-    Procedure Factor;
-    Procedure RelOp;
-    Procedure AddOp;
-    Procedure MulOp;
-    Procedure Designator;
-    Procedure SetConstructor;
-    Procedure SetElement;
-    Procedure ExprList;
+    Procedure Expression(C : TGenericContainer; var ExprType : TExprTypes);
+    Procedure SimpleExpression(C : TGenericContainer; var ExprType : TExprTypes);
+    Procedure Term(C : TGenericContainer; var ExprType : TExprTypes);
+    Procedure Factor(C : TGenericContainer; var ExprType : TExprTypes);
+    Function RelOp(C : TGenericContainer) : Boolean;
+    Function AddOp(C : TGenericContainer) : Boolean;
+    Function MulOp(C : TGenericContainer; var ExprType : TExprTypes) : Boolean;
+    Procedure Designator(C : TGenericContainer; var ExprType : TExprTypes);
+    Procedure DesignatorSubElement(C : TGenericContainer;
+      var ExprType : TExprTypes; strValidSymbols : Array of String);
+    Function SetConstructor(C : TGenericContainer) : Boolean;
+    Procedure SetElement(C : TGenericContainer);
+    Procedure ExprList(C : TGenericContainer);
     Procedure Statement;
     Procedure StmtList;
     Procedure SimpleStatement;
-    Procedure StructStmt;
-    Procedure CompoundStmt;
-    Procedure ConditionalStmt;
-    Procedure IfStmt;
-    Procedure CastStmt;
+    Function StructStmt : Boolean;
+    Function CompoundStmt : Boolean;
+    Function ConditionalStmt : Boolean;
+    Function IfStmt : Boolean;
+    Function CaseStmt : Boolean;
     Procedure CaseSelector;
     Procedure CaseLabel;
-    Procedure LoopStmt;
-    Procedure RepeatStmt;
-    Procedure WhileStmt;
-    Procedure ForStmt;
-    Procedure WithStmt;
+    Function LoopStmt : Boolean;
+    Function RepeatStmt : Boolean;
+    Function WhileStmt : Boolean;
+    Function ForStmt : Boolean;
+    Function WithStmt : Boolean;
+    Function TryExceptAndFinallyStmt : Boolean;
+    Function ExceptionBlock : Boolean;
+    Function RaiseStmt : Boolean;
+    Function AssemblerStatement : Boolean;
     Function ProcedureDeclSection(Scope : TScope; Method : TMethodDecl) : Boolean;
     Procedure ProcedureDecl;
     Procedure FunctionDecl;
@@ -137,7 +143,7 @@ Type
     Procedure Parameter(Method : TMethodDecl; ParamMod : TParamModifier);
     Procedure Directive(M : TMethodDecl);
     Function ObjectType : TObjectDecl;
-    Procedure ObjHeritage;
+    Procedure ObjHeritage(ObjDecl : TObjectDecl);
     Function MethodList(Cls : TObjectDecl; Scope : TScope) : Boolean;
     function MethodHeading(Cls: TObjectDecl; Scope: TScope): Boolean;
     Function ConstructorHeading(Scope :TScope) : TMethodDecl;
@@ -155,29 +161,28 @@ Type
     Procedure PropertyParameterList(Prop : TProperty);
     Procedure PropertySpecifiers(Prop : TProperty);
     Function  InterfaceType : TInterfaceDecl;
-    Procedure InterfaceHeritage;
+    Procedure InterfaceHeritage(InterfaceDecl : TInterfaceDecl);
     Procedure RequiresClause;
     procedure ContainsClause;
-    Function IdentList(OwnList : Boolean; IdentListType : TIdentListType;
-      SeekTokens : Array Of String): TIdentList;
-    // Procedure QualId;
-    function TypeId: String;
+    Function IdentList(OwnList : Boolean; SeekTokens : Array Of String): TIdentList;
+    // Procedure QualId; // These can be iterated Form1.Control1.Click
+    Function TypeId(C: TGenericContainer) : Boolean;
     // Procedure Ident;
-    Function ConstExpr(C: TGenericContainer) : Boolean;
+    Function ConstExpr(C: TGenericContainer; var ExprType : TExprTypes) : Boolean;
     // Procedure UnitId;
     // Procedure LabelId;
     // Procedure Number;
     // Procedure OpString;
-    (* Helper method to the grammer parsers *)
+    (* Helper method to the grammar parsers *)
     Function ProcedureBit(ProcType : TMethodType; Scope : TScope) : TMethodDecl;
-    procedure ExportsEntry;
-    procedure ExportsList;
-    Procedure SkipStatements(var iBlockCount : Integer);
     Procedure ScopeImplementedMethods;
     procedure Sort;
+    Procedure TokenizeStream;
     Procedure ParseTokens;
     procedure ErrorAndSeekToken(strMsg, strMethod, strExpected: String;
       SeekTokens: array of string);
+    Procedure AddToExpression(C : TGenericContainer);
+    function IsToken(strToken: String; C: TGenericContainer): Boolean;
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
       ModuleOptions : TModuleOptions; DocOptions : TDocOptions);
@@ -221,13 +226,13 @@ Const
     identifiers and as types.
 
   **)
-  strReservedWords : Array[1..63] Of String = (
-    'and', 'array', 'as', 'asm', 'begin', 'case',	'class', 'const',
+  strReservedWords : Array[1..64] Of String = (
+    'and', 'array', 'as', 'asm', 'begin', 'case', 'class', 'const',
     'constructor', 'destructor', 'dispinterface', 'div', 'do', 'downto', 'else',
     'end', 'except', 'exports', 'file', 'finalization', 'finally', 'for',
     'function', 'goto', 'if', 'implementation', 'in', 'inherited',
     'initialization', 'inline', 'interface', 'is', 'label', 'library', 'mod',
-    {'nil', }'not', 'object', 'of', 'or', 'out', 'packed', 'procedure', 'program',
+    {'nil', }'not', 'object', 'of', 'or', 'on', 'out', 'packed', 'procedure', 'program',
     'property', 'raise', 'record', 'repeat', 'resourcestring', 'set', 'shl',
     'shr', {'string', }'then', 'threadvar', 'to', 'try', 'type', 'unit', 'until',
     'uses', 'var', 'while', 'with', 'xor'
@@ -274,35 +279,53 @@ Const
   strBlockStarts : Array[1..4] Of String = ('asm', 'begin', 'case', 'try');
 
   (** An array of parameter modifier phases. **)
-  strModifier : Array[pmNone..pmOut] Of String = ('', ' as a reference',
-    ' constant', ' as out');
+  {: @debug strModifier : Array[pmNone..pmOut] Of String = ('', ' as a reference',
+    ' constant', ' as out');}
   (** A simple array for outputting a or an. **)
-  strAOrAn : Array[False..True] Of String = ('a', 'an');
+  //: @debug strAOrAn : Array[False..True] Of String = ('a', 'an');
   (** A list of vowels. **)
-  strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+  //: @debug strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
 
   (** This is a list of reserved, directives word and a semi colon which are
       token that can be sort as then next place to start parsing from when an
       error is  encountered. **)
-  strSeekableOnErrorTokens : Array[1..89] Of String = (';',
-    'absolute', 'abstract', 'and', 'array', 'as', 'asm', 'assembler',
-    'automated', 'begin', 'case', 'class', 'const', 'constructor', 'contains',
-    'default', 'destructor', 'dispid', 'dispinterface', 'div', 'do', 'downto',
-    'else', 'end', 'except', 'exports', 'file', 'finalization', 'finally',
-    'for', 'function', 'goto', 'if', 'implementation', 'implements', 'in',
-    'index', 'inherited', 'initialization', 'inline', 'interface', 'is',
-    'label', 'library', 'mod', 'name', 'near', 'nodefault', 'not', 'object',
-    'of', 'or', 'out', 'package', 'packed', 'private', 'procedure', 'program',
-    'property', 'protected', 'public', 'published', 'raise', 'read', 'readonly',
-    'record', 'repeat', 'requires', 'resident', 'resourcestring', 'set', 'shl',
-    'shr', 'stored', 'then', 'threadvar', 'to', 'try', 'type', 'unit', 'until',
-    'uses', 'var', 'varargs', 'while', 'with', 'write', 'writeonly', 'xor'
+  strSeekableOnErrorTokens : Array[1..30] Of String = (';', 'const', 'contains',
+    'do', 'else', 'end', 'except', 'exports', 'finalization', 'finally',
+    'function', 'implementation',
+    'implements', 'initialization', 'interface', 'label', 'library', 'object',
+    'package', 'procedure', 'program', 'record', 'requires', 'resourcestring',
+    'then', 'type', 'unit', 'until', 'uses', 'var'
   );
-  
-  strConstExprFuncs : Array[1..15] Of String = ('Abs', 'Chr', 'Hi', 'High',
+//    'absolute', 'abstract', 'and', 'array', 'as', 'asm', 'assembler',
+//    'automated', 'begin', 'case', 'class', 'constructor',
+//    'default', 'destructor', 'dispid', 'dispinterface', 'div', 'do', 'downto',
+//    'else', 'except', 'file', 'finally',
+//    'for', 'goto', 'if', 'in',
+//    'index', 'inherited', 'inline', 'is',
+//    'mod', 'name', 'near', 'nodefault', 'not',
+//    'of', 'or', 'out', 'packed', 'private',
+//    'property', 'protected', 'public', 'published', 'raise', 'read', 'readonly',
+//    'repeat', 'resident', 'set', 'shl',
+//    'shr', 'stored', 'then', 'threadvar', 'to', 'try', 'until',
+//    'varargs', 'while', 'with', 'write', 'writeonly', 'xor'
+
+  (** This is a list of functions which can be used in a const expression. **)
+  strConstExprDesignators : Array[1..15] Of String = ('Abs', 'Chr', 'Hi', 'High',
     'Length', 'Lo', 'Low', 'Odd', 'Ord', 'Pred', 'Round', 'SizeOf', 'Succ',
     'Swap', 'Trunc');
-    
+  (** A list of Rel operators for expressions. **)
+  strRelOps : Array[1..9] Of String = ('<', '<=', '<>', '=', '>', '>=', 'as',
+    'in', 'is');
+  (** A list of Add operators for expressions. **)
+  strAddOps : Array[1..4] Of String = ('+', '-', 'or', 'xor');
+  (** A list of Multiplier operators for expressions. **)
+  strMulOps : Array[1..7] Of String = ('*', '/', 'and', 'div', 'mod', 'shl', 'shr');
+  (** A list of expression concatenators which might appear after an identifier
+      indicating that this might be an expression and not just a TypeId. **)
+  strExpressionIndicators : Array[1..19] Of String = ('*', '+', '-', '/', '<',
+    '<=', '<>', {'=', }'>', '>=', 'and', 'as', 'div', 'in', 'is', 'mod', 'or',
+    'shl', 'shr', 'xor');
+
 Implementation
 
 Uses
@@ -355,9 +378,13 @@ Constructor TPascalDocModule.Create(Source : TStream; strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions; DocOptions : TDocOptions);
 
 Begin
-  Inherited Create(Source, strReservedWords, strDirectives, IsModified,
-    strFileName);
-  If moParse In ModuleOptions Then ParseTokens;
+  Inherited Create(IsModified, strFileName);
+  FSourceStream := Source;
+  AddTickCount('Start');
+  TokenizeStream;
+  AddTickCount('Tokenize');
+  If moParse In ModuleOptions Then
+    ParseTokens;
   AddTickCount('Parse');
   Sort;
   AddTickCount('Sort');
@@ -387,7 +414,206 @@ Begin
   Inherited Destroy;
 End;
 
+(**
 
+  This method tokenises the stream of text passed to the constructor and splits
+  it into tokens.
+
+  @precon  None.
+  @postcon Tokenises the stream of text passed to the constructor and splits
+           it into tokens.
+
+**)
+Procedure TPascalDocModule.TokenizeStream;
+
+Type
+  (** State machine for block types. **)
+  TBlockType = (btNoBlock, btStringLiteral, btLineComment, btBraceComment,
+    btFullComment, btCompoundSymbol);
+
+Const
+  (** Growth size of the token buffer. **)
+  iTokenCapacity = 25;
+  test = 12.34;
+  {: @todo Move to BaseLanguageModule }
+  strSingleSymbols : Set Of Char = ['(', ')', ';', ',', '[', ']'];
+
+Var
+  boolEOF : Boolean;
+  (** Token buffer. **)
+  strToken : String;
+  CurCharType : TTokenType;
+  LastCharType : TTokenType;
+  BlockType : TBlockType;
+  (** Current line number **)
+  iLine : Integer;
+  (** Current column number **)
+  iColumn : Integer;
+  (** Token stream position. Fast to inc this than read the stream position. **)
+  iStreamPos : Integer;
+  (** Token line **)
+  iTokenLine : Integer;
+  (** Token column **)
+  iTokenColumn : Integer;
+  (** Current character position **)
+  iStreamCount : Integer;
+  Ch : Char;
+  LastChar : Char;
+  (** Token size **)
+  iTokenLen : Integer;
+  LastToken : TTokenType;
+
+Begin
+  BlockType := btNoBlock;
+  iStreamPos := 0;
+  iTokenLine := 1;
+  iTokenColumn := 1;
+  boolEOF := False;
+  CurCharType := ttUnknown;
+  LastCharType := ttUnknown;
+  iStreamCount := 0;
+  iLine := 1;
+  iColumn := 1;
+  Ch := #0;
+  LastChar := #0;
+  strToken := '';
+  LastToken := ttUnknown;
+
+  iTokenLen := 0;
+  SetLength(strToken, iTokenCapacity);
+
+  Try
+    If FSourceStream <> Nil Then
+      Begin
+        Repeat
+          If FSourceStream.Read(ch, 1) > 0 Then
+            Begin
+              Inc(iStreamCount);
+              LastCharType := CurCharType;
+              CurCharType := GetTokenType(Ch, LastCharType);
+
+              // Check for full block comments
+              If (BlockType = btNoBlock) And (LastChar = '(') And (Ch = '*') Then
+                BlockType := btFullComment;
+
+              // Check for line comments
+              If (BlockType = btNoBlock) And (LastChar = '/') And (Ch = '/') Then
+                BlockType := btLineComment;
+
+              If (LastCharType <> CurCharType) Or (Ch In strSingleSymbols) Or
+                (LastChar In strSingleSymbols)Then
+                Begin
+                  If ((BlockType In [btStringLiteral, btLineComment]) And
+                    (CurCharType <> ttLineEnd)) Or
+                    (BlockType In [btBraceComment, btFullComment,
+                    btCompoundSymbol]) Then
+                    Begin
+                      Inc(iTokenLen);
+                      If iTokenLen > Length(strToken) Then
+                        SetLength(strToken, iTokenCapacity + Length(strToken));
+                      strToken[iTokenLen] := Ch;
+                    End Else
+                    Begin
+                      SetLength(strToken, iTokenLen);
+                      If Not IsTokenWhiteSpace(strToken) Then
+                        Begin
+                          If LastCharType = ttIdentifier Then
+                            Begin
+                              If IsKeyWord(strToken, strReservedWords) Then
+                                LastCharType := ttReservedWord;
+                              If IsKeyWord(strToken, strDirectives) Then
+                                LastCharType := ttDirective;
+                              If strToken[1] = '#' Then
+                                LastCharType := ttStringLiteral;
+                            End;
+                          If BlockType = btLineComment Then
+                            LastCharType := ttComment;
+                          If (LastCharType = ttComment) And (Length(strToken) > 2) Then
+                            If (strToken[1] = '{') And (strToken[2] = '$') Then
+                              LastCharType := ttCompilerDirective;
+                          If ((LastToken = ttNumber) And ((strToken = '.') Or (LastCharType = ttNumber))) Or
+                            ((LastToken = ttStringLiteral) And (strToken[1] = '#')) Then
+                            Begin
+                              AppendToLastToken(strToken);
+                              LastToken := ttNumber;
+                            End Else
+                            Begin
+                              AddToken(TTokenInfo.Create(strToken, iStreamPos,
+                                iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+                              LastToken := LastCharType;
+                            End;
+                        End;
+                     // Store Stream position, line number and column of
+                     // token start
+                     iStreamPos := iStreamCount;
+                     iTokenLine := iLine;
+                     iTokenColumn := iColumn;
+                     BlockType := btNoBlock;
+                     iTokenLen := 1;
+                     SetLength(strToken, iTokenCapacity);
+                     strToken[iTokenLen] := Ch;
+                    End;
+                End Else
+                Begin
+                  Inc(iTokenLen);
+                  If iTokenLen > Length(strToken) Then
+                    SetLength(strToken, iTokenCapacity + Length(strToken));
+                  strToken[iTokenLen] := Ch;
+                End;
+
+              // Check for the end of a block comment
+              If (BlockType = btFullComment) And (LastChar = '*') And (Ch = ')') Then
+                Begin
+                  BlockType := btNoBlock;
+                  CurCharType := ttComment;
+                End;
+
+              // Check for string literals
+              If CurCharType = ttStringLiteral Then
+                If BlockType = btStringLiteral Then
+                  BlockType := btNoBlock
+                Else If BlockType = btNoBlock Then
+                  BlockType := btStringLiteral;
+
+              // Check for block Comments
+              If (BlockType = btNoBlock) And (Ch = '{') Then
+                Begin
+                  CurCharType := ttComment;
+                  BlockType := btBraceComment;
+                End;
+              If (BlockType = btBraceComment) And (Ch = '}') Then
+                Begin
+                  CurCharType := ttComment;
+                  BlockType := btNoBlock;
+                End;
+              If BlockType = btCompoundSymbol Then
+                BlockType := btNoBlock;
+
+              Inc(iColumn);
+              If Ch = #10 Then
+                Begin
+                  Inc(iLine);
+                  iColumn := 1;
+                  If BlockType In [btLineComment, btStringLiteral] Then
+                    BlockType := btNoBlock;
+                End;
+              LastChar := Ch;
+            End Else
+              boolEOF := True;
+        Until boolEOF;
+        If iTokenLen > 0 Then
+          Begin
+            SetLength(strToken, iTokenLen);
+            If Not IsTokenWhiteSpace(strToken) Then
+              AddToken(TTokenInfo.Create(strToken, iStreamPos,
+                iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+          End;
+      End;
+  Except
+    On E : Exception Do
+      Errors.Add(E.Message, 'TokenizeStream', 0, 0, etError);
+  End
+End;
 
 (**
 
@@ -639,33 +865,85 @@ Begin
     Errors.Add('Not enough strings passed to ErrorAndSeekToken().', strMethod,
       Token.Line, Token.Column, etError);
   End;
+  NextNonCommentToken;
   While Not IsKeyWord(Token.Token, SeekTokens) Do
-    Begin
-      NextNonCommentToken;
-      If (Token.UToken = 'CLASS') And (PrevToken.Token = '=') Then
-        Begin
-          While Not IsKeyWord(Token.Token, [';']) Do
-            NextNonCommentToken;
-          Exit;
-        End;
-    End;
+    NextNonCommentToken;
+End;
+
+(**
+
+  This is the method that should be called to parse the previously parse tokens.
+
+  @precon  None.
+  @postcon Attempts to parse the token list and check it grammatically for
+           Errors while providing delcaration elements for browsing.
+
+**)
+procedure TPascalDocModule.ParseTokens;
+begin
+  Goal;
+end;
+
+(**
+
+  This method adds the current toen to the passed generic container if it is not
+  nil and moves to the next non comment token.
+
+  @precon  None.
+  @postcon Adds the current toen to the passed generic container if it is not
+           nil and moves to the next non comment token.
+
+  @param   C as a TGenericContainer
+
+**)
+Procedure TPascalDocModule.AddToExpression(C : TGenericContainer);
+
+Begin
+  If C <> Nil Then
+    C.Add(Token.Token);
+  NextNonCommentToken;
+End;
+
+(**
+
+  This method check the current token against the passed string and if true
+  returns true and addeds the token to the generic container.
+
+  @precon  None.
+  @postcon Check the current token against the passed string and if true
+           returns true and addeds the token to the generic container.
+
+  @param   strToken as a String
+  @param   C        as a TGenericContainer
+  @return  a Boolean 
+
+**)
+Function TPascalDocModule.IsToken(strToken : String; C : TGenericContainer): Boolean;
+
+Begin
+  Result := strToken = Token.Token;
+  If Result Then
+    AddToExpression(C);
 End;
 
 (**
 
   This method is the starting position for the parsing of an object pascal
-  module. It finds the first non comment token and begins the grammer checking
+  module. It finds the first non comment token and begins the grammar checking
   from their by deligating to the program, library, unit and package methods.
 
   @grammar Goal -> ( Program | Package | Library | Unit )
 
   @precon  None.
-  @postcon It finds the first non comment token and begins the grammer checking
+  @postcon It finds the first non comment token and begins the grammar checking
            from their by deligating to the program, library, unit and package
            methods.
 
 **)
 procedure TPascalDocModule.Goal;
+
+Var
+  boolHasProcessed : Boolean;
 
 begin
   Try
@@ -679,12 +957,21 @@ begin
     If Not EndOfTokens Then
       Begin
         ModuleComment := GetComment;
-        Repeat
-          {Do Nothing}
-        Until Not (OPProgram Or OPLibrary Or OPPackage Or OPUnit);
+        boolHasProcessed := OPProgram;
+        If Not boolHasProcessed  Then
+          boolHasProcessed := OPLibrary;
+        If Not boolHasProcessed  Then
+          boolHasProcessed := OPPackage;
+        If Not boolHasProcessed  Then
+          boolHasProcessed := OPUnit;
+        If Not boolHasProcessed  Then
+          ErrorAndSeekToken(strModuleKeyWordNotfound, 'Goal', Token.Token,
+            strSeekableOnErrorTokens);
       End Else
         Raise EDocException.Create(strUnExpectedEndOfFile);
   Except
+    On E : EDocException Do
+      Errors.Add(E.Message, E.ExceptionMethod, 0, 0, etError);
     On E : Exception Do
       Errors.Add(E.Message, 'Goal', 0, 0, etError);
   End;
@@ -693,7 +980,7 @@ end;
 (**
 
   This method parses a Program declaration from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
   @grammar Program -> [ PROGRAM Ident [ '(' IdentList ')' ';' ]
                       ProgramBlock '.'
@@ -712,41 +999,44 @@ begin
     Exit;
   ModuleType := mtProgram;
   NextNonCommentToken;
-  If Token.TokenType <> ttIdentifier Then
-    Raise EDocException.CreateNormal(strIdentExpected, Token, 'OPProgram');
-  ModuleName := Token.Token;
-  ModuleNameLine := Token.Line;
-  ModuleNameCol := Token.Column;
-  NextNonCommentToken;
-  // In the Program module we need to check for '(' Ident List ')' but discard
-  If Token.Token = '(' Then
+  If Token.TokenType = ttIdentifier Then
     Begin
+      ModuleName := Token.Token;
+      ModuleNameLine := Token.Line;
+      ModuleNameCol := Token.Column;
       NextNonCommentToken;
-      IdentList(True, iltStandIdentList, strSeekableOnErrorTokens); // get ident list
-      // Check for closing parenthesis
-      If Token.Token <> ')' Then
-        ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ')',
+      // In the Program module we need to check for '(' Ident List ')' but discard
+      If Token.Token = '(' Then
+        Begin
+          NextNonCommentToken;
+          IdentList(True, strSeekableOnErrorTokens); // get ident list
+          // Check for closing parenthesis
+          If Token.Token <> ')' Then
+            ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ')',
+              strSeekableOnErrorTokens)
+          Else
+            NextNonCommentToken;
+        End;
+      // Check for ';'
+      If Token.Token <> ';' Then
+        ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ';',
           strSeekableOnErrorTokens)
       Else
         NextNonCommentToken;
-    End;
-  // Check for ';'
-  If Token.Token <> ';' Then
-    ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ';',
-      strSeekableOnErrorTokens)
-  Else
-    NextNonCommentToken;
-  ProgramBlock;
-  // Check for '.'
-  If Token.Token <> '.' Then
-    Raise EDocException.CreateLiteral(strLiteralExpected, '.', Token,
-      'OPPRogram');
+      ProgramBlock;
+      // Check for '.'
+      If Token.Token <> '.' Then
+        ErrorAndSeekToken(strLiteralExpected, 'OPProgram', '.',
+          strSeekableOnErrorTokens);
+    End Else
+      ErrorAndSeekToken(strIdentExpected, 'OPProgram', Token.Token,
+        strSeekableOnErrorTokens);
 end;
 
 (**
 
   This method parses a unit declaration from the current token position using
-  the following object pascal grammer.
+  the following object pascal grammar.
 
   @grammar Unit -> UNIT Ident ';'
                    InterfaceSection
@@ -763,38 +1053,40 @@ Function TPascalDocModule.OPUnit : Boolean;
 
 Begin
   Result := Token.UToken = 'UNIT';
-  If Not Result Then
-    Exit;
-  ModuleType := mtUnit;
-  NextNonCommentToken;
-  If Token.TokenType <> ttIdentifier Then
-    ErrorAndSeekToken(strIdentExpected, 'OPUnit', Token.Token,
-      strSeekableOnErrorTokens)
-  Else
-    Begin;
-      ModuleName := Token.Token;
-      ModuleNameLine := Token.Line;
-      ModuleNameCol := Token.Column;
+  If Result Then
+    Begin
+      ModuleType := mtUnit;
       NextNonCommentToken;
+      If Token.TokenType <> ttIdentifier Then
+        ErrorAndSeekToken(strIdentExpected, 'OPUnit', Token.Token,
+          strSeekableOnErrorTokens)
+      Else
+        Begin;
+          ModuleName := Token.Token;
+          ModuleNameLine := Token.Line;
+          ModuleNameCol := Token.Column;
+          NextNonCommentToken;
+        End;
+      // Check for ';'
+      If Token.Token <> ';' Then
+        ErrorAndSeekToken(strLiteralExpected, 'OPUnit', ';',
+          strSeekableOnErrorTokens)
+      Else
+        NextNonCommentToken;
+      InterfaceSection;
+      ImplementationSection;
+      InitSection;
+      // Check for '.'
+      If Token.Token <> '.' Then
+        ErrorAndSeekToken(strLiteralExpected, 'OPUnit', '.',
+          strSeekableOnErrorTokens);
     End;
-  // Check for ';'
-  If Token.Token <> ';' Then
-    ErrorAndSeekToken(strLiteralExpected, 'OPUnit', ';',
-      strSeekableOnErrorTokens)
-  Else
-    NextNonCommentToken;
-  InterfaceSection;
-  ImplementationSection;
-  InitSection;
-  // Check for '.'
-  If Token.Token <> '.' Then
-    Raise EDocException.CreateLiteral(strLiteralExpected, '.', Token, 'OPUnit');
 End;
 
 (**
 
   This method parses a package declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
   @grammar Package -> PACKAGE Ident ';'
                       [ RequiresClause ]
@@ -811,43 +1103,44 @@ Function TPascalDocModule.OPPackage : Boolean;
 
 begin
   Result := Token.UToken = 'PACKAGE';
-  If Not Result Then
-    Exit;
-  ModuleType := mtPackage;
-  NextNonCommentToken;
-  If Token.TokenType <> ttIdentifier Then
-    ErrorAndSeekToken(strIdentExpected, 'OPPackage', Token.Token,
-      strSeekableOnErrorTokens)
-  Else
-    Begin
-      ModuleName := Token.Token;
-      ModuleNameLine := Token.Line;
-      ModuleNameCol := Token.Column;
+  If Result Then
+    Begin;
+      ModuleType := mtPackage;
       NextNonCommentToken;
+      If Token.TokenType <> ttIdentifier Then
+        ErrorAndSeekToken(strIdentExpected, 'OPPackage', Token.Token,
+          strSeekableOnErrorTokens)
+      Else
+        Begin
+          ModuleName := Token.Token;
+          ModuleNameLine := Token.Line;
+          ModuleNameCol := Token.Column;
+          NextNonCommentToken;
+        End;
+      // Check for ';'
+      If Token.Token <> ';' Then
+        ErrorAndSeekToken(strLiteralExpected, 'OPPackage', ';',
+          strSeekableOnErrorTokens)
+      Else
+        NextNonCommentToken;
+      // Look for requires and contains clauses
+      RequiresClause;
+      ContainsClause;
+      If Token.UToken <> 'END' Then
+        ErrorAndSeekToken(strReservedWordExpected, 'OPPackage', 'END',
+          strSeekableOnErrorTokens)
+      Else
+        NextNonCommentToken;
+      If Token.Token <> '.' Then
+        ErrorAndSeekToken(strLiteralExpected, 'OPPackage', '.',
+          strSeekableOnErrorTokens);
     End;
-  // Check for ';'
-  If Token.Token <> ';' Then
-    ErrorAndSeekToken(strLiteralExpected, 'OPPackage', ';',
-      strSeekableOnErrorTokens)
-  Else
-    NextNonCommentToken;
-  // Look for requires and contains clauses
-  RequiresClause;
-  ContainsClause;
-  If Token.UToken <> 'END' Then
-    ErrorAndSeekToken(strReservedWordExpected, 'OPPackage', 'END',
-      strSeekableOnErrorTokens)
-  Else
-    NextNonCommentToken;
-  If Token.Token <> '.' Then
-    Raise EDocException.CreateLiteral(strLiteralExpected, '.', Token,
-      'OPPackage');
 end;
 
 (**
 
   This method parses the Library declaration from the current token using the
-  following object pascal grammer.
+  following object pascal grammar.
 
   @grammar Library -> LIBRARY Ident ';'
                       ProgramBlock '.'
@@ -862,44 +1155,45 @@ Function TPascalDocModule.OPLibrary : Boolean;
 
 begin
   Result := Token.UToken = 'LIBRARY';
-  If Not Result Then
-    Exit;
-  ModuleType := mtLibrary;
-  NextNonCommentToken;
-  If Token.TokenType <> ttIdentifier Then
-    ErrorAndSeekToken(strIdentExpected, 'OPLibrary', Token.Token,
-      strSeekableOnErrorTokens)
-  Else
+  If Result Then
     Begin
-      ModuleName := Token.Token;
-      ModuleNameLine := Token.Line;
-      ModuleNameCol := Token.Column;
+      ModuleType := mtLibrary;
       NextNonCommentToken;
+      If Token.TokenType <> ttIdentifier Then
+        ErrorAndSeekToken(strIdentExpected, 'OPLibrary', Token.Token,
+          strSeekableOnErrorTokens)
+      Else
+        Begin
+          ModuleName := Token.Token;
+          ModuleNameLine := Token.Line;
+          ModuleNameCol := Token.Column;
+          NextNonCommentToken;
+        End;
+      // Check for ';'
+      If Token.Token <> ';' Then
+        ErrorAndSeekToken(strLiteralExpected, 'OPLibrary', ';',
+          strSeekableOnErrorTokens)
+      Else
+        NextNonCommentToken;
+      ProgramBlock;
+      // Check for '.'
+      If Token.Token <> '.' Then
+        ErrorAndSeekToken(strLiteralExpected, 'OPLibrary', '.',
+          strSeekableOnErrorTokens);
     End;
-  // Check for ';'
-  If Token.Token <> ';' Then
-    ErrorAndSeekToken(strLiteralExpected, 'OPLibrary', ';',
-      strSeekableOnErrorTokens)
-  Else
-    NextNonCommentToken;
-  ProgramBlock;
-  // Check for '.'
-  If Token.Token <> '.' Then
-    Raise EDocException.CreateLiteral(strLiteralExpected, '.', Token,
-      'OPLibrary');
 end;
 
 (**
 
   This method parses a program block from the current token position using
-  the following object pascal grammer.
+  the following object pascal grammar.
 
   @grammar ProgramBlock -> [ UsesClause ]
                            Block
 
   @precon  None.
   @postcon Parses a program block from the current token position using the
-           following object pascal grammer.
+           following object pascal grammar.
 
 **)
 procedure TPascalDocModule.ProgramBlock;
@@ -911,13 +1205,13 @@ end;
 (**
 
   This method parses the Uses clause declaration from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  @grammer Uses -> USES IdentList ';'
+  @grammar Uses -> USES IdentList ';'
 
   @precon  None.
   @postcon Parses the Uses clause declaration from the current token position
-           using the following object pascal grammer.
+           using the following object pascal grammar.
 
 **)
 Procedure TPascalDocModule.UsesClause;
@@ -932,11 +1226,11 @@ Begin
       NextNonCommentToken;
       If UsesCls = Nil Then
         Begin
-          UsesCls := IdentList(True, iltUsesClause, strSeekableOnErrorTokens);
+          UsesCls := IdentList(True, strSeekableOnErrorTokens);
           UsesCls.Comment := Comment;
         End Else
         Begin
-          UsesCls.Assign(IdentList(True, iltUsesClause, strSeekableOnErrorTokens));
+          UsesCls.Assign(IdentList(True, strSeekableOnErrorTokens));
           If UsesCls.Comment <> Nil Then
             UsesCls.Comment.Assign(Comment)
           Else
@@ -950,10 +1244,15 @@ Begin
     End;
 End;
 
+Procedure TPascalDocModule.PortabilityDirective;
+
+Begin
+End;
+
 (**
 
   This method parses an interface section from the current token position using
-  the following object pascal grammer.
+  the following object pascal grammar.
 
   @grammar  InterfaceClause -> INTERFACE
                                [ UsesClause ]
@@ -961,7 +1260,7 @@ End;
 
   @precon  None.
   @postcon Parses an interface section from the current token position using
-           the following object pascal grammer.
+           the following object pascal grammar.
 
 **)
 Procedure TPascalDocModule.InterfaceSection;
@@ -979,7 +1278,7 @@ End;
 (**
 
   This method parses an interface declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
   @grammar InterfaceDecl -> ConstSection
                             ResStringSection
@@ -991,7 +1290,7 @@ End;
 
   @precon  None.
   @postcon Parses an interface declaration from the current token position
-           using the following object pascal grammer.
+           using the following object pascal grammar.
 
 **)
 Procedure TPascalDocModule.InterfaceDecl;
@@ -1006,14 +1305,14 @@ Begin
     VarSection(scPublic, Nil) Or
     ThreadVarSection(scPublic) Or
     ExportedHeading Or
-    ExportedProcs
+    ExportedStmt
   );
 End;
 
 (**
 
   This method parses a exported heading declaration section from the current
-  token position using the following object pascal grammer.
+  token position using the following object pascal grammar.
 
   @grammar ExportedHeading -> ProcedureHeading ';' [ Directive ]
                               FunctionHeading ';' [ Directive ]
@@ -1037,13 +1336,12 @@ Begin
       M := FunctionHeading(scPublic);
     If M <> Nil Then
       Begin
-        ExportedHeadings.Add(M);
         Result := True;
-        // Check for ';'
         If Token.Token = ';' Then
           Begin
             NextNonCommentToken;
             Directive(M);
+            ExportedHeadings.Add(M);
           End Else
             ErrorAndSeekToken(strLiteralExpected, 'ExportedHeading', ';',
               strSeekableOnErrorTokens);
@@ -1053,10 +1351,61 @@ End;
 
 (**
 
+  This method parses an implementation section from the current token position
+  using the following object pascal grammar.
+
+  @grammar ImplementationSection -> IMPLEMENTATION
+                                    [ UsesClause ]
+                                    [ DeclSection ] ...
+
+  @precon  None.
+  @postcon Parses an implementation section from the current token position.
+
+**)
+Procedure TPascalDocModule.ImplementationSection;
+
+Begin
+  If Token.UToken <> 'IMPLEMENTATION' Then
+    ErrorAndSeekToken(strReservedWordExpected, 'ImplementationSection',
+      'IMPLEMENTATION', strSeekableOnErrorTokens)
+  Else
+    NextNonCommentToken;
+  UsesClause;
+  DeclSection(scPrivate, Nil);
+End;
+
+(**
+
+  This method parses a block section from the current token position using the
+  following object pascal grammar.
+
+  @grammar Block -> [ DeclSection ]
+                    CompoundStmt
+
+  @precon  On entry to this method, Scope defines the current scope of the
+           block i.e. private in in the implemenation section or public if in
+           the interface section and The Method parameter is nil for methods in
+           the implementation section or a reference to a method for a local
+           declaration section with in a method.
+  @postcon Parses a block section from the current token position
+
+  @param   Scope  as a TScope
+  @param   Method as a TMethodDecl
+
+**)
+procedure TPascalDocModule.Block(Scope : TScope; Method : TMethodDecl);
+
+Begin
+  DeclSection(Scope, Method);
+  CompoundStmt;
+End;
+
+(**
+
   This method parses an exported procedure section from the current token
   position.
 
-  @grammar ExportedProcs -> EXPORTS ExportsList ';'
+  @grammar ExportedStmt -> EXPORTS ExportsItem [, ExportsItem]...
 
   @precon  none.
   @postcon Returns true if an exported procedure was found.
@@ -1064,45 +1413,28 @@ End;
   @return  a Boolean
 
 **)
-Function TPascalDocModule.ExportedProcs : Boolean;
+Function TPascalDocModule.ExportedStmt : Boolean;
 
 Begin
   Result := Token.UToken = 'EXPORTS';
   If Result Then
     Begin
-      ExportsList;
+      NextNonCommentToken;
+      Repeat
+        ExportsItem;
+      Until Not IsToken(',', Nil);
       If Token.Token = ';' Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strLiteralExpected, 'ExportedProcs', ';',
+        ErrorAndSeekToken(strLiteralExpected, 'ExportedStmt', ';',
           strSeekableOnErrorTokens);
     End;
 End;
 
 (**
 
-  This method parses an exports list from the current token position using the
-  following object pascal grammer.
-
-  @grammar ExportsList -> ExportsEntry / ',' ...
-
-  @precon  None.
-  @postcon Parses an exports list from the current token position.
-
-**)
-Procedure TPascalDocModule.ExportsList();
-
-Begin
-  Repeat
-    NextNonCommentToken;
-    ExportsEntry;
-  Until Token.Token <> ',';
-End;
-
-(**
-
   This method parses an exports entry from the current token position using the
-  following object pascal grammer.
+  following object pascal grammar.
 
   @grammar ExportsEntry -> Ident [ INDEX IntegerConstant [ NAME StringConstant ]
              [ RESIDENT ] ]</TD>
@@ -1111,7 +1443,7 @@ End;
   @postcon Parses an exports entry from the current token position.
 
 **)
-Procedure TPascalDocModule.ExportsEntry;
+Procedure TPascalDocModule.ExportsItem;
 
 Var
   E : TGenericContainer;
@@ -1139,72 +1471,15 @@ Begin
           E.Add(Token.Token);
           NextNonCommentToken;
         End;
-      // Check RESIDENT
-      If Token.UToken = 'RESIDENT' Then
-        Begin
-          E.Add(Token.Token);
-          NextNonCommentToken;
-        End;
     End Else
-      ErrorAndSeekToken(strIdentExpected, 'ExportsEntry', Token.Token,
+      ErrorAndSeekToken(strIdentExpected, 'ExportsItem', Token.Token,
         strSeekableOnErrorTokens);
 End;
 
 (**
 
-  This method parses an implementation section from the current token position
-  using the following object pascal grammer.
-
-  @grammar ImplementationSection -> IMPLEMENTATION
-                                    [ UsesClause ]
-                                    [ DeclSection ] ...
-
-  @precon  None.
-  @postcon Parses an implementation section from the current token position.
-
-**)
-Procedure TPascalDocModule.ImplementationSection;
-
-Begin
-  If Token.UToken <> 'IMPLEMENTATION' Then
-    ErrorAndSeekToken(strReservedWordExpected, 'ImplementationSection',
-      'IMPLEMENTATION', strSeekableOnErrorTokens)
-  Else
-    NextNonCommentToken;
-  UsesClause;
-  DeclSection(scPrivate, Nil);
-End;
-
-(**
-
-  This method parses a block section from the current token position using the
-  following object pascal grammer.
-
-  @grammar Block -> [ DeclSection ]
-                    CompoundStmt
-
-  @precon  On entry to this method, Scope defines the current scope of the
-           block i.e. private in in the implemenation section or public if in
-           the interface section and The Method parameter is nil for methods in
-           the implementation section or a reference to a method for a local
-           declaration section with in a method.
-  @postcon Parses a block section from the current token position
-
-  @param   Scope  as a TScope
-  @param   Method as a TMethodDecl
-
-**)
-procedure TPascalDocModule.Block(Scope : TScope; Method : TMethodDecl);
-
-Begin
-  DeclSection(Scope, Method);
-  CompoundStmt;
-End;
-
-(**
-
   This method parses a declaration section from the current token position using
-  the following object pascal grammer.
+  the following object pascal grammar.
 
   @grammar DeclSection -> LabelDeclSection
                        -> ConstSection
@@ -1239,14 +1514,14 @@ Begin
     VarSection(Scope, Method) Or
     ThreadVarSection(Scope) Or
     ProcedureDeclSection(Scope, Method) Or
-    ExportedProcs
+    ExportedStmt
   );
 End;
 
 (**
 
   This method parses a label declaration section from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
   @grammar LabelDeclSection -> LABEL LabelId
 
@@ -1264,7 +1539,7 @@ Begin
     Begin
       NextNonCommentToken;
       // We will ignore labels but treat them as IdentLists
-      IdentList(True, iltStandIdentList, strSeekableOnErrorTokens);
+      IdentList(True, strSeekableOnErrorTokens);
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'LabelDeclSection', ';',
@@ -1277,7 +1552,7 @@ End;
 (**
 
   This method parses a constant section declaration from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
   @grammar ConstSection -> CONST ( ConstantDecl ';' ) ...
 
@@ -1328,7 +1603,7 @@ End;
 (**
 
   This method parses a constant declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
   @grammar ConstantDecl -> Ident '=' ConstExpr
                         -> Ident ':' TypeId '=' TypedConstant
@@ -1350,7 +1625,8 @@ Function TPascalDocModule.ConstantDecl(Scope : TScope; Method : TMethodDecl) : B
 
 Var
   C : TGenericContainer;
-  T : TTypes;
+  T : TTypeDecl;
+  ExprType : TExprTypes;
 
 Begin
   Result := False;
@@ -1366,12 +1642,12 @@ Begin
       Result := True;
       C.Comment := GetComment;
       NextNonCommentToken;
-      //: @todo Need to return to this later to implement ConstExpr properly!
       If Token.Token = '=' Then        // ConstExpr
         Begin
           C.Add(Token.Token);
           NextNonCommentToken;
-          ConstExpr(C)
+          ExprType := [etUnknown, etConstExpr];
+          ConstExpr(C, ExprType)
         End
       Else If Token.Token = ':' Then   // TypedConstant
         Begin
@@ -1382,9 +1658,9 @@ Begin
             C.Append(T);
           If Token.Token = '=' Then
             Begin
-             C.Add('=');
+              C.Add('=');
               NextNonCommentToken;
-              TypedConstant(C);
+              TypedConstant(C, T);
             End Else
               ErrorAndSeekToken(strLiteralExpected, 'ConstantDecl', '=',
                 strSeekableOnErrorTokens);
@@ -1468,10 +1744,11 @@ Function TPascalDocModule.ResourceStringDecl(Scope : TScope;
 
 Var
   C : TGenericContainer;
+  ExprType : TExprTypes;
 
 Begin
   Result := False;
-  FConstExprType := cetString;
+  ExprType := [etConstExpr, etString];
   // If not identifier then there is a new section
   If Token.TokenType = ttIdentifier Then
     Begin
@@ -1488,8 +1765,7 @@ Begin
         Begin
           C.Add(Token.Token);
           NextNonCommentToken;
-          //: @todo Implement this as a constant expression of TYPE String.
-          ConstExpr(C);
+          ConstExpr(C, ExprType);
           NextNonCommentToken;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'ResourceStringDecl', '=',
@@ -1500,7 +1776,7 @@ End;
 (**
 
   This method parses a type section from the current token position using the
-  following object pascal grammer.
+  following object pascal grammar.
 
   @grammar Typesection -> TYPE ( TypeDecl ';' ) ...
 
@@ -1551,7 +1827,7 @@ End;
 (**
 
   This method parses a type declaration section from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
   @grammar TypeDecl -> Ident '=' Type
                     -> Ident '=' RestrictedType
@@ -1559,7 +1835,10 @@ End;
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
-  @return  a TTypes
+
+  @param   Scope  as a TScope
+  @param   Method as a TMethodDecl
+  @return  a Boolean
 
 **)
 Function TPascalDocModule.TypeDecl(Scope : TScope;
@@ -1607,61 +1886,74 @@ Begin
     End;
 End;
 
-Function TPascalDocModule.GetTypeDecl : TTypes;
+(**
+
+  This method attempt to get a type declaration from the current token
+  position.
+
+  @precon  None.
+  @postcon If a type is found it is returned as the result else nil.
+
+  @return  a TTypeDecl
+
+**)
+Function TPascalDocModule.GetTypeDecl : TTypeDecl;
 
 Begin
-  Result := OPType;
+  Result := RestrictedType;
   If Result = Nil Then
-    Result := RestrictedType;
+    Result := OPType;
 End;
 
 (**
 
   This method parses a typed constant from the current token position using
-  the following object pascal grammer.
+  the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>TypedConstant</B></TD>
-      <TD>-></TD>
-      <TD>( ConstExpr | ArrayConstant | RecordConstant )</TD>
-    </TR>
-    <TR>
-      <TD><B>ArrayConstant</B></TD>
-      <TD>-></TD>
-      <TD>'(' TypedConstant / ',' ... ')'</TD>
-    </TR>
-    <TR>
-      <TD><B>RecordConstant</B></TD>
-      <TD>-></TD>
-      <TD>'(' RecordFieldConstant / ';' ... ')'</TD>
-    </TR>
-    <TR>
-      <TD><B>RecordFieldConstant</B></TD>
-      <TD>-></TD>
-      <TD>Ident ':' TypedConstant</TD>
-    </TR>
-  </TABLE>
+  @grammar TypedConstant -> ( ConstExpr | ArrayConstant | RecordConstant )
 
   @precon  C is a valid instance of the constant to be populated with tokens.
   @postcon Returns false if this was not a typed constant an not handled.
 
   @param   C as a TGenericContainer
+  @param   T as a TTypeDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.TypedConstant(C : TGenericContainer) : Boolean;
+Function TPascalDocModule.TypedConstant(C : TGenericContainer;
+  T : TTypeDecl) : Boolean;
+  
+Var
+  ExprType : TExprTypes;
 
 Begin
-  Result := ArrayConstant(C) Or RecordConstant(C) Or ConstExpr(C);
+  ExprType := [etUnknown, etConstExpr];
+  Result := ArrayConstant(C) Or RecordConstant(C) Or ConstExpr(C, ExprType);
 End;
 
+(**
+
+  This method test whether the typed constant is an Array Constant (starts with
+  ARRAY.
+  
+  @grammar ArrayConstant -> '(' TypedConstant/','... ')'
+  
+  @precon  C must be a valid generic container.
+  @postcon If ARRAY is found processes the constant as an array constant.
+  
+  @param  C as a TGenericContainer
+  @return a Boolean
+
+**)
 Function TPascalDocModule.ArrayConstant(C : TGenericContainer) : Boolean;
 
+Var
+  A : TArrayType;
+  
 Begin
-  Result := False;
-  //: @todo Requires implementing at the same time as ConstExpr
+  A := ArrayType(False);
+  Result := (A <> Nil);
+
 end;
 
 Function TPascalDocModule.RecordConstant(C : TGenericContainer) : Boolean;
@@ -1679,92 +1971,70 @@ End;
 (**
 
   This method parses a type from the current token position using the following
-  object pascal grammer.
+  object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>Type</B></TD>
-      <TD>-></TD>
-      <TD>TypeId</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>SimpleType</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>StrucType</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>PointerType</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>StringType</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>ProcedureType</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>VariantType</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>ClassRefType</TD>
-    </TR>
-  </TABLE>
+  @grammar Type -> TypeId
+                -> SimpleType
+                -> StrucType
+                -> PointerType
+                -> StringType
+                -> ProcedureType
+                -> VariantType
+                -> ClassRefType
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
-  @return  a TTypes
+  @return  a TTypeDecl
 
 **)
-Function TPascalDocModule.OPType : TTypes;
+Function TPascalDocModule.OPType : TTypeDecl;
 
 Begin
-  Result := ClassRefType;
-  If Result = Nil Then Result := VariantType;
-  If Result = Nil Then Result := ProcedureType;
-  If Result = Nil Then Result := StringType;
-  If Result = Nil Then Result := PointerType;
-  If Result = Nil Then Result := StrucType;
+  Result := StrucType;
+  If Result = Nil Then
+    Result := PointerType;
+  If Result = Nil Then
+    Result := StringType;
+  If Result = Nil Then
+    Result := ProcedureType;
+  If Result = Nil Then
+    Result := VariantType;
+  If Result = Nil Then
+    Result := ClassRefType;
+  If Result = Nil Then // TypeId here is implement manually
+    If Token.TokenType = ttIdentifier Then
+      Begin
+        NextNonCommentToken;
+        If Not IsKeyWord(Token.Token, strExpressionIndicators) Then
+          Begin
+            Result := TTypeId.Create;
+            SymbolTable.Add(Result);
+            Result.Add(PrevToken.Token);
+            If Token.Token = '.' Then
+              Begin
+                AddToExpression(Result);
+                If Token.TokenType = ttIdentifier Then
+                  AddToExpression(Result)
+                Else
+                  ErrorAndSeekToken(strIdentExpected, 'OPType', Token.Token,
+                    strSeekableOnErrorTokens);
+              End;
+          End Else
+            RollbackToken;
+      End;
+  If Result = Nil Then
+    Result := SimpleType;
 End;
 
 (**
 
   This method parses a restricted type from the current token position using
-  the following object pascal grammer.
+  the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>RestrictedType</B></TD>
-      <TD>-></TD>
-      <TD>ObjectType</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>ClassType</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>InterfaceType</TD>
-    </TR>
-  </TABLE>
+  @grammar RestrictedType -> ObjectType
+                          -> ClassType
+                          -> InterfaceType
 
   @note    The simpleType() method is here to act as a catch all for types that
            have note been previously handled.
@@ -1772,31 +2042,25 @@ End;
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
-  @return  a TTypes
+  @return  a TRestrictedType
 
 **)
-Function TPascalDocModule.RestrictedType : TTypes;
+Function TPascalDocModule.RestrictedType : TRestrictedType;
 
 Begin
   Result := ObjectType;
-  If Result = Nil Then Result := ClassType;
-  If Result = Nil Then Result := InterfaceType;
-  If Result = Nil Then Result := SimpleType;
+  If Result = Nil Then
+    Result := ClassType;
+  If Result = Nil Then
+    Result := InterfaceType;
 End;
 
 (**
 
   This method parses a class reference type declaration from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ClassRefType</B></TD>
-      <TD>-></TD>
-      <TD>CLASS OF TypeId</TD>
-    </TR>
-  </TABLE>
+  @grammar ClassRefType -> CLASS OF TypeId
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -1821,79 +2085,44 @@ Begin
   SymbolTable.Add(Result);
   Result.Add('Class');
   Result.Add('Of');
-  Result.Add(TypeId);
+  If Not TypeId(Result) Then
+    ErrorAndSeekToken(strTypeIdExpected, 'PointerType', '',
+      strSeekableOnErrorTokens);
 End;
 
 (**
 
   This method parses a simple type declaration from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>SimpleType</B></TD>
-      <TD>-></TD>
-      <TD>( OrdinalType | RealType )</TD>
-    </TR>
-  </TABLE>
+  @grammar SimpleType -> ( OrdinalType | RealType )
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
-  @return  a TTypes
+  @return  a TSimpleType
 
 **)
-function TPascalDocModule.SimpleType : TTypes;
+function TPascalDocModule.SimpleType : TSimpleType;
 
 begin
   Result := RealType;
-  If result = Nil Then Result := OrdinalType;
+  If Result = Nil Then
+    Result := OrdinalType;
 end;
 
 (**
 
   This method determines if the token represents a real type using the following
-  object pascal grammer.
+  object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>RealType</B></TD>
-      <TD>-></TD>
-      <TD>REAL48</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>REAL</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>SINGLE</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>DOUBLE</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>EXTENDED</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>CURRENCY</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>COMP</TD>
-    </TR>
-  </TABLE>
+  @grammar RealType -> REAL48
+                    -> REAL
+                    -> SINGLE
+                    -> DOUBLE
+                    -> EXTENDED
+                    -> CURRENCY
+                    -> COMP
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -1905,7 +2134,8 @@ Function TPascalDocModule.RealType : TRealType;
 
 Begin
   Result := Nil;
-  If Not IsKeyWord(Token.Token, strRealTypes) Then Exit;
+  If Not IsKeyWord(Token.Token, strRealTypes) Then
+    Exit;
   Result := TRealType.Create;
   SymbolTable.Add(Result);
   Result.Add(Token.Token);
@@ -1915,16 +2145,9 @@ End;
 (**
 
   This method determines if the type is an ordinal type using the folowing
-  object pascal grammer.
+  object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>OrdinalType</B></TD>
-      <TD>-></TD>
-      <TD>( SubrangeType | EnumerateType | OrdIndent )</TD>
-    </TR>
-  </TABLE>
+  @grammar OrdinalType -> ( SubrangeType | EnumerateType | OrdIndent )
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -1943,85 +2166,34 @@ End;
 (**
 
   This method determines if the current token is an ordinal ident using the
-  following object pascal grammer.
+  following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>OrdIndent</B></TD>
-      <TD>-></TD>
-      <TD>SHORTINT</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>SMALLINT</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>INTEGER</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>BYTE</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>LONGINT</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>INT64</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>WORD</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>BOOLEAN</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>CHAR</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>WIDECHAR</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>LONGWORD</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>PCHAR</TD>
-    </TR>
-  </TABLE>
+  @grammar OrdIndent -> SHORTINT
+                     -> SMALLINT
+                     -> INTEGER
+                     -> BYTE
+                     -> LONGINT
+                     -> INT64
+                     -> WORD
+                     -> BOOLEAN
+                     -> CHAR
+                     -> WIDECHAR
+                     -> LONGWORD
+                     -> PCHAR
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
-  @return  a TOrdinalType
+  @return  a TOrdIdent
 
 **)
-Function TPascalDocModule.OrdIdent : TOrdinalType;
+Function TPascalDocModule.OrdIdent : TOrdIdent;
 
 Begin
   Result := Nil;
   If Not IsKeyWord(Token.Token, strOrdIdents) Then
     Exit;
-  Result := TOrdinalType.Create;
+  Result := TOrdIdent.Create;
   SymbolTable.Add(Result);
   Result.Add(Token.Token);
   NextNonCommentToken;
@@ -2030,21 +2202,10 @@ End;
 (**
 
   This method parses a variant type declaration section using the following
-  object pascal grammer.
+  object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>VariantType</B></TD>
-      <TD>-></TD>
-      <TD>VARIANT</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>OLEVARIANT</TD>
-    </TR>
-  </TABLE>
+  @grammar VariantType -> VARIANT
+                       -> OLEVARIANT
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -2068,110 +2229,113 @@ end;
 (**
 
   This method parses  a sub range type from the current token position using
-  the following object pascal grammer. This method also currently acts as a type
+  the following object pascal grammar. This method also currently acts as a type
   CATCH ALL if nothing else works.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>SubrangeType</B></TD>
-      <TD>-></TD>
-      <TD>ConstExpr .. ConstExpr</TD>
-    </TR>
-  </TABLE>
+  @grammar SubrangeType -> ConstExpr .. ConstExpr
 
   @precon  None.
   @postcon Returns an ordinal type if one was parsed else returns nil.
 
-  @return  a TOrdinalType
+  @return  a TSubRangeType
 
 **)
-Function TPascalDocModule.SubRangeType : TOrdinalType;
-
-Begin
-  //: @todo This needs implementing properly.
-  Result := TOrdinalType.Create;
-  SymbolTable.Add(Result);
-  ConstExpr(Result);
-End;
-
-(**
-
-  This method parses an enumerate type from the current token position using
-  the following object pascal grammer.
-
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>EnumerateType</B></TD>
-      <TD>-></TD>
-      <TD>'(' IdentList ')'</TD>
-    </TR>
-  </TABLE>
-
-  @precon  None.
-  @postcon Returns an ordinal type if one was parsed else returns nil.
-
-  @return  a TOrdinalType
-
-**)
-Function TPascalDocModule.EnumerateType : TOrdinalType;
+Function TPascalDocModule.SubRangeType : TSubRangeType;
 
 Var
-  I : TIdentList;
+  ExprType : TExprTypes;
 
 Begin
   Result := Nil;
-  If Not (Token.Token = '(') Then
-    Exit;
-  Result := TOrdinalType.Create;
-  SymbolTable.Add(Result);
-  NextNonCommentToken;
-  Result.Add('(');
-  I := IdentList(False, iltIndexedEnumerates, []); //: @todo SeekTokens(EnumerateType)
-  Try
-    Result.Add(I.AsString);
-  Finally
-    I.Free;
-  End;
-  If Token.Token <> ')' Then
-    ErrorAndSeekToken(strLiteralExpected, 'EnumerateType', ')',
-      strSeekableOnErrorTokens)
-  Else
+  If Not IsKeyWord(Token.Token, strReservedWords) Then
     Begin
-      Result.Add(')');
-      NextNonCommentToken;
+      Result := TSubRangeType.Create;
+      SymbolTable.Add(Result);
+      ExprType := [etUnknown, etConstExpr];
+      ConstExpr(Result, ExprType);
+      If Token.Token = '..' Then
+        AddToExpression(Result)
+      Else
+        ErrorAndSeekToken(strLiteralExpected, 'SubRange', '..',
+          strSeekableOnErrorTokens);
+      ConstExpr(Result, ExprType);
     End;
 End;
 
 (**
 
-  This method parses a sring type declaration from the current token position
-  using the following object pascal grammer.
+  This method parses an enumerate type from the current token position using
+  the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>StringType</B></TD>
-      <TD>-></TD>
-      <TD>STRING</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>ANSISTRING</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>WIDESTRING</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>STRING '[' ConstExpr ']'</TD>
-    </TR>
-  </TABLE>
+  @grammar EnumeratedType -> '(' EnumerateTypeElement, ... ')'
+
+  @precon  None.
+  @postcon Returns an ordinal type if one was parsed else returns nil.
+
+  @return  a TEnumerateType
+
+**)
+Function TPascalDocModule.EnumerateType : TEnumerateType;
+
+Begin
+  Result := Nil;
+  If Token.Token = '(' Then
+    Begin
+      Result := TEnumerateType.Create;
+      SymbolTable.Add(Result);
+      AddToExpression(Result);
+      Repeat
+        EnumerateElement(Result);
+      Until Not IsToken(',', Result);
+      If Token.Token = ')' Then
+        AddToExpression(Result)
+      Else
+        ErrorAndSeekToken(strLiteralExpected, 'EnumerateType', ')',
+          strSeekableOnErrorTokens);
+    End;
+End;
+
+(**
+
+  This method parses the current token position as an Enumerate Element.
+
+  @grammar EnumerateTypeElement -> Ident [ ‘=’ ConstExpr ]
+
+  @precon  None.
+  @postcon Parses the current token position as an Enumerate Element.
+
+  @param   EnumerateType as a TEnumerateType
+
+**)
+Procedure TPascalDocModule.EnumerateElement(EnumerateType : TEnumerateType);
+
+Var
+  ExprType : TExprTypes;
+
+Begin
+  If Token.TokenType = ttIdentifier Then
+    Begin
+      AddToExpression(EnumerateType);
+      If Token.Token = '=' Then
+        Begin
+          AddToExpression(EnumerateType);
+          ExprType := [etUnknown, etConstExpr];
+          ConstExpr(EnumerateType, ExprType);
+        End;
+    End Else
+      ErrorAndSeekToken(strIdentExpected, 'EnumerateElement', Token.Token,
+        strSeekableOnErrorTokens);
+End;
+
+(**
+
+  This method parses a sring type declaration from the current token position
+  using the following object pascal grammar.
+
+  @grammar StringType -> STRING
+                      -> ANSISTRING
+                      -> WIDESTRING
+                      -> STRING '[' ConstExpr ']'
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -2180,6 +2344,9 @@ End;
 
 **)
 Function TPascalDocModule.StringType : TStringType;
+
+Var
+  ExprType : TExprTypes;
 
 begin
   Result := Nil;
@@ -2194,7 +2361,8 @@ begin
     Begin
       Result.Add('[');
       NextNonCommentToken;
-      ConstExpr(Result);
+      ExprType := [etString, etConstExpr];
+      ConstExpr(Result, ExprType);
       If Token.Token = ']' Then
         Begin
           Result.Add(Token.Token);
@@ -2208,24 +2376,17 @@ end;
 (**
 
   This method parses an Array, Set of File type declaration from the current
-  token position using the following object pascal grammer.
+  token position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>StrucType</B></TD>
-      <TD>-></TD>
-      <TD>[ PACKED ] ( ArrayType | SetType | FileType | RecType )</TD>
-    </TR>
-  </TABLE>
+  @grammar StrucType -> [ PACKED ] ( ArrayType | SetType | FileType | RecType )
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
-  @return  a TTypes
+  @return  a TTypeDecl
 
 **)
-Function TPascalDocModule.StrucType : TTypes;
+Function TPascalDocModule.StrucType : TTypeDecl;
 
 Var
   boolPacked : Boolean;
@@ -2249,17 +2410,10 @@ end;
 (**
 
   This method parses an array type declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ArrayType</B></TD>
-      <TD>-></TD>
-      <TD>ARRAY [ '[' OrdinalType / ',' ... ']' ] OF Type</TD>
-    </TR>
-  </TABLE>
-
+  @grammar ArrayType -> ARRAY [ '[' OrdinalType / ',' ... ']' ] OF Type
+  
   @precon  boolPacked determines if the array type is packed or not.
   @postcon This method returns True if this method handles a constant
            declaration section.
@@ -2270,54 +2424,54 @@ end;
 **)
 Function TPascalDocModule.ArrayType(boolPacked : Boolean) : TArrayType;
 
+Var
+  E : TOrdinalType;
+
 Begin
   Result := Nil;
-  If Not (Token.UToken = 'ARRAY') Then Exit;
-  Result := TArrayType.Create;
-  SymbolTable.Add(Result);
-  If boolPacked Then
-    Result.Add('Packed');
-  Result.Add(Token.Token);
-  NextNonCommentToken;
-  If Token.Token = '[' Then
+  If Token.UToken = 'ARRAY' Then
     Begin
+      Result := TArrayType.Create;
+      SymbolTable.Add(Result);
+      If boolPacked Then
+        Result.Add('Packed');
       Result.Add(Token.Token);
       NextNonCommentToken;
-      While Token.Token <> ']' Do
+      If Token.Token = '[' Then
+        Begin
+          Repeat
+            NextNonCommentToken;
+            Result.AddDimension;
+            E := OrdinalType;
+            Result.Append(E);
+          Until Not IsToken(',', Result);
+          If Token.Token = ']' Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strLiteralExpected, 'ArrayType', ']',
+              strSeekableOnErrorTokens);
+        End;
+      If Token.UToken = 'OF' Then
         Begin
           Result.Add(Token.Token);
           NextNonCommentToken;
-        End;
-      Result.Add(Token.Token);
-      NextNonCommentToken;
+          While Not (Token.Token[1] In [';', '=']) Do
+            Begin
+              Result.Add(Token.Token);
+              NextNonCommentToken;
+            End;
+        End Else
+          ErrorAndSeekToken(strReservedWordExpected, 'ArrayType', 'OF',
+            strSeekableOnErrorTokens);
     End;
-  If Token.UToken = 'OF' Then
-    Begin
-      Result.Add(Token.Token);
-      NextNonCommentToken;
-      While Not (Token.Token[1] In [';', '=']) Do
-        Begin
-          Result.Add(Token.Token);
-          NextNonCommentToken;
-        End;
-    End Else
-      ErrorAndSeekToken(strReservedWordExpected, 'ArrayType', 'OF',
-        strSeekableOnErrorTokens);
 End;
 
 (**
 
   Method parses a set type declaration from the current token position using
-  following object pascal grammer.
+  following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>SetType</B></TD>
-      <TD>-></TD>
-      <TD>SET OF OrdinalType</TD>
-    </TR>
-  </TABLE>
+  @grammar SetType -> SET OF OrdinalType
 
   @precon  boolPacked determines if the set type is packed or not.
   @postcon This method returns True if this method handles a constant
@@ -2355,16 +2509,9 @@ End;
 (**
 
   This method parses a file type declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>FileType</B></TD>
-      <TD>-></TD>
-      <TD>FILE OF Type</TD>
-    </TR>
-  </TABLE>
+  @grammar FileType -> FILE OF Type
 
   @precon  boolPacked determines if the file type is packed or not.
   @postcon This method returns True if this method handles a constant
@@ -2403,14 +2550,7 @@ End;
 
   This method parses a record type declaration from the current token position.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>RecType</B></TD>
-      <TD>-></TD>
-      <TD>RECORD [ FieldList ] END</TD>
-    </TR>
-  </TABLE>
+  @grammar RecType -> RECORD [ FieldList ] END
 
   @precon  boolPacked detmerines if the record is packed for not.
   @postcon This method returns True if this method handles a constant
@@ -2442,14 +2582,7 @@ end;
   This method parses a field list for classes, records and object declarations
   from the current token position.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>FieldList</B></TD>
-      <TD>-></TD>
-      <TD>FieldDecl / ';' ... [ VariantSection ] [ ';' ]</TD>
-    </TR>
-  </TABLE>
+  @grammar FieldList -> FieldDecl / ';' ... [ VariantSection ] [ ';' ]
 
   @precon  Rec in a valid instance of a record type to add fields / parameters
            too.
@@ -2474,16 +2607,9 @@ end;
 (**
 
   This method parses a records field declarations from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>FieldDecl</B></TD>
-      <TD>-></TD>
-      <TD>IdentList ':' Type</TD>
-    </TR>
-  </TABLE>
+  @grammar FieldDecl -> IdentList ':' Type
 
   @precon  Rec in a valid instance of a record type to add fields / parameters
            too.
@@ -2498,10 +2624,10 @@ Var
   I : TIdentList;
   j : Integer;
   P : TParameter;
-  T : TTypes;
+  T : TTypeDecl;
 
 Begin
-  I := IdentList(False, iltStandIdentList, []); //: @todo SeekTokens(FieldDecl)
+  I := IdentList(False, strSeekableOnErrorTokens);
   Try
     If Token.Token = ':' Then
       Begin
@@ -2526,16 +2652,9 @@ End;
 (**
 
   This method parses the variant section of a record from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>VariantSection</B></TD>
-      <TD>-></TD>
-      <TD>CASE [ Ident ':' ] TypeId OF RecVariant / ';' ...</TD>
-    </TR>
-  </TABLE>
+  @grammar VariantSection -> CASE [ Ident ':' ] TypeId OF RecVariant / ';' ...
 
   @precon  Rec in a valid instance of a record type to add fields / parameters
            too.
@@ -2568,16 +2687,9 @@ End;
 (**
 
   This method parses the record variant section of a record from the current
-  token position using the following object pascal grammer.
+  token position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>RecVariant</B></TD>
-      <TD>-></TD>
-      <TD>ConstExpr / ',' ... ':' '(' [ FieldList ] ')'</TD>
-    </TR>
-  </TABLE>
+  @grammar RecVariant -> ConstExpr / ',' ... ':' '(' [ FieldList ] ')'
 
   @precon  Rec in a valid instance of a record type to add fields / parameters
            too.
@@ -2591,27 +2703,31 @@ Procedure TPascalDocModule.RecVariant(Rec : TRecordDecl);
 
 Var
   C : TGenericContainer;
+  ExprType : TExprTypes;
 
 Begin
   C := TGenericContainer.Create('tmp', scPrivate, 0, 0);
   Try
     Repeat
-      If Token.Token = ',' Then NextNonCommentToken;
-      ConstExpr(C);
-    Until Token.Token <> ',';
+      ExprType := [etUnknown, etConstExpr];
+      ConstExpr(C, ExprType);
+    Until Not IsToken(',', C);
     If Token.Token <> ':' Then
-      Raise EDocException.CreateLiteral(strLiteralExpected, ':', Token,
-        'RecVariant');
-    NextNonCommentToken;
+      ErrorAndSeekToken(strLiteralExpected, 'RecVariant', ':',
+        strSeekableOnErrorTokens)
+    Else
+      NextNonCommentToken;
     If Token.Token <> '(' Then
-      Raise EDocException.CreateLiteral(strLiteralExpected, '(', Token,
-        'RecVariant');
-    NextNonCommentToken;
+      ErrorAndSeekToken(strLiteralExpected, 'RecVariant', '(',
+        strSeekableOnErrorTokens)
+    Else
+      NextNonCommentToken;
     FieldList(Rec);
     If Token.Token <> ')' Then
-      Raise EDocException.CreateLiteral(strLiteralExpected, ')', Token,
-        'RecVariant');
-    NextNonCommentToken;
+      ErrorAndSeekToken(strLiteralExpected, 'RecVariant', ')',
+        strSeekableOnErrorTokens)
+    Else;
+      NextNonCommentToken;
   Finally
     C.Free;
   End;
@@ -2620,16 +2736,9 @@ End;
 (**
 
   This method parses a pointer type declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>PointerType</B></TD>
-      <TD>-></TD>
-      <TD>'^' TypeId</TD>
-    </TR>
-  </TABLE>
+  @grammar PointerType -> '^' TypeId
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -2639,7 +2748,7 @@ End;
 **)
 Function TPascalDocModule.PointerType : TPointerType;
 
-begin
+Begin
   Result := Nil;
   If Not (Token.Token = '^') Then
     Exit;
@@ -2647,22 +2756,17 @@ begin
   SymbolTable.Add(Result);
   Result.Add('^');
   NextNonCommentToken;
-  Result.Add(TypeId);
+  If Not TypeId(Result) Then
+    ErrorAndSeekToken(strTypeIdExpected, 'PointerType', '',
+      strSeekableOnErrorTokens);
 end;
 
 (**
 
   This method parses a procedure type declaration from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ProceduralType</B></TD>
-      <TD>-></TD>
-      <TD>( ProcedureHeading | FunctionHeading ) [ OF OBJECT ]</TD>
-    </TR>
-  </TABLE>
+  @grammar ProceduralType -> ( ProcedureHeading | FunctionHeading ) [ OF OBJECT ]
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -2700,12 +2804,14 @@ begin
       Begin
         NextNonCommentToken;
         If Token.UToken <> 'OBJECT' Then
-          Raise EDocException.CreateLiteral(strReservedWordExpected, 'OBJECT',
-            Token, 'ProcedureType');
-        boolOfObject := True;
-        NextNonCommentToken;
+          ErrorAndSeekToken(strReservedWordExpected, 'ProcedureType', 'OBJECT',
+            strSeekableOnErrorTokens)
+        Else
+          Begin
+            boolOfObject := True;
+            NextNonCommentToken;
+          End;
       End;
-    Directive(M);
     Result := TProcedureType.Create;
     SymbolTable.Add(Result);
     Result.Add(M.GetAsString(True, True));
@@ -2719,16 +2825,9 @@ end;
 (**
 
   This method check and parses a var section declaration from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>VarSection</B></TD>
-      <TD>-></TD>
-      <TD>VAR ( VarDecl ';' ) ...</TD>
-    </TR>
-  </TABLE>
+  @grammar VarSection -> VAR ( VarDecl ';' ) ...
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
@@ -2767,9 +2866,10 @@ Begin
   While VarDecl(Scope, V) Do
     Begin
       If Token.Token <> ';' Then
-        Raise EDocException.CreateLiteral(strLiteralExpected, ';', Token,
-          'VarSection');
-      NextNonCommentToken;
+        ErrorAndSeekToken(strLiteralExpected, 'VarSection', ';',
+          strSeekableOnErrorTokens)
+      Else
+        NextNonCommentToken;
     End;
 End;
 
@@ -2778,7 +2878,7 @@ End;
   This method parses a Thread var section declatation from the current token
   position.
 
-  @see     For object pascal grammer see {@link TPascalDocModule.VarSection}.
+  @see     For object pascal grammar see {@link TPascalDocModule.VarSection}.
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
@@ -2810,9 +2910,10 @@ Begin
   While VarDecl(Scope, ThreadVars) Do
     Begin
       If Token.Token <> ';' Then
-        Raise EDocException.CreateLiteral(strLiteralExpected, ';', Token,
-          'ThreadVarSection');
-      NextNonCommentToken;
+        ErrorAndSeekToken(strLiteralExpected, 'ThreadVarSection', ';',
+          strSeekableOnErrorTokens)
+      Else
+        NextNonCommentToken;
     End;
 End;
 
@@ -2820,14 +2921,7 @@ End;
 
   This method parses a variable declaration from the current token position.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>VarDecl</B></TD>
-      <TD>-></TD>
-      <TD>IdentList ':' Type [ ( ABSOLUTE ( Ident | ConstExpr ) ) | '=' ConstExpr ] </TD>
-    </TR>
-  </TABLE>
+  @grammar VarDecl -> IdentList ':' Type [ ( ABSOLUTE ( Ident | ConstExpr ) ) | '=' ConstExpr ]
 
   @precon  Scope defines the current scope of the variable and VarSection is a
            valid variable container for the storage of the variable declared.
@@ -2845,308 +2939,1186 @@ Var
   I  :TIdentList;
   j : Integer;
   V : TGenericContainer;
-  T : TTypes;
+  T : TTypeDecl;
   C : TGenericContainer;
+  ExprType : TExprTypes;
 
 Begin
   Result := False;
   If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
     Exit;
   // Get ident list line and column
-  I := IdentList(False, iltStandIdentList, []); //: @todo SeekTokens(VarDecl)
+  I := IdentList(False, strSeekableOnErrorTokens);
   Try
     If Token.Token <> ':' Then
-      Raise EDocException.CreateLiteral(strLiteralExpected, ':', Token, 'VarDecl');
-    NextNonCommentToken;
-    T := GetTypeDecl;
-    If T = Nil Then
-      Raise Exception.Create('Can''t get type in vardecl.');
-    If Token.UToken = 'ABSOLUTE' Then
+      ErrorAndSeekToken(strLiteralExpected, 'VarDecl', ':',
+        strSeekableOnErrorTokens)
+    Else
       Begin
-        C := TGenericContainer.Create;
-        Try
-          C.Add(Token.Token);
-          NextNonCommentToken;
-          ConstExpr(C);
-        Finally
-          T.Append(C);
-          C.Free;
-        End;
+        NextNonCommentToken;
+        T := GetTypeDecl;
+        If T = Nil Then
+          Raise Exception.Create('Can''t get type in vardecl.');
+        If Token.UToken = 'ABSOLUTE' Then
+          Begin
+            C := TGenericContainer.Create;
+            Try
+              C.Add(Token.Token);
+              NextNonCommentToken;
+              ExprType := [etUnknown, etConstExpr];
+              ConstExpr(C, ExprType);
+            Finally
+              T.Append(C);
+              C.Free;
+            End;
+          End;
+        If Token.Token = '=' Then
+          Begin
+            C := TGenericContainer.Create;
+            Try
+              C.Add(Token.Token);
+              NextNonCommentToken;
+              ExprType := [etUnknown, etConstExpr];
+              ConstExpr(C, ExprType);
+            Finally
+              T.Append(C);
+              C.Free;
+            End;
+          End;
+        For j := 0 To I.Count - 1 Do
+          Begin
+            V := TVar.Create(I[j].Ident, Scope, I[j].Line, I[j].Col);
+            V.Add(':');
+            V.Append(T);
+            V.Comment := I[j].Comment;
+            VarSection.Add(V);
+          End;
+        Result := True;
       End;
-    If Token.Token = '=' Then
-      Begin
-        C := TGenericContainer.Create;
-        Try
-          C.Add(Token.Token);
-          NextNonCommentToken;
-          ConstExpr(C);
-        Finally
-          T.Append(C);
-          C.Free;
-        End;
-      End;
-    For j := 0 To I.Count - 1 Do
-      Begin
-        V := TVar.Create(I[j].Ident, Scope, I[j].Line, I[j].Col);
-        V.Add(':');
-        V.Append(T);
-        V.Comment := I[j].Comment;
-        VarSection.Add(V);
-      End;
-    Result := True;
   Finally
     I.Free;
   End;
 End;
 
-Procedure TPascalDocModule.Expression;
+(**
+
+  This method attempts to parse the next series of tokens as an expression.
+  
+  @grammer Expression -> SimpleExpression [RelOp SimpleExpression]
+
+  @precon  None.
+  @postcon Attempts to parse the next series of tokens as an expression.
+
+  @param   C as a TGenericContainer
+  @param   ExprType as a TExprTypes
+
+**)
+Procedure TPascalDocModule.Expression(C : TGenericContainer;
+  var ExprType : TExprTypes);
 
 Begin
+  SimpleExpression(C, ExprType);
+  If RelOp(C) Then
+    SimpleExpression(C, ExprType);
 End;
 
-Procedure TPascalDocModule.SimpleExpression;
+(**
+
+  This method attempts to parse the next series of tokens as a Simple
+  Expression.
+
+  @grammar SimpleExpression -> ['+' | '-'] Term [AddOp Term]...
+
+  @precon  none.
+  @postcon Attempts to parse the next series of tokens as a Simple Expression.
+
+  @param   C as a TGenericContainer
+  @param   ExprType as a TExprTypes
+
+**)
+Procedure TPascalDocModule.SimpleExpression(C : TGenericContainer;
+  var ExprType : TExprTypes);
 
 Begin
+  If IsKeyWord(Token.Token, ['+', '-']) Then
+    AddToExpression(C);
+  Repeat
+    Term(C, ExprType);
+  Until Not AddOp(C);
 End;
 
-Procedure TPascalDocModule.Term;
+(**
+
+  This method attempts to parse a term from the current token position.
+
+  @grammar Term -> Factor [MulOp Factor]...
+
+  @precon  None.
+  @postcon Attempts to parse a term from the current token position.
+
+  @param   C as a TGenericContainer
+  @param   ExprType as a TExprTypes
+
+**)
+Procedure TPascalDocModule.Term(C : TGenericContainer; var ExprType : TExprTypes);
 
 Begin
+  Repeat
+    Factor(C, ExprType);
+  Until Not MulOp(C, ExprType)
 End;
 
-Procedure TPascalDocModule.Factor;
+(**
+
+  This method attempts to parse a factor from the current token position.
+
+  @grammar Factor -> Designator ['(' ExprList ')']
+                  -> '@' Designator
+                  -> Number
+                  -> String
+                  -> NIL
+                  -> '(' Expression ')'
+                  -> NOT Factor
+                  -> SetConstructor
+                  -> TypeId '(' Expression ')'
+
+  @precon  None.
+  @postcon Attempts to parse a factor from the current token position.
+
+  @param   C as a TGenericContainer
+  @param   ExprType as a TExprTypes
+
+**)
+Procedure TPascalDocModule.Factor(C : TGenericContainer;
+  var ExprType : TExprTypes);
+
+Var
+  SubExprType : TExprTypes;
+
+  (**
+
+    This method sets up the ExprType variable accounting for Constant
+    Expressions.
+
+    @precon  None.
+    @postcon Sets up the ExprType variable accounting for Constant
+             Expressions.
+
+  **)
+  Procedure SetupSubExprType;
+
+  Begin
+    SubExprType := [etUnknown];
+    If etConstExpr In ExprType Then
+      Include(SubExprType, etConstExpr); // Make sure const expr is propogated
+  End;
 
 Begin
+  If Token.TokenType In [ttStringLiteral] Then
+    Begin
+      If (etUnknown In ExprType) Then
+        Begin
+          Exclude(ExprType, etUnknown);
+          Include(ExprType, etString);
+          AddToExpression(C);
+        End
+      Else If Not (etString In ExprType) Then
+        ErrorAndSeekToken(strExprConflict, 'Factor', '', strSeekableOnErrorTokens)
+      Else
+        AddToExpression(C);
+    End
+  Else If Token.TokenType In [ttNumber] Then
+    Begin
+      If (etUnknown In ExprType) Then
+        Begin
+          Exclude(ExprType, etUnknown);
+          Include(ExprType, etNumeric);
+          AddToExpression(C);
+        End
+      Else If Not (etNumeric In ExprType) Then
+        ErrorAndSeekToken(strExprConflict, 'Factor', '', strSeekableOnErrorTokens)
+      Else
+        AddToExpression(C);
+    End
+  Else If Token.UToken = 'NIL' Then
+    AddToExpression(C)
+  Else If Token.Token = '@' Then
+    Begin
+      AddToExpression(C);
+      SetupSubExprType;
+      Designator(C, SubExprType)
+    End
+  Else If Token.UToken = 'NOT' Then
+    Begin
+      AddToExpression(C);
+      SetupSubExprType;
+      Factor(C, SubExprType)
+    End
+  Else If Token.Token = '(' Then
+    Begin
+      AddToExpression(C);
+      SetupSubExprType;
+      Expression(C, SubExprType);
+      If Token.Token = ')' Then
+        Begin
+          AddToExpression(C);
+          DesignatorSubElement(C, SubExprType, ['.']); // Type cast handler
+        End
+      Else
+        ErrorAndSeekToken(strLiteralExpected, 'Factor', ')',
+          strSeekableOnErrorTokens);
+    End
+  Else If SetConstructor(C) Then
+    // Do nothing block...
+  //: @debug Else If TypeId(C) Then
+    // Do nothing block...
+  Else
+    Begin
+      SetupSubExprType;
+      Designator(C, SubExprType);
+    End;
 End;
 
-Procedure TPascalDocModule.RelOp;
+(**
+
+  This method check for the presence of a RelOp token at the current position
+  and returns true if found and advances the token position else returns false
+
+  @grammar RelOp  -> '>'
+                  -> '<'
+                  -> '<='
+                  -> '>='
+                  -> '<>'
+                  -> IN
+                  -> IS
+                  -> AS
+                  -> = (this is not in the original grammar.)
+
+  @precon  None.
+  @postcon Check for the presence of a RelOp token at the current position
+           and returns true if found and advances the token position else
+           returns false
+
+  @param   C as a TGenericContainer
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.RelOp(C : TGenericContainer) : Boolean;
 
 Begin
+  Result := IsKeyWord(Token.Token, strRelOps);
+  If Result Then
+    AddToExpression(C);
 End;
 
-Procedure TPascalDocModule.AddOp;
+(**
+
+  This method check for the presence of an AddOp token at the current position
+  and returns true if found and advances the token position else returns false
+
+  @grammar AddOp 	-> '+'
+                  -> '-'
+                  -> OR
+                  -> XOR
+
+  @precon  None.
+  @postcon Check for the presence of an AddOp token at the current position
+           and returns true if found and advances the token position else
+           returns false
+
+  @param   C as a TGenericContainer
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.AddOp(C : TGenericContainer) : Boolean;
 
 Begin
+  Result := IsKeyWord(Token.Token, strAddOps);
+  If Result Then
+    AddToExpression(C);
 End;
 
-Procedure TPascalDocModule.MulOp;
+(**
+
+  This method check for the presence of a MulOp token at the current position
+  and returns true if found and advances the token position else returns false
+
+  @grammar MulOp 	-> '*'
+                  -> '/'
+                  -> DIV
+                  -> MOD
+                  -> AND
+                  -> SHL
+                  -> SHR
+
+  @precon  None.
+  @postcon Check for the presence of a MulOp token at the current position
+           and returns true if found and advances the token position else
+           returns false
+
+  @param   C as a TGenericContainer
+  @param   ExprType as a TExprTypes
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.MulOp(C : TGenericContainer;
+  var ExprType : TExprTypes) : Boolean;
 
 Begin
+  Result := IsKeyWord(Token.Token, strMulOps);
+  If Result Then
+    Begin
+      If Not (etString In ExprType) Then
+        AddToExpression(C)
+      Else
+        ErrorAndSeekToken(strExprConflict, 'MulOp', '',
+          strSeekableOnErrorTokens);
+    End;
 End;
 
-Procedure TPascalDocModule.Designator;
+(**
+
+  This method attempts to parse the current token position as a Designator.
+
+  @grammar Designator -> QualId ['.' Ident | '[' ExprList ']' | '^']...
+
+  @precon  None
+  @postcon Attempts to parse the current token position as a Designator.
+
+  @param   C as a TGenericContainer
+  @param   ExprType as a TExprTypes
+  
+  @bug     Create a function IsIdentifier which allows all the following token
+           types: ttIdentifier, ttDirective
+
+**)
+Procedure TPascalDocModule.Designator(C : TGenericContainer;
+  var ExprType : TExprTypes);
+
+Var
+  ET : TExprTypes;
 
 Begin
+  If Token.TokenType In [ttIdentifier, ttDirective] Then
+    Begin
+      AddToExpression(C);
+      DesignatorSubElement(C, ExprType, ['.', '[', '^', '(']);
+    End;
 End;
 
-Procedure TPascalDocModule.SetConstructor;
+(**
+
+  This method handles the sub elements of a designator, i.e. period, [, ( and ^.
+
+  @precon  None.
+  @postcon Handles the sub elements of a designator, i.e. period, [, ( and ^.
+
+  @param   C               as a TGenericContainer
+  @param   ExprType        as a TExprTypes as a reference
+  @param   strValidSymbols as an Array Of String
+
+**)
+Procedure TPascalDocModule.DesignatorSubElement(C : TGenericContainer;
+  var ExprType : TExprTypes; strValidSymbols : Array of String);
 
 Begin
+  While IsKeyWord(Token.Token, strValidSymbols) Or (IsKeyWord(Token.Token, ['(', '['])) Do // Always check for proc/func
+    If Token.Token = '.' Then
+      Begin
+        AddToExpression(C);
+        If Token.TokenType In [ttIdentifier, ttDirective] Then
+          AddToExpression(C)
+        Else
+          ErrorAndSeekToken(strIdentExpected, 'DesignatorSubElement', Token.Token,
+            strSeekableOnErrorTokens);
+      End
+    Else If Token.Token = '[' Then
+      Begin
+        AddToExpression(C);
+        ExprList(C);
+        If Token.Token = ']' Then
+          AddToExpression(C)
+        Else
+          ErrorAndSeekToken(strLiteralExpected, 'DesignatorSubElement', ']',
+            strSeekableOnErrorTokens);
+      End
+    Else If Token.Token = '^' Then
+      AddToExpression(C)
+    Else If Token.Token = '(' Then
+      Begin
+        If etConstExpr In ExprType Then
+          If Not IsKeyWord(PrevToken.Token, strConstExprDesignators) Then
+            Begin
+              ErrorAndSeekToken(strConstExprDesignator, 'DesignatorSubElement',
+                PrevToken.Token, strSeekableOnErrorTokens);
+              Exit;
+            End;
+        AddToExpression(C);
+        ExprList(C);
+        If Token.Token = ')' Then
+          AddToExpression(C)
+        Else
+          ErrorAndSeekToken(strLiteralExpected, 'DesignatorSubElement', ')',
+            strSeekableOnErrorTokens);
+      End;
 End;
 
-Procedure TPascalDocModule.SetElement;
+(**
+
+  This method attempts to parse the current token position as a Set Constructor.
+
+  @grammar SetConstructor -> '[' [SetElement/','...] ']'
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a Set Constructor.
+
+  @param   C as a TGenericContainer
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.SetConstructor(C : TGenericContainer) : Boolean;
 
 Begin
+  Result := Token.Token = '[';
+  If Result Then
+    Begin
+      AddToExpression(C);
+      SetElement(C);
+      If Token.Token = ']' Then
+        AddToExpression(C);
+    End;
 End;
 
-Procedure TPascalDocModule.ExprList;
+(**
+
+  This method attempts to parse the current token position as a set element.
+
+  @grammar SetElement -> Expression ['..' Expression]
+  
+  @precon  None.
+  @postcon Attempts to parse the current token position as a set element.
+
+  @param   C as a TGenericContainer
+
+**)
+Procedure TPascalDocModule.SetElement(C : TGenericContainer);
+
+Var
+  ExprType : TExprTypes;
 
 Begin
+  ExprType := [etUnknown];
+  Repeat
+    Expression(C, ExprType);
+  Until Not (IsToken('..', C) Or IsToken(',', C));
 End;
 
+(**
+
+  This method attempts to parse the current token position as an Expression
+  List.
+  
+  @grammar ExprList -> Expression/','...
+  
+  @precon  None.
+  @postcon Attempts to parse the current token position as an Expression List.
+  
+  @param   C as a TGenericContainer
+
+**)
+Procedure TPascalDocModule.ExprList(C : TGenericContainer);
+
+Var
+  ExprType : TExprTypes;
+
+Begin
+  Repeat
+    ExprType := [etUnknown];
+    Expression(C, ExprType);
+  Until Not IsToken(',', C);
+End;
+
+(**
+
+  This method attempts to parse the current token position as a statement.
+
+  @grammar Statement -> [LabelId ':'] [SimpleStatement | StructStmt]
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a statement.
+
+**)
 Procedure TPascalDocModule.Statement;
 
 Begin
+  // Check for label
+  NextNonCommentToken;
+  If Token.Token = ':' Then
+    NextNonCommentToken
+  Else
+    RollBackToken;
+  If Not StructStmt Then
+    SimpleStatement;
 End;
 
+(**
+
+  This method attempts to parse the current token as a list of statements.
+
+  @grammar StmtList -> Statement ';'...
+
+  @precon  None.
+  @postcon Attempts to parse the current token as a list of statements.
+
+**)
 Procedure TPascalDocModule.StmtList;
 
 Begin
+  Repeat
+    Statement;
+  Until Not IsToken(';', Nil);
 End;
 
+(**
+
+  This method attempts to evaluate the current token position as a Simple
+  Statement.
+
+  @grammar SimpleStatement -> Designator ['(' ExprList ')']
+                           -> Designator ':=' Expression
+                           -> INHERITED
+                           -> GOTO LabelId
+
+  @precon  None.
+  @postcon Attempts to evaluate the current token position as a Simple
+           Statement.
+
+**)
 Procedure TPascalDocModule.SimpleStatement;
 
+Var
+  ExprType : TExprTypes;
+
 Begin
+  If Token.UToken = 'INHERITED' Then
+    Begin
+      NextNonCommentToken;
+      ExprType := [etUnknown];
+      Designator(Nil, ExprType);
+    End
+  Else If Token.Token = 'GOTO' Then
+    Begin
+      NextNonCommentToken;
+      NextNonCommentToken;
+    End
+  Else
+    Begin
+      ExprType := [etUnknown];
+      Designator(Nil, ExprType);
+      If Token.Token = '(' Then
+        Begin
+          NextNonCommentToken;
+          ExprType := [etUnknown];
+          Expression(Nil, ExprType);
+          If Token.Token = ')' Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strLiteralExpected, 'SimpleStatement', ')',
+              strSeekableOnErrorTokens);
+          DesignatorSubElement(Nil, ExprType, ['.']);
+        End Else
+      If Token.Token = ':=' Then
+        Begin
+          NextNonCommentToken;
+          ExprType := [etUnknown];
+          Expression(Nil, ExprType);
+        End;
+    End;
 End;
 
-Procedure TPascalDocModule.StructStmt;
+(**
+
+  This method attempts to parse the current token position as a structured
+  statement.
+
+  @grammar StructStmt -> CompoundStmt
+                      -> ConditionalStmt
+                      -> LoopStmt
+                      -> WithStmt
+                      -> TryExceptStmt
+                      -> TryFinallyStmt
+                      -> RaiseStmt
+                      -> AssemblerStmt
+
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a structured
+           statement.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.StructStmt : Boolean;
 
 Begin
+  Result := CompoundStmt Or ConditionalStmt Or LoopStmt Or WithStmt Or
+    TryExceptAndFinallyStmt Or // <= Combined together as the type can not be
+    RaiseStmt Or               //    determined until the Except or Finally
+    AssemblerStatement;        //    key work is found.
 End;
 
 (**
 
   This method parses the compound statement section of a procedure implementation
-  from the current token position using the following object pascal grammer.
+  from the current token position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>CompoundStmt</B></TD>
-      <TD>-></TD>
-      <TD></TD>
-    </TR>
-  </TABLE>
+  @grammar CompoundStmt -> BEGIN StmtList END
 
   @precon  None.
   @postcon Parses the compound statement section of a procedure implementation
            from the current token position
 
-**)
-procedure TPascalDocModule.CompoundStmt();
+  @return  a Boolean
 
-Var
-  iBlockCount : Integer;
+**)
+Function TPascalDocModule.CompoundStmt : Boolean;
 
 begin
-  iBlockCount := 0;
-  GetBodyCmt;
-  If Not IsKeyWord(Token.Token, strBlockStarts) Then Exit;
-  Inc(iBlockCount);
-  // The finding of the next token is handled manually so we can find todos
-  NextToken;
-  While (Token.TokenType In [ttComment, ttCompilerDirective]) And
-    Not EndOfTokens Do
+  Result := Token.UToken = 'BEGIN';
+  If Result Then
     Begin
-      GetBodyCmt;
-      NextToken;
+      NextNonCommentToken;
+      StmtList;
+      If Token.UToken = 'END' Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strReservedWordExpected, 'CompoundStmt', 'END',
+          ['end']{strSeekableOnErrorTokens});
     End;
-  SkipStatements(iBlockCount);
-  GetBodyCmt;
 end;
 
-Procedure TPascalDocModule.ConditionalStmt;
+(**
+
+  This method attempts to parse the current token position as a ConditionalStmt.
+
+  @grammar ConditionalStmt -> IfStmt
+                           -> CaseStmt
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a ConditionalStmt.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.ConditionalStmt : Boolean;
 
 Begin
-End;
-
-Procedure TPascalDocModule.IfStmt;
-
-Begin
-End;
-
-Procedure TPascalDocModule.CastStmt;
-
-Begin
-End;
-
-Procedure TPascalDocModule.CaseSelector;
-
-Begin
-End;
-
-Procedure TPascalDocModule.CaseLabel;
-
-Begin
-End;
-
-Procedure TPascalDocModule.LoopStmt;
-
-Begin
-End;
-
-Procedure TPascalDocModule.RepeatStmt;
-
-Begin
-End;
-
-Procedure TPascalDocModule.WhileStmt;
-
-Begin
-End;
-
-Procedure TPascalDocModule.ForStmt;
-
-Begin
-End;
-
-Procedure TPascalDocModule.WithStmt;
-
-Begin
+  Result := IfStmt Or CaseStmt;
 End;
 
 (**
 
-  This method skips statements with in the implementation section of
-  procedures and programs.
+  This method attempts to parse the current token position as an IF statement.
 
-  @precon  iBlockCount is a referenced count er to the current level of
-           nested statement block.
-  @postcon Skips statements with in the implementation section of
-           procedures and programs.
+  @grammar IfStmt -> IF Expression THEN Statement [ELSE Statement]
 
-  @param   iBlockCount as an Integer as a reference
+  @precon  None.
+  @postcon Attempts to parse the current token position as an IF statement.
+
+  @return  a Boolean
 
 **)
-procedure TPascalDocModule.SkipStatements(var iBlockCount : Integer);
+Function TPascalDocModule.IfStmt : Boolean;
 
-begin
-  // Skip over compound statements
-  While iBlockCount > 0 Do
+Var
+  ExprType : TExprTypes;
+
+Begin
+  Result := Token.UToken = 'IF';
+  If Result Then
     Begin
-      GetBodyCmt;
-      If IsKeyWord(Token.Token, strBlockStarts) Then
-        Inc(iBlockCount);
-      If (Token.UToken = 'END') Then
-        Dec(iBlockCount);
-      If Token.UToken = 'FINALIZATION' Then
-        Exit;
-      // The finding of the next token is handled manually so we can find todos
-      NextToken;
-      While (Token.TokenType In [ttComment, ttCompilerDirective]) And
-        Not EndOfTokens Do
+      NextNonCommentToken;
+      ExprType := [etUnknown];
+      Expression(Nil, ExprType);
+      If Token.UToken = 'THEN' Then
         Begin
-          GetBodyCmt;
-          NextToken;
+          NextNonCommentToken;
+          Statement;
+          If Token.UToken = 'ELSE' Then
+            Begin
+              NextNonCommentToken;
+              Statement;
+            End;
+        End Else
+          ErrorAndSeekToken(strReservedWordExpected, 'IfStmt', 'THEN',
+            strSeekableOnErrorTokens);
+    End;
+End;
+
+(**
+
+  This method attempts to parse the current token position as a CASE statement.
+
+  @grammar CaseStmt -> CASE Expression OF CaseSelector ';'... [ELSE Statement] [';'] END
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a CASE statement.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.CaseStmt : Boolean;
+
+Var
+  ExprType : TExprTypes;
+
+Begin
+  Result := Token.UToken = 'CASE';
+  If Result Then
+    Begin
+      NextNonCommentToken;
+      ExprType := [etUnknown];
+      Expression(Nil, ExprType);
+      If Token.UToken = 'OF' Then
+        Begin
+          NextNonCommentToken;
+          Repeat
+            CaseSelector
+          Until Not IsToken(';', Nil);
+          If Token.UToken = 'ELSE' Then
+            Begin
+              NextNonCommentToken;
+              Statement;
+              If Token.Token = ';' Then
+                NextNonCommentToken;
+            End;
+          If Token.UToken = 'END' Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strReservedWordExpected, 'CaseStmt', 'END',
+              strSeekableOnErrorTokens);
+        End Else
+          ErrorAndSeekToken(strReservedWordExpected, 'CaseStmt', 'OF',
+            strSeekableOnErrorTokens);
+    End;
+End;
+
+(**
+
+  This method attempts to parse the current token position as a case selector.
+
+  @grammar CaseSelector	-> CaseLabel ','... ':' Statement
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a case selector.
+
+  @return  a Boolean
+
+**)
+Procedure TPascalDocModule.CaseSelector;
+
+Begin
+  Repeat
+    CaseLabel;
+  Until Not IsToken(',', Nil);
+  If Token.Token = ':' Then
+    Begin
+      NextNonCommentToken;
+      Statement;
+    End Else
+      If Not IsKeyWord(Token.Token, ['else', 'end']) Then
+        ErrorAndSeekToken(strLiteralExpected, 'CaseSelector', ':',
+          strSeekableOnErrorTokens);
+End;
+
+(**
+
+  This method attempts to parse the current token position as a Case Label.
+
+  @grammar CaseLabel -> ConstExpr ['..' ConstExpr]
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a Case Label.
+
+**)
+Procedure TPascalDocModule.CaseLabel;
+
+Var
+  ExprType : TExprTypes;
+
+Begin
+  ExprType := [etUnknown, etConstExpr];
+  ConstExpr(Nil, ExprType);
+  If Token.Token = '..' Then
+    Begin
+      NextNonCommentToken;
+      ConstExpr(Nil, ExprType);
+    End;
+End;
+
+(**
+
+  This method attempts to parse the current token position as a Loop statement.
+
+  @grammar LoopStmt -> RepeatStmt
+                    -> WhileStmt
+                    -> ForStmt
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a Loop statement.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.LoopStmt : Boolean;
+
+Begin
+  Result := RepeatStmt Or WhileStmt Or ForStmt;
+End;
+
+(**
+
+  This method attempts to parse the current token position as a Repeat Statement.
+
+  @grammar RepeatStmt -> REPEAT StmtList UNTIL Expression
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a Repeat Statement.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.RepeatStmt : Boolean;
+
+Var
+  ExprType : TExprTypes;
+
+Begin
+  Result := Token.UToken = 'REPEAT';
+  If Result Then
+    Begin
+      NextNonCommentToken;
+      StmtList;
+      If Token.UToken = 'UNTIL' Then
+        Begin
+          NextNonCommentToken;
+          ExprType := [etUnknown];
+          Expression(Nil, ExprType);
+        End
+      Else
+        ErrorAndSeekToken(strReservedWordExpected, 'RepeatStmt', 'UNTIL',
+          strSeekableOnErrorTokens);
+    End;
+End;
+
+(**
+
+  This method attempts to parse the current token position as a While Statement.
+
+  @grammar WhileStmt -> WHILE Expression DO Statement
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a While Statement.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.WhileStmt : Boolean;
+
+Var
+  ExprType : TExprTypes;
+
+Begin
+  Result := Token.UToken = 'WHILE';
+  If Result Then
+    Begin
+      NextNonCommentToken;
+      ExprType := [etUnknown];
+      Expression(Nil, ExprType);
+      If Token.UToken = 'DO' Then
+        Begin
+          NextNonCommentToken;
+          Statement;
+        End Else
+          ErrorAndSeekToken(strReservedWordExpected, 'WhileStmt', 'DO',
+            strSeekableOnErrorTokens);
+    End;
+End;
+
+(**
+
+  This method attempt to parse the current token position as a For statement.
+
+  @grammar ForStmt -> FOR QualId ':=' Expression (TO | DOWNTO) Expression DO Statement
+
+  @precon  None.
+  @postcon Attempt to parse the current token position as a For statement.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.ForStmt : Boolean;
+
+Var
+  ExprType : TExprTypes;
+
+Begin
+  Result := Token.UToken = 'FOR';
+  If Result Then
+    Begin
+      NextNonCommentToken;
+      If Token.TokenType = ttIdentifier Then
+        Begin
+          NextNonCommentToken;
+          If Token.Token = ':=' Then
+            Begin
+              NextNonCommentToken;
+              ExprType := [etUnknown];
+              Expression(Nil, ExprType);
+              If IsKeyWord(Token.Token, ['downto', 'to']) Then
+                Begin
+                  NextNonCommentToken;
+                  Expression(Nil, ExprType);
+                  If Token.UToken = 'DO' Then
+                    Begin
+                      NextNonCommentToken;
+                      Statement;
+                    End Else
+                      ErrorAndSeekToken(strReservedWordExpected, 'ForStmt', 'DO',
+                        strSeekableOnErrorTokens);
+                End Else
+                  ErrorAndSeekToken(strReservedWordExpected, 'ForStmt',
+                    'TO or DOWNTO', strSeekableOnErrorTokens);
+            End Else
+              ErrorAndSeekToken(strLiteralExpected, 'ForStmt', ':=',
+                strSeekableOnErrorTokens);
+        End Else
+          ErrorAndSeekToken(strIdentExpected, 'ForStmt', Token.Token,
+            strSeekableOnErrorTokens);
+    End;
+End;
+
+(**
+
+  This method attempts to parse the current token position as a With Statement.
+
+  @grammar WithStmt -> WITH IdentList DO Statement
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a With Statement.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.WithStmt : Boolean;
+
+Begin
+  Result := Token.UToken = 'WITH';
+  If Result Then
+    Begin
+      NextNonCommentToken;
+      ExprList(Nil);
+      If Token.UToken = 'DO' Then
+        Begin
+          NextNonCommentToken;
+          Statement;
+        End Else
+          ErrorAndSeekToken(strReservedWordExpected, 'WithStmt', 'DO',
+            strSeekableOnErrorTokens);
+    End;
+End;
+
+(**
+
+  This method attempts to parse the current token position as a Try Except or
+  Try Finally block.
+
+  @grammar TryExceptStmt -> TRY
+                              StmtList
+                            EXCEPT
+                              ExceptionBlock
+                            END
+
+                            ...or...
+
+                            TRY
+                              StmtList
+                            FINALLY
+                              StmtList
+                            END
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a Try Except or
+           Try Finally block.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.TryExceptAndFinallyStmt : Boolean;
+
+Begin
+  Result := Token.UToken = 'TRY';
+  If Result Then
+    Begin
+      NextNonCommentToken;
+      StmtList;
+      If IsKeyWord(Token.UToken, ['except', 'finally']) Then
+        Begin
+          If Token.UToken = 'EXCEPT' Then
+            Begin
+              NextNonCommentToken;
+              If Not ExceptionBlock Then
+                StmtList;
+            End Else
+            Begin
+              NextNonCommentToken;
+              StmtList;
+            End;
+          If Token.UToken = 'END' Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strReservedWordExpected, 'TryExceptAndFinallyStmt',
+              'END', strSeekableOnErrorTokens);
+        End Else
+          ErrorAndSeekToken(strReservedWordExpected, 'TryExceptAndFinallyStmt',
+            'EXCEPT or FINALLY', strSeekableOnErrorTokens);
+    End;
+End;
+
+(**
+
+  This method attempt to parse the current token position as an Exception Block.
+
+  @grammar ExceptionBlock -> [ON [Ident ‘:’] TypeID DO Statement]...
+		             [ELSE Statement]
+
+
+  @precon  None.
+  @postcon Attempt to parse the current token position as an Exception Block.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.ExceptionBlock : Boolean;
+
+Var
+  C : TGenericContainer;
+
+Begin
+  Result := False;
+  While Token.UToken = 'ON' Do
+    Begin
+      Result := True;
+      NextNonCommentToken;
+      If Token.TokenType = ttIdentifier Then
+        Begin
+          NextNonCommentToken;
+          If Token.Token = ':' Then
+            NextNonCommentToken
+          Else
+            RollBackToken;
+        End;
+      C := TGenericContainer.Create;
+      Try
+        TypeId(C);
+        If Token.UToken = 'DO' Then
+          Begin
+            NextNonCommentToken;
+            Statement;
+            If Token.Token = ';' Then
+              Begin
+                NextNonCommentToken;
+                If Token.UToken = 'ELSE' Then
+                  Begin
+                    NextNonCommentToken;
+                    StmtList;
+                  End;
+                End Else
+                  ErrorAndSeekToken(strReservedWordExpected, 'ExceptionBlock', 'DO',
+                    strSeekableOnErrorTokens);
+              End Else
+                ErrorAndSeekToken(strLiteralExpected, 'ExceptionBlock', ';',
+                  strSeekableOnErrorTokens);
+      Finally
+        C.Free;
+      End;
+    End;
+End;
+
+(**
+
+  This method attempts to parse the current token position as a Raise Statement.
+
+  @grammar RaiseStmt -> RAISE [object] [AT address]
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a Raise Statement.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.RaiseStmt : Boolean;
+
+Begin
+  Result := Token.UToken = 'RAISE';
+  If Result Then
+    Begin
+      NextNonCommentToken;
+      SimpleStatement;
+      If Token.UToken = 'AT' Then
+        Begin
+          NextNonCommentToken;
+          If Token.TokenType = ttNumber Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strNumberExpected, 'RaiseStmt', '',
+              strSeekableOnErrorTokens);
         End;
     End;
-end;
+End;
+
+(**
+
+  This method attempts to parse the current token position as an assembler
+  statement.
+
+  @grammar AssmeblerStatement -> ASM
+                                   <assemblerlanguage>
+                                 END
+
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as an assembler
+           statement.
+
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.AssemblerStatement : Boolean;
+
+Begin
+  Result := Token.UToken = 'ASM';
+  If Result Then
+    Begin
+      Repeat
+        NextNonCommentToken;
+      Until Token.UToken = 'END';
+      NextNonCommentToken;
+    End;
+End;
 
 (**
 
   This method parses a procedure declaration section from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ProcedureDeclSection</B></TD>
-      <TD>-></TD>
-      <TD>ProcedureDecl</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>FunctionDecl</TD>
-    </TR>
-  </TABLE>
-  <TABLE>
-    <TR>
-      <TD><B>ProcedureDecl</B></TD>
-      <TD>-></TD>
-      <TD>ProcedureHeading ';' [ Directive ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>Block ';'</TD>
-    </TR>
-  </TABLE>
-  <TABLE>
-    <TR>
-      <TD><B>FunctionDecl</B></TD>
-      <TD>-></TD>
-      <TD>FunctionHeading ';' [ Directive ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>Block ';'</TD>
-    </TR>
-  </TABLE>
+  @grammar ProcedureDeclSection -> ProcedureDecl
+                                -> FunctionDecl
+                                -> ConstructorDecl
+                                -> DestructorDecl
 
-  @note    This method is not implemented as per the grammer as I think the
-           grammer is incorrect. The grammer dictates a block call after each
+  @note    This method is not implemented as per the grammar as I think the
+           grammar is incorrect. The grammar dictates a block call after each
            procedure and function declaration BUT there are no constructor and
            destructor declarations only headings. I have places the Block() call
            here in the ProceduralDeclSection() instead and called all
@@ -3186,21 +4158,23 @@ Begin
       M := DestructorHeading(Scope);
     If M <> Nil Then
       Begin
+        Result := True;
+        NextNonCommentToken;
+        Directive(M);
         M.ClassMethod := Cls;
         If Method = Nil Then
           ImplementedMethods.Add(M)
         Else
           Method.LocalMethods.Add(M);
-        Result := True;
-        NextNonCommentToken;
         // Only call Block not an external procedure.
         If (Length(M.Ext) = 0) And Not M.HasDirective('forward') Then
           Begin
             Block(scLocal, M);
-            If Token.Token <> ';' Then
-              Raise EDocException.CreateLiteral(strLiteralExpected, ';', Token,
-                'ProcedureDeclSection');
-            NextNonCommentToken;
+            If Token.Token = ';' Then
+              NextNonCommentToken
+            Else
+              ErrorAndSeekToken(strLiteralExpected, 'ProcedureDeclSection', ';',
+                StrSeekableOnErrorTokens);
           End;
       End;
   Until M = Nil;
@@ -3219,16 +4193,9 @@ End;
 (**
 
   This method parses a function declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>FunctionHeading</B></TD>
-      <TD>-></TD>
-      <TD>FUNCTION Ident [ FormalParameters ] ':' ( SimpleType | STRING )</TD>
-    </TR>
-  </TABLE>
+  @grammar FunctionHeading -> FUNCTION Ident [ FormalParameters ] ':' ( SimpleType | STRING )
 
   @precon  Scope is the current scope of the function declaration.
   @postcon Returns a method declaration is a function was parsed else nil.
@@ -3257,16 +4224,9 @@ End;
 (**
 
   This method parse a procedure declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ProcedureHeading</B></TD>
-      <TD>-></TD>
-      <TD>PROCEDURE Ident [ FormalParameters ]</TD>
-    </TR>
-  </TABLE>
+  @grammar ProcedureHeading -> PROCEDURE Ident [ FormalParameters ]
 
   @precon  Scope is the current scope of the procedure declaration.
   @postcon Returns a method declaration is a procedure was parsed else nil.
@@ -3313,54 +4273,50 @@ Begin
     End Else
       C := GetComment;
   NextNonCommentToken;
-  If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-    Raise EDocException.CreateNormal(strIdentExpected, Token, 'ProcedureHeading');
-  // Create method and store in collection and get comment
-  Result := TMethodDecl.Create(ProcType, Scope, Token.Line, Token.Column);
-  Result.Comment := C;
-  Result.Identifier := Token.Token;
-  NextNonCommentToken;
-  // Check for '.' to signify a class method
-  If Token.Token = '.' Then
+  If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
-      NextNonCommentToken;
-      Result.ClsName := Result.Identifier;
-      If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-        Raise EDocException.CreateNormal(strIdentExpected, Token,
-          'ProcedureHeading');
+      // Create method and store in collection and get comment
+      Result := TMethodDecl.Create(ProcType, Scope, Token.Line, Token.Column);
+      Result.Comment := C;
       Result.Identifier := Token.Token;
       NextNonCommentToken;
-    End;
-  FormalParameter(Result);
-  // Check for an alias
-  If Token.Token = '=' Then
-    Begin
-      NextNonCommentToken;
-      Result.Alias := Token.Token;
-      NextNonCommentToken;
+      // Check for '.' to signify a class method
       If Token.Token = '.' Then
         Begin
-          Result.Alias := Result.Alias + Token.Token;
           NextNonCommentToken;
-          Result.Alias := Result.Alias + Token.Token;
+          Result.ClsName := Result.Identifier;
+          If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
+            ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
+              strSeekableOnErrorTokens);
+          Result.Identifier := Token.Token;
           NextNonCommentToken;
         End;
-    End;
+      FormalParameter(Result);
+      // Check for an alias
+      If Token.Token = '=' Then
+        Begin
+          NextNonCommentToken;
+          Result.Alias := Token.Token;
+          NextNonCommentToken;
+          If Token.Token = '.' Then
+            Begin
+              Result.Alias := Result.Alias + Token.Token;
+              NextNonCommentToken;
+              Result.Alias := Result.Alias + Token.Token;
+              NextNonCommentToken;
+            End;
+        End;
+    End Else
+      ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
+        strSeekableOnErrorTokens);
 End;
 
 (**
 
   This method parses a methods formal parameters from the current token
-  position using the following object psacal grammer.
+  position using the following object psacal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>FormalParameter</B></TD>
-      <TD>-></TD>
-      <TD>'(' FormalParm / ';' ... ')'</TD>
-    </TR>
-  </TABLE>
+  @grammar FormalParameter -> '(' FormalParm / ';' ... ')'
 
   @precon  Method is a valid method to which the formal parameters are to be
            added.
@@ -3380,26 +4336,20 @@ Begin
           Break;
         FormalParam(Method);
       Until Token.Token <> ';';
-      If Token.Token <> ')' Then
-        Raise EDocException.CreateLiteral(strLiteralExpected, ')', Token,
-          'FormalParameters');
-      NextNonCommentToken;
+      If Token.Token = ')' Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strLiteralExpected, 'FormalParameters', ')',
+          strSeekableOnErrorTokens);
   End;
 End;
 
 (**
 
   This method parses a formal parameter for a method from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>FormalParam</B></TD>
-      <TD>-></TD>
-      <TD>[ VAR | CONST | OUT ] Parameter</TD>
-    </TR>
-  </TABLE>
+  @grammar FormalParam -> [ VAR | CONST | OUT ] Parameter
 
   @precon  Method is a valid method to which the formal parameters are to be
            added.
@@ -3431,21 +4381,10 @@ End;
 (**
 
   This method parses a parameter list for a method from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>Parameter</B></TD>
-      <TD>-></TD>
-      <TD>IdentList [ ':' ( [ ARRAY OF ] SimpleType | STRING | FILE ) ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>Ident ':' SimpleType '=' ConstExpr</TD>
-    </TR>
-  </TABLE>
+  @grammar Parameter -> IdentList [ ':' ( [ ARRAY OF ] SimpleType | STRING | FILE ) ]
+                     -> Ident ':' SimpleType '=' ConstExpr
 
   @precon  Method is a valid method to add a parameter too and ParamMod is a
            parameter modifier for the parameter to signify a const, var or out
@@ -3464,14 +4403,14 @@ Var
   boolArrayOf : Boolean;
   strValue : String;
   j : Integer;
-  T : TTypes;
+  T : TTypeDecl;
 
 Begin
   // Get ident list
   T := Nil;
   boolArrayOf := False;
   strValue := '';
-  I := IdentList(False, iltStandIdentList, []); //: @todo SeekTokens(Paramter)
+  I := IdentList(False, strSeekableOnErrorTokens);
   Try
     If Token.Token = ':' Then
       Begin
@@ -3480,11 +4419,13 @@ Begin
         If Token.UToken = 'ARRAY' Then
           Begin
             NextNonCommentToken;
-            IF Token.UToken <> 'OF' Then
-              Raise EDocException.CreateLiteral(strReservedWordExpected, 'OF',
-                Token, 'FormalParameter');
-              boolArrayOf := True;
-              NextNonCommentToken;
+            IF Token.UToken = 'OF' Then
+              Begin;
+                boolArrayOf := True;
+                NextNonCommentToken;
+              End Else
+                ErrorAndSeekToken(strReservedWordExpected, 'FormalParameter', 'OF',
+                  strSeekableOnErrorTokens);
           End;
         T := GetTypeDecl;
         // Get default value
@@ -3512,22 +4453,8 @@ End;
 
 (**
 
-  This is the method that should be called to parse the previously parse tokens.
-
-  @precon  None.
-  @postcon Attempts to parse the token list and check it grammatically for
-           Errors while providing delcaration elements for browsing.
-
-**)
-procedure TPascalDocModule.ParseTokens;
-begin
-  Goal;
-end;
-
-(**
-
   This method retrives the method directives after the method declaration from
-  the current token position using the followong object pascal grammer.
+  the current token position using the followong object pascal grammar.
 
   @grammar Directive -> REGISTER    ';'
                         DYNAMIC     ';'
@@ -3602,16 +4529,9 @@ End;
 (**
 
   This method parses an Object type declaration from the current token position
-  using the followong object pascal grammer.
+  using the followong object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ObjectType</B></TD>
-      <TD>-></TD>
-      <TD>OBJECT [ ObjHertiage ] [ ObjectFieldList ] [ MethodList ]</TD>
-    </TR>
-  </TABLE>
+  @grammar ObjectType -> OBJECT [ ObjHertiage ] [ ObjectFieldList ] [ MethodList ]
 
   @precon  None.
   @postcon Returns an object declaration if one was parsed else nil.
@@ -3633,7 +4553,7 @@ begin
   SymbolTable.Add(Result);
   NextNonCommentToken;
   // Get the classes heritage
-  ClassHeritage(Result);
+  ObjHeritage(Result);
   // If this class has not body then return
   If Token.Token = ';' Then
     Begin
@@ -3649,30 +4569,53 @@ begin
     ClassFieldList(Result, InternalScope)
   );
   // Check for 'END' and ';'
-  If Token.UToken <> 'END' Then
-    Raise EDocException.CreateLiteral(strReservedWordExpected, 'END', Token,
-      'ObjectType');
-  NextNonCommentToken;
+  If Token.UToken = 'END' Then
+    NextNonCommentToken
+  Else
+    ErrorAndSeekToken(strReservedWordExpected, 'ObjectType', 'END',
+      strSeekableOnErrorTokens);
 end;
 
-Procedure TPascalDocModule.ObjHeritage;
+(**
 
-Begin
+  This method attempts to parse the current token position as an Object Heritage
+  list.
+
+  @grammar ObjHeritage -> '(' QualId ')'
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as an Object Heritage
+           list.
+
+  @param   ObjDecl as a TObjectDecl
+
+**)
+Procedure TPascalDocModule.ObjHeritage(ObjDecl : TObjectDecl);
+
+begin
+  If Token.Token = '(' Then
+    Begin
+      NextNonCommentToken;
+      If Token.TokenType = ttIdentifier Then
+        Begin
+          NextNonCommentToken;
+          If Token.Token = ')' Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strLiteralExpected, 'ObjHeritage', ')',
+              strSeekableOnErrorTokens);
+        End Else
+            ErrorAndSeekToken(strIdentExpected, 'ObjHeritage', Token.Token,
+              strSeekableOnErrorTokens);
+    End;
 End;
 
 (**
 
   This method parse a method list from the current token position using the
-  following object pascal grammer.
+  following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>MethodList</B></TD>
-      <TD>-></TD>
-      <TD>( MethodHeading [ ';' VIRTUAL ] ) / ';' ...</TD>
-    </TR>
-  </TABLE>
+  @grammar MethodList -> ( MethodHeading [ ';' VIRTUAL ] ) / ';' ...
 
   @precon  Cls is an object declaration to add methods too and Scopeis the
            current internal scope of the object.
@@ -3694,29 +4637,10 @@ End;
   This method checks for and parses a method declaration in a class from the
   current token position.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>MethodHeading</B></TD>
-      <TD>-></TD>
-      <TD>ProcedureHeading</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>FunctionHeading</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>ConstructorHeading</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>DestructorHeading</TD>
-    </TR>
-  </TABLE>
+  @grammar MethodHeading -> ProcedureHeading
+                         -> FunctionHeading
+                         -> ConstructorHeading
+                         -> DestructorHeading
 
   @precon  Cls is an object declaration to add method declarations too and
            Scope is the current scope inside the object declaration.
@@ -3753,8 +4677,15 @@ begin
   If M <> Nil Then
     Begin
       M.ClassMethod := boolClassMethod;
-      Cls.Methods.Add(M);
       Result := True;
+      If Token.Token = ';' Then
+        Begin
+          NextNonCommentToken;
+          Directive(M);
+          Cls.Methods.Add(M);
+        End Else
+          ErrorAndSeekToken(strLiteralExpected, 'ExportedHeading', ';',
+            strSeekableOnErrorTokens);
     End Else
       If boolClassMethod Then
         RollBackToken;
@@ -3763,16 +4694,9 @@ end;
 (**
 
   This method parses a constructor declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ConstructorHeading</B></TD>
-      <TD>-></TD>
-      <TD>CONSTRUCTOR Ident [ FormalParameters ]</TD>
-    </TR>
-  </TABLE>
+  @grammar ConstructorHeading -> CONSTRUCTOR Ident [ FormalParameters ]
 
   @precon  Scope is the current scope of the constructor declaration.
   @postcon Returns a method declaration is a constructor was parsed else nil.
@@ -3784,23 +4708,14 @@ end;
 function TPascalDocModule.ConstructorHeading(Scope: TScope): TMethodDecl;
 begin
   Result := ProcedureBit(mtConstructor, Scope);
-  If Result <> Nil Then
-    Directive(Result);
 end;
 
 (**
 
   This method parses a destructor declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>DestructorHeading</B></TD>
-      <TD>-></TD>
-      <TD>DESTRUCTOR Ident [ FormalParameters ]</TD>
-    </TR>
-  </TABLE>
+  @grammar DestructorHeading -> DESTRUCTOR Ident [ FormalParameters ]
 
   @precon  Scope is the current scope of the destructor declaration.
   @postcon Returns a method declaration is a destructor was parsed else nil.
@@ -3812,23 +4727,14 @@ end;
 function TPascalDocModule.DestructorHeading(Scope: TScope): TMethodDecl;
 begin
   Result := ProcedureBit(mtDestructor, Scope);
-  If Result <> Nil Then
-    Directive(Result);
 end;
 
 (**
 
   This method parses a classes / interfaces field list from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ObjFieldList</B></TD>
-      <TD>-></TD>
-      <TD>( IndentList ':' Type ) / ';' ...</TD>
-    </TR>
-  </TABLE>
+  @grammar ObjFieldList -> ( IndentList ':' Type ) / ';' ...
 
   @precon  Cls is an ibject delcaration to add fields too and Scope is the
            current internal scope of the object.
@@ -3845,25 +4751,27 @@ Var
   I : TIdentList;
   j : Integer;
   P : TParameter;
-  T : TTypes;
+  T : TTypeDecl;
 
 begin
   Result := False;
-  I := IdentList(False, iltStandIdentList, []); //: @todo SeekTokens(ObjFieldList)
+  I := IdentList(False, strSeekableOnErrorTokens);
   Try
-    If Token.Token <> ':' Then
-      Raise EDocException.CreateLiteral(strLiteralExpected, ':', Token,
-        'ObjFieldList');
-    Result := True;
-    NextNonCommentToken;
-    T := GetTypeDecl;
-    For j := 0 To I.Count - 1 Do
+    If Token.Token = ':' Then
       Begin
-        P := TParameter.Create(pmNone, I[j].Ident, False, T, '', Scope,
-          I[j].Line, I[j].Col);
-        P.Comment := I[j].Comment;
-        Cls.AddParameter(P);
-      End;
+        Result := True;
+        NextNonCommentToken;
+        T := GetTypeDecl;
+        For j := 0 To I.Count - 1 Do
+          Begin
+            P := TParameter.Create(pmNone, I[j].Ident, False, T, '', Scope,
+              I[j].Line, I[j].Col);
+            P.Comment := I[j].Comment;
+            Cls.AddParameter(P);
+          End;
+      End Else
+        ErrorAndSeekToken(strLiteralExpected, 'ObjFieldList', ':',
+          strSeekableOnErrorTokens);
   Finally
     I.Free;
   End;
@@ -3872,26 +4780,11 @@ end;
 (**
 
   This method parses the modules initialisation / finalisation section from the
-  current token position using the following object pascal grammer.
+  current token position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>InitSection</B></TD>
-      <TD>-></TD>
-      <TD>INITIALIZATION StmtList [ FINALIZATION StmtList ] END</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>BEGIN StmtList End</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD>-></TD>
-      <TD>END</TD>
-    </TR>
-  </TABLE>
+  @grammar InitSection -> INITIALIZATION StmtList [ FINALIZATION StmtList ] END
+                       -> BEGIN StmtList End
+                       -> END
 
   @precon  None.
   @postcon Parses the modules initialisation / finalisation section from the
@@ -3900,22 +4793,22 @@ end;
 **)
 Procedure TPascalDocModule.InitSection;
 
-Var
-  i : Integer;
-
 Begin
   If Token.UToken = 'INITIALIZATION' Then
     Begin
       InitComment := GetComment;
       NextNonCommentToken;
-      i := 1;
-      SkipStatements(i);
+      StmtList;
       If Token.UToken = 'FINALIZATION' Then
         Begin
           FinalComment := GetComment;
           NextNonCommentToken;
-          i := 1;
-          SkipStatements(i);
+          StmtList;
+          If Token.UToken = 'END' Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strReservedWordExpected, 'Initsection',
+              'END', strSeekableOnErrorTokens);
         End;
     End
   Else If Token.UToken = 'BEGIN' Then
@@ -3923,44 +4816,21 @@ Begin
   Else If Token.UToken = 'END' Then
     NextNonCommentToken
   Else
-    Raise EDocException.CreateLiteral(strReservedWordExpected,
-      'INITIALIZATION, BEGIN or END', Token, 'Initsection');
+    ErrorAndSeekToken(strReservedWordExpected, 'Initsection',
+      'INITIALIZATION, BEGIN or END', strSeekableOnErrorTokens);
 End;
 
 (**
 
   This method parse a class declaration from the current token position
   deligating field, property and method declarations using the following
-  object pascal grammer.
+  object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ClassType</B></TD>
-      <TD>-></TD>
-      <TD>CLASS [ ClassHeritage ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>[ ClassFieldList ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>[ ClassMethodList ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>[ ClassPropertyList ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>END</TD>
-    </TR>
-  </TABLE>
+  @grammar ClassType -> CLASS [ ClassHeritage ]
+                              [ ClassFieldList ]
+                              [ ClassMethodList ]
+                              [ ClassPropertyList ]
+                        END
 
   @precon  None.
   @postcon Returns a class declaration is a class was parsed else nil.
@@ -3978,9 +4848,15 @@ begin
   Result := Nil;
   If Not (Token.UToken = 'CLASS') Then
     Exit;
+  NextNonCommentToken;
+  // Check for 'OF'
+  If Token.UToken = 'OF' Then
+    Begin
+      RollBackToken;
+      Exit;
+    End;
   Result := TClassDecl.Create;
   SymbolTable.Add(Result);
-  NextNonCommentToken;
   Result.AbstractClass := (Token.UToken = 'ABSTRACT');
   If Result.AbstractClass Then
     NextNonCommentToken;
@@ -3999,25 +4875,19 @@ begin
     ClassFieldList(Result, InternalScope)
   );
   // Check for 'END' and ';'
-  If Token.UToken <> 'END' Then
-    Raise EDocException.CreateLiteral(strReservedWordExpected, 'END', Token,
-      'ClassType');
-  NextNonCommentToken;
+  If Token.UToken = 'END' Then
+    NextNonCommentToken
+  Else
+    ErrorAndSeekToken(strReservedWordExpected, 'ClassType', 'END',
+      strSeekableOnErrorTokens);
 end;
 
 (**
 
   This method parses a class heriage ist from the current token
-  position using the following object pascal grammer.
+  position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ClassHeritage</B></TD>
-      <TD>-></TD>
-      <TD>'(' IdentList ')'</TD>
-    </TR>
-  </TABLE>
+  @grammar ClassHeritage -> '(' IdentList ')'
 
   @precon  Cls is a valid object declaration to get a heritage for.
   @postcon Parses a class heriage ist from the current token position
@@ -4031,34 +4901,29 @@ Var
   I : TIdentList;
 
 begin
-  If Token.Token <> '(' Then
-    Exit;
-  NextNonCommentToken;
-  I := IdentList(False, iltStandIdentList, []); //: @todo SeekTokens(ClassHeritage)
-  Try
-    Cls.Heritage.Assign(I);
-  Finally
-    I.Free;
-  End;
-  If Token.Token <> ')' Then
-    Raise EDocException.CreateLiteral(strLiteralExpected, ')', Token,
-      'ClassHeritage');
-  NextNonCommentToken;
+  If Token.Token = '(' Then
+    Begin
+      NextNonCommentToken;
+      I := IdentList(False, strSeekableOnErrorTokens);
+      Try
+        Cls.Heritage.Assign(I);
+      Finally
+        I.Free;
+      End;
+      If Token.Token = ')' Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strLiteralExpected, 'ClassHeritage', ')',
+          strSeekableOnErrorTokens);
+    End;
 end;
 
 (**
 
   This method parse the class visibility from the current token
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ClassVisibility</B></TD>
-      <TD>-></TD>
-      <TD>[ PUBLIC | PROTECTED | PRIVATE | PUBLISHED ]</TD>
-    </TR>
-  </TABLE>
+  @grammar ClassVisibility -> [ PUBLIC | PROTECTED | PRIVATE | PUBLISHED ]
 
   @precon  Scope is the current internal scope of the class.
   @postcon Parse the class visibility from the current token
@@ -4085,16 +4950,9 @@ end;
 (**
 
   This method parses a class field list from the current token position using
-  the following object pascal grammer.
+  the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ObjFieldList</B></TD>
-      <TD>-></TD>
-      <TD>( ClassVisibility ObjFieldList ) / ';' ...</TD>
-    </TR>
-  </TABLE>
+  @grammar ObjFieldList -> ( ClassVisibility ObjFieldList ) / ';' ...
 
   @precon  Cls is a valid object declaration to add fields too and Scope is the
            current scope of the class.
@@ -4119,16 +4977,9 @@ End;
 (**
 
   This method parses a class method list from the current token position using
-  the following object pascal grammer.
+  the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>MethodList</B></TD>
-      <TD>-></TD>
-      <TD>( ClassVisibility MethodList ) / ';' ...</TD>
-    </TR>
-  </TABLE>
+  @grammar MethodList -> ( ClassVisibility MethodList ) / ';' ...
 
   @precon  Cls is a valid object declaration to get method for and Scope is the
            current scope of the class.
@@ -4146,25 +4997,14 @@ Begin
   Result := MethodList(Cls, Scope);
   If Not Result Then
     Exit;
-  If Token.Token <> ';' Then
-    Raise EDocException.CreateLiteral(strLiteralExpected, ';', Token,
-      'MethodList');
-  NextNonCommentToken;
 End;
 
 (**
 
   This method parses a class property list frmo the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ClassPropertyList</B></TD>
-      <TD>-></TD>
-      <TD>( ClassVisibility PropertyList ';' ) ...</TD>
-    </TR>
-  </TABLE>
+  @grammar ClassPropertyList -> ( ClassVisibility PropertyList ';' ) ...
 
   @precon  Cls is a valid class declaration to get method for and Scope is the
            current scope of the class.
@@ -4183,25 +5023,19 @@ Begin
   Result :=  PropertyList(Cls, Scope);
   If Not Result Then
     Exit;
-  If Token.Token <> ';' Then
-    Raise EDocException.CreateLiteral(strLiteralExpected, ';', Token,
-      'ClassPropertyList');
-  NextNonCommentToken;
+  If Token.Token = ';' Then
+    NextNonCommentToken
+  Else
+    ErrorAndSeekToken(strLiteralExpected, 'ClassPropertyList', ';',
+      strSeekableOnErrorTokens);
 End;
 
 (**
 
   This method parses a class property list from the current
-  token position using the following object pascal grammer.
+  token position using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>PropertyList</B></TD>
-      <TD>-></TD>
-      <TD>PROPERTY Ident [ PropertyInterface ] PropertySpecifiers</TD>
-    </TR>
-  </TABLE>
+  @grammar PropertyList -> PROPERTY Ident [ PropertyInterface ] PropertySpecifiers
 
   @precon  Cls is a valid class declaration to get method for and Scope is the
            current scope of the class.
@@ -4225,29 +5059,25 @@ begin
     Exit;
   C := GetComment;
   NextNonCommentToken;
-  If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-    Raise EDocException.CreateNormal(strIdentExpected, Token, 'PropertyList');
-  P := TProperty.Create(Token.Token, Scope, Token.Line, Token.Column);
-  Cls.AddProperty(P);
-  P.Comment := C;
-  NextNonCommentToken;
-  PropertyInterface(P);
-  PropertySpecifiers(P);
+  If Token.TokenType In [ttIdentifier, ttDirective] Then
+    Begin
+      P := TProperty.Create(Token.Token, Scope, Token.Line, Token.Column);
+      Cls.AddProperty(P);
+      P.Comment := C;
+      NextNonCommentToken;
+      PropertyInterface(P);
+      PropertySpecifiers(P);
+    End Else
+      ErrorAndSeekToken(strIdentExpected, 'PropertyList', Token.Token,
+        strSeekableOnErrorTokens);
 end;
 
 (**
 
   This method parses the property interface from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>PropertyInterface</B></TD>
-      <TD>-></TD>
-      <TD>[ PropertyParameterList ] ':' Ident</TD>
-    </TR>
-  </TABLE>
+  @grammar PropertyInterface -> [ PropertyParameterList ] ':' Ident
 
   @precon  Prop is a property to parse an interface for.
   @postcon Parses the property interface from the current token position
@@ -4272,16 +5102,9 @@ End;
 (**
 
   This method parses a properties parameter list from the current token using
-  the following object pascal grammer.
+  the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>PropertyParameterList</B></TD>
-      <TD>-></TD>
-      <TD>'[' ( IdentList ':' TypeId ) / ';' ... ']'</TD>
-    </TR>
-  </TABLE>
+  @grammar PropertyParameterList -> '[' ( IdentList ':' TypeId ) / ';' ... ']'
 
   @precon  Prop is a property to parse a parameter list for.
   @postcon Parses a properties parameter list from the current token
@@ -4295,7 +5118,7 @@ Var
   ParamMod : TParamModifier;
   I : TIdentList;
   j : Integer;
-  T : TTypes;
+  T : TTypeDecl;
 
 Begin
   If Token.Token = '[' Then
@@ -4311,66 +5134,41 @@ Begin
           ParamMod := pmOut;
         If ParamMod <> pmNone Then
           NextNonCommentToken;
-        I := IdentList(False, iltStandIdentList, []); //: @todo SeekTokens(PropertyParameterList)
+        I := IdentList(False, strSeekableOnErrorTokens);
         Try
-          If Token.Token <> ':' Then
-            Raise EDocException.CreateLiteral(strLiteralExpected, ':', Token,
-              'PropertyParameterList');
-          NextNonCommentToken;
-          T := GetTypeDecl;
-          For j := 0 To I.Count - 1 Do
-            Prop.AddParameter(TParameter.Create(ParamMod, I[j].Ident, False,
-              T, '', scPublic, I[j].Line, I[j].Col));
+          If Token.Token = ':' Then
+            Begin
+              NextNonCommentToken;
+              T := GetTypeDecl;
+              For j := 0 To I.Count - 1 Do
+                Prop.AddParameter(TParameter.Create(ParamMod, I[j].Ident, False,
+                  T, '', scPublic, I[j].Line, I[j].Col));
+            End Else
+              ErrorAndSeekToken(strLiteralExpected, 'PropertyParameterList', ':',
+                strSeekableOnErrorTokens);
         Finally
           I.Free;
         End;
       Until Token.Token <> ';';
-      If Token.Token <> ']' Then
-        Raise EDocException.CreateLiteral(strLiteralExpected, ']', Token,
-          'PropertyParameterList');
-      NextNonCommentToken;
+      If Token.Token = ']' Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strLiteralExpected, 'PropertyParameterList', ']',
+          strSeekableOnErrorTokens);
     End;
 End;
-
 
 (**
 
   This method parses the property specifiers from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>PropertySpecifiers</B></TD>
-      <TD>-></TD>
-      <TD>[ INDEX ConstExpr ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>[ READ Ident ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>[ WRITE Ident ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>[ STORED ( Ident | Constant) ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>[ ( DEFAULT ConstExpr ) | NODEFAULT ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>[ IMPLEMENTS TypeId ]</TD>
-    </TR>
-  </TABLE>
+  @grammar PropertySpecifiers -> [ INDEX ConstExpr ]
+                                 [ READ Ident ]
+                                 [ WRITE Ident ]
+                                 [ STORED ( Ident | Constant) ]
+                                 [ ( DEFAULT ConstExpr ) | NODEFAULT ]
+                                 [ IMPLEMENTS TypeId ]
 
   @precon  Prop is a property to parse specifiers for.
   @postcon Parses the property specifiers from the current token position
@@ -4485,26 +5283,12 @@ end;
 (**
 
   This method parses an Interface declaration from the current token position
-  using the following object pascal grammer.
+  using the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>InterfaceType</B></TD>
-      <TD>-></TD>
-      <TD>INTERFACE [ InterfaceHeritage ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>[ ClassMethodList ]</TD>
-    </TR>
-    <TR>
-      <TD></TD>
-      <TD></TD>
-      <TD>[ ClassPropertyList ]</TD>
-    </TR>
-  </TABLE>
+  @grammar InterfaceType -> INTERFACE [ InterfaceHeritage ]
+                            [ ClassMethodList ]
+                            [ ClassPropertyList ]
+                            END
 
   @precon  None.
   @postcon Returns an interface declaration if one was parsed else nil.
@@ -4532,19 +5316,23 @@ begin
   If Token.Token = ';' Then
     Exit;
   // Get the classes heritage
-  ClassHeritage(Result);
+  InterfaceHeritage(Result);
   // Get GUID if there is one
   If Token.Token = '[' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType <> ttStringLiteral Then
-        Raise EDocException.CreateNormal(strStringExpected, Token, 'InterfaceType');
-      Result.GUID := Token.Token;
-      NextNonCommentToken;
-      If Token.Token <> ']' Then
-        Raise EDocException.CreateLiteral(strLiteralExpected, ']', Token,
-          'InterfaceType');
-      NextNonCommentToken;
+      If Token.TokenType = ttStringLiteral Then
+        Begin
+          Result.GUID := Token.Token;
+          NextNonCommentToken;
+          If Token.Token = ']' Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strLiteralExpected, 'InterfaceType', ']',
+              strSeekableOnErrorTokens);
+        End Else
+          ErrorAndSeekToken(strStringExpected, 'InterfaceType', '',
+            strSeekableOnErrorTokens);
     End;
   Repeat
     ClassVisibility(InternalScope);
@@ -4555,30 +5343,37 @@ begin
     ClassPropertyList(Result, InternalScope)
   );
   // Check for 'END' and ';'
-  If Token.UToken <> 'END' Then
-    Raise EDocException.CreateLiteral(strReservedWordExpected, 'END', Token,
-      'InterfaceType');
-  NextNonCommentToken;
+  If Token.UToken = 'END' Then
+    NextNonCommentToken
+  Else
+    ErrorAndSeekToken(strReservedWordExpected, 'InterfaceType', 'END',
+      strSeekableOnErrorTokens);
 end;
 
-Procedure TPascalDocModule.InterfaceHeritage;
+(**
+
+  This method attempts to parse the current token position as a heritage list.
+
+  @grammar InterfaceHeritage -> '(' IdentList ')'
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a heritage list.
+
+  @param   InterfaceDecl as a TInterfaceDecl
+
+**)
+Procedure TPascalDocModule.InterfaceHeritage(InterfaceDecl : TInterfaceDecl);
 
 begin
+  ClassHeritage(InterfaceDecl); // Same as ClassHeritage
 End;
 
 (**
 
   This method parses a requires clause from the current token position usnig
-  the following object pascal grammer.
+  the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>RequiresClause</B></TD>
-      <TD>-></TD>
-      <TD>REQUIRES IdentList ... ';'</TD>
-    </TR>
-  </TABLE>
+  @grammar RequiresClause -> REQUIRES IdentList ... ';'
 
   @precon  None.
   @postcon Parses a requires clause from the current token position usnig
@@ -4594,27 +5389,20 @@ Begin
     Exit;
   Comment := GetComment;
   NextNonCommentToken;
-  Requires := IdentList(True, iltUsesClause, []); //: @todo SeekTokens(RequiresClause);
+  Requires := IdentList(True, strSeekableOnErrorTokens);
   Requires.Comment := Comment;
   If Token.Token <> ';' Then
-    Raise EDocException.CreateLiteral(strLiteralExpected, ';', Token,
-      'RequiresClause');
+    ErrorAndSeekToken(strLiteralExpected, 'RequiresClause', ';',
+      strSeekableOnErrorTokens);
   NextNonCommentToken;
 End;
 
 (**
 
   This method parses a contains clause fro the cutrrent token position using
-  the following object pascal grammer.
+  the following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ContainsClause</B></TD>
-      <TD>-></TD>
-      <TD>CONTAINS IdentList ... ';'</TD>
-    </TR>
-  </TABLE>
+  @grammar ContainsClause -> CONTAINS IdentList ... ';'
 
   @precon  None.
   @postcon Parses a contains clause fro the cutrrent token position
@@ -4630,11 +5418,11 @@ Begin
     Exit;
   Comment := GetComment;
   NextNonCommentToken;
-  Contains := IdentList(True, iltUsesClause, []); //: @todo SeekTokens(ContainsClause)
+  Contains := IdentList(True, strSeekableOnErrorTokens);
   Contains.Comment := Comment;
   If Token.Token <> ';' Then
-    Raise EDocException.CreateLiteral(strLiteralExpected, ';', Token,
-      'ContainsClause');
+    ErrorAndSeekToken(strLiteralExpected, 'ContainsClause', ';',
+      strSeekableOnErrorTokens);
   NextNonCommentToken;
 End;
 
@@ -4645,7 +5433,7 @@ End;
   is added to the classes owned items list for automatic disposal, else it the
   responsibliity of the calling function to disposal of the class.
 
-  @grammer IdentList -> Ident / ',' ...
+  @grammar IdentList -> Ident / ',' ...
 
   @precon  OwnList determines if the identlist should be disposed of be the
            parser or be the caller. SeekTokens is a sorted lowercase list of
@@ -4653,146 +5441,88 @@ End;
   @postcon Returns an ident list.
 
   @param   OwnList    as a Boolean
-  @param   IdentListType as a TIdentListType
   @param   SeekTokens as an Array of String
   @return  a TIdentList
 
 **)
 Function TPascalDocModule.IdentList(OwnList : Boolean;
-  IdentListType : TIdentListType; SeekTokens : Array Of String) : TIdentList;
-var
-  C: TGenericContainer;
+  SeekTokens : Array Of String) : TIdentList;
 
 Begin
-  If IdentListType = iltIndexedEnumerates Then
-    Result := TIndexedEnumerateList.Create
-  Else
-    Result := TIdentList.Create;
+  Result := TIdentList.Create;
   // Add to owned list immediately if required to ensure that is an exception
   // is raised the memory is released in the destructor
   If OwnList Then
     OwnedItems.Add(Result);
-  While Not EndOfTokens Do
-    Begin
-      If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-        Begin
-          ErrorAndSeekToken(strIdentExpected, 'IdentList', Token.Token,
-            SeekTokens);
-          Exit;
-        End;
-      Result.Add(Token.Token, Token.Line, Token.Column, GetComment);
-      NextNonCommentToken;
-      If IdentListType In [iltUsesClause] Then
-        If Token.UToken = 'IN' Then
-          Begin
-            NextNonCommentToken;
-            If Token.TokenType <> ttStringLiteral Then
-              ErrorAndSeekToken(strStringExpected, 'IdentList', Token.Token,
-                SeekTokens)
-            Else
-              NextNonCommentToken;
-          End;
-      If IdentListType In [iltIndexedEnumerates] Then
-        If Token.Token = '=' Then
-          Begin
-            NextNonCommentToken;
-            C := TGenericContainer.Create;
-            Try
-              With (Result As TIndexedEnumerateList) Do
-                ConstExpr(IndexInfo[Count - 1]);
-            Finally
-              C.Free;
-            End;
-          End;
-      If Token.Token <> ',' Then
-        Exit;
-      NextNonCommentToken;
-    End;
+  Repeat
+    Result.Add(Token.Token, Token.Line, Token.Column, GetComment);
+    NextNonCommentToken;
+    If Token.UToken = 'IN' Then
+      Begin
+        NextNonCommentToken;
+        If Token.TokenType <> ttStringLiteral Then
+          ErrorAndSeekToken(strStringExpected, 'IdentList', Token.Token,
+            SeekTokens)
+        Else
+          NextNonCommentToken;
+      End;
+  Until Not IsToken(',', Nil);
 End;
 
 (**
 
   This method returns a type id at the current token position using the
-  following object pascal grammer.
+  following object pascal grammar.
 
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>TypeId</B></TD>
-      <TD>-></TD>
-      <TD>[ UnitId '.' ] &#060;type-identifier></TD>
-    </TR>
-  </TABLE>
+  @grammar TypeId -> [ UnitId '.' ] <type-identifier>
 
-  @precon  None.
+  @precon  C must be a valid generic container.
   @postcon Returns a type id as a string of text.
-
-  @return  a String
-
-**)
-Function TPascalDocModule.TypeId : String;
-
-Begin
-  Result := Token.Token;
-  NextNonCommentToken;
-  If Token.Token <> '.' Then
-    Exit;
-  Result := Result + Token.Token;
-  NextNonCommentToken;
-  Result := Result + Token.Token;
-  NextNonCommentToken;
-End;
-
-(**
-
-  This method parses a constant expression from the current token position
-  using the following object pascal grammer.
-
-  <P><B><U>Object Pascal Grammer</U></B></P>
-  <TABLE>
-    <TR>
-      <TD><B>ConstExpr</B></TD>
-      <TD>-></TD>
-      <TD>&#060;constant-expression></TD>
-    </TR>
-  </TABLE>
-
-  @precon  C is a generic container to add tokens too.
-  @postcon Returns true if a constant expression was parsed.
 
   @param   C as a TGenericContainer
   @return  a Boolean
 
 **)
-Function TPascalDocModule.ConstExpr(C : TGenericContainer) : Boolean;
-
-Var
-  iCounter : Integer;
-  iTokens : Integer;
+Function TPascalDocModule.TypeId(C: TGenericContainer) : Boolean;
 
 Begin
-  {: @todo Need to impleent this correctly using Expression() and pass and check
-           the type during processing. }
-  Result := True;
-  iCounter := 0;
-  ITokens := 0;
-  While (Not (Token.Token[1] In strConstExprTerminals) Or (iCounter > 0)) And
-    Not IsKeyWord(Token.Token, strSeekableOnErrorTokens) Do
+  Result := Token.TokenType = ttIdentifier;
+  If Result Then
     Begin
-      If Token.Token[1] In ['(', '['] Then
-        Inc(iCounter);
-      If Token.Token[1] In [')', ']'] Then
+      AddToExpression(C);
+      If Token.Token = '.' Then
         Begin
-          Dec(iCounter);
-          If iCounter < 0 Then
-            Exit;
+          AddToExpression(C);
+          If Token.TokenType = ttIdentifier Then
+            AddToExpression(C)
+          Else
+            ErrorAndSeekToken(strIdentExpected, 'TypeId', Token.Token,
+              strSeekableOnErrorTokens);
         End;
-      C.Add(Token.Token);
-      NextNonCommentToken;
-      Inc(iTokens);
     End;
-  If iTokens = 0 Then
-    Errors.Add('Loop detected.', 'ConstExpr', Token.Line, Token.Column, etError);
+End;
+
+(**
+
+  This method parses a constant expression from the current token position
+  using the following object pascal grammar.
+
+  @grammar ConstExpr -> <constant-expression>
+
+  @precon  C is a generic container to add tokens too.
+  @postcon Returns true if a constant expression was parsed.
+
+  @param   C as a TGenericContainer
+  @param   ExprType as a TExprTypes
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.ConstExpr(C : TGenericContainer;
+  var ExprType : TExprTypes) : Boolean;
+
+Begin
+  Result := True;
+  Expression(C, ExprType); // ConstExpr is a subset of Expression
 End;
 
 { TPascalDocModuleList }

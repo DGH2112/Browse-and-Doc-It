@@ -72,9 +72,9 @@ Type
     Function TypeDecl(Scope : TScope; Method : TMethodDecl) : Boolean;
     Function GetTypeDecl : TTypeDecl;
     Function TypedConstant(C: TGenericContainer; T : TTypeDecl) : Boolean;
-    Function ArrayConstant(C: TGenericContainer) : Boolean;
-    Function RecordConstant(C: TGenericContainer) : Boolean;
-    Procedure RecordFieldConstant;
+    Function ArrayConstant(C: TGenericContainer; T : TTypeDecl) : Boolean;
+    Function RecordConstant(C: TGenericContainer; T : TTypeDecl) : Boolean;
+    Function RecordFieldConstant(C : TGenericContainer; T : TTypeDecl) : Boolean;
     function OPType : TTypeDecl;
     function RestrictedType : TRestrictedType;
     Function ClassRefType : TClassRefType;
@@ -183,6 +183,8 @@ Type
       SeekTokens: array of string);
     Procedure AddToExpression(C : TGenericContainer);
     function IsToken(strToken: String; C: TGenericContainer): Boolean;
+    procedure ArrayElement(C : TGenericContainer;
+      iStartDimension: Integer; AT : TArrayType);
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
       ModuleOptions : TModuleOptions; DocOptions : TDocOptions);
@@ -310,9 +312,9 @@ Const
 //    'varargs', 'while', 'with', 'write', 'writeonly', 'xor'
 
   (** This is a list of functions which can be used in a const expression. **)
-  strConstExprDesignators : Array[1..15] Of String = ('Abs', 'Chr', 'Hi', 'High',
-    'Length', 'Lo', 'Low', 'Odd', 'Ord', 'Pred', 'Round', 'SizeOf', 'Succ',
-    'Swap', 'Trunc');
+  strConstExprDesignators : Array[1..15] Of String = ('abs', 'chr', 'hi', 'high',
+    'length', 'lo', 'low', 'odd', 'ord', 'pred', 'round', 'sizeof', 'succ',
+    'swap', 'trunc');
   (** A list of Rel operators for expressions. **)
   strRelOps : Array[1..9] Of String = ('<', '<=', '<>', '=', '>', '>=', 'as',
     'in', 'is');
@@ -325,6 +327,9 @@ Const
   strExpressionIndicators : Array[1..19] Of String = ('*', '+', '-', '/', '<',
     '<=', '<>', {'=', }'>', '>=', 'and', 'as', 'div', 'in', 'is', 'mod', 'or',
     'shl', 'shr', 'xor');
+  (** A list of portability directives. **)
+  strPortabilityDirective : Array[1..3] Of String = ('deprecated', 'library',
+    'platform');
 
 Implementation
 
@@ -1244,9 +1249,25 @@ Begin
     End;
 End;
 
+(**
+
+  This method attempts to parse the current token position as a Portability
+  directive.
+
+  @grammar PortabilityDirective -> platform
+                                -> deprecated
+                                -> library
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a Portability
+           directive.
+
+**)
 Procedure TPascalDocModule.PortabilityDirective;
 
 Begin
+  If IsKeyWord(Token.Token, strPortabilityDirective) Then
+    NextNonCommentToken; //: @todo Add to symbol.
 End;
 
 (**
@@ -1922,50 +1943,148 @@ End;
 **)
 Function TPascalDocModule.TypedConstant(C : TGenericContainer;
   T : TTypeDecl) : Boolean;
-  
+
 Var
   ExprType : TExprTypes;
 
 Begin
   ExprType := [etUnknown, etConstExpr];
-  Result := ArrayConstant(C) Or RecordConstant(C) Or ConstExpr(C, ExprType);
+  Result := ArrayConstant(C, T) Or RecordConstant(C, T) Or ConstExpr(C, ExprType);
 End;
 
 (**
 
   This method test whether the typed constant is an Array Constant (starts with
   ARRAY.
-  
-  @grammar ArrayConstant -> '(' TypedConstant/','... ')'
-  
+
+  @grammar ArrayConstant -> '(' TypedConstant ','... ')'
+
   @precon  C must be a valid generic container.
   @postcon If ARRAY is found processes the constant as an array constant.
-  
+
   @param  C as a TGenericContainer
+  @param   T as a TTypeDecl
   @return a Boolean
 
 **)
-Function TPascalDocModule.ArrayConstant(C : TGenericContainer) : Boolean;
+Function TPascalDocModule.ArrayConstant(C : TGenericContainer;
+  T : TTypeDecl) : Boolean;
 
 Var
   A : TArrayType;
-  
-Begin
-  A := ArrayType(False);
-  Result := (A <> Nil);
+  iDim : Integer;
 
+Begin
+  Result := T Is TArrayType;
+  If Result Then
+    ArrayElement(C, 1, T As TArrayType);
 end;
 
-Function TPascalDocModule.RecordConstant(C : TGenericContainer) : Boolean;
+(**
+
+  This method parses the current token position are an element of an array
+  constant.
+
+  @precon  C must be a valid generic container and AT must be an instance of the
+           array type associated with the array constant.
+  @postcon Parses the current token position are an element of an array
+           constant.
+
+  @param   C               as a TGenericContainer
+  @param   iStartDimension as an Integer
+  @param   AT              as a TArrayType
+
+**)
+Procedure TPascalDocModule.ArrayElement(C : TGenericContainer;
+  iStartDimension : Integer; AT : TArrayType);
+Begin
+  If iStartDimension <= AT.Dimensions Then
+    If Token.Token = '(' Then
+      Begin
+        AddToExpression(C);
+        Repeat
+          If iStartDimension < AT.Dimensions Then
+            ArrayElement(C, iStartDimension + 1, AT)
+          Else
+            TypedConstant(C, Nil)
+        Until Not IsToken(',', C);
+        If Token.Token = ')' Then
+          AddToExpression(C)
+        Else
+          ErrorAndSeekToken(strLiteralExpected, 'ProcessArrayDimension', ')',
+            strSeekableOnErrorTokens);
+      End Else
+        ErrorAndSeekToken(strLiteralExpected, 'ProcessArrayDimension', '(',
+          strSeekableOnErrorTokens);
+End;
+
+(**
+
+  This method attempts to parser the current token position as an RecordConstant.
+
+  @grammar RecordConstant -> '(' RecordFieldConstant ';'... ')'
+
+  @precon  C must be a valid generic container.
+  @postcon Attempts to parser the current token position as an RecordConstant.
+
+  @param   C as a TGenericContainer
+  @param   T as a TTypeDecl
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.RecordConstant(C : TGenericContainer;
+  T : TTypeDecl) : Boolean;
+
+Begin
+  Result := Token.Token = '(';
+  If Result Then
+    Begin
+      AddToExpression(C);
+      Repeat
+        RecordFieldConstant(C, T);
+      Until Not IsToken(';', C);
+      If Token.Token = ')' Then
+        AddToExpression(C)
+      Else
+        ErrorAndSeekToken(strLiteralExpected, 'RecordConstant', ')',
+          strSeekableOnErrorTokens);
+    End;
+End;
+
+(**
+
+  This method attempts to parse the current token position as a record field
+  constant.
+
+  @grammar RecordFieldConstant -> Ident ':' TypedConstant
+
+  @precon  C must be a valid generic container.
+  @postcon Attempts to parse the current token position as a record field
+           constant.
+
+  @param   C as a TGenericContainer
+  @param   T as a TTypeDecl
+  @return  a Boolean
+
+**)
+Function TPascalDocModule.RecordFieldConstant(C : TGenericContainer;
+  T : TTypeDecl) : Boolean;
 
 Begin
   Result := False;
-  //: @todo Requires implementing at the same time as ConstExpr
-End;
-
-Procedure TPascalDocModule.RecordFieldConstant;
-
-Begin
+  If Token.TokenType In [ttIdentifier, ttDirective] Then
+    Begin
+      NextNonCommentToken;
+      If Token.Token = ':' Then
+        Begin
+          Result := True;
+          RollBackToken;
+          AddToExpression(C);
+          AddToExpression(C);
+          TypedConstant(C, T)
+        End Else
+          RollBackToken;
+    End;
 End;
 
 (**
@@ -2159,8 +2278,10 @@ Function TPascalDocModule.OrdinalType : TOrdinalType;
 
 Begin
   Result := OrdIdent;
-  If Result = Nil Then Result := EnumerateType;
-  If Result = Nil Then Result := SubRangeType;
+  If Result = Nil Then
+    Result := EnumerateType;
+  If Result = Nil Then
+    Result := SubRangeType;
 End;
 
 (**
@@ -2440,13 +2561,14 @@ Begin
       If Token.Token = '[' Then
         Begin
           Repeat
-            NextNonCommentToken;
+            AddToExpression(Result);
             Result.AddDimension;
             E := OrdinalType;
-            Result.Append(E);
+            If E <> Nil Then
+              Result.Append(E);
           Until Not IsToken(',', Result);
           If Token.Token = ']' Then
-            NextNonCommentToken
+            AddToExpression(Result)
           Else
             ErrorAndSeekToken(strLiteralExpected, 'ArrayType', ']',
               strSeekableOnErrorTokens);
@@ -4180,11 +4302,33 @@ Begin
   Until M = Nil;
 End;
 
+(**
+
+  This method attempts to parse the current token position as a ProcedureDecl;
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a ProcedureDecl;
+
+  @grammar ProcedureDecl -> ProcedureHeading ';' [Directive] [PortabilityDirective]
+                            Block ';'
+
+**)
 Procedure TPascalDocModule.ProcedureDecl;
 
 Begin
 End;
 
+(**
+
+  This method attempts to parse the current token position as a FunctionDecl;
+
+  @precon  None.
+  @postcon Attempts to parse the current token position as a FunctionDecl;
+
+  @grammar FunctionDecl -> FunctionHeading ';' [Directive] [PortabilityDirective]
+                           Block ';'
+
+**)
 Procedure TPascalDocModule.FunctionDecl;
 
 Begin

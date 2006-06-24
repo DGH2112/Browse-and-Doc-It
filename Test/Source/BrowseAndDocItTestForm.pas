@@ -154,6 +154,7 @@ Var
   M : TPascalDocModule;
 
 begin
+  lvFileList.Items.Clear;
   iResult := FindFirst(DirectoryListBox1.Directory + '\*.pas', faAnyFile, recFile);
   Try
     While iResult = 0 Do

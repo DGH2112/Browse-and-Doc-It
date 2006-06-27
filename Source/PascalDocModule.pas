@@ -36,6 +36,8 @@ Type
   (** This is a set of TExprType enumerates. **)
   TExprTypes = Set of TExprType;
 
+  TSeekToken = (stActual, stFirst);
+
   (**
 
     This is the main class for dealing with object pascal units and program
@@ -180,11 +182,12 @@ Type
     Procedure TokenizeStream;
     Procedure ParseTokens;
     procedure ErrorAndSeekToken(strMsg, strMethod, strExpected: String;
-      SeekTokens: array of string);
+      SeekTokens: Array Of String; SeekToken : TSeekToken);
     Procedure AddToExpression(C : TGenericContainer);
     function IsToken(strToken: String; C: TGenericContainer): Boolean;
     procedure ArrayElement(C : TGenericContainer;
       iStartDimension: Integer; AT : TArrayType);
+    Function UndefinedToken : Boolean;
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
       ModuleOptions : TModuleOptions; DocOptions : TDocOptions);
@@ -441,7 +444,7 @@ Const
   iTokenCapacity = 25;
   test = 12.34;
   {: @todo Move to BaseLanguageModule }
-  strSingleSymbols : Set Of Char = ['(', ')', ';', ',', '[', ']'];
+  strSingleSymbols : Set Of Char = ['(', ')', ';', ',', '[', ']', '^', '-', '+', '/', '*'];
 
 Var
   boolEOF : Boolean;
@@ -537,10 +540,11 @@ Begin
                             If (strToken[1] = '{') And (strToken[2] = '$') Then
                               LastCharType := ttCompilerDirective;
                           If ((LastToken = ttNumber) And ((strToken = '.') Or (LastCharType = ttNumber))) Or
-                            ((LastToken = ttStringLiteral) And (strToken[1] = '#')) Then
+                            ((LastToken = ttStringLiteral) And (strToken[1] = '#')) Or
+                            ((LastToken = ttStringLiteral) And (LastCharType = ttStringLiteral)) Then
                             Begin
                               AppendToLastToken(strToken);
-                              LastToken := ttNumber;
+                              LastToken := LastToken;
                             End Else
                             Begin
                               AddToken(TTokenInfo.Create(strToken, iStreamPos,
@@ -739,7 +743,7 @@ Begin
   recPosition.Column := Token.Column;
   recPosition.BufferPos := Token.BufferPos;
   Result := TClassDecl.Create('Temp', scPrivate, 0, 0);
-  If Not (PropertyList(Result, Scope) And (Result.PropertyCount > 0)) Then
+  If Not (PropertyList(Result, Scope) And (Result.Properties.Count > 0)) Then
     FreeAndNil(Result);
 End;
 
@@ -811,12 +815,14 @@ begin
   // Check class method for implementations.
   For i := 0 To Types.Count - 1 Do
     If Types[i] Is TObjectDecl Then
-      With Types[i] As TObjectDecl Do
-        For j := 0 To Methods.Count -1 Do
-          If ImplementedMethods.Find(Identifier, Methods[j].Identifier) = -1 Then
-            Errors.Add(Format(strUnsatisfiedForwardReference,
-              [Identifier, Methods[j].Identifier]), 'ScopeImplementedMethods',
-              Methods[j].Line, Methods[j].Col, etError);
+      If Not (Types[i] Is TInterfaceDecl) Then
+        With Types[i] As TObjectDecl Do
+          For j := 0 To Methods.Count -1 Do
+            If ImplementedMethods.Find(Identifier, Methods[j].Identifier) = -1 Then
+              If Not Methods[j].HasDirective('ABSTRACT') Then
+                Errors.Add(Format(strUnsatisfiedForwardReference,
+                  [Identifier, Methods[j].Identifier]), 'ScopeImplementedMethods',
+                  Methods[j].Line, Methods[j].Col, etError);
 end;
 
 (**
@@ -835,7 +841,7 @@ end;
 
 **)
 Procedure TPascalDocModule.ErrorAndSeekToken(strMsg, strMethod, strExpected : String;
-  SeekTokens: Array of string);
+  SeekTokens: Array Of String; SeekToken : TSeekToken);
 
   (**
 
@@ -872,6 +878,8 @@ Begin
   End;
   NextNonCommentToken;
   While Not IsKeyWord(Token.Token, SeekTokens) Do
+    NextNonCommentToken;
+  If SeekToken = stFirst Then
     NextNonCommentToken;
 End;
 
@@ -971,7 +979,7 @@ begin
           boolHasProcessed := OPUnit;
         If Not boolHasProcessed  Then
           ErrorAndSeekToken(strModuleKeyWordNotfound, 'Goal', Token.Token,
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
       End Else
         Raise EDocException.Create(strUnExpectedEndOfFile);
   Except
@@ -1018,24 +1026,24 @@ begin
           // Check for closing parenthesis
           If Token.Token <> ')' Then
             ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ')',
-              strSeekableOnErrorTokens)
+              strSeekableOnErrorTokens, stActual)
           Else
             NextNonCommentToken;
         End;
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ';',
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stActual)
       Else
         NextNonCommentToken;
       ProgramBlock;
       // Check for '.'
       If Token.Token <> '.' Then
         ErrorAndSeekToken(strLiteralExpected, 'OPProgram', '.',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
     End Else
       ErrorAndSeekToken(strIdentExpected, 'OPProgram', Token.Token,
-        strSeekableOnErrorTokens);
+        strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -1064,7 +1072,7 @@ Begin
       NextNonCommentToken;
       If Token.TokenType <> ttIdentifier Then
         ErrorAndSeekToken(strIdentExpected, 'OPUnit', Token.Token,
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stActual)
       Else
         Begin;
           ModuleName := Token.Token;
@@ -1075,7 +1083,7 @@ Begin
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'OPUnit', ';',
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stActual)
       Else
         NextNonCommentToken;
       InterfaceSection;
@@ -1084,7 +1092,7 @@ Begin
       // Check for '.'
       If Token.Token <> '.' Then
         ErrorAndSeekToken(strLiteralExpected, 'OPUnit', '.',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -1114,7 +1122,7 @@ begin
       NextNonCommentToken;
       If Token.TokenType <> ttIdentifier Then
         ErrorAndSeekToken(strIdentExpected, 'OPPackage', Token.Token,
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stActual)
       Else
         Begin
           ModuleName := Token.Token;
@@ -1125,7 +1133,7 @@ begin
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'OPPackage', ';',
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stActual)
       Else
         NextNonCommentToken;
       // Look for requires and contains clauses
@@ -1133,12 +1141,12 @@ begin
       ContainsClause;
       If Token.UToken <> 'END' Then
         ErrorAndSeekToken(strReservedWordExpected, 'OPPackage', 'END',
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stActual)
       Else
         NextNonCommentToken;
       If Token.Token <> '.' Then
         ErrorAndSeekToken(strLiteralExpected, 'OPPackage', '.',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -1166,7 +1174,7 @@ begin
       NextNonCommentToken;
       If Token.TokenType <> ttIdentifier Then
         ErrorAndSeekToken(strIdentExpected, 'OPLibrary', Token.Token,
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stActual)
       Else
         Begin
           ModuleName := Token.Token;
@@ -1177,14 +1185,14 @@ begin
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'OPLibrary', ';',
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stActual)
       Else
         NextNonCommentToken;
       ProgramBlock;
       // Check for '.'
       If Token.Token <> '.' Then
         ErrorAndSeekToken(strLiteralExpected, 'OPLibrary', '.',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -1243,7 +1251,7 @@ Begin
         End;
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'UsesClause', ';',
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stActual)
       Else
         NextNonCommentToken;
     End;
@@ -1289,7 +1297,7 @@ Procedure TPascalDocModule.InterfaceSection;
 Begin
   If Token.UToken <> 'INTERFACE' Then
     ErrorAndSeekToken(strReservedWordExpected, 'InterfaceSection', 'INTERFACE',
-      strSeekableOnErrorTokens)
+      strSeekableOnErrorTokens, stActual)
   Else
     NextNonCommentToken;
   UsesClause;
@@ -1326,7 +1334,8 @@ Begin
     VarSection(scPublic, Nil) Or
     ThreadVarSection(scPublic) Or
     ExportedHeading Or
-    ExportedStmt
+    ExportedStmt Or
+    UndefinedToken
   );
 End;
 
@@ -1365,7 +1374,7 @@ Begin
             ExportedHeadings.Add(M);
           End Else
             ErrorAndSeekToken(strLiteralExpected, 'ExportedHeading', ';',
-              strSeekableOnErrorTokens);
+              strSeekableOnErrorTokens, stFirst);
       End;
   Until M = Nil;
 End;
@@ -1388,7 +1397,7 @@ Procedure TPascalDocModule.ImplementationSection;
 Begin
   If Token.UToken <> 'IMPLEMENTATION' Then
     ErrorAndSeekToken(strReservedWordExpected, 'ImplementationSection',
-      'IMPLEMENTATION', strSeekableOnErrorTokens)
+      'IMPLEMENTATION', strSeekableOnErrorTokens, stActual)
   Else
     NextNonCommentToken;
   UsesClause;
@@ -1416,9 +1425,14 @@ End;
 **)
 procedure TPascalDocModule.Block(Scope : TScope; Method : TMethodDecl);
 
+Var
+  bool : Boolean;
+
 Begin
   DeclSection(Scope, Method);
-  CompoundStmt;
+  bool := CompoundStmt;
+  If Not bool Then
+    AssemblerStatement;
 End;
 
 (**
@@ -1448,7 +1462,7 @@ Begin
         NextNonCommentToken
       Else
         ErrorAndSeekToken(strLiteralExpected, 'ExportedStmt', ';',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stFirst);
     End;
 End;
 
@@ -1494,7 +1508,7 @@ Begin
         End;
     End Else
       ErrorAndSeekToken(strIdentExpected, 'ExportsItem', Token.Token,
-        strSeekableOnErrorTokens);
+        strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -1535,7 +1549,8 @@ Begin
     VarSection(Scope, Method) Or
     ThreadVarSection(Scope) Or
     ProcedureDeclSection(Scope, Method) Or
-    ExportedStmt
+    ExportedStmt Or
+    UndefinedToken
   );
 End;
 
@@ -1564,7 +1579,7 @@ Begin
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'LabelDeclSection', ';',
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stFirst)
       Else
         NextNonCommentToken;
     End;
@@ -1617,7 +1632,7 @@ Begin
           NextNonCommentToken
         Else
           ErrorAndSeekToken(strLiteralExpected, 'ConstSection', ';',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stFirst);
     End;
 End;
 
@@ -1684,10 +1699,10 @@ Begin
               TypedConstant(C, T);
             End Else
               ErrorAndSeekToken(strLiteralExpected, 'ConstantDecl', '=',
-                strSeekableOnErrorTokens);
+                strSeekableOnErrorTokens, stActual);
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'ConstantDecl', '= or :',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -1790,7 +1805,7 @@ Begin
           NextNonCommentToken;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'ResourceStringDecl', '=',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -1841,7 +1856,7 @@ Begin
           NextNonCommentToken
         Else
           ErrorAndSeekToken(strLiteralExpected, 'TypeSection', ';',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stFirst);
     End;
 End;
 
@@ -1850,8 +1865,8 @@ End;
   This method parses a type declaration section from the current token position
   using the following object pascal grammar.
 
-  @grammar TypeDecl -> Ident '=' Type
-                    -> Ident '=' RestrictedType
+  @grammar TypeDecl -> Ident '=' [TYPE] Type
+                    -> Ident '=' [TYPE] RestrictedType
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -1869,7 +1884,7 @@ Var
   Ident : TIdentInfo;
   Ty : TGenericContainer;
   C : TComment;
-  
+
 Begin
   Result := False;
   If Token.TokenType = ttIdentifier Then
@@ -1885,6 +1900,8 @@ Begin
       If Token.Token = '=' Then
         Begin
           NextNonCommentToken;
+          If Token.UToken = 'TYPE' Then
+            NextNonCommentToken;
           Ty := GetTypeDecl;
           If Ty <> Nil Then
             Begin
@@ -1899,11 +1916,11 @@ Begin
               Else
                 Types.Add(Ty);
             End Else
-              ErrorAndSeekToken(strTypeNotFound, 'TypeDecl', '',
-                strSeekableOnErrorTokens);
+              ErrorAndSeekToken(strTypeNotFound, 'TypeDecl', Token.Token,
+                strSeekableOnErrorTokens, stActual);
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'TypeDecl', '=',
-            strSeekableOnErrorTokens)
+            strSeekableOnErrorTokens, stActual)
     End;
 End;
 
@@ -1970,10 +1987,6 @@ End;
 Function TPascalDocModule.ArrayConstant(C : TGenericContainer;
   T : TTypeDecl) : Boolean;
 
-Var
-  A : TArrayType;
-  iDim : Integer;
-
 Begin
   Result := T Is TArrayType;
   If Result Then
@@ -2012,10 +2025,10 @@ Begin
           AddToExpression(C)
         Else
           ErrorAndSeekToken(strLiteralExpected, 'ProcessArrayDimension', ')',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
       End Else
         ErrorAndSeekToken(strLiteralExpected, 'ProcessArrayDimension', '(',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -2047,7 +2060,7 @@ Begin
         AddToExpression(C)
       Else
         ErrorAndSeekToken(strLiteralExpected, 'RecordConstant', ')',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -2121,27 +2134,6 @@ Begin
     Result := VariantType;
   If Result = Nil Then
     Result := ClassRefType;
-  If Result = Nil Then // TypeId here is implement manually
-    If Token.TokenType = ttIdentifier Then
-      Begin
-        NextNonCommentToken;
-        If Not IsKeyWord(Token.Token, strExpressionIndicators) Then
-          Begin
-            Result := TTypeId.Create;
-            SymbolTable.Add(Result);
-            Result.Add(PrevToken.Token);
-            If Token.Token = '.' Then
-              Begin
-                AddToExpression(Result);
-                If Token.TokenType = ttIdentifier Then
-                  AddToExpression(Result)
-                Else
-                  ErrorAndSeekToken(strIdentExpected, 'OPType', Token.Token,
-                    strSeekableOnErrorTokens);
-              End;
-          End Else
-            RollbackToken;
-      End;
   If Result = Nil Then
     Result := SimpleType;
 End;
@@ -2206,7 +2198,7 @@ Begin
   Result.Add('Of');
   If Not TypeId(Result) Then
     ErrorAndSeekToken(strTypeIdExpected, 'PointerType', '',
-      strSeekableOnErrorTokens);
+      strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -2374,12 +2366,11 @@ Begin
       SymbolTable.Add(Result);
       ExprType := [etUnknown, etConstExpr];
       ConstExpr(Result, ExprType);
-      If Token.Token = '..' Then
-        AddToExpression(Result)
-      Else
-        ErrorAndSeekToken(strLiteralExpected, 'SubRange', '..',
-          strSeekableOnErrorTokens);
-      ConstExpr(Result, ExprType);
+      If Token.Token = '..' Then // Handle simple expressions
+        Begin
+          AddToExpression(Result);
+          ConstExpr(Result, ExprType);
+        End;
     End;
 End;
 
@@ -2412,7 +2403,7 @@ Begin
         AddToExpression(Result)
       Else
         ErrorAndSeekToken(strLiteralExpected, 'EnumerateType', ')',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -2445,7 +2436,7 @@ Begin
         End;
     End Else
       ErrorAndSeekToken(strIdentExpected, 'EnumerateElement', Token.Token,
-        strSeekableOnErrorTokens);
+        strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -2482,7 +2473,7 @@ begin
     Begin
       Result.Add('[');
       NextNonCommentToken;
-      ExprType := [etString, etConstExpr];
+      ExprType := [etNumeric, etConstExpr];
       ConstExpr(Result, ExprType);
       If Token.Token = ']' Then
         Begin
@@ -2490,7 +2481,7 @@ begin
           NextNonCommentToken;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'StringType', ']',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -2571,7 +2562,7 @@ Begin
             AddToExpression(Result)
           Else
             ErrorAndSeekToken(strLiteralExpected, 'ArrayType', ']',
-              strSeekableOnErrorTokens);
+              strSeekableOnErrorTokens, stActual);
         End;
       If Token.UToken = 'OF' Then
         Begin
@@ -2584,7 +2575,7 @@ Begin
             End;
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'ArrayType', 'OF',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -2625,7 +2616,7 @@ Begin
         End;
     End Else
       ErrorAndSeekToken(strReservedWordExpected, 'SetType', 'OF',
-        strSeekableOnErrorTokens);
+        strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -2696,7 +2687,7 @@ begin
     NextNonCommentToken
   Else
     ErrorAndSeekToken(strReservedWordExpected, 'RecType', 'END',
-      strSeekableOnErrorTokens);
+      strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -2765,7 +2756,7 @@ Begin
           End;
       End Else
         ErrorAndSeekToken(strLiteralExpected, 'FieldList', ':',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
   Finally
     I.Free;
   End;
@@ -2836,18 +2827,18 @@ Begin
     Until Not IsToken(',', C);
     If Token.Token <> ':' Then
       ErrorAndSeekToken(strLiteralExpected, 'RecVariant', ':',
-        strSeekableOnErrorTokens)
+        strSeekableOnErrorTokens, stActual)
     Else
       NextNonCommentToken;
     If Token.Token <> '(' Then
       ErrorAndSeekToken(strLiteralExpected, 'RecVariant', '(',
-        strSeekableOnErrorTokens)
+        strSeekableOnErrorTokens, stActual)
     Else
       NextNonCommentToken;
     FieldList(Rec);
     If Token.Token <> ')' Then
       ErrorAndSeekToken(strLiteralExpected, 'RecVariant', ')',
-        strSeekableOnErrorTokens)
+        strSeekableOnErrorTokens, stActual)
     Else;
       NextNonCommentToken;
   Finally
@@ -2880,7 +2871,7 @@ Begin
   NextNonCommentToken;
   If Not TypeId(Result) Then
     ErrorAndSeekToken(strTypeIdExpected, 'PointerType', '',
-      strSeekableOnErrorTokens);
+      strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -2927,13 +2918,14 @@ begin
         NextNonCommentToken;
         If Token.UToken <> 'OBJECT' Then
           ErrorAndSeekToken(strReservedWordExpected, 'ProcedureType', 'OBJECT',
-            strSeekableOnErrorTokens)
+            strSeekableOnErrorTokens, stActual)
         Else
           Begin
             boolOfObject := True;
             NextNonCommentToken;
           End;
       End;
+    //: @bug Directive(M);
     Result := TProcedureType.Create;
     SymbolTable.Add(Result);
     Result.Add(M.GetAsString(True, True));
@@ -2989,7 +2981,7 @@ Begin
     Begin
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'VarSection', ';',
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stFirst)
       Else
         NextNonCommentToken;
     End;
@@ -3033,7 +3025,7 @@ Begin
     Begin
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'ThreadVarSection', ';',
-          strSeekableOnErrorTokens)
+          strSeekableOnErrorTokens, stFirst)
       Else
         NextNonCommentToken;
     End;
@@ -3074,7 +3066,7 @@ Begin
   Try
     If Token.Token <> ':' Then
       ErrorAndSeekToken(strLiteralExpected, 'VarDecl', ':',
-        strSeekableOnErrorTokens)
+        strSeekableOnErrorTokens, stActual)
     Else
       Begin
         NextNonCommentToken;
@@ -3112,7 +3104,15 @@ Begin
             V := TVar.Create(I[j].Ident, Scope, I[j].Line, I[j].Col);
             V.Add(':');
             V.Append(T);
-            V.Comment := I[j].Comment;
+            If I[j].Comment <> Nil Then
+              Begin
+                V.Comment := TComment.Create(I[j].Comment); //: @bug Surely I.Comment gets destroyed!
+              End Else
+                If I[0].Comment <> Nil Then
+                  Begin
+                    V.Comment := TComment.Create(I[0].Comment);
+                    V.Comment.AddToken('(Copy)', ttIdentifier);
+                  End;
             VarSection.Add(V);
           End;
         Result := True;
@@ -3125,7 +3125,7 @@ End;
 (**
 
   This method attempts to parse the next series of tokens as an expression.
-  
+
   @grammer Expression -> SimpleExpression [RelOp SimpleExpression]
 
   @precon  None.
@@ -3139,9 +3139,9 @@ Procedure TPascalDocModule.Expression(C : TGenericContainer;
   var ExprType : TExprTypes);
 
 Begin
-  SimpleExpression(C, ExprType);
-  If RelOp(C) Then
+  Repeat
     SimpleExpression(C, ExprType);
+  Until Not RelOp(C);
 End;
 
 (**
@@ -3245,7 +3245,8 @@ Begin
           AddToExpression(C);
         End
       Else If Not (etString In ExprType) Then
-        ErrorAndSeekToken(strExprConflict, 'Factor', '', strSeekableOnErrorTokens)
+        ErrorAndSeekToken(strExprConflict, 'Factor', Token.Token,
+          strSeekableOnErrorTokens, stActual)
       Else
         AddToExpression(C);
     End
@@ -3258,7 +3259,8 @@ Begin
           AddToExpression(C);
         End
       Else If Not (etNumeric In ExprType) Then
-        ErrorAndSeekToken(strExprConflict, 'Factor', '', strSeekableOnErrorTokens)
+        ErrorAndSeekToken(strExprConflict, 'Factor', Token.Token,
+          strSeekableOnErrorTokens, stActual)
       Else
         AddToExpression(C);
     End
@@ -3268,13 +3270,19 @@ Begin
     Begin
       AddToExpression(C);
       SetupSubExprType;
-      Designator(C, SubExprType)
+      Expression(C, SubExprType);
     End
   Else If Token.UToken = 'NOT' Then
     Begin
       AddToExpression(C);
       SetupSubExprType;
-      Factor(C, SubExprType)
+      Factor(C, SubExprType);
+    End
+  Else If Token.UToken = 'INHERITED' Then
+    Begin
+      AddToExpression(C);
+      SetupSubExprType;
+      Designator(C, SubExprType)
     End
   Else If Token.Token = '(' Then
     Begin
@@ -3288,7 +3296,7 @@ Begin
         End
       Else
         ErrorAndSeekToken(strLiteralExpected, 'Factor', ')',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
     End
   Else If SetConstructor(C) Then
     // Do nothing block...
@@ -3393,8 +3401,8 @@ Begin
       If Not (etString In ExprType) Then
         AddToExpression(C)
       Else
-        ErrorAndSeekToken(strExprConflict, 'MulOp', '',
-          strSeekableOnErrorTokens);
+        ErrorAndSeekToken(strExprConflict, 'MulOp', Token.Token,
+          strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -3416,9 +3424,6 @@ End;
 **)
 Procedure TPascalDocModule.Designator(C : TGenericContainer;
   var ExprType : TExprTypes);
-
-Var
-  ET : TExprTypes;
 
 Begin
   If Token.TokenType In [ttIdentifier, ttDirective] Then
@@ -3452,7 +3457,7 @@ Begin
           AddToExpression(C)
         Else
           ErrorAndSeekToken(strIdentExpected, 'DesignatorSubElement', Token.Token,
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
       End
     Else If Token.Token = '[' Then
       Begin
@@ -3462,7 +3467,7 @@ Begin
           AddToExpression(C)
         Else
           ErrorAndSeekToken(strLiteralExpected, 'DesignatorSubElement', ']',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
       End
     Else If Token.Token = '^' Then
       AddToExpression(C)
@@ -3472,7 +3477,7 @@ Begin
           If Not IsKeyWord(PrevToken.Token, strConstExprDesignators) Then
             Begin
               ErrorAndSeekToken(strConstExprDesignator, 'DesignatorSubElement',
-                PrevToken.Token, strSeekableOnErrorTokens);
+                PrevToken.Token, strSeekableOnErrorTokens, stActual);
               Exit;
             End;
         AddToExpression(C);
@@ -3481,7 +3486,7 @@ Begin
           AddToExpression(C)
         Else
           ErrorAndSeekToken(strLiteralExpected, 'DesignatorSubElement', ')',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
       End;
 End;
 
@@ -3529,8 +3534,8 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  ExprType := [etUnknown];
   Repeat
+    ExprType := [etUnknown];
     Expression(C, ExprType);
   Until Not (IsToken('..', C) Or IsToken(',', C));
 End;
@@ -3646,9 +3651,9 @@ Begin
             NextNonCommentToken
           Else
             ErrorAndSeekToken(strLiteralExpected, 'SimpleStatement', ')',
-              strSeekableOnErrorTokens);
+              strSeekableOnErrorTokens, stActual);
           DesignatorSubElement(Nil, ExprType, ['.']);
-        End Else
+        End;
       If Token.Token = ':=' Then
         Begin
           NextNonCommentToken;
@@ -3715,7 +3720,7 @@ begin
         NextNonCommentToken
       Else
         ErrorAndSeekToken(strReservedWordExpected, 'CompoundStmt', 'END',
-          ['end']{strSeekableOnErrorTokens});
+          ['end']{strSeekableOnErrorTokens}, stActual);
     End;
 end;
 
@@ -3773,7 +3778,7 @@ Begin
             End;
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'IfStmt', 'THEN',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -3810,18 +3815,16 @@ Begin
           If Token.UToken = 'ELSE' Then
             Begin
               NextNonCommentToken;
-              Statement;
-              If Token.Token = ';' Then
-                NextNonCommentToken;
-            End;
+              StmtList;
+             End;
           If Token.UToken = 'END' Then
             NextNonCommentToken
           Else
             ErrorAndSeekToken(strReservedWordExpected, 'CaseStmt', 'END',
-              strSeekableOnErrorTokens);
+              strSeekableOnErrorTokens, stActual);
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'CaseStmt', 'OF',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -3850,7 +3853,7 @@ Begin
     End Else
       If Not IsKeyWord(Token.Token, ['else', 'end']) Then
         ErrorAndSeekToken(strLiteralExpected, 'CaseSelector', ':',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -3929,7 +3932,7 @@ Begin
         End
       Else
         ErrorAndSeekToken(strReservedWordExpected, 'RepeatStmt', 'UNTIL',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -3963,7 +3966,7 @@ Begin
           Statement;
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'WhileStmt', 'DO',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -4007,16 +4010,16 @@ Begin
                       Statement;
                     End Else
                       ErrorAndSeekToken(strReservedWordExpected, 'ForStmt', 'DO',
-                        strSeekableOnErrorTokens);
+                        strSeekableOnErrorTokens, stActual);
                 End Else
                   ErrorAndSeekToken(strReservedWordExpected, 'ForStmt',
-                    'TO or DOWNTO', strSeekableOnErrorTokens);
+                    'TO or DOWNTO', strSeekableOnErrorTokens, stActual);
             End Else
               ErrorAndSeekToken(strLiteralExpected, 'ForStmt', ':=',
-                strSeekableOnErrorTokens);
+                strSeekableOnErrorTokens, stActual);
         End Else
           ErrorAndSeekToken(strIdentExpected, 'ForStmt', Token.Token,
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -4046,7 +4049,7 @@ Begin
           Statement;
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'WithStmt', 'DO',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -4100,10 +4103,10 @@ Begin
             NextNonCommentToken
           Else
             ErrorAndSeekToken(strReservedWordExpected, 'TryExceptAndFinallyStmt',
-              'END', strSeekableOnErrorTokens);
+              'END', strSeekableOnErrorTokens, stActual);
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'TryExceptAndFinallyStmt',
-            'EXCEPT or FINALLY', strSeekableOnErrorTokens);
+            'EXCEPT or FINALLY', strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -4157,10 +4160,10 @@ Begin
                   End;
                 End Else
                   ErrorAndSeekToken(strReservedWordExpected, 'ExceptionBlock', 'DO',
-                    strSeekableOnErrorTokens);
+                    strSeekableOnErrorTokens, stActual);
               End Else
                 ErrorAndSeekToken(strLiteralExpected, 'ExceptionBlock', ';',
-                  strSeekableOnErrorTokens);
+                  strSeekableOnErrorTokens, stActual);
       Finally
         C.Free;
       End;
@@ -4194,7 +4197,7 @@ Begin
             NextNonCommentToken
           Else
             ErrorAndSeekToken(strNumberExpected, 'RaiseStmt', '',
-              strSeekableOnErrorTokens);
+              strSeekableOnErrorTokens, stActual);
         End;
     End;
 End;
@@ -4296,7 +4299,7 @@ Begin
               NextNonCommentToken
             Else
               ErrorAndSeekToken(strLiteralExpected, 'ProcedureDeclSection', ';',
-                StrSeekableOnErrorTokens);
+                strSeekableOnErrorTokens, stActual);
           End;
       End;
   Until M = Nil;
@@ -4431,7 +4434,7 @@ Begin
           Result.ClsName := Result.Identifier;
           If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
             ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
-              strSeekableOnErrorTokens);
+              strSeekableOnErrorTokens, stActual);
           Result.Identifier := Token.Token;
           NextNonCommentToken;
         End;
@@ -4452,7 +4455,7 @@ Begin
         End;
     End Else
       ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
-        strSeekableOnErrorTokens);
+        strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -4484,7 +4487,7 @@ Begin
         NextNonCommentToken
       Else
         ErrorAndSeekToken(strLiteralExpected, 'FormalParameters', ')',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
   End;
 End;
 
@@ -4569,9 +4572,16 @@ Begin
                 NextNonCommentToken;
               End Else
                 ErrorAndSeekToken(strReservedWordExpected, 'FormalParameter', 'OF',
-                  strSeekableOnErrorTokens);
+                  strSeekableOnErrorTokens, stActual);
           End;
         T := GetTypeDecl;
+        If T = Nil Then
+          If Token.UToken = 'CONST' Then
+            Begin
+              T := TTypeDecl.Create(Token.Token, scPrivate, Token.Line,
+                Token.Column);
+              NextNonCommentToken;
+            End;
         // Get default value
         If Token.Token = '=' Then
           Begin
@@ -4587,7 +4597,7 @@ Begin
       End;
     // Create the parameters using the ident list
     For j := 0 To I.Count - 1 Do
-      Method.Add(TParameter.Create(ParamMod, I[j].Ident, boolArrayOf, T,
+      Method.Parameters.Add(TParameter.Create(ParamMod, I[j].Ident, boolArrayOf, T,
         strValue, scPublic, I[j].Line, I[j].Col));
   Finally
     I.Free;
@@ -4656,17 +4666,23 @@ Begin
       If Token.UToken = 'DISPID' Then
         Begin
           NextNonCommentToken;
-          M.AddDirectives(Token.Token);
-          NextNonCommentToken;
+          If Token.Token = '-' Then
+            Begin
+              M.AddDirectives(Token.Token);
+              NextNonCommentToken;
+            End;
+          If Token.TokenType = ttNumber Then
+            M.AddDirectives(Token.Token)
+          Else
+            ErrorAndSeekToken(strNumberExpected, 'Directive', Token.Token,
+              strSeekableOnErrorTokens, stActual);
         End;
       NextNonCommentToken;
-      If Token.Token <> ';' Then
-        Begin
-          ErrorAndSeekToken(strLiteralExpected, 'Directive', ';',
-            strSeekableOnErrorTokens);
-          Exit;
-        End Else
-          NextNonCommentToken;
+      If Token.Token = ';' Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strLiteralExpected, 'Directive', ';',
+          strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -4717,7 +4733,7 @@ begin
     NextNonCommentToken
   Else
     ErrorAndSeekToken(strReservedWordExpected, 'ObjectType', 'END',
-      strSeekableOnErrorTokens);
+      strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -4747,10 +4763,10 @@ begin
             NextNonCommentToken
           Else
             ErrorAndSeekToken(strLiteralExpected, 'ObjHeritage', ')',
-              strSeekableOnErrorTokens);
+              strSeekableOnErrorTokens, stActual);
         End Else
             ErrorAndSeekToken(strIdentExpected, 'ObjHeritage', Token.Token,
-              strSeekableOnErrorTokens);
+              strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -4829,7 +4845,7 @@ begin
           Cls.Methods.Add(M);
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'ExportedHeading', ';',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End Else
       If boolClassMethod Then
         RollBackToken;
@@ -4915,7 +4931,7 @@ begin
           End;
       End Else
         ErrorAndSeekToken(strLiteralExpected, 'ObjFieldList', ':',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
   Finally
     I.Free;
   End;
@@ -4948,12 +4964,12 @@ Begin
           FinalComment := GetComment;
           NextNonCommentToken;
           StmtList;
-          If Token.UToken = 'END' Then
-            NextNonCommentToken
-          Else
-            ErrorAndSeekToken(strReservedWordExpected, 'Initsection',
-              'END', strSeekableOnErrorTokens);
         End;
+      If Token.UToken = 'END' Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strReservedWordExpected, 'Initsection',
+          'END', strSeekableOnErrorTokens, stActual);
     End
   Else If Token.UToken = 'BEGIN' Then
     CompoundStmt
@@ -4961,7 +4977,7 @@ Begin
     NextNonCommentToken
   Else
     ErrorAndSeekToken(strReservedWordExpected, 'Initsection',
-      'INITIALIZATION, BEGIN or END', strSeekableOnErrorTokens);
+      'INITIALIZATION, BEGIN or END', strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -5023,7 +5039,7 @@ begin
     NextNonCommentToken
   Else
     ErrorAndSeekToken(strReservedWordExpected, 'ClassType', 'END',
-      strSeekableOnErrorTokens);
+      strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -5058,7 +5074,7 @@ begin
         NextNonCommentToken
       Else
         ErrorAndSeekToken(strLiteralExpected, 'ClassHeritage', ')',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -5171,7 +5187,7 @@ Begin
     NextNonCommentToken
   Else
     ErrorAndSeekToken(strLiteralExpected, 'ClassPropertyList', ';',
-      strSeekableOnErrorTokens);
+      strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -5206,14 +5222,14 @@ begin
   If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
       P := TProperty.Create(Token.Token, Scope, Token.Line, Token.Column);
-      Cls.AddProperty(P);
+      Cls.Properties.Add(P);
       P.Comment := C;
       NextNonCommentToken;
       PropertyInterface(P);
       PropertySpecifiers(P);
     End Else
       ErrorAndSeekToken(strIdentExpected, 'PropertyList', Token.Token,
-        strSeekableOnErrorTokens);
+        strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -5285,11 +5301,11 @@ Begin
               NextNonCommentToken;
               T := GetTypeDecl;
               For j := 0 To I.Count - 1 Do
-                Prop.AddParameter(TParameter.Create(ParamMod, I[j].Ident, False,
+                Prop.Parameters.Add(TParameter.Create(ParamMod, I[j].Ident, False,
                   T, '', scPublic, I[j].Line, I[j].Col));
             End Else
               ErrorAndSeekToken(strLiteralExpected, 'PropertyParameterList', ':',
-                strSeekableOnErrorTokens);
+                strSeekableOnErrorTokens, stActual);
         Finally
           I.Free;
         End;
@@ -5298,7 +5314,7 @@ Begin
         NextNonCommentToken
       Else
         ErrorAndSeekToken(strLiteralExpected, 'PropertyParameterList', ']',
-          strSeekableOnErrorTokens);
+          strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -5473,10 +5489,10 @@ begin
             NextNonCommentToken
           Else
             ErrorAndSeekToken(strLiteralExpected, 'InterfaceType', ']',
-              strSeekableOnErrorTokens);
+              strSeekableOnErrorTokens, stActual);
         End Else
           ErrorAndSeekToken(strStringExpected, 'InterfaceType', '',
-            strSeekableOnErrorTokens);
+            strSeekableOnErrorTokens, stActual);
     End;
   Repeat
     ClassVisibility(InternalScope);
@@ -5491,7 +5507,7 @@ begin
     NextNonCommentToken
   Else
     ErrorAndSeekToken(strReservedWordExpected, 'InterfaceType', 'END',
-      strSeekableOnErrorTokens);
+      strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -5537,7 +5553,7 @@ Begin
   Requires.Comment := Comment;
   If Token.Token <> ';' Then
     ErrorAndSeekToken(strLiteralExpected, 'RequiresClause', ';',
-      strSeekableOnErrorTokens);
+      strSeekableOnErrorTokens, stActual);
   NextNonCommentToken;
 End;
 
@@ -5566,7 +5582,7 @@ Begin
   Contains.Comment := Comment;
   If Token.Token <> ';' Then
     ErrorAndSeekToken(strLiteralExpected, 'ContainsClause', ';',
-      strSeekableOnErrorTokens);
+      strSeekableOnErrorTokens, stActual);
   NextNonCommentToken;
 End;
 
@@ -5606,7 +5622,7 @@ Begin
         NextNonCommentToken;
         If Token.TokenType <> ttStringLiteral Then
           ErrorAndSeekToken(strStringExpected, 'IdentList', Token.Token,
-            SeekTokens)
+            SeekTokens, stActual)
         Else
           NextNonCommentToken;
       End;
@@ -5641,7 +5657,7 @@ Begin
             AddToExpression(C)
           Else
             ErrorAndSeekToken(strIdentExpected, 'TypeId', Token.Token,
-              strSeekableOnErrorTokens);
+              strSeekableOnErrorTokens, stActual);
         End;
     End;
 End;
@@ -5667,6 +5683,19 @@ Function TPascalDocModule.ConstExpr(C : TGenericContainer;
 Begin
   Result := True;
   Expression(C, ExprType); // ConstExpr is a subset of Expression
+End;
+
+Function TPascalDocModule.UndefinedToken : Boolean;
+
+Begin
+  Result := Not IsKeyWord(Token.Token, strReservedWords);
+  If Result Then
+    Begin
+      ErrorAndSeekToken(strUndefinedToken, 'UndefinedToken', Token.Token,
+        strSeekableOnErrorTokens, stActual);
+      If Token.Token = ';' Then
+        NextNonCommentToken;
+    End;
 End;
 
 { TPascalDocModuleList }

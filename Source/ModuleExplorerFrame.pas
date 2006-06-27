@@ -989,15 +989,15 @@ Var
   j : Integer;
 
 begin
-  If Cls.ParameterCount > 0 Then
+  If Cls.Parameters.Count > 0 Then
     Begin
-      For j := 0 To Cls.ParameterCount - 1 Do
-        If IsInOptions(Cls.Parameter[j].Scope) Then
+      For j := 0 To Cls.Parameters.Count - 1 Do
+        If IsInOptions(Cls.Parameters[j].Scope) Then
           Begin
-            F := AddNode(S, Cls.Parameter[j].Identifier + ' : ' +
-              Cls.Parameter[j].ParamType.AsString(True), Cls.Parameter[j].Line,
-                Cls.Parameter[j].Col, -1, Cls.Parameter[j].Comment);
-            SetNodeIcon(Cls.Parameter[j].Scope, iField, F);
+            F := AddNode(S, Cls.Parameters[j].Identifier + ' : ' +
+              Cls.Parameters[j].ParamType.AsString(True), Cls.Parameters[j].Line,
+                Cls.Parameters[j].Col, -1, Cls.Parameters[j].Comment);
+            SetNodeIcon(Cls.Parameters[j].Scope, iField, F);
           End;
     End;
 end;
@@ -1024,9 +1024,9 @@ Var
   j : Integer;
 
 begin
-  If Cls.PropertyCount > 0 Then
+  If Cls.Properties.Count > 0 Then
     Begin
-      For j := 0 To Cls.PropertyCount - 1 Do
+      For j := 0 To Cls.Properties.Count - 1 Do
         If IsInOptions(Cls.Properties[j].Scope) Then
           Begin
             F := AddNode(S, Cls.Properties[j].AsString, Cls.Properties[j].Line,

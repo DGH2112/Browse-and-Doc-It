@@ -15,7 +15,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, SynEditHighlighter, SynHighlighterPas, SynEdit, ExtCtrls,
-  ModuleExplorerFrame, BaseLanguageModule, StdCtrls, FileCtrl, ComCtrls;
+  ModuleExplorerFrame, BaseLanguageModule, StdCtrls, FileCtrl, ComCtrls,
+  Menus, StdActns, ActnList, ProgressForm;
 
 type
   (** This is thre class that defined the main interface form. **)
@@ -28,10 +29,24 @@ type
     CheckBox1: TCheckBox;
     Panel3: TPanel;
     Splitter1: TSplitter;
-    DirectoryListBox1: TDirectoryListBox;
-    DriveComboBox1: TDriveComboBox;
     btnQuit: TButton;
     lvFileList: TListView;
+    edtDirectory: TEdit;
+    btnDirectory: TButton;
+    PopupMenu1: TPopupMenu;
+    ActionList1: TActionList;
+    EditCut1: TEditCut;
+    EditCopy1: TEditCopy;
+    EditPaste1: TEditPaste;
+    EditSelectAll1: TEditSelectAll;
+    EditUndo1: TEditUndo;
+    EditDelete1: TEditDelete;
+    Undo1: TMenuItem;
+    Cut1: TMenuItem;
+    Copy1: TMenuItem;
+    Paste1: TMenuItem;
+    Delete1: TMenuItem;
+    SelectAll1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
@@ -44,12 +59,20 @@ type
     procedure FileListClick(Sender: TObject);
     procedure btnQuitClick(Sender: TObject);
     procedure DirectoryListBox1Change(Sender: TObject);
+    procedure btnDirectoryClick(Sender: TObject);
   private
     { Private declarations }
     FModuleExplorerFrame : TframeModuleExplorer;
     FDocOptions : TDocOptions;
+    FDirectory : String;
+    FFileName : String;
+    FProgressForm : TfrmProgress;
     function GetFileName: String;
+    procedure SetDirectory(const Value: String);
     procedure SetFileName(const Value: String);
+    Function GetErrors(strFileName : String) : Integer;
+    Procedure RecurseDirectories(strDirectory : String);
+    property Directory : String Read FDirectory Write SetDirectory;
     Property FileName : String Read GetFileName Write SetFileName;
   public
     { Public declarations }
@@ -146,43 +169,66 @@ end;
 **)
 procedure TfrmBrowseAndDocItTestForm.DirectoryListBox1Change(Sender: TObject);
 
+begin
+  lvFileList.Items.Clear;
+  FProgressForm.Init(1, 'Scanning Directories', 'Please wait...');
+  RecurseDirectories(FDirectory);
+  FProgressForm.Hide;
+end;
+
+Procedure TfrmBrowseAndDocItTestForm.RecurseDirectories(strDirectory : String);
+
 Var
   recFile : TSearchRec;
   iResult : Integer;
   liItem : TListItem;
-  Source : TFileStream;
-  M : TPascalDocModule;
 
-begin
-  lvFileList.Items.Clear;
-  iResult := FindFirst(DirectoryListBox1.Directory + '\*.pas', faAnyFile, recFile);
+Begin
+  iResult := FindFirst(strDirectory + '\*.*', faAnyFile, recFile);
   Try
     While iResult = 0 Do
       Begin
-        liItem := lvFileList.Items.Add;
-        liItem.Caption := recFile.Name;
-        Source := TFileStream.Create(DirectoryListBox1.Directory + '\' +
-          recFile.Name, fmOpenRead);
-        Try
-          Source.Position := 0;
-          M := TPascalDocModule.Create(Source,
-            DirectoryListBox1.Directory + '\' + recFile.Name, False,
-            [moParse], FDocOptions);
-          Try
-            liItem.SubItems.Add(Format('%d', [M.Errors.Count]));
+        If IsKeyWord(ExtractFileExt(recFile.Name), ['.dpk', '.dpr', '.pas']) Then
+          Begin
+            FProgressForm.UpdateProgress(0, 'Scanning: ' +
+              Copy(strDirectory + '\' + recFile.Name, Length(FDirectory) + 1, 255) + '...');
+            liItem := lvFileList.Items.Add;
+            liItem.Caption := recFile.Name;
+            liItem.SubItems.Add(Format('%d', [
+              GetErrors(strDirectory + '\' + recFile.Name)]));
+            liItem.SubItems.Add(strDirectory + '\' + recFile.Name);
             Application.ProcessMessages;
-          Finally
-            M.Free;
           End;
-        Finally
-          Source.Free;
-        End;
+        If (recFile.Attr And faDirectory <> 0) And (recFile.Name[1] <> '.') Then
+          RecurseDirectories(strDirectory + '\' + recFile.Name);
         iResult := FindNext(recFile);
       End;
   Finally
     FindClose(recFile);
   End;
-end;
+End;
+
+Function TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String) : Integer;
+
+Var
+  Source : TFileStream;
+  M : TPascalDocModule;
+
+Begin
+  Source := TFileStream.Create(strFileName, fmOpenRead);
+  Try
+    Source.Position := 0;
+    M := TPascalDocModule.Create(Source, strFileName, False,
+      [moParse], FDocOptions);
+    Try
+      Result := M.Errors.Count;
+    Finally
+      M.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+End;
 
 (**
 
@@ -195,13 +241,18 @@ end;
 
 **)
 procedure TfrmBrowseAndDocItTestForm.FileListClick(Sender: TObject);
+
+Var
+  boolCanClose :Boolean;
+
 begin
+  FormCloseQuery(Self, boolCanClose);
   If lvFileList.Selected <> Nil Then
-    If FileExists(lvFileList.Selected.Caption) Then
-      FileName := lvFileList.Selected.Caption
+    If FileExists(lvFileList.Selected.SubItems[1]) Then
+      FileName := lvFileList.Selected.SubItems[1]
     Else
       MessageDlg(Format('The file "%s" was not found.',
-        [lvFileList.Selected.Caption]), mtError, [mbOK], 0);
+        [lvFileList.Selected.SubItems[1]]), mtError, [mbOK], 0);
 end;
 
 (**
@@ -223,9 +274,9 @@ Const
 
 begin
   If SynEdit1.Modified Then
-    Case MessageDlg(Format(strMsg, [FileName]), mtConfirmation,
+    Case MessageDlg(Format(strMsg, [FFileName]), mtConfirmation,
       [mbYes, mbNo, mbCancel], 0) Of
-      mrYes: SynEdit1.Lines.SaveToFile(FileName);
+      mrYes: SynEdit1.Lines.SaveToFile(FFileName);
       mrCancel: CanClose := False;
     End;
 end;
@@ -247,6 +298,7 @@ Var
   i : TDocOption;
 
 begin
+  FProgressForm := TfrmProgress.Create(Nil);
   For i := Low(TDocOption) To High(TDocOption) Do
     Include(FDocOptions, i);
   SpecialTags := TStringList.Create;
@@ -260,6 +312,8 @@ begin
       Left := ReadInteger(strRegRootKey + 'Position', 'Left', Left);
       Height := ReadInteger(strRegRootKey + 'Position', 'Height', Height);
       Width := ReadInteger(strRegRootKey + 'Position', 'Width', Width);
+      Panel1.Width := ReadInteger(strRegRootKey + 'Position', 'Splitter', Panel1.Width);
+      Directory := ReadString(strRegRootKey + 'Position', 'Directory', GetCurrentDir);
     Finally
       Free;
     End;
@@ -287,11 +341,14 @@ begin
       WriteInteger(strRegRootKey + 'Position', 'Left', Left);
       WriteInteger(strRegRootKey + 'Position', 'Height', Height);
       WriteInteger(strRegRootKey + 'Position', 'Width', Width);
+      WriteInteger(strRegRootKey + 'Position', 'Splitter', Panel1.Width);
+      WriteString(strRegRootKey + 'Position', 'Directory', Directory);
     Finally
       Free;
     End;
   FModuleExplorerFrame.Free;
   SpecialTags.Free;
+  FProgressForm.Free;
 end;
 
 (**
@@ -307,8 +364,7 @@ end;
 **)
 function TfrmBrowseAndDocItTestForm.GetFileName: String;
 begin
-  If lvFileList.Selected <> Nil Then
-    Result := lvFileList.Selected.Caption;
+  Result := FFileName;
 end;
 
 (**
@@ -345,7 +401,9 @@ end;
 **)
 procedure TfrmBrowseAndDocItTestForm.SetFileName(const Value: String);
 begin
-  SynEdit1.Lines.LoadFromFile(FileName);
+  FFileName := Value;
+  Caption := FFileName;
+  SynEdit1.Lines.LoadFromFile(FFileName);
   Synedit1.Modified := False;
   SynEdit1Change(Self);
 end;
@@ -399,6 +457,25 @@ procedure TfrmBrowseAndDocItTestForm.SynEdit1StatusChange(Sender: TObject;
 begin
   Panel2.Caption := Format('Line %d, Column %d', [SynEdit1.CaretY, SynEdit1.CaretX]);
 end;
+
+procedure TfrmBrowseAndDocItTestForm.btnDirectoryClick(Sender: TObject);
+
+Var
+  FDir : String;
+
+begin
+  FDir := Directory;
+  If SelectDirectory(FDir, [], 0) Then
+    Directory := FDir;
+end;
+
+procedure TfrmbrowseAndDocItTestForm.SetDirectory(Const Value : String);
+begin
+  FDirectory := Value;
+  edtDirectory.Text := FDirectory;
+  DirectoryListBox1Change(Self);
+end;
+
 
 end.
 

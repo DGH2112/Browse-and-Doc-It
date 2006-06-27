@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    24 Jun 2006
+  @Date    27 Jun 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -167,6 +167,7 @@ Type
     Function GetLine : Integer;
     Function GetCol : Integer;
   Public
+    Constructor Create(srcComment : TComment); Overload;
     Constructor Create(strComment : String; iLine, iCol : Integer); Overload;
     Destructor Destroy; Override;
     Class Function CreateComment(strComment : String; iLine, iCol : Integer) : TComment;
@@ -526,6 +527,29 @@ Type
     Property Col : Integer Read FCol;
   End;
 
+  TParameterCollection = Class
+  Private
+    FParameters : TObjectList;
+    Function GetParameter(iIndex : Integer) : TParameter;
+    Function GetCount : Integer;
+  Public
+    Constructor Create;
+    Destructor Destroy; Override;
+    Procedure Add(Parameter : TParameter);
+    Procedure Sort;
+    (**
+      Returns the specifically indexed parameter of the method.
+      @param   iIndex as       an Integer
+      @return  a TParameter
+    **)
+    Property Parameter[iIndex : Integer] : TParameter Read GetParameter; Default;
+    (**
+      Returns the number of parameter the method has.
+      @return  an Integer
+    **)
+    Property Count : Integer Read GetCount;
+  End;
+
   (** This is a forward declaration so that a method declaration can contain
   other methods. **)
   TMethodCollection = Class;
@@ -537,7 +561,7 @@ Type
     FMethodType : TMethodType;
     FClsName : String;
     FIdentifier : String;
-    FParameter : TObjectList;
+    FParameters : TParameterCollection;
     FReturnType : String;
     FDirectives : TStringList;
     FScope : TScope;
@@ -554,8 +578,6 @@ Type
     FAlias: String;
     Procedure SetClsName(Value : String);
     Procedure SetIdentifier(Value : String);
-    Function GetParameter(iIndex : Integer) : TParameter;
-    Function GetCount : Integer;
     Procedure SetReturnType(Value : String);
     procedure SetMsg(const Value: String);
     procedure SetExt(const Value: String);
@@ -564,7 +586,6 @@ Type
     Constructor Create(MethodType : TMethodType; Scope : TScope;
       iLine, iCol : Integer);
     Destructor Destroy; Override;
-    Procedure Add(Parameter : TParameter);
     Procedure AddDirectives(strDirective : String);
     Function GetAsString(ShowClassName, ShowMethodType : Boolean): String;
     Function HasDirective(strDirective : String) : Boolean;
@@ -589,17 +610,7 @@ Type
       @return  a String
     **)
     Property Identifier : String Read FIdentifier Write SetIdentifier;
-    (**
-      Returns the specifically indexed parameter of the method.
-      @param   iIndex as       an Integer
-      @return  a TParameter
-    **)
-    Property Parameter[iIndex : Integer] : TParameter Read GetParameter; Default;
-    (**
-      Returns the number of parameter the method has.
-      @return  an Integer
-    **)
-    Property ParameterCount : Integer Read GetCount;
+    Property Parameters : TParameterCollection Read FParameters;
     (**
       Returns the return type of the method if it is a function.
       @return  a String
@@ -707,7 +718,7 @@ Type
   (** This is a class that represents properties of a class or interface. **)
   TProperty = Class
   Private
-    FParameter : TObjectList;
+    FParameters : TParameterCollection;
     FIdentifier : String;
     FTypeId : String;
     FIndexSpec : String;
@@ -725,7 +736,6 @@ Type
     FReadOnlySpec: Boolean;
     FWriteOnlySpec: Boolean;
     Function GetAsString : String;
-    function GetParameter(iIndex: Integer): TParameter;
     procedure SetDefaultSpec(const Value: String);
     procedure SetImplementsSpec(const Value: String);
     procedure SetIndexSpec(const Value: String);
@@ -733,12 +743,10 @@ Type
     procedure SetStoredSpec(const Value: String);
     procedure SetTypeId(const Value: String);
     procedure SetWriteSpec(const Value: String);
-    function GetParameterCount: Integer;
     procedure SetDefaultProperty(const Value: Boolean);
   Public
     Constructor Create(strIdent : String; Scope : TScope; iLine, iCol : Integer);
     Destructor Destroy; Override;
-    Procedure AddParameter(Parameter : TParameter);
     Procedure Assign(Prop : TProperty);
     (**
       Returns the identifier of the property.
@@ -750,12 +758,7 @@ Type
       @param   iIndex as       an Integer
       @return  a TParameter
     **)
-    Property Parameter[iIndex : Integer] : TParameter Read GetParameter;
-    (**
-      Returns the number of parameter the property has.
-      @return  an Integer
-    **)
-    Property ParameterCount : Integer Read GetParameterCount;
+    Property Parameters : TParameterCollection Read FParameters;
     (**
       Returns the type identifier of the property.
       @return  a String
@@ -840,13 +843,34 @@ Type
     Property WriteOnlySpec : Boolean Read FWriteOnlySpec Write FWriteOnlySpec;
   End;
 
+  TPropertyCollection = Class
+  Private
+    FProperties : TObjectList;
+    Function GetProperty(iIndex : Integer) : TProperty;
+    Function GetCount : Integer;
+  Public
+    Constructor Create;
+    Destructor Destroy; Override;
+    Procedure Add(Prop : TProperty);
+    Procedure Sort;
+    (**
+      Returns the indexed property for the class.
+      @param   iIndex as       an Integer
+      @return  a TProperty
+    **)
+    Property Properties[iIndex : Integer] : TProperty Read GetProperty; Default;
+    (**
+      Returns the number of properties in the classes properties collection.
+      @return  an Integer
+    **)
+    Property Count : Integer Read GetCount;
+  End;
+
   (** This is a class that represents a record definition. **)
   TRecordDecl = Class(TRestrictedType)
   Private
     FPacked : Boolean;
-    FParameter : TObjectList;
-    Function GetParameter(iIndex : Integer) : TParameter;
-    Function GetParameterCount : Integer;
+    FParameters : TParameterCollection;
   Public
     Constructor Create; Override;
     Destructor Destroy; Override;
@@ -858,12 +882,7 @@ Type
       @param   iIndex as       an Integer
       @return  a TParameter
     **)
-    Property Parameter[iIndex : Integer] : TParameter Read GetParameter;
-    (**
-      Returns the number of parameter (fields) in the record.
-      @return  an Integer
-    **)
-    Property ParameterCount : Integer Read GetParameterCount;
+    Property Parameters : TParameterCollection Read FParameters;
     (**
       Returns whether the record is packed or not.
       @return  a Boolean
@@ -895,29 +914,16 @@ Type
   definition **)
   TClassDecl = Class(TObjectDecl)
   Private
-    FProperty : TObjectList;
+    FProperties : TPropertyCollection;
     FAbstractClass: Boolean;
-    Function GetProperty(iIndex : Integer) : TProperty;
-    Function GetPropertyCount : Integer;
   Public
     Constructor Create; Override;
     Destructor Destroy; Override;
-    Procedure AddProperty(Prop : TProperty);
     Function AsString(ShowFirstToken : Boolean) : String; Override;
     Procedure Assign(AObject : TObjectDecl); Override;
     Procedure Sort; Override;
-    (**
-      Returns the indexed property for the class.
-      @param   iIndex as       an Integer
-      @return  a TProperty
-    **)
-    Property Properties[iIndex : Integer] : TProperty Read GetProperty;
-    (**
-      Returns the number of properties in the classes properties collection.
-      @return  an Integer
-    **)
-    Property PropertyCount : Integer Read GetPropertyCount;
     Property AbstractClass : Boolean Read FAbstractClass Write FAbstractClass;
+    Property properties : TPropertyCollection Read FProperties;
   End;
 
   (** This is a class the extends the class definition to handle an interface
@@ -1715,6 +1721,7 @@ ResourceString
       Package, Unit or Library. **)
   strModuleKeyWordNotfound = 'Module starting keyword PROGRAM, PACKAGE, UNIT ' +
     'or LIBRARY not found.';
+  strUnDefinedToken = 'The token "%s" at line %d column %d is not defined.';
 
 Const
   (** A set of characters for alpha characaters **)
@@ -3214,6 +3221,19 @@ begin
   Result := Result + str;
 end;
 
+Constructor TComment.Create(srcComment : TComment);
+
+Begin
+  Inherited Create;
+  FLastTag := Nil;
+  FTokens := TStringList.Create;
+  FTags := TObjectList.Create(True);
+  FTagMode := False;
+  FLine := srcComment.Line;
+  FCol := srcComment.Col;
+  Assign(srcComment);
+End;
+
 (**
 
   This is the TComment constructor. It create a token list and a tag list.
@@ -3638,7 +3658,7 @@ Constructor TIdentList.Create;
 Begin
   Inherited Create;
   FComment := Nil;
-  FIdents := TObjectList.Create;
+  FIdents := TObjectList.Create(True);
 End;
 
 (**
@@ -4134,7 +4154,7 @@ Begin
     Begin
       If Items[i] is TClassDecl Then
         With Items[i] As TClassDecl Do
-          If Heritage.Count + ParameterCount + PropertyCount + Methods.Count = 0 Then
+          If Heritage.Count + Parameters.Count + Properties.Count + Methods.Count = 0 Then
             FItems.Delete(i);
     End;
 End;
@@ -4183,7 +4203,7 @@ begin
   Result := -1;
   For i := 0 To Count - 1 Do
     If FItems[i] Is TObjectDecl Then
-      If strClassName = (FItems[i] As TObjectDecl).Identifier Then
+      If AnsiCompareText(strClassName, (FItems[i] As TObjectDecl).Identifier) = 0 Then
         Begin
           Result := i;
           Exit;
@@ -4280,26 +4300,79 @@ begin
   inherited;
 end;
 
+(**
+
+  This method adds a parameter class to the parameters collection.
+
+  @precon  Paremeter is a parameter to add to the method.
+  @postcon Adds a parameter class to the parameters collection.
+
+  @param   Parameter as a TParameter
+
+**)
+Procedure TParameterCollection.Add(Parameter : TParameter);
+
+Begin
+  FParameters.Add(Parameter);
+End;
+
+(**
+
+  This is a getter method for the Count property.
+
+  @precon  None.
+  @postcon Returns the number of parameters in the method.
+
+  @return  an Integer
+
+**)
+Function TParameterCollection.GetCount : Integer;
+
+Begin
+  Result := FParameters.Count;
+End;
+
+(**
+
+  This is a getter method for the Parameter array property.
+
+  @precon  iIndex is th eindex of the parameter required.
+  @postcon Returns a paramemter object for the specified item.
+
+  @param   iIndex as an Integer
+  @return  a TParameter
+
+**)
+Function TParameterCollection.GetParameter(iIndex : Integer) : TParameter;
+
+Begin
+  Result := FParameters[iIndex] As TParameter;
+End;
+
+Constructor TParameterCollection.Create;
+
+Begin
+  FParameters := TObjectList.Create(True);
+End;
+
+Destructor TParameterCollection.Destroy;
+
+Begin
+  FParameters.Free;
+  Inherited;
+End;
+
+Procedure TParameterCollection.Sort;
+
+Begin
+  FParameters.Sort(SortRecordDecl);
+End;
+
 (** --------------------------------------------------------------------------
 
   TProperty Methods
 
  -------------------------------------------------------------------------- **)
-
-(**
-
-  This method adds a parameter to the parameter collection.
-
-  @precon  Parameter is a parameter to be added to the property.
-  @postcon Adds a parameter to the parameter collection.
-
-  @param   Parameter as a TParameter
-
-**)
-procedure TProperty.AddParameter(Parameter: TParameter);
-begin
-  FParameter.Add(Parameter);
-end;
 
 (**
 
@@ -4329,11 +4402,11 @@ begin
   FImplementsSpec := Prop.ImplementsSpec;
   FIndexSpec := Prop.IndexSpec;
   FLine := Prop.Line;
-  For i := 0 To Prop.ParameterCount - 1 Do
+  For i := 0 To Prop.Parameters.Count - 1 Do
     Begin
       P := TParameter.Create(pmNone, '', False, Nil, '', scPrivate, 0, 0);
-      P.Assign(Prop.Parameter[i]);
-      AddParameter(P);
+      P.Assign(Prop.Parameters[i]);
+      Parameters.Add(P);
     End;
   FReadOnlySpec := Prop.ReadOnlySpec;
   FReadSpec := Prop.ReadSpec;
@@ -4378,7 +4451,7 @@ begin
   FTypeId := '';
   FWriteSpec := '';
   FScope := Scope;
-  FParameter := TObjectList.Create(True);
+  FParameters := TParameterCollection.Create;
   FIdentifier := strIdent;
   FLine := iLine;
   FCol := iCol;
@@ -4395,7 +4468,7 @@ end;
 **)
 destructor TProperty.Destroy;
 begin
-  FParameter.Free;
+  FParameters.Free;
   inherited;
 end;
 
@@ -4417,20 +4490,20 @@ Var
 
 begin
   Result := Identifier;
-  If ParameterCount > 0 Then
+  If Parameters.Count > 0 Then
     Begin
       Result := Result + '[';
-      For i := 0 To ParameterCount - 1 Do
+      For i := 0 To Parameters.Count - 1 Do
         Begin
-          Case Parameter[i].ParamModifier Of
+          Case Parameters[i].ParamModifier Of
             pmConst : Result := Result + 'Const ';
             pmVar: Result := Result + 'Var ';
             pmOut: Result := Result + 'Out ';
           End;
           If i <> 0 Then
             Result := Result + '; ';
-          Result := Result + Parameter[i].Identifier + ' : ' +
-            Parameter[i].ParamType.AsString(True);
+          Result := Result + Parameters[i].Identifier + ' : ' +
+            Parameters[i].ParamType.AsString(True);
         End;
       Result := Result + ']';
     End;
@@ -4455,37 +4528,6 @@ begin
     Result := Result + ' DispId ' + DispIdSpec;
   If DefaultProperty Then
     Result := Result + '; Default';
-end;
-
-(**
-
-  This is a getter method for the Parameter array property.
-
-  @precon  iIndex is the index of the parameter of the property required.
-  @postcon Returns a parameter object for the requested item.
-
-  @param   iIndex as an Integer
-  @return  a TParameter
-
-**)
-function TProperty.GetParameter(iIndex: Integer): TParameter;
-begin
-  Result := FParameter[iIndex] As TParameter;
-end;
-
-(**
-
-  This is a getter method for the ParameterCount property.
-
-  @precon  None.
-  @postcon Returns the number of parameters in the property.
-
-  @return  an Integer
-
-**)
-function TProperty.GetParameterCount: Integer;
-begin
-  Result := FParameter.Count;
 end;
 
 (**
@@ -4616,6 +4658,71 @@ begin
     FWriteSpec := Value;
 end;
 
+(**
+
+  This method adds a property to the classes property collection.
+
+  @precon  Prop is a property to be added to the class.
+  @postcon Adds a property to the classes property collection.
+
+  @param   Prop as a TProperty
+
+**)
+procedure TPropertyCollection.Add(Prop: TProperty);
+begin
+  FProperties.Add(Prop);
+end;
+
+(**
+
+  This is a getter method for the Property array property.
+
+  @precon  iIndex is the index of the property required.
+  @postcon Returns the property object requested.
+
+  @param   iIndex as an Integer
+  @return  a TProperty
+
+**)
+function TPropertyCollection.GetProperty(iIndex: Integer): TProperty;
+begin
+  Result := FProperties[iIndex] As TProperty;
+end;
+
+(**
+
+  This is a getter method for the PropertyCount property.
+
+  @precon  None.
+  @postcon Returns the number of properties in the class.
+
+  @return  an Integer
+
+**)
+function TPropertyCollection.GetCount: Integer;
+begin
+  Result := FProperties.Count;
+end;
+
+procedure TPropertyCollection.Sort;
+
+begin
+  FProperties.Sort(SortClassDecl);
+End;
+
+Constructor TPropertyCollection.Create;
+
+Begin
+  FProperties := TObjectList.Create(True);
+End;
+
+Destructor TPropertyCollection.Destroy;
+
+Begin
+  FProperties.Free;
+  Inherited;
+End;
+
 (** --------------------------------------------------------------------------
 
   TMethodDecl Methods
@@ -4652,7 +4759,7 @@ Begin
   FIdentifier := '';
   FMsg := '';
   FReturnType := '';
-  FParameter := TObjectList.Create(True);
+  FParameters := TParameterCollection.Create;
   FDirectives := TStringList.Create;
   FMethodType := MethodType;
   FScope := Scope;
@@ -4683,7 +4790,7 @@ Begin
   FTypes.Free;
   FLocalMethods.Free;
   FDirectives.Free;
-  FParameter.Free;
+  FParameters.Free;
   Inherited Destroy;
 End;
 
@@ -4719,11 +4826,11 @@ begin
   //FLocalMethods
   FMethodType := Method.MethodType;
   FMsg := Method.Msg;
-  For i := 0 To Method.ParameterCount - 1 Do
+  For i := 0 To Method.Parameters.Count - 1 Do
     Begin
       P := TParameter.Create(pmNone, '', False, Nil, '', scPrivate, 0, 0);
-      P.Assign(Method.Parameter[i]);
-      Add(P);
+      P.Assign(Method.Parameters[i]);
+      Parameters.Add(P);
     End;
   //FResStrings
   FReturnType := Method.ReturnType;
@@ -4781,55 +4888,6 @@ Procedure TMethodDecl.SetReturnType(Value : String);
 Begin
   If FReturnType <> Value Then
     FReturnType := Value;
-End;
-
-(**
-
-  This method adds a parameter class to the parameters collection.
-
-  @precon  Paremeter is a parameter to add to the method.
-  @postcon Adds a parameter class to the parameters collection.
-
-  @param   Parameter as a TParameter
-
-**)
-Procedure TMethodDecl.Add(Parameter : TParameter);
-
-Begin
-  FParameter.Add(Parameter);
-End;
-
-(**
-
-  This is a getter method for the Count property.
-
-  @precon  None.
-  @postcon Returns the number of parameters in the method.
-
-  @return  an Integer
-
-**)
-Function TMethodDecl.GetCount : Integer;
-
-Begin
-  Result := FParameter.Count;
-End;
-
-(**
-
-  This is a getter method for the Parameter array property.
-
-  @precon  iIndex is th eindex of the parameter required.
-  @postcon Returns a paramemter object for the specified item.
-
-  @param   iIndex as an Integer
-  @return  a TParameter
-
-**)
-Function TMethodDecl.GetParameter(iIndex : Integer) : TParameter;
-
-Begin
-  Result := FParameter[iIndex] As TParameter;
 End;
 
 (**
@@ -4897,24 +4955,24 @@ Begin
     Result := Result + ClsName + '.';
   Result := Result + Identifier;
   // Get parameters
-  If ParameterCount > 0 Then Result := Result + '(';
-  For i := 0 To ParameterCount - 1 Do
+  If Parameters.Count > 0 Then Result := Result + '(';
+  For i := 0 To Parameters.Count - 1 Do
     Begin
-      Result := Result + strParamModifier[Parameter[i].ParamModifier];
-      Result := Result + Parameter[i].Identifier;
-      If (i <> ParameterCount - 1) And (Parameter[i].ParamType.AsString(True) =
-        Parameter[i + 1].ParamType.AsString(True)) Then
+      Result := Result + strParamModifier[Parameters[i].ParamModifier];
+      Result := Result + Parameters[i].Identifier;
+      If (i <> Parameters.Count - 1) And (Parameters[i].ParamType.AsString(True) =
+        Parameters[i + 1].ParamType.AsString(True)) Then
         Result := Result + ', '
       Else
-        If Parameter[i].ParamType.Count > 0 Then
+        If Parameters[i].ParamType.Count > 0 Then
           Begin
             Result := Result + ' :';
-            If Parameter[i].ArrayOf Then Result := Result + ' Array Of';
-            Result := Result + #32 + Parameter[i].ParamType.AsString(True);
-            If i <> ParameterCount - 1 Then Result := Result + '; ';
+            If Parameters[i].ArrayOf Then Result := Result + ' Array Of';
+            Result := Result + #32 + Parameters[i].ParamType.AsString(True);
+            If i <> Parameters.Count - 1 Then Result := Result + '; ';
           End;
     End;
-  If ParameterCount > 0 Then Result := Result + ')';
+  If Parameters.Count > 0 Then Result := Result + ')';
   // Get return type
   If ReturnType <> '' Then Result := Result + ' : ' + ReturnType;
   // Get directives
@@ -5109,8 +5167,8 @@ Var
 begin
   Result := -1;
   For i := 0 To Count - 1 Do
-    If (strClsName = Method[i].ClsName) And
-      (strMethodName = Method[i].Identifier) Then
+    If (AnsiCompareText(strClsName, Method[i].ClsName) = 0) And
+      (AnsiCompareText(strMethodName, Method[i].Identifier) = 0) Then
       Begin
         Result := i;
         Exit;
@@ -5135,7 +5193,7 @@ end;
 **)
 procedure TRecordDecl.AddParameter(Parameter: TParameter);
 begin
-  FParameter.Add(Parameter);
+  FParameters.Add(Parameter);
 end;
 
 (**
@@ -5170,7 +5228,7 @@ constructor TRecordDecl.Create;
 begin
   inherited;
   FPacked := False;
-  FParameter := TObjectList.Create(True);
+  FParameters := TParameterCollection.Create;
 end;
 
 (**
@@ -5183,39 +5241,8 @@ end;
 **)
 destructor TRecordDecl.Destroy;
 begin
-  FParameter.Free;
+  FParameters.Free;
   inherited;
-end;
-
-(**
-
-  This is a getter method for the Parameter array property.
-
-  @precon  iIndex is the index of the paramemter required.
-  @postcon Returns the parameter object requested.
-
-  @param   iIndex as an Integer
-  @return  a TParameter
-
-**)
-function TRecordDecl.GetParameter(iIndex: Integer): TParameter;
-begin
-  Result := FParameter[iIndex] As TParameter;
-end;
-
-(**
-
-  This is a getter method for the ParameterCount property.
-
-  @precon  None.
-  @postcon Returns the number of fields in the record.
-
-  @return  an Integer
-
-**)
-function TRecordDecl.GetParameterCount: Integer;
-begin
-  Result := FParameter.Count;
 end;
 
 (**
@@ -5229,7 +5256,7 @@ end;
 procedure TRecordDecl.Sort;
 begin
   inherited;
-  FParameter.Sort(SortRecordDecl);
+  FParameters.Sort;
 end;
 
 (** ---------------------------------------------------------------------------
@@ -5261,10 +5288,10 @@ begin
   Identifier := AObject.Identifier;
   Heritage.Assign(AObject.Heritage);
   Scope := AObject.Scope;
-  For i := 0 To AObject.ParameterCount - 1 Do
+  For i := 0 To AObject.Parameters.Count - 1 Do
     Begin
       P := TParameter.Create(pmNone, '', False, Nil, '', scPrivate, 0, 0);
-      P.Assign(AObject.Parameter[i]);
+      P.Assign(AObject.Parameters[i]);
       AddParameter(P);
     End;
   For i := 0 To AObject.Methods.Count - 1 Do
@@ -5349,21 +5376,6 @@ end;
 
 (**
 
-  This method adds a property to the classes property collection.
-
-  @precon  Prop is a property to be added to the class.
-  @postcon Adds a property to the classes property collection.
-
-  @param   Prop as a TProperty
-
-**)
-procedure TClassDecl.AddProperty(Prop: TProperty);
-begin
-  FProperty.Add(Prop);
-end;
-
-(**
-
   This method is a virtual assign procedure so that the properties of a
   TClassDecl can be assigned to another instance of the same class.
 
@@ -5384,11 +5396,11 @@ Var
 begin
   Inherited Assign(AObject);
   A := AObject As TClassDecl;
-  For i := 0 To A.PropertyCount - 1 Do
+  For i := 0 To A.Properties.Count - 1 Do
     Begin
       P := TProperty.Create('', scPrivate, 0, 0);
       P.Assign(A.Properties[i]);
-      AddProperty(P);
+      Properties.Add(P);
     End;
 end;
 
@@ -5429,7 +5441,7 @@ End;
 constructor TClassDecl.Create;
 begin
   Inherited Create;
-  FProperty := TObjectList.Create(True);
+  FProperties := TPropertyCollection.Create;
 end;
 
 (**
@@ -5445,39 +5457,8 @@ end;
 **)
 destructor TClassDecl.Destroy;
 begin
-  FProperty.Free;
+  FProperties.Free;
   inherited Destroy;
-end;
-
-(**
-
-  This is a getter method for the Property array property.
-
-  @precon  iIndex is the index of the property required.
-  @postcon Returns the property object requested.
-
-  @param   iIndex as an Integer
-  @return  a TProperty
-
-**)
-function TClassDecl.GetProperty(iIndex: Integer): TProperty;
-begin
-  Result := FProperty[iIndex] As TProperty;
-end;
-
-(**
-
-  This is a getter method for the PropertyCount property.
-
-  @precon  None.
-  @postcon Returns the number of properties in the class.
-
-  @return  an Integer
-
-**)
-function TClassDecl.GetPropertyCount: Integer;
-begin
-  Result := FProperty.Count;
 end;
 
 (**
@@ -5491,7 +5472,7 @@ end;
 procedure TClassDecl.Sort;
 begin
   inherited;
-  FProperty.Sort(SortClassDecl);
+  FProperties.Sort;
 end;
 
 (**

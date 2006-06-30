@@ -2,9 +2,6 @@
 
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
-  @todo       Handle conditional compilation. Now there's a dilema here do I
-              handle it at the token level or during the parsing of the source?
-
   @precon     Before this class con be constructed it requires an instance of a
               TStream decendant passed to the constructor which contains the
               source code text to be parsed.
@@ -19,7 +16,7 @@
               specific token.
 
   @Version    1.0
-  @Date       24 Jun 2006
+  @Date       30 Jun 2006
   @Author     David Hoyle
 
 **)
@@ -36,6 +33,7 @@ Type
   (** This is a set of TExprType enumerates. **)
   TExprTypes = Set of TExprType;
 
+  (** A type to define the type of token search. **)
   TSeekToken = (stActual, stFirst);
 
   (**
@@ -107,7 +105,7 @@ Type
     Procedure SimpleExpression(C : TGenericContainer; var ExprType : TExprTypes);
     Procedure Term(C : TGenericContainer; var ExprType : TExprTypes);
     Procedure Factor(C : TGenericContainer; var ExprType : TExprTypes);
-    Function RelOp(C : TGenericContainer) : Boolean;
+    Function RelOp(C : TGenericContainer; ExprType : TExprTypes) : Boolean;
     Function AddOp(C : TGenericContainer) : Boolean;
     Function MulOp(C : TGenericContainer; var ExprType : TExprTypes) : Boolean;
     Procedure Designator(C : TGenericContainer; var ExprType : TExprTypes);
@@ -282,14 +280,6 @@ Const
   strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
   (** This is a list of compound block statement start keywords. **)
   strBlockStarts : Array[1..4] Of String = ('asm', 'begin', 'case', 'try');
-
-  (** An array of parameter modifier phases. **)
-  {: @debug strModifier : Array[pmNone..pmOut] Of String = ('', ' as a reference',
-    ' constant', ' as out');}
-  (** A simple array for outputting a or an. **)
-  //: @debug strAOrAn : Array[False..True] Of String = ('a', 'an');
-  (** A list of vowels. **)
-  //: @debug strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
 
   (** This is a list of reserved, directives word and a semi colon which are
       token that can be sort as then next place to start parsing from when an
@@ -838,6 +828,7 @@ end;
   @param   strMethod   as a String
   @param   strExpected as a String
   @param   SeekTokens  as an Array Of string
+  @param   SeekToken   as a TSeekToken
 
 **)
 Procedure TPascalDocModule.ErrorAndSeekToken(strMsg, strMethod, strExpected : String;
@@ -963,9 +954,8 @@ begin
     If TokenCount = 0 Then
       Exit;
     // Find first non comment token
-    While (Token.TokenType In [ttComment, ttCompilerDirective]) And
-      Not EndOfTokens Do
-      NextToken;
+    While (Token.TokenType In [ttComment, ttCompilerDirective]) And Not EndOfTokens Do
+      NextNonCommentToken;
     // Check for end of file else must be identifier
     If Not EndOfTokens Then
       Begin
@@ -2538,6 +2528,7 @@ Function TPascalDocModule.ArrayType(boolPacked : Boolean) : TArrayType;
 
 Var
   E : TOrdinalType;
+  T : TTypeDecl;
 
 Begin
   Result := Nil;
@@ -2568,11 +2559,9 @@ Begin
         Begin
           Result.Add(Token.Token);
           NextNonCommentToken;
-          While Not (Token.Token[1] In [';', '=']) Do
-            Begin
-              Result.Add(Token.Token);
-              NextNonCommentToken;
-            End;
+          T := GetTypeDecl;
+          If T <> Nil Then
+            Result.Add(T.AsString(False)); //: @todo Remove '=' and update recorddecl.asstring()
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'ArrayType', 'OF',
             strSeekableOnErrorTokens, stActual);
@@ -3141,7 +3130,7 @@ Procedure TPascalDocModule.Expression(C : TGenericContainer;
 Begin
   Repeat
     SimpleExpression(C, ExprType);
-  Until Not RelOp(C);
+  Until Not RelOp(C, ExprType);
 End;
 
 (**
@@ -3292,7 +3281,7 @@ Begin
       If Token.Token = ')' Then
         Begin
           AddToExpression(C);
-          DesignatorSubElement(C, SubExprType, ['.']); // Type cast handler
+          DesignatorSubElement(C, SubExprType, ['.', '^']); // Type cast handler
         End
       Else
         ErrorAndSeekToken(strLiteralExpected, 'Factor', ')',
@@ -3330,13 +3319,15 @@ End;
            returns false
 
   @param   C as a TGenericContainer
+  @param   ExprType as a TExprTypes
   @return  a Boolean
 
 **)
-Function TPascalDocModule.RelOp(C : TGenericContainer) : Boolean;
+Function TPascalDocModule.RelOp(C : TGenericContainer; ExprType : TExprTypes) : Boolean;
 
 Begin
-  Result := IsKeyWord(Token.Token, strRelOps);
+  Result := IsKeyWord(Token.Token, strRelOps) And Not
+    ((Token.Token = '=') And (etConstExpr In ExprType));
   If Result Then
     AddToExpression(C);
 End;
@@ -3627,19 +3618,15 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  If Token.UToken = 'INHERITED' Then
-    Begin
-      NextNonCommentToken;
-      ExprType := [etUnknown];
-      Designator(Nil, ExprType);
-    End
-  Else If Token.Token = 'GOTO' Then
+  If Token.Token = 'GOTO' Then
     Begin
       NextNonCommentToken;
       NextNonCommentToken;
     End
   Else
     Begin
+      If Token.UToken = 'INHERITED' Then
+        NextNonCommentToken;
       ExprType := [etUnknown];
       Designator(Nil, ExprType);
       If Token.Token = '(' Then
@@ -3652,7 +3639,7 @@ Begin
           Else
             ErrorAndSeekToken(strLiteralExpected, 'SimpleStatement', ')',
               strSeekableOnErrorTokens, stActual);
-          DesignatorSubElement(Nil, ExprType, ['.']);
+          DesignatorSubElement(Nil, ExprType, ['.', '^']);
         End;
       If Token.Token = ':=' Then
         Begin
@@ -5685,6 +5672,18 @@ Begin
   Expression(C, ExprType); // ConstExpr is a subset of Expression
 End;
 
+(**
+
+  This method is a catch all handler for declarations so that the code tries
+  to find the next declaration in the event of a code error.
+
+  @precon  None.
+  @postcon A catch all handler for declarations so that the code tries
+           to find the next declaration in the event of a code error.
+
+  @return  a Boolean
+
+**)
 Function TPascalDocModule.UndefinedToken : Boolean;
 
 Begin

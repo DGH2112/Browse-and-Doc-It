@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    27 Jun 2006
+  @Date    30 Jun 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -527,6 +527,7 @@ Type
     Property Col : Integer Read FCol;
   End;
 
+  (** A class to define a collection of parameters. **)
   TParameterCollection = Class
   Private
     FParameters : TObjectList;
@@ -843,6 +844,7 @@ Type
     Property WriteOnlySpec : Boolean Read FWriteOnlySpec Write FWriteOnlySpec;
   End;
 
+  (** A class to define a collection of properties. **)
   TPropertyCollection = Class
   Private
     FProperties : TObjectList;
@@ -1260,6 +1262,9 @@ Type
     FFileName: String;
     FModified : Boolean;
     FDocumentConflicts: TObjectList;
+    FCompilerDefs : TStringList;
+    FPreviousTokenIndex : TTokenIndex;
+    FCompilerConditionStack : TList;
     Function GetTokenCount : Integer;
     Function GetTokenInfo(iIndex : TTokenIndex) : TTokenInfo;
     Function GetToken : TTokenInfo;
@@ -1283,6 +1288,7 @@ Type
     Procedure GetBodyCmt;
     Procedure AddToken(AToken : TTokenInfo);
     procedure AppendToLastToken(strToken : String);
+    procedure ProcessCompilerDirective(var iSkip : Integer);
     (**
       Returns a refernce the to owned items collection. This is used to manage
       the life time of all the ident lists and comments found in the module.
@@ -1308,6 +1314,10 @@ Type
       iIdentColumn, iCommentLine, iCommentCol  : Integer;
       DocConflictType : TDocConflictType);
     Function ConvertDate(Const strDate : String) : TDateTime;
+    Procedure AddDef(strDef : String);
+    Procedure DeleteDef(strDef : String);
+    Function IfDef(strDef : String) : Boolean;
+    Function IfNotDef(strDef : String) : Boolean;
     { Properties }
     (**
       Returns a reference to the modules error collection.
@@ -1719,9 +1729,16 @@ ResourceString
     'in a Constant Expression.';
   (** An exception message if the first none comment token is not Program,
       Package, Unit or Library. **)
-  strModuleKeyWordNotfound = 'Module starting keyword PROGRAM, PACKAGE, UNIT ' +
-    'or LIBRARY not found.';
+  strModuleKeyWordNotfound = '"%s" found but module starting keyword PROGRAM, ' +
+    'PACKAGE, UNIT or LIBRARY not found.';
+  (** An exception message for an undefined token in the stream. **)
   strUnDefinedToken = 'The token "%s" at line %d column %d is not defined.';
+  (** An exception message for an $ELSE without a string $IFDEF / $FIFNDEF **)
+  strElseIfMissingIfDef = '$ELSE is missing a starting $IFDEF or $IFNDEF at ' +
+    'line %d column %d.';
+  (** An exception message for an $ENDIF without a string $IFDEF / $FIFNDEF **)
+  strEndIfMissingIfDef = '$ENDIF is missing a starting $IFDEF or $IFNDEF at ' +
+    'line %d column %d.';
 
 Const
   (** A set of characters for alpha characaters **)
@@ -1751,6 +1768,13 @@ Const
   (** A list of strings representing the parameter modifiers for methods. **)
   strParamModifier : Array[pmNone..pmOut] Of String = ('', 'var ', 'const ',
     'out ');
+  (** A simple array for outputting a or an. **)
+  strAOrAn : Array[False..True] Of String = ('a', 'an');
+  (** An array of parameter modifier phases. **)
+  strModifier : Array[pmNone..pmOut] Of String = ('', ' as a reference',
+    ' constant', ' as out');
+  (** A list of vowels. **)
+  strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
 
   (** This is a string array representing the TDocOption enumerates.
       @todo Moves the descriptions to resource strings and add some context. **)
@@ -1908,7 +1932,7 @@ Var
 Implementation
 
 Uses
-  Windows;
+  Windows, StrUtils;
 
 (**
 
@@ -2413,536 +2437,6 @@ End;
 
 (**
 
-  This method adds a specific documentation conflict to the Docuemntation
-  conflict collection.
-
-  @precon  None.
-  @postcon Adds a specific documentation conflict to the Docuemntation
-           conflict collection.
-
-  @param   Args            as an Array Of TVarRec constant
-  @param   iIdentLine      as an Integer
-  @param   iIdentColumn    as an Integer
-  @param   iCommentLine    as an Integer
-  @param   iCommentCol     as an Integer
-  @param   DocConflictType as a TDocConflictType
-
-**)
-procedure TBaseLanguageModule.AddDocumentConflict(Const Args: Array of TVarRec;
-  iIdentLine, iIdentColumn, iCommentLine, iCommentCol : Integer;
-  DocConflictType: TDocConflictType);
-  
-begin
-  FDocumentConflicts.Add(TDocumentConflict.Create(Args, iIdentLine,
-    iIdentColumn, iCommentLine, iCommentCol, DocConflictType));
-end;
-
-(**
-
-  This method adds a timer count to the modules OpTickCount collection. This
-  can be used to provide timing / profiling information on operations.
-
-  @precon  None.
-  @postcon Adds a timer count to the modules OpTickCount collection. This
-           can be used to provide timing / profiling information on operations.
-
-  @param   strLabel as a String
-
-**)
-procedure TBaseLanguageModule.AddTickCount(strLabel: String);
-begin
-  FTickList.AddObject(strLabel, TObject(GetTickCount));
-end;
-
-(**
-
-  This is the constructor method for the TBaseLanguageModule class.
-
-  @precon  None.
-  @postcon Initialise this base class and Tokensizes the passed stream of
-           characters.
-
-  @param   IsModified       as a Boolean
-  @param   strFileName      as a String
-
-**)
-constructor TBaseLanguageModule.Create(IsModified : Boolean; strFileName : String);
-begin
-  Inherited Create;
-  FFileName := strFileName;
-  FModified := IsModified;
-  FOwnedItems := TObjectList.Create(True);
-  FTokens := TObjectList.Create(True);
-  FTokenIndex := 0;
-  FDocErrors := TDocErrorCollection.Create;
-  FTickList := TStringList.Create;
-  FExportedHeadings := TMethodCollection.Create;
-  FImplementedMethods := TMethodCollection.Create;
-  FConstantsCollection := TGenericContainerCollection.Create(True);
-  FResStrCollection := TGenericContainerCollection.Create(True);
-  FVarsCollection := TGenericContainerCollection.Create(True);
-  FThreadVarsCollection := TGenericContainerCollection.Create(True);
-  FTypeCollection := TGenericContainerCollection.Create(False);
-  FExportsCollection := TGenericContainerCollection.Create(True);
-  FBodyComment := TObjectList.Create(True);
-  FSymbolTable := TGenericContainerCollection.Create(True);
-  FDocumentConflicts :=  TObjectList.Create(True);
-  FContainsClause := Nil;
-  FFinalComment := Nil;
-  FInitComment := Nil;
-  FModuleComment := Nil;
-  FModuleName := '';
-  FModuleNameCol := 0;
-  FModuleNameLine := 0;
-  FModuleType := mtUnit;
-  FRequiresClause := Nil;
-  FUsesClause := Nil;
-end;
-
-(**
-
-  This is the destructor method for the TBaseLanguageModule class.
-
-  @precon  None.
-  @postcon Frees the memory used by all the collections.
-
-**)
-destructor TBaseLanguageModule.Destroy;
-begin
-  FDocumentConflicts.Free;
-  FSymbolTable.Free;
-  FBodyComment.Free;
-  FExportsCollection.Free;
-  FTypeCollection.Free;
-  FThreadVarsCollection.Free;
-  FVarsCollection.Free;
-  FResStrCollection.Free;
-  FConstantsCollection.Free;
-  FImplementedMethods.Free;
-  FExportedHeadings.Free;
-  FTickList.Free;
-  FDocErrors.Free;
-  FTokens.Free;
-  FOwnedItems.Free;
-  inherited;
-end;
-
-(**
-
-  This method adds the given token to the underlying token collection.
-  
-  @precon  AToken must be a valid instance of a TTokenInfo class..
-  @postcon Adds the given token to the underlying token collection.
-  
-  @param   AToken as a TTokenInfo
-  
-**)
-Procedure TBaseLanguageModule.AddToken(AToken : TTokenInfo);
-
-Begin
-  FTokens.Add(AToken);
-End;
-
-(**
-
-  This method appends the pased token string to the previous token.
-
-  @precon  None.
-  @postcon Appends the pased token string to the previous token.
-
-  @param   strToken as a String
-
-**)
-Procedure TBaseLanguageModule.AppendToLastToken(strToken : String);
-
-Begin
-  TokenInfo[TokenCount - 1].Append(strToken);
-End;
-
-(**
-
-  This method tries to get a document comment from the previous token and return
-  a TComment class to the calling routine.
-
-  @note    All comments found are automatically added to the comment collection
-           for disposal when the parser is destroyed.
-
-  @precon  None.
-  @postcon Returns the comment immediately before the current token else nil.
-
-  @return  a TComment
-
-**)
-Function TBaseLanguageModule.GetComment : TComment;
-
-Var
-  T : TTokenInfo;
-
-Begin
-  Result := Nil;
-  If FTokenIndex - 1 > -1 Then
-    Begin
-      T := FTokens[FTokenIndex - 1] As TTokenInfo;
-      If T.TokenType = ttComment Then
-        Begin
-          Result := TComment.CreateComment(T.Token, T.Line, T.Column);
-          OwnedItems.Add(Result);
-        End;
-    End;
-End;
-
-(**
-
-  This is a setter method for the TokenIndex property.
-
-  @precon  iIndex is the token index to set the parse to start at.
-  @postcon Sets the TokenIndex position.
-
-  @param   iIndex as a TTokenIndex
-
-**)
-Procedure TBaseLanguageModule.SetTokenIndex(iIndex : TTokenIndex);
-
-Begin
-  FTokenIndex := iIndex;
-End;
-
-(**
-
-  This method is a sort procedure for the Documentation Conflicts
-  collection.
-
-  @precon  None.
-  @postcon Sorts the documentation conflicts first by Category and then by
-           message.
-
-**)
-procedure TBaseLanguageModule.SortDocumentConflicts;
-begin
-  FDocumentConflicts.Sort(CompareDocConflicts);
-end;
-
-(**
-
-  This method tries to get a body comment from the previous token in the token
-  list and add it to the body comment list.
-
-  @precon  None.
-  @postcon Tries to get a body comment from the previous token in the token
-           list and add it to the body comment list.
-
-**)
-Procedure TBaseLanguageModule.GetBodyCmt;
-
-Var
-  T : TTokenInfo;
-  C : TComment;
-
-Begin
-  If FTokenIndex - 1 > -1 Then
-    Begin
-      T := FTokens[FTokenIndex - 1] As TTokenInfo;
-      If T.TokenType = ttComment Then
-        Begin
-          C := TComment.CreateComment(T.Token, T.Line, T.Column);
-          If C <> Nil Then BodyComments.Add(C);
-        End;
-    End;
-End;
-
-(**
-
-  This is a getter method for the BodyComment property.
-
-  @precon  iIndex is the index of the body comment required.
-  @postcon Return the requested comment object.
-
-  @param   iIndex as an Integer
-  @return  a TComment
-
-**)
-Function TBaseLanguageModule.GetBodyComment(iIndex : Integer) : TComment;
-
-Begin
-  Result := FBodyComment[iIndex] As TComment;
-End;
-
-(**
-
-  This is a getter method for the BodyCommentCount property.
-
-  @precon  None.
-  @postcon Returns the number of body comment in the collection.
-
-  @return  an Integer
-
-**)
-Function TBaseLanguageModule.GetBodyCommentCount : Integer;
-
-Begin
-  Result := FBodyComment.Count;
-End;
-
-(**
-
-  This is a getter method for the DocumentConflict property.
-
-  @precon  iIndex must be a valid integer index.
-  @postcon Returns the documentation conflict references by the passed index.
-
-  @param   iIndex as an Integer
-  @return  a TDocumentConflict
-
-**)
-function TBaseLanguageModule.GetDocumentConflict(
-  iIndex: Integer): TDocumentConflict;
-begin
-  Result := FDocumentConflicts.Items[iIndex] As TDocumentConflict;
-end;
-
-(**
-
-  This is a getter method for the DocumentConflictCount property.
-
-  @precon  None.
-  @postcon Returns the number of documenation conflicts in the collection.
-
-  @return  an Integer
-
-**)
-function TBaseLanguageModule.GetDocumentConflictCount: Integer;
-begin
-  Result := FDocumentConflicts.Count;
-end;
-
-(**
-
-  This is a getter method for the OpTickCount property.
-
-  @precon  None.
-  @postcon If both the start and end token are found in the collection of Tick
-           Counts then the number of Tick Counts between them are returned.
-
-  @param   strStart  as a String
-  @param   strFinish as a String
-  @return  an Integer
-
-**)
-function TBaseLanguageModule.GetOpTickCount(strStart, strFinish : String): Integer;
-
-Var
-  i : Integer;
-  iStart, iFinish : Integer;
-
-begin
-  Result := -1;
-  iStart := 0;
-  iFinish := 0;
-  For i := 0 To FTickList.Count - 1 Do
-    Begin
-      If AnsiComparetext(FTickList[i], strStart) = 0 Then iStart := i;
-      If AnsiComparetext(FTickList[i], strFinish) = 0 Then iFinish := i;
-    End;
-  If iStart * iFinish > 0 Then
-    Result := Integer(FTickList.Objects[iFinish]) - Integer(FTickList.Objects[iStart]);
-end;
-
-(**
-
-  This is a getter method for the OpTickCountByIndex property.
-
-  @precon  iIndex must be a valid index.
-  @postcon Returns the tick count associated with the passed index.
-
-  @param   iIndex as an Integer
-  @return  an Integer
-
-**)
-function TBaseLanguageModule.GetOpTickCountByIndex(iIndex: Integer): Integer;
-begin
-  Result := Integer(FTickList.Objects[iIndex]);
-end;
-
-(**
-
-  This is a getter method for the OpTickCountName property.
-
-  @precon  iIndex must be a valid integer index.
-  @postcon Returns the name of the OpTickCount references by the index passed.
-
-  @param   iIndex as an Integer
-  @return  a String
-
-**)
-function TBaseLanguageModule.GetOpTickCountName(iIndex: Integer): String;
-begin
-  Result := FTickList[iIndex];
-end;
-
-(**
-
-  This is a getter method for the OpTickCounts property.
-
-  @precon  None.
-  @postcon Returns the number of items in the OpTickCount collection.
-
-  @return  an Integer
-
-**)
-function TBaseLanguageModule.GetOpTickCounts: Integer;
-begin
-  Result := FTickList.Count;
-end;
-
-(**
-
-  This is a getter method for the TokenCount property.
-
-  @precon  None.
-  @postcon Returns the number of tokens in the collection.
-
-  @return  an Integer
-
-**)
-Function TBaseLanguageModule.GetTokenCount : Integer;
-
-Begin
-  Result := FTokens.Count;
-End;
-(**
-
-  This is a getter method for the TokenInfo property.
-
-  @precon  iIndex is the index of the token info object required.
-  @postcon Returns the token info object requested.
-
-  @param   iIndex as a TTokenIndex
-  @return  a TTokenInfo
-
-**)
-function TBaseLanguageModule.GetTokenInfo(iIndex: TTokenIndex): TTokenInfo;
-
-begin
-  Result := FTokens[iIndex] As TTokenInfo;
-end;
-
-(**
-
-  This is a getter method for the Token property.
-
-  @precon  None.
-  @postcon Returns a token info object for the current token.
-
-  @return  a TTokenInfo
-
-**)
-Function TBaseLanguageModule.GetToken : TTokenInfo;
-
-Begin
-  If FTokenIndex >= FTokens.Count Then
-    Raise EDocException.Create(strUnExpectedEndOfFile);
-  Result := FTokens[FTokenIndex] As TTokenInfo;
-End;
-
-(**
-
-  This method moves the toke to the next token in the token list or raises an
-  EDocException.
-
-  @precon  None.
-  @postcon Moves the token to the next token in the token list or raises an
-           EDocException.
-
-**)
-Procedure TBaseLanguageModule.NextToken;
-
-begin
-  Inc(FTokenIndex);
-end;
-
-(**
-
-  This method checks for the end of the token list and returns true if it is
-  found.
-
-  @precon  None.
-  @postcon Returns true is we are beyond the end of the token collection.
-
-  @return  a Boolean
-
-**)
-Function TBaseLanguageModule.EndOfTokens : Boolean;
-
-Begin
-  Result := FTokenIndex >= FTokens.Count;
-End;
-
-(**
-
-  This method move the token position to the next non comment token.
-
-  @precon  None.
-  @postcon Move the token position to the next non comment token.
-
-**)
-procedure TBaseLanguageModule.NextNonCommentToken;
-begin
-  // Go to the next token
-  NextToken;
-  // Keep going if a comment
-  While (Token.TokenType In [ttComment, ttCompilerDirective]) And Not EndOfTokens Do
-    NextToken;
-end;
-
-(**
-
-  This method rolls back to the previous token in the token list skipping
-  comment tokens.
-
-  @precon  None.
-  @postcon Rolls back to the previous token in the token list skipping
-           comment tokens.
-
-**)
-Procedure TBaseLanguageModule.RollBackToken;
-
-Begin
-  Dec(FTokenIndex);
-  While (FTokenIndex > 0) And (TokenInfo[FTokenIndex].TokenType In [ttComment,
-    ttCompilerDirective]) Do
-    Dec(FTokenIndex);
-  If FTokenIndex < 0 Then
-    Raise EDocException.Create(strUnExpectedStartOfFile);
-End;
-
-(**
-
-  This method returns the previous token in the token list, else returns nil.
-
-  @precon  None.
-  @postcon Returns a token info object for the previous non comment token.
-
-  @return  a TTokenInfo
-
-**)
-Function TBaseLanguageModule.PrevToken : TTokenInfo;
-
-Var
-  i : Integer;
-
-begin
-  Result := Nil;
-  For i := FTokenIndex - 1 DownTo 0 Do
-    If Not ((FTokens[i] As TTokenInfo).TokenType In [ttComment,
-      ttCompilerDirective]) Then
-      Begin
-        Result := FTokens[i] As TTokenInfo;
-        Exit;
-      End;
-end;
-
-(**
-
   This method added the strToken to the tags token list with type iType.
 
   @precon  strToken is a string to be added as a token and iType is the token
@@ -3221,6 +2715,16 @@ begin
   Result := Result + str;
 end;
 
+(**
+
+  This is the constructor method for the TComment class.
+
+  @precon  None.
+  @postcon Allows a comment to be constructed from another comment (clone).
+
+  @param   srcComment as a TComment
+
+**)
 Constructor TComment.Create(srcComment : TComment);
 
 Begin
@@ -4349,12 +3853,28 @@ Begin
   Result := FParameters[iIndex] As TParameter;
 End;
 
+(**
+
+  This is the constructor method for the TParameterCollection class.
+
+  @precon  None
+  @postcon Creates the parameter collection.
+
+**)
 Constructor TParameterCollection.Create;
 
 Begin
   FParameters := TObjectList.Create(True);
 End;
 
+(**
+
+  This is the destructor method for the TParameterCollection class.
+
+  @precon  None.
+  @postcon Destroys the parameter collection.
+
+**)
 Destructor TParameterCollection.Destroy;
 
 Begin
@@ -4362,6 +3882,14 @@ Begin
   Inherited;
 End;
 
+(**
+
+  This method sorts the parameter collection.
+
+  @precon  None.
+  @postcon Sorts the parameter collection.
+
+**)
 Procedure TParameterCollection.Sort;
 
 Begin
@@ -4704,18 +4232,42 @@ begin
   Result := FProperties.Count;
 end;
 
+(**
+
+  This method sorts the property collection.
+
+  @precon  None.
+  @postcon Sorts the property collection.
+
+**)
 procedure TPropertyCollection.Sort;
 
 begin
   FProperties.Sort(SortClassDecl);
 End;
 
+(**
+
+  This is the constructor method for the TPropertyCollection class.
+
+  @precon  None.
+  @postcon Creates the properties collection.
+
+**)
 Constructor TPropertyCollection.Create;
 
 Begin
   FProperties := TObjectList.Create(True);
 End;
 
+(**
+
+  This is the destructor method for the TPropertyCollection class.
+
+  @precon  None.
+  @postcon Destroys the collection.
+
+**)
 Destructor TPropertyCollection.Destroy;
 
 Begin
@@ -5207,11 +4759,20 @@ end;
   @param   ShowFirstToken as a Boolean
   @return  a String
 
+  @bug     Need to provide a Type Set of Parameters for the option to AsString().
+
 **)
 Function TRecordDecl.AsString(ShowFirstToken : Boolean) : String;
 
+Var
+  i : Integer;
+
 Begin
   Result := Identifier + ' = Record';
+  For i := 0 To Parameters.Count - 1 Do
+    Result := Result + #32 + Parameters[i].FIdentifier + ' : ' +
+      Parameters[i].FParamType.AsString(True) + ';';
+  Result := Result  + ' End';
   If IsPacked Then
     Result := 'Packed ' + Result;
 End;
@@ -5770,5 +5331,761 @@ function TDocumentConflict.GetDescription: String;
 begin
   Result := DocConflictInfo[DocConflictType].Description;
 end;
+
+(**
+
+  This method adds a Compiler Definition to the sources internal list.
+
+  @precon  None.
+  @postcon Adds a Compiler Definition to the sources internal list.
+
+  @param   strDef as a String
+
+**)
+procedure TBaseLanguageModule.AddDef(strDef : String);
+
+begin
+  FCompilerDefs.Add(strDef);
+end;
+
+(**
+
+  This method adds a specific documentation conflict to the Docuemntation
+  conflict collection.
+
+  @precon  None.
+  @postcon Adds a specific documentation conflict to the Docuemntation
+           conflict collection.
+
+  @param   Args            as an Array Of TVarRec constant
+  @param   iIdentLine      as an Integer
+  @param   iIdentColumn    as an Integer
+  @param   iCommentLine    as an Integer
+  @param   iCommentCol     as an Integer
+  @param   DocConflictType as a TDocConflictType
+
+**)
+procedure TBaseLanguageModule.AddDocumentConflict(Const Args: Array of TVarRec;
+  iIdentLine, iIdentColumn, iCommentLine, iCommentCol : Integer;
+  DocConflictType: TDocConflictType);
+
+begin
+  FDocumentConflicts.Add(TDocumentConflict.Create(Args, iIdentLine,
+    iIdentColumn, iCommentLine, iCommentCol, DocConflictType));
+end;
+
+(**
+
+  This method adds a timer count to the modules OpTickCount collection. This
+  can be used to provide timing / profiling information on operations.
+
+  @precon  None.
+  @postcon Adds a timer count to the modules OpTickCount collection. This
+           can be used to provide timing / profiling information on operations.
+
+  @param   strLabel as a String
+
+**)
+procedure TBaseLanguageModule.AddTickCount(strLabel: String);
+begin
+  FTickList.AddObject(strLabel, TObject(GetTickCount));
+end;
+
+(**
+
+  This is the constructor method for the TBaseLanguageModule class.
+
+  @precon  None.
+  @postcon Initialise this base class and Tokensizes the passed stream of
+           characters.
+
+  @param   IsModified       as a Boolean
+  @param   strFileName      as a String
+
+**)
+constructor TBaseLanguageModule.Create(IsModified : Boolean; strFileName : String);
+begin
+  Inherited Create;
+  FFileName := strFileName;
+  FModified := IsModified;
+  FOwnedItems := TObjectList.Create(True);
+  FTokens := TObjectList.Create(True);
+  FTokenIndex := 0;
+  FDocErrors := TDocErrorCollection.Create;
+  FTickList := TStringList.Create;
+  FExportedHeadings := TMethodCollection.Create;
+  FImplementedMethods := TMethodCollection.Create;
+  FConstantsCollection := TGenericContainerCollection.Create(True);
+  FResStrCollection := TGenericContainerCollection.Create(True);
+  FVarsCollection := TGenericContainerCollection.Create(True);
+  FThreadVarsCollection := TGenericContainerCollection.Create(True);
+  FTypeCollection := TGenericContainerCollection.Create(False);
+  FExportsCollection := TGenericContainerCollection.Create(True);
+  FBodyComment := TObjectList.Create(True);
+  FSymbolTable := TGenericContainerCollection.Create(True);
+  FDocumentConflicts :=  TObjectList.Create(True);
+  FContainsClause := Nil;
+  FFinalComment := Nil;
+  FInitComment := Nil;
+  FModuleComment := Nil;
+  FModuleName := '';
+  FModuleNameCol := 0;
+  FModuleNameLine := 0;
+  FModuleType := mtUnit;
+  FRequiresClause := Nil;
+  FUsesClause := Nil;
+  FCompilerDefs := TStringList.Create;
+  FCompilerDefs.Sorted := True;
+  FCompilerDefs.Duplicates := dupIgnore;
+  FCompilerDefs.CaseSensitive := False;
+  FCompilerConditionStack := TList.Create;
+end;
+
+(**
+
+  This method deletes a definition from the source compiler definitions list.
+
+  @precon  None.
+  @postcon Deletes a definition from the source compiler definitions list.
+
+  @param   strDef as a String
+
+**)
+procedure TBaseLanguageModule.DeleteDef(strDef : String);
+
+Var
+  i : Integer;
+
+begin
+  If FCompilerDefs.Find(strDef, i) Then
+    FCompilerDefs.Delete(i);
+end;
+
+(**
+
+  This is the destructor method for the TBaseLanguageModule class.
+
+  @precon  None.
+  @postcon Frees the memory used by all the collections.
+
+**)
+destructor TBaseLanguageModule.Destroy;
+begin
+  FCompilerConditionStack.Free;
+  FCompilerDefs.Free;
+  FDocumentConflicts.Free;
+  FSymbolTable.Free;
+  FBodyComment.Free;
+  FExportsCollection.Free;
+  FTypeCollection.Free;
+  FThreadVarsCollection.Free;
+  FVarsCollection.Free;
+  FResStrCollection.Free;
+  FConstantsCollection.Free;
+  FImplementedMethods.Free;
+  FExportedHeadings.Free;
+  FTickList.Free;
+  FDocErrors.Free;
+  FTokens.Free;
+  FOwnedItems.Free;
+  inherited;
+end;
+
+(**
+
+  This method adds the given token to the underlying token collection.
+  
+  @precon  AToken must be a valid instance of a TTokenInfo class..
+  @postcon Adds the given token to the underlying token collection.
+  
+  @param   AToken as a TTokenInfo
+  
+**)
+Procedure TBaseLanguageModule.AddToken(AToken : TTokenInfo);
+
+Begin
+  FTokens.Add(AToken);
+End;
+
+(**
+
+  This method appends the pased token string to the previous token.
+
+  @precon  None.
+  @postcon Appends the pased token string to the previous token.
+
+  @param   strToken as a String
+
+**)
+Procedure TBaseLanguageModule.AppendToLastToken(strToken : String);
+
+Begin
+  TokenInfo[TokenCount - 1].Append(strToken);
+End;
+
+(**
+
+  This method checks to see the the given definition exists in the source list.
+
+  @precon  None.
+  @postcon Returns true if the definition exists.
+
+  @param   strDef as a String
+  @return  a Boolean
+
+**)
+function TBaseLanguageModule.IfDef(strDef : String) : Boolean;
+
+Var
+  iIndex : Integer;
+
+begin
+  Result := FCompilerDefs.Find(strDef, iIndex);
+end;
+
+(**
+
+  This method checks to see if a definition DOES NOT exist in the list.
+
+  @precon  None.
+  @postcon Returns true if the definition does not exist.
+
+  @param   strDef as a String
+  @return  a Boolean
+
+**)
+function TBaseLanguageModule.IfNotDef(strDef : String) : Boolean;
+
+begin
+  Result := Not IfDef(strDef);
+end;
+
+(**
+
+  This method tries to get a document comment from the previous token and return
+  a TComment class to the calling routine.
+
+  @note    All comments found are automatically added to the comment collection
+           for disposal when the parser is destroyed.
+
+  @precon  None.
+  @postcon Returns the comment immediately before the current token else nil.
+
+  @return  a TComment
+
+**)
+Function TBaseLanguageModule.GetComment : TComment;
+
+Var
+  T : TTokenInfo;
+
+Begin
+  Result := Nil;
+  If FTokenIndex - 1 > -1 Then
+    Begin
+      T := FTokens[FTokenIndex - 1] As TTokenInfo;
+      If T.TokenType = ttComment Then
+        Begin
+          Result := TComment.CreateComment(T.Token, T.Line, T.Column);
+          OwnedItems.Add(Result);
+        End;
+    End;
+End;
+
+(**
+
+  This is a setter method for the TokenIndex property.
+
+  @precon  iIndex is the token index to set the parse to start at.
+  @postcon Sets the TokenIndex position.
+
+  @param   iIndex as a TTokenIndex
+
+**)
+Procedure TBaseLanguageModule.SetTokenIndex(iIndex : TTokenIndex);
+
+Begin
+  FTokenIndex := iIndex;
+End;
+
+(**
+
+  This method is a sort procedure for the Documentation Conflicts
+  collection.
+
+  @precon  None.
+  @postcon Sorts the documentation conflicts first by Category and then by
+           message.
+
+**)
+procedure TBaseLanguageModule.SortDocumentConflicts;
+begin
+  FDocumentConflicts.Sort(CompareDocConflicts);
+end;
+
+(**
+
+  This method tries to get a body comment from the previous token in the token
+  list and add it to the body comment list.
+
+  @precon  None.
+  @postcon Tries to get a body comment from the previous token in the token
+           list and add it to the body comment list.
+
+**)
+Procedure TBaseLanguageModule.GetBodyCmt;
+
+Var
+  T : TTokenInfo;
+  C : TComment;
+
+Begin
+  If FTokenIndex - 1 > -1 Then
+    Begin
+      T := FTokens[FTokenIndex - 1] As TTokenInfo;
+      If T.TokenType = ttComment Then
+        Begin
+          C := TComment.CreateComment(T.Token, T.Line, T.Column);
+          If C <> Nil Then BodyComments.Add(C);
+        End;
+    End;
+End;
+
+(**
+
+  This is a getter method for the BodyComment property.
+
+  @precon  iIndex is the index of the body comment required.
+  @postcon Return the requested comment object.
+
+  @param   iIndex as an Integer
+  @return  a TComment
+
+**)
+Function TBaseLanguageModule.GetBodyComment(iIndex : Integer) : TComment;
+
+Begin
+  Result := FBodyComment[iIndex] As TComment;
+End;
+
+(**
+
+  This is a getter method for the BodyCommentCount property.
+
+  @precon  None.
+  @postcon Returns the number of body comment in the collection.
+
+  @return  an Integer
+
+**)
+Function TBaseLanguageModule.GetBodyCommentCount : Integer;
+
+Begin
+  Result := FBodyComment.Count;
+End;
+
+(**
+
+  This is a getter method for the DocumentConflict property.
+
+  @precon  iIndex must be a valid integer index.
+  @postcon Returns the documentation conflict references by the passed index.
+
+  @param   iIndex as an Integer
+  @return  a TDocumentConflict
+
+**)
+function TBaseLanguageModule.GetDocumentConflict(
+  iIndex: Integer): TDocumentConflict;
+begin
+  Result := FDocumentConflicts.Items[iIndex] As TDocumentConflict;
+end;
+
+(**
+
+  This is a getter method for the DocumentConflictCount property.
+
+  @precon  None.
+  @postcon Returns the number of documenation conflicts in the collection.
+
+  @return  an Integer
+
+**)
+function TBaseLanguageModule.GetDocumentConflictCount: Integer;
+begin
+  Result := FDocumentConflicts.Count;
+end;
+
+(**
+
+  This is a getter method for the OpTickCount property.
+
+  @precon  None.
+  @postcon If both the start and end token are found in the collection of Tick
+           Counts then the number of Tick Counts between them are returned.
+
+  @param   strStart  as a String
+  @param   strFinish as a String
+  @return  an Integer
+
+**)
+function TBaseLanguageModule.GetOpTickCount(strStart, strFinish : String): Integer;
+
+Var
+  i : Integer;
+  iStart, iFinish : Integer;
+
+begin
+  Result := -1;
+  iStart := 0;
+  iFinish := 0;
+  For i := 0 To FTickList.Count - 1 Do
+    Begin
+      If AnsiComparetext(FTickList[i], strStart) = 0 Then iStart := i;
+      If AnsiComparetext(FTickList[i], strFinish) = 0 Then iFinish := i;
+    End;
+  If iStart * iFinish > 0 Then
+    Result := Integer(FTickList.Objects[iFinish]) - Integer(FTickList.Objects[iStart]);
+end;
+
+(**
+
+  This is a getter method for the OpTickCountByIndex property.
+
+  @precon  iIndex must be a valid index.
+  @postcon Returns the tick count associated with the passed index.
+
+  @param   iIndex as an Integer
+  @return  an Integer
+
+**)
+function TBaseLanguageModule.GetOpTickCountByIndex(iIndex: Integer): Integer;
+begin
+  Result := Integer(FTickList.Objects[iIndex]);
+end;
+
+(**
+
+  This is a getter method for the OpTickCountName property.
+
+  @precon  iIndex must be a valid integer index.
+  @postcon Returns the name of the OpTickCount references by the index passed.
+
+  @param   iIndex as an Integer
+  @return  a String
+
+**)
+function TBaseLanguageModule.GetOpTickCountName(iIndex: Integer): String;
+begin
+  Result := FTickList[iIndex];
+end;
+
+(**
+
+  This is a getter method for the OpTickCounts property.
+
+  @precon  None.
+  @postcon Returns the number of items in the OpTickCount collection.
+
+  @return  an Integer
+
+**)
+function TBaseLanguageModule.GetOpTickCounts: Integer;
+begin
+  Result := FTickList.Count;
+end;
+
+(**
+
+  This is a getter method for the TokenCount property.
+
+  @precon  None.
+  @postcon Returns the number of tokens in the collection.
+
+  @return  an Integer
+
+**)
+Function TBaseLanguageModule.GetTokenCount : Integer;
+
+Begin
+  Result := FTokens.Count;
+End;
+(**
+
+  This is a getter method for the TokenInfo property.
+
+  @precon  iIndex is the index of the token info object required.
+  @postcon Returns the token info object requested.
+
+  @param   iIndex as a TTokenIndex
+  @return  a TTokenInfo
+
+**)
+function TBaseLanguageModule.GetTokenInfo(iIndex: TTokenIndex): TTokenInfo;
+
+begin
+  Result := FTokens[iIndex] As TTokenInfo;
+end;
+
+(**
+
+  This is a getter method for the Token property.
+
+  @precon  None.
+  @postcon Returns a token info object for the current token.
+
+  @return  a TTokenInfo
+
+**)
+Function TBaseLanguageModule.GetToken : TTokenInfo;
+
+Begin
+  If FTokenIndex >= FTokens.Count Then
+    Raise EDocException.Create(strUnExpectedEndOfFile);
+  Result := FTokens[FTokenIndex] As TTokenInfo;
+End;
+
+(**
+
+  This method moves the toke to the next token in the token list or raises an
+  EDocException.
+
+  @precon  None.
+  @postcon Moves the token to the next token in the token list or raises an
+           EDocException.
+
+**)
+Procedure TBaseLanguageModule.NextToken;
+
+begin
+  Inc(FTokenIndex);
+end;
+
+(**
+
+  This method checks for the end of the token list and returns true if it is
+  found.
+
+  @precon  None.
+  @postcon Returns true is we are beyond the end of the token collection.
+
+  @return  a Boolean
+
+**)
+Function TBaseLanguageModule.EndOfTokens : Boolean;
+
+Begin
+  Result := FTokenIndex >= FTokens.Count;
+End;
+
+(**
+
+  This method move the token position to the next non comment token.
+
+  @precon  None.
+  @postcon Move the token position to the next non comment token.
+
+**)
+procedure TBaseLanguageModule.NextNonCommentToken;
+
+Var
+  boolContinue : Boolean;
+  iSkip : Integer;
+
+begin
+  iSkip := 0;
+  If Token.TokenType = ttCompilerDirective Then // Catch first token as directive
+    ProcessCompilerDirective(iSkip);
+  Repeat
+    If Not (TokenInfo[FTokenIndex].TokenType In [ttComment, ttCompilerDirective])
+      And (iSkip = 0) Then
+      FPreviousTokenIndex := FTokenIndex;
+    NextToken;
+    If Token.TokenType = ttCompilerDirective Then
+      ProcessCompilerDirective(iSkip);
+    boolContinue := (
+      (
+        Token.TokenType In [ttComment, ttCompilerDirective]
+      ) And
+      Not EndOfTokens
+    ) Or (iSkip > 0)
+  Until Not boolContinue;
+    //NextToken;
+end;
+
+(**
+
+  This method processes a compiler directive looking for conditional statements.
+
+  @precon  None.
+  @postcon Processes a compiler directive looking for conditional statements.
+
+  @note Needs a stack to hold the $IFDEF / $IFNDEF moves, i.e. iSkip + 1 or
+        iSkip + 0 so that $ELSE can know how to handle its moves iSkip - 1
+        or iSkip + 1 respectively and also $ENDIF. The stack will hold the
+        $IFDEF / $IFNDEF move, i.e. +1 so that the first to find it between
+        $ELSE and $ENDIF can reverse the move, i.e. if $ELSE does -1 then
+        $ENDIF does nothing because the move is used up.
+
+  @param   iSkip as an Integer as a reference
+
+**)
+procedure TBaseLanguageModule.ProcessCompilerDirective(var iSkip : Integer);
+
+  (**
+
+    This function returns the definition string from the current compiler
+    directive.
+
+    @precon  None.
+    @postcon Returns the definition as a string.
+
+    @return  a String
+
+  **)
+  Function GetDef : String;
+
+  Begin
+    Result := Trim(Copy(Token.Token, 9, Length(Token.Token) - 9));
+  End;
+
+  (**
+
+    This function checks to see if the string of text starts with the passed
+    start string.
+
+    @precon  None.
+    @postcon Returns true if the string starts match.
+
+    @param   strText  as a String
+    @param   strStart as a String
+    @return  a Boolean 
+
+  **)
+  Function Like(strText, strStart : String) : Boolean;
+
+  Begin
+    Result := False;
+    If Length(strText) >= Length(strStart) Then
+    Result := AnsiCompareText(Copy(strText, 1, Length(strStart)), strStart) = 0;
+  End;
+
+Var
+  iStack, iStackTop : Integer;
+
+begin
+  If Like(Token.Token, '{$DEFINE') Then
+    AddDef(GetDef)
+  Else If Like(Token.Token, '{$UNDEF') Then
+    DeleteDef(GetDef)
+  Else If Like(Token.Token, '{$IFDEF') Then
+    Begin
+      If Not IfDef(GetDef) Then
+        Begin
+          FCompilerConditionStack.Add(Pointer(1));
+          Inc(iSkip);
+        End Else
+          FCompilerConditionStack.Add(Pointer(0));
+    End
+  Else If Like(Token.Token, '{$IFNDEF') Then
+    Begin
+      If Not IfNotDef(GetDef) Then
+        Begin
+          FCompilerConditionStack.Add(Pointer(1));
+          Inc(iSkip);
+        End Else
+          FCompilerConditionStack.Add(Pointer(0));
+    End
+  Else If Like(Token.Token, '{$ELSE}') Then
+    Begin
+      iStackTop := FCompilerConditionStack.Count;
+      If iStackTop > 0 Then
+        Begin
+          iStack := Integer(FCompilerConditionStack[iStackTop - 1]);
+          If iStack = 1 Then
+            Begin
+              FCompilerConditionStack[iStackTop - 1] := Pointer(0);
+              Dec(iSkip)
+            End Else
+            Begin
+              FCompilerConditionStack[iStackTop - 1] := Pointer(1);
+              Inc(iSkip);
+            End;
+        End Else
+          Errors.Add(Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
+            'ProcessCompilerDirective', Token.Line, Token.Column, etWarning);
+    End
+  Else If Like(Token.Token, '{$ENDIF}') Then
+    Begin
+      iStackTop := FCompilerConditionStack.Count;
+      If iStackTop > 0 Then
+        Begin
+          iStack := Integer(FCompilerConditionStack[iStackTop - 1]);
+          If iStack = 1 Then
+            Dec(iSkip);
+          FCompilerConditionStack.Delete(iStackTop - 1);
+        End Else
+          Errors.Add(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
+            'ProcessCompilerDirective', Token.Line, Token.Column, etWarning);
+    End;
+  If iSkip < 0 Then
+    iSkip := 0;
+end;
+
+
+(**
+
+  This method returns the previous token in the token list, else returns nil.
+
+  @precon  None.
+  @postcon Returns a token info object for the previous non comment token.
+
+  @return  a TTokenInfo
+
+**)
+Function TBaseLanguageModule.PrevToken : TTokenInfo;
+
+Var
+  i : Integer;
+
+begin
+  Result := Nil;
+  If FPreviousTokenIndex > 0 Then
+    Result := FTokens[FPreviousTokenIndex] As TTokenInfo
+  Else
+    For i := FTokenIndex - 1 DownTo 0 Do
+      If Not ((FTokens[i] As TTokenInfo).TokenType In [ttComment,
+        ttCompilerDirective]) Then
+        Begin
+          Result := FTokens[i] As TTokenInfo;
+          Exit;
+        End;
+end;
+
+(**
+
+  This method rolls back the current token to the previous valid token if there
+  is one else searches for a previous token.
+
+  @precon  None.
+  @postcon Rolls back the current token to the previous valid token if there
+           is one else searches for a previous token.
+
+**)
+Procedure TBaseLanguageModule.RollBackToken;
+
+Begin
+  If FPreviousTokenIndex > 0 Then
+    FTokenIndex := FPreviousTokenIndex
+  Else
+    Begin
+      Dec(FTokenIndex);
+      While (FTokenIndex > 0) And (TokenInfo[FTokenIndex].TokenType In [ttComment,
+        ttCompilerDirective]) Do
+        Dec(FTokenIndex);
+      If FTokenIndex < 0 Then
+        Raise EDocException.Create(strUnExpectedStartOfFile);
+    End;
+End;
 
 End.

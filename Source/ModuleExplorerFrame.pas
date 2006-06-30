@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    01 Jun 2006
+  @Date    30 Jun 2006
   @Author  David Hoyle
   @Version 1.0
   
@@ -938,6 +938,7 @@ procedure TframeModuleExplorer.DisplayClasses(Classes : TGenericContainerCollect
 Var
   N, S : TTreeNode;
   i : Integer;
+  strLabel : String;
 
 Begin
   // Get Functions / Procedures
@@ -952,7 +953,21 @@ Begin
           Begin
             If IsInOptions(Classes[i].Scope) Then
               Begin
-                S := AddNode(N, Classes[i].AsString(True), Classes[i].Line,
+                If Classes[i] Is TDispInterfaceDecl Then
+                  strLabel := Classes[i].Identifier + ' = DispInterface'
+                Else If Classes[i] Is TInterfaceDecl Then
+                  strLabel := Classes[i].Identifier + ' = Interface'
+                Else If Classes[i] Is TClassDecl Then
+                  strLabel := Classes[i].Identifier + ' = Class'
+                Else If Classes[i] Is TRecordDecl Then
+                  strLabel := Classes[i].Identifier + ' = Record';
+                If Classes[i] Is TClassDecl Then
+                  With Classes[i] As TClassDecl Do
+                    Begin
+                      If Heritage.Count > 0 Then
+                        strLabel := strLabel + '(' + Heritage.AsString + ')'
+                    End;
+                S := AddNode(N, strLabel, Classes[i].Line,
                   Classes[i].Col, -1, Classes[i].Comment);
                 SetNodeIcon(Classes[i].Scope, iIconStart, S);
                 If Classes[i] Is TRecordDecl Then

@@ -3,7 +3,7 @@
   This mmodule contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    23 May 2006
+  @Date    30 Jun 2006
   @Version 1.0
 
 **)
@@ -754,22 +754,22 @@ Begin
   Writer.Insert(PChar('(**'#13#10));
   Writer.Insert(PChar(StringOfChar(#32, iCol - 1) + '  '#13#10));
   iLen := 0;
-  For i := 0 To P.ParameterCount - 1 Do
-    If iLen < Length(P.Parameter[i].Identifier) Then
-      iLen := Length(P.Parameter[i].Identifier);
-  For i := 0 To P.ParameterCount - 1 Do
+  For i := 0 To P.Parameters.Count - 1 Do
+    If iLen < Length(P.Parameters[i].Identifier) Then
+      iLen := Length(P.Parameters[i].Identifier);
+  For i := 0 To P.Parameters.Count - 1 Do
     Begin
       Writer.Insert(PChar(StringOfChar(#32, iCol - 1) +
         Format('  @param   %-*s as ', [iLen,
-          P.Parameter[i].Identifier])));
-      If P.Parameter[i].ParamType.AsString(True) <> '' Then
+          P.Parameters[i].Identifier])));
+      If P.Parameters[i].ParamType.AsString(True) <> '' Then
         Writer.Insert(PChar(StringOfChar(#32, iCol - 1) + '  ' +
         Format('%s %s%s%s'#13#10, [
-          strAOrAn[(P.Parameter[i].ParamType.AsString(True)[1] In
-            strVowels) Or P.Parameter[i].ArrayOf],
-          strArrayOf[P.Parameter[i].ArrayOf],
-          P.Parameter[i].ParamType.AsString(True),
-          strModifier[P.Parameter[i].ParamModifier]
+          strAOrAn[(P.Parameters[i].ParamType.AsString(True)[1] In
+            strVowels) Or P.Parameters[i].ArrayOf],
+          strArrayOf[P.Parameters[i].ArrayOf],
+          P.Parameters[i].ParamType.AsString(True),
+          strModifier[P.Parameters[i].ParamModifier]
          ])));
     End;
   If P.TypeId <> '' Then
@@ -817,22 +817,22 @@ begin
   Writer.Insert(PChar(#10#13));
   // Output method information
   iLen := 0;
-  For i := 0 To Method.ParameterCount - 1 Do
-    If iLen < Length(Method.Parameter[i].Identifier) Then
-      iLen := Length(Method.Parameter[i].Identifier);
-  For i := 0 To Method.ParameterCount - 1 Do
+  For i := 0 To Method.Parameters.Count - 1 Do
+    If iLen < Length(Method.Parameters[i].Identifier) Then
+      iLen := Length(Method.Parameters[i].Identifier);
+  For i := 0 To Method.Parameters.Count - 1 Do
     Begin
       Writer.Insert(PChar(StringOfChar(#32, iCol - 1)));
       Writer.Insert(PChar(Format('  @param   %-*s as ', [
-        iLen, Method.Parameter[i].Identifier])));
-      If Method.Parameter[i].ParamType.AsString(True) <> '' Then
+        iLen, Method.Parameters[i].Identifier])));
+      If Method.Parameters[i].ParamType.AsString(True) <> '' Then
         Begin
           Writer.Insert(PChar(Format('%s %s%s%s'#10#13, [
-            strAOrAn[(Method.Parameter[i].ParamType.AsString(True)[1] In strVowels)
-              Or Method.Parameter[i].ArrayOf],
-            strArrayOf[Method.Parameter[i].ArrayOf],
-            Method.Parameter[i].ParamType.AsString(True),
-            strModifier[Method.Parameter[i].ParamModifier]])));
+            strAOrAn[(Method.Parameters[i].ParamType.AsString(True)[1] In strVowels)
+              Or Method.Parameters[i].ArrayOf],
+            strArrayOf[Method.Parameters[i].ArrayOf],
+            Method.Parameters[i].ParamType.AsString(True),
+            strModifier[Method.Parameters[i].ParamModifier]])));
         End;
     End;
   If Method.ReturnType <> '' Then
@@ -844,7 +844,7 @@ begin
       Writer.Insert(PChar(#10#13));
     End;
   // Block Footer
-  If (Method.ParameterCount > 0) Or (Method.ReturnType <> '') Then
+  If (Method.Parameters.Count > 0) Or (Method.ReturnType <> '') Then
     Writer.Insert(PChar(#10#13));
   Writer.Insert(PChar(StringOfChar(#32, iCol - 1) + '**)'#10#13));
   Writer.Insert(PChar(StringOfChar(#32, iCol - 1)));

@@ -5,7 +5,7 @@
   version of PascalDoc.
 
   @Author  David Hoyle
-  @Date    23 May 2006
+  @Date    30 Jun 2006
   @Version 1.0
 
 **)
@@ -94,6 +94,7 @@ contains
   SpecialTagForm in 'Source\SpecialTagForm.pas',
   TokenForm in 'Source\TokenForm.pas',
   ProgressForm in 'Source\ProgressForm.pas',
-  BaseLanguageModule in 'Source\BaseLanguageModule.pas';
+  BaseLanguageModule in 'Source\BaseLanguageModule.pas',
+  ModuleExplorerFrame in 'Source\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame};
 
 end.

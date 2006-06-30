@@ -130,19 +130,11 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     object edtDirectory: TEdit
       Left = 8
       Top = 8
-      Width = 233
+      Width = 257
       Height = 21
       TabOrder = 1
       Text = 'edtDirectory'
-    end
-    object btnDirectory: TButton
-      Left = 240
-      Top = 8
-      Width = 27
-      Height = 25
-      Caption = '...'
-      TabOrder = 2
-      OnClick = btnDirectoryClick
+      OnChange = edtDirectoryChange
     end
   end
   object SynPasSyn1: TSynPasSyn

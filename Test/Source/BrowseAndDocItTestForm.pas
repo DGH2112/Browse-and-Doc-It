@@ -32,7 +32,6 @@ type
     btnQuit: TButton;
     lvFileList: TListView;
     edtDirectory: TEdit;
-    btnDirectory: TButton;
     PopupMenu1: TPopupMenu;
     ActionList1: TActionList;
     EditCut1: TEditCut;
@@ -59,7 +58,7 @@ type
     procedure FileListClick(Sender: TObject);
     procedure btnQuitClick(Sender: TObject);
     procedure DirectoryListBox1Change(Sender: TObject);
-    procedure btnDirectoryClick(Sender: TObject);
+    procedure edtDirectoryChange(Sender: TObject);
   private
     { Private declarations }
     FModuleExplorerFrame : TframeModuleExplorer;
@@ -313,7 +312,7 @@ begin
       Height := ReadInteger(strRegRootKey + 'Position', 'Height', Height);
       Width := ReadInteger(strRegRootKey + 'Position', 'Width', Width);
       Panel1.Width := ReadInteger(strRegRootKey + 'Position', 'Splitter', Panel1.Width);
-      Directory := ReadString(strRegRootKey + 'Position', 'Directory', GetCurrentDir);
+      edtDirectory.Text := ReadString(strRegRootKey + 'Position', 'Directory', GetCurrentDir);
     Finally
       Free;
     End;
@@ -342,7 +341,7 @@ begin
       WriteInteger(strRegRootKey + 'Position', 'Height', Height);
       WriteInteger(strRegRootKey + 'Position', 'Width', Width);
       WriteInteger(strRegRootKey + 'Position', 'Splitter', Panel1.Width);
-      WriteString(strRegRootKey + 'Position', 'Directory', Directory);
+      WriteString(strRegRootKey + 'Position', 'Directory', edtDirectory.Text);
     Finally
       Free;
     End;
@@ -458,17 +457,6 @@ begin
   Panel2.Caption := Format('Line %d, Column %d', [SynEdit1.CaretY, SynEdit1.CaretX]);
 end;
 
-procedure TfrmBrowseAndDocItTestForm.btnDirectoryClick(Sender: TObject);
-
-Var
-  FDir : String;
-
-begin
-  FDir := Directory;
-  If SelectDirectory(FDir, [], 0) Then
-    Directory := FDir;
-end;
-
 procedure TfrmbrowseAndDocItTestForm.SetDirectory(Const Value : String);
 begin
   FDirectory := Value;
@@ -476,6 +464,11 @@ begin
   DirectoryListBox1Change(Self);
 end;
 
+procedure TfrmBrowseAndDocItTestForm.edtDirectoryChange(Sender: TObject);
+begin
+  If DirectoryExists(edtDirectory.Text) Then
+    Directory := edtDirectory.Text;
+end;
 
 end.
 

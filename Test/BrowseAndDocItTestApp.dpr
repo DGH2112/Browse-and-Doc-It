@@ -1,6 +1,16 @@
-program BrowseAnDocItTestApp;
+(**
+  
+  This is the test applications project file.
+
+  @Date    07 Jun 2006
+  @Author  David Hoyle
+  @Version 1.0
+  
+**)
+program BrowseAndDocItTestApp;
 
 {%TogetherDiagram 'ModelSupport_BrowseAnDocItTestApp\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocItTestApp\default.txaPackage'}
 
 uses
   Forms,
@@ -10,7 +20,9 @@ uses
   ModuleExplorerFrame in 'Source\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
   OptionsForm in 'Source\OptionsForm.pas' {frmOptions},
   PascalDocChecker in 'Source\PascalDocChecker.pas',
-  PascalDocModule in 'Source\PascalDocModule.pas';
+  PascalDocModule in 'Source\PascalDocModule.pas',
+  ProgressForm in 'Source\ProgressForm.pas' {frmProgressForm},
+  TokenForm in 'Source\TokenForm.pas' {frmTokenForm};
 
 {$R *.res}
 

@@ -5,7 +5,7 @@
   version of PascalDoc.
 
   @Author  David Hoyle
-  @Date    30 Jun 2006
+  @Date    06 Jul 2006
   @Version 1.0
 
 **)
@@ -36,50 +36,14 @@ package BrowseAndDocIt;
 {$DESCRIPTION 'Browse and Doc It'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
+{$DEFINE Hello}
+{$DEFINE Goodbye}
 {%TogetherDiagram 'ModelSupport_BrowseAndDocIt\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocAbstractOutput\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocHTMLOutput\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\PascalDocChecker\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocWizardForm\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocTypes\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\ToolsAPIUtils\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocClasses\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\OptionsForm\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Comments\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\PascalDocModule\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\SpecialTagForm\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\ProgressForm\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DockableModuleExplorer\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\BrowseAndDocItWizard\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Indexer\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\ToolsAPIUtils\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Module Explorer Sequence Diagram.txvint'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Comments\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocWizardForm\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\OptionsForm\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\PascalDocChecker\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Indexer\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocAbstractOutput\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\PascalDocModule\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\ProgressForm\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocHTMLOutput\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocClasses\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\SpecialTagForm\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DockableModuleExplorer\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\BrowseAndDocItWizard\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\DocTypes\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\BaseLanguageModule\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\TokenForm\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\Class Diagram.txvcls'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\BaseLanguageModule\default.txvpck'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\TokenForm\default.txvpck'}
 
 requires
   rtl,
   designide,
   vcl,
-  xmlrtl,
   vclactnband,
   vclx,
   vcljpg;

@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    19 May 2006
+  @Date    06 Jul 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -65,7 +65,7 @@ type
 implementation
 
 Uses
-  SpecialTagForm;
+  SpecialTagForm, ModuleExplorerFrame;
 
 ResourceString
   (** This is a message to be displayed when a tag is not valid **)

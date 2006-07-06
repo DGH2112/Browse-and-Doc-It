@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    30 Jun 2006
+  @Date    06 Jul 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -37,7 +37,7 @@ Type
   (** A set to represent combinations of scopes. **)
   TScopes = Set Of TScope;
   (** An enumerate for the parameter modifiers of methods. **)
-  TParamModifier = (pmNone, pmVar, pmConst, pmOut);
+  TParamModifier = (pamNone, pamVar, pamConst, pamOut);
   (** An enumerate for the types of modules that can be parsed. **)
   TModuleType = (mtProgram, mtPackage, mtLibrary, mtUnit);
   (** An enumerate for the different methods. **)
@@ -49,7 +49,10 @@ Type
       with in the module explorer.
       @bug At the moment these option are not passed early enough for the
            doManageExpandedNodes option to be available to the LoadSettings
-           and SaveSettings methods.
+           and SaveSettings methods. Therefore perhaps the calling class which
+           uses the frameModuleExplorer shoudl call the Loadsettings() and
+           SaveSettings() methods and not depend on the frame class to call
+           these in the constructor and destructor respectively.
   **)
   TDocOption = (
     doCustomDrawing,
@@ -327,6 +330,7 @@ Type
       Virtual;
     Procedure Assign(src : TIdentList);
     Procedure Sort;
+    Function Find(strIdent : String) : Integer;
     Function AsString : String; Virtual;
     (**
       Returns the specifically indexed identifier in the list.
@@ -577,6 +581,7 @@ Type
     FConsts : TGenericContainerCollection;
     FResStrings : TGenericContainerCollection;
     FAlias: String;
+    FLabels : TIdentList;
     Procedure SetClsName(Value : String);
     Procedure SetIdentifier(Value : String);
     Procedure SetReturnType(Value : String);
@@ -689,6 +694,7 @@ Type
       @return  a String
     **)
     Property Alias : String Read FAlias Write FAlias;
+    Property Labels : TIdentList Read FLabels;
   End;
 
   (** This is a collaboration class to hold instances of method declarations. **)
@@ -1230,9 +1236,20 @@ Type
   (** This is a set of Module Option enumerates. **)
   TModuleOptions = Set Of TModuleOption;
 
+  (** A type to define the position before a token of the comment to be
+      associated with the identifier. **)
+  TCommentPosition = (cpBeforeCurrentToken, cpBeforePreviousToken);
+
+  (** This is a type for a set of characters and the return type of several
+      properties. **)
+  TCharSet = Set of Char;
+
+  (** This is a type to define an array of string. **)
+  TArrayOfString = Array Of String;
+
   (** This is an abtract class from which all language modules should be
       derived. **)
-  TBaseLanguageModule = Class //: @debug Abstract
+  TBaseLanguageModule = Class {$IFDEF VER180} Abstract {$ENDIF}
   Private
     FOwnedItems : TObjectList;
     FTokens : TObjectList;
@@ -1282,13 +1299,23 @@ Type
     Function EndOfTokens : Boolean;
     Procedure NextNonCommentToken;
     Procedure RollBackToken;
-    Function GetComment : TComment;
+    Function GetComment(
+      CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
     Procedure SetTokenIndex(iIndex : TTokenIndex);
     Procedure SortDocumentConflicts;
     Procedure GetBodyCmt;
     Procedure AddToken(AToken : TTokenInfo);
     procedure AppendToLastToken(strToken : String);
     procedure ProcessCompilerDirective(var iSkip : Integer);
+    Function GetReservedWords : TArrayOfString; Virtual; Abstract;
+    Function GetDirectives : TArrayOfString; Virtual; Abstract;
+    Function GetTokenChars : TCharSet; Virtual; Abstract;
+    Function GetNumbers : TCharSet; Virtual; Abstract;
+    Function GetSymbols : TCharSet; Virtual; Abstract;
+    Function GetQuote : TCharSet; Virtual; Abstract;
+    Function GetWhiteSpace : TCharSet; Virtual; Abstract;
+    Function GetLineEnd : TCharSet; Virtual; Abstract;
+    Function GetModuleName : String; Virtual;
     (**
       Returns a refernce the to owned items collection. This is used to manage
       the life time of all the ident lists and comments found in the module.
@@ -1306,6 +1333,7 @@ Type
       @return  a TObjectList
     **)
     Property BodyComments : TObjectList Read FBodyComment;
+    Property CompilerDefines : TStringList Read FCompilerDefs;
   Public
     Constructor Create(IsModified : Boolean; strFileName : String);
     Destructor Destroy; Override;
@@ -1344,7 +1372,7 @@ Type
       Returns the module name as a string.
       @return  a String
     **)
-    Property ModuleName : String Read FModuleName Write FModuleName;
+    Property ModuleName : String Read GetModuleName Write FModuleName;
     (**
       Returns the type of the modules, Program, Unit, Package, etc.
       @return  a TModuleType
@@ -1472,11 +1500,102 @@ Type
     **)
     Property ExportsClause : TGenericContainerCollection Read FExportsCollection
       Write FExportsCollection;
+    Property ReservedWords : TArrayOfString Read GetReservedWords;
+    Property Directives : TArrayOfString Read GetReservedWords;
+    Property TokenChars : TCharSet Read GetTokenChars;
+    Property Numbers : TCharSet Read GetNumbers;
+    Property Symbols : TCharSet Read GetSymbols;
+    Property Quote : TCharSet Read GetQuote;
+    Property WhiteSpace : TCharSet Read GetWhiteSpace;
+    Property LineEnd : TCharSet Read GetLineEnd;
   End;
 
 ResourceString
   (** The registry key for the wizards settings. **)
   strRegRootKey = 'Software\Season''s Fall\Browse and Doc It\';
+
+  (** Options text for Draw Syntax Highlighted Module Explorer **)
+  strDrawSynHighModuleExplorer = 'Draw Syntax Highlighted Module Explorer';
+  (** Options text for Show comments in the hints **)
+  strShowCommentsInTheHints = 'Show comments in the hints';
+  (** Options text for Show local declarations in methods **)
+  strShowLocalDeclarationsInMethods = 'Show local declarations in methods';
+  (** Options text for Show private declarations **)
+  strShowPrivateDeclarations = 'Show private declarations';
+  (** Options text for Show protected declarations **)
+  strShowProtectedDeclarations = 'Show protected declarations';
+  (** Options text for Show public declarations **)
+  strShowPublicDeclarations = 'Show public declarations';
+  (** Options text for Show published declarations **)
+  strShowPublishedDeclarations = 'Show published declarations';
+  (** Options text for Show local procedures and functions **)
+  strShowLocalProcsAndFuncs = 'Show local procedures and functions';
+  (** Options text for Show Documentation Conflicts **)
+  strShowDocumentationConflicts = 'Show Documentation Conflicts';
+  (** Options text for Manage Expanded Nodes **)
+  strManageExpandedNodes = 'Manage Expanded Nodes';
+  (** Options text for Show Missing Method Documentation **)
+  strShowMissingMethodDocumentation = 'Show Missing Method Documentation';
+  (** Options text for Show Missing Method Documentation Description **)
+  strShowMissingMethodDocDesc = 'Show Missing Method Documentation Description';
+  (** Options text for Show Different Method Parameter Count **)
+  strShowDiffMethodParameterCount = 'Show Different Method Parameter Count';
+  (** Options text for Show Undocumented Method Parameters **)
+  strShowUndocumentedMethodParameters = 'Show Undocumented Method Parameters';
+  (** Options text for Show Incorrect Method Parameter Type **)
+  strShowIncorrectMethodParameterType = 'Show Incorrect Method Parameter Type';
+  (** Options text for Show Undocumented Method Return **)
+  strShowUndocumentedMethodReturn = 'Show Undocumented Method Return';
+  (** Options text for Show Incorrect Method Return Type **)
+  strShowIncorrectMethodReturnType = 'Show Incorrect Method Return Type';
+  (** Options text for Show Undocumented Types **)
+  strShowUndocumentedTypes = 'Show Undocumented Types';
+  (** Options text for Show Undocumented Records **)
+  strShowUndocumentedRecords = 'Show Undocumented Records';
+  (** Options text for Show Undocumented Objects **)
+  strShowUndocumentedObjects = 'Show Undocumented Objects';
+  (** Options text for Show Undocumented Classes **)
+  strShowUndocumentedClasses = 'Show Undocumented Classes';
+  (** Options text for Show Undocumented Interfaces **)
+  strShowUndocumentedInterfaces = 'Show Undocumented Interfaces';
+  (** Options text for Show Undocumented Variables **)
+  strShowUndocumentedVariables = 'Show Undocumented Variables';
+  (** Options text for Show Undocumented Constants **)
+  strShowUndocumentedConstants = 'Show Undocumented Constants';
+  (** Options text for Show Undocumented Module **)
+  strShowUndocumentedModule = 'Show Undocumented Module';
+  (** Options text for Show Missing Module Date **)
+  strShowMissingModuleDate = 'Show Missing Module Date';
+  (** Options text for Show Check Module Date **)
+  strShowCheckModuleDate = 'Show Check Module Date';
+  (** Options text for Show Missing Module Version **)
+  strShowMissingModuleVersion = 'Show Missing Module Version';
+  (** Options text for Show Missing Module Author **)
+  strShowMissingModuleAuthor = 'Show Missing Module Author';
+  (** Options text for Show Missing Method Pre-Conditions **)
+  strShowMissingMethodPreConditions = 'Show Missing Method Pre-Conditions';
+  (** Options text for Show Missing Method Post-Conditions **)
+  strShowMissingMethodPostConditions = 'Show Missing Method Post-Conditions';
+  (** Options text for Show Missing Property Documentation **)
+  strShowMissingPropertyDocumentation = 'Show Missing Property Documentation';
+  (** Options text for Show Missing Property Documentation Description **)
+  strShowMissingPropertyDocuDesc = 'Show Missing Property Documentation Description';
+  (** Options text for Show Different Property Parameter Count **)
+  strShowDiffPropertyParameterCount = 'Show Different Property Parameter Count';
+  (** Options text for Show Undocumented Property Parameter **)
+  strShowUndocumentedPropertyParameter = 'Show Undocumented Property Parameter';
+  (** Options text for Show Incorrect Property Parameter Type **)
+  strShowIncorrectPropertyParameterType = 'Show Incorrect Property Parameter Type';
+  (** Options text for Show Undocumented Property Return Type **)
+  strShowUndocumentedPropertyReturnType = 'Show Undocumented Property Return Type';
+  (** Options text for Show Incorrect Property Return Type **)
+  strShowIncorrectPropertyReturnType = 'Show Incorrect Property Return Type';
+  (** Options text for Show Missing Property Pre-Conditions **)
+  strShowMissingPropertyPreConditions = 'Show Missing Property Pre-Conditions';
+  (** Options text for Show Missing Property Post-Conditions **)
+  strShowMissingPropertyPostConditions = 'Show Missing Property Post-Conditions';
+  (** Options text for Categories Documentation Conflicts **)
+  strCategoriesDocConflicts = 'Categories Documentation Conflicts';
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
@@ -1485,152 +1604,329 @@ ResourceString
   strModuleDocumentation = 'Module Documentation';
   (** This is a documentation error for a missing module description **)
   strModuleMissingDocumentation = 'This module has no document comment.';
-  (** This is a documentation error for a missing module description **)
+  (** This is a documentation error description for a missing module
+      description **)
   strModuleMissingDocumentationDesc = 'Each module should have a comment ' +
     'before the PROGRAM, UNIT, PACKAGE or LIBARY key work describing the ' +
-    'contents of the module.';
+    'contents of the module. #Example: #(** #  description #  @@Author David Hoyle ' +
+    '#  @@Version 1.0 #  @@Date 07/Jan/2006 #**)';
   (** This is a documentation error for a missing documentation date **)
   strModuleMissingDate = 'This module is missing a documentation date.';
+  (** This is a documentation error description for a missing documentation
+      date **)
+  strModuleMissingDateDesc = 'Each module comment required an @@Date tag to ' +
+    'describe the date on which the module was last edited. #Example: ' +
+    '@@Date 07 Jan 1970';
   (** This is a documentation error for an incorrect documenation date **)
   strModuleIncorrectDate = 'The module documentation date ''%s'' is incorrect (''%s'').';
+  (** This is a documentation error description for an incorrect documenation
+      date **)
+  strModuleIncorrectDateDesc = 'The module date must be either the date of the ' +
+    'file saved to disk for the current date if the module is being edited. ' +
+    '#Example: @@Date 12/Jan/2006';
   (** This is a documentation error for an invalid documenation date **)
   strModuleCheckDateError = 'The module documentation date ''%s'' is not valid (''%s'').';
+  (** This is a documentation error description for an invalid documenation date **)
+  strModuleCheckDateErrorDesc = 'The module date must be a valid date and be ' +
+    'either the date of the file saved to disk for the current date if the ' +
+    'module is being edited. #Example: @@Date 12/Jan/2006';
   (** This is a documentation error for a missing documentation version **)
   strModuleMissingVersion = 'This module is missing a documentation version.';
+  (** This is a documentation error description for a missing documentation
+      version **)
+  strModuleMissingVersionDesc = 'Each module comment requires an @@Version tag ' +
+    'which should be incremented when major and minor changes. #Example: ' +
+    '@@Version 1.0.';
   (** This is a documentation error for a missing documentation author **)
   strModuleMissingAuthor = 'This module is missing a documentation author.';
+  (** This is a documentation error description for a missing documentation
+      author **)
+  strModuleMissingAuthorDesc = 'Each module comment should have an @@Author tag ' +
+    'to describe who has written the module. #Example: @@Author David Hoyle';
 
   (** This is the tree branch under which type documentation error appear **)
   strTypeDocumentation = 'Type Documentation';
   (** Document conflict message for an undocumented type clause item. **)
   strTypeClauseUndocumented = 'Type ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented type clause
+      item. **)
+  strTypeClauseUndocumentedDesc = 'Each Type declaration should have a short ' +
+    'description which attempts to decribed what the type should be used for.';
 
   (** This is the tree branch under which constant documentation error appear **)
   strConstantDocumentation = 'Constant Documentation';
   (** Document conflict message for an undocumented constant clause item. **)
   strConstantClauseUndocumented = 'Constant ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented constant clause
+      item. **)
+  strConstantClauseUndocumentedDesc = 'Each Constant declaration should have ' +
+    'a short description which attempts to decribed what the constant ' +
+    'represents.';
 
   (** This is the tree branch under which resource string documentation error appear **)
   strResourceStringDocumentation = 'Resource String Documentation';
   (** Document conflict message for an undocumented resource string clause item. **)
   strResourceStringClauseUndocumented = 'Resource string ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented resource string
+      clause item. **)
+  strResourceStringClauseUndocumentedDesc = 'Each Resource String declaration ' +
+    'should have a short description which attempts to decribed what the ' +
+    'resource string represents.';
 
   (** This is the tree branch under which variable documentation error appear **)
   strVariableDocumentation = 'Variable Documentation';
   (** Document conflict message for an undocumented variable clause item. **)
   strVariableClauseUndocumented = 'Variable ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented variable clause
+      item. **)
+  strVariableClauseUndocumentedDesc = 'Each Variable declaration ' +
+    'should have a short description which attempts to decribed what the ' +
+    'variable is used for.';
 
   (** This is the tree branch under which thread variable documentation error appear **)
   strThreadVarDocumentation = 'Thread Variable Documentation';
   (** Document conflict message for an undocumented thread variable clause item. **)
   strThreadVarClauseUndocumented = 'Thread variable ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented thread variable
+      clause item. **)
+  strThreadVarClauseUndocumentedDesc = 'Each Thread Variable declaration ' +
+    'should have a short description which attempts to decribed what the ' +
+    'thread variable is used for.';
 
   (** This is the tree branch under which record documentation error appear **)
   strRecordDocumentation = 'Record Documentation';
   (** Document conflict message for an undocumented record clause item. **)
   strRecordClauseUndocumented = 'Record variable ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented record clause
+      item. **)
+  strRecordClauseUndocumentedDesc = 'Each Record declaration ' +
+    'should have a short description which attempts to decribed what the ' +
+    'record represents.';
 
   (** This is the tree branch under which object documentation error appear **)
   strObjectDocumentation = 'Object Documentation';
   (** Document conflict message for an undocumented object clause item. **)
   strObjectClauseUndocumented = 'Object variable ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented object clause
+      item. **)
+  strObjectClauseUndocumentedDesc = 'Each Object declaration ' +
+    'should have a short description which attempts to decribed what the ' +
+    'object represents.';
 
   (** This is the tree branch under which class documentation error appear **)
   strClassDocumentation = 'Class Documentation';
   (** Document conflict message for an undocumented class variable clause item. **)
   strClassClauseUndocumented = 'Class variable ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented class variable
+      clause item. **)
+  strClassClauseUndocumentedDesc = 'Each Class declaration ' +
+    'should have a short description which attempts to decribed what the ' +
+    'class represents.';
 
   (** This is the tree branch under which interface documentation error appear **)
   strInterfaceDocumentation = 'Interface Documentation';
   (** Document conflict message for an undocumented interface variable clause item. **)
   strInterfaceClauseUndocumented = 'Interface variable ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented interface
+      variable clause item. **)
+  strInterfaceClauseUndocumentedDesc = 'Each Interface declaration ' +
+    'should have a short description which attempts to decribed what the ' +
+    'interface represents.';
 
   (** This is the tree branch under which dispinterface documentation error appear **)
   strDispInterfaceDocumentation = 'DispInterface Documentation';
   (** Document conflict message for an undocumented dispinterface variable clause item. **)
   strDispInterfaceClauseUndocumented = 'DispInterface variable ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented dispinterface
+      variable clause item. **)
+  strDispInterfaceClauseUndocumentedDesc = 'Each DispInterface declaration ' +
+    'should have a short description which attempts to decribed what the ' +
+    'dispinterface represents.';
 
   (** Label for Method Documentation Conflicts **)
   strMethodDocumentation = 'Method Documentation';
   (** Document conflict message for missing method documentation. **)
   strMethodUndocumented = 'Method ''%s'' has not been documented.';
+  (** Document conflict message description for missing method documentation. **)
+  strMethodUndocumentedDesc = 'Each method declaration in the implementation ' +
+    'section should have a description which should provide information to ' +
+    'future developers regarding the purpose of the method. # #In addition to ' +
+    'the descrition each method should have a pre-condition statement ' +
+    '(@@precon) and a post-condition statement (@postcon). # #Along with these ' +
+    'there should be a list of the parameters and any return types.';
   (** Document conflict message for missing method description. **)
   strMethodHasNoDesc = 'Method ''%s'' has no description.';
+  (** Document conflict message descritpion for missing method description. **)
+  strMethodHasNoDescDesc = 'Each method declaration in the implementation ' +
+    'section should have a description which should provide information to ' +
+    'furture developers regarding the purpose of the method.';
 
   (** Label for Method Parameter Documentation Conflicts **)
   strMethodParamDocumentation = 'Method Parameter Documentation';
   (** Document conflict message for different number of parameters and tags. **)
   strMethodDiffParamCount = 'Method ''%s'' has a different parameter count.';
+  (** Document conflict message description for different number of parameters
+      and tags. **)
+  strMethodDiffParamCountDesc = 'There are a different number of @@param tags ' +
+    'in the comment compared to the prameters passed to the method.';
   (** Document conflict message for an undocumented parameter. **)
   strMethodUndocumentedParam = 'Parameter ''%s'' in method ''%s'' is not documented.';
+  (** Document conflict message description for an undocumented parameter. **)
+  strMethodUndocumentedParamDesc = 'The specified parameter in the documented ' +
+    'method does not have a corresponding @@param tag in the comment header.';
   (** Document conflict message for an incorrect parameter type. **)
   strMethodIncorrectParamType = 'The parameter type for ''%s'' in method ''%s'' is incorrect.';
+  (** Document conflict message description for an incorrect parameter type. **)
+  strMethodIncorrectParamTypeDesc = 'The type of the specified parameter ' +
+    'differents from the type provided in the @@param tag of the method comment.';
 
   (** Label for Method Return Documentation Conflicts **)
   strMethodReturnDocumentation = 'Method Return Documentation';
   (** Document conflict message for an undocumented return type. **)
   strMethodUndocumentedReturn = 'Method ''%s''`s return type is not documented.';
+  (** Document conflict message descritpion for an undocumented return type. **)
+  strMethodUndocumentedReturnDesc = 'A methods return type required an ' +
+    '@@return tag in the method comment.';
   (** Document conflict message for an incorrect return type. **)
   strMethodIncorrectReturnType = 'Method ''%s''`s return type is incorrect.';
+  (** Document conflict message description for an incorrect return type. **)
+  strMethodIncorrectReturnTypeDesc = 'The type of the method return is not the ' +
+    'same as the type defined in the method.';
 
   (** Label for Method Pre-Condition Documentation Conflicts **)
   strMethodPreConDocumentation = 'Method Pre-Condition Documentation';
   (** A documentation message for missing precondition text. **)
   strMethodPreConNotDocumented = 'A Pre-condition in Method ''%s'' is not documented.';
+  (** A documentation message description for missing precondition text. **)
+  strMethodPreConNotDocumentedDesc = 'The @@precon tag in the specified method ' +
+    'is either not present or does not contain a statement. A pre-condition ' +
+    'statement says something about the status of the input parameters for the ' +
+    'method which must be valid for the method to function correctly.';
   (** Document conflict message for a missing pre-condition tag. **)
   strMethodMissingPreCon = 'Method ''%s'' has missing pre-condition tags.';
+  (** Document conflict message description for a missing pre-condition tag. **)
+  strMethodMissingPreConDesc = 'The method comment expected an @@precon tag ' +
+    'which says something about the status of the input parameters for the ' +
+    'method which must be valid for the method to function correctly.';
   (** Document conflict message for too many pre-condition tag. **)
   strMethodTooManyPreCons = 'Method ''%s'' has too many pre-condition tags.';
+  (** Document conflict message description for too many pre-condition tag. **)
+  strMethodTooManyPreConsDesc = 'The method comment has too many pre-condition ' +
+    'tags (@@precon).';
 
   (** Label for Method Post-Condition Documentation Conflicts **)
   strMethodPostConDocumentation = 'Method Post-Condition Documentation';
   (** A documentation message for missing postcondition text. **)
-  strMethodPostConNotDocumented = 'A Post-condition in Method ''%s'' is not documented.';
+  strMethodPostConNotDocumented = 'A Post-condition in Method ''%s'' is not ' +
+    'documented.';
+  (** A documentation message description for missing postcondition text. **)
+  strMethodPostConNotDocumentedDesc = 'The @@prepost tag in the specified method ' +
+    'is either not present or does not contain a statement. A post-condition ' +
+    'statement says something about the status of the output from the method ' +
+    'which will be valid for the method after being called.';
   (** Document conflict message for a missing post-condition tag. **)
   strMethodMissingPostCon = 'Method ''%s'' has a missing post-condition tag.';
+  (** Document conflict message description for a missing post-condition tag. **)
+  strMethodMissingPostConDesc = 'The method comment expected an @@postcon tag ' +
+    'which says something about the status of the out of the method which ' +
+    'will be valid after the method is called.';
   (** Document conflict message for too many post-condition tag. **)
   strMethodTooManyPostCons = 'Method ''%s'' has too many post-condition tags.';
+  (** Document conflict message description for too many post-condition tag. **)
+  strMethodTooManyPostConsDesc = 'The method comment has too many post-condition ' +
+    'tags (@@postcon).';
 
   (** Label for Property Documentation Conflicts **)
   strPropertyDocumentation = 'Property Documentation';
   (** Document conflict message for missing method documentation. **)
   strPropertyUndocumented = 'Property ''%s'' has not been documented.';
+  (** Document conflict message description for missing method documentation. **)
+  strPropertyUndocumentedDesc = 'Each property declaration in the class or' +
+    'interface should have a description which should provide information to ' +
+    'future developers regarding the purpose of the property. # #In addition to ' +
+    'the descrition each property should have a pre-condition statement ' +
+    '(@@precon) and a post-condition statement (@postcon). # #Along with these ' +
+    'there should be a list of the parameters and any return types.';
   (** Document conflict message for missing property description. **)
   strPropertyHasNoDesc = 'Property ''%s'' has no description.';
+  (** Document conflict message description for missing property description. **)
+  strPropertyHasNoDescDesc = 'Each property declaration in the class or ' +
+    'interface should have a description which should provide information to ' +
+    'furture developers regarding the purpose of the method.';
 
   (** Label for Property Parameter Documentation Conflicts **)
   strPropertyParamDocumentation = 'Property Parameter Documentation';
   (** Document conflict message for different number of parameters and tags. **)
   strPropertyDiffParamCount = 'Property ''%s'' has a different parameter count.';
+  (** Document conflict message description for different number of parameters
+      and tags. **)
+  strPropertyDiffParamCountDesc = 'There are a different number of @@param tags ' +
+    'in the comment compared to the prameters passed to the property.';
   (** Document conflict message for an undocumented parameter. **)
   strPropertyUndocumentedParam = 'Parameter ''%s'' in property ''%s'' is not documented.';
+  (** Document conflict message description for an undocumented parameter. **)
+  strPropertyUndocumentedParamDesc = 'The specified parameter in the documented ' +
+    'property does not have a corresponding @@param tag in the comment header.';
   (** Document conflict message for an incorrect parameter type. **)
   strPropertyIncorrectParamType = 'The parameter type for ''%s'' in property ''%s'' is incorrect.';
+  (** Document conflict message description for an incorrect parameter type. **)
+  strPropertyIncorrectParamTypeDesc = 'The type of the specified parameter ' +
+    'differents from the type provided in the @@param tag of the property comment.';
 
   (** Label for Property Return Documentation Conflicts **)
   strPropertyReturnDocumentation = 'Property Return Documentation';
   (** Document conflict message for an undocumented return type. **)
   strPropertyUndocumentedReturn = 'Property ''%s''`s return type is not documented.';
+  (** Document conflict message description for an undocumented return type. **)
+  strPropertyUndocumentedReturnDesc = 'A property return type required an ' +
+    '@@return tag in the property comment.';
   (** Document conflict message for an incorrect return type. **)
   strPropertyIncorrectReturnType = 'Property ''%s''`s return type is incorrect.';
+  (** Document conflict message description for an incorrect return type. **)
+  strPropertyIncorrectReturnTypeDesc = 'The type of the property return is not ' +
+    'the same as the type defined in the property.';
 
   (** Label for Property Pre-Condition Documentation Conflicts **)
   strPropertyPreConDocumentation = 'Property Pre-Condition Documentation';
   (** A documentation message for missing precondition text. **)
   strPropertyPreConNotDocumented = 'A Pre-condition in Property ''%s'' is not documented.';
+  (** A documentation message descritpion for missing precondition text. **)
+  strPropertyPreConNotDocumentedDesc = 'The @@precon tag in the specified property ' +
+    'is either not present or does not contain a statement. A pre-condition ' +
+    'statement says something about the status of the input parameters for the ' +
+    'property which must be valid for the property to function correctly.';
   (** Document conflict message for a missing pre-condition tag. **)
   strPropertyMissingPreCon = 'Property ''%s'' has missing pre-condition tags.';
+  (** Document conflict message description for a missing pre-condition tag. **)
+  strPropertyMissingPreConDesc = 'The property comment expected an @@precon tag ' +
+    'which says something about the status of the input parameters for the ' +
+    'property which must be valid for the property to function correctly.';
   (** Document conflict message for too many pre-condition tag. **)
   strPropertyTooManyPreCons = 'Property ''%s'' has too many pre-condition tags.';
+  (** Document conflict message description for too many pre-condition tag. **)
+  strPropertyTooManyPreConsDesc = 'The property comment has too many pre-condition ' +
+    'tags (@@precon).';
 
   (** Label for Property Post-Condition Documentation Conflicts **)
   strPropertyPostConDocumentation = 'Property Post-Condition Documentation';
   (** A documentation message for missing postcondition text. **)
   strPropertyPostConNotDocumented = 'A Post-condition in Property ''%s'' is not documented.';
+  (** A documentation message description for missing postcondition text. **)
+  strPropertyPostConNotDocumentedDesc = 'The @@prepost tag in the specified property ' +
+    'is either not present or does not contain a statement. A post-condition ' +
+    'statement says something about the status of the output from the property ' +
+    'which will be valid for the property after being called.';
   (** Document conflict message for a missing post-condition tag. **)
   strPropertyMissingPostCon = 'Property ''%s'' has a missing post-condition tag.';
+  (** Document conflict message description for a missing post-condition tag. **)
+  strPropertyMissingPostConDesc = 'The property comment expected an @@postcon tag ' +
+    'which says something about the status of the out of the property which ' +
+    'will be valid after the property is called.';
   (** Document conflict message for too many post-condition tag. **)
   strPropertyTooManyPostCons = 'Property ''%s'' has too many post-condition tags.';
+  (** Document conflict message description for too many post-condition tag. **)
+  strPropertyTooManyPostConsDesc = 'The property comment has too many post-condition ' +
+    'tags (@@postcon).';
 
   (** Errors and warnings label **)
   strErrorsAndWarnings = 'Errors and Warnings';
@@ -1740,6 +2036,11 @@ ResourceString
   strEndIfMissingIfDef = '$ENDIF is missing a starting $IFDEF or $IFNDEF at ' +
     'line %d column %d.';
 
+(** @bug These constants are Language Specific. Implement these are properties
+         in the base language class of type TCharSet = Set of Char where the
+         Getter method is virtual and can be overridden in the desccendant
+         class and therefore return the specific languages token
+         characteristics. **)
 Const
   (** A set of characters for alpha characaters **)
   strTokenChars : Set Of Char = ['#', '_', 'a'..'z', 'A'..'Z'];
@@ -1754,172 +2055,169 @@ Const
   strWhiteSpace : Set Of Char = [#32, #9];
   (** A set of characters for line feed and carriage return **)
   strLineEnd : Set of Char = [#10, #13];
+
+Const
   (** A list of strings representing the different types of token. **)
   strTypes : Array[ttUnknown..ttLinkTag] Of String = ('Unknown',
     'WhiteSpace', 'Keyword', 'Identifier', 'Number', 'Symbol', 'LineEnd',
     'ArrayElement', 'StatementEnd', 'StringLiteral', 'Comment', 'HTMLTag',
     'Directive', 'CompilerDirective', 'LinkTag');
-  (** A list of strings representing the scope types. **)
-  strScope : Array[scGlobal..scPublished] Of String = ('global', 'local',
-    'private', 'protected', 'public', 'published');
   (** A list of strings representing the types of methods. **)
   strMethodTypes : Array[mtConstructor..mtFunction] Of String = (
     'Constructor', 'Destructor', 'Procedure', 'Function');
   (** A list of strings representing the parameter modifiers for methods. **)
-  strParamModifier : Array[pmNone..pmOut] Of String = ('', 'var ', 'const ',
+  strParamModifier : Array[pamNone..pamOut] Of String = ('', 'var ', 'const ',
     'out ');
-  (** A simple array for outputting a or an. **)
-  strAOrAn : Array[False..True] Of String = ('a', 'an');
-  (** An array of parameter modifier phases. **)
-  strModifier : Array[pmNone..pmOut] Of String = ('', ' as a reference',
-    ' constant', ' as out');
-  (** A list of vowels. **)
-  strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
 
-  (** This is a string array representing the TDocOption enumerates.
-      @todo Moves the descriptions to resource strings and add some context. **)
+  (** This is a string array representing the TDocOption enumerates. **)
   DocOptionInfo : Array[Low(TDocOption)..High(TDocOption)] Of TDocOptionRec = (
-    (Description : 'Draw Syntax Highlighted Module Explorer'; Enabled : False),
-    (Description : 'Show comments in the hints'; Enabled : False),
-    (Description : 'Show local declarations in methods'; Enabled : False),
-    (Description : 'Show private declarations'; Enabled : True),
-    (Description : 'Show protected declarations'; Enabled : True),
-    (Description : 'Show public declarations'; Enabled : True),
-    (Description : 'Show published declarations'; Enabled : True),
-    (Description : 'Show local procedures and functions'; Enabled : True),
-    (Description : 'Show Documentation Conflicts'; Enabled : False),
-    (Description : 'Manage Expanded Nodes'; Enabled : True),
-    (Description : 'Show Missing Method Documentation'; Enabled : True),
-    (Description : 'Show Missing Method Documentation Description'; Enabled : True),
-    (Description : 'Show Different Method Parameter Count'; Enabled : True),
-    (Description : 'Show Undocumented Method Parameters'; Enabled : True),
-    (Description : 'Show Incorrect Method Parameter Type'; Enabled : True),
-    (Description : 'Show Undocumented Method Return'; Enabled : True),
-    (Description : 'Show Incorrect Method Return Type'; Enabled : True),
-    (Description : 'Show Undocumented Types'; Enabled : False),
-    (Description : 'Show Undocumented Records'; Enabled : False),
-    (Description : 'Show Undocumented Objects'; Enabled : False),
-    (Description : 'Show Undocumented Classes'; Enabled : False),
-    (Description : 'Show Undocumented Interfaces'; Enabled : False),
-    (Description : 'Show Undocumented Variables'; Enabled : False),
-    (Description : 'Show Undocumented Constants'; Enabled : False),
-    (Description : 'Show Undocumented Module'; Enabled : True),
-    (Description : 'Show Missing Module Date'; Enabled : False),
-    (Description : 'Show Check Module Date'; Enabled : False),
-    (Description : 'Show Missing Module Version'; Enabled : False),
-    (Description : 'Show Missing Module Author'; Enabled : False),
-    (Description : 'Show Missing Method Pre-Conditions'; Enabled : False),
-    (Description : 'Show Missing Method Post-Conditions'; Enabled : False),
-    (Description : 'Show Missing Property Documentation'; Enabled : False),
-    (Description : 'Show Missing Property Documentation Description'; Enabled : False),
-    (Description : 'Show Different Property Parameter Count'; Enabled : False),
-    (Description : 'Show Undocumented Property Parameter'; Enabled : False),
-    (Description : 'Show Incorrect Property Parameter Type'; Enabled : False),
-    (Description : 'Show Undocumented Property Return Type'; Enabled : False),
-    (Description : 'Show Incorrect Property Return Type'; Enabled : False),
-    (Description : 'Show Missing Property Pre-Conditions'; Enabled : False),
-    (Description : 'Show Missing Property Post-Conditions'; Enabled : False),
-    (Description : 'Categories Documentation Conflicts'; Enabled : False)
+    (Description : strDrawSynHighModuleExplorer; Enabled : False),
+    (Description : strShowCommentsInTheHints; Enabled : False),
+    (Description : strShowLocalDeclarationsInMethods; Enabled : False),
+    (Description : strShowPrivateDeclarations; Enabled : True),
+    (Description : strShowProtectedDeclarations; Enabled : True),
+    (Description : strShowPublicDeclarations; Enabled : True),
+    (Description : strShowPublishedDeclarations; Enabled : True),
+    (Description : strShowLocalProcsAndFuncs; Enabled : True),
+    (Description : strShowDocumentationConflicts; Enabled : False),
+    (Description : strManageExpandedNodes; Enabled : True),
+    (Description : strShowMissingMethodDocumentation; Enabled : True),
+    (Description : strShowMissingMethodDocDesc; Enabled : True),
+    (Description : strShowDiffMethodParameterCount; Enabled : True),
+    (Description : strShowUndocumentedMethodParameters; Enabled : True),
+    (Description : strShowIncorrectMethodParameterType; Enabled : True),
+    (Description : strShowUndocumentedMethodReturn; Enabled : True),
+    (Description : strShowIncorrectMethodReturnType; Enabled : True),
+    (Description : strShowUndocumentedTypes; Enabled : False),
+    (Description : strShowUndocumentedRecords; Enabled : False),
+    (Description : strShowUndocumentedObjects; Enabled : False),
+    (Description : strShowUndocumentedClasses; Enabled : False),
+    (Description : strShowUndocumentedInterfaces; Enabled : False),
+    (Description : strShowUndocumentedVariables; Enabled : False),
+    (Description : strShowUndocumentedConstants; Enabled : False),
+    (Description : strShowUndocumentedModule; Enabled : True),
+    (Description : strShowMissingModuleDate; Enabled : False),
+    (Description : strShowCheckModuleDate; Enabled : False),
+    (Description : strShowMissingModuleVersion; Enabled : False),
+    (Description : strShowMissingModuleAuthor; Enabled : False),
+    (Description : strShowMissingMethodPreConditions; Enabled : False),
+    (Description : strShowMissingMethodPostConditions; Enabled : False),
+    (Description : strShowMissingPropertyDocumentation; Enabled : False),
+    (Description : strShowMissingPropertyDocuDesc; Enabled : False),
+    (Description : strShowDiffPropertyParameterCount; Enabled : False),
+    (Description : strShowUndocumentedPropertyParameter; Enabled : False),
+    (Description : strShowIncorrectPropertyParameterType; Enabled : False),
+    (Description : strShowUndocumentedPropertyReturnType; Enabled : False),
+    (Description : strShowIncorrectPropertyReturnType; Enabled : False),
+    (Description : strShowMissingPropertyPreConditions; Enabled : False),
+    (Description : strShowMissingPropertyPostConditions; Enabled : False),
+    (Description : strCategoriesDocConflicts; Enabled : False)
   );
 
-  (** This is a string array representing the TDocOption enumerates.
-      @todo This needs to be expanded with descriptions for all the documentation conflicts.
-  **)
-  DocConflictInfo : Array[Low(TDocConflictType)..High(TDocConflictType)] Of TDocConflictTypeRec = (
-    (Category: strModuleDocumentation;
-      MessageMask: strModuleMissingDocumentation;
-      Description: strModuleMissingDocumentationDesc),
-    (Category: strModuleDocumentation;
-      MessageMask: strModuleMissingDate; Description: ''),
-    (Category: strModuleDocumentation;
-      MessageMask: strModuleIncorrectDate; Description: ''),
-    (Category: strModuleDocumentation;
-      MessageMask: strModuleCheckDateError; Description: ''),
-    (Category: strModuleDocumentation;
-      MessageMask: strModuleMissingVersion; Description: ''),
-    (Category: strModuleDocumentation;
-      MessageMask: strModuleMissingAuthor; Description: ''),
-    (Category: strTypedocumentation;
-      MessageMask: strTypeClauseUndocumented; Description: ''),
-    (Category: strConstantdocumentation;
-      MessageMask: strConstantClauseUndocumented; Description: ''),
-    (Category: strResourceStringdocumentation;
-      MessageMask: strResourceStringClauseUndocumented; Description: ''),
-    (Category: strVariabledocumentation;
-      MessageMask: strVariableClauseUndocumented; Description: ''),
-    (Category: strThreadVardocumentation;
-      MessageMask: strThreadVarClauseUndocumented; Description: ''),
-    (Category: strRecorddocumentation;
-      MessageMask: strRecordClauseUndocumented; Description: ''),
-    (Category: strObjectdocumentation;
-      MessageMask: strObjectClauseUndocumented; Description: ''),
-    (Category: strClassdocumentation;
-      MessageMask: strClassClauseUndocumented; Description: ''),
-    (Category: strInterfacedocumentation;
-      MessageMask: strInterfaceClauseUndocumented; Description: ''),
-    (Category: strDispinterfacedocumentation;
-      MessageMask: strDispinterfaceClauseUndocumented; Description: ''),
-    (Category: strMethodDocumentation;
-      MessageMask: strMethodUndocumented; Description: ''),
-    (Category: strMethodDocumentation;
-      MessageMask: strMethodHasNoDesc; Description: ''),
-    (Category: strMethodParamDocumentation;
-      MessageMask: strMethodDiffParamCount; Description: ''),
-    (Category: strMethodParamDocumentation;
-      MessageMask: strMethodUndocumentedParam; Description: ''),
-    (Category: strMethodParamDocumentation;
-      MessageMask: strMethodIncorrectParamType; Description: ''),
-    (Category: strMethodReturnDocumentation;
-      MessageMask: strMethodUndocumentedReturn; Description: ''),
-    (Category: strMethodReturnDocumentation;
-      MessageMask: strMethodIncorrectReturnType; Description: ''),
-    (Category: strMethodPreconDocumentation;
-      MessageMask: strMethodPreconNotDocumented; Description: ''),
-    (Category: strMethodPreconDocumentation;
-      MessageMask: strMethodMissingPrecon; Description: ''),
-    (Category: strMethodPreconDocumentation;
-      MessageMask: strMethodTooManyPrecons; Description: ''),
-    (Category: strMethodPostconDocumentation;
-      MessageMask: strMethodPostconNotDocumented; Description: ''),
-    (Category: strMethodPostconDocumentation;
-      MessageMask: strMethodMissingPostcon; Description: ''),
-    (Category: strMethodPostconDocumentation;
-      MessageMask: strMethodTooManyPostcons; Description: ''),
-    (Category: strPropertyDocumentation;
-      MessageMask: strPropertyUndocumented; Description: ''),
-    (Category: strPropertyDocumentation;
-      MessageMask: strPropertyHasNoDesc; Description: ''),
-    (Category: strPropertyParamDocumentation;
-      MessageMask: strPropertyDiffParamCount; Description: ''),
-    (Category: strPropertyParamDocumentation;
-      MessageMask: strPropertyUndocumentedParam; Description: ''),
-    (Category: strPropertyParamDocumentation;
-      MessageMask: strPropertyIncorrectParamType; Description: ''),
-    (Category: strPropertyReturnDocumentation;
-      MessageMask: strPropertyUndocumentedReturn; Description: ''),
-    (Category: strPropertyReturnDocumentation;
-      MessageMask: strPropertyIncorrectReturnType; Description: ''),
-    (Category: strPropertyPreconDocumentation;
-      MessageMask: strPropertyPreconNotDocumented; Description: ''),
-    (Category: strPropertyPreconDocumentation;
-      MessageMask: strPropertyMissingPrecon; Description: ''),
-    (Category: strPropertyPreconDocumentation;
-      MessageMask: strPropertyTooManyPrecons; Description: ''),
-    (Category: strPropertyPostconDocumentation;
-      MessageMask: strPropertyPostconNotDocumented; Description: ''),
-    (Category: strPropertyPostconDocumentation;
-      MessageMask: strPropertyMissingPostcon; Description: ''),
-    (Category: strPropertyPostconDocumentation;
-      MessageMask: strPropertyTooManyPostcons; Description: '' )
+  (** This is a string array representing the TDocOption enumerates. **)
+  DocConflictInfo : Array[Low(TDocConflictType)..High(TDocConflictType)]
+    Of TDocConflictTypeRec = (
+    (Category: strModuleDocumentation; MessageMask:
+      strModuleMissingDocumentation; Description:
+      strModuleMissingDocumentationDesc),
+    (Category: strModuleDocumentation; MessageMask: strModuleMissingDate;
+      Description: strModuleMissingDateDesc),
+    (Category: strModuleDocumentation; MessageMask: strModuleIncorrectDate;
+      Description: strModuleIncorrectDateDesc),
+    (Category: strModuleDocumentation; MessageMask: strModuleCheckDateError;
+      Description: strModuleCheckDateErrorDesc),
+    (Category: strModuleDocumentation; MessageMask: strModuleMissingVersion;
+      Description: strModuleMissingVersionDesc),
+    (Category: strModuleDocumentation; MessageMask: strModuleMissingAuthor;
+      Description: strModuleMissingAuthorDesc),
+    (Category: strTypedocumentation; MessageMask: strTypeClauseUndocumented;
+      Description: strTypeClauseUndocumentedDesc),
+    (Category: strConstantdocumentation; MessageMask:
+      strConstantClauseUndocumented; Description:
+      strConstantClauseUndocumentedDesc),
+    (Category: strResourceStringdocumentation; MessageMask:
+      strResourceStringClauseUndocumented; Description:
+      strResourceStringClauseUndocumentedDesc),
+    (Category: strVariabledocumentation; MessageMask:
+      strVariableClauseUndocumented; Description:
+      strVariableClauseUndocumentedDesc),
+    (Category: strThreadVardocumentation; MessageMask:
+      strThreadVarClauseUndocumented; Description:
+      strThreadVarClauseUndocumentedDesc),
+    (Category: strRecorddocumentation; MessageMask:
+      strRecordClauseUndocumented; Description: strRecordClauseUndocumentedDesc),
+    (Category: strObjectdocumentation; MessageMask: strObjectClauseUndocumented;
+      Description: strObjectClauseUndocumentedDesc),
+    (Category: strClassdocumentation; MessageMask: strClassClauseUndocumented;
+      Description: strClassClauseUndocumentedDesc),
+    (Category: strInterfacedocumentation; MessageMask:
+      strInterfaceClauseUndocumented; Description:
+      strInterfaceClauseUndocumentedDesc),
+    (Category: strDispinterfacedocumentation; MessageMask:
+      strDispinterfaceClauseUndocumented; Description:
+      strDispinterfaceClauseUndocumentedDesc),
+    (Category: strMethodDocumentation; MessageMask: strMethodUndocumented;
+      Description: strMethodUndocumentedDesc),
+    (Category: strMethodDocumentation; MessageMask: strMethodHasNoDesc;
+      Description: strMethodHasNoDescDesc),
+    (Category: strMethodParamDocumentation; MessageMask:
+      strMethodDiffParamCount; Description: strMethodDiffParamCountDesc),
+    (Category: strMethodParamDocumentation; MessageMask:
+      strMethodUndocumentedParam; Description: strMethodUndocumentedParamDesc),
+    (Category: strMethodParamDocumentation; MessageMask:
+      strMethodIncorrectParamType; Description: strMethodIncorrectParamTypeDesc),
+    (Category: strMethodReturnDocumentation; MessageMask:
+      strMethodUndocumentedReturn; Description: strMethodUndocumentedReturnDesc),
+    (Category: strMethodReturnDocumentation; MessageMask:
+      strMethodIncorrectReturnType; Description:
+      strMethodIncorrectReturnTypeDesc),
+    (Category: strMethodPreconDocumentation; MessageMask:
+      strMethodPreconNotDocumented; Description:
+      strMethodPreconNotDocumentedDesc),
+    (Category: strMethodPreconDocumentation; MessageMask:
+      strMethodMissingPrecon; Description: strMethodMissingPreconDesc),
+    (Category: strMethodPreconDocumentation; MessageMask:
+      strMethodTooManyPrecons; Description: strMethodTooManyPreconsDesc),
+    (Category: strMethodPostconDocumentation; MessageMask:
+      strMethodPostconNotDocumented; Description:
+      strMethodPostconNotDocumentedDesc),
+    (Category: strMethodPostconDocumentation; MessageMask:
+      strMethodMissingPostcon; Description: strMethodMissingPostconDesc),
+    (Category: strMethodPostconDocumentation; MessageMask:
+      strMethodTooManyPostcons; Description: strMethodTooManyPostconsDesc),
+    (Category: strPropertyDocumentation; MessageMask: strPropertyUndocumented;
+      Description: strPropertyUndocumentedDesc),
+    (Category: strPropertyDocumentation; MessageMask: strPropertyHasNoDesc;
+      Description: strPropertyHasNoDescDesc),
+    (Category: strPropertyParamDocumentation; MessageMask:
+      strPropertyDiffParamCount; Description: strPropertyDiffParamCountDesc),
+    (Category: strPropertyParamDocumentation; MessageMask:
+      strPropertyUndocumentedParam; Description:
+      strPropertyUndocumentedParamDesc),
+    (Category: strPropertyParamDocumentation; MessageMask:
+      strPropertyIncorrectParamType; Description:
+      strPropertyIncorrectParamTypeDesc),
+    (Category: strPropertyReturnDocumentation; MessageMask:
+      strPropertyUndocumentedReturn; Description:
+      strPropertyUndocumentedReturnDesc),
+    (Category: strPropertyReturnDocumentation; MessageMask:
+      strPropertyIncorrectReturnType; Description:
+      strPropertyIncorrectReturnTypeDesc),
+    (Category: strPropertyPreconDocumentation; MessageMask:
+      strPropertyPreconNotDocumented; Description:
+      strPropertyPreconNotDocumentedDesc),
+    (Category: strPropertyPreconDocumentation; MessageMask:
+      strPropertyMissingPrecon; Description: strPropertyMissingPreconDesc),
+    (Category: strPropertyPreconDocumentation; MessageMask:
+      strPropertyTooManyPrecons; Description: strPropertyTooManyPreconsDesc),
+    (Category: strPropertyPostconDocumentation; MessageMask:
+      strPropertyPostconNotDocumented; Description:
+      strPropertyPostconNotDocumentedDesc),
+    (Category: strPropertyPostconDocumentation; MessageMask:
+      strPropertyMissingPostcon; Description: strPropertyMissingPostconDesc),
+    (Category: strPropertyPostconDocumentation; MessageMask:
+      strPropertyTooManyPostcons; Description: strPropertyTooManyPostconsDesc)
   );
-
-  (** A list of string representing the types of modules. **)
-  strModuleTypes : Array[mtProgram..mtUnit] Of String = ('Program', 'Package',
-    'Library', 'Unit');
-  (** This is a constant for special tag items to show in the tree **)
-  iShowInTree = $0001;
-  (** This is a constant for special tag items to auto expand in the tree **)
-  iAutoExpand = $0002;
 
 Var
   (** This is a global string list containing the special tags list. **)
@@ -1943,6 +2241,10 @@ Uses
            taken for and LastToken os the type of the last token as this has an
            effect on some characters.
   @postcon Returns the token type for the given character.
+
+  @todo    Move this to pascalDocModule as it is language specific and provide
+           the ExplorerModuleFrame with an independant version switch can be
+           configured through options.
 
   @param   Ch           as a Char
   @param   LastCharType as a TTokenType
@@ -2039,7 +2341,7 @@ begin
       Else
         Begin
           Result := True;
-          Exit;
+          Break;
         End;
     End;
 end;
@@ -2149,10 +2451,13 @@ Var
   Procedure ProcessValue(iIndex : Integer; var iValue : Word; Delete : Boolean);
 
   Begin
-    If iIndex > sl.Count - 1 Then Exit;
-    Val(sl[iIndex], iValue, i);
-    If i <> 0 Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-    If Delete Then sl.Delete(iIndex);
+    If iIndex <= sl.Count - 1 Then
+      Begin
+        Val(sl[iIndex], iValue, i);
+        If i <> 0 Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+        If Delete Then
+          sl.Delete(iIndex);
+      End;
   End;
 
   (**
@@ -2606,9 +2911,8 @@ begin
       FLastTag := TTag.Create(Copy(strToken, 2, Length(strToken) - 1),
         FTagLine, FTagColumn - Length(strToken));
       FTags.Add(FLastTag);
-      Exit; // Don't add token identifier to token list
-    End;
-  If Not FTagMode Then
+    End
+  Else If Not FTagMode Then
     Begin
       If (strToken[1] = '<') And (strToken[Length(strToken)] = '>') Then
         iType := ttHTMLTag;
@@ -2701,7 +3005,12 @@ begin
   For i := 0 To TokenCount - 1 Do
     If (TokenType[i] <> ttHTMLtag) Or ((TokenType[i] = ttHTMLtag) And ShowHTML) Then
     Begin
-      str := str + Token[i] + #32;
+      If Copy(Token[i], 1, 2) = '@@' Then
+        str := str + Copy(Token[i], 2, Length(Token[i]) - 1) + #32
+      Else If Copy(Token[i], 1, 1) = '#' Then
+        str := str + #13 + Copy(Token[i], 2, Length(Token[i]) - 1) + #32
+      Else
+        str := str + Token[i] + #32;
       If Length(str) > iMaxWidth Then
         Begin
           If Result <> '' Then
@@ -2789,19 +3098,27 @@ class function TComment.CreateComment(strComment: String; iLine,
 
 begin
   Result := Nil;
-  If Length(strComment) = 0 Then Exit;
-  Case strComment[1] Of
-    '/' : strComment := Copy(strComment, 3, Length(strComment) - 2);
-    '{' : strComment := Copy(strComment, 2, Length(strComment) - 2);
-    '(' : strComment := Copy(strComment, 3, Length(strComment) - 4);
-  End;
-  If Length(strComment) = 0 Then Exit;
-  If strComment[Length(strComment)] = '*' Then
-    SetLength(strComment, Length(strComment) - 1);
-  If Length(strComment) = 0 Then Exit;
-  If Not (strComment[1] In [':', '*']) Then Exit;
-  strComment := Copy(strComment, 2, Length(strComment) - 1);
-  Result := Create(strComment, iLine, iCol);
+  If Length(strComment) > 0 Then
+    Begin
+      Case strComment[1] Of
+        '/' : strComment := Copy(strComment, 3, Length(strComment) - 2);
+        '{' : strComment := Copy(strComment, 2, Length(strComment) - 2);
+        '(' : strComment := Copy(strComment, 3, Length(strComment) - 4);
+      End;
+      If Length(strComment) > 0 Then
+        Begin
+          If strComment[Length(strComment)] = '*' Then
+            SetLength(strComment, Length(strComment) - 1);
+          If Length(strComment) > 0 Then
+            Begin
+              If (strComment[1] In [':', '*']) Then
+                Begin;
+                  strComment := Copy(strComment, 2, Length(strComment) - 1);
+                  Result := Create(strComment, iLine, iCol);
+                End;
+            End;
+        End;
+    End;
 end;
 
 (**
@@ -3061,7 +3378,7 @@ begin
     If AnsiCompareText(Tag[i].TagName, strTagName) = 0 Then
       Begin
         Result := i;
-        Exit;
+        Break;
       End;
 end;
 
@@ -3179,6 +3496,34 @@ begin
   FIdents.Free;
   inherited;
 end;
+
+(**
+
+  This method returns the index of the identifer which matches the given
+  identifier else returns -1.
+
+  @precon  None.
+  @postcon Returns the index of the identifer which matches the given
+           identifier else returns -1.
+
+  @param   strIdent as a String
+  @return  an Integer 
+
+**)
+Function TIdentList.Find(strIdent : String) : Integer;
+
+Var
+  i : Integer;
+
+Begin
+  Result := -1;
+  For i := 0 To Count - 1 Do
+    If AnsiCompareText(strIdent, Idents[i].Ident) = 0 Then
+      Begin
+        Result := i;
+        Break;
+      End;
+End;
 
 (**
 
@@ -3710,7 +4055,7 @@ begin
       If AnsiCompareText(strClassName, (FItems[i] As TObjectDecl).Identifier) = 0 Then
         Begin
           Result := i;
-          Exit;
+          Break;
         End;
 end;
 
@@ -3932,7 +4277,7 @@ begin
   FLine := Prop.Line;
   For i := 0 To Prop.Parameters.Count - 1 Do
     Begin
-      P := TParameter.Create(pmNone, '', False, Nil, '', scPrivate, 0, 0);
+      P := TParameter.Create(pamNone, '', False, Nil, '', scPrivate, 0, 0);
       P.Assign(Prop.Parameters[i]);
       Parameters.Add(P);
     End;
@@ -4024,9 +4369,9 @@ begin
       For i := 0 To Parameters.Count - 1 Do
         Begin
           Case Parameters[i].ParamModifier Of
-            pmConst : Result := Result + 'Const ';
-            pmVar: Result := Result + 'Var ';
-            pmOut: Result := Result + 'Out ';
+            pamConst : Result := Result + 'Const ';
+            pamVar: Result := Result + 'Var ';
+            pamOut: Result := Result + 'Out ';
           End;
           If i <> 0 Then
             Result := Result + '; ';
@@ -4322,6 +4667,7 @@ Begin
   FVars := TGenericContainerCollection.Create(True);
   FConsts := TGenericContainerCollection.Create(True);
   FResStrings := TGenericContainerCollection.Create(True);
+  FLabels := TIdentList.Create;
 End;
 
 (**
@@ -4336,6 +4682,7 @@ End;
 Destructor TMethodDecl.Destroy;
 
 Begin
+  FLabels.Free;
   FResStrings.Free;
   FConsts.Free;
   FVars.Free;
@@ -4380,7 +4727,7 @@ begin
   FMsg := Method.Msg;
   For i := 0 To Method.Parameters.Count - 1 Do
     Begin
-      P := TParameter.Create(pmNone, '', False, Nil, '', scPrivate, 0, 0);
+      P := TParameter.Create(pamNone, '', False, Nil, '', scPrivate, 0, 0);
       P.Assign(Method.Parameters[i]);
       Parameters.Add(P);
     End;
@@ -4562,7 +4909,7 @@ begin
     If AnsiCompareText(strDirective, Directives[i]) = 0 Then
       Begin
         Result := True;
-        Exit;
+        Break;
       End;
 end;
 
@@ -4723,7 +5070,7 @@ begin
       (AnsiCompareText(strMethodName, Method[i].Identifier) = 0) Then
       Begin
         Result := i;
-        Exit;
+        Break;
       End;
 end;
 
@@ -4759,8 +5106,6 @@ end;
   @param   ShowFirstToken as a Boolean
   @return  a String
 
-  @bug     Need to provide a Type Set of Parameters for the option to AsString().
-
 **)
 Function TRecordDecl.AsString(ShowFirstToken : Boolean) : String;
 
@@ -4768,7 +5113,10 @@ Var
   i : Integer;
 
 Begin
-  Result := Identifier + ' = Record';
+  Result := Identifier;
+  If Result <> '' Then
+    Result := Result + #32;
+  Result := Result + 'Record';
   For i := 0 To Parameters.Count - 1 Do
     Result := Result + #32 + Parameters[i].FIdentifier + ' : ' +
       Parameters[i].FParamType.AsString(True) + ';';
@@ -4851,7 +5199,7 @@ begin
   Scope := AObject.Scope;
   For i := 0 To AObject.Parameters.Count - 1 Do
     Begin
-      P := TParameter.Create(pmNone, '', False, Nil, '', scPrivate, 0, 0);
+      P := TParameter.Create(pamNone, '', False, Nil, '', scPrivate, 0, 0);
       P.Assign(AObject.Parameters[i]);
       AddParameter(P);
     End;
@@ -5571,19 +5919,26 @@ end;
   @precon  None.
   @postcon Returns the comment immediately before the current token else nil.
 
+  @param   CommentPosition as a TCommentPosition
   @return  a TComment
 
 **)
-Function TBaseLanguageModule.GetComment : TComment;
+Function TBaseLanguageModule.GetComment(
+  CommentPosition : TCommentPosition) : TComment;
 
 Var
   T : TTokenInfo;
+  iOffset : Integer;
 
 Begin
   Result := Nil;
-  If FTokenIndex - 1 > -1 Then
+  If CommentPosition = cpBeforeCurrentToken Then
+    iOffset := -1
+  Else
+    iOffset := -2;
+  If FTokenIndex + iOffset > -1 Then
     Begin
-      T := FTokens[FTokenIndex - 1] As TTokenInfo;
+      T := FTokens[FTokenIndex + iOffset] As TTokenInfo;
       If T.TokenType = ttComment Then
         Begin
           Result := TComment.CreateComment(T.Token, T.Line, T.Column);
@@ -5715,6 +6070,23 @@ function TBaseLanguageModule.GetDocumentConflictCount: Integer;
 begin
   Result := FDocumentConflicts.Count;
 end;
+
+(**
+
+  This is a getter method for the ModuleName property.
+
+  @precon  None.
+  @postcon Override this method to change its appearance.
+
+  @return  a String
+
+**)
+Function TBaseLanguageModule.GetModuleName : String;
+
+Begin
+  Result := FModuleName;
+End;
+
 
 (**
 
@@ -5891,12 +6263,19 @@ procedure TBaseLanguageModule.NextNonCommentToken;
 Var
   boolContinue : Boolean;
   iSkip : Integer;
+  C : TComment;
 
 begin
   iSkip := 0;
   If Token.TokenType = ttCompilerDirective Then // Catch first token as directive
     ProcessCompilerDirective(iSkip);
   Repeat
+    If Token.TokenType = ttComment Then
+      Begin
+        C := TComment.CreateComment(Token.Token, Token.Line, Token.Column);
+        If C <> Nil Then
+          BodyComments.Add(C);
+      End;
     If Not (TokenInfo[FTokenIndex].TokenType In [ttComment, ttCompilerDirective])
       And (iSkip = 0) Then
       FPreviousTokenIndex := FTokenIndex;
@@ -5970,6 +6349,25 @@ procedure TBaseLanguageModule.ProcessCompilerDirective(var iSkip : Integer);
     Result := AnsiCompareText(Copy(strText, 1, Length(strStart)), strStart) = 0;
   End;
 
+  (**
+
+    This method adds the number to the stack and increments the iSkip variable
+    by the value passed.
+
+    @precon  None.
+    @postcon Adds the number to the stack and increments the iSkip variable
+             by the value passed.
+
+    @param   iValue as an Integer
+
+  **)
+  Procedure AddToStackAndInc(iValue : Integer);
+
+  Begin
+    FCompilerConditionStack.Add(Pointer(iValue));
+    Inc(iSkip, iValue);
+  End;
+
 Var
   iStack, iStackTop : Integer;
 
@@ -5981,22 +6379,25 @@ begin
   Else If Like(Token.Token, '{$IFDEF') Then
     Begin
       If Not IfDef(GetDef) Then
-        Begin
-          FCompilerConditionStack.Add(Pointer(1));
-          Inc(iSkip);
-        End Else
-          FCompilerConditionStack.Add(Pointer(0));
+        AddToStackAndInc(1)
+      Else
+        AddToStackAndInc(0);
+    End
+  Else If Like(Token.Token, '{$IFOPT') Then
+    Begin
+      If Not IfDef(GetDef) Then
+        AddToStackAndInc(1)
+      Else
+        AddToStackAndInc(0);
     End
   Else If Like(Token.Token, '{$IFNDEF') Then
     Begin
       If Not IfNotDef(GetDef) Then
-        Begin
-          FCompilerConditionStack.Add(Pointer(1));
-          Inc(iSkip);
-        End Else
-          FCompilerConditionStack.Add(Pointer(0));
+        AddToStackAndInc(1)
+      Else
+        AddToStackAndInc(0);
     End
-  Else If Like(Token.Token, '{$ELSE}') Then
+  Else If Like(Token.Token, '{$ELSE') Then
     Begin
       iStackTop := FCompilerConditionStack.Count;
       If iStackTop > 0 Then
@@ -6015,7 +6416,7 @@ begin
           Errors.Add(Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
             'ProcessCompilerDirective', Token.Line, Token.Column, etWarning);
     End
-  Else If Like(Token.Token, '{$ENDIF}') Then
+  Else If Like(Token.Token, '{$ENDIF') Then
     Begin
       iStackTop := FCompilerConditionStack.Count;
       If iStackTop > 0 Then
@@ -6058,7 +6459,7 @@ begin
         ttCompilerDirective]) Then
         Begin
           Result := FTokens[i] As TTokenInfo;
-          Exit;
+          Break;
         End;
 end;
 

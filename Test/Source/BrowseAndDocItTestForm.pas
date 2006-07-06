@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    24 Jun 2006
+  @Date    06 Jul 2006
   @Author  David Hoyle
 
 **)
@@ -111,7 +111,7 @@ begin
     SynEdit1.Lines.SaveToStream(Source);
     Source.Position := 0;
     M := TPascalDocModule.Create(Source, FileName, True,
-      [moParse, moCheckForDocumentConflicts], FDocOptions);
+      [moParse, moCheckForDocumentConflicts], FDocOptions, Nil);
     Try
       TfrmTokenForm.Execute(M);
     Finally
@@ -175,6 +175,16 @@ begin
   FProgressForm.Hide;
 end;
 
+(**
+
+  This method recurse the directories searching for files.
+
+  @precon  None.
+  @postcon Recurse the directories searching for files.
+
+  @param   strDirectory as a String
+
+**)
 Procedure TfrmBrowseAndDocItTestForm.RecurseDirectories(strDirectory : String);
 
 Var
@@ -207,6 +217,17 @@ Begin
   End;
 End;
 
+(**
+
+  This method gets the number of errors for the given files name.
+
+  @precon  None.
+  @postcon Gets the number of errors for the given files name.
+
+  @param   strFileName as a String
+  @return  an Integer    
+
+**)
 Function TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String) : Integer;
 
 Var
@@ -218,7 +239,7 @@ Begin
   Try
     Source.Position := 0;
     M := TPascalDocModule.Create(Source, strFileName, False,
-      [moParse], FDocOptions);
+      [moParse], FDocOptions, Nil);
     Try
       Result := M.Errors.Count;
     Finally
@@ -301,6 +322,19 @@ begin
   For i := Low(TDocOption) To High(TDocOption) Do
     Include(FDocOptions, i);
   SpecialTags := TStringList.Create;
+  SpecialTags.AddObject('todo=Things To Do', TObject(3));
+  SpecialTags.AddObject('precon=Pre-Conditions', TObject(0));
+  SpecialTags.AddObject('postcon=Post-Conditions', TObject(0));
+  SpecialTags.AddObject('param=Parameters', TObject(0));
+  SpecialTags.AddObject('return=Returns', TObject(0));
+  SpecialTags.AddObject('note=Notes', TObject(0));
+  SpecialTags.AddObject('see=Also See', TObject(0));
+  SpecialTags.AddObject('exception=Exception Raised', TObject(0));
+  SpecialTags.AddObject('bug=Known Bugs', TObject(3));
+  SpecialTags.AddObject('debug=Debugging Code', TObject(3));
+  SpecialTags.AddObject('date=Date Code Last Updated', TObject(0));
+  SpecialTags.AddObject('author=Code Author', TObject(0));
+  SpecialTags.AddObject('version=Code Version', TObject(0));
   FModuleExplorerFrame := TframeModuleExplorer.Create(Self);
   FModuleExplorerFrame.Parent := Panel1;
   FModuleExplorerFrame.Align := alClient;
@@ -429,7 +463,7 @@ begin
     SynEdit1.Lines.SaveToStream(Source);
     Source.Position := 0;
     M := TPascalDocModule.Create(Source, FileName, SynEdit1.Modified,
-      [moParse, moCheckForDocumentConflicts], FDocOptions);
+      [moParse, moCheckForDocumentConflicts], FDocOptions, Nil);
     Try
       FModuleExplorerFrame.RenderModule(M, FDocOptions);
     Finally
@@ -457,6 +491,16 @@ begin
   Panel2.Caption := Format('Line %d, Column %d', [SynEdit1.CaretY, SynEdit1.CaretX]);
 end;
 
+(**
+
+  This is a setter method for the Directory property.
+
+  @precon  None.
+  @postcon Forces the list box of files to be updated when the directory changes.
+
+  @param   Value as a String constant
+
+**)
 procedure TfrmbrowseAndDocItTestForm.SetDirectory(Const Value : String);
 begin
   FDirectory := Value;
@@ -464,6 +508,17 @@ begin
   DirectoryListBox1Change(Self);
 end;
 
+(**
+
+  This is an edit on change event handler.
+
+  @precon  None.
+  @postcon Updates the Directory based on the directory typed in the edit
+           control.
+
+  @param   Sender as a TObject
+
+**)
 procedure TfrmBrowseAndDocItTestForm.edtDirectoryChange(Sender: TObject);
 begin
   If DirectoryExists(edtDirectory.Text) Then

@@ -6,17 +6,8 @@
               TStream decendant passed to the constructor which contains the
               source code text to be parsed.
 
-  @bug        Comments which lie out side the method and not conisdered part of
-              the tokens parsed are not picked up during as BodyComments, i.e.
-
-              //: @@todo First comment
-              //: @@todo Second comment
-
-              The first comment is not picked up as it does not relate to a
-              specific token.
-
   @Version    1.0
-  @Date       30 Jun 2006
+  @Date       06 Jul 2006
   @Author     David Hoyle
 
 **)
@@ -63,7 +54,7 @@ Type
     Function ExportedStmt : Boolean;
     procedure ExportsItem;
     Procedure DeclSection(Scope : TScope; Method : TMethodDecl);
-    Function LabelDeclSection : Boolean;
+    Function LabelDeclSection(M : TMethodDecl) : Boolean;
     Function ConstSection(Scope : TScope; Method : TMethodDecl) : Boolean;
     Function ConstantDecl(Scope : TScope; Method : TMethodDecl) : Boolean;
     Function ResStringSection(Scope: TScope; Method : TMethodDecl): Boolean;
@@ -114,23 +105,23 @@ Type
     Function SetConstructor(C : TGenericContainer) : Boolean;
     Procedure SetElement(C : TGenericContainer);
     Procedure ExprList(C : TGenericContainer);
-    Procedure Statement;
-    Procedure StmtList;
+    Procedure Statement(M : TMethodDecl);
+    Procedure StmtList(M : TMethodDecl);
     Procedure SimpleStatement;
-    Function StructStmt : Boolean;
-    Function CompoundStmt : Boolean;
-    Function ConditionalStmt : Boolean;
-    Function IfStmt : Boolean;
-    Function CaseStmt : Boolean;
-    Procedure CaseSelector;
+    Function StructStmt(M : TMethodDecl) : Boolean;
+    Function CompoundStmt(M : TMethodDecl) : Boolean;
+    Function ConditionalStmt(M : TMethodDecl) : Boolean;
+    Function IfStmt(M : TMethodDecl) : Boolean;
+    Function CaseStmt(M : TMethodDecl) : Boolean;
+    Procedure CaseSelector(M : TMethodDecl);
     Procedure CaseLabel;
-    Function LoopStmt : Boolean;
-    Function RepeatStmt : Boolean;
-    Function WhileStmt : Boolean;
-    Function ForStmt : Boolean;
-    Function WithStmt : Boolean;
-    Function TryExceptAndFinallyStmt : Boolean;
-    Function ExceptionBlock : Boolean;
+    Function LoopStmt(M : TMethodDecl) : Boolean;
+    Function RepeatStmt(M : TMethodDecl) : Boolean;
+    Function WhileStmt(M : TMethodDecl) : Boolean;
+    Function ForStmt(M : TMethodDecl) : Boolean;
+    Function WithStmt(M : TMethodDecl) : Boolean;
+    Function TryExceptAndFinallyStmt(M : TMethodDecl) : Boolean;
+    Function ExceptionBlock(M : TMethodDecl) : Boolean;
     Function RaiseStmt : Boolean;
     Function AssemblerStatement : Boolean;
     Function ProcedureDeclSection(Scope : TScope; Method : TMethodDecl) : Boolean;
@@ -186,9 +177,12 @@ Type
     procedure ArrayElement(C : TGenericContainer;
       iStartDimension: Integer; AT : TArrayType);
     Function UndefinedToken : Boolean;
+  Protected
+    Function GetModuleName : String; Override;
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
-      ModuleOptions : TModuleOptions; DocOptions : TDocOptions);
+      ModuleOptions : TModuleOptions; DocOptions : TDocOptions;
+      Defines : TStringList);
     Destructor Destroy; Override;
     Function FindMethodAtStreamPosition(iStreamPos : TStreamPosition;
       var recPosition : TTokenPosition) : TMethodDecl;
@@ -222,6 +216,20 @@ Type
   End;
 
 Const
+  (** A string representing the Array Of parameter type. **)
+  strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
+
+Implementation
+
+Uses
+  PascalDocChecker;
+
+(** @bug These constants are Language Specific. Implement these are properties
+         in the base language class of type TCharSet = Set of Char where the
+         Getter method is virtual and can be overridden in the desccendant
+         class and therefore return the specific languages token
+         characteristics. **)
+Const
   (**
     A sorted list of keywords. Used for identifying tokens as keyword.
 
@@ -251,6 +259,14 @@ Const
     'resident', 'safecall', 'stdcall', 'stored', 'varargs', 'virtual', 'write',
     'writeonly'
   );
+  
+Const
+  (** A list of string representing the types of modules. **)
+  strModuleTypes : Array[mtProgram..mtUnit] Of String = ('Program', 'Package',
+    'Library', 'Unit');
+  (** A list of strings representing the scope types. **)
+  strScope : Array[scGlobal..scPublished] Of String = ('global', 'local',
+    'private', 'protected', 'public', 'published');
   (** A sorted list of method directives. Used in identifying method
   directives. **)
   strMethodDirectives : Array[1..19] Of String = (
@@ -276,8 +292,6 @@ Const
   strVariants : Array[1..2] Of String = ('olevariant', 'variant');
   (** A list of string types. **)
   strStrings  : Array[1..3] Of String = ('ansistring', 'string', 'widestring');
-  (** A string representing the Array Of parameter type. **)
-  strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
   (** This is a list of compound block statement start keywords. **)
   strBlockStarts : Array[1..4] Of String = ('asm', 'begin', 'case', 'try');
 
@@ -324,37 +338,6 @@ Const
   strPortabilityDirective : Array[1..3] Of String = ('deprecated', 'library',
     'platform');
 
-Implementation
-
-Uses
-  PascalDocChecker;
-
-(**
-
-  Thid method checks to see if the supplied tag is a special tag.
-
-  @precon  strTagName is the name of a special tag to be checked.
-  @postcon Returns the index of the special tag or -1 is not found.
-
-  @param   strTagName as a String
-  @return  a Integer
-
-**)
-Function IsSpecial(strTagName : String) : Integer;
-
-Var
-  i : Integer;
-
-Begin
-  Result := -1;
-  For i := 0 To SpecialTags.Count - 1 Do
-    If AnsiCompareText(SpecialTags.Names[i], strTagName) = 0 Then
-      Begin
-        Result := i;
-        Exit;
-      End;
-End;
-
 (**
 
   This is the constructor method for the TPascalDocModule class.
@@ -370,13 +353,17 @@ End;
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
   @param   DocOptions    as a TDocOptions
+  @param   Defines       as a TStringList
 
 **)
 Constructor TPascalDocModule.Create(Source : TStream; strFileName : String;
-  IsModified : Boolean; ModuleOptions : TModuleOptions; DocOptions : TDocOptions);
+  IsModified : Boolean; ModuleOptions : TModuleOptions; DocOptions : TDocOptions;
+  Defines : TStringList);
 
 Begin
   Inherited Create(IsModified, strFileName);
+  If Defines <> Nil Then
+    CompilerDefines.Assign(Defines);
   FSourceStream := Source;
   AddTickCount('Start');
   TokenizeStream;
@@ -433,7 +420,6 @@ Const
   (** Growth size of the token buffer. **)
   iTokenCapacity = 25;
   test = 12.34;
-  {: @todo Move to BaseLanguageModule }
   strSingleSymbols : Set Of Char = ['(', ')', ';', ',', '[', ']', '^', '-', '+', '/', '*'];
 
 Var
@@ -659,31 +645,32 @@ Begin
         iTokenIndex := i;
         Break;
       End;
-  If iTokenIndex = -1 Then
-    Exit;
-  SetTokenIndex(iTokenIndex);
-  recPosition.Line := Token.Line;
-  recPosition.Column := Token.Column;
-  recPosition.BufferPos := Token.BufferPos;
-  If (PrevToken <> Nil) And (PrevToken.UToken = 'CLASS') Then
+  If iTokenIndex > -1 Then
     Begin
-      recPosition.BufferPos := PrevToken.BufferPos;
-      recPosition.Column := PrevToken.Column;
+      SetTokenIndex(iTokenIndex);
+      recPosition.Line := Token.Line;
+      recPosition.Column := Token.Column;
+      recPosition.BufferPos := Token.BufferPos;
+      If (PrevToken <> Nil) And (PrevToken.UToken = 'CLASS') Then
+        Begin
+          recPosition.BufferPos := PrevToken.BufferPos;
+          recPosition.Column := PrevToken.Column;
+        End;
+      If Token.UToken = 'CONSTRUCTOR' Then
+        MethodType := mtConstructor
+      Else If Token.UToken = 'DESTRUCTOR' Then
+        MethodType := mtDestructor
+      Else If Token.UToken = 'FUNCTION' Then
+        MethodType := mtFunction
+      Else
+        MethodType := mtProcedure;
+      Case MethodType Of
+        mtConstructor: Result := ConstructorHeading(scPublic);
+        mtDestructor: Result := DestructorHeading(scPublic);
+        mtFunction: Result := FunctionHeading(scPublic);
+        mtProcedure: Result := ProcedureHeading(scPublic);
+      End;
     End;
-  If Token.UToken = 'CONSTRUCTOR' Then
-    MethodType := mtConstructor
-  Else If Token.UToken = 'DESTRUCTOR' Then
-    MethodType := mtDestructor
-  Else If Token.UToken = 'FUNCTION' Then
-    MethodType := mtFunction
-  Else
-    MethodType := mtProcedure;
-  Case MethodType Of
-    mtConstructor: Result := ConstructorHeading(scPublic);
-    mtDestructor: Result := DestructorHeading(scPublic);
-    mtFunction: Result := FunctionHeading(scPublic);
-    mtProcedure: Result := ProcedureHeading(scPublic);
-  End;
 End;
 
 (**
@@ -727,14 +714,16 @@ Begin
         iTokenIndex := i;
         Break;
       End;
-  If iTokenIndex = -1 Then Exit;
-  SetTokenIndex(iTokenIndex);
-  recPosition.Line := Token.Line;
-  recPosition.Column := Token.Column;
-  recPosition.BufferPos := Token.BufferPos;
-  Result := TClassDecl.Create('Temp', scPrivate, 0, 0);
-  If Not (PropertyList(Result, Scope) And (Result.Properties.Count > 0)) Then
-    FreeAndNil(Result);
+  If iTokenIndex > -1 Then
+    Begin
+      SetTokenIndex(iTokenIndex);
+      recPosition.Line := Token.Line;
+      recPosition.Column := Token.Column;
+      recPosition.BufferPos := Token.BufferPos;
+      Result := TClassDecl.Create('Temp', scPrivate, 0, 0);
+      If Not (PropertyList(Result, Scope) And (Result.Properties.Count > 0)) Then
+        FreeAndNil(Result);
+    End;
 End;
 
 
@@ -808,11 +797,12 @@ begin
       If Not (Types[i] Is TInterfaceDecl) Then
         With Types[i] As TObjectDecl Do
           For j := 0 To Methods.Count -1 Do
-            If ImplementedMethods.Find(Identifier, Methods[j].Identifier) = -1 Then
-              If Not Methods[j].HasDirective('ABSTRACT') Then
-                Errors.Add(Format(strUnsatisfiedForwardReference,
-                  [Identifier, Methods[j].Identifier]), 'ScopeImplementedMethods',
-                  Methods[j].Line, Methods[j].Col, etError);
+            If Methods[j].Alias = '' Then
+              If ImplementedMethods.Find(Identifier, Methods[j].Identifier) = -1 Then
+                If Not Methods[j].HasDirective('ABSTRACT') Then
+                  Errors.Add(Format(strUnsatisfiedForwardReference,
+                    [Identifier, Methods[j].Identifier]), 'ScopeImplementedMethods',
+                    Methods[j].Line, Methods[j].Col, etError);
 end;
 
 (**
@@ -919,7 +909,7 @@ End;
 
   @param   strToken as a String
   @param   C        as a TGenericContainer
-  @return  a Boolean 
+  @return  a Boolean
 
 **)
 Function TPascalDocModule.IsToken(strToken : String; C : TGenericContainer): Boolean;
@@ -929,6 +919,25 @@ Begin
   If Result Then
     AddToExpression(C);
 End;
+
+(**
+
+  This is a getter method for the ModuleName property.
+
+  @precon  None.
+  @postcon Overrides the inherited method to place the module type in front of
+           the module name.
+
+  @return  a String
+
+**)
+Function TPascalDocModule.GetModuleName : String;
+
+Begin
+  Result := Inherited GetModuleName;
+  Result := strModuleTypes[ModuleType] + #32 + Result;
+End;
+
 
 (**
 
@@ -951,27 +960,28 @@ Var
 
 begin
   Try
-    If TokenCount = 0 Then
-      Exit;
-    // Find first non comment token
-    While (Token.TokenType In [ttComment, ttCompilerDirective]) And Not EndOfTokens Do
-      NextNonCommentToken;
-    // Check for end of file else must be identifier
-    If Not EndOfTokens Then
+    If TokenCount > 0 Then
       Begin
-        ModuleComment := GetComment;
-        boolHasProcessed := OPProgram;
-        If Not boolHasProcessed  Then
-          boolHasProcessed := OPLibrary;
-        If Not boolHasProcessed  Then
-          boolHasProcessed := OPPackage;
-        If Not boolHasProcessed  Then
-          boolHasProcessed := OPUnit;
-        If Not boolHasProcessed  Then
-          ErrorAndSeekToken(strModuleKeyWordNotfound, 'Goal', Token.Token,
-            strSeekableOnErrorTokens, stActual);
-      End Else
-        Raise EDocException.Create(strUnExpectedEndOfFile);
+        // Find first non comment token
+        While (Token.TokenType In [ttComment, ttCompilerDirective]) And Not EndOfTokens Do
+          NextNonCommentToken;
+        // Check for end of file else must be identifier
+        If Not EndOfTokens Then
+          Begin
+            ModuleComment := GetComment;
+            boolHasProcessed := OPProgram;
+            If Not boolHasProcessed  Then
+              boolHasProcessed := OPLibrary;
+            If Not boolHasProcessed  Then
+              boolHasProcessed := OPPackage;
+            If Not boolHasProcessed  Then
+              boolHasProcessed := OPUnit;
+            If Not boolHasProcessed  Then
+              ErrorAndSeekToken(strModuleKeyWordNotfound, 'Goal', Token.Token,
+                strSeekableOnErrorTokens, stActual);
+          End Else
+            Raise EDocException.Create(strUnExpectedEndOfFile);
+      End;
   Except
     On E : EDocException Do
       Errors.Add(E.Message, E.ExceptionMethod, 0, 0, etError);
@@ -998,42 +1008,43 @@ Function TPascalDocModule.OPProgram : Boolean;
 
 begin
   Result := Token.UToken = 'PROGRAM';
-  If Not Result Then
-    Exit;
-  ModuleType := mtProgram;
-  NextNonCommentToken;
-  If Token.TokenType = ttIdentifier Then
+  If Result Then
     Begin
-      ModuleName := Token.Token;
-      ModuleNameLine := Token.Line;
-      ModuleNameCol := Token.Column;
+      ModuleType := mtProgram;
       NextNonCommentToken;
-      // In the Program module we need to check for '(' Ident List ')' but discard
-      If Token.Token = '(' Then
+      If Token.TokenType = ttIdentifier Then
         Begin
+          ModuleName := Token.Token;
+          ModuleNameLine := Token.Line;
+          ModuleNameCol := Token.Column;
           NextNonCommentToken;
-          IdentList(True, strSeekableOnErrorTokens); // get ident list
-          // Check for closing parenthesis
-          If Token.Token <> ')' Then
-            ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ')',
+          // In the Program module we need to check for '(' Ident List ')' but discard
+          If Token.Token = '(' Then
+            Begin
+              NextNonCommentToken;
+              IdentList(True, strSeekableOnErrorTokens); // get ident list
+              // Check for closing parenthesis
+              If Token.Token <> ')' Then
+                ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ')',
+                  strSeekableOnErrorTokens, stActual)
+              Else
+                NextNonCommentToken;
+            End;
+          // Check for ';'
+          If Token.Token <> ';' Then
+            ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ';',
               strSeekableOnErrorTokens, stActual)
           Else
             NextNonCommentToken;
-        End;
-      // Check for ';'
-      If Token.Token <> ';' Then
-        ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ';',
-          strSeekableOnErrorTokens, stActual)
-      Else
-        NextNonCommentToken;
-      ProgramBlock;
-      // Check for '.'
-      If Token.Token <> '.' Then
-        ErrorAndSeekToken(strLiteralExpected, 'OPProgram', '.',
-          strSeekableOnErrorTokens, stActual);
-    End Else
-      ErrorAndSeekToken(strIdentExpected, 'OPProgram', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+          ProgramBlock;
+          // Check for '.'
+          If Token.Token <> '.' Then
+            ErrorAndSeekToken(strLiteralExpected, 'OPProgram', '.',
+              strSeekableOnErrorTokens, stActual);
+        End Else
+          ErrorAndSeekToken(strIdentExpected, 'OPProgram', Token.Token,
+            strSeekableOnErrorTokens, stActual);
+    End;
 end;
 
 (**
@@ -1265,7 +1276,7 @@ Procedure TPascalDocModule.PortabilityDirective;
 
 Begin
   If IsKeyWord(Token.Token, strPortabilityDirective) Then
-    NextNonCommentToken; //: @todo Add to symbol.
+    NextNonCommentToken; //: @note Does not get added to any symbols.
 End;
 
 (**
@@ -1420,7 +1431,7 @@ Var
 
 Begin
   DeclSection(Scope, Method);
-  bool := CompoundStmt;
+  bool := CompoundStmt(Method);
   If Not bool Then
     AssemblerStatement;
 End;
@@ -1532,7 +1543,7 @@ Begin
   Repeat
     {Do nothing}
   Until Not (
-    LabelDeclSection Or
+    LabelDeclSection(Method) Or
     ConstSection(Scope, Method) Or
     ResStringSection(Scope, Nil) Or
     TypeSection(Scope, Method) Or
@@ -1554,18 +1565,19 @@ End;
   @precon  None.
   @postcon This method dicards the labels found and returns True if this method
            handles a label declaration section.
+
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.LabelDeclSection : Boolean;
+Function TPascalDocModule.LabelDeclSection(M : TMethodDecl) : Boolean;
 
 Begin
   Result := Token.UToken = 'LABEL';
   If Result Then
     Begin
       NextNonCommentToken;
-      // We will ignore labels but treat them as IdentLists
-      IdentList(True, strSeekableOnErrorTokens);
+      M.Labels.Assign(IdentList(True, strSeekableOnErrorTokens));
       // Check for ';'
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'LabelDeclSection', ';',
@@ -1726,22 +1738,23 @@ Var
 
 Begin
   Result := Token.UToken = 'RESOURCESTRING';
-  If Not Result Then
-    Exit;
-  R := ResourceStrings;
-  If Method <> Nil Then
-    R := Method.ResStrings;
-  If R.Comment = Nil Then
-    R.Comment := GetComment
-  Else
+  If Result Then
     Begin
-      C := GetComment;
-      R.Comment.Assign(C);
+      R := ResourceStrings;
+      If Method <> Nil Then
+        R := Method.ResStrings;
+      If R.Comment = Nil Then
+        R.Comment := GetComment
+      Else
+        Begin
+          C := GetComment;
+          R.Comment.Assign(C);
+        End;
+      NextNonCommentToken;
+      Repeat
+        {Loop do nothing}
+      Until Not ResourceStringDecl(Scope, Method);
     End;
-  NextNonCommentToken;
-  Repeat
-    {Loop do nothing}
-  Until Not ResourceStringDecl(Scope, Method);
 End;
 
 (**
@@ -2137,9 +2150,6 @@ End;
                           -> ClassType
                           -> InterfaceType
 
-  @note    The simpleType() method is here to act as a catch all for types that
-           have note been previously handled.
-
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
@@ -2173,22 +2183,22 @@ Function TPascalDocModule.ClassRefType : TClassRefType;
 
 Begin
   Result := Nil;
-  If Not (Token.UToken = 'CLASS') Then
-    Exit;
-  NextNonCommentToken;
-  If Token.UToken <> 'OF' Then
+  If Token.UToken = 'CLASS' Then
     Begin
-      RollBackToken;
-      Exit;
+      NextNonCommentToken;
+      If Token.UToken = 'OF' Then
+        Begin
+          NextNonCommentToken;
+          Result := TClassRefType.Create;
+          SymbolTable.Add(Result);
+          Result.Add('Class');
+          Result.Add('Of');
+          If Not TypeId(Result) Then
+            ErrorAndSeekToken(strTypeIdExpected, 'PointerType', '',
+              strSeekableOnErrorTokens, stActual);
+        End Else
+          RollBackToken;
     End;
-  NextNonCommentToken;
-  Result := TClassRefType.Create;
-  SymbolTable.Add(Result);
-  Result.Add('Class');
-  Result.Add('Of');
-  If Not TypeId(Result) Then
-    ErrorAndSeekToken(strTypeIdExpected, 'PointerType', '',
-      strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -2235,12 +2245,13 @@ Function TPascalDocModule.RealType : TRealType;
 
 Begin
   Result := Nil;
-  If Not IsKeyWord(Token.Token, strRealTypes) Then
-    Exit;
-  Result := TRealType.Create;
-  SymbolTable.Add(Result);
-  Result.Add(Token.Token);
-  NextNonCommentToken;
+  If IsKeyWord(Token.Token, strRealTypes) Then
+    Begin
+      Result := TRealType.Create;
+      SymbolTable.Add(Result);
+      Result.Add(Token.Token);
+      NextNonCommentToken;
+    End;
 End;
 
 (**
@@ -2294,12 +2305,13 @@ Function TPascalDocModule.OrdIdent : TOrdIdent;
 
 Begin
   Result := Nil;
-  If Not IsKeyWord(Token.Token, strOrdIdents) Then
-    Exit;
-  Result := TOrdIdent.Create;
-  SymbolTable.Add(Result);
-  Result.Add(Token.Token);
-  NextNonCommentToken;
+  If IsKeyWord(Token.Token, strOrdIdents) Then
+    Begin
+      Result := TOrdIdent.Create;
+      SymbolTable.Add(Result);
+      Result.Add(Token.Token);
+      NextNonCommentToken;
+    End;
 End;
 
 (**
@@ -2320,13 +2332,14 @@ Function TPascalDocModule.VariantType : TVariantType;
 
 begin
   Result := Nil;
-  If Not IsKeyWord(Token.UToken, strVariants) Then
-    Exit;
-  Result := TVariantType.Create;
-  SymbolTable.Add(Result);
-  Result.Add('=');
-  Result.Add(Token.Token);
-  NextNonCommentToken;
+  If IsKeyWord(Token.UToken, strVariants) Then
+    Begin
+      Result := TVariantType.Create;
+      SymbolTable.Add(Result);
+      Result.Add('=');
+      Result.Add(Token.Token);
+      NextNonCommentToken;
+    End;
 end;
 
 (**
@@ -2452,26 +2465,27 @@ Var
 
 begin
   Result := Nil;
-  If Not IsKeyWord(Token.Token, strStrings) Then
-    Exit;
-  Result := TStringType.Create;
-  SymbolTable.Add(Result);
-  Result.Add(Token.Token);
-  NextNonCommentToken;
-  // Check for '[' ConstExpr ']'
-  If Token.Token = '[' Then
+  If IsKeyWord(Token.Token, strStrings) Then
     Begin
-      Result.Add('[');
+      Result := TStringType.Create;
+      SymbolTable.Add(Result);
+      Result.Add(Token.Token);
       NextNonCommentToken;
-      ExprType := [etNumeric, etConstExpr];
-      ConstExpr(Result, ExprType);
-      If Token.Token = ']' Then
+      // Check for '[' ConstExpr ']'
+      If Token.Token = '[' Then
         Begin
-          Result.Add(Token.Token);
+          Result.Add('[');
           NextNonCommentToken;
-        End Else
-          ErrorAndSeekToken(strLiteralExpected, 'StringType', ']',
-            strSeekableOnErrorTokens, stActual);
+          ExprType := [etNumeric, etConstExpr];
+          ConstExpr(Result, ExprType);
+          If Token.Token = ']' Then
+            Begin
+              Result.Add(Token.Token);
+              NextNonCommentToken;
+            End Else
+              ErrorAndSeekToken(strLiteralExpected, 'StringType', ']',
+                strSeekableOnErrorTokens, stActual);
+        End;
     End;
 end;
 
@@ -2561,7 +2575,7 @@ Begin
           NextNonCommentToken;
           T := GetTypeDecl;
           If T <> Nil Then
-            Result.Add(T.AsString(False)); //: @todo Remove '=' and update recorddecl.asstring()
+            Result.Add(T.AsString(False));
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'ArrayType', 'OF',
             strSeekableOnErrorTokens, stActual);
@@ -2587,25 +2601,27 @@ Function TPascalDocModule.SetType(boolPacked : Boolean) : TSetType;
 
 Begin
   Result := Nil;
-  If Not (Token.UToken = 'SET') Then Exit;
-  Result := TSetType.Create;
-  SymbolTable.Add(Result);
-  If boolPacked Then
-    Result.Add('Packed');
-  Result.Add(Token.Token);
-  NextNonCommentToken;
-  If Token.UToken = 'OF' Then
+  If Token.UToken = 'SET' Then
     Begin
+      Result := TSetType.Create;
+      SymbolTable.Add(Result);
+      If boolPacked Then
+        Result.Add('Packed');
       Result.Add(Token.Token);
       NextNonCommentToken;
-      While Not (Token.Token[1] In [';', '=']) Do
+      If Token.UToken = 'OF' Then
         Begin
           Result.Add(Token.Token);
           NextNonCommentToken;
-        End;
-    End Else
-      ErrorAndSeekToken(strReservedWordExpected, 'SetType', 'OF',
-        strSeekableOnErrorTokens, stActual);
+          While Not (Token.Token[1] In [';', '=']) Do
+            Begin
+              Result.Add(Token.Token);
+              NextNonCommentToken;
+            End;
+        End Else
+          ErrorAndSeekToken(strReservedWordExpected, 'SetType', 'OF',
+            strSeekableOnErrorTokens, stActual);
+    End;
 End;
 
 (**
@@ -2627,24 +2643,25 @@ Function TPascalDocModule.FileType(boolPacked : Boolean) : TFileType;
 
 Begin
   Result := Nil;
-  If Not (Token.UToken = 'FILE') Then Exit;
-  NextNonCommentToken;
-  If Token.UToken <> 'OF' Then
+  If Token.UToken = 'FILE' Then
     Begin
-      RollBackToken;
-      Exit;
-    End;
-  Result := TFileType.Create;
-  SymbolTable.Add(Result);
-  If boolPacked Then
-    Result.Add('Packed');
-  Result.Add('File');
-  Result.Add(Token.Token);
-  NextNonCommentToken;
-  While Token.Token <> ';' Do
-    Begin
-      Result.Add(Token.Token);
       NextNonCommentToken;
+      If Token.UToken <> 'OF' Then
+        Begin
+          Result := TFileType.Create;
+          SymbolTable.Add(Result);
+          If boolPacked Then
+            Result.Add('Packed');
+          Result.Add('File');
+          Result.Add(Token.Token);
+          NextNonCommentToken;
+          While Token.Token <> ';' Do
+            Begin
+              Result.Add(Token.Token);
+              NextNonCommentToken;
+            End;
+        End Else
+          RollBackToken;
     End;
 End;
 
@@ -2666,17 +2683,19 @@ Function TPascalDocModule.RecType(boolPacked : Boolean): TRecordDecl;
 
 begin
   Result := Nil;
-  If Not (Token.UToken = 'RECORD') Then Exit;
-  Result := TRecordDecl.Create;
-  SymbolTable.Add(Result);
-  Result.IsPacked := boolPacked;
-  NextNonCommentToken;
-  FieldList(Result);
-  If Token.UToken = 'END' Then
-    NextNonCommentToken
-  Else
-    ErrorAndSeekToken(strReservedWordExpected, 'RecType', 'END',
-      strSeekableOnErrorTokens, stActual);
+  If Token.UToken = 'RECORD' Then
+    Begin
+      Result := TRecordDecl.Create;
+      SymbolTable.Add(Result);
+      Result.IsPacked := boolPacked;
+      NextNonCommentToken;
+      FieldList(Result);
+      If Token.UToken = 'END' Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strReservedWordExpected, 'RecType', 'END',
+          strSeekableOnErrorTokens, stActual);
+    End;
 end;
 
 (**
@@ -2698,12 +2717,13 @@ Procedure TPascalDocModule.FieldList(Rec: TRecordDecl);
 
 begin
   While (Token.UToken <> 'END') And (Token.Token <> ')') Do
-    Begin
-      If VariantSection(Rec) Then Exit;
-      FieldDecl(Rec);
-      // Check for ';'
-      If Token.Token = ';' Then NextNonCommentToken;
-    End;
+    If Not VariantSection(Rec) Then
+      Begin
+        FieldDecl(Rec);
+        // Check for ';'
+        If Token.Token = ';' Then
+          NextNonCommentToken;
+      End;
 end;
 
 (**
@@ -2738,7 +2758,7 @@ Begin
         // Create record fields
         For j := 0 To I.Count - 1 Do
           Begin
-            P :=  TParameter.Create(pmNone, I[j].Ident, False, T, '',
+            P :=  TParameter.Create(pamNone, I[j].Ident, False, T, '',
               scPublic, I[j].Line, I[j].Col);
             P.Comment := I[j].Comment;
             Rec.AddParameter(P);
@@ -2768,21 +2788,47 @@ End;
 **)
 Function TPascalDocModule.VariantSection(Rec: TRecordDecl) : Boolean;
 
+Var
+  C : TGenericContainer;
+
 Begin
   Result := Token.UToken = 'CASE';
   If Result Then
     Begin
-      //: @bug Skip CASE declaration to RecVariant section
-      While Token.UToken <> 'OF' Do
-        NextNonCommentToken;
-      Repeat
-        NextNonCommentToken;
-        If (Token.UToken = 'END') Or (Token.Token = ')') Then
-          Exit;
-        RecVariant(Rec);
-      Until Token.Token <> ';';
-      If Token.Token = ';' Then
-        NextNonCommentToken;
+      NextNonCommentToken;
+      If Token.TokenType = ttIdentifier Then
+        Begin
+          NextNonCommentToken;
+          If Token.Token = ':' Then
+            NextNonCommentToken
+          Else
+            RollBackToken;
+        End;
+      C := TGenericContainer.Create(Token.Token, scPrivate, Token.Line,
+        Token.Column);
+      Try
+        If TypeId(C) Then
+          Begin
+            If Token.UToken = 'OF' Then
+              Begin
+                NextNonCommentToken;
+                Repeat
+                  NextNonCommentToken;
+                  If (Token.UToken = 'END') Or (Token.Token = ')') Then
+                    Exit;
+                  RecVariant(Rec);
+                Until Token.Token <> ';';
+                If Token.Token = ';' Then
+                  NextNonCommentToken;
+              End Else
+                ErrorAndSeekToken(strReservedWordExpected, 'VariantSection',
+                  'OF', strSeekableOnErrorTokens, stActual);
+          End Else
+            ErrorAndSeekToken(strTypeIDExpected, 'VariantSection',
+              Token.Token, strSeekableOnErrorTokens, stActual);
+      Finally
+        C.Free;
+      End;
     End;
 End;
 
@@ -2852,15 +2898,16 @@ Function TPascalDocModule.PointerType : TPointerType;
 
 Begin
   Result := Nil;
-  If Not (Token.Token = '^') Then
-    Exit;
-  Result := TPointerType.Create;
-  SymbolTable.Add(Result);
-  Result.Add('^');
-  NextNonCommentToken;
-  If Not TypeId(Result) Then
-    ErrorAndSeekToken(strTypeIdExpected, 'PointerType', '',
-      strSeekableOnErrorTokens, stActual);
+  If Token.Token = '^' Then
+    Begin
+      Result := TPointerType.Create;
+      SymbolTable.Add(Result);
+      Result.Add('^');
+      NextNonCommentToken;
+      If Not TypeId(Result) Then
+        ErrorAndSeekToken(strTypeIdExpected, 'PointerType', '',
+          strSeekableOnErrorTokens, stActual);
+    End;
 end;
 
 (**
@@ -2886,43 +2933,43 @@ Var
 begin
   boolOfObject := False;
   Result := Nil;
-  If Not ((Token.UToken = 'FUNCTION') Or (Token.UToken = 'PROCEDURE')) Then
-    Exit;
-  If Token.UToken = 'FUNCTION' Then
-    MethodType := mtFunction
-  Else
-    MethodType := mtProcedure;
-  M := TMethodDecl.Create(MethodType, scPublic, 0, 0);
-  Try
-    NextNonCommentToken;
-    FormalParameter(M);
-    If Token.Token = ':' Then
-      Begin
+  If (Token.UToken = 'FUNCTION') Or (Token.UToken = 'PROCEDURE') Then
+    Begin
+      If Token.UToken = 'FUNCTION' Then
+        MethodType := mtFunction
+      Else
+        MethodType := mtProcedure;
+      M := TMethodDecl.Create(MethodType, scPublic, 0, 0);
+      Try
         NextNonCommentToken;
-        M.ReturnType := Token.Token;
-        NextNonCommentToken;
-      End;
-    If Token.UToken = 'OF' Then
-      Begin
-        NextNonCommentToken;
-        If Token.UToken <> 'OBJECT' Then
-          ErrorAndSeekToken(strReservedWordExpected, 'ProcedureType', 'OBJECT',
-            strSeekableOnErrorTokens, stActual)
-        Else
+        FormalParameter(M);
+        If Token.Token = ':' Then
           Begin
-            boolOfObject := True;
+            NextNonCommentToken;
+            M.ReturnType := Token.Token;
             NextNonCommentToken;
           End;
+        If Token.UToken = 'OF' Then
+          Begin
+            NextNonCommentToken;
+            If Token.UToken <> 'OBJECT' Then
+              ErrorAndSeekToken(strReservedWordExpected, 'ProcedureType', 'OBJECT',
+                strSeekableOnErrorTokens, stActual)
+            Else
+              Begin
+                boolOfObject := True;
+                NextNonCommentToken;
+              End;
+          End;
+        Result := TProcedureType.Create;
+        SymbolTable.Add(Result);
+        Result.Add(M.GetAsString(True, True));
+        If boolOfObject Then
+          Result.Add('Of Object');
+      Finally
+        M.Free;
       End;
-    //: @bug Directive(M);
-    Result := TProcedureType.Create;
-    SymbolTable.Add(Result);
-    Result.Add(M.GetAsString(True, True));
-    If boolOfObject Then
-      Result.Add('Of Object');
-  Finally
-    M.Free;
-  End;
+    End;
 end;
 
 (**
@@ -2953,26 +3000,27 @@ Var
 
 Begin
   Result := Token.UToken = 'VAR';
-  If Not Result Then
-    Exit;
-  V := Vars;
-  If Method <> Nil Then
-    V := Method.Vars;
-  If V.Comment = Nil Then
-    V.Comment := GetComment
-  Else
+  If Result Then
     Begin
-      C := GetComment;
-      V.Comment.Assign(C);
-    End;
-  NextNonCommentToken;
-  While VarDecl(Scope, V) Do
-    Begin
-      If Token.Token <> ';' Then
-        ErrorAndSeekToken(strLiteralExpected, 'VarSection', ';',
-          strSeekableOnErrorTokens, stFirst)
+      V := Vars;
+      If Method <> Nil Then
+        V := Method.Vars;
+      If V.Comment = Nil Then
+        V.Comment := GetComment
       Else
-        NextNonCommentToken;
+        Begin
+          C := GetComment;
+          V.Comment.Assign(C);
+        End;
+      NextNonCommentToken;
+      While VarDecl(Scope, V) Do
+        Begin
+          If Token.Token <> ';' Then
+            ErrorAndSeekToken(strLiteralExpected, 'VarSection', ';',
+              strSeekableOnErrorTokens, stFirst)
+          Else
+            NextNonCommentToken;
+        End;
     End;
 End;
 
@@ -3000,23 +3048,24 @@ Var
 
 Begin
   Result := Token.UToken = 'THREADVAR';
-  If Not Result Then
-    Exit;
-  If ThreadVars.Comment = Nil Then
-    ThreadVars.Comment := GetComment
-  Else
+  If Result Then
     Begin
-      C := GetComment;
-      ThreadVars.Comment.Assign(C);
-    End;
-  NextNonCommentToken;
-  While VarDecl(Scope, ThreadVars) Do
-    Begin
-      If Token.Token <> ';' Then
-        ErrorAndSeekToken(strLiteralExpected, 'ThreadVarSection', ';',
-          strSeekableOnErrorTokens, stFirst)
+      If ThreadVars.Comment = Nil Then
+        ThreadVars.Comment := GetComment
       Else
-        NextNonCommentToken;
+        Begin
+          C := GetComment;
+          ThreadVars.Comment.Assign(C);
+        End;
+      NextNonCommentToken;
+      While VarDecl(Scope, ThreadVars) Do
+        Begin
+          If Token.Token <> ';' Then
+            ErrorAndSeekToken(strLiteralExpected, 'ThreadVarSection', ';',
+              strSeekableOnErrorTokens, stFirst)
+          Else
+            NextNonCommentToken;
+        End;
     End;
 End;
 
@@ -3048,67 +3097,68 @@ Var
 
 Begin
   Result := False;
-  If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-    Exit;
-  // Get ident list line and column
-  I := IdentList(False, strSeekableOnErrorTokens);
-  Try
-    If Token.Token <> ':' Then
-      ErrorAndSeekToken(strLiteralExpected, 'VarDecl', ':',
-        strSeekableOnErrorTokens, stActual)
-    Else
-      Begin
-        NextNonCommentToken;
-        T := GetTypeDecl;
-        If T = Nil Then
-          Raise Exception.Create('Can''t get type in vardecl.');
-        If Token.UToken = 'ABSOLUTE' Then
+  If Token.TokenType In [ttIdentifier, ttDirective] Then
+    Begin
+      // Get ident list line and column
+      I := IdentList(False, strSeekableOnErrorTokens);
+      Try
+        If Token.Token <> ':' Then
+          ErrorAndSeekToken(strLiteralExpected, 'VarDecl', ':',
+            strSeekableOnErrorTokens, stActual)
+        Else
           Begin
-            C := TGenericContainer.Create;
-            Try
-              C.Add(Token.Token);
-              NextNonCommentToken;
-              ExprType := [etUnknown, etConstExpr];
-              ConstExpr(C, ExprType);
-            Finally
-              T.Append(C);
-              C.Free;
-            End;
-          End;
-        If Token.Token = '=' Then
-          Begin
-            C := TGenericContainer.Create;
-            Try
-              C.Add(Token.Token);
-              NextNonCommentToken;
-              ExprType := [etUnknown, etConstExpr];
-              ConstExpr(C, ExprType);
-            Finally
-              T.Append(C);
-              C.Free;
-            End;
-          End;
-        For j := 0 To I.Count - 1 Do
-          Begin
-            V := TVar.Create(I[j].Ident, Scope, I[j].Line, I[j].Col);
-            V.Add(':');
-            V.Append(T);
-            If I[j].Comment <> Nil Then
+            NextNonCommentToken;
+            T := GetTypeDecl;
+            If T = Nil Then
+              Raise Exception.Create('Can''t get type in vardecl.');
+            If Token.UToken = 'ABSOLUTE' Then
               Begin
-                V.Comment := TComment.Create(I[j].Comment); //: @bug Surely I.Comment gets destroyed!
-              End Else
-                If I[0].Comment <> Nil Then
+                C := TGenericContainer.Create;
+                Try
+                  C.Add(Token.Token);
+                  NextNonCommentToken;
+                  ExprType := [etUnknown, etConstExpr];
+                  ConstExpr(C, ExprType);
+                Finally
+                  T.Append(C);
+                  C.Free;
+                End;
+              End;
+            If Token.Token = '=' Then
+              Begin
+                C := TGenericContainer.Create;
+                Try
+                  C.Add(Token.Token);
+                  NextNonCommentToken;
+                  ExprType := [etUnknown, etConstExpr];
+                  ConstExpr(C, ExprType);
+                Finally
+                  T.Append(C);
+                  C.Free;
+                End;
+              End;
+            For j := 0 To I.Count - 1 Do
+              Begin
+                V := TVar.Create(I[j].Ident, Scope, I[j].Line, I[j].Col);
+                V.Add(':');
+                V.Append(T);
+                If I[j].Comment <> Nil Then
                   Begin
-                    V.Comment := TComment.Create(I[0].Comment);
-                    V.Comment.AddToken('(Copy)', ttIdentifier);
-                  End;
-            VarSection.Add(V);
+                    V.Comment := TComment.Create(I[j].Comment);
+                  End Else
+                    If I[0].Comment <> Nil Then
+                      Begin
+                        V.Comment := TComment.Create(I[0].Comment);
+                        V.Comment.AddToken('(Copy)', ttIdentifier);
+                      End;
+                VarSection.Add(V);
+              End;
+            Result := True;
           End;
-        Result := True;
+      Finally
+        I.Free;
       End;
-  Finally
-    I.Free;
-  End;
+    End;
 End;
 
 (**
@@ -3191,7 +3241,7 @@ End;
                   -> '(' Expression ')'
                   -> NOT Factor
                   -> SetConstructor
-                  -> TypeId '(' Expression ')'
+                  -> TypeId '(' Expression ')' // NOT USED
 
   @precon  None.
   @postcon Attempts to parse a factor from the current token position.
@@ -3288,8 +3338,6 @@ Begin
           strSeekableOnErrorTokens, stActual);
     End
   Else If SetConstructor(C) Then
-    // Do nothing block...
-  //: @debug Else If TypeId(C) Then
     // Do nothing block...
   Else
     Begin
@@ -3409,9 +3457,6 @@ End;
   @param   C as a TGenericContainer
   @param   ExprType as a TExprTypes
   
-  @bug     Create a function IsIdentifier which allows all the following token
-           types: ttIdentifier, ttDirective
-
 **)
 Procedure TPascalDocModule.Designator(C : TGenericContainer;
   var ExprType : TExprTypes);
@@ -3464,6 +3509,7 @@ Begin
       AddToExpression(C)
     Else If Token.Token = '(' Then
       Begin
+        {$IFDEF CheckForConstExpr}
         If etConstExpr In ExprType Then
           If Not IsKeyWord(PrevToken.Token, strConstExprDesignators) Then
             Begin
@@ -3471,6 +3517,7 @@ Begin
                 PrevToken.Token, strSeekableOnErrorTokens, stActual);
               Exit;
             End;
+        {$ENDIF}
         AddToExpression(C);
         ExprList(C);
         If Token.Token = ')' Then
@@ -3565,17 +3612,24 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a statement.
 
+  @param   M as a TMethodDecl
+  
 **)
-Procedure TPascalDocModule.Statement;
+Procedure TPascalDocModule.Statement(M : TMethodDecl);
 
 Begin
-  // Check for label
-  NextNonCommentToken;
-  If Token.Token = ':' Then
-    NextNonCommentToken
-  Else
-    RollBackToken;
-  If Not StructStmt Then
+  If M <> Nil Then
+    If M.Labels.Count > 0 Then // Check for label
+      If M.Labels.Find(Token.Token) > -1 Then
+        Begin
+          NextNonCommentToken;
+          If Token.Token = ':' Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strLiteralExpected, 'Statement', ':',
+              strSeekableOnErrorTokens, stActual);
+        End;
+  If Not StructStmt(M) Then
     SimpleStatement;
 End;
 
@@ -3588,12 +3642,14 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token as a list of statements.
 
+  @param   M as a TMethodDecl
+  
 **)
-Procedure TPascalDocModule.StmtList;
+Procedure TPascalDocModule.StmtList(M : TMethodDecl);
 
 Begin
   Repeat
-    Statement;
+    Statement(M);
   Until Not IsToken(';', Nil);
 End;
 
@@ -3669,14 +3725,15 @@ End;
   @postcon Attempts to parse the current token position as a structured
            statement.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.StructStmt : Boolean;
+Function TPascalDocModule.StructStmt(M : TMethodDecl) : Boolean;
 
 Begin
-  Result := CompoundStmt Or ConditionalStmt Or LoopStmt Or WithStmt Or
-    TryExceptAndFinallyStmt Or // <= Combined together as the type can not be
+  Result := CompoundStmt(M) Or ConditionalStmt(M) Or LoopStmt(M) Or WithStmt(M) Or
+    TryExceptAndFinallyStmt(M) Or // <= Combined together as the type can not be
     RaiseStmt Or               //    determined until the Except or Finally
     AssemblerStatement;        //    key work is found.
 End;
@@ -3692,17 +3749,18 @@ End;
   @postcon Parses the compound statement section of a procedure implementation
            from the current token position
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.CompoundStmt : Boolean;
+Function TPascalDocModule.CompoundStmt(M : TMethodDecl) : Boolean;
 
 begin
   Result := Token.UToken = 'BEGIN';
   If Result Then
     Begin
       NextNonCommentToken;
-      StmtList;
+      StmtList(M);
       If Token.UToken = 'END' Then
         NextNonCommentToken
       Else
@@ -3721,13 +3779,14 @@ end;
   @precon  None.
   @postcon Attempts to parse the current token position as a ConditionalStmt.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.ConditionalStmt : Boolean;
+Function TPascalDocModule.ConditionalStmt(M : TMethodDecl) : Boolean;
 
 Begin
-  Result := IfStmt Or CaseStmt;
+  Result := IfStmt(M) Or CaseStmt(M);
 End;
 
 (**
@@ -3739,10 +3798,11 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as an IF statement.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.IfStmt : Boolean;
+Function TPascalDocModule.IfStmt(M : TMethodDecl) : Boolean;
 
 Var
   ExprType : TExprTypes;
@@ -3757,11 +3817,11 @@ Begin
       If Token.UToken = 'THEN' Then
         Begin
           NextNonCommentToken;
-          Statement;
+          Statement(M);
           If Token.UToken = 'ELSE' Then
             Begin
               NextNonCommentToken;
-              Statement;
+              Statement(M);
             End;
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'IfStmt', 'THEN',
@@ -3778,10 +3838,11 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a CASE statement.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.CaseStmt : Boolean;
+Function TPascalDocModule.CaseStmt(M : TMethodDecl) : Boolean;
 
 Var
   ExprType : TExprTypes;
@@ -3797,12 +3858,12 @@ Begin
         Begin
           NextNonCommentToken;
           Repeat
-            CaseSelector
+            CaseSelector(M)
           Until Not IsToken(';', Nil);
           If Token.UToken = 'ELSE' Then
             Begin
               NextNonCommentToken;
-              StmtList;
+              StmtList(M);
              End;
           If Token.UToken = 'END' Then
             NextNonCommentToken
@@ -3824,10 +3885,11 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a case selector.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Procedure TPascalDocModule.CaseSelector;
+Procedure TPascalDocModule.CaseSelector(M : TMethodDecl);
 
 Begin
   Repeat
@@ -3836,7 +3898,7 @@ Begin
   If Token.Token = ':' Then
     Begin
       NextNonCommentToken;
-      Statement;
+      Statement(M);
     End Else
       If Not IsKeyWord(Token.Token, ['else', 'end']) Then
         ErrorAndSeekToken(strLiteralExpected, 'CaseSelector', ':',
@@ -3879,13 +3941,14 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a Loop statement.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.LoopStmt : Boolean;
+Function TPascalDocModule.LoopStmt(M : TMethodDecl) : Boolean;
 
 Begin
-  Result := RepeatStmt Or WhileStmt Or ForStmt;
+  Result := RepeatStmt(M) Or WhileStmt(M) Or ForStmt(M);
 End;
 
 (**
@@ -3897,10 +3960,11 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a Repeat Statement.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.RepeatStmt : Boolean;
+Function TPascalDocModule.RepeatStmt(M : TMethodDecl) : Boolean;
 
 Var
   ExprType : TExprTypes;
@@ -3910,7 +3974,7 @@ Begin
   If Result Then
     Begin
       NextNonCommentToken;
-      StmtList;
+      StmtList(M);
       If Token.UToken = 'UNTIL' Then
         Begin
           NextNonCommentToken;
@@ -3932,10 +3996,11 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a While Statement.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.WhileStmt : Boolean;
+Function TPascalDocModule.WhileStmt(M : TMethodDecl) : Boolean;
 
 Var
   ExprType : TExprTypes;
@@ -3950,7 +4015,7 @@ Begin
       If Token.UToken = 'DO' Then
         Begin
           NextNonCommentToken;
-          Statement;
+          Statement(M);
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'WhileStmt', 'DO',
             strSeekableOnErrorTokens, stActual);
@@ -3966,10 +4031,11 @@ End;
   @precon  None.
   @postcon Attempt to parse the current token position as a For statement.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.ForStmt : Boolean;
+Function TPascalDocModule.ForStmt(M : TMethodDecl) : Boolean;
 
 Var
   ExprType : TExprTypes;
@@ -3994,7 +4060,7 @@ Begin
                   If Token.UToken = 'DO' Then
                     Begin
                       NextNonCommentToken;
-                      Statement;
+                      Statement(M);
                     End Else
                       ErrorAndSeekToken(strReservedWordExpected, 'ForStmt', 'DO',
                         strSeekableOnErrorTokens, stActual);
@@ -4019,10 +4085,11 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a With Statement.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.WithStmt : Boolean;
+Function TPascalDocModule.WithStmt(M : TMethodDecl) : Boolean;
 
 Begin
   Result := Token.UToken = 'WITH';
@@ -4033,7 +4100,7 @@ Begin
       If Token.UToken = 'DO' Then
         Begin
           NextNonCommentToken;
-          Statement;
+          Statement(M);
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'WithStmt', 'DO',
             strSeekableOnErrorTokens, stActual);
@@ -4063,28 +4130,29 @@ End;
   @postcon Attempts to parse the current token position as a Try Except or
            Try Finally block.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.TryExceptAndFinallyStmt : Boolean;
+Function TPascalDocModule.TryExceptAndFinallyStmt(M : TMethodDecl) : Boolean;
 
 Begin
   Result := Token.UToken = 'TRY';
   If Result Then
     Begin
       NextNonCommentToken;
-      StmtList;
+      StmtList(M);
       If IsKeyWord(Token.UToken, ['except', 'finally']) Then
         Begin
           If Token.UToken = 'EXCEPT' Then
             Begin
               NextNonCommentToken;
-              If Not ExceptionBlock Then
-                StmtList;
+              If Not ExceptionBlock(M) Then
+                StmtList(M);
             End Else
             Begin
               NextNonCommentToken;
-              StmtList;
+              StmtList(M);
             End;
           If Token.UToken = 'END' Then
             NextNonCommentToken
@@ -4108,10 +4176,11 @@ End;
   @precon  None.
   @postcon Attempt to parse the current token position as an Exception Block.
 
+  @param   M as a TMethodDecl
   @return  a Boolean
 
 **)
-Function TPascalDocModule.ExceptionBlock : Boolean;
+Function TPascalDocModule.ExceptionBlock(M : TMethodDecl) : Boolean;
 
 Var
   C : TGenericContainer;
@@ -4136,14 +4205,14 @@ Begin
         If Token.UToken = 'DO' Then
           Begin
             NextNonCommentToken;
-            Statement;
+            Statement(M);
             If Token.Token = ';' Then
               Begin
                 NextNonCommentToken;
                 If Token.UToken = 'ELSE' Then
                   Begin
                     NextNonCommentToken;
-                    StmtList;
+                    StmtList(M);
                   End;
                 End Else
                   ErrorAndSeekToken(strReservedWordExpected, 'ExceptionBlock', 'DO',
@@ -4343,16 +4412,18 @@ Function TPascalDocModule.FunctionHeading(Scope :TScope) : TMethodDecl;
 Begin
   Result := ProcedureBit(mtFunction, Scope);
   // Exit if not a function
-  If Result = Nil Then
-    Exit;
-  If Token.Token = ':' Then
+  If Result <> Nil Then
     Begin
-      NextNonCommentToken;
-      Result.ReturnType := Token.Token;
-      NextNonCommentToken;
-    End Else
-      Errors.Add(Format(strFunctionWarning, [Result.QualifiedName]),
-        'FunctionHeading', Token.Line, Token.Column, etWarning);
+      If Token.Token = ':' Then
+        Begin
+          NextNonCommentToken;
+          Result.ReturnType := Token.Token;
+          NextNonCommentToken;
+        End Else
+          If Result.Alias = '' Then
+            Errors.Add(Format(strFunctionWarning, [Result.QualifiedName]),
+              'FunctionHeading', Token.Line, Token.Column, etWarning);
+    End;
 End;
 
 (**
@@ -4397,52 +4468,50 @@ Var
 
 Begin
   Result := Nil;
-  If Token.UToken <> UpperCase(strMethodTypes[ProcType]) Then
-    Exit;
-  If PrevToken.UToken = 'CLASS' Then
+  If Token.UToken = UpperCase(strMethodTypes[ProcType]) Then
     Begin
-      RollBackToken;
-      C := GetComment;
+      If PrevToken.UToken = 'CLASS' Then
+        C := GetComment(cpBeforePreviousToken)
+      Else
+        C := GetComment;
       NextNonCommentToken;
-    End Else
-      C := GetComment;
-  NextNonCommentToken;
-  If Token.TokenType In [ttIdentifier, ttDirective] Then
-    Begin
-      // Create method and store in collection and get comment
-      Result := TMethodDecl.Create(ProcType, Scope, Token.Line, Token.Column);
-      Result.Comment := C;
-      Result.Identifier := Token.Token;
-      NextNonCommentToken;
-      // Check for '.' to signify a class method
-      If Token.Token = '.' Then
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
-          NextNonCommentToken;
-          Result.ClsName := Result.Identifier;
-          If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-            ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
-              strSeekableOnErrorTokens, stActual);
+          // Create method and store in collection and get comment
+          Result := TMethodDecl.Create(ProcType, Scope, Token.Line, Token.Column);
+          Result.Comment := C;
           Result.Identifier := Token.Token;
           NextNonCommentToken;
-        End;
-      FormalParameter(Result);
-      // Check for an alias
-      If Token.Token = '=' Then
-        Begin
-          NextNonCommentToken;
-          Result.Alias := Token.Token;
-          NextNonCommentToken;
+          // Check for '.' to signify a class method
           If Token.Token = '.' Then
             Begin
-              Result.Alias := Result.Alias + Token.Token;
               NextNonCommentToken;
-              Result.Alias := Result.Alias + Token.Token;
+              Result.ClsName := Result.Identifier;
+              If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
+                ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
+                  strSeekableOnErrorTokens, stActual);
+              Result.Identifier := Token.Token;
               NextNonCommentToken;
             End;
-        End;
-    End Else
-      ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+          FormalParameter(Result);
+          // Check for an alias
+          If Token.Token = '=' Then
+            Begin
+              NextNonCommentToken;
+              Result.Alias := Token.Token;
+              NextNonCommentToken;
+              If Token.Token = '.' Then
+                Begin
+                  Result.Alias := Result.Alias + Token.Token;
+                  NextNonCommentToken;
+                  Result.Alias := Result.Alias + Token.Token;
+                  NextNonCommentToken;
+                End;
+            End;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
+            strSeekableOnErrorTokens, stActual);
+    End;
 End;
 
 (**
@@ -4499,15 +4568,15 @@ Var
   pmMod : TParamModifier;
 
 Begin
-  pmMod := pmNone;
+  pmMod := pamNone;
   // Get modifiers
   If Token.UToken = 'VAR' Then
-    pmMod := pmVar
+    pmMod := pamVar
   Else If Token.UToken = 'CONST' Then
-    pmMod := pmConst
+    pmMod := pamConst
   Else If Token.UToken = 'OUT' Then
-    pmMod := pmOut;
-  If pmMod <> pmNone Then
+    pmMod := pamOut;
+  If pmMod <> pamNone Then
     NextNonCommentToken;
   Parameter(Method, pmMod);
 End;
@@ -4694,33 +4763,33 @@ Var
 begin
   InternalScope := scPublic;
   Result := Nil;
-  If Not (Token.UToken = 'OBJECT') Then
-    Exit;
-  Result := TObjectDecl.Create;
-  SymbolTable.Add(Result);
-  NextNonCommentToken;
-  // Get the classes heritage
-  ObjHeritage(Result);
-  // If this class has not body then return
-  If Token.Token = ';' Then
+  If Token.UToken = 'OBJECT' Then
     Begin
+      Result := TObjectDecl.Create;
+      SymbolTable.Add(Result);
       NextNonCommentToken;
-      Exit;
+      // Get the classes heritage
+      ObjHeritage(Result);
+      // If this class has not body then return
+      If Token.Token <> ';' Then
+        Begin
+      Repeat
+        ClassVisibility(InternalScope);
+        If Token.UToken = 'END' Then
+          Break;
+      Until Not (
+        ClassMethodList(Result, InternalScope) Or
+        ClassFieldList(Result, InternalScope)
+      );
+      // Check for 'END' and ';'
+      If Token.UToken = 'END' Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strReservedWordExpected, 'ObjectType', 'END',
+          strSeekableOnErrorTokens, stActual);
+        End Else
+          NextNonCommentToken;
     End;
-  Repeat
-    ClassVisibility(InternalScope);
-    If Token.UToken = 'END' Then
-      Break;
-  Until Not (
-    ClassMethodList(Result, InternalScope) Or
-    ClassFieldList(Result, InternalScope)
-  );
-  // Check for 'END' and ';'
-  If Token.UToken = 'END' Then
-    NextNonCommentToken
-  Else
-    ErrorAndSeekToken(strReservedWordExpected, 'ObjectType', 'END',
-      strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -4911,7 +4980,7 @@ begin
         T := GetTypeDecl;
         For j := 0 To I.Count - 1 Do
           Begin
-            P := TParameter.Create(pmNone, I[j].Ident, False, T, '', Scope,
+            P := TParameter.Create(pamNone, I[j].Ident, False, T, '', Scope,
               I[j].Line, I[j].Col);
             P.Comment := I[j].Comment;
             Cls.AddParameter(P);
@@ -4945,12 +5014,12 @@ Begin
     Begin
       InitComment := GetComment;
       NextNonCommentToken;
-      StmtList;
+      StmtList(Nil);
       If Token.UToken = 'FINALIZATION' Then
         Begin
           FinalComment := GetComment;
           NextNonCommentToken;
-          StmtList;
+          StmtList(Nil);
         End;
       If Token.UToken = 'END' Then
         NextNonCommentToken
@@ -4959,7 +5028,7 @@ Begin
           'END', strSeekableOnErrorTokens, stActual);
     End
   Else If Token.UToken = 'BEGIN' Then
-    CompoundStmt
+    CompoundStmt(Nil)
   Else If Token.UToken = 'END' Then
     NextNonCommentToken
   Else
@@ -4993,40 +5062,41 @@ Var
 begin
   InternalScope := scPublished;
   Result := Nil;
-  If Not (Token.UToken = 'CLASS') Then
-    Exit;
-  NextNonCommentToken;
-  // Check for 'OF'
-  If Token.UToken = 'OF' Then
+  If Token.UToken = 'CLASS' Then
     Begin
-      RollBackToken;
-      Exit;
+      NextNonCommentToken;
+      // Check for 'OF'
+      If Token.UToken <> 'OF' Then
+        Begin
+          Result := TClassDecl.Create;
+          SymbolTable.Add(Result);
+          Result.AbstractClass := (Token.UToken = 'ABSTRACT');
+          If Result.AbstractClass Then
+            NextNonCommentToken;
+          // Get the classes heritage
+          ClassHeritage(Result);
+          // If this class has no body then return
+          If Token.Token <> ';' Then
+            Begin
+              Repeat
+                ClassVisibility(InternalScope);
+                If Token.UToken = 'END' Then
+                  Break;
+              Until Not (
+                ClassMethodList(Result, InternalScope) Or
+                ClassPropertyList(Result, InternalScope) Or
+                ClassFieldList(Result, InternalScope)
+              );
+              // Check for 'END' and ';'
+              If Token.UToken = 'END' Then
+                NextNonCommentToken
+              Else
+                ErrorAndSeekToken(strReservedWordExpected, 'ClassType', 'END',
+                  strSeekableOnErrorTokens, stActual);
+            End;
+        End Else
+          RollBackToken;
     End;
-  Result := TClassDecl.Create;
-  SymbolTable.Add(Result);
-  Result.AbstractClass := (Token.UToken = 'ABSTRACT');
-  If Result.AbstractClass Then
-    NextNonCommentToken;
-  // Get the classes heritage
-  ClassHeritage(Result);
-  // If this class has no body then return
-  If Token.Token = ';' Then
-    Exit;
-  Repeat
-    ClassVisibility(InternalScope);
-    If Token.UToken = 'END' Then
-      Break;
-  Until Not (
-    ClassMethodList(Result, InternalScope) Or
-    ClassPropertyList(Result, InternalScope) Or
-    ClassFieldList(Result, InternalScope)
-  );
-  // Check for 'END' and ';'
-  If Token.UToken = 'END' Then
-    NextNonCommentToken
-  Else
-    ErrorAndSeekToken(strReservedWordExpected, 'ClassType', 'END',
-      strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -5115,10 +5185,9 @@ Function TPascalDocModule.ClassFieldList(Cls: TObjectDecl; Scope: TScope): Boole
 Begin
   ClassVisibility(Scope);
   Result := ObjFieldList(Cls, Scope);
-  If Not Result Then
-    Exit;
-  If Token.Token = ';' Then
-    NextNonCommentToken;
+  If Result Then
+    If Token.Token = ';' Then
+      NextNonCommentToken;
 End;
 
 (**
@@ -5142,8 +5211,6 @@ Function TPascalDocModule.ClassMethodList(Cls: TObjectDecl; Scope: TScope): Bool
 Begin
   ClassVisibility(Scope);
   Result := MethodList(Cls, Scope);
-  If Not Result Then
-    Exit;
 End;
 
 (**
@@ -5168,13 +5235,14 @@ Function TPascalDocModule.ClassPropertyList(Cls: TClassDecl;
 Begin
   ClassVisibility(Scope);
   Result :=  PropertyList(Cls, Scope);
-  If Not Result Then
-    Exit;
-  If Token.Token = ';' Then
-    NextNonCommentToken
-  Else
-    ErrorAndSeekToken(strLiteralExpected, 'ClassPropertyList', ';',
-      strSeekableOnErrorTokens, stActual);
+  If Result Then
+    Begin
+      If Token.Token = ';' Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strLiteralExpected, 'ClassPropertyList', ';',
+          strSeekableOnErrorTokens, stActual);
+    End;
 End;
 
 (**
@@ -5202,21 +5270,22 @@ Var
 begin
   ClassVisibility(Scope);
   Result := Token.UToken = 'PROPERTY';
-  If Not Result Then
-    Exit;
-  C := GetComment;
-  NextNonCommentToken;
-  If Token.TokenType In [ttIdentifier, ttDirective] Then
+  If Result Then
     Begin
-      P := TProperty.Create(Token.Token, Scope, Token.Line, Token.Column);
-      Cls.Properties.Add(P);
-      P.Comment := C;
+      C := GetComment;
       NextNonCommentToken;
-      PropertyInterface(P);
-      PropertySpecifiers(P);
-    End Else
-      ErrorAndSeekToken(strIdentExpected, 'PropertyList', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
+        Begin
+          P := TProperty.Create(Token.Token, Scope, Token.Line, Token.Column);
+          Cls.Properties.Add(P);
+          P.Comment := C;
+          NextNonCommentToken;
+          PropertyInterface(P);
+          PropertySpecifiers(P);
+        End Else
+          ErrorAndSeekToken(strIdentExpected, 'PropertyList', Token.Token,
+            strSeekableOnErrorTokens, stActual);
+    End;
 end;
 
 (**
@@ -5272,14 +5341,14 @@ Begin
     Begin
       Repeat
         NextNonCommentToken;
-        ParamMod := pmNone;
+        ParamMod := pamNone;
         If Token.UToken = 'VAR' Then
-          ParamMod := pmVar;
+          ParamMod := pamVar;
         If Token.UToken = 'CONST' Then
-          ParamMod := pmConst;
+          ParamMod := pamConst;
         If Token.UToken = 'OUT' Then
-          ParamMod := pmOut;
-        If ParamMod <> pmNone Then
+          ParamMod := pamOut;
+        If ParamMod <> pamNone Then
           NextNonCommentToken;
         I := IdentList(False, strSeekableOnErrorTokens);
         Try
@@ -5451,50 +5520,52 @@ Var
 begin
   InternalScope := scPublic;
   Result := Nil;
-  If Not ((Token.UToken = 'INTERFACE') Or (Token.UToken = 'DISPINTERFACE')) Then
-    Exit;
-  If Token.UToken = 'INTERFACE' Then
-    Result := TInterfaceDecl.Create
-  Else
-    Result := TDispInterfaceDecl.Create;
-  SymbolTable.Add(Result);
-  NextNonCommentToken;
-  // If this class has not body then return
-  If Token.Token = ';' Then
-    Exit;
-  // Get the classes heritage
-  InterfaceHeritage(Result);
-  // Get GUID if there is one
-  If Token.Token = '[' Then
+  If (Token.UToken = 'INTERFACE') Or (Token.UToken = 'DISPINTERFACE') Then
     Begin
+      If Token.UToken = 'INTERFACE' Then
+        Result := TInterfaceDecl.Create
+      Else
+        Result := TDispInterfaceDecl.Create;
+      SymbolTable.Add(Result);
       NextNonCommentToken;
-      If Token.TokenType = ttStringLiteral Then
+      // If this class has not body then return
+      If Token.Token <> ';' Then
         Begin
-          Result.GUID := Token.Token;
-          NextNonCommentToken;
-          If Token.Token = ']' Then
+          // Get the classes heritage
+          InterfaceHeritage(Result);
+          // Get GUID if there is one
+          If Token.Token = '[' Then
+            Begin
+              NextNonCommentToken;
+              If Token.TokenType = ttStringLiteral Then
+                Begin
+                  Result.GUID := Token.Token;
+                  NextNonCommentToken;
+                  If Token.Token = ']' Then
+                    NextNonCommentToken
+                  Else
+                    ErrorAndSeekToken(strLiteralExpected, 'InterfaceType', ']',
+                      strSeekableOnErrorTokens, stActual);
+                End Else
+                  ErrorAndSeekToken(strStringExpected, 'InterfaceType', '',
+                    strSeekableOnErrorTokens, stActual);
+            End;
+          Repeat
+            ClassVisibility(InternalScope);
+            If Token.UToken = 'END' Then
+              Break;
+          Until Not (
+            ClassMethodList(Result, InternalScope) Or
+            ClassPropertyList(Result, InternalScope)
+          );
+          // Check for 'END' and ';'
+          If Token.UToken = 'END' Then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLiteralExpected, 'InterfaceType', ']',
+            ErrorAndSeekToken(strReservedWordExpected, 'InterfaceType', 'END',
               strSeekableOnErrorTokens, stActual);
-        End Else
-          ErrorAndSeekToken(strStringExpected, 'InterfaceType', '',
-            strSeekableOnErrorTokens, stActual);
+        End;
     End;
-  Repeat
-    ClassVisibility(InternalScope);
-    If Token.UToken = 'END' Then
-      Break;
-  Until Not (
-    ClassMethodList(Result, InternalScope) Or
-    ClassPropertyList(Result, InternalScope)
-  );
-  // Check for 'END' and ';'
-  If Token.UToken = 'END' Then
-    NextNonCommentToken
-  Else
-    ErrorAndSeekToken(strReservedWordExpected, 'InterfaceType', 'END',
-      strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -5532,16 +5603,17 @@ Var
   Comment : TComment;
 
 Begin
-  If Not (Token.UToken = 'REQUIRES') Then
-    Exit;
-  Comment := GetComment;
-  NextNonCommentToken;
-  Requires := IdentList(True, strSeekableOnErrorTokens);
-  Requires.Comment := Comment;
-  If Token.Token <> ';' Then
-    ErrorAndSeekToken(strLiteralExpected, 'RequiresClause', ';',
-      strSeekableOnErrorTokens, stActual);
-  NextNonCommentToken;
+  If Token.UToken = 'REQUIRES' Then
+    Begin
+      Comment := GetComment;
+      NextNonCommentToken;
+      Requires := IdentList(True, strSeekableOnErrorTokens);
+      Requires.Comment := Comment;
+      If Token.Token <> ';' Then
+        ErrorAndSeekToken(strLiteralExpected, 'RequiresClause', ';',
+          strSeekableOnErrorTokens, stActual);
+      NextNonCommentToken;
+    End;
 End;
 
 (**
@@ -5561,16 +5633,17 @@ Var
   Comment : TComment;
 
 Begin
-  If Not (Token.UToken = 'CONTAINS') Then
-    Exit;
-  Comment := GetComment;
-  NextNonCommentToken;
-  Contains := IdentList(True, strSeekableOnErrorTokens);
-  Contains.Comment := Comment;
-  If Token.Token <> ';' Then
-    ErrorAndSeekToken(strLiteralExpected, 'ContainsClause', ';',
-      strSeekableOnErrorTokens, stActual);
-  NextNonCommentToken;
+  If Token.UToken = 'CONTAINS' Then
+    Begin
+      Comment := GetComment;
+      NextNonCommentToken;
+      Contains := IdentList(True, strSeekableOnErrorTokens);
+      Contains.Comment := Comment;
+      If Token.Token <> ';' Then
+        ErrorAndSeekToken(strLiteralExpected, 'ContainsClause', ';',
+          strSeekableOnErrorTokens, stActual);
+      NextNonCommentToken;
+    End;
 End;
 
 (**

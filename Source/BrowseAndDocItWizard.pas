@@ -1,10 +1,13 @@
 (**
 
-  This mmodule contains the packages main wizard interface.
+  This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    30 Jun 2006
+  @Date    06 Jul 2006
   @Version 1.0
+
+  @todo    Configurable Font Name and Size for the Browser tree.
+  @todo    Configurable Font Colours for the Browser Tree.
 
 **)
 Unit BrowseAndDocItWizard;
@@ -54,6 +57,9 @@ Type
     Procedure InsertLineCommentClick(Sender : TObject);
     Procedure InsertInSituCommentClick(Sender : TObject);
     Procedure ModuleExplorerClick(Sender : TObject);
+    //{$IFNDEF VER180}
+    //Procedure EditorTimer(Sender : TObject);
+    //{$ENDIF}
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -66,17 +72,23 @@ Type
     Function GetMenuText: string;
   End;
 
+
   (** This class handles notifications from the editor so that changes in the
       editor can be displayed. **)
-  TEditorNotifier = Class(TNotifierObject, INTAEditServicesNotifier)
+  TEditorNotifier = Class(TNotifierObject{$IFDEF VER180}, INTAEditServicesNotifier{$ENDIF})
   Private
     FUpdateTimer : TTimer;
+    {$IFNDEF VER180}
+    FLastSize : Integer;
+    FLastEditorName : String;
+    {$ENDIF}
     Procedure RefreshTree;
     Procedure TimerEventHandler(Sender : TObject);
   Protected
   Public
     Constructor Create;
     Destructor Destroy; Override;
+    {$IFDEF VER180}
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
     procedure WindowActivated(const EditWindow: INTAEditWindow);
@@ -86,7 +98,9 @@ Type
     procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+    {$ENDIF}
   End;
+  
 
   (** This class represents a key binding notifier for installing and handling
       key bindings for this plugin. **)
@@ -124,7 +138,7 @@ Implementation
 
 Uses
   SysUtils, DockableModuleExplorer, Registry, ToolsAPIUtils,
-  OptionsForm, Forms, Windows, ShellAPI, TokenForm;
+  OptionsForm, Forms, Windows, ShellAPI, TokenForm, ModuleExplorerFrame;
 
 Resourcestring
   (** This is a text string of revision from nil and a to z. **)
@@ -134,13 +148,28 @@ Resourcestring
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
   strSplashScreenBuild = 'Open Source Freeware by David Hoyle (Build %d.%d.%d.%d)';
 
+Const
+  (** A simple array for outputting a or an. **)
+  strAOrAn : Array[False..True] Of String = ('a', 'an');
+  (** An array of parameter modifier phases. **)
+  strModifier : Array[pamNone..pamOut] Of String = ('', ' as a reference',
+    ' constant', ' as out');
+  (** A list of vowels. **)
+  strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+
 Var
   (** This is an index for the wizard when register with the ide. Its required
       in order to remove it from memory. **)
   iWizardIndex : Integer;
+  {$IFDEF VER180}
   (** This is an index for the editor notifier required when the package is
       unloaded **)
   iEditorIndex : Integer;
+  {$ELSE}
+  (** This is a private reference for the Editor Notifier class when not
+      registered with the IDE. **)
+  objEditorNotifier : TEditorNotifier;
+  {$ENDIF}
   (** A private varaible to hold the Document Explorer Options **)
   FDocExplorerOptions : TDocOptions;
   (** A private variable to hold the update interval in ms between changes and
@@ -174,8 +203,12 @@ Begin
   Wizard := TBrowseAndDocItWizard.Create;
   iWizardIndex := (BorlandIDEServices As IOTAWizardServices).AddWizard(
     Wizard);
+  {$IFDEF VER180}
   iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
     TEditorNotifier.Create);
+  {$ELSE}
+  objEditorNotifier := TEditorNotifier.Create;
+  {$ENDIF}
   iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
     TKeyboardBinding.Create(Wizard))
 End;
@@ -219,6 +252,12 @@ Begin
   FFileName := '';
   iUpdateInterval := 0;
   SpecialTags := TStringList.Create;
+  //{$IFNDEF VER180}
+  //FTimer := TTimer.Create(Nil);
+  //FTimer.OnTimer := EditorTimer;
+  //FTimer.Interval := 1000;
+  //FTimer.Enabled := True;
+  //{$ENDIF}
   LoadSettings;
 End;
 
@@ -396,6 +435,11 @@ Begin
           SpecialTags.AddObject('note=Notes', TObject(0));
           SpecialTags.AddObject('see=Also See', TObject(0));
           SpecialTags.AddObject('exception=Exception Raised', TObject(0));
+          SpecialTags.AddObject('bug=Known Bugs', TObject(iShowInTree And iAutoExpand));
+          SpecialTags.AddObject('debug=Debugging Code', TObject(iShowInTree And iAutoExpand));
+          SpecialTags.AddObject('date=Date Code Last Updated', TObject(0));
+          SpecialTags.AddObject('author=Code Author', TObject(0));
+          SpecialTags.AddObject('version=Code Version', TObject(0));
         End Else
         Begin
           For k := 1 To iCount Do
@@ -616,7 +660,7 @@ begin
   objMemStream := EditorAsMemoryStream(SourceEditor);
   Try
     With TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
-      SourceEditor.Modified, [], []) Do
+      SourceEditor.Modified, [], [], Nil) Do
       Try
         EditPos :=  SourceEditor.GetEditView(0).CursorPos;
         CharPos.Line := EditPos.Line;
@@ -690,7 +734,7 @@ begin
   objMemStream := EditorAsMemoryStream(SourceEditor);
   Try
     With TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
-      SourceEditor.Modified, [], []) Do
+      SourceEditor.Modified, [], [], Nil) Do
       Try
         EditPos :=  SourceEditor.GetEditView(0).CursorPos;
         CharPos.Line := EditPos.Line;
@@ -964,11 +1008,14 @@ begin
       End;
       If C.Line * C.Col > 0 Then
         Begin
-          SourceEditor.GetEditView(0).CursorPos := C;
-          If FBrowsePosition In [bpIdentifierCentre, bpCommentCentre] Then
-            SourceEditor.GetEditView(0).Center(C.Line, 1)
-          Else
-            SourceEditor.GetEditView(0).SetTopLeft(C.Line, 1);
+          If SourceEditor.EditViewCount > 0 Then
+            Begin
+              SourceEditor.GetEditView(0).CursorPos := C;
+              If FBrowsePosition In [bpIdentifierCentre, bpCommentCentre] Then
+                SourceEditor.GetEditView(0).Center(C.Line, 1)
+              Else
+                SourceEditor.GetEditView(0).SetTopLeft(C.Line, 1);
+            End;
         End;
     End;
 end;
@@ -1006,8 +1053,6 @@ end;
   @precon  None.
   @postcon Initialises the wizard.
 
-  @todo    This code needs to be updated to reflect the Register() procedure.
-
   @param   BorlandIDEServices as an IBorlandIDEServices constant
   @param   RegisterProc       as a TWizardRegisterProc
   @param   Terminate          as a TWizardTerminateProc as a reference
@@ -1020,6 +1065,8 @@ Function InitWizard(Const BorlandIDEServices : IBorlandIDEServices;
 
 Var
   Svcs : IOTAServices;
+  Wizard : TBrowseAndDocItWizard;
+
 
 Begin
   Result := BorlandIDEServices <> Nil;
@@ -1028,7 +1075,16 @@ Begin
       Svcs := BorlandIDEServices As IOTAServices;
       ToolsAPI.BorlandIDEServices := BorlandIDEServices;
       Application.Handle := Svcs.GetParentHandle;
-      RegisterProc(TBrowseAndDocItWizard.Create);
+      Wizard := TBrowseAndDocItWizard.Create;
+      RegisterProc(Wizard);
+      {$IFDEF VER180}
+      iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
+        TEditorNotifier.Create);
+      {$ELSE}
+      objEditorNotifier := TEditorNotifier.Create;
+      {$ENDIF}
+      iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
+        TKeyboardBinding.Create(Wizard))
     End;
 End;
 
@@ -1043,7 +1099,11 @@ End;
 constructor TEditorNotifier.Create;
 begin
   FUpdateTimer := TTimer.Create(Nil);
+  {$IFDEF VER180}
   FUpdateTimer.Interval := 100;
+  {$ELSE}
+  FUpdateTimer.Interval := 500;
+  {$ENDIF}
   FUpdateTimer.OnTimer := TimerEventHandler;
   FUpdateTimer.Enabled := True;
 end;
@@ -1062,6 +1122,132 @@ begin
   inherited;
 end;
 
+(**
+
+  This method get and parsers the current editor and display it in the module
+  explorer.
+
+  @precon  None.
+  @postcon Creates an instance of the language module for the specified file
+           extension and passes the language module to the Dockable Module
+           Explorer for rendering.
+
+**)
+Procedure TEditorNotifier.RefreshTree;
+
+Var
+  objMemStream : TMemoryStream;
+  SourceEditor : IOTASourceEditor;
+  Reader : IOTAEditReader;
+  iPosition : Integer;
+  iRead : Integer;
+  M : TPascalDocModule;
+  strExt : String;
+  Options : IOTAProjectOptions;
+  slDefines : TStringList;
+
+begin
+  If (Application <> Nil) And (Application.MainForm <> Nil) And
+    Application.MainForm.Visible Then
+    Begin
+      objMemStream := TMemoryStream.Create;
+      Try
+        SourceEditor := ActiveSourceEditor;
+        If SourceEditor <> Nil Then
+          Begin
+            strExt := UpperCase(ExtractFileExt(SourceEditor.FileName));
+            If (strExt = '.PAS') Or (strExt = '.DPR') Or (strExt = '.DPK') Then
+              Begin
+                Options := ActiveProject.ProjectOptions;
+                slDefines := TStringList.Create;
+                Try
+                  slDefines.Text := StringReplace(Options.Values['Defines'],
+                    ';', #13#10, [rfReplaceAll]);
+                  Reader := SourceEditor.CreateReader;
+                  Try
+                    iPosition := 0;
+                    Repeat
+                      iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
+                      objMemStream.WriteBuffer(Buffer, iRead);
+                      Inc(iPosition, iRead);
+                    Until iRead < iBufferSize;
+                  Finally
+                    Reader := Nil;
+                  End;
+                  objMemStream.Position := 0;
+                  M := TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
+                    SourceEditor.Modified, [moParse, moCheckForDocumentConflicts],
+                    FDocExplorerOptions, slDefines);
+                  With M Do
+                    Try
+                      TfrmDockableModuleExplorer.RenderDocumentTree(M, FDocExplorerOptions);
+                    Finally
+                      Free;
+                    End;
+                Finally
+                  slDefines.Free;
+                End;
+              End Else
+                TfrmDockableModuleExplorer.RenderDocumentTree(Nil, FDocExplorerOptions);
+          End;
+      Finally
+        objMemStream.Free;
+      End;
+    End;
+end;
+
+(**
+
+  This is a TTimer on Timer event handler.
+
+  @precon  None.
+  @postcon Checks to see if the last time the editor was changes is beyond the
+           wait time for the module to be updated.
+
+  @param   Sender as a TObject
+
+**)
+procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
+
+{$IFNDEF VER180}
+Var
+  Editor : IOTASourceEditor;
+  MemStream : TMemoryStream;
+{$ENDIF}
+
+begin
+  {$IFNDEF VER180}
+  Editor := ActiveSourceEditor;
+  If Editor <> Nil Then
+    Begin
+      If Editor.FileName <> FLastEditorName Then
+        Begin
+          iLastUpdateTickCount := 1;
+          FLastEditorName := Editor.FileName;
+        End Else
+        Begin
+          MemStream := EditorAsMemoryStream(Editor);
+          Try
+            If FLastSize <> MemStream.Size Then
+              Begin
+                iLastUpdateTickCount := GetTickCount;
+                FLastSize := MemStream.Size;
+              End;
+          Finally
+            MemStream.Free;
+          End;
+        End;
+    End;
+  {$ENDIF}
+  If (iLastUpdateTickCount > 0) And
+    (GetTickCount > iLastUpdateTickCount + iUpdateInterval) Then
+    Begin
+      iLastUpdateTickCount := 0;
+      RefreshTree;
+    End;
+end;
+
+{$IFDEF VER180}
 (**
 
   This an impementation of the DockFormRefresh method for the Editor Notifier
@@ -1151,89 +1337,6 @@ end;
 
 (**
 
-  This method get and parsers the current editor and display it in the module
-  explorer.
-
-  @precon  None.
-  @postcon Creates an instance of the language module for the specified file
-           extension and passes the language module to the Dockable Module
-           Explorer for rendering.
-
-**)
-Procedure TEditorNotifier.RefreshTree;
-
-Var
-  objMemStream : TMemoryStream;
-  SourceEditor : IOTASourceEditor;
-  Reader : IOTAEditReader;
-  iPosition : Integer;
-  iRead : Integer;
-  M : TPascalDocModule;
-  strExt : String;
-
-begin
-  If (Application = Nil) Or (Application.MainForm = Nil) Then Exit;
-  If Not Application.MainForm.Visible Then Exit;
-  objMemStream := TMemoryStream.Create;
-  Try
-    SourceEditor := ActiveSourceEditor;
-    If SourceEditor = Nil Then
-      Exit;
-    strExt := UpperCase(ExtractFileExt(SourceEditor.FileName));
-    If Not ((strExt = '.PAS') Or (strExt = '.DPR') Or (strExt = '.DPK')) Then
-      Begin
-        TfrmDockableModuleExplorer.RenderDocumentTree(Nil, FDocExplorerOptions);
-        Exit;
-      End;
-    Reader := SourceEditor.CreateReader;
-    Try
-      iPosition := 0;
-      Repeat
-        iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
-        objMemStream.WriteBuffer(Buffer, iRead);
-        Inc(iPosition, iRead);
-      Until iRead < iBufferSize;
-    Finally
-      Reader := Nil;
-    End;
-    objMemStream.Position := 0;
-    M := TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
-      SourceEditor.Modified, [moParse, moCheckForDocumentConflicts],
-      FDocExplorerOptions);
-    With M Do
-      Try
-        TfrmDockableModuleExplorer.RenderDocumentTree(M, FDocExplorerOptions);
-      Finally
-        Free;
-      End;
-  Finally
-    objMemStream.Free;
-  End;
-end;
-
-(**
-
-  This is a TTimer on Timer event handler.
-
-  @precon  None.
-  @postcon Checks to see if the last time the editor was changes is beyond the
-           wait time for the module to be updated.
-
-  @param   Sender as a TObject
-
-**)
-procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
-begin
-  If (iLastUpdateTickCount > 0) And (GetTickCount > iLastUpdateTickCount +
-    iUpdateInterval) Then
-    Begin
-      iLastUpdateTickCount := 0;
-      RefreshTree;
-    End;
-end;
-
-(**
-
   This an impementation of the WindowActivated method for the Editor Notifier
   interface.
 
@@ -1287,7 +1390,7 @@ end;
   This method is not used by this class and is therefore not implemented.
 
   @precon  None.
-  @postcon None. 
+  @postcon None.
 
   @param   EditWindow        as an INTAEditWindow constant
   @param   Show              as a Boolean
@@ -1298,6 +1401,7 @@ procedure TEditorNotifier.WindowShow(const EditWindow: INTAEditWindow; Show,
   LoadedFromDesktop: Boolean);
 begin
 end;
+{$ENDIF}
 
 (**
 
@@ -1445,7 +1549,6 @@ end;
 procedure TKeyboardBinding.InsertMethodComment(const Context: IOTAKeyContext;
   KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
 begin
-  OutputMessage('Method Comment');
   FWizard.InsertMethodCommentClick(Self);
   BindingResult := krHandled;
 end;
@@ -1512,7 +1615,7 @@ begin
     End;
     objMemStream.Position := 0;
     Source := TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
-      SourceEditor.Modified, [], []);
+      SourceEditor.Modified, [], [], Nil);
     Try
       TfrmTokenForm.Execute(Source);
     Finally
@@ -1633,7 +1736,11 @@ Initialization
     is unloaded. **)
 Finalization
   (BorlandIDEServices As IOTAKeyboardServices).RemoveKeyboardBinding(iKeyBinding);
+  {$IFDEF VER180}
   (BorlandIDEServices As IOTAEditorServices).RemoveNotifier(iEditorIndex);
+  {$ELSE}
+  objEditorNotifier.Free;
+  {$ENDIF}
   (BorlandIDEServices As IOTAWizardServices).RemoveWizard(iWizardIndex);
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
 End.

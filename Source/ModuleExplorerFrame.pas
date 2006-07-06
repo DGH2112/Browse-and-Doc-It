@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    30 Jun 2006
+  @Date    06 Jul 2006
   @Author  David Hoyle
   @Version 1.0
   
@@ -137,7 +137,8 @@ type
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
-    procedure RenderModule(M : TBaseLanguageModule; DocExplorerOptions : TDocOptions);
+    procedure RenderModule(M : TBaseLanguageModule;
+      DocExplorerOptions : TDocOptions);
     (**
       This is an event for the selection change in the browser tree.
       @return  a TSelectionChange
@@ -146,10 +147,16 @@ type
       Write FSelectionChange;
   end;
 
+Const
+  (** This is a constant for special tag items to show in the tree **)
+  iShowInTree = $0001;
+  (** This is a constant for special tag items to auto expand in the tree **)
+  iAutoExpand = $0002;
+
 implementation
 
 Uses
-  Registry;
+  Registry, Types;
 
 Const
   (** Icon index for a plane folder. **)
@@ -511,19 +518,12 @@ Function TframeModuleExplorer.GetNodeComment(iLine, iCol : Integer;
   C : TComment) : Integer;
 
 Var
-  i, j : Integer;
+//  i, j : Integer;
   info : TTreeNodeInfo;
 
 Begin
   info := TTreeNodeInfo.Create(iLine, iCol, C);
   Result := FNodeInfo.Add(info);
-  If C <>  Nil Then
-    For i := 0 To C.TagCount - 1 Do
-      For j := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
-        If FSpecialTagNodes[j].boolShow Then
-          If AnsiCompareText(C.Tag[i].TagName, FSpecialTagNodes[j].strTagName) = 0 Then
-            AddNode(FSpecialTagNodes[j].Node, C.Tag[i].AsString(False),
-              C.Tag[i].Line, C.Tag[i].Column, iToDoItem, Nil);
 End;
 
 (**
@@ -810,7 +810,7 @@ Begin
         If IsInOptions(M[i].Scope) Or ((M[i].Scope = scLocal) And
           (doShowLocalProcs In FOptions)) Then
           Begin
-            If strLastClassName <> M[i].ClsName Then
+            If AnsiCompareText(strLastClassName, M[i].ClsName) <> 0 Then
               Begin
                 If M[i].ClsName <> '' Then
                   Begin
@@ -1140,7 +1140,6 @@ Var
   i : Integer;
   strTop : String;
   strSelection : String;
-  tmp : TTreeNode;
 
   (**
 
@@ -1166,7 +1165,7 @@ Var
           FExpandedNodes.Delete(iNode);
       End;
   End;
-  
+
   (**
 
     This method returns the path of the specified tree node.
@@ -1312,10 +1311,10 @@ Begin
                 Integer(SpecialTags.Objects[i]) And iAutoExpand <> 0;
             End;
           If M = Nil Then Exit;
-          FModule := AddNode(Nil, strModuleTypes[M.ModuleType] + #32 +
-            M.ModuleName, M.ModuleNameLine, M.ModuleNameCol, iModule,
-            Nil); // Can not process the comment here as the root node doesn't
-                  // exist yet.
+          FModule := AddNode(Nil, M.ModuleName, M.ModuleNameLine,
+            M.ModuleNameCol, iModule, Nil); // Can not process the comment here
+                                            // as the root node doesn't
+                                            // exist yet.
           DisplayErrors(M);
           DisplayDocumentConflicts(M);
           CreateSpecialTagNodes;
@@ -1342,11 +1341,6 @@ Begin
       End;
     End;
   M.AddTickCount('Render');
-  //: @debug Body comments!
-  tmp := AddNode(FModule, 'Body Comments', 0, 0, iDocConflictFolder, Nil);
-  For i := 0 To M.BodyCommentCount - 1 Do
-    AddNode(tmp, M.BodyComment[i].AsString(0, 1024, False),
-      M.BodyComment[i].Line, M.BodyComment[i].Col, iDocConflictItem, Nil);
   With stbStatusBar Do
     Begin
       SimpleText := '';
@@ -1554,34 +1548,20 @@ Function TframeModuleExplorer.AddNode(P: TTreeNode; strText: String;
   iLine, iCol, iImageIndex : Integer; Comment: TComment) : TTreeNode;
 
 Const
-  iTreeLimit = 250;
+  iTreeLimit = (*{$IFNDEF VER120} 250 {$ELSE}*) 0 (*{$ENDIF}*);
 
 Var
   str : String;
 
 begin
   str := strText;
-  If Length(str) > iTreeLimit Then
+  If (Length(str) > iTreeLimit) And (iTreeLimit > 0) Then
     str := Copy(str, 1, iTreeLimit);
   Result := tvExplorer.Items.AddChild(P, str);
   Result.Data := TObject(GetNodeComment(iLine, iCol, Comment));
   Result.ImageIndex := iImageIndex;
   Result.SelectedIndex := iImageIndex;
 end;
-
-(** @debug
-
-  This is a getter method for the NodeInfoCount property.
-
-  @postcon Returns the number of items on the node info collection.
-
-  @return  an Integer
-
-
-function TframeModuleExplorer.GetNodeInfoCount: Integer;
-begin
-  Result := FNodeInfo.Count;
-end;**)
 
 (**
 
@@ -1829,48 +1809,56 @@ Var
   i, j : Integer;
   R : TRect;
   str : String;
+  iLines : Integer;
+  iLine : Integer;
 
 Begin
+  iLines := 1;
+  iLine := 0;
   With Canvas Do
     Begin
-      If FCustomDraw Then
-        Begin
-          //: @bug This needs fixing properly!!!
-          sl := Tokenize(Caption, [], []);
-          Try
-            iPos := 2;
-            For i := 0 To sl.Count - 1 Do
+      //: @bug This needs fixing properly!!!
+      sl := Tokenize(Caption, [], []);
+      Try
+        iPos := 2;
+        For i := 0 To sl.Count - 1 Do
+          Begin
+            If FCustomDraw Then
+              GetFontInfo(sl, i, FNodeLevel, Canvas)
+            Else
               Begin
-                GetFontInfo(sl, i, FNodeLevel, Canvas);
-                TextOut(iPos, 0, sl[i]);
-                Inc(iPos, TextWidth(sl[i]));
+                Refresh;
+                Font.Color := clInfoText;
+                Font.Style := [];
               End;
-          Finally
-            sl.Free;
+            If iPos + TextWidth(sl[i]) > Width Then
+              Begin
+                iPos := 2 + 10; // Indent multiple lines
+                Inc(iLines);
+              End;
+            iLine := (iLines - 1) * TextHeight(sl[i]);
+            TextOut(iPos, iLine, sl[i]);
+            Inc(iPos, TextWidth(sl[i]));
           End;
-        End Else
-        Begin
-          Refresh;
-          Font.Color := clInfoText;
-          Font.Style := [];
-          TextOut(2, 0, Caption);
-        End;
+      Finally
+        sl.Free;
+      End;
       If (FComment <> Nil) And ((FComment.TokenCount > 0) Or
         (FComment.TagCount > 0)) Then
         Begin
-          FillRect(Rect(0, 15, Width, Height));
+          FillRect(Rect(0, 15 + iLine, Width, Height));
           Pen.Color := clMaroon;
-          MoveTo(0, 15);
-          Lineto(Width, 15);
+          MoveTo(0, 15 + iLine);
+          Lineto(Width, 15 + iLine);
           Refresh;
           Font.Style := [];
           Font.Color := clNavy;
           str := FComment.AsString(0, MaxInt, False);
-          R := Rect(2, 17, Width - 2, Height);
+          R := Rect(2, 17 + iLine, Width - 2, Height);
           iPos := DrawText(Canvas.Handle, PChar(str), -1, R,
             DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
             DrawTextBiDiModeFlagsReadingOnly);
-          R := Rect(2, 17 + iPos, Width - 4, Height);
+          R := Rect(2, 17 + iLine + iPos, Width - 4, Height);
           For i := 0 To SpecialTags.Count - 1 Do
             Begin
               If DrawSpecialTag(FComment, SpecialTags.Names[i]) Then
@@ -1883,7 +1871,7 @@ Begin
                   str := SpecialTags.Values[SpecialTags.Names[i]];
                   Inc(R.Top, DrawText(Canvas.Handle, PChar(str), -1, R,
                     DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-                    DrawTextBiDiModeFlagsReadingOnly));
+                    DrawTextBiDiModeFlagsReadingOnly) + 1);
                   For j := 0 To FComment.TagCount - 1 Do
                     If AnsiCompareText(SpecialTags.Names[i], FComment.Tag[j].TagName) = 0 Then
                       Begin
@@ -1902,23 +1890,6 @@ Begin
                       End;
                 End;
             End;
-          (*For j := 0 To FComment.TagCount - 1 Do
-            If IsSpecial(FComment.Tag[j].TagName) = -1 Then
-              Begin
-                Refresh;
-                Font.Style := [];
-                Font.Color := clMaroon;
-                R := Rect(2, R.Top, Width - 2, Height);
-                str := FComment.Tag[j].TagName + '   : ' + FComment.Tag[j].AsString;
-                DrawText(Canvas.Handle, PChar(str), -1, R,
-                  DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-                  DrawTextBiDiModeFlagsReadingOnly);
-                Refresh;
-                Font.Style := [fsBold];
-                Inc(R.Top, DrawText(Canvas.Handle, PChar(FComment.Tag[j].TagName), -1, R,
-                  DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-                  DrawTextBiDiModeFlagsReadingOnly));
-              End;*)
         End;
     End;
 End;
@@ -1950,13 +1921,15 @@ Function TCustomHintWindow.CalcHintRect(MinWidth, MaxWidth : Integer;
 
 Var
   sl : TStringList;
-  iPos : Integer;
+  iPos, iMaxPos, iLastMax : Integer;
   i, j : Integer;
   str : String;
   R : TRect;
 
 Begin
   Result := Node.DisplayRect(True);
+  iMaxPos := Node.TreeView.ScreenToClient(Point(Screen.WorkAreaRect.Right, 0)).X -
+    Result.Left;
   If SyntaxHighlight Then
     Begin
       // Need to amend the width of the rectangle for the custom drawing
@@ -1964,12 +1937,21 @@ Begin
       //: @bug This needs to be fixed properly!!!
       sl := Tokenize(Node.Text, [], []);
       Try
+        iLastmax := 0;
         For i := 0 To sl.Count - 1 Do
           Begin
             GetFontInfo(sl, i, Node.Level, Canvas);
             Inc(iPos, Canvas.TextWidth(sl[i]));
+            If iPos > iMaxPos Then
+              Begin
+                Inc(Result.Bottom, Canvas.TextHeight(sl[i]) + 2);
+                iPos := 5 + 10; // indent multiple lines
+                iLastMax := iMaxPos;
+              End Else
+                If iPos > iLastMax Then
+                  iLastMax := iPos;
           End;
-        Result.Right := Result.Left + iPos;
+        Result.Right := Result.Left + iLastMax;
       Finally
         sl.Free;
       End;
@@ -1989,7 +1971,7 @@ Begin
       R := Rect(Result.Left + 2, 0, Result.Right - 2, 0);
       Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(str), -1, R,
         DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-        DrawTextBiDiModeFlagsReadingOnly));
+        DrawTextBiDiModeFlagsReadingOnly) + 2);
       For i := 0 To SpecialTags.Count - 1 Do
         Begin
           If DrawSpecialTag(Comment, SpecialTags.Names[i]) Then
@@ -2000,7 +1982,7 @@ Begin
               str := SpecialTags.Values[SpecialTags.Names[i]];
               Inc(Result.Bottom, 5 + DrawText(Canvas.Handle, PChar(str), -1, R,
                 DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-                DrawTextBiDiModeFlagsReadingOnly));
+                DrawTextBiDiModeFlagsReadingOnly) + 2);
               For j := 0 To Comment.TagCount - 1 Do
                 If AnsiCompareText(SpecialTags.Names[i], Comment.Tag[j].TagName) = 0 Then
                   Begin
@@ -2010,21 +1992,10 @@ Begin
                     str := Comment.Tag[j].AsString(False);
                     Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(str), -1, R,
                       DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-                      DrawTextBiDiModeFlagsReadingOnly));
+                      DrawTextBiDiModeFlagsReadingOnly) + 2);
                   End;
             End;
         End;
-      (*For j := 0 To Comment.TagCount - 1 Do
-        If IsSpecial(Comment.Tag[j].TagName) = -1 Then
-          Begin
-            Refresh;
-            Canvas.Font.Style := [];
-            R := Rect(2, 17, Width - 4, Height);
-            str := Comment.Tag[j].TagName + ' : ' + Comment.Tag[j].AsString;
-            Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(str), -1, R,
-              DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-              DrawTextBiDiModeFlagsReadingOnly));
-          End;*)
     End;
 End;
 

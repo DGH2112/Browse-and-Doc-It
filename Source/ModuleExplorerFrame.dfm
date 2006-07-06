@@ -26,7 +26,7 @@ object frameModuleExplorer: TframeModuleExplorer
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -12
+    Font.Height = -11
     Font.Name = 'MS Sans Serif'
     Font.Style = []
     HideSelection = False

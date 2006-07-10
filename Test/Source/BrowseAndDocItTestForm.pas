@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    06 Jul 2006
+  @Date    10 Jul 2006
   @Author  David Hoyle
 
 **)
@@ -50,7 +50,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
     Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol : Integer);
+      iCommentCol : Integer; Error : Boolean);
     procedure Button1Click(Sender: TObject);
     procedure CheckBox1Click(Sender: TObject);
     procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
@@ -411,10 +411,11 @@ end;
   @param   iIdentCol    as an Integer
   @param   iCommentLine as an Integer
   @param   iCommentCol  as an Integer
+  @param   Error        as a Boolean
 
 **)
 procedure TfrmBrowseAndDocItTestForm.SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-  iCommentCol: Integer);
+  iCommentCol: Integer; Error : Boolean);
 
 begin
   SynEdit1.CaretX := iIdentCol;

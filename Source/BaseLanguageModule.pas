@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    06 Jul 2006
+  @Date    10 Jul 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -50,7 +50,7 @@ Type
       @bug At the moment these option are not passed early enough for the
            doManageExpandedNodes option to be available to the LoadSettings
            and SaveSettings methods. Therefore perhaps the calling class which
-           uses the frameModuleExplorer shoudl call the Loadsettings() and
+           uses the frameModuleExplorer should call the Loadsettings() and
            SaveSettings() methods and not depend on the frame class to call
            these in the constructor and destructor respectively.
   **)
@@ -1244,8 +1244,8 @@ Type
       properties. **)
   TCharSet = Set of Char;
 
-  (** This is a type to define an array of string. **)
-  TArrayOfString = Array Of String;
+//  (** This is a type to define an array of string. **)
+//  TArrayOfString = Array Of String;
 
   (** This is an abtract class from which all language modules should be
       derived. **)
@@ -1307,14 +1307,6 @@ Type
     Procedure AddToken(AToken : TTokenInfo);
     procedure AppendToLastToken(strToken : String);
     procedure ProcessCompilerDirective(var iSkip : Integer);
-    Function GetReservedWords : TArrayOfString; Virtual; Abstract;
-    Function GetDirectives : TArrayOfString; Virtual; Abstract;
-    Function GetTokenChars : TCharSet; Virtual; Abstract;
-    Function GetNumbers : TCharSet; Virtual; Abstract;
-    Function GetSymbols : TCharSet; Virtual; Abstract;
-    Function GetQuote : TCharSet; Virtual; Abstract;
-    Function GetWhiteSpace : TCharSet; Virtual; Abstract;
-    Function GetLineEnd : TCharSet; Virtual; Abstract;
     Function GetModuleName : String; Virtual;
     (**
       Returns a refernce the to owned items collection. This is used to manage
@@ -1500,14 +1492,6 @@ Type
     **)
     Property ExportsClause : TGenericContainerCollection Read FExportsCollection
       Write FExportsCollection;
-    Property ReservedWords : TArrayOfString Read GetReservedWords;
-    Property Directives : TArrayOfString Read GetReservedWords;
-    Property TokenChars : TCharSet Read GetTokenChars;
-    Property Numbers : TCharSet Read GetNumbers;
-    Property Symbols : TCharSet Read GetSymbols;
-    Property Quote : TCharSet Read GetQuote;
-    Property WhiteSpace : TCharSet Read GetWhiteSpace;
-    Property LineEnd : TCharSet Read GetLineEnd;
   End;
 
 ResourceString
@@ -2035,28 +2019,18 @@ ResourceString
   (** An exception message for an $ENDIF without a string $IFDEF / $FIFNDEF **)
   strEndIfMissingIfDef = '$ENDIF is missing a starting $IFDEF or $IFNDEF at ' +
     'line %d column %d.';
+  (** An exception message for an Ordinal Type not found. **)
+  strOrdinalTypeExpected = 'Ordinal type expected but "%s" found at line %d ' +
+    'column %d.';
+  (** An exception message for a Type Declaration not found. **)
+  strTypeDeclExpected = 'Type Declaration expected but "%s" found at line %s ' +
+    'column %d.';
 
-(** @bug These constants are Language Specific. Implement these are properties
-         in the base language class of type TCharSet = Set of Char where the
-         Getter method is virtual and can be overridden in the desccendant
-         class and therefore return the specific languages token
-         characteristics. **)
 Const
-  (** A set of characters for alpha characaters **)
-  strTokenChars : Set Of Char = ['#', '_', 'a'..'z', 'A'..'Z'];
-  (** A set of numbers **)
-  strNumbers : Set Of Char = ['$', '0'..'9'];
-  (** A set of characters for general symbols **)
-  strSymbols : Set Of Char = ['&', '(', ')', '*', '+',
-    ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
-  (** A set of characters for quotes **)
-  strQuote : Set Of Char = [''''];
   (** A set of characters for whitespace **)
   strWhiteSpace : Set Of Char = [#32, #9];
   (** A set of characters for line feed and carriage return **)
   strLineEnd : Set of Char = [#10, #13];
-
-Const
   (** A list of strings representing the different types of token. **)
   strTypes : Array[ttUnknown..ttLinkTag] Of String = ('Unknown',
     'WhiteSpace', 'Keyword', 'Identifier', 'Number', 'Symbol', 'LineEnd',
@@ -2224,86 +2198,12 @@ Var
   SpecialTags : TStringList;
 
   Function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
-  Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
   Function IsTokenWhiteSpace(strToken : String) : Boolean;
 
 Implementation
 
 Uses
   Windows, StrUtils;
-
-(**
-
-  This function returns the token type for a given character and last token
-  type.
-
-  @precon  Ch is the character for which the token type assessment needs to be
-           taken for and LastToken os the type of the last token as this has an
-           effect on some characters.
-  @postcon Returns the token type for the given character.
-
-  @todo    Move this to pascalDocModule as it is language specific and provide
-           the ExplorerModuleFrame with an independant version switch can be
-           configured through options.
-
-  @param   Ch           as a Char
-  @param   LastCharType as a TTokenType
-  @return  a TTokenType
-
-**)
-Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
-
-Begin
-  If ch In strWhiteSpace Then
-    Result := ttWhiteSpace
-  Else If ch In strTokenChars Then
-    Begin
-      If (LastCharType = ttNumber) And (Ch In ['A'..'F', 'a'..'f']) Then
-        Result := ttNumber
-      Else
-        Result := ttIdentifier;
-    End
-  Else If ch In strNumbers Then
-    Begin
-      Result := ttNumber;
-      If LastCharType = ttIdentifier Then
-        Result := ttIdentifier;
-    End
-  Else If ch In strLineEnd Then
-    Result := ttLineEnd
-  Else If ch In strQuote Then
-    Result := ttStringLiteral
-  Else If ch In strSymbols Then
-    Result := ttSymbol
-  Else
-    Result := ttUnknown;
-End;
-
-(**
-
-  This method checks to see if the passed token if white space, if so returns
-  true.
-
-  @precon  None.
-  @postcon Checks to see if the passed token if white space, if so returns
-           true.
-
-  @param   strToken as a String
-  @return  a Boolean
-
-**)
-Function IsTokenWhiteSpace(strToken : String) : Boolean;
-
-Var
-  i : Integer;
-
-Begin
-  Result := True;
-  For i := 1 To Length(strToken) Do
-    If Not (strToken[i] In strWhiteSpace) And
-      Not (strToken[i] In strLineEnd)Then
-      Result := False;
-End;
 
 (**
 
@@ -2345,6 +2245,32 @@ begin
         End;
     End;
 end;
+
+(**
+
+  This method checks to see if the passed token if white space, if so returns
+  true.
+
+  @precon  None.
+  @postcon Checks to see if the passed token if white space, if so returns
+           true.
+
+  @param   strToken as a String
+  @return  a Boolean
+
+**)
+Function IsTokenWhiteSpace(strToken : String) : Boolean;
+
+Var
+  i : Integer;
+
+Begin
+  Result := True;
+  For i := 1 To Length(strToken) Do
+    If Not (strToken[i] In strWhiteSpace) And
+      Not (strToken[i] In strLineEnd)Then
+      Result := False;
+End;
 
 (**
 

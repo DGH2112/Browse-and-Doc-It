@@ -38,7 +38,7 @@ object frameModuleExplorer: TframeModuleExplorer
     ShowHint = True
     TabOrder = 1
     ToolTips = False
-    OnChange = tvExplorerChange
+    OnClick = tvExplorerClick
     OnCustomDrawItem = tvExplorerCustomDrawItem
     OnMouseMove = tvExplorerMouseMove
   end

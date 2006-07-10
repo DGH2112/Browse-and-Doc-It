@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    06 Jul 2006
+  @Date    10 Jul 2006
   @Version 1.0
 
   @todo    Configurable Font Name and Size for the Browser tree.
@@ -43,7 +43,7 @@ Type
     Procedure LoadSettings;
     Procedure SaveSettings;
     procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol : Integer);
+      iCommentCol : Integer; Error : Boolean);
     function GetMethodDescription(Method : TMethodDecl) : String;
     procedure WriteMethodComment(Method : TMethodDecl; Writer : IOTAEditWriter;
       iBufferPos : TStreamPosition; iCol : Integer);
@@ -575,7 +575,8 @@ begin
   // Get header in view if not already
   With SourceEditor.GetEditView(0) Do
     Begin
-      SelectionChange(EditPos.Line, EditPos.Col, EditPos.Line, EditPos.Col);
+      SelectionChange(EditPos.Line, EditPos.Col, EditPos.Line, EditPos.Col,
+        False);
       // Place cursor at start of comment
       Case CommentType Of
         ctBlock:
@@ -682,7 +683,7 @@ begin
               EditPos.Col := recPosition.Column + 2;
               EditPos.Line := recPosition.Line + 2;
               SelectionChange(EditPos.Line - 2, EditPos.Col, EditPos.Line - 2,
-                EditPos.Col);
+                EditPos.Col, False);
               CursorPos := EditPos;
             End;
         Finally
@@ -756,7 +757,7 @@ begin
               EditPos.Line := recPosition.Line + 1;
               EditPos.Col := recPosition.Column + 2;
               SelectionChange(EditPos.Line - 1, EditPos.Col, EditPos.Line - 1,
-                EditPos.Col);
+                EditPos.Col, False);
               CursorPos := EditPos;
             End;
         Finally
@@ -973,10 +974,11 @@ end;
   @param   iIdentCol  as an Integer
   @param   iCommentLine as an Integer
   @param   iCommentCol  as an Integer
+  @param   Error       as a Boolean
 
 **)
 procedure TBrowseAndDocItWizard.SelectionChange(iIdentLine, iIdentCol,
-  iCommentLine, iCommentCol : Integer);
+  iCommentLine, iCommentCol : Integer; Error : Boolean);
 
 Var
   SourceEditor : IOTASourceEditor;
@@ -989,29 +991,27 @@ begin
   SourceEditor := ActiveSourceEditor;
   If SourceEditor <> Nil Then
     Begin
-      Case FBrowsePosition Of
-        bpCommentTop, bpCommentCentre:
-          Begin
-            C.Line := iCommentLine;
-            C.Col := iCommentCol;
-            If C.Line * C.Col = 0 Then
-              Begin
-                C.Line := iIdentLine;
-                C.Col := iIdentCol;
-              End;
-          End;
-        bpIdentifierTop, bpIdentifierCentre:
-          Begin
-            C.Line := iIdentLine;
-            C.Col := iIdentCol;
-          End;
-      End;
+      If (FBrowsePosition In [bpCommentTop, bpCommentCentre]) Then
+        Begin
+          C.Line := iCommentLine;
+          C.Col := iCommentCol;
+          If C.Line * C.Col = 0 Then
+            Begin
+              C.Line := iIdentLine;
+              C.Col := iIdentCol;
+            End;
+        End Else
+        Begin
+          C.Line := iIdentLine;
+          C.Col := iIdentCol;
+        End;
       If C.Line * C.Col > 0 Then
         Begin
           If SourceEditor.EditViewCount > 0 Then
             Begin
               SourceEditor.GetEditView(0).CursorPos := C;
-              If FBrowsePosition In [bpIdentifierCentre, bpCommentCentre] Then
+              If (FBrowsePosition In [bpIdentifierCentre, bpCommentCentre]) Or
+                Error Then
                 SourceEditor.GetEditView(0).Center(C.Line, 1)
               Else
                 SourceEditor.GetEditView(0).SetTopLeft(C.Line, 1);

@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    29 May 2006
+  @Date    12 Jul 2006
   @Version 1.0
 
 **)
@@ -29,7 +29,8 @@ type
     Class Procedure CreateDockableModuleExplorer;
     Class Procedure RenderDocumentTree(BaseLanguageModule : TBaseLanguageModule;
       DocExplorerOptions : TDocOptions);
-    Class Procedure HookEventHandlers(SelectionChangeProc : TSelectionChange);
+    Class Procedure HookEventHandlers(SelectionChangeProc : TSelectionChange;
+      Focus : TNotifyEvent);
   end;
 
   (** This is a classifier for the dockable form so that it can be registered
@@ -99,8 +100,6 @@ End;
   @postcon The dockable form is unregistered with the IDE.
 
   @param   FormVar  as   @param   FormName as a String constant
-
-  @bug     Procedure not rendered in explorer tree properly.
 
 **)
 Procedure UnRegisterDockableForm(var FormVar; Const FormName : String);
@@ -259,13 +258,17 @@ end;
   @postcon Sets the SelectionChange event handler for the dockable form.
 
   @param   SelectionChangeProc as a TSelectionChange
+  @param   Focus               as a TNotifyEvent
 
 **)
 class procedure TfrmDockableModuleExplorer.HookEventHandlers(
-  SelectionChangeProc: TSelectionChange);
+  SelectionChangeProc: TSelectionChange; Focus : TNotifyEvent);
 begin
   If Assigned(FormInstance) Then
-    FormInstance.FModuleExplorerFrame.OnSelectionChange := SelectionChangeProc;
+    Begin
+      FormInstance.FModuleExplorerFrame.OnSelectionChange := SelectionChangeProc;
+      FormInstance.FModuleExplorerFrame.OnFocus := Focus;
+    End;
 end;
 
 End.

@@ -101,23 +101,6 @@ object frmOptions: TfrmOptions
         end
       end
     end
-    object TabSheet1: TTabSheet
-      Caption = 'Editor Position'
-      ImageIndex = 3
-      object rgEditorPosition: TRadioGroup
-        Left = 3
-        Top = 3
-        Width = 454
-        Height = 300
-        Caption = 'Editor Position while Browsing'
-        Items.Strings = (
-          'Comment Top positioned at the top of the Editor'
-          'Comment Top positioned in the Centre of the Editor'
-          'Identifier Top positioned at the top of the Editor'
-          'Idenitier Top positioned in the Centre of the Editor')
-        TabOrder = 0
-      end
-    end
     object Page2: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1

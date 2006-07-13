@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    06 Jul 2006
+  @Date    12 Jul 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -44,8 +44,6 @@ type
     HelpFileDir: TDirectoryListBox;
     edtUpdateInterval: TEdit;
     udUpdateInterval: TUpDown;
-    TabSheet1: TTabSheet;
-    rgEditorPosition: TRadioGroup;
     CheckedImages: TImageList;
     procedure btnAddClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
@@ -59,7 +57,7 @@ type
   public
     { Public declarations }
     Class Function Execute(var Options : TDocOptions; var iInt : Integer;
-      var DocHelpFile : String; var iBrowsePosition : Integer) : Boolean;
+      var DocHelpFile : String) : Boolean;
   end;
 
 implementation
@@ -87,12 +85,11 @@ ResourceString
   @param   Options     as a TDocOptions as a reference
   @param   iInt        as an Integer as a reference
   @param   DocHelpFile as a String as a reference
-  @param   iBrowsePosition as an Integer as a reference
   @return  a Boolean
 
 **)
 Class Function TfrmOptions.Execute(var Options : TDocOptions; var iInt : Integer;
-  var DocHelpFile : String; var iBrowsePosition : Integer) : Boolean;
+  var DocHelpFile : String) : Boolean;
 
 Var
   i : TDocOption;
@@ -112,7 +109,6 @@ Begin
       udUpdateInterval.Position := iInt;
       If FileExists(DocHelpFile) Then
         HelpFileDir.Directory := DocHelpFile;
-      rgEditorPosition.ItemIndex := iBrowsePosition;
       If ShowModal = mrOK Then
         Begin
           Result := True;
@@ -126,7 +122,6 @@ Begin
             lbSpecialTags.Items.Objects[j]);
           iInt := udUpdateInterval.Position;
           DocHelpFile := HelpFileDir.Directory;
-          iBrowsePosition := rgEditorPosition.ItemIndex;
         End;
     Finally
       Free;

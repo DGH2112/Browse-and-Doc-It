@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       10 Jul 2006
+  @Date       13 Jul 2006
   @Author     David Hoyle
 
 **)
@@ -201,12 +201,16 @@ Type
     Procedure Delete(iIndex : Integer);
     (**
       This property provides access to the individual modules in the collection.
+      @precon  iIndex must be a valid index between 0 and Count - 1.
+      @postcon Returns an instance of the specified indexed module.
       @param   iIndex as       an Integer
       @return  a TPascalDocModule
     **)
     Property Module[iIndex : Integer] : TPascalDocModule Read GetModule; Default;
     (**
       This property returns the number of modules in the collection.
+      @precon  None.
+      @postcon Returns the number of modules in the collection.
       @return  an Integer
     **)
     Property Count : Integer Read GetCount;
@@ -252,14 +256,14 @@ Const
   );
   (** A sorted list of directives. Used for identifying tokens as
   directives. **)
-  strDirectives : Array[1..40] Of String = (
+  strDirectives : Array[1..42] Of String = (
     'absolute', 'abstract', 'assembler', 'automated', 'cdecl', 'contains',
     'default', 'dispid', 'dynamic', 'export', 'external', 'far', 'forward',
     'implements', 'index', 'message', 'name', 'near', 'nodefault', 'overload',
     'override', 'package', 'pascal', 'private', 'protected', 'public',
     'published', 'read', 'readonly', 'register', 'reintroduce', 'requires',
-    'resident', 'safecall', 'stdcall', 'stored', 'varargs', 'virtual', 'write',
-    'writeonly'
+    'resident', 'safecall', 'sealed', 'static', 'stdcall', 'stored', 'varargs',
+    'virtual', 'write', 'writeonly'
   );
   
 Const
@@ -1494,7 +1498,7 @@ Var
   bool : Boolean;
 
 Begin
-  DeclSection(Scope, Method);
+  DeclSection(scLocal, Method);
   ExportedStmt;
   bool := CompoundStmt(Method);
   If Not bool Then
@@ -4463,13 +4467,6 @@ End;
                                 -> ConstructorDecl
                                 -> DestructorDecl
 
-  @note    This method is not implemented as per the grammar as I think the
-           grammar is incorrect. The grammar dictates a block call after each
-           procedure and function declaration BUT there are no constructor and
-           destructor declarations only headings. I have places the Block() call
-           here in the ProceduralDeclSection() instead and called all
-           ####Heading() methods.
-
   @precon  Scope is the current scope of the procedure declaration and Method
            is the current method scoped else nil.
   @postcon Returns true is a procedure declaration was parsed.
@@ -4974,7 +4971,8 @@ End;
                         DYNAMIC     ';'
                         VIRTUAL     ';'
                         EXPORT      ';'
-                        EXTERNAL    ';'
+                        EXTERNAL    ConstExpr '';'
+                        DISPID      ConstExpr '';'
                         FAR         ';'
                         FORWARD     ';'
                         MESSAGE     ConstExpr ';'
@@ -5002,31 +5000,41 @@ Begin
   // Check for method directives
   While IsKeyWord(Token.Token, strMethodDirectives) Do
     Begin
-      M.AddDirectives(Token.Token);
-      If Token.UToken = 'MESSAGE' Then
-        Begin
-          NextNonCommentToken;
-          ExprType := [etConstExpr, etNumeric];
-          ConstExpr(Nil, ExprType);
-        End
-      Else If Token.UToken = 'EXTERNAL' Then
-        Begin
-          NextNonCommentToken;
-          ExprType := [etConstExpr, etString];
-          ConstExpr(C, ExprType);
-        End
-      Else If Token.UToken = 'DISPID' Then
-        Begin
-          NextNonCommentToken;
-          ExprType := [etConstExpr, etNumeric];
-          ConstExpr(C, ExprType);
-        End Else
-          NextNonCommentToken;
-      If Token.Token = ';' Then
-        NextNonCommentToken
-      Else
-        ErrorAndSeekToken(strLiteralExpected, 'Directive', ';',
-          strSeekableOnErrorTokens, stActual);
+      C := TGenericContainer.Create;
+      Try
+        If Token.UToken = 'MESSAGE' Then
+          Begin
+            NextNonCommentToken;
+            ExprType := [etConstExpr, etNumeric];
+            ConstExpr(C, ExprType);
+            M.AddDirectives('Meesage ' + C.AsString(True));
+          End
+        Else If Token.UToken = 'EXTERNAL' Then
+          Begin
+            NextNonCommentToken;
+            ExprType := [etConstExpr, etString];
+            ConstExpr(C, ExprType);
+            M.AddDirectives('External ' + C.AsString(True));
+          End
+        Else If Token.UToken = 'DISPID' Then
+          Begin
+            NextNonCommentToken;
+            ExprType := [etConstExpr, etNumeric];
+            ConstExpr(C, ExprType);
+            M.AddDirectives('DispID ' + C.AsString(True));
+          End Else
+          Begin
+            M.AddDirectives(Token.Token);
+            NextNonCommentToken;
+          End;
+        If Token.Token = ';' Then
+          NextNonCommentToken
+        Else
+          ErrorAndSeekToken(strLiteralExpected, 'Directive', ';',
+            strSeekableOnErrorTokens, stActual);
+      Finally
+        C.Free;
+      End;
     End;
 End;
 
@@ -5390,10 +5398,10 @@ End;
   deligating field, property and method declarations using the following
   object pascal grammar.
 
-  @grammar ClassType -> CLASS [ ClassHeritage ]
-                              [ ClassFieldList ]
-                              [ ClassMethodList ]
-                              [ ClassPropertyList ]
+  @grammar ClassType -> CLASS [ ABSTRACT | SEALED] [ ClassHeritage ]
+                          [ ClassFieldList ]
+                          [ ClassMethodList ]
+                          [ ClassPropertyList ]
                         END
 
   @precon  None.
@@ -5421,6 +5429,9 @@ begin
           Result.AbstractClass := (Token.UToken = 'ABSTRACT');
           If Result.AbstractClass Then
             NextNonCommentToken;
+          Result.SealedClass := (Token.UToken = 'SEALED');
+          If Result.SealedClass Then
+            NextNonCommentToken;
           // Get the classes heritage
           ClassHeritage(Result);
           // If this class has no body then return
@@ -5435,7 +5446,7 @@ begin
                 ClassPropertyList(Result, InternalScope) Or
                 ClassFieldList(Result, InternalScope)
               );
-              // Check for 'END' and ';'
+              // Check for 'END'
               If Token.UToken = 'END' Then
                 NextNonCommentToken
               Else
@@ -5488,18 +5499,18 @@ end;
   This method parse the class visibility from the current token
   using the following object pascal grammar.
 
-  @grammar ClassVisibility -> [ PUBLIC | PROTECTED | PRIVATE | PUBLISHED ]
+  @grammar ClassVisibility -> [ STATIC ] [ PUBLIC | PROTECTED | PRIVATE | PUBLISHED ]
 
   @precon  Scope is the current internal scope of the class.
   @postcon Parse the class visibility from the current token
 
   @param   Scope as a TScope as a reference
 
-  @todo    Handle STATIC Private, etc
-
 **)
 procedure TPascalDocModule.ClassVisibility(var Scope : TScope);
 begin
+  If Token.UToken = 'STATIC' Then
+    NextNonCommentToken;
   While IsKeyWord(Token.Token, strScope) Do
     Begin
       If Token.UToken = 'PRIVATE' Then
@@ -5743,64 +5754,74 @@ End;
 
 **)
 procedure TPascalDocModule.PropertySpecifiers(Prop: TProperty);
+
+Var
+  C : TGenericContainer;
+  ExprType : TExprTypes;
+
 begin
   // Check for index
   If Token.UToken = 'INDEX' Then
     Begin
       NextNonCommentToken;
-      While Not IsKeyWord(Token.UToken, strMethodDirectives) And (Token.Token <> ';') Do
-        Begin
-          Prop.IndexSpec := Token.Token;
-          NextNonCommentToken;
-        End;
+      ExprType := [etNumeric, etConstExpr];
+      C := TGenericContainer.Create;
+      Try
+        ConstExpr(C, ExprType);
+        Prop.IndexSpec := C.AsString(True);
+      Finally
+        C.Free;
+      End;
     End;
   // Check for read
   If Token.UToken = 'READ' Then
     Begin
       NextNonCommentToken;
-      While Not IsKeyWord(Token.Token, strPropSpecs) Do
+      If Token.TokenType = ttIdentifier Then
         Begin
-          If Prop.ReadSpec <> '' Then
-            Prop.ReadSpec:= Prop.ReadSpec + #32;
-          Prop.ReadSpec := Prop.ReadSpec + Token.Token;
+          Prop.ReadSpec := Token.Token;
           NextNonCommentToken;
-        End;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, 'PropertySpecifier', Token.Token,
+            strSeekableOnErrorTokens, stActual);
     End;
   // Check for write
   If Token.UToken = 'WRITE' Then
     Begin
       NextNonCommentToken;
-      While Not IsKeyWord(Token.Token, strPropSpecs) Do
+      If Token.TokenType = ttIdentifier Then
         Begin
-          If Prop.WriteSpec <> '' Then
-            Prop.WriteSpec:= Prop.WriteSpec + #32;
-          Prop.WriteSpec := Prop.WriteSpec + Token.Token;
+          Prop.WriteSpec := Token.Token;
           NextNonCommentToken;
-        End;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, 'PropertySpecifier', Token.Token,
+            strSeekableOnErrorTokens, stActual);
     End;
   // Check for stored
   If Token.UToken = 'STORED' Then
     Begin
       NextNonCommentToken;
-      While Not IsKeyWord(Token.Token, strPropSpecs) Do
-        Begin
-          If Prop.StoredSpec <> '' Then
-            Prop.StoredSpec:= Prop.StoredSpec + #32;
-          Prop.StoredSpec := Prop.StoredSpec + Token.Token;
-          NextNonCommentToken;
-        End;
+      ExprType := [etNumeric, etConstExpr];
+      C := TGenericContainer.Create;
+      Try
+        ConstExpr(C, ExprType);
+        Prop.StoredSpec := C.AsString(True);
+      Finally
+        C.Free;
+      End;
     End;
   // Check for default
   If Token.UToken = 'DEFAULT' Then
     Begin
       NextNonCommentToken;
-      While Not IsKeyWord(Token.Token, strPropSpecs) Do
-        Begin
-          If Prop.DefaultSpec <> '' Then
-            Prop.DefaultSpec:= Prop.DefaultSpec + #32;
-          Prop.DefaultSpec := Prop.DefaultSpec + Token.Token;
-          NextNonCommentToken;
-        End;
+      ExprType := [etNumeric, etConstExpr];
+      C := TGenericContainer.Create;
+      Try
+        ConstExpr(C, ExprType);
+        Prop.DefaultSpec := C.AsString(True);
+      Finally
+        C.Free;
+      End;
     End;
   If Token.UToken = 'NODEFAULT' Then
     NextNonCommentToken;
@@ -5824,13 +5845,14 @@ begin
   If Token.UToken = 'DISPID' Then
     Begin
       NextNonCommentToken;
-      Prop.DispIDSpec := Token.Token;
-      If Token.Token = '-' Then
-        Begin
-          NextNonCommentToken;
-          Prop.DispIDSpec := Prop.DispIDSpec + Token.Token;
-        End;
-      NextNonCommentToken;
+      ExprType := [etNumeric, etConstExpr];
+      C := TGenericContainer.Create;
+      Try
+        ConstExpr(C, ExprType);
+        Prop.DispIdSpec := C.AsString(True);
+      Finally
+        C.Free;
+      End;
     End;
   // Check for ';'
   If Token.Token = ';' Then
@@ -5950,7 +5972,7 @@ End;
 Procedure TPascalDocModule.RequiresClause;
 
 Var
-  Comment : TComment;
+  Comment : TComment;                     
 
 Begin
   If Token.UToken = 'REQUIRES' Then

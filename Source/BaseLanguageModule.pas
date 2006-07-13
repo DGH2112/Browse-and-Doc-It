@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    10 Jul 2006
+  @Date    13 Jul 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -94,8 +94,7 @@ Type
     doShowUndocPropReturn,
     doShowIncorrectPropReturnType,
     doShowMissingPropPreCons,
-    doShowMissingPropPostCons,
-    doCategoriesConflicts
+    doShowMissingPropPostCons
   );
 
   (** This is a set of display options. **)
@@ -119,33 +118,45 @@ Type
     Function AsString(ShowHTML : Boolean) : String;
     (**
       Returns the tag name as a string.
+      @precon  None.
+      @postcon Returns the tag name as a string.
       @return  a String
     **)
     Property TagName : String read FTagName write SetTagName;
     (**
       Returns the specifically index token from the tags token collection.
+      @precon  iTokenIndex must be a valid index between 0 and TokenCount - 1.
+      @postcon Returns the specifically index token from the tags token collection.
       @param   iTokenIndex as       an Integer
       @return  a String
     **)
     Property Token[iTokenIndex : Integer] : String read GetToken; Default;
     (**
       Returns the specifically index tokens type from the tags token collection.
+      @precon  iTokenIndex must be a valid index between 0 and TokenCount - 1.
+      @postcon Returns the specifically index tokens type from the tags token collection.
       @param   iTokenIndex as       an Integer
       @return  a TTokenType
     **)
     Property TokenType[iTokenIndex : Integer] : TTokenType read GetTokenType;
     (**
       Returns the number of token in the tag.
+      @precon  None.
+      @postcon Returns the number of token in the tag.
       @return  an Integer
     **)
     Property TokenCount : Integer read GetTokenCount;
     (**
       Returns the line number of the tag.
+      @precon  None.
+      @postcon Returns the line number of the tag.
       @return  an Integer
     **)
     Property Line : Integer Read FLine;
     (**
       Returns the column position of the tag.
+      @precon  None.
+      @postcon Returns the column position of the tag.
       @return  an Integer
     **)
     Property Column : Integer Read FColumn;
@@ -183,39 +194,53 @@ Type
     Function FindTag(strTagName : String) : Integer;
     (**
       Returns the specifically indexed token from the collection.
+      @precon  iTokenIndex must a valid index between 0 and TokenCount - 1.
+      @postcon Returns the specifically indexed token from the collection.
       @param   iTokenIndex as       an Integer
       @return  a String
     **)
     Property Token[iTokenIndex : Integer] : String read GetToken; Default;
     (**
       Returns the number of tokens found in the comment.
+      @precon  None.
+      @postcon Returns the number of tokens found in the comment.
       @return  an Integer
     **)
     Property TokenCount : Integer read GetTokenCount;
     (**
       Returns the specifically indexed tokens type from the token collection.
+      @precon  iTokenIndex must be a valid index between 0 and TokenCount - 1.
+      @postcon Returns the specifically indexed tokens type from the token collection.
       @param   iTokenIndex as       an Integer
       @return  a TTokenType
     **)
     Property TokenType[iTokenIndex : Integer] : TTokenType read GetTokenType;
     (**
       Returns the specifically indexed tag from the comments tag collection.
+      @precon  iTagIndex must eb a valid index between 0 and TagCount - 1.
+      @postcon Returns the specifically indexed tag from the comments tag collection.
       @param   iTagIndex as       an Integer
       @return  a TTag
     **)
     Property Tag[iTagIndex : Integer] : TTag Read GetTag;
     (**
       Returns the number of tags found within the comment.
+      @precon  None.
+      @postcon Returns the number of tags found within the comment.
       @return  an Integer
     **)
     Property TagCount : Integer Read GetTagCount;
     (**
       Returns the line number of the comment.
+      @precon  None.
+      @postcon Returns the line number of the comment.
       @return  an Integer
     **)
     Property Line : Integer Read GetLine;
     (**
       Returns the column number of the comment.
+      @precon  None.
+      @postcon Returns the column number of the comment.
       @return  an Integer
     **)
     Property Col : Integer Read GetCol;
@@ -249,36 +274,50 @@ Type
     Procedure Append(strToken : String);
     (**
       Returns the token as a string.
+      @precon  None.
+      @postcon Returns the token as a string.
       @return  a String
     **)
     Property Token : String read FToken;
     (**
       Returns the uppercase version of the token. Used for keyword comparisons.
+      @precon  None.
+      @postcon Returns the uppercase version of the token. Used for keyword comparisons.
       @return  a String
     **)
     Property UToken : String read FUToken;
     (**
       Returns the buffer position of the token start point.
+      @precon  None.
+      @postcon Returns the buffer position of the token start point.
       @return  an Integer
     **)
     Property BufferPos : Integer read FBufferPos;
     (**
       Returns the line number of the token start point.
+      @precon  None.
+      @postcon Returns the line number of the token start point.
       @return  an Integer
     **)
     Property Line : Integer read FLine;
     (**
       Returns the column number of the token start point.
+      @precon  None.
+      @postcon Returns the column number of the token start point.
       @return  an Integer
     **)
     Property Column : Integer read FColumn;
     (**
       Returns the length of the token.
+      @precon  None.
+      @postcon Returns the length of the token.
       @return  an Integer
     **)
     Property Length : Integer read FLength;
     (**
       Returns the token type for the token.
+      @precon  None.
+      @postcon Returns the token type for the token.
       @return  a TTokenType
     **)
     Property TokenType : TTokenType read FTokenType;
@@ -296,21 +335,29 @@ Type
     Constructor Create(strIdent : String; iLine, iCol : Integer; Comment : TComment);
     (**
       Returns the identifiers name as a string.
+      @precon  None.
+      @postcon Returns the identifiers name as a string.
       @return  a String
     **)
     Property Ident : String Read FIdent;
     (**
       Returns the line number of the idenifier.
+      @precon  None.
+      @postcon Returns the line number of the idenifier.
       @return  an Integer
     **)
     Property Line : Integer Read FLine;
     (**
       Returns the column number of the identifier.
+      @precon  None.
+      @postcon Returns the column number of the identifier.
       @return  an Integer
     **)
     Property Col : Integer Read FCol;
     (**
       Returns the comment associated with the identifier.
+      @precon  None.
+      @postcon Returns the comment associated with the identifier.
       @return  a TComment
     **)
     Property Comment : TComment Read FComment;
@@ -334,17 +381,23 @@ Type
     Function AsString : String; Virtual;
     (**
       Returns the specifically indexed identifier in the list.
+      @precon  iIndex must be a valid index between 0 and Count - 1.
+      @postcon Returns the specifically indexed identifier in the list.
       @param   iIndex as       an Integer
       @return  a TIdent
     **)
     Property Idents[iIndex : Integer] : TIdent Read GetIdentInfo; Default;
     (**
       Returns the number of identifiers in the list.
+      @precon  None.
+      @postcon Returns the number of identifiers in the list.
       @return  an Integer
     **)
     Property Count : Integer Read GetCount;
     (**
       Returns the comment associated with the identifier list.
+      @precon  None.
+      @postcon Returns the comment associated with the identifier list.
       @return  a TComment
     **)
     Property Comment : TComment Read FComment Write FComment;
@@ -375,37 +428,51 @@ Type
     Function AsString(ShowFirstToken : Boolean) : String; Virtual;
     (**
       Returns the identifier for the generic container.
+      @precon  None.
+      @postcon Returns the identifier for the generic container.
       @return  a String
     **)
     Property Identifier : String Read FIdentifier Write FIdentifier;
     (**
       Returns the specifically indexed token in the container.
+      @precon  iIndex must be a valid index between 0 and Count - 1.
+      @postcon Returns the specifically indexed token in the container.
       @param   iIndex as       an Integer
       @return  a String
     **)
     Property Token[iIndex : Integer] : String Read GetToken; Default;
     (**
       Returns the number of tokens in the generic container.
+      @precon  None.
+      @postcon Returns the number of tokens in the generic container.
       @return  an Integer
     **)
     Property Count : Integer Read GetTokenCount;
     (**
       Returns the comment associated with the generic container.
+      @precon  None.
+      @postcon Returns the comment associated with the generic container.
       @return  a TComment
     **)
     Property Comment : TComment Read FComment Write FComment;
     (**
       Returns the scope of the generic container.
+      @precon  None.
+      @postcon Returns the scope of the generic container.
       @return  a TScope
     **)
     Property Scope : TScope Read FScope Write FScope;
     (**
       Returns the line number for the generic container.
+      @precon  None.
+      @postcon Returns the line number for the generic container.
       @return  an Integer
     **)
     Property Line : Integer Read FLine Write FLine;
     (**
       Returns the column number of the generic container.
+      @precon  None.
+      @postcon Returns the column number of the generic container.
       @return  an Integer
     **)
     Property Col : Integer Read FCol Write FCol;
@@ -427,17 +494,23 @@ Type
     Procedure Sort;
     (**
       Returns the comment associcate with this collection.
+      @precon  None.
+      @postcon Returns the comment associcate with this collection.
       @return  a TComment
     **)
     Property Comment : TComment Read FComment Write FComment;
     (**
       Returns the specifically indexed item from the generic collection.
+      @precon  iIndex must be a valid index between 0 and Count - 1.
+      @postcon Returns the specifically indexed item from the generic collection.
       @param   iIndex as       an Integer
       @return  a TGenericContainer
     **)
     Property Items[iIndex : Integer] : TGenericContainer Read GetItem; Default;
     (**
       Returns the number of items in the generic collection.
+      @precon  None.
+      @postcon Returns the number of items in the generic collection.
       @return  an Integer
     **)
     Property Count : Integer Read GetCount;
@@ -486,46 +559,64 @@ Type
     Destructor Destroy; Override;
     (**
       Returns the parameter modifier : const, var or out.
+      @precon  None.
+      @postcon Returns the parameter modifier : const, var or out.
       @return  a TParamModifier
     **)
     Property ParamModifier : TParamModifier Read FParamModifier;
     (**
       Returns the parameters idenitfier.
+      @precon  None.
+      @postcon Returns the parameters idenitfier.
       @return  a String
     **)
     Property Identifier : String Read FIdentifier;
     (**
       Returns whether the parameter is an array parameter.
+      @precon  None.
+      @postcon Returns whether the parameter is an array parameter.
       @return  a Boolean
     **)
     Property ArrayOf : Boolean Read FArrayOf;
     (**
       Returns the parameter type identifier for the parameter.
+      @precon  None.
+      @postcon Returns the parameter type identifier for the parameter.
       @return  a TTypes
     **)
     Property ParamType : TTypes Read FParamType;
     (**
       Returns the default value of the parameter is there is one.
+      @precon  None.
+      @postcon Returns the default value of the parameter is there is one.
       @return  a String
     **)
     Property DefaultValue : String Read FDefaultValue;
     (**
       Returns the comment associcated with the parameter (field).
+      @precon  None.
+      @postcon Returns the comment associcated with the parameter (field).
       @return  a TComment
     **)
     Property Comment : TComment Read FComment Write FComment;
     (**
       Returns the parameters scope with in the record / object / class etc.
+      @precon  None.
+      @postcon Returns the parameters scope with in the record / object / class etc.
       @return  a TScope
     **)
     Property Scope : TScope Read FScope;
     (**
       Returns the parameters line number.
+      @precon  None.
+      @postcon Returns the parameters line number.
       @return  an Integer
     **)
     Property Line : Integer Read FLine;
     (**
       Returns the parameters column number.
+      @precon  None.
+      @postcon Returns the parameters column number.
       @return  an Integer
     **)
     Property Col : Integer Read FCol;
@@ -544,12 +635,16 @@ Type
     Procedure Sort;
     (**
       Returns the specifically indexed parameter of the method.
+      @precon  iIndex must be a valid index between 0 and Count - 1.
+      @postcon Returns the specifically indexed parameter of the method.
       @param   iIndex as       an Integer
       @return  a TParameter
     **)
     Property Parameter[iIndex : Integer] : TParameter Read GetParameter; Default;
     (**
       Returns the number of parameter the method has.
+      @precon  None.
+      @postcon Returns the number of parameter the method has.
       @return  an Integer
     **)
     Property Count : Integer Read GetCount;
@@ -598,102 +693,155 @@ Type
     Procedure Assign(Method : TMethodDecl);
     (**
       Returns the comment associated with the method.
+      @precon  None.
+      @postcon Returns the comment associated with the method.
       @return  a TComment
     **)
     Property Comment : TComment Read FComment Write FComment;
     (**
       Returns the methods types, procedure, function, constructor, destructor.
+      @precon  None.
+      @postcon Returns the methods types, procedure, function, constructor, destructor.
       @return  a TMethodType
     **)
     Property MethodType : TMethodType Read FMethodType;
     (**
       Returns the methods class name.
+      @precon  None.
+      @postcon Returns the methods class name.
       @return  a String
     **)
     Property ClsName : String Read FClsName Write SetClsName;
     (**
       Returns the methods idenitifier.
+      @precon  None.
+      @postcon Returns the methods idenitifier.
       @return  a String
     **)
     Property Identifier : String Read FIdentifier Write SetIdentifier;
+    (**
+      This property defines a collection of parameters associated with the
+      method.
+      @precon  None.
+      @postcon References a collection of parameters associated with the method.
+      @return  a TParameterCollection
+    **)
     Property Parameters : TParameterCollection Read FParameters;
     (**
       Returns the return type of the method if it is a function.
+      @precon  None.
+      @postcon Returns the return type of the method if it is a function.
       @return  a String
     **)
     Property ReturnType : String Read FReturnType Write SetReturnType;
     (**
       Returns the string list of directives associated with the method.
+      @precon  None.
+      @postcon Returns the string list of directives associated with the method.
       @return  a TStringList
     **)
     Property Directives : TStringList Read FDirectives;
     (**
       Returns the internal scope of the method within the class / interface /
+      @precon  None.
+      @postcon Returns the internal scope of the method within the class / interface /
       module etc.
       @return  a TScope
     **)
     Property Scope : TScope Read FScope Write FScope;
     (**
       Returns the associated message for the method if the method is a message
+      @precon  None.
+      @postcon Returns the associated message for the method if the method is a message
       handler.
       @return  a String
     **)
     Property Msg : String Read FMsg Write SetMsg;
     (**
       Returns the external reference for the method if there is one.
+      @precon  None.
+      @postcon Returns the external reference for the method if there is one.
       @return  a String
     **)
     Property Ext : String Read FExt Write SetExt;
     (**
       Return whether the method is a class method.
+      @precon  None.
+      @postcon Return whether the method is a class method.
       @return  a Boolean
     **)
     Property ClassMethod : Boolean Read FClassMethod Write FClassMethod;
     (**
       Returns the line number of the method.
+      @precon  None.
+      @postcon Returns the line number of the method.
       @return  an Integer
     **)
     Property Line : Integer Read FLine;
     (**
       Returns the column number of the method.
+      @precon  None.
+      @postcon Returns the column number of the method.
       @return  an Integer
     **)
     Property Col : Integer Read FCol;
     (**
       Returns a reference to the local methods collection of this method.
+      @precon  None.
+      @postcon Returns a reference to the local methods collection of this method.
       @return  a TMethodCollection
     **)
     Property LocalMethods : TMethodCollection Read FLocalMethods;
     (**
       Returns a reference to the types collection of the method.
+      @precon  None.
+      @postcon Returns a reference to the types collection of the method.
       @return  a TGenericContainerCollection
     **)
     Property Types : TGenericContainerCollection Read FTypes;
     (**
       Returns a reference to the variables collection of the method.
+      @precon  None.
+      @postcon Returns a reference to the variables collection of the method.
       @return  a TGenericContainerCollection
     **)
     Property Vars : TGenericContainerCollection Read FVars;
     (**
       Returns a reference to the constants collection of the method.
+      @precon  None.
+      @postcon Returns a reference to the constants collection of the method.
       @return  a TGenericContainerCollection
     **)
     Property Consts : TGenericContainerCollection Read FConsts;
     (**
       Returns a reference to the resource string collection of the method.
+      @precon  None.
+      @postcon Returns a reference to the resource string collection of the method.
       @return  a TGenericContainerCollection
     **)
     Property ResStrings : TGenericContainerCollection Read FResStrings;
     (**
       Returns the Qualified name of the method.
+      @precon  None.
+      @postcon Returns the Qualified name of the method.
       @return  a String
     **)
     Property QualifiedName : String Read GetQualifiedName;
     (**
       Returns the method alias name.
+      @precon  None.
+      @postcon Returns the method alias name.
       @return  a String
     **)
     Property Alias : String Read FAlias Write FAlias;
+    (**
+      This property defines a list of label identifiers associated with the
+      method.
+      @precon  None.
+      @postcon References an IdentList of labels identifiers associated with the
+               method.
+      @return  a TIdentList
+    **)
     Property Labels : TIdentList Read FLabels;
   End;
 
@@ -711,12 +859,16 @@ Type
     Procedure Sort;
     (**
       Returns the specifically indexed method from the methods collection.
+      @precon  iIndex must be a valid index between 0 and Count - 1.
+      @postcon Returns the specifically indexed method from the methods collection.
       @param   iIndex as       an Integer
       @return  a TMethodDecl
     **)
     Property Method[iIndex : Integer] : TMethodDecl Read GetMethod; Default;
     (**
       Returns the number of methods in the methods collection.
+      @precon  None.
+      @postcon Returns the number of methods in the methods collection.
       @return  an Integer
     **)
     Property Count : Integer Read GetCount;
@@ -757,94 +909,129 @@ Type
     Procedure Assign(Prop : TProperty);
     (**
       Returns the identifier of the property.
+      @precon  None.
+      @postcon Returns the identifier of the property.
       @return  a String
     **)
     Property Identifier : String Read FIdentifier;
     (**
       Returns the specifically indexed parameter of the property.
-      @param   iIndex as       an Integer
-      @return  a TParameter
+      @precon  None.
+      @postcon Returns the specifically indexed parameter of the property.
+      @return  a TParameterCollection
     **)
     Property Parameters : TParameterCollection Read FParameters;
     (**
       Returns the type identifier of the property.
+      @precon  None.
+      @postcon Returns the type identifier of the property.
       @return  a String
     **)
     Property TypeId : String Read FTypeId Write SetTypeId;
     (**
       Returns the
+      @precon  None.
+      @postcon Returns the
       @return  a String
     **)
     Property IndexSpec : String Read FIndexSpec Write SetIndexSpec;
     (**
       Returns the properties Read specification.
+      @precon  None.
+      @postcon Returns the properties Read specification.
       @return  a String
     **)
     Property ReadSpec : String Read FReadSpec Write SetReadSpec;
     (**
       Returns the properties write specification.
+      @precon  None.
+      @postcon Returns the properties write specification.
       @return  a String
     **)
     Property WriteSpec : String Read FWriteSpec Write SetWriteSpec;
     (**
       Returns the properties Stored specification.
+      @precon  None.
+      @postcon Returns the properties Stored specification.
       @return  a String
     **)
     Property StoredSpec : String Read FStoredSpec Write SetStoredSpec;
     (**
       Returns the property default value.
+      @precon  None.
+      @postcon Returns the property default value.
       @return  a String
     **)
     Property DefaultSpec : String Read FDefaultSpec Write SetDefaultSpec;
     (**
       Returns whether this property is the classes / interfaces default
+      @precon  None.
+      @postcon Returns whether this property is the classes / interfaces default
       property.
       @return  a Boolean
     **)
     Property DefaultProperty : Boolean Read FDefaultProperty Write SetDefaultProperty;
     (**
       Returns the implements specification for the property.
+      @precon  None.
+      @postcon Returns the implements specification for the property.
       @return  a String
     **)
     Property ImplementsSpec : String Read FImplementsSpec Write SetImplementsSpec;
     (**
       Returns a string represnetation of the property with all the appropriate
+      @precon  None.
+      @postcon Returns a string represnetation of the property with all the appropriate
       specifiers.
       @return  a String
     **)
     Property AsString : String Read GetAsString;
     (**
       Returns the comment associated with the property.
+      @precon  None.
+      @postcon Returns the comment associated with the property.
       @return  a TComment
     **)
     Property Comment : TComment Read FComment Write FComment;
     (**
       Returns the scope with in the class / interface of the property.
+      @precon  None.
+      @postcon Returns the scope with in the class / interface of the property.
       @return  a TScope
     **)
     Property Scope : TScope Read FScope;
     (**
       Returns the line number of the property.
+      @precon  None.
+      @postcon Returns the line number of the property.
       @return  an Integer
     **)
     Property Line : Integer Read FLine;
     (**
       Returns the column number of the property.
+      @precon  None.
+      @postcon Returns the column number of the property.
       @return  an Integer
     **)
     Property Col : Integer Read FCol;
     (**
       Returns the properties DispID reference.
+      @precon  None.
+      @postcon Returns the properties DispID reference.
       @return  a String
     **)
     Property DispIdSpec : String Read FDispIDSpec Write FDispIDSpec;
     (**
       Returns whether the property has a ReadOnly specification.
+      @precon  None.
+      @postcon Returns whether the property has a ReadOnly specification.
       @return  a Boolean
     **)
     Property ReadOnlySpec : Boolean Read FReadOnlySpec Write FReadOnlySpec;
     (**
       Returns whether the property has a WriteOnly specification.
+      @precon  None.
+      @postcon Returns whether the property has a WriteOnly specification.
       @return  a Boolean
     **)
     Property WriteOnlySpec : Boolean Read FWriteOnlySpec Write FWriteOnlySpec;
@@ -863,12 +1050,16 @@ Type
     Procedure Sort;
     (**
       Returns the indexed property for the class.
+      @precon  iIndex must be a valid index between 0 and Count - 1.
+      @postcon Returns the indexed property for the class.
       @param   iIndex as       an Integer
       @return  a TProperty
     **)
     Property Properties[iIndex : Integer] : TProperty Read GetProperty; Default;
     (**
       Returns the number of properties in the classes properties collection.
+      @precon  None.
+      @postcon Returns the number of properties in the classes properties collection.
       @return  an Integer
     **)
     Property Count : Integer Read GetCount;
@@ -887,12 +1078,15 @@ Type
     Function AsString(ShowFirstToken : Boolean) : String; Override;
     (**
       Returns the specifically indexed parameter in the record.
-      @param   iIndex as       an Integer
-      @return  a TParameter
+      @precon  None.
+      @postcon Returns the specifically indexed parameter in the record.
+      @return  a TParameterCollection
     **)
     Property Parameters : TParameterCollection Read FParameters;
     (**
       Returns whether the record is packed or not.
+      @precon  None.
+      @postcon Returns whether the record is packed or not.
       @return  a Boolean
     **)
     Property IsPacked : Boolean Read FPacked Write FPacked;
@@ -912,9 +1106,17 @@ Type
     Procedure Sort; Override;
     (**
       Returns a reference to the object class heritage.
+      @precon  None.
+      @postcon Returns a reference to the object class heritage.
       @return  a TIdentList
     **)
     Property Heritage : TIdentList Read FHeritage;
+    (**
+      This property defines a collection of methods associated with the object.
+      @precon  None.
+      @postcon References a collection of methods associated with the object.
+      @return  a TMethodCollection
+    **)
     Property Methods : TMethodCollection Read FMethods;
   End;
 
@@ -924,14 +1126,35 @@ Type
   Private
     FProperties : TPropertyCollection;
     FAbstractClass: Boolean;
+    FSealedClass : Boolean;
   Public
     Constructor Create; Override;
     Destructor Destroy; Override;
     Function AsString(ShowFirstToken : Boolean) : String; Override;
     Procedure Assign(AObject : TObjectDecl); Override;
     Procedure Sort; Override;
+    (**
+      This property defined whether the class is abstract or not.
+      @precon  None.
+      @postcon None.
+      @return  a Boolean
+    **)
     Property AbstractClass : Boolean Read FAbstractClass Write FAbstractClass;
-    Property properties : TPropertyCollection Read FProperties;
+    (**
+      This property defines whether the class is sealed or not.
+      @precon  None.
+      @postcon None.
+      @return  a Boolean
+    **)
+    Property SealedClass : Boolean Read FSealedClass Write FSealedClass;
+    (**
+      This property returns a collection of properties associated with the
+      class.
+      @precon  None.
+      @postcon Returns a collection of properties associated with the class.
+      @return  a TPropertyCollection
+    **)
+    Property Properties : TPropertyCollection Read FProperties;
   End;
 
   (** This is a class the extends the class definition to handle an interface
@@ -945,6 +1168,8 @@ Type
     Procedure Assign(AObject : TObjectDecl); Override;
     (**
       Returns the GUID for the interface.
+      @precon  None.
+      @postcon Returns the GUID for the interface.
       @return  a String
     **)
     Property GUID : String Read FGUID Write SetGUID;
@@ -1029,6 +1254,12 @@ Type
     FDimensions : Integer;
   Public
     Procedure AddDimension;
+    (**
+      This property defines the number of dmiensions that the array contains.
+      @precon  None.
+      @postcon Returns the number of dimension that the array contains.
+      @return  an Integer
+    **)
     Property Dimensions : Integer Read FDimensions;
   End;
 
@@ -1061,26 +1292,36 @@ Type
       ErrType : TErrorType); Overload;
     (**
       Returns the exception message.
+      @precon  None.
+      @postcon Returns the exception message.
       @return  a String
     **)
     Property Msg : String Read FMsg;
     (**
       Returns the line number where the exception occurred.
+      @precon  None.
+      @postcon Returns the line number where the exception occurred.
       @return  an Integer
     **)
     Property Line : Integer Read FLine;
     (**
       Returns the column number where the exception occurred.
+      @precon  None.
+      @postcon Returns the column number where the exception occurred.
       @return  an Integer
     **)
     Property Col : Integer Read FCol;
     (**
       Returns the type of exception stored.
-      @return  a String
+      @precon  None.
+      @postcon Returns the type of exception stored.
+      @return  a TErrorType
     **)
     Property ErrorType : TErrorType Read FErrorType;
     (**
-      Returns the  exception method of the exception stored.
+      Returns the exception method of the exception stored.
+      @precon  None.
+      @postcon Returns the exception method of the exception stored.
       @return  a String
     **)
     Property Method : String Read FMethod;
@@ -1099,11 +1340,15 @@ Type
       ErrType : TErrorType);
     (**
       Returns the number of errors in the collection.
+      @precon  None.
+      @postcon Returns the number of errors in the collection.
       @return  an Integer
     **)
     Property Count : Integer Read GetCount;
     (**
       Returns the specifically indexed error from the collection.
+      @precon  iIndex must be a valid index between 1 and Count - 1.
+      @postcon Returns the specifically indexed error from the collection.
       @param   iIndex as       an Integer
       @return  a TDocError
     **)
@@ -1128,16 +1373,22 @@ Type
       strMethodName : String);
     (**
       Returns the line number of the documentation exception.
+      @precon  None.
+      @postcon Returns the line number of the documentation exception.
       @return  an Integer
     **)
     Property Line : Integer Read FLine;
     (**
       Returns the column number of the documentation exception.
+      @precon  None.
+      @postcon Returns the column number of the documentation exception.
       @return  an Integer
     **)
     Property Col : Integer Read FCol;
     (**
       Returns a string representing the classes ExceptionMethod.
+      @precon  None.
+      @postcon Returns a string representing the classes ExceptionMethod.
       @return  a String
     **)
     Property ExceptionMethod : String Read FExceptionMethod;
@@ -1214,13 +1465,71 @@ Type
     Constructor Create(Const Args: Array of TVarRec; iIdentLine,
       iIdentColumn, iCommentLine, iCommentCol : Integer;
       DocConflictType : TDocConflictType);
+    (**
+      This property defines the category under which the conflict should appear.
+      @precon  None.
+      @postcon Returns the category under which the conflict should appear.
+      @return  a String
+    **)
     Property Category : String Read GetCategory;
+    (**
+      This property defines the actual documentation conflict message.
+      @precon  None.
+      @postcon Return the actual documentation conflict message.
+      @return  a String
+    **)
     Property Message : String Read FMessage;
+    (**
+      This property defines the description associated with the
+      documentation conflict.
+      @precon  None.
+      @postcon Returns the description associated with the documentation
+               conflict.
+      @return  a String
+    **)
     Property Description : String Read GetDescription;
+    (**
+      This property defines the identifier line associated with the documenation
+      conflict.
+      @precon  None.
+      @postcon Returns the identifier line associated with the documenation
+               conflict.
+      @return  an Integer
+    **)
     Property IdentLine : Integer Read FIdentLine;
+    (**
+      This property defines the identifier column associated with the
+      documenation conflict.
+      @precon  None.
+      @postcon Returns the identifier column associated with the documenation
+               conflict.
+      @return  an Integer
+    **)
     Property IdentColumn : Integer Read FIdentColumn;
+    (**
+      This property defines the line where the comment associated with the
+      conflict starts.
+      @precon  None.
+      @postcon Returns the line where the comment associated with the conflict
+               starts.
+      @return  an Integer
+    **)
     Property CommentLine : Integer Read FCommentLine;
+    (**
+      This property defines the column where the comment associated with the
+      conflict starts.
+      @precon  None.
+      @postcon Return the column where the comment associated with the conflict
+                      starts.
+      @return  an Integer
+    **)
     Property CommentColumn : Integer Read FCommentColumn;
+    (**
+      This property defines the type of documentation conflict.
+      @precon  None.
+      @postcon Returns the type of documentation conflict.
+      @return  a TDocConflictType
+    **)
     Property DocConflictType : TDocConflictType Read FDocConflictType;
   End;
 
@@ -1311,20 +1620,36 @@ Type
     (**
       Returns a refernce the to owned items collection. This is used to manage
       the life time of all the ident lists and comments found in the module.
+      @precon  None.
+      @postcon Returns a refernce the to owned items collection. This is used to
+               manage the life time of all the ident lists and comments found in
+               the module.
       @return  a TObjectList
     **)
     Property OwnedItems : TObjectList Read FOwnedItems;
     (**
       Returns the current token with in the module. Also see
       {@link TPascalDocModule.SetTokenIndex SetTokenIndex}.
+      @precon  None.
+      @postcon Returns the current token with in the module. Also see
+               {@link TPascalDocModule.SetTokenIndex SetTokenIndex}.
       @return  a TTokenInfo
     **)
     Property Token : TTokenInfo Read GetToken;
     (**
       Returns a reference to the body comments collection.
+      @precon  None.
+      @postcon Returns a reference to the body comments collection.
       @return  a TObjectList
     **)
     Property BodyComments : TObjectList Read FBodyComment;
+    (**
+      This property provide access to a list of compiler defines as a string
+      list.
+      @precon  None.
+      @postcon Provide a string list of compiler defines {$DEFINE xxxxx}
+      @return  a TStringList
+    **)
     Property CompilerDefines : TStringList Read FCompilerDefs;
   Public
     Constructor Create(IsModified : Boolean; strFileName : String);
@@ -1341,11 +1666,16 @@ Type
     { Properties }
     (**
       Returns a reference to the modules error collection.
-      @return  a TDocErrorCollection
+      @precon  None.
+      @postcon Returns a reference to the modules error collection.
+      @return  an Integer
     **)
     Property TokenCount : Integer Read GetTokenCount;
     (**
       Returns the token information for the specifically indexed token within
+      the module.
+      @precon  None.
+      @postcon Returns the token information for the specifically indexed token within
       the module.
       @param   iIndex as       a TTokenIndex
       @return  a TTokenInfo
@@ -1353,66 +1683,121 @@ Type
     Property TokenInfo[iIndex : TTokenIndex] : TTokenInfo Read GetTokenInfo;
     (**
       Returns the number of token within the module after tokenizing.
-      @return  an Integer
+      @precon  None.
+      @postcon Returns the number of token within the module after tokenizing.
+      @return  an TDocErrorCollection
     **)
     Property Errors : TDocErrorCollection Read FDocErrors;
+    (**
+      This property returns the tick count time between the 2 named tick counts
+      previously stored using the AddTickCount() method.
+      @precon  None.
+      @postcon Returns the time between two counter if both the names are found.
+      @param   strStart  as       a String
+      @param   strFinish as       a String
+      @return  an Integer
+    **)
     Property OpTickCount[strStart, strFinish : String] : Integer Read GetOpTickCount;
+    (**
+      Thie property returns the number of operation tick counter storeed in the
+      collection.
+      @precon  None.
+      @postcon Returns the number of operation tick counter storeed in the
+               collection.
+      @return  an Integer
+    **)
     Property OpTickCounts : Integer Read GetOpTickCounts;
+    (**
+      This property returns the tick count associated with the indexed item.
+      @precon  iIndex must be a valid index between 0 and OpTickCount - 1.
+      @postcon Returns the tick count associated with the indexed item.
+      @param   iIndex as       an Integer
+      @return  an Integer
+    **)
     Property OpTickCountByIndex[iIndex : Integer] : Integer Read GetOpTickCountByIndex;
+    (**
+      This property returns the name associated with the indexed item.
+      @precon  iIndex must be a valid index between 0 and OpTickCount - 1.
+      @postcon Returns the name associated with the indexed item.
+      @param   iIndex as       an Integer
+      @return  a String
+    **)
     Property OpTickCountName[iIndex : Integer] : String Read GetOpTickCountName;
     (**
       Returns the module name as a string.
+      @precon  None.
+      @postcon Returns the module name as a string.
       @return  a String
     **)
     Property ModuleName : String Read GetModuleName Write FModuleName;
     (**
       Returns the type of the modules, Program, Unit, Package, etc.
+      @precon  None.
+      @postcon Returns the type of the modules, Program, Unit, Package, etc.
       @return  a TModuleType
     **)
     Property ModuleType : TModuleType Read FModuleType Write FModuleType;
     (**
       Returns a reference to the modules comment.
+      @precon  None.
+      @postcon Returns a reference to the modules comment.
       @return  a TComment
     **)
     Property ModuleComment : TComment Read FModuleComment Write FModuleComment;
     (**
       Returns a reference to the implemented methods collection.
+      @precon  None.
+      @postcon Returns a reference to the implemented methods collection.
       @return  a TMethodCollection
     **)
     Property ImplementedMethods : TMethodCollection Read FImplementedMethods;
     (**
       Returns a reference to the constants clause collection.
+      @precon  None.
+      @postcon Returns a reference to the constants clause collection.
       @return  a TGenericContainerCollection
     **)
     Property Constants : TGenericContainerCollection Read FConstantsCollection;
     (**
       Returns a reference to the variables clause collection.
+      @precon  None.
+      @postcon Returns a reference to the variables clause collection.
       @return  a TGenericContainerCollection
     **)
     Property Vars : TGenericContainerCollection Read FVarsCollection;
     (**
       Returns a reference to the modules types clause collection.
+      @precon  None.
+      @postcon Returns a reference to the modules types clause collection.
       @return  a TGenericContainerCollection
     **)
     Property Types : TGenericContainerCollection Read FTypeCollection;
     (**
       Returns the specific indexed body comment from the collection.
+      @precon  None.
+      @postcon Returns the specific indexed body comment from the collection.
       @param   iIndex as       an Integer
       @return  a TComment
     **)
     Property BodyComment[iIndex : Integer] : TComment Read GetBodyComment;
     (**
       Returns a reference to the modules body comments collection.
+      @precon  None.
+      @postcon Returns a reference to the modules body comments collection.
       @return  an Integer
     **)
     Property BodyCommentCount : Integer Read GetBodyCommentCount;
     (**
       Returns the line number of the modules name.
+      @precon  None.
+      @postcon Returns the line number of the modules name.
       @return  an Integer
     **)
     Property ModuleNameLine : Integer Read FModuleNameLine Write FModuleNameLine;
     (**
       Returns the column number of the module name.
+      @precon  None.
+      @postcon Returns the column number of the module name.
       @return  an Integer
     **)
     Property ModuleNameCol : Integer Read FModuleNameCol Write FModuleNameCol;
@@ -1421,73 +1806,108 @@ Type
       are stored here and disposed of from here. Reference from other collections
       like Types are purely reference only and those collection will not manage
       the symbols life time.
+      @precon  None.
+      @postcon Returns a reference to the modules symbol table. All symbol in
+               the module are stored here and disposed of from here. Reference
+               from other collections like Types are purely reference only and
+               those collection will not manage the symbols life time.
       @return  a TGenericContainerCollection
     **)
     Property SymbolTable : TGenericContainerCollection Read FSymbolTable;
     (**
       This property returns the file name of the module as passed to the
       constructor.
+      @precon  None.
+      @postcon This property returns the file name of the module as passed to the
+      constructor.
       @return  a String
     **)
     Property FileName : String Read FFileName;
     (**
       This property returns whether the source code is modified or not.
+      @precon  None.
+      @postcon This property returns whether the source code is modified or not.
       @return  a Boolean
     **)
     Property Modified : Boolean Read FModified;
     (**
       This property returns a reference to the classes document conflict list.
-      @return  a TStringList
+      @precon  iIndex must be a valid index between 0 and
+               DocumentConflictCount - 1
+      @postcon This property returns a reference to the classes document
+               conflict list.
+      @param   iIndex as an Integer
+      @return  a TDocumentConflict
     **)
     Property DocumentConflict[iIndex : Integer] : TDocumentConflict
       Read GetDocumentConflict;
     (**
-
+      This property returns the number of documentation conflicts in the module.
+      @precon  None.
+      @postcon Returns the number of documentation conflicts in the module.
       @return  an Integer
     **)
     Property DocumentConflictCount : Integer Read GetDocumentConflictCount;
     (**
       Returns a reference to the requires clause collection.
+      @precon  None.
+      @postcon Returns a reference to the requires clause collection.
       @return  a TIdentList
     **)
     Property Requires : TIdentList Read FRequiresClause Write FRequiresClause;
     (**
       Returns a reference to the contains clause collection.
+      @precon  None.
+      @postcon Returns a reference to the contains clause collection.
       @return  a TIdentList
     **)
     Property Contains : TIdentList Read FContainsClause Write FContainsClause;
     (**
       Returns a reference to the uses clause collection.
+      @precon  None.
+      @postcon Returns a reference to the uses clause collection.
       @return  a TIdentList
     **)
     Property UsesCls : TIdentList Read FUsesClause Write FUsesClause;
     (**
       Returns a reference to the exported headings collection.
+      @precon  None.
+      @postcon Returns a reference to the exported headings collection.
       @return  a TMethodCollection
     **)
     Property ExportedHeadings : TMethodCollection Read FExportedHeadings;
     (**
       Returns a reference to the resource string clause collection.
+      @precon  None.
+      @postcon Returns a reference to the resource string clause collection.
       @return  a TGenericContainerCollection
     **)
     Property ResourceStrings : TGenericContainerCollection Read FResStrCollection;
     (**
       Returns a reference to the ThreadVar clause collection.
+      @precon  None.
+      @postcon Returns a reference to the ThreadVar clause collection.
       @return  a TGenericContainerCollection
     **)
     Property ThreadVars : TGenericContainerCollection Read FThreadVarsCollection;
     (**
       Returns a reference to the modules Initialization comment.
+      @precon  None.
+      @postcon Returns a reference to the modules Initialization comment.
       @return  a TComment
     **)
     Property InitComment : TComment Read FInitComment Write FInitComment;
     (**
       Returns a reference to the modules Finalization comment.
+      @precon  None.
+      @postcon Returns a reference to the modules Finalization comment.
       @return  a TComment
     **)
     Property FinalComment : TComment Read FFinalComment Write FFinalComment;
     (**
       Returns a refernce to the modules exports collection.
+      @precon  None.
+      @postcon Returns a refernce to the modules exports collection.
       @return  a TGenericContainerCollection
     **)
     Property ExportsClause : TGenericContainerCollection Read FExportsCollection
@@ -1578,8 +1998,6 @@ ResourceString
   strShowMissingPropertyPreConditions = 'Show Missing Property Pre-Conditions';
   (** Options text for Show Missing Property Post-Conditions **)
   strShowMissingPropertyPostConditions = 'Show Missing Property Post-Conditions';
-  (** Options text for Categories Documentation Conflicts **)
-  strCategoriesDocConflicts = 'Categories Documentation Conflicts';
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
@@ -2084,8 +2502,7 @@ Const
     (Description : strShowUndocumentedPropertyReturnType; Enabled : False),
     (Description : strShowIncorrectPropertyReturnType; Enabled : False),
     (Description : strShowMissingPropertyPreConditions; Enabled : False),
-    (Description : strShowMissingPropertyPostConditions; Enabled : False),
-    (Description : strCategoriesDocConflicts; Enabled : False)
+    (Description : strShowMissingPropertyPostConditions; Enabled : False)
   );
 
   (** This is a string array representing the TDocOption enumerates. **)
@@ -5258,6 +5675,8 @@ Begin
   Result := Identifier + ' = Class';
   If AbstractClass Then
     Result := Result + ' Abstract';
+  If SealedClass Then
+    Result := Result + ' Sealed';
   If Heritage.Count > 0 Then
     Result := Result + '(' + Heritage.AsString + ')';
 End;

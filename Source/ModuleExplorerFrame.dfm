@@ -40,6 +40,7 @@ object frameModuleExplorer: TframeModuleExplorer
     ToolTips = False
     OnClick = tvExplorerClick
     OnCustomDrawItem = tvExplorerCustomDrawItem
+    OnKeyDown = tvExplorerKeyDown
     OnMouseMove = tvExplorerMouseMove
   end
   object ilScopeImages: TImageList

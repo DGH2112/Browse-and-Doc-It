@@ -1,22 +1,26 @@
 (**
-  
+
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    10 Jul 2006
+  @Date    12 Jul 2006
   @Author  David Hoyle
   @Version 1.0
-  
+
 **)
 unit ModuleExplorerFrame;
 
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ImgList, ComCtrls, ExtCtrls, Contnrs, BaseLanguageModule;
 
 type
+  (** This enumerate represents the type of the item that generates the
+      selection change event. **)
+  TSelectType = (stIdentifier, stError, stConflict, stSpecialTags);
+
   (** This class represents information about each nodes. Used in a collection
       instead of hanging the data off the tree nodes. **)
   TTreeNodeInfo = Class
@@ -24,27 +28,39 @@ type
     FLine : Integer;
     FCol : Integer;
     FComment : TComment;
-    FError : Boolean;
+    FSelectType : TSelectType;
   Public
     Constructor Create(iLine, iCol : Integer; Comment : TComment;
-      Error : Boolean); Overload;
+      SelectType : TSelectType); Overload;
     Destructor Destroy; Override;
     (**
       This property returns the line number of the tree node comment.
+      @precon  None.
+      @postcon Returns the line associated with the node info structure.
       @return  an Integer
     **)
     Property Line : Integer Read FLine;
     (**
       This property returns the column number of the tree node comment.
+      @precon  None.
+      @postcon Returns the column associated with the node info structure.
       @return  an Integer
     **)
     Property Col : Integer Read FCol;
     (**
       This property returns the comment associated with the tree node info.
+      @precon  None.
+      @postcon Returns the comment associated with the node info structure.
       @return  a TComment
     **)
     Property Comment : TComment Read FComment;
-    Property Error : Boolean Read FError;
+    (**
+      A property to define the type of select being made.
+      @precon  None.
+      @postcon Returns the type of selection made.
+      @return  a TSelectType
+    **)
+    Property SelectType : TSelectType Read FSelectType;
   End;
 
   (** This record contains information about the special tag nodes **)
@@ -76,7 +92,7 @@ type
   (** This is a procedure type for the positioning of the cursor in the
       current module. **)
   TSelectionChange = Procedure(iIdentLine, iIdentCol, iCommentLine,
-    iCommentCol : Integer; Error : Boolean) Of Object;
+    iCommentCol : Integer; SelectType : TSelectType) Of Object;
 
   (** This is a frame class to contain all the functionality of the module
       explorer so that it can be placed inside any container required and
@@ -91,12 +107,15 @@ type
     procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure tvExplorerClick(Sender: TObject);
+    procedure tvExplorerKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private declarations }
     FModule : TTreeNode;
     FOptions : TDocOptions;
     FNodeInfo : TObjectList;
     FSelectionChange : TSelectionChange;
+    FFocus : TNotifyEvent;
     FUpdating : Boolean;
     FExpandedNodes : TStringList;
     FSpecialTagNodes : Array Of TSpecialTagNode;
@@ -115,12 +134,12 @@ type
     { Private declarations }
     procedure GetBodyCommentTags(M : TBaseLanguageModule);
     Function AddNode(P : TTreeNode; strText : String; iLine, iCol,
-      iImageIndex : Integer; Comment : TComment; Error : Boolean) : TTreeNode;
+      iImageIndex : Integer; Comment : TComment; SelectType : TSelectType) : TTreeNode;
     function GetTreeNodeInfo(iIndex: Integer): TTreeNodeInfo;
     procedure CreateSpecialTagNodes;
     function IsInOptions(Scope: TScope): Boolean;
     Function GetNodeComment(iLine, iCol : Integer; C : TComment;
-      Error : Boolean) : Integer;
+      SelectType : TSelectType) : Integer;
     procedure ExpandNodes;
     procedure OutputModuleInfo(M : TBaseLanguageModule);
     procedure DisplayClassMethods(Cls : TObjectDecl; S : TTreeNode);
@@ -131,6 +150,8 @@ type
     Procedure DisplayDocumentConflicts(M : TBaseLanguageModule);
     (**
       This property returns the indexed NodeInfo class for the collection.
+      @precon  iIndex must eb a valid index.
+      @postcon Returns the indexed NodeInfo class for the collection.
       @param   iIndex as an Integer
       @return  a TTreeNodeInfo
     **)
@@ -145,10 +166,19 @@ type
       DocExplorerOptions : TDocOptions);
     (**
       This is an event for the selection change in the browser tree.
+      @precon  None.
+      @postcon Hooks an event handler for the On Selection change event.
       @return  a TSelectionChange
     **)
     Property OnSelectionChange : TSelectionChange Read FSelectionChange
       Write FSelectionChange;
+    (**
+      This is an event for the on focus change in the browser.
+      @precon  None.
+      @postcon Hooks an event handler for the On Focus change event.
+      @return  a TNotifyEvent
+    **)
+    Property OnFocus : TNotifyEvent Read FFocus Write FFocus;
   end;
 
 Const
@@ -263,6 +293,25 @@ Const
       there counter has been reset by another appearance in a refresh. **)
   iMaxRefreshes = 50;
 
+  (** A set of reserved word for the tree view to mark in bold **)
+  strReservedWords : Array[1..109] Of String = (
+    'absolute', 'abstract', 'and', 'array', 'as', 'asm', 'assembler',
+    'automated', 'begin', 'case', 'cdecl', 'class', 'const', 'constructor',
+    'contains', 'default', 'destructor', 'dispid', 'dispinterface', 'div', 'do',
+    'downto', 'dynamic', 'else', 'end', 'except', 'export', 'exports',
+    'external', 'far', 'file', 'finalization', 'finally', 'for', 'forward',
+    'function', 'goto', 'if', 'implementation', 'implements', 'in', 'index',
+    'inherited', 'initialization', 'inline', 'interface', 'is', 'label',
+    'library', 'local', 'message', 'mod', 'name', 'near', 'nil', 'nodefault',
+    'not', 'object', 'of', 'on', 'or', 'out', 'overload', 'override', 'package',
+    'packed', 'pascal', 'private', 'procedure', 'program', 'property',
+    'protected', 'public', 'published', 'raise', 'read', 'readonly', 'record',
+    'register', 'reintroduce', 'repeat', 'requires', 'resident',
+    'resourcestring', 'safecall', 'sealed', 'set', 'shl', 'shr', 'static',
+    'stdcall', 'stored', 'string', 'then', 'threadvar', 'to', 'try', 'type',
+    'unit', 'until', 'uses', 'var', 'varargs', 'virtual', 'while', 'with',
+    'write', 'writeonly', 'xor'
+  );
 {$R *.dfm}
 
 (**
@@ -319,12 +368,11 @@ End;
 
   @param   strText as a String
   @param   strReservedWords as an Array Of String
-  @param   strDirectives as an Array Of String
   @return  a TStringList
 
 **)
-Function Tokenize(strText : String; strReservedWords,
-  strDirectives : Array Of String) : TStringList;
+Function Tokenize(strText : String;
+  strReservedWords : Array Of String) : TStringList;
 
 Type
   (** State machine for block types. **)
@@ -374,8 +422,6 @@ Begin
                 Begin
                   If IsKeyWord(strToken, strReservedWords) Then
                     LastToken := ttReservedWord;
-                  If IsKeyWord(strToken, strDirectives) Then
-                    LastToken := ttDirective;
                   Result.AddObject(strToken, TObject(LastToken));
                 End;
              BlockType := btNoBlock;
@@ -404,8 +450,6 @@ Begin
       SetLength(strToken, iTokenLen);
       If IsKeyWord(strToken, strReservedWords) Then
         CurToken := ttReservedWord;
-      If IsKeyWord(strToken, strDirectives) Then
-        CurToken := ttDirective;
       Result.AddObject(strToken, TObject(CurToken));
     End;
 End;
@@ -471,21 +515,21 @@ End;
            and This comment to be added to the node info object.
   @postcon Initialises the class.
 
-  @param   iLine   as an Integer
-  @param   iCol    as an Integer
-  @param   Comment as a TComment
-  @param   Error       as a Boolean
+  @param   iLine      as an Integer
+  @param   iCol       as an Integer
+  @param   Comment    as a TComment
+  @param   SelectType as a TSelectType
 
 **)
 Constructor TTreeNodeInfo.Create(iLine, iCol : Integer; Comment : TComment;
-  Error : Boolean);
+  SelectType : TSelectType);
 
 Begin
   Inherited Create;
   FLine := ILine;
   FCol := iCol;
   FComment := Nil;
-  FError := Error;
+  FSelectType := SelectType;
   If Comment <> Nil Then
     FComment := TComment.Create('', Comment.Line, Comment.Col)
   Else
@@ -558,21 +602,21 @@ end;
            created and associated with a node.
   @postcon Returns the index of the newly created node comment.
 
-  @param   iLine as an Integer
-  @param   iCol  as an Integer
-  @param   C     as a TComment
-  @param   Error       as a Boolean
+  @param   iLine      as an Integer
+  @param   iCol       as an Integer
+  @param   C          as a TComment
+  @param   SelectType as a TSelectType
   @return  an Integer
 
 **)
 Function TframeModuleExplorer.GetNodeComment(iLine, iCol : Integer;
-  C : TComment; Error : Boolean) : Integer;
+  C : TComment; SelectType : TSelectType) : Integer;
 
 Var
   Info : TTreeNodeInfo;
 
 Begin
-  Info := TTreeNodeInfo.Create(iLine, iCol, C, Error);
+  Info := TTreeNodeInfo.Create(iLine, iCol, C, SelectType);
   Result := FNodeInfo.Add(info);
 End;
 
@@ -605,9 +649,10 @@ Begin
   // Uses Clause
   If U <> Nil Then
     Begin
-      N := AddNode(P, strLabel, 0, 0, iLabelIcon, U.Comment, False);
+      N := AddNode(P, strLabel, 0, 0, iLabelIcon, U.Comment, stIdentifier);
       For i := 0 To U.Count - 1 Do
-        AddNode(N, U[i].Ident, U[i].Line, U[i].Col, iIcon, U[i].Comment, False);
+        AddNode(N, U[i].Ident, U[i].Line, U[i].Col, iIcon, U[i].Comment,
+          stIdentifier);
       If N.Count = 0 Then
         N.Delete;
     End;
@@ -643,7 +688,7 @@ Begin
   If C.Count > 0 Then
     Begin
       If strLabel <> '' Then
-        N := Addnode(P, strLabel, 0, 0, iLabelIcon, C.Comment, False)
+        N := Addnode(P, strLabel, 0, 0, iLabelIcon, C.Comment, stIdentifier)
       Else
         N := P;
       For i := 0 To C.Count - 1 Do
@@ -652,7 +697,7 @@ Begin
           If IsInOptions(C[i].Scope) Then
             Begin
               Item := AddNode(N, C[i].Identifier + #32 + C[i].AsString(True),
-                C[i].Line, C[i].Col, -1, C[i].Comment, False);
+                C[i].Line, C[i].Col, -1, C[i].Comment, stIdentifier);
               SetNodeIcon(C[i].Scope, iStartIcon, Item);
             End;
       If (strLabel <> '') And (N.Count = 0) Then
@@ -688,11 +733,12 @@ begin
     Begin
       If DocConflictNode = Nil Then
         DocConflictNode := AddNode(FModule, strDocumentationConflicts, 0, 0,
-          iDocConflictFolder, Nil, True);
+          iDocConflictFolder, Nil, stConflict);
       If AnsiCompareText(strLastCategory, M.DocumentConflict[i].Category) <> 0 Then
         Begin
           InsertionNode := AddNode(DocConflictNode,
-            M.DocumentConflict[i].Category, 0, 0, iDocConflictFolder, Nil, True);
+            M.DocumentConflict[i].Category, 0, 0, iDocConflictFolder, Nil,
+              stConflict);
           strLastCategory := M.DocumentConflict[i].Category;
         End;
       Case M.DocumentConflict[i].DocConflictType Of
@@ -750,7 +796,7 @@ begin
       Try
         AddNode(InsertionNode, M.DocumentConflict[i].Message,
           M.DocumentConflict[i].IdentLine, M.DocumentConflict[i].IdentColumn,
-          iImage, ConflictComment, True);
+          iImage, ConflictComment, stConflict);
       Finally
         ConflictComment.Free;
       End;
@@ -852,7 +898,7 @@ Begin
   If M.Count > 0 Then
     Begin
       If strLabel <> '' Then
-        N := AddNode(P, strLabel, 0, 0, iLabelIcon, Nil, False)
+        N := AddNode(P, strLabel, 0, 0, iLabelIcon, Nil, stIdentifier)
       Else
         N := P;
       C := N;
@@ -864,14 +910,14 @@ Begin
               Begin
                 If M[i].ClsName <> '' Then
                   Begin
-                    C := AddNode(N, M[i].ClsName, 0, 0, -1, Nil, False);
+                    C := AddNode(N, M[i].ClsName, 0, 0, -1, Nil, stIdentifier);
                     SetNodeIcon(scPublic, iClass, C);
                   End Else
                     C := N;
                 strLastClassName := M[i].ClsName;
               End;
             F := AddNode(C, M[i].GetAsString(False, False), M[i].Line, M[i].Col,
-              -1, M[i].Comment, False);
+              -1, M[i].Comment, stIdentifier);
             Case M[i].MethodType Of
               mtProcedure : SetNodeIcon(M[i].Scope, iProcedure, F);
               mtFunction : SetNodeIcon(M[i].Scope, iFunction, F);
@@ -995,7 +1041,7 @@ Begin
   If Classes.Count > 0 Then
     Begin
       If strNodeLabel <> '' Then
-        N := AddNode(P, strNodeLabel, 0, 0, iLabelIcon, Nil, False)
+        N := AddNode(P, strNodeLabel, 0, 0, iLabelIcon, Nil, stIdentifier)
       Else
         N := P;
       For i := 0 To Classes.Count - 1 Do
@@ -1018,7 +1064,7 @@ Begin
                         strLabel := strLabel + '(' + Heritage.AsString + ')'
                     End;
                 S := AddNode(N, strLabel, Classes[i].Line,
-                  Classes[i].Col, -1, Classes[i].Comment, False);
+                  Classes[i].Col, -1, Classes[i].Comment, stIdentifier);
                 SetNodeIcon(Classes[i].Scope, iIconStart, S);
                 If Classes[i] Is TRecordDecl Then
                   DisplayClassFields(Classes[i] As TRecordDecl, S);
@@ -1061,7 +1107,8 @@ begin
           Begin
             F := AddNode(S, Cls.Parameters[j].Identifier + ' : ' +
               Cls.Parameters[j].ParamType.AsString(True), Cls.Parameters[j].Line,
-                Cls.Parameters[j].Col, -1, Cls.Parameters[j].Comment, False);
+                Cls.Parameters[j].Col, -1, Cls.Parameters[j].Comment,
+                stIdentifier);
             SetNodeIcon(Cls.Parameters[j].Scope, iField, F);
           End;
     End;
@@ -1095,7 +1142,8 @@ begin
         If IsInOptions(Cls.Properties[j].Scope) Then
           Begin
             F := AddNode(S, Cls.Properties[j].AsString, Cls.Properties[j].Line,
-              Cls.Properties[j].Col, -1, Cls.Properties[j].Comment, False);
+              Cls.Properties[j].Col, -1, Cls.Properties[j].Comment,
+              stIdentifier);
             SetNodeIcon(Cls.Properties[j].Scope, iProperty, F);
           End;
     End;
@@ -1130,7 +1178,7 @@ begin
           Begin
             F := AddNode(S, Cls.Methods[j].GetAsString(True, False),
               Cls.Methods[j].Line, Cls.Methods[j].Col, -1,
-              Cls.Methods[j].Comment, False);
+              Cls.Methods[j].Comment, stIdentifier);
             Case Cls.Methods[j].MethodType Of
               mtProcedure : SetNodeIcon(Cls.Methods[j].Scope, iProcedure, F);
               mtFunction : SetNodeIcon(Cls.Methods[j].Scope, iFunction, F);
@@ -1168,7 +1216,7 @@ Begin
             If AnsiCompareText(Tag[j].TagName, FSpecialTagNodes[k].strTagName) = 0 Then
               AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(False),
                 M.BodyComment[i].Tag[j].Line, M.BodyComment[i].Tag[j].Column,
-                  iToDoItem, Nil, True);
+                  iToDoItem, Nil, stSpecialTags);
 End;
 
 (**
@@ -1362,7 +1410,7 @@ Begin
             End;
           If M = Nil Then Exit;
           FModule := AddNode(Nil, M.ModuleName, M.ModuleNameLine,
-            M.ModuleNameCol, iModule, Nil, False);
+            M.ModuleNameCol, iModule, Nil, stIdentifier);
                                             // Can not process the comment here
                                             // as the root node doesn't
                                             // exist yet.
@@ -1370,7 +1418,7 @@ Begin
           DisplayDocumentConflicts(M);
           CreateSpecialTagNodes;
           FModule.Data := TObject(GetNodeComment(M.ModuleNameLine,
-            M.ModuleNameCol, M.ModuleComment, False)); // Process module comment here.
+            M.ModuleNameCol, M.ModuleComment, stIdentifier)); // Process module comment here.
           OutputModuleInfo(M);
           // Expand previously expanded branches
           For i := 0 To tvExplorer.Items.Count - 1 Do
@@ -1430,12 +1478,12 @@ Begin
   FError := Nil;
   If M.Errors.Count > 0 Then
     FError := AddNode(FModule, strErrorsAndWarnings, 0, 0, iErrorFolder, Nil,
-      True);
+      stError);
   For i := 0 To M.Errors.Count - 1 Do
     Begin
       N := AddNode(FError, M.Errors[i].Msg + ' [' +
         M.Errors[i].Method + ']', M.Errors[i].Line,
-        M.Errors[i].Col, -1, Nil, True);
+        M.Errors[i].Col, -1, Nil, stError);
       Case M.Errors[i].ErrorType Of
         etWarning :
           Begin
@@ -1485,11 +1533,11 @@ begin
   // Initialization Clause
   If M.InitComment <> Nil Then
     AddNode(FModule, strInitialization, M.InitComment.Line,
-      M.InitComment.Col, iInitialization, M.InitComment, False);
+      M.InitComment.Col, iInitialization, M.InitComment, stIdentifier);
   // Finalization Clause
   If M.FinalComment <> Nil Then
     AddNode(FModule, strFinalization, M.FinalComment.Line,
-      M.FinalComment.Col, iFinalization, M.FinalComment, False);
+      M.FinalComment.Col, iFinalization, M.FinalComment, stIdentifier);
   GetBodyCommentTags(M);
 end;
 
@@ -1567,16 +1615,17 @@ End;
   @param   iCol        as an Integer
   @param   iImageIndex as a Integer
   @param   Comment     as a TComment
-  @param   Error       as a Boolean
+  @param   SelectType  as a TSelectType
   @return  a TTreeNode
 
 **)
 Function TframeModuleExplorer.AddNode(P: TTreeNode; strText: String;
   iLine, iCol, iImageIndex : Integer; Comment: TComment;
-  Error : Boolean) : TTreeNode;
+  SelectType : TSelectType) : TTreeNode;
 
 Const
-  iTreeLimit = (*{$IFNDEF VER120} 250 {$ELSE}*) 0 (*{$ENDIF}*);
+  //: A limit to work around a bug in Delphi 5 TreeView
+  iTreeLimit = {$IFDEF VER120} 250 {$ELSE} 0 {$ENDIF};
 
 Var
   str : String;
@@ -1586,7 +1635,7 @@ begin
   If (Length(str) > iTreeLimit) And (iTreeLimit > 0) Then
     str := Copy(str, 1, iTreeLimit);
   Result := tvExplorer.Items.AddChild(P, str);
-  Result.Data := TObject(GetNodeComment(iLine, iCol, Comment, Error));
+  Result.Data := TObject(GetNodeComment(iLine, iCol, Comment, SelectType));
   Result.ImageIndex := iImageIndex;
   Result.SelectedIndex := iImageIndex;
 end;
@@ -1648,8 +1697,7 @@ begin
     If Not DefaultDraw Then
       Begin
         iOffset := GetScrollPos(Sender.Handle, SB_HORZ);
-        //: @bug This needs fixing properly!!!
-        sl := Tokenize(Node.Text, [], []);
+        sl := Tokenize(Node.Text, strReservedWords);
         Try
           // Highlight selected item.
           If cdsSelected In State Then
@@ -1845,8 +1893,7 @@ Begin
   iLine := 0;
   With Canvas Do
     Begin
-      //: @bug This needs fixing properly!!!
-      sl := Tokenize(Caption, [], []);
+      sl := Tokenize(Caption, strReservedWords);
       Try
         iPos := 2;
         For i := 0 To sl.Count - 1 Do
@@ -1962,8 +2009,7 @@ Begin
     Begin
       // Need to amend the width of the rectangle for the custom drawing
       iPos := 5;
-      //: @bug This needs to be fixed properly!!!
-      sl := Tokenize(Node.Text, [], []);
+      sl := Tokenize(Node.Text, strReservedWords);
       Try
         iLastmax := 0;
         For i := 0 To sl.Count - 1 Do
@@ -2089,7 +2135,7 @@ End;
   This is an on click event handler for the explorer tree view.
 
   @precon  None.
-  @postcon Fires a SelectionChange event for the specifically selected item. 
+  @postcon Fires a SelectionChange event for the specifically selected item.
 
   @param   Sender as a TObject
 
@@ -2106,10 +2152,34 @@ begin
       Begin
         N := NodeInfo[Integer(tvExplorer.Selected.Data)];
         If N.Comment = Nil Then
-          FSelectionChange(N.Line, N.Col, N.Line, N.Col, N.Error)
+          FSelectionChange(N.Line, N.Col, N.Line, N.Col, N.SelectType)
         Else
-          FSelectionChange(N.Line, N.Col, N.Comment.Line, N.Comment.Col, N.Error);
+          FSelectionChange(N.Line, N.Col, N.Comment.Line, N.Comment.Col,
+            N.SelectType);
       End;
+end;
+
+(**
+
+  This method is an on key down event handler for the tree view.
+
+  @precon  None.
+  @postcon If an on focus event handler is assigned it is fired.
+
+  @param   Sender as a TObject
+  @param   Key    as a Word as a reference
+  @param   Shift  as a TShiftState
+
+**)
+procedure TframeModuleExplorer.tvExplorerKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+begin
+  If Key = 13 Then
+    Begin
+      tvExplorerClick(Sender);
+      If Assigned(OnFocus) Then
+        FFocus(Sender);
+    End;
 end;
 
 end.

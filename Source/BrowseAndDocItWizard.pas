@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    10 Jul 2006
+  @Date    12 Jul 2006
   @Version 1.0
 
   @todo    Configurable Font Name and Size for the Browser tree.
@@ -16,7 +16,7 @@ Interface
 
 Uses
   Classes, ToolsAPI, DeskUtil, Menus, ExtCtrls, BaseLanguageModule,
-  PascalDocModule, DockForm;
+  PascalDocModule, DockForm, ModuleExplorerFrame;
 
 Type
   (** This emunerate descibed the different types of doc comment .**)
@@ -43,12 +43,14 @@ Type
     Procedure LoadSettings;
     Procedure SaveSettings;
     procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol : Integer; Error : Boolean);
+      iCommentCol : Integer; SelectType : TSelectType);
+    Procedure Focus(Sender : TObject);
     function GetMethodDescription(Method : TMethodDecl) : String;
-    procedure WriteMethodComment(Method : TMethodDecl; Writer : IOTAEditWriter;
-      iBufferPos : TStreamPosition; iCol : Integer);
-    Procedure WritePropertyComment(P : TProperty;
-      Writer : IOTAEditWriter; iBufferPos : TStreamPosition; iCol : Integer);
+    Function WriteMethodComment(Method : TMethodDecl; Writer : IOTAEditWriter;
+      iBufferPos : TStreamPosition; iCol : Integer) : Integer;
+    Function WritePropertyComment(P : TProperty;
+      Writer : IOTAEditWriter; iBufferPos : TStreamPosition;
+      iCol : Integer) : Integer;
     procedure CreateMenuItem(mmiParent: TMenuItem;  strCaption: String = '';
       ClickProc: TNotifyEvent = Nil);
     Procedure InsertMethodCommentClick(Sender : TObject);
@@ -84,6 +86,7 @@ Type
     {$ENDIF}
     Procedure RefreshTree;
     Procedure TimerEventHandler(Sender : TObject);
+    Procedure DetermineCompilerDefinitions(slDefines : TStringList);
   Protected
   Public
     Constructor Create;
@@ -100,7 +103,7 @@ Type
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     {$ENDIF}
   End;
-  
+
 
   (** This class represents a key binding notifier for installing and handling
       key bindings for this plugin. **)
@@ -138,7 +141,7 @@ Implementation
 
 Uses
   SysUtils, DockableModuleExplorer, Registry, ToolsAPIUtils,
-  OptionsForm, Forms, Windows, ShellAPI, TokenForm, ModuleExplorerFrame;
+  OptionsForm, Forms, Windows, ShellAPI, TokenForm;
 
 Resourcestring
   (** This is a text string of revision from nil and a to z. **)
@@ -230,7 +233,7 @@ Var
 
 Begin
   Inherited Create;
-  TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange);
+  TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus);
   mmiMainMenu := (BorlandIDEServices as INTAServices).MainMenu;
   mmiPascalDocMenu := TMenuItem.Create(mmiMainMenu);
   With mmiPascalDocMenu Do
@@ -575,8 +578,14 @@ begin
   // Get header in view if not already
   With SourceEditor.GetEditView(0) Do
     Begin
-      SelectionChange(EditPos.Line, EditPos.Col, EditPos.Line, EditPos.Col,
-        False);
+      Case CommentType Of
+        ctBlock:
+          SelectionChange(EditPos.Line + 5, EditPos.Col, EditPos.Line + 5,
+            EditPos.Col, stIdentifier);
+      Else
+        SelectionChange(EditPos.Line + 1, EditPos.Col, EditPos.Line + 1,
+          EditPos.Col,  stIdentifier);
+      End;
       // Place cursor at start of comment
       Case CommentType Of
         ctBlock:
@@ -584,8 +593,8 @@ begin
             EditPos.Line := EditPos.Line + 2;
             EditPos.Col := EditPos.Col + 2;
           End;
-        ctLine, ctInSitu:
-          EditPos.Col := EditPos.Col + 4;
+      Else
+        EditPos.Col := EditPos.Col + 4;
       End;
       CursorPos := EditPos;
       Paint;
@@ -653,6 +662,7 @@ Var
   Writer : IOTAEditWriter;
   Method : TMethodDecl;
   recPosition : TTokenPosition;
+  iLines : Integer;
 
 begin
   SourceEditor := ActiveSourceEditor;
@@ -672,7 +682,7 @@ begin
           If Method = Nil Then Exit;
           Writer := SourceEditor.CreateUndoableWriter;
           Try
-            WriteMethodComment(Method, Writer, recPosition.BufferPos,
+            iLines := WriteMethodComment(Method, Writer, recPosition.BufferPos,
               recPosition.Column);
           Finally
             Writer := Nil;
@@ -682,8 +692,8 @@ begin
             Begin
               EditPos.Col := recPosition.Column + 2;
               EditPos.Line := recPosition.Line + 2;
-              SelectionChange(EditPos.Line - 2, EditPos.Col, EditPos.Line - 2,
-                EditPos.Col, False);
+              SelectionChange(EditPos.Line + iLines - 1, EditPos.Col,
+                EditPos.Line + iLines - 1, EditPos.Col, stIdentifier);
               CursorPos := EditPos;
             End;
         Finally
@@ -727,6 +737,7 @@ Var
   Writer : IOTAEditWriter;
   Cls : TClassDecl;
   recPosition : TTokenPosition;
+  iLines : Integer;
 
 begin
   SourceEditor := ActiveSourceEditor;
@@ -746,7 +757,7 @@ begin
           If Cls = Nil Then Exit;
           Writer := SourceEditor.CreateUndoableWriter;
           Try
-            WritePropertyComment(Cls.Properties[0], Writer,
+            iLines := WritePropertyComment(Cls.Properties[0], Writer,
               recPosition.BufferPos, recPosition.Column);
           Finally
             Writer := Nil;
@@ -756,8 +767,8 @@ begin
             Begin
               EditPos.Line := recPosition.Line + 1;
               EditPos.Col := recPosition.Column + 2;
-              SelectionChange(EditPos.Line - 1, EditPos.Col, EditPos.Line - 1,
-                EditPos.Col, False);
+              SelectionChange(recPosition.Line + iLines, EditPos.Col,
+                recPosition.Line + iLines, EditPos.Col, stIdentifier);
               CursorPos := EditPos;
             End;
         Finally
@@ -785,19 +796,24 @@ end;
   @param   Writer     as an IOTAEditWriter
   @param   iBufferPos as a TStreamPosition
   @param   iCol       as an Integer
+  @return  an Integer
 
 **)
-Procedure TBrowseAndDocItWizard.WritePropertyComment(P : TProperty;
-  Writer : IOTAEditWriter; iBufferPos : TStreamPosition; iCol : Integer);
+Function TBrowseAndDocItWizard.WritePropertyComment(P : TProperty;
+  Writer : IOTAEditWriter; iBufferPos : TStreamPosition;
+  iCol : Integer) : Integer;
 
 Var
   i : Integer;
   iLen : Integer;
 
 Begin
+  Result := 0;
   Writer.CopyTo(iBufferPos - 1);
   Writer.Insert(PChar('(**'#13#10));
+  Inc(Result);
   Writer.Insert(PChar(StringOfChar(#32, iCol - 1) + '  '#13#10));
+  Inc(Result);
   iLen := 0;
   For i := 0 To P.Parameters.Count - 1 Do
     If iLen < Length(P.Parameters[i].Identifier) Then
@@ -816,6 +832,7 @@ Begin
           P.Parameters[i].ParamType.AsString(True),
           strModifier[P.Parameters[i].ParamModifier]
          ])));
+       Inc(Result);
     End;
   If P.TypeId <> '' Then
     Begin
@@ -824,8 +841,10 @@ Begin
         [strAOrAn[P.TypeId[1] In strVowels], iLen,
         P.TypeId])));
       Writer.Insert(PChar(#10#13));
+      Inc(Result);
     End;
   Writer.Insert(PChar(StringOfChar(#32, iCol - 1) + '**)'#13#10));
+  Inc(Result);
   Writer.Insert(PChar(StringOfChar(#32, iCol - 1)));
 End;
 
@@ -843,23 +862,29 @@ End;
   @param   Writer     as an IOTAEditWriter
   @param   iBufferPos as a TStreamPosition
   @param   iCol       as an Integer
+  @return  an Integer   
 
 **)
-procedure TBrowseAndDocItWizard.WriteMethodComment(Method : TMethodDecl;
-  Writer : IOTAEditWriter; iBufferPos : TStreamPosition; iCol : Integer);
+Function TBrowseAndDocItWizard.WriteMethodComment(Method : TMethodDecl;
+  Writer : IOTAEditWriter; iBufferPos : TStreamPosition;
+  iCol : Integer) : Integer;
 
 Var
   iLen : Integer;
   i : Integer;
 
 begin
+  Result := 0;
   Writer.CopyTo(iBufferPos - 1);
   // Block Header
   Writer.Insert('(**'#10#13);
+  Inc(Result);
   Writer.Insert(PChar(#10#13));
+  Inc(Result);
   Writer.Insert(PChar(StringOfChar(#32, iCol - 1) +
     GetMethodDescription(Method)));
   Writer.Insert(PChar(#10#13));
+  Inc(Result);
   // Output method information
   iLen := 0;
   For i := 0 To Method.Parameters.Count - 1 Do
@@ -878,6 +903,7 @@ begin
             strArrayOf[Method.Parameters[i].ArrayOf],
             Method.Parameters[i].ParamType.AsString(True),
             strModifier[Method.Parameters[i].ParamModifier]])));
+            Inc(Result);
         End;
     End;
   If Method.ReturnType <> '' Then
@@ -887,11 +913,16 @@ begin
       [strAOrAn[Method.ReturnType[1] In strVowels], iLen,
       Method.ReturnType])));
       Writer.Insert(PChar(#10#13));
+      Inc(Result);
     End;
   // Block Footer
   If (Method.Parameters.Count > 0) Or (Method.ReturnType <> '') Then
-    Writer.Insert(PChar(#10#13));
+    Begin
+      Writer.Insert(PChar(#10#13));
+      Inc(Result);
+    End;
   Writer.Insert(PChar(StringOfChar(#32, iCol - 1) + '**)'#10#13));
+  Inc(Result);
   Writer.Insert(PChar(StringOfChar(#32, iCol - 1)));
 end;
 
@@ -951,7 +982,7 @@ begin
   Opts := FDocExplorerOptions;
   HelpFile := FDocHelpFile;
   iBrowsePos := Integer(FBrowsePosition);
-  If TfrmOptions.Execute(Opts, i, HelpFile, iBrowsePos) Then
+  If TfrmOptions.Execute(Opts, i, HelpFile) Then
     Begin
       iUpdateInterval := i;
       FDocExplorerOptions := Opts;
@@ -974,11 +1005,11 @@ end;
   @param   iIdentCol  as an Integer
   @param   iCommentLine as an Integer
   @param   iCommentCol  as an Integer
-  @param   Error       as a Boolean
+  @param   SelectType   as a TSelectType
 
 **)
 procedure TBrowseAndDocItWizard.SelectionChange(iIdentLine, iIdentCol,
-  iCommentLine, iCommentCol : Integer; Error : Boolean);
+  iCommentLine, iCommentCol : Integer; SelectType : TSelectType);
 
 Var
   SourceEditor : IOTASourceEditor;
@@ -990,34 +1021,15 @@ begin
             will perform strangely when being browsed. **)
   SourceEditor := ActiveSourceEditor;
   If SourceEditor <> Nil Then
-    Begin
-      If (FBrowsePosition In [bpCommentTop, bpCommentCentre]) Then
-        Begin
-          C.Line := iCommentLine;
-          C.Col := iCommentCol;
-          If C.Line * C.Col = 0 Then
-            Begin
-              C.Line := iIdentLine;
-              C.Col := iIdentCol;
-            End;
-        End Else
-        Begin
-          C.Line := iIdentLine;
-          C.Col := iIdentCol;
-        End;
-      If C.Line * C.Col > 0 Then
-        Begin
-          If SourceEditor.EditViewCount > 0 Then
-            Begin
-              SourceEditor.GetEditView(0).CursorPos := C;
-              If (FBrowsePosition In [bpIdentifierCentre, bpCommentCentre]) Or
-                Error Then
-                SourceEditor.GetEditView(0).Center(C.Line, 1)
-              Else
-                SourceEditor.GetEditView(0).SetTopLeft(C.Line, 1);
-            End;
-        End;
-    End;
+    If SourceEditor.EditViewCount > 0 Then
+      Begin
+        C.Col := iIdentCol;
+        C.Line := iIdentLine;
+        SourceEditor.GetEditView(0).CursorPos := C;
+        SourceEditor.GetEditView(0).Center(iIdentLine, 1);
+        If iCommentLine < SourceEditor.EditViews[0].TopRow Then
+          SourceEditor.GetEditView(0).SetTopLeft(iCommentLine, 1);
+      End;
 end;
 
 (**
@@ -1044,6 +1056,25 @@ begin
   ShellExecute(HInstance, 'OPEN', PChar(FDocHelpFile + strHelpFile), '',
     PChar(FDocHelpFile), SW_NORMAL);
 end;
+
+(**
+
+  This method is an event handler for the On Focus event from the explorer
+  frame.
+
+  @precon  None.
+  @postcon Focuses the active editor.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBrowseAndDocItWizard.Focus(Sender : TObject);
+
+Begin
+  If ActiveSourceEditor <> Nil Then
+    ActiveSourceEditor.Show;
+End;
+
 
 (**
 
@@ -1163,6 +1194,7 @@ begin
                 Try
                   slDefines.Text := StringReplace(Options.Values['Defines'],
                     ';', #13#10, [rfReplaceAll]);
+                  DetermineCompilerDefinitions(slDefines);
                   Reader := SourceEditor.CreateReader;
                   Try
                     iPosition := 0;
@@ -1195,6 +1227,46 @@ begin
       End;
     End;
 end;
+
+(**
+
+  This method determines which sytem compiler definitions need to be put
+  in the definition list.
+
+  @precon  slDefines neds to be a valid TStringList
+  @postcon Adds the relavent compiler definitions.
+
+  @param   slDefines as a TStringList
+
+**)
+Procedure TEditorNotifier.DetermineCompilerDefinitions(slDefines : TStringList);
+
+Begin
+  // Delphi 4 - Starts here as ths will be the earliest version that can run
+  // this addin.
+  {$IFDEF VER120} // Delphi 4
+  slDefines.Add('VER120');
+  {$ENDIF}
+  {$IFDEF VER130} // Delphi 5
+  slDefines.Add('VER130');
+  {$ENDIF}
+  {$IFDEF VER140} // Delphi 6
+  slDefines.Add('VER140');
+  {$ENDIF}
+  {$IFDEF VER150} // Delphi 7
+  slDefines.Add('VER150');
+  {$ENDIF}
+  {$IFDEF VER160} // Delphi ??
+  slDefines.Add('VER160');
+  {$ENDIF}
+  {$IFDEF VER170} // Delphi 2005
+  slDefines.Add('VER170');
+  {$ENDIF}
+  {$IFDEF VER180} // Delphi 2006
+  slDefines.Add('VER180');
+  {$ENDIF}
+End;
+
 
 (**
 

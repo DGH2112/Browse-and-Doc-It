@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    10 Jul 2006
+  @Date    12 Jul 2006
   @Author  David Hoyle
 
 **)
@@ -50,7 +50,8 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
     Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol : Integer; Error : Boolean);
+      iCommentCol : Integer; SelectType : TSelectType);
+    Procedure Focus(Sender : TObject);
     procedure Button1Click(Sender: TObject);
     procedure CheckBox1Click(Sender: TObject);
     procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
@@ -71,7 +72,21 @@ type
     procedure SetFileName(const Value: String);
     Function GetErrors(strFileName : String) : Integer;
     Procedure RecurseDirectories(strDirectory : String);
+    (**
+      A property to define the directory for searching.
+      @precon  None.
+      @postcon Sets the directory for searching and initiates a new search or
+               returns the durrent search directory.
+      @return  a String
+    **)
     property Directory : String Read FDirectory Write SetDirectory;
+    (**
+      A property to define the currently selected file.
+      @precon  None.
+      @postcon Sets the current file and initiates the file being displayed in
+               the editor or returns the current file name.
+      @return  a String
+    **)
     Property FileName : String Read GetFileName Write SetFileName;
   public
     { Public declarations }
@@ -339,6 +354,7 @@ begin
   FModuleExplorerFrame.Parent := Panel1;
   FModuleExplorerFrame.Align := alClient;
   FModuleExplorerFrame.OnSelectionChange := SelectionChange;
+  FModuleExplorerFrame.OnFocus := Focus;
   With TRegIniFile.Create Do
     Try
       Top := ReadInteger(strRegRootKey + 'Position', 'Top', Top);
@@ -411,11 +427,11 @@ end;
   @param   iIdentCol    as an Integer
   @param   iCommentLine as an Integer
   @param   iCommentCol  as an Integer
-  @param   Error        as a Boolean
+  @param   SelectType   as a TSelectType
 
 **)
 procedure TfrmBrowseAndDocItTestForm.SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-  iCommentCol: Integer; Error : Boolean);
+  iCommentCol: Integer; SelectType : TSelectType);
 
 begin
   SynEdit1.CaretX := iIdentCol;
@@ -525,6 +541,23 @@ begin
   If DirectoryExists(edtDirectory.Text) Then
     Directory := edtDirectory.Text;
 end;
+
+(**
+
+  This method focuses the editor when the focus event is fired.
+
+  @precon  None.
+  @postcon Focuses the editor when the focus event is fired.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.Focus(Sender : TObject);
+
+Begin
+  SynEdit1.SetFocus;
+End;
+
 
 end.
 

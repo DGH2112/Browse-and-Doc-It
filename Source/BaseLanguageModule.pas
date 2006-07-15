@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    13 Jul 2006
+  @Date    14 Jul 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -2663,7 +2663,7 @@ begin
     End;
 end;
 
-(**
+(***
 
   This method checks to see if the passed token if white space, if so returns
   true.
@@ -6104,6 +6104,7 @@ begin
   FOwnedItems := TObjectList.Create(True);
   FTokens := TObjectList.Create(True);
   FTokenIndex := 0;
+  FPreviousTokenIndex := -1;
   FDocErrors := TDocErrorCollection.Create;
   FTickList := TStringList.Create;
   FExportedHeadings := TMethodCollection.Create;
@@ -6796,7 +6797,7 @@ Var
 
 begin
   Result := Nil;
-  If FPreviousTokenIndex > 0 Then
+  If FPreviousTokenIndex >= 0 Then
     Result := FTokens[FPreviousTokenIndex] As TTokenInfo
   Else
     For i := FTokenIndex - 1 DownTo 0 Do
@@ -6821,7 +6822,7 @@ end;
 Procedure TBaseLanguageModule.RollBackToken;
 
 Begin
-  If FPreviousTokenIndex > 0 Then
+  If FPreviousTokenIndex >= 0 Then
     FTokenIndex := FPreviousTokenIndex
   Else
     Begin

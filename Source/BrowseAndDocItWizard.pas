@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    12 Jul 2006
+  @Date    14 Jul 2006
   @Version 1.0
 
   @todo    Configurable Font Name and Size for the Browser tree.
@@ -59,12 +59,6 @@ Type
     Procedure InsertLineCommentClick(Sender : TObject);
     Procedure InsertInSituCommentClick(Sender : TObject);
     Procedure ModuleExplorerClick(Sender : TObject);
-    //{$IFNDEF VER180}
-    //Procedure EditorTimer(Sender : TObject);
-    //{$ENDIF}
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
     { IOTAWizard }
     Function GetIDString: string;
     Function GetName: string;
@@ -72,6 +66,9 @@ Type
     Procedure Execute;
     { IOTAMenuWizard }
     Function GetMenuText: string;
+  Public
+    Constructor Create;
+    Destructor Destroy; Override;
   End;
 
 
@@ -81,7 +78,7 @@ Type
   Private
     FUpdateTimer : TTimer;
     {$IFNDEF VER180}
-    FLastSize : Integer;
+    FLastSize : Int64;
     FLastEditorName : String;
     {$ENDIF}
     Procedure RefreshTree;
@@ -124,13 +121,13 @@ Type
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
     Procedure ShowTokens(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-  Protected
-  Public
-    Constructor Create(Wizard : TBrowseAndDocItWizard);
     function GetBindingType: TBindingType;
     function GetDisplayName: string;
     function GetName: string;
     procedure BindKeyboard(const BindingServices: IOTAKeyBindingServices);
+  Protected
+  Public
+    Constructor Create(Wizard : TBrowseAndDocItWizard);
   End;
 
   Procedure Register;
@@ -1267,7 +1264,6 @@ Begin
   {$ENDIF}
 End;
 
-
 (**
 
   This is a TTimer on Timer event handler.
@@ -1282,9 +1278,39 @@ End;
 procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
 
 {$IFNDEF VER180}
+  (**
+
+    This function returns the size of the editor stream, i.e. size of the text
+    buffer.
+
+    @precon  If Editor is Nil 0 is returned.
+    @postcon Returns the size of the editor stream, i.e. size of the text
+             buffer.
+
+    @param   Editor as an IOTASourceEditor
+    @return  an Int64
+
+  **)
+  Function MemStreamSize(Editor : IOTASourceEditor) : Int64;
+
+  Var
+    MemStream : TMemoryStream;
+
+  Begin
+    Result := 0;
+    If Editor <> Nil Then
+      Begin
+        MemStream := EditorAsMemoryStream(Editor);
+        Try
+          Result := MemStream.Size;
+        Finally
+          MemStream.Free;
+        End;
+      End;
+  End;
+
 Var
   Editor : IOTASourceEditor;
-  MemStream : TMemoryStream;
 {$ENDIF}
 
 begin
@@ -1297,25 +1323,26 @@ begin
           iLastUpdateTickCount := 1;
           FLastEditorName := Editor.FileName;
         End Else
-        Begin
-          MemStream := EditorAsMemoryStream(Editor);
-          Try
-            If FLastSize <> MemStream.Size Then
-              Begin
-                iLastUpdateTickCount := GetTickCount;
-                FLastSize := MemStream.Size;
-              End;
-          Finally
-            MemStream.Free;
-          End;
-        End;
+          If FLastSize <> MemStreamSize(Editor) Then
+            Begin
+              iLastUpdateTickCount := GetTickCount;
+              FLastSize := MemStreamSize(Editor);
+            End;
     End;
   {$ENDIF}
   If (iLastUpdateTickCount > 0) And
     (GetTickCount > iLastUpdateTickCount + iUpdateInterval) Then
     Begin
       iLastUpdateTickCount := 0;
-      RefreshTree;
+      {$IFNDEF VER180}
+      FLastSize := MemStreamSize(Editor);
+      {$ENDIF}
+      FUpdateTimer.Enabled := False;
+      Try
+        RefreshTree;
+      Finally
+        FUpdateTimer.Enabled := True;
+      End;
     End;
 end;
 

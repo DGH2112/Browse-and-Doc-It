@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    12 Jul 2006
+  @Date    17 Jul 2006
   @Author  David Hoyle
   @Version 1.0
 
@@ -1531,13 +1531,15 @@ begin
   DisplayClause(M.Requires, FModule, strRequires, iUnit, iUnitLabel);
   DisplayClause(M.Contains, FModule, strContains, iUnit, iUnitLabel);
   // Initialization Clause
-  If M.InitComment <> Nil Then
-    AddNode(FModule, strInitialization, M.InitComment.Line,
-      M.InitComment.Col, iInitialization, M.InitComment, stIdentifier);
+  If M.InitializationSection <> Nil Then
+    AddNode(FModule, strInitialization, M.InitializationSection.Line,
+      M.InitializationSection.Col, iInitialization,
+      M.InitializationSection.Comment, stIdentifier);
   // Finalization Clause
-  If M.FinalComment <> Nil Then
-    AddNode(FModule, strFinalization, M.FinalComment.Line,
-      M.FinalComment.Col, iFinalization, M.FinalComment, stIdentifier);
+  If M.FinalizationSection <> Nil Then
+    AddNode(FModule, strFinalization, M.FinalizationSection.Line,
+      M.FinalizationSection.Col, iFinalization, M.FinalizationSection.Comment,
+      stIdentifier);
   GetBodyCommentTags(M);
 end;
 

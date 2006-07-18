@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       13 Jul 2006
+  @Date       17 Jul 2006
   @Author     David Hoyle
 
 **)
@@ -2091,6 +2091,10 @@ end;
 **)
 Procedure TPascalDocModule.ArrayElement(C : TGenericContainer;
   iStartDimension : Integer; AT : TArrayType);
+
+Var
+  ExprType : TExprTypes;
+
 Begin
   If iStartDimension <= AT.Dimensions Then
     If Token.Token = '(' Then
@@ -2105,11 +2109,13 @@ Begin
         If Token.Token = ')' Then
           AddToExpression(C)
         Else
-          ErrorAndSeekToken(strLiteralExpected, 'ProcessArrayDimension', ')',
+          ErrorAndSeekToken(strLiteralExpected, 'ArrayElement', ')',
             strSeekableOnErrorTokens, stActual);
       End Else
-        ErrorAndSeekToken(strLiteralExpected, 'ProcessArrayDimension', '(',
-          strSeekableOnErrorTokens, stActual);
+      Begin // If not '(' handle as ConstExpr
+        ExprType := [etUnknown, etConstExpr];
+        ConstExpr(C, ExprType);
+      End;
 End;
 
 (**
@@ -2129,13 +2135,20 @@ End;
 Function TPascalDocModule.RecordConstant(C : TGenericContainer;
   T : TTypeDecl) : Boolean;
 
+Var
+  ExprType : TExprTypes;
+
 Begin
   Result := Token.Token = '(';
   If Result Then
     Begin
       AddToExpression(C);
       Repeat
-        RecordFieldConstant(C, T);
+        If Not RecordFieldConstant(C, T) Then
+          Begin // If not handled treat as ConstExpr
+            ExprType := [etUnknown, etConstExpr];
+            ConstExpr(C, ExprType);
+          End;
       Until Not IsToken(';', C);
       If Token.Token = ')' Then
         AddToExpression(C)
@@ -4409,20 +4422,20 @@ End;
 **)
 Function TPascalDocModule.RaiseStmt : Boolean;
 
+Var
+  ExprType : TExprTypes;
+
 Begin
   Result := Token.UToken = 'RAISE';
   If Result Then
     Begin
       NextNonCommentToken;
       SimpleStatement;
-      If Token.UToken = 'AT' Then
+      If Uppercase(Token.Token) = 'AT' Then
         Begin
           NextNonCommentToken;
-          If Token.TokenType = ttNumber Then
-            NextNonCommentToken
-          Else
-            ErrorAndSeekToken(strNumberExpected, 'RaiseStmt', '',
-              strSeekableOnErrorTokens, stActual);
+          ExprType := [etUnknown, etConstExpr];
+          ConstExpr(Nil, ExprType);
         End;
     End;
 End;
@@ -5368,12 +5381,14 @@ Procedure TPascalDocModule.InitSection;
 Begin
   If Token.UToken = 'INITIALIZATION' Then
     Begin
-      InitComment := GetComment;
+      InitializationSection := TIdent.Create(Token.Token, Token.Line,
+        Token.Column, GetComment);
       NextNonCommentToken;
       StmtList(Nil);
       If Token.UToken = 'FINALIZATION' Then
         Begin
-          FinalComment := GetComment;
+          FinalizationSection := TIdent.Create(Token.Token, Token.Line,
+            Token.Column, GetComment);
           NextNonCommentToken;
           StmtList(Nil);
         End;
@@ -5383,8 +5398,10 @@ Begin
         ErrorAndSeekToken(strReservedWordExpected, 'Initsection',
           'END', strSeekableOnErrorTokens, stActual);
     End
-  Else If Token.UToken = 'BEGIN' Then
-    CompoundStmt(Nil)
+  Else If CompoundStmt(Nil) Then
+    Begin
+      // Do Nothing...
+    End
   Else If Token.UToken = 'END' Then
     NextNonCommentToken
   Else
@@ -5777,25 +5794,27 @@ begin
   If Token.UToken = 'READ' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType = ttIdentifier Then
-        Begin
-          Prop.ReadSpec := Token.Token;
-          NextNonCommentToken;
-        End Else
-          ErrorAndSeekToken(strIdentExpected, 'PropertySpecifier', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+      ExprType := [etUnknown];
+      C := TGenericContainer.Create;
+      Try
+        Designator(C, ExprType);
+        Prop.ReadSpec := C.AsString(True);
+      Finally
+        C.Free;
+      End;
     End;
   // Check for write
   If Token.UToken = 'WRITE' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType = ttIdentifier Then
-        Begin
-          Prop.WriteSpec := Token.Token;
-          NextNonCommentToken;
-        End Else
-          ErrorAndSeekToken(strIdentExpected, 'PropertySpecifier', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+      ExprType := [etUnknown];
+      C := TGenericContainer.Create;
+      Try
+        Designator(C, ExprType);
+        Prop.WriteSpec := C.AsString(True);
+      Finally
+        C.Free;
+      End;
     End;
   // Check for stored
   If Token.UToken = 'STORED' Then
@@ -5814,7 +5833,7 @@ begin
   If Token.UToken = 'DEFAULT' Then
     Begin
       NextNonCommentToken;
-      ExprType := [etNumeric, etConstExpr];
+      ExprType := [etUnknown, etConstExpr];
       C := TGenericContainer.Create;
       Try
         ConstExpr(C, ExprType);

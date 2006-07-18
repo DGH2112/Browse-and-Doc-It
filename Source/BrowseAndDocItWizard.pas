@@ -3,11 +3,16 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    14 Jul 2006
+  @Date    17 Jul 2006
   @Version 1.0
 
   @todo    Configurable Font Name and Size for the Browser tree.
   @todo    Configurable Font Colours for the Browser Tree.
+  @todo    Configurable Tree View, i.e. switch on or off the tree, images, etc.
+  @todo    Create an Option class which has the ability to Load and Save its
+           own settings and then remove the need to the Module Explorer Frame
+           and the Browse And Doc it wizard to Load and Save the settings
+           directly.
 
 **)
 Unit BrowseAndDocItWizard;
@@ -15,8 +20,8 @@ Unit BrowseAndDocItWizard;
 Interface
 
 Uses
-  Classes, ToolsAPI, DeskUtil, Menus, ExtCtrls, BaseLanguageModule,
-  PascalDocModule, DockForm, ModuleExplorerFrame;
+  Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, PascalDocModule,
+  ModuleExplorerFrame;
 
 Type
   (** This emunerate descibed the different types of doc comment .**)
@@ -991,11 +996,11 @@ end;
 
 (**
 
-  This method move the active editors cursor the the supplied position and
+  This method move the active editors cursor to the supplied position and
   centres the cursor on th screen.
 
   @precon  None.
-  @postcon When a selection of made in the explorer the cursor is placed in
+  @postcon When a selection is made in the explorer the cursor is placed in
            the editor.
 
   @param   iIdentLine as an Integer

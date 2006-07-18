@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    14 Jul 2006
+  @Date    17 Jul 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -94,7 +94,9 @@ Type
     doShowUndocPropReturn,
     doShowIncorrectPropReturnType,
     doShowMissingPropPreCons,
-    doShowMissingPropPostCons
+    doShowMissingPropPostCons,
+    doShowMissingInitComment,
+    doShowMissingFinalComment
   );
 
   (** This is a set of display options. **)
@@ -1438,7 +1440,9 @@ Type
     dctPropertyTooManyPrecons,
     dctPropertyPostconNotDocumented,
     dctPropertyMissingPostcon,
-    dctPropertyTooManyPostcons
+    dctPropertyTooManyPostcons,
+    dctMissingInitComment,
+    dctMissingFinalComment
   );
 
   (** A record to describe the information to be associated with a
@@ -1577,8 +1581,8 @@ Type
     FRequiresClause : TIdentList;
     FContainsClause : TIdentList;
     FUsesClause : TIdentList;
-    FInitComment : TComment;
-    FFinalComment : TComment;
+    FInitSection : TIdent;
+    FFinalSection : TIdent;
     FResStrCollection: TGenericContainerCollection;
     FExportsCollection : TGenericContainerCollection;
     FBodyComment : TObjectList;
@@ -1894,16 +1898,16 @@ Type
       Returns a reference to the modules Initialization comment.
       @precon  None.
       @postcon Returns a reference to the modules Initialization comment.
-      @return  a TComment
+      @return  a TIdent
     **)
-    Property InitComment : TComment Read FInitComment Write FInitComment;
+    Property InitializationSection : TIdent Read FInitSection Write FInitSection;
     (**
       Returns a reference to the modules Finalization comment.
       @precon  None.
       @postcon Returns a reference to the modules Finalization comment.
-      @return  a TComment
+      @return  a TIdent
     **)
-    Property FinalComment : TComment Read FFinalComment Write FFinalComment;
+    Property FinalizationSection : TIdent Read FFinalSection Write FFinalSection;
     (**
       Returns a refernce to the modules exports collection.
       @precon  None.
@@ -1998,6 +2002,10 @@ ResourceString
   strShowMissingPropertyPreConditions = 'Show Missing Property Pre-Conditions';
   (** Options text for Show Missing Property Post-Conditions **)
   strShowMissingPropertyPostConditions = 'Show Missing Property Post-Conditions';
+  (** Options text for Show Missing Initialization Comment **)
+  strShowMissingInitComment = 'Show Missing Initialization Comments';
+  (** Options text for Show Missing Finalization Comment **)
+  strShowMissingFinalComment = 'Show Missing Finalization Comments';
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
@@ -2330,6 +2338,26 @@ ResourceString
   strPropertyTooManyPostConsDesc = 'The property comment has too many post-condition ' +
     'tags (@@postcon).';
 
+  (** Label for Finalialization Documentation Conflicts **)
+  strModuleInitSection = 'Module Initialization Section';
+  (** Document conflict message for a missing Finalialization Comment. **)
+  strMissingInitComment = 'The module is missing an Initialization Comment.';
+  (** Document conflict message description a missing Finalialization Comment. **)
+  strMissingInitCommentDesc = 'It is usually advised able to document the ' +
+    'code contain in the Initialization section of the module so that ' +
+    'developers known which portion of the module are automatically ' +
+    'created.';
+
+  (** Label for Initialization Documentation Conflicts **)
+  strModuleFinalSection = 'Module Finalization Section';
+  (** Document conflict message for a missing Initialization Comment. **)
+  strMissingFinalComment = 'The module is missing an Finalization Comment.';
+  (** Document conflict message description a missing Initialization Comment. **)
+  strMissingFinalCommentDesc = 'It is usually advised able to document the ' +
+    'code contain in the Finalization section of the module so that ' +
+    'developers known which portion of the module are automatically ' +
+    'destroyed.';
+
   (** Errors and warnings label **)
   strErrorsAndWarnings = 'Errors and Warnings';
   (** Label for Uses Clause **)
@@ -2502,7 +2530,9 @@ Const
     (Description : strShowUndocumentedPropertyReturnType; Enabled : False),
     (Description : strShowIncorrectPropertyReturnType; Enabled : False),
     (Description : strShowMissingPropertyPreConditions; Enabled : False),
-    (Description : strShowMissingPropertyPostConditions; Enabled : False)
+    (Description : strShowMissingPropertyPostConditions; Enabled : False),
+    (Description : strShowMissingInitComment; Enabled : False),
+    (Description : strShowMissingFinalComment; Enabled : False)
   );
 
   (** This is a string array representing the TDocOption enumerates. **)
@@ -2607,7 +2637,11 @@ Const
     (Category: strPropertyPostconDocumentation; MessageMask:
       strPropertyMissingPostcon; Description: strPropertyMissingPostconDesc),
     (Category: strPropertyPostconDocumentation; MessageMask:
-      strPropertyTooManyPostcons; Description: strPropertyTooManyPostconsDesc)
+      strPropertyTooManyPostcons; Description: strPropertyTooManyPostconsDesc),
+    (Category: strModuleInitSection; MessageMask:
+      strMissingInitComment; Description: strMissingInitCommentDesc),
+    (Category: strModuleFinalSection; MessageMask:
+      strMissingFinalComment; Description: strMissingFinalCommentDesc)
   );
 
 Var
@@ -6119,8 +6153,8 @@ begin
   FSymbolTable := TGenericContainerCollection.Create(True);
   FDocumentConflicts :=  TObjectList.Create(True);
   FContainsClause := Nil;
-  FFinalComment := Nil;
-  FInitComment := Nil;
+  FFinalSection := Nil;
+  FInitSection := Nil;
   FModuleComment := Nil;
   FModuleName := '';
   FModuleNameCol := 0;
@@ -6165,6 +6199,10 @@ end;
 **)
 destructor TBaseLanguageModule.Destroy;
 begin
+  If InitializationSection <> Nil Then
+    InitializationSection.Free;
+  If FinalizationSection <> Nil Then
+    FinalizationSection.Free;
   FCompilerConditionStack.Free;
   FCompilerDefs.Free;
   FDocumentConflicts.Free;

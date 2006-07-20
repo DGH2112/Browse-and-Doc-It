@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    17 Jul 2006
+  @Date    20 Jul 2006
   @Version 1.0
 
   @todo    Configurable Font Name and Size for the Browser tree.
@@ -21,7 +21,7 @@ Interface
 
 Uses
   Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, PascalDocModule,
-  ModuleExplorerFrame;
+  ModuleExplorerFrame, DockForm;
 
 Type
   (** This emunerate descibed the different types of doc comment .**)

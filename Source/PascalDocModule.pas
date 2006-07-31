@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       17 Jul 2006
+  @Date       27 Jul 2006
   @Author     David Hoyle
 
 **)
@@ -178,8 +178,7 @@ Type
     Function GetModuleName : String; Override;
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
-      ModuleOptions : TModuleOptions; DocOptions : TDocOptions;
-      Defines : TStringList);
+      ModuleOptions : TModuleOptions);
     Destructor Destroy; Override;
     Function FindMethodAtStreamPosition(iStreamPos : TStreamPosition;
       var recPosition : TTokenPosition) : TMethodDecl;
@@ -402,18 +401,14 @@ End;
   @param   strFileName   as a String
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
-  @param   DocOptions    as a TDocOptions
-  @param   Defines       as a TStringList
 
 **)
 Constructor TPascalDocModule.Create(Source : TStream; strFileName : String;
-  IsModified : Boolean; ModuleOptions : TModuleOptions; DocOptions : TDocOptions;
-  Defines : TStringList);
+  IsModified : Boolean; ModuleOptions : TModuleOptions);
 
 Begin
   Inherited Create(IsModified, strFileName);
-  If Defines <> Nil Then
-    CompilerDefines.Assign(Defines);
+  CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSourceStream := Source;
   AddTickCount('Start');
   TokenizeStream;
@@ -425,7 +420,7 @@ Begin
   AddTickCount('Sort');
   If (moParse In ModuleOptions) And
     (moCheckForDocumentConflicts In ModuleOptions) Then
-    With TPascalDocChecker.Create(Self, DocOptions) Do
+    With TPascalDocChecker.Create(Self) Do
       Try
         CheckDocumentForConflicts;
         SortDocumentConflicts;

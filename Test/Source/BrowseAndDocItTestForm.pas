@@ -1,10 +1,10 @@
 (**
-  
+
   This module contains a simple interface for to test the PascalDocModule parser
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    12 Jul 2006
+  @Date    27 Jul 2006
   @Author  David Hoyle
 
 **)
@@ -63,7 +63,6 @@ type
   private
     { Private declarations }
     FModuleExplorerFrame : TframeModuleExplorer;
-    FDocOptions : TDocOptions;
     FDirectory : String;
     FFileName : String;
     FProgressForm : TfrmProgress;
@@ -126,7 +125,7 @@ begin
     SynEdit1.Lines.SaveToStream(Source);
     Source.Position := 0;
     M := TPascalDocModule.Create(Source, FileName, True,
-      [moParse, moCheckForDocumentConflicts], FDocOptions, Nil);
+      [moParse, moCheckForDocumentConflicts]);
     Try
       TfrmTokenForm.Execute(M);
     Finally
@@ -253,8 +252,7 @@ Begin
   Source := TFileStream.Create(strFileName, fmOpenRead);
   Try
     Source.Position := 0;
-    M := TPascalDocModule.Create(Source, strFileName, False,
-      [moParse], FDocOptions, Nil);
+    M := TPascalDocModule.Create(Source, strFileName, False, [moParse]);
     Try
       Result := M.Errors.Count;
     Finally
@@ -335,21 +333,7 @@ Var
 begin
   FProgressForm := TfrmProgress.Create(Nil);
   For i := Low(TDocOption) To High(TDocOption) Do
-    Include(FDocOptions, i);
-  SpecialTags := TStringList.Create;
-  SpecialTags.AddObject('todo=Things To Do', TObject(3));
-  SpecialTags.AddObject('precon=Pre-Conditions', TObject(0));
-  SpecialTags.AddObject('postcon=Post-Conditions', TObject(0));
-  SpecialTags.AddObject('param=Parameters', TObject(0));
-  SpecialTags.AddObject('return=Returns', TObject(0));
-  SpecialTags.AddObject('note=Notes', TObject(0));
-  SpecialTags.AddObject('see=Also See', TObject(0));
-  SpecialTags.AddObject('exception=Exception Raised', TObject(0));
-  SpecialTags.AddObject('bug=Known Bugs', TObject(3));
-  SpecialTags.AddObject('debug=Debugging Code', TObject(3));
-  SpecialTags.AddObject('date=Date Code Last Updated', TObject(0));
-  SpecialTags.AddObject('author=Code Author', TObject(0));
-  SpecialTags.AddObject('version=Code Version', TObject(0));
+    BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [i];
   FModuleExplorerFrame := TframeModuleExplorer.Create(Self);
   FModuleExplorerFrame.Parent := Panel1;
   FModuleExplorerFrame.Align := alClient;
@@ -396,7 +380,6 @@ begin
       Free;
     End;
   FModuleExplorerFrame.Free;
-  SpecialTags.Free;
   FProgressForm.Free;
 end;
 
@@ -480,9 +463,9 @@ begin
     SynEdit1.Lines.SaveToStream(Source);
     Source.Position := 0;
     M := TPascalDocModule.Create(Source, FileName, SynEdit1.Modified,
-      [moParse, moCheckForDocumentConflicts], FDocOptions, Nil);
+      [moParse, moCheckForDocumentConflicts]);
     Try
-      FModuleExplorerFrame.RenderModule(M, FDocOptions);
+      FModuleExplorerFrame.RenderModule(M);
     Finally
       M.Free;
     End;

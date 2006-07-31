@@ -27,8 +27,7 @@ type
     Class Procedure ShowDockableModuleExplorer;
     Class Procedure RemoveDockableModuleExplorer;
     Class Procedure CreateDockableModuleExplorer;
-    Class Procedure RenderDocumentTree(BaseLanguageModule : TBaseLanguageModule;
-      DocExplorerOptions : TDocOptions);
+    Class Procedure RenderDocumentTree(BaseLanguageModule : TBaseLanguageModule);
     Class Procedure HookEventHandlers(SelectionChangeProc : TSelectionChange;
       Focus : TNotifyEvent);
   end;
@@ -237,16 +236,14 @@ end;
            rendered.
 
   @param   BaseLanguageModule    as a TBaseLanguageModule
-  @param   DocExplorerOptions as a TDocOptions
 
 **)
 class procedure TfrmDockableModuleExplorer.RenderDocumentTree(
-  BaseLanguageModule: TBaseLanguageModule; DocExplorerOptions : TDocOptions);
+  BaseLanguageModule: TBaseLanguageModule);
 begin
   If Assigned(FormInstance) Then
     If FormInstance.Visible Then
-      FormInstance.FModuleExplorerFrame.RenderModule(BaseLanguageModule,
-        DocExplorerOptions);
+      FormInstance.FModuleExplorerFrame.RenderModule(BaseLanguageModule);
 end;
 
 (**

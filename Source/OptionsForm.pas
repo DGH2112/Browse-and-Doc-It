@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    12 Jul 2006
+  @Date    27 Jul 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -56,8 +56,7 @@ type
   private
   public
     { Public declarations }
-    Class Function Execute(var Options : TDocOptions; var iInt : Integer;
-      var DocHelpFile : String) : Boolean;
+    Class Function Execute(var iInt : Integer; var DocHelpFile : String) : Boolean;
   end;
 
 implementation
@@ -77,18 +76,16 @@ ResourceString
   controls based on the passed Options parameter. If OK is selected then
   the Options parameter is updated to suit the new options.
 
-  @precon  Options is a set of TDocOptions to be represented in the dialogue,
-           iInt is the timer interval to be represented in the dialogue,
+  @precon  iInt is the timer interval to be represented in the dialogue,
            DocHelpFile is the directory of the modules help file.
   @postcon Returns true if the OK button on the dialogue was pressed.
 
-  @param   Options     as a TDocOptions as a reference
   @param   iInt        as an Integer as a reference
   @param   DocHelpFile as a String as a reference
   @return  a Boolean
 
 **)
-Class Function TfrmOptions.Execute(var Options : TDocOptions; var iInt : Integer;
+Class Function TfrmOptions.Execute(var iInt : Integer;
   var DocHelpFile : String) : Boolean;
 
 Var
@@ -102,7 +99,7 @@ Begin
       For i := Low(TDocOption) To High(TDocOption) Do
         Begin
           clbOptions.Items.Add(DocOptionInfo[i].Description);
-          clbOptions.Checked[Integer(i)] := i In Options;
+          clbOptions.Checked[Integer(i)] := i In BrowseAndDocItOptions.Options;
         End;
       For j := 0 To SpecialTags.Count - 1 Do
         lbSpecialTags.Items.AddObject(SpecialTags[j], SpecialTags.Objects[j]);
@@ -112,10 +109,10 @@ Begin
       If ShowModal = mrOK Then
         Begin
           Result := True;
-          Options := [];
+          BrowseAndDocItOptions.Options := [];
           For i := Low(TDocOption) To High(TDocOption) Do
             If clbOptions.Checked[Integer(i)] Then
-              Options := Options + [i];
+              BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [i];
           SpecialTags.Clear;
           For j := 0 To lbSpecialTags.Items.Count - 1 Do
             SpecialTags.AddObject(lbSpecialTags.Items[j],

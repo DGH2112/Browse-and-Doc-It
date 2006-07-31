@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    20 Jul 2006
+  @Date    27 Jul 2006
   @Version 1.0
 
   @todo    Configurable Font Name and Size for the Browser tree.
@@ -21,7 +21,7 @@ Interface
 
 Uses
   Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, PascalDocModule,
-  ModuleExplorerFrame, DockForm;
+  ModuleExplorerFrame {$IFDEF VER180}, DockForm {$ENDIF};
 
 Type
   (** This emunerate descibed the different types of doc comment .**)
@@ -175,8 +175,6 @@ Var
       registered with the IDE. **)
   objEditorNotifier : TEditorNotifier;
   {$ENDIF}
-  (** A private varaible to hold the Document Explorer Options **)
-  FDocExplorerOptions : TDocOptions;
   (** A private variable to hold the update interval in ms between changes and
       the updating of the module explorer **)
   iUpdateInterval: Cardinal;
@@ -256,13 +254,6 @@ Begin
   FCounter := 0;
   FFileName := '';
   iUpdateInterval := 0;
-  SpecialTags := TStringList.Create;
-  //{$IFNDEF VER180}
-  //FTimer := TTimer.Create(Nil);
-  //FTimer.OnTimer := EditorTimer;
-  //FTimer.Interval := 1000;
-  //FTimer.Enabled := True;
-  //{$ENDIF}
   LoadSettings;
 End;
 
@@ -308,7 +299,6 @@ End;
 destructor TBrowseAndDocItWizard.Destroy;
 begin
   SaveSettings;
-  SpecialTags.Free;
   If mmiPascalDocMenu <> Nil Then
     mmiPascalDocMenu.Free;
   Inherited;
@@ -426,27 +416,13 @@ Begin
       For j := Low(TDocOption) To High(TDocOption) Do
         If ReadBool(strRegRootKey + 'DocExplorerOptions', DocOptionInfo[j].Description,
           DocOptionInfo[j].Enabled) Then
-          FDocExplorerOptions := FDocExplorerOptions + [j];
+          BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [j];
       iUpdateInterval := ReadInteger(strRegRootKey + 'ModuleExplorer', 'UpdateInterval', 1000);
       FDocOption := ReadInteger(strRegRootKey + 'Setup', 'DocOption', 0);
       iCount := ReadInteger(strregRootKey + 'Setup', 'SpecialTagCount', 0);
-      If iCount = 0 Then
-        Begin // Some default special tags
-          SpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree And iAutoExpand));
-          SpecialTags.AddObject('precon=Pre-Conditions', TObject(0));
-          SpecialTags.AddObject('postcon=Post-Conditions', TObject(0));
-          SpecialTags.AddObject('param=Parameters', TObject(0));
-          SpecialTags.AddObject('return=Returns', TObject(0));
-          SpecialTags.AddObject('note=Notes', TObject(0));
-          SpecialTags.AddObject('see=Also See', TObject(0));
-          SpecialTags.AddObject('exception=Exception Raised', TObject(0));
-          SpecialTags.AddObject('bug=Known Bugs', TObject(iShowInTree And iAutoExpand));
-          SpecialTags.AddObject('debug=Debugging Code', TObject(iShowInTree And iAutoExpand));
-          SpecialTags.AddObject('date=Date Code Last Updated', TObject(0));
-          SpecialTags.AddObject('author=Code Author', TObject(0));
-          SpecialTags.AddObject('version=Code Version', TObject(0));
-        End Else
+      If iCount > 0 Then
         Begin
+          SpecialTags.Clear;
           For k := 1 To iCount Do
             SpecialTags.AddObject(ReadString(strRegRootKey + 'SpecialTags',
               Format('SpecialTag%d', [k]), ''), TObject(ReadInteger(strRegRootKey + 'SpecialTags',
@@ -478,8 +454,8 @@ Begin
   With TRegIniFile.Create() Do
     Try
       For j := Low(TDocOption) To High(TDocOption) Do
-        WriteBool(strRegRootKey + 'DocExplorerOptions', DocOptionInfo[j].Description,
-          j In FDocExplorerOptions);
+        WriteBool(strRegRootKey + 'DocExplorerOptions',
+          DocOptionInfo[j].Description, j In BrowseAndDocItOptions.Options);
       WriteInteger(strRegRootKey + 'ModuleExplorer', 'UpdateInterval', iUpdateInterval);
       WriteInteger(strRegRootKey + 'Setup', 'DocOption', FDocOption);
       WriteInteger(strRegRootKey + 'Setup', 'SpecialTagCount', SpecialTags.Count);
@@ -673,7 +649,7 @@ begin
   objMemStream := EditorAsMemoryStream(SourceEditor);
   Try
     With TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
-      SourceEditor.Modified, [], [], Nil) Do
+      SourceEditor.Modified, []) Do
       Try
         EditPos :=  SourceEditor.GetEditView(0).CursorPos;
         CharPos.Line := EditPos.Line;
@@ -748,7 +724,7 @@ begin
   objMemStream := EditorAsMemoryStream(SourceEditor);
   Try
     With TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
-      SourceEditor.Modified, [], [], Nil) Do
+      SourceEditor.Modified, []) Do
       Try
         EditPos :=  SourceEditor.GetEditView(0).CursorPos;
         CharPos.Line := EditPos.Line;
@@ -974,20 +950,17 @@ end;
 procedure TBrowseAndDocItWizard.OptionsClick(Sender: TObject);
 
 Var
-  Opts : TDocOptions;
   i : Integer;
   HelpFile : String;
   iBrowsePos : Integer;
 
 begin
   i := iUpdateInterval;
-  Opts := FDocExplorerOptions;
   HelpFile := FDocHelpFile;
   iBrowsePos := Integer(FBrowsePosition);
-  If TfrmOptions.Execute(Opts, i, HelpFile) Then
+  If TfrmOptions.Execute(i, HelpFile) Then
     Begin
       iUpdateInterval := i;
-      FDocExplorerOptions := Opts;
       FDocHelpFile := HelpFile;
       iLastUpdateTickCount := 1;
       FBrowsePosition := TBrowsePosition(iBrowsePos);
@@ -1177,7 +1150,6 @@ Var
   M : TPascalDocModule;
   strExt : String;
   Options : IOTAProjectOptions;
-  slDefines : TStringList;
 
 begin
   If (Application <> Nil) And (Application.MainForm <> Nil) And
@@ -1192,37 +1164,32 @@ begin
             If (strExt = '.PAS') Or (strExt = '.DPR') Or (strExt = '.DPK') Then
               Begin
                 Options := ActiveProject.ProjectOptions;
-                slDefines := TStringList.Create;
+                BrowseAndDocItOptions.Defines.Text :=
+                  StringReplace(Options.Values['Defines'], ';', #13#10,
+                    [rfReplaceAll]);
+                DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
+                Reader := SourceEditor.CreateReader;
                 Try
-                  slDefines.Text := StringReplace(Options.Values['Defines'],
-                    ';', #13#10, [rfReplaceAll]);
-                  DetermineCompilerDefinitions(slDefines);
-                  Reader := SourceEditor.CreateReader;
-                  Try
-                    iPosition := 0;
-                    Repeat
-                      iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
-                      objMemStream.WriteBuffer(Buffer, iRead);
-                      Inc(iPosition, iRead);
-                    Until iRead < iBufferSize;
-                  Finally
-                    Reader := Nil;
-                  End;
-                  objMemStream.Position := 0;
-                  M := TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
-                    SourceEditor.Modified, [moParse, moCheckForDocumentConflicts],
-                    FDocExplorerOptions, slDefines);
-                  With M Do
-                    Try
-                      TfrmDockableModuleExplorer.RenderDocumentTree(M, FDocExplorerOptions);
-                    Finally
-                      Free;
-                    End;
+                  iPosition := 0;
+                  Repeat
+                    iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
+                    objMemStream.WriteBuffer(Buffer, iRead);
+                    Inc(iPosition, iRead);
+                  Until iRead < iBufferSize;
                 Finally
-                  slDefines.Free;
+                  Reader := Nil;
                 End;
+                objMemStream.Position := 0;
+                M := TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
+                  SourceEditor.Modified, [moParse, moCheckForDocumentConflicts]);
+                With M Do
+                  Try
+                    TfrmDockableModuleExplorer.RenderDocumentTree(M);
+                  Finally
+                    Free;
+                  End;
               End Else
-                TfrmDockableModuleExplorer.RenderDocumentTree(Nil, FDocExplorerOptions);
+                TfrmDockableModuleExplorer.RenderDocumentTree(Nil);
           End;
       Finally
         objMemStream.Free;
@@ -1244,7 +1211,7 @@ end;
 Procedure TEditorNotifier.DetermineCompilerDefinitions(slDefines : TStringList);
 
 Begin
-  // Delphi 4 - Starts here as ths will be the earliest version that can run
+  // Delphi 4 - Starts here as this will be the earliest version that can run
   // this addin.
   {$IFDEF VER120} // Delphi 4
   slDefines.Add('VER120');
@@ -1258,7 +1225,7 @@ Begin
   {$IFDEF VER150} // Delphi 7
   slDefines.Add('VER150');
   {$ENDIF}
-  {$IFDEF VER160} // Delphi ??
+  {$IFDEF VER160} // Delphi for .NET
   slDefines.Add('VER160');
   {$ENDIF}
   {$IFDEF VER170} // Delphi 2005
@@ -1719,7 +1686,7 @@ begin
     End;
     objMemStream.Position := 0;
     Source := TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
-      SourceEditor.Modified, [], [], Nil);
+      SourceEditor.Modified, []);
     Try
       TfrmTokenForm.Execute(Source);
     Finally

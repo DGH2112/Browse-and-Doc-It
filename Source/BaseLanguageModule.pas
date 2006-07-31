@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    17 Jul 2006
+  @Date    27 Jul 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -46,14 +46,7 @@ Type
   TErrorType = (etWarning, etError);
 
   (** This is a list of options valable for the display of module information
-      with in the module explorer.
-      @bug At the moment these option are not passed early enough for the
-           doManageExpandedNodes option to be available to the LoadSettings
-           and SaveSettings methods. Therefore perhaps the calling class which
-           uses the frameModuleExplorer should call the Loadsettings() and
-           SaveSettings() methods and not depend on the frame class to call
-           these in the constructor and destructor respectively.
-  **)
+      **)
   TDocOption = (
     doCustomDrawing,
     doShowCommentHints,
@@ -64,7 +57,6 @@ Type
     doShowPublisheds,
     doShowLocalProcs,
     doShowConflicts,
-    doManageExpandedNodes,
     doShowMissingProcDocs,
     doShowMissingDocDesc,
     doShowDiffParamCount,
@@ -1918,6 +1910,31 @@ Type
       Write FExportsCollection;
   End;
 
+  (** This is a class to define a set of options for the application. **)
+  TBrowseAndDocItOptions = Class
+  Private
+    FOptions : TDocOptions;
+    FDefines : TStringList;
+  Protected
+  Public
+    Constructor Create;
+    Destructor Destroy; Override;
+    (**
+      This property contains the basic toggleable options for the application.
+      @precon  None.
+      @postcon Contains the basic toggleable options for the application.
+      @return  a TDocOptions
+    **)
+    Property Options : TDocOptions Read FOptions Write FOptions;
+    (**
+      This property provides a list of Compiler Conditional Defines.
+      @precon  None.
+      @postcon Provides a list of Compiler Conditional Defines.
+      @return  a TStringList
+    **)
+    Property Defines : TStringList Read FDefines;
+  End;
+
 ResourceString
   (** The registry key for the wizards settings. **)
   strRegRootKey = 'Software\Season''s Fall\Browse and Doc It\';
@@ -1940,8 +1957,6 @@ ResourceString
   strShowLocalProcsAndFuncs = 'Show local procedures and functions';
   (** Options text for Show Documentation Conflicts **)
   strShowDocumentationConflicts = 'Show Documentation Conflicts';
-  (** Options text for Manage Expanded Nodes **)
-  strManageExpandedNodes = 'Manage Expanded Nodes';
   (** Options text for Show Missing Method Documentation **)
   strShowMissingMethodDocumentation = 'Show Missing Method Documentation';
   (** Options text for Show Missing Method Documentation Description **)
@@ -2500,7 +2515,6 @@ Const
     (Description : strShowPublishedDeclarations; Enabled : True),
     (Description : strShowLocalProcsAndFuncs; Enabled : True),
     (Description : strShowDocumentationConflicts; Enabled : False),
-    (Description : strManageExpandedNodes; Enabled : True),
     (Description : strShowMissingMethodDocumentation; Enabled : True),
     (Description : strShowMissingMethodDocDesc; Enabled : True),
     (Description : strShowDiffMethodParameterCount; Enabled : True),
@@ -2644,9 +2658,19 @@ Const
       strMissingFinalComment; Description: strMissingFinalCommentDesc)
   );
 
+  (** This is a constant for special tag items to show in the tree **)
+  iShowInTree = $0001;
+  (** This is a constant for special tag items to auto expand in the tree **)
+  iAutoExpand = $0002;
+
 Var
-  (** This is a global string list containing the special tags list. **)
+  (** This is a global string list containing the special tags list. It is
+      constructed and destroyed in the Initialization and Finalizations
+      sections respectively. **)
   SpecialTags : TStringList;
+  (** This is a global variable for the Browse and Doc It options that need to
+      be available throughout the application. **)
+  BrowseAndDocItOptions : TBrowseAndDocItOptions;
 
   Function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
   Function IsTokenWhiteSpace(strToken : String) : Boolean;
@@ -6683,13 +6707,6 @@ end;
   @precon  None.
   @postcon Processes a compiler directive looking for conditional statements.
 
-  @note Needs a stack to hold the $IFDEF / $IFNDEF moves, i.e. iSkip + 1 or
-        iSkip + 0 so that $ELSE can know how to handle its moves iSkip - 1
-        or iSkip + 1 respectively and also $ENDIF. The stack will hold the
-        $IFDEF / $IFNDEF move, i.e. +1 so that the first to find it between
-        $ELSE and $ENDIF can reverse the move, i.e. if $ELSE does -1 then
-        $ENDIF does nothing because the move is used up.
-
   @param   iSkip as an Integer as a reference
 
 **)
@@ -6873,4 +6890,58 @@ Begin
     End;
 End;
 
+(**
+
+  This is the constructor method for the TBrowseAndDocItOptions class.
+
+  @precon  None.
+  @postcon Does nothing at the moment.
+
+**)
+Constructor TBrowseAndDocItOptions.Create;
+
+Begin
+  Inherited Create;
+  FDefines := TStringList.Create;
+End;
+
+(**
+
+  This is the destructor method for the TBrowseAndDocItOptions class.
+
+  @precon  none.
+  @postcon Does onthing at the moment except call the inherited destroy method.
+
+**)
+Destructor TBrowseAndDocItOptions.Destroy;
+
+Begin
+  FDefines.Free;
+  Inherited Destroy;
+End;
+
+(** This initializations section ensures that there is a valid instance of the
+    SpecialTags class and a valid instance of the BrowseAndDocItOption class. **)
+Initialization
+  SpecialTags := TStringList.Create;
+  // Create a default set of Special Tags.
+  SpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree And iAutoExpand));
+  SpecialTags.AddObject('precon=Pre-Conditions', TObject(0));
+  SpecialTags.AddObject('postcon=Post-Conditions', TObject(0));
+  SpecialTags.AddObject('param=Parameters', TObject(0));
+  SpecialTags.AddObject('return=Returns', TObject(0));
+  SpecialTags.AddObject('note=Notes', TObject(0));
+  SpecialTags.AddObject('see=Also See', TObject(0));
+  SpecialTags.AddObject('exception=Exception Raised', TObject(0));
+  SpecialTags.AddObject('bug=Known Bugs', TObject(iShowInTree And iAutoExpand));
+  SpecialTags.AddObject('debug=Debugging Code', TObject(iShowInTree And iAutoExpand));
+  SpecialTags.AddObject('date=Date Code Last Updated', TObject(0));
+  SpecialTags.AddObject('author=Code Author', TObject(0));
+  SpecialTags.AddObject('version=Code Version', TObject(0));
+  BrowseAndDocItOptions := TBrowseAndDocItOptions.Create;
+(** This finalization section ensures that the SpecialTags and
+    BrowseAndDocItOptions class are destroyed. **)
+Finalization
+  BrowseAndDocItOptions.Free;
+  SpecialTags.Free;
 End.

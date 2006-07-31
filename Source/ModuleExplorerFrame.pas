@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    17 Jul 2006
+  @Date    27 Jul 2006
   @Author  David Hoyle
   @Version 1.0
 
@@ -112,7 +112,6 @@ type
   private
     { Private declarations }
     FModule : TTreeNode;
-    FOptions : TDocOptions;
     FNodeInfo : TObjectList;
     FSelectionChange : TSelectionChange;
     FFocus : TNotifyEvent;
@@ -162,8 +161,7 @@ type
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
-    procedure RenderModule(M : TBaseLanguageModule;
-      DocExplorerOptions : TDocOptions);
+    procedure RenderModule(M : TBaseLanguageModule);
     (**
       This is an event for the selection change in the browser tree.
       @precon  None.
@@ -180,12 +178,6 @@ type
     **)
     Property OnFocus : TNotifyEvent Read FFocus Write FFocus;
   end;
-
-Const
-  (** This is a constant for special tag items to show in the tree **)
-  iShowInTree = $0001;
-  (** This is a constant for special tag items to auto expand in the tree **)
-  iAutoExpand = $0002;
 
 implementation
 
@@ -801,7 +793,8 @@ begin
         ConflictComment.Free;
       End;
     End;
-  If (DocConflictNode <> Nil) And (doShowConflicts In FOptions) Then
+  If (DocConflictNode <> Nil) And
+    (doShowConflicts In BrowseAndDocItOptions.Options) Then
     DocConflictNode.Expand(True);
 end;
 
@@ -821,11 +814,21 @@ Function TframeModuleExplorer.IsInOptions(Scope : TScope) : Boolean;
 Begin
   Result := False;
   Case Scope Of
-    scLocal     : If doShowLocals In FOptions Then Result := True;
-    scPrivate   : If doShowPrivates In FOptions Then Result := True;
-    scProtected : If doShowProtecteds In FOptions Then Result := True;
-    scPublic    : If doShowPublics In FOptions Then Result := True;
-    scPublished : If doShowPublisheds In FOptions Then Result := True;
+    scLocal:
+      If doShowLocals In BrowseAndDocItOptions.Options Then
+        Result := True;
+    scPrivate:
+      If doShowPrivates In BrowseAndDocItOptions.Options Then
+        Result := True;
+    scProtected:
+      If doShowProtecteds In BrowseAndDocItOptions.Options Then
+        Result := True;
+    scPublic:
+      If doShowPublics In BrowseAndDocItOptions.Options Then
+        Result := True;
+    scPublished:
+      If doShowPublisheds In BrowseAndDocItOptions.Options Then
+        Result := True;
   End;
 End;
 
@@ -904,7 +907,7 @@ Begin
       C := N;
       For i := 0 To M.Count - 1 Do
         If IsInOptions(M[i].Scope) Or ((M[i].Scope = scLocal) And
-          (doShowLocalProcs In FOptions)) Then
+          (doShowLocalProcs In BrowseAndDocItOptions.Options)) Then
           Begin
             If AnsiCompareText(strLastClassName, M[i].ClsName) <> 0 Then
               Begin
@@ -1228,11 +1231,9 @@ End;
   @postcon Renders the module information for the given module.
 
   @param   M                  as a TBaseLanguageModule
-  @param   docExplorerOptions as a TDocOptions
 
 **)
-procedure TframeModuleExplorer.RenderModule(M : TBaseLanguageModule;
-  DocExplorerOptions : TDocOptions);
+procedure TframeModuleExplorer.RenderModule(M : TBaseLanguageModule);
 
 Var
   i : Integer;
@@ -1376,8 +1377,7 @@ Var
   End;
 
 Begin
-  FOptions := DocExplorerOptions;
-  If doManageExpandedNodes In FOptions Then ManageExpanedNodes;
+  ManageExpanedNodes;
   FHintWin.ReleaseHandle; // Stop AV when refreshing the tree.
   With tvExplorer Do
     Begin
@@ -1694,7 +1694,7 @@ Var
   iCentre : Integer;
 
 begin
-  DefaultDraw := Not (doCustomDrawing In FOptions);
+  DefaultDraw := Not (doCustomDrawing In BrowseAndDocItOptions.Options);
   With Sender.Canvas Do
     If Not DefaultDraw Then
       Begin
@@ -1830,10 +1830,10 @@ begin
       If (Node <> Nil) And (Node <> FLastNode) Then
         Begin
           FLastNode := Node;
-          If doShowCommentHints In FOptions Then
+          If doShowCommentHints In BrowseAndDocItOptions.Options Then
             C := NodeInfo[Integer(Node.Data)].Comment;
           Rect := FHintWin.CalcHintRect(tvExplorer.ClientWidth, Screen.Width,
-            Node, doCustomDrawing In FOptions, C);
+            Node, doCustomDrawing In BrowseAndDocItOptions.Options, C);
           If (Rect.Right <= tvExplorer.ClientWidth) And ((C = Nil) Or
             ((C.TokenCount = 0) And (C.TagCount = 0))) Then
             Begin
@@ -1842,7 +1842,8 @@ begin
             End;
           Rect.TopLeft := tvExplorer.ClientToScreen(Rect.TopLeft);
           Rect.BottomRight := tvExplorer.ClientToScreen(Rect.BottomRight);
-          FHintWin.ActivateHint(Rect, Node, doCustomDrawing In FOptions, C);
+          FHintWin.ActivateHint(Rect, Node,
+            doCustomDrawing In BrowseAndDocItOptions.Options, C);
           FLastNode := Node;
         End Else
           If (Node <> FLastNode) Then

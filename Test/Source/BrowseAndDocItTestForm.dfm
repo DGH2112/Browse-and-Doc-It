@@ -1,9 +1,9 @@
 object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   Left = 161
   Top = 170
-  Width = 915
-  Height = 766
   Caption = 'frmBrowseAndDocItTestForm'
+  ClientHeight = 732
+  ClientWidth = 907
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,23 +20,25 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   object Splitter1: TSplitter
     Left = 689
     Top = 43
-    Height = 690
+    Height = 689
     ResizeStyle = rsUpdate
+    ExplicitHeight = 690
   end
   object Panel1: TPanel
     Left = 273
     Top = 43
     Width = 416
-    Height = 690
+    Height = 689
     Align = alLeft
     Caption = 'Panel1'
     TabOrder = 0
+    ExplicitHeight = 690
   end
   object SynEdit1: TSynEdit
     Left = 692
     Top = 43
     Width = 215
-    Height = 690
+    Height = 689
     Align = alClient
     ActiveLineColor = clSkyBlue
     Font.Charset = DEFAULT_CHARSET
@@ -59,6 +61,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoKeepCaretX, eoRightMouseMovesCursor, eoScrollPastEof, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabIndent, eoTabsToSpaces, eoTrimTrailingSpaces]
     OnChange = SynEdit1Change
     OnStatusChange = SynEdit1StatusChange
+    ExplicitHeight = 690
   end
   object Panel2: TPanel
     Left = 0
@@ -99,13 +102,14 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Left = 0
     Top = 43
     Width = 273
-    Height = 690
+    Height = 689
     Align = alLeft
     Caption = 'Panel3'
     TabOrder = 3
+    ExplicitHeight = 690
     DesignSize = (
       273
-      690)
+      689)
     object lvFileList: TListView
       Left = 8
       Top = 40

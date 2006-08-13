@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    27 Jul 2006
+  @Date    13 Aug 2006
   @Author  David Hoyle
 
 **)
@@ -15,7 +15,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, SynEditHighlighter, SynHighlighterPas, SynEdit, ExtCtrls,
-  ModuleExplorerFrame, BaseLanguageModule, StdCtrls, FileCtrl, ComCtrls,
+  ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
+  {$WARN UNIT_PLATFORM OFF} FileCtrl {$WARN UNIT_PLATFORM ON}, ComCtrls,
   Menus, StdActns, ActnList, ProgressForm;
 
 type
@@ -331,6 +332,7 @@ Var
   i : TDocOption;
 
 begin
+  OutputDebugString('Started');
   FProgressForm := TfrmProgress.Create(Nil);
   For i := Low(TDocOption) To High(TDocOption) Do
     BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [i];
@@ -381,6 +383,7 @@ begin
     End;
   FModuleExplorerFrame.Free;
   FProgressForm.Free;
+  OutputDebugString('Finished');
 end;
 
 (**

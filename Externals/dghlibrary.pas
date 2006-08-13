@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    07 Jan 2006
+  @Date    11 Aug 2006
 
 **)
 Unit DGHLibrary;
@@ -584,8 +584,8 @@ Var
 begin
   iDegs := Trunc(dblBearingAsDec);
   iMins := Trunc((dblBearingAsDec - iDegs) * 100);
-  dblSecs := (((dblBearingAsDec - iDegs) * 100) - iMins) * 100;
-  Result := iDegs + iMins / 60.0 + dblSecs / 3600;
+  dblSecs := (((dblBearingAsDec - iDegs) * 100.0) - iMins) * 100.0;
+  Result := iDegs + iMins / 60.0 + dblSecs / 3600.0;
 end;
 
 (**
@@ -3406,7 +3406,7 @@ begin
   Inherited Create;
   FHElements := THElements.Create();
   FCoordinateError := 0.010;
-  FBearingError := 10 / 3600.0;
+  FBearingError := 10.0 / 3600.0;
   FModified := False;
 end;
 

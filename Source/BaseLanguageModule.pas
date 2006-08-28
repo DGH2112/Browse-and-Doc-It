@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    27 Jul 2006
+  @Date    11 Aug 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -2486,6 +2486,11 @@ ResourceString
   (** An exception message for a Type Declaration not found. **)
   strTypeDeclExpected = 'Type Declaration expected but "%s" found at line %s ' +
     'column %d.';
+  (** An exception message for a Label not found. **)
+  strLabelExpected = 'Label expected but "%s" found at line %s column %d.';
+  (** An exception message for a Constant Expression found. **)
+  strConstExprExpected = 'Constant Expression expected but "%s" found at ' +
+    'line %s column %d.';
 
 Const
   (** A set of characters for whitespace **)
@@ -5307,7 +5312,8 @@ Var
 begin
   Result := False;
   For i := 0 To Directives.Count - 1 Do
-    If AnsiCompareText(strDirective, Directives[i]) = 0 Then
+    If AnsiCompareText(strDirective,
+      Copy(Directives[i], 1, Length(strDirective))) = 0 Then
       Begin
         Result := True;
         Break;

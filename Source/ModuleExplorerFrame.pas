@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    27 Jul 2006
+  @Date    17 Aug 2006
   @Author  David Hoyle
   @Version 1.0
 
@@ -14,7 +14,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ImgList, ComCtrls, ExtCtrls, Contnrs, BaseLanguageModule;
+  Dialogs, ImgList, ComCtrls, ExtCtrls, Contnrs, BaseLanguageModule,
+  ActnList, ToolWin;
 
 type
   (** This enumerate represents the type of the item that generates the
@@ -102,6 +103,25 @@ type
     stbStatusBar: TStatusBar;
     ilScopeImages: TImageList;
     tvExplorer: TTreeView;
+    ToolBar1: TToolBar;
+    ToolButton1: TToolButton;
+    ToolButton2: TToolButton;
+    ToolButton3: TToolButton;
+    ToolButton4: TToolButton;
+    ToolButton5: TToolButton;
+    ActionList1: TActionList;
+    actLocal: TAction;
+    actPrivate: TAction;
+    actProtected: TAction;
+    actPublic: TAction;
+    actPublished: TAction;
+    ToolButton6: TToolButton;
+    ToolButton7: TToolButton;
+    ToolButton8: TToolButton;
+    ToolButton9: TToolButton;
+    actCustomDrawing: TAction;
+    actShowCommentHints: TAction;
+    actShowConflicts: TAction;
     procedure tvExplorerCustomDrawItem(Sender: TCustomTreeView;
       Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -109,6 +129,7 @@ type
     procedure tvExplorerClick(Sender: TObject);
     procedure tvExplorerKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure actToolbarActionExecute(Sender: TObject);
   private
     { Private declarations }
     FModule : TTreeNode;
@@ -120,6 +141,7 @@ type
     FSpecialTagNodes : Array Of TSpecialTagNode;
     FHintWin : TCustomHintWindow;
     FLastNode : TTreeNode;
+    FOptionsChange : TNotifyEvent;
     procedure DisplayClause(U : TIdentList; P : TTreeNode; strLabel : String;
       iIcon, iLabelIcon : Integer); Overload;
     procedure DisplayClause(C : TGenericContainerCollection; P : TTreeNode;
@@ -157,6 +179,7 @@ type
     Property NodeInfo[iIndex : Integer] : TTreeNodeInfo Read GetTreeNodeInfo;
     Procedure LoadSettings;
     Procedure SaveSettings;
+    procedure WM_ShowWindow(var Msg : TMessage); Message WM_SHOWWINDOW;
   public
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
@@ -177,6 +200,14 @@ type
       @return  a TNotifyEvent
     **)
     Property OnFocus : TNotifyEvent Read FFocus Write FFocus;
+    (**
+      This is an event handler for the On Options Change event.
+      @precon  None.
+      @postcon Hooks an event handler for the change of options event.
+      @return  a TNotifyEvent
+    **)
+    Property OnOptionsChange : TNotifyEvent Read FOptionsChange
+      Write FOptionsChange;
   end;
 
 implementation
@@ -1376,6 +1407,9 @@ Var
         End;
   End;
 
+  Var
+    recMsg : TMessage;
+
 Begin
   ManageExpanedNodes;
   FHintWin.ReleaseHandle; // Stop AV when refreshing the tree.
@@ -1455,6 +1489,7 @@ Begin
             M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1]]);
         End;
     End;
+  WM_ShowWindow(recMsg); // updated toolbar
 End;
 
 (**
@@ -2184,5 +2219,70 @@ begin
         FFocus(Sender);
     End;
 end;
+
+(**
+
+  This method handles all the on Execute event handlers for the Action items.
+
+  @precon  None.
+  @postcon Asscoiated the appropriate DocOption with the Action based on the Tag
+           property.
+
+  @param   Sender as a TObject
+
+**)
+procedure TframeModuleExplorer.actToolbarActionExecute(Sender: TObject);
+
+Var
+  DocOption : TDocOption;
+
+begin
+  If Sender Is TAction Then
+    Begin
+      Case (Sender As TAction).Tag Of
+        0 : DocOption := doCustomDrawing;
+        1 : DocOption := doShowCommentHints;
+        2 : DocOption := doShowConflicts;
+        3 : DocOption := doShowLocals;
+        4 : DocOption := doShowPrivates;
+        5 : DocOption := doShowProtecteds;
+        6 : DocOption := doShowPublics;
+        7 : DocOption := doShowPublisheds;
+      End;
+      If DocOption In BrowseAndDocItOptions.Options Then
+        BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options - [DocOption]
+      Else
+        BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [DocOption];
+      If Assigned(FOptionsChange) Then
+        FOptionsChange(Self);
+    End;
+end;
+
+(**
+
+  This is a windows message handler for the WM_SHOWWINDOW message.
+
+  @precon  None.
+  @postcon Updates the status of the Action items when the Explorer Frame
+           Window is shown or hidden.
+
+  @param   Msg as a TMessage as a reference
+
+**)
+procedure TframeModuleExplorer.WM_ShowWindow(var Msg : TMessage);
+
+Begin
+  If BrowseAndDocItOptions <> Nil Then
+    Begin
+      actCustomDrawing.Checked := doCustomDrawing In BrowseAndDocItOptions.Options;
+      actShowCommentHints.Checked := doShowCommentHints In BrowseAndDocItOptions.Options;
+      actShowConflicts.Checked := doShowConflicts In BrowseAndDocItOptions.Options;
+      actLocal.Checked := doShowLocals In BrowseAndDocItOptions.Options;
+      actPrivate.Checked := doShowPrivates In BrowseAndDocItOptions.Options;
+      actProtected.Checked := doShowProtecteds In BrowseAndDocItOptions.Options;
+      actPublic.Checked := doShowPublics In BrowseAndDocItOptions.Options;
+      actPublished.Checked := doShowPublisheds In BrowseAndDocItOptions.Options;
+    End;
+End;
 
 end.

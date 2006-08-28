@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       27 Jul 2006
+  @Date       13 Aug 2006
   @Author     David Hoyle
 
 **)
@@ -20,7 +20,7 @@ Uses
 
 Type
   (** This is an enumerate to describe the type of constant expression. **)
-  TExprType = (etUnknown, etConstExpr, etString, etNumeric);
+  TExprType = (etUnknown, etConstExpr, etString, etInteger, etFloat);
   (** This is a set of TExprType enumerates. **)
   TExprTypes = Set of TExprType;
 
@@ -174,6 +174,9 @@ Type
       iStartDimension: Integer; AT : TArrayType);
     Function UndefinedToken : Boolean;
     Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
+    Procedure CheckReturnValue(Method : TMethodDecl);
+    Procedure CheckAlias(Method : TMethodDecl);
+    Function CheckNumberType(ExprType : TExprTypes) : Boolean;
   Protected
     Function GetModuleName : String; Override;
   Public
@@ -274,9 +277,9 @@ Const
     'private', 'protected', 'public', 'published');
   (** A sorted list of method directives. Used in identifying method
   directives. **)
-  strMethodDirectives : Array[1..21] Of String = (
+  strMethodDirectives : Array[1..22] Of String = (
     'abstract', 'assembler', 'cdecl', 'dispid', 'dynamic', 'export',
-    'external', 'far', 'forward',  'local', 'message', 'near', 'overload',
+    'external', 'far', 'forward',  'local', 'message', 'name', 'near', 'overload',
     'override', 'pascal', 'register', 'reintroduce', 'safecall', 'stdcall',
     'varargs', 'virtual'
   );
@@ -303,12 +306,12 @@ Const
   (** This is a list of reserved, directives word and a semi colon which are
       token that can be sort as then next place to start parsing from when an
       error is  encountered. **)
-  strSeekableOnErrorTokens : Array[1..30] Of String = (';', 'const', 'contains',
+  strSeekableOnErrorTokens : Array[1..31] Of String = (';', 'const', 'contains',
     'do', 'else', 'end', 'except', 'exports', 'finalization', 'finally',
     'function', 'implementation',
     'implements', 'initialization', 'interface', 'label', 'library', 'object',
     'package', 'procedure', 'program', 'record', 'requires', 'resourcestring',
-    'then', 'type', 'unit', 'until', 'uses', 'var'
+    'static', 'then', 'type', 'unit', 'until', 'uses', 'var'
   );
 //    'absolute', 'abstract', 'and', 'array', 'as', 'asm', 'assembler',
 //    'automated', 'begin', 'case', 'class', 'constructor',
@@ -1548,6 +1551,7 @@ Procedure TPascalDocModule.ExportsItem;
 
 Var
   E : TGenericContainer;
+  ExprType : TExprTypes;
 
 Begin
   If (Token.TokenType In [ttIdentifier]) Then
@@ -1560,21 +1564,15 @@ Begin
       If Token.UToken = 'INDEX' Then
         Begin
           AddToExpression(E);
-          If Token.TokenType = ttNumber Then
-            AddToExpression(E)
-          Else
-            ErrorAndSeekToken(strNumberExpected, 'ExportsItem', Token.Token,
-              strSeekableOnErrorTokens, stActual);
+          ExprType := [etInteger, etConstExpr];
+          ConstExpr(E, ExprType);
         End;
       // Check NAME
       If Token.UToken = 'NAME' Then
         Begin
           AddToExpression(E);
-          If Token.TokenType = ttStringLiteral Then
-            AddToExpression(E)
-          Else
-            ErrorAndSeekToken(strStringExpected, 'ExportsItem', Token.Token,
-              strSeekableOnErrorTokens, stActual);
+          ExprType := [etString, etConstExpr];
+          ConstExpr(E, ExprType);
         End;
     End Else
       ErrorAndSeekToken(strIdentExpected, 'ExportsItem', Token.Token,
@@ -2562,7 +2560,7 @@ begin
         Begin
           Result.Add('[');
           NextNonCommentToken;
-          ExprType := [etNumeric, etConstExpr];
+          ExprType := [etInteger, etConstExpr];
           ConstExpr(Result, ExprType);
           If Token.Token = ']' Then
             Begin
@@ -2818,13 +2816,10 @@ Begin
               Begin
                 NextNonCommentToken;
                 Repeat
-                  NextNonCommentToken;
-                  If (Token.UToken = 'END') Or (Token.Token = ')') Then
-                    Exit;
+                  If IsKeyWord(Token.Token, [')', 'else', 'end']) Then
+                    Break;
                   RecVariant(Rec);
-                Until Token.Token <> ';';
-                If Token.Token = ';' Then
-                  NextNonCommentToken;
+                Until Not IsToken(';', Nil);
               End Else
                 ErrorAndSeekToken(strReservedWordExpected, 'VariantSection',
                   'OF', strSeekableOnErrorTokens, stActual);
@@ -2957,7 +2952,7 @@ Begin
   If Token.UToken = 'FILE' Then
     Begin
       NextNonCommentToken;
-      If Token.UToken <> 'OF' Then
+      If Token.UToken = 'OF' Then
         Begin
           Result := TFileType.Create;
           SymbolTable.Add(Result);
@@ -3450,10 +3445,13 @@ Begin
       If (etUnknown In ExprType) Then
         Begin
           Exclude(ExprType, etUnknown);
-          Include(ExprType, etNumeric);
+          If Pos('.', Token.Token) > 0 Then
+            Include(ExprType, etFloat)
+          Else
+            Include(ExprType, etInteger);
           AddToExpression(C);
         End
-      Else If Not (etNumeric In ExprType) Then
+      Else If Not CheckNumberType(ExprType) Then
         ErrorAndSeekToken(strExprConflict, 'Factor', Token.Token,
           strSeekableOnErrorTokens, stActual)
       Else
@@ -3500,6 +3498,31 @@ Begin
       SetupSubExprType;
       Designator(C, SubExprType);
     End;
+End;
+
+(**
+
+  This method checks the type of number in the expression to make sure Integers
+  and Floating point number aren't mixed.
+
+  @precon  None.
+  @postcon Checks the type of number in the expression to make sure Integers
+           and Floating point number aren't mixed.
+
+  @param   ExprType as a TExprTypes
+  @return  a Boolean
+
+  @note    This may have problems with expression that allow integers and
+           floats to be added, etc.
+
+**)
+Function TPascalDocModule.CheckNumberType(ExprType : TExprTypes) : Boolean;
+
+Begin
+  If Pos('.', Token.Token) > 0 Then
+    Result := etFloat In ExprType
+  Else
+    Result := etInteger In ExprType;
 End;
 
 (**
@@ -3849,10 +3872,14 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  If Token.Token = 'GOTO' Then
+  If Token.UToken = 'GOTO' Then
     Begin
       NextNonCommentToken;
-      NextNonCommentToken;
+      If Token.TokenType In [ttIdentifier, ttNumber] Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strLabelExpected, 'SimpleStatement', Token.Token,
+          strSeekableOnErrorTokens, stActual);
     End
   Else
     Begin
@@ -4035,6 +4062,8 @@ Begin
         Begin
           NextNonCommentToken;
           Repeat
+            If IsKeyWord(Token.Token, ['else', 'end']) Then
+              Break;
             CaseSelector(M)
           Until Not IsToken(';', Nil);
           If Token.UToken = 'ELSE' Then
@@ -4544,12 +4573,16 @@ Begin
           NextNonCommentToken;
           Directive(Result);
           PortabilityDirective;
-          Block(Scope, Result);
-          If Token.Token = ';' Then
-            NextNonCommentToken
-          Else
-            ErrorAndSeekToken(strLiteralExpected, 'ProcedureDecl', ';',
-              strSeekableOnErrorTokens, stActual);
+          If Not (Result.HasDirective('EXTERNAL') Or
+            Result.HasDirective('FORWARD'))Then
+            Begin
+              Block(Scope, Result);
+              If Token.Token = ';' Then
+                NextNonCommentToken
+              Else
+                ErrorAndSeekToken(strLiteralExpected, 'ProcedureDecl', ';',
+                  strSeekableOnErrorTokens, stActual);
+            End;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'ProcedureDecl', ';',
             strSeekableOnErrorTokens, stActual);
@@ -4581,12 +4614,16 @@ Begin
           NextNonCommentToken;
           Directive(Result);
           PortabilityDirective;
-          Block(Scope, Result);
-          If Token.Token = ';' Then
-            NextNonCommentToken
-          Else
-            ErrorAndSeekToken(strLiteralExpected, 'FunctionDecl', ';',
-              strSeekableOnErrorTokens, stActual);
+          If Not (Result.HasDirective('EXTERNAL') Or
+            Result.HasDirective('FORWARD'))Then
+            Begin
+              Block(Scope, Result);
+              If Token.Token = ';' Then
+                NextNonCommentToken
+              Else
+                ErrorAndSeekToken(strLiteralExpected, 'FunctionDecl', ';',
+                  strSeekableOnErrorTokens, stActual);
+            End;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'FunctionDecl', ';',
             strSeekableOnErrorTokens, stActual);
@@ -4617,12 +4654,16 @@ Begin
         Begin
           NextNonCommentToken;
           Directive(Result);
-          Block(Scope, Result);
-          If Token.Token = ';' Then
-            NextNonCommentToken
-          Else
-            ErrorAndSeekToken(strLiteralExpected, 'ConstructorDecl', ';',
-              strSeekableOnErrorTokens, stActual);
+          If Not (Result.HasDirective('EXTERNAL') Or
+            Result.HasDirective('FORWARD'))Then
+            Begin
+              Block(Scope, Result);
+              If Token.Token = ';' Then
+                NextNonCommentToken
+              Else
+                ErrorAndSeekToken(strLiteralExpected, 'ConstructorDecl', ';',
+                  strSeekableOnErrorTokens, stActual);
+            End;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'ConstructorDecl', ';',
             strSeekableOnErrorTokens, stActual);
@@ -4653,12 +4694,16 @@ Begin
         Begin
           NextNonCommentToken;
           Directive(Result);
-          Block(Scope, Result);
-          If Token.Token = ';' Then
-            NextNonCommentToken
-          Else
-            ErrorAndSeekToken(strLiteralExpected, 'ConstructorDecl', ';',
-              strSeekableOnErrorTokens, stActual);
+          If Not (Result.HasDirective('EXTERNAL') Or
+            Result.HasDirective('FORWARD'))Then
+            Begin
+              Block(Scope, Result);
+              If Token.Token = ';' Then
+                NextNonCommentToken
+              Else
+                ErrorAndSeekToken(strLiteralExpected, 'ConstructorDecl', ';',
+                  strSeekableOnErrorTokens, stActual);
+            End;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'ConstructorDecl', ';',
             strSeekableOnErrorTokens, stActual);
@@ -4722,30 +4767,88 @@ Begin
             End;
           End;
       FormalParameter(Result);
-      // Check for an alias
-      If Token.Token = '=' Then
+      CheckAlias(Result);
+      CheckReturnValue(Result);
+    End;
+End;
+
+(**
+
+  This method checks the alias (if one exists) of the procedure / function.
+
+  @precon  Method must be a valid TMethodDecl instance.
+  @postcon Checks the alias (if one exists) of the procedure / function.
+
+  @param   Method as a TMethodDecl
+
+**)
+procedure TPascalDocModule.CheckAlias(Method : TMethodDecl);
+
+Begin
+  If Token.Token = '=' Then
+    Begin
+      NextNonCommentToken;
+      If Token.TokenType In [ttIdentifier] Then
         Begin
-          NextNonCommentToken;
-          Result.Alias := Token.Token;
+          Method.Alias := Token.Token;
           NextNonCommentToken;
           If Token.Token = '.' Then
             Begin
-              Result.Alias := Result.Alias + Token.Token;
+              Method.Alias := Method.Alias + Token.Token;
               NextNonCommentToken;
-              Result.Alias := Result.Alias + Token.Token;
-              NextNonCommentToken;
+              If Token.TokenType In [ttIdentifier] Then
+                Begin
+                  Method.Alias := Method.Alias + Token.Token;
+                  NextNonCommentToken;
+                End Else
+                  ErrorAndSeekToken(strIdentExpected, 'CheckAlias', Token.Token,
+                    strSeekableOnErrorTokens, stActual);
             End;
-        End;
-      If Token.Token = ':' Then
-        Begin
-          NextNonCommentToken;
-          Result.ReturnType := Token.Token;
-          NextNonCommentToken;
         End Else
-          If Result.Alias = '' Then
-            Errors.Add(Format(strFunctionWarning, [Result.QualifiedName]),
-              'FunctionHeading', Token.Line, Token.Column, etWarning);
+          ErrorAndSeekToken(strIdentExpected, 'CheckAlias', Token.Token,
+            strSeekableOnErrorTokens, stActual);
     End;
+End;
+
+(**
+
+  This method checks the returns value of the function.
+
+  @precon  Method must be a valid TMethodDecl instance.
+  @postcon Checks the returns value of the function.
+
+  @param   Method as a TMethodDecl
+
+**)
+Procedure TPascalDocModule.CheckReturnValue(Method : TMethodDecl);
+
+Begin
+  If Token.Token = ':' Then
+    Begin
+      NextNonCommentToken;
+      If Token.TokenType In [ttIdentifier] Then
+        Begin
+          Method.ReturnType := Token.Token;
+          NextNonCommentToken;
+          If Token.Token = '.' Then
+            Begin
+              Method.ReturnType := Method.ReturnType + '.';
+              NextNonCommentToken;
+              If Token.TokenType In [ttIdentifier] Then
+                Begin
+                  Method.ReturnType := Method.ReturnType + Token.Token;
+                  NextNonCommentToken;
+                End Else
+                  ErrorAndSeekToken(strIdentExpected, 'CheckReturnValue',
+                    Token.Token, strSeekableOnErrorTokens, stActual);
+            End;
+        End Else
+          ErrorAndSeekToken(strIdentExpected, 'CheckReturnValue',
+            Token.Token, strSeekableOnErrorTokens, stActual);
+    End Else
+      If Method.Alias = '' Then
+        Errors.Add(Format(strFunctionWarning, [Method.QualifiedName]),
+          'CheckReturnValue', Token.Line, Token.Column, etWarning);
 End;
 
 (**
@@ -4805,20 +4908,7 @@ Begin
             End;
           End;
       FormalParameter(Result);
-      // Check for an alias
-      If Token.Token = '=' Then
-        Begin
-          NextNonCommentToken;
-          Result.Alias := Token.Token;
-          NextNonCommentToken;
-          If Token.Token = '.' Then
-            Begin
-              Result.Alias := Result.Alias + Token.Token;
-              NextNonCommentToken;
-              Result.Alias := Result.Alias + Token.Token;
-              NextNonCommentToken;
-            End;
-        End;
+      CheckAlias(Result);
     End;
 End;
 
@@ -4979,8 +5069,8 @@ End;
                         DYNAMIC     ';'
                         VIRTUAL     ';'
                         EXPORT      ';'
-                        EXTERNAL    ConstExpr '';'
-                        DISPID      ConstExpr '';'
+                        EXTERNAL    ConstExpr [NAME ConstExpr ';' ] ';'
+                        DISPID      ConstExpr ';'
                         FAR         ';'
                         FORWARD     ';'
                         MESSAGE     ConstExpr ';'
@@ -5013,7 +5103,7 @@ Begin
         If Token.UToken = 'MESSAGE' Then
           Begin
             NextNonCommentToken;
-            ExprType := [etConstExpr, etNumeric];
+            ExprType := [etConstExpr, etInteger];
             ConstExpr(C, ExprType);
             M.AddDirectives('Meesage ' + C.AsString(True));
           End
@@ -5023,11 +5113,18 @@ Begin
             ExprType := [etConstExpr, etString];
             ConstExpr(C, ExprType);
             M.AddDirectives('External ' + C.AsString(True));
+            If Token.UToken = 'NAME' Then
+              Begin
+                NextNonCommentToken;
+                ExprType := [etConstExpr, etString];
+                ConstExpr(C, ExprType);
+                M.AddDirectives('Name ' + C.AsString(True));
+              End;
           End
         Else If Token.UToken = 'DISPID' Then
           Begin
             NextNonCommentToken;
-            ExprType := [etConstExpr, etNumeric];
+            ExprType := [etConstExpr, etInteger];
             ConstExpr(C, ExprType);
             M.AddDirectives('DispID ' + C.AsString(True));
           End Else
@@ -5556,11 +5653,13 @@ end;
 Function TPascalDocModule.ClassFieldList(Cls: TObjectDecl; Scope: TScope): Boolean;
 
 Begin
-  ClassVisibility(Scope);
   Result := ObjFieldList(Cls, Scope);
   If Result Then
     If Token.Token = ';' Then
-      NextNonCommentToken;
+      NextNonCommentToken
+    Else
+      ErrorAndSeekToken(strLiteralExpected, 'ClassFieldList', ';',
+        strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -5582,7 +5681,6 @@ End;
 Function TPascalDocModule.ClassMethodList(Cls: TObjectDecl; Scope: TScope): Boolean;
 
 Begin
-  ClassVisibility(Scope);
   Result := MethodList(Cls, Scope);
 End;
 
@@ -5606,7 +5704,6 @@ Function TPascalDocModule.ClassPropertyList(Cls: TClassDecl;
   var Scope: TScope): Boolean;
 
 Begin
-  ClassVisibility(Scope);
   Result :=  PropertyList(Cls, Scope);
   If Result Then
     Begin
@@ -5776,7 +5873,7 @@ begin
   If Token.UToken = 'INDEX' Then
     Begin
       NextNonCommentToken;
-      ExprType := [etNumeric, etConstExpr];
+      ExprType := [etInteger, etConstExpr];
       C := TGenericContainer.Create;
       Try
         ConstExpr(C, ExprType);
@@ -5815,7 +5912,7 @@ begin
   If Token.UToken = 'STORED' Then
     Begin
       NextNonCommentToken;
-      ExprType := [etNumeric, etConstExpr];
+      ExprType := [etInteger, etConstExpr];
       C := TGenericContainer.Create;
       Try
         ConstExpr(C, ExprType);
@@ -5859,7 +5956,7 @@ begin
   If Token.UToken = 'DISPID' Then
     Begin
       NextNonCommentToken;
-      ExprType := [etNumeric, etConstExpr];
+      ExprType := [etInteger, etConstExpr];
       C := TGenericContainer.Create;
       Try
         ConstExpr(C, ExprType);
@@ -6129,9 +6226,16 @@ End;
 Function TPascalDocModule.ConstExpr(C : TGenericContainer;
   var ExprType : TExprTypes) : Boolean;
 
+Var
+  iStartIndex : Integer;
+
 Begin
   Result := True;
+  iStartIndex := Token.BufferPos;
   Expression(C, ExprType); // ConstExpr is a subset of Expression
+  If iStartIndex = Token.BufferPos Then
+    ErrorAndSeekToken(strConstExprExpected, 'ConstExpr', Token.Token,
+      strSeekableOnErrorTokens, stActual);
 End;
 
 (**

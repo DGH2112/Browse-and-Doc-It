@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    27 Jul 2006
+  @Date    28 Aug 2006
   @Version 1.0
 
   @todo    Configurable Font Name and Size for the Browser tree.
@@ -50,6 +50,7 @@ Type
     procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
       iCommentCol : Integer; SelectType : TSelectType);
     Procedure Focus(Sender : TObject);
+    Procedure OptionsChange(Sender : TObject);
     function GetMethodDescription(Method : TMethodDecl) : String;
     Function WriteMethodComment(Method : TMethodDecl; Writer : IOTAEditWriter;
       iBufferPos : TStreamPosition; iCol : Integer) : Integer;
@@ -233,7 +234,8 @@ Var
 
 Begin
   Inherited Create;
-  TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus);
+  TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus,
+    OptionsChange);
   mmiMainMenu := (BorlandIDEServices as INTAServices).MainMenu;
   mmiPascalDocMenu := TMenuItem.Create(mmiMainMenu);
   With mmiPascalDocMenu Do
@@ -1050,6 +1052,22 @@ Begin
     ActiveSourceEditor.Show;
 End;
 
+(**
+
+  This is an event handler to be hooked the the Module Explorer Frames
+  OnOptionsChange event handler.
+
+  @precon  None.
+  @postcon Refreshes the current module view.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBrowseAndDocItWizard.OptionsChange(Sender : TObject);
+
+Begin
+  iLastUpdateTickCount := 1;
+End;
 
 (**
 
@@ -1163,10 +1181,13 @@ begin
             strExt := UpperCase(ExtractFileExt(SourceEditor.FileName));
             If (strExt = '.PAS') Or (strExt = '.DPR') Or (strExt = '.DPK') Then
               Begin
-                Options := ActiveProject.ProjectOptions;
-                BrowseAndDocItOptions.Defines.Text :=
-                  StringReplace(Options.Values['Defines'], ';', #13#10,
-                    [rfReplaceAll]);
+                If ActiveProject <> Nil Then
+                  Begin
+                    Options := ActiveProject.ProjectOptions;
+                    BrowseAndDocItOptions.Defines.Text :=
+                      StringReplace(Options.Values['Defines'], ';', #13#10,
+                      [rfReplaceAll]);
+                  End;
                 DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
                 Reader := SourceEditor.CreateReader;
                 Try

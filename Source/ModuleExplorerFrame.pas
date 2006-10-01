@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    17 Aug 2006
+  @Date    01 Oct 2006
   @Author  David Hoyle
   @Version 1.0
 
@@ -213,7 +213,7 @@ type
 implementation
 
 Uses
-  Registry, Types;
+  Registry, Types, Math;
 
 Const
   (** Icon index for a plane folder. **)
@@ -1504,6 +1504,9 @@ End;
 **)
 Procedure TframeModuleExplorer.DisplayErrors(M : TBaseLanguageModule);
 
+Const
+  iMaxErrors : Integer = 25;
+
 Var
   i : Integer;
   N : TTreeNode;
@@ -1514,7 +1517,7 @@ Begin
   If M.Errors.Count > 0 Then
     FError := AddNode(FModule, strErrorsAndWarnings, 0, 0, iErrorFolder, Nil,
       stError);
-  For i := 0 To M.Errors.Count - 1 Do
+  For i := 0 To Min(M.Errors.Count - 1, iMaxErrors) Do
     Begin
       N := AddNode(FError, M.Errors[i].Msg + ' [' +
         M.Errors[i].Method + ']', M.Errors[i].Line,

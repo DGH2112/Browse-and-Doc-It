@@ -20,9 +20,9 @@ object frameModuleExplorer: TframeModuleExplorer
   end
   object tvExplorer: TTreeView
     Left = 0
-    Top = 32
+    Top = 30
     Width = 243
-    Height = 272
+    Height = 274
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -42,15 +42,17 @@ object frameModuleExplorer: TframeModuleExplorer
     OnCustomDrawItem = tvExplorerCustomDrawItem
     OnKeyDown = tvExplorerKeyDown
     OnMouseMove = tvExplorerMouseMove
+    ExplicitTop = 29
+    ExplicitHeight = 275
   end
   object ToolBar1: TToolBar
     Left = 0
     Top = 0
     Width = 243
+    Height = 30
     AutoSize = True
     BorderWidth = 2
     Caption = 'ToolBar1'
-    Flat = True
     Images = ilScopeImages
     TabOrder = 2
     object ToolButton6: TToolButton

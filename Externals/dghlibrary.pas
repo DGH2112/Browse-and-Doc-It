@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    11 Aug 2006
+  @Date    01 Oct 2006
 
 **)
 Unit DGHLibrary;
@@ -4833,6 +4833,8 @@ Var
 
 begin
   HInfo := HAlignment.Compare(dblEasting, dblNorthing, dblBearing);
+  Result.dblEasting := dblEasting;
+  Result.dblNorthing := dblNorthing;
   Result.dblIEasting := HInfo.dblEasting;
   Result.dblINorthing := HInfo.dblNorthing;
   Result.dblChainage := HInfo.dblChainage;

@@ -1,10 +1,10 @@
 object frmDockableModuleExplorer: TfrmDockableModuleExplorer
   Left = 456
   Top = 303
+  Width = 265
+  Height = 392
   Caption = 'Module Explorer'
-  ClientHeight = 359
-  ClientWidth = 257
-  Color = clSkyBlue
+  Color = clBtnFace
   Constraints.MinHeight = 250
   Constraints.MinWidth = 100
   Font.Charset = DEFAULT_CHARSET

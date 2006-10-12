@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    28 Aug 2006
+  @Date    12 Oct 2006
   @Version 1.0
 
   @todo    Configurable Font Name and Size for the Browser tree.
@@ -1000,6 +1000,9 @@ begin
   If SourceEditor <> Nil Then
     If SourceEditor.EditViewCount > 0 Then
       Begin
+        SourceEditor.Show;
+        If SourceEditor.GetSubViewCount > 0 Then
+          SourceEditor.SwitchToView(0);
         C.Col := iIdentCol;
         C.Line := iIdentLine;
         SourceEditor.GetEditView(0).CursorPos := C;

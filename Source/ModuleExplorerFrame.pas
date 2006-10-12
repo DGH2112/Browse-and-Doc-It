@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    01 Oct 2006
+  @Date    12 Oct 2006
   @Author  David Hoyle
   @Version 1.0
 
@@ -126,7 +126,7 @@ type
       Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
-    procedure tvExplorerClick(Sender: TObject);
+    procedure tvExplorerDblClick(Sender: TObject);
     procedure tvExplorerKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure actToolbarActionExecute(Sender: TObject);
@@ -2181,7 +2181,7 @@ End;
   @param   Sender as a TObject
 
 **)
-procedure TframeModuleExplorer.tvExplorerClick(Sender: TObject);
+procedure TframeModuleExplorer.tvExplorerDblClick(Sender: TObject);
 
 Var
   N : TTreeNodeInfo;
@@ -2217,7 +2217,7 @@ procedure TframeModuleExplorer.tvExplorerKeyDown(Sender: TObject;
 begin
   If Key = 13 Then
     Begin
-      tvExplorerClick(Sender);
+      tvExplorerDblClick(Sender);
       If Assigned(OnFocus) Then
         FFocus(Sender);
     End;

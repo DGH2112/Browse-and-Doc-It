@@ -38,12 +38,10 @@ object frameModuleExplorer: TframeModuleExplorer
     ShowHint = True
     TabOrder = 1
     ToolTips = False
-    OnClick = tvExplorerClick
     OnCustomDrawItem = tvExplorerCustomDrawItem
+    OnDblClick = tvExplorerDblClick
     OnKeyDown = tvExplorerKeyDown
     OnMouseMove = tvExplorerMouseMove
-    ExplicitTop = 29
-    ExplicitHeight = 275
   end
   object ToolBar1: TToolBar
     Left = 0

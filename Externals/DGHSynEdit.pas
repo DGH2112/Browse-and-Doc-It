@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    08 Feb 2006
+  @Date    14 Oct 2006
 
 **)
 
@@ -39,6 +39,8 @@ Type
     Procedure Display;
     Procedure UpperCaseWord;
     procedure LowerCaseWord;
+    Procedure LoadFromRegistry(strRootKey : String);
+    Procedure SaveToRegistry(strRootKey : String);
     { Properties }
     (**
       This property returns an appropriate captions for the editor tab within
@@ -121,7 +123,7 @@ Implementation
 { TDGHSynEdit }
 
 Uses
-  Menus, Windows;
+  Menus, Windows, Registry;
 
 (**
 
@@ -292,6 +294,43 @@ end;
 
 (**
 
+  This method loads the editors settings from the given registry key.
+
+  @precon  None.
+  @postcon Loads the editors settings from the given registry key.
+
+  @param   strRootKey as a String
+
+**)
+procedure TDGHSynEdit.LoadFromRegistry(strRootKey: String);
+begin
+  With TRegIniFile.Create(strRootKey) Do
+    Try
+      Color := ReadInteger(strRootKey + 'EditorSettings', 'Color', Color);
+      ActiveLineColor := ReadInteger(strRootKey + 'EditorSettings', 'ActiveLineColor',
+        ActiveLineColor);
+      Font.Name := ReadString(strRootKey + 'EditorSettings', 'FontName', Font.Name);
+      Font.Size := ReadInteger(strRootKey + 'EditorSettings', 'FontSize', Font.Size);
+      Gutter.Font.Assign(Font);
+      Gutter.ShowLineNumbers := ReadBool(strRootKey + 'EditorSettings', 'ShowLineNumbers',
+        Gutter.ShowLineNumbers);
+      Options := TSynEditorOptions(ReadInteger(strRootKey + 'EditorSettings', 'Options',
+        Integer(Options)));
+      RightEdge := ReadInteger(strRootKey + 'EditorSettings', 'RightEdge', RightEdge);
+      RightEdgeColor := ReadInteger(strRootKey + 'EditorSettings', 'RightEdgeColor',
+        RightEdgeColor);
+      SelectedColor.Foreground := ReadInteger(strRootKey + 'EditorSettings',
+        'SelectedForeground', SelectedColor.Foreground);
+      SelectedColor.Background := ReadInteger(strRootKey + 'EditorSettings',
+        'SelectedBackground', SelectedColor.Background);
+      TabWidth := ReadInteger(strRootKey + 'EditorSettings', 'Tab Width', TabWidth);
+    Finally
+      Free;
+    End;
+end;
+
+(**
+
   This method saves the current editor edits to a disk file and updates the
   filename, date and time and tab caption.
 
@@ -310,6 +349,36 @@ begin
   FileAge(strFileName, FFileDateTime);
   Modified := False;
   TabCaption := ExtractFileName(strFileName);
+end;
+
+(**
+
+  This method saves the editors settings to the given registry key.
+
+  @precon  None.
+  @postcon Saves the editors settings to the given registry key.
+
+  @param   strRootKey as a String
+
+**)
+procedure TDGHSynEdit.SaveToRegistry(strRootKey: String);
+begin
+  With TRegIniFile.Create(strRootKey) Do
+    Try
+      WriteInteger(strRootKey + 'EditorSettings', 'Color', Color);
+      WriteInteger(strRootKey + 'EditorSettings', 'ActiveLineColor', ActiveLineColor);
+      WriteString(strRootKey + 'EditorSettings', 'FontName', Font.Name);
+      WriteInteger(strRootKey + 'EditorSettings', 'FontSize', Font.Size);
+      WriteBool(strRootKey + 'EditorSettings', 'ShowLineNumbers', Gutter.ShowLineNumbers);
+      WriteInteger(strRootKey + 'EditorSettings', 'Options', Integer(Options));
+      WriteInteger(strRootKey + 'EditorSettings', 'RightEdge', RightEdge);
+      WriteInteger(strRootKey + 'EditorSettings', 'RightEdgeColor', RightEdgeColor);
+      WriteInteger(strRootKey + 'EditorSettings', 'SelectedForeground', SelectedColor.Foreground);
+      WriteInteger(strRootKey + 'EditorSettings', 'SelectedBackground', SelectedColor.Background);
+      WriteInteger(strRootKey + 'EditorSettings', 'Tab Width', TabWidth);
+    Finally
+      Free;
+    End;
 end;
 
 (**

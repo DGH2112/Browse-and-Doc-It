@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Oct 2006
+  @Date    18 Feb 2007
 
 **)
 Unit DGHLibrary;
@@ -492,6 +492,8 @@ Type
   Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer): Integer;
   Function Pow(X, Y : Real) : Real;
   Function ReduceBearing(dblBearing : Double) : Double;
+  Function GetBuildNumber(var iMajor, iMinor, iBugfix : Integer) : String;
+  Function GetConsoleTitle(strTitle: String) : String;
 
 { -------------------------------------------------------------------------
 
@@ -4899,6 +4901,85 @@ Function BearingToString(recBearing : TBearing) : String;
 Begin
   With recBearing Do
     Result := Format('%d°%2.2d''%2.2d.%2.2d"', [iDegrees, iMinutes, iSeconds, iHundreds]);
+End;
+
+(**
+
+  This routine extract the build number from the EXE resources for
+  display in the app title.
+
+  @precon  None.
+  @postcon Extract the build number from the EXE resources for display in the
+           app title.
+
+  @param   iMajor  as an Integer as a reference
+  @param   iMinor  as an Integer as a reference
+  @param   iBugfix as an Integer as a reference
+  @return  a String
+
+**)
+Function GetBuildNumber(var iMajor, iMinor, iBugfix : Integer) : String;
+
+Const
+  strBuild = '%d.%d.%d.%d';
+
+Var
+  VerInfoSize: DWORD;
+  VerInfo: Pointer;
+  VerValueSize: DWORD;
+  VerValue: PVSFixedFileInfo;
+  Dummy: DWORD;
+
+Begin
+  VerInfoSize := GetFileVersionInfoSize(PChar(ParamStr(0)), Dummy);
+  If VerInfoSize <> 0 Then
+    Begin
+      GetMem(VerInfo, VerInfoSize);
+      GetFileVersionInfo(PChar(ParamStr(0)), 0, VerInfoSize, VerInfo);
+      VerQueryValue(VerInfo, '\', Pointer(VerValue), VerValueSize);
+      with VerValue^ do
+      begin
+        iMajor := dwFileVersionMS shr 16;
+        iMinor := dwFileVersionMS and $FFFF;
+        iBugfix := dwFileVersionLS shr 16;
+        Result := Format(strBuild, [iMajor, iMinor, iBugfix, dwFileVersionLS and $FFFF]);
+      end;
+      FreeMem(VerInfo, VerInfoSize);
+    End Else
+      Raise Exception.Create('This executable does not contain any version information.');
+End;
+
+(**
+
+  This method returns a string for the title of a console application containing
+  the version number and build number.
+
+  @precon  Expects a string to contains %d.%d%s for the version number followed
+           by %s for the build number.
+  @postcon Returns a string for the title of a console application containing
+           the version number and build number.
+
+  @param   strTitle as a String
+  @return  a String
+
+**)
+Function GetConsoleTitle(strTitle: String) : String;
+
+Const
+  strBugFix = ' abcdefghijklmnopqrstuvwxyz';
+
+Var
+  iMajor, iMinor, iBugfix : Integer;
+  strBuildNumber  : String;
+  dtDate : TDateTime;
+
+Begin
+  strBuildNumber := GetBuildNumber(iMajor, iMinor, iBugFix);
+  Result := Format(strTitle, [iMajor, iMinor, strBugFix[iBugFix + 1],
+    strBuildNumber]);
+  FileAge(ParamStr(0), dtDate);
+  Result := Result + #10#13 +
+    Format('Written by David Hoyle (c) %s', [FormatDateTime('mmm/yyyy', dtDate)]);
 End;
 
 End.

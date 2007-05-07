@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    14 Oct 2006
+  @Date    07 May 2007
 
 **)
 
@@ -143,6 +143,7 @@ begin
   Inherited Create(AOwner);
   TabWidth := 2;
   WantTabs := True;
+  MaxScrollWidth := 8192;
   (*
     Add Wordstar shortcuts.
   *)

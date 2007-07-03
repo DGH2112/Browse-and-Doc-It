@@ -4977,7 +4977,11 @@ Begin
   strBuildNumber := GetBuildNumber(iMajor, iMinor, iBugFix);
   Result := Format(strTitle, [iMajor, iMinor, strBugFix[iBugFix + 1],
     strBuildNumber]);
+  {$IFDEF VER180}
   FileAge(ParamStr(0), dtDate);
+  {$ELSE}
+  dtDate := FileDateToDateTime(FileAge(ParamStr(0)));
+  {$ENDIF}
   Result := Result + #10#13 +
     Format('Written by David Hoyle (c) %s', [FormatDateTime('mmm/yyyy', dtDate)]);
 End;

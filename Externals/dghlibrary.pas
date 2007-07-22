@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    18 Feb 2007
+  @Date    22 Jul 2007
 
 **)
 Unit DGHLibrary;
@@ -13,7 +13,7 @@ Unit DGHLibrary;
 Interface
 
 Uses
-  SysUtils, Classes, Windows;
+  SysUtils, Classes, Windows, Graphics;
 
 Type
   (** A record to describe the degrees, minutes and seconds of a bearing. **)
@@ -494,6 +494,12 @@ Type
   Function ReduceBearing(dblBearing : Double) : Double;
   Function GetBuildNumber(var iMajor, iMinor, iBugfix : Integer) : String;
   Function GetConsoleTitle(strTitle: String) : String;
+  Function ForeGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
+  Function BackGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
+  Procedure OutputToConsole(hndConsole : THandle; Const strText : String = '';
+    iTextColour : TColor = clNone; iBackColour : TColor = clNone);
+  Procedure OutputToConsoleLn(hndConsole : THandle; Const strText : String = '';
+    iTextColour : TColor = clNone; iBackColour : TColor = clNone);
 
 { -------------------------------------------------------------------------
 
@@ -4982,8 +4988,200 @@ Begin
   {$ELSE}
   dtDate := FileDateToDateTime(FileAge(ParamStr(0)));
   {$ENDIF}
-  Result := Result + #10#13 +
+  Result := Result + #13#10 +
     Format('Written by David Hoyle (c) %s', [FormatDateTime('mmm/yyyy', dtDate)]);
+End;
+
+(**
+
+  This function returns the background colour attribute for the console
+  associated with the given cl#### colour.
+
+  Colour Matrix:
+    Red(Maroon)
+                Yellow(Olive)
+    Lime(Green)               White(Gray)
+                Aqua(Teal)
+    Blue(Navy)
+
+  @precon  CSBI must be a valid Console Screen Buffer Info structure.
+  @postcon Returns the background colour attribute for the console
+           associated with the given cl#### colour.
+
+  @param   iColour as a TColor
+  @param   CSBI    as a CONSOLE_SCREEN_BUFFER_INFO
+  @return  an Integer
+
+**)
+Function ForeGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
+
+Begin
+  Case iColour Of
+    clBlack  : Result := 0;
+    clMaroon  :Result := FOREGROUND_RED;
+    clGreen   :Result := FOREGROUND_GREEN;
+    clOlive   :Result := FOREGROUND_RED Or FOREGROUND_GREEN;
+    clNavy    :Result := FOREGROUND_BLUE;
+    //clPurple  :;
+    clTeal    :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN;
+    clGray    :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN Or
+                 FOREGROUND_RED;
+    //clSilver  :;
+    clRed     :Result := FOREGROUND_RED   Or FOREGROUND_INTENSITY;
+    clLime    :Result := FOREGROUND_GREEN Or FOREGROUND_INTENSITY;
+    clYellow  :Result := FOREGROUND_RED Or FOREGROUND_GREEN Or
+                 FOREGROUND_INTENSITY;
+    clBlue    :Result := FOREGROUND_BLUE  Or FOREGROUND_INTENSITY;
+    //clFuchsia :;
+    clAqua    :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN  Or
+                 FOREGROUND_INTENSITY;
+    //clLtGray  :;
+    //clDkGray  :;
+    clWhite   :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN Or
+                 FOREGROUND_RED Or FOREGROUND_INTENSITY;
+    clNone  : Result  := CSBI.wAttributes And $0F;
+  Else
+    Raise Exception.Create('Invalid console colour.');
+  End;
+End;
+
+(**
+
+  This function returns the background colour attribute for the console
+  associated with the given cl#### colour.
+
+  @precon  CSBI must be a valid Console Screen Buffer Info structure.
+  @postcon Returns the background colour attribute for the console
+           associated with the given cl#### colour.
+
+  @param   iColour as a TColor
+  @param   CSBI    as a CONSOLE_SCREEN_BUFFER_INFO
+  @return  an Integer
+
+**)
+Function BackGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
+
+Begin
+  Case iColour Of
+    clBlack  : Result := 0;
+    clMaroon  :Result := BACKGROUND_RED;
+    clGreen   :Result := BACKGROUND_GREEN;
+    clOlive   :Result := BACKGROUND_RED Or BACKGROUND_GREEN;
+    clNavy    :Result := BACKGROUND_BLUE;
+    //clPurple  :;
+    clTeal    :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN;
+    clGray    :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN Or
+                 BACKGROUND_RED;
+    //clSilver  :;
+    clRed     :Result := BACKGROUND_RED   Or BACKGROUND_INTENSITY;
+    clLime    :Result := BACKGROUND_GREEN Or BACKGROUND_INTENSITY;
+    clYellow  :Result := BACKGROUND_RED Or BACKGROUND_GREEN Or
+                 BACKGROUND_INTENSITY;
+    clBlue    :Result := BACKGROUND_BLUE  Or BACKGROUND_INTENSITY;
+    //clFuchsia :;
+    clAqua    :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN  Or
+                 BACKGROUND_INTENSITY;
+    //clLtGray  :;
+    //clDkGray  :;
+    clWhite   :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN Or
+                 BACKGROUND_RED Or BACKGROUND_INTENSITY;
+    clNone  : Result  := CSBI.wAttributes And $F0;
+  Else
+    Raise Exception.Create('Invalid console colour.');
+  End;
+End;
+
+(**
+
+  This function outputs the given text to the console references by the given
+  handle using the text and background colours provided. If xlNone is used for
+  the colours then the consoles default colours are used. Adds a Carriage Return
+  at the end of each line.
+
+  @precon  hndConsole must be a valid console handle.
+  @postcon Outputs the given text to the console references by the given
+           handle using the text and background colours provided.
+
+  @param   hndConsole  as a THandle
+  @param   strText     as a String constant
+  @param   iTextColour as a TColor
+  @param   iBackColour as a TColor
+
+**)
+Procedure OutputToConsoleLn(hndConsole : THandle; Const strText : String = '';
+  iTextColour : TColor = clNone; iBackColour : TColor = clNone);
+
+Var
+  sl : TStringList;
+  i : Integer;
+
+Begin
+  sl := TstringList.Create;
+  Try
+    sl.Text := strText;
+    If sl.Text = '' Then
+      sl.Text := #13#10;
+    For i := 0 to sl.Count - 1 Do
+      Begin
+        OutputToConsole(hndConsole, sl[i], iTextColour, iBackColour);
+        Writeln;
+      End;
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
+  This function outputs the given text to the console references by the given
+  handle using the text and background colours provided. If xlNone is used for
+  the colours then the consoles default colours are used. DOES NOT add a
+  carraige return at the end of each line.
+
+  @precon  hndConsole must be a valid console handle.
+  @postcon Outputs the given text to the console references by the given
+           handle using the text and background colours provided.
+
+  @param   hndConsole  as a THandle
+  @param   strText     as a String constant
+  @param   iTextColour as a TColor
+  @param   iBackColour as a TColor
+
+**)
+Procedure OutputToConsole(hndConsole : THandle; Const strText : String = '';
+  iTextColour : TColor = clNone; iBackColour : TColor = clNone);
+
+Var
+  ConsoleInfo : TConsoleScreenBufferInfo;
+  wChars : DWord;
+  iChar : Integer;
+  Attrs : Array of Word;
+  NewPos : TCoord;
+
+Begin
+  {$WARN SYMBOL_PLATFORM OFF}
+  Win32Check(GetConsoleScreenBufferInfo(hndConsole, ConsoleInfo));
+  {$WARN SYMBOL_PLATFORM ON}
+  NewPos := ConsoleInfo.dwCursorPosition;
+  {$WARN SYMBOL_PLATFORM OFF}
+  Win32Check(WriteConsoleOutputCharacter(hndConsole, PChar(strText), Length(strText),
+    ConsoleInfo.dwCursorPosition, wChars));
+  {$WARN SYMBOL_PLATFORM ON}
+  SetLength(Attrs, Length(strText));
+  For iChar := 0 To Length(strText) - 1 Do
+    Attrs[iChar] := ForeGroundColour(iTextColour, ConsoleInfo) Or
+      BackGroundColour(iBackColour, ConsoleInfo);
+  {$WARN SYMBOL_PLATFORM OFF}
+  Win32Check(WriteConsoleOutputAttribute(hndConsole, Attrs,
+    Length(strText), ConsoleInfo.dwCursorPosition, wChars));
+  {$WARN SYMBOL_PLATFORM ON}
+  Inc(NewPos.X, wChars);
+  While NewPos.X > ConsoleInfo.dwMaximumWindowSize.X Do
+    Begin
+      Inc(NewPos.Y);
+      Dec(NewPos.X, ConsoleInfo.dwMaximumWindowSize.X);
+    End;
+  SetConsoleCursorPosition(hndConsole, NewPos);
 End;
 
 End.

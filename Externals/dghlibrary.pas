@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Jul 2007
+  @Date    24 Jul 2007
 
 **)
 Unit DGHLibrary;
@@ -492,7 +492,7 @@ Type
   Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer): Integer;
   Function Pow(X, Y : Real) : Real;
   Function ReduceBearing(dblBearing : Double) : Double;
-  Function GetBuildNumber(var iMajor, iMinor, iBugfix : Integer) : String;
+  Function GetBuildNumber(var iMajor, iMinor, iBugfix, iBuild : Integer) : String;
   Function GetConsoleTitle(strTitle: String) : String;
   Function ForeGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
   Function BackGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
@@ -4921,10 +4921,11 @@ End;
   @param   iMajor  as an Integer as a reference
   @param   iMinor  as an Integer as a reference
   @param   iBugfix as an Integer as a reference
+  @param   iBuild  as an Integer as a reference
   @return  a String
 
 **)
-Function GetBuildNumber(var iMajor, iMinor, iBugfix : Integer) : String;
+Function GetBuildNumber(var iMajor, iMinor, iBugfix, iBuild : Integer) : String;
 
 Const
   strBuild = '%d.%d.%d.%d';
@@ -4948,7 +4949,8 @@ Begin
         iMajor := dwFileVersionMS shr 16;
         iMinor := dwFileVersionMS and $FFFF;
         iBugfix := dwFileVersionLS shr 16;
-        Result := Format(strBuild, [iMajor, iMinor, iBugfix, dwFileVersionLS and $FFFF]);
+        iBuild := dwFileVersionLS and $FFFF;
+        Result := Format(strBuild, [iMajor, iMinor, iBugfix, iBuild]);
       end;
       FreeMem(VerInfo, VerInfoSize);
     End Else
@@ -4975,12 +4977,12 @@ Const
   strBugFix = ' abcdefghijklmnopqrstuvwxyz';
 
 Var
-  iMajor, iMinor, iBugfix : Integer;
+  iMajor, iMinor, iBugfix, iBuild : Integer;
   strBuildNumber  : String;
   dtDate : TDateTime;
 
 Begin
-  strBuildNumber := GetBuildNumber(iMajor, iMinor, iBugFix);
+  strBuildNumber := GetBuildNumber(iMajor, iMinor, iBugFix, iBuild);
   Result := Format(strTitle, [iMajor, iMinor, strBugFix[iBugFix + 1],
     strBuildNumber]);
   {$IFDEF VER180}
@@ -5161,17 +5163,13 @@ Var
 Begin
   {$WARN SYMBOL_PLATFORM OFF}
   Win32Check(GetConsoleScreenBufferInfo(hndConsole, ConsoleInfo));
-  {$WARN SYMBOL_PLATFORM ON}
   NewPos := ConsoleInfo.dwCursorPosition;
-  {$WARN SYMBOL_PLATFORM OFF}
   Win32Check(WriteConsoleOutputCharacter(hndConsole, PChar(strText), Length(strText),
     ConsoleInfo.dwCursorPosition, wChars));
-  {$WARN SYMBOL_PLATFORM ON}
   SetLength(Attrs, Length(strText));
   For iChar := 0 To Length(strText) - 1 Do
     Attrs[iChar] := ForeGroundColour(iTextColour, ConsoleInfo) Or
       BackGroundColour(iBackColour, ConsoleInfo);
-  {$WARN SYMBOL_PLATFORM OFF}
   Win32Check(WriteConsoleOutputAttribute(hndConsole, Attrs,
     Length(strText), ConsoleInfo.dwCursorPosition, wChars));
   {$WARN SYMBOL_PLATFORM ON}

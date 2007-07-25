@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    24 Jul 2007
+  @Date    25 Jul 2007
 
 **)
 Unit DGHLibrary;
@@ -5174,10 +5174,10 @@ Begin
     Length(strText), ConsoleInfo.dwCursorPosition, wChars));
   {$WARN SYMBOL_PLATFORM ON}
   Inc(NewPos.X, wChars);
-  While NewPos.X > ConsoleInfo.dwMaximumWindowSize.X Do
+  While NewPos.X > ConsoleInfo.dwSize.X Do
     Begin
       Inc(NewPos.Y);
-      Dec(NewPos.X, ConsoleInfo.dwMaximumWindowSize.X);
+      Dec(NewPos.X, ConsoleInfo.dwSize.X);
     End;
   SetConsoleCursorPosition(hndConsole, NewPos);
 End;

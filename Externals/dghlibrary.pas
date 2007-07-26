@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    25 Jul 2007
+  @Date    26 Jul 2007
 
 **)
 Unit DGHLibrary;
@@ -497,9 +497,11 @@ Type
   Function ForeGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
   Function BackGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
   Procedure OutputToConsole(hndConsole : THandle; Const strText : String = '';
-    iTextColour : TColor = clNone; iBackColour : TColor = clNone);
+    iTextColour : TColor = clNone; iBackColour : TColor = clNone;
+    boolUpdateCursor : Boolean = True);
   Procedure OutputToConsoleLn(hndConsole : THandle; Const strText : String = '';
-    iTextColour : TColor = clNone; iBackColour : TColor = clNone);
+    iTextColour : TColor = clNone; iBackColour : TColor = clNone;
+    boolUpdateCursor : Boolean = True);
 
 { -------------------------------------------------------------------------
 
@@ -4985,11 +4987,7 @@ Begin
   strBuildNumber := GetBuildNumber(iMajor, iMinor, iBugFix, iBuild);
   Result := Format(strTitle, [iMajor, iMinor, strBugFix[iBugFix + 1],
     strBuildNumber]);
-  {$IFDEF VER180}
   FileAge(ParamStr(0), dtDate);
-  {$ELSE}
-  dtDate := FileDateToDateTime(FileAge(ParamStr(0)));
-  {$ENDIF}
   Result := Result + #13#10 +
     Format('Written by David Hoyle (c) %s', [FormatDateTime('mmm/yyyy', dtDate)]);
 End;
@@ -5108,10 +5106,12 @@ End;
   @param   strText     as a String constant
   @param   iTextColour as a TColor
   @param   iBackColour as a TColor
+  @param   boolUpdateCursor as a Boolean
 
 **)
 Procedure OutputToConsoleLn(hndConsole : THandle; Const strText : String = '';
-  iTextColour : TColor = clNone; iBackColour : TColor = clNone);
+  iTextColour : TColor = clNone; iBackColour : TColor = clNone;
+    boolUpdateCursor : Boolean = True);
 
 Var
   sl : TStringList;
@@ -5125,7 +5125,8 @@ Begin
       sl.Text := #13#10;
     For i := 0 to sl.Count - 1 Do
       Begin
-        OutputToConsole(hndConsole, sl[i], iTextColour, iBackColour);
+        OutputToConsole(hndConsole, sl[i], iTextColour, iBackColour,
+          boolUpdateCursor);
         Writeln;
       End;
   Finally
@@ -5148,10 +5149,12 @@ End;
   @param   strText     as a String constant
   @param   iTextColour as a TColor
   @param   iBackColour as a TColor
+  @param   boolUpdateCursor as a Boolean
 
 **)
 Procedure OutputToConsole(hndConsole : THandle; Const strText : String = '';
-  iTextColour : TColor = clNone; iBackColour : TColor = clNone);
+  iTextColour : TColor = clNone; iBackColour : TColor = clNone;
+    boolUpdateCursor : Boolean = True);
 
 Var
   ConsoleInfo : TConsoleScreenBufferInfo;
@@ -5159,27 +5162,30 @@ Var
   iChar : Integer;
   Attrs : Array of Word;
   NewPos : TCoord;
+  iForeAttrColour, iBackAttrColour : Integer;
 
 Begin
-  {$WARN SYMBOL_PLATFORM OFF}
   Win32Check(GetConsoleScreenBufferInfo(hndConsole, ConsoleInfo));
   NewPos := ConsoleInfo.dwCursorPosition;
   Win32Check(WriteConsoleOutputCharacter(hndConsole, PChar(strText), Length(strText),
     ConsoleInfo.dwCursorPosition, wChars));
   SetLength(Attrs, Length(strText));
+  iForeAttrColour := ForeGroundColour(iTextColour, ConsoleInfo);
+  iBackAttrColour := BackGroundColour(iBackColour, ConsoleInfo);
   For iChar := 0 To Length(strText) - 1 Do
-    Attrs[iChar] := ForeGroundColour(iTextColour, ConsoleInfo) Or
-      BackGroundColour(iBackColour, ConsoleInfo);
+    Attrs[iChar] := iForeAttrColour Or iBackAttrColour;
   Win32Check(WriteConsoleOutputAttribute(hndConsole, Attrs,
     Length(strText), ConsoleInfo.dwCursorPosition, wChars));
-  {$WARN SYMBOL_PLATFORM ON}
-  Inc(NewPos.X, wChars);
-  While NewPos.X > ConsoleInfo.dwSize.X Do
+  If boolUpdateCursor Then
     Begin
-      Inc(NewPos.Y);
-      Dec(NewPos.X, ConsoleInfo.dwSize.X);
+      Inc(NewPos.X, wChars);
+      While NewPos.X > ConsoleInfo.dwSize.X Do
+        Begin
+          Inc(NewPos.Y);
+          Dec(NewPos.X, ConsoleInfo.dwSize.X);
+        End;
+      SetConsoleCursorPosition(hndConsole, NewPos);
     End;
-  SetConsoleCursorPosition(hndConsole, NewPos);
 End;
 
 End.

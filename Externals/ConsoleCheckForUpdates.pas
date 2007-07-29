@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    24 Jul 2007
+  @Date    29 Jul 2007
 
 **)
 Unit ConsoleCheckForUpdates;
@@ -149,6 +149,7 @@ Begin
       On E : Exception Do
         OutputMsg(Format(strExceptionS, [E.Message]), clRed);
     End;
+    OutputToConsoleLn(FConHnd);
   Finally
     xmlDoc := Nil;
   End;

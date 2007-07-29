@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    26 Jul 2007
+  @Date    29 Jul 2007
 
 **)
 Unit DGHLibrary;
@@ -494,8 +494,8 @@ Type
   Function ReduceBearing(dblBearing : Double) : Double;
   Function GetBuildNumber(var iMajor, iMinor, iBugfix, iBuild : Integer) : String;
   Function GetConsoleTitle(strTitle: String) : String;
-  Function ForeGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
-  Function BackGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
+  Function ForeGroundColour(iColour : TColor; CSBI : TConsoleScreenBufferInfo) : Integer;
+  Function BackGroundColour(iColour : TColor; CSBI : TConsoleScreenBufferInfo) : Integer;
   Procedure OutputToConsole(hndConsole : THandle; Const strText : String = '';
     iTextColour : TColor = clNone; iBackColour : TColor = clNone;
     boolUpdateCursor : Boolean = True);
@@ -5009,11 +5009,11 @@ End;
            associated with the given cl#### colour.
 
   @param   iColour as a TColor
-  @param   CSBI    as a CONSOLE_SCREEN_BUFFER_INFO
+  @param   CSBI    as a TConsoleScreenBufferInfo
   @return  an Integer
 
 **)
-Function ForeGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
+Function ForeGroundColour(iColour : TColor; CSBI : TConsoleScreenBufferInfo) : Integer;
 
 Begin
   Case iColour Of
@@ -5055,11 +5055,11 @@ End;
            associated with the given cl#### colour.
 
   @param   iColour as a TColor
-  @param   CSBI    as a CONSOLE_SCREEN_BUFFER_INFO
+  @param   CSBI    as a TConsoleScreenBufferInfo
   @return  an Integer
 
 **)
-Function BackGroundColour(iColour : TColor; CSBI : CONSOLE_SCREEN_BUFFER_INFO) : Integer;
+Function BackGroundColour(iColour : TColor; CSBI : TConsoleScreenBufferInfo) : Integer;
 
 Begin
   Case iColour Of

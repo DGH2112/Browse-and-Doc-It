@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    29 Jul 2007
+  @Date    30 Jul 2007
 
 **)
 Unit DGHLibrary;
@@ -5163,19 +5163,21 @@ Var
   Attrs : Array of Word;
   NewPos : TCoord;
   iForeAttrColour, iBackAttrColour : Integer;
+  strTABText : String;
 
 Begin
+  strTabText := StringReplace(strText, #9, #32, [rfReplaceAll]);
   Win32Check(GetConsoleScreenBufferInfo(hndConsole, ConsoleInfo));
   NewPos := ConsoleInfo.dwCursorPosition;
-  Win32Check(WriteConsoleOutputCharacter(hndConsole, PChar(strText), Length(strText),
+  Win32Check(WriteConsoleOutputCharacter(hndConsole, PChar(strTABText), Length(strTABText),
     ConsoleInfo.dwCursorPosition, wChars));
-  SetLength(Attrs, Length(strText));
+  SetLength(Attrs, Length(strTABText));
   iForeAttrColour := ForeGroundColour(iTextColour, ConsoleInfo);
   iBackAttrColour := BackGroundColour(iBackColour, ConsoleInfo);
-  For iChar := 0 To Length(strText) - 1 Do
+  For iChar := 0 To Length(strTABText) - 1 Do
     Attrs[iChar] := iForeAttrColour Or iBackAttrColour;
   Win32Check(WriteConsoleOutputAttribute(hndConsole, Attrs,
-    Length(strText), ConsoleInfo.dwCursorPosition, wChars));
+    Length(strTABText), ConsoleInfo.dwCursorPosition, wChars));
   If boolUpdateCursor Then
     Begin
       Inc(NewPos.X, wChars);

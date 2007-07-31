@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    30 Jul 2007
+  @Date    31 Jul 2007
 
 **)
 Unit DGHLibrary;
@@ -5166,7 +5166,7 @@ Var
   strTABText : String;
 
 Begin
-  strTabText := StringReplace(strText, #9, #32, [rfReplaceAll]);
+  strTabText := StringReplace(strText, #9, #175, [rfReplaceAll]);
   Win32Check(GetConsoleScreenBufferInfo(hndConsole, ConsoleInfo));
   NewPos := ConsoleInfo.dwCursorPosition;
   Win32Check(WriteConsoleOutputCharacter(hndConsole, PChar(strTABText), Length(strTABText),

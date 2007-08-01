@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    31 Jul 2007
+  @Date    01 Aug 2007
 
 **)
 Unit DGHLibrary;
@@ -494,8 +494,6 @@ Type
   Function ReduceBearing(dblBearing : Double) : Double;
   Function GetBuildNumber(var iMajor, iMinor, iBugfix, iBuild : Integer) : String;
   Function GetConsoleTitle(strTitle: String) : String;
-  Function ForeGroundColour(iColour : TColor; CSBI : TConsoleScreenBufferInfo) : Integer;
-  Function BackGroundColour(iColour : TColor; CSBI : TConsoleScreenBufferInfo) : Integer;
   Procedure OutputToConsole(hndConsole : THandle; Const strText : String = '';
     iTextColour : TColor = clNone; iBackColour : TColor = clNone;
     boolUpdateCursor : Boolean = True);
@@ -5009,11 +5007,11 @@ End;
            associated with the given cl#### colour.
 
   @param   iColour as a TColor
-  @param   CSBI    as a TConsoleScreenBufferInfo
+  @param   iNone   as a TColor
   @return  an Integer
 
 **)
-Function ForeGroundColour(iColour : TColor; CSBI : TConsoleScreenBufferInfo) : Integer;
+Function ForeGroundColour(iColour, iNone : TColor): Integer;
 
 Begin
   Case iColour Of
@@ -5039,7 +5037,7 @@ Begin
     //clDkGray  :;
     clWhite   :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN Or
                  FOREGROUND_RED Or FOREGROUND_INTENSITY;
-    clNone  : Result  := CSBI.wAttributes And $0F;
+    clNone  : Result  := iNone;
   Else
     Raise Exception.Create('Invalid console colour.');
   End;
@@ -5055,11 +5053,11 @@ End;
            associated with the given cl#### colour.
 
   @param   iColour as a TColor
-  @param   CSBI    as a TConsoleScreenBufferInfo
+  @param   iNone   as a TColor
   @return  an Integer
 
 **)
-Function BackGroundColour(iColour : TColor; CSBI : TConsoleScreenBufferInfo) : Integer;
+Function BackGroundColour(iColour, iNone : TColor) : Integer;
 
 Begin
   Case iColour Of
@@ -5085,7 +5083,7 @@ Begin
     //clDkGray  :;
     clWhite   :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN Or
                  BACKGROUND_RED Or BACKGROUND_INTENSITY;
-    clNone  : Result  := CSBI.wAttributes And $F0;
+    clNone  : Result  := iNone;
   Else
     Raise Exception.Create('Invalid console colour.');
   End;
@@ -5116,6 +5114,8 @@ Procedure OutputToConsoleLn(hndConsole : THandle; Const strText : String = '';
 Var
   sl : TStringList;
   i : Integer;
+  ConBufRec : TConsoleScreenBufferInfo;
+  CurPos : TCoord;
 
 Begin
   sl := TstringList.Create;
@@ -5127,7 +5127,10 @@ Begin
       Begin
         OutputToConsole(hndConsole, sl[i], iTextColour, iBackColour,
           boolUpdateCursor);
-        Writeln;
+        GetConsoleScreenBufferInfo(hndConsole, ConBufRec);
+        CurPos.X := 0;
+        CurPos.Y := ConBufRec.dwCursorPosition.Y + 1;
+        SetConsoleCursorPosition(hndConsole, CurPos);
       End;
   Finally
     sl.Free;
@@ -5172,8 +5175,8 @@ Begin
   Win32Check(WriteConsoleOutputCharacter(hndConsole, PChar(strTABText), Length(strTABText),
     ConsoleInfo.dwCursorPosition, wChars));
   SetLength(Attrs, Length(strTABText));
-  iForeAttrColour := ForeGroundColour(iTextColour, ConsoleInfo);
-  iBackAttrColour := BackGroundColour(iBackColour, ConsoleInfo);
+  iForeAttrColour := ForeGroundColour(iTextColour, ConsoleInfo.wAttributes And $0F);
+  iBackAttrColour := BackGroundColour(iBackColour, ConsoleInfo.wAttributes And $F0);
   For iChar := 0 To Length(strTABText) - 1 Do
     Attrs[iChar] := iForeAttrColour Or iBackAttrColour;
   Win32Check(WriteConsoleOutputAttribute(hndConsole, Attrs,

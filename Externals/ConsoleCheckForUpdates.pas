@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    29 Jul 2007
+  @Date    01 Aug 2007
 
 **)
 Unit ConsoleCheckForUpdates;
@@ -65,8 +65,10 @@ ResourceString
     ' description below for update details...';
   (** A resource string to define that the package was not found. **)
   strPackageNotFound = '  Package "%s" not found!';
-  (** A resorce string for an exception message. **)
+  (** A resource string for an exception message. **)
   strExceptionS = '  Exception: %s';
+  (** A resource string to prompt to continue. **)
+  strPressEnterToContinue = 'Press <Enter> to continue...';
 
 
 (**
@@ -140,6 +142,9 @@ Begin
                   OutputToConsoleLn(FConHnd, '  ' +
                     StringReplace(GetNamedNodeText(P, 'Description'), #13#10,
                     #32#32#13#10, [rfReplaceAll]), clLime);
+                  OutputToConsoleLn(FConHnd, strPressEnterToContinue);
+                  SysUtils.Beep;
+                  ReadLn;
                 End;
             End Else
               OutputMsg(Format(strPackageNotFound, [FSoftwareID]), clYellow);

@@ -190,10 +190,10 @@ Begin
   FSoftwareID := strSoftwareID;
   FRegRoot := strRegRoot;
   FConHnd := GetStdHandle(STD_OUTPUT_HANDLE);
-  OutputMsg(strCheckingForUpdates, clWhite);
   ReadLastUpdateDate;
   If boolForceUpdate Or (FLastUpdateDate + 7.0 < Now) Then
     Begin
+      OutputMsg(strCheckingForUpdates, clWhite);
       iURLs := CharCount('|', strURL) + 1;
       For iURL := 1 To iURLs Do
         If CheckForUpdates(GetField(FURL, '|', iURL)) Then

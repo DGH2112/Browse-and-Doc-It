@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Aug 2007
+  @Date    08 Aug 2007
 
 **)
 Unit ConsoleCheckForUpdates;
@@ -26,7 +26,7 @@ Type
     FLastUpdateDate : TDateTime;
     FRegRoot : String;
   Protected
-    Procedure CheckForUpdates;
+    Function CheckForUpdates(strURL : String) : Boolean;
     Function FindPackage(xmlNodeList : IXMLDOMNodeList) : IXMLDOMNode;
     Function GetNamedNodeText(P : IXMLDOMNode; strName : String) : String;
     Function CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : Boolean;
@@ -101,8 +101,11 @@ End;
   @postcon Displays messages to the console regarding the versioning of the
            software.
 
+  @param   strURL as a String
+  @return  a Boolean
+
 **)
-Procedure TConsoleCheckForupdates.CheckForUpdates;
+Function TConsoleCheckForupdates.CheckForUpdates(strURL : String) : Boolean;
 
 Var
   xmlDoc : DOMDocument;
@@ -111,17 +114,16 @@ Var
   iMajor, iMinor, iBugFix, iBuild : Integer;
 
 Begin
-  FConHnd := GetStdHandle(STD_OUTPUT_HANDLE);
-  OutputMsg(strCheckingForUpdates, clWhite);
+  Result := False;
   OutputMsg(strLoadingMSXML);
   xmlDoc := CoDOMDocument40.Create;
   Try
     Try
       xmlDoc.ValidateOnParse := True;
-      OutputMsg(Format(strLoadingURL, [FURL]));
+      OutputMsg(Format(strLoadingURL, [strURL]));
       xmlDoc.async := False;
       xmlDoc.validateOnParse := True;
-      If xmlDoc.load(FURL) And (xmlDoc.parseError.errorCode = 0) Then
+      If xmlDoc.load(strURL) And (xmlDoc.parseError.errorCode = 0) Then
         Begin
           OutputMsg(strGettingPackages);
           xmlNodeList := xmlDoc.getElementsByTagName('Package');
@@ -146,10 +148,11 @@ Begin
                   SysUtils.Beep;
                   ReadLn;
                 End;
+              Result := True;
             End Else
               OutputMsg(Format(strPackageNotFound, [FSoftwareID]), clYellow);
         End Else
-          OutputMsg(Format('  %s ("%s")', [xmlDoc.parseError.reason, FURL]), clRed);
+          OutputMsg(Format('  %s ("%s")', [xmlDoc.parseError.reason, strURL]), clRed);
     Except
       On E : Exception Do
         OutputMsg(Format(strExceptionS, [E.Message]), clRed);
@@ -176,14 +179,23 @@ End;
 Constructor TConsoleCheckForupdates.Create(strURL, strSoftwareID,
   strRegRoot : String; boolForceUpdate : Boolean);
 
+Var
+  iURLs : Integer;
+  iURL : Integer;
+
 Begin
   FURL := strURL;
   FSoftwareID := strSoftwareID;
   FRegRoot := strRegRoot;
+  FConHnd := GetStdHandle(STD_OUTPUT_HANDLE);
+  OutputMsg(strCheckingForUpdates, clWhite);
   ReadLastUpdateDate;
   If boolForceUpdate Or (FLastUpdateDate + 7.0 < Now) Then
     Begin
-      CheckForUpdates;
+      iURLs := CharCount('|', strURL) + 1;
+      For iURL := 1 To iURLs Do
+        If CheckForUpdates(GetField(FURL, '|', iURL)) Then
+          Break;
       WriteLastUpdateDate;
     End;
 End;
@@ -296,7 +308,8 @@ End;
 Procedure TConsoleCheckForupdates.OutputMsg(strText : String; iColour : TColor = clNone);
 
 Begin
-  OutputToConsoleLn(FConHnd, strText, iColour);
+  OutputToConsoleLn(FConHnd, StringReplace(strText, #13#10, #32, [rfReplaceAll]),
+    iColour);
 End;
 
 (**

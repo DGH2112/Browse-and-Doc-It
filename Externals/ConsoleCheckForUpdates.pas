@@ -61,7 +61,7 @@ ResourceString
   (** A resource string to note that the software is up to date. **)
   strYourSoftwareIsUpToDate = '  Your software is up to date!';
   (** A resource string to note that there is an update available. **)
-  strThereIsASoftwareUpdate = 'There is a software update available! See the' +
+  strThereIsASoftwareUpdate = '  There is a software update available! See the' +
     ' description below for update details...';
   (** A resource string to define that the package was not found. **)
   strPackageNotFound = '  Package "%s" not found!';
@@ -141,9 +141,11 @@ Begin
               Else
                 Begin
                   OutputToConsoleLn(FConHnd, strThereIsASoftwareUpdate, clYellow);
+                  OutputToConsoleLn(FConHnd);
                   OutputToConsoleLn(FConHnd, '  ' +
                     StringReplace(GetNamedNodeText(P, 'Description'), #13#10,
                     #32#32#13#10, [rfReplaceAll]), clLime);
+                  OutputToConsoleLn(FConHnd);
                   OutputToConsoleLn(FConHnd, strPressEnterToContinue);
                   SysUtils.Beep;
                   ReadLn;

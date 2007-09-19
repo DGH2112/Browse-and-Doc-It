@@ -224,7 +224,7 @@ Type
     Function GetElementDetails : THElement;
     Constructor Create(dblOEasting, dblONorthing, dblOChainage, dblStChainage,
       dblOBearing, dblLength, dblRLValue : Double); Virtual;
-    Constructor CreateFalse(dblEasting, dblNorthing, dblChainage,
+    Constructor CreateWithFalseOrigin(dblEasting, dblNorthing, dblChainage,
       dblBearing, dblLength, dblStRadius, dblEndRadius : Double); Virtual;
   End;
 
@@ -2701,8 +2701,8 @@ end;
   @param   dblEndRadius as a Double
 
 **)
-constructor THClothoidElement.CreateFalse(dblEasting, dblNorthing, dblChainage,
-      dblBearing, dblLength, dblStRadius, dblEndRadius : Double);
+constructor THClothoidElement.CreateWithFalseOrigin(dblEasting, dblNorthing,
+  dblChainage, dblBearing, dblLength, dblStRadius, dblEndRadius : Double);
 
 Var
   dblZ : Double;
@@ -3381,12 +3381,12 @@ Var
   FHClothiod : THClothoidElement;
 
 begin
-  FHClothiod := THClothoidElement.CreateFalse(dblEasting, dblNorthing,
+  FHClothiod := THClothoidElement.CreateWithFalseOrigin(dblEasting, dblNorthing,
     dblChainage, dblBearing, dblLength, dblStRadius, dblEndRadius);
-    FHElements.Add(FHClothiod);
-    Modified := True;
-    If Assigned(OnChange) Then
-     OnChange(Self);
+  FHElements.Add(FHClothiod);
+  Modified := True;
+  If Assigned(OnChange) Then
+    OnChange(Self);
 end;
 
 (**

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Aug 2007
+  @Date    19 Sep 2007
 
 **)
 Unit DGHLibrary;
@@ -520,6 +520,10 @@ Implementation
 
 Uses
   Math, ComObj, ShlObj, IniFiles;
+
+resourcestring
+  (** A resource string to define the output format of a bearing. **)
+  strBearingFormat = '%d° %2.2d'' %2.2d.%2.2d"';
 
 Const
   (** A constant to define the type of based that can be used with number in
@@ -4906,7 +4910,7 @@ Function BearingToString(recBearing : TBearing) : String;
 
 Begin
   With recBearing Do
-    Result := Format('%d°%2.2d''%2.2d.%2.2d"', [iDegrees, iMinutes, iSeconds, iHundreds]);
+    Result := Format(strBearingFormat, [iDegrees, iMinutes, iSeconds, iHundreds]);
 End;
 
 (**

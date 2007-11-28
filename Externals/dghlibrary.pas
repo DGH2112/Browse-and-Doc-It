@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Sep 2007
+  @Date    28 Nov 2007
 
 **)
 Unit DGHLibrary;
@@ -3950,10 +3950,10 @@ begin
   If Count = 0 Then
     Raise Exception.Create('There is no horizontal alignment.');
   If dblChainage < GetStartChainage(0) Then
-    Raise Exception.CreateFmt('The chainage and offset [%12.4f, %12.4f] lies ' +
+    Raise Exception.CreateFmt('The chainage %1.4f and offset %1.4f lies ' +
       'before the alignment start.', [dblChainage, dblOffset]);
   If dblChainage > GetEndChainage(Count - 1) Then
-    Raise Exception.CreateFmt('The chainage and offset [%12.4f, %12.4f] lies ' +
+    Raise Exception.CreateFmt('The chainage %1.4f and offset %1.4f lies ' +
       'beyond the alignment end.', [dblChainage, dblOffset]);
   For iElement := 0 To Count - 1 Do
     If (dblChainage >= GetStartChainage(iElement)) And
@@ -3997,7 +3997,7 @@ begin
         Begin
           If iElement = 0 Then
             Raise EBeforeAlignmentStartException.CreateFmt(
-              'These coordinates [%12.4f, %12.4f] lie before the alignment start.',
+              'These coordinates (%1.4f, %1.4f) lie before the alignment start.',
               [dblEasting, dblNorthing]);
           Result := THBaseElement(FHElements[iElement - 1]).Measure(dblEasting,
             dblNorthing);
@@ -4015,7 +4015,7 @@ begin
       Exit;
     End Else
       Raise EAfterAlignmentEndException.CreateFmt(
-          'These coordinates [%12.4f, %12.4f] lie beyond the alignment end.',
+          'These coordinates (%1.4f, %1.4f) lie beyond the alignment end.',
           [dblEasting, dblNorthing]);
 end;
 
@@ -4039,9 +4039,9 @@ function THAlignmentCollection.Compare(dblEasting, dblNorthing,
 
 
 ResourceString
-  strBeforeMsg = 'This intersection [%12.4f, %12.4f, %15s] lies before the ' +
+  strBeforeMsg = 'This intersection (%1.4f, %1.4f, %s) lies before the ' +
     'alignment start.';
-  strAfterMsg = 'This intersection [%12.4f, %12.4f, %15s] lies after the ' +
+  strAfterMsg = 'This intersection (%1.4f, %1.4f, %s) lies after the ' +
     'alignment end.';
 
 Var

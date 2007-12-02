@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    28 Nov 2007
+  @Date    02 Dec 2007
 
 **)
 Unit DGHLibrary;
@@ -592,11 +592,17 @@ Var
   iDegs : Integer;
   iMins : Integer;
   dblSecs : Double;
+  str : String;
+  iPos : Integer;
+  iErrCode: Integer;
 
 begin
-  iDegs := Trunc(dblBearingAsDec);
-  iMins := Trunc((dblBearingAsDec - iDegs) * 100);
-  dblSecs := (((dblBearingAsDec - iDegs) * 100.0) - iMins) * 100.0;
+  str := Format('%1.6f', [dblBearingAsDec]);
+  iPos := Pos('.', str);
+  Val(Copy(str, 1, iPos - 1), iDegs, iErrCode);
+  Val(Copy(str, iPos + 1, 2), iMins, iErrCode);
+  Val(Copy(str, iPos + 3, 4), dblSecs, iErrCode);
+  dblSecs := dblSecs / 100.0;
   Result := iDegs + iMins / 60.0 + dblSecs / 3600.0;
 end;
 

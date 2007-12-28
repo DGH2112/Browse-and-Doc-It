@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    02 Dec 2007
+  @Date    28 Dec 2007
 
 **)
 Unit DGHLibrary;
@@ -315,7 +315,7 @@ Type
       bCentre : Boolean); Virtual;
     procedure UpdateClothoid(iELement : Integer; dblEasting, dblNorthing,
       dblBearing, dblOChainage, dblStChainage, dblRLValue,
-      dblLength: Double); Virtual;
+      dblLength: Double; boolFalse : Boolean); Virtual;
     Procedure LoadFromFile(strFileName : String); Virtual;
     Procedure SaveToFile(strFileName : String); Virtual;
     Function GetStraight(iElement : Integer) : THElement; Virtual;
@@ -3802,11 +3802,12 @@ end;
   @param   dblStChainage as a Double
   @param   dblRLValue    as a Double
   @param   dblLength     as a Double
+  @param   boolFalse     as a Boolean
 
 **)
 procedure THAlignmentCollection.UpdateClothoid(iElement : Integer; dblEasting,
   dblNorthing, dblBearing, dblOChainage, dblStChainage, dblRLValue,
-  dblLength: Double);
+  dblLength: Double; boolFalse : Boolean);
 
 Var
   FOldClothoid : THClothoidElement;
@@ -3820,8 +3821,12 @@ begin
     Destroy old version
   *)
   FOldClothoid := THClothoidElement(FHElements[iElement]);
-  FHElements[iElement] := THClothoidElement.Create(dblEasting, dblNorthing,
-    dblOChainage, dblStChainage, dblBearing, dblLength, dblRLValue);
+  If Not boolFalse Then
+    FHElements[iElement] := THClothoidElement.Create(dblEasting, dblNorthing,
+      dblOChainage, dblStChainage, dblBearing, dblLength, dblRLValue)
+  Else
+    FHElements[iElement] := THClothoidElement.CreateWithFalseOrigin(dblEasting,
+      dblNorthing, dblOChainage, dblBearing, dblLength, dblStChainage, dblRLValue);
   FOldClothoid.Free;
   Modified := True;
   If Assigned(OnChange) Then

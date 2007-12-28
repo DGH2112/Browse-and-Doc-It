@@ -974,7 +974,7 @@ Var
 begin
   Result := False;
   str := LowerCase(strWord);
-  l := 0;
+  l := Low(strWordList);
   r := High(strWordList);
   While l <= r Do
     Begin

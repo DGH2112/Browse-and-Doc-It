@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    28 Dec 2007
+  @Date    29 Dec 2007
 
 **)
 Unit DGHLibrary;
@@ -185,7 +185,7 @@ Type
     Function Measure(dblEasting, dblNorthing : Double) : THInfo; Override;
     Function Compare(dblEasting, dblNorthing, dblBearing : Double) : THCompInfo;
       Override;
-    Function GetElementDetails : THElement;
+    Function GetElementDetails : THElement; Virtual;
     Constructor Create(dblEasting, dblNorthing, dblBearing, dblChainage,
       dblLength : Double); Virtual;
   End;
@@ -201,7 +201,7 @@ Type
     Function Measure(dblEasting, dblNorthing : Double) : THInfo; Override;
     Function Compare(dblEasting, dblNorthing, dblBearing : Double) : THCompInfo;
       Override;
-    Function GetElementDetails : THElement;
+    Function GetElementDetails : THElement; Virtual;
     Constructor Create(dblEasting, dblNorthing, dblChainage, dblBearing,
       dblLength, dblRadius : Double; bCentre : Boolean); Virtual;
   End;
@@ -211,17 +211,17 @@ Type
   Private
     FOChainage : Double;
     FRLValue : Double;
-    Function GetX(dblDistance : Double) : Double;
-    Function GetY(dblDistance : Double) : Double;
-    Function GetTheta(dblDistance : Double) : Double;
   Protected
+    Function GetX(dblDistance : Double) : Double; Virtual;
+    Function GetY(dblDistance : Double) : Double; Virtual;
+    Function GetTheta(dblDistance : Double) : Double; Virtual;
     Function ElementType : TElementType; Override;
     Function Setout(dblChainage, dblOffset : Double) : THInfo; Override;
     Function Measure(dblEasting, dblNorthing : Double) : THInfo; Override;
     Function Compare(dblEasting, dblNorthing, dblBearing : Double) : THCompInfo;
       Override;
     Function GetRadius(dblChainage : Double) : Double; Override;
-    Function GetElementDetails : THElement;
+    Function GetElementDetails : THElement; Virtual;
     Constructor Create(dblOEasting, dblONorthing, dblOChainage, dblStChainage,
       dblOBearing, dblLength, dblRLValue : Double); Virtual;
     Constructor CreateWithFalseOrigin(dblEasting, dblNorthing, dblChainage,
@@ -2632,7 +2632,7 @@ begin
     dblC1 := dblC - dblFC / dblFDC;
     Inc(iCount);
     If iCount > 1000 Then
-      Raise Exception.Create('Clothoid Compare: Loop Detected Comparing.');
+      Raise Exception.Create('Loop Detected in Clothoid.Compare.');
   Until(Abs(dblC1 - dblC) < 0.00005);
 
   recHInfo := Setout(FOChainage + dblC, 0);
@@ -2645,7 +2645,7 @@ begin
     dblBS := 0;
   If (recHInfo.dblEasting - dblEasting) < 0 Then
     dblBS := PI * 2 - dblBS;
-  If Cos(DegToRad(dblBearing + 90 - dblBS)) > 0 Then
+  If Abs(dblBearing - RadToDeg(dblBS)) > 90 Then
     dblSS := dblSS * -1;
 
   Result.dblEasting := recHInfo.dblEasting;
@@ -2930,9 +2930,11 @@ Var
   HData : THInfo;
   dblDelta : Double;
   dblO : Double;
+  iLoops : Integer;
 
 begin
   dblC := FOChainage;
+  iLoops := 0;
   Repeat
     HData := Setout(dblC, 0);
     Vector := GetVector(HData.dblEasting, HData.dblNorthing, dblEasting,
@@ -2942,6 +2944,9 @@ begin
     dblO := Cos(DegToRad(HData.dblBearing + 90 - Vector.dblBearing)) *
       Vector.dblDistance;
     dblC := dblC + dblDelta;
+    Inc(iLoops);
+    If iLoops > 1000 Then
+      Raise Exception.Create('Loop detected in Clothoid.Measure.');
   Until (Abs(dblDelta) < 0.00005);
   Result.dblChainage := dblC;
   Result.dblBearing := HData.dblBearing;

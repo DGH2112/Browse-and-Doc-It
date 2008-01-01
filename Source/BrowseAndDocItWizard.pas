@@ -13,6 +13,8 @@
            own settings and then remove the need to the Module Explorer Frame
            and the Browse And Doc it wizard to Load and Save the settings
            directly.
+  @todo    Make the timer for the refresh of the tree reset the counter if the
+           cursor position changes, i.e. do not refresh while cursor is moving.
 
 **)
 Unit BrowseAndDocItWizard;

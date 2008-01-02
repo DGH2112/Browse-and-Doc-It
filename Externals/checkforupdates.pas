@@ -44,7 +44,7 @@ Type
 Implementation
 
 Uses
-  DGHLibrary, Registry {$IFNDEF CONSOLE}, CheckForUpdatesForm {$ENDIF};
+  DGHLibrary, IniFiles {$IFNDEF CONSOLE}, CheckForUpdatesForm {$ENDIF};
 
 ResourceString
   (** A resource string of the start of the checking process. **)
@@ -359,7 +359,7 @@ Var
   iDay, iMonth, iYear : Word;
 
 Begin
-  With TRegIniFile.Create(FRegRoot) Do
+  With TIniFile.Create(FRegRoot) Do
     Try
       iDay := ReadInteger('CheckForUpdates', 'Day', 01);
       iMonth := ReadInteger('CheckForUpdates', 'Month', 01);
@@ -384,7 +384,7 @@ Var
   iDay, iMonth, iYear : Word;
 
 Begin
-  With TRegIniFile.Create(FRegRoot) Do
+  With TIniFile.Create(FRegRoot) Do
     Try
       DecodeDate(Now, iYear, iMonth, iDay);
       WriteInteger('CheckForUpdates', 'Day', iDay);

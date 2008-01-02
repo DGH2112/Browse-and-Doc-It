@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    29 Dec 2007
+  @Date    02 Jan 2008
 
 **)
 Unit DGHLibrary;
@@ -440,10 +440,9 @@ Type
     Procedure LoadFromFile(strFileName : String); Virtual;
     Procedure Clear;
     Function Setout(dblChainage, dblOffset : Double) : TInfo; Virtual;
-    Function Measure(dblEasting, dblNorthing, dblLevel : Double) : TMeasureInfo;
+    Function Measure(dblEasting, dblNorthing : Double) : TMeasureInfo;
       Virtual;
-    Function Compare(dblEasting, dblNorthing, dblBearing,
-      dblLevel : Double) : TCompareInfo; Virtual;
+    Function Compare(dblEasting, dblNorthing, dblBearing : Double) : TCompareInfo; Virtual;
     (**
       A property to define the horizontal alignment of the string line
       @precon  None.
@@ -1808,7 +1807,7 @@ Begin
       Else If Funct = 'EXP' Then
         Result := Exp(RealNumber)
       Else If Funct = 'LN' Then
-        Result := Log2(RealNumber)
+        Result := LN(RealNumber)
       Else If Funct = 'INV' Then
         Result := 1.0 / RealNumber
       Else If Funct = 'INT' Then
@@ -1819,12 +1818,6 @@ Begin
         Result := Abs(RealNumber)
       Else If Funct = 'NOT' Then
         Result := Not Trunc(RealNumber)
-      Else If Funct = 'BIN' Then
-        Result := StrToFloat(DecToBin(FloatToStr(RealNumber)))
-      Else If Funct = 'OCT' Then
-        Result := StrToFloat(DecToOct(FloatToStr(RealNumber)))
-      Else If Funct = 'HEX' Then
-        Result := StrToFloat(DecToHex(FloatToStr(RealNumber)))
       Else
         Raise Exception.CreateFmt('Invalid function [%s].', [Funct])
     End Else
@@ -2484,6 +2477,7 @@ Var
 
 begin
   Vector := GetVector(FEasting, FNorthing, dblEasting, dblNorthing);
+  Vector.dblBearing := AdjustBearing(Vector.dblBearing); //: check calls to GetVector and see if they need AdjustBearing!
   If FRadius > 0 Then
     Begin
       dblB := Vector.dblBearing + 90;
@@ -2507,6 +2501,8 @@ begin
       dblZ := (FBearing - dblB) / 360 * FRadius * 2 * PI;
       If dblZ > 2 * PI * Abs(FRadius) Then
         dblZ := dblZ - 2 * PI * Abs(FRadius);
+      If dblZ < -2 * PI * Abs(FRadius) Then
+        dblZ := dblZ + 2 * PI * Abs(FRadius);
       Result.dblBearing := AdjustBearing(Vector.dblBearing - 90);
       Result.dblOffset := Vector.dblDistance - Abs(FRadius);
       Result.dblChainage := FChainage - dblZ;
@@ -2762,10 +2758,10 @@ begin
       dblX := GetX(-dblLength);
       dblY := GetY(-dblLength);
       dblTheta := GetTheta(-dblLength);
-      FBearing := AdjustBearing(dblBearing + RadToDeg(dblTheta));
-      FEasting := dblEasting + dblX * Sin(DegToRad(FBearing + 90)) -
+      FBearing := AdjustBearing(dblBearing - RadToDeg(dblTheta));
+      FEasting := dblEasting - dblX * Sin(DegToRad(FBearing + 90)) -
         dblY * Sin(DegToRad(FBearing));
-      FNorthing := dblNorthing + dblX * Cos(DegToRad(FBearing + 90)) -
+      FNorthing := dblNorthing - dblX * Cos(DegToRad(FBearing + 90)) -
         dblY * Cos(DegToRad(FBearing));
     End Else
     Begin
@@ -2776,11 +2772,6 @@ begin
       dblX := GetX(dblZ);
       dblY := GetY(dblZ);
       dblTheta := GetTheta(dblZ);
-      If dblZ < 0 Then
-        Begin
-          dblX := -dblX;
-          dblTheta := -dblTheta;
-        End;
       FBearing := AdjustBearing(dblBearing - RadToDeg(dblTheta));
       FEasting := dblEasting - dblY * Sin(DegToRad(FBearing)) -
         dblX * Sin(DegToRad(FBearing + 90));
@@ -2861,6 +2852,8 @@ end;
 function THClothoidElement.GetTheta(dblDistance : Double): Double;
 begin
   Result := Sqr(dblDistance) / ( 2 * FRLValue);
+  If dblDistance < 0 Then
+    Result := -Result;
 end;
 
 (**
@@ -2885,6 +2878,8 @@ begin
   Result := Power(dblDistance, 3) / (6 * K) -
     Power(dblDistance ,7) / (336 * Power(K, 3)) +
     Power(dblDistance, 11) / (42240 * Power(K, 5));
+  If dblDistance < 0 Then
+    Result := -Result;
 end;
 
 (**
@@ -2981,11 +2976,6 @@ begin
   dblX := GetX(dblChainage - FOChainage);
   dblY := GetY(dblChainage - FOChainage);
   dblTheta := GetTheta(dblChainage - FOChainage);
-  If dblY < 0.0 Then
-    Begin
-      dblX := dblX * -1;
-      dblTheta := dblTheta * -1;
-    End;
   Result.dblEasting := FEasting + dblY * Sin(dblOBearing) +
     dblX * Sin(dblOBearing + PI / 2) +
     dblOffset * Sin(dblOBearing + PI / 2 + dblTheta);
@@ -4816,11 +4806,10 @@ end;
 
   @param   dblEasting  as a Double
   @param   dblNorthing as a Double
-  @param   dblLevel    as a Double
   @return  a TMeasureInfo
 
 **)
-function TStringAlignment.Measure(dblEasting, dblNorthing, dblLevel: Double): TMeasureInfo;
+function TStringAlignment.Measure(dblEasting, dblNorthing : Double): TMeasureInfo;
 
 Var
   HInfo : THInfo;
@@ -4848,12 +4837,11 @@ end;
   @param   dblEasting  as a Double
   @param   dblNorthing as a Double
   @param   dblBearing  as a Double
-  @param   dblLevel    as a Double
   @return  a TCompareInfo
 
 **)
-function TStringAlignment.Compare(dblEasting, dblNorthing, dblBearing,
-  dblLevel: Double): TCompareInfo;
+function TStringAlignment.Compare(dblEasting, dblNorthing,
+  dblBearing : Double): TCompareInfo;
 
 Var
   HInfo : THCompInfo;

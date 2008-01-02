@@ -29,7 +29,7 @@ Type
     Function CheckForUpdates(strURL : String) : Boolean;
     Function FindPackage(xmlNodeList : IXMLDOMNodeList) : IXMLDOMNode;
     Function GetNamedNodeText(P : IXMLDOMNode; strName : String) : String;
-    Function CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : Boolean;
+    Function CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : Integer;
     Procedure OutputMsg(strText : String; iColour : TColor = clNone);
     procedure ReadLastUpdateDate;
     procedure WriteLastUpdateDate;
@@ -70,7 +70,8 @@ ResourceString
   strExceptionS = '  Exception: %s';
   (** A resource string to prompt to continue. **)
   strPressEnterToContinue = 'Press <Enter> to continue...';
-
+  (** A resource string to prompt that you are using a newer version of software. **)
+  strYouAreUsingANewerVersion = '  You are using a newer version of the software than is available from the internet.';
 
 (**
 
@@ -113,6 +114,7 @@ Var
   xmlNodeList : IXMLDOMNodeList;
   P : IXMLDOMNode;
   iMajor, iMinor, iBugFix, iBuild : Integer;
+  iResult : Integer;
 
 Begin
   Result := False;
@@ -137,14 +139,29 @@ Begin
               iMinor := StrToInt(GetNamedNodeText(P, 'Minor'));
               iBugFix := StrToInt(GetNamedNodeText(P, 'BugFix'));
               iBuild := StrToInt(GetNamedNodeText(P, 'Build'));
-              If Not CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild) Then
+              iResult := CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild);
+              If iResult = 0 Then
                 OutputMsg(strYourSoftwareIsUpToDate, clWhite)
-              Else
+              Else If iResult > 0 Then
                 Begin
-                  OutputMsg(strThereIsASoftwareUpdate, clYellow);
+                  OutputMsg(strYouAreUsingANewerVersion, clRed);
+                  OutputMsg('');
+                  OutputMsg('  ' +
+                    StringReplace(GetNamedNodeText(P, 'Description'), #13#10,
+                    #32#32#13#10, [rfReplaceAll]), clLime);
                   {$IFDEF CONSOLE}
                   OutputMsg('');
+                  OutputMsg(strPressEnterToContinue);
+                  SysUtils.Beep;
+                  ReadLn;
+                  {$ELSE}
+                  SysUtils.Beep;
+                  TfrmCheckForUpdates.Stop;
                   {$ENDIF}
+                End Else
+                Begin
+                  OutputMsg(strThereIsASoftwareUpdate, clYellow);
+                  OutputMsg('');
                   OutputMsg('  ' +
                     StringReplace(GetNamedNodeText(P, 'Description'), #13#10,
                     #32#32#13#10, [rfReplaceAll]), clLime);
@@ -167,9 +184,7 @@ Begin
       On E : Exception Do
         OutputMsg(Format(strExceptionS, [E.Message]), clRed);
     End;
-    {$IFDEF CONSOLE}
     OutputMsg('');
-    {$ENDIF}
   Finally
     xmlDoc := Nil;
   End;
@@ -291,35 +306,34 @@ End;
 
 (**
 
-  This method returns true if the build version number of the software is
-  lower than the passed version numbers.
+  This method returns -ve if the software of older than the internet version,
+  0 if the same or +ve if it is newer than the internet version.
 
   @precon  None.
-  @postcon Returns true if the build version number of the software is
-           lower than the passed version numbers.
+  @postcon Returns -ve if the software of older than the internet version,
+           0 if the same or +ve if it is..
 
   @param   iMajor  as an Integer
   @param   iMinor  as an Integer
   @param   iBugFix as an Integer
   @param   iBuild  as an Integer
-  @return  a Boolean
+  @return  a Integer
 
 **)
-Function TCheckForUpdates.CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : Boolean;
+Function TCheckForUpdates.CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : Integer;
 
 Var
   iMaj, iMin, iBug, iBui : Integer;
 
 Begin
   GetBuildNumber(iMaj, iMin, iBug, iBui);
-  Result := iMajor > iMaj;
-  If Not Result Then
-    Result := (iMajor = iMaj) And (iMinor > iMin);
-  If Not Result Then
-    Result := (iMajor = iMaj) And (iMinor = iMin) And (iBugFix > iBug);
-  If Not Result Then
-    Result := (iMajor = iMaj) And (iMinor = iMin) And (iBugFix = iBug) And
-      (iBuild > iBui);
+  Result := iMaj - iMajor;
+  If Result = 0 Then
+    Result := iMin - iMinor;
+  If Result = 0 Then
+    Result := iBug - iBugFix;
+  If Result = 0 Then
+    Result := iBui - iBuild;
 End;
 
 (**
@@ -340,8 +354,9 @@ Begin
   OutputToConsoleLn(FConHnd, StringReplace(strText, #13#10, #32, [rfReplaceAll]),
     iColour);
   {$ELSE}
-  TfrmCheckForUpdates.ShowUpdates(StringReplace(strText, #13#10, #32, [rfReplaceAll]),
-    iColour);
+  If strText <> '' Then
+    TfrmCheckForUpdates.ShowUpdates(StringReplace(strText, #13#10, #32, [rfReplaceAll]),
+      iColour);
   {$ENDIF}
 End;
 

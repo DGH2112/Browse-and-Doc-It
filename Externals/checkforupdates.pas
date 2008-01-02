@@ -1,14 +1,14 @@
 (**
-  
+
   This module contains a class which handles the checking of updates from the
   Internet for console applications.
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    08 Aug 2007
+  @Date    02 Jan 2008
 
 **)
-Unit ConsoleCheckForUpdates;
+Unit CheckForUpdates;
 
 Interface
 
@@ -18,7 +18,7 @@ Uses
 Type
   (** This class handles the checking of software vesions against the
       internet. **)
-  TConsoleCheckForupdates = Class
+  TCheckForUpdates = Class
   Private
     FConHnd : THandle;
     FURL : String;
@@ -36,6 +36,7 @@ Type
   Public
     Constructor Create(strURL, strSoftwareID, strRegRoot : String;
       boolForceUpdate : Boolean);
+    Destructor Destroy; Override;
     Class Procedure Execute(strURL, strSoftwareID, strRegRoot : String;
       boolForceUpdate : Boolean);
   End;
@@ -43,7 +44,7 @@ Type
 Implementation
 
 Uses
-  DGHLibrary, Registry;
+  DGHLibrary, Registry {$IFNDEF CONSOLE}, CheckForUpdatesForm {$ENDIF};
 
 ResourceString
   (** A resource string of the start of the checking process. **)
@@ -84,11 +85,11 @@ ResourceString
   @param   boolForceUpdate as a Boolean
 
 **)
-Class Procedure TConsoleCheckForUpdates.Execute(strURL, strSoftwareID,
+Class Procedure TCheckForUpdates.Execute(strURL, strSoftwareID,
   strRegRoot : String; boolForceUpdate : Boolean);
 
 Begin
-  TConsoleCheckForUpdates.Create(strURL, strSoftwareID, strRegRoot,
+  TCheckForUpdates.Create(strURL, strSoftwareID, strRegRoot,
     boolForceUpdate).Free;
 End;
 
@@ -105,7 +106,7 @@ End;
   @return  a Boolean
 
 **)
-Function TConsoleCheckForupdates.CheckForUpdates(strURL : String) : Boolean;
+Function TCheckForUpdates.CheckForUpdates(strURL : String) : Boolean;
 
 Var
   xmlDoc : DOMDocument;
@@ -140,15 +141,22 @@ Begin
                 OutputMsg(strYourSoftwareIsUpToDate, clWhite)
               Else
                 Begin
-                  OutputToConsoleLn(FConHnd, strThereIsASoftwareUpdate, clYellow);
-                  OutputToConsoleLn(FConHnd);
-                  OutputToConsoleLn(FConHnd, '  ' +
+                  OutputMsg(strThereIsASoftwareUpdate, clYellow);
+                  {$IFDEF CONSOLE}
+                  OutputMsg('');
+                  {$ENDIF}
+                  OutputMsg('  ' +
                     StringReplace(GetNamedNodeText(P, 'Description'), #13#10,
                     #32#32#13#10, [rfReplaceAll]), clLime);
-                  OutputToConsoleLn(FConHnd);
-                  OutputToConsoleLn(FConHnd, strPressEnterToContinue);
+                  {$IFDEF CONSOLE}
+                  OutputMsg('');
+                  OutputMsg(strPressEnterToContinue);
                   SysUtils.Beep;
                   ReadLn;
+                  {$ELSE}
+                  SysUtils.Beep;
+                  TfrmCheckForUpdates.Stop;
+                  {$ENDIF}
                 End;
               Result := True;
             End Else
@@ -159,7 +167,9 @@ Begin
       On E : Exception Do
         OutputMsg(Format(strExceptionS, [E.Message]), clRed);
     End;
-    OutputToConsoleLn(FConHnd);
+    {$IFDEF CONSOLE}
+    OutputMsg('');
+    {$ENDIF}
   Finally
     xmlDoc := Nil;
   End;
@@ -178,7 +188,7 @@ End;
   @param   boolForceUpdate as a Boolean
 
 **)
-Constructor TConsoleCheckForupdates.Create(strURL, strSoftwareID,
+Constructor TCheckForUpdates.Create(strURL, strSoftwareID,
   strRegRoot : String; boolForceUpdate : Boolean);
 
 Var
@@ -204,6 +214,22 @@ End;
 
 (**
 
+  This is the destructor method for the TConsoleCheckForupdates class.
+
+  @precon  None.
+  @postcon Ensures the Update Form is closed and freed when the class frees.
+
+**)
+destructor TCheckForUpdates.Destroy;
+begin
+  {$IFNDEF CONSOLE}
+  TfrmCheckForUpdates.HideUpdates;
+  {$ENDIF}
+  Inherited Destroy;
+end;
+
+(**
+
   This function searches through the packages looking for the packages with
   the correct ID.
 
@@ -215,7 +241,7 @@ End;
   @return  an IXMLDOMNode
 
 **)
-Function TConsoleCheckForupdates.FindPackage(xmlNodeList : IXMLDOMNodeList) : IXMLDOMNode;
+Function TCheckForUpdates.FindPackage(xmlNodeList : IXMLDOMNodeList) : IXMLDOMNode;
 
 Var
   i, j : Integer;
@@ -248,7 +274,7 @@ End;
   @return  a String
 
 **)
-Function TConsoleCheckForupdates.GetNamedNodeText(P : IXMLDOMNode; strName : String) : String;
+Function TCheckForUpdates.GetNamedNodeText(P : IXMLDOMNode; strName : String) : String;
 
 Var
   i : Integer;
@@ -279,7 +305,7 @@ End;
   @return  a Boolean
 
 **)
-Function TConsoleCheckForupdates.CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : Boolean;
+Function TCheckForUpdates.CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : Boolean;
 
 Var
   iMaj, iMin, iBug, iBui : Integer;
@@ -307,11 +333,16 @@ End;
   @param   iColour as a TColor
 
 **)
-Procedure TConsoleCheckForupdates.OutputMsg(strText : String; iColour : TColor = clNone);
+Procedure TCheckForUpdates.OutputMsg(strText : String; iColour : TColor = clNone);
 
 Begin
+  {$IFDEF CONSOLE}
   OutputToConsoleLn(FConHnd, StringReplace(strText, #13#10, #32, [rfReplaceAll]),
     iColour);
+  {$ELSE}
+  TfrmCheckForUpdates.ShowUpdates(StringReplace(strText, #13#10, #32, [rfReplaceAll]),
+    iColour);
+  {$ENDIF}
 End;
 
 (**
@@ -322,7 +353,7 @@ End;
   @postcon Reads the last update date from the registry.
 
 **)
-Procedure TConsoleCheckForUpdates.ReadLastUpdateDate;
+Procedure TCheckForUpdates.ReadLastUpdateDate;
 
 Var
   iDay, iMonth, iYear : Word;
@@ -347,7 +378,7 @@ End;
   @postcon Writes the last update date to the registry.
 
 **)
-Procedure TConsoleCheckForUpdates.WriteLastUpdateDate;
+Procedure TCheckForUpdates.WriteLastUpdateDate;
 
 Var
   iDay, iMonth, iYear : Word;

@@ -14,23 +14,27 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons;
+  Dialogs, StdCtrls, Buttons, ExtCtrls;
 
 type
   (** This class represents for the form interface. **)
   TfrmCheckForUpdates = class(TForm)
     lbInformation: TListBox;
     btnOK: TBitBtn;
+    tmFinish: TTimer;
     procedure lbInformationDrawItem(Control: TWinControl; Index: Integer;
       Rect: TRect; State: TOwnerDrawState);
     procedure lbInformationMeasureItem(Control: TWinControl; Index: Integer;
       var Height: Integer);
+    procedure tmFinishTimer(Sender: TObject);
+    procedure btnOKClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
     { Public declarations }
     Class Procedure ShowUpdates(strMsg : String; iColour : TColor);
-    Class Procedure Stop;
+    Class Procedure Finish(iSeconds : Integer);
     Class Procedure HideUpdates;
   end;
 
@@ -150,6 +154,36 @@ end;
 
 (**
 
+  This is an on timer event handler for the Timer control.
+
+  @precon  None.
+  @postcon Closes the dialogue.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmCheckForUpdates.tmFinishTimer(Sender: TObject);
+begin
+  Close;
+end;
+
+(**
+
+  This is an on click event handler for the OK button.
+
+  @precon  None.
+  @postcon Closes the dialogue.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmCheckForUpdates.btnOKClick(Sender: TObject);
+begin
+  Close;
+end;
+
+(**
+
   This method shows the dialogue in a modal form so the user can see that there
   is information to be read.
 
@@ -157,13 +191,38 @@ end;
   @postcon Shows the dialogue in a modal form so the user can see that there
            is information to be read.
 
+  @param   iSeconds as an Integer
+
 **)
-class procedure TfrmCheckForUpdates.Stop;
+class procedure TfrmCheckForUpdates.Finish(iSeconds : Integer);
 begin
   frm.btnOK.Enabled := True;
-  frm.Hide;
-  frm.ShowModal;
+  frm.tmFinish.Interval := iSeconds * 1000;
+  frm.tmFinish.Enabled := True;
 end;
 
+(**
+
+  This is an on close event handler for the form.
+
+  @precon  None.
+  @postcon Disables the timer.
+
+  @param   Sender as a TObject
+  @param   Action as a TCloseAction as a reference
+
+**)
+procedure TfrmCheckForUpdates.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  tmFinish.Enabled := False;
+end;
+
+(** Nothing the intialise. **)
+Initialization
+(** Make sure the form is freed is its been created. **)
+Finalization
+  If frm <> Nil Then
+    frm.Free;
 end.
 

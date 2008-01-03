@@ -15,6 +15,7 @@ object frmCheckForUpdates: TfrmCheckForUpdates
   FormStyle = fsStayOnTop
   OldCreateOrder = False
   Position = poMainFormCenter
+  OnClose = FormClose
   DesignSize = (
     544
     171)
@@ -38,7 +39,6 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     TabOrder = 0
     OnDrawItem = lbInformationDrawItem
     OnMeasureItem = lbInformationMeasureItem
-    ExplicitWidth = 618
   end
   object btnOK: TBitBtn
     Left = 461
@@ -52,6 +52,7 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     Enabled = False
     ModalResult = 1
     TabOrder = 1
+    OnClick = btnOKClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
       0400000000006801000000000000000000001000000000000000000000000000
@@ -70,6 +71,11 @@ object frmCheckForUpdates: TfrmCheckForUpdates
       333A333333333333333338330000333333333333333333333333333333333333
       0000}
     NumGlyphs = 2
-    ExplicitLeft = 497
+  end
+  object tmFinish: TTimer
+    Enabled = False
+    OnTimer = tmFinishTimer
+    Left = 40
+    Top = 40
   end
 end

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    02 Jan 2008
+  @Date    03 Jan 2008
 
 **)
 Unit CheckForUpdates;
@@ -29,10 +29,12 @@ Type
     Function CheckForUpdates(strURL : String) : Boolean;
     Function FindPackage(xmlNodeList : IXMLDOMNodeList) : IXMLDOMNode;
     Function GetNamedNodeText(P : IXMLDOMNode; strName : String) : String;
-    Function CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : Integer;
+    Function CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer;
+      var strAppVerNum : String) : Integer;
     Procedure OutputMsg(strText : String; iColour : TColor = clNone);
     procedure ReadLastUpdateDate;
     procedure WriteLastUpdateDate;
+    Function BuildVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : String;
   Public
     Constructor Create(strURL, strSoftwareID, strRegRoot : String;
       boolForceUpdate : Boolean);
@@ -62,8 +64,8 @@ ResourceString
   (** A resource string to note that the software is up to date. **)
   strYourSoftwareIsUpToDate = '  Your software is up to date!';
   (** A resource string to note that there is an update available. **)
-  strThereIsASoftwareUpdate = '  There is a software update available! See the' +
-    ' description below for update details...';
+  strThereIsASoftwareUpdate = '  There is a software update available ' +
+    '[New %s, Old %s]! See the description below for update details...';
   (** A resource string to define that the package was not found. **)
   strPackageNotFound = '  Package "%s" not found!';
   (** A resource string for an exception message. **)
@@ -71,7 +73,8 @@ ResourceString
   (** A resource string to prompt to continue. **)
   strPressEnterToContinue = 'Press <Enter> to continue...';
   (** A resource string to prompt that you are using a newer version of software. **)
-  strYouAreUsingANewerVersion = '  You are using a newer version of the software than is available from the internet.';
+  strYouAreUsingANewerVersion = '  You are using a newer version of the ' +
+    'software [%s] than is available from the internet [%s].';
 
 (**
 
@@ -96,6 +99,32 @@ End;
 
 (**
 
+  This method builds a string representation of the build information.
+
+  @precon  None.
+  @postcon Builds a string representation of the build information.
+
+  @param   iMajor  as an Integer
+  @param   iMinor  as an Integer
+  @param   iBugFix as an Integer
+  @param   iBuild  as an Integer
+  @return  a String
+
+**)
+function TCheckForUpdates.BuildVersionNumber(iMajor, iMinor, iBugFix,
+  iBuild: Integer): String;
+
+Const
+  strBugs = ' abcedfghijklmnopqrstuvwxyz';
+  strBuild = '%d.%d%s (Build %d.%d.%d.%d)';
+
+begin
+  Result := Format(strBuild, [iMajor, iMinor, strBugs[iBugFix], iMajor, iMinor,
+    iBugFix, iBuild]);
+end;
+
+(**
+
   This procedure checks the build number of the software against the XML file
   at the given URL to see if there are any updates available.
 
@@ -115,6 +144,7 @@ Var
   P : IXMLDOMNode;
   iMajor, iMinor, iBugFix, iBuild : Integer;
   iResult : Integer;
+  strInternet, strApplication : String;
 
 Begin
   Result := False;
@@ -139,16 +169,15 @@ Begin
               iMinor := StrToInt(GetNamedNodeText(P, 'Minor'));
               iBugFix := StrToInt(GetNamedNodeText(P, 'BugFix'));
               iBuild := StrToInt(GetNamedNodeText(P, 'Build'));
-              iResult := CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild);
+              strInternet := BuildVersionNumber(iMajor, iMinor, iBugFix, iBuild);
+              iResult := CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild,
+                strApplication);
               If iResult = 0 Then
                 OutputMsg(strYourSoftwareIsUpToDate, clWhite)
               Else If iResult > 0 Then
                 Begin
-                  OutputMsg(strYouAreUsingANewerVersion, clRed);
-                  OutputMsg('');
-                  OutputMsg('  ' +
-                    StringReplace(GetNamedNodeText(P, 'Description'), #13#10,
-                    #32#32#13#10, [rfReplaceAll]), clLime);
+                  OutputMsg(Format(strYouAreUsingANewerVersion,
+                    [strApplication, strInternet]), clRed);
                   {$IFDEF CONSOLE}
                   OutputMsg('');
                   OutputMsg(strPressEnterToContinue);
@@ -160,7 +189,8 @@ Begin
                   {$ENDIF}
                 End Else
                 Begin
-                  OutputMsg(strThereIsASoftwareUpdate, clYellow);
+                  OutputMsg(Format(strThereIsASoftwareUpdate,
+                    [strInternet, strApplication]), clYellow);
                   OutputMsg('');
                   OutputMsg('  ' +
                     StringReplace(GetNamedNodeText(P, 'Description'), #13#10,
@@ -313,14 +343,16 @@ End;
   @postcon Returns -ve if the software of older than the internet version,
            0 if the same or +ve if it is..
 
-  @param   iMajor  as an Integer
-  @param   iMinor  as an Integer
-  @param   iBugFix as an Integer
-  @param   iBuild  as an Integer
+  @param   iMajor       as an Integer
+  @param   iMinor       as an Integer
+  @param   iBugFix      as an Integer
+  @param   iBuild       as an Integer
+  @param   strAppVerNum as a String
   @return  a Integer
 
 **)
-Function TCheckForUpdates.CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : Integer;
+Function TCheckForUpdates.CheckVersionNumber(iMajor, iMinor, iBugFix,
+  iBuild : Integer; var strAppVerNum : String) : Integer;
 
 Var
   iMaj, iMin, iBug, iBui : Integer;
@@ -334,6 +366,7 @@ Begin
     Result := iBug - iBugFix;
   If Result = 0 Then
     Result := iBui - iBuild;
+  strAppVerNum := BuildVersionNumber(iMaj, iMin, iBug, iBui);
 End;
 
 (**

@@ -38,7 +38,6 @@ Type
   Public
     Constructor Create(strURL, strSoftwareID, strRegRoot : String;
       boolForceUpdate : Boolean);
-    Destructor Destroy; Override;
     Class Procedure Execute(strURL, strSoftwareID, strRegRoot : String;
       boolForceUpdate : Boolean);
   End;
@@ -173,8 +172,11 @@ Begin
               iResult := CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild,
                 strApplication);
               If iResult = 0 Then
-                OutputMsg(strYourSoftwareIsUpToDate, clWhite)
-              Else If iResult > 0 Then
+                Begin
+                  OutputMsg(strYourSoftwareIsUpToDate, clWhite);
+                  TfrmCheckForUpdates.Finish(5);
+                End Else
+              If iResult > 0 Then
                 Begin
                   OutputMsg(Format(strYouAreUsingANewerVersion,
                     [strApplication, strInternet]), clRed);
@@ -185,7 +187,7 @@ Begin
                   ReadLn;
                   {$ELSE}
                   SysUtils.Beep;
-                  TfrmCheckForUpdates.Stop;
+                  TfrmCheckForUpdates.Finish(60);
                   {$ENDIF}
                 End Else
                 Begin
@@ -202,7 +204,7 @@ Begin
                   ReadLn;
                   {$ELSE}
                   SysUtils.Beep;
-                  TfrmCheckForUpdates.Stop;
+                  TfrmCheckForUpdates.Finish(60);
                   {$ENDIF}
                 End;
               Result := True;
@@ -256,22 +258,6 @@ Begin
       WriteLastUpdateDate;
     End;
 End;
-
-(**
-
-  This is the destructor method for the TConsoleCheckForupdates class.
-
-  @precon  None.
-  @postcon Ensures the Update Form is closed and freed when the class frees.
-
-**)
-destructor TCheckForUpdates.Destroy;
-begin
-  {$IFNDEF CONSOLE}
-  TfrmCheckForUpdates.HideUpdates;
-  {$ENDIF}
-  Inherited Destroy;
-end;
 
 (**
 

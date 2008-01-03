@@ -119,8 +119,8 @@ Const
   strBuild = '%d.%d%s (Build %d.%d.%d.%d)';
 
 begin
-  Result := Format(strBuild, [iMajor, iMinor, strBugs[iBugFix], iMajor, iMinor,
-    iBugFix, iBuild]);
+  Result := Format(strBuild, [iMajor, iMinor, strBugs[Succ(iBugFix)], iMajor,
+    iMinor, iBugFix, iBuild]);
 end;
 
 (**

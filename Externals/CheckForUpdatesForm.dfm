@@ -5,7 +5,7 @@ object frmCheckForUpdates: TfrmCheckForUpdates
   BorderStyle = bsToolWindow
   Caption = 'Checking for Software Updates...'
   ClientHeight = 171
-  ClientWidth = 580
+  ClientWidth = 544
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,16 +16,16 @@ object frmCheckForUpdates: TfrmCheckForUpdates
   OldCreateOrder = False
   Position = poMainFormCenter
   DesignSize = (
-    580
+    544
     171)
   PixelsPerInch = 96
   TextHeight = 13
   object lbInformation: TListBox
     Left = 8
     Top = 8
-    Width = 564
+    Width = 528
     Height = 124
-    Style = lbOwnerDrawFixed
+    Style = lbOwnerDrawVariable
     Anchors = [akLeft, akTop, akRight, akBottom]
     Color = clBlack
     Font.Charset = DEFAULT_CHARSET
@@ -37,9 +37,11 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     ParentFont = False
     TabOrder = 0
     OnDrawItem = lbInformationDrawItem
+    OnMeasureItem = lbInformationMeasureItem
+    ExplicitWidth = 618
   end
   object btnOK: TBitBtn
-    Left = 497
+    Left = 461
     Top = 138
     Width = 75
     Height = 25
@@ -68,6 +70,6 @@ object frmCheckForUpdates: TfrmCheckForUpdates
       333A333333333333333338330000333333333333333333333333333333333333
       0000}
     NumGlyphs = 2
-    ExplicitTop = 236
+    ExplicitLeft = 497
   end
 end

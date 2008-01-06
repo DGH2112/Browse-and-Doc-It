@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Jan 2008
+  @Date    06 Jan 2008
 
 **)
 Unit CheckForUpdates;
@@ -174,7 +174,9 @@ Begin
               If iResult = 0 Then
                 Begin
                   OutputMsg(strYourSoftwareIsUpToDate, clWhite);
+                  {$IFNDEF CONSOLE}
                   TfrmCheckForUpdates.Finish(5);
+                  {$ENDIF}
                 End Else
               If iResult > 0 Then
                 Begin

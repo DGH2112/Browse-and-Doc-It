@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    06 Jan 2008
+  @Date    12 Jan 2008
 
 **)
 Unit CheckForUpdates;
@@ -25,6 +25,12 @@ Type
     FSoftwareID : String;
     FLastUpdateDate : TDateTime;
     FRegRoot : String;
+    FMessageTextColour: TColor;
+    FMessageConfirmColour: TColor;
+    FMessageWarningColour: TColor;
+    FMessageNoteColour: TColor;
+    FMessageDescriptionColour: TColor;
+    FMessageHeaderColour: TColor;
   Protected
     Function CheckForUpdates(strURL : String) : Boolean;
     Function FindPackage(xmlNodeList : IXMLDOMNodeList) : IXMLDOMNode;
@@ -35,9 +41,12 @@ Type
     procedure ReadLastUpdateDate;
     procedure WriteLastUpdateDate;
     Function BuildVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : String;
+    Procedure LoadSettings;
+    Procedure SaveSettings;
   Public
     Constructor Create(strURL, strSoftwareID, strRegRoot : String;
       boolForceUpdate : Boolean);
+    Destructor Destroy; Override;
     Class Procedure Execute(strURL, strSoftwareID, strRegRoot : String;
       boolForceUpdate : Boolean);
   End;
@@ -147,23 +156,23 @@ Var
 
 Begin
   Result := False;
-  OutputMsg(strLoadingMSXML);
+  OutputMsg(strLoadingMSXML, FMessageTextColour);
   xmlDoc := CoDOMDocument40.Create;
   Try
     Try
       xmlDoc.ValidateOnParse := True;
-      OutputMsg(Format(strLoadingURL, [strURL]));
+      OutputMsg(Format(strLoadingURL, [strURL]), FMessageTextColour);
       xmlDoc.async := False;
       xmlDoc.validateOnParse := True;
       If xmlDoc.load(strURL) And (xmlDoc.parseError.errorCode = 0) Then
         Begin
-          OutputMsg(strGettingPackages);
+          OutputMsg(strGettingPackages, FMessageTextColour);
           xmlNodeList := xmlDoc.getElementsByTagName('Package');
           P := FindPackage(xmlNodeList);
           If P <> Nil Then
             Begin
-              OutputMsg(Format(strFoundPackage, [FSoftwareID]));
-              OutputMsg(strCheckingSoftwareVerNum);
+              OutputMsg(Format(strFoundPackage, [FSoftwareID]), FMessageTextColour);
+              OutputMsg(strCheckingSoftwareVerNum, FMessageTextColour);
               iMajor := StrToInt(GetNamedNodeText(P, 'Major'));
               iMinor := StrToInt(GetNamedNodeText(P, 'Minor'));
               iBugFix := StrToInt(GetNamedNodeText(P, 'BugFix'));
@@ -173,7 +182,7 @@ Begin
                 strApplication);
               If iResult = 0 Then
                 Begin
-                  OutputMsg(strYourSoftwareIsUpToDate, clWhite);
+                  OutputMsg(strYourSoftwareIsUpToDate, FMessageConfirmColour);
                   {$IFNDEF CONSOLE}
                   TfrmCheckForUpdates.Finish(5);
                   {$ENDIF}
@@ -181,10 +190,10 @@ Begin
               If iResult > 0 Then
                 Begin
                   OutputMsg(Format(strYouAreUsingANewerVersion,
-                    [strApplication, strInternet]), clRed);
+                    [strApplication, strInternet]), FMessageWarningColour);
                   {$IFDEF CONSOLE}
                   OutputMsg('');
-                  OutputMsg(strPressEnterToContinue);
+                  OutputMsg(strPressEnterToContinue, FMessageTextColour);
                   SysUtils.Beep;
                   ReadLn;
                   {$ELSE}
@@ -194,14 +203,14 @@ Begin
                 End Else
                 Begin
                   OutputMsg(Format(strThereIsASoftwareUpdate,
-                    [strInternet, strApplication]), clYellow);
+                    [strInternet, strApplication]), FMessageNoteColour);
                   OutputMsg('');
                   OutputMsg('  ' +
                     StringReplace(GetNamedNodeText(P, 'Description'), #13#10,
-                    #32#32#13#10, [rfReplaceAll]), clLime);
+                    #32#32#13#10, [rfReplaceAll]), FMessageDescriptionColour);
                   {$IFDEF CONSOLE}
                   OutputMsg('');
-                  OutputMsg(strPressEnterToContinue);
+                  OutputMsg(strPressEnterToContinue, FMessageTextColour);
                   SysUtils.Beep;
                   ReadLn;
                   {$ELSE}
@@ -211,12 +220,12 @@ Begin
                 End;
               Result := True;
             End Else
-              OutputMsg(Format(strPackageNotFound, [FSoftwareID]), clYellow);
+              OutputMsg(Format(strPackageNotFound, [FSoftwareID]), FMessageNoteColour);
         End Else
-          OutputMsg(Format('  %s ("%s")', [xmlDoc.parseError.reason, strURL]), clRed);
+          OutputMsg(Format('  %s ("%s")', [xmlDoc.parseError.reason, strURL]), FMessageWarningColour);
     Except
       On E : Exception Do
-        OutputMsg(Format(strExceptionS, [E.Message]), clRed);
+        OutputMsg(Format(strExceptionS, [E.Message]), FMessageWarningColour);
     End;
     OutputMsg('');
   Finally
@@ -245,6 +254,8 @@ Var
   iURL : Integer;
 
 Begin
+  FMessageWarningColour := clRed;
+  LoadSettings;
   FURL := strURL;
   FSoftwareID := strSoftwareID;
   FRegRoot := strRegRoot;
@@ -252,7 +263,7 @@ Begin
   ReadLastUpdateDate;
   If boolForceUpdate Or (FLastUpdateDate + 7.0 < Now) Then
     Begin
-      OutputMsg(strCheckingForUpdates, clWhite);
+      OutputMsg(strCheckingForUpdates, FMessageHeaderColour);
       iURLs := CharCount('|', strURL) + 1;
       For iURL := 1 To iURLs Do
         If CheckForUpdates(GetField(FURL, '|', iURL)) Then
@@ -260,6 +271,20 @@ Begin
       WriteLastUpdateDate;
     End;
 End;
+
+(**
+
+  This is the destructor method for the TCheckForUpdates class.
+
+  @precon  None.
+  @postcon Saves the INI settings for Colours.
+
+**)
+destructor TCheckForUpdates.Destroy;
+begin
+  SaveSettings;
+  Inherited Destroy;
+end;
 
 (**
 
@@ -321,6 +346,29 @@ Begin
         Break;
       End;
 End;
+
+(**
+
+  This method loads the Colours settings from the INI file.
+
+  @precon  None.
+  @postcon Loads the Colours settings from the INI file.
+
+**)
+procedure TCheckForUpdates.LoadSettings;
+begin
+  With TiniFile.Create(FRegRoot) Do
+    Try
+      FMessageTextColour := StringToColor(ReadString('Colours', 'MessageText', 'clNone'));
+      FMessageConfirmColour := StringToColor(ReadString('Colours', 'MessageConfirm', 'clWhite'));
+      FMessageWarningColour := StringToColor(ReadString('Colours', 'MessageWarning', 'clRed'));
+      FMessageNoteColour := StringToColor(ReadString('Colours', 'MessageNote', 'clYellow'));
+      FMessageDescriptionColour := StringToColor(ReadString('Colours', 'MessageDescription', 'clLime'));
+      FMessageHeaderColour := StringToColor(ReadString('Colours', 'MessageHeader', 'clWhite'));
+    Finally
+      Free;
+    End;
+end;
 
 (**
 
@@ -405,6 +453,29 @@ Begin
       Free;
     End;
 End;
+
+(**
+
+  This method saves the Colour settings to the INI file.
+
+  @precon  None.
+  @postcon Saves the Colour settings to the INI file.
+
+**)
+procedure TCheckForUpdates.SaveSettings;
+begin
+  With TiniFile.Create(FRegRoot) Do
+    Try
+      WriteString('Colours', 'MessageText', ColorToString(FMessageTextColour));
+      WriteString('Colours', 'MessageConfirm', ColorToString(FMessageConfirmColour));
+      WriteString('Colours', 'MessageWarning', ColorToString(FMessageWarningColour));
+      WriteString('Colours', 'MessageNote', ColorToString(FMessageNoteColour));
+      WriteString('Colours', 'MessageDescription', ColorToString(FMessageDescriptionColour));
+      WriteString('Colours', 'MessageHeader', ColorToString(FMessageHeaderColour));
+    Finally
+      Free;
+    End;
+end;
 
 (**
 

@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    07 May 2007
+  @Date    20 Jan 2008
 
 **)
 
@@ -39,8 +39,8 @@ Type
     Procedure Display;
     Procedure UpperCaseWord;
     procedure LowerCaseWord;
-    Procedure LoadFromRegistry(strRootKey : String);
-    Procedure SaveToRegistry(strRootKey : String);
+    Procedure LoadFromINIFile(strRootKey : String);
+    Procedure SaveToINIFile(strRootKey : String);
     { Properties }
     (**
       This property returns an appropriate captions for the editor tab within
@@ -123,7 +123,7 @@ Implementation
 { TDGHSynEdit }
 
 Uses
-  Menus, Windows, Registry;
+  Menus, Windows, IniFiles;
 
 (**
 
@@ -295,36 +295,41 @@ end;
 
 (**
 
-  This method loads the editors settings from the given registry key.
+  This method loads the editors settings from the given INI File key.
 
   @precon  None.
-  @postcon Loads the editors settings from the given registry key.
+  @postcon Loads the editors settings from the given INI File key.
 
   @param   strRootKey as a String
 
 **)
-procedure TDGHSynEdit.LoadFromRegistry(strRootKey: String);
+procedure TDGHSynEdit.LoadFromINIFile(strRootKey: String);
+
+Var
+  strKey : String;
+
 begin
-  With TRegIniFile.Create(strRootKey) Do
+  With TIniFile.Create(strRootKey) Do
     Try
-      Color := ReadInteger(strRootKey + 'EditorSettings', 'Color', Color);
-      ActiveLineColor := ReadInteger(strRootKey + 'EditorSettings', 'ActiveLineColor',
+      strKey := Highlighter.LanguageName + 'EditorSettings';
+      Color := ReadInteger(strKey, 'Color', Color);
+      ActiveLineColor := ReadInteger(strKey, 'ActiveLineColor',
         ActiveLineColor);
-      Font.Name := ReadString(strRootKey + 'EditorSettings', 'FontName', Font.Name);
-      Font.Size := ReadInteger(strRootKey + 'EditorSettings', 'FontSize', Font.Size);
+      Font.Name := ReadString(strKey, 'FontName', Font.Name);
+      Font.Size := ReadInteger(strKey, 'FontSize', Font.Size);
       Gutter.Font.Assign(Font);
-      Gutter.ShowLineNumbers := ReadBool(strRootKey + 'EditorSettings', 'ShowLineNumbers',
+      Gutter.ShowLineNumbers := ReadBool(strKey, 'ShowLineNumbers',
         Gutter.ShowLineNumbers);
-      Options := TSynEditorOptions(ReadInteger(strRootKey + 'EditorSettings', 'Options',
+      Options := TSynEditorOptions(ReadInteger(strKey, 'Options',
         Integer(Options)));
-      RightEdge := ReadInteger(strRootKey + 'EditorSettings', 'RightEdge', RightEdge);
-      RightEdgeColor := ReadInteger(strRootKey + 'EditorSettings', 'RightEdgeColor',
+      RightEdge := ReadInteger(strKey, 'RightEdge', RightEdge);
+      RightEdgeColor := ReadInteger(strKey, 'RightEdgeColor',
         RightEdgeColor);
-      SelectedColor.Foreground := ReadInteger(strRootKey + 'EditorSettings',
+      SelectedColor.Foreground := ReadInteger(strKey,
         'SelectedForeground', SelectedColor.Foreground);
-      SelectedColor.Background := ReadInteger(strRootKey + 'EditorSettings',
+      SelectedColor.Background := ReadInteger(strKey,
         'SelectedBackground', SelectedColor.Background);
-      TabWidth := ReadInteger(strRootKey + 'EditorSettings', 'Tab Width', TabWidth);
+      TabWidth := ReadInteger(strKey, 'Tab Width', TabWidth);
     Finally
       Free;
     End;
@@ -354,29 +359,34 @@ end;
 
 (**
 
-  This method saves the editors settings to the given registry key.
+  This method saves the editors settings to the given Ini File key.
 
   @precon  None.
-  @postcon Saves the editors settings to the given registry key.
+  @postcon Saves the editors settings to the given Ini File key.
 
   @param   strRootKey as a String
 
 **)
-procedure TDGHSynEdit.SaveToRegistry(strRootKey: String);
+procedure TDGHSynEdit.SaveToINIFile(strRootKey: String);
+
+Var
+  strKey : String;
+
 begin
-  With TRegIniFile.Create(strRootKey) Do
+  With TIniFile.Create(strRootKey) Do
     Try
-      WriteInteger(strRootKey + 'EditorSettings', 'Color', Color);
-      WriteInteger(strRootKey + 'EditorSettings', 'ActiveLineColor', ActiveLineColor);
-      WriteString(strRootKey + 'EditorSettings', 'FontName', Font.Name);
-      WriteInteger(strRootKey + 'EditorSettings', 'FontSize', Font.Size);
-      WriteBool(strRootKey + 'EditorSettings', 'ShowLineNumbers', Gutter.ShowLineNumbers);
-      WriteInteger(strRootKey + 'EditorSettings', 'Options', Integer(Options));
-      WriteInteger(strRootKey + 'EditorSettings', 'RightEdge', RightEdge);
-      WriteInteger(strRootKey + 'EditorSettings', 'RightEdgeColor', RightEdgeColor);
-      WriteInteger(strRootKey + 'EditorSettings', 'SelectedForeground', SelectedColor.Foreground);
-      WriteInteger(strRootKey + 'EditorSettings', 'SelectedBackground', SelectedColor.Background);
-      WriteInteger(strRootKey + 'EditorSettings', 'Tab Width', TabWidth);
+      strKey := Highlighter.LanguageName + 'EditorSettings';
+      WriteInteger(strKey, 'Color', Color);
+      WriteInteger(strKey, 'ActiveLineColor', ActiveLineColor);
+      WriteString(strKey, 'FontName', Font.Name);
+      WriteInteger(strKey, 'FontSize', Font.Size);
+      WriteBool(strKey, 'ShowLineNumbers', Gutter.ShowLineNumbers);
+      WriteInteger(strKey, 'Options', Integer(Options));
+      WriteInteger(strKey, 'RightEdge', RightEdge);
+      WriteInteger(strKey, 'RightEdgeColor', RightEdgeColor);
+      WriteInteger(strKey, 'SelectedForeground', SelectedColor.Foreground);
+      WriteInteger(strKey, 'SelectedBackground', SelectedColor.Background);
+      WriteInteger(strKey, 'Tab Width', TabWidth);
     Finally
       Free;
     End;

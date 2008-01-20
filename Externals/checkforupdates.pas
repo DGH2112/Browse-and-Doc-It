@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Jan 2008
+  @Date    20 Jan 2008
 
 **)
 Unit CheckForUpdates;
@@ -431,10 +431,10 @@ End;
 
 (**
 
-  This method reads the last update date from the registry.
+  This method reads the last update date from the INI File.
 
   @precon  None.
-  @postcon Reads the last update date from the registry.
+  @postcon Reads the last update date from the INI File.
 
 **)
 Procedure TCheckForUpdates.ReadLastUpdateDate;
@@ -479,10 +479,10 @@ end;
 
 (**
 
-  This method writes the last update date to the registry.
+  This method writes the last update date to the INI File.
 
   @precon  None.
-  @postcon Writes the last update date to the registry.
+  @postcon Writes the last update date to the INI File.
 
 **)
 Procedure TCheckForUpdates.WriteLastUpdateDate;

@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    20 Jan 2008
+  @Date    22 Jan 2008
 
 **)
 
@@ -311,7 +311,10 @@ Var
 begin
   With TIniFile.Create(strRootKey) Do
     Try
-      strKey := Highlighter.LanguageName + 'EditorSettings';
+      If Assigned(Highlighter) Then
+        strKey := Highlighter.LanguageName + 'EditorSettings'
+      Else
+        strKey := 'EditorSettings';
       Color := ReadInteger(strKey, 'Color', Color);
       ActiveLineColor := ReadInteger(strKey, 'ActiveLineColor',
         ActiveLineColor);
@@ -375,7 +378,10 @@ Var
 begin
   With TIniFile.Create(strRootKey) Do
     Try
-      strKey := Highlighter.LanguageName + 'EditorSettings';
+      If Assigned(Highlighter) Then
+        strKey := Highlighter.LanguageName + 'EditorSettings'
+      Else
+        strKey := 'EditorSettings';
       WriteInteger(strKey, 'Color', Color);
       WriteInteger(strKey, 'ActiveLineColor', ActiveLineColor);
       WriteString(strKey, 'FontName', Font.Name);

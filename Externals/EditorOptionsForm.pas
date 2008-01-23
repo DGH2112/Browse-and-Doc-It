@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    14 Oct 2006
+  @Date    23 Jan 2008
 
 **)
 unit EditorOptionsForm;
@@ -66,6 +66,7 @@ type
   private
     { Private declarations }
     FAttributes : TObjectList;
+    FUpdating : Boolean;
   public
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
@@ -231,6 +232,7 @@ End;
   @postcon nvokes a form for editing the given instance of the TSynEdit control.
 
   @param   Editor as a TSynEdit as a reference
+  @return  a Boolean
 
 **)
 Class Function TfrmEditorOptions.Execute(Editor : TSynEdit) : Boolean;
@@ -328,20 +330,28 @@ procedure TfrmEditorOptions.lbAttributesClick(Sender: TObject);
 
 Var
   i : Integer;
+  A : TAttribute;
 
 begin
   If lbAttributes.ItemIndex > -1 Then
     For i :=  0 To FAttributes.Count - 1 Do
-      With (FAttributes[i] As TAttribute) Do
-      If Name = lbAttributes.Items[lbAttributes.ItemIndex] Then
-        Begin
-          cbxAttrForeColour.Selected := ForeColour;
-          cbxAttrBackColour.Selected := BackColour;
-          cbxBold.Checked := fsBold In Style;
-          cbxItalic.Checked := fsItalic In Style;
-          cbxUnderlined.Checked := fsUnderline In Style;
-          cbxStrikeout.Checked := fsStrikeOut In Style;
-        End;
+      Begin
+        A := FAttributes[i] As TAttribute;
+        If A.Name = lbAttributes.Items[lbAttributes.ItemIndex] Then
+          Begin
+            FUpdating := True;
+            Try
+              cbxAttrForeColour.Selected := A.ForeColour;
+              cbxAttrBackColour.Selected := A.BackColour;
+              cbxBold.Checked := fsBold In A.Style;
+              cbxItalic.Checked := fsItalic In A.Style;
+              cbxUnderlined.Checked := fsUnderline In A.Style;
+              cbxStrikeout.Checked := fsStrikeOut In A.Style;
+            Finally
+              FUpdating := False;
+            End;
+          End;
+      End;
 end;
 
 (**
@@ -361,26 +371,27 @@ Var
 
 begin
   If lbAttributes.ItemIndex > -1 Then
-    For i :=  0 To FAttributes.Count - 1 Do
-      If (FAttributes[i] As TAttribute).Name =
-        lbAttributes.Items[lbAttributes.ItemIndex] Then
-        Begin
-          (FAttributes[i] As TAttribute).ForeColour := cbxAttrForeColour.Selected;
-          (FAttributes[i] As TAttribute).BackColour := cbxAttrBackColour.Selected;
-          (FAttributes[i] As TAttribute).Style := [];
-          If cbxBold.Checked Then
-            (FAttributes[i] As TAttribute).Style :=
-              (FAttributes[i] As TAttribute).Style + [fsBold];
-          If cbxItalic.Checked Then
-            (FAttributes[i] As TAttribute).Style :=
-              (FAttributes[i] As TAttribute).Style + [fsItalic];
-          If cbxUnderlined.Checked Then
-            (FAttributes[i] As TAttribute).Style :=
-              (FAttributes[i] As TAttribute).Style + [fsUnderline];
-          If cbxStrikeout.Checked Then
-            (FAttributes[i] As TAttribute).Style :=
-              (FAttributes[i] As TAttribute).Style + [fsStrikeout];
-        End;
+    If Not FUpdating Then
+      For i :=  0 To FAttributes.Count - 1 Do
+        If (FAttributes[i] As TAttribute).Name =
+          lbAttributes.Items[lbAttributes.ItemIndex] Then
+          Begin
+            (FAttributes[i] As TAttribute).ForeColour := cbxAttrForeColour.Selected;
+            (FAttributes[i] As TAttribute).BackColour := cbxAttrBackColour.Selected;
+            (FAttributes[i] As TAttribute).Style := [];
+            If cbxBold.Checked Then
+              (FAttributes[i] As TAttribute).Style :=
+                (FAttributes[i] As TAttribute).Style + [fsBold];
+            If cbxItalic.Checked Then
+              (FAttributes[i] As TAttribute).Style :=
+                (FAttributes[i] As TAttribute).Style + [fsItalic];
+            If cbxUnderlined.Checked Then
+              (FAttributes[i] As TAttribute).Style :=
+                (FAttributes[i] As TAttribute).Style + [fsUnderline];
+            If cbxStrikeout.Checked Then
+              (FAttributes[i] As TAttribute).Style :=
+                (FAttributes[i] As TAttribute).Style + [fsStrikeout];
+          End;
 end;
 
 end.

@@ -28,10 +28,6 @@ object frmEditorOptions: TfrmEditorOptions
     TabOrder = 0
     object VisualTab: TTabSheet
       Caption = 'Visual'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lblActiveLineColour: TLabel
         Left = 3
         Top = 34
@@ -118,7 +114,7 @@ object frmEditorOptions: TfrmEditorOptions
         Top = 59
         Width = 145
         Height = 21
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 2
         Text = 'cbxFontName'
       end
@@ -225,10 +221,6 @@ object frmEditorOptions: TfrmEditorOptions
     object BehaviourTab: TTabSheet
       Caption = 'Behaviour'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         299
         280)
@@ -245,10 +237,6 @@ object frmEditorOptions: TfrmEditorOptions
     object SyntaxTab: TTabSheet
       Caption = 'Syntax Highlighting'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         299
         280)

@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Jan 2008
+  @Date    25 Jan 2008
 
 **)
 
@@ -312,26 +312,26 @@ begin
   With TIniFile.Create(strRootKey) Do
     Try
       If Assigned(Highlighter) Then
-        strKey := Highlighter.LanguageName + 'EditorSettings'
+        strKey := Highlighter.LanguageName + '.Editor Settings'
       Else
-        strKey := 'EditorSettings';
-      Color := ReadInteger(strKey, 'Color', Color);
-      ActiveLineColor := ReadInteger(strKey, 'ActiveLineColor',
+        strKey := 'Editor Settings';
+      Color := ReadInteger(strKey, 'Colour', Color);
+      ActiveLineColor := ReadInteger(strKey, 'Active Line Colour',
         ActiveLineColor);
-      Font.Name := ReadString(strKey, 'FontName', Font.Name);
-      Font.Size := ReadInteger(strKey, 'FontSize', Font.Size);
+      Font.Name := ReadString(strKey, 'Font Name', Font.Name);
+      Font.Size := ReadInteger(strKey, 'Font Size', Font.Size);
       Gutter.Font.Assign(Font);
-      Gutter.ShowLineNumbers := ReadBool(strKey, 'ShowLineNumbers',
+      Gutter.ShowLineNumbers := ReadBool(strKey, 'Show Line Numbers',
         Gutter.ShowLineNumbers);
-      Options := TSynEditorOptions(ReadInteger(strKey, 'Options',
+      Options := TSynEditorOptions(ReadInteger(strKey, 'Editor Options',
         Integer(Options)));
-      RightEdge := ReadInteger(strKey, 'RightEdge', RightEdge);
-      RightEdgeColor := ReadInteger(strKey, 'RightEdgeColor',
+      RightEdge := ReadInteger(strKey, 'Right Edge', RightEdge);
+      RightEdgeColor := ReadInteger(strKey, 'Right Edge Colour',
         RightEdgeColor);
       SelectedColor.Foreground := ReadInteger(strKey,
-        'SelectedForeground', SelectedColor.Foreground);
+        'Selected Foreground', SelectedColor.Foreground);
       SelectedColor.Background := ReadInteger(strKey,
-        'SelectedBackground', SelectedColor.Background);
+        'Selected Background', SelectedColor.Background);
       TabWidth := ReadInteger(strKey, 'Tab Width', TabWidth);
     Finally
       Free;
@@ -379,19 +379,19 @@ begin
   With TIniFile.Create(strRootKey) Do
     Try
       If Assigned(Highlighter) Then
-        strKey := Highlighter.LanguageName + 'EditorSettings'
+        strKey := Highlighter.LanguageName + '.Editor Settings'
       Else
-        strKey := 'EditorSettings';
-      WriteInteger(strKey, 'Color', Color);
-      WriteInteger(strKey, 'ActiveLineColor', ActiveLineColor);
-      WriteString(strKey, 'FontName', Font.Name);
-      WriteInteger(strKey, 'FontSize', Font.Size);
-      WriteBool(strKey, 'ShowLineNumbers', Gutter.ShowLineNumbers);
-      WriteInteger(strKey, 'Options', Integer(Options));
-      WriteInteger(strKey, 'RightEdge', RightEdge);
-      WriteInteger(strKey, 'RightEdgeColor', RightEdgeColor);
-      WriteInteger(strKey, 'SelectedForeground', SelectedColor.Foreground);
-      WriteInteger(strKey, 'SelectedBackground', SelectedColor.Background);
+        strKey := 'Editor Settings';
+      WriteInteger(strKey, 'Colour', Color);
+      WriteInteger(strKey, 'Active Line Colour', ActiveLineColor);
+      WriteString(strKey, 'Font Name', Font.Name);
+      WriteInteger(strKey, 'Font Size', Font.Size);
+      WriteBool(strKey, 'Show Line Numbers', Gutter.ShowLineNumbers);
+      WriteInteger(strKey, 'Editor Options', Integer(Options));
+      WriteInteger(strKey, 'Right Edge', RightEdge);
+      WriteInteger(strKey, 'Right Edge Colour', RightEdgeColor);
+      WriteInteger(strKey, 'Selected Foreground', SelectedColor.Foreground);
+      WriteInteger(strKey, 'Selected Background', SelectedColor.Background);
       WriteInteger(strKey, 'Tab Width', TabWidth);
     Finally
       Free;

@@ -9345,6 +9345,7 @@ var
   TempString: String;
   OrgSelectionMode : TSynSelectionMode;
   SomethingToDelete : Boolean;
+  ptrDispose : PChar;
 
   function GetDelLen : integer;
   var
@@ -9394,80 +9395,85 @@ begin
     StrToDeleteLen := (FTabWidth + 2) * (e - BB.Line) + FTabWidth + 1;
     //                chars per line * lines-1    + last line + null char
     StrToDelete := StrAlloc(StrToDeleteLen);
-    StrToDelete[0] := #0;
-    SomethingToDelete := False;
-    for i := BB.Line to e-1 do
-    begin
-       Line := PChar(Lines[i-1]);
-       //'Line' is 0-based, 'BB.x' is 1-based, so the '-1'
-       //And must not increment 'Line' pointer by more than its 'Length' 
-       if fActiveSelectionMode = smColumn then
-         Inc( Line, MinIntValue([ BB.Char-1, BE.Char-1, Length(Lines[i-1]) ]) );
-       //Instead of doing a StringOfChar, we need to get *exactly* what was
-       //being deleted incase there is a TabChar
-       TmpDelLen := GetDelLen;
-       StrCat(StrToDelete,PChar(Copy(Line, 1, TmpDelLen)));
-       StrCat(StrToDelete, PChar(#13#10));
-       if (fCaretY = i) and (x <> 1) then
-         x := x - TmpDelLen;
-    end;
-    Line := PChar(Lines[e-1]);
-   if fActiveSelectionMode = smColumn then
-     Inc( Line, MinIntValue([ BB.Char-1, BE.Char-1, Length(Lines[e-1]) ]) );
-    TmpDelLen := GetDelLen;
-    StrCat(StrToDelete,PChar(Copy(Line, 1, TmpDelLen)));
-    if (fCaretY = e) and (x <> 1) then
-      x := x - TmpDelLen;
+    Try
+      ptrDispose := StrToDelete;
+      StrToDelete[0] := #0;
+      SomethingToDelete := False;
+      for i := BB.Line to e-1 do
+      begin
+         Line := PChar(Lines[i-1]);
+         //'Line' is 0-based, 'BB.x' is 1-based, so the '-1'
+         //And must not increment 'Line' pointer by more than its 'Length'
+         if fActiveSelectionMode = smColumn then
+           Inc( Line, MinIntValue([ BB.Char-1, BE.Char-1, Length(Lines[i-1]) ]) );
+         //Instead of doing a StringOfChar, we need to get *exactly* what was
+         //being deleted incase there is a TabChar
+         TmpDelLen := GetDelLen;
+         StrCat(StrToDelete,PChar(Copy(Line, 1, TmpDelLen)));
+         StrCat(StrToDelete, PChar(#13#10));
+         if (fCaretY = i) and (x <> 1) then
+           x := x - TmpDelLen;
+      end;
+      Line := PChar(Lines[e-1]);
+     if fActiveSelectionMode = smColumn then
+       Inc( Line, MinIntValue([ BB.Char-1, BE.Char-1, Length(Lines[e-1]) ]) );
+      TmpDelLen := GetDelLen;
+      StrCat(StrToDelete,PChar(Copy(Line, 1, TmpDelLen)));
+      if (fCaretY = e) and (x <> 1) then
+        x := x - TmpDelLen;
 
-    FirstIndent := -1;
-    // Delete string
-    if SomethingToDelete then
-    begin
-      FullStrToDelete := StrToDelete;
-      InternalCaretY := BB.Line;
-      if fActiveSelectionMode <> smColumn then
-        i := 1
-      else
-        i := Min( BB.Char, BE.Char );
-      repeat
-        Run := GetEOL(StrToDelete);
-        if Run <> StrToDelete then
-        begin
-          Len := Run - StrToDelete;
-          if FirstIndent = -1 then
-            FirstIndent := Len;
-          if Len > 0 then
+      FirstIndent := -1;
+      // Delete string
+      if SomethingToDelete then
+      begin
+        FullStrToDelete := StrToDelete;
+        InternalCaretY := BB.Line;
+        if fActiveSelectionMode <> smColumn then
+          i := 1
+        else
+          i := Min( BB.Char, BE.Char );
+        repeat
+          Run := GetEOL(StrToDelete);
+          if Run <> StrToDelete then
           begin
-            TempString := Lines[CaretY - 1];
-            Delete(TempString, i, Len);
-            Lines[CaretY - 1] := TempString;
+            Len := Run - StrToDelete;
+            if FirstIndent = -1 then
+              FirstIndent := Len;
+            if Len > 0 then
+            begin
+              TempString := Lines[CaretY - 1];
+              Delete(TempString, i, Len);
+              Lines[CaretY - 1] := TempString;
+            end;
           end;
-        end;
-        if Run^ = #13 then
-        begin
-          Inc(Run);
-          if Run^ = #10 then
+          if Run^ = #13 then
+          begin
             Inc(Run);
-          Inc(fCaretY);
-        end;
-        StrToDelete := Run;
-      until Run^ = #0;
-      LastIndent := Len;
-      fUndoList.AddChange( crUnindent, BB, BE, FullStrToDelete, fActiveSelectionMode );
-    end;
-    // restore selection
-    if FirstIndent = -1 then
-      FirstIndent := 0;
-    //adjust the x position of orgcaretpos appropriately
-    if fActiveSelectionMode = smColumn then
-      SetCaretAndSelection( OrgCaretPos, BB, BE )
-    else begin
-      OrgCaretPos.Char := X;
-      Dec( BB.Char, FirstIndent );
-      Dec( BE.Char, LastIndent );
-      SetCaretAndSelection( OrgCaretPos, BB, BE );
-    end;
-    ActiveSelectionMode := OrgSelectionMode;
+            if Run^ = #10 then
+              Inc(Run);
+            Inc(fCaretY);
+          end;
+          StrToDelete := Run;
+        until Run^ = #0;
+        LastIndent := Len;
+        fUndoList.AddChange( crUnindent, BB, BE, FullStrToDelete, fActiveSelectionMode );
+      end;
+      // restore selection
+      if FirstIndent = -1 then
+        FirstIndent := 0;
+      //adjust the x position of orgcaretpos appropriately
+      if fActiveSelectionMode = smColumn then
+        SetCaretAndSelection( OrgCaretPos, BB, BE )
+      else begin
+        OrgCaretPos.Char := X;
+        Dec( BB.Char, FirstIndent );
+        Dec( BE.Char, LastIndent );
+        SetCaretAndSelection( OrgCaretPos, BB, BE );
+      end;
+      ActiveSelectionMode := OrgSelectionMode;
+    Finally
+      StrDispose(ptrDispose);
+    End;
   end;
 end;
 

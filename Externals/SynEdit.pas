@@ -9395,8 +9395,8 @@ begin
     StrToDeleteLen := (FTabWidth + 2) * (e - BB.Line) + FTabWidth + 1;
     //                chars per line * lines-1    + last line + null char
     StrToDelete := StrAlloc(StrToDeleteLen);
+    ptrDispose := StrToDelete;
     Try
-      ptrDispose := StrToDelete;
       StrToDelete[0] := #0;
       SomethingToDelete := False;
       for i := BB.Line to e-1 do

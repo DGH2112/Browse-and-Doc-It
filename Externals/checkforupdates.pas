@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    20 Jan 2008
+  @Date    03 Feb 2008
 
 **)
 Unit CheckForUpdates;
@@ -394,7 +394,7 @@ Var
   iMaj, iMin, iBug, iBui : Integer;
 
 Begin
-  GetBuildNumber(iMaj, iMin, iBug, iBui);
+  GetBuildNumber(ParamStr(0), iMaj, iMin, iBug, iBui);
   Result := iMaj - iMajor;
   If Result = 0 Then
     Result := iMin - iMinor;

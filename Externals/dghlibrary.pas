@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    02 Jan 2008
+  @Date    01 Feb 2008
 
 **)
 Unit DGHLibrary;
@@ -16,6 +16,9 @@ Uses
   SysUtils, Classes, Windows, Graphics;
 
 Type
+  (** A custom exception for errors getting the building number. **)
+  EBuildNumberException = Exception;
+
   (** A record to describe the degrees, minutes and seconds of a bearing. **)
   TBearing = Record
     iDegrees : Integer;
@@ -491,7 +494,8 @@ Type
   Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer): Integer;
   Function Pow(X, Y : Real) : Real;
   Function ReduceBearing(dblBearing : Double) : Double;
-  Function GetBuildNumber(var iMajor, iMinor, iBugfix, iBuild : Integer) : String;
+  Function GetBuildNumber(strFileName : String; var iMajor, iMinor, iBugfix,
+    iBuild : Integer) : String;
   Function GetConsoleTitle(strTitle: String) : String;
   Procedure OutputToConsole(hndConsole : THandle; Const strText : String = '';
     iTextColour : TColor = clNone; iBackColour : TColor = clNone;
@@ -4933,7 +4937,8 @@ End;
   @return  a String
 
 **)
-Function GetBuildNumber(var iMajor, iMinor, iBugfix, iBuild : Integer) : String;
+Function GetBuildNumber(strFileName : String; var iMajor, iMinor, iBugfix,
+  iBuild : Integer) : String;
 
 Const
   strBuild = '%d.%d.%d.%d';
@@ -4946,11 +4951,11 @@ Var
   Dummy: DWORD;
 
 Begin
-  VerInfoSize := GetFileVersionInfoSize(PChar(ParamStr(0)), Dummy);
+  VerInfoSize := GetFileVersionInfoSize(PChar(strFileName), Dummy);
   If VerInfoSize <> 0 Then
     Begin
       GetMem(VerInfo, VerInfoSize);
-      GetFileVersionInfo(PChar(ParamStr(0)), 0, VerInfoSize, VerInfo);
+      GetFileVersionInfo(PChar(strFileName), 0, VerInfoSize, VerInfo);
       VerQueryValue(VerInfo, '\', Pointer(VerValue), VerValueSize);
       with VerValue^ do
       begin
@@ -4962,7 +4967,8 @@ Begin
       end;
       FreeMem(VerInfo, VerInfoSize);
     End Else
-      Raise Exception.Create('This executable does not contain any version information.');
+      Raise EBuildNumberException.CreateFmt(
+        'The executable "%s" does not contain any version information.', [strFileName]);
 End;
 
 (**
@@ -4990,7 +4996,7 @@ Var
   dtDate : TDateTime;
 
 Begin
-  strBuildNumber := GetBuildNumber(iMajor, iMinor, iBugFix, iBuild);
+  strBuildNumber := GetBuildNumber(ParamStr(0), iMajor, iMinor, iBugFix, iBuild);
   Result := Format(strTitle, [iMajor, iMinor, strBugFix[iBugFix + 1],
     strBuildNumber]);
   FileAge(ParamStr(0), dtDate);

@@ -3,7 +3,7 @@ object frmEditorOptions: TfrmEditorOptions
   Top = 291
   BorderStyle = bsDialog
   Caption = 'Editor Options'
-  ClientHeight = 355
+  ClientHeight = 362
   ClientWidth = 323
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,19 +15,21 @@ object frmEditorOptions: TfrmEditorOptions
   Position = poMainFormCenter
   DesignSize = (
     323
-    355)
+    362)
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TPageControl
     Left = 8
     Top = 8
     Width = 307
-    Height = 308
+    Height = 315
     ActivePage = VisualTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
+    ExplicitHeight = 308
     object VisualTab: TTabSheet
       Caption = 'Visual'
+      ExplicitHeight = 280
       object lblActiveLineColour: TLabel
         Left = 3
         Top = 34
@@ -221,25 +223,28 @@ object frmEditorOptions: TfrmEditorOptions
     object BehaviourTab: TTabSheet
       Caption = 'Behaviour'
       ImageIndex = 1
+      ExplicitHeight = 280
       DesignSize = (
         299
-        280)
+        287)
       object clbOptions: TCheckListBox
         Left = 3
         Top = 3
         Width = 293
-        Height = 274
+        Height = 281
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0
+        ExplicitHeight = 274
       end
     end
     object SyntaxTab: TTabSheet
       Caption = 'Syntax Highlighting'
       ImageIndex = 2
+      ExplicitHeight = 280
       DesignSize = (
         299
-        280)
+        287)
       object lblAttrForeColour: TLabel
         Left = 143
         Top = 40
@@ -282,11 +287,12 @@ object frmEditorOptions: TfrmEditorOptions
         Left = 3
         Top = 56
         Width = 134
-        Height = 221
+        Height = 228
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0
         OnClick = lbAttributesClick
+        ExplicitHeight = 221
       end
       object cbxAttrForeColour: TColorBox
         Left = 143
@@ -296,7 +302,7 @@ object frmEditorOptions: TfrmEditorOptions
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         ItemHeight = 16
         TabOrder = 1
-        OnClick = AttributeChange
+        OnChange = AttributeChange
       end
       object cbxAttrBackColour: TColorBox
         Left = 143
@@ -306,7 +312,7 @@ object frmEditorOptions: TfrmEditorOptions
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         ItemHeight = 16
         TabOrder = 2
-        OnClick = AttributeChange
+        OnChange = AttributeChange
       end
       object grpFontStyles: TGroupBox
         Left = 143
@@ -356,20 +362,22 @@ object frmEditorOptions: TfrmEditorOptions
   end
   object btnOK: TBitBtn
     Left = 240
-    Top = 322
+    Top = 329
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     TabOrder = 2
     Kind = bkOK
+    ExplicitTop = 322
   end
   object btnCancel: TBitBtn
     Left = 159
-    Top = 323
+    Top = 330
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     TabOrder = 1
     Kind = bkCancel
+    ExplicitTop = 323
   end
 end

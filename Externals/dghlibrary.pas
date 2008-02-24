@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Feb 2008
+  @Date    24 Feb 2008
 
 **)
 Unit DGHLibrary;
@@ -503,6 +503,7 @@ Type
   Procedure OutputToConsoleLn(hndConsole : THandle; Const strText : String = '';
     iTextColour : TColor = clNone; iBackColour : TColor = clNone;
     boolUpdateCursor : Boolean = True);
+  Function BuildRootKey : String;
 
 { -------------------------------------------------------------------------
 
@@ -4930,10 +4931,11 @@ End;
   @postcon Extract the build number from the EXE resources for display in the
            app title.
 
-  @param   iMajor  as an Integer as a reference
-  @param   iMinor  as an Integer as a reference
-  @param   iBugfix as an Integer as a reference
-  @param   iBuild  as an Integer as a reference
+  @param   strFileName as a String
+  @param   iMajor      as an Integer as a reference
+  @param   iMinor      as an Integer as a reference
+  @param   iBugfix     as an Integer as a reference
+  @param   iBuild      as an Integer as a reference
   @return  a String
 
 **)
@@ -5206,5 +5208,43 @@ Begin
       SetConsoleCursorPosition(hndConsole, NewPos);
     End;
 End;
+
+(**
+
+  This method builds the root key INI filename for the loading and saving of
+  settings from the instance handle for the module.
+
+  @precon  None.
+  @postcon Builds the root key INI filename for the loading and saving of
+           settings from the instance handle for the module.
+
+  @return  a String
+
+**)
+Function BuildRootKey : String;
+
+var
+  i: Cardinal;
+  strUserName: string;
+  strComputerName: string;
+  strModulePathAndName : String;
+  Buffer : Array[0..MAX_PATH] Of Char;
+
+begin
+  i := 1024;
+  SetLength(strUserName, i);
+  GetUserName(@strUserName[1], i);
+  Win32Check(LongBool(i));
+  SetLength(strUserName, i - 1);
+  i := 1024;
+  SetLength(strComputerName, i);
+  GetComputerName(@strComputerName[1], i);
+  Win32Check(LongBool(i));
+  SetLength(strComputerName, i);
+  GetModuleFileName(hInstance, Buffer, MAX_PATH);
+  strModulePathAndName := ChangeFileExt(StrPas(Buffer), '');
+  Result := Format('%s Settings for %s on %s.INI', [strModulePathAndName,
+    strUserName, strComputerName]);
+end;
 
 End.

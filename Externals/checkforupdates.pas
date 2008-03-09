@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Feb 2008
+  @Date    09 Mar 2008
 
 **)
 Unit CheckForUpdates;
@@ -220,7 +220,13 @@ Begin
                 End;
               Result := True;
             End Else
+            Begin
               OutputMsg(Format(strPackageNotFound, [FSoftwareID]), FMessageNoteColour);
+              {$IFNDEF CONSOLE}
+              SysUtils.Beep;
+              TfrmCheckForUpdates.Finish(60);
+              {$ENDIF}
+            End;
         End Else
           OutputMsg(Format('  %s ("%s")', [xmlDoc.parseError.reason, strURL]), FMessageWarningColour);
     Except

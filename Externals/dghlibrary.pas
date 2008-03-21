@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    24 Feb 2008
+  @Date    21 Mar 2008
 
 **)
 Unit DGHLibrary;
@@ -5001,7 +5001,11 @@ Begin
   strBuildNumber := GetBuildNumber(ParamStr(0), iMajor, iMinor, iBugFix, iBuild);
   Result := Format(strTitle, [iMajor, iMinor, strBugFix[iBugFix + 1],
     strBuildNumber]);
+  {$IFDEF VER180}
   FileAge(ParamStr(0), dtDate);
+  {$ELSE}
+  dtDate := FileDateToDateTime(FileAge(ParamStr(0)));
+  {$ENDIF}
   Result := Result + #13#10 +
     Format('Written by David Hoyle (c) %s', [FormatDateTime('mmm/yyyy', dtDate)]);
 End;
@@ -5105,6 +5109,40 @@ Begin
   End;
 End;
 
+Type
+  (** An enumerate to define the current console output mode **)
+  TConsoleMode = (cmUnknown, cmStandard, cmRedirected);
+
+Var
+  (** A private variable to hold the console output mode **)
+  ConsoleMode : TConsoleMode;
+
+(**
+
+  This function returns the current mode of output of the console functions. The
+  first time its gets the console mode from the Win32 API.
+
+  @precon  hndConsole must be a valid console handle.
+  @postcon Returns the current mode of output of the console functions.
+
+  @param   hndConsole as a THandle
+  @return  a Boolean   
+
+**)
+Function CheckConsoleMode(hndConsole : THandle) : Boolean;
+
+Var
+  lpMode : Cardinal;
+
+Begin
+  If ConsoleMode = cmUnknown Then
+    If Not GetConsoleMode(hndConsole, lpMode) Then
+      ConsoleMode := cmRedirected
+    Else
+      ConsoleMode := cmStandard;
+  Result := ConsoleMode = cmStandard;
+End;
+
 (**
 
   This function outputs the given text to the console references by the given
@@ -5130,23 +5168,23 @@ Procedure OutputToConsoleLn(hndConsole : THandle; Const strText : String = '';
 Var
   sl : TStringList;
   i : Integer;
-  ConBufRec : TConsoleScreenBufferInfo;
-  CurPos : TCoord;
+  wChars : Cardinal;
 
 Begin
-  sl := TstringList.Create;
+  sl := TStringList.Create;
   Try
     sl.Text := strText;
     If sl.Text = '' Then
       sl.Text := #13#10;
     For i := 0 to sl.Count - 1 Do
       Begin
-        OutputToConsole(hndConsole, sl[i], iTextColour, iBackColour,
-          boolUpdateCursor);
-        GetConsoleScreenBufferInfo(hndConsole, ConBufRec);
-        CurPos.X := 0;
-        CurPos.Y := ConBufRec.dwCursorPosition.Y + 1;
-        SetConsoleCursorPosition(hndConsole, CurPos);
+        If CheckConsoleMode(hndConsole) Then
+          Begin
+            OutputToConsole(hndConsole, sl[i], iTextColour, iBackColour,
+              boolUpdateCursor);
+            Win32Check(WriteConsole(hndConsole, PChar(#13#10), 2, wChars, Nil));
+          End Else
+            WriteLn(sl[i]);
       End;
   Finally
     sl.Free;
@@ -5180,33 +5218,52 @@ Var
   wChars : DWord;
   iChar : Integer;
   Attrs : Array of Word;
+  OldPos : TCoord;
   NewPos : TCoord;
   iForeAttrColour, iBackAttrColour : Integer;
   strTABText : String;
 
 Begin
   strTabText := StringReplace(strText, #9, #175, [rfReplaceAll]);
-  Win32Check(GetConsoleScreenBufferInfo(hndConsole, ConsoleInfo));
-  NewPos := ConsoleInfo.dwCursorPosition;
-  Win32Check(WriteConsoleOutputCharacter(hndConsole, PChar(strTABText), Length(strTABText),
-    ConsoleInfo.dwCursorPosition, wChars));
-  SetLength(Attrs, Length(strTABText));
-  iForeAttrColour := ForeGroundColour(iTextColour, ConsoleInfo.wAttributes And $0F);
-  iBackAttrColour := BackGroundColour(iBackColour, ConsoleInfo.wAttributes And $F0);
-  For iChar := 0 To Length(strTABText) - 1 Do
-    Attrs[iChar] := iForeAttrColour Or iBackAttrColour;
-  Win32Check(WriteConsoleOutputAttribute(hndConsole, Attrs,
-    Length(strTABText), ConsoleInfo.dwCursorPosition, wChars));
-  If boolUpdateCursor Then
+  If CheckConsoleMode(hndConsole) Then
     Begin
-      Inc(NewPos.X, wChars);
-      While NewPos.X > ConsoleInfo.dwSize.X Do
+      Repeat
+        Win32Check(GetConsoleScreenBufferInfo(hndConsole, ConsoleInfo));
+        OldPos := ConsoleInfo.dwCursorPosition;
+        NewPos := OldPos;
+        Win32Check(WriteConsoleOutputCharacter(hndConsole, PChar(strTABText), Length(strTABText),
+          ConsoleInfo.dwCursorPosition, wChars));
+        SetLength(Attrs, wChars);
+        iForeAttrColour := ForeGroundColour(iTextColour, ConsoleInfo.wAttributes And $0F);
+        iBackAttrColour := BackGroundColour(iBackColour, ConsoleInfo.wAttributes And $F0);
+        For iChar := 0 To wChars - 1 Do
+          Attrs[iChar] := iForeAttrColour Or iBackAttrColour;
+        Win32Check(WriteConsoleOutputAttribute(hndConsole, Attrs,
+          Length(strTABText), ConsoleInfo.dwCursorPosition, wChars));
+        Delete(strTABText, 1, wChars);
+        Inc(NewPos.X, wChars);
+        While NewPos.X >= ConsoleInfo.dwSize.X Do
+          Begin
+            Inc(NewPos.Y);
+            Dec(NewPos.X, ConsoleInfo.dwSize.X);
+          End;
+        If strTABText <> '' Then
+          Begin
+            Win32Check(WriteConsole(hndConsole, PChar(#13#10), 2, wChars, Nil));
+            Inc(NewPos.Y);
+            NewPos.X := 0;
+          End;
+      Until strTABText = '';
+      If boolUpdateCursor Then
         Begin
-          Inc(NewPos.Y);
-          Dec(NewPos.X, ConsoleInfo.dwSize.X);
-        End;
-      SetConsoleCursorPosition(hndConsole, NewPos);
-    End;
+          // The only time the below fails is at the end of the buffer and a new
+          // line is required, hence the new line on failure.
+          If Not SetConsoleCursorPosition(hndConsole, NewPos) Then
+            Win32Check(WriteConsole(hndConsole, PChar(#13#10), 2, wChars, Nil));
+        End Else
+          Win32Check(SetConsoleCursorPosition(hndConsole, OldPos));
+    End Else
+      Write(strTABText);
 End;
 
 (**
@@ -5247,4 +5304,7 @@ begin
     strUserName, strComputerName]);
 end;
 
+(** Initialises the console more to Unknown to force a call to the Win32 API **)
+Initialization
+  ConsoleMode := cmUnknown;
 End.

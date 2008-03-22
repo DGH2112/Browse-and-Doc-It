@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Mar 2008
+  @Date    22 Mar 2008
 
 **)
 Unit DGHLibrary;
@@ -225,10 +225,9 @@ Type
       Override;
     Function GetRadius(dblChainage : Double) : Double; Override;
     Function GetElementDetails : THElement; Virtual;
-    Constructor Create(dblOEasting, dblONorthing, dblOChainage, dblStChainage,
-      dblOBearing, dblLength, dblRLValue : Double); Virtual;
-    Constructor CreateWithFalseOrigin(dblEasting, dblNorthing, dblChainage,
-      dblBearing, dblLength, dblStRadius, dblEndRadius : Double); Virtual;
+    Constructor Create(dblEasting, dblNorthing, dblChainage, dblBearing,
+      dblLength, dblStChainageOrRadius, dblRLValueOrEndRadius : Double;
+      boolFalse : Boolean); Virtual;
   End;
 
   (** This class is the base class in the heiracrhy for the vertical
@@ -2664,124 +2663,108 @@ end;
            origin bearing, start chainage and origin chainage
   @postcon The class is created.
 
-  @param   dblOEasting   as a Double
-  @param   dblONorthing  as a Double
-  @param   dblOChainage  as a Double
-  @param   dblStChainage as a Double
-  @param   dblOBearing   as a Double
-  @param   dblLength     as a Double
-  @param   dblRLValue    as a Double
+  @param   dblEasting            as a Double
+  @param   dblNorthing           as a Double
+  @param   dblChainage           as a Double
+  @param   dblBearing            as a Double
+  @param   dblLength             as a Double
+  @param   dblStChainageOrRadius as a Double
+  @param   dblRLValueOrEndRadius as a Double
+  @param   boolFalse             as a Boolean
 
 **)
-constructor THClothoidElement.Create(dblOEasting, dblONorthing,
-  dblOChainage, dblStChainage, dblOBearing, dblLength, dblRLValue: Double);
+constructor THClothoidElement.Create(dblEasting, dblNorthing, dblChainage,
+  dblBearing, dblLength, dblStChainageOrRadius, dblRLValueOrEndRadius: Double;
+  boolFalse : Boolean);
+var
+  dblX: Double;
+  dblY: Double;
+  dblTheta: Double;
+  dblZ: Double;
 begin
   Inherited Create();
-  FEasting        := dblOEasting;
-  FNorthing       := dblONorthing;
-  FOChainage      := dblOChainage;
-  FChainage       := dblStChainage;
-  FBearing        := dblOBearing;
-  FLength         := dblLength;
-  If FLength <= 0 Then
-    Raise ELengthZeroOrNegativeException.Create(
-      'The length of an element can not be Zero or Negative.');
-  FRLValue        := dblRLValue;
-  If FRLValue = 0 Then
-    Raise EZeroRLValueExecption.Create(
-      'A horizontal clothoid must have a non-zero RL value.');
-end;
-
-(**
-
-  This is the constructor method for the THClothoidElement class.
-
-  @precon  This constructor creates a transition element with a false origin.
-  @postcon The class is created.
-
-  @param   dblEasting   as a Double
-  @param   dblNorthing  as a Double
-  @param   dblChainage  as a Double
-  @param   dblBearing   as a Double
-  @param   dblLength    as a Double
-  @param   dblStRadius  as a Double
-  @param   dblEndRadius as a Double
-
-**)
-constructor THClothoidElement.CreateWithFalseOrigin(dblEasting, dblNorthing,
-  dblChainage, dblBearing, dblLength, dblStRadius, dblEndRadius : Double);
-
-Var
-  dblZ : Double;
-  dblX : Double;
-  dblY : Double;
-  dblTheta : Double;
-
-begin
-  Inherited Create();
-  FLength := dblLength;
-  If FLength <= 0 Then
-    Raise ELengthZeroOrNegativeException.Create(
-      'The length of an element can not be Zero or Negative.');
-  If dblStRadius + dblEndRadius = 0 Then
-    Raise EZeroRadiusException.Create(
-      'A horizontal clothoid must have non-zero Start and End Radius values.');
-  If dblStRadius = 0 Then
+  If Not boolFalse Then
     Begin
-      (*
-        This means the starting point if is the origin.
-      *)
       FEasting        := dblEasting;
       FNorthing       := dblNorthing;
       FOChainage      := dblChainage;
-      FChainage       := dblChainage;
       FBearing        := dblBearing;
       FLength         := dblLength;
+      FChainage       := dblStChainageOrRadius;
       If FLength <= 0 Then
         Raise ELengthZeroOrNegativeException.Create(
           'The length of an element can not be Zero or Negative.');
-      FRLValue        := dblLength * dblEndRadius;
+      FRLValue        := dblRLValueOrEndRadius;
       If FRLValue = 0 Then
         Raise EZeroRLValueExecption.Create(
           'A horizontal clothoid must have a non-zero RL value.');
-    End
-  Else If dblEndRadius = 0 Then
-    Begin
-      (*
-        This means the end point is the origina and needs calcuating.
-      *)
-      FChainage       := dblChainage;
-      FLength         := dblLength;
-      FOChainage      := dblChainage + dblLength;
-      If FLength <= 0 Then
-        Raise ELengthZeroOrNegativeException.Create(
-          'The length of an element can not be Zero or Negative.');
-      FRLValue        := dblLength * dblStRadius;
-      If FRLValue = 0 Then
-        Raise EZeroRLValueExecption.Create(
-          'A horizontal clothoid must have a non-zero RL value.');
-      dblX := GetX(-dblLength);
-      dblY := GetY(-dblLength);
-      dblTheta := GetTheta(-dblLength);
-      FBearing := AdjustBearing(dblBearing - RadToDeg(dblTheta));
-      FEasting := dblEasting - dblX * Sin(DegToRad(FBearing + 90)) -
-        dblY * Sin(DegToRad(FBearing));
-      FNorthing := dblNorthing - dblX * Cos(DegToRad(FBearing + 90)) -
-        dblY * Cos(DegToRad(FBearing));
     End Else
     Begin
-      dblZ := FLength * dblEndRadius / (dblStRadius - dblEndRadius);
-      FRLValue := Abs(dblZ) * dblStRadius;
-      FChainage := dblChainage;
-      FOChainage := dblChainage - dblZ;
-      dblX := GetX(dblZ);
-      dblY := GetY(dblZ);
-      dblTheta := GetTheta(dblZ);
-      FBearing := AdjustBearing(dblBearing - RadToDeg(dblTheta));
-      FEasting := dblEasting - dblY * Sin(DegToRad(FBearing)) -
-        dblX * Sin(DegToRad(FBearing + 90));
-      FNorthing := dblNorthing - dblY * Cos(DegToRad(FBearing)) -
-        dblX * Cos(DegToRad(FBearing + 90));
+      FLength := dblLength;
+      If FLength <= 0 Then
+        Raise ELengthZeroOrNegativeException.Create(
+          'The length of an element can not be Zero or Negative.');
+      If dblStChainageOrRadius + dblRLValueOrEndRadius = 0 Then
+        Raise EZeroRadiusException.Create(
+          'A horizontal clothoid must have non-zero Start and End Radius values.');
+      If dblStChainageOrRadius = 0 Then
+        Begin
+          (*
+            This means the starting point if is the origin.
+          *)
+          FEasting        := dblEasting;
+          FNorthing       := dblNorthing;
+          FOChainage      := dblChainage;
+          FChainage       := dblChainage;
+          FBearing        := dblBearing;
+          FLength         := dblLength;
+          If FLength <= 0 Then
+            Raise ELengthZeroOrNegativeException.Create(
+              'The length of an element can not be Zero or Negative.');
+          FRLValue        := dblLength * dblRLValueOrEndRadius;
+          If FRLValue = 0 Then
+            Raise EZeroRLValueExecption.Create(
+              'A horizontal clothoid must have a non-zero RL value.');
+        End
+      Else If dblRLValueOrEndRadius = 0 Then
+        Begin
+          (*
+            This means the end point is the origina and needs calcuating.
+          *)
+          FChainage       := dblChainage;
+          FLength         := dblLength;
+          FOChainage      := dblChainage + dblLength;
+          If FLength <= 0 Then
+            Raise ELengthZeroOrNegativeException.Create(
+              'The length of an element can not be Zero or Negative.');
+          FRLValue        := dblLength * dblStChainageOrRadius;
+          If FRLValue = 0 Then
+            Raise EZeroRLValueExecption.Create(
+              'A horizontal clothoid must have a non-zero RL value.');
+          dblX := GetX(-dblLength);
+          dblY := GetY(-dblLength);
+          dblTheta := GetTheta(-dblLength);
+          FBearing := AdjustBearing(dblBearing - RadToDeg(dblTheta));
+          FEasting := dblEasting - dblX * Sin(DegToRad(FBearing + 90)) -
+            dblY * Sin(DegToRad(FBearing));
+          FNorthing := dblNorthing - dblX * Cos(DegToRad(FBearing + 90)) -
+            dblY * Cos(DegToRad(FBearing));
+        End Else
+        Begin
+          dblZ := FLength * dblRLValueOrEndRadius / (dblStChainageOrRadius -
+            dblRLValueOrEndRadius);
+          FRLValue := Abs(dblZ) * dblStChainageOrRadius;
+          FChainage := dblChainage;
+          FOChainage := dblChainage - dblZ;
+          dblX := GetX(dblZ);
+          dblY := GetY(dblZ);
+          dblTheta := GetTheta(dblZ);
+          FBearing := AdjustBearing(dblBearing - RadToDeg(dblTheta));
+          FEasting := dblEasting - dblY * Sin(DegToRad(FBearing)) -
+            dblX * Sin(DegToRad(FBearing + 90));
+          FNorthing := dblNorthing - dblY * Cos(DegToRad(FBearing)) -
+            dblX * Cos(DegToRad(FBearing + 90));
+        End;
     End;
 end;
 
@@ -3356,7 +3339,7 @@ Var
 
 begin
   FHClothiod := THClothoidElement.Create(dblEasting, dblNorthing, dblOChainage,
-    dblStChainage, dblBearing, dblLength, dblRLValue);
+    dblBearing, dblLength, dblStChainage, dblRLValue, False);
     FHElements.Add(FHClothiod);
     Modified := True;
     If Assigned(OnChange) Then
@@ -3387,8 +3370,8 @@ Var
   FHClothiod : THClothoidElement;
 
 begin
-  FHClothiod := THClothoidElement.CreateWithFalseOrigin(dblEasting, dblNorthing,
-    dblChainage, dblBearing, dblLength, dblStRadius, dblEndRadius);
+  FHClothiod := THClothoidElement.Create(dblEasting, dblNorthing,
+    dblChainage, dblBearing, dblLength, dblStRadius, dblEndRadius, True);
   FHElements.Add(FHClothiod);
   Modified := True;
   If Assigned(OnChange) Then
@@ -3823,10 +3806,10 @@ begin
   FOldClothoid := THClothoidElement(FHElements[iElement]);
   If Not boolFalse Then
     FHElements[iElement] := THClothoidElement.Create(dblEasting, dblNorthing,
-      dblOChainage, dblStChainage, dblBearing, dblLength, dblRLValue)
+      dblOChainage, dblBearing, dblLength, dblStChainage, dblRLValue, False)
   Else
-    FHElements[iElement] := THClothoidElement.CreateWithFalseOrigin(dblEasting,
-      dblNorthing, dblOChainage, dblBearing, dblLength, dblStChainage, dblRLValue);
+    FHElements[iElement] := THClothoidElement.Create(dblEasting, dblNorthing,
+      dblOChainage, dblBearing, dblLength, dblStChainage, dblRLValue, True);
   FOldClothoid.Free;
   Modified := True;
   If Assigned(OnChange) Then

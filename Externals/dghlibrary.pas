@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Mar 2008
+  @Date    25 Mar 2008
 
 **)
 Unit DGHLibrary;
@@ -1968,7 +1968,7 @@ Begin
           Begin
             iFStart := iPStart - 1;
             strFunc := '';
-            While (Not (strCurEquation[iFStart] In ValidDelimiters)) And (iFStart > 0) Do
+            While (iFStart > 0) And Not (strCurEquation[iFStart] In ValidDelimiters) Do
               Begin
                 strFunc := strCurEquation[iFStart] + strFunc;
                 Dec(iFStart)

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    25 Mar 2008
+  @Date    26 Mar 2008
 
 **)
 Unit DGHLibrary;
@@ -1011,12 +1011,12 @@ Function ConvertDate(Const strDate : String) : TDateTime;
 Type
   (** This is a record that defined the date and time for a date. **)
   TDateRec = Record
-    iDay, iMonth, iYear, iHour, iMinute, iSecond : Word;
+    iDay, iMonth, iYear, iHour, iMinute, iSecond, iMilli : Word;
   End;
 
 Const
   strErrMsg = 'Can not convert the date "%s" to a valid TDateTime value.';
-  Delimiters : Set Of Char = ['-', ' ', '\', '/', ':'];
+  Delimiters : Set Of Char = ['-', ' ', '\', '/', ':', '.'];
   Days : Array[1..7] Of String = ('fri', 'mon', 'sat', 'sun', 'thu', 'tue', 'wed');
   Months : Array[1..24] Of String = (
     'apr', 'april',
@@ -1129,7 +1129,7 @@ Var
     iIndex0 := 0; // Default Day / Month / Year
     iIndex1 := 1;
     iIndex2 := 2;
-    slFormat := TstringList.Create;
+    slFormat := TStringList.Create;
     Try
       str := '';
       For j := 1 To Length(ShortDateFormat) Do
@@ -1163,7 +1163,7 @@ Begin
       If strDate[i] In Delimiters Then
         Begin
           AddToken(sl, strToken);
-          If (strDate[i] = ':') And (iTime = -1) Then iTime := sl.Count - 1;
+          If (strDate[i] In [':']) And (iTime = -1) Then iTime := sl.Count - 1;
         End Else
           strToken := strToken + strDate[i];
     AddToken(sl, strToken);
@@ -1174,6 +1174,7 @@ Begin
         ProcessValue(iTime,recDate.iHour, True);
         ProcessValue(iTime,recDate.iMinute, True);
         ProcessValue(iTime,recDate.iSecond, True);
+        ProcessValue(iTime,recDate.iMilli, True);
       End;
     // Remove day value if present
     For i := sl.Count - 1 DownTo 0 Do
@@ -1216,7 +1217,7 @@ Begin
         If Not (iHour In [0..23]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
         If Not (iMinute In [0..59]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
         If Not (iSecond In [0..59]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-        Result := EncodeTime(iHour, iMinute, iSecond, 0);
+        Result := EncodeTime(iHour, iMinute, iSecond, iMilli);
         If iYear * iMonth * iDay <> 0 Then
           Begin
             If Not (iDay In [1..31]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);

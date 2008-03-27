@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    25 Jan 2008
+  @Date    27 Mar 2008
 
 **)
 
@@ -220,6 +220,10 @@ begin
   AddKey(ecLowercaseWord, Ord('I'), [ssCtrl], 0, []);         // Lowercase Word
   AddKey(ecPrint, Ord('K'), [ssCtrl], Ord('P'), [ssCtrl]);    // Print
   AddKey(ecPrint, Ord('K'), [ssCtrl], Ord('P'), []);
+  Options := [eoAltSetsColumnMode, eoAutoIndent, eoAutoSizeMaxScrollWidth,
+    eoDragDropEditing, eoEnhanceHomeKey, eoEnhanceEndKey, eoGroupUndo,
+    eoScrollHintFollows, eoScrollPastEof, eoScrollPastEol, eoShowScrollHint,
+    eoSmartTabs, eoTabIndent, eoTabsToSpaces, eoTrimTrailingSpaces];
 end;
 
 (**

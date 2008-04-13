@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    09 Mar 2008
+  @Date    13 Apr 2008
 
 **)
 Unit CheckForUpdates;
@@ -222,13 +222,20 @@ Begin
             End Else
             Begin
               OutputMsg(Format(strPackageNotFound, [FSoftwareID]), FMessageNoteColour);
-              {$IFNDEF CONSOLE}
               SysUtils.Beep;
+              {$IFNDEF CONSOLE}
               TfrmCheckForUpdates.Finish(60);
               {$ENDIF}
             End;
         End Else
-          OutputMsg(Format('  %s ("%s")', [xmlDoc.parseError.reason, strURL]), FMessageWarningColour);
+        Begin
+          OutputMsg(Format('  %s ("%s")', [xmlDoc.parseError.reason, strURL]),
+            FMessageWarningColour);
+          {$IFNDEF CONSOLE}
+          SysUtils.Beep;
+          TfrmCheckForUpdates.Finish(60);
+          {$ENDIF}
+        End;
     Except
       On E : Exception Do
         OutputMsg(Format(strExceptionS, [E.Message]), FMessageWarningColour);

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    13 Apr 2008
+  @Date    11 May 2008
 
 **)
 Unit CheckForUpdates;
@@ -21,7 +21,6 @@ Type
   TCheckForUpdates = Class
   Private
     FConHnd : THandle;
-    FURL : String;
     FSoftwareID : String;
     FLastUpdateDate : TDateTime;
     FRegRoot : String;
@@ -31,6 +30,7 @@ Type
     FMessageNoteColour: TColor;
     FMessageDescriptionColour: TColor;
     FMessageHeaderColour: TColor;
+    FURLs : String;
   Protected
     Function CheckForUpdates(strURL : String) : Boolean;
     Function FindPackage(xmlNodeList : IXMLDOMNodeList) : IXMLDOMNode;
@@ -44,10 +44,9 @@ Type
     Procedure LoadSettings;
     Procedure SaveSettings;
   Public
-    Constructor Create(strURL, strSoftwareID, strRegRoot : String;
-      boolForceUpdate : Boolean);
+    Constructor Create(strSoftwareID, strRegRoot : String; boolForceUpdate : Boolean);
     Destructor Destroy; Override;
-    Class Procedure Execute(strURL, strSoftwareID, strRegRoot : String;
+    Class Procedure Execute(strSoftwareID, strRegRoot : String;
       boolForceUpdate : Boolean);
   End;
 
@@ -91,18 +90,16 @@ ResourceString
   @precon  None.
   @postcon Main interface method for checking the software version.
 
-  @param   strURL          as a String
   @param   strSoftwareID   as a String
   @param   strRegRoot      as a String
   @param   boolForceUpdate as a Boolean
 
 **)
-Class Procedure TCheckForUpdates.Execute(strURL, strSoftwareID,
-  strRegRoot : String; boolForceUpdate : Boolean);
+Class Procedure TCheckForUpdates.Execute(strSoftwareID, strRegRoot : String;
+  boolForceUpdate : Boolean);
 
 Begin
-  TCheckForUpdates.Create(strURL, strSoftwareID, strRegRoot,
-    boolForceUpdate).Free;
+  TCheckForUpdates.Create(strSoftwareID, strRegRoot, boolForceUpdate).Free;
 End;
 
 (**
@@ -253,23 +250,37 @@ End;
   @precon  None.
   @postcon Initialises the class.
 
-  @param   strURL          as a String
   @param   strSoftwareID   as a String
   @param   strRegRoot      as a String
   @param   boolForceUpdate as a Boolean
 
 **)
-Constructor TCheckForUpdates.Create(strURL, strSoftwareID,
-  strRegRoot : String; boolForceUpdate : Boolean);
+Constructor TCheckForUpdates.Create(strSoftwareID, strRegRoot : String;
+  boolForceUpdate : Boolean);
 
 Var
   iURLs : Integer;
   iURL : Integer;
+  Buffer : PChar;
+  strDPRDPKFile : String;
 
 Begin
   FMessageWarningColour := clRed;
   LoadSettings;
-  FURL := strURL;
+  FURLs := 'http://www.hoyld.freeserve.co.uk/HoylD.xml';
+  Buffer := StrAlloc(1024);
+  Try
+    GetModuleFileName(hInstance, Buffer, 1024);
+    strDPRDPKFile := PChar(Buffer);
+    strDPRDPKFile := ChangeFileExt(strDPRDPKFile, '.DP');
+    If FileExists(strDPRDPKFile + 'R') Or FileExists(strDPRDPKFile + 'K') Then
+      Begin
+        strDPRDPKFile := ExtractFilePath(strDPRDPKFile);
+        FURLs := FURLs + '|' + strDPRDPKFile + '..\..\..\Web Page\HoylD.xml';
+      End;
+  Finally
+    StrDispose(Buffer);
+  End;
   FSoftwareID := strSoftwareID;
   FRegRoot := strRegRoot;
   FConHnd := GetStdHandle(STD_OUTPUT_HANDLE);
@@ -277,9 +288,9 @@ Begin
   If boolForceUpdate Or (FLastUpdateDate + 7.0 < Now) Then
     Begin
       OutputMsg(strCheckingForUpdates, FMessageHeaderColour);
-      iURLs := CharCount('|', strURL) + 1;
+      iURLs := CharCount('|', FURLs) + 1;
       For iURL := 1 To iURLs Do
-        If CheckForUpdates(GetField(FURL, '|', iURL)) Then
+        If CheckForUpdates(GetField(FURLs, '|', iURL)) Then
           Break;
       WriteLastUpdateDate;
     End;

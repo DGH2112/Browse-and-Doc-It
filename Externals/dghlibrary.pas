@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    26 Mar 2008
+  @Date    26 May 2008
 
 **)
 Unit DGHLibrary;
@@ -461,6 +461,9 @@ Type
     Property VAlignment : TVAlignmentCollection Read FVAlignment;
   End;
 
+  (** This is a procedure type for handling Exception messages in ParseMacro. **)
+  TExceptionProcedure = Procedure(strExceptionMsg : String) Of Object;
+
   Function AdjustBearing(dblBearing : Double) : Double;
   Function BearingToString(recBearing : TBearing) : String;
   Function BinToDec(sDisplayNumber : String) : String;
@@ -503,6 +506,10 @@ Type
     iTextColour : TColor = clNone; iBackColour : TColor = clNone;
     boolUpdateCursor : Boolean = True);
   Function BuildRootKey : String;
+  Procedure TokeniseMacro(slTokens : TStringList; Const strMacro : String);
+  Function ParseMacro(Const strMacro : String; var strCommand,
+    strFileName : String; strCommands : Array Of String;
+    ExceptionProc : TExceptionProcedure) : Boolean;
 
 { -------------------------------------------------------------------------
 
@@ -5287,6 +5294,278 @@ begin
   Result := Format('%s Settings for %s on %s.INI', [strModulePathAndName,
     strUserName, strComputerName]);
 end;
+
+(**
+
+  This method tokenise a macro string into token which are placed in the passed
+  string list.
+
+  @precon  slTokens must be a valid string list instance.
+  @postcon Tokenise a macro string into token which are placed in the passed
+           string list.
+
+  @param   slTokens as a TStringList
+  @param   strMacro as a String constant
+
+**)
+Procedure TokeniseMacro(slTokens : TStringList; Const strMacro : String);
+
+Const
+  strWhiteSpace : Set Of Char = [#32, #9];
+  strTokenChars : Set Of Char = ['#', '_', 'a'..'z', 'A'..'Z'];
+  strNumbers    : Set Of Char = ['0'..'9'];
+  strSymbols    : Set Of Char = ['&', '(', ')', '*', '+', ',', '-', '.', '/',
+    ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
+  strQuotes     : Set Of Char = ['"', ''''];
+  strLineEnds   : Set of Char = [#10, #13];
+
+Type
+  TTokenType = (ttWhiteSpace, ttIdentifier, ttNumber, ttLineEnd,
+    ttStringLiteral, ttSymbol, ttUnknown);
+
+  (**
+
+    This function returns the token type based on the current character and the
+    last chacrater type.
+
+    @precon  None.
+    @postcon Returns the token type based on the current character and the
+             last chacrater type.
+
+    @param   Ch           as a Char
+    @param   LastCharType as a TTokenType
+    @return  a TTokenType
+
+  **)
+  Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
+
+  Begin
+    If ch In strWhiteSpace Then
+      Result := ttWhiteSpace
+    Else If ch In strTokenChars Then
+      Result := ttIdentifier
+    Else If ch In strNumbers Then
+      Begin
+        Result := ttNumber;
+        If LastCharType = ttIdentifier Then
+          Result := ttIdentifier;
+      End
+    Else If ch In strLineEnds Then
+      Result := ttLineEnd
+    Else If ch In strQuotes Then
+      Result := ttStringLiteral
+    Else If ch In strSymbols Then
+      Result := ttSymbol
+    Else
+      Result := ttUnknown;
+  End;
+
+  (**
+
+    This method determines if the token is white space and returns true is so.
+
+    @precon  None.
+    @postcon Determines if the token is white space and returns true is so.
+
+    @param   strToken as a String
+    @return  a Boolean
+
+  **)
+  Function IsTokenWhiteSpace(strToken : String) : Boolean;
+
+  Var
+    i : Integer;
+
+  Begin
+    Result := True;
+    For i := 1 To Length(strToken) Do
+      If Not (strToken[i] In strWhiteSpace) And Not (strToken[i] In strLineEnds)Then
+        Result := False;
+  End;
+
+Type
+  (** State machine for block types. **)
+  TBlockType = (btNoBlock, btStringLiteral, btCompoundSymbol);
+
+Const
+  (** Growth size of the token buffer. **)
+  iTokenCapacity = 25;
+
+Var
+  strToken : String;
+  CurCharType : TTokenType;
+  LastCharType : TTokenType;
+  BlockType : TBlockType;
+  Ch : Char;
+  LastToken : TTokenType;
+  i : Integer;
+
+Begin
+  BlockType := btNoBlock;
+  CurCharType := ttUnknown;
+  strToken := '';
+  LastToken := ttUnknown;
+
+  For i := 1 To Length(strMacro) Do
+    Begin
+      LastCharType := CurCharType;
+      Ch := strMacro[i];
+      CurCharType := GetTokenType(Ch, LastCharType);
+
+      If (LastCharType <> CurCharType) Then
+        Begin
+          If ((BlockType In [btStringLiteral]) And (CurCharType <> ttLineEnd)) Or
+            (BlockType In [btCompoundSymbol]) Then
+            strToken := ConCat(strToken, Ch)
+          Else
+            Begin
+              If Not IsTokenWhiteSpace(strToken) Then
+                Begin
+                  If ((LastToken = ttNumber) And ((strToken = '.') Or (LastCharType = ttNumber))) Or
+                    ((LastToken = ttStringLiteral) And (strToken[1] = '#')) Or
+                    ((LastToken = ttStringLiteral) And (LastCharType = ttStringLiteral)) Then
+                    Begin
+                      strToken := ConCat(strToken, Ch);
+                      LastToken := LastToken;
+                    End Else
+                    Begin
+                      slTokens.Add(strToken);
+                      strToken := '';
+                      LastToken := LastCharType;
+                    End;
+                End;
+             BlockType := btNoBlock;
+             strToken := ConCat(strToken, Ch);
+            End;
+        End Else
+        If CurCharType = ttSymbol Then
+          Begin
+            slTokens.Add(strToken);
+            strToken := Ch;
+            LastToken := LastCharType;
+          End Else
+            strToken := ConCat(strToken, Ch);
+
+      // Check for string literals
+      If CurCharType = ttStringLiteral Then
+        If BlockType = btStringLiteral Then
+          BlockType := btNoBlock
+        Else If BlockType = btNoBlock Then
+          BlockType := btStringLiteral;
+
+      If BlockType = btCompoundSymbol Then
+        BlockType := btNoBlock;
+
+      If Ch = #10 Then
+        If BlockType In [btStringLiteral] Then
+          BlockType := btNoBlock;
+    End;
+  If strToken <> '' Then
+    slTokens.Add(strToken);
+End;
+
+(**
+
+  This method parses a macro to find the command and filename. If found
+  correctly this function returns true with the command and filename in the var
+  parameters.
+
+  @precon  strCommand must be an array of lowercase commands in alphanumeric
+           order.
+  @postcon Parses a macro to find the command and filename. If found correctly
+           this function returns true with the command and filename in the var
+           parameters.
+
+  @param   strMacro      as a String constant
+  @param   strCommand    as a String as a reference
+  @param   strFileName   as a String as a reference
+  @param   strCommands   as an Array Of String
+  @param   ExceptionProc as a TExceptionProcedure
+  @return  a Boolean
+
+**)
+Function ParseMacro(Const strMacro : String; var strCommand,
+  strFileName : String; strCommands : Array Of String;
+  ExceptionProc : TExceptionProcedure) : Boolean;
+
+ResourceString
+  strExceptionMsg =
+    'Error (%s),'#13#10 +
+    'Parsing Macro "%s".'#13#10 +
+    #13#10 +
+    'Syntax:'#13#10 +
+    '  [Command(Drive:\Path\FileName.Extension)]';
+  strUnexpectedEndOfMacro = 'Unexpected end of macro.';
+  strExpectedOpeningBracket = 'Opening square bracket expected but found "%s".';
+  strNotValidCommand = '"%s" is not a valid macro command.';
+  strExpectedOpeningParenthesis = 'Opening parenthesis expected after command but found "%s".';
+  strExpectedClosingParenthesis = 'Closing parenthesis expected after filename but found "%s".';
+  strExpectedClosingBracket = 'Closing square bracket expected but found "%s".';
+  strExpectedEndOfMacro = 'End of macro expected but found "%s"';
+
+Var
+  slTokens : TStringList;
+  iToken : Integer;
+
+  (**
+
+    This procedure increments the token position is possible else raises an
+    exception.
+
+    @precon  None.
+    @postcon Increments the token position is possible else raises an
+             exception.
+
+  **)
+  Procedure IncTokenPos;
+
+  Begin
+    If iToken < slTokens.Count - 1 Then
+      Inc(iToken)
+    Else
+      Raise Exception.Create(strUnexpectedEndOfMacro);
+  End;
+
+Begin
+  Result := False;
+  slTokens := TStringList.Create;
+  Try
+    Try
+      TokeniseMacro(slTokens, strMacro);
+      iToken := 0;
+      If slTokens[iToken] <> '[' Then
+        Raise Exception.CreateFmt(strExpectedOpeningBracket, [slTokens[iToken]]);
+      IncTokenPos;
+      If Not IsKeyWord(slTokens[iToken], strCommands) Then
+        Raise Exception.CreateFmt(strNotValidCommand, [slTokens[iToken]]);
+      strCommand := slTokens[iToken];
+      IncTokenPos;
+      If slTokens[iToken] <> '(' Then
+        Raise Exception.CreateFmt(strExpectedOpeningParenthesis, [slTokens[iToken]]);
+      IncTokenPos;
+      strFileName := slTokens[iToken];
+      If strFileName[1] In ['"', ''''] Then
+        strFileName := Copy(strFileName, 2, Length(strFileName) - 1);
+      If strFileName[Length(strFileName)] In ['"', ''''] Then
+        strFileName := Copy(strFileName, 1, Length(strFileName) - 1);
+      IncTokenPos;
+      If slTokens[iToken] <> ')' Then
+        Raise Exception.CreateFmt(strExpectedClosingParenthesis, [slTokens[iToken]]);
+      IncTokenPos;
+      If slTokens[iToken] <> ']' Then
+        Raise Exception.CreateFmt(strExpectedClosingBracket, [slTokens[iToken]]);
+      If iToken > slTokens.Count - 1 Then
+        Raise Exception.CreateFmt(strExpectedEndOfMacro, [slTokens[iToken]]);
+      Result := True;
+    Except
+      On E : Exception Do
+        If Assigned(ExceptionProc) Then
+          ExceptionProc(E.Message);
+    End;
+  Finally
+    slTokens.Free;
+  End;
+End;
 
 (** Initialises the console more to Unknown to force a call to the Win32 API **)
 Initialization

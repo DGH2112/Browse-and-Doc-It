@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    26 May 2008
+  @Date    28 May 2008
 
 **)
 Unit CheckForUpdates;
@@ -416,9 +416,13 @@ Function TCheckForUpdates.CheckVersionNumber(iMajor, iMinor, iBugFix,
 
 Var
   iMaj, iMin, iBug, iBui : Integer;
+  Buffer : Array[0..MAX_PATH] Of Char;
+  strModuleFileName : String;
 
-Begin
-  GetBuildNumber(ParamStr(0), iMaj, iMin, iBug, iBui);
+begin
+  GetModuleFilename(hInstance, Buffer, MAX_PATH);
+  strModuleFileName := StrPas(Buffer);
+  GetBuildNumber(strModuleFileName, iMaj, iMin, iBug, iBui);
   Result := iMaj - iMajor;
   If Result = 0 Then
     Result := iMin - iMinor;

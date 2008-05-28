@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    26 May 2008
+  @Date    28 May 2008
 
 **)
 Unit DGHLibrary;
@@ -5438,7 +5438,7 @@ Begin
              strToken := ConCat(strToken, Ch);
             End;
         End Else
-        If CurCharType = ttSymbol Then
+        If (CurCharType = ttSymbol) And Not (BlockType = btStringLiteral) Then
           Begin
             slTokens.Add(strToken);
             strToken := Ch;
@@ -5560,7 +5560,7 @@ Begin
     Except
       On E : Exception Do
         If Assigned(ExceptionProc) Then
-          ExceptionProc(E.Message);
+          ExceptionProc(Format(strExceptionMsg, [E.Message, strMacro]));
     End;
   Finally
     slTokens.Free;

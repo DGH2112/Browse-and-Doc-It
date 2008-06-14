@@ -547,6 +547,10 @@ Type
 
   Function EvaluateEquation(Const strEquation :String) : Double;
 
+ResourceString
+  (** A list of bug fix letters as a string array. **)
+  strBugFix = ' abcdefghijklmnopqrstuvwxyz';
+
 Implementation
 
 Uses
@@ -5008,9 +5012,6 @@ End;
 
 **)
 Function GetConsoleTitle(strTitle: String) : String;
-
-Const
-  strBugFix = ' abcdefghijklmnopqrstuvwxyz';
 
 Var
   iMajor, iMinor, iBugfix, iBuild : Integer;

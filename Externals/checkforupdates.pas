@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    28 May 2008
+  @Date    14 Jun 2008
 
 **)
 Unit CheckForUpdates;
@@ -120,11 +120,10 @@ function TCheckForUpdates.BuildVersionNumber(iMajor, iMinor, iBugFix,
   iBuild: Integer): String;
 
 Const
-  strBugs = ' abcedfghijklmnopqrstuvwxyz';
   strBuild = '%d.%d%s (Build %d.%d.%d.%d)';
 
 begin
-  Result := Format(strBuild, [iMajor, iMinor, strBugs[Succ(iBugFix)], iMajor,
+  Result := Format(strBuild, [iMajor, iMinor, strBugFix[Succ(iBugFix)], iMajor,
     iMinor, iBugFix, iBuild]);
 end;
 

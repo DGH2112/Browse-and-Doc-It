@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    28 May 2008
+  @Date    14 Jun 2008
 
 **)
 Unit DGHLibrary;
@@ -464,6 +464,27 @@ Type
   (** This is a procedure type for handling Exception messages in ParseMacro. **)
   TExceptionProcedure = Procedure(strExceptionMsg : String) Of Object;
 
+  (** This is an enumerate to describe the type of message returned by the
+      message handler in IDGHCreateProcessEvents. **)
+  TProcMsgType = (pmtStandard, pmtAbort, pmtException);
+
+  (** An interface that needs to be implemented by an class passed to
+      DGHCreateProcess so that messages can be handled. **)
+  IDGHCreateProcessEvents = Interface
+    Procedure ProcessMsgHandler(strMsg : String; MsgType : TProcMsgType; var boolAbort : Boolean);
+    Procedure IdleHandler;
+  End;
+
+  (** A record to describe the information required by DGHCreateProcess. **)
+  TProcessInfo = Record
+    boolEnabled : Boolean;
+    strEXE : String;
+    strParams : String;
+    strDir : String;
+  End;
+
+  Function DGHCreateProcess(Process : TProcessInfo; ProcMsgHndr : IDGHCreateProcessEvents) : Integer;
+
   Function AdjustBearing(dblBearing : Double) : Double;
   Function BearingToString(recBearing : TBearing) : String;
   Function BinToDec(sDisplayNumber : String) : String;
@@ -529,11 +550,17 @@ Type
 Implementation
 
 Uses
-  Math, ComObj, ShlObj, IniFiles;
+  Math, ComObj, ShlObj, IniFiles, ShlWapi;
 
 resourcestring
   (** A resource string to define the output format of a bearing. **)
   strBearingFormat = '%d° %2.2d'' %2.2d.%2.2d"';
+  (** A resource string to say that the directory was not found. **)
+  strDirectoryNotFound = 'The directory "%s" does not exist.';
+  (** A resource string to say the user aborted the process. **)
+  strUserAbort = 'User Abort!';
+  (** A resource string to say that the EXE file was not found. **)
+  strEXENotFound = 'The executable file "%s" does not exist.';
 
 Const
   (** A constant to define the type of based that can be used with number in
@@ -1452,7 +1479,8 @@ Begin
     Begin
       If sDisplayNumber[iCount] <> '-' Then
         Begin
-          iResult := iResult + StrToInt(sDisplayNumber[iCount]) * Trunc(Power(2, iPower));
+          iResult := iResult + SysUtils.StrToInt(sDisplayNumber[iCount]) *
+            Trunc(Power(2, iPower));
           Inc(iPower);
         End Else
           bNegative := True;
@@ -1496,7 +1524,8 @@ Begin
     Begin
       If sDisplayNumber[iCount] <> '-' Then
         Begin
-          iResult := iResult + StrToInt(sDisplayNumber[iCount]) * Trunc(Power(8, iPower));
+          iResult := iResult + SysUtils.StrToInt(sDisplayNumber[iCount]) *
+            Trunc(Power(8, iPower));
           Inc(iPower);
         End Else
           bNegative := True
@@ -1542,7 +1571,7 @@ Begin
       If sDisplayNumber[iCount] <> '-' Then
         Begin
           Case sDisplayNumber[iCount] Of
-            '0'..'9' : iNumber := StrToInt(sDisplayNumber[iCount]);
+            '0'..'9' : iNumber := SysUtils.StrToInt(sDisplayNumber[iCount]);
             'A'..'F' : iNumber := Word(sDisplayNumber[iCount]) - Word('A') + 10;
           Else
             iNumber := 0;
@@ -5565,6 +5594,156 @@ Begin
   Finally
     slTokens.Free;
   End;
+End;
+
+(**
+
+  This function creates a process with message handlers which must be
+  implemented by the passed interface in order for the calling process to
+  get messages from the process console and handle idle and abort.
+
+  @precon  ProcMsgHndr must be a valid class implementing TDGHCreateProcessEvent.
+  @postcon Creates a process with message handlers which must be implemented by
+           the passed interface in order for the calling process to get messages
+           from the process console and handle idle and abort.
+
+  @param   Process     as a TProcessInfo
+  @param   ProcMsgHndr as an IDGHCreateProcessEvents
+  @return  an Integer
+
+**)
+Function  DGHCreateProcess(Process : TProcessInfo;
+  ProcMsgHndr : IDGHCreateProcessEvents) : Integer;
+
+Var
+  boolAbort: Boolean;
+
+  (**
+
+    This prcoedure is called periodically by the process handler in order to
+    retreive console output from the running process. Output everything from
+    the console (pipe the anonymous pipe) but the last line as this may not be
+    a complete line of information from the console (except if boolPurge is
+    true).
+
+    @precon  slLines must be a valid instance of a TStringList class to
+             accumulate the console output.
+    @postcon Outputs to the IDGHCreareProcessEvent interface output information
+             from the console.
+
+    @param   slLines as a TStringList
+    @param   hRead   as a THandle
+    @param   Purge   as a Boolean
+
+  **)
+  Procedure ProcessOutput(slLines : TStringList; hRead : THandle;
+    Purge : Boolean = False);
+
+  Var
+    iTotalBytesInPipe : Cardinal;
+    iBytesRead : Cardinal;
+    strOutput : String;
+
+  Begin
+    ProcMsgHndr.IdleHandler;
+    If boolAbort Then
+      Begin
+        If Assigned(ProcMsgHndr) Then
+          ProcMsgHndr.ProcessMsgHandler(strUserAbort, pmtAbort, boolAbort);
+        Exit;
+      End;
+    Win32Check(PeekNamedPipe(hRead, Nil, 0, Nil, @iTotalBytesInPipe, Nil));
+    If iTotalBytesInPipe > 0 Then
+      Begin
+        SetLength(strOutput, iTotalBytesInPipe);
+        ReadFile(hRead, strOutput[1], iTotalBytesInPipe, iBytesRead, Nil);
+        SetLength(strOutput, iBytesRead);
+        slLines.Text := Copy(slLines.Text, 1, Length(slLines.text) - 2) + strOutput;
+      End;
+    // Use a string list to output each line except the last as it may not
+    // be complete yet.
+    If Assigned(ProcMsgHndr) Then
+      While slLines.Count > 1 - Integer(Purge) Do
+        Begin
+          ProcMsgHndr.ProcessMsgHandler(slLines[0], pmtStandard, boolAbort);
+          slLines.Delete(0);
+        End;
+  End;
+
+Var
+  hRead, hWrite : THandle;
+  slLines : TStringList;
+  SecurityAttrib : TSecurityAttributes;
+  StartupInfo : TStartupInfo;
+  ProcessInfo : TProcessInformation;
+  iExitCode : Cardinal;
+  strBuffer : Array[0..MAX_PATH] Of Char;
+  OpDirs : PAnsiChar;
+
+Begin
+  Result := 0;
+  boolAbort := False;
+  If Process.boolEnabled Then
+    Try
+      If Not FileExists(Process.strEXE) Then
+        Begin
+          StrPCopy(strBuffer, Process.strEXE);
+          OpDirs := '';
+          If PathFindOnPath(strBuffer, OpDirs) Then
+            Process.strEXE := StrPas(strBuffer)
+          Else
+            Raise Exception.CreateFmt(strEXENotFound, [Process.strEXE]);
+        End;
+      If Not DirectoryExists(Process.strDir) Then
+        Raise Exception.CreateFmt(strDirectoryNotFound, [Process.strDir]);
+      FillChar(SecurityAttrib, SizeOf(SecurityAttrib), 0);
+      SecurityAttrib.nLength := SizeOf(SecurityAttrib);
+      SecurityAttrib.bInheritHandle := True;
+      SecurityAttrib.lpSecurityDescriptor := nil;
+      Win32Check(CreatePipe(hRead, hWrite, @SecurityAttrib, 4096));
+      Try
+        FillChar(StartupInfo, SizeOf(TStartupInfo), 0);
+        StartupInfo.cb := SizeOf(TStartupInfo);
+        StartupInfo.cb          := SizeOf(StartupInfo);
+        StartupInfo.dwFlags     := STARTF_USESHOWWINDOW or STARTF_USESTDHANDLES;
+        StartupInfo.wShowWindow := SW_HIDE;
+        StartupInfo.hStdOutput  := hWrite;
+        StartupInfo.hStdError   := hWrite;
+        Win32Check(CreateProcess(PChar(Process.strEXE),
+          PChar('"' + Process.strEXE + '" ' + Process.strParams), @SecurityAttrib,
+          Nil, True, CREATE_NEW_CONSOLE, Nil, PChar(Process.strDir), StartupInfo,
+          ProcessInfo));
+        Try
+          slLines := TStringList.Create;
+          Try
+            While WaitforSingleObject(ProcessInfo.hProcess, 50) = WAIT_TIMEOUT Do
+              Begin
+                ProcessOutput(slLines, hRead);
+                If boolAbort Then
+                  Begin
+                    TerminateProcess(ProcessInfo.hProcess, 0);
+                    Break;
+                  End;
+              End;
+            ProcessOutput(slLines, hRead, True);
+          Finally
+            slLines.Free;
+          End;
+          If GetExitCodeProcess(ProcessInfo.hProcess, iExitCode) Then
+            Inc(Result, iExitCode)
+        Finally
+          Win32Check(CloseHandle(ProcessInfo.hThread));
+          Win32Check(CloseHandle(ProcessInfo.hProcess));
+        End;
+      Finally
+        Win32Check(CloseHandle(hWrite));
+        Win32Check(CloseHandle(hRead));
+      End;
+    Except
+      On E : Exception Do
+        If Assigned(ProcMsgHndr) Then
+          ProcMsgHndr.ProcessMsgHandler(E.Message, pmtException, boolAbort);
+    End;
 End;
 
 (** Initialises the console more to Unknown to force a call to the Win32 API **)

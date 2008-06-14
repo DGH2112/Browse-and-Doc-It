@@ -26,10 +26,8 @@ object frmEditorOptions: TfrmEditorOptions
     ActivePage = VisualTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
-    ExplicitHeight = 308
     object VisualTab: TTabSheet
       Caption = 'Visual'
-      ExplicitHeight = 280
       object lblActiveLineColour: TLabel
         Left = 3
         Top = 34
@@ -223,6 +221,9 @@ object frmEditorOptions: TfrmEditorOptions
     object BehaviourTab: TTabSheet
       Caption = 'Behaviour'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
       ExplicitHeight = 280
       DesignSize = (
         299
@@ -235,12 +236,14 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0
-        ExplicitHeight = 274
       end
     end
     object SyntaxTab: TTabSheet
       Caption = 'Syntax Highlighting'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
       ExplicitHeight = 280
       DesignSize = (
         299
@@ -292,7 +295,6 @@ object frmEditorOptions: TfrmEditorOptions
         ItemHeight = 13
         TabOrder = 0
         OnClick = lbAttributesClick
-        ExplicitHeight = 221
       end
       object cbxAttrForeColour: TColorBox
         Left = 143
@@ -368,7 +370,6 @@ object frmEditorOptions: TfrmEditorOptions
     Anchors = [akRight, akBottom]
     TabOrder = 2
     Kind = bkOK
-    ExplicitTop = 322
   end
   object btnCancel: TBitBtn
     Left = 159
@@ -378,6 +379,5 @@ object frmEditorOptions: TfrmEditorOptions
     Anchors = [akRight, akBottom]
     TabOrder = 1
     Kind = bkCancel
-    ExplicitTop = 323
   end
 end

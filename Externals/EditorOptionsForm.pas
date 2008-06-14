@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    08 Feb 2008
+  @Date    14 Jun 2008
 
 **)
 unit EditorOptionsForm;
@@ -131,7 +131,7 @@ Const
       TSynEditorOptions. Use to provide an list of options. **)
   BehaviouralOptions : Array[Low(TSynEditorOption)..High(TSynEditorOption)] Of
     TSynEditorOptionsRecord = (
-    (Description : '<Alt> key invokes Code Selection Mode'; Value: eoAltSetsColumnMode),
+    (Description : '<Alt> key invokes Column Selection Mode'; Value: eoAltSetsColumnMode),
     (Description : 'Auto Indent'; Value: eoAutoIndent),
     (Description : 'Auto Size Max Scroll Width'; Value: eoAutoSizeMaxScrollWidth),
     (Description : 'Disable Scroll Arrows'; Value: eoDisableScrollArrows),

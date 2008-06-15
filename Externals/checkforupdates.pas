@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    14 Jun 2008
+  @Date    15 Jun 2008
 
 **)
 Unit CheckForUpdates;
@@ -37,7 +37,7 @@ Type
     Function GetNamedNodeText(P : IXMLDOMNode; strName : String) : String;
     Function CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer;
       var strAppVerNum : String) : Integer;
-    Procedure OutputMsg(strText : String; iColour : TColor = clNone);
+    Procedure OutputMsg(strText, strURL : String; iColour : TColor = clNone);
     procedure ReadLastUpdateDate;
     procedure WriteLastUpdateDate;
     Function BuildVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : String;
@@ -72,7 +72,7 @@ ResourceString
   strYourSoftwareIsUpToDate = '  Your software is up to date!';
   (** A resource string to note that there is an update available. **)
   strThereIsASoftwareUpdate = '  There is a software update available ' +
-    '[New %s, Old %s]! See the description below for update details...';
+    '[New %s, Old %s] @ %s! See the description below for update details...';
   (** A resource string to define that the package was not found. **)
   strPackageNotFound = '  Package "%s" not found!';
   (** A resource string for an exception message. **)
@@ -81,7 +81,7 @@ ResourceString
   strPressEnterToContinue = 'Press <Enter> to continue...';
   (** A resource string to prompt that you are using a newer version of software. **)
   strYouAreUsingANewerVersion = '  You are using a newer version of the ' +
-    'software [%s] than is available from the internet [%s].';
+    'software [%s] than is available from the internet [%s] @ %s.';
 
 (**
 
@@ -152,23 +152,23 @@ Var
 
 Begin
   Result := False;
-  OutputMsg(strLoadingMSXML, FMessageTextColour);
+  OutputMsg(strLoadingMSXML, strURL, FMessageTextColour);
   xmlDoc := CoDOMDocument40.Create;
   Try
     Try
       xmlDoc.ValidateOnParse := True;
-      OutputMsg(Format(strLoadingURL, [strURL]), FMessageTextColour);
+      OutputMsg(Format(strLoadingURL, [strURL + 'HoylD.xml']), strURL, FMessageTextColour);
       xmlDoc.async := False;
       xmlDoc.validateOnParse := True;
-      If xmlDoc.load(strURL) And (xmlDoc.parseError.errorCode = 0) Then
+      If xmlDoc.load(strURL + 'HoylD.xml') And (xmlDoc.parseError.errorCode = 0) Then
         Begin
-          OutputMsg(strGettingPackages, FMessageTextColour);
+          OutputMsg(strGettingPackages, strURL, FMessageTextColour);
           xmlNodeList := xmlDoc.getElementsByTagName('Package');
           P := FindPackage(xmlNodeList);
           If P <> Nil Then
             Begin
-              OutputMsg(Format(strFoundPackage, [FSoftwareID]), FMessageTextColour);
-              OutputMsg(strCheckingSoftwareVerNum, FMessageTextColour);
+              OutputMsg(Format(strFoundPackage, [FSoftwareID]), strURL, FMessageTextColour);
+              OutputMsg(strCheckingSoftwareVerNum, strURL, FMessageTextColour);
               iMajor := StrToInt(GetNamedNodeText(P, 'Major'));
               iMinor := StrToInt(GetNamedNodeText(P, 'Minor'));
               iBugFix := StrToInt(GetNamedNodeText(P, 'BugFix'));
@@ -178,7 +178,7 @@ Begin
                 strApplication);
               If iResult = 0 Then
                 Begin
-                  OutputMsg(strYourSoftwareIsUpToDate, FMessageConfirmColour);
+                  OutputMsg(strYourSoftwareIsUpToDate, strURL, FMessageConfirmColour);
                   {$IFNDEF CONSOLE}
                   TfrmCheckForUpdates.Finish(5);
                   {$ENDIF}
@@ -186,10 +186,11 @@ Begin
               If iResult > 0 Then
                 Begin
                   OutputMsg(Format(strYouAreUsingANewerVersion,
-                    [strApplication, strInternet]), FMessageWarningColour);
+                    [strApplication, strInternet, strURL]), strURL,
+                    FMessageWarningColour);
                   {$IFDEF CONSOLE}
-                  OutputMsg('');
-                  OutputMsg(strPressEnterToContinue, FMessageTextColour);
+                  OutputMsg('', strURL);
+                  OutputMsg(strPressEnterToContinue, strURL, FMessageTextColour);
                   SysUtils.Beep;
                   ReadLn;
                   {$ELSE}
@@ -199,14 +200,15 @@ Begin
                 End Else
                 Begin
                   OutputMsg(Format(strThereIsASoftwareUpdate,
-                    [strInternet, strApplication]), FMessageNoteColour);
-                  OutputMsg('');
+                    [strInternet, strApplication, strURL]), strURL,
+                    FMessageNoteColour);
+                  OutputMsg('', strURL);
                   OutputMsg('  ' +
                     StringReplace(GetNamedNodeText(P, 'Description'), #13#10,
-                    #32#32#13#10, [rfReplaceAll]), FMessageDescriptionColour);
+                    #32#32#13#10, [rfReplaceAll]), strURL, FMessageDescriptionColour);
                   {$IFDEF CONSOLE}
-                  OutputMsg('');
-                  OutputMsg(strPressEnterToContinue, FMessageTextColour);
+                  OutputMsg('', strURL);
+                  OutputMsg(strPressEnterToContinue, strURL, FMessageTextColour);
                   SysUtils.Beep;
                   ReadLn;
                   {$ELSE}
@@ -217,7 +219,7 @@ Begin
               Result := True;
             End Else
             Begin
-              OutputMsg(Format(strPackageNotFound, [FSoftwareID]), FMessageNoteColour);
+              OutputMsg(Format(strPackageNotFound, [FSoftwareID]), strURL, FMessageNoteColour);
               SysUtils.Beep;
               {$IFNDEF CONSOLE}
               TfrmCheckForUpdates.Finish(60);
@@ -225,7 +227,7 @@ Begin
             End;
         End Else
         Begin
-          OutputMsg(Format('  %s ("%s")', [xmlDoc.parseError.reason, strURL]),
+          OutputMsg(Format('  %s ("%s")', [xmlDoc.parseError.reason, strURL]), strURL,
             FMessageWarningColour);
           {$IFNDEF CONSOLE}
           SysUtils.Beep;
@@ -234,9 +236,9 @@ Begin
         End;
     Except
       On E : Exception Do
-        OutputMsg(Format(strExceptionS, [E.Message]), FMessageWarningColour);
+        OutputMsg(Format(strExceptionS, [E.Message]), strURL, FMessageWarningColour);
     End;
-    OutputMsg('');
+    OutputMsg('', strURL);
   Finally
     xmlDoc := Nil;
   End;
@@ -266,7 +268,7 @@ Var
 Begin
   FMessageWarningColour := clRed;
   LoadSettings;
-  FURLs := 'http://davidghoyle.googlepages.com/HoylD.xml';
+  FURLs := 'http://davidghoyle.googlepages.com/';
   Buffer := StrAlloc(1024);
   Try
     GetModuleFileName(hInstance, Buffer, 1024);
@@ -275,7 +277,7 @@ Begin
     If FileExists(strDPRDPKFile + 'R') Or FileExists(strDPRDPKFile + 'K') Then
       Begin
         strDPRDPKFile := ExtractFilePath(strDPRDPKFile);
-        FURLs := FURLs + '|' + strDPRDPKFile + '..\..\..\Web Page\HoylD.xml';
+        FURLs := FURLs + '|' + strDPRDPKFile + '..\..\..\Web Page\';
       End;
   Finally
     StrDispose(Buffer);
@@ -286,7 +288,7 @@ Begin
   ReadLastUpdateDate;
   If boolForceUpdate Or (FLastUpdateDate + 7.0 < Now) Then
     Begin
-      OutputMsg(strCheckingForUpdates, FMessageHeaderColour);
+      OutputMsg(strCheckingForUpdates, '', FMessageHeaderColour);
       iURLs := CharCount('|', FURLs) + 1;
       For iURL := 1 To iURLs Do
         If CheckForUpdates(GetField(FURLs, '|', iURL)) Then
@@ -440,10 +442,12 @@ End;
   @postcon Outputs a message to the console IF boolOutputMsgs is true.
 
   @param   strText as a String
+  @param   strURL  as a String
   @param   iColour as a TColor
 
 **)
-Procedure TCheckForUpdates.OutputMsg(strText : String; iColour : TColor = clNone);
+Procedure TCheckForUpdates.OutputMsg(strText, strURL : String;
+  iColour : TColor = clNone);
 
 Begin
   {$IFDEF CONSOLE}
@@ -451,7 +455,9 @@ Begin
     iColour);
   {$ELSE}
   If strText <> '' Then
-    TfrmCheckForUpdates.ShowUpdates(StringReplace(strText, #13#10, #32, [rfReplaceAll]),
+    TfrmCheckForUpdates.ShowUpdates(
+      StringReplace(strText, #13#10, #32, [rfReplaceAll]),
+      strURL,
       iColour);
   {$ENDIF}
 End;

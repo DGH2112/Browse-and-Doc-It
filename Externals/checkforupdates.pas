@@ -31,6 +31,7 @@ Type
     FMessageDescriptionColour: TColor;
     FMessageHeaderColour: TColor;
     FURLs : String;
+    FUpdateInterval : Integer;
   Protected
     Function CheckForUpdates(strURL : String) : Boolean;
     Function FindPackage(xmlNodeList : IXMLDOMNodeList) : IXMLDOMNode;
@@ -286,7 +287,7 @@ Begin
   FRegRoot := strRegRoot;
   FConHnd := GetStdHandle(STD_OUTPUT_HANDLE);
   ReadLastUpdateDate;
-  If boolForceUpdate Or (FLastUpdateDate + 7.0 < Now) Then
+  If boolForceUpdate Or (FLastUpdateDate + FUpdateInterval < Now) Then
     Begin
       OutputMsg(strCheckingForUpdates, '', FMessageHeaderColour);
       iURLs := CharCount('|', FURLs) + 1;
@@ -482,6 +483,7 @@ Begin
       iMonth := ReadInteger('CheckForUpdates', 'Month', 01);
       iYear := ReadInteger('CheckForUpdates', 'Year', 1900);
       FLastUpdateDate :=  EncodeDate(iYear, iMonth, iDay);
+      FUpdateInterval := ReadInteger('CheckForUpdates', 'Interval', 28);
     Finally
       Free;
     End;
@@ -526,6 +528,7 @@ Var
 Begin
   With TIniFile.Create(FRegRoot) Do
     Try
+      WriteInteger('CheckForUpdates', 'Interval', FUpdateInterval);
       DecodeDate(Now, iYear, iMonth, iDay);
       WriteInteger('CheckForUpdates', 'Day', iDay);
       WriteInteger('CheckForUpdates', 'Month', iMonth);

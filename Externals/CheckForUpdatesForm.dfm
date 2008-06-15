@@ -21,6 +21,23 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     171)
   PixelsPerInch = 96
   TextHeight = 13
+  object lblWebSite: TLabel
+    Left = 8
+    Top = 143
+    Width = 50
+    Height = 13
+    Hint = 'Click to open this website...'
+    Caption = 'lblWebSite'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsUnderline]
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
+    OnClick = lblWebSiteClick
+  end
   object lbInformation: TListBox
     Left = 8
     Top = 8

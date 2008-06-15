@@ -1,11 +1,11 @@
 (**
-  
+
   This module contains a clas which represents a form for displaying software
   update information using a Singleton Form.
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Jan 2008
+  @Date    15 Jun 2008
 
 **)
 unit CheckForUpdatesForm;
@@ -22,6 +22,7 @@ type
     lbInformation: TListBox;
     btnOK: TBitBtn;
     tmFinish: TTimer;
+    lblWebSite: TLabel;
     procedure lbInformationDrawItem(Control: TWinControl; Index: Integer;
       Rect: TRect; State: TOwnerDrawState);
     procedure lbInformationMeasureItem(Control: TWinControl; Index: Integer;
@@ -29,11 +30,12 @@ type
     procedure tmFinishTimer(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure lblWebSiteClick(Sender: TObject);
   private
     { Private declarations }
   public
     { Public declarations }
-    Class Procedure ShowUpdates(strMsg : String; iColour : TColor);
+    Class Procedure ShowUpdates(strMsg, strURL : String; iColour : TColor);
     Class Procedure Finish(iSeconds : Integer);
     Class Procedure HideUpdates;
   end;
@@ -41,6 +43,9 @@ type
 implementation
 
 {$R *.dfm}
+
+Uses
+  ShellAPI;
 
 Var
   (** This is an private variable for the Singleton Form reference. **)
@@ -81,6 +86,7 @@ procedure TfrmCheckForUpdates.lbInformationDrawItem(Control: TWinControl;
 Var
   iColour : TColor;
   strText : String;
+  R : TRect;
 
 begin
   With (Control As TListBox).Canvas Do
@@ -91,9 +97,10 @@ begin
         Font.Color := iColour;
       FillRect(Rect);
       strText := Trim((Control As TListBox).Items[Index]);
-      Inc(Rect.Left, 4);
-      Dec(Rect.Right, 26);
-      DrawText((Control As TListBox).Canvas.Handle, PChar(strText), Length(strText), Rect,
+      R := (Control As TListBox).ItemRect(Index);
+      Inc(R.Left, 4);
+      Dec(R.Right, 4);
+      DrawText((Control As TListBox).Canvas.Handle, PChar(strText), Length(strText), R,
         DT_LEFT Or DT_NOCLIP Or DT_NOPREFIX Or DT_WORDBREAK);
     End;
 end;
@@ -121,11 +128,27 @@ begin
   strText := Trim((Control As TListBox).Items[Index]);
   R := (Control As TListBox).ItemRect(Index);
   Inc(R.Left, 4);
-  Dec(R.Right, 26);
+  Dec(R.Right, 4);
   DrawText((Control As TListBox).Canvas.Handle, PChar(strText), Length(strText), R,
     DT_CALCRECT Or DT_LEFT Or DT_NOCLIP Or DT_NOPREFIX Or DT_WORDBREAK);
   If R.Bottom - R.Top > Height Then
     Height := R.Bottom - R.Top + 3;
+end;
+
+(**
+
+  This is an on click event handler for the WebSite label.
+
+  @precon  None.
+  @postcon Opens the URL on the label.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmCheckForUpdates.lblWebSiteClick(Sender: TObject);
+begin
+  ShellExecute(Application.Handle, 'OPEN', PChar(lblWebSite.Caption),
+    '', '', SW_SHOWNORMAL);
 end;
 
 (**
@@ -136,10 +159,12 @@ end;
   @postcon Displays the message window and adds the message to the listbox.
 
   @param   strMsg  as a String
+  @param   strURL  as a String
   @param   iColour as a TColor
 
 **)
-class procedure TfrmCheckForUpdates.ShowUpdates(strMsg: String; iColour: TColor);
+class procedure TfrmCheckForUpdates.ShowUpdates(strMsg, strURL: String;
+  iColour: TColor);
 begin
   If frm = Nil Then
     frm := TfrmCheckForUpdates.Create(Nil);
@@ -148,6 +173,7 @@ begin
       Show;
       lbInformation.Items.AddObject(strMsg, TObject(iColour));
       lbInformation.ItemIndex := lbInformation.Items.Count - 1;
+      lblWebSite.Caption := strURL;
     End;
   Application.ProcessMessages;
 end;

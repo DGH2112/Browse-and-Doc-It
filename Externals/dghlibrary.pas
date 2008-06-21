@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    14 Jun 2008
+  @Date    21 Jun 2008
 
 **)
 Unit DGHLibrary;
@@ -526,7 +526,8 @@ Type
   Procedure OutputToConsoleLn(hndConsole : THandle; Const strText : String = '';
     iTextColour : TColor = clNone; iBackColour : TColor = clNone;
     boolUpdateCursor : Boolean = True);
-  Function BuildRootKey : String;
+  Function BuildRootKey(slParams : TStringList;
+    ExceptionProc : TExceptionProcedure) : String;
   Procedure TokeniseMacro(slTokens : TStringList; Const strMacro : String);
   Function ParseMacro(Const strMacro : String; var strCommand,
     strFileName : String; strCommands : Array Of String;
@@ -5292,14 +5293,70 @@ End;
   This method builds the root key INI filename for the loading and saving of
   settings from the instance handle for the module.
 
-  @precon  None.
+  @precon  slParams must be a valid instance of a TStringList class.
   @postcon Builds the root key INI filename for the loading and saving of
            settings from the instance handle for the module.
 
+  @param   slParams      as a TStringList
+  @param   ExceptionProc as a TExceptionProcedure
   @return  a String
 
 **)
-Function BuildRootKey : String;
+Function BuildRootKey(slParams : TStringList;
+  ExceptionProc : TExceptionProcedure) : String;
+
+ResourceString
+  strExpectedSquare = 'Expected "[" at position 3 in alternate INI file parameter.';
+  strExpectedClosingSquare = 'Expected a closing "]" in alternate INI file parameter.';
+  strPathDoesNotExist = 'The path "%s" does not exist for the alternate INI file.';
+
+  (**
+
+    This function parses the alternate INI filename from the parameter.
+
+    @precon  None.
+    @postcon Parses the alternate INI filename from the parameter.
+
+    @param   strDefaultINI as a String
+    @param   strParam      as a String
+    @return  a String
+
+  **)
+  Function ParseAlternateINIFile(strDefaultINI, strParam : String) : String;
+
+  Var
+    i : Integer;
+    strFileName : String;
+
+  Begin
+    Result := strDefaultINI;
+    i := 3;
+    If strParam[i] <> '[' Then
+      If Assigned(ExceptionProc) Then
+        Begin
+          ExceptionProc(strExpectedSquare);
+          Exit;
+        End;
+    Inc(i);
+    strFileName := '';
+    While (i <= Length(strParam)) And (strParam[i] <> ']') Do
+      Begin
+        strFileName := strFileName + strParam[i];
+        Inc(i);
+        If i > Length(strParam) Then
+          If Assigned(ExceptionProc) Then
+            Begin
+              ExceptionProc(strExpectedClosingSquare);
+              Exit;
+            End;
+      End;
+    strFileName := ExpandFileName(strFileName);
+    If DirectoryExists(ExtractFilePath(strFileName)) Then
+      Result := strFileName
+    Else
+      If Assigned(ExceptionProc) Then
+        ExceptionProc(Format(strPathDoesNotExist, [ExtractFilePath(strFileName)]));
+  End;
 
 var
   i: Cardinal;
@@ -5307,6 +5364,7 @@ var
   strComputerName: string;
   strModulePathAndName : String;
   Buffer : Array[0..MAX_PATH] Of Char;
+  iParam : Integer;
 
 begin
   i := 1024;
@@ -5323,6 +5381,19 @@ begin
   strModulePathAndName := ChangeFileExt(StrPas(Buffer), '');
   Result := Format('%s Settings for %s on %s.INI', [strModulePathAndName,
     strUserName, strComputerName]);
+  If AnsiCompareText(ExtractFileExt(StrPas(Buffer)), '.exe') = 0 Then
+    For iParam := 1 To ParamCount Do
+      Begin
+        If Length(ParamStr(iParam)) > 0 Then
+          If ParamStr(iParam)[1] In ['-', '/'] Then
+            If Length(ParamStr(iParam)) > 1 Then
+              If ParamStr(iParam)[2] In ['@'] Then
+                Begin
+                  Result := ParseAlternateINIFile(Result, ParamStr(iParam));
+                  Continue;
+                End;
+        slParams.Add(ParamStr(iParam));
+      End;
 end;
 
 (**

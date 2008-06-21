@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Mar 2008
+  @Date    21 Jun 2008
 
 **)
 
@@ -26,6 +26,8 @@ Type
   Private
     FFileName: String;
     FFileDateTime: TDateTime;
+    FSGMLTag: Boolean;
+    FInsertingTag : Boolean;
     function GetTabCaption: String;
     procedure SetTabCaption(const Value: String);
     procedure SetFileName(const Value: String);
@@ -41,6 +43,7 @@ Type
     procedure LowerCaseWord;
     Procedure LoadFromINIFile(strRootKey : String);
     Procedure SaveToINIFile(strRootKey : String);
+    Procedure DoChange; Override;
     { Properties }
     (**
       This property returns an appropriate captions for the editor tab within
@@ -71,6 +74,13 @@ Type
       @return  a TDateTime
     **)
     Property FileDateTime : TDateTime read FFileDateTime write SetFileDateTime;
+    (**
+      A property to determine if SMGL completion tags should be inserted.
+      @precon  None.
+      @postcon Returns whether SMGL completion tags should be inserted.
+      @return  a Boolean
+    **)
+    Property SMGLTagCompletion : Boolean Read FSGMLTag Write FSGMLTag;
   Published
   End;
 
@@ -144,6 +154,7 @@ begin
   TabWidth := 2;
   WantTabs := True;
   MaxScrollWidth := 8192;
+  FSGMLTag := False;
   (*
     Add Wordstar shortcuts.
   *)
@@ -240,6 +251,55 @@ procedure TDGHSynEdit.Display;
 begin
   If Parent Is TTabSheet Then
     (Parent As TTabsheet).PageControl.ActivePage := (Parent As TTabsheet);
+end;
+
+(**
+
+  This is an overridden DoChange to insert complletion tags for SMGL languages.
+
+  @precon  None.
+  @postcon Insert complletion tags for SMGL languages.
+
+**)
+procedure TDGHSynEdit.DoChange;
+
+Var
+  C : TBufferCoord;
+  strLine : String;
+  iLength : Integer;
+  strTag : String;
+  i : Integer;
+
+begin
+  If FSGMLTag And Not FInsertingTag Then
+    Begin
+      FInsertingTag := True;
+      Try
+        C := Self.CaretXY;
+        strLine := Lines[C.Line - 1];
+        iLength := Length(strLine);
+        strTag := '';
+        If (iLength > 0) And (C.Char - 1 <= iLength) And
+          (strLine[C.Char - 1]= '>') And (strLine[C.Char - 2] <> '/') Then
+          Begin
+            For i := C.Char - 2 DownTo 1 Do
+              If strLine[i] = '<' Then
+                Begin
+                  If strLine[i + 1] <> '/' Then
+                    strTag := GetWordAtRowCol(BufferCoord(i + 1, C.Line));
+                  Break;
+                End;
+            If strTag <> '' Then
+              Begin
+                SelText := Format('</%s>', [strTag]);;
+                SetCaretXY(C);
+              End;
+          End;
+      Finally
+        FInsertingTag := False;
+      End;
+    End;
+  Inherited DoChange;
 end;
 
 (**

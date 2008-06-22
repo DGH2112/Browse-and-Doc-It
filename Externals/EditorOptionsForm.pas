@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    14 Jun 2008
+  @Date    22 Jun 2008
 
 **)
 unit EditorOptionsForm;
@@ -160,6 +160,41 @@ Const
     (Description : 'Trim Trailing Spaces'; Value: eoTrimTrailingSpaces)
   );
 
+Var
+  (** A private variable to give the EnumFontProc access to the ComboBox. **)
+  FontNames : TComboBox;
+
+(**
+
+  An enumeration procedure for extracting fixed width fonts.
+
+  @precon  None.
+  @postcon Adds fixed width fonts to the combo box.
+
+  @param   LogFont    as a PEnumLogFontEx
+  @param   TextMetric as a PNewTextMetric
+  @param   FontType   as an Integer
+  @param   lParam     as a LPARAM
+  @return  an Integer   
+
+**)
+Function FontEnumExProc(LogFont : PEnumLogFontEx; TextMetric : PNewTextMetric;
+  FontType : Integer; lParam : LPARAM) : Integer; StdCall;
+
+Var
+  S : String;
+
+Begin
+  With TEnumLogFontEx(LogFont^) Do
+    If elfLogFont.lfPitchAndFamily And FIXED_PITCH > 0 Then
+      Begin
+        S := elfLogFont.lfFaceName;
+        If FontNames.Items.IndexOf(S) = -1 Then
+          FontNames.Items.AddObject(S, TObject(FontType));
+      End;
+  Result := 1;
+End;
+
 (**
 
   This is the constructor method for the TAttribute class.
@@ -197,14 +232,18 @@ End;
 Constructor TfrmEditorOptions.Create(AOwner : TComponent);
 
 Var
-  i : Integer;
   j : TSynEditorOption;
+  FontInfo : TLogFont;
 
 Begin
   Inherited Create(AOwner);
   FAttributes := TObjectList.Create(True);
-  For i := 0 To Screen.Fonts.Count - 1 Do
-    cbxFontName.Items.Add(Screen.Fonts[i]);
+  FontInfo.lfCharSet := DEFAULT_CHARSET;
+  FontInfo.lfFaceName := '';
+  FontInfo.lfPitchAndFamily := FIXED_PITCH;
+  FontNames := cbxFontName;
+  EnumFontFamiliesEx(Canvas.Handle, FontInfo, @FontEnumExProc, 0,
+    Integer(cbxFontName));
   For j := Low(TSynEditorOption) To High(TSynEditorOption) Do
     clbOptions.Items.Add(BehaviouralOptions[j].Description);
 End;
@@ -249,7 +288,7 @@ Begin
       udTabWidth.Position := Editor.TabWidth;
       cbxEditorBackgroundColour.Selected := Editor.Color;
       cbxActiveLineColour.Selected := Editor.ActiveLineColor;
-      cbxFontName.Text := Editor.Font.Name;
+      cbxFontName.ItemIndex := cbxFontName.Items.IndexOf(Editor.Font.Name);
       udEditorFontSize.Position := Editor.Font.Size;
       chxLineNumbers.Checked := Editor.Gutter.ShowLineNumbers;
       udRightEdgePosition.Position := Editor.RightEdge;

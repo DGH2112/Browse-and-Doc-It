@@ -114,9 +114,10 @@ object frmEditorOptions: TfrmEditorOptions
         Top = 59
         Width = 145
         Height = 21
+        Style = csDropDownList
         ItemHeight = 13
+        Sorted = True
         TabOrder = 2
-        Text = 'cbxFontName'
       end
       object edtFontSize: TEdit
         Left = 152
@@ -221,10 +222,6 @@ object frmEditorOptions: TfrmEditorOptions
     object BehaviourTab: TTabSheet
       Caption = 'Behaviour'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 280
       DesignSize = (
         299
         287)
@@ -241,10 +238,6 @@ object frmEditorOptions: TfrmEditorOptions
     object SyntaxTab: TTabSheet
       Caption = 'Syntax Highlighting'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 280
       DesignSize = (
         299
         287)

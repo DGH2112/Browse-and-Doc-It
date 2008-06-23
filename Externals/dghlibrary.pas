@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Jun 2008
+  @Date    23 Jun 2008
 
 **)
 Unit DGHLibrary;
@@ -5350,7 +5350,7 @@ ResourceString
               Exit;
             End;
       End;
-    strFileName := ExpandFileName(strFileName);
+    strFileName := ExpandUNCFileName(strFileName);
     If DirectoryExists(ExtractFilePath(strFileName)) Then
       Result := strFileName
     Else

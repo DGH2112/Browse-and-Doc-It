@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Jun 2008
+  @Date    23 Jun 2008
 
 **)
 
@@ -159,78 +159,14 @@ begin
     Add Wordstar shortcuts.
   *)
   AddKey(ecDeleteChar, VK_DELETE, [ssCtrl], 0, []);
-  AddKey(ecBlockIndent, Ord('K'), [ssCtrl], Ord('I'), [ssCtrl]);
-  AddKey(ecBlockIndent, Ord('K'), [ssCtrl], Ord('I'), []);
-  AddKey(ecBlockUnindent, Ord('K'), [ssCtrl], Ord('U'), [ssCtrl]);
-  AddKey(ecBlockUnindent, Ord('K'), [ssCtrl], Ord('U'), []);
-  AddKey(ecCopy, Ord('K'), [ssCtrl], Ord('C'), [ssCtrl]);
-  AddKey(ecCopy, Ord('K'), [ssCtrl], Ord('C'), []);
-  AddKey(ecPaste, Ord('K'), [ssCtrl], Ord('V'), [ssCtrl]);
-  AddKey(ecPaste, Ord('K'), [ssCtrl], Ord('V'), []);
-  AddKey(ecLineSelect, Ord('K'), [ssCtrl], Ord('L'), [ssCtrl]);
-  AddKey(ecLineSelect, Ord('K'), [ssCtrl], Ord('L'), []);
-  AddKey(ecCut, Ord('K'), [ssCtrl], Ord('Y'), [ssCtrl]);
-  AddKey(ecCut, Ord('K'), [ssCtrl], Ord('Y'), []);
-  AddKey(ecColumnSelect, Ord('O'), [ssCtrl], Ord('C'), [ssCtrl]);
-  AddKey(ecColumnSelect, Ord('O'), [ssCtrl], Ord('C'), []);
-  AddKey(ecColumnSelect, Ord('O'), [ssCtrl], Ord('I'), [ssCtrl]);
-  AddKey(ecColumnSelect, Ord('O'), [ssCtrl], Ord('I'), []);
-  AddKey(ecNormalSelect, Ord('O'), [ssCtrl], Ord('K'), [ssCtrl]);
-  AddKey(ecNormalSelect, Ord('O'), [ssCtrl], Ord('K'), []);
-  AddKey(ecLineSelect, Ord('O'), [ssCtrl], Ord('L'), [ssCtrl]);
-  AddKey(ecLineSelect, Ord('O'), [ssCtrl], Ord('L'), []);
-  { Block Set Bookmarks }
-  AddKey(ecSetMarker0, Ord('K'), [ssCtrl], Ord('0'), [ssCtrl]);
-  AddKey(ecSetMarker1, Ord('K'), [ssCtrl], Ord('1'), [ssCtrl]);
-  AddKey(ecSetMarker2, Ord('K'), [ssCtrl], Ord('2'), [ssCtrl]);
-  AddKey(ecSetMarker3, Ord('K'), [ssCtrl], Ord('3'), [ssCtrl]);
-  AddKey(ecSetMarker4, Ord('K'), [ssCtrl], Ord('4'), [ssCtrl]);
-  AddKey(ecSetMarker5, Ord('K'), [ssCtrl], Ord('5'), [ssCtrl]);
-  AddKey(ecSetMarker6, Ord('K'), [ssCtrl], Ord('6'), [ssCtrl]);
-  AddKey(ecSetMarker7, Ord('K'), [ssCtrl], Ord('7'), [ssCtrl]);
-  AddKey(ecSetMarker8, Ord('K'), [ssCtrl], Ord('8'), [ssCtrl]);
-  AddKey(ecSetMarker9, Ord('K'), [ssCtrl], Ord('9'), [ssCtrl]);
-  AddKey(ecSetMarker0, Ord('K'), [ssCtrl], Ord('0'), []);
-  AddKey(ecSetMarker1, Ord('K'), [ssCtrl], Ord('1'), []);
-  AddKey(ecSetMarker2, Ord('K'), [ssCtrl], Ord('2'), []);
-  AddKey(ecSetMarker3, Ord('K'), [ssCtrl], Ord('3'), []);
-  AddKey(ecSetMarker4, Ord('K'), [ssCtrl], Ord('4'), []);
-  AddKey(ecSetMarker5, Ord('K'), [ssCtrl], Ord('5'), []);
-  AddKey(ecSetMarker6, Ord('K'), [ssCtrl], Ord('6'), []);
-  AddKey(ecSetMarker7, Ord('K'), [ssCtrl], Ord('7'), []);
-  AddKey(ecSetMarker8, Ord('K'), [ssCtrl], Ord('8'), []);
-  AddKey(ecSetMarker9, Ord('K'), [ssCtrl], Ord('9'), []);
-  { Block Goto Bookmarks }
-  AddKey(ecGotoMarker0, Ord('Q'), [ssCtrl], Ord('0'), [ssCtrl]);
-  AddKey(ecGotoMarker1, Ord('Q'), [ssCtrl], Ord('1'), [ssCtrl]);
-  AddKey(ecGotoMarker2, Ord('Q'), [ssCtrl], Ord('2'), [ssCtrl]);
-  AddKey(ecGotoMarker3, Ord('Q'), [ssCtrl], Ord('3'), [ssCtrl]);
-  AddKey(ecGotoMarker4, Ord('Q'), [ssCtrl], Ord('4'), [ssCtrl]);
-  AddKey(ecGotoMarker5, Ord('Q'), [ssCtrl], Ord('5'), [ssCtrl]);
-  AddKey(ecGotoMarker6, Ord('Q'), [ssCtrl], Ord('6'), [ssCtrl]);
-  AddKey(ecGotoMarker7, Ord('Q'), [ssCtrl], Ord('7'), [ssCtrl]);
-  AddKey(ecGotoMarker8, Ord('Q'), [ssCtrl], Ord('8'), [ssCtrl]);
-  AddKey(ecGotoMarker9, Ord('Q'), [ssCtrl], Ord('9'), [ssCtrl]);
-  AddKey(ecGotoMarker0, Ord('Q'), [ssCtrl], Ord('0'), []);
-  AddKey(ecGotoMarker1, Ord('Q'), [ssCtrl], Ord('1'), []);
-  AddKey(ecGotoMarker2, Ord('Q'), [ssCtrl], Ord('2'), []);
-  AddKey(ecGotoMarker3, Ord('Q'), [ssCtrl], Ord('3'), []);
-  AddKey(ecGotoMarker4, Ord('Q'), [ssCtrl], Ord('4'), []);
-  AddKey(ecGotoMarker5, Ord('Q'), [ssCtrl], Ord('5'), []);
-  AddKey(ecGotoMarker6, Ord('Q'), [ssCtrl], Ord('6'), []);
-  AddKey(ecGotoMarker7, Ord('Q'), [ssCtrl], Ord('7'), []);
-  AddKey(ecGotoMarker8, Ord('Q'), [ssCtrl], Ord('8'), []);
-  AddKey(ecGotoMarker9, Ord('Q'), [ssCtrl], Ord('9'), []);
+  AddKey(ecWordLeft, VK_LEFT, [ssCtrl], 0, []);
+  AddKey(ecWordRight, VK_RIGHT, [ssCtrl], 0, []);
+  AddKey(ecSelPageLeft, VK_LEFT, [ssAlt, ssShift], 0, []);
+  AddKey(ecSelPageRight, VK_RIGHT, [ssAlt, ssShift], 0, []);
+  AddKey(ecScrollLeft, VK_LEFT, [ssAlt], 0, []);
+  AddKey(ecScrollRight, VK_RIGHT, [ssAlt], 0, []);
+  AddKey(ecCommentBlock, Ord('C'), [ssAlt, ssCtrl], 0, []);
   { Custom Commands }
-  AddKey(ecFind, Ord('Q'), [ssCtrl], Ord('F'), [ssCtrl]);     // Find
-  AddKey(ecFind, Ord('Q'), [ssCtrl], Ord('F'), []);
-  AddKey(ecFindAgain, Ord('L'), [ssCtrl], 0, []);             // Find Again
-  AddKey(ecReplace, Ord('Q'), [ssCtrl], Ord('A'), [ssCtrl]);  // Replace
-  AddKey(ecReplace, Ord('Q'), [ssCtrl], Ord('A'), []);
-  AddKey(ecUppercaseWord, Ord('U'), [ssCtrl], 0, []);         // Uppercase Word
-  AddKey(ecLowercaseWord, Ord('I'), [ssCtrl], 0, []);         // Lowercase Word
-  AddKey(ecPrint, Ord('K'), [ssCtrl], Ord('P'), [ssCtrl]);    // Print
-  AddKey(ecPrint, Ord('K'), [ssCtrl], Ord('P'), []);
   Options := [eoAltSetsColumnMode, eoAutoIndent, eoAutoSizeMaxScrollWidth,
     eoDragDropEditing, eoEnhanceHomeKey, eoEnhanceEndKey, eoGroupUndo,
     eoScrollHintFollows, eoScrollPastEof, eoScrollPastEol, eoShowScrollHint,

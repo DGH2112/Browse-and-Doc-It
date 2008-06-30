@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Jun 2008
+  @Date    30 Jun 2008
 
 **)
 unit EditorOptionsForm;
@@ -14,9 +14,82 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls, ExtCtrls, Buttons, SynEdit, CheckLst, Contnrs;
+  Dialogs, ComCtrls, StdCtrls, ExtCtrls, Buttons, SynEdit, CheckLst, Contnrs,
+  SynEditHighlighter;
 
 type
+  (** This is a private class to hold information about each highlighter
+      attribute. **)
+  TAttribute = Class
+  Private
+    FForeColour : TColor;
+    FBackColour : TColor;
+    FStyle      : TFontStyles;
+    FName       : String;
+    FAttribute  : TSynHighlighterAttributes;
+    FParent     : TSynCustomHighlighter;
+  Protected
+  Public
+    Constructor Create(Name : String; Fore, Back : TColor; Style : TFontStyles;
+      Attr : TSynHighlighterAttributes; Parent : TSynCustomHighlighter);
+    (**
+      This property reads and writes the Attribute Name
+      @precon  None
+      @postcon Reads and writes the Attribute Name
+      @return  a String
+    **)
+    Property Name : String Read FName Write FName;
+    (**
+      This property reads and writes the Attribute ForeColour
+      @precon  None
+      @postcon Reads and writes the Attribute ForeColour
+      @return  a TColor
+    **)
+    Property ForeColour : TColor Read FForeColour Write FForeColour;
+    (**
+      This property reads and writes the Attribute BackColour
+      @precon  None
+      @postcon Reads and writes the Attribute BackColour
+      @return  a TColor
+    **)
+    Property BackColour : TColor Read FBackColour Write FBackColour;
+    (**
+      This property reads and writes the Attribute Style
+      @precon  None
+      @postcon Reads and writes the Attribute Style
+      @return  a TFontStyles
+    **)
+    Property Style : TFontStyles Read FStyle Write FStyle;
+    (**
+      This property reads and writes the referenced TSynHighlighterAttrubute
+      @precon  None
+      @postcon Reads and writes the referenced TSynHighlighterAttrubute
+      @return  a TSynHighlighterAttributes
+    **)
+    Property Attribute : TSynHighlighterAttributes Read FAttribute Write FAttribute;
+    (**
+      This property reads and writes the Parent Highlighter
+      @precon  None
+      @postcon Reads and writes the Parent Highlighter
+      @return  a TSynCustomHighlighter
+    **)
+    Property Parent : TSynCustomHighlighter Read FParent Write FParent;
+  End;
+
+  (** A class to represent a collection of attributes. **)
+  TAttributes = Class
+  Private
+    FAttributes     : TObjectList;
+    FProcessedAttrs : TList;
+  Protected
+  Public
+    Constructor Create;
+    Destructor Destroy; Override;
+    Function Add(Attr : TSynHighlighterAttributes;
+      Parent : TSynCustomHighlighter) : TAttribute;
+    Procedure Update(boolIncTags : Boolean);
+  End;
+
   (** This class represents the form interface for editing the editor
       options. **)
   TfrmEditorOptions = class(TForm)
@@ -65,61 +138,25 @@ type
     procedure AttributeChange(Sender: TObject);
   private
     { Private declarations }
-    FAttributes : TObjectList;
+    FAttributes : TAttributes;
     FUpdating : Boolean;
+    Procedure AddHighlighter(Highlighter : TSynCustomHighlighter);
+    Function HighlighterName(Highlighter : TSynCustomHighlighter) : String;
   public
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
-    Class Function Execute(Editor : TSynEdit) : Boolean;
+    Class Function Execute(Editor : TSynEdit; boolIncTag : Boolean) : Boolean;
   end;
 
 implementation
 
 {$R *.dfm}
 
-Type
-  (** This is a private class to hold information about each highlighter
-      attribute. **)
-  TAttribute = Class
-  Private
-    FForeColour : TColor;
-    FBackColour : TColor;
-    FStyle      : TFontStyles;
-    FName       : String;
-  Protected
-  Public
-    Constructor Create(Name : String; Fore, Back : TColor; Style : TFontStyles);
-    (**
-      This property reads and writes the Attribute Name
-      @precon  None
-      @postcon Reads and writes the Attribute Name
-      @return  a String
-    **)
-    Property Name : String Read FName Write FName;
-    (**
-      This property reads and writes the Attribute ForeColour
-      @precon  None
-      @postcon Reads and writes the Attribute ForeColour
-      @return  a TColor
-    **)
-    Property ForeColour : TColor Read FForeColour Write FForeColour;
-    (**
-      This property reads and writes the Attribute BackColour
-      @precon  None
-      @postcon Reads and writes the Attribute BackColour
-      @return  a TColor
-    **)
-    Property BackColour : TColor Read FBackColour Write FBackColour;
-    (**
-      This property reads and writes the Attribute Style
-      @precon  None
-      @postcon Reads and writes the Attribute Style
-      @return  a TFontStyles
-    **)
-    Property Style : TFontStyles Read FStyle Write FStyle;
-  End;
+Uses
+  SynHighlighterMulti;
 
+Type
   (** A record to describe descriptions for each TSynEditorOption. **)
   TSynEditorOptionsRecord = Record
     Description : String;
@@ -202,20 +239,142 @@ End;
   @precon  None.
   @postcon Creates an instance of a TAttribute class.
 
-  @param   Name  as a String
-  @param   Fore  as a TColor
-  @param   Back  as a TColor
-  @param   Style as a TFontStyles
+  @param   Name   as a String
+  @param   Fore   as a TColor
+  @param   Back   as a TColor
+  @param   Style  as a TFontStyles
+  @param   Attr   as a TSynHighlighterAttributes
+  @param   Parent as a TSynCustomHighlighter
 
 **)
 Constructor TAttribute.Create(Name : String; Fore, Back : TColor;
-  Style : TFontStyles);
+  Style : TFontStyles; Attr : TSynHighlighterAttributes;
+  Parent : TSynCustomHighlighter);
 
 Begin
-  FName := Name;
+  FName       := Name;
   FForeColour := Fore;
   FBackColour := Back;
-  FStyle := Style;
+  FStyle      := Style;
+  FAttribute  := Attr;
+  FParent     := Parent;
+End;
+
+(**
+
+  This method adds a TAttrbute to the collection based on the passed
+  TSynHighlighterAttributes.
+
+  @precon  Attr and Parent must be valid instanes of an attribute and
+           highlighter respectively.
+  @postcon Adds a TAttrbute to the collection based on the passed
+           TSynHighlighterAttributes.
+
+  @param   Attr   as a TSynHighlighterAttributes
+  @param   Parent as a TSynCustomHighlighter
+  @return  a TAttribute
+
+**)
+Function TAttributes.Add(Attr : TSynHighlighterAttributes;
+  Parent : TSynCustomHighlighter) : TAttribute;
+
+Begin
+  Result := Nil;
+  If FProcessedAttrs.IndexOf(Attr) = -1 Then  // Only add it not already in list
+    Begin
+      FProcessedAttrs.Add(Attr);
+      Result := TAttribute.Create(Attr.Name, Attr.Foreground, Attr.Background,
+        Attr.Style, Attr, Parent);
+      FAttributes.Add(Result);
+    End;
+End;
+
+(**
+
+  This is a constructor method for the TAttributes class.
+  
+  @precon  None.
+  @postcon Initialise the collection.
+  
+**)
+Constructor TAttributes.Create;
+
+Begin
+  FAttributes := TObjectList.Create(True);
+  FProcessedAttrs := TList.Create;
+End;
+
+(**
+
+  This is a destructor for the Attributes class.
+  
+  @precon  None.
+  @postcon Frees the classes internal memory.
+  
+**)
+Destructor TAttributes.Destroy;
+
+Begin
+  FProcessedAttrs.Free;
+  FAttributes.Free;
+End;
+
+(**
+
+  This method updates the referenced highlighter attributes and highlighter.
+  
+  @precon  None.
+  @postcon Updates the referenced highlighter attributes and highlighter.
+
+  @param   boolIncTags as a Boolean
+
+**)
+Procedure TAttributes.Update(boolIncTags : Boolean);
+
+Var
+  i : Integer;
+
+Begin
+  For i := 0 To FAttributes.Count - 1 Do
+    With FAttributes[i] As TAttribute Do
+      Begin
+        Attribute.Foreground := ForeColour;
+        Attribute.Background := BackColour;
+        Attribute.Style      := Style;
+        If boolIncTags Then
+          Parent.Tag := Parent.Tag + 1;
+      End;
+End;
+
+(**
+
+  This method add the attributes of the given highlighters to the attribute
+  collection.
+  
+  @precon  Highlighter must be a valid instance.
+  @postcon Add the attributes of the given highlighters to the attribute
+           collection.
+           
+  @param   Highlighter as a TSynCustomHighlighter
+
+**)
+Procedure TfrmEditorOptions.AddHighlighter(Highlighter : TSynCustomHighlighter);
+
+Var
+  A : TAttribute;
+  iPos : Integer;
+  strName : String;
+  i : Integer;
+
+Begin
+  strName := HighlighterName(Highlighter);
+  For i := 0 To Highlighter.AttrCount - 1 Do
+    Begin
+      A := FAttributes.Add(Highlighter.Attribute[i], Highlighter);
+      If A <> Nil Then
+        lbAttributes.Items.AddObject(Format('%s:%s', [strName,
+          Highlighter.Attribute[i].Name]), A);
+    End;
 End;
 
 (**
@@ -237,7 +396,7 @@ Var
 
 Begin
   Inherited Create(AOwner);
-  FAttributes := TObjectList.Create(True);
+  FAttributes := TAttributes.Create;
   FontInfo.lfCharSet := DEFAULT_CHARSET;
   FontInfo.lfFaceName := '';
   FontInfo.lfPitchAndFamily := FIXED_PITCH;
@@ -271,14 +430,19 @@ End;
   @postcon nvokes a form for editing the given instance of the TSynEdit control.
 
   @param   Editor as a TSynEdit as a reference
+  @param   boolIncTag as a Boolean
   @return  a Boolean
 
 **)
-Class Function TfrmEditorOptions.Execute(Editor : TSynEdit) : Boolean;
+Class Function TfrmEditorOptions.Execute(Editor : TSynEdit;
+  boolIncTag : Boolean) : Boolean;
 
 Var
   i : TSynEditorOption;
+  M : TSynMultiSyn;
+  S : TScheme;
   j : Integer;
+  A : TAttribute;
 
 Begin
   Result := False;
@@ -301,16 +465,27 @@ Begin
       // Highlighter
       If Editor.Highlighter <> Nil Then
         Begin
-          lblHighlighterType.Caption := Editor.Highlighter.LanguageName;
-          For j := 0 To Editor.Highlighter.AttrCount - 1 Do
-            With Editor.Highlighter.Attribute[j] Do
-              Begin
-                FAttributes.Add(TAttribute.Create(Name, Foreground, Background,
-                  Style));
-                lbAttributes.Items.Add(Editor.Highlighter.Attribute[j].Name);
-              End;
+          If Editor.Highlighter Is TSynMultiSyn Then
+            Begin
+              M := Editor.Highlighter As TSynMultiSyn;
+              AddHighlighter(M.DefaultHighlighter);
+              lblHighlighterType.Caption := M.DefaultHighlighter.LanguageName;
+              For j := 0 To M.Schemes.Count - 1 Do
+                Begin
+                  S := M.Schemes[j] As TScheme;
+                  A := FAttributes.Add(S.MarkerAttri, M);
+                  If A <> Nil Then
+                    lbAttributes.Items.AddObject(Format('%s:%s', [
+                      S.SchemeName, 'Marker']), A);
+                  AddHighlighter(S.Highlighter);
+                End;
+            End Else
+            Begin
+              lblHighlighterType.Caption := Editor.Highlighter.LanguageName;
+              AddHighlighter(Editor.Highlighter);
+            End;
         End Else
-          SyntaxTab.Enabled := False;
+          SyntaxTab.Visible := False;
       // Initialise the Highlighter Attributes.
       If lbAttributes.Items.Count > 0 Then
         Begin
@@ -339,20 +514,40 @@ Begin
             Else
               Editor.Options := Editor.Options - [i];
           // Highlighter
-          If Editor.Highlighter <> Nil Then
-            For j := 0 To Editor.Highlighter.AttrCount - 1 Do
-              With Editor.Highlighter.Attribute[j] Do
-                Begin
-                  Foreground := (FAttributes[j] As TAttribute).ForeColour;
-                  Background := (FAttributes[j] As TAttribute).BackColour;
-                  Style      := (FAttributes[j] As TAttribute).Style;
-                End;
+          FAttributes.Update(boolIncTag);
           Result := True;
         End;
     Finally
       Free;
     End;
 End;
+
+(**
+
+  This method returns the name of the highlighter from the first part of the
+  default filter.
+
+  @precon  Highlighter must be a valid instance.
+  @postcon Returns the name of the highlighter from the first part of the
+           default filter.
+
+  @param   Highlighter as a TSynCustomHighlighter
+  @return  a String
+
+**)
+function TfrmEditorOptions.HighlighterName(
+  Highlighter: TSynCustomHighlighter): String;
+
+Var
+  iPos : Integer;
+
+begin
+  Result := GetShortHint(Highlighter.LanguageName);
+  iPos := Pos('(', Result);
+  If iPos > 0 Then
+    Delete(Result, iPos, Length(Result) - iPos + 1);
+  Result := Trim(Result);
+end;
 
 (**
 
@@ -368,29 +563,27 @@ End;
 procedure TfrmEditorOptions.lbAttributesClick(Sender: TObject);
 
 Var
-  i : Integer;
   A : TAttribute;
 
 begin
   If lbAttributes.ItemIndex > -1 Then
-    For i :=  0 To FAttributes.Count - 1 Do
-      Begin
-        A := FAttributes[i] As TAttribute;
-        If A.Name = lbAttributes.Items[lbAttributes.ItemIndex] Then
-          Begin
-            FUpdating := True;
-            Try
-              cbxAttrForeColour.Selected := A.ForeColour;
-              cbxAttrBackColour.Selected := A.BackColour;
-              cbxBold.Checked := fsBold In A.Style;
-              cbxItalic.Checked := fsItalic In A.Style;
-              cbxUnderlined.Checked := fsUnderline In A.Style;
-              cbxStrikeout.Checked := fsStrikeOut In A.Style;
-            Finally
-              FUpdating := False;
-            End;
+    Begin
+      A := lbAttributes.Items.Objects[lbAttributes.ItemIndex] As TAttribute;
+      If A <> Nil Then
+        Begin
+          FUpdating := True;
+          Try
+            cbxAttrForeColour.Selected := A.ForeColour;
+            cbxAttrBackColour.Selected := A.BackColour;
+            cbxBold.Checked := fsBold In A.Style;
+            cbxItalic.Checked := fsItalic In A.Style;
+            cbxUnderlined.Checked := fsUnderline In A.Style;
+            cbxStrikeout.Checked := fsStrikeOut In A.Style;
+          Finally
+            FUpdating := False;
           End;
-      End;
+        End;
+    End;
 end;
 
 (**
@@ -406,31 +599,28 @@ end;
 procedure TfrmEditorOptions.AttributeChange(Sender: TObject);
 
 Var
-  i : Integer;
+  A : TAttribute;
 
 begin
   If lbAttributes.ItemIndex > -1 Then
     If Not FUpdating Then
-      For i :=  0 To FAttributes.Count - 1 Do
-        If (FAttributes[i] As TAttribute).Name =
-          lbAttributes.Items[lbAttributes.ItemIndex] Then
+      Begin
+        A := lbAttributes.Items.Objects[lbAttributes.ItemIndex] As TAttribute;
+        If A <> Nil Then
           Begin
-            (FAttributes[i] As TAttribute).ForeColour := cbxAttrForeColour.Selected;
-            (FAttributes[i] As TAttribute).BackColour := cbxAttrBackColour.Selected;
-            (FAttributes[i] As TAttribute).Style := [];
+            A.ForeColour := cbxAttrForeColour.Selected;
+            A.BackColour := cbxAttrBackColour.Selected;
+            A.Style := [];
             If cbxBold.Checked Then
-              (FAttributes[i] As TAttribute).Style :=
-                (FAttributes[i] As TAttribute).Style + [fsBold];
+              A.Style := A.Style + [fsBold];
             If cbxItalic.Checked Then
-              (FAttributes[i] As TAttribute).Style :=
-                (FAttributes[i] As TAttribute).Style + [fsItalic];
+              A.Style := A.Style + [fsItalic];
             If cbxUnderlined.Checked Then
-              (FAttributes[i] As TAttribute).Style :=
-                (FAttributes[i] As TAttribute).Style + [fsUnderline];
+              A.Style := A.Style + [fsUnderline];
             If cbxStrikeout.Checked Then
-              (FAttributes[i] As TAttribute).Style :=
-                (FAttributes[i] As TAttribute).Style + [fsStrikeout];
+              A.Style := A.Style + [fsStrikeout];
           End;
+      End;
 end;
 
 end.

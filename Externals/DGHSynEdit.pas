@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    23 Jun 2008
+  @Date    30 Jun 2008
 
 **)
 
@@ -18,6 +18,8 @@ Uses
   SysUtils, Classes, ComCtrls, SynEdit, SynEditTypes, SynEditKeyCmds;
 
 Type
+  (** A declaration for a call back proc to exceptions. **)
+  TDGHSynEditExceptionProc = Procedure(strExceptionMsg : String) Of Object;
 
   (** Derived class of TSynEdit. Some of the methods assume that the editor is
       dymanically created as the first control of a TabSheet instance, hence
@@ -28,12 +30,14 @@ Type
     FFileDateTime: TDateTime;
     FSGMLTag: Boolean;
     FInsertingTag : Boolean;
+    FExceptionProc : TDGHSynEditExceptionProc;
     function GetTabCaption: String;
     procedure SetTabCaption(const Value: String);
     procedure SetFileName(const Value: String);
     function GetParentTabSheet: TTabSheet;
     procedure SetFileDateTime(const Value: TDateTime);
   Protected
+    Procedure DoChange; Override;
   Public
     Constructor Create(AOwner : TComponent); Override;
     Procedure LoadFromFile(strFileName : String);
@@ -43,7 +47,6 @@ Type
     procedure LowerCaseWord;
     Procedure LoadFromINIFile(strRootKey : String);
     Procedure SaveToINIFile(strRootKey : String);
-    Procedure DoChange; Override;
     { Properties }
     (**
       This property returns an appropriate captions for the editor tab within
@@ -81,6 +84,14 @@ Type
       @return  a Boolean
     **)
     Property SMGLTagCompletion : Boolean Read FSGMLTag Write FSGMLTag;
+    (**
+      A property to define a call back proc for exceptions.
+      @precon  None.
+      @postcon Sets or returns the call back proc.
+      @return  a TDGHSynEditExceptionProc
+    **)
+    Property ExceptionProc : TDGHSynEditExceptionProc Read FExceptionProc
+      Write FExceptionProc;
   Published
   End;
 
@@ -155,9 +166,7 @@ begin
   WantTabs := True;
   MaxScrollWidth := 8192;
   FSGMLTag := False;
-  (*
-    Add Wordstar shortcuts.
-  *)
+  (* shortcuts.*)
   AddKey(ecDeleteChar, VK_DELETE, [ssCtrl], 0, []);
   AddKey(ecWordLeft, VK_LEFT, [ssCtrl], 0, []);
   AddKey(ecWordRight, VK_RIGHT, [ssCtrl], 0, []);
@@ -166,6 +175,7 @@ begin
   AddKey(ecScrollLeft, VK_LEFT, [ssAlt], 0, []);
   AddKey(ecScrollRight, VK_RIGHT, [ssAlt], 0, []);
   AddKey(ecCommentBlock, Ord('C'), [ssAlt, ssCtrl], 0, []);
+  AddKey(ecAutoCompletion, Ord('J'), [ssCtrl], 0, []);
   { Custom Commands }
   Options := [eoAltSetsColumnMode, eoAutoIndent, eoAutoSizeMaxScrollWidth,
     eoDragDropEditing, eoEnhanceHomeKey, eoEnhanceEndKey, eoGroupUndo,
@@ -288,8 +298,18 @@ end;
 procedure TDGHSynEdit.LoadFromFile(strFileName: String);
 begin
   FileName := strFileName;
+  {$IFDEF VER180}
   FileAge(strFileName, FFileDateTime);
-  Lines.LoadFromFile(strFileName);
+  {$ELSE}
+  FFileDateTime := FileDateToDateTime(FileAge(strFileName));
+  {$ENDIF}
+  Try
+    Lines.LoadFromFile(strFileName);
+  Except
+    On E : Exception Do
+      If Assigned(FExceptionProc) Then
+        FExceptionproc(E.MEssage);
+  End;
   TabCaption := ExtractFileName(strFileName);
 end;
 
@@ -354,8 +374,18 @@ end;
 procedure TDGHSynEdit.SaveToFile(strFileName: String);
 begin
   FileName := strFileName;
-  Lines.SaveToFile(strFileName);
+  Try
+    Lines.SaveToFile(strFileName);
+  Except
+    On E : Exception Do
+      If Assigned(FExceptionProc) Then
+        FExceptionproc(E.Message);
+  End;
+  {$IFDEF VER180}
   FileAge(strFileName, FFileDateTime);
+  {$ELSE}
+  FFileDateTime := FileDateToDateTime(FileAge(strFileName));
+  {$ENDIF}
   Modified := False;
   TabCaption := ExtractFileName(strFileName);
 end;

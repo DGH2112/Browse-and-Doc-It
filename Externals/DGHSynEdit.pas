@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    30 Jun 2008
+  @Date    01 Jul 2008
 
 **)
 
@@ -124,20 +124,6 @@ Type
     BlockBegin : TBlockPosition;
     BlockEnd : TBlockPosition;
   End;
-
-Const
-  (** A constant to define the Find Wordstar key sequence. **)
-  ecFind          = ecUserFirst + 1;
-  (** A constant to define the Find Again Wordstar key sequence. **)
-  ecFindAgain     = ecUserFirst + 2;
-  (** A constant to define the Replace Wordstar key sequence. **)
-  ecReplace       = ecUserFirst + 3;
-  (** A constant to define the Upper Word Wordstar key sequence. **)
-  ecUppercaseWord = ecUserFirst + 4;
-  (** A constant to define the Lower Word Wordstar key sequence. **)
-  ecLowercaseWord = ecUserFirst + 5;
-  (** A constant to define the Print Wordstar key sequence. **)
-  ecPrint         = ecUserFirst + 6;
 
 Implementation
 
@@ -308,7 +294,9 @@ begin
   Except
     On E : Exception Do
       If Assigned(FExceptionProc) Then
-        FExceptionproc(E.MEssage);
+        FExceptionproc(E.Message)
+      Else
+        Raise;
   End;
   TabCaption := ExtractFileName(strFileName);
 end;
@@ -379,7 +367,9 @@ begin
   Except
     On E : Exception Do
       If Assigned(FExceptionProc) Then
-        FExceptionproc(E.Message);
+        FExceptionproc(E.Message)
+      Else
+        Raise;
   End;
   {$IFDEF VER180}
   FileAge(strFileName, FFileDateTime);

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    30 Jun 2008
+  @Date    01 Jul 2008
 
 **)
 unit EditorOptionsForm;
@@ -362,7 +362,6 @@ Procedure TfrmEditorOptions.AddHighlighter(Highlighter : TSynCustomHighlighter);
 
 Var
   A : TAttribute;
-  iPos : Integer;
   strName : String;
   i : Integer;
 

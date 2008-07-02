@@ -369,9 +369,9 @@ begin
   With TIniFile.Create(strRootKey) Do
     Try
       If Assigned(Highlighter) Then
-        strKey := HighlighterName(Highlighter) + '.Editor Settings'
+        strKey := HighlighterName(Highlighter)
       Else
-        strKey := 'Editor Settings';
+        strKey := 'General';
       Color := ReadInteger(strKey, 'Colour', Color);
       ActiveLineColor := ReadInteger(strKey, 'Active Line Colour',
         ActiveLineColor);
@@ -448,9 +448,9 @@ begin
   With TIniFile.Create(strRootKey) Do
     Try
       If Assigned(Highlighter) Then
-        strKey := HighlighterName(Highlighter) + '.Editor Settings'
+        strKey := HighlighterName(Highlighter)
       Else
-        strKey := 'Editor Settings';
+        strKey := 'General';
       WriteInteger(strKey, 'Colour', Color);
       WriteInteger(strKey, 'Active Line Colour', ActiveLineColor);
       WriteString(strKey, 'Font Name', Font.Name);

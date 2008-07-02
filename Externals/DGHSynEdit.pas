@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Jul 2008
+  @Date    02 Jul 2008
 
 **)
 
@@ -15,7 +15,8 @@ Unit DGHSynEdit;
 Interface
 
 Uses
-  SysUtils, Classes, ComCtrls, SynEdit, SynEditTypes, SynEditKeyCmds;
+  SysUtils, Classes, ComCtrls, SynEdit, SynEditTypes, SynEditKeyCmds,
+  SynEditHighlighter, Controls;
 
 Type
   (** A declaration for a call back proc to exceptions. **)
@@ -125,12 +126,60 @@ Type
     BlockEnd : TBlockPosition;
   End;
 
+  Function HighlighterName(Highlighter : TSynCustomHighlighter) : String;
+  Function HighlighterExts(Highlighter : TSynCustomHighlighter) : String;
+
 Implementation
 
 { TDGHSynEdit }
 
 Uses
   Menus, Windows, IniFiles;
+  
+(**
+
+  This function returns the Highlighter name from the first part of the
+  Highlighter's Default Filter string.
+  
+  @precon  Highlighter must be a valid instance.
+  @postcon Returns the Highlighter name from the first part of the
+           Highlighter's Default Filter string.
+           
+  @param   Highlighter as a TSynCustomHighlighter
+  @return  a String
+
+**)
+Function HighlighterName(Highlighter : TSynCustomHighlighter) : String;
+
+Var
+  iPos : Integer;
+
+Begin
+  Result := GetShortHint(Highlighter.DefaultFilter);
+  iPos := Pos('(', Result);
+  If iPos > 0 Then
+    Delete(Result, iPos, Length(Result) - iPos + 1);
+  Result := Trim(Result);
+End;
+
+(**
+
+  This function returns the Highlighter extensions from the second part of the
+  Highlighter's Default Filter string.
+
+  @precon  Highlighter must be a valid instance.
+  @postcon Returns the Highlighter extensions from the second part of the
+           Highlighter's Default Filter string.
+
+  @param   Highlighter as a TSynCustomHighlighter
+  @return  a String
+
+**)
+Function HighlighterExts(Highlighter : TSynCustomHighlighter) : String;
+
+Begin
+  Result := GetLongHint(Highlighter.DefaultFilter);
+End;
 
 (**
 
@@ -320,7 +369,7 @@ begin
   With TIniFile.Create(strRootKey) Do
     Try
       If Assigned(Highlighter) Then
-        strKey := Highlighter.LanguageName + '.Editor Settings'
+        strKey := HighlighterName(Highlighter) + '.Editor Settings'
       Else
         strKey := 'Editor Settings';
       Color := ReadInteger(strKey, 'Colour', Color);
@@ -364,6 +413,13 @@ begin
   FileName := strFileName;
   Try
     Lines.SaveToFile(strFileName);
+    {$IFDEF VER180}
+    FileAge(strFileName, FFileDateTime);
+    {$ELSE}
+    FFileDateTime := FileDateToDateTime(FileAge(strFileName));
+    {$ENDIF}
+    Modified := False;
+    TabCaption := ExtractFileName(strFileName);
   Except
     On E : Exception Do
       If Assigned(FExceptionProc) Then
@@ -371,13 +427,6 @@ begin
       Else
         Raise;
   End;
-  {$IFDEF VER180}
-  FileAge(strFileName, FFileDateTime);
-  {$ELSE}
-  FFileDateTime := FileDateToDateTime(FileAge(strFileName));
-  {$ENDIF}
-  Modified := False;
-  TabCaption := ExtractFileName(strFileName);
 end;
 
 (**
@@ -399,7 +448,7 @@ begin
   With TIniFile.Create(strRootKey) Do
     Try
       If Assigned(Highlighter) Then
-        strKey := Highlighter.LanguageName + '.Editor Settings'
+        strKey := HighlighterName(Highlighter) + '.Editor Settings'
       Else
         strKey := 'Editor Settings';
       WriteInteger(strKey, 'Colour', Color);

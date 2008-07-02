@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Jul 2008
+  @Date    02 Jul 2008
 
 **)
 unit EditorOptionsForm;
@@ -141,7 +141,6 @@ type
     FAttributes : TAttributes;
     FUpdating : Boolean;
     Procedure AddHighlighter(Highlighter : TSynCustomHighlighter);
-    Function HighlighterName(Highlighter : TSynCustomHighlighter) : String;
   public
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
@@ -154,7 +153,7 @@ implementation
 {$R *.dfm}
 
 Uses
-  SynHighlighterMulti;
+  SynHighlighterMulti, DGHSynEdit;
 
 Type
   (** A record to describe descriptions for each TSynEditorOption. **)
@@ -468,7 +467,7 @@ Begin
             Begin
               M := Editor.Highlighter As TSynMultiSyn;
               AddHighlighter(M.DefaultHighlighter);
-              lblHighlighterType.Caption := M.DefaultHighlighter.LanguageName;
+              lblHighlighterType.Caption := HighlighterName(M.DefaultHighlighter);
               For j := 0 To M.Schemes.Count - 1 Do
                 Begin
                   S := M.Schemes[j] As TScheme;
@@ -480,7 +479,7 @@ Begin
                 End;
             End Else
             Begin
-              lblHighlighterType.Caption := Editor.Highlighter.LanguageName;
+              lblHighlighterType.Caption := HighlighterName(Editor.Highlighter);
               AddHighlighter(Editor.Highlighter);
             End;
         End Else
@@ -520,33 +519,6 @@ Begin
       Free;
     End;
 End;
-
-(**
-
-  This method returns the name of the highlighter from the first part of the
-  default filter.
-
-  @precon  Highlighter must be a valid instance.
-  @postcon Returns the name of the highlighter from the first part of the
-           default filter.
-
-  @param   Highlighter as a TSynCustomHighlighter
-  @return  a String
-
-**)
-function TfrmEditorOptions.HighlighterName(
-  Highlighter: TSynCustomHighlighter): String;
-
-Var
-  iPos : Integer;
-
-begin
-  Result := GetShortHint(Highlighter.LanguageName);
-  iPos := Pos('(', Result);
-  If iPos > 0 Then
-    Delete(Result, iPos, Length(Result) - iPos + 1);
-  Result := Trim(Result);
-end;
 
 (**
 

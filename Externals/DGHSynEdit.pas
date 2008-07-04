@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    02 Jul 2008
+  @Date    04 Jul 2008
 
 **)
 
@@ -32,6 +32,7 @@ Type
     FSGMLTag: Boolean;
     FInsertingTag : Boolean;
     FExceptionProc : TDGHSynEditExceptionProc;
+    FSuspendTagCompletion : Boolean;
     function GetTabCaption: String;
     procedure SetTabCaption(const Value: String);
     procedure SetFileName(const Value: String);
@@ -48,6 +49,7 @@ Type
     procedure LowerCaseWord;
     Procedure LoadFromINIFile(strRootKey : String);
     Procedure SaveToINIFile(strRootKey : String);
+    Procedure SuspendTagCompletion;
     { Properties }
     (**
       This property returns an appropriate captions for the editor tab within
@@ -201,6 +203,7 @@ begin
   WantTabs := True;
   MaxScrollWidth := 8192;
   FSGMLTag := False;
+  FSuspendTagCompletion := False;
   (* shortcuts.*)
   AddKey(ecDeleteChar, VK_DELETE, [ssCtrl], 0, []);
   AddKey(ecWordLeft, VK_LEFT, [ssCtrl], 0, []);
@@ -252,7 +255,8 @@ Var
   i : Integer;
 
 begin
-  If FSGMLTag And Not FInsertingTag Then
+  OutputDebugString('TDGHSynEdit.DoChange');
+  If FSGMLTag And Not FInsertingTag And Not FSuspendTagCompletion Then
     Begin
       FInsertingTag := True;
       Try
@@ -280,6 +284,8 @@ begin
         FInsertingTag := False;
       End;
     End;
+  If FSuspendTagCompletion Then
+    FSuspendTagCompletion := False;
   Inherited DoChange;
 end;
 
@@ -497,6 +503,20 @@ procedure TDGHSynEdit.SetTabCaption(const Value: String);
 begin
   If Parent Is TTabSheet Then
     (Parent As TTabsheet).Caption := Value;
+end;
+
+(**
+
+  This method temporarily suspends the html/xml tag completion for 1 change
+  event.
+
+  @precon  None.
+  @postcon Temporarily suspends the html/xml tag completion for 1 change event.
+
+**)
+procedure TDGHSynEdit.SuspendTagCompletion;
+begin
+  FSuspendTagCompletion := True;
 end;
 
 (**

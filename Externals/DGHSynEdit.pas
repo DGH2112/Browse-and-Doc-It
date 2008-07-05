@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    04 Jul 2008
+  @Date    05 Jul 2008
 
 **)
 
@@ -255,7 +255,6 @@ Var
   i : Integer;
 
 begin
-  OutputDebugString('TDGHSynEdit.DoChange');
   If FSGMLTag And Not FInsertingTag And Not FSuspendTagCompletion Then
     Begin
       FInsertingTag := True;

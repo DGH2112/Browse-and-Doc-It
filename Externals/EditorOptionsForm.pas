@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    02 Jul 2008
+  @Date    05 Jul 2008
 
 **)
 unit EditorOptionsForm;

@@ -33,6 +33,7 @@ Type
     FInsertingTag : Boolean;
     FExceptionProc : TDGHSynEditExceptionProc;
     FSuspendTagCompletion : Boolean;
+    FLastSize : Integer;
     function GetTabCaption: String;
     procedure SetTabCaption(const Value: String);
     procedure SetFileName(const Value: String);
@@ -137,12 +138,12 @@ Implementation
 
 Uses
   Menus, Windows, IniFiles;
-  
+
 (**
 
   This function returns the Highlighter name from the first part of the
   Highlighter's Default Filter string.
-  
+
   @precon  Highlighter must be a valid instance.
   @postcon Returns the Highlighter name from the first part of the
            Highlighter's Default Filter string.
@@ -199,6 +200,7 @@ constructor TDGHSynEdit.Create(AOwner: TComponent);
 
 begin
   Inherited Create(AOwner);
+  FLastSize := 0;
   TabWidth := 2;
   WantTabs := True;
   MaxScrollWidth := 8192;
@@ -255,7 +257,8 @@ Var
   i : Integer;
 
 begin
-  If FSGMLTag And Not FInsertingTag And Not FSuspendTagCompletion Then
+  If FSGMLTag And Not FInsertingTag And Not FSuspendTagCompletion And
+    (FLastSize < Length(Text)) Then
     Begin
       FInsertingTag := True;
       Try
@@ -285,6 +288,7 @@ begin
     End;
   If FSuspendTagCompletion Then
     FSuspendTagCompletion := False;
+  FLastSize := Length(Text);
   Inherited DoChange;
 end;
 
@@ -353,6 +357,7 @@ begin
         Raise;
   End;
   TabCaption := ExtractFileName(strFileName);
+  FLastSize := Length(Text);
 end;
 
 (**

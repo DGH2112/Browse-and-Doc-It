@@ -1,4 +1,4 @@
-(**
+﻿(**
 
   This is a derived class from TSynEdit allowing me to override some of
   the default properties and also add an number of extra WordStar style
@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    05 Jul 2008
+  @Date    09 Jul 2008
 
 **)
 
@@ -36,7 +36,6 @@ Type
     FLastSize : Integer;
     function GetTabCaption: String;
     procedure SetTabCaption(const Value: String);
-    procedure SetFileName(const Value: String);
     function GetParentTabSheet: TTabSheet;
     procedure SetFileDateTime(const Value: TDateTime);
   Protected
@@ -66,7 +65,7 @@ Type
       @postcon Returns the filename for the editor.
       @return  a String
     **)
-    Property FileName : String Read FFileName Write SetFileName;
+    Property FileName : String Read FFileName;
     (**
       This property returns the tab sheet that the editor is bound within.
       @precon  None.
@@ -341,14 +340,14 @@ end;
 **)
 procedure TDGHSynEdit.LoadFromFile(strFileName: String);
 begin
-  FileName := strFileName;
+  FFileName := strFileName;
   {$IFDEF VER180}
-  FileAge(strFileName, FFileDateTime);
+  FileAge(FFileName, FFileDateTime);
   {$ELSE}
-  FFileDateTime := FileDateToDateTime(FileAge(strFileName));
+  FFileDateTime := FileDateToDateTime(FileAge(FFileName));
   {$ENDIF}
   Try
-    Lines.LoadFromFile(strFileName);
+    Lines.LoadFromFile(FFileName);
   Except
     On E : Exception Do
       If Assigned(FExceptionProc) Then
@@ -356,7 +355,7 @@ begin
       Else
         Raise;
   End;
-  TabCaption := ExtractFileName(strFileName);
+  TabCaption := ExtractFileName(FFileName);
   FLastSize := Length(Text);
 end;
 
@@ -420,16 +419,16 @@ end;
 **)
 procedure TDGHSynEdit.SaveToFile(strFileName: String);
 begin
-  FileName := strFileName;
+  FFileName := strFileName;
   Try
-    Lines.SaveToFile(strFileName);
+    Lines.SaveToFile(FFileName);
     {$IFDEF VER180}
-    FileAge(strFileName, FFileDateTime);
+    FileAge(FFileName, FFileDateTime);
     {$ELSE}
-    FFileDateTime := FileDateToDateTime(FileAge(strFileName));
+    FFileDateTime := FileDateToDateTime(FileAge(FFileName));
     {$ENDIF}
     Modified := False;
-    TabCaption := ExtractFileName(strFileName);
+    TabCaption := ExtractFileName(FFileName);
   Except
     On E : Exception Do
       If Assigned(FExceptionProc) Then
@@ -475,22 +474,6 @@ begin
     Finally
       Free;
     End;
-end;
-
-(**
-
-  This is a setter method for the FileName property.
-
-  @precon  None.
-  @postcon Sets the filename of the editor.
-
-  @param   Value as a String constant
-
-**)
-procedure TDGHSynEdit.SetFileName(const Value: String);
-begin
-  If FFileName <> Value Then
-    FFileName := Value;
 end;
 
 (**

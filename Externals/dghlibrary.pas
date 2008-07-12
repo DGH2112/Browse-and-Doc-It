@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    23 Jun 2008
+  @Date    12 Jul 2008
 
 **)
 Unit DGHLibrary;
@@ -464,14 +464,10 @@ Type
   (** This is a procedure type for handling Exception messages in ParseMacro. **)
   TExceptionProcedure = Procedure(strExceptionMsg : String) Of Object;
 
-  (** This is an enumerate to describe the type of message returned by the
-      message handler in IDGHCreateProcessEvents. **)
-  TProcMsgType = (pmtStandard, pmtAbort, pmtException);
-
   (** An interface that needs to be implemented by an class passed to
       DGHCreateProcess so that messages can be handled. **)
   IDGHCreateProcessEvents = Interface
-    Procedure ProcessMsgHandler(strMsg : String; MsgType : TProcMsgType; var boolAbort : Boolean);
+    Procedure ProcessMsgHandler(strMsg : String; var boolAbort : Boolean);
     Procedure IdleHandler;
   End;
 
@@ -5382,18 +5378,19 @@ begin
   Result := Format('%s Settings for %s on %s.INI', [strModulePathAndName,
     strUserName, strComputerName]);
   If AnsiCompareText(ExtractFileExt(StrPas(Buffer)), '.exe') = 0 Then
-    For iParam := 1 To ParamCount Do
-      Begin
-        If Length(ParamStr(iParam)) > 0 Then
-          If ParamStr(iParam)[1] In ['-', '/'] Then
-            If Length(ParamStr(iParam)) > 1 Then
-              If ParamStr(iParam)[2] In ['@'] Then
-                Begin
-                  Result := ParseAlternateINIFile(Result, ParamStr(iParam));
-                  Continue;
-                End;
-        slParams.Add(ParamStr(iParam));
-      End;
+    If slParams <> Nil Then
+      For iParam := 1 To ParamCount Do
+        Begin
+          If Length(ParamStr(iParam)) > 0 Then
+            If ParamStr(iParam)[1] In ['-', '/'] Then
+              If Length(ParamStr(iParam)) > 1 Then
+                If ParamStr(iParam)[2] In ['@'] Then
+                  Begin
+                    Result := ParseAlternateINIFile(Result, ParamStr(iParam));
+                    Continue;
+                  End;
+          slParams.Add(ParamStr(iParam));
+        End;
 end;
 
 (**
@@ -5721,7 +5718,7 @@ Var
     If boolAbort Then
       Begin
         If Assigned(ProcMsgHndr) Then
-          ProcMsgHndr.ProcessMsgHandler(strUserAbort, pmtAbort, boolAbort);
+          ProcMsgHndr.ProcessMsgHandler(strUserAbort, boolAbort);
         Exit;
       End;
     Win32Check(PeekNamedPipe(hRead, Nil, 0, Nil, @iTotalBytesInPipe, Nil));
@@ -5737,7 +5734,7 @@ Var
     If Assigned(ProcMsgHndr) Then
       While slLines.Count > 1 - Integer(Purge) Do
         Begin
-          ProcMsgHndr.ProcessMsgHandler(slLines[0], pmtStandard, boolAbort);
+          ProcMsgHndr.ProcessMsgHandler(slLines[0], boolAbort);
           slLines.Delete(0);
         End;
   End;
@@ -5814,7 +5811,7 @@ Begin
     Except
       On E : Exception Do
         If Assigned(ProcMsgHndr) Then
-          ProcMsgHndr.ProcessMsgHandler(E.Message, pmtException, boolAbort);
+          ProcMsgHndr.ProcessMsgHandler(E.Message, boolAbort);
     End;
 End;
 

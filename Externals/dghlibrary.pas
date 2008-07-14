@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Jul 2008
+  @Date    14 Jul 2008
 
 **)
 Unit DGHLibrary;
@@ -515,6 +515,7 @@ Type
   Function ReduceBearing(dblBearing : Double) : Double;
   Function GetBuildNumber(strFileName : String; var iMajor, iMinor, iBugfix,
     iBuild : Integer) : String;
+  Function CheckConsoleMode(hndConsole : THandle) : Boolean;
   Function GetConsoleTitle(strTitle: String) : String;
   Procedure OutputToConsole(hndConsole : THandle; Const strText : String = '';
     iTextColour : TColor = clNone; iBackColour : TColor = clNone;

@@ -13,9 +13,9 @@ unit BrowseAndDocItTestForm;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, SynEditHighlighter, SynHighlighterPas, SynEdit, ExtCtrls,
-  ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
+  Windows, Messages, SysUtils, {$IFDEF VER180} Variants, {$ENDIF} Classes,
+  Graphics, Controls, Forms, Dialogs, SynEditHighlighter, SynHighlighterPas,
+  SynEdit, ExtCtrls, ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
   {$WARN UNIT_PLATFORM OFF} FileCtrl {$WARN UNIT_PLATFORM ON}, ComCtrls,
   Menus, StdActns, ActnList, ProgressForm;
 
@@ -255,7 +255,9 @@ Begin
     Source.Position := 0;
     M := TPascalDocModule.Create(Source, strFileName, False, [moParse]);
     Try
-      Result := M.Errors.Count;
+      Result := 0;
+      If M.FindElement(strErrorsAndWarnings) <> Nil Then
+        Result := M.FindElement(strErrorsAndWarnings).Count;
     Finally
       M.Free;
     End;

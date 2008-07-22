@@ -32,7 +32,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Align = alLeft
     Caption = 'Panel1'
     TabOrder = 0
-    ExplicitHeight = 690
   end
   object SynEdit1: TSynEdit
     Left = 692
@@ -61,7 +60,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoKeepCaretX, eoRightMouseMovesCursor, eoScrollPastEof, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabIndent, eoTabsToSpaces, eoTrimTrailingSpaces]
     OnChange = SynEdit1Change
     OnStatusChange = SynEdit1StatusChange
-    ExplicitHeight = 690
   end
   object Panel2: TPanel
     Left = 0
@@ -106,7 +104,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Align = alLeft
     Caption = 'Panel3'
     TabOrder = 3
-    ExplicitHeight = 690
     DesignSize = (
       273
       689)

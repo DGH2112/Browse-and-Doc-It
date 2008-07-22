@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    13 Aug 2006
+  @Date    22 Jul 2008
   @Author  David Hoyle
 
 **)
@@ -257,7 +257,7 @@ Begin
     Try
       Result := 0;
       If M.FindElement(strErrorsAndWarnings) <> Nil Then
-        Result := M.FindElement(strErrorsAndWarnings).Count;
+        Result := M.FindElement(strErrorsAndWarnings).ElementCount;
     Finally
       M.Free;
     End;

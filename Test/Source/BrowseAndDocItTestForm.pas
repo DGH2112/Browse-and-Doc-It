@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    22 Jul 2008
+  @Date    23 Jul 2008
   @Author  David Hoyle
 
 **)
@@ -67,6 +67,7 @@ type
     FDirectory : String;
     FFileName : String;
     FProgressForm : TfrmProgress;
+    FINIFileName : String;
     function GetFileName: String;
     procedure SetDirectory(const Value: String);
     procedure SetFileName(const Value: String);
@@ -100,7 +101,7 @@ var
 implementation
 
 Uses
-  PascalDocModule, TokenForm, Registry;
+  PascalDocModule, TokenForm, IniFiles, DGHLibrary;
 
 {$R *.dfm}
 
@@ -305,16 +306,9 @@ end;
 procedure TfrmBrowseAndDocItTestForm.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 
-Const
-  strMsg = 'The file "%s" has been modified. Do you want to save the changes?';
-
 begin
   If SynEdit1.Modified Then
-    Case MessageDlg(Format(strMsg, [FFileName]), mtConfirmation,
-      [mbYes, mbNo, mbCancel], 0) Of
-      mrYes: SynEdit1.Lines.SaveToFile(FFileName);
-      mrCancel: CanClose := False;
-    End;
+    SynEdit1.Lines.SaveToFile(FFileName);
 end;
 
 (**
@@ -332,8 +326,10 @@ procedure TfrmBrowseAndDocItTestForm.FormCreate(Sender: TObject);
 
 Var
   i : TDocOption;
+  ini : TIniFile;
 
 begin
+  FINIFileName := BuildRootKey(Nil, Nil);
   OutputDebugString('Started');
   FProgressForm := TfrmProgress.Create(Nil);
   For i := Low(TDocOption) To High(TDocOption) Do
@@ -343,17 +339,17 @@ begin
   FModuleExplorerFrame.Align := alClient;
   FModuleExplorerFrame.OnSelectionChange := SelectionChange;
   FModuleExplorerFrame.OnFocus := Focus;
-  With TRegIniFile.Create Do
-    Try
-      Top := ReadInteger(strRegRootKey + 'Position', 'Top', Top);
-      Left := ReadInteger(strRegRootKey + 'Position', 'Left', Left);
-      Height := ReadInteger(strRegRootKey + 'Position', 'Height', Height);
-      Width := ReadInteger(strRegRootKey + 'Position', 'Width', Width);
-      Panel1.Width := ReadInteger(strRegRootKey + 'Position', 'Splitter', Panel1.Width);
-      edtDirectory.Text := ReadString(strRegRootKey + 'Position', 'Directory', GetCurrentDir);
-    Finally
-      Free;
-    End;
+  ini := TIniFile.Create(FINIFileName);
+  Try
+    Top := ini.ReadInteger('Position', 'Top', Top);
+    Left := ini.ReadInteger('Position', 'Left', Left);
+    Height := ini.ReadInteger('Position', 'Height', Height);
+    Width := ini.ReadInteger('Position', 'Width', Width);
+    Panel1.Width := ini.ReadInteger('Position', 'Splitter', Panel1.Width);
+    edtDirectory.Text := ini.ReadString('Position', 'Directory', GetCurrentDir);
+  Finally
+    ini.Free;
+  End;
 end;
 
 (**
@@ -372,14 +368,14 @@ Const
   strMsg = 'The file "%s" has been modified. Do you want to save the changes?';
 
 begin
-  With TRegIniFile.Create Do
+  With TIniFile.Create(FINIFileName) Do
     Try
-      WriteInteger(strRegRootKey + 'Position', 'Top', Top);
-      WriteInteger(strRegRootKey + 'Position', 'Left', Left);
-      WriteInteger(strRegRootKey + 'Position', 'Height', Height);
-      WriteInteger(strRegRootKey + 'Position', 'Width', Width);
-      WriteInteger(strRegRootKey + 'Position', 'Splitter', Panel1.Width);
-      WriteString(strRegRootKey + 'Position', 'Directory', edtDirectory.Text);
+      WriteInteger('Position', 'Top', Top);
+      WriteInteger('Position', 'Left', Left);
+      WriteInteger('Position', 'Height', Height);
+      WriteInteger('Position', 'Width', Width);
+      WriteInteger('Position', 'Splitter', Panel1.Width);
+      WriteString('Position', 'Directory', edtDirectory.Text);
     Finally
       Free;
     End;

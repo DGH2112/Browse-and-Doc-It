@@ -11,7 +11,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poDesktopCenter
+  Position = poDefault
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy

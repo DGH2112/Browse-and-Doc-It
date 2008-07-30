@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    27 Jul 2006
+  @Date    30 Jul 2006
   @Version 1.0
   @Author  David Hoyle
 
@@ -98,7 +98,7 @@ Begin
     Try
       For i := Low(TDocOption) To High(TDocOption) Do
         Begin
-          clbOptions.Items.Add(DocOptionInfo[i].Description);
+          clbOptions.Items.Add(DocOptionInfo[i].FDescription);
           clbOptions.Checked[Integer(i)] := i In BrowseAndDocItOptions.Options;
         End;
       For j := 0 To SpecialTags.Count - 1 Do

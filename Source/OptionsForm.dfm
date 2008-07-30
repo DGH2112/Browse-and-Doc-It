@@ -104,6 +104,10 @@ object frmOptions: TfrmOptions
     object Page2: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lbSpecialTags: TListBox
         Left = 0
         Top = 17
@@ -201,6 +205,10 @@ object frmOptions: TfrmOptions
     object HelpFilePage: TTabSheet
       Caption = ' Help File Directory'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object HelpFileDir: TDirectoryListBox
         Left = 0
         Top = 0

@@ -121,7 +121,7 @@ Uses
 procedure TfrmBrowseAndDocItTestForm.Button1Click(Sender: TObject);
 
 Var
-  M : TPascalDocModule;
+  M : TPascalModule;
   Source : TMemoryStream;
 
 begin
@@ -129,7 +129,7 @@ begin
   Try
     FSynEdit.Lines.SaveToStream(Source);
     Source.Position := 0;
-    M := TPascalDocModule.Create(Source, FileName, True,
+    M := TPascalModule.Create(Source, FileName, True,
       [moParse, moCheckForDocumentConflicts]);
     Try
       TfrmTokenForm.Execute(M);
@@ -273,13 +273,13 @@ Function TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String) : Integer;
 
 Var
   Source : TFileStream;
-  M : TPascalDocModule;
+  M : TPascalModule;
 
 Begin
   Source := TFileStream.Create(strFileName, fmOpenRead);
   Try
     Source.Position := 0;
-    M := TPascalDocModule.Create(Source, strFileName, False, [moParse]);
+    M := TPascalModule.Create(Source, strFileName, False, [moParse]);
     Try
       Result := 0;
       If M.FindElement(strErrorsAndWarnings) <> Nil Then
@@ -537,7 +537,7 @@ end;
 procedure TfrmBrowseAndDocItTestForm.SynEdit1Change(Sender: TObject);
 
 Var
-  M : TPascalDocModule;
+  M : TPascalModule;
   Source : TMemoryStream;
 
 begin
@@ -546,7 +546,7 @@ begin
   Try
     FSynEdit.Lines.SaveToStream(Source);
     Source.Position := 0;
-    M := TPascalDocModule.Create(Source, FileName, FSynEdit.Modified,
+    M := TPascalModule.Create(Source, FileName, FSynEdit.Modified,
       [moParse, moCheckForDocumentConflicts]);
     Try
       FModuleExplorerFrame.RenderModule(M);

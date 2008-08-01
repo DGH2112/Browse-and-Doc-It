@@ -33,7 +33,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Align = alLeft
     Caption = 'Panel1'
     TabOrder = 0
-    ExplicitHeight = 689
   end
   object Panel2: TPanel
     Left = 0

@@ -1,8 +1,9 @@
 object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   Left = 161
   Top = 170
+  ActiveControl = lvFileList
   Caption = 'frmBrowseAndDocItTestForm'
-  ClientHeight = 732
+  ClientHeight = 763
   ClientWidth = 907
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,7 +21,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   object Splitter1: TSplitter
     Left = 689
     Top = 43
-    Height = 689
+    Height = 720
     ResizeStyle = rsUpdate
     ExplicitHeight = 690
   end
@@ -28,38 +29,11 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Left = 273
     Top = 43
     Width = 416
-    Height = 689
+    Height = 720
     Align = alLeft
     Caption = 'Panel1'
     TabOrder = 0
-  end
-  object SynEdit1: TSynEdit
-    Left = 692
-    Top = 43
-    Width = 215
-    Height = 689
-    Align = alClient
-    ActiveLineColor = clSkyBlue
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Courier New'
-    Font.Style = []
-    PopupMenu = PopupMenu1
-    TabOrder = 1
-    Gutter.Font.Charset = DEFAULT_CHARSET
-    Gutter.Font.Color = clWindowText
-    Gutter.Font.Height = -11
-    Gutter.Font.Name = 'Courier New'
-    Gutter.Font.Style = []
-    Gutter.ShowLineNumbers = True
-    Highlighter = SynPasSyn1
-    InsertCaret = ctHalfBlock
-    Lines.Strings = (
-      '')
-    Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoHideShowScrollbars, eoKeepCaretX, eoRightMouseMovesCursor, eoScrollPastEof, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabIndent, eoTabsToSpaces, eoTrimTrailingSpaces]
-    OnChange = SynEdit1Change
-    OnStatusChange = SynEdit1StatusChange
+    ExplicitHeight = 689
   end
   object Panel2: TPanel
     Left = 0
@@ -95,23 +69,32 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       TabOrder = 2
       OnClick = btnQuitClick
     end
+    object btnOptions: TButton
+      Left = 297
+      Top = 12
+      Width = 75
+      Height = 25
+      Caption = 'Options'
+      TabOrder = 3
+      OnClick = btnOptionsClick
+    end
   end
   object Panel3: TPanel
     Left = 0
     Top = 43
     Width = 273
-    Height = 689
+    Height = 720
     Align = alLeft
     Caption = 'Panel3'
-    TabOrder = 3
+    TabOrder = 1
     DesignSize = (
       273
-      689)
+      720)
     object lvFileList: TListView
       Left = 8
-      Top = 40
+      Top = 35
       Width = 259
-      Height = 641
+      Height = 678
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = <
         item
@@ -126,7 +109,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       RowSelect = True
       TabOrder = 0
       ViewStyle = vsReport
-      OnClick = FileListClick
+      OnSelectItem = lvFileListSelectItem
     end
     object edtDirectory: TEdit
       Left = 8
@@ -137,27 +120,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Text = 'edtDirectory'
       OnChange = edtDirectoryChange
     end
-  end
-  object SynPasSyn1: TSynPasSyn
-    AsmAttri.Foreground = clMaroon
-    CommentAttri.Foreground = clPurple
-    DirectiveAttri.Foreground = clPurple
-    DirectiveAttri.Style = []
-    IdentifierAttri.Foreground = clNavy
-    NumberAttri.Foreground = clGreen
-    NumberAttri.Style = [fsBold]
-    FloatAttri.Foreground = clGreen
-    FloatAttri.Style = [fsBold]
-    HexAttri.Foreground = clGreen
-    HexAttri.Style = [fsBold]
-    StringAttri.Foreground = clTeal
-    StringAttri.Style = [fsBold]
-    CharAttri.Foreground = clTeal
-    CharAttri.Style = [fsBold]
-    SymbolAttri.Foreground = clGreen
-    SymbolAttri.Style = [fsBold]
-    Left = 504
-    Top = 144
   end
   object PopupMenu1: TPopupMenu
     Left = 345

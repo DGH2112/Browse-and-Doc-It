@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    23 Jul 2008
+  @Date    01 Aug 2008
   @Author  David Hoyle
 
 **)
@@ -23,8 +23,6 @@ type
   (** This is thre class that defined the main interface form. **)
   TfrmBrowseAndDocItTestForm = class(TForm)
     Panel1: TPanel;
-    SynEdit1: TSynEdit;
-    SynPasSyn1: TSynPasSyn;
     Panel2: TPanel;
     Button1: TButton;
     CheckBox1: TCheckBox;
@@ -47,6 +45,7 @@ type
     Paste1: TMenuItem;
     Delete1: TMenuItem;
     SelectAll1: TMenuItem;
+    btnOptions: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
@@ -57,10 +56,12 @@ type
     procedure CheckBox1Click(Sender: TObject);
     procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure FileListClick(Sender: TObject);
     procedure btnQuitClick(Sender: TObject);
     procedure DirectoryListBox1Change(Sender: TObject);
     procedure edtDirectoryChange(Sender: TObject);
+    procedure lvFileListSelectItem(Sender: TObject; Item: TListItem;
+      Selected: Boolean);
+    procedure btnOptionsClick(Sender: TObject);
   private
     { Private declarations }
     FModuleExplorerFrame : TframeModuleExplorer;
@@ -68,6 +69,8 @@ type
     FFileName : String;
     FProgressForm : TfrmProgress;
     FINIFileName : String;
+    FSynEdit: TSynEdit;
+    FSynPasSyn: TSynPasSyn;
     function GetFileName: String;
     procedure SetDirectory(const Value: String);
     procedure SetFileName(const Value: String);
@@ -101,7 +104,7 @@ var
 implementation
 
 Uses
-  PascalDocModule, TokenForm, IniFiles, DGHLibrary;
+  PascalDocModule, TokenForm, IniFiles, DGHLibrary, OptionsForm;
 
 {$R *.dfm}
 
@@ -124,7 +127,7 @@ Var
 begin
   Source := TMemoryStream.Create;
   Try
-    SynEdit1.Lines.SaveToStream(Source);
+    FSynEdit.Lines.SaveToStream(Source);
     Source.Position := 0;
     M := TPascalDocModule.Create(Source, FileName, True,
       [moParse, moCheckForDocumentConflicts]);
@@ -136,6 +139,28 @@ begin
   Finally
     Source.Free;
   End;
+end;
+
+(**
+
+  This is an on click event handler for the options button.
+
+  @precon  None.
+  @postcon Displays the Options dialogue.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmBrowseAndDocItTestForm.btnOptionsClick(Sender: TObject);
+
+Var
+  i : Integer;
+  strHelp : String;
+
+begin
+  i := 5;
+  If TfrmOptions.Execute(i, strHelp) Then
+    SynEdit1Change(Sender);
 end;
 
 (**
@@ -167,9 +192,9 @@ end;
 procedure TfrmBrowseAndDocItTestForm.CheckBox1Click(Sender: TObject);
 begin
   If CheckBox1.Checked Then
-    SynEdit1.Options := SynEdit1.Options + [eoShowSpecialChars]
+    FSynEdit.Options := FSynEdit.Options + [eoShowSpecialChars]
   Else
-    SynEdit1.Options := SynEdit1.Options - [eoShowSpecialChars];
+    FSynEdit.Options := FSynEdit.Options - [eoShowSpecialChars];
 end;
 
 (**
@@ -269,31 +294,6 @@ End;
 
 (**
 
-  This is an on click event handler for the FileListBox1 control.
-
-  @precon  None.
-  @postcon Sets the filename property to the selected file.
-
-  @param   Sender as a TObject
-
-**)
-procedure TfrmBrowseAndDocItTestForm.FileListClick(Sender: TObject);
-
-Var
-  boolCanClose :Boolean;
-
-begin
-  FormCloseQuery(Self, boolCanClose);
-  If lvFileList.Selected <> Nil Then
-    If FileExists(lvFileList.Selected.SubItems[1]) Then
-      FileName := lvFileList.Selected.SubItems[1]
-    Else
-      MessageDlg(Format('The file "%s" was not found.',
-        [lvFileList.Selected.SubItems[1]]), mtError, [mbOK], 0);
-end;
-
-(**
-
   This is an on close event handler for the main form.
 
   @precon  None.
@@ -307,8 +307,11 @@ procedure TfrmBrowseAndDocItTestForm.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 
 begin
-  If SynEdit1.Modified Then
-    SynEdit1.Lines.SaveToFile(FFileName);
+  If FSynEdit.Modified Then
+    Begin
+      FSynEdit.Lines.SaveToFile(FFileName);
+      FSynEdit.Modified := False;
+    End;
 end;
 
 (**
@@ -326,30 +329,70 @@ procedure TfrmBrowseAndDocItTestForm.FormCreate(Sender: TObject);
 
 Var
   i : TDocOption;
-  ini : TIniFile;
+  j : Integer;
 
 begin
+  FSynEdit := TSynEdit.Create(Nil);
+  With FSynEdit Do
+    Begin
+      Parent := Self;
+      Highlighter := FSynPasSyn;
+      Align := alClient;
+      ActiveLineColor := clSkyBlue;
+      Gutter.ShowLineNumbers := True;
+      PopupMenu := PopupMenu1;
+      OnChange := SynEdit1Change;
+      OnStatusChange:= SynEdit1StatusChange;
+    End;
+  FSynPasSyn := TSynPasSyn.Create(Nil);
+  With FSynPasSyn Do
+    Begin
+      AsmAttri.Foreground := clMaroon;
+      CommentAttri.Foreground := clPurple;
+      DirectiveAttri.Foreground := clGreen;
+      DirectiveAttri.Style := [fsBold];
+      IdentifierAttri.Foreground := clNavy;
+      NumberAttri.Foreground := clGreen;
+      FloatAttri.Foreground := clGreen;
+      HexAttri.Foreground := clGreen;
+      StringAttri.Foreground := clTeal;
+      CharAttri.Foreground := clTeal;
+      SymbolAttri.Foreground := clGreen;
+    End;
+  FSynEdit.Highlighter := FSynPasSyn;
   FINIFileName := BuildRootKey(Nil, Nil);
   OutputDebugString('Started');
   FProgressForm := TfrmProgress.Create(Nil);
-  For i := Low(TDocOption) To High(TDocOption) Do
-    BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [i];
   FModuleExplorerFrame := TframeModuleExplorer.Create(Self);
   FModuleExplorerFrame.Parent := Panel1;
   FModuleExplorerFrame.Align := alClient;
   FModuleExplorerFrame.OnSelectionChange := SelectionChange;
   FModuleExplorerFrame.OnFocus := Focus;
-  ini := TIniFile.Create(FINIFileName);
-  Try
-    Top := ini.ReadInteger('Position', 'Top', Top);
-    Left := ini.ReadInteger('Position', 'Left', Left);
-    Height := ini.ReadInteger('Position', 'Height', Height);
-    Width := ini.ReadInteger('Position', 'Width', Width);
-    Panel1.Width := ini.ReadInteger('Position', 'Splitter', Panel1.Width);
-    edtDirectory.Text := ini.ReadString('Position', 'Directory', GetCurrentDir);
-  Finally
-    ini.Free;
-  End;
+  With TIniFile.Create(FINIFileName) Do
+    Try
+      For i := Low(TDocOption) to High(TDocOption) Do
+        If ReadBool('Options', DocOptionInfo[i].FDescription,
+          DocOptionInfo[i].FEnabled) Then
+          BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [i]
+        Else
+          BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options - [i];
+      For j := 0 To SpecialTags.Count - 1 Do
+        SpecialTags.Objects[j] := TObject(
+          ReadInteger('SpecialTags', SpecialTags.Names[j],
+          Integer(SpecialTags.Objects[j]))
+        );
+      Top := ReadInteger('Position', 'Top', Top);
+      Left := ReadInteger('Position', 'Left', Left);
+      Height := ReadInteger('Position', 'Height', Height);
+      Width := ReadInteger('Position', 'Width', Width);
+      Panel1.Width := ReadInteger('Position', 'Splitter', Panel1.Width);
+      edtDirectory.Text := ReadString('Position', 'Directory', GetCurrentDir);
+      j := ReadInteger('Setup', 'Selection', 0);
+      If lvFileList.Items.Count > j Then
+        lvFileList.ItemIndex := j;
+    Finally
+      Free;
+    End;
 end;
 
 (**
@@ -364,18 +407,29 @@ end;
 **)
 procedure TfrmBrowseAndDocItTestForm.FormDestroy(Sender: TObject);
 
-Const
-  strMsg = 'The file "%s" has been modified. Do you want to save the changes?';
+Var
+  i : TDocOption;
+  j : Integer;
 
 begin
+  FSynEdit.Highlighter := Nil;
+  FSynEdit.Free;
+  FSynPasSyn.Free;
   With TIniFile.Create(FINIFileName) Do
     Try
+      For i := Low(TDocOption) to High(TDocOption) Do
+        WriteBool('Options', DocOptionInfo[i].FDescription,
+          i In BrowseAndDocItOptions.Options);
+      For j := 0 To SpecialTags.Count - 1 Do
+        WriteInteger('SpecialTags', SpecialTags.Names[j],
+          Integer(SpecialTags.Objects[j]));
       WriteInteger('Position', 'Top', Top);
       WriteInteger('Position', 'Left', Left);
       WriteInteger('Position', 'Height', Height);
       WriteInteger('Position', 'Width', Width);
       WriteInteger('Position', 'Splitter', Panel1.Width);
       WriteString('Position', 'Directory', edtDirectory.Text);
+      WriteInteger('Setup', 'Selection', lvFileList.ItemIndex);
     Finally
       Free;
     End;
@@ -402,6 +456,34 @@ end;
 
 (**
 
+  This is a Select item event handler for the list view.
+
+  @precon  None.
+  @postcon Saves any changes and options the new file selected.
+
+  @param   Sender   as a TObject
+  @param   Item     as a TListItem
+  @param   Selected as a Boolean
+
+**)
+procedure TfrmBrowseAndDocItTestForm.lvFileListSelectItem(Sender: TObject;
+  Item: TListItem; Selected: Boolean);
+
+Var
+  boolCanClose :Boolean;
+
+begin
+  FormCloseQuery(Self, boolCanClose);
+  If lvFileList.Selected <> Nil Then
+    If FileExists(lvFileList.Selected.SubItems[1]) Then
+      FileName := lvFileList.Selected.SubItems[1]
+    Else
+      MessageDlg(Format('The file "%s" was not found.',
+        [lvFileList.Selected.SubItems[1]]), mtError, [mbOK], 0);
+end;
+
+(**
+
   This is an OnSelctionChange event handler for the module explorer.
 
   @precon  None.
@@ -418,9 +500,9 @@ procedure TfrmBrowseAndDocItTestForm.SelectionChange(iIdentLine, iIdentCol, iCom
   iCommentCol: Integer; SelectType : TSelectType);
 
 begin
-  SynEdit1.CaretX := iIdentCol;
-  SynEdit1.CaretY := iIdentLine;
-  SynEdit1.TopLine := iIdentLine - SynEdit1.LinesInWindow Div 2;
+  FSynEdit.CaretX := iIdentCol;
+  FSynEdit.CaretY := iIdentLine;
+  FSynEdit.TopLine := iIdentLine - FSynEdit.LinesInWindow Div 2;
 end;
 
 (**
@@ -437,8 +519,8 @@ procedure TfrmBrowseAndDocItTestForm.SetFileName(const Value: String);
 begin
   FFileName := Value;
   Caption := FFileName;
-  SynEdit1.Lines.LoadFromFile(FFileName);
-  Synedit1.Modified := False;
+  FSynEdit.Lines.LoadFromFile(FFileName);
+  FSynedit.Modified := False;
   SynEdit1Change(Self);
 end;
 
@@ -459,11 +541,12 @@ Var
   Source : TMemoryStream;
 
 begin
+  //: @todo Only update module explorer IF change and been stead for several seconds.
   Source := TMemoryStream.Create;
   Try
-    SynEdit1.Lines.SaveToStream(Source);
+    FSynEdit.Lines.SaveToStream(Source);
     Source.Position := 0;
-    M := TPascalDocModule.Create(Source, FileName, SynEdit1.Modified,
+    M := TPascalDocModule.Create(Source, FileName, FSynEdit.Modified,
       [moParse, moCheckForDocumentConflicts]);
     Try
       FModuleExplorerFrame.RenderModule(M);
@@ -489,7 +572,7 @@ end;
 procedure TfrmBrowseAndDocItTestForm.SynEdit1StatusChange(Sender: TObject;
   Changes: TSynStatusChanges);
 begin
-  Panel2.Caption := Format('Line %d, Column %d', [SynEdit1.CaretY, SynEdit1.CaretX]);
+  Panel2.Caption := Format('Line %d, Column %d', [FSynEdit.CaretY, FSynEdit.CaretX]);
 end;
 
 (**
@@ -539,7 +622,7 @@ end;
 Procedure TfrmBrowseAndDocItTestForm.Focus(Sender : TObject);
 
 Begin
-  SynEdit1.SetFocus;
+  FSynEdit.SetFocus;
 End;
 
 

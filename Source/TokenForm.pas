@@ -3,7 +3,7 @@
   This is a debug form for displaying the tokens and their information.
 
   @version      0.9
-  @date         25 May 2006
+  @date         01 Aug 2008
   @author       David Hoyle
 
 **)
@@ -13,7 +13,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ComCtrls, BaseLanguageModule, PascalDocModule;
+  StdCtrls, ComCtrls, BaseLanguageModule;
 
 type
   (** This class represents a forms for inspecting the token in a module. **)
@@ -26,7 +26,7 @@ type
     { Private declarations }
   public
     { Public declarations }
-    Class Procedure Execute(Source : TPascalDocModule);
+    Class Procedure Execute(Source : TBaseLanguageModule);
   end;
 
 implementation
@@ -43,7 +43,7 @@ Uses
 
   @precon  strText is a string representation of a token type.
   @postcon Returns the appropriate colour for the token type.
-  
+
   @param   strText as a String
   @return  a TColor
 
@@ -150,11 +150,11 @@ end;
   @precon  Source is a valid instance of a TPsacalDocModule that requires its
            tokens displaying.
   @postcon Displays the token form.
-           
-  @param   Source as a TPascalDocModule
+
+  @param   Source as a TBaseLanguageModule
 
 **)
-class procedure TfrmTokenForm.Execute(Source: TPascalDocModule);
+class procedure TfrmTokenForm.Execute(Source: TBaseLanguageModule);
 
 Var
   i : Integer;

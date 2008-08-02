@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    01 Aug 2008
+  @Date    02 Aug 2008
   @Author  David Hoyle
 
 **)
@@ -17,7 +17,7 @@ uses
   Graphics, Controls, Forms, Dialogs, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ExtCtrls, ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
   {$WARN UNIT_PLATFORM OFF} FileCtrl {$WARN UNIT_PLATFORM ON}, ComCtrls,
-  Menus, StdActns, ActnList, ProgressForm;
+  Menus, StdActns, ActnList, ProgressForm, Buttons;
 
 type
   (** This is thre class that defined the main interface form. **)
@@ -28,7 +28,6 @@ type
     CheckBox1: TCheckBox;
     Panel3: TPanel;
     Splitter1: TSplitter;
-    btnQuit: TButton;
     lvFileList: TListView;
     edtDirectory: TEdit;
     PopupMenu1: TPopupMenu;
@@ -46,6 +45,7 @@ type
     Delete1: TMenuItem;
     SelectAll1: TMenuItem;
     btnOptions: TButton;
+    btnQuit: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);

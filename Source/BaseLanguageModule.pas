@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    11 Aug 2006
+  @Date    03 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -17,13 +17,6 @@ Uses
 
 Type
 
-  (** This is a record that contains the description and the default for a
-      TDocOption enumerate. **)
-  TDocOptionRec = Record
-    Description : String;
-    Enabled : Boolean;
-  End;
-
   (** Type to distinguish Stream position from token index. **)
   TStreamPosition = Integer;
   (** Type to distinguish Stream position from token index. **)
@@ -33,7 +26,7 @@ Type
     ttSymbol, ttLineEnd, ttArrayElement, ttStatementEnd, ttStringLiteral,
     ttComment, ttHTMLTag, ttDirective, ttCompilerDirective, ttLinkTag);
   (** An enumerate for the scoping of identifiers. **)
-  TScope = (scGlobal, scLocal, scPrivate, scProtected, scPublic, scPublished);
+  TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic, scPublished);
   (** A set to represent combinations of scopes. **)
   TScopes = Set Of TScope;
   (** An enumerate for the parameter modifiers of methods. **)
@@ -91,8 +84,320 @@ Type
     doShowMissingFinalComment
   );
 
+  (** An enumerate to associate images with different types of Elements. **)
+  TImageIndex = (
+    iiNone,
+
+    iiModule,
+
+    iiDocConflictFolder,
+    iiDocConflictIncorrect,
+    iiDocConflictItem,
+    iiDocConflictMissing,
+
+    iiErrorFolder,
+    iiError,
+    iiWarning,
+
+    iiUsesLabel,
+    iiUsesItem,
+
+    iiTypesLabel,
+    iiPublicType,
+    iiPrivateType,
+    iiPublishedType,
+    iiProtectedType,
+    iiLocalType,
+
+    iiRecordsLabel,
+    iiPublicRecord,
+    iiPrivateRecord,
+    iiPublishedRecord,
+    iiProtectedRecord,
+    iiLocalRecord,
+
+    iiFieldsLabel,
+    iiPublicField,
+    iiPrivateField,
+    iiPublishedField,
+    iiProtectedField,
+
+    iiObjectsLabel,
+    iiPublicObject,
+    iiPrivateObject,
+    iiPublishedObject,
+    iiProtectedObject,
+    iiLocalObject,
+
+    iiPublicConstructor,
+    iiPrivateConstructor,
+    iiPublishedConstructor,
+    iiProtectedConstructor,
+    iiLocalConstructor,
+
+    iiPublicDestructor,
+    iiPrivateDestructor,
+    iiPublishedDestructor,
+    iiProtectedDestructor,
+    iiLocalDestructor,
+
+    iiPublicProcedure,
+    iiPrivateProcedure,
+    iiPublishedProcedure,
+    iiProtectedProcedure,
+    iiLocalProcedure,
+
+    iiPublicFunction,
+    iiPrivateFunction,
+    iiPublishedFunction,
+    iiProtectedFunction,
+    iiLocalFunction,
+
+    iiClassesLabel,
+    iiPublicClass,
+    iiPrivateClass,
+    iiPublishedClass,
+    iiProtectedClass,
+    iiLocalClass,
+
+    iiPropertiesLabel,
+    iiPublicProperty,
+    iiPrivateProperty,
+    iiPublishedProperty,
+    iiProtectedProperty,
+    iiLocalProperty,
+
+    iiInterfacesLabel,
+    iiPublicInterface,
+    iiPrivateInterface,
+    iiPublishedInterface,
+    iiProtectedInterface,
+    iiLocalInterface,
+
+    iiDispInterfacesLabel,
+    iiPublicDispInterface,
+    iiPrivateDispInterface,
+    iiPublishedDispInterface,
+    iiProtectedDispInterface,
+    iiLocalDispInterface,
+
+    iiConstantsLabel,
+    iiPublicConstant,
+    iiPrivateConstant,
+    iiPublishedConstant,
+    iiProtectedConstant,
+    iiLocalConstant,
+
+    iiResourceStringsLabel,
+    iiPublicResourceString,
+    iiPrivateResourceString,
+    iiPublishedResourceString,
+    iiProtectedResourceString,
+    iiLocalResourceString,
+
+    iiVariablesLabel,
+    iiPublicVariable,
+    iiPrivateVariable,
+    iiPublishedVariable,
+    iiProtectedVariable,
+    iiLocalVariable,
+
+    iiThreadVarsLabel,
+    iiPublicThreadVar,
+    iiPrivateThreadVar,
+    iiPublishedThreadVar,
+    iiProtectedThreadVar,
+    iiLocalThreadVar,
+
+    iiExportedHeadingsLabel,
+
+    iiExportedFunctionsLabel,
+    iiPublicExportedFunction,
+    iiPrivateExportedFunction,
+    iiPublishedExportedFunction,
+    iiProtectedExportedFunction,
+    iiLocalExportedFunction,
+
+    iiLabelsLabel,
+    iiPublicLabel,
+
+    iiImplementedMethods,
+
+    iiInitialization,
+    iiFinalization,
+
+    iiToDoFolder,
+    iiToDoItem,
+
+    iiUnknownClsObj
+  );
+
   (** This is a set of display options. **)
   TDocOptions = Set of TDocOption;
+
+  (** This is an enumerate to define the options for the parsing of a module. **)
+  TModuleOption = (moParse, moCheckForDocumentConflicts);
+  (** This is a set of Module Option enumerates. **)
+  TModuleOptions = Set Of TModuleOption;
+
+  (** A type to define the position before a token of the comment to be
+      associated with the identifier. **)
+  TCommentPosition = (cpBeforeCurrentToken, cpBeforePreviousToken);
+
+  (** An enumerate to define the type of conflict and hence icon. **)
+  TDocConflictIcon = (dciItem, dciIncorrect, dciMissing);
+
+  (** An enumerate to index document conflict information. **)
+  TDocConflictType = (
+    dctModuleMissingDocumentation,
+    dctModuleMissingDate,
+    dctModuleIncorrectDate,
+    dctModuleCheckDateError,
+    dctModuleMissingVersion,
+    dctModuleMissingAuthor,
+
+    dctTypeClauseUndocumented,
+    dctConstantClauseUndocumented,
+    dctResourceStringClauseUndocumented,
+    dctVariableClauseUndocumented,
+    dctThreadVarClauseUndocumented,
+
+    dctClassClauseUndocumented,
+
+    dctPropertyUndocumented,
+    dctPropertyHasNoDesc,
+    dctPropertyPreconNotDocumented,
+    dctPropertyDiffParamCount,
+    dctPropertyMissingPreCon,
+    dctPropertyTooManyPreCons,
+    dctPropertyUndocumentedParam,
+    dctPropertyIncorrectParamType,
+    dctPropertyPostconNotDocumented,
+    dctPropertyUndocumentedReturn,
+    dctPropertyIncorrectReturnType,
+    dctPropertyMissingPostCon,
+    dctPropertyTooManyPostCons,
+
+    dctRecordClauseUndocumented,
+
+    dctObjectClauseUndocumented,
+
+    dctInterfaceClauseUndocumented,
+
+    dctDispInterfaceClauseUndocumented,
+
+    dctMethodUndocumented,
+    dctMethodHasNoDesc,
+    dctMethodPreconNotDocumented,
+    dctMethodDiffParamCount,
+    dctMethodMissingPreCon,
+    dctMethodTooManyPrecons,
+    dctMethodUndocumentedParam,
+    dctMethodIncorrectParamType,
+    dctMethodPostconNotDocumented,
+    dctMethodUndocumentedReturn,
+    dctMethodIncorrectReturntype,
+    dctMethodMissingPostCon,
+    dctMethodTooManyPostCons,
+
+    dctMissingInitComment,
+    dctMissingFinalComment
+  );
+
+  (** This record refined a pairing of Resource Name and Image Mask Colour for
+      the imported images from the Executable File associated with the
+      Image Index enumerate. **)
+  TImageIndexInfo = Record
+    FResourcename : String;
+    FMaskColour : Integer;
+  End;
+
+  (** This is a record that contains the description and the default for a
+      TDocOption enumerate. **)
+  TDocOptionRec = Record
+    FDescription : String;
+    FEnabled : Boolean;
+  End;
+
+  (** A record type to contain a token and its line and column in the editor. **)
+  TIdentInfo = Record
+    FIdent : String;
+    FLine : Integer;
+    FCol : Integer;
+    FScope : TScope;
+  End;
+
+  (** This is a record to describe the position of a token in the editor. **)
+  TTokenPosition = Record
+    FLine : Integer;
+    FColumn : Integer;
+    FBufferPos : Integer;
+  End;
+
+  (** This is a class the store information about each token **)
+  TTokenInfo = Class
+  private
+    FToken : String;
+    FColumn : Integer;
+    FBufferPos: Integer;
+    FLine: Integer;
+    FLength : Integer;
+    FTokenType: TTokenType;
+    FUToken : String;
+  Public
+    Constructor Create(strToken : String; iPos, iLine, iCol,
+      iLength : Integer; TType : TTokenType); Overload;
+    Procedure Append(strToken : String);
+    (**
+      Returns the token as a string.
+      @precon  None.
+      @postcon Returns the token as a string.
+      @return  a String
+    **)
+    Property Token : String read FToken;
+    (**
+      Returns the uppercase version of the token. Used for keyword comparisons.
+      @precon  None.
+      @postcon Returns the uppercase version of the token. Used for keyword comparisons.
+      @return  a String
+    **)
+    Property UToken : String read FUToken;
+    (**
+      Returns the buffer position of the token start point.
+      @precon  None.
+      @postcon Returns the buffer position of the token start point.
+      @return  an Integer
+    **)
+    Property BufferPos : Integer read FBufferPos;
+    (**
+      Returns the line number of the token start point.
+      @precon  None.
+      @postcon Returns the line number of the token start point.
+      @return  an Integer
+    **)
+    Property Line : Integer read FLine;
+    (**
+      Returns the column number of the token start point.
+      @precon  None.
+      @postcon Returns the column number of the token start point.
+      @return  an Integer
+    **)
+    Property Column : Integer read FColumn;
+    (**
+      Returns the length of the token.
+      @precon  None.
+      @postcon Returns the length of the token.
+      @return  an Integer
+    **)
+    Property Length : Integer read FLength;
+    (**
+      Returns the token type for the token.
+      @precon  None.
+      @postcon Returns the token type for the token.
+      @return  a TTokenType
+    **)
+    Property TokenType : TTokenType read FTokenType;
+  End;
 
   (** A class to hold text about a single tag **)
   TTag = Class
@@ -101,6 +406,7 @@ Type
     FTagName: String;
     FLine: Integer;
     FColumn: Integer;
+  Protected
     function GetToken(iTokenIndex: Integer): String;
     procedure SetTagName(const Value: String);
     function GetTokenCount : Integer;
@@ -167,6 +473,7 @@ Type
     FCol : Integer;
     FTagLine : Integer;
     FTagColumn : Integer;
+  Protected
     function GetTag(iTagIndex: Integer): TTag;
     function GetTagCount: Integer;
     function GetToken(iTokenIndex: Integer): String;
@@ -240,316 +547,171 @@ Type
     Property Col : Integer Read GetCol;
   End;
 
-  (** Forward declaration. **)
-  TMethodDecl = Class;
+  (** This is a class reference for the TElementContainer class such that the
+      descendant classes can clone themselves. **)
+  TElementContainerClass = Class Of TElementContainer;
 
-  (** A record type to contain a token and its line and column in the editor. **)
-  TIdentInfo = Record
-    Ident : String;
-    Line : Integer;
-    Col : Integer;
-    Scope : TScope;
-    Method : TMethodDecl;
-  End;
-
-  (** This is a class the store information about each token **)
-  TTokenInfo = Class
-  private
-    FToken : String;
-    FColumn : Integer;
-    FBufferPos: Integer;
-    FLine: Integer;
-    FLength : Integer;
-    FTokenType: TTokenType;
-    FUToken : String;
-  Public
-    Constructor Create(strToken : String; iPos, iLine, iCol,
-      iLength : Integer; TType : TTokenType); Overload;
-    Procedure Append(strToken : String);
-    (**
-      Returns the token as a string.
-      @precon  None.
-      @postcon Returns the token as a string.
-      @return  a String
-    **)
-    Property Token : String read FToken;
-    (**
-      Returns the uppercase version of the token. Used for keyword comparisons.
-      @precon  None.
-      @postcon Returns the uppercase version of the token. Used for keyword comparisons.
-      @return  a String
-    **)
-    Property UToken : String read FUToken;
-    (**
-      Returns the buffer position of the token start point.
-      @precon  None.
-      @postcon Returns the buffer position of the token start point.
-      @return  an Integer
-    **)
-    Property BufferPos : Integer read FBufferPos;
-    (**
-      Returns the line number of the token start point.
-      @precon  None.
-      @postcon Returns the line number of the token start point.
-      @return  an Integer
-    **)
-    Property Line : Integer read FLine;
-    (**
-      Returns the column number of the token start point.
-      @precon  None.
-      @postcon Returns the column number of the token start point.
-      @return  an Integer
-    **)
-    Property Column : Integer read FColumn;
-    (**
-      Returns the length of the token.
-      @precon  None.
-      @postcon Returns the length of the token.
-      @return  an Integer
-    **)
-    Property Length : Integer read FLength;
-    (**
-      Returns the token type for the token.
-      @precon  None.
-      @postcon Returns the token type for the token.
-      @return  a TTokenType
-    **)
-    Property TokenType : TTokenType read FTokenType;
-  End;
-
-  (** This class represents a single identifier with line, col and comment
-      attributes. **)
-  TIdent = Class
+  (** This class implements the IElementCollection interface so that this
+      element container can be rendered with the module browser. **)
+  TElementContainer = Class {$IFDEF VER180} Abstract {$ENDIF}
   Private
-    FLine: Integer;
-    FCol: Integer;
-    FIdent: String;
-    FComment: TComment;
-  Public
-    Constructor Create(strIdent : String; iLine, iCol : Integer; Comment : TComment);
-    (**
-      Returns the identifiers name as a string.
-      @precon  None.
-      @postcon Returns the identifiers name as a string.
-      @return  a String
-    **)
-    Property Ident : String Read FIdent;
-    (**
-      Returns the line number of the idenifier.
-      @precon  None.
-      @postcon Returns the line number of the idenifier.
-      @return  an Integer
-    **)
-    Property Line : Integer Read FLine;
-    (**
-      Returns the column number of the identifier.
-      @precon  None.
-      @postcon Returns the column number of the identifier.
-      @return  an Integer
-    **)
-    Property Col : Integer Read FCol;
-    (**
-      Returns the comment associated with the identifier.
-      @precon  None.
-      @postcon Returns the comment associated with the identifier.
-      @return  a TComment
-    **)
-    Property Comment : TComment Read FComment;
-  End;
-
-  (** This class represents a list of identifiers **)
-  TIdentList = Class
-  Private
-    FIdents : TObjectList;
-    FComment : TComment;
-    Function GetIdentInfo(iIndex : Integer) : TIdent;
-    Function GetCount : Integer;
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
-    Procedure Add(strIdent : String; iLine, iCol : Integer; Comment : TComment);
-      Virtual;
-    Procedure Assign(src : TIdentList);
-    Procedure Sort;
-    Function Find(strIdent : String) : Integer;
-    Function AsString : String; Virtual;
-    (**
-      Returns the specifically indexed identifier in the list.
-      @precon  iIndex must be a valid index between 0 and Count - 1.
-      @postcon Returns the specifically indexed identifier in the list.
-      @param   iIndex as       an Integer
-      @return  a TIdent
-    **)
-    Property Idents[iIndex : Integer] : TIdent Read GetIdentInfo; Default;
-    (**
-      Returns the number of identifiers in the list.
-      @precon  None.
-      @postcon Returns the number of identifiers in the list.
-      @return  an Integer
-    **)
-    Property Count : Integer Read GetCount;
-    (**
-      Returns the comment associated with the identifier list.
-      @precon  None.
-      @postcon Returns the comment associated with the identifier list.
-      @return  a TComment
-    **)
-    Property Comment : TComment Read FComment Write FComment;
-  End;
-
-  (** This class holds the information for a constant. **)
-  TGenericContainer = Class
-  Private
-    FTokens : TStringList;
-    FComment : TComment;
-    FIdentifier : String;
-    FScope : TScope;
+    FElements : TObjectList;
+    FTokens : TObjectList;
+    FName : String;
     FLine : Integer;
-    FCol : Integer;
-    Function GetToken(iIndex : Integer) : String;
+    FColumn : Integer;
+    FComment : TComment;
+    FScope : TScope;
+    FImageIndex : TImageIndex;
+  Protected
+    Function GetElementCount : Integer;
+    Function GetElements(iIndex : Integer) : TElementContainer;
     Function GetTokenCount : Integer;
+    Function GetTokens(iIndex : Integer) : TTokenInfo;
+    Function GetAsString : String; Virtual;
+    Function GetImageIndexAdjustedForScope : Integer;
+    Function Find(strName : String) : Integer;
+    Function GetName: String; Virtual;
   Public
-    Constructor Create; Overload; Virtual;
-    Constructor Create(strIdentifier : String; Scope : TScope;
-      iLine, iCol : Integer); Overload; Virtual;
-    Constructor Create(Ident : TIdentInfo); Overload; Virtual;
+    Constructor Create(strName : String; AScope : TScope; iLine,
+      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Virtual;
     Destructor Destroy; Override;
-    Procedure Add(strToken : String);
-    Procedure Assign(src : TPersistent);
-    Procedure Append(src : TGenericContainer);
-    Procedure Insert(strText : String; iIndex : Integer);
-    Procedure Sort; Virtual;
-    Function AsString(ShowFirstToken : Boolean) : String; Virtual;
+    Function Add(AElement : TElementContainer) : TElementContainer; Overload; Virtual;
+    Function Add(Token : TTokenInfo; AScope : TScope; AImageIndex : TImageIndex;
+      AComment : TComment) : TElementContainer; Overload; Virtual;
+    Function Add(strToken : String; AImageIndex : TImageIndex;
+      AComment : TComment) : TElementContainer; Overload; Virtual;
+    Procedure AppendToken(AToken : TTokenInfo); Overload; Virtual;
+    Procedure AppendToken(strToken : String); Overload; Virtual;
+    Procedure AddTokens(AElement : TElementContainer); Virtual;
+    Function FindElement(strName : String) : TElementContainer;
+    Procedure Assign(Source : TElementContainer); Virtual;
+    Function FindToken(strToken : String) : Integer;
+    Procedure DeleteElement(iIndex : Integer);
+    Procedure CheckDocumentation; Virtual;
+    Procedure AddDocumentConflict(Const Args: Array of TVarRec;
+      iIdentLine, iIdentColumn : Integer; AComment : TComment;
+      DocConflictType : TDocConflictType);
     (**
-      Returns the identifier for the generic container.
+      This property returns the number of elements in the collection.
       @precon  None.
-      @postcon Returns the identifier for the generic container.
-      @return  a String
-    **)
-    Property Identifier : String Read FIdentifier Write FIdentifier;
-    (**
-      Returns the specifically indexed token in the container.
-      @precon  iIndex must be a valid index between 0 and Count - 1.
-      @postcon Returns the specifically indexed token in the container.
-      @param   iIndex as       an Integer
-      @return  a String
-    **)
-    Property Token[iIndex : Integer] : String Read GetToken; Default;
-    (**
-      Returns the number of tokens in the generic container.
-      @precon  None.
-      @postcon Returns the number of tokens in the generic container.
+      @postcon Returns the number of elements in the collection.
       @return  an Integer
     **)
-    Property Count : Integer Read GetTokenCount;
+    Property ElementCount : Integer Read GetElementCount;
     (**
-      Returns the comment associated with the generic container.
-      @precon  None.
-      @postcon Returns the comment associated with the generic container.
-      @return  a TComment
+      This property returns an instance of the indexed token from the
+      collection.
+      @precon  iIndex must be a valid index.
+      @postcon Returns an instance of the indexed token from the collection.
+      @param   iIndex as       an Integer
+      @return  a TTokenInfo
     **)
-    Property Comment : TComment Read FComment Write FComment;
+    Property Tokens[iIndex : Integer] : TTokenInfo Read GetTokens;
     (**
-      Returns the scope of the generic container.
+      This property returns the number of tokens in the collection.
       @precon  None.
-      @postcon Returns the scope of the generic container.
-      @return  a TScope
+      @postcon Returns the number of tokens in the collection.
+      @return  an Integer
     **)
-    Property Scope : TScope Read FScope Write FScope;
+    Property TokenCount : Integer Read GetTokenCount;
     (**
-      Returns the line number for the generic container.
+      This property returns an instance of the indexed element from the
+      collection.
+      @precon  iIndex must be a valid index.
+      @postcon Returns an instance of the indexed element from the collection.
+      @param   iIndex as       an Integer
+      @return  a TElementContainer
+    **)
+    Property Elements[iIndex : Integer] : TElementContainer Read GetElements; Default;
+    (**
+      This property returns the name of the element.
       @precon  None.
-      @postcon Returns the line number for the generic container.
+      @postcon Returns the name of the element.
+      @return  a String
+    **)
+    Property Name : String Read GetName;
+    (**
+      This property returns the identifier name (same as name) of the element.
+      @precon  None.
+      @postcon Returns the identifier name (same as name) of the element.
+      @return  a String
+    **)
+    Property Identifier : String read FName Write FName;
+    (**
+      This property returns the line number associated with this element.
+      @precon  None.
+      @postcon Returns the line number associated with this element.
       @return  an Integer
     **)
     Property Line : Integer Read FLine Write FLine;
     (**
-      Returns the column number of the generic container.
+      This property returns the column number associated with this element.
       @precon  None.
-      @postcon Returns the column number of the generic container.
+      @postcon Returns the column number associated with this element.
       @return  an Integer
     **)
-    Property Col : Integer Read FCol Write FCol;
-  End;
-
-  (** This is a collaboration class for storing the constants. **)
-  TGenericContainerCollection = Class
-  Private
-    FItems : TObjectList;
-    FComment : TComment;
-    Function GetCount : Integer;
-    Function GetItem(iIndex : Integer) : TGenericContainer;
-  Public
-    Constructor Create(OwnItems : Boolean);
-    Destructor Destroy; Override;
-    procedure RemoveForwardDecls;
-    Procedure Add(AItem : TGenericContainer);
-    Function Find(strClassName : String) : Integer;
-    Procedure Sort;
+    Property Column : Integer Read FColumn Write FColumn;
     (**
-      Returns the comment associcate with this collection.
+      This property returns the comment that is associated with this element.
       @precon  None.
-      @postcon Returns the comment associcate with this collection.
+      @postcon Returns the comment that is associated with this element.
       @return  a TComment
     **)
     Property Comment : TComment Read FComment Write FComment;
     (**
-      Returns the specifically indexed item from the generic collection.
-      @precon  iIndex must be a valid index between 0 and Count - 1.
-      @postcon Returns the specifically indexed item from the generic collection.
-      @param   iIndex as       an Integer
-      @return  a TGenericContainer
-    **)
-    Property Items[iIndex : Integer] : TGenericContainer Read GetItem; Default;
-    (**
-      Returns the number of items in the generic collection.
+      This property returns a string representation of the element.
       @precon  None.
-      @postcon Returns the number of items in the generic collection.
+      @postcon Returns a string representation of the element.
+      @return  a String
+    **)
+    Property AsString : String Read GetAsString;
+    (**
+      This property returns the Scope of the element.
+      @precon  None.
+      @postcon Returns the Scope of the element.
+      @return  a TScope
+    **)
+    Property Scope : TScope Read FScope Write FScope;
+    (**
+      This property returns the Image Index of the element.
+      @precon  None.
+      @postcon Returns the Image Index of the element.
+      @return  a TImageIndex
+    **)
+    Property ImageIndex : TImageIndex Read FImageIndex Write FImageIndex;
+    (**
+      This property returns the image index associated with the element based on
+      its Image Index and Scope.
+      @precon  None.
+      @postcon Returns the image index associated with the element based on
+               its Image Index and Scope.
       @return  an Integer
     **)
-    Property Count : Integer Read GetCount;
+    Property ImageIndexAdjustedForScope : Integer Read GetImageIndexAdjustedForScope;
   End;
 
+  (** This class represents a single identifier with line, col and comment
+      attributes. **)
+  TIdent = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer);
+
+  (** This class represents a list of identifiers **)
+  TIdentList = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer);
+
   (** This is a sub class for all types **)
-  TTypeDecl = Class(TGenericContainer);
-
-  (** This is a sub class for general type types **)
-  TTypes = Class(TTypeDecl);
-  (** This is a sub class for restricted type types **)
-  TRestrictedType = Class(TTypeDecl);
-
-  (** This is a sub class for typeid types **)
-  TTypeID = Class(TTypes);
-  (** This is a sub class for Simple Type types **)
-  TSimpleType = Class(TTypes);
-  (** This is a sub class for Structured Type types **)
-  TStrucType = Class(TTypes);
-  (** This is a sub class for String types **)
-  TStringType = Class(TTypes);
-  (** This is a sub class for Procedure types **)
-  TProcedureType = Class(TTypes);
-  (** This is a sub class for Variant types **)
-  TVariantType = Class(TTypes);
-  (** This is a sub class for Class Ref types **)
-  TClassRefType = Class(TTypes);
+  TGenericTypeDecl = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer);
 
   (** This class represents a parameter of a method declaration. **)
-  TParameter = Class
+  TGenericParameter = Class (TElementContainer)
   Private
     FParamModifier : TParamModifier;
-    FIdentifier : String;
     FArrayOf : Boolean;
-    FParamType : TTypes;
+    FParamType : TGenericTypeDecl;
     FDefaultValue : String;
-    FComment : TComment;
-    FScope : TScope;
-    FLine: Integer;
-    FCol: Integer;
   Public
     Constructor Create(ParamMod : TParamModifier; Ident : String;
-      boolArrayOf : Boolean; AType : TTypeDecl; Value : String;
-      Scope : TScope; iLine, iCol : Integer); Overload;
-    Procedure Assign(Parameter : TParameter);
+      boolArrayOf : Boolean; AType : TGenericTypeDecl; Value : String;
+      AScope : TScope; iLine, iCol : Integer); ReIntroduce; Overload;
     Destructor Destroy; Override;
     (**
       Returns the parameter modifier : const, var or out.
@@ -558,13 +720,6 @@ Type
       @return  a TParamModifier
     **)
     Property ParamModifier : TParamModifier Read FParamModifier;
-    (**
-      Returns the parameters idenitfier.
-      @precon  None.
-      @postcon Returns the parameters idenitfier.
-      @return  a String
-    **)
-    Property Identifier : String Read FIdentifier;
     (**
       Returns whether the parameter is an array parameter.
       @precon  None.
@@ -576,9 +731,9 @@ Type
       Returns the parameter type identifier for the parameter.
       @precon  None.
       @postcon Returns the parameter type identifier for the parameter.
-      @return  a TTypes
+      @return  a TgenericTypeDecl
     **)
-    Property ParamType : TTypes Read FParamType;
+    Property ParamType : TGenericTypeDecl Read FParamType;
     (**
       Returns the default value of the parameter is there is one.
       @precon  None.
@@ -587,111 +742,36 @@ Type
     **)
     Property DefaultValue : String Read FDefaultValue;
     (**
-      Returns the comment associcated with the parameter (field).
-      @precon  None.
-      @postcon Returns the comment associcated with the parameter (field).
-      @return  a TComment
-    **)
-    Property Comment : TComment Read FComment Write FComment;
-    (**
       Returns the parameters scope with in the record / object / class etc.
       @precon  None.
       @postcon Returns the parameters scope with in the record / object / class etc.
       @return  a TScope
     **)
-    Property Scope : TScope Read FScope;
-    (**
-      Returns the parameters line number.
-      @precon  None.
-      @postcon Returns the parameters line number.
-      @return  an Integer
-    **)
-    Property Line : Integer Read FLine;
-    (**
-      Returns the parameters column number.
-      @precon  None.
-      @postcon Returns the parameters column number.
-      @return  an Integer
-    **)
-    Property Col : Integer Read FCol;
   End;
-
-  (** A class to define a collection of parameters. **)
-  TParameterCollection = Class
-  Private
-    FParameters : TObjectList;
-    Function GetParameter(iIndex : Integer) : TParameter;
-    Function GetCount : Integer;
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
-    Procedure Add(Parameter : TParameter);
-    Procedure Sort;
-    (**
-      Returns the specifically indexed parameter of the method.
-      @precon  iIndex must be a valid index between 0 and Count - 1.
-      @postcon Returns the specifically indexed parameter of the method.
-      @param   iIndex as       an Integer
-      @return  a TParameter
-    **)
-    Property Parameter[iIndex : Integer] : TParameter Read GetParameter; Default;
-    (**
-      Returns the number of parameter the method has.
-      @precon  None.
-      @postcon Returns the number of parameter the method has.
-      @return  an Integer
-    **)
-    Property Count : Integer Read GetCount;
-  End;
-
-  (** This is a forward declaration so that a method declaration can contain
-  other methods. **)
-  TMethodCollection = Class;
 
   (** This class represents a method declaration. **)
-  TMethodDecl = Class
+  TGenericMethodDecl = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
   Private
-    FComment : TComment;
+    FParameters : TObjectList;
     FMethodType : TMethodType;
     FClsName : String;
-    FIdentifier : String;
-    FParameters : TParameterCollection;
-    FReturnType : String;
-    FDirectives : TStringList;
-    FScope : TScope;
+    FReturnType : TGenericTypeDecl;
     FMsg: String;
     FExt: String;
     FClassMethod : Boolean;
-    FLine: Integer;
-    FCol: Integer;
-    FLocalMethods : TMethodCollection;
-    FTypes : TGenericContainerCollection;
-    FVars : TGenericContainerCollection;
-    FConsts : TGenericContainerCollection;
-    FResStrings : TGenericContainerCollection;
     FAlias: String;
-    FLabels : TIdentList;
+  Protected
     Procedure SetClsName(Value : String);
-    Procedure SetIdentifier(Value : String);
-    Procedure SetReturnType(Value : String);
     procedure SetMsg(const Value: String);
     procedure SetExt(const Value: String);
     Function GetQualifiedName : String;
+    Function GetParameterCount : Integer;
+    Function GetParameters(iIndex : Integer) : TGenericParameter;
   Public
-    Constructor Create(MethodType : TMethodType; Scope : TScope;
-      iLine, iCol : Integer);
+    Constructor Create(MethodType : TMethodType; strName : String; AScope : TScope;
+      iLine, iCol : Integer); ReIntroduce; Virtual;
     Destructor Destroy; Override;
-    Procedure AddDirectives(strDirective : String);
-    Function GetAsString(ShowClassName, ShowMethodType : Boolean): String;
-    Function HasDirective(strDirective : String) : Boolean;
-    Procedure Assign(Method : TMethodDecl);
-    (**
-      Returns the comment associated with the method.
-      @precon  None.
-      @postcon Returns the comment associated with the method.
-      @return  a TComment
-    **)
-    Property Comment : TComment Read FComment Write FComment;
+    Procedure AddParameter(AParameter : TGenericParameter);
     (**
       Returns the methods types, procedure, function, constructor, destructor.
       @precon  None.
@@ -707,42 +787,27 @@ Type
     **)
     Property ClsName : String Read FClsName Write SetClsName;
     (**
-      Returns the methods idenitifier.
+      This property returns the number of parameter in the parameter collection.
       @precon  None.
-      @postcon Returns the methods idenitifier.
-      @return  a String
+      @postcon Returns the number of parameter in the parameter collection.
+      @return  an Integer
     **)
-    Property Identifier : String Read FIdentifier Write SetIdentifier;
+    Property ParameterCount : Integer Read GetParameterCount;
     (**
-      This property defines a collection of parameters associated with the
-      method.
-      @precon  None.
-      @postcon References a collection of parameters associated with the method.
-      @return  a TParameterCollection
+      This property returns an instance of the indexed parameter.
+      @precon  iIndex must be a valid index.
+      @postcon Returns an instance of the indexed parameter.
+      @param   iIndex as       an Integer
+      @return  a TGenericParameter
     **)
-    Property Parameters : TParameterCollection Read FParameters;
+    Property Parameters[iIndex : Integer] : TGenericParameter Read GetParameters;
     (**
-      Returns the return type of the method if it is a function.
+      This property returns the type corresponding to the method return.
       @precon  None.
-      @postcon Returns the return type of the method if it is a function.
-      @return  a String
+      @postcon Returns the type corresponding to the method return.
+      @return  a TGenericTypeDecl
     **)
-    Property ReturnType : String Read FReturnType Write SetReturnType;
-    (**
-      Returns the string list of directives associated with the method.
-      @precon  None.
-      @postcon Returns the string list of directives associated with the method.
-      @return  a TStringList
-    **)
-    Property Directives : TStringList Read FDirectives;
-    (**
-      Returns the internal scope of the method within the class / interface /
-      @precon  None.
-      @postcon Returns the internal scope of the method within the class / interface /
-      module etc.
-      @return  a TScope
-    **)
-    Property Scope : TScope Read FScope Write FScope;
+    Property ReturnType : TGenericTypeDecl Read FReturnType Write FReturnType;
     (**
       Returns the associated message for the method if the method is a message
       @precon  None.
@@ -766,55 +831,6 @@ Type
     **)
     Property ClassMethod : Boolean Read FClassMethod Write FClassMethod;
     (**
-      Returns the line number of the method.
-      @precon  None.
-      @postcon Returns the line number of the method.
-      @return  an Integer
-    **)
-    Property Line : Integer Read FLine;
-    (**
-      Returns the column number of the method.
-      @precon  None.
-      @postcon Returns the column number of the method.
-      @return  an Integer
-    **)
-    Property Col : Integer Read FCol;
-    (**
-      Returns a reference to the local methods collection of this method.
-      @precon  None.
-      @postcon Returns a reference to the local methods collection of this method.
-      @return  a TMethodCollection
-    **)
-    Property LocalMethods : TMethodCollection Read FLocalMethods;
-    (**
-      Returns a reference to the types collection of the method.
-      @precon  None.
-      @postcon Returns a reference to the types collection of the method.
-      @return  a TGenericContainerCollection
-    **)
-    Property Types : TGenericContainerCollection Read FTypes;
-    (**
-      Returns a reference to the variables collection of the method.
-      @precon  None.
-      @postcon Returns a reference to the variables collection of the method.
-      @return  a TGenericContainerCollection
-    **)
-    Property Vars : TGenericContainerCollection Read FVars;
-    (**
-      Returns a reference to the constants collection of the method.
-      @precon  None.
-      @postcon Returns a reference to the constants collection of the method.
-      @return  a TGenericContainerCollection
-    **)
-    Property Consts : TGenericContainerCollection Read FConsts;
-    (**
-      Returns a reference to the resource string collection of the method.
-      @precon  None.
-      @postcon Returns a reference to the resource string collection of the method.
-      @return  a TGenericContainerCollection
-    **)
-    Property ResStrings : TGenericContainerCollection Read FResStrings;
-    (**
       Returns the Qualified name of the method.
       @precon  None.
       @postcon Returns the Qualified name of the method.
@@ -828,462 +844,57 @@ Type
       @return  a String
     **)
     Property Alias : String Read FAlias Write FAlias;
-    (**
-      This property defines a list of label identifiers associated with the
-      method.
-      @precon  None.
-      @postcon References an IdentList of labels identifiers associated with the
-               method.
-      @return  a TIdentList
-    **)
-    Property Labels : TIdentList Read FLabels;
-  End;
-
-  (** This is a collaboration class to hold instances of method declarations. **)
-  TMethodCollection = Class
-  Private
-    FMethods : TObjectList;
-    Function GetMethod(iIndex : Integer) : TMethodDecl;
-    Function GetCount : Integer;
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
-    Procedure Add(Method : TMethodDecl);
-    Function Find(strClsName, strMethodName : String) : Integer;
-    Procedure Sort;
-    (**
-      Returns the specifically indexed method from the methods collection.
-      @precon  iIndex must be a valid index between 0 and Count - 1.
-      @postcon Returns the specifically indexed method from the methods collection.
-      @param   iIndex as       an Integer
-      @return  a TMethodDecl
-    **)
-    Property Method[iIndex : Integer] : TMethodDecl Read GetMethod; Default;
-    (**
-      Returns the number of methods in the methods collection.
-      @precon  None.
-      @postcon Returns the number of methods in the methods collection.
-      @return  an Integer
-    **)
-    Property Count : Integer Read GetCount;
   End;
 
   (** This is a class that represents properties of a class or interface. **)
-  TProperty = Class
+  TGenericProperty = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
   Private
-    FParameters : TParameterCollection;
-    FIdentifier : String;
-    FTypeId : String;
-    FIndexSpec : String;
-    FScope : TScope;
-    FWriteSpec: String;
-    FImplementsSpec: String;
-    FStoredSpec: String;
-    FDefaultSpec: String;
-    FReadSpec: String;
-    FComment: TComment;
-    FDefaultProperty: Boolean;
-    FLine: Integer;
-    FCol: Integer;
-    FDispIDSpec: String;
-    FReadOnlySpec: Boolean;
-    FWriteOnlySpec: Boolean;
-    Function GetAsString : String;
-    procedure SetDefaultSpec(const Value: String);
-    procedure SetImplementsSpec(const Value: String);
-    procedure SetIndexSpec(const Value: String);
-    procedure SetReadSpec(const Value: String);
-    procedure SetStoredSpec(const Value: String);
-    procedure SetTypeId(const Value: String);
-    procedure SetWriteSpec(const Value: String);
-    procedure SetDefaultProperty(const Value: Boolean);
+    FParameters : TObjectList;
+    FTypeID : TGenericTypeDecl;
+  Protected
+    Function GetParameterCount : Integer;
+    Function GetParameters(iIndex : Integer) : TGenericParameter;
+    Procedure SetTypeID(T : TGenericTypeDecl);
   Public
-    Constructor Create(strIdent : String; Scope : TScope; iLine, iCol : Integer);
+    Constructor Create(strIdent : String; AScope : TScope; iLine, iCol : Integer;
+      AImageIndex : TImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
-    Procedure Assign(Prop : TProperty);
+    Procedure AddParameter(AParameter : TGenericParameter);
     (**
-      Returns the identifier of the property.
+      This property returns the number of parameter in the parameter collection.
       @precon  None.
-      @postcon Returns the identifier of the property.
-      @return  a String
+      @postcon Returns the number of parameter in the parameter collection.
+      @return  an Integer
     **)
-    Property Identifier : String Read FIdentifier;
+    Property ParameterCount : Integer Read GetParameterCount;
     (**
-      Returns the specifically indexed parameter of the property.
-      @precon  None.
-      @postcon Returns the specifically indexed parameter of the property.
-      @return  a TParameterCollection
+      This property returns an instance of the indexed parameter.
+      @precon  iIndex must be a valid index.
+      @postcon Returns an instance of the indexed parameter.
+      @param   iIndex as       an Integer
+      @return  a TGenericParameter
     **)
-    Property Parameters : TParameterCollection Read FParameters;
+    Property Parameters[iIndex : Integer] : TGenericParameter Read GetParameters;
     (**
       Returns the type identifier of the property.
       @precon  None.
       @postcon Returns the type identifier of the property.
-      @return  a String
+      @return  a TGenericTypeDecl
     **)
-    Property TypeId : String Read FTypeId Write SetTypeId;
-    (**
-      Returns the
-      @precon  None.
-      @postcon Returns the
-      @return  a String
-    **)
-    Property IndexSpec : String Read FIndexSpec Write SetIndexSpec;
-    (**
-      Returns the properties Read specification.
-      @precon  None.
-      @postcon Returns the properties Read specification.
-      @return  a String
-    **)
-    Property ReadSpec : String Read FReadSpec Write SetReadSpec;
-    (**
-      Returns the properties write specification.
-      @precon  None.
-      @postcon Returns the properties write specification.
-      @return  a String
-    **)
-    Property WriteSpec : String Read FWriteSpec Write SetWriteSpec;
-    (**
-      Returns the properties Stored specification.
-      @precon  None.
-      @postcon Returns the properties Stored specification.
-      @return  a String
-    **)
-    Property StoredSpec : String Read FStoredSpec Write SetStoredSpec;
-    (**
-      Returns the property default value.
-      @precon  None.
-      @postcon Returns the property default value.
-      @return  a String
-    **)
-    Property DefaultSpec : String Read FDefaultSpec Write SetDefaultSpec;
-    (**
-      Returns whether this property is the classes / interfaces default
-      @precon  None.
-      @postcon Returns whether this property is the classes / interfaces default
-      property.
-      @return  a Boolean
-    **)
-    Property DefaultProperty : Boolean Read FDefaultProperty Write SetDefaultProperty;
-    (**
-      Returns the implements specification for the property.
-      @precon  None.
-      @postcon Returns the implements specification for the property.
-      @return  a String
-    **)
-    Property ImplementsSpec : String Read FImplementsSpec Write SetImplementsSpec;
-    (**
-      Returns a string represnetation of the property with all the appropriate
-      @precon  None.
-      @postcon Returns a string represnetation of the property with all the appropriate
-      specifiers.
-      @return  a String
-    **)
-    Property AsString : String Read GetAsString;
-    (**
-      Returns the comment associated with the property.
-      @precon  None.
-      @postcon Returns the comment associated with the property.
-      @return  a TComment
-    **)
-    Property Comment : TComment Read FComment Write FComment;
-    (**
-      Returns the scope with in the class / interface of the property.
-      @precon  None.
-      @postcon Returns the scope with in the class / interface of the property.
-      @return  a TScope
-    **)
-    Property Scope : TScope Read FScope;
-    (**
-      Returns the line number of the property.
-      @precon  None.
-      @postcon Returns the line number of the property.
-      @return  an Integer
-    **)
-    Property Line : Integer Read FLine;
-    (**
-      Returns the column number of the property.
-      @precon  None.
-      @postcon Returns the column number of the property.
-      @return  an Integer
-    **)
-    Property Col : Integer Read FCol;
-    (**
-      Returns the properties DispID reference.
-      @precon  None.
-      @postcon Returns the properties DispID reference.
-      @return  a String
-    **)
-    Property DispIdSpec : String Read FDispIDSpec Write FDispIDSpec;
-    (**
-      Returns whether the property has a ReadOnly specification.
-      @precon  None.
-      @postcon Returns whether the property has a ReadOnly specification.
-      @return  a Boolean
-    **)
-    Property ReadOnlySpec : Boolean Read FReadOnlySpec Write FReadOnlySpec;
-    (**
-      Returns whether the property has a WriteOnly specification.
-      @precon  None.
-      @postcon Returns whether the property has a WriteOnly specification.
-      @return  a Boolean
-    **)
-    Property WriteOnlySpec : Boolean Read FWriteOnlySpec Write FWriteOnlySpec;
+    Property TypeId : TGenericTypeDecl Read FTypeID Write SetTypeID;
   End;
-
-  (** A class to define a collection of properties. **)
-  TPropertyCollection = Class
-  Private
-    FProperties : TObjectList;
-    Function GetProperty(iIndex : Integer) : TProperty;
-    Function GetCount : Integer;
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
-    Procedure Add(Prop : TProperty);
-    Procedure Sort;
-    (**
-      Returns the indexed property for the class.
-      @precon  iIndex must be a valid index between 0 and Count - 1.
-      @postcon Returns the indexed property for the class.
-      @param   iIndex as       an Integer
-      @return  a TProperty
-    **)
-    Property Properties[iIndex : Integer] : TProperty Read GetProperty; Default;
-    (**
-      Returns the number of properties in the classes properties collection.
-      @precon  None.
-      @postcon Returns the number of properties in the classes properties collection.
-      @return  an Integer
-    **)
-    Property Count : Integer Read GetCount;
-  End;
-
-  (** This is a class that represents a record definition. **)
-  TRecordDecl = Class(TRestrictedType)
-  Private
-    FPacked : Boolean;
-    FParameters : TParameterCollection;
-  Public
-    Constructor Create; Override;
-    Destructor Destroy; Override;
-    Procedure AddParameter(Parameter : TParameter);
-    Procedure Sort; Override;
-    Function AsString(ShowFirstToken : Boolean) : String; Override;
-    (**
-      Returns the specifically indexed parameter in the record.
-      @precon  None.
-      @postcon Returns the specifically indexed parameter in the record.
-      @return  a TParameterCollection
-    **)
-    Property Parameters : TParameterCollection Read FParameters;
-    (**
-      Returns whether the record is packed or not.
-      @precon  None.
-      @postcon Returns whether the record is packed or not.
-      @return  a Boolean
-    **)
-    Property IsPacked : Boolean Read FPacked Write FPacked;
-  End;
-
-  (** This is a class the extends the record definition to handle an object
-  definition **)
-  TObjectDecl = Class(TRecordDecl)
-  Private
-    FMethods : TMethodCollection;
-    FHeritage : TIdentList;
-  Public
-    Constructor Create; Override;
-    Destructor Destroy; Override;
-    Function AsString(ShowFirstToken : Boolean) : String; Override;
-    Procedure Assign(AObject : TObjectDecl); Virtual;
-    Procedure Sort; Override;
-    (**
-      Returns a reference to the object class heritage.
-      @precon  None.
-      @postcon Returns a reference to the object class heritage.
-      @return  a TIdentList
-    **)
-    Property Heritage : TIdentList Read FHeritage;
-    (**
-      This property defines a collection of methods associated with the object.
-      @precon  None.
-      @postcon References a collection of methods associated with the object.
-      @return  a TMethodCollection
-    **)
-    Property Methods : TMethodCollection Read FMethods;
-  End;
-
-  (** This is a class the extends the object definition to handle an class
-  definition **)
-  TClassDecl = Class(TObjectDecl)
-  Private
-    FProperties : TPropertyCollection;
-    FAbstractClass: Boolean;
-    FSealedClass : Boolean;
-  Public
-    Constructor Create; Override;
-    Destructor Destroy; Override;
-    Function AsString(ShowFirstToken : Boolean) : String; Override;
-    Procedure Assign(AObject : TObjectDecl); Override;
-    Procedure Sort; Override;
-    (**
-      This property defined whether the class is abstract or not.
-      @precon  None.
-      @postcon None.
-      @return  a Boolean
-    **)
-    Property AbstractClass : Boolean Read FAbstractClass Write FAbstractClass;
-    (**
-      This property defines whether the class is sealed or not.
-      @precon  None.
-      @postcon None.
-      @return  a Boolean
-    **)
-    Property SealedClass : Boolean Read FSealedClass Write FSealedClass;
-    (**
-      This property returns a collection of properties associated with the
-      class.
-      @precon  None.
-      @postcon Returns a collection of properties associated with the class.
-      @return  a TPropertyCollection
-    **)
-    Property Properties : TPropertyCollection Read FProperties;
-  End;
-
-  (** This is a class the extends the class definition to handle an interface
-  definition **)
-  TInterfaceDecl = Class(TClassDecl)
-  Private
-    FGUID : String;
-    Procedure SetGUID(Value : String);
-  Public
-    Function AsString(ShowFirstToken : Boolean) : String; Override;
-    Procedure Assign(AObject : TObjectDecl); Override;
-    (**
-      Returns the GUID for the interface.
-      @precon  None.
-      @postcon Returns the GUID for the interface.
-      @return  a String
-    **)
-    Property GUID : String Read FGUID Write SetGUID;
-  End;
-
-  (** This is a class the extends the class definition to handle an interface
-  definition **)
-  TDispInterfaceDecl = Class(TInterfaceDecl)
-  Public
-    Function AsString(ShowFirstToken : Boolean) : String; Override;
-  End;
-
-  (** This is a sub class for Ordinal types **)
-  TOrdinalType = Class(TSimpleType);
-  (** This is a sub class for Real types **)
-  TRealType = Class(TSimpleType);
-  
-  (** This is a sub class for the Real48 type. **)
-  TReal48 = Class(TRealType);
-  (** This is a sub class for the Real type. **)
-  TReal = Class(TRealType);
-  (** This is a sub class for the Single type. **)
-  TSingle = Class(TRealType);
-  (** This is a sub class for the Double type. **)
-  TDouble = Class(TRealType);
-  (** This is a sub class for the Extended type. **)
-  TExtended = Class(TRealType);
-  (** This is a sub class for the Currency type. **)
-  TCurrency = Class(TRealType);
-  (** This is a sub class for the Complex type. **)
-  TComp = Class(TRealType);
-
-  (** This is a sub class for the SubRange type. **)
-  TSubRangeType = Class(TOrdinalType);
-  (** This is a sub class for the Enumerate type. **)
-  TEnumerateType = Class(TOrdinalType);
-  (** This is a sub class for the OrdIdent type. **)
-  TOrdIdent = Class(TOrdinalType);
-
-  (** This is a sub class for the ShortInt type. **)
-  TShortInt = Class(TOrdIdent);
-  (** This is a sub class for the SmallInt type. **)
-  TSmallInt = Class(TOrdIdent);
-  (** This is a sub class for the Integer type. **)
-  TInteger = Class(TOrdIdent);
-  (** This is a sub class for the Byte type. **)
-  TByte = Class(TOrdIdent);
-  (** This is a sub class for the LongInt type. **)
-  TLongInt = Class(TOrdIdent);
-  (** This is a sub class for the Int64 type. **)
-  TInt64 = Class(TOrdIdent);
-  (** This is a sub class for the Word type. **)
-  TWord = Class(TOrdIdent);
-  (** This is a sub class for the Boolean type. **)
-  TBoolean = Class(TOrdIdent);
-  (** This is a sub class for the Char type. **)
-  TChar = Class(TOrdIdent);
-  (** This is a sub class for the WideChar type. **)
-  TWideChar = Class(TOrdIdent);
-  (** This is a sub class for the LongWord type. **)
-  TLongWord = Class(TOrdIdent);
-  (** This is a sub class for the PChar type. **)
-  TPChar = Class(TOrdIdent);
-
-  (** This is a sub class for the Variant type. **)
-  TVariant = Class(TVariantType);
-  (** This is a sub class for the OLEVariant type. **)
-  TOLEVariant = Class(TVariantType);
-
-  (** This is a sub class for the String type. **)
-  TString = Class(TStringType);
-  (** This is a sub class for the AnsiString type. **)
-  TAnsiString = Class(TStringType);
-  (** This is a sub class for the WideString type. **)
-  TWideString = Class(TStringType);
-  (** This is a sub class for the ShortString type. **)
-  TShortString = Class(TStringType);
-
-  (** This is a sub class for Array types **)
-  TArrayType = Class(TStrucType)
-  Private
-    FDimensions : Integer;
-  Public
-    Procedure AddDimension;
-    (**
-      This property defines the number of dmiensions that the array contains.
-      @precon  None.
-      @postcon Returns the number of dimension that the array contains.
-      @return  an Integer
-    **)
-    Property Dimensions : Integer Read FDimensions;
-  End;
-
-  (** This is a sub class for Set types **)
-  TSetType = Class(TStrucType);
-  (** This is a sub class for File types **)
-  TFileType = Class(TStrucType);
-  (** This is a sub class for Pointer types **)
-  TPointerType = Class(TTypes);
-
-  (** This is a sub class for all constants. **)
-  TConstant = Class(TGenericContainer);
-  (** This is a sub class for all resource strings. **)
-  TResourceString = Class(TConstant);
-  (** This is a sub class for all variables. **)
-  TVar = Class(TGenericContainer);
-  (** This is a sub class for all thread variables. **)
-  TThreadVar = Class(TVar);
 
   (** This class defines a parsing error. **)
-  TDocError = Class
+  TDocError = Class(TElementContainer)
   Private
-    FLine: Integer;
-    FCol: Integer;
     FMsg: String;
     FErrorType : TErrorType;
     FMethod : String;
+  Protected
+    Function GetAsString : String; Override;
   Public
-    Constructor Create(strMsg, strMethod : String; iLine, iCol : Integer;
-      ErrType : TErrorType); Overload;
+    Constructor Create(strMsg : String; AScope : TScope; strMethod : String; iLine,
+      iCol : Integer; ErrType : TErrorType); Reintroduce; Overload;
     (**
       Returns the exception message.
       @precon  None.
@@ -1291,20 +902,6 @@ Type
       @return  a String
     **)
     Property Msg : String Read FMsg;
-    (**
-      Returns the line number where the exception occurred.
-      @precon  None.
-      @postcon Returns the line number where the exception occurred.
-      @return  an Integer
-    **)
-    Property Line : Integer Read FLine;
-    (**
-      Returns the column number where the exception occurred.
-      @precon  None.
-      @postcon Returns the column number where the exception occurred.
-      @return  an Integer
-    **)
-    Property Col : Integer Read FCol;
     (**
       Returns the type of exception stored.
       @precon  None.
@@ -1321,64 +918,24 @@ Type
     Property Method : String Read FMethod;
   End;
 
-  (** This class provides a collection for the parsing errors. **)
-  TDocErrorCollection = Class
-  Private
-    FErrors : TObjectList;
-    function GetCount: Integer;
-    function GetError(iIndex: Integer): TDocError;
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
-    Procedure Add(strMsg, strMethod : String; iLine, iCol : Integer;
-      ErrType : TErrorType);
-    (**
-      Returns the number of errors in the collection.
-      @precon  None.
-      @postcon Returns the number of errors in the collection.
-      @return  an Integer
-    **)
-    Property Count : Integer Read GetCount;
-    (**
-      Returns the specifically indexed error from the collection.
-      @precon  iIndex must be a valid index between 1 and Count - 1.
-      @postcon Returns the specifically indexed error from the collection.
-      @param   iIndex as       an Integer
-      @return  a TDocError
-    **)
-    Property Errors[iIndex : Integer] : TDocError Read GetError; Default;
-  End;
-
   (**
 
     This is an augmented Exception class to hold information about the
     line number and column number of the error.
 
   **)
-  EDocException = Class(Exception)
+  EDocException = Class(TElementContainer)
   Private
-    FLine : Integer;
-    FCol : Integer;
     FExceptionMethod: String;
+  Protected
+    function GetMessage: String;
   Public
-    Constructor CreateNormal(strMsg : String; Token : TTokenInfo;
-      strMethodName : String);
-    Constructor CreateLiteral(strMsg, strLiteral : String; Token : TTokenInfo;
-      strMethodName : String);
-    (**
-      Returns the line number of the documentation exception.
-      @precon  None.
-      @postcon Returns the line number of the documentation exception.
-      @return  an Integer
-    **)
-    Property Line : Integer Read FLine;
-    (**
-      Returns the column number of the documentation exception.
-      @precon  None.
-      @postcon Returns the column number of the documentation exception.
-      @return  an Integer
-    **)
-    Property Col : Integer Read FCol;
+    Constructor Create(strMsg : String; Token : TTokenInfo;
+      strMethodName : String); ReIntroduce; Overload;
+    Constructor Create(strMsg, strLiteral : String; Token : TTokenInfo;
+      strMethodName : String); ReIntroduce; Overload;
+    Constructor Create(strMsg : String; strMethodName : String); ReIntroduce;
+      Overload;
     (**
       Returns a string representing the classes ExceptionMethod.
       @precon  None.
@@ -1386,127 +943,34 @@ Type
       @return  a String
     **)
     Property ExceptionMethod : String Read FExceptionMethod;
-  End;
-
-  (** This is an enumerate to define the different type of documentation
-      conflict. **)
-  TDocConflictType = (
-    dctModuleMissingDocumentation,
-    dctModuleMissingDate,
-    dctModuleIncorrectDate,
-    dctModuleCheckDateError,
-    dctModuleMissingVersion,
-    dctModuleMissingAuthor,
-    dctTypeClauseUndocumented,
-    dctConstantClauseUndocumented,
-    dctResourceStringClauseUndocumented,
-    dctVariableClauseUndocumented,
-    dctThreadVarClauseUndocumented,
-    dctRecordClauseUndocumented,
-    dctObjectClauseUndocumented,
-    dctClassClauseUndocumented,
-    dctInterfaceClauseUndocumented,
-    dctDispinterfaceClauseUndocumented,
-    dctMethodUndocumented,
-    dctMethodHasNoDesc,
-    dctMethodDiffParamCount,
-    dctMethodUndocumentedParam,
-    dctMethodIncorrectParamType,
-    dctMethodUndocumentedReturn,
-    dctMethodIncorrectReturnType,
-    dctMethodPreconNotDocumented,
-    dctMethodMissingPrecon,
-    dctMethodTooManyPrecons,
-    dctMethodPostconNotDocumented,
-    dctMethodMissingPostcon,
-    dctMethodTooManyPostcons,
-    dctPropertyUndocumented,
-    dctPropertyHasNoDesc,
-    dctPropertyDiffParamCount,
-    dctPropertyUndocumentedParam,
-    dctPropertyIncorrectParamType,
-    dctPropertyUndocumentedReturn,
-    dctPropertyIncorrectReturnType,
-    dctPropertyPreconNotDocumented,
-    dctPropertyMissingPrecon,
-    dctPropertyTooManyPrecons,
-    dctPropertyPostconNotDocumented,
-    dctPropertyMissingPostcon,
-    dctPropertyTooManyPostcons,
-    dctMissingInitComment,
-    dctMissingFinalComment
-  );
-
-  (** A record to describe the information to be associated with a
-      DocConflictType **)
-  TDocConflictTypeRec = Record
-    Category : String;
-    MessageMask : String;
-    Description : String;
+    (**
+      This property returns the message of the Document Error as a String.
+      @precon  None.
+      @postcon Returns the message of the Document Error as a String.
+      @return  a String
+    **)
+    Property Message : String Read GetMessage;
   End;
 
   (** This is a class to represent a module documentation conflict. **)
-  TDocumentConflict = Class
+  TDocumentConflict = Class(TElementContainer)
   Private
-    FMessage : String;
-    FIdentLine : Integer;
-    FIdentColumn : Integer;
-    FCommentLine : Integer;
+    FMessage       : String;
+    FCommentLine   : Integer;
     FCommentColumn : Integer;
-    FDocConflictType: TDocConflictType;
   Protected
-    Function GetCategory: String;
-    Function GetDescription: String;
+    Function GetAsString : String; Override;
   Public
     Constructor Create(Const Args: Array of TVarRec; iIdentLine,
       iIdentColumn, iCommentLine, iCommentCol : Integer;
-      DocConflictType : TDocConflictType);
-    (**
-      This property defines the category under which the conflict should appear.
-      @precon  None.
-      @postcon Returns the category under which the conflict should appear.
-      @return  a String
-    **)
-    Property Category : String Read GetCategory;
-    (**
-      This property defines the actual documentation conflict message.
-      @precon  None.
-      @postcon Return the actual documentation conflict message.
-      @return  a String
-    **)
-    Property Message : String Read FMessage;
-    (**
-      This property defines the description associated with the
-      documentation conflict.
-      @precon  None.
-      @postcon Returns the description associated with the documentation
-               conflict.
-      @return  a String
-    **)
-    Property Description : String Read GetDescription;
-    (**
-      This property defines the identifier line associated with the documenation
-      conflict.
-      @precon  None.
-      @postcon Returns the identifier line associated with the documenation
-               conflict.
-      @return  an Integer
-    **)
-    Property IdentLine : Integer Read FIdentLine;
-    (**
-      This property defines the identifier column associated with the
-      documenation conflict.
-      @precon  None.
-      @postcon Returns the identifier column associated with the documenation
-               conflict.
-      @return  an Integer
-    **)
-    Property IdentColumn : Integer Read FIdentColumn;
+      strDocConflictMsg, strDocConflictDesc : String;
+      AImageIndex : TImageIndex); ReIntroduce;
+    Destructor Destroy; Override;
     (**
       This property defines the line where the comment associated with the
       conflict starts.
       @precon  None.
-      @postcon Returns the line where the comment associated with the conflict
+      @postcon Return the line where the comment associated with the conflict
                starts.
       @return  an Integer
     **)
@@ -1516,34 +980,11 @@ Type
       conflict starts.
       @precon  None.
       @postcon Return the column where the comment associated with the conflict
-                      starts.
+               starts.
       @return  an Integer
     **)
     Property CommentColumn : Integer Read FCommentColumn;
-    (**
-      This property defines the type of documentation conflict.
-      @precon  None.
-      @postcon Returns the type of documentation conflict.
-      @return  a TDocConflictType
-    **)
-    Property DocConflictType : TDocConflictType Read FDocConflictType;
   End;
-
-  (** This is a record to describe the position of a token in the editor. **)
-  TTokenPosition = Record
-    Line : Integer;
-    Column : Integer;
-    BufferPos : Integer;
-  End;
-
-  (** This is an enumerate to define the options for the parsing of a module. **)
-  TModuleOption = (moParse, moCheckForDocumentConflicts);
-  (** This is a set of Module Option enumerates. **)
-  TModuleOptions = Set Of TModuleOption;
-
-  (** A type to define the position before a token of the comment to be
-      associated with the identifier. **)
-  TCommentPosition = (cpBeforeCurrentToken, cpBeforePreviousToken);
 
   (** This is a type for a set of characters and the return type of several
       properties. **)
@@ -1554,39 +995,25 @@ Type
 
   (** This is an abtract class from which all language modules should be
       derived. **)
-  TBaseLanguageModule = Class {$IFDEF VER180} Abstract {$ENDIF}
+  TBaseLanguageModule = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
   Private
     FOwnedItems : TObjectList;
     FTokens : TObjectList;
     FTokenIndex : TTokenIndex;
-    FDocErrors: TDocErrorCollection;
+    FDocErrors: TElementContainer;
     FTickList : TStringList;
     FModuleName : String;
     FModuleType : TModuleType;
     FModuleComment : TComment;
-    FExportedHeadings : TMethodCollection;
-    FImplementedMethods : TMethodCollection;
-    FConstantsCollection : TGenericContainerCollection;
-    FVarsCollection : TGenericContainerCollection;
-    FThreadVarsCollection : TGenericContainerCollection;
-    FTypeCollection : TGenericContainerCollection;
-    FRequiresClause : TIdentList;
-    FContainsClause : TIdentList;
-    FUsesClause : TIdentList;
-    FInitSection : TIdent;
-    FFinalSection : TIdent;
-    FResStrCollection: TGenericContainerCollection;
-    FExportsCollection : TGenericContainerCollection;
     FBodyComment : TObjectList;
     FModuleNameCol: Integer;
     FModuleNameLine: Integer;
-    FSymbolTable: TGenericContainerCollection;
     FFileName: String;
     FModified : Boolean;
-    FDocumentConflicts: TObjectList;
     FCompilerDefs : TStringList;
     FPreviousTokenIndex : TTokenIndex;
     FCompilerConditionStack : TList;
+  Protected
     Function GetTokenCount : Integer;
     Function GetTokenInfo(iIndex : TTokenIndex) : TTokenInfo;
     Function GetToken : TTokenInfo;
@@ -1596,9 +1023,7 @@ Type
     function GetOpTickCount(strStart, strFinish : String): Integer;
     Function GetBodyComment(iIndex : Integer) : TComment;
     Function GetBodyCommentCount : Integer;
-    Function GetDocumentConflict(iIndex : Integer) : TDocumentConflict;
-    Function GetDocumentConflictCount : Integer;
-  Protected
+    Function GetAsString : String; Override;
     Function PrevToken : TTokenInfo;
     Procedure NextToken;
     Function EndOfTokens : Boolean;
@@ -1607,7 +1032,6 @@ Type
     Function GetComment(
       CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
     Procedure SetTokenIndex(iIndex : TTokenIndex);
-    Procedure SortDocumentConflicts;
     Procedure GetBodyCmt;
     Procedure AddToken(AToken : TTokenInfo);
     procedure AppendToLastToken(strToken : String);
@@ -1648,17 +1072,15 @@ Type
     **)
     Property CompilerDefines : TStringList Read FCompilerDefs;
   Public
-    Constructor Create(IsModified : Boolean; strFileName : String);
+    Constructor Create(IsModified : Boolean; strFileName : String); Reintroduce;
+      Overload;
     Destructor Destroy; Override;
     Procedure AddTickCount(strLabel : String);
-    Procedure AddDocumentConflict(Const Args: Array of TVarRec; iIdentLine,
-      iIdentColumn, iCommentLine, iCommentCol  : Integer;
-      DocConflictType : TDocConflictType);
-    Function ConvertDate(Const strDate : String) : TDateTime;
     Procedure AddDef(strDef : String);
     Procedure DeleteDef(strDef : String);
     Function IfDef(strDef : String) : Boolean;
     Function IfNotDef(strDef : String) : Boolean;
+    Procedure AddError(Error : TElementContainer);
     { Properties }
     (**
       Returns a reference to the modules error collection.
@@ -1677,13 +1099,6 @@ Type
       @return  a TTokenInfo
     **)
     Property TokenInfo[iIndex : TTokenIndex] : TTokenInfo Read GetTokenInfo;
-    (**
-      Returns the number of token within the module after tokenizing.
-      @precon  None.
-      @postcon Returns the number of token within the module after tokenizing.
-      @return  an TDocErrorCollection
-    **)
-    Property Errors : TDocErrorCollection Read FDocErrors;
     (**
       This property returns the tick count time between the 2 named tick counts
       previously stored using the AddTickCount() method.
@@ -1741,34 +1156,6 @@ Type
     **)
     Property ModuleComment : TComment Read FModuleComment Write FModuleComment;
     (**
-      Returns a reference to the implemented methods collection.
-      @precon  None.
-      @postcon Returns a reference to the implemented methods collection.
-      @return  a TMethodCollection
-    **)
-    Property ImplementedMethods : TMethodCollection Read FImplementedMethods;
-    (**
-      Returns a reference to the constants clause collection.
-      @precon  None.
-      @postcon Returns a reference to the constants clause collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property Constants : TGenericContainerCollection Read FConstantsCollection;
-    (**
-      Returns a reference to the variables clause collection.
-      @precon  None.
-      @postcon Returns a reference to the variables clause collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property Vars : TGenericContainerCollection Read FVarsCollection;
-    (**
-      Returns a reference to the modules types clause collection.
-      @precon  None.
-      @postcon Returns a reference to the modules types clause collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property Types : TGenericContainerCollection Read FTypeCollection;
-    (**
       Returns the specific indexed body comment from the collection.
       @precon  None.
       @postcon Returns the specific indexed body comment from the collection.
@@ -1798,19 +1185,6 @@ Type
     **)
     Property ModuleNameCol : Integer Read FModuleNameCol Write FModuleNameCol;
     (**
-      Returns a reference to the modules symbol table. All symbol in the module
-      are stored here and disposed of from here. Reference from other collections
-      like Types are purely reference only and those collection will not manage
-      the symbols life time.
-      @precon  None.
-      @postcon Returns a reference to the modules symbol table. All symbol in
-               the module are stored here and disposed of from here. Reference
-               from other collections like Types are purely reference only and
-               those collection will not manage the symbols life time.
-      @return  a TGenericContainerCollection
-    **)
-    Property SymbolTable : TGenericContainerCollection Read FSymbolTable;
-    (**
       This property returns the file name of the module as passed to the
       constructor.
       @precon  None.
@@ -1826,88 +1200,6 @@ Type
       @return  a Boolean
     **)
     Property Modified : Boolean Read FModified;
-    (**
-      This property returns a reference to the classes document conflict list.
-      @precon  iIndex must be a valid index between 0 and
-               DocumentConflictCount - 1
-      @postcon This property returns a reference to the classes document
-               conflict list.
-      @param   iIndex as an Integer
-      @return  a TDocumentConflict
-    **)
-    Property DocumentConflict[iIndex : Integer] : TDocumentConflict
-      Read GetDocumentConflict;
-    (**
-      This property returns the number of documentation conflicts in the module.
-      @precon  None.
-      @postcon Returns the number of documentation conflicts in the module.
-      @return  an Integer
-    **)
-    Property DocumentConflictCount : Integer Read GetDocumentConflictCount;
-    (**
-      Returns a reference to the requires clause collection.
-      @precon  None.
-      @postcon Returns a reference to the requires clause collection.
-      @return  a TIdentList
-    **)
-    Property Requires : TIdentList Read FRequiresClause Write FRequiresClause;
-    (**
-      Returns a reference to the contains clause collection.
-      @precon  None.
-      @postcon Returns a reference to the contains clause collection.
-      @return  a TIdentList
-    **)
-    Property Contains : TIdentList Read FContainsClause Write FContainsClause;
-    (**
-      Returns a reference to the uses clause collection.
-      @precon  None.
-      @postcon Returns a reference to the uses clause collection.
-      @return  a TIdentList
-    **)
-    Property UsesCls : TIdentList Read FUsesClause Write FUsesClause;
-    (**
-      Returns a reference to the exported headings collection.
-      @precon  None.
-      @postcon Returns a reference to the exported headings collection.
-      @return  a TMethodCollection
-    **)
-    Property ExportedHeadings : TMethodCollection Read FExportedHeadings;
-    (**
-      Returns a reference to the resource string clause collection.
-      @precon  None.
-      @postcon Returns a reference to the resource string clause collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property ResourceStrings : TGenericContainerCollection Read FResStrCollection;
-    (**
-      Returns a reference to the ThreadVar clause collection.
-      @precon  None.
-      @postcon Returns a reference to the ThreadVar clause collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property ThreadVars : TGenericContainerCollection Read FThreadVarsCollection;
-    (**
-      Returns a reference to the modules Initialization comment.
-      @precon  None.
-      @postcon Returns a reference to the modules Initialization comment.
-      @return  a TIdent
-    **)
-    Property InitializationSection : TIdent Read FInitSection Write FInitSection;
-    (**
-      Returns a reference to the modules Finalization comment.
-      @precon  None.
-      @postcon Returns a reference to the modules Finalization comment.
-      @return  a TIdent
-    **)
-    Property FinalizationSection : TIdent Read FFinalSection Write FFinalSection;
-    (**
-      Returns a refernce to the modules exports collection.
-      @precon  None.
-      @postcon Returns a refernce to the modules exports collection.
-      @return  a TGenericContainerCollection
-    **)
-    Property ExportsClause : TGenericContainerCollection Read FExportsCollection
-      Write FExportsCollection;
   End;
 
   (** This is a class to define a set of options for the application. **)
@@ -1935,10 +1227,15 @@ Type
     Property Defines : TStringList Read FDefines;
   End;
 
-ResourceString
-  (** The registry key for the wizards settings. **)
-  strRegRootKey = 'Software\Season''s Fall\Browse and Doc It\';
+  (** A record to describe document conflict information. **)
+  TDocConflictTable = Record
+    FCategory     : String;
+    FMessage      : String;
+    FDescription  : String;
+    FConflictType : TDocConflictIcon;
+  End;
 
+ResourceString
   (** Options text for Draw Syntax Highlighted Module Explorer **)
   strDrawSynHighModuleExplorer = 'Draw Syntax Highlighted Module Explorer';
   (** Options text for Show comments in the hints **)
@@ -2024,6 +1321,126 @@ ResourceString
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
+  (** Errors and warnings label **)
+  strErrorsAndWarnings = 'Errors and Warnings';
+  (** Label for Uses Clause **)
+  strUses = 'Uses';
+  (** Label for Types Clause **)
+  strTypesLabel = 'Types';
+  (** Label for Class Clause **)
+  strClass = 'Class';
+  (** Label for Classes Clause **)
+  strClasses = 'Classes';
+  (** Label for Interfaces Clause **)
+  strInterfaces = 'Interfaces';
+  (** Label for Interface Clause **)
+  strInterface = 'Interface';
+  (** Label for DispInterface Clause **)
+  strDispInterface = 'DispInterface';
+  (** Label for DispInterfaces Clause **)
+  strDispInterfaces = 'DispInterfaces';
+  (** Label for Object Clause **)
+  strObject = 'Object';
+  (** Label for Objects Clause **)
+  strObjects = 'Objects';
+  (** Label for Record Clause **)
+  strRecord = 'Record';
+  (** Label for Records Clause **)
+  strRecords = 'Records';
+  (** Label for Constants Clause **)
+  strConstants = 'Constants';
+  (** Label for Resource Strings Clause **)
+  strResourceStrings = 'Resource Strings';
+  (** Label for Variables Clause **)
+  strVars = 'Variables';
+  (** Label for Thread Variables Clause **)
+  strThreadVars = 'Thread Variables';
+  (** Label for Exported Headings **)
+  strExportedHeadings = 'Exported Headings';
+  (** Label for Exports Clause **)
+  strExports = 'Exports';
+  (** Label for Implemented Methods **)
+  strImplementedMethods = 'Implemented Methods';
+  (** Label for Requires Clause **)
+  strRequires = 'Requires';
+  (** Label for Contains Clause **)
+  strContains = 'Contains';
+  (** Label for Modules Section **)
+  strModules = 'Modules';
+  (** Label for Initialization Clause **)
+  strInitialization = 'Initialization';
+  (** Label for Finalization Clause **)
+  strFinalization = 'Finalization';
+  (** Label for Functions and Procedures label **)
+  strFunctionsAndProcedures = 'Function & Procedures';
+  (** Label for Labels **)
+  strLabel = 'Labels';
+
+  (** Resource string for saving a file. **)
+  strSaveFile = 'Do you want to save the file "%s"?';
+  (** Resource string for overwriting a file. **)
+  strOverwriteFile = 'Do you want to overwrite the file "%s"?';
+  (** Resource string for a class not found. **)
+  strUnExpectedStartOfFile = 'Unexpected start-of-file.';
+  (** Exception message for an unexpected end of file. **)
+  strUnExpectedEndOfFile = 'Unexpected end-of-file.';
+  (** Exception message when an identifier is expected but something else is found. **)
+  strIdentExpected = 'Identifier expected but "%s" found at line %d column %d.';
+  (** Exception message when an string is expected but something else is found. **)
+  strStringExpected = 'String literal expected but "%s" found at line %d column %d.';
+  (** Exception message when an number is expected but something else is found. **)
+  strNumberExpected = 'Number expected but "%s" found at line %d column %d.';
+  (** Exception message when an reserved word is expected but something else is
+      found. **)
+  strReservedWordExpected = 'Expected "%s" but "%s" found at line %d column %d.';
+  (** Exception message when an literal character is expected but something else
+      is found. **)
+  strLiteralExpected = '"%s" expected but "%s" found at line %d column %d.';
+  (** Warning for a function not having a return parameter. **)
+  strFunctionWarning = 'Function "%s" does not have a return type specified.';
+  (** An exception message for a non defined help file option. **)
+  strHelpFileNotDefined = 'There is no help file specified. Please specified a ' +
+    'help file in the options dialogue.';
+  (** An exception message for a missing help file **)
+  strHelpFileNotFound = 'The help file "%s" was not found.';
+  (** An exception message for an undeclared class method. **)
+  strUndeclaredClassMethod = 'Method "%s" has not been declared.';
+  (** An exception message for an unsatisfied forward reference. **)
+  strUnSatisfiedForwardReference = 'Method "%s" has an unsatisfied ' +
+    'forward reference.';
+  (** An exception message for a type not found. **)
+  strTypeNotFound = 'Type declaration missing but found "%s" at line %d column %d.';
+  (** An exception message when a TypeID is expected. **)
+  strTypeIDExpected = 'A TypeID was expected but found "%s" at line %d column %d.';
+  (** An execption message when a Expr conflict occurs in an expression **)
+  strExprConflict = 'The token "%s" conflicts with the TYPE of the preceeding ' +
+    'expression at line %d column %d.';
+  (** An exception message if a function is used in a constant expression **)
+  strConstExprDesignator = 'The token "%s" at line %d column %d is not allowed ' +
+    'in a Constant Expression.';
+  (** An exception message if the first none comment token is not Program,
+      Package, Unit or Library. **)
+  strModuleKeyWordNotfound = '"%s" found but module starting keyword PROGRAM, ' +
+    'PACKAGE, UNIT or LIBRARY not found.';
+  (** An exception message for an undefined token in the stream. **)
+  strUnDefinedToken = 'The token "%s" at line %d column %d is not defined.';
+  (** An exception message for an $ELSE without a string $IFDEF / $FIFNDEF **)
+  strElseIfMissingIfDef = '$ELSE is missing a starting $IFDEF or $IFNDEF at ' +
+    'line %d column %d.';
+  (** An exception message for an $ENDIF without a string $IFDEF / $FIFNDEF **)
+  strEndIfMissingIfDef = '$ENDIF is missing a starting $IFDEF or $IFNDEF at ' +
+    'line %d column %d.';
+  (** An exception message for an Ordinal Type not found. **)
+  strOrdinalTypeExpected = 'Ordinal type expected but "%s" found at line %d ' +
+    'column %d.';
+  (** An exception message for a Type Declaration not found. **)
+  strTypeDeclExpected = 'Type Declaration expected but "%s" found at line %s ' +
+    'column %d.';
+  (** An exception message for a Label not found. **)
+  strLabelExpected = 'Label expected but "%s" found at line %s column %d.';
+  (** An exception message for a Constant Expression found. **)
+  strConstExprExpected = 'Constant Expression expected but "%s" found at ' +
+    'line %s column %d.';
 
   (** This is the tree branch under which module documentation error appear **)
   strModuleDocumentation = 'Module Documentation';
@@ -2177,7 +1594,7 @@ ResourceString
     'section should have a description which should provide information to ' +
     'future developers regarding the purpose of the method. # #In addition to ' +
     'the descrition each method should have a pre-condition statement ' +
-    '(@@precon) and a post-condition statement (@postcon). # #Along with these ' +
+    '(@precon) and a post-condition statement (@postcon). # #Along with these ' +
     'there should be a list of the parameters and any return types.';
   (** Document conflict message for missing method description. **)
   strMethodHasNoDesc = 'Method ''%s'' has no description.';
@@ -2237,7 +1654,7 @@ ResourceString
   strMethodTooManyPreCons = 'Method ''%s'' has too many pre-condition tags.';
   (** Document conflict message description for too many pre-condition tag. **)
   strMethodTooManyPreConsDesc = 'The method comment has too many pre-condition ' +
-    'tags (@@precon).';
+    'tags (@precon).';
 
   (** Label for Method Post-Condition Documentation Conflicts **)
   strMethodPostConDocumentation = 'Method Post-Condition Documentation';
@@ -2259,7 +1676,7 @@ ResourceString
   strMethodTooManyPostCons = 'Method ''%s'' has too many post-condition tags.';
   (** Document conflict message description for too many post-condition tag. **)
   strMethodTooManyPostConsDesc = 'The method comment has too many post-condition ' +
-    'tags (@@postcon).';
+    'tags (@postcon).';
 
   (** Label for Property Documentation Conflicts **)
   strPropertyDocumentation = 'Property Documentation';
@@ -2270,7 +1687,7 @@ ResourceString
     'interface should have a description which should provide information to ' +
     'future developers regarding the purpose of the property. # #In addition to ' +
     'the descrition each property should have a pre-condition statement ' +
-    '(@@precon) and a post-condition statement (@postcon). # #Along with these ' +
+    '(@precon) and a post-condition statement (@postcon). # #Along with these ' +
     'there should be a list of the parameters and any return types.';
   (** Document conflict message for missing property description. **)
   strPropertyHasNoDesc = 'Property ''%s'' has no description.';
@@ -2330,7 +1747,7 @@ ResourceString
   strPropertyTooManyPreCons = 'Property ''%s'' has too many pre-condition tags.';
   (** Document conflict message description for too many pre-condition tag. **)
   strPropertyTooManyPreConsDesc = 'The property comment has too many pre-condition ' +
-    'tags (@@precon).';
+    'tags (@precon).';
 
   (** Label for Property Post-Condition Documentation Conflicts **)
   strPropertyPostConDocumentation = 'Property Post-Condition Documentation';
@@ -2351,9 +1768,9 @@ ResourceString
   strPropertyTooManyPostCons = 'Property ''%s'' has too many post-condition tags.';
   (** Document conflict message description for too many post-condition tag. **)
   strPropertyTooManyPostConsDesc = 'The property comment has too many post-condition ' +
-    'tags (@@postcon).';
+    'tags (@postcon).';
 
-  (** Label for Finalialization Documentation Conflicts **)
+  (** Label for Finalization Documentation Conflicts **)
   strModuleInitSection = 'Module Initialization Section';
   (** Document conflict message for a missing Finalialization Comment. **)
   strMissingInitComment = 'The module is missing an Initialization Comment.';
@@ -2373,125 +1790,6 @@ ResourceString
     'developers known which portion of the module are automatically ' +
     'destroyed.';
 
-  (** Errors and warnings label **)
-  strErrorsAndWarnings = 'Errors and Warnings';
-  (** Label for Uses Clause **)
-  strUses = 'Uses';
-  (** Label for Types Clause **)
-  strTypesLabel = 'Types';
-  (** Label for Class Clause **)
-  strClass = 'Class';
-  (** Label for Classes Clause **)
-  strClasses = 'Classes';
-  (** Label for Interfaces Clause **)
-  strInterfaces = 'Interfaces';
-  (** Label for Interface Clause **)
-  strInterface = 'Interface';
-  (** Label for DispInterface Clause **)
-  strDispInterface = 'DispInterface';
-  (** Label for DispInterfaces Clause **)
-  strDispInterfaces = 'DispInterfaces';
-  (** Label for Object Clause **)
-  strObject = 'Object';
-  (** Label for Objects Clause **)
-  strObjects = 'Objects';
-  (** Label for Record Clause **)
-  strRecord = 'Record';
-  (** Label for Records Clause **)
-  strRecords = 'Records';
-  (** Label for Constants Clause **)
-  strConstants = 'Constants';
-  (** Label for Resource Strings Clause **)
-  strResourceStrings = 'Resource Strings';
-  (** Label for Variables Clause **)
-  strVars = 'Variables';
-  (** Label for Thread Variables Clause **)
-  strThreadVars = 'Thread Variables';
-  (** Label for Exported Headings **)
-  strExportedHeadings = 'Exported Headings';
-  (** Label for Exports Clause **)
-  strExports = 'Exports';
-  (** Label for Implemented Methods **)
-  strImplementedMethods = 'Implemented Methods';
-  (** Label for Requires Clause **)
-  strRequires = 'Requires';
-  (** Label for Contains Clause **)
-  strContains = 'Contains';
-  (** Label for Modules Section **)
-  strModules = 'Modules';
-  (** Label for Initialization Clause **)
-  strInitialization = 'Initialization';
-  (** Label for Finalization Clause **)
-  strFinalization = 'Finalization';
-  (** Label for Functions and Procedures label **)
-  strFunctionsAndProcedures = 'Function & Procedures';
-  (** Resource string for saving a file. **)
-
-  strSaveFile = 'Do you want to save the file "%s"?';
-  (** Resource string for overwriting a file. **)
-  strOverwriteFile = 'Do you want to overwrite the file "%s"?';
-  (** Resource string for a class not found. **)
-  strUnExpectedStartOfFile = 'Unexpected start-of-file.';
-  (** Exception message for an unexpected end of file. **)
-  strUnExpectedEndOfFile = 'Unexpected end-of-file.';
-  (** Exception message when an identifier is expected but something else is found. **)
-  strIdentExpected = 'Identifier expected but "%s" found at line %d column %d.';
-  (** Exception message when an string is expected but something else is found. **)
-  strStringExpected = 'String literal expected but "%s" found at line %d column %d.';
-  (** Exception message when an number is expected but something else is found. **)
-  strNumberExpected = 'Number expected but "%s" found at line %d column %d.';
-  (** Exception message when an reserved word is expected but something else is
-      found. **)
-  strReservedWordExpected = 'Expected "%s" but "%s" found at line %d column %d.';
-  (** Exception message when an literal character is expected but something else
-      is found. **)
-  strLiteralExpected = '"%s" expected but "%s" found at line %d column %d.';
-  (** Warning for a function not having a return parameter. **)
-  strFunctionWarning = 'Function "%s" does not have a return type specified.';
-  (** An exception message for a non defined help file option. **)
-  strHelpFileNotDefined = 'There is no help file specified. Please specified a ' +
-    'help file in the options dialogue.';
-  (** An exception message for a missing help file **)
-  strHelpFileNotFound = 'The help file "%s" was not found.';
-  (** An exception message for an undeclared class method. **)
-  strUndeclaredClassMethod = 'Class method "%s.%s" has not been declared.';
-  (** An exception message for an unsatisfied forward reference. **)
-  strUnSatisfiedForwardReference = 'Class method "%s.%s" has an unsatisfied ' +
-    'forward reference.';
-  (** An exception message for a type not found. **)
-  strTypeNotFound = 'Type declaration missing but found "%s" at line %d column %d.';
-  (** An exception message when a TypeID is expected. **)
-  strTypeIDExpected = 'A TypeID was expected but found "%s" at line %d column %d.';
-  (** An execption message when a Expr conflict occurs in an expression **)
-  strExprConflict = 'The token "%s" conflicts with the TYPE of the preceeding ' +
-    'expression at line %d column %d.';
-  (** An exception message if a function is used in a constant expression **)
-  strConstExprDesignator = 'The token "%s" at line %d column %d is not allowed ' +
-    'in a Constant Expression.';
-  (** An exception message if the first none comment token is not Program,
-      Package, Unit or Library. **)
-  strModuleKeyWordNotfound = '"%s" found but module starting keyword PROGRAM, ' +
-    'PACKAGE, UNIT or LIBRARY not found.';
-  (** An exception message for an undefined token in the stream. **)
-  strUnDefinedToken = 'The token "%s" at line %d column %d is not defined.';
-  (** An exception message for an $ELSE without a string $IFDEF / $FIFNDEF **)
-  strElseIfMissingIfDef = '$ELSE is missing a starting $IFDEF or $IFNDEF at ' +
-    'line %d column %d.';
-  (** An exception message for an $ENDIF without a string $IFDEF / $FIFNDEF **)
-  strEndIfMissingIfDef = '$ENDIF is missing a starting $IFDEF or $IFNDEF at ' +
-    'line %d column %d.';
-  (** An exception message for an Ordinal Type not found. **)
-  strOrdinalTypeExpected = 'Ordinal type expected but "%s" found at line %d ' +
-    'column %d.';
-  (** An exception message for a Type Declaration not found. **)
-  strTypeDeclExpected = 'Type Declaration expected but "%s" found at line %s ' +
-    'column %d.';
-  (** An exception message for a Label not found. **)
-  strLabelExpected = 'Label expected but "%s" found at line %s column %d.';
-  (** An exception message for a Constant Expression found. **)
-  strConstExprExpected = 'Constant Expression expected but "%s" found at ' +
-    'line %s column %d.';
-
 Const
   (** A set of characters for whitespace **)
   strWhiteSpace : Set Of Char = [#32, #9];
@@ -2502,171 +1800,390 @@ Const
     'WhiteSpace', 'Keyword', 'Identifier', 'Number', 'Symbol', 'LineEnd',
     'ArrayElement', 'StatementEnd', 'StringLiteral', 'Comment', 'HTMLTag',
     'Directive', 'CompilerDirective', 'LinkTag');
-  (** A list of strings representing the types of methods. **)
-  strMethodTypes : Array[mtConstructor..mtFunction] Of String = (
-    'Constructor', 'Destructor', 'Procedure', 'Function');
-  (** A list of strings representing the parameter modifiers for methods. **)
-  strParamModifier : Array[pamNone..pamOut] Of String = ('', 'var ', 'const ',
-    'out ');
-
   (** This is a string array representing the TDocOption enumerates. **)
   DocOptionInfo : Array[Low(TDocOption)..High(TDocOption)] Of TDocOptionRec = (
-    (Description : strDrawSynHighModuleExplorer; Enabled : False),
-    (Description : strShowCommentsInTheHints; Enabled : False),
-    (Description : strShowLocalDeclarationsInMethods; Enabled : False),
-    (Description : strShowPrivateDeclarations; Enabled : True),
-    (Description : strShowProtectedDeclarations; Enabled : True),
-    (Description : strShowPublicDeclarations; Enabled : True),
-    (Description : strShowPublishedDeclarations; Enabled : True),
-    (Description : strShowLocalProcsAndFuncs; Enabled : True),
-    (Description : strShowDocumentationConflicts; Enabled : False),
-    (Description : strShowMissingMethodDocumentation; Enabled : True),
-    (Description : strShowMissingMethodDocDesc; Enabled : True),
-    (Description : strShowDiffMethodParameterCount; Enabled : True),
-    (Description : strShowUndocumentedMethodParameters; Enabled : True),
-    (Description : strShowIncorrectMethodParameterType; Enabled : True),
-    (Description : strShowUndocumentedMethodReturn; Enabled : True),
-    (Description : strShowIncorrectMethodReturnType; Enabled : True),
-    (Description : strShowUndocumentedTypes; Enabled : False),
-    (Description : strShowUndocumentedRecords; Enabled : False),
-    (Description : strShowUndocumentedObjects; Enabled : False),
-    (Description : strShowUndocumentedClasses; Enabled : False),
-    (Description : strShowUndocumentedInterfaces; Enabled : False),
-    (Description : strShowUndocumentedVariables; Enabled : False),
-    (Description : strShowUndocumentedConstants; Enabled : False),
-    (Description : strShowUndocumentedModule; Enabled : True),
-    (Description : strShowMissingModuleDate; Enabled : False),
-    (Description : strShowCheckModuleDate; Enabled : False),
-    (Description : strShowMissingModuleVersion; Enabled : False),
-    (Description : strShowMissingModuleAuthor; Enabled : False),
-    (Description : strShowMissingMethodPreConditions; Enabled : False),
-    (Description : strShowMissingMethodPostConditions; Enabled : False),
-    (Description : strShowMissingPropertyDocumentation; Enabled : False),
-    (Description : strShowMissingPropertyDocuDesc; Enabled : False),
-    (Description : strShowDiffPropertyParameterCount; Enabled : False),
-    (Description : strShowUndocumentedPropertyParameter; Enabled : False),
-    (Description : strShowIncorrectPropertyParameterType; Enabled : False),
-    (Description : strShowUndocumentedPropertyReturnType; Enabled : False),
-    (Description : strShowIncorrectPropertyReturnType; Enabled : False),
-    (Description : strShowMissingPropertyPreConditions; Enabled : False),
-    (Description : strShowMissingPropertyPostConditions; Enabled : False),
-    (Description : strShowMissingInitComment; Enabled : False),
-    (Description : strShowMissingFinalComment; Enabled : False)
-  );
-
-  (** This is a string array representing the TDocOption enumerates. **)
-  DocConflictInfo : Array[Low(TDocConflictType)..High(TDocConflictType)]
-    Of TDocConflictTypeRec = (
-    (Category: strModuleDocumentation; MessageMask:
-      strModuleMissingDocumentation; Description:
-      strModuleMissingDocumentationDesc),
-    (Category: strModuleDocumentation; MessageMask: strModuleMissingDate;
-      Description: strModuleMissingDateDesc),
-    (Category: strModuleDocumentation; MessageMask: strModuleIncorrectDate;
-      Description: strModuleIncorrectDateDesc),
-    (Category: strModuleDocumentation; MessageMask: strModuleCheckDateError;
-      Description: strModuleCheckDateErrorDesc),
-    (Category: strModuleDocumentation; MessageMask: strModuleMissingVersion;
-      Description: strModuleMissingVersionDesc),
-    (Category: strModuleDocumentation; MessageMask: strModuleMissingAuthor;
-      Description: strModuleMissingAuthorDesc),
-    (Category: strTypedocumentation; MessageMask: strTypeClauseUndocumented;
-      Description: strTypeClauseUndocumentedDesc),
-    (Category: strConstantdocumentation; MessageMask:
-      strConstantClauseUndocumented; Description:
-      strConstantClauseUndocumentedDesc),
-    (Category: strResourceStringdocumentation; MessageMask:
-      strResourceStringClauseUndocumented; Description:
-      strResourceStringClauseUndocumentedDesc),
-    (Category: strVariabledocumentation; MessageMask:
-      strVariableClauseUndocumented; Description:
-      strVariableClauseUndocumentedDesc),
-    (Category: strThreadVardocumentation; MessageMask:
-      strThreadVarClauseUndocumented; Description:
-      strThreadVarClauseUndocumentedDesc),
-    (Category: strRecorddocumentation; MessageMask:
-      strRecordClauseUndocumented; Description: strRecordClauseUndocumentedDesc),
-    (Category: strObjectdocumentation; MessageMask: strObjectClauseUndocumented;
-      Description: strObjectClauseUndocumentedDesc),
-    (Category: strClassdocumentation; MessageMask: strClassClauseUndocumented;
-      Description: strClassClauseUndocumentedDesc),
-    (Category: strInterfacedocumentation; MessageMask:
-      strInterfaceClauseUndocumented; Description:
-      strInterfaceClauseUndocumentedDesc),
-    (Category: strDispinterfacedocumentation; MessageMask:
-      strDispinterfaceClauseUndocumented; Description:
-      strDispinterfaceClauseUndocumentedDesc),
-    (Category: strMethodDocumentation; MessageMask: strMethodUndocumented;
-      Description: strMethodUndocumentedDesc),
-    (Category: strMethodDocumentation; MessageMask: strMethodHasNoDesc;
-      Description: strMethodHasNoDescDesc),
-    (Category: strMethodParamDocumentation; MessageMask:
-      strMethodDiffParamCount; Description: strMethodDiffParamCountDesc),
-    (Category: strMethodParamDocumentation; MessageMask:
-      strMethodUndocumentedParam; Description: strMethodUndocumentedParamDesc),
-    (Category: strMethodParamDocumentation; MessageMask:
-      strMethodIncorrectParamType; Description: strMethodIncorrectParamTypeDesc),
-    (Category: strMethodReturnDocumentation; MessageMask:
-      strMethodUndocumentedReturn; Description: strMethodUndocumentedReturnDesc),
-    (Category: strMethodReturnDocumentation; MessageMask:
-      strMethodIncorrectReturnType; Description:
-      strMethodIncorrectReturnTypeDesc),
-    (Category: strMethodPreconDocumentation; MessageMask:
-      strMethodPreconNotDocumented; Description:
-      strMethodPreconNotDocumentedDesc),
-    (Category: strMethodPreconDocumentation; MessageMask:
-      strMethodMissingPrecon; Description: strMethodMissingPreconDesc),
-    (Category: strMethodPreconDocumentation; MessageMask:
-      strMethodTooManyPrecons; Description: strMethodTooManyPreconsDesc),
-    (Category: strMethodPostconDocumentation; MessageMask:
-      strMethodPostconNotDocumented; Description:
-      strMethodPostconNotDocumentedDesc),
-    (Category: strMethodPostconDocumentation; MessageMask:
-      strMethodMissingPostcon; Description: strMethodMissingPostconDesc),
-    (Category: strMethodPostconDocumentation; MessageMask:
-      strMethodTooManyPostcons; Description: strMethodTooManyPostconsDesc),
-    (Category: strPropertyDocumentation; MessageMask: strPropertyUndocumented;
-      Description: strPropertyUndocumentedDesc),
-    (Category: strPropertyDocumentation; MessageMask: strPropertyHasNoDesc;
-      Description: strPropertyHasNoDescDesc),
-    (Category: strPropertyParamDocumentation; MessageMask:
-      strPropertyDiffParamCount; Description: strPropertyDiffParamCountDesc),
-    (Category: strPropertyParamDocumentation; MessageMask:
-      strPropertyUndocumentedParam; Description:
-      strPropertyUndocumentedParamDesc),
-    (Category: strPropertyParamDocumentation; MessageMask:
-      strPropertyIncorrectParamType; Description:
-      strPropertyIncorrectParamTypeDesc),
-    (Category: strPropertyReturnDocumentation; MessageMask:
-      strPropertyUndocumentedReturn; Description:
-      strPropertyUndocumentedReturnDesc),
-    (Category: strPropertyReturnDocumentation; MessageMask:
-      strPropertyIncorrectReturnType; Description:
-      strPropertyIncorrectReturnTypeDesc),
-    (Category: strPropertyPreconDocumentation; MessageMask:
-      strPropertyPreconNotDocumented; Description:
-      strPropertyPreconNotDocumentedDesc),
-    (Category: strPropertyPreconDocumentation; MessageMask:
-      strPropertyMissingPrecon; Description: strPropertyMissingPreconDesc),
-    (Category: strPropertyPreconDocumentation; MessageMask:
-      strPropertyTooManyPrecons; Description: strPropertyTooManyPreconsDesc),
-    (Category: strPropertyPostconDocumentation; MessageMask:
-      strPropertyPostconNotDocumented; Description:
-      strPropertyPostconNotDocumentedDesc),
-    (Category: strPropertyPostconDocumentation; MessageMask:
-      strPropertyMissingPostcon; Description: strPropertyMissingPostconDesc),
-    (Category: strPropertyPostconDocumentation; MessageMask:
-      strPropertyTooManyPostcons; Description: strPropertyTooManyPostconsDesc),
-    (Category: strModuleInitSection; MessageMask:
-      strMissingInitComment; Description: strMissingInitCommentDesc),
-    (Category: strModuleFinalSection; MessageMask:
-      strMissingFinalComment; Description: strMissingFinalCommentDesc)
+    (FDescription : strDrawSynHighModuleExplorer;          FEnabled : False),
+    (FDescription : strShowCommentsInTheHints;             FEnabled : False),
+    (FDescription : strShowLocalDeclarationsInMethods;     FEnabled : False),
+    (FDescription : strShowPrivateDeclarations;            FEnabled : True),
+    (FDescription : strShowProtectedDeclarations;          FEnabled : True),
+    (FDescription : strShowPublicDeclarations;             FEnabled : True),
+    (FDescription : strShowPublishedDeclarations;          FEnabled : True),
+    (FDescription : strShowLocalProcsAndFuncs;             FEnabled : True),
+    (FDescription : strShowDocumentationConflicts;         FEnabled : False),
+    (FDescription : strShowMissingMethodDocumentation;     FEnabled : True),
+    (FDescription : strShowMissingMethodDocDesc;           FEnabled : True),
+    (FDescription : strShowDiffMethodParameterCount;       FEnabled : True),
+    (FDescription : strShowUndocumentedMethodParameters;   FEnabled : True),
+    (FDescription : strShowIncorrectMethodParameterType;   FEnabled : True),
+    (FDescription : strShowUndocumentedMethodReturn;       FEnabled : True),
+    (FDescription : strShowIncorrectMethodReturnType;      FEnabled : True),
+    (FDescription : strShowUndocumentedTypes;              FEnabled : False),
+    (FDescription : strShowUndocumentedRecords;            FEnabled : False),
+    (FDescription : strShowUndocumentedObjects;            FEnabled : False),
+    (FDescription : strShowUndocumentedClasses;            FEnabled : False),
+    (FDescription : strShowUndocumentedInterfaces;         FEnabled : False),
+    (FDescription : strShowUndocumentedVariables;          FEnabled : False),
+    (FDescription : strShowUndocumentedConstants;          FEnabled : False),
+    (FDescription : strShowUndocumentedModule;             FEnabled : True),
+    (FDescription : strShowMissingModuleDate;              FEnabled : False),
+    (FDescription : strShowCheckModuleDate;                FEnabled : False),
+    (FDescription : strShowMissingModuleVersion;           FEnabled : False),
+    (FDescription : strShowMissingModuleAuthor;            FEnabled : False),
+    (FDescription : strShowMissingMethodPreConditions;     FEnabled : False),
+    (FDescription : strShowMissingMethodPostConditions;    FEnabled : False),
+    (FDescription : strShowMissingPropertyDocumentation;   FEnabled : False),
+    (FDescription : strShowMissingPropertyDocuDesc;        FEnabled : False),
+    (FDescription : strShowDiffPropertyParameterCount;     FEnabled : False),
+    (FDescription : strShowUndocumentedPropertyParameter;  FEnabled : False),
+    (FDescription : strShowIncorrectPropertyParameterType; FEnabled : False),
+    (FDescription : strShowUndocumentedPropertyReturnType; FEnabled : False),
+    (FDescription : strShowIncorrectPropertyReturnType;    FEnabled : False),
+    (FDescription : strShowMissingPropertyPreConditions;   FEnabled : False),
+    (FDescription : strShowMissingPropertyPostConditions;  FEnabled : False),
+    (FDescription : strShowMissingInitComment;             FEnabled : False),
+    (FDescription : strShowMissingFinalComment;            FEnabled : False)
   );
 
   (** This is a constant for special tag items to show in the tree **)
   iShowInTree = $0001;
   (** This is a constant for special tag items to auto expand in the tree **)
   iAutoExpand = $0002;
+
+  (** This is a list of Image Resource name to be loaded fom the executable. **)
+  ImageList : Array[Succ(Low(TImageIndex))..High(TImageIndex)] Of TImageIndexInfo = (
+    (FResourceName : 'Module';                    FMaskColour: $0000FF00),
+
+    (FResourceName : 'DocConflictFolder';         FMaskColour: $0000FF00),
+    (FResourceName : 'DocConflictIncorrect';      FMaskColour: $0000FF00),
+    (FResourceName : 'DocConflictItem';           FMaskColour: $0000FF00),
+    (FResourceName : 'DocConflictMissing';        FMaskColour: $0000FF00),
+
+    (FResourceName : 'ErrorFolder';               FMaskColour: $0000FF00),
+    (FResourceName : 'Error';                     FMaskColour: $0000FF00),
+    (FResourceName : 'Warning';                   FMaskColour: $0000FF00),
+
+    (FResourceName : 'UsesLabel';                 FMaskColour: $0000FF00),
+    (FResourceName : 'UsesItem';                  FMaskColour: $0000FF00),
+
+    (FResourceName : 'TypesLabel';                FMaskColour: $0000FF00),
+    (FResourceName : 'PublicType';                FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateType';               FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedType';             FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedType';             FMaskColour: $0000FF00),
+    (FResourceName : 'LocalType';                 FMaskColour: $0000FF00),
+
+    (FResourceName : 'RecordsLabel';              FMaskColour: $0000FF00),
+    (FResourceName : 'PublicRecord';              FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateRecord';             FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedRecord';           FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedRecord';           FMaskColour: $0000FF00),
+    (FResourceName : 'LocalRecord';               FMaskColour: $0000FF00),
+
+    (FResourceName : 'FieldsLabel';               FMaskColour: $0000FF00),
+    (FResourceName : 'PublicField';               FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateField';              FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedField';            FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedField';            FMaskColour: $0000FF00),
+
+    (FResourceName : 'ObjectsLabel';              FMaskColour: $0000FF00),
+    (FResourceName : 'PublicObject';              FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateObject';             FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedObject';           FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedObject';           FMaskColour: $0000FF00),
+    (FResourceName : 'LocalObject';               FMaskColour: $0000FF00),
+
+    (FResourceName : 'PublicConstructor';         FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateConstructor';        FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedConstructor';      FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedConstructor';      FMaskColour: $0000FF00),
+    (FResourceName : 'LocalConstructor';          FMaskColour: $0000FF00),
+
+    (FResourceName : 'PublicDestructor';          FMaskColour: $00FF00FF),
+    (FResourceName : 'PrivateDestructor';         FMaskColour: $00FF00FF),
+    (FResourceName : 'PublishedDestructor';       FMaskColour: $00FF00FF),
+    (FResourceName : 'ProtectedDestructor';       FMaskColour: $00FF00FF),
+    (FResourceName : 'LocalDestructor';           FMaskColour: $00FF00FF),
+
+    (FResourceName : 'PublicProcedure';           FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateProcedure';          FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedProcedure';        FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedProcedure';        FMaskColour: $0000FF00),
+    (FResourceName : 'LocalProcedure';            FMaskColour: $0000FF00),
+
+    (FResourceName : 'PublicFunction';            FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateFunction';           FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedFunction';         FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedFunction';         FMaskColour: $0000FF00),
+    (FResourceName : 'LocalFunction';             FMaskColour: $0000FF00),
+
+    (FResourceName : 'ClassesLabel';              FMaskColour: $0000FF00),
+    (FResourceName : 'PublicClass';               FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateClass';              FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedClass';            FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedClass';            FMaskColour: $0000FF00),
+    (FResourceName : 'LocalClass';                FMaskColour: $0000FF00),
+
+    (FResourceName : 'PropertyLabel';             FMaskColour: $00FF00FF),
+    (FResourceName : 'PublicProperty';            FMaskColour: $00FF00FF),
+    (FResourceName : 'PrivateProperty';           FMaskColour: $00FF00FF),
+    (FResourceName : 'PublishedProperty';         FMaskColour: $00FF00FF),
+    (FResourceName : 'ProtectedProperty';         FMaskColour: $00FF00FF),
+    (FResourceName : 'LocalProperty';             FMaskColour: $00FF00FF),
+
+    (FResourceName : 'InterfacesLabel';           FMaskColour: $0000FF00),
+    (FResourceName : 'PublicInterface';           FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateInterface';          FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedInterface';        FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedInterface';        FMaskColour: $0000FF00),
+    (FResourceName : 'LocalInterface';            FMaskColour: $0000FF00),
+
+    (FResourceName : 'DispInterfacesLabel';       FMaskColour: $0000FF00),
+    (FResourceName : 'PublicDispInterface';       FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateDispInterface';      FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedDispInterface';    FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedDispInterface';    FMaskColour: $0000FF00),
+    (FResourceName : 'LocalDispInterface';        FMaskColour: $0000FF00),
+
+    (FResourceName : 'ConstantsLabel';            FMaskColour: $0000FF00),
+    (FResourceName : 'PublicConst';               FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateConst';              FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedConst';            FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedConst';            FMaskColour: $0000FF00),
+    (FResourceName : 'LocalConst';                FMaskColour: $0000FF00),
+
+    (FResourceName : 'ResourceStringsLabel';      FMaskColour: $0000FF00),
+    (FResourceName : 'PublicResourceString';      FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateResourceString';     FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedResourceString';   FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedResourceString';   FMaskColour: $0000FF00),
+    (FResourceName : 'LocalResourceString';       FMaskColour: $0000FF00),
+
+    (FResourceName : 'VariablesLabel';            FMaskColour: $0000FF00),
+    (FResourceName : 'PublicVariable';            FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateVariable';           FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedVariable';         FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedVariable';         FMaskColour: $0000FF00),
+    (FResourceName : 'LocalVariable';             FMaskColour: $0000FF00),
+
+    (FResourceName : 'ThreadVarsLabel';           FMaskColour: $0000FF00),
+    (FResourceName : 'PublicThreadVar';           FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateThreadVar';          FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedThreadVar';        FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedThreadVar';        FMaskColour: $0000FF00),
+    (FResourceName : 'LocalThreadVar';            FMaskColour: $0000FF00),
+
+    (FResourceName : 'ExportedHeadingsLabel';     FMaskColour: $0000FF00),
+
+    (FResourceName : 'ExportedFunctionsLabel';    FMaskColour: $0000FF00),
+    (FResourceName : 'PublicExportedFunction';    FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateExportedFunction';   FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedExportedFunction'; FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedExportedFunction'; FMaskColour: $0000FF00),
+    (FResourceName : 'LocalExportedFunction';     FMaskColour: $0000FF00),
+
+    (FResourceName : 'LabelsLabel';               FMaskColour: $0000FF00),
+    (FResourceName : 'PublicLabel';               FMaskColour: $0000FF00),
+
+    (FResourceName : 'ImplementedMethodsLabel';   FMaskColour: $0000FF00),
+
+    (FResourceName : 'InitializationLabel';       FMaskColour: $00FF00FF),
+    (FResourceName : 'FinalizationLabel';         FMaskColour: $0000FF00),
+
+    (FResourceName : 'ToDoFolder';                FMaskColour: $0000FF00),
+    (FResourceName : 'ToDoItem';                  FMaskColour: $0000FF00),
+
+    (FResourceName : 'UnknownClsObj';             FMaskColour: $0000FF00)
+  );
+
+  (** A table of information for document conflicts. **)
+  DocConflictTable : Array[Low(TDocConflictType)..High(TDocConflictType)] Of TDocConflictTable = (
+    (FCategory: strModuleDocumentation;
+      FMessage: strModuleMissingDocumentation;
+      FDescription: strModuleMissingDocumentationDesc;
+      FConflictType: dciMissing),
+    (FCategory: strModuleDocumentation;
+      FMessage: strModuleMissingDate;
+      FDescription: strModuleMissingDateDesc;
+      FConflictType: dciMissing),
+    (FCategory: strModuleDocumentation;
+      FMessage: strModuleIncorrectDate;
+      FDescription: strModuleIncorrectDateDesc;
+      FConflictType: dciIncorrect),
+    (FCategory: strModuleDocumentation;
+      FMessage: strModuleCheckDateError;
+      FDescription: strModuleCheckDateErrorDesc;
+      FConflictType: dciIncorrect),
+    (FCategory: strModuleDocumentation;
+      FMessage: strModuleMissingVersion;
+      FDescription: strModuleMissingVersionDesc;
+      FConflictType: dciMissing),
+    (FCategory: strModuleDocumentation;
+      FMessage: strModuleMissingAuthor;
+      FDescription: strModuleMissingAuthorDesc;
+      FConflictType: dciMissing),
+
+    (FCategory: strTypeDocumentation;
+      FMessage: strTypeClauseUndocumented;
+      FDescription: strTypeClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strConstantDocumentation;
+      FMessage: strConstantClauseUndocumented;
+      FDescription: strConstantClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strResourceStringDocumentation;
+      FMessage: strResourceStringClauseUndocumented;
+      FDescription: strResourceStringClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strVariableDocumentation;
+      FMessage: strVariableClauseUndocumented;
+      FDescription: strVariableClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strThreadVarDocumentation;
+      FMessage: strThreadVarClauseUndocumented;
+      FDescription: strThreadVarClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+
+    (FCategory: strClassDocumentation;
+      FMessage: strClassClauseUndocumented;
+      FDescription: strClassClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyUndocumented;
+      FDescription: strPropertyUndocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyHasNoDesc;
+      FDescription: strPropertyHasNoDescDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyPreconNotDocumented;
+      FDescription: strPropertyPreconNotDocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyDiffParamCount;
+      FDescription: strPropertyPreconNotDocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyMissingPreCon;
+      FDescription: strPropertyMissingPreConDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyTooManyPreCons;
+      FDescription: strPropertyTooManyPreConsDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyUndocumentedParam;
+      FDescription: strPropertyUndocumentedParamDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyIncorrectParamType;
+      FDescription: strPropertyIncorrectParamTypeDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyPostconNotDocumented;
+      FDescription: strPropertyPostconNotDocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyUndocumentedReturn;
+      FDescription: strPropertyUndocumentedReturnDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyIncorrectReturnType;
+      FDescription: strPropertyIncorrectReturnTypeDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyMissingPostCon;
+      FDescription: strPropertyMissingPostConDesc;
+      FConflictType: dciMissing),
+    (FCategory: strPropertyDocumentation;
+      FMessage: strPropertyTooManyPostCons;
+      FDescription: strPropertyTooManyPostConsDesc;
+      FConflictType: dciMissing),
+
+    (FCategory: strRecordDocumentation;
+      FMessage: strRecordClauseUndocumented;
+      FDescription: strRecordClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+
+    (FCategory: strObjectDocumentation;
+      FMessage: strObjectClauseUndocumented;
+      FDescription: strObjectClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+
+    (FCategory: strInterfaceDocumentation;
+      FMessage: strInterfaceClauseUndocumented;
+      FDescription: strInterfaceClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+
+    (FCategory: strDispInterfaceDocumentation;
+      FMessage: strDispInterfaceClauseUndocumented;
+      FDescription: strDispInterfaceClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+
+    (FCategory: strMethodDocumentation;
+      FMessage: strMethodUndocumented;
+      FDescription: strMethodUndocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodDocumentation;
+      FMessage: strMethodHasNoDesc;
+      FDescription: strMethodHasNoDescDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodPreConDocumentation;
+      FMessage: strMethodPreconNotDocumented;
+      FDescription: strMethodPreconNotDocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodParamDocumentation;
+      FMessage: strMethodDiffParamCount;
+      FDescription: strMethodDiffParamCountDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodPreconDocumentation;
+      FMessage: strMethodMissingPreCon;
+      FDescription: strMethodMissingPreConDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodPreconDocumentation;
+      FMessage: strMethodTooManyPrecons;
+      FDescription: strMethodTooManyPreconsDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodParamDocumentation;
+      FMessage: strMethodUndocumentedParam;
+      FDescription: strMethodUndocumentedParamDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodParamDocumentation;
+      FMessage: strMethodIncorrectParamType;
+      FDescription: strMethodIncorrectParamTypeDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodPostConDocumentation;
+      FMessage: strMethodPostconNotDocumented;
+      FDescription: strMethodPostconNotDocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodReturnDocumentation;
+      FMessage: strMethodUndocumentedReturn;
+      FDescription: strMethodUndocumentedReturnDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodReturnDocumentation;
+      FMessage: strMethodIncorrectReturntype;
+      FDescription: strMethodIncorrectReturntypeDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodPostConDocumentation;
+      FMessage: strMethodMissingPostCon;
+      FDescription: strMethodMissingPostConDesc;
+      FConflictType: dciMissing),
+    (FCategory: strMethodPostConDocumentation;
+      FMessage: strMethodTooManyPostCons;
+      FDescription: strMethodTooManyPostConsDesc;
+      FConflictType: dciMissing),
+
+    (FCategory: strModuleInitSection;
+      FMessage: strMissingInitComment;
+      FDescription: strMissingInitCommentDesc;
+      FConflictType: dciMissing),
+    (FCategory: strModuleFinalSection;
+      FMessage: strMissingFinalComment;
+      FDescription: strMissingFinalComment;
+      FConflictType: dciMissing)
+  );
 
 Var
   (** This is a global string list containing the special tags list. It is
@@ -2684,6 +2201,14 @@ Implementation
 
 Uses
   Windows, StrUtils;
+
+Var
+  (** This variable provides an incremental number of making doc conflict
+      messages unique. **)
+  iDocConflictCounter: Integer;
+  (** This private variable holds the root of the module for the insertion
+      of the documentation conflicts. It is set in TBaseLanguageModule.Create **)
+  objModuleRootElement : TElementContainer;
 
 (**
 
@@ -2750,400 +2275,6 @@ Begin
     If Not (strToken[i] In strWhiteSpace) And
       Not (strToken[i] In strLineEnd)Then
       Result := False;
-End;
-
-(**
-
-  This function converts a freeform text string representing dates and times
-  in standard formats in to a TDateTime value.
-
-  @precon  strDate is the string to convert into a date.
-  @postcon Returns a valid TDateTime value.
-
-  @param   strDate as a String
-  @return  a TDateTime
-
-**)
-Function TBaseLanguageModule.ConvertDate(Const strDate : String) : TDateTime;
-
-Type
-  TDateRec = Record
-    iDay, iMonth, iYear, iHour, iMinute, iSecond : Word;
-  End;
-
-Const
-  strErrMsg = 'Can not convert the date "%s" to a valid TDateTime value.';
-  Delimiters : Set Of Char = ['-', ' ', '\', '/', ':'];
-  Days : Array[1..7] Of String = ('fri', 'mon', 'sat', 'sun', 'thu', 'tue', 'wed');
-  Months : Array[1..24] Of String = (
-    'apr', 'april',
-    'aug', 'august',
-    'dec', 'december',
-    'feb', 'february',
-    'jan', 'january',
-    'jul', 'july',
-    'jun', 'june',
-    'mar', 'march',
-    'may', 'may',
-    'nov', 'november',
-    'oct', 'october',
-    'sep', 'september'
-    );
-  MonthIndexes : Array[1..24] Of Word = (
-    4, 4,
-    8, 8,
-    12, 12,
-    2, 2,
-    1, 1,
-    7, 7,
-    6, 6,
-    3, 3,
-    5, 5,
-    11, 11,
-    10, 10,
-    9, 9
-  );
-
-Var
-  i : Integer;
-  sl : TStringList;
-  strToken : String;
-  iTime : Integer;
-  recDate : TDateRec;
-  tmp : Word;
-  iIndex0, iIndex1, iIndex2 : Integer;
-
-  (**
-
-    This procedure adds the token to the specified string list and clears the
-    token.
-
-    @precon  StringList is the string list to add the token too and strToken is
-             the token to add to the list.
-    @postcon Adds the token to the specified string list and clears the
-             token.
-
-    @param   StringList as a TStringList
-    @param   strToken   as a String as a reference
-
-  **)
-  Procedure AddToken(StringList : TStringList; var strToken  : String);
-
-  Begin
-    If strToken <> '' Then
-      Begin
-        StringList.Add(strToken);
-        strToken := '';
-      End;
-  End;
-
-  (**
-
-    This procedure tries to extract the value from the indexed string list
-    item into the passed variable reference. It delete is true it remove the
-    item from the string list.
-
-    @precon  iIndex is the index of the item from the string list to extract,
-             iValue is a word variable to place the converted item into and
-             Delete determines whether the item is removed from the string list.
-    @postcon Tries to extract the value from the indexed string list
-             item into the passed variable reference.
-
-    @param   iIndex as an Integer
-    @param   iValue as a Word as a reference
-    @param   Delete as a Boolean
-
-  **)
-  Procedure ProcessValue(iIndex : Integer; var iValue : Word; Delete : Boolean);
-
-  Begin
-    If iIndex <= sl.Count - 1 Then
-      Begin
-        Val(sl[iIndex], iValue, i);
-        If i <> 0 Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-        If Delete Then
-          sl.Delete(iIndex);
-      End;
-  End;
-
-  (**
-
-    This procedure assigns string list indexes to the three index values
-    according to the short date format and what information is supplied.
-
-    @precon  None.
-    @postcon Assigns string list indexes to the three index values according to
-             the short date format and what information is supplied.
-
-  **)
-  Procedure AssignIndexes();
-
-  Var
-    slFormat : TStringList;
-    str : String;
-    j : Integer;
-
-  Begin
-    iIndex0 := 0; // Default Day / Month / Year
-    iIndex1 := 1;
-    iIndex2 := 2;
-    slFormat := TstringList.Create;
-    Try
-      str := '';
-      For j := 1 To Length(ShortDateFormat) Do
-        If ShortDateFormat[j] In Delimiters Then
-          AddToken(slFormat, str)
-        Else
-          str := str + ShortDateFormat[j];
-      AddToken(slFormat, str);
-      // Remove day of week
-      For j := slFormat.Count - 1 DownTo 0 Do
-        If (slFormat[j][1] In ['d', 'D']) And (Length(slFormat[j]) > 2) Then
-          slFormat.Delete(j);
-      For j := 0 To slFormat.Count - 1 Do
-        Begin
-          If slFormat[j][1] In ['d', 'D'] Then iIndex0 := j;
-          If slFormat[j][1] In ['m', 'M'] Then iIndex1 := j;
-          If slFormat[j][1] In ['y', 'Y'] Then iIndex2 := j;
-        End;
-    Finally
-      slFormat.Free;
-    End;
-  End;
-
-Begin
-  Result := 0;
-  sl := TStringList.Create;
-  Try
-    strToken := '';
-    iTime := -1;
-    For i := 1 To Length(strDate) Do
-      If strDate[i] In Delimiters Then
-        Begin
-          AddToken(sl, strToken);
-          If (strDate[i] = ':') And (iTime = -1) Then iTime := sl.Count - 1;
-        End Else
-          strToken := strToken + strDate[i];
-    AddToken(sl, strToken);
-    FillChar(recDate, SizeOf(recDate), 0);
-    // Decode time
-    If iTime > -1 Then
-      Begin
-        ProcessValue(iTime,recDate.iHour, True);
-        ProcessValue(iTime,recDate.iMinute, True);
-        ProcessValue(iTime,recDate.iSecond, True);
-      End;
-    // Remove day value if present
-    For i := sl.Count - 1 DownTo 0 Do
-      If IsKeyWord(sl[i], Days) Then
-        sl.Delete(i);
-    // Decode date
-    Case sl.Count Of
-      1 :
-        Begin
-          DecodeDate(Now, recDate.iYear, recDate.iMonth, tmp);
-          ProcessValue(0, recDate.iDay, False); // Day only
-        End;
-      2, 3 : // Day and Month (Year)
-        Begin
-          DecodeDate(Now, recDate.iYear, tmp, tmp);
-          AssignIndexes;
-          ProcessValue(iIndex0, recDate.iDay, False); // Get day
-          If IsKeyWord(sl[iIndex1], Months) Then
-            Begin
-              For i := Low(Months) To High(Months) Do
-                If AnsiCompareText(Months[i], sl[iIndex1]) = 0 Then
-                  Begin
-                    recDate.iMonth := MonthIndexes[i];
-                    Break;
-                  End;
-            End Else
-              ProcessValue(iIndex1, recDate.iMonth, False); // Get Month
-            If sl.Count = 3 Then
-              Begin
-                ProcessValue(iIndex2, recDate.iYear, False); // Get Year
-                If recDate.iYear < 1900 Then Inc(recDate.iYear, 2000);
-              End;
-        End;
-    Else
-      If sl.Count <> 0 Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-    End;
-    // Output result.
-    With recDate Do
-      Begin
-        If Not (iHour In [0..23]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-        If Not (iMinute In [0..59]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-        If Not (iSecond In [0..59]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-        Result := EncodeTime(iHour, iMinute, iSecond, 0);
-        If iYear * iMonth * iDay <> 0 Then
-          Begin
-            If Not (iDay In [1..31]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-            If Not (iMonth In [1..12]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-            Result := Result + EncodeDate(iYear, iMonth, iDay);
-          End;
-      End;
-  Finally
-    sl.Free;
-  End;
-End;
-
-(**
-
-  This is a TObjectList custom sort procedure for the TIdentList class.
-
-  @precon  None.
-  @postcon Compares the 2 items and returns the comparison, If item12 < item2
-           then -1, if the same then 0, and if item1 > item 2 then +1.
-
-  @param   Item1 as a Pointer
-  @param   Item2 as a Pointer
-  @return  an Integer
-
-**)
-Function SortIdentList(Item1, Item2 : Pointer) : Integer;
-
-Begin
-  Result := AnsiCompareText(TIdent(Item1).Ident, TIdent(Item2).Ident);
-End;
-
-(**
-
-  This is a TObjectList custom sort procedure for the
-  TGenericContainerCollection class.
-
-  @precon  None.
-  @postcon Compares the 2 items and returns the comparison, If item12 < item2
-           then -1, if the same then 0, and if item1 > item 2 then +1.
-
-  @param   Item1 as a Pointer
-  @param   Item2 as a Pointer
-  @return  an Integer
-
-**)
-Function SortGenericContainerCollection(Item1, Item2 : Pointer) : Integer;
-
-Begin
-  Result := AnsiCompareText(TGenericContainer(Item1).Identifier,
-    TGenericContainer(Item2).Identifier);
-End;
-
-(**
-
-  This is a TObjectList custom sort procedure for the TMethodCollection class.
-
-  @precon  None.
-  @postcon Compares the 2 items and returns the comparison, If item12 < item2
-           then -1, if the same then 0, and if item1 > item 2 then +1.
-
-  @param   Item1 as a Pointer
-  @param   Item2 as a Pointer
-  @return  an Integer
-
-**)
-Function SortMethodCollection(Item1, Item2 : Pointer) : Integer;
-
-Begin
-  Result := AnsiCompareText(TMethodDecl(Item1).QualifiedName,
-    TMethodDecl(Item2).QualifiedName);
-End;
-
-(**
-
-  This is a TObjectList custom sort procedure for the TRecordDecl class.
-
-  @precon  None.
-  @postcon Compares the 2 items and returns the comparison, If item12 < item2
-           then -1, if the same then 0, and if item1 > item 2 then +1.
-
-  @param   Item1 as a Pointer
-  @param   Item2 as a Pointer
-  @return  an Integer
-
-**)
-Function SortRecordDecl(Item1, Item2 : Pointer) : Integer;
-
-Begin
-  Result := AnsiCompareText(TParameter(Item1).Identifier,
-    TParameter(Item2).Identifier);
-End;
-
-(**
-
-  This is a TObjectList custom sort procedure for the TMethodDecl class.
-
-  @precon  None.
-  @postcon Compares the 2 items and returns the comparison, If item12 < item2
-           then -1, if the same then 0, and if item1 > item 2 then +1.
-
-  @param   Item1 as a Pointer
-  @param   Item2 as a Pointer
-  @return  an Integer
-
-**)
-Function SortMethodDecl(Item1, Item2 : Pointer) : Integer;
-
-Begin
-  Result := AnsiCompareText(TMethodDecl(Item1).Identifier,
-    TMethodDecl(Item2).Identifier);
-End;
-
-(**
-
-  This is a TObjectList custom sort procedure for the TClassDecl class.
-
-  @precon  None.
-  @postcon Compares the 2 items and returns the comparison, If item12 < item2
-           then -1, if the same then 0, and if item1 > item 2 then +1.
-
-  @param   Item1 as a Pointer
-  @param   Item2 as a Pointer
-  @return  an Integer
-
-**)
-Function SortClassDecl(Item1, Item2 : Pointer) : Integer;
-
-Begin
-  Result := AnsiCompareText(TProperty(Item1).Identifier,
-    TProperty(Item2).Identifier);
-End;
-
-(**
-
-  This is a custom sort method for the DocConflictClass which allows the
-  internal sort method to sort the documentation conflicts.
-
-  @precon  None.
-  @postcon Compares the 2 items and returns the comparison, If item12 < item2
-           then -1, if the same then 0, and if item1 > item 2 then +1.
-
-  @param   Item1 as a Pointer
-  @param   Item2 as a Pointer
-  @return  an Integer
-
-**)
-Function CompareDocConflicts(Item1, Item2 : Pointer) : Integer;
-
-Begin
-  Result := AnsiCompareText(
-    TDocumentConflict(Item1).Category + '.' + TDocumentConflict(Item1).Message,
-    TDocumentConflict(Item2).Category + '.' + TDocumentConflict(Item2).Message)
-
-End;
-
-(**
-
-  This method increments the internal count of the number of dimensions of the
-  array.
-
-  @precon  None.
-  @postcon Increments the internal count of the number of dimensions of the
-           array.
-
-**)
-Procedure TArrayType.AddDimension;
-
-Begin
-  Inc(FDimensions);
 End;
 
 (**
@@ -3825,6 +2956,193 @@ end;
 
 (**
 
+  This method adds and passed elemtn container to this classes element
+  collection.
+
+  @precon  AElement must be a valid TElementContainer.
+  @postcon Adds and passed elemtn container to this classes element
+           collection.
+
+  @param   AElement as a TElementContainer
+  @return  a TElementContainer
+
+**)
+Function TElementContainer.Add(AElement: TElementContainer) : TElementContainer;
+
+Var
+  i : Integer;
+
+begin
+  Result := AElement;
+  If AElement = Nil Then
+    Exit;
+  Assert(AElement.Name <> '', 'AElement is NULL!');
+  i := Find(AElement.Name);
+  If i < 0 Then
+    FElements.Insert(Abs(i) - 1, AElement)
+  Else
+    Begin
+      Result := FElements[i -1] As TElementContainer;
+      Result.Comment.Assign(AElement.Comment);
+      (** Free AElement after getting the comment as it will leak otherwise. **)
+      AElement.Free;
+    End;
+end;
+
+(**
+
+  This method adds and passed Token to this classes element collection.
+
+  @precon  Token must be a valid TTokenInfo and AComment must be either nil or
+           a valid TComment instance.
+  @postcon Adds and passed elemtn container to this classes element
+           collection.
+
+  @param   Token       as a TTokenInfo
+  @param   AScope      as a TScope
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+  @return  a TElementContainer
+
+**)
+Function TElementContainer.Add(Token: TTokenInfo; AScope : TScope;
+  AImageIndex : TImageIndex; AComment: TComment) : TElementContainer;
+
+Var
+  i : Integer;
+
+begin
+  Assert(Token.Token <> '', 'Token is NULL!');
+  i := Find(Token.Token);
+  If i < 0 Then
+    Begin
+      Result := TElementContainer.Create(Token.Token, AScope, Token.Line,
+        Token.Column, AImageIndex, AComment);
+      FElements.Insert(Abs(i) - 1, Result);
+    End Else
+    Begin
+      Result := FElements[i - 1] As TElementContainer;
+      Result.Comment.Assign(AComment);
+    End;
+end;
+
+(**
+
+  This method adds a string token to the container as a sub container NOT a
+  token.
+
+  @precon  None.
+  @postcon Returns an instance of the sub container created around the token.
+
+  @param   strToken    as a String
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+  @return  a TElementContainer
+
+**)
+function TElementContainer.Add(strToken: String; AImageIndex: TImageIndex;
+  AComment: TComment): TElementContainer;
+
+Var
+  i : Integer;
+
+begin
+  Assert(strToken <> '', 'strToken is NULL!');
+  i := Find(strToken);
+  If i < 0 Then
+    Begin
+      Result := TElementContainer.Create(strToken, scNone, 0, 0, AImageIndex, AComment);
+      FElements.Insert(Abs(i) - 1, Result);
+    End Else
+    Begin
+      Result := FElements[i - 1] As TElementContainer;
+      Result.Comment.Assign(AComment);
+    End;
+end;
+
+(**
+
+  This method adds a specific documentation conflict to the Docuemntation
+  conflict collection.
+
+  @precon  None.
+  @postcon Adds a specific documentation conflict to the Docuemntation
+           conflict collection.
+
+  @param   Args            as an Array Of TVarRec constant
+  @param   iIdentLine      as an Integer
+  @param   iIdentColumn    as an Integer
+  @param   AComment        as a TComment
+  @param   DocConflictType as a TDocConflictType
+
+**)
+procedure TElementContainer.AddDocumentConflict(Const Args: Array of TVarRec;
+  iIdentLine, iIdentColumn : Integer; AComment : TComment;
+  DocConflictType : TDocConflictType);
+
+Var
+  E, I : TElementContainer;
+  iL, iC : Integer;
+  iIcon : TImageIndex;
+
+begin
+  iL := 0;
+  iC := 0;
+  If AComment <> Nil Then
+    Begin
+      iL := AComment.Line;
+      iC := AComment.Col;
+    End;
+  Case DocConflictTable[DocConflictType].FConflictType Of
+    dciMissing : iIcon := iiDocConflictMissing;
+    dciIncorrect : iIcon := iiDocConflictIncorrect;
+  Else
+    iIcon := iiDocConflictItem;
+  End;
+  Assert(objModuleRootElement <> Nil, 'objModuleRootElement CAN NOT BE NULL!');
+  E := objModuleRootElement.FindElement(strDocumentationConflicts);
+  If E = Nil Then
+    Begin
+      E := TElementContainer.Create(strDocumentationConflicts, scGlobal, 0, 0,
+        iiDocConflictFolder, Nil);
+      E := objModuleRootElement.Add(E);
+    End;
+  I := E.FindElement(DocConflictTable[DocConflictType].FCategory);
+  If I = Nil Then
+    Begin
+      I := TElementContainer.Create(DocConflictTable[DocConflictType].FCategory,
+        scGlobal, 0, 0, iiDocConflictFolder, Nil);
+      I := E.Add(I);
+    End;
+  I.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iL, iC,
+    DocConflictTable[DocConflictType].FMessage,
+    DocConflictTable[DocConflictType].FDescription, iIcon));
+end;
+
+(**
+
+  This methof adds the given elements tokens to the current containers tokens.
+
+  @precon  None.
+  @postcon Adds the given elements tokens to the current containers tokens.
+
+  @param   AElement as a TElementContainer
+
+**)
+procedure TElementContainer.AddTokens(AElement: TElementContainer);
+
+Var
+  i : Integer;
+
+begin
+  If AElement = Nil Then
+    Exit;
+  For i := 0 To AElement.TokenCount - 1 Do
+    AppendToken(AElement.Tokens[i]);
+end;
+
+(**
+
   This method appends the given string to the end of the token.
 
   @precon  None.
@@ -3843,659 +3161,364 @@ End;
 
 (**
 
-  This is the constructor method for the TIdent class.
+  This method adds a TTokenInfo instance to the Token collection.
 
-  @precon  strIdent is the name of the new identifier, iLine is the line number
-           of the identifier, iCol is the column number of the identifier and
-           Comment is the comment associated with the identifier.
-  @postcon Create the Ident class.
+  @precon  AToken must be a valid instance of a TTokenInfo class.
+  @postcon Adds a TTokenInfo instance to the Token collection.
 
-  @param   strIdent as a String
-  @param   iLine    as an Integer
-  @param   iCol     as an Integer
-  @param   Comment  as a TComment
+  @param   AToken as a TTokenInfo
 
 **)
-constructor TIdent.Create(strIdent: String; iLine, iCol: Integer;
-  Comment: TComment);
+procedure TElementContainer.AppendToken(AToken: TTokenInfo);
 begin
-  FIdent := strIdent;
-  FLine := iLine;
-  FCol := iCol;
-  FComment := Comment;
+  FTokens.Add(TTokenInfo.Create(AToken.Token, AToken.BufferPos, AToken.Line,
+    AToken.Column, AToken.Length, AToken.TokenType));
 end;
 
-(** --------------------------------------------------------------------------
-
-  TIdentList Methods
-
- -------------------------------------------------------------------------- **)
-
 (**
 
-  This is the constructor for the TIdentList class. It creates an internal
-  TStringlist for storing the identifiers.
+  This method appends the given string as a token in the containers token list.
 
   @precon  None.
-  @postcon Initialises the class.
+  @postcon Appends the given string as a token in the containers token list.
+
+  @param   strToken as a String
 
 **)
-Constructor TIdentList.Create;
-
-Begin
-  Inherited Create;
-  FComment := Nil;
-  FIdents := TObjectList.Create(True);
-End;
-
-(**
-
-  This is the destructor for the TIdentList class and it free the internal
-  StringList.
-
-  @precon  None.
-  @postcon Frees the memory allocated for the idents.
-
-**)
-destructor TIdentList.Destroy;
+procedure TElementContainer.AppendToken(strToken: String);
 begin
-  FIdents.Free;
+  FTokens.Add(TTokenInfo.Create(strToken, 0, 0, 0, 0, ttUnknown));
+end;
+
+(**
+
+  This method copies the tokens from the source into this element replacing any
+  token that already exist.
+
+  @precon  Source must be a valid TElementContainer.
+  @postcon Copies the tokens from the source into this element replacing any
+           token that already exist.
+
+  @param   Source as a TElementContainer
+
+**)
+procedure TElementContainer.Assign(Source: TElementContainer);
+
+Var
+  iToken : Integer;
+
+begin
+  FName := Source.FName;
+  FScope := Source.FScope;
+  FLine := Source.FLine;
+  FColumn := Source.FColumn;
+  FComment := Nil;
+  If Source.Comment <> Nil Then
+    FComment := TComment.Create(Source.Comment);
+  FImageIndex := Source.FImageIndex;
+  FTokens.Clear;
+  For iToken :=  0 To Source.TokenCount - 1 Do
+    AppendToken(Source.Tokens[iToken]);
+end;
+
+(**
+
+  This method recrusively checks the documentation of the module. Descendants
+  need to override this to implement document checking.
+
+  @precon  None.
+  @postcon Recrusively checks the documentation of the module.
+
+**)
+procedure TElementContainer.CheckDocumentation;
+
+Var
+  i : Integer;
+
+begin
+  For i := 1 To ElementCount Do
+    Elements[i].CheckDocumentation;
+end;
+
+(**
+
+  This is the constructor method for the TElementContainer class.
+
+  @precon  AComment must be either nil or a valid TComment instance.
+  @postcon Creates an instance of the element container.
+
+  @param   strName     as a String
+  @param   AScope      as a TScope
+  @param   iLine       as an Integer
+  @param   iColumn     as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+
+**)
+constructor TElementContainer.Create(strName: String; AScope : TScope;
+  iLine, iColumn : Integer; AImageIndex : TImageIndex; AComment: TComment);
+
+begin
+  FElements := TObjectList.Create(True);
+  FTokens := TObjectList.Create(True);
+  FName := strName;
+  FLine := iLine;
+  FColumn := iColumn;
+  FComment := AComment;
+  FScope := AScope;
+  FImageIndex := AImageIndex;
+end;
+
+(**
+
+  This method deletes the indexed element from the collection.
+
+  @precon  iIndex must be a valid index between 1 and ElementCount.
+  @postcon Deletes the indexed element from the collection.
+
+  @param   iIndex as an Integer
+
+**)
+procedure TElementContainer.DeleteElement(iIndex: Integer);
+
+begin
+  FElements.Delete(iIndex - 1);
+end;
+
+(**
+
+  This is the destructor method for the TElementContainer class.
+
+  @precon  None.
+  @postcon Destroys the instance of the class.
+
+**)
+destructor TElementContainer.Destroy;
+begin
+  FTokens.Free;
+  FElements.Free;
   inherited;
 end;
 
 (**
 
-  This method returns the index of the identifer which matches the given
-  identifier else returns -1.
+  This method returns the position of the named container in the current
+  containers collection if found else returns the position (as a negative)
+  where the item should be inserted in the collection.
 
   @precon  None.
-  @postcon Returns the index of the identifer which matches the given
-           identifier else returns -1.
+  @postcon Returns the position of the named container in the current
+           containers collection if found else returns the position (as a
+           negative) where the item should be inserted in the collection.
 
-  @param   strIdent as a String
-  @return  an Integer 
+  @param   strName as a String
+  @return  an Integer
 
 **)
-Function TIdentList.Find(strIdent : String) : Integer;
+function TElementContainer.Find(strName: String): Integer;
+
+Var
+  iFirst : Integer;
+  iMid : Integer;
+  iLast : Integer;
+
+begin
+  Result := -1;
+  iFirst := 1;
+  iLast := FElements.Count;
+  While iFirst <= iLast Do
+    Begin
+      iMid := (iFirst + iLast) Div 2;
+      If AnsiCompareText(Elements[iMid].Name, strName) = 0 Then
+        Begin
+          Result := iMid;
+          Break;
+        End Else
+      If AnsiCompareText(Elements[iMid].Name, strName) > 0 Then
+        iLast := iMid - 1
+      Else
+        iFirst := iMid + 1;
+    End;
+  If Result < 0 Then
+    Result := -iFirst;
+end;
+
+(**
+
+  This method searches the elements collection of and instance matching the
+  given name.
+
+  @precon  None.
+  @postcon Returns either instance of the found item or returns nil.
+
+  @param   strName as a String
+  @return  a TElementContainer
+
+**)
+function TElementContainer.FindElement(strName: String): TElementContainer;
 
 Var
   i : Integer;
 
-Begin
+begin
+  Result := Nil;
+  i := Find(strName);
+  If i > 0 Then
+    Result := Elements[i];
+end;
+
+(**
+
+  This function finds the occurance of the token and returns its index if found
+  else returns -1.
+
+  @precon  None.
+  @postcon Finds the occurance of the token and returns its index if found
+           else returns -1.
+
+  @param   strToken as a String
+  @return  an Integer
+
+**)
+function TElementContainer.FindToken(strToken: String): Integer;
+
+var
+  i: Integer;
+
+begin
   Result := -1;
-  For i := 0 To Count - 1 Do
-    If AnsiCompareText(strIdent, Idents[i].Ident) = 0 Then
+  For i := 0 To TokenCount - 1 Do
+    If strToken = Tokens[i].Token Then
       Begin
         Result := i;
         Break;
       End;
-End;
+end;
 
 (**
 
-  This method is a getter method for the Count property.
+  This is a getter method for the AsString property.
 
   @precon  None.
-  @postcon Returns the number of identifiers in the collection.
+  @postcon Returns the name of the element followed by the list of tokens.
+
+  @return  a String
+
+**)
+function TElementContainer.GetAsString: String;
+
+begin
+  Result := FName;
+end;
+
+(**
+
+  This method returns the adjusted image index the element based on the scope.
+
+  @precon  None.
+  @postcon Returns the adjusted image index the element based on the scope.
 
   @return  an Integer
 
 **)
-Function TIdentList.GetCount : Integer;
+Function TElementContainer.GetImageIndexAdjustedForScope : Integer;
 
 Begin
-  Result := FIdents.Count;
+  Case FScope Of
+    scPrivate   : Result := Integer(ImageIndex) - Integer(Succ(iiNone)) + 1;
+    scPublished : Result := Integer(ImageIndex) - Integer(Succ(iiNone)) + 2;
+    scProtected : Result := Integer(ImageIndex) - Integer(Succ(iiNone)) + 3;
+    scLocal     : Result := Integer(ImageIndex) - Integer(Succ(iiNone)) + 4;
+  Else
+    // scPublic, scGlobal, scNone
+    Result := Integer(ImageIndex) - Integer(Succ(iiNone));
+  End;
 End;
 
 (**
 
-  This is a getter method for the IndentInfo property.
-
-  @precon  iIndex is the index of the item in the collection required.
-  @postcon Returns an identifier class for the identifier requested.
-
-  @param   iIndex as an Integer
-  @return  a TIdent
-
-**)
-Function TIdentList.GetIdentInfo(iIndex : Integer) : TIdent;
-
-Begin
-  Result := FIdents[iIndex] As TIdent;
-End;
-
-(**
-
-  This method sort the identity list.
+  This is a getter method for the Name property.
 
   @precon  None.
-  @postcon Sort yhe identity list.
-
-**)
-procedure TIdentList.Sort;
-
-begin
-  Inherited;
-  FIdents.Sort(SortIdentList);
-end;
-
-(**
-
-  This method adds an identifier to the internal string list and stores the
-  line number in the lower 16 bits of the Data pointer and the column number
-  in the upper 16 bits of the Data pointer.
-
-  @precon  strIdent is a text identifier to add to the collection, iLine is the
-           line number of the identifier, iCol is the column number of the
-           collection and Comment is the comment to be associated with the
-           identifier.
-  @postcon Adds an identifier to the internal string list and stores the
-           line number in the lower 16 bits of the Data pointer and the column
-           number in the upper 16 bits of the Data pointer.
-
-  @param   strIdent as a String
-  @param   iLine    as an Integer
-  @param   iCol     as an Integer
-  @param   Comment  as a TComment
-
-**)
-Procedure TIdentList.Add(strIdent : String; iLine, iCol : Integer;
-  Comment : TComment);
-
-Begin
-  FIdents.Add(TIdent.Create(strIdent, iLine, iCol, Comment));
-End;
-
-(**
-
-  This method added the contents of the source ident list to this ident list.
-
-  @precon  src is another valid identifier object to get identifiers from.
-  @postcon Added the contents of the source ident list to this ident list.
-
-  @param   src as a TIdentList
-
-**)
-Procedure TIdentList.Assign(src : TIdentList);
-
-Var
-  i : Integer;
-
-Begin
-  For i := 0 To src.Count - 1 Do
-    Add(src[i].Ident, src[i].Line, src[i].Col, src[i].Comment);
-End;
-
-(**
-
-  This method returns the ident list as a comma separated list of tokens.
-
-  @precon  None.
-  @postcon Returns a string representation of the identifiers comma separated.
+  @postcon Returns the name of the element. This can be override for the
+           purposes of find / sorting the elements. Identifier still returns
+           the FName variable.
 
   @return  a String
 
 **)
-function TIdentList.AsString: String;
-
-Var
-  I : Integer;
-
+function TElementContainer.GetName: String;
 begin
-  Result := '';
-  For i := 0 To FIdents.Count - 1 Do
-    Begin
-      If Result <> '' Then
-        Result := Result + ', ';
-      Result := Result + Idents[i].Ident;
-    End;
+  Result := FName;
 end;
-
-(** --------------------------------------------------------------------------
-
-  TConstant Methods
-
- ------------------------------------------------------------------------- **)
-
-(**
-
-  This is the constructor for the TConstant class. It creates an internal
-  TStringList for the constants text.
-
-  @precon  None
-  @postcon It creates an internal StringList for the constants text.
-
-**)
-Constructor TGenericContainer.Create;
-
-Begin
-  Inherited Create;
-  FComment := Nil;
-  FTokens := TStringList.Create;
-  FIdentifier := '';
-  FScope := scPrivate;
-  FLine := 0;
-  FCol := 0;
-End;
-
-(**
-
-  This is the constructor for the TConstant class. It creates an internal
-  TStringList for the constants text and initialises the identifier, scope
-  line and column attributes.
-
-  @precon  strIdentifier is a text identifier for the item to be created,
-           Scope is the scope of the item, iLine is the line number of the
-           item and iCol is the column number of the item.
-  @postcon It creates an internal StringList for the constants text and
-           initialises the identifier, scope line and column attributes.
-
-  @param   strIdentifier as a String
-  @param   Scope         as a TScope
-  @param   iLine         as an Integer
-  @param   iCol          as an Integer
-
-**)
-Constructor TGenericContainer.Create(strIdentifier  :String; Scope : TScope;
-  iLine, iCol : Integer);
-
-Begin
-  Self.Create;
-  FIdentifier := strIdentifier;
-  FScope := Scope;
-  FLine := iLine;
-  FCol := iCol;
-End;
-
-(**
-
-  This is the constructor for the TConstant class. It creates an internal
-  TStringList for the constants text and initialises the identifier, scope
-  line and column attributes.
-
-  @precon  Ident is a identifier info create to create the item from.
-  @postcon It creates an internal TStringList for the constants text and
-           initialises the identifier, scope line and column attributes.
-
-  @param   Ident as a TIdentInfo
-
-**)
-constructor TGenericContainer.Create(Ident: TIdentInfo);
-begin
-  Self.Create;
-  FIdentifier := Ident.Ident;
-  FScope := Ident.Scope;
-  FLine := Ident.Line;
-  FCol := Ident.Col;
-end;
-
-(**
-
-  This is the TConstant classes destructor. It frees the internal TStringList.
-
-  @precon  None.
-  @postcon It frees the internal TStringList.
-
-**)
-Destructor TGenericContainer.Destroy;
-
-Begin
-  FTokens.Free;
-  Inherited Destroy;
-End;
-
-(**
-
-  This method adds the passed token to the internal string list.
-
-  @precon  strToken is a text token to add to the collection.
-  @postcon Adds the passed token to the internal string list.
-
-  @param   strToken as a String
-
-**)
-Procedure TGenericContainer.Add(strToken : String);
-
-Begin
-  FTokens.Add(strToken);
-End;
-
-(**
-
-  This is a getter method for the Token property.
-
-  @precon  iIndex is the index of the token required.
-  @postcon Returns the required token as a string.
-
-  @param   iIndex as an Integer
-  @return  a String
-
-**)
-Function TGenericContainer.GetToken(iIndex : Integer) : String;
-
-Begin
-  Result := FTokens[iIndex];
-End;
-
-(**
-
-  This is a getter method for the TokenCount property.
-
-  @precon  None.
-  @postcon returns the number of tokens in the collection.
-
-  @return  an Integer
-
-**)
-Function TGenericContainer.GetTokenCount : Integer;
-
-Begin
-  Result := FTokens.Count;
-End;
-
-(**
-
-  This method allows the contents of a source string list to be assigned to
-  the internal string list.
-
-  @precon  src is another generic container collection to get tokens from.
-  @postcon Allows the contents of a source string list to be assigned to
-           the internal string list.
-
-  @param   src as a TPersistent
-
-**)
-Procedure TGenericContainer.Assign(src : TPersistent);
-
-Begin
-  If FTokens <> Nil Then
-    FTokens.Assign(src);
-End;
-
-(**
-
-  This method appends the tokens in the src container on to the end of this
-  container.
-
-  @precon  src is another generic container collection to append tokens from.
-  @postcon Appends the tokens in the src container on to the end of this
-           container.
-
-  @param   src as a TGenericContainer
-
-**)
-procedure TGenericContainer.Append(src: TGenericContainer);
-
-Var
-  i : Integer;
-
-begin
-  If FTokens <> Nil Then
-    For i := 0 To src.Count - 1 Do
-      FTokens.Add(src[i]);
-end;
-
-(**
-
-  This method return the value of the constant as a string.
-
-  @precon  ShowFirstToken tells the method to display the first token in the
-           returned string.
-  @postcon Returns a string representation of the item.
-
-  @param   ShowFirstToken as a Boolean
-  @return  a String
-
-**)
-function TGenericContainer.AsString(ShowFirstToken : Boolean): String;
-
-Var
-  i : Integer;
-
-begin
-  Result := '';
-  For i := (1 - Integer(ShowFirstToken)) To FTokens.Count - 1 Do
-    Begin
-      If Result <> '' Then
-        Result := Result + #32;
-      Result := Result + FTokens[i];
-    End;
-end;
-
-(**
-
-  This method allows the insertion of the given text in to the token collection
-  at the given index.
-
-  @precon  strText is a string token to insert into the container and iIndex is
-           the position where the token should be inserted.
-  @postcon Allows the insertion of the given text in to the token collection
-           at the given index.
-
-  @param   strText as a String
-  @param   iIndex  as an Integer
-
-**)
-procedure TGenericContainer.Insert(strText: String; iIndex: Integer);
-
-begin
-  FTokens.Insert(iIndex, strText);
-end;
-
-(**
-
-  This method is a virtual sort method not implemented, but should be
-  overridden by descendants.
-
-  @precon  None.
-  @postcon None.
-
-**)
-procedure TGenericContainer.Sort;
-begin
-  // Do nothing - all descendants need to implement and override this method.
-end;
-
-(** --------------------------------------------------------------------------
-
-  TGenericContainerCollection Methods
-
- -------------------------------------------------------------------------- **)
-
-(**
-
-  This is the ConstantCollections constructor. It creates a object list to hold
-  and manage all the constants that are added to the collection.
-
-  @precon  OwnItems tells the collection to dispose of the memory belonging to
-           the items in the collection, else its the responsibility if the
-           creator.
-  @postcon It creates a object list to hold and manage all the constants that
-           are added to the collection.
-
-  @param   OwnItems as a Boolean
-
-**)
-Constructor TGenericContainerCollection.Create(OwnItems : Boolean);
-
-Begin
-  Inherited Create;
-  FComment := Nil;
-  FItems := TObjectList.Create(OwnItems);
-End;
-
-(**
-
-  This is the constant collection destructor method. It frees the object list
-  and in turn frees all the constants added.
-
-  @precon  None.
-  @postcon It frees the object list and in turn frees all the constants added.
-
-**)
-Destructor TGenericContainerCollection.Destroy;
-
-Begin
-  FItems.Free;
-  Inherited Destroy;
-End;
-
-(**
-
-  This method adds the specified constant to the internal collection.
-
-  @precon  AItem is generic container to add to the collection.
-  @postcon Adds the specified constant to the internal collection.
-
-  @param   AItem as a TGenericContainer
-
-**)
-Procedure TGenericContainerCollection.Add(AItem : TGenericContainer);
-
-Begin
-  FItems.Add(AItem);
-End;
-
-(**
-
-  This is a getter method for the Constant array property.
-
-  @precon  iIndex is the index of the item in the collection required.
-  @postcon Returns a generic container for the item requested.
-
-  @param   iIndex as an Integer
-  @return  a TGenericContainer
-
-**)
-Function TGenericContainerCollection.GetItem(iIndex : Integer) : TGenericContainer;
-
-Begin
-  Result := FItems[iIndex] As TGenericContainer;
-End;
 
 (**
 
   This is a getter method for the Count property.
 
   @precon  None.
-  @postcon returns the number of items in the collection.
+  @postcon Returns the number of Items in the Elements Collection.
 
   @return  an Integer
 
 **)
-Function TGenericContainerCollection.GetCount : Integer;
-
-Begin
-  Result := FItems.Count;
-End;
-
-(**
-
-  This method removes any forward declarations from the types collection.
-
-  @precon  None.
-  @postcon Removes any forward declarations from the types collection.
-
-**)
-Procedure TGenericContainerCollection.RemoveForwardDecls;
-
-Var
-  i : Integer;
-
-Begin
-  // Search for forward record, object, class and interface declarations and
-  // remove
-  For i := FItems.Count - 1 DownTo 0 Do
-    Begin
-      If Items[i] is TClassDecl Then
-        With Items[i] As TClassDecl Do
-          If Heritage.Count + Parameters.Count + Properties.Count + Methods.Count = 0 Then
-            FItems.Delete(i);
-    End;
-End;
-
-(**
-
-  This method sorts the classes Items list and then calls each item in term and
-  asks them to sort themselves.
-
-  @precon  None.
-  @postcon Sorts the classes Items list and then calls each item in term and
-           asks them to sort themselves.
-
-**)
-procedure TGenericContainerCollection.Sort;
-
-Var
-  i : Integer;
-
+function TElementContainer.GetElementCount: Integer;
 begin
-  Inherited;
-  FItems.Sort(SortGenericContainerCollection);
-  For i := 0 To Count - 1 Do
-    Items[i].Sort;
+  Result := FElements.Count;
 end;
 
 (**
 
-  This method finds th index in the collection of the specified class name else
-  returns -1.
+  This is a getter method for the Elements property.
 
-  @precon  strClassName is the name of the class of items to be found in the
-           collection.
-  @postcon Returns the index of the found item else returns -1.
+  @precon  iIndex must be a valid index into the elements collection.
+  @postcon Returns the instance of the indexed element.
 
-  @param   strClassName as a String
+  @param   iIndex as an Integer
+  @return  a TElementContainer
+
+**)
+function TElementContainer.GetElements(iIndex: Integer): TElementContainer;
+begin
+  Result := FElements[iIndex - 1] As TElementContainer;
+end;
+
+(**
+
+  This is a getter method for the TokenCount property.
+
+  @precon  None.
+  @postcon Returns the number of Tokens in the elements collection.
+
   @return  an Integer
 
 **)
-function TGenericContainerCollection.Find(strClassName: String): Integer;
-
-Var
-  i : Integer;
-
+function TElementContainer.GetTokenCount: Integer;
 begin
-  Result := -1;
-  For i := 0 To Count - 1 Do
-    If FItems[i] Is TObjectDecl Then
-      If AnsiCompareText(strClassName, (FItems[i] As TObjectDecl).Identifier) = 0 Then
-        Begin
-          Result := i;
-          Break;
-        End;
+  Result := FTokens.Count;
 end;
 
+(**
+
+  This is a getter method for the Tokens property.
+
+  @precon  iIndex must be a valid index into the Token collection.
+  @postcon Returns the instance of the indexed token.
+
+  @param   iIndex as an Integer
+  @return  a TTokenInfo
+
+**)
+function TElementContainer.GetTokens(iIndex: Integer): TTokenInfo;
+begin
+  Result := FTokens[iIndex] As TTokenInfo;
+end;
 
 (** --------------------------------------------------------------------------
 
   TParameter Methods
 
  -------------------------------------------------------------------------- **)
-
-(**
-
-  This method is a virtual assign procedure so that the properties of a
-  Parameter can be assigned to another instance of the same class.
-
-  @precon  Parameter is the parameter declaration to get information from.
-  @postcon A virtual assign procedure so that the properties of a Parameter can
-           be assigned to another instance of the same class.
-
-  @param   Parameter as a TParameter
-
-**)
-procedure TParameter.Assign(Parameter: TParameter);
-begin
-  FArrayOf := Parameter.ArrayOf;
-  FCol := Parameter.Col;
-  //FComment
-  FDefaultValue := Parameter.DefaultValue;
-  FIdentifier := Parameter.Identifier;
-  FLine := Parameter.Line;
-  FParamModifier := Parameter.ParamModifier;
-  FParamType.Append(Parameter.ParamType);
-  FScope := Parameter.Scope;
-end;
 
 (**
 
@@ -4515,29 +3538,29 @@ end;
   @param   ParamMod    as a TParamModifier
   @param   Ident       as a String
   @param   boolArrayOf as a Boolean
-  @param   AType       as a TTypeDecl
+  @param   AType       as a TGenericTypeDecl
   @param   Value       as a String
-  @param   Scope       as a TScope
+  @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iCol        as an Integer
 
 **)
-Constructor TParameter.Create(ParamMod : TParamModifier; Ident : String;
-  boolArrayOf : Boolean; AType : TTypeDecl;
-  Value : String; Scope : TScope; iLine, iCol : Integer);
+Constructor TGenericParameter.Create(ParamMod : TParamModifier; Ident : String;
+  boolArrayOf : Boolean; AType : TGenericTypeDecl;
+  Value : String; AScope : TScope; iLine, iCol : Integer);
 
 Begin
-  FParamType := TTypes.Create;
+  Inherited Create(Ident, AScope, iLine, iCol, iiNone, Nil);
   If AType <> Nil Then
-    FParamType.Append(AType);
+    Begin
+      FParamType := TElementContainerClass(AType.ClassType).Create('', AScope,
+        0, 0, iiNone, Nil) As TGenericTypeDecl;
+      FParamType.Assign(AType);
+    End;
   FParamModifier := ParamMod;
-  FIdentifier := Ident;
   FArrayOf := boolArrayOf;
   FDefaultValue := Value;
-  FScope := Scope;
-  FLine := iLine;
-  FCol := iCol;
-  FComment := Nil;
+  Assert(Ident <> '', 'Ident in TGenericParameter IS NULL!');
 End;
 
 (**
@@ -4549,103 +3572,11 @@ End;
   @postcon If frees the parameter type string list.
 
 **)
-destructor TParameter.Destroy;
+destructor TGenericParameter.Destroy;
 begin
   FParamType.Free;
   inherited;
 end;
-
-(**
-
-  This method adds a parameter class to the parameters collection.
-
-  @precon  Paremeter is a parameter to add to the method.
-  @postcon Adds a parameter class to the parameters collection.
-
-  @param   Parameter as a TParameter
-
-**)
-Procedure TParameterCollection.Add(Parameter : TParameter);
-
-Begin
-  FParameters.Add(Parameter);
-End;
-
-(**
-
-  This is a getter method for the Count property.
-
-  @precon  None.
-  @postcon Returns the number of parameters in the method.
-
-  @return  an Integer
-
-**)
-Function TParameterCollection.GetCount : Integer;
-
-Begin
-  Result := FParameters.Count;
-End;
-
-(**
-
-  This is a getter method for the Parameter array property.
-
-  @precon  iIndex is th eindex of the parameter required.
-  @postcon Returns a paramemter object for the specified item.
-
-  @param   iIndex as an Integer
-  @return  a TParameter
-
-**)
-Function TParameterCollection.GetParameter(iIndex : Integer) : TParameter;
-
-Begin
-  Result := FParameters[iIndex] As TParameter;
-End;
-
-(**
-
-  This is the constructor method for the TParameterCollection class.
-
-  @precon  None
-  @postcon Creates the parameter collection.
-
-**)
-Constructor TParameterCollection.Create;
-
-Begin
-  FParameters := TObjectList.Create(True);
-End;
-
-(**
-
-  This is the destructor method for the TParameterCollection class.
-
-  @precon  None.
-  @postcon Destroys the parameter collection.
-
-**)
-Destructor TParameterCollection.Destroy;
-
-Begin
-  FParameters.Free;
-  Inherited;
-End;
-
-(**
-
-  This method sorts the parameter collection.
-
-  @precon  None.
-  @postcon Sorts the parameter collection.
-
-**)
-Procedure TParameterCollection.Sort;
-
-Begin
-  FParameters.Sort(SortRecordDecl);
-End;
 
 (** --------------------------------------------------------------------------
 
@@ -4655,45 +3586,17 @@ End;
 
 (**
 
-  This method is a virtual assign procedure so that the properties of a
-  Property can be assigned to another instance of the same class.
+  This method adds a parameter to the property.
 
-  @precon  Prop is the property declaration to get information from.
-  @postcon Virtual assign procedure so that the properties of a Property can be
-           assigned to another instance of the same class.
+  @precon  AParameter must be a valid TGenericParameter descendant.
+  @postcon Adds a parameter to the property.
 
-  @param   Prop as a TProperty
+  @param   AParameter as a TGenericParameter
 
 **)
-procedure TProperty.Assign(Prop: TProperty);
-
-Var
-  i : Integer;
-  P : TParameter;
-
+procedure TGenericProperty.AddParameter(AParameter: TGenericParameter);
 begin
-  FCol := Prop.Col;
-  //FComment
-  FDefaultProperty := Prop.DefaultProperty;
-  FDefaultSpec := Prop.DefaultSpec;
-  FDispIDSpec := Prop.DispIdSpec;
-  FIdentifier := Prop.Identifier;
-  FImplementsSpec := Prop.ImplementsSpec;
-  FIndexSpec := Prop.IndexSpec;
-  FLine := Prop.Line;
-  For i := 0 To Prop.Parameters.Count - 1 Do
-    Begin
-      P := TParameter.Create(pamNone, '', False, Nil, '', scPrivate, 0, 0);
-      P.Assign(Prop.Parameters[i]);
-      Parameters.Add(P);
-    End;
-  FReadOnlySpec := Prop.ReadOnlySpec;
-  FReadSpec := Prop.ReadSpec;
-  FScope := Prop.Scope;
-  FStoredSpec := Prop.StoredSpec;
-  FTypeId := Prop.TypeId;
-  FWriteOnlySpec := Prop.WriteOnlySpec;
-  FWriteSpec := Prop.WriteSpec;
+  FParameters.Add(AParameter);
 end;
 
 (**
@@ -4708,32 +3611,20 @@ end;
   @postcon It initialises the basic information for the class. If also creates a
            parameter collection for the storage of parameters.
 
-  @param   strIdent as a String
-  @param   Scope    as a TScope
-  @param   iLine    as an Integer
-  @param   iCol     as an Integer
+  @param   strIdent    as a String
+  @param   AScope       as a TScope
+  @param   iLine       as an Integer
+  @param   iCol        as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
 
 **)
-constructor TProperty.Create(strIdent: String; Scope: TScope;
-  iLine, iCol : Integer);
+constructor TGenericProperty.Create(strIdent: String; AScope: TScope;
+  iLine, iCol : Integer; AImageIndex : TImageIndex; AComment : TComment);
 begin
-  FComment := Nil;
-  FDefaultProperty := False;
-  FDefaultSpec := '';
-  FDispIDSpec := '';
-  FImplementsSpec := '';
-  FIndexSpec := '';
-  FReadOnlySpec := False;
-  FWriteOnlySpec := False;
-  FReadSpec := '';
-  FStoredSpec := '';
-  FTypeId := '';
-  FWriteSpec := '';
-  FScope := Scope;
-  FParameters := TParameterCollection.Create;
-  FIdentifier := strIdent;
-  FLine := iLine;
-  FCol := iCol;
+  Inherited Create(strIdent, AScope, iLine, iCol, AImageIndex, AComment);
+  FParameters := TObjectList.Create(True);
+  FTypeId := Nil;
 end;
 
 (**
@@ -4745,292 +3636,82 @@ end;
   @postcon It frees the parameter collection and the parameters.
 
 **)
-destructor TProperty.Destroy;
+destructor TGenericProperty.Destroy;
 begin
   FParameters.Free;
-  inherited;
+  If FTypeID <> Nil Then
+    FTypeID.Free;
+  Inherited Destroy;
 end;
 
 (**
 
-  This is a getter method for the AsString property. It returns a string
-  representation of the property.
+  This is a getter method for the ParameterCount property.
 
   @precon  None.
-  @postcon Returns a string representation of the property.
-
-  @return  a String
-
-**)
-function TProperty.GetAsString: String;
-
-Var
-  I : Integer;
-
-begin
-  Result := Identifier;
-  If Parameters.Count > 0 Then
-    Begin
-      Result := Result + '[';
-      For i := 0 To Parameters.Count - 1 Do
-        Begin
-          Case Parameters[i].ParamModifier Of
-            pamConst : Result := Result + 'Const ';
-            pamVar: Result := Result + 'Var ';
-            pamOut: Result := Result + 'Out ';
-          End;
-          If i <> 0 Then
-            Result := Result + '; ';
-          Result := Result + Parameters[i].Identifier + ' : ' +
-            Parameters[i].ParamType.AsString(True);
-        End;
-      Result := Result + ']';
-    End;
-  If TypeId <> '' Then
-    Result := Result + ' : ' + TypeId;
-  // Get specifiers
-  If IndexSpec <> '' Then
-    Result := Result + ' Index ' + IndexSpec;
-  If ReadSpec <> '' Then
-    Result := Result + ' Read ' + ReadSpec;
-  If WriteSpec <> '' Then
-    Result := Result + ' Write ' + WriteSpec;
-  If StoredSpec <> '' Then
-    Result := Result + ' Stored ' + StoredSpec;
-  If DefaultSpec <> '' Then
-    Result := Result + ' Default ' + DefaultSpec;
-  If ImplementsSpec <> '' Then
-    Result := Result + ' Implements ' + ImplementsSpec;
-  If ReadOnlySpec Then
-    Result := Result + ' ReadOnly';
-  If DispIdSpec <> '' Then
-    Result := Result + ' DispId ' + DispIdSpec;
-  If DefaultProperty Then
-    Result := Result + '; Default';
-end;
-
-(**
-
-  This is a setter method for the DefaultProperty property.
-
-  @precon  Value is the new value to assign to the DefaultProperty property.
-  @postcon Sets the default property.
-
-  @param   Value as a Boolean constant
-
-**)
-procedure TProperty.SetDefaultProperty(const Value: Boolean);
-begin
-  If FDefaultProperty <> Value Then
-    FDefaultProperty := Value;
-end;
-
-(**
-
-  This is a setter method for the DefaultSpec property.
-
-  @precon  Value is the new value to assign to the DefaultSpec property.
-  @postcon Sets the default Spec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TProperty.SetDefaultSpec(const Value: String);
-begin
-  If FDefaultSpec <> Value Then
-    FDefaultSpec := Value;
-end;
-
-(**
-
-  This is a setter method for the ImplementsSpec property.
-
-  @precon  Value is the new value to assign to the ImplementsSpec property.
-  @postcon Sets the implementsSpec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TProperty.SetImplementsSpec(const Value: String);
-begin
-  If FImplementsSpec <> Value Then
-    FImplementsSpec := Value;
-end;
-
-(**
-
-  This is a setter method for the IndexSpec property.
-
-  @precon  Value is the new value to assign to the IndexSpec property.
-  @postcon Setst the indexspec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TProperty.SetIndexSpec(const Value: String);
-begin
-  If FIndexSpec <> Value Then
-    FIndexSpec := Value;
-end;
-
-(**
-
-  This is a setter method for the ReadSpec property.
-
-  @precon  Value is the new value to assign to the ReadSpec property.
-  @postcon Sets the readspec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TProperty.SetReadSpec(const Value: String);
-begin
-  If FReadSpec <> Value Then
-    FReadSpec := Value;
-end;
-
-(**
-
-  This is a setter method for the StoredSpec property.
-
-  @precon  Value is the new value to assign to the StoredSpec property.
-  @postcon Sets the stored spec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TProperty.SetStoredSpec(const Value: String);
-begin
-  If FStoredSpec <> Value Then
-    FStoredSpec := Value;
-end;
-
-(**
-
-  This is a setter method for the TypeId property.
-
-  @precon  Value is the new value to assign to the TyprId property.
-  @postcon Sets type id property.
-
-  @param   Value as a String constant
-
-**)
-procedure TProperty.SetTypeId(const Value: String);
-begin
-  If FTypeId <> Value Then
-    FTypeId := Value;
-end;
-
-(**
-
-  This is a setter method for the WriteSpec property.
-
-  @precon  Value is the new value to assign to the WriteSpec property.
-  @postcon Sets the write spec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TProperty.SetWriteSpec(const Value: String);
-begin
-  If FWriteSpec <> Value Then
-    FWriteSpec := Value;
-end;
-
-(**
-
-  This method adds a property to the classes property collection.
-
-  @precon  Prop is a property to be added to the class.
-  @postcon Adds a property to the classes property collection.
-
-  @param   Prop as a TProperty
-
-**)
-procedure TPropertyCollection.Add(Prop: TProperty);
-begin
-  FProperties.Add(Prop);
-end;
-
-(**
-
-  This is a getter method for the Property array property.
-
-  @precon  iIndex is the index of the property required.
-  @postcon Returns the property object requested.
-
-  @param   iIndex as an Integer
-  @return  a TProperty
-
-**)
-function TPropertyCollection.GetProperty(iIndex: Integer): TProperty;
-begin
-  Result := FProperties[iIndex] As TProperty;
-end;
-
-(**
-
-  This is a getter method for the PropertyCount property.
-
-  @precon  None.
-  @postcon Returns the number of properties in the class.
+  @postcon Returns the number of parameters in the property.
 
   @return  an Integer
 
 **)
-function TPropertyCollection.GetCount: Integer;
+function TGenericProperty.GetParameterCount: Integer;
 begin
-  Result := FProperties.Count;
+  Result := FParameters.Count;
 end;
 
 (**
 
-  This method sorts the property collection.
+  This is a getter method for the Parameters property.
 
-  @precon  None.
-  @postcon Sorts the property collection.
+  @precon  iIndex must be between 0 and ParameterCount - 1.
+  @postcon Returns an instance of the indexed parameter.
+
+  @param   iIndex as an Integer
+  @return  a TGenericParameter
 
 **)
-procedure TPropertyCollection.Sort;
-
+function TGenericProperty.GetParameters(iIndex: Integer): TGenericParameter;
 begin
-  FProperties.Sort(SortClassDecl);
-End;
+  Result := FParameters[iIndex] As TGenericParameter;
+end;
 
 (**
 
-  This is the constructor method for the TPropertyCollection class.
+  This is a setter method for the TypeID property.
 
   @precon  None.
-  @postcon Creates the properties collection.
+  @postcon Makes a copy of the type T.
+
+  @param   T as a TGenericTypeDecl
 
 **)
-Constructor TPropertyCollection.Create;
-
-Begin
-  FProperties := TObjectList.Create(True);
-End;
-
-(**
-
-  This is the destructor method for the TPropertyCollection class.
-
-  @precon  None.
-  @postcon Destroys the collection.
-
-**)
-Destructor TPropertyCollection.Destroy;
-
-Begin
-  FProperties.Free;
-  Inherited;
-End;
+procedure TGenericProperty.SetTypeID(T: TGenericTypeDecl);
+begin
+  If T <> Nil Then
+    FTypeID := TElementContainerClass(T.ClassType).Create(T.Name, T.Scope, T.Line,
+      T.Column, T.ImageIndex, T.Comment) As TGenericTypeDecl;
+end;
 
 (** --------------------------------------------------------------------------
 
   TMethodDecl Methods
 
  -------------------------------------------------------------------------- **)
+
+(**
+
+  This method adds the given parameter to the internal list.
+
+  @precon  AParameter must be a valid instance.
+  @postcon Adds the given parameter to the internal list.
+
+  @param   AParameter as a TGenericParameter
+
+**)
+procedure TGenericMethodDecl.AddParameter(AParameter: TGenericParameter);
+begin
+  FParameters.Add(AParameter);
+end;
 
 (**
 
@@ -5044,36 +3725,37 @@ End;
   @postcon It initialises the method type, scope and line and col information.
 
   @param   MethodType as a TMethodType
-  @param   Scope      as a TScope
+  @param   strName    as a String
+  @param   AScope     as a TScope
   @param   iLine      as an Integer
   @param   iCol       as an Integer
 
 **)
-Constructor TMethodDecl.Create(MethodType : TMethodType; Scope : TScope;
-  iLine, iCol : Integer);
+Constructor TGenericMethodDecl.Create(MethodType : TMethodType; strName : String;
+  AScope : TScope; iLine, iCol : Integer);
+
+Var
+  AImageIndex : TImageIndex;
 
 Begin
-  Inherited Create;
+  FParameters := TObjectList.Create(True);
+  Case MethodType Of
+    mtConstructor : AImageIndex := iiPublicConstructor;
+    mtDestructor  : AImageIndex := iiPublicDestructor;
+    mtProcedure   : AImageIndex := iiPublicProcedure;
+    mtFunction    : AImageIndex := iiPublicFunction;
+  Else
+    AImageIndex := iiPublicProcedure;
+  End;
+  Inherited Create(strName, AScope, iLine, iCol, AImageIndex, Nil);
   FAlias := '';
   FClassMethod := False;
   FClsName := '';
   FComment := Nil;
   FExt := '';
-  FIdentifier := '';
   FMsg := '';
-  FReturnType := '';
-  FParameters := TParameterCollection.Create;
-  FDirectives := TStringList.Create;
+  FReturnType := Nil;
   FMethodType := MethodType;
-  FScope := Scope;
-  FLine := iLine;
-  FCol := iCol;
-  FLocalMethods := TMethodCollection.Create;
-  FTypes := TGenericContainerCollection.Create(False);
-  FVars := TGenericContainerCollection.Create(True);
-  FConsts := TGenericContainerCollection.Create(True);
-  FResStrings := TGenericContainerCollection.Create(True);
-  FLabels := TIdentList.Create;
 End;
 
 (**
@@ -5085,64 +3767,13 @@ End;
   @postcon It frees the parameters collection, the parameter and the directives.
 
 **)
-Destructor TMethodDecl.Destroy;
+Destructor TGenericMethodDecl.Destroy;
 
 Begin
-  FLabels.Free;
-  FResStrings.Free;
-  FConsts.Free;
-  FVars.Free;
-  FTypes.Free;
-  FLocalMethods.Free;
-  FDirectives.Free;
+  FReturnType.Free;
   FParameters.Free;
   Inherited Destroy;
 End;
-
-(**
-
-  This method is a virtual assign procedure so that the properties of a
-  method can be assigned to another instance of the same class.
-
-  @precon  Method is the method declaration to get information from.
-  @postcon Virtual assign procedure so that the properties of a method can be
-           assigned to another instance of the same class.
-
-  @param   Method as a TMethodDecl
-
-**)
-procedure TMethodDecl.Assign(Method: TMethodDecl);
-
-Var
-  i : Integer;
-  P : TParameter;
-
-begin
-  FAlias := Method.Alias;
-  FClassMethod := Method.ClassMethod;
-  FClsName := Method.ClsName;
-  FCol := Method.Col;
-  //FComment
-  //FConsts
-  FDirectives.Assign(Method.Directives);
-  FExt := Method.Ext;
-  FIdentifier := Method.Identifier;
-  FLine := Method.Line;
-  //FLocalMethods
-  FMethodType := Method.MethodType;
-  FMsg := Method.Msg;
-  For i := 0 To Method.Parameters.Count - 1 Do
-    Begin
-      P := TParameter.Create(pamNone, '', False, Nil, '', scPrivate, 0, 0);
-      P.Assign(Method.Parameters[i]);
-      Parameters.Add(P);
-    End;
-  //FResStrings
-  FReturnType := Method.ReturnType;
-  FScope := Method.Scope;
-  //FTypes
-  //FVars
-end;
 
 (**
 
@@ -5154,7 +3785,7 @@ end;
   @param   Value as a String
 
 **)
-Procedure TMethodDecl.SetClsName(Value : String);
+Procedure TGenericMethodDecl.SetClsName(Value : String);
 
 Begin
   If FClsName <> Value Then
@@ -5163,37 +3794,34 @@ End;
 
 (**
 
-  This is a setter method for the Identifier property.
+  This is a getter method for the ParameterCount property.
 
-  @precon  Value is the new value to assign to the Identifier property.
-  @postcon Sets the identifier property.
+  @precon  None.
+  @postcon Returns the number of parameters associated with the method.
 
-  @param   Value as a String
+  @return  an Integer
 
 **)
-Procedure TMethodDecl.SetIdentifier(Value : String);
-
-Begin
-  If FIdentifier <> Value Then
-    FIdentifier := Value;
-End;
+function TGenericMethodDecl.GetParameterCount: Integer;
+begin
+  Result := FParameters.Count;
+end;
 
 (**
 
-  This is a setter method for the ReturnType property.
+  This is a getter method for the Parameters property.
 
-  @precon  Value is the new value to assign to the ReturnType property.
-  @postcon Sets the return type property.
+  @precon  iIndex must be a valid index.
+  @postcon Returns the index instance of the paramter.
 
-  @param   Value as a String
+  @param   iIndex as an Integer
+  @return  a TGenericParameter
 
 **)
-Procedure TMethodDecl.SetReturnType(Value : String);
-
-Begin
-  If FReturnType <> Value Then
-    FReturnType := Value;
-End;
+function TGenericMethodDecl.GetParameters(iIndex: Integer): TGenericParameter;
+begin
+  Result := FParameters[iIndex] As TGenericParameter;
+end;
 
 (**
 
@@ -5205,120 +3833,13 @@ End;
   @return  a String
 
 **)
-Function TMethodDecl.GetQualifiedName : String;
+Function TGenericMethodDecl.GetQualifiedName : String;
 
 Begin
   Result := Identifier;
   If ClsName <> '' Then
     Result := ClsName + '.' + Result;
 End;
-
-
-(**
-
-  This method adds a directive to the directives list.
-
-  @precon  strDirective is a directive token to be added to the directives
-           collection.
-  @postcon Adds a directive to the directives list.
-
-  @param   strDirective as a String
-
-**)
-Procedure TMethodDecl.AddDirectives(strDirective : String);
-
-Begin
-  FDirectives.Add(strDirective);
-End;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  ShowClassName tell the routine to returns the class name in the
-           resultant string and ShowMethodType tell the routine to returns the
-           methods type in the resultant string.
-  @postcon Returns a string representation of the method.
-
-  @param   ShowClassName  as a Boolean
-  @param   ShowMethodType as a Boolean
-  @return  a String
-
-**)
-Function TMethodDecl.GetAsString(ShowClassName, ShowMethodType : Boolean) : String;
-
-Var
-  i : Integer;
-
-Begin
-  Result := '';
-  If ShowMethodType Then
-    Result := strMethodTypes[MethodType];
-  If ClassMethod Then
-    Result := Result + 'Class ';
-  If (ClsName <> '') And ShowClassName Then
-    Result := Result + ClsName + '.';
-  Result := Result + Identifier;
-  // Get parameters
-  If Parameters.Count > 0 Then Result := Result + '(';
-  For i := 0 To Parameters.Count - 1 Do
-    Begin
-      Result := Result + strParamModifier[Parameters[i].ParamModifier];
-      Result := Result + Parameters[i].Identifier;
-      If (i <> Parameters.Count - 1) And (Parameters[i].ParamType.AsString(True) =
-        Parameters[i + 1].ParamType.AsString(True)) Then
-        Result := Result + ', '
-      Else
-        If Parameters[i].ParamType.Count > 0 Then
-          Begin
-            Result := Result + ' :';
-            If Parameters[i].ArrayOf Then Result := Result + ' Array Of';
-            Result := Result + #32 + Parameters[i].ParamType.AsString(True);
-            If i <> Parameters.Count - 1 Then Result := Result + '; ';
-          End;
-    End;
-  If Parameters.Count > 0 Then Result := Result + ')';
-  // Get return type
-  If ReturnType <> '' Then Result := Result + ' : ' + ReturnType;
-  // Get directives
-  If Directives.Count > 0 Then
-    For i := 0 To Directives.Count - 1 Do
-      result := Result + '; ' + Directives[i];
-  If Msg <> '' Then
-    Result := Result + #32 + Msg;
-  If Ext <> '' Then
-    Result := Result + #32 + Ext;
-  If Alias <> '' Then
-    Result := Result + ' = ' + Alias;
-End;
-
-(**
-
-  This method test the directive for a specified directive and returns true if
-  found.
-
-  @precon  strDirective is the directive to search for.
-  @postcon Returns true if the directive was found.
-
-  @param   strDirective as a String
-  @return  a Boolean
-
-**)
-function TMethodDecl.HasDirective(strDirective: String): Boolean;
-
-Var
-  i : Integer;
-
-begin
-  Result := False;
-  For i := 0 To Directives.Count - 1 Do
-    If AnsiCompareText(strDirective,
-      Copy(Directives[i], 1, Length(strDirective))) = 0 Then
-      Begin
-        Result := True;
-        Break;
-      End;
-end;
 
 (**
 
@@ -5330,7 +3851,7 @@ end;
   @param   Value as a String constant
 
 **)
-procedure TMethodDecl.SetMsg(const Value: String);
+procedure TGenericMethodDecl.SetMsg(const Value: String);
 begin
   If FMsg <> Value Then
     FMsg := Value;
@@ -5346,526 +3867,10 @@ end;
   @param   Value as a String constant
 
 **)
-procedure TMethodDecl.SetExt(const Value: String);
+procedure TGenericMethodDecl.SetExt(const Value: String);
 begin
   If FExt <> Value Then
     FExt := Value;
-end;
-
-(** --------------------------------------------------------------------------
-
-  TMethodCollection Methods
-
- -------------------------------------------------------------------------- **)
-
-(**
-
-  This is the constructor method for the TMethodCollection class. It creates
-  a collection object to hold all the methods.
-
-  @precon  None.
-  @postcon It creates a collection object to hold all the methods.
-
-**)
-Constructor TMethodCollection.Create;
-
-Begin
-  Inherited Create;
-  FMethods := TObjectList.Create(True);
-End;
-
-(**
-
-  This is the destructor method for the TMethodCollection class. It frees the
-  method collection and all the methods stored.
-
-  @precon  None.
-  @postcon It frees the method collection and all the methods stored.
-
-**)
-Destructor TMethodCollection.Destroy;
-
-Begin
-  FMethods.Free;
-  Inherited Destroy;
-End;
-
-(**
-
-  This method adds a TMethodDecl class to the methods collection.
-
-  @precon  Method is a method declaration to be added to the collection.
-  @postcon Adds a TMethodDecl class to the methods collection.
-
-  @param   Method as a TMethodDecl
-
-**)
-Procedure TMethodCollection.Add(Method : TMethodDecl);
-
-Begin
-  FMethods.Add(Method);
-End;
-
-(**
-
-  This is a getter method for the Method property.
-
-  @precon  iIndex is the index of the method required.
-  @postcon Returns a method declaration object for the requested item.
-
-  @param   iIndex as an Integer
-  @return  a TMethodDecl
-
-**)
-Function TMethodCollection.GetMethod(iIndex : Integer) : TMethodDecl;
-
-Begin
-  Result := FMethods[iIndex] As TMethodDecl;
-End;
-
-(**
-
-  Thos method sorts the methods in the class.
-
-  @precon  None.
-  @postcon Sorts the methods in the class.
-
-**)
-procedure TMethodCollection.Sort;
-begin
-  Inherited;
-  FMethods.Sort(SortMethodCollection);
-end;
-
-(**
-
-  This is a getter method for the Count property.
-
-  @precon  None.
-  @postcon Returns the number of method in the collection.
-
-  @return  an Integer
-
-**)
-Function TMethodCollection.GetCount : Integer;
-
-Begin
-  Result := FMethods.Count;
-End;
-
-(**
-
-  This method returns the index of the specified method else returns -1.
-
-  @precon  strMethodName is the name of a method to find.
-  @postcon Returns the index of the method if found else -1.
-
-  @param   strClsName    as a String
-  @param   strMethodName as a String
-  @return  an Integer
-
-**)
-function TMethodCollection.Find(strClsName, strMethodName: String): Integer;
-
-Var
-  i : Integer;
-
-begin
-  Result := -1;
-  For i := 0 To Count - 1 Do
-    If (AnsiCompareText(strClsName, Method[i].ClsName) = 0) And
-      (AnsiCompareText(strMethodName, Method[i].Identifier) = 0) Then
-      Begin
-        Result := i;
-        Break;
-      End;
-end;
-
-(** ---------------------------------------------------------------------------
-
-  TRecordDecl Methods
-
- -------------------------------------------------------------------------- **)
-
-(**
-
-  This method adds a parameter to the classes parameter collection.
-
-  @precon  Parameter is a parameter to be added to the records field collection.
-  @postcon Adds a parameter to the classes parameter collection.
-
-  @param   Parameter as a TParameter
-
-**)
-procedure TRecordDecl.AddParameter(Parameter: TParameter);
-begin
-  FParameters.Add(Parameter);
-end;
-
-(**
-
-  This method returns a string representation of the record excluding fields.
-
-  @precon  ShowFirstToken tells the method whether to show the first token in
-           the resultant string.
-  @postcon Returns a string representation of the records declaration only.
-
-  @param   ShowFirstToken as a Boolean
-  @return  a String
-
-**)
-Function TRecordDecl.AsString(ShowFirstToken : Boolean) : String;
-
-Var
-  i : Integer;
-
-Begin
-  Result := Identifier;
-  If Result <> '' Then
-    Result := Result + #32;
-  Result := Result + 'Record';
-  For i := 0 To Parameters.Count - 1 Do
-    Result := Result + #32 + Parameters[i].FIdentifier + ' : ' +
-      Parameters[i].FParamType.AsString(True) + ';';
-  Result := Result  + ' End';
-  If IsPacked Then
-    Result := 'Packed ' + Result;
-End;
-
-(**
-
-  This is the constructor method for the TRecordDecl class.
-
-  @precon  None.
-  @postcon Initialises the class.
-
-**)
-constructor TRecordDecl.Create;
-begin
-  inherited;
-  FPacked := False;
-  FParameters := TParameterCollection.Create;
-end;
-
-(**
-
-  This is the destructor method for the TRecordDecl class.
-
-  @precon  None.
-  @postcon Destroy the instance of the class.
-
-**)
-destructor TRecordDecl.Destroy;
-begin
-  FParameters.Free;
-  inherited;
-end;
-
-(**
-
-  This method sorts the record classes paramters.
-
-  @precon  None.
-  @postcon Sorts the record classes paramters.
-
-**)
-procedure TRecordDecl.Sort;
-begin
-  inherited;
-  FParameters.Sort;
-end;
-
-(** ---------------------------------------------------------------------------
-
-  TObjectDecl Methods
-
- -------------------------------------------------------------------------- **)
-
-(**
-
-  This method is a virtual assign procedure so that the properties of a
-  TObjectDecl can be assigned to another instance of the same class.
-
-  @precon  AObject is the object declaration to get information from.
-  @postcon Virtual assign procedure so that the properties of a TObjectDecl can
-           be assigned to another instance of the same class.
-
-  @param   AObject as a TObjectDecl
-
-**)
-procedure TObjectDecl.Assign(AObject: TObjectDecl);
-
-Var
-  i : Integer;
-  P : TParameter;
-  M : TMethodDecl;
-
-begin
-  Identifier := AObject.Identifier;
-  Heritage.Assign(AObject.Heritage);
-  Scope := AObject.Scope;
-  For i := 0 To AObject.Parameters.Count - 1 Do
-    Begin
-      P := TParameter.Create(pamNone, '', False, Nil, '', scPrivate, 0, 0);
-      P.Assign(AObject.Parameters[i]);
-      AddParameter(P);
-    End;
-  For i := 0 To AObject.Methods.Count - 1 Do
-    Begin
-      M := TMethodDecl.Create(mtProcedure, scPrivate, 0, 0);
-      M.Assign(AObject.Methods[i]);
-      Methods.Add(M);
-    End;
-end;
-
-(**
-
-  This method returns a string representation of the object exlcluding fields
-  and methods.
-
-  @precon  ShowFirstToken tells the method to show the first token in the
-           resultant string.
-  @postcon Returns a string representation of the object declaration.
-
-  @param   ShowFirstToken as a Boolean
-  @return  a String
-
-**)
-Function TObjectDecl.AsString(ShowFirstToken : Boolean) : String;
-
-Begin
-  Result := Identifier + ' = Object';
-  If Heritage.Count > 0 Then
-    Result := Result + '(' + Heritage.AsString + ')';
-End;
-
-
-(**
-
-  This is the constructor method for the TObjectDecl class.
-
-  @precon  None.
-  @postcon Initialises the class.
-
-**)
-constructor TObjectDecl.Create;
-begin
-  inherited;
-  FHeritage := TIdentList.Create;
-  FMethods := TMethodCollection.Create;
-end;
-
-(**
-
-  This is the destructor method for the TObjectDecl class.
-
-  @precon  None.
-  @postcon Destroy the instance of the class.
-
-**)
-destructor TObjectDecl.Destroy;
-begin
-  FMethods.Free;
-  FHeritage.Free;
-  inherited;
-end;
-
-(**
-
-  This method sorts the object class's methods.
-
-  @precon  None.
-  @postcon Sorts the object classes methods.
-
-**)
-procedure TObjectDecl.Sort;
-begin
-  inherited;
-  FMethods.Sort;
-end;
-
-(** ---------------------------------------------------------------------------
-
-  TClassDecl Methods
-
- -------------------------------------------------------------------------- **)
-
-(**
-
-  This method is a virtual assign procedure so that the properties of a
-  TClassDecl can be assigned to another instance of the same class.
-
-  @precon  AObject is the object declaration to get information from.
-  @postcon Virtual assign procedure so that the properties of a TClassDecl can
-           be assigned to another instance of the same class.
-
-  @param   AObject as a TObjectDecl
-
-**)
-procedure TClassDecl.Assign(AObject: TObjectDecl);
-
-Var
-  i : Integer;
-  P : TProperty;
-  A : TClassDecl;
-
-begin
-  Inherited Assign(AObject);
-  A := AObject As TClassDecl;
-  For i := 0 To A.Properties.Count - 1 Do
-    Begin
-      P := TProperty.Create('', scPrivate, 0, 0);
-      P.Assign(A.Properties[i]);
-      Properties.Add(P);
-    End;
-end;
-
-(**
-
-  This method returns a string represenmtation of the classes declaration
-  excluding fields, properties, and methods.
-
-  @precon  ShowFirstToken tells the method to show the first token in the
-           resultant string.
-  @postcon Returns a string representation of the object declaration.
-
-  @param   ShowFirstToken as a Boolean
-  @return  a String
-
-**)
-Function TClassDecl.AsString(ShowFirstToken : Boolean) : String;
-
-Begin
-  Result := Identifier + ' = Class';
-  If AbstractClass Then
-    Result := Result + ' Abstract';
-  If SealedClass Then
-    Result := Result + ' Sealed';
-  If Heritage.Count > 0 Then
-    Result := Result + '(' + Heritage.AsString + ')';
-End;
-
-(**
-
-  This is the constructor method for the TClassDecl class. This initialise the
-  classes identifier, scope and line and col information. It also creates
-  collections for storing parameter (fields), properties and methods.
-
-  @precon  None.
-  @postcon This initialise the classes identifier, scope and line and col
-           information.
-
-**)
-constructor TClassDecl.Create;
-begin
-  Inherited Create;
-  FProperties := TPropertyCollection.Create;
-end;
-
-(**
-
-  This is the destructor method for the TClassDecl class. It frees the fields,
-  properties and methods collections and in turns al the fields (parameters),
-  properties and methods held by the class.
-
-  @precon  None.
-  @postcon It frees the fields, properties and methods collections and in turns
-           al the fields (parameters), properties and methods held by the class.
-
-**)
-destructor TClassDecl.Destroy;
-begin
-  FProperties.Free;
-  inherited Destroy;
-end;
-
-(**
-
-  This method corts the classes property list.
-
-  @precon  None.
-  @postcon Sorts the proerty list.
-
-**)
-procedure TClassDecl.Sort;
-begin
-  inherited;
-  FProperties.Sort;
-end;
-
-(**
-
-  This method is a virtual assign procedure so that the properties of a
-  TInterfaceDecl can be assigned to another instance of the same class.
-
-  @precon  AObject is the object declaration to get information from.
-  @postcon Virtual assign procedure so that the properties of a TInterfaceDecl
-           can be assigned to another instance of the same class.
-
-  @param   AObject as a TObjectDecl
-
-**)
-procedure TInterfaceDecl.Assign(AObject: TObjectDecl);
-begin
-  inherited Assign(AObject);
-end;
-
-(**
-
-  This method returns a string representation of the interface excluding
-  properties and methods.
-
-  @precon  ShowFirstToken tells the method to show the first token in the
-           resultant string.
-  @postcon Returns a string representation of the object declaration.
-
-  @param   ShowFirstToken as a Boolean
-  @return  a String
-
-**)
-Function TInterfaceDecl.AsString(ShowFirstToken : Boolean) : String;
-
-Begin
-  Result := Identifier + ' = Interface';
-  If Heritage.Count > 0 Then
-    Result := Result + '(' + Heritage.AsString + ')';
-End;
-
-(**
-
-  This is a setter method for the GUID property.
-
-  @precon  Value is the value to be assign to the GUID property.
-  @postcon Setst the GUID property.
-
-  @param   Value as a String
-
-**)
-procedure TInterfaceDecl.SetGUID(Value : String);
-
-Begin
-  If FGUID <> Value Then
-    FGUID := Value;
-End;
-
-{ TDispInterfaceDecl }
-
-(**
-
-  This method returns a string representation if a dispinterface.
-
-  @precon ShowFirstToken identifies if the first token it to be displayed.
-  @postcon Returns a string representation of the dispiterface declaration
-
-  @param   ShowFirstToken as a Boolean
-  @return  a String
-
-**)
-function TDispInterfaceDecl.AsString(ShowFirstToken: Boolean): String;
-begin
-  Result := Identifier + ' = DispInterface';
-  If Heritage.Count > 0 Then
-    Result := Result + '(' + Heritage.AsString + ')';
 end;
 
 (**
@@ -5879,104 +3884,46 @@ end;
   @postcon Initialises the class.
 
   @param   strMsg             as a String
+  @param   AScope             as a TScope
   @param   strMethod          as a String
   @param   iLine              as an Integer
   @param   iCol               as an Integer
   @param   ErrType            as a TErrorType
 
 **)
-constructor TDocError.Create(strMsg, strMethod: String; iLine, iCol: Integer;
-  ErrType : TErrorType);
+constructor TDocError.Create(strMsg : String; AScope : TScope; strMethod: String; iLine,
+  iCol: Integer; ErrType : TErrorType);
 
-begin
+Var
+  AImageIndex : TImageIndex;
+
+Begin
+  Case ErrType Of
+    etWarning: AImageIndex := iiWarning;
+  Else
+    AImageIndex := iiError;
+  End;
+  Inherited Create(Format('%d@%d:%d', [GetTickCount, iLine, iCol]), AScope,
+    iLine, iCol, AImageIndex, Nil);
   FMsg := strMsg;
-  FLine := iLine;
-  FCol := iCol;
   FErrorType := ErrType;
   FMethod := strMethod;
 End;
 
-{ TDocErrorCollection }
-
 (**
 
-  This method adds an error to the error collection.
-
-  @precon  strMsg is the error message to add to the collection, iLine is the
-           line number of the error, iCol is the column number for the message.
-           strExceptionMethod is the name of the method the exception occurred
-           in and ErrType determines if the message is a warning or an error.
-  @postcon Adds an error to the error collection.
-
-  @param   strMsg        as a String
-  @param   strMethod     as a String
-  @param   iLine         as an Integer
-  @param   iCol          as an Integer
-  @param   ErrType       as a TErrorType
-
-**)
-procedure TDocErrorCollection.Add(strMsg, strMethod: String; iLine, iCol: Integer;
-  ErrType : TErrorType);
-begin
-  FErrors.Add(TDocError.Create(strMsg, strMethod, iLine, iCol, ErrType));
-end;
-
-(**
-
-  This is the constructor method for the TDocErrorCollection class.
+  This is a getter method for the AsString property.
 
   @precon  None.
-  @postcon Creates the collection.
+  @postcon Override the default method and returns the Document Error Message.
+
+  @return  a String
 
 **)
-constructor TDocErrorCollection.Create;
+Function TDocError.GetAsString: String;
+
 begin
-  FErrors := TObjectList.Create(True);
-end;
-
-(**
-
-  This is the destructor method for the TDocErrorCollection class.
-
-  @precon  None.
-  @postcon Destroy the collection.
-
-**)
-destructor TDocErrorCollection.Destroy;
-begin
-  FErrors.Free;
-  inherited;
-end;
-
-(**
-
-  This is a getter method for the Count property.
-
-  @precon  None.
-  @postcon Returns the number of errors in the collection.
-
-  @return  an Integer
-
-**)
-function TDocErrorCollection.GetCount: Integer;
-begin
-  Result := FErrors.Count;
-end;
-
-(**
-
-  This is a getter method for the Error property.
-
-  @precon  iIndex is the index of the error required.
-  @postcon Returns the doc error object requested/
-
-  @param   iIndex as an Integer
-  @return  a TDocError
-
-**)
-function TDocErrorCollection.GetError(iIndex: Integer): TDocError;
-begin
-  Result := FErrors[iIndex] As TDocError;
+  Result := FMsg;
 end;
 
 (**
@@ -5993,13 +3940,12 @@ end;
   @param   strMethodName as a String
 
 **)
-Constructor EDocException.CreateNormal(strMsg : String; Token : TTokenInfo;
+Constructor EDocException.Create(strMsg : String; Token : TTokenInfo;
   strMethodName : String);
 
 Begin
-  Inherited Create(Format(strMsg, [Token.Token, Token.Line, Token.Column]));
-  FLine := Token.Line;
-  FCol := Token.Column;
+  Inherited Create(Format(strMsg, [Token.Token, Token.Line, Token.Column]),
+    scGlobal, Token.Line, Token.Column, iiError, Nil);
   FExceptionMethod := strMethodName;
 End;
 
@@ -6019,16 +3965,47 @@ End;
   @param   strMethodName as a String
 
 **)
-Constructor EDocException.CreateLiteral(strMsg, strLiteral : String;
+Constructor EDocException.Create(strMsg, strLiteral : String;
   Token : TTokenInfo; strMethodName : String);
 
 Begin
   Inherited Create(Format(strMsg, [strLiteral, Token.Token, Token.Line,
-    Token.Column]));
-  FLine := Token.Line;
-  FCol := Token.Column;
+    Token.Column]), scGlobal, Token.Line, Token.Column, iiError, Nil);
   FExceptionMethod := strMethodName;
 End;
+
+(**
+
+  This is the constructor method for the EDocException class.
+
+  @precon  None.
+  @postcon Creates an instance of the Document Exception with the message strMsg
+           and Method name strMethodName.
+
+  @param   strMsg        as a String
+  @param   strMethodName as a String
+
+**)
+constructor EDocException.Create(strMsg: String; strMethodName : String);
+begin
+  Inherited Create(strMsg, scGlobal, 0, 0, iiError, Nil);
+  FExceptionMethod := strMethodName;
+end;
+
+(**
+
+  This is a getter method for the Message property.
+
+  @precon  None.
+  @postcon Returns the message stored in the FName field.
+
+  @return  a String
+
+**)
+function EDocException.GetMessage: String;
+begin
+  Result := Name;
+end;
 
 { TDocumentConflict }
 
@@ -6039,54 +4016,58 @@ End;
   @precon  None.
   @postcon Initialises the Conflict class.
 
-  @param   Args            as an Array Of TVarRec constant
-  @param   iIdentLine      as an Integer
-  @param   iIdentColumn    as an Integer
-  @param   iCommentLine    as an Integer
-  @param   iCommentCol     as an Integer
-  @param   DocConflictType as a TDocConflictType
+  @param   Args               as an Array Of TVarRec constant
+  @param   iIdentLine         as an Integer
+  @param   iIdentColumn       as an Integer
+  @param   iCommentLine       as an Integer
+  @param   iCommentCol        as an Integer
+  @param   strDocConflictMsg  as a String
+  @param   strDocConflictDesc as a String
+  @param   AImageIndex        as a TImageIndex
 
 **)
 constructor TDocumentConflict.Create(Const Args: Array of TVarRec; iIdentLine,
       iIdentColumn, iCommentLine, iCommentCol : Integer;
-      DocConflictType : TDocConflictType);
+      strDocConflictMsg, strDocConflictDesc : String; AImageIndex : TImageIndex);
+
 begin
-  FMessage := Format(DocConflictInfo[DocConflictType].MessageMask , Args);
-  FIdentLine := iIdentLine;
-  FIdentColumn := iIdentColumn;
+  Inherited Create(Format('%4.4d', [iDocConflictCounter]), scGlobal, iIdentLine,
+    iIdentColumn, AImageIndex, Nil);
+  Inc(iDocConflictCounter);
+  FMessage := Format(strDocConflictMsg , Args);
   FCommentLine := iCommentLine;
   FCommentColumn := iCommentCol;
-  FDocConflictType := DocConflictType;
+  FComment := TComment.Create(strDocConflictDesc, 0, 0);
 end;
 
 (**
 
-  This is a getter method for the Category property.
+  This is the destructor method for the TDocumentConflict class.
 
   @precon  None.
-  @postcon Returns the category of the document conflict.
-
-  @return  a String
+  @postcon Frees the comment.
 
 **)
-function TDocumentConflict.GetCategory: String;
+destructor TDocumentConflict.Destroy;
 begin
-  Result := DocConflictInfo[DocConflictType].Category;
+  FComment.Free;
+  Inherited Destroy;
 end;
 
 (**
 
-  This is a getter method for the Description property.
+  This is a getter method for the AsString property.
 
   @precon  None.
-  @postcon Returns a description of the document conflict.
+  @postcon Return the document conflict message.
 
   @return  a String
 
 **)
-function TDocumentConflict.GetDescription: String;
+Function TDocumentConflict.GetAsString: String;
+
 begin
-  Result := DocConflictInfo[DocConflictType].Description;
+  Result := FMessage;
 end;
 
 (**
@@ -6107,28 +4088,24 @@ end;
 
 (**
 
-  This method adds a specific documentation conflict to the Docuemntation
-  conflict collection.
+  This method adds an error to the Base Language's Element Collection under
+  a sub folder of strCategory.
 
-  @precon  None.
-  @postcon Adds a specific documentation conflict to the Docuemntation
-           conflict collection.
+  @precon  Error must be a valid TElementContainer.
+  @postcon Adds an error to the Base Language's Element Collection under
+           a sub folder of strCategory.
 
-  @param   Args            as an Array Of TVarRec constant
-  @param   iIdentLine      as an Integer
-  @param   iIdentColumn    as an Integer
-  @param   iCommentLine    as an Integer
-  @param   iCommentCol     as an Integer
-  @param   DocConflictType as a TDocConflictType
+  @param   Error       as a TElementContainer
 
 **)
-procedure TBaseLanguageModule.AddDocumentConflict(Const Args: Array of TVarRec;
-  iIdentLine, iIdentColumn, iCommentLine, iCommentCol : Integer;
-  DocConflictType: TDocConflictType);
+Procedure TBaseLanguageModule.AddError(Error: TElementContainer);
+
+Var
+  I : TElementContainer;
 
 begin
-  FDocumentConflicts.Add(TDocumentConflict.Create(Args, iIdentLine,
-    iIdentColumn, iCommentLine, iCommentCol, DocConflictType));
+  I := Add(strErrorsAndWarnings, iiErrorFolder, Nil);
+  I.Add(Error);
 end;
 
 (**
@@ -6162,41 +4139,26 @@ end;
 **)
 constructor TBaseLanguageModule.Create(IsModified : Boolean; strFileName : String);
 begin
-  Inherited Create;
+  Inherited Create(strFileName, scGlobal, 0, 0, iiModule, Nil);
   FFileName := strFileName;
   FModified := IsModified;
   FOwnedItems := TObjectList.Create(True);
   FTokens := TObjectList.Create(True);
   FTokenIndex := 0;
   FPreviousTokenIndex := -1;
-  FDocErrors := TDocErrorCollection.Create;
   FTickList := TStringList.Create;
-  FExportedHeadings := TMethodCollection.Create;
-  FImplementedMethods := TMethodCollection.Create;
-  FConstantsCollection := TGenericContainerCollection.Create(True);
-  FResStrCollection := TGenericContainerCollection.Create(True);
-  FVarsCollection := TGenericContainerCollection.Create(True);
-  FThreadVarsCollection := TGenericContainerCollection.Create(True);
-  FTypeCollection := TGenericContainerCollection.Create(False);
-  FExportsCollection := TGenericContainerCollection.Create(True);
   FBodyComment := TObjectList.Create(True);
-  FSymbolTable := TGenericContainerCollection.Create(True);
-  FDocumentConflicts :=  TObjectList.Create(True);
-  FContainsClause := Nil;
-  FFinalSection := Nil;
-  FInitSection := Nil;
   FModuleComment := Nil;
   FModuleName := '';
   FModuleNameCol := 0;
   FModuleNameLine := 0;
   FModuleType := mtUnit;
-  FRequiresClause := Nil;
-  FUsesClause := Nil;
   FCompilerDefs := TStringList.Create;
   FCompilerDefs.Sorted := True;
   FCompilerDefs.Duplicates := dupIgnore;
   FCompilerDefs.CaseSensitive := False;
   FCompilerConditionStack := TList.Create;
+  objModuleRootElement := Self;
 end;
 
 (**
@@ -6229,23 +4191,9 @@ end;
 **)
 destructor TBaseLanguageModule.Destroy;
 begin
-  If InitializationSection <> Nil Then
-    InitializationSection.Free;
-  If FinalizationSection <> Nil Then
-    FinalizationSection.Free;
   FCompilerConditionStack.Free;
   FCompilerDefs.Free;
-  FDocumentConflicts.Free;
-  FSymbolTable.Free;
   FBodyComment.Free;
-  FExportsCollection.Free;
-  FTypeCollection.Free;
-  FThreadVarsCollection.Free;
-  FVarsCollection.Free;
-  FResStrCollection.Free;
-  FConstantsCollection.Free;
-  FImplementedMethods.Free;
-  FExportedHeadings.Free;
   FTickList.Free;
   FDocErrors.Free;
   FTokens.Free;
@@ -6256,12 +4204,12 @@ end;
 (**
 
   This method adds the given token to the underlying token collection.
-  
+
   @precon  AToken must be a valid instance of a TTokenInfo class..
   @postcon Adds the given token to the underlying token collection.
-  
+
   @param   AToken as a TTokenInfo
-  
+
 **)
 Procedure TBaseLanguageModule.AddToken(AToken : TTokenInfo);
 
@@ -6379,18 +4327,21 @@ End;
 
 (**
 
-  This method is a sort procedure for the Documentation Conflicts
-  collection.
+  This is a getter method for the AsString property.
 
   @precon  None.
-  @postcon Sorts the documentation conflicts first by Category and then by
-           message.
+  @postcon Override and default GetAsString method and returns the name of the
+           module.
+
+  @return  a String
 
 **)
-procedure TBaseLanguageModule.SortDocumentConflicts;
+Function TBaseLanguageModule.GetAsString : String;
+
 begin
-  FDocumentConflicts.Sort(CompareDocConflicts);
+  Result := ExtractFileName(Name);
 end;
+
 
 (**
 
@@ -6452,38 +4403,6 @@ Function TBaseLanguageModule.GetBodyCommentCount : Integer;
 Begin
   Result := FBodyComment.Count;
 End;
-
-(**
-
-  This is a getter method for the DocumentConflict property.
-
-  @precon  iIndex must be a valid integer index.
-  @postcon Returns the documentation conflict references by the passed index.
-
-  @param   iIndex as an Integer
-  @return  a TDocumentConflict
-
-**)
-function TBaseLanguageModule.GetDocumentConflict(
-  iIndex: Integer): TDocumentConflict;
-begin
-  Result := FDocumentConflicts.Items[iIndex] As TDocumentConflict;
-end;
-
-(**
-
-  This is a getter method for the DocumentConflictCount property.
-
-  @precon  None.
-  @postcon Returns the number of documenation conflicts in the collection.
-
-  @return  an Integer
-
-**)
-function TBaseLanguageModule.GetDocumentConflictCount: Integer;
-begin
-  Result := FDocumentConflicts.Count;
-end;
 
 (**
 
@@ -6627,7 +4546,7 @@ Function TBaseLanguageModule.GetToken : TTokenInfo;
 
 Begin
   If FTokenIndex >= FTokens.Count Then
-    Raise EDocException.Create(strUnExpectedEndOfFile);
+    Raise EDocException.Create(strUnExpectedEndOfFile, 'GetToken');
   Result := FTokens[FTokenIndex] As TTokenInfo;
 End;
 
@@ -6820,8 +4739,12 @@ begin
               Inc(iSkip);
             End;
         End Else
-          Errors.Add(Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
-            'ProcessCompilerDirective', Token.Line, Token.Column, etWarning);
+          Add(
+            TDocError.Create(
+              Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
+              scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column,
+              etWarning)
+          );
     End
   Else If Like(Token.Token, '{$ENDIF') Then
     Begin
@@ -6833,8 +4756,11 @@ begin
             Dec(iSkip);
           FCompilerConditionStack.Delete(iStackTop - 1);
         End Else
-          Errors.Add(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
-            'ProcessCompilerDirective', Token.Line, Token.Column, etWarning);
+          Add(
+            TDocError.Create(
+              Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
+              scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etWarning)
+          );
     End;
   If iSkip < 0 Then
     iSkip := 0;
@@ -6892,7 +4818,7 @@ Begin
         ttCompilerDirective]) Do
         Dec(FTokenIndex);
       If FTokenIndex < 0 Then
-        Raise EDocException.Create(strUnExpectedStartOfFile);
+        Raise EDocException.Create(strUnExpectedStartOfFile, 'RollBackToken');
     End;
 End;
 
@@ -6929,6 +4855,8 @@ End;
 (** This initializations section ensures that there is a valid instance of the
     SpecialTags class and a valid instance of the BrowseAndDocItOption class. **)
 Initialization
+  iDocConflictCounter := 1;
+  objModuleRootElement := Nil;
   SpecialTags := TStringList.Create;
   // Create a default set of Special Tags.
   SpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree And iAutoExpand));

@@ -3,9 +3,11 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    12 Oct 2006
+  @Date    03 Aug 2008
   @Author  David Hoyle
   @Version 1.0
+
+  @bug     Option ShowConflicts does not expand that node.
 
 **)
 unit ModuleExplorerFrame;
@@ -103,72 +105,42 @@ type
     stbStatusBar: TStatusBar;
     ilScopeImages: TImageList;
     tvExplorer: TTreeView;
-    ToolBar1: TToolBar;
-    ToolButton1: TToolButton;
-    ToolButton2: TToolButton;
-    ToolButton3: TToolButton;
-    ToolButton4: TToolButton;
-    ToolButton5: TToolButton;
-    ActionList1: TActionList;
-    actLocal: TAction;
-    actPrivate: TAction;
-    actProtected: TAction;
-    actPublic: TAction;
-    actPublished: TAction;
-    ToolButton6: TToolButton;
-    ToolButton7: TToolButton;
-    ToolButton8: TToolButton;
-    ToolButton9: TToolButton;
-    actCustomDrawing: TAction;
-    actShowCommentHints: TAction;
-    actShowConflicts: TAction;
     procedure tvExplorerCustomDrawItem(Sender: TCustomTreeView;
       Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
-    procedure tvExplorerDblClick(Sender: TObject);
+    procedure tvExplorerClick(Sender: TObject);
     procedure tvExplorerKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure actToolbarActionExecute(Sender: TObject);
   private
     { Private declarations }
     FModule : TTreeNode;
     FNodeInfo : TObjectList;
     FSelectionChange : TSelectionChange;
     FFocus : TNotifyEvent;
-    FUpdating : Boolean;
     FExpandedNodes : TStringList;
     FSpecialTagNodes : Array Of TSpecialTagNode;
     FHintWin : TCustomHintWindow;
     FLastNode : TTreeNode;
     FOptionsChange : TNotifyEvent;
-    procedure DisplayClause(U : TIdentList; P : TTreeNode; strLabel : String;
-      iIcon, iLabelIcon : Integer); Overload;
-    procedure DisplayClause(C : TGenericContainerCollection; P : TTreeNode;
-      strLabel : String; iStartIcon, iLabelIcon : Integer); Overload;
-    procedure DisplayProcs(M: TMethodCollection; P: TTreeNode;
-      strLabel : String; boolImplementation : Boolean; iLabelIcon : Integer);
-    procedure DisplayClasses(Classes : TGenericContainerCollection; P : TTreeNode;
-      strNodeLabel, strClassName : String; iIconStart, iLabelIcon : Integer);
-    procedure SetNodeIcon(Scope: TScope; iStartIndex: Integer;
-      var Node: TTreeNode);
+    FINIFileName: String;
+    FSelectionChanging: Boolean;
+    FRendering: Boolean;
     { Private declarations }
     procedure GetBodyCommentTags(M : TBaseLanguageModule);
     Function AddNode(P : TTreeNode; strText : String; iLine, iCol,
       iImageIndex : Integer; Comment : TComment; SelectType : TSelectType) : TTreeNode;
     function GetTreeNodeInfo(iIndex: Integer): TTreeNodeInfo;
     procedure CreateSpecialTagNodes;
-    function IsInOptions(Scope: TScope): Boolean;
     Function GetNodeComment(iLine, iCol : Integer; C : TComment;
       SelectType : TSelectType) : Integer;
     procedure ExpandNodes;
-    procedure OutputModuleInfo(M : TBaseLanguageModule);
-    procedure DisplayClassMethods(Cls : TObjectDecl; S : TTreeNode);
-    procedure DisplayClassProperties(Cls : TClassDecl; S : TTreeNode);
-    procedure DisplayClassFields(Cls : TRecordDecl; S : TTreeNode);
-    Procedure DisplayErrors(M : TBaseLanguageModule);
+    procedure OutputModuleInfo(Container : TElementContainer);
     Procedure CMMouseLeave(var Msg : TMessage); Message CM_MOUSELEAVE;
-    Procedure DisplayDocumentConflicts(M : TBaseLanguageModule);
+    function FindTreeItem(strText: String): Integer;
+    procedure GetExpandedNodes;
+    function GetNodePath(Node: TTreeNode): String;
+    procedure SetExpandedNodes;
     (**
       This property returns the indexed NodeInfo class for the collection.
       @precon  iIndex must eb a valid index.
@@ -179,7 +151,7 @@ type
     Property NodeInfo[iIndex : Integer] : TTreeNodeInfo Read GetTreeNodeInfo;
     Procedure LoadSettings;
     Procedure SaveSettings;
-    procedure WM_ShowWindow(var Msg : TMessage); Message WM_SHOWWINDOW;
+    Procedure RenderContainers(RootNode : TTreenode; Container : TElementContainer);
   public
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
@@ -213,110 +185,10 @@ type
 implementation
 
 Uses
-  Registry, Types, Math;
+  IniFiles, Types, Math, DGHLibrary;
 
 Const
-  (** Icon index for a plane folder. **)
-  iFolder = 0;
-  (** Icon index for an error folder. **)
-  iErrorFolder = 1;
-  (** Icon Index for a to do folder. **)
-  iToDoFolder = 2;
-  (** Icon index for the todo item. **)
-  iToDoItem = 3;
-  (** Icon index for the document conflict folder. **)
-  iDocConflictFolder = 4;
-  (** Icon index for the a document conflict item. **)
-  iDocConflictItem = 5;
-  (** Icon index for the a document conflict missing item. **)
-  iDocConflictMissing = 6;
-  (** Icon index for the a document conflict error item. **)
-  iDocConflictError = 7;
-  (** Icon index for the an error item. **)
-  iError = 8;
-  (** Icon index for a warning item. **)
-  iWarning = 9;
-  (** Icon index for the an unit item. **)
-  iUnit = 10;
-  (** Icon index for the class items. **)
-  iClass = 11;
-  (** Icon index for the field items. **)
-  iField = 16;
-  (** Icon index for the property items. **)
-  iProperty = 21;
-  (** Icon index for the procedure items. **)
-  iProcedure = 26;
-  (** Icon index for the function items. **)
-  iFunction = 31;
-  (** Icon index for the constructor items. **)
-  iConstructor = 36;
-  (** Icon index for the destructor items. **)
-  iDestructor = 41;
-  (** Icon index for the record items. **)
-  iRecord = 46;
-  (** Icon index for the interface items. **)
-  iInterface = 51;
-  (** Icon index for the object items. **)
-  iObject = 56;
-  (** Icon index for the type items. **)
-  iTypes = 61;
-  (** Icon index for the var items. **)
-  iVars = 66;
-  (** Icon index for the constant items. **)
-  iConstants = 71;
-  (** Icon index for the exported headings items. **)
-  iExportHeadings = 76;
-  (** Icon index for the field collection items. **)
-  iFieldCollection = 81;
-  (** Icon index for the property collection items. **)
-  iPropertyCollection = 82;
-  (** Icon index for the method collection items. **)
-  iMethodCollection = 83;
-  (** Icon index for the uses clause label **)
-  iUnitLabel = 84;
-  (** Icon index for the types clause label **)
-  iTypeLabel = 85;
-  (** Icon index for the class label **)
-  iClassLabel = 86;
-  (** Icon index for the interface label **)
-  iInterfaceLabel = 87;
-  (** Icon index for the object label **)
-  iObjectLabel = 88;
-  (** Icon index for the record label **)
-  iRecordLabel = 89;
-  (** Icon index for the constants clause label **)
-  iConstantsLabel = 90;
-  (** Icon index for the variables clause label **)
-  iVarsLabel = 91;
-  (** Icon index for the implemented methods label **)
-  iImplementedMethodsLabel = 92;
-  (** Icon index for the exported heading label **)
-  iExportedHeadingsLabel = 93;
-  (** Icon index for the exports clause label **)
-  iExportsLabel = 94;
-  (** Icon index for the Res String clause **)
-  iResString = 95;
-  (** Icon index for the Thread Var clause **)
-  iThreadVar = 100;
-  (** Icon index for the module image **)
-  iModule = 105;
-  (** Icon index for the constants clause label **)
-  iResStringLabel = 106;
-  (** Icon index for the variables clause label **)
-  iThreadVarLabel = 107;
-  (** Icon index for spacing **)
-  iSpacer  = 108;
-  (** Icon index for inheritance **)
-  iInheritance = 109;
-  (** Icon index for initialization sections **)
-  iInitialization = 110;
-  (** Icon index for Finalization sections **)
-  iFinalization = 111;
-  (** This is the maximum number of refreshes to keep expanded nodes for unless
-      there counter has been reset by another appearance in a refresh. **)
-  iMaxRefreshes = 50;
-
-  (** A set of reserved word for the tree view to mark in bold **)
+  (** A set of reserved word for the tree view to mark in bold @bug This needs to comes from the parser! **)
   strReservedWords : Array[1..109] Of String = (
     'absolute', 'abstract', 'and', 'array', 'as', 'asm', 'assembler',
     'automated', 'begin', 'case', 'cdecl', 'class', 'const', 'constructor',
@@ -513,7 +385,7 @@ Begin
               End;
             ttSymbol, ttNumber :
               Begin
-                Font.Style := [fsBold];
+                Font.Style := [];
                 Font.Color := clGreen;
               End;
             ttStringLiteral :
@@ -554,9 +426,9 @@ Begin
   FComment := Nil;
   FSelectType := SelectType;
   If Comment <> Nil Then
-    FComment := TComment.Create('', Comment.Line, Comment.Col)
-  Else
-    FComment := TComment.Create('', 0, 0);
+    FComment := TComment.Create('', Comment.Line, Comment.Col);
+  //Else
+  //  FComment := TComment.Create('', 0, 0);
   FComment.Assign(Comment);
 End;
 
@@ -586,8 +458,13 @@ End;
 
 **)
 Constructor TframeModuleExplorer.Create(AOwner: TComponent);
+
+Var
+  i : TImageIndex;
+
 begin
   Inherited;
+  FINIFileName := BuildRootKey(Nil, Nil);
   FNodeInfo := TObjectList.Create(True);
   FExpandedNodes := TStringList.Create;
   FExpandedNodes.Sorted := True;
@@ -596,6 +473,11 @@ begin
   FHintWin := TCustomHintWindow.Create(Self);
   FHintWin.Color := clInfoBk;
   FHintWin.Canvas.Font.Assign(tvExplorer.Font);
+  ilScopeImages.Clear;
+  For i := Succ(Low(TImageIndex)) to High(TImageIndex) Do
+    If Not ilScopeImages.GetResource(rtBitmap, ImageList[i].FResourceName, 16,
+      [lrDefaultColor], ImageList[i].FMaskColour) Then
+      ShowMessage(Format('Resource "%s" not found.', [ImageList[i].FResourceName]))
 end;
 
 (**
@@ -607,7 +489,9 @@ end;
 
 **)
 Destructor TframeModuleExplorer.Destroy;
+
 begin
+  GetExpandedNodes;
   FHintWin.Free;
   SaveSettings;
   FExpandedNodes.Free;
@@ -645,226 +529,6 @@ End;
 
 (**
 
-  This method dislpays the given clause as children of the given tree node.
-
-  @precon  U is a identification list to be displayed in the tree, P is the
-           parent node for all the items in the list, strLabel is the label for
-           a category node between the parent and the list, iIcon is an index
-           for the items icons and iLabelIcon is the index of the icon to be
-           used for the clause label
-  @postcon Displays the TIdent clause given.
-
-  @param   U          as a TIdentList
-  @param   P          as a TTreeNode
-  @param   strLabel   as a String
-  @param   iIcon      as an Integer
-  @param   iLabelIcon as an Integer
-
-**)
-procedure TframeModuleExplorer.DisplayClause(U : TIdentList; P : TTreeNode;
-  strLabel : String; iIcon, iLabelIcon : Integer);
-
-Var
-  N : TTreeNode;
-  i : Integer;
-
-Begin
-  // Uses Clause
-  If U <> Nil Then
-    Begin
-      N := AddNode(P, strLabel, 0, 0, iLabelIcon, U.Comment, stIdentifier);
-      For i := 0 To U.Count - 1 Do
-        AddNode(N, U[i].Ident, U[i].Line, U[i].Col, iIcon, U[i].Comment,
-          stIdentifier);
-      If N.Count = 0 Then
-        N.Delete;
-    End;
-End;
-
-(**
-
-  This method displays the given clause as children if the given tree node.
-
-  @precon  C is a valid generic container collection to be displayed in the
-           tree, P is the parent tree node to attach the items to, strLabel is a
-           label for the intermediate node between the parent and the items,
-           iStartIcon is the starting icon index for the items and iStartIcon is
-           the icon index for the collection label.
-  @postcon Displays the given clause infromation.
-
-  @param   C          as a TGenericContainerCollection
-  @param   P          as a TTreeNode
-  @param   strLabel   as a String
-  @param   iStartIcon as an Integer
-  @param   iLabelIcon as an Integer
-
-**)
-procedure TframeModuleExplorer.DisplayClause(C : TGenericContainerCollection;
-  P : TTreeNode; strLabel : String; iStartIcon, iLabelIcon : Integer);
-
-Var
-  N, Item : TTreeNode;
-  i : Integer;
-
-Begin
-  // Const Clause
-  If C.Count > 0 Then
-    Begin
-      If strLabel <> '' Then
-        N := Addnode(P, strLabel, 0, 0, iLabelIcon, C.Comment, stIdentifier)
-      Else
-        N := P;
-      For i := 0 To C.Count - 1 Do
-        // Display all types that are not records, objects, classes, and interfaces
-        If Not (C[i] Is TRecordDecl) Then
-          If IsInOptions(C[i].Scope) Then
-            Begin
-              Item := AddNode(N, C[i].Identifier + #32 + C[i].AsString(True),
-                C[i].Line, C[i].Col, -1, C[i].Comment, stIdentifier);
-              SetNodeIcon(C[i].Scope, iStartIcon, Item);
-            End;
-      If (strLabel <> '') And (N.Count = 0) Then
-        N.Delete;
-    End;
-End;
-
-(**
-
-  This method renders the documentation conflicts for the given module.
-
-  @precon  M must be a valid Pascal Doc Module.
-  @postcon renders the docuemntation conflicts for the given module.
-
-  @param   M as a TBaseLanguageModule
-
-**)
-procedure TframeModuleExplorer.DisplayDocumentConflicts(
-  M: TBaseLanguageModule);
-
-Var
-  i : Integer;
-  DocConflictNode : TTreeNode;
-  strLastCategory : String;
-  InsertionNode : TTreeNode;
-  iImage : Integer;
-  ConflictComment : TComment;
-
-begin
-  DocConflictNode := Nil;
-  InsertionNode := Nil;
-  For i := 0 To M.DocumentConflictCount - 1 Do
-    Begin
-      If DocConflictNode = Nil Then
-        DocConflictNode := AddNode(FModule, strDocumentationConflicts, 0, 0,
-          iDocConflictFolder, Nil, stConflict);
-      If AnsiCompareText(strLastCategory, M.DocumentConflict[i].Category) <> 0 Then
-        Begin
-          InsertionNode := AddNode(DocConflictNode,
-            M.DocumentConflict[i].Category, 0, 0, iDocConflictFolder, Nil,
-              stConflict);
-          strLastCategory := M.DocumentConflict[i].Category;
-        End;
-      Case M.DocumentConflict[i].DocConflictType Of
-        dctModuleMissingDate,
-        dctModuleMissingVersion,
-        dctTypeClauseUndocumented,
-        dctConstantClauseUndocumented,
-        dctResourceStringClauseUndocumented,
-        dctVariableClauseUndocumented,
-        dctThreadVarClauseUndocumented,
-        dctRecordClauseUndocumented,
-        dctObjectClauseUndocumented,
-        dctClassClauseUndocumented,
-        dctInterfaceClauseUndocumented,
-        dctDispinterfaceClauseUndocumented,
-        dctMethodUndocumented,
-        dctMethodHasNoDesc,
-        dctMethodPostconNotDocumented,
-        dctPropertyUndocumented,
-        dctPropertyHasNoDesc,
-        dctPropertyPreconNotDocumented,
-        dctPropertyPostconNotDocumented
-          : iImage := iDocConflictItem;
-        dctModuleMissingDocumentation,
-        dctModuleMissingAuthor,
-        dctMethodUndocumentedParam,
-        dctMethodUndocumentedReturn,
-        dctMethodPreconNotDocumented,
-        dctMethodMissingPrecon,
-        dctMethodMissingPostcon,
-        dctPropertyUndocumentedParam,
-        dctPropertyUndocumentedReturn,
-        dctPropertyMissingPrecon,
-        dctPropertyMissingPostcon
-          : iImage := iDocConflictMissing;
-        dctModuleIncorrectDate,
-        dctModuleCheckDateError,
-        dctMethodDiffParamCount,
-        dctMethodIncorrectParamType,
-        dctMethodIncorrectReturnType,
-        dctMethodTooManyPrecons,
-        dctMethodTooManyPostcons,
-        dctPropertyDiffParamCount,
-        dctPropertyIncorrectParamType,
-        dctPropertyIncorrectReturnType,
-        dctPropertyTooManyPrecons,
-        dctPropertyTooManyPostcons
-          : iImage := iDocConflictError;
-      Else
-        iImage := iDocConflictError;
-      End;
-      ConflictComment := TComment.Create(M.DocumentConflict[i].Description,
-        M.DocumentConflict[i].CommentLine,
-        M.DocumentConflict[i].CommentColumn);
-      Try
-        AddNode(InsertionNode, M.DocumentConflict[i].Message,
-          M.DocumentConflict[i].IdentLine, M.DocumentConflict[i].IdentColumn,
-          iImage, ConflictComment, stConflict);
-      Finally
-        ConflictComment.Free;
-      End;
-    End;
-  If (DocConflictNode <> Nil) And
-    (doShowConflicts In BrowseAndDocItOptions.Options) Then
-    DocConflictNode.Expand(True);
-end;
-
-(**
-
-  This method returns true if the given scope is in the options set.
-
-  @precon Scope is the scope if the item to be tested.
-  @postcon Return true if the scope if is in the options.
-
-  @param   Scope as a TScope
-  @return  a Boolean
-
-**)
-Function TframeModuleExplorer.IsInOptions(Scope : TScope) : Boolean;
-
-Begin
-  Result := False;
-  Case Scope Of
-    scLocal:
-      If doShowLocals In BrowseAndDocItOptions.Options Then
-        Result := True;
-    scPrivate:
-      If doShowPrivates In BrowseAndDocItOptions.Options Then
-        Result := True;
-    scProtected:
-      If doShowProtecteds In BrowseAndDocItOptions.Options Then
-        Result := True;
-    scPublic:
-      If doShowPublics In BrowseAndDocItOptions.Options Then
-        Result := True;
-    scPublished:
-      If doShowPublisheds In BrowseAndDocItOptions.Options Then
-        Result := True;
-  End;
-End;
-
-(**
-
   This method loads the managed expanded nodes list from the registry.
 
   @precon  None.
@@ -879,96 +543,23 @@ Var
   iValue : Integer;
 
 begin
-  With TRegIniFile.Create() Do
+  With TIniFile.Create(FINIFileName) Do
     Try
       sl := TStringList.Create;
       Try
-        ReadSection(strRegRootKey + 'ManagedExpandedNodes', sl);
-      Finally
+        ReadSection('ManagedExpandedNodes', sl);
         For i := 0 To sl.Count - 1 Do
           Begin
-            iValue := ReadInteger(strRegRootKey + 'ManagedExpandedNodes', sl[i], 0);
+            iValue := ReadInteger('ManagedExpandedNodes', sl[i], 0);
             FExpandedNodes.AddObject(sl[i], TObject(iValue));
           End;
+      Finally
+        sl.Free;
       End;
     Finally
       Free;
     End;
 end;
-
-(**
-
-  This method displays the methods of the given method collection as children of
-  the passed tree node. If also recursively called itself and other routines to
-  display local method, types and vars, etc...
-
-  @precon  M is a method collection to be displayed in the tree, P is the parent
-           node to display the items under, strLabel is the label of an
-           intermediate item between the parent and the methods,
-           boolImplementation indicates whether the methods are in the
-           imlpementation section or not and iLabelIcon is the icon to be used
-           for the collection label.
-  @postcon Displays the procedures in the collection.
-
-  @param   M                  as a TMethodCollection
-  @param   P                  as a TTreeNode
-  @param   strLabel           as a String
-  @param   boolImplementation as a Boolean
-  @param   iLabelIcon         as an Integer
-
-**)
-procedure TframeModuleExplorer.DisplayProcs(M : TMethodCollection; P : TTreeNode;
-  strLabel : String; boolImplementation : Boolean; iLabelIcon : Integer);
-
-Var
-  N, F : TTreeNode;
-  i : Integer;
-  C : TTreeNode;
-  strLastClassName : String;
-
-Begin
-  // Get Functions / Procedures
-  strLastClassName := '';
-  If M.Count > 0 Then
-    Begin
-      If strLabel <> '' Then
-        N := AddNode(P, strLabel, 0, 0, iLabelIcon, Nil, stIdentifier)
-      Else
-        N := P;
-      C := N;
-      For i := 0 To M.Count - 1 Do
-        If IsInOptions(M[i].Scope) Or ((M[i].Scope = scLocal) And
-          (doShowLocalProcs In BrowseAndDocItOptions.Options)) Then
-          Begin
-            If AnsiCompareText(strLastClassName, M[i].ClsName) <> 0 Then
-              Begin
-                If M[i].ClsName <> '' Then
-                  Begin
-                    C := AddNode(N, M[i].ClsName, 0, 0, -1, Nil, stIdentifier);
-                    SetNodeIcon(scPublic, iClass, C);
-                  End Else
-                    C := N;
-                strLastClassName := M[i].ClsName;
-              End;
-            F := AddNode(C, M[i].GetAsString(False, False), M[i].Line, M[i].Col,
-              -1, M[i].Comment, stIdentifier);
-            Case M[i].MethodType Of
-              mtProcedure : SetNodeIcon(M[i].Scope, iProcedure, F);
-              mtFunction : SetNodeIcon(M[i].Scope, iFunction, F);
-              mtConstructor : SetNodeIcon(M[i].Scope, iConstructor, F);
-              mtDestructor : SetNodeIcon(M[i].Scope, iDestructor, F);
-            End;
-            DisplayClasses(M[i].Types, F, '', 'TRecordDecl', iRecord, iRecordLabel);
-            DisplayClause(M[i].Types, F, '', iTypes, iTypeLabel);
-            DisplayClause(M[i].Vars, F, '', iVars, iVarsLabel);
-            DisplayClause(M[i].Consts, F, '', iConstants, iConstantsLabel);
-            DisplayClause(M[i].ResStrings, F, '', iConstants, iConstantsLabel);
-            DisplayProcs(M[i].LocalMethods, F, '', True, iImplementedMethodsLabel);
-          End;
-      If (strLabel <> '') And (N.Count = 0) Then
-        N.Delete;
-    End;
-End;
 
 (**
 
@@ -984,246 +575,16 @@ Var
   i : Integer;
 
 begin
-  With TRegIniFile.Create() Do
+  With TIniFile.Create(FINIFileName) Do
     Try
-      EraseSection(strRegRootKey + 'ManagedExpandedNodes');
+      EraseSection('ManagedExpandedNodes');
       For i := 0 To FExpandedNodes.Count - 1 Do
-        WriteInteger(strRegRootKey + 'ManagedExpandedNodes', FExpandedNodes[i],
+        WriteInteger('ManagedExpandedNodes', FExpandedNodes[i],
           Integer(FExpandedNodes.Objects[i]));
     Finally
       Free;
     End;
 end;
-
-(**
-
-  This method for the NodeIcon property.
-
-  @precon  Scope is the scope if the node icon to set, iStartIndex is the start
-           index of the items icon set and Node is the node to assign the icons
-           too.
-  @postcon Sets the tree nodes image based on the starting index and the scope.
-
-  @param   Scope       as a TScope
-  @param   iStartIndex as an Integer
-  @param   Node        as a TTreeNode as a reference
-
-**)
-Procedure TframeModuleExplorer.SetNodeIcon(Scope : TScope;
-  iStartIndex : Integer; var Node : TTreeNode);
-
-  (**
-
-    This procedure sets the nodes image and select index to the value passed.
-
-    @precon  i is the icon index to be set.
-    @postcon Sets the image indexes of the passed tree node.
-
-    @param   i as an Integer
-
-  **)
-  procedure SetIndex(i : Integer);
-
-  begin
-    Node.ImageIndex := i;
-    Node.SelectedIndex := i;
-  end;
-
-Begin
-  Case Scope Of
-    scPublic, scGlobal : SetIndex(iStartIndex);
-    scPrivate          : SetIndex(iStartIndex + 1);
-    scPublished        : SetIndex(iStartIndex + 2);
-    scProtected        : SetIndex(iStartIndex + 3);
-    scLocal            : SetIndex(iStartIndex + 4);
-  End;
-End;
-
-(**
-
-  This method displays the fields, properties and method of the classes in the
-  supplied class collection as children of the given tree node.
-
-  @precon  Classes is a generic container collection of class like items to be
-           displayed, P is the parent node to display the items under,
-           strNodeLabel is the label of an intermediate node between the parent
-           and the items to be displayed, strClassName is the name of the class
-           of items to be displayed, iIconStart is the starting icon for the
-           items to be displayed and iLabelIcon is the icon to use on the
-           contain label.
-  @postcon Displays the classes in the container.
-
-  @param   Classes      as a TGenericContainerCollection
-  @param   P            as a TTreeNode
-  @param   strNodeLabel as a String - Node label
-  @param   strClassName as a String - Class name of type to display
-  @param   iIconStart   as an Integer - Start point of scope icons
-  @param   iLabelIcon   as an Integer
-
-**)
-procedure TframeModuleExplorer.DisplayClasses(Classes : TGenericContainerCollection;
-  P : TTreeNode; strNodeLabel, strClassName : String;
-  iIconStart, iLabelIcon : Integer);
-
-Var
-  N, S : TTreeNode;
-  i : Integer;
-  strLabel : String;
-
-Begin
-  // Get Functions / Procedures
-  If Classes.Count > 0 Then
-    Begin
-      If strNodeLabel <> '' Then
-        N := AddNode(P, strNodeLabel, 0, 0, iLabelIcon, Nil, stIdentifier)
-      Else
-        N := P;
-      For i := 0 To Classes.Count - 1 Do
-        If Classes[i].ClassNameIs(strClassName) Then
-          Begin
-            If IsInOptions(Classes[i].Scope) Then
-              Begin
-                If Classes[i] Is TDispInterfaceDecl Then
-                  strLabel := Classes[i].Identifier + ' = DispInterface'
-                Else If Classes[i] Is TInterfaceDecl Then
-                  strLabel := Classes[i].Identifier + ' = Interface'
-                Else If Classes[i] Is TClassDecl Then
-                  strLabel := Classes[i].Identifier + ' = Class'
-                Else If Classes[i] Is TRecordDecl Then
-                  strLabel := Classes[i].Identifier + ' = Record';
-                If Classes[i] Is TClassDecl Then
-                  With Classes[i] As TClassDecl Do
-                    Begin
-                      If Heritage.Count > 0 Then
-                        strLabel := strLabel + '(' + Heritage.AsString + ')'
-                    End;
-                S := AddNode(N, strLabel, Classes[i].Line,
-                  Classes[i].Col, -1, Classes[i].Comment, stIdentifier);
-                SetNodeIcon(Classes[i].Scope, iIconStart, S);
-                If Classes[i] Is TRecordDecl Then
-                  DisplayClassFields(Classes[i] As TRecordDecl, S);
-                If Classes[i] Is TClassDecl Then
-                  DisplayClassProperties(Classes[i] As TClassDecl, S);
-                If Classes[i] Is TObjectDecl Then
-                  DisplayClassMethods(Classes[i] As TObjectDecl, S);
-            End;
-        End;
-      If strNodeLabel <> '' Then
-        If N.Count = 0 Then
-          N.Delete;
-    End;
-End;
-
-(**
-
-  This method displays the give classes fields as children of the give tree
-  node.
-
-  @precon  Cls is a record whos fields require displaying and S is the tree node
-           to attach the fields too.
-  @postcon Display the class fields.
-
-  @param   Cls as a TRecordDecl
-  @param   S   as a TTreeNode
-
-**)
-procedure TframeModuleExplorer.DisplayClassFields(Cls : TRecordDecl; S : TTreeNode);
-
-Var
-  F : TTreeNode;
-  j : Integer;
-
-begin
-  If Cls.Parameters.Count > 0 Then
-    Begin
-      For j := 0 To Cls.Parameters.Count - 1 Do
-        If IsInOptions(Cls.Parameters[j].Scope) Then
-          Begin
-            F := AddNode(S, Cls.Parameters[j].Identifier + ' : ' +
-              Cls.Parameters[j].ParamType.AsString(True), Cls.Parameters[j].Line,
-                Cls.Parameters[j].Col, -1, Cls.Parameters[j].Comment,
-                stIdentifier);
-            SetNodeIcon(Cls.Parameters[j].Scope, iField, F);
-          End;
-    End;
-end;
-
-
-(**
-
-  This method displays the give classes properties as children of the given
-  tree node.
-
-  @precon  Cls is a class whos properties require displaying and S is the tree
-           node to attach the fields too.
-  @postcon This method displays the class properties.
-
-  @param   Cls as a TClassDecl
-  @param   S   as a TTreeNode
-
-**)
-procedure TframeModuleExplorer.DisplayClassProperties(Cls : TClassDecl;
-  S : TTreeNode);
-
-Var
-  F : TTreeNode;
-  j : Integer;
-
-begin
-  If Cls.Properties.Count > 0 Then
-    Begin
-      For j := 0 To Cls.Properties.Count - 1 Do
-        If IsInOptions(Cls.Properties[j].Scope) Then
-          Begin
-            F := AddNode(S, Cls.Properties[j].AsString, Cls.Properties[j].Line,
-              Cls.Properties[j].Col, -1, Cls.Properties[j].Comment,
-              stIdentifier);
-            SetNodeIcon(Cls.Properties[j].Scope, iProperty, F);
-          End;
-    End;
-end;
-
-
-(**
-
-  This method displays the give classes method as children to the supplied
-  treenode.
-
-  @precon  Cls is an object whos methods require displaying and S is the tree
-           node to attach the fields too.
-  @postcon Displays the Class methods.
-
-  @param   Cls as a TObjectDecl
-  @param   S   as a TTreeNode
-
-**)
-procedure TframeModuleExplorer.DisplayClassMethods(Cls : TObjectDecl;
-  S : TTreeNode);
-
-Var
-  F : TTreeNode;
-  j : Integer;
-
-begin
-  If Cls.Methods.Count > 0 Then
-    Begin
-      For j := 0 To Cls.Methods.Count - 1 Do
-        If IsInOptions(Cls.Methods[j].Scope) Then
-          Begin
-            F := AddNode(S, Cls.Methods[j].GetAsString(True, False),
-              Cls.Methods[j].Line, Cls.Methods[j].Col, -1,
-              Cls.Methods[j].Comment, stIdentifier);
-            Case Cls.Methods[j].MethodType Of
-              mtProcedure : SetNodeIcon(Cls.Methods[j].Scope, iProcedure, F);
-              mtFunction : SetNodeIcon(Cls.Methods[j].Scope, iFunction, F);
-              mtConstructor : SetNodeIcon(Cls.Methods[j].Scope, iConstructor, F);
-              mtDestructor : SetNodeIcon(Cls.Methods[j].Scope, iDestructor, F);
-            End;
-          End
-    End;
-
-end;
-
 
 (**
 
@@ -1250,7 +611,156 @@ Begin
             If AnsiCompareText(Tag[j].TagName, FSpecialTagNodes[k].strTagName) = 0 Then
               AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(False),
                 M.BodyComment[i].Tag[j].Line, M.BodyComment[i].Tag[j].Column,
-                  iToDoItem, Nil, stSpecialTags);
+                  Integer(iiToDoItem) - 1, Nil, stSpecialTags);
+End;
+
+(**
+
+  This method renders the modules sub-containers recursively.
+
+  @precon  RootNode must be a valid tree node and Container must be a valid
+           container.
+  @postcon Renders the modules sub-containers recursively.
+
+  @param   RootNode  as a TTreenode
+  @param   Container as a TElementContainer
+
+**)
+procedure TframeModuleExplorer.RenderContainers(RootNode : TTreenode; Container: TElementContainer);
+
+Var
+  i : Integer;
+  NewNode : TTreeNode;
+
+begin
+  For i := 1 To Container.ElementCount Do
+    Begin
+      NewNode := AddNode(RootNode, Container[i].AsString, Container[i].Line,
+        Container[i].Column, Container[i].ImageIndexAdjustedForScope,
+        Container[i].Comment, stIdentifier);
+      RenderContainers(NewNode, Container[i]);
+    End;
+end;
+
+(**
+
+  This method returns the path of the specified tree node.
+
+  @precon  Node is the tree node to be pathed.
+  @postcon Returns a string representation of the tree nodes path excluding
+           the root item.
+
+  @param   Node as a TTreeNode
+  @return  a String
+
+**)
+Function TframeModuleExplorer.GetNodePath(Node : TTreeNode) : String;
+
+Var
+  P : TTreeNode;
+  str : String;
+
+Begin
+  str := '';
+  P := Node;
+  While P <> Nil Do
+    Begin
+      If P.Parent <> Nil Then
+        str := P.Text + '.' + str;
+      P := P.Parent;
+    End;
+  Result := str;
+End;
+
+(**
+
+  This method gets the tree nodes that are currently expanded and stores them
+  in a string list.
+
+  @precon  Node is the tree node to be tested for expansion.
+  @postcon Adds, update or deletes nodes from the expanded node list depending
+           whether thhey are now expanded.
+
+**)
+Procedure TframeModuleExplorer.GetExpandedNodes;
+
+Var
+  str : String;
+  i, iIndex : Integer;
+  Node : TTreeNode;
+
+Begin
+  For i := 0 To tvExplorer.Items.Count - 1 Do
+    Begin
+      Node := tvExplorer.Items[i];
+      If Node.Count = 0 Then
+        Continue;
+      str := StringReplace(GetNodePath(Node), '=', '|', [rfReplaceAll]);
+      If Node.Expanded And (str <> '') Then
+        Begin
+          If Not FExpandedNodes.Find(str, iIndex) Then
+            iIndex := FExpandedNodes.Add(str);
+          FExpandedNodes.Objects[iIndex] := TObject(1);
+        End Else
+          If FExpandedNodes.Find(str, iIndex) Then
+            FExpandedNodes.Delete(iIndex);
+    End;
+End;
+
+(**
+
+  This method expands the tree view nodes if they are foudn in the list..
+
+  @precon  Node is the tree node to be expanded.
+  @postcon Sets the node as expanded if it was in the edpanded node list.
+
+**)
+Procedure TframeModuleExplorer.SetExpandedNodes;
+
+Var
+  i, j : Integer;
+  str : String;
+  Node : TTreeNode;
+
+Begin
+  For i := 0 To tvExplorer.Items.Count - 1 Do
+    Begin
+      Node := tvExplorer.Items[i];
+      If Node.Count = 0 Then
+        Continue;
+      str := StringReplace(GetNodePath(Node), '=', '|', [rfReplaceAll]);
+      If FExpandedNodes.Find(str, j) Then
+        Node.Expanded := True;
+    End;
+End;
+
+(**
+
+  This function finds the tree node that has the path specified by the
+  passed text.
+
+  @precon  strText is the string representation of the node path to be
+           found.
+  @postcon Returns tree node index of the item corresponding to the given
+           path.
+
+  @param   strText as a String
+  @return  an Integer
+
+**)
+Function TframeModuleExplorer.FindTreeItem(strText : String) : Integer;
+
+Var
+  j : Integer;
+
+Begin
+  Result := -1;
+  For j := 0 To tvExplorer.Items.Count - 1 Do
+    If AnsiCompareText(GetNodePath(tvExplorer.Items[j]), strText) = 0 Then
+      Begin
+        Result := j;
+        Exit;
+      End;
 End;
 
 (**
@@ -1271,273 +781,86 @@ Var
   strTop : String;
   strSelection : String;
 
-  (**
-
-    This routine manages the expanded node list. It increments the counter for
-    each node to indicate the age of the node and deletes nodes that are more
-    that iMaxRefreshes refreshes old.
-
-    @precon  None.
-    @postcon Keeps nodes alive which are not older than iMaxrefreshes.
-
-  **)
-  Procedure ManageExpanedNodes;
-
-  Var
-    iNode : Integer;
-
-  Begin
-    For iNode := FExpandedNodes.Count - 1 DownTo 0 Do
-      Begin
-        FExpandedNodes.Objects[iNode] := TObject(Integer(
-          FExpandedNodes.Objects[iNode]) + 1);
-        If Integer(FExpandedNodes.Objects[iNode]) > iMaxRefreshes Then
-          FExpandedNodes.Delete(iNode);
-      End;
-  End;
-
-  (**
-
-    This method returns the path of the specified tree node.
-
-    @precon  Node is the tree node to be pathed.
-    @postcon Returns a string representation of the tree nodes path excluding
-             the root item.
-
-    @param   Node as a TTreeNode
-    @return  a String
-
-  **)
-  Function GetNodePath(Node : TTreeNode) : String;
-
-  Var
-    P : TTreeNode;
-    str : String;
-
-  Begin
-    str := '';
-    P := Node;
-    While P <> Nil Do
-      Begin
-        If P.Parent <> Nil Then
-          str := P.Text + '.' + str;
-        P := P.Parent;
-      End;
-    Result := str;
-  End;
-
-  (**
-
-    This method gets the tree nodes that are currently expanded and stores them
-    in a string list.
-
-    @precon  Node is the tree node to be tested for expansion.
-    @postcon Adds, update or deletes nodes from the expanded node list depending
-             whether thhey are now expanded.
-
-    @param   Node as a TTreeNode
-
-  **)
-  Procedure GetExpandedNodes(Node : TTreeNode);
-
-  Var
-    str : String;
-    iIndex : Integer;
-
-  Begin
-    If Node.Count = 0 Then Exit;
-    str := GetNodePath(Node);
-    If Node.Expanded Then
-      Begin
-        If Not FExpandedNodes.Find(str, iIndex) Then
-          iIndex := FExpandedNodes.Add(str);
-        FExpandedNodes.Objects[iIndex] := TObject(1);
-      End Else
-        If FExpandedNodes.Find(str, iIndex) Then
-          FExpandedNodes.Delete(iIndex);
-  End;
-
-  (**
-
-    This method expands the tree view nodes if they are foudn in the list..
-
-    @precon  Node is the tree node to be expanded.
-    @postcon Sets the node as expanded if it was in the edpanded node list.
-
-    @param   Node as a TTreeNode
-
-  **)
-  Procedure SetExpandedNodes(Node : TTreeNode);
-
-  Var
-    j : Integer;
-
-  Begin
-    If Node.Count = 0 Then Exit;
-    If FExpandedNodes.Find(GetNodePath(Node), j) Then
-      Node.Expanded := True;
-  End;
-
-  (**
-
-    This function finds the tree node that has the path specified by the
-    passed text.
-
-    @precon  strText is the string representation of the node path to be
-             found.
-    @postcon Returns tree node index of the item corresponding to the given
-             path.
-
-    @param   strText as a String
-    @return  an Integer
-
-  **)
-  Function FindTreeItem(strText : String) : Integer;
-
-  Var
-    j : Integer;
-
-  Begin
-    Result := -1;
-    For j := 0 To tvExplorer.Items.Count - 1 Do
-      If AnsiCompareText(GetNodePath(tvExplorer.Items[j]), strText) = 0 Then
-        Begin
-          Result := j;
-          Exit;
-        End;
-  End;
-
-  Var
-    recMsg : TMessage;
-
 Begin
-  ManageExpanedNodes;
-  FHintWin.ReleaseHandle; // Stop AV when refreshing the tree.
-  With tvExplorer Do
-    Begin
-      For i := 0 To tvExplorer.Items.Count - 1 Do
-        GetExpandedNodes(tvExplorer.Items[i]);
-      // Find and store the top item and the selected item in the tree view
-      strTop := '';
-      If tvExplorer.TopItem <> Nil Then
-        strTop := GetNodePath(tvExplorer.TopItem);
-      strSelection := '';
-      If tvExplorer.Selected <> Nil Then
-        strSelection := GetNodePath(tvExplorer.Selected);
-      FUpdating := True;
-      Items.BeginUpdate;
-      Try
-        Items.Clear;
-        FNodeInfo.Clear;
-        FModule := Nil;
-        SetLength(FSpecialTagNodes, SpecialTags.Count);
+  If FRendering Then
+    Exit;
+  FRendering := True;
+  Try
+    FHintWin.ReleaseHandle; // Stop AV when refreshing the tree.
+    With tvExplorer Do
+      Begin
+        GetExpandedNodes;
+        // Find and store the top item and the selected item in the tree view
+        strTop := '';
+        If tvExplorer.TopItem <> Nil Then
+          strTop := GetNodePath(tvExplorer.TopItem);
+        strSelection := '';
+        If tvExplorer.Selected <> Nil Then
+          strSelection := GetNodePath(tvExplorer.Selected);
+        Items.BeginUpdate;
         Try
-          For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
-            Begin
-              FSpecialTagNodes[i].strTagName := SpecialTags.Names[i];
-              FSpecialTagNodes[i].strTagDesc :=
-                SpecialTags.Values[SpecialTags.Names[i]];
-              FSpecialTagNodes[i].boolShow :=
-                Integer(SpecialTags.Objects[i]) And iShowInTree <> 0;
-              FSpecialTagNodes[i].boolExpand :=
-                Integer(SpecialTags.Objects[i]) And iAutoExpand <> 0;
-            End;
-          If M = Nil Then Exit;
-          FModule := AddNode(Nil, M.ModuleName, M.ModuleNameLine,
-            M.ModuleNameCol, iModule, Nil, stIdentifier);
-                                            // Can not process the comment here
-                                            // as the root node doesn't
-                                            // exist yet.
-          DisplayErrors(M);
-          DisplayDocumentConflicts(M);
-          CreateSpecialTagNodes;
-          FModule.Data := TObject(GetNodeComment(M.ModuleNameLine,
-            M.ModuleNameCol, M.ModuleComment, stIdentifier)); // Process module comment here.
-          OutputModuleInfo(M);
-          // Expand previously expanded branches
-          For i := 0 To tvExplorer.Items.Count - 1 Do
-            SetExpandedNodes(tvExplorer.Items[i]);
-          ExpandNodes;
-          // Restore top and selected items
-          If M.Errors.Count = 0 Then // Only if no errors.
-            Begin
-              i := FindTreeItem(strTop);
-              If i <> - 1 Then
-                tvExplorer.TopItem := tvExplorer.Items[i];
-            End Else
-              tvExplorer.TopItem := tvExplorer.Items[0];
-          i := FindTreeItem(strSelection);
-          If i <> - 1 Then
-            tvExplorer.Selected := tvExplorer.Items[i];
+          Items.Clear;
+          FNodeInfo.Clear;
+          FModule := Nil;
+          SetLength(FSpecialTagNodes, SpecialTags.Count);
+          Try
+            For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
+              Begin
+                FSpecialTagNodes[i].strTagName := SpecialTags.Names[i];
+                FSpecialTagNodes[i].strTagDesc :=
+                  SpecialTags.Values[SpecialTags.Names[i]];
+                FSpecialTagNodes[i].boolShow :=
+                  Integer(SpecialTags.Objects[i]) And iShowInTree <> 0;
+                FSpecialTagNodes[i].boolExpand :=
+                  Integer(SpecialTags.Objects[i]) And iAutoExpand <> 0;
+              End;
+            If M = Nil Then
+              Exit;
+            // Create Root Tree Node
+            FModule := AddNode(Nil, M.ModuleName, M.ModuleNameLine,
+              M.ModuleNameCol, M.ImageIndexAdjustedForScope, M.Comment,
+              stIdentifier);
+            CreateSpecialTagNodes;
+            OutputModuleInfo(M);
+            SetExpandedNodes;
+            ExpandNodes;
+            // Restore top and selected items
+            If M.FindElement(strErrorsAndWarnings) = Nil Then // Only if no errors.
+              Begin
+                i := FindTreeItem(strTop);
+                If i <> - 1 Then
+                  tvExplorer.TopItem := tvExplorer.Items[i];
+              End Else
+                tvExplorer.TopItem := tvExplorer.Items[0];
+            i := FindTreeItem(strSelection);
+            If i <> - 1 Then
+              tvExplorer.Selected := tvExplorer.Items[i];
+          Finally
+            FSpecialTagNodes := Nil;
+          End;
         Finally
-          FSpecialTagNodes := Nil;
+          Items.EndUpdate;
         End;
-      Finally
-        Items.EndUpdate;
-        FUpdating := False;
       End;
-    End;
-  M.AddTickCount('Render');
-  With stbStatusBar Do
-    Begin
-      SimpleText := '';
-      For i := 1 To M.OpTickCounts - 1 Do
-        Begin
-          If SimpleText <> '' Then SimpleText := SimpleText + ', ';
-          SimpleText := SimpleText + Format('%s: %d', [
-            Copy(M.OpTickCountName[i],1, 25),
-            M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1]]);
-        End;
-    End;
-  WM_ShowWindow(recMsg); // updated toolbar
-End;
-
-(**
-
-  This method displays any errors found during the parsing of the module.
-
-  @precon  M is a valid instance of a TBaseLanguageModule that has been parsed.
-  @postcon Displays the error in the module.
-
-  @param   M as a TBaseLanguageModule
-
-**)
-Procedure TframeModuleExplorer.DisplayErrors(M : TBaseLanguageModule);
-
-Const
-  iMaxErrors : Integer = 25;
-
-Var
-  i : Integer;
-  N : TTreeNode;
-  FError : TTreeNode;
-
-Begin
-  FError := Nil;
-  If M.Errors.Count > 0 Then
-    FError := AddNode(FModule, strErrorsAndWarnings, 0, 0, iErrorFolder, Nil,
-      stError);
-  For i := 0 To Min(M.Errors.Count - 1, iMaxErrors) Do
-    Begin
-      N := AddNode(FError, M.Errors[i].Msg + ' [' +
-        M.Errors[i].Method + ']', M.Errors[i].Line,
-        M.Errors[i].Col, -1, Nil, stError);
-      Case M.Errors[i].ErrorType Of
-        etWarning :
+    M.AddTickCount('Render');
+    With stbStatusBar Do
+      Begin
+        SimpleText := '';
+        For i := 1 To M.OpTickCounts - 1 Do
           Begin
-            N.ImageIndex := iWarning;
-            N.SelectedIndex := iWarning;
+            If SimpleText <> '' Then SimpleText := SimpleText + ', ';
+            SimpleText := SimpleText + Format('%s: %d', [
+              M.OpTickCountName[i],
+              M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1]]);
           End;
-        etError :
-          Begin
-            N.ImageIndex := iError;
-            N.SelectedIndex := iError;
-          End;
+        If SimpleText <> '' Then SimpleText := SimpleText + ', ';
+        SimpleText := SimpleText + Format('%s: %d', ['Total',
+          M.OpTickCountByIndex[M.OpTickCounts - 1] - M.OpTickCountByIndex[0]]);
       End;
-      FError.Expand(True);
-    End;
+  Finally
+    FRendering := False;
+  End;
 End;
-
 
 (**
 
@@ -1546,39 +869,14 @@ End;
   @precon  M is a valid instance of a TBaseLanguageModule that has been parsed.
   @postcon Outputs the different parts of the module.
 
-  @param   M as a TBaseLanguageModule
+  @param   Container as a TElementContainer
 
 **)
-procedure TframeModuleExplorer.OutputModuleInfo(M : TBaseLanguageModule);
+procedure TframeModuleExplorer.OutputModuleInfo(Container : TElementContainer);
 
 begin
-  DisplayClause(M.UsesCls, FModule, strUses, iUnit, iUnitLabel);
-  DisplayClause(M.Types, FModule, strTypesLabel, iTypes, iTypeLabel);
-  DisplayClasses(M.Types, FModule, strClasses, 'TClassDecl', iClass, iClassLabel);
-  DisplayClasses(M.Types, FModule, strInterfaces, 'TInterfaceDecl', iInterface, iInterfaceLabel);
-  DisplayClasses(M.Types, FModule, strDispInterfaces, 'TDispInterfaceDecl', iInterface, iInterfaceLabel);
-  DisplayClasses(M.Types, FModule, strObjects, 'TObjectDecl', iObject, iObjectLabel);
-  DisplayClasses(M.Types, FModule, strRecords, 'TRecordDecl', iRecord, iRecordLabel);
-  DisplayClause(M.Constants, FModule, strConstants, iConstants, iConstantsLabel);
-  DisplayClause(M.ResourceStrings, FModule, strResourceStrings, iResString, iResStringLabel);
-  DisplayClause(M.Vars, FModule, strVars, iVars, iVarsLabel);
-  DisplayClause(M.ThreadVars, FModule, strThreadVars, iThreadVar, iThreadVarLabel);
-  DisplayProcs(M.ExportedHeadings, FModule, strExportedHeadings, False, iExportedHeadingsLabel);
-  DisplayClause(M.ExportsClause, FModule, strExports, iExportHeadings, iExportsLabel);
-  DisplayProcs(M.ImplementedMethods, FModule, strImplementedMethods, True, iImplementedMethodsLabel);
-  DisplayClause(M.Requires, FModule, strRequires, iUnit, iUnitLabel);
-  DisplayClause(M.Contains, FModule, strContains, iUnit, iUnitLabel);
-  // Initialization Clause
-  If M.InitializationSection <> Nil Then
-    AddNode(FModule, strInitialization, M.InitializationSection.Line,
-      M.InitializationSection.Col, iInitialization,
-      M.InitializationSection.Comment, stIdentifier);
-  // Finalization Clause
-  If M.FinalizationSection <> Nil Then
-    AddNode(FModule, strFinalization, M.FinalizationSection.Line,
-      M.FinalizationSection.Col, iFinalization, M.FinalizationSection.Comment,
-      stIdentifier);
-  GetBodyCommentTags(M);
+  RenderContainers(FModule, Container);
+  GetBodyCommentTags(Container As TBaseLanguageModule);
 end;
 
 
@@ -1628,10 +926,11 @@ Var
 Begin
   For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
     Begin
+      //: @bug ToDo node has module comment!
       FSpecialTagNodes[i].Node := tvExplorer.Items.AddChild(FModule,
         FSpecialTagNodes[i].strTagDesc);
-      FSpecialTagNodes[i].Node.ImageIndex := iToDoFolder;
-      FSpecialTagNodes[i].Node.SelectedIndex := iToDoFolder;
+      FSpecialTagNodes[i].Node.ImageIndex := Integer(iiToDoFolder) - 1;
+      FSpecialTagNodes[i].Node.SelectedIndex := Integer(iiToDoFolder) - 1;
     End;
 End;
 
@@ -1817,7 +1116,6 @@ begin
           //Draw Image
           NodeRect.Left := NodeRect.Left + tvExplorer.Indent;
           ilScopeImages.Draw(Sender.Canvas, NodeRect.Left, NodeRect.top, Node.ImageIndex);
-
           // Draw text
           NodeRect.Left := NodeRect.Left + ilScopeImages.Width + 3;
           iPos := NodeRect.Left + 2;
@@ -2181,23 +1479,30 @@ End;
   @param   Sender as a TObject
 
 **)
-procedure TframeModuleExplorer.tvExplorerDblClick(Sender: TObject);
+procedure TframeModuleExplorer.tvExplorerClick(Sender: TObject);
 
 Var
   N : TTreeNodeInfo;
 
 
 begin
-  If tvExplorer.Selected <> Nil Then
-    If Assigned(FSelectionChange) And Not FUpdating Then
-      Begin
-        N := NodeInfo[Integer(tvExplorer.Selected.Data)];
-        If N.Comment = Nil Then
-          FSelectionChange(N.Line, N.Col, N.Line, N.Col, N.SelectType)
-        Else
-          FSelectionChange(N.Line, N.Col, N.Comment.Line, N.Comment.Col,
-            N.SelectType);
-      End;
+  If FSelectionChanging Then
+    Exit;
+  FSelectionChanging := True;
+  Try
+    If tvExplorer.Selected <> Nil Then
+      If Assigned(FSelectionChange) And Not FRendering Then
+        Begin
+          N := NodeInfo[Integer(tvExplorer.Selected.Data)];
+          If N.Comment = Nil Then
+            FSelectionChange(N.Line, N.Col, N.Line, N.Col, N.SelectType)
+          Else
+            FSelectionChange(N.Line, N.Col, N.Comment.Line, N.Comment.Col,
+              N.SelectType);
+        End;
+  Finally
+    FSelectionChanging := False;
+  End;
 end;
 
 (**
@@ -2217,75 +1522,10 @@ procedure TframeModuleExplorer.tvExplorerKeyDown(Sender: TObject;
 begin
   If Key = 13 Then
     Begin
-      tvExplorerDblClick(Sender);
+      tvExplorerClick(Sender);
       If Assigned(OnFocus) Then
         FFocus(Sender);
     End;
 end;
-
-(**
-
-  This method handles all the on Execute event handlers for the Action items.
-
-  @precon  None.
-  @postcon Asscoiated the appropriate DocOption with the Action based on the Tag
-           property.
-
-  @param   Sender as a TObject
-
-**)
-procedure TframeModuleExplorer.actToolbarActionExecute(Sender: TObject);
-
-Var
-  DocOption : TDocOption;
-
-begin
-  If Sender Is TAction Then
-    Begin
-      Case (Sender As TAction).Tag Of
-        0 : DocOption := doCustomDrawing;
-        1 : DocOption := doShowCommentHints;
-        2 : DocOption := doShowConflicts;
-        3 : DocOption := doShowLocals;
-        4 : DocOption := doShowPrivates;
-        5 : DocOption := doShowProtecteds;
-        6 : DocOption := doShowPublics;
-        7 : DocOption := doShowPublisheds;
-      End;
-      If DocOption In BrowseAndDocItOptions.Options Then
-        BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options - [DocOption]
-      Else
-        BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [DocOption];
-      If Assigned(FOptionsChange) Then
-        FOptionsChange(Self);
-    End;
-end;
-
-(**
-
-  This is a windows message handler for the WM_SHOWWINDOW message.
-
-  @precon  None.
-  @postcon Updates the status of the Action items when the Explorer Frame
-           Window is shown or hidden.
-
-  @param   Msg as a TMessage as a reference
-
-**)
-procedure TframeModuleExplorer.WM_ShowWindow(var Msg : TMessage);
-
-Begin
-  If BrowseAndDocItOptions <> Nil Then
-    Begin
-      actCustomDrawing.Checked := doCustomDrawing In BrowseAndDocItOptions.Options;
-      actShowCommentHints.Checked := doShowCommentHints In BrowseAndDocItOptions.Options;
-      actShowConflicts.Checked := doShowConflicts In BrowseAndDocItOptions.Options;
-      actLocal.Checked := doShowLocals In BrowseAndDocItOptions.Options;
-      actPrivate.Checked := doShowPrivates In BrowseAndDocItOptions.Options;
-      actProtected.Checked := doShowProtecteds In BrowseAndDocItOptions.Options;
-      actPublic.Checked := doShowPublics In BrowseAndDocItOptions.Options;
-      actPublished.Checked := doShowPublisheds In BrowseAndDocItOptions.Options;
-    End;
-End;
 
 end.

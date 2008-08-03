@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    02 Aug 2008
+  @Date    03 Aug 2008
   @Author  David Hoyle
 
 **)
@@ -29,7 +29,6 @@ type
     Panel3: TPanel;
     Splitter1: TSplitter;
     lvFileList: TListView;
-    edtDirectory: TEdit;
     PopupMenu1: TPopupMenu;
     ActionList1: TActionList;
     EditCut1: TEditCut;
@@ -46,6 +45,8 @@ type
     SelectAll1: TMenuItem;
     btnOptions: TButton;
     btnQuit: TBitBtn;
+    chkRecurse: TCheckBox;
+    DirectoryListBox: TDirectoryListBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
@@ -62,6 +63,7 @@ type
     procedure lvFileListSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
     procedure btnOptionsClick(Sender: TObject);
+    procedure chkRecurseClick(Sender: TObject);
   private
     { Private declarations }
     FModuleExplorerFrame : TframeModuleExplorer;
@@ -74,7 +76,7 @@ type
     function GetFileName: String;
     procedure SetDirectory(const Value: String);
     procedure SetFileName(const Value: String);
-    Function GetErrors(strFileName : String) : Integer;
+    Procedure GetErrors(strFileName : String; var iErrors, iConflicts : Integer);
     Procedure RecurseDirectories(strDirectory : String);
     (**
       A property to define the directory for searching.
@@ -199,6 +201,21 @@ end;
 
 (**
 
+  This is an on click event handler for the Recurse check box.
+
+  @precon  None.
+  @postcon Determines whether recursive searching is undertaken.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmBrowseAndDocItTestForm.chkRecurseClick(Sender: TObject);
+begin
+  edtDirectoryChange(Sender);
+end;
+
+(**
+
   This is an on chnage event handler for the directory list control.
 
   @precon  None.
@@ -232,6 +249,8 @@ Var
   recFile : TSearchRec;
   iResult : Integer;
   liItem : TListItem;
+  iErrors: Integer;
+  iConflicts: Integer;
 
 Begin
   iResult := FindFirst(strDirectory + '\*.*', faAnyFile, recFile);
@@ -244,13 +263,15 @@ Begin
               Copy(strDirectory + '\' + recFile.Name, Length(FDirectory) + 1, 255) + '...');
             liItem := lvFileList.Items.Add;
             liItem.Caption := recFile.Name;
-            liItem.SubItems.Add(Format('%d', [
-              GetErrors(strDirectory + '\' + recFile.Name)]));
+            GetErrors(strDirectory + '\' + recFile.Name, iErrors, iConflicts);
+            liItem.SubItems.Add(Format('%d', [iErrors]));
+            liItem.SubItems.Add(Format('%d', [iConflicts]));
             liItem.SubItems.Add(strDirectory + '\' + recFile.Name);
             Application.ProcessMessages;
           End;
-        If (recFile.Attr And faDirectory <> 0) And (recFile.Name[1] <> '.') Then
-          RecurseDirectories(strDirectory + '\' + recFile.Name);
+        If chkRecurse.Checked Then
+          If (recFile.Attr And faDirectory <> 0) And (recFile.Name[1] <> '.') Then
+            RecurseDirectories(strDirectory + '\' + recFile.Name);
         iResult := FindNext(recFile);
       End;
   Finally
@@ -266,24 +287,36 @@ End;
   @postcon Gets the number of errors for the given files name.
 
   @param   strFileName as a String
-  @return  an Integer    
+  @param   iErrors     as an Integer as a reference
+  @param   iConflicts  as an Integer as a reference
 
 **)
-Function TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String) : Integer;
+Procedure TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String;
+  var iErrors, iConflicts : Integer);
 
 Var
   Source : TFileStream;
   M : TPascalModule;
+  i : Integer;
+  C: TElementContainer;
 
 Begin
+  iErrors := 0;
+  iConflicts := 0;
   Source := TFileStream.Create(strFileName, fmOpenRead);
   Try
     Source.Position := 0;
-    M := TPascalModule.Create(Source, strFileName, False, [moParse]);
+    M := TPascalModule.Create(Source, strFileName, False, [moParse,
+      moCheckForDocumentConflicts]);
     Try
-      Result := 0;
       If M.FindElement(strErrorsAndWarnings) <> Nil Then
-        Result := M.FindElement(strErrorsAndWarnings).ElementCount;
+        iErrors := M.FindElement(strErrorsAndWarnings).ElementCount;
+      C := M.FindElement(strDocumentationConflicts);
+      If C <> Nil Then
+        Begin
+          For i := 1 To C.ElementCount Do
+            Inc(iConflicts,C.Elements[i].ElementCount);
+        End;
     Finally
       M.Free;
     End;
@@ -386,8 +419,9 @@ begin
       Height := ReadInteger('Position', 'Height', Height);
       Width := ReadInteger('Position', 'Width', Width);
       Panel1.Width := ReadInteger('Position', 'Splitter', Panel1.Width);
-      edtDirectory.Text := ReadString('Position', 'Directory', GetCurrentDir);
+      DirectoryListBox.Directory := ReadString('Position', 'Directory', GetCurrentDir);
       j := ReadInteger('Setup', 'Selection', 0);
+      chkRecurse.Checked := ReadBool('Setup', 'Recurse', False);
       If lvFileList.Items.Count > j Then
         lvFileList.ItemIndex := j;
     Finally
@@ -428,8 +462,9 @@ begin
       WriteInteger('Position', 'Height', Height);
       WriteInteger('Position', 'Width', Width);
       WriteInteger('Position', 'Splitter', Panel1.Width);
-      WriteString('Position', 'Directory', edtDirectory.Text);
+      WriteString('Position', 'Directory', DirectoryListBox.Directory);
       WriteInteger('Setup', 'Selection', lvFileList.ItemIndex);
+      WriteBool('Setup', 'Recurse', chkRecurse.Checked)
     Finally
       Free;
     End;
@@ -475,11 +510,11 @@ Var
 begin
   FormCloseQuery(Self, boolCanClose);
   If lvFileList.Selected <> Nil Then
-    If FileExists(lvFileList.Selected.SubItems[1]) Then
-      FileName := lvFileList.Selected.SubItems[1]
+    If FileExists(lvFileList.Selected.SubItems[2]) Then
+      FileName := lvFileList.Selected.SubItems[2]
     Else
       MessageDlg(Format('The file "%s" was not found.',
-        [lvFileList.Selected.SubItems[1]]), mtError, [mbOK], 0);
+        [lvFileList.Selected.SubItems[2]]), mtError, [mbOK], 0);
 end;
 
 (**
@@ -541,7 +576,6 @@ Var
   Source : TMemoryStream;
 
 begin
-  //: @todo Only update module explorer IF change and been stead for several seconds.
   Source := TMemoryStream.Create;
   Try
     FSynEdit.Lines.SaveToStream(Source);
@@ -588,7 +622,7 @@ end;
 procedure TfrmbrowseAndDocItTestForm.SetDirectory(Const Value : String);
 begin
   FDirectory := Value;
-  edtDirectory.Text := FDirectory;
+  DirectoryListBox.Directory := FDirectory;
   DirectoryListBox1Change(Self);
 end;
 
@@ -605,8 +639,8 @@ end;
 **)
 procedure TfrmBrowseAndDocItTestForm.edtDirectoryChange(Sender: TObject);
 begin
-  If DirectoryExists(edtDirectory.Text) Then
-    Directory := edtDirectory.Text;
+  If DirectoryExists(DirectoryListBox.Directory) Then
+    Directory := DirectoryListBox.Directory;
 end;
 
 (**

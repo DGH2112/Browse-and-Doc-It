@@ -96,6 +96,15 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
         0000}
       NumGlyphs = 2
     end
+    object chkRecurse: TCheckBox
+      Left = 378
+      Top = 14
+      Width = 97
+      Height = 17
+      Caption = 'Recurse'
+      TabOrder = 4
+      OnClick = chkRecurseClick
+    end
   end
   object Panel3: TPanel
     Left = 0
@@ -110,17 +119,23 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       720)
     object lvFileList: TListView
       Left = 8
-      Top = 35
+      Top = 223
       Width = 259
-      Height = 678
+      Height = 490
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = <
         item
           Caption = 'FileName'
-          Width = 185
+          Width = 125
         end
         item
+          Alignment = taRightJustify
           Caption = 'Errors'
+        end
+        item
+          Alignment = taRightJustify
+          Caption = 'Conflicts'
+          Width = 60
         end>
       HideSelection = False
       ReadOnly = True
@@ -129,13 +144,13 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       ViewStyle = vsReport
       OnSelectItem = lvFileListSelectItem
     end
-    object edtDirectory: TEdit
+    object DirectoryListBox: TDirectoryListBox
       Left = 8
-      Top = 8
-      Width = 257
-      Height = 21
+      Top = 6
+      Width = 259
+      Height = 211
+      ItemHeight = 16
       TabOrder = 1
-      Text = 'edtDirectory'
       OnChange = edtDirectoryChange
     end
   end

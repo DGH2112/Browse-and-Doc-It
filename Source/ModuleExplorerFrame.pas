@@ -886,7 +886,8 @@ end;
   options and their contents.
 
   @precon  None.
-  @postcon Expands and
+  @postcon Expands, collapses or delete various nodes depending on the
+           options and their contents.
 
 **)
 procedure TframeModuleExplorer.ExpandNodes;
@@ -906,6 +907,13 @@ begin
     If FSpecialTagNodes[i].Node <> Nil Then
       If FSpecialTagNodes[i].boolExpand Then
         FSpecialTagNodes[i].Node.Expand(True);
+  If doShowConflicts In BrowseAndDocItOptions.Options Then
+    For i := 0 To FModule.Count -1 Do
+      If AnsiCompareText(FModule.Item[i].Text, strDocumentationConflicts) = 0 Then
+        Begin
+          FModule.Item[i].Expand(True);
+          Break;
+        End;
 end;
 
 

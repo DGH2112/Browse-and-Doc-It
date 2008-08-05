@@ -7,10 +7,8 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       03 Aug 2008
+  @Date       05 Aug 2008
   @Author     David Hoyle
-
-  @bug        Locals shown in methods regardless of options flag.
 
 **)
 Unit PascalDocModule;
@@ -31,14 +29,6 @@ Type
 
   (** This is a sub class for general type types **)
   TTypes = Class(TGenericTypeDecl)
-  Protected
-    Function GetAsString : String; Override;
-  Public
-    Procedure CheckDocumentation; Override;
-  End;
-
-  (** A type for the returns of functions. **)
-  TReturnType = Class(TGenericTypeDecl)
   Protected
     Function GetAsString : String; Override;
   End;
@@ -158,7 +148,7 @@ Type
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment); Override;
-    Procedure CheckDocumentation; Override;
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     (**
       Returns whether the record is packed or not.
       @precon  None.
@@ -172,19 +162,13 @@ Type
   TPascalParameter = Class(TGenericParameter)
   Protected
     Function GetAsString : String; Override;
-    Function ParamReturn : String;
   End;
 
   (** This is a class that defines method within Object Pascal code. **)
   TPascalMethod = Class(TGenericMethodDecl)
   Private
     FDirectives : TStringList;
-    FForwardDecl : Boolean;
     FResolved    : Boolean;
-    procedure CheckMethodDocumentation;
-    procedure CheckMethodParamCount;
-    Procedure CheckMethodParameters;
-    Procedure CheckMethodReturns;
   Protected
     Function GetAsString : String; Override;
     Function GetName : String; Override;
@@ -194,7 +178,6 @@ Type
     Destructor Destroy; Override;
     Procedure AddDirectives(strDirective : String);
     Function HasDirective(strDirective : String) : Boolean;
-    procedure CheckDocumentation; Override;
     (**
       Returns the string list of directives associated with the method.
       @precon  None.
@@ -202,13 +185,6 @@ Type
       @return  a TStringList
     **)
     Property Directives : TStringList Read FDirectives;
-    (**
-      This property returns whether the method is a forward declaration or not.
-      @precon  None.
-      @postcon Returns whether the method is a forward declaration or not.
-      @return  a Boolean
-    **)
-    Property ForwardDecl : Boolean Read FForwardDecl Write FForwardDecl;
     (**
       This property returns whether the method is resovled forward or not.
       @precon  None.
@@ -333,7 +309,7 @@ Type
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
-    procedure CheckDocumentation; Override;
+    procedure CheckDocumentation(var boolCascade : Boolean); Override;
     (**
       Returns a reference to the object class heritage.
       @precon  None.
@@ -349,15 +325,10 @@ Type
   Private
     FAbstractClass: Boolean;
     FSealedClass : Boolean;
-    procedure CheckPropertyTags(Prop: TGenericProperty);
-    procedure CheckPropertyDocumentation(Prop: TGenericProperty);
-    procedure CheckPropertyParamCount(Prop: TGenericProperty);
-    procedure CheckPropertyParameters(Prop: TGenericProperty);
-    procedure CheckPropertyReturns(Prop: TGenericProperty);
   Protected
     Function GetAsString : String; Override;
   Public
-    Procedure CheckDocumentation; Override;
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     (**
       This property defined whether the class is abstract or not.
       @precon  None.
@@ -383,7 +354,7 @@ Type
     Procedure SetGUID(Value : String);
     Function GetAsString : String; Override;
   Public
-    procedure CheckDocumentation; Override;
+    procedure CheckDocumentation(var boolCascade : Boolean); Override;
     (**
       Returns the GUID for the interface.
       @precon  None.
@@ -400,11 +371,11 @@ Type
   Protected
     Function GetAsString : String; Override;
   Public
-    procedure CheckDocumentation; Override;
+    procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This is a sub class for all constants. **)
-  TConstant = Class(TElementContainer)
+  TConstant = Class(TGenericConstant)
   Private
     FTyped : Boolean;
   Protected
@@ -412,7 +383,6 @@ Type
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
-    Procedure CheckDocumentation; Override;
     (**
       This property determines it the constant is typed or simple.
       @precon  None.
@@ -425,20 +395,18 @@ Type
   (** This is a sub class for all resource strings. **)
   TResourceString = Class(TConstant)
   Public
-    Procedure CheckDocumentation; Override;
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This is a sub class for all variables. **)
-  TVar = Class(TElementContainer)
+  TVar = Class(TGenericVariable)
   Protected
     Function GetAsString : String; Override;
-  Public
-    Procedure CheckDocumentation; Override;
   End;
   (** This is a sub class for all thread variables. **)
   TThreadVar = Class(TVar)
   Public
-    Procedure CheckDocumentation; Override;
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This class presents a field in a record, object, or class. **)
@@ -456,13 +424,13 @@ Type
   (** A class to represent the initialization section **)
   TInitializationSection = Class(TElementContainer)
   Public
-    Procedure CheckDocumentation; Override;
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** A class to represent the finalization section **)
   TFinalizationSection = Class(TElementContainer)
   Public
-    Procedure CheckDocumentation; Override;
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This is a record to represent the token information for type declaration. **)
@@ -634,7 +602,6 @@ Type
       var recPosition : TTokenPosition; Container : TElementContainer) : TPascalMethod;
     Function FindPropertyAtStreamPosition(iStreamPos: TStreamPosition;
       var recPosition : TTokenPosition; Container : TElementContainer): TClassDecl;
-    Procedure CheckDocumentation; Override;
   End;
 
 Const
@@ -642,9 +609,6 @@ Const
   strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
 
 Implementation
-
-Uses
-  DGHLibrary;
 
 Const
   (** A set of characters for alpha characaters **)
@@ -849,7 +813,7 @@ function TInterfaceDecl.GetAsString: String;
 var
   iToken: Integer;
 begin
-  Result := Name + #32'='#32'Interface';
+  Result := Identifier + #32'='#32'Interface';
   If Heritage.ElementCount > 0 Then
     Begin
       Result := Result + '(';
@@ -877,7 +841,7 @@ function TDispInterfaceDecl.GetAsString: String;
 var
   iToken: Integer;
 begin
-  Result := Name + #32'='#32'DispInterface';
+  Result := Identifier + #32'='#32'DispInterface';
   If Heritage.ElementCount > 0 Then
     Begin
       Result := Result + '(';
@@ -906,7 +870,7 @@ procedure TInterfaceDecl.SetGUID(Value : String);
 Begin
   If FGUID <> Value Then
     FGUID := Value;
-End; 
+End;
 
 (**
 
@@ -925,30 +889,14 @@ Var
   iToken : Integer;
 
 begin
-  Result := Name + #32'=';
+  If Identifier <> '' Then
+    Result := Identifier + #32'=';
   For iToken := 0 To TokenCount - 1 Do
-    Result := Result + #32 + Tokens[iToken].Token;
-end;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Returns the return type's definition.
-
-  @return  a String
-
-**)
-function TReturnType.GetAsString: String;
-
-Var
-  iToken : Integer;
-
-begin
-  Result := '';
-  For iToken := 0 To TokenCount - 1 Do
-    Result := Result + #32 + Tokens[iToken].Token;
+    Begin
+      If Result <> '' Then
+        Result := Result +#32;
+      Result := Result + Tokens[iToken].Token;
+    End;
 end;
 
 (**
@@ -990,7 +938,7 @@ Var
   iToken : Integer;
 
 begin
-  Result := Name;
+  Result := Identifier;
   If FTyped Then
     Result := Result + #32':'
    Else
@@ -1016,33 +964,14 @@ Var
 
 begin
   Result := strParamModifier[ParamModifier];
-  Result := Result + Identifier + #32':'#32;
-  Result := Result + strArrayOf[ArrayOf];
+  Result := Result + Identifier;
   If ParamType <> Nil Then
-    For i := 0 To ParamType.TokenCount - 1 Do
-      Result := Result + ParamType.Tokens[i].Token;
-end;
-
-(**
-
-  This method returns the type information for the parameter only.
-
-  @precon  None.
-  @postcon Returns the type information for the parameter only.
-
-  @return  a String
-
-**)
-function TPascalParameter.ParamReturn: String;
-
-Var
-  i : Integer;
-
-begin
-  Result := '';
-  If ParamType <> Nil Then
-    For i := 0 To ParamType.TokenCount - 1 Do
-      Result := Result + ParamType.Tokens[i].Token;
+    Begin
+      Result := Result + #32':'#32;
+      Result := Result + strArrayOf[ArrayOf];
+      For i := 0 To ParamType.TokenCount - 1 Do
+        Result := Result + ParamType.Tokens[i].Token;
+    End;
 end;
 
 (**
@@ -1081,7 +1010,6 @@ constructor TPascalMethod.Create(MethodType: TMethodType; strName : String;
 begin
   Inherited Create(MethodType, strName, AScope, iLine, iCol);
   FDirectives := TStringList.Create;
-  FForwardDecl := False;
 end;
 
 (**
@@ -1129,7 +1057,7 @@ begin
       Result := Result + ')';
     End;
   If ReturnType <> Nil Then
-      Result := Result + #32':' + ReturnType.AsString;
+      Result := Result + #32':'#32 + ReturnType.AsString;
   For i := 0 To FDirectives.Count - 1 Do
     Result := Result + '; ' + FDirectives[i];
 end;
@@ -1155,7 +1083,10 @@ begin
   If Result = '' Then
     Result := Format('PROC%4.4d', [Random(9999)]);
   For i := 0 To ParameterCount - 1 Do
-    Result := Result + Format('.%s', [Parameters[i].Name]);
+    If Parameters[i].ParamType <> Nil Then
+      Result := Result + Format('.%s', [Parameters[i].ParamType.AsString]);
+  If HasDirective('forward') Then
+    Result := Result + '.Forward';
 end;
 
 (**
@@ -1250,7 +1181,7 @@ Var
   i : Integer;
 
 begin
-  Result := 'Property ' + Name;
+  Result := 'Property ' + Identifier;
   If ParameterCount > 0 Then
     Begin
       Result := Result + '[';
@@ -1265,7 +1196,7 @@ begin
   Result := Result + #32':'#32;
   If TypeID <> Nil Then
     For i := 0 To TypeId.TokenCount - 1 Do
-      Result := Result + TypeId.Tokens[i].Token;
+      Result := Result + TypeId.AsString;
   OutputSpec(FIndexSpec);
   OutputSpec(FReadSpec);
   OutputSpec(FWriteSpec);
@@ -1409,7 +1340,7 @@ var
   iToken: Integer;
 
 begin
-  Result := Name;
+  Result := Identifier;
   For iToken := 0 To TokenCount - 1 Do
     Result := Result + #32 + Tokens[iToken].Token;
 end;
@@ -1426,7 +1357,7 @@ end;
 **)
 function TRecordDecl.GetAsString: String;
 begin
-  Result := Name + #32'='#32'Record';
+  Result := Identifier + #32'='#32'Record';
 end;
 
 (**
@@ -1445,7 +1376,7 @@ Var
   iToken : Integer;
 
 begin
-  Result := Name + #32'=';
+  Result := Identifier + #32'=';
   For iToken := 0 To TokenCount - 1 Do
     Result := Result + #32 + Tokens[iToken].Token;
 end;
@@ -1466,7 +1397,7 @@ Var
   iToken : Integer;
 
 begin
-  Result := Name;
+  Result := Identifier;
   For iToken := 0 To TokenCount - 1 Do
     Result := Result + #32 + Tokens[iToken].Token;
 end;
@@ -1487,7 +1418,7 @@ Var
   i : Integer;
 
 begin
-  Result := Name + #32':';
+  Result := Identifier + #32':';
   For i := 0 To TokenCount - 1 Do
     Result := Result + #32 + Tokens[i].Token;
 end;
@@ -1544,7 +1475,7 @@ Var
   iToken: Integer;
 
 begin
-  Result := Name + #32'='#32'Object';
+  Result := Identifier + #32'='#32'Object';
   If FHeritage.TokenCount > 0 Then
     Begin
       Result := Result + '(';
@@ -1574,7 +1505,7 @@ Var
   iToken: Integer;
 
 begin
-  Result := Name + #32'='#32'Class';
+  Result := Identifier + #32'='#32'Class';
   If Heritage.ElementCount > 0 Then
     Begin
       Result := Result + '(';
@@ -1650,6 +1581,8 @@ End;
 **)
 Constructor TPascalModule.Create(Source : TStream; strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
+var
+  boolCascade: Boolean;
 
 Begin
   Inherited Create(IsModified, strFileName);
@@ -1666,8 +1599,9 @@ Begin
       AddTickCount('Tidy');
       CheckUnResolvedMethods;
       AddTickCount('Resolve');
+      boolCascade := True;
       If moCheckForDocumentConflicts In ModuleOptions Then
-        CheckDocumentation;
+        CheckDocumentation(boolCascade);
     End;
   AddTickCount('Check');
 End;
@@ -2110,27 +2044,29 @@ Var
   E : TElementContainer;
 
 begin
-  If Container = Nil Then
+  If Method <> Nil Then
     Begin
-      Container := Add(strImplementedMethods, iiImplementedMethods, Nil);
-      iIcon := iiUnknownClsObj;
-      AScope := scNone;
-      E := FindElement(strTypesLabel);
-      If E <> Nil Then
-        If Method.ClsName <> '' Then
-          Begin
-            E := E.FindElement(Method.ClsName);
-            If E <> Nil Then
+      If Container = Nil Then
+        Begin
+          Container := Add(strImplementedMethods, iiImplementedMethods, Nil);
+          iIcon := iiUnknownClsObj;
+          AScope := scNone;
+          E := FindElement(strTypesLabel);
+          If E <> Nil Then
+            If Method.ClsName <> '' Then
               Begin
-                iIcon := E.ImageIndex;
-                AScope := E.Scope;
+                E := E.FindElement(Method.ClsName);
+                If E <> Nil Then
+                  Begin
+                    iIcon := E.ImageIndex;
+                    AScope := E.Scope;
+                  End;
+                Container := Container.Add(
+                  TElementContainer.Create(Method.ClsName, AScope, 0, 0, iIcon, Nil));
               End;
-            Container := Container.Add(
-              TTokenInfo.Create(Method.ClsName, 0, 0, 0, 0, ttUnknown),
-              AScope, iIcon, Nil);
-          End;
+        End;
+      Method := Container.Add(Method) As TPascalMethod;
     End;
-  Method := Container.Add(Method) As TPascalMethod;
 end;
 
 (**
@@ -2889,7 +2825,9 @@ Begin
   Result := Token.UToken = 'CONST';
   If Result Then
     Begin
-      C:= Add(strConstants, iiConstantsLabel, GetComment);
+      If Container = Nil Then
+        Container := Self;
+      C:= Container.Add(strConstants, iiConstantsLabel, GetComment);
       NextNonCommentToken;
       While ConstantDecl(AScope, C) Do
         If Token.Token = ';' Then
@@ -3096,7 +3034,9 @@ Begin
   Result := Token.UToken = 'TYPE';
   If Result Then
     Begin
-      T := Add(strTypesLabel, iiTypesLabel, GetComment);
+      If Container = Nil Then
+        Container := Self;
+      T := Container.Add(strTypesLabel, iiTypesLabel, GetComment);
       NextNonCommentToken;
       While TypeDecl(AScope, T) Do
         If Token.Token = ';' Then
@@ -3922,7 +3862,10 @@ begin
       With AToken Do
         Result := TRecordDecl.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicRecord, FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TRecordDecl;
+      Result.Line := AToken.FToken.Line;
+      Result.Column := AToken.FToken.Column;
+      Result.Comment := AToken.FComment ;
       Result.IsPacked := boolPacked;
       NextNonCommentToken;
       FieldList(Result);
@@ -4501,10 +4444,12 @@ Begin
                   If I[j].Comment <> Nil Then
                     Begin
                       V.Comment := TComment.Create(I[j].Comment);
+                      OwnedItems.Add(V.Comment);
                     End Else
                       If I[1].Comment <> Nil Then
                         Begin
                           V.Comment := TComment.Create(I[1].Comment);
+                          OwnedItems.Add(V.Comment);
                           V.Comment.AddToken('(Copy)', ttIdentifier);
                         End;
                 End;
@@ -4587,10 +4532,12 @@ Begin
                   If I[j].Comment <> Nil Then
                     Begin
                       V.Comment := TComment.Create(I[j].Comment);
+                      OwnedItems.Add(V.Comment);
                     End Else
                       If I[1].Comment <> Nil Then
                         Begin
                           V.Comment := TComment.Create(I[0].Comment);
+                          OwnedItems.Add(V.Comment);
                           V.Comment.AddToken('(Copy)', ttIdentifier);
                         End;
                 End;
@@ -6131,7 +6078,7 @@ Begin
       NextNonCommentToken;
       If Token.TokenType In [ttIdentifier] Then
         Begin
-          Method.ReturnType := TReturnType.Create('', scNone, 0, 0, iiNone, Nil);
+          Method.ReturnType := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
           TypeId(Method.ReturnType);
         End Else
           ErrorAndSeekToken(strIdentExpected, 'CheckReturnValue',
@@ -6198,24 +6145,24 @@ begin
           If (N <> Nil) And (N Is TPascalMethod) Then
             Begin
               M.Resolved := True;
-              (M As TPascalMethod).Resolved := True;
-              M.Scope := M.Scope;
+              (N As TPascalMethod).Resolved := True;
+              (N As TPascalMethod).Scope := M.Scope;
             End;
         End;
   // Find unresolved declarations
   If T <> Nil Then
     For k := 1 To T.ElementCount Do
       Begin
-        If T.Elements[k] Is TObjectDecl Then
+        If (T.Elements[k] Is TObjectDecl) And Not (T.Elements[k] Is TInterfaceDecl) Then
           Begin
             C := T.Elements[k];
             For j := 1 To C.ElementCount Do
               If C.Elements[j] Is TPascalMethod Then
                 Begin
                   M := C.Elements[j] As TPascalMethod;
-                  If Not M.Resolved Then
+                  If Not M.Resolved And Not M.ForwardDecl Then
                     AddError(TDocError.Create(Format(strUnSatisfiedForwardReference,
-                      [C.Name + '.' + M.Identifier]), scNone, 'CheckUnResolvedMethods', M.Line,
+                      [C.Identifier + '.' + M.Identifier]), scNone, 'CheckUnResolvedMethods', M.Line,
                       M.Column, etError));
                 End;
           End;
@@ -6244,7 +6191,7 @@ begin
                   M := C.Elements[j] As TPascalMethod;
                   If Not M.Resolved Then
                     AddError(TDocError.Create(Format(strUndeclaredClassMethod,
-                      [C.Name + '.' + M.Identifier]), scNone, 'CheckUnResolvedMethods', M.Line,
+                      [C.Identifier + '.' + M.Identifier]), scNone, 'CheckUnResolvedMethods', M.Line,
                       M.Column, etError));
                 End;
           End;
@@ -6422,6 +6369,7 @@ Begin
   strValue := '';
   P := TElementContainer.Create('', scLocal, 0, 0, iiNone, Nil);
   Try
+    P.Sorted:= False;
     FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
     Try
       IdentList(P, strSeekableOnErrorTokens);
@@ -6512,6 +6460,10 @@ Begin
   // Check for method directives
   While IsKeyWord(Token.Token, strMethodDirectives) Do
     Begin
+      If Token.UToken = 'FORWARD' THEN
+        M.ForwardDecl := True;
+      If Token.UToken = 'ABSTRACT' THEN
+        M.ForwardDecl := True;
       C := TElementContainer.Create('', scLocal, 0, 0, iiNone, Nil);
       Try
         If Token.UToken = 'MESSAGE' Then
@@ -6523,6 +6475,7 @@ Begin
           End
         Else If Token.UToken = 'EXTERNAL' Then
           Begin
+            M.ForwardDecl := True;
             NextNonCommentToken;
             ExprType := [etConstExpr, etString];
             ConstExpr(C, ExprType);
@@ -6585,7 +6538,10 @@ begin
       With AToken Do
         Result := TObjectDecl.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicObject, FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TObjectDecl;
+      Result.Line := AToken.FToken.Line;
+      Result.Column := AToken.FToken.Column;
+      Result.Comment := AToken.FComment ;
       NextNonCommentToken;
       // Get the classes heritage
       ObjHeritage(Result);
@@ -6983,7 +6939,10 @@ begin
           With AToken Do
             Result := TClassDecl.Create(FToken.Token, FScope, FToken.Line,
               FToken.Column, iiPublicClass, FComment);
-          AToken.FContainer.Add(Result);
+          Result := AToken.FContainer.Add(Result) As TClassDecl;
+          Result.Line := AToken.FToken.Line;
+          Result.Column := AToken.FToken.Column;
+          Result.Comment := AToken.FComment;
           Result.AbstractClass := (Token.UToken = 'ABSTRACT');
           If Result.AbstractClass Then
             NextNonCommentToken;
@@ -7224,7 +7183,8 @@ Begin
       NextNonCommentToken;
       FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
       Try
-        Prop.TypeId := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+        Prop.TypeId := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
+        TypeId(Prop.TypeId);
       Finally
         FTemporaryElements.Free;
       End;
@@ -7463,12 +7423,22 @@ begin
       UpdateTypeToken(AToken);
       With AToken Do
         If Token.UToken = 'INTERFACE' Then
-          Result := TInterfaceDecl.Create(FToken.Token, FScope, FToken.Line,
-            FToken.Column, iiPublicInterface, FComment)
-        Else
-          Result := TDispInterfaceDecl.Create(FToken.Token, FScope, FToken.Line,
-            FToken.Column, iiPublicDispInterface, FComment);
-      AToken.FContainer.Add(Result);
+          Begin
+            Result := TInterfaceDecl.Create(FToken.Token, FScope, FToken.Line,
+              FToken.Column, iiPublicInterface, FComment);
+            Result := AToken.FContainer.Add(Result) as TInterfaceDecl;
+            Result.Line := AToken.FToken.Line;
+            Result.Column := AToken.FToken.Column;
+            Result.Comment := AToken.FComment ;
+          End Else
+          Begin
+            Result := TDispInterfaceDecl.Create(FToken.Token, FScope, FToken.Line,
+              FToken.Column, iiPublicDispInterface, FComment);
+            Result := AToken.FContainer.Add(Result) as TDispInterfaceDecl;
+            Result.Line := AToken.FToken.Line;
+            Result.Column := AToken.FToken.Column;
+            Result.Comment := AToken.FComment ;
+          End;
       NextNonCommentToken;
       // If this class has not body then return
       If Token.Token <> ';' Then
@@ -7718,110 +7688,23 @@ End;
 
 (**
 
-  This method checks the module comment for various type of documentation
-  errors.
-
-  @precon  Module is the module to check.
-  @postcon The modules comment is checked for errors.
-
-**)
-Procedure TPascalModule.CheckDocumentation;
-
-Var
-  i : Integer;
-  strDate : String;
-  dtDate, dtFileDate : TDateTime;
-  Tag : TTag;
-
-Begin
-  If ((ModuleComment = Nil) Or (ModuleComment.TokenCount = 0)) And
-    (doShowUndocumentedModule In BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
-      dctModuleMissingDocumentation);
-  If (ModuleComment = Nil) Then Exit;
-  If (doShowMissingModuleDate In BrowseAndDocItOptions.Options) Then
-    Begin
-      i := ModuleComment.FindTag('date');
-      If (i = -1) Or (ModuleComment.Tag[i].TokenCount = 0) Then
-        AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
-          dctModuleMissingDate)
-      Else
-        Begin
-          Tag := ModuleComment.Tag[i];
-          strDate := Tag.AsString(False);
-          If Modified Then
-            dtFileDate := Now
-          Else
-            {$IFDEF VER180}
-            FileAge(FileName, dtFileDate);
-            {$ELSE}
-            dtFileDate := FileDateToDateTime(FileAge(Module.FileName));
-            {$ENDIF}
-          Try
-            dtDate := ConvertDate(strDate);
-            If Int(dtDate) <> Int(dtFileDate) Then
-              AddDocumentConflict([strDate, FormatDateTime('dd/mmm/yyyy', dtFileDate)],
-                Tag.Line, Tag.Column, ModuleComment, dctModuleIncorrectDate);
-          Except
-            AddDocumentConflict([strDate, FormatDateTime('dd/mmm/yyyy', dtFileDate)],
-              Tag.Line, Tag.Column, ModuleComment, dctModuleCheckDateError);
-          End
-        End;
-    End;
-  If (doShowMissingModuleVersion In BrowseAndDocItOptions.Options) Then
-    Begin
-      i := ModuleComment.FindTag('version');
-      If (i = -1) Or (ModuleComment.Tag[i].TokenCount = 0) Then
-        AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
-          dctModuleMissingVersion)
-    End;
-  If (doShowMissingModuleAuthor In BrowseAndDocItOptions.Options) Then
-    Begin
-      i := ModuleComment.FindTag('author');
-      If (i = -1) Or (ModuleComment.Tag[i].TokenCount = 0) Then
-        AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
-          dctModuleMissingAuthor)
-    End;
-  Inherited CheckDocumentation;
-End;
-
-(**
-
   This method checks the documentation for the given clause item.
 
   @precon  C is a valid generic container to be checked for clause like
            documentation.
   @postcon Checks the passed clause for documentation errors.
 
-**)
-Procedure TTypes.CheckDocumentation;
-
-Begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedTypes In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          dctTypeClauseUndocumented);
-    End;
-End;
-
-(**
-
-  This method checks the documentation for the given clause item.
-
-  @precon  C is a valid generic container to be checked for clause like
-           documentation.
-  @postcon Checks the passed clause for documentation errors.
+  @param   boolCascade as a Boolean
 
 **)
-Procedure TConstant.CheckDocumentation;
+Procedure TResourceString.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
   If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedConsts In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
-          dctConstantClauseUndocumented);
+          DocConflictTable[dctResourceStringClauseUndocumented]);
     End;
 End;
 
@@ -7833,55 +7716,17 @@ End;
            documentation.
   @postcon Checks the passed clause for documentation errors.
 
-**)
-Procedure TResourceString.CheckDocumentation;
-
-Begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedConsts In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          dctResourceStringClauseUndocumented);
-    End;
-End;
-
-(**
-
-  This method checks the documentation for the given clause item.
-
-  @precon  C is a valid generic container to be checked for clause like
-           documentation.
-  @postcon Checks the passed clause for documentation errors.
+  @param   boolCascade as a Boolean
 
 **)
-Procedure TVar.CheckDocumentation;
+Procedure TThreadVar.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
   If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedVars In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
-          dctVariableClauseUndocumented);
-    End;
-End;
-
-(**
-
-  This method checks the documentation for the given clause item.
-
-  @precon  C is a valid generic container to be checked for clause like
-           documentation.
-  @postcon Checks the passed clause for documentation errors.
-
-**)
-Procedure TThreadVar.CheckDocumentation;
-
-Begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedVars In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          dctThreadVarClauseUndocumented);
+          DocConflictTable[dctThreadVarClauseUndocumented]);
     End;
 End;
 
@@ -7893,15 +7738,17 @@ End;
            documentation.
   @postcon Checks the passed class for documentation errors.
 
+  @param   boolCascade as a Boolean
+
  **)
-Procedure TRecordDecl.CheckDocumentation;
+Procedure TRecordDecl.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
   If (Comment = Nil) Or (Comment.TokenCount = 0) Then
     Begin
       If doShowUndocumentedRecords In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
-          dctRecordClauseUndocumented);
+          DocConflictTable[dctRecordClauseUndocumented]);
     End;
 End;
 
@@ -7913,15 +7760,17 @@ End;
            documentation.
   @postcon Checks the passed class for documentation errors.
 
+  @param   boolCascade as a Boolean
+
  **)
-Procedure TObjectDecl.CheckDocumentation;
+Procedure TObjectDecl.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
   If (Comment = Nil) Or (Comment.TokenCount = 0) Then
     Begin
       If doShowUndocumentedObjects In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
-          dctObjectClauseUndocumented);
+          DocConflictTable[dctObjectClauseUndocumented]);
     End;
 End;
 
@@ -7933,8 +7782,10 @@ End;
            documentation.
   @postcon Checks the passed class for documentation errors.
 
+  @param   boolCascade as a Boolean
+
  **)
-Procedure TClassDecl.CheckDocumentation;
+Procedure TClassDecl.CheckDocumentation(var boolCascade : Boolean);
 
 Var
   i : Integer;
@@ -7944,11 +7795,11 @@ Begin
     Begin
       If doShowUndocumentedClasses In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
-          dctClassClauseUndocumented);
+          DocConflictTable[dctClassClauseUndocumented]);
     End;
   For i := 1 To ElementCount Do
     If Elements[i] Is TGenericProperty Then
-      CheckPropertyTags(Elements[i] As TGenericProperty);
+      (Elements[i] As TGenericProperty).CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7959,15 +7810,17 @@ End;
            documentation.
   @postcon Checks the passed class for documentation errors.
 
+  @param   boolCascade as a Boolean
+
  **)
-Procedure TInterfaceDecl.CheckDocumentation;
+Procedure TInterfaceDecl.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
   If (Comment = Nil) Or (Comment.TokenCount = 0) Then
     Begin
       If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
-          dctInterfaceClauseUndocumented);
+          DocConflictTable[dctInterfaceClauseUndocumented]);
     End;
 End;
 
@@ -7979,451 +7832,19 @@ End;
            documentation.
   @postcon Checks the passed class for documentation errors.
 
+  @param   boolCascade as a Boolean
+
  **)
-Procedure TDispInterfaceDecl.CheckDocumentation;
+Procedure TDispInterfaceDecl.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
   If (Comment = Nil) Or (Comment.TokenCount = 0) Then
     Begin
       If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
-          dctDispInterfaceClauseUndocumented);
+          DocConflictTable[dctDispInterfaceClauseUndocumented]);
     End;
 End;
-
-(**
-
-  This method check the given property for all the approriate documentation.
-
-  @precon  Cls is the class declaration that the property belongs too and Prop
-           is valid property declaration to be checked for documentation.
-  @postcon Checks the passed property for errors in the docuemntation tags.
-
-  @param   Prop as a TGenericProperty
-
- **)
-procedure TClassDecl.CheckPropertyTags(Prop : TGenericProperty);
-
-begin
-  CheckPropertyDocumentation(Prop);
-  If Prop.Comment = Nil Then
-    Exit;
-  CheckPropertyParamCount(Prop);
-  CheckPropertyParameters(Prop);
-  CheckPropertyReturns(Prop);
-end;
-
-(**
-
-  This method check the given property for general document problems, i.e.
-  missing or no description.
-
-  @precon  Cls is the class declaration that the property belongs too and Prop is
-           valid property declaration to be checked for documentation.
-  @postcon The passed property of the passed class is checked for documentation
-           errors.
-
-  @param   Prop as a TGenericProperty
-
-**)
-Procedure TClassDecl.CheckPropertyDocumentation(Prop : TGenericProperty);
-
-Begin
-  If Prop.Comment = Nil Then
-    Begin
-      If doShowMissingPropertyDoc In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier + '.' + Prop.Identifier], Prop.Line,
-          Prop.Column, Prop.Comment, dctPropertyUndocumented);
-      Exit;
-    End;
-  If (Prop.Comment.TokenCount = 0) And
-    (doShowMissingPropDocDesc In BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([Identifier + '.' + Prop.Identifier], Prop.Line,
-      Prop.Column, Prop.Comment, dctPropertyHasNoDesc);
-End;
-
-(**
-
-  This method check the given property for the correct parameter count and pre
-  and post condition count.
-
-  @precon  Cls is the class declaration that the property belongs too and Prop is
-           valid property declaration to be checked for documentation.
-  @postcon The passed property is checked for errors in its parameters.
-
-  @param   Prop as a TGenericProperty
-
-**)
-Procedure TClassDecl.CheckPropertyParamCount(Prop  : TGenericProperty);
-
-Var
-  i, j, k : Integer;
-
-Begin
-  j := 0;
-  For i := 0 To Prop.Comment.TagCount - 1 Do
-    If LowerCase(Prop.Comment.Tag[i].TagName) = 'param' Then
-      Inc(j);
-  k := 0;
-  For i := 0 To Prop.Comment.TagCount - 1 Do
-    If LowerCase(Prop.Comment.Tag[i].TagName) = 'precon' Then
-      Begin
-        Inc(k);
-        If Prop.Comment.Tag[i].TokenCount = 0 Then
-          AddDocumentConflict(['Property', identifier + '.' + Prop.Identifier],
-            Prop.Comment.Tag[i].Line, Prop.Comment.Tag[i].Column, Prop.Comment,
-            dctPropertyPreconNotDocumented);
-      End;
-  If (Prop.ParameterCount <> j) And
-    (doShowDiffPropParamCount In BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([identifier + '.' + Prop.Identifier], Prop.Line, Prop.Column,
-      Prop.Comment, dctPropertyDiffParamCount);
-  If (k < 1) And (doShowMissingPropPreCons In BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([identifier + '.' + Prop.Identifier], Prop.Line, Prop.Column,
-      Prop.Comment, dctPropertyMissingPreCon);
-  If (k > 1) And (doShowMissingPropPreCons In BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([identifier + '.' + Prop.Identifier], Prop.Line, Prop.Column,
-      Prop.Comment, dctPropertyTooManyPreCons);
-End;
-
-(**
-
-  This method check the given property for correctness of the parameter
-  documentation.
-
-  @precon  Cls is the class declaration that the property belongs too and Prop
-           is valid property declaration to be checked for documentation.
-  @postcon The passed property is check for errors in the parameter
-           docuemntation.
-
-  @param   Prop as a TGenericProperty
-
-**)
-Procedure TClassDecl.CheckPropertyParameters(Prop : TGenericProperty);
-
-Var
-  i, j : Integer;
-  iFound : Integer;
-  strType : String;
-  strParam: String;
-
-Begin
-  For i := 0 To Prop.ParameterCount - 1 Do
-    Begin
-      // Parameter name
-      iFound := -1;
-      With Prop.Comment Do
-        For j := 0 To TagCount - 1 Do
-          If (LowerCase(Tag[j].TagName) = 'param') And (Tag[j].TokenCount > 0) And
-            (LowerCase(Tag[j][0]) = Lowercase(Prop.Parameters[i].Identifier)) Then
-            Begin
-              iFound := j;
-              Break;
-            End;
-      If (iFound = -1) And (doShowUndocPropParam In BrowseAndDocItOptions.Options) Then
-        AddDocumentConflict([Prop.Parameters[i].Identifier, Identifier + '.' +
-          Prop.Identifier], Prop.Line, Prop.Column, Prop.Comment,
-            dctPropertyUndocumentedParam);
-      // Parameter type
-      If iFound > -1 Then
-        With Prop.Comment Do
-          Begin
-            strType := '';
-            If Tag[iFound].TokenCount > 3 Then
-              If AnsiCompareText(Tag[iFound].Token[3], 'ARRAY') = 0 Then
-                Begin
-                  If Tag[iFound].TokenCount > 5 Then
-                    strType := Tag[iFound].Token[5]
-                End Else
-                  strType := Tag[iFound].Token[3];
-            strParam := (Prop.Parameters[i] As TPascalParameter).ParamReturn;
-            If Not ((LowerCase(strType) = Lowercase(strParam))) Then
-              If doShowIncorrectPropParamType In BrowseAndDocItOptions.Options Then
-                AddDocumentConflict([Prop.Parameters[i].Identifier, Identifier + '.' +
-                  Prop.Identifier], Prop.Line, Prop.Column, Prop.Comment,
-                  dctPropertyIncorrectParamType);
-        End;
-    End;
-End;
-
-(**
-
-  This method check the given property for the correct return parameter.
-
-  @precon  Cls is the class declaration that the property belongs too and Prop
-           is valid property declaration to be checked for documentation.
-  @postcon Checks the passed property for returns documentation errors.
-
-  @param   Prop as a TGenericProperty
-
-**)
-Procedure TClassDecl.CheckPropertyReturns(Prop : TGenericProperty);
-
-Var
-  i, j, k : Integer;
-  iFound : Integer;
-
-Begin
-  iFound := -1;
-  k := 0;
-  For i := 0 To Prop.Comment.TagCount - 1 Do
-    If LowerCase(Prop.Comment.Tag[i].TagName) = 'postcon' Then
-      Begin
-        Inc(k);
-        If Prop.Comment.Tag[i].TokenCount = 0 Then
-          AddDocumentConflict([Identifier + '.' + Prop.Identifier],
-            Prop.Comment.Tag[i].Line, Prop.Comment.Tag[i].Column, Prop.Comment,
-            dctPropertyPostconNotDocumented);
-      End;
-  If (Prop.TypeId <> Nil) Then
-    Begin
-      With Prop.Comment Do
-        For j := 0 To TagCount - 1 Do
-          If (LowerCase(Tag[j].TagName) = 'return') Then
-            Begin
-              iFound := j;
-              Break;
-            End;
-    End;
-  If (iFound = -1) And (doShowUndocPropReturn in BrowseAndDocItOptions.Options) Then
-    Begin
-      If Prop.TypeId <> Nil Then
-        AddDocumentConflict([Identifier + '.' + Prop.Identifier],
-          Prop.Line, Prop.Column, Prop.Comment, dctPropertyUndocumentedReturn)
-    End Else
-    Begin
-      If ((Prop.Comment.Tag[iFound].TokenCount < 2) Or
-        (AnsiCompareText(Prop.TypeId.AsString,
-        Prop.Comment.Tag[iFound][1]) <> 0)) And
-        (doShowIncorrectPropReturnType In BrowseAndDocItOptions.Options) Then
-        AddDocumentConflict([Identifier + '.' + Prop.Identifier], Prop.Line,
-          Prop.Column, Prop.Comment, dctPropertyIncorrectReturnType);
-    End;
-  If doShowMissingPropPostCons in BrowseAndDocItOptions.Options Then iFound := 0;
-  If (k = 0) And (doShowMissingPropPostCons in BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([Identifier + '.' + Prop.Identifier], Prop.Line, Prop.Column,
-      Prop.Comment, dctPropertyMissingPostCon);
-  If doShowMissingPropPostCons in BrowseAndDocItOptions.Options Then
-    If (k > 1) And (iFound <> -1) Then
-      AddDocumentConflict([Identifier + '.' + Prop.Identifier], Prop.Line,
-        Prop.Column, Prop.Comment, dctPropertyTooManyPostCons);
-End;
-
-
-(**
-
-  This method checks the method passed against the method comments tags and
-  highlights missing parameter comments, return tags and missing descriptions.
-
-  @precon  Method is the method declaration that requires checking for document
-           conflicts.
-  @postcon The passed method is systematicaly check for errors.
-
-**)
-procedure TPascalMethod.CheckDocumentation;
-
-Begin
-  If Not FForwardDecl Then
-    Begin
-      CheckMethodDocumentation;
-      If Comment <> Nil Then
-        Begin
-          CheckMethodParamCount;
-          CheckMethodParameters;
-          CheckMethodReturns;
-        End;  
-    End;
-  Inherited CheckDocumentation;
-end;
-
-(**
-
-  This method check the given method for general document problems, i.e.
-  missing or no description.
-
-  @precon  Method is valid method declaration to be checked for documentation.
-  @postcon Checks the passed method for docuemntation errors.
-
-**)
-Procedure TPascalMethod.CheckMethodDocumentation;
-
-Begin
-  If Comment = Nil Then
-    Begin
-      If doShowMissingProcDocs In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([QualifiedName], Line, Column, Comment,
-          dctMethodUndocumented);
-      Exit;
-    End;
-  If (Comment.TokenCount = 0) And
-    (doShowMissingDocDesc In BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([QualifiedName], Line, Column, Comment,
-      dctMethodHasNoDesc);
-End;
-
-(**
-
-  This method checks the given method for the correct number of parameters and
-  tags.
-
-  @precon  Method is a method declaration that needs the be check for document
-           conflicts.
-  @postcon Checks the passed method for errors in the parameter count
-           documentation.
-
-**)
-Procedure TPascalMethod.CheckMethodParamCount;
-
-Var
-  i, j, k : Integer;
-
-Begin
-  j := 0;
-  For i := 0 To Comment.TagCount - 1 Do
-    If LowerCase(Comment.Tag[i].TagName) = 'param' Then
-      Inc(j);
-  k := 0;
-  For i := 0 To Comment.TagCount - 1 Do
-    If LowerCase(Comment.Tag[i].TagName) = 'precon' Then
-      Begin
-        Inc(k);
-        If Comment.Tag[i].TokenCount = 0 Then
-          AddDocumentConflict([QualifiedName], Comment.Tag[i].Line,
-            Comment.Tag[i].Column, Comment,
-            dctMethodPreconNotDocumented);
-      End;
-  If (ParameterCount <> j) And
-    (doShowDiffParamCount In BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([QualifiedName], Line, Column, Comment,
-      dctMethodDiffParamCount);
-  If (k < 1) And (doShowMissingPreCons In BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([QualifiedName], Line, Column, Comment,
-      dctMethodMissingPreCon);
-  If (k > 1) And (doShowMissingPreCons In BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([QualifiedName], Line, Column, Comment,
-      dctMethodTooManyPrecons);
-End;
-
-(**
-
-  This method checks the given method for the correct parameter tags and
-  pre conditions.
-
-  @precon  Method is a method declaration that needs the be check for document
-           conflicts.
-  @postcon Checks the passed method for errors in the parameter documentation.
-
-**)
-Procedure TPascalMethod.CheckMethodParameters;
-
-Var
-  i, j : Integer;
-  iFound : Integer;
-  strType : String;
-  strParam: String;
-
-Begin
-  For i := 0 To ParameterCount - 1 Do
-    Begin
-      // Parameter name
-      iFound := -1;
-      With Comment Do
-        For j := 0 To TagCount - 1 Do
-          If (LowerCase(Tag[j].TagName) = 'param') And (Tag[j].TokenCount > 0) And
-            (LowerCase(Tag[j][0]) = Lowercase(Parameters[i].Identifier)) Then
-            Begin
-              iFound := j;
-              Break;
-            End;
-      If (iFound = -1) And
-        (doShowUndocumentedParams In BrowseAndDocItOptions.Options) Then
-        AddDocumentConflict([Parameters[i].Identifier, QualifiedName],
-          Line, Column, Comment, dctMethodUndocumentedParam);
-      // Parameter type
-      If iFound > -1 Then
-        With Comment Do
-          Begin
-            strType := '';
-            If Tag[iFound].TokenCount > 3 Then
-              If AnsiCompareText(Tag[iFound].Token[3], 'ARRAY') = 0 Then
-                Begin
-                  If Tag[iFound].TokenCount > 5 Then
-                    strType := Tag[iFound].Token[5];
-                End Else
-                  strType := Tag[iFound].Token[3];
-            strParam := (Parameters[i] As TPascalParameter).ParamReturn;
-            If Not (LowerCase(strType) = Lowercase(strParam)) Then
-              If (doShowIncorrectParamType In BrowseAndDocItOptions.Options) Then
-                AddDocumentConflict([Parameters[i].Identifier, QualifiedName],
-                  Line, Column, Comment, dctMethodIncorrectParamType);
-          End;
-    End;
-End;
-
-(**
-
-  This method checks the given method for the correct return information and
-  tags.
-
-  @precon  Method is a method declaration that needs the be check for document
-           conflicts.
-  @postcon The passed method return is checked for errors.
-
-**)
-Procedure TPascalMethod.CheckMethodReturns;
-
-Var
-  i, j, k : Integer;
-  iFound : Integer;
-
-Begin
-  iFound := -1;
-  k := 0;
-  For i := 0 To Comment.TagCount - 1 Do
-    If LowerCase(Comment.Tag[i].TagName) = 'postcon' Then
-      Begin
-        Inc(k);
-        If Comment.Tag[i].TokenCount = 0 Then
-          AddDocumentConflict([QualifiedName], Comment.Tag[i].Line,
-            Comment.Tag[i].Column, Comment, dctMethodPostconNotDocumented);
-      End;
-  If MethodType = mtFunction Then
-    Begin;
-      If (ReturnType.AsString <> '') Then
-        Begin
-          With Comment Do
-            For j := 0 To TagCount - 1 Do
-              If AnsiCompareText(Tag[j].TagName, 'return') = 0 Then
-                Begin
-                  iFound := j;
-                  Break;
-                End;
-        End;
-      If (iFound = -1) And
-        (doShowUndocumentedReturn In BrowseAndDocItOptions.Options) Then
-        AddDocumentConflict([QualifiedName], Line, Column,
-          Comment, dctMethodUndocumentedReturn)
-      Else
-        Begin
-          If ((Comment.Tag[iFound].TokenCount < 2) Or
-            (AnsiCompareText(ReturnType.AsString,
-            Comment.Tag[iFound][1]) <> 0)) And
-            (doShowIncorrectReturnType In BrowseAndDocItOptions.Options) Then
-            AddDocumentConflict([QualifiedName], Line, Column, Comment,
-            dctMethodIncorrectReturntype);
-        End;
-    End;
-  iFound := 0;
-  If (k = 0) And (doShowMissingPostCons in BrowseAndDocItOptions.Options) Then
-    AddDocumentConflict([QualifiedName], Line, Column, Comment,
-      dctMethodMissingPostCon);
-  If doShowMissingPostCons in BrowseAndDocItOptions.Options Then
-    If (k > 1) And (iFound <> -1) Then
-      AddDocumentConflict([QualifiedName], Line, Column, Comment,
-        dctMethodTooManyPostCons);
-End;
-
-
 
 (**
 
@@ -8432,14 +7853,16 @@ End;
   @precon  None.
   @postcon Check the module's initialisation sections for comments.
 
+  @param   boolCascade as a Boolean
+
 **)
-Procedure TInitializationSection.CheckDocumentation;
+Procedure TInitializationSection.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
   If doShowMissingInitComment In BrowseAndDocItOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([strInitialization], Line, Column , Comment,
-        dctMissingInitComment);
+        DocConflictTable[dctMissingInitComment]);
 End;
 
 (**
@@ -8449,14 +7872,16 @@ End;
   @precon  None.
   @postcon Check the module's finalisation sections for comments.
 
+  @param   boolCascade as a Boolean
+
 **)
-Procedure TFinalizationSection.CheckDocumentation;
+Procedure TFinalizationSection.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
   If doShowMissingFinalComment In BrowseAndDocItOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([strFinalization], Line, Column, Comment,
-        dctMissingFinalComment);
+        DocConflictTable[dctMissingFinalComment]);
 End;
 
 End.

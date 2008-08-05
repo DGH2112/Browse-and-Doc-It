@@ -1,0 +1,170 @@
+/*
+
+  This is a Windows Resource File which generates a list of BitMaps for use
+  In the Explorer Tree View.
+
+*/
+Module                          BITMAP "Images\Module.bmp"
+
+DocConflictFolder               BITMAP "Images\DocConflictFolder.bmp"
+DocConflictIncorrect            BITMAP "Images\DocConflictIncorrect.bmp"
+DocConflictItem                 BITMAP "Images\DocConflictItem.bmp"
+DocConflictMissing              BITMAP "Images\DocConflictMissing.bmp"
+
+ErrorFolder                     BITMAP "Images\errorFolder.bmp"
+Error                           BITMAP "Images\error.bmp"
+Warning                         BITMAP "Images\Warning.bmp"
+
+UsesLabel                       BITMAP "Images\UsesLabel.bmp"
+UsesItem                        BITMAP "Images\UsesItem.bmp"
+
+TypesLabel                      BITMAP "Images\TypesLabel.bmp"
+PrivateType                     BITMAP "Images\privateType.bmp"
+ProtectedType                   BITMAP "Images\protectedType.bmp"
+PublicType                      BITMAP "Images\publicType.bmp"
+PublishedType                   BITMAP "Images\publishedType.bmp"
+LocalType                       BITMAP "Images\localType.bmp"
+
+RecordsLabel                    BITMAP "Images\RecordLabel.bmp"
+PrivateRecord                   BITMAP "Images\privateRecord.bmp"
+ProtectedRecord                 BITMAP "Images\protectedRecord.bmp"
+PublicRecord                    BITMAP "Images\publicRecord.bmp"
+PublishedRecord                 BITMAP "Images\publishedRecord.bmp"
+LocalRecord                     BITMAP "Images\localRecord.bmp"
+
+FieldsLabel                     BITMAP "Images\FieldsLabel.bmp"
+PrivateField                    BITMAP "Images\privateField.bmp"
+ProtectedField                  BITMAP "Images\protectedField.bmp"
+PublicField                     BITMAP "Images\publicField.bmp"
+PublishedField                  BITMAP "Images\publishedField.bmp"
+
+ObjectsLabel                    BITMAP "Images\ObjectLabel.bmp"
+privateObject                   BITMAP "Images\privateObject.bmp"
+protectedObject                 BITMAP "Images\protectedObject.bmp"
+publicObject                    BITMAP "Images\publicObject.bmp"
+publishedObject                 BITMAP "Images\publishedObject.bmp"
+localObject                     BITMAP "Images\localObject.bmp"
+
+PrivateConstructor              BITMAP "Images\privateConstructor.bmp"
+ProtectedConstructor            BITMAP "Images\protectedConstructor.bmp"
+PublicConstructor               BITMAP "Images\publicConstructor.bmp"
+PublishedConstructor            BITMAP "Images\publishedConstructor.bmp"
+LocalConstructor                BITMAP "Images\localConstructor.bmp"
+
+PrivateDestructor               BITMAP "Images\privateDestructor.bmp"
+ProtectedDestructor             BITMAP "Images\protectedDestructor.bmp"
+PublicDestructor                BITMAP "Images\publicDestructor.bmp"
+PublishedDestructor             BITMAP "Images\publishedDestructor.bmp"
+LocalDestructor                 BITMAP "Images\localDestructor.bmp"
+
+PrivateFunction                 BITMAP "Images\privateFunction.bmp"
+ProtectedFunction               BITMAP "Images\protectedFunction.bmp"
+PublicFunction                  BITMAP "Images\publicFunction.bmp"
+PublishedFunction               BITMAP "Images\publishedFunction.bmp"
+LocalFunction                   BITMAP "Images\localFunction.bmp"
+
+PrivateProcedure                BITMAP "Images\privateProcedure.bmp"
+ProtectedProcedure              BITMAP "Images\protectedProcedure.bmp"
+PublicProcedure                 BITMAP "Images\publicProcedure.bmp"
+PublishedProcedure              BITMAP "Images\publishedProcedure.bmp"
+LocalProcedure                  BITMAP "Images\localProcedure.bmp"
+
+ClassesLabel                    BITMAP "Images\ClassLabel.bmp"
+PrivateClass                    BITMAP "Images\privateClass.bmp"
+ProtectedClass                  BITMAP "Images\protectedClass.bmp"
+PublicClass                     BITMAP "Images\publicClass.bmp"
+PublishedClass                  BITMAP "Images\publishedClass.bmp"
+LocalClass                      BITMAP "Images\localClass.bmp"
+
+PropertyLabel                   BITMAP "Images\PropertyLabel.bmp"
+PublicProperty                  BITMAP "Images\publicProperty.bmp"
+PrivateProperty                 BITMAP "Images\privateProperty.bmp"
+ProtectedProperty               BITMAP "Images\protectedProperty.bmp"
+PublishedProperty               BITMAP "Images\publishedProperty.bmp"
+LocalProperty                   BITMAP "Images\localProperty.bmp"
+
+InterfacesLabel                 BITMAP "Images\InterfaceLabel.bmp"
+PrivateInterface                BITMAP "Images\privateInterface.bmp"
+ProtectedInterface              BITMAP "Images\protectedInterface.bmp"
+PublicInterface                 BITMAP "Images\publicInterface.bmp"
+PublishedInterface              BITMAP "Images\publishedInterface.bmp"
+LocalInterface                  BITMAP "Images\localInterface.bmp"
+
+DispInterfacesLabel             BITMAP "Images\DispInterfaceLabel.bmp"
+PrivateDispInterface            BITMAP "Images\privateDispInterface.bmp"
+ProtectedDispInterface          BITMAP "Images\protectedDispInterface.bmp"
+PublicDispInterface             BITMAP "Images\publicDispInterface.bmp"
+PublishedDispInterface          BITMAP "Images\publishedDispInterface.bmp"
+LocalDispInterface              BITMAP "Images\localDispInterface.bmp"
+
+ConstantsLabel                  BITMAP "Images\ConstantsLabel.bmp"
+PrivateConst                    BITMAP "Images\privateConst.bmp"
+ProtectedConst                  BITMAP "Images\protectedConst.bmp"
+PublicConst                     BITMAP "Images\publicConst.bmp"
+PublishedConst                  BITMAP "Images\publishedConst.bmp"
+LocalConst                      BITMAP "Images\localConst.bmp"
+
+ResourceStringsLabel            BITMAP "Images\ResStringLabel.bmp"
+PrivateResourceString           BITMAP "Images\privateResString.bmp"
+PublicResourceString            BITMAP "Images\publicResString.bmp"
+ProtectedResourceString         BITMAP "Images\protectedResString.bmp"
+PublishedResourceString         BITMAP "Images\publishedResString.bmp"
+LocalResourceString             BITMAP "Images\localResString.bmp"
+
+VariablesLabel                  BITMAP "Images\VarsLabel.bmp"
+PublishedVariable               BITMAP "Images\publishedVar.bmp"
+PublicVariable                  BITMAP "Images\publicVar.bmp"
+ProtectedVariable               BITMAP "Images\protectedVar.bmp"
+PrivateVariable                 BITMAP "Images\privateVar.bmp"
+LocalVariable                   BITMAP "Images\localVar.bmp"
+
+ThreadVarsLabel                 BITMAP "Images\ThreadVarsLabel.bmp"
+PrivateThreadVar                BITMAP "Images\privateThreadVar.bmp"
+ProtectedThreadVar              BITMAP "Images\protectedThreadVar.bmp"
+PublicThreadVar                 BITMAP "Images\publicThreadVar.bmp"
+PublishedThreadVar              BITMAP "Images\publishedThreadVar.bmp"
+LocalThreadVar                  BITMAP "Images\localThreadVar.bmp"
+
+ExportedHeadingsLabel           BITMAP "Images\ExportedHeadingsLabel.bmp"
+
+ExportedFunctionsLabel          BITMAP "Images\ExportsLabel.bmp"
+PrivateExportedFunction         BITMAP "Images\privateExportedFunction.bmp"
+ProtectedExportedFunction       BITMAP "Images\protectedExportedFunction.bmp"
+PublicExportedFunction          BITMAP "Images\publicExportedFunction.bmp"
+PublishedExportedFunction       BITMAP "Images\publishedExportedFunction.bmp"
+LocalExportedFunction           BITMAP "Images\localExportedFunction.bmp"
+
+LabelsLabel                     BITMAP "Images\LabelsLabel.bmp"
+PublicLabel                     BITMAP "Images\publicLabel.bmp"
+
+ImplementedMethodsLabel         BITMAP "Images\ImplementedMethodsLabel.bmp"
+
+InitializationLabel             BITMAP "Images\Initialization.bmp"
+FinalizationLabel               BITMAP "Images\Finalization.bmp"
+
+ToDoFolder                      BITMAP "Images\todoFolder.bmp"
+ToDoItem                        BITMAP "Images\todoItem.bmp"
+
+UnknownClsObj                   BITMAP "Images\UnknownClsObj.bmp"
+
+;;Class                           BITMAP "Images\Class.bmp"
+;;FieldCollection                 BITMAP "Images\FieldCollection.bmp"
+;;Folder                          BITMAP "Images\Folder.bmp"
+;;Heritage                        BITMAP "Images\Heritage.bmp"
+;;Inheritance                     BITMAP "Images\Inheritance.bmp"
+;;Local                           BITMAP "Images\Local.bmp"
+;;MethodCollection                BITMAP "Images\MethodCollection.bmp"
+;;Methods                         BITMAP "Images\Methods.bmp"
+;;objects                         BITMAP "Images\objects.bmp"
+;;Private                         BITMAP "Images\Private.bmp"
+;;PropertyCollection              BITMAP "Images\PropertyCollection.bmp"
+;;Protected                       BITMAP "Images\Protected.bmp"
+;;Public                          BITMAP "Images\Public.bmp"
+;;Published                       BITMAP "Images\Published.bmp"
+;;ShowLocal                       BITMAP "Images\ShowLocal.bmp"
+;;ShowPrivate                     BITMAP "Images\ShowPrivate.bmp"
+;;ShowProtected                   BITMAP "Images\ShowProtected.bmp"
+;;ShowPublic                      BITMAP "Images\ShowPublic.bmp"
+;;ShowPublished                   BITMAP "Images\ShowPublished.bmp"
+
+

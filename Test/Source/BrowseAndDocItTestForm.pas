@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    03 Aug 2008
+  @Date    04 Aug 2008
   @Author  David Hoyle
 
 **)
@@ -535,9 +535,12 @@ procedure TfrmBrowseAndDocItTestForm.SelectionChange(iIdentLine, iIdentCol, iCom
   iCommentCol: Integer; SelectType : TSelectType);
 
 begin
-  FSynEdit.CaretX := iIdentCol;
-  FSynEdit.CaretY := iIdentLine;
-  FSynEdit.TopLine := iIdentLine - FSynEdit.LinesInWindow Div 2;
+  If iIdentLine * iIdentCol > 0 Then
+    Begin
+      FSynEdit.CaretX := iIdentCol;
+      FSynEdit.CaretY := iIdentLine;
+      FSynEdit.TopLine := iIdentLine - FSynEdit.LinesInWindow Div 2;
+    End;
 end;
 
 (**

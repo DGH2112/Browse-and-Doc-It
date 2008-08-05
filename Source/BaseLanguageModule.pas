@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    03 Aug 2008
+  @Date    05 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -48,7 +48,6 @@ Type
     doShowProtecteds,
     doShowPublics,
     doShowPublisheds,
-    doShowLocalProcs,
     doShowConflicts,
     doShowMissingProcDocs,
     doShowMissingDocDesc,
@@ -547,6 +546,14 @@ Type
     Property Col : Integer Read GetCol;
   End;
 
+  (** A record to describe document conflict information. **)
+  TDocConflictTable = Record
+    FCategory     : String;
+    FMessage      : String;
+    FDescription  : String;
+    FConflictType : TDocConflictIcon;
+  End;
+
   (** This is a class reference for the TElementContainer class such that the
       descendant classes can clone themselves. **)
   TElementContainerClass = Class Of TElementContainer;
@@ -563,6 +570,7 @@ Type
     FComment : TComment;
     FScope : TScope;
     FImageIndex : TImageIndex;
+    FSorted  : Boolean;
   Protected
     Function GetElementCount : Integer;
     Function GetElements(iIndex : Integer) : TElementContainer;
@@ -572,6 +580,7 @@ Type
     Function GetImageIndexAdjustedForScope : Integer;
     Function Find(strName : String) : Integer;
     Function GetName: String; Virtual;
+    Procedure SetSorted(boolValue : Boolean);
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Virtual;
@@ -588,10 +597,10 @@ Type
     Procedure Assign(Source : TElementContainer); Virtual;
     Function FindToken(strToken : String) : Integer;
     Procedure DeleteElement(iIndex : Integer);
-    Procedure CheckDocumentation; Virtual;
+    Procedure CheckDocumentation(var boolCascade : Boolean); Virtual;
     Procedure AddDocumentConflict(Const Args: Array of TVarRec;
       iIdentLine, iIdentColumn : Integer; AComment : TComment;
-      DocConflictType : TDocConflictType);
+      DocConflictRec : TDocConflictTable);
     (**
       This property returns the number of elements in the collection.
       @precon  None.
@@ -689,6 +698,13 @@ Type
       @return  an Integer
     **)
     Property ImageIndexAdjustedForScope : Integer Read GetImageIndexAdjustedForScope;
+    (**
+      This property determines if the collection is sorted or sequential.
+      @precon  None.
+      @postcon Sets or gets whether the collection is sorted.
+      @return  a Boolean
+    **)
+    Property Sorted : Boolean Read FSorted Write SetSorted;
   End;
 
   (** This class represents a single identifier with line, col and comment
@@ -699,7 +715,22 @@ Type
   TIdentList = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer);
 
   (** This is a sub class for all types **)
-  TGenericTypeDecl = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer);
+  TGenericTypeDecl = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
+  Public
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
+  End;
+
+  (** This is a sub class for all constants **)
+  TGenericConstant = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
+  Public
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
+  End;
+
+  (** This is a sub class for all variables **)
+  TGenericVariable = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
+  Public
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
+  End;
 
   (** This class represents a parameter of a method declaration. **)
   TGenericParameter = Class (TElementContainer)
@@ -713,6 +744,7 @@ Type
       boolArrayOf : Boolean; AType : TGenericTypeDecl; Value : String;
       AScope : TScope; iLine, iCol : Integer); ReIntroduce; Overload;
     Destructor Destroy; Override;
+    Function ParamReturn : String;
     (**
       Returns the parameter modifier : const, var or out.
       @precon  None.
@@ -760,6 +792,7 @@ Type
     FExt: String;
     FClassMethod : Boolean;
     FAlias: String;
+    FForwardDecl : Boolean;
   Protected
     Procedure SetClsName(Value : String);
     procedure SetMsg(const Value: String);
@@ -767,11 +800,16 @@ Type
     Function GetQualifiedName : String;
     Function GetParameterCount : Integer;
     Function GetParameters(iIndex : Integer) : TGenericParameter;
+    procedure CheckMethodDocumentation;
+    procedure CheckMethodParamCount;
+    Procedure CheckMethodParameters;
+    Procedure CheckMethodReturns;
   Public
     Constructor Create(MethodType : TMethodType; strName : String; AScope : TScope;
       iLine, iCol : Integer); ReIntroduce; Virtual;
     Destructor Destroy; Override;
     Procedure AddParameter(AParameter : TGenericParameter);
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     (**
       Returns the methods types, procedure, function, constructor, destructor.
       @precon  None.
@@ -844,6 +882,13 @@ Type
       @return  a String
     **)
     Property Alias : String Read FAlias Write FAlias;
+    (**
+      This property returns whether the method is a forward declaration or not.
+      @precon  None.
+      @postcon Returns whether the method is a forward declaration or not.
+      @return  a Boolean
+    **)
+    Property ForwardDecl : Boolean Read FForwardDecl Write FForwardDecl;
   End;
 
   (** This is a class that represents properties of a class or interface. **)
@@ -854,12 +899,16 @@ Type
   Protected
     Function GetParameterCount : Integer;
     Function GetParameters(iIndex : Integer) : TGenericParameter;
-    Procedure SetTypeID(T : TGenericTypeDecl);
+    procedure CheckPropertyDocumentation;
+    procedure CheckPropertyParamCount;
+    procedure CheckPropertyParameters;
+    procedure CheckPropertyReturns;
   Public
     Constructor Create(strIdent : String; AScope : TScope; iLine, iCol : Integer;
       AImageIndex : TImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
     Procedure AddParameter(AParameter : TGenericParameter);
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     (**
       This property returns the number of parameter in the parameter collection.
       @precon  None.
@@ -881,7 +930,7 @@ Type
       @postcon Returns the type identifier of the property.
       @return  a TGenericTypeDecl
     **)
-    Property TypeId : TGenericTypeDecl Read FTypeID Write SetTypeID;
+    Property TypeId : TGenericTypeDecl Read FTypeID Write FTypeID;
   End;
 
   (** This class defines a parsing error. **)
@@ -1081,6 +1130,7 @@ Type
     Function IfDef(strDef : String) : Boolean;
     Function IfNotDef(strDef : String) : Boolean;
     Procedure AddError(Error : TElementContainer);
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     { Properties }
     (**
       Returns a reference to the modules error collection.
@@ -1227,14 +1277,6 @@ Type
     Property Defines : TStringList Read FDefines;
   End;
 
-  (** A record to describe document conflict information. **)
-  TDocConflictTable = Record
-    FCategory     : String;
-    FMessage      : String;
-    FDescription  : String;
-    FConflictType : TDocConflictIcon;
-  End;
-
 ResourceString
   (** Options text for Draw Syntax Highlighted Module Explorer **)
   strDrawSynHighModuleExplorer = 'Draw Syntax Highlighted Module Explorer';
@@ -1250,8 +1292,6 @@ ResourceString
   strShowPublicDeclarations = 'Show public declarations';
   (** Options text for Show published declarations **)
   strShowPublishedDeclarations = 'Show published declarations';
-  (** Options text for Show local procedures and functions **)
-  strShowLocalProcsAndFuncs = 'Show local procedures and functions';
   (** Options text for Show Documentation Conflicts **)
   strShowDocumentationConflicts = 'Show Documentation Conflicts';
   (** Options text for Show Missing Method Documentation **)
@@ -1603,8 +1643,6 @@ ResourceString
     'section should have a description which should provide information to ' +
     'furture developers regarding the purpose of the method.';
 
-  (** Label for Method Parameter Documentation Conflicts **)
-  strMethodParamDocumentation = 'Method Parameter Documentation';
   (** Document conflict message for different number of parameters and tags. **)
   strMethodDiffParamCount = 'Method ''%s'' has a different parameter count.';
   (** Document conflict message description for different number of parameters
@@ -1622,8 +1660,6 @@ ResourceString
   strMethodIncorrectParamTypeDesc = 'The type of the specified parameter ' +
     'differents from the type provided in the @@param tag of the method comment.';
 
-  (** Label for Method Return Documentation Conflicts **)
-  strMethodReturnDocumentation = 'Method Return Documentation';
   (** Document conflict message for an undocumented return type. **)
   strMethodUndocumentedReturn = 'Method ''%s''`s return type is not documented.';
   (** Document conflict message descritpion for an undocumented return type. **)
@@ -1635,8 +1671,6 @@ ResourceString
   strMethodIncorrectReturnTypeDesc = 'The type of the method return is not the ' +
     'same as the type defined in the method.';
 
-  (** Label for Method Pre-Condition Documentation Conflicts **)
-  strMethodPreConDocumentation = 'Method Pre-Condition Documentation';
   (** A documentation message for missing precondition text. **)
   strMethodPreConNotDocumented = 'A Pre-condition in Method ''%s'' is not documented.';
   (** A documentation message description for missing precondition text. **)
@@ -1656,8 +1690,6 @@ ResourceString
   strMethodTooManyPreConsDesc = 'The method comment has too many pre-condition ' +
     'tags (@precon).';
 
-  (** Label for Method Post-Condition Documentation Conflicts **)
-  strMethodPostConDocumentation = 'Method Post-Condition Documentation';
   (** A documentation message for missing postcondition text. **)
   strMethodPostConNotDocumented = 'A Post-condition in Method ''%s'' is not ' +
     'documented.';
@@ -1696,8 +1728,6 @@ ResourceString
     'interface should have a description which should provide information to ' +
     'furture developers regarding the purpose of the method.';
 
-  (** Label for Property Parameter Documentation Conflicts **)
-  strPropertyParamDocumentation = 'Property Parameter Documentation';
   (** Document conflict message for different number of parameters and tags. **)
   strPropertyDiffParamCount = 'Property ''%s'' has a different parameter count.';
   (** Document conflict message description for different number of parameters
@@ -1715,8 +1745,6 @@ ResourceString
   strPropertyIncorrectParamTypeDesc = 'The type of the specified parameter ' +
     'differents from the type provided in the @@param tag of the property comment.';
 
-  (** Label for Property Return Documentation Conflicts **)
-  strPropertyReturnDocumentation = 'Property Return Documentation';
   (** Document conflict message for an undocumented return type. **)
   strPropertyUndocumentedReturn = 'Property ''%s''`s return type is not documented.';
   (** Document conflict message description for an undocumented return type. **)
@@ -1728,8 +1756,6 @@ ResourceString
   strPropertyIncorrectReturnTypeDesc = 'The type of the property return is not ' +
     'the same as the type defined in the property.';
 
-  (** Label for Property Pre-Condition Documentation Conflicts **)
-  strPropertyPreConDocumentation = 'Property Pre-Condition Documentation';
   (** A documentation message for missing precondition text. **)
   strPropertyPreConNotDocumented = 'A Pre-condition in Property ''%s'' is not documented.';
   (** A documentation message descritpion for missing precondition text. **)
@@ -1749,8 +1775,6 @@ ResourceString
   strPropertyTooManyPreConsDesc = 'The property comment has too many pre-condition ' +
     'tags (@precon).';
 
-  (** Label for Property Post-Condition Documentation Conflicts **)
-  strPropertyPostConDocumentation = 'Property Post-Condition Documentation';
   (** A documentation message for missing postcondition text. **)
   strPropertyPostConNotDocumented = 'A Post-condition in Property ''%s'' is not documented.';
   (** A documentation message description for missing postcondition text. **)
@@ -1809,7 +1833,6 @@ Const
     (FDescription : strShowProtectedDeclarations;          FEnabled : True),
     (FDescription : strShowPublicDeclarations;             FEnabled : True),
     (FDescription : strShowPublishedDeclarations;          FEnabled : True),
-    (FDescription : strShowLocalProcsAndFuncs;             FEnabled : True),
     (FDescription : strShowDocumentationConflicts;         FEnabled : False),
     (FDescription : strShowMissingMethodDocumentation;     FEnabled : True),
     (FDescription : strShowMissingMethodDocDesc;           FEnabled : True),
@@ -2130,47 +2153,47 @@ Const
       FMessage: strMethodHasNoDesc;
       FDescription: strMethodHasNoDescDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodPreConDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodPreconNotDocumented;
       FDescription: strMethodPreconNotDocumentedDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodParamDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodDiffParamCount;
       FDescription: strMethodDiffParamCountDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodPreconDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodMissingPreCon;
       FDescription: strMethodMissingPreConDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodPreconDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodTooManyPrecons;
       FDescription: strMethodTooManyPreconsDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodParamDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodUndocumentedParam;
       FDescription: strMethodUndocumentedParamDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodParamDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodIncorrectParamType;
       FDescription: strMethodIncorrectParamTypeDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodPostConDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodPostconNotDocumented;
       FDescription: strMethodPostconNotDocumentedDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodReturnDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodUndocumentedReturn;
       FDescription: strMethodUndocumentedReturnDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodReturnDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodIncorrectReturntype;
       FDescription: strMethodIncorrectReturntypeDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodPostConDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodMissingPostCon;
       FDescription: strMethodMissingPostConDesc;
       FConflictType: dciMissing),
-    (FCategory: strMethodPostConDocumentation;
+    (FCategory: strMethodDocumentation;
       FMessage: strMethodTooManyPostCons;
       FDescription: strMethodTooManyPostConsDesc;
       FConflictType: dciMissing),
@@ -2200,7 +2223,7 @@ Var
 Implementation
 
 Uses
-  Windows, StrUtils;
+  Windows, StrUtils, DGHLibrary;
 
 Var
   (** This variable provides an incremental number of making doc conflict
@@ -2974,9 +2997,7 @@ Var
 
 begin
   Result := AElement;
-  If AElement = Nil Then
-    Exit;
-  Assert(AElement.Name <> '', 'AElement is NULL!');
+  Assert(AElement.Name <> '', 'Can not add a null element to the collection!');
   i := Find(AElement.Name);
   If i < 0 Then
     FElements.Insert(Abs(i) - 1, AElement)
@@ -3012,7 +3033,7 @@ Var
   i : Integer;
 
 begin
-  Assert(Token.Token <> '', 'Token is NULL!');
+  Assert(Token.Token <> '', 'Can not add a null token to the collection!');
   i := Find(Token.Token);
   If i < 0 Then
     Begin
@@ -3047,7 +3068,7 @@ Var
   i : Integer;
 
 begin
-  Assert(strToken <> '', 'strToken is NULL!');
+  Assert(strToken <> '', 'Can not add a null string to the collection!');
   i := Find(strToken);
   If i < 0 Then
     Begin
@@ -3073,12 +3094,12 @@ end;
   @param   iIdentLine      as an Integer
   @param   iIdentColumn    as an Integer
   @param   AComment        as a TComment
-  @param   DocConflictType as a TDocConflictType
+  @param   DocConflictRec  as a TDocConflictTable
 
 **)
 procedure TElementContainer.AddDocumentConflict(Const Args: Array of TVarRec;
   iIdentLine, iIdentColumn : Integer; AComment : TComment;
-  DocConflictType : TDocConflictType);
+  DocConflictRec : TDocConflictTable);
 
 Var
   E, I : TElementContainer;
@@ -3093,13 +3114,13 @@ begin
       iL := AComment.Line;
       iC := AComment.Col;
     End;
-  Case DocConflictTable[DocConflictType].FConflictType Of
+  Case DocConflictRec.FConflictType Of
     dciMissing : iIcon := iiDocConflictMissing;
     dciIncorrect : iIcon := iiDocConflictIncorrect;
   Else
     iIcon := iiDocConflictItem;
   End;
-  Assert(objModuleRootElement <> Nil, 'objModuleRootElement CAN NOT BE NULL!');
+  Assert(objModuleRootElement <> Nil, 'objModuleRootElement can not be null!');
   E := objModuleRootElement.FindElement(strDocumentationConflicts);
   If E = Nil Then
     Begin
@@ -3107,16 +3128,15 @@ begin
         iiDocConflictFolder, Nil);
       E := objModuleRootElement.Add(E);
     End;
-  I := E.FindElement(DocConflictTable[DocConflictType].FCategory);
+  I := E.FindElement(DocConflictrec.FCategory);
   If I = Nil Then
     Begin
-      I := TElementContainer.Create(DocConflictTable[DocConflictType].FCategory,
+      I := TElementContainer.Create(DocConflictRec.FCategory,
         scGlobal, 0, 0, iiDocConflictFolder, Nil);
       I := E.Add(I);
     End;
   I.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iL, iC,
-    DocConflictTable[DocConflictType].FMessage,
-    DocConflictTable[DocConflictType].FDescription, iIcon));
+    DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon));
 end;
 
 (**
@@ -3135,8 +3155,7 @@ Var
   i : Integer;
 
 begin
-  If AElement = Nil Then
-    Exit;
+  Assert(AElement <> Nil, 'Can not add a null element to the collection!');
   For i := 0 To AElement.TokenCount - 1 Do
     AppendToken(AElement.Tokens[i]);
 end;
@@ -3229,15 +3248,18 @@ end;
   @precon  None.
   @postcon Recrusively checks the documentation of the module.
 
+  @param   boolCascade as a Boolean
+
 **)
-procedure TElementContainer.CheckDocumentation;
+procedure TElementContainer.CheckDocumentation(var boolCascade : Boolean);
 
 Var
   i : Integer;
 
 begin
-  For i := 1 To ElementCount Do
-    Elements[i].CheckDocumentation;
+  If boolCascade Then
+    For i := 1 To ElementCount Do
+      Elements[i].CheckDocumentation(boolCascade);
 end;
 
 (**
@@ -3324,20 +3346,32 @@ Var
 
 begin
   Result := -1;
-  iFirst := 1;
-  iLast := FElements.Count;
-  While iFirst <= iLast Do
-    Begin
-      iMid := (iFirst + iLast) Div 2;
-      If AnsiCompareText(Elements[iMid].Name, strName) = 0 Then
+  If FSorted Then
+    Begin // Binary search...
+      iFirst := 1;
+      iLast := FElements.Count;
+      While iFirst <= iLast Do
         Begin
-          Result := iMid;
-          Break;
-        End Else
-      If AnsiCompareText(Elements[iMid].Name, strName) > 0 Then
-        iLast := iMid - 1
-      Else
-        iFirst := iMid + 1;
+          iMid := (iFirst + iLast) Div 2;
+          If AnsiCompareText(Elements[iMid].Name, strName) = 0 Then
+            Begin
+              Result := iMid;
+              Break;
+            End Else
+          If AnsiCompareText(Elements[iMid].Name, strName) > 0 Then
+            iLast := iMid - 1
+          Else
+            iFirst := iMid + 1;
+        End;
+    End Else
+    Begin // Sequential search...
+      For iFirst := 1 To ElementCount Do
+        If AnsiCompareText(Elements[iFirst].Name, strName) = 0 Then
+          Begin
+            Result := iFirst;
+            Break;
+          End;
+      iFirst := ElementCount + 1;
     End;
   If Result < 0 Then
     Result := -iFirst;
@@ -3514,6 +3548,23 @@ begin
   Result := FTokens[iIndex] As TTokenInfo;
 end;
 
+(**
+
+  This is a setter method for the Sorted property.
+
+  @precon  None.
+  @postcon Sets the class to be either sorted or not sorted. Must be set before
+           adding elements to the collection.
+
+  @param   boolValue as a Boolean
+
+**)
+procedure TElementContainer.SetSorted(boolValue: Boolean);
+begin
+  Assert(ElementCount = 0, 'Can not set sorted after adding elements.');
+  FSorted := boolValue;
+end;
+
 (** --------------------------------------------------------------------------
 
   TParameter Methods
@@ -3578,6 +3629,28 @@ begin
   inherited;
 end;
 
+(**
+
+  This method returns the type information for the parameter only.
+
+  @precon  None.
+  @postcon Returns the type information for the parameter only.
+
+  @return  a String
+
+**)
+function TGenericParameter.ParamReturn: String;
+
+Var
+  i : Integer;
+
+begin
+  Result := '';
+  If ParamType <> Nil Then
+    For i := 0 To ParamType.TokenCount - 1 Do
+      Result := Result + ParamType.Tokens[i].Token;
+end;
+
 (** --------------------------------------------------------------------------
 
   TProperty Methods
@@ -3639,8 +3712,7 @@ end;
 destructor TGenericProperty.Destroy;
 begin
   FParameters.Free;
-  If FTypeID <> Nil Then
-    FTypeID.Free;
+  FTypeID.Free;
   Inherited Destroy;
 end;
 
@@ -3673,23 +3745,6 @@ end;
 function TGenericProperty.GetParameters(iIndex: Integer): TGenericParameter;
 begin
   Result := FParameters[iIndex] As TGenericParameter;
-end;
-
-(**
-
-  This is a setter method for the TypeID property.
-
-  @precon  None.
-  @postcon Makes a copy of the type T.
-
-  @param   T as a TGenericTypeDecl
-
-**)
-procedure TGenericProperty.SetTypeID(T: TGenericTypeDecl);
-begin
-  If T <> Nil Then
-    FTypeID := TElementContainerClass(T.ClassType).Create(T.Name, T.Scope, T.Line,
-      T.Column, T.ImageIndex, T.Comment) As TGenericTypeDecl;
 end;
 
 (** --------------------------------------------------------------------------
@@ -3756,6 +3811,7 @@ Begin
   FMsg := '';
   FReturnType := Nil;
   FMethodType := MethodType;
+  FForwardDecl := False;
 End;
 
 (**
@@ -4821,6 +4877,573 @@ Begin
         Raise EDocException.Create(strUnExpectedStartOfFile, 'RollBackToken');
     End;
 End;
+
+(**
+
+  This method checks the module comment for various type of documentation
+  errors.
+
+  @precon  Module is the module to check.
+  @postcon The modules comment is checked for errors.
+
+  @param   boolCascade as a Boolean
+
+**)
+Procedure TBaseLanguageModule.CheckDocumentation(var boolCascade : Boolean);
+
+Var
+  i : Integer;
+  strDate : String;
+  dtDate, dtFileDate : TDateTime;
+  Tag : TTag;
+
+Begin
+  If (ModuleComment <> Nil) And (ModuleComment.FindTag('stopdocumentation') >= 0) Then
+    Begin
+      boolCascade := False;
+      Exit;
+    End;
+  If ((ModuleComment = Nil) Or (ModuleComment.TokenCount = 0)) And
+    (doShowUndocumentedModule In BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
+      DocConflictTable[dctModuleMissingDocumentation]);
+  If ModuleComment <> Nil Then
+    Begin
+      If (doShowMissingModuleDate In BrowseAndDocItOptions.Options) Then
+        Begin
+          i := ModuleComment.FindTag('date');
+          If (i = -1) Or (ModuleComment.Tag[i].TokenCount = 0) Then
+            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
+              DocConflictTable[dctModuleMissingDate])
+          Else
+            Begin
+              Tag := ModuleComment.Tag[i];
+              strDate := Tag.AsString(False);
+              If Modified Then
+                dtFileDate := Now
+              Else
+                {$IFDEF VER180}
+                FileAge(FileName, dtFileDate);
+                {$ELSE}
+                dtFileDate := FileDateToDateTime(FileAge(Module.FileName));
+                {$ENDIF}
+              Try
+                dtDate := ConvertDate(strDate);
+                If Int(dtDate) <> Int(dtFileDate) Then
+                  AddDocumentConflict([strDate, FormatDateTime('dd/mmm/yyyy', dtFileDate)],
+                    Tag.Line, Tag.Column, ModuleComment, DocConflictTable[dctModuleIncorrectDate]);
+              Except
+                AddDocumentConflict([strDate, FormatDateTime('dd/mmm/yyyy', dtFileDate)],
+                  Tag.Line, Tag.Column, ModuleComment, DocConflictTable[dctModuleCheckDateError]);
+              End
+            End;
+        End;
+      If (doShowMissingModuleVersion In BrowseAndDocItOptions.Options) Then
+        Begin
+          i := ModuleComment.FindTag('version');
+          If (i = -1) Or (ModuleComment.Tag[i].TokenCount = 0) Then
+            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
+              DocConflictTable[dctModuleMissingVersion])
+        End;
+      If (doShowMissingModuleAuthor In BrowseAndDocItOptions.Options) Then
+        Begin
+          i := ModuleComment.FindTag('author');
+          If (i = -1) Or (ModuleComment.Tag[i].TokenCount = 0) Then
+            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
+              DocConflictTable[dctModuleMissingAuthor])
+        End;
+    End;
+  Inherited CheckDocumentation(boolCascade);
+End;
+
+(**
+
+  This method checks the documentation for the given clause item.
+
+  @precon  C is a valid generic container to be checked for clause like
+           documentation.
+  @postcon Checks the passed clause for documentation errors.
+
+  @param   boolCascade as a Boolean
+
+**)
+Procedure TGenericTypeDecl.CheckDocumentation(var boolCascade : Boolean);
+
+Begin
+  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+    Begin
+      If doShowUndocumentedTypes In BrowseAndDocItOptions.Options Then
+        AddDocumentConflict([Identifier], Line, Column, Comment,
+          DocConflictTable[dctTypeClauseUndocumented]);
+    End;
+End;
+
+(**
+
+  This method checks the documentation for the given clause item.
+
+  @precon  C is a valid generic container to be checked for clause like
+           documentation.
+  @postcon Checks the passed clause for documentation errors.
+
+  @param   boolCascade as a Boolean
+
+**)
+Procedure TGenericConstant.CheckDocumentation(var boolCascade : Boolean);
+
+Begin
+  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+    Begin
+      If doShowUndocumentedConsts In BrowseAndDocItOptions.Options Then
+        AddDocumentConflict([Identifier], Line, Column, Comment,
+          DocConflictTable[dctConstantClauseUndocumented]);
+    End;
+End;
+
+(**
+
+  This method checks the documentation for the given clause item.
+
+  @precon  C is a valid generic container to be checked for clause like
+           documentation.
+  @postcon Checks the passed clause for documentation errors.
+
+  @param   boolCascade as a Boolean
+
+**)
+Procedure TGenericVariable.CheckDocumentation(var boolCascade : Boolean);
+
+Begin
+  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+    Begin
+      If doShowUndocumentedVars In BrowseAndDocItOptions.Options Then
+        AddDocumentConflict([Identifier], Line, Column, Comment,
+          DocConflictTable[dctVariableClauseUndocumented]);
+    End;
+End;
+
+(**
+
+  This method checks the method passed against the method comments tags and
+  highlights missing parameter comments, return tags and missing descriptions.
+
+  @precon  Method is the method declaration that requires checking for document
+           conflicts.
+  @postcon The passed method is systematicaly check for errors.
+
+  @param   boolCascade as a Boolean
+
+**)
+procedure TGenericMethodDecl.CheckDocumentation(var boolCascade : Boolean);
+
+Begin
+  If Not FForwardDecl And (Identifier <> '') Then
+    Begin
+      CheckMethodDocumentation;
+      If Comment <> Nil Then
+        Begin
+          CheckMethodParamCount;
+          CheckMethodParameters;
+          CheckMethodReturns;
+        End;
+    End;
+  Inherited CheckDocumentation(boolCascade);
+end;
+
+(**
+
+  This method check the given method for general document problems, i.e.
+  missing or no description.
+
+  @precon  Method is valid method declaration to be checked for documentation.
+  @postcon Checks the passed method for docuemntation errors.
+
+**)
+Procedure TGenericMethodDecl.CheckMethodDocumentation;
+
+Begin
+  If Comment = Nil Then
+    Begin
+      If doShowMissingProcDocs In BrowseAndDocItOptions.Options Then
+        AddDocumentConflict([QualifiedName], Line, Column, Comment,
+          DocConflictTable[dctMethodUndocumented]);
+      Exit;
+    End;
+  If (Comment.TokenCount = 0) And
+    (doShowMissingDocDesc In BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([QualifiedName], Line, Column, Comment,
+      DocConflictTable[dctMethodHasNoDesc]);
+End;
+
+(**
+
+  This method checks the given method for the correct number of parameters and
+  tags.
+
+  @precon  Method is a method declaration that needs the be check for document
+           conflicts.
+  @postcon Checks the passed method for errors in the parameter count
+           documentation.
+
+**)
+Procedure TGenericMethodDecl.CheckMethodParamCount;
+
+Var
+  i, j, k : Integer;
+
+Begin
+  j := 0;
+  For i := 0 To Comment.TagCount - 1 Do
+    If LowerCase(Comment.Tag[i].TagName) = 'param' Then
+      Inc(j);
+  k := 0;
+  For i := 0 To Comment.TagCount - 1 Do
+    If LowerCase(Comment.Tag[i].TagName) = 'precon' Then
+      Begin
+        Inc(k);
+        If Comment.Tag[i].TokenCount = 0 Then
+          AddDocumentConflict([QualifiedName], Comment.Tag[i].Line,
+            Comment.Tag[i].Column, Comment,
+            DocConflictTable[dctMethodPreconNotDocumented]);
+      End;
+  If (ParameterCount <> j) And
+    (doShowDiffParamCount In BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([QualifiedName], Line, Column, Comment,
+      DocConflictTable[dctMethodDiffParamCount]);
+  If (k < 1) And (doShowMissingPreCons In BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([QualifiedName], Line, Column, Comment,
+      DocConflictTable[dctMethodMissingPreCon]);
+  If (k > 1) And (doShowMissingPreCons In BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([QualifiedName], Line, Column, Comment,
+      DocConflictTable[dctMethodTooManyPrecons]);
+End;
+
+(**
+
+  This method checks the given method for the correct parameter tags and
+  pre conditions.
+
+  @precon  Method is a method declaration that needs the be check for document
+           conflicts.
+  @postcon Checks the passed method for errors in the parameter documentation.
+
+**)
+Procedure TGenericMethodDecl.CheckMethodParameters;
+
+Var
+  i, j : Integer;
+  iFound : Integer;
+  strType : String;
+  strParam: String;
+
+Begin
+  For i := 0 To ParameterCount - 1 Do
+    Begin
+      // Parameter name
+      iFound := -1;
+      With Comment Do
+        For j := 0 To TagCount - 1 Do
+          If (LowerCase(Tag[j].TagName) = 'param') And (Tag[j].TokenCount > 0) And
+            (LowerCase(Tag[j][0]) = Lowercase(Parameters[i].Identifier)) Then
+            Begin
+              iFound := j;
+              Break;
+            End;
+      If (iFound = -1) And
+        (doShowUndocumentedParams In BrowseAndDocItOptions.Options) Then
+        AddDocumentConflict([Parameters[i].Identifier, QualifiedName],
+          Line, Column, Comment, DocConflictTable[dctMethodUndocumentedParam]);
+      // Parameter type
+      If iFound > -1 Then
+        With Comment Do
+          Begin
+            strType := '';
+            If Tag[iFound].TokenCount > 3 Then
+              If AnsiCompareText(Tag[iFound].Token[3], 'ARRAY') = 0 Then
+                Begin
+                  If Tag[iFound].TokenCount > 5 Then
+                    strType := Tag[iFound].Token[5];
+                End Else
+                  strType := Tag[iFound].Token[3];
+            strParam := Parameters[i].ParamReturn;
+            If Not (LowerCase(strType) = Lowercase(strParam)) Then
+              If (doShowIncorrectParamType In BrowseAndDocItOptions.Options) Then
+                AddDocumentConflict([Parameters[i].Identifier, QualifiedName],
+                  Line, Column, Comment, DocConflictTable[dctMethodIncorrectParamType]);
+          End;
+    End;
+End;
+
+(**
+
+  This method checks the given method for the correct return information and
+  tags.
+
+  @precon  Method is a method declaration that needs the be check for document
+           conflicts.
+  @postcon The passed method return is checked for errors.
+
+**)
+Procedure TGenericMethodDecl.CheckMethodReturns;
+
+Var
+  i, j, k : Integer;
+  iFound : Integer;
+
+Begin
+  iFound := -1;
+  k := 0;
+  For i := 0 To Comment.TagCount - 1 Do
+    If LowerCase(Comment.Tag[i].TagName) = 'postcon' Then
+      Begin
+        Inc(k);
+        If Comment.Tag[i].TokenCount = 0 Then
+          AddDocumentConflict([QualifiedName], Comment.Tag[i].Line,
+            Comment.Tag[i].Column, Comment, DocConflictTable[dctMethodPostconNotDocumented]);
+      End;
+  If MethodType = mtFunction Then
+    Begin;
+      If (ReturnType.AsString <> '') Then
+        Begin
+          With Comment Do
+            For j := 0 To TagCount - 1 Do
+              If AnsiCompareText(Tag[j].TagName, 'return') = 0 Then
+                Begin
+                  iFound := j;
+                  Break;
+                End;
+        End;
+      If (iFound = -1) And
+        (doShowUndocumentedReturn In BrowseAndDocItOptions.Options) Then
+        AddDocumentConflict([QualifiedName], Line, Column,
+          Comment, DocConflictTable[dctMethodUndocumentedReturn])
+      Else
+        Begin
+          If ((Comment.Tag[iFound].TokenCount < 2) Or
+            (AnsiCompareText(ReturnType.AsString, Comment.Tag[iFound][1]) <> 0)) And
+            (doShowIncorrectReturnType In BrowseAndDocItOptions.Options) Then
+            AddDocumentConflict([QualifiedName], Line, Column, Comment,
+            DocConflictTable[dctMethodIncorrectReturntype]);
+        End;
+    End;
+  iFound := 0;
+  If (k = 0) And (doShowMissingPostCons in BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([QualifiedName], Line, Column, Comment,
+      DocConflictTable[dctMethodMissingPostCon]);
+  If doShowMissingPostCons in BrowseAndDocItOptions.Options Then
+    If (k > 1) And (iFound <> -1) Then
+      AddDocumentConflict([QualifiedName], Line, Column, Comment,
+        DocConflictTable[dctMethodTooManyPostCons]);
+End;
+
+(**
+
+  This method check the given property for all the approriate documentation.
+
+  @precon  Cls is the class declaration that the property belongs too and Prop
+           is valid property declaration to be checked for documentation.
+  @postcon Checks the passed property for errors in the docuemntation tags.
+
+  @param   boolCascade as a Boolean
+
+**)
+procedure TGenericProperty.CheckDocumentation(var boolCascade: Boolean);
+
+begin
+  CheckPropertyDocumentation;
+  If Comment <> Nil Then
+    Begin
+      CheckPropertyParamCount;
+      CheckPropertyParameters;
+      CheckPropertyReturns;
+    End;
+end;
+
+(**
+
+  This method check the given property for general document problems, i.e.
+  missing or no description.
+
+  @precon  Cls is the class declaration that the property belongs too and Prop is
+           valid property declaration to be checked for documentation.
+  @postcon The passed property of the passed class is checked for documentation
+           errors.
+
+**)
+Procedure TGenericProperty.CheckPropertyDocumentation;
+
+Begin
+  If Comment = Nil Then
+    Begin
+      If doShowMissingPropertyDoc In BrowseAndDocItOptions.Options Then
+        AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctPropertyUndocumented]);
+      Exit;
+    End;
+  If (Comment.TokenCount = 0) And
+    (doShowMissingPropDocDesc In BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([Identifier], Line, Column, Comment,
+      DocConflictTable[dctPropertyHasNoDesc]);
+End;
+
+(**
+
+  This method check the given property for the correct parameter count and pre
+  and post condition count.
+
+  @precon  Cls is the class declaration that the property belongs too and Prop is
+           valid property declaration to be checked for documentation.
+  @postcon The passed property is checked for errors in its parameters.
+
+**)
+Procedure TGenericProperty.CheckPropertyParamCount;
+
+Var
+  i, j, k : Integer;
+
+Begin
+  j := 0;
+  For i := 0 To Comment.TagCount - 1 Do
+    If LowerCase(Comment.Tag[i].TagName) = 'param' Then
+      Inc(j);
+  k := 0;
+  For i := 0 To Comment.TagCount - 1 Do
+    If LowerCase(Comment.Tag[i].TagName) = 'precon' Then
+      Begin
+        Inc(k);
+        If Comment.Tag[i].TokenCount = 0 Then
+          AddDocumentConflict(['Property', Identifier], Comment.Tag[i].Line,
+            Comment.Tag[i].Column, Comment,
+            DocConflictTable[dctPropertyPreconNotDocumented]);
+      End;
+  If (ParameterCount <> j) And
+    (doShowDiffPropParamCount In BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([Identifier], Line, Column, Comment,
+    DocConflictTable[dctPropertyDiffParamCount]);
+  If (k < 1) And (doShowMissingPropPreCons In BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([Identifier], Line, Column, Comment,
+    DocConflictTable[dctPropertyMissingPreCon]);
+  If (k > 1) And (doShowMissingPropPreCons In BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([Identifier], Line, Column, Comment,
+    DocConflictTable[dctPropertyTooManyPreCons]);
+End;
+
+(**
+
+  This method check the given property for correctness of the parameter
+  documentation.
+
+  @precon  Cls is the class declaration that the property belongs too and Prop
+           is valid property declaration to be checked for documentation.
+  @postcon The passed property is check for errors in the parameter
+           docuemntation.
+
+**)
+Procedure TGenericProperty.CheckPropertyParameters;
+
+Var
+  i, j : Integer;
+  iFound : Integer;
+  strType : String;
+  strParam: String;
+
+Begin
+  For i := 0 To ParameterCount - 1 Do
+    Begin
+      // Parameter name
+      iFound := -1;
+      With Comment Do
+        For j := 0 To TagCount - 1 Do
+          If (LowerCase(Tag[j].TagName) = 'param') And (Tag[j].TokenCount > 0) And
+            (LowerCase(Tag[j][0]) = Lowercase(Parameters[i].Identifier)) Then
+            Begin
+              iFound := j;
+              Break;
+            End;
+      If (iFound = -1) And (doShowUndocPropParam In BrowseAndDocItOptions.Options) Then
+        AddDocumentConflict([Parameters[i].Identifier, Identifier], Line, Column,
+          Comment, DocConflictTable[dctPropertyUndocumentedParam]);
+      // Parameter type
+      If iFound > -1 Then
+        With Comment Do
+          Begin
+            strType := '';
+            If Tag[iFound].TokenCount > 3 Then
+              If AnsiCompareText(Tag[iFound].Token[3], 'ARRAY') = 0 Then
+                Begin
+                  If Tag[iFound].TokenCount > 5 Then
+                    strType := Tag[iFound].Token[5]
+                End Else
+                  strType := Tag[iFound].Token[3];
+            strParam := Parameters[i].ParamReturn;
+            If Not ((LowerCase(strType) = Lowercase(strParam))) Then
+              If doShowIncorrectPropParamType In BrowseAndDocItOptions.Options Then
+                AddDocumentConflict([Parameters[i].Identifier, Identifier], Line,
+                  Column, Comment, DocConflictTable[dctPropertyIncorrectParamType]);
+        End;
+    End;
+End;
+
+(**
+
+  This method check the given property for the correct return parameter.
+
+  @precon  Cls is the class declaration that the property belongs too and Prop
+           is valid property declaration to be checked for documentation.
+  @postcon Checks the passed property for returns documentation errors.
+
+**)
+Procedure TGenericProperty.CheckPropertyReturns;
+
+Var
+  i, j, k : Integer;
+  iFound : Integer;
+
+Begin
+  iFound := -1;
+  k := 0;
+  For i := 0 To Comment.TagCount - 1 Do
+    If LowerCase(Comment.Tag[i].TagName) = 'postcon' Then
+      Begin
+        Inc(k);
+        If Comment.Tag[i].TokenCount = 0 Then
+          AddDocumentConflict([Identifier], Comment.Tag[i].Line,
+            Comment.Tag[i].Column, Comment,
+            DocConflictTable[dctPropertyPostconNotDocumented]);
+      End;
+  If (TypeId <> Nil) Then
+    Begin
+      With Comment Do
+        For j := 0 To TagCount - 1 Do
+          If (LowerCase(Tag[j].TagName) = 'return') Then
+            Begin
+              iFound := j;
+              Break;
+            End;
+    End;
+  If (iFound = -1) And (doShowUndocPropReturn in BrowseAndDocItOptions.Options) Then
+    Begin
+      If TypeId <> Nil Then
+        AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctPropertyUndocumentedReturn])
+    End Else
+    Begin
+      If ((Comment.Tag[iFound].TokenCount < 2) Or
+        (AnsiCompareText(TypeId.AsString, Comment.Tag[iFound][1]) <> 0)) And
+        (doShowIncorrectPropReturnType In BrowseAndDocItOptions.Options) Then
+        AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctPropertyIncorrectReturnType]);
+    End;
+  If doShowMissingPropPostCons in BrowseAndDocItOptions.Options Then iFound := 0;
+  If (k = 0) And (doShowMissingPropPostCons in BrowseAndDocItOptions.Options) Then
+    AddDocumentConflict([Identifier], Line, Column, Comment,
+    DocConflictTable[dctPropertyMissingPostCon]);
+  If doShowMissingPropPostCons in BrowseAndDocItOptions.Options Then
+    If (k > 1) And (iFound <> -1) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment,
+      DocConflictTable[dctPropertyTooManyPostCons]);
+End;
+
 
 (**
 

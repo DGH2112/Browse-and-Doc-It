@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    03 Aug 2008
+  @Date    04 Aug 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -426,9 +426,9 @@ Begin
   FComment := Nil;
   FSelectType := SelectType;
   If Comment <> Nil Then
-    FComment := TComment.Create('', Comment.Line, Comment.Col);
-  //Else
-  //  FComment := TComment.Create('', 0, 0);
+    FComment := TComment.Create('', Comment.Line, Comment.Col)
+  Else
+    FComment := TComment.Create('', 0, 0);
   FComment.Assign(Comment);
 End;
 

@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    04 Aug 2008
+  @Date    06 Aug 2008
   @Author  David Hoyle
 
 **)
@@ -106,7 +106,7 @@ var
 implementation
 
 Uses
-  PascalDocModule, TokenForm, IniFiles, DGHLibrary, OptionsForm;
+  TokenForm, IniFiles, DGHLibrary, OptionsForm, ModuleDispatcher;
 
 {$R *.dfm}
 
@@ -123,7 +123,7 @@ Uses
 procedure TfrmBrowseAndDocItTestForm.Button1Click(Sender: TObject);
 
 Var
-  M : TPascalModule;
+  M : TBaseLanguageModule;
   Source : TMemoryStream;
 
 begin
@@ -131,13 +131,13 @@ begin
   Try
     FSynEdit.Lines.SaveToStream(Source);
     Source.Position := 0;
-    M := TPascalModule.Create(Source, FileName, True,
-      [moParse, moCheckForDocumentConflicts]);
-    Try
-      TfrmTokenForm.Execute(M);
-    Finally
-      M.Free;
-    End;
+    M := Dispatcher(Source, FileName, True, [moParse, moCheckForDocumentConflicts]);
+    If M <> Nil Then
+      Try
+        TfrmTokenForm.Execute(M);
+      Finally
+        M.Free;
+      End;
   Finally
     Source.Free;
   End;
@@ -296,7 +296,7 @@ Procedure TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String;
 
 Var
   Source : TFileStream;
-  M : TPascalModule;
+  M : TBaseLanguageModule;
   i : Integer;
   C: TElementContainer;
 
@@ -306,20 +306,20 @@ Begin
   Source := TFileStream.Create(strFileName, fmOpenRead);
   Try
     Source.Position := 0;
-    M := TPascalModule.Create(Source, strFileName, False, [moParse,
-      moCheckForDocumentConflicts]);
-    Try
-      If M.FindElement(strErrorsAndWarnings) <> Nil Then
-        iErrors := M.FindElement(strErrorsAndWarnings).ElementCount;
-      C := M.FindElement(strDocumentationConflicts);
-      If C <> Nil Then
-        Begin
-          For i := 1 To C.ElementCount Do
-            Inc(iConflicts,C.Elements[i].ElementCount);
-        End;
-    Finally
-      M.Free;
-    End;
+    M := Dispatcher(Source, strFileName, False, [moParse, moCheckForDocumentConflicts]);
+    If M <> Nil Then
+      Try
+        If M.FindElement(strErrorsAndWarnings) <> Nil Then
+          iErrors := M.FindElement(strErrorsAndWarnings).ElementCount;
+        C := M.FindElement(strDocumentationConflicts);
+        If C <> Nil Then
+          Begin
+            For i := 1 To C.ElementCount Do
+              Inc(iConflicts,C.Elements[i].ElementCount);
+          End;
+      Finally
+        M.Free;
+      End;
   Finally
     Source.Free;
   End;
@@ -575,7 +575,7 @@ end;
 procedure TfrmBrowseAndDocItTestForm.SynEdit1Change(Sender: TObject);
 
 Var
-  M : TPascalModule;
+  M : TBaseLanguageModule;
   Source : TMemoryStream;
 
 begin
@@ -583,13 +583,13 @@ begin
   Try
     FSynEdit.Lines.SaveToStream(Source);
     Source.Position := 0;
-    M := TPascalModule.Create(Source, FileName, FSynEdit.Modified,
-      [moParse, moCheckForDocumentConflicts]);
-    Try
-      FModuleExplorerFrame.RenderModule(M);
-    Finally
-      M.Free;
-    End;
+    M := Dispatcher(Source, FileName, FSynEdit.Modified, [moParse, moCheckForDocumentConflicts]);
+    If M <> Nil Then
+      Try
+          FModuleExplorerFrame.RenderModule(M);
+      Finally
+        M.Free;
+      End;
   Finally
     Source.Free;
   End;

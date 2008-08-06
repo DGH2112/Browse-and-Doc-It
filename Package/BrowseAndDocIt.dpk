@@ -1,11 +1,11 @@
 (**
-  
+
   This module defined a new package for testing a dockable form for the IDE.
   This dockable form will eventually become the Module Explorer for a new
   version of PascalDoc.
 
   @Author  David Hoyle
-  @Date    06 Jul 2006
+  @Date    27 Dec 2006
   @Version 1.0
 
 **)
@@ -36,8 +36,7 @@ package BrowseAndDocIt;
 {$DESCRIPTION 'Browse and Doc It'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
-{$DEFINE Hello}
-{$DEFINE Goodbye}
+{%W32RC '..\ExplorerImages.RC'}
 {%TogetherDiagram 'ModelSupport_BrowseAndDocIt\default.txaPackage'}
 
 requires
@@ -49,16 +48,16 @@ requires
   vcljpg;
 
 contains
-  BrowseAndDocItWizard in 'Source\BrowseAndDocItWizard.pas',
-  DockableModuleExplorer in 'Source\DockableModuleExplorer.pas',
-  PascalDocModule in 'Source\PascalDocModule.pas',
-  PascalDocChecker in 'Source\PascalDocChecker.pas',
-  OptionsForm in 'Source\OptionsForm.pas',
-  ToolsAPIUtils in 'Source\ToolsAPIUtils.pas',
-  SpecialTagForm in 'Source\SpecialTagForm.pas',
-  TokenForm in 'Source\TokenForm.pas',
-  ProgressForm in 'Source\ProgressForm.pas',
-  BaseLanguageModule in 'Source\BaseLanguageModule.pas',
-  ModuleExplorerFrame in 'Source\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame};
+  BrowseAndDocItWizard in '..\Source\BrowseAndDocItWizard.pas',
+  DockableModuleExplorer in '..\Source\DockableModuleExplorer.pas',
+  PascalDocModule in '..\..\..\Library\PascalDocModule.pas',
+  OptionsForm in '..\Source\OptionsForm.pas',
+  ToolsAPIUtils in '..\Source\ToolsAPIUtils.pas',
+  SpecialTagForm in '..\Source\SpecialTagForm.pas',
+  TokenForm in '..\..\..\Library\TokenForm.pas',
+  ProgressForm in '..\Source\ProgressForm.pas',
+  BaseLanguageModule in '..\..\..\Library\BaseLanguageModule.pas',
+  ModuleExplorerFrame in '..\..\..\Library\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
+  dghlibrary in '..\..\..\LIBRARY\dghlibrary.pas';
 
 end.

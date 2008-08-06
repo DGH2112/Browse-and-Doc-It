@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       05 Aug 2008
+  @Date       06 Aug 2008
   @Author     David Hoyle
 
 **)
@@ -598,10 +598,6 @@ Type
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
       ModuleOptions : TModuleOptions);
-    Function FindMethodAtStreamPosition(iStreamPos : TStreamPosition;
-      var recPosition : TTokenPosition; Container : TElementContainer) : TPascalMethod;
-    Function FindPropertyAtStreamPosition(iStreamPos: TStreamPosition;
-      var recPosition : TTokenPosition; Container : TElementContainer): TClassDecl;
   End;
 
 Const
@@ -1808,143 +1804,6 @@ Begin
         TDocError.Create(E.Message, scGlobal, 'TokenizeStream', 0, 0, etError)
       );
   End
-End;
-
-(**
-
-  This method finds the method declaration that precedes the current cursor
-  position and returns the token index for the delcaration start or -1 if
-  no declaration was found.
-
-  @precon  iStreamPos is the stream position where the current cursor is and
-           where to start the search backwards.
-  @postcon Returns a token index for the first method declaration found.
-
-  @param   iStreamPos  as a TStreamPosition
-  @param   recPosition as a TTokenPosition as a reference.
-  @param   Container   as a TElementContainer
-  @return  a TPascalMethod
-
-**)
-Function TPascalModule.FindMethodAtStreamPosition(
-  iStreamPos : TStreamPosition; var recPosition : TTokenPosition;
-  Container : TElementContainer) : TPascalMethod;
-
-Const
-  strMethods : Array[1..4] of String = ('constructor', 'destructor', 'function',
-    'procedure');
-
-Var
-  i, j : Integer;
-  iTokenIndex : Integer;
-  MethodType : TMethodType;
-
-Begin
-  Result := Nil;
-  iTokenIndex := -1;
-  // Find token at cursor
-  j := -1;
-  For i := TokenCount - 1 DownTo 0 Do
-    If TokenInfo[i].BufferPos <= iStreamPos Then
-      Begin
-        j := i;
-        Break;
-      End;
-  // Find method before this point
-  For i := j DownTo 0 Do
-    If IsKeyWord(TokenInfo[i].Token, strMethods) Then
-      Begin
-        iTokenIndex := i;
-        Break;
-      End;
-  If iTokenIndex > -1 Then
-    Begin
-      SetTokenIndex(iTokenIndex);
-      recPosition.FLine := Token.Line;
-      recPosition.FColumn := Token.Column;
-      recPosition.FBufferPos := Token.BufferPos;
-      If (PrevToken <> Nil) And (PrevToken.UToken = 'CLASS') Then
-        Begin
-          recPosition.FBufferPos := PrevToken.BufferPos;
-          recPosition.FColumn := PrevToken.Column;
-        End;
-      If Token.UToken = 'CONSTRUCTOR' Then
-        MethodType := mtConstructor
-      Else If Token.UToken = 'DESTRUCTOR' Then
-        MethodType := mtDestructor
-      Else If Token.UToken = 'FUNCTION' Then
-        MethodType := mtFunction
-      Else
-        MethodType := mtProcedure;
-      Case MethodType Of
-        mtConstructor: Result := ConstructorHeading(scPublic, Container);
-        mtDestructor: Result := DestructorHeading(scPublic, Container);
-        mtFunction: Result := FunctionHeading(scPublic, Container);
-        mtProcedure: Result := ProcedureHeading(scPublic, Container);
-      End;
-    End;
-End;
-
-(**
-
-  This method finds the property declaration that precedes the current cursor
-  position and returns the token index for the delcaration start or -1 if
-  no declaration was found.
-
-  @precon  iStreamPos is the stream position where the current cursor is and
-           where to start the search backwards.
-  @postcon Returns a token index for the first property declaration found.
-
-  @param   iStreamPos  as a TStreamPosition
-  @param   recPosition as a TTokenPosition as a Reference
-  @param   Container   as a TElementContainer
-  @return  a TClassDecl
-
-**)
-Function TPascalModule.FindPropertyAtStreamPosition(
-  iStreamPos : TStreamPosition; var recPosition : TTokenPosition;
-  Container : TElementContainer) : TClassDecl;
-
-Var
-  i, j : Integer;
-  iTokenIndex : Integer;
-  AScope : TScope;
-
-Begin
-  Result := Nil;
-  iTokenIndex := -1;
-  // Find token at cursor
-  j := -1;
-  For i := TokenCount - 1 DownTo 0 Do
-    If TokenInfo[i].BufferPos <= iStreamPos Then
-      Begin
-        j := i;
-        Break;
-      End;
-  // Find method before this point
-  For i := j DownTo 0 Do
-    If TokenInfo[i].UToken = 'PROPERTY' Then
-      Begin
-        iTokenIndex := i;
-        Break;
-      End;
-  If iTokenIndex > -1 Then
-    Begin
-      SetTokenIndex(iTokenIndex);
-      recPosition.FLine := Token.Line;
-      recPosition.FColumn := Token.Column;
-      recPosition.FBufferPos := Token.BufferPos;
-      Result := TClassDecl.Create('Temp', scPrivate, 0, 0, iiNone, Nil);
-      If Not (PropertyList(Result, AScope)) Then
-        Begin
-          j := 0;
-          For i := 1 To Result.ElementCount Do
-            If Result.Elements[i] Is TGenericProperty Then
-              Inc(j);
-          If j = 0 Then
-            FreeAndNil(Result);
-        End;
-    End;
 End;
 
 (**

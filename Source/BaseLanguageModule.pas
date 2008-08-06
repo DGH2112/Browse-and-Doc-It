@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    05 Aug 2008
+  @Date    06 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -3289,6 +3289,7 @@ begin
   FComment := AComment;
   FScope := AScope;
   FImageIndex := AImageIndex;
+  FSorted := True;
 end;
 
 (**

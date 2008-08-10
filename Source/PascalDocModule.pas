@@ -953,10 +953,6 @@ end;
 
 **)
 Function TPascalParameter.GetAsString : String;
-
-Var
-  i: Integer;
-
 begin
   Result := strParamModifier[ParamModifier];
   Result := Result + Identifier;
@@ -964,8 +960,7 @@ begin
     Begin
       Result := Result + #32':'#32;
       Result := Result + strArrayOf[ArrayOf];
-      For i := 0 To ParamType.TokenCount - 1 Do
-        Result := Result + ParamType.Tokens[i].Token;
+      Result := Result + ParamReturn;
     End;
 end;
 

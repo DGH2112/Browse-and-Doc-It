@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    06 Aug 2008
+  @Date    10 Aug 2008
   @Version 1.0
 
 **)
@@ -21,7 +21,7 @@ Function Dispatcher(Source : TStream; strFileName : String;
   Implementation
 
 Uses
-  PascalDocModule;
+  Windows, PascalDocModule;
 
 (**
 

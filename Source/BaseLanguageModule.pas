@@ -16,7 +16,6 @@ Uses
   SysUtils, Classes, Contnrs;
 
 Type
-
   (** Type to distinguish Stream position from token index. **)
   TStreamPosition = Integer;
   (** Type to distinguish Stream position from token index. **)
@@ -37,6 +36,8 @@ Type
   TMethodType = (mtConstructor, mtDestructor, mtProcedure, mtFunction);
   (** An enumerate for warning and errors. **)
   TErrorType = (etWarning, etError);
+  (** A type to return an array of strings **)
+  TKeyWords = Array of String;
 
   (** This is a list of options valable for the display of module information
       **)
@@ -1131,6 +1132,7 @@ Type
     Function IfNotDef(strDef : String) : Boolean;
     Procedure AddError(Error : TElementContainer);
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
+    Function KeyWords : TKeyWords; Virtual; Abstract;
     { Properties }
     (**
       Returns a reference to the modules error collection.

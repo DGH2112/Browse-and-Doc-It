@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    04 Aug 2008
+  @Date    10 Aug 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -475,7 +475,7 @@ begin
   FHintWin.Canvas.Font.Assign(tvExplorer.Font);
   ilScopeImages.Clear;
   For i := Succ(Low(TImageIndex)) to High(TImageIndex) Do
-    If Not ilScopeImages.GetResource(rtBitmap, ImageList[i].FResourceName, 16,
+    If Not ilScopeImages.GetInstRes(hInstance, rtBitmap, ImageList[i].FResourceName, 16,
       [lrDefaultColor], ImageList[i].FMaskColour) Then
       ShowMessage(Format('Resource "%s" not found.', [ImageList[i].FResourceName]))
 end;

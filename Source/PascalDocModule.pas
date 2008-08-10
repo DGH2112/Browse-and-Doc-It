@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       06 Aug 2008
+  @Date       10 Aug 2008
   @Author     David Hoyle
 
 **)
@@ -600,9 +600,6 @@ Type
       ModuleOptions : TModuleOptions);
   End;
 
-Const
-  (** A string representing the Array Of parameter type. **)
-  strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
 
 Implementation
 
@@ -616,6 +613,8 @@ Const
     ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
   (** A set of characters for quotes **)
   strQuote : Set Of Char = [''''];
+  (** A string representing the Array Of parameter type. **)
+  strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
 
   (**
     A sorted list of keywords. Used for identifying tokens as keyword.
@@ -1579,6 +1578,7 @@ Constructor TPascalModule.Create(Source : TStream; strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
 var
   boolCascade: Boolean;
+  i : Integer;
 
 Begin
   Inherited Create(IsModified, strFileName);
@@ -1597,7 +1597,13 @@ Begin
       AddTickCount('Resolve');
       boolCascade := True;
       If moCheckForDocumentConflicts In ModuleOptions Then
-        CheckDocumentation(boolCascade);
+        Begin
+          Add(strDocumentationConflicts, iiDocConflictFolder, Nil);
+          CheckDocumentation(boolCascade);
+          i := Find(strDocumentationConflicts);
+          If (i > 0) And (Elements[i].ElementCount = 0) Then
+            DeleteElement(i);
+        End;
     End;
   AddTickCount('Check');
 End;
@@ -4087,30 +4093,36 @@ Function TPascalModule.ProcedureType(AToken : TTypeToken) : TProcedureType;
 
 Var
   M : TPascalMethod;
+  Temporary: TElementContainer;
 
 begin
   Result := Nil;
-  M := ProcedureHeading(scPrivate, AToken.FContainer, False);
-  If M = Nil Then
-    M := FunctionHeading(scPrivate, AToken.FContainer, False);
-  If M <> Nil Then
-    Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
-        Result := TProcedureType.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicType, FComment);
-      AToken.FContainer.Add(Result);
-      Result.AppendToken(M.AsString);
-      If Token.UToken = 'OF' Then
-        Begin
-          AddToExpression(Result);
-          If Token.UToken = 'OBJECT' Then
-            AddToExpression(Result)
-          Else
-            ErrorAndSeekToken(strReservedWordExpected, 'ProcedureType', 'OBJECT',
-              strSeekableOnErrorTokens, stActual);
-        End Else
-    End;
+  Temporary := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    M := ProcedureHeading(scPrivate, Temporary, False);
+    If M = Nil Then
+      M := FunctionHeading(scPrivate, Temporary, False);
+    If M <> Nil Then
+      Begin
+        UpdateTypeToken(AToken);
+        With AToken Do
+          Result := TProcedureType.Create(FToken.Token, FScope, FToken.Line,
+            FToken.Column, iiPublicType, FComment);
+        AToken.FContainer.Add(Result);
+        Result.AppendToken(M.AsString);
+        If Token.UToken = 'OF' Then
+          Begin
+            AddToExpression(Result);
+            If Token.UToken = 'OBJECT' Then
+              AddToExpression(Result)
+            Else
+              ErrorAndSeekToken(strReservedWordExpected, 'ProcedureType', 'OBJECT',
+                strSeekableOnErrorTokens, stActual);
+          End Else
+      End;
+  Finally
+    Temporary.Free;
+  End;
 end;
 
 (**
@@ -5833,6 +5845,8 @@ Var
   C : TComment;
   strIdentifier: String;
   strClsName: String;
+  iLine: Integer;
+  iColumn: Integer;
 
 Begin
   Result := Nil;
@@ -5850,10 +5864,14 @@ Begin
           Exit;
         End;
       // Create method and store in collection and get comment
+      iLine := 0;
+      iColumn := 0;
       Try
         If boolIdent Then
           Begin
             strIdentifier := Token.Token;
+            iLine := Token.Line;
+            iColumn := Token.Column;
             NextNonCommentToken;
             // Check for '.' to signify a class method
             If Token.Token = '.' Then
@@ -5864,12 +5882,14 @@ Begin
                   ErrorAndSeekToken(strIdentExpected, 'FunctionHeading', Token.Token,
                     strSeekableOnErrorTokens, stActual);
                 strIdentifier := Token.Token;
+                iLine := Token.Line;
+                iColumn := Token.Column;
                 NextNonCommentToken;
               End;
             End;
       Finally
         Result := TPascalMethod.Create(mtFunction, strIdentifier, AScope,
-          Token.Line, Token.Column);
+          iLine, iColumn);
         Result.ClsName := strClsName;
         Result.Comment := C;
       End;
@@ -6080,6 +6100,7 @@ Var
   C : TComment;
   strIdentifier: String;
   strClsName: String;
+  iLine, iColumn : Integer;
 
 Begin
   Result := Nil;
@@ -6097,10 +6118,14 @@ Begin
           Exit;
         End;
       // Create method and store in collection and get comment
+      iLine := 0;
+      iColumn := 0;
       Try
         If boolIdent Then
           Begin
             strIdentifier := Token.Token;
+            iLine := Token.Line;
+            iColumn := Token.Column;
             NextNonCommentToken;
             // Check for '.' to signify a class method
             If Token.Token = '.' Then
@@ -6111,12 +6136,14 @@ Begin
                   ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
                     strSeekableOnErrorTokens, stActual);
                 strIdentifier := Token.Token;
+                iLine := Token.Line;
+                iColumn := Token.Column;
                 NextNonCommentToken;
               End;
             End;
       Finally
         Result := TPascalMethod.Create(mtProcedure, strIdentifier, AScope,
-          Token.Line, Token.Column);
+          iLine, iColumn);
         Result.ClsName := strClsName;
         Result.Comment := C;
       End;
@@ -6563,6 +6590,8 @@ Var
   C : TComment;
   strIdentifier: String;
   strClsName: String;
+  iLine: Integer;
+  iColumn: Integer;
 
 begin
   Result := Nil;
@@ -6573,8 +6602,12 @@ begin
       If (Token.TokenType In [ttIdentifier, ttDirective]) Then
         Begin
           // Create method and store in collection and get comment
+          iLine := 0;
+          iColumn := 0;
           Try
             strIdentifier := Token.Token;
+            iLine := Token.Line;
+            iColumn := Token.Column;
             NextNonCommentToken;
             // Check for '.' to signify a class method
             If Token.Token = '.' Then
@@ -6585,11 +6618,13 @@ begin
                   ErrorAndSeekToken(strIdentExpected, 'ConstructorHeading', Token.Token,
                     strSeekableOnErrorTokens, stActual);
                 strIdentifier := Token.Token;
+                iLine := Token.Line;
+                iColumn := Token.Column;
                 NextNonCommentToken;
               End;
           Finally
             Result := TPascalMethod.Create(mtConstructor, strIdentifier, AScope,
-              Token.Line, Token.Column);
+              iLine, iColumn);
             Result.ClsName := strClsName;
             Result.Comment := C;
           End;
@@ -6622,6 +6657,8 @@ Var
   C : TComment;
   strIdentifier: String;
   strClsName: String;
+  iLine: Integer;
+  iColumn: Integer;
 
 begin
   Result := Nil;
@@ -6632,8 +6669,12 @@ begin
       If (Token.TokenType In [ttIdentifier, ttDirective]) Then
         Begin
           // Create method and store in collection and get comment
+          iLine := 0;
+          iColumn := 0;
           Try
             strIdentifier := Token.Token;
+            iLine := Token.Line;
+            iColumn := Token.Column;
             NextNonCommentToken;
             // Check for '.' to signify a class method
             If Token.Token = '.' Then
@@ -6644,11 +6685,13 @@ begin
                   ErrorAndSeekToken(strIdentExpected, 'DestructorHeading', Token.Token,
                     strSeekableOnErrorTokens, stActual);
                 strIdentifier := Token.Token;
+                iLine := Token.Line;
+                iColumn := Token.Column;
                 NextNonCommentToken;
               End;
           Finally
             Result := TPascalMethod.Create(mtDestructor, strIdentifier, AScope,
-              Token.Line, Token.Column);
+              iLine, iColumn);
             Result.ClsName := strClsName;
             Result.Comment := C;
           End;

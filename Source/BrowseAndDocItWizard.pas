@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    12 Oct 2006
+  @Date    10 Aug 2008
   @Version 1.0
 
   @todo    Configurable Font Name and Size for the Browser tree.
@@ -22,8 +22,8 @@ Unit BrowseAndDocItWizard;
 Interface
 
 Uses
-  Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, PascalDocModule,
-  ModuleExplorerFrame {$IFDEF VER180}, DockForm {$ENDIF};
+  Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, ModuleExplorerFrame,
+  DockForm;
 
 Type
   (** This emunerate descibed the different types of doc comment .**)
@@ -34,7 +34,7 @@ Type
   TBrowsePosition = (bpCommentTop, bpCommentCentre, bpIdentifierTop,
     bpIdentifierCentre);
 
-  (** This is the clas which defined the Wizard interface. **)
+  (** This is the class which defined the Wizard interface. **)
   TBrowseAndDocItWizard = Class(TNotifierObject, IOTAWizard)
   Private
     mmiPascalDocMenu : TMenuItem;
@@ -44,6 +44,7 @@ Type
     FDocOption: Integer;
     FDocHelpFile : String;
     FBrowsePosition : TBrowsePosition;
+    FINIFileName: String;
     procedure InsertCommentBlock(CommentType: TCommentType);
     procedure OptionsClick(Sender: TObject);
     procedure HelpClick(Sender: TObject);
@@ -53,12 +54,11 @@ Type
       iCommentCol : Integer; SelectType : TSelectType);
     Procedure Focus(Sender : TObject);
     Procedure OptionsChange(Sender : TObject);
-    function GetMethodDescription(Method : TMethodDecl) : String;
-    Function WriteMethodComment(Method : TMethodDecl; Writer : IOTAEditWriter;
-      iBufferPos : TStreamPosition; iCol : Integer) : Integer;
-    Function WritePropertyComment(P : TProperty;
-      Writer : IOTAEditWriter; iBufferPos : TStreamPosition;
-      iCol : Integer) : Integer;
+    function GetMethodDescription(Method : TGenericMethodDecl) : String;
+    Function WriteMethodComment(Method : TGenericMethodDecl;
+      Source : IOTASourceEditor; Writer : IOTAEditWriter) : TOTAEditPos;
+    Function WritePropertyComment(Prop : TGenericProperty;
+      Source : IOTASourceEditor; Writer : IOTAEditWriter) : TOTAEditPos;
     procedure CreateMenuItem(mmiParent: TMenuItem;  strCaption: String = '';
       ClickProc: TNotifyEvent = Nil);
     Procedure InsertMethodCommentClick(Sender : TObject);
@@ -78,7 +78,6 @@ Type
     Constructor Create;
     Destructor Destroy; Override;
   End;
-
 
   (** This class handles notifications from the editor so that changes in the
       editor can be displayed. **)
@@ -109,7 +108,6 @@ Type
     {$ENDIF}
   End;
 
-
   (** This class represents a key binding notifier for installing and handling
       key bindings for this plugin. **)
   TKeyboardBinding = Class(TNotifierObject, IOTAKeyboardBinding)
@@ -139,14 +137,20 @@ Type
   End;
 
   Procedure Register;
+  Function InitWizard(Const BorlandIDEServices : IBorlandIDEServices;
+    RegisterProc : TWizardRegisterProc;
+    var Terminate: TWizardTerminateProc) : Boolean; StdCall;
+
+Exports
+  InitWizard Name WizardEntryPoint;
 
 Implementation
 
-{$R SplashScreenIcon.res}
+{$R ..\SplashScreenIcon.res}
 
 Uses
-  SysUtils, DockableModuleExplorer, Registry, ToolsAPIUtils,
-  OptionsForm, Forms, Windows, ShellAPI, TokenForm;
+  SysUtils, DockableModuleExplorer, IniFiles, ToolsAPIUtils, OptionsForm, Forms,
+  Windows, ShellAPI, TokenForm, DGHLibrary, ModuleDispatcher, Dialogs, Controls;
 
 Resourcestring
   (** This is a text string of revision from nil and a to z. **)
@@ -155,6 +159,16 @@ Resourcestring
   strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2006';
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
   strSplashScreenBuild = 'Open Source Freeware by David Hoyle (Build %d.%d.%d.%d)';
+  (** This is a message for no methods to comment. **)
+  strNoMethodFound = 'No method found on or above the current cursor position.';
+  (** This is a message to confirm you wish to update the current comment. **)
+  strMethodAlreadyExists = 'The method "%s" already has a comment. Do you' +
+  ' want to continue?';
+  (** This is a message for no property to comment. **)
+  strNoPropertyFound = 'No property found on or above the current cursor position.';
+  (** This is a message to confirm you wish to update the current comment. **)
+  strPropertyAlreadyExists = 'The property "%s" already has a comment. Do you' +
+  ' want to continue?';
 
 Const
   (** A simple array for outputting a or an. **)
@@ -164,6 +178,8 @@ Const
     ' constant', ' as out');
   (** A list of vowels. **)
   strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+  (** A constant array of outputs for the ArrayOf property. **)
+  strArrayOf : Array[False..True] Of String = ('', 'Array Of');
 
 Var
   (** This is an index for the wizard when register with the ide. Its required
@@ -236,6 +252,7 @@ Var
 
 Begin
   Inherited Create;
+  FINIFileName := BuildRootKey(Nil, Nil);
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus,
     OptionsChange);
   mmiMainMenu := (BorlandIDEServices as INTAServices).MainMenu;
@@ -415,25 +432,25 @@ Var
   k : Integer;
 
 Begin
-  With TRegIniFile.Create() Do
+  With TIniFile.Create(FINIFileName) Do
     Try
       For j := Low(TDocOption) To High(TDocOption) Do
-        If ReadBool(strRegRootKey + 'DocExplorerOptions', DocOptionInfo[j].Description,
-          DocOptionInfo[j].Enabled) Then
+        If ReadBool('DocExplorerOptions', DocOptionInfo[j].FDescription,
+          DocOptionInfo[j].FEnabled) Then
           BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [j];
-      iUpdateInterval := ReadInteger(strRegRootKey + 'ModuleExplorer', 'UpdateInterval', 1000);
-      FDocOption := ReadInteger(strRegRootKey + 'Setup', 'DocOption', 0);
-      iCount := ReadInteger(strregRootKey + 'Setup', 'SpecialTagCount', 0);
+      iUpdateInterval := ReadInteger('ModuleExplorer', 'UpdateInterval', 1000);
+      FDocOption := ReadInteger('Setup', 'DocOption', 0);
+      iCount := ReadInteger('Setup', 'SpecialTagCount', 0);
       If iCount > 0 Then
         Begin
           SpecialTags.Clear;
           For k := 1 To iCount Do
-            SpecialTags.AddObject(ReadString(strRegRootKey + 'SpecialTags',
-              Format('SpecialTag%d', [k]), ''), TObject(ReadInteger(strRegRootKey + 'SpecialTags',
+            SpecialTags.AddObject(ReadString('SpecialTags',
+              Format('SpecialTag%d', [k]), ''), TObject(ReadInteger('SpecialTags',
               Format('SpecialTagOptions%d', [k]), 0)));
         End;
-      FDocHelpFile := ReadString(strRegRootKey + 'ModuleExplorer', 'HelpFile', '');
-      FBrowsePosition := TBrowsePosition(ReadInteger(strRegRootKey + 'Setup', 'BrowsePosition',
+      FDocHelpFile := ReadString('ModuleExplorer', 'HelpFile', '');
+      FBrowsePosition := TBrowsePosition(ReadInteger('Setup', 'BrowsePosition',
         Integer(bpIdentifierCentre)));
     Finally
       Free;
@@ -455,23 +472,23 @@ Var
   k : Integer;
 
 Begin
-  With TRegIniFile.Create() Do
+  With TIniFile.Create(FINIFileName) Do
     Try
       For j := Low(TDocOption) To High(TDocOption) Do
-        WriteBool(strRegRootKey + 'DocExplorerOptions',
-          DocOptionInfo[j].Description, j In BrowseAndDocItOptions.Options);
-      WriteInteger(strRegRootKey + 'ModuleExplorer', 'UpdateInterval', iUpdateInterval);
-      WriteInteger(strRegRootKey + 'Setup', 'DocOption', FDocOption);
-      WriteInteger(strRegRootKey + 'Setup', 'SpecialTagCount', SpecialTags.Count);
+        WriteBool('DocExplorerOptions',
+          DocOptionInfo[j].FDescription, j In BrowseAndDocItOptions.Options);
+      WriteInteger('ModuleExplorer', 'UpdateInterval', iUpdateInterval);
+      WriteInteger('Setup', 'DocOption', FDocOption);
+      WriteInteger('Setup', 'SpecialTagCount', SpecialTags.Count);
       For k := 1 To SpecialTags.Count Do
         Begin
-          WriteString(strRegRootKey + 'SpecialTags', Format('SpecialTag%d', [k]),
+          WriteString('SpecialTags', Format('SpecialTag%d', [k]),
             SpecialTags[k - 1]);
-          WriteInteger(strRegRootKey + 'SpecialTags', Format('SpecialTagOptions%d', [k]),
+          WriteInteger('SpecialTags', Format('SpecialTagOptions%d', [k]),
             Integer(SpecialTags.Objects[k - 1]));
         End;
-      WriteString(strRegRootKey + 'ModuleExplorer', 'HelpFile', FDocHelpFile);
-      WriteInteger(strRegRootKey + 'Setup', 'BrowsePosition', Integer(FBrowsePosition));
+      WriteString('ModuleExplorer', 'HelpFile', FDocHelpFile);
+      WriteInteger('Setup', 'BrowsePosition', Integer(FBrowsePosition));
     Finally
       Free;
     End;
@@ -635,59 +652,195 @@ end;
 **)
 procedure TBrowseAndDocItWizard.InsertMethodCommentClick(Sender: TObject);
 
-Var
-  objMemStream : TMemoryStream;
-  SourceEditor: IOTASourceEditor;
-  iStreamPos : TStreamPosition;
-  EditPos : TOTAEditPos;
-  CharPos : TOTACharPos;
-  Writer : IOTAEditWriter;
-  Method : TMethodDecl;
-  recPosition : TTokenPosition;
-  iLines : Integer;
+var
+  objMemStream: TStream;
+  Module : TBaseLanguageModule;
+  EditPos: TOTAEditPos;
+  T : TElementContainer;
+  M, N : TGenericMethodDecl;
+  Writer: IOTAEditWriter;
+  Source: IOTASourceEditor;
+
+  (**
+
+    This method recursively works throug the hierarchy of elements looking for
+    the method which is closest to be on or just above the current cursor line.
+
+    @precon  Container must be a valid TElementContainer instance.
+    @postcon Recursively works throug the hierarchy of elements looking for
+             the method which is closest to be on or just above the current
+             cursor line.
+
+    @param   Container as a TElementContainer
+
+  **)
+  Procedure FindMethod(Container : TElementContainer);
+
+  Var
+    i : Integer;
+
+  Begin
+    For i := 1 To Container.ElementCount Do
+      Begin
+        If Container.Elements[i] Is TGenericMethodDecl Then
+          Begin
+            M := Container.Elements[i] As TGenericMethodDecl;
+            If (M.Line <= EditPos.Line) Then
+              Begin
+                If N = Nil Then
+                  N := M
+                Else
+                  If M.Line > N.Line Then
+                    N := M;
+              End;
+          End;
+        FindMethod(Container.Elements[i]);
+      End;
+  End;
 
 begin
-  SourceEditor := ActiveSourceEditor;
-  If SourceEditor = Nil Then
+  N := Nil;
+  Source := ActiveSourceEditor;
+  If Source = Nil Then
     Exit;
-  objMemStream := EditorAsMemoryStream(SourceEditor);
+  objMemStream := EditorAsMemoryStream(Source);
   Try
-    With TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
-      SourceEditor.Modified, []) Do
+    Module := Dispatcher(objMemStream, Source.FileName, Source.Modified, [moParse]);
+    If Module <> Nil Then
       Try
-        EditPos :=  SourceEditor.GetEditView(0).CursorPos;
-        CharPos.Line := EditPos.Line;
-        CharPos.CharIndex := EditPos.Col;
-        iStreamPos := SourceEditor.GetEditView(0).CharPosToPos(CharPos);
-        Method := FindMethodAtStreamPosition(iStreamPos, recPosition);
-        Try
-          If Method = Nil Then Exit;
-          Writer := SourceEditor.CreateUndoableWriter;
-          Try
-            iLines := WriteMethodComment(Method, Writer, recPosition.BufferPos,
-              recPosition.Column);
-          Finally
-            Writer := Nil;
+        EditPos :=  Source.GetEditView(0).CursorPos;
+        T := Module.FindElement(strImplementedMethods);
+        If T <> Nil Then
+          Begin
+            FindMethod(T);
+            If N <> Nil Then
+              Begin
+                If N.Comment <> Nil Then
+                  If MessageDlg(Format(strMethodAlreadyExists, [N.QualifiedName]),
+                    mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
+                    Exit;
+                Writer := Source.CreateUndoableWriter;
+                Try
+                  EditPos := WriteMethodComment(N, Source, Writer);
+                Finally
+                  Writer := Nil;
+                End;
+                Source.GetEditView(0).CursorPos := EditPos;
+              End Else
+                MessageDlg(strNoMethodFound, mtWarning, [mbOK], 0);
           End;
-          // Get header in view if not already
-          With SourceEditor.GetEditView(0) Do
-            Begin
-              EditPos.Col := recPosition.Column + 2;
-              EditPos.Line := recPosition.Line + 2;
-              SelectionChange(EditPos.Line + iLines - 1, EditPos.Col,
-                EditPos.Line + iLines - 1, EditPos.Col, stIdentifier);
-              CursorPos := EditPos;
-            End;
-        Finally
-          If Method <> Nil Then Method.Free;
-        End;
       Finally
-        Free;
+        Module.Free;
       End;
   Finally
    objMemStream.Free;
   End;
 end;
+
+(**
+
+  This method write the method comment to the active editor.
+
+  @precon  Method is a valid instance of a method declaration to be commented,
+           Writer is a valid instance of an open tools api writer, iBufferPos is
+           the buffer position to insert the comment and iCol is the column to
+           indent the comment by.
+  @postcon A method comment is inserted into the editor.
+
+  @todo    How about updating the current comment but writing out the current
+           comments comment information including tags.
+
+  @param   Method as a TGenericMethodDecl
+  @param   Source as an IOTASourceEditor
+  @param   Writer as an IOTAEditWriter
+  @return  a TOTAEditPos
+
+**)
+Function TBrowseAndDocItWizard.WriteMethodComment(Method : TGenericMethodDecl;
+  Source : IOTASourceEditor; Writer : IOTAEditWriter) : TOTAEditPos;
+
+Const
+  strMethodTypes : Array[mtConstructor..mtFunction] Of String = (
+    'Constructor', 'Destructor', 'Procedure', 'Function');
+
+Var
+  iLen : Integer;
+  i : Integer;
+  CharPos: TOTACharPos;
+  iBufferPos: Integer;
+  iLines : Integer;
+  strType: String;
+
+begin
+  iLines := 0;
+  CharPos.Line := Method.Line;
+  CharPos.CharIndex := Method.Column;
+  If Method.ClsName <> '' Then
+    Dec(CharPos.CharIndex, 1 + Length(Method.ClsName));
+  Dec(CharPos.CharIndex, 1 + Length(strMethodTypes[Method.MethodType]));
+  If Method.ClassMethod Then
+    Dec(CharPos.CharIndex, 6);
+  iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
+  Writer.CopyTo(iBufferPos - 1);
+  // Block Header
+  Writer.Insert('(**'#10#13);
+  Inc(iLines);
+  Writer.Insert(PChar(#10#13));
+  Inc(iLines);
+  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) +
+    GetMethodDescription(Method)));
+  Inc(iLines);
+  Writer.Insert(PChar(#10#13));
+  Inc(iLines);
+  // Output method information
+  iLen := 0;
+  For i := 0 To Method.ParameterCount - 1 Do
+    If iLen < Length(Method.Parameters[i].Identifier) Then
+      iLen := Length(Method.Parameters[i].Identifier);
+  For i := 0 To Method.ParameterCount - 1 Do
+    Begin
+      Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
+      Inc(iLines);
+      Writer.Insert(PChar(Format('  @param   %-*s as ', [
+        iLen, Method.Parameters[i].Identifier])));
+      Inc(iLines);
+      If Method.Parameters[i].ParamType <> Nil Then
+        Begin
+          strType := Method.Parameters[i].ParamReturn;
+          Writer.Insert(PChar(Format('%s %s%s%s'#10#13, [
+            strAOrAn[(strType[1] In strVowels) Or Method.Parameters[i].ArrayOf],
+            strArrayOf[Method.Parameters[i].ArrayOf], strType,
+            strModifier[Method.Parameters[i].ParamModifier]])));
+          Inc(iLines);
+        End;
+    End;
+  If Method.ReturnType <> Nil Then
+    Begin
+      Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
+      Inc(iLines);
+      Writer.Insert(PChar(Format('  @return  %s %-*s',
+        [strAOrAn[Method.ReturnType.AsString[1] In strVowels], iLen,
+        Method.ReturnType.AsString])));
+      Inc(iLines);
+      Writer.Insert(PChar(#10#13));
+      Inc(iLines);
+    End;
+  // Block Footer
+  If (Method.ParameterCount > 0) Or (Method.ReturnType <> Nil) Then
+    Begin
+      Writer.Insert(PChar(#10#13));
+      Inc(iLines);
+    End;
+  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '**)'#10#13));
+  Inc(iLines);
+  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
+  // Get header in view if not already
+  Result.Col := CharPos.CharIndex + 2;
+  Result.Line := CharPos.Line + 2;
+  SelectionChange(Result.Line + iLines, Result.Col, Result.Line, Result.Col,
+    stIdentifier);
+end;
+
 
 (**
 
@@ -710,54 +863,84 @@ end;
 **)
 procedure TBrowseAndDocItWizard.InsertPropertyCommentClick(Sender: TObject);
 
-Var
-  objMemStream : TMemoryStream;
-  SourceEditor: IOTASourceEditor;
-  iStreamPos : TStreamPosition;
-  EditPos : TOTAEditPos;
-  CharPos : TOTACharPos;
-  Writer : IOTAEditWriter;
-  Cls : TClassDecl;
-  recPosition : TTokenPosition;
-  iLines : Integer;
+var
+  objMemStream: TStream;
+  Module : TBaseLanguageModule;
+  EditPos: TOTAEditPos;
+  Source : IOTASourceEditor;
+  T : TElementContainer;
+  P, Q : TGenericProperty;
+  Writer: IOTAEditWriter;
+
+  (**
+
+    This method recursively works throug the hierarchy of elements looking for
+    the properties which is closest to be on or just above the current cursor line.
+
+    @precon  Container must be a valid TElementContainer instance.
+    @postcon Recursively works throug the hierarchy of elements looking for
+             the property which is closest to be on or just above the current
+             cursor line.
+
+    @param   Container as a TElementContainer
+
+  **)
+  Procedure FindProperty(Container : TElementContainer);
+
+  Var
+    i : Integer;
+
+  Begin
+    For i := 1 To Container.ElementCount Do
+      Begin
+        If Container.Elements[i] Is TGenericProperty Then
+          Begin
+            P := Container.Elements[i] As TGenericProperty;
+            If (P.Line <= EditPos.Line) Then
+              Begin
+                If Q = Nil Then
+                  Q := P
+                Else
+                  If P.Line > Q.Line Then
+                    Q := P;
+              End;
+          End;
+        FindProperty(Container.Elements[i]);
+      End;
+  End;
 
 begin
-  SourceEditor := ActiveSourceEditor;
-  If SourceEditor = Nil Then
+  Source := ActiveSourceEditor;
+  If Source = Nil Then
     Exit;
-  objMemStream := EditorAsMemoryStream(SourceEditor);
+  objMemStream := EditorAsMemoryStream(Source);
   Try
-    With TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
-      SourceEditor.Modified, []) Do
+    Module := Dispatcher(objMemStream, Source.FileName, Source.Modified, [moParse]);
+    If Module <> Nil Then
       Try
-        EditPos :=  SourceEditor.GetEditView(0).CursorPos;
-        CharPos.Line := EditPos.Line;
-        CharPos.CharIndex := EditPos.Col;
-        iStreamPos := SourceEditor.GetEditView(0).CharPosToPos(CharPos);
-        Cls := FindPropertyAtStreamPosition(iStreamPos, recPosition);
-        Try
-          If Cls = Nil Then Exit;
-          Writer := SourceEditor.CreateUndoableWriter;
-          Try
-            iLines := WritePropertyComment(Cls.Properties[0], Writer,
-              recPosition.BufferPos, recPosition.Column);
-          Finally
-            Writer := Nil;
+        EditPos :=  Source.GetEditView(0).CursorPos;
+        T := Module.FindElement(strTypesLabel);
+        If T <> Nil Then
+          Begin
+            FindProperty(T);
+            If Q <> Nil Then
+              Begin
+                If Q.Comment <> Nil Then
+                  If MessageDlg(Format(strPropertyAlreadyExists, [Q.Identifier]),
+                    mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
+                    Exit;
+                Writer := Source.CreateUndoableWriter;
+                Try
+                  EditPos := WritePropertyComment(Q, Source, Writer);
+                Finally
+                  Writer := Nil;
+                End;
+                Source.GetEditView(0).CursorPos := EditPos;
+              End Else
+                MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
           End;
-          // Get header in view if not already
-          With SourceEditor.GetEditView(0) Do
-            Begin
-              EditPos.Line := recPosition.Line + 1;
-              EditPos.Col := recPosition.Column + 2;
-              SelectionChange(recPosition.Line + iLines, EditPos.Col,
-                recPosition.Line + iLines, EditPos.Col, stIdentifier);
-              CursorPos := EditPos;
-            End;
-        Finally
-          Cls.Free;
-        End;
       Finally
-        Free;
+        Module.Free;
       End;
   Finally
    objMemStream.Free;
@@ -774,140 +957,73 @@ end;
            indent the comment by.
   @postcon A property comment it inserted into the editor.
 
-  @param   P          as a TProperty
-  @param   Writer     as an IOTAEditWriter
-  @param   iBufferPos as a TStreamPosition
-  @param   iCol       as an Integer
-  @return  an Integer
+  @param   Prop   as a TGenericProperty
+  @param   Source as an IOTASourceEditor
+  @param   Writer as an IOTAEditWriter
+  @return  a TOTAEditPos
 
 **)
-Function TBrowseAndDocItWizard.WritePropertyComment(P : TProperty;
-  Writer : IOTAEditWriter; iBufferPos : TStreamPosition;
-  iCol : Integer) : Integer;
+Function TBrowseAndDocItWizard.WritePropertyComment(Prop : TGenericProperty;
+  Source : IOTASourceEditor; Writer : IOTAEditWriter) : TOTAEditPos;
 
 Var
   i : Integer;
   iLen : Integer;
+  CharPos: TOTACharPos;
+  iBufferPos: Integer;
+  iLines : Integer;
+  strType: String;
 
 Begin
-  Result := 0;
+  iLines := 0;
+  CharPos.Line := Prop.Line;
+  CharPos.CharIndex := Prop.Column;
+  Dec(CharPos.CharIndex, 9);
+  iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
   Writer.CopyTo(iBufferPos - 1);
   Writer.Insert(PChar('(**'#13#10));
-  Inc(Result);
-  Writer.Insert(PChar(StringOfChar(#32, iCol - 1) + '  '#13#10));
-  Inc(Result);
+  Inc(iLines);
+  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '  '#13#10));
+  Inc(iLines);
   iLen := 0;
-  For i := 0 To P.Parameters.Count - 1 Do
-    If iLen < Length(P.Parameters[i].Identifier) Then
-      iLen := Length(P.Parameters[i].Identifier);
-  For i := 0 To P.Parameters.Count - 1 Do
+  For i := 0 To Prop.ParameterCount - 1 Do
+    If iLen < Length(Prop.Parameters[i].Identifier) Then
+      iLen := Length(Prop.Parameters[i].Identifier);
+  For i := 0 To Prop.ParameterCount - 1 Do
     Begin
-      Writer.Insert(PChar(StringOfChar(#32, iCol - 1) +
+      Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) +
         Format('  @param   %-*s as ', [iLen,
-          P.Parameters[i].Identifier])));
-      If P.Parameters[i].ParamType.AsString(True) <> '' Then
-        Writer.Insert(PChar(StringOfChar(#32, iCol - 1) + '  ' +
-        Format('%s %s%s%s'#13#10, [
-          strAOrAn[(P.Parameters[i].ParamType.AsString(True)[1] In
-            strVowels) Or P.Parameters[i].ArrayOf],
-          strArrayOf[P.Parameters[i].ArrayOf],
-          P.Parameters[i].ParamType.AsString(True),
-          strModifier[P.Parameters[i].ParamModifier]
-         ])));
-       Inc(Result);
-    End;
-  If P.TypeId <> '' Then
-    Begin
-      Writer.Insert(PChar(StringOfChar(#32, iCol - 1)));
-      Writer.Insert(PChar(Format('  @return  %s %-*s',
-        [strAOrAn[P.TypeId[1] In strVowels], iLen,
-        P.TypeId])));
-      Writer.Insert(PChar(#10#13));
-      Inc(Result);
-    End;
-  Writer.Insert(PChar(StringOfChar(#32, iCol - 1) + '**)'#13#10));
-  Inc(Result);
-  Writer.Insert(PChar(StringOfChar(#32, iCol - 1)));
-End;
-
-(**
-
-  This method write the method comment to the active editor.
-
-  @precon  Method is a valid instance of a method declaration to be commented,
-           Writer is a valid instance of an open tools api writer, iBufferPos is
-           the buffer position to insert the comment and iCol is the column to
-           indent the comment by.
-  @postcon A method comment is inserted into the editor.
-
-  @param   Method     as a TMethodDecl
-  @param   Writer     as an IOTAEditWriter
-  @param   iBufferPos as a TStreamPosition
-  @param   iCol       as an Integer
-  @return  an Integer   
-
-**)
-Function TBrowseAndDocItWizard.WriteMethodComment(Method : TMethodDecl;
-  Writer : IOTAEditWriter; iBufferPos : TStreamPosition;
-  iCol : Integer) : Integer;
-
-Var
-  iLen : Integer;
-  i : Integer;
-
-begin
-  Result := 0;
-  Writer.CopyTo(iBufferPos - 1);
-  // Block Header
-  Writer.Insert('(**'#10#13);
-  Inc(Result);
-  Writer.Insert(PChar(#10#13));
-  Inc(Result);
-  Writer.Insert(PChar(StringOfChar(#32, iCol - 1) +
-    GetMethodDescription(Method)));
-  Writer.Insert(PChar(#10#13));
-  Inc(Result);
-  // Output method information
-  iLen := 0;
-  For i := 0 To Method.Parameters.Count - 1 Do
-    If iLen < Length(Method.Parameters[i].Identifier) Then
-      iLen := Length(Method.Parameters[i].Identifier);
-  For i := 0 To Method.Parameters.Count - 1 Do
-    Begin
-      Writer.Insert(PChar(StringOfChar(#32, iCol - 1)));
-      Writer.Insert(PChar(Format('  @param   %-*s as ', [
-        iLen, Method.Parameters[i].Identifier])));
-      If Method.Parameters[i].ParamType.AsString(True) <> '' Then
+          Prop.Parameters[i].Identifier])));
+      If Prop.Parameters[i].ParamType <> Nil Then
         Begin
-          Writer.Insert(PChar(Format('%s %s%s%s'#10#13, [
-            strAOrAn[(Method.Parameters[i].ParamType.AsString(True)[1] In strVowels)
-              Or Method.Parameters[i].ArrayOf],
-            strArrayOf[Method.Parameters[i].ArrayOf],
-            Method.Parameters[i].ParamType.AsString(True),
-            strModifier[Method.Parameters[i].ParamModifier]])));
-            Inc(Result);
+          strType := Prop.Parameters[i].ParamReturn;
+          Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '  ' +
+          Format('%s %s%s%s'#13#10, [strAOrAn[(strType[1] In
+              strVowels) Or Prop.Parameters[i].ArrayOf],
+            strArrayOf[Prop.Parameters[i].ArrayOf], strType,
+            strModifier[Prop.Parameters[i].ParamModifier]
+            ])));
+          Inc(iLines);
         End;
     End;
-  If Method.ReturnType <> '' Then
+  If Prop.TypeId <> Nil Then
     Begin
-      Writer.Insert(PChar(StringOfChar(#32, iCol - 1)));
+      Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
       Writer.Insert(PChar(Format('  @return  %s %-*s',
-      [strAOrAn[Method.ReturnType[1] In strVowels], iLen,
-      Method.ReturnType])));
+        [strAOrAn[Prop.TypeId.AsString[1] In strVowels], iLen,
+        Prop.TypeId.AsString])));
       Writer.Insert(PChar(#10#13));
-      Inc(Result);
+      Inc(iLines);
     End;
-  // Block Footer
-  If (Method.Parameters.Count > 0) Or (Method.ReturnType <> '') Then
-    Begin
-      Writer.Insert(PChar(#10#13));
-      Inc(Result);
-    End;
-  Writer.Insert(PChar(StringOfChar(#32, iCol - 1) + '**)'#10#13));
-  Inc(Result);
-  Writer.Insert(PChar(StringOfChar(#32, iCol - 1)));
-end;
-
+  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '**)'#13#10));
+  Inc(iLines);
+  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
+  // Get header in view if not already
+  Result.Col := CharPos.CharIndex + 2;
+  Result.Line := CharPos.Line + 1;
+  SelectionChange(Result.Line + iLines, Result.Col, Result.Line, Result.Col,
+    stIdentifier);
+End;
 
 (**
 
@@ -916,12 +1032,12 @@ end;
 
   @precon  Method is a valid instance of a method declatation to be described.
   @postcon Returns a description of the method isf applicable.
-  
-  @param   Method as a TMethodDecl
+
+  @param   Method as a TGenericMethodDecl
   @return  a String
 
 **)
-function TBrowseAndDocItWizard.GetMethodDescription(Method : TMethodDecl) : String;
+function TBrowseAndDocItWizard.GetMethodDescription(Method : TGenericMethodDecl) : String;
 
 begin
   If LowerCase(Copy(Method.Identifier, 1, 3)) = 'get' Then
@@ -1002,15 +1118,19 @@ begin
   If SourceEditor <> Nil Then
     If SourceEditor.EditViewCount > 0 Then
       Begin
-        SourceEditor.Show;
-        If SourceEditor.GetSubViewCount > 0 Then
-          SourceEditor.SwitchToView(0);
-        C.Col := iIdentCol;
-        C.Line := iIdentLine;
-        SourceEditor.GetEditView(0).CursorPos := C;
-        SourceEditor.GetEditView(0).Center(iIdentLine, 1);
-        If iCommentLine < SourceEditor.EditViews[0].TopRow Then
-          SourceEditor.GetEditView(0).SetTopLeft(iCommentLine, 1);
+        If iIdentCol * iIdentLine > 0 Then
+          Begin
+            SourceEditor.Show;
+            If SourceEditor.GetSubViewCount > 0 Then
+              SourceEditor.SwitchToView(0);
+            C.Col := iIdentCol;
+            C.Line := iIdentLine;
+            SourceEditor.GetEditView(0).CursorPos := C;
+            SourceEditor.GetEditView(0).Center(iIdentLine, 1);
+          End;
+        If iCommentLine > 0 Then
+          If iCommentLine < SourceEditor.EditViews[0].TopRow Then
+            SourceEditor.GetEditView(0).SetTopLeft(iCommentLine, 1);
       End;
 end;
 
@@ -1098,6 +1218,7 @@ Var
 
 
 Begin
+  TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   Result := BorlandIDEServices <> Nil;
   If Result Then
     Begin
@@ -1170,7 +1291,7 @@ Var
   Reader : IOTAEditReader;
   iPosition : Integer;
   iRead : Integer;
-  M : TPascalDocModule;
+  M : TBaseLanguageModule;
   strExt : String;
   Options : IOTAProjectOptions;
 
@@ -1206,7 +1327,7 @@ begin
                   Reader := Nil;
                 End;
                 objMemStream.Position := 0;
-                M := TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
+                M := Dispatcher(objMemStream, SourceEditor.FileName,
                   SourceEditor.Modified, [moParse, moCheckForDocumentConflicts]);
                 With M Do
                   Try
@@ -1691,7 +1812,7 @@ Var
   Reader : IOTAEditReader;
   iPosition : Integer;
   iRead : Integer;
-  Source : TPascalDocModule;
+  Source : TBaseLanguageModule;
 
 begin
   objMemStream := TMemoryStream.Create;
@@ -1711,13 +1832,14 @@ begin
       Reader := Nil;
     End;
     objMemStream.Position := 0;
-    Source := TPascalDocModule.Create(objMemStream, SourceEditor.FileName,
+    Source := Dispatcher(objMemStream, SourceEditor.FileName,
       SourceEditor.Modified, []);
-    Try
-      TfrmTokenForm.Execute(Source);
-    Finally
-      Source.Free;
-    End;
+    If Source <> Nil Then
+      Try
+        TfrmTokenForm.Execute(Source);
+      Finally
+        Source.Free;
+      End;
   Finally
     objMemStream.Free;
   End;
@@ -1823,7 +1945,7 @@ Initialization
   bmSplashScreen := LoadBitmap(hInstance, 'BrowseAndDocItSplashScreenBitMap');
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
   (SplashScreenServices As IOTASplashScreenServices).AddPluginBitmap(
-    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix, 1)]),
+    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1)]),
     bmSplashScreen,
     True,
     Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]), ''

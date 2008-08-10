@@ -295,6 +295,7 @@ Type
     dctMethodPostconNotDocumented,
     dctMethodUndocumentedReturn,
     dctMethodIncorrectReturntype,
+    dctMethodReturnNotRequired,
     dctMethodMissingPostCon,
     dctMethodTooManyPostCons,
 
@@ -1667,6 +1668,11 @@ ResourceString
   (** Document conflict message description for an incorrect return type. **)
   strMethodIncorrectReturnTypeDesc = 'The type of the method return is not the ' +
     'same as the type defined in the method.';
+  (** Document conflict message for a return not required. **)
+  strMethodReturnNotRequired = 'Method ''%s''`s return type is not required.';
+  (** Document conflict message description for a return not required. **)
+  strMethodReturnNotRequiredDesc = 'The type of the method return is not ' +
+    'required for this type of method..';
 
   (** A documentation message for missing precondition text. **)
   strMethodPreConNotDocumented = 'A Pre-condition in Method ''%s'' is not documented.';
@@ -2185,6 +2191,10 @@ Const
       FMessage: strMethodIncorrectReturntype;
       FDescription: strMethodIncorrectReturntypeDesc;
       FConflictType: dciMissing),
+    (FCategory: strMethodDocumentation;
+      FMessage: strMethodReturnNotRequired;
+      FDescription: strMethodReturnNotRequiredDesc;
+      FConflictType: dciItem),
     (FCategory: strMethodDocumentation;
       FMessage: strMethodMissingPostCon;
       FDescription: strMethodMissingPostConDesc;
@@ -5200,16 +5210,14 @@ Begin
       End;
   If MethodType = mtFunction Then
     Begin;
-      If (ReturnType.AsString <> '') Then
-        Begin
-          With Comment Do
-            For j := 0 To TagCount - 1 Do
-              If AnsiCompareText(Tag[j].TagName, 'return') = 0 Then
-                Begin
-                  iFound := j;
-                  Break;
-                End;
-        End;
+      If (ReturnType <> Nil) Then
+        With Comment Do
+          For j := 0 To TagCount - 1 Do
+            If AnsiCompareText(Tag[j].TagName, 'return') = 0 Then
+              Begin
+                iFound := j;
+                Break;
+              End;
       If (iFound = -1) And
         (doShowUndocumentedReturn In BrowseAndDocItOptions.Options) Then
         AddDocumentConflict([QualifiedName], Line, Column,
@@ -5220,9 +5228,12 @@ Begin
             (AnsiCompareText(ReturnType.AsString, Comment.Tag[iFound][1]) <> 0)) And
             (doShowIncorrectReturnType In BrowseAndDocItOptions.Options) Then
             AddDocumentConflict([QualifiedName], Line, Column, Comment,
-            DocConflictTable[dctMethodIncorrectReturntype]);
+              DocConflictTable[dctMethodIncorrectReturntype]);
         End;
-    End;
+    End Else
+      If Comment.FindTag('return') >= 0 Then
+        AddDocumentConflict([QualifiedName], Line, Column, Comment,
+          DocConflictTable[dctMethodReturnNotRequired]);
   iFound := 0;
   If (k = 0) And (doShowMissingPostCons in BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([QualifiedName], Line, Column, Comment,

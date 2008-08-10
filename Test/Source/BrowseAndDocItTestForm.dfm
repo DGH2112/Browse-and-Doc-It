@@ -32,7 +32,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Height = 720
     Align = alLeft
     Caption = 'Panel1'
-    TabOrder = 0
+    TabOrder = 1
   end
   object Panel2: TPanel
     Left = 0
@@ -40,7 +40,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Width = 907
     Height = 43
     Align = alTop
-    TabOrder = 2
+    TabOrder = 0
     object Button1: TButton
       Left = 8
       Top = 12
@@ -113,7 +113,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Height = 720
     Align = alLeft
     Caption = 'Panel3'
-    TabOrder = 1
+    TabOrder = 2
     DesignSize = (
       273
       720)

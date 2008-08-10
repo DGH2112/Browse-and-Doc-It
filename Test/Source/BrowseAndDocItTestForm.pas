@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    06 Aug 2008
+  @Date    07 Aug 2008
   @Author  David Hoyle
 
 **)
@@ -13,10 +13,10 @@ unit BrowseAndDocItTestForm;
 interface
 
 uses
-  Windows, Messages, SysUtils, {$IFDEF VER180} Variants, {$ENDIF} Classes,
+  Windows, Messages, SysUtils, Variants, Classes,
   Graphics, Controls, Forms, Dialogs, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ExtCtrls, ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
-  {$WARN UNIT_PLATFORM OFF} FileCtrl {$WARN UNIT_PLATFORM ON}, ComCtrls,
+  FileCtrl, ComCtrls,
   Menus, StdActns, ActnList, ProgressForm, Buttons;
 
 type

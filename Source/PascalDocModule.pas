@@ -598,6 +598,7 @@ Type
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
       ModuleOptions : TModuleOptions);
+    Function KeyWords : TKeyWords; Override;
   End;
 
 
@@ -623,7 +624,7 @@ Const
     identifiers and as types.
 
   **)
-  strReservedWords : Array[1..64] Of String = (
+  strReservedWords : Array[0..63] Of String = (
     'and', 'array', 'as', 'asm', 'begin', 'case', 'class', 'const',
     'constructor', 'destructor', 'dispinterface', 'div', 'do', 'downto', 'else',
     'end', 'except', 'exports', 'file', 'finalization', 'finally', 'for',
@@ -1970,6 +1971,27 @@ Begin
   If Result Then
     AddToExpression(Container);
 End;
+
+(**
+
+  This method returns an array of key words for use in the explorer module.
+
+  @precon  None.
+  @postcon Returns an array of key words for use in the explorer module.
+
+  @return  a TKeyWords
+
+**)
+function TPascalModule.KeyWords: TKeyWords;
+
+Var
+  i : Integer;
+
+begin
+  SetLength(Result, Succ(High(strReservedWords)));
+  For i := Low(strReservedWords) To High(strReservedWords) Do
+    Result[i] := strReservedWords[i];
+end;
 
 (**
 

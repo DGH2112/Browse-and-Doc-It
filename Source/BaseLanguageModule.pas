@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    10 Aug 2008
+  @Date    12 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -116,6 +116,7 @@ Type
     iiLocalRecord,
 
     iiFieldsLabel,
+    iiLocalField,
     iiPublicField,
     iiPrivateField,
     iiPublishedField,
@@ -219,8 +220,13 @@ Type
 
     iiLabelsLabel,
     iiPublicLabel,
+    iiPrivateLabel,
+    iiPublishedLabel,
+    iiProtectedLabel,
+    iiLocalLabel,
 
     iiImplementedMethods,
+    iiMethodsLabel,
 
     iiInitialization,
     iiFinalization,
@@ -968,40 +974,6 @@ Type
     Property Method : String Read FMethod;
   End;
 
-  (**
-
-    This is an augmented Exception class to hold information about the
-    line number and column number of the error.
-
-  **)
-  EDocException = Class(TElementContainer)
-  Private
-    FExceptionMethod: String;
-  Protected
-    function GetMessage: String;
-  Public
-    Constructor Create(strMsg : String; Token : TTokenInfo;
-      strMethodName : String); ReIntroduce; Overload;
-    Constructor Create(strMsg, strLiteral : String; Token : TTokenInfo;
-      strMethodName : String); ReIntroduce; Overload;
-    Constructor Create(strMsg : String; strMethodName : String); ReIntroduce;
-      Overload;
-    (**
-      Returns a string representing the classes ExceptionMethod.
-      @precon  None.
-      @postcon Returns a string representing the classes ExceptionMethod.
-      @return  a String
-    **)
-    Property ExceptionMethod : String Read FExceptionMethod;
-    (**
-      This property returns the message of the Document Error as a String.
-      @precon  None.
-      @postcon Returns the message of the Document Error as a String.
-      @return  a String
-    **)
-    Property Message : String Read GetMessage;
-  End;
-
   (** This is a class to represent a module documentation conflict. **)
   TDocumentConflict = Class(TElementContainer)
   Private
@@ -1254,15 +1226,29 @@ Type
     Property Modified : Boolean Read FModified;
   End;
 
+  (** This enumerate define the position of the editor when an item is selected
+      in the module explorer. **)
+  TBrowsePosition = (bpCommentTop, bpCommentCentre, bpIdentifierTop,
+    bpIdentifierCentre, bpIdentifierCentreShowAllComment);
+
   (** This is a class to define a set of options for the application. **)
   TBrowseAndDocItOptions = Class
   Private
     FOptions : TDocOptions;
     FDefines : TStringList;
+    FSpecialTags : TStringList;
+    FExpandedNodes : TStringList;
+    FINIFileName : String;
+    FDocHelpFile: String;
+    FUpdateInterval: Cardinal;
+    FScopesToRender : TScopes;
+    FBrowsePosition : TBrowsePosition;
   Protected
   Public
     Constructor Create;
     Destructor Destroy; Override;
+    Procedure LoadSettings;
+    Procedure SaveSettings;
     (**
       This property contains the basic toggleable options for the application.
       @precon  None.
@@ -1277,7 +1263,55 @@ Type
       @return  a TStringList
     **)
     Property Defines : TStringList Read FDefines;
+    (**
+      This property provide access to the special tags string list.
+      @precon  None.
+      @postcon Provide access to the special tags string list.
+      @return  a TStringList
+    **)
+    Property SpecialTags : TStringList Read FSpecialTags;
+    (**
+      This property provide access to the expanded nodes string list.
+      @precon  None.
+      @postcon Provide access to the expanded nodes string list.
+      @return  a TStringList
+    **)
+    Property ExpandedNodes : TStringList Read FExpandedNodes;
+    (**
+      This property defines the help file for the application.
+      @precon  None.
+      @postcon Gets and sets the help file for the application.
+      @return  a String
+    **)
+    Property DocHelpFile : String Read FDocHelpFile Write FDocHelpFile;
+    (**
+      This property determines the amount of time in milliseonds between the
+      last editor update and the next refresh. Interval only, the application
+      needs to implement the logic.
+      @precon  None.
+      @postcon Gets and sets the update interval.
+      @return  a Cardinal
+    **)
+    Property UpdateInterval : Cardinal Read FUpdateInterval Write FUpdateInterval;
+    (**
+      This property determines the scopes to render in the module explorer.
+      @precon  None.
+      @postcon Gets and sets the scopes to render.
+      @return  a TScopes
+    **)
+    Property ScopesToRender : TScopes Read FScopesToRender Write FScopesToRender;
+    (**
+      This property determines the behaviour of the positioning of the cursor
+      in the editor window.
+      @precon  None.
+      @postcon Gets and sets the browse position.
+      @return  a TBrowsePosition
+    **)
+    Property BrowsePosition : TBrowsePosition Read FBrowsePosition Write FBrowsePosition;
   End;
+
+  (** A silent parser abort exception. **)
+  EParserAbort = Class(Exception);
 
 ResourceString
   (** Options text for Draw Syntax Highlighted Module Explorer **)
@@ -1415,6 +1449,12 @@ ResourceString
   strFunctionsAndProcedures = 'Function & Procedures';
   (** Label for Labels **)
   strLabel = 'Labels';
+  (** Label for fields **)
+  strFieldsLabel = 'Fields';
+  (** Label for Properties **)
+  strProperties = 'Properties';
+  (** Label for Methods. **)
+  strMethods = 'Methods';
 
   (** Resource string for saving a file. **)
   strSaveFile = 'Do you want to save the file "%s"?';
@@ -1879,145 +1919,151 @@ Const
 
   (** This is a list of Image Resource name to be loaded fom the executable. **)
   ImageList : Array[Succ(Low(TImageIndex))..High(TImageIndex)] Of TImageIndexInfo = (
-    (FResourceName : 'MODULE';                    FMaskColour: $0000FF00),
+    (FResourceName : 'Module';                    FMaskColour: $0000FF00),
 
-    (FResourceName : 'DOCCONFLICTFOLDER';         FMaskColour: $0000FF00),
-    (FResourceName : 'DOCCONFLICTINCORRECT';      FMaskColour: $0000FF00),
-    (FResourceName : 'DOCCONFLICTITEM';           FMaskColour: $0000FF00),
-    (FResourceName : 'DOCCONFLICTMISSING';        FMaskColour: $0000FF00),
+    (FResourceName : 'DocConflictFolder';         FMaskColour: $0000FF00),
+    (FResourceName : 'DocConflictIncorrect';      FMaskColour: $0000FF00),
+    (FResourceName : 'DocConflictItem';           FMaskColour: $0000FF00),
+    (FResourceName : 'DocConflictMissing';        FMaskColour: $0000FF00),
 
-    (FResourceName : 'ERRORFOLDER';               FMaskColour: $0000FF00),
-    (FResourceName : 'ERROR';                     FMaskColour: $0000FF00),
-    (FResourceName : 'WARNING';                   FMaskColour: $0000FF00),
+    (FResourceName : 'ErrorFolder';               FMaskColour: $0000FF00),
+    (FResourceName : 'Error';                     FMaskColour: $0000FF00),
+    (FResourceName : 'Warning';                   FMaskColour: $0000FF00),
 
-    (FResourceName : 'USESLABEL';                 FMaskColour: $0000FF00),
-    (FResourceName : 'USESITEM';                  FMaskColour: $0000FF00),
+    (FResourceName : 'UsesLabel';                 FMaskColour: $0000FF00),
+    (FResourceName : 'UsesItem';                  FMaskColour: $0000FF00),
 
-    (FResourceName : 'TYPESLABEL';                FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICTYPE';                FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATETYPE';               FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDTYPE';             FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDTYPE';             FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALTYPE';                 FMaskColour: $0000FF00),
+    (FResourceName : 'TypeSLabel';                FMaskColour: $0000FF00),
+    (FResourceName : 'PublicType';                FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateType';               FMaskColour: $0000FF00),
+    (FResourceName : 'PUBLISHEDType';             FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedType';             FMaskColour: $0000FF00),
+    (FResourceName : 'LocalType';                 FMaskColour: $0000FF00),
 
-    (FResourceName : 'RECORDSLABEL';              FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICRECORD';              FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATERECORD';             FMaskColour: $0000FF00),
+    (FResourceName : 'RECORDSLabel';              FMaskColour: $0000FF00),
+    (FResourceName : 'PublicRECORD';              FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateRECORD';             FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDRECORD';           FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDRECORD';           FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALRECORD';               FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedRECORD';           FMaskColour: $0000FF00),
+    (FResourceName : 'LocalRECORD';               FMaskColour: $0000FF00),
 
-    (FResourceName : 'FIELDSLABEL';               FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICFIELD';               FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATEFIELD';              FMaskColour: $0000FF00),
+    (FResourceName : 'FIELDSLabel';               FMaskColour: $0000FF00),
+    (FResourceName : 'LocalFIELD';                FMaskColour: $0000FF00),
+    (FResourceName : 'PublicFIELD';               FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateFIELD';              FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDFIELD';            FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDFIELD';            FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedFIELD';            FMaskColour: $0000FF00),
 
-    (FResourceName : 'OBJECTSLABEL';              FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICOBJECT';              FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATEOBJECT';             FMaskColour: $0000FF00),
+    (FResourceName : 'OBJECTSLabel';              FMaskColour: $0000FF00),
+    (FResourceName : 'PublicOBJECT';              FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateOBJECT';             FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDOBJECT';           FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDOBJECT';           FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALOBJECT';               FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedOBJECT';           FMaskColour: $0000FF00),
+    (FResourceName : 'LocalOBJECT';               FMaskColour: $0000FF00),
 
-    (FResourceName : 'PUBLICCONSTRUCTOR';         FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATECONSTRUCTOR';        FMaskColour: $0000FF00),
+    (FResourceName : 'PublicCONSTRUCTOR';         FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateCONSTRUCTOR';        FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDCONSTRUCTOR';      FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDCONSTRUCTOR';      FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALCONSTRUCTOR';          FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedCONSTRUCTOR';      FMaskColour: $0000FF00),
+    (FResourceName : 'LocalCONSTRUCTOR';          FMaskColour: $0000FF00),
 
-    (FResourceName : 'PUBLICDESTRUCTOR';          FMaskColour: $00FF00FF),
-    (FResourceName : 'PRIVATEDESTRUCTOR';         FMaskColour: $00FF00FF),
+    (FResourceName : 'PublicDESTRUCTOR';          FMaskColour: $00FF00FF),
+    (FResourceName : 'PrivateDESTRUCTOR';         FMaskColour: $00FF00FF),
     (FResourceName : 'PUBLISHEDDESTRUCTOR';       FMaskColour: $00FF00FF),
-    (FResourceName : 'PROTECTEDDESTRUCTOR';       FMaskColour: $00FF00FF),
-    (FResourceName : 'LOCALDESTRUCTOR';           FMaskColour: $00FF00FF),
+    (FResourceName : 'ProtectedDESTRUCTOR';       FMaskColour: $00FF00FF),
+    (FResourceName : 'LocalDESTRUCTOR';           FMaskColour: $00FF00FF),
 
-    (FResourceName : 'PUBLICPROCEDURE';           FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATEPROCEDURE';          FMaskColour: $0000FF00),
+    (FResourceName : 'PublicPROCEDURE';           FMaskColour: $0000FF00),
+    (FResourceName : 'PrivatePROCEDURE';          FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDPROCEDURE';        FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDPROCEDURE';        FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALPROCEDURE';            FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedPROCEDURE';        FMaskColour: $0000FF00),
+    (FResourceName : 'LocalPROCEDURE';            FMaskColour: $0000FF00),
 
-    (FResourceName : 'PUBLICFUNCTION';            FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATEFUNCTION';           FMaskColour: $0000FF00),
+    (FResourceName : 'PublicFUNCTION';            FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateFUNCTION';           FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDFUNCTION';         FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDFUNCTION';         FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALFUNCTION';             FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedFUNCTION';         FMaskColour: $0000FF00),
+    (FResourceName : 'LocalFUNCTION';             FMaskColour: $0000FF00),
 
-    (FResourceName : 'CLASSESLABEL';              FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICCLASS';               FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATECLASS';              FMaskColour: $0000FF00),
+    (FResourceName : 'CLASSESLabel';              FMaskColour: $0000FF00),
+    (FResourceName : 'PublicCLASS';               FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateCLASS';              FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDCLASS';            FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDCLASS';            FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALCLASS';                FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedCLASS';            FMaskColour: $0000FF00),
+    (FResourceName : 'LocalCLASS';                FMaskColour: $0000FF00),
 
-    (FResourceName : 'PROPERTYLABEL';             FMaskColour: $00FF00FF),
-    (FResourceName : 'PUBLICPROPERTY';            FMaskColour: $00FF00FF),
-    (FResourceName : 'PRIVATEPROPERTY';           FMaskColour: $00FF00FF),
+    (FResourceName : 'PROPERTYLabel';             FMaskColour: $00FF00FF),
+    (FResourceName : 'PublicPROPERTY';            FMaskColour: $00FF00FF),
+    (FResourceName : 'PrivatePROPERTY';           FMaskColour: $00FF00FF),
     (FResourceName : 'PUBLISHEDPROPERTY';         FMaskColour: $00FF00FF),
-    (FResourceName : 'PROTECTEDPROPERTY';         FMaskColour: $00FF00FF),
-    (FResourceName : 'LOCALPROPERTY';             FMaskColour: $00FF00FF),
+    (FResourceName : 'ProtectedPROPERTY';         FMaskColour: $00FF00FF),
+    (FResourceName : 'LocalPROPERTY';             FMaskColour: $00FF00FF),
 
-    (FResourceName : 'INTERFACESLABEL';           FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICINTERFACE';           FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATEINTERFACE';          FMaskColour: $0000FF00),
+    (FResourceName : 'INTERFACESLabel';           FMaskColour: $0000FF00),
+    (FResourceName : 'PublicINTERFACE';           FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateINTERFACE';          FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDINTERFACE';        FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDINTERFACE';        FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALINTERFACE';            FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedINTERFACE';        FMaskColour: $0000FF00),
+    (FResourceName : 'LocalINTERFACE';            FMaskColour: $0000FF00),
 
-    (FResourceName : 'DISPINTERFACESLABEL';       FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICDISPINTERFACE';       FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATEDISPINTERFACE';      FMaskColour: $0000FF00),
+    (FResourceName : 'DISPINTERFACESLabel';       FMaskColour: $0000FF00),
+    (FResourceName : 'PublicDISPINTERFACE';       FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateDISPINTERFACE';      FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDDISPINTERFACE';    FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDDISPINTERFACE';    FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALDISPINTERFACE';        FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedDISPINTERFACE';    FMaskColour: $0000FF00),
+    (FResourceName : 'LocalDISPINTERFACE';        FMaskColour: $0000FF00),
 
-    (FResourceName : 'CONSTANTSLABEL';            FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICCONST';               FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATECONST';              FMaskColour: $0000FF00),
+    (FResourceName : 'CONSTANTSLabel';            FMaskColour: $0000FF00),
+    (FResourceName : 'PublicCONST';               FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateCONST';              FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDCONST';            FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDCONST';            FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALCONST';                FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedCONST';            FMaskColour: $0000FF00),
+    (FResourceName : 'LocalCONST';                FMaskColour: $0000FF00),
 
-    (FResourceName : 'RESOURCESTRINGSLABEL';      FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICRESOURCESTRING';      FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATERESOURCESTRING';     FMaskColour: $0000FF00),
+    (FResourceName : 'RESOURCESTRINGSLabel';      FMaskColour: $0000FF00),
+    (FResourceName : 'PublicRESOURCESTRING';      FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateRESOURCESTRING';     FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDRESOURCESTRING';   FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDRESOURCESTRING';   FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALRESOURCESTRING';       FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedRESOURCESTRING';   FMaskColour: $0000FF00),
+    (FResourceName : 'LocalRESOURCESTRING';       FMaskColour: $0000FF00),
 
-    (FResourceName : 'VARIABLESLABEL';            FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICVARIABLE';            FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATEVARIABLE';           FMaskColour: $0000FF00),
+    (FResourceName : 'VARIABLESLabel';            FMaskColour: $0000FF00),
+    (FResourceName : 'PublicVARIABLE';            FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateVARIABLE';           FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDVARIABLE';         FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDVARIABLE';         FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALVARIABLE';             FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedVARIABLE';         FMaskColour: $0000FF00),
+    (FResourceName : 'LocalVARIABLE';             FMaskColour: $0000FF00),
 
-    (FResourceName : 'THREADVARSLABEL';           FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICTHREADVAR';           FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATETHREADVAR';          FMaskColour: $0000FF00),
+    (FResourceName : 'THREADVARSLabel';           FMaskColour: $0000FF00),
+    (FResourceName : 'PublicTHREADVAR';           FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateTHREADVAR';          FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDTHREADVAR';        FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDTHREADVAR';        FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALTHREADVAR';            FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedTHREADVAR';        FMaskColour: $0000FF00),
+    (FResourceName : 'LocalTHREADVAR';            FMaskColour: $0000FF00),
 
-    (FResourceName : 'EXPORTEDHEADINGSLABEL';     FMaskColour: $0000FF00),
+    (FResourceName : 'EXPORTEDHEADINGSLabel';     FMaskColour: $0000FF00),
 
-    (FResourceName : 'EXPORTEDFUNCTIONSLABEL';    FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICEXPORTEDFUNCTION';    FMaskColour: $0000FF00),
-    (FResourceName : 'PRIVATEEXPORTEDFUNCTION';   FMaskColour: $0000FF00),
+    (FResourceName : 'EXPORTEDFUNCTIONSLabel';    FMaskColour: $0000FF00),
+    (FResourceName : 'PublicEXPORTEDFUNCTION';    FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateEXPORTEDFUNCTION';   FMaskColour: $0000FF00),
     (FResourceName : 'PUBLISHEDEXPORTEDFUNCTION'; FMaskColour: $0000FF00),
-    (FResourceName : 'PROTECTEDEXPORTEDFUNCTION'; FMaskColour: $0000FF00),
-    (FResourceName : 'LOCALEXPORTEDFUNCTION';     FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedEXPORTEDFUNCTION'; FMaskColour: $0000FF00),
+    (FResourceName : 'LocalEXPORTEDFUNCTION';     FMaskColour: $0000FF00),
 
-    (FResourceName : 'LABELSLABEL';               FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLICLABEL';               FMaskColour: $0000FF00),
+    (FResourceName : 'LabelsLabel';               FMaskColour: $0000FF00),
+    (FResourceName : 'LocalLabel';                FMaskColour: $0000FF00),
+    (FResourceName : 'PrivateLabel';              FMaskColour: $0000FF00),
+    (FResourceName : 'ProtectedLabel';            FMaskColour: $0000FF00),
+    (FResourceName : 'PublicLabel';               FMaskColour: $0000FF00),
+    (FResourceName : 'PublishedLabel';            FMaskColour: $0000FF00),
 
-    (FResourceName : 'IMPLEMENTEDMETHODSLABEL';   FMaskColour: $0000FF00),
+    (FResourceName : 'METHODSLabel';              FMaskColour: $0000FF00),
+    (FResourceName : 'IMPLEMENTEDMETHODSLabel';   FMaskColour: $0000FF00),
 
-    (FResourceName : 'INITIALIZATIONLABEL';       FMaskColour: $00FF00FF),
-    (FResourceName : 'FINALIZATIONLABEL';         FMaskColour: $0000FF00),
+    (FResourceName : 'INITIALIZATIONLabel';       FMaskColour: $00FF00FF),
+    (FResourceName : 'FINALIZATIONLabel';         FMaskColour: $0000FF00),
 
-    (FResourceName : 'TODOFOLDER';                FMaskColour: $0000FF00),
+    (FResourceName : 'TODOFolder';                FMaskColour: $0000FF00),
     (FResourceName : 'TODOITEM';                  FMaskColour: $0000FF00),
 
     (FResourceName : 'UNKNOWNCLSOBJ';             FMaskColour: $0000FF00)
@@ -2217,10 +2263,6 @@ Const
   );
 
 Var
-  (** This is a global string list containing the special tags list. It is
-      constructed and destroyed in the Initialization and Finalizations
-      sections respectively. **)
-  SpecialTags : TStringList;
   (** This is a global variable for the Browse and Doc It options that need to
       be available throughout the application. **)
   BrowseAndDocItOptions : TBrowseAndDocItOptions;
@@ -2231,7 +2273,13 @@ Var
 Implementation
 
 Uses
-  Windows, StrUtils, DGHLibrary;
+  Windows, StrUtils, DGHLibrary, INIFiles;
+
+resourcestring
+  (** An error message for tying to add one type of element but finding another
+      with the same name. **)
+  strTryingToAddType = 'Trying to add type "%s" but found type "%s" with the' +
+  ' same name (%s).';
 
 Var
   (** This variable provides an incremental number of making doc conflict
@@ -2565,6 +2613,7 @@ function TComment.AsString(iIndent, iMaxWidth: Integer; ShowHTML : Boolean): Str
 
 Var
   str : String;
+  strToken : String;
   i : Integer;
 
 begin
@@ -2574,18 +2623,19 @@ begin
     If (TokenType[i] <> ttHTMLtag) Or ((TokenType[i] = ttHTMLtag) And ShowHTML) Then
     Begin
       If Copy(Token[i], 1, 2) = '@@' Then
-        str := str + Copy(Token[i], 2, Length(Token[i]) - 1) + #32
+        strToken := Copy(Token[i], 2, Length(Token[i]) - 1) + #32
       Else If Copy(Token[i], 1, 1) = '#' Then
-        str := str + #13 + Copy(Token[i], 2, Length(Token[i]) - 1) + #32
+        strToken := #13 + Copy(Token[i], 2, Length(Token[i]) - 1) + #32
       Else
-        str := str + Token[i] + #32;
-      If Length(str) > iMaxWidth Then
+        strToken := Token[i] + #32;
+      If Length(str + strToken) > iMaxWidth Then
         Begin
           If Result <> '' Then
             Result := Result + #13#10;
           Result := Result + str;
           str := StringOfChar(#32, iIndent);
         End;
+      str := str + strToken;
     End;
   If Result <> '' Then
     Result := Result + #13#10;
@@ -2610,8 +2660,13 @@ Begin
   FTokens := TStringList.Create;
   FTags := TObjectList.Create(True);
   FTagMode := False;
-  FLine := srcComment.Line;
-  FCol := srcComment.Col;
+  FLine := 0;
+  FCol := 0;
+  If srcComment <> Nil Then
+    Begin
+      FLine := srcComment.Line;
+      FCol := srcComment.Col;
+    End;
   Assign(srcComment);
 End;
 
@@ -3002,6 +3057,7 @@ Function TElementContainer.Add(AElement: TElementContainer) : TElementContainer;
 
 Var
   i : Integer;
+  E: TElementContainer;
 
 begin
   Result := AElement;
@@ -3010,10 +3066,19 @@ begin
   If i < 0 Then
     FElements.Insert(Abs(i) - 1, AElement)
   Else
-    Begin
+    Try
       Result := FElements[i -1] As TElementContainer;
       Result.Comment.Assign(AElement.Comment);
+      If Not AElement.ClassNameIs(Result.ClassName) Then
+        Begin
+          E := objModuleRootElement.Add(strErrorsAndWarnings, iiErrorFolder, Nil);
+          E.Add(TDocError.Create(Format(strTryingToAddType, [AElement.ClassName,
+            Result.ClassName, AElement.Name]), scNone, 'TElementContainer.Add',
+            AElement.Line, AElement.Column, etError));
+          Raise EParserAbort.Create('');
+        End;
       (** Free AElement after getting the comment as it will leak otherwise. **)
+    Finally
       AElement.Free;
     End;
 end;
@@ -3989,87 +4054,8 @@ Function TDocError.GetAsString: String;
 
 begin
   Result := FMsg;
-end;
-
-(**
-
-  This is the constructor method for the EDocException class.
-
-  @precon  strMsg is the text message of the exception, Token is the token where
-           the error occurred and strMethodName is the name of the method where
-           the exception occurred.
-  @postcon Creates the exception.
-
-  @param   strMsg        as a String
-  @param   Token         as a TTokenInfo
-  @param   strMethodName as a String
-
-**)
-Constructor EDocException.Create(strMsg : String; Token : TTokenInfo;
-  strMethodName : String);
-
-Begin
-  Inherited Create(Format(strMsg, [Token.Token, Token.Line, Token.Column]),
-    scGlobal, Token.Line, Token.Column, iiError, Nil);
-  FExceptionMethod := strMethodName;
-End;
-
-(**
-
-  This is the constructor method for the EDocException class.
-
-  @precon  strMsg is the text message of the exception, strLiteral is the
-           literal text that was expected when the exception occurred, Token is
-           the token where the error occurred and strMethodName is the name of
-           the method where the exception occurred.
-  @postcon Creates the exception.
-
-  @param   strMsg        as a String
-  @param   strLiteral    as a String
-  @param   Token         as a TTokenInfo
-  @param   strMethodName as a String
-
-**)
-Constructor EDocException.Create(strMsg, strLiteral : String;
-  Token : TTokenInfo; strMethodName : String);
-
-Begin
-  Inherited Create(Format(strMsg, [strLiteral, Token.Token, Token.Line,
-    Token.Column]), scGlobal, Token.Line, Token.Column, iiError, Nil);
-  FExceptionMethod := strMethodName;
-End;
-
-(**
-
-  This is the constructor method for the EDocException class.
-
-  @precon  None.
-  @postcon Creates an instance of the Document Exception with the message strMsg
-           and Method name strMethodName.
-
-  @param   strMsg        as a String
-  @param   strMethodName as a String
-
-**)
-constructor EDocException.Create(strMsg: String; strMethodName : String);
-begin
-  Inherited Create(strMsg, scGlobal, 0, 0, iiError, Nil);
-  FExceptionMethod := strMethodName;
-end;
-
-(**
-
-  This is a getter method for the Message property.
-
-  @precon  None.
-  @postcon Returns the message stored in the FName field.
-
-  @return  a String
-
-**)
-function EDocException.GetMessage: String;
-begin
-  Result := Name;
+  If DebugHook <> 0 Then
+    Result := Result + Format(' [%s]', [FMethod]);
 end;
 
 { TDocumentConflict }
@@ -4611,7 +4597,11 @@ Function TBaseLanguageModule.GetToken : TTokenInfo;
 
 Begin
   If FTokenIndex >= FTokens.Count Then
-    Raise EDocException.Create(strUnExpectedEndOfFile, 'GetToken');
+    Begin
+      AddError(TDocError.Create(strUnExpectedEndOfFile, scNone, 'GetToken',
+        0, 0, etError));
+      Raise EParserAbort.Create('');
+    End;
   Result := FTokens[FTokenIndex] As TTokenInfo;
 End;
 
@@ -4883,7 +4873,11 @@ Begin
         ttCompilerDirective]) Do
         Dec(FTokenIndex);
       If FTokenIndex < 0 Then
-        Raise EDocException.Create(strUnExpectedStartOfFile, 'RollBackToken');
+        Begin
+          AddError(TDocError.Create(strUnExpectedStartOfFile, scNone,
+            'RollBackToken', 0, 0, etError));
+          Raise EParserAbort.Create('');
+        End;
     End;
 End;
 
@@ -5468,6 +5462,27 @@ Constructor TBrowseAndDocItOptions.Create;
 Begin
   Inherited Create;
   FDefines := TStringList.Create;
+  FSpecialTags := TStringList.Create;
+  // Create a default set of Special Tags.
+  FSpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree And iAutoExpand));
+  FSpecialTags.AddObject('precon=Pre-Conditions', TObject(0));
+  FSpecialTags.AddObject('postcon=Post-Conditions', TObject(0));
+  FSpecialTags.AddObject('param=Parameters', TObject(0));
+  FSpecialTags.AddObject('return=Returns', TObject(0));
+  FSpecialTags.AddObject('note=Notes', TObject(0));
+  FSpecialTags.AddObject('see=Also See', TObject(0));
+  FSpecialTags.AddObject('exception=Exception Raised', TObject(0));
+  FSpecialTags.AddObject('bug=Known Bugs', TObject(iShowInTree And iAutoExpand));
+  FSpecialTags.AddObject('debug=Debugging Code', TObject(iShowInTree And iAutoExpand));
+  FSpecialTags.AddObject('date=Date Code Last Updated', TObject(0));
+  FSpecialTags.AddObject('author=Code Author', TObject(0));
+  FSpecialTags.AddObject('version=Code Version', TObject(0));
+  FExpandedNodes := TStringList.Create;
+  FExpandedNodes.Sorted := True;
+  FExpandedNodes.Duplicates := dupIgnore;
+  FINIFileName := BuildRootKey(Nil, Nil);
+  FScopesToRender := [scPrivate, scProtected, scPublic, scPublished];
+  LoadSettings;
 End;
 
 (**
@@ -5481,34 +5496,107 @@ End;
 Destructor TBrowseAndDocItOptions.Destroy;
 
 Begin
+  SaveSettings;
+  FExpandedNodes.Free;
+  FSpecialTags.Free;
   FDefines.Free;
   Inherited Destroy;
 End;
 
+(**
+
+  This method loads the applications settings from an ini file.
+
+  @precon  None.
+  @postcon Loads the applications settings from an ini file.
+
+**)
+procedure TBrowseAndDocItOptions.LoadSettings;
+
+Var
+  sl :  TStringList;
+  i : TDocOption;
+  j : Integer;
+  iValue : Integer;
+
+begin
+  With TIniFile.Create(FINIFileName) Do
+    Try
+      For i := Low(TDocOption) to High(TDocOption) Do
+        If ReadBool('Options', DocOptionInfo[i].FDescription,
+          DocOptionInfo[i].FEnabled) Then
+          FOptions := FOptions + [i]
+        Else
+          FOptions := FOptions - [i];
+      For j := 0 To FSpecialTags.Count - 1 Do
+        FSpecialTags.Objects[j] := TObject(
+          ReadInteger('SpecialTags', FSpecialTags.Names[j],
+          Integer(FSpecialTags.Objects[j]))
+        );
+      sl := TStringList.Create;
+      Try
+        ReadSection('ManagedExpandedNodes', sl);
+        For j := 0 To sl.Count - 1 Do
+          Begin
+            iValue := ReadInteger('ManagedExpandedNodes', sl[j], 0);
+            FExpandedNodes.AddObject(sl[j], TObject(iValue));
+          End;
+      Finally
+        sl.Free;
+      End;
+      FUpdateInterval := ReadInteger('ModuleExplorer', 'UpdateInterval', 1000);
+      FDocHelpFile := ReadString('ModuleExplorer', 'HelpFile', '');
+      FScopesToRender := TScopes(Byte(ReadInteger('ModuleExplorer', 'ScopesToRender',
+        Byte(FScopesToRender))));
+      FBrowsePosition := TBrowsePosition(ReadInteger('Setup', 'BrowsePosition',
+        Integer(bpIdentifierCentreShowAllComment)));
+    Finally
+      Free;
+    End;
+end;
+
+(**
+
+  This method saves the applications settings to an ini file.
+
+  @precon  None.
+  @postcon Saves the applications settings to an ini file.
+
+**)
+procedure TBrowseAndDocItOptions.SaveSettings;
+
+Var
+  i : TDocOption;
+  j : Integer;
+
+begin
+  With TIniFile.Create(FINIFileName) Do
+    Try
+      For i := Low(TDocOption) to High(TDocOption) Do
+        WriteBool('Options', DocOptionInfo[i].FDescription, i In FOptions);
+      For j := 0 To FSpecialTags.Count - 1 Do
+        WriteInteger('SpecialTags', FSpecialTags.Names[j], Integer(FSpecialTags.Objects[j]));
+      EraseSection('ManagedExpandedNodes');
+      For j := 0 To BrowseAndDocItOptions.ExpandedNodes.Count - 1 Do
+        WriteInteger('ManagedExpandedNodes', FExpandedNodes[j],
+          Integer(FExpandedNodes.Objects[j]));
+      WriteInteger('ModuleExplorer', 'UpdateInterval', FUpdateInterval);
+      WriteString('ModuleExplorer', 'HelpFile', FDocHelpFile);
+      WriteInteger('ModuleExplorer', 'ScopesToRender', Byte(FScopesToRender));
+      WriteInteger('Setup', 'BrowsePosition', Integer(FBrowsePosition));
+    Finally
+      Free;
+    End;
+end;
+
 (** This initializations section ensures that there is a valid instance of the
-    SpecialTags class and a valid instance of the BrowseAndDocItOption class. **)
+    BrowseAndDocItOption class. **)
 Initialization
   iDocConflictCounter := 1;
   objModuleRootElement := Nil;
-  SpecialTags := TStringList.Create;
-  // Create a default set of Special Tags.
-  SpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree And iAutoExpand));
-  SpecialTags.AddObject('precon=Pre-Conditions', TObject(0));
-  SpecialTags.AddObject('postcon=Post-Conditions', TObject(0));
-  SpecialTags.AddObject('param=Parameters', TObject(0));
-  SpecialTags.AddObject('return=Returns', TObject(0));
-  SpecialTags.AddObject('note=Notes', TObject(0));
-  SpecialTags.AddObject('see=Also See', TObject(0));
-  SpecialTags.AddObject('exception=Exception Raised', TObject(0));
-  SpecialTags.AddObject('bug=Known Bugs', TObject(iShowInTree And iAutoExpand));
-  SpecialTags.AddObject('debug=Debugging Code', TObject(iShowInTree And iAutoExpand));
-  SpecialTags.AddObject('date=Date Code Last Updated', TObject(0));
-  SpecialTags.AddObject('author=Code Author', TObject(0));
-  SpecialTags.AddObject('version=Code Version', TObject(0));
   BrowseAndDocItOptions := TBrowseAndDocItOptions.Create;
-(** This finalization section ensures that the SpecialTags and
-    BrowseAndDocItOptions class are destroyed. **)
+(** This finalization section ensures that the BrowseAndDocItOptions class are
+    destroyed. **)
 Finalization
   BrowseAndDocItOptions.Free;
-  SpecialTags.Free;
 End.

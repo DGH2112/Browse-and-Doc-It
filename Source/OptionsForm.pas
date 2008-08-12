@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    30 Jul 2006
+  @Date    12 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -54,9 +54,10 @@ type
       Rect: TRect; State: TOwnerDrawState);
     { Private declarations }
   private
+    FUpdateInterval: Cardinal;
   public
     { Public declarations }
-    Class Function Execute(var iInt : Integer; var DocHelpFile : String) : Boolean;
+    Class Function Execute : Boolean;
   end;
 
 implementation
@@ -80,13 +81,10 @@ ResourceString
            DocHelpFile is the directory of the modules help file.
   @postcon Returns true if the OK button on the dialogue was pressed.
 
-  @param   iInt        as an Integer as a reference
-  @param   DocHelpFile as a String as a reference
   @return  a Boolean
 
 **)
-Class Function TfrmOptions.Execute(var iInt : Integer;
-  var DocHelpFile : String) : Boolean;
+Class Function TfrmOptions.Execute : Boolean;
 
 Var
   i : TDocOption;
@@ -101,11 +99,12 @@ Begin
           clbOptions.Items.Add(DocOptionInfo[i].FDescription);
           clbOptions.Checked[Integer(i)] := i In BrowseAndDocItOptions.Options;
         End;
-      For j := 0 To SpecialTags.Count - 1 Do
-        lbSpecialTags.Items.AddObject(SpecialTags[j], SpecialTags.Objects[j]);
-      udUpdateInterval.Position := iInt;
-      If FileExists(DocHelpFile) Then
-        HelpFileDir.Directory := DocHelpFile;
+      For j := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
+        lbSpecialTags.Items.AddObject(BrowseAndDocItOptions.SpecialTags[j],
+          BrowseAndDocItOptions.SpecialTags.Objects[j]);
+      udUpdateInterval.Position := FUpdateInterval;
+      If FileExists(BrowseAndDocItOptions.DocHelpFile) Then
+        HelpFileDir.Directory := BrowseAndDocItOptions.DocHelpFile;
       If ShowModal = mrOK Then
         Begin
           Result := True;
@@ -113,12 +112,13 @@ Begin
           For i := Low(TDocOption) To High(TDocOption) Do
             If clbOptions.Checked[Integer(i)] Then
               BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [i];
-          SpecialTags.Clear;
+          BrowseAndDocItOptions.SpecialTags.Clear;
           For j := 0 To lbSpecialTags.Items.Count - 1 Do
-            SpecialTags.AddObject(lbSpecialTags.Items[j],
+            BrowseAndDocItOptions.SpecialTags.AddObject(lbSpecialTags.Items[j],
             lbSpecialTags.Items.Objects[j]);
-          iInt := udUpdateInterval.Position;
-          DocHelpFile := HelpFileDir.Directory;
+          FUpdateInterval := udUpdateInterval.Position;
+          BrowseAndDocItOptions.DocHelpFile := HelpFileDir.Directory;
+          BrowseAndDocItOptions.SaveSettings;
         End;
     Finally
       Free;

@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    07 Aug 2008
+  @Date    12 Aug 2008
   @Author  David Hoyle
 
 **)
@@ -78,6 +78,7 @@ type
     procedure SetFileName(const Value: String);
     Procedure GetErrors(strFileName : String; var iErrors, iConflicts : Integer);
     Procedure RecurseDirectories(strDirectory : String);
+    Procedure RefreshExplorer(Sender : TObject);
     (**
       A property to define the directory for searching.
       @precon  None.
@@ -155,13 +156,8 @@ end;
 **)
 procedure TfrmBrowseAndDocItTestForm.btnOptionsClick(Sender: TObject);
 
-Var
-  i : Integer;
-  strHelp : String;
-
 begin
-  i := 5;
-  If TfrmOptions.Execute(i, strHelp) Then
+  If TfrmOptions.Execute Then
     SynEdit1Change(Sender);
 end;
 
@@ -281,6 +277,21 @@ End;
 
 (**
 
+  This is an on refresh event handler for the module explorer called back.
+
+  @precon  None.
+  @postcon Refreshes the module explorer. 
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmBrowseAndDocItTestForm.RefreshExplorer(Sender: TObject);
+begin
+  SynEdit1Change(Sender);
+end;
+
+(**
+
   This method gets the number of errors for the given files name.
 
   @precon  None.
@@ -361,7 +372,6 @@ end;
 procedure TfrmBrowseAndDocItTestForm.FormCreate(Sender: TObject);
 
 Var
-  i : TDocOption;
   j : Integer;
 
 begin
@@ -401,19 +411,9 @@ begin
   FModuleExplorerFrame.Align := alClient;
   FModuleExplorerFrame.OnSelectionChange := SelectionChange;
   FModuleExplorerFrame.OnFocus := Focus;
+  FModuleExplorerFrame.OnRefresh := RefreshExplorer;
   With TIniFile.Create(FINIFileName) Do
     Try
-      For i := Low(TDocOption) to High(TDocOption) Do
-        If ReadBool('Options', DocOptionInfo[i].FDescription,
-          DocOptionInfo[i].FEnabled) Then
-          BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [i]
-        Else
-          BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options - [i];
-      For j := 0 To SpecialTags.Count - 1 Do
-        SpecialTags.Objects[j] := TObject(
-          ReadInteger('SpecialTags', SpecialTags.Names[j],
-          Integer(SpecialTags.Objects[j]))
-        );
       Top := ReadInteger('Position', 'Top', Top);
       Left := ReadInteger('Position', 'Left', Left);
       Height := ReadInteger('Position', 'Height', Height);
@@ -441,22 +441,12 @@ end;
 **)
 procedure TfrmBrowseAndDocItTestForm.FormDestroy(Sender: TObject);
 
-Var
-  i : TDocOption;
-  j : Integer;
-
 begin
   FSynEdit.Highlighter := Nil;
   FSynEdit.Free;
   FSynPasSyn.Free;
   With TIniFile.Create(FINIFileName) Do
     Try
-      For i := Low(TDocOption) to High(TDocOption) Do
-        WriteBool('Options', DocOptionInfo[i].FDescription,
-          i In BrowseAndDocItOptions.Options);
-      For j := 0 To SpecialTags.Count - 1 Do
-        WriteInteger('SpecialTags', SpecialTags.Names[j],
-          Integer(SpecialTags.Objects[j]));
       WriteInteger('Position', 'Top', Top);
       WriteInteger('Position', 'Left', Left);
       WriteInteger('Position', 'Height', Height);

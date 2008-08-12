@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       10 Aug 2008
+  @Date       12 Aug 2008
   @Author     David Hoyle
 
 **)
@@ -584,7 +584,6 @@ Type
     Procedure AddToExpression(Container : TElementContainer);
     function IsToken(strToken: String; Container: TElementContainer): Boolean;
     procedure ArrayElement(C : TElementContainer; iStartDimension: Integer; AT : TArrayType);
-    Function UndefinedToken : Boolean;
     Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
     Procedure CheckReturnValue(Method : TPascalMethod);
     Procedure CheckAlias(Method : TPascalMethod);
@@ -600,7 +599,6 @@ Type
       ModuleOptions : TModuleOptions);
     Function KeyWords : TKeyWords; Override;
   End;
-
 
 Implementation
 
@@ -624,28 +622,28 @@ Const
     identifiers and as types.
 
   **)
-  strReservedWords : Array[0..63] Of String = (
+  strReservedWords : Array[0..69] Of String = (
     'and', 'array', 'as', 'asm', 'begin', 'case', 'class', 'const',
     'constructor', 'destructor', 'dispinterface', 'div', 'do', 'downto', 'else',
-    'end', 'except', 'exports', 'file', 'finalization', 'finally', 'for',
+    'end', 'except', 'exports', 'file', 'final', 'finalization', 'finally', 'for',
     'function', 'goto', 'if', 'implementation', 'in', 'inherited',
     'initialization', 'inline', 'interface', 'is', 'label', 'library', 'mod',
-    {'nil', }'not', 'object', 'of', 'on', 'or', 'out', 'packed',
+    'nil', 'not', 'object', 'of', 'on', 'or', 'out', 'packed',
     'procedure', 'program', 'property', 'raise', 'record', 'repeat',
-    'resourcestring', 'set', 'shl', 'shr', {'string', }'then', 'threadvar',
-    'to', 'try', 'type', 'unit', 'until', 'uses', 'var', 'while',
-    'with', 'xor'
+    'resourcestring', 'sealed', 'set', 'shl', 'shr', 'static', 'string', 'then',
+    'threadvar', 'to', 'try', 'type', 'unit', 'unsafe', 'until', 'uses', 'var',
+    'while', 'with', 'xor'
   );
   (** A sorted list of directives. Used for identifying tokens as
   directives. **)
-  strDirectives : Array[1..42] Of String = (
+  strDirectives : Array[0..44] Of String = (
     'absolute', 'abstract', 'assembler', 'automated', 'cdecl', 'contains',
-    'default', 'dispid', 'dynamic', 'export', 'external', 'far', 'forward',
-    'implements', 'index', 'message', 'name', 'near', 'nodefault', 'overload',
-    'override', 'package', 'pascal', 'private', 'protected', 'public',
-    'published', 'read', 'readonly', 'register', 'reintroduce', 'requires',
-    'resident', 'safecall', 'sealed', 'static', 'stdcall', 'stored', 'varargs',
-    'virtual', 'write', 'writeonly'
+    'default', 'deprecated', 'dispid', 'dynamic', 'export', 'external', 'far',
+    'forward', 'implements', 'index', 'inline', 'library', 'local', 'message',
+    'name', 'near', 'nodefault', 'overload', 'override', 'package', 'pascal',
+    'platform', 'private', 'protected', 'public', 'published', 'read',
+    'readonly', 'register', 'reintroduce', 'requires', 'resident', 'safecall',
+    'stdcall', 'stored', 'varargs', 'virtual', 'write', 'writeonly'
   );
 
   (** A list of string representing the types of modules. **)
@@ -1926,6 +1924,8 @@ begin
                   TElementContainer.Create(Method.ClsName, AScope, 0, 0, iIcon, Nil));
               End;
         End;
+      If Container Is TObjectDecl Then
+        Container := Container.Add(strMethods, iiMethodsLabel, Nil);
       Method := Container.Add(Method) As TPascalMethod;
     End;
 end;
@@ -1985,12 +1985,23 @@ End;
 function TPascalModule.KeyWords: TKeyWords;
 
 Var
-  i : Integer;
+  i, j : Integer;
+  str : String;
 
 begin
-  SetLength(Result, Succ(High(strReservedWords)));
+  SetLength(Result, Succ(High(strReservedWords)) + Succ(High(strDirectives)));
   For i := Low(strReservedWords) To High(strReservedWords) Do
     Result[i] := strReservedWords[i];
+  For i := Low(strDirectives) To High(strDirectives) Do
+    Result[High(strReservedWords) + i] := strDirectives[i];
+  For i := Low(Result) To Pred(High(Result)) Do
+    For j := i + 1 To High(Result) Do
+      If Result[i] > Result[j] Then
+        Begin
+          str := Result[i];
+          Result[i] := Result[j];
+          Result[j] := str;
+        End;
 end;
 
 (**
@@ -2053,13 +2064,14 @@ begin
               ErrorAndSeekToken(strModuleKeyWordNotfound, 'Goal', Token.Token,
                 strSeekableOnErrorTokens, stActual);
           End Else
-            Raise EDocException.Create(strUnExpectedEndOfFile, 'Goal');
+          Begin
+            AddError(TDocError.Create(strUnExpectedEndOfFile, scNone, 'Goal',
+              0, 0, etError));
+            Raise EParserAbort.Create('');
+          End;
       End;
   Except
-    On E : EDocException Do
-      AddError(TDocError.Create(E.Message, scGlobal, E.ExceptionMethod, 0, 0, etError));
-    On E : Exception Do
-      AddError(TDocError.Create(E.Message, scGlobal, 'Goal', 0, 0, etError));
+    On E : EParserAbort Do { Do nothing};
   End;
 end;
 
@@ -2086,7 +2098,7 @@ begin
       Comment := GetComment;
       ModuleType := mtProgram;
       NextNonCommentToken;
-      If Token.TokenType = ttIdentifier Then
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
           ModuleName := Token.Token;
           ModuleNameLine := Token.Line;
@@ -2147,7 +2159,7 @@ Begin
       Comment := GetComment;
       ModuleType := mtUnit;
       NextNonCommentToken;
-      If Token.TokenType <> ttIdentifier Then
+      If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
         ErrorAndSeekToken(strIdentExpected, 'OPUnit', Token.Token,
           strSeekableOnErrorTokens, stActual)
       Else
@@ -2199,7 +2211,7 @@ begin
       Comment := GetComment;
       ModuleType := mtPackage;
       NextNonCommentToken;
-      If Token.TokenType <> ttIdentifier Then
+      If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
         ErrorAndSeekToken(strIdentExpected, 'OPPackage', Token.Token,
           strSeekableOnErrorTokens, stActual)
       Else
@@ -2252,7 +2264,7 @@ begin
       Comment := GetComment;
       ModuleType := mtLibrary;
       NextNonCommentToken;
-      If Token.TokenType <> ttIdentifier Then
+      If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
         ErrorAndSeekToken(strIdentExpected, 'OPLibrary', Token.Token,
           strSeekableOnErrorTokens, stActual)
       Else
@@ -2410,8 +2422,7 @@ Begin
     VarSection(scPublic, Nil) Or
     ThreadVarSection(scPublic) Or
     ExportedHeading(C) Or
-    ExportsStmt Or
-    UndefinedToken
+    ExportsStmt
   );
 End;
 
@@ -2572,11 +2583,11 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  If (Token.TokenType In [ttIdentifier]) Then
+  If (Token.TokenType In [ttIdentifier, ttDirective]) Then
     Begin
       E := TExportsItem.Create(Token.Token, scPublic, Token.Line,
         Token.Column, iiPublicExportedFunction, GetComment);
-      Container.Add(E);
+      E := Container.Add(E);
       NextNonCommentToken;
       // Check INDEX
       If Token.UToken = 'INDEX' Then
@@ -2634,8 +2645,7 @@ Begin
     TypeSection(AScope, Container) Or
     VarSection(AScope, Container) Or
     ThreadVarSection(AScope) Or
-    ProcedureDeclSection(AScope, Container) Or
-    UndefinedToken
+    ProcedureDeclSection(AScope, Container)
   );
 End;
 
@@ -2656,18 +2666,22 @@ End;
 **)
 Function TPascalModule.LabelDeclSection(Container : TElementContainer) : Boolean;
 
-Var
-  L : TElementContainer;
-
 Begin
   Result := Token.UToken = 'LABEL';
   If Result Then
     Begin
       If Container = Nil Then
         Container := Self;
-      L := Container.Add(strLabel, iiLabelsLabel, GetComment);
       NextNonCommentToken;
-      IdentList(L, strSeekableOnErrorTokens);
+      Repeat
+        If Token.TokenType In [ttNumber] Then
+          Begin
+            Container.Add(Token, scLocal, iiPublicLabel, GetComment);
+            NextNonCommentToken;
+          End Else
+            ErrorAndSeekToken(strNumberExpected, 'LabelDeclSection', Token.Token,
+              strSeekableOnErrorTokens, stFirst);
+      Until Not IsToken(',', Nil);
       // Check for ';'
       If Token.Token = ';' Then
         NextNonCommentToken
@@ -2709,7 +2723,10 @@ Begin
     Begin
       If Container = Nil Then
         Container := Self;
-      C:= Container.Add(strConstants, iiConstantsLabel, GetComment);
+      If Container Is TGenericMethodDecl Then
+        C := Container
+      Else
+        C:= Container.Add(strConstants, iiConstantsLabel, GetComment);
       NextNonCommentToken;
       While ConstantDecl(AScope, C) Do
         If Token.Token = ';' Then
@@ -2754,12 +2771,12 @@ Var
 Begin
   Result := False;
   // If not identifier then there is a new section
-  If Token.TokenType = ttIdentifier Then
+  If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
       // Create constant and add to the collection, then get comment
       C := TConstant.Create(Token.Token, AScope, Token.Line, Token.Column,
         iiPublicConstant, GetComment);
-      Container.Add(C);
+      C := Container.Add(C) As TConstant;
       Result := True;
       NextNonCommentToken;
       If Token.Token = '=' Then        // ConstExpr
@@ -2827,7 +2844,10 @@ Begin
     Begin
       If Container = Nil Then
         Container := Self;
-      R := Container.Add(strResourceStrings, iiResourceStringsLabel, GetComment);
+      If Container Is TGenericMethodDecl Then
+        R := Container
+      Else
+        R := Container.Add(strResourceStrings, iiResourceStringsLabel, GetComment);
       NextNonCommentToken;
       Repeat
         {Loop do nothing}
@@ -2867,12 +2887,12 @@ Begin
   Result := False;
   ExprType := [etConstExpr, etString];
   // If not identifier then there is a new section
-  If Token.TokenType = ttIdentifier Then
+  If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
       // Create constant and add to the collection, then get comment
       C := TResourceString.Create(Token.Token, AScope ,Token.Line, Token.Column,
         iiPublicResourceString, GetComment);
-      Container.Add(C);
+      C := Container.Add(C);
       Result := True;
       NextNonCommentToken;
       If Token.Token = '=' then
@@ -2918,7 +2938,10 @@ Begin
     Begin
       If Container = Nil Then
         Container := Self;
-      T := Container.Add(strTypesLabel, iiTypesLabel, GetComment);
+      If Container Is TGenericMethodDecl Then
+        T := Container
+      Else
+        T := Container.Add(strTypesLabel, iiTypesLabel, GetComment);
       NextNonCommentToken;
       While TypeDecl(AScope, T) Do
         If Token.Token = ';' Then
@@ -2954,7 +2977,7 @@ Var
 
 Begin
   Result := False;
-  If Token.TokenType = ttIdentifier Then
+  If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
       AToken.FToken := Token;
       AToken.FScope := AScope;
@@ -3263,7 +3286,7 @@ Begin
           With AToken Do
             Result := TClassRefType.Create(FToken.Token, FScope, FToken.Line,
               FToken.Column, iiPublicType, FComment);
-          AToken.FContainer.Add(Result);
+          Result := AToken.FContainer.Add(Result) As TClassRefType;
           Result.AppendToken('Class');
           Result.AppendToken('Of');
           If Not TypeId(Result) Then
@@ -3349,7 +3372,7 @@ Begin
       With AToken Do
         Result := TRealType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TRealType;
       Result.AppendToken(Token);
       NextNonCommentToken;
     End;
@@ -3417,7 +3440,7 @@ Begin
       With AToken Do
         Result := TOrdIdent.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TOrdIdent;
       Result.AppendToken(Token);
       NextNonCommentToken;
     End;
@@ -3449,7 +3472,7 @@ begin
       With AToken Do
         Result := TVariantType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TVariantType;
       Result.AppendToken(Token);
       NextNonCommentToken;
     End;
@@ -3483,7 +3506,7 @@ Begin
       With AToken Do
         Result := TSubRangeType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TSubRangeType;
       ExprType := [etUnknown, etConstExpr];
       ConstExpr(Result, ExprType);
       If Token.Token = '..' Then // Handle simple expressions
@@ -3518,7 +3541,7 @@ Begin
       With AToken Do
         Result := TEnumerateType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TEnumerateType;
       AddToExpression(Result);
       Repeat
         EnumerateElement(Result);
@@ -3549,7 +3572,7 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  If Token.TokenType = ttIdentifier Then
+  If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
       AddToExpression(EnumerateType);
       If Token.Token = '=' Then
@@ -3593,7 +3616,7 @@ begin
       UpdateTypeToken(AToken);
       Result := TStringType.Create(AToken.FToken.Token, AToken.FScope,
         AToken.FToken.Line, AToken.FToken.Column, iiPublicType, AToken.FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TStringType;
       Result.AppendToken(Token);
       NextNonCommentToken;
       // Check for '[' ConstExpr ']'
@@ -3680,7 +3703,7 @@ Begin
       With AToken Do
         Result := TArrayType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TArrayType;
       If boolPacked Then
         Result.AppendToken('Packed');
       Result.AppendToken(Token);
@@ -3864,7 +3887,7 @@ Begin
   If Result Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType = ttIdentifier Then
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
           NextNonCommentToken;
           If Token.Token = ':' Then
@@ -3976,7 +3999,7 @@ Begin
       With AToken Do
         Result := TSetType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TSetType;
       If boolPacked Then
         Result.AppendToken('Packed');
       Result.AppendToken(Token);
@@ -4035,7 +4058,7 @@ Begin
           With AToken Do
             Result := TFileType.Create(FToken.Token, FScope, FToken.Line,
               FToken.Column, iiPublicType, FComment);
-          AToken.FContainer.Add(Result);
+          Result := AToken.FContainer.Add(Result) As TFileType;
           If boolPacked Then
             Result.AppendToken('Packed');
           Result.AppendToken('File');
@@ -4082,7 +4105,7 @@ Begin
       With AToken Do
         Result := TPointerType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      AToken.FContainer.Add(Result);
+      Result := AToken.FContainer.Add(Result) As TPointerType;
       Result.AppendToken(Token);
       NextNonCommentToken;
       If Not TypeId(Result) Then
@@ -4125,7 +4148,7 @@ begin
         With AToken Do
           Result := TProcedureType.Create(FToken.Token, FScope, FToken.Line,
             FToken.Column, iiPublicType, FComment);
-        AToken.FContainer.Add(Result);
+        Result := AToken.FContainer.Add(Result) As TProcedureType;
         Result.AppendToken(M.AsString);
         If Token.UToken = 'OF' Then
           Begin
@@ -4174,7 +4197,10 @@ Begin
     Begin
       If Container = Nil Then
         Container := Self;
-      V := Container.Add(strVars, iiVariablesLabel, GetComment);
+      If Container Is TGenericMethodDecl Then
+        V := Container
+      Else
+        V := Container.Add(strVars, iiVariablesLabel, GetComment);
       NextNonCommentToken;
       While VarDecl(AScope, V) Do
         Begin
@@ -4323,24 +4349,25 @@ Begin
                   End;
                 End;
               PortabilityDirective;
-              For j := 1 To I.ElementCount Do
-                Begin
-                  V := TVar.Create(I[j].Identifier, AScope, I[j].Line, I[j].Column,
-                    iiPublicVariable, I[j].Comment);
-                  VarSection.Add(V);
-                  V.AddTokens(T);
-                  If I[j].Comment <> Nil Then
-                    Begin
-                      V.Comment := TComment.Create(I[j].Comment);
-                      OwnedItems.Add(V.Comment);
-                    End Else
-                      If I[1].Comment <> Nil Then
-                        Begin
-                          V.Comment := TComment.Create(I[1].Comment);
-                          OwnedItems.Add(V.Comment);
-                          V.Comment.AddToken('(Copy)', ttIdentifier);
-                        End;
-                End;
+              If T <> Nil Then
+                For j := 1 To I.ElementCount Do
+                  Begin
+                    V := TVar.Create(I[j].Identifier, AScope, I[j].Line, I[j].Column,
+                      iiPublicVariable, I[j].Comment);
+                    V := VarSection.Add(V);
+                    V.AddTokens(T);
+                    If I[j].Comment <> Nil Then
+                      Begin
+                        V.Comment := TComment.Create(I[j].Comment);
+                        OwnedItems.Add(V.Comment);
+                      End Else
+                        If I[1].Comment <> Nil Then
+                          Begin
+                            V.Comment := TComment.Create(I[1].Comment);
+                            OwnedItems.Add(V.Comment);
+                            V.Comment.AddToken('(Copy)', ttIdentifier);
+                          End;
+                  End;
               Result := True;
             Finally
               FTemporaryElements.Free;
@@ -4415,7 +4442,7 @@ Begin
                 Begin
                   V := TThreadVar.Create(I[j].Identifier, AScope, I[j].Line, I[j].Column,
                     iiPublicThreadVar, I[j].Comment);
-                  VarSection.Add(V);
+                  V := VarSection.Add(V);
                   V.AddTokens(T);
                   If I[j].Comment <> Nil Then
                     Begin
@@ -5006,7 +5033,7 @@ Begin
   If Token.UToken = 'GOTO' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier, ttNumber] Then
+      If Token.TokenType In [ttNumber] Then
         NextNonCommentToken
       Else
         ErrorAndSeekToken(strLabelExpected, 'SimpleStatement', Token.Token,
@@ -5381,7 +5408,7 @@ Begin
   If Result Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType = ttIdentifier Then
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
           NextNonCommentToken;
           If Token.Token = ':=' Then
@@ -5527,7 +5554,7 @@ Begin
     Begin
       Result := True;
       NextNonCommentToken;
-      If Token.TokenType = ttIdentifier Then
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
           NextNonCommentToken;
           If Token.Token = ':' Then
@@ -5934,7 +5961,7 @@ Begin
   If Token.Token = '=' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier] Then
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
           Method.Alias := Token.Token;
           NextNonCommentToken;
@@ -5942,7 +5969,7 @@ Begin
             Begin
               Method.Alias := Method.Alias + Token.Token;
               NextNonCommentToken;
-              If Token.TokenType In [ttIdentifier] Then
+              If Token.TokenType In [ttIdentifier, ttDirective] Then
                 Begin
                   Method.Alias := Method.Alias + Token.Token;
                   NextNonCommentToken;
@@ -5972,7 +5999,7 @@ Begin
   If Token.Token = ':' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier] Then
+      If (Token.TokenType In [ttIdentifier, ttDirective]) Or (Token.UToken = 'STRING') Then
         Begin
           Method.ReturnType := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
           TypeId(Method.ReturnType);
@@ -6021,12 +6048,16 @@ begin
               O := T.FindElement(M.ClsName);
               If (O <> Nil) And (O Is TObjectDecl) Then
                 Begin
-                  N := O.FindElement(M.Name);
-                  If (N <> Nil) And (N Is TPascalMethod) Then
+                  N := O.FindElement(strMethods);
+                  If (N <> Nil) Then
                     Begin
-                      M.Scope := N.Scope;
-                      M.Resolved := True;
-                      (N As TPascalMethod).Resolved := True;
+                      N := N.FindElement(M.Name);
+                      If (N <> Nil) And (N Is TPascalMethod) Then
+                        Begin
+                          M.Scope := N.Scope;
+                          M.Resolved := True;
+                          (N As TPascalMethod).Resolved := True;
+                        End;
                     End;
                 End;
             End;
@@ -6052,15 +6083,17 @@ begin
         If (T.Elements[k] Is TObjectDecl) And Not (T.Elements[k] Is TInterfaceDecl) Then
           Begin
             C := T.Elements[k];
-            For j := 1 To C.ElementCount Do
-              If C.Elements[j] Is TPascalMethod Then
-                Begin
-                  M := C.Elements[j] As TPascalMethod;
-                  If Not M.Resolved And Not M.ForwardDecl Then
-                    AddError(TDocError.Create(Format(strUnSatisfiedForwardReference,
-                      [C.Identifier + '.' + M.Identifier]), scNone, 'CheckUnResolvedMethods', M.Line,
-                      M.Column, etError));
-                End;
+            O := C.FindElement(strMethods);
+            If O <> Nil Then
+              For j := 1 To O.ElementCount Do
+                If O.Elements[j] Is TPascalMethod Then
+                  Begin
+                    M := O.Elements[j] As TPascalMethod;
+                    If Not M.Resolved And Not M.ForwardDecl Then
+                      AddError(TDocError.Create(Format(strUnSatisfiedForwardReference,
+                        [C.Identifier + '.' + M.Identifier]), scNone, 'CheckUnResolvedMethods', M.Line,
+                        M.Column, etError));
+                  End;
           End;
         End;
   // Find unresolved exported methods.
@@ -6490,7 +6523,7 @@ begin
   If Token.Token = '(' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType = ttIdentifier Then
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
           ObjDecl.Heritage.AppendToken(Token);
           NextNonCommentToken;
@@ -6760,7 +6793,7 @@ begin
             Begin
               P := TField.Create(I[j].Name, AScope, I[j].Line, I[j].Column,
                 iiPublicField, I[j].Comment);
-              Cls.Add(P);
+              Cls.Add(strFieldsLabel, iiFieldsLabel, Nil).Add(P);
               P.AddTokens(T);
             End;
         Finally
@@ -7067,7 +7100,7 @@ begin
         Begin
           P := TPascalProperty.Create(Token.Token, AScope, Token.Line,
             Token.Column, iiPublicProperty, C);
-          Cls.Add(P);
+          Cls.Add(strProperties, iiPropertiesLabel, Nil).Add(P);
           NextNonCommentToken;
           PropertyInterface(P);
           PropertySpecifiers(P);
@@ -7498,23 +7531,27 @@ Procedure TPascalModule.IdentList(Container : TElementContainer;
   SeekTokens : Array Of String; iImageIndex : TImageIndex = iiNone);
 
 Begin
-  Repeat
-    If Token.TokenType In [ttIdentifier, ttDirective] Then
-      Begin
-        If Container <> Nil Then
-          Container.Add(Token, scNone, iImageIndex, GetComment);
-        NextNonCommentToken;
-        If Token.UToken = 'IN' Then
-          Begin
-            NextNonCommentToken;
-            If Token.TokenType <> ttStringLiteral Then
-              ErrorAndSeekToken(strStringExpected, 'IdentList', Token.Token,
-                SeekTokens, stActual)
-            Else
+  If Token.TokenType In [ttIdentifier, ttDirective] Then
+    Repeat
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
+        Begin
+          If Container <> Nil Then
+            Container.Add(Token, scNone, iImageIndex, GetComment);
+          NextNonCommentToken;
+          If Token.UToken = 'IN' Then
+            Begin
               NextNonCommentToken;
-          End;
-      End;
-  Until Not IsToken(',', Nil);
+              If Token.TokenType <> ttStringLiteral Then
+                ErrorAndSeekToken(strStringExpected, 'IdentList', Token.Token,
+                  SeekTokens, stActual)
+              Else
+                NextNonCommentToken;
+            End;
+        End Else
+//        If Not (Token.TokenType In [ttSymbol]) Then
+          ErrorAndSeekToken(strIdentExpected, 'IdentList', Token.Token,
+            strSeekableOnErrorTokens, stFirst);
+    Until Not IsToken(',', Nil);
 End;
 
 (**
@@ -7534,14 +7571,14 @@ End;
 Function TPascalModule.TypeId(Container: TElementContainer) : Boolean;
 
 Begin
-  Result := Token.TokenType = ttIdentifier;
+  Result := (Token.TokenType In [ttIdentifier, ttDirective]) Or (Token.UToken = 'STRING');
   If Result Then
     Begin
       AddToExpression(Container);
       If Token.Token = '.' Then
         Begin
           AddToExpression(Container);
-          If Token.TokenType = ttIdentifier Then
+          If Token.TokenType In [ttIdentifier, ttDirective] Then
             AddToExpression(Container)
           Else
             ErrorAndSeekToken(strIdentExpected, 'TypeId', Token.Token,
@@ -7578,31 +7615,6 @@ Begin
   If iStartIndex = Token.BufferPos Then
     ErrorAndSeekToken(strConstExprExpected, 'ConstExpr', Token.Token,
       strSeekableOnErrorTokens, stActual);
-End;
-
-(**
-
-  This method is a catch all handler for declarations so that the code tries
-  to find the next declaration in the event of a code error.
-
-  @precon  None.
-  @postcon A catch all handler for declarations so that the code tries
-           to find the next declaration in the event of a code error.
-
-  @return  a Boolean
-
-**)
-Function TPascalModule.UndefinedToken : Boolean;
-
-Begin
-  Result := Not IsKeyWord(Token.Token, strReservedWords);
-  If Result Then
-    Begin
-      ErrorAndSeekToken(strUndefinedToken, 'UndefinedToken', Token.Token,
-        strSeekableOnErrorTokens, stActual);
-      If Token.Token = ';' Then
-        NextNonCommentToken;
-    End;
 End;
 
 (**

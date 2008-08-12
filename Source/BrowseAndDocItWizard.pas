@@ -3,18 +3,10 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    10 Aug 2008
+  @Date    12 Aug 2008
   @Version 1.0
 
-  @todo    Configurable Font Name and Size for the Browser tree.
-  @todo    Configurable Font Colours for the Browser Tree.
-  @todo    Configurable Tree View, i.e. switch on or off the tree, images, etc.
-  @todo    Create an Option class which has the ability to Load and Save its
-           own settings and then remove the need to the Module Explorer Frame
-           and the Browse And Doc it wizard to Load and Save the settings
-           directly.
-  @todo    Make the timer for the refresh of the tree reset the counter if the
-           cursor position changes, i.e. do not refresh while cursor is moving.
+  @todo    Configurable Font Name, Size, Colour and Style for the Browser tree.
 
 **)
 Unit BrowseAndDocItWizard;
@@ -29,11 +21,6 @@ Type
   (** This emunerate descibed the different types of doc comment .**)
   TCommentType = (ctBlock, ctLine, ctInSitu);
 
-  (** This enumerate define the position of the editor when an item is selected
-      in the module explorer **)
-  TBrowsePosition = (bpCommentTop, bpCommentCentre, bpIdentifierTop,
-    bpIdentifierCentre);
-
   (** This is the class which defined the Wizard interface. **)
   TBrowseAndDocItWizard = Class(TNotifierObject, IOTAWizard)
   Private
@@ -41,26 +28,21 @@ Type
     FCounter : Integer;
     FFileName : String;
     FKeyBinding : Integer;
-    FDocOption: Integer;
-    FDocHelpFile : String;
-    FBrowsePosition : TBrowsePosition;
-    FINIFileName: String;
     procedure InsertCommentBlock(CommentType: TCommentType);
     procedure OptionsClick(Sender: TObject);
     procedure HelpClick(Sender: TObject);
-    Procedure LoadSettings;
-    Procedure SaveSettings;
     procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
       iCommentCol : Integer; SelectType : TSelectType);
     Procedure Focus(Sender : TObject);
     Procedure OptionsChange(Sender : TObject);
-    function GetMethodDescription(Method : TGenericMethodDecl) : String;
+    function GetMethodDescription(Method : TGenericMethodDecl; AComment : TComment;
+      iIndent : Integer) : String;
     Function WriteMethodComment(Method : TGenericMethodDecl;
-      Source : IOTASourceEditor; Writer : IOTAEditWriter) : TOTAEditPos;
+      Source : IOTASourceEditor; Writer : IOTAEditWriter; AComment : TComment) : TOTAEditPos;
     Function WritePropertyComment(Prop : TGenericProperty;
-      Source : IOTASourceEditor; Writer : IOTAEditWriter) : TOTAEditPos;
+      Source : IOTASourceEditor; Writer : IOTAEditWriter; AComment : TComment) : TOTAEditPos;
     procedure CreateMenuItem(mmiParent: TMenuItem;  strCaption: String = '';
-      ClickProc: TNotifyEvent = Nil);
+      ClickProc: TNotifyEvent = Nil; AShortCut : TShortCut = 0);
     Procedure InsertMethodCommentClick(Sender : TObject);
     Procedure InsertPropertyCommentClick(Sender : TObject);
     Procedure InsertBlockCommentClick(Sender : TObject);
@@ -74,6 +56,9 @@ Type
     Procedure Execute;
     { IOTAMenuWizard }
     Function GetMenuText: string;
+    Function OutputTag(iIndent : Integer; Tag : TTag) : String;
+    function GetPropertyDescription(Prop: TGenericProperty;
+      AComment: TComment; iIndent: Integer): String;
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -88,6 +73,7 @@ Type
     FLastSize : Int64;
     FLastEditorName : String;
     {$ENDIF}
+    FLastCursorPos: TOTAEditPos;
     Procedure RefreshTree;
     Procedure TimerEventHandler(Sender : TObject);
     Procedure DetermineCompilerDefinitions(slDefines : TStringList);
@@ -113,7 +99,7 @@ Type
   TKeyboardBinding = Class(TNotifierObject, IOTAKeyboardBinding)
   Private
     FWizard : TBrowseAndDocItWizard;
-    Procedure FocusModlueExplorer(const Context: IOTAKeyContext;
+    Procedure FocusModuleExplorer(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
     Procedure InsertMethodComment(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
@@ -163,7 +149,7 @@ Resourcestring
   strNoMethodFound = 'No method found on or above the current cursor position.';
   (** This is a message to confirm you wish to update the current comment. **)
   strMethodAlreadyExists = 'The method "%s" already has a comment. Do you' +
-  ' want to continue?';
+  ' want to update the comment with revised parameters and returns?';
   (** This is a message for no property to comment. **)
   strNoPropertyFound = 'No property found on or above the current cursor position.';
   (** This is a message to confirm you wish to update the current comment. **)
@@ -194,9 +180,6 @@ Var
       registered with the IDE. **)
   objEditorNotifier : TEditorNotifier;
   {$ENDIF}
-  (** A private variable to hold the update interval in ms between changes and
-      the updating of the module explorer **)
-  iUpdateInterval: Cardinal;
   (** A private variable to hold the time of the last editor update. **)
   iLastUpdateTickCount : Cardinal;
   (** An index for the keybinding nofitier - required when the package is
@@ -252,7 +235,6 @@ Var
 
 Begin
   Inherited Create;
-  FINIFileName := BuildRootKey(Nil, Nil);
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus,
     OptionsChange);
   mmiMainMenu := (BorlandIDEServices as INTAServices).MainMenu;
@@ -260,7 +242,8 @@ Begin
   With mmiPascalDocMenu Do
     Caption := '&Browse and Doc It';
   mmiMainMenu.Items.Insert(mmiMainMenu.Items.Count - 2, mmiPascalDocMenu);
-  CreateMenuItem(mmiPascalDocMenu, 'Module &Explorer', ModuleExplorerClick);
+  CreateMenuItem(mmiPascalDocMenu, 'Module &Explorer', ModuleExplorerClick,
+    Menus.ShortCut(13, [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Method Comment', InsertMethodCommentClick);
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Property Comment', InsertPropertyCommentClick);
@@ -274,24 +257,24 @@ Begin
   FKeyBinding := 0;
   FCounter := 0;
   FFileName := '';
-  iUpdateInterval := 0;
-  LoadSettings;
 End;
 
 (**
 
-  This method creates menu items using the passed information.
+  This method creates menu items using the passed information. 
 
-  @precon  mmiParent must be a valid parent menu item in the IDE.
-  @postcon A Sub menu ite is created under mmiParent.
+  @precon  mmiParent must be a valid parent menu item in the IDE. 
+  @postcon A Sub menu ite is created under mmiParent. 
 
-  @param   mmiParent  as a TMenuItem as a reference
+  @param   mmiParent  as a TMenuItem
   @param   strCaption as a String
   @param   ClickProc  as a TNotifyEvent
+  @param   AShortCut  as a TShortCut
 
 **)
 Procedure TBrowseAndDocItWizard.CreateMenuItem(mmiParent : TMenuItem;
-  strCaption : String = ''; ClickProc : TNotifyEvent = Nil);
+  strCaption : String = ''; ClickProc : TNotifyEvent = Nil;
+  AShortCut : TShortCut = 0);
 
 Var
   mmiItem : TMenuItem;
@@ -305,6 +288,7 @@ Begin
       Else
         Caption := strCaption;
       OnClick := ClickProc;
+      mmiItem.ShortCut := AShortCut;
       mmiParent.Add(mmiItem);
     End;
 End;
@@ -319,7 +303,6 @@ End;
 **)
 destructor TBrowseAndDocItWizard.Destroy;
 begin
-  SaveSettings;
   If mmiPascalDocMenu <> Nil Then
     mmiPascalDocMenu.Free;
   Inherited;
@@ -415,84 +398,6 @@ procedure TBrowseAndDocItWizard.ModuleExplorerClick(Sender: TObject);
 begin
   TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
 end;
-
-(**
-
-  This method loads the wizards settings from the registry.
-
-  @precon  None.
-  @postcon Loads the wizards settings from the registry.
-
-**)
-Procedure TBrowseAndDocItWizard.LoadSettings;
-
-Var
-  j : TDocOption;
-  iCount : Integer;
-  k : Integer;
-
-Begin
-  With TIniFile.Create(FINIFileName) Do
-    Try
-      For j := Low(TDocOption) To High(TDocOption) Do
-        If ReadBool('DocExplorerOptions', DocOptionInfo[j].FDescription,
-          DocOptionInfo[j].FEnabled) Then
-          BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [j];
-      iUpdateInterval := ReadInteger('ModuleExplorer', 'UpdateInterval', 1000);
-      FDocOption := ReadInteger('Setup', 'DocOption', 0);
-      iCount := ReadInteger('Setup', 'SpecialTagCount', 0);
-      If iCount > 0 Then
-        Begin
-          SpecialTags.Clear;
-          For k := 1 To iCount Do
-            SpecialTags.AddObject(ReadString('SpecialTags',
-              Format('SpecialTag%d', [k]), ''), TObject(ReadInteger('SpecialTags',
-              Format('SpecialTagOptions%d', [k]), 0)));
-        End;
-      FDocHelpFile := ReadString('ModuleExplorer', 'HelpFile', '');
-      FBrowsePosition := TBrowsePosition(ReadInteger('Setup', 'BrowsePosition',
-        Integer(bpIdentifierCentre)));
-    Finally
-      Free;
-    End;
-End;
-
-(**
-
-  This method saves the wizards settings to the registry.
-
-  @precon  None.
-  @postcon Saves the wizards settings to the registry.
-
-**)
-Procedure TBrowseAndDocItWizard.SaveSettings;
-
-Var
-  j : TDocOption;
-  k : Integer;
-
-Begin
-  With TIniFile.Create(FINIFileName) Do
-    Try
-      For j := Low(TDocOption) To High(TDocOption) Do
-        WriteBool('DocExplorerOptions',
-          DocOptionInfo[j].FDescription, j In BrowseAndDocItOptions.Options);
-      WriteInteger('ModuleExplorer', 'UpdateInterval', iUpdateInterval);
-      WriteInteger('Setup', 'DocOption', FDocOption);
-      WriteInteger('Setup', 'SpecialTagCount', SpecialTags.Count);
-      For k := 1 To SpecialTags.Count Do
-        Begin
-          WriteString('SpecialTags', Format('SpecialTag%d', [k]),
-            SpecialTags[k - 1]);
-          WriteInteger('SpecialTags', Format('SpecialTagOptions%d', [k]),
-            Integer(SpecialTags.Objects[k - 1]));
-        End;
-      WriteString('ModuleExplorer', 'HelpFile', FDocHelpFile);
-      WriteInteger('Setup', 'BrowsePosition', Integer(FBrowsePosition));
-    Finally
-      Free;
-    End;
-End;
 
 (**
 
@@ -721,7 +626,7 @@ begin
                     Exit;
                 Writer := Source.CreateUndoableWriter;
                 Try
-                  EditPos := WriteMethodComment(N, Source, Writer);
+                  EditPos := WriteMethodComment(N, Source, Writer, N.Comment);
                 Finally
                   Writer := Nil;
                 End;
@@ -739,25 +644,23 @@ end;
 
 (**
 
-  This method write the method comment to the active editor.
+  This method writes the method comment to the active editor.
 
-  @precon  Method is a valid instance of a method declaration to be commented,
-           Writer is a valid instance of an open tools api writer, iBufferPos is
-           the buffer position to insert the comment and iCol is the column to
-           indent the comment by.
-  @postcon A method comment is inserted into the editor.
+  @precon  Method is a valid instance of a method declaration to be commented,
+           Writer is a valid instance of an open tools api writer, iBufferPos
+           is the buffer position to insert the comment and iCol is the
+           column to indent the comment by.
+  @postcon A method comment is inserted into the editor.
 
-  @todo    How about updating the current comment but writing out the current
-           comments comment information including tags.
-
-  @param   Method as a TGenericMethodDecl
-  @param   Source as an IOTASourceEditor
-  @param   Writer as an IOTAEditWriter
+  @param   Method   as a TGenericMethodDecl
+  @param   Source   as an IOTASourceEditor
+  @param   Writer   as an IOTAEditWriter
+  @param   AComment as a TComment
   @return  a TOTAEditPos
 
 **)
 Function TBrowseAndDocItWizard.WriteMethodComment(Method : TGenericMethodDecl;
-  Source : IOTASourceEditor; Writer : IOTAEditWriter) : TOTAEditPos;
+  Source : IOTASourceEditor; Writer : IOTAEditWriter; AComment : TComment) : TOTAEditPos;
 
 Const
   strMethodTypes : Array[mtConstructor..mtFunction] Of String = (
@@ -766,13 +669,13 @@ Const
 Var
   iLen : Integer;
   i : Integer;
-  CharPos: TOTACharPos;
+  C, CharPos: TOTACharPos;
   iBufferPos: Integer;
   iLines : Integer;
   strType: String;
 
 begin
-  iLines := 0;
+  iLines := Method.Line;
   CharPos.Line := Method.Line;
   CharPos.CharIndex := Method.Column;
   If Method.ClsName <> '' Then
@@ -780,18 +683,23 @@ begin
   Dec(CharPos.CharIndex, 1 + Length(strMethodTypes[Method.MethodType]));
   If Method.ClassMethod Then
     Dec(CharPos.CharIndex, 6);
-  iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
-  Writer.CopyTo(iBufferPos - 1);
+  If AComment <> Nil Then // Delete existing comment.
+    Begin
+      C.CharIndex := AComment.Col;
+      C.Line := AComment.Line;
+      iBufferPos := Source.GetEditView(0).CharPosToPos(C);
+      Writer.CopyTo(iBufferPos - 1);
+      iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
+      Writer.DeleteTo(iBufferPos - 1);
+    End Else
+    Begin
+      iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
+      Writer.CopyTo(iBufferPos - 1);
+    End;
   // Block Header
-  Writer.Insert('(**'#10#13);
-  Inc(iLines);
-  Writer.Insert(PChar(#10#13));
-  Inc(iLines);
+  Writer.Insert('(**'#10#13#10#13);
   Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) +
-    GetMethodDescription(Method)));
-  Inc(iLines);
-  Writer.Insert(PChar(#10#13));
-  Inc(iLines);
+    GetMethodDescription(Method, AComment, CharPos.CharIndex - 1 + 2)));
   // Output method information
   iLen := 0;
   For i := 0 To Method.ParameterCount - 1 Do
@@ -800,10 +708,8 @@ begin
   For i := 0 To Method.ParameterCount - 1 Do
     Begin
       Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
-      Inc(iLines);
       Writer.Insert(PChar(Format('  @param   %-*s as ', [
         iLen, Method.Parameters[i].Identifier])));
-      Inc(iLines);
       If Method.Parameters[i].ParamType <> Nil Then
         Begin
           strType := Method.Parameters[i].ParamReturn;
@@ -811,29 +717,22 @@ begin
             strAOrAn[(strType[1] In strVowels) Or Method.Parameters[i].ArrayOf],
             strArrayOf[Method.Parameters[i].ArrayOf], strType,
             strModifier[Method.Parameters[i].ParamModifier]])));
-          Inc(iLines);
         End;
     End;
   If Method.ReturnType <> Nil Then
     Begin
       Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
-      Inc(iLines);
       Writer.Insert(PChar(Format('  @return  %s %-*s',
         [strAOrAn[Method.ReturnType.AsString[1] In strVowels], iLen,
         Method.ReturnType.AsString])));
-      Inc(iLines);
       Writer.Insert(PChar(#10#13));
-      Inc(iLines);
     End;
   // Block Footer
   If (Method.ParameterCount > 0) Or (Method.ReturnType <> Nil) Then
-    Begin
-      Writer.Insert(PChar(#10#13));
-      Inc(iLines);
-    End;
+    Writer.Insert(PChar(#10#13));
   Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '**)'#10#13));
-  Inc(iLines);
   Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
+  iLines := Writer.CurrentPos.Line - iLines;
   // Get header in view if not already
   Result.Col := CharPos.CharIndex + 2;
   Result.Line := CharPos.Line + 2;
@@ -841,6 +740,106 @@ begin
     stIdentifier);
 end;
 
+(**
+
+  This method returns a description for the method if it is a constructor,
+  destructor, getter or setter method, else it returns an empty string.
+
+  @precon  Method is a valid instance of a method declatation to be described.
+  @postcon Returns a description of the method is applicable.
+
+  @param   Method   as a TGenericMethodDecl
+  @param   AComment as a TComment
+  @param   iIndent  as an Integer
+  @return  a String
+
+**)
+function TBrowseAndDocItWizard.GetMethodDescription(Method : TGenericMethodDecl;
+  AComment : TComment; iIndent : Integer) : String;
+
+var
+  i: Integer;
+  boolCon: Boolean;
+
+begin
+  If AComment = Nil Then
+    BEgin
+      If LowerCase(Copy(Method.Identifier, 1, 3)) = 'get' Then
+        Result := Format('  This is a getter method for the %s property.'#10#13#10#13,
+          [Copy(Method.Identifier, 4, Length(Method.Identifier) - 3)])
+      Else If LowerCase(Copy(Method.Identifier, 1, 3)) = 'set' Then
+        Result := Format('  This is a setter method for the %s property.'#10#13#10#13,
+          [Copy(Method.Identifier, 4, Length(Method.Identifier) - 3)])
+      Else If Method.MethodType = mtConstructor Then
+        Result := Format('  This is the constructor method for the %s class.'#10#13#10#13,
+          [Method.ClsName])
+      Else If Method.MethodType = mtDestructor Then
+        Result := Format('  This is the destructor method for the %s class.'#10#13#10#13,
+          [Method.ClsName])
+      Else
+        Result := #32#32#10#13#10#13;
+    End Else
+    Begin
+      Result := Format('%s'#10#13#10#13, [AComment.AsString(iIndent, 80, True)]);
+      boolCon := False;
+      i := AComment.FindTag('precon');
+      If i > -1 Then
+        Begin
+          Result := Result + OutputTag(iIndent, AComment.Tag[i]);
+          boolCon := True;
+        End;
+      i := AComment.FindTag('postcon');
+      If i > -1 Then
+        Begin
+          Result := Result + OutputTag(iIndent, AComment.Tag[i]);
+          boolCon := True;
+        End;
+      If boolCon Then
+        Result := Result + #10#13;
+      boolCon := False;
+      For i := 0 To AComment.TagCount - 1 Do
+        If Not IsKeyWord(AComment.Tag[i].TagName, ['param', 'postcon', 'precon', 'return']) Then
+          Begin
+            Result := Result + OutputTag(iIndent, AComment.Tag[i]);
+            boolCon := True;
+          End;
+      If boolCon Then
+        Result := Result + #10#13;
+    End;
+end;
+
+(**
+
+  This function returns the tag information indented and broken into line no
+  wider than 80 characters.
+
+  @precon  Tag must be a valid comment tag.
+  @postcon Returns the tag information indented and broken into line no wider
+           than 80 characters.
+
+  @param   iIndent as an Integer
+  @param   Tag     as a TTag
+  @return  a String
+
+**)
+Function TBrowseAndDocItWizard.OutputTag(iIndent : Integer; Tag : TTag) : String;
+
+Var
+  str : String;
+  i : Integer;
+
+Begin
+  str := Format('%s@%-8s', [StringOfChar(#32, iIndent), Tag.TagName]);
+  For  i := 0 To Tag.TokenCount - 1 Do
+    If Length(str + Tag.Token[i]) < 80 Then
+      str := str + Tag.Token[i] + #32
+    Else
+      Begin
+        Result := Result + str;
+        str := #10#13 + StringOfChar(#32, iIndent + 9) + Tag.Token[i] + #32;
+      End;
+  Result := Result + str + #10#13;
+End;
 
 (**
 
@@ -931,7 +930,7 @@ begin
                     Exit;
                 Writer := Source.CreateUndoableWriter;
                 Try
-                  EditPos := WritePropertyComment(Q, Source, Writer);
+                  EditPos := WritePropertyComment(Q, Source, Writer, Q.Comment);
                 Finally
                   Writer := Nil;
                 End;
@@ -949,42 +948,53 @@ end;
 
 (**
 
-  This method write the property comment to the active editor.
+  This method write the property comment to the active editor.
 
-  @precon  P is a valid instance of a property declaration to be commented,
-           Writer is a valid instance of an open tools api writer, iBufferPos is
-           the buffer position to insert the comment and iCol is the column to
-           indent the comment by.
-  @postcon A property comment it inserted into the editor.
+  @precon  P is a valid instance of a property declaration to be commented,
+           Writer is a valid instance of an open tools api writer, iBufferPos
+           is the buffer position to insert the comment and iCol is the
+           column to indent the comment by.
+  @postcon A property comment it inserted into the editor.
 
-  @param   Prop   as a TGenericProperty
-  @param   Source as an IOTASourceEditor
-  @param   Writer as an IOTAEditWriter
+  @param   Prop     as a TGenericProperty
+  @param   Source   as an IOTASourceEditor
+  @param   Writer   as an IOTAEditWriter
+  @param   AComment as a TComment
   @return  a TOTAEditPos
 
 **)
 Function TBrowseAndDocItWizard.WritePropertyComment(Prop : TGenericProperty;
-  Source : IOTASourceEditor; Writer : IOTAEditWriter) : TOTAEditPos;
+  Source : IOTASourceEditor; Writer : IOTAEditWriter; AComment : TComment) : TOTAEditPos;
 
 Var
   i : Integer;
   iLen : Integer;
-  CharPos: TOTACharPos;
+  C, CharPos: TOTACharPos;
   iBufferPos: Integer;
   iLines : Integer;
   strType: String;
 
 Begin
-  iLines := 0;
+  iLines := Prop.Line;
   CharPos.Line := Prop.Line;
   CharPos.CharIndex := Prop.Column;
   Dec(CharPos.CharIndex, 9);
-  iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
-  Writer.CopyTo(iBufferPos - 1);
+  If AComment <> Nil Then // Delete existing comment.
+    Begin
+      C.CharIndex := AComment.Col;
+      C.Line := AComment.Line;
+      iBufferPos := Source.GetEditView(0).CharPosToPos(C);
+      Writer.CopyTo(iBufferPos - 1);
+      iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
+      Writer.DeleteTo(iBufferPos - 1);
+    End Else
+    Begin
+      iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
+      Writer.CopyTo(iBufferPos - 1);
+    End;
   Writer.Insert(PChar('(**'#13#10));
-  Inc(iLines);
-  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '  '#13#10));
-  Inc(iLines);
+  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) +
+    GetPropertyDescription(Prop, AComment, CharPos.CharIndex - 1)));
   iLen := 0;
   For i := 0 To Prop.ParameterCount - 1 Do
     If iLen < Length(Prop.Parameters[i].Identifier) Then
@@ -1003,7 +1013,6 @@ Begin
             strArrayOf[Prop.Parameters[i].ArrayOf], strType,
             strModifier[Prop.Parameters[i].ParamModifier]
             ])));
-          Inc(iLines);
         End;
     End;
   If Prop.TypeId <> Nil Then
@@ -1013,12 +1022,11 @@ Begin
         [strAOrAn[Prop.TypeId.AsString[1] In strVowels], iLen,
         Prop.TypeId.AsString])));
       Writer.Insert(PChar(#10#13));
-      Inc(iLines);
     End;
   Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '**)'#13#10));
-  Inc(iLines);
   Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
   // Get header in view if not already
+  iLines := Writer.CurrentPos.Line - iLines;
   Result.Col := CharPos.CharIndex + 2;
   Result.Line := CharPos.Line + 1;
   SelectionChange(Result.Line + iLines, Result.Col, Result.Line, Result.Col,
@@ -1027,35 +1035,42 @@ End;
 
 (**
 
-  This method returns a description for the method if it is a constructor,
-  destructor, getter or setter method, else it returns an empty string.
+  This method returns a description for the method if it is a constructor,
+  destructor, getter or setter method, else it returns an empty string. 
 
-  @precon  Method is a valid instance of a method declatation to be described.
-  @postcon Returns a description of the method isf applicable.
+  @precon  Method is a valid instance of a method declatation to be described. 
+  @postcon Returns a description of the method is applicable. 
 
-  @param   Method as a TGenericMethodDecl
-  @return  a String
+  @param   Prop     as a TGenericProperty
+  @param   AComment as a TComment
+  @param   iIndent  as an Integer
+  @return  a String  
 
 **)
-function TBrowseAndDocItWizard.GetMethodDescription(Method : TGenericMethodDecl) : String;
+function TBrowseAndDocItWizard.GetPropertyDescription(Prop : TGenericProperty;
+  AComment : TComment; iIndent : Integer) : String;
+
+var
+  i: Integer;
 
 begin
-  If LowerCase(Copy(Method.Identifier, 1, 3)) = 'get' Then
-    Result := Format('  This is a getter method for the %s property.'#10#13,
-      [Copy(Method.Identifier, 4, Length(Method.Identifier) - 3)])
-  Else If LowerCase(Copy(Method.Identifier, 1, 3)) = 'set' Then
-    Result := Format('  This is a setter method for the %s property.'#10#13,
-      [Copy(Method.Identifier, 4, Length(Method.Identifier) - 3)])
-  Else If Method.MethodType = mtConstructor Then
-    Result := Format('  This is the constructor method for the %s class.'#10#13,
-      [Method.ClsName])
-  Else If Method.MethodType = mtDestructor Then
-    Result := Format('  This is the destructor method for the %s class.'#10#13,
-      [Method.ClsName])
-  Else
-    Result := #32#32#10#13;
+  If AComment = Nil Then
+    Begin
+      Result := #32#32#10#13;
+    End Else
+    Begin
+      Result := Format('%s'#10#13, [AComment.AsString(iIndent, 80, True)]);
+      i := AComment.FindTag('precon');
+      If i > -1 Then
+        Result := Result + OutputTag(iIndent, AComment.Tag[i]);
+      i := AComment.FindTag('postcon');
+      If i > -1 Then
+        Result := Result + OutputTag(iIndent, AComment.Tag[i]);
+      For i := 0 To AComment.TagCount - 1 Do
+        If Not IsKeyWord(AComment.Tag[i].TagName, ['param', 'postcon', 'precon', 'return']) Then
+          Result := Result + OutputTag(iIndent, AComment.Tag[i]);
+    End;
 end;
-
 
 (**
 
@@ -1069,22 +1084,9 @@ end;
 **)
 procedure TBrowseAndDocItWizard.OptionsClick(Sender: TObject);
 
-Var
-  i : Integer;
-  HelpFile : String;
-  iBrowsePos : Integer;
-
 begin
-  i := iUpdateInterval;
-  HelpFile := FDocHelpFile;
-  iBrowsePos := Integer(FBrowsePosition);
-  If TfrmOptions.Execute(i, HelpFile) Then
-    Begin
-      iUpdateInterval := i;
-      FDocHelpFile := HelpFile;
-      iLastUpdateTickCount := 1;
-      FBrowsePosition := TBrowsePosition(iBrowsePos);
-    End;
+  If TfrmOptions.Execute Then
+    iLastUpdateTickCount := 1;
 end;
 
 (**
@@ -1111,13 +1113,15 @@ Var
   C : TOTAEditPos;
 
 begin
-  (** @note There is no discurnable way of getting the code editor to handle
-            folded code through the open tools API, therefore folded code
-            will perform strangely when being browsed. **)
+  {: @bug IOTAModuleRegions - Query an IOTAModule for this interface in order to obtain source code
+      region information.  This info is applied to the editor buffer to describe
+      those regions in the editor that can be collapsed/expanded}
+  //: @todo Implement browser positions.
   SourceEditor := ActiveSourceEditor;
   If SourceEditor <> Nil Then
     If SourceEditor.EditViewCount > 0 Then
       Begin
+        SourceEditor.Module.CurrentEditor.Show;
         If iIdentCol * iIdentLine > 0 Then
           Begin
             SourceEditor.Show;
@@ -1148,15 +1152,15 @@ end;
 procedure TBrowseAndDocItWizard.HelpClick(Sender: TObject);
 
 Const
-  strHelpFile = '\PASCALDOCHELP.HLP';
+  strHelpFile = '\BrowseAndDocIt.HLP';
 
 begin
-  If FDocHelpFile = '' Then
+  If BrowseAndDocItOptions.DocHelpFile = '' Then
     Raise Exception.Create(strHelpFileNotDefined);
-  If Not FileExists(FDocHelpFile + strHelpFile) Then
-    Raise Exception.CreateFmt(strHelpFileNotFound, [FDocHelpFile + strHelpFile]);
-  ShellExecute(HInstance, 'OPEN', PChar(FDocHelpFile + strHelpFile), '',
-    PChar(FDocHelpFile), SW_NORMAL);
+  If Not FileExists(BrowseAndDocItOptions.DocHelpFile + strHelpFile) Then
+    Raise Exception.CreateFmt(strHelpFileNotFound, [BrowseAndDocItOptions.DocHelpFile + strHelpFile]);
+  ShellExecute(HInstance, 'OPEN', PChar(BrowseAndDocItOptions.DocHelpFile + strHelpFile), '',
+    PChar(BrowseAndDocItOptions.DocHelpFile), SW_NORMAL);
 end;
 
 (**
@@ -1172,9 +1176,24 @@ end;
 **)
 Procedure TBrowseAndDocItWizard.Focus(Sender : TObject);
 
+Var
+  i : Integer;
+  frm: TCustomForm;
+
 Begin
   If ActiveSourceEditor <> Nil Then
-    ActiveSourceEditor.Show;
+    Begin
+      ActiveSourceEditor.Show;
+      // IDE hack to focus the editor window because the above line doesn't do it
+      frm := ActiveSourceEditor.EditViews[0].GetEditWindow.Form;
+      For i := 0 To frm.ComponentCount - 1 Do
+        If frm.Components[i].ClassName = 'TEditControl' Then
+          Begin
+            If (frm.Components[i] As TWinControl).Visible Then
+              (frm.Components[i] As TWinControl).SetFocus;
+            Break;
+          End;
+    End;
 End;
 
 (**
@@ -1396,7 +1415,7 @@ End;
 **)
 procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
 
-{$IFNDEF VER180}
+  {$IFNDEF VER180}
   (**
 
     This function returns the size of the editor stream, i.e. size of the text
@@ -1427,16 +1446,25 @@ procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
         End;
       End;
   End;
+  {$ENDIF}
 
 Var
   Editor : IOTASourceEditor;
-{$ENDIF}
+  P : TOTAEditPos;
 
 begin
-  {$IFNDEF VER180}
   Editor := ActiveSourceEditor;
   If Editor <> Nil Then
     Begin
+      If Editor.GetEditViewCount > 0 Then
+        P := Editor.GetEditView(0).CursorPos;
+      If iLastUpdateTickCount > 0 Then
+        If (P.Col <> FLastCursorPos.Col) Or (P.Line <> FLastCursorPos.Line) Then
+          Begin
+            iLastUpdateTickCount := GetTickCount;
+            FLastCursorPos := P;
+          End;
+      {$IFNDEF VER180}
       If Editor.FileName <> FLastEditorName Then
         Begin
           iLastUpdateTickCount := 1;
@@ -1447,10 +1475,10 @@ begin
               iLastUpdateTickCount := GetTickCount;
               FLastSize := MemStreamSize(Editor);
             End;
+      {$ENDIF}
     End;
-  {$ENDIF}
   If (iLastUpdateTickCount > 0) And
-    (GetTickCount > iLastUpdateTickCount + iUpdateInterval) Then
+    (GetTickCount > iLastUpdateTickCount + BrowseAndDocItOptions.UpdateInterval) Then
     Begin
       iLastUpdateTickCount := 0;
       {$IFNDEF VER180}
@@ -1644,15 +1672,17 @@ Var
   VerValueSize: DWORD;
   VerValue: PVSFixedFileInfo;
   Dummy: DWORD;
+  strBuffer : Array[0..MAX_PATH] Of Char;
 
 Begin
   { Build Number }
-  VerInfoSize := GetFileVersionInfoSize(PChar('BrowseAndDocIt.BPL'), Dummy);
+  GetModuleFilename(hInstance, strBuffer, MAX_PATH);
+  VerInfoSize := GetFileVersionInfoSize(strBuffer, Dummy);
   If VerInfoSize <> 0 Then
     Begin
       GetMem(VerInfo, VerInfoSize);
       Try
-        GetFileVersionInfo(PChar('BrowseAndDocIt.BPL'), 0, VerInfoSize, VerInfo);
+        GetFileVersionInfo(strBuffer, 0, VerInfoSize, VerInfo);
         VerQueryValue(VerInfo, '\', Pointer(VerValue), VerValueSize);
         With VerValue^ Do
           Begin
@@ -1682,7 +1712,7 @@ End;
 procedure TKeyboardBinding.BindKeyboard(
   const BindingServices: IOTAKeyBindingServices);
 begin
-  BindingServices.AddKeyBinding([Shortcut(13, [ssCtrl, ssShift, ssAlt])], FocusModlueExplorer, Nil);
+  BindingServices.AddKeyBinding([Shortcut(13, [ssCtrl, ssShift, ssAlt])], FocusModuleExplorer, Nil);
   BindingServices.AddKeyBinding([Shortcut(Ord('M'), [ssCtrl, ssShift, ssAlt])], InsertMethodComment, Nil);
   BindingServices.AddKeyBinding([Shortcut(Ord('P'), [ssCtrl, ssShift, ssAlt])], InsertPropertyComment, Nil);
   BindingServices.AddKeyBinding([Shortcut(Ord('B'), [ssCtrl, ssShift, ssAlt])], InsertBlockComment, Nil);
@@ -1873,7 +1903,7 @@ end;
   @param   BindingResult as a TKeyBindingResult as a reference
 
 **)
-procedure TKeyboardBinding.FocusModlueExplorer(const Context: IOTAKeyContext;
+procedure TKeyboardBinding.FocusModuleExplorer(const Context: IOTAKeyContext;
   KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
 begin
   FWizard.ModuleExplorerClick(Self);
@@ -1907,7 +1937,7 @@ end;
 **)
 function TKeyboardBinding.GetDisplayName: string;
 begin
-  Result := 'Browse And Doc It Bindings';
+  Result := 'Browse And Doc It Comment Bindings';
 end;
 
 (**

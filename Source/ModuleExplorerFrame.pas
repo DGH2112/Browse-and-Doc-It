@@ -3,11 +3,9 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    10 Aug 2008
+  @Date    12 Aug 2008
   @Author  David Hoyle
   @Version 1.0
-
-  @bug     Option ShowConflicts does not expand that node.
 
 **)
 unit ModuleExplorerFrame;
@@ -33,7 +31,7 @@ type
     FComment : TComment;
     FSelectType : TSelectType;
   Public
-    Constructor Create(iLine, iCol : Integer; Comment : TComment;
+    Constructor Create(iLine, iCol : Integer; AComment : TComment;
       SelectType : TSelectType); Overload;
     Destructor Destroy; Override;
     (**
@@ -105,27 +103,40 @@ type
     stbStatusBar: TStatusBar;
     ilScopeImages: TImageList;
     tvExplorer: TTreeView;
+    tbrExplorerScope: TToolBar;
+    ilToolbar: TImageList;
+    alToolbar: TActionList;
+    actLocal: TAction;
+    actPrivate: TAction;
+    actProtected: TAction;
+    actPublic: TAction;
+    actPublished: TAction;
+    ToolButton1: TToolButton;
+    ToolButton2: TToolButton;
+    ToolButton3: TToolButton;
+    ToolButton4: TToolButton;
+    ToolButton5: TToolButton;
     procedure tvExplorerCustomDrawItem(Sender: TCustomTreeView;
       Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure tvExplorerClick(Sender: TObject);
-    procedure tvExplorerKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure actLocalUpdate(Sender: TObject);
+    procedure actLocalExecute(Sender: TObject);
+    procedure tvExplorerKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     FModule : TTreeNode;
     FNodeInfo : TObjectList;
     FSelectionChange : TSelectionChange;
     FFocus : TNotifyEvent;
-    FExpandedNodes : TStringList;
     FSpecialTagNodes : Array Of TSpecialTagNode;
     FHintWin : TCustomHintWindow;
     FLastNode : TTreeNode;
-    FOptionsChange : TNotifyEvent;
     FINIFileName: String;
     FSelectionChanging: Boolean;
     FRendering: Boolean;
+    FRefresh : TNotifyEvent;
     { Private declarations }
     procedure GetBodyCommentTags(M : TBaseLanguageModule);
     Function AddNode(P : TTreeNode; strText : String; iLine, iCol,
@@ -149,8 +160,6 @@ type
       @return  a TTreeNodeInfo
     **)
     Property NodeInfo[iIndex : Integer] : TTreeNodeInfo Read GetTreeNodeInfo;
-    Procedure LoadSettings;
-    Procedure SaveSettings;
     Procedure RenderContainers(RootNode : TTreenode; Container : TElementContainer);
   public
     { Public declarations }
@@ -178,8 +187,7 @@ type
       @postcon Hooks an event handler for the change of options event.
       @return  a TNotifyEvent
     **)
-    Property OnOptionsChange : TNotifyEvent Read FOptionsChange
-      Write FOptionsChange;
+    Property OnRefresh : TNotifyEvent Read FRefresh Write FRefresh;
   end;
 
 implementation
@@ -187,27 +195,11 @@ implementation
 Uses
   IniFiles, Types, Math, DGHLibrary;
 
-Const
-  (** A set of reserved word for the tree view to mark in bold @bug This needs to comes from the parser! **)
-  strReservedWords : Array[1..109] Of String = (
-    'absolute', 'abstract', 'and', 'array', 'as', 'asm', 'assembler',
-    'automated', 'begin', 'case', 'cdecl', 'class', 'const', 'constructor',
-    'contains', 'default', 'destructor', 'dispid', 'dispinterface', 'div', 'do',
-    'downto', 'dynamic', 'else', 'end', 'except', 'export', 'exports',
-    'external', 'far', 'file', 'finalization', 'finally', 'for', 'forward',
-    'function', 'goto', 'if', 'implementation', 'implements', 'in', 'index',
-    'inherited', 'initialization', 'inline', 'interface', 'is', 'label',
-    'library', 'local', 'message', 'mod', 'name', 'near', 'nil', 'nodefault',
-    'not', 'object', 'of', 'on', 'or', 'out', 'overload', 'override', 'package',
-    'packed', 'pascal', 'private', 'procedure', 'program', 'property',
-    'protected', 'public', 'published', 'raise', 'read', 'readonly', 'record',
-    'register', 'reintroduce', 'repeat', 'requires', 'resident',
-    'resourcestring', 'safecall', 'sealed', 'set', 'shl', 'shr', 'static',
-    'stdcall', 'stored', 'string', 'then', 'threadvar', 'to', 'try', 'type',
-    'unit', 'until', 'uses', 'var', 'varargs', 'virtual', 'while', 'with',
-    'write', 'writeonly', 'xor'
-  );
 {$R *.dfm}
+
+Var
+  (** A private variable which is assigned the key words array. **)
+  strKeyWords : TKeyWords;
 
 (**
 
@@ -262,12 +254,10 @@ End;
   @note     The string list returnsed must be destroyed be the calling method.
 
   @param   strText as a String
-  @param   strReservedWords as an Array Of String
   @return  a TStringList
 
 **)
-Function Tokenize(strText : String;
-  strReservedWords : Array Of String) : TStringList;
+Function Tokenize(strText : String) : TStringList;
 
 Type
   (** State machine for block types. **)
@@ -315,8 +305,9 @@ Begin
               SetLength(strToken, iTokenLen);
               If iTokenLen > 0 Then
                 Begin
-                  If IsKeyWord(strToken, strReservedWords) Then
-                    LastToken := ttReservedWord;
+                  If strKeyWords <> Nil Then
+                    If IsKeyWord(strToken, strKeyWords) Then
+                      LastToken := ttReservedWord;
                   Result.AddObject(strToken, TObject(LastToken));
                 End;
              BlockType := btNoBlock;
@@ -343,8 +334,9 @@ Begin
   If iTokenLen > 0 Then
     Begin
       SetLength(strToken, iTokenLen);
-      If IsKeyWord(strToken, strReservedWords) Then
-        CurToken := ttReservedWord;
+      If strKeyWords <> Nil Then
+        If IsKeyWord(strToken, strKeyWords) Then
+          CurToken := ttReservedWord;
       Result.AddObject(strToken, TObject(CurToken));
     End;
 End;
@@ -412,24 +404,19 @@ End;
 
   @param   iLine      as an Integer
   @param   iCol       as an Integer
-  @param   Comment    as a TComment
+  @param   AComment   as a TComment
   @param   SelectType as a TSelectType
 
 **)
-Constructor TTreeNodeInfo.Create(iLine, iCol : Integer; Comment : TComment;
+Constructor TTreeNodeInfo.Create(iLine, iCol : Integer; AComment : TComment;
   SelectType : TSelectType);
 
 Begin
   Inherited Create;
   FLine := ILine;
   FCol := iCol;
-  FComment := Nil;
+  FComment := TComment.Create(AComment);
   FSelectType := SelectType;
-  If Comment <> Nil Then
-    FComment := TComment.Create('', Comment.Line, Comment.Col)
-  Else
-    FComment := TComment.Create('', 0, 0);
-  FComment.Assign(Comment);
 End;
 
 (**
@@ -466,10 +453,6 @@ begin
   Inherited;
   FINIFileName := BuildRootKey(Nil, Nil);
   FNodeInfo := TObjectList.Create(True);
-  FExpandedNodes := TStringList.Create;
-  FExpandedNodes.Sorted := True;
-  FExpandedNodes.Duplicates := dupIgnore;
-  LoadSettings;
   FHintWin := TCustomHintWindow.Create(Self);
   FHintWin.Color := clInfoBk;
   FHintWin.Canvas.Font.Assign(tvExplorer.Font);
@@ -493,8 +476,6 @@ Destructor TframeModuleExplorer.Destroy;
 begin
   GetExpandedNodes;
   FHintWin.Free;
-  SaveSettings;
-  FExpandedNodes.Free;
   FNodeInfo.Free;
   Inherited;
 end;
@@ -526,65 +507,6 @@ Begin
   Info := TTreeNodeInfo.Create(iLine, iCol, C, SelectType);
   Result := FNodeInfo.Add(info);
 End;
-
-(**
-
-  This method loads the managed expanded nodes list from the registry.
-
-  @precon  None.
-  @postcon Loads the managed expanded nodes list from the registry.
-
-**)
-procedure TframeModuleExplorer.LoadSettings;
-
-Var
-  sl :  TStringList;
-  i : Integer;
-  iValue : Integer;
-
-begin
-  With TIniFile.Create(FINIFileName) Do
-    Try
-      sl := TStringList.Create;
-      Try
-        ReadSection('ManagedExpandedNodes', sl);
-        For i := 0 To sl.Count - 1 Do
-          Begin
-            iValue := ReadInteger('ManagedExpandedNodes', sl[i], 0);
-            FExpandedNodes.AddObject(sl[i], TObject(iValue));
-          End;
-      Finally
-        sl.Free;
-      End;
-    Finally
-      Free;
-    End;
-end;
-
-(**
-
-  This method saves the managed expand nodess list to the registry.
-
-  @precon  None.
-  @postcon Saves the managed expand nodess list to the registry.
-
-**)
-procedure TframeModuleExplorer.SaveSettings;
-
-Var
-  i : Integer;
-
-begin
-  With TIniFile.Create(FINIFileName) Do
-    Try
-      EraseSection('ManagedExpandedNodes');
-      For i := 0 To FExpandedNodes.Count - 1 Do
-        WriteInteger('ManagedExpandedNodes', FExpandedNodes[i],
-          Integer(FExpandedNodes.Objects[i]));
-    Finally
-      Free;
-    End;
-end;
 
 (**
 
@@ -634,12 +556,13 @@ Var
 
 begin
   For i := 1 To Container.ElementCount Do
-    Begin
-      NewNode := AddNode(RootNode, Container[i].AsString, Container[i].Line,
-        Container[i].Column, Container[i].ImageIndexAdjustedForScope,
-        Container[i].Comment, stIdentifier);
-      RenderContainers(NewNode, Container[i]);
-    End;
+    If Container.Elements[i].Scope In BrowseAndDocItOptions.ScopesToRender + [scNone, scGlobal] Then
+      Begin
+        NewNode := AddNode(RootNode, Container[i].AsString, Container[i].Line,
+          Container[i].Column, Container[i].ImageIndexAdjustedForScope,
+          Container[i].Comment, stIdentifier);
+        RenderContainers(NewNode, Container[i]);
+      End;
 end;
 
 (**
@@ -698,12 +621,12 @@ Begin
       str := StringReplace(GetNodePath(Node), '=', '|', [rfReplaceAll]);
       If Node.Expanded And (str <> '') Then
         Begin
-          If Not FExpandedNodes.Find(str, iIndex) Then
-            iIndex := FExpandedNodes.Add(str);
-          FExpandedNodes.Objects[iIndex] := TObject(1);
+          If Not BrowseAndDocItOptions.ExpandedNodes.Find(str, iIndex) Then
+            iIndex := BrowseAndDocItOptions.ExpandedNodes.Add(str);
+          BrowseAndDocItOptions.ExpandedNodes.Objects[iIndex] := TObject(1);
         End Else
-          If FExpandedNodes.Find(str, iIndex) Then
-            FExpandedNodes.Delete(iIndex);
+          If BrowseAndDocItOptions.ExpandedNodes.Find(str, iIndex) Then
+            BrowseAndDocItOptions.ExpandedNodes.Delete(iIndex);
     End;
 End;
 
@@ -729,7 +652,7 @@ Begin
       If Node.Count = 0 Then
         Continue;
       str := StringReplace(GetNodePath(Node), '=', '|', [rfReplaceAll]);
-      If FExpandedNodes.Find(str, j) Then
+      If BrowseAndDocItOptions.ExpandedNodes.Find(str, j) Then
         Node.Expanded := True;
     End;
 End;
@@ -782,6 +705,10 @@ Var
   strSelection : String;
 
 Begin
+  If M = Nil Then
+    strKeyWords := Nil
+  Else
+    strKeyWords := M.KeyWords;
   If FRendering Then
     Exit;
   FRendering := True;
@@ -802,17 +729,17 @@ Begin
           Items.Clear;
           FNodeInfo.Clear;
           FModule := Nil;
-          SetLength(FSpecialTagNodes, SpecialTags.Count);
+          SetLength(FSpecialTagNodes, BrowseAndDocItOptions.SpecialTags.Count);
           Try
             For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
               Begin
-                FSpecialTagNodes[i].strTagName := SpecialTags.Names[i];
+                FSpecialTagNodes[i].strTagName := BrowseAndDocItOptions.SpecialTags.Names[i];
                 FSpecialTagNodes[i].strTagDesc :=
-                  SpecialTags.Values[SpecialTags.Names[i]];
+                  BrowseAndDocItOptions.SpecialTags.Values[BrowseAndDocItOptions.SpecialTags.Names[i]];
                 FSpecialTagNodes[i].boolShow :=
-                  Integer(SpecialTags.Objects[i]) And iShowInTree <> 0;
+                  Integer(BrowseAndDocItOptions.SpecialTags.Objects[i]) And iShowInTree <> 0;
                 FSpecialTagNodes[i].boolExpand :=
-                  Integer(SpecialTags.Objects[i]) And iAutoExpand <> 0;
+                  Integer(BrowseAndDocItOptions.SpecialTags.Objects[i]) And iAutoExpand <> 0;
               End;
             If M = Nil Then
               Exit;
@@ -907,13 +834,14 @@ begin
     If FSpecialTagNodes[i].Node <> Nil Then
       If FSpecialTagNodes[i].boolExpand Then
         FSpecialTagNodes[i].Node.Expand(True);
-  If doShowConflicts In BrowseAndDocItOptions.Options Then
-    For i := 0 To FModule.Count -1 Do
+  For i := 0 To FModule.Count -1 Do
+    Begin
       If AnsiCompareText(FModule.Item[i].Text, strDocumentationConflicts) = 0 Then
-        Begin
+        If doShowConflicts In BrowseAndDocItOptions.Options Then
           FModule.Item[i].Expand(True);
-          Break;
-        End;
+      If AnsiCompareText(FModule.Item[i].Text, strErrorsAndWarnings) = 0 Then
+        FModule.Item[i].Expand(True);
+    End;
 end;
 
 
@@ -934,13 +862,85 @@ Var
 Begin
   For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
     Begin
-      //: @bug ToDo node has module comment!
       FSpecialTagNodes[i].Node := tvExplorer.Items.AddChild(FModule,
         FSpecialTagNodes[i].strTagDesc);
+      FSpecialTagNodes[i].Node.Data := TObject($FFFFFFFF);
       FSpecialTagNodes[i].Node.ImageIndex := Integer(iiToDoFolder) - 1;
       FSpecialTagNodes[i].Node.SelectedIndex := Integer(iiToDoFolder) - 1;
     End;
 End;
+
+(**
+
+  This is an on execute event handler for all the scope actions.
+
+  @precon  None.
+  @postcon Updates the ScopesToRender set based on the action invoked.
+
+  @param   Sender as a TObject
+
+**)
+procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
+
+  (**
+
+    This procedure adds or removed the given scope from the ScopesToRender set.
+
+    @precon  None.
+    @postcon Adds or removed the given scope from the ScopesToRender set.
+
+    @param   AScope as a TScope
+
+  **)
+  procedure UpdateScopes(AScope : TScope);
+
+  Begin
+    With BrowseAndDocItOptions Do
+      If AScope In ScopesToRender Then
+        ScopesToRender := ScopesToRender - [AScope]
+      Else
+        ScopesToRender := ScopesToRender + [AScope];
+  End;
+
+begin
+  With BrowseAndDocItOptions Do
+    If Sender = actLocal Then
+      UpdateScopes(scLocal)
+    Else If Sender = actPrivate Then
+      UpdateScopes(scPrivate)
+    Else If Sender = actProtected Then
+      UpdateScopes(scProtected)
+    Else If Sender = actPublic Then
+      UpdateScopes(scPublic)
+    Else If Sender = actPublished Then
+      UpdateScopes(scPublished);
+  If Assigned(FRefresh) Then
+    FRefresh(Sender);
+end;
+
+(**
+
+  This is an on update event handler for the sceop actions.
+
+  @precon  None.
+  @postcon Checks the action depending on the scopes in ScopesToRender. 
+
+  @param   Sender as a TObject
+
+**)
+procedure TframeModuleExplorer.actLocalUpdate(Sender: TObject);
+begin
+  If Sender = actLocal Then
+    (Sender As TAction).Checked := scLocal In BrowseAndDocItOptions.ScopesToRender
+  Else If Sender = actPrivate Then
+    (Sender As TAction).Checked := scPrivate In BrowseAndDocItOptions.ScopesToRender
+  Else If Sender = actProtected Then
+    (Sender As TAction).Checked := scProtected In BrowseAndDocItOptions.ScopesToRender
+  Else If Sender = actPublic Then
+    (Sender As TAction).Checked := scPublic In BrowseAndDocItOptions.ScopesToRender
+  Else If Sender = actPublished Then
+    (Sender As TAction).Checked := scPublished In BrowseAndDocItOptions.ScopesToRender;
+end;
 
 (**
 
@@ -1044,7 +1044,7 @@ begin
     If Not DefaultDraw Then
       Begin
         iOffset := GetScrollPos(Sender.Handle, SB_HORZ);
-        sl := Tokenize(Node.Text, strReservedWords);
+        sl := Tokenize(Node.Text);
         Try
           // Highlight selected item.
           If cdsSelected In State Then
@@ -1175,7 +1175,8 @@ begin
         Begin
           FLastNode := Node;
           If doShowCommentHints In BrowseAndDocItOptions.Options Then
-            C := NodeInfo[Integer(Node.Data)].Comment;
+            If Node.Data <> TObject($FFFFFFFF) Then
+              C := NodeInfo[Integer(Node.Data)].Comment;
           Rect := FHintWin.CalcHintRect(tvExplorer.ClientWidth, Screen.Width,
             Node, doCustomDrawing In BrowseAndDocItOptions.Options, C);
           If (Rect.Right <= tvExplorer.ClientWidth) And ((C = Nil) Or
@@ -1240,7 +1241,7 @@ Begin
   iLine := 0;
   With Canvas Do
     Begin
-      sl := Tokenize(Caption, strReservedWords);
+      sl := Tokenize(Caption);
       Try
         iPos := 2;
         For i := 0 To sl.Count - 1 Do
@@ -1281,21 +1282,21 @@ Begin
             DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
             DrawTextBiDiModeFlagsReadingOnly);
           R := Rect(2, 17 + iLine + iPos, Width - 4, Height);
-          For i := 0 To SpecialTags.Count - 1 Do
+          For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
             Begin
-              If DrawSpecialTag(FComment, SpecialTags.Names[i]) Then
+              If DrawSpecialTag(FComment, BrowseAndDocItOptions.SpecialTags.Names[i]) Then
                 Begin
                   Refresh;
                   Font.Style := [fsBold, fsUnderline];
                   Font.Color := clPurple;
                   Inc(R.Top, 5);
                   R := Rect(2, R.Top, Width - 2, Height);
-                  str := SpecialTags.Values[SpecialTags.Names[i]];
+                  str := BrowseAndDocItOptions.SpecialTags.Values[BrowseAndDocItOptions.SpecialTags.Names[i]];
                   Inc(R.Top, DrawText(Canvas.Handle, PChar(str), -1, R,
                     DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
                     DrawTextBiDiModeFlagsReadingOnly) + 1);
                   For j := 0 To FComment.TagCount - 1 Do
-                    If AnsiCompareText(SpecialTags.Names[i], FComment.Tag[j].TagName) = 0 Then
+                    If AnsiCompareText(BrowseAndDocItOptions.SpecialTags.Names[i], FComment.Tag[j].TagName) = 0 Then
                       Begin
                         Pen.Color := clBlack;
                         Brush.Color := clBlack;
@@ -1356,7 +1357,7 @@ Begin
     Begin
       // Need to amend the width of the rectangle for the custom drawing
       iPos := 5;
-      sl := Tokenize(Node.Text, strReservedWords);
+      sl := Tokenize(Node.Text);
       Try
         iLastmax := 0;
         For i := 0 To sl.Count - 1 Do
@@ -1393,19 +1394,19 @@ Begin
       Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(str), -1, R,
         DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
         DrawTextBiDiModeFlagsReadingOnly) + 2);
-      For i := 0 To SpecialTags.Count - 1 Do
+      For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
         Begin
-          If DrawSpecialTag(Comment, SpecialTags.Names[i]) Then
+          If DrawSpecialTag(Comment, BrowseAndDocItOptions.SpecialTags.Names[i]) Then
             Begin
               Refresh;
               Canvas.Font.Style := [fsBold, fsUnderline];
               R := Rect(Result.Left + 2, 0, Result.Right - 2, 0);
-              str := SpecialTags.Values[SpecialTags.Names[i]];
+              str := BrowseAndDocItOptions.SpecialTags.Values[BrowseAndDocItOptions.SpecialTags.Names[i]];
               Inc(Result.Bottom, 5 + DrawText(Canvas.Handle, PChar(str), -1, R,
                 DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
                 DrawTextBiDiModeFlagsReadingOnly) + 2);
               For j := 0 To Comment.TagCount - 1 Do
-                If AnsiCompareText(SpecialTags.Names[i], Comment.Tag[j].TagName) = 0 Then
+                If AnsiCompareText(BrowseAndDocItOptions.SpecialTags.Names[i], Comment.Tag[j].TagName) = 0 Then
                   Begin
                     Refresh;
                     Canvas.Font.Style := [];
@@ -1501,12 +1502,15 @@ begin
     If tvExplorer.Selected <> Nil Then
       If Assigned(FSelectionChange) And Not FRendering Then
         Begin
-          N := NodeInfo[Integer(tvExplorer.Selected.Data)];
-          If N.Comment = Nil Then
-            FSelectionChange(N.Line, N.Col, N.Line, N.Col, N.SelectType)
-          Else
-            FSelectionChange(N.Line, N.Col, N.Comment.Line, N.Comment.Col,
-              N.SelectType);
+          N := Nil;
+          If tvExplorer.Selected.Data <> TObject($FFFFFFFF) Then
+            N := NodeInfo[Integer(tvExplorer.Selected.Data)];
+          If N <> Nil Then
+            If N.Comment = Nil Then
+              FSelectionChange(N.Line, N.Col, N.Line, N.Col, N.SelectType)
+            Else
+              FSelectionChange(N.Line, N.Col, N.Comment.Line, N.Comment.Col,
+                N.SelectType);
         End;
   Finally
     FSelectionChanging := False;
@@ -1515,25 +1519,26 @@ end;
 
 (**
 
-  This method is an on key down event handler for the tree view.
+  This method is an on key down event handler for the tree view. 
 
-  @precon  None.
-  @postcon If an on focus event handler is assigned it is fired.
+  @precon  None. 
+  @postcon If an on focus event handler is assigned it is fired. 
 
-  @param   Sender as a TObject
-  @param   Key    as a Word as a reference
-  @param   Shift  as a TShiftState
+  @param   Sender as a TObject
+  @param   Key    as a Char as a reference
 
 **)
-procedure TframeModuleExplorer.tvExplorerKeyDown(Sender: TObject;
-  var Key: Word; Shift: TShiftState);
-begin
-  If Key = 13 Then
+procedure TframeModuleExplorer.tvExplorerKeyPress(Sender: TObject; var Key: Char);
+
+  begin
+  If Key = #13 Then
     Begin
       tvExplorerClick(Sender);
       If Assigned(OnFocus) Then
         FFocus(Sender);
+      Key := #0;
     End;
+
 end;
 
 end.

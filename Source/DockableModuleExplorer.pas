@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    17 Aug 2006
+  @Date    12 Aug 2008
   @Version 1.0
 
 **)
@@ -24,12 +24,13 @@ type
   public
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
+    Procedure Focus;
     Class Procedure ShowDockableModuleExplorer;
     Class Procedure RemoveDockableModuleExplorer;
     Class Procedure CreateDockableModuleExplorer;
     Class Procedure RenderDocumentTree(BaseLanguageModule : TBaseLanguageModule);
     Class Procedure HookEventHandlers(SelectionChangeProc : TSelectionChange;
-      Focus, OptionsChange : TNotifyEvent);
+      Focus, ScopeChange : TNotifyEvent);
   end;
 
   (** This is a classifier for the dockable form so that it can be registered
@@ -67,8 +68,12 @@ Begin
     Begin
       Form.ForceShow;
       FocusWindow(Form);
+      Form.Focus;
     End Else
+    Begin
       Form.Show;
+      Form.Focus;
+    End;
 End;
 
 (**
@@ -186,6 +191,23 @@ end;
 
 (**
 
+  This method focuses the modukle explorers tree view the be focused IF
+  available.
+
+  @precon  None.
+  @postcon Focuses the modukle explorers tree view the be focused IF available.
+
+**)
+procedure TfrmDockableModuleExplorer.Focus;
+begin
+  If FModuleExplorerFrame <> Nil Then
+    If FModuleExplorerFrame.Visible Then
+      If FModuleExplorerFrame.tvExplorer.Visible Then
+        FModuleExplorerFrame.tvExplorer.SetFocus;
+end;
+
+(**
+
   This is a class method to create the dockable form instance.
 
   @precon  None.
@@ -256,17 +278,17 @@ end;
 
   @param   SelectionChangeProc as a TSelectionChange
   @param   Focus               as a TNotifyEvent
-  @param   OptionsChange       as a TNotifyEvent
+  @param   ScopeChange         as a TNotifyEvent
 
 **)
 class procedure TfrmDockableModuleExplorer.HookEventHandlers(
-  SelectionChangeProc: TSelectionChange; Focus, OptionsChange : TNotifyEvent);
+  SelectionChangeProc: TSelectionChange; Focus, ScopeChange : TNotifyEvent);
 begin
   If Assigned(FormInstance) Then
     Begin
       FormInstance.FModuleExplorerFrame.OnSelectionChange := SelectionChangeProc;
       FormInstance.FModuleExplorerFrame.OnFocus := Focus;
-      FormInstance.FModuleExplorerFrame.OnOptionsChange := OptionsChange;
+      FormInstance.FModuleExplorerFrame.OnRefresh := ScopeChange;
     End;
 end;
 

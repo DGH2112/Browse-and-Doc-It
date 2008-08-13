@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       12 Aug 2008
+  @Date       13 Aug 2008
   @Author     David Hoyle
 
 **)
@@ -6605,6 +6605,7 @@ begin
   If M <> Nil Then
     Begin
       M.ClassMethod := boolClassMethod;
+      M.ForwardDecl := True;
       Result := True;
       If Token.Token = ';' Then
         Begin
@@ -7637,6 +7638,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctResourceStringClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7659,6 +7661,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctThreadVarClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7681,6 +7684,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctRecordClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7703,6 +7707,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctObjectClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7728,9 +7733,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctClassClauseUndocumented]);
     End;
-  For i := 1 To ElementCount Do
-    If Elements[i] Is TGenericProperty Then
-      (Elements[i] As TGenericProperty).CheckDocumentation(boolCascade);
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7753,6 +7756,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctInterfaceClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7775,6 +7779,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctDispInterfaceClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7794,6 +7799,7 @@ Begin
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([strInitialization], Line, Column , Comment,
         DocConflictTable[dctMissingInitComment]);
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7813,6 +7819,7 @@ Begin
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([strFinalization], Line, Column, Comment,
         DocConflictTable[dctMissingFinalComment]);
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 End.

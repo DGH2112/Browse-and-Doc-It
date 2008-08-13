@@ -3,10 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    12 Aug 2008
+  @Date    13 Aug 2008
   @Version 1.0
-
-  @todo    Configurable Font Name, Size, Colour and Style for the Browser tree.
 
 **)
 Unit BrowseAndDocItWizard;
@@ -71,8 +69,8 @@ Type
     FUpdateTimer : TTimer;
     {$IFNDEF VER180}
     FLastSize : Int64;
-    FLastEditorName : String;
     {$ENDIF}
+    FLastEditorName : String;
     FLastCursorPos: TOTAEditPos;
     Procedure RefreshTree;
     Procedure TimerEventHandler(Sender : TObject);
@@ -261,12 +259,16 @@ End;
 
 (**
 
-  This method creates menu items using the passed information. 
 
-  @precon  mmiParent must be a valid parent menu item in the IDE. 
-  @postcon A Sub menu ite is created under mmiParent. 
+  This method creates menu items using the passed information. 
 
-  @param   mmiParent  as a TMenuItem
+
+  @precon  mmiParent must be a valid parent menu item in the IDE. 
+
+  @postcon A Sub menu ite is created under mmiParent. 
+
+
+  @param   mmiParent  as a TMenuItem
   @param   strCaption as a String
   @param   ClickProc  as a TNotifyEvent
   @param   AShortCut  as a TShortCut
@@ -644,16 +646,24 @@ end;
 
 (**
 
-  This method writes the method comment to the active editor.
 
-  @precon  Method is a valid instance of a method declaration to be commented,
-           Writer is a valid instance of an open tools api writer, iBufferPos
-           is the buffer position to insert the comment and iCol is the
-           column to indent the comment by.
-  @postcon A method comment is inserted into the editor.
+  This method writes the method comment to the active editor.
 
-  @param   Method   as a TGenericMethodDecl
-  @param   Source   as an IOTASourceEditor
+
+  @precon  Method is a valid instance of a method declaration to be commented,
+
+           Writer is a valid instance of an open tools api writer, iBufferPos
+
+           is the buffer position to insert the comment and iCol is the
+
+           column to indent the comment by.
+
+  @postcon A method comment is inserted into the editor.
+
+
+  @param   Method   as a TGenericMethodDecl
+
+  @param   Source   as an IOTASourceEditor
   @param   Writer   as an IOTAEditWriter
   @param   AComment as a TComment
   @return  a TOTAEditPos
@@ -736,19 +746,23 @@ begin
   // Get header in view if not already
   Result.Col := CharPos.CharIndex + 2;
   Result.Line := CharPos.Line + 2;
-  SelectionChange(Result.Line + iLines, Result.Col, Result.Line, Result.Col,
+  SelectionChange(Result.Line + iLines, Result.Col, Result.Line - 2, Result.Col,
     stIdentifier);
 end;
 
 (**
 
-  This method returns a description for the method if it is a constructor,
+
+  This method returns a description for the method if it is a constructor,
   destructor, getter or setter method, else it returns an empty string.
 
-  @precon  Method is a valid instance of a method declatation to be described.
-  @postcon Returns a description of the method is applicable.
 
-  @param   Method   as a TGenericMethodDecl
+  @precon  Method is a valid instance of a method declatation to be described.
+
+  @postcon Returns a description of the method is applicable.
+
+
+  @param   Method   as a TGenericMethodDecl
   @param   AComment as a TComment
   @param   iIndent  as an Integer
   @return  a String
@@ -810,14 +824,19 @@ end;
 
 (**
 
-  This function returns the tag information indented and broken into line no
+
+  This function returns the tag information indented and broken into line no
   wider than 80 characters.
 
-  @precon  Tag must be a valid comment tag.
-  @postcon Returns the tag information indented and broken into line no wider
-           than 80 characters.
 
-  @param   iIndent as an Integer
+  @precon  Tag must be a valid comment tag.
+
+  @postcon Returns the tag information indented and broken into line no wider
+
+           than 80 characters.
+
+
+  @param   iIndent as an Integer
   @param   Tag     as a TTag
   @return  a String
 
@@ -948,16 +967,24 @@ end;
 
 (**
 
-  This method write the property comment to the active editor.
 
-  @precon  P is a valid instance of a property declaration to be commented,
-           Writer is a valid instance of an open tools api writer, iBufferPos
-           is the buffer position to insert the comment and iCol is the
-           column to indent the comment by.
-  @postcon A property comment it inserted into the editor.
+  This method write the property comment to the active editor.
 
-  @param   Prop     as a TGenericProperty
-  @param   Source   as an IOTASourceEditor
+
+  @precon  P is a valid instance of a property declaration to be commented,
+
+           Writer is a valid instance of an open tools api writer, iBufferPos
+
+           is the buffer position to insert the comment and iCol is the
+
+           column to indent the comment by.
+
+  @postcon A property comment it inserted into the editor.
+
+
+  @param   Prop     as a TGenericProperty
+
+  @param   Source   as an IOTASourceEditor
   @param   Writer   as an IOTAEditWriter
   @param   AComment as a TComment
   @return  a TOTAEditPos
@@ -1029,22 +1056,26 @@ Begin
   iLines := Writer.CurrentPos.Line - iLines;
   Result.Col := CharPos.CharIndex + 2;
   Result.Line := CharPos.Line + 1;
-  SelectionChange(Result.Line + iLines, Result.Col, Result.Line, Result.Col,
+  SelectionChange(Result.Line + iLines, Result.Col, Result.Line - 1, Result.Col,
     stIdentifier);
 End;
 
 (**
 
-  This method returns a description for the method if it is a constructor,
-  destructor, getter or setter method, else it returns an empty string. 
 
-  @precon  Method is a valid instance of a method declatation to be described. 
-  @postcon Returns a description of the method is applicable. 
+  This method returns a description for the method if it is a constructor,
+  destructor, getter or setter method, else it returns an empty string.
 
-  @param   Prop     as a TGenericProperty
+
+  @precon  Method is a valid instance of a method declatation to be described.
+
+  @postcon Returns a description of the method is applicable.
+
+
+  @param   Prop     as a TGenericProperty
   @param   AComment as a TComment
   @param   iIndent  as an Integer
-  @return  a String  
+  @return  a String
 
 **)
 function TBrowseAndDocItWizard.GetPropertyDescription(Prop : TGenericProperty;
@@ -1113,28 +1144,49 @@ Var
   C : TOTAEditPos;
 
 begin
-  {: @bug IOTAModuleRegions - Query an IOTAModule for this interface in order to obtain source code
-      region information.  This info is applied to the editor buffer to describe
-      those regions in the editor that can be collapsed/expanded}
-  //: @todo Implement browser positions.
+  {: @note although you can get the regions by Query an IOTAModule for
+           IOTAModuleRegions, you can not do anything with them!}
   SourceEditor := ActiveSourceEditor;
   If SourceEditor <> Nil Then
-    If SourceEditor.EditViewCount > 0 Then
-      Begin
-        SourceEditor.Module.CurrentEditor.Show;
-        If iIdentCol * iIdentLine > 0 Then
-          Begin
-            SourceEditor.Show;
-            If SourceEditor.GetSubViewCount > 0 Then
-              SourceEditor.SwitchToView(0);
-            C.Col := iIdentCol;
-            C.Line := iIdentLine;
-            SourceEditor.GetEditView(0).CursorPos := C;
-            SourceEditor.GetEditView(0).Center(iIdentLine, 1);
-          End;
-        If iCommentLine > 0 Then
-          If iCommentLine < SourceEditor.EditViews[0].TopRow Then
-            SourceEditor.GetEditView(0).SetTopLeft(iCommentLine, 1);
+    Begin
+      If SourceEditor.EditViewCount > 0 Then
+        Begin
+          SourceEditor.Module.CurrentEditor.Show;
+          If iIdentCol * iIdentLine > 0 Then
+            Begin
+              SourceEditor.Show;
+              If SourceEditor.GetSubViewCount > 0 Then
+                SourceEditor.SwitchToView(0);
+              C.Col := iIdentCol;
+              C.Line := iIdentLine;
+              SourceEditor.GetEditView(0).CursorPos := C;
+              Case BrowseAndDocItOptions.BrowsePosition Of
+                bpCommentTop:
+                  Begin
+                    If iCommentLine > 0 Then
+                      iIdentLine := iCommentLine;
+                    SourceEditor.GetEditView(0).SetTopLeft(iIdentLine, 1);
+                  End;
+                bpCommentCentre:
+                  Begin
+                    If iCommentLine > 0 Then
+                      iIdentLine := iCommentLine;
+                    SourceEditor.GetEditView(0).Center(iIdentLine, 1);
+                  End;
+                bpIdentifierTop:
+                  SourceEditor.GetEditView(0).SetTopLeft(iIdentLine, 1);
+                bpIdentifierCentre:
+                  SourceEditor.GetEditView(0).Center(iIdentLine, 1);
+                bpIdentifierCentreShowAllComment:
+                  Begin
+                    SourceEditor.GetEditView(0).Center(iIdentLine, 1);
+                    If iCommentLine > 0 Then
+                      If iCommentLine < SourceEditor.EditViews[0].TopRow Then
+                        SourceEditor.GetEditView(0).SetTopLeft(iCommentLine, 1);
+                  End;
+              End;
+            End;
+        End;
       End;
 end;
 
@@ -1464,18 +1516,18 @@ begin
             iLastUpdateTickCount := GetTickCount;
             FLastCursorPos := P;
           End;
-      {$IFNDEF VER180}
       If Editor.FileName <> FLastEditorName Then
         Begin
           iLastUpdateTickCount := 1;
           FLastEditorName := Editor.FileName;
-        End Else
-          If FLastSize <> MemStreamSize(Editor) Then
+        End
+      {$IFNDEF VER180}
+        Else If FLastSize <> MemStreamSize(Editor) Then
             Begin
               iLastUpdateTickCount := GetTickCount;
               FLastSize := MemStreamSize(Editor);
-            End;
-      {$ENDIF}
+            End
+      {$ENDIF};
     End;
   If (iLastUpdateTickCount > 0) And
     (GetTickCount > iLastUpdateTickCount + BrowseAndDocItOptions.UpdateInterval) Then

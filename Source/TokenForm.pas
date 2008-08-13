@@ -3,7 +3,7 @@
   This is a debug form for displaying the tokens and their information.
 
   @version      0.9
-  @date         01 Aug 2008
+  @date         13 Aug 2008
   @author       David Hoyle
 
 **)
@@ -56,7 +56,7 @@ Var
 Begin
   Result := clBlack;
   For i := ttUnknown To ttDirective Do
-    If strText = strTypes[i] Then
+    If strText = strTokenType[i] Then
       Case i Of
         ttUnKnown : Result := clRed;
         ttReservedWord, ttDirective : Result := clBlack;
@@ -89,7 +89,7 @@ Var
 Begin
   Result := [];
   For i := ttUnknown To ttDirective Do
-    If strText = strTypes[i] Then
+    If strText = strTokenType[i] Then
       Case i Of
         ttUnKnown : Result := [];
         ttReservedWord, ttDirective : Result := [fsBold];
@@ -173,7 +173,7 @@ begin
               With lvListView1.Items.Add Do
                 Begin
                   Caption := IntToStr(i);
-                  SubItems.Add(strTypes[Source.TokenInfo[i].TokenType]);
+                  SubItems.Add(strTokenType[Source.TokenInfo[i].TokenType]);
                   SubItems.Add(IntToStr(Source.TokenInfo[i].BufferPos));
                   SubItems.Add(IntToStr(Source.TokenInfo[i].Line));
                   SubItems.Add(IntToStr(Source.TokenInfo[i].Column));

@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    12 Aug 2008
+  @Date    13 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -13,7 +13,7 @@ Unit BaseLanguageModule;
 
 Interface
 Uses
-  SysUtils, Classes, Contnrs;
+  SysUtils, Classes, Contnrs, Graphics;
 
 Type
   (** Type to distinguish Stream position from token index. **)
@@ -1231,6 +1231,12 @@ Type
   TBrowsePosition = (bpCommentTop, bpCommentCentre, bpIdentifierTop,
     bpIdentifierCentre, bpIdentifierCentreShowAllComment);
 
+  (** A record to define the font information for each token type. **)
+  TTokenFontInfo = Record
+    FColour : TColor;
+    FStyles : TFontStyles;
+  End;
+
   (** This is a class to define a set of options for the application. **)
   TBrowseAndDocItOptions = Class
   Private
@@ -1243,7 +1249,12 @@ Type
     FUpdateInterval: Cardinal;
     FScopesToRender : TScopes;
     FBrowsePosition : TBrowsePosition;
+    FFontName : String;
+    FFontSize : Integer;
+    FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
   Protected
+    Function GetTokenFontInfo(ATokenType  : TTokenType) : TTokenFontInfo;
+    Procedure SetTokenFontInfo(ATokenType  : TTokenType; ATokenFontInfo : TTokenFontInfo);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -1285,12 +1296,12 @@ Type
     **)
     Property DocHelpFile : String Read FDocHelpFile Write FDocHelpFile;
     (**
-      This property determines the amount of time in milliseonds between the
-      last editor update and the next refresh. Interval only, the application
-      needs to implement the logic.
-      @precon  None.
-      @postcon Gets and sets the update interval.
-      @return  a Cardinal
+      This property determines the amount of time in milliseonds between the 
+      last editor update and the next refresh. Interval only, the application 
+      needs to implement the logic. 
+      @precon  None. 
+      @postcon Gets and sets the update interval. 
+      @return  a Cardinal
     **)
     Property UpdateInterval : Cardinal Read FUpdateInterval Write FUpdateInterval;
     (**
@@ -1308,6 +1319,30 @@ Type
       @return  a TBrowsePosition
     **)
     Property BrowsePosition : TBrowsePosition Read FBrowsePosition Write FBrowsePosition;
+    (**
+      This property determines the Font Name of the Module explorer.
+      @precon  None.
+      @postcon Gets or sets the module explorer font name.
+      @return  a String
+    **)
+    Property FontName : String Read FFontName Write FFontName;
+    (**
+      This property determines the font size of the module explorer font.
+      @precon  None.
+      @postcon Gets or sets the module explorer font size.
+      @return  an Integer
+    **)
+    Property FontSize : Integer Read FFontSize Write FFontSize;
+    (**
+      This property determines the colour and style attribute of a token in the
+      module explorer
+      @precon  None.
+      @postcon Gets and sets the colour and style of the token.
+      @param   ATokenType as     a TTokenType
+      @return  a TTokenFontInfo
+    **)
+    Property TokenFontInfo[ATokenType : TTokenType] : TTokenFontInfo Read
+      GetTokenFontInfo Write SetTokenFontInfo;
   End;
 
   (** A silent parser abort exception. **)
@@ -1401,8 +1436,6 @@ ResourceString
   strUses = 'Uses';
   (** Label for Types Clause **)
   strTypesLabel = 'Types';
-  (** Label for Class Clause **)
-  strClass = 'Class';
   (** Label for Classes Clause **)
   strClasses = 'Classes';
   (** Label for Interfaces Clause **)
@@ -1439,14 +1472,10 @@ ResourceString
   strRequires = 'Requires';
   (** Label for Contains Clause **)
   strContains = 'Contains';
-  (** Label for Modules Section **)
-  strModules = 'Modules';
   (** Label for Initialization Clause **)
   strInitialization = 'Initialization';
   (** Label for Finalization Clause **)
   strFinalization = 'Finalization';
-  (** Label for Functions and Procedures label **)
-  strFunctionsAndProcedures = 'Function & Procedures';
   (** Label for Labels **)
   strLabel = 'Labels';
   (** Label for fields **)
@@ -1456,54 +1485,50 @@ ResourceString
   (** Label for Methods. **)
   strMethods = 'Methods';
 
-  (** Resource string for saving a file. **)
-  strSaveFile = 'Do you want to save the file "%s"?';
-  (** Resource string for overwriting a file. **)
-  strOverwriteFile = 'Do you want to overwrite the file "%s"?';
   (** Resource string for a class not found. **)
   strUnExpectedStartOfFile = 'Unexpected start-of-file.';
   (** Exception message for an unexpected end of file. **)
   strUnExpectedEndOfFile = 'Unexpected end-of-file.';
   (** Exception message when an identifier is expected but something else is found. **)
-  strIdentExpected = 'Identifier expected but "%s" found at line %d column %d.';
+  strIdentExpected = 'Identifier expected but ''%s'' found at line %d column %d.';
   (** Exception message when an string is expected but something else is found. **)
-  strStringExpected = 'String literal expected but "%s" found at line %d column %d.';
+  strStringExpected = 'String literal expected but ''%s'' found at line %d column %d.';
   (** Exception message when an number is expected but something else is found. **)
-  strNumberExpected = 'Number expected but "%s" found at line %d column %d.';
+  strNumberExpected = 'Number expected but ''%s'' found at line %d column %d.';
   (** Exception message when an reserved word is expected but something else is
       found. **)
-  strReservedWordExpected = 'Expected "%s" but "%s" found at line %d column %d.';
+  strReservedWordExpected = 'Expected ''%s'' but ''%s'' found at line %d column %d.';
   (** Exception message when an literal character is expected but something else
       is found. **)
-  strLiteralExpected = '"%s" expected but "%s" found at line %d column %d.';
+  strLiteralExpected = '''%s'' expected but ''%s'' found at line %d column %d.';
   (** Warning for a function not having a return parameter. **)
-  strFunctionWarning = 'Function "%s" does not have a return type specified.';
+  strFunctionWarning = 'Function ''%s'' does not have a return type specified.';
   (** An exception message for a non defined help file option. **)
   strHelpFileNotDefined = 'There is no help file specified. Please specified a ' +
     'help file in the options dialogue.';
   (** An exception message for a missing help file **)
-  strHelpFileNotFound = 'The help file "%s" was not found.';
+  strHelpFileNotFound = 'The help file ''%s'' was not found.';
   (** An exception message for an undeclared class method. **)
-  strUndeclaredClassMethod = 'Method "%s" has not been declared.';
+  strUndeclaredClassMethod = 'Method ''%s'' has not been declared.';
   (** An exception message for an unsatisfied forward reference. **)
-  strUnSatisfiedForwardReference = 'Method "%s" has an unsatisfied ' +
+  strUnSatisfiedForwardReference = 'Method ''%s'' has an unsatisfied ' +
     'forward reference.';
   (** An exception message for a type not found. **)
-  strTypeNotFound = 'Type declaration missing but found "%s" at line %d column %d.';
+  strTypeNotFound = 'Type declaration missing but found ''%s'' at line %d column %d.';
   (** An exception message when a TypeID is expected. **)
-  strTypeIDExpected = 'A TypeID was expected but found "%s" at line %d column %d.';
+  strTypeIDExpected = 'A TypeID was expected but found ''%s'' at line %d column %d.';
   (** An execption message when a Expr conflict occurs in an expression **)
-  strExprConflict = 'The token "%s" conflicts with the TYPE of the preceeding ' +
+  strExprConflict = 'The token ''%s'' conflicts with the TYPE of the preceeding ' +
     'expression at line %d column %d.';
   (** An exception message if a function is used in a constant expression **)
-  strConstExprDesignator = 'The token "%s" at line %d column %d is not allowed ' +
+  strConstExprDesignator = 'The token ''%s'' at line %d column %d is not allowed ' +
     'in a Constant Expression.';
   (** An exception message if the first none comment token is not Program,
       Package, Unit or Library. **)
-  strModuleKeyWordNotfound = '"%s" found but module starting keyword PROGRAM, ' +
+  strModuleKeyWordNotfound = '''%s'' found but module starting keyword PROGRAM, ' +
     'PACKAGE, UNIT or LIBRARY not found.';
   (** An exception message for an undefined token in the stream. **)
-  strUnDefinedToken = 'The token "%s" at line %d column %d is not defined.';
+  strUnDefinedToken = 'The token ''%s'' at line %d column %d is not defined.';
   (** An exception message for an $ELSE without a string $IFDEF / $FIFNDEF **)
   strElseIfMissingIfDef = '$ELSE is missing a starting $IFDEF or $IFNDEF at ' +
     'line %d column %d.';
@@ -1511,15 +1536,15 @@ ResourceString
   strEndIfMissingIfDef = '$ENDIF is missing a starting $IFDEF or $IFNDEF at ' +
     'line %d column %d.';
   (** An exception message for an Ordinal Type not found. **)
-  strOrdinalTypeExpected = 'Ordinal type expected but "%s" found at line %d ' +
+  strOrdinalTypeExpected = 'Ordinal type expected but ''%s'' found at line %d ' +
     'column %d.';
   (** An exception message for a Type Declaration not found. **)
-  strTypeDeclExpected = 'Type Declaration expected but "%s" found at line %s ' +
+  strTypeDeclExpected = 'Type Declaration expected but ''%s'' found at line %s ' +
     'column %d.';
   (** An exception message for a Label not found. **)
-  strLabelExpected = 'Label expected but "%s" found at line %s column %d.';
+  strLabelExpected = 'Label expected but ''%s'' found at line %s column %d.';
   (** An exception message for a Constant Expression found. **)
-  strConstExprExpected = 'Constant Expression expected but "%s" found at ' +
+  strConstExprExpected = 'Constant Expression expected but ''%s'' found at ' +
     'line %s column %d.';
 
   (** This is the tree branch under which module documentation error appear **)
@@ -1864,11 +1889,7 @@ Const
   strWhiteSpace : Set Of Char = [#32, #9];
   (** A set of characters for line feed and carriage return **)
   strLineEnd : Set of Char = [#10, #13];
-  (** A list of strings representing the different types of token. **)
-  strTypes : Array[ttUnknown..ttLinkTag] Of String = ('Unknown',
-    'WhiteSpace', 'Keyword', 'Identifier', 'Number', 'Symbol', 'LineEnd',
-    'ArrayElement', 'StatementEnd', 'StringLiteral', 'Comment', 'HTMLTag',
-    'Directive', 'CompilerDirective', 'LinkTag');
+
   (** This is a string array representing the TDocOption enumerates. **)
   DocOptionInfo : Array[Low(TDocOption)..High(TDocOption)] Of TDocOptionRec = (
     (FDescription : strDrawSynHighModuleExplorer;          FEnabled : False),
@@ -1910,6 +1931,25 @@ Const
     (FDescription : strShowMissingPropertyPostConditions;  FEnabled : False),
     (FDescription : strShowMissingInitComment;             FEnabled : False),
     (FDescription : strShowMissingFinalComment;            FEnabled : False)
+  );
+
+  (** This is a default set of font information for the application. **)
+  strTokenTypeInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo = (
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : [fsBold]),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : [fsBold]),
+    (FColour : clBlack; FStyles : []),
+    (FColour : clBlack; FStyles : [])
   );
 
   (** This is a constant for special tag items to show in the tree **)
@@ -2262,6 +2302,12 @@ Const
       FConflictType: dciMissing)
   );
 
+  (** A list of strings representing the token types. **)
+  strTokenType : Array[Low(TTokenType)..High(TTokenType)] Of String = (
+    'Unknown', 'WhiteSpace', 'ReservedWord', 'Identifier', 'Number',
+    'Symbol', 'LineEnd', 'ArrayElement', 'StatementEnd', 'StringLiteral',
+    'Comment', 'HTMLTag', 'Directive', 'CompilerDirective', 'LinkTag');
+
 Var
   (** This is a global variable for the Browse and Doc It options that need to
       be available throughout the application. **)
@@ -2278,7 +2324,7 @@ Uses
 resourcestring
   (** An error message for tying to add one type of element but finding another
       with the same name. **)
-  strTryingToAddType = 'Trying to add type "%s" but found type "%s" with the' +
+  strTryingToAddType = 'Trying to add type ''%s'' but found type ''%s'' with the' +
   ' same name (%s).';
 
 Var
@@ -2291,15 +2337,15 @@ Var
 
 (**
 
-  This function returns true if the given word is in the supplied word list. It
-  uses a binary search, so the word lists need to be sorted.
+  This function returns true if the given word is in the supplied word list.
+  It uses a binary search, so the word lists need to be sorted.
 
-  @precon  strWord is the word to be searches for in the word list and
-           strWordList is a static array of words in lowercase and alphabetical
-           order.
-  @postcon Returns true if the word is found in the list.
+  @precon  strWord is the word to be searches for in the word list and
+           strWordList is a static array of words in lowercase and
+           alphabetical order.
+  @postcon Returns true if the word is found in the list.
 
-  @param   strWord     as a String
+  @param   strWord     as a String
   @param   strWordList as an Array Of String
   @return  a Boolean
 
@@ -2358,13 +2404,13 @@ End;
 
 (**
 
-  This method added the strToken to the tags token list with type iType.
+  This method added the strToken to the tags token list with type iType.
 
-  @precon  strToken is a string to be added as a token and iType is the token
-           type of the token.
-  @postcon Adds the token to the internal list.
+  @precon  strToken is a string to be added as a token and iType is the token
+           type of the token.
+  @postcon Adds the token to the internal list.
 
-  @param   strToken as a String
+  @param   strToken as a String
   @param   iType    as a TTokenType
 
 **)
@@ -2672,16 +2718,16 @@ End;
 
 (**
 
-  This is the TComment constructor. It create a token list and a tag list.
-  Then it passes the comment to the comment parser.
+  This is the TComment constructor. It create a token list and a tag list. Then
+  it passes the comment to the comment parser.
 
-  @precon  strComment is a string of text to be parsed as a comment, iLine is
-           the line number of the comment and iCol is the column number of the
-           comment.
-  @postcon It create a token list and a tag list. Then it passes the comment to
-           the comment parser.
+  @precon  strComment is a string of text to be parsed as a comment, iLine is
+           the line number of the comment and iCol is the column number of
+           the comment.
+  @postcon It create a token list and a tag list. Then it passes the comment to
+           the comment parser.
 
-  @param   strComment as a String
+  @param   strComment as a String
   @param   iLine      as an Integer
   @param   iCol       as an Integer
 
@@ -2700,17 +2746,17 @@ end;
 
 (**
 
-  This method is a class method to first check the comment for being a
+  This method is a class method to first check the comment for being a
   documentation comment and then creating an instance of a TComment class and
   parsing the comment via the constructor.
 
-  @precon  strComment is the full comment to be checked and parsed, iLine is the
-           line number of the comment and iCol is the column number of the
-           comment.
-  @postcon Returns Nil if this is not a documentation comment or returns a valid
-           TComment class.
+  @precon  strComment is the full comment to be checked and parsed, iLine is
+           the line number of the comment and iCol is the column number of
+           the comment.
+  @postcon Returns Nil if this is not a documentation comment or returns a
+           valid TComment class.
 
-  @param   strComment as a String
+  @param   strComment as a String
   @param   iLine      as an Integer
   @param   iCol       as an Integer
   @return  a TComment
@@ -4979,6 +5025,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctTypeClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -5001,6 +5048,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctConstantClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -5023,6 +5071,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctVariableClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -5261,6 +5310,7 @@ begin
       CheckPropertyParameters;
       CheckPropertyReturns;
     End;
+  Inherited CheckDocumentation(boolCascade);
 end;
 
 (**
@@ -5505,6 +5555,22 @@ End;
 
 (**
 
+  This is a getter method for the TokenFontInfo property.
+
+  @precon  None.
+  @postcon Retursn the record information for the token type.
+
+  @param   ATokenType as a TTokenType
+  @return  a TTokenFontInfo
+
+**)
+function TBrowseAndDocItOptions.GetTokenFontInfo(ATokenType: TTokenType): TTokenFontInfo;
+begin
+  Result := FTokenFontInfo[ATokenType];
+end;
+
+(**
+
   This method loads the applications settings from an ini file.
 
   @precon  None.
@@ -5518,6 +5584,7 @@ Var
   i : TDocOption;
   j : Integer;
   iValue : Integer;
+  T: TTokenType;
 
 begin
   With TIniFile.Create(FINIFileName) Do
@@ -5550,6 +5617,15 @@ begin
         Byte(FScopesToRender))));
       FBrowsePosition := TBrowsePosition(ReadInteger('Setup', 'BrowsePosition',
         Integer(bpIdentifierCentreShowAllComment)));
+      FFontName := ReadString('ModuleExplorer', 'Name', 'MS Sans Serif');
+      FFontSize := ReadInteger('ModuleExplorer', 'Size', 8);
+      For T := Low(TTokenType) To High(TTokenType) Do
+        Begin
+          FTokenFontInfo[T].FColour := StringToColor(ReadString('TokenFontinfo',
+            Format('%s.Colour', [strTokenType[T]]), ColorToString(strTokenTypeInfo[T].FColour)));
+          FTokenFontInfo[T].FStyles := TFontStyles(Byte(ReadInteger('TokenFontinfo',
+            Format('%s.Styles', [strTokenType[T]]), Byte(strTokenTypeInfo[T].FStyles))));
+        End;
     Finally
       Free;
     End;
@@ -5568,6 +5644,7 @@ procedure TBrowseAndDocItOptions.SaveSettings;
 Var
   i : TDocOption;
   j : Integer;
+  T: TTokenType;
 
 begin
   With TIniFile.Create(FINIFileName) Do
@@ -5584,9 +5661,35 @@ begin
       WriteString('ModuleExplorer', 'HelpFile', FDocHelpFile);
       WriteInteger('ModuleExplorer', 'ScopesToRender', Byte(FScopesToRender));
       WriteInteger('Setup', 'BrowsePosition', Integer(FBrowsePosition));
+      WriteString('ModuleExplorer', 'Name', FFontName);
+      WriteInteger('ModuleExplorer', 'Size', FFontSize);
+      For T := Low(TTokenType) To High(TTokenType) Do
+        Begin
+          WriteString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
+            ColorToString(FTokenFontInfo[T].FColour));
+          WriteInteger('TokenFontinfo', Format('%s.Styles', [strTokenType[T]]),
+            Byte(FTokenFontInfo[T].FStyles));
+        End;
     Finally
       Free;
     End;
+end;
+
+(**
+
+  This is a setter method for the TokenFontInfo property.
+
+  @precon  None.
+  @postcon Sets the indexed Token Font Information record. 
+
+  @param   ATokenType     as a TTokenType
+  @param   ATokenFontInfo as a TTokenFontInfo
+
+**)
+procedure TBrowseAndDocItOptions.SetTokenFontInfo(ATokenType: TTokenType;
+  ATokenFontInfo: TTokenFontInfo);
+begin
+  FTokenFontInfo[ATokenType] := ATokenFontInfo;
 end;
 
 (** This initializations section ensures that there is a valid instance of the

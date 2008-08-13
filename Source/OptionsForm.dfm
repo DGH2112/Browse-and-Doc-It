@@ -3,9 +3,11 @@ object frmOptions: TfrmOptions
   Top = 269
   BorderStyle = bsDialog
   Caption = 'Options'
-  ClientHeight = 367
-  ClientWidth = 468
+  ClientHeight = 318
+  ClientWidth = 544
   Color = clBtnFace
+  Constraints.MinHeight = 350
+  Constraints.MinWidth = 550
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -13,61 +15,35 @@ object frmOptions: TfrmOptions
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
+  DesignSize = (
+    544
+    318)
   PixelsPerInch = 96
   TextHeight = 13
-  object BottomPanel: TPanel
-    Left = 0
-    Top = 334
-    Width = 468
-    Height = 33
-    Align = alBottom
-    BevelOuter = bvNone
-    TabOrder = 0
-    DesignSize = (
-      468
-      33)
-    object bbtnOK: TBitBtn
-      Left = 312
-      Top = 4
-      Width = 75
-      Height = 25
-      Anchors = [akTop, akRight]
-      TabOrder = 0
-      Kind = bkOK
-    end
-    object bbtnCancel: TBitBtn
-      Left = 392
-      Top = 4
-      Width = 75
-      Height = 25
-      Anchors = [akTop, akRight]
-      TabOrder = 1
-      Kind = bkCancel
-    end
-  end
   object OptionTab: TPageControl
-    Left = 0
-    Top = 0
-    Width = 468
-    Height = 334
+    Left = 8
+    Top = 8
+    Width = 528
+    Height = 271
     ActivePage = Page1
-    Align = alClient
-    TabOrder = 1
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    TabOrder = 0
     object Page1: TTabSheet
       Caption = 'General Options'
       object clbOptions: TCheckListBox
         Left = 0
         Top = 0
-        Width = 460
-        Height = 272
+        Width = 520
+        Height = 209
         Align = alClient
         ItemHeight = 13
         TabOrder = 0
       end
       object IntervalPanel: TPanel
         Left = 0
-        Top = 272
-        Width = 460
+        Top = 209
+        Width = 520
         Height = 34
         Align = alBottom
         BevelOuter = bvNone
@@ -104,11 +80,15 @@ object frmOptions: TfrmOptions
     object Page2: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 530
+      ExplicitHeight = 288
       object lbSpecialTags: TListBox
         Left = 0
         Top = 17
-        Width = 460
-        Height = 258
+        Width = 520
+        Height = 195
         Style = lbOwnerDrawFixed
         Align = alClient
         ItemHeight = 16
@@ -118,62 +98,77 @@ object frmOptions: TfrmOptions
       end
       object TagPanel: TPanel
         Left = 0
-        Top = 275
-        Width = 460
+        Top = 212
+        Width = 520
         Height = 31
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
+        ExplicitTop = 257
+        ExplicitWidth = 530
+        DesignSize = (
+          520
+          31)
         object btnAdd: TBitBtn
-          Left = 64
+          Left = 121
           Top = 4
           Width = 75
           Height = 25
+          Anchors = [akTop, akRight]
           Caption = '&Add'
           TabOrder = 0
           OnClick = btnAddClick
+          ExplicitLeft = 131
         end
         object btnDelete: TBitBtn
-          Left = 224
+          Left = 283
           Top = 4
           Width = 75
           Height = 25
+          Anchors = [akTop, akRight]
           Caption = '&Delete'
           TabOrder = 2
           OnClick = btnDeleteClick
+          ExplicitLeft = 293
         end
         object btnMoveUp: TBitBtn
-          Left = 304
+          Left = 364
           Top = 4
           Width = 75
           Height = 25
+          Anchors = [akTop, akRight]
           Caption = 'Move &Up'
           TabOrder = 3
           OnClick = btnMoveUpClick
+          ExplicitLeft = 374
         end
         object btnMoveDown: TBitBtn
-          Left = 384
+          Left = 445
           Top = 4
           Width = 75
           Height = 25
+          Anchors = [akTop, akRight]
           Caption = '&Move Down'
           TabOrder = 4
           OnClick = btnMoveDownClick
+          ExplicitLeft = 455
         end
         object btnEdit: TBitBtn
-          Left = 144
+          Left = 202
           Top = 4
           Width = 75
           Height = 25
+          Anchors = [akTop, akRight]
           Caption = '&Edit'
           TabOrder = 1
           OnClick = btnEditClick
+          ExplicitLeft = 212
         end
       end
       object HeaderControl1: THeaderControl
         Left = 0
         Top = 0
-        Width = 460
+        Width = 520
         Height = 17
         Sections = <
           item
@@ -196,6 +191,172 @@ object frmOptions: TfrmOptions
             Text = 'Tag Description'
             Width = 300
           end>
+        ExplicitWidth = 530
+      end
+    end
+    object TabSheet1: TTabSheet
+      Caption = 'Module Explorer'
+      ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 530
+      ExplicitHeight = 288
+      DesignSize = (
+        520
+        243)
+      object lblFontName: TLabel
+        Left = 3
+        Top = 6
+        Width = 55
+        Height = 13
+        Caption = 'Font &Name:'
+        FocusControl = cbxFontName
+      end
+      object lblFontSize: TLabel
+        Left = 3
+        Top = 33
+        Width = 44
+        Height = 13
+        Caption = 'Font &Size'
+        FocusControl = edtFontSize
+      end
+      object lblTokenTypes: TLabel
+        Left = 3
+        Top = 66
+        Width = 63
+        Height = 13
+        Caption = '&Token Types'
+        FocusControl = lbxTokenTypes
+      end
+      object cbxFontName: TComboBox
+        Left = 79
+        Top = 3
+        Width = 439
+        Height = 21
+        Style = csDropDownList
+        Anchors = [akLeft, akTop, akRight]
+        ItemHeight = 0
+        TabOrder = 0
+      end
+      object edtFontSize: TEdit
+        Left = 79
+        Top = 30
+        Width = 420
+        Height = 21
+        Anchors = [akLeft, akTop, akRight]
+        ReadOnly = True
+        TabOrder = 1
+        Text = '8'
+        ExplicitWidth = 430
+      end
+      object udFontSize: TUpDown
+        Left = 499
+        Top = 30
+        Width = 16
+        Height = 21
+        Anchors = [akTop, akRight]
+        Associate = edtFontSize
+        Min = 8
+        Max = 72
+        Position = 8
+        TabOrder = 2
+        ExplicitLeft = 509
+      end
+      object lbxTokenTypes: TListBox
+        Left = 3
+        Top = 84
+        Width = 340
+        Height = 156
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        ItemHeight = 13
+        TabOrder = 3
+        OnClick = lbxTokenTypesClick
+      end
+      object cbxFontColour: TColorBox
+        Left = 349
+        Top = 84
+        Width = 168
+        Height = 22
+        Anchors = [akTop, akRight]
+        ItemHeight = 16
+        TabOrder = 4
+        OnChange = cbxFontColourChange
+        ExplicitLeft = 359
+      end
+      object gbxFontStyles: TGroupBox
+        Left = 349
+        Top = 112
+        Width = 168
+        Height = 128
+        Anchors = [akTop, akRight, akBottom]
+        Caption = 'Font Styles'
+        TabOrder = 5
+        ExplicitLeft = 359
+        ExplicitHeight = 173
+        object chkBold: TCheckBox
+          Left = 12
+          Top = 21
+          Width = 97
+          Height = 17
+          Caption = '&Bold'
+          TabOrder = 0
+          OnClick = chkBoldClick
+        end
+        object chkItalic: TCheckBox
+          Left = 13
+          Top = 44
+          Width = 97
+          Height = 17
+          Caption = '&Italic'
+          TabOrder = 1
+          OnClick = chkItalicClick
+        end
+        object chkUnderline: TCheckBox
+          Left = 13
+          Top = 67
+          Width = 97
+          Height = 17
+          Caption = '&Underline'
+          TabOrder = 2
+          OnClick = chkUnderlineClick
+        end
+        object chkStrikeout: TCheckBox
+          Left = 12
+          Top = 90
+          Width = 97
+          Height = 17
+          Caption = '&Strikeout'
+          TabOrder = 3
+          OnClick = chkStrikeoutClick
+        end
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'Code Browsing'
+      ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 530
+      ExplicitHeight = 288
+      DesignSize = (
+        520
+        243)
+      object rgpBrowsePosition: TRadioGroup
+        Left = 3
+        Top = 3
+        Width = 514
+        Height = 237
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        Caption = 'Browse Position'
+        Items.Strings = (
+          'Comment top aligned with top of the editor'
+          'Comment top aligned with the centre of the editor'
+          'Identifier aligned with top of the editor'
+          'Identifier aligned with the centre of the editor'
+          'Identifier centred in the editor but show all of the comment')
+        TabOrder = 0
+        ExplicitWidth = 524
+        ExplicitHeight = 282
       end
     end
     object HelpFilePage: TTabSheet
@@ -203,22 +364,42 @@ object frmOptions: TfrmOptions
       ImageIndex = 2
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 530
+      ExplicitHeight = 288
       object HelpFileDir: TDirectoryListBox
         Left = 0
         Top = 0
-        Width = 460
-        Height = 306
+        Width = 520
+        Height = 243
         Align = alClient
         ItemHeight = 16
         TabOrder = 0
+        ExplicitWidth = 530
+        ExplicitHeight = 288
       end
     end
   end
+  object bbtnCancel: TBitBtn
+    Left = 461
+    Top = 285
+    Width = 75
+    Height = 25
+    Anchors = [akRight, akBottom]
+    TabOrder = 1
+    Kind = bkCancel
+  end
+  object bbtnOK: TBitBtn
+    Left = 380
+    Top = 285
+    Width = 75
+    Height = 25
+    Anchors = [akRight, akBottom]
+    TabOrder = 2
+    Kind = bkOK
+  end
   object CheckedImages: TImageList
-    Left = 44
-    Top = 60
+    Left = 50
+    Top = 48
     Bitmap = {
       494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010

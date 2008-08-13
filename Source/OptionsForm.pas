@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    12 Aug 2008
+  @Date    13 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -23,7 +23,6 @@ type
   (** This class represents an options dialogue where the user can change the
       display options of the application. **)
   TfrmOptions = class(TForm)
-    BottomPanel: TPanel;
     bbtnOK: TBitBtn;
     bbtnCancel: TBitBtn;
     OptionTab: TPageControl;
@@ -45,6 +44,22 @@ type
     edtUpdateInterval: TEdit;
     udUpdateInterval: TUpDown;
     CheckedImages: TImageList;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    lblFontName: TLabel;
+    cbxFontName: TComboBox;
+    lblFontSize: TLabel;
+    edtFontSize: TEdit;
+    udFontSize: TUpDown;
+    lbxTokenTypes: TListBox;
+    lblTokenTypes: TLabel;
+    cbxFontColour: TColorBox;
+    gbxFontStyles: TGroupBox;
+    chkBold: TCheckBox;
+    chkItalic: TCheckBox;
+    chkUnderline: TCheckBox;
+    chkStrikeout: TCheckBox;
+    rgpBrowsePosition: TRadioGroup;
     procedure btnAddClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
     procedure btnEditClick(Sender: TObject);
@@ -52,9 +67,16 @@ type
     procedure btnMoveDownClick(Sender: TObject);
     procedure lbSpecialTagsDrawItem(Control: TWinControl; Index: Integer;
       Rect: TRect; State: TOwnerDrawState);
+    procedure FormCreate(Sender: TObject);
+    procedure lbxTokenTypesClick(Sender: TObject);
+    procedure cbxFontColourChange(Sender: TObject);
+    procedure chkBoldClick(Sender: TObject);
+    procedure chkItalicClick(Sender: TObject);
+    procedure chkUnderlineClick(Sender: TObject);
+    procedure chkStrikeoutClick(Sender: TObject);
     { Private declarations }
-  private
-    FUpdateInterval: Cardinal;
+  Private
+    FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
   public
     { Public declarations }
     Class Function Execute : Boolean;
@@ -89,6 +111,7 @@ Class Function TfrmOptions.Execute : Boolean;
 Var
   i : TDocOption;
   j : Integer;
+  k : TTokenType;
 
 Begin
   Result := False;
@@ -102,9 +125,19 @@ Begin
       For j := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
         lbSpecialTags.Items.AddObject(BrowseAndDocItOptions.SpecialTags[j],
           BrowseAndDocItOptions.SpecialTags.Objects[j]);
-      udUpdateInterval.Position := FUpdateInterval;
+      udUpdateInterval.Position := BrowseAndDocItOptions.UpdateInterval;
       If FileExists(BrowseAndDocItOptions.DocHelpFile) Then
         HelpFileDir.Directory := BrowseAndDocItOptions.DocHelpFile;
+      For j := 0 To cbxFontName.Items.Count - 1 Do
+        If cbxFontName.Items[j] = BrowseAndDocItOptions.FontName Then
+          Begin
+            cbxFontName.ItemIndex := j;
+            Break;
+          End;
+      For k := Low(TTokenType) to High(TTokenType) Do
+        FTokenFontInfo[k] := BrowseAndDocItOptions.TokenFontInfo[k];
+      udFontSize.Position := BrowseAndDocItOptions.FontSize;
+      rgpBrowsePosition.ItemIndex := Integer(BrowseAndDocItOptions.BrowsePosition);
       If ShowModal = mrOK Then
         Begin
           Result := True;
@@ -116,14 +149,43 @@ Begin
           For j := 0 To lbSpecialTags.Items.Count - 1 Do
             BrowseAndDocItOptions.SpecialTags.AddObject(lbSpecialTags.Items[j],
             lbSpecialTags.Items.Objects[j]);
-          FUpdateInterval := udUpdateInterval.Position;
+          BrowseAndDocItOptions.UpdateInterval := udUpdateInterval.Position;
           BrowseAndDocItOptions.DocHelpFile := HelpFileDir.Directory;
+          BrowseAndDocItOptions.FontName := cbxFontName.Text;
+          BrowseAndDocItOptions.FontSize := udFontSize.Position;
+          For k := Low(TTokenType) to High(TTokenType) Do
+            BrowseAndDocItOptions.TokenFontInfo[k] := FTokenFontInfo[k];
+          BrowseAndDocItOptions.BrowsePosition := TBrowsePosition(rgpBrowsePosition.ItemIndex);
           BrowseAndDocItOptions.SaveSettings;
         End;
     Finally
       Free;
     End;
 End;
+
+(**
+
+  This is an on create event handler for the form.
+
+  @precon  None.
+  @postcon Initialises the font names drop down with font names.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.FormCreate(Sender: TObject);
+
+Var
+  i : Integer;
+  j : TTokenType;
+
+begin
+  For i := 0 To Screen.Fonts.Count - 1 Do
+    cbxFontName.Items.Add(Screen.Fonts[i]);
+  For j := Low(TTokenType) to High(TTokenType) Do
+    lbxTokenTypes.Items.Add(strTokenType[j]);
+  lbxTokenTypes.ItemIndex := 0;
+end;
 
 (**
 
@@ -150,14 +212,37 @@ Var
 begin
   lb := Control As TListBox;
   lb.Canvas.FillRect(Rect);
-  CheckedImages.Draw(lb.Canvas, 32, lb.ItemHeight * Index,
+  CheckedImages.Draw(lb.Canvas, 32, Rect.Top,
     Integer(lb.Items.Objects[Index]) And iShowInTree);
-  CheckedImages.Draw(lb.Canvas, 112, lb.ItemHeight * Index,
+  CheckedImages.Draw(lb.Canvas, 112, Rect.Top,
     (Integer(lb.Items.Objects[Index]) And iAutoExpand) Div 2);
   iPos := Pos('=', lb.Items[Index]);
   lb.Canvas.TextOut(Rect.Left + 160, Rect.Top, Copy(lb.Items[Index], 1, iPos - 1));
   lb.Canvas.TextOut(Rect.Left + 260, Rect.Top, Copy(lb.Items[Index], iPos + 1,
     Length(lb.Items[Index]) - iPos));
+end;
+
+(**
+
+  This is an on click event handler for the token type list box control.
+
+  @precon  None.
+  @postcon Sets the Font Colour and style controls.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.lbxTokenTypesClick(Sender: TObject);
+begin
+  With lbxTokenTypes Do
+    If ItemIndex > -1 Then
+      Begin
+        cbxFontColour.Selected := FTokenFontInfo[TTokenType(itemIndex)].FColour;
+        chkBold.Checked := fsBold In FTokenFontInfo[TTokenType(itemIndex)].FStyles;
+        chkItalic.Checked := fsItalic In FTokenFontInfo[TTokenType(itemIndex)].FStyles;
+        chkUnderline.Checked := fsUnderline In FTokenFontInfo[TTokenType(itemIndex)].FStyles;
+        chkStrikeout.Checked := fsStrikeout In FTokenFontInfo[TTokenType(itemIndex)].FStyles;
+      End;
 end;
 
 (**
@@ -264,6 +349,93 @@ begin
   If lbSpecialTags.ItemIndex > 0 Then
     lbSpecialTags.Items.Exchange(lbSpecialTags.ItemIndex,
       lbSpecialTags.ItemIndex - 1);
+end;
+
+(**
+
+  This is an on change event handler for the Font Colour control.
+
+  @precon  None.
+  @postcon Updates the internal list of Token Font Information.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.cbxFontColourChange(Sender: TObject);
+begin
+  FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FColour := cbxFontColour.Selected;
+end;
+
+(**
+
+  This is an on click event handler for the bold check box.
+
+  @precon  None.
+  @postcon Includes or Excludes the Bold option in the token font info style.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.chkBoldClick(Sender: TObject);
+begin
+  If chkBold.Checked Then
+    Include(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsBold)
+  Else
+    Exclude(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsBold);
+end;
+
+(**
+
+  This is an on click event handler for the italic check box.
+
+  @precon  None.
+  @postcon Includes or Excludes the Italic option in the token font info style.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.chkItalicClick(Sender: TObject);
+begin
+  If chkItalic.Checked Then
+    Include(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsItalic)
+  Else
+    Exclude(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsItalic);
+end;
+
+(**
+
+  This is an on click event handler for the Strikeout check box.
+
+  @precon  None.
+  @postcon Includes or Excludes the Strikeout option in the token font info style.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.chkStrikeoutClick(Sender: TObject);
+begin
+  If chkStrikeout.Checked Then
+    Include(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsStrikeOut)
+  Else
+    Exclude(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsStrikeOut);
+end;
+
+(**
+
+  This is an on click event handler for the Underline check box.
+
+  @precon  None.
+  @postcon Includes or Excludes the Underline option in the token font info style.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.chkUnderlineClick(Sender: TObject);
+begin
+  If chkUnderline.Checked Then
+    Include(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsUnderline)
+  Else
+    Exclude(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsUnderline);
 end;
 
 (**

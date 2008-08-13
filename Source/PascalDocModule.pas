@@ -7723,9 +7723,6 @@ End;
  **)
 Procedure TClassDecl.CheckDocumentation(var boolCascade : Boolean);
 
-Var
-  i : Integer;
-
 Begin
   If (Comment = Nil) Or (Comment.TokenCount = 0) Then
     Begin

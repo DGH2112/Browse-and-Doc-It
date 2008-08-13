@@ -165,7 +165,7 @@ Const
   (** A list of vowels. **)
   strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
   (** A constant array of outputs for the ArrayOf property. **)
-  strArrayOf : Array[False..True] Of String = ('', 'Array Of');
+  strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
 
 Var
   (** This is an index for the wizard when register with the ide. Its required
@@ -795,7 +795,7 @@ begin
         Result := #32#32#10#13#10#13;
     End Else
     Begin
-      Result := Format('[%s]'#10#13#10#13, [AComment.AsString(iIndent, 80, True)]);
+      Result := Format('%s'#10#13#10#13, [AComment.AsString(iIndent, 80, True)]);
       boolCon := False;
       i := AComment.FindTag('precon');
       If i > -1 Then

@@ -6089,7 +6089,7 @@ begin
                 If O.Elements[j] Is TPascalMethod Then
                   Begin
                     M := O.Elements[j] As TPascalMethod;
-                    If Not M.Resolved And Not M.ForwardDecl Then
+                    If Not M.Resolved And Not M.HasDirective('virtual') Then
                       AddError(TDocError.Create(Format(strUnSatisfiedForwardReference,
                         [C.Identifier + '.' + M.Identifier]), scNone, 'CheckUnResolvedMethods', M.Line,
                         M.Column, etError));

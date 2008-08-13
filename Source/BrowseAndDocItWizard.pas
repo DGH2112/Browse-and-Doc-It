@@ -6,6 +6,8 @@
   @Date    13 Aug 2008
   @Version 1.0
 
+  @todo    If there are no error from the parser add any IDE errors.
+
 **)
 Unit BrowseAndDocItWizard;
 
@@ -708,8 +710,7 @@ begin
     End;
   // Block Header
   Writer.Insert('(**'#10#13#10#13);
-  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) +
-    GetMethodDescription(Method, AComment, CharPos.CharIndex - 1 + 2)));
+  Writer.Insert(PChar(GetMethodDescription(Method, AComment, CharPos.CharIndex - 1 + 2)));
   // Output method information
   iLen := 0;
   For i := 0 To Method.ParameterCount - 1 Do
@@ -794,7 +795,7 @@ begin
         Result := #32#32#10#13#10#13;
     End Else
     Begin
-      Result := Format('%s'#10#13#10#13, [AComment.AsString(iIndent, 80, True)]);
+      Result := Format('[%s]'#10#13#10#13, [AComment.AsString(iIndent, 80, True)]);
       boolCon := False;
       i := AComment.FindTag('precon');
       If i > -1 Then
@@ -1020,8 +1021,7 @@ Begin
       Writer.CopyTo(iBufferPos - 1);
     End;
   Writer.Insert(PChar('(**'#13#10));
-  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) +
-    GetPropertyDescription(Prop, AComment, CharPos.CharIndex - 1)));
+  Writer.Insert(PChar(GetPropertyDescription(Prop, AComment, CharPos.CharIndex - 1 + 2)));
   iLen := 0;
   For i := 0 To Prop.ParameterCount - 1 Do
     If iLen < Length(Prop.Parameters[i].Identifier) Then

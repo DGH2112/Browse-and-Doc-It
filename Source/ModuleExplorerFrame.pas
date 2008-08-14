@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    12 Aug 2008
+  @Date    14 Aug 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -75,13 +75,16 @@ type
 
   (** This is a custom hint window for displaying hints about the tree view
       items. Its customisation support the syntax highlighting custom draw
-      support of the tree view. **)
+      support of the tree view.
+  **)
   TCustomHintWindow = Class(THintWindow)
   Private
     FComment : TComment;
     FNodeLevel : Integer;
     FCustomDraw : Boolean;
+    FTreeView: TTreeView;
   Public
+    Constructor Create(AOwner : TComponent; ATreeView : TTreeView); ReIntroduce;
     Procedure Paint; Override;
     Function CalcHintRect(MinWidth, MaxWidth : Integer; Node : TTreeNode;
       SyntaxHighlight : Boolean; Comment : TComment) : TRect; Reintroduce; Overload;
@@ -367,24 +370,40 @@ Begin
       Refresh;
       If Level <> 1 Then
         Begin
-          Font.Color := clNavy;
-          Font.Style := [];
           Case TTokenType(sl.Objects[i]) Of
-            ttReservedWord, ttDirective :
+            ttIdentifier:
               Begin
-                Font.Style := [fsBold];
-                Font.Color := clBlack;
+                Font.Color := BrowseAndDocItOptions.TokenFontInfo[ttIdentifier].FColour;
+                Font.Style := BrowseAndDocItOptions.TokenFontInfo[ttIdentifier].FStyles;
               End;
-            ttSymbol, ttNumber :
+            ttReservedWord:
               Begin
-                Font.Style := [];
-                Font.Color := clGreen;
+                Font.Color := BrowseAndDocItOptions.TokenFontInfo[ttReservedWord].FColour;
+                Font.Style := BrowseAndDocItOptions.TokenFontInfo[ttReservedWord].FStyles;
+              End;
+            ttDirective :
+              Begin
+                Font.Color := BrowseAndDocItOptions.TokenFontInfo[ttDirective].FColour;
+                Font.Style := BrowseAndDocItOptions.TokenFontInfo[ttDirective].FStyles;
+              End;
+            ttSymbol :
+              Begin
+                Font.Color := BrowseAndDocItOptions.TokenFontInfo[ttSymbol].FColour;
+                Font.Style := BrowseAndDocItOptions.TokenFontInfo[ttSymbol].FStyles;
+              End;
+            ttNumber :
+              Begin
+                Font.Color := BrowseAndDocItOptions.TokenFontInfo[ttNumber].FColour;
+                Font.Style := BrowseAndDocItOptions.TokenFontInfo[ttNumber].FStyles;
               End;
             ttStringLiteral :
               Begin
-                Font.Style := [fsBold];
-                Font.Color := clTeal;
+                Font.Color := BrowseAndDocItOptions.TokenFontInfo[ttStringLiteral].FColour;
+                Font.Style := BrowseAndDocItOptions.TokenFontInfo[ttStringLiteral].FStyles;
               End;
+          Else
+            Font.Color := clBlack;
+            Font.Style := [];
           End;
         End Else
         Begin
@@ -453,7 +472,7 @@ begin
   Inherited;
   FINIFileName := BuildRootKey(Nil, Nil);
   FNodeInfo := TObjectList.Create(True);
-  FHintWin := TCustomHintWindow.Create(Self);
+  FHintWin := TCustomHintWindow.Create(Self, tvExplorer);
   FHintWin.Color := clInfoBk;
   FHintWin.Canvas.Font.Assign(tvExplorer.Font);
   ilScopeImages.Clear;
@@ -716,6 +735,8 @@ Begin
     FHintWin.ReleaseHandle; // Stop AV when refreshing the tree.
     With tvExplorer Do
       Begin
+        Font.Name := BrowseAndDocItOptions.FontName;
+        Font.Size := BrowseAndDocItOptions.FontSize;
         GetExpandedNodes;
         // Find and store the top item and the selected item in the tree view
         strTop := '';
@@ -923,7 +944,7 @@ end;
   This is an on update event handler for the sceop actions.
 
   @precon  None.
-  @postcon Checks the action depending on the scopes in ScopesToRender. 
+  @postcon Checks the action depending on the scopes in ScopesToRender.
 
   @param   Sender as a TObject
 
@@ -1131,7 +1152,7 @@ begin
             Begin
               GetFontInfo(sl, i, Node.Level, Sender.Canvas);
               TextOut(iPos, NodeRect.Top + 1, sl[i]);
-              Inc(iPos, TextWidth(sl[i]));
+              Inc(iPos, TextWidth(sl[i]) + 1);
             End;
         Finally
           sl.Free;
@@ -1241,6 +1262,7 @@ Begin
   iLine := 0;
   With Canvas Do
     Begin
+      Font.Assign(FTreeView.Font);
       sl := Tokenize(Caption);
       Try
         iPos := 2;
@@ -1261,7 +1283,7 @@ Begin
               End;
             iLine := (iLines - 1) * TextHeight(sl[i]);
             TextOut(iPos, iLine, sl[i]);
-            Inc(iPos, TextWidth(sl[i]));
+            Inc(iPos, TextWidth(sl[i]) + 1);
           End;
       Finally
         sl.Free;
@@ -1350,6 +1372,7 @@ Var
   R : TRect;
 
 Begin
+  Canvas.Font.Assign(FTreeView.Font);
   Result := Node.DisplayRect(True);
   iMaxPos := Node.TreeView.ScreenToClient(Point(Screen.WorkAreaRect.Right, 0)).X -
     Result.Left;
@@ -1363,7 +1386,7 @@ Begin
         For i := 0 To sl.Count - 1 Do
           Begin
             GetFontInfo(sl, i, Node.Level, Canvas);
-            Inc(iPos, Canvas.TextWidth(sl[i]));
+            Inc(iPos, Canvas.TextWidth(sl[i]) + 1);
             If iPos > iMaxPos Then
               Begin
                 Inc(Result.Bottom, Canvas.TextHeight(sl[i]) + 2);
@@ -1420,6 +1443,25 @@ Begin
         End;
     End;
 End;
+
+(**
+
+
+  This is the constructor method for the TCustomHintWindow class.
+
+  @precon  ATreeView must be a valid instance of the explorer treeview.
+  @postcon Ensures the hint can get the treeviews font information.
+
+
+  @param   AOwner    as a TComponent
+  @param   ATreeView as a TTreeView
+
+**)
+constructor TCustomHintWindow.Create(AOwner : TComponent; ATreeView: TTreeView);
+begin
+  Inherited Create(AOwner);
+  FTreeView := ATreeView;
+end;
 
 (**
 
@@ -1519,12 +1561,16 @@ end;
 
 (**
 
-  This method is an on key down event handler for the tree view. 
 
-  @precon  None. 
-  @postcon If an on focus event handler is assigned it is fired. 
+  This method is an on key down event handler for the tree view. 
 
-  @param   Sender as a TObject
+
+  @precon  None. 
+
+  @postcon If an on focus event handler is assigned it is fired. 
+
+
+  @param   Sender as a TObject
   @param   Key    as a Char as a reference
 
 **)

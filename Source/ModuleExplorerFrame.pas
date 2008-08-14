@@ -1256,6 +1256,7 @@ Var
   str : String;
   iLines : Integer;
   iLine : Integer;
+  iHeight: Integer;
 
 Begin
   iLines := 1;
@@ -1291,19 +1292,20 @@ Begin
       If (FComment <> Nil) And ((FComment.TokenCount > 0) Or
         (FComment.TagCount > 0)) Then
         Begin
-          FillRect(Rect(0, 15 + iLine, Width, Height));
+          iHeight := TextHeight('Wp');
+          FillRect(Rect(0, iHeight + 2 + iLine, Width, Height));
           Pen.Color := clMaroon;
-          MoveTo(0, 15 + iLine);
-          Lineto(Width, 15 + iLine);
+          MoveTo(0, iHeight + 4 + iLine);
+          Lineto(Width, iHeight + 4 + iLine);
           Refresh;
           Font.Style := [];
           Font.Color := clNavy;
           str := FComment.AsString(0, MaxInt, False);
-          R := Rect(2, 17 + iLine, Width - 2, Height);
+          R := Rect(2, iHeight + 6 + iLine, Width - 2, Height);
           iPos := DrawText(Canvas.Handle, PChar(str), -1, R,
             DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
             DrawTextBiDiModeFlagsReadingOnly);
-          R := Rect(2, 17 + iLine + iPos, Width - 4, Height);
+          R := Rect(2, iHeight + 6 + iLine + iPos, Width - 4, Height);
           For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
             Begin
               If DrawSpecialTag(FComment, BrowseAndDocItOptions.SpecialTags.Names[i]) Then

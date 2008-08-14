@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       13 Aug 2008
+  @Date       14 Aug 2008
   @Author     David Hoyle
 
 **)
@@ -598,6 +598,7 @@ Type
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
       ModuleOptions : TModuleOptions);
     Function KeyWords : TKeyWords; Override;
+    Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
   End;
 
 Implementation
@@ -7818,5 +7819,146 @@ Begin
         DocConflictTable[dctMissingFinalComment]);
   Inherited CheckDocumentation(boolCascade);
 End;
+
+(**
+
+  This method processes a compiler directive looking for conditional statements.
+
+  @precon  None.
+  @postcon Processes a compiler directive looking for conditional statements.
+
+  @param   iSkip as an Integer as a reference
+
+**)
+procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
+
+  (**
+
+    This function returns the definition string from the current compiler
+    directive.
+
+    @precon  None.
+    @postcon Returns the definition as a string.
+
+    @return  a String
+
+  **)
+  Function GetDef : String;
+
+  Begin
+    Result := Trim(Copy(Token.Token, 9, Length(Token.Token) - 9));
+  End;
+
+  (**
+
+    This function checks to see if the string of text starts with the passed
+    start string.
+
+    @precon  None.
+    @postcon Returns true if the string starts match.
+
+    @param   strText  as a String
+    @param   strStart as a String
+    @return  a Boolean 
+
+  **)
+  Function Like(strText, strStart : String) : Boolean;
+
+  Begin
+    Result := False;
+    If Length(strText) >= Length(strStart) Then
+    Result := AnsiCompareText(Copy(strText, 1, Length(strStart)), strStart) = 0;
+  End;
+
+  (**
+
+    This method adds the number to the stack and increments the iSkip variable
+    by the value passed.
+
+    @precon  None.
+    @postcon Adds the number to the stack and increments the iSkip variable
+             by the value passed.
+
+    @param   iValue as an Integer
+
+  **)
+  Procedure AddToStackAndInc(iValue : Integer);
+
+  Begin
+    CompilerConditionStack.Add(Pointer(iValue));
+    Inc(iSkip, iValue);
+  End;
+
+Var
+  iStack, iStackTop : Integer;
+
+begin
+  If Like(Token.Token, '{$DEFINE') Then
+    AddDef(GetDef)
+  Else If Like(Token.Token, '{$UNDEF') Then
+    DeleteDef(GetDef)
+  Else If Like(Token.Token, '{$IFDEF') Then
+    Begin
+      If Not IfDef(GetDef) Then
+        AddToStackAndInc(1)
+      Else
+        AddToStackAndInc(0);
+    End
+  Else If Like(Token.Token, '{$IFOPT') Then
+    Begin
+      If Not IfDef(GetDef) Then
+        AddToStackAndInc(1)
+      Else
+        AddToStackAndInc(0);
+    End
+  Else If Like(Token.Token, '{$IFNDEF') Then
+    Begin
+      If Not IfNotDef(GetDef) Then
+        AddToStackAndInc(1)
+      Else
+        AddToStackAndInc(0);
+    End
+  Else If Like(Token.Token, '{$ELSE') Then
+    Begin
+      iStackTop := CompilerConditionStack.Count;
+      If iStackTop > 0 Then
+        Begin
+          iStack := Integer(CompilerConditionStack[iStackTop - 1]);
+          If iStack = 1 Then
+            Begin
+              CompilerConditionStack[iStackTop - 1] := Pointer(0);
+              Dec(iSkip)
+            End Else
+            Begin
+              CompilerConditionStack[iStackTop - 1] := Pointer(1);
+              Inc(iSkip);
+            End;
+        End Else
+          Add(
+            TDocError.Create(
+              Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
+              scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column,
+              etWarning)
+          );
+    End
+  Else If Like(Token.Token, '{$ENDIF') Then
+    Begin
+      iStackTop := CompilerConditionStack.Count;
+      If iStackTop > 0 Then
+        Begin
+          iStack := Integer(CompilerConditionStack[iStackTop - 1]);
+          If iStack = 1 Then
+            Dec(iSkip);
+          CompilerConditionStack.Delete(iStackTop - 1);
+        End Else
+          Add(
+            TDocError.Create(
+              Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
+              scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etWarning)
+          );
+    End;
+  If iSkip < 0 Then
+    iSkip := 0;
+end;
 
 End.

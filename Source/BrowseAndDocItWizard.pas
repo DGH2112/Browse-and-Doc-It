@@ -3,10 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    13 Aug 2008
+  @Date    14 Aug 2008
   @Version 1.0
-
-  @todo    If there are no error from the parser add any IDE errors.
 
 **)
 Unit BrowseAndDocItWizard;
@@ -1363,8 +1361,10 @@ Var
   iPosition : Integer;
   iRead : Integer;
   M : TBaseLanguageModule;
-  strExt : String;
   Options : IOTAProjectOptions;
+  E : IOTAModuleErrors;
+  i : Integer;
+  Es : TOTAErrors;
 
 begin
   If (Application <> Nil) And (Application.MainForm <> Nil) And
@@ -1375,39 +1375,42 @@ begin
         SourceEditor := ActiveSourceEditor;
         If SourceEditor <> Nil Then
           Begin
-            strExt := UpperCase(ExtractFileExt(SourceEditor.FileName));
-            If (strExt = '.PAS') Or (strExt = '.DPR') Or (strExt = '.DPK') Then
+            If ActiveProject <> Nil Then
               Begin
-                If ActiveProject <> Nil Then
-                  Begin
-                    Options := ActiveProject.ProjectOptions;
-                    BrowseAndDocItOptions.Defines.Text :=
-                      StringReplace(Options.Values['Defines'], ';', #13#10,
-                      [rfReplaceAll]);
-                  End;
-                DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
-                Reader := SourceEditor.CreateReader;
-                Try
-                  iPosition := 0;
-                  Repeat
-                    iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
-                    objMemStream.WriteBuffer(Buffer, iRead);
-                    Inc(iPosition, iRead);
-                  Until iRead < iBufferSize;
-                Finally
-                  Reader := Nil;
-                End;
-                objMemStream.Position := 0;
-                M := Dispatcher(objMemStream, SourceEditor.FileName,
-                  SourceEditor.Modified, [moParse, moCheckForDocumentConflicts]);
-                With M Do
-                  Try
-                    TfrmDockableModuleExplorer.RenderDocumentTree(M);
-                  Finally
-                    Free;
-                  End;
-              End Else
-                TfrmDockableModuleExplorer.RenderDocumentTree(Nil);
+                Options := ActiveProject.ProjectOptions;
+                BrowseAndDocItOptions.Defines.Text :=
+                  StringReplace(Options.Values['Defines'], ';', #13#10,
+                  [rfReplaceAll]);
+              End;
+            DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
+            Reader := SourceEditor.CreateReader;
+            Try
+              iPosition := 0;
+              Repeat
+                iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
+                objMemStream.WriteBuffer(Buffer, iRead);
+                Inc(iPosition, iRead);
+              Until iRead < iBufferSize;
+            Finally
+              Reader := Nil;
+            End;
+            objMemStream.Position := 0;
+            M := Dispatcher(objMemStream, SourceEditor.FileName,
+              SourceEditor.Modified, [moParse, moCheckForDocumentConflicts]);
+            Try
+              If M <> Nil Then
+                If M.FindElement(strErrorsAndWarnings) = Nil Then
+                  If SourceEditor.Module.QueryInterface(IOTAModuleErrors, E) = S_OK Then
+                    Begin
+                      Es := E.GetErrors;
+                      For i := Low(Es) to High(Es) Do
+                        M.AddError(TDocError.Create(Es[i].Text, scNone, 'IDE',
+                          Es[i].Start.Line, Es[i].Start.CharIndex + 1, etError));
+                    End;
+              TfrmDockableModuleExplorer.RenderDocumentTree(M);
+            Finally
+              M.Free;
+            End;
           End;
       Finally
         objMemStream.Free;

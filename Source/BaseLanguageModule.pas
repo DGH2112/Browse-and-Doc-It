@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    13 Aug 2008
+  @Date    14 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -1035,6 +1035,7 @@ Type
     FCompilerDefs : TStringList;
     FPreviousTokenIndex : TTokenIndex;
     FCompilerConditionStack : TList;
+    FLastComment: TTokenInfo;
   Protected
     Function GetTokenCount : Integer;
     Function GetTokenInfo(iIndex : TTokenIndex) : TTokenInfo;
@@ -1054,10 +1055,9 @@ Type
     Function GetComment(
       CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
     Procedure SetTokenIndex(iIndex : TTokenIndex);
-    Procedure GetBodyCmt;
     Procedure AddToken(AToken : TTokenInfo);
     procedure AppendToLastToken(strToken : String);
-    procedure ProcessCompilerDirective(var iSkip : Integer);
+    procedure ProcessCompilerDirective(var iSkip : Integer); Virtual; Abstract;
     Function GetModuleName : String; Virtual;
     (**
       Returns a refernce the to owned items collection. This is used to manage
@@ -1224,6 +1224,14 @@ Type
       @return  a Boolean
     **)
     Property Modified : Boolean Read FModified;
+    (**
+      This property defines a compiler condition stack for use in the
+      ProcessCompilerDefintions method.
+      @precon  None.
+      @postcon Provides access to the compiler condition stack.
+      @return  a TList
+    **)
+    Property CompilerConditionStack : TList Read FCompilerConditionStack;
   End;
 
   (** This enumerate define the position of the editor when an item is selected
@@ -1299,9 +1307,12 @@ Type
       This property determines the amount of time in milliseonds between the 
       last editor update and the next refresh. Interval only, the application 
       needs to implement the logic. 
-      @precon  None. 
-      @postcon Gets and sets the update interval. 
-      @return  a Cardinal
+
+      @precon  None. 
+
+      @postcon Gets and sets the update interval. 
+
+      @return  a Cardinal
     **)
     Property UpdateInterval : Cardinal Read FUpdateInterval Write FUpdateInterval;
     (**
@@ -1336,9 +1347,12 @@ Type
     (**
       This property determines the colour and style attribute of a token in the
       module explorer
-      @precon  None.
-      @postcon Gets and sets the colour and style of the token.
-      @param   ATokenType as     a TTokenType
+
+      @precon  None.
+
+      @postcon Gets and sets the colour and style of the token.
+
+      @param   ATokenType as     a TTokenType
       @return  a TTokenFontInfo
     **)
     Property TokenFontInfo[ATokenType : TTokenType] : TTokenFontInfo Read
@@ -2337,15 +2351,21 @@ Var
 
 (**
 
-  This function returns true if the given word is in the supplied word list.
+
+  This function returns true if the given word is in the supplied word list.
   It uses a binary search, so the word lists need to be sorted.
 
-  @precon  strWord is the word to be searches for in the word list and
-           strWordList is a static array of words in lowercase and
-           alphabetical order.
-  @postcon Returns true if the word is found in the list.
 
-  @param   strWord     as a String
+  @precon  strWord is the word to be searches for in the word list and
+
+           strWordList is a static array of words in lowercase and
+
+           alphabetical order.
+
+  @postcon Returns true if the word is found in the list.
+
+
+  @param   strWord     as a String
   @param   strWordList as an Array Of String
   @return  a Boolean
 
@@ -2404,13 +2424,18 @@ End;
 
 (**
 
-  This method added the strToken to the tags token list with type iType.
 
-  @precon  strToken is a string to be added as a token and iType is the token
-           type of the token.
-  @postcon Adds the token to the internal list.
+  This method added the strToken to the tags token list with type iType.
 
-  @param   strToken as a String
+
+  @precon  strToken is a string to be added as a token and iType is the token
+
+           type of the token.
+
+  @postcon Adds the token to the internal list.
+
+
+  @param   strToken as a String
   @param   iType    as a TTokenType
 
 **)
@@ -2718,16 +2743,23 @@ End;
 
 (**
 
-  This is the TComment constructor. It create a token list and a tag list. Then
+
+  This is the TComment constructor. It create a token list and a tag list. Then
   it passes the comment to the comment parser.
 
-  @precon  strComment is a string of text to be parsed as a comment, iLine is
-           the line number of the comment and iCol is the column number of
-           the comment.
-  @postcon It create a token list and a tag list. Then it passes the comment to
-           the comment parser.
 
-  @param   strComment as a String
+  @precon  strComment is a string of text to be parsed as a comment, iLine is
+
+           the line number of the comment and iCol is the column number of
+
+           the comment.
+
+  @postcon It create a token list and a tag list. Then it passes the comment to
+
+           the comment parser.
+
+
+  @param   strComment as a String
   @param   iLine      as an Integer
   @param   iCol       as an Integer
 
@@ -2746,17 +2778,24 @@ end;
 
 (**
 
-  This method is a class method to first check the comment for being a
+
+  This method is a class method to first check the comment for being a
   documentation comment and then creating an instance of a TComment class and
   parsing the comment via the constructor.
 
-  @precon  strComment is the full comment to be checked and parsed, iLine is
-           the line number of the comment and iCol is the column number of
-           the comment.
-  @postcon Returns Nil if this is not a documentation comment or returns a
-           valid TComment class.
 
-  @param   strComment as a String
+  @precon  strComment is the full comment to be checked and parsed, iLine is
+
+           the line number of the comment and iCol is the column number of
+
+           the comment.
+
+  @postcon Returns Nil if this is not a documentation comment or returns a
+
+           valid TComment class.
+
+
+  @param   strComment as a String
   @param   iLine      as an Integer
   @param   iCol       as an Integer
   @return  a TComment
@@ -4439,35 +4478,6 @@ begin
   Result := ExtractFileName(Name);
 end;
 
-
-(**
-
-  This method tries to get a body comment from the previous token in the token
-  list and add it to the body comment list.
-
-  @precon  None.
-  @postcon Tries to get a body comment from the previous token in the token
-           list and add it to the body comment list.
-
-**)
-Procedure TBaseLanguageModule.GetBodyCmt;
-
-Var
-  T : TTokenInfo;
-  C : TComment;
-
-Begin
-  If FTokenIndex - 1 > -1 Then
-    Begin
-      T := FTokens[FTokenIndex - 1] As TTokenInfo;
-      If T.TokenType = ttComment Then
-        Begin
-          C := TComment.CreateComment(T.Token, T.Line, T.Column);
-          If C <> Nil Then BodyComments.Add(C);
-        End;
-    End;
-End;
-
 (**
 
   This is a getter method for the BodyComment property.
@@ -4704,11 +4714,14 @@ begin
   If Token.TokenType = ttCompilerDirective Then // Catch first token as directive
     ProcessCompilerDirective(iSkip);
   Repeat
-    If Token.TokenType = ttComment Then
+    If (Token.TokenType = ttComment) And (FLastComment <> Token) Then
       Begin
         C := TComment.CreateComment(Token.Token, Token.Line, Token.Column);
         If C <> Nil Then
-          BodyComments.Add(C);
+          Begin
+            BodyComments.Add(C);
+            FLastComment := Token;
+          End;
       End;
     If Not (TokenInfo[FTokenIndex].TokenType In [ttComment, ttCompilerDirective])
       And (iSkip = 0) Then
@@ -4723,150 +4736,7 @@ begin
       Not EndOfTokens
     ) Or (iSkip > 0)
   Until Not boolContinue;
-    //NextToken;
 end;
-
-(**
-
-  This method processes a compiler directive looking for conditional statements.
-
-  @precon  None.
-  @postcon Processes a compiler directive looking for conditional statements.
-
-  @param   iSkip as an Integer as a reference
-
-**)
-procedure TBaseLanguageModule.ProcessCompilerDirective(var iSkip : Integer);
-
-  (**
-
-    This function returns the definition string from the current compiler
-    directive.
-
-    @precon  None.
-    @postcon Returns the definition as a string.
-
-    @return  a String
-
-  **)
-  Function GetDef : String;
-
-  Begin
-    Result := Trim(Copy(Token.Token, 9, Length(Token.Token) - 9));
-  End;
-
-  (**
-
-    This function checks to see if the string of text starts with the passed
-    start string.
-
-    @precon  None.
-    @postcon Returns true if the string starts match.
-
-    @param   strText  as a String
-    @param   strStart as a String
-    @return  a Boolean 
-
-  **)
-  Function Like(strText, strStart : String) : Boolean;
-
-  Begin
-    Result := False;
-    If Length(strText) >= Length(strStart) Then
-    Result := AnsiCompareText(Copy(strText, 1, Length(strStart)), strStart) = 0;
-  End;
-
-  (**
-
-    This method adds the number to the stack and increments the iSkip variable
-    by the value passed.
-
-    @precon  None.
-    @postcon Adds the number to the stack and increments the iSkip variable
-             by the value passed.
-
-    @param   iValue as an Integer
-
-  **)
-  Procedure AddToStackAndInc(iValue : Integer);
-
-  Begin
-    FCompilerConditionStack.Add(Pointer(iValue));
-    Inc(iSkip, iValue);
-  End;
-
-Var
-  iStack, iStackTop : Integer;
-
-begin
-  If Like(Token.Token, '{$DEFINE') Then
-    AddDef(GetDef)
-  Else If Like(Token.Token, '{$UNDEF') Then
-    DeleteDef(GetDef)
-  Else If Like(Token.Token, '{$IFDEF') Then
-    Begin
-      If Not IfDef(GetDef) Then
-        AddToStackAndInc(1)
-      Else
-        AddToStackAndInc(0);
-    End
-  Else If Like(Token.Token, '{$IFOPT') Then
-    Begin
-      If Not IfDef(GetDef) Then
-        AddToStackAndInc(1)
-      Else
-        AddToStackAndInc(0);
-    End
-  Else If Like(Token.Token, '{$IFNDEF') Then
-    Begin
-      If Not IfNotDef(GetDef) Then
-        AddToStackAndInc(1)
-      Else
-        AddToStackAndInc(0);
-    End
-  Else If Like(Token.Token, '{$ELSE') Then
-    Begin
-      iStackTop := FCompilerConditionStack.Count;
-      If iStackTop > 0 Then
-        Begin
-          iStack := Integer(FCompilerConditionStack[iStackTop - 1]);
-          If iStack = 1 Then
-            Begin
-              FCompilerConditionStack[iStackTop - 1] := Pointer(0);
-              Dec(iSkip)
-            End Else
-            Begin
-              FCompilerConditionStack[iStackTop - 1] := Pointer(1);
-              Inc(iSkip);
-            End;
-        End Else
-          Add(
-            TDocError.Create(
-              Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
-              scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column,
-              etWarning)
-          );
-    End
-  Else If Like(Token.Token, '{$ENDIF') Then
-    Begin
-      iStackTop := FCompilerConditionStack.Count;
-      If iStackTop > 0 Then
-        Begin
-          iStack := Integer(FCompilerConditionStack[iStackTop - 1]);
-          If iStack = 1 Then
-            Dec(iSkip);
-          FCompilerConditionStack.Delete(iStackTop - 1);
-        End Else
-          Add(
-            TDocError.Create(
-              Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
-              scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etWarning)
-          );
-    End;
-  If iSkip < 0 Then
-    iSkip := 0;
-end;
-
 
 (**
 
@@ -5555,12 +5425,14 @@ End;
 
 (**
 
-  This is a getter method for the TokenFontInfo property.
+
+  This is a getter method for the TokenFontInfo property.
 
   @precon  None.
   @postcon Retursn the record information for the token type.
 
-  @param   ATokenType as a TTokenType
+
+  @param   ATokenType as a TTokenType
   @return  a TTokenFontInfo
 
 **)
@@ -5677,12 +5549,14 @@ end;
 
 (**
 
-  This is a setter method for the TokenFontInfo property.
+
+  This is a setter method for the TokenFontInfo property.
 
   @precon  None.
   @postcon Sets the indexed Token Font Information record. 
 
-  @param   ATokenType     as a TTokenType
+
+  @param   ATokenType     as a TTokenType
   @param   ATokenFontInfo as a TTokenFontInfo
 
 **)

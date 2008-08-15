@@ -1070,17 +1070,16 @@ begin
           // Highlight selected item.
           If cdsSelected In State Then
             Begin
-              Brush.Color := clHighlight;
               NodeRect := Node.DisplayRect(True);
               // Need to amend the width of the rectangle for the custom drawing
               iPos := 5;
               For i := 0 To sl.Count - 1 Do
                 Begin
                   GetFontInfo(sl, i, Node.Level, Sender.Canvas);
-                  Inc(iPos, TextWidth(sl[i]));
+                  Inc(iPos, TextWidth(sl[i]) + 1);
                 End;
               NodeRect.Right := NodeRect.Left + iPos;
-              Brush.Color := clAqua;
+              Brush.Color := clInfoBk;
               FillRect(NodeRect);
               Pen.Color := clBlack;
               Rectangle(NodeRect);

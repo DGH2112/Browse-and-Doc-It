@@ -1263,6 +1263,7 @@ Type
     FFontSize : Integer;
     FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
     FExcludeDocFiles : TStringList;
+    FMethodDescriptions : TStringList;
   Protected
     Function GetTokenFontInfo(ATokenType  : TTokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(ATokenType  : TTokenType; ATokenFontInfo : TTokenFontInfo);
@@ -1362,6 +1363,14 @@ Type
       @return  a TStringList
     **)
     Property ExcludeDocFiles : TStringList Read FExcludeDocFiles;
+    (**
+      This property stores a list of method descriptions related to pattern
+      matches.
+      @precon  None.
+      @postcon Gets and sets the method list.
+      @return  a TStringList
+    **)
+    Property MethodDescriptions : TStringList Read FMethodDescriptions;
   End;
 
   (** A silent parser abort exception. **)
@@ -4829,7 +4838,8 @@ Var
 
 Begin
   For i := 0 To BrowseAndDocItOptions.ExcludeDocFiles.Count -1 Do
-    If Pos(BrowseAndDocItOptions.ExcludeDocFiles[i], FFileName) > 0 Then
+    If Pos(Lowercase(BrowseAndDocItOptions.ExcludeDocFiles[i]),
+      Lowercase(FFileName)) > 0 Then
       Exit;
   If (ModuleComment <> Nil) And (ModuleComment.FindTag('stopdocumentation') >= 0) Then
     Begin
@@ -5417,6 +5427,7 @@ Begin
   FINIFileName := BuildRootKey(Nil, Nil);
   FScopesToRender := [scPrivate, scProtected, scPublic, scPublished];
   FExcludeDocFiles := TStringList.Create;
+  FMethodDescriptions := TStringList.Create;
   LoadSettings;
 End;
 
@@ -5432,6 +5443,7 @@ Destructor TBrowseAndDocItOptions.Destroy;
 
 Begin
   SaveSettings;
+  FMethodDescriptions.Free;
   FExcludeDocFiles.Free;
   FExpandedNodes.Free;
   FSpecialTags.Free;
@@ -5516,6 +5528,15 @@ begin
         End;
       FExcludeDocFiles.Text := StringReplace(ReadString('Setup', 'ExcludeDocFiles',
         ''), '|', #13#10, [rfReplaceAll]);
+      sl := TStringList.Create;
+      Try
+        ReadSection('MethodDescriptions', sl);
+        For j := 0 To sl.Count - 1 Do
+          FMethodDescriptions.Add(Format('%s=%s', [sl[j],
+            ReadString('MethodDescriptions', sl[j], '')]));
+      Finally
+        sl.Free;
+      End;
     Finally
       Free;
     End;
@@ -5562,6 +5583,10 @@ begin
         End;
       WriteString('Setup', 'ExcludeDocFiles', StringReplace(FExcludeDocFiles.Text,
         #13#10, '|', [rfReplaceAll]));
+      EraseSection('MethodDescriptions');
+      For j := 0 To FMethodDescriptions.Count - 1 Do
+        WriteString('MethodDescriptions', FMethodDescriptions.Names[j],
+          FMethodDescriptions.ValueFromIndex[j]);
     Finally
       Free;
     End;

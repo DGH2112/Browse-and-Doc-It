@@ -62,6 +62,11 @@ type
     rgpBrowsePosition: TRadioGroup;
     tabExcludeDocFiles: TTabSheet;
     mmoExcludeDocFiles: TMemo;
+    tabMethodDescriptions: TTabSheet;
+    lvMethodDescriptions: TListView;
+    btnAddDesc: TBitBtn;
+    btnEditDesc: TBitBtn;
+    btnDeleteDesc: TBitBtn;
     procedure btnAddClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
     procedure btnEditClick(Sender: TObject);
@@ -78,6 +83,9 @@ type
     procedure chkStrikeoutClick(Sender: TObject);
     procedure lbSpecialTagsMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure btnDeleteDescClick(Sender: TObject);
+    procedure btnAddDescClick(Sender: TObject);
+    procedure btnEditDescClick(Sender: TObject);
     { Private declarations }
   Private
     FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
@@ -89,7 +97,7 @@ type
 implementation
 
 Uses
-  SpecialTagForm, ModuleExplorerFrame;
+  SpecialTagForm, ModuleExplorerFrame, MethodDescriptionForm;
 
 ResourceString
   (** This is a message to be displayed when a tag is not valid **)
@@ -116,6 +124,7 @@ Var
   i : TDocOption;
   j : Integer;
   k : TTokenType;
+  Item: TListItem;
 
 Begin
   Result := False;
@@ -143,6 +152,12 @@ Begin
       udFontSize.Position := BrowseAndDocItOptions.FontSize;
       rgpBrowsePosition.ItemIndex := Integer(BrowseAndDocItOptions.BrowsePosition);
       mmoExcludeDocFiles.Text := BrowseAndDocItOptions.ExcludeDocFiles.Text;
+      For j := 0 To BrowseAndDocItOptions.MethodDescriptions.Count - 1 Do
+        Begin
+          Item := lvMethodDescriptions.Items.Add;
+          Item.Caption := BrowseAndDocItOptions.MethodDescriptions.Names[j];
+          Item.SubItems.Add(BrowseAndDocItOptions.MethodDescriptions.ValueFromIndex[j]);
+        End;
       If ShowModal = mrOK Then
         Begin
           Result := True;
@@ -162,6 +177,11 @@ Begin
             BrowseAndDocItOptions.TokenFontInfo[k] := FTokenFontInfo[k];
           BrowseAndDocItOptions.BrowsePosition := TBrowsePosition(rgpBrowsePosition.ItemIndex);
           BrowseAndDocItOptions.ExcludeDocFiles.Text := mmoExcludeDocFiles.Text;
+          BrowseAndDocItOptions.MethodDescriptions.Clear;
+          For j := 0 To lvMethodDescriptions.Items.Count - 1 Do
+            BrowseAndDocItOptions.MethodDescriptions.Add(Format('%s=%s', [
+              lvMethodDescriptions.Items[j].Caption,
+              lvMethodDescriptions.Items[j].SubItems[0]]));
           BrowseAndDocItOptions.SaveSettings;
         End;
     Finally
@@ -315,6 +335,31 @@ end;
 
 (**
 
+  This method is an on click event handler for the Add Description button.
+
+  @precon  None.
+  @postcon Aloows the user to add a method description to the list.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.btnAddDescClick(Sender: TObject);
+
+Var
+  strPattern, strDescription : String;
+  Item: TListItem;
+
+begin
+  If TfrmMethodDescriptions.Execute(strPattern, strDescription) Then
+    Begin
+      Item := lvMethodDescriptions.Items.Add;
+      Item.Caption := strPattern;
+      Item.SubItems.Add(strDescription);
+    End;
+end;
+
+(**
+
   This is a TButton on click event. It allows the user to delete a tag from
   the list.
 
@@ -328,6 +373,22 @@ procedure TfrmOptions.btnDeleteClick(Sender: TObject);
 begin
   If lbSpecialTags.ItemIndex <> -1 Then
     lbSpecialTags.Items.Delete(lbSpecialTags.ItemIndex);
+end;
+
+(**
+
+  This is an on click event handler for the delete description button.
+
+  @precon  None.
+  @postcon Delete the selected item from the method description list view.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.btnDeleteDescClick(Sender: TObject);
+begin
+  If lvMethodDescriptions.ItemIndex > -1 Then
+    lvMethodDescriptions.Items.Delete(lvMethodDescriptions.ItemIndex);
 end;
 
 (**
@@ -370,6 +431,34 @@ begin
               TObject(Integer(boolShow) * iShowInTree +
               Integer(boolExpand) * iAutoExpand);
         End;
+    End;
+end;
+
+(**
+
+  This method is an on click event handler for the Edit Description button.
+
+  @precon  None.
+  @postcon Allows the user to edit the current method description.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.btnEditDescClick(Sender: TObject);
+
+Var
+  strPattern, strDescription : String;
+  iIndex: Integer;
+
+begin
+  iIndex := lvMethodDescriptions.ItemIndex;
+  If iIndex > -1 Then
+    Begin
+      strPattern := lvMethodDescriptions.Items[iIndex].Caption;
+      strDescription := lvMethodDescriptions.Items[iIndex].SubItems[0];
+      If TfrmMethodDescriptions.Execute(strPattern, strDescription) Then
+        lvMethodDescriptions.Items[iIndex].Caption := strPattern;
+        lvMethodDescriptions.Items[iIndex].SubItems[0] := strDescription;
     End;
 end;
 

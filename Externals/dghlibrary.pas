@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    14 Jul 2008
+  @Date    16 Aug 2008
 
 **)
 Unit DGHLibrary;
@@ -480,7 +480,6 @@ Type
   End;
 
   Function DGHCreateProcess(Process : TProcessInfo; ProcMsgHndr : IDGHCreateProcessEvents) : Integer;
-
   Function AdjustBearing(dblBearing : Double) : Double;
   Function BearingToString(recBearing : TBearing) : String;
   Function BinToDec(sDisplayNumber : String) : String;
@@ -529,6 +528,7 @@ Type
   Function ParseMacro(Const strMacro : String; var strCommand,
     strFileName : String; strCommands : Array Of String;
     ExceptionProc : TExceptionProcedure) : Boolean;
+  Function Like(strPattern, strText : String) : Boolean;
 
 { -------------------------------------------------------------------------
 
@@ -5814,6 +5814,77 @@ Begin
         If Assigned(ProcMsgHndr) Then
           ProcMsgHndr.ProcessMsgHandler(E.Message, boolAbort);
     End;
+End;
+
+(**
+
+  This function returns true if the pattern matches the text.
+
+  @precon  None.
+  @postcon Returns true if the pattern matches the text.
+
+  @param   strPattern as a String
+  @param   strText    as a String
+  @return  a Boolean
+
+**)
+Function Like(strPattern, strText : String) : Boolean;
+
+Type
+  TMatchType = (mtStart, mtEnd);
+  TMatchTypes = Set Of TMatchType;
+
+Var
+  MatchTypes : TMatchTypes;
+  sl : TStringList;
+  i: Integer;
+  iIndex : Integer;
+  iPos: Integer;
+
+Begin
+  Result := False;
+  MatchTypes := [];
+  If Length(strPattern) = 0 Then
+    Exit;
+  If strPattern[1] <> '*' Then
+    Include(MatchTypes, mtStart)
+  Else
+    Delete(strPattern, 1, 1);
+  If strPattern[Length(strPattern)] <> '*' Then
+    Include(MatchTypes, mtEnd)
+  Else
+    Delete(strPattern, Length(strPattern), 1);
+  sl := TStringList.Create;
+  Try
+    For i := 1 To CharCount('*', strPattern) + 1 Do
+      sl.Add(lowercase(GetField(strPattern, '*', i)));
+    // Check start
+    iIndex := 1;
+    If sl.Count > 0 Then
+      If mtStart In MatchTypes Then
+        If AnsiCompareText(sl[0], Copy(strText, 1, Length(sl[0]))) <> 0 Then
+          Exit
+        Else
+          Inc(iIndex, Length(sl[0]));
+    // Check in between
+    For i := Integer(mtStart In MatchTypes) To sl.Count - 1 - Integer(mtEnd In MatchTypes) Do
+      Begin
+        iPos := Pos(sl[i], lowercase(strText));
+        If iPos = 0 Then
+          Exit;
+        Inc(iIndex, iPos);
+        Inc(iIndex, Length(sl[i]));
+      End;
+    // Check end
+    If sl.Count > 0 Then
+      If mtEnd In MatchTypes Then
+        If AnsiCompareText(sl[sl.Count - 1], Copy(strText, Length(strText) -
+          Length(sl[sl.Count - 1]) + 1, Length(sl[sl.Count - 1]))) <> 0 Then
+          Exit;
+    Result := True;
+  Finally
+    sl.Free;
+  End;
 End;
 
 (** Initialises the console more to Unknown to force a call to the Win32 API **)

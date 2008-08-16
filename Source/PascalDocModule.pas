@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       15 Aug 2008
+  @Date       16 Aug 2008
   @Author     David Hoyle
 
 **)
@@ -3848,14 +3848,18 @@ Begin
                   P :=  TField.Create(I[j].Name, scPublic, I[j].Line, I[j].Column,
                     iiPublicField, I[j].Comment);
                   Rec.Add(P);
-                  P.AddTokens(T);
+                  If T <> Nil Then
+                    P.AddTokens(T)
+                  Else
+                    ErrorAndSeekToken(strTypeNotFound, 'FieldDecl', '',
+                      strSeekableOnErrorTokens, stFirst);
                 End;
               PortabilityDirective;
             Finally
               FTemporaryElements.Free;
             End;
           End Else
-            ErrorAndSeekToken(strLiteralExpected, 'FieldList', ':',
+            ErrorAndSeekToken(strLiteralExpected, 'FieldDecl', ':',
               strSeekableOnErrorTokens, stActual);
         End;
   Finally
@@ -6796,7 +6800,11 @@ begin
               P := TField.Create(I[j].Name, AScope, I[j].Line, I[j].Column,
                 iiPublicField, I[j].Comment);
               Cls.Add(strFieldsLabel, iiFieldsLabel, Nil).Add(P);
-              P.AddTokens(T);
+              If T <> Nil Then
+                P.AddTokens(T)
+              Else
+                ErrorAndSeekToken(strTypeDeclExpected, 'ObjFieldList', '',
+                  strSeekableOnErrorTokens, stFirst);
             End;
         Finally
           FTemporaryElements.Free;
@@ -7723,6 +7731,8 @@ End;
 
  **)
 Procedure TClassDecl.CheckDocumentation(var boolCascade : Boolean);
+var
+  i: Integer;
 
 Begin
   If (Comment = Nil) Or (Comment.TokenCount = 0) Then
@@ -7731,7 +7741,8 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctClassClauseUndocumented]);
     End;
-  Inherited CheckDocumentation(boolCascade);
+  For i := 1 to ElementCount Do
+    Elements[i].CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7746,6 +7757,8 @@ End;
 
  **)
 Procedure TInterfaceDecl.CheckDocumentation(var boolCascade : Boolean);
+var
+  i: Integer;
 
 Begin
   If (Comment = Nil) Or (Comment.TokenCount = 0) Then
@@ -7754,7 +7767,8 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctInterfaceClauseUndocumented]);
     End;
-  Inherited CheckDocumentation(boolCascade);
+  For i := 1 to ElementCount Do
+    Elements[i].CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7769,6 +7783,8 @@ End;
 
  **)
 Procedure TDispInterfaceDecl.CheckDocumentation(var boolCascade : Boolean);
+var
+  i: Integer;
 
 Begin
   If (Comment = Nil) Or (Comment.TokenCount = 0) Then
@@ -7777,7 +7793,8 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctDispInterfaceClauseUndocumented]);
     End;
-  Inherited CheckDocumentation(boolCascade);
+  For i := 1 to ElementCount Do
+    Elements[i].CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7797,7 +7814,6 @@ Begin
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([strInitialization], Line, Column , Comment,
         DocConflictTable[dctMissingInitComment]);
-  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7817,7 +7833,6 @@ Begin
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([strFinalization], Line, Column, Comment,
         DocConflictTable[dctMissingFinalComment]);
-  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**

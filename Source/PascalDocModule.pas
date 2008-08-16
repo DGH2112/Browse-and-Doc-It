@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       14 Aug 2008
+  @Date       15 Aug 2008
   @Author     David Hoyle
 
 **)
@@ -7639,7 +7639,6 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctResourceStringClauseUndocumented]);
     End;
-  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7662,7 +7661,6 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctThreadVarClauseUndocumented]);
     End;
-  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7685,7 +7683,6 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctRecordClauseUndocumented]);
     End;
-  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -7700,6 +7697,8 @@ End;
 
  **)
 Procedure TObjectDecl.CheckDocumentation(var boolCascade : Boolean);
+var
+  i: Integer;
 
 Begin
   If (Comment = Nil) Or (Comment.TokenCount = 0) Then
@@ -7708,7 +7707,8 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctObjectClauseUndocumented]);
     End;
-  Inherited CheckDocumentation(boolCascade);
+  For i := 1 to ElementCount Do
+    Elements[i].CheckDocumentation(boolCascade);
 End;
 
 (**

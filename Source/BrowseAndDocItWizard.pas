@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    15 Aug 2008
+  @Date    16 Aug 2008
   @Version 1.0
 
 **)
@@ -771,25 +771,19 @@ function TBrowseAndDocItWizard.GetMethodDescription(Method : TGenericMethodDecl;
 var
   i: Integer;
   boolCon: Boolean;
+  strDescription : String;
 
 begin
+  With BrowseAndDocItOptions Do
+    For i := 0 To MethodDescriptions.Count - 1 Do
+      If Like(MethodDescriptions.Names[i], Method.Identifier) Then
+        Begin
+          strDescription := MethodDescriptions.ValueFromIndex[i];
+          Break;
+        End;
   If AComment = Nil Then
-    BEgin
-      If LowerCase(Copy(Method.Identifier, 1, 3)) = 'get' Then
-        Result := Format('  This is a getter method for the %s property.'#10#13#10#13,
-          [Copy(Method.Identifier, 4, Length(Method.Identifier) - 3)])
-      Else If LowerCase(Copy(Method.Identifier, 1, 3)) = 'set' Then
-        Result := Format('  This is a setter method for the %s property.'#10#13#10#13,
-          [Copy(Method.Identifier, 4, Length(Method.Identifier) - 3)])
-      Else If Method.MethodType = mtConstructor Then
-        Result := Format('  This is the constructor method for the %s class.'#10#13#10#13,
-          [Method.ClsName])
-      Else If Method.MethodType = mtDestructor Then
-        Result := Format('  This is the destructor method for the %s class.'#10#13#10#13,
-          [Method.ClsName])
-      Else
-        Result := #32#32#10#13#10#13;
-    End Else
+    Result := Format('%s%s'#10#13#10#13, [StringOfChar(#32, iIndent), strDescription])
+  Else
     Begin
       Result := Format('%s'#10#13#10#13, [AComment.AsString(iIndent, 80, True)]);
       boolCon := False;

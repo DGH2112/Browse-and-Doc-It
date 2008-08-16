@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    14 Aug 2008
+  @Date    15 Aug 2008
   @Version 1.0
 
 **)
@@ -129,8 +129,6 @@ Exports
   InitWizard Name WizardEntryPoint;
 
 Implementation
-
-{$R ..\SplashScreenIcon.res}
 
 Uses
   SysUtils, DockableModuleExplorer, IniFiles, ToolsAPIUtils, OptionsForm, Forms,
@@ -1398,15 +1396,16 @@ begin
             M := Dispatcher(objMemStream, SourceEditor.FileName,
               SourceEditor.Modified, [moParse, moCheckForDocumentConflicts]);
             Try
-              If M <> Nil Then
-                If M.FindElement(strErrorsAndWarnings) = Nil Then
-                  If SourceEditor.Module.QueryInterface(IOTAModuleErrors, E) = S_OK Then
-                    Begin
-                      Es := E.GetErrors;
-                      For i := Low(Es) to High(Es) Do
-                        M.AddError(TDocError.Create(Es[i].Text, scNone, 'IDE',
-                          Es[i].Start.Line, Es[i].Start.CharIndex + 1, etError));
-                    End;
+              If doShowParserErrorOrigin In BrowseAndDocItOptions.Options Then
+                If M <> Nil Then
+                  If M.FindElement(strErrorsAndWarnings) = Nil Then
+                    If SourceEditor.Module.QueryInterface(IOTAModuleErrors, E) = S_OK Then
+                      Begin
+                        Es := E.GetErrors;
+                        For i := Low(Es) to High(Es) Do
+                          M.AddError(TDocError.Create(Es[i].Text, scNone, 'IDE',
+                            Es[i].Start.Line, Es[i].Start.CharIndex + 1, etError));
+                      End;
               TfrmDockableModuleExplorer.RenderDocumentTree(M);
             Finally
               M.Free;

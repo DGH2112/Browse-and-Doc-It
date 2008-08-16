@@ -1262,6 +1262,7 @@ Type
     FFontName : String;
     FFontSize : Integer;
     FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
+    FExcludeDocFiles : TStringList;
   Protected
     Function GetTokenFontInfo(ATokenType  : TTokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(ATokenType  : TTokenType; ATokenFontInfo : TTokenFontInfo);
@@ -1306,15 +1307,12 @@ Type
     **)
     Property DocHelpFile : String Read FDocHelpFile Write FDocHelpFile;
     (**
-      This property determines the amount of time in milliseonds between the 
-      last editor update and the next refresh. Interval only, the application 
-      needs to implement the logic. 
-
-      @precon  None. 
-
-      @postcon Gets and sets the update interval. 
-
-      @return  a Cardinal
+      This property determines the amount of time in milliseonds between the
+      last editor update and the next refresh. Interval only, the application
+      needs to implement the logic.
+      @precon  None.
+      @postcon Gets and sets the update interval.
+      @return  a Cardinal
     **)
     Property UpdateInterval : Cardinal Read FUpdateInterval Write FUpdateInterval;
     (**
@@ -1349,16 +1347,21 @@ Type
     (**
       This property determines the colour and style attribute of a token in the
       module explorer
-
-      @precon  None.
-
-      @postcon Gets and sets the colour and style of the token.
-
-      @param   ATokenType as     a TTokenType
+      @precon  None.
+      @postcon Gets and sets the colour and style of the token.
+      @param   ATokenType as       a TTokenType
       @return  a TTokenFontInfo
     **)
     Property TokenFontInfo[ATokenType : TTokenType] : TTokenFontInfo Read
       GetTokenFontInfo Write SetTokenFontInfo;
+    (**
+      This properrty holds a list of files / partial or full which should not be
+      documented.
+      @precon  None.
+      @postcon Gets and sets the list.
+      @return  a TStringList
+    **)
+    Property ExcludeDocFiles : TStringList Read FExcludeDocFiles;
   End;
 
   (** A silent parser abort exception. **)
@@ -4825,6 +4828,9 @@ Var
   Tag : TTag;
 
 Begin
+  For i := 0 To BrowseAndDocItOptions.ExcludeDocFiles.Count -1 Do
+    If Pos(BrowseAndDocItOptions.ExcludeDocFiles[i], FFileName) > 0 Then
+      Exit;
   If (ModuleComment <> Nil) And (ModuleComment.FindTag('stopdocumentation') >= 0) Then
     Begin
       boolCascade := False;
@@ -5410,6 +5416,7 @@ Begin
   FExpandedNodes.Duplicates := dupIgnore;
   FINIFileName := BuildRootKey(Nil, Nil);
   FScopesToRender := [scPrivate, scProtected, scPublic, scPublished];
+  FExcludeDocFiles := TStringList.Create;
   LoadSettings;
 End;
 
@@ -5425,6 +5432,7 @@ Destructor TBrowseAndDocItOptions.Destroy;
 
 Begin
   SaveSettings;
+  FExcludeDocFiles.Free;
   FExpandedNodes.Free;
   FSpecialTags.Free;
   FDefines.Free;
@@ -5506,6 +5514,8 @@ begin
           FTokenFontInfo[T].FStyles := TFontStyles(Byte(ReadInteger('TokenFontinfo',
             Format('%s.Styles', [strTokenType[T]]), Byte(strTokenTypeInfo[T].FStyles))));
         End;
+      FExcludeDocFiles.Text := StringReplace(ReadString('Setup', 'ExcludeDocFiles',
+        ''), '|', #13#10, [rfReplaceAll]);
     Finally
       Free;
     End;
@@ -5550,6 +5560,8 @@ begin
           WriteInteger('TokenFontinfo', Format('%s.Styles', [strTokenType[T]]),
             Byte(FTokenFontInfo[T].FStyles));
         End;
+      WriteString('Setup', 'ExcludeDocFiles', StringReplace(FExcludeDocFiles.Text,
+        #13#10, '|', [rfReplaceAll]));
     Finally
       Free;
     End;

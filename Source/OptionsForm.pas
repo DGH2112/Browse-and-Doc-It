@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    13 Aug 2008
+  @Date    15 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -74,6 +74,8 @@ type
     procedure chkItalicClick(Sender: TObject);
     procedure chkUnderlineClick(Sender: TObject);
     procedure chkStrikeoutClick(Sender: TObject);
+    procedure lbSpecialTagsMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
     { Private declarations }
   Private
     FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
@@ -220,6 +222,40 @@ begin
   lb.Canvas.TextOut(Rect.Left + 160, Rect.Top, Copy(lb.Items[Index], 1, iPos - 1));
   lb.Canvas.TextOut(Rect.Left + 260, Rect.Top, Copy(lb.Items[Index], iPos + 1,
     Length(lb.Items[Index]) - iPos));
+end;
+
+(**
+
+  This is an on mouse down event handler for the special tags list box.
+
+  @precon  None.
+  @postcon Allows th euser to enabled/diaable items by clicking on them.
+
+  @param   Sender as a TObject
+  @param   Button as a TMouseButton
+  @param   Shift  as a TShiftState
+  @param   X      as an Integer
+  @param   Y      as an Integer
+
+**)
+procedure TfrmOptions.lbSpecialTagsMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+
+Var
+  iIndex: Integer;
+
+begin
+  iIndex := lbSpecialTags.ItemAtPos(Point(X, Y), True);
+  If iIndex > -1 Then
+    Begin
+      If X In [32..48] Then
+        lbSpecialTags.Items.Objects[iIndex] := TObject(
+          Integer(lbSpecialTags.Items.Objects[iIndex]) Xor iShowInTree);
+      If X In [112..128] Then
+        lbSpecialTags.Items.Objects[iIndex] := TObject(
+          Integer(lbSpecialTags.Items.Objects[iIndex]) Xor iAutoExpand);
+      lbSpecialTags.Invalidate;
+    End;
 end;
 
 (**

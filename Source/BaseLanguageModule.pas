@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    14 Aug 2008
+  @Date    16 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -80,7 +80,9 @@ Type
     doShowMissingPropPreCons,
     doShowMissingPropPostCons,
     doShowMissingInitComment,
-    doShowMissingFinalComment
+    doShowMissingFinalComment,
+    doShowIDEErrorsOnSuccessfulParse,
+    doShowParserErrorOrigin
   );
 
   (** An enumerate to associate images with different types of Elements. **)
@@ -1441,6 +1443,10 @@ ResourceString
   strShowMissingInitComment = 'Show Missing Initialization Comments';
   (** Options text for Show Missing Finalization Comment **)
   strShowMissingFinalComment = 'Show Missing Finalization Comments';
+  (** Options text for Showing IDE error messages when no parser messages. **)
+  strShowIDEErrorsOnSuccessfulParse = 'Show IDE Error messages if parser is successfully.';
+  (** Options text for showing the origin method of the parser errors. **)
+  strShowParserErrorOrigin = 'Show the origin method of the Parser error.';
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
@@ -1944,7 +1950,9 @@ Const
     (FDescription : strShowMissingPropertyPreConditions;   FEnabled : False),
     (FDescription : strShowMissingPropertyPostConditions;  FEnabled : False),
     (FDescription : strShowMissingInitComment;             FEnabled : False),
-    (FDescription : strShowMissingFinalComment;            FEnabled : False)
+    (FDescription : strShowMissingFinalComment;            FEnabled : False),
+    (FDescription : strShowIDEErrorsOnSuccessfulParse;     FEnabled : False),
+    (FDescription : strShowParserErrorOrigin;              FEnabled : False)
   );
 
   (** This is a default set of font information for the application. **)
@@ -4139,7 +4147,7 @@ Function TDocError.GetAsString: String;
 
 begin
   Result := FMsg;
-  If DebugHook <> 0 Then
+  If doShowParserErrorOrigin In BrowseAndDocItOptions.FOptions Then
     Result := Result + Format(' [%s]', [FMethod]);
 end;
 

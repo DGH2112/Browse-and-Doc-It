@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    15 Aug 2008
+  @Date    16 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -60,6 +60,8 @@ type
     chkUnderline: TCheckBox;
     chkStrikeout: TCheckBox;
     rgpBrowsePosition: TRadioGroup;
+    tabExcludeDocFiles: TTabSheet;
+    mmoExcludeDocFiles: TMemo;
     procedure btnAddClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
     procedure btnEditClick(Sender: TObject);
@@ -140,6 +142,7 @@ Begin
         FTokenFontInfo[k] := BrowseAndDocItOptions.TokenFontInfo[k];
       udFontSize.Position := BrowseAndDocItOptions.FontSize;
       rgpBrowsePosition.ItemIndex := Integer(BrowseAndDocItOptions.BrowsePosition);
+      mmoExcludeDocFiles.Text := BrowseAndDocItOptions.ExcludeDocFiles.Text;
       If ShowModal = mrOK Then
         Begin
           Result := True;
@@ -158,6 +161,7 @@ Begin
           For k := Low(TTokenType) to High(TTokenType) Do
             BrowseAndDocItOptions.TokenFontInfo[k] := FTokenFontInfo[k];
           BrowseAndDocItOptions.BrowsePosition := TBrowsePosition(rgpBrowsePosition.ItemIndex);
+          BrowseAndDocItOptions.ExcludeDocFiles.Text := mmoExcludeDocFiles.Text;
           BrowseAndDocItOptions.SaveSettings;
         End;
     Finally

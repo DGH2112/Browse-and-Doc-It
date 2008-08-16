@@ -1,4 +1,4 @@
-﻿(**
+(**
 
   This is a derived class from TSynEdit allowing me to override some of
   the default properties and also add an number of extra WordStar style
@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    09 Jul 2008
+  @Date    16 Aug 2008
 
 **)
 

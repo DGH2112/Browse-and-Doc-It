@@ -16,14 +16,16 @@ uses
   ExceptionLog,
   Forms,
   BrowseAndDocItTestForm in 'Source\BrowseAndDocItTestForm.pas' {frmBrowseAndDocItTestForm},
-  SpecialTagForm in '..\Source\SpecialTagForm.pas' {frmSpecialTag},
+  SpecialTagForm in '..\..\..\Library\SpecialTagForm.pas' {frmSpecialTag},
   BaseLanguageModule in '..\..\..\Library\BaseLanguageModule.pas',
   ModuleExplorerFrame in '..\..\..\Library\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
-  OptionsForm in '..\Source\OptionsForm.pas' {frmOptions},
+  OptionsForm in '..\..\..\Library\OptionsForm.pas' {frmOptions},
   PascalDocModule in '..\..\..\Library\PascalDocModule.pas',
   ProgressForm in '..\Source\ProgressForm.pas' {frmProgressForm},
   TokenForm in '..\..\..\Library\TokenForm.pas' {frmTokenForm},
-  dghlibrary in '..\..\..\Library\dghlibrary.pas';
+  dghlibrary in '..\..\..\Library\dghlibrary.pas',
+  ModuleDispatcher in '..\..\..\Library\ModuleDispatcher.pas',
+  MethodDescriptionForm in '..\..\..\LIBRARY\MethodDescriptionForm.pas' {frmMethodDescriptions};
 
 {$R *.res}
 

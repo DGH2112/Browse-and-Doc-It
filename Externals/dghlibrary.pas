@@ -5870,7 +5870,7 @@ Begin
     For i := Integer(mtStart In MatchTypes) To sl.Count - 1 - Integer(mtEnd In MatchTypes) Do
       Begin
         iPos := Pos(sl[i], lowercase(strText));
-        If iPos = 0 Then
+        If (iPos = 0) Or (iPos < iIndex) Then
           Exit;
         Inc(iIndex, iPos);
         Inc(iIndex, Length(sl[i]));

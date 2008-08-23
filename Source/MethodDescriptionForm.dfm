@@ -14,6 +14,7 @@ object frmMethodDescriptions: TfrmMethodDescriptions
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poMainFormCenter
   DesignSize = (
     632
     101)

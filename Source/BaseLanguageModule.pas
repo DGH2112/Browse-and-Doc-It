@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    16 Aug 2008
+  @Date    22 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -12,6 +12,7 @@
 Unit BaseLanguageModule;
 
 Interface
+
 Uses
   SysUtils, Classes, Contnrs, Graphics;
 
@@ -35,7 +36,7 @@ Type
   (** An enumerate for the different methods. **)
   TMethodType = (mtConstructor, mtDestructor, mtProcedure, mtFunction);
   (** An enumerate for warning and errors. **)
-  TErrorType = (etWarning, etError);
+  TErrorType = (etHint, etWarning, etError);
   (** A type to return an array of strings **)
   TKeyWords = Array of String;
 
@@ -44,10 +45,9 @@ Type
   TDocOption = (
     doCustomDrawing,
     doShowCommentHints,
-    doShowPrivates,
-    doShowProtecteds,
-    doShowPublics,
-    doShowPublisheds,
+    doShowErrors,
+    doShowWarnings,
+    doShowHints,
     doShowConflicts,
     doShowMissingProcDocs,
     doShowMissingDocDesc,
@@ -82,7 +82,8 @@ Type
     doShowMissingInitComment,
     doShowMissingFinalComment,
     doShowIDEErrorsOnSuccessfulParse,
-    doShowParserErrorOrigin
+    doShowParserErrorOrigin,
+    doShowUnReferencedLocalsPrivates
   );
 
   (** An enumerate to associate images with different types of Elements. **)
@@ -98,7 +99,11 @@ Type
 
     iiErrorFolder,
     iiError,
+    iiWarningFolder,
     iiWarning,
+
+    iiHintFolder,
+    iiHint,
 
     iiUsesLabel,
     iiUsesItem,
@@ -563,13 +568,15 @@ Type
     FConflictType : TDocConflictIcon;
   End;
 
+  TDocIssue = Class;
+
   (** This is a class reference for the TElementContainer class such that the
       descendant classes can clone themselves. **)
   TElementContainerClass = Class Of TElementContainer;
 
   (** This class implements the IElementCollection interface so that this
       element container can be rendered with the module browser. **)
-  TElementContainer = Class {$IFDEF VER180} Abstract {$ENDIF}
+  TElementContainer = Class Abstract
   Private
     FElements : TObjectList;
     FTokens : TObjectList;
@@ -580,6 +587,7 @@ Type
     FScope : TScope;
     FImageIndex : TImageIndex;
     FSorted  : Boolean;
+    FReferenced : Boolean;
   Protected
     Function GetElementCount : Integer;
     Function GetElements(iIndex : Integer) : TElementContainer;
@@ -607,6 +615,8 @@ Type
     Function FindToken(strToken : String) : Integer;
     Procedure DeleteElement(iIndex : Integer);
     Procedure CheckDocumentation(var boolCascade : Boolean); Virtual;
+    Procedure AddIssue(strMsg : String; AScope : TScope; strMethod : String;
+      iLine, iCol : Integer; ErrType : TErrorType);
     Procedure AddDocumentConflict(Const Args: Array of TVarRec;
       iIdentLine, iIdentColumn : Integer; AComment : TComment;
       DocConflictRec : TDocConflictTable);
@@ -714,29 +724,62 @@ Type
       @return  a Boolean
     **)
     Property Sorted : Boolean Read FSorted Write SetSorted;
+    (**
+      This property determines if the symbol has been referenced in code.
+      @precon  None.
+      @postcon Gets or sets the referenced property.
+      @return  a Boolean
+    **)
+    Property Referenced  : Boolean Read FReferenced Write FReferenced;
+  End;
+
+  (** This class defines a document error. **)
+  TDocIssue = Class(TElementContainer)
+  Private
+    FMsg: String;
+    FMethod : String;
+  Protected
+    Function GetAsString : String; Override;
+  Public
+    Constructor Create(strMsg : String; AScope : TScope; strMethod : String; iLine,
+      iCol : Integer; AImageIndex : TImageIndex); Reintroduce; Overload;
+    (**
+      Returns the exception method of the exception stored.
+      @precon  None.
+      @postcon Returns the exception method of the exception stored.
+      @return  a String
+    **)
+    Property Method : String Read FMethod;
+    (**
+      Returns the exception message.
+      @precon  None.
+      @postcon Returns the exception message.
+      @return  a String
+    **)
+    Property Msg : String Read FMsg;
   End;
 
   (** This class represents a single identifier with line, col and comment
       attributes. **)
-  TIdent = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer);
+  TIdent = Class Abstract (TElementContainer);
 
   (** This class represents a list of identifiers **)
-  TIdentList = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer);
+  TIdentList = Class Abstract (TElementContainer);
 
   (** This is a sub class for all types **)
-  TGenericTypeDecl = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
+  TGenericTypeDecl = Class Abstract (TElementContainer)
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This is a sub class for all constants **)
-  TGenericConstant = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
+  TGenericConstant = Class Abstract (TElementContainer)
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This is a sub class for all variables **)
-  TGenericVariable = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
+  TGenericVariable = Class Abstract (TElementContainer)
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
@@ -791,7 +834,7 @@ Type
   End;
 
   (** This class represents a method declaration. **)
-  TGenericMethodDecl = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
+  TGenericMethodDecl = Class Abstract (TElementContainer)
   Private
     FParameters : TObjectList;
     FMethodType : TMethodType;
@@ -901,7 +944,7 @@ Type
   End;
 
   (** This is a class that represents properties of a class or interface. **)
-  TGenericProperty = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
+  TGenericProperty = Class Abstract (TElementContainer)
   Private
     FParameters : TObjectList;
     FTypeID : TGenericTypeDecl;
@@ -942,40 +985,6 @@ Type
     Property TypeId : TGenericTypeDecl Read FTypeID Write FTypeID;
   End;
 
-  (** This class defines a parsing error. **)
-  TDocError = Class(TElementContainer)
-  Private
-    FMsg: String;
-    FErrorType : TErrorType;
-    FMethod : String;
-  Protected
-    Function GetAsString : String; Override;
-  Public
-    Constructor Create(strMsg : String; AScope : TScope; strMethod : String; iLine,
-      iCol : Integer; ErrType : TErrorType); Reintroduce; Overload;
-    (**
-      Returns the exception message.
-      @precon  None.
-      @postcon Returns the exception message.
-      @return  a String
-    **)
-    Property Msg : String Read FMsg;
-    (**
-      Returns the type of exception stored.
-      @precon  None.
-      @postcon Returns the type of exception stored.
-      @return  a TErrorType
-    **)
-    Property ErrorType : TErrorType Read FErrorType;
-    (**
-      Returns the exception method of the exception stored.
-      @precon  None.
-      @postcon Returns the exception method of the exception stored.
-      @return  a String
-    **)
-    Property Method : String Read FMethod;
-  End;
-
   (** This is a class to represent a module documentation conflict. **)
   TDocumentConflict = Class(TElementContainer)
   Private
@@ -1014,12 +1023,9 @@ Type
       properties. **)
   TCharSet = Set of Char;
 
-//  (** This is a type to define an array of string. **)
-//  TArrayOfString = Array Of String;
-
   (** This is an abtract class from which all language modules should be
       derived. **)
-  TBaseLanguageModule = Class {$IFDEF VER180} Abstract {$ENDIF} (TElementContainer)
+  TBaseLanguageModule = Class Abstract (TElementContainer)
   Private
     FOwnedItems : TObjectList;
     FTokens : TObjectList;
@@ -1104,7 +1110,6 @@ Type
     Procedure DeleteDef(strDef : String);
     Function IfDef(strDef : String) : Boolean;
     Function IfNotDef(strDef : String) : Boolean;
-    Procedure AddError(Error : TElementContainer);
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function KeyWords : TKeyWords; Virtual; Abstract;
     { Properties }
@@ -1381,14 +1386,12 @@ ResourceString
   strDrawSynHighModuleExplorer = 'Draw Syntax Highlighted Module Explorer';
   (** Options text for Show comments in the hints **)
   strShowCommentsInTheHints = 'Show comments in the hints';
-  (** Options text for Show private declarations **)
-  strShowPrivateDeclarations = 'Show private declarations';
-  (** Options text for Show protected declarations **)
-  strShowProtectedDeclarations = 'Show protected declarations';
-  (** Options text for Show public declarations **)
-  strShowPublicDeclarations = 'Show public declarations';
-  (** Options text for Show published declarations **)
-  strShowPublishedDeclarations = 'Show published declarations';
+  (** Options text for Show Errors **)
+  strShowErrors = 'Show Module Errors';
+  (** Options text for Show Warnings **)
+  strShowWarnings = 'Show Module Warnings';
+  (** Options text for Show Hints **)
+  strShowHints = 'Show Module Hints';
   (** Options text for Show Documentation Conflicts **)
   strShowDocumentationConflicts = 'Show Documentation Conflicts';
   (** Options text for Show Missing Method Documentation **)
@@ -1459,41 +1462,29 @@ ResourceString
   strShowIDEErrorsOnSuccessfulParse = 'Show IDE Error messages if parser is successfully.';
   (** Options text for showing the origin method of the parser errors. **)
   strShowParserErrorOrigin = 'Show the origin method of the Parser error.';
+  (** Options text for showing unreferenced locals and privates. **)
+  strShowUnreferencedLocals = 'Show all unreferenced local and private symbols.';
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
-  (** Errors and warnings label **)
-  strErrorsAndWarnings = 'Errors and Warnings';
+  (** Errors label **)
+  strErrors = 'Errors';
+  (** Warnings label **)
+  strWarnings = 'Warnings';
+  (** Hints label **)
+  strHints = 'Hints';
   (** Label for Uses Clause **)
   strUses = 'Uses';
   (** Label for Types Clause **)
   strTypesLabel = 'Types';
-  (** Label for Classes Clause **)
-  strClasses = 'Classes';
-  (** Label for Interfaces Clause **)
-  strInterfaces = 'Interfaces';
-  (** Label for Interface Clause **)
-  strInterface = 'Interface';
-  (** Label for DispInterface Clause **)
-  strDispInterface = 'DispInterface';
-  (** Label for DispInterfaces Clause **)
-  strDispInterfaces = 'DispInterfaces';
-  (** Label for Object Clause **)
-  strObject = 'Object';
-  (** Label for Objects Clause **)
-  strObjects = 'Objects';
-  (** Label for Record Clause **)
-  strRecord = 'Record';
-  (** Label for Records Clause **)
-  strRecords = 'Records';
   (** Label for Constants Clause **)
-  strConstants = 'Constants';
+  strConstantsLabel = 'Constants';
   (** Label for Resource Strings Clause **)
-  strResourceStrings = 'Resource Strings';
+  strResourceStringsLabel = 'Resource Strings';
   (** Label for Variables Clause **)
-  strVars = 'Variables';
+  strVarsLabel = 'Variables';
   (** Label for Thread Variables Clause **)
-  strThreadVars = 'Thread Variables';
+  strThreadVarsLabel = 'Thread Variables';
   (** Label for Exported Headings **)
   strExportedHeadings = 'Exported Headings';
   (** Label for Exports Clause **)
@@ -1578,6 +1569,8 @@ ResourceString
   (** An exception message for a Constant Expression found. **)
   strConstExprExpected = 'Constant Expression expected but ''%s'' found at ' +
     'line %s column %d.';
+  (** Document conflict message for a unreferenced locals. **)
+  strUnreferencedLocal = 'The symbol ''%s'' has not been referenced in the code.';
 
   (** This is the tree branch under which module documentation error appear **)
   strModuleDocumentation = 'Module Documentation';
@@ -1675,7 +1668,7 @@ ResourceString
   (** This is the tree branch under which record documentation error appear **)
   strRecordDocumentation = 'Record Documentation';
   (** Document conflict message for an undocumented record clause item. **)
-  strRecordClauseUndocumented = 'Record variable ''%s'' is undocumented.';
+  strRecordClauseUndocumented = 'Record type ''%s'' is undocumented.';
   (** Document conflict message description for an undocumented record clause
       item. **)
   strRecordClauseUndocumentedDesc = 'Each Record declaration ' +
@@ -1685,7 +1678,7 @@ ResourceString
   (** This is the tree branch under which object documentation error appear **)
   strObjectDocumentation = 'Object Documentation';
   (** Document conflict message for an undocumented object clause item. **)
-  strObjectClauseUndocumented = 'Object variable ''%s'' is undocumented.';
+  strObjectClauseUndocumented = 'Object type ''%s'' is undocumented.';
   (** Document conflict message description for an undocumented object clause
       item. **)
   strObjectClauseUndocumentedDesc = 'Each Object declaration ' +
@@ -1695,7 +1688,7 @@ ResourceString
   (** This is the tree branch under which class documentation error appear **)
   strClassDocumentation = 'Class Documentation';
   (** Document conflict message for an undocumented class variable clause item. **)
-  strClassClauseUndocumented = 'Class variable ''%s'' is undocumented.';
+  strClassClauseUndocumented = 'Class type ''%s'' is undocumented.';
   (** Document conflict message description for an undocumented class variable
       clause item. **)
   strClassClauseUndocumentedDesc = 'Each Class declaration ' +
@@ -1705,7 +1698,7 @@ ResourceString
   (** This is the tree branch under which interface documentation error appear **)
   strInterfaceDocumentation = 'Interface Documentation';
   (** Document conflict message for an undocumented interface variable clause item. **)
-  strInterfaceClauseUndocumented = 'Interface variable ''%s'' is undocumented.';
+  strInterfaceClauseUndocumented = 'Interface type ''%s'' is undocumented.';
   (** Document conflict message description for an undocumented interface
       variable clause item. **)
   strInterfaceClauseUndocumentedDesc = 'Each Interface declaration ' +
@@ -1715,7 +1708,7 @@ ResourceString
   (** This is the tree branch under which dispinterface documentation error appear **)
   strDispInterfaceDocumentation = 'DispInterface Documentation';
   (** Document conflict message for an undocumented dispinterface variable clause item. **)
-  strDispInterfaceClauseUndocumented = 'DispInterface variable ''%s'' is undocumented.';
+  strDispInterfaceClauseUndocumented = 'DispInterface type ''%s'' is undocumented.';
   (** Document conflict message description for an undocumented dispinterface
       variable clause item. **)
   strDispInterfaceClauseUndocumentedDesc = 'Each DispInterface declaration ' +
@@ -1916,6 +1909,7 @@ ResourceString
     'developers known which portion of the module are automatically ' +
     'destroyed.';
 
+
 Const
   (** A set of characters for whitespace **)
   strWhiteSpace : Set Of Char = [#32, #9];
@@ -1926,10 +1920,9 @@ Const
   DocOptionInfo : Array[Low(TDocOption)..High(TDocOption)] Of TDocOptionRec = (
     (FDescription : strDrawSynHighModuleExplorer;          FEnabled : False),
     (FDescription : strShowCommentsInTheHints;             FEnabled : False),
-    (FDescription : strShowPrivateDeclarations;            FEnabled : True),
-    (FDescription : strShowProtectedDeclarations;          FEnabled : True),
-    (FDescription : strShowPublicDeclarations;             FEnabled : True),
-    (FDescription : strShowPublishedDeclarations;          FEnabled : True),
+    (FDescription : strShowErrors;                         FEnabled : True),
+    (FDescription : strShowWarnings;                       FEnabled : False),
+    (FDescription : strShowHints;                          FEnabled : False),
     (FDescription : strShowDocumentationConflicts;         FEnabled : False),
     (FDescription : strShowMissingMethodDocumentation;     FEnabled : True),
     (FDescription : strShowMissingMethodDocDesc;           FEnabled : True),
@@ -1964,7 +1957,8 @@ Const
     (FDescription : strShowMissingInitComment;             FEnabled : False),
     (FDescription : strShowMissingFinalComment;            FEnabled : False),
     (FDescription : strShowIDEErrorsOnSuccessfulParse;     FEnabled : False),
-    (FDescription : strShowParserErrorOrigin;              FEnabled : False)
+    (FDescription : strShowParserErrorOrigin;              FEnabled : False),
+    (FDescription : strShowUnreferencedLocals;             FEnabled : False)
   );
 
   (** This is a default set of font information for the application. **)
@@ -1993,154 +1987,157 @@ Const
 
   (** This is a list of Image Resource name to be loaded fom the executable. **)
   ImageList : Array[Succ(Low(TImageIndex))..High(TImageIndex)] Of TImageIndexInfo = (
-    (FResourceName : 'Module';                    FMaskColour: $0000FF00),
+    (FResourceName : 'Module';                    FMaskColour: clLime),
 
-    (FResourceName : 'DocConflictFolder';         FMaskColour: $0000FF00),
-    (FResourceName : 'DocConflictIncorrect';      FMaskColour: $0000FF00),
-    (FResourceName : 'DocConflictItem';           FMaskColour: $0000FF00),
-    (FResourceName : 'DocConflictMissing';        FMaskColour: $0000FF00),
+    (FResourceName : 'DocConflictFolder';         FMaskColour: clLime),
+    (FResourceName : 'DocConflictIncorrect';      FMaskColour: clLime),
+    (FResourceName : 'DocConflictItem';           FMaskColour: clLime),
+    (FResourceName : 'DocConflictMissing';        FMaskColour: clLime),
 
-    (FResourceName : 'ErrorFolder';               FMaskColour: $0000FF00),
-    (FResourceName : 'Error';                     FMaskColour: $0000FF00),
-    (FResourceName : 'Warning';                   FMaskColour: $0000FF00),
+    (FResourceName : 'ErrorFolder';               FMaskColour: clLime),
+    (FResourceName : 'Error';                     FMaskColour: clLime),
+    (FResourceName : 'WarningFolder';             FMaskColour: clLime),
+    (FResourceName : 'Warning';                   FMaskColour: clLime),
+    (FResourceName : 'HintFolder';                FMaskColour: clFuchsia),
+    (FResourceName : 'Hint';                      FMaskColour: clFuchsia),
 
-    (FResourceName : 'UsesLabel';                 FMaskColour: $0000FF00),
-    (FResourceName : 'UsesItem';                  FMaskColour: $0000FF00),
+    (FResourceName : 'UsesLabel';                 FMaskColour: clLime),
+    (FResourceName : 'UsesItem';                  FMaskColour: clLime),
 
-    (FResourceName : 'TypeSLabel';                FMaskColour: $0000FF00),
-    (FResourceName : 'PublicType';                FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateType';               FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDType';             FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedType';             FMaskColour: $0000FF00),
-    (FResourceName : 'LocalType';                 FMaskColour: $0000FF00),
+    (FResourceName : 'TypesLabel';                FMaskColour: clLime),
+    (FResourceName : 'PublicType';                FMaskColour: clLime),
+    (FResourceName : 'PrivateType';               FMaskColour: clLime),
+    (FResourceName : 'PublishedType';             FMaskColour: clLime),
+    (FResourceName : 'ProtectedType';             FMaskColour: clLime),
+    (FResourceName : 'LocalType';                 FMaskColour: clLime),
 
-    (FResourceName : 'RECORDSLabel';              FMaskColour: $0000FF00),
-    (FResourceName : 'PublicRECORD';              FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateRECORD';             FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDRECORD';           FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedRECORD';           FMaskColour: $0000FF00),
-    (FResourceName : 'LocalRECORD';               FMaskColour: $0000FF00),
+    (FResourceName : 'RecordsLabel';              FMaskColour: clLime),
+    (FResourceName : 'PublicRecord';              FMaskColour: clLime),
+    (FResourceName : 'PrivateRecord';             FMaskColour: clLime),
+    (FResourceName : 'PublishedRecord';           FMaskColour: clLime),
+    (FResourceName : 'ProtectedRecord';           FMaskColour: clLime),
+    (FResourceName : 'LocalRecord';               FMaskColour: clLime),
 
-    (FResourceName : 'FIELDSLabel';               FMaskColour: $0000FF00),
-    (FResourceName : 'LocalFIELD';                FMaskColour: $0000FF00),
-    (FResourceName : 'PublicFIELD';               FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateFIELD';              FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDFIELD';            FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedFIELD';            FMaskColour: $0000FF00),
+    (FResourceName : 'FieldsLabel';               FMaskColour: clLime),
+    (FResourceName : 'LocalField';                FMaskColour: clLime),
+    (FResourceName : 'PublicField';               FMaskColour: clLime),
+    (FResourceName : 'PrivateField';              FMaskColour: clLime),
+    (FResourceName : 'PublishedField';            FMaskColour: clLime),
+    (FResourceName : 'ProtectedField';            FMaskColour: clLime),
 
-    (FResourceName : 'OBJECTSLabel';              FMaskColour: $0000FF00),
-    (FResourceName : 'PublicOBJECT';              FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateOBJECT';             FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDOBJECT';           FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedOBJECT';           FMaskColour: $0000FF00),
-    (FResourceName : 'LocalOBJECT';               FMaskColour: $0000FF00),
+    (FResourceName : 'ObjectsLabel';              FMaskColour: clLime),
+    (FResourceName : 'PublicObject';              FMaskColour: clLime),
+    (FResourceName : 'PrivateObject';             FMaskColour: clLime),
+    (FResourceName : 'PublishedObject';           FMaskColour: clLime),
+    (FResourceName : 'ProtectedObject';           FMaskColour: clLime),
+    (FResourceName : 'LocalObject';               FMaskColour: clLime),
 
-    (FResourceName : 'PublicCONSTRUCTOR';         FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateCONSTRUCTOR';        FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDCONSTRUCTOR';      FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedCONSTRUCTOR';      FMaskColour: $0000FF00),
-    (FResourceName : 'LocalCONSTRUCTOR';          FMaskColour: $0000FF00),
+    (FResourceName : 'PublicConstructor';         FMaskColour: clLime),
+    (FResourceName : 'PrivateConstructor';        FMaskColour: clLime),
+    (FResourceName : 'PublishedConstructor';      FMaskColour: clLime),
+    (FResourceName : 'ProtectedConstructor';      FMaskColour: clLime),
+    (FResourceName : 'LocalConstructor';          FMaskColour: clLime),
 
-    (FResourceName : 'PublicDESTRUCTOR';          FMaskColour: $00FF00FF),
-    (FResourceName : 'PrivateDESTRUCTOR';         FMaskColour: $00FF00FF),
-    (FResourceName : 'PUBLISHEDDESTRUCTOR';       FMaskColour: $00FF00FF),
-    (FResourceName : 'ProtectedDESTRUCTOR';       FMaskColour: $00FF00FF),
-    (FResourceName : 'LocalDESTRUCTOR';           FMaskColour: $00FF00FF),
+    (FResourceName : 'PublicDestructor';          FMaskColour: clFuchsia),
+    (FResourceName : 'PrivateDestructor';         FMaskColour: clFuchsia),
+    (FResourceName : 'PublishedDestructor';       FMaskColour: clFuchsia),
+    (FResourceName : 'ProtectedDestructor';       FMaskColour: clFuchsia),
+    (FResourceName : 'LocalDestructor';           FMaskColour: clFuchsia),
 
-    (FResourceName : 'PublicPROCEDURE';           FMaskColour: $0000FF00),
-    (FResourceName : 'PrivatePROCEDURE';          FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDPROCEDURE';        FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedPROCEDURE';        FMaskColour: $0000FF00),
-    (FResourceName : 'LocalPROCEDURE';            FMaskColour: $0000FF00),
+    (FResourceName : 'PublicProcedure';           FMaskColour: clLime),
+    (FResourceName : 'PrivateProcedure';          FMaskColour: clLime),
+    (FResourceName : 'PublishedProcedure';        FMaskColour: clLime),
+    (FResourceName : 'ProtectedProcedure';        FMaskColour: clLime),
+    (FResourceName : 'LocalProcedure';            FMaskColour: clLime),
 
-    (FResourceName : 'PublicFUNCTION';            FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateFUNCTION';           FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDFUNCTION';         FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedFUNCTION';         FMaskColour: $0000FF00),
-    (FResourceName : 'LocalFUNCTION';             FMaskColour: $0000FF00),
+    (FResourceName : 'PublicFunction';            FMaskColour: clLime),
+    (FResourceName : 'PrivateFunction';           FMaskColour: clLime),
+    (FResourceName : 'PublishedFunction';         FMaskColour: clLime),
+    (FResourceName : 'ProtectedFunction';         FMaskColour: clLime),
+    (FResourceName : 'LocalFunction';             FMaskColour: clLime),
 
-    (FResourceName : 'CLASSESLabel';              FMaskColour: $0000FF00),
-    (FResourceName : 'PublicCLASS';               FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateCLASS';              FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDCLASS';            FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedCLASS';            FMaskColour: $0000FF00),
-    (FResourceName : 'LocalCLASS';                FMaskColour: $0000FF00),
+    (FResourceName : 'ClassesLabel';              FMaskColour: clLime),
+    (FResourceName : 'PublicClass';               FMaskColour: clLime),
+    (FResourceName : 'PrivateClass';              FMaskColour: clLime),
+    (FResourceName : 'PublishedClass';            FMaskColour: clLime),
+    (FResourceName : 'ProtectedClass';            FMaskColour: clLime),
+    (FResourceName : 'LocalClass';                FMaskColour: clLime),
 
-    (FResourceName : 'PROPERTYLabel';             FMaskColour: $00FF00FF),
-    (FResourceName : 'PublicPROPERTY';            FMaskColour: $00FF00FF),
-    (FResourceName : 'PrivatePROPERTY';           FMaskColour: $00FF00FF),
-    (FResourceName : 'PUBLISHEDPROPERTY';         FMaskColour: $00FF00FF),
-    (FResourceName : 'ProtectedPROPERTY';         FMaskColour: $00FF00FF),
-    (FResourceName : 'LocalPROPERTY';             FMaskColour: $00FF00FF),
+    (FResourceName : 'PropertyLabel';             FMaskColour: clFuchsia),
+    (FResourceName : 'PublicProperty';            FMaskColour: clFuchsia),
+    (FResourceName : 'PrivateProperty';           FMaskColour: clFuchsia),
+    (FResourceName : 'PublishedProperty';         FMaskColour: clFuchsia),
+    (FResourceName : 'ProtectedProperty';         FMaskColour: clFuchsia),
+    (FResourceName : 'LocalProperty';             FMaskColour: clFuchsia),
 
-    (FResourceName : 'INTERFACESLabel';           FMaskColour: $0000FF00),
-    (FResourceName : 'PublicINTERFACE';           FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateINTERFACE';          FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDINTERFACE';        FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedINTERFACE';        FMaskColour: $0000FF00),
-    (FResourceName : 'LocalINTERFACE';            FMaskColour: $0000FF00),
+    (FResourceName : 'InterfacesLabel';           FMaskColour: clLime),
+    (FResourceName : 'PublicInterface';           FMaskColour: clLime),
+    (FResourceName : 'PrivateInterface';          FMaskColour: clLime),
+    (FResourceName : 'PublishedInterface';        FMaskColour: clLime),
+    (FResourceName : 'ProtectedInterface';        FMaskColour: clLime),
+    (FResourceName : 'LocalInterface';            FMaskColour: clLime),
 
-    (FResourceName : 'DISPINTERFACESLabel';       FMaskColour: $0000FF00),
-    (FResourceName : 'PublicDISPINTERFACE';       FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateDISPINTERFACE';      FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDDISPINTERFACE';    FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedDISPINTERFACE';    FMaskColour: $0000FF00),
-    (FResourceName : 'LocalDISPINTERFACE';        FMaskColour: $0000FF00),
+    (FResourceName : 'DispInterfaceSLabel';       FMaskColour: clLime),
+    (FResourceName : 'PublicDispInterface';       FMaskColour: clLime),
+    (FResourceName : 'PrivateDispInterface';      FMaskColour: clLime),
+    (FResourceName : 'PublishedDispInterface';    FMaskColour: clLime),
+    (FResourceName : 'ProtectedDispInterface';    FMaskColour: clLime),
+    (FResourceName : 'LocalDispInterface';        FMaskColour: clLime),
 
-    (FResourceName : 'CONSTANTSLabel';            FMaskColour: $0000FF00),
-    (FResourceName : 'PublicCONST';               FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateCONST';              FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDCONST';            FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedCONST';            FMaskColour: $0000FF00),
-    (FResourceName : 'LocalCONST';                FMaskColour: $0000FF00),
+    (FResourceName : 'ConstantsLabel';            FMaskColour: clLime),
+    (FResourceName : 'PublicConst';               FMaskColour: clLime),
+    (FResourceName : 'PrivateConst';              FMaskColour: clLime),
+    (FResourceName : 'PublishedConst';            FMaskColour: clLime),
+    (FResourceName : 'ProtectedConst';            FMaskColour: clLime),
+    (FResourceName : 'LocalConst';                FMaskColour: clLime),
 
-    (FResourceName : 'RESOURCESTRINGSLabel';      FMaskColour: $0000FF00),
-    (FResourceName : 'PublicRESOURCESTRING';      FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateRESOURCESTRING';     FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDRESOURCESTRING';   FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedRESOURCESTRING';   FMaskColour: $0000FF00),
-    (FResourceName : 'LocalRESOURCESTRING';       FMaskColour: $0000FF00),
+    (FResourceName : 'ResourceStringsLabel';      FMaskColour: clLime),
+    (FResourceName : 'PublicResourceString';      FMaskColour: clLime),
+    (FResourceName : 'PrivateResourceString';     FMaskColour: clLime),
+    (FResourceName : 'PublishedResourceString';   FMaskColour: clLime),
+    (FResourceName : 'ProtectedResourceString';   FMaskColour: clLime),
+    (FResourceName : 'LocalResourceString';       FMaskColour: clLime),
 
-    (FResourceName : 'VARIABLESLabel';            FMaskColour: $0000FF00),
-    (FResourceName : 'PublicVARIABLE';            FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateVARIABLE';           FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDVARIABLE';         FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedVARIABLE';         FMaskColour: $0000FF00),
-    (FResourceName : 'LocalVARIABLE';             FMaskColour: $0000FF00),
+    (FResourceName : 'VariablesLabel';            FMaskColour: clLime),
+    (FResourceName : 'PublicVariable';            FMaskColour: clLime),
+    (FResourceName : 'PrivateVariable';           FMaskColour: clLime),
+    (FResourceName : 'PublishedVariable';         FMaskColour: clLime),
+    (FResourceName : 'ProtectedVariable';         FMaskColour: clLime),
+    (FResourceName : 'LocalVariable';             FMaskColour: clLime),
 
-    (FResourceName : 'THREADVARSLabel';           FMaskColour: $0000FF00),
-    (FResourceName : 'PublicTHREADVAR';           FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateTHREADVAR';          FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDTHREADVAR';        FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedTHREADVAR';        FMaskColour: $0000FF00),
-    (FResourceName : 'LocalTHREADVAR';            FMaskColour: $0000FF00),
+    (FResourceName : 'ThreadVarsLabel';           FMaskColour: clLime),
+    (FResourceName : 'PublicThreadVar';           FMaskColour: clLime),
+    (FResourceName : 'PrivateThreadVar';          FMaskColour: clLime),
+    (FResourceName : 'PublishedThreadVar';        FMaskColour: clLime),
+    (FResourceName : 'ProtectedThreadVar';        FMaskColour: clLime),
+    (FResourceName : 'LocalThreadVar';            FMaskColour: clLime),
 
-    (FResourceName : 'EXPORTEDHEADINGSLabel';     FMaskColour: $0000FF00),
+    (FResourceName : 'ExportedHeadingsLabel';     FMaskColour: clLime),
 
-    (FResourceName : 'EXPORTEDFUNCTIONSLabel';    FMaskColour: $0000FF00),
-    (FResourceName : 'PublicEXPORTEDFUNCTION';    FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateEXPORTEDFUNCTION';   FMaskColour: $0000FF00),
-    (FResourceName : 'PUBLISHEDEXPORTEDFUNCTION'; FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedEXPORTEDFUNCTION'; FMaskColour: $0000FF00),
-    (FResourceName : 'LocalEXPORTEDFUNCTION';     FMaskColour: $0000FF00),
+    (FResourceName : 'ExportedFunctionsLabel';    FMaskColour: clLime),
+    (FResourceName : 'PublicExportedFunction';    FMaskColour: clLime),
+    (FResourceName : 'PrivateExportedFunction';   FMaskColour: clLime),
+    (FResourceName : 'PublishedExportedFunction'; FMaskColour: clLime),
+    (FResourceName : 'ProtectedExportedFunction'; FMaskColour: clLime),
+    (FResourceName : 'LocalExportedFunction';     FMaskColour: clLime),
 
-    (FResourceName : 'LabelsLabel';               FMaskColour: $0000FF00),
-    (FResourceName : 'LocalLabel';                FMaskColour: $0000FF00),
-    (FResourceName : 'PrivateLabel';              FMaskColour: $0000FF00),
-    (FResourceName : 'ProtectedLabel';            FMaskColour: $0000FF00),
-    (FResourceName : 'PublicLabel';               FMaskColour: $0000FF00),
-    (FResourceName : 'PublishedLabel';            FMaskColour: $0000FF00),
+    (FResourceName : 'LabelsLabel';               FMaskColour: clLime),
+    (FResourceName : 'LocalLabel';                FMaskColour: clLime),
+    (FResourceName : 'PrivateLabel';              FMaskColour: clLime),
+    (FResourceName : 'ProtectedLabel';            FMaskColour: clLime),
+    (FResourceName : 'PublicLabel';               FMaskColour: clLime),
+    (FResourceName : 'PublishedLabel';            FMaskColour: clLime),
 
-    (FResourceName : 'METHODSLabel';              FMaskColour: $0000FF00),
-    (FResourceName : 'IMPLEMENTEDMETHODSLabel';   FMaskColour: $0000FF00),
+    (FResourceName : 'MethodsLabel';              FMaskColour: clLime),
+    (FResourceName : 'ImplementedMethodsLabel';   FMaskColour: clLime),
 
-    (FResourceName : 'INITIALIZATIONLabel';       FMaskColour: $00FF00FF),
-    (FResourceName : 'FINALIZATIONLabel';         FMaskColour: $0000FF00),
+    (FResourceName : 'InitializationLabel';       FMaskColour: clFuchsia),
+    (FResourceName : 'FinalizationLabel';         FMaskColour: clLime),
 
-    (FResourceName : 'TODOFolder';                FMaskColour: $0000FF00),
-    (FResourceName : 'TODOITEM';                  FMaskColour: $0000FF00),
+    (FResourceName : 'TodoFolder';                FMaskColour: clLime),
+    (FResourceName : 'TodoItem';                  FMaskColour: clLime),
 
-    (FResourceName : 'UNKNOWNCLSOBJ';             FMaskColour: $0000FF00)
+    (FResourceName : 'UnknownClsObj';             FMaskColour: clLime)
   );
 
   (** A table of information for document conflicts. **)
@@ -2332,7 +2329,7 @@ Const
       FConflictType: dciMissing),
     (FCategory: strModuleFinalSection;
       FMessage: strMissingFinalComment;
-      FDescription: strMissingFinalComment;
+      FDescription: strMissingFinalCommentDesc;
       FConflictType: dciMissing)
   );
 
@@ -3173,17 +3170,20 @@ begin
   Else
     Try
       Result := FElements[i -1] As TElementContainer;
-      Result.Comment.Assign(AElement.Comment);
+      If Result.Comment = Nil Then
+        Result.Comment := AElement.Comment
+      Else
+        Result.Comment.Assign(AElement.Comment);
       If Not AElement.ClassNameIs(Result.ClassName) Then
         Begin
-          E := objModuleRootElement.Add(strErrorsAndWarnings, iiErrorFolder, Nil);
-          E.Add(TDocError.Create(Format(strTryingToAddType, [AElement.ClassName,
+          E := objModuleRootElement.Add(strErrors, iiErrorFolder, Nil);
+          E.Add(TDocIssue.Create(Format(strTryingToAddType, [AElement.ClassName,
             Result.ClassName, AElement.Name]), scNone, 'TElementContainer.Add',
-            AElement.Line, AElement.Column, etError));
+            AElement.Line, AElement.Column, iiError));
           Raise EParserAbort.Create('');
         End;
-      (** Free AElement after getting the comment as it will leak otherwise. **)
     Finally
+      (** Free AElement after getting the comment as it will leak otherwise. **)
       AElement.Free;
     End;
 end;
@@ -3255,7 +3255,10 @@ begin
     End Else
     Begin
       Result := FElements[i - 1] As TElementContainer;
-      Result.Comment.Assign(AComment);
+      If Result.Comment = Nil Then
+        Result.Comment := AComment
+      Else
+        Result.Comment.Assign(AComment);
     End;
 end;
 
@@ -3315,6 +3318,48 @@ begin
     End;
   I.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iL, iC,
     DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon));
+end;
+
+(**
+
+  This method adds an error to the Base Language's Element Collection under a 
+  sub folder of strCategory. 
+
+  @precon  Error must be a valid TElementContainer. 
+  @postcon Adds an error to the Base Language's Element Collection under a sub 
+           folder of strCategory. 
+
+  @param   strMsg    as a String
+  @param   AScope    as a TScope
+  @param   strMethod as a String
+  @param   iLine     as an Integer
+  @param   iCol      as an Integer
+  @param   ErrType   as a TErrorType
+
+**)
+Procedure TElementContainer.AddIssue(strMsg : String; AScope : TScope;
+  strMethod : String; iLine, iCol : Integer; ErrType : TErrorType);
+
+Var
+  I : TElementContainer;
+
+begin
+  Assert(objModuleRootElement <> Nil, 'objModuleRootElement can not be null!');
+  Case ErrType Of
+    etHint:
+      Begin
+        I := objModuleRootElement.Add(strHints, iiHintFolder, Nil);
+        I.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol, iiHint));
+      End;
+    etWarning:
+      Begin
+        I := objModuleRootElement.Add(strWarnings, iiWarningFolder, Nil);
+        I.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol, iiWarning));
+      End
+  Else
+    I := objModuleRootElement.Add(strErrors, iiErrorFolder, Nil);
+    I.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol, iiError));
+  End;
 end;
 
 (**
@@ -3468,6 +3513,7 @@ begin
   FScope := AScope;
   FImageIndex := AImageIndex;
   FSorted := True;
+  FReferenced := False;
 end;
 
 (**
@@ -4110,38 +4156,30 @@ end;
 
 (**
 
-  This is the constructor method for the TDocError class.
+  This is the constructor method for the TDocError class. 
 
-  @precon  strMsg is the error message to create a doc error for, iLine is the
-           line number of the error, iCol is the column number for the message,
-           strExceptionMethod is the name of the method the exception occurred
-           in and ErrType determines if the mesage is a warning or an error.
-  @postcon Initialises the class.
+  @precon  strMsg is the error message to create a doc error for, iLine is the 
+           line number of the error, iCol is the column number for the 
+           message, strExceptionMethod is the name of the method the 
+           exception occurred in and ErrType determines if the mesage is a 
+           warning or an error. 
+  @postcon Initialises the class. 
 
-  @param   strMsg             as a String
-  @param   AScope             as a TScope
-  @param   strMethod          as a String
-  @param   iLine              as an Integer
-  @param   iCol               as an Integer
-  @param   ErrType            as a TErrorType
+  @param   strMsg      as a String
+  @param   AScope      as a TScope
+  @param   strMethod   as a String
+  @param   iLine       as an Integer
+  @param   iCol        as an Integer
+  @param   AImageIndex as a TImageIndex
 
 **)
-constructor TDocError.Create(strMsg : String; AScope : TScope; strMethod: String; iLine,
-  iCol: Integer; ErrType : TErrorType);
-
-Var
-  AImageIndex : TImageIndex;
+constructor TDocIssue.Create(strMsg : String; AScope : TScope; strMethod: String;
+  iLine, iCol: Integer; AImageIndex : TImageIndex);
 
 Begin
-  Case ErrType Of
-    etWarning: AImageIndex := iiWarning;
-  Else
-    AImageIndex := iiError;
-  End;
   Inherited Create(Format('%d@%d:%d', [GetTickCount, iLine, iCol]), AScope,
     iLine, iCol, AImageIndex, Nil);
   FMsg := strMsg;
-  FErrorType := ErrType;
   FMethod := strMethod;
 End;
 
@@ -4155,7 +4193,7 @@ End;
   @return  a String
 
 **)
-Function TDocError.GetAsString: String;
+Function TDocIssue.GetAsString: String;
 
 begin
   Result := FMsg;
@@ -4240,28 +4278,6 @@ procedure TBaseLanguageModule.AddDef(strDef : String);
 
 begin
   FCompilerDefs.Add(strDef);
-end;
-
-(**
-
-  This method adds an error to the Base Language's Element Collection under
-  a sub folder of strCategory.
-
-  @precon  Error must be a valid TElementContainer.
-  @postcon Adds an error to the Base Language's Element Collection under
-           a sub folder of strCategory.
-
-  @param   Error       as a TElementContainer
-
-**)
-Procedure TBaseLanguageModule.AddError(Error: TElementContainer);
-
-Var
-  I : TElementContainer;
-
-begin
-  I := Add(strErrorsAndWarnings, iiErrorFolder, Nil);
-  I.Add(Error);
 end;
 
 (**
@@ -4674,8 +4690,7 @@ Function TBaseLanguageModule.GetToken : TTokenInfo;
 Begin
   If FTokenIndex >= FTokens.Count Then
     Begin
-      AddError(TDocError.Create(strUnExpectedEndOfFile, scNone, 'GetToken',
-        0, 0, etError));
+      AddIssue(strUnExpectedEndOfFile, scNone, 'GetToken', 0, 0, etError);
       Raise EParserAbort.Create('');
     End;
   Result := FTokens[FTokenIndex] As TTokenInfo;
@@ -4810,8 +4825,7 @@ Begin
         Dec(FTokenIndex);
       If FTokenIndex < 0 Then
         Begin
-          AddError(TDocError.Create(strUnExpectedStartOfFile, scNone,
-            'RollBackToken', 0, 0, etError));
+          AddIssue(strUnExpectedStartOfFile, scNone, 'RollBackToken', 0, 0, etError);
           Raise EParserAbort.Create('');
         End;
     End;
@@ -4865,11 +4879,7 @@ Begin
               If Modified Then
                 dtFileDate := Now
               Else
-                {$IFDEF VER180}
                 FileAge(FileName, dtFileDate);
-                {$ELSE}
-                dtFileDate := FileDateToDateTime(FileAge(Module.FileName));
-                {$ENDIF}
               Try
                 dtDate := ConvertDate(strDate);
                 If Int(dtDate) <> Int(dtFileDate) Then
@@ -4919,6 +4929,11 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctTypeClauseUndocumented]);
     End;
+  If doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options Then
+    If Scope In [scLocal, scPrivate] Then
+      If Not Referenced Then
+        AddIssue(Format(strUnreferencedLocal, [Identifier]),
+          scNone, 'CheckDocumentation', Line, Column, etHint);
   Inherited CheckDocumentation(boolCascade);
 End;
 
@@ -4942,6 +4957,11 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctConstantClauseUndocumented]);
     End;
+  If doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options Then
+    If Scope In [scLocal, scPrivate] Then
+      If Not Referenced Then
+        AddIssue(Format(strUnreferencedLocal, [Identifier]),
+          scNone, 'CheckDocumentation', Line, Column, etHint);
   Inherited CheckDocumentation(boolCascade);
 End;
 
@@ -4965,6 +4985,11 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctVariableClauseUndocumented]);
     End;
+  If doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options Then
+    If Scope In [scLocal, scPrivate] Then
+      If Not Referenced Then
+        AddIssue(Format(strUnreferencedLocal, [Identifier]),
+          scNone, 'CheckDocumentation', Line, Column, etHint);
   Inherited CheckDocumentation(boolCascade);
 End;
 
@@ -4993,6 +5018,11 @@ Begin
           CheckMethodReturns;
         End;
     End;
+  If doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options Then
+    If Scope In [scLocal] Then
+      If Not Referenced Then
+        AddIssue(Format(strUnreferencedLocal, [Identifier]),
+          scNone, 'CheckDocumentation', Line, Column, etHint);
   Inherited CheckDocumentation(boolCascade);
 end;
 

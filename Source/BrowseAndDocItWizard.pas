@@ -13,7 +13,7 @@ Interface
 
 Uses
   Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, ModuleExplorerFrame,
-  DockForm;
+  DockForm, Types;
 
 Type
   (** This emunerate descibed the different types of doc comment .**)
@@ -34,7 +34,7 @@ Type
     Procedure Focus(Sender : TObject);
     Procedure OptionsChange(Sender : TObject);
     function GetMethodDescription(Method : TGenericMethodDecl; AComment : TComment;
-      iIndent : Integer) : String;
+      iIndent : Integer; var CursorAdjust : TPoint) : String;
     Function WriteMethodComment(Method : TGenericMethodDecl;
       Source : IOTASourceEditor; Writer : IOTAEditWriter; AComment : TComment) : TOTAEditPos;
     Function WritePropertyComment(Prop : TGenericProperty;
@@ -708,6 +708,7 @@ Var
   iBufferPos: Integer;
   iLines : Integer;
   strType: String;
+  P : TPoint;
 
 begin
   iLines := Method.Line;
@@ -733,7 +734,8 @@ begin
     End;
   // Block Header
   Writer.Insert('(**'#10#13#10#13);
-  Writer.Insert(PChar(GetMethodDescription(Method, AComment, CharPos.CharIndex - 1 + 2)));
+  Writer.Insert(PChar(GetMethodDescription(Method, AComment,
+    CharPos.CharIndex - 1 + 2, P)));
   // Output method information
   iLen := 0;
   For i := 0 To Method.ParameterCount - 1 Do
@@ -768,48 +770,71 @@ begin
   Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
   iLines := Writer.CurrentPos.Line - iLines;
   // Get header in view if not already
-  Result.Col := CharPos.CharIndex + 2;
-  Result.Line := CharPos.Line + 2;
-  SelectionChange(Result.Line + iLines, Result.Col, Result.Line - 2, Result.Col,
-    stIdentifier);
+  Result.Col := CharPos.CharIndex + 2 + P.X;
+  Result.Line := CharPos.Line + 2 + P.Y;
+  SelectionChange(Result.Line + iLines, Result.Col, Result.Line - 2,
+    Result.Col, stIdentifier);
 end;
 
 (**
 
-
-  This method returns a description for the method if it is a constructor,
+  This method returns a description for the method if it is a constructor,
   destructor, getter or setter method, else it returns an empty string.
 
+  @precon  Method is a valid instance of a method declatation to be described.
+  @postcon Returns a description of the method is applicable.
 
-  @precon  Method is a valid instance of a method declatation to be described.
-
-  @postcon Returns a description of the method is applicable.
-
-
-  @param   Method   as a TGenericMethodDecl
-  @param   AComment as a TComment
-  @param   iIndent  as an Integer
+  @param   Method       as a TGenericMethodDecl
+  @param   AComment     as a TComment
+  @param   iIndent      as an Integer
+  @param   CursorAdjust as a TPoint
   @return  a String
 
 **)
 function TBrowseAndDocItWizard.GetMethodDescription(Method : TGenericMethodDecl;
-  AComment : TComment; iIndent : Integer) : String;
+  AComment : TComment; iIndent : Integer; var CursorAdjust : TPoint) : String;
 
 var
   i: Integer;
   boolCon: Boolean;
   strDescription : String;
+  j: Integer;
 
 begin
+  CursorAdjust.X := 0;
+  CursorAdjust.Y := 0;
   With BrowseAndDocItOptions Do
     For i := 0 To MethodDescriptions.Count - 1 Do
       If Like(MethodDescriptions.Names[i], Method.Identifier) Then
         Begin
-          strDescription := MethodDescriptions.ValueFromIndex[i];
-          Break;
+          With TComment.Create(MethodDescriptions.ValueFromIndex[i], 0, 0) Do
+            Try
+              strDescription := AsString(iIndent, 80, True);
+              If Pos('|', strDescription) > 0 Then
+                For j := 1 To Length(strDescription) Do
+                  Begin
+                    If strDescription[j] = '|' Then
+                      Begin
+                        Delete(strDescription, j, 1);
+                        Break;
+                      End;
+                    If strDescription[j] <> #10 Then
+                      Inc(CursorAdjust.X);
+                    If strDescription[j] = #13 Then
+                      Begin
+                        Inc(CursorAdjust.Y);
+                        CursorAdjust.X := 0;
+                      End;
+                  End;
+              If CursorAdjust.X > 0 Then
+                Dec(CursorAdJust.X, iIndent);
+              Break;
+            Finally
+              Free;
+            End;
         End;
   If AComment = Nil Then
-    Result := Format('%s%s'#10#13#10#13, [StringOfChar(#32, iIndent), strDescription])
+    Result := Format('%s'#10#13#10#13, [strDescription])
   Else
     Begin
       Result := Format('%s'#10#13#10#13, [AComment.AsString(iIndent, 80, True)]);

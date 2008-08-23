@@ -1,0 +1,7 @@
+/*
+
+  This is a Windows Resource File which generates a Splash Screen Icon for the
+  BDS 2006 IDE.
+
+*/
+BrowseAndDocItSplashScreenBitMap BITMAP "Icons\Browse And Doc It 48x48 Icon.bmp"

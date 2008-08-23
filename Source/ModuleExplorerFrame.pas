@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    14 Aug 2008
+  @Date    20 Aug 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -773,7 +773,7 @@ Begin
             SetExpandedNodes;
             ExpandNodes;
             // Restore top and selected items
-            If M.FindElement(strErrorsAndWarnings) = Nil Then // Only if no errors.
+            If M.FindElement(strErrors) = Nil Then // Only if no errors.
               Begin
                 i := FindTreeItem(strTop);
                 If i <> - 1 Then
@@ -855,13 +855,20 @@ begin
     If FSpecialTagNodes[i].Node <> Nil Then
       If FSpecialTagNodes[i].boolExpand Then
         FSpecialTagNodes[i].Node.Expand(True);
-  For i := 0 To FModule.Count -1 Do
+  For i := 0 To FModule.Count - 1 Do
     Begin
       If AnsiCompareText(FModule.Item[i].Text, strDocumentationConflicts) = 0 Then
         If doShowConflicts In BrowseAndDocItOptions.Options Then
           FModule.Item[i].Expand(True);
-      If AnsiCompareText(FModule.Item[i].Text, strErrorsAndWarnings) = 0 Then
-        FModule.Item[i].Expand(True);
+      If AnsiCompareText(FModule.Item[i].Text, strHints) = 0 Then
+        If doShowHints In BrowseAndDocItOptions.Options Then
+          FModule.Item[i].Expand(True);
+      If AnsiCompareText(FModule.Item[i].Text, strWarnings) = 0 Then
+        If doShowWarnings In BrowseAndDocItOptions.Options Then
+          FModule.Item[i].Expand(True);
+      If AnsiCompareText(FModule.Item[i].Text, strErrors) = 0 Then
+        If doShowErrors In BrowseAndDocItOptions.Options Then
+          FModule.Item[i].Expand(True);
     End;
 end;
 

@@ -1,9 +1,9 @@
-(**
+﻿(**
 
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    16 Aug 2008
+  @Date    23 Aug 2008
   @Version 1.0
 
 **)
@@ -20,7 +20,7 @@ Type
   TCommentType = (ctBlock, ctLine, ctInSitu);
 
   (** This is the class which defined the Wizard interface. **)
-  TBrowseAndDocItWizard = Class(TNotifierObject, IOTAWizard)
+  TBrowseAndDocItWizard = Class(TNotifierObject, IOTAWizard{, IOTAIDENotifier})
   Private
     mmiPascalDocMenu : TMenuItem;
     FCounter : Integer;
@@ -53,10 +53,21 @@ Type
     Function GetState: TWizardState;
     Procedure Execute;
     { IOTAMenuWizard }
+    {$HINTS OFF}
     Function GetMenuText: string;
+    {$HINTS ON}
     Function OutputTag(iIndent : Integer; Tag : TTag) : String;
     function GetPropertyDescription(Prop: TGenericProperty;
       AComment: TComment; iIndent: Integer): String;
+    { IOTAIDENotifier
+    procedure AfterCompile(Succeeded: Boolean);
+    procedure BeforeCompile(const Project: IOTAProject; var Cancel: Boolean);
+    procedure FileNotification(NotifyCode: TOTAFileNotification;
+      const FileName: string; var Cancel: Boolean);
+    procedure AfterSave;
+    procedure BeforeSave;
+    procedure Destroyed;
+    procedure Modified; }
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -64,12 +75,9 @@ Type
 
   (** This class handles notifications from the editor so that changes in the
       editor can be displayed. **)
-  TEditorNotifier = Class(TNotifierObject{$IFDEF VER180}, INTAEditServicesNotifier{$ENDIF})
+  TEditorNotifier = Class(TNotifierObject, INTAEditServicesNotifier)
   Private
     FUpdateTimer : TTimer;
-    {$IFNDEF VER180}
-    FLastSize : Int64;
-    {$ENDIF}
     FLastEditorName : String;
     FLastCursorPos: TOTAEditPos;
     Procedure RefreshTree;
@@ -79,7 +87,6 @@ Type
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    {$IFDEF VER180}
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
     procedure WindowActivated(const EditWindow: INTAEditWindow);
@@ -89,7 +96,6 @@ Type
     procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    {$ENDIF}
   End;
 
   (** This class represents a key binding notifier for installing and handling
@@ -132,7 +138,8 @@ Implementation
 
 Uses
   SysUtils, DockableModuleExplorer, IniFiles, ToolsAPIUtils, OptionsForm, Forms,
-  Windows, ShellAPI, TokenForm, DGHLibrary, ModuleDispatcher, Dialogs, Controls;
+  Windows, ShellAPI, TokenForm, DGHLibrary, ModuleDispatcher, Dialogs, Controls,
+  PsAPI;
 
 Resourcestring
   (** This is a text string of revision from nil and a to z. **)
@@ -167,20 +174,16 @@ Var
   (** This is an index for the wizard when register with the ide. Its required
       in order to remove it from memory. **)
   iWizardIndex : Integer;
-  {$IFDEF VER180}
   (** This is an index for the editor notifier required when the package is
       unloaded **)
   iEditorIndex : Integer;
-  {$ELSE}
-  (** This is a private reference for the Editor Notifier class when not
-      registered with the IDE. **)
-  objEditorNotifier : TEditorNotifier;
-  {$ENDIF}
+  iIDENotifier : Integer;
   (** A private variable to hold the time of the last editor update. **)
   iLastUpdateTickCount : Cardinal;
   (** An index for the keybinding nofitier - required when the package is
       unloaded **)
   iKeyBinding: Integer;
+  {boolCompiling : Boolean;}
 
 (**
 
@@ -202,17 +205,32 @@ Var
 Begin
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   Wizard := TBrowseAndDocItWizard.Create;
-  iWizardIndex := (BorlandIDEServices As IOTAWizardServices).AddWizard(
-    Wizard);
-  {$IFDEF VER180}
+  iWizardIndex := (BorlandIDEServices As IOTAWizardServices).AddWizard(Wizard);
+  iIDENotifier := (BorlandIDEServices As IOTAServices).AddNotifier(Wizard);
   iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
     TEditorNotifier.Create);
-  {$ELSE}
-  objEditorNotifier := TEditorNotifier.Create;
-  {$ENDIF}
   iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
     TKeyboardBinding.Create(Wizard))
 End;
+
+{procedure TBrowseAndDocItWizard.AfterCompile(Succeeded: Boolean);
+begin
+  boolCompiling := False;
+end;
+
+procedure TBrowseAndDocItWizard.AfterSave;
+begin
+end;
+
+procedure TBrowseAndDocItWizard.BeforeCompile(const Project: IOTAProject;
+  var Cancel: Boolean);
+begin
+  boolCompiling := True;
+end;
+
+procedure TBrowseAndDocItWizard.BeforeSave;
+begin
+end;}
 
 (**
 
@@ -258,12 +276,12 @@ End;
 (**
 
 
-  This method creates menu items using the passed information. 
+  This method creates menu items using the passed information.
 
 
-  @precon  mmiParent must be a valid parent menu item in the IDE. 
+  @precon  mmiParent must be a valid parent menu item in the IDE.
 
-  @postcon A Sub menu ite is created under mmiParent. 
+  @postcon A Sub menu ite is created under mmiParent.
 
 
   @param   mmiParent  as a TMenuItem
@@ -308,6 +326,10 @@ begin
   Inherited;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
 end;
+
+{procedure TBrowseAndDocItWizard.Destroyed;
+begin
+end;}
 
 (**
 
@@ -382,6 +404,10 @@ function TBrowseAndDocItWizard.GetState: TWizardState;
 begin
   Result := [wsEnabled];
 end;
+
+{procedure TBrowseAndDocItWizard.Modified;
+begin
+end;}
 
 (**
 
@@ -562,7 +588,7 @@ var
   Module : TBaseLanguageModule;
   EditPos: TOTAEditPos;
   T : TElementContainer;
-  M, N : TGenericMethodDecl;
+  N : TGenericMethodDecl;
   Writer: IOTAEditWriter;
   Source: IOTASourceEditor;
 
@@ -583,6 +609,7 @@ var
 
   Var
     i : Integer;
+    M : TGenericMethodDecl;
 
   Begin
     For i := 1 To Container.ElementCount Do
@@ -878,7 +905,7 @@ var
   EditPos: TOTAEditPos;
   Source : IOTASourceEditor;
   T : TElementContainer;
-  P, Q : TGenericProperty;
+  Q : TGenericProperty;
   Writer: IOTAEditWriter;
 
   (**
@@ -898,6 +925,7 @@ var
 
   Var
     i : Integer;
+    P : TGenericProperty;
 
   Begin
     For i := 1 To Container.ElementCount Do
@@ -1205,6 +1233,13 @@ begin
     PChar(BrowseAndDocItOptions.DocHelpFile), SW_NORMAL);
 end;
 
+{procedure TBrowseAndDocItWizard.FileNotification(
+  NotifyCode: TOTAFileNotification; const FileName: string;
+  var Cancel: Boolean);
+begin
+
+end;}
+
 (**
 
   This method is an event handler for the On Focus event from the explorer
@@ -1288,12 +1323,9 @@ Begin
       Application.Handle := Svcs.GetParentHandle;
       Wizard := TBrowseAndDocItWizard.Create;
       RegisterProc(Wizard);
-      {$IFDEF VER180}
+      iIDENotifier := (BorlandIDEServices As IOTAServices).AddNotifier(Wizard);
       iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
         TEditorNotifier.Create);
-      {$ELSE}
-      objEditorNotifier := TEditorNotifier.Create;
-      {$ENDIF}
       iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
         TKeyboardBinding.Create(Wizard))
     End;
@@ -1310,11 +1342,7 @@ End;
 constructor TEditorNotifier.Create;
 begin
   FUpdateTimer := TTimer.Create(Nil);
-  {$IFDEF VER180}
   FUpdateTimer.Interval := 100;
-  {$ELSE}
-  FUpdateTimer.Interval := 500;
-  {$ENDIF}
   FUpdateTimer.OnTimer := TimerEventHandler;
   FUpdateTimer.Enabled := True;
 end;
@@ -1354,13 +1382,16 @@ Var
   iRead : Integer;
   M : TBaseLanguageModule;
   Options : IOTAProjectOptions;
-  E : IOTAModuleErrors;
+  {E : IOTAModuleErrors;
   i : Integer;
-  Es : TOTAErrors;
+  Es : TOTAErrors;}
 
 begin
-  If (Application <> Nil) And (Application.MainForm <> Nil) And
-    Application.MainForm.Visible Then
+  If Application = Nil Then
+    Exit;
+  If Application.MainForm = Nil Then
+    Exit;
+  If Application.MainForm.Visible Then
     Begin
       objMemStream := TMemoryStream.Create;
       Try
@@ -1390,16 +1421,19 @@ begin
             M := Dispatcher(objMemStream, SourceEditor.FileName,
               SourceEditor.Modified, [moParse, moCheckForDocumentConflicts]);
             Try
-              If doShowParserErrorOrigin In BrowseAndDocItOptions.Options Then
+              {: @note Can not use this due to lock up in the IDE when calling
+                       QueryInterface of the module when compiling is happening.
+              If doShowIDEErrorsOnSuccessfulParse In BrowseAndDocItOptions.Options Then
                 If M <> Nil Then
-                  If M.FindElement(strErrorsAndWarnings) = Nil Then
-                    If SourceEditor.Module.QueryInterface(IOTAModuleErrors, E) = S_OK Then
-                      Begin
-                        Es := E.GetErrors;
-                        For i := Low(Es) to High(Es) Do
-                          M.AddError(TDocError.Create(Es[i].Text, scNone, 'IDE',
-                            Es[i].Start.Line, Es[i].Start.CharIndex + 1, etError));
-                      End;
+                  If M.FindElement(strErrors) = Nil Then
+                    If Not boolCompiling And CheckChildProcesses Then
+                      If SourceEditor.Module.QueryInterface(IOTAModuleErrors, E) = S_OK Then
+                        Begin
+                          Es := E.GetErrors;
+                          For i := Low(Es) to High(Es) Do
+                            M.AddIssue(Es[i].Text, scNone, 'IDE', Es[i].Start.Line,
+                              Es[i].Start.CharIndex + 1, etError);
+                        End;}
               TfrmDockableModuleExplorer.RenderDocumentTree(M);
             Finally
               M.Free;
@@ -1463,39 +1497,6 @@ End;
 **)
 procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
 
-  {$IFNDEF VER180}
-  (**
-
-    This function returns the size of the editor stream, i.e. size of the text
-    buffer.
-
-    @precon  If Editor is Nil 0 is returned.
-    @postcon Returns the size of the editor stream, i.e. size of the text
-             buffer.
-
-    @param   Editor as an IOTASourceEditor
-    @return  an Int64
-
-  **)
-  Function MemStreamSize(Editor : IOTASourceEditor) : Int64;
-
-  Var
-    MemStream : TMemoryStream;
-
-  Begin
-    Result := 0;
-    If Editor <> Nil Then
-      Begin
-        MemStream := EditorAsMemoryStream(Editor);
-        Try
-          Result := MemStream.Size;
-        Finally
-          MemStream.Free;
-        End;
-      End;
-  End;
-  {$ENDIF}
-
 Var
   Editor : IOTASourceEditor;
   P : TOTAEditPos;
@@ -1517,21 +1518,11 @@ begin
           iLastUpdateTickCount := 1;
           FLastEditorName := Editor.FileName;
         End
-      {$IFNDEF VER180}
-        Else If FLastSize <> MemStreamSize(Editor) Then
-            Begin
-              iLastUpdateTickCount := GetTickCount;
-              FLastSize := MemStreamSize(Editor);
-            End
-      {$ENDIF};
     End;
   If (iLastUpdateTickCount > 0) And
     (GetTickCount > iLastUpdateTickCount + BrowseAndDocItOptions.UpdateInterval) Then
     Begin
       iLastUpdateTickCount := 0;
-      {$IFNDEF VER180}
-      FLastSize := MemStreamSize(Editor);
-      {$ENDIF}
       FUpdateTimer.Enabled := False;
       Try
         RefreshTree;
@@ -1541,7 +1532,6 @@ begin
     End;
 end;
 
-{$IFDEF VER180}
 (**
 
   This an impementation of the DockFormRefresh method for the Editor Notifier
@@ -1695,7 +1685,6 @@ procedure TEditorNotifier.WindowShow(const EditWindow: INTAEditWindow; Show,
   LoadedFromDesktop: Boolean);
 begin
 end;
-{$ENDIF}
 
 (**
 
@@ -2003,7 +1992,6 @@ begin
   Result := 'BrowseAndDocItBindings';
 end;
 
-{$IFDEF VER180}
 Var
   (** This is a handle for the splash screen bitmap resource **)
   bmSplashScreen : HBITMAP;
@@ -2015,11 +2003,9 @@ Var
   iBugFix : Integer;
   (** This is a variable to hold the build number for the package. **)
   iBuild : Integer;
-{$ENDIF}
 
 (** This initialization section installs an IDE Splash Screen item. **)
 Initialization
-{$IFDEF VER180}
   bmSplashScreen := LoadBitmap(hInstance, 'BrowseAndDocItSplashScreenBitMap');
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
   (SplashScreenServices As IOTASplashScreenServices).AddPluginBitmap(
@@ -2028,16 +2014,12 @@ Initialization
     True,
     Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]), ''
     );
-{$ENDIF}
 (** This finalization section removes this wizard from the IDE when the package
     is unloaded. **)
 Finalization
   (BorlandIDEServices As IOTAKeyboardServices).RemoveKeyboardBinding(iKeyBinding);
-  {$IFDEF VER180}
   (BorlandIDEServices As IOTAEditorServices).RemoveNotifier(iEditorIndex);
-  {$ELSE}
-  objEditorNotifier.Free;
-  {$ENDIF}
+  (BorlandIDEServices As IOTAServices).RemoveNotifier(iIDENotifier);
   (BorlandIDEServices As IOTAWizardServices).RemoveWizard(iWizardIndex);
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
 End.

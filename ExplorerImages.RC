@@ -13,7 +13,10 @@ DocConflictMissing              BITMAP "Images\DocConflictMissing.bmp"
 
 ErrorFolder                     BITMAP "Images\errorFolder.bmp"
 Error                           BITMAP "Images\error.bmp"
+WarningFolder                   BITMAP "Images\WarningFolder.bmp"
 Warning                         BITMAP "Images\Warning.bmp"
+HintFolder                      BITMAP "Images\HintFolder.bmp"
+Hint                            BITMAP "Images\Hint.bmp"
 
 UsesLabel                       BITMAP "Images\UsesLabel.bmp"
 UsesItem                        BITMAP "Images\UsesItem.bmp"

@@ -85,6 +85,7 @@ type
     procedure btnDeleteDescClick(Sender: TObject);
     procedure btnAddDescClick(Sender: TObject);
     procedure btnEditDescClick(Sender: TObject);
+    procedure lvMethodDescriptionsDblClick(Sender: TObject);
     { Private declarations }
   Private
     FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
@@ -302,6 +303,22 @@ begin
         chkUnderline.Checked := fsUnderline In FTokenFontInfo[TTokenType(itemIndex)].FStyles;
         chkStrikeout.Checked := fsStrikeout In FTokenFontInfo[TTokenType(itemIndex)].FStyles;
       End;
+end;
+
+(**
+
+  This method is an on double click event handler for the Metho Description
+  ListView.
+
+  @precon  None.
+  @postcon Edits the selected item.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.lvMethodDescriptionsDblClick(Sender: TObject);
+begin
+  btnEditDescClick(Sender);
 end;
 
 (**

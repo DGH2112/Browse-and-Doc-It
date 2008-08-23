@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    16 Aug 2008
+  @Date    23 Aug 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -32,7 +32,6 @@ type
     lbSpecialTags: TListBox;
     IntervalPanel: TPanel;
     lblRefreshInterval: TLabel;
-    TagPanel: TPanel;
     HeaderControl1: THeaderControl;
     btnAdd: TBitBtn;
     btnDelete: TBitBtn;

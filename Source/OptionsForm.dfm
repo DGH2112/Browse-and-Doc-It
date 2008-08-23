@@ -26,7 +26,7 @@ object frmOptions: TfrmOptions
     Top = 8
     Width = 648
     Height = 377
-    ActivePage = tabMethodDescriptions
+    ActivePage = Page1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object Page1: TTabSheet
@@ -80,86 +80,31 @@ object frmOptions: TfrmOptions
     object Page2: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
+      DesignSize = (
+        640
+        349)
       object lbSpecialTags: TListBox
-        Left = 0
-        Top = 17
-        Width = 640
-        Height = 301
+        Left = 3
+        Top = 19
+        Width = 634
+        Height = 296
         Style = lbOwnerDrawFixed
-        Align = alClient
+        Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 16
         TabOrder = 0
         OnDblClick = btnEditClick
         OnDrawItem = lbSpecialTagsDrawItem
         OnMouseDown = lbSpecialTagsMouseDown
       end
-      object TagPanel: TPanel
-        Left = 0
-        Top = 318
-        Width = 640
-        Height = 31
-        Align = alBottom
-        BevelOuter = bvNone
-        TabOrder = 1
-        DesignSize = (
-          640
-          31)
-        object btnAdd: TBitBtn
-          Left = 241
-          Top = 4
-          Width = 75
-          Height = 25
-          Anchors = [akTop, akRight]
-          Caption = '&Add'
-          TabOrder = 0
-          OnClick = btnAddClick
-        end
-        object btnDelete: TBitBtn
-          Left = 403
-          Top = 4
-          Width = 75
-          Height = 25
-          Anchors = [akTop, akRight]
-          Caption = '&Delete'
-          TabOrder = 2
-          OnClick = btnDeleteClick
-        end
-        object btnMoveUp: TBitBtn
-          Left = 484
-          Top = 4
-          Width = 75
-          Height = 25
-          Anchors = [akTop, akRight]
-          Caption = 'Move &Up'
-          TabOrder = 3
-          OnClick = btnMoveUpClick
-        end
-        object btnMoveDown: TBitBtn
-          Left = 565
-          Top = 4
-          Width = 75
-          Height = 25
-          Anchors = [akTop, akRight]
-          Caption = '&Move Down'
-          TabOrder = 4
-          OnClick = btnMoveDownClick
-        end
-        object btnEdit: TBitBtn
-          Left = 322
-          Top = 4
-          Width = 75
-          Height = 25
-          Anchors = [akTop, akRight]
-          Caption = '&Edit'
-          TabOrder = 1
-          OnClick = btnEditClick
-        end
-      end
       object HeaderControl1: THeaderControl
-        Left = 0
-        Top = 0
-        Width = 640
+        Left = 3
+        Top = 3
+        Width = 634
         Height = 17
+        Align = alNone
+        Anchors = [akLeft, akTop, akRight]
+        FullDrag = False
+        Enabled = False
         Sections = <
           item
             ImageIndex = -1
@@ -181,6 +126,57 @@ object frmOptions: TfrmOptions
             Text = 'Tag Description'
             Width = 300
           end>
+        Style = hsFlat
+      end
+      object btnAdd: TBitBtn
+        Left = 238
+        Top = 321
+        Width = 75
+        Height = 25
+        Anchors = [akRight, akBottom]
+        Caption = '&Add'
+        TabOrder = 2
+        OnClick = btnAddClick
+      end
+      object btnDelete: TBitBtn
+        Left = 400
+        Top = 321
+        Width = 75
+        Height = 25
+        Anchors = [akRight, akBottom]
+        Caption = '&Delete'
+        TabOrder = 3
+        OnClick = btnDeleteClick
+      end
+      object btnEdit: TBitBtn
+        Left = 319
+        Top = 321
+        Width = 75
+        Height = 25
+        Anchors = [akRight, akBottom]
+        Caption = '&Edit'
+        TabOrder = 4
+        OnClick = btnEditClick
+      end
+      object btnMoveDown: TBitBtn
+        Left = 562
+        Top = 321
+        Width = 75
+        Height = 25
+        Anchors = [akRight, akBottom]
+        Caption = '&Move Down'
+        TabOrder = 5
+        OnClick = btnMoveDownClick
+      end
+      object btnMoveUp: TBitBtn
+        Left = 481
+        Top = 321
+        Width = 75
+        Height = 25
+        Anchors = [akRight, akBottom]
+        Caption = 'Move &Up'
+        TabOrder = 6
+        OnClick = btnMoveUpClick
       end
     end
     object TabSheet1: TTabSheet

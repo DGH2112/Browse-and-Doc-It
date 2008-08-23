@@ -611,7 +611,8 @@ Type
 
 Implementation
 
-resourcestring
+Resourcestring
+  (** This is an error message for not enough tokens. **)
   strNotEnoughStrings = 'Not enough strings passed to ErrorAndSeekToken().';
 
 Const
@@ -2566,7 +2567,7 @@ Begin
   Else
     NextNonCommentToken;
   UsesClause;
-  DeclSection(scLocal, Nil);
+  DeclSection(scPrivate, Nil);
   ExportsStmt;
 End;
 

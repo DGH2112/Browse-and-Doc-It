@@ -177,7 +177,7 @@ Var
   (** This is an index for the editor notifier required when the package is
       unloaded **)
   iEditorIndex : Integer;
-  iIDENotifier : Integer;
+  {iIDENotifier : Integer;}
   (** A private variable to hold the time of the last editor update. **)
   iLastUpdateTickCount : Cardinal;
   (** An index for the keybinding nofitier - required when the package is
@@ -206,7 +206,7 @@ Begin
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   Wizard := TBrowseAndDocItWizard.Create;
   iWizardIndex := (BorlandIDEServices As IOTAWizardServices).AddWizard(Wizard);
-  iIDENotifier := (BorlandIDEServices As IOTAServices).AddNotifier(Wizard);
+  {iIDENotifier := (BorlandIDEServices As IOTAServices).AddNotifier(Wizard);}
   iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
     TEditorNotifier.Create);
   iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
@@ -1323,7 +1323,7 @@ Begin
       Application.Handle := Svcs.GetParentHandle;
       Wizard := TBrowseAndDocItWizard.Create;
       RegisterProc(Wizard);
-      iIDENotifier := (BorlandIDEServices As IOTAServices).AddNotifier(Wizard);
+      {iIDENotifier := (BorlandIDEServices As IOTAServices).AddNotifier(Wizard);}
       iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
         TEditorNotifier.Create);
       iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
@@ -2019,7 +2019,7 @@ Initialization
 Finalization
   (BorlandIDEServices As IOTAKeyboardServices).RemoveKeyboardBinding(iKeyBinding);
   (BorlandIDEServices As IOTAEditorServices).RemoveNotifier(iEditorIndex);
-  (BorlandIDEServices As IOTAServices).RemoveNotifier(iIDENotifier);
+  {(BorlandIDEServices As IOTAServices).RemoveNotifier(iIDENotifier);}
   (BorlandIDEServices As IOTAWizardServices).RemoveWizard(iWizardIndex);
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
 End.

@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       23 Aug 2008
+  @Date       24 Aug 2008
   @Author     David Hoyle
 
 **)
@@ -3790,7 +3790,8 @@ Begin
               T := OrdinalType(TypeToken(Nil, scNone, Nil,
                 FTemporaryElements.Add(Format('%d', [Result.Dimensions]), iiNone,
                 Nil)));
-              Result.AddTokens(T);
+              If T <> Nil Then
+                Result.AddTokens(T);
             Until Not IsToken(',', Result);
             If Token.Token = ']' Then
               AddToExpression(Result)
@@ -3803,7 +3804,8 @@ Begin
             Result.AppendToken(Token);
             NextNonCommentToken;
             T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
-            Result.AddTokens(T);
+            If T <> Nil Then
+              Result.AddTokens(T);
           End Else
             ErrorAndSeekToken(strReservedWordExpected, 'ArrayType', 'OF',
               strSeekableOnErrorTokens, stActual);

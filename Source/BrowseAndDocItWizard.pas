@@ -1,9 +1,9 @@
-﻿(**
+(**
 
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    23 Aug 2008
+  @Date    28 Aug 2008
   @Version 1.0
 
 **)
@@ -778,13 +778,17 @@ end;
 
 (**
 
-  This method returns a description for the method if it is a constructor,
+
+  This method returns a description for the method if it is a constructor,
   destructor, getter or setter method, else it returns an empty string.
 
-  @precon  Method is a valid instance of a method declatation to be described.
-  @postcon Returns a description of the method is applicable.
 
-  @param   Method       as a TGenericMethodDecl
+  @precon  Method is a valid instance of a method declatation to be described.
+
+  @postcon Returns a description of the method is applicable.
+
+
+  @param   Method       as a TGenericMethodDecl
   @param   AComment     as a TComment
   @param   iIndent      as an Integer
   @param   CursorAdjust as a TPoint

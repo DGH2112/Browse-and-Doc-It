@@ -575,7 +575,8 @@ Var
 
 begin
   For i := 1 To Container.ElementCount Do
-    If Container.Elements[i].Scope In BrowseAndDocItOptions.ScopesToRender + [scNone, scGlobal] Then
+    If Container.Elements[i].Scope In BrowseAndDocItOptions.ScopesToRender +
+      [scNone, scGlobal] Then
       Begin
         NewNode := AddNode(RootNode, Container[i].AsString, Container[i].Line,
           Container[i].Column, Container[i].ImageIndexAdjustedForScope,
@@ -821,10 +822,19 @@ End;
 
 **)
 procedure TframeModuleExplorer.OutputModuleInfo(Container : TElementContainer);
+var
+  N: TTreeNode;
 
 begin
   RenderContainers(FModule, Container);
   GetBodyCommentTags(Container As TBaseLanguageModule);
+  N := FModule.getFirstChild;
+  While N <> Nil Do
+    Begin
+      If N.Text = strDocumentationConflicts Then
+        FModule.MoveTo(FModule, naInsert);
+      N := FModule.GetNextChild(N);
+    End;
 end;
 
 

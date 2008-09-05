@@ -1,0 +1,163 @@
+/*
+
+  This file contains CSS information for the Browse And Doc It HTML Output.
+
+  @Author  David Hoyle
+  @Date    29 Aug 2008
+  @Version 1.0
+
+*/
+a:active {
+  background     : Red;
+  color          : Yellow;
+}
+
+a:link {
+  color          : Blue;
+}
+
+a:visited {
+  color          : Gray;
+}
+
+a:hover {
+  background     : Green;
+  color          : White;
+}
+
+body {
+  color          : Yellow;   //#FFFFFF;
+  background     : #FFFFFF;
+  font-family    : "Tahoma", Times, Serif;
+  font-size      : 10pt;
+}
+
+div.Contents {
+  margin         : 2pt;
+  position       : absolute;
+  top            : 4em;
+  bottom         : 0;
+  left           : 20em;
+  right          : 0;
+  overflow       : auto;
+  background     : white;
+  color          : black;
+}
+
+div.List {
+  background     : #FFFFFF;
+  margin-bottom  : 2pt;
+  font-weight    : Bold;
+  border         : solid thin;
+}
+
+div.Module {
+  margin-left    : 5pt;
+  margin-right   : 5pt;
+  padding-top    : 2pt;
+  padding-bottom : 2pt;
+  font-weight    : normal;
+}
+
+div.Modules {
+  position       : fixed;
+  top            : 0;
+  bottom         : 0;
+  left           : 0;
+  width          : 20em;
+  background     : white;
+  color          : White;
+  overflow       : auto;
+}
+
+div.Section {
+  margin-left    : 5pt;
+  margin-right   : 5pt;
+  padding-top    : 2pt;
+  padding-bottom : 2pt;
+  float          : left;
+}
+
+div.Sections {
+  position       : fixed;
+  top            : 0;
+  left           : 20em;
+  height         : 4em;
+  right          : 0;
+  background     : #EEEEFF;
+  margin-bottom  : 2px;
+  color          : black;
+}
+
+div.Text {
+  background     : #EEEEFF;
+  padding        : 5pt;
+  color          : Black;
+}
+
+h1 {
+  font-family    : times
+}
+
+h2 {
+  font-family    : times;
+  color : navy
+}
+
+h3 {
+  font-family    : times;
+  color : navy;
+}
+
+h4 {
+  font-family    : times;
+  color          : navy;
+  margin         : 1em;
+}
+
+html {
+  color          : #DDDDFF;
+}
+
+img.left {
+  float          : Left;
+  margin         : 5pt;
+}
+
+img.right {
+  float          : Right;
+  margin         : 5pt;
+}
+
+img.verticallymiddle {
+  vertical-align : middle;
+}
+
+li {
+  list-style-type : none;
+}
+
+p.Comment {
+  color          : navy;
+}
+
+table.Tags {
+  color          : maroon
+}
+
+td.TagName {
+  font-weight    : bold;
+}
+
+/* ------------------------------------------------------------------------ */
+
+TABLE.Navigation { background-color : #EEEEFF }
+TABLE.Sub { margin-left : 18 }
+
+TD.SpecialTag {color : purple; font-weight: bold; text-decoration: underline}
+
+THEAD { font-weight : bold }
+THEAD.Main { background-color : #CCCCFF }
+THEAD.Sub { background-color : cyan }
+
+

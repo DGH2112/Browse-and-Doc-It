@@ -3,7 +3,7 @@
   This module contains a base class for all documentation modules.
 
   @Author  David Hoyle
-  @Date    28 Aug 2008
+  @Date    06 Sep 2008
   @Version 1.0
 
 **)
@@ -24,7 +24,7 @@ Type
   Protected
     Function GetMainDocument : String; Virtual; Abstract;
   Public
-    Constructor Create(strOutputDirectory : String); Virtual;
+    Constructor Create(strOutputDirectory, strTitle : String); Virtual;
     Destructor Destroy; Override;
     Procedure Add(strFileName : String);
     Procedure OutputDocumentation; Virtual; Abstract;
@@ -62,15 +62,16 @@ End;
 
 (**
 
-  This is a constructor for the base documentation class.
+  This is a constructor for the base documentation class. 
 
-  @precon  None.
-  @postcon Initialises the class.
+  @precon  None. 
+  @postcon Initialises the class. 
 
   @param   strOutputDirectory as a String
+  @param   strTitle           as a String
 
 **)
-Constructor TBaseDocumentation.Create(strOutputDirectory : String);
+Constructor TBaseDocumentation.Create(strOutputDirectory, strTitle : String);
 
 ResourceString
   strOutputDirectoryIsNull = 'The output directory is NULL!';

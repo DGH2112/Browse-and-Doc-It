@@ -19,14 +19,15 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
-    Left = 689
+    Left = 681
     Top = 43
     Height = 720
     ResizeStyle = rsUpdate
+    ExplicitLeft = 689
     ExplicitHeight = 690
   end
   object Panel1: TPanel
-    Left = 273
+    Left = 265
     Top = 43
     Width = 416
     Height = 720
@@ -105,23 +106,32 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       TabOrder = 4
       OnClick = chkRecurseClick
     end
+    object Documentation: TButton
+      Left = 446
+      Top = 12
+      Width = 108
+      Height = 25
+      Caption = 'Documentation'
+      TabOrder = 5
+      OnClick = DocumentationClick
+    end
   end
   object Panel3: TPanel
     Left = 0
     Top = 43
-    Width = 273
+    Width = 265
     Height = 720
     Align = alLeft
     Caption = 'Panel3'
     TabOrder = 2
     DesignSize = (
-      273
+      265
       720)
     object lvFileList: TListView
       Left = 8
-      Top = 223
-      Width = 259
-      Height = 490
+      Top = 264
+      Width = 251
+      Height = 450
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = <
         item
@@ -130,12 +140,23 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
         end
         item
           Alignment = taRightJustify
-          Caption = 'Errors'
+          Caption = 'H'
+          Width = 25
         end
         item
           Alignment = taRightJustify
-          Caption = 'Conflicts'
-          Width = 60
+          Caption = 'W'
+          Width = 25
+        end
+        item
+          Alignment = taRightJustify
+          Caption = 'E'
+          Width = 25
+        end
+        item
+          Alignment = taRightJustify
+          Caption = 'C'
+          Width = 25
         end>
       HideSelection = False
       ReadOnly = True
@@ -146,12 +167,22 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     end
     object DirectoryListBox: TDirectoryListBox
       Left = 8
-      Top = 6
-      Width = 259
-      Height = 211
+      Top = 31
+      Width = 251
+      Height = 227
+      Anchors = [akLeft, akTop, akRight]
       ItemHeight = 16
       TabOrder = 1
       OnChange = edtDirectoryChange
+    end
+    object DriveComboBox: TDriveComboBox
+      Left = 8
+      Top = 6
+      Width = 251
+      Height = 19
+      Anchors = [akLeft, akTop, akRight]
+      DirList = DirectoryListBox
+      TabOrder = 2
     end
   end
   object PopupMenu1: TPopupMenu

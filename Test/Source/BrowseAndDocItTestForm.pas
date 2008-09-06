@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    12 Aug 2008
+  @Date    06 Sep 2008
   @Author  David Hoyle
 
 **)
@@ -47,6 +47,8 @@ type
     btnQuit: TBitBtn;
     chkRecurse: TCheckBox;
     DirectoryListBox: TDirectoryListBox;
+    DriveComboBox: TDriveComboBox;
+    Documentation: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
@@ -64,6 +66,7 @@ type
       Selected: Boolean);
     procedure btnOptionsClick(Sender: TObject);
     procedure chkRecurseClick(Sender: TObject);
+    procedure DocumentationClick(Sender: TObject);
   private
     { Private declarations }
     FModuleExplorerFrame : TframeModuleExplorer;
@@ -76,7 +79,7 @@ type
     function GetFileName: String;
     procedure SetDirectory(const Value: String);
     procedure SetFileName(const Value: String);
-    Procedure GetErrors(strFileName : String; var iErrors, iConflicts : Integer);
+    Procedure GetErrors(strFileName : String; var iHints, iWarnings, iErrors, iConflicts : Integer);
     Procedure RecurseDirectories(strDirectory : String);
     Procedure RefreshExplorer(Sender : TObject);
     (**
@@ -107,7 +110,9 @@ var
 implementation
 
 Uses
-  TokenForm, IniFiles, DGHLibrary, OptionsForm, ModuleDispatcher;
+  TokenForm, IniFiles, DGHLibrary, OptionsForm, ModuleDispatcher,
+  DocumentationDispatcher, BaseDocumentation, ShellAPI,
+  DocumentationOptionsForm;
 
 {$R *.dfm}
 
@@ -231,6 +236,37 @@ end;
 
 (**
 
+  This is an on click event handler for the Documentation Button.
+
+  @precon  None.
+  @postcon Invokes the documentation mechanism.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmBrowseAndDocItTestForm.DocumentationClick(Sender: TObject);
+
+Var
+  i : Integer;
+  ADocType: TDocType;
+
+begin
+  If TfrmDocumentationOptions.Execute(ADocType) Then
+    With DocumentDispatcher(ExtractFilePath(ParamStr(0)) + '\TEST Documentation\',
+      ADocType) Do
+      Try
+        For i := 0 To lvFileList.Items.Count - 1 Do
+          Add(lvFileList.Items[i].SubItems[4]);
+        OutputDocumentation;
+        ShellExecute(hInstance, 'OPEN', PChar(MainDocument), '',
+          PChar(GetCurrentDir), SW_NORMAL);
+      Finally
+        Free;
+      End;
+end;
+
+(**
+
   This method recurse the directories searching for files.
 
   @precon  None.
@@ -245,7 +281,7 @@ Var
   recFile : TSearchRec;
   iResult : Integer;
   liItem : TListItem;
-  iErrors: Integer;
+  iHints, iWarnings, iErrors: Integer;
   iConflicts: Integer;
 
 Begin
@@ -259,7 +295,10 @@ Begin
               Copy(strDirectory + '\' + recFile.Name, Length(FDirectory) + 1, 255) + '...');
             liItem := lvFileList.Items.Add;
             liItem.Caption := recFile.Name;
-            GetErrors(strDirectory + '\' + recFile.Name, iErrors, iConflicts);
+            GetErrors(strDirectory + '\' + recFile.Name, iHints, iWarnings,
+              iErrors, iConflicts);
+            liItem.SubItems.Add(Format('%d', [iHints]));
+            liItem.SubItems.Add(Format('%d', [iWarnings]));
             liItem.SubItems.Add(Format('%d', [iErrors]));
             liItem.SubItems.Add(Format('%d', [iConflicts]));
             liItem.SubItems.Add(strDirectory + '\' + recFile.Name);
@@ -292,18 +331,20 @@ end;
 
 (**
 
-  This method gets the number of errors for the given files name.
+  This method gets the number of errors for the given files name. 
 
-  @precon  None.
-  @postcon Gets the number of errors for the given files name.
+  @precon  None. 
+  @postcon Gets the number of errors for the given files name. 
 
-  @param   strFileName as a String
+  @param   strFileName as a String
+  @param   iHints      as an Integer as a reference
+  @param   iWarnings   as an Integer as a reference
   @param   iErrors     as an Integer as a reference
   @param   iConflicts  as an Integer as a reference
 
 **)
 Procedure TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String;
-  var iErrors, iConflicts : Integer);
+  var iHints, iWarnings, iErrors, iConflicts : Integer);
 
 Var
   Source : TFileStream;
@@ -312,6 +353,8 @@ Var
   C: TElementContainer;
 
 Begin
+  iHints := 0;
+  iWarnings := 0;
   iErrors := 0;
   iConflicts := 0;
   Source := TFileStream.Create(strFileName, fmOpenRead);
@@ -320,8 +363,12 @@ Begin
     M := Dispatcher(Source, strFileName, False, [moParse, moCheckForDocumentConflicts]);
     If M <> Nil Then
       Try
-        If M.FindElement(strErrorsAndWarnings) <> Nil Then
-          iErrors := M.FindElement(strErrorsAndWarnings).ElementCount;
+        If M.FindElement(strHints) <> Nil Then
+          iHints := M.FindElement(strHints).ElementCount;
+        If M.FindElement(strWarnings) <> Nil Then
+          iErrors := M.FindElement(strWarnings).ElementCount;
+        If M.FindElement(strErrors) <> Nil Then
+          iErrors := M.FindElement(strErrors).ElementCount;
         C := M.FindElement(strDocumentationConflicts);
         If C <> Nil Then
           Begin
@@ -500,11 +547,11 @@ Var
 begin
   FormCloseQuery(Self, boolCanClose);
   If lvFileList.Selected <> Nil Then
-    If FileExists(lvFileList.Selected.SubItems[2]) Then
-      FileName := lvFileList.Selected.SubItems[2]
+    If FileExists(lvFileList.Selected.SubItems[4]) Then
+      FileName := lvFileList.Selected.SubItems[4]
     Else
       MessageDlg(Format('The file "%s" was not found.',
-        [lvFileList.Selected.SubItems[2]]), mtError, [mbOK], 0);
+        [lvFileList.Selected.SubItems[4]]), mtError, [mbOK], 0);
 end;
 
 (**

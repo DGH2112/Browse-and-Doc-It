@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       24 Aug 2008
+  @Date       06 Sep 2008
   @Author     David Hoyle
 
 **)
@@ -27,10 +27,27 @@ Type
   (** A type to define the type of token search. **)
   TSeekToken = (stActual, stFirst);
 
+  (** This class represents a list of identifiers **)
+  TIdentList = Class(TElementContainer)
+  Private
+  Protected
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  End;
+
+  (** This class represents a temporary list / collection **)
+  TTempCntr = Class(TElementContainer)
+  Private
+  Protected
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  End;
+
   (** This is a sub class for general type types **)
   TTypes = Class(TGenericTypeDecl)
   Protected
-    Function GetAsString : String; Override;
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
 
   (** This is a sub class for restricted type types **)
@@ -121,7 +138,9 @@ Type
   TArrayType = Class(TStrucType)
   Private
     FDimensions : Integer;
+  Protected
   Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     Procedure AddDimension;
     (**
       This property defines the number of dmiensions that the array contains.
@@ -144,11 +163,11 @@ Type
   Private
     FPacked : Boolean;
   Protected
-    Function GetAsString : String; Override;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment); Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     (**
       Returns whether the record is packed or not.
       @precon  None.
@@ -161,7 +180,8 @@ Type
   (** A class to represent a Object Pascal Parameter. **)
   TPascalParameter = Class(TGenericParameter)
   Protected
-    Function GetAsString : String; Override;
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
 
   (** This is a class that defines method within Object Pascal code. **)
@@ -170,7 +190,6 @@ Type
     FDirectives : TStringList;
     FResolved    : Boolean;
   Protected
-    Function GetAsString : String; Override;
     Function GetName : String; Override;
   Public
     Constructor Create(MethodType : TMethodType; strName : String; AScope : TScope;
@@ -178,6 +197,7 @@ Type
     Destructor Destroy; Override;
     Procedure AddDirectives(strDirective : String);
     Function HasDirective(strDirective : String) : Boolean;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     (**
       Returns the string list of directives associated with the method.
       @precon  None.
@@ -215,10 +235,10 @@ Type
     procedure SetStoredSpec(const Value: String);
     procedure SetWriteSpec(const Value: String);
     procedure SetDefaultProperty(const Value: Boolean);
-    Function GetAsString : String; Override;
   Public
     Constructor Create(strIdent: String; AScope: TScope; iLine, iCol : Integer;
       AImageIndex : TImageIndex; AComment : TComment); Override;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     (**
       Returns the
       @precon  None.
@@ -295,7 +315,8 @@ Type
   (** This class defines a property specifier. **)
   TPropertySpec = Class(TElementContainer)
   Protected
-    Function GetAsString : String; Override;
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
 
   (** This is a class the extends the record definition to handle an object
@@ -304,12 +325,12 @@ Type
   Private
     FHeritage : TIdentList;
   Protected
-    Function GetAsString : String; Override;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
     procedure CheckDocumentation(var boolCascade : Boolean); Override;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     (**
       Returns a reference to the object class heritage.
       @precon  None.
@@ -326,9 +347,9 @@ Type
     FAbstractClass: Boolean;
     FSealedClass : Boolean;
   Protected
-    Function GetAsString : String; Override;
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     (**
       This property defined whether the class is abstract or not.
       @precon  None.
@@ -352,9 +373,9 @@ Type
     FGUID : String;
   Protected
     Procedure SetGUID(Value : String);
-    Function GetAsString : String; Override;
   Public
     procedure CheckDocumentation(var boolCascade : Boolean); Override;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     (**
       Returns the GUID for the interface.
       @precon  None.
@@ -369,9 +390,9 @@ Type
   TDispInterfaceDecl = Class(TInterfaceDecl)
   private
   Protected
-    Function GetAsString : String; Override;
   Public
     procedure CheckDocumentation(var boolCascade : Boolean); Override;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
 
   (** This is a sub class for all constants. **)
@@ -379,10 +400,10 @@ Type
   Private
     FTyped : Boolean;
   Protected
-    Function GetAsString : String; Override;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     (**
       This property determines it the constant is typed or simple.
       @precon  None.
@@ -401,7 +422,8 @@ Type
   (** This is a sub class for all variables. **)
   TVar = Class(TGenericVariable)
   Protected
-    Function GetAsString : String; Override;
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
   (** This is a sub class for all thread variables. **)
   TThreadVar = Class(TVar)
@@ -412,24 +434,32 @@ Type
   (** This class presents a field in a record, object, or class. **)
   TField = Class(TElementContainer)
   Protected
-    Function GetAsString : String; Override;
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
 
   (** This class represents an exported method. **)
   TExportsItem = Class(TElementContainer)
   Protected
-    Function GetAsString : String; Override;
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
 
   (** A class to represent the initialization section **)
   TInitializationSection = Class(TElementContainer)
+  Private
+  Protected
   Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** A class to represent the finalization section **)
   TFinalizationSection = Class(TElementContainer)
+  Private
+  Protected
   Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
@@ -467,7 +497,7 @@ Type
     Procedure Block(AScope : TScope; Method : TPascalMethod);
     Function ExportsStmt : Boolean;
     procedure ExportsItem(Container : TElementContainer);
-    Procedure DeclSection(AScope : TScope; Method : TGenericMethodDecl);
+    Procedure DeclSection(AScope : TScope; Method : TPascalMethod);
     Function LabelDeclSection(Container : TElementContainer) : Boolean;
     Function ConstSection(AScope : TScope; Container : TElementContainer) : Boolean;
     Function ConstantDecl(AScope : TScope; Container : TElementContainer) : Boolean;
@@ -503,9 +533,10 @@ Type
     Function VariantSection(Rec: TRecordDecl) : Boolean;
     Function PointerType(AToken : TTypeToken) : TPointerType;
     Function ProcedureType(AToken : TTypeToken) : TProcedureType;
-    Function VarSection(AScope : TScope; Method : TElementContainer) : Boolean;
+    Function VarSection(AScope : TScope; Method : TPascalMethod) : Boolean;
     Function ThreadVarSection(AScope : TScope) : Boolean;
-    Function VarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
+    Function VarDecl(AScope : TScope; VarSection : TElementContainer;
+      Method : TPascalMethod) : Boolean;
     Function ThreadVarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
     Procedure Expression(Method : TGenericMethodDecl;C : TElementContainer; var ExprType : TExprTypes);
     Procedure SimpleExpression(Method : TGenericMethodDecl;C : TElementContainer;
@@ -614,6 +645,10 @@ Implementation
 Resourcestring
   (** This is an error message for not enough tokens. **)
   strNotEnoughStrings = 'Not enough strings passed to ErrorAndSeekToken().';
+  (** This is an error message for rendering a temporay container - SHOULDN'T do this **)
+  strTriedToRenderTmpCntr = 'Tried to Render a Temporary Container!';
+  (** This is an error message for duplicate identifiers. **)
+  strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found.';
 
 Const
   (** A set of characters for alpha characaters **)
@@ -795,15 +830,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Returns the Interface declaration with the heritage.
+  @precon  None.
+  @postcon Returns the Interface declaration with the heritage.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TInterfaceDecl.GetAsString: String;
+function TInterfaceDecl.AsString(boolForDocumentation : Boolean): String;
 var
   iToken: Integer;
 begin
@@ -823,15 +859,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Returns the DispInterface declaration with the heritage.
+  @precon  None.
+  @postcon Returns the DispInterface declaration with the heritage.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TDispInterfaceDecl.GetAsString: String;
+function TDispInterfaceDecl.AsString(boolForDocumentation : Boolean): String;
 var
   iToken: Integer;
 begin
@@ -868,16 +905,17 @@ End;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property. 
 
-  @precon  None.
-  @postcon Returns a type formatted with an equals sign between the name and the
-           definition.
+  @precon  None. 
+  @postcon Returns a type formatted with an equals sign between the name and 
+           the definition. 
 
-  @return  a String
+  @param   boolForDocumentation as a Boolean
+  @return  a String              
 
 **)
-function TTypes.GetAsString: String;
+function TTypes.AsString(boolForDocumentation : Boolean): String;
 
 Var
   iToken : Integer;
@@ -917,16 +955,17 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Formats the constant information depending on whether its a simple
-           constant or a typed constant.
+  @precon  None.
+  @postcon Formats the constant information depending on whether its a simple
+           constant or a typed constant.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TConstant.GetAsString: String;
+function TConstant.AsString(boolForDocumentation : Boolean): String;
 
 Var
   iToken : Integer;
@@ -943,15 +982,17 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Outputs the parameter information in the style of object pascal code.
+  @precon  None.
+  @postcon Outputs the parameter information in the style of object pascal
+           code.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-Function TPascalParameter.GetAsString : String;
+Function TPascalParameter.AsString(boolForDocumentation : Boolean) : String;
 begin
   Result := strParamModifier[ParamModifier];
   Result := Result + Identifier;
@@ -1017,15 +1058,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Outputs the pascal method declaration.
+  @precon  None.
+  @postcon Outputs the pascal method declaration.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TPascalMethod.GetAsString: String;
+function TPascalMethod.AsString(boolForDocumentation : Boolean): String;
 
 Var
   i : Integer;
@@ -1036,13 +1078,25 @@ begin
     Result := Result + #32 + Identifier;
   If ParameterCount > 0 Then
     Begin
-      Result := Result + '(';
+      If boolForDocumentation Then
+        Result := Result + '('#13#10
+      Else
+        Result := Result + '(';
       For i := 0 To ParameterCount - 1 Do
         Begin
+          If boolForDocumentation Then
+            Result := Result + #32#32;
           Result := Result + Parameters[i].AsString;
           If i < ParameterCount - 1 Then
-            Result := Result + '; ';
+            Begin
+              If boolForDocumentation Then
+                Result := Result + ';'#13#10
+              Else
+                Result := Result + '; ';
+            End;
         End;
+      If boolForDocumentation Then
+        Result := Result + #13#10;
       Result := Result + ')';
     End;
   If ReturnType <> Nil Then
@@ -1139,15 +1193,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Outputs the pascal property declaration.
+  @precon  None.
+  @postcon Outputs the pascal property declaration.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TPascalProperty.GetAsString: String;
+function TPascalProperty.AsString(boolForDocumentation : Boolean): String;
 
   (**
 
@@ -1315,15 +1370,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Returns the property specifier, Name = key word, tokens = value.
+  @precon  None.
+  @postcon Returns the property specifier, Name = key word, tokens = value.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TPropertySpec.GetAsString: String;
+function TPropertySpec.AsString(boolForDocumentation : Boolean): String;
 
 var
   iToken: Integer;
@@ -1336,30 +1392,32 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Returns the name of the record + '= Record'.
+  @precon  None.
+  @postcon Returns the name of the record + '= Record'.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TRecordDecl.GetAsString: String;
+function TRecordDecl.AsString(boolForDocumentation : Boolean): String;
 begin
   Result := Identifier + #32'='#32'Record';
 end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Returns the name of the field and = sign and then the definition.
+  @precon  None.
+  @postcon Returns the name of the field and = sign and then the definition.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TField.GetAsString: String;
+function TField.AsString(boolForDocumentation : Boolean): String;
 
 Var
   iToken : Integer;
@@ -1372,15 +1430,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Returns the Exported item declaration.
+  @precon  None.
+  @postcon Returns the Exported item declaration.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TExportsItem.GetAsString: String;
+function TExportsItem.AsString(boolForDocumentation : Boolean): String;
 
 Var
   iToken : Integer;
@@ -1393,15 +1452,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Returns the variable declaration.
+  @precon  None.
+  @postcon Returns the variable declaration.
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TVar.GetAsString: String;
+function TVar.AsString(boolForDocumentation : Boolean): String;
 
 Var
   i : Integer;
@@ -1450,15 +1510,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Output the name of the Object = '= Object("HeritageList")'
+  @precon  None.
+  @postcon Output the name of the Object = '= Object("HeritageList")'
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TObjectDecl.GetAsString: String;
+function TObjectDecl.AsString(boolForDocumentation : Boolean): String;
 
 Var
   iToken: Integer;
@@ -1480,15 +1541,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Output the name of the Class = '= Class("HeritageList")'
+  @precon  None.
+  @postcon Output the name of the Class = '= Class("HeritageList")'
 
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TClassDecl.GetAsString: String;
+function TClassDecl.AsString(boolForDocumentation : Boolean): String;
 
 Var
   iToken: Integer;
@@ -1587,11 +1649,8 @@ Begin
       AddTickCount('Parse');
       TidyUpEmptyElements;
       AddTickCount('Tidy');
-      If FindElement(strErrors) = Nil Then
-        Begin
-          CheckUnResolvedMethods;
-          AddTickCount('Resolve');
-        End;
+      CheckUnResolvedMethods;
+      AddTickCount('Resolve');
       boolCascade := True;
       If moCheckForDocumentConflicts In ModuleOptions Then
         Begin
@@ -1912,6 +1971,7 @@ Var
   iIcon : TImageIndex;
   AScope : TScope;
   E : TElementContainer;
+  tmpMethod : TPascalMethod;
 
 begin
   If Method <> Nil Then
@@ -1932,12 +1992,16 @@ begin
                     AScope := E.Scope;
                   End;
                 Container := Container.Add(
-                  TElementContainer.Create(Method.ClsName, AScope, 0, 0, iIcon, Nil));
+                  TLabelContainer.Create(Method.ClsName, AScope, 0, 0, iIcon, Nil));
               End;
         End;
       If Container Is TObjectDecl Then
         Container := Container.Add(strMethods, iiMethodsLabel, Nil);
-      Method := Container.Add(Method) As TPascalMethod;
+      tmpMethod := Method;
+      Method := Container.Add(tmpMethod) As TPascalMethod;
+      If tmpMethod <> Method Then
+        AddIssue(Format(strDuplicateIdentifierFound, [Method.Identifier]),
+          scNone,  'AddToContainer', tmpMethod.Line, tmpMethod.Column, etError);
     End;
 end;
 
@@ -2067,14 +2131,19 @@ Var
 
 begin
   If Method <> Nil Then
-    Begin
-      E := Method.FindElement(strSymbol);
-      If E <> Nil Then
-        Begin
-          E.Referenced := True;
-          Exit;
-        End;
-    End;
+    For i := Low(strSections) to High(strSections) Do
+      Begin
+        E := Method.FindElement(strSections[i]);
+        If E <> Nil Then
+          Begin
+            E := E.FindElement(strSymbol);
+            If E <> Nil Then
+              Begin
+                E.Referenced := True;
+                Exit;
+              End;
+          End;
+      End;
   For i := Low(strSections) to High(strSections) Do
     Begin
       E := FindElement(strSections[i]);
@@ -2694,7 +2763,7 @@ End;
            block i.e. private in in the implemenation section or public if in 
            the interface section and The Method parameter is nil for methods 
            in the implementation section or a reference to a method for a 
-           local declaration section with in a method.
+           local declaration section with in a method. 
   @postcon Parses a declaration section from the current token position. 
 
   @grammar DeclSection -> LabelDeclSection -> ConstSection -> ResStringSection 
@@ -2702,10 +2771,10 @@ End;
            ProcedureDeclSection -> ExportedProcs 
 
   @param   AScope as a TScope
-  @param   Method as a TGenericMethodDecl
+  @param   Method as a TPascalMethod
 
 **)
-Procedure TPascalModule.DeclSection(AScope : TScope; Method : TGenericMethodDecl);
+Procedure TPascalModule.DeclSection(AScope : TScope; Method : TPascalMethod);
 
 Begin
   Repeat
@@ -2748,7 +2817,7 @@ Begin
       Repeat
         If Token.TokenType In [ttNumber] Then
           Begin
-            Container.Add(Token, scLocal, iiPublicLabel, GetComment);
+            Container.Add(strLabel, iiLabelsLabel, Nil).Add(Token, scLocal, iiPublicLabel, GetComment);
             NextNonCommentToken;
           End Else
             ErrorAndSeekToken(strNumberExpected, 'LabelDeclSection', Token.Token,
@@ -2795,10 +2864,7 @@ Begin
     Begin
       If Container = Nil Then
         Container := Self;
-      If Container Is TGenericMethodDecl Then
-        C := Container
-      Else
-        C:= Container.Add(strConstantsLabel, iiConstantsLabel, GetComment);
+      C:= Container.Add(strConstantsLabel, iiConstantsLabel, GetComment);
       NextNonCommentToken;
       While ConstantDecl(AScope, C) Do
         If Token.Token = ';' Then
@@ -2837,7 +2903,7 @@ Function TPascalModule.ConstantDecl(AScope : TScope;
 Var
   T : TGenericTypeDecl;
   ExprType : TExprTypes;
-  C : TConstant;
+  C, tmpC : TConstant;
   FTemporaryElements: TElementContainer;
 
 Begin
@@ -2846,10 +2912,13 @@ Begin
   If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
       // Create constant and add to the collection, then get comment
-      C := TConstant.Create(Token.Token, AScope, Token.Line, Token.Column,
+      tmpC := TConstant.Create(Token.Token, AScope, Token.Line, Token.Column,
         iiPublicConstant, GetComment);
-      C := Container.Add(C) As TConstant;
+      C := Container.Add(tmpC) As TConstant;
       Result := True;
+      If tmpC <> C Then
+        AddIssue(Format(strDuplicateIdentifierFound, [Token.Token]), scNone,
+          'ConstantDecl', Token.Line, Token.Column, etError);
       NextNonCommentToken;
       If Token.Token = '=' Then        // ConstExpr
         Begin
@@ -2862,9 +2931,10 @@ Begin
         Begin
           C.Typed := True;
           NextNonCommentToken;
-          FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+          FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
           Try
             T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+            C.AddTokens(T);
             If Token.Token = '=' Then
               Begin
                 C.AppendToken(Token);
@@ -2916,10 +2986,7 @@ Begin
     Begin
       If Container = Nil Then
         Container := Self;
-      If Container Is TGenericMethodDecl Then
-        R := Container
-      Else
-        R := Container.Add(strResourceStringsLabel, iiResourceStringsLabel, GetComment);
+      R := Container.Add(strResourceStringsLabel, iiResourceStringsLabel, GetComment);
       NextNonCommentToken;
       Repeat
         {Loop do nothing}
@@ -2952,7 +3019,7 @@ Function TPascalModule.ResourceStringDecl(AScope : TScope;
   Container : TElementContainer) : Boolean;
 
 Var
-  C : TElementContainer;
+  C, tmpC : TElementContainer;
   ExprType : TExprTypes;
 
 Begin
@@ -2962,9 +3029,12 @@ Begin
   If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
       // Create constant and add to the collection, then get comment
-      C := TResourceString.Create(Token.Token, AScope ,Token.Line, Token.Column,
+      tmpC := TResourceString.Create(Token.Token, AScope ,Token.Line, Token.Column,
         iiPublicResourceString, GetComment);
-      C := Container.Add(C);
+      C := Container.Add(tmpC);
+      If tmpC <> C Then
+        AddIssue(Format(strDuplicateIdentifierFound, [Token.Token]), scNone,
+          'ResourceStringDecl', Token.Line, Token.Column, etError);
       Result := True;
       NextNonCommentToken;
       If Token.Token = '=' then
@@ -3010,10 +3080,7 @@ Begin
     Begin
       If Container = Nil Then
         Container := Self;
-      If Container Is TGenericMethodDecl Then
-        T := Container
-      Else
-        T := Container.Add(strTypesLabel, iiTypesLabel, GetComment);
+      T := Container.Add(strTypesLabel, iiTypesLabel, GetComment);
       NextNonCommentToken;
       While TypeDecl(AScope, T) Do
         If Token.Token = ';' Then
@@ -3051,10 +3118,7 @@ Begin
   Result := False;
   If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
-      AToken.FToken := Token;
-      AToken.FScope := AScope;
-      AToken.FComment := GetComment;
-      AToken.FContainer := Container;
+      AToken := TypeToken(Token, AScope, GetComment, Container);
       NextNonCommentToken;
       If Token.Token = '=' Then
         Begin
@@ -3780,7 +3844,7 @@ Begin
         Result.AppendToken('Packed');
       Result.AppendToken(Token);
       NextNonCommentToken;
-      FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+      FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         If Token.Token = '[' Then
           Begin
@@ -3899,7 +3963,7 @@ Procedure TPascalModule.FieldDecl(Rec: TRecordDecl);
 Var
   I : TIdentList;
   j : Integer;
-  P : TField;
+  P, tmpP : TField;
   T : TGenericTypeDecl;
   FTemporaryElements: TElementContainer;
 
@@ -3912,15 +3976,18 @@ Begin
         If Token.Token = ':' Then
           Begin
             NextNonCommentToken;
-            FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+            FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
             Try
               T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
               // Create record fields
               For j := 1 To I.ElementCount Do
                 Begin
-                  P :=  TField.Create(I[j].Name, scPublic, I[j].Line, I[j].Column,
+                  tmpP :=  TField.Create(I[j].Name, scPublic, I[j].Line, I[j].Column,
                     iiPublicField, I[j].Comment);
-                  Rec.Add(P);
+                  P := Rec.Add(tmpP) As TField;
+                  If P <> tmpP Then
+                    AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name]),
+                      scNone, 'FieldDecl', I[j].Line, I[j].Column, etError);
                   If T <> Nil Then
                     P.AddTokens(T)
                   Else
@@ -3973,7 +4040,7 @@ Begin
           Else
             RollBackToken;
         End;
-      C := TElementContainer.Create(Token.Token, scPrivate, Token.Line,
+      C := TTempCntr.Create(Token.Token, scPrivate, Token.Line,
         Token.Column, iiNone, Nil);
       Try
         If TypeId(C) Then
@@ -4020,7 +4087,7 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  C := TElementContainer.Create('', scPrivate, 0, 0, iiNone, Nil);
+  C := TTempCntr.Create('', scPrivate, 0, 0, iiNone, Nil);
   Try
     Repeat
       ExprType := [etUnknown, etConstExpr];
@@ -4085,7 +4152,7 @@ Begin
       If Token.UToken = 'OF' Then
         Begin
           AddToExpression(Result);
-          FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+          FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
           Try
             T := OrdinalType(TypeToken(Nil, scNone, Nil, FTemporaryElements));
             If T <> Nil Then
@@ -4141,7 +4208,7 @@ Begin
             Result.AppendToken('Packed');
           Result.AppendToken('File');
           AddToExpression(Result);
-          FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+          FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
           Try
             T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
             If T <> Nil Then
@@ -4215,7 +4282,7 @@ Var
 
 begin
   Result := Nil;
-  Temporary := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+  Temporary := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
   Try
     M := ProcedureHeading(scPrivate, Temporary, False);
     If M = Nil Then
@@ -4256,15 +4323,15 @@ end;
   @postcon This method returns True if this method handles a constant 
            declaration section. 
 
-  @grammar VarSection -> VAR ( VarDecl ';' ) ...
+  @grammar VarSection -> VAR ( VarDecl ';' ) ... 
 
   @param   AScope as a TScope
-  @param   Method as a TElementContainer
+  @param   Method as a TPascalMethod
   @return  a Boolean
 
 **)
 Function TPascalModule.VarSection(AScope : TScope;
-  Method : TElementContainer) : Boolean;
+  Method : TPascalMethod) : Boolean;
 
 Var
   V : TElementContainer;
@@ -4273,14 +4340,12 @@ Begin
   Result := Token.UToken = 'VAR';
   If Result Then
     Begin
-      If Method = Nil Then
-        Method := Self;
-      If Method Is TGenericMethodDecl Then
-        V := Method
-      Else
-        V := Method.Add(strVarsLabel, iiVariablesLabel, GetComment);
+      V := Method;
+      If V = Nil Then
+        V := Self;
+      V := V.Add(strVarsLabel, iiVariablesLabel, GetComment);
       NextNonCommentToken;
-      While VarDecl(AScope, V) Do
+      While VarDecl(AScope, V, Method) Do
         Begin
           If Token.Token <> ';' Then
             ErrorAndSeekToken(strLiteralExpected, 'VarSection', ';',
@@ -4356,21 +4421,23 @@ end;
 
 (**
 
-  This method parses a variable declaration from the current token position.
+  This method parses a variable declaration from the current token position. 
 
-  @grammar VarDecl -> IdentList ':' Type [ ( ABSOLUTE ( Ident | ConstExpr ) ) | '=' ConstExpr ]
+  @precon  AScope defines the current scope of the variable and VarSection is a 
+           valid variable container for the storage of the variable declared. 
+  @postcon Returns true if a variable declaration was handled. 
 
-  @precon  AScope defines the current scope of the variable and VarSection is a
-           valid variable container for the storage of the variable declared.
-  @postcon Returns true if a variable declaration was handled.
+  @grammar VarDecl -> IdentList ':' Type [ ( ABSOLUTE ( Ident | ConstExpr ) ) | 
+           '=' ConstExpr ] 
 
-  @param   AScope      as a TScope
+  @param   AScope     as a TScope
   @param   VarSection as a TElementContainer
-  @return  a Boolean
+  @param   Method     as a TPascalMethod
+  @return  a Boolean   
 
 **)
 Function TPascalModule.VarDecl(AScope : TScope;
-  VarSection : TElementContainer) : Boolean;
+  VarSection : TElementContainer; Method : TPascalMethod) : Boolean;
 
   (**
 
@@ -4399,7 +4466,7 @@ Function TPascalModule.VarDecl(AScope : TScope;
 Var
   I  :TIdentList;
   j : Integer;
-  V : TElementContainer;
+  V, tmpV : TElementContainer;
   T : TGenericTypeDecl;
   C : TElementContainer;
   ExprType : TExprTypes;
@@ -4418,18 +4485,18 @@ Begin
             strSeekableOnErrorTokens, stActual)
         Else
           Begin
-            FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+            FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
             Try
               NextNonCommentToken;
               T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
               If T <> Nil Then
-                If VarSection Is TGenericMethodDecl Then
-                  ReferenceLocalsPrivates(TypeTokens(T), VarSection As TGenericMethodDecl)
+                If Method Is TGenericMethodDecl Then
+                  ReferenceLocalsPrivates(TypeTokens(T), Method As TGenericMethodDecl)
                 Else
                   ReferenceLocalsPrivates(TypeTokens(T), Nil);
               If Token.UToken = 'ABSOLUTE' Then
                 Begin
-                  C := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+                  C := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
                   Try
                     C.AppendToken(Token.Token);
                     NextNonCommentToken;
@@ -4443,7 +4510,7 @@ Begin
                 End;
               If Token.Token = '=' Then
                 Begin
-                  C := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+                  C := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
                   Try
                     C.AppendToken(Token.Token);
                     NextNonCommentToken;
@@ -4459,9 +4526,12 @@ Begin
               If T <> Nil Then
                 For j := 1 To I.ElementCount Do
                   Begin
-                    V := TVar.Create(I[j].Identifier, AScope, I[j].Line, I[j].Column,
+                    tmpV := TVar.Create(I[j].Identifier, AScope, I[j].Line, I[j].Column,
                       iiPublicVariable, I[j].Comment);
-                    V := VarSection.Add(V);
+                    V := VarSection.Add(tmpV);
+                    If tmpV <> V Then
+                      AddIssue(Format(strDuplicateIdentifierFound, [I[j].Identifier]),
+                        scNone, 'VarDecl', I[j].Line, I[j].Column, etError);
                     V.AddTokens(T);
                     If I[j].Comment <> Nil Then
                       Begin
@@ -4507,7 +4577,7 @@ Function TPascalModule.ThreadVarDecl(AScope : TScope;
 Var
   I  :TIdentList;
   j : Integer;
-  V : TElementContainer;
+  V, tmpV : TElementContainer;
   T : TGenericTypeDecl;
   C : TElementContainer;
   ExprType : TExprTypes;
@@ -4527,12 +4597,12 @@ Begin
         Else
           Begin
             NextNonCommentToken;
-            FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+            FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
             Try
               T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
               If Token.Token = '=' Then
                 Begin
-                  C := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+                  C := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
                   Try
                     C.AppendToken(Token);
                     NextNonCommentToken;
@@ -4547,9 +4617,12 @@ Begin
               PortabilityDirective;
               For j := 1 To I.ElementCount Do
                 Begin
-                  V := TThreadVar.Create(I[j].Identifier, AScope, I[j].Line, I[j].Column,
+                  tmpV := TThreadVar.Create(I[j].Identifier, AScope, I[j].Line, I[j].Column,
                     iiPublicThreadVar, I[j].Comment);
-                  V := VarSection.Add(V);
+                  V := VarSection.Add(tmpV);
+                  If tmpV <> V Then
+                    AddIssue(Format(strDuplicateIdentifierFound, [I[j].Identifier]),
+                      scNone, 'VarDecl', I[j].Line, I[j].Column, etError);
                   V.AddTokens(T);
                   If I[j].Comment <> Nil Then
                     Begin
@@ -5657,6 +5730,7 @@ Begin
       NextNonCommentToken;
       If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
+          ReferenceLocalsPrivates(Token.Token, Method);
           NextNonCommentToken;
           If Token.Token = ':=' Then
             Begin
@@ -5816,7 +5890,7 @@ Begin
           Else
             RollBackToken;
         End;
-      Con := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+      Con := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         TypeId(Con);
         If Token.UToken = 'DO' Then
@@ -6564,10 +6638,10 @@ Begin
   T := Nil;
   boolArrayOf := False;
   strValue := '';
-  P := TElementContainer.Create('', scLocal, 0, 0, iiNone, Nil);
+  P := TTempCntr.Create('', scLocal, 0, 0, iiNone, Nil);
   Try
     P.Sorted:= False;
-    FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+    FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
     Try
       IdentList(P, strSeekableOnErrorTokens);
       If Token.Token = ':' Then
@@ -6589,7 +6663,7 @@ Begin
           If T = Nil Then
             If Token.UToken = 'CONST' Then
               Begin
-                T := TGenericTypeDecl.Create(Token.Token, scPrivate, Token.Line,
+                T := TTypes.Create(Token.Token, scPrivate, Token.Line,
                   Token.Column, iiNone, Nil);
                 NextNonCommentToken;
               End;
@@ -6597,7 +6671,7 @@ Begin
           If Token.Token = '=' Then
             Begin
               NextNonCommentToken;
-              C := TElementContainer.Create('', scLocal, 0, 0, iiNone, Nil);
+              C := TConstant.Create('', scLocal, 0, 0, iiNone, Nil);
               Try
                 ExprType := [etConstExpr, etUnknown];
                 ConstExpr(Method, C, ExprType);
@@ -6661,14 +6735,14 @@ Begin
         M.ForwardDecl := True;
       If Token.UToken = 'ABSTRACT' THEN
         M.ForwardDecl := True;
-      C := TElementContainer.Create('', scLocal, 0, 0, iiNone, Nil);
+      C := TIdentList.Create('', scLocal, 0, 0, iiNone, Nil);
       Try
         If Token.UToken = 'MESSAGE' Then
           Begin
             NextNonCommentToken;
             ExprType := [etConstExpr, etInteger];
             ConstExpr(Nil, C, ExprType);
-            M.AddDirectives('Meesage ' + C.AsString);
+            M.AddDirectives('Message ' + C.AsString);
           End
         Else If Token.UToken = 'EXTERNAL' Then
           Begin
@@ -7035,7 +7109,7 @@ Function TPascalModule.ObjFieldList(Cls: TObjectDecl; AScope: TScope): Boolean;
 Var
   I : TIdentList;
   j : Integer;
-  P : TField;
+  P, tmpP : TField;
   T : TGenericTypeDecl;
   FTemporaryElements: TElementContainer;
 
@@ -7048,14 +7122,17 @@ begin
       Begin
         Result := True;
         NextNonCommentToken;
-        FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+        FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
         Try
           T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
           For j := 1 To I.ElementCount Do
             Begin
-              P := TField.Create(I[j].Name, AScope, I[j].Line, I[j].Column,
+              tmpP := TField.Create(I[j].Name, AScope, I[j].Line, I[j].Column,
                 iiPublicField, I[j].Comment);
-              Cls.Add(strFieldsLabel, iiFieldsLabel, Nil).Add(P);
+              P := Cls.Add(strFieldsLabel, iiFieldsLabel, Nil).Add(tmpP) As TField;
+              If P <> tmpP Then
+                AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name]),
+                  scNone, 'ObjFieldDecl', I[j].Line, I[j].Column, etError);
               If T <> Nil Then
                 P.AddTokens(T)
               Else
@@ -7092,14 +7169,12 @@ Procedure TPascalModule.InitSection;
 Begin
   If Token.UToken = 'INITIALIZATION' Then
     Begin
-      Add(TInitializationSection.Create(strInitialization, scNone, Token.Line,
-        Token.Column, iiInitialization, GetComment));
+      Add(Token, scNone, iiInitialization, GetComment);
       NextNonCommentToken;
       StmtList(Nil);
       If Token.UToken = 'FINALIZATION' Then
         Begin
-          Add(TFinalizationSection.Create(strFinalization, scNone, Token.Line,
-            Token.Column, iiFinalization, GetComment));
+          Add(Token, scNone, iiFinalization, GetComment);
           NextNonCommentToken;
           StmtList(Nil);
         End;
@@ -7352,7 +7427,7 @@ End;
 Function TPascalModule.PropertyList(Cls: TClassDecl; var AScope: TScope): Boolean;
 
 Var
-  P : TPascalProperty;
+  P, tmpP : TPascalProperty;
   C : TComment;
 
 begin
@@ -7364,9 +7439,12 @@ begin
       NextNonCommentToken;
       If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
-          P := TPascalProperty.Create(Token.Token, AScope, Token.Line,
+          tmpP := TPascalProperty.Create(Token.Token, AScope, Token.Line,
             Token.Column, iiPublicProperty, C);
-          Cls.Add(strProperties, iiPropertiesLabel, Nil).Add(P);
+          P := Cls.Add(strProperties, iiPropertiesLabel, Nil).Add(tmpP) As TPascalProperty;
+          If P <> tmpP Then
+            AddIssue(Format(strDuplicateIdentifierFound, [Token.Token]),
+              scNone,  'AddToContainer', Token.Line, Token.Column, etError);
           NextNonCommentToken;
           PropertyInterface(P);
           PropertySpecifiers(P);
@@ -7399,7 +7477,7 @@ Begin
   If Token.Token = ':' Then
     Begin
       NextNonCommentToken;
-      FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+      FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         Prop.TypeId := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
         TypeId(Prop.TypeId);
@@ -7451,7 +7529,7 @@ Begin
           If Token.Token = ':' Then
             Begin
               NextNonCommentToken;
-              FTemporaryElements := TElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+              FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
               Try
                 T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
                 For j := 1 To I.ElementCount Do
@@ -7802,7 +7880,8 @@ Begin
       If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
           If Container <> Nil Then
-            Container.Add(Token, scNone, iImageIndex, GetComment);
+            Container.Add(TIdentList.Create(Token.Token, scNone, Token.Line,
+              Token.Column, iImageIndex, GetComment));
           NextNonCommentToken;
           If Token.UToken = 'IN' Then
             Begin
@@ -7814,7 +7893,6 @@ Begin
                 NextNonCommentToken;
             End;
         End Else
-//        If Not (Token.TokenType In [ttSymbol]) Then
           ErrorAndSeekToken(strIdentExpected, 'IdentList', Token.Token,
             strSeekableOnErrorTokens, stFirst);
     Until Not IsToken(',', Nil);
@@ -7856,22 +7934,22 @@ End;
 (**
 
 
-  This method parses a constant expression from the current token position 
-  using the following object pascal grammar. 
+  This method parses a constant expression from the current token position
+  using the following object pascal grammar.
 
 
-  @precon  C is a generic container to add tokens too. 
+  @precon  C is a generic container to add tokens too.
 
-  @postcon Returns true if a constant expression was parsed. 
+  @postcon Returns true if a constant expression was parsed.
 
 
-  @grammar ConstExpr -> <constant-expression> 
+  @grammar ConstExpr -> <constant-expression>
 
 
   @param   Method    as a TGenericMethodDecl
   @param   Container as a TElementContainer
   @param   ExprType  as a TExprTypes as a reference
-  @return  a Boolean  
+  @return  a Boolean
 
 **)
 Function TPascalModule.ConstExpr(Method : TGenericMethodDecl;
@@ -8080,6 +8158,22 @@ End;
 
 (**
 
+  This is a getter method for the AsString property.
+
+  @precon  None.
+  @postcon Returns the name of the Initialisation section as a String.
+
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TInitializationSection.AsString(boolForDocumentation : Boolean): String;
+begin
+  Result := Identifier;
+end;
+
+(**
+
   This method check the module's finalisation sections for comments.
 
   @precon  None.
@@ -8096,6 +8190,22 @@ Begin
       AddDocumentConflict([strFinalization], Line, Column, Comment,
         DocConflictTable[dctMissingFinalComment]);
 End;
+
+(**
+
+  This is a getter method for the AsString property.
+
+  @precon  None.
+  @postcon Returns the name of the Finalisation section as a String.
+
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TFinalizationSection.AsString(boolForDocumentation : Boolean = False): String;
+begin
+  Result := Identifier;
+end;
 
 (**
 
@@ -8136,7 +8246,7 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
 
     @param   strText  as a String
     @param   strStart as a String
-    @return  a Boolean 
+    @return  a Boolean
 
   **)
   Function Like(strText, strStart : String) : Boolean;
@@ -8230,6 +8340,66 @@ begin
     End;
   If iSkip < 0 Then
     iSkip := 0;
+end;
+
+(**
+
+  This is a getter method for the AsString property.
+
+  @precon  None.
+  @postcon Returns a string representation of the class information.
+
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TIdentList.AsString(boolForDocumentation : Boolean): String;
+begin
+  Result := Identifier;
+end;
+
+(**
+
+  This is a getter method for the AsString property.
+
+  @precon  None.
+  @postcon Returns a string representation of the class information.
+
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TTempCntr.AsString(boolForDocumentation : Boolean): String;
+begin
+  Result := '';
+  Raise Exception.Create(strTriedToRenderTmpCntr);
+end;
+
+(**
+
+  This is a getter method for the AsString property.
+
+  @precon  None.
+  @postcon Returns a string representation of the type.
+
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TArrayType.AsString(boolForDocumentation : Boolean): String;
+
+var
+  iToken: Integer;
+
+begin
+  If Identifier <> '' Then
+    Result := Identifier + #32'=';
+  For iToken := 0 To TokenCount - 1 Do
+    Begin
+      If Result <> '' Then
+        Result := Result +#32;
+      Result := Result + Tokens[iToken].Token;
+    End;
 end;
 
 End.

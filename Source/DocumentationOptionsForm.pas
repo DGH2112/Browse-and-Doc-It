@@ -49,10 +49,15 @@ implementation
 **)
 class function TfrmDocumentationOptions.Execute(var ADocType: TDocType): Boolean;
 
+Var
+  i : TDocType;
+
 begin
   Result := False;
   With TfrmDocumentationOptions.Create(Nil) Do
     Try
+      For i := Low(TDocType) to High(TDocType) Do
+        rgpDocumentationOptions.Items.Add(strDocumentationTypes[i]);
       rgpDocumentationOptions.ItemIndex := Byte(ADocType);
       If ShowModal = mrOK Then
         Begin

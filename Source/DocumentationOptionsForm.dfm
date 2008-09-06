@@ -26,8 +26,6 @@ object frmDocumentationOptions: TfrmDocumentationOptions
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Documentation Options'
     TabOrder = 0
-    ExplicitWidth = 438
-    ExplicitHeight = 325
   end
   object btnOK: TBitBtn
     Left = 267
@@ -37,7 +35,6 @@ object frmDocumentationOptions: TfrmDocumentationOptions
     Anchors = [akTop, akRight]
     TabOrder = 1
     Kind = bkOK
-    ExplicitLeft = 452
   end
   object btnCancel: TBitBtn
     Left = 267
@@ -47,6 +44,5 @@ object frmDocumentationOptions: TfrmDocumentationOptions
     Anchors = [akTop, akRight]
     TabOrder = 2
     Kind = bkCancel
-    ExplicitLeft = 445
   end
 end

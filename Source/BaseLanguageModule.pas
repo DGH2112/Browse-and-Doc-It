@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    22 Aug 2008
+  @Date    05 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -593,7 +593,6 @@ Type
     Function GetElements(iIndex : Integer) : TElementContainer;
     Function GetTokenCount : Integer;
     Function GetTokens(iIndex : Integer) : TTokenInfo;
-    Function GetAsString : String; Virtual;
     Function GetImageIndexAdjustedForScope : Integer;
     Function Find(strName : String) : Integer;
     Function GetName: String; Virtual;
@@ -620,6 +619,7 @@ Type
     Procedure AddDocumentConflict(Const Args: Array of TVarRec;
       iIdentLine, iIdentColumn : Integer; AComment : TComment;
       DocConflictRec : TDocConflictTable);
+    Function AsString(boolForDocumentation : Boolean = False) : String; Virtual; Abstract;
     (**
       This property returns the number of elements in the collection.
       @precon  None.
@@ -688,13 +688,6 @@ Type
     **)
     Property Comment : TComment Read FComment Write FComment;
     (**
-      This property returns a string representation of the element.
-      @precon  None.
-      @postcon Returns a string representation of the element.
-      @return  a String
-    **)
-    Property AsString : String Read GetAsString;
-    (**
       This property returns the Scope of the element.
       @precon  None.
       @postcon Returns the Scope of the element.
@@ -738,11 +731,10 @@ Type
   Private
     FMsg: String;
     FMethod : String;
-  Protected
-    Function GetAsString : String; Override;
   Public
     Constructor Create(strMsg : String; AScope : TScope; strMethod : String; iLine,
       iCol : Integer; AImageIndex : TImageIndex); Reintroduce; Overload;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     (**
       Returns the exception method of the exception stored.
       @precon  None.
@@ -762,9 +754,6 @@ Type
   (** This class represents a single identifier with line, col and comment
       attributes. **)
   TIdent = Class Abstract (TElementContainer);
-
-  (** This class represents a list of identifiers **)
-  TIdentList = Class Abstract (TElementContainer);
 
   (** This is a sub class for all types **)
   TGenericTypeDecl = Class Abstract (TElementContainer)
@@ -991,14 +980,13 @@ Type
     FMessage       : String;
     FCommentLine   : Integer;
     FCommentColumn : Integer;
-  Protected
-    Function GetAsString : String; Override;
   Public
     Constructor Create(Const Args: Array of TVarRec; iIdentLine,
       iIdentColumn, iCommentLine, iCommentCol : Integer;
       strDocConflictMsg, strDocConflictDesc : String;
       AImageIndex : TImageIndex); ReIntroduce;
     Destructor Destroy; Override;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     (**
       This property defines the line where the comment associated with the
       conflict starts.
@@ -1054,7 +1042,6 @@ Type
     function GetOpTickCount(strStart, strFinish : String): Integer;
     Function GetBodyComment(iIndex : Integer) : TComment;
     Function GetBodyCommentCount : Integer;
-    Function GetAsString : String; Override;
     Function PrevToken : TTokenInfo;
     Procedure NextToken;
     Function EndOfTokens : Boolean;
@@ -1112,6 +1099,7 @@ Type
     Function IfNotDef(strDef : String) : Boolean;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function KeyWords : TKeyWords; Virtual; Abstract;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     { Properties }
     (**
       Returns a reference to the modules error collection.
@@ -1380,6 +1368,13 @@ Type
 
   (** A silent parser abort exception. **)
   EParserAbort = Class(Exception);
+
+  (** A class to represent a label within the Module Explorer / Documentation **)
+  TLabelContainer = Class(TElementContainer)
+  Private
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  End;
 
 ResourceString
   (** Options text for Draw Syntax Highlighted Module Explorer **)
@@ -3215,7 +3210,7 @@ begin
   i := Find(Token.Token);
   If i < 0 Then
     Begin
-      Result := TElementContainer.Create(Token.Token, AScope, Token.Line,
+      Result := TLabelContainer.Create(Token.Token, AScope, Token.Line,
         Token.Column, AImageIndex, AComment);
       FElements.Insert(Abs(i) - 1, Result);
     End Else
@@ -3250,7 +3245,7 @@ begin
   i := Find(strToken);
   If i < 0 Then
     Begin
-      Result := TElementContainer.Create(strToken, scNone, 0, 0, AImageIndex, AComment);
+      Result := TLabelContainer.Create(strToken, scNone, 0, 0, AImageIndex, AComment);
       FElements.Insert(Abs(i) - 1, Result);
     End Else
     Begin
@@ -3305,14 +3300,14 @@ begin
   E := objModuleRootElement.FindElement(strDocumentationConflicts);
   If E = Nil Then
     Begin
-      E := TElementContainer.Create(strDocumentationConflicts, scGlobal, 0, 0,
+      E := TLabelContainer.Create(strDocumentationConflicts, scGlobal, 0, 0,
         iiDocConflictFolder, Nil);
       E := objModuleRootElement.Add(E);
     End;
   I := E.FindElement(DocConflictrec.FCategory);
   If I = Nil Then
     Begin
-      I := TElementContainer.Create(DocConflictRec.FCategory,
+      I := TLabelContainer.Create(DocConflictRec.FCategory,
         scGlobal, 0, 0, iiDocConflictFolder, Nil);
       I := E.Add(I);
     End;
@@ -3652,22 +3647,6 @@ begin
         Result := i;
         Break;
       End;
-end;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Returns the name of the element followed by the list of tokens.
-
-  @return  a String
-
-**)
-function TElementContainer.GetAsString: String;
-
-begin
-  Result := FName;
 end;
 
 (**
@@ -4185,15 +4164,16 @@ End;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property. 
 
-  @precon  None.
-  @postcon Override the default method and returns the Document Error Message.
+  @precon  None. 
+  @postcon Override the default method and returns the Document Error Message. 
 
-  @return  a String
+  @param   boolForDocumentation as a Boolean
+  @return  a String              
 
 **)
-Function TDocIssue.GetAsString: String;
+Function TDocIssue.AsString(boolForDocumentation : Boolean): String;
 
 begin
   Result := FMsg;
@@ -4250,15 +4230,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property. 
 
-  @precon  None.
-  @postcon Return the document conflict message.
+  @precon  None. 
+  @postcon Return the document conflict message. 
 
-  @return  a String
+  @param   boolForDocumentation as a Boolean
+  @return  a String              
 
 **)
-Function TDocumentConflict.GetAsString: String;
+Function TDocumentConflict.AsString(boolForDocumentation : Boolean): String;
 
 begin
   Result := FMessage;
@@ -4499,16 +4480,17 @@ End;
 
 (**
 
-  This is a getter method for the AsString property.
+  This is a getter method for the AsString property. 
 
-  @precon  None.
-  @postcon Override and default GetAsString method and returns the name of the
-           module.
+  @precon  None. 
+  @postcon Override and default GetAsString method and returns the name of the 
+           module. 
 
-  @return  a String
+  @param   boolForDocumentation as a Boolean
+  @return  a String              
 
 **)
-Function TBaseLanguageModule.GetAsString : String;
+Function TBaseLanguageModule.AsString(boolForDocumentation : Boolean) : String;
 
 begin
   Result := ExtractFileName(Name);
@@ -5628,7 +5610,7 @@ end;
   This is a setter method for the TokenFontInfo property.
 
   @precon  None.
-  @postcon Sets the indexed Token Font Information record. 
+  @postcon Sets the indexed Token Font Information record.
 
 
   @param   ATokenType     as a TTokenType
@@ -5639,6 +5621,24 @@ procedure TBrowseAndDocItOptions.SetTokenFontInfo(ATokenType: TTokenType;
   ATokenFontInfo: TTokenFontInfo);
 begin
   FTokenFontInfo[ATokenType] := ATokenFontInfo;
+end;
+
+{ TLabelContainer }
+
+(**
+
+  This is a getter method for the AsString property.
+
+  @precon  None.
+  @postcon Returns the name of the label as a string.
+
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TLabelContainer.AsString(boolForDocumentation : Boolean): String;
+begin
+  Result := FName;
 end;
 
 (** This initializations section ensures that there is a valid instance of the

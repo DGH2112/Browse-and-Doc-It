@@ -253,7 +253,7 @@ Var
 begin
   If TfrmDocumentationOptions.Execute(ADocType) Then
     With DocumentDispatcher(ExtractFilePath(ParamStr(0)) + '\TEST Documentation\',
-      ADocType) Do
+      'Test Documentation', ADocType) Do
       Try
         For i := 0 To lvFileList.Items.Count - 1 Do
           Add(lvFileList.Items[i].SubItems[4]);

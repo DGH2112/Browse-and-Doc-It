@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    10 Aug 2008
+  @Date    07 Sep 2008
   @Version 1.0
 
 **)
@@ -15,8 +15,9 @@ Interface
 Uses
   SysUtils, Classes, BaseLanguageModule;
 
-Function Dispatcher(Source : TStream; strFileName : String;
-  boolModified : Boolean; ModuleOptions : TModuleOptions) : TBaseLanguageModule;
+  Function Dispatcher(Source : TStream; strFileName : String;
+    boolModified : Boolean; ModuleOptions : TModuleOptions) : TBaseLanguageModule;
+  Function CanAddDocument(strFileName : String) : Boolean;
 
   Implementation
 
@@ -54,6 +55,26 @@ Begin
     Result := TPascalModule.Create(Source, strFileName, boolModified, ModuleOptions);
   If AnsiCompareText(strExt, '.pas') = 0 Then
     Result := TPascalModule.Create(Source, strFileName, boolModified, ModuleOptions);
+End;
+
+(**
+
+  This method determines if the file can be documented by the system.
+
+  @precon  None.
+  @postcon Determines if the file can be documented by the system.
+
+  @param   strFileName as a String
+  @return  a Boolean    
+
+**)
+Function CanAddDocument(strFileName : String) : Boolean;
+
+Const
+  strValidExtensions : Array[1..3] Of String = ('.dpk', '.dpr', '.pas');
+
+Begin
+  Result := IsKeyWord(ExtractFileExt(strFileName), strValidExtensions);
 End;
 
 End.

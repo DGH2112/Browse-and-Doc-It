@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    28 Aug 2008
+  @Date    07 Sep 2008
   @Version 1.0
 
 **)
@@ -46,6 +46,7 @@ Type
     Procedure InsertBlockCommentClick(Sender : TObject);
     Procedure InsertLineCommentClick(Sender : TObject);
     Procedure InsertInSituCommentClick(Sender : TObject);
+    Procedure DocumentationClick(Sender : TObject);
     Procedure ModuleExplorerClick(Sender : TObject);
     { IOTAWizard }
     Function GetIDString: string;
@@ -139,7 +140,7 @@ Implementation
 Uses
   SysUtils, DockableModuleExplorer, IniFiles, ToolsAPIUtils, OptionsForm, Forms,
   Windows, ShellAPI, TokenForm, DGHLibrary, ModuleDispatcher, Dialogs, Controls,
-  PsAPI;
+  PsAPI, DocumentationOptionsForm, DocumentationDispatcher, BaseDocumentation;
 
 Resourcestring
   (** This is a text string of revision from nil and a to z. **)
@@ -258,6 +259,8 @@ Begin
   mmiMainMenu.Items.Insert(mmiMainMenu.Items.Count - 2, mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, 'Module &Explorer', ModuleExplorerClick,
     Menus.ShortCut(13, [ssCtrl, ssShift, ssAlt]));
+  CreateMenuItem(mmiPascalDocMenu, '&Documentation', DocumentationClick,
+    Menus.ShortCut(Ord('D'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Method Comment', InsertMethodCommentClick);
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Property Comment', InsertPropertyCommentClick);
@@ -325,6 +328,41 @@ begin
     mmiPascalDocMenu.Free;
   Inherited;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
+end;
+
+(**
+
+  This is an on click event handler for the documentation menu.
+
+  @precon  None.
+  @postcon Invokes the documentation of the current active project.
+
+  @param   Sender as a TObject
+
+**)
+procedure TBrowseAndDocItWizard.DocumentationClick(Sender: TObject);
+
+var
+  ADocType: TDocType;
+  AProject: IOTAProject;
+  i: Integer;
+
+begin
+  AProject := ActiveProject;
+  If ActiveProject <> Nil Then
+    If TfrmDocumentationOptions.Execute(ADocType) Then
+      With DocumentDispatcher(
+        ExtractFilePath(AProject.FileName) + 'Documentation',
+        ExtractFileName(AProject.FileName), ADocType) Do
+        Try
+          For i := 0 To AProject.GetModuleCount - 1 Do
+            Add(AProject.GetModule(i).FileName);
+          OutputDocumentation;
+          ShellExecute(Application.Handle, 'Open', PChar(MainDocument), '', '',
+            SW_SHOWNORMAL);
+        Finally
+          Free;
+        End;
 end;
 
 {procedure TBrowseAndDocItWizard.Destroyed;

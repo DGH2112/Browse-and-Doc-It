@@ -3,7 +3,7 @@
   This file contains CSS information for the Browse And Doc It HTML Output.
 
   @Author  David Hoyle
-  @Date    05 Sep 2008
+  @Date    07 Sep 2008
   @Version 1.0
 
 */
@@ -29,10 +29,6 @@ body {
   background       : #FFFFFF;
   font-family      : "Tahoma", Times, Serif;
   font-size        : 10pt;
-}
-
-div.section:hover {
-  background       : Green;
 }
 
 div.Contents {
@@ -64,6 +60,11 @@ div.Module {
   font-weight      : normal;
 }
 
+div.Module:hover {
+  background       : Green;
+  color            : White;
+}
+
 div.Modules {
   position         : absolute;
   top              : 0;
@@ -89,6 +90,11 @@ div.Section {
   padding-top      : 2pt;
   padding-bottom   : 2pt;
   float            : left;
+}
+
+div.Section:hover {
+  background       : Green;
+  color            : White;
 }
 
 div.Sections {
@@ -215,6 +221,18 @@ td {
 
 td.TagName {
   font-weight      : bold;
+}
+
+td.Red {
+  background       : #FFCCCC;
+}
+
+td.Green {
+  background       : #CCFFCC;
+}
+
+td.Yellow {
+  background       : #FFFFCC;
 }
 
 th {

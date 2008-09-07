@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       06 Sep 2008
+  @Date       07 Sep 2008
   @Author     David Hoyle
 
 **)
@@ -1218,7 +1218,13 @@ function TPascalProperty.AsString(boolForDocumentation : Boolean): String;
 
   Begin
     If strValue <> '' Then
-      Result := Result + #32 + strValue;
+      Begin
+        If boolForDocumentation Then
+          Result := Result + #32#32;
+        Result := Result + #32 + strValue;
+        If boolForDocumentation Then
+          Result := Result + #13#10;
+      End;
   End;
 
 Var
@@ -1229,18 +1235,28 @@ begin
   If ParameterCount > 0 Then
     Begin
       Result := Result + '[';
+      If boolForDocumentation Then
+        Result := Result + #13#10;
       For i := 0 To ParameterCount - 1 Do
         Begin
-          Result := Result + Parameters[i].AsString;
-          If i < ParameterCount - 1 Then
-            Result := Result + '; ';
-        End;
+          If boolForDocumentation Then
+            Result := Result + #32#32;
+            Result := Result + Parameters[i].AsString;
+            If i < ParameterCount - 1 Then
+              Result := Result + '; ';
+          If boolForDocumentation Then
+            Result := Result + #13#10;
+          End;
       Result := Result + ']';
     End;
   Result := Result + #32':'#32;
   If TypeID <> Nil Then
-    For i := 0 To TypeId.TokenCount - 1 Do
-      Result := Result + TypeId.AsString;
+    Begin
+      For i := 0 To TypeId.TokenCount - 1 Do
+        Result := Result + TypeId.AsString;
+      If boolForDocumentation Then
+        Result := Result + #13#10;
+    End;
   OutputSpec(FIndexSpec);
   OutputSpec(FReadSpec);
   OutputSpec(FWriteSpec);

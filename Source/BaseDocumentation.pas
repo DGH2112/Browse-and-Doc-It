@@ -3,7 +3,7 @@
   This module contains a base class for all documentation modules.
 
   @Author  David Hoyle
-  @Date    06 Sep 2008
+  @Date    07 Sep 2008
   @Version 1.0
 
 **)
@@ -44,6 +44,9 @@ Type
 
 Implementation
 
+Uses
+  ModuleDispatcher;
+
 (**
 
   This method simple adds the code module to the list of code modules.
@@ -57,7 +60,8 @@ Implementation
 Procedure TBaseDocumentation.Add(strFileName : String);
 
 Begin
-   FFileNames.Add(strFileName);
+  If CanAddDocument(strFileName) Then
+    FFileNames.Add(strFileName);
 End;
 
 (**

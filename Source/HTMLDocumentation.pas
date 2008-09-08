@@ -4,8 +4,10 @@
   information.
 
   @Author  David Hoyle
-  @Date    07 Sep 2008
+  @Date    08 Sep 2008
   @Version 1.0
+
+  @todo    Make the background colour of the PRE tags a module explorer option.
 
 **)
 Unit HTMLDocumentation;
@@ -49,10 +51,12 @@ Type
     Procedure OutputContainers(slContents : TStringList;
       Container : TElementContainer; iIndentLevel : Integer);
     Function N(strText : String) : String;
+    Function P(strText : String) : String;
     { HTML Tag Outputs }
     Function A(strText, strHREF : String; strName : String = '') : String;
-    Function H(strText : String; iLevel : Integer; AImage : TImageIndex) : String;
-    Function IMG(AImageIndex : TImageIndex) : String;
+    Function H(strText : String; iLevel : Integer; AImage : TImageIndex;
+      AScope : TScope) : String;
+    Function IMG(AImageIndex : TImageIndex; AScope : TScope) : String;
     Function LI(strClass, strText : String) : String;
   Public
     Constructor Create(strOutputDirectory, strTitle : String); Override;
@@ -63,7 +67,8 @@ Type
 Implementation
 
 Uses
-  SysUtils, Windows, ModuleDispatcher, DGHLibrary, Graphics, GIFImage, Controls;
+  SysUtils, Windows, ModuleDispatcher, DGHLibrary, Graphics, GIFImage, Controls,
+  StrUtils, GenericTokenizer;
 
 (**
 
@@ -96,7 +101,7 @@ End;
 
 (**
 
-  This is a constructor for the THTMLDocumentation class. 
+  This is a constructor for the THTMLDocumentation class.
 
   @precon  None. 
   @postcon Initialises the Special Tag string lists. 
@@ -117,7 +122,7 @@ begin
   For i := 1 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
     FSpecialTagNodes.Add(TStringList.Create);
   FSummaryContent := TStringList.Create;
-  FSummaryContent.Add(H(Format('Summary for Project %s', [FTitle]), 1, iiModule));
+  FSummaryContent.Add(H(Format('Summary for Project %s', [FTitle]), 1, iiModule, scNone));
   FSummaryContent.Add('<div class="Indent">');
   FSummaryContent.Add('  <table>');
   FSummaryContent.Add('    <thead>');
@@ -356,7 +361,8 @@ Begin
     slContents.Add(Format('<!-- %s -->', [FCurrentModule.ModuleName]));
     slContents.Add(H(A('Documentation for ' +
       ExtractFileName(FCurrentModule.ModuleName), '',
-      'ModuleOverview'), FHeaderLevel, FCurrentModule.ImageIndex));
+      'ModuleOverview'), FHeaderLevel, FCurrentModule.ImageIndex,
+      FCurrentModule.Scope));
     Inc(FHeaderLevel);
     OutputComment(slContents, FCurrentModule, 0);
     slContents.Add('');
@@ -396,6 +402,25 @@ End;
 Procedure THTMLDocumentation.GenerateCSS;
 Var
   sl : TStringList;
+  i : BaseLanguageModule.TTokenType;
+
+  (**
+
+    This method returns a HTML hexidecimal colour from the given TColor.
+
+    @precon  None.
+    @postcon Returns a HTML hexidecimal colour from the given TColor.
+
+    @param   AColour as a TColor
+    @return  a String 
+
+  **)
+  Function HTMLColour(AColour : TColor) : String;
+
+  Begin
+    Result := Format('%p', [Pointer(AColour)]);
+    Result := Copy(Result, 7, 2) + Copy(Result, 5, 2) + Copy(Result, 3, 2);
+  End;
 
 Begin
   Update(FProgressIndex, 'Generating CSS...');
@@ -404,6 +429,22 @@ Begin
   sl := TStringList.Create;
   Try
     sl.Text := GetStringResource('BrowseAndDocItCSS');
+    With BrowseAndDocItOptions Do
+      For i := Low(BaseLanguageModule.TTokenType) to High(BaseLanguageModule.TTokenType) Do
+        Begin
+          sl.Add(Format('span.%s {', [strTokenType[i]]));
+          sl.Add(Format('  color            : #%s;', [HTMLColour(TokenFontInfo[i].FColour)]));
+          If fsBold In TokenFontInfo[i].FStyles Then
+            sl.Add('  font-weight      : bold;');
+          If fsItalic In TokenFontInfo[i].FStyles Then
+            sl.Add('  font-stylet      : italic;');
+          If fsUnderline In TokenFontInfo[i].FStyles Then
+            sl.Add('  font-decoration  : underline;');
+          If fsStrikeout In TokenFontInfo[i].FStyles Then
+            sl.Add('  font-decoration  : line-through;');
+          sl.Add('}');
+          sl.Add('');
+        End;
     sl.SaveToFile(FOutputDirectory + 'Styles\BrowseAndDocIt.CSS');
   Finally
     sl.Free;
@@ -434,11 +475,12 @@ begin
   If E = Nil Then
     Exit;
   slContents.Add(H(A(strDocumentationConflicts, '', strDocumentationConflicts),
-    FHeaderLevel, E.ImageIndex));
+    FHeaderLevel, E.ImageIndex, E.Scope));
   For i := 1 To E.ElementCount Do
     Begin
       slContents.Add(Format('<!-- %s -->', [strDocumentationConflicts]));
-      slContents.Add(H(E[i].AsString(True), FHeaderLevel + 1, E[i].ImageIndex));
+      slContents.Add(H(E[i].AsString(True), FHeaderLevel + 1, E[i].ImageIndex,
+        E[i].Scope));
       slContents.Add('<ul>');
       For j := 1 To E[i].ElementCount Do
         slContents.Add(#32#32 + LI(ImageList[E[i][j].ImageIndex].FResourcename,
@@ -477,7 +519,8 @@ begin
       If E = Nil Then
         Continue;
       slContents.Add(Format('<!-- %s -->', [strSections[i]]));
-      slContents.Add(H(A(strSections[i], '', strSections[i]), FHeaderLevel, E.ImageIndex));
+      slContents.Add(H(A(strSections[i], '', strSections[i]), FHeaderLevel,
+        E.ImageIndex, E.Scope));
       slContents.Add('<ul>');
       For j := 1 To E.ElementCount Do
         slContents.Add(#32#32 + LI(ImageList[E[j].ImageIndex].FResourcename,
@@ -592,16 +635,16 @@ Begin
     sl.Add(strIndent + '<div class="List">');
     sl.Add(strIndent + '  <div class="ModuleTitle">Modules</div>');
     sl.Add(strIndent + Format('  <div class="Module">%s&nbsp;%s</div>',
-      [IMG(iiModule), A('Summary', 'Summary.html')]));
+      [IMG(iiModule, scNone), A('Summary', 'Summary.html')]));
     For i := 0 To FFileNames.Count - 1 Do
       Begin
         strFileName := ExtractFileName(FFileNames[i]);
         sl.Add(strIndent + Format('  <div class="Module">%s&nbsp;%s</div>',
-          [IMG(iiModule), A(ExtractFileName(strFileName),
+          [IMG(iiModule, scNone), A(ExtractFileName(strFileName),
           ChangeFileExt(strFileName, '.html'))]));
       End;
     sl.Add(strIndent + Format('  <div class="Module">%s&nbsp;%s</div>',
-      [IMG(iiModule), A('Index', 'Index.html')]));
+      [IMG(iiModule, scNone), A('Index', 'Index.html')]));
     sl.Add(strIndent + '</div>');
     FCurrentHTMLFile[iIns] := sl.Text;
   Finally
@@ -635,12 +678,13 @@ Begin
   sl := TStringList.Create;
   Try
     sl.Add(strIndent + Format('<div class="Section">%s&nbsp;%s</div>', [
-      IMG(iiModule), A('Module Overview', '#ModuleOverview')]));
+      IMG(iiModule, scNone), A('Module Overview', '#ModuleOverview')]));
     For i := 1 To FCurrentModule.ElementCount Do
       Begin
         E := FCurrentModule.Elements[i];
         sl.Add(strIndent + Format('<div class="Section">%s&nbsp;%s</div>', [
-          IMG(E.ImageIndex), A(E.AsString(True), '#' + E.AsString(True) + '2')]));
+          IMG(E.ImageIndex, E.Scope), A(E.AsString(True),
+          '#' + E.AsString(True) + '2')]));
       End;
     FCurrentHTMLFile[iIns] := sl.Text;
   Finally
@@ -687,7 +731,8 @@ begin
         Continue;
       strSection := BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i];
       slContents.Add(Format('<!-- %s -->', [strSection]));
-      slContents.Add(H(A(strSection, '', strSection), FHeaderLevel, iiToDoFolder));
+      slContents.Add(H(A(strSection, '', strSection), FHeaderLevel,
+        iiToDoFolder, scNone));
       slContents.Add('<ul>');
       For j := 0 To sl.Count - 1 Do
         slContents.Add(#32#32 + LI('ToDoItem', N(sl[j])));
@@ -814,10 +859,11 @@ end;
 
 **)
 function THTMLDocumentation.H(strText: String; iLevel: Integer;
-  AImage : TImageIndex): String;
+  AImage : TImageIndex; AScope : TScope): String;
 
 begin
-  Result := Format('<h%d>%s&nbsp;%s</h%d>', [iLevel, IMG(AImage), strText, iLevel]);
+  Result := Format('<h%d>%s&nbsp;%s</h%d>', [iLevel, IMG(AImage, AScope),
+   strText, iLevel]);
 end;
 
 (**
@@ -833,10 +879,23 @@ end;
   @return  a String
 
 **)
-function THTMLDocumentation.IMG(AImageIndex: TImageIndex): String;
+function THTMLDocumentation.IMG(AImageIndex: TImageIndex; AScope : TScope): String;
+
+Var
+  iImage : TImageIndex;
+
 begin
+  Case AScope Of
+    scPrivate   : iImage := Succ(AImageIndex);
+    scPublished : iImage := Succ(Succ(AImageIndex));
+    scProtected : iImage := Succ(Succ(Succ(AImageIndex)));
+    scLocal     : iImage := Succ(Succ(Succ(Succ(AImageIndex))));
+  Else
+    // scPublic, scGlobal, scNone
+    iImage := AImageIndex;
+  End;
   Result := Format('<img class="verticallymiddle" src="Images/%s.gif" alt=""/>',
-    [ImageList[AImageIndex].FResourcename]);
+    [ImageList[iImage].FResourcename]);
 end;
 
 (**
@@ -959,7 +1018,7 @@ begin
     Begin
       slContents.Add(strIndent + H(A(Container.AsString(True), '',
         Container.AsString(True) + IntToStr(FHeaderLevel)), FHeaderLevel,
-        Container.ImageIndex));
+        Container.ImageIndex, Container.Scope));
       OutputComment(slContents, Container, iIndentLevel);
       Inc(FHeaderLevel);
       boolIncHeader := True;
@@ -982,10 +1041,11 @@ begin
           End;
         slContents.Add(strIndent + '      <tr>');
         slContents.Add(strIndent + Format('        <td>%s&nbsp;%s</td>', [
-          IMG(Container[i].ImageIndex), N(Container[i].Identifier)]));
+          IMG(Container[i].ImageIndex, Container[i].Scope),
+          N(Container[i].Identifier)]));
         slContents.Add(strIndent + '        <td>');
         slContents.Add(strIndent + Format('          <pre wrap>%s</pre>', [
-          N(Container[i].AsString(True))]));
+          P(Container[i].AsString(True))]));
         OutputComment(slContents, Container[i], iIndentLevel + 1);
         OutputContainers(slContents, Container[i], iIndentLevel + 1);
         slContents.Add(strIndent + '        </td>');
@@ -1116,6 +1176,42 @@ Begin
     Stream.Free;
   End;
 End;
+
+(**
+
+  This method parses the code and highlights it with syntax information.
+
+  @precon  None.
+  @postcon Parses the code and highlights it with syntax information.
+
+  @param   strText as a String
+  @return  a String 
+
+**)
+function THTMLDocumentation.P(strText: String): String;
+
+Var
+  sl : TStringList;
+  i: Integer;
+
+begin
+  Result := '';
+  sl := Tokenize(strText, FKeyWords);
+  Try
+    For i := 0 To sl.Count - 1 Do
+      Case BaseLanguageModule.TTokenType(sl.Objects[i]) Of
+        ttReservedWord : Result := Result + Format('<span class="ReservedWord">%s</span>', [sl[i]]);
+        ttIdentifier   : Result := Result + Format('<span class="Identifier">%s</span>', [sl[i]]);
+        ttSymbol       : Result := Result + Format('<span class="Symbol">%s</span>', [sl[i]]);
+        ttStringLiteral: Result := Result + Format('<span class="StringLiteral">%s</span>', [sl[i]]);
+        ttNumber       : Result := Result + Format('<span class="Number">%s</span>', [sl[i]]);
+      Else
+        Result := Result + sl[i];
+      End;
+  Finally
+    sl.Free;
+  End;
+end;
 
 (**
 

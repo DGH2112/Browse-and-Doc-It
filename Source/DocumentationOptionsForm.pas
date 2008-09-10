@@ -1,11 +1,11 @@
 (**
-  
+
   This module contains a class which represent a form for defining the option
   for Documentation.
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    06 Sep 2008
+  @Date    09 Sep 2008
 
 **)
 unit DocumentationOptionsForm;
@@ -22,6 +22,12 @@ type
     rgpDocumentationOptions: TRadioGroup;
     btnOK: TBitBtn;
     btnCancel: TBitBtn;
+    gbxScopeOptions: TGroupBox;
+    chkLocal: TCheckBox;
+    chkPrivate: TCheckBox;
+    chkProtected: TCheckBox;
+    chkPublic: TCheckBox;
+    chkPublished: TCheckBox;
   private
     { Private declarations }
   public
@@ -30,6 +36,9 @@ type
   end;
 
 implementation
+
+Uses
+  BaseLanguageModule;
 
 {$R *.dfm}
 
@@ -59,9 +68,30 @@ begin
       For i := Low(TDocType) to High(TDocType) Do
         rgpDocumentationOptions.Items.Add(strDocumentationTypes[i]);
       rgpDocumentationOptions.ItemIndex := Byte(ADocType);
+      chkLocal.Checked := scLocal In BrowseAndDocItOptions.ScopesToDocument;
+      chkPrivate.Checked := scPrivate In BrowseAndDocItOptions.ScopesToDocument;
+      chkProtected.Checked := scProtected In BrowseAndDocItOptions.ScopesToDocument;
+      chkPublic.Checked := scPublic In BrowseAndDocItOptions.ScopesToDocument;
+      chkPublished.Checked := scPublished In BrowseAndDocItOptions.ScopesToDocument;
       If ShowModal = mrOK Then
         Begin
           ADocType := TDocType(rgpDocumentationOptions.ItemIndex);
+          BrowseAndDocItOptions.ScopesToDocument := [];
+          If chkLocal.Checked Then
+            BrowseAndDocItOptions.ScopesToDocument :=
+              BrowseAndDocItOptions.ScopesToDocument + [scLocal];
+          If chkPrivate.Checked Then
+            BrowseAndDocItOptions.ScopesToDocument :=
+              BrowseAndDocItOptions.ScopesToDocument + [scPrivate];
+          If chkProtected.Checked Then
+            BrowseAndDocItOptions.ScopesToDocument :=
+              BrowseAndDocItOptions.ScopesToDocument + [scProtected];
+          If chkPublic.Checked Then
+            BrowseAndDocItOptions.ScopesToDocument :=
+              BrowseAndDocItOptions.ScopesToDocument + [scPublic];
+          If chkPublished.Checked Then
+            BrowseAndDocItOptions.ScopesToDocument :=
+              BrowseAndDocItOptions.ScopesToDocument + [scPublished];
           Result := True;
         End;
     Finally

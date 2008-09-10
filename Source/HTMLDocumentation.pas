@@ -4,10 +4,8 @@
   information.
 
   @Author  David Hoyle
-  @Date    08 Sep 2008
+  @Date    10 Sep 2008
   @Version 1.0
-
-  @todo    Make the background colour of the PRE tags a module explorer option.
 
 **)
 Unit HTMLDocumentation;
@@ -29,12 +27,16 @@ Type
     FSummaryContent: TStringList;
     FTitle: String;
     FKeyWords : TKeyWords;
+    FScopesToDocument: TScopes;
+    FIndex : TStringList;
+    FHTMLFileName: String;
   Protected
     procedure GenerateImages(strImageDirectory: String);
     function ExpandLinkTag(strToken: String): String;
     Procedure OutputHTMLDocumentation(strFileName : String);
     Procedure GenerateSummary;
     Procedure GenerateCSS;
+    Procedure GenerateIndex;
     procedure GenerateSchema;
     Procedure GenerateHTML(strTitle : String);
     Procedure GenerateModuleList;
@@ -49,7 +51,8 @@ Type
     Procedure OutputComment(slContents : TStringList; E : TElementContainer;
       iIndentLevel : Integer);
     Procedure OutputContainers(slContents : TStringList;
-      Container : TElementContainer; iIndentLevel : Integer);
+      Container : TElementContainer; iIndentLevel : Integer;
+      strContainerLabel : String);
     Function N(strText : String) : String;
     Function P(strText : String) : String;
     { HTML Tag Outputs }
@@ -117,10 +120,12 @@ Var
 
 begin
   Inherited Create(strOutputDirectory, strTitle);
+  FScopesToDocument := BrowseAndDocItOptions.ScopesToDocument + [scNone, scGlobal];
   FTitle := strTitle;
   FSpecialTagNodes := TObjectList.Create(true);
   For i := 1 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
     FSpecialTagNodes.Add(TStringList.Create);
+  FIndex := TStringList.Create;
   FSummaryContent := TStringList.Create;
   FSummaryContent.Add(H(Format('Summary for Project %s', [FTitle]), 1, iiModule, scNone));
   FSummaryContent.Add('<div class="Indent">');
@@ -154,6 +159,7 @@ end;
 **)
 destructor THTMLDocumentation.Destroy;
 begin
+  FIndex.Free;
   FSummaryContent.Free;
   FSpecialTagNodes.Free;
   Inherited Destroy;
@@ -379,7 +385,8 @@ Begin
               Break;
             End;
         If Not boolIgnore Then
-          OutputContainers(slContents, FCurrentModule[i], 0);
+          OutputContainers(slContents, FCurrentModule[i], 0,
+            FCurrentModule[i].Identifier);
       End;
     For i := 0 To slContents.Count - 1 Do
       slContents[i] := strIndent + slContents[i];
@@ -418,7 +425,7 @@ Var
   Function HTMLColour(AColour : TColor) : String;
 
   Begin
-    Result := Format('%p', [Pointer(AColour)]);
+    Result := Format('%p', [Pointer(ColorToRGB(AColour))]);
     Result := Copy(Result, 7, 2) + Copy(Result, 5, 2) + Copy(Result, 3, 2);
   End;
 
@@ -429,6 +436,8 @@ Begin
   sl := TStringList.Create;
   Try
     sl.Text := GetStringResource('BrowseAndDocItCSS');
+    sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
+      BrowseAndDocItOptions.BGColour), []);
     With BrowseAndDocItOptions Do
       For i := Low(BaseLanguageModule.TTokenType) to High(BaseLanguageModule.TTokenType) Do
         Begin
@@ -609,6 +618,98 @@ End;
 
 (**
 
+  This method generates an index from all the identifiers stored in the FIndex
+  string list.
+
+  @precon  None.
+  @postcon Generates an index from all the identifiers stored in the FIndex
+           string list.
+
+**)
+procedure THTMLDocumentation.GenerateIndex;
+
+var
+  sl, slC, slSections: TStringList;
+  iIns: Integer;
+  i: Integer;
+  strIndent: String;
+  strID: String;
+  strRef: String;
+  iPos: Integer;
+  strCurAlpha, strLastAlpha : String;
+
+begin
+  Update(FProgressIndex, 'Generating Index...');
+  Inc(FProgressIndex);
+  sl := TStringList.Create;
+  Try
+    FCurrentHTMLFile := sl;
+    GenerateHTML('Summary');
+    GenerateModuleList;
+    iIns := FindInsertionPoint('*$CONTENT$');
+    i := Pos('$', FCurrentHTMLFile[iIns]);
+    strIndent := StringOfChar(#32, i - 1);
+    slSections := TStringList.Create;
+    Try
+      slC := TstringList.Create;
+      Try
+        slC.Add(H('Index for ' + FTitle, 1, iiNone, scNone));
+        FIndex.Sort;
+        For i := 0 To FIndex.Count - 1 Do
+          Begin
+            strCurAlpha := FIndex[i][1];
+            If (strLastAlpha <> '') And (AnsiCompareText(strCurAlpha, strLastAlpha) <> 0) Then
+              Begin
+                slC.Add('  </table>');
+                slC.Add('</div>');
+              End;
+            If AnsiCompareText(strCurAlpha, strLastAlpha) <> 0 Then
+              Begin
+                slC.Add('<hr>');
+                slC.Add(H(A(strCurAlpha, '', strCurAlpha), 2, iiNone, scNone));
+                slSections.Add(strCurAlpha);
+                slC.Add('<div class="Indent">');
+                slC.Add('  <table>');
+              End;
+            slC.Add('    <tr>');
+            iPos := Pos('(', FIndex.Names[i]);
+            strID := Copy(FIndex.Names[i], 1, iPos - 1);
+            strRef := Copy(FIndex.Names[i], iPos, Length(FIndex.Names[i]) - iPos + 1);
+            slC.Add(Format('    <td>%s %s</td>', [A(strID,
+              ExtractFileName(FIndex.ValueFromIndex[i]), ''), strRef]));
+            slC.Add('    </tr>');
+            strLastAlpha := strCurAlpha;
+          End;
+        slC.Add('  </table>');
+        slC.Add('</div>');
+        For i := 0 To slC.Count - 1 Do
+          slC[i] := strIndent + slC[i];
+        sl[iIns] := slC.Text;
+      Finally
+        slC.Free;
+      End;
+      // Section list of Alphabet Hyperlinks
+      FCurrentHTMLFile := sl;
+      iIns := FindInsertionPoint('*$SECTIONLIST$');
+      i := Pos('$', FCurrentHTMLFile[iIns]);
+      strIndent := StringOfChar(#32, i - 1);
+      For i := 0 To slSections.Count - 1 Do
+        slSections[i] := strIndent + Format('<div class="Section">%s</div>', [
+          H(A(UpperCase(slSections[i]), '#' + UpperCase(slSections[i]), ''), 2,
+          iiNone, scNone)]);
+      FCurrentHTMLFile[iIns] := slSections.Text;
+    Finally
+      slSections.Free;
+    End;
+    sl.SaveToFile(FOutputDirectory + 'Index.html');
+  Finally
+    sl.Free;
+  End;
+
+end;
+
+(**
+
 
   This method outputs a menu of all the module in this package of documentation.
 
@@ -775,14 +876,26 @@ Begin
   ForceDirectories(FOutputDirectory + '\Schema');
   sl := TStringList.Create;
   Try
-    sl.Text := GetStringResource('BrowseAndDocItXHTMLStrict');
-    sl.SaveToFile(FOutputDirectory + 'Schema\xhtml1-strict.dtd');
-    sl.Text := GetStringResource('BrowseAndDocItXHTMLSymbol');
-    sl.SaveToFile(FOutputDirectory + 'Schema\xhtml-symbol.ent');
-    sl.Text := GetStringResource('BrowseAndDocItXHTMLSpecial');
-    sl.SaveToFile(FOutputDirectory + 'Schema\xhtml-special.ent');
-    sl.Text := GetStringResource('BrowseAndDocItXHTMLLat1');
-    sl.SaveToFile(FOutputDirectory + 'Schema\xhtml-lat1.ent');
+    If Not FileExists(FOutputDirectory + 'Schema\xhtml1-strict.dtd') Then
+      Begin
+        sl.Text := GetStringResource('BrowseAndDocItXHTMLStrict');
+        sl.SaveToFile(FOutputDirectory + 'Schema\xhtml1-strict.dtd');
+      End;
+    If Not FileExists(FOutputDirectory + 'Schema\xhtml-symbol.ent') Then
+      Begin
+        sl.Text := GetStringResource('BrowseAndDocItXHTMLSymbol');
+        sl.SaveToFile(FOutputDirectory + 'Schema\xhtml-symbol.ent');
+      End;
+    If Not FileExists(FOutputDirectory + 'Schema\xhtml-special.ent') Then
+      Begin
+        sl.Text := GetStringResource('BrowseAndDocItXHTMLSpecial');
+        sl.SaveToFile(FOutputDirectory + 'Schema\xhtml-special.ent');
+      End;
+    If Not FileExists(FOutputDirectory + 'Schema\xhtml-lat1.ent') Then
+      Begin
+        sl.Text := GetStringResource('BrowseAndDocItXHTMLLat1');
+        sl.SaveToFile(FOutputDirectory + 'Schema\xhtml-lat1.ent');
+      End;
   Finally
     sl.Free;
   End;
@@ -843,19 +956,16 @@ end;
 
 (**
 
+  This method returns a string representing a header tag. 
 
-  This method returns a string representing a header tag. 
+  @precon  None. 
+  @postcon Returns a string representing a header tag. 
 
-
-  @precon  None.
-
-  @postcon Returns a string representing a header tag.
-
-
-  @param   strText as a String
+  @param   strText as a String
   @param   iLevel  as an Integer
   @param   AImage  as a TImageIndex
-  @return  a String
+  @param   AScope  as a TScope
+  @return  a String 
 
 **)
 function THTMLDocumentation.H(strText: String; iLevel: Integer;
@@ -868,15 +978,14 @@ end;
 
 (**
 
+  This method outputs an img tag with the image vertically aligned central. 
 
-  This method outputs an img tag with the image vertically aligned central.
+  @precon  None. 
+  @postcon Outputs an img tag with the image vertically aligned central. 
 
-  @precon  None.
-  @postcon Outputs an img tag with the image vertically aligned central.
-
-
-  @param   AImageIndex as a TImageIndex
-  @return  a String
+  @param   AImageIndex as a TImageIndex
+  @param   AScope      as a TScope
+  @return  a String     
 
 **)
 function THTMLDocumentation.IMG(AImageIndex: TImageIndex; AScope : TScope): String;
@@ -885,17 +994,20 @@ Var
   iImage : TImageIndex;
 
 begin
-  Case AScope Of
-    scPrivate   : iImage := Succ(AImageIndex);
-    scPublished : iImage := Succ(Succ(AImageIndex));
-    scProtected : iImage := Succ(Succ(Succ(AImageIndex)));
-    scLocal     : iImage := Succ(Succ(Succ(Succ(AImageIndex))));
-  Else
-    // scPublic, scGlobal, scNone
-    iImage := AImageIndex;
-  End;
-  Result := Format('<img class="verticallymiddle" src="Images/%s.gif" alt=""/>',
-    [ImageList[iImage].FResourcename]);
+  Result := '';
+  If AImageIndex <> iiNone then
+    Begin
+      Case AScope Of
+        scPrivate   : iImage := Succ(AImageIndex);
+        scPublished : iImage := Succ(Succ(AImageIndex));
+        scProtected : iImage := Succ(Succ(Succ(AImageIndex)));
+        scLocal     : iImage := Succ(Succ(Succ(Succ(AImageIndex))));
+      Else
+        iImage := AImageIndex; // scPublic, scGlobal, scNone
+      End;
+      Result := Format('<img class="verticallymiddle" src="Images/%s.gif" alt=""/>',
+        [ImageList[iImage].FResourcename]);
+    End;
 end;
 
 (**
@@ -984,24 +1096,21 @@ end;
 
 (**
 
+  This method output the tree of information stored in the module recursively. 
 
-  This method output the tree of information stored in the module recursively. 
+  @precon  slContents must be a valid indtance of a string list and Container 
+           must ba a valid descendant of TElement Container. 
+  @postcon Output the tree of information stored in the module recursively. 
 
-
-  @precon  slContents must be a valid indtance of a string list and Container 
-
-           must ba a valid descendant of TElement Container. 
-
-  @postcon Output the tree of information stored in the module recursively. 
-
-
-  @param   slContents   as a TStringList
-  @param   Container    as a TElementContainer
-  @param   iIndentLevel as an Integer
+  @param   slContents        as a TStringList
+  @param   Container         as a TElementContainer
+  @param   iIndentLevel      as an Integer
+  @param   strContainerLabel as a String
 
 **)
 procedure THTMLDocumentation.OutputContainers(slContents: TStringList;
-  Container: TElementContainer; iIndentLevel : Integer);
+  Container: TElementContainer; iIndentLevel : Integer;
+  strContainerLabel : String);
 
 var
   i: Integer;
@@ -1026,31 +1135,38 @@ begin
   slContents.Add(strIndent + '<div class="Indent">');
   For i := 1 To Container.ElementCount Do
     If Not (Container[i] Is TLabelContainer) Then
-      Begin
-        If Not boolHeader Then
-          Begin
-            slContents.Add(strIndent + '  <table>');
-            slContents.Add(strIndent + '    <thead>');
-            slContents.Add(strIndent + '      <tr>');
-            slContents.Add(strIndent + '        <th>Name</th>');
-            slContents.Add(strIndent + '        <th>Data / Type</th>');
-            slContents.Add(strIndent + '      </tr>');
-            slContents.Add(strIndent + '    </thead>');
-            slContents.Add(strIndent + '    <tbody>');
-            boolHeader := True;
-          End;
-        slContents.Add(strIndent + '      <tr>');
-        slContents.Add(strIndent + Format('        <td>%s&nbsp;%s</td>', [
-          IMG(Container[i].ImageIndex, Container[i].Scope),
-          N(Container[i].Identifier)]));
-        slContents.Add(strIndent + '        <td>');
-        slContents.Add(strIndent + Format('          <pre wrap>%s</pre>', [
-          P(Container[i].AsString(True))]));
-        OutputComment(slContents, Container[i], iIndentLevel + 1);
-        OutputContainers(slContents, Container[i], iIndentLevel + 1);
-        slContents.Add(strIndent + '        </td>');
-        slContents.Add(strIndent + '      </tr>');
+      If Container[i].Scope In FScopesToDocument Then
+        Begin
+          FIndex.Add(Format('%s=%s#%s', [
+            Format('%s(%s)', [Container[i].Identifier, strContainerLabel]),
+            FHTMLFileName,
+            Format('%s.%s', [strContainerLabel, Container[i].Identifier])]));
+          If Not boolHeader Then
+            Begin
+              slContents.Add(strIndent + '  <table>');
+              slContents.Add(strIndent + '    <thead>');
+              slContents.Add(strIndent + '      <tr>');
+              slContents.Add(strIndent + '        <th>Name</th>');
+              slContents.Add(strIndent + '        <th>Data / Type</th>');
+              slContents.Add(strIndent + '      </tr>');
+              slContents.Add(strIndent + '    </thead>');
+              slContents.Add(strIndent + '    <tbody>');
+              boolHeader := True;
             End;
+          slContents.Add(strIndent + '      <tr>');
+          slContents.Add(strIndent + Format('        <td>%s&nbsp;%s</td>', [
+            IMG(Container[i].ImageIndex, Container[i].Scope),
+            A(Container[i].Identifier, '',
+            strContainerLabel + '.' + Container[i].Identifier)]));
+          slContents.Add(strIndent + '        <td>');
+          slContents.Add(strIndent + Format('          <pre wrap>%s</pre>', [
+            P(Container[i].AsString(True))]));
+          OutputComment(slContents, Container[i], iIndentLevel + 1);
+          OutputContainers(slContents, Container[i], iIndentLevel + 1,
+            strContainerLabel + '.' + Container[i].Identifier);
+          slContents.Add(strIndent + '        </td>');
+          slContents.Add(strIndent + '      </tr>');
+        End;
   If boolHeader Then
     Begin
       slContents.Add(strIndent + '    </tbody>');
@@ -1059,10 +1175,12 @@ begin
     End;
   For i := 1 To Container.ElementCount Do
     If Container[i] Is TLabelContainer Then
-      Begin
-        OutputComment(slContents, Container[i], iIndentLevel);
-        OutputContainers(slContents, Container[i], iIndentLevel + 1);
-      End;
+      If Container[i].Scope In FScopesToDocument Then
+        Begin
+          OutputComment(slContents, Container[i], iIndentLevel);
+          OutputContainers(slContents, Container[i], iIndentLevel + 1,
+            strContainerLabel + '.' + Container[i].Identifier);
+        End;
   If boolIncHeader Then
     Dec(FHeaderLevel);
   slContents.Add(strIndent + '</div>');
@@ -1086,7 +1204,7 @@ Var
   i : Integer;
 
 Begin
-  Initialise(4 + Integer(High(TImageIndex)) + FFileNames.Count, 'HTML Documentation',
+  Initialise(5 + Integer(High(TImageIndex)) + FFileNames.Count, 'HTML Documentation',
     'Processing source code, please wait...');
   Try
     GenerateCSS;
@@ -1101,6 +1219,7 @@ Begin
         OutputHTMLDocumentation(FFileNames[i]);
       End;
     GenerateSummary;
+    GenerateIndex;
   Finally
     Finalise;
   End;
@@ -1128,10 +1247,10 @@ Const
 
 Var
   Stream : TFileStream;
-  strHTMLName : String;
   i: Integer;
   E: TElementContainer;
   j: Integer;
+  k: Integer;
 
 Begin
   Stream := TFileStream.Create(strFileName, fmOpenRead Or fmShareDenyNone);
@@ -1151,7 +1270,15 @@ Begin
             i := 0;
             E := FCurrentModule.FindElement(strSections[j]);
             If E <> Nil Then
-              i := E.ElementCount;
+              Begin
+                If j = High(strSections) Then
+                  Begin
+                    For k := 1 To E.ElementCount Do
+                      Inc(i, E[k].ElementCount);
+                  End
+                Else
+                  Inc(i, E.ElementCount);
+              End;
             If i = 0 Then
               FSummaryContent.Add(Format('        <td class="Green">%d</td>', [i]))
             Else
@@ -1163,9 +1290,9 @@ Begin
           GenerateModuleList;
           GenerateSectionList;
           FHeaderLevel := 1;
+          FHTMLFileName := FOutputDirectory + ChangeFileExt(ExtractFileName(strFileName), '.html');
           GenerateContent;
-          strHTMLName := FOutputDirectory + ChangeFileExt(ExtractFileName(strFileName), '.html');
-          FCurrentHTMLFile.SaveToFile(strHTMLName);
+          FCurrentHTMLFile.SaveToFile(FHTMLFileName);
         Finally
           FCurrentHTMLFile.Free;
         End;

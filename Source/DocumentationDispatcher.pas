@@ -4,7 +4,7 @@
   that should be produced.
 
   @Author  David Hoyle
-  @Date    06 Sep 2008
+  @Date    09 Sep 2008
   @Version 1.0
 
 **)
@@ -18,16 +18,16 @@ Uses
 Type
   (** This is an enumerate to define the types of documentation hat can be
       produced **)
-  TDocType = (dtHTML , dtRTF, dtWinHelp, dtHTMLHelp);
+  TDocType = (dtHTML {, dtRTF, dtWinHelp, dtHTMLHelp});
 
 Const
   (** This is a constant array to define text representations of the document
       types available. **)
   strDocumentationTypes : Array[Low(TDocType)..High(TDocType)] Of String = (
-    'HTML Documentation',
-    'Rich Text Format Documentation (Not implemented)',
-    'Win32 Help Documentation (Not implemented)',
-    'HTML Help Documentation (Not implemented)'
+    'HTML Documentation' {,
+    'Rich Text Format Documentation',
+    'Win32 Help Documentation',
+    'HTML Help Documentation'}
   );
 
   Function DocumentDispatcher(strOutputDirectory, strTitle : String;

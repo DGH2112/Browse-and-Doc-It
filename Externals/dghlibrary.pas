@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    16 Aug 2008
+  @Date    10 Sep 2008
 
 **)
 Unit DGHLibrary;
@@ -567,7 +567,7 @@ resourcestring
 Const
   (** A constant to define the type of based that can be used with number in
       eqautions. **)
-  Bases = ['B', 'O', 'H'];
+  //Bases = ['B', 'O', 'H'];
   (** The numeric number in base 2 **)
   BinNums = ['-', '0', '1'];
   (** The numeric number in base 8 **)
@@ -5409,18 +5409,13 @@ end;
 **)
 Procedure TokeniseMacro(slTokens : TStringList; Const strMacro : String);
 
-Const
-  strWhiteSpace : Set Of Char = [#32, #9];
-  strTokenChars : Set Of Char = ['#', '_', 'a'..'z', 'A'..'Z'];
-  strNumbers    : Set Of Char = ['0'..'9'];
-  strSymbols    : Set Of Char = ['&', '(', ')', '*', '+', ',', '-', '.', '/',
-    ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
-  strQuotes     : Set Of Char = ['"', ''''];
-  strLineEnds   : Set of Char = [#10, #13];
-
 Type
   TTokenType = (ttWhiteSpace, ttIdentifier, ttNumber, ttLineEnd,
     ttStringLiteral, ttSymbol, ttUnknown);
+
+  Const
+    strWhiteSpace : Set Of Char = [#32, #9];
+    strLineEnds   : Set of Char = [#10, #13];
 
   (**
 
@@ -5437,6 +5432,13 @@ Type
 
   **)
   Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
+
+  Const
+    strTokenChars : Set Of Char = ['#', '_', 'a'..'z', 'A'..'Z'];
+    strNumbers    : Set Of Char = ['0'..'9'];
+    strSymbols    : Set Of Char = ['&', '(', ')', '*', '+', ',', '-', '.', '/',
+      ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
+    strQuotes     : Set Of Char = ['"', ''''];
 
   Begin
     If ch In strWhiteSpace Then
@@ -5485,10 +5487,6 @@ Type
 Type
   (** State machine for block types. **)
   TBlockType = (btNoBlock, btStringLiteral, btCompoundSymbol);
-
-Const
-  (** Growth size of the token buffer. **)
-  iTokenCapacity = 25;
 
 Var
   strToken : String;

@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    05 Sep 2008
+  @Date    10 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -1257,6 +1257,8 @@ Type
     FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
     FExcludeDocFiles : TStringList;
     FMethodDescriptions : TStringList;
+    FScopesToDocument : TScopes;
+    FModuleExplorerBGColour : TColor;
   Protected
     Function GetTokenFontInfo(ATokenType  : TTokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(ATokenType  : TTokenType; ATokenFontInfo : TTokenFontInfo);
@@ -1364,6 +1366,20 @@ Type
       @return  a TStringList
     **)
     Property MethodDescriptions : TStringList Read FMethodDescriptions;
+    (**
+      This property determines the scopes to document.
+      @precon  None.
+      @postcon Gets and sets the scopes to document.
+      @return  a TScopes
+    **)
+    Property ScopesToDocument : TScopes Read FScopesToDocument Write FScopesToDocument;
+    (**
+      This gets and sets the background colour for the Module explorer.
+      @precon  None.
+      @postcon Gets and sets the background colour for the Module explorer.
+      @return  a TColor
+    **)
+    Property BGColour : TColor Read FModuleExplorerBGColour Write FModuleExplorerBGColour;
   End;
 
   (** A silent parser abort exception. **)
@@ -5440,6 +5456,7 @@ Begin
   FScopesToRender := [scPrivate, scProtected, scPublic, scPublished];
   FExcludeDocFiles := TStringList.Create;
   FMethodDescriptions := TStringList.Create;
+  FScopesToDocument := [scPublished, scPublic, scProtected, scPrivate];
   LoadSettings;
 End;
 
@@ -5549,6 +5566,10 @@ begin
       Finally
         sl.Free;
       End;
+      FScopesToDocument := TScopes(Byte(ReadInteger('Documentation', 'Scopes',
+        Byte(FScopesToDocument))));
+      FModuleExplorerBGColour := StringToColor(ReadString('ModuleExploror',
+        'BGColour', ColorToString(clWindow)));
     Finally
       Free;
     End;
@@ -5599,6 +5620,9 @@ begin
       For j := 0 To FMethodDescriptions.Count - 1 Do
         WriteString('MethodDescriptions', FMethodDescriptions.Names[j],
           FMethodDescriptions.ValueFromIndex[j]);
+      WriteInteger('Documentation', 'Scopes', Byte(FScopesToDocument));
+      WriteString('ModuleExploror', 'BGColour',
+        ColorToString(FModuleExplorerBGColour));
     Finally
       Free;
     End;

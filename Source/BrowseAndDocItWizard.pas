@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    07 Sep 2008
+  @Date    10 Sep 2008
   @Version 1.0
 
 **)
@@ -353,7 +353,7 @@ begin
     If TfrmDocumentationOptions.Execute(ADocType) Then
       With DocumentDispatcher(
         ExtractFilePath(AProject.FileName) + 'Documentation',
-        ExtractFileName(AProject.FileName), ADocType) Do
+        ExtractFileName(AProject.ProjectOptions.TargetName), ADocType) Do
         Try
           For i := 0 To AProject.GetModuleCount - 1 Do
             Add(AProject.GetModule(i).FileName);

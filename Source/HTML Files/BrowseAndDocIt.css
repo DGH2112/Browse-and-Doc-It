@@ -3,7 +3,7 @@
   This file contains CSS information for the Browse And Doc It HTML Output.
 
   @Author  David Hoyle
-  @Date    07 Sep 2008
+  @Date    10 Sep 2008
   @Version 1.0
 
 */
@@ -195,7 +195,7 @@ p.TagHeader {
 }
 
 pre {
-  background       : #CCFFCC;
+  background       : #$PREBGCOLOUR$;
   border-bottom    : solid thin gray;
   color            : black;
   margin-top       : -0.5em;

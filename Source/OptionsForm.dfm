@@ -31,10 +31,6 @@ object frmOptions: TfrmOptions
     TabOrder = 0
     object Page1: TTabSheet
       Caption = 'General Options'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object clbOptions: TCheckListBox
         Left = 0
         Top = 0
@@ -84,10 +80,6 @@ object frmOptions: TfrmOptions
     object Page2: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 640
-      ExplicitHeight = 349
       DesignSize = (
         655
         342)
@@ -135,7 +127,6 @@ object frmOptions: TfrmOptions
             Width = 300
           end>
         Style = hsFlat
-        ExplicitWidth = 634
       end
       object btnAdd: TBitBtn
         Left = 253
@@ -146,8 +137,6 @@ object frmOptions: TfrmOptions
         Caption = '&Add'
         TabOrder = 2
         OnClick = btnAddClick
-        ExplicitLeft = 238
-        ExplicitTop = 321
       end
       object btnDelete: TBitBtn
         Left = 415
@@ -158,8 +147,6 @@ object frmOptions: TfrmOptions
         Caption = '&Delete'
         TabOrder = 3
         OnClick = btnDeleteClick
-        ExplicitLeft = 400
-        ExplicitTop = 321
       end
       object btnEdit: TBitBtn
         Left = 334
@@ -170,8 +157,6 @@ object frmOptions: TfrmOptions
         Caption = '&Edit'
         TabOrder = 4
         OnClick = btnEditClick
-        ExplicitLeft = 319
-        ExplicitTop = 321
       end
       object btnMoveDown: TBitBtn
         Left = 577
@@ -182,8 +167,6 @@ object frmOptions: TfrmOptions
         Caption = '&Move Down'
         TabOrder = 5
         OnClick = btnMoveDownClick
-        ExplicitLeft = 562
-        ExplicitTop = 321
       end
       object btnMoveUp: TBitBtn
         Left = 496
@@ -194,17 +177,11 @@ object frmOptions: TfrmOptions
         Caption = 'Move &Up'
         TabOrder = 6
         OnClick = btnMoveUpClick
-        ExplicitLeft = 481
-        ExplicitTop = 321
       end
     end
     object TabSheet1: TTabSheet
       Caption = 'Module Explorer'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         655
         342)
@@ -248,7 +225,7 @@ object frmOptions: TfrmOptions
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 0
       end
       object edtFontSize: TEdit
@@ -288,6 +265,7 @@ object frmOptions: TfrmOptions
         Top = 84
         Width = 168
         Height = 22
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 4
@@ -342,19 +320,16 @@ object frmOptions: TfrmOptions
         Left = 484
         Top = 254
         Width = 168
-        Height = 19
+        Height = 22
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 16
         TabOrder = 6
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'Code Browsing'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 640
-      ExplicitHeight = 349
       DesignSize = (
         655
         342)
@@ -372,17 +347,11 @@ object frmOptions: TfrmOptions
           'Identifier aligned with the centre of the editor'
           'Identifier centred in the editor but show all of the comment')
         TabOrder = 0
-        ExplicitWidth = 634
-        ExplicitHeight = 343
       end
     end
     object tabExcludeDocFiles: TTabSheet
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 640
-      ExplicitHeight = 349
       DesignSize = (
         655
         342)
@@ -400,10 +369,6 @@ object frmOptions: TfrmOptions
     object tabMethodDescriptions: TTabSheet
       Caption = 'Method Descriptions'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 640
-      ExplicitHeight = 349
       DesignSize = (
         655
         342)
@@ -428,8 +393,6 @@ object frmOptions: TfrmOptions
         TabOrder = 0
         ViewStyle = vsReport
         OnDblClick = lvMethodDescriptionsDblClick
-        ExplicitWidth = 553
-        ExplicitHeight = 343
       end
       object btnAddDesc: TBitBtn
         Left = 577
@@ -454,7 +417,6 @@ object frmOptions: TfrmOptions
           333333333337733333FF3333333C333330003333333733333777333333333333
           3000333333333333377733333333333333333333333333333333}
         NumGlyphs = 2
-        ExplicitLeft = 562
       end
       object btnEditDesc: TBitBtn
         Left = 577
@@ -479,7 +441,6 @@ object frmOptions: TfrmOptions
           0FF03333737F37737F373330B00FFFFF0F033337F77F33337F733309030FFFFF
           00333377737FFFFF773333303300000003333337337777777333}
         NumGlyphs = 2
-        ExplicitLeft = 562
       end
       object btnDeleteDesc: TBitBtn
         Left = 577
@@ -504,16 +465,11 @@ object frmOptions: TfrmOptions
           333333377F33333333FF3333C333333330003333733333333777333333333333
           3000333333333333377733333333333333333333333333333333}
         NumGlyphs = 2
-        ExplicitLeft = 562
       end
     end
     object HelpFilePage: TTabSheet
       Caption = ' Help File Directory'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 640
-      ExplicitHeight = 349
       object HelpFileDir: TDirectoryListBox
         Left = 0
         Top = 0
@@ -522,8 +478,6 @@ object frmOptions: TfrmOptions
         Align = alClient
         ItemHeight = 16
         TabOrder = 0
-        ExplicitWidth = 640
-        ExplicitHeight = 349
       end
     end
   end

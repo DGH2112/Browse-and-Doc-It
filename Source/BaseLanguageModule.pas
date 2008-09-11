@@ -2015,6 +2015,8 @@ Const
   iShowInTree = $0001;
   (** This is a constant for special tag items to auto expand in the tree **)
   iAutoExpand = $0002;
+  (** This is a constant for special tag items to show in the documentation **)
+  iShowInDoc = $0004;
 
   (** This is a list of Image Resource name to be loaded fom the executable. **)
   ImageList : Array[Succ(Low(TImageIndex))..High(TImageIndex)] Of TImageIndexInfo = (
@@ -5506,7 +5508,7 @@ Begin
   FDefines := TStringList.Create;
   FSpecialTags := TStringList.Create;
   // Create a default set of Special Tags.
-  FSpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree And iAutoExpand));
+  FSpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree And iAutoExpand And iShowInDoc));
   FSpecialTags.AddObject('precon=Pre-Conditions', TObject(0));
   FSpecialTags.AddObject('postcon=Post-Conditions', TObject(0));
   FSpecialTags.AddObject('param=Parameters', TObject(0));
@@ -5514,8 +5516,8 @@ Begin
   FSpecialTags.AddObject('note=Notes', TObject(0));
   FSpecialTags.AddObject('see=Also See', TObject(0));
   FSpecialTags.AddObject('exception=Exception Raised', TObject(0));
-  FSpecialTags.AddObject('bug=Known Bugs', TObject(iShowInTree And iAutoExpand));
-  FSpecialTags.AddObject('debug=Debugging Code', TObject(iShowInTree And iAutoExpand));
+  FSpecialTags.AddObject('bug=Known Bugs', TObject(iShowInTree And iAutoExpand And iShowInDoc));
+  FSpecialTags.AddObject('debug=Debugging Code', TObject(iShowInTree And iAutoExpand And iShowInDoc));
   FSpecialTags.AddObject('date=Date Code Last Updated', TObject(0));
   FSpecialTags.AddObject('author=Code Author', TObject(0));
   FSpecialTags.AddObject('version=Code Version', TObject(0));

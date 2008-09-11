@@ -4241,8 +4241,9 @@ constructor TDocIssue.Create(strMsg : String; AScope : TScope; strMethod: String
   iLine, iCol: Integer; AImageIndex : TImageIndex);
 
 Begin
-  Inherited Create(Format('%d@%d:%d', [GetTickCount, iLine, iCol]), AScope,
-    iLine, iCol, AImageIndex, Nil);
+  Inherited Create(Format('%4.4d', [iDocConflictCounter]), AScope, iLine, iCol,
+    AImageIndex, Nil);
+  Inc(iDocConflictCounter);
   FMsg := strMsg;
   FMethod := strMethod;
 End;

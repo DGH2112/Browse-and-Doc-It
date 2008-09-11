@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    10 Sep 2008
+  @Date    11 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -108,7 +108,11 @@ Type
     iiUsesLabel,
     iiUsesItem,
 
-    iiTypesLabel,
+    iiPublicTypesLabel,
+    iiPrivateTypesLabel,
+    iiPublishedTypesLabel,
+    iiProtectedTypesLabel,
+    iiLocalTypesLabel,
     iiPublicType,
     iiPrivateType,
     iiPublishedType,
@@ -188,28 +192,40 @@ Type
     iiProtectedDispInterface,
     iiLocalDispInterface,
 
-    iiConstantsLabel,
+    iiPublicConstantsLabel,
+    iiPrivateConstantsLabel,
+    iiPublishedConstantsLabel,
+    iiProtectedConstantsLabel,
+    iiLocalConstantsLabel,
     iiPublicConstant,
     iiPrivateConstant,
     iiPublishedConstant,
     iiProtectedConstant,
     iiLocalConstant,
 
-    iiResourceStringsLabel,
+    iiPublicResourceStringsLabel,
+    iiPrivateResourceStringsLabel,
+    iiPublishedResourceStringsLabel,
+    iiProtectedResourceStringsLabel,
+    iiLocalResourceStringsLabel,
     iiPublicResourceString,
     iiPrivateResourceString,
     iiPublishedResourceString,
     iiProtectedResourceString,
     iiLocalResourceString,
 
-    iiVariablesLabel,
+    iiPublicVariablesLabel,
+    iiPrivateVariablesLabel,
+    iiPublishedVariablesLabel,
+    iiProtectedVariablesLabel,
+    iiLocalVariablesLabel,
     iiPublicVariable,
     iiPrivateVariable,
     iiPublishedVariable,
     iiProtectedVariable,
     iiLocalVariable,
 
-    iiThreadVarsLabel,
+    iiPublicThreadVarsLabel,
     iiPublicThreadVar,
     iiPrivateThreadVar,
     iiPublishedThreadVar,
@@ -225,7 +241,11 @@ Type
     iiProtectedExportedFunction,
     iiLocalExportedFunction,
 
-    iiLabelsLabel,
+    iiPublicLabelsLabel,
+    iiPrivateLabelsLabel,
+    iiPublishedLabelsLabel,
+    iiProtectedLabelsLabel,
+    iiLocalLabelsLabel,
     iiPublicLabel,
     iiPrivateLabel,
     iiPublishedLabel,
@@ -605,7 +625,7 @@ Type
     Function Add(Token : TTokenInfo; AScope : TScope; AImageIndex : TImageIndex;
       AComment : TComment) : TElementContainer; Overload; Virtual;
     Function Add(strToken : String; AImageIndex : TImageIndex;
-      AComment : TComment) : TElementContainer; Overload; Virtual;
+      AScope : TScope; AComment : TComment) : TElementContainer; Overload; Virtual;
     Procedure AppendToken(AToken : TTokenInfo); Overload; Virtual;
     Procedure AppendToken(strToken : String); Overload; Virtual;
     Procedure AddTokens(AElement : TElementContainer); Virtual;
@@ -615,7 +635,7 @@ Type
     Procedure DeleteElement(iIndex : Integer);
     Procedure CheckDocumentation(var boolCascade : Boolean); Virtual;
     Procedure AddIssue(strMsg : String; AScope : TScope; strMethod : String;
-      iLine, iCol : Integer; ErrType : TErrorType);
+      iLine, iCol : Integer; ErrorType : TErrorType);
     Procedure AddDocumentConflict(Const Args: Array of TVarRec;
       iIdentLine, iIdentColumn : Integer; AComment : TComment;
       DocConflictRec : TDocConflictTable);
@@ -1998,157 +2018,177 @@ Const
 
   (** This is a list of Image Resource name to be loaded fom the executable. **)
   ImageList : Array[Succ(Low(TImageIndex))..High(TImageIndex)] Of TImageIndexInfo = (
-    (FResourceName : 'Module';                    FMaskColour: clLime),
+    (FResourceName : 'Module';                        FMaskColour: clLime),
 
-    (FResourceName : 'DocConflictFolder';         FMaskColour: clLime),
-    (FResourceName : 'DocConflictIncorrect';      FMaskColour: clLime),
-    (FResourceName : 'DocConflictItem';           FMaskColour: clLime),
-    (FResourceName : 'DocConflictMissing';        FMaskColour: clLime),
+    (FResourceName : 'DocConflictFolder';             FMaskColour: clLime),
+    (FResourceName : 'DocConflictIncorrect';          FMaskColour: clLime),
+    (FResourceName : 'DocConflictItem';               FMaskColour: clLime),
+    (FResourceName : 'DocConflictMissing';            FMaskColour: clLime),
 
-    (FResourceName : 'ErrorFolder';               FMaskColour: clLime),
-    (FResourceName : 'Error';                     FMaskColour: clLime),
-    (FResourceName : 'WarningFolder';             FMaskColour: clLime),
-    (FResourceName : 'Warning';                   FMaskColour: clLime),
-    (FResourceName : 'HintFolder';                FMaskColour: clFuchsia),
-    (FResourceName : 'Hint';                      FMaskColour: clFuchsia),
+    (FResourceName : 'ErrorFolder';                   FMaskColour: clLime),
+    (FResourceName : 'Error';                         FMaskColour: clLime),
+    (FResourceName : 'WarningFolder';                 FMaskColour: clLime),
+    (FResourceName : 'Warning';                       FMaskColour: clLime),
+    (FResourceName : 'HintFolder';                    FMaskColour: clFuchsia),
+    (FResourceName : 'Hint';                          FMaskColour: clFuchsia),
 
-    (FResourceName : 'UsesLabel';                 FMaskColour: clLime),
-    (FResourceName : 'UsesItem';                  FMaskColour: clLime),
+    (FResourceName : 'UsesLabel';                     FMaskColour: clLime),
+    (FResourceName : 'UsesItem';                      FMaskColour: clLime),
 
-    (FResourceName : 'TypesLabel';                FMaskColour: clLime),
-    (FResourceName : 'PublicType';                FMaskColour: clLime),
-    (FResourceName : 'PrivateType';               FMaskColour: clLime),
-    (FResourceName : 'PublishedType';             FMaskColour: clLime),
-    (FResourceName : 'ProtectedType';             FMaskColour: clLime),
-    (FResourceName : 'LocalType';                 FMaskColour: clLime),
+    (FResourceName : 'PublicTypesLabel';              FMaskColour: clLime),
+    (FResourceName : 'PrivateTypesLabel';             FMaskColour: clLime),
+    (FResourceName : 'PublishedTypesLabel';           FMaskColour: clLime),
+    (FResourceName : 'ProtectedTypesLabel';           FMaskColour: clLime),
+    (FResourceName : 'LocalTypesLabel';               FMaskColour: clLime),
+    (FResourceName : 'PublicType';                    FMaskColour: clLime),
+    (FResourceName : 'PrivateType';                   FMaskColour: clLime),
+    (FResourceName : 'PublishedType';                 FMaskColour: clLime),
+    (FResourceName : 'ProtectedType';                 FMaskColour: clLime),
+    (FResourceName : 'LocalType';                     FMaskColour: clLime),
 
-    (FResourceName : 'RecordsLabel';              FMaskColour: clLime),
-    (FResourceName : 'PublicRecord';              FMaskColour: clLime),
-    (FResourceName : 'PrivateRecord';             FMaskColour: clLime),
-    (FResourceName : 'PublishedRecord';           FMaskColour: clLime),
-    (FResourceName : 'ProtectedRecord';           FMaskColour: clLime),
-    (FResourceName : 'LocalRecord';               FMaskColour: clLime),
+    (FResourceName : 'RecordsLabel';                  FMaskColour: clLime),
+    (FResourceName : 'PublicRecord';                  FMaskColour: clLime),
+    (FResourceName : 'PrivateRecord';                 FMaskColour: clLime),
+    (FResourceName : 'PublishedRecord';               FMaskColour: clLime),
+    (FResourceName : 'ProtectedRecord';               FMaskColour: clLime),
+    (FResourceName : 'LocalRecord';                   FMaskColour: clLime),
 
-    (FResourceName : 'FieldsLabel';               FMaskColour: clLime),
-    (FResourceName : 'LocalField';                FMaskColour: clLime),
-    (FResourceName : 'PublicField';               FMaskColour: clLime),
-    (FResourceName : 'PrivateField';              FMaskColour: clLime),
-    (FResourceName : 'PublishedField';            FMaskColour: clLime),
-    (FResourceName : 'ProtectedField';            FMaskColour: clLime),
+    (FResourceName : 'FieldsLabel';                   FMaskColour: clLime),
+    (FResourceName : 'LocalField';                    FMaskColour: clLime),
+    (FResourceName : 'PublicField';                   FMaskColour: clLime),
+    (FResourceName : 'PrivateField';                  FMaskColour: clLime),
+    (FResourceName : 'PublishedField';                FMaskColour: clLime),
+    (FResourceName : 'ProtectedField';                FMaskColour: clLime),
 
-    (FResourceName : 'ObjectsLabel';              FMaskColour: clLime),
-    (FResourceName : 'PublicObject';              FMaskColour: clLime),
-    (FResourceName : 'PrivateObject';             FMaskColour: clLime),
-    (FResourceName : 'PublishedObject';           FMaskColour: clLime),
-    (FResourceName : 'ProtectedObject';           FMaskColour: clLime),
-    (FResourceName : 'LocalObject';               FMaskColour: clLime),
+    (FResourceName : 'ObjectsLabel';                  FMaskColour: clLime),
+    (FResourceName : 'PublicObject';                  FMaskColour: clLime),
+    (FResourceName : 'PrivateObject';                 FMaskColour: clLime),
+    (FResourceName : 'PublishedObject';               FMaskColour: clLime),
+    (FResourceName : 'ProtectedObject';               FMaskColour: clLime),
+    (FResourceName : 'LocalObject';                   FMaskColour: clLime),
 
-    (FResourceName : 'PublicConstructor';         FMaskColour: clLime),
-    (FResourceName : 'PrivateConstructor';        FMaskColour: clLime),
-    (FResourceName : 'PublishedConstructor';      FMaskColour: clLime),
-    (FResourceName : 'ProtectedConstructor';      FMaskColour: clLime),
-    (FResourceName : 'LocalConstructor';          FMaskColour: clLime),
+    (FResourceName : 'PublicConstructor';             FMaskColour: clLime),
+    (FResourceName : 'PrivateConstructor';            FMaskColour: clLime),
+    (FResourceName : 'PublishedConstructor';          FMaskColour: clLime),
+    (FResourceName : 'ProtectedConstructor';          FMaskColour: clLime),
+    (FResourceName : 'LocalConstructor';              FMaskColour: clLime),
 
-    (FResourceName : 'PublicDestructor';          FMaskColour: clFuchsia),
-    (FResourceName : 'PrivateDestructor';         FMaskColour: clFuchsia),
-    (FResourceName : 'PublishedDestructor';       FMaskColour: clFuchsia),
-    (FResourceName : 'ProtectedDestructor';       FMaskColour: clFuchsia),
-    (FResourceName : 'LocalDestructor';           FMaskColour: clFuchsia),
+    (FResourceName : 'PublicDestructor';              FMaskColour: clFuchsia),
+    (FResourceName : 'PrivateDestructor';             FMaskColour: clFuchsia),
+    (FResourceName : 'PublishedDestructor';           FMaskColour: clFuchsia),
+    (FResourceName : 'ProtectedDestructor';           FMaskColour: clFuchsia),
+    (FResourceName : 'LocalDestructor';               FMaskColour: clFuchsia),
 
-    (FResourceName : 'PublicProcedure';           FMaskColour: clLime),
-    (FResourceName : 'PrivateProcedure';          FMaskColour: clLime),
-    (FResourceName : 'PublishedProcedure';        FMaskColour: clLime),
-    (FResourceName : 'ProtectedProcedure';        FMaskColour: clLime),
-    (FResourceName : 'LocalProcedure';            FMaskColour: clLime),
+    (FResourceName : 'PublicProcedure';               FMaskColour: clLime),
+    (FResourceName : 'PrivateProcedure';              FMaskColour: clLime),
+    (FResourceName : 'PublishedProcedure';            FMaskColour: clLime),
+    (FResourceName : 'ProtectedProcedure';            FMaskColour: clLime),
+    (FResourceName : 'LocalProcedure';                FMaskColour: clLime),
 
-    (FResourceName : 'PublicFunction';            FMaskColour: clLime),
-    (FResourceName : 'PrivateFunction';           FMaskColour: clLime),
-    (FResourceName : 'PublishedFunction';         FMaskColour: clLime),
-    (FResourceName : 'ProtectedFunction';         FMaskColour: clLime),
-    (FResourceName : 'LocalFunction';             FMaskColour: clLime),
+    (FResourceName : 'PublicFunction';                FMaskColour: clLime),
+    (FResourceName : 'PrivateFunction';               FMaskColour: clLime),
+    (FResourceName : 'PublishedFunction';             FMaskColour: clLime),
+    (FResourceName : 'ProtectedFunction';             FMaskColour: clLime),
+    (FResourceName : 'LocalFunction';                 FMaskColour: clLime),
 
-    (FResourceName : 'ClassesLabel';              FMaskColour: clLime),
-    (FResourceName : 'PublicClass';               FMaskColour: clLime),
-    (FResourceName : 'PrivateClass';              FMaskColour: clLime),
-    (FResourceName : 'PublishedClass';            FMaskColour: clLime),
-    (FResourceName : 'ProtectedClass';            FMaskColour: clLime),
-    (FResourceName : 'LocalClass';                FMaskColour: clLime),
+    (FResourceName : 'ClassesLabel';                  FMaskColour: clLime),
+    (FResourceName : 'PublicClass';                   FMaskColour: clLime),
+    (FResourceName : 'PrivateClass';                  FMaskColour: clLime),
+    (FResourceName : 'PublishedClass';                FMaskColour: clLime),
+    (FResourceName : 'ProtectedClass';                FMaskColour: clLime),
+    (FResourceName : 'LocalClass';                    FMaskColour: clLime),
 
-    (FResourceName : 'PropertyLabel';             FMaskColour: clFuchsia),
-    (FResourceName : 'PublicProperty';            FMaskColour: clFuchsia),
-    (FResourceName : 'PrivateProperty';           FMaskColour: clFuchsia),
-    (FResourceName : 'PublishedProperty';         FMaskColour: clFuchsia),
-    (FResourceName : 'ProtectedProperty';         FMaskColour: clFuchsia),
-    (FResourceName : 'LocalProperty';             FMaskColour: clFuchsia),
+    (FResourceName : 'PropertyLabel';                 FMaskColour: clFuchsia),
+    (FResourceName : 'PublicProperty';                FMaskColour: clFuchsia),
+    (FResourceName : 'PrivateProperty';               FMaskColour: clFuchsia),
+    (FResourceName : 'PublishedProperty';             FMaskColour: clFuchsia),
+    (FResourceName : 'ProtectedProperty';             FMaskColour: clFuchsia),
+    (FResourceName : 'LocalProperty';                 FMaskColour: clFuchsia),
 
-    (FResourceName : 'InterfacesLabel';           FMaskColour: clLime),
-    (FResourceName : 'PublicInterface';           FMaskColour: clLime),
-    (FResourceName : 'PrivateInterface';          FMaskColour: clLime),
-    (FResourceName : 'PublishedInterface';        FMaskColour: clLime),
-    (FResourceName : 'ProtectedInterface';        FMaskColour: clLime),
-    (FResourceName : 'LocalInterface';            FMaskColour: clLime),
+    (FResourceName : 'InterfacesLabel';               FMaskColour: clLime),
+    (FResourceName : 'PublicInterface';               FMaskColour: clLime),
+    (FResourceName : 'PrivateInterface';              FMaskColour: clLime),
+    (FResourceName : 'PublishedInterface';            FMaskColour: clLime),
+    (FResourceName : 'ProtectedInterface';            FMaskColour: clLime),
+    (FResourceName : 'LocalInterface';                FMaskColour: clLime),
 
-    (FResourceName : 'DispInterfaceSLabel';       FMaskColour: clLime),
-    (FResourceName : 'PublicDispInterface';       FMaskColour: clLime),
-    (FResourceName : 'PrivateDispInterface';      FMaskColour: clLime),
-    (FResourceName : 'PublishedDispInterface';    FMaskColour: clLime),
-    (FResourceName : 'ProtectedDispInterface';    FMaskColour: clLime),
-    (FResourceName : 'LocalDispInterface';        FMaskColour: clLime),
+    (FResourceName : 'DispInterfaceSLabel';           FMaskColour: clLime),
+    (FResourceName : 'PublicDispInterface';           FMaskColour: clLime),
+    (FResourceName : 'PrivateDispInterface';          FMaskColour: clLime),
+    (FResourceName : 'PublishedDispInterface';        FMaskColour: clLime),
+    (FResourceName : 'ProtectedDispInterface';        FMaskColour: clLime),
+    (FResourceName : 'LocalDispInterface';            FMaskColour: clLime),
 
-    (FResourceName : 'ConstantsLabel';            FMaskColour: clLime),
-    (FResourceName : 'PublicConst';               FMaskColour: clLime),
-    (FResourceName : 'PrivateConst';              FMaskColour: clLime),
-    (FResourceName : 'PublishedConst';            FMaskColour: clLime),
-    (FResourceName : 'ProtectedConst';            FMaskColour: clLime),
-    (FResourceName : 'LocalConst';                FMaskColour: clLime),
+    (FResourceName : 'PublicConstantsLabel';          FMaskColour: clLime),
+    (FResourceName : 'PrivateConstantsLabel';         FMaskColour: clLime),
+    (FResourceName : 'PublishedConstantsLabel';       FMaskColour: clLime),
+    (FResourceName : 'ProtectedConstantsLabel';       FMaskColour: clLime),
+    (FResourceName : 'LocalConstantsLabel';           FMaskColour: clLime),
+    (FResourceName : 'PublicConst';                   FMaskColour: clLime),
+    (FResourceName : 'PrivateConst';                  FMaskColour: clLime),
+    (FResourceName : 'PublishedConst';                FMaskColour: clLime),
+    (FResourceName : 'ProtectedConst';                FMaskColour: clLime),
+    (FResourceName : 'LocalConst';                    FMaskColour: clLime),
 
-    (FResourceName : 'ResourceStringsLabel';      FMaskColour: clLime),
-    (FResourceName : 'PublicResourceString';      FMaskColour: clLime),
-    (FResourceName : 'PrivateResourceString';     FMaskColour: clLime),
-    (FResourceName : 'PublishedResourceString';   FMaskColour: clLime),
-    (FResourceName : 'ProtectedResourceString';   FMaskColour: clLime),
-    (FResourceName : 'LocalResourceString';       FMaskColour: clLime),
+    (FResourceName : 'PublicResourceStringsLabel';    FMaskColour: clLime),
+    (FResourceName : 'PrivateResourceStringsLabel';   FMaskColour: clLime),
+    (FResourceName : 'PublishedResourceStringsLabel'; FMaskColour: clLime),
+    (FResourceName : 'ProtectedResourceStringsLabel'; FMaskColour: clLime),
+    (FResourceName : 'LocalResourceStringsLabel';     FMaskColour: clLime),
+    (FResourceName : 'PublicResourceString';          FMaskColour: clLime),
+    (FResourceName : 'PrivateResourceString';         FMaskColour: clLime),
+    (FResourceName : 'PublishedResourceString';       FMaskColour: clLime),
+    (FResourceName : 'ProtectedResourceString';       FMaskColour: clLime),
+    (FResourceName : 'LocalResourceString';           FMaskColour: clLime),
 
-    (FResourceName : 'VariablesLabel';            FMaskColour: clLime),
-    (FResourceName : 'PublicVariable';            FMaskColour: clLime),
-    (FResourceName : 'PrivateVariable';           FMaskColour: clLime),
-    (FResourceName : 'PublishedVariable';         FMaskColour: clLime),
-    (FResourceName : 'ProtectedVariable';         FMaskColour: clLime),
-    (FResourceName : 'LocalVariable';             FMaskColour: clLime),
+    (FResourceName : 'PublicVariablesLabel';          FMaskColour: clLime),
+    (FResourceName : 'PrivateVariablesLabel';         FMaskColour: clLime),
+    (FResourceName : 'PublishedVariablesLabel';       FMaskColour: clLime),
+    (FResourceName : 'ProtectedVariablesLabel';       FMaskColour: clLime),
+    (FResourceName : 'LocalVariablesLabel';           FMaskColour: clLime),
+    (FResourceName : 'PublicVariable';                FMaskColour: clLime),
+    (FResourceName : 'PrivateVariable';               FMaskColour: clLime),
+    (FResourceName : 'PublishedVariable';             FMaskColour: clLime),
+    (FResourceName : 'ProtectedVariable';             FMaskColour: clLime),
+    (FResourceName : 'LocalVariable';                 FMaskColour: clLime),
 
-    (FResourceName : 'ThreadVarsLabel';           FMaskColour: clLime),
-    (FResourceName : 'PublicThreadVar';           FMaskColour: clLime),
-    (FResourceName : 'PrivateThreadVar';          FMaskColour: clLime),
-    (FResourceName : 'PublishedThreadVar';        FMaskColour: clLime),
-    (FResourceName : 'ProtectedThreadVar';        FMaskColour: clLime),
-    (FResourceName : 'LocalThreadVar';            FMaskColour: clLime),
+    (FResourceName : 'PublicThreadVarsLabel';         FMaskColour: clLime),
+    (FResourceName : 'PublicThreadVar';               FMaskColour: clLime),
+    (FResourceName : 'PrivateThreadVar';              FMaskColour: clLime),
+    (FResourceName : 'PublishedThreadVar';            FMaskColour: clLime),
+    (FResourceName : 'ProtectedThreadVar';            FMaskColour: clLime),
+    (FResourceName : 'LocalThreadVar';                FMaskColour: clLime),
 
-    (FResourceName : 'ExportedHeadingsLabel';     FMaskColour: clLime),
+    (FResourceName : 'ExportedHeadingsLabel';         FMaskColour: clLime),
 
-    (FResourceName : 'ExportedFunctionsLabel';    FMaskColour: clLime),
-    (FResourceName : 'PublicExportedFunction';    FMaskColour: clLime),
-    (FResourceName : 'PrivateExportedFunction';   FMaskColour: clLime),
-    (FResourceName : 'PublishedExportedFunction'; FMaskColour: clLime),
-    (FResourceName : 'ProtectedExportedFunction'; FMaskColour: clLime),
-    (FResourceName : 'LocalExportedFunction';     FMaskColour: clLime),
+    (FResourceName : 'ExportedFunctionsLabel';        FMaskColour: clLime),
+    (FResourceName : 'PublicExportedFunction';        FMaskColour: clLime),
+    (FResourceName : 'PrivateExportedFunction';       FMaskColour: clLime),
+    (FResourceName : 'PublishedExportedFunction';     FMaskColour: clLime),
+    (FResourceName : 'ProtectedExportedFunction';     FMaskColour: clLime),
+    (FResourceName : 'LocalExportedFunction';         FMaskColour: clLime),
 
-    (FResourceName : 'LabelsLabel';               FMaskColour: clLime),
-    (FResourceName : 'LocalLabel';                FMaskColour: clLime),
-    (FResourceName : 'PrivateLabel';              FMaskColour: clLime),
-    (FResourceName : 'ProtectedLabel';            FMaskColour: clLime),
-    (FResourceName : 'PublicLabel';               FMaskColour: clLime),
-    (FResourceName : 'PublishedLabel';            FMaskColour: clLime),
+    (FResourceName : 'PublicLabelsLabel';             FMaskColour: clLime),
+    (FResourceName : 'PrivateLabelsLabel';            FMaskColour: clLime),
+    (FResourceName : 'PublishedLabelsLabel';          FMaskColour: clLime),
+    (FResourceName : 'ProtectedLabelsLabel';          FMaskColour: clLime),
+    (FResourceName : 'LocalLabelsLabel';              FMaskColour: clLime),
+    (FResourceName : 'LocalLabel';                    FMaskColour: clLime),
+    (FResourceName : 'PrivateLabel';                  FMaskColour: clLime),
+    (FResourceName : 'ProtectedLabel';                FMaskColour: clLime),
+    (FResourceName : 'PublicLabel';                   FMaskColour: clLime),
+    (FResourceName : 'PublishedLabel';                FMaskColour: clLime),
 
-    (FResourceName : 'MethodsLabel';              FMaskColour: clLime),
-    (FResourceName : 'ImplementedMethodsLabel';   FMaskColour: clLime),
+    (FResourceName : 'MethodsLabel';                  FMaskColour: clLime),
+    (FResourceName : 'ImplementedMethodsLabel';       FMaskColour: clLime),
 
-    (FResourceName : 'InitializationLabel';       FMaskColour: clFuchsia),
-    (FResourceName : 'FinalizationLabel';         FMaskColour: clLime),
+    (FResourceName : 'InitializationLabel';           FMaskColour: clFuchsia),
+    (FResourceName : 'FinalizationLabel';             FMaskColour: clLime),
 
-    (FResourceName : 'TodoFolder';                FMaskColour: clLime),
-    (FResourceName : 'TodoItem';                  FMaskColour: clLime),
+    (FResourceName : 'TodoFolder';                    FMaskColour: clLime),
+    (FResourceName : 'TodoItem';                      FMaskColour: clLime),
 
-    (FResourceName : 'UnknownClsObj';             FMaskColour: clLime)
+    (FResourceName : 'UnknownClsObj';                 FMaskColour: clLime)
   );
 
   (** A table of information for document conflicts. **)
@@ -2362,6 +2402,10 @@ Implementation
 
 Uses
   Windows, StrUtils, DGHLibrary, INIFiles;
+
+Const
+  (** This constant represent the maximum of issue / doc conflicts to add. **)
+  iIssueLimit : Integer = 25;
 
 resourcestring
   (** An error message for tying to add one type of element but finding another
@@ -3187,7 +3231,7 @@ begin
         Result.Comment.Assign(AElement.Comment);
       If Not AElement.ClassNameIs(Result.ClassName) Then
         Begin
-          E := objModuleRootElement.Add(strErrors, iiErrorFolder, Nil);
+          E := objModuleRootElement.Add(strErrors, iiErrorFolder, scNone, Nil);
           E.Add(TDocIssue.Create(Format(strTryingToAddType, [AElement.ClassName,
             Result.ClassName, AElement.Name]), scNone, 'TElementContainer.Add',
             AElement.Line, AElement.Column, iiError));
@@ -3238,20 +3282,21 @@ end;
 
 (**
 
-  This method adds a string token to the container as a sub container NOT a
-  token.
+  This method adds a string token to the container as a sub container NOT a 
+  token. 
 
-  @precon  None.
-  @postcon Returns an instance of the sub container created around the token.
+  @precon  None. 
+  @postcon Returns an instance of the sub container created around the token. 
 
-  @param   strToken    as a String
+  @param   strToken    as a String
   @param   AImageIndex as a TImageIndex
+  @param   AScope      as a TScope
   @param   AComment    as a TComment
   @return  a TElementContainer
 
 **)
 function TElementContainer.Add(strToken: String; AImageIndex: TImageIndex;
-  AComment: TComment): TElementContainer;
+  AScope : TScope; AComment: TComment): TElementContainer;
 
 Var
   i : Integer;
@@ -3261,7 +3306,7 @@ begin
   i := Find(strToken);
   If i < 0 Then
     Begin
-      Result := TLabelContainer.Create(strToken, scNone, 0, 0, AImageIndex, AComment);
+      Result := TLabelContainer.Create(strToken, AScope, 0, 0, AImageIndex, AComment);
       FElements.Insert(Abs(i) - 1, Result);
     End Else
     Begin
@@ -3345,32 +3390,56 @@ end;
   @param   strMethod as a String
   @param   iLine     as an Integer
   @param   iCol      as an Integer
-  @param   ErrType   as a TErrorType
+  @param   ErrorType as a TErrorType
 
 **)
 Procedure TElementContainer.AddIssue(strMsg : String; AScope : TScope;
-  strMethod : String; iLine, iCol : Integer; ErrType : TErrorType);
+  strMethod : String; iLine, iCol : Integer; ErrorType : TErrorType);
+
+Type
+  TIssueRec = Record
+    FFolder       : String;
+    FFolderImage  : TImageIndex;
+    FItemImage    : TImageIndex;
+    FTooMany      : String;
+  End;
+
+ResourceString
+  strTooManyHints = 'Too many hints...';
+  strTooManyWarnings = 'Too many warnings...';
+  strTooManyErrors = 'Too many errors...';
+
+Const
+  recIssues : Array[Low(TErrorType)..High(TErrorType)] Of TIssueRec = (
+    (FFolder : strHints;
+      FFolderImage : iiHintFolder;
+      FItemImage : iiHint;
+      FTooMany : strTooManyHints),
+    (FFolder : strWarnings;
+      FFolderImage : iiWarningFolder;
+      FItemImage : iiWarning;
+      FTooMany : strTooManyWarnings),
+    (FFolder : strErrors;
+      FFolderImage : iiErrorFolder;
+      FItemImage : iiError;
+      FTooMany : strTooManyErrors)
+  );
 
 Var
   I : TElementContainer;
+  iCount : Integer;
 
 begin
   Assert(objModuleRootElement <> Nil, 'objModuleRootElement can not be null!');
-  Case ErrType Of
-    etHint:
-      Begin
-        I := objModuleRootElement.Add(strHints, iiHintFolder, Nil);
-        I.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol, iiHint));
-      End;
-    etWarning:
-      Begin
-        I := objModuleRootElement.Add(strWarnings, iiWarningFolder, Nil);
-        I.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol, iiWarning));
-      End
-  Else
-    I := objModuleRootElement.Add(strErrors, iiErrorFolder, Nil);
-    I.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol, iiError));
-  End;
+  I := objModuleRootElement.Add(recIssues[ErrorType].FFolder,
+    recIssues[ErrorType].FFolderImage, scNone, Nil);
+  iCount := I.ElementCount;
+  If iCount < iIssueLimit Then
+    I.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol,
+      recIssues[ErrorType].FItemImage))
+  Else If iCount = iIssueLimit Then
+    I.Add(TDocIssue.Create(recIssues[ErrorType].FTooMany, scNone, 'AddIssue', 0,
+      0, recIssues[ErrorType].FItemImage));
 end;
 
 (**

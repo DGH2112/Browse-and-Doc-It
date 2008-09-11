@@ -5925,7 +5925,7 @@ Begin
     Begin
       Repeat
         NextNonCommentToken;
-      Until Token.UToken = 'END';
+      Until (Token.UToken = 'END') And (PrevToken.Token <> '@@');
       NextNonCommentToken;
     End;
 End;

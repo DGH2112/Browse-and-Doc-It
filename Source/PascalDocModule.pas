@@ -7,15 +7,12 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       10 Sep 2008
+  @Date       11 Sep 2008
   @Author     David Hoyle
 
-  @bug        Labels need to be scope so that locals can be removed.
   @todo       See if the AsString() functions can tidy up the output by removing
               some of the whitespace rather than output each token with a #32
               between.
-  @bug        I dont think #32'some text' is being interrupted as a string
-              literal.
 
 **)
 Unit PascalDocModule;
@@ -478,6 +475,11 @@ Type
     FContainer   : TElementContainer;
   End;
 
+  (** An enumerate for the types of reference changes that can be done. **)
+  TRefType = (rtVariables, rtConstants, rtResourceStrings, rtTypes);
+  (** A set of reference checks that need to be undertaken. **)
+  TRefTypes = Set of TRefType;
+
   (**
 
     This is the main class for dealing with object pascal units and program
@@ -630,7 +632,7 @@ Type
     Procedure AddToContainer(Container : TElementContainer; var Method : TPascalMethod);
     Procedure TidyUpEmptyElements;
     Procedure CheckUnResolvedMethods;
-    Procedure ReferenceLocalsPrivates(strSymbol : String);
+    Procedure ReferenceLocalsPrivates(strSymbol : String; RefTypes : TRefTypes);
     function GetCurrentMethod: TPascalMethod;
     (**
       This property returns the method on top of the method stack.
@@ -1681,10 +1683,10 @@ Begin
       boolCascade := True;
       If moCheckForDocumentConflicts In ModuleOptions Then
         Begin
-          Add(strErrors, iiErrorFolder, Nil);
-          Add(strWarnings, iiWarningFolder, Nil);
-          Add(strHints, iiHintFolder, Nil);
-          Add(strDocumentationConflicts, iiDocConflictFolder, Nil);
+          Add(strErrors, iiErrorFolder, scNone, Nil);
+          Add(strWarnings, iiWarningFolder, scNone, Nil);
+          Add(strHints, iiHintFolder, scNone, Nil);
+          Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
           CheckDocumentation(boolCascade);
           i := Find(strErrors);
           If (i > 0) And (Elements[i].ElementCount = 0) Then
@@ -2019,7 +2021,7 @@ begin
     Begin
       If Container = Nil Then
         Begin
-          Container := Add(strImplementedMethods, iiImplementedMethods, Nil);
+          Container := Add(strImplementedMethods, iiImplementedMethods, scNone, Nil);
           iIcon := iiUnknownClsObj;
           AScope := scNone;
           E := FindElement(strTypesLabel);
@@ -2037,7 +2039,7 @@ begin
               End;
         End;
       If Container Is TObjectDecl Then
-        Container := Container.Add(strMethods, iiMethodsLabel, Nil);
+        Container := Container.Add(strMethods, iiMethodsLabel, scNone, Nil);
       tmpMethod := Method;
       Method := Container.Add(tmpMethod) As TPascalMethod;
       If tmpMethod <> Method Then
@@ -2174,51 +2176,55 @@ End;
 
 
   @param   strSymbol as a String
+  @param   RefTypes  as a TRefTypes
 
 **)
-procedure TPascalModule.ReferenceLocalsPrivates(strSymbol : String);
+procedure TPascalModule.ReferenceLocalsPrivates(strSymbol : String; RefTypes : TRefTypes);
 
 Const
-  strSections : Array[1..4] Of String = (strTypesLabel, strConstantsLabel,
-    strResourceStringsLabel, strVarsLabel);
+  strSections : Array[Low(TRefType)..High(TRefType)] Of String = (
+    strConstantsLabel, strResourceStringsLabel, strVarsLabel, strTypesLabel);
 
 Var
   E : TElementContainer;
   i: Integer;
   j: Integer;
   M : TPascalMethod;
+  iRefType : TRefType;
 
 begin
   If Not (doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options) Then
     Exit;
   For j := FMethodStack.Count - 1 DownTo 0 Do
     If FMethodStack[j] <> Nil Then
-      For i := Low(strSections) to High(strSections) Do
-        Begin
-          E := (FMethodStack[j] As TPascalMethod).FindElement(strSections[i]);
-          If E <> Nil Then
-            Begin
-              E := E.FindElement(strSymbol);
-              If E <> Nil Then
-                Begin
-                  E.Referenced := True;
-                  Exit;
-                End;
-            End;
-        End;
-  For i := Low(strSections) to High(strSections) Do
-    Begin
-      E := FindElement(strSections[i]);
-      If E <> Nil Then
-        Begin
-          E := E.FindElement(strSymbol);
-          If E <> Nil Then
-            Begin
-              E.Referenced := True;
-              Exit;
-            End;
-        End;
-    End;
+      For iRefType := Low(TRefType) to High(TRefType) Do
+        If iRefType In RefTypes Then
+          Begin
+            E := (FMethodStack[j] As TPascalMethod).FindElement(strSections[iRefType]);
+            If E <> Nil Then
+              Begin
+                E := E.FindElement(strSymbol);
+                If E <> Nil Then
+                  Begin
+                    E.Referenced := True;
+                    Exit;
+                  End;
+              End;
+          End;
+  For iRefType := Low(TRefType) to High(TRefType) Do
+    If iRefType In RefTypes Then
+      Begin
+        E := FindElement(strSections[iRefType]);
+        If E <> Nil Then
+          Begin
+            E := E.FindElement(strSymbol);
+            If E <> Nil Then
+              Begin
+                E.Referenced := True;
+                Exit;
+              End;
+          End;
+      End;
   For j := FMethodStack.Count - 1 DownTo 0 Do
     If FMethodStack[j] <> Nil Then
       Begin
@@ -2541,7 +2547,7 @@ Begin
   If Token.UToken = 'USES' Then
     Begin
       AComment := GetComment;
-      U := Add(strUses, iiUsesLabel, AComment);
+      U := Add(strUses, iiUsesLabel, scNone, AComment);
       NextNonCommentToken;
       IdentList(U, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
@@ -2624,7 +2630,7 @@ var
   C: TElementContainer;
 
 Begin
-  C := Add(strExportedHeadings, iiExportedHeadingslabel, Nil);
+  C := Add(strExportedHeadings, iiExportedHeadingslabel, scNone, Nil);
   Repeat
     {Loop doing nothing};
   Until Not (
@@ -2766,7 +2772,7 @@ Begin
   Result := Token.UToken = 'EXPORTS';
   If Result Then
     Begin
-      Ex := Add(strExports, iiExportedFunctionsLabel, GetComment);
+      Ex := Add(strExports, iiExportedFunctionsLabel, scNone, GetComment);
       NextNonCommentToken;
       Repeat
         ExportsItem(Ex);
@@ -2885,7 +2891,8 @@ Begin
       Repeat
         If Token.TokenType In [ttNumber] Then
           Begin
-            CurrentMethod.Add(strLabel, iiLabelsLabel, Nil).Add(Token, scLocal, iiPublicLabel, GetComment);
+            CurrentMethod.Add(strLabel, iiPublicLabelsLabel, scNone, Nil).Add(
+              Token, scLocal, iiPublicLabel, GetComment);
             NextNonCommentToken;
           End Else
             ErrorAndSeekToken(strNumberExpected, 'LabelDeclSection', Token.Token,
@@ -2929,9 +2936,9 @@ Begin
   If Result Then
     Begin
       If CurrentMethod <> Nil Then
-        C:= CurrentMethod.Add(strConstantsLabel, iiConstantsLabel, GetComment)
+        C:= CurrentMethod.Add(strConstantsLabel, iiPublicConstantsLabel, scLocal, GetComment)
       Else
-        C:= Add(strConstantsLabel, iiConstantsLabel, GetComment);
+        C:= Add(strConstantsLabel, iiPublicConstantsLabel, scPublic, GetComment);
       NextNonCommentToken;
       While ConstantDecl(AScope, C) Do
         If Token.Token = ';' Then
@@ -3049,9 +3056,11 @@ Begin
   If Result Then
     Begin
       If CurrentMethod <> Nil Then
-        R := CurrentMethod.Add(strResourceStringsLabel, iiResourceStringsLabel, GetComment)
+        R := CurrentMethod.Add(strResourceStringsLabel,
+          iiPublicResourceStringsLabel, scLocal, GetComment)
       Else
-        R := Add(strResourceStringsLabel, iiResourceStringsLabel, GetComment);
+        R := Add(strResourceStringsLabel, iiPublicResourceStringsLabel, scPublic,
+          GetComment);
       NextNonCommentToken;
       Repeat
         {Loop do nothing}
@@ -3142,9 +3151,9 @@ Begin
   If Result Then
     Begin
       If CurrentMethod <> Nil Then
-        T := CurrentMethod.Add(strTypesLabel, iiTypesLabel, GetComment)
+        T := CurrentMethod.Add(strTypesLabel, iiPublicTypesLabel, scLocal, GetComment)
       Else
-        T := Add(strTypesLabel, iiTypesLabel, GetComment);
+        T := Add(strTypesLabel, iiPublicTypesLabel, scPublic, GetComment);
       NextNonCommentToken;
       While TypeDecl(AScope, T) Do
         If Token.Token = ';' Then
@@ -3161,7 +3170,7 @@ End;
   using the following object pascal grammar. 
 
   @precon  None. 
-  @postcon This method returns True if this method handles a constant 
+  @postcon This method returns True if this method handles a constant
            declaration section. 
 
   @grammar TypeDecl -> Ident '=' [TYPE] Type -> Ident '=' [TYPE] RestrictedType 
@@ -3915,7 +3924,7 @@ Begin
               Result.AddDimension;
               T := OrdinalType(TypeToken(Nil, scNone, Nil,
                 FTemporaryElements.Add(Format('%d', [Result.Dimensions]), iiNone,
-                Nil)));
+                scNone, Nil)));
               If T <> Nil Then
                 Result.AddTokens(T);
             Until Not IsToken(',', Result);
@@ -4401,9 +4410,9 @@ Begin
   If Result Then
     Begin
       If CurrentMethod <> Nil Then
-        V := CurrentMethod.Add(strVarsLabel, iiVariablesLabel, GetComment)
+        V := CurrentMethod.Add(strVarsLabel, iiPublicVariablesLabel, scLocal, GetComment)
       Else
-        V := Add(strVarsLabel, iiVariablesLabel, GetComment);
+        V := Add(strVarsLabel, iiPublicVariablesLabel, scPublic, GetComment);
       NextNonCommentToken;
       While VarDecl(AScope, V) Do
         Begin
@@ -4442,7 +4451,7 @@ Begin
   Result := Token.UToken = 'THREADVAR';
   If Result Then
     Begin
-      V := Add(strThreadVarsLabel, iiThreadVarsLabel, GetComment);
+      V := Add(strThreadVarsLabel, iiPublicThreadVarsLabel, scNone, GetComment);
       NextNonCommentToken;
       While ThreadVarDecl(AScope, V) Do
         Begin
@@ -4548,7 +4557,7 @@ Begin
               NextNonCommentToken;
               T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
               If T <> Nil Then
-                ReferenceLocalsPrivates(TypeTokens(T));
+                ReferenceLocalsPrivates(TypeTokens(T), [rtTypes]);
               If Token.UToken = 'ABSOLUTE' Then
                 Begin
                   C := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
@@ -5024,7 +5033,8 @@ Begin
   Result := Token.TokenType In [ttIdentifier, ttDirective];
   If Result Then
     Begin
-      ReferenceLocalsPrivates(Token.Token);
+      ReferenceLocalsPrivates(Token.Token, [rtConstants, rtResourceStrings,
+        rtVariables, rtTypes]);
       AddToExpression(C);
       DesignatorSubElement(C, ExprType, ['.', '[', '^', '(']);
     End;
@@ -5053,7 +5063,7 @@ Begin
         AddToExpression(C);
         If Token.TokenType In [ttIdentifier, ttDirective] Then
           Begin
-            ReferenceLocalsPrivates(Token.Token);
+            ReferenceLocalsPrivates(Token.Token, [rtConstants, rtResourceStrings, rtVariables]);
             AddToExpression(C);
           End
         Else
@@ -5062,7 +5072,7 @@ Begin
       End
     Else If Token.Token = '[' Then
       Begin
-        ReferenceLocalsPrivates(Token.Token);
+        ReferenceLocalsPrivates(Token.Token, [rtConstants, rtResourceStrings, rtVariables]);
         AddToExpression(C);
         ExprList(C);
         If Token.Token = ']' Then
@@ -5073,7 +5083,7 @@ Begin
       End
     Else If Token.Token = '^' Then
       Begin
-        ReferenceLocalsPrivates(Token.Token);
+        ReferenceLocalsPrivates(Token.Token, [rtTypes]);
         AddToExpression(C);
       End
     Else If (Token.Token = '(') Then
@@ -5668,7 +5678,7 @@ Begin
       NextNonCommentToken;
       If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
-          ReferenceLocalsPrivates(Token.Token);
+          ReferenceLocalsPrivates(Token.Token, [rtVariables]);
           NextNonCommentToken;
           If Token.Token = ':=' Then
             Begin
@@ -7058,7 +7068,7 @@ begin
             Begin
               tmpP := TField.Create(I[j].Name, AScope, I[j].Line, I[j].Column,
                 iiPublicField, I[j].Comment);
-              P := Cls.Add(strFieldsLabel, iiFieldsLabel, Nil).Add(tmpP) As TField;
+              P := Cls.Add(strFieldsLabel, iiFieldsLabel, scNone, Nil).Add(tmpP) As TField;
               If P <> tmpP Then
                 AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name]),
                   scNone, 'ObjFieldDecl', I[j].Line, I[j].Column, etError);
@@ -7370,7 +7380,7 @@ begin
         Begin
           tmpP := TPascalProperty.Create(Token.Token, AScope, Token.Line,
             Token.Column, iiPublicProperty, C);
-          P := Cls.Add(strProperties, iiPropertiesLabel, Nil).Add(tmpP) As TPascalProperty;
+          P := Cls.Add(strProperties, iiPropertiesLabel, scNone, Nil).Add(tmpP) As TPascalProperty;
           If P <> tmpP Then
             AddIssue(Format(strDuplicateIdentifierFound, [Token.Token]),
               scNone,  'AddToContainer', Token.Line, Token.Column, etError);
@@ -7742,7 +7752,7 @@ Var
 Begin
   If Token.UToken = 'REQUIRES' Then
     Begin
-      R := Add(strRequires, iiUsesLabel, GetComment);
+      R := Add(strRequires, iiUsesLabel, scNone, GetComment);
       NextNonCommentToken;
       IdentList(R, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
@@ -7771,7 +7781,7 @@ Var
 Begin
   If Token.UToken = 'CONTAINS' Then
     Begin
-      C := Add(strContains, iiUsesLabel, GetComment);
+      C := Add(strContains, iiUsesLabel, scNone, GetComment);
       NextNonCommentToken;
       IdentList(C, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
@@ -7953,7 +7963,7 @@ End;
 Procedure TRecordDecl.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
-  If (Comment = Nil) Or (Comment.TokenCount = 0) Then
+  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedRecords In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
@@ -7977,7 +7987,7 @@ var
   i: Integer;
 
 Begin
-  If (Comment = Nil) Or (Comment.TokenCount = 0) Then
+  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedObjects In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
@@ -8003,7 +8013,7 @@ var
   i: Integer;
 
 Begin
-  If (Comment = Nil) Or (Comment.TokenCount = 0) Then
+  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedClasses In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
@@ -8029,7 +8039,7 @@ var
   i: Integer;
 
 Begin
-  If (Comment = Nil) Or (Comment.TokenCount = 0) Then
+  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
@@ -8055,7 +8065,7 @@ var
   i: Integer;
 
 Begin
-  If (Comment = Nil) Or (Comment.TokenCount = 0) Then
+  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,

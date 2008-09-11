@@ -4,7 +4,7 @@ object frmOptions: TfrmOptions
   BorderStyle = bsDialog
   Caption = 'Options'
   ClientHeight = 417
-  ClientWidth = 679
+  ClientWidth = 699
   Color = clBtnFace
   Constraints.MinHeight = 350
   Constraints.MinWidth = 550
@@ -17,37 +17,41 @@ object frmOptions: TfrmOptions
   Position = poScreenCenter
   OnCreate = FormCreate
   DesignSize = (
-    679
+    699
     417)
   PixelsPerInch = 96
   TextHeight = 13
   object OptionTab: TPageControl
     Left = 8
     Top = 8
-    Width = 663
+    Width = 683
     Height = 370
     ActivePage = Page1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
+    ExplicitWidth = 663
     object Page1: TTabSheet
       Caption = 'General Options'
+      ExplicitWidth = 655
       object clbOptions: TCheckListBox
         Left = 0
         Top = 0
-        Width = 655
+        Width = 675
         Height = 308
         Align = alClient
         ItemHeight = 13
         TabOrder = 0
+        ExplicitWidth = 655
       end
       object IntervalPanel: TPanel
         Left = 0
         Top = 308
-        Width = 655
+        Width = 675
         Height = 34
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
+        ExplicitWidth = 655
         object lblRefreshInterval: TLabel
           Left = 8
           Top = 12
@@ -80,13 +84,14 @@ object frmOptions: TfrmOptions
     object Page2: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
+      ExplicitWidth = 655
       DesignSize = (
-        655
+        675
         342)
       object lbSpecialTags: TListBox
         Left = 3
         Top = 19
-        Width = 649
+        Width = 669
         Height = 289
         Style = lbOwnerDrawFixed
         Anchors = [akLeft, akTop, akRight, akBottom]
@@ -95,11 +100,12 @@ object frmOptions: TfrmOptions
         OnDblClick = btnEditClick
         OnDrawItem = lbSpecialTagsDrawItem
         OnMouseDown = lbSpecialTagsMouseDown
+        ExplicitWidth = 649
       end
       object HeaderControl1: THeaderControl
         Left = 3
         Top = 3
-        Width = 649
+        Width = 669
         Height = 17
         Align = alNone
         Anchors = [akLeft, akTop, akRight]
@@ -118,6 +124,11 @@ object frmOptions: TfrmOptions
           end
           item
             ImageIndex = -1
+            Text = 'Show In Doc'
+            Width = 80
+          end
+          item
+            ImageIndex = -1
             Text = 'Tag Name'
             Width = 100
           end
@@ -127,9 +138,10 @@ object frmOptions: TfrmOptions
             Width = 300
           end>
         Style = hsFlat
+        ExplicitWidth = 649
       end
       object btnAdd: TBitBtn
-        Left = 253
+        Left = 273
         Top = 314
         Width = 75
         Height = 25
@@ -137,9 +149,10 @@ object frmOptions: TfrmOptions
         Caption = '&Add'
         TabOrder = 2
         OnClick = btnAddClick
+        ExplicitLeft = 253
       end
       object btnDelete: TBitBtn
-        Left = 415
+        Left = 435
         Top = 314
         Width = 75
         Height = 25
@@ -147,9 +160,10 @@ object frmOptions: TfrmOptions
         Caption = '&Delete'
         TabOrder = 3
         OnClick = btnDeleteClick
+        ExplicitLeft = 415
       end
       object btnEdit: TBitBtn
-        Left = 334
+        Left = 354
         Top = 314
         Width = 75
         Height = 25
@@ -157,9 +171,10 @@ object frmOptions: TfrmOptions
         Caption = '&Edit'
         TabOrder = 4
         OnClick = btnEditClick
+        ExplicitLeft = 334
       end
       object btnMoveDown: TBitBtn
-        Left = 577
+        Left = 597
         Top = 314
         Width = 75
         Height = 25
@@ -167,9 +182,10 @@ object frmOptions: TfrmOptions
         Caption = '&Move Down'
         TabOrder = 5
         OnClick = btnMoveDownClick
+        ExplicitLeft = 577
       end
       object btnMoveUp: TBitBtn
-        Left = 496
+        Left = 516
         Top = 314
         Width = 75
         Height = 25
@@ -177,13 +193,15 @@ object frmOptions: TfrmOptions
         Caption = 'Move &Up'
         TabOrder = 6
         OnClick = btnMoveUpClick
+        ExplicitLeft = 496
       end
     end
     object TabSheet1: TTabSheet
       Caption = 'Module Explorer'
       ImageIndex = 3
+      ExplicitWidth = 655
       DesignSize = (
-        655
+        675
         342)
       object lblFontName: TLabel
         Left = 3
@@ -210,7 +228,7 @@ object frmOptions: TfrmOptions
         FocusControl = lbxTokenTypes
       end
       object lblBackgroundColour: TLabel
-        Left = 484
+        Left = 504
         Top = 235
         Width = 91
         Height = 13
@@ -221,25 +239,27 @@ object frmOptions: TfrmOptions
       object cbxFontName: TComboBox
         Left = 79
         Top = 3
-        Width = 574
+        Width = 594
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
         ItemHeight = 13
         TabOrder = 0
+        ExplicitWidth = 574
       end
       object edtFontSize: TEdit
         Left = 79
         Top = 30
-        Width = 555
+        Width = 575
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         ReadOnly = True
         TabOrder = 1
         Text = '8'
+        ExplicitWidth = 555
       end
       object udFontSize: TUpDown
-        Left = 634
+        Left = 654
         Top = 30
         Width = 16
         Height = 21
@@ -249,19 +269,21 @@ object frmOptions: TfrmOptions
         Max = 72
         Position = 8
         TabOrder = 2
+        ExplicitLeft = 634
       end
       object lbxTokenTypes: TListBox
         Left = 3
         Top = 84
-        Width = 475
+        Width = 495
         Height = 255
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 3
         OnClick = lbxTokenTypesClick
+        ExplicitWidth = 475
       end
       object cbxFontColour: TColorBox
-        Left = 484
+        Left = 504
         Top = 84
         Width = 168
         Height = 22
@@ -270,15 +292,17 @@ object frmOptions: TfrmOptions
         ItemHeight = 16
         TabOrder = 4
         OnChange = cbxFontColourChange
+        ExplicitLeft = 484
       end
       object gbxFontStyles: TGroupBox
-        Left = 484
+        Left = 504
         Top = 112
         Width = 168
         Height = 116
         Anchors = [akTop, akRight]
         Caption = 'Font Styles'
         TabOrder = 5
+        ExplicitLeft = 484
         object chkBold: TCheckBox
           Left = 12
           Top = 21
@@ -317,7 +341,7 @@ object frmOptions: TfrmOptions
         end
       end
       object cbxBGColour: TColorBox
-        Left = 484
+        Left = 504
         Top = 254
         Width = 168
         Height = 22
@@ -325,18 +349,20 @@ object frmOptions: TfrmOptions
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 6
+        ExplicitLeft = 484
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'Code Browsing'
       ImageIndex = 4
+      ExplicitWidth = 655
       DesignSize = (
-        655
+        675
         342)
       object rgpBrowsePosition: TRadioGroup
         Left = 3
         Top = 3
-        Width = 649
+        Width = 669
         Height = 336
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = 'Browse Position'
@@ -347,35 +373,39 @@ object frmOptions: TfrmOptions
           'Identifier aligned with the centre of the editor'
           'Identifier centred in the editor but show all of the comment')
         TabOrder = 0
+        ExplicitWidth = 649
       end
     end
     object tabExcludeDocFiles: TTabSheet
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
+      ExplicitWidth = 655
       DesignSize = (
-        655
+        675
         342)
       object mmoExcludeDocFiles: TMemo
         Left = 3
         Top = 3
-        Width = 649
+        Width = 669
         Height = 336
         Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'mmoExcludeDocFiles')
         TabOrder = 0
+        ExplicitWidth = 649
       end
     end
     object tabMethodDescriptions: TTabSheet
       Caption = 'Method Descriptions'
       ImageIndex = 6
+      ExplicitWidth = 655
       DesignSize = (
-        655
+        675
         342)
       object lvMethodDescriptions: TListView
         Left = 3
         Top = 3
-        Width = 568
+        Width = 588
         Height = 336
         Anchors = [akLeft, akTop, akRight, akBottom]
         Columns = <
@@ -393,9 +423,10 @@ object frmOptions: TfrmOptions
         TabOrder = 0
         ViewStyle = vsReport
         OnDblClick = lvMethodDescriptionsDblClick
+        ExplicitWidth = 568
       end
       object btnAddDesc: TBitBtn
-        Left = 577
+        Left = 597
         Top = 3
         Width = 75
         Height = 25
@@ -417,9 +448,10 @@ object frmOptions: TfrmOptions
           333333333337733333FF3333333C333330003333333733333777333333333333
           3000333333333333377733333333333333333333333333333333}
         NumGlyphs = 2
+        ExplicitLeft = 577
       end
       object btnEditDesc: TBitBtn
-        Left = 577
+        Left = 597
         Top = 34
         Width = 75
         Height = 25
@@ -441,9 +473,10 @@ object frmOptions: TfrmOptions
           0FF03333737F37737F373330B00FFFFF0F033337F77F33337F733309030FFFFF
           00333377737FFFFF773333303300000003333337337777777333}
         NumGlyphs = 2
+        ExplicitLeft = 577
       end
       object btnDeleteDesc: TBitBtn
-        Left = 577
+        Left = 597
         Top = 65
         Width = 75
         Height = 25
@@ -465,39 +498,44 @@ object frmOptions: TfrmOptions
           333333377F33333333FF3333C333333330003333733333333777333333333333
           3000333333333333377733333333333333333333333333333333}
         NumGlyphs = 2
+        ExplicitLeft = 577
       end
     end
     object HelpFilePage: TTabSheet
       Caption = ' Help File Directory'
       ImageIndex = 2
+      ExplicitWidth = 655
       object HelpFileDir: TDirectoryListBox
         Left = 0
         Top = 0
-        Width = 655
+        Width = 675
         Height = 342
         Align = alClient
         ItemHeight = 16
         TabOrder = 0
+        ExplicitWidth = 655
       end
     end
   end
   object bbtnCancel: TBitBtn
-    Left = 596
+    Left = 616
     Top = 384
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     TabOrder = 1
     Kind = bkCancel
+    ExplicitLeft = 596
   end
   object bbtnOK: TBitBtn
-    Left = 515
+    Left = 535
     Top = 384
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     TabOrder = 2
     Kind = bkOK
+    ExplicitLeft = 515
   end
   object CheckedImages: TImageList
     Left = 50

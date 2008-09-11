@@ -246,9 +246,11 @@ begin
     Integer(lb.Items.Objects[Index]) And iShowInTree);
   CheckedImages.Draw(lb.Canvas, 112, Rect.Top,
     (Integer(lb.Items.Objects[Index]) And iAutoExpand) Div 2);
+  CheckedImages.Draw(lb.Canvas, 192, Rect.Top,
+    (Integer(lb.Items.Objects[Index]) And iShowInDoc) Div 3);
   iPos := Pos('=', lb.Items[Index]);
-  lb.Canvas.TextOut(Rect.Left + 160, Rect.Top, Copy(lb.Items[Index], 1, iPos - 1));
-  lb.Canvas.TextOut(Rect.Left + 260, Rect.Top, Copy(lb.Items[Index], iPos + 1,
+  lb.Canvas.TextOut(Rect.Left + 246, Rect.Top, Copy(lb.Items[Index], 1, iPos - 1));
+  lb.Canvas.TextOut(Rect.Left + 346, Rect.Top, Copy(lb.Items[Index], iPos + 1,
     Length(lb.Items[Index]) - iPos));
 end;
 
@@ -282,6 +284,9 @@ begin
       If X In [112..128] Then
         lbSpecialTags.Items.Objects[iIndex] := TObject(
           Integer(lbSpecialTags.Items.Objects[iIndex]) Xor iAutoExpand);
+      If X In [192..208] Then
+        lbSpecialTags.Items.Objects[iIndex] := TObject(
+          Integer(lbSpecialTags.Items.Objects[iIndex]) Xor iShowInDoc);
       lbSpecialTags.Invalidate;
     End;
 end;

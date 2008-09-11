@@ -3,7 +3,7 @@
   This file contains CSS information for the Browse And Doc It HTML Output.
 
   @Author  David Hoyle
-  @Date    10 Sep 2008
+  @Date    11 Sep 2008
   @Version 1.0
 
 */
@@ -112,25 +112,36 @@ div.Sections {
 }
 
 h1 {
+  color            : black;
   font-family      : times;
   border-top       : Thin;
   border-bottom    : Thin;
 }
 
 h2 {
+  color            : navy;
   font-family      : times;
-  color            : navy
 }
 
 h3 {
+  color            : maroon;
   font-family      : times;
-  color            : navy;
 }
 
 h4 {
+  color            : green;
   font-family      : times;
-  color            : navy;
   margin           : 1em;
+}
+
+h5 {
+  color            : purple;
+  font-family      : times;
+}
+
+h6 {
+  color            : black;
+  font-family      : times;
 }
 
 img.left {

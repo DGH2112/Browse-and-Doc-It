@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    10 Sep 2008
+  @Date    11 Sep 2008
   @Version 1.0
 
 **)
@@ -139,7 +139,7 @@ begin
   FSummaryContent.Add(Format('        <th>%s</th>', ['Document Conflicts']));
   With BrowseAndDocItOptions Do
     For i := 0 To SpecialTags.Count - 1 Do
-      If Integer(SpecialTags.Objects[i]) And iShowInTree > 0 Then
+      If Integer(SpecialTags.Objects[i]) And iShowInDoc > 0 Then
         FSummaryContent.Add(Format('        <th>%s</th>', [
           SpecialTags.ValueFromIndex[i]]));
   FSummaryContent.Add('      </tr>');
@@ -822,7 +822,7 @@ begin
     With FCurrentModule.BodyComment[i] Do
       For j := 0 To TagCount - 1 Do
         For k := 0 To FSpecialTagNodes.Count - 1 Do
-          If Integer(BrowseAndDocItOptions.SpecialTags.Objects[k]) And iShowInTree > 0 Then
+          If Integer(BrowseAndDocItOptions.SpecialTags.Objects[k]) And iShowInDoc > 0 Then
             If AnsiCompareText(Tag[j].TagName, BrowseAndDocItOptions.SpecialTags.Names[k]) = 0 Then
               (FSpecialTagNodes[k] As TStringList).Add(Tag[j].AsString(False));
   For i := 0 To FSpecialTagNodes.Count - 1 Do
@@ -843,7 +843,7 @@ begin
   For j := 0 To FSpecialTagNodes.Count - 1 Do
     Begin
       If Integer(BrowseAndDocItOptions.SpecialTags.Objects[j]) And
-        iShowInTree > 0 Then
+        iShowInDoc > 0 Then
         Begin
           i := (FSpecialTagNodes[j] As TStringList).Count;
           If i = 0 Then

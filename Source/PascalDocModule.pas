@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       11 Sep 2008
+  @Date       12 Sep 2008
   @Author     David Hoyle
 
   @todo       See if the AsString() functions can tidy up the output by removing
@@ -2179,11 +2179,12 @@ End;
   @param   RefTypes  as a TRefTypes
 
 **)
-procedure TPascalModule.ReferenceLocalsPrivates(strSymbol : String; RefTypes : TRefTypes);
+procedure TPascalModule.ReferenceLocalsPrivates(strSymbol : String;
+  RefTypes : TRefTypes);
 
 Const
   strSections : Array[Low(TRefType)..High(TRefType)] Of String = (
-    strConstantsLabel, strResourceStringsLabel, strVarsLabel, strTypesLabel);
+    strVarsLabel, strConstantsLabel, strResourceStringsLabel, strTypesLabel);
 
 Var
   E : TElementContainer;
@@ -5652,16 +5653,11 @@ End;
 
   This method attempt to parse the current token position as a For statement.
 
-
   @precon  None.
-
   @postcon Attempt to parse the current token position as a For statement.
 
-
   @grammar ForStmt -> FOR QualId ':=' Expression (TO | DOWNTO) Expression DO
-
            Statement
-
 
   @return  a Boolean
 
@@ -6307,6 +6303,10 @@ Var
   k, j : Integer;
 
 begin
+  I := FindElement(strErrors);
+  If I <> Nil Then
+    If I.ElementCount > 0 Then
+      Exit; // Only resolved methods IF there are no other errors.
   I := FindElement(strImplementedMethods);
   T := FindElement(strTypesLabel);
   X := FindElement(strExportedHeadings);

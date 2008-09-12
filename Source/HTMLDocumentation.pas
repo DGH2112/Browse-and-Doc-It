@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    11 Sep 2008
+  @Date    12 Sep 2008
   @Version 1.0
 
 **)
@@ -16,13 +16,42 @@ Uses
   Classes, BaseLanguageModule, BaseDocumentation, Contnrs;
 
 Type
+  (** This class represent a set of documenation conflicts for a module. **)
+  TSumDocCon = Class
+  Private
+    FModule    : String;
+    FConflicts : TStringList;
+  Protected
+  Public
+    Constructor Create(strModule : String);
+    Destructor Destroy; Override;
+    (**
+      This property provides access to the string list of conflicts.
+      @precon  None.
+      @postcon Provides access to the string list of conflicts.
+      @return  a TStringList
+    **)
+    Property Conflicts : TStringList Read FConflicts;
+    (**
+      This property returns the name of the module the conflicts belong to.
+      @precon  None.
+      @postcon Returns the name of the module the conflicts belong to.
+      @return  a String
+    **)
+    Property Module : String Read FModule;
+  End;
+
   (** This is a class to produce HTML documentation. **)
   THTMLDocumentation = Class(TBaseDocumentation)
   Private
     FCurrentModule   : TBaseLanguageModule;
     FCurrentHTMLFile : TStringList;
     FProgressIndex: Integer;
-    FSpecialTagNodes: TObjectList;
+    FModuleSpecialTagNodes: TObjectList;
+    FSummarySpecialTagNodes: TObjectList;
+    FErrors: TStringList;
+    FWarnings: TStringList;
+    FHints: TStringList;
     FHeaderLevel: Integer;
     FSummaryContent: TStringList;
     FTitle: String;
@@ -30,6 +59,10 @@ Type
     FScopesToDocument: TScopes;
     FIndex : TStringList;
     FHTMLFileName: String;
+    FSummaryDocConflicts : TObjectList;
+    FSections : TStringList;
+    procedure OutputSummarySpecialTags;
+    function GetSumDocCons(iIndex : Integer): TSumDocCon;
   Protected
     procedure GenerateImages(strImageDirectory: String);
     function ExpandLinkTag(strToken: String): String;
@@ -55,12 +88,26 @@ Type
       strContainerLabel : String);
     Function N(strText : String) : String;
     Function P(strText : String) : String;
+    Procedure InitialiseSummary;
+    Procedure OutputErrorsWarningsAndHints(slEWH : TStringList; strSectionTitle,
+      strLIType : String; AImageIndex : TImageIndex);
+    Procedure OutputSummaryDocumentationConflicts;
     { HTML Tag Outputs }
     Function A(strText, strHREF : String; strName : String = '') : String;
     Function H(strText : String; iLevel : Integer; AImage : TImageIndex;
       AScope : TScope) : String;
     Function IMG(AImageIndex : TImageIndex; AScope : TScope) : String;
     Function LI(strClass, strText : String) : String;
+    (**
+      This property provides access to an array of documentation conflicts for
+      all the modules.
+      @precon  iIndex must be a valid index into the array 0 to count - 1.
+      @postcon Provides access to an array of documentation conflicts for
+               all the modules.
+      @param   iIndex as       an Integer
+      @return  a TSumDocCon
+    **)
+    Property SumDocCons[iIndex : Integer] : TSumDocCon Read GetSumDocCons;
   Public
     Constructor Create(strOutputDirectory, strTitle : String); Override;
     Destructor Destroy; Override;
@@ -122,29 +169,19 @@ begin
   Inherited Create(strOutputDirectory, strTitle);
   FScopesToDocument := BrowseAndDocItOptions.ScopesToDocument + [scNone, scGlobal];
   FTitle := strTitle;
-  FSpecialTagNodes := TObjectList.Create(true);
+  FModuleSpecialTagNodes := TObjectList.Create(true);
   For i := 1 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
-    FSpecialTagNodes.Add(TStringList.Create);
+    FModuleSpecialTagNodes.Add(TStringList.Create);
+  FSummarySpecialTagNodes := TObjectList.Create(true);
+  For i := 1 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
+    FSummarySpecialTagNodes.Add(TStringList.Create);
   FIndex := TStringList.Create;
-  FSummaryContent := TStringList.Create;
-  FSummaryContent.Add(H(Format('Summary for Project %s', [FTitle]), 1, iiModule, scNone));
-  FSummaryContent.Add('<div class="Indent">');
-  FSummaryContent.Add('  <table>');
-  FSummaryContent.Add('    <thead>');
-  FSummaryContent.Add('      <tr>');
-  FSummaryContent.Add(Format('        <th>%s</th>', ['Module']));
-  FSummaryContent.Add(Format('        <th>%s</th>', ['Errors']));
-  FSummaryContent.Add(Format('        <th>%s</th>', ['Warnings']));
-  FSummaryContent.Add(Format('        <th>%s</th>', ['Hints']));
-  FSummaryContent.Add(Format('        <th>%s</th>', ['Document Conflicts']));
-  With BrowseAndDocItOptions Do
-    For i := 0 To SpecialTags.Count - 1 Do
-      If Integer(SpecialTags.Objects[i]) And iShowInDoc > 0 Then
-        FSummaryContent.Add(Format('        <th>%s</th>', [
-          SpecialTags.ValueFromIndex[i]]));
-  FSummaryContent.Add('      </tr>');
-  FSummaryContent.Add('    </thead>');
-  FSummaryContent.Add('    <tbody>');
+  FErrors := TStringList.Create;
+  FWarnings := TStringList.Create;
+  FHints := TStringList.Create;
+  FSummaryDocConflicts := TObjectList.Create(True);
+  FSections := TStringList.Create;
+  InitialiseSummary;
 end;
 
 (**
@@ -159,9 +196,15 @@ end;
 **)
 destructor THTMLDocumentation.Destroy;
 begin
+  FSections.Free;
+  FSummaryDocConflicts.Free;
+  FHints.Free;
+  FWarnings.Free;
+  FErrors.Free;
   FIndex.Free;
   FSummaryContent.Free;
-  FSpecialTagNodes.Free;
+  FSummarySpecialTagNodes.Free;
+  FModuleSpecialTagNodes.Free;
   Inherited Destroy;
 end;
 
@@ -266,7 +309,7 @@ End;
   @postcon Generates the finalisation information for the summary and outputs
            the file.
 
-**)
+**)
 procedure THTMLDocumentation.GenerateSummary;
 
 var
@@ -275,24 +318,43 @@ var
   i: Integer;
   slSummary : TStringList;
   strIndent: String;
+  slSections : TStringList;
 
 begin
   slSummary := TStringList.Create;
   Try
     FCurrentHTMLFile := slSummary;
-    GenerateHTML('Summary');
+    GenerateHTML(A('Summary', '', 'Summary'));
     GenerateModuleList;
-    iIns := FindInsertionPoint('*$SECTIONLIST$');
-    FCurrentHTMLFile[iIns] := '';
     iIns := FindInsertionPoint('*$CONTENT$');
     i := Pos('$', FCurrentHTMLFile[iIns]);
     strIndent := StringOfChar(#32, i - 1);
     FSummaryContent.Add('    </tbody>');
-    FSummaryContent.Add('  <table>');
+    FSummaryContent.Add('  </table>');
     FSummaryContent.Add('</div>');
+    OutputErrorsWarningsAndHints(FErrors, strErrors, 'Error', iiErrorFolder);
+    OutputErrorsWarningsAndHints(FWarnings, strWarnings, 'Warning', iiWarningFolder);
+    OutputErrorsWarningsAndHints(FHints, strHints, 'Hint', iiHintFolder);
+    OutputSummaryDocumentationConflicts;
+    OutputSummarySpecialTags;
     For i := 0 To FSummaryContent.Count - 1 Do
       FSummaryContent[i] := strIndent + FSummaryContent[i];
     slSummary[iIns] := FSummaryContent.Text;
+    iIns := FindInsertionPoint('*$SECTIONLIST$');
+    i := Pos('$', FCurrentHTMLFile[iIns]);
+    strIndent := StringOfChar(#32, i - 1);
+    slSections := TstringList.Create;
+    Try
+      For i := 0 To FSections.Count - 1 Do
+        slSections.Add(Format('<div class="Section">%s&nbsp;%s</div>', [
+          IMG(TImageIndex(FSections.Objects[i]), scNone),
+          A(FSections[i], '#' + FSections[i])]));
+      For i := 0 To slSections.Count - 1 Do
+        slSections[i] := strIndent + slSections[i];
+      FCurrentHTMLFile[iIns] := slSections.text;
+    Finally
+      slSections.Free;
+    End;
     strHTMLName := FOutputDirectory + 'Summary.html';
     slSummary.SaveToFile(strHTMLName);
   Finally
@@ -409,7 +471,6 @@ End;
 Procedure THTMLDocumentation.GenerateCSS;
 Var
   sl : TStringList;
-  i : BaseLanguageModule.TTokenType;
 
   (**
 
@@ -419,7 +480,7 @@ Var
     @postcon Returns a HTML hexidecimal colour from the given TColor.
 
     @param   AColour as a TColor
-    @return  a String 
+    @return  a String
 
   **)
   Function HTMLColour(AColour : TColor) : String;
@@ -429,15 +490,19 @@ Var
     Result := Copy(Result, 7, 2) + Copy(Result, 5, 2) + Copy(Result, 3, 2);
   End;
 
-Begin
-  Update(FProgressIndex, 'Generating CSS...');
-  Inc(FProgressIndex);
-  ForceDirectories(FOutputDirectory + '\Styles');
-  sl := TStringList.Create;
-  Try
-    sl.Text := GetStringResource('BrowseAndDocItCSS');
-    sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
-      BrowseAndDocItOptions.BGColour), []);
+  (**
+
+    This procedure outputs the code styles to the CSS file.
+
+    @precon  None.
+    @postcon Outputs the code styles to the CSS file.
+
+  **)
+  Procedure OutputCodeStyles;
+  Var
+    i : BaseLanguageModule.TTokenType;
+    
+  Begin
     With BrowseAndDocItOptions Do
       For i := Low(BaseLanguageModule.TTokenType) to High(BaseLanguageModule.TTokenType) Do
         Begin
@@ -454,7 +519,24 @@ Begin
           sl.Add('}');
           sl.Add('');
         End;
-    sl.SaveToFile(FOutputDirectory + 'Styles\BrowseAndDocIt.CSS');
+  End;
+
+Begin
+  Update(FProgressIndex, 'Generating CSS...');
+  Inc(FProgressIndex);
+  ForceDirectories(FOutputDirectory + '\Styles');
+  sl := TStringList.Create;
+  Try
+    sl.Text := GetStringResource('BrowseAndDocItCSSScreen');
+    sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
+      BrowseAndDocItOptions.BGColour), []);
+    OutputCodeStyles;
+    sl.SaveToFile(FOutputDirectory + 'Styles\BrowseAndDocItScreen.CSS');
+    sl.Text := GetStringResource('BrowseAndDocItCSSPrint');
+    sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
+      BrowseAndDocItOptions.BGColour), []);
+    OutputCodeStyles;
+    sl.SaveToFile(FOutputDirectory + 'Styles\BrowseAndDocItPrint.CSS');
   Finally
     sl.Free;
   End;
@@ -478,6 +560,7 @@ procedure THTMLDocumentation.GenerateDocumentConflicts(slContents : TStringList)
 Var
   i, j : Integer;
   E : TElementContainer;
+  SDC: TSumDocCon;
 
 begin
   E := FCurrentModule.FindElement(strDocumentationConflicts);
@@ -485,16 +568,24 @@ begin
     Exit;
   slContents.Add(H(A(strDocumentationConflicts, '', strDocumentationConflicts),
     FHeaderLevel, E.ImageIndex, E.Scope));
+  SDC := TSumDocCon.Create(ExtractFileName(FCurrentModule.FileName));
+  FSummaryDocConflicts.Add(SDC);
   For i := 1 To E.ElementCount Do
     Begin
       slContents.Add(Format('<!-- %s -->', [strDocumentationConflicts]));
-      slContents.Add(H(E[i].AsString(True), FHeaderLevel + 1, E[i].ImageIndex,
+      slContents.Add('<div class="Indent">');
+      slContents.Add(#32#32 + H(E[i].AsString(True), FHeaderLevel + 1, E[i].ImageIndex,
         E[i].Scope));
-      slContents.Add('<ul>');
+      slContents.Add('  <ul>');
       For j := 1 To E[i].ElementCount Do
-        slContents.Add(#32#32 + LI(ImageList[E[i][j].ImageIndex].FResourcename,
-          N(E[i][j].AsString(True))));
-      slContents.Add('</ul>');
+        Begin
+          slContents.Add('    ' + LI(ImageList[E[i][j].ImageIndex].FResourcename,
+            N(E[i][j].AsString(True))));
+          SDC.Conflicts.Add(Format('%s=%s', [E[i].AsString(True),
+            E[i][j].AsString(True)]));
+        End;
+      slContents.Add('  </ul>');
+      slContents.Add('</div>');
       slContents.Add('');
     End;
 end;
@@ -515,25 +606,33 @@ end;
 procedure THTMLDocumentation.GenerateErrorsWarningsHints(slContents : TStringList);
 
 Const
-  strSections : Array[1..3] Of String = (strErrors, strWarnings, strHints);
+  Sections : Array[1..3] Of String = (strErrors, strWarnings, strHints);
 
 Var
   i, j : Integer;
   E : TElementContainer;
+  sls : Array[1..3] Of TStringList;
 
 begin
-  For i := Low(strSections) to High(strSections) Do
+  sls[1] := FErrors;
+  sls[2] := FWarnings;
+  sls[3] := FHints;
+  For i := Low(Sections) to High(Sections) Do
     Begin
-      E := FCurrentModule.FindElement(strSections[i]);
+      E := FCurrentModule.FindElement(Sections[i]);
       If E = Nil Then
         Continue;
-      slContents.Add(Format('<!-- %s -->', [strSections[i]]));
-      slContents.Add(H(A(strSections[i], '', strSections[i]), FHeaderLevel,
+      slContents.Add(Format('<!-- %s -->', [Sections[i]]));
+      slContents.Add(H(A(Sections[i], '', Sections[i]), FHeaderLevel,
         E.ImageIndex, E.Scope));
       slContents.Add('<ul>');
       For j := 1 To E.ElementCount Do
-        slContents.Add(#32#32 + LI(ImageList[E[j].ImageIndex].FResourcename,
-        N(E[j].AsString(True))));
+        Begin
+          slContents.Add(#32#32 + LI(ImageList[E[j].ImageIndex].FResourcename,
+          N(E[j].AsString(True))));
+          sls[i].Add(Format('%s=%s', [ExtractFileName(FCurrentModule.FileName),
+            E[j].AsString(True)]));
+        End;
       slContents.Add('</ul>');
       slContents.Add('');
     End;
@@ -816,18 +915,25 @@ Var
   strSection: String;
 
 begin
-  For i := 0 To FSpecialTagNodes.Count - 1 Do
-    (FSpecialTagNodes[i] As TStringList).Clear;
+  For i := 0 To FModuleSpecialTagNodes.Count - 1 Do
+    (FModuleSpecialTagNodes[i] As TStringList).Clear;
   For i := 0 To FCurrentModule.BodyCommentCount - 1 Do
     With FCurrentModule.BodyComment[i] Do
       For j := 0 To TagCount - 1 Do
-        For k := 0 To FSpecialTagNodes.Count - 1 Do
+        For k := 0 To FModuleSpecialTagNodes.Count - 1 Do
           If Integer(BrowseAndDocItOptions.SpecialTags.Objects[k]) And iShowInDoc > 0 Then
-            If AnsiCompareText(Tag[j].TagName, BrowseAndDocItOptions.SpecialTags.Names[k]) = 0 Then
-              (FSpecialTagNodes[k] As TStringList).Add(Tag[j].AsString(False));
-  For i := 0 To FSpecialTagNodes.Count - 1 Do
+            If AnsiCompareText(Tag[j].TagName,
+              BrowseAndDocItOptions.SpecialTags.Names[k]) = 0 Then
+              Begin
+                (FSummarySpecialTagNodes[k] As TStringList).Add(
+                  Format('%s=%s', [ExtractFileName(FCurrentModule.FileName),
+                  Tag[j].AsString(False)]));
+                (FModuleSpecialTagNodes[k] As TStringList).Add(
+                  Tag[j].AsString(False));
+              End;
+  For i := 0 To FModuleSpecialTagNodes.Count - 1 Do
     Begin
-      sl := FSpecialTagNodes[i] As TStringList;
+      sl := FModuleSpecialTagNodes[i] As TStringList;
       If sl.Count = 0 Then
         Continue;
       strSection := BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i];
@@ -840,12 +946,12 @@ begin
       slContents.Add('</ul>');
       slContents.Add('');
     End;
-  For j := 0 To FSpecialTagNodes.Count - 1 Do
+  For j := 0 To FModuleSpecialTagNodes.Count - 1 Do
     Begin
       If Integer(BrowseAndDocItOptions.SpecialTags.Objects[j]) And
         iShowInDoc > 0 Then
         Begin
-          i := (FSpecialTagNodes[j] As TStringList).Count;
+          i := (FModuleSpecialTagNodes[j] As TStringList).Count;
           If i = 0 Then
             FSummaryContent.Add(Format('        <td class="Green">%d</td>', [i]))
           Else
@@ -952,6 +1058,22 @@ begin
   Finally
     Res.Free;
   End;
+end;
+
+(**
+
+  This is a getter method for the SumDocCons property.
+
+  @precon  iIndex must be a valid integer between 0 and Count - 1.
+  @postcon Returns the instance of the TSumDocCons class.
+
+  @param   iIndex as an Integer
+  @return  a TSumDocCon
+
+**)
+function THTMLDocumentation.GetSumDocCons(iIndex : Integer): TSumDocCon;
+begin
+  Result := FSummaryDocConflicts[iIndex]  As TSumDocCon;
 end;
 
 (**
@@ -1227,6 +1349,198 @@ End;
 
 (**
 
+  This method outputs the documentation conflicts for all the modules to the
+  summary html page.
+
+  @precon  None.
+  @postcon Outputs the documentation conflicts for all the modules to the
+           summary html page.
+
+**)
+procedure THTMLDocumentation.OutputSummaryDocumentationConflicts;
+
+var
+  i: Integer;
+  j: Integer;
+  strDocSection, strLastDocSection : String;
+
+begin
+  If FSummaryDocConflicts.Count > 0 Then
+      Begin
+        FSummaryContent.Add(Format('<!-- %s -->', ['Documentation Conflicts']));
+        FSections.AddObject(strDocumentationConflicts,
+          TObject(iiDocConflictFolder));
+        FSummaryContent.Add(H(A(strDocumentationConflicts, '',
+          strDocumentationConflicts), 2, iiDocConflictFolder, scNone));
+        FSummaryContent.Add('<div class="Indent">');
+        For i := 0 To FSummaryDocConflicts.Count - 1 Do
+          Begin
+            strDocSection := '';
+            strLastDocSection := '';
+            FSummaryContent.Add('  ' + H(SumDocCons[i].Module, 3, iiModule, scNone));
+            FSummaryContent.Add('  <div class="Indent">');
+            For j := 0 To SumDocCons[i].Conflicts.Count - 1 Do
+              Begin
+                strDocSection := SumDocCons[i].Conflicts.Names[j];
+                If strDocSection <> strLastDocSection Then
+                  Begin
+                    If strLastDocSection <> '' Then
+                      FSummaryContent.Add('    </ul>');
+                    FSummaryContent.Add('    ' + H(strDocSection, 4,
+                      iiDocConflictFolder, scNone));
+                    FSummaryContent.Add('    <ul>');
+                  End;
+                FSummaryContent.Add('      ' + LI('ToDoItem',
+                  SumDocCons[i].Conflicts.ValueFromIndex[j]));
+                strLastDocSection := strDocSection;
+              End;
+            FSummaryContent.Add('    </ul>');
+            FSummaryContent.Add('  </div>');
+          End;
+        FSummaryContent.Add('</div>');
+        FSummaryContent.Add('');
+      End;
+end;
+
+(**
+
+  This method outputs the Errors, Warnings and Hints for all modules to the
+  summary html page.
+
+  @precon  slEWH must be a valid instance of a string list.
+  @postcon Outputs the Errors, Warnings and Hints for all modules to the
+           summary html page.
+
+  @param   slEWH           as a TStringList
+  @param   strSectionTitle as a String
+  @param   strLIType       as a String
+  @param   AImageIndex     as a TImageIndex
+
+**)
+procedure THTMLDocumentation.OutputErrorsWarningsAndHints(slEWH: TStringList;
+  strSectionTitle, strLIType : String; AImageIndex : TImageIndex);
+
+var
+  strModuleName: String;
+  i: Integer;
+  strLastModuleName: String;
+
+begin
+  If slEWH.Count = 0 Then
+    Exit;
+  FSummaryContent.Add(Format('<!-- %s -->', [strSectionTitle]));
+  FSections.AddObject(strSectionTitle, TObject(AImageIndex));
+  FSummaryContent.Add(H(A(strSectionTitle, '', strSectionTitle), 2, AImageIndex,
+    scNone));
+  strModuleName := '';
+  FSummaryContent.Add('<div class="Indent">');
+  For i := 0 To slEWH.Count - 1 Do
+    Begin
+      strModuleName := slEWH.Names[i];
+      If strModuleName <> strLastModuleName Then
+        Begin
+          If strLastModuleName <> '' Then
+            FSummaryContent.Add('  </ul>');
+          FSummaryContent.Add('  ' + H(strModuleName, 3, iiModule, scNone));
+          FSummaryContent.Add('  <ul>');
+        End;
+      FSummaryContent.Add('    ' + LI(strLIType, slEWH.ValueFromIndex[i]));
+      strLastModuleName := strModuleName;
+    End;
+  FSummaryContent.Add('  </ul>');
+  FSummaryContent.Add('</div>');
+  FSummaryContent.Add('');
+end;
+
+(**
+
+  This method outputs the Special tags from all the modules to the summary
+  html page.
+
+  @precon  None.
+  @postcon Outputs the Special tags from all the modules to the summary
+           html page.
+
+**)
+procedure THTMLDocumentation.OutputSummarySpecialTags;
+
+var
+  strLastModuleName: string;
+  sl: TStringList;
+  strModuleName: string;
+  j: Integer;
+  i: Integer;
+
+begin
+  For i := 0 To FSummarySpecialTagNodes.Count - 1 Do
+    If (FSummarySpecialTagNodes[i] as TStringList).Count > 0 Then
+      Begin
+        FSummaryContent.Add(Format('<!-- %s -->', [
+          BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i]]));
+        FSections.AddObject(BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i],
+          TObject(iiTodoFolder));
+        sl := (FSummarySpecialTagNodes[i] as TStringList);
+        FSummaryContent.Add(H(A(BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i], '',
+          BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i]), 2, iiToDoFolder, scNone));
+        strModuleName := '';
+        FSummaryContent.Add('<div class="Indent">');
+        For j := 0 To sl.Count - 1 Do
+          Begin
+            strModuleName := sl.Names[j];
+            If strModuleName <> strLastModuleName Then
+              Begin
+                FSummaryContent.Add('  </ul>');
+                FSummaryContent.Add('  ' + H(strModuleName, 3, iiModule, scNone));
+                FSummaryContent.Add('  <ul>');
+              End;
+            FSummaryContent.Add('    ' + LI('ToDoItem', sl.ValueFromIndex[j]));
+            strLastModuleName := strModuleName;
+          End;
+        FSummaryContent.Add('  </ul>');
+        FSummaryContent.Add('</div>');
+        FSummaryContent.Add('');
+      end;
+end;
+
+(**
+
+  This method initialise the summary content so that it is ready to accept the
+  summary information generate during the processing of the modules.
+
+  @precon  None.
+  @postcon Sets up the table header for the summary information.
+
+**)
+procedure THTMLDocumentation.InitialiseSummary;
+
+var
+  i: Integer;
+
+begin
+  FSections.AddObject('Summary', TObject(iiModule));
+  FSummaryContent := TStringList.Create;
+  FSummaryContent.Add(H(Format('Project %s', [FTitle]), 1, iiNone, scNone));
+  FSummaryContent.Add(H(A('Summary', '', 'Summary'), 2, iiModule, scNone));
+  FSummaryContent.Add('<div class="Indent">');
+  FSummaryContent.Add('  <table>');
+  FSummaryContent.Add('    <thead>');
+  FSummaryContent.Add('      <tr>');
+  FSummaryContent.Add(Format('        <th>%s</th>', ['Module']));
+  FSummaryContent.Add(Format('        <th>%s</th>', ['Errors']));
+  FSummaryContent.Add(Format('        <th>%s</th>', ['Warnings']));
+  FSummaryContent.Add(Format('        <th>%s</th>', ['Hints']));
+  FSummaryContent.Add(Format('        <th>%s</th>', ['Document Conflicts']));
+  with BrowseAndDocItOptions do
+    for i := 0 to SpecialTags.Count - 1 do
+      if Integer(SpecialTags.Objects[i]) and iShowInDoc > 0 then
+        FSummaryContent.Add(Format('        <th>%s</th>', [SpecialTags.ValueFromIndex[i]]));
+  FSummaryContent.Add('      </tr>');
+  FSummaryContent.Add('    </thead>');
+  FSummaryContent.Add('    <tbody>');
+end;
+
+(**
+
 
   This method creates a HTML document, gets a source module document and
   generates documentation for that source code.
@@ -1359,6 +1673,38 @@ function THTMLDocumentation.N(strText : String): String;
 
 begin
   Result := StringReplace(strText, '<', '&lt;', [rfReplaceAll]);
+end;
+
+{ TSumDocCon }
+
+(**
+
+  This is a constructor for the TSumDocCon class.
+
+  @precon  None.
+  @postcon Initialises the class.
+
+  @param   strModule as a String
+
+**)
+constructor TSumDocCon.Create(strModule : String);
+begin
+  FModule := strModule;
+  FConflicts := TStringList.Create;
+end;
+
+(**
+
+  This is a destructor for the TSumDocCon class.
+
+  @precon  None.
+  @postcon Frees the memory used by the class.
+
+**)
+destructor TSumDocCon.Destroy;
+begin
+  FConflicts.Free;
+  Inherited Destroy;
 end;
 
 End.

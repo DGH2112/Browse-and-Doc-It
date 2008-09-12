@@ -324,7 +324,7 @@ begin
   slSummary := TStringList.Create;
   Try
     FCurrentHTMLFile := slSummary;
-    GenerateHTML(A('Summary', '', 'Summary'));
+    GenerateHTML('Summary');
     GenerateModuleList;
     iIns := FindInsertionPoint('*$CONTENT$');
     i := Pos('$', FCurrentHTMLFile[iIns]);

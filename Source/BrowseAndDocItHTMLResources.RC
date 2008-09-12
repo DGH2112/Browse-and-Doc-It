@@ -3,7 +3,8 @@
   This is a Windows Resource File which contains HTML and CSS templates.
 
 */
-BrowseAndDocItCSS           RCDATA "HTML Files\BrowseAndDocIt.css"
+BrowseAndDocItCSSScreen     RCDATA "HTML Files\BrowseAndDocItScreen.css"
+BrowseAndDocItCSSPrint      RCDATA "HTML Files\BrowseAndDocItPrint.css"
 BrowseAndDocItHTMLTemplate  RCDATA "HTML Files\BrowseAndDocItHTMLTemplate.html"
 BrowseAndDocItXHTMLLat1     RCDATA "HTML Files\xhtml-lat1.ent"
 BrowseAndDocItXHTMLSpecial  RCDATA "HTML Files\xhtml-special.ent"

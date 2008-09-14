@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    11 Sep 2008
+  @Date    14 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -1279,6 +1279,7 @@ Type
     FMethodDescriptions : TStringList;
     FScopesToDocument : TScopes;
     FModuleExplorerBGColour : TColor;
+    FTokenLimit : Integer;
   Protected
     Function GetTokenFontInfo(ATokenType  : TTokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(ATokenType  : TTokenType; ATokenFontInfo : TTokenFontInfo);
@@ -1400,6 +1401,13 @@ Type
       @return  a TColor
     **)
     Property BGColour : TColor Read FModuleExplorerBGColour Write FModuleExplorerBGColour;
+    (**
+      This property gets ans sets the token limit to the module explorer.
+      @precon  None.
+      @postcon Gets ans sets the token limit to the module explorer.
+      @return  an Integer
+    **)
+    Property TokenLimit : Integer Read FTokenLimit Write FTokenLimit;
   End;
 
   (** A silent parser abort exception. **)
@@ -5642,6 +5650,7 @@ begin
         Byte(FScopesToDocument))));
       FModuleExplorerBGColour := StringToColor(ReadString('ModuleExploror',
         'BGColour', ColorToString(clWindow)));
+      FTokenLimit := ReadInteger('ModuleExplorer', 'TokenLimit', 50);
     Finally
       Free;
     End;
@@ -5695,6 +5704,7 @@ begin
       WriteInteger('Documentation', 'Scopes', Byte(FScopesToDocument));
       WriteString('ModuleExploror', 'BGColour',
         ColorToString(FModuleExplorerBGColour));
+      WriteInteger('ModuleExplorer', 'TokenLimit', FTokenLimit);
     Finally
       Free;
     End;

@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    10 Sep 2008
+  @Date    14 Sep 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -626,12 +626,14 @@ Begin
               End;
             If M = Nil Then
               Exit;
+            M.AddTickCount('C');
             // Create Root Tree Node
             FModule := AddNode(Nil, M.ModuleName, M.ModuleNameLine,
               M.ModuleNameCol, M.ImageIndexAdjustedForScope, M.Comment,
               stIdentifier);
             CreateSpecialTagNodes;
             OutputModuleInfo(M);
+            M.AddTickCount('B');
             SetExpandedNodes;
             ExpandNodes;
             // Restore top and selected items
@@ -648,6 +650,7 @@ Begin
           Finally
             FSpecialTagNodes := Nil;
           End;
+          M.AddTickCount('S');
         Finally
           Items.EndUpdate;
         End;
@@ -943,7 +946,7 @@ begin
     If Not DefaultDraw Then
       Begin
         iOffset := GetScrollPos(Sender.Handle, SB_HORZ);
-        sl := Tokenize(Node.Text, strKeyWords);
+        sl := Tokenize(Node.Text, strKeyWords, BrowseAndDocItOptions.TokenLimit);
         Try
           // Highlight selected item.
           If cdsSelected In State Then
@@ -1141,7 +1144,7 @@ Begin
   With Canvas Do
     Begin
       Font.Assign(FTreeView.Font);
-      sl := Tokenize(Caption, strKeyWords);
+      sl := Tokenize(Caption, strKeyWords, BrowseAndDocItOptions.TokenLimit);
       Try
         iPos := 2;
         For i := 0 To sl.Count - 1 Do
@@ -1259,7 +1262,7 @@ Begin
     Begin
       // Need to amend the width of the rectangle for the custom drawing
       iPos := 5;
-      sl := Tokenize(Node.Text, strKeyWords);
+      sl := Tokenize(Node.Text, strKeyWords, BrowseAndDocItOptions.TokenLimit);
       Try
         iLastmax := 0;
         For i := 0 To sl.Count - 1 Do

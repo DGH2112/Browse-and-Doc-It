@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    11 Sep 2008
+  @Date    14 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -68,6 +68,9 @@ type
     btnDeleteDesc: TBitBtn;
     lblBackgroundColour: TLabel;
     cbxBGColour: TColorBox;
+    lblTokenLimit: TLabel;
+    edtTokenLimit: TEdit;
+    udTokenLimit: TUpDown;
     procedure btnAddClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
     procedure btnEditClick(Sender: TObject);
@@ -161,6 +164,7 @@ Begin
           Item.SubItems.Add(BrowseAndDocItOptions.MethodDescriptions.ValueFromIndex[j]);
         End;
       cbxBGColour.Selected := BrowseAndDocItOptions.BGColour;
+      udTokenLimit.Position := BrowseAndDocItOptions.TokenLimit;
       If ShowModal = mrOK Then
         Begin
           Result := True;
@@ -186,6 +190,7 @@ Begin
               lvMethodDescriptions.Items[j].Caption,
               lvMethodDescriptions.Items[j].SubItems[0]]));
           BrowseAndDocItOptions.BGColour := cbxBGColour.Selected;
+          BrowseAndDocItOptions.TokenLimit := udTokenLimit.Position;
           BrowseAndDocItOptions.SaveSettings;
         End;
     Finally

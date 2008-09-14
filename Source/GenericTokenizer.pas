@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    08 Sep 2008
+  @Date    14 Sep 2008
   @Version 1.0
 
   @todo    Tokenize should also be language independant.
@@ -17,26 +17,29 @@ Interface
 Uses
   Classes, BaseLanguageModule;
 
-  Function Tokenize(strText : String; KeyWords : TKeyWords) : TStringList;
+  Function Tokenize(strText : String; var KeyWords : TKeyWords;
+    iLimit : Integer = 999999) : TStringList;
 
 Implementation
 
 (**
 
-  This function returns a string list contains the tokenized representation of 
-  the passed string with respect to some basic object pascal grammer. 
+  This function returns a string list contains the tokenized representation of
+  the passed string with respect to some basic object pascal grammer.
 
-  @precon  strText si the line of text to be tokenised 
-  @postcon Returns a new string list of the tokenized string 
+  @precon  strText si the line of text to be tokenised
+  @postcon Returns a new string list of the tokenized string
 
-  @note    The string list returnsed must be destroyed be the calling method. 
+  @note    The string list returnsed must be destroyed be the calling method.
 
   @param   strText  as a String
-  @param   KeyWords as a TKeyWords
+  @param   KeyWords as a TKeyWords as a reference
+  @param   iLimit   as an Integer
   @return  a TStringList
 
 **)
-Function Tokenize(strText : String; KeyWords : TKeyWords) : TStringList;
+Function Tokenize(strText : String; var KeyWords : TKeyWords;
+  iLimit : Integer = 999999) : TStringList;
 
   (**
 
@@ -131,6 +134,11 @@ Begin
                     If IsKeyWord(strToken, KeyWords) Then
                       LastToken := ttReservedWord;
                   Result.AddObject(strToken, TObject(LastToken));
+                  If Result.Count >= iLimit Then
+                    Begin
+                      Result.Add('...');
+                      Exit;
+                    End;
                 End;
              BlockType := btNoBlock;
              iTokenLen := 1;

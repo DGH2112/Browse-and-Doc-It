@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    12 Sep 2008
+  @Date    15 Sep 2008
   @Version 1.0
 
 **)
@@ -270,7 +270,7 @@ Function THTMLDocumentation.ExpandLinkTag(strToken : String) : String;
         strSubSymbol := '';
       End;
     If strLabel = '' Then strLabel := strSymbol + strSubSymbol;
-    Result := Format('<A HREF="%s.html#%s%s">%s</A>', [strModule, strSymbol,
+    Result := Format('<a href="%s.html#%s%s">%s</a>', [strModule, strSymbol,
       strSubSymbol, strLabel]);
   End;
 
@@ -289,7 +289,7 @@ Begin
   If i <> 0 Then
     Begin
       strHREF := Copy(strToken, 1, i - 1);
-      strLabel := Copy(strToken, i + 1, Length(strToken) - i);
+      strLabel := N(Copy(strToken, i + 1, Length(strToken) - i));
     End Else
     Begin
       strHREF := strToken;
@@ -764,19 +764,17 @@ begin
               End;
             If AnsiCompareText(strCurAlpha, strLastAlpha) <> 0 Then
               Begin
-                slC.Add('<hr>');
+                slC.Add('<hr/>');
                 slC.Add(H(A(strCurAlpha, '', strCurAlpha), 2, iiNone, scNone));
                 slSections.Add(strCurAlpha);
                 slC.Add('<div class="Indent">');
                 slC.Add('  <table>');
               End;
-            slC.Add('    <tr>');
             iPos := Pos('(', FIndex.Names[i]);
             strID := Copy(FIndex.Names[i], 1, iPos - 1);
             strRef := Copy(FIndex.Names[i], iPos, Length(FIndex.Names[i]) - iPos + 1);
-            slC.Add(Format('    <td>%s %s</td>', [A(strID,
+            slC.Add(Format('    <tr><td>%s %s</td></tr>', [A(strID,
               ExtractFileName(FIndex.ValueFromIndex[i]), ''), strRef]));
-            slC.Add('    </tr>');
             strLastAlpha := strCurAlpha;
           End;
         slC.Add('  </table>');
@@ -1187,7 +1185,7 @@ begin
     If E.Comment.TokenType[i] = ttLinkTag Then
       strComment := strComment + Format('%s ', [ExpandLinkTag(E.Comment.Token[i])])
     Else
-      strComment := strComment + Format('%s ', [E.Comment.Token[i]]);
+      strComment := strComment + N(Format('%s ', [E.Comment.Token[i]]));
   strIndent := StringOfChar(#32, 6 * iIndentLevel);
   slContents.Add(Format('%s  <p class="Comment">%s</p>', [strIndent, strComment]));
   If E.Comment.TagCount = 0 Then
@@ -1208,7 +1206,7 @@ begin
                     If E.Comment.Tag[j].TokenType[k] = ttLinkTag Then
                       strTags := strTags + Format('%s ', [ExpandLinkTag(E.Comment.Tag[j].Token[k])])
                     Else
-                      strTags := strTags + Format('%s ', [E.Comment.Tag[j].Token[k]]);
+                      strTags := strTags + Format('%s ', [N(E.Comment.Tag[j].Token[k])]);
                   slContents.Add(Format('%s    %s', [strIndent, LI('SpecialTag', strTags)]));
                 End;
             slContents.Add(Format('%s  </ul>', [strIndent]));
@@ -1244,7 +1242,7 @@ begin
   strIndent := StringOfChar(#32, 4 * iIndentLevel);
   boolHeader := False;
   boolIncHeader := False;
-  slContents.Add(Format('%s<!-- %s -->', [strIndent, Container.AsString(True)]));
+  slContents.Add(Format('%s<!-- %s -->', [strIndent, N(Container.AsString(True))]));
   If Container Is TLabelContainer Then
     Begin
       slContents.Add(strIndent + H(A(Container.AsString(True), '',
@@ -1281,7 +1279,7 @@ begin
             A(Container[i].Identifier, '',
             strContainerLabel + '.' + Container[i].Identifier)]));
           slContents.Add(strIndent + '        <td>');
-          slContents.Add(strIndent + Format('          <pre wrap>%s</pre>', [
+          slContents.Add(strIndent + Format('          <pre>%s</pre>', [
             P(Container[i].AsString(True))]));
           OutputComment(slContents, Container[i], iIndentLevel + 1);
           OutputContainers(slContents, Container[i], iIndentLevel + 1,
@@ -1432,6 +1430,7 @@ begin
   FSections.AddObject(strSectionTitle, TObject(AImageIndex));
   FSummaryContent.Add(H(A(strSectionTitle, '', strSectionTitle), 2, AImageIndex,
     scNone));
+  strLastModuleName := '';
   strModuleName := '';
   FSummaryContent.Add('<div class="Indent">');
   For i := 0 To slEWH.Count - 1 Do
@@ -1482,6 +1481,7 @@ begin
         sl := (FSummarySpecialTagNodes[i] as TStringList);
         FSummaryContent.Add(H(A(BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i], '',
           BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i]), 2, iiToDoFolder, scNone));
+        strLastModuleName := '';
         strModuleName := '';
         FSummaryContent.Add('<div class="Indent">');
         For j := 0 To sl.Count - 1 Do
@@ -1489,7 +1489,8 @@ begin
             strModuleName := sl.Names[j];
             If strModuleName <> strLastModuleName Then
               Begin
-                FSummaryContent.Add('  </ul>');
+                If strLastModuleName <> '' Then
+                  FSummaryContent.Add('  </ul>');
                 FSummaryContent.Add('  ' + H(strModuleName, 3, iiModule, scNone));
                 FSummaryContent.Add('  <ul>');
               End;
@@ -1641,13 +1642,13 @@ begin
   Try
     For i := 0 To sl.Count - 1 Do
       Case BaseLanguageModule.TTokenType(sl.Objects[i]) Of
-        ttReservedWord : Result := Result + Format('<span class="ReservedWord">%s</span>', [sl[i]]);
-        ttIdentifier   : Result := Result + Format('<span class="Identifier">%s</span>', [sl[i]]);
-        ttSymbol       : Result := Result + Format('<span class="Symbol">%s</span>', [sl[i]]);
-        ttStringLiteral: Result := Result + Format('<span class="StringLiteral">%s</span>', [sl[i]]);
-        ttNumber       : Result := Result + Format('<span class="Number">%s</span>', [sl[i]]);
+        ttReservedWord : Result := Result + Format('<span class="ReservedWord">%s</span>', [N(sl[i])]);
+        ttIdentifier   : Result := Result + Format('<span class="Identifier">%s</span>', [N(sl[i])]);
+        ttSymbol       : Result := Result + Format('<span class="Symbol">%s</span>', [N(sl[i])]);
+        ttStringLiteral: Result := Result + Format('<span class="StringLiteral">%s</span>', [N(sl[i])]);
+        ttNumber       : Result := Result + Format('<span class="Number">%s</span>', [N(sl[i])]);
       Else
-        Result := Result + sl[i];
+        Result := Result + N(sl[i]);
       End;
   Finally
     sl.Free;
@@ -1671,8 +1672,22 @@ end;
 **)
 function THTMLDocumentation.N(strText : String): String;
 
+Const
+  strValidHTMLChars : Set of Char = ['a'..'z', 'A'..'Z', '0'..'9', #32, '.',
+    ',', '!', '"', '£', '$', '%', '^', '*', '(', ')', '_', '+', '-', '=', '{',
+    '}', '[', ']', ':', ';', '@', '''', '~', '?', '/', '\', '|', #13, #10, '#'];
+
+Var
+  i : Integer;
+
 begin
-  Result := StringReplace(strText, '<', '&lt;', [rfReplaceAll]);
+  Result := strText;
+  For i := 1 To Length(strText) Do
+    Begin
+      If Not (strText[i] In strValidHTMLChars) Then
+        Result := StringReplace(Result, strText[i],
+          Format('&#%d;', [Ord(strText[i])]), [rfReplaceAll]);
+    End;
 end;
 
 { TSumDocCon }

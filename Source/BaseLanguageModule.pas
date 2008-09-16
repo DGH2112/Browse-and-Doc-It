@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    14 Sep 2008
+  @Date    16 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -617,6 +617,8 @@ Type
     Function Find(strName : String) : Integer;
     Function GetName: String; Virtual;
     Procedure SetSorted(boolValue : Boolean);
+    Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
+      strDelimiter : String; iMaxWidth : Integer) : String; Virtual;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Virtual;
@@ -1280,6 +1282,7 @@ Type
     FScopesToDocument : TScopes;
     FModuleExplorerBGColour : TColor;
     FTokenLimit : Integer;
+    FMaxDocOutputWidth: Integer;
   Protected
     Function GetTokenFontInfo(ATokenType  : TTokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(ATokenType  : TTokenType; ATokenFontInfo : TTokenFontInfo);
@@ -1408,6 +1411,15 @@ Type
       @return  an Integer
     **)
     Property TokenLimit : Integer Read FTokenLimit Write FTokenLimit;
+    (**
+      This property gets and sets the maximum width of the code output in
+      documentation.
+      @precon  None.
+      @postcon Gets and sets the maximum width of the code output in
+               documentation.
+      @return  an Integer
+    **)
+    Property MaxDocOutputWidth : Integer Read FMaxDocOutputWidth Write FMaxDocOutputWidth;
   End;
 
   (** A silent parser abort exception. **)
@@ -3388,12 +3400,12 @@ end;
 
 (**
 
-  This method adds an error to the Base Language's Element Collection under a 
-  sub folder of strCategory. 
+  This method adds an error to the Base Language's Element Collection under a
+  sub folder of strCategory.
 
-  @precon  Error must be a valid TElementContainer. 
-  @postcon Adds an error to the Base Language's Element Collection under a sub 
-           folder of strCategory. 
+  @precon  Error must be a valid TElementContainer.
+  @postcon Adds an error to the Base Language's Element Collection under a sub
+           folder of strCategory.
 
   @param   strMsg    as a String
   @param   AScope    as a TScope
@@ -3553,6 +3565,76 @@ begin
     AppendToken(Source.Tokens[iToken]);
 end;
 
+(**
+
+  This method builds a string from the identifer and tokens and tries to present
+  it with the style of code you would probably except.
+
+  @precon  None.
+  @postcon Builds a string from the identifer and tokens and tries to present
+           it with the style of code you would probably except.
+
+  @param   boolIdentifier       as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @param   strDelimiter         as a String
+  @param   iMaxWidth            as an Integer
+  @return  a String              
+
+**)
+Function TElementContainer.BuildStringRepresentation(boolIdentifier,
+  boolForDocumentation : Boolean; strDelimiter : String; iMaxWidth : Integer) : String;
+
+Const
+  strNoSpaceAfter : Set Of Char = ['(', '[', '{', '.'];
+  strNoSpaceBefore : Set Of Char = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
+  strSpaceAfter : Set Of Char = ['=', ':', '+', '-', '*', '\'];
+
+Var
+  iToken : Integer;
+  T, L, D : TTokenInfo;
+  boolSpace: Boolean;
+  iLength : Integer;
+
+Begin
+  L := Nil;
+  Result := '';
+  If boolIdentifier Then
+    Result := Identifier;
+  If Length(strDelimiter) > 0 Then
+    Begin
+      If Not (strDelimiter[1] In strNoSpaceBefore) Then
+        Result := Result + #32;
+      Result := Result + strDelimiter;
+    End;
+  iLength := Length(Result);
+  D := TTokenInfo.Create(strDelimiter, 0, 0, 0, Length(strDelimiter), ttSymbol);
+  Try
+    L := D;
+    For iToken := 0 To TokenCount - 1 Do
+      Begin
+        boolSpace := (iToken > 0) Or (strDelimiter <> '');
+        T := Tokens[iToken];
+        boolSpace := boolSpace And Not (T.Token[1] In strNoSpaceBefore);
+        If L <> Nil Then
+          boolSpace := boolSpace  And Not (L.Token[1] In strNoSpaceAfter);
+        If boolSpace Or ((L.Length > 0) And (L.Token[1] In strSpaceAfter)) Then
+          If Not (boolForDocumentation And (iLength + T.Length > iMaxWidth)) Then
+            Begin
+              Result := Result + #32;
+              Inc(iLength);
+            End Else
+            Begin
+              Result := Result + #13#10#32#32;
+              iLength := 2;
+            End;
+        Result := Result + T.Token;
+        Inc(iLength, T.Length);
+        L := T;
+      End;
+  Finally
+    D.Free;
+  End;
+End;
 (**
 
   This method recrusively checks the documentation of the module. Descendants
@@ -5651,6 +5733,7 @@ begin
       FModuleExplorerBGColour := StringToColor(ReadString('ModuleExploror',
         'BGColour', ColorToString(clWindow)));
       FTokenLimit := ReadInteger('ModuleExplorer', 'TokenLimit', 50);
+      FMaxDocOutputWidth := ReadInteger('Documentation', 'MaxDocOutputWidth', 80);
     Finally
       Free;
     End;
@@ -5705,6 +5788,7 @@ begin
       WriteString('ModuleExploror', 'BGColour',
         ColorToString(FModuleExplorerBGColour));
       WriteInteger('ModuleExplorer', 'TokenLimit', FTokenLimit);
+      WriteInteger('Documentation', 'MaxDocOutputWidth', FMaxDocOutputWidth);
     Finally
       Free;
     End;

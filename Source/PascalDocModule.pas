@@ -7,12 +7,8 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       12 Sep 2008
+  @Date       16 Sep 2008
   @Author     David Hoyle
-
-  @todo       See if the AsString() functions can tidy up the output by removing
-              some of the whitespace rather than output each token with a #32
-              between.
 
 **)
 Unit PascalDocModule;
@@ -929,18 +925,13 @@ End;
 **)
 function TTypes.AsString(boolForDocumentation : Boolean): String;
 
-Var
-  iToken : Integer;
-
 begin
   If Identifier <> '' Then
-    Result := Identifier + #32'=';
-  For iToken := 0 To TokenCount - 1 Do
-    Begin
-      If Result <> '' Then
-        Result := Result +#32;
-      Result := Result + Tokens[iToken].Token;
-    End;
+    Result := BuildStringRepresentation(True, boolForDocumentation, '=',
+      BrowseAndDocItOptions.MaxDocOutputWidth)
+  Else
+    Result := BuildStringRepresentation(False, boolForDocumentation, '',
+      BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
 (**
@@ -979,17 +970,13 @@ end;
 **)
 function TConstant.AsString(boolForDocumentation : Boolean): String;
 
-Var
-  iToken : Integer;
-
 begin
-  Result := Identifier;
   If FTyped Then
-    Result := Result + #32':'
+    Result := BuildStringRepresentation(True, boolForDocumentation, ':',
+      BrowseAndDocItOptions.MaxDocOutputWidth)
    Else
-     Result := Result + #32'=';
-  For iToken := 0 To TokenCount - 1 Do
-    Result := Result + #32 + Tokens[iToken].Token;
+     Result := BuildStringRepresentation(True, boolForDocumentation, '=',
+       BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
 (**
@@ -1491,13 +1478,9 @@ end;
 **)
 function TVar.AsString(boolForDocumentation : Boolean): String;
 
-Var
-  i : Integer;
-
 begin
-  Result := Identifier + #32':';
-  For i := 0 To TokenCount - 1 Do
-    Result := Result + #32 + Tokens[i].Token;
+  Result := BuildStringRepresentation(True, boolForDocumentation, ':',
+    BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
 (**
@@ -8326,18 +8309,9 @@ end;
 **)
 function TArrayType.AsString(boolForDocumentation : Boolean): String;
 
-var
-  iToken: Integer;
-
 begin
-  If Identifier <> '' Then
-    Result := Identifier + #32'=';
-  For iToken := 0 To TokenCount - 1 Do
-    Begin
-      If Result <> '' Then
-        Result := Result +#32;
-      Result := Result + Tokens[iToken].Token;
-    End;
+  Result := BuildStringRepresentation(Identifier <> '', boolForDocumentation,
+    '=', BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
 End.

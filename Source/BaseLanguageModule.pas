@@ -3596,7 +3596,6 @@ Var
   iLength : Integer;
 
 Begin
-  L := Nil;
   Result := '';
   If boolIdentifier Then
     Result := Identifier;

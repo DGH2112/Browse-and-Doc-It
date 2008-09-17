@@ -2894,7 +2894,7 @@ Begin
       Assert(CurrentMethod <> Nil, 'Method in LabelDeclSection is NULL!');
       NextNonCommentToken;
       Repeat
-        If Token.TokenType In [ttNumber] Then
+        If Token.TokenType In [ttIdentifier, ttDirective] Then
           Begin
             CurrentMethod.Add(strLabel, iiPublicLabelsLabel, scNone, Nil).Add(
               Token, scLocal, iiPublicLabel, GetComment);
@@ -5219,7 +5219,7 @@ Begin
     Begin
       L := CurrentMethod.FindElement(strLabel);
       If L <> Nil Then // Check for label
-        If L.FindToken(Token.Token) > -1 Then
+        If L.FindElement(Token.Token) <> Nil Then
           Begin
             NextNonCommentToken;
             If Token.Token = ':' Then
@@ -5288,7 +5288,7 @@ Begin
   If Token.UToken = 'GOTO' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType In [ttNumber] Then
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
         NextNonCommentToken
       Else
         ErrorAndSeekToken(strLabelExpected, 'SimpleStatement', Token.Token,

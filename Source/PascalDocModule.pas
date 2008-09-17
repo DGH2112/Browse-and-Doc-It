@@ -7,8 +7,13 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       16 Sep 2008
+  @Date       17 Sep 2008
   @Author     David Hoyle
+
+  @bug        Can not resolve constants, variables and types within a class
+              declaration.
+  @bug        Do class vars, consts and types require documenting?
+  @bug        Can not resolved implemented methods for child classes, etc. 
 
 **)
 Unit PascalDocModule;
@@ -345,7 +350,9 @@ Type
   TClassDecl = Class(TObjectDecl)
   Private
     FAbstractClass: Boolean;
-    FSealedClass : Boolean;
+    FSealedClass  : Boolean;
+    FHelper       : Boolean;
+    FHelperClass  : String;
   Protected
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
@@ -364,6 +371,20 @@ Type
       @return  a Boolean
     **)
     Property SealedClass : Boolean Read FSealedClass Write FSealedClass;
+    (**
+      This property gets or sets whether the class is a helper class.
+      @precon  None.
+      @postcon Gets or sets whether the class is a helper class.
+      @return  a Boolean
+    **)
+    Property HelperClass : Boolean Read FHelper Write FHelper;
+    (**
+      This property gets or sets the class name of the class to be helped.
+      @precon  None.
+      @postcon Gets or sets the class name of the class to be helped.
+      @return  a String
+    **)
+    Property HelperClassName : String Read FHelperClass Write FHelperClass;
   End;
 
   (** This is a class the extends the class definition to handle an interface
@@ -503,13 +524,13 @@ Type
     Procedure Block(AScope : TScope; Method : TPascalMethod);
     Function ExportsStmt : Boolean;
     procedure ExportsItem(Container : TElementContainer);
-    Procedure DeclSection(AScope : TScope);
+    Procedure DeclSection(AScope : TScope; Container : TElementContainer);
     Function LabelDeclSection : Boolean;
-    Function ConstSection(AScope : TScope) : Boolean;
+    Function ConstSection(AScope : TScope; Container : TElementContainer) : Boolean;
     Function ConstantDecl(AScope : TScope; Container : TElementContainer) : Boolean;
     Function ResStringSection(AScope: TScope): Boolean;
     Function ResourceStringDecl(AScope: TScope; Container : TElementContainer): Boolean;
-    Function TypeSection(AScope : TScope) : Boolean;
+    Function TypeSection(AScope : TScope; Container : TElementContainer) : Boolean;
     Function TypeDecl(AScope : TScope; Container : TElementContainer) : Boolean;
     Function GetTypeDecl(AToken : TTypeToken) : TGenericTypeDecl;
     Function TypedConstant(C: TElementContainer; T : TGenericTypeDecl) : Boolean;
@@ -539,7 +560,7 @@ Type
     Function VariantSection(Rec: TRecordDecl) : Boolean;
     Function PointerType(AToken : TTypeToken) : TPointerType;
     Function ProcedureType(AToken : TTypeToken) : TProcedureType;
-    Function VarSection(AScope : TScope) : Boolean;
+    Function VarSection(AScope : TScope; Container : TElementContainer) : Boolean;
     Function ThreadVarSection(AScope : TScope) : Boolean;
     Function VarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
     Function ThreadVarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
@@ -677,26 +698,26 @@ Const
     identifiers and as types.
 
   **)
-  strReservedWords : Array[0..69] Of String = (
+  strReservedWords : Array[0..70] Of String = (
     'and', 'array', 'as', 'asm', 'begin', 'case', 'class', 'const',
     'constructor', 'destructor', 'dispinterface', 'div', 'do', 'downto', 'else',
-    'end', 'except', 'exports', 'file', 'final', 'finalization', 'finally', 'for',
-    'function', 'goto', 'if', 'implementation', 'in', 'inherited',
+    'end', 'except', 'exports', 'file', 'finalization', 'finally', 'for',
+    'function', 'goto', 'helper', 'if', 'implementation', 'in', 'inherited',
     'initialization', 'inline', 'interface', 'is', 'label', 'library', 'mod',
     'nil', 'not', 'object', 'of', 'on', 'or', 'out', 'packed',
     'procedure', 'program', 'property', 'raise', 'record', 'repeat',
-    'resourcestring', 'sealed', 'set', 'shl', 'shr', 'static', 'string', 'then',
-    'threadvar', 'to', 'try', 'type', 'unit', 'unsafe', 'until', 'uses', 'var',
-    'while', 'with', 'xor'
+    'resourcestring', 'sealed', 'set', 'shl', 'shr', 'static', 'strict', 'string',
+    'then', 'threadvar', 'to', 'try', 'type', 'unit', 'unsafe', 'until', 'uses',
+    'var', 'while', 'with', 'xor'
   );
   (** A sorted list of directives. Used for identifying tokens as
   directives. **)
-  strDirectives : Array[0..44] Of String = (
+  strDirectives : Array[0..45] Of String = (
     'absolute', 'abstract', 'assembler', 'automated', 'cdecl', 'contains',
     'default', 'deprecated', 'dispid', 'dynamic', 'export', 'external', 'far',
-    'forward', 'implements', 'index', 'inline', 'library', 'local', 'message',
-    'name', 'near', 'nodefault', 'overload', 'override', 'package', 'pascal',
-    'platform', 'private', 'protected', 'public', 'published', 'read',
+    'final', 'forward', 'implements', 'index', 'inline', 'library', 'local',
+    'message', 'name', 'near', 'nodefault', 'overload', 'override', 'package',
+    'pascal', 'platform', 'private', 'protected', 'public', 'published', 'read',
     'readonly', 'register', 'reintroduce', 'requires', 'resident', 'safecall',
     'stdcall', 'stored', 'varargs', 'virtual', 'write', 'writeonly'
   );
@@ -704,6 +725,9 @@ Const
   (** A list of string representing the types of modules. **)
   strModuleTypes : Array[mtProgram..mtUnit] Of String = ('Program', 'Package',
     'Library', 'Unit');
+  (** A list of strings representing the stricted scope types. **)
+  strStrictedScope : Array[scPrivate..scProtected] Of String = ('private',
+    'protected');
   (** A list of strings representing the scope types. **)
   strScope : Array[scGlobal..scPublished] Of String = ('global', 'local',
     'private', 'protected', 'public', 'published');
@@ -738,18 +762,6 @@ Const
     'package', 'procedure', 'program', 'record', 'requires', 'resourcestring',
     'static', 'then', 'type', 'unit', 'until', 'uses', 'var'
   );
-//    'absolute', 'abstract', 'and', 'array', 'as', 'asm', 'assembler',
-//    'automated', 'begin', 'case', 'class', 'constructor',
-//    'default', 'destructor', 'dispid', 'dispinterface', 'div', 'do', 'downto',
-//    'else', 'except', 'file', 'finally',
-//    'for', 'goto', 'if', 'in',
-//    'index', 'inherited', 'inline', 'is',
-//    'mod', 'name', 'near', 'nodefault', 'not',
-//    'of', 'or', 'out', 'packed', 'private',
-//    'property', 'protected', 'public', 'published', 'raise', 'read', 'readonly',
-//    'repeat', 'resident', 'set', 'shl',
-//    'shr', 'stored', 'then', 'threadvar', 'to', 'try', 'until',
-//    'varargs', 'while', 'with', 'write', 'writeonly', 'xor'
 
   (** This is a list of functions which can be used in a const expression. **)
   strConstExprDesignators : Array[1..17] Of String = ('abs', 'byte', 'chr', 'hi',
@@ -795,7 +807,7 @@ Begin
   Result.FScope := AScope;
   Result.FComment := AComment;
   Result.FContainer := Container;
-  Assert(Container <> Nil, 'Conatiner in TTypeToken CAN NOT be NULL!');
+  Assert(Container <> Nil, 'Conatiner in TTypeToken is NULL!');
 End;
 
 (**
@@ -1568,6 +1580,12 @@ Var
 
 begin
   Result := Identifier + #32'='#32'Class';
+  If FAbstractClass Then
+    Result := Result + #32'Abstract';
+  If FSealedClass Then
+    Result := Result + #32'Sealed';
+  If FHelper Then
+    Result := Result + #32'Helper';
   If Heritage.ElementCount > 0 Then
     Begin
       Result := Result + '(';
@@ -1579,6 +1597,8 @@ begin
         End;
       Result := Result + ')';
     End;
+  If FHelper Then
+    Result := Result + Format(' For %s', [FHelperClass]);
 end;
 
 (**
@@ -2618,10 +2638,10 @@ Begin
   Repeat
     {Loop doing nothing};
   Until Not (
-    ConstSection(scPublic) Or
+    ConstSection(scPublic, Self) Or
     ResStringSection(scPublic) Or
-    TypeSection(scPublic) Or
-    VarSection(scPublic) Or
+    TypeSection(scPublic, Self) Or
+    VarSection(scPublic, Self) Or
     ThreadVarSection(scPublic) Or
     ExportedHeading(C) Or
     ExportsStmt
@@ -2692,7 +2712,7 @@ Begin
   Else
     NextNonCommentToken;
   UsesClause;
-  DeclSection(scPrivate);
+  DeclSection(scPrivate, Self);
   ExportsStmt;
 End;
 
@@ -2723,7 +2743,7 @@ Var
 Begin
   FMethodStack.Add(Method);
   Try
-    DeclSection(scLocal);
+    DeclSection(scLocal, Method);
     ExportsStmt;
     bool := CompoundStmt;
     If Not bool Then
@@ -2824,27 +2844,28 @@ End;
            block i.e. private in in the implemenation section or public if in 
            the interface section and The Method parameter is nil for methods 
            in the implementation section or a reference to a method for a 
-           local declaration section with in a method.
-  @postcon Parses a declaration section from the current token position.
+           local declaration section with in a method. 
+  @postcon Parses a declaration section from the current token position. 
 
-  @grammar DeclSection -> LabelDeclSection -> ConstSection -> ResStringSection
-           -> TypeSection -> VarSection -> ThreadVarSection ->
-           ProcedureDeclSection -> ExportedProcs
+  @grammar DeclSection -> LabelDeclSection -> ConstSection -> ResStringSection 
+           -> TypeSection -> VarSection -> ThreadVarSection -> 
+           ProcedureDeclSection -> ExportedProcs 
 
-  @param   AScope as a TScope
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
 
 **)
-Procedure TPascalModule.DeclSection(AScope : TScope);
+Procedure TPascalModule.DeclSection(AScope : TScope; Container : TElementContainer);
 
 Begin
   Repeat
     {Do nothing}
   Until Not (
     LabelDeclSection Or
-    ConstSection(AScope) Or
+    ConstSection(AScope, Container) Or
     ResStringSection(AScope) Or
-    TypeSection(AScope) Or
-    VarSection(AScope) Or
+    TypeSection(AScope, Container) Or
+    VarSection(AScope, Container) Or
     ThreadVarSection(AScope) Or
     ProcedureDeclSection(AScope)
   );
@@ -2906,23 +2927,27 @@ End;
 
   @grammar ConstSection -> CONST ( ConstantDecl ';' ) ... 
 
-  @param   AScope as a TScope
-  @return  a Boolean
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean  
 
 **)
-Function TPascalModule.ConstSection(AScope : TScope) : Boolean;
+Function TPascalModule.ConstSection(AScope : TScope; Container : TElementContainer) : Boolean;
 
 Var
   C : TElementContainer;
+  LabelScope: TScope;
 
 Begin
   Result := Token.UToken = 'CONST';
   If Result Then
     Begin
-      If CurrentMethod <> Nil Then
-        C:= CurrentMethod.Add(strConstantsLabel, iiPublicConstantsLabel, scLocal, GetComment)
-      Else
-        C:= Add(strConstantsLabel, iiPublicConstantsLabel, scPublic, GetComment);
+      If Container = Nil Then
+        Container := Self;
+      LabelScope := AScope;
+      If LabelScope <> scLocal Then
+        LabelScope := scPublic;
+      C:= Container.Add(strConstantsLabel, iiPublicConstantsLabel, LabelScope, GetComment);
       NextNonCommentToken;
       While ConstantDecl(AScope, C) Do
         If Token.Token = ';' Then
@@ -3121,23 +3146,27 @@ End;
 
   @grammar Typesection -> TYPE ( TypeDecl ';' ) ... 
 
-  @param   AScope as a TScope
-  @return  a Boolean
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean  
 
 **)
-Function TPascalModule.TypeSection(AScope : TScope) : Boolean;
+Function TPascalModule.TypeSection(AScope : TScope; Container : TElementContainer) : Boolean;
 
 Var
   T : TElementContainer;
+  LabelScope: TScope;
 
 Begin
   Result := Token.UToken = 'TYPE';
   If Result Then
     Begin
-      If CurrentMethod <> Nil Then
-        T := CurrentMethod.Add(strTypesLabel, iiPublicTypesLabel, scLocal, GetComment)
-      Else
-        T := Add(strTypesLabel, iiPublicTypesLabel, scPublic, GetComment);
+      If Container = Nil Then
+        Container := Self;
+      LabelScope := AScope;
+      If LabelScope <> scLocal Then
+        LabelScope := scPublic;
+      T := Container.Add(strTypesLabel, iiPublicTypesLabel, LabelScope, GetComment);
       NextNonCommentToken;
       While TypeDecl(AScope, T) Do
         If Token.Token = ';' Then
@@ -4367,36 +4396,40 @@ end;
 
 (**
 
-  This method check and parses a var section declaration from the current token
-  position using the following object pascal grammar.
+  This method check and parses a var section declaration from the current token 
+  position using the following object pascal grammar. 
 
-  @precon  On entry to this method, Scope defines the current scope of the
-           block i.e. private in in the implemenation section or public if in
-           the interface section and The Method parameter is nil for methods
-           in the implementation section or a reference to a method for a
-           local declaration section with in a method.
-  @postcon This method returns True if this method handles a constant
-           declaration section.
+  @precon  On entry to this method, Scope defines the current scope of the 
+           block i.e. private in in the implemenation section or public if in 
+           the interface section and The Method parameter is nil for methods 
+           in the implementation section or a reference to a method for a 
+           local declaration section with in a method. 
+  @postcon This method returns True if this method handles a constant 
+           declaration section. 
 
-  @grammar VarSection -> VAR ( VarDecl ';' ) ...
+  @grammar VarSection -> VAR ( VarDecl ';' ) ... 
 
-  @param   AScope as a TScope
-  @return  a Boolean
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean  
 
 **)
-Function TPascalModule.VarSection(AScope : TScope) : Boolean;
+Function TPascalModule.VarSection(AScope : TScope; Container : TElementContainer) : Boolean;
 
 Var
   V : TElementContainer;
+  LabelScope : TScope;
 
 Begin
   Result := Token.UToken = 'VAR';
   If Result Then
     Begin
-      If CurrentMethod <> Nil Then
-        V := CurrentMethod.Add(strVarsLabel, iiPublicVariablesLabel, scLocal, GetComment)
-      Else
-        V := Add(strVarsLabel, iiPublicVariablesLabel, scPublic, GetComment);
+      If Container = Nil Then
+        Container := Self;
+      LabelScope := AScope;
+      If LabelScope <> scLocal Then
+        LabelScope := scPublic;
+      V := Container.Add(strVarsLabel, iiPublicVariablesLabel, LabelScope, GetComment);
       NextNonCommentToken;
       While VarDecl(AScope, V) Do
         Begin
@@ -4831,8 +4864,8 @@ Begin
       Else
         AddToExpression(C);
     End
-  Else If Token.UToken = 'NIL' Then
-    AddToExpression(C)
+  { Else If Token.UToken = 'NIL' Then
+    AddToExpression(C) }
   Else If Token.Token = '@' Then
     Begin
       AddToExpression(C);
@@ -5014,7 +5047,8 @@ End;
 Function TPascalModule.Designator(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
 
 Begin
-  Result := Token.TokenType In [ttIdentifier, ttDirective];
+  Result := (Token.TokenType In [ttIdentifier, ttDirective]) Or
+    (Token.UToken = 'NIL');
   If Result Then
     Begin
       ReferenceLocalsPrivates(Token.Token, [rtConstants, rtResourceStrings,
@@ -7140,8 +7174,10 @@ function TPascalModule.ClassType(AToken : TTypeToken) : TClassDecl;
 
 Var
   InternalScope : TScope;
+  boolFieldAllowed: Boolean;
 
 begin
+  boolFieldAllowed := True;
   InternalScope := scPublished;
   Result := Nil;
   If Token.UToken = 'CLASS' Then
@@ -7164,8 +7200,28 @@ begin
           Result.SealedClass := (Token.UToken = 'SEALED');
           If Result.SealedClass Then
             NextNonCommentToken;
+          Result.HelperClass := (Token.UToken = 'HELPER');
+          If Result.HelperClass Then
+            Begin
+              NextNonCommentToken;
+              boolFieldAllowed := False;
+            End;
           // Get the classes heritage
           ClassHeritage(Result);
+          If Result.HelperClass Then
+            If Token.UToken = 'FOR' Then
+              Begin
+                NextNonCommentToken;
+                If Token.TokenType In [ttIdentifier, ttDirective] Then
+                  Begin
+                    Result.HelperClassName := Token.Token;
+                    NextNonCommentToken;
+                  End Else
+                    ErrorAndSeekToken(strIdentExpected, 'ClassType', Token.Token,
+                      strSeekableOnErrorTokens, stActual);
+              End Else
+                ErrorAndSeekToken(strReservedWordExpected, 'ClassType', 'FOR',
+                  strSeekableOnErrorTokens, stActual);
           // If this class has no body then return
           If Token.Token <> ';' Then
             Begin
@@ -7176,7 +7232,10 @@ begin
               Until Not (
                 ClassMethodList(Result, InternalScope) Or
                 ClassPropertyList(Result, InternalScope) Or
-                ClassFieldList(Result, InternalScope)
+                TypeSection(InternalScope, Result) Or
+                ConstSection(InternalScope, Result) Or
+                VarSection(InternalScope, Result) Or
+                (boolFieldAllowed And ClassFieldList(Result, InternalScope))
               );
               // Check for 'END'
               If Token.UToken = 'END' Then
@@ -7233,20 +7292,30 @@ end;
 **)
 procedure TPascalModule.ClassVisibility(var AScope : TScope);
 begin
-  If Token.UToken = 'STATIC' Then
-    NextNonCommentToken;
-  While IsKeyWord(Token.Token, strScope) Do
+  If Token.UToken = 'STRICT' Then
     Begin
-      If Token.UToken = 'PRIVATE' Then
-        AScope := scPrivate
-      Else If Token.UToken = 'PROTECTED' Then
-        AScope := scProtected
-      Else If Token.UToken = 'PUBLIC' Then
-        AScope := scPublic
-      Else
-        AScope := scPublished;
       NextNonCommentToken;
-    End;
+      While IsKeyWord(Token.Token, strStrictedScope) Do
+        Begin
+          If Token.UToken = 'PRIVATE' Then
+            AScope := scPrivate
+          Else If Token.UToken = 'PROTECTED' Then
+            AScope := scProtected;
+          NextNonCommentToken;
+        End;
+    End Else
+      While IsKeyWord(Token.Token, strScope) Do
+        Begin
+          If Token.UToken = 'PRIVATE' Then
+            AScope := scPrivate
+          Else If Token.UToken = 'PROTECTED' Then
+            AScope := scProtected
+          Else If Token.UToken = 'PUBLIC' Then
+            AScope := scPublic
+          Else
+            AScope := scPublished;
+          NextNonCommentToken;
+        End;
 end;
 
 (**

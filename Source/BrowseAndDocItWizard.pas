@@ -3,8 +3,10 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    10 Sep 2008
+  @Date    17 Sep 2008
   @Version 1.0
+
+  @bug     Line position of comment tags in coflicts is not right!
 
 **)
 Unit BrowseAndDocItWizard;
@@ -349,12 +351,15 @@ var
 
 begin
   AProject := ActiveProject;
-  If ActiveProject <> Nil Then
+  If AProject <> Nil Then
     If TfrmDocumentationOptions.Execute(ADocType) Then
       With DocumentDispatcher(
         ExtractFilePath(AProject.FileName) + 'Documentation',
         ExtractFileName(AProject.ProjectOptions.TargetName), ADocType) Do
         Try
+          Add(AProject.FileName);
+          For i := 0 To AProject.ModuleFileCount - 1 Do
+            Add(AProject.ModuleFileEditors[i].FileName);
           For i := 0 To AProject.GetModuleCount - 1 Do
             Add(AProject.GetModule(i).FileName);
           OutputDocumentation;

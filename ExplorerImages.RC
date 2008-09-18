@@ -145,6 +145,17 @@ PublicThreadVar                 BITMAP "Images\publicThreadVar.bmp"
 PublishedThreadVar              BITMAP "Images\publishedThreadVar.bmp"
 LocalThreadVar                  BITMAP "Images\localThreadVar.bmp"
 
+PrivateClassVariablesLabel      BITMAP "Images\PrivateClassVarsLabel.bmp"
+ProtectedClassVariablesLabel    BITMAP "Images\ProtectedClassVarsLabel.bmp"
+PublicClassVariablesLabel       BITMAP "Images\PublicClassVarsLabel.bmp"
+PublishedClassVariablesLabel    BITMAP "Images\PublishedClassVarsLabel.bmp"
+LocalClassVariablesLabel        BITMAP "Images\LocalClassVarsLabel.bmp"
+PublishedClassVariable          BITMAP "Images\publishedClassVar.bmp"
+PublicClassVariable             BITMAP "Images\publicClassVar.bmp"
+ProtectedClassVariable          BITMAP "Images\protectedClassVar.bmp"
+PrivateClassVariable            BITMAP "Images\privateClassVar.bmp"
+LocalClassVariable              BITMAP "Images\localClassVar.bmp"
+
 ExportedHeadingsLabel           BITMAP "Images\ExportedHeadingsLabel.bmp"
 
 ExportedFunctionsLabel          BITMAP "Images\ExportsLabel.bmp"

@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    16 Sep 2008
+  @Date    18 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -231,6 +231,17 @@ Type
     iiPublishedThreadVar,
     iiProtectedThreadVar,
     iiLocalThreadVar,
+
+    iiPublicClassVariablesLabel,
+    iiPrivateClassVariablesLabel,
+    iiPublishedClassVariablesLabel,
+    iiProtectedClassVariablesLabel,
+    iiLocalClassVariablesLabel,
+    iiPublicClassVariable,
+    iiPrivateClassVariable,
+    iiPublishedClassVariable,
+    iiProtectedClassVariable,
+    iiLocalClassVariable,
 
     iiExportedHeadingsLabel,
 
@@ -1534,6 +1545,8 @@ ResourceString
   strResourceStringsLabel = 'Resource Strings';
   (** Label for Variables Clause **)
   strVarsLabel = 'Variables';
+  (** Label for Class Variables Clause **)
+  strClassVarsLabel = 'Class Variables';
   (** Label for Thread Variables Clause **)
   strThreadVarsLabel = 'Thread Variables';
   (** Label for Exported Headings **)
@@ -2180,6 +2193,17 @@ Const
     (FResourceName : 'PublishedThreadVar';            FMaskColour: clLime),
     (FResourceName : 'ProtectedThreadVar';            FMaskColour: clLime),
     (FResourceName : 'LocalThreadVar';                FMaskColour: clLime),
+
+    (FResourceName : 'PublicClassVariablesLabel';     FMaskColour: clLime),
+    (FResourceName : 'PrivateClassVariablesLabel';    FMaskColour: clLime),
+    (FResourceName : 'PublishedClassVariablesLabel';  FMaskColour: clLime),
+    (FResourceName : 'ProtectedClassVariablesLabel';  FMaskColour: clLime),
+    (FResourceName : 'LocalClassVariablesLabel';      FMaskColour: clLime),
+    (FResourceName : 'PublicClassVariable';           FMaskColour: clLime),
+    (FResourceName : 'PrivateClassVariable';          FMaskColour: clLime),
+    (FResourceName : 'PublishedClassVariable';        FMaskColour: clLime),
+    (FResourceName : 'ProtectedClassVariable';        FMaskColour: clLime),
+    (FResourceName : 'LocalClassVariable';            FMaskColour: clLime),
 
     (FResourceName : 'ExportedHeadingsLabel';         FMaskColour: clLime),
 

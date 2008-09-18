@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       17 Sep 2008
+  @Date       18 Sep 2008
   @Author     David Hoyle
 
   @bug        Can not resolve constants, variables and types within a class
@@ -561,8 +561,10 @@ Type
     Function PointerType(AToken : TTypeToken) : TPointerType;
     Function ProcedureType(AToken : TTypeToken) : TProcedureType;
     Function VarSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function ClassVarSection(AScope : TScope; Container : TElementContainer) : Boolean;
     Function ThreadVarSection(AScope : TScope) : Boolean;
-    Function VarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
+    Function VarDecl(AScope : TScope; VarSection : TElementContainer;
+      AImageIndex : TImageIndex) : Boolean;
     Function ThreadVarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
     Procedure Expression(C : TElementContainer; var ExprType : TExprTypes);
     Procedure SimpleExpression(C : TElementContainer; var ExprType : TExprTypes);
@@ -4396,22 +4398,22 @@ end;
 
 (**
 
-  This method check and parses a var section declaration from the current token 
-  position using the following object pascal grammar. 
+  This method check and parses a var section declaration from the current token
+  position using the following object pascal grammar.
 
-  @precon  On entry to this method, Scope defines the current scope of the 
-           block i.e. private in in the implemenation section or public if in 
-           the interface section and The Method parameter is nil for methods 
-           in the implementation section or a reference to a method for a 
-           local declaration section with in a method. 
-  @postcon This method returns True if this method handles a constant 
-           declaration section. 
+  @precon  On entry to this method, Scope defines the current scope of the
+           block i.e. private in in the implemenation section or public if in
+           the interface section and The Method parameter is nil for methods
+           in the implementation section or a reference to a method for a
+           local declaration section with in a method.
+  @postcon This method returns True if this method handles a constant
+           declaration section.
 
-  @grammar VarSection -> VAR ( VarDecl ';' ) ... 
+  @grammar VarSection -> VAR ( VarDecl ';' ) ...
 
   @param   AScope    as a TScope
   @param   Container as a TElementContainer
-  @return  a Boolean  
+  @return  a Boolean
 
 **)
 Function TPascalModule.VarSection(AScope : TScope; Container : TElementContainer) : Boolean;
@@ -4431,7 +4433,7 @@ Begin
         LabelScope := scPublic;
       V := Container.Add(strVarsLabel, iiPublicVariablesLabel, LabelScope, GetComment);
       NextNonCommentToken;
-      While VarDecl(AScope, V) Do
+      While VarDecl(AScope, V, iiPublicVariable) Do
         Begin
           If Token.Token <> ';' Then
             ErrorAndSeekToken(strLiteralExpected, 'VarSection', ';',
@@ -4439,6 +4441,62 @@ Begin
           Else
             NextNonCommentToken;
         End;
+    End;
+End;
+
+(**
+
+  This method checks and parses a class var section declaration from the current
+  token position using the following object pascal grammar.
+
+  @precon  On entry to this method, Scope defines the current scope of the
+           block i.e. private in in the implemenation section or public if in
+           the interface section and The Method parameter is nil for methods
+           in the implementation section or a reference to a method for a
+           local declaration section with in a method.
+  @postcon This method returns True if this method handles a constant
+           declaration section.
+
+  @grammar VarSection -> CLASS VAR ( VarDecl ';' ) ...
+
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TPascalModule.ClassVarSection(AScope : TScope;
+  Container : TElementContainer) : Boolean;
+
+Var
+  V : TElementContainer;
+  LabelScope : TScope;
+
+Begin
+  Result := False;
+  If Token.UToken = 'CLASS' Then
+    Begin
+      NextNonCommentToken;
+      Result := Token.UToken = 'VAR';
+      If Result Then
+        Begin
+          If Container = Nil Then
+            Container := Self;
+          LabelScope := AScope;
+          If LabelScope <> scLocal Then
+            LabelScope := scPublic;
+          V := Container.Add(strClassVarsLabel, iiPublicClassVariablesLabel,
+            LabelScope, GetComment);
+          NextNonCommentToken;
+          While VarDecl(AScope, V, iiPublicClassVariable) Do
+            Begin
+              If Token.Token <> ';' Then
+                ErrorAndSeekToken(strLiteralExpected, 'ClassVarSection', ';',
+                  strSeekableOnErrorTokens, stFirst)
+              Else
+                NextNonCommentToken;
+            End;
+        End Else
+          RollBackToken;
     End;
 End;
 
@@ -4507,21 +4565,23 @@ end;
 
 (**
 
-  This method parses a variable declaration from the current token position.
+  This method parses a variable declaration from the current token position. 
 
-  @precon  AScope defines the current scope of the variable and VarSection is a
-           valid variable container for the storage of the variable declared.
-  @postcon Returns true if a variable declaration was handled.
+  @precon  AScope defines the current scope of the variable and VarSection is a 
+           valid variable container for the storage of the variable declared. 
+  @postcon Returns true if a variable declaration was handled. 
 
-  @grammar VarDecl -> IdentList ':' Type [ ( ABSOLUTE ( Ident | ConstExpr ) ) |
-           '=' ConstExpr ]
+  @grammar VarDecl -> IdentList ':' Type [ ( ABSOLUTE ( Ident | ConstExpr ) ) | 
+           '=' ConstExpr ] 
 
-  @param   AScope     as a TScope
-  @param   VarSection as a TElementContainer
-  @return  a Boolean
+  @param   AScope      as a TScope
+  @param   VarSection  as a TElementContainer
+  @param   AImageIndex as a TImageIndex
+  @return  a Boolean    
 
 **)
-Function TPascalModule.VarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
+Function TPascalModule.VarDecl(AScope : TScope; VarSection : TElementContainer;
+  AImageIndex : TImageIndex) : Boolean;
 
   (**
 
@@ -4608,7 +4668,7 @@ Begin
                 For j := 1 To I.ElementCount Do
                   Begin
                     tmpV := TVar.Create(I[j].Identifier, AScope, I[j].Line, I[j].Column,
-                      iiPublicVariable, I[j].Comment);
+                      AImageIndex, I[j].Comment);
                     V := VarSection.Add(tmpV);
                     If tmpV <> V Then
                       AddIssue(Format(strDuplicateIdentifierFound, [I[j].Identifier]),
@@ -7235,6 +7295,7 @@ begin
                 TypeSection(InternalScope, Result) Or
                 ConstSection(InternalScope, Result) Or
                 VarSection(InternalScope, Result) Or
+                ClassVarSection(InternalScope, Result) Or
                 (boolFieldAllowed And ClassFieldList(Result, InternalScope))
               );
               // Check for 'END'

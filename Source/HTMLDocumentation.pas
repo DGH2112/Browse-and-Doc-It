@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    15 Sep 2008
+  @Date    19 Sep 2008
   @Version 1.0
 
 **)
@@ -45,7 +45,6 @@ Type
   THTMLDocumentation = Class(TBaseDocumentation)
   Private
     FCurrentModule   : TBaseLanguageModule;
-    FCurrentHTMLFile : TStringList;
     FProgressIndex: Integer;
     FModuleSpecialTagNodes: TObjectList;
     FSummarySpecialTagNodes: TObjectList;
@@ -61,6 +60,7 @@ Type
     FHTMLFileName: String;
     FSummaryDocConflicts : TObjectList;
     FSections : TStringList;
+    FPerfCounters : TStringList;
     procedure OutputSummarySpecialTags;
     function GetSumDocCons(iIndex : Integer): TSumDocCon;
   Protected
@@ -71,11 +71,12 @@ Type
     Procedure GenerateCSS;
     Procedure GenerateIndex;
     procedure GenerateSchema;
-    Procedure GenerateHTML(strTitle : String);
-    Procedure GenerateModuleList;
-    Procedure GenerateSectionList;
-    Procedure GenerateContent;
-    Function FindInsertionPoint(strText : String) : Integer;
+    Procedure GenerateHTML(slHTMLFile : TStringList; strTitle : String);
+    Procedure GenerateModuleList(slHTMLFile : TStringList);
+    Procedure GenerateSectionList(slHTMLFile : TStringList);
+    Procedure GenerateContent(slHTMLFile : TStringList);
+    Function FindInsertionPoint(slHTMLFile : TStringList;
+      strText : String) : Integer;
     Function GetStringResource(strName : String) : String;
     Function GetMainDocument : String; Override;
     Procedure GenerateErrorsWarningsHints(slContents : TStringList);
@@ -181,6 +182,7 @@ begin
   FHints := TStringList.Create;
   FSummaryDocConflicts := TObjectList.Create(True);
   FSections := TStringList.Create;
+  FPerfCounters := TStringList.Create;
   InitialiseSummary;
 end;
 
@@ -196,6 +198,7 @@ end;
 **)
 destructor THTMLDocumentation.Destroy;
 begin
+  FPerfCounters.Free;
   FSections.Free;
   FSummaryDocConflicts.Free;
   FHints.Free;
@@ -323,11 +326,17 @@ var
 begin
   slSummary := TStringList.Create;
   Try
-    FCurrentHTMLFile := slSummary;
-    GenerateHTML('Summary');
-    GenerateModuleList;
-    iIns := FindInsertionPoint('*$CONTENT$');
-    i := Pos('$', FCurrentHTMLFile[iIns]);
+    If doShowPrefCountersInDocSummary In BrowseAndDocItOptions.Options Then
+      Begin
+        iIns := FindInsertionPoint(FSummaryContent, '*$PERFCOUNTERS$');
+        For i := 0 To FPerfCounters.Count - 1 Do
+          FPerfCounters[i] := '      <th>' + FPerfCounters[i] + '</th>';
+        FSummaryContent[iIns] := FPerfCounters.Text;
+      End;
+    GenerateHTML(slSummary, 'Summary');
+    GenerateModuleList(slSummary);
+    iIns := FindInsertionPoint(slSummary, '*$CONTENT$');
+    i := Pos('$', slSummary[iIns]);
     strIndent := StringOfChar(#32, i - 1);
     FSummaryContent.Add('    </tbody>');
     FSummaryContent.Add('  </table>');
@@ -340,10 +349,10 @@ begin
     For i := 0 To FSummaryContent.Count - 1 Do
       FSummaryContent[i] := strIndent + FSummaryContent[i];
     slSummary[iIns] := FSummaryContent.Text;
-    iIns := FindInsertionPoint('*$SECTIONLIST$');
-    i := Pos('$', FCurrentHTMLFile[iIns]);
+    iIns := FindInsertionPoint(slSummary, '*$SECTIONLIST$');
+    i := Pos('$', slSummary[iIns]);
     strIndent := StringOfChar(#32, i - 1);
-    slSections := TstringList.Create;
+    slSections := TStringList.Create;
     Try
       For i := 0 To FSections.Count - 1 Do
         slSections.Add(Format('<div class="Section">%s&nbsp;%s</div>', [
@@ -351,7 +360,7 @@ begin
           A(FSections[i], '#' + FSections[i])]));
       For i := 0 To slSections.Count - 1 Do
         slSections[i] := strIndent + slSections[i];
-      FCurrentHTMLFile[iIns] := slSections.text;
+      slSummary[iIns] := slSections.text;
     Finally
       slSections.Free;
     End;
@@ -364,20 +373,18 @@ end;
 
 (**
 
+  This method attempts to find the insert point in the doucmentation template. 
 
-  This method attempts to find the insert point in the doucmentation template.
+  @precon  slHTML must be a valid TStringList instance. 
+  @postcon Return the index of the insert point line if found else returns -1. 
 
-
-  @precon  slHTML must be a valid TStringList instance.
-
-  @postcon Return the index of the insert point line if found else returns -1.
-
-
-  @param   strText as a String
+  @param   slHTMLFile as a TStringList
+  @param   strText    as a String
   @return  an Integer
 
 **)
-Function THTMLDocumentation.FindInsertionPoint(strText : String) : Integer;
+Function THTMLDocumentation.FindInsertionPoint(slHTMLFile : TStringList;
+  strText : String) : Integer;
 
 ResourceString
   strInsertionPointNotFound = 'Insertion Point "%s" not found!';
@@ -386,8 +393,8 @@ Var
   i : Integer;
 
 Begin
-  For i := 0 To FCurrentHTMLFile.Count - 1 Do
-    If Like(strText, FCurrentHTMLFile[i]) Then
+  For i := 0 To slHTMLFile.Count - 1 Do
+    If Like(strText, slHTMLFile[i]) Then
       Begin
         Result := i;
         Exit;
@@ -405,9 +412,10 @@ End;
   @postcon Outputs the contents of the html to a string list which is then
            inserted into the template HTML file.
 
+  @param   slHTMLFile as a TStringList
 
 **)
-Procedure THTMLDocumentation.GenerateContent;
+Procedure THTMLDocumentation.GenerateContent(slHTMLFile : TStringList);
 
 Const
   strSections : Array[1..4] Of String = (strDocumentationConflicts, strErrors,
@@ -421,8 +429,8 @@ Var
   boolIgnore: Boolean;
 
 Begin
-  iIns := FindInsertionPoint('*$CONTENT$');
-  i := Pos('$', FCurrentHTMLFile[iIns]);
+  iIns := FindInsertionPoint(slHTMLFile, '*$CONTENT$');
+  i := Pos('$', slHTMLFile[iIns]);
   strIndent := StringOfChar(#32, i - 1);
   slContents := TStringList.Create;
   Try
@@ -452,7 +460,7 @@ Begin
       End;
     For i := 0 To slContents.Count - 1 Do
       slContents[i] := strIndent + slContents[i];
-    FCurrentHTMLFile[iIns] := slContents.Text;
+    slHTMLFile[iIns] := slContents.Text;
   Finally
     slContents.Free;
   End;
@@ -649,13 +657,14 @@ end;
            title.
 
 
+  @param   slHTMLFile as a TStringList
   @param   strTitle as a String
 
 **)
-Procedure THTMLDocumentation.GenerateHTML(strTitle : String);
+Procedure THTMLDocumentation.GenerateHTML(slHTMLFile : TStringList; strTitle : String);
 
 Begin
- FCurrentHTMLFile.Text := StringReplace(GetStringResource(
+ slHTMLFile.Text := StringReplace(GetStringResource(
    'BrowseAndDocItHTMLTemplate'), '$TITLE$', strTitle, [rfReplaceAll]);
 End;
 
@@ -742,11 +751,10 @@ begin
   Inc(FProgressIndex);
   sl := TStringList.Create;
   Try
-    FCurrentHTMLFile := sl;
-    GenerateHTML('Summary');
-    GenerateModuleList;
-    iIns := FindInsertionPoint('*$CONTENT$');
-    i := Pos('$', FCurrentHTMLFile[iIns]);
+    GenerateHTML(sl, 'Index');
+    GenerateModuleList(sl);
+    iIns := FindInsertionPoint(sl, '*$CONTENT$');
+    i := Pos('$', sl[iIns]);
     strIndent := StringOfChar(#32, i - 1);
     slSections := TStringList.Create;
     Try
@@ -756,7 +764,7 @@ begin
         FIndex.Sort;
         For i := 0 To FIndex.Count - 1 Do
           Begin
-            strCurAlpha := FIndex[i][1];
+            strCurAlpha := UpperCase(FIndex[i][1]);
             If (strLastAlpha <> '') And (AnsiCompareText(strCurAlpha, strLastAlpha) <> 0) Then
               Begin
                 slC.Add('  </table>');
@@ -772,8 +780,9 @@ begin
               End;
             iPos := Pos('(', FIndex.Names[i]);
             strID := Copy(FIndex.Names[i], 1, iPos - 1);
-            strRef := Copy(FIndex.Names[i], iPos, Length(FIndex.Names[i]) - iPos + 1);
-            slC.Add(Format('    <tr><td>%s %s</td></tr>', [A(strID,
+            strRef := StringReplace(ChangeFileExt(ExtractFileName(
+              FIndex.ValueFromIndex[i]), ''), 'html#', '', [rfReplaceAll]);
+            slC.Add(Format('    <tr><td>%s</td><td>%s</td></tr>', [A(strID,
               ExtractFileName(FIndex.ValueFromIndex[i]), ''), strRef]));
             strLastAlpha := strCurAlpha;
           End;
@@ -786,15 +795,14 @@ begin
         slC.Free;
       End;
       // Section list of Alphabet Hyperlinks
-      FCurrentHTMLFile := sl;
-      iIns := FindInsertionPoint('*$SECTIONLIST$');
-      i := Pos('$', FCurrentHTMLFile[iIns]);
+      iIns := FindInsertionPoint(sl, '*$SECTIONLIST$');
+      i := Pos('$', sl[iIns]);
       strIndent := StringOfChar(#32, i - 1);
       For i := 0 To slSections.Count - 1 Do
         slSections[i] := strIndent + Format('<div class="Section">%s</div>', [
           H(A(UpperCase(slSections[i]), '#' + UpperCase(slSections[i]), ''), 2,
           iiNone, scNone)]);
-      FCurrentHTMLFile[iIns] := slSections.Text;
+      sl[iIns] := slSections.Text;
     Finally
       slSections.Free;
     End;
@@ -813,9 +821,10 @@ end;
   @precon  None.
   @postcon Outputs a menu of all the module in this package of documentation.
 
+  @param   slHTMLFile as a TStringList
 
 **)
-Procedure THTMLDocumentation.GenerateModuleList;
+Procedure THTMLDocumentation.GenerateModuleList(slHTMLFile : TStringList);
 
 Var
   iIns : Integer;
@@ -825,8 +834,8 @@ Var
   strFileName : String;
 
 Begin
-  iIns := FindInsertionPoint('*$MODULELIST$');
-  i := Pos('$', FCurrentHTMLFile[iIns]);
+  iIns := FindInsertionPoint(slHTMLFile, '*$MODULELIST$');
+  i := Pos('$', slHTMLFile[iIns]);
   strIndent := StringOfChar(#32, i - 1);
   sl := TStringList.Create;
   Try
@@ -844,7 +853,7 @@ Begin
     sl.Add(strIndent + Format('  <div class="Module">%s&nbsp;%s</div>',
       [IMG(iiModule, scNone), A('Index', 'Index.html')]));
     sl.Add(strIndent + '</div>');
-    FCurrentHTMLFile[iIns] := sl.Text;
+    slHTMLFile[iIns] := sl.Text;
   Finally
     sl.Free;
   End;
@@ -858,9 +867,10 @@ End;
   @precon  None.
   @postcon Generates a menu for the various section contained in this module.
 
+  @param   slHTMLFile as a TStringList
 
 **)
-Procedure THTMLDocumentation.GenerateSectionList;
+Procedure THTMLDocumentation.GenerateSectionList(slHTMLFile : TStringList);
 
 Var
   iIns : Integer;
@@ -870,8 +880,8 @@ Var
   E : TElementContainer;
 
 Begin
-  iIns := FindInsertionPoint('*$SECTIONLIST$');
-  i := Pos('$', FCurrentHTMLFile[iIns]);
+  iIns := FindInsertionPoint(slHTMLFile, '*$SECTIONLIST$');
+  i := Pos('$', slHTMLFile[iIns]);
   strIndent := StringOfChar(#32, i - 1);
   sl := TStringList.Create;
   Try
@@ -884,7 +894,7 @@ Begin
           IMG(E.ImageIndex, E.Scope), A(E.AsString(True),
           '#' + E.AsString(True) + '2')]));
       End;
-    FCurrentHTMLFile[iIns] := sl.Text;
+    slHTMLFile[iIns] := sl.Text;
   Finally
     sl.Free;
   End;
@@ -955,6 +965,16 @@ begin
           Else
             FSummaryContent.Add(Format('        <td class="Yellow">%d</td>', [i]));
         End;
+    End;
+  If doShowPrefCountersInDocSummary In BrowseAndDocItOptions.Options Then
+    Begin
+      For i := 1 To FCurrentModule.OpTickCounts - 1 Do
+        FSummaryContent.Add(Format('        <td>%d</td>', [
+          FCurrentModule.OpTickCountByIndex[i] -
+          FCurrentModule.OpTickCountByIndex[i - 1]]));
+      FSummaryContent.Add(Format('        <td>%d</td>', [
+        FCurrentModule.OpTickCountByIndex[FCurrentModule.OpTickCounts - 1] -
+        FCurrentModule.OpTickCountByIndex[0]]));
     End;
   FSummaryContent.Add('      </tr>');
 end;
@@ -1531,10 +1551,13 @@ begin
   FSummaryContent.Add(Format('        <th>%s</th>', ['Warnings']));
   FSummaryContent.Add(Format('        <th>%s</th>', ['Hints']));
   FSummaryContent.Add(Format('        <th>%s</th>', ['Document Conflicts']));
-  with BrowseAndDocItOptions do
-    for i := 0 to SpecialTags.Count - 1 do
-      if Integer(SpecialTags.Objects[i]) and iShowInDoc > 0 then
+  With BrowseAndDocItOptions Do
+    For i := 0 to SpecialTags.Count - 1 Do
+      If Integer(SpecialTags.Objects[i]) And iShowInDoc > 0 Then
         FSummaryContent.Add(Format('        <th>%s</th>', [SpecialTags.ValueFromIndex[i]]));
+  With BrowseAndDocItOptions Do
+    If doShowPrefCountersInDocSummary In Options Then
+      FSummaryContent.Add('        $PERFCOUNTERS$');
   FSummaryContent.Add('      </tr>');
   FSummaryContent.Add('    </thead>');
   FSummaryContent.Add('    <tbody>');
@@ -1561,19 +1584,28 @@ Const
     strDocumentationConflicts);
 
 Var
-  Stream : TFileStream;
+  Stream : TMemoryStream;
   i: Integer;
   E: TElementContainer;
   j: Integer;
   k: Integer;
+  CurrentHTMLFile: TStringList;
 
 Begin
-  Stream := TFileStream.Create(strFileName, fmOpenRead Or fmShareDenyNone);
+  Stream := TMemoryStream.Create;
   Try
+    Stream.LoadFromFile(strFileName);
     FCurrentModule := Dispatcher(Stream, strFileName, False, [moParse,
       moCheckForDocumentConflicts]);
     If FCurrentModule <> Nil Then
       Try
+        If doShowPrefCountersInDocSummary In BrowseAndDocItOptions.Options Then
+          If FPerfCounters.Count = 0 Then
+            Begin
+              For i := 1 To FCurrentModule.OpTickCounts - 1 Do
+                FPerfCounters.Add(FCurrentModule.OpTickCountName[i]);
+              FPerfCounters.Add('Total');
+            End;
         FKeyWords := FCurrentModule.KeyWords;
         FSummaryContent.Add('      <tr>');
         FSummaryContent.Add(Format('        <td>%s</td>', [
@@ -1599,17 +1631,17 @@ Begin
             Else
               FSummaryContent.Add(Format('        <td class="Red">%d</td>', [i]));
           End;
-        FCurrentHTMLFile := TStringList.Create;
+        CurrentHTMLFile := TStringList.Create;
         Try
-          GenerateHTML(ExtractFileName(strFileName));
-          GenerateModuleList;
-          GenerateSectionList;
+          GenerateHTML(CurrentHTMLFile, ExtractFileName(strFileName));
+          GenerateModuleList(CurrentHTMLFile);
+          GenerateSectionList(CurrentHTMLFile);
           FHeaderLevel := 1;
           FHTMLFileName := FOutputDirectory + ChangeFileExt(ExtractFileName(strFileName), '.html');
-          GenerateContent;
-          FCurrentHTMLFile.SaveToFile(FHTMLFileName);
+          GenerateContent(CurrentHTMLFile);
+          CurrentHTMLFile.SaveToFile(FHTMLFileName);
         Finally
-          FCurrentHTMLFile.Free;
+          CurrentHTMLFile.Free;
         End;
     Finally
       FCurrentModule.Free;

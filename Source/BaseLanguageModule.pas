@@ -5752,7 +5752,8 @@ begin
         For j := 0 To sl.Count - 1 Do
           Begin
             iValue := ReadInteger('ManagedExpandedNodes', sl[j], 0);
-            FExpandedNodes.AddObject(sl[j], TObject(iValue));
+            FExpandedNodes.AddObject(StringReplace(sl[j], '|', '=', [rfReplaceAll]),
+              TObject(iValue));
           End;
       Finally
         sl.Free;
@@ -5818,7 +5819,8 @@ begin
         WriteInteger('SpecialTags', FSpecialTags.Names[j], Integer(FSpecialTags.Objects[j]));
       EraseSection('ManagedExpandedNodes');
       For j := 0 To BrowseAndDocItOptions.ExpandedNodes.Count - 1 Do
-        WriteInteger('ManagedExpandedNodes', FExpandedNodes[j],
+        WriteInteger('ManagedExpandedNodes',
+          StringReplace(FExpandedNodes[j], '=', '|', [rfReplaceAll]),
           Integer(FExpandedNodes.Objects[j]));
       WriteInteger('ModuleExplorer', 'UpdateInterval', FUpdateInterval);
       WriteString('ModuleExplorer', 'HelpFile', FDocHelpFile);

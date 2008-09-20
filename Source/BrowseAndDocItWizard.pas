@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    17 Sep 2008
+  @Date    20 Sep 2008
   @Version 1.0
 
   @bug     Line position of comment tags in coflicts is not right!
@@ -757,8 +757,8 @@ begin
   iLines := Method.Line;
   CharPos.Line := Method.Line;
   CharPos.CharIndex := Method.Column;
-  If Method.ClsName <> '' Then
-    Dec(CharPos.CharIndex, 1 + Length(Method.ClsName));
+  For i := 0 To Method.ClassNames.Count - 1 Do
+    Dec(CharPos.CharIndex, 1 + Length(Method.ClassNames[i]));
   Dec(CharPos.CharIndex, 1 + Length(strMethodTypes[Method.MethodType]));
   If Method.ClassMethod Then
     Dec(CharPos.CharIndex, 6);

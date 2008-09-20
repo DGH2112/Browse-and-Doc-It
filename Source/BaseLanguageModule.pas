@@ -623,6 +623,7 @@ Type
     FSorted  : Boolean;
     FReferenced : Boolean;
     FDocumentConflictLabel : TLabelContainer;
+    FParent : TElementContainer;
   Protected
     Function GetElementCount : Integer;
     Function GetElements(iIndex : Integer) : TElementContainer;
@@ -769,6 +770,15 @@ Type
       @return  a Boolean
     **)
     Property Referenced  : Boolean Read FReferenced Write FReferenced;
+    (**
+      This property returns the parent container of this object. A return of
+      nil means that there is no parent.
+      @precon  None.
+      @postcon Returns the parent container of this object. A return of
+               nil means that there is no parent.
+      @return  a TElementContainer
+    **)
+    Property Parent  : TElementContainer Read FParent;
   End;
 
   (** This class defines a document error. **)
@@ -872,7 +882,7 @@ Type
   Private
     FParameters : TObjectList;
     FMethodType : TMethodType;
-    FClsName : String;
+    FClassNames : TStringList;
     FReturnType : TGenericTypeDecl;
     FMsg: String;
     FExt: String;
@@ -880,7 +890,6 @@ Type
     FAlias: String;
     FForwardDecl : Boolean;
   Protected
-    Procedure SetClsName(Value : String);
     procedure SetMsg(const Value: String);
     procedure SetExt(const Value: String);
     Function GetQualifiedName : String;
@@ -907,9 +916,9 @@ Type
       Returns the methods class name.
       @precon  None.
       @postcon Returns the methods class name.
-      @return  a String
+      @return  a TStringList
     **)
-    Property ClsName : String Read FClsName Write SetClsName;
+    Property ClassNames : TStringList Read FClassNames;
     (**
       This property returns the number of parameter in the parameter collection.
       @precon  None.
@@ -3280,6 +3289,7 @@ Var
 begin
   Result := AElement;
   Assert(AElement.Name <> '', 'Can not add a null element to the collection!');
+  AElement.FParent := Self;
   i := Find(AElement.Name);
   If i < 0 Then
     FElements.Insert(Abs(i) - 1, AElement)
@@ -3333,6 +3343,7 @@ begin
     Begin
       Result := TLabelContainer.Create(Token.Token, AScope, Token.Line,
         Token.Column, AImageIndex, AComment);
+      Result.FParent := Self;
       FElements.Insert(Abs(i) - 1, Result);
     End Else
     Begin
@@ -3343,11 +3354,11 @@ end;
 
 (**
 
-  This method adds a string token to the container as a sub container NOT a 
-  token. 
+  This method adds a string token to the container as a sub container NOT a
+  token.
 
-  @precon  None. 
-  @postcon Returns an instance of the sub container created around the token. 
+  @precon  None.
+  @postcon Returns an instance of the sub container created around the token.
 
   @param   strToken    as a String
   @param   AImageIndex as a TImageIndex
@@ -3368,6 +3379,7 @@ begin
   If i < 0 Then
     Begin
       Result := TLabelContainer.Create(strToken, AScope, 0, 0, AImageIndex, AComment);
+      Result.FParent := Self;
       FElements.Insert(Abs(i) - 1, Result);
     End Else
     Begin
@@ -3724,6 +3736,7 @@ begin
   FImageIndex := AImageIndex;
   FSorted := True;
   FReferenced := False;
+  FParent := Nil;
 end;
 
 (**
@@ -4241,7 +4254,7 @@ Begin
   Inherited Create(strName, AScope, iLine, iCol, AImageIndex, Nil);
   FAlias := '';
   FClassMethod := False;
-  FClsName := '';
+  FClassNames := TStringList.Create;
   FComment := Nil;
   FExt := '';
   FMsg := '';
@@ -4262,26 +4275,10 @@ End;
 Destructor TGenericMethodDecl.Destroy;
 
 Begin
+  FClassNames.Free;
   FReturnType.Free;
   FParameters.Free;
   Inherited Destroy;
-End;
-
-(**
-
-  This is a setter method for the ClsName property.
-
-  @precon  Value is the new value to assign to the ClsName property.
-  @postcon Setst the class name property.
-
-  @param   Value as a String
-
-**)
-Procedure TGenericMethodDecl.SetClsName(Value : String);
-
-Begin
-  If FClsName <> Value Then
-    FClsName := Value;
 End;
 
 (**
@@ -4327,10 +4324,19 @@ end;
 **)
 Function TGenericMethodDecl.GetQualifiedName : String;
 
+var
+  i: Integer;
+
 Begin
-  Result := Identifier;
-  If ClsName <> '' Then
-    Result := ClsName + '.' + Result;
+  For i := 0 To FClassNames.Count - 1 Do
+    Begin
+      If Result <> '' Then
+        Result := Result + '.';
+      Result := Result + FClassNames[i];
+    End;
+  If Result <> '' Then
+    Result := Result + '.';
+  Result := Result + Identifier;
 End;
 
 (**

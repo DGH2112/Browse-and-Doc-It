@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    18 Sep 2008
+  @Date    20 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -83,7 +83,8 @@ Type
     doShowMissingFinalComment,
     doShowIDEErrorsOnSuccessfulParse,
     doShowParserErrorOrigin,
-    doShowUnReferencedLocalsPrivates
+    doShowUnReferencedLocalsPrivates,
+    doShowPrefCountersInDocSummary
   );
 
   (** An enumerate to associate images with different types of Elements. **)
@@ -605,6 +606,8 @@ Type
       descendant classes can clone themselves. **)
   TElementContainerClass = Class Of TElementContainer;
 
+  TLabelContainer = Class;
+
   (** This class implements the IElementCollection interface so that this
       element container can be rendered with the module browser. **)
   TElementContainer = Class Abstract
@@ -619,6 +622,7 @@ Type
     FImageIndex : TImageIndex;
     FSorted  : Boolean;
     FReferenced : Boolean;
+    FDocumentConflictLabel : TLabelContainer;
   Protected
     Function GetElementCount : Integer;
     Function GetElements(iIndex : Integer) : TElementContainer;
@@ -630,6 +634,14 @@ Type
     Procedure SetSorted(boolValue : Boolean);
     Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
       strDelimiter : String; iMaxWidth : Integer) : String; Virtual;
+    function GetDocumentConflictLabel : TLabelContainer;
+    (**
+      This property returns a reference to the doucment conflict label.
+      @precon  None.
+      @postcon Returns a reference to the doucment conflict label.
+      @return  a TLabelContainer
+    **)
+    Property DocumentConflictLabel : TLabelContainer Read GetDocumentConflictLabel;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Virtual;
@@ -1433,15 +1445,15 @@ Type
     Property MaxDocOutputWidth : Integer Read FMaxDocOutputWidth Write FMaxDocOutputWidth;
   End;
 
-  (** A silent parser abort exception. **)
-  EParserAbort = Class(Exception);
-
   (** A class to represent a label within the Module Explorer / Documentation **)
   TLabelContainer = Class(TElementContainer)
   Private
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
+
+  (** A silent parser abort exception. **)
+  EParserAbort = Class(Exception);
 
 ResourceString
   (** Options text for Draw Syntax Highlighted Module Explorer **)
@@ -1526,6 +1538,8 @@ ResourceString
   strShowParserErrorOrigin = 'Show the origin method of the Parser error.';
   (** Options text for showing unreferenced locals and privates. **)
   strShowUnreferencedLocals = 'Show all unreferenced local and private symbols.';
+  (** Options text for showing preformance counters in the documentation summary. **)
+  strShowPerfCountersInDocSummary = 'Show performance counters in the documenation summary.';
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
@@ -2022,7 +2036,8 @@ Const
     (FDescription : strShowMissingFinalComment;            FEnabled : False),
     (FDescription : strShowIDEErrorsOnSuccessfulParse;     FEnabled : False),
     (FDescription : strShowParserErrorOrigin;              FEnabled : False),
-    (FDescription : strShowUnreferencedLocals;             FEnabled : False)
+    (FDescription : strShowUnreferencedLocals;             FEnabled : False),
+    (FDescription : strShowPerfCountersInDocSummary;       FEnabled : False)
   );
 
   (** This is a default set of font information for the application. **)
@@ -3404,7 +3419,7 @@ begin
     iIcon := iiDocConflictItem;
   End;
   Assert(objModuleRootElement <> Nil, 'objModuleRootElement can not be null!');
-  E := objModuleRootElement.FindElement(strDocumentationConflicts);
+  E := objModuleRootElement.DocumentConflictLabel;
   If E = Nil Then
     Begin
       E := TLabelContainer.Create(strDocumentationConflicts, scGlobal, 0, 0,
@@ -3847,6 +3862,23 @@ begin
         Result := i;
         Break;
       End;
+end;
+
+(**
+
+  This is a getter method for the DocumentConflictLabel property.
+
+  @precon  None.
+  @postcon Returns the reference to the document conflict label.
+
+  @return  a TLabelContainer
+
+**)
+function TElementContainer.GetDocumentConflictLabel : TLabelContainer;
+begin
+  If FDocumentConflictLabel = Nil Then
+    FDocumentConflictLabel := FindElement(strDocumentationConflicts) As TLabelContainer;
+  Result := FDocumentConflictLabel;
 end;
 
 (**

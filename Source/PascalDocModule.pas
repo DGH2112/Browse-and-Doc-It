@@ -12,7 +12,6 @@
 
   @bug        Can not resolve constants, variables and types within a class
               declaration.
-  @bug        Do class vars, consts and types require documenting?
 
 **)
 Unit PascalDocModule;
@@ -1507,6 +1506,11 @@ begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctFieldClauseUndocumented]);
     End;
+  If doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options Then
+    If Scope In [scPrivate, scProtected, scPublic] Then
+      If Not Referenced Then
+        AddIssue(Format(strUnreferencedLocal, [Identifier]),
+          scNone, 'CheckDocumentation', Line, Column, etHint);
 end;
 
 (**
@@ -8160,6 +8164,34 @@ End;
 
  **)
 Procedure TClassDecl.CheckDocumentation(var boolCascade : Boolean);
+
+  (**
+
+    This function checks that the class sub element should be documented.
+
+    @precon  None.
+    @postcon Checks that the class sub element should be documented.
+
+    @param   strLabel as a String
+    @return  a Boolean 
+
+  **)
+  Function CanCheckClassElements(strLabel : String) : Boolean;
+
+  Const
+    strClassDecls : Array[1..4] Of String = (strTypesLabel, strConstantsLabel,
+      strVarsLabel, strClassVarsLabel);
+
+  Var
+    i: Integer;
+
+  Begin
+    Result := True;
+    If Not (doShowUndocumentedClassDecls In BrowseAndDocItOptions.Options) Then
+      For i := Low(strClassDecls) to High(strClassDecls) Do
+        Result := Result And (strClassDecls[i] <> strLabel);
+  End;
+
 var
   i: Integer;
 
@@ -8170,8 +8202,10 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctClassClauseUndocumented]);
     End;
-  For i := 1 to ElementCount Do
-    Elements[i].CheckDocumentation(boolCascade);
+  If boolCascade Then
+    For i := 1 To ElementCount Do
+      If CanCheckClassElements(Elements[i].Identifier) Then
+        Elements[i].CheckDocumentation(boolCascade);
 End;
 
 (**

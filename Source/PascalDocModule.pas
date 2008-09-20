@@ -7,13 +7,15 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       18 Sep 2008
+  @Date       20 Sep 2008
   @Author     David Hoyle
 
   @bug        Can not resolve constants, variables and types within a class
               declaration.
   @bug        Do class vars, consts and types require documenting?
-  @bug        Can not resolved implemented methods for child classes, etc. 
+  @bug        Can not resolved implemented methods for child classes, etc.
+
+  @todo       Allow option to document record, object and class fields.
 
 **)
 Unit PascalDocModule;
@@ -508,6 +510,8 @@ Type
   Private
     FSourceStream : TStream;
     FMethodStack : TObjectList;
+    FTypesLabel: TLabelContainer;
+    FImplementedMethodsLabel: TLabelContainer;
     { Grammar Parsers }
     Procedure Goal;
     Function OPProgram : Boolean;
@@ -661,7 +665,23 @@ Type
     **)
     Property CurrentMethod : TPascalMethod Read GetCurrentMethod;
   Protected
+    function GetTypesLabel : TLabelContainer;
+    function GetImplementedMethodsLabel : TLabelContainer;
     Function GetModuleName : String; Override;
+    (**
+      This property returns a reference to the Types Methods label.
+      @precon  None.
+      @postcon Returns a reference to the Types Methods label.
+      @return  a TLabelContainer
+    **)
+    Property TypesLabel : TLabelContainer Read GetTypesLabel;
+    (**
+      This property returns a reference to the Implemented Methods label.
+      @precon  None.
+      @postcon Returns a reference to the Implemented Methods label.
+      @return  a TLabelContainer
+    **)
+    Property ImplementedMethodsLabel : TLabelContainer Read GetImplementedMethodsLabel;
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
       ModuleOptions : TModuleOptions);
@@ -2029,7 +2049,7 @@ begin
           Container := Add(strImplementedMethods, iiImplementedMethods, scNone, Nil);
           iIcon := iiUnknownClsObj;
           AScope := scNone;
-          E := FindElement(strTypesLabel);
+          E := TypesLabel;
           If E <> Nil Then
             If Method.ClsName <> '' Then
               Begin
@@ -2132,7 +2152,7 @@ end;
   This is a getter method for the CurrentMethod property.
 
   @precon  None.
-  @postcon Returns the method on top of the method stack else returns nil.  
+  @postcon Returns the method on top of the method stack else returns nil.
 
   @return  a TPascalMethod
 
@@ -2143,6 +2163,24 @@ begin
     Result := Nil
   Else
     Result := FMethodStack[FMethodStack.Count - 1] As TPascalMethod;
+end;
+
+(**
+
+  This is a getter method for the ImplementedMethodsLabel property.
+
+  @precon  None.
+  @postcon Returns a reference to the Implemented Methods Label.
+
+  @return  a TLabelContainer
+
+**)
+function TPascalModule.GetImplementedMethodsLabel: TLabelContainer;
+
+begin
+  If FImplementedMethodsLabel = Nil Then
+    FImplementedMethodsLabel := FindElement(strImplementedMethods) As TLabelContainer;
+  Result := FImplementedMethodsLabel;
 end;
 
 (**
@@ -2240,7 +2278,7 @@ begin
             If AnsiCompareText(M[i].Identifier, strSymbol) = 0 Then
               M[i].Referenced := True;
       End;
-  E := FindElement(strImplementedMethods);
+  E := ImplementedMethodsLabel;
   If E <> Nil Then
     For i := 1 To E.ElementCount Do
       If E[i].Scope In [scLocal] Then
@@ -3241,6 +3279,24 @@ Begin
     Result := OPType(AToken);
   PortabilityDirective;
 End;
+
+(**
+
+  This is a getter method for the types label property.
+
+  @precon  None.
+  @postcon Returns a reference to the types label.
+
+  @return  a TLabelContainer
+
+**)
+function TPascalModule.GetTypesLabel: TLabelContainer;
+
+begin
+  If FTypesLabel = Nil Then
+    FTypesLabel := FindElement(strTypesLabel) As TLabelContainer;
+  Result := FTypesLabel;
+end;
 
 (**
 
@@ -6384,8 +6440,8 @@ begin
   If I <> Nil Then
     If I.ElementCount > 0 Then
       Exit; // Only resolved methods IF there are no other errors.
-  I := FindElement(strImplementedMethods);
-  T := FindElement(strTypesLabel);
+  I := ImplementedMethodsLabel;
+  T := TypesLabel;
   X := FindElement(strExportedHeadings);
   // Resolve the scope of implemented methods of classes.
   If (i <> Nil) And (T <> Nil) Then

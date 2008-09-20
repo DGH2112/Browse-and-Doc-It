@@ -626,7 +626,6 @@ Begin
               End;
             If M = Nil Then
               Exit;
-            M.AddTickCount('C');
             // Create Root Tree Node
             FModule := AddNode(Nil, M.ModuleName, M.ModuleNameLine,
               M.ModuleNameCol, M.ImageIndexAdjustedForScope, M.Comment,
@@ -649,7 +648,6 @@ Begin
           Finally
             FSpecialTagNodes := Nil;
           End;
-          M.AddTickCount('S');
         Finally
           Items.EndUpdate;
         End;

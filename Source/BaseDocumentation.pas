@@ -3,7 +3,7 @@
   This module contains a base class for all documentation modules.
 
   @Author  David Hoyle
-  @Date    09 Sep 2008
+  @Date    19 Sep 2008
   @Version 1.0
 
 **)
@@ -58,14 +58,8 @@ Uses
 
 **)
 Procedure TBaseDocumentation.Add(strFileName : String);
-var
-  i: Integer;
 
 Begin
-  For i := 0 To BrowseAndDocItOptions.ExcludeDocFiles.Count -1 Do
-    If Pos(Lowercase(BrowseAndDocItOptions.ExcludeDocFiles[i]),
-      Lowercase(strFileName)) > 0 Then
-      Exit;
   If CanAddDocument(strFileName) Then
     FFileNames.Add(strFileName);
 End;

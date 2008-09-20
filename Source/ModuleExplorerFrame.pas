@@ -948,6 +948,9 @@ begin
         sl := Tokenize(Node.Text, strKeyWords, BrowseAndDocItOptions.TokenLimit);
         Try
           // Highlight selected item.
+          NodeRect := Node.DisplayRect(False);
+          Brush.Color := tvExplorer.Color;
+          FillRect(NodeRect);
           If cdsSelected In State Then
             Begin
               NodeRect := Node.DisplayRect(True);
@@ -959,8 +962,11 @@ begin
                   Inc(iPos, TextWidth(sl[i]) + 1);
                 End;
               NodeRect.Right := NodeRect.Left + iPos;
-              Brush.Color := clInfoBk;
-              FillRect(NodeRect);
+              If cdsFocused In State Then
+                Begin
+                  Brush.Color := clInfoBk;
+                  FillRect(NodeRect);
+                End;
               Pen.Color := clBlack;
               Rectangle(NodeRect);
             End;

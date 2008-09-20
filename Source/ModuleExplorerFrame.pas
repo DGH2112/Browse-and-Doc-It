@@ -498,7 +498,7 @@ Begin
       Node := tvExplorer.Items[i];
       If Node.Count = 0 Then
         Continue;
-      str := StringReplace(GetNodePath(Node), '=', '|', [rfReplaceAll]);
+      str := GetNodePath(Node);
       If Node.Expanded And (str <> '') Then
         Begin
           If Not BrowseAndDocItOptions.ExpandedNodes.Find(str, iIndex) Then
@@ -531,7 +531,7 @@ Begin
       Node := tvExplorer.Items[i];
       If Node.Count = 0 Then
         Continue;
-      str := StringReplace(GetNodePath(Node), '=', '|', [rfReplaceAll]);
+      str := GetNodePath(Node);
       If BrowseAndDocItOptions.ExpandedNodes.Find(str, j) Then
         Node.Expanded := True;
     End;

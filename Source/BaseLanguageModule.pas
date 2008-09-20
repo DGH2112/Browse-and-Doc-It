@@ -51,14 +51,6 @@ Type
     doShowHints,
     doShowConflicts,
 
-    doShowMissingProcDocs,
-    doShowMissingDocDesc,
-    doShowDiffParamCount,
-    doShowUndocumentedParams,
-    doShowIncorrectParamType,
-    doShowUndocumentedReturn,
-    doShowIncorrectReturnType,
-
     doShowUndocumentedTypes,
     doShowUndocumentedRecords,
     doShowUndocumentedObjects,
@@ -67,6 +59,7 @@ Type
     doShowUndocumentedVars,
     doShowUndocumentedConsts,
     doShowUndocumentedFields,
+    doShowUndocumentedClassDecls,
 
     doShowUndocumentedModule,
     doShowMissingModuleDate,
@@ -74,23 +67,30 @@ Type
     doShowMissingModuleVersion,
     doShowMissingModuleAuthor,
 
-    doShowMissingPreCons,
-    doShowMissingPostCons,
-    doShowMissingPropertyDoc,
-    doShowMissingPropDocDesc,
-    doShowDiffPropParamCount,
+    doShowMethodMissingDocs,
+    doShowMethodMissingDocDesc,
+    doShowMethodDiffParamCount,
+    doShowMethodUndocumentedParams,
+    doShowMethodIncorrectParamType,
+    doShowMethodUndocumentedReturn,
+    doShowMethodIncorrectReturnType,
+    doShowMethodMissingPreCons,
+    doShowMethodMissingPostCons,
 
-    doShowUndocPropParam,
-    doShowIncorrectPropParamType,
-    doShowUndocPropReturn,
-    doShowIncorrectPropReturnType,
-    doShowMissingPropPreCons,
-    doShowMissingPropPostCons,
+    doShowPropertyMissingDoc,
+    doShowPropertyMissingDocDesc,
+    doShowPropertyDiffPropParamCount,
+    doShowPropertyUndocumentedParams,
+    doShowPropertyIncorrectParamType,
+    doShowPropertyUndocumentedReturn,
+    doShowPropertyIncorrectReturnType,
+    doShowPropertyMissingPreCons,
+    doShowPropertyMissingPostCons,
 
     doShowMissingInitComment,
     doShowMissingFinalComment,
 
-    doShowIDEErrorsOnSuccessfulParse,
+    {doShowIDEErrorsOnSuccessfulParse,}
     doShowParserErrorOrigin,
     doShowUnReferencedLocalsPrivates,
     doShowPrefCountersInDocSummary
@@ -1517,6 +1517,8 @@ ResourceString
   strShowUndocumentedConstants = 'Show Undocumented Constants';
   (** Options text for Show Undocumented Fields **)
   strShowUndocumentedFields = 'Show Undocumented Fields';
+  (** Options text for Show Undocumented Class Decls **)
+  strShowUndocumentedClassDecls = 'Show Undocumented Class Types, Vars and Consts';
   (** Options text for Show Undocumented Module **)
   strShowUndocumentedModule = 'Show Undocumented Module';
   (** Options text for Show Missing Module Date **)
@@ -1554,7 +1556,7 @@ ResourceString
   (** Options text for Show Missing Finalization Comment **)
   strShowMissingFinalComment = 'Show Missing Finalization Comments';
   (** Options text for Showing IDE error messages when no parser messages. **)
-  strShowIDEErrorsOnSuccessfulParse = 'Show IDE Error messages if parser is successfully.';
+  {strShowIDEErrorsOnSuccessfulParse = 'Show IDE Error messages if parser is successfully.';}
   (** Options text for showing the origin method of the parser errors. **)
   strShowParserErrorOrigin = 'Show the origin method of the Parser error.';
   (** Options text for showing unreferenced locals and privates. **)
@@ -2035,13 +2037,6 @@ Const
     (FDescription : strShowHints;                          FEnabled : False),
     (FDescription : strShowDocumentationConflicts;         FEnabled : False),
 
-    (FDescription : strShowMissingMethodDocumentation;     FEnabled : True),
-    (FDescription : strShowMissingMethodDocDesc;           FEnabled : True),
-    (FDescription : strShowDiffMethodParameterCount;       FEnabled : True),
-    (FDescription : strShowUndocumentedMethodParameters;   FEnabled : True),
-    (FDescription : strShowIncorrectMethodParameterType;   FEnabled : True),
-    (FDescription : strShowUndocumentedMethodReturn;       FEnabled : True),
-    (FDescription : strShowIncorrectMethodReturnType;      FEnabled : True),
 
     (FDescription : strShowUndocumentedTypes;              FEnabled : False),
     (FDescription : strShowUndocumentedRecords;            FEnabled : False),
@@ -2051,6 +2046,7 @@ Const
     (FDescription : strShowUndocumentedVariables;          FEnabled : False),
     (FDescription : strShowUndocumentedConstants;          FEnabled : False),
     (FDescription : strShowUndocumentedFields;             FEnabled : False),
+    (FDescription : strShowUndocumentedClassDecls;         FEnabled : False),
 
     (FDescription : strShowUndocumentedModule;             FEnabled : True),
     (FDescription : strShowMissingModuleDate;              FEnabled : False),
@@ -2058,6 +2054,13 @@ Const
     (FDescription : strShowMissingModuleVersion;           FEnabled : False),
     (FDescription : strShowMissingModuleAuthor;            FEnabled : False),
 
+    (FDescription : strShowMissingMethodDocumentation;     FEnabled : True),
+    (FDescription : strShowMissingMethodDocDesc;           FEnabled : True),
+    (FDescription : strShowDiffMethodParameterCount;       FEnabled : True),
+    (FDescription : strShowUndocumentedMethodParameters;   FEnabled : True),
+    (FDescription : strShowIncorrectMethodParameterType;   FEnabled : True),
+    (FDescription : strShowUndocumentedMethodReturn;       FEnabled : True),
+    (FDescription : strShowIncorrectMethodReturnType;      FEnabled : True),
     (FDescription : strShowMissingMethodPreConditions;     FEnabled : False),
     (FDescription : strShowMissingMethodPostConditions;    FEnabled : False),
 
@@ -2074,7 +2077,7 @@ Const
     (FDescription : strShowMissingInitComment;             FEnabled : False),
     (FDescription : strShowMissingFinalComment;            FEnabled : False),
 
-    (FDescription : strShowIDEErrorsOnSuccessfulParse;     FEnabled : False),
+    {(FDescription : strShowIDEErrorsOnSuccessfulParse;     FEnabled : False),}
     (FDescription : strShowParserErrorOrigin;              FEnabled : False),
     (FDescription : strShowUnreferencedLocals;             FEnabled : False),
     (FDescription : strShowPerfCountersInDocSummary;       FEnabled : False)
@@ -5296,13 +5299,13 @@ Procedure TGenericMethodDecl.CheckMethodDocumentation;
 Begin
   If Comment = Nil Then
     Begin
-      If doShowMissingProcDocs In BrowseAndDocItOptions.Options Then
+      If doShowMethodMissingDocs In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([QualifiedName], Line, Column, Comment,
           DocConflictTable[dctMethodUndocumented]);
       Exit;
     End;
   If (Comment.TokenCount = 0) And
-    (doShowMissingDocDesc In BrowseAndDocItOptions.Options) Then
+    (doShowMethodMissingDocDesc In BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([QualifiedName], Line, Column, Comment,
       DocConflictTable[dctMethodHasNoDesc]);
 End;
@@ -5339,13 +5342,13 @@ Begin
             DocConflictTable[dctMethodPreconNotDocumented]);
       End;
   If (ParameterCount <> j) And
-    (doShowDiffParamCount In BrowseAndDocItOptions.Options) Then
+    (doShowMethodDiffParamCount In BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([QualifiedName], Line, Column, Comment,
       DocConflictTable[dctMethodDiffParamCount]);
-  If (k < 1) And (doShowMissingPreCons In BrowseAndDocItOptions.Options) Then
+  If (k < 1) And (doShowMethodMissingPreCons In BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([QualifiedName], Line, Column, Comment,
       DocConflictTable[dctMethodMissingPreCon]);
-  If (k > 1) And (doShowMissingPreCons In BrowseAndDocItOptions.Options) Then
+  If (k > 1) And (doShowMethodMissingPreCons In BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([QualifiedName], Line, Column, Comment,
       DocConflictTable[dctMethodTooManyPrecons]);
 End;
@@ -5382,7 +5385,7 @@ Begin
               Break;
             End;
       If (iFound = -1) And
-        (doShowUndocumentedParams In BrowseAndDocItOptions.Options) Then
+        (doShowMethodUndocumentedParams In BrowseAndDocItOptions.Options) Then
         AddDocumentConflict([Parameters[i].Identifier, QualifiedName],
           Line, Column, Comment, DocConflictTable[dctMethodUndocumentedParam]);
       // Parameter type
@@ -5399,7 +5402,7 @@ Begin
                   strType := Tag[iFound].Token[3];
             strParam := Parameters[i].ParamReturn;
             If Not (LowerCase(strType) = Lowercase(strParam)) Then
-              If (doShowIncorrectParamType In BrowseAndDocItOptions.Options) Then
+              If (doShowMethodIncorrectParamType In BrowseAndDocItOptions.Options) Then
                 AddDocumentConflict([Parameters[i].Identifier, QualifiedName],
                   Line, Column, Comment, DocConflictTable[dctMethodIncorrectParamType]);
           End;
@@ -5444,14 +5447,14 @@ Begin
                 Break;
               End;
       If (iFound = -1) And
-        (doShowUndocumentedReturn In BrowseAndDocItOptions.Options) Then
+        (doShowMethodUndocumentedReturn In BrowseAndDocItOptions.Options) Then
         AddDocumentConflict([QualifiedName], Line, Column,
           Comment, DocConflictTable[dctMethodUndocumentedReturn])
       Else
         Begin
           If ((Comment.Tag[iFound].TokenCount < 2) Or
             (AnsiCompareText(ReturnType.AsString, Comment.Tag[iFound][1]) <> 0)) And
-            (doShowIncorrectReturnType In BrowseAndDocItOptions.Options) Then
+            (doShowMethodIncorrectReturnType In BrowseAndDocItOptions.Options) Then
             AddDocumentConflict([QualifiedName], Line, Column, Comment,
               DocConflictTable[dctMethodIncorrectReturntype]);
         End;
@@ -5460,10 +5463,10 @@ Begin
         AddDocumentConflict([QualifiedName], Line, Column, Comment,
           DocConflictTable[dctMethodReturnNotRequired]);
   iFound := 0;
-  If (k = 0) And (doShowMissingPostCons in BrowseAndDocItOptions.Options) Then
+  If (k = 0) And (doShowMethodMissingPostCons in BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([QualifiedName], Line, Column, Comment,
       DocConflictTable[dctMethodMissingPostCon]);
-  If doShowMissingPostCons in BrowseAndDocItOptions.Options Then
+  If doShowMethodMissingPostCons in BrowseAndDocItOptions.Options Then
     If (k > 1) And (iFound <> -1) Then
       AddDocumentConflict([QualifiedName], Line, Column, Comment,
         DocConflictTable[dctMethodTooManyPostCons]);
@@ -5509,13 +5512,13 @@ Procedure TGenericProperty.CheckPropertyDocumentation;
 Begin
   If Comment = Nil Then
     Begin
-      If doShowMissingPropertyDoc In BrowseAndDocItOptions.Options Then
+      If doShowPropertyMissingDoc In BrowseAndDocItOptions.Options Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
         DocConflictTable[dctPropertyUndocumented]);
       Exit;
     End;
   If (Comment.TokenCount = 0) And
-    (doShowMissingPropDocDesc In BrowseAndDocItOptions.Options) Then
+    (doShowPropertyMissingDocDesc In BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([Identifier], Line, Column, Comment,
       DocConflictTable[dctPropertyHasNoDesc]);
 End;
@@ -5551,13 +5554,13 @@ Begin
             DocConflictTable[dctPropertyPreconNotDocumented]);
       End;
   If (ParameterCount <> j) And
-    (doShowDiffPropParamCount In BrowseAndDocItOptions.Options) Then
+    (doShowPropertyDiffPropParamCount In BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([Identifier], Line, Column, Comment,
     DocConflictTable[dctPropertyDiffParamCount]);
-  If (k < 1) And (doShowMissingPropPreCons In BrowseAndDocItOptions.Options) Then
+  If (k < 1) And (doShowPropertyMissingPreCons In BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([Identifier], Line, Column, Comment,
     DocConflictTable[dctPropertyMissingPreCon]);
-  If (k > 1) And (doShowMissingPropPreCons In BrowseAndDocItOptions.Options) Then
+  If (k > 1) And (doShowPropertyMissingPreCons In BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([Identifier], Line, Column, Comment,
     DocConflictTable[dctPropertyTooManyPreCons]);
 End;
@@ -5594,7 +5597,7 @@ Begin
               iFound := j;
               Break;
             End;
-      If (iFound = -1) And (doShowUndocPropParam In BrowseAndDocItOptions.Options) Then
+      If (iFound = -1) And (doShowPropertyUndocumentedParams In BrowseAndDocItOptions.Options) Then
         AddDocumentConflict([Parameters[i].Identifier, Identifier], Line, Column,
           Comment, DocConflictTable[dctPropertyUndocumentedParam]);
       // Parameter type
@@ -5611,7 +5614,7 @@ Begin
                   strType := Tag[iFound].Token[3];
             strParam := Parameters[i].ParamReturn;
             If Not ((LowerCase(strType) = Lowercase(strParam))) Then
-              If doShowIncorrectPropParamType In BrowseAndDocItOptions.Options Then
+              If doShowPropertyIncorrectParamType In BrowseAndDocItOptions.Options Then
                 AddDocumentConflict([Parameters[i].Identifier, Identifier], Line,
                   Column, Comment, DocConflictTable[dctPropertyIncorrectParamType]);
         End;
@@ -5655,7 +5658,7 @@ Begin
               Break;
             End;
     End;
-  If (iFound = -1) And (doShowUndocPropReturn in BrowseAndDocItOptions.Options) Then
+  If (iFound = -1) And (doShowPropertyUndocumentedReturn in BrowseAndDocItOptions.Options) Then
     Begin
       If TypeId <> Nil Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
@@ -5664,15 +5667,15 @@ Begin
     Begin
       If ((Comment.Tag[iFound].TokenCount < 2) Or
         (AnsiCompareText(TypeId.AsString, Comment.Tag[iFound][1]) <> 0)) And
-        (doShowIncorrectPropReturnType In BrowseAndDocItOptions.Options) Then
+        (doShowPropertyIncorrectReturnType In BrowseAndDocItOptions.Options) Then
         AddDocumentConflict([Identifier], Line, Column, Comment,
         DocConflictTable[dctPropertyIncorrectReturnType]);
     End;
-  If doShowMissingPropPostCons in BrowseAndDocItOptions.Options Then iFound := 0;
-  If (k = 0) And (doShowMissingPropPostCons in BrowseAndDocItOptions.Options) Then
+  If doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options Then iFound := 0;
+  If (k = 0) And (doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options) Then
     AddDocumentConflict([Identifier], Line, Column, Comment,
     DocConflictTable[dctPropertyMissingPostCon]);
-  If doShowMissingPropPostCons in BrowseAndDocItOptions.Options Then
+  If doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options Then
     If (k > 1) And (iFound <> -1) Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
       DocConflictTable[dctPropertyTooManyPostCons]);

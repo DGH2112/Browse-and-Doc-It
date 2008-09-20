@@ -45,10 +45,12 @@ Type
   TDocOption = (
     doCustomDrawing,
     doShowCommentHints,
+
     doShowErrors,
     doShowWarnings,
     doShowHints,
     doShowConflicts,
+
     doShowMissingProcDocs,
     doShowMissingDocDesc,
     doShowDiffParamCount,
@@ -56,6 +58,7 @@ Type
     doShowIncorrectParamType,
     doShowUndocumentedReturn,
     doShowIncorrectReturnType,
+
     doShowUndocumentedTypes,
     doShowUndocumentedRecords,
     doShowUndocumentedObjects,
@@ -63,24 +66,30 @@ Type
     doShowUndocumentedInterfaces,
     doShowUndocumentedVars,
     doShowUndocumentedConsts,
+    doShowUndocumentedFields,
+
     doShowUndocumentedModule,
     doShowMissingModuleDate,
     doShowCheckModuleDate,
     doShowMissingModuleVersion,
     doShowMissingModuleAuthor,
+
     doShowMissingPreCons,
     doShowMissingPostCons,
     doShowMissingPropertyDoc,
     doShowMissingPropDocDesc,
     doShowDiffPropParamCount,
+
     doShowUndocPropParam,
     doShowIncorrectPropParamType,
     doShowUndocPropReturn,
     doShowIncorrectPropReturnType,
     doShowMissingPropPreCons,
     doShowMissingPropPostCons,
+
     doShowMissingInitComment,
     doShowMissingFinalComment,
+
     doShowIDEErrorsOnSuccessfulParse,
     doShowParserErrorOrigin,
     doShowUnReferencedLocalsPrivates,
@@ -305,6 +314,7 @@ Type
     dctResourceStringClauseUndocumented,
     dctVariableClauseUndocumented,
     dctThreadVarClauseUndocumented,
+    dctFieldClauseUndocumented,
 
     dctClassClauseUndocumented,
 
@@ -1505,6 +1515,8 @@ ResourceString
   strShowUndocumentedVariables = 'Show Undocumented Variables';
   (** Options text for Show Undocumented Constants **)
   strShowUndocumentedConstants = 'Show Undocumented Constants';
+  (** Options text for Show Undocumented Fields **)
+  strShowUndocumentedFields = 'Show Undocumented Fields';
   (** Options text for Show Undocumented Module **)
   strShowUndocumentedModule = 'Show Undocumented Module';
   (** Options text for Show Missing Module Date **)
@@ -1751,6 +1763,16 @@ ResourceString
   strThreadVarClauseUndocumentedDesc = 'Each Thread Variable declaration ' +
     'should have a short description which attempts to decribed what the ' +
     'thread variable is used for.';
+
+  (** This is the tree branch under which field documentation error appear **)
+  strFieldDocumentation = 'Field Documentation';
+  (** Document conflict message for an undocumented field clause item. **)
+  strFieldClauseUndocumented = 'Field ''%s'' is undocumented.';
+  (** Document conflict message description for an undocumented Field
+      clause item. **)
+  strFieldClauseUndocumentedDesc = 'Each Field declaration ' +
+    'should have a short description which attempts to decribed what the ' +
+    'field is used for.';
 
   (** This is the tree branch under which record documentation error appear **)
   strRecordDocumentation = 'Record Documentation';
@@ -2007,10 +2029,12 @@ Const
   DocOptionInfo : Array[Low(TDocOption)..High(TDocOption)] Of TDocOptionRec = (
     (FDescription : strDrawSynHighModuleExplorer;          FEnabled : False),
     (FDescription : strShowCommentsInTheHints;             FEnabled : False),
+
     (FDescription : strShowErrors;                         FEnabled : True),
     (FDescription : strShowWarnings;                       FEnabled : False),
     (FDescription : strShowHints;                          FEnabled : False),
     (FDescription : strShowDocumentationConflicts;         FEnabled : False),
+
     (FDescription : strShowMissingMethodDocumentation;     FEnabled : True),
     (FDescription : strShowMissingMethodDocDesc;           FEnabled : True),
     (FDescription : strShowDiffMethodParameterCount;       FEnabled : True),
@@ -2018,6 +2042,7 @@ Const
     (FDescription : strShowIncorrectMethodParameterType;   FEnabled : True),
     (FDescription : strShowUndocumentedMethodReturn;       FEnabled : True),
     (FDescription : strShowIncorrectMethodReturnType;      FEnabled : True),
+
     (FDescription : strShowUndocumentedTypes;              FEnabled : False),
     (FDescription : strShowUndocumentedRecords;            FEnabled : False),
     (FDescription : strShowUndocumentedObjects;            FEnabled : False),
@@ -2025,13 +2050,17 @@ Const
     (FDescription : strShowUndocumentedInterfaces;         FEnabled : False),
     (FDescription : strShowUndocumentedVariables;          FEnabled : False),
     (FDescription : strShowUndocumentedConstants;          FEnabled : False),
+    (FDescription : strShowUndocumentedFields;             FEnabled : False),
+
     (FDescription : strShowUndocumentedModule;             FEnabled : True),
     (FDescription : strShowMissingModuleDate;              FEnabled : False),
     (FDescription : strShowCheckModuleDate;                FEnabled : False),
     (FDescription : strShowMissingModuleVersion;           FEnabled : False),
     (FDescription : strShowMissingModuleAuthor;            FEnabled : False),
+
     (FDescription : strShowMissingMethodPreConditions;     FEnabled : False),
     (FDescription : strShowMissingMethodPostConditions;    FEnabled : False),
+
     (FDescription : strShowMissingPropertyDocumentation;   FEnabled : False),
     (FDescription : strShowMissingPropertyDocuDesc;        FEnabled : False),
     (FDescription : strShowDiffPropertyParameterCount;     FEnabled : False),
@@ -2041,8 +2070,10 @@ Const
     (FDescription : strShowIncorrectPropertyReturnType;    FEnabled : False),
     (FDescription : strShowMissingPropertyPreConditions;   FEnabled : False),
     (FDescription : strShowMissingPropertyPostConditions;  FEnabled : False),
+
     (FDescription : strShowMissingInitComment;             FEnabled : False),
     (FDescription : strShowMissingFinalComment;            FEnabled : False),
+
     (FDescription : strShowIDEErrorsOnSuccessfulParse;     FEnabled : False),
     (FDescription : strShowParserErrorOrigin;              FEnabled : False),
     (FDescription : strShowUnreferencedLocals;             FEnabled : False),
@@ -2307,6 +2338,10 @@ Const
     (FCategory: strThreadVarDocumentation;
       FMessage: strThreadVarClauseUndocumented;
       FDescription: strThreadVarClauseUndocumentedDesc;
+      FConflictType: dciMissing),
+    (FCategory: strFieldDocumentation;
+      FMessage: strFieldClauseUndocumented;
+      FDescription: strFieldClauseUndocumentedDesc;
       FConflictType: dciMissing),
 
     (FCategory: strClassDocumentation;

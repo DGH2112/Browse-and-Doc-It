@@ -13,9 +13,6 @@
   @bug        Can not resolve constants, variables and types within a class
               declaration.
   @bug        Do class vars, consts and types require documenting?
-  @bug        Can not resolved implemented methods for child classes, etc.
-
-  @todo       Allow option to document record, object and class fields.
 
 **)
 Unit PascalDocModule;
@@ -459,6 +456,7 @@ Type
   Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This class represents an exported method. **)
@@ -512,6 +510,7 @@ Type
     FMethodStack : TObjectList;
     FTypesLabel: TLabelContainer;
     FImplementedMethodsLabel: TLabelContainer;
+    FExportedHeadingsLabel: TLabelContainer;
     { Grammar Parsers }
     Procedure Goal;
     Function OPProgram : Boolean;
@@ -655,6 +654,11 @@ Type
     Procedure AddToContainer(Container : TElementContainer; var Method : TPascalMethod);
     Procedure TidyUpEmptyElements;
     Procedure CheckUnResolvedMethods;
+    procedure ResolveScopeOfImplementedClassMethods(StartLabel : TLabelContainer);
+    procedure ResolveScopeOfImplementedExportedMethods;
+    procedure FindUnresolvedObjectAndClassMethods(TypeLabel : TLabelContainer);
+    procedure FindUnresolvedExportedMethods;
+    procedure FindUnresolvedImplementedClassMethods(StartLabel : TLabelContainer);
     Procedure ReferenceLocalsPrivates(strSymbol : String; RefTypes : TRefTypes);
     function GetCurrentMethod: TPascalMethod;
     (**
@@ -667,6 +671,7 @@ Type
   Protected
     function GetTypesLabel : TLabelContainer;
     function GetImplementedMethodsLabel : TLabelContainer;
+    function GetExportedHeadingsLabel : TLabelContainer;
     Function GetModuleName : String; Override;
     (**
       This property returns a reference to the Types Methods label.
@@ -682,6 +687,13 @@ Type
       @return  a TLabelContainer
     **)
     Property ImplementedMethodsLabel : TLabelContainer Read GetImplementedMethodsLabel;
+    (**
+      This property returns a reference to the Exported Headings label.
+      @precon  None.
+      @postcon Returns a reference to the Exported Headings label.
+      @return  a TLabelContainer
+    **)
+    Property ExportedHeadingsLabel : TLabelContainer Read GetExportedHeadingsLabel;
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
       ModuleOptions : TModuleOptions);
@@ -1479,6 +1491,26 @@ end;
 
 (**
 
+  This method check whether the field has been documented correctly.
+
+  @precon  None.
+  @postcon Check whether the field has been documented correctly.
+
+  @param   boolCascade as a Boolean as a reference
+
+**)
+procedure TField.CheckDocumentation(var boolCascade: Boolean);
+begin
+  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+    Begin
+      If doShowUndocumentedFields In BrowseAndDocItOptions.Options Then
+        AddDocumentConflict([Identifier], Line, Column, Comment,
+          DocConflictTable[dctFieldClauseUndocumented]);
+    End;
+end;
+
+(**
+
   This is a getter method for the AsString property.
 
   @precon  None.
@@ -2040,6 +2072,7 @@ Var
   AScope : TScope;
   E : TElementContainer;
   tmpMethod : TPascalMethod;
+  iCls: Integer;
 
 begin
   If Method <> Nil Then
@@ -2051,16 +2084,16 @@ begin
           AScope := scNone;
           E := TypesLabel;
           If E <> Nil Then
-            If Method.ClsName <> '' Then
+            For iCls := 0 To Method.ClassNames.Count - 1 Do
               Begin
-                E := E.FindElement(Method.ClsName);
+                E := E.FindElement(Method.ClassNames[iCls]);
                 If E <> Nil Then
                   Begin
                     iIcon := E.ImageIndex;
                     AScope := E.Scope;
                   End;
-                Container := Container.Add(
-                  TLabelContainer.Create(Method.ClsName, AScope, 0, 0, iIcon, Nil));
+                Container := Container.Add(TLabelContainer.Create(
+                  Method.ClassNames[iCls], AScope, 0, 0, iIcon, Nil));
               End;
         End;
       If Container Is TObjectDecl Then
@@ -2163,6 +2196,23 @@ begin
     Result := Nil
   Else
     Result := FMethodStack[FMethodStack.Count - 1] As TPascalMethod;
+end;
+
+(**
+
+  This is a getter method for the ExportedHeadingsLabel property.
+
+  @precon  None.
+  @postcon Returns a reference to the Exported Headings Label.
+
+  @return  a TLabelContainer
+
+**)
+function TPascalModule.GetExportedHeadingsLabel: TLabelContainer;
+begin
+  If FExportedHeadingsLabel = Nil Then
+    FExportedHeadingsLabel := FindElement(strImplementedMethods) As TLabelContainer;
+  Result := FExportedHeadingsLabel;
 end;
 
 (**
@@ -6291,7 +6341,7 @@ Function TPascalModule.FunctionHeading(AScope :TScope;
 Var
   C : TComment;
   strIdentifier: String;
-  strClsName: String;
+  slClassNames: TStringList;
   iLine: Integer;
   iColumn: Integer;
 
@@ -6313,32 +6363,37 @@ Begin
       // Create method and store in collection and get comment
       iLine := 0;
       iColumn := 0;
+      slClassNames := TStringList.Create;
       Try
-        If boolIdent Then
-          Begin
-            strIdentifier := Token.Token;
-            iLine := Token.Line;
-            iColumn := Token.Column;
-            NextNonCommentToken;
-            // Check for '.' to signify a class method
-            If Token.Token = '.' Then
-              Begin
-                NextNonCommentToken;
-                strClsName := strIdentifier;
-                If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-                  ErrorAndSeekToken(strIdentExpected, 'FunctionHeading', Token.Token,
-                    strSeekableOnErrorTokens, stActual);
-                strIdentifier := Token.Token;
-                iLine := Token.Line;
-                iColumn := Token.Column;
-                NextNonCommentToken;
-              End;
+        Try
+          If boolIdent Then
+            Begin
+              strIdentifier := Token.Token;
+              iLine := Token.Line;
+              iColumn := Token.Column;
+              NextNonCommentToken;
+              // Check for '.' to signify a class method
+                While Token.Token = '.' Do
+                  Begin
+                    NextNonCommentToken;
+                    slClassNames.Add(strIdentifier);
+                    If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
+                      ErrorAndSeekToken(strIdentExpected, 'FunctionHeading', Token.Token,
+                        strSeekableOnErrorTokens, stActual);
+                    strIdentifier := Token.Token;
+                    iLine := Token.Line;
+                    iColumn := Token.Column;
+                    NextNonCommentToken;
+                  End;
             End;
+        Finally
+          Result := TPascalMethod.Create(mtFunction, strIdentifier, AScope,
+            iLine, iColumn);
+          Result.ClassNames.Assign(slClassNames);
+          Result.Comment := C;
+        End;
       Finally
-        Result := TPascalMethod.Create(mtFunction, strIdentifier, AScope,
-          iLine, iColumn);
-        Result.ClsName := strClsName;
-        Result.Comment := C;
+        slClassNames.Free;
       End;
       FormalParameter(Result);
       CheckAlias(Result);
@@ -6431,107 +6486,19 @@ End;
 procedure TPascalModule.CheckUnResolvedMethods;
 
 Var
-  I, T, C, O, N, X : TElementContainer;
-  M : TPascalMethod;
-  k, j : Integer;
+  Errors: TLabelContainer;
 
 begin
-  I := FindElement(strErrors);
-  If I <> Nil Then
-    If I.ElementCount > 0 Then
-      Exit; // Only resolved methods IF there are no other errors.
-  I := ImplementedMethodsLabel;
-  T := TypesLabel;
-  X := FindElement(strExportedHeadings);
-  // Resolve the scope of implemented methods of classes.
-  If (i <> Nil) And (T <> Nil) Then
-    For k := 1 To I.ElementCount Do
-      If Not (I.Elements[k] Is TPascalMethod) Then
-        Begin
-          C := I.Elements[k];
-          For j := 1 To C.ElementCount Do
-            Begin
-              M := C.Elements[j] As TPascalMethod;
-              O := T.FindElement(M.ClsName);
-              If (O <> Nil) And (O Is TObjectDecl) Then
-                Begin
-                  N := O.FindElement(strMethods);
-                  If (N <> Nil) Then
-                    Begin
-                      N := N.FindElement(M.Name);
-                      If (N <> Nil) And (N Is TPascalMethod) Then
-                        Begin
-                          M.Scope := N.Scope;
-                          M.Resolved := True;
-                          (N As TPascalMethod).Resolved := True;
-                        End;
-                    End;
-                End;
-            End;
-        End;
-  // Resolve the scope of implemented exported methods.
-  If (X <> Nil) And (I <> Nil) Then
-    For k := 1 To X.ElementCount Do
-      If X.Elements[k] Is TPascalMethod Then
-        Begin
-          M := X.Elements[k] As TPascalMethod;
-          N := I.FindElement(M.Name);
-          If (N <> Nil) And (N Is TPascalMethod) Then
-            Begin
-              M.Resolved := True;
-              (N As TPascalMethod).Resolved := True;
-              (N As TPascalMethod).Scope := M.Scope;
-            End;
-        End;
-  // Find unresolved declarations
-  If T <> Nil Then
-    For k := 1 To T.ElementCount Do
-      Begin
-        If (T.Elements[k] Is TObjectDecl) And Not (T.Elements[k] Is TInterfaceDecl) Then
-          Begin
-            C := T.Elements[k];
-            O := C.FindElement(strMethods);
-            If O <> Nil Then
-              For j := 1 To O.ElementCount Do
-                If O.Elements[j] Is TPascalMethod Then
-                  Begin
-                    M := O.Elements[j] As TPascalMethod;
-                    If Not M.Resolved And Not M.HasDirective('virtual') Then
-                      AddIssue(Format(strUnSatisfiedForwardReference,
-                        [C.Identifier + '.' + M.Identifier]), scNone, 'CheckUnResolvedMethods', M.Line,
-                        M.Column, etError);
-                  End;
-          End;
-        End;
-  // Find unresolved exported methods.
-  If X <> Nil Then
-    For k := 1 To X.ElementCount Do
-      If X.Elements[k] Is TPascalMethod Then
-        Begin
-          M := X.Elements[k] As TPascalMethod;
-          If Not M.Resolved Then
-            AddIssue(Format(strUnSatisfiedForwardReference,
-              [M.Identifier]), scNone, 'CheckUnResolvedMethods', M.Line,
-              M.Column, etError);
-        End;
-  // Find unresolved class implementations
-  If I <> Nil Then
-    For k := 1 To I.ElementCount Do
-      Begin
-        If Not (I.Elements[k] Is TPascalMethod) Then
-          Begin
-            C := I.Elements[k];
-            For j := 1 To C.ElementCount Do
-              If C.Elements[j] Is TPascalMethod Then
-                Begin
-                  M := C.Elements[j] As TPascalMethod;
-                  If Not M.Resolved Then
-                    AddIssue(Format(strUndeclaredClassMethod,
-                      [C.Identifier + '.' + M.Identifier]), scNone, 'CheckUnResolvedMethods', M.Line,
-                      M.Column, etError);
-                End;
-          End;
-        End;
+  // Only resolved methods IF there are no other errors.
+  Errors := FindElement(strErrors) As TLabelContainer;
+  If Errors <> Nil Then
+    If Errors.ElementCount > 0 Then
+      Exit;
+  ResolveScopeOfImplementedClassMethods(ImplementedMethodsLabel);
+  ResolveScopeOfImplementedExportedMethods;
+  FindUnresolvedObjectAndClassMethods(TypesLabel);
+  FindUnresolvedExportedMethods;
+  FindUnresolvedImplementedClassMethods(ImplementedMethodsLabel);
 end;
 
 (**
@@ -6556,7 +6523,7 @@ Function TPascalModule.ProcedureHeading(AScope : TScope;
 Var
   C : TComment;
   strIdentifier: String;
-  strClsName: String;
+  slClassNames: TStringList;
   iLine, iColumn : Integer;
 
 Begin
@@ -6577,32 +6544,37 @@ Begin
       // Create method and store in collection and get comment
       iLine := 0;
       iColumn := 0;
+      slClassNames := TStringList.Create;
       Try
-        If boolIdent Then
-          Begin
-            strIdentifier := Token.Token;
-            iLine := Token.Line;
-            iColumn := Token.Column;
-            NextNonCommentToken;
-            // Check for '.' to signify a class method
-            If Token.Token = '.' Then
-              Begin
-                NextNonCommentToken;
-                strClsName := strIdentifier;
-                If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-                  ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
-                    strSeekableOnErrorTokens, stActual);
-                strIdentifier := Token.Token;
-                iLine := Token.Line;
-                iColumn := Token.Column;
-                NextNonCommentToken;
+        Try
+          If boolIdent Then
+            Begin
+              strIdentifier := Token.Token;
+              iLine := Token.Line;
+              iColumn := Token.Column;
+              NextNonCommentToken;
+              // Check for '.' to signify a class method
+              While Token.Token = '.' Do
+                Begin
+                  NextNonCommentToken;
+                  slClassNames.Add(strIdentifier);
+                  If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
+                    ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
+                      strSeekableOnErrorTokens, stActual);
+                  strIdentifier := Token.Token;
+                  iLine := Token.Line;
+                  iColumn := Token.Column;
+                  NextNonCommentToken;
+                End;
               End;
-            End;
+        Finally
+          Result := TPascalMethod.Create(mtProcedure, strIdentifier, AScope,
+            iLine, iColumn);
+          Result.ClassNames.Assign(slClassNames);
+          Result.Comment := C;
+        End;
       Finally
-        Result := TPascalMethod.Create(mtProcedure, strIdentifier, AScope,
-          iLine, iColumn);
-        Result.ClsName := strClsName;
-        Result.Comment := C;
+        slClassNames.Free;
       End;
       FormalParameter(Result);
       CheckAlias(Result);
@@ -7047,7 +7019,7 @@ function TPascalModule.ConstructorHeading(AScope: TScope;
 Var
   C : TComment;
   strIdentifier: String;
-  strClsName: String;
+  slClassNames: TStringList;
   iLine: Integer;
   iColumn: Integer;
 
@@ -7062,29 +7034,34 @@ begin
           // Create method and store in collection and get comment
           iLine := 0;
           iColumn := 0;
+          slClassNames := TStringList.Create;
           Try
-            strIdentifier := Token.Token;
-            iLine := Token.Line;
-            iColumn := Token.Column;
-            NextNonCommentToken;
-            // Check for '.' to signify a class method
-            If Token.Token = '.' Then
-              Begin
-                NextNonCommentToken;
-                strClsName := strIdentifier;
-                If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-                  ErrorAndSeekToken(strIdentExpected, 'ConstructorHeading', Token.Token,
-                    strSeekableOnErrorTokens, stActual);
-                strIdentifier := Token.Token;
-                iLine := Token.Line;
-                iColumn := Token.Column;
-                NextNonCommentToken;
-              End;
+            Try
+              strIdentifier := Token.Token;
+              iLine := Token.Line;
+              iColumn := Token.Column;
+              NextNonCommentToken;
+              // Check for '.' to signify a class method
+              While Token.Token = '.' Do
+                Begin
+                  NextNonCommentToken;
+                  slClassNames.Add(strIdentifier);
+                  If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
+                    ErrorAndSeekToken(strIdentExpected, 'ConstructorHeading', Token.Token,
+                      strSeekableOnErrorTokens, stActual);
+                  strIdentifier := Token.Token;
+                  iLine := Token.Line;
+                  iColumn := Token.Column;
+                  NextNonCommentToken;
+                End;
+            Finally
+              Result := TPascalMethod.Create(mtConstructor, strIdentifier, AScope,
+                iLine, iColumn);
+              Result.ClassNames.Assign(slClassNames);
+              Result.Comment := C;
+            End;
           Finally
-            Result := TPascalMethod.Create(mtConstructor, strIdentifier, AScope,
-              iLine, iColumn);
-            Result.ClsName := strClsName;
-            Result.Comment := C;
+            slClassNames.Free;
           End;
           FormalParameter(Result);
         End;
@@ -7114,7 +7091,7 @@ function TPascalModule.DestructorHeading(AScope: TScope;
 Var
   C : TComment;
   strIdentifier: String;
-  strClsName: String;
+  slClassNames: TStringList;
   iLine: Integer;
   iColumn: Integer;
 
@@ -7129,29 +7106,34 @@ begin
           // Create method and store in collection and get comment
           iLine := 0;
           iColumn := 0;
+          slClassNames := TStringList.Create;
           Try
-            strIdentifier := Token.Token;
-            iLine := Token.Line;
-            iColumn := Token.Column;
-            NextNonCommentToken;
-            // Check for '.' to signify a class method
-            If Token.Token = '.' Then
-              Begin
-                NextNonCommentToken;
-                strClsName := strIdentifier;
-                If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-                  ErrorAndSeekToken(strIdentExpected, 'DestructorHeading', Token.Token,
-                    strSeekableOnErrorTokens, stActual);
-                strIdentifier := Token.Token;
-                iLine := Token.Line;
-                iColumn := Token.Column;
-                NextNonCommentToken;
-              End;
+            Try
+              strIdentifier := Token.Token;
+              iLine := Token.Line;
+              iColumn := Token.Column;
+              NextNonCommentToken;
+              // Check for '.' to signify a class method
+              While Token.Token = '.' Do
+                Begin
+                  NextNonCommentToken;
+                  slClassNames.Add(strIdentifier);
+                  If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
+                    ErrorAndSeekToken(strIdentExpected, 'DestructorHeading', Token.Token,
+                      strSeekableOnErrorTokens, stActual);
+                  strIdentifier := Token.Token;
+                  iLine := Token.Line;
+                  iColumn := Token.Column;
+                  NextNonCommentToken;
+                End;
+            Finally
+              Result := TPascalMethod.Create(mtDestructor, strIdentifier, AScope,
+                iLine, iColumn);
+              Result.ClassNames.Assign(slClassNames);
+              Result.Comment := C;
+            End;
           Finally
-            Result := TPascalMethod.Create(mtDestructor, strIdentifier, AScope,
-              iLine, iColumn);
-            Result.ClsName := strClsName;
-            Result.Comment := C;
+            slClassNames.Free;
           End;
           FormalParameter(Result);
         End;
@@ -8447,6 +8429,237 @@ begin
     End;
   If iSkip < 0 Then
     iSkip := 0;
+end;
+
+(**
+
+  This method find unresolved implemented methods, both within objects and
+  classes and simple procedures and function and outputs an error if they are
+  unresolved.
+
+  @precon  None.
+  @postcon Find unresolved implemented methods, both within objects and
+           classes and simple procedures and function and outputs an error if
+           they are unresolved.
+
+  @param   StartLabel as a TLabelContainer
+
+**)
+procedure TPascalModule.FindUnresolvedImplementedClassMethods(
+  StartLabel : TLabelContainer);
+
+var
+  Method: TPascalMethod;
+  ClassLabel: TLabelContainer;
+  k: Integer;
+
+begin
+  If StartLabel <> Nil Then
+    For k := 1 To StartLabel.ElementCount Do
+      Begin
+        If StartLabel.Elements[k] Is TPascalMethod Then
+          Begin
+            Method := StartLabel.Elements[k] As TPascalMethod;
+            If Not Method.Resolved Then
+              AddIssue(Format(strUndeclaredClassMethod, [Method.QualifiedName]),
+                  scNone, 'FindUnresolvedImplementedClassMethods', Method.Line,
+                  Method.Column, etError);
+          End Else
+          Begin
+            ClassLabel := StartLabel.Elements[k] as TLabelContainer;
+            FindUnresolvedImplementedClassMethods(ClassLabel);
+          End;
+      End;
+end;
+
+(**
+
+  This method find unresolved exported headings and outputs them as errors.
+
+  @precon  None.
+  @postcon Find unresolved exported headings and outputs them as errors.
+
+**)
+procedure TPascalModule.FindUnresolvedExportedMethods;
+
+var
+  Method: TPascalMethod;
+  k: Integer;
+
+begin
+  If ExportedHeadingsLabel <> Nil Then
+    For k := 1 To ExportedHeadingsLabel.ElementCount Do
+      If ExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
+        Begin
+          Method := ExportedHeadingsLabel.Elements[k] As TPascalMethod;
+          If Not Method.Resolved Then
+            AddIssue(Format(strUnSatisfiedForwardReference, [Method.Identifier]),
+              scNone, 'FindUnresolvedExportedMethods', Method.Line, Method.Column, etError);
+        End;
+end;
+
+(**
+
+  This method finds all the unresolved object and class methods in a recursive
+  manner to capture any private classes of classes.
+
+  @precon  None.
+  @postcon Finds all the unresolved object and class methods in a recursive
+           manner to capture any private classes of classes.
+
+  @param   TypeLabel as a TLabelContainer
+
+**)
+procedure TPascalModule.FindUnresolvedObjectAndClassMethods(TypeLabel : TLabelContainer);
+
+  (**
+
+    This function walks backwards through the heirarchy to find all the
+    qualifying objects and classes.
+
+    @precon  None.
+    @postcon Walks backwards through the heirarchy to find all the
+             qualifying objects and classes.
+
+    @param   ObjOrCls as a TObjectDecl
+    @return  a String
+
+  **)
+  Function GetClassQualification(ObjOrCls : TObjectDecl) : String;
+
+  Var
+    P : TElementContainer;
+
+  Begin
+    Result := '';
+    P := ObjOrCls;
+    While P <> Nil Do
+      Begin
+        If P Is TObjectDecl Then
+          Result := P.Identifier + '.' + Result;
+        P := P.Parent;
+      End;
+  End;
+
+var
+  Method: TPascalMethod;
+  j: Integer;
+  MethodsLabel: TElementContainer;
+  ObjectOrClass: TObjectDecl;
+  k: Integer;
+  ClassTypeLabel: TLabelContainer;
+
+begin
+  If TypeLabel <> Nil Then
+    For k := 1 To TypeLabel.ElementCount Do
+      Begin
+        If (TypeLabel.Elements[k] Is TObjectDecl) And Not
+          (TypeLabel.Elements[k] Is TInterfaceDecl) Then
+          Begin
+            ObjectOrClass := TypeLabel.Elements[k] As TObjectDecl;
+            MethodsLabel := ObjectOrClass.FindElement(strMethods);
+            If MethodsLabel <> Nil Then
+              For j := 1 To MethodsLabel.ElementCount Do
+                If MethodsLabel.Elements[j] Is TPascalMethod Then
+                  Begin
+                    Method := MethodsLabel.Elements[j] As TPascalMethod;
+                    If Not Method.Resolved And Not Method.HasDirective('virtual') Then
+                      AddIssue(Format(strUnSatisfiedForwardReference,
+                        [GetClassQualification(ObjectOrClass) + Method.Identifier]),
+                        scNone, 'FindUnresolvedObjectAndClassMethods', Method.Line,
+                        Method.Column, etError);
+                  End;
+            ClassTypeLabel := ObjectOrClass.FindElement(strTypesLabel) As TLabelContainer;
+            If ClassTypeLabel <> Nil Then
+              FindUnresolvedObjectAndClassMethods(ClassTypeLabel);
+          End;
+      end;
+end;
+
+(**
+
+  This method Resolved the scope of implemented exported headings.
+
+  @precon  None.
+  @postcon Resolved the scope of implemented exported headings.
+
+**)
+procedure TPascalModule.ResolveScopeOfImplementedExportedMethods;
+
+var
+  ImplementedMethod: TElementContainer;
+  Method: TPascalMethod;
+  k: Integer;
+
+begin
+  If (ExportedHeadingsLabel <> Nil) And (ImplementedMethodsLabel <> Nil) Then
+    For k := 1 To ExportedHeadingsLabel.ElementCount Do
+      If ExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
+        Begin
+          Method := ExportedHeadingsLabel.Elements[k] As TPascalMethod;
+          ImplementedMethod := ImplementedMethodsLabel.FindElement(Method.Name);
+          If (ImplementedMethod <> Nil) And (ImplementedMethod Is TPascalMethod) Then
+            Begin
+              Method.Resolved := True;
+              (ImplementedMethod As TPascalMethod).Resolved := True;
+              (ImplementedMethod As TPascalMethod).Scope := Method.Scope;
+            End;
+        End;
+end;
+
+(**
+
+  This method searches the types tree for the declarations of the methods found
+  in the implemented methods element and marks elements as resolved.
+
+  @precon  None.
+  @postcon Searches the types tree for the declarations of the methods found
+           in the implemented methods element and marks elements as resolved.
+
+  @param   StartLabel as a TLabelContainer
+
+**)
+procedure TPascalModule.ResolveScopeOfImplementedClassMethods(
+  StartLabel : TLabelContainer);
+
+var
+  Element: TElementContainer;
+  Method: TPascalMethod;
+  j: Integer;
+  i: Integer;
+  sl : TStringList;
+
+begin
+  If StartLabel <> Nil Then
+    For i := 1 To StartLabel.ElementCount Do
+      If StartLabel.Elements[i] Is TPascalMethod Then
+        Begin
+          Method := StartLabel.Elements[i] As TPascalMethod;
+          sl := Method.ClassNames;
+          Element := Self;
+          For j := 0 To sl.Count - 1 Do
+            Begin
+              Element := Element.FindElement(strTypesLabel);
+              If Element <> Nil Then
+                Element := Element.FindElement(sl[j]);
+            End;
+          If Element Is TObjectDecl Then
+            Begin
+              Element := Element.FindElement(strMethods);
+              If Element <> Nil Then
+                Begin
+                  Element := Element.FindElement(Method.Name);
+                  If Element Is TPascalMethod Then
+                    Begin
+                      Method.Scope := Element.Scope;
+                      Method.Resolved := True;
+                      (Element As TPascalMethod).Resolved := True;
+                    End;
+                End;
+            End;
+        End Else
+          ResolveScopeOfImplementedClassMethods(
+            StartLabel.Elements[i] As TLabelContainer);
 end;
 
 (**

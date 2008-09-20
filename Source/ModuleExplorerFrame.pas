@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    14 Sep 2008
+  @Date    20 Sep 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -633,7 +633,6 @@ Begin
               stIdentifier);
             CreateSpecialTagNodes;
             OutputModuleInfo(M);
-            M.AddTickCount('B');
             SetExpandedNodes;
             ExpandNodes;
             // Restore top and selected items
@@ -686,19 +685,21 @@ End;
 
 **)
 procedure TframeModuleExplorer.OutputModuleInfo(Container : TElementContainer);
+
+Const
+  strPromotedLabels : Array[1..4] Of String = (strDocumentationConflicts,
+    strHints, strWarnings, strErrors);
+
 var
-  N: TTreeNode;
+  i, j: Integer;
 
 begin
   RenderContainers(FModule, Container);
   GetBodyCommentTags(Container As TBaseLanguageModule);
-  N := FModule.getFirstChild;
-  While N <> Nil Do
-    Begin
-      If N.Text = strDocumentationConflicts Then
-        FModule.MoveTo(FModule, naInsert);
-      N := FModule.GetNextChild(N);
-    End;
+  For j := Low(strPromotedLabels) To High(strPromotedLabels) Do
+    For i := 0 To FModule.Count - 1 Do
+      If FModule.Item[i].Text = strPromotedLabels[j] Then
+        FModule.Item[i].MoveTo(FModule.getFirstChild, naAddFirst);
 end;
 
 

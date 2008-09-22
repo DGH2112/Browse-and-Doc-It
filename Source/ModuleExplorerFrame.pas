@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    20 Sep 2008
+  @Date    22 Sep 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -583,6 +583,7 @@ Var
   i : Integer;
   strTop : String;
   strSelection : String;
+  strTickLabel: String;
 
 Begin
   tvExplorer.Color := BRowseAndDocItOptions.BGColour;
@@ -626,12 +627,14 @@ Begin
               End;
             If M = Nil Then
               Exit;
+            M.AddTickCount('Render(C:B:S:R)');
             // Create Root Tree Node
             FModule := AddNode(Nil, M.ModuleName, M.ModuleNameLine,
               M.ModuleNameCol, M.ImageIndexAdjustedForScope, M.Comment,
               stIdentifier);
             CreateSpecialTagNodes;
             OutputModuleInfo(M);
+            M.AddTickCount('');
             SetExpandedNodes;
             ExpandNodes;
             // Restore top and selected items
@@ -649,18 +652,21 @@ Begin
             FSpecialTagNodes := Nil;
           End;
         Finally
+          M.AddTickCount('');
           Items.EndUpdate;
         End;
       End;
-    M.AddTickCount('Render');
+    M.AddTickCount('');
     With stbStatusBar Do
       Begin
         SimpleText := '';
         For i := 1 To M.OpTickCounts - 1 Do
           Begin
             If SimpleText <> '' Then SimpleText := SimpleText + ', ';
-            SimpleText := SimpleText + Format('%s: %d', [
-              M.OpTickCountName[i],
+            strTickLabel := M.OpTickCountName[i];
+            If strTickLabel <> '' Then
+              strTickLabel := strTickLabel + ':';
+            SimpleText := SimpleText + Format('%s%d', [strTickLabel,
               M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1]]);
           End;
         If SimpleText <> '' Then SimpleText := SimpleText + ', ';

@@ -584,6 +584,7 @@ Var
   strTop : String;
   strSelection : String;
   strTickLabel: String;
+  iTicks: Integer;
 
 Begin
   tvExplorer.Color := BRowseAndDocItOptions.BGColour;
@@ -627,14 +628,14 @@ Begin
               End;
             If M = Nil Then
               Exit;
-            M.AddTickCount('Render(C:B:S:R)');
+            M.AddTickCount('Clear');
             // Create Root Tree Node
             FModule := AddNode(Nil, M.ModuleName, M.ModuleNameLine,
               M.ModuleNameCol, M.ImageIndexAdjustedForScope, M.Comment,
               stIdentifier);
             CreateSpecialTagNodes;
             OutputModuleInfo(M);
-            M.AddTickCount('');
+            M.AddTickCount('Build');
             SetExpandedNodes;
             ExpandNodes;
             // Restore top and selected items
@@ -652,22 +653,26 @@ Begin
             FSpecialTagNodes := Nil;
           End;
         Finally
-          M.AddTickCount('');
+          M.AddTickCount('Setup');
           Items.EndUpdate;
         End;
       End;
-    M.AddTickCount('');
+    M.AddTickCount('Render');
     With stbStatusBar Do
       Begin
         SimpleText := '';
         For i := 1 To M.OpTickCounts - 1 Do
           Begin
-            If SimpleText <> '' Then SimpleText := SimpleText + ', ';
             strTickLabel := M.OpTickCountName[i];
             If strTickLabel <> '' Then
               strTickLabel := strTickLabel + ':';
-            SimpleText := SimpleText + Format('%s%d', [strTickLabel,
-              M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1]]);
+            iTicks := M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1];
+            If iTicks > 0 Then
+              Begin
+                If SimpleText <> '' Then
+                  SimpleText := SimpleText + ', ';
+                SimpleText := SimpleText + Format('%s%d', [strTickLabel, iTicks]);
+              End;
           End;
         If SimpleText <> '' Then SimpleText := SimpleText + ', ';
         SimpleText := SimpleText + Format('%s: %d', ['Total',

@@ -239,13 +239,6 @@ Type
     FReadOnlySpec: Boolean;
     FWriteOnlySpec: Boolean;
   Protected
-    procedure SetDefaultSpec(const Value: String);
-    procedure SetImplementsSpec(const Value: String);
-    procedure SetIndexSpec(const Value: String);
-    procedure SetReadSpec(const Value: String);
-    procedure SetStoredSpec(const Value: String);
-    procedure SetWriteSpec(const Value: String);
-    procedure SetDefaultProperty(const Value: Boolean);
   Public
     Constructor Create(strIdent: String; AScope: TScope; iLine, iCol : Integer;
       AImageIndex : TImageIndex; AComment : TComment); Override;
@@ -256,35 +249,35 @@ Type
       @postcon Returns the
       @return  a String
     **)
-    Property IndexSpec : String Read FIndexSpec Write SetIndexSpec;
+    Property IndexSpec : String Read FIndexSpec Write FIndexSpec;
     (**
       Returns the properties Read specification.
       @precon  None.
       @postcon Returns the properties Read specification.
       @return  a String
     **)
-    Property ReadSpec : String Read FReadSpec Write SetReadSpec;
+    Property ReadSpec : String Read FReadSpec Write FReadSpec;
     (**
       Returns the properties write specification.
       @precon  None.
       @postcon Returns the properties write specification.
       @return  a String
     **)
-    Property WriteSpec : String Read FWriteSpec Write SetWriteSpec;
+    Property WriteSpec : String Read FWriteSpec Write FWriteSpec;
     (**
       Returns the properties Stored specification.
       @precon  None.
       @postcon Returns the properties Stored specification.
       @return  a String
     **)
-    Property StoredSpec : String Read FStoredSpec Write SetStoredSpec;
+    Property StoredSpec : String Read FStoredSpec Write FStoredSpec;
     (**
       Returns the property default value.
       @precon  None.
       @postcon Returns the property default value.
       @return  a String
     **)
-    Property DefaultSpec : String Read FDefaultSpec Write SetDefaultSpec;
+    Property DefaultSpec : String Read FDefaultSpec Write FDefaultSpec;
     (**
       Returns whether this property is the classes / interfaces default
       @precon  None.
@@ -292,14 +285,14 @@ Type
       property.
       @return  a Boolean
     **)
-    Property DefaultProperty : Boolean Read FDefaultProperty Write SetDefaultProperty;
+    Property DefaultProperty : Boolean Read FDefaultProperty Write FDefaultProperty;
     (**
       Returns the implements specification for the property.
       @precon  None.
       @postcon Returns the implements specification for the property.
       @return  a String
     **)
-    Property ImplementsSpec : String Read FImplementsSpec Write SetImplementsSpec;
+    Property ImplementsSpec : String Read FImplementsSpec Write FImplementsSpec;
     (**
       Returns the properties DispID reference.
       @precon  None.
@@ -400,7 +393,6 @@ Type
   Private
     FGUID : String;
   Protected
-    Procedure SetGUID(Value : String);
   Public
     procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
@@ -410,7 +402,7 @@ Type
       @postcon Returns the GUID for the interface.
       @return  a String
     **)
-    Property GUID : String Read FGUID Write SetGUID;
+    Property GUID : String Read FGUID Write FGUID;
   End;
 
   (** This is a class the extends the class definition to handle an interface
@@ -831,13 +823,13 @@ Const
 (**
 
 
-  This function creates a TTypeToken negating the need for a temporary 
-  variable. 
+  This function creates a TTypeToken negating the need for a temporary
+  variable.
 
 
-  @precon  None. 
+  @precon  None.
 
-  @postcon Creates a TTypeToken negating the need for a temporary variable. 
+  @postcon Creates a TTypeToken negating the need for a temporary variable.
 
 
   @param   AToken    as a TTokenInfo
@@ -927,6 +919,9 @@ begin
         End;
       Result := Result + ')';
     End;
+  If boolForDocumentation Then
+    If FGUID <> '' Then
+      Result := Result + #13#10 + FGUID;
 end;
 
 (**
@@ -961,23 +956,6 @@ begin
       Result := Result + ')';
     End;
 end;
-
-(**
-
-  This is a setter method for the GUID property.
-
-  @precon  Value is the value to be assign to the GUID property.
-  @postcon Setst the GUID property.
-
-  @param   Value as a String
-
-**)
-procedure TInterfaceDecl.SetGUID(Value : String);
-
-Begin
-  If FGUID <> Value Then
-    FGUID := Value;
-End;
 
 (**
 
@@ -1421,118 +1399,6 @@ end;
 
 (**
 
-  This is a setter method for the DefaultProperty property.
-
-  @precon  Value is the new value to assign to the DefaultProperty property.
-  @postcon Sets the default property.
-
-  @param   Value as a Boolean constant
-
-**)
-procedure TPascalProperty.SetDefaultProperty(const Value: Boolean);
-begin
-  If FDefaultProperty <> Value Then
-    FDefaultProperty := Value;
-end;
-
-(**
-
-  This is a setter method for the DefaultSpec property.
-
-  @precon  Value is the new value to assign to the DefaultSpec property.
-  @postcon Sets the default Spec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TPascalProperty.SetDefaultSpec(const Value: String);
-begin
-  If FDefaultSpec <> Value Then
-    FDefaultSpec := Value;
-end;
-
-(**
-
-  This is a setter method for the ImplementsSpec property.
-
-  @precon  Value is the new value to assign to the ImplementsSpec property.
-  @postcon Sets the implementsSpec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TPascalProperty.SetImplementsSpec(const Value: String);
-begin
-  If FImplementsSpec <> Value Then
-    FImplementsSpec := Value;
-end;
-
-(**
-
-  This is a setter method for the IndexSpec property.
-
-  @precon  Value is the new value to assign to the IndexSpec property.
-  @postcon Setst the indexspec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TPascalProperty.SetIndexSpec(const Value: String);
-begin
-  If FIndexSpec <> Value Then
-    FIndexSpec := Value;
-end;
-
-(**
-
-  This is a setter method for the ReadSpec property.
-
-  @precon  Value is the new value to assign to the ReadSpec property.
-  @postcon Sets the readspec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TPascalProperty.SetReadSpec(const Value: String);
-begin
-  If FReadSpec <> Value Then
-    FReadSpec := Value;
-end;
-
-(**
-
-  This is a setter method for the StoredSpec property.
-
-  @precon  Value is the new value to assign to the StoredSpec property.
-  @postcon Sets the stored spec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TPascalProperty.SetStoredSpec(const Value: String);
-begin
-  If FStoredSpec <> Value Then
-    FStoredSpec := Value;
-end;
-
-(**
-
-  This is a setter method for the WriteSpec property.
-
-  @precon  Value is the new value to assign to the WriteSpec property.
-  @postcon Sets the write spec property.
-
-  @param   Value as a String constant
-
-**)
-procedure TPascalProperty.SetWriteSpec(const Value: String);
-begin
-  If FWriteSpec <> Value Then
-    FWriteSpec := Value;
-end;
-
-(**
-
 
   This is a getter method for the AsString property.
 
@@ -1623,11 +1489,7 @@ begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctFieldClauseUndocumented]);
     End;
-  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
-    If Scope In [scPrivate, scProtected, scPublic] Then
-      If Not Referenced Then
-        AddIssue(Format(strUnreferencedLocal, [Identifier]),
-          scNone, 'CheckDocumentation', Line, Column, etHint);
+  Inherited CheckDocumentation(boolCascade);
 end;
 
 (**
@@ -1748,8 +1610,15 @@ begin
               Exit;
             End;
         End;
-    End;    
-end;
+    End;
+  S := FindElement(strMethodsLabel) As TLabelContainer;
+  If S <> Nil Then
+    Begin
+      For i := 1 To S.ElementCount Do
+      If AnsiCompareText(strSymbol, S[i].Identifier) = 0 Then
+        S[i].Referenced := True;
+    End;
+End;
 
 (**
 
@@ -1910,29 +1779,29 @@ Begin
       AddTickCount('Parse');
       CheckUnResolvedMethods;
       AddTickCount('Resolve');
+      Add(strErrors, iiErrorFolder, scNone, Nil);
+      Add(strWarnings, iiWarningFolder, scNone, Nil);
+      Add(strHints, iiHintFolder, scNone, Nil);
+      Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
+      CheckReferences;
+      AddTickCount('Refs');
       boolCascade := True;
       If moCheckForDocumentConflicts In ModuleOptions Then
-        Begin
-          Add(strErrors, iiErrorFolder, scNone, Nil);
-          Add(strWarnings, iiWarningFolder, scNone, Nil);
-          Add(strHints, iiHintFolder, scNone, Nil);
-          Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
-          CheckDocumentation(boolCascade);
-          i := Find(strErrors);
-          If (i > 0) And (Elements[i].ElementCount = 0) Then
-            DeleteElement(i);
-          i := Find(strWarnings);
-          If (i > 0) And (Elements[i].ElementCount = 0) Then
-            DeleteElement(i);
-          i := Find(strHints);
-          If (i > 0) And (Elements[i].ElementCount = 0) Then
-            DeleteElement(i);
-          i := Find(strDocumentationConflicts);
-          If (i > 0) And (Elements[i].ElementCount = 0) Then
-            DeleteElement(i);
-        End;
+        CheckDocumentation(boolCascade);
+      AddTickCount('Check');
+      i := Find(strErrors);
+      If (i > 0) And (Elements[i].ElementCount = 0) Then
+        DeleteElement(i);
+      i := Find(strWarnings);
+      If (i > 0) And (Elements[i].ElementCount = 0) Then
+        DeleteElement(i);
+      i := Find(strHints);
+      If (i > 0) And (Elements[i].ElementCount = 0) Then
+        DeleteElement(i);
+      i := Find(strDocumentationConflicts);
+      If (i > 0) And (Elements[i].ElementCount = 0) Then
+        DeleteElement(i);
     End;
-  AddTickCount('Check');
 End;
 
 (**
@@ -2254,7 +2123,7 @@ begin
     Begin
       If Container = Nil Then
         Begin
-          Container := Add(strImplementedMethods, iiImplementedMethods, scNone, Nil);
+          Container := Add(strImplementedMethodsLabel, iiImplementedMethods, scNone, Nil);
           iIcon := iiUnknownClsObj;
           AScope := scNone;
           E := TypesLabel;
@@ -2272,7 +2141,7 @@ begin
               End;
         End;
       If Container Is TObjectDecl Then
-        Container := Container.Add(strMethods, iiMethodsLabel, scNone, Nil);
+        Container := Container.Add(strMethodsLabel, iiMethodsLabel, scNone, Nil);
       tmpMethod := Method;
       Method := Container.Add(tmpMethod) As TPascalMethod;
       If tmpMethod <> Method Then
@@ -2394,7 +2263,7 @@ end;
 function TPascalModule.GetExportedHeadingsLabel: TLabelContainer;
 begin
   If FExportedHeadingsLabel = Nil Then
-    FExportedHeadingsLabel := FindElement(strImplementedMethods) As TLabelContainer;
+    FExportedHeadingsLabel := FindElement(strExportedHeadingsLabel) As TLabelContainer;
   Result := FExportedHeadingsLabel;
 end;
 
@@ -2414,7 +2283,7 @@ function TPascalModule.GetImplementedMethodsLabel: TLabelContainer;
 
 begin
   If FImplementedMethodsLabel = Nil Then
-    FImplementedMethodsLabel := FindElement(strImplementedMethods) As TLabelContainer;
+    FImplementedMethodsLabel := FindElement(strImplementedMethodsLabel) As TLabelContainer;
   Result := FImplementedMethodsLabel;
 end;
 
@@ -2824,7 +2693,7 @@ var
   C: TElementContainer;
 
 Begin
-  C := Add(strExportedHeadings, iiExportedHeadingslabel, scNone, Nil);
+  C := Add(strExportedHeadingsLabel, iiExportedHeadingslabel, scNone, Nil);
   Repeat
     {Loop doing nothing};
   Until Not (
@@ -2966,7 +2835,7 @@ Begin
   Result := Token.UToken = 'EXPORTS';
   If Result Then
     Begin
-      Ex := Add(strExports, iiExportedFunctionsLabel, scNone, GetComment);
+      Ex := Add(strExportsLabel, iiExportedFunctionsLabel, scNone, GetComment);
       NextNonCommentToken;
       Repeat
         ExportsItem(Ex);
@@ -3047,7 +2916,7 @@ End;
 
   @grammar DeclSection -> LabelDeclSection -> ConstSection -> ResStringSection 
 
-           -> TypeSection -> VarSection -> ThreadVarSection -> 
+           -> TypeSection -> VarSection -> ThreadVarSection ->
 
            ProcedureDeclSection -> ExportedProcs 
 
@@ -3103,7 +2972,7 @@ Begin
       Repeat
         If Token.TokenType In [ttIdentifier, ttDirective] Then
           Begin
-            CurrentMethod.Add(strLabel, iiPublicLabelsLabel, scNone, Nil).Add(
+            CurrentMethod.Add(strLabelsLabel, iiPublicLabelsLabel, scNone, Nil).Add(
               Token, scLocal, iiPublicLabel, GetComment);
             NextNonCommentToken;
           End Else
@@ -3287,7 +3156,7 @@ End;
 
   @grammar ConstSection -> RESOURCESTRING ( ResourceStringDecl ';' ) ... Also 
 
-           see {@link TPascalDocModule.ConstantSection} . 
+           see {@link TPascalDocModule.ConstantSection} .
 
 
   @param   AScope as a TScope
@@ -4519,8 +4388,11 @@ Var
   i: Integer;
   S: TLabelContainer;
   E: TElementContainer;
+  M: TPascalMethod;
+  boolFound: Boolean;
 
 begin
+  // Check Vars, Consts and Types
   For i := Low(strSections) To High(strSections) Do
     Begin
       S := FindElement(strSections[i]) As TLabelContainer;
@@ -4534,12 +4406,31 @@ begin
             End;
         End;
     End;
+  // Check Module Local Methods
+  boolFound := False;
   E := ImplementedMethodsLabel;
   If E <> Nil Then
     For i := 1 To E.ElementCount Do
-      If E[i].Scope In [scLocal] Then
-        If AnsiCompareText(E[i].Identifier, strSymbol) = 0 Then
+      If AnsiCompareText(E[i].Identifier, strSymbol) = 0 Then
+        Begin
           E[i].Referenced := True;
+          boolFound := True;
+        End;
+  If boolFound Then
+    Exit;
+  // Check Methods in Same Class.
+  M := CurrentMethod;
+  If M <> Nil Then
+    Begin
+      E := M.ObjClsInt;
+      If E <> Nil Then
+        Begin
+          E := E.FindElement(strMethodsLabel);
+          For i := 1 To E.ElementCount Do
+            If AnsiCompareText(E[i].Identifier, strSymbol) = 0 Then
+              E[i].Referenced := True;
+        End;
+    End;
 end;
 
 (**
@@ -4917,10 +4808,10 @@ Var
   i : Integer;
 
 begin
-  i := Find(strImplementedMethods);
+  i := Find(strImplementedMethodsLabel);
   If (i > 0) And (Elements[i].ElementCount = 0) Then
     DeleteElement(i);
-  i := Find(strExportedHeadings);
+  i := Find(strExportedHeadingsLabel);
   If (i > 0) And (Elements[i].ElementCount = 0) Then
     DeleteElement(i);
 end;
@@ -5005,7 +4896,7 @@ Begin
               NextNonCommentToken;
               T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
               If T <> Nil Then
-                ReferenceSymbol(TypeTokens(T));
+                VarSection.ReferenceSymbol(TypeTokens(T));
               If Token.UToken = 'ABSOLUTE' Then
                 Begin
                   C := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
@@ -5514,7 +5405,9 @@ Begin
     Begin
       M := CurrentMethod As TPascalMethod;
       If M <> Nil Then
-        M.ReferenceSymbol(Token.Token);
+        M.ReferenceSymbol(Token.Token)
+      Else
+        ReferenceSymbol(Token.Token);
       AddToExpression(C);
       DesignatorSubElement(C, ExprType, ['.', '[', '^', '(']);
     End;
@@ -5552,7 +5445,9 @@ Begin
         If Token.TokenType In [ttIdentifier, ttDirective] Then
           Begin
             If M <> Nil Then
-              M.ReferenceSymbol(Token.Token);
+              M.ReferenceSymbol(Token.Token)
+            Else
+              ReferenceSymbol(Token.Token);
             AddToExpression(C);
           End
         Else
@@ -5562,7 +5457,9 @@ Begin
     Else If Token.Token = '[' Then
       Begin
         If M <> Nil Then
-          M.ReferenceSymbol(Token.Token);
+          M.ReferenceSymbol(Token.Token)
+        Else
+          ReferenceSymbol(Token.Token);
         AddToExpression(C);
         ExprList(C);
         If Token.Token = ']' Then
@@ -5574,7 +5471,9 @@ Begin
     Else If Token.Token = '^' Then
       Begin
         If M <> Nil Then
-          M.ReferenceSymbol(Token.Token);
+          M.ReferenceSymbol(Token.Token)
+        Else
+          ReferenceSymbol(Token.Token);
         AddToExpression(C);
       End
     Else If (Token.Token = '(') Then
@@ -5710,7 +5609,7 @@ Var
 Begin
   If CurrentMethod <> Nil Then
     Begin
-      L := CurrentMethod.FindElement(strLabel);
+      L := CurrentMethod.FindElement(strLabelsLabel);
       If L <> Nil Then // Check for label
         If L.FindElement(Token.Token) <> Nil Then
           Begin
@@ -6213,7 +6112,9 @@ Begin
         Begin
           M := CurrentMethod As TPascalMethod;
           If M <> Nil Then
-            M.ReferenceSymbol(Token.Token);
+            M.ReferenceSymbol(Token.Token)
+          Else
+            ReferenceSymbol(Token.Token);
           NextNonCommentToken;
           If Token.Token = ':=' Then
             Begin
@@ -7916,7 +7817,7 @@ begin
         Begin
           tmpP := TPascalProperty.Create(Token.Token, AScope, Token.Line,
             Token.Column, iiPublicProperty, C);
-          P := Cls.Add(strProperties, iiPropertiesLabel, scNone, Nil).Add(tmpP) As TPascalProperty;
+          P := Cls.Add(strPropertiesLabel, iiPropertiesLabel, scNone, Nil).Add(tmpP) As TPascalProperty;
           If P <> tmpP Then
             AddIssue(Format(strDuplicateIdentifierFound, [Token.Token]),
               scNone,  'AddToContainer', Token.Line, Token.Column, etError);
@@ -8086,6 +7987,8 @@ begin
       Try
         Designator(C, ExprType);
         Prop.ReadSpec := C.AsString;
+        If C.TokenCount > 0 Then
+          Prop.ReferenceSymbol(C.Tokens[0].Token);
       Finally
         C.Free;
       End;
@@ -8099,6 +8002,8 @@ begin
       Try
         Designator(C, ExprType);
         Prop.WriteSpec := C.AsString;
+        If C.TokenCount > 0 Then
+          Prop.ReferenceSymbol(C.Tokens[0].Token);
       Finally
         C.Free;
       End;
@@ -8298,7 +8203,7 @@ Var
 Begin
   If Token.UToken = 'REQUIRES' Then
     Begin
-      R := Add(strRequires, iiUsesLabel, scNone, GetComment);
+      R := Add(strRequiresLabel, iiUsesLabel, scNone, GetComment);
       NextNonCommentToken;
       IdentList(R, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
@@ -8327,7 +8232,7 @@ Var
 Begin
   If Token.UToken = 'CONTAINS' Then
     Begin
-      C := Add(strContains, iiUsesLabel, scNone, GetComment);
+      C := Add(strContainsLabel, iiUsesLabel, scNone, GetComment);
       NextNonCommentToken;
       IdentList(C, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
@@ -8471,6 +8376,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctResourceStringClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -8493,6 +8399,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctThreadVarClauseUndocumented]);
     End;
+  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -8507,6 +8414,8 @@ End;
 
  **)
 Procedure TRecordDecl.CheckDocumentation(var boolCascade : Boolean);
+var
+  i: Integer;
 
 Begin
   If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
@@ -8515,6 +8424,8 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctRecordClauseUndocumented]);
     End;
+  For i := 1 To ElementCount Do
+    Elements[i].CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -8539,7 +8450,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctObjectClauseUndocumented]);
     End;
-  For i := 1 to ElementCount Do
+  For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
 
@@ -8555,36 +8466,6 @@ End;
 
  **)
 Procedure TClassDecl.CheckDocumentation(var boolCascade : Boolean);
-
-  (**
-
-
-    This function checks that the class sub element should be documented.
-
-    @precon  None.
-    @postcon Checks that the class sub element should be documented.
-
-
-    @param   strLabel as a String
-    @return  a Boolean 
-
-  **)
-  Function CanCheckClassElements(strLabel : String) : Boolean;
-
-  Const
-    strClassDecls : Array[1..4] Of String = (strTypesLabel, strConstantsLabel,
-      strVarsLabel, strClassVarsLabel);
-
-  Var
-    i: Integer;
-
-  Begin
-    Result := True;
-    If Not (doShowUndocumentedClassDecls In BrowseAndDocItOptions.Options) Then
-      For i := Low(strClassDecls) to High(strClassDecls) Do
-        Result := Result And (strClassDecls[i] <> strLabel);
-  End;
-
 var
   i: Integer;
 
@@ -8595,10 +8476,8 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctClassClauseUndocumented]);
     End;
-  If boolCascade Then
-    For i := 1 To ElementCount Do
-      If CanCheckClassElements(Elements[i].Identifier) Then
-        Elements[i].CheckDocumentation(boolCascade);
+  For i := 1 To ElementCount Do
+    Elements[i].CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -8623,7 +8502,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctInterfaceClauseUndocumented]);
     End;
-  For i := 1 to ElementCount Do
+  For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
 
@@ -8649,7 +8528,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctDispInterfaceClauseUndocumented]);
     End;
-  For i := 1 to ElementCount Do
+  For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
 
@@ -8668,7 +8547,7 @@ Procedure TInitializationSection.CheckDocumentation(var boolCascade : Boolean);
 Begin
   If doShowMissingInitComment In BrowseAndDocItOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
-      AddDocumentConflict([strInitialization], Line, Column , Comment,
+      AddDocumentConflict([strInitializationLabel], Line, Column , Comment,
         DocConflictTable[dctMissingInitComment]);
 End;
 
@@ -8707,7 +8586,7 @@ Procedure TFinalizationSection.CheckDocumentation(var boolCascade : Boolean);
 Begin
   If doShowMissingFinalComment In BrowseAndDocItOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
-      AddDocumentConflict([strFinalization], Line, Column, Comment,
+      AddDocumentConflict([strFinalizationLabel], Line, Column, Comment,
         DocConflictTable[dctMissingFinalComment]);
 End;
 
@@ -8897,7 +8776,7 @@ begin
         If StartLabel.Elements[k] Is TPascalMethod Then
           Begin
             Method := StartLabel.Elements[k] As TPascalMethod;
-            If Not Method.Resolved Then
+            If (Method.ObjClsInt <> Nil) And Not Method.Resolved Then
               AddIssue(Format(strUndeclaredClassMethod, [Method.QualifiedName]),
                   scNone, 'FindUnresolvedImplementedClassMethods', Method.Line,
                   Method.Column, etError);
@@ -9031,7 +8910,7 @@ begin
           (TypeLabel.Elements[k] Is TInterfaceDecl) Then
           Begin
             ObjectOrClass := TypeLabel.Elements[k] As TObjectDecl;
-            MethodsLabel := ObjectOrClass.FindElement(strMethods);
+            MethodsLabel := ObjectOrClass.FindElement(strMethodsLabel);
             If MethodsLabel <> Nil Then
               For j := 1 To MethodsLabel.ElementCount Do
                 If MethodsLabel.Elements[j] Is TPascalMethod Then
@@ -9123,7 +9002,7 @@ begin
             End;
           If Element Is TObjectDecl Then
             Begin
-              Element := Element.FindElement(strMethods);
+              Element := Element.FindElement(strMethodsLabel);
               If Element <> Nil Then
                 Begin
                   Element := Element.FindElement(Method.Name);
@@ -9131,6 +9010,8 @@ begin
                     Begin
                       Method.Scope := Element.Scope;
                       Method.Resolved := True;
+                      Method.Referenced := Element.Referenced;
+                      Element.Referenced := True; 
                       (Element As TPascalMethod).Resolved := True;
                     End;
                 End;

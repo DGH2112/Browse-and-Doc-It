@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    20 Sep 2008
+  @Date    22 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -92,7 +92,7 @@ Type
 
     {doShowIDEErrorsOnSuccessfulParse,}
     doShowParserErrorOrigin,
-    doShowUnReferencedLocalsPrivates,
+    doShowUnReferencedSymbols,
     doShowPrefCountersInDocSummary
   );
 
@@ -670,6 +670,7 @@ Type
     Function FindToken(strToken : String) : Integer;
     Procedure DeleteElement(iIndex : Integer);
     Procedure CheckDocumentation(var boolCascade : Boolean); Virtual;
+    Procedure ReferenceSymbol(strSymbol : String); Virtual;
     Procedure AddIssue(strMsg : String; AScope : TScope; strMethod : String;
       iLine, iCol : Integer; ErrorType : TErrorType);
     Procedure AddDocumentConflict(Const Args: Array of TVarRec;
@@ -1560,7 +1561,7 @@ ResourceString
   (** Options text for showing the origin method of the parser errors. **)
   strShowParserErrorOrigin = 'Show the origin method of the Parser error.';
   (** Options text for showing unreferenced locals and privates. **)
-  strShowUnreferencedLocals = 'Show all unreferenced local and private symbols.';
+  strShowUnreferencedSymbols = 'Show all unreferenced symbols.';
   (** Options text for showing preformance counters in the documentation summary. **)
   strShowPerfCountersInDocSummary = 'Show performance counters in the documenation summary.';
 
@@ -2079,7 +2080,7 @@ Const
 
     {(FDescription : strShowIDEErrorsOnSuccessfulParse;     FEnabled : False),}
     (FDescription : strShowParserErrorOrigin;              FEnabled : False),
-    (FDescription : strShowUnreferencedLocals;             FEnabled : False),
+    (FDescription : strShowUnreferencedSymbols;            FEnabled : False),
     (FDescription : strShowPerfCountersInDocSummary;       FEnabled : False)
   );
 
@@ -4037,6 +4038,25 @@ end;
 
 (**
 
+  This method does nothing other than call its parents ReferenceSymbol method.
+  Descendant should override this method to resolve symbols in the code.
+
+  @precon  None.
+  @postcon Passes the processing of the symbol to its parent IF the parent
+           exists.
+
+  @param   strSymbol as a String
+
+**)
+Procedure TElementContainer.ReferenceSymbol(strSymbol : String);
+
+Begin
+  If FParent <> Nil Then
+    FParent.ReferenceSymbol(strSymbol);
+End;
+
+(**
+
   This is a setter method for the Sorted property.
 
   @precon  None.
@@ -5188,7 +5208,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctTypeClauseUndocumented]);
     End;
-  If doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options Then
+  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
     If Scope In [scLocal, scPrivate] Then
       If Not Referenced Then
         AddIssue(Format(strUnreferencedLocal, [Identifier]),
@@ -5216,7 +5236,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctConstantClauseUndocumented]);
     End;
-  If doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options Then
+  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
     If Scope In [scLocal, scPrivate] Then
       If Not Referenced Then
         AddIssue(Format(strUnreferencedLocal, [Identifier]),
@@ -5244,7 +5264,7 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctVariableClauseUndocumented]);
     End;
-  If doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options Then
+  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
     If Scope In [scLocal, scPrivate] Then
       If Not Referenced Then
         AddIssue(Format(strUnreferencedLocal, [Identifier]),
@@ -5277,7 +5297,7 @@ Begin
           CheckMethodReturns;
         End;
     End;
-  If doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options Then
+  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
     If Scope In [scLocal] Then
       If Not Referenced Then
         AddIssue(Format(strUnreferencedLocal, [Identifier]),

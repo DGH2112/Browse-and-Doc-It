@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    20 Sep 2008
+  @Date    22 Sep 2008
   @Version 1.0
 
   @bug     Line position of comment tags in coflicts is not right!
@@ -50,6 +50,7 @@ Type
     Procedure InsertInSituCommentClick(Sender : TObject);
     Procedure DocumentationClick(Sender : TObject);
     Procedure ModuleExplorerClick(Sender : TObject);
+  Protected
     { IOTAWizard }
     Function GetIDString: string;
     Function GetName: string;
@@ -87,9 +88,6 @@ Type
     Procedure TimerEventHandler(Sender : TObject);
     Procedure DetermineCompilerDefinitions(slDefines : TStringList);
   Protected
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
     procedure WindowActivated(const EditWindow: INTAEditWindow);
@@ -99,6 +97,9 @@ Type
     procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+  Public
+    Constructor Create;
+    Destructor Destroy; Override;
   End;
 
   (** This class represents a key binding notifier for installing and handling
@@ -120,6 +121,7 @@ Type
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
     Procedure ShowTokens(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
+  Protected
     function GetBindingType: TBindingType;
     function GetDisplayName: string;
     function GetName: string;
@@ -684,7 +686,7 @@ begin
     If Module <> Nil Then
       Try
         EditPos :=  Source.GetEditView(0).CursorPos;
-        T := Module.FindElement(strImplementedMethods);
+        T := Module.FindElement(strImplementedMethodsLabel);
         If T <> Nil Then
           Begin
             FindMethod(T);

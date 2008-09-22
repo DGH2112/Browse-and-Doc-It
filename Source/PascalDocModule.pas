@@ -489,7 +489,8 @@ Type
   End;
 
   (** An enumerate for the types of reference changes that can be done. **)
-  TRefType = (rtVariables, rtConstants, rtResourceStrings, rtTypes);
+  TRefType = (rtFields, rtVariables, rtConstants, rtResourceStrings, rtTypes,
+    rtClassVars);
   (** A set of reference checks that need to be undertaken. **)
   TRefTypes = Set of TRefType;
 
@@ -2277,9 +2278,8 @@ procedure TPascalModule.ReferenceSymbols(strSymbol : String; RefTypes : TRefType
 
 Const
   strSections : Array[Low(TRefType)..High(TRefType)] Of String = (
-    strVarsLabel, strConstantsLabel, strResourceStringsLabel, strTypesLabel);
-  strClassSections : Array[1..5] Of String = (strFieldsLabel,
-    strVarsLabel, strConstantsLabel, strTypesLabel, strClassVarsLabel);
+    strFieldsLabel, strVarsLabel, strConstantsLabel, strResourceStringsLabel,
+    strTypesLabel, strClassVarsLabel);
 
 Var
   E : TElementContainer;
@@ -2288,7 +2288,6 @@ Var
   M : TPascalMethod;
   iRefType : TRefType;
   sl: TStringList;
-  k: Integer;
   S: TElementContainer;
 
 begin
@@ -2321,9 +2320,9 @@ begin
           Begin
             E := E.FindElement(sl[i]);
             If E <> Nil Then
-              For k := Low(strClassSections) to High(strClassSections) Do
+              For iRefType := Low(strSections) to High(strSections) Do
                 Begin
-                  S := E.FindElement(strClassSections[k]);
+                  S := E.FindElement(strSections[iRefType]);
                   If S <> Nil Then
                     Begin
                       S := S.FindElement(strSymbol);
@@ -2332,12 +2331,11 @@ begin
                           S.Referenced := True;
                           Exit;
                         End;
-
                     End;
                 End;
+            If sl.Count > 1 Then
+              E := E.FindElement(strTypesLabel);
           End;
-        If sl.Count > 1 Then
-          E := E.FindElement(strTypesLabel);
       End;
   // Reference Module Privates
   For iRefType := Low(TRefType) to High(TRefType) Do
@@ -5254,8 +5252,8 @@ Begin
     (Token.UToken = 'NIL');
   If Result Then
     Begin
-      ReferenceSymbols(Token.Token, [rtConstants, rtResourceStrings,
-        rtVariables, rtTypes]);
+      ReferenceSymbols(Token.Token, [rtFields, rtConstants, rtResourceStrings,
+        rtVariables, rtTypes, rtClassVars]);
       AddToExpression(C);
       DesignatorSubElement(C, ExprType, ['.', '[', '^', '(']);
     End;
@@ -5284,7 +5282,8 @@ Begin
         AddToExpression(C);
         If Token.TokenType In [ttIdentifier, ttDirective] Then
           Begin
-            ReferenceSymbols(Token.Token, [rtConstants, rtResourceStrings, rtVariables]);
+            ReferenceSymbols(Token.Token, [rtFields, rtConstants,
+              rtResourceStrings, rtVariables, rtClassVars]);
             AddToExpression(C);
           End
         Else
@@ -5293,7 +5292,8 @@ Begin
       End
     Else If Token.Token = '[' Then
       Begin
-        ReferenceSymbols(Token.Token, [rtConstants, rtResourceStrings, rtVariables]);
+        ReferenceSymbols(Token.Token, [rtFields, rtConstants, rtResourceStrings,
+          rtVariables, rtClassVars]);
         AddToExpression(C);
         ExprList(C);
         If Token.Token = ']' Then
@@ -7583,13 +7583,13 @@ end;
 
 (**
 
-  This method parses the property interface from the current token position 
-  using the following object pascal grammar. 
+  This method parses the property interface from the current token position
+  using the following object pascal grammar.
 
-  @precon  Prop is a property to parse an interface for. 
-  @postcon Parses the property interface from the current token position 
+  @precon  Prop is a property to parse an interface for.
+  @postcon Parses the property interface from the current token position
 
-  @grammar PropertyInterface -> [ PropertyParameterList ] ':' Ident 
+  @grammar PropertyInterface -> [ PropertyParameterList ] ':' Ident
 
   @param   Prop   as a TPascalProperty
 
@@ -7728,6 +7728,7 @@ begin
       Try
         Designator(C, ExprType);
         Prop.ReadSpec := C.AsString;
+        ReferenceSymbols(Prop.ReadSpec, [rtFields]);
       Finally
         C.Free;
       End;
@@ -7741,6 +7742,7 @@ begin
       Try
         Designator(C, ExprType);
         Prop.WriteSpec := C.AsString;
+        ReferenceSymbols(Prop.WriteSpec, [rtFields]);
       Finally
         C.Free;
       End;

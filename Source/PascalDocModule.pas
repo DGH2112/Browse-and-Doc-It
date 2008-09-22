@@ -7,11 +7,8 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       20 Sep 2008
+  @Date       22 Sep 2008
   @Author     David Hoyle
-
-  @bug        Can not resolve constants, variables and types within a class
-              declaration.
 
 **)
 Unit PascalDocModule;
@@ -658,7 +655,7 @@ Type
     procedure FindUnresolvedObjectAndClassMethods(TypeLabel : TLabelContainer);
     procedure FindUnresolvedExportedMethods;
     procedure FindUnresolvedImplementedClassMethods(StartLabel : TLabelContainer);
-    Procedure ReferenceLocalsPrivates(strSymbol : String; RefTypes : TRefTypes);
+    Procedure ReferenceSymbols(strSymbol : String; RefTypes : TRefTypes);
     function GetCurrentMethod: TPascalMethod;
     (**
       This property returns the method on top of the method stack.
@@ -2276,12 +2273,13 @@ End;
   @param   RefTypes  as a TRefTypes
 
 **)
-procedure TPascalModule.ReferenceLocalsPrivates(strSymbol : String;
-  RefTypes : TRefTypes);
+procedure TPascalModule.ReferenceSymbols(strSymbol : String; RefTypes : TRefTypes);
 
 Const
   strSections : Array[Low(TRefType)..High(TRefType)] Of String = (
     strVarsLabel, strConstantsLabel, strResourceStringsLabel, strTypesLabel);
+  strClassSections : Array[1..5] Of String = (strFieldsLabel,
+    strVarsLabel, strConstantsLabel, strTypesLabel, strClassVarsLabel);
 
 Var
   E : TElementContainer;
@@ -2289,10 +2287,14 @@ Var
   j: Integer;
   M : TPascalMethod;
   iRefType : TRefType;
+  sl: TStringList;
+  k: Integer;
+  S: TElementContainer;
 
 begin
   If Not (doShowUnReferencedLocalsPrivates In BrowseAndDocItOptions.Options) Then
     Exit;
+  // Reference Method Locals
   For j := FMethodStack.Count - 1 DownTo 0 Do
     If FMethodStack[j] <> Nil Then
       For iRefType := Low(TRefType) to High(TRefType) Do
@@ -2309,6 +2311,35 @@ begin
                   End;
               End;
           End;
+  // Reference Class Vars, Const, Types and Fields
+  For i := FMethodStack.Count - 1 DownTo 0 Do
+    If FMethodStack[i] <> Nil Then
+      Begin
+        sl := (FMethodStack[i] As TPascalMethod).ClassNames;
+        E := TypesLabel;
+        For j := 0 To sl.Count - 1 Do
+          Begin
+            E := E.FindElement(sl[i]);
+            If E <> Nil Then
+              For k := Low(strClassSections) to High(strClassSections) Do
+                Begin
+                  S := E.FindElement(strClassSections[k]);
+                  If S <> Nil Then
+                    Begin
+                      S := S.FindElement(strSymbol);
+                      If S <> Nil Then
+                        Begin
+                          S.Referenced := True;
+                          Exit;
+                        End;
+
+                    End;
+                End;
+          End;
+        If sl.Count > 1 Then
+          E := E.FindElement(strTypesLabel);
+      End;
+  // Reference Module Privates
   For iRefType := Low(TRefType) to High(TRefType) Do
     If iRefType In RefTypes Then
       Begin
@@ -2323,6 +2354,7 @@ begin
               End;
           End;
       End;
+  // Reference Local Methods in the Method Stack
   For j := FMethodStack.Count - 1 DownTo 0 Do
     If FMethodStack[j] <> Nil Then
       Begin
@@ -2332,6 +2364,7 @@ begin
             If AnsiCompareText(M[i].Identifier, strSymbol) = 0 Then
               M[i].Referenced := True;
       End;
+  // Reference Private Methods in the Module
   E := ImplementedMethodsLabel;
   If E <> Nil Then
     For i := 1 To E.ElementCount Do
@@ -4744,7 +4777,7 @@ Begin
               NextNonCommentToken;
               T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
               If T <> Nil Then
-                ReferenceLocalsPrivates(TypeTokens(T), [rtTypes]);
+                ReferenceSymbols(TypeTokens(T), [rtTypes]);
               If Token.UToken = 'ABSOLUTE' Then
                 Begin
                   C := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
@@ -5221,7 +5254,7 @@ Begin
     (Token.UToken = 'NIL');
   If Result Then
     Begin
-      ReferenceLocalsPrivates(Token.Token, [rtConstants, rtResourceStrings,
+      ReferenceSymbols(Token.Token, [rtConstants, rtResourceStrings,
         rtVariables, rtTypes]);
       AddToExpression(C);
       DesignatorSubElement(C, ExprType, ['.', '[', '^', '(']);
@@ -5251,7 +5284,7 @@ Begin
         AddToExpression(C);
         If Token.TokenType In [ttIdentifier, ttDirective] Then
           Begin
-            ReferenceLocalsPrivates(Token.Token, [rtConstants, rtResourceStrings, rtVariables]);
+            ReferenceSymbols(Token.Token, [rtConstants, rtResourceStrings, rtVariables]);
             AddToExpression(C);
           End
         Else
@@ -5260,7 +5293,7 @@ Begin
       End
     Else If Token.Token = '[' Then
       Begin
-        ReferenceLocalsPrivates(Token.Token, [rtConstants, rtResourceStrings, rtVariables]);
+        ReferenceSymbols(Token.Token, [rtConstants, rtResourceStrings, rtVariables]);
         AddToExpression(C);
         ExprList(C);
         If Token.Token = ']' Then
@@ -5271,7 +5304,7 @@ Begin
       End
     Else If Token.Token = '^' Then
       Begin
-        ReferenceLocalsPrivates(Token.Token, [rtTypes]);
+        ReferenceSymbols(Token.Token, [rtTypes]);
         AddToExpression(C);
       End
     Else If (Token.Token = '(') Then
@@ -5861,7 +5894,7 @@ Begin
       NextNonCommentToken;
       If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
-          ReferenceLocalsPrivates(Token.Token, [rtVariables]);
+          ReferenceSymbols(Token.Token, [rtVariables]);
           NextNonCommentToken;
           If Token.Token = ':=' Then
             Begin

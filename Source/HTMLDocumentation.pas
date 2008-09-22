@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    19 Sep 2008
+  @Date    22 Sep 2008
   @Version 1.0
 
 **)
@@ -743,7 +743,6 @@ var
   strIndent: String;
   strID: String;
   strRef: String;
-  iPos: Integer;
   strCurAlpha, strLastAlpha : String;
 
 begin
@@ -778,8 +777,7 @@ begin
                 slC.Add('<div class="Indent">');
                 slC.Add('  <table>');
               End;
-            iPos := Pos('(', FIndex.Names[i]);
-            strID := Copy(FIndex.Names[i], 1, iPos - 1);
+            strID := FIndex.Names[i];
             strRef := StringReplace(ChangeFileExt(ExtractFileName(
               FIndex.ValueFromIndex[i]), ''), 'html#', '', [rfReplaceAll]);
             slC.Add(Format('    <tr><td>%s</td><td>%s</td></tr>', [A(strID,
@@ -1278,7 +1276,7 @@ begin
       If Container[i].Scope In FScopesToDocument Then
         Begin
           FIndex.Add(Format('%s=%s#%s', [
-            Format('%s(%s)', [Container[i].Identifier, strContainerLabel]),
+            Format('%s', [Container[i].Identifier]),
             FHTMLFileName,
             Format('%s.%s', [strContainerLabel, Container[i].Identifier])]));
           If Not boolHeader Then

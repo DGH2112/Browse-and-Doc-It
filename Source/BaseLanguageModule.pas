@@ -463,7 +463,6 @@ Type
     FColumn: Integer;
   Protected
     function GetToken(iTokenIndex: Integer): String;
-    procedure SetTagName(const Value: String);
     function GetTokenCount : Integer;
     function GetTokenType(iTokenIndex: Integer): TTokenType;
   Public
@@ -477,7 +476,7 @@ Type
       @postcon Returns the tag name as a string.
       @return  a String
     **)
-    Property TagName : String read FTagName write SetTagName;
+    Property TagName : String read FTagName write FTagName;
     (**
       Returns the specifically index token from the tags token collection.
       @precon  iTokenIndex must be a valid index between 0 and TokenCount - 1.
@@ -676,7 +675,9 @@ Type
     Procedure AddDocumentConflict(Const Args: Array of TVarRec;
       iIdentLine, iIdentColumn : Integer; AComment : TComment;
       DocConflictRec : TDocConflictTable);
-    Function AsString(boolForDocumentation : Boolean = False) : String; Virtual; Abstract;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Virtual;
+      Abstract;
+    Procedure CheckReferences; Virtual;
     (**
       This property returns the number of elements in the collection.
       @precon  None.
@@ -1469,6 +1470,8 @@ Type
   TLabelContainer = Class(TElementContainer)
   Private
   Public
+    Constructor Create(strName : String; AScope : TScope; iLine,
+      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
 
@@ -1588,27 +1591,27 @@ ResourceString
   (** Label for Thread Variables Clause **)
   strThreadVarsLabel = 'Thread Variables';
   (** Label for Exported Headings **)
-  strExportedHeadings = 'Exported Headings';
+  strExportedHeadingsLabel = 'Exported Headings';
   (** Label for Exports Clause **)
-  strExports = 'Exports';
+  strExportsLabel = 'Exports';
   (** Label for Implemented Methods **)
-  strImplementedMethods = 'Implemented Methods';
+  strImplementedMethodsLabel = 'Implemented Methods';
   (** Label for Requires Clause **)
-  strRequires = 'Requires';
+  strRequiresLabel = 'Requires';
   (** Label for Contains Clause **)
-  strContains = 'Contains';
+  strContainsLabel = 'Contains';
   (** Label for Initialization Clause **)
-  strInitialization = 'Initialization';
+  strInitializationLabel = 'Initialization';
   (** Label for Finalization Clause **)
-  strFinalization = 'Finalization';
+  strFinalizationLabel = 'Finalization';
   (** Label for Labels **)
-  strLabel = 'Labels';
+  strLabelsLabel = 'Labels';
   (** Label for fields **)
   strFieldsLabel = 'Fields';
   (** Label for Properties **)
-  strProperties = 'Properties';
+  strPropertiesLabel = 'Properties';
   (** Label for Methods. **)
-  strMethods = 'Methods';
+  strMethodsLabel = 'Methods';
 
   (** Resource string for a class not found. **)
   strUnExpectedStartOfFile = 'Unexpected start-of-file.';
@@ -2734,22 +2737,6 @@ end;
 function TTag.GetTokenType(iTokenIndex: Integer): TTokenType;
 begin
   Result := TTokenType(FTokens.Objects[iTokenIndex]);
-end;
-
-(**
-
-  This is a setter method for the TagName property of the TTag class.
-
-  @precon  Value is the new value of the TagName property.
-  @postcon Sets the TagName property.
-
-  @param   Value as a String constant
-
-**)
-procedure TTag.SetTagName(const Value: String);
-begin
-  If FTagName <> Value Then
-    FTagName := Value;
 end;
 
 (** --------------------------------------------------------------------------
@@ -4057,6 +4044,33 @@ End;
 
 (**
 
+  This method recursively checks the referenced property and outputs a hint if
+  any element is not refrernced which has a scope of Local or Private.
+
+  @precon  None.
+  @postcon Recursively checks the referenced property and outputs a hint if
+           any element is not refrernced which has a scope of Local or Private.
+
+**)
+Procedure TElementContainer.CheckReferences;
+
+Var
+  i : Integer;
+
+begin
+  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
+    Begin
+      If Scope In [scLocal, scPrivate] Then
+        If Not Referenced Then
+          AddIssue(Format(strUnreferencedLocal, [Identifier]),
+            scNone, 'CheckReferences', Line, Column, etHint);
+      For i := 1 To ElementCount Do
+        Elements[i].CheckReferences;
+    End;
+end;
+
+(**
+
   This is a setter method for the Sorted property.
 
   @precon  None.
@@ -5208,11 +5222,6 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctTypeClauseUndocumented]);
     End;
-  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
-    If Scope In [scLocal, scPrivate] Then
-      If Not Referenced Then
-        AddIssue(Format(strUnreferencedLocal, [Identifier]),
-          scNone, 'CheckDocumentation', Line, Column, etHint);
   Inherited CheckDocumentation(boolCascade);
 End;
 
@@ -5236,11 +5245,6 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctConstantClauseUndocumented]);
     End;
-  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
-    If Scope In [scLocal, scPrivate] Then
-      If Not Referenced Then
-        AddIssue(Format(strUnreferencedLocal, [Identifier]),
-          scNone, 'CheckDocumentation', Line, Column, etHint);
   Inherited CheckDocumentation(boolCascade);
 End;
 
@@ -5264,11 +5268,6 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctVariableClauseUndocumented]);
     End;
-  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
-    If Scope In [scLocal, scPrivate] Then
-      If Not Referenced Then
-        AddIssue(Format(strUnreferencedLocal, [Identifier]),
-          scNone, 'CheckDocumentation', Line, Column, etHint);
   Inherited CheckDocumentation(boolCascade);
 End;
 
@@ -5297,11 +5296,6 @@ Begin
           CheckMethodReturns;
         End;
     End;
-  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
-    If Scope In [scLocal] Then
-      If Not Referenced Then
-        AddIssue(Format(strUnreferencedLocal, [Identifier]),
-          scNone, 'CheckDocumentation', Line, Column, etHint);
   Inherited CheckDocumentation(boolCascade);
 end;
 
@@ -5935,6 +5929,31 @@ begin
 end;
 
 { TLabelContainer }
+
+(**
+
+  This is an overridden constructor to ensure that label are not displayed in
+  the unreferenced scope hints.
+
+  @precon  None.
+  @postcon Overridden constructor to ensure that label are not displayed in
+           the unreferenced scope hints.
+
+  @param   strName     as a String
+  @param   AScope      as a TScope
+  @param   iLine       as an Integer
+  @param   iColumn     as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+
+**)
+Constructor TLabelContainer.Create(strName: String; AScope: TScope; iLine,
+  iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
+
+Begin
+  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+  FReferenced := True;
+End;
 
 (**
 

@@ -3,7 +3,7 @@
   This is a generic progress dialogue for use in the ObjectPascalDocWizard.
 
   @version    0.9
-  @date       18 May 2006
+  @date       23 Sep 2008
   @author     David Hoyle
 
 **)

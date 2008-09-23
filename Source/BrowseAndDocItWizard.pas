@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    22 Sep 2008
+  @Date    23 Sep 2008
   @Version 1.0
 
   @bug     Line position of comment tags in coflicts is not right!
@@ -527,19 +527,19 @@ begin
       ctBlock:
         Begin
           Writer.Insert('(**');
-          Writer.Insert(#10#13);
-          Writer.Insert(PChar(StringOfChar(#32, iLen - 1) + '  '#10#13));
-          Writer.Insert(PChar(StringOfChar(#32, iLen - 1) + '  '#10#13));
-          Writer.Insert(PChar(StringOfChar(#32, iLen - 1) + '  '#10#13));
+          Writer.Insert(#13#10);
+          Writer.Insert(PChar(StringOfChar(#32, iLen - 1) + '  '#13#10));
+          Writer.Insert(PChar(StringOfChar(#32, iLen - 1) + '  '#13#10));
+          Writer.Insert(PChar(StringOfChar(#32, iLen - 1) + '  '#13#10));
           Writer.Insert(PChar(StringOfChar(#32, iLen - 1)));
-          Writer.Insert(PChar('**)'#10#13));
+          Writer.Insert(PChar('**)'#13#10));
           Writer.Insert(PChar(StringOfChar(#32, iLen - 1)));
         End;
       ctLine :
         Begin
           Writer.Insert('(**');
           Writer.Insert(#32#32);
-          Writer.Insert(PChar('**)'#10#13));
+          Writer.Insert(PChar('**)'#13#10));
           Writer.Insert(PChar(StringOfChar(#32, iLen - 1)));
         End;
       ctInSitu :
@@ -778,7 +778,7 @@ begin
       Writer.CopyTo(iBufferPos - 1);
     End;
   // Block Header
-  Writer.Insert('(**'#10#13#10#13);
+  Writer.Insert('(**'#13#10#13#10);
   Writer.Insert(PChar(GetMethodDescription(Method, AComment,
     CharPos.CharIndex - 1 + 2, P)));
   // Output method information
@@ -794,7 +794,7 @@ begin
       If Method.Parameters[i].ParamType <> Nil Then
         Begin
           strType := Method.Parameters[i].ParamReturn;
-          Writer.Insert(PChar(Format('%s %s%s%s'#10#13, [
+          Writer.Insert(PChar(Format('%s %s%s%s'#13#10, [
             strAOrAn[(strType[1] In strVowels) Or Method.Parameters[i].ArrayOf],
             strArrayOf[Method.Parameters[i].ArrayOf], strType,
             strModifier[Method.Parameters[i].ParamModifier]])));
@@ -806,12 +806,12 @@ begin
       Writer.Insert(PChar(Format('  @return  %s %-*s',
         [strAOrAn[Method.ReturnType.AsString[1] In strVowels], iLen,
         Method.ReturnType.AsString])));
-      Writer.Insert(PChar(#10#13));
+      Writer.Insert(PChar(#13#10));
     End;
   // Block Footer
   If (Method.ParameterCount > 0) Or (Method.ReturnType <> Nil) Then
-    Writer.Insert(PChar(#10#13));
-  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '**)'#10#13));
+    Writer.Insert(PChar(#13#10));
+  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '**)'#13#10));
   Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
   iLines := Writer.CurrentPos.Line - iLines;
   // Get header in view if not already
@@ -883,10 +883,10 @@ begin
             End;
         End;
   If AComment = Nil Then
-    Result := Format('%s'#10#13#10#13, [strDescription])
+    Result := Format('%s'#13#10#13#10, [strDescription])
   Else
     Begin
-      Result := Format('%s'#10#13#10#13, [AComment.AsString(iIndent, 80, True)]);
+      Result := Format('%s'#13#10#13#10, [AComment.AsString(iIndent, 80, True)]);
       boolCon := False;
       i := AComment.FindTag('precon');
       If i > -1 Then
@@ -901,7 +901,7 @@ begin
           boolCon := True;
         End;
       If boolCon Then
-        Result := Result + #10#13;
+        Result := Result + #13#10;
       boolCon := False;
       For i := 0 To AComment.TagCount - 1 Do
         If Not IsKeyWord(AComment.Tag[i].TagName, ['param', 'postcon', 'precon', 'return']) Then
@@ -910,7 +910,7 @@ begin
             boolCon := True;
           End;
       If boolCon Then
-        Result := Result + #10#13;
+        Result := Result + #13#10;
     End;
 end;
 
@@ -947,9 +947,9 @@ Begin
     Else
       Begin
         Result := Result + str;
-        str := #10#13 + StringOfChar(#32, iIndent + 9) + Tag.Token[i] + #32;
+        str := #13#10 + StringOfChar(#32, iIndent + 9) + Tag.Token[i] + #32;
       End;
-  Result := Result + str + #10#13;
+  Result := Result + str + #13#10;
 End;
 
 (**
@@ -1140,7 +1140,7 @@ Begin
       Writer.Insert(PChar(Format('  @return  %s %-*s',
         [strAOrAn[Prop.TypeId.AsString[1] In strVowels], iLen,
         Prop.TypeId.AsString])));
-      Writer.Insert(PChar(#10#13));
+      Writer.Insert(PChar(#13#10));
     End;
   Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '**)'#13#10));
   Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
@@ -1179,10 +1179,10 @@ var
 begin
   If AComment = Nil Then
     Begin
-      Result := #32#32#10#13;
+      Result := #32#32#13#10;
     End Else
     Begin
-      Result := Format('%s'#10#13, [AComment.AsString(iIndent, 80, True)]);
+      Result := Format('%s'#13#10, [AComment.AsString(iIndent, 80, True)]);
       i := AComment.FindTag('precon');
       If i > -1 Then
         Result := Result + OutputTag(iIndent, AComment.Tag[i]);

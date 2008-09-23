@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    22 Sep 2008
+  @Date    23 Sep 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -150,7 +150,6 @@ type
       SelectType : TSelectType) : Integer;
     procedure ExpandNodes;
     procedure OutputModuleInfo(Container : TElementContainer);
-    Procedure CMMouseLeave(var Msg : TMessage); Message CM_MOUSELEAVE;
     function FindTreeItem(strText: String): Integer;
     procedure GetExpandedNodes;
     function GetNodePath(Node: TTreeNode): String;
@@ -161,9 +160,12 @@ type
       @postcon Returns the indexed NodeInfo class for the collection.
       @param   iIndex as an Integer
       @return  a TTreeNodeInfo
+      @bug     This property is not referenced in TObjectDecl.ReferenceSymbol.
     **)
     Property NodeInfo[iIndex : Integer] : TTreeNodeInfo Read GetTreeNodeInfo;
     Procedure RenderContainers(RootNode : TTreenode; Container : TElementContainer);
+  Protected
+    Procedure CMMouseLeave(var Msg : TMessage); Message CM_MOUSELEAVE;
   public
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
@@ -653,7 +655,8 @@ Begin
             FSpecialTagNodes := Nil;
           End;
         Finally
-          M.AddTickCount('Setup');
+          If M <> Nil Then
+            M.AddTickCount('Setup');
           Items.EndUpdate;
         End;
       End;

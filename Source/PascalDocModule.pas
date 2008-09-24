@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       23 Sep 2008
+  @Date       24 Sep 2008
   @Author     David Hoyle
 
 **)
@@ -647,7 +647,6 @@ Type
     Procedure AddToExpression(Container : TElementContainer);
     function IsToken(strToken: String; Container: TElementContainer): Boolean;
     procedure ArrayElement(C : TElementContainer; iStartDimension: Integer; AT : TArrayType);
-    Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
     Procedure CheckReturnValue(Method : TPascalMethod);
     Procedure CheckAlias(Method : TPascalMethod);
     Function CheckNumberType(ExprType : TExprTypes) : Boolean;
@@ -1957,59 +1956,6 @@ end;
 
 (**
 
-  This function returns the token type for a given character and last token
-  type.
-
-  @precon  Ch is the character for which the token type assessment needs to be
-           taken for and LastToken os the type of the last token as this has an
-           effect on some characters.
-  @postcon Returns the token type for the given character.
-
-  @param   Ch           as a Char
-  @param   LastCharType as a TTokenType
-  @return  a TTokenType
-
-**)
-Function TPascalModule.GetTokenType(Ch : Char;
-  LastCharType : TTokenType) : TTokenType;
-
-Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.GetTokenType');
-  Try
-  {$ENDIF}
-  If ch In strWhiteSpace Then
-    Result := ttWhiteSpace
-  Else If ch In strTokenChars Then
-    Begin
-      If (LastCharType = ttNumber) And (Ch In ['A'..'F', 'a'..'f']) Then
-        Result := ttNumber
-      Else
-        Result := ttIdentifier;
-    End
-  Else If ch In strNumbers Then
-    Begin
-      Result := ttNumber;
-      If LastCharType = ttIdentifier Then
-        Result := ttIdentifier;
-    End
-  Else If ch In strLineEnd Then
-    Result := ttLineEnd
-  Else If ch In strQuote Then
-    Result := ttStringLiteral
-  Else If ch In strSymbols Then
-    Result := ttSymbol
-  Else
-    Result := ttUnknown;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
-End;
-
-(**
-
   This is the constructor method for the TPascalDocModule class.
 
   @precon  Source is a valid TStream descendant containing as stream of text,
@@ -2183,7 +2129,30 @@ Begin
             Begin
               Inc(iStreamCount);
               LastCharType := CurCharType;
-              CurCharType := GetTokenType(Ch, LastCharType);
+
+              If ch In strWhiteSpace Then
+                CurCharType := ttWhiteSpace
+              Else If ch In strTokenChars Then
+                Begin
+                  If (LastCharType = ttNumber) And (Ch In ['A'..'F', 'a'..'f']) Then
+                    CurCharType := ttNumber
+                  Else
+                    CurCharType := ttIdentifier;
+                End
+              Else If ch In strNumbers Then
+                Begin
+                  CurCharType := ttNumber;
+                  If LastCharType = ttIdentifier Then
+                    CurCharType := ttIdentifier;
+                End
+              Else If ch In strLineEnd Then
+                CurCharType := ttLineEnd
+              Else If ch In strQuote Then
+                CurCharType := ttStringLiteral
+              Else If ch In strSymbols Then
+                CurCharType := ttSymbol
+              Else
+                CurCharType := ttUnknown;
 
               // Check for full block comments
               If (BlockType = btNoBlock) And (LastChar = '(') And (Ch = '*') Then
@@ -2198,8 +2167,7 @@ Begin
                 Begin
                   If ((BlockType In [btStringLiteral, btLineComment]) And
                     (CurCharType <> ttLineEnd)) Or
-                    (BlockType In [btBraceComment, btFullComment,
-                    btCompoundSymbol]) Then
+                    (BlockType In [btBraceComment, btFullComment, btCompoundSymbol]) Then
                     Begin
                       Inc(iTokenLen);
                       If iTokenLen > Length(strToken) Then
@@ -2208,35 +2176,36 @@ Begin
                     End Else
                     Begin
                       SetLength(strToken, iTokenLen);
-                      If Not IsTokenWhiteSpace(strToken) Then
-                        Begin
-                          If LastCharType = ttIdentifier Then
-                            Begin
-                              If IsKeyWord(strToken, strReservedWords) Then
-                                LastCharType := ttReservedWord;
-                              If IsKeyWord(strToken, strDirectives) Then
-                                LastCharType := ttDirective;
-                              If strToken[1] = '#' Then
-                                LastCharType := ttStringLiteral;
-                            End;
-                          If BlockType = btLineComment Then
-                            LastCharType := ttComment;
-                          If (LastCharType = ttComment) And (Length(strToken) > 2) Then
-                            If (strToken[1] = '{') And (strToken[2] = '$') Then
-                              LastCharType := ttCompilerDirective;
-                          If ((LastToken = ttNumber) And ((strToken = '.') Or (LastCharType = ttNumber))) Or
-                            ((LastToken = ttStringLiteral) And (strToken[1] = '#')) Or
-                            ((LastToken = ttStringLiteral) And (LastCharType = ttStringLiteral)) Then
-                            Begin
-                              AppendToLastToken(strToken);
-                              LastToken := LastToken;
-                            End Else
-                            Begin
-                              AddToken(TTokenInfo.Create(strToken, iStreamPos,
-                                iTokenLine, iTokenColumn, Length(strToken), LastCharType));
-                              LastToken := LastCharType;
-                            End;
-                        End;
+                      If iTokenLen > 0 Then
+                        If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
+                          Begin
+                            If LastCharType = ttIdentifier Then
+                              Begin
+                                If IsKeyWord(strToken, strReservedWords) Then
+                                  LastCharType := ttReservedWord;
+                                If IsKeyWord(strToken, strDirectives) Then
+                                  LastCharType := ttDirective;
+                                If strToken[1] = '#' Then
+                                  LastCharType := ttStringLiteral;
+                              End;
+                            If BlockType = btLineComment Then
+                              LastCharType := ttComment;
+                            If (LastCharType = ttComment) And (Length(strToken) > 2) Then
+                              If (strToken[1] = '{') And (strToken[2] = '$') Then
+                                LastCharType := ttCompilerDirective;
+                            If ((LastToken = ttNumber) And ((strToken = '.') Or (LastCharType = ttNumber))) Or
+                              ((LastToken = ttStringLiteral) And (strToken[1] = '#')) Or
+                              ((LastToken = ttStringLiteral) And (LastCharType = ttStringLiteral)) Then
+                              Begin
+                                AppendToLastToken(strToken);
+                                LastToken := LastToken;
+                              End Else
+                              Begin
+                                AddToken(TTokenInfo.Create(strToken, iStreamPos,
+                                  iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+                                LastToken := LastCharType;
+                              End;
+                          End;
                      // Store Stream position, line number and column of
                      // token start
                      iStreamPos := iStreamCount;
@@ -2298,7 +2267,7 @@ Begin
         If iTokenLen > 0 Then
           Begin
             SetLength(strToken, iTokenLen);
-            If Not IsTokenWhiteSpace(strToken) Then
+            If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
               AddToken(TTokenInfo.Create(strToken, iStreamPos,
                 iTokenLine, iTokenColumn, Length(strToken), LastCharType));
           End;

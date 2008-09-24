@@ -80,14 +80,18 @@ object frmOptions: TfrmOptions
     object Page2: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         342)
       object lbSpecialTags: TListBox
         Left = 3
-        Top = 19
+        Top = 26
         Width = 669
-        Height = 289
+        Height = 282
         Style = lbOwnerDrawFixed
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 16
@@ -187,6 +191,10 @@ object frmOptions: TfrmOptions
     object TabSheet1: TTabSheet
       Caption = 'Module Explorer'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -237,7 +245,7 @@ object frmOptions: TfrmOptions
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 0
       end
       object edtFontSize: TEdit
@@ -344,7 +352,7 @@ object frmOptions: TfrmOptions
         Width = 150
         Height = 21
         TabOrder = 7
-        Text = '0'
+        Text = '10'
       end
       object udTokenLimit: TUpDown
         Left = 654
@@ -361,6 +369,10 @@ object frmOptions: TfrmOptions
     object TabSheet2: TTabSheet
       Caption = 'Code Browsing'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -383,6 +395,10 @@ object frmOptions: TfrmOptions
     object tabExcludeDocFiles: TTabSheet
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -400,31 +416,13 @@ object frmOptions: TfrmOptions
     object tabMethodDescriptions: TTabSheet
       Caption = 'Method Descriptions'
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         342)
-      object lvMethodDescriptions: TListView
-        Left = 3
-        Top = 3
-        Width = 588
-        Height = 336
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        Columns = <
-          item
-            Caption = 'Pattern'
-            Width = 150
-          end
-          item
-            Caption = 'Description'
-            Width = 375
-          end>
-        HideSelection = False
-        ReadOnly = True
-        RowSelect = True
-        TabOrder = 0
-        ViewStyle = vsReport
-        OnDblClick = lvMethodDescriptionsDblClick
-      end
       object btnAddDesc: TBitBtn
         Left = 597
         Top = 3
@@ -432,7 +430,7 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Add'
-        TabOrder = 1
+        TabOrder = 0
         OnClick = btnAddDescClick
         Glyph.Data = {
           76010000424D7601000000000000760000002800000020000000100000000100
@@ -456,7 +454,7 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Edit'
-        TabOrder = 2
+        TabOrder = 1
         OnClick = btnEditDescClick
         Glyph.Data = {
           76010000424D7601000000000000760000002800000020000000100000000100
@@ -480,7 +478,7 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Delete'
-        TabOrder = 3
+        TabOrder = 2
         OnClick = btnDeleteDescClick
         Glyph.Data = {
           76010000424D7601000000000000760000002800000020000000100000000100
@@ -497,10 +495,46 @@ object frmOptions: TfrmOptions
           3000333333333333377733333333333333333333333333333333}
         NumGlyphs = 2
       end
+      object hctlMethodDescriptions: THeaderControl
+        Left = 3
+        Top = 3
+        Width = 588
+        Height = 17
+        Align = alNone
+        Anchors = [akLeft, akTop, akRight]
+        Sections = <
+          item
+            ImageIndex = -1
+            Text = 'Pattern'
+            Width = 150
+          end
+          item
+            ImageIndex = -1
+            Text = 'Description'
+            Width = 400
+          end>
+        Style = hsFlat
+      end
+      object lbxMethodDescriptions: TListBox
+        Left = 3
+        Top = 26
+        Width = 588
+        Height = 313
+        Style = lbOwnerDrawFixed
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        ItemHeight = 16
+        TabOrder = 4
+        OnDblClick = lbxMethodDescriptionsDblClick
+        OnDrawItem = lbxMethodDescriptionsDrawItem
+      end
     end
     object HelpFilePage: TTabSheet
       Caption = ' Help File Directory'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object HelpFileDir: TDirectoryListBox
         Left = 0
         Top = 0

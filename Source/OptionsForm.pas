@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    14 Sep 2008
+  @Date    24 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -62,7 +62,6 @@ type
     tabExcludeDocFiles: TTabSheet;
     mmoExcludeDocFiles: TMemo;
     tabMethodDescriptions: TTabSheet;
-    lvMethodDescriptions: TListView;
     btnAddDesc: TBitBtn;
     btnEditDesc: TBitBtn;
     btnDeleteDesc: TBitBtn;
@@ -71,6 +70,8 @@ type
     lblTokenLimit: TLabel;
     edtTokenLimit: TEdit;
     udTokenLimit: TUpDown;
+    hctlMethodDescriptions: THeaderControl;
+    lbxMethodDescriptions: TListBox;
     procedure btnAddClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
     procedure btnEditClick(Sender: TObject);
@@ -90,7 +91,9 @@ type
     procedure btnDeleteDescClick(Sender: TObject);
     procedure btnAddDescClick(Sender: TObject);
     procedure btnEditDescClick(Sender: TObject);
-    procedure lvMethodDescriptionsDblClick(Sender: TObject);
+    procedure lbxMethodDescriptionsDblClick(Sender: TObject);
+    procedure lbxMethodDescriptionsDrawItem(Control: TWinControl;
+      Index: Integer; Rect: TRect; State: TOwnerDrawState);
     { Private declarations }
   Private
     FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
@@ -129,11 +132,10 @@ Var
   i : TDocOption;
   j : Integer;
   k : TTokenType;
-  Item: TListItem;
 
 Begin
   Result := False;
-  With TfrmOptions.Create(Nil) Do
+  With TfrmOptions.Create(Application.MainForm) Do
     Try
       For i := Low(TDocOption) To High(TDocOption) Do
         Begin
@@ -158,11 +160,7 @@ Begin
       rgpBrowsePosition.ItemIndex := Integer(BrowseAndDocItOptions.BrowsePosition);
       mmoExcludeDocFiles.Text := BrowseAndDocItOptions.ExcludeDocFiles.Text;
       For j := 0 To BrowseAndDocItOptions.MethodDescriptions.Count - 1 Do
-        Begin
-          Item := lvMethodDescriptions.Items.Add;
-          Item.Caption := BrowseAndDocItOptions.MethodDescriptions.Names[j];
-          Item.SubItems.Add(BrowseAndDocItOptions.MethodDescriptions.ValueFromIndex[j]);
-        End;
+        lbxMethodDescriptions.Items.Add(BrowseAndDocItOptions.MethodDescriptions[j]);
       cbxBGColour.Selected := BrowseAndDocItOptions.BGColour;
       udTokenLimit.Position := BrowseAndDocItOptions.TokenLimit;
       If ShowModal = mrOK Then
@@ -185,10 +183,9 @@ Begin
           BrowseAndDocItOptions.BrowsePosition := TBrowsePosition(rgpBrowsePosition.ItemIndex);
           BrowseAndDocItOptions.ExcludeDocFiles.Text := mmoExcludeDocFiles.Text;
           BrowseAndDocItOptions.MethodDescriptions.Clear;
-          For j := 0 To lvMethodDescriptions.Items.Count - 1 Do
-            BrowseAndDocItOptions.MethodDescriptions.Add(Format('%s=%s', [
-              lvMethodDescriptions.Items[j].Caption,
-              lvMethodDescriptions.Items[j].SubItems[0]]));
+          For j := 0 To lbxMethodDescriptions.Items.Count - 1 Do
+            BrowseAndDocItOptions.MethodDescriptions.Add(
+            lbxMethodDescriptions.Items[j]);
           BrowseAndDocItOptions.BGColour := cbxBGColour.Selected;
           BrowseAndDocItOptions.TokenLimit := udTokenLimit.Position;
           BrowseAndDocItOptions.SaveSettings;
@@ -200,12 +197,14 @@ End;
 
 (**
 
-  This is an on create event handler for the form.
+
+  This is an on create event handler for the form.
 
   @precon  None.
   @postcon Initialises the font names drop down with font names.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmOptions.FormCreate(Sender: TObject);
@@ -261,12 +260,14 @@ end;
 
 (**
 
-  This is an on mouse down event handler for the special tags list box.
+
+  This is an on mouse down event handler for the special tags list box.
 
   @precon  None.
   @postcon Allows th euser to enabled/diaable items by clicking on them.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
   @param   Button as a TMouseButton
   @param   Shift  as a TShiftState
   @param   X      as an Integer
@@ -298,12 +299,44 @@ end;
 
 (**
 
-  This is an on click event handler for the token type list box control.
+  This is an on draw item event handler for the method descriptions.
+
+  @precon  None.
+  @postcon Draws the str=str information in the list box as 2 columns of
+           information without the = sign.
+
+  @param   Control as a TWinControl
+  @param   Index   as an Integer
+  @param   Rect    as a TRect
+  @param   State   as a TOwnerDrawState
+
+**)
+procedure TfrmOptions.lbxMethodDescriptionsDrawItem(Control: TWinControl;
+  Index: Integer; Rect: TRect; State: TOwnerDrawState);
+
+var
+  lb: TListBox;
+  iPos: Integer;
+
+begin
+  lb := Control As TListBox;
+  lb.Canvas.FillRect(Rect);
+  iPos := Pos('=', lb.Items[Index]);
+  lb.Canvas.TextOut(Rect.Left + 4, Rect.Top, Copy(lb.Items[Index], 1, iPos - 1));
+  lb.Canvas.TextOut(Rect.Left + 154, Rect.Top, Copy(lb.Items[Index], iPos + 1,
+    Length(lb.Items[Index]) - iPos));
+end;
+
+(**
+
+
+  This is an on click event handler for the token type list box control.
 
   @precon  None.
   @postcon Sets the Font Colour and style controls.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmOptions.lbxTokenTypesClick(Sender: TObject);
@@ -321,16 +354,18 @@ end;
 
 (**
 
-  This method is an on double click event handler for the Metho Description
+
+  This method is an on double click event handler for the Metho Description
   ListView.
 
   @precon  None.
   @postcon Edits the selected item.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
-procedure TfrmOptions.lvMethodDescriptionsDblClick(Sender: TObject);
+procedure TfrmOptions.lbxMethodDescriptionsDblClick(Sender: TObject);
 begin
   btnEditDescClick(Sender);
 end;
@@ -365,27 +400,24 @@ end;
 
 (**
 
-  This method is an on click event handler for the Add Description button.
+
+  This method is an on click event handler for the Add Description button.
 
   @precon  None.
   @postcon Aloows the user to add a method description to the list.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmOptions.btnAddDescClick(Sender: TObject);
 
 Var
   strPattern, strDescription : String;
-  Item: TListItem;
 
 begin
   If TfrmMethodDescriptions.Execute(strPattern, strDescription) Then
-    Begin
-      Item := lvMethodDescriptions.Items.Add;
-      Item.Caption := strPattern;
-      Item.SubItems.Add(strDescription);
-    End;
+    lbxMethodDescriptions.Items.Add(Format('%s=%s', [strPattern, strDescription]));
 end;
 
 (**
@@ -407,18 +439,20 @@ end;
 
 (**
 
-  This is an on click event handler for the delete description button.
+
+  This is an on click event handler for the delete description button.
 
   @precon  None.
   @postcon Delete the selected item from the method description list view.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmOptions.btnDeleteDescClick(Sender: TObject);
 begin
-  If lvMethodDescriptions.ItemIndex > -1 Then
-    lvMethodDescriptions.Items.Delete(lvMethodDescriptions.ItemIndex);
+  If lbxMethodDescriptions.ItemIndex > -1 Then
+    lbxMethodDescriptions.Items.Delete(lbxMethodDescriptions.ItemIndex);
 end;
 
 (**
@@ -466,12 +500,14 @@ end;
 
 (**
 
-  This method is an on click event handler for the Edit Description button.
+
+  This method is an on click event handler for the Edit Description button.
 
   @precon  None.
   @postcon Allows the user to edit the current method description.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmOptions.btnEditDescClick(Sender: TObject);
@@ -481,14 +517,14 @@ Var
   iIndex: Integer;
 
 begin
-  iIndex := lvMethodDescriptions.ItemIndex;
+  iIndex := lbxMethodDescriptions.ItemIndex;
   If iIndex > -1 Then
     Begin
-      strPattern := lvMethodDescriptions.Items[iIndex].Caption;
-      strDescription := lvMethodDescriptions.Items[iIndex].SubItems[0];
+      strPattern := lbxMethodDescriptions.Items.Names[iIndex];
+      strDescription := lbxMethodDescriptions.Items.ValueFromIndex[iIndex];
       If TfrmMethodDescriptions.Execute(strPattern, strDescription) Then
-        lvMethodDescriptions.Items[iIndex].Caption := strPattern;
-        lvMethodDescriptions.Items[iIndex].SubItems[0] := strDescription;
+        lbxMethodDescriptions.Items[iIndex] := Format('%s=%s', [strPattern,
+          strDescription]);
     End;
 end;
 
@@ -512,12 +548,14 @@ end;
 
 (**
 
-  This is an on change event handler for the Font Colour control.
+
+  This is an on change event handler for the Font Colour control.
 
   @precon  None.
   @postcon Updates the internal list of Token Font Information.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmOptions.cbxFontColourChange(Sender: TObject);
@@ -527,12 +565,14 @@ end;
 
 (**
 
-  This is an on click event handler for the bold check box.
+
+  This is an on click event handler for the bold check box.
 
   @precon  None.
   @postcon Includes or Excludes the Bold option in the token font info style.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmOptions.chkBoldClick(Sender: TObject);
@@ -545,12 +585,14 @@ end;
 
 (**
 
-  This is an on click event handler for the italic check box.
+
+  This is an on click event handler for the italic check box.
 
   @precon  None.
   @postcon Includes or Excludes the Italic option in the token font info style.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmOptions.chkItalicClick(Sender: TObject);
@@ -563,12 +605,14 @@ end;
 
 (**
 
-  This is an on click event handler for the Strikeout check box.
+
+  This is an on click event handler for the Strikeout check box.
 
   @precon  None.
   @postcon Includes or Excludes the Strikeout option in the token font info style.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmOptions.chkStrikeoutClick(Sender: TObject);
@@ -581,12 +625,14 @@ end;
 
 (**
 
-  This is an on click event handler for the Underline check box.
+
+  This is an on click event handler for the Underline check box.
 
   @precon  None.
   @postcon Includes or Excludes the Underline option in the token font info style.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmOptions.chkUnderlineClick(Sender: TObject);

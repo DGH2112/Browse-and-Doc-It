@@ -4,7 +4,7 @@
   profiles.
 
   @Version 1.0
-  @Date    23 Sep 2008
+  @Date    24 Sep 2008
   @Author  David Hoyle
 
 **)
@@ -22,33 +22,23 @@ Type
   TProfile = Class
   Strict Private
     FMethodName    : String;
-    FStartTick     : Int64;
-    FDurationTick  : Int64;
-    FInProcessTick : Int64;
+    FStartTick     : Extended;
+    FDurationTick  : Extended;
+    FInProcessTick : Extended;
     FCallCount     : Int64;
     FProfiles      : TObjectList;
     FParent        : TProfile;
     FStackDepth    : Int64;
-  Strict
-  private
+  Strict Protected
     Function FindProfile(strMethodName : String; iStackDepth : Integer) : TProfile;
     Procedure StartTiming;
-    Function GetTotalTime: Int64;
     (**
       This property returns the total duration of the profiles calls, i.e. TickCount.
       @precon  None.
       @postcon Returns the total duration of the profiles calls.
-      @return  a Int64
+      @return  a Extended
     **)
-    Property DurationTick : Int64 Read FDurationTick;
-    (**
-      This property returns the total duration of all the profiles sub profile calls.
-      @precon  None.
-      @postcon Returns the total duration of all the profiles sub profile calls
-      @return  a Int64
-    **)
-    Property TotalTime : Int64 Read GetTotalTime;
-  published
+    Property DurationTick : Extended Read FDurationTick;
   Public
     Constructor Create(strMethod : String; iStackDepth : Integer; objParent : TProfile);
     Destructor Destroy; Override;
@@ -73,12 +63,34 @@ Type
   End;
 
 Var
+  (** This is a public variable which give the calling code access to the
+      instance of the TPRofiler class. **)
   CodeProfiler : TProfiler;
 
 Implementation
 
 Uses
-  SysUtils, Windows;
+  SysUtils, Windows {$IFNDEF CONSOLE}, ProgressForm {$ENDIF};
+
+(**
+
+  This method returns the performance tick count from the system.
+
+  @precon  None.
+  @postcon Returns the performance tick count from the system.
+
+  @return  an Extended
+
+**)
+Function TickTime: Extended;
+
+Var
+  t, f : Int64;
+begin
+  QueryPerformanceCounter(t);
+  QueryPerformanceFrequency(f);
+  Result := 1000000.0 * Int(t) / Int(f);
+end;
 
 (**
 
@@ -144,15 +156,13 @@ Begin
           FInProcessTick := FInProcessTick - P.DurationTick;
         End;
       iPos := Pos('.', FMethodName);
-      slProfileFile.Add(Format('%d,%s,%s,%d,%d,%d,%1.1f,%1.1f', [
+      slProfileFile.Add(Format('%d,%s,%s,%1.1f,%1.1f,%d', [
         FStackDepth,
         Copy(FMethodName, 1, iPos - 1),
         Copy(FMethodName, iPos + 1, Length(FMethodName) - iPos),
         FDurationTick,
         FInProcessTick,
-        FCallCount,
-        Int(FDurationTick) / Int(FCallCount),
-        Int(FInProcessTick) / Int(FCallCount)
+        FCallCount
       ]));
     End;
   For i := 0 To FProfiles.Count - 1 Do
@@ -170,8 +180,8 @@ End;
            found the profile is returned else a new profile is added and that
            profile returned.
 
-  @param   strMethod as a String
-  @param   iStackDepth as a Integer
+  @param   strMethodName as a String
+  @param   iStackDepth   as an Integer
   @return  a TProfile
 
 **)
@@ -197,34 +207,15 @@ End;
 
 (**
 
-  This method is a getter method for the TotalTime property.
+  This method starts the process of monitoring the current methods profile
+  session.
 
   @precon  None.
-  @postcon Returns the total time for all sub profiles.
+  @postcon Starts the process of monitoring the current methods profile
+           session.
 
-  @return  an Int64
-
-**)
-function TProfile.GetTotalTime: Int64;
-
-Var
-  i : Integer;
-
-Begin
-  Result := 0;
-  For i := 0 To FProfiles.Count - 1 Do
-    Inc(Result, (FProfiles[i] As TProfile).DurationTick);
-End;
-
-(**
-
-  This method starts the process of monitoring the current methods profile session.
-
-  @precon  None.
-  @postcon Starts the process of monitoring the current methods profile session.
-
-  @param   strMethod as a String
-  @param   iStackDepth as a Integer
+  @param   strMethodName as a String
+  @param   iStackDepth   as an Integer
   @return  a TProfile
 
 **)
@@ -246,7 +237,7 @@ End;
 Procedure TProfile.StartTiming;
 
 Begin
-  FStartTick := GetTickCount;
+  FStartTick := TickTime;
   Inc(FCallCount);
 End;
 
@@ -263,7 +254,7 @@ End;
 Function TProfile.StopProfile : TProfile;
 
 Begin
-  FDurationTick  := FDurationTick + (GetTickCount - FStartTick);
+  FDurationTick  := FDurationTick + (TickTime - FStartTick);
   FInProcessTick := FDurationTick; { Make the same as FDuration. A call to
                                      calculate this needs to be made after
                                      profiling and before dumping the
@@ -315,30 +306,62 @@ Var
   strBuffer : Array[0..MAX_PATH] Of Char;
   strModuleFileName, strFileName : String;
   slProfile: TStringList;
+  {$IFNDEF CONSOLE}
+  frm : TfrmProgress;
+  {$ENDIF}
 
 Begin
-  GetModuleFileName(hInstance, strBuffer, MAX_PATH);
-  strFileName := StrPas(strBuffer);
-  strModuleFileName := strFileName;
-  strFileName := ChangeFileExt(strFileName, '.profile');
-  slProfile := TStringList.Create;
+  {$IFNDEF CONSOLE}
+  frm := TfrmProgress.Create(Nil);
+  {$ENDIF}
   Try
-    slProfile.Add('Profile Dump For Application ' + strModuleFileName + ' on ' +
-      FormatDateTime('ddd dd/mmm/yyyy @ hh:mm:ss', Now));
-    slProfile.Add(Format('%s,%s,%s,%s,%s,%s,%s,%s', [
-      'Stack Depth',
-      'Class',
-      'Method Name',
-      'Total Tick Count (ms)',
-      'In Process Tick Count (ms)',
-      'Call Count',
-      'Average Total Tick Count (ms) per Call',
-      'Average In Process Tick Count (ms) per Call'
-    ]));
-    FRootProfile.DumpProfileInformation(slProfile);
-    slProfile.SaveToFile(strFileName);
+    {$IFDEF CONSOLE}
+    WriteLn('Processing the profile information...');
+    {$ELSE}
+    frm.Init(3, 'Profiling', 'Processing the profile information...');
+    {$ENDIF}
+    GetModuleFileName(hInstance, strBuffer, MAX_PATH);
+    strFileName := StrPas(strBuffer);
+    strModuleFileName := strFileName;
+    strFileName := ChangeFileExt(strFileName, '.profile');
+    slProfile := TStringList.Create;
+    Try
+      {$IFNDEF CONSOLE}
+      frm.UpdateProgress(1, 'Loading existing data...');
+      {$ELSE}
+      frm.Init(3, 'Profiling', 'Loading existing data...');
+      {$ENDIF}
+      If FileExists(strFileName) Then
+        slProfile.LoadFromFile(strFileName);
+      slProfile.Add('Profile Dump For Application ' + strModuleFileName + ' on ' +
+        FormatDateTime('ddd dd/mmm/yyyy @ hh:mm:ss', Now));
+      slProfile.Add(Format('%s,%s,%s,%s,%s,%s', [
+        'Stack Depth',
+        'Class',
+        'Method Name',
+        'Total Tick Count (ms)',
+        'In Process Tick Count (ms)',
+        'Call Count'
+      ]));
+      {$IFNDEF CONSOLE}
+      frm.UpdateProgress(2, 'Processing new data...');
+      {$ELSE}
+      frm.Init(3, 'Profiling', 'Loading existing data...');
+      {$ENDIF}
+      FRootProfile.DumpProfileInformation(slProfile);
+      {$IFNDEF CONSOLE}
+      frm.UpdateProgress(3, 'Save data...');
+      {$ELSE}
+      frm.Init(3, 'Profiling', 'Save data...');
+      {$ENDIF}
+      slProfile.SaveToFile(strFileName);
+    Finally
+      slProfile.Free;
+    End;
   Finally
-    slProfile.Free;
+    {$IFNDEF CONSOLE}
+    frm.Free;
+    {$ENDIF}
   End;
 end;
 

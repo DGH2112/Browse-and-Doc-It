@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    22 Sep 2008
+  @Date    24 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -2024,7 +2024,6 @@ ResourceString
     'developers known which portion of the module are automatically ' +
     'destroyed.';
 
-
 Const
   (** A set of characters for whitespace **)
   strWhiteSpace : Set Of Char = [#32, #9];
@@ -2508,12 +2507,11 @@ Var
   BrowseAndDocItOptions : TBrowseAndDocItOptions;
 
   Function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
-  Function IsTokenWhiteSpace(strToken : String) : Boolean;
 
 Implementation
 
 Uses
-  Windows, StrUtils, DGHLibrary, INIFiles;
+  Windows, StrUtils, DGHLibrary, INIFiles, Profiler;
 
 Const
   (** This constant represent the maximum of issue / doc conflicts to add. **)
@@ -2579,32 +2577,6 @@ begin
         End;
     End;
 end;
-
-(***
-
-  This method checks to see if the passed token if white space, if so returns
-  true.
-
-  @precon  None.
-  @postcon Checks to see if the passed token if white space, if so returns
-           true.
-
-  @param   strToken as a String
-  @return  a Boolean
-
-**)
-Function IsTokenWhiteSpace(strToken : String) : Boolean;
-
-Var
-  i : Integer;
-
-Begin
-  Result := True;
-  For i := 1 To Length(strToken) Do
-    If Not (strToken[i] In strWhiteSpace) And
-      Not (strToken[i] In strLineEnd)Then
-      Result := False;
-End;
 
 (**
 
@@ -3147,8 +3119,9 @@ begin
         (strComment[i] = '<') Then
         Begin
           SetLength(strToken, iTokenLen);
-          If Not IsTokenWhiteSpace(strToken) Then
-            AddToken(strToken, LastToken);
+          If iTokenLen > 0 Then
+            If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
+              AddToken(strToken, LastToken);
           iTokenLen := 1;
           SetLength(strToken, iTokenCapacity);
           strToken[iTokenLen] := strComment[i];;
@@ -3179,7 +3152,7 @@ begin
   If (iTokenLen > 0) Then
     Begin
      SetLength(strToken, iTokenLen);
-      If Not IsTokenWhiteSpace(strToken) Then
+      If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
         AddToken(strToken, LastToken);
     End;
 end;

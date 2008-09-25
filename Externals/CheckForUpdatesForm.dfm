@@ -14,7 +14,7 @@ object frmCheckForUpdates: TfrmCheckForUpdates
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = False
-  Position = poMainFormCenter
+  Position = poScreenCenter
   OnClose = FormClose
   DesignSize = (
     544
@@ -26,17 +26,20 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     Top = 143
     Width = 50
     Height = 13
+    Cursor = crHandPoint
     Hint = 'Click to open this website...'
     Caption = 'lblWebSite'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlue
     Font.Height = -11
     Font.Name = 'Tahoma'
-    Font.Style = [fsUnderline]
+    Font.Style = []
     ParentFont = False
     ParentShowHint = False
     ShowHint = True
     OnClick = lblWebSiteClick
+    OnMouseEnter = lblWebSiteMouseEnter
+    OnMouseLeave = lblWebSiteMouseLeave
   end
   object lbInformation: TListBox
     Left = 8

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    15 Jun 2008
+  @Date    25 Sep 2008
 
 **)
 unit CheckForUpdatesForm;
@@ -31,6 +31,8 @@ type
     procedure btnOKClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lblWebSiteClick(Sender: TObject);
+    procedure lblWebSiteMouseEnter(Sender: TObject);
+    procedure lblWebSiteMouseLeave(Sender: TObject);
   private
     { Private declarations }
   public
@@ -149,6 +151,36 @@ procedure TfrmCheckForUpdates.lblWebSiteClick(Sender: TObject);
 begin
   ShellExecute(Application.Handle, 'OPEN', PChar(lblWebSite.Caption),
     '', '', SW_SHOWNORMAL);
+end;
+
+(**
+
+  This is an on mouse enter event handler for the web site label.
+
+  @precon  None.
+  @postcon Adds the underlining to the label.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmCheckForUpdates.lblWebSiteMouseEnter(Sender: TObject);
+begin
+  lblWebSite.Font.Style := lblWebSite.Font.Style + [fsUnderline];
+end;
+
+(**
+
+  This is an on mouse leave event handler for the web site label.
+
+  @precon  None.
+  @postcon Remove the underlining from the label.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmCheckForUpdates.lblWebSiteMouseLeave(Sender: TObject);
+begin
+  lblWebSite.Font.Style := lblWebSite.Font.Style - [fsUnderline];
 end;
 
 (**

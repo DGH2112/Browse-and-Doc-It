@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       24 Sep 2008
+  @Date       28 Sep 2008
   @Author     David Hoyle
 
 **)
@@ -161,13 +161,15 @@ Type
   (** This is a class that represents a record definition. **)
   TRecordDecl = Class(TRestrictedType)
   Private
-    FPacked : Boolean;
+    FPacked      : Boolean;
+    FFieldsLabel : TLabelContainer;
   Protected
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment); Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function  AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function  ReferenceSymbol(strSymbol : String) : Boolean; Override;
     (**
       Returns whether the record is packed or not.
       @precon  None.
@@ -175,6 +177,13 @@ Type
       @return  a Boolean
     **)
     Property IsPacked : Boolean Read FPacked Write FPacked;
+    (**
+      This property caches the fields label IF it exists.
+      @precon  None.
+      @postcon Returns the reference to the fields label.
+      @return  a TLabelContainer
+    **)
+    Property FieldsLabel : TLabelContainer Read FFieldsLabel Write FFieldsLabel;
   End;
 
   (** A class to represent a Object Pascal Parameter. **)
@@ -189,9 +198,14 @@ Type
   (** This is a class that defines method within Object Pascal code. **)
   TPascalMethod = Class(TGenericMethodDecl)
   Private
-    FDirectives : TStringList;
-    FResolved   : Boolean;
-    FObjClsInt  : TObjectDecl;
+    FDirectives           : TStringList;
+    FResolved             : Boolean;
+    FObjClsInt            : TObjectDecl;
+    FTypesLabel           : TLabelContainer;
+    FVariablesLabel       : TLabelContainer;
+    FConstantsLabel       : TLabelContainer;
+    FResourceStringsLabel : TLabelContainer;
+    FLabelsLabel          : TLabelContainer;
   Protected
     Function GetName : String; Override;
   Public
@@ -201,7 +215,7 @@ Type
     Procedure AddDirectives(strDirective : String);
     Function HasDirective(strDirective : String) : Boolean;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
-    Procedure ReferenceSymbol(strSymbol : String); Override;
+    Function ReferenceSymbol(strSymbol : String) : Boolean; Override;
     (**
       Returns the string list of directives associated with the method.
       @precon  None.
@@ -223,6 +237,44 @@ Type
       @return  a TObjectDecl
     **)
     Property ObjClsInt : TObjectDecl Read FObjClsInt Write FObjClsInt;
+    (**
+      This property gets or sets the types label for the module.
+      @precon  None.
+      @postcon Gets or sets the types label for the module.
+      @return  a TLabelContainer
+    **)
+    Property TypesLabel  : TLabelContainer Read FTypesLabel Write FTypesLabel;
+    (**
+      This property gets or sets the Variables label for the module.
+      @precon  None.
+      @postcon Gets or sets the Variables label for the module.
+      @return  a TLabelContainer
+    **)
+    Property VariablesLabel : TLabelContainer Read FVariablesLabel
+      Write FVariablesLabel;
+    (**
+      This property gets or sets the Constants label for the module.
+      @precon  None.
+      @postcon Gets or sets the Constants label for the module.
+      @return  a TLabelContainer
+    **)
+    Property ConstantsLabel : TLabelContainer Read FConstantsLabel
+      Write FConstantsLabel;
+    (**
+      This property gets or sets the Resource Strings label for the module.
+      @precon  None.
+      @postcon Gets or sets the Resource Strings label  for the module.
+      @return  a TLabelContainer
+    **)
+    Property ResourceStringsLabel : TLabelContainer Read FResourceStringsLabel
+      Write FResourceStringsLabel;
+    (**
+      This property gets or sets the Labels label for the module.
+      @precon  None.
+      @postcon Gets or sets the Labels label for the module.
+      @return  a TLabelContainer
+    **)
+    Property LabelsLabel : TLabelContainer Read FLabelsLabel Write FLabelsLabel;
   End;
 
   (** This is a class that defines properties with Object Pascal code. **)
@@ -328,6 +380,7 @@ Type
   TObjectDecl = Class(TRecordDecl)
   Private
     FHeritage : TIdentList;
+    FMethodsLabel: TLabelContainer;
   Protected
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
@@ -335,7 +388,7 @@ Type
     Destructor Destroy; Override;
     procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
-    Procedure ReferenceSymbol(strSymbol : String); Override;
+    Function ReferenceSymbol(strSymbol : String) : Boolean; Override;
     (**
       Returns a reference to the object class heritage.
       @precon  None.
@@ -343,6 +396,13 @@ Type
       @return  a TIdentList
      **)
     Property Heritage : TIdentList Read FHeritage;
+    (**
+      This property gets or sets the methods label of the object.
+      @precon  None.
+      @postcon Gets or sets the methods label of the object.
+      @return  a TLabelContainer
+    **)
+    Property MethodsLabel : TLabelContainer Read FMethodsLabel Write FMethodsLabel;
   End;
 
   (** This is a class the extends the object definition to handle an class
@@ -353,10 +413,16 @@ Type
     FSealedClass  : Boolean;
     FHelper       : Boolean;
     FHelperClass  : String;
+    FTypesLabel: TLabelContainer;
+    FConstantsLabel: TLabelContainer;
+    FVariablesLabel: TLabelContainer;
+    FClassVarsLabel: TLabelContainer;
+    FPropertiesLabel: TLabelContainer;
   Protected
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function ReferenceSymbol(strSymbol : String) : Boolean; Override;
     (**
       This property defined whether the class is abstract or not.
       @precon  None.
@@ -385,6 +451,45 @@ Type
       @return  a String
     **)
     Property HelperClassName : String Read FHelperClass Write FHelperClass;
+    (**
+      This property gets and sets the Types label for the class.
+      @precon  None.
+      @postcon Gets and sets the Types label for the class.
+      @return  a TLabelContainer
+    **)
+    Property TypesLabel : TLabelContainer Read FTypesLabel Write FTypesLabel;
+    (**
+      This property gets and sets the Variables label for the class.
+      @precon  None.
+      @postcon Gets and sets the Variables label for the class.
+      @return  a TLabelContainer
+    **)
+    Property VariablesLabel : TLabelContainer Read FVariablesLabel
+      Write FVariablesLabel;
+    (**
+      This property gets and sets the ClassVars label for the class.
+      @precon  None.
+      @postcon Gets and sets the ClassVars label for the class.
+      @return  a TLabelContainer
+    **)
+    Property ClassVarsLabel : TLabelContainer Read FClassVarsLabel
+      Write FClassVarsLabel;
+    (**
+      This property gets and sets the Constants label for the class.
+      @precon  None.
+      @postcon Gets and sets the Constants label for the class.
+      @return  a TLabelContainer
+    **)
+    Property ConstantsLabel : TLabelContainer Read FConstantsLabel
+      Write FConstantsLabel;
+    (**
+      This property gets and sets the Properties label for the class.
+      @precon  None.
+      @postcon Gets and sets the Properties label for the class.
+      @return  a TLabelContainer
+    **)
+    Property PropertiesLabel : TLabelContainer Read FPropertiesLabel
+      Write FPropertiesLabel;
   End;
 
   (** This is a class the extends the class definition to handle an interface
@@ -507,11 +612,15 @@ Type
   **)
   TPascalModule = Class(TBaseLanguageModule)
   Private
-    FSourceStream : TStream;
-    FMethodStack : TObjectList;
-    FTypesLabel: TLabelContainer;
-    FImplementedMethodsLabel: TLabelContainer;
-    FExportedHeadingsLabel: TLabelContainer;
+    FSourceStream          : TStream;
+    FMethodStack             : TObjectList;
+    FTypesLabel              : TLabelContainer;
+    FConstantsLabel          : TLabelContainer;
+    FResourceStringsLabel    : TLabelContainer;
+    FVariablesLabel          : TLabelContainer;
+    FThreadVarsLabel          : TLabelContainer;
+    FExportedHeadingsLabel   : TLabelContainer;
+    FImplementedMethodsLabel : TLabelContainer;
     { Grammar Parsers }
     Procedure Goal;
     Function OPProgram : Boolean;
@@ -565,7 +674,7 @@ Type
     Function PointerType(AToken : TTypeToken) : TPointerType;
     Function ProcedureType(AToken : TTypeToken) : TProcedureType;
     Function VarSection(AScope : TScope; Container : TElementContainer) : Boolean;
-    Function ClassVarSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function ClassVarSection(AScope : TScope; Cls : TClassDecl) : Boolean;
     Function ThreadVarSection(AScope : TScope) : Boolean;
     Function VarDecl(AScope : TScope; VarSection : TElementContainer;
       AImageIndex : TImageIndex) : Boolean;
@@ -662,9 +771,6 @@ Type
     Function FindObjClsInt(slClassNames : TStringList) : TObjectDecl;
   Protected
     function GetCurrentMethod: TPascalMethod;
-    function GetTypesLabel : TLabelContainer;
-    function GetImplementedMethodsLabel : TLabelContainer;
-    function GetExportedHeadingsLabel : TLabelContainer;
     Function GetModuleName : String; Override;
     (**
       This property returns the method on top of the method stack.
@@ -673,34 +779,13 @@ Type
       @return  a TPascalMethod
     **)
     Property CurrentMethod : TPascalMethod Read GetCurrentMethod;
-    (**
-      This property returns a reference to the Types Methods label.
-      @precon  None.
-      @postcon Returns a reference to the Types Methods label.
-      @return  a TLabelContainer
-    **)
-    Property TypesLabel : TLabelContainer Read GetTypesLabel;
-    (**
-      This property returns a reference to the Implemented Methods label.
-      @precon  None.
-      @postcon Returns a reference to the Implemented Methods label.
-      @return  a TLabelContainer
-    **)
-    Property ImplementedMethodsLabel : TLabelContainer Read GetImplementedMethodsLabel;
-    (**
-      This property returns a reference to the Exported Headings label.
-      @precon  None.
-      @postcon Returns a reference to the Exported Headings label.
-      @return  a TLabelContainer
-    **)
-    Property ExportedHeadingsLabel : TLabelContainer Read GetExportedHeadingsLabel;
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
       ModuleOptions : TModuleOptions);
     Destructor Destroy; Override;
     Function KeyWords : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
-    Procedure ReferenceSymbol(strSymbol : String); Override;
+    Function ReferenceSymbol(strSymbol : String) : Boolean; Override;
   End;
 
 Implementation
@@ -867,16 +952,7 @@ End;
 Procedure TArrayType.AddDimension;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TArrayType.AddDimension');
-  Try
-  {$ENDIF}
   Inc(FDimensions);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -897,29 +973,16 @@ End;
 constructor TRecordDecl.Create(strName : String; AScope : TScope; iLine,
   iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment);
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TRecordDecl.Create');
-  Try
-  {$ENDIF}
   Inherited Create(strName, AScope, iLine, iColumn, iImageIndex, AComment);
   FPacked := False;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
 
-
   This is a getter method for the AsString property.
 
-
   @precon  None.
-
   @postcon Returns the Interface declaration with the heritage.
-
 
   @param   boolForDocumentation as a Boolean
   @return  a String
@@ -1017,21 +1080,12 @@ end;
 function TTypes.AsString(boolForDocumentation : Boolean): String;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TTypes.AsString');
-  Try
-  {$ENDIF}
   If Identifier <> '' Then
     Result := BuildStringRepresentation(True, boolForDocumentation, '=',
       BrowseAndDocItOptions.MaxDocOutputWidth)
   Else
     Result := BuildStringRepresentation(False, boolForDocumentation, '',
       BrowseAndDocItOptions.MaxDocOutputWidth);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1052,17 +1106,8 @@ end;
 constructor TConstant.Create(strName: String; AScope: TScope; iLine,
   iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TConstant.Create');
-  Try
-  {$ENDIF}
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FTyped := False;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1085,21 +1130,12 @@ end;
 function TConstant.AsString(boolForDocumentation : Boolean): String;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TConstant.AsString');
-  Try
-  {$ENDIF}
   If FTyped Then
     Result := BuildStringRepresentation(True, boolForDocumentation, ':',
       BrowseAndDocItOptions.MaxDocOutputWidth)
    Else
      Result := BuildStringRepresentation(True, boolForDocumentation, '=',
        BrowseAndDocItOptions.MaxDocOutputWidth);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1121,10 +1157,6 @@ end;
 **)
 Function TPascalParameter.AsString(boolForDocumentation : Boolean) : String;
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalParameter.AsString');
-  Try
-  {$ENDIF}
   Result := strParamModifier[ParamModifier];
   Result := Result + Identifier;
   If ParamType <> Nil Then
@@ -1133,11 +1165,6 @@ begin
       Result := Result + strArrayOf[ArrayOf];
       Result := Result + ParamReturn;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1154,16 +1181,7 @@ end;
 Procedure TPascalMethod.AddDirectives(strDirective : String);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalMethod.AddDirectives');
-  Try
-  {$ENDIF}
   FDirectives.Add(strDirective);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -1183,19 +1201,15 @@ End;
 constructor TPascalMethod.Create(MethodType: TMethodType; strName : String;
   AScope: TScope; iLine, iCol: Integer);
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalMethod.Create');
-  Try
-  {$ENDIF}
   Inherited Create(MethodType, strName, AScope, iLine, iCol);
-  FDirectives := TStringList.Create;
-  FResolved := False;
-  FObjClsInt := Nil;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
+  FTypesLabel           := Nil;
+  FVariablesLabel       := Nil;
+  FConstantsLabel       := Nil;
+  FResourceStringsLabel := Nil;
+  FLabelsLabel          := Nil;
+  FDirectives           := TStringList.Create;
+  FResolved             := False;
+  FObjClsInt            := Nil;
 end;
 
 (**
@@ -1208,17 +1222,8 @@ end;
 **)
 destructor TPascalMethod.Destroy;
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalMethod.Destroy');
-  Try
-  {$ENDIF}
   FDirectives.Free;
   Inherited Destroy;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1242,10 +1247,6 @@ Var
   i : Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalMethod.AsString');
-  Try
-  {$ENDIF}
   Result := strMethodTypes[MethodType];
   If Name <> '' Then
     Result := Result + #32 + Identifier;
@@ -1276,11 +1277,6 @@ begin
       Result := Result + #32':'#32 + ReturnType.AsString;
   For i := 0 To FDirectives.Count - 1 Do
     Result := Result + '; ' + FDirectives[i];
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1300,10 +1296,6 @@ Var
   i : Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalMethod.GetName');
-  Try
-  {$ENDIF}
   Result := Identifier;
   If Result = '' Then
     Result := Format('PROC%4.4d', [Random(9999)]);
@@ -1312,11 +1304,6 @@ begin
       Result := Result + Format('.%s', [Parameters[i].ParamType.AsString]);
   If HasDirective('forward') Then
     Result := Result + '.Forward';
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1337,10 +1324,6 @@ Var
   i : Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalMethod.HasDirective');
-  Try
-  {$ENDIF}
   Result := False;
   For i := 0 To Directives.Count - 1 Do
     If AnsiCompareText(strDirective,
@@ -1349,33 +1332,23 @@ begin
         Result := True;
         Break;
       End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
 
-  This method tries to find the symbol with its scope as mark it as referenced.
+  This method tries to find the symbol with its scope as mark it as referenced. 
 
-  @precon  None.
-  @postcon Tries to find the symbol with its scope as mark it as referenced.
+  @precon  None. 
+  @postcon Tries to find the symbol with its scope as mark it as referenced. 
 
-  @param   strSymbol as a String
+  @param   strSymbol as a String
+  @return  a Boolean  
 
 **)
-procedure TPascalMethod.ReferenceSymbol(strSymbol: String);
-
-Const
-  strSections : Array[1..4] Of String = (strVarsLabel, strConstantsLabel,
-    strResourceStringsLabel, strTypesLabel);
+Function TPascalMethod.ReferenceSymbol(strSymbol: String) : Boolean;
 
 Var
   i: Integer;
-  S: TLabelContainer;
-  E: TElementContainer;
   M: TPascalMethod;
   boolFound: Boolean;
 
@@ -1384,19 +1357,17 @@ begin
   CodeProfiler.Start('TPascalMethod.ReferenceSymbol');
   Try
   {$ENDIF}
-  For i := Low(strSections) To High(strSections) Do
-    Begin
-      S := FindElement(strSections[i]) As TLabelContainer;
-      If S <> Nil Then
-        Begin
-          E := S.FindElement(strSymbol);
-          If E <> Nil Then
-            Begin
-              E.Referenced := True;
-              Exit;
-            End;
-        End;
-    End;
+  Result := ReferenceSection(strSymbol, FVariablesLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FConstantsLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FResourceStringsLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FTypesLabel);
+  // Local Methods
   boolFound := False;
   For i := 1 To ElementCount Do
     If Elements[i] Is TPascalMethod Then
@@ -1409,10 +1380,15 @@ begin
           End;
       End;
   If boolFound Then
-    Exit;
+    Begin
+      Result := True;
+      Exit;
+    End;
   If ObjClsInt <> Nil Then
-    ObjClsInt.ReferenceSymbol(strSymbol);
-  Inherited ReferenceSymbol(strSymbol);
+    Result := ObjClsInt.ReferenceSymbol(strSymbol);
+  If Result Then
+    Exit;
+  Result := Inherited ReferenceSymbol(strSymbol); //: bug IS this a duplicate?
   {$IFDEF PROFILECODE}
   Finally
     CodeProfiler.Stop;
@@ -1438,10 +1414,6 @@ end;
 constructor TPascalProperty.Create(strIdent: String; AScope: TScope;
   iLine, iCol : Integer; AImageIndex : TImageIndex; AComment : TComment);
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalProperty.Create');
-  Try
-  {$ENDIF}
   Inherited Create(strIdent, AScope, iLine, iCol, AImageIndex, AComment);
   FDefaultProperty := False;
   FDefaultSpec := '';
@@ -1453,11 +1425,6 @@ begin
   FReadSpec := '';
   FStoredSpec := '';
   FWriteSpec := '';
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1575,18 +1542,9 @@ var
   iToken: Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPropertySpec.AsString');
-  Try
-  {$ENDIF}
   Result := Identifier;
   For iToken := 0 To TokenCount - 1 Do
     Result := Result + #32 + Tokens[iToken].Token;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1639,18 +1597,9 @@ Var
   iToken : Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TField.AsString');
-  Try
-  {$ENDIF}
   Result := Identifier + #32'=';
   For iToken := 0 To TokenCount - 1 Do
     Result := Result + #32 + Tokens[iToken].Token;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1667,10 +1616,6 @@ end;
 **)
 procedure TField.CheckDocumentation(var boolCascade: Boolean);
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TField.CheckDocumentation');
-  Try
-  {$ENDIF}
   If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedFields In BrowseAndDocItOptions.Options Then
@@ -1678,11 +1623,6 @@ begin
           DocConflictTable[dctFieldClauseUndocumented]);
     End;
   Inherited CheckDocumentation(boolCascade);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1738,17 +1678,8 @@ end;
 function TVar.AsString(boolForDocumentation : Boolean): String;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TVar.AsString');
-  Try
-  {$ENDIF}
   Result := BuildStringRepresentation(True, boolForDocumentation, ':',
     BrowseAndDocItOptions.MaxDocOutputWidth);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1769,17 +1700,8 @@ end;
 constructor TObjectDecl.Create(strName: String; AScope: TScope; iLine,
   iColumn: Integer; iImageIndex: TImageIndex; AComment: TComment);
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TObjectDecl.Create');
-  Try
-  {$ENDIF}
   Inherited Create(strName, AScope, iLine, iColumn, iImageIndex, AComment);
   FHeritage := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1792,65 +1714,46 @@ end;
 **)
 destructor TObjectDecl.Destroy;
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TObjectDecl.Destroy');
-  Try
-  {$ENDIF}
   FHeritage.Free;
-  inherited;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
+  Inherited Destroy;
 end;
 
 (**
 
-  This method references symbols with the scope of the object / class.
+  This method references symbols with the scope of the object / class. 
 
-  @precon  None.
-  @postcon References symbols with the scope of the object / class.
+  @precon  None. 
+  @postcon References symbols with the scope of the object / class. 
 
-  @param   strSymbol as a String
+  @param   strSymbol as a String
+  @return  a Boolean  
 
 **)
-procedure TObjectDecl.ReferenceSymbol(strSymbol : String);
-
-Const
-  strSections : Array[1..6] Of String = (strFieldsLabel, strVarsLabel,
-   strConstantsLabel, strResourceStringsLabel, strTypesLabel, strClassVarsLabel);
+Function TObjectDecl.ReferenceSymbol(strSymbol : String) : Boolean;
 
 Var
   i: Integer;
-  S: TLabelContainer;
-  E: TElementContainer;
+  boolFound: Boolean;
 
 begin
   {$IFDEF PROFILECODE}
   CodeProfiler.Start('TObjectDecl.ReferenceSymbol');
   Try
   {$ENDIF}
-  For i := Low(strSections) To High(strSections) Do
+  Result := Inherited ReferenceSymbol(strSymbol);
+  If Result Then
+    Exit;
+  boolFound := False;
+  If FMethodsLabel <> Nil Then
     Begin
-      S := FindElement(strSections[i]) As TLabelContainer;
-      If S <> Nil Then
-        Begin
-          E := S.FindElement(strSymbol);
-          If E <> Nil Then
-            Begin
-              E.Referenced := True;
-              Exit;
-            End;
-        End;
+      For i := 1 To FMethodslabel.ElementCount Do
+        If AnsiCompareText(strSymbol, FMethodslabel[i].Identifier) = 0 Then
+          Begin
+            FMethodslabel[i].Referenced := True;
+            boolFound := True;
+          End;
     End;
-  S := FindElement(strMethodsLabel) As TLabelContainer;
-  If S <> Nil Then
-    Begin
-      For i := 1 To S.ElementCount Do
-      If AnsiCompareText(strSymbol, S[i].Identifier) = 0 Then
-        S[i].Referenced := True;
-    End;
+  Result := boolFound;
   {$IFDEF PROFILECODE}
   Finally
     CodeProfiler.Stop;
@@ -1923,10 +1826,6 @@ Var
   iToken: Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TClassDecl.AsString');
-  Try
-  {$ENDIF}
   Result := Identifier + #32'='#32'Class';
   If FAbstractClass Then
     Result := Result + #32'Abstract';
@@ -1947,11 +1846,6 @@ begin
     End;
   If FHelper Then
     Result := Result + Format(' For %s', [FHelperClass]);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1982,6 +1876,13 @@ Begin
   Try
   {$ENDIF}
   Inherited Create(IsModified, strFileName);
+  FTypesLabel              := Nil;
+  FConstantsLabel          := Nil;
+  FResourceStringsLabel    := Nil;
+  FVariablesLabel          := Nil;
+  FThreadVarsLabel          := Nil;
+  FExportedHeadingsLabel   := Nil;
+  FImplementedMethodsLabel := Nil;
   FMethodStack := TObjectList.Create(False);
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSourceStream := Source;
@@ -1991,9 +1892,9 @@ Begin
   If moParse In ModuleOptions Then
     Begin
       ParseTokens;
-      TidyUpEmptyElements;
       AddTickCount('Parse');
       CheckUnResolvedMethods;
+      TidyUpEmptyElements;
       AddTickCount('Resolve');
       Add(strErrors, iiErrorFolder, scNone, Nil);
       Add(strWarnings, iiWarningFolder, scNone, Nil);
@@ -2037,17 +1938,8 @@ End;
 **)
 Destructor TPascalModule.Destroy;
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.Destroy');
-  Try
-  {$ENDIF}
   FMethodStack.Free;
   Inherited Destroy;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -2099,10 +1991,6 @@ Var
   LastToken : TTokenType;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.TokenizeStream');
-  Try
-  {$ENDIF}
   BlockType := btNoBlock;
   iStreamPos := 0;
   iTokenLine := 1;
@@ -2276,11 +2164,6 @@ Begin
     On E : Exception Do
       AddIssue(E.Message, scGlobal, 'TokenizeStream', 0, 0, etError);
   End
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -2326,10 +2209,6 @@ Procedure TPascalModule.ErrorAndSeekToken(strMsg, strMethod, strParam : String;
   End;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ErrorAndSeekToken');
-  Try
-  {$ENDIF}
   Case StringCount(strMsg) Of
     0: AddIssue(Format(strMsg, [Token.Line, Token.Column]),
            scGlobal, strMethod, Token.Line, Token.Column, etError);
@@ -2345,11 +2224,6 @@ Begin
     NextNonCommentToken;
   If SeekToken = stFirst Then
     NextNonCommentToken;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -2407,10 +2281,13 @@ begin
     Begin
       If Container = Nil Then
         Begin
-          Container := Add(strImplementedMethodsLabel, iiImplementedMethods, scNone, Nil);
+          If FImplementedMethodsLabel = Nil Then
+            FImplementedMethodsLabel := Add(strImplementedMethodsLabel,
+              iiImplementedMethods, scNone, Nil) As TLabelContainer;
+          Container := FImplementedMethodsLabel;
           iIcon := iiUnknownClsObj;
           AScope := scNone;
-          E := TypesLabel;
+          E := FTypesLabel;
           If E <> Nil Then
             For iCls := 0 To Method.ClassNames.Count - 1 Do
               Begin
@@ -2425,7 +2302,12 @@ begin
               End;
         End;
       If Container Is TObjectDecl Then
-        Container := Container.Add(strMethodsLabel, iiMethodsLabel, scNone, Nil);
+        Begin
+          If (Container As TObjectDecl).FMethodsLabel = Nil Then
+            (Container As TObjectDecl).FMethodsLabel := Container.Add(
+              strMethodsLabel, iiMethodsLabel, scNone, Nil) As TLabelContainer;
+          Container := (Container As TObjectDecl).FMethodsLabel;
+        End;
       tmpMethod := Method;
       Method := Container.Add(tmpMethod) As TPascalMethod;
       If tmpMethod <> Method Then
@@ -2454,18 +2336,9 @@ end;
 Procedure TPascalModule.AddToExpression(Container : TElementContainer);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.AddToExpression');
-  Try
-  {$ENDIF}
   If Container <> Nil Then
     Container.AppendToken(Token);
   NextNonCommentToken;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -2485,18 +2358,9 @@ End;
 Function TPascalModule.IsToken(strToken : String; Container : TElementContainer): Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.IsToken');
-  Try
-  {$ENDIF}
   Result := strToken = Token.Token;
   If Result Then
     AddToExpression(Container);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -2520,10 +2384,6 @@ Var
   str : String;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.KeyWords');
-  Try
-  {$ENDIF}
   SetLength(Result, Succ(High(strReservedWords)) + Succ(High(strDirectives)));
   For i := Low(strReservedWords) To High(strReservedWords) Do
     Result[i] := strReservedWords[i];
@@ -2537,11 +2397,6 @@ begin
           Result[i] := Result[j];
           Result[j] := str;
         End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -2558,76 +2413,10 @@ end;
 **)
 function TPascalModule.GetCurrentMethod: TPascalMethod;
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.GetCurrentMethod');
-  Try
-  {$ENDIF}
   If FMethodStack.Count = 0 Then
     Result := Nil
   Else
     Result := FMethodStack[FMethodStack.Count - 1] As TPascalMethod;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
-end;
-
-(**
-
-
-  This is a getter method for the ExportedHeadingsLabel property.
-
-  @precon  None.
-  @postcon Returns a reference to the Exported Headings Label.
-
-
-  @return  a TLabelContainer
-
-**)
-function TPascalModule.GetExportedHeadingsLabel: TLabelContainer;
-begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.GetExportedHeadingsLabel');
-  Try
-  {$ENDIF}
-  If FExportedHeadingsLabel = Nil Then
-    FExportedHeadingsLabel := FindElement(strExportedHeadingsLabel) As TLabelContainer;
-  Result := FExportedHeadingsLabel;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
-end;
-
-(**
-
-
-  This is a getter method for the ImplementedMethodsLabel property.
-
-  @precon  None.
-  @postcon Returns a reference to the Implemented Methods Label.
-
-
-  @return  a TLabelContainer
-
-**)
-function TPascalModule.GetImplementedMethodsLabel: TLabelContainer;
-
-begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.GetImplementedMethodsLabel');
-  Try
-  {$ENDIF}
-  If FImplementedMethodsLabel = Nil Then
-    FImplementedMethodsLabel := FindElement(strImplementedMethodsLabel) As TLabelContainer;
-  Result := FImplementedMethodsLabel;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -2644,17 +2433,8 @@ end;
 Function TPascalModule.GetModuleName : String;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.GetModuleName');
-  Try
-  {$ENDIF}
   Result := Inherited GetModuleName;
   Result := strModuleTypes[ModuleType] + #32 + Result;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -2734,10 +2514,6 @@ end;
 Function TPascalModule.OPProgram : Boolean;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.OPProgram');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'PROGRAM';
   If Result Then
     Begin
@@ -2778,11 +2554,6 @@ begin
           ErrorAndSeekToken(strIdentExpected, 'OPProgram', Token.Token,
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -2865,10 +2636,6 @@ End;
 Function TPascalModule.OPPackage : Boolean;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.OPPackage');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'PACKAGE';
   If Result Then
     Begin;
@@ -2903,11 +2670,6 @@ begin
         ErrorAndSeekToken(strLiteralExpected, 'OPPackage', '.',
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -2927,10 +2689,6 @@ end;
 Function TPascalModule.OPLibrary : Boolean;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.OPLibrary');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'LIBRARY';
   If Result Then
     Begin
@@ -2959,11 +2717,6 @@ begin
         ErrorAndSeekToken(strLiteralExpected, 'OPLibrary', '.',
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -3013,28 +2766,18 @@ Var
   AComment : TComment;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.UsesClause');
-  Try
-  {$ENDIF}
-      If Token.UToken = 'USES' Then
-      Begin
-        AComment := GetComment;
-        U := Add(strUses, iiUsesLabel, scNone, AComment);
+  If Token.UToken = 'USES' Then
+    Begin
+      AComment := GetComment;
+      U := Add(strUses, iiUsesLabel, scNone, AComment);
+      NextNonCommentToken;
+      IdentList(U, strSeekableOnErrorTokens, iiUsesItem);
+      If Token.Token <> ';' Then
+        ErrorAndSeekToken(strLiteralExpected, 'UsesClause', ';',
+          strSeekableOnErrorTokens, stActual)
+      Else
         NextNonCommentToken;
-        IdentList(U, strSeekableOnErrorTokens, iiUsesItem);
-        If Token.Token <> ';' Then
-          ErrorAndSeekToken(strLiteralExpected, 'UsesClause', ';',
-            strSeekableOnErrorTokens, stActual)
-        Else
-          NextNonCommentToken;
-      End;
-
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
+    End;
 End;
 
 (**
@@ -3054,17 +2797,8 @@ End;
 Procedure TPascalModule.PortabilityDirective;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.PortabilityDirective');
-  Try
-  {$ENDIF}
   If IsKeyWord(Token.Token, strPortabilityDirective) Then
     NextNonCommentToken; //: @note Does not get added to any symbols.
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3123,15 +2857,14 @@ End;
 **)
 Procedure TPascalModule.InterfaceDecl;
 
-var
-  C: TElementContainer;
-
 Begin
   {$IFDEF PROFILECODE}
   CodeProfiler.Start('TPascalModule.InterfaceDecl');
   Try
   {$ENDIF}
-  C := Add(strExportedHeadingsLabel, iiExportedHeadingslabel, scNone, Nil);
+  If FExportedHeadingsLabel = Nil Then
+    FExportedHeadingsLabel := Add(strExportedHeadingsLabel,
+      iiExportedHeadingslabel, scNone, Nil) As TLabelContainer;
   Repeat
     {Loop doing nothing};
   Until Not (
@@ -3140,7 +2873,7 @@ Begin
     TypeSection(scPublic, Self) Or
     VarSection(scPublic, Self) Or
     ThreadVarSection(scPublic) Or
-    ExportedHeading(C) Or
+    ExportedHeading(FExportedHeadingsLabel) Or
     ExportsStmt
   );
   {$IFDEF PROFILECODE}
@@ -3172,10 +2905,6 @@ Var
   M : TPascalMethod;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ExportedHeading');
-  Try
-  {$ENDIF}
   Result := False;
   Repeat
     M := ProcedureHeading(scPublic, Container);
@@ -3194,11 +2923,6 @@ Begin
               strSeekableOnErrorTokens, stFirst);
       End;
   Until M = Nil;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3302,10 +3026,6 @@ Var
   Ex : TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ExportsStmt');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'EXPORTS';
   If Result Then
     Begin
@@ -3320,11 +3040,6 @@ Begin
         ErrorAndSeekToken(strLiteralExpected, 'ExportedStmt', ';',
           strSeekableOnErrorTokens, stFirst);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3461,10 +3176,6 @@ End;
 Function TPascalModule.LabelDeclSection : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.LabelDeclSection');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'LABEL';
   If Result Then
     Begin
@@ -3473,8 +3184,10 @@ Begin
       Repeat
         If Token.TokenType In [ttIdentifier, ttDirective] Then
           Begin
-            CurrentMethod.Add(strLabelsLabel, iiPublicLabelsLabel, scNone, Nil).Add(
-              Token, scLocal, iiPublicLabel, GetComment);
+            CurrentMethod.LabelsLabel := CurrentMethod.Add(strLabelsLabel,
+              iiPublicLabelsLabel, scNone, Nil) As TLabelContainer;
+            CurrentMethod.LabelsLabel.Add(Token, scLocal, iiPublicLabel,
+              GetComment);
             NextNonCommentToken;
           End Else
             ErrorAndSeekToken(strNumberExpected, 'LabelDeclSection', Token.Token,
@@ -3487,11 +3200,6 @@ Begin
         ErrorAndSeekToken(strLiteralExpected, 'LabelDeclSection', ';',
           strSeekableOnErrorTokens, stFirst);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3538,12 +3246,31 @@ Begin
   Result := Token.UToken = 'CONST';
   If Result Then
     Begin
-      If Container = Nil Then
-        Container := Self;
       LabelScope := AScope;
       If LabelScope <> scLocal Then
         LabelScope := scPublic;
-      C:= Container.Add(strConstantsLabel, iiPublicConstantsLabel, LabelScope, GetComment);
+      If Container Is TPascalMethod then
+        Begin
+          If (Container As TPascalMethod).ConstantsLabel = Nil Then
+            (Container As TPascalMethod).ConstantsLabel := CurrentMethod.Add(
+              strConstantsLabel, iiPublicConstantsLabel, LabelScope,
+              GetComment) As TLabelContainer;
+          C := (Container As TPascalMethod).ConstantsLabel;
+        End Else
+      If Container Is TClassDecl then
+        Begin
+          If (Container As TClassDecl).ConstantsLabel = Nil Then
+            (Container As TClassDecl).ConstantsLabel := CurrentMethod.Add(
+              strConstantsLabel, iiPublicConstantsLabel, LabelScope,
+              GetComment) As TLabelContainer;
+          C := (Container As TClassDecl).ConstantsLabel;
+        End Else
+        Begin
+          If FConstantsLabel = Nil Then
+            FConstantsLabel := Add(strConstantsLabel, iiPublicConstantsLabel,
+              LabelScope, GetComment) As TLabelContainer;
+          C := FConstantsLabel;
+        End;
       NextNonCommentToken;
       While ConstantDecl(AScope, C) Do
         If Token.Token = ';' Then
@@ -3684,29 +3411,28 @@ Var
   R : TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ResStringSection');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'RESOURCESTRING';
   If Result Then
     Begin
       If CurrentMethod <> Nil Then
-        R := CurrentMethod.Add(strResourceStringsLabel,
-          iiPublicResourceStringsLabel, scLocal, GetComment)
-      Else
-        R := Add(strResourceStringsLabel, iiPublicResourceStringsLabel, scPublic,
-          GetComment);
+        Begin
+          If CurrentMethod.ResourceStringsLabel = Nil Then
+            CurrentMethod.ResourceStringsLabel := CurrentMethod.Add(
+              strResourceStringsLabel, iiPublicResourceStringsLabel, scLocal,
+              GetComment) As TLabelContainer;
+          R := CurrentMethod.ResourceStringsLabel;
+        End Else
+        Begin
+          If FResourceStringsLabel = Nil Then
+            FResourceStringsLabel := Add(strResourceStringsLabel,
+              iiPublicResourceStringsLabel, scPublic, GetComment) As TLabelContainer;
+          R := FResourceStringsLabel;
+        End;
       NextNonCommentToken;
       Repeat
         {Loop do nothing}
       Until Not ResourceStringDecl(AScope, R);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3738,10 +3464,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ResourceStringDecl');
-  Try
-  {$ENDIF}
   Result := False;
   ExprType := [etConstExpr, etString];
   // If not identifier then there is a new section
@@ -3765,11 +3487,6 @@ Begin
           ErrorAndSeekToken(strLiteralExpected, 'ResourceStringDecl', '=',
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3797,8 +3514,8 @@ End;
 Function TPascalModule.TypeSection(AScope : TScope; Container : TElementContainer) : Boolean;
 
 Var
-  T : TElementContainer;
   LabelScope: TScope;
+  TL : TLabelContainer;
 
 Begin
   {$IFDEF PROFILECODE}
@@ -3808,14 +3525,31 @@ Begin
   Result := Token.UToken = 'TYPE';
   If Result Then
     Begin
-      If Container = Nil Then
-        Container := Self;
       LabelScope := AScope;
       If LabelScope <> scLocal Then
         LabelScope := scPublic;
-      T := Container.Add(strTypesLabel, iiPublicTypesLabel, LabelScope, GetComment);
+      If Container Is TPascalMethod Then
+        Begin
+          If (Container As TPascalMethod).TypesLabel = Nil Then
+            (Container As TPascalMethod).TypesLabel := Container.Add(strTypesLabel,
+              iiPublicTypesLabel, LabelScope, GetComment) As TLabelContainer;
+          TL := (Container As TPascalMethod).TypesLabel;
+        End Else
+      If Container Is TClassDecl Then
+        Begin
+          If (Container As TClassDecl).TypesLabel = Nil Then
+            (Container As TClassDecl).TypesLabel := Container.Add(strTypesLabel,
+              iiPublicTypesLabel, LabelScope, GetComment) As TLabelContainer;
+          TL := (Container As TClassDecl).TypesLabel;
+        End Else
+        Begin
+          If FTypesLabel = Nil Then
+            FTypesLabel := Add(strTypesLabel, iiPublicTypesLabel, LabelScope,
+              GetComment) As TLabelContainer;
+          TL := FTypesLabel;
+        End;
       NextNonCommentToken;
-      While TypeDecl(AScope, T) Do
+      While TypeDecl(AScope, TL) Do
         If Token.Token = ';' Then
           NextNonCommentToken
         Else
@@ -3913,35 +3647,6 @@ End;
 
 (**
 
-
-  This is a getter method for the types label property.
-
-  @precon  None.
-  @postcon Returns a reference to the types label.
-
-
-  @return  a TLabelContainer
-
-**)
-function TPascalModule.GetTypesLabel: TLabelContainer;
-
-begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.GetTypesLabel');
-  Try
-  {$ENDIF}
-  If FTypesLabel = Nil Then
-    FTypesLabel := FindElement(strTypesLabel) As TLabelContainer;
-  Result := FTypesLabel;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
-end;
-
-(**
-
   This method parses a typed constant from the current token position using
   the following object pascal grammar.
 
@@ -3994,18 +3699,9 @@ Function TPascalModule.ArrayConstant(C : TElementContainer;
   T : TGenericTypeDecl) : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ArrayConstant');
-  Try
-  {$ENDIF}
   Result := T Is TArrayType;
   If Result Then
     ArrayElement(C, 1, T As TArrayType);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -4030,10 +3726,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ArrayElement');
-  Try
-  {$ENDIF}
   If iStartDimension <= AT.Dimensions Then
     If Token.Token = '(' Then
       Begin
@@ -4054,11 +3746,6 @@ Begin
         ExprType := [etUnknown, etConstExpr];
         ConstExpr(C, ExprType);
       End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4082,10 +3769,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.RecordConstant');
-  Try
-  {$ENDIF}
   Result := Token.Token = '(';
   If Result Then
     Begin
@@ -4103,11 +3786,6 @@ Begin
         ErrorAndSeekToken(strLiteralExpected, 'RecordConstant', ')',
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4130,10 +3808,6 @@ Function TPascalModule.RecordFieldConstant(C : TElementContainer;
   T : TGenericTypeDecl) : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.RecordFieldConstant');
-  Try
-  {$ENDIF}
   Result := False;
   If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
@@ -4148,11 +3822,6 @@ Begin
         End Else
           RollBackToken;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4258,10 +3927,6 @@ End;
 Function TPascalModule.ClassRefType(AToken : TTypeToken) : TClassRefType;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ClassRefType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.UToken = 'CLASS' Then
     Begin
@@ -4282,11 +3947,6 @@ Begin
         End Else
           RollBackToken;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4304,19 +3964,10 @@ End;
 Procedure TPascalModule.UpdateTypeToken(var AToken: TTypeToken);
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.UpdateTypeToken');
-  Try
-  {$ENDIF}
   If AToken.FToken = Nil Then
     AToken.FToken := Token;
   If AToken.FComment = Nil Then
     AToken.FComment := GetComment;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -4375,10 +4026,6 @@ end;
 Function TPascalModule.RealType(AToken : TTypeToken) : TRealType;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.RealType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If IsKeyWord(Token.Token, strRealTypes) Then
     Begin
@@ -4390,11 +4037,6 @@ Begin
       Result.AppendToken(Token);
       NextNonCommentToken;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4461,10 +4103,6 @@ End;
 Function TPascalModule.OrdIdent(AToken : TTypeToken) : TOrdIdent;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.OrdIdent');
-  Try
-  {$ENDIF}
   Result := Nil;
   If IsKeyWord(Token.Token, strOrdIdents) Then
     Begin
@@ -4476,11 +4114,6 @@ Begin
       Result.AppendToken(Token);
       NextNonCommentToken;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4502,10 +4135,6 @@ End;
 Function TPascalModule.VariantType(AToken : TTypeToken) : TVariantType;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.VariantType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If IsKeyWord(Token.Token, strVariants) Then
     Begin
@@ -4517,11 +4146,6 @@ begin
       Result.AppendToken(Token);
       NextNonCommentToken;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -4589,10 +4213,6 @@ End;
 Function TPascalModule.EnumerateType(AToken : TTypeToken) : TEnumerateType;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.EnumerateType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.Token = '(' Then
     Begin
@@ -4611,11 +4231,6 @@ Begin
         ErrorAndSeekToken(strLiteralExpected, 'EnumerateType', ')',
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4636,10 +4251,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.EnumerateElement');
-  Try
-  {$ENDIF}
   If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
       AddToExpression(EnumerateType);
@@ -4652,11 +4263,6 @@ Begin
     End Else
       ErrorAndSeekToken(strIdentExpected, 'EnumerateElement', Token.Token,
         strSeekableOnErrorTokens, stActual);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4683,10 +4289,6 @@ Var
   ExprType : TExprTypes;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.StringType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If IsKeyWord(Token.Token, strStrings) Then
     Begin
@@ -4712,11 +4314,6 @@ begin
                 strSeekableOnErrorTokens, stActual);
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -4740,10 +4337,6 @@ Var
   boolPacked : Boolean;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.StrucType');
-  Try
-  {$ENDIF}
   boolPacked := False;
   If Token.UToken = 'PACKED' Then
     Begin
@@ -4757,11 +4350,6 @@ begin
     Result := FileType(boolPacked, AToken);
   If Result = Nil Then
     Result := RecType(boolPacked, AToken);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -4787,10 +4375,6 @@ var
   FTemporaryElements: TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ArrayType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.UToken = 'ARRAY' Then
     Begin
@@ -4837,11 +4421,6 @@ Begin
       End;
       PortabilityDirective;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4862,10 +4441,6 @@ End;
 Function TPascalModule.RecType(boolPacked : Boolean; AToken : TTypeToken): TRecordDecl;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.RecType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.UToken = 'RECORD' Then
     Begin
@@ -4886,11 +4461,6 @@ begin
         ErrorAndSeekToken(strReservedWordExpected, 'RecType', 'END',
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -4918,19 +4488,10 @@ end;
 Procedure TPascalModule.FieldList(Rec: TRecordDecl);
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FieldList');
-  Try
-  {$ENDIF}
   Repeat
     If Not VariantSection(Rec) Then
       FieldDecl(Rec);
   Until Not IsToken(';', Nil);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -4963,10 +4524,6 @@ Var
   FTemporaryElements: TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FieldDecl');
-  Try
-  {$ENDIF}
   I := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
   Try
     IdentList(I, strSeekableOnErrorTokens);
@@ -5004,11 +4561,6 @@ Begin
   Finally
     I.Free;
   End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5038,10 +4590,6 @@ Var
   C : TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.VariantSection');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'CASE';
   If Result Then
     Begin
@@ -5077,11 +4625,6 @@ Begin
         C.Free;
       End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5113,10 +4656,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.RecVariant');
-  Try
-  {$ENDIF}
   C := TTempCntr.Create('', scPrivate, 0, 0, iiNone, Nil);
   Try
     Repeat
@@ -5142,32 +4681,23 @@ Begin
   Finally
     C.Free;
   End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
 
-  This method tries to find the symbol with its scope as mark it as referenced.
+  This method tries to find the symbol with its scope as mark it as referenced. 
 
-  @precon  None.
-  @postcon Tries to find the symbol with its scope as mark it as referenced.
+  @precon  None. 
+  @postcon Tries to find the symbol with its scope as mark it as referenced. 
 
-  @param   strSymbol as a String
+  @param   strSymbol as a String
+  @return  a Boolean  
 
 **)
-procedure TPascalModule.ReferenceSymbol(strSymbol: String);
-
-Const
-  strSections : Array[1..5] Of String = (strVarsLabel, strConstantsLabel,
-    strResourceStringsLabel, strTypesLabel, strThreadVarsLabel);
+Function TPascalModule.ReferenceSymbol(strSymbol: String) : Boolean;
 
 Var
   i: Integer;
-  S: TLabelContainer;
   E: TElementContainer;
   M: TPascalMethod;
   boolFound: Boolean;
@@ -5177,23 +4707,24 @@ begin
   CodeProfiler.Start('TPascalModule.ReferenceSymbol');
   Try
   {$ENDIF}
-  // Check Vars, Consts and Types
-  For i := Low(strSections) To High(strSections) Do
-    Begin
-      S := FindElement(strSections[i]) As TLabelContainer;
-      If S <> Nil Then
-        Begin
-          E := S.FindElement(strSymbol);
-          If E <> Nil Then
-            Begin
-              E.Referenced := True;
-              Exit;
-            End;
-        End;
-    End;
+  Result := ReferenceSection(strSymbol, FVariablesLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FConstantsLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FResourceStringsLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FTypesLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FThreadVarsLabel);
+  If Result Then
+    Exit;
   // Check Module Local Methods
   boolFound := False;
-  E := ImplementedMethodsLabel;
+  E := FImplementedMethodsLabel;
   If E <> Nil Then
     For i := 1 To E.ElementCount Do
       If AnsiCompareText(E[i].Identifier, strSymbol) = 0 Then
@@ -5201,19 +4732,20 @@ begin
           E[i].Referenced := True;
           boolFound := True;
         End;
-  If boolFound Then
+  Result := boolFound;
+  If Result Then
     Exit;
   // Check Methods in Same Class.
   M := CurrentMethod;
   If M <> Nil Then
     Begin
-      E := M.ObjClsInt;
-      If E <> Nil Then
+      If M.ObjClsInt <> Nil Then
         Begin
-          E := E.FindElement(strMethodsLabel);
-          For i := 1 To E.ElementCount Do
-            If AnsiCompareText(E[i].Identifier, strSymbol) = 0 Then
-              E[i].Referenced := True;
+          E := M.ObjClsInt.MethodsLabel;
+          If E <> Nil Then
+            For i := 1 To E.ElementCount Do
+              If AnsiCompareText(E[i].Identifier, strSymbol) = 0 Then
+                E[i].Referenced := True;
         End;
     End;
   {$IFDEF PROFILECODE}
@@ -5246,10 +4778,6 @@ Var
   FTemporaryElements: TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.SetType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.UToken = 'SET' Then
     Begin
@@ -5281,11 +4809,6 @@ Begin
             strSeekableOnErrorTokens, stActual);
       PortabilityDirective;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5311,10 +4834,6 @@ Var
   FTemporaryElements: TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FileType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.UToken = 'FILE' Then
     Begin
@@ -5345,11 +4864,6 @@ Begin
           ErrorAndSeekToken(strReservedWordExpected, 'FileType', 'OF',
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5370,10 +4884,6 @@ End;
 Function TPascalModule.PointerType(AToken : TTypeToken) : TPointerType;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.PointerType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.Token = '^' Then
     Begin
@@ -5388,11 +4898,6 @@ Begin
         ErrorAndSeekToken(strTypeIdExpected, 'PointerType', Token.Token,
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -5417,10 +4922,6 @@ Var
   TemporaryContainer: TElementContainer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ProcedureType');
-  Try
-  {$ENDIF}
   Result := Nil;
   TemporaryContainer := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
   Try
@@ -5448,11 +4949,6 @@ begin
   Finally
     TemporaryContainer.Free;
   End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -5488,7 +4984,7 @@ end;
 Function TPascalModule.VarSection(AScope : TScope; Container : TElementContainer) : Boolean;
 
 Var
-  V : TElementContainer;
+  V : TLabelContainer;
   LabelScope : TScope;
 
 Begin
@@ -5499,12 +4995,31 @@ Begin
   Result := Token.UToken = 'VAR';
   If Result Then
     Begin
-      If Container = Nil Then
-        Container := Self;
       LabelScope := AScope;
       If LabelScope <> scLocal Then
         LabelScope := scPublic;
-      V := Container.Add(strVarsLabel, iiPublicVariablesLabel, LabelScope, GetComment);
+      If Container Is TPascalMethod Then
+        Begin
+          If (Container As TPascalMethod).VariablesLabel = Nil Then
+            (Container As TPascalMethod).VariablesLabel := Container.Add(
+              strVarsLabel, iiPublicVariablesLabel, LabelScope,
+              GetComment) As TLabelContainer;
+          V := (Container As TPascalMethod).VariablesLabel;
+        End Else
+      If Container Is TClassDecl Then
+        Begin
+          If (Container As TClassDecl).VariablesLabel = Nil Then
+            (Container As TClassDecl).VariablesLabel := Container.Add(
+              strVarsLabel, iiPublicVariablesLabel, LabelScope,
+              GetComment) As TLabelContainer;
+          V := (Container As TClassDecl).VariablesLabel;
+        End Else
+        Begin
+          If FVariablesLabel = Nil Then
+            FVariablesLabel := Add(strVarsLabel, iiPublicVariablesLabel, LabelScope,
+              GetComment) As TLabelContainer;
+          V := FVariablesLabel;
+        End;
       NextNonCommentToken;
       While VarDecl(AScope, V, iiPublicVariable) Do
         Begin
@@ -5524,36 +5039,32 @@ End;
 
 (**
 
-  This method checks and parses a class var section declaration from the 
+  This method checks and parses a class var section declaration from the 
   current token position using the following object pascal grammar. 
 
-  @precon  On entry to this method, Scope defines the current scope of the 
-           block i.e. private in in the implemenation section or public if in 
-           the interface section and The Method parameter is nil for methods 
-           in the implementation section or a reference to a method for a 
-           local declaration section with in a method. 
-  @postcon This method returns True if this method handles a constant 
-           declaration section. 
+  @precon  On entry to this method, Scope defines the current scope of the 
+           block i.e. private in in the implemenation section or public if in 
+           the interface section and The Method parameter is nil for methods 
+           in the implementation section or a reference to a method for a 
+           local declaration section with in a method. 
+  @postcon This method returns True if this method handles a constant 
+           declaration section. 
 
-  @grammar VarSection -> CLASS VAR ( VarDecl ';' ) ... 
+  @grammar VarSection -> CLASS VAR ( VarDecl ';' ) ... 
 
-  @param   AScope    as a TScope
-  @param   Container as a TElementContainer
-  @return  a Boolean  
+  @param   AScope as a TScope
+  @param   Cls    as a TClassDecl
+  @return  a Boolean
 
 **)
 Function TPascalModule.ClassVarSection(AScope : TScope;
-  Container : TElementContainer) : Boolean;
+  Cls : TClassDecl) : Boolean;
 
 Var
   V : TElementContainer;
   LabelScope : TScope;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ClassVarSection');
-  Try
-  {$ENDIF}
   Result := False;
   If Token.UToken = 'CLASS' Then
     Begin
@@ -5561,13 +5072,14 @@ Begin
       Result := Token.UToken = 'VAR';
       If Result Then
         Begin
-          If Container = Nil Then
-            Container := Self;
           LabelScope := AScope;
           If LabelScope <> scLocal Then
             LabelScope := scPublic;
-          V := Container.Add(strClassVarsLabel, iiPublicClassVariablesLabel,
-            LabelScope, GetComment);
+          If Cls.ClassVarsLabel = Nil Then
+            Cls.ClassVarsLabel := Cls.Add(strClassVarsLabel,
+              iiPublicClassVariablesLabel, LabelScope,
+              GetComment) As TLabelContainer;
+          V := Cls.ClassVarsLabel;
           NextNonCommentToken;
           While VarDecl(AScope, V, iiPublicClassVariable) Do
             Begin
@@ -5580,11 +5092,6 @@ Begin
         End Else
           RollBackToken;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5606,20 +5113,15 @@ End;
 **)
 Function TPascalModule.ThreadVarSection(AScope : TScope) : Boolean;
 
-Var
-  V : TElementContainer;
-
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ThreadVarSection');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'THREADVAR';
   If Result Then
     Begin
-      V := Add(strThreadVarsLabel, iiPublicThreadVarsLabel, scNone, GetComment);
+      If FThreadVarsLabel = Nil Then
+        FThreadVarsLabel := Add(strThreadVarsLabel, iiPublicThreadVarsLabel,
+          scNone, GetComment) As TLabelContainer;
       NextNonCommentToken;
-      While ThreadVarDecl(AScope, V) Do
+      While ThreadVarDecl(AScope, FThreadVarsLabel) Do
         Begin
           If Token.Token <> ';' Then
             ErrorAndSeekToken(strLiteralExpected, 'ThreadVarSection', ';',
@@ -5628,11 +5130,6 @@ Begin
             NextNonCommentToken;
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5651,21 +5148,12 @@ Var
   i : Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.TidyUpEmptyElements');
-  Try
-  {$ENDIF}
   i := Find(strImplementedMethodsLabel);
   If (i > 0) And (Elements[i].ElementCount = 0) Then
     DeleteElement(i);
   i := Find(strExportedHeadingsLabel);
   If (i > 0) And (Elements[i].ElementCount = 0) Then
     DeleteElement(i);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -6168,19 +5656,10 @@ End;
 Function TPascalModule.CheckNumberType(ExprType : TExprTypes) : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.CheckNumberType');
-  Try
-  {$ENDIF}
   If Pos('.', Token.Token) > 0 Then
     Result := etFloat In ExprType
   Else
     Result := etInteger In ExprType;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6211,19 +5690,10 @@ End;
 Function TPascalModule.RelOp(C : TElementContainer; ExprType : TExprTypes) : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.RelOp');
-  Try
-  {$ENDIF}
   Result := IsKeyWord(Token.Token, strRelOps) And Not
     ((Token.Token = '=') And (etConstExpr In ExprType));
   If Result Then
     AddToExpression(C);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6248,18 +5718,9 @@ End;
 Function TPascalModule.AddOp(C : TElementContainer) : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.AddOp');
-  Try
-  {$ENDIF}
   Result := IsKeyWord(Token.Token, strAddOps);
   If Result Then
     AddToExpression(C);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6288,10 +5749,6 @@ End;
 Function TPascalModule.MulOp(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.MulOp');
-  Try
-  {$ENDIF}
   Result := IsKeyWord(Token.Token, strMulOps);
   If Result Then
     Begin
@@ -6301,11 +5758,6 @@ Begin
         ErrorAndSeekToken(strExprConflict, 'MulOp', Token.Token,
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6469,10 +5921,6 @@ End;
 Function TPascalModule.SetConstructor(C : TElementContainer) : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.SetConstructor');
-  Try
-  {$ENDIF}
   Result := Token.Token = '[';
   If Result Then
     Begin
@@ -6481,11 +5929,6 @@ Begin
       If Token.Token = ']' Then
         AddToExpression(C);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6578,9 +6021,6 @@ End;
 **)
 Procedure TPascalModule.Statement;
 
-Var
-  L : TElementContainer;
-
 Begin
   {$IFDEF PROFILECODE}
   CodeProfiler.Start('TPascalModule.Statement');
@@ -6588,9 +6028,8 @@ Begin
   {$ENDIF}
   If CurrentMethod <> Nil Then
     Begin
-      L := CurrentMethod.FindElement(strLabelsLabel);
-      If L <> Nil Then // Check for label
-        If L.FindElement(Token.Token) <> Nil Then
+      If CurrentMethod.LabelsLabel <> Nil Then // Check for label
+        If CurrentMethod.LabelsLabel.FindElement(Token.Token) <> Nil Then
           Begin
             NextNonCommentToken;
             If Token.Token = ':' Then
@@ -6906,10 +6345,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.CaseStmt');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'CASE';
   If Result Then
     Begin
@@ -6938,11 +6373,6 @@ Begin
           ErrorAndSeekToken(strReservedWordExpected, 'CaseStmt', 'OF',
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6998,10 +6428,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.CaseLabel');
-  Try
-  {$ENDIF}
   ExprType := [etUnknown, etConstExpr];
   ConstExpr(Nil, ExprType);
   If Token.Token = '..' Then
@@ -7009,11 +6435,6 @@ Begin
       NextNonCommentToken;
       ConstExpr(Nil, ExprType);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7062,10 +6483,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.RepeatStmt');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'REPEAT';
   If Result Then
     Begin
@@ -7081,11 +6498,6 @@ Begin
         ErrorAndSeekToken(strReservedWordExpected, 'RepeatStmt', 'UNTIL',
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7107,10 +6519,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.WhileStmt');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'WHILE';
   If Result Then
     Begin
@@ -7125,11 +6533,6 @@ Begin
           ErrorAndSeekToken(strReservedWordExpected, 'WhileStmt', 'DO',
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7259,10 +6662,6 @@ End;
 Function TPascalModule.TryExceptAndFinallyStmt : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.TryExceptAndFinallyStmt');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'TRY';
   If Result Then
     Begin
@@ -7289,11 +6688,6 @@ Begin
           ErrorAndSeekToken(strReservedWordExpected, 'TryExceptAndFinallyStmt',
             'EXCEPT or FINALLY', strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7316,10 +6710,6 @@ Var
   Con : TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ExceptionBlock');
-  Try
-  {$ENDIF}
   Result := False;
   While Token.UToken = 'ON' Do
     Begin
@@ -7358,11 +6748,6 @@ Begin
         Con.Free;
       End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7384,10 +6769,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.RaiseStmt');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'RAISE';
   If Result Then
     Begin
@@ -7400,11 +6781,6 @@ Begin
           ConstExpr(Nil, ExprType);
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7426,10 +6802,6 @@ End;
 Function TPascalModule.AssemblerStatement : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.AssemblerStatement');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'ASM';
   If Result Then
     Begin
@@ -7438,11 +6810,6 @@ Begin
       Until (Token.UToken = 'END') And (PrevToken.Token <> '@@');
       NextNonCommentToken;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7569,10 +6936,6 @@ End;
 Function TPascalModule.FunctionDecl(AScope : TScope) : TPascalMethod;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FunctionDecl');
-  Try
-  {$ENDIF}
   Result := FunctionHeading(AScope, CurrentMethod);
   If Result <> Nil Then
     Begin
@@ -7595,11 +6958,6 @@ Begin
           ErrorAndSeekToken(strLiteralExpected, 'FunctionDecl', ';',
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7619,10 +6977,6 @@ End;
 Function TPascalModule.ConstructorDecl(AScope : TScope) : TPascalMethod;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ConstructorDecl');
-  Try
-  {$ENDIF}
   Result := ConstructorHeading(AScope, CurrentMethod);
   If Result <> Nil Then
     Begin
@@ -7644,11 +6998,6 @@ Begin
           ErrorAndSeekToken(strLiteralExpected, 'ConstructorDecl', ';',
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7668,10 +7017,6 @@ End;
 Function TPascalModule.DestructorDecl(AScope : TScope) : TPascalMethod;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.DestructorDecl');
-  Try
-  {$ENDIF}
   Result := DestructorHeading(AScope, CurrentMethod);
   If Result <> Nil Then
     Begin
@@ -7693,11 +7038,6 @@ Begin
           ErrorAndSeekToken(strLiteralExpected, 'ConstructorDecl', ';',
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7807,10 +7147,6 @@ End;
 procedure TPascalModule.CheckAlias(Method : TPascalMethod);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.CheckAlias');
-  Try
-  {$ENDIF}
   If Token.Token = '=' Then
     Begin
       NextNonCommentToken;
@@ -7834,11 +7170,6 @@ Begin
           ErrorAndSeekToken(strIdentExpected, 'CheckAlias', Token.Token,
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7854,10 +7185,6 @@ End;
 Procedure TPascalModule.CheckReturnValue(Method : TPascalMethod);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.CheckReturnValue');
-  Try
-  {$ENDIF}
   If Token.Token = ':' Then
     Begin
       NextNonCommentToken;
@@ -7873,11 +7200,6 @@ Begin
         AddIssue(Format(strFunctionWarning,
           [Method.QualifiedName]), scNone, 'CheckReturnValue', Token.Line,
           Token.Column, etWarning);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7898,25 +7220,16 @@ Var
   Errors: TLabelContainer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.CheckUnResolvedMethods');
-  Try
-  {$ENDIF}
+  ResolveScopeOfImplementedClassMethods(FImplementedMethodsLabel);
+  ResolveScopeOfImplementedExportedMethods;
   // Only resolved methods IF there are no other errors.
   Errors := FindElement(strErrors) As TLabelContainer;
   If Errors <> Nil Then
     If Errors.ElementCount > 0 Then
       Exit;
-  ResolveScopeOfImplementedClassMethods(ImplementedMethodsLabel);
-  ResolveScopeOfImplementedExportedMethods;
-  FindUnresolvedObjectAndClassMethods(TypesLabel);
+  FindUnresolvedObjectAndClassMethods(FTypesLabel);
   FindUnresolvedExportedMethods;
-  FindUnresolvedImplementedClassMethods(ImplementedMethodsLabel);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
+  FindUnresolvedImplementedClassMethods(FImplementedMethodsLabel);
 end;
 
 (**
@@ -8227,10 +7540,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.Directive');
-  Try
-  {$ENDIF}
   // Check for method directives
   While IsKeyWord(Token.Token, strMethodDirectives) Do
     Begin
@@ -8282,11 +7591,6 @@ Begin
         C.Free;
       End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -8309,10 +7613,6 @@ Var
   InternalScope : TScope;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ObjectType');
-  Try
-  {$ENDIF}
   InternalScope := scPublic;
   Result := Nil;
   If Token.UToken = 'OBJECT' Then
@@ -8348,11 +7648,6 @@ begin
         End Else
           NextNonCommentToken;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -8524,10 +7819,6 @@ Var
   iColumn: Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ConstructorHeading');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.UToken = UpperCase(strMethodTypes[mtConstructor]) Then
     Try
@@ -8573,11 +7864,6 @@ begin
     Finally
       AddToContainer(Container, Result);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -8606,10 +7892,6 @@ Var
   iColumn: Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.DestructorHeading');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.UToken = UpperCase(strMethodTypes[mtDestructor]) Then
     Try
@@ -8655,11 +7937,6 @@ begin
     Finally
       AddToContainer(Container, Result);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -8713,7 +7990,10 @@ begin
             Begin
               tmpP := TField.Create(I[j].Name, AScope, I[j].Line, I[j].Column,
                 iiPublicField, I[j].Comment);
-              P := Cls.Add(strFieldsLabel, iiFieldsLabel, scNone, Nil).Add(tmpP) As TField;
+              If Cls.FieldsLabel = Nil Then
+                Cls.FieldsLabel := Cls.Add(strFieldsLabel, iiFieldsLabel, scNone,
+                  Nil) As TLabelContainer;
+              P := Cls.FieldsLabel.Add(tmpP) As TField;
               If P <> tmpP Then
                 AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name]),
                   scNone, 'ObjFieldDecl', I[j].Line, I[j].Column, etError);
@@ -8756,10 +8036,6 @@ end;
 Procedure TPascalModule.InitSection;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.InitSection');
-  Try
-  {$ENDIF}
   If Token.UToken = 'INITIALIZATION' Then
     Begin
       Add(Token, scNone, iiInitialization, GetComment);
@@ -8786,11 +8062,6 @@ Begin
   Else
     ErrorAndSeekToken(strReservedWordExpected, 'Initsection',
       'INITIALIZATION, BEGIN or END', strSeekableOnErrorTokens, stActual);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -8917,10 +8188,6 @@ end;
 procedure TPascalModule.ClassHeritage(Cls: TObjectDecl);
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ClassHeritage');
-  Try
-  {$ENDIF}
   If Token.Token = '(' Then
     Begin
       NextNonCommentToken;
@@ -8931,11 +8198,6 @@ begin
         ErrorAndSeekToken(strLiteralExpected, 'ClassHeritage', ')',
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -8953,10 +8215,6 @@ end;
 **)
 procedure TPascalModule.ClassVisibility(var AScope : TScope);
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ClassVisibility');
-  Try
-  {$ENDIF}
   If Token.UToken = 'STRICT' Then
     Begin
       NextNonCommentToken;
@@ -8981,11 +8239,6 @@ begin
             AScope := scPublished;
           NextNonCommentToken;
         End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -9013,10 +8266,6 @@ end;
 Function TPascalModule.ClassFieldList(Cls: TObjectDecl; AScope: TScope): Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ClassFieldList');
-  Try
-  {$ENDIF}
   Result := ObjFieldList(Cls, AScope);
   If Result Then
     If Token.Token = ';' Then
@@ -9024,11 +8273,6 @@ Begin
     Else
       ErrorAndSeekToken(strLiteralExpected, 'ClassFieldList', ';',
         strSeekableOnErrorTokens, stActual);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -9134,8 +8378,9 @@ End;
 Function TPascalModule.PropertyList(Cls: TClassDecl; var AScope: TScope): Boolean;
 
 Var
-  P, tmpP : TPascalProperty;
+  tmpP : TPascalProperty;
   C : TComment;
+  P: TPascalProperty;
 
 begin
   {$IFDEF PROFILECODE}
@@ -9152,7 +8397,10 @@ begin
         Begin
           tmpP := TPascalProperty.Create(Token.Token, AScope, Token.Line,
             Token.Column, iiPublicProperty, C);
-          P := Cls.Add(strPropertiesLabel, iiPropertiesLabel, scNone, Nil).Add(tmpP) As TPascalProperty;
+          If Cls.PropertiesLabel = Nil Then
+            Cls.PropertiesLabel := Cls.Add(strPropertiesLabel, iiPropertiesLabel,
+              scNone, Nil) As TLabelContainer;
+          P := Cls.PropertiesLabel.Add(tmpP) As TPascalProperty;
           If P <> tmpP Then
             AddIssue(Format(strDuplicateIdentifierFound, [Token.Token]),
               scNone,  'AddToContainer', Token.Line, Token.Column, etError);
@@ -9193,10 +8441,6 @@ var
   FTemporaryElements: TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.PropertyInterface');
-  Try
-  {$ENDIF}
   PropertyParameterList(Prop);
   // Check for property type id
   If Token.Token = ':' Then
@@ -9210,11 +8454,6 @@ Begin
         FTemporaryElements.Free;
       End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -9245,10 +8484,6 @@ Var
   FTemporaryElements: TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.PropertyParameterList');
-  Try
-  {$ENDIF}
   If Token.Token = '[' Then
     Begin
       Repeat
@@ -9291,11 +8526,6 @@ Begin
         ErrorAndSeekToken(strLiteralExpected, 'PropertyParameterList', ']',
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -9557,16 +8787,7 @@ end;
 Procedure TPascalModule.InterfaceHeritage(InterfaceDecl : TInterfaceDecl);
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.InterfaceHeritage');
-  Try
-  {$ENDIF}
   ClassHeritage(InterfaceDecl); // Same as ClassHeritage
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -9668,10 +8889,6 @@ Procedure TPascalModule.IdentList(Container : TElementContainer;
   SeekTokens : Array Of String; iImageIndex : TImageIndex = iiNone);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.IdentList');
-  Try
-  {$ENDIF}
   If Token.TokenType In [ttIdentifier, ttDirective] Then
     Repeat
       If Token.TokenType In [ttIdentifier, ttDirective] Then
@@ -9693,11 +8910,6 @@ Begin
           ErrorAndSeekToken(strIdentExpected, 'IdentList', Token.Token,
             strSeekableOnErrorTokens, stFirst);
     Until Not IsToken(',', Nil);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -9717,10 +8929,6 @@ End;
 Function TPascalModule.TypeId(Container: TElementContainer) : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.TypeId');
-  Try
-  {$ENDIF}
   Result := (Token.TokenType In [ttIdentifier, ttDirective]) Or (Token.UToken = 'STRING');
   If Result Then
     Begin
@@ -9735,11 +8943,6 @@ Begin
               strSeekableOnErrorTokens, stActual);
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -9800,10 +9003,6 @@ End;
 Procedure TResourceString.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TResourceString.CheckDocumentation');
-  Try
-  {$ENDIF}
   If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedConsts In BrowseAndDocItOptions.Options Then
@@ -9811,11 +9010,6 @@ Begin
           DocConflictTable[dctResourceStringClauseUndocumented]);
     End;
   Inherited CheckDocumentation(boolCascade);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -9866,10 +9060,6 @@ var
   i: Integer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TRecordDecl.CheckDocumentation');
-  Try
-  {$ENDIF}
   If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedRecords In BrowseAndDocItOptions.Options Then
@@ -9878,12 +9068,24 @@ Begin
     End;
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
+
+(**
+
+  This method searches for reference to the passed symbol in the records
+  fields.
+
+  @precon  None.
+  @postcon Returns true if the symbol is found.
+
+  @param   strSymbol as a String
+  @return  a Boolean  
+
+**)
+Function TRecordDecl.ReferenceSymbol(strSymbol: String) : Boolean;
+begin
+  Result := ReferenceSection(strSymbol, FFieldsLabel);
+end;
 
 (**
 
@@ -9936,10 +9138,6 @@ var
   i: Integer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TClassDecl.CheckDocumentation');
-  Try
-  {$ENDIF}
   If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedClasses In BrowseAndDocItOptions.Options Then
@@ -9948,12 +9146,49 @@ Begin
     End;
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
+End;
+
+(**
+
+  This method searches for reference to trhe passed symbol in the classes
+  various section.
+
+  @precon  None.
+  @postcon Returns true if the symbol is found.
+
+  @param   strSymbol as a String
+  @return  a Boolean  
+
+**)
+Function TClassDecl.ReferenceSymbol(strSymbol: String) : Boolean;
+
+begin
+  {$IFDEF PROFILECODE}
+  CodeProfiler.Start('TClassDecl.ReferenceSymbol');
+  Try
+  {$ENDIF}
+  Result := Inherited ReferenceSymbol(strSymbol);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FVariablesLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FConstantsLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FTypesLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FClassVarsLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(strSymbol, FPropertiesLabel);
   {$IFDEF PROFILECODE}
   Finally
     CodeProfiler.Stop;
   End;
   {$ENDIF}
-End;
+end;
 
 (**
 
@@ -9971,10 +9206,6 @@ var
   i: Integer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TInterfaceDecl.CheckDocumentation');
-  Try
-  {$ENDIF}
   If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
     Begin
       If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
@@ -9983,11 +9214,6 @@ Begin
     End;
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -10212,10 +9438,6 @@ Var
   iStack, iStackTop : Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ProcessCompilerDirective');
-  Try
-  {$ENDIF}
   If Like(Token.Token, '{$DEFINE') Then
     AddDef(GetDef)
   Else If Like(Token.Token, '{$UNDEF') Then
@@ -10276,11 +9498,6 @@ begin
     End;
   If iSkip < 0 Then
     iSkip := 0;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -10308,10 +9525,6 @@ var
   k: Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FindUnresolvedImplementedClassMethods');
-  Try
-  {$ENDIF}
   If StartLabel <> Nil Then
     For k := 1 To StartLabel.ElementCount Do
       Begin
@@ -10328,11 +9541,6 @@ begin
             FindUnresolvedImplementedClassMethods(ClassLabel);
           End;
       End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -10353,10 +9561,6 @@ Var
   E: TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FindObjClsInt');
-  Try
-  {$ENDIF}
   Result := Nil;
   E := Self;
   For i := 0 To slClassNames.Count -  1 Do
@@ -10368,11 +9572,6 @@ Begin
   If E <> Nil Then
     If E Is TObjectDecl Then
       Result := E As TObjectDecl;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -10392,24 +9591,15 @@ var
   k: Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FindUnresolvedExportedMethods');
-  Try
-  {$ENDIF}
-  If ExportedHeadingsLabel <> Nil Then
-    For k := 1 To ExportedHeadingsLabel.ElementCount Do
-      If ExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
+  If FExportedHeadingsLabel <> Nil Then
+    For k := 1 To FExportedHeadingsLabel.ElementCount Do
+      If FExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
         Begin
-          Method := ExportedHeadingsLabel.Elements[k] As TPascalMethod;
+          Method := FExportedHeadingsLabel.Elements[k] As TPascalMethod;
           If Not Method.Resolved Then
             AddIssue(Format(strUnSatisfiedForwardReference, [Method.Identifier]),
               scNone, 'FindUnresolvedExportedMethods', Method.Line, Method.Column, etError);
           End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -10468,10 +9658,6 @@ var
   ClassTypeLabel: TLabelContainer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FindUnresolvedObjectAndClassMethods');
-  Try
-  {$ENDIF}
   If TypeLabel <> Nil Then
     For k := 1 To TypeLabel.ElementCount Do
       Begin
@@ -10479,7 +9665,7 @@ begin
           (TypeLabel.Elements[k] Is TInterfaceDecl) Then
           Begin
             ObjectOrClass := TypeLabel.Elements[k] As TObjectDecl;
-            MethodsLabel := ObjectOrClass.FindElement(strMethodsLabel);
+            MethodsLabel := ObjectOrClass.MethodsLabel;
             If MethodsLabel <> Nil Then
               For j := 1 To MethodsLabel.ElementCount Do
                 If MethodsLabel.Elements[j] Is TPascalMethod Then
@@ -10496,11 +9682,6 @@ begin
               FindUnresolvedObjectAndClassMethods(ClassTypeLabel);
           End;
       end;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -10521,16 +9702,12 @@ var
   k: Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ResolveScopeOfImplementedExportedMethods');
-  Try
-  {$ENDIF}
-  If (ExportedHeadingsLabel <> Nil) And (ImplementedMethodsLabel <> Nil) Then
-    For k := 1 To ExportedHeadingsLabel.ElementCount Do
-      If ExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
+  If (FExportedHeadingsLabel <> Nil) And (FImplementedMethodsLabel <> Nil) Then
+    For k := 1 To FExportedHeadingsLabel.ElementCount Do
+      If FExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
         Begin
-          Method := ExportedHeadingsLabel.Elements[k] As TPascalMethod;
-          ImplementedMethod := ImplementedMethodsLabel.FindElement(Method.Name);
+          Method := FExportedHeadingsLabel.Elements[k] As TPascalMethod;
+          ImplementedMethod := FImplementedMethodsLabel.FindElement(Method.Name);
           If (ImplementedMethod <> Nil) And (ImplementedMethod Is TPascalMethod) Then
             Begin
               Method.Resolved := True;
@@ -10538,11 +9715,6 @@ begin
               (ImplementedMethod As TPascalMethod).Scope := Method.Scope;
             End;
         End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -10565,9 +9737,7 @@ procedure TPascalModule.ResolveScopeOfImplementedClassMethods(
 var
   Element: TElementContainer;
   Method: TPascalMethod;
-  j: Integer;
   i: Integer;
-  sl : TStringList;
 
 begin
   {$IFDEF PROFILECODE}
@@ -10579,17 +9749,9 @@ begin
       If StartLabel.Elements[i] Is TPascalMethod Then
         Begin
           Method := StartLabel.Elements[i] As TPascalMethod;
-          sl := Method.ClassNames;
-          Element := Self;
-          For j := 0 To sl.Count - 1 Do
+          If Method.ObjClsInt <> Nil Then
             Begin
-              Element := Element.FindElement(strTypesLabel);
-              If Element <> Nil Then
-                Element := Element.FindElement(sl[j]);
-            End;
-          If Element Is TObjectDecl Then
-            Begin
-              Element := Element.FindElement(strMethodsLabel);
+              Element := Method.ObjClsInt.MethodsLabel;
               If Element <> Nil Then
                 Begin
                   Element := Element.FindElement(Method.Name);
@@ -10630,16 +9792,7 @@ end;
 **)
 function TIdentList.AsString(boolForDocumentation : Boolean): String;
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TIdentList.AsString');
-  Try
-  {$ENDIF}
   Result := Identifier;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**

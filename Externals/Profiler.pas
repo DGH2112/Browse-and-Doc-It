@@ -4,7 +4,7 @@
   profiles.
 
   @Version 1.0
-  @Date    24 Sep 2008
+  @Date    28 Sep 2008
   @Author  David Hoyle
 
 **)
@@ -287,7 +287,9 @@ end;
 **)
 destructor TProfiler.Destroy;
 begin
+  {$IFDEF PROFILECODE}
   DumpProfileInformation;
+  {$ENDIF}
   FRootProfile.Free;
   Inherited Destroy;
 end;

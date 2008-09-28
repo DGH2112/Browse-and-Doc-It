@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    24 Sep 2008
+  @Date    28 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -644,40 +644,33 @@ Type
     Procedure SetSorted(boolValue : Boolean);
     Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
       strDelimiter : String; iMaxWidth : Integer) : String; Virtual;
-    function GetDocumentConflictLabel : TLabelContainer;
-    (**
-      This property returns a reference to the doucment conflict label.
-      @precon  None.
-      @postcon Returns a reference to the doucment conflict label.
-      @return  a TLabelContainer
-    **)
-    Property DocumentConflictLabel : TLabelContainer Read GetDocumentConflictLabel;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Virtual;
     Destructor Destroy; Override;
-    Function Add(AElement : TElementContainer) : TElementContainer; Overload; Virtual;
-    Function Add(Token : TTokenInfo; AScope : TScope; AImageIndex : TImageIndex;
+    Function  Add(AElement : TElementContainer) : TElementContainer; Overload; Virtual;
+    Function  Add(Token : TTokenInfo; AScope : TScope; AImageIndex : TImageIndex;
       AComment : TComment) : TElementContainer; Overload; Virtual;
-    Function Add(strToken : String; AImageIndex : TImageIndex;
+    Function  Add(strToken : String; AImageIndex : TImageIndex;
       AScope : TScope; AComment : TComment) : TElementContainer; Overload; Virtual;
     Procedure AppendToken(AToken : TTokenInfo); Overload; Virtual;
     Procedure AppendToken(strToken : String); Overload; Virtual;
     Procedure AddTokens(AElement : TElementContainer); Virtual;
-    Function FindElement(strName : String) : TElementContainer;
+    Function  FindElement(strName : String) : TElementContainer;
     Procedure Assign(Source : TElementContainer); Virtual;
-    Function FindToken(strToken : String) : Integer;
+    Function  FindToken(strToken : String) : Integer;
     Procedure DeleteElement(iIndex : Integer);
     Procedure CheckDocumentation(var boolCascade : Boolean); Virtual;
-    Procedure ReferenceSymbol(strSymbol : String); Virtual;
+    Function  ReferenceSymbol(strSymbol : String) : Boolean; Virtual;
     Procedure AddIssue(strMsg : String; AScope : TScope; strMethod : String;
       iLine, iCol : Integer; ErrorType : TErrorType);
     Procedure AddDocumentConflict(Const Args: Array of TVarRec;
       iIdentLine, iIdentColumn : Integer; AComment : TComment;
       DocConflictRec : TDocConflictTable);
-    Function AsString(boolForDocumentation : Boolean = False) : String; Virtual;
+    Function  AsString(boolForDocumentation : Boolean = False) : String; Virtual;
       Abstract;
     Procedure CheckReferences; Virtual;
+    Function ReferenceSection(strSymbol : String; Section: TLabelContainer) : Boolean;
     (**
       This property returns the number of elements in the collection.
       @precon  None.
@@ -1374,9 +1367,12 @@ Type
       This property determines the amount of time in milliseonds between the
       last editor update and the next refresh. Interval only, the application
       needs to implement the logic.
-      @precon  None.
-      @postcon Gets and sets the update interval.
-      @return  a Cardinal
+
+      @precon  None.
+
+      @postcon Gets and sets the update interval.
+
+      @return  a Cardinal
     **)
     Property UpdateInterval : Cardinal Read FUpdateInterval Write FUpdateInterval;
     (**
@@ -1411,9 +1407,12 @@ Type
     (**
       This property determines the colour and style attribute of a token in the
       module explorer
-      @precon  None.
-      @postcon Gets and sets the colour and style of the token.
-      @param   ATokenType as       a TTokenType
+
+      @precon  None.
+
+      @postcon Gets and sets the colour and style of the token.
+
+      @param   ATokenType as       a TTokenType
       @return  a TTokenFontInfo
     **)
     Property TokenFontInfo[ATokenType : TTokenType] : TTokenFontInfo Read
@@ -2511,7 +2510,7 @@ Var
 Implementation
 
 Uses
-  Windows, StrUtils, DGHLibrary, INIFiles, Profiler;
+  Windows, StrUtils, DGHLibrary, INIFiles {$IFDEF PROFILECODE}, Profiler {$ENDIF};
 
 Const
   (** This constant represent the maximum of issue / doc conflicts to add. **)
@@ -3353,13 +3352,17 @@ end;
 
 (**
 
-  This method adds a string token to the container as a sub container NOT a
+
+  This method adds a string token to the container as a sub container NOT a
   token.
 
-  @precon  None.
-  @postcon Returns an instance of the sub container created around the token.
 
-  @param   strToken    as a String
+  @precon  None.
+
+  @postcon Returns an instance of the sub container created around the token.
+
+
+  @param   strToken    as a String
   @param   AImageIndex as a TImageIndex
   @param   AScope      as a TScope
   @param   AComment    as a TComment
@@ -3416,6 +3419,10 @@ Var
   iIcon : TImageIndex;
 
 begin
+  {$IFDEF PROFILECODE}
+  CodeProfiler.Start('TElementContainer.AddDocumentConflict');
+  Try
+  {$ENDIF}
   iL := 0;
   iC := 0;
   If AComment <> Nil Then
@@ -3430,11 +3437,12 @@ begin
     iIcon := iiDocConflictItem;
   End;
   Assert(objModuleRootElement <> Nil, 'objModuleRootElement can not be null!');
-  E := objModuleRootElement.DocumentConflictLabel;
+  E := objModuleRootElement.FDocumentConflictLabel;
   If E = Nil Then
     Begin
-      E := TLabelContainer.Create(strDocumentationConflicts, scGlobal, 0, 0,
-        iiDocConflictFolder, Nil);
+      FDocumentConflictLabel := TLabelContainer.Create(strDocumentationConflicts,
+        scGlobal, 0, 0, iiDocConflictFolder, Nil);
+      E := FDocumentConflictLabel;
       E := objModuleRootElement.Add(E);
     End;
   I := E.FindElement(DocConflictrec.FCategory);
@@ -3446,18 +3454,28 @@ begin
     End;
   I.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iL, iC,
     DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon));
+  {$IFDEF PROFILECODE}
+  Finally
+    CodeProfiler.Stop;
+  End;
+  {$ENDIF}
 end;
 
 (**
 
-  This method adds an error to the Base Language's Element Collection under a
+
+  This method adds an error to the Base Language's Element Collection under a
   sub folder of strCategory.
 
-  @precon  Error must be a valid TElementContainer.
-  @postcon Adds an error to the Base Language's Element Collection under a sub
-           folder of strCategory.
 
-  @param   strMsg    as a String
+  @precon  Error must be a valid TElementContainer.
+
+  @postcon Adds an error to the Base Language's Element Collection under a sub
+
+           folder of strCategory.
+
+
+  @param   strMsg    as a String
   @param   AScope    as a TScope
   @param   strMethod as a String
   @param   iLine     as an Integer
@@ -3617,18 +3635,20 @@ end;
 
 (**
 
-  This method builds a string from the identifer and tokens and tries to present
+
+  This method builds a string from the identifer and tokens and tries to present
   it with the style of code you would probably except.
 
   @precon  None.
   @postcon Builds a string from the identifer and tokens and tries to present
            it with the style of code you would probably except.
 
-  @param   boolIdentifier       as a Boolean
+
+  @param   boolIdentifier       as a Boolean
   @param   boolForDocumentation as a Boolean
   @param   strDelimiter         as a String
   @param   iMaxWidth            as an Integer
-  @return  a String              
+  @return  a String
 
 **)
 Function TElementContainer.BuildStringRepresentation(boolIdentifier,
@@ -3766,7 +3786,7 @@ destructor TElementContainer.Destroy;
 begin
   FTokens.Free;
   FElements.Free;
-  inherited;
+  Inherited Destroy;
 end;
 
 (**
@@ -3842,10 +3862,19 @@ Var
   i : Integer;
 
 begin
+  {$IFDEF PROFILECODE}
+  CodeProfiler.Start('TElementContainer.FindElement');
+  Try
+  {$ENDIF}
   Result := Nil;
   i := Find(strName);
   If i > 0 Then
     Result := Elements[i];
+  {$IFDEF PROFILECODE}
+  Finally
+    CodeProfiler.Stop;
+  End;
+  {$ENDIF}
 end;
 
 (**
@@ -3867,6 +3896,10 @@ var
   i: Integer;
 
 begin
+  {$IFDEF PROFILECODE}
+  CodeProfiler.Start('TElementContainer.FindToken');
+  Try
+  {$ENDIF}
   Result := -1;
   For i := 0 To TokenCount - 1 Do
     If strToken = Tokens[i].Token Then
@@ -3874,23 +3907,11 @@ begin
         Result := i;
         Break;
       End;
-end;
-
-(**
-
-  This is a getter method for the DocumentConflictLabel property.
-
-  @precon  None.
-  @postcon Returns the reference to the document conflict label.
-
-  @return  a TLabelContainer
-
-**)
-function TElementContainer.GetDocumentConflictLabel : TLabelContainer;
-begin
-  If FDocumentConflictLabel = Nil Then
-    FDocumentConflictLabel := FindElement(strDocumentationConflicts) As TLabelContainer;
-  Result := FDocumentConflictLabel;
+  {$IFDEF PROFILECODE}
+  Finally
+    CodeProfiler.Stop;
+  End;
+  {$ENDIF}
 end;
 
 (**
@@ -3998,33 +4019,87 @@ end;
 
 (**
 
-  This method does nothing other than call its parents ReferenceSymbol method.
-  Descendant should override this method to resolve symbols in the code.
+  This method searches for references to the passed symbol in the passed section.
 
   @precon  None.
-  @postcon Passes the processing of the symbol to its parent IF the parent
-           exists.
+  @postcon Returns true if the symbol was found.
 
-  @param   strSymbol as a String
+  @param   strSymbol as a String
+  @param   Section   as a TLabelContainer
+  @return  a Boolean
 
 **)
-Procedure TElementContainer.ReferenceSymbol(strSymbol : String);
+Function TElementContainer.ReferenceSection(strSymbol : String;
+  Section : TLabelContainer) : Boolean;
+
+Var
+  E: TElementContainer;
 
 Begin
-  If FParent <> Nil Then
-    FParent.ReferenceSymbol(strSymbol);
+  {$IFDEF PROFILECODE}
+  CodeProfiler.Start('TElementContainer.ReferenceSection');
+  Try
+  {$ENDIF}
+  Result := False;
+  If Section <> Nil Then
+    Begin
+      E := Section.FindElement(strSymbol);
+      If E <> Nil Then
+        Begin
+          E.Referenced := True;
+          Result := True;
+          Exit;
+        End;
+    End;
+  {$IFDEF PROFILECODE}
+  Finally
+    CodeProfiler.Stop;
+  End;
+  {$ENDIF}
 End;
 
 (**
 
-  This method recursively checks the referenced property and outputs a hint if
+  This method does nothing other than call its parents ReferenceSymbol method. 
+  Descendant should override this method to resolve symbols in the code. 
+
+  @precon  None. 
+  @postcon Passes the processing of the symbol to its parent IF the parent 
+           exists. 
+
+  @param   strSymbol as a String
+  @return  a Boolean  
+
+**)
+Function TElementContainer.ReferenceSymbol(strSymbol : String) : Boolean;
+
+Begin
+  {$IFDEF PROFILECODE}
+  CodeProfiler.Start('TElementContainer.ReferenceSymbol');
+  Try
+  {$ENDIF}
+  Result := False;
+  If FParent <> Nil Then
+    Result := FParent.ReferenceSymbol(strSymbol);
+  {$IFDEF PROFILECODE}
+  Finally
+    CodeProfiler.Stop;
+  End;
+  {$ENDIF}
+End;
+
+(**
+
+
+  This method recursively checks the referenced property and outputs a hint if
   any element is not refrernced which has a scope of Local or Private.
 
   @precon  None.
   @postcon Recursively checks the referenced property and outputs a hint if
            any element is not refrernced which has a scope of Local or Private.
 
-**)
+
+**)
 Procedure TElementContainer.CheckReferences;
 
 Var
@@ -4418,16 +4493,24 @@ end;
 
 (**
 
-  This is the constructor method for the TDocError class. 
 
-  @precon  strMsg is the error message to create a doc error for, iLine is the 
-           line number of the error, iCol is the column number for the 
-           message, strExceptionMethod is the name of the method the 
-           exception occurred in and ErrType determines if the mesage is a 
-           warning or an error. 
-  @postcon Initialises the class. 
+  This is the constructor method for the TDocError class. 
 
-  @param   strMsg      as a String
+
+  @precon  strMsg is the error message to create a doc error for, iLine is the 
+
+           line number of the error, iCol is the column number for the 
+
+           message, strExceptionMethod is the name of the method the 
+
+           exception occurred in and ErrType determines if the mesage is a 
+
+           warning or an error. 
+
+  @postcon Initialises the class. 
+
+
+  @param   strMsg      as a String
   @param   AScope      as a TScope
   @param   strMethod   as a String
   @param   iLine       as an Integer
@@ -4448,12 +4531,16 @@ End;
 
 (**
 
-  This is a getter method for the AsString property. 
 
-  @precon  None. 
-  @postcon Override the default method and returns the Document Error Message. 
+  This is a getter method for the AsString property. 
 
-  @param   boolForDocumentation as a Boolean
+
+  @precon  None. 
+
+  @postcon Override the default method and returns the Document Error Message. 
+
+
+  @param   boolForDocumentation as a Boolean
   @return  a String              
 
 **)
@@ -4514,12 +4601,16 @@ end;
 
 (**
 
-  This is a getter method for the AsString property. 
 
-  @precon  None. 
-  @postcon Return the document conflict message. 
+  This is a getter method for the AsString property. 
 
-  @param   boolForDocumentation as a Boolean
+
+  @precon  None. 
+
+  @postcon Return the document conflict message. 
+
+
+  @param   boolForDocumentation as a Boolean
   @return  a String              
 
 **)
@@ -4764,13 +4855,18 @@ End;
 
 (**
 
-  This is a getter method for the AsString property. 
 
-  @precon  None. 
-  @postcon Override and default GetAsString method and returns the name of the 
-           module. 
+  This is a getter method for the AsString property. 
 
-  @param   boolForDocumentation as a Boolean
+
+  @precon  None. 
+
+  @postcon Override and default GetAsString method and returns the name of the 
+
+           module. 
+
+
+  @param   boolForDocumentation as a Boolean
   @return  a String              
 
 **)
@@ -5905,14 +6001,16 @@ end;
 
 (**
 
-  This is an overridden constructor to ensure that label are not displayed in
+
+  This is an overridden constructor to ensure that label are not displayed in
   the unreferenced scope hints.
 
   @precon  None.
   @postcon Overridden constructor to ensure that label are not displayed in
            the unreferenced scope hints.
 
-  @param   strName     as a String
+
+  @param   strName     as a String
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
@@ -5930,12 +6028,16 @@ End;
 
 (**
 
-  This is a getter method for the AsString property.
 
-  @precon  None.
-  @postcon Returns the name of the label as a string.
+  This is a getter method for the AsString property.
 
-  @param   boolForDocumentation as a Boolean
+
+  @precon  None.
+
+  @postcon Returns the name of the label as a string.
+
+
+  @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)

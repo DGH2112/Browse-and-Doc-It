@@ -7,8 +7,11 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       28 Sep 2008
+  @Date       29 Sep 2008
   @Author     David Hoyle
+
+  @debug      Remove AToken of type TTokenType from the call stack and replace
+              with private variable of class.
 
 **)
 Unit PascalDocModule;
@@ -169,7 +172,7 @@ Type
       iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment); Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function  AsString(boolForDocumentation : Boolean = False) : String; Override;
-    Function  ReferenceSymbol(strSymbol : String) : Boolean; Override;
+    Function  ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
     (**
       Returns whether the record is packed or not.
       @precon  None.
@@ -215,7 +218,7 @@ Type
     Procedure AddDirectives(strDirective : String);
     Function HasDirective(strDirective : String) : Boolean;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
-    Function ReferenceSymbol(strSymbol : String) : Boolean; Override;
+    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
     (**
       Returns the string list of directives associated with the method.
       @precon  None.
@@ -388,7 +391,7 @@ Type
     Destructor Destroy; Override;
     procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
-    Function ReferenceSymbol(strSymbol : String) : Boolean; Override;
+    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
     (**
       Returns a reference to the object class heritage.
       @precon  None.
@@ -422,7 +425,7 @@ Type
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
-    Function ReferenceSymbol(strSymbol : String) : Boolean; Override;
+    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
     (**
       This property defined whether the class is abstract or not.
       @precon  None.
@@ -759,7 +762,7 @@ Type
     Procedure CheckReturnValue(Method : TPascalMethod);
     Procedure CheckAlias(Method : TPascalMethod);
     Function CheckNumberType(ExprType : TExprTypes) : Boolean;
-    Procedure UpdateTypeToken(var AToken : TTypeToken);
+    Procedure UpdateTypeToken(var AToken : TTypeToken); InLine;
     Procedure AddToContainer(Container : TElementContainer; var Method : TPascalMethod);
     Procedure TidyUpEmptyElements;
     Procedure CheckUnResolvedMethods;
@@ -785,7 +788,7 @@ Type
     Destructor Destroy; Override;
     Function KeyWords : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
-    Function ReferenceSymbol(strSymbol : String) : Boolean; Override;
+    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
   End;
 
 Implementation
@@ -858,11 +861,11 @@ Const
     'private', 'protected', 'public', 'published');
   (** A sorted list of method directives. Used in identifying method
   directives. **)
-  strMethodDirectives : Array[1..22] Of String = (
+  strMethodDirectives : Array[1..23] Of String = (
     'abstract', 'assembler', 'cdecl', 'dispid', 'dynamic', 'export',
-    'external', 'far', 'forward',  'local', 'message', 'name', 'near', 'overload',
-    'override', 'pascal', 'register', 'reintroduce', 'safecall', 'stdcall',
-    'varargs', 'virtual'
+    'external', 'far', 'fina', 'forward',  'inline', 'local', 'message',
+    'near', 'overload', 'override', 'pascal', 'register', 'reintroduce',
+    'safecall', 'stdcall',  'varargs', 'virtual'
   );
   (** A list of real types. **)
   strRealTypes : Array[1..7] Of String = ('comp', 'currency',
@@ -954,6 +957,23 @@ Procedure TArrayType.AddDimension;
 Begin
   Inc(FDimensions);
 End;
+
+(**
+
+
+  This is a getter method for the AsString property.
+
+  @precon  None.
+  @postcon Returns the name of the record + '= Record'.
+
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TRecordDecl.AsString(boolForDocumentation : Boolean): String;
+begin
+  Result := Identifier + #32'='#32'Record';
+end;
 
 (**
 
@@ -1341,11 +1361,11 @@ end;
   @precon  None. 
   @postcon Tries to find the symbol with its scope as mark it as referenced. 
 
-  @param   strSymbol as a String
-  @return  a Boolean  
+  @param   AToken as a TTokenInfo
+  @return  a Boolean
 
 **)
-Function TPascalMethod.ReferenceSymbol(strSymbol: String) : Boolean;
+Function TPascalMethod.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
 
 Var
   i: Integer;
@@ -1353,29 +1373,26 @@ Var
   boolFound: Boolean;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalMethod.ReferenceSymbol');
-  Try
-  {$ENDIF}
-  Result := ReferenceSection(strSymbol, FVariablesLabel);
+  Result := ReferenceSection(AToken, FVariablesLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FConstantsLabel);
+  Result := ReferenceSection(AToken, FConstantsLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FResourceStringsLabel);
+  Result := ReferenceSection(AToken, FResourceStringsLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FTypesLabel);
+  Result := ReferenceSection(AToken, FTypesLabel);
   // Local Methods
   boolFound := False;
   For i := 1 To ElementCount Do
     If Elements[i] Is TPascalMethod Then
       Begin
         M := Elements[i] As TPascalMethod;
-        If AnsiCompareText(strSymbol, M.Identifier) = 0 Then
+        If AnsiCompareText(AToken.Token, M.Identifier) = 0 Then
           Begin
             M.Referenced := True;
+            AToken.Reference := trResolved;
             boolFound := True;
           End;
       End;
@@ -1385,15 +1402,10 @@ begin
       Exit;
     End;
   If ObjClsInt <> Nil Then
-    Result := ObjClsInt.ReferenceSymbol(strSymbol);
+    Result := ObjClsInt.ReferenceSymbol(AToken);
   If Result Then
     Exit;
-  Result := Inherited ReferenceSymbol(strSymbol); //: bug IS this a duplicate?
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
+  Result := Inherited ReferenceSymbol(AToken); //: bug IS this a duplicate?
 end;
 
 (**
@@ -1429,14 +1441,10 @@ end;
 
 (**
 
-
   This is a getter method for the AsString property.
 
-
   @precon  None.
-
   @postcon Outputs the pascal property declaration.
-
 
   @param   boolForDocumentation as a Boolean
   @return  a String
@@ -1471,10 +1479,6 @@ Var
   i : Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalProperty.AsString');
-  Try
-  {$ENDIF}
   Result := 'Property ' + Identifier;
   If ParameterCount > 0 Then
     Begin
@@ -1514,11 +1518,6 @@ begin
   OutputSpec(FDispIDSpec);
   If FDefaultProperty Then
     OutputSpec('Default');
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1545,35 +1544,6 @@ begin
   Result := Identifier;
   For iToken := 0 To TokenCount - 1 Do
     Result := Result + #32 + Tokens[iToken].Token;
-end;
-
-(**
-
-
-  This is a getter method for the AsString property.
-
-
-  @precon  None.
-
-  @postcon Returns the name of the record + '= Record'.
-
-
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TRecordDecl.AsString(boolForDocumentation : Boolean): String;
-begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TRecordDecl.AsString');
-  Try
-  {$ENDIF}
-  Result := Identifier + #32'='#32'Record';
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1725,11 +1695,11 @@ end;
   @precon  None. 
   @postcon References symbols with the scope of the object / class. 
 
-  @param   strSymbol as a String
-  @return  a Boolean  
+  @param   AToken as a TTokenInfo
+  @return  a Boolean
 
 **)
-Function TObjectDecl.ReferenceSymbol(strSymbol : String) : Boolean;
+Function TObjectDecl.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
 
 Var
   i: Integer;
@@ -1740,16 +1710,17 @@ begin
   CodeProfiler.Start('TObjectDecl.ReferenceSymbol');
   Try
   {$ENDIF}
-  Result := Inherited ReferenceSymbol(strSymbol);
+  Result := Inherited ReferenceSymbol(AToken);
   If Result Then
     Exit;
   boolFound := False;
   If FMethodsLabel <> Nil Then
     Begin
       For i := 1 To FMethodslabel.ElementCount Do
-        If AnsiCompareText(strSymbol, FMethodslabel[i].Identifier) = 0 Then
+        If AnsiCompareText(AToken.Token, FMethodslabel[i].Identifier) = 0 Then
           Begin
             FMethodslabel[i].Referenced := True;
+            AToken.Reference := trResolved;
             boolFound := True;
           End;
     End;
@@ -2237,16 +2208,7 @@ End;
 **)
 procedure TPascalModule.ParseTokens;
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ParseTokens');
-  Try
-  {$ENDIF}
   Goal;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -2985,10 +2947,6 @@ Var
   bool : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.Block');
-  Try
-  {$ENDIF}
   FMethodStack.Add(Method);
   Try
     DeclSection(scLocal, Method);
@@ -3000,11 +2958,6 @@ Begin
   Finally
     FMethodStack.Delete(FMethodStack.Count - 1);
   End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3239,10 +3192,6 @@ Var
   LabelScope: TScope;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ConstSection');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'CONST';
   If Result Then
     Begin
@@ -3279,11 +3228,6 @@ Begin
           ErrorAndSeekToken(strLiteralExpected, 'ConstSection', ';',
             strSeekableOnErrorTokens, stFirst);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3518,10 +3462,6 @@ Var
   TL : TLabelContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.TypeSection');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'TYPE';
   If Result Then
     Begin
@@ -3556,11 +3496,6 @@ Begin
           ErrorAndSeekToken(strLiteralExpected, 'TypeSection', ';',
             strSeekableOnErrorTokens, stFirst);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3630,19 +3565,10 @@ End;
 Function TPascalModule.GetTypeDecl(AToken : TTypeToken) : TGenericTypeDecl;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.GetTypeDecl');
-  Try
-  {$ENDIF}
   Result := RestrictedType(AToken);
   If Result = Nil Then
     Result := OPType(AToken);
   PortabilityDirective;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3667,17 +3593,8 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.TypedConstant');
-  Try
-  {$ENDIF}
   ExprType := [etUnknown, etConstExpr];
   Result := ArrayConstant(C, T) Or RecordConstant(C, T) Or ConstExpr(C, ExprType);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3849,10 +3766,6 @@ End;
 Function TPascalModule.OPType(AToken : TTypeToken) : TGenericTypeDecl;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.OPType');
-  Try
-  {$ENDIF}
   Result := StrucType(AToken);
   If Result = Nil Then
     Result := PointerType(AToken);
@@ -3866,11 +3779,6 @@ Begin
   Result := ClassRefType(AToken);
   If Result = Nil Then
     Result := SimpleType(AToken);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3893,20 +3801,11 @@ End;
 Function TPascalModule.RestrictedType(AToken : TTypeToken) : TRestrictedType;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.RestrictedType');
-  Try
-  {$ENDIF}
   Result := ObjectType(AToken);
   If Result = Nil Then
     Result := ClassType(AToken);
   If Result = Nil Then
     Result := InterfaceType(AToken);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -3988,18 +3887,9 @@ end;
 function TPascalModule.SimpleType(AToken : TTypeToken) : TSimpleType;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.SimpleType');
-  Try
-  {$ENDIF}
   Result := RealType(AToken);
   If Result = Nil Then
     Result := OrdinalType(AToken);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -4057,20 +3947,11 @@ End;
 Function TPascalModule.OrdinalType(AToken : TTypeToken) : TOrdinalType;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.OrdinalType');
-  Try
-  {$ENDIF}
   Result := OrdIdent(AToken);
   If Result = Nil Then
   Result := EnumerateType(AToken);
   If Result = Nil Then
   Result := SubRangeType(AToken);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4169,10 +4050,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.SubRangeType');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Not IsKeyWord(Token.Token, strReservedWords) Then
     Begin
@@ -4189,11 +4066,6 @@ Begin
           ConstExpr(Result, ExprType);
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4690,11 +4562,11 @@ End;
   @precon  None. 
   @postcon Tries to find the symbol with its scope as mark it as referenced. 
 
-  @param   strSymbol as a String
-  @return  a Boolean  
+  @param   AToken as a TTokenInfo
+  @return  a Boolean
 
 **)
-Function TPascalModule.ReferenceSymbol(strSymbol: String) : Boolean;
+Function TPascalModule.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
 
 Var
   i: Integer;
@@ -4707,19 +4579,19 @@ begin
   CodeProfiler.Start('TPascalModule.ReferenceSymbol');
   Try
   {$ENDIF}
-  Result := ReferenceSection(strSymbol, FVariablesLabel);
+  Result := ReferenceSection(AToken, FVariablesLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FConstantsLabel);
+  Result := ReferenceSection(AToken, FConstantsLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FResourceStringsLabel);
+  Result := ReferenceSection(AToken, FResourceStringsLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FTypesLabel);
+  Result := ReferenceSection(AToken, FTypesLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FThreadVarsLabel);
+  Result := ReferenceSection(AToken, FThreadVarsLabel);
   If Result Then
     Exit;
   // Check Module Local Methods
@@ -4727,9 +4599,10 @@ begin
   E := FImplementedMethodsLabel;
   If E <> Nil Then
     For i := 1 To E.ElementCount Do
-      If AnsiCompareText(E[i].Identifier, strSymbol) = 0 Then
+      If AnsiCompareText(E[i].Identifier, AToken.Token) = 0 Then
         Begin
           E[i].Referenced := True;
+          AToken.Reference := trResolved;
           boolFound := True;
         End;
   Result := boolFound;
@@ -4744,8 +4617,11 @@ begin
           E := M.ObjClsInt.MethodsLabel;
           If E <> Nil Then
             For i := 1 To E.ElementCount Do
-              If AnsiCompareText(E[i].Identifier, strSymbol) = 0 Then
-                E[i].Referenced := True;
+              If AnsiCompareText(E[i].Identifier, AToken.Token) = 0 Then
+                Begin
+                  E[i].Referenced := True;
+                  AToken.Reference := trResolved;
+                End;
         End;
     End;
   {$IFDEF PROFILECODE}
@@ -4988,10 +4864,6 @@ Var
   LabelScope : TScope;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.VarSection');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'VAR';
   If Result Then
     Begin
@@ -5030,11 +4902,6 @@ Begin
             NextNonCommentToken;
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5177,30 +5044,6 @@ end;
 Function TPascalModule.VarDecl(AScope : TScope; VarSection : TElementContainer;
   AImageIndex : TImageIndex) : Boolean;
 
-  (**
-
-    This function returns the tokens of the Type declarations for checking
-    in the ReferenceLoclsPrivates method.
-
-    @precon  T must be a valid TGenericTypeDecl.
-    @postcon Returns the tokens of the Type declarations for checking
-             in the ReferenceLoclsPrivates method.
-
-    @param   T as a TGenericTypeDecl
-    @return  a String
-
-  **)
-  Function TypeTokens(T : TGenericTypeDecl) : String;
-
-  Var
-    i : Integer;
-
-  Begin
-    Result := '';
-    For i := 0 To T.TokenCount - 1 Do
-      Result := Result + T.Tokens[i].Token;
-  End;
-
 Var
   I  :TIdentList;
   j : Integer;
@@ -5209,6 +5052,7 @@ Var
   C : TElementContainer;
   ExprType : TExprTypes;
   FTemporaryElements: TElementContainer;
+  AToken: TTokenInfo;
 
 Begin
   {$IFDEF PROFILECODE}
@@ -5230,9 +5074,10 @@ Begin
             FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
             Try
               NextNonCommentToken;
+              AToken := Token;
               T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
               If T <> Nil Then
-                VarSection.ReferenceSymbol(TypeTokens(T));
+                VarSection.ReferenceSymbol(AToken);
               If Token.UToken = 'ABSOLUTE' Then
                 Begin
                   C := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
@@ -5421,18 +5266,9 @@ End;
 Procedure TPascalModule.Expression(C : TElementContainer; var ExprType : TExprTypes);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.Expression');
-  Try
-  {$ENDIF}
   Repeat
     SimpleExpression(C, ExprType);
   Until Not RelOp(C, ExprType);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5457,20 +5293,11 @@ End;
 Procedure TPascalModule.SimpleExpression(C : TElementContainer; var ExprType : TExprTypes);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.SimpleExpression');
-  Try
-  {$ENDIF}
   If IsKeyWord(Token.Token, ['+', '-']) Then
     AddToExpression(C);
   Repeat
     Term(C, ExprType);
   Until Not AddOp(C);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5494,18 +5321,9 @@ End;
 Procedure TPascalModule.Term(C : TElementContainer; var ExprType : TExprTypes);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.Term');
-  Try
-  {$ENDIF}
   Repeat
     Factor(C, ExprType);
   Until Not MulOp(C, ExprType)
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5554,10 +5372,6 @@ Var
   End;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.Factor');
-  Try
-  {$ENDIF}
   If Token.TokenType In [ttStringLiteral] Then
     Begin
       If (etUnknown In ExprType) Then
@@ -5630,11 +5444,6 @@ Begin
       SetupSubExprType;
       Designator(C, SubExprType);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5785,27 +5594,22 @@ var
   M : TPascalMethod;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.Designator');
-  Try
-  {$ENDIF}
   Result := (Token.TokenType In [ttIdentifier, ttDirective]) Or
     (Token.UToken = 'NIL');
   If Result Then
     Begin
       M := CurrentMethod As TPascalMethod;
-      If M <> Nil Then
-        M.ReferenceSymbol(Token.Token)
-      Else
-        ReferenceSymbol(Token.Token);
+      If Token.Reference In [trUnknown] Then
+        If M <> Nil Then
+          Begin
+            If Not M.ReferenceSymbol(Token) Then
+              Token.Reference := trUnresolved
+          End Else
+            If Not ReferenceSymbol(Token) Then
+              Token.Reference := trUnresolved;
       AddToExpression(C);
       DesignatorSubElement(C, ExprType, ['.', '[', '^', '(']);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -5832,10 +5636,6 @@ var
   M: TPascalMethod;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.DesignatorSubElement');
-  Try
-  {$ENDIF}
   M := CurrentMethod As TPascalMethod;
   While IsKeyWord(Token.Token, strValidSymbols) Or (IsKeyWord(Token.Token, ['(', '['])) Do // Always check for proc/func
   If Token.Token = '.' Then
@@ -5843,10 +5643,14 @@ Begin
       AddToExpression(C);
       If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
-          If M <> Nil Then
-            M.ReferenceSymbol(Token.Token)
-          Else
-            ReferenceSymbol(Token.Token);
+          If Token.Reference In [trUnknown] Then
+            If M <> Nil Then
+              Begin
+                If Not M.ReferenceSymbol(Token) Then
+                  Token.Reference := trUnresolved;
+              End Else
+                If Not ReferenceSymbol(Token) Then
+                  Token.Reference := trUnresolved;
           AddToExpression(C);
         End
       Else
@@ -5855,10 +5659,14 @@ Begin
     End
   Else If Token.Token = '[' Then
     Begin
-      If M <> Nil Then
-        M.ReferenceSymbol(Token.Token)
-      Else
-        ReferenceSymbol(Token.Token);
+      If Token.Reference In [trUnknown] Then
+        If M <> Nil Then
+          Begin
+            If Not M.ReferenceSymbol(Token) Then
+              Token.Reference := trUnresolved;
+          End Else
+            If Not ReferenceSymbol(Token) Then
+              Token.Reference := trUnresolved;
       AddToExpression(C);
       ExprList(C);
       If Token.Token = ']' Then
@@ -5869,10 +5677,14 @@ Begin
     End
   Else If Token.Token = '^' Then
     Begin
-      If M <> Nil Then
-        M.ReferenceSymbol(Token.Token)
-      Else
-        ReferenceSymbol(Token.Token);
+      If Token.Reference In [trUnknown] Then
+        If M <> Nil Then
+          Begin
+            If Not M.ReferenceSymbol(Token) Then
+              Token.Reference := trUnresolved;
+          End Else
+            If Not ReferenceSymbol(Token) Then
+              Token.Reference := trUnresolved;
       AddToExpression(C);
     End
   Else If (Token.Token = '(') Then
@@ -5892,11 +5704,6 @@ Begin
         ErrorAndSeekToken(strLiteralExpected, 'DesignatorSubElement', ')',
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6022,10 +5829,6 @@ End;
 Procedure TPascalModule.Statement;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.Statement');
-  Try
-  {$ENDIF}
   If CurrentMethod <> Nil Then
     Begin
       If CurrentMethod.LabelsLabel <> Nil Then // Check for label
@@ -6041,11 +5844,6 @@ Begin
     End;
   If Not StructStmt Then
     SimpleStatement;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6115,10 +5913,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.SimpleStatement');
-  Try
-  {$ENDIF}
   If Token.UToken = 'GOTO' Then
     Begin
       NextNonCommentToken;
@@ -6155,11 +5949,6 @@ Begin
           Expression(Nil, ExprType);
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6182,10 +5971,6 @@ End;
 Function TPascalModule.StructStmt : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.StructStmt');
-  Try
-  {$ENDIF}
   Result :=
     CompoundStmt Or
     ConditionalStmt Or
@@ -6194,11 +5979,6 @@ Begin
     TryExceptAndFinallyStmt Or // <= Combined together as the type can not be
     RaiseStmt Or               //    determined until the Except or Finally
     AssemblerStatement;        //    key work is found.
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6220,10 +6000,6 @@ End;
 Function TPascalModule.CompoundStmt : Boolean;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.CompoundStmt');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'BEGIN';
   If Result Then
     Begin
@@ -6235,11 +6011,6 @@ begin
         ErrorAndSeekToken(strReservedWordExpected, 'CompoundStmt', 'END',
           ['end']{strSeekableOnErrorTokens}, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -6263,16 +6034,7 @@ end;
 Function TPascalModule.ConditionalStmt : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ConditionalStmt');
-  Try
-  {$ENDIF}
   Result := IfStmt Or CaseStmt;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6295,10 +6057,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.IfStmt');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'IF';
   If Result Then
     Begin
@@ -6318,11 +6076,6 @@ Begin
           ErrorAndSeekToken(strReservedWordExpected, 'IfStmt', 'THEN',
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6389,10 +6142,6 @@ End;
 Procedure TPascalModule.CaseSelector;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.CaseSelector');
-  Try
-  {$ENDIF}
   Repeat
     CaseLabel;
   Until Not IsToken(',', Nil);
@@ -6404,11 +6153,6 @@ Begin
       If Not IsKeyWord(Token.Token, ['else', 'end']) Then
         ErrorAndSeekToken(strLiteralExpected, 'CaseSelector', ':',
           strSeekableOnErrorTokens, stActual);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6452,16 +6196,7 @@ End;
 Function TPascalModule.LoopStmt : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.LoopStmt');
-  Try
-  {$ENDIF}
   Result := RepeatStmt Or WhileStmt Or ForStmt;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6556,10 +6291,6 @@ Var
   M: TPascalMethod;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ForStmt');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'FOR';
   If Result Then
     Begin
@@ -6567,10 +6298,14 @@ Begin
       If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
           M := CurrentMethod As TPascalMethod;
-          If M <> Nil Then
-            M.ReferenceSymbol(Token.Token)
-          Else
-            ReferenceSymbol(Token.Token);
+          If Token.Reference In [trUnknown] Then
+            If M <> Nil Then
+              Begin
+                If Not M.ReferenceSymbol(Token) Then
+                  Token.Reference := trUnresolved;
+              End Else
+                If Not ReferenceSymbol(Token) then
+                  Token.Reference := trUnresolved;
           NextNonCommentToken;
           If Token.Token = ':=' Then
             Begin
@@ -6598,11 +6333,6 @@ Begin
           ErrorAndSeekToken(strIdentExpected, 'ForStmt', Token.Token,
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -6620,10 +6350,6 @@ End;
 Function TPascalModule.WithStmt : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.WithStmt');
-  Try
-  {$ENDIF}
   Result := Token.UToken = 'WITH';
   If Result Then
     Begin
@@ -6637,11 +6363,6 @@ Begin
           ErrorAndSeekToken(strReservedWordExpected, 'WithStmt', 'DO',
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7067,10 +6788,6 @@ Var
   iColumn: Integer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FunctionHeading');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.UToken = UpperCase(strMethodTypes[mtFunction]) Then
     Try
@@ -7127,11 +6844,6 @@ Begin
     Finally
       AddToContainer(Container, Result);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7258,10 +6970,6 @@ Var
   iLine, iColumn : Integer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ProcedureHeading');
-  Try
-  {$ENDIF}
   Result := Nil;
   If Token.UToken = UpperCase(strMethodTypes[mtProcedure]) Then
     Try
@@ -7317,11 +7025,6 @@ Begin
     Finally
       AddToContainer(Container, Result);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7341,10 +7044,6 @@ End;
 Procedure TPascalModule.FormalParameter(Method : TPascalMethod);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FormalParameter');
-  Try
-  {$ENDIF}
   If Token.Token = '(' Then
     Begin
       NextNonCommentToken;
@@ -7357,11 +7056,6 @@ Begin
         ErrorAndSeekToken(strLiteralExpected, 'FormalParameters', ')',
           strSeekableOnErrorTokens, stActual);
   End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7385,10 +7079,6 @@ Var
   pmMod : TParamModifier;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.FormalParam');
-  Try
-  {$ENDIF}
   pmMod := pamNone;
   // Get modifiers
   If Token.UToken = 'VAR' Then
@@ -7400,11 +7090,6 @@ Begin
   If pmMod <> pamNone Then
     NextNonCommentToken;
   Parameter(Method, pmMod);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7437,10 +7122,6 @@ Var
   FTemporaryElements: TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.Parameter');
-  Try
-  {$ENDIF}
   // Get ident list
   T := Nil;
   boolArrayOf := False;
@@ -7498,11 +7179,6 @@ Begin
   Finally
     P.Free;
   End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7713,16 +7389,7 @@ End;
 Function TPascalModule.MethodList(Cls: TObjectDecl; AScope: TScope): Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.MethodList');
-  Try
-  {$ENDIF}
   Result := MethodHeading(Cls, AScope);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -7751,10 +7418,6 @@ Var
   boolClassMethod : Boolean;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.MethodHeading');
-  Try
-  {$ENDIF}
   Result := False;
   // Check for class method
   boolClassMethod := False;
@@ -7786,11 +7449,6 @@ begin
     End Else
       If boolClassMethod Then
         RollBackToken;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -8090,10 +7748,6 @@ Var
   boolFieldAllowed: Boolean;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ClassType');
-  Try
-  {$ENDIF}
   boolFieldAllowed := True;
   InternalScope := scPublished;
   Result := Nil;
@@ -8165,11 +7819,6 @@ begin
         End Else
           RollBackToken;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -8294,16 +7943,7 @@ End;
 Function TPascalModule.ClassMethodList(Cls: TObjectDecl; AScope: TScope): Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ClassMethodList');
-  Try
-  {$ENDIF}
   Result := MethodList(Cls, AScope);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -8331,10 +7971,6 @@ End;
 Function TPascalModule.ClassPropertyList(Cls: TClassDecl; var AScope: TScope): Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ClassPropertyList');
-  Try
-  {$ENDIF}
   Result :=  PropertyList(Cls, AScope);
   If Result Then
     Begin
@@ -8344,11 +7980,6 @@ Begin
         ErrorAndSeekToken(strLiteralExpected, 'ClassPropertyList', ';',
           strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -8383,10 +8014,6 @@ Var
   P: TPascalProperty;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.PropertyList');
-  Try
-  {$ENDIF}
   ClassVisibility(AScope);
   Result := Token.UToken = 'PROPERTY';
   If Result Then
@@ -8395,11 +8022,11 @@ begin
       NextNonCommentToken;
       If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
-          tmpP := TPascalProperty.Create(Token.Token, AScope, Token.Line,
-            Token.Column, iiPublicProperty, C);
           If Cls.PropertiesLabel = Nil Then
             Cls.PropertiesLabel := Cls.Add(strPropertiesLabel, iiPropertiesLabel,
               scNone, Nil) As TLabelContainer;
+          tmpP := TPascalProperty.Create(Token.Token, AScope, Token.Line,
+            Token.Column, iiPublicProperty, C);
           P := Cls.PropertiesLabel.Add(tmpP) As TPascalProperty;
           If P <> tmpP Then
             AddIssue(Format(strDuplicateIdentifierFound, [Token.Token]),
@@ -8411,11 +8038,6 @@ begin
           ErrorAndSeekToken(strIdentExpected, 'PropertyList', Token.Token,
             strSeekableOnErrorTokens, stActual);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -8580,7 +8202,7 @@ begin
         Designator(C, ExprType);
         Prop.ReadSpec := C.AsString;
         If C.TokenCount > 0 Then
-          Prop.ReferenceSymbol(C.Tokens[0].Token);
+          Prop.ReferenceSymbol(C.Tokens[0]);
       Finally
         C.Free;
       End;
@@ -8595,7 +8217,7 @@ begin
         Designator(C, ExprType);
         Prop.WriteSpec := C.AsString;
         If C.TokenCount > 0 Then
-          Prop.ReferenceSymbol(C.Tokens[0].Token);
+          Prop.ReferenceSymbol(C.Tokens[0]);
       Finally
         C.Free;
       End;
@@ -8699,10 +8321,6 @@ Var
   InternalScope : TScope;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.InterfaceType');
-  Try
-  {$ENDIF}
   InternalScope := scPublic;
   Result := Nil;
   If (Token.UToken = 'INTERFACE') Or (Token.UToken = 'DISPINTERFACE') Then
@@ -8765,11 +8383,6 @@ begin
               strSeekableOnErrorTokens, stActual);
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -8972,21 +8585,12 @@ Var
   iStartIndex : Integer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.ConstExpr');
-  Try
-  {$ENDIF}
   Result := True;
   iStartIndex := Token.BufferPos;
   Expression(Container, ExprType); // ConstExpr is a subset of Expression
   If iStartIndex = Token.BufferPos Then
     ErrorAndSeekToken(strConstExprExpected, 'ConstExpr', Token.Token,
       strSeekableOnErrorTokens, stActual);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -9072,19 +8676,19 @@ End;
 
 (**
 
-  This method searches for reference to the passed symbol in the records
-  fields.
+  This method searches for reference to the passed symbol in the records 
+  fields. 
 
-  @precon  None.
-  @postcon Returns true if the symbol is found.
+  @precon  None. 
+  @postcon Returns true if the symbol is found. 
 
-  @param   strSymbol as a String
-  @return  a Boolean  
+  @param   AToken as a TTokenInfo
+  @return  a Boolean
 
 **)
-Function TRecordDecl.ReferenceSymbol(strSymbol: String) : Boolean;
+Function TRecordDecl.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
 begin
-  Result := ReferenceSection(strSymbol, FFieldsLabel);
+  Result := ReferenceSection(AToken, FFieldsLabel);
 end;
 
 (**
@@ -9150,44 +8754,35 @@ End;
 
 (**
 
-  This method searches for reference to trhe passed symbol in the classes
-  various section.
+  This method searches for reference to trhe passed symbol in the classes 
+  various section. 
 
-  @precon  None.
-  @postcon Returns true if the symbol is found.
+  @precon  None. 
+  @postcon Returns true if the symbol is found. 
 
-  @param   strSymbol as a String
-  @return  a Boolean  
+  @param   AToken as a TTokenInfo
+  @return  a Boolean
 
 **)
-Function TClassDecl.ReferenceSymbol(strSymbol: String) : Boolean;
+Function TClassDecl.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TClassDecl.ReferenceSymbol');
-  Try
-  {$ENDIF}
-  Result := Inherited ReferenceSymbol(strSymbol);
+  Result := Inherited ReferenceSymbol(AToken);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FVariablesLabel);
+  Result := ReferenceSection(AToken, FVariablesLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FConstantsLabel);
+  Result := ReferenceSection(AToken, FConstantsLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FTypesLabel);
+  Result := ReferenceSection(AToken, FTypesLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FClassVarsLabel);
+  Result := ReferenceSection(AToken, FClassVarsLabel);
   If Result Then
     Exit;
-  Result := ReferenceSection(strSymbol, FPropertiesLabel);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
+  Result := ReferenceSection(AToken, FPropertiesLabel);
 end;
 
 (**
@@ -9545,12 +9140,14 @@ end;
 
 (**
 
-  This method tries to find the class that the class names string list refers to.
+
+  This method tries to find the class that the class names string list refers to.
 
   @precon  slClassNames must be a valid instance of a string list class.
   @postcon Returns the class reference the string list refers to else returns nil;
 
-  @param   slClassNames as a TStringList
+
+  @param   slClassNames as a TStringList
   @return  a TObjectDecl
 
 **)

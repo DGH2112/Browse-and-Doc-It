@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    28 Sep 2008
+  @Date    29 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -388,6 +388,9 @@ Type
     FColumn : Integer;
     FBufferPos : Integer;
   End;
+  
+  (** This enumerate defermines the status of the token's reference resolution. **)
+  TTokenReference = (trUnknown, trUnresolved, trResolved);
 
   (** This is a class the store information about each token **)
   TTokenInfo = Class
@@ -399,6 +402,7 @@ Type
     FLength : Integer;
     FTokenType: TTokenType;
     FUToken : String;
+    FReference : TTokenReference;
   Public
     Constructor Create(strToken : String; iPos, iLine, iCol,
       iLength : Integer; TType : TTokenType); Overload;
@@ -452,6 +456,13 @@ Type
       @return  a TTokenType
     **)
     Property TokenType : TTokenType read FTokenType;
+    (**
+      This property gets and sets the reference information for the token. 
+      @precon  None. 
+      @postcon Gets and sets the reference information for the token. 
+      @return  a TTokenReference
+    **)
+    Property Reference : TTokenReference Read FReference Write FReference;
   End;
 
   (** A class to hold text about a single tag **)
@@ -661,7 +672,7 @@ Type
     Function  FindToken(strToken : String) : Integer;
     Procedure DeleteElement(iIndex : Integer);
     Procedure CheckDocumentation(var boolCascade : Boolean); Virtual;
-    Function  ReferenceSymbol(strSymbol : String) : Boolean; Virtual;
+    Function  ReferenceSymbol(AToken : TTokenInfo) : Boolean; Virtual;
     Procedure AddIssue(strMsg : String; AScope : TScope; strMethod : String;
       iLine, iCol : Integer; ErrorType : TErrorType);
     Procedure AddDocumentConflict(Const Args: Array of TVarRec;
@@ -670,7 +681,7 @@ Type
     Function  AsString(boolForDocumentation : Boolean = False) : String; Virtual;
       Abstract;
     Procedure CheckReferences; Virtual;
-    Function ReferenceSection(strSymbol : String; Section: TLabelContainer) : Boolean;
+    Function ReferenceSection(AToken : TTokenInfo; Section: TLabelContainer) : Boolean;
     (**
       This property returns the number of elements in the collection.
       @precon  None.
@@ -3263,6 +3274,7 @@ begin
   FUToken := '';
   If FTokenType In [ttReservedWord, ttDirective] Then
     FUToken := UpperCase(strToken);
+  FReference := trUnknown;
 end;
 
 (**
@@ -3862,19 +3874,10 @@ Var
   i : Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TElementContainer.FindElement');
-  Try
-  {$ENDIF}
   Result := Nil;
   i := Find(strName);
   If i > 0 Then
     Result := Elements[i];
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -4019,43 +4022,36 @@ end;
 
 (**
 
-  This method searches for references to the passed symbol in the passed section.
+  This method searches for references to the passed symbol in the passed 
+  section. 
 
-  @precon  None.
-  @postcon Returns true if the symbol was found.
+  @precon  None. 
+  @postcon Returns true if the symbol was found. 
 
-  @param   strSymbol as a String
-  @param   Section   as a TLabelContainer
+  @param   AToken  as a TTokenInfo
+  @param   Section as a TLabelContainer
   @return  a Boolean
 
 **)
-Function TElementContainer.ReferenceSection(strSymbol : String;
+Function TElementContainer.ReferenceSection(AToken : TTokenInfo;
   Section : TLabelContainer) : Boolean;
 
 Var
   E: TElementContainer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TElementContainer.ReferenceSection');
-  Try
-  {$ENDIF}
   Result := False;
   If Section <> Nil Then
     Begin
-      E := Section.FindElement(strSymbol);
+      E := Section.FindElement(AToken.Token);
       If E <> Nil Then
         Begin
           E.Referenced := True;
+          AToken.Reference := trResolved;
           Result := True;
           Exit;
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -4067,25 +4063,16 @@ End;
   @postcon Passes the processing of the symbol to its parent IF the parent 
            exists. 
 
-  @param   strSymbol as a String
-  @return  a Boolean  
+  @param   AToken as a TTokenInfo
+  @return  a Boolean
 
 **)
-Function TElementContainer.ReferenceSymbol(strSymbol : String) : Boolean;
+Function TElementContainer.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TElementContainer.ReferenceSymbol');
-  Try
-  {$ENDIF}
   Result := False;
   If FParent <> Nil Then
-    Result := FParent.ReferenceSymbol(strSymbol);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
+    Result := FParent.ReferenceSymbol(AToken);
 End;
 
 (**

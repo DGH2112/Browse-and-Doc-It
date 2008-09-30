@@ -8990,7 +8990,6 @@ var
   i: Integer;
 
 begin
-  //: @debug Can this not be done when the implemented method is created?
   If StartLabel <> Nil Then
     For i := 1 To StartLabel.ElementCount Do
       If StartLabel.Elements[i] Is TPascalMethod Then

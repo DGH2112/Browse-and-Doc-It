@@ -10,9 +10,6 @@
   @Date       30 Sep 2008
   @Author     David Hoyle
 
-  @debug      Remove AToken of type TTokenType from the call stack and replace
-              with private variable of class.
-
 **)
 Unit PascalDocModule;
 
@@ -624,6 +621,7 @@ Type
     FThreadVarsLabel          : TLabelContainer;
     FExportedHeadingsLabel   : TLabelContainer;
     FImplementedMethodsLabel : TLabelContainer;
+    FTokenType: TTypeToken;
     { Grammar Parsers }
     Procedure Goal;
     Function OPProgram : Boolean;
@@ -648,34 +646,34 @@ Type
     Function ResourceStringDecl(AScope: TScope; Container : TElementContainer): Boolean;
     Function TypeSection(AScope : TScope; Container : TElementContainer) : Boolean;
     Function TypeDecl(AScope : TScope; Container : TElementContainer) : Boolean;
-    Function GetTypeDecl(AToken : TTypeToken) : TGenericTypeDecl;
+    Function GetTypeDecl : TGenericTypeDecl;
     Function TypedConstant(C: TElementContainer; T : TGenericTypeDecl) : Boolean;
     Function ArrayConstant(C: TElementContainer; T : TGenericTypeDecl) : Boolean;
     Function RecordConstant(C: TElementContainer; T : TGenericTypeDecl) : Boolean;
     Function RecordFieldConstant(C : TElementContainer; T : TGenericTypeDecl) : Boolean;
-    function OPType(AToken : TTypeToken) : TGenericTypeDecl;
-    function RestrictedType(AToken : TTypeToken) : TRestrictedType;
-    Function ClassRefType(AToken : TTypeToken) : TClassRefType;
-    Function SimpleType(AToken : TTypeToken) : TSimpleType;
-    function RealType(AToken : TTypeToken) : TRealType;
-    function OrdinalType(AToken : TTypeToken) : TOrdinalType;
-    function OrdIdent(AToken : TTypeToken) : TOrdIdent;
-    Function VariantType(AToken : TTypeToken) : TVariantType;
-    function SubRangeType(AToken : TTypeToken) : TSubRangeType;
-    function EnumerateType(AToken : TTypeToken) : TEnumerateType;
+    function OPType : TGenericTypeDecl;
+    function RestrictedType : TRestrictedType;
+    Function ClassRefType : TClassRefType;
+    Function SimpleType : TSimpleType;
+    function RealType : TRealType;
+    function OrdinalType : TOrdinalType;
+    function OrdIdent : TOrdIdent;
+    Function VariantType : TVariantType;
+    function SubRangeType : TSubRangeType;
+    function EnumerateType : TEnumerateType;
     Procedure EnumerateElement(EnumerateType : TEnumerateType);
-    Function StringType(AToken : TTypeToken) : TStringType;
-    Function StrucType(AToken : TTypeToken) : TGenericTypeDecl;
-    function ArrayType(boolPacked : Boolean; AToken : TTypeToken): TArrayType;
-    Function RecType(boolPacked : Boolean; AToken : TTypeToken) : TRecordDecl;
+    Function StringType : TStringType;
+    Function StrucType : TGenericTypeDecl;
+    function ArrayType(boolPacked : Boolean): TArrayType;
+    Function RecType(boolPacked : Boolean) : TRecordDecl;
     Procedure FieldList(Rec : TRecordDecl);
     procedure FieldDecl(Rec: TRecordDecl);
     procedure RecVariant(Rec: TRecordDecl);
-    function SetType(boolPacked: Boolean; AToken : TTypeToken): TSetType;
-    function FileType(boolPacked: Boolean; AToken : TTypeToken): TFileType;
+    function SetType(boolPacked: Boolean): TSetType;
+    function FileType(boolPacked: Boolean): TFileType;
     Function VariantSection(Rec: TRecordDecl) : Boolean;
-    Function PointerType(AToken : TTypeToken) : TPointerType;
-    Function ProcedureType(AToken : TTypeToken) : TProcedureType;
+    Function PointerType : TPointerType;
+    Function ProcedureType : TProcedureType;
     Function VarSection(AScope : TScope; Container : TElementContainer) : Boolean;
     Function ClassVarSection(AScope : TScope; Cls : TClassDecl) : Boolean;
     Function ThreadVarSection(AScope : TScope) : Boolean;
@@ -725,7 +723,7 @@ Type
     Procedure FormalParam(Method : TPascalMethod);
     Procedure Parameter(Method : TPascalMethod; ParamMod : TParamModifier);
     Procedure Directive(M : TPascalMethod);
-    Function ObjectType(AToken : TTypeToken) : TObjectDecl;
+    Function ObjectType : TObjectDecl;
     Procedure ObjHeritage(ObjDecl : TObjectDecl);
     Function MethodList(Cls : TObjectDecl; AScope : TScope) : Boolean;
     function MethodHeading(Cls: TObjectDecl; AScope: TScope): Boolean;
@@ -733,7 +731,7 @@ Type
     Function DestructorHeading(AScope :TScope; Container : TElementContainer) : TPascalMethod;
     Function ObjFieldList(Cls : TObjectDecl; AScope : TScope) : Boolean;
     Procedure InitSection;
-    Function ClassType(AToken : TTypeToken) : TClassDecl;
+    Function ClassType : TClassDecl;
     Procedure ClassHeritage(Cls : TObjectDecl);
     procedure ClassVisibility(var AScope : TScope);
     Function ClassFieldList(Cls : TObjectDecl; AScope : TScope) : Boolean;
@@ -743,7 +741,7 @@ Type
     Procedure PropertyInterface(Prop : TPascalProperty);
     Procedure PropertyParameterList(Prop : TPascalProperty);
     Procedure PropertySpecifiers(Prop : TPascalProperty);
-    Function  InterfaceType(AToken : TTypeToken) : TInterfaceDecl;
+    Function  InterfaceType : TInterfaceDecl;
     Procedure InterfaceHeritage(InterfaceDecl : TInterfaceDecl);
     Procedure RequiresClause;
     procedure ContainsClause;
@@ -762,7 +760,7 @@ Type
     Procedure CheckReturnValue(Method : TPascalMethod);
     Procedure CheckAlias(Method : TPascalMethod);
     Function CheckNumberType(ExprType : TExprTypes) : Boolean;
-    Procedure UpdateTypeToken(var AToken : TTypeToken); InLine;
+    Procedure UpdateTypeToken; InLine;
     Procedure AddToContainer(Container : TElementContainer; var Method : TPascalMethod);
     Procedure TidyUpEmptyElements;
     Procedure CheckUnResolvedMethods;
@@ -3172,7 +3170,8 @@ Begin
           NextNonCommentToken;
           FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
           Try
-            T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+            FTokenType := TypeToken(Nil, scNone, Nil, FTemporaryElements);
+            T := GetTypeDecl;
             C.AddTokens(T);
             If Token.Token = '=' Then
               Begin
@@ -3382,14 +3381,11 @@ End;
 **)
 Function TPascalModule.TypeDecl(AScope : TScope; Container : TElementContainer) : Boolean;
 
-Var
-  AToken : TTypeToken;
-
 Begin
   Result := False;
   If Token.TokenType In [ttIdentifier, ttDirective] Then
     Begin
-      AToken := TypeToken(Token, AScope, GetComment, Container);
+      FTokenType := TypeToken(Token, AScope, GetComment, Container);
       NextNonCommentToken;
       If Token.Token = '=' Then
         Begin
@@ -3397,7 +3393,7 @@ Begin
           If Token.UToken = 'TYPE' Then
             NextNonCommentToken;
           Result := True;
-          If GetTypeDecl(AToken) = Nil Then
+          If GetTypeDecl = Nil Then
             ErrorAndSeekToken(strTypeNotFound, 'TypeDecl', Token.Token,
               strSeekableOnErrorTokens, stActual);
         End Else
@@ -3414,16 +3410,15 @@ End;
   @precon  None.
   @postcon If a type is found it is returned as the result else nil.
 
-  @param   AToken as a TTypeToken
   @return  a TGenericTypeDecl
 
 **)
-Function TPascalModule.GetTypeDecl(AToken : TTypeToken) : TGenericTypeDecl;
+Function TPascalModule.GetTypeDecl : TGenericTypeDecl;
 
 Begin
-  Result := RestrictedType(AToken);
+  Result := RestrictedType;
   If Result = Nil Then
-    Result := OPType(AToken);
+    Result := OPType;
   PortabilityDirective;
 End;
 
@@ -3615,26 +3610,25 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TGenericTypeDecl
 
 **)
-Function TPascalModule.OPType(AToken : TTypeToken) : TGenericTypeDecl;
+Function TPascalModule.OPType : TGenericTypeDecl;
 
 Begin
-  Result := StrucType(AToken);
+  Result := StrucType;
   If Result = Nil Then
-    Result := PointerType(AToken);
+    Result := PointerType;
   If Result = Nil Then
-    Result := StringType(AToken);
+    Result := StringType;
   If Result = Nil Then
-    Result := ProcedureType(AToken);
+    Result := ProcedureType;
   If Result = Nil Then
-    Result := VariantType(AToken);
+    Result := VariantType;
   If Result = Nil Then
-  Result := ClassRefType(AToken);
+  Result := ClassRefType;
   If Result = Nil Then
-    Result := SimpleType(AToken);
+    Result := SimpleType;
 End;
 
 (**
@@ -3650,18 +3644,17 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TRestrictedType
 
 **)
-Function TPascalModule.RestrictedType(AToken : TTypeToken) : TRestrictedType;
+Function TPascalModule.RestrictedType : TRestrictedType;
 
 Begin
-  Result := ObjectType(AToken);
+  Result := ObjectType;
   If Result = Nil Then
-    Result := ClassType(AToken);
+    Result := ClassType;
   If Result = Nil Then
-    Result := InterfaceType(AToken);
+    Result := InterfaceType;
 End;
 
 (**
@@ -3675,11 +3668,10 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TClassRefType
 
 **)
-Function TPascalModule.ClassRefType(AToken : TTypeToken) : TClassRefType;
+Function TPascalModule.ClassRefType : TClassRefType;
 
 Begin
   Result := Nil;
@@ -3689,11 +3681,11 @@ Begin
       If Token.UToken = 'OF' Then
         Begin
           NextNonCommentToken;
-          UpdateTypeToken(AToken);
-          With AToken Do
+          UpdateTypeToken;
+          With FTokenType Do
             Result := TClassRefType.Create(FToken.Token, FScope, FToken.Line,
               FToken.Column, iiPublicType, FComment);
-          Result := AToken.FContainer.Add(Result) As TClassRefType;
+          Result := FTokenType.FContainer.Add(Result) As TClassRefType;
           Result.AppendToken('Class');
           Result.AppendToken('Of');
           If Not TypeId(Result) Then
@@ -3713,16 +3705,14 @@ End;
   @postcon Updates the AToken record depending on the initial information
            passed.
 
-  @param   AToken as a TTypeToken as a reference
-
 **)
-Procedure TPascalModule.UpdateTypeToken(var AToken: TTypeToken);
+Procedure TPascalModule.UpdateTypeToken;
 
-begin
-  If AToken.FToken = Nil Then
-    AToken.FToken := Token;
-  If AToken.FComment = Nil Then
-    AToken.FComment := GetComment;
+Begin
+  If FTokenType.FToken = Nil Then
+    FTokenType.FToken := Token;
+  If FTokenType.FComment = Nil Then
+    FTokenType.FComment := GetComment;
 end;
 
 (**
@@ -3736,16 +3726,15 @@ end;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TSimpleType
 
 **)
-function TPascalModule.SimpleType(AToken : TTypeToken) : TSimpleType;
+function TPascalModule.SimpleType : TSimpleType;
 
 begin
-  Result := RealType(AToken);
+  Result := RealType;
   If Result = Nil Then
-    Result := OrdinalType(AToken);
+    Result := OrdinalType;
 end;
 
 (**
@@ -3765,21 +3754,20 @@ end;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TRealType
 
 **)
-Function TPascalModule.RealType(AToken : TTypeToken) : TRealType;
+Function TPascalModule.RealType : TRealType;
 
 Begin
   Result := Nil;
   If IsKeyWord(Token.Token, strRealTypes) Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         Result := TRealType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      Result := AToken.FContainer.Add(Result) As TRealType;
+      Result := FTokenType.FContainer.Add(Result) As TRealType;
       Result.AppendToken(Token);
       NextNonCommentToken;
     End;
@@ -3796,18 +3784,17 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TOrdinalType
 
 **)
-Function TPascalModule.OrdinalType(AToken : TTypeToken) : TOrdinalType;
+Function TPascalModule.OrdinalType : TOrdinalType;
 
 Begin
-  Result := OrdIdent(AToken);
+  Result := OrdIdent;
   If Result = Nil Then
-  Result := EnumerateType(AToken);
+  Result := EnumerateType;
   If Result = Nil Then
-  Result := SubRangeType(AToken);
+  Result := SubRangeType;
 End;
 
 (**
@@ -3833,21 +3820,20 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TOrdIdent
 
 **)
-Function TPascalModule.OrdIdent(AToken : TTypeToken) : TOrdIdent;
+Function TPascalModule.OrdIdent : TOrdIdent;
 
 Begin
   Result := Nil;
   If IsKeyWord(Token.Token, strOrdIdents) Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         Result := TOrdIdent.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      Result := AToken.FContainer.Add(Result) As TOrdIdent;
+      Result := FTokenType.FContainer.Add(Result) As TOrdIdent;
       Result.AppendToken(Token);
       NextNonCommentToken;
     End;
@@ -3865,21 +3851,20 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TVariantType
 
 **)
-Function TPascalModule.VariantType(AToken : TTypeToken) : TVariantType;
+Function TPascalModule.VariantType : TVariantType;
 
 begin
   Result := Nil;
   If IsKeyWord(Token.Token, strVariants) Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         Result := TVariantType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      Result := AToken.FContainer.Add(Result) As TVariantType;
+      Result := FTokenType.FContainer.Add(Result) As TVariantType;
       Result.AppendToken(Token);
       NextNonCommentToken;
     End;
@@ -3896,11 +3881,10 @@ end;
   @precon  None.
   @postcon Returns an ordinal type if one was parsed else returns nil.
 
-  @param   AToken as a TTypeToken
   @return  a TSubRangeType
 
 **)
-Function TPascalModule.SubRangeType(AToken : TTypeToken) : TSubRangeType;
+Function TPascalModule.SubRangeType : TSubRangeType;
 
 Var
   ExprType : TExprTypes;
@@ -3909,11 +3893,11 @@ Begin
   Result := Nil;
   If Not IsKeyWord(Token.Token, strReservedWords) Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         Result := TSubRangeType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      Result := AToken.FContainer.Add(Result) As TSubRangeType;
+      Result := FTokenType.FContainer.Add(Result) As TSubRangeType;
       ExprType := [etUnknown, etConstExpr];
       ConstExpr(Result, ExprType);
       If Token.Token = '..' Then // Handle simple expressions
@@ -3934,21 +3918,20 @@ End;
   @precon  None.
   @postcon Returns an ordinal type if one was parsed else returns nil.
 
-  @param   AToken as a TTypeToken
   @return  a TEnumerateType
 
 **)
-Function TPascalModule.EnumerateType(AToken : TTypeToken) : TEnumerateType;
+Function TPascalModule.EnumerateType : TEnumerateType;
 
 Begin
   Result := Nil;
   If Token.Token = '(' Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         Result := TEnumerateType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      Result := AToken.FContainer.Add(Result) As TEnumerateType;
+      Result := FTokenType.FContainer.Add(Result) As TEnumerateType;
       AddToExpression(Result);
       Repeat
         EnumerateElement(Result);
@@ -4007,11 +3990,10 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TStringType
 
 **)
-Function TPascalModule.StringType(AToken : TTypeToken) : TStringType;
+Function TPascalModule.StringType : TStringType;
 
 Var
   ExprType : TExprTypes;
@@ -4020,10 +4002,11 @@ begin
   Result := Nil;
   If IsKeyWord(Token.Token, strStrings) Then
     Begin
-      UpdateTypeToken(AToken);
-      Result := TStringType.Create(AToken.FToken.Token, AToken.FScope,
-        AToken.FToken.Line, AToken.FToken.Column, iiPublicType, AToken.FComment);
-      Result := AToken.FContainer.Add(Result) As TStringType;
+      UpdateTypeToken;
+      Result := TStringType.Create(FTokenType.FToken.Token, FTokenType.FScope,
+        FTokenType.FToken.Line, FTokenType.FToken.Column, iiPublicType,
+        FTokenType.FComment);
+      Result := FTokenType.FContainer.Add(Result) As TStringType;
       Result.AppendToken(Token);
       NextNonCommentToken;
       // Check for '[' ConstExpr ']'
@@ -4055,11 +4038,10 @@ end;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TGenericTypeDecl
 
 **)
-Function TPascalModule.StrucType(AToken : TTypeToken) : TGenericTypeDecl;
+Function TPascalModule.StrucType : TGenericTypeDecl;
 
 Var
   boolPacked : Boolean;
@@ -4071,13 +4053,13 @@ begin
       boolPacked := True;
       NextNonCommentToken;
     End;
-  Result := ArrayType(boolPacked, AToken);
+  Result := ArrayType(boolPacked);
   If Result = Nil Then
-    Result := SetType(boolPacked, AToken);
+    Result := SetType(boolPacked);
   If Result = Nil Then
-    Result := FileType(boolPacked, AToken);
+    Result := FileType(boolPacked);
   If Result = Nil Then
-    Result := RecType(boolPacked, AToken);
+    Result := RecType(boolPacked);
 end;
 
 (**
@@ -4092,11 +4074,10 @@ end;
            declaration section.
 
   @param   boolPacked as a Boolean
-  @param   AToken     as a TTypeToken
   @return  a TArrayType
 
 **)
-Function TPascalModule.ArrayType(boolPacked : Boolean; AToken : TTypeToken) : TArrayType;
+Function TPascalModule.ArrayType(boolPacked : Boolean) : TArrayType;
 
 var
   T: TGenericTypeDecl;
@@ -4106,11 +4087,11 @@ Begin
   Result := Nil;
   If Token.UToken = 'ARRAY' Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         Result := TArrayType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      Result := AToken.FContainer.Add(Result) As TArrayType;
+      Result := FTokenType.FContainer.Add(Result) As TArrayType;
       If boolPacked Then
         Result.AppendToken('Packed');
       Result.AppendToken(Token);
@@ -4122,9 +4103,10 @@ Begin
             AddToExpression(Result);
             Repeat
               Result.AddDimension;
-              T := OrdinalType(TypeToken(Nil, scNone, Nil,
+              FTokenType := TypeToken(Nil, scNone, Nil,
                 FTemporaryElements.Add(Format('%d', [Result.Dimensions]), iiNone,
-                scNone, Nil)));
+                scNone, Nil));
+              T := OrdinalType;
               If T <> Nil Then
                 Result.AddTokens(T);
             Until Not IsToken(',', Result);
@@ -4138,7 +4120,8 @@ Begin
           Begin
             Result.AppendToken(Token);
             NextNonCommentToken;
-            T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+            FTokenType := TypeToken(Nil, scNone, Nil, FTemporaryElements);
+            T := GetTypeDecl;
             If T <> Nil Then
               Result.AddTokens(T);
           End Else
@@ -4162,24 +4145,23 @@ End;
            declaration section.
 
   @param   boolPacked as a Boolean
-  @param   AToken     as a TTypeToken
   @return  a TRecordDecl
 
 **)
-Function TPascalModule.RecType(boolPacked : Boolean; AToken : TTypeToken): TRecordDecl;
+Function TPascalModule.RecType(boolPacked : Boolean): TRecordDecl;
 
 begin
   Result := Nil;
   If Token.UToken = 'RECORD' Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         Result := TRecordDecl.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicRecord, FComment);
-      Result := AToken.FContainer.Add(Result) As TRecordDecl;
-      Result.Line := AToken.FToken.Line;
-      Result.Column := AToken.FToken.Column;
-      Result.Comment := AToken.FComment ;
+      Result := FTokenType.FContainer.Add(Result) As TRecordDecl;
+      Result.Line := FTokenType.FToken.Line;
+      Result.Column := FTokenType.FToken.Column;
+      Result.Comment := FTokenType.FComment ;
       Result.IsPacked := boolPacked;
       NextNonCommentToken;
       FieldList(Result);
@@ -4197,18 +4179,12 @@ end;
   This method parses a field list for classes, records and object declarations
   from the current token position.
 
-
   @precon  Rec in a valid instance of a record type to add fields / parameters
-
            too.
-
   @postcon Parses a field list for classes, records and object declarations
-
            from the current token position.
 
-
   @grammar FieldList -> FieldDecl / ';' ... [ VariantSection ] [ ';' ]
-
 
   @param   Rec    as a TRecordDecl
 
@@ -4262,7 +4238,8 @@ Begin
             NextNonCommentToken;
             FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
             Try
-              T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+              FTokenType := TypeToken(Nil, scNone, Nil, FTemporaryElements);
+              T := GetTypeDecl;
               // Create record fields
               For j := 1 To I.ElementCount Do
                 Begin
@@ -4413,10 +4390,10 @@ End;
 
 (**
 
-  This method tries to find the symbol with its scope as mark it as referenced. 
+  This method tries to find the symbol with its scope as mark it as referenced.
 
-  @precon  None. 
-  @postcon Tries to find the symbol with its scope as mark it as referenced. 
+  @precon  None.
+  @postcon Tries to find the symbol with its scope as mark it as referenced.
 
   @param   AToken as a TTokenInfo
   @return  a Boolean
@@ -4490,11 +4467,10 @@ end;
            declaration section.
 
   @param   boolPacked as a Boolean
-  @param   AToken     as a TTypeToken
   @return  a TSetType
 
 **)
-Function TPascalModule.SetType(boolPacked : Boolean; AToken : TTypeToken) : TSetType;
+Function TPascalModule.SetType(boolPacked : Boolean) : TSetType;
 
 Var
   T : TOrdinalType;
@@ -4504,11 +4480,11 @@ Begin
   Result := Nil;
   If Token.UToken = 'SET' Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         Result := TSetType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      Result := AToken.FContainer.Add(Result) As TSetType;
+      Result := FTokenType.FContainer.Add(Result) As TSetType;
       If boolPacked Then
         Result.AppendToken('Packed');
       Result.AppendToken(Token);
@@ -4518,7 +4494,8 @@ Begin
           AddToExpression(Result);
           FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
           Try
-            T := OrdinalType(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+            FTokenType := TypeToken(Nil, scNone, Nil, FTemporaryElements);
+            T := OrdinalType;
             If T <> Nil Then
               Result.AddTokens(T)
             Else
@@ -4546,11 +4523,10 @@ End;
            declaration section.
 
   @param   boolPacked as a Boolean
-  @param   AToken     as a TTypeToken
   @return  a TFileType
 
 **)
-Function TPascalModule.FileType(boolPacked : Boolean; AToken : TTypeToken) : TFileType;
+Function TPascalModule.FileType(boolPacked : Boolean) : TFileType;
 
 Var
   T : TGenericTypeDecl;
@@ -4563,18 +4539,19 @@ Begin
       NextNonCommentToken;
       If Token.UToken = 'OF' Then
         Begin
-          UpdateTypeToken(AToken);
-          With AToken Do
+          UpdateTypeToken;
+          With FTokenType Do
             Result := TFileType.Create(FToken.Token, FScope, FToken.Line,
               FToken.Column, iiPublicType, FComment);
-          Result := AToken.FContainer.Add(Result) As TFileType;
+          Result := FTokenType.FContainer.Add(Result) As TFileType;
           If boolPacked Then
             Result.AppendToken('Packed');
           Result.AppendToken('File');
           AddToExpression(Result);
           FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
           Try
-            T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+            FTokenType := TypeToken(Nil, scNone, Nil, FTemporaryElements);
+            T := GetTypeDecl;
             If T <> Nil Then
               Result.AddTokens(T)
             Else
@@ -4600,21 +4577,20 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TPointerType
 
 **)
-Function TPascalModule.PointerType(AToken : TTypeToken) : TPointerType;
+Function TPascalModule.PointerType : TPointerType;
 
 Begin
   Result := Nil;
   If Token.Token = '^' Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         Result := TPointerType.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicType, FComment);
-      Result := AToken.FContainer.Add(Result) As TPointerType;
+      Result := FTokenType.FContainer.Add(Result) As TPointerType;
       Result.AppendToken(Token);
       NextNonCommentToken;
       If Not TypeId(Result) Then
@@ -4634,11 +4610,10 @@ end;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @param   AToken as a TTypeToken
   @return  a TProcedureType
 
 **)
-Function TPascalModule.ProcedureType(AToken : TTypeToken) : TProcedureType;
+Function TPascalModule.ProcedureType : TProcedureType;
 
 Var
   M : TPascalMethod;
@@ -4653,11 +4628,11 @@ begin
       M := FunctionHeading(scPrivate, TemporaryContainer, False);
     If M <> Nil Then
       Begin
-        UpdateTypeToken(AToken);
-        With AToken Do
+        UpdateTypeToken;
+        With FTokenType Do
           Result := TProcedureType.Create(FToken.Token, FScope, FToken.Line,
             FToken.Column, iiPublicType, FComment);
-        Result := AToken.FContainer.Add(Result) As TProcedureType;
+        Result := FTokenType.FContainer.Add(Result) As TProcedureType;
         Result.AppendToken(M.AsString);
         If Token.UToken = 'OF' Then
           Begin
@@ -4918,7 +4893,8 @@ Begin
             Try
               NextNonCommentToken;
               AToken := Token;
-              T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+              FTokenType := TypeToken(Nil, scNone, Nil, FTemporaryElements);
+              T := GetTypeDecl;
               If T <> Nil Then
                 VarSection.ReferenceSymbol(AToken);
               If Token.UToken = 'ABSOLUTE' Then
@@ -5026,7 +5002,8 @@ Begin
             NextNonCommentToken;
             FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
             Try
-              T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+              FTokenType := TypeToken(Nil, scNone, Nil, FTemporaryElements);
+              T := GetTypeDecl;
               If Token.Token = '=' Then
                 Begin
                   C := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
@@ -6931,7 +6908,8 @@ Begin
                   ErrorAndSeekToken(strReservedWordExpected, 'FormalParameter', 'OF',
                     strSeekableOnErrorTokens, stActual);
             End;
-          T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+          FTokenType := TypeToken(Nil, scNone, Nil, FTemporaryElements);
+          T := GetTypeDecl;
           If T = Nil Then
             If Token.UToken = 'CONST' Then
               Begin
@@ -7063,11 +7041,10 @@ End;
   @precon  None.
   @postcon Returns an object declaration if one was parsed else nil.
 
-  @param   AToken as a TTypeToken
   @return  a TObjectDecl
 
 **)
-function TPascalModule.ObjectType(AToken : TTypeToken) : TObjectDecl;
+function TPascalModule.ObjectType : TObjectDecl;
 
 Var
   InternalScope : TScope;
@@ -7077,14 +7054,14 @@ begin
   Result := Nil;
   If Token.UToken = 'OBJECT' Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         Result := TObjectDecl.Create(FToken.Token, FScope, FToken.Line,
           FToken.Column, iiPublicObject, FComment);
-      Result := AToken.FContainer.Add(Result) As TObjectDecl;
-      Result.Line := AToken.FToken.Line;
-      Result.Column := AToken.FToken.Column;
-      Result.Comment := AToken.FComment ;
+      Result := FTokenType.FContainer.Add(Result) As TObjectDecl;
+      Result.Line := FTokenType.FToken.Line;
+      Result.Column := FTokenType.FToken.Column;
+      Result.Comment := FTokenType.FComment ;
       NextNonCommentToken;
       // Get the classes heritage
       ObjHeritage(Result);
@@ -7414,7 +7391,8 @@ begin
         NextNonCommentToken;
         FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
         Try
-          T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+          FTokenType := TypeToken(Nil, scNone, Nil, FTemporaryElements);
+          T := GetTypeDecl;
           For j := 1 To I.ElementCount Do
             Begin
               tmpP := TField.Create(I[j].Name, AScope, I[j].Line, I[j].Column,
@@ -7503,11 +7481,10 @@ End;
   @precon  None.
   @postcon Returns a class declaration is a class was parsed else nil.
 
-  @param   AToken as a TTypeToken
   @return  a TClassDecl
 
 **)
-function TPascalModule.ClassType(AToken : TTypeToken) : TClassDecl;
+function TPascalModule.ClassType : TClassDecl;
 
 Var
   InternalScope : TScope;
@@ -7523,14 +7500,14 @@ begin
       // Check for 'OF'
       If Token.UToken <> 'OF' Then
         Begin
-          UpdateTypeToken(AToken);
-          With AToken Do
+          UpdateTypeToken;
+          With FTokenType Do
             Result := TClassDecl.Create(FToken.Token, FScope, FToken.Line,
               FToken.Column, iiPublicClass, FComment);
-          Result := AToken.FContainer.Add(Result) As TClassDecl;
-          Result.Line := AToken.FToken.Line;
-          Result.Column := AToken.FToken.Column;
-          Result.Comment := AToken.FComment;
+          Result := FTokenType.FContainer.Add(Result) As TClassDecl;
+          Result.Line := FTokenType.FToken.Line;
+          Result.Column := FTokenType.FToken.Column;
+          Result.Comment := FTokenType.FComment;
           Result.AbstractClass := (Token.UToken = 'ABSTRACT');
           If Result.AbstractClass Then
             NextNonCommentToken;
@@ -7893,7 +7870,8 @@ Begin
               NextNonCommentToken;
               FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
               Try
-                T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
+                FTokenType := TypeToken(Nil, scNone, Nil, FTemporaryElements);
+                T := GetTypeDecl;
                 For j := 1 To I.ElementCount Do
                   Prop.AddParameter(TPascalParameter.Create(
                     ParamMod, I[j].Identifier, False, T, '', scPublic, I[j].Line,
@@ -8068,11 +8046,10 @@ end;
   @precon  None.
   @postcon Returns an interface declaration if one was parsed else nil.
 
-  @param   AToken as a TTypeToken
   @return  a TInterfaceDecl
 
 **)
-function TPascalModule.InterfaceType(AToken : TTypeToken) : TInterfaceDecl;
+function TPascalModule.InterfaceType : TInterfaceDecl;
 
 Var
   InternalScope : TScope;
@@ -8082,24 +8059,24 @@ begin
   Result := Nil;
   If (Token.UToken = 'INTERFACE') Or (Token.UToken = 'DISPINTERFACE') Then
     Begin
-      UpdateTypeToken(AToken);
-      With AToken Do
+      UpdateTypeToken;
+      With FTokenType Do
         If Token.UToken = 'INTERFACE' Then
           Begin
             Result := TInterfaceDecl.Create(FToken.Token, FScope, FToken.Line,
               FToken.Column, iiPublicInterface, FComment);
-            Result := AToken.FContainer.Add(Result) as TInterfaceDecl;
-            Result.Line := AToken.FToken.Line;
-            Result.Column := AToken.FToken.Column;
-            Result.Comment := AToken.FComment ;
+            Result := FTokenType.FContainer.Add(Result) as TInterfaceDecl;
+            Result.Line := FTokenType.FToken.Line;
+            Result.Column := FTokenType.FToken.Column;
+            Result.Comment := FTokenType.FComment ;
           End Else
           Begin
             Result := TDispInterfaceDecl.Create(FToken.Token, FScope, FToken.Line,
               FToken.Column, iiPublicDispInterface, FComment);
-            Result := AToken.FContainer.Add(Result) as TDispInterfaceDecl;
-            Result.Line := AToken.FToken.Line;
-            Result.Column := AToken.FToken.Column;
-            Result.Comment := AToken.FComment ;
+            Result := FTokenType.FContainer.Add(Result) as TDispInterfaceDecl;
+            Result.Line := FTokenType.FToken.Line;
+            Result.Column := FTokenType.FToken.Column;
+            Result.Comment := FTokenType.FComment ;
           End;
       NextNonCommentToken;
       // If this class has not body then return

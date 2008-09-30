@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    29 Sep 2008
+  @Date    30 Sep 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -2521,7 +2521,7 @@ Var
 Implementation
 
 Uses
-  Windows, StrUtils, DGHLibrary, INIFiles {$IFDEF PROFILECODE}, Profiler {$ENDIF};
+  Windows, StrUtils, DGHLibrary, INIFiles;
 
 Const
   (** This constant represent the maximum of issue / doc conflicts to add. **)
@@ -3431,10 +3431,6 @@ Var
   iIcon : TImageIndex;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TElementContainer.AddDocumentConflict');
-  Try
-  {$ENDIF}
   iL := 0;
   iC := 0;
   If AComment <> Nil Then
@@ -3466,11 +3462,6 @@ begin
     End;
   I.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iL, iC,
     DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon));
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -3899,10 +3890,6 @@ var
   i: Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TElementContainer.FindToken');
-  Try
-  {$ENDIF}
   Result := -1;
   For i := 0 To TokenCount - 1 Do
     If strToken = Tokens[i].Token Then
@@ -3910,11 +3897,6 @@ begin
         Result := i;
         Break;
       End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**

@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    23 Sep 2008
+  @Date    01 Oct 2008
   @Version 1.0
 
   @bug     Line position of comment tags in coflicts is not right!
@@ -208,6 +208,7 @@ Var
   Wizard : TBrowseAndDocItWizard;
 
 Begin
+  Application.Handle := Application.MainForm.Handle;
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   Wizard := TBrowseAndDocItWizard.Create;
   iWizardIndex := (BorlandIDEServices As IOTAWizardServices).AddWizard(Wizard);
@@ -336,12 +337,14 @@ end;
 
 (**
 
-  This is an on click event handler for the documentation menu.
+
+  This is an on click event handler for the documentation menu.
 
   @precon  None.
   @postcon Invokes the documentation of the current active project.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TBrowseAndDocItWizard.DocumentationClick(Sender: TObject);
@@ -1388,6 +1391,7 @@ Var
 
 
 Begin
+  Application.Handle := Application.MainForm.Handle;
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   Result := BorlandIDEServices <> Nil;
   If Result Then

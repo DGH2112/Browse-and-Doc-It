@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    14 Sep 2008
+  @Date    01 Oct 2008
   @Version 1.0
 
   @todo    Tokenize should also be language independant.
@@ -41,48 +41,6 @@ Implementation
 Function Tokenize(strText : String; var KeyWords : TKeyWords;
   iLimit : Integer = 999999) : TStringList;
 
-  (**
-
-    This function returns the token type for a given character and last token
-    type.
-
-    @precon  Ch is the character for which the token type assessment needs to be
-             taken for and LastToken os the type of the last token as this has
-             an effect on some characters.
-    @postcon Returns the token type for the given character.
-
-    @param   Ch           as a Char
-    @param   LastCharType as a TTokenType
-    @return  a TTokenType
-
-  **)
-  Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
-
-  Begin
-    If ch In [#32, #9] Then
-      Result := ttWhiteSpace
-    Else If ch In ['#', '_', 'a'..'z', 'A'..'Z'] Then
-      Begin
-        If (LastCharType = ttNumber) And (Ch In ['A'..'F', 'a'..'f']) Then
-          Result := ttNumber
-        Else
-          Result := ttIdentifier;
-      End
-    Else If ch In ['$', '0'..'9'] Then
-      Begin
-        Result := ttNumber;
-        If LastCharType = ttIdentifier Then
-          Result := ttIdentifier;
-      End
-    Else If ch In [#10, #13] Then
-      Result := ttLineEnd
-    Else If ch In [''''] Then
-      Result := ttStringLiteral
-    Else If ch In [#0..#255] - ['#', '_', 'a'..'z', 'A'..'Z', '$', '0'..'9'] Then
-      Result := ttSymbol
-    Else
-      Result := ttUnknown;
-  End;
 
 Type
   (** State machine for block types. **)
@@ -115,8 +73,29 @@ Begin
   For i := 1 To Length(strText) Do
     Begin
       LastToken := CurToken;
-      CurToken := GetTokenType(strText[i], LastToken);
-
+      If strText[i] In [#32, #9] Then
+        CurToken := ttWhiteSpace
+      Else If strText[i] In ['#', '_', 'a'..'z', 'A'..'Z'] Then
+        Begin
+          If (LastToken = ttNumber) And (strText[i] In ['A'..'F', 'a'..'f']) Then
+            CurToken := ttNumber
+          Else
+            CurToken := ttIdentifier;
+        End
+      Else If strText[i] In ['$', '0'..'9'] Then
+        Begin
+          CurToken := ttNumber;
+          If LastToken = ttIdentifier Then
+            CurToken := ttIdentifier;
+        End
+      Else If strText[i] In [#10, #13] Then
+        CurToken := ttLineEnd
+      Else If strText[i] In [''''] Then
+        CurToken := ttStringLiteral
+      Else If strText[i] In [#0..#255] - ['#', '_', 'a'..'z', 'A'..'Z', '$', '0'..'9'] Then
+        CurToken := ttSymbol
+      Else
+        CurToken := ttUnknown;
       If (LastToken <> CurToken) Or (CurToken = ttSymbol) Then
         Begin
           If ((BlockType In [btStringLiteral]) And (CurToken <> ttLineEnd)) Then

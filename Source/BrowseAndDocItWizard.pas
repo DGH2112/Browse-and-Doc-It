@@ -7,6 +7,8 @@
   @Version 1.0
 
   @bug     Line position of comment tags in coflicts is not right!
+  @bug     There is a potential bug with the BrowseAndDocItOptions class being
+           access in the thread as well as in the main IDE thread?
 
 **)
 Unit BrowseAndDocItWizard;
@@ -86,7 +88,6 @@ Type
     FLastCursorPos: TOTAEditPos;
     Procedure RefreshTree;
     Procedure TimerEventHandler(Sender : TObject);
-    Procedure DetermineCompilerDefinitions(slDefines : TStringList);
   Protected
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
@@ -130,6 +131,33 @@ Type
   Public
     Constructor Create(Wizard : TBrowseAndDocItWizard);
   End;
+
+  (** This class defines a thread in which the parsing of the code and
+      rendering of the module explorer is done. **)
+  TBrowseAndDocItThread = class(TThread)
+  Private
+    FModule: TBaseLanguageModule;
+    FMemoryStream : TMemoryStream;
+    FFileName: String;
+    FModified: Boolean;
+    Procedure SetName;
+  Protected
+    Procedure Execute; Override;
+    Procedure RenderModuleExplorer;
+    Procedure DetermineCompilerDefinitions(slDefines : TStringList);
+    Procedure ShowException;
+  Public
+    Constructor CreateBrowseAndDocItThread;
+    Destructor Destroy; Override;
+  End;
+
+  (** This record defines information for use in naming threads. **)
+  TThreadNameInfo = record
+    FType: LongWord;     // must be 0x1000
+    FName: PChar;        // pointer to name (in user address space)
+    FThreadID: LongWord; // thread ID (-1 indicates caller thread)
+    FFlags: LongWord;    // reserved for future use, must be zero
+  end;
 
   Procedure Register;
   Function InitWizard(Const BorlandIDEServices : IBorlandIDEServices;
@@ -1452,115 +1480,14 @@ end;
 **)
 Procedure TEditorNotifier.RefreshTree;
 
-Var
-  objMemStream : TMemoryStream;
-  SourceEditor : IOTASourceEditor;
-  Reader : IOTAEditReader;
-  iPosition : Integer;
-  iRead : Integer;
-  M : TBaseLanguageModule;
-  Options : IOTAProjectOptions;
-  {E : IOTAModuleErrors;
-  i : Integer;
-  Es : TOTAErrors;}
-
 begin
   If Application = Nil Then
     Exit;
   If Application.MainForm = Nil Then
     Exit;
   If Application.MainForm.Visible Then
-    Begin
-      objMemStream := TMemoryStream.Create;
-      Try
-        SourceEditor := ActiveSourceEditor;
-        If SourceEditor <> Nil Then
-          Begin
-            If ActiveProject <> Nil Then
-              Begin
-                Options := ActiveProject.ProjectOptions;
-                BrowseAndDocItOptions.Defines.Text :=
-                  StringReplace(Options.Values['Defines'], ';', #13#10,
-                  [rfReplaceAll]);
-              End;
-            DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
-            Reader := SourceEditor.CreateReader;
-            Try
-              iPosition := 0;
-              Repeat
-                iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
-                objMemStream.WriteBuffer(Buffer, iRead);
-                Inc(iPosition, iRead);
-              Until iRead < iBufferSize;
-            Finally
-              Reader := Nil;
-            End;
-            objMemStream.Position := 0;
-            M := Dispatcher(objMemStream, SourceEditor.FileName,
-              SourceEditor.Modified, [moParse, moCheckForDocumentConflicts]);
-            Try
-              {: @note Can not use this due to lock up in the IDE when calling
-                       QueryInterface of the module when compiling is happening.
-              If doShowIDEErrorsOnSuccessfulParse In BrowseAndDocItOptions.Options Then
-                If M <> Nil Then
-                  If M.FindElement(strErrors) = Nil Then
-                    If Not boolCompiling And CheckChildProcesses Then
-                      If SourceEditor.Module.QueryInterface(IOTAModuleErrors, E) = S_OK Then
-                        Begin
-                          Es := E.GetErrors;
-                          For i := Low(Es) to High(Es) Do
-                            M.AddIssue(Es[i].Text, scNone, 'IDE', Es[i].Start.Line,
-                              Es[i].Start.CharIndex + 1, etError);
-                        End;}
-              TfrmDockableModuleExplorer.RenderDocumentTree(M);
-            Finally
-              M.Free;
-            End;
-          End;
-      Finally
-        objMemStream.Free;
-      End;
-    End;
+    TBrowseAndDocItThread.CreateBrowseAndDocItThread;
 end;
-
-(**
-
-  This method determines which sytem compiler definitions need to be put
-  in the definition list.
-
-  @precon  slDefines neds to be a valid TStringList
-  @postcon Adds the relavent compiler definitions.
-
-  @param   slDefines as a TStringList
-
-**)
-Procedure TEditorNotifier.DetermineCompilerDefinitions(slDefines : TStringList);
-
-Begin
-  // Delphi 4 - Starts here as this will be the earliest version that can run
-  // this addin.
-  {$IFDEF VER120} // Delphi 4
-  slDefines.Add('VER120');
-  {$ENDIF}
-  {$IFDEF VER130} // Delphi 5
-  slDefines.Add('VER130');
-  {$ENDIF}
-  {$IFDEF VER140} // Delphi 6
-  slDefines.Add('VER140');
-  {$ENDIF}
-  {$IFDEF VER150} // Delphi 7
-  slDefines.Add('VER150');
-  {$ENDIF}
-  {$IFDEF VER160} // Delphi for .NET
-  slDefines.Add('VER160');
-  {$ENDIF}
-  {$IFDEF VER170} // Delphi 2005
-  slDefines.Add('VER170');
-  {$ENDIF}
-  {$IFDEF VER180} // Delphi 2006
-  slDefines.Add('VER180');
-  {$ENDIF}
-End;
 
 (**
 
@@ -2068,6 +1995,218 @@ end;
 function TKeyboardBinding.GetName: string;
 begin
   Result := 'BrowseAndDocItBindings';
+end;
+
+{ TBrowseAndDocItThread }
+
+(**
+
+  This is a setter method for the  property.
+
+  @precon  None.
+  @postcon Sets the name of the thread.
+
+**)
+procedure TBrowseAndDocItThread.SetName;
+
+var
+  ThreadNameInfo: TThreadNameInfo;
+
+begin
+  ThreadNameInfo.FType := $1000;
+  ThreadNameInfo.FName := 'BrowseAndDocItThread';
+  ThreadNameInfo.FThreadID := $FFFFFFFF;
+  ThreadNameInfo.FFlags := 0;
+  try
+    RaiseException( $406D1388, 0, sizeof(ThreadNameInfo) div sizeof(LongWord),
+      @ThreadNameInfo );
+  except
+  end;
+end;
+
+(**
+
+  This method displays the raised exception message pass via the FFileName
+  field.
+
+  @precon  None.
+  @postcon Displays the raised exception message pass via the FFileName
+           field.
+
+**)
+procedure TBrowseAndDocItThread.ShowException;
+begin
+  ShowMessage('Exception in TBrowseAndDocItThread:'#13#10 + FFileName);
+end;
+
+(**
+
+  This is a constructor for the TBrowseAndDocItThread class.
+
+  @precon  None.
+  @postcon Creates a suspended thread and sets up a stream with the contents of
+           the active editor and then resumed the thread in order to parse the
+           contents.
+
+**)
+constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread;
+
+Var
+  SourceEditor : IOTASourceEditor;
+  Reader : IOTAEditReader;
+  iPosition : Integer;
+  iRead : Integer;
+  Options : IOTAProjectOptions;
+
+begin
+  Inherited Create(True);
+  FreeOnTerminate := True; // Self Freeing...
+  FMemoryStream := TMemoryStream.Create;
+  SourceEditor := ActiveSourceEditor;
+  If SourceEditor <> Nil Then
+    Begin
+      If ActiveProject <> Nil Then
+        Begin
+          Options := ActiveProject.ProjectOptions;
+          BrowseAndDocItOptions.Defines.Text :=
+            StringReplace(Options.Values['Defines'], ';', #13#10,
+            [rfReplaceAll]);
+        End;
+      DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
+      Reader := SourceEditor.CreateReader;
+      Try
+        iPosition := 0;
+        Repeat
+          iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
+          FMemoryStream.WriteBuffer(Buffer, iRead);
+          Inc(iPosition, iRead);
+        Until iRead < iBufferSize;
+      Finally
+        Reader := Nil;
+      End;
+      FFileName := SourceEditor.FileName;
+      FModified := SourceEditor.Modified;
+    End;
+  Resume;
+end;
+
+(**
+
+  This is a destructor for the TBrowseAndDocItThread class.
+
+  @precon  None.
+  @postcon Frees the stream memory.
+
+**)
+destructor TBrowseAndDocItThread.Destroy;
+begin
+  FMemoryStream.Free;
+  Inherited Destroy;
+end;
+
+(**
+
+  This method determines which sytem compiler definitions need to be put
+  in the definition list.
+
+  @precon  slDefines neds to be a valid TStringList
+  @postcon Adds the relavent compiler definitions.
+
+  @param   slDefines as a TStringList
+
+**)
+Procedure TBrowseAndDocItThread.DetermineCompilerDefinitions(slDefines : TStringList);
+
+Begin
+  // Delphi 4 - Starts here as this will be the earliest version that can run
+  // this addin.
+  {$IFDEF VER120} // Delphi 4
+  slDefines.Add('VER120');
+  {$ENDIF}
+  {$IFDEF VER130} // Delphi 5
+  slDefines.Add('VER130');
+  {$ENDIF}
+  {$IFDEF VER140} // Delphi 6
+  slDefines.Add('VER140');
+  {$ENDIF}
+  {$IFDEF VER150} // Delphi 7
+  slDefines.Add('VER150');
+  {$ENDIF}
+  {$IFDEF VER160} // Delphi for .NET
+  slDefines.Add('VER160');
+  {$ENDIF}
+  {$IFDEF VER170} // Delphi 2005
+  slDefines.Add('VER170');
+  {$ENDIF}
+  {$IFDEF VER180} // Delphi 2006
+  slDefines.Add('VER180');
+  {$ENDIF}
+End;
+
+(**
+
+  This execute method parses the code of the active editor stored in the
+  memory stream and render the information in the explorer module.
+
+  @precon  FMemoryStream must be a valid stream of chars to parse.
+  @postcon Parses the code of the active editor stored in the memory stream and
+           render the information in the explorer module.
+
+**)
+procedure TBrowseAndDocItThread.Execute;
+
+{Var
+  E : IOTAModuleErrors;
+  i : Integer;
+  Es : TOTAErrors;}
+
+begin
+  SetName;
+  Try
+    FMemoryStream.Position := 0;
+    FModule := Dispatcher(FMemoryStream, FFileName, FModified, [moParse,
+      moCheckForDocumentConflicts]);
+    Try
+      {: @note Can not use this due to lock up in the IDE when calling
+               QueryInterface of the module when compiling is happening.
+      If doShowIDEErrorsOnSuccessfulParse In BrowseAndDocItOptions.Options Then
+        If FModule <> Nil Then
+          If FModule.FindElement(strErrors) = Nil Then
+            If Not boolCompiling And CheckChildProcesses Then
+              If SourceEditor.Module.QueryInterface(IOTAModuleErrors, E) = S_OK Then
+                Begin
+                  Es := E.GetErrors;
+                  For i := Low(Es) to High(Es) Do
+                    FModule.AddIssue(Es[i].Text, scNone, 'IDE', Es[i].Start.Line,
+                      Es[i].Start.CharIndex + 1, etError);
+                End;}
+      Synchronize(RenderModuleExplorer);
+    Finally
+      FModule.Free;
+    End;
+  Except
+    On E : Exception Do
+      Begin
+        FFileName := E.Message;
+        Synchronize(ShowException);
+      End;
+  End;
+end;
+
+(**
+
+  This method synchronizes with the main IDE thread and renders the module
+  explorer.
+
+  @precon  FModule must be a valid TBaseLanguageModule instance.
+  @postcon Synchronizes with the main IDE thread and renders the module
+           explorer.
+
+**)
+procedure TBrowseAndDocItThread.RenderModuleExplorer;
+
+begin
+  TfrmDockableModuleExplorer.RenderDocumentTree(FModule);
 end;
 
 Var

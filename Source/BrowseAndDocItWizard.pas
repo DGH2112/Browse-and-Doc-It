@@ -3,12 +3,10 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    01 Oct 2008
+  @Date    03 Oct 2008
   @Version 1.0
 
   @bug     Line position of comment tags in coflicts is not right!
-  @bug     There is a potential bug with the BrowseAndDocItOptions class being
-           access in the thread as well as in the main IDE thread?
 
 **)
 Unit BrowseAndDocItWizard;
@@ -86,7 +84,8 @@ Type
     FUpdateTimer : TTimer;
     FLastEditorName : String;
     FLastCursorPos: TOTAEditPos;
-    Procedure RefreshTree;
+    FLastParserResult : Boolean;
+    Procedure EnableTimer(boolSuccessfulParse : Boolean);
     Procedure TimerEventHandler(Sender : TObject);
   Protected
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
@@ -132,6 +131,9 @@ Type
     Constructor Create(Wizard : TBrowseAndDocItWizard);
   End;
 
+  (** This is a procedure to returns the success of the parse in the thread. **)
+  TParserNotify = Procedure(boolSuccessfulParse : Boolean) Of Object;
+
   (** This class defines a thread in which the parsing of the code and
       rendering of the module explorer is done. **)
   TBrowseAndDocItThread = class(TThread)
@@ -140,6 +142,7 @@ Type
     FMemoryStream : TMemoryStream;
     FFileName: String;
     FModified: Boolean;
+    FSuccessfulParseProc : TParserNotify;
     Procedure SetName;
   Protected
     Procedure Execute; Override;
@@ -147,7 +150,7 @@ Type
     Procedure DetermineCompilerDefinitions(slDefines : TStringList);
     Procedure ShowException;
   Public
-    Constructor CreateBrowseAndDocItThread;
+    Constructor CreateBrowseAndDocItThread(SuccessfulParseProc : TParserNotify);
     Destructor Destroy; Override;
   End;
 
@@ -1450,6 +1453,7 @@ begin
   FUpdateTimer := TTimer.Create(Nil);
   FUpdateTimer.Interval := 100;
   FUpdateTimer.OnTimer := TimerEventHandler;
+  FLastParserResult := True;
   FUpdateTimer.Enabled := True;
 end;
 
@@ -1469,24 +1473,19 @@ end;
 
 (**
 
-  This method get and parsers the current editor and display it in the module
-  explorer.
+  This method reenabled the timer and returns whether the parse failed or not.
 
   @precon  None.
-  @postcon Creates an instance of the language module for the specified file
-           extension and passes the language module to the Dockable Module
-           Explorer for rendering.
+  @postcon Reenabled the timer and returns whether the parse failed or not.
+
+  @param   boolSuccessfulParse as a Boolean
 
 **)
-Procedure TEditorNotifier.RefreshTree;
+Procedure TEditorNotifier.EnableTimer(boolSuccessfulParse : Boolean);
 
 begin
-  If Application = Nil Then
-    Exit;
-  If Application.MainForm = Nil Then
-    Exit;
-  If Application.MainForm.Visible Then
-    TBrowseAndDocItThread.CreateBrowseAndDocItThread;
+  FUpdateTimer.Enabled := True;
+  FLastParserResult := boolSuccessfulParse;
 end;
 
 (**
@@ -1495,7 +1494,8 @@ end;
 
   @precon  None.
   @postcon Checks to see if the last time the editor was changes is beyond the
-           wait time for the module to be updated.
+           wait time for the module to be updated. Creates an instance of the
+           thread to render the module explorer.
 
   @param   Sender as a TObject
 
@@ -1528,12 +1528,12 @@ begin
     (GetTickCount > iLastUpdateTickCount + BrowseAndDocItOptions.UpdateInterval) Then
     Begin
       iLastUpdateTickCount := 0;
-      FUpdateTimer.Enabled := False;
-      Try
-        RefreshTree;
-      Finally
-        FUpdateTimer.Enabled := True;
-      End;
+      If (Application <> Nil) And (Application.MainForm <> Nil) And
+        Application.MainForm.Visible Then
+        Begin
+          FUpdateTimer.Enabled := False;
+          TBrowseAndDocItThread.CreateBrowseAndDocItThread(EnableTimer);
+        End;
     End;
 end;
 
@@ -1594,7 +1594,7 @@ end;
   interface.
 
   @precon  None.
-  @postcon Forces an immediate update of the module explorer.
+  @postcon Refreshes the module explorer IF the last parser was sucessful.
 
   @param   EditWindow as an INTAEditWindow constant
   @param   EditView   as an IOTAEditView constant
@@ -1603,7 +1603,8 @@ end;
 procedure TEditorNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
   const EditView: IOTAEditView);
 begin
-  iLastUpdateTickCount := 1;
+  If FLastParserResult Then
+    iLastUpdateTickCount := 1;
 end;
 
 (**
@@ -2001,55 +2002,18 @@ end;
 
 (**
 
-  This is a setter method for the  property.
+  This is a constructor for the TBrowseAndDocItThread class. 
 
-  @precon  None.
-  @postcon Sets the name of the thread.
+  @precon  None. 
+  @postcon Creates a suspended thread and sets up a stream with the contents of 
+           the active editor and then resumed the thread in order to parse 
+           the contents. 
 
-**)
-procedure TBrowseAndDocItThread.SetName;
-
-var
-  ThreadNameInfo: TThreadNameInfo;
-
-begin
-  ThreadNameInfo.FType := $1000;
-  ThreadNameInfo.FName := 'BrowseAndDocItThread';
-  ThreadNameInfo.FThreadID := $FFFFFFFF;
-  ThreadNameInfo.FFlags := 0;
-  try
-    RaiseException( $406D1388, 0, sizeof(ThreadNameInfo) div sizeof(LongWord),
-      @ThreadNameInfo );
-  except
-  end;
-end;
-
-(**
-
-  This method displays the raised exception message pass via the FFileName
-  field.
-
-  @precon  None.
-  @postcon Displays the raised exception message pass via the FFileName
-           field.
+  @param   SuccessfulParseProc as a TParserNotify
 
 **)
-procedure TBrowseAndDocItThread.ShowException;
-begin
-  ShowMessage('Exception in TBrowseAndDocItThread:'#13#10 + FFileName);
-end;
-
-(**
-
-  This is a constructor for the TBrowseAndDocItThread class.
-
-  @precon  None.
-  @postcon Creates a suspended thread and sets up a stream with the contents of
-           the active editor and then resumed the thread in order to parse the
-           contents.
-
-**)
-constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread;
+constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(
+  SuccessfulParseProc : TParserNotify);
 
 Var
   SourceEditor : IOTASourceEditor;
@@ -2061,6 +2025,7 @@ Var
 begin
   Inherited Create(True);
   FreeOnTerminate := True; // Self Freeing...
+  FSuccessfulParseProc := SuccessfulParseProc;
   FMemoryStream := TMemoryStream.Create;
   SourceEditor := ActiveSourceEditor;
   If SourceEditor <> Nil Then
@@ -2207,6 +2172,50 @@ procedure TBrowseAndDocItThread.RenderModuleExplorer;
 
 begin
   TfrmDockableModuleExplorer.RenderDocumentTree(FModule);
+  If Assigned(FSuccessfulParseProc) Then
+    FSuccessfulParseProc(True);
+end;
+
+(**
+
+  This is a setter method for the  property.
+
+  @precon  None.
+  @postcon Sets the name of the thread.
+
+**)
+procedure TBrowseAndDocItThread.SetName;
+
+var
+  ThreadNameInfo: TThreadNameInfo;
+
+begin
+  ThreadNameInfo.FType := $1000;
+  ThreadNameInfo.FName := 'BrowseAndDocItThread';
+  ThreadNameInfo.FThreadID := $FFFFFFFF;
+  ThreadNameInfo.FFlags := 0;
+  try
+    RaiseException( $406D1388, 0, sizeof(ThreadNameInfo) div sizeof(LongWord),
+      @ThreadNameInfo );
+  except
+  end;
+end;
+
+(**
+
+  This method displays the raised exception message pass via the FFileName
+  field.
+
+  @precon  None.
+  @postcon Displays the raised exception message pass via the FFileName
+           field.
+
+**)
+procedure TBrowseAndDocItThread.ShowException;
+begin
+  ShowMessage('Exception in TBrowseAndDocItThread:'#13#10 + FFileName);
+  If Assigned(FSuccessfulParseProc) Then
+    FSuccessfulParseProc(False);
 end;
 
 Var

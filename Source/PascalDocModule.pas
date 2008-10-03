@@ -8350,7 +8350,6 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctResourceStringClauseUndocumented]);
     End;
-  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**
@@ -8373,7 +8372,6 @@ Begin
         AddDocumentConflict([Identifier], Line, Column, Comment,
           DocConflictTable[dctThreadVarClauseUndocumented]);
     End;
-  Inherited CheckDocumentation(boolCascade);
 End;
 
 (**

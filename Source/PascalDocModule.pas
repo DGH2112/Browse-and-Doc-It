@@ -1823,7 +1823,8 @@ Begin
       Add(strWarnings, iiWarningFolder, scNone, Nil);
       Add(strHints, iiHintFolder, scNone, Nil);
       Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
-      CheckReferences;
+      If FindElement(strErrors).ElementCount = 0 Then
+        CheckReferences;
       AddTickCount('Refs');
       boolCascade := True;
       If moCheckForDocumentConflicts In ModuleOptions Then

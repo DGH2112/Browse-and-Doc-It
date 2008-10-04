@@ -3,10 +3,8 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    03 Oct 2008
+  @Date    04 Oct 2008
   @Version 1.0
-
-  @bug     Line position of comment tags in coflicts is not right!
 
 **)
 Unit BrowseAndDocItWizard;
@@ -28,9 +26,11 @@ Type
     FCounter : Integer;
     FFileName : String;
     FKeyBinding : Integer;
+    FINIFile: String;
     procedure InsertCommentBlock(CommentType: TCommentType);
     procedure OptionsClick(Sender: TObject);
     procedure HelpClick(Sender: TObject);
+    procedure CheckForUpdatesClick(Sender: TObject);
     procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
       iCommentCol : Integer; SelectType : TSelectType);
     Procedure Focus(Sender : TObject);
@@ -175,7 +175,8 @@ Implementation
 Uses
   SysUtils, DockableModuleExplorer, IniFiles, ToolsAPIUtils, OptionsForm, Forms,
   Windows, ShellAPI, TokenForm, DGHLibrary, ModuleDispatcher, Dialogs, Controls,
-  PsAPI, DocumentationOptionsForm, DocumentationDispatcher, BaseDocumentation;
+  PsAPI, DocumentationOptionsForm, DocumentationDispatcher, BaseDocumentation,
+  CheckForUpdates, CheckForUpdatesForm;
 
 Resourcestring
   (** This is a text string of revision from nil and a to z. **)
@@ -205,6 +206,8 @@ Const
   strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
   (** A constant array of outputs for the ArrayOf property. **)
   strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
+  (** This is the software ID for this module on the internet. **)
+  strSoftwareID = 'BrowseAndDocIt';
 
 Var
   (** This is an index for the wizard when register with the ide. Its required
@@ -271,6 +274,21 @@ end;}
 
 (**
 
+  This is an click event handler for the Check for Updates menu.
+
+  @precon  None.
+  @postcon Invokes the checking for updates.
+
+  @param   Sender as a TObject
+
+**)
+procedure TBrowseAndDocItWizard.CheckForUpdatesClick(Sender: TObject);
+begin
+  TCheckForUpdates.Execute(strSoftwareID, FINIFile, Sender <> Nil);
+end;
+
+(**
+
   This is the constructor method for the TPascalDocWizard class. This
   constructor create the explorer form and menus.
 
@@ -306,10 +324,14 @@ Begin
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, '&Options', OptionsClick);
   CreateMenuItem(mmiPascalDocMenu);
+  CreateMenuItem(mmiPascalDocMenu, 'Check for &Updates...', CheckForUpdatesClick);
+  CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, '&Help', HelpClick);
   FKeyBinding := 0;
   FCounter := 0;
   FFileName := '';
+  FINIFile := BuildRootKey(Nil, Nil);
+  CheckForUpdatesClick(Nil);
 End;
 
 (**
@@ -2237,7 +2259,7 @@ Initialization
   (SplashScreenServices As IOTASplashScreenServices).AddPluginBitmap(
     Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1)]),
     bmSplashScreen,
-    True,
+    False,
     Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]), ''
     );
 (** This finalization section removes this wizard from the IDE when the package

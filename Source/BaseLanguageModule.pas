@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    30 Sep 2008
+  @Date    04 Oct 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -93,6 +93,7 @@ Type
     {doShowIDEErrorsOnSuccessfulParse,}
     doShowParserErrorOrigin,
     doShowUnReferencedSymbols,
+    doShowPerformanceCountersInModuleExplorer,
     doShowPrefCountersInDocSummary
   );
 
@@ -1124,6 +1125,8 @@ Type
     procedure AppendToLastToken(strToken : String);
     procedure ProcessCompilerDirective(var iSkip : Integer); Virtual; Abstract;
     Function GetModuleName : String; Virtual;
+    function GetBytes: Int64;
+    function GetLines: Integer;
     (**
       Returns a refernce the to owned items collection. This is used to manage
       the life time of all the ident lists and comments found in the module.
@@ -1297,6 +1300,20 @@ Type
       @return  a TList
     **)
     Property CompilerConditionStack : TList Read FCompilerConditionStack;
+    (**
+      This property returns the number of bytes in the file.
+      @precon  None.
+      @postcon Returns the number of bytes in the file.
+      @return  an Int64
+    **)
+    Property Bytes : Int64 Read GetBytes;
+    (**
+      This property returns the number of lines in the file.
+      @precon  None.
+      @postcon Returns the number of lines in the file.
+      @return  an Integer
+    **)
+    Property Lines : Integer Read GetLines;
   End;
 
   (** This enumerate define the position of the editor when an item is selected
@@ -1575,6 +1592,8 @@ ResourceString
   strShowParserErrorOrigin = 'Show the origin method of the Parser error.';
   (** Options text for showing unreferenced locals and privates. **)
   strShowUnreferencedSymbols = 'Show all unreferenced symbols.';
+  (** Options text for showing preformance counters in the documentation summary. **)
+  strShowPerfCountersInModuleExplorer = 'Show performance counters in the statusbar of the module explorer.';
   (** Options text for showing preformance counters in the documentation summary. **)
   strShowPerfCountersInDocSummary = 'Show performance counters in the documenation summary.';
 
@@ -2093,6 +2112,7 @@ Const
     {(FDescription : strShowIDEErrorsOnSuccessfulParse;     FEnabled : False),}
     (FDescription : strShowParserErrorOrigin;              FEnabled : False),
     (FDescription : strShowUnreferencedSymbols;            FEnabled : False),
+    (FDescription : strShowPerfCountersInModuleExplorer;   FEnabled : False),
     (FDescription : strShowPerfCountersInDocSummary;       FEnabled : False)
   );
 
@@ -4808,6 +4828,23 @@ End;
 
 (**
 
+  This is a getter method for the Lines property.
+
+  @precon  None.
+  @postcon Returns the number Lines in the file. 
+
+  @return  an Integer
+
+**)
+function TBaseLanguageModule.GetLines: Integer;
+begin
+  Result := 0;
+  If TokenCount > 0 Then
+    Result := Token.Line; // Last token
+end;
+
+(**
+
   This is a setter method for the TokenIndex property.
 
   @precon  iIndex is the token index to set the parse to start at.
@@ -4877,6 +4914,33 @@ Function TBaseLanguageModule.GetBodyCommentCount : Integer;
 Begin
   Result := FBodyComment.Count;
 End;
+
+(**
+
+  This is a getter method for the Bytes property.
+
+  @precon  None.
+  @postcon Returns the number of bytes in the file.
+
+  @return  an Int64
+
+**)
+function TBaseLanguageModule.GetBytes: Int64;
+
+Var
+  rec : TSearchRec;
+  i : Integer;
+
+begin
+  Result := 0;
+  i := FindFirst(FFileName, faAnyFile, rec);
+  Try
+    If i = 0 Then
+      Result := rec.Size;
+  Finally
+    SysUtils.FindClose(rec);
+  End;
+end;
 
 (**
 

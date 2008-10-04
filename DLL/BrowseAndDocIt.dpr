@@ -1,11 +1,11 @@
 (**
 
   This module defines a DLL which can be loaded ny the BDS IDE.
-  
+
   @Version 1.0
   @Author  David Hoyle
-  @Date    16 Aug 2008
-  
+  @Date    04 Oct 2008
+
 **)
 library BrowseAndDocIt;
 
@@ -21,9 +21,17 @@ library BrowseAndDocIt;
 
 {$R '..\ExplorerImages.res' '..\ExplorerImages.RC'}
 {$R '..\SplashScreenIcon.res' '..\SplashScreenIcon.RC'}
+{$R '..\..\..\Library\BrowseAndDocItHTMLResources.res' '..\..\..\Library\BrowseAndDocItHTMLResources.RC'}
+{%File '..\..\..\Library\HTML Files\BrowseAndDocItScreen.css'}
+{%File '..\..\..\Library\HTML Files\BrowseAndDocItPrint.css'}
+{%HTMLTool '..\..\..\Library\HTML Files\BrowseAndDocItHTMLTemplate.html'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\default.txaPackage'}
+{%File '..\..\..\LIBRARY\HTML Files\xhtml1-strict.dtd'}
+{%File '..\..\..\LIBRARY\HTML Files\xhtml-lat1.ent'}
+{%File '..\..\..\LIBRARY\HTML Files\xhtml-special.ent'}
+{%File '..\..\..\LIBRARY\HTML Files\xhtml-symbol.ent'}
 uses
   ShareMem,
-  ExceptionLog,
   SysUtils,
   Classes,
   DGHLibrary in '..\..\..\Library\DGHLibrary.pas',
@@ -33,11 +41,22 @@ uses
   ModuleExplorerFrame in '..\..\..\Library\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
   OptionsForm in '..\..\..\Library\OptionsForm.pas' {frmOptions},
   PascalDocModule in '..\..\..\Library\PascalDocModule.pas',
-  ProgressForm in '..\Source\ProgressForm.pas' {frmProgress},
-  SpecialTagForm in '..\..\..\Library\\SpecialTagForm.pas' {frmSpecialTag},
+  ProgressForm in '..\..\..\Library\ProgressForm.pas' {frmProgress},
+  SpecialTagForm in '..\..\..\Library\SpecialTagForm.pas' {frmSpecialTag},
   TokenForm in '..\..\..\Library\TokenForm.pas' {frmTokenForm},
   ToolsAPIUtils in '..\Source\ToolsAPIUtils.pas',
-  ModuleDispatcher in '..\..\..\Library\ModuleDispatcher.pas';
+  ModuleDispatcher in '..\..\..\Library\ModuleDispatcher.pas',
+  MethodDescriptionForm in '..\..\..\LIBRARY\MethodDescriptionForm.pas' {frmMethodDescriptions},
+  DocumentationDispatcher in '..\..\..\Library\DocumentationDispatcher.pas',
+  HTMLDocumentation in '..\..\..\Library\HTMLDocumentation.pas',
+  BaseDocumentation in '..\..\..\Library\BaseDocumentation.pas',
+  GIFImage in '..\..\..\Library\TGIFImage\GIFImage.pas',
+  DocumentationOptionsForm in '..\..\..\LIBRARY\DocumentationOptionsForm.pas' {frmDocumentationOptions},
+  Profiler in '..\..\..\LIBRARY\Profiler.pas',
+  GenericTokenizer in '..\..\..\LIBRARY\GenericTokenizer.pas',
+  checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
+  CheckForUpdatesForm in '..\..\..\LIBRARY\CheckForUpdatesForm.pas' {frmCheckForUpdates},
+  MSXML2_TLB in '..\..\..\LIBRARY\MSXML2_TLB.pas';
 
 {$R *.res}
 

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    15 Jun 2008
+  @Date    04 Oct 2008
 
 **)
 Unit CheckForUpdates;
@@ -78,8 +78,10 @@ ResourceString
   strPackageNotFound = '  Package "%s" not found!';
   (** A resource string for an exception message. **)
   strExceptionS = '  Exception: %s';
+  {$IFDEF CONSOLE}
   (** A resource string to prompt to continue. **)
   strPressEnterToContinue = 'Press <Enter> to continue...';
+  {$ENDIF}
   (** A resource string to prompt that you are using a newer version of software. **)
   strYouAreUsingANewerVersion = '  You are using a newer version of the ' +
     'software [%s] than is available from the internet [%s] @ %s.';

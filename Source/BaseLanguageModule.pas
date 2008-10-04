@@ -4839,8 +4839,8 @@ End;
 function TBaseLanguageModule.GetLines: Integer;
 begin
   Result := 0;
-  If TokenCount > 0 Then
-    Result := Token.Line; // Last token
+  If FTokens.Count > 0 Then
+    Result := (FTokens[FTokens.Count - 1] As TTokenInfo).Line;
 end;
 
 (**

@@ -5520,7 +5520,8 @@ Begin
             If Not (LowerCase(strType) = Lowercase(strParam)) Then
               If (doShowMethodIncorrectParamType In BrowseAndDocItOptions.Options) Then
                 AddDocumentConflict([Parameters[i].Identifier, QualifiedName],
-                  Line, Column, Comment, DocConflictTable[dctMethodIncorrectParamType]);
+                  Tag[iFound].Line, Tag[iFound].Column, Comment,
+                  DocConflictTable[dctMethodIncorrectParamType]);
           End;
     End;
 End;
@@ -5550,7 +5551,8 @@ Begin
         Inc(k);
         If Comment.Tag[i].TokenCount = 0 Then
           AddDocumentConflict([QualifiedName], Comment.Tag[i].Line,
-            Comment.Tag[i].Column, Comment, DocConflictTable[dctMethodPostconNotDocumented]);
+            Comment.Tag[i].Column, Comment,
+            DocConflictTable[dctMethodPostconNotDocumented]);
       End;
   If MethodType = mtFunction Then
     Begin;
@@ -5571,7 +5573,8 @@ Begin
           If ((Comment.Tag[iFound].TokenCount < 2) Or
             (AnsiCompareText(ReturnType.AsString, Comment.Tag[iFound][1]) <> 0)) And
             (doShowMethodIncorrectReturnType In BrowseAndDocItOptions.Options) Then
-            AddDocumentConflict([QualifiedName], Line, Column, Comment,
+            AddDocumentConflict([QualifiedName], Comment.Tag[iFound].Line,
+              Comment.Tag[iFound].Column, Comment,
               DocConflictTable[dctMethodIncorrectReturntype]);
         End;
     End Else
@@ -5731,8 +5734,9 @@ Begin
             strParam := Parameters[i].ParamReturn;
             If Not ((LowerCase(strType) = Lowercase(strParam))) Then
               If doShowPropertyIncorrectParamType In BrowseAndDocItOptions.Options Then
-                AddDocumentConflict([Parameters[i].Identifier, Identifier], Line,
-                  Column, Comment, DocConflictTable[dctPropertyIncorrectParamType]);
+                AddDocumentConflict([Parameters[i].Identifier, Identifier],
+                  Tag[iFound].Line, Tag[iFound].Column, Comment,
+                  DocConflictTable[dctPropertyIncorrectParamType]);
         End;
     End;
 End;
@@ -5784,7 +5788,8 @@ Begin
       If ((Comment.Tag[iFound].TokenCount < 2) Or
         (AnsiCompareText(TypeId.AsString, Comment.Tag[iFound][1]) <> 0)) And
         (doShowPropertyIncorrectReturnType In BrowseAndDocItOptions.Options) Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
+        AddDocumentConflict([Identifier], Comment.Tag[iFound].Line,
+        Comment.Tag[iFound].Column, Comment,
         DocConflictTable[dctPropertyIncorrectReturnType]);
     End;
   If doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options Then iFound := 0;

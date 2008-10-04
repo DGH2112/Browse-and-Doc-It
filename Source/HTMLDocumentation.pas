@@ -530,9 +530,17 @@ Var
         End;
   End;
 
+Type
+  TCSSInfo = Record
+    FResource : String;
+    FFileName : String;
+  End;
+
 Const
-  CSSFiles : Array[1..2] Of String = ('BrowseAndDocItCSSScreen.CSS',
-    'BrowseAndDocItCSSPrint.CSS');
+  CSSFiles : Array[1..2] Of TCSSInfo = (
+    (FResource : 'BrowseAndDocItCSSScreen'; FFileName: 'BrowseAndDocItScreen.CSS'),
+    (FResource : 'BrowseAndDocItCSSPrint';  FFileName: 'BrowseAndDocItPrint.CSS')
+  );
 
 Var
   Buffer : Array[0..MAX_PATH] Of Char;
@@ -551,16 +559,16 @@ Begin
   Try
     For i := Low(CSSFiles) to High(CSSFiles) Do
       Begin
-        If Not FileExists(strFileName + CSSFiles[i]) Then
+        If Not FileExists(strFileName + CSSFiles[i].FFileName) Then
           Begin
-            sl.Text := GetStringResource(ChangeFileExt(CSSFiles[i], ''));
-            sl.SaveToFile(strFileName + CSSFiles[i]);
+            sl.Text := GetStringResource(CSSFiles[i].FResource);
+            sl.SaveToFile(strFileName + CSSFiles[i].FFileName);
           End Else
-            sl.LoadFromFile(strFileName + CSSFiles[i]);
+            sl.LoadFromFile(strFileName + CSSFiles[i].FFileName);
         sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
           BrowseAndDocItOptions.BGColour), []);
         OutputCodeStyles;
-        sl.SaveToFile(FOutputDirectory + 'Styles\' + CSSFiles[i]);
+        sl.SaveToFile(FOutputDirectory + 'Styles\' + CSSFiles[i].FFileName);
       End;
   Finally
     sl.Free;

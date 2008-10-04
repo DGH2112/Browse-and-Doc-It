@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    23 Sep 2008
+  @Date    04 Oct 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -154,16 +154,16 @@ type
     procedure GetExpandedNodes;
     function GetNodePath(Node: TTreeNode): String;
     procedure SetExpandedNodes;
+    Procedure RenderContainers(RootNode : TTreenode; Container : TElementContainer);
+    Procedure UpdateStatusBar(M : TBaseLanguageModule);
     (**
       This property returns the indexed NodeInfo class for the collection.
       @precon  iIndex must eb a valid index.
       @postcon Returns the indexed NodeInfo class for the collection.
       @param   iIndex as an Integer
       @return  a TTreeNodeInfo
-      @bug     This property is not referenced in TObjectDecl.ReferenceSymbol.
     **)
     Property NodeInfo[iIndex : Integer] : TTreeNodeInfo Read GetTreeNodeInfo;
-    Procedure RenderContainers(RootNode : TTreenode; Container : TElementContainer);
   Protected
     Procedure CMMouseLeave(var Msg : TMessage); Message CM_MOUSELEAVE;
   public
@@ -199,6 +199,10 @@ implementation
 
 Uses
   IniFiles, Types, Math, DGHLibrary, GenericTokenizer;
+
+Resourcestring
+  (** A format pattern for the statusbar text. **)
+  strStatusbarText = '%1.0n Bytes, %1.0n Tokens and %1.0n Lines.';
 
 {$R *.dfm}
 
@@ -585,8 +589,6 @@ Var
   i : Integer;
   strTop : String;
   strSelection : String;
-  strTickLabel: String;
-  iTicks: Integer;
 
 Begin
   tvExplorer.Color := BRowseAndDocItOptions.BGColour;
@@ -661,26 +663,7 @@ Begin
         End;
       End;
     M.AddTickCount('Render');
-    With stbStatusBar Do
-      Begin
-        SimpleText := '';
-        For i := 1 To M.OpTickCounts - 1 Do
-          Begin
-            strTickLabel := M.OpTickCountName[i];
-            If strTickLabel <> '' Then
-              strTickLabel := strTickLabel + ':';
-            iTicks := M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1];
-            If iTicks > 0 Then
-              Begin
-                If SimpleText <> '' Then
-                  SimpleText := SimpleText + ', ';
-                SimpleText := SimpleText + Format('%s%d', [strTickLabel, iTicks]);
-              End;
-          End;
-        If SimpleText <> '' Then SimpleText := SimpleText + ', ';
-        SimpleText := SimpleText + Format('%s: %d', ['Total',
-          M.OpTickCountByIndex[M.OpTickCounts - 1] - M.OpTickCountByIndex[0]]);
-      End;
+    UpdateStatusBar(M);
   Finally
     FRendering := False;
   End;
@@ -1117,6 +1100,53 @@ begin
     Begin
       FHintWin.ReleaseHandle;
       FLastNode := Nil;
+    End;
+end;
+
+(**
+
+  This method update the status of the module explorer statusbar.
+
+  @precon  M must be a valid instance of a TBaseLanguageModule.
+  @postcon Update the status of the module explorer statusbar.
+
+  @param   M as a TBaseLanguageModule
+
+**)
+procedure TframeModuleExplorer.UpdateStatusBar(M: TBaseLanguageModule);
+
+Var
+  strTickLabel: String;
+  iTicks: Integer;
+  i : Integer;
+
+begin
+  If doShowPerformanceCountersInModuleExplorer In BrowseAndDocItOptions.Options Then
+    Begin
+      stbStatusBar.SimpleText := '';
+      For i := 1 To M.OpTickCounts - 1 Do
+        Begin
+          strTickLabel := M.OpTickCountName[i];
+          If strTickLabel <> '' Then
+            strTickLabel := strTickLabel + ':';
+          iTicks := M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1];
+          If iTicks > 0 Then
+            Begin
+              If stbStatusBar.SimpleText <> '' Then
+                stbStatusBar.SimpleText := stbStatusBar.SimpleText + ', ';
+              stbStatusBar.SimpleText := stbStatusBar.SimpleText +
+                Format('%s%d', [strTickLabel, iTicks]);
+            End;
+        End;
+      If stbStatusBar.SimpleText <> '' Then
+        stbStatusBar.SimpleText := stbStatusBar.SimpleText + ', ';
+      stbStatusBar.SimpleText := stbStatusBar.SimpleText +
+        Format('%s: %d', ['Total', M.OpTickCountByIndex[M.OpTickCounts - 1] -
+        M.OpTickCountByIndex[0]]);
+    End Else
+    Begin
+      stbStatusBar.SimpleText := Format(strStatusbarText, [
+        Int(M.Bytes), Int(M.TokenCount), Int(M.Lines)]);
     End;
 end;
 

@@ -5,13 +5,16 @@
   version of PascalDoc.
 
   @Author  David Hoyle
-  @Date    27 Dec 2006
+  @Date    04 Oct 2008
   @Version 1.0
 
 **)
 package BrowseAndDocIt;
 
 {$R *.res}
+{$R '..\ExplorerImages.res'}
+{$R '..\SplashScreenIcon.res'}
+{$R '..\..\..\Library\BrowseAndDocItHTMLResources.res'}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -36,8 +39,6 @@ package BrowseAndDocIt;
 {$DESCRIPTION 'Browse and Doc It'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
-{%W32RC '..\ExplorerImages.RC'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\default.txaPackage'}
 
 requires
   rtl,
@@ -51,13 +52,25 @@ contains
   BrowseAndDocItWizard in '..\Source\BrowseAndDocItWizard.pas',
   DockableModuleExplorer in '..\Source\DockableModuleExplorer.pas',
   PascalDocModule in '..\..\..\Library\PascalDocModule.pas',
-  OptionsForm in '..\Source\OptionsForm.pas',
+  OptionsForm in '..\..\..\Library\OptionsForm.pas',
   ToolsAPIUtils in '..\Source\ToolsAPIUtils.pas',
-  SpecialTagForm in '..\Source\SpecialTagForm.pas',
+  SpecialTagForm in '..\..\..\Library\SpecialTagForm.pas',
   TokenForm in '..\..\..\Library\TokenForm.pas',
-  ProgressForm in '..\Source\ProgressForm.pas',
+  ProgressForm in '..\..\..\Library\ProgressForm.pas',
   BaseLanguageModule in '..\..\..\Library\BaseLanguageModule.pas',
   ModuleExplorerFrame in '..\..\..\Library\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
-  dghlibrary in '..\..\..\LIBRARY\dghlibrary.pas';
+  dghlibrary in '..\..\..\LIBRARY\dghlibrary.pas',
+  ModuleDispatcher in '..\..\..\LIBRARY\ModuleDispatcher.pas',
+  MethodDescriptionForm in '..\..\..\LIBRARY\MethodDescriptionForm.pas',
+  HTMLDocumentation in '..\..\..\Library\HTMLDocumentation.pas',
+  BaseDocumentation in '..\..\..\Library\BaseDocumentation.pas',
+  DocumentationDispatcher in '..\..\..\Library\DocumentationDispatcher.pas',
+  GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas',
+  DocumentationOptionsForm in '..\..\..\LIBRARY\DocumentationOptionsForm.pas',
+  GenericTokenizer in '..\..\..\LIBRARY\GenericTokenizer.pas',
+  Profiler in '..\..\..\LIBRARY\Profiler.pas',
+  MSXML2_TLB in '..\..\..\LIBRARY\MSXML2_TLB.pas',
+  checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
+  CheckForUpdatesForm in '..\..\..\LIBRARY\CheckForUpdatesForm.pas';
 
 end.

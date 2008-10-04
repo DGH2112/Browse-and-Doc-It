@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    09 Sep 2008
+  @Date    04 Oct 2008
 
 **)
 unit DocumentationOptionsForm;
@@ -28,6 +28,7 @@ type
     chkProtected: TCheckBox;
     chkPublic: TCheckBox;
     chkPublished: TCheckBox;
+    lblCSSComment: TLabel;
   private
     { Private declarations }
   public

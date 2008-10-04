@@ -3,7 +3,7 @@ object frmDocumentationOptions: TfrmDocumentationOptions
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Documentation Options'
-  ClientHeight = 283
+  ClientHeight = 373
   ClientWidth = 350
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,17 +15,39 @@ object frmDocumentationOptions: TfrmDocumentationOptions
   Position = poMainFormCenter
   DesignSize = (
     350
-    283)
+    373)
   PixelsPerInch = 96
   TextHeight = 13
+  object lblCSSComment: TLabel
+    Left = 8
+    Top = 305
+    Width = 334
+    Height = 60
+    Anchors = [akLeft, akRight, akBottom]
+    AutoSize = False
+    Caption = 
+      'If you wish to change the layout and style of the HTML output, e' +
+      'dit the 2 CSS files stored in the Styles\ directory of the Brows' +
+      'eAndDocIt module installation directory. These are always copied' +
+      ' to the destination directory for the target HTML documentation.'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clMaroon
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    WordWrap = True
+    ExplicitTop = 342
+  end
   object rgpDocumentationOptions: TRadioGroup
     Left = 8
     Top = 8
     Width = 253
-    Height = 118
+    Height = 142
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Documentation Options'
     TabOrder = 0
+    ExplicitHeight = 179
   end
   object btnOK: TBitBtn
     Left = 267
@@ -47,12 +69,13 @@ object frmDocumentationOptions: TfrmDocumentationOptions
   end
   object gbxScopeOptions: TGroupBox
     Left = 8
-    Top = 132
+    Top = 156
     Width = 253
     Height = 143
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Scope Options'
     TabOrder = 1
+    ExplicitTop = 193
     object chkLocal: TCheckBox
       Left = 14
       Top = 22

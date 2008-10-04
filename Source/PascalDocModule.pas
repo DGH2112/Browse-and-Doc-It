@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       03 Oct 2008
+  @Date       04 Oct 2008
   @Author     David Hoyle
 
 **)
@@ -2386,11 +2386,12 @@ begin
           End Else
           Begin
             AddIssue(strUnExpectedEndOfFile, scNone, 'Goal', 0, 0, etError);
-            Raise EParserAbort.Create('');
+            Raise EParserAbort.Create('Parsing Aborted!');
           End;
       End;
   Except
-    On E : EParserAbort Do { Do nothing};
+    On E : EParserAbort Do
+      AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
   End;
 end;
 

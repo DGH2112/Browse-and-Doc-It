@@ -3336,7 +3336,7 @@ begin
           E.Add(TDocIssue.Create(Format(strTryingToAddType, [AElement.ClassName,
             Result.ClassName, AElement.Name]), scNone, 'TElementContainer.Add',
             AElement.Line, AElement.Column, iiError));
-          Raise EParserAbort.Create('');
+          Raise EParserAbort.Create('Parsing Aborted!');
         End;
     Finally
       (** Free AElement after getting the comment as it will leak otherwise. **)
@@ -5086,7 +5086,7 @@ Begin
   If FTokenIndex >= FTokens.Count Then
     Begin
       AddIssue(strUnExpectedEndOfFile, scNone, 'GetToken', 0, 0, etError);
-      Raise EParserAbort.Create('');
+      Raise EParserAbort.Create('Parsing Aborted!');
     End;
   Result := FTokens[FTokenIndex] As TTokenInfo;
 End;
@@ -5221,7 +5221,7 @@ Begin
       If FTokenIndex < 0 Then
         Begin
           AddIssue(strUnExpectedStartOfFile, scNone, 'RollBackToken', 0, 0, etError);
-          Raise EParserAbort.Create('');
+          Raise EParserAbort.Create('Parsing Aborted!');
         End;
     End;
 End;

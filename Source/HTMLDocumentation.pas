@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    22 Sep 2008
+  @Date    04 Oct 2008
   @Version 1.0
 
 **)
@@ -477,6 +477,7 @@ End;
 
 **)
 Procedure THTMLDocumentation.GenerateCSS;
+
 Var
   sl : TStringList;
 
@@ -509,7 +510,7 @@ Var
   Procedure OutputCodeStyles;
   Var
     i : BaseLanguageModule.TTokenType;
-    
+
   Begin
     With BrowseAndDocItOptions Do
       For i := Low(BaseLanguageModule.TTokenType) to High(BaseLanguageModule.TTokenType) Do
@@ -529,22 +530,38 @@ Var
         End;
   End;
 
+Const
+  CSSFiles : Array[1..2] Of String = ('BrowseAndDocItCSSScreen.CSS',
+    'BrowseAndDocItCSSPrint.CSS');
+
+Var
+  Buffer : Array[0..MAX_PATH] Of Char;
+  strFileName : String;
+  i : Integer;
+
 Begin
   Update(FProgressIndex, 'Generating CSS...');
   Inc(FProgressIndex);
+  GetModuleFileName(hInstance, Buffer, MAX_PATH);
+  strFileName := StrPas(Buffer);
+  strFileName := ExtractFilePath(strFileName) + 'Styles\';
+  ForceDirectories(strFileName);
   ForceDirectories(FOutputDirectory + '\Styles');
   sl := TStringList.Create;
   Try
-    sl.Text := GetStringResource('BrowseAndDocItCSSScreen');
-    sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
-      BrowseAndDocItOptions.BGColour), []);
-    OutputCodeStyles;
-    sl.SaveToFile(FOutputDirectory + 'Styles\BrowseAndDocItScreen.CSS');
-    sl.Text := GetStringResource('BrowseAndDocItCSSPrint');
-    sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
-      BrowseAndDocItOptions.BGColour), []);
-    OutputCodeStyles;
-    sl.SaveToFile(FOutputDirectory + 'Styles\BrowseAndDocItPrint.CSS');
+    For i := Low(CSSFiles) to High(CSSFiles) Do
+      Begin
+        If Not FileExists(strFileName + CSSFiles[i]) Then
+          Begin
+            sl.Text := GetStringResource(ChangeFileExt(CSSFiles[i], ''));
+            sl.SaveToFile(strFileName + CSSFiles[i]);
+          End Else
+            sl.LoadFromFile(strFileName + CSSFiles[i]);
+        sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
+          BrowseAndDocItOptions.BGColour), []);
+        OutputCodeStyles;
+        sl.SaveToFile(FOutputDirectory + 'Styles\' + CSSFiles[i]);
+      End;
   Finally
     sl.Free;
   End;
@@ -1057,9 +1074,6 @@ end;
 
 **)
 function THTMLDocumentation.GetStringResource(strName: String): String;
-
-ResourceString
-  strResourceNotFound = 'Resource "%s" not found.';
 
 Var
   Res: TResourceStream;

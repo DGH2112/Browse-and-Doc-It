@@ -4,7 +4,7 @@
   profiles.
 
   @Version 1.0
-  @Date    28 Sep 2008
+  @Date    06 Oct 2008
   @Author  David Hoyle
 
 **)
@@ -22,9 +22,9 @@ Type
   TProfile = Class
   Strict Private
     FMethodName    : String;
-    FStartTick     : Extended;
-    FDurationTick  : Extended;
-    FInProcessTick : Extended;
+    FStartTick     : Double;
+    FDurationTick  : Double;
+    FInProcessTick : Double;
     FCallCount     : Int64;
     FProfiles      : TObjectList;
     FParent        : TProfile;
@@ -36,9 +36,9 @@ Type
       This property returns the total duration of the profiles calls, i.e. TickCount.
       @precon  None.
       @postcon Returns the total duration of the profiles calls.
-      @return  a Extended
+      @return  a Double
     **)
-    Property DurationTick : Extended Read FDurationTick;
+    Property DurationTick : Double Read FDurationTick;
   Public
     Constructor Create(strMethod : String; iStackDepth : Integer; objParent : TProfile);
     Destructor Destroy; Override;
@@ -79,17 +79,17 @@ Uses
   @precon  None.
   @postcon Returns the performance tick count from the system.
 
-  @return  an Extended
+  @return  an Double
 
 **)
-Function TickTime: Extended;
+Function TickTime: Double;
 
 Var
   t, f : Int64;
 begin
   QueryPerformanceCounter(t);
   QueryPerformanceFrequency(f);
-  Result := 1000000.0 * Int(t) / Int(f);
+  Result := 1000.0 * Int(t) / Int(f);
 end;
 
 (**
@@ -156,7 +156,7 @@ Begin
           FInProcessTick := FInProcessTick - P.DurationTick;
         End;
       iPos := Pos('.', FMethodName);
-      slProfileFile.Add(Format('%d,%s,%s,%1.1f,%1.1f,%d', [
+      slProfileFile.Add(Format('%d,%s,%s,%1.4f,%1.4f,%d', [
         FStackDepth,
         Copy(FMethodName, 1, iPos - 1),
         Copy(FMethodName, iPos + 1, Length(FMethodName) - iPos),

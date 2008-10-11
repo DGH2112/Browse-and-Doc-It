@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    10 Sep 2008
+  @Date    11 Oct 2008
 
 **)
 Unit DGHLibrary;
@@ -118,16 +118,8 @@ Type
     dblStChainage : Double;
   End;
 
-  (** This record defines a vertical straight element of an alignment. **)
-  TVStraight = Record
-    dblLevel    : Double;
-    dblGradient : Double;
-    dblChainage : Double;
-    dblLength   : Double;
-  End;
-
-  (** This record defines a circular straight element of an alignment. **)
-  TVCircular = Record
+  (** This record defines a vertical element of an alignment. **)
+  TVElement = Record
     dblLevel    : Double;
     dblGradient : Double;
     dblChainage : Double;
@@ -160,118 +152,293 @@ Type
   (** This class is the base class in the heiracrhy for the horizontal
       alignments classes. **)
   THBaseElement = Class
-  Private
+  Strict Private
     FEasting  : Double;
     FNorthing : Double;
     FBearing  : Double;
     FChainage : Double;
     FLength   : Double;
-  Protected
-    Function ElementType : TElementType; Virtual; Abstract;
+  Strict Protected
+    Function GetElementType : TElementType; Virtual; Abstract;
     Function GetStartPoint : THInfo; Virtual;
     Function GetEndPoint : THInfo; Virtual;
     Function GetStartChainage : Double; Virtual;
     Function GetEndChainage : Double; Virtual;
     Function GetRadius(dblChainage : Double) : Double; Virtual; Abstract;
+    Function GetElementDetails : THElement; Virtual; Abstract;
+  Public
+    Constructor Create(dblEasting, dblNorthing, dblBearing, dblChainage,
+      dblLength : Double); Virtual;
     Function Setout(dblChainage, dblOffset : Double) : THInfo; Virtual; Abstract;
     Function Measure(dblEasting, dblNorthing : Double) : THInfo; Virtual; Abstract;
     Function Compare(dblEasting, dblNorthing, dblBearing : Double) : THCompInfo;
       Virtual; Abstract;
+    (**
+      This property returns the Eastings value.
+      @precon  None.
+      @postcon Returns the Eastings value.
+      @return  a Double
+    **)
+    Property Easting  : Double Read FEasting;
+    (**
+      This property returns the northing value.
+      @precon  None.
+      @postcon Returns the northings value.
+      @return  a Double
+    **)
+    Property Northing : Double Read FNorthing;
+    (**
+      This property returns the bearing value.
+      @precon  None.
+      @postcon Returns the bearing value.
+      @return  a Double
+    **)
+    Property Bearing  : Double Read FBearing;
+    (**
+      This property returns the chainage value.
+      @precon  None.
+      @postcon Returns the chainage value.
+      @return  a Double
+    **)
+    Property Chainage : Double Read FChainage;
+    (**
+      This property returns the length of the element.
+      @precon  None.
+      @postcon Returns the length of the element.
+      @return  a Double
+    **)
+    Property Length   : Double Read FLength;
+    (**
+      This property returns the type of the element.
+      @precon  None.
+      @postcon Returns the type of the element.
+      @return  a TElementType
+    **)
+    Property ElementType : TElementType Read GetElementType;
+    (**
+      This property returns the start point of the element.
+      @precon  None.
+      @postcon Returns the start point of the element.
+      @return  a THInfo
+    **)
+    Property StartPoint : THInfo Read GetStartPoint;
+    (**
+      This property returns the end point of the element.
+      @precon  None.
+      @postcon Returns the end point of the element.
+      @return  a THInfo
+    **)
+    Property EndPoint : THInfo Read GetEndPoint;
+    (**
+      This property return the start chainage of the element.
+      @precon  None.
+      @postcon Return the start chainage of the element.
+      @return  a Double
+    **)
+    Property StartChainage : Double Read GetStartChainage;
+    (**
+      This property returns the end chainage of the element.
+      @precon  None.
+      @postcon Returns the end chainage of the element.
+      @return  a Double
+    **)
+    Property EndChainage : Double Read GetEndChainage;
+    (**
+      This property returns the radius of the element.
+      @precon  None.
+      @postcon Returns the radius of the element.
+      @param   dblChainage as       a Double
+      @return  a Double
+    **)
+    Property Radius[dblChainage : Double] : Double Read GetRadius;
+    (**
+      This property returns the elements details as a recorOrd.
+      @precon  None.
+      @postcon Returns the elements details as a recorOrd.
+      @return  a THElement
+    **)
+    Property ElementDetails : THElement Read GetElementDetails;
   End;
 
   (** This class defined a Straight Horizontal alignment element. **)
   THStraightElement = Class(THBaseElement)
-  Protected
-    Function ElementType : TElementType; Override;
+  Strict Protected
+    Function GetElementType : TElementType; Override;
     Function GetRadius(dblChainage : Double) : Double; Override;
+    Function GetElementDetails : THElement; Override;
+  Public
+    Constructor Create(dblEasting, dblNorthing, dblBearing, dblChainage,
+      dblLength : Double); Reintroduce; Overload; Virtual;
     Function Setout(dblChainage, dblOffset : Double) : THInfo; Override;
     Function Measure(dblEasting, dblNorthing : Double) : THInfo; Override;
     Function Compare(dblEasting, dblNorthing, dblBearing : Double) : THCompInfo;
       Override;
-    Function GetElementDetails : THElement; Virtual;
-    Constructor Create(dblEasting, dblNorthing, dblBearing, dblChainage,
-      dblLength : Double); Virtual;
   End;
 
   (** This class defined a Circular Horizontal alignment element. **)
   THCircularElement = Class(THBaseElement)
-  Private
+  Strict Private
     FRadius : Double;
-  Protected
-    Function ElementType : TElementType; Override;
+  Strict Protected
+    Function GetElementType : TElementType; Override;
     Function GetRadius(dblChainage : Double) : Double; Override;
+    Function GetElementDetails : THElement; Override;
+  Public
+    Constructor Create(dblEasting, dblNorthing, dblChainage, dblBearing,
+      dblLength, dblRadius : Double; bCentre : Boolean); ReIntroduce; Overload;
+      Virtual;
     Function Setout(dblChainage, dblOffset : Double) : THInfo; Override;
     Function Measure(dblEasting, dblNorthing : Double) : THInfo; Override;
     Function Compare(dblEasting, dblNorthing, dblBearing : Double) : THCompInfo;
       Override;
-    Function GetElementDetails : THElement; Virtual;
-    Constructor Create(dblEasting, dblNorthing, dblChainage, dblBearing,
-      dblLength, dblRadius : Double; bCentre : Boolean); Virtual;
   End;
 
   (** This class defined a Clothoid Horizontal alignment element. **)
   THClothoidElement = Class(THBaseElement)
-  Private
+  Strict Private
     FOChainage : Double;
     FRLValue : Double;
-  Protected
+  Strict Protected
     Function GetX(dblDistance : Double) : Double; Virtual;
     Function GetY(dblDistance : Double) : Double; Virtual;
     Function GetTheta(dblDistance : Double) : Double; Virtual;
-    Function ElementType : TElementType; Override;
+    Function GetElementType : TElementType; Override;
+    Function GetRadius(dblChainage : Double) : Double; Override;
+    Function GetElementDetails : THElement; Override;
+  Public
+    Constructor Create(dblEasting, dblNorthing, dblChainage, dblBearing,
+      dblLength, dblStChainageOrRadius, dblRLValueOrEndRadius : Double;
+      boolFalse : Boolean); Reintroduce; Overload; Virtual;
     Function Setout(dblChainage, dblOffset : Double) : THInfo; Override;
     Function Measure(dblEasting, dblNorthing : Double) : THInfo; Override;
     Function Compare(dblEasting, dblNorthing, dblBearing : Double) : THCompInfo;
       Override;
-    Function GetRadius(dblChainage : Double) : Double; Override;
-    Function GetElementDetails : THElement; Virtual;
-    Constructor Create(dblEasting, dblNorthing, dblChainage, dblBearing,
-      dblLength, dblStChainageOrRadius, dblRLValueOrEndRadius : Double;
-      boolFalse : Boolean); Virtual;
   End;
 
   (** This class is the base class in the heiracrhy for the vertical
       alignments classes. **)
   TVBaseElement = Class
-  Private
+  Strict Private
     FLevel    : Double;
     FGradient : Double;
     FChainage : Double;
     FLength   : Double;
-  Protected
-    Function ElementType : TElementType; Virtual; Abstract;
+  Strict Protected
+    Function GetElementType : TElementType; Virtual; Abstract;
     Function GetStartPoint : TVInfo; Virtual;
     Function GetEndPoint : TVInfo; Virtual;
     Function GetStartChainage : Double; Virtual;
     Function GetEndChainage : Double; Virtual;
     Function GetRadius(dblChainage : Double) : Double; Virtual; Abstract;
-    Function Setout(dblChainage : Double) : TVInfo; Virtual;
-      Abstract;
+    Function GetElementDetails : TVElement; Virtual; Abstract;
+  Public
+    Constructor Create(dblLevel, dblGradient, dblChainage, dblLength : Double);
+      Virtual;
+    Function Setout(dblChainage : Double) : TVInfo; Virtual; Abstract;
+    (**
+      This property returns the starting level of the element.
+      @precon  None.
+      @postcon Returns the starting level of the element.
+      @return  a Double
+    **)
+    Property Level : Double Read FLevel;
+    (**
+      This property returns the starting gradient of the element.
+      @precon  None.
+      @postcon Returns the starting gradient of the element.
+      @return  a Double
+    **)
+    Property Gradient : Double Read FGradient;
+    (**
+      This property returns the starting chainage of the element.
+      @precon  None.
+      @postcon Returns the starting chainage of the element.
+      @return  a Double
+    **)
+    Property Chainage : Double Read FChainage;
+    (**
+      This property returns the length of the element.
+      @precon  None.
+      @postcon Returns the length of the element.
+      @return  a Double
+    **)
+    Property Length : Double Read FLength;
+    (**
+      This property returns the elements type.
+      @precon  None.
+      @postcon Returns the elements type.
+      @return  a TElementType
+    **)
+    Property ElementType : TElementType Read GetElementType;
+    (**
+      This property returns the start point of the element.
+      @precon  None.
+      @postcon Returns the start point of the element.
+      @return  a TVInfo
+    **)
+    Property StartPoint : TVInfo Read GetStartPoint;
+    (**
+      This property returns the end point of the element.
+      @precon  None.
+      @postcon Returns the end point of the element.
+      @return  a TVInfo
+    **)
+    Property EndPoint : TVInfo Read GetEndPoint;
+    (**
+      This property returns the start chainage of the element.
+      @precon  None.
+      @postcon Returns the start chainage of the element.
+      @return  a Double
+    **)
+    Property StartChainage : Double Read GetStartChainage;
+    (**
+      This property returns the end chaninage of the element.
+      @precon  None.
+      @postcon Returns the end chaninage of the element.
+      @return  a Double
+    **)
+    Property EndChainage : Double Read GetEndChainage;
+    (**
+      This property returns the radius of the element at a point.
+      @precon  None.
+      @postcon Returns the radius of the element at a point.
+      @param   dblChainage as       a Double
+      @return  a Double
+    **)
+    Property Radius[dblChainage : Double] : Double Read GetRadius;
+    (**
+      This property returns the elements details.
+      @precon  None.
+      @postcon Returns the elements details.
+      @return  a TVElement
+    **)
+    Property ElementDetails : TVElement Read GetElementDetails;
   End;
 
   (** This class defined a Straight Vertical element of an alignment. **)
   TVStraightElement = Class(TVBaseElement)
-  Private
-  Protected
-    Constructor Create(dblLevel, dblGradient, dblChainage, dblLength : Double);
-      Virtual;
-    Function ElementType : TElementType; Override;
+  Strict Protected
+    Function GetElementType : TElementType; Override;
     Function GetRadius(dblChainage : Double) : Double; Override;
+    Function GetElementDetails : TVElement; Override;
+  Public
+    Constructor Create(dblLevel, dblGradient, dblChainage, dblLength : Double);
+      Reintroduce; Overload;
     Function Setout(dblChainage : Double) : TVInfo; Override;
-    Function GetElementDetails : TVStraight;
   End;
 
   (** This class defined a Circular Vertical element of an alignment. **)
   TVCircularElement = Class(TVBaseElement)
-  Private
+  Strict Private
     FRadius : Double;
-  Protected
-    Constructor Create(dblLevel, dblGradient, dblChainage, dblLength,
-      dblRadius : Double); Virtual;
-    Function ElementType : TElementType; Override;
+  Strict Protected
+    Function GetElementType : TElementType; Override;
     Function GetRadius(dblChainage : Double) : Double; Override;
+    Function GetElementDetails : TVElement; Override;
+  Public
+    Constructor Create(dblLevel, dblGradient, dblChainage, dblLength,
+      dblRadius : Double); Reintroduce; Overload;
     Function Setout(dblChainage : Double) : TVInfo; Override;
-    Function GetElementDetails : TVCircular;
   End;
 
   (** Forward declaration of the class type THElements **)
@@ -282,7 +449,7 @@ Type
 
   (** This class represents a collection of horizontal alignment elements. **)
   THAlignmentCollection = Class
-  Private
+  Strict Private
     FHElements : THElements;
     FOnChange : TNotifyEvent;
     FCoordinateError: Double;
@@ -363,7 +530,7 @@ Type
 
   (** This class represents a collection of vertical alignment elements. **)
   TVAlignmentCollection = Class
-  Private
+  Strict Private
     FVElements : TVElements;
     FModified: Boolean;
     FOnChange: TNotifyEvent;
@@ -392,8 +559,8 @@ Type
       dblChainage, dblLength : Double); Virtual;
     Procedure UpdateCircular(iElement : Integer; dblLevel, dblGradient,
       dblChainage, dblLength, dblRadius : Double); Virtual;
-    Function GetStraight(iElement : Integer) : TVStraight; Virtual;
-    Function GetCircular(iElement : Integer) : TVCircular; Virtual;
+    Function GetStraight(iElement : Integer) : TVElement; Virtual;
+    Function GetCircular(iElement : Integer) : TVElement; Virtual;
     Function StartChainage : Double;
     Function EndChainage : Double;
     Procedure Clear;
@@ -432,7 +599,7 @@ Type
   (** This class represents a collection of both horizontal and vertical
       alignment elements. **)
   TStringAlignment = Class
-  Private
+  Strict Private
     FHAlignment : THAlignmentCollection;
     FVAlignment : TVAlignmentCollection;
   Public
@@ -529,6 +696,9 @@ Type
     strFileName : String; strCommands : Array Of String;
     ExceptionProc : TExceptionProcedure) : Boolean;
   Function Like(strPattern, strText : String) : Boolean;
+  Function CalcColour(dblValue, dblLowCriteria, dblMiddleCriteria,
+    dblUpperCriteria : Double; iLowColour, iMiddleColour,
+    iHighColour : TColor) : TColor;
 
 { -------------------------------------------------------------------------
 
@@ -2051,6 +2221,31 @@ End;
 
 (**
 
+  This is a constructor for the THBaseElement class.
+
+  @precon  None.
+  @postcon Initialises the base element information. 
+
+  @param   dblEasting  as a Double
+  @param   dblNorthing as a Double
+  @param   dblBearing  as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+
+**)
+Constructor THBaseElement.Create(dblEasting, dblNorthing, dblBearing,
+  dblChainage, dblLength : Double);
+
+Begin
+  FEasting  := dblEasting;
+  FNorthing := dblNorthing;
+  FBearing  := dblBearing;
+  FChainage := dblChainage;
+  FLength   := dblLength;
+End;
+
+(**
+
   This is a getter method for the EndChainage property.
 
   @precon  None.
@@ -2140,14 +2335,14 @@ Var
   rec : THInfo;
 
 begin
-  B := GetVector(FEasting, FNorthing, dblEasting, dblNorthing);
+  B := GetVector(Easting, Northing, dblEasting, dblNorthing);
   B.dblBearing := AdjustBearing(B.dblBearing);
-  Result.dblChainage := FChainage +
+  Result.dblChainage := Chainage +
     Sin(DegToRad(dblBearing) - (DegToRad(B.dblBearing) + PI)) /
-    Sin(DegToRad(FBearing) - DegToRad(dblBearing)) * B.dblDistance;
-  Result.dblDistance := Sin(DegToRad(B.dblBearing) - DegToRad(FBearing)) /
-    Sin(DegToRad(FBearing) - DegToRad(dblBearing)) * B.dblDistance;
-  Result.dblBearing := FBearing;
+    Sin(DegToRad(Bearing) - DegToRad(dblBearing)) * B.dblDistance;
+  Result.dblDistance := Sin(DegToRad(B.dblBearing) - DegToRad(Bearing)) /
+    Sin(DegToRad(Bearing) - DegToRad(dblBearing)) * B.dblDistance;
+  Result.dblBearing := Bearing;
   rec := Setout(Result.dblChainage, 0);
   Result.dblEasting := rec.dblEasting;
   Result.dblNorthing := rec.dblNorthing;
@@ -2171,13 +2366,8 @@ constructor THStraightElement.Create(dblEasting, dblNorthing, dblBearing,
   dblChainage, dblLength: Double);
 
 begin
-  Inherited Create();
-  FEasting  := dblEasting;
-  FNorthing := dblNorthing;
-  FBearing  := dblBearing;
-  FChainage := dblChainage;
-  FLength   := dblLength;
-  If FLength <= 0 Then
+  Inherited Create(dblEasting, dblNorthing, dblBearing, dblChainage, dblLength);
+  If Length <= 0 Then
     Raise ELengthZeroOrNegativeException.Create(
       'The length of an element can not be Zero or Negative.');
 end;
@@ -2192,7 +2382,7 @@ end;
   @return  a TElementType
 
 **)
-function THStraightElement.ElementType: TElementType;
+function THStraightElement.GetElementType: TElementType;
 
 begin
   Result := etStraight;
@@ -2214,11 +2404,11 @@ function THStraightElement.GetElementDetails: THElement;
 begin
   With Result Do
     Begin
-      dblEasting := FEasting;
-      dblNorthing := FNorthing;
-      dblBearing := FBearing;
-      dblChainage := FChainage;
-      dblLength := FLength;
+      dblEasting := Easting;
+      dblNorthing := Northing;
+      dblBearing := Bearing;
+      dblChainage := Chainage;
+      dblLength := Length;
     End;
 end;
 
@@ -2258,12 +2448,12 @@ Var
   Vector : TVector;
 
 begin
-  Vector := GetVector(FEasting, FNorthing, dblEasting, dblNorthing);
-  Result.dblChainage := FChainage + Vector.dblDistance *
-    Cos(DegToRad(FBearing - Vector.dblBearing));
+  Vector := GetVector(Easting, Northing, dblEasting, dblNorthing);
+  Result.dblChainage := Chainage + Vector.dblDistance *
+    Cos(DegToRad(Bearing - Vector.dblBearing));
   Result.dblOffset := Vector.dblDistance *
-    Sin(DegToRad(Vector.dblBearing - FBearing));
-  Result.dblBearing := FBearing;
+    Sin(DegToRad(Vector.dblBearing - Bearing));
+  Result.dblBearing := Bearing;
 end;
 
 (**
@@ -2286,12 +2476,12 @@ Var
   Vector : TVector;
 
 begin
-  Vector := GetVector(0, FChainage, dblOffset, dblChainage);
-  Result.dblEasting := FEasting + Vector.dblDistance *
-    Sin(DegToRad(FBearing + Vector.dblBearing));
-  Result.dblNorthing := FNorthing + Vector.dblDistance *
-    Cos(DegToRad(FBearing + Vector.dblBearing));
-  Result.dblBearing := FBearing;
+  Vector := GetVector(0, Chainage, dblOffset, dblChainage);
+  Result.dblEasting := Easting + Vector.dblDistance *
+    Sin(DegToRad(Bearing + Vector.dblBearing));
+  Result.dblNorthing := Northing + Vector.dblDistance *
+    Cos(DegToRad(Bearing + Vector.dblBearing));
+  Result.dblBearing := Bearing;
 end;
 
 { -------------------------------------------------------------------------
@@ -2337,35 +2527,35 @@ Var
 begin
   If FRadius > 0 then
     Begin
-      dblT := FBearing + 270;
+      dblT := Bearing + 270;
       dblP := 90;
     End Else
     Begin
-      dblT := FBearing + 90;
+      dblT := Bearing + 90;
       dblP := 270;
     End;
-  dblS := Sqrt(Sqr(FEasting - dblEasting) + Sqr(FNorthing - dblNorthing));
+  dblS := Sqrt(Sqr(Easting - dblEasting) + Sqr(Northing - dblNorthing));
   If dblS <> 0 Then
-    dblA := ArcCos((FNorthing - dblNOrthing) / dblS)
+    dblA := ArcCos((Northing - dblNorthing) / dblS)
   Else
     dblA := 0;
-  If (FEasting - dblEasting) < 0 Then
+  If (Easting - dblEasting) < 0 Then
     dblA := PI * 2 - dblA;
   dblK := 1;
   dblQ := ArcSin(dblS * Sin(dblA - DegToRad(dblBearing)) / (Abs(FRadius)));
   dblE := DegToRad(dblBearing) - dblQ;
 
   Repeat
-    dblI := FEasting + Abs(FRadius) * Sin(dblE);
-    dblJ := FNorthing + Abs(FRadius) * Cos(dblE);
+    dblI := Easting + Abs(FRadius) * Sin(dblE);
+    dblJ := Northing + Abs(FRadius) * Cos(dblE);
     { If Dist is close to Radius this become invalid }
     If Abs(Abs(FRadius) - dblS) > 0.0001 Then
       dblDist := Sin(PI - (dblA - DegToRad(dblBearing)) -
         (DegToRad(dblBearing) - dblE)) * dblS / Sin(dblQ)
     Else
       dblDist := 0;;
-    dblBz := ArcCos((dblJ - FNorthing) / Abs(FRadius));
-    If (dblI - FEasting) < 0  Then
+    dblBz := ArcCos((dblJ - Northing) / Abs(FRadius));
+    If (dblI - Easting) < 0  Then
       dblBz := PI * 2 - dblBz;
     dblTz := DegToRad(dblT);
     Repeat
@@ -2379,7 +2569,7 @@ begin
     dblTb := AdjustBearing(RadToDeg(dblBz) + dblP);
     If dblCz > (2 * PI * Abs(FRadius)) Then
       dblCz := dblCz - 2 * PI * Abs(FRadius);
-    If (dblCz > 0) And (dblCz + FChainage < GetEndChainage) then
+    If (dblCz > 0) And (dblCz + Chainage < GetEndChainage) then
       Break;
     if dblK < 0 then
       Break;
@@ -2389,7 +2579,7 @@ begin
 
   Result.dblEasting := dblI;
   Result.dblNorthing := dblJ;
-  Result.dblChainage := FChainage + dblCz;
+  Result.dblChainage := Chainage + dblCz;
   Result.dblBearing := dblTb;
   Result.dblDistance := dblDist;
 end;
@@ -2417,32 +2607,30 @@ constructor THCircularElement.Create(dblEasting, dblNorthing, dblChainage,
 
 Var
   dblAdjust : Double;
+  dblE, dblN : Double;
 
 begin
-  Inherited Create();
-  FChainage := dblChainage;
-  FBearing  := dblBearing;
   FRadius   := dblRadius;
-  If FRadius = 0 Then
-    Raise EZeroRadiusException.Create(
-      'A horizontal Circular must have a non-zero radius.');
-  FLength := dblLength;
-  If FLength <= 0 Then
-    Raise ELengthZeroOrNegativeException.Create(
-      'The length of an element can not be Zero or Negative.');
   If bCentre Then
     Begin
-      FEasting  := dblEasting;
-      FNorthing := dblNorthing;
+      dblE  := dblEasting;
+      dblN := dblNorthing;
     End Else
     Begin
       If FRadius < 0 Then
         dblAdjust := -90
       Else
         dblAdjust := +90;
-      FEasting := dblEasting + Abs(FRadius) * Sin(DegToRad(FBearing + dblAdjust));
-      FNorthing := dblNorthing + Abs(FRadius) * Cos(DegToRad(FBearing + dblAdjust));
+      dblE := dblEasting + Abs(FRadius) * Sin(DegToRad(dblBearing + dblAdjust));
+      dblN := dblNorthing + Abs(FRadius) * Cos(DegToRad(dblBearing + dblAdjust));
     End;
+  Inherited Create(dblE, dblN, dblBearing, dblChainage, dblLength);
+  If FRadius = 0 Then
+    Raise EZeroRadiusException.Create(
+      'A horizontal Circular must have a non-zero radius.');
+  If Length <= 0 Then
+    Raise ELengthZeroOrNegativeException.Create(
+      'The length of an element can not be Zero or Negative.');
 end;
 
 (**
@@ -2455,7 +2643,7 @@ end;
   @return  a TElementType
 
 **)
-function THCircularElement.ElementType: TElementType;
+function THCircularElement.GetElementType: TElementType;
 begin
   Result := etCircular;
 end;
@@ -2474,11 +2662,11 @@ function THCircularElement.GetElementDetails: THElement;
 begin
   With Result Do
     Begin
-      dblEasting := FEasting;
-      dblNorthing := FNorthing;
-      dblBearing := FBearing;
-      dblChainage := FChainage;
-      dblLength := FLength;
+      dblEasting := Easting;
+      dblNorthing := Northing;
+      dblBearing := Bearing;
+      dblChainage := Chainage;
+      dblLength := Length;
       dblRadius := FRadius;
     End;
 end;
@@ -2519,36 +2707,36 @@ Var
   dblB : Double;
 
 begin
-  Vector := GetVector(FEasting, FNorthing, dblEasting, dblNorthing);
+  Vector := GetVector(Easting, Northing, dblEasting, dblNorthing);
   Vector.dblBearing := AdjustBearing(Vector.dblBearing); //: check calls to GetVector and see if they need AdjustBearing!
   If FRadius > 0 Then
     Begin
       dblB := Vector.dblBearing + 90;
       If dblB > 180 Then
         dblB := dblB - 360;
-      While dblB < FBearing Do
+      While dblB < Bearing Do
         dblB := dblB + 360;
-      dblZ := (dblB - FBearing) / 360 * FRadius * 2 * PI;
+      dblZ := (dblB - Bearing) / 360 * FRadius * 2 * PI;
       If dblZ > 2 * PI * Abs(FRadius) Then
         dblZ := dblZ - 2 * PI * Abs(FRadius);
       Result.dblBearing := AdjustBearing(Vector.dblBearing + 90);
       Result.dblOffset := FRadius - Vector.dblDistance;
-      Result.dblChainage := FChainage + dblZ;
+      Result.dblChainage := Chainage + dblZ;
     End Else
     Begin
       dblB := Vector.dblBearing - 90;
       If dblB < -180 Then
         dblB := dblB + 360;
-      While dblB > FBearing Do
+      While dblB > Bearing Do
         dblB := dblB - 360;
-      dblZ := (FBearing - dblB) / 360 * FRadius * 2 * PI;
+      dblZ := (Bearing - dblB) / 360 * FRadius * 2 * PI;
       If dblZ > 2 * PI * Abs(FRadius) Then
         dblZ := dblZ - 2 * PI * Abs(FRadius);
       If dblZ < -2 * PI * Abs(FRadius) Then
         dblZ := dblZ + 2 * PI * Abs(FRadius);
       Result.dblBearing := AdjustBearing(Vector.dblBearing - 90);
       Result.dblOffset := Vector.dblDistance - Abs(FRadius);
-      Result.dblChainage := FChainage - dblZ;
+      Result.dblChainage := Chainage - dblZ;
     End;
 end;
 
@@ -2573,18 +2761,18 @@ Var
   dblR : Double;
 
 begin
-  dblB := (dblChainage - FChainage) / (2 * PI * FRadius) * 360;
-  Result.dblBearing := AdjustBearing(FBearing + dblB);
+  dblB := (dblChainage - Chainage) / (2 * PI * FRadius) * 360;
+  Result.dblBearing := AdjustBearing(Bearing + dblB);
   If FRadius > 0.0 Then
     Begin
       dblR := FRadius - dblOffset;
-      Result.dblEasting := FEasting + dblR * Sin(DegToRad(FBearing + dblB - 90));
-      Result.dblNorthing := FNorthing + dblR * Cos(DegToRad(FBearing + dblB - 90));
+      Result.dblEasting := Easting + dblR * Sin(DegToRad(Bearing + dblB - 90));
+      Result.dblNorthing := Northing + dblR * Cos(DegToRad(Bearing + dblB - 90));
     End Else
     Begin
       dblR := Abs(FRadius) + dblOffset;
-      Result.dblEasting := FEasting + dblR * Sin(DegToRad(FBearing + dblB + 90));
-      Result.dblNorthing := FNorthing + dblR * Cos(DegToRad(FBearing + dblB + 90));
+      Result.dblEasting := Easting + dblR * Sin(DegToRad(Bearing + dblB + 90));
+      Result.dblNorthing := Northing + dblR * Cos(DegToRad(Bearing + dblB + 90));
     End;
 end;
 
@@ -2630,17 +2818,17 @@ Var
 
 begin
   iCount := 0;
-  dblSS := Sqrt(Sqr(dblEasting - FEasting) + Sqr(dblNorthing - FNorthing));
+  dblSS := Sqrt(Sqr(dblEasting - Easting) + Sqr(dblNorthing - Northing));
   If dblSS <> 0 Then
-    dblBS := Arccos((dblNorthing - FNorthing) / dblSS)
+    dblBS := Arccos((dblNorthing - Northing) / dblSS)
   Else
     dblBS := 0;
-  If dblEasting - FEasting < 0 Then
+  If dblEasting - Easting < 0 Then
     dblBS := PI * 2 - dblBS;
-  dblEO := dblSS * Sin(dblBS - DegToRad(FBearing));
-  dblNO := dblSS * Cos(dblBS - DegToRad(FBearing));
-  dblM := Tan(PI/2 - (DegToRad(dblBearing) - DegToRad(FBearing)));
-  dblAA := dblNO - Tan(PI/2 - (DegToRad(dblBearing) - DegToRad(FBearing))) * dblEO;
+  dblEO := dblSS * Sin(dblBS - DegToRad(Bearing));
+  dblNO := dblSS * Cos(dblBS - DegToRad(Bearing));
+  dblM := Tan(PI/2 - (DegToRad(dblBearing) - DegToRad(Bearing)));
+  dblAA := dblNO - Tan(PI/2 - (DegToRad(dblBearing) - DegToRad(Bearing))) * dblEO;
   //If FRLValue < 0 Then
   //  dblM := dblM * -1;
   //dblK := Abs(FRLVAlue);
@@ -2715,22 +2903,24 @@ end;
 constructor THClothoidElement.Create(dblEasting, dblNorthing, dblChainage,
   dblBearing, dblLength, dblStChainageOrRadius, dblRLValueOrEndRadius: Double;
   boolFalse : Boolean);
+
 var
   dblX: Double;
   dblY: Double;
   dblTheta: Double;
   dblZ: Double;
+  dblE, dblN, dblC, dblB, dblL : Double;
+
 begin
-  Inherited Create();
   If Not boolFalse Then
     Begin
-      FEasting        := dblEasting;
-      FNorthing       := dblNorthing;
-      FOChainage      := dblChainage;
-      FBearing        := dblBearing;
-      FLength         := dblLength;
-      FChainage       := dblStChainageOrRadius;
-      If FLength <= 0 Then
+      dblE       := dblEasting;
+      dblN       := dblNorthing;
+      FOChainage := dblChainage;
+      dblB       := dblBearing;
+      dblL       := dblLength;
+      dblC       := dblStChainageOrRadius;
+      If dblL <= 0 Then
         Raise ELengthZeroOrNegativeException.Create(
           'The length of an element can not be Zero or Negative.');
       FRLValue        := dblRLValueOrEndRadius;
@@ -2739,8 +2929,8 @@ begin
           'A horizontal clothoid must have a non-zero RL value.');
     End Else
     Begin
-      FLength := dblLength;
-      If FLength <= 0 Then
+      dblL := dblLength;
+      If dblL <= 0 Then
         Raise ELengthZeroOrNegativeException.Create(
           'The length of an element can not be Zero or Negative.');
       If dblStChainageOrRadius + dblRLValueOrEndRadius = 0 Then
@@ -2751,13 +2941,13 @@ begin
           (*
             This means the starting point if is the origin.
           *)
-          FEasting        := dblEasting;
-          FNorthing       := dblNorthing;
-          FOChainage      := dblChainage;
-          FChainage       := dblChainage;
-          FBearing        := dblBearing;
-          FLength         := dblLength;
-          If FLength <= 0 Then
+          dblE       := dblEasting;
+          dblN       := dblNorthing;
+          FOChainage := dblChainage;
+          dblC       := dblChainage;
+          dblB       := dblBearing;
+          dblL       := dblLength;
+          If dblL <= 0 Then
             Raise ELengthZeroOrNegativeException.Create(
               'The length of an element can not be Zero or Negative.');
           FRLValue        := dblLength * dblRLValueOrEndRadius;
@@ -2770,10 +2960,10 @@ begin
           (*
             This means the end point is the origina and needs calcuating.
           *)
-          FChainage       := dblChainage;
-          FLength         := dblLength;
-          FOChainage      := dblChainage + dblLength;
-          If FLength <= 0 Then
+          dblC       := dblChainage;
+          dblL       := dblLength;
+          FOChainage := dblChainage + dblLength;
+          If dblL <= 0 Then
             Raise ELengthZeroOrNegativeException.Create(
               'The length of an element can not be Zero or Negative.');
           FRLValue        := dblLength * dblStChainageOrRadius;
@@ -2783,28 +2973,25 @@ begin
           dblX := GetX(-dblLength);
           dblY := GetY(-dblLength);
           dblTheta := GetTheta(-dblLength);
-          FBearing := AdjustBearing(dblBearing - RadToDeg(dblTheta));
-          FEasting := dblEasting - dblX * Sin(DegToRad(FBearing + 90)) -
-            dblY * Sin(DegToRad(FBearing));
-          FNorthing := dblNorthing - dblX * Cos(DegToRad(FBearing + 90)) -
-            dblY * Cos(DegToRad(FBearing));
+          dblB := AdjustBearing(dblBearing - RadToDeg(dblTheta));
+          dblE := dblEasting - dblX * Sin(DegToRad(dblB + 90)) - dblY * Sin(DegToRad(dblB));
+          dblN := dblNorthing - dblX * Cos(DegToRad(dblB + 90)) - dblY * Cos(DegToRad(dblB));
         End Else
         Begin
-          dblZ := FLength * dblRLValueOrEndRadius / (dblStChainageOrRadius -
+          dblZ := dblL * dblRLValueOrEndRadius / (dblStChainageOrRadius -
             dblRLValueOrEndRadius);
           FRLValue := Abs(dblZ) * dblStChainageOrRadius;
-          FChainage := dblChainage;
+          dblC := dblChainage;
           FOChainage := dblChainage - dblZ;
           dblX := GetX(dblZ);
           dblY := GetY(dblZ);
           dblTheta := GetTheta(dblZ);
-          FBearing := AdjustBearing(dblBearing - RadToDeg(dblTheta));
-          FEasting := dblEasting - dblY * Sin(DegToRad(FBearing)) -
-            dblX * Sin(DegToRad(FBearing + 90));
-          FNorthing := dblNorthing - dblY * Cos(DegToRad(FBearing)) -
-            dblX * Cos(DegToRad(FBearing + 90));
+          dblB := AdjustBearing(dblBearing - RadToDeg(dblTheta));
+          dblE := dblEasting - dblY * Sin(DegToRad(dblB)) - dblX * Sin(DegToRad(dblB + 90));
+          dblN := dblNorthing - dblY * Cos(DegToRad(dblB)) - dblX * Cos(DegToRad(dblB + 90));
         End;
     End;
+  Inherited Create(dblE, dblN, dblB, dblC, dblL);
 end;
 
 (**
@@ -2817,7 +3004,7 @@ end;
   @return  a TElementType
 
 **)
-function THClothoidElement.ElementType: TElementType;
+function THClothoidElement.GetElementType: TElementType;
 begin
   Result := etClothoid;
 end;
@@ -2836,13 +3023,13 @@ function THClothoidElement.GetElementDetails: THElement;
 begin
   With Result Do
     Begin
-      dblEasting := FEasting;
-      dblNorthing := FNorthing;
-      dblBearing := FBearing;
+      dblEasting := Easting;
+      dblNorthing := Northing;
+      dblBearing := Bearing;
       dblChainage := FOChainage;
-      dblLength := FLength;
+      dblLength := Length;
       dblRLValue := FRLValue;
-      dblStChainage := FChainage;
+      dblStChainage := Chainage;
     End;
 end;
 
@@ -2999,14 +3186,14 @@ Var
   dblOBearing : Double;
 
 begin
-  dblOBearing := DegToRad(FBearing);
+  dblOBearing := DegToRad(Bearing);
   dblX := GetX(dblChainage - FOChainage);
   dblY := GetY(dblChainage - FOChainage);
   dblTheta := GetTheta(dblChainage - FOChainage);
-  Result.dblEasting := FEasting + dblY * Sin(dblOBearing) +
+  Result.dblEasting := Easting + dblY * Sin(dblOBearing) +
     dblX * Sin(dblOBearing + PI / 2) +
     dblOffset * Sin(dblOBearing + PI / 2 + dblTheta);
-  Result.dblNorthing := FNorthing + dblY * Cos(dblOBearing) +
+  Result.dblNorthing := Northing + dblY * Cos(dblOBearing) +
     dblX * Cos(dblOBearing + PI / 2) +
     dblOffset * Cos(dblOBearing + PI / 2 + dblTheta);
   Result.dblBearing := AdjustBearing(RadToDeg(dblTheta + dblOBearing));
@@ -3017,6 +3204,29 @@ end;
    TVBaseElement Class Methods
 
  -------------------------------------------------------------------------- }
+
+(**
+
+  This is a constructor for the TVBaseElement class.
+
+  @precon  None.
+  @postcon Initialises the base element information.
+
+  @param   dblLevel    as a Double
+  @param   dblGradient as a Double
+  @param   dblChainage as a Double
+  @param   dblLength   as a Double
+
+**)
+Constructor TVBaseElement.Create(dblLevel, dblGradient, dblChainage,
+  dblLength : Double);
+
+Begin
+  FLevel := dblLevel;
+  FGradient := dblGradient;
+  FChainage := dblChainage;
+  FLength := dblLength;
+End;
 
 (**
 
@@ -3100,12 +3310,8 @@ end;
 constructor TVStraightElement.Create(dblLevel, dblGradient, dblChainage,
   dblLength: Double);
 begin
-  Inherited Create;
-  FLevel    := dblLevel;
-  FGradient := dblGradient;
-  FChainage := dblChainage;
-  FLength   := dblLength;
-  If FLength <= 0 Then
+  Inherited Create(dblLevel, dblGradient, dblChainage, dblLength);
+  If Length <= 0 Then
     Raise ELengthZeroOrNegativeException.Create(
       'The length of an element can not be Zero or Negative.');
 end;
@@ -3120,29 +3326,29 @@ end;
   @return  a TElementType
 
 **)
-function TVStraightElement.ElementType: TElementType;
+function TVStraightElement.GetElementType: TElementType;
 begin
   Result := etStraight;
 end;
 
 (**
 
-  This is a getter method for the ElementDetails property.
+  This is a getter method for the ElementDetails property. 
 
-  @precon  None.
-  @postcon Returns the elements details.
+  @precon  None. 
+  @postcon Returns the elements details. 
 
-  @return  a TVStraight
+  @return  a TVElement
 
 **)
-function TVStraightElement.GetElementDetails: TVStraight;
+function TVStraightElement.GetElementDetails: TVElement;
 begin
   With Result Do
     Begin
-      dblLevel    := FLevel;
-      dblGradient := FGradient;
-      dblChainage := FChainage;
-      dblLength   := FLEngth;
+      dblLevel    := Level;
+      dblGradient := Gradient;
+      dblChainage := Chainage;
+      dblLength   := Length;
     End;
 end;
 
@@ -3175,8 +3381,8 @@ end;
 **)
 function TVStraightElement.Setout(dblChainage: Double): TVInfo;
 begin
-  Result.dblLevel := FLevel + FGradient * (dblChainage - FChainage);
-  Result.dblGradient := FGradient;
+  Result.dblLevel := Level + Gradient * (dblChainage - Chainage);
+  Result.dblGradient := Gradient;
 end;
 
 { -------------------------------------------------------------------------
@@ -3203,12 +3409,8 @@ end;
 constructor TVCircularElement.Create(dblLevel, dblGradient, dblChainage,
   dblLength, dblRadius: Double);
 begin
-  Inherited Create;
-  FLevel    := dblLevel;
-  FGradient := dblGradient;
-  FChainage := dblChainage;
-  FLength   := dblLength;
-  If FLength <= 0 Then
+  Inherited Create(dblLevel, dblGradient, dblChainage, dblLength);
+  If Length <= 0 Then
     Raise ELengthZeroOrNegativeException.Create(
       'The length of an element can not be Zero or Negative.');
   FRadius   := dblRadius;
@@ -3227,29 +3429,29 @@ end;
   @return  a TElementType
 
 **)
-function TVCircularElement.ElementType: TElementType;
+function TVCircularElement.GetElementType: TElementType;
 begin
   Result := etCircular;
 end;
 
 (**
 
-  This is a getter method for the ElementDetails property.
+  This is a getter method for the ElementDetails property. 
 
-  @precon  None.
-  @postcon Returns the details of the elements construction.
+  @precon  None. 
+  @postcon Returns the details of the elements construction. 
 
-  @return  a TVCircular
+  @return  a TVElement
 
 **)
-function TVCircularElement.GetElementDetails: TVCircular;
+function TVCircularElement.GetElementDetails: TVElement;
 begin
   With Result Do
     Begin
-      dblLevel    := FLevel;
-      dblGradient := FGradient;
-      dblChainage := FChainage;
-      dblLength   := FLEngth;
+      dblLevel    := Level;
+      dblGradient := Gradient;
+      dblChainage := Chainage;
+      dblLength   := Length;
       dblRadius   := FRadius;
     End;
 end;
@@ -3283,9 +3485,9 @@ end;
 **)
 function TVCircularElement.Setout(dblChainage: Double): TVInfo;
 begin
-  Result.dblLevel := FLevel + FGradient * (dblChainage - FChainage) +
-    Sqr(dblChainage - FChainage) / (2 * FRadius);
-  Result.dblGradient := FGradient + (dblChainage - FChainage) / FRadius;
+  Result.dblLevel := Level + Gradient * (dblChainage - Chainage) +
+    Sqr(dblChainage - Chainage) / (2 * FRadius);
+  Result.dblGradient := Gradient + (dblChainage - Chainage) / FRadius;
 end;
 
 { -------------------------------------------------------------------------
@@ -3502,7 +3704,7 @@ end;
 function THAlignmentCollection.GetElementStart(iElement: Integer): THInfo;
 
 begin
-  Result := THBaseElement(FHElements[iElement]).GetStartPoint;
+  Result := THBaseElement(FHElements[iElement]).StartPoint;
 end;
 
 (**
@@ -3519,7 +3721,7 @@ end;
 function THAlignmentCollection.GetElementEnd(iElement: Integer): THInfo;
 
 begin
-  Result := THBaseElement(FHElements[iElement]).GetEndPoint;
+  Result := THBaseElement(FHElements[iElement]).EndPoint;
 end;
 
 (**
@@ -3536,7 +3738,7 @@ end;
 function THAlignmentCollection.GetEndChainage(iElement: Integer): Double;
 
 begin
-  Result := THBaseElement(FHElements[iElement]).GetEndChainage;
+  Result := THBaseElement(FHElements[iElement]).EndChainage;
 end;
 
 (**
@@ -3553,7 +3755,7 @@ end;
 function THAlignmentCollection.GetStartChainage(iElement: Integer): Double;
 
 begin
-  Result := THBaseElement(FHElements[iElement]).GetStartChainage;
+  Result := THBaseElement(FHElements[iElement]).StartChainage;
 end;
 
 (**
@@ -3680,7 +3882,7 @@ begin
       Case ElementType(iElement) Of
         etStraight:
           Begin
-            recElement := THStraightElement(FHElements[iElement]).GetElementDetails;
+            recElement := THStraightElement(FHElements[iElement]).ElementDetails;
             WriteItem(iElement, 'Type', Integer(ElementType(iElement)));
             WriteItem(iElement, 'Easting', recElement.dblEasting);
             WriteItem(iElement, 'Northing', recElement.dblNorthing);
@@ -3690,7 +3892,7 @@ begin
           End;
         etCircular:
           Begin
-            recElement := THCircularElement(FHElements[iElement]).GetElementDetails;
+            recElement := THCircularElement(FHElements[iElement]).ElementDetails;
             WriteItem(iElement, 'Type', Integer(ElementType(iElement)));
             WriteItem(iElement, 'Easting', recElement.dblEasting);
             WriteItem(iElement, 'Northing', recElement.dblNorthing);
@@ -3701,7 +3903,7 @@ begin
           End;
         etClothoid:
           Begin
-            recElement := THClothoidElement(FHElements[iElement]).GetElementDetails;
+            recElement := THClothoidElement(FHElements[iElement]).ElementDetails;
             WriteItem(iElement, 'Type', Integer(ElementType(iElement)));
             WriteItem(iElement, 'Easting', recElement.dblEasting);
             WriteItem(iElement, 'Northing', recElement.dblNorthing);
@@ -3732,7 +3934,7 @@ end;
 function THAlignmentCollection.GetCircular(iElement: Integer): THElement;
 
 begin
-  Result := THCircularElement(FHElements[iElement]).GetElementDetails;
+  Result := THCircularElement(FHElements[iElement]).ElementDetails;
 end;
 
 (**
@@ -3749,7 +3951,7 @@ end;
 function THAlignmentCollection.GetClothoid(iElement: Integer): THElement;
 
 begin
-  Result := THClothoidElement(FHElements[iElement]).GetElementDetails;
+  Result := THClothoidElement(FHElements[iElement]).ElementDetails;
 end;
 
 (**
@@ -3766,7 +3968,7 @@ end;
 function THAlignmentCollection.GetStraight(iElement: Integer): THElement;
 
 begin
-  Result := THStraightElement(FHElements[iElement]).GetElementDetails;
+  Result := THStraightElement(FHElements[iElement]).ElementDetails;
 end;
 
 (**
@@ -3908,7 +4110,7 @@ end;
 function THAlignmentCollection.GetRadius(iElement: Integer;
   dblChainage: Double): Double;
 begin
-  Result := THBaseElement(FHElements[iElement]).GetRadius(dblChainage);
+  Result := THBaseElement(FHElements[iElement]).Radius[dblChainage];
 end;
 
 (**
@@ -4023,7 +4225,7 @@ begin
   Result.dblBearing := 0;
   For iElement := 0 To Count - 1 Do
     Begin
-      HInfo := THBaseElement(FHElements[iElement]).GetStartPoint;
+      HInfo := THBaseElement(FHElements[iElement]).StartPoint;
       Vector := GetVector(HInfo.dblEasting, HInfo.dblNorthing, dblEasting,
         dblNorthing);
       If Cos(DegToRad(Vector.dblBearing - HInfo.dblBearing)) <= 0 Then
@@ -4038,7 +4240,7 @@ begin
         End;
     End;
   { Check last element }
-  HInfo := THBaseElement(FHElements[Count - 1]).GetEndPoint;
+  HInfo := THBaseElement(FHElements[Count - 1]).EndPoint;
   Vector := GetVector(HInfo.dblEasting, HInfo.dblNorthing, dblEasting,
     dblNorthing);
   If Cos(DegToRad(Vector.dblBearing - HInfo.dblBearing)) <= 0 Then
@@ -4133,7 +4335,7 @@ function THAlignmentCollection.EndChainage: Double;
 begin
   If Count <= 0 Then
     Raise Exception.Create('There is no horizontal alignment.');
-  Result := THBaseElement(FHElements[Count - 1]).GetEndChainage;
+  Result := THBaseElement(FHElements[Count - 1]).EndChainage;
 end;
 
 (**
@@ -4150,7 +4352,7 @@ function THAlignmentCollection.StartChainage: Double;
 begin
   If Count <= 0 Then
     Raise Exception.Create('There is no horizontal alignment.');
-  Result := THBaseElement(FHElements[0]).GetStartChainage;
+  Result := THBaseElement(FHElements[0]).StartChainage;
 end;
 
 (**
@@ -4338,23 +4540,23 @@ function TVAlignmentCollection.EndChainage: Double;
 begin
   If Count <= 0 Then
     Raise Exception.Create('There is no vertical alignment.');
-  Result := TVBaseElement(FVElements[Count - 1]).GetEndChainage;
+  Result := TVBaseElement(FVElements[Count - 1]).EndChainage;
 end;
 
 (**
 
-  This method returns the details of the indexed circular element.
+  This method returns the details of the indexed circular element. 
 
-  @precon  iElement must be a valid element index.
-  @postcon Returns the details of the indexed circular element.
+  @precon  iElement must be a valid element index. 
+  @postcon Returns the details of the indexed circular element. 
 
   @param   iElement as an Integer
-  @return  a TVCircular
+  @return  a TVElement
 
 **)
-function TVAlignmentCollection.GetCircular(iElement: Integer): TVCircular;
+function TVAlignmentCollection.GetCircular(iElement: Integer): TVElement;
 begin
-  Result := TVCircularElement(FVElements[iElement]).GetElementDetails;
+  Result := TVCircularElement(FVElements[iElement]).ElementDetails;
 end;
 
 (**
@@ -4370,7 +4572,7 @@ end;
 **)
 function TVAlignmentCollection.GetElementEnd(iElement: Integer): TVInfo;
 begin
-  Result := TVBaseElement(FVElements[iElement]).GetEndPoint;
+  Result := TVBaseElement(FVElements[iElement]).EndPoint;
 end;
 
 (**
@@ -4386,7 +4588,7 @@ end;
 **)
 function TVAlignmentCollection.GetElementStart(iElement: Integer): TVInfo;
 begin
-  Result := TVBaseElement(FVElements[iElement]).GetStartPoint;
+  Result := TVBaseElement(FVElements[iElement]).StartPoint;
 end;
 
 (**
@@ -4402,7 +4604,7 @@ end;
 **)
 function TVAlignmentCollection.GetEndChainage(iElement: Integer): Double;
 begin
-  Result := TVBaseElement(FVElements[iElement]).GetEndChainage;
+  Result := TVBaseElement(FVElements[iElement]).EndChainage;
 end;
 
 (**
@@ -4420,7 +4622,7 @@ end;
 function TVAlignmentCollection.GetRadius(iElement: Integer;
   dblChainage: Double): Double;
 begin
-  Result := TVBaseElement(FVElements[iElement]).GetRadius(dblChainage);
+  Result := TVBaseElement(FVElements[iElement]).Radius[dblChainage];
 end;
 
 (**
@@ -4436,23 +4638,24 @@ end;
 **)
 function TVAlignmentCollection.GetStartChainage(iElement: Integer): Double;
 begin
-  Result := TVBaseElement(FVElements[iElement]).GetStartChainage;
+  Result := TVBaseElement(FVElements[iElement]).StartChainage;
 end;
 
 (**
 
-  This method returns the straight element details for the given indexed element.
+  This method returns the straight element details for the given indexed 
+  element. 
 
-  @precon  iElement must be a valid element index.
-  @postcon Returns the straight element details for the given indexed element.
+  @precon  iElement must be a valid element index. 
+  @postcon Returns the straight element details for the given indexed element. 
 
   @param   iElement as an Integer
-  @return  a TVStraight
+  @return  a TVElement
 
 **)
-function TVAlignmentCollection.GetStraight(iElement: Integer): TVStraight;
+function TVAlignmentCollection.GetStraight(iElement: Integer): TVElement;
 begin
-  Result := TVStraightElement(FVElements[iElement]).GetElementDetails;
+  Result := TVStraightElement(FVElements[iElement]).ElementDetails;
 end;
 
 (**
@@ -4517,8 +4720,8 @@ procedure TVAlignmentCollection.SaveToFile(strFileName: String);
 Var
   iniFile : TIniFile;
   iElement : Integer;
-  recStraight : TVStraight;
-  recCircular : TVCircular;
+  recStraight : TVElement;
+  recCircular : TVElement;
 
   (**
 
@@ -4566,7 +4769,7 @@ begin
       Case ElementType(iElement) Of
         etStraight:
           Begin
-            recStraight := TVStraightElement(FVElements[iElement]).GetElementDetails;
+            recStraight := TVStraightElement(FVElements[iElement]).ElementDetails;
             WriteItem(iElement, 'Type', Integer(ElementType(iElement)));
             WriteItem(iElement, 'Level', recStraight.dblLevel);
             WriteItem(iElement, 'Gradient', recStraight.dblGradient);
@@ -4575,7 +4778,7 @@ begin
           End;
         etCircular:
           Begin
-            recCircular := TVCircularElement(FVElements[iElement]).GetElementDetails;
+            recCircular := TVCircularElement(FVElements[iElement]).ElementDetails;
             WriteItem(iElement, 'Type', Integer(ElementType(iElement)));
             WriteItem(iElement, 'Level', recCircular.dblLevel);
             WriteItem(iElement, 'Gradient', recCircular.dblGradient);
@@ -4680,7 +4883,7 @@ function TVAlignmentCollection.StartChainage: Double;
 begin
   If Count <= 0 Then
     Raise Exception.Create('There is no vertical alignment.');
-  Result := TVBaseElement(FVElements[0]).GetStartChainage;
+  Result := TVBaseElement(FVElements[0]).StartChainage;
 end;
 
 (**
@@ -5883,6 +6086,57 @@ Begin
   Finally
     sl.Free;
   End;
+End;
+
+(**
+
+  This method interpolates a colour for the specified percentage position 
+  within the colour and position information passed. 
+
+  @precon  None. 
+  @postcon Interpolates a colour for the specified percentage position within 
+           the colour and position information passed.. 
+
+  @param   dblValue          as a Double
+  @param   dblLowCriteria    as a Double
+  @param   dblMiddleCriteria as a Double
+  @param   dblUpperCriteria  as a Double
+  @param   iLowColour        as a TColor
+  @param   iMiddleColour     as a TColor
+  @param   iHighColour       as a TColor
+  @return  a TColor
+
+**)
+Function CalcColour(dblValue, dblLowCriteria, dblMiddleCriteria,
+  dblUpperCriteria : Double; iLowColour, iMiddleColour, iHighColour : TColor) : TColor;
+
+Var
+  iR, iG, iB : Integer;
+
+Begin
+  If dblValue <= dblLowCriteria Then
+    Result := iLowColour
+  Else If dblValue <= dblMiddleCriteria Then
+    Begin
+      iB := iMiddleColour And $FF0000 - iLowColour And $FF0000;
+      iG := iMiddleColour And $00FF00 - iLowColour And $00FF00;
+      iR := iMiddleColour And $0000FF - iLowColour And $0000FF;
+      Result :=
+        Round(iLowColour And $FF0000 + iB * (dblValue - dblLowCriteria) / (dblMiddleCriteria - dblLowCriteria)) And $FF0000 +
+        Round(iLowColour And $00FF00 + iG * (dblValue - dblLowCriteria) / (dblMiddleCriteria - dblLowCriteria)) And $00FF00 +
+        Round(iLowColour And $0000FF + iR * (dblValue - dblLowCriteria) / (dblMiddleCriteria - dblLowCriteria)) And $0000FF;
+    End Else
+  If dblValue <= dblUpperCriteria then
+    Begin
+      iB := iHighColour And $FF0000 - iMiddleColour And $FF0000;
+      iG := iHighColour And $00FF00 - iMiddleColour And $00FF00;
+      iR := iHighColour And $0000FF - iMiddleColour And $0000FF;
+      Result :=
+        Round(iMiddleColour And $FF0000 + iB * (dblValue - dblMiddleCriteria) / (dblUpperCriteria - dblMiddleCriteria)) And $FF0000 +
+        Round(iMiddleColour And $00FF00 + iG * (dblValue - dblMiddleCriteria) / (dblUpperCriteria - dblMiddleCriteria)) And $00FF00 +
+        Round(iMiddleColour And $0000FF + iR * (dblValue - dblMiddleCriteria) / (dblUpperCriteria - dblMiddleCriteria)) And $0000FF;
+    End Else
+      Result := iHighColour;
 End;
 
 (** Initialises the console more to Unknown to force a call to the Win32 API **)

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    11 Oct 2008
+  @Date    12 Oct 2008
 
 **)
 Unit DGHLibrary;
@@ -6013,7 +6013,10 @@ Begin
     Except
       On E : Exception Do
         If Assigned(ProcMsgHndr) Then
-          ProcMsgHndr.ProcessMsgHandler(E.Message, boolAbort);
+          Begin
+            ProcMsgHndr.ProcessMsgHandler(E.Message, boolAbort);
+            Inc(Result);
+          End;
     End;
 End;
 

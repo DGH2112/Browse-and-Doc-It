@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       04 Oct 2008
+  @Date       15 Oct 2008
   @Author     David Hoyle
 
 **)
@@ -823,11 +823,11 @@ Const
     identifiers and as types.
 
   **)
-  strReservedWords : Array[0..70] Of String = (
+  strReservedWords : Array[0..69] Of String = (
     'and', 'array', 'as', 'asm', 'begin', 'case', 'class', 'const',
     'constructor', 'destructor', 'dispinterface', 'div', 'do', 'downto', 'else',
     'end', 'except', 'exports', 'file', 'finalization', 'finally', 'for',
-    'function', 'goto', 'helper', 'if', 'implementation', 'in', 'inherited',
+    'function', 'goto', 'if', 'implementation', 'in', 'inherited',
     'initialization', 'inline', 'interface', 'is', 'label', 'library', 'mod',
     'nil', 'not', 'object', 'of', 'on', 'or', 'out', 'packed',
     'procedure', 'program', 'property', 'raise', 'record', 'repeat',
@@ -837,10 +837,10 @@ Const
   );
   (** A sorted list of directives. Used for identifying tokens as
   directives. **)
-  strDirectives : Array[0..45] Of String = (
+  strDirectives : Array[0..46] Of String = (
     'absolute', 'abstract', 'assembler', 'automated', 'cdecl', 'contains',
     'default', 'deprecated', 'dispid', 'dynamic', 'export', 'external', 'far',
-    'final', 'forward', 'implements', 'index', 'inline', 'library', 'local',
+    'final', 'forward', 'helper', 'implements', 'index', 'inline', 'library', 'local',
     'message', 'name', 'near', 'nodefault', 'overload', 'override', 'package',
     'pascal', 'platform', 'private', 'protected', 'public', 'published', 'read',
     'readonly', 'register', 'reintroduce', 'requires', 'resident', 'safecall',
@@ -4583,8 +4583,16 @@ Begin
             FTemporaryElements.Free;
           End;
         End Else
-          ErrorAndSeekToken(strReservedWordExpected, 'FileType', 'OF',
-            strSeekableOnErrorTokens, stActual);
+        Begin
+          UpdateTypeToken(AToken);
+          With AToken Do
+            Result := TFileType.Create(FToken.Token, FScope, FToken.Line,
+              FToken.Column, iiPublicType, FComment);
+          Result := AToken.FContainer.Add(Result) As TFileType;
+          If boolPacked Then
+            Result.AppendToken('Packed');
+          Result.AppendToken('File');
+        End;
     End;
 End;
 
@@ -4666,6 +4674,16 @@ begin
             Else
               ErrorAndSeekToken(strReservedWordExpected, 'ProcedureType', 'OBJECT',
                 strSeekableOnErrorTokens, stActual);
+          End;
+        If Token.Token = ';' Then
+          Begin
+            NextNonCommentToken;
+            If IsKeyWord(Token.Token, strMethodDirectives) Then
+              Begin
+                Result.AppendToken(Token);
+                NextNonCommentToken;
+              End Else
+                RollBackToken;
           End;
       End;
   Finally
@@ -5239,6 +5257,12 @@ Begin
       SetupSubExprType;
       Expression(C, SubExprType);
     End
+  Else If Token.Token = '@@' Then
+    Begin
+      AddToExpression(C);
+      SetupSubExprType;
+      Expression(C, SubExprType);
+    End
   Else If Token.UToken = 'NOT' Then
     Begin
       AddToExpression(C);
@@ -5423,7 +5447,7 @@ var
 
 Begin
   Result := (Token.TokenType In [ttIdentifier, ttDirective]) Or
-    (Token.UToken = 'NIL');
+    (Token.UToken = 'NIL') Or (Token.UToken = 'STRING');
   If Result Then
     Begin
       M := CurrentMethod As TPascalMethod;
@@ -5517,13 +5541,14 @@ Begin
     End
   Else If (Token.Token = '(') Then
     Begin
-      If etConstExpr In ExprType Then
-        If Not IsKeyWord(PrevToken.Token, strConstExprDesignators) Then
-          Begin
-            ErrorAndSeekToken(strConstExprDesignator, 'DesignatorSubElement',
-              PrevToken.Token, strSeekableOnErrorTokens, stActual);
-            Exit;
-          End;
+      If doStrictConstantExpressions In BrowseAndDocItOptions.Options Then
+        If etConstExpr In ExprType Then
+          If Not IsKeyWord(PrevToken.Token, strConstExprDesignators) Then
+            Begin
+              ErrorAndSeekToken(strConstExprDesignator, 'DesignatorSubElement',
+                PrevToken.Token, strSeekableOnErrorTokens, stActual);
+              Exit;
+            End;
       AddToExpression(C);
       ExprList(C);
       If Token.Token = ')' Then
@@ -8918,6 +8943,25 @@ procedure TPascalModule.FindUnresolvedObjectAndClassMethods(TypeLabel : TLabelCo
         P := P.Parent;
       End;
   End;
+  
+  (**
+
+    This method determines if the method should have an implementation.
+
+    @precon  Method must be a valid TPascalMethod instance..
+    @postcon Determines if the method should have an implementation.
+
+    @param   Method as a TPascalMethod
+    @return  a Boolean
+
+  **)
+  Function ShouldMethodHaveImplementation(Method : TPascalMethod) : Boolean;
+  
+  Begin
+    Result := Not Method.Resolved;
+    Result := Result And Not Method.HasDirective('virtual');
+    Result := Result And (Method.Alias = '');
+  End;
 
 var
   Method: TPascalMethod;
@@ -8941,7 +8985,7 @@ begin
                 If MethodsLabel.Elements[j] Is TPascalMethod Then
                   Begin
                     Method := MethodsLabel.Elements[j] As TPascalMethod;
-                    If Not Method.Resolved And Not Method.HasDirective('virtual') Then
+                    If ShouldMethodHaveImplementation(Method) Then
                       AddIssue(Format(strUnSatisfiedForwardReference,
                         [GetClassQualification(ObjectOrClass) + Method.Identifier]),
                         scNone, 'FindUnresolvedObjectAndClassMethods', Method.Line,

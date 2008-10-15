@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    04 Oct 2008
+  @Date    15 Oct 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -94,7 +94,8 @@ Type
     doShowParserErrorOrigin,
     doShowUnReferencedSymbols,
     doShowPerformanceCountersInModuleExplorer,
-    doShowPrefCountersInDocSummary
+    doShowPrefCountersInDocSummary,
+    doStrictConstantExpressions
   );
 
   (** An enumerate to associate images with different types of Elements. **)
@@ -1592,10 +1593,12 @@ ResourceString
   strShowParserErrorOrigin = 'Show the origin method of the Parser error.';
   (** Options text for showing unreferenced locals and privates. **)
   strShowUnreferencedSymbols = 'Show all unreferenced symbols.';
-  (** Options text for showing preformance counters in the documentation summary. **)
+  (** Options text for showing preformance counters in the module explorer. **)
   strShowPerfCountersInModuleExplorer = 'Show performance counters in the statusbar of the module explorer.';
   (** Options text for showing preformance counters in the documentation summary. **)
   strShowPerfCountersInDocSummary = 'Show performance counters in the documenation summary.';
+  (** Options text for strict evaluation of constant expressions. **)
+  strStrictConstantExpressions = 'Strict evaluation of constant expressions.';
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
@@ -2113,7 +2116,8 @@ Const
     (FDescription : strShowParserErrorOrigin;              FEnabled : False),
     (FDescription : strShowUnreferencedSymbols;            FEnabled : False),
     (FDescription : strShowPerfCountersInModuleExplorer;   FEnabled : False),
-    (FDescription : strShowPerfCountersInDocSummary;       FEnabled : False)
+    (FDescription : strShowPerfCountersInDocSummary;       FEnabled : False),
+    (FDescription : strStrictConstantExpressions;          FEnabled : True)
   );
 
   (** This is a default set of font information for the application. **)

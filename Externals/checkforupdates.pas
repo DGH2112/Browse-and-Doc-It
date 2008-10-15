@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    04 Oct 2008
+  @Date    15 Oct 2008
 
 **)
 Unit CheckForUpdates;
@@ -193,9 +193,12 @@ Begin
                     FMessageWarningColour);
                   {$IFDEF CONSOLE}
                   OutputMsg('', strURL);
-                  OutputMsg(strPressEnterToContinue, strURL, FMessageTextColour);
-                  SysUtils.Beep;
-                  ReadLn;
+                  If CheckConsoleMode(FConHnd) Then
+                    Begin
+                      OutputMsg(strPressEnterToContinue, strURL, FMessageTextColour);
+                      SysUtils.Beep;
+                      ReadLn;
+                    End;
                   {$ELSE}
                   SysUtils.Beep;
                   TfrmCheckForUpdates.Finish(60);

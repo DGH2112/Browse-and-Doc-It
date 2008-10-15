@@ -3841,7 +3841,7 @@ function TRegExpr.Replace (AInputStr : RegExprString;
 {=============================================================}
 
 {$IFDEF RegExpPCodeDump}
-function TRegExpr.DumpOp (op : TREOp) : RegExprString;
+function TRegExpr.DumpOp (op : REChar) : RegExprString;
 // printable representation of opcode
  begin
   case op of

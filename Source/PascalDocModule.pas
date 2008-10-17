@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       15 Oct 2008
+  @Date       17 Oct 2008
   @Author     David Hoyle
 
 **)
@@ -618,9 +618,10 @@ Type
     FConstantsLabel          : TLabelContainer;
     FResourceStringsLabel    : TLabelContainer;
     FVariablesLabel          : TLabelContainer;
-    FThreadVarsLabel          : TLabelContainer;
+    FThreadVarsLabel         : TLabelContainer;
     FExportedHeadingsLabel   : TLabelContainer;
     FImplementedMethodsLabel : TLabelContainer;
+    FExternalSyms            : TStringList;
     { Grammar Parsers }
     Procedure Goal;
     Function OPProgram : Boolean;
@@ -721,7 +722,7 @@ Type
     Procedure FormalParameter(Method : TPascalMethod);
     Procedure FormalParam(Method : TPascalMethod);
     Procedure Parameter(Method : TPascalMethod; ParamMod : TParamModifier);
-    Procedure Directive(M : TPascalMethod);
+    Procedure Directive(M : TPascalMethod; boolGrammarFix : Boolean = False);
     Function ObjectType(AToken : TTypeToken) : TObjectDecl;
     Procedure ObjHeritage(ObjDecl : TObjectDecl);
     Function MethodList(Cls : TObjectDecl; AScope : TScope) : Boolean;
@@ -1806,6 +1807,9 @@ Begin
   FThreadVarsLabel         := Nil;
   FExportedHeadingsLabel   := Nil;
   FImplementedMethodsLabel := Nil;
+  FExternalSyms := TStringList.Create;
+  FExternalSyms.Sorted := True;
+  FExternalSyms.CaseSensitive := False;
   FMethodStack := TObjectList.Create(False);
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSourceStream := Source;
@@ -1862,6 +1866,7 @@ End;
 **)
 Destructor TPascalModule.Destroy;
 begin
+  FExternalSyms.Free;
   FMethodStack.Free;
   Inherited Destroy;
 end;
@@ -3163,7 +3168,6 @@ Begin
           NextNonCommentToken;
           ExprType := [etUnknown, etConstExpr];
           ConstExpr(C, ExprType);
-          PortabilityDirective;
         End
       Else If Token.Token = ':' Then   // TypedConstant
         Begin
@@ -3178,7 +3182,6 @@ Begin
                 C.AppendToken(Token);
                 NextNonCommentToken;
                 TypedConstant(C, T);
-                PortabilityDirective;
               End Else
                 ErrorAndSeekToken(strLiteralExpected, 'ConstantDecl', '=',
                   strSeekableOnErrorTokens, stActual);
@@ -3188,6 +3191,7 @@ Begin
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'ConstantDecl', '= or :',
             strSeekableOnErrorTokens, stActual);
+      PortabilityDirective;
     End;
 End;
 
@@ -3290,6 +3294,7 @@ Begin
         Begin
           NextNonCommentToken;
           ConstExpr(C, ExprType);
+          PortabilityDirective;
           NextNonCommentToken;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'ResourceStringDecl', '=',
@@ -3593,6 +3598,17 @@ Begin
           TypedConstant(C, T)
         End Else
           RollBackToken;
+    End Else
+    Begin
+      Result := True;
+      While Token.TokenType In [ttNumber, ttStringLiteral] Do
+        Begin
+          AddToExpression(C);
+          If Token.Token = ',' Then
+            AddToExpression(C)
+          Else
+            Exit;
+        End;
     End;
 End;
 
@@ -5551,6 +5567,11 @@ Begin
             End;
       AddToExpression(C);
       ExprList(C);
+      If Token.Token = ':' Then // Handle Str(Line : value, Value)
+        Begin
+          AddToExpression(C);
+          ExprList(C);
+        End;
       If Token.Token = ')' Then
         AddToExpression(C)
       Else
@@ -5763,6 +5784,12 @@ Begin
             ErrorAndSeekToken(strLiteralExpected, 'SimpleStatement', ')',
               strSeekableOnErrorTokens, stActual);
           DesignatorSubElement(Nil, ExprType, ['.', '^']);
+        End Else
+      If Token.Token = '@' Then
+        Begin
+          NextNonCommentToken;
+          ExprType := [etUnknown];
+          Designator(Nil, ExprType);
         End Else
         Begin
           ExprType := [etUnknown];
@@ -6432,8 +6459,7 @@ Begin
           NextNonCommentToken;
           Directive(Result);
           PortabilityDirective;
-          If Not (Result.HasDirective('EXTERNAL') Or
-            Result.HasDirective('FORWARD'))Then
+          If Not Result.ForwardDecl Then
             Begin
               Block(AScope, Result);
               If Token.Token = ';' Then
@@ -6473,8 +6499,7 @@ Begin
           NextNonCommentToken;
           Directive(Result);
           PortabilityDirective;
-          If Not (Result.HasDirective('EXTERNAL') Or
-            Result.HasDirective('FORWARD'))Then
+          If Not Result.ForwardDecl Then
             Begin
               Block(AScope, Result);
               If Token.Token = ';' Then
@@ -6513,8 +6538,7 @@ Begin
         Begin
           NextNonCommentToken;
           Directive(Result);
-          If Not (Result.HasDirective('EXTERNAL') Or
-            Result.HasDirective('FORWARD'))Then
+          If Not Result.ForwardDecl Then
             Begin
               Block(AScope, Result);
               If Token.Token = ';' Then
@@ -6553,8 +6577,7 @@ Begin
         Begin
           NextNonCommentToken;
           Directive(Result);
-          If Not (Result.HasDirective('EXTERNAL') Or
-            Result.HasDirective('FORWARD'))Then
+          If Not Result.ForwardDecl Then
             Begin
               Block(AScope, Result);
               If Token.Token = ';' Then
@@ -6649,6 +6672,7 @@ Begin
       FormalParameter(Result);
       CheckAlias(Result);
       CheckReturnValue(Result);
+      Directive(Result, True);
     Finally
       AddToContainer(Container, Result);
     End;
@@ -6717,9 +6741,8 @@ Begin
             Token.Token, strSeekableOnErrorTokens, stActual);
     End Else
       If Method.Alias = '' Then
-        AddIssue(Format(strFunctionWarning,
-          [Method.QualifiedName]), scNone, 'CheckReturnValue', Token.Line,
-          Token.Column, etWarning);
+        AddIssue(Format(strFunctionWarning, [Method.QualifiedName]), scNone,
+          'FunctionHeading', Token.Line, Token.Column, etWarning);
 End;
 
 (**
@@ -6830,6 +6853,7 @@ Begin
       End;
       FormalParameter(Result);
       CheckAlias(Result);
+      Directive(Result, True);
     Finally
       AddToContainer(Container, Result);
     End;
@@ -6991,33 +7015,23 @@ End;
 
 (**
 
-  This method retrives the method directives after the method declaration from
-  the current token position using the followong object pascal grammar.
+  This method retrives the method directives after the method declaration from 
+  the current token position using the followong object pascal grammar. 
 
-  @grammar Directive -> REGISTER    ';'
-                        DYNAMIC     ';'
-                        VIRTUAL     ';'
-                        EXPORT      ';'
-                        EXTERNAL    ConstExpr [NAME ConstExpr ';' ] ';'
-                        DISPID      ConstExpr ';'
-                        FAR         ';'
-                        FORWARD     ';'
-                        MESSAGE     ConstExpr ';'
-                        OVERRIDE    ';'
-                        OVERLOAD    ';'
-                        PASCAL      ';'
-                        REINTRODUCE ';'
-                        SAFECALL    ';'
-                        STDCALL     ';'
+  @precon  M is a valid method declaration to add directives too. 
+  @postcon Retrives the method directives after the method declaration from the 
+           current token position 
 
-  @precon  M is a valid method declaration to add directives too.
-  @postcon Retrives the method directives after the method declaration from
-           the current token position
+  @grammar Directive -> REGISTER ';' DYNAMIC ';' VIRTUAL ';' EXPORT ';'
+           EXTERNAL ConstExpr [NAME ConstExpr ';' ] ';' DISPID ConstExpr ';'
+           FAR ';' FORWARD ';' MESSAGE ConstExpr ';' OVERRIDE ';' OVERLOAD
+           ';' PASCAL ';' REINTRODUCE ';' SAFECALL ';' STDCALL ';'
 
-  @param   M as a TPascalMethod
+  @param   M              as a TPascalMethod
+  @param   boolGrammarFix as a Boolean
 
 **)
-Procedure TPascalModule.Directive(M : TPascalMethod);
+Procedure TPascalModule.Directive(M : TPascalMethod; boolGrammarFix : Boolean = False);
 
 Var
   C : TElementContainer;
@@ -7044,15 +7058,19 @@ Begin
           Begin
             M.ForwardDecl := True;
             NextNonCommentToken;
-            ExprType := [etConstExpr, etString];
-            ConstExpr(C, ExprType);
-            M.AddDirectives('External ' + C.AsString);
-            If Token.UToken = 'NAME' Then
+            If Token.Token <> ';' Then
               Begin
-                NextNonCommentToken;
                 ExprType := [etConstExpr, etString];
                 ConstExpr(C, ExprType);
-                M.AddDirectives('Name ' + C.AsString);
+                M.AddDirectives('External');
+                M.AddDirectives(C.AsString);
+                If Token.UToken = 'NAME' Then
+                  Begin
+                    NextNonCommentToken;
+                    ExprType := [etConstExpr, etString];
+                    ConstExpr(C, ExprType);
+                    M.AddDirectives('Name ' + C.AsString);
+                  End;
               End;
           End
         Else If Token.UToken = 'DISPID' Then
@@ -7061,16 +7079,20 @@ Begin
             ExprType := [etConstExpr, etInteger];
             ConstExpr(C, ExprType);
             M.AddDirectives('DispID ' + C.AsString);
-          End Else
+          End
+        Else
           Begin
             M.AddDirectives(Token.Token);
             NextNonCommentToken;
           End;
-        If Token.Token = ';' Then
-          NextNonCommentToken
-        Else
-          ErrorAndSeekToken(strLiteralExpected, 'Directive', ';',
-            strSeekableOnErrorTokens, stActual);
+        If Not IsKeyWord(Token.Token, strMethodDirectives) Then
+          If Token.Token = ';' Then      // no semi-colon         |
+            Begin                        //                       v
+              If Not boolGrammarFix Then // function X() : Integer stdcall;
+                NextNonCommentToken
+            End Else
+              ErrorAndSeekToken(strLiteralExpected, 'Directive', ';',
+                strSeekableOnErrorTokens, stActual);
       Finally
         C.Free;
       End;
@@ -7242,6 +7264,7 @@ begin
         Begin
           NextNonCommentToken;
           Directive(M);
+          PortabilityDirective;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'MethodHeading', ';',
             strSeekableOnErrorTokens, stActual);
@@ -7654,10 +7677,10 @@ end;
 **)
 procedure TPascalModule.ClassVisibility(var AScope : TScope);
 begin
-  If Token.UToken = 'STRICT' Then
+  While Token.UToken = 'STRICT' Do
     Begin
       NextNonCommentToken;
-      While IsKeyWord(Token.Token, strStrictedScope) Do
+      If IsKeyWord(Token.Token, strStrictedScope) Then
         Begin
           If Token.UToken = 'PRIVATE' Then
             AScope := scPrivate
@@ -7665,19 +7688,19 @@ begin
             AScope := scProtected;
           NextNonCommentToken;
         End;
-    End Else
-      While IsKeyWord(Token.Token, strScope) Do
-        Begin
-          If Token.UToken = 'PRIVATE' Then
-            AScope := scPrivate
-          Else If Token.UToken = 'PROTECTED' Then
-            AScope := scProtected
-          Else If Token.UToken = 'PUBLIC' Then
-            AScope := scPublic
-          Else
-            AScope := scPublished;
-          NextNonCommentToken;
-        End;
+    End;
+  While IsKeyWord(Token.Token, strScope) Do
+    Begin
+      If Token.UToken = 'PRIVATE' Then
+        AScope := scPrivate
+      Else If Token.UToken = 'PROTECTED' Then
+        AScope := scProtected
+      Else If Token.UToken = 'PUBLIC' Then
+        AScope := scPublic
+      Else
+        AScope := scPublished;
+      NextNonCommentToken;
+    End;
 end;
 
 (**
@@ -8135,7 +8158,7 @@ begin
           If Token.Token = '[' Then
             Begin
               NextNonCommentToken;
-              If Token.TokenType = ttStringLiteral Then
+              If Token.TokenType In [ttStringLiteral, ttIdentifier] Then
                 Begin
                   Result.GUID := Token.Token;
                   NextNonCommentToken;
@@ -8682,9 +8705,15 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
 
   **)
   Function GetDef : String;
+  
+  Var
+    iPos : Integer;
+    strToken : String;
 
   Begin
-    Result := Trim(Copy(Token.Token, 9, Length(Token.Token) - 9));
+    strToken := Token.Token;
+    iPos := Pos(#32, strToken);
+    Result := Trim(Copy(strToken, iPos + 1, Length(strToken) - iPos - 1));
   End;
 
   (**
@@ -8788,7 +8817,9 @@ begin
         End Else
           AddIssue(Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
               scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etWarning);
-    End;
+    End
+  Else If Like(Token.Token, '{$EXTERNALSYM') Then
+    FExternalSyms.Add(GetDef);
   If iSkip < 0 Then
     iSkip := 0;
 end;
@@ -8884,6 +8915,7 @@ procedure TPascalModule.FindUnresolvedExportedMethods;
 var
   Method: TPascalMethod;
   k: Integer;
+  iIndex : Integer;
 
 begin
   If FExportedHeadingsLabel <> Nil Then
@@ -8891,7 +8923,7 @@ begin
       If FExportedHeadingsLabel.Elements[k] Is TPascalMethod Then
         Begin
           Method := FExportedHeadingsLabel.Elements[k] As TPascalMethod;
-          If Not Method.Resolved Then
+          If Not Method.Resolved And Not FExternalSyms.Find(Method.Identifier, iIndex) Then
             AddIssue(Format(strUnSatisfiedForwardReference, [Method.Identifier]),
               scNone, 'FindUnresolvedExportedMethods', Method.Line, Method.Column, etError);
           End;

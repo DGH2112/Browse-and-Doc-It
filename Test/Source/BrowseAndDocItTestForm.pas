@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    06 Sep 2008
+  @Date    17 Oct 2008
   @Author  David Hoyle
 
 **)
@@ -16,72 +16,83 @@ uses
   Windows, Messages, SysUtils, Variants, Classes,
   Graphics, Controls, Forms, Dialogs, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ExtCtrls, ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
-  FileCtrl, ComCtrls,
-  Menus, StdActns, ActnList, ProgressForm, Buttons;
+  FileCtrl, ComCtrls, Contnrs,
+  Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ActnCtrls, ToolWin,
+  ActnMan, ActnMenus, XPStyleActnCtrls, ActnPopup;
 
 type
   (** This is thre class that defined the main interface form. **)
   TfrmBrowseAndDocItTestForm = class(TForm)
-    Panel1: TPanel;
-    Panel2: TPanel;
-    Button1: TButton;
-    CheckBox1: TCheckBox;
-    Panel3: TPanel;
+    pnlModuleExplorer: TPanel;
+    pnlFileList: TPanel;
     Splitter1: TSplitter;
     lvFileList: TListView;
-    PopupMenu1: TPopupMenu;
-    ActionList1: TActionList;
-    EditCut1: TEditCut;
-    EditCopy1: TEditCopy;
-    EditPaste1: TEditPaste;
-    EditSelectAll1: TEditSelectAll;
-    EditUndo1: TEditUndo;
-    EditDelete1: TEditDelete;
+    DirectoryListBox: TDirectoryListBox;
+    DriveComboBox: TDriveComboBox;
+    chkHints: TCheckBox;
+    chkWarnings: TCheckBox;
+    chkErrors: TCheckBox;
+    chkConflicts: TCheckBox;
+    amActions: TActionManager;
+    atbToolbar: TActionToolBar;
+    ilImages: TImageList;
+    actFileExit: TFileExit;
+    actViewSpecialCharacters: TAction;
+    actFileRecurseFolders: TAction;
+    sbrStatusBar: TStatusBar;
+    actEditCut: TEditCut;
+    actEditCopy: TEditCopy;
+    actEditPaste: TEditPaste;
+    actEditSelectAll: TEditSelectAll;
+    actEditUndo: TEditUndo;
+    actEditDelete: TEditDelete;
+    popActionBar: TPopupActionBar;
     Undo1: TMenuItem;
     Cut1: TMenuItem;
     Copy1: TMenuItem;
     Paste1: TMenuItem;
     Delete1: TMenuItem;
     SelectAll1: TMenuItem;
-    btnOptions: TButton;
-    btnQuit: TBitBtn;
-    chkRecurse: TCheckBox;
-    DirectoryListBox: TDirectoryListBox;
-    DriveComboBox: TDriveComboBox;
-    Documentation: TButton;
+    actViewShowTokens: TAction;
+    actToolsOptions: TAction;
+    actToolsDocumentation: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
     Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
       iCommentCol : Integer; SelectType : TSelectType);
     Procedure Focus(Sender : TObject);
-    procedure Button1Click(Sender: TObject);
-    procedure CheckBox1Click(Sender: TObject);
+    procedure ShowTokensClick(Sender: TObject);
+    procedure SpecialCharactersClick(Sender: TObject);
     procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure btnQuitClick(Sender: TObject);
     procedure DirectoryListBox1Change(Sender: TObject);
     procedure edtDirectoryChange(Sender: TObject);
     procedure lvFileListSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
     procedure btnOptionsClick(Sender: TObject);
-    procedure chkRecurseClick(Sender: TObject);
+    procedure RecurseFolders(Sender: TObject);
     procedure DocumentationClick(Sender: TObject);
-  private
+    procedure lvFileListCustomDrawItem(Sender: TCustomListView; Item: TListItem;
+      State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure FilterChange(Sender: TObject);
+  Strict Private
     { Private declarations }
+    FFileName: String;
     FModuleExplorerFrame : TframeModuleExplorer;
     FDirectory : String;
-    FFileName : String;
     FProgressForm : TfrmProgress;
     FINIFileName : String;
     FSynEdit: TSynEdit;
     FSynPasSyn: TSynPasSyn;
+    FParseRecords : TObjectList;
     function GetFileName: String;
-    procedure SetDirectory(const Value: String);
     procedure SetFileName(const Value: String);
-    Procedure GetErrors(strFileName : String; var iHints, iWarnings, iErrors, iConflicts : Integer);
+    procedure SetDirectory(const Value: String);
+  Strict Protected
     Procedure RecurseDirectories(strDirectory : String);
     Procedure RefreshExplorer(Sender : TObject);
+    Procedure PopulateListView;
     (**
       A property to define the directory for searching.
       @precon  None.
@@ -101,6 +112,62 @@ type
   public
     { Public declarations }
   end;
+
+  (** This is an example helper class to demonstrate the coding, **)
+  TMyHelper = Class Helper For TfrmBrowseAndDocItTestForm
+  Private
+  Protected
+    Procedure GetErrors(strFileName : String; var iHints, iWarnings, iErrors, iConflicts : Integer);
+  Public
+  End;
+
+  (** This is a class which represents a parser record of information. **)
+  TParseRecord = Class
+  Strict Private
+    FFileName  : String;
+    FErrors    : Integer;
+    FWarnings  : Integer;
+    FHints     : Integer;
+    FConflicts : Integer;
+  Public
+    Constructor Create(strFileName : String; iErrors, iWarnings, iHints,
+      iConflicts : Integer);
+    (**
+      This property returns the file name of the parser record.
+      @precon  None.
+      @postcon Returns the file name of the parser record.
+      @return  a String
+    **)
+    Property FileName  : String Read FFileName;
+    (**
+      This property returns the number of errors in the file.
+      @precon  None.
+      @postcon Returns the number of errors in the file.
+      @return  an Integer
+    **)
+    Property Errors    : Integer Read FErrors;
+    (**
+      This property returns the number of warnings in the file.
+      @precon  None.
+      @postcon Returns the number of warnings in the file.
+      @return  an Integer
+    **)
+    Property Warnings  : Integer Read FWarnings;
+    (**
+      This property returns the number of hints in the file.
+      @precon  None.
+      @postcon Returns the number of hints in the file.
+      @return  an Integer
+    **)
+    Property Hints     : Integer Read FHints;
+    (**
+      This property returns the number of conflicts in the file.
+      @precon  None.
+      @postcon Returns the number of conflicts in the file.
+      @return  an Integer
+    **)
+    Property Conflicts : Integer Read FConflicts;
+  End;
 
 var
   (** This is a global form variable so that the Delphi IDE can auto create
@@ -126,7 +193,7 @@ Uses
   @param   Sender as a TObject
 
 **)
-procedure TfrmBrowseAndDocItTestForm.Button1Click(Sender: TObject);
+procedure TfrmBrowseAndDocItTestForm.ShowTokensClick(Sender: TObject);
 
 Var
   M : TBaseLanguageModule;
@@ -168,33 +235,18 @@ end;
 
 (**
 
-  This is an on click event handler for the Quit Button.
-
-  @precon  None.
-  @postcon Closes the application.
-
-  @param   Sender as a TObject
-
-**)
-procedure TfrmBrowseAndDocItTestForm.btnQuitClick(Sender: TObject);
-begin
-  Close;
-end;
-
-(**
-
   This is an on click event handler for the Checkbox1 control.
 
-  @precon  None.
+  @precon  None
   @postcon Displays or hides the special character markers in the SynEdit1
            control.
 
   @param   Sender as a TObject
 
 **)
-procedure TfrmBrowseAndDocItTestForm.CheckBox1Click(Sender: TObject);
+procedure TfrmBrowseAndDocItTestForm.SpecialCharactersClick(Sender: TObject);
 begin
-  If CheckBox1.Checked Then
+  If actViewSpecialCharacters.Checked Then
     FSynEdit.Options := FSynEdit.Options + [eoShowSpecialChars]
   Else
     FSynEdit.Options := FSynEdit.Options - [eoShowSpecialChars];
@@ -210,7 +262,7 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmBrowseAndDocItTestForm.chkRecurseClick(Sender: TObject);
+procedure TfrmBrowseAndDocItTestForm.RecurseFolders(Sender: TObject);
 begin
   edtDirectoryChange(Sender);
 end;
@@ -229,19 +281,23 @@ procedure TfrmBrowseAndDocItTestForm.DirectoryListBox1Change(Sender: TObject);
 
 begin
   lvFileList.Items.Clear;
+  FParseRecords.Clear;
   FProgressForm.Init(1, 'Scanning Directories', 'Please wait...');
   RecurseDirectories(FDirectory);
+  PopulateListView;
   FProgressForm.Hide;
 end;
 
 (**
 
-  This is an on click event handler for the Documentation Button.
+
+  This is an on click event handler for the Documentation Button.
 
   @precon  None.
   @postcon Invokes the documentation mechanism.
 
-  @param   Sender as a TObject
+
+  @param   Sender as a TObject
 
 **)
 procedure TfrmBrowseAndDocItTestForm.DocumentationClick(Sender: TObject);
@@ -280,7 +336,6 @@ Procedure TfrmBrowseAndDocItTestForm.RecurseDirectories(strDirectory : String);
 Var
   recFile : TSearchRec;
   iResult : Integer;
-  liItem : TListItem;
   iHints, iWarnings, iErrors: Integer;
   iConflicts: Integer;
 
@@ -293,18 +348,13 @@ Begin
           Begin
             FProgressForm.UpdateProgress(0, 'Scanning: ' +
               Copy(strDirectory + '\' + recFile.Name, Length(FDirectory) + 1, 255) + '...');
-            liItem := lvFileList.Items.Add;
-            liItem.Caption := recFile.Name;
             GetErrors(strDirectory + '\' + recFile.Name, iHints, iWarnings,
               iErrors, iConflicts);
-            liItem.SubItems.Add(Format('%d', [iHints]));
-            liItem.SubItems.Add(Format('%d', [iWarnings]));
-            liItem.SubItems.Add(Format('%d', [iErrors]));
-            liItem.SubItems.Add(Format('%d', [iConflicts]));
-            liItem.SubItems.Add(strDirectory + '\' + recFile.Name);
+            FParseRecords.Add(TParseRecord.Create(strDirectory + '\' + recFile.Name,
+              iErrors, iWarnings, iHints, iConflicts));
             Application.ProcessMessages;
           End;
-        If chkRecurse.Checked Then
+        If actFileRecurseFolders.Checked Then
           If (recFile.Attr And faDirectory <> 0) And (recFile.Name[1] <> '.') Then
             RecurseDirectories(strDirectory + '\' + recFile.Name);
         iResult := FindNext(recFile);
@@ -331,19 +381,23 @@ end;
 
 (**
 
-  This method gets the number of errors for the given files name. 
 
-  @precon  None. 
-  @postcon Gets the number of errors for the given files name. 
+  This method gets the number of errors for the given files name. 
 
-  @param   strFileName as a String
+
+  @precon  None. 
+
+  @postcon Gets the number of errors for the given files name. 
+
+
+  @param   strFileName as a String
   @param   iHints      as an Integer as a reference
   @param   iWarnings   as an Integer as a reference
   @param   iErrors     as an Integer as a reference
   @param   iConflicts  as an Integer as a reference
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String;
+Procedure TMyHelper.GetErrors(strFileName : String;
   var iHints, iWarnings, iErrors, iConflicts : Integer);
 
 Var
@@ -366,7 +420,7 @@ Begin
         If M.FindElement(strHints) <> Nil Then
           iHints := M.FindElement(strHints).ElementCount;
         If M.FindElement(strWarnings) <> Nil Then
-          iErrors := M.FindElement(strWarnings).ElementCount;
+          iWarnings := M.FindElement(strWarnings).ElementCount;
         If M.FindElement(strErrors) <> Nil Then
           iErrors := M.FindElement(strErrors).ElementCount;
         C := M.FindElement(strDocumentationConflicts);
@@ -422,6 +476,7 @@ Var
   j : Integer;
 
 begin
+  FParseRecords := TObjectList.Create(True);
   FSynEdit := TSynEdit.Create(Nil);
   With FSynEdit Do
     Begin
@@ -430,7 +485,7 @@ begin
       Align := alClient;
       ActiveLineColor := clSkyBlue;
       Gutter.ShowLineNumbers := True;
-      PopupMenu := PopupMenu1;
+      PopupMenu := popActionBar;
       OnChange := SynEdit1Change;
       OnStatusChange:= SynEdit1StatusChange;
     End;
@@ -451,10 +506,15 @@ begin
     End;
   FSynEdit.Highlighter := FSynPasSyn;
   FINIFileName := BuildRootKey(Nil, Nil);
-  OutputDebugString('Started');
+  {$IFDEF WIN32}
+  BrowseAndDocItOptions.Defines.Add('WIN32');
+  BrowseAndDocItOptions.Defines.Add('MSWINDOWS');
+  {$ELSE}
+  BrowseAndDocItOptions.Defines.Add('LINUX');
+  {$ENDIF}
   FProgressForm := TfrmProgress.Create(Nil);
   FModuleExplorerFrame := TframeModuleExplorer.Create(Self);
-  FModuleExplorerFrame.Parent := Panel1;
+  FModuleExplorerFrame.Parent := pnlModuleExplorer;
   FModuleExplorerFrame.Align := alClient;
   FModuleExplorerFrame.OnSelectionChange := SelectionChange;
   FModuleExplorerFrame.OnFocus := Focus;
@@ -465,10 +525,15 @@ begin
       Left := ReadInteger('Position', 'Left', Left);
       Height := ReadInteger('Position', 'Height', Height);
       Width := ReadInteger('Position', 'Width', Width);
-      Panel1.Width := ReadInteger('Position', 'Splitter', Panel1.Width);
+      pnlModuleExplorer.Width := ReadInteger('Position', 'Splitter', pnlModuleExplorer.Width);
       DirectoryListBox.Directory := ReadString('Position', 'Directory', GetCurrentDir);
       j := ReadInteger('Setup', 'Selection', 0);
-      chkRecurse.Checked := ReadBool('Setup', 'Recurse', False);
+      actFileRecurseFolders.Checked := ReadBool('Setup', 'Recurse', False);
+      RecurseFolders(Self);
+      chkErrors.Checked := ReadBool('Setup', 'Errors', False);
+      chkWarnings.Checked := ReadBool('Setup', 'Warnings', False);
+      chkHints.Checked := ReadBool('Setup', 'Hints', False);
+      chkConflicts.Checked := ReadBool('Setup', 'Conflicts', False);
       If lvFileList.Items.Count > j Then
         lvFileList.ItemIndex := j;
     Finally
@@ -498,16 +563,20 @@ begin
       WriteInteger('Position', 'Left', Left);
       WriteInteger('Position', 'Height', Height);
       WriteInteger('Position', 'Width', Width);
-      WriteInteger('Position', 'Splitter', Panel1.Width);
+      WriteInteger('Position', 'Splitter', pnlModuleExplorer.Width);
       WriteString('Position', 'Directory', DirectoryListBox.Directory);
       WriteInteger('Setup', 'Selection', lvFileList.ItemIndex);
-      WriteBool('Setup', 'Recurse', chkRecurse.Checked)
+      WriteBool('Setup', 'Recurse', actFileRecurseFolders.Checked);
+      WriteBool('Setup', 'Errors', chkErrors.Checked);
+      WriteBool('Setup', 'Warnings', chkWarnings.Checked);
+      WriteBool('Setup', 'Hints', chkHints.Checked);
+      WriteBool('Setup', 'Conflicts', chkConflicts.Checked);
     Finally
       Free;
     End;
   FModuleExplorerFrame.Free;
   FProgressForm.Free;
-  OutputDebugString('Finished');
+  FParseRecords.Free;
 end;
 
 (**
@@ -524,6 +593,49 @@ end;
 function TfrmBrowseAndDocItTestForm.GetFileName: String;
 begin
   Result := FFileName;
+end;
+
+(**
+
+  This is a custom draw item event handler for the list view.
+
+  @precon  None.
+  @postcon Colours Errors, Hints, Warnings, etc.
+
+  @param   Sender      as a TCustomListView
+  @param   Item        as a TListItem
+  @param   State       as a TCustomDrawState
+  @param   DefaultDraw as a Boolean as a reference
+
+**)
+procedure TfrmBrowseAndDocItTestForm.lvFileListCustomDrawItem(
+  Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
+  var DefaultDraw: Boolean);
+
+Var
+  iErrors, iWarnings, iHints, iConflicts : Integer;
+
+begin
+  iErrors := 0;
+  iWarnings := 0;
+  iHints := 0;
+  iConflicts := 0;
+  If Item.SubItems.Count > 2 Then
+    iErrors := StrToInt(Item.SubItems[2]);
+  If Item.SubItems.Count > 1 Then
+    iWarnings := StrToInt(Item.SubItems[1]);
+  If Item.SubItems.Count > 0 Then
+    iHints := StrToInt(Item.SubItems[0]);
+  If Item.SubItems.Count > 3 Then
+    iConflicts := StrToInt(Item.SubItems[3]);
+  If iConflicts > 0 Then
+    Sender.Canvas.Brush.Color := clYellow;
+  If iHints > 0 Then
+    Sender.Canvas.Brush.Color := clLime;
+  If iWarnings > 0 Then
+    Sender.Canvas.Brush.Color := $0080FF;
+  If iErrors > 0 Then
+    Sender.Canvas.Brush.Color := clRed;
 end;
 
 (**
@@ -552,6 +664,51 @@ begin
     Else
       MessageDlg(Format('The file "%s" was not found.',
         [lvFileList.Selected.SubItems[4]]), mtError, [mbOK], 0);
+end;
+
+(**
+
+  This method popluates the list view based on the filter checkboxes.
+
+  @precon  None.
+  @postcon Popluates the list view based on the filter checkboxes.
+
+**)
+procedure TfrmBrowseAndDocItTestForm.PopulateListView;
+
+Var
+  i : Integer;
+  rec : TParseRecord;
+  liItem: TListItem;
+  boolInclude : Boolean;
+
+begin
+  Try
+    lvFileList.Clear;
+    lvFileList.Items.BeginUpdate;
+    For i := 0 To FParseRecords.Count - 1 Do
+      Begin
+        rec := FParseRecords[i] As TParseRecord;
+        boolInclude := Not chkErrors.Checked And Not chkWarnings.Checked And
+          Not chkHints.Checked And Not chkConflicts.Checked;
+        boolInclude := boolInclude Or (chkErrors.Checked And (rec.Errors > 0));
+        boolInclude := boolInclude Or (chkWarnings.Checked And (rec.Warnings > 0));
+        boolInclude := boolInclude Or (chkHints.Checked And (rec.Hints > 0));
+        boolInclude := boolInclude Or (chkConflicts.Checked And (rec.Conflicts > 0));
+        If boolInclude Then
+          Begin
+            liItem := lvFileList.Items.Add;
+            liItem.Caption := ExtractFileName(rec.FileName);
+            liItem.SubItems.Add(Format('%d', [rec.Hints]));
+            liItem.SubItems.Add(Format('%d', [rec.Warnings]));
+            liItem.SubItems.Add(Format('%d', [rec.Errors]));
+            liItem.SubItems.Add(Format('%d', [rec.Conflicts]));
+            liItem.SubItems.Add(rec.FileName);
+          End;
+      End;
+  Finally
+    lvFileList.Items.EndUpdate;
+  End;
 end;
 
 (**
@@ -646,7 +803,7 @@ end;
 procedure TfrmBrowseAndDocItTestForm.SynEdit1StatusChange(Sender: TObject;
   Changes: TSynStatusChanges);
 begin
-  Panel2.Caption := Format('Line %d, Column %d', [FSynEdit.CaretY, FSynEdit.CaretX]);
+  sbrStatusBar.SimpleText := Format('Line %d, Column %d', [FSynEdit.CaretY, FSynEdit.CaretX]);
 end;
 
 (**
@@ -685,6 +842,22 @@ end;
 
 (**
 
+  This is a check button change event handler for all the error, hint, etc
+  checkboxes.
+
+  @precon  None.
+  @postcon Populates the list view.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmBrowseAndDocItTestForm.FilterChange(Sender: TObject);
+begin
+  PopulateListView;
+end;
+
+(**
+
   This method focuses the editor when the focus event is fired.
 
   @precon  None.
@@ -700,5 +873,31 @@ Begin
 End;
 
 
-end.
+{ TParseRecord }
+
+(**
+
+  This is a constructor for the TParseRecord class.
+
+  @precon  None.
+  @postcon Initialises the record class with information.
+
+  @param   strFileName as a String
+  @param   iErrors     as an Integer
+  @param   iWarnings   as an Integer
+  @param   iHints      as an Integer
+  @param   iConflicts  as an Integer
+
+**)
+constructor TParseRecord.Create(strFileName: String; iErrors, iWarnings, iHints,
+  iConflicts: Integer);
+begin
+  FFileName  := strFileName;
+  FErrors    := iErrors;
+  FWarnings  := iWarnings;
+  FHints     := iHints;
+  FConflicts := iConflicts;
+end;
+
+End.
 

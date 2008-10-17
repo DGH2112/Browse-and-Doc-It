@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    15 Oct 2008
+  @Date    17 Oct 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -1705,7 +1705,7 @@ ResourceString
   strLabelExpected = 'Label expected but ''%s'' found at line %s column %d.';
   (** An exception message for a Constant Expression found. **)
   strConstExprExpected = 'Constant Expression expected but ''%s'' found at ' +
-    'line %s column %d.';
+    'line %d column %d.';
   (** Document conflict message for a unreferenced locals. **)
   strUnreferencedLocal = 'The symbol ''%s'' has not been referenced in the code.';
 

@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    04 Oct 2008
+  @Date    17 Oct 2008
   @Version 1.0
 
 **)
@@ -2127,6 +2127,12 @@ Begin
   {$ENDIF}
   {$IFDEF VER180} // Delphi 2006
   slDefines.Add('VER180');
+  {$ENDIF}
+  {$IFDEF WIN32}
+  slDefines.Add('WIN32');
+  slDefines.Add('MSWINDOWS');
+  {$ELSE}
+  slDefines.Add('LINUX');
   {$ENDIF}
 End;
 

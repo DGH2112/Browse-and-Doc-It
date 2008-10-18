@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    17 Oct 2008
+  @Date    18 Oct 2008
   @Version 1.0
 
 **)
@@ -29,7 +29,6 @@ Type
     FINIFile: String;
     procedure InsertCommentBlock(CommentType: TCommentType);
     procedure OptionsClick(Sender: TObject);
-    procedure HelpClick(Sender: TObject);
     procedure CheckForUpdatesClick(Sender: TObject);
     procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
       iCommentCol : Integer; SelectType : TSelectType);
@@ -325,8 +324,6 @@ Begin
   CreateMenuItem(mmiPascalDocMenu, '&Options', OptionsClick);
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, 'Check for &Updates...', CheckForUpdatesClick);
-  CreateMenuItem(mmiPascalDocMenu);
-  CreateMenuItem(mmiPascalDocMenu, '&Help', HelpClick);
   FKeyBinding := 0;
   FCounter := 0;
   FFileName := '';
@@ -1336,31 +1333,6 @@ begin
             End;
         End;
       End;
-end;
-
-(**
-
-  This method invokes the HTML help page of the documentation to provide
-  help for this addin.
-
-  @precon  Sender is the menu item that invokes this event.
-  @postcon Displays the Help file.
-
-  @param   Sender as a TObject
-
-**)
-procedure TBrowseAndDocItWizard.HelpClick(Sender: TObject);
-
-Const
-  strHelpFile = '\BrowseAndDocIt.HLP';
-
-begin
-  If BrowseAndDocItOptions.DocHelpFile = '' Then
-    Raise Exception.Create(strHelpFileNotDefined);
-  If Not FileExists(BrowseAndDocItOptions.DocHelpFile + strHelpFile) Then
-    Raise Exception.CreateFmt(strHelpFileNotFound, [BrowseAndDocItOptions.DocHelpFile + strHelpFile]);
-  ShellExecute(HInstance, 'OPEN', PChar(BrowseAndDocItOptions.DocHelpFile + strHelpFile), '',
-    PChar(BrowseAndDocItOptions.DocHelpFile), SW_NORMAL);
 end;
 
 {procedure TBrowseAndDocItWizard.FileNotification(

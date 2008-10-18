@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    17 Oct 2008
+  @Date    18 Oct 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -1336,7 +1336,6 @@ Type
     FSpecialTags : TStringList;
     FExpandedNodes : TStringList;
     FINIFileName : String;
-    FDocHelpFile: String;
     FUpdateInterval: Cardinal;
     FScopesToRender : TScopes;
     FBrowsePosition : TBrowsePosition;
@@ -1385,13 +1384,6 @@ Type
       @return  a TStringList
     **)
     Property ExpandedNodes : TStringList Read FExpandedNodes;
-    (**
-      This property defines the help file for the application.
-      @precon  None.
-      @postcon Gets and sets the help file for the application.
-      @return  a String
-    **)
-    Property DocHelpFile : String Read FDocHelpFile Write FDocHelpFile;
     (**
       This property determines the amount of time in milliseonds between the
       last editor update and the next refresh. Interval only, the application
@@ -5928,7 +5920,6 @@ begin
         sl.Free;
       End;
       FUpdateInterval := ReadInteger('ModuleExplorer', 'UpdateInterval', 1000);
-      FDocHelpFile := ReadString('ModuleExplorer', 'HelpFile', '');
       FScopesToRender := TScopes(Byte(ReadInteger('ModuleExplorer', 'ScopesToRender',
         Byte(FScopesToRender))));
       FBrowsePosition := TBrowsePosition(ReadInteger('Setup', 'BrowsePosition',
@@ -5992,7 +5983,6 @@ begin
           StringReplace(FExpandedNodes[j], '=', '|', [rfReplaceAll]),
           Integer(FExpandedNodes.Objects[j]));
       WriteInteger('ModuleExplorer', 'UpdateInterval', FUpdateInterval);
-      WriteString('ModuleExplorer', 'HelpFile', FDocHelpFile);
       WriteInteger('ModuleExplorer', 'ScopesToRender', Byte(FScopesToRender));
       WriteInteger('Setup', 'BrowsePosition', Integer(FBrowsePosition));
       WriteString('ModuleExplorer', 'Name', FFontName);

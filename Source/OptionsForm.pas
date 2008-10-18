@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    24 Sep 2008
+  @Date    18 Oct 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -38,8 +38,6 @@ type
     btnMoveUp: TBitBtn;
     btnMoveDown: TBitBtn;
     btnEdit: TBitBtn;
-    HelpFilePage: TTabSheet;
-    HelpFileDir: TDirectoryListBox;
     edtUpdateInterval: TEdit;
     udUpdateInterval: TUpDown;
     CheckedImages: TImageList;
@@ -146,8 +144,6 @@ Begin
         lbSpecialTags.Items.AddObject(BrowseAndDocItOptions.SpecialTags[j],
           BrowseAndDocItOptions.SpecialTags.Objects[j]);
       udUpdateInterval.Position := BrowseAndDocItOptions.UpdateInterval;
-      If FileExists(BrowseAndDocItOptions.DocHelpFile) Then
-        HelpFileDir.Directory := BrowseAndDocItOptions.DocHelpFile;
       For j := 0 To cbxFontName.Items.Count - 1 Do
         If cbxFontName.Items[j] = BrowseAndDocItOptions.FontName Then
           Begin
@@ -175,7 +171,6 @@ Begin
             BrowseAndDocItOptions.SpecialTags.AddObject(lbSpecialTags.Items[j],
             lbSpecialTags.Items.Objects[j]);
           BrowseAndDocItOptions.UpdateInterval := udUpdateInterval.Position;
-          BrowseAndDocItOptions.DocHelpFile := HelpFileDir.Directory;
           BrowseAndDocItOptions.FontName := cbxFontName.Text;
           BrowseAndDocItOptions.FontSize := udFontSize.Position;
           For k := Low(TTokenType) to High(TTokenType) Do

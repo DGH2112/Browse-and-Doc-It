@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    18 May 2006
+  @Date    21 Oct 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -63,6 +63,7 @@ Var
   AProjectGroup: IOTAProjectGroup;
 
 Begin
+  Result := Nil;
   AModuleServices := (BorlandIDEServices as IOTAModuleServices);
   For i := 0 To AModuleServices.ModuleCount - 1 Do
     Begin
@@ -74,8 +75,6 @@ Begin
   AModuleServices := Nil;
   AModule := Nil;
   AProjectGroup := Nil;
-  If Result = Nil Then
-    raise Exception.Create('Sorry, no ProjectGroup available');
 end;
 
 (**
@@ -90,8 +89,14 @@ end;
 **)
 Function ActiveProject : IOTAProject;
 
+var
+  G : IOTAProjectGroup;
+
 Begin
-  Result := ProjectGroup.ActiveProject;
+  Result := Nil;
+  G := ProjectGroup;
+  If G <> Nil Then
+    Result := G.ActiveProject;
 End;
 
 (**

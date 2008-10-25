@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       17 Oct 2008
+  @Date       23 Oct 2008
   @Author     David Hoyle
 
 **)
@@ -760,7 +760,7 @@ Type
     Procedure CheckReturnValue(Method : TPascalMethod);
     Procedure CheckAlias(Method : TPascalMethod);
     Function CheckNumberType(ExprType : TExprTypes) : Boolean;
-    Procedure UpdateTypeToken(var AToken : TTypeToken); InLine;
+    Procedure UpdateTypeToken(var AToken : TTypeToken); {$IFDEF D0006}} InLine; {$ENDIF}
     Procedure AddToContainer(Container : TElementContainer; var Method : TPascalMethod);
     Procedure TidyUpEmptyElements;
     Procedure CheckUnResolvedMethods;
@@ -1809,7 +1809,9 @@ Begin
   FImplementedMethodsLabel := Nil;
   FExternalSyms := TStringList.Create;
   FExternalSyms.Sorted := True;
+  {$IFDEF D0006}
   FExternalSyms.CaseSensitive := False;
+  {$ENDIF}
   FMethodStack := TObjectList.Create(False);
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSourceStream := Source;

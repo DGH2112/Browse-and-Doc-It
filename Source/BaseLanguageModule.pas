@@ -3,18 +3,20 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    18 Oct 2008
+  @Date    23 Oct 2008
   @Version 1.0
   @Author  David Hoyle
 
 **)
-
 Unit BaseLanguageModule;
 
 Interface
 
 Uses
   SysUtils, Classes, Contnrs, Graphics;
+
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** Type to distinguish Stream position from token index. **)
@@ -396,7 +398,7 @@ Type
 
   (** This is a class the store information about each token **)
   TTokenInfo = Class
-  private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FToken : String;
     FColumn : Integer;
     FBufferPos: Integer;
@@ -469,7 +471,7 @@ Type
 
   (** A class to hold text about a single tag **)
   TTag = Class
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FTokens : TStringList;
     FTagName: String;
     FLine: Integer;
@@ -531,7 +533,7 @@ Type
 
   (** A class the handles and stores all the comment information **)
   TComment = Class
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FTokens : TStringList;
     FTags : TObjectList;
     FTagMode : Boolean;
@@ -632,8 +634,8 @@ Type
 
   (** This class implements the IElementCollection interface so that this
       element container can be rendered with the module browser. **)
-  TElementContainer = Class Abstract
-  Private
+  TElementContainer = Class {$IFDEF D2005} Abstract {$ENDIF}
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FElements : TObjectList;
     FTokens : TObjectList;
     FName : String;
@@ -801,7 +803,7 @@ Type
 
   (** This class defines a document error. **)
   TDocIssue = Class(TElementContainer)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FMsg: String;
     FMethod : String;
   Public
@@ -826,29 +828,29 @@ Type
 
   (** This class represents a single identifier with line, col and comment
       attributes. **)
-  TIdent = Class Abstract (TElementContainer);
+  TIdent = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer);
 
   (** This is a sub class for all types **)
-  TGenericTypeDecl = Class Abstract (TElementContainer)
+  TGenericTypeDecl = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This is a sub class for all constants **)
-  TGenericConstant = Class Abstract (TElementContainer)
+  TGenericConstant = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This is a sub class for all variables **)
-  TGenericVariable = Class Abstract (TElementContainer)
+  TGenericVariable = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This class represents a parameter of a method declaration. **)
   TGenericParameter = Class (TElementContainer)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FParamModifier : TParamModifier;
     FArrayOf : Boolean;
     FParamType : TGenericTypeDecl;
@@ -896,8 +898,8 @@ Type
   End;
 
   (** This class represents a method declaration. **)
-  TGenericMethodDecl = Class Abstract (TElementContainer)
-  Private
+  TGenericMethodDecl = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FParameters : TObjectList;
     FMethodType : TMethodType;
     FClassNames : TStringList;
@@ -1005,8 +1007,8 @@ Type
   End;
 
   (** This is a class that represents properties of a class or interface. **)
-  TGenericProperty = Class Abstract (TElementContainer)
-  Private
+  TGenericProperty = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FParameters : TObjectList;
     FTypeID : TGenericTypeDecl;
   Protected
@@ -1048,7 +1050,7 @@ Type
 
   (** This is a class to represent a module documentation conflict. **)
   TDocumentConflict = Class(TElementContainer)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FMessage       : String;
     FCommentLine   : Integer;
     FCommentColumn : Integer;
@@ -1085,8 +1087,8 @@ Type
 
   (** This is an abtract class from which all language modules should be
       derived. **)
-  TBaseLanguageModule = Class Abstract (TElementContainer)
-  Private
+  TBaseLanguageModule = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FOwnedItems : TObjectList;
     FTokens : TObjectList;
     FTokenIndex : TTokenIndex;
@@ -1330,7 +1332,7 @@ Type
 
   (** This is a class to define a set of options for the application. **)
   TBrowseAndDocItOptions = Class
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FOptions : TDocOptions;
     FDefines : TStringList;
     FSpecialTags : TStringList;
@@ -1488,7 +1490,7 @@ Type
 
   (** A class to represent a label within the Module Explorer / Documentation **)
   TLabelContainer = Class(TElementContainer)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
@@ -2537,7 +2539,7 @@ Var
 Implementation
 
 Uses
-  Windows, StrUtils, DGHLibrary, INIFiles;
+  Windows, DGHLibrary, INIFiles;
 
 Const
   (** This constant represent the maximum of issue / doc conflicts to add. **)
@@ -4360,7 +4362,7 @@ Begin
   FAlias := '';
   FClassMethod := False;
   FClassNames := TStringList.Create;
-  FComment := Nil;
+  Comment := Nil;
   FExt := '';
   FMsg := '';
   FReturnType := Nil;
@@ -4533,7 +4535,7 @@ Function TDocIssue.AsString(boolForDocumentation : Boolean): String;
 
 begin
   Result := FMsg;
-  If doShowParserErrorOrigin In BrowseAndDocItOptions.FOptions Then
+  If doShowParserErrorOrigin In BrowseAndDocItOptions.Options Then
     Result := Result + Format(' [%s]', [FMethod]);
 end;
 
@@ -4567,7 +4569,7 @@ begin
   FMessage := Format(strDocConflictMsg , Args);
   FCommentLine := iCommentLine;
   FCommentColumn := iCommentCol;
-  FComment := TComment.Create(strDocConflictDesc, 0, 0);
+  Comment := TComment.Create(strDocConflictDesc, 0, 0);
 end;
 
 (**
@@ -4580,7 +4582,7 @@ end;
 **)
 destructor TDocumentConflict.Destroy;
 begin
-  FComment.Free;
+  Comment.Free;
   Inherited Destroy;
 end;
 
@@ -4669,7 +4671,9 @@ begin
   FCompilerDefs := TStringList.Create;
   FCompilerDefs.Sorted := True;
   FCompilerDefs.Duplicates := dupIgnore;
+  {$IFDEF D0006}
   FCompilerDefs.CaseSensitive := False;
+  {$ENDIF}
   FCompilerConditionStack := TList.Create;
   objModuleRootElement := Self;
 end;
@@ -5270,7 +5274,11 @@ Begin
               If Modified Then
                 dtFileDate := Now
               Else
+                {$IFDEF D2006}
                 FileAge(FileName, dtFileDate);
+                {$ELSE}
+                dtFileDate := FileDateToDateTime(FileAge(FileName));
+                {$ENDIF}
               Try
                 dtDate := ConvertDate(strDate);
                 If Int(dtDate) <> Int(dtFileDate) Then
@@ -5998,8 +6006,13 @@ begin
         #13#10, '|', [rfReplaceAll]));
       EraseSection('MethodDescriptions');
       For j := 0 To FMethodDescriptions.Count - 1 Do
+        {$IFDEF D006}
         WriteString('MethodDescriptions', FMethodDescriptions.Names[j],
           FMethodDescriptions.ValueFromIndex[j]);
+        {$ELSE}
+        WriteString('MethodDescriptions', FMethodDescriptions.Names[j],
+          FMethodDescriptions.Values[FMethodDescriptions.Names[j]]);
+        {$ENDIF}
       WriteInteger('Documentation', 'Scopes', Byte(FScopesToDocument));
       WriteString('ModuleExploror', 'BGColour',
         ColorToString(FModuleExplorerBGColour));
@@ -6055,7 +6068,7 @@ Constructor TLabelContainer.Create(strName: String; AScope: TScope; iLine,
 
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
-  FReferenced := True;
+  Referenced := True;
 End;
 
 (**
@@ -6075,7 +6088,7 @@ End;
 **)
 function TLabelContainer.AsString(boolForDocumentation : Boolean): String;
 begin
-  Result := FName;
+  Result := Name;
 end;
 
 (** This initializations section ensures that there is a valid instance of the

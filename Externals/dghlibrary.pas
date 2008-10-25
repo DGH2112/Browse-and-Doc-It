@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Oct 2008
+  @Date    25 Oct 2008
 
 **)
 Unit DGHLibrary;
@@ -14,6 +14,8 @@ Interface
 
 Uses
   SysUtils, Classes, Windows, Graphics;
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** A custom exception for errors getting the building number. **)
@@ -152,13 +154,13 @@ Type
   (** This class is the base class in the heiracrhy for the horizontal
       alignments classes. **)
   THBaseElement = Class
-  Strict Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FEasting  : Double;
     FNorthing : Double;
     FBearing  : Double;
     FChainage : Double;
     FLength   : Double;
-  Strict Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetElementType : TElementType; Virtual; Abstract;
     Function GetStartPoint : THInfo; Virtual;
     Function GetEndPoint : THInfo; Virtual;
@@ -262,7 +264,7 @@ Type
 
   (** This class defined a Straight Horizontal alignment element. **)
   THStraightElement = Class(THBaseElement)
-  Strict Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetElementType : TElementType; Override;
     Function GetRadius(dblChainage : Double) : Double; Override;
     Function GetElementDetails : THElement; Override;
@@ -277,9 +279,9 @@ Type
 
   (** This class defined a Circular Horizontal alignment element. **)
   THCircularElement = Class(THBaseElement)
-  Strict Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FRadius : Double;
-  Strict Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetElementType : TElementType; Override;
     Function GetRadius(dblChainage : Double) : Double; Override;
     Function GetElementDetails : THElement; Override;
@@ -295,10 +297,10 @@ Type
 
   (** This class defined a Clothoid Horizontal alignment element. **)
   THClothoidElement = Class(THBaseElement)
-  Strict Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FOChainage : Double;
     FRLValue : Double;
-  Strict Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetX(dblDistance : Double) : Double; Virtual;
     Function GetY(dblDistance : Double) : Double; Virtual;
     Function GetTheta(dblDistance : Double) : Double; Virtual;
@@ -318,12 +320,12 @@ Type
   (** This class is the base class in the heiracrhy for the vertical
       alignments classes. **)
   TVBaseElement = Class
-  Strict Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FLevel    : Double;
     FGradient : Double;
     FChainage : Double;
     FLength   : Double;
-  Strict Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetElementType : TElementType; Virtual; Abstract;
     Function GetStartPoint : TVInfo; Virtual;
     Function GetEndPoint : TVInfo; Virtual;
@@ -417,7 +419,7 @@ Type
 
   (** This class defined a Straight Vertical element of an alignment. **)
   TVStraightElement = Class(TVBaseElement)
-  Strict Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetElementType : TElementType; Override;
     Function GetRadius(dblChainage : Double) : Double; Override;
     Function GetElementDetails : TVElement; Override;
@@ -429,9 +431,9 @@ Type
 
   (** This class defined a Circular Vertical element of an alignment. **)
   TVCircularElement = Class(TVBaseElement)
-  Strict Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FRadius : Double;
-  Strict Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetElementType : TElementType; Override;
     Function GetRadius(dblChainage : Double) : Double; Override;
     Function GetElementDetails : TVElement; Override;
@@ -449,7 +451,7 @@ Type
 
   (** This class represents a collection of horizontal alignment elements. **)
   THAlignmentCollection = Class
-  Strict Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FHElements : THElements;
     FOnChange : TNotifyEvent;
     FCoordinateError: Double;
@@ -530,7 +532,7 @@ Type
 
   (** This class represents a collection of vertical alignment elements. **)
   TVAlignmentCollection = Class
-  Strict Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FVElements : TVElements;
     FModified: Boolean;
     FOnChange: TNotifyEvent;
@@ -599,7 +601,7 @@ Type
   (** This class represents a collection of both horizontal and vertical
       alignment elements. **)
   TStringAlignment = Class
-  Strict Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FHAlignment : THAlignmentCollection;
     FVAlignment : TVAlignmentCollection;
   Public
@@ -722,9 +724,9 @@ ResourceString
 Implementation
 
 Uses
-  Math, ComObj, ShlObj, IniFiles, ShlWapi;
+  Math, ComObj, ShlObj, IniFiles {$IFNDEF D2005}, FileCtrl {$ENDIF};
 
-resourcestring
+Resourcestring
   (** A resource string to define the output format of a bearing. **)
   strBearingFormat = '%d° %2.2d'' %2.2d.%2.2d"';
   (** A resource string to say that the directory was not found. **)
@@ -746,6 +748,9 @@ Const
   HexNums = OctNums + ['8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
   (** A list of valid equation delimiters. **)
   ValidDelimiters = ['(',')','*','/','+','-'];
+
+function PathFindOnPath(pszPath: PChar; var ppszOtherDirs: PChar): BOOL; stdcall;
+  external 'shlwapi' name 'PathFindOnPathA';
 
 (**
 
@@ -5223,7 +5228,7 @@ Begin
   strBuildNumber := GetBuildNumber(ParamStr(0), iMajor, iMinor, iBugFix, iBuild);
   Result := Format(strTitle, [iMajor, iMinor, strBugFix[iBugFix + 1],
     strBuildNumber]);
-  {$IFDEF VER180}
+  {$IFDEF D2006}
   FileAge(ParamStr(0), dtDate);
   {$ELSE}
   dtDate := FileDateToDateTime(FileAge(ParamStr(0)));
@@ -6022,12 +6027,14 @@ End;
 
 (**
 
-  This function returns true if the pattern matches the text.
+
+  This function returns true if the pattern matches the text.
 
   @precon  None.
   @postcon Returns true if the pattern matches the text.
 
-  @param   strPattern as a String
+
+  @param   strPattern as a String
   @param   strText    as a String
   @return  a Boolean
 
@@ -6113,33 +6120,82 @@ End;
 Function CalcColour(dblValue, dblLowCriteria, dblMiddleCriteria,
   dblUpperCriteria : Double; iLowColour, iMiddleColour, iHighColour : TColor) : TColor;
 
-Var
-  iR, iG, iB : Integer;
+  (**
+
+    This function calculate the intepolation of a single colour value between 2
+    colours based on value for those colour positions.
+
+    @precon  None.
+    @postcon Returns the colour which is an interpolation between the input
+             colours.
+
+    @param   iLow     as a TColor
+    @param   iHigh    as a TColor
+    @param   iMask    as a TColor
+    @param   dblLow   as a Double
+    @param   dblValue as a Double
+    @param   dblHigh  as a Double
+    @return  a TColor
+
+  **)
+  Function InterpolateColour(iLow, iHigh, iMask : TColor; dblLow,
+    dblValue, dblHigh : Double) : TColor;
+
+  Var
+    iColourDiff : TColor;
+
+  Begin
+    iColourDiff := iHigh And iMask - iLow And iMask;
+    Result := Round(iLow And iMask + iColourDiff * (dblValue - dblLow) /
+      (dblHigh - dblLow)) And iMask;
+  End;
+
+  (**
+
+    This function calculate the intepolation of a colour value between 2
+    colours based on value for those colour positions.
+
+    @precon  None.
+    @postcon Returns the colour which is an interpolation between the input
+             colours.
+
+    @param   iLow     as a TColor
+    @param   iHigh    as a TColor
+    @param   dblLow   as a Double
+    @param   dblValue as a Double
+    @param   dblHigh  as a Double
+    @return  a TColor  
+
+  **)
+  Function InterpolateColours(iLow, iHigh : TColor; dblLow,
+    dblValue, dblHigh : Double) : TColor;
+
+  Begin
+    Result :=
+      InterpolateColour(iLow, iHigh, $FF0000, dblLow, dblValue, dblHigh) +
+      InterpolateColour(iLow, iHigh, $00FF00, dblLow, dblValue, dblHigh) +
+      InterpolateColour(iLow, iHigh, $0000FF, dblLow, dblValue, dblHigh);
+  End;
 
 Begin
   If dblValue <= dblLowCriteria Then
     Result := iLowColour
   Else If dblValue <= dblMiddleCriteria Then
-    Begin
-      iB := iMiddleColour And $FF0000 - iLowColour And $FF0000;
-      iG := iMiddleColour And $00FF00 - iLowColour And $00FF00;
-      iR := iMiddleColour And $0000FF - iLowColour And $0000FF;
-      Result :=
-        Round(iLowColour And $FF0000 + iB * (dblValue - dblLowCriteria) / (dblMiddleCriteria - dblLowCriteria)) And $FF0000 +
-        Round(iLowColour And $00FF00 + iG * (dblValue - dblLowCriteria) / (dblMiddleCriteria - dblLowCriteria)) And $00FF00 +
-        Round(iLowColour And $0000FF + iR * (dblValue - dblLowCriteria) / (dblMiddleCriteria - dblLowCriteria)) And $0000FF;
-    End Else
-  If dblValue <= dblUpperCriteria then
-    Begin
-      iB := iHighColour And $FF0000 - iMiddleColour And $FF0000;
-      iG := iHighColour And $00FF00 - iMiddleColour And $00FF00;
-      iR := iHighColour And $0000FF - iMiddleColour And $0000FF;
-      Result :=
-        Round(iMiddleColour And $FF0000 + iB * (dblValue - dblMiddleCriteria) / (dblUpperCriteria - dblMiddleCriteria)) And $FF0000 +
-        Round(iMiddleColour And $00FF00 + iG * (dblValue - dblMiddleCriteria) / (dblUpperCriteria - dblMiddleCriteria)) And $00FF00 +
-        Round(iMiddleColour And $0000FF + iR * (dblValue - dblMiddleCriteria) / (dblUpperCriteria - dblMiddleCriteria)) And $0000FF;
-    End Else
-      Result := iHighColour;
+    Result := InterpolateColours(
+      ColorToRGB(iLowColour),
+      ColorToRGB(iMiddleColour),
+      dblLowCriteria,
+      dblValue,
+      dblMiddleCriteria)
+  Else If dblValue <= dblUpperCriteria then
+    Result := InterpolateColours(
+      ColorToRGB(iMiddleColour),
+      ColorToRGB(iHighColour),
+      dblMiddleCriteria,
+      dblValue,
+      dblUpperCriteria)
+  Else
+    Result := iHighColour;
 End;
 
 (** Initialises the console more to Unknown to force a call to the Win32 API **)

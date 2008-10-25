@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    04 Oct 2008
+  @Date    23 Oct 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -1146,7 +1146,7 @@ begin
     End Else
     Begin
       stbStatusBar.SimpleText := Format(strStatusbarText, [
-        Int(M.Bytes), Int(M.TokenCount), Int(M.Lines)]);
+        Int(Integer(M.Bytes)), Int(M.TokenCount), Int(M.Lines)]);
     End;
 end;
 

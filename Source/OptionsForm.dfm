@@ -221,7 +221,6 @@ object frmOptions: TfrmOptions
         Height = 13
         Anchors = [akTop, akRight]
         Caption = 'Background &Colour'
-        ExplicitLeft = 469
       end
       object lblTokenLimit: TLabel
         Left = 504
@@ -237,7 +236,7 @@ object frmOptions: TfrmOptions
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 0
       end
       object edtFontSize: TEdit
@@ -277,7 +276,6 @@ object frmOptions: TfrmOptions
         Top = 84
         Width = 168
         Height = 22
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 4
@@ -333,7 +331,6 @@ object frmOptions: TfrmOptions
         Top = 254
         Width = 168
         Height = 22
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 6
@@ -528,8 +525,8 @@ object frmOptions: TfrmOptions
     Kind = bkOK
   end
   object CheckedImages: TImageList
-    Left = 50
-    Top = 48
+    Left = 42
+    Top = 56
     Bitmap = {
       494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010

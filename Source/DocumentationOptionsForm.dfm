@@ -1,6 +1,6 @@
 object frmDocumentationOptions: TfrmDocumentationOptions
-  Left = 0
-  Top = 0
+  Left = 648
+  Top = 534
   BorderStyle = bsDialog
   Caption = 'Documentation Options'
   ClientHeight = 373
@@ -37,7 +37,6 @@ object frmDocumentationOptions: TfrmDocumentationOptions
     Font.Style = []
     ParentFont = False
     WordWrap = True
-    ExplicitTop = 342
   end
   object rgpDocumentationOptions: TRadioGroup
     Left = 8
@@ -47,7 +46,6 @@ object frmDocumentationOptions: TfrmDocumentationOptions
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Documentation Options'
     TabOrder = 0
-    ExplicitHeight = 179
   end
   object btnOK: TBitBtn
     Left = 267
@@ -75,7 +73,6 @@ object frmDocumentationOptions: TfrmDocumentationOptions
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Scope Options'
     TabOrder = 1
-    ExplicitTop = 193
     object chkLocal: TCheckBox
       Left = 14
       Top = 22

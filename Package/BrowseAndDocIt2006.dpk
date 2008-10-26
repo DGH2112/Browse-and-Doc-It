@@ -5,11 +5,11 @@
   version of PascalDoc.
 
   @Author  David Hoyle
-  @Date    04 Oct 2008
+  @Date    25 Oct 2008
   @Version 1.0
 
 **)
-package BrowseAndDocIt;
+package BrowseAndDocIt2006;
 
 {$R *.res}
 {$R '..\ExplorerImages.res'}
@@ -39,6 +39,7 @@ package BrowseAndDocIt;
 {$DESCRIPTION 'Browse and Doc It'}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
+{%File '..\..\..\LIBRARY\CompilerDefinitions.inc'}
 
 requires
   rtl,

@@ -12,7 +12,7 @@ object frmDocumentationOptions: TfrmDocumentationOptions
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poMainFormCenter
+  Position = poScreenCenter
   DesignSize = (
     350
     373)

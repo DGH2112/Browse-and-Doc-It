@@ -1,9 +1,9 @@
 object frmMethodDescriptions: TfrmMethodDescriptions
-  Left = 0
-  Top = 0
+  Left = 529
+  Top = 589
+  Width = 640
+  Height = 135
   Caption = 'Method Descriptions'
-  ClientHeight = 101
-  ClientWidth = 632
   Color = clBtnFace
   Constraints.MaxHeight = 135
   Constraints.MinHeight = 135
@@ -14,7 +14,7 @@ object frmMethodDescriptions: TfrmMethodDescriptions
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poMainFormCenter
+  Position = poScreenCenter
   DesignSize = (
     632
     101)

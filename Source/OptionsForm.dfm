@@ -236,7 +236,7 @@ object frmOptions: TfrmOptions
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 0
       end
       object edtFontSize: TEdit
@@ -276,6 +276,7 @@ object frmOptions: TfrmOptions
         Top = 84
         Width = 168
         Height = 22
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 4
@@ -331,6 +332,7 @@ object frmOptions: TfrmOptions
         Top = 254
         Width = 168
         Height = 22
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 6

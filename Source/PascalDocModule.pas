@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       23 Oct 2008
+  @Date       04 Nov 2008
   @Author     David Hoyle
 
 **)
@@ -1566,12 +1566,10 @@ end;
 **)
 procedure TField.CheckDocumentation(var boolCascade: Boolean);
 begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedFields In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          DocConflictTable[dctFieldClauseUndocumented]);
-    End;
+  If doShowUndocumentedFields In BrowseAndDocItOptions.Options Then
+    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctFieldClauseUndocumented]);
   Inherited CheckDocumentation(boolCascade);
 end;
 
@@ -6985,8 +6983,8 @@ Begin
           If T = Nil Then
             If Token.UToken = 'CONST' Then
               Begin
-                T := TTypes.Create(Token.Token, scPrivate, Token.Line,
-                  Token.Column, iiNone, Nil);
+                T := FTemporaryElements.Add(TTypes.Create(Token.Token, scPrivate,
+                  Token.Line, Token.Column, iiNone, Nil)) As TTypes;
                 NextNonCommentToken;
               End;
           // Get default value
@@ -8395,12 +8393,10 @@ End;
 Procedure TResourceString.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedConsts In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          DocConflictTable[dctResourceStringClauseUndocumented]);
-    End;
+  If doShowUndocumentedConsts In BrowseAndDocItOptions.Options Then
+    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctResourceStringClauseUndocumented]);
 End;
 
 (**
@@ -8417,12 +8413,10 @@ End;
 Procedure TThreadVar.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedVars In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          DocConflictTable[dctThreadVarClauseUndocumented]);
-    End;
+  If doShowUndocumentedVars In BrowseAndDocItOptions.Options Then
+    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctThreadVarClauseUndocumented]);
 End;
 
 (**
@@ -8441,23 +8435,21 @@ var
   i: Integer;
 
 Begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedRecords In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          DocConflictTable[dctRecordClauseUndocumented]);
-    End;
+  If doShowUndocumentedRecords In BrowseAndDocItOptions.Options Then
+    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctRecordClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
 
 (**
 
-  This method searches for reference to the passed symbol in the records 
-  fields. 
+  This method searches for reference to the passed symbol in the records
+  fields.
 
-  @precon  None. 
-  @postcon Returns true if the symbol is found. 
+  @precon  None.
+  @postcon Returns true if the symbol is found.
 
   @param   AToken as a TTokenInfo
   @return  a Boolean
@@ -8484,12 +8476,10 @@ var
   i: Integer;
 
 Begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedObjects In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          DocConflictTable[dctObjectClauseUndocumented]);
-    End;
+  If doShowUndocumentedObjects In BrowseAndDocItOptions.Options Then
+    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctObjectClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
@@ -8510,23 +8500,21 @@ var
   i: Integer;
 
 Begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedClasses In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          DocConflictTable[dctClassClauseUndocumented]);
-    End;
+  If doShowUndocumentedClasses In BrowseAndDocItOptions.Options Then
+    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctClassClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
 
 (**
 
-  This method searches for reference to trhe passed symbol in the classes 
-  various section. 
+  This method searches for reference to trhe passed symbol in the classes
+  various section.
 
-  @precon  None. 
-  @postcon Returns true if the symbol is found. 
+  @precon  None.
+  @postcon Returns true if the symbol is found.
 
   @param   AToken as a TTokenInfo
   @return  a Boolean
@@ -8569,12 +8557,10 @@ var
   i: Integer;
 
 Begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          DocConflictTable[dctInterfaceClauseUndocumented]);
-    End;
+  If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
+    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctInterfaceClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
@@ -8595,12 +8581,10 @@ var
   i: Integer;
 
 Begin
-  If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-    Begin
-      If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
-        AddDocumentConflict([Identifier], Line, Column, Comment,
-          DocConflictTable[dctDispInterfaceClauseUndocumented]);
-    End;
+  If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
+    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment,
+        DocConflictTable[dctDispInterfaceClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
@@ -8707,7 +8691,7 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
 
   **)
   Function GetDef : String;
-  
+
   Var
     iPos : Integer;
     strToken : String;

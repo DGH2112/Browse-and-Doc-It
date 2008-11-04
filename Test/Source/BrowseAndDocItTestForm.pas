@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    17 Oct 2008
+  @Date    04 Nov 2008
   @Author  David Hoyle
 
 **)

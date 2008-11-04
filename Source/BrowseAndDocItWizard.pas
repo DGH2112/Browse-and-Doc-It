@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    25 Oct 2008
+  @Date    03 Nov 2008
   @Version 1.0
 
 **)
@@ -2108,6 +2108,7 @@ begin
           BrowseAndDocItOptions.Defines.Text :=
             StringReplace(Options.Values['Defines'], ';', #13#10,
             [rfReplaceAll]);
+          DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
         End;
       DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
       Reader := SourceEditor.CreateReader;

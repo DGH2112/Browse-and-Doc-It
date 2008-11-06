@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    04 Nov 2008
+  @Date    06 Nov 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -1165,8 +1165,8 @@ Type
     **)
     Property CompilerDefines : TStringList Read FCompilerDefs;
   Public
-    Constructor Create(IsModified : Boolean; strFileName : String); Reintroduce;
-      Overload;
+    Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
+      ModuleOptions : TModuleOptions); Virtual;
     Destructor Destroy; Override;
     Procedure AddTickCount(strLabel : String);
     Procedure AddDef(strDef : String);
@@ -4642,17 +4642,21 @@ end;
 
 (**
 
-  This is the constructor method for the TBaseLanguageModule class.
+  This is the constructor method for the TBaseLanguageModule class. 
 
-  @precon  None.
-  @postcon Initialise this base class and Tokensizes the passed stream of
-           characters.
+  @precon  None. 
+  @postcon Initialise this base class and Tokensizes the passed stream of 
+           characters. 
 
-  @param   IsModified       as a Boolean
-  @param   strFileName      as a String
+  @param   Source        as a TStream
+  @param   strFileName   as a String
+  @param   IsModified    as a Boolean
+  @param   ModuleOptions as a TModuleOptions
 
 **)
-constructor TBaseLanguageModule.Create(IsModified : Boolean; strFileName : String);
+constructor TBaseLanguageModule.Create(Source : TStream; strFileName : String;
+  IsModified : Boolean; ModuleOptions : TModuleOptions);
+
 begin
   Inherited Create(strFileName, scGlobal, 0, 0, iiModule, Nil);
   FFileName := strFileName;

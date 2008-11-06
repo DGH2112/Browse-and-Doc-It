@@ -3176,7 +3176,8 @@ Begin
           FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
           Try
             T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
-            C.AddTokens(T);
+            If T <> Nil Then
+              C.AddTokens(T);
             If Token.Token = '=' Then
               Begin
                 C.AppendToken(Token);

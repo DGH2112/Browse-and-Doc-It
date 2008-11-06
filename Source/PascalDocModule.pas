@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       04 Nov 2008
+  @Date       06 Nov 2008
   @Author     David Hoyle
 
 **)
@@ -782,7 +782,7 @@ Type
     Property CurrentMethod : TPascalMethod Read GetCurrentMethod;
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
-      ModuleOptions : TModuleOptions);
+      ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function KeyWords : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
@@ -1797,7 +1797,7 @@ Begin
   CodeProfiler.Start('TPascalModule.Create');
   Try
   {$ENDIF}
-  Inherited Create(IsModified, strFileName);
+  Inherited Create(Source, strFileName, IsModified, ModuleOptions);
   FTypesLabel              := Nil;
   FConstantsLabel          := Nil;
   FResourceStringsLabel    := Nil;

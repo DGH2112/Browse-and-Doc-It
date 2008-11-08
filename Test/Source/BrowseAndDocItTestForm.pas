@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    04 Nov 2008
+  @Date    07 Nov 2008
   @Author  David Hoyle
 
 **)
@@ -344,7 +344,7 @@ Begin
   Try
     While iResult = 0 Do
       Begin
-        If IsKeyWord(ExtractFileExt(recFile.Name), ['.dpk', '.dpr', '.pas']) Then
+        If CanParseDocument(ExtractFileExt(recFile.Name)) Then
           Begin
             FProgressForm.UpdateProgress(0, 'Scanning: ' +
               Copy(strDirectory + '\' + recFile.Name, Length(FDirectory) + 1, 255) + '...');

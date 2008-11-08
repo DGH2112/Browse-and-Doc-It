@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       06 Nov 2008
+  @Date       08 Nov 2008
   @Author     David Hoyle
 
 **)
@@ -2629,7 +2629,7 @@ end;
 procedure TPascalModule.ProgramBlock;
 begin
   UsesClause;
-  Block(scPublic, Nil);
+  Block(scPrivate, Nil);
 end;
 
 (**
@@ -2845,7 +2845,7 @@ Var
 Begin
   FMethodStack.Add(Method);
   Try
-    DeclSection(scLocal, Method);
+    DeclSection(AScope, Method);
     ExportsStmt;
     bool := CompoundStmt;
     If Not bool Then
@@ -6462,7 +6462,7 @@ Begin
           PortabilityDirective;
           If Not Result.ForwardDecl Then
             Begin
-              Block(AScope, Result);
+              Block(scLocal, Result);
               If Token.Token = ';' Then
                 NextNonCommentToken
               Else
@@ -6502,7 +6502,7 @@ Begin
           PortabilityDirective;
           If Not Result.ForwardDecl Then
             Begin
-              Block(AScope, Result);
+              Block(scLocal, Result);
               If Token.Token = ';' Then
                 NextNonCommentToken
               Else
@@ -6541,7 +6541,7 @@ Begin
           Directive(Result);
           If Not Result.ForwardDecl Then
             Begin
-              Block(AScope, Result);
+              Block(scLocal, Result);
               If Token.Token = ';' Then
                 NextNonCommentToken
               Else
@@ -6580,7 +6580,7 @@ Begin
           Directive(Result);
           If Not Result.ForwardDecl Then
             Begin
-              Block(AScope, Result);
+              Block(scLocal, Result);
               If Token.Token = ';' Then
                 NextNonCommentToken
               Else
@@ -7942,10 +7942,11 @@ Begin
               FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
               Try
                 T := GetTypeDecl(TypeToken(Nil, scNone, Nil, FTemporaryElements));
-                For j := 1 To I.ElementCount Do
-                  Prop.AddParameter(TPascalParameter.Create(
-                    ParamMod, I[j].Identifier, False, T, '', scPublic, I[j].Line,
-                    I[j].Column));
+                If T <> Nil Then
+                  For j := 1 To I.ElementCount Do
+                    Prop.AddParameter(TPascalParameter.Create(
+                      ParamMod, I[j].Identifier, False, T, '', scPublic, I[j].Line,
+                      I[j].Column));
               Finally
                 FTemporaryElements.Free;
               End;

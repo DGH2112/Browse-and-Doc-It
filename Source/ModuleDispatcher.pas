@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    06 Nov 2008
+  @Date    07 Nov 2008
   @Version 1.0
 
 **)
@@ -17,13 +17,13 @@ Uses
 
   Function Dispatcher(Source : TStream; strFileName : String;
     boolModified : Boolean; ModuleOptions : TModuleOptions) : TBaseLanguageModule;
-  Function CanAddDocument(strFileName : String) : Boolean;
+  Function CanParseDocument(strFileName : String) : Boolean;
 
   Implementation
 
 Uses
   Windows, PascalDocModule;
-  
+
 Type
   (** A class type to define classes in the record structure. **)
   TBaseLanguageModuleClass = Class Of TBaseLanguageModule;
@@ -124,7 +124,7 @@ End;
   @return  a Boolean
 
 **)
-Function CanAddDocument(strFileName : String) : Boolean;
+Function CanParseDocument(strFileName : String) : Boolean;
 
 Begin
   Result := Find(ExtractFileExt(strFileName)) > 0;

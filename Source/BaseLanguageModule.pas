@@ -1166,7 +1166,7 @@ Type
     Property CompilerDefines : TStringList Read FCompilerDefs;
   Public
     Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
-      ModuleOptions : TModuleOptions); Virtual;
+      ModuleOptions : TModuleOptions); Reintroduce; Overload; Virtual;
     Destructor Destroy; Override;
     Procedure AddTickCount(strLabel : String);
     Procedure AddDef(strDef : String);

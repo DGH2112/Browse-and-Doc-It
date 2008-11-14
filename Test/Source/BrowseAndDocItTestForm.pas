@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    07 Nov 2008
+  @Date    14 Nov 2008
   @Author  David Hoyle
 
 **)
@@ -60,7 +60,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
     Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol : Integer; SelectType : TSelectType);
+      iCommentCol : Integer);
     Procedure Focus(Sender : TObject);
     procedure ShowTokensClick(Sender: TObject);
     procedure SpecialCharactersClick(Sender: TObject);
@@ -722,11 +722,10 @@ end;
   @param   iIdentCol    as an Integer
   @param   iCommentLine as an Integer
   @param   iCommentCol  as an Integer
-  @param   SelectType   as a TSelectType
 
 **)
 procedure TfrmBrowseAndDocItTestForm.SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-  iCommentCol: Integer; SelectType : TSelectType);
+  iCommentCol: Integer);
 
 begin
   If iIdentLine * iIdentCol > 0 Then

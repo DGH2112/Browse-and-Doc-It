@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    06 Nov 2008
+  @Date    15 Nov 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -1165,8 +1165,8 @@ Type
     **)
     Property CompilerDefines : TStringList Read FCompilerDefs;
   Public
-    Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
-      ModuleOptions : TModuleOptions); Reintroduce; Overload; Virtual;
+    Constructor CreateParser(Source : TStream; strFileName : String;
+      IsModified : Boolean; ModuleOptions : TModuleOptions); Virtual;
     Destructor Destroy; Override;
     Procedure AddTickCount(strLabel : String);
     Procedure AddDef(strDef : String);
@@ -4654,8 +4654,8 @@ end;
   @param   ModuleOptions as a TModuleOptions
 
 **)
-constructor TBaseLanguageModule.Create(Source : TStream; strFileName : String;
-  IsModified : Boolean; ModuleOptions : TModuleOptions);
+constructor TBaseLanguageModule.CreateParser(Source : TStream;
+  strFileName : String; IsModified : Boolean; ModuleOptions : TModuleOptions);
 
 begin
   Inherited Create(strFileName, scGlobal, 0, 0, iiModule, Nil);

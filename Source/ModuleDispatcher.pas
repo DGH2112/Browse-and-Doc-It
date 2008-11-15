@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    07 Nov 2008
+  @Date    15 Nov 2008
   @Version 1.0
 
 **)
@@ -107,8 +107,8 @@ Begin
   Result := Nil;
   iIndex := Find(ExtractFileExt(strFileName));
   If iIndex > 0 Then
-    Result := Modules[iIndex].FCls.Create(Source, strFileName, boolModified,
-      ModuleOptions);
+    Result := Modules[iIndex].FCls.CreateParser(Source, strFileName,
+      boolModified, ModuleOptions);
 End;
 
 (**

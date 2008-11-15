@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       08 Nov 2008
+  @Date       15 Nov 2008
   @Author     David Hoyle
 
 **)
@@ -612,7 +612,7 @@ Type
   **)
   TPascalModule = Class(TBaseLanguageModule)
   Private
-    FSourceStream          : TStream;
+    FSourceStream            : TStream;
     FMethodStack             : TObjectList;
     FTypesLabel              : TLabelContainer;
     FConstantsLabel          : TLabelContainer;
@@ -781,12 +781,13 @@ Type
     **)
     Property CurrentMethod : TPascalMethod Read GetCurrentMethod;
   Public
-    Constructor Create(Source : TStream; strFileName : String; IsModified : Boolean;
-      ModuleOptions : TModuleOptions); Override;
+    Constructor CreateParser(Source : TStream; strFileName : String;
+      IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function KeyWords : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
     Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
 
 Implementation
@@ -1786,7 +1787,7 @@ end;
   @param   ModuleOptions as a TModuleOptions
 
 **)
-Constructor TPascalModule.Create(Source : TStream; strFileName : String;
+Constructor TPascalModule.CreateParser(Source : TStream; strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
 var
   boolCascade: Boolean;
@@ -1797,7 +1798,7 @@ Begin
   CodeProfiler.Start('TPascalModule.Create');
   Try
   {$ENDIF}
-  Inherited Create(Source, strFileName, IsModified, ModuleOptions);
+  Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   FTypesLabel              := Nil;
   FConstantsLabel          := Nil;
   FResourceStringsLabel    := Nil;
@@ -6386,6 +6387,23 @@ Begin
       NextNonCommentToken;
     End;
 End;
+
+(**
+
+  This function returns a string repreentation of the unit.
+
+  @precon  None.
+  @postcon Returns a string repreentation of the unit.
+
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TPascalModule.AsString(boolForDocumentation: Boolean): String;
+begin
+  Result := strModuleTypes[ModuleType];
+  Result := Result + #32 + ChangeFileExt(ExtractFileName(Identifier), '');
+end;
 
 (**
 

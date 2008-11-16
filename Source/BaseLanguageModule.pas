@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    15 Nov 2008
+  @Date    16 Nov 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -26,7 +26,8 @@ Type
   (** An enumerate type to define the stream status and token types. **)
   TTokenType = (ttUnknown, ttWhiteSpace, ttReservedWord, ttIdentifier, ttNumber,
     ttSymbol, ttLineEnd, ttArrayElement, ttStatementEnd, ttStringLiteral,
-    ttComment, ttHTMLTag, ttDirective, ttCompilerDirective, ttLinkTag);
+    ttComment, ttHTMLTag, ttDirective, ttCompilerDirective, ttLinkTag,
+    ttTreeHeader);
   (** An enumerate for the scoping of identifiers. **)
   TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic, scPublished);
   (** A set to represent combinations of scopes. **)
@@ -1350,6 +1351,8 @@ Type
     FModuleExplorerBGColour : TColor;
     FTokenLimit : Integer;
     FMaxDocOutputWidth: Integer;
+    FManagedNodesLife : Integer;
+    FTreeColour : TColor;
   Protected
     Function GetTokenFontInfo(ATokenType  : TTokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(ATokenType  : TTokenType; ATokenFontInfo : TTokenFontInfo);
@@ -1390,11 +1393,8 @@ Type
       This property determines the amount of time in milliseonds between the
       last editor update and the next refresh. Interval only, the application
       needs to implement the logic.
-
       @precon  None.
-
       @postcon Gets and sets the update interval.
-
       @return  a Cardinal
     **)
     Property UpdateInterval : Cardinal Read FUpdateInterval Write FUpdateInterval;
@@ -1430,11 +1430,8 @@ Type
     (**
       This property determines the colour and style attribute of a token in the
       module explorer
-
       @precon  None.
-
       @postcon Gets and sets the colour and style of the token.
-
       @param   ATokenType as       a TTokenType
       @return  a TTokenFontInfo
     **)
@@ -1486,6 +1483,22 @@ Type
       @return  an Integer
     **)
     Property MaxDocOutputWidth : Integer Read FMaxDocOutputWidth Write FMaxDocOutputWidth;
+    (**
+      This property gets and sets the period of time in days which managed nodes
+      are alive for.
+      @precon  None.
+      @postcon Gets and sets the period of time in days which managed nodes
+               are alive for.
+      @return  an Integer
+    **)
+    Property ManagedNodesLive : Integer Read FManagedNodesLife Write FManagedNodesLife;
+    (**
+      This property gets and sets the colour of the explorer tree lines.
+      @precon  None.
+      @postcon Gets and sets the colour of the explorer tree lines.
+      @return  a TColor
+    **)
+    Property TreeColour : TColor Read FTreeColour Write FTreeColour;
   End;
 
   (** A class to represent a label within the Module Explorer / Documentation **)
@@ -2116,21 +2129,22 @@ Const
 
   (** This is a default set of font information for the application. **)
   strTokenTypeInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo = (
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : [fsBold]),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : [fsBold]),
-    (FColour : clBlack; FStyles : []),
-    (FColour : clBlack; FStyles : [])
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : [fsBold]),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : [fsBold]),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clMaroon; FStyles : [fsBold])
   );
 
   (** This is a constant for special tag items to show in the tree **)
@@ -2527,7 +2541,8 @@ Const
   strTokenType : Array[Low(TTokenType)..High(TTokenType)] Of String = (
     'Unknown', 'WhiteSpace', 'ReservedWord', 'Identifier', 'Number',
     'Symbol', 'LineEnd', 'ArrayElement', 'StatementEnd', 'StringLiteral',
-    'Comment', 'HTMLTag', 'Directive', 'CompilerDirective', 'LinkTag');
+    'Comment', 'HTMLTag', 'Directive', 'CompilerDirective', 'LinkTag',
+    'TreeHeader');
 
 Var
   (** This is a global variable for the Browse and Doc It options that need to
@@ -5843,7 +5858,7 @@ Begin
   FDefines := TStringList.Create;
   FSpecialTags := TStringList.Create;
   // Create a default set of Special Tags.
-  FSpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree And iAutoExpand And iShowInDoc));
+  FSpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree Or iAutoExpand Or iShowInDoc));
   FSpecialTags.AddObject('precon=Pre-Conditions', TObject(0));
   FSpecialTags.AddObject('postcon=Post-Conditions', TObject(0));
   FSpecialTags.AddObject('param=Parameters', TObject(0));
@@ -5851,8 +5866,8 @@ Begin
   FSpecialTags.AddObject('note=Notes', TObject(0));
   FSpecialTags.AddObject('see=Also See', TObject(0));
   FSpecialTags.AddObject('exception=Exception Raised', TObject(0));
-  FSpecialTags.AddObject('bug=Known Bugs', TObject(iShowInTree And iAutoExpand And iShowInDoc));
-  FSpecialTags.AddObject('debug=Debugging Code', TObject(iShowInTree And iAutoExpand And iShowInDoc));
+  FSpecialTags.AddObject('bug=Known Bugs', TObject(iShowInTree Or iAutoExpand Or iShowInDoc));
+  FSpecialTags.AddObject('debug=Debugging Code', TObject(iShowInTree Or iAutoExpand Or iShowInDoc));
   FSpecialTags.AddObject('date=Date Code Last Updated', TObject(0));
   FSpecialTags.AddObject('author=Code Author', TObject(0));
   FSpecialTags.AddObject('version=Code Version', TObject(0));
@@ -5931,13 +5946,15 @@ begin
           FOptions := FOptions + [i]
         Else
           FOptions := FOptions - [i];
-      For j := 0 To FSpecialTags.Count - 1 Do
-        FSpecialTags.Objects[j] := TObject(
-          ReadInteger('SpecialTags', FSpecialTags.Names[j],
-          Integer(FSpecialTags.Objects[j]))
-        );
       sl := TStringList.Create;
       Try
+        ReadSection('SpecialTagNames', sl);
+        If sl.Count > 0 Then
+          FSpecialTags.Clear;
+        For j := 0 To sl.Count - 1 Do
+          FSpecialTags.AddObject(Format('%s=%s', [sl[j],
+            ReadString('SpecialTagNames', sl[j], '')]),
+            TObject(ReadInteger('SpecialTags', sl[j], 0)));
         ReadSection('ManagedExpandedNodes', sl);
         For j := 0 To sl.Count - 1 Do
           Begin
@@ -5979,6 +5996,8 @@ begin
         'BGColour', ColorToString(clWindow)));
       FTokenLimit := ReadInteger('ModuleExplorer', 'TokenLimit', 50);
       FMaxDocOutputWidth := ReadInteger('Documentation', 'MaxDocOutputWidth', 80);
+      FManagedNodesLife := ReadInteger('ModuleExplorer', 'ManagedNodesLife', 90);
+      FTreeColour := StringToColor(ReadString('ModuleExplorer', 'TreeColour', 'clGray'));
     Finally
       Free;
     End;
@@ -6004,8 +6023,15 @@ begin
     Try
       For i := Low(TDocOption) to High(TDocOption) Do
         WriteBool('Options', DocOptionInfo[i].FDescription, i In FOptions);
+      EraseSection('SpecialTags');
+      EraseSection('SpecialTagNames');
       For j := 0 To FSpecialTags.Count - 1 Do
-        WriteInteger('SpecialTags', FSpecialTags.Names[j], Integer(FSpecialTags.Objects[j]));
+        Begin
+          WriteInteger('SpecialTags', FSpecialTags.Names[j],
+            Integer(FSpecialTags.Objects[j]));
+          WriteString('SpecialTagNames', FSpecialTags.Names[j],
+            FSpecialTags.Values[FSpecialTags.Names[j]]);
+        End;
       EraseSection('ManagedExpandedNodes');
       For j := 0 To BrowseAndDocItOptions.ExpandedNodes.Count - 1 Do
         WriteInteger('ManagedExpandedNodes',
@@ -6035,10 +6061,12 @@ begin
           FMethodDescriptions.Values[FMethodDescriptions.Names[j]]);
         {$ENDIF}
       WriteInteger('Documentation', 'Scopes', Byte(FScopesToDocument));
-      WriteString('ModuleExploror', 'BGColour',
+      WriteString('ModuleExplorer', 'BGColour',
         ColorToString(FModuleExplorerBGColour));
       WriteInteger('ModuleExplorer', 'TokenLimit', FTokenLimit);
       WriteInteger('Documentation', 'MaxDocOutputWidth', FMaxDocOutputWidth);
+      WriteInteger('ModuleExplorer', 'ManagedNodesLife', FManagedNodesLife);
+      WriteString('ModuleExplorer', 'TreeColour', ColorToString(FTreeColour));
     Finally
       Free;
     End;

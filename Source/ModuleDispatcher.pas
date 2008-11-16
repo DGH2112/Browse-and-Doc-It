@@ -37,12 +37,12 @@ Type
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
   Modules : Array[1..6] of TDispatcherInfo = (
-    (FExt: '.dpk'; FCls: TPascalModule),
-    (FExt: '.dpr'; FCls: TPascalModule),
-    (FExt: '.pas'; FCls: TPascalModule),
     (FExt: '.bas'; FCls: TVBModule),
     (FExt: '.cls'; FCls: TVBModule),
-    (FExt: '.frm'; FCls: TVBModule)
+    (FExt: '.dpk'; FCls: TPascalModule),
+    (FExt: '.dpr'; FCls: TPascalModule),
+    (FExt: '.frm'; FCls: TVBModule),
+    (FExt: '.pas'; FCls: TPascalModule)
   );
 
 (**

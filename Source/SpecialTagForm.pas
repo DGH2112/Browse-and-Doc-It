@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 May 2006
+  @Date    16 Nov 2008
 
 **)
 unit SpecialTagForm;
@@ -27,12 +27,13 @@ type
     btnCancel: TBitBtn;
     cbxShowInTree: TCheckBox;
     cbxAutoExpand: TCheckBox;
+    chkShowInDoc: TCheckBox;
   private
     { Private declarations }
   public
     { Public declarations }
     Class Function Execute(var strName, strDescription : String;
-      var boolShow, boolExpand : Boolean) : Boolean;
+      var boolShowInTree, boolExpand, boolShowInDoc : Boolean) : Boolean;
   end;
 
 implementation
@@ -43,25 +44,26 @@ implementation
 
 (**
 
-  This method accepts a name and description string and displays them for
-  editing in the form. If the user presses OK the form returns true.
+  This method accepts a name and description string and displays them for 
+  editing in the form. If the user presses OK the form returns true. 
 
-  @precon  strName is the tags name, strDescription is the tags description,
-           boolShow is a boolean value it indicate whether to show the tag in
-           the browser, boolExpand is a boolean value it indicate whether to
-           expand the tag in the browser and Returns true if the OK button was
-           pressed.
-  @postcon Displays the special tag form.
+  @precon  strName is the tags name, strDescription is the tags description, 
+           boolShow is a boolean value it indicate whether to show the tag in 
+           the browser, boolExpand is a boolean value it indicate whether to 
+           expand the tag in the browser and Returns true if the OK button 
+           was pressed. 
+  @postcon Displays the special tag form. 
 
   @param   strName        as a String as a reference
   @param   strDescription as a String as a reference
-  @param   boolShow       as a Boolean as a reference
+  @param   boolShowInTree as a Boolean as a reference
   @param   boolExpand     as a Boolean as a reference
-  @return  a Boolean
+  @param   boolShowInDoc  as a Boolean as a reference
+  @return  a Boolean       
 
 **)
 class function TfrmSpecialTag.Execute(var strName, strDescription: String;
-  var boolShow, boolExpand : Boolean): Boolean;
+  var boolShowInTree, boolExpand, boolShowInDoc : Boolean): Boolean;
 
 begin
   With TfrmSpecialTag.Create(Nil) Do
@@ -69,14 +71,16 @@ begin
       Result := False;
       edtName.Text := strName;
       edtDescription.Text := strDescription;
-      cbxShowInTree.Checked := boolShow;
+      cbxShowInTree.Checked := boolShowInTree;
       cbxAutoExpand.Checked := boolExpand;
+      chkShowInDoc.Checked := boolShowInDoc;
       If ShowModal = mrOK Then
         Begin
           strName := edtName.Text;
           strDescription := edtDescription.Text;
-          boolShow := cbxShowInTree.Checked;
+          boolShowInTree := cbxShowInTree.Checked;
           boolExpand :=cbxAutoExpand.Checked;
+          boolShowInDoc := chkShowInDoc.Checked;
           Result := True
         End;
     Finally

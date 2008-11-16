@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    03 Nov 2008
+  @Date    16 Nov 2008
   @Version 1.0
 
 **)
@@ -33,7 +33,7 @@ Type
     procedure OptionsClick(Sender: TObject);
     procedure CheckForUpdatesClick(Sender: TObject);
     procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol : Integer; SelectType : TSelectType);
+      iCommentCol : Integer);
     Procedure Focus(Sender : TObject);
     Procedure OptionsChange(Sender : TObject);
     function GetMethodDescription(Method : TGenericMethodDecl; AComment : TComment;
@@ -632,10 +632,10 @@ begin
       Case CommentType Of
         ctBlock:
           SelectionChange(EditPos.Line + 5, EditPos.Col, EditPos.Line + 5,
-            EditPos.Col, stIdentifier);
+            EditPos.Col);
       Else
         SelectionChange(EditPos.Line + 1, EditPos.Col, EditPos.Line + 1,
-          EditPos.Col,  stIdentifier);
+          EditPos.Col);
       End;
       // Place cursor at start of comment
       Case CommentType Of
@@ -894,7 +894,7 @@ begin
   Result.Col := CharPos.CharIndex + 2 + P.X;
   Result.Line := CharPos.Line + 2 + P.Y;
   SelectionChange(Result.Line + iLines, Result.Col, Result.Line - 2,
-    Result.Col, stIdentifier);
+    Result.Col);
 end;
 
 (**
@@ -1224,8 +1224,7 @@ Begin
   iLines := Writer.CurrentPos.Line - iLines;
   Result.Col := CharPos.CharIndex + 2;
   Result.Line := CharPos.Line + 1;
-  SelectionChange(Result.Line + iLines, Result.Col, Result.Line - 1, Result.Col,
-    stIdentifier);
+  SelectionChange(Result.Line + iLines, Result.Col, Result.Line - 1, Result.Col);
 End;
 
 (**
@@ -1301,11 +1300,10 @@ end;
   @param   iIdentCol  as an Integer
   @param   iCommentLine as an Integer
   @param   iCommentCol  as an Integer
-  @param   SelectType   as a TSelectType
 
 **)
 procedure TBrowseAndDocItWizard.SelectionChange(iIdentLine, iIdentCol,
-  iCommentLine, iCommentCol : Integer; SelectType : TSelectType);
+  iCommentLine, iCommentCol : Integer);
 
 Var
   SourceEditor : IOTASourceEditor;

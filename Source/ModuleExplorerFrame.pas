@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    15 Nov 2008
+  @Date    16 Nov 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -240,7 +240,8 @@ type
 implementation
 
 Uses
-  IniFiles, Types, Math, DGHLibrary, GenericTokenizer, Profiler;
+  IniFiles, Types, Math, DGHLibrary, GenericTokenizer
+  {$IFDEF PROFILECODE}, Profiler {$ENDIF};
 
 Type
   (** This record described the data sorted in the virtual tree view. **)
@@ -325,8 +326,8 @@ Begin
           End;
         End Else
         Begin
-          Canvas.Font.Color := clMaroon; //: @refactor Should be an option.
-          Canvas.Font.Style := [fsBold];
+          Canvas.Font.Color := TokenFontInfo[ttTreeHeader].FColour;
+          Canvas.Font.Style := TokenFontInfo[ttTreeHeader].FStyles;
         End;
    End;
   {$IFDEF PROFILECODE}
@@ -1173,7 +1174,7 @@ Begin
   CodeProfiler.Start('TframeModuleExplorer.RenderModule');
   Try
   {$ENDIF}
-  tvExplorer.Color := BRowseAndDocItOptions.BGColour;
+  tvExplorer.Color := BrowseAndDocItOptions.BGColour;
   If M = Nil Then
     strKeyWords := Nil
   Else
@@ -1193,12 +1194,13 @@ Begin
     Try
       tvExplorer.Clear;
       FNodeInfo.Clear;
-      M.AddTickCount('Clear');
-      SetLength(FSpecialTagNodes, BrowseAndDocItOptions.SpecialTags.Count);
       If M = Nil Then
         Exit;
+      M.AddTickCount('Clear');
+      SetLength(FSpecialTagNodes, BrowseAndDocItOptions.SpecialTags.Count);
       // Create Root Tree Node
-      FModule := AddNode(Nil, M.AsString, 0, M.ImageIndexAdjustedForScope);
+      FModule := AddNode(Nil, M.AsString, 0, M.ImageIndexAdjustedForScope,
+        M.Line, M.Column, M.Comment);
       CreateSpecialTagNodes(M);
       OutputModuleInfo(M);
       M.AddTickCount('Build');
@@ -1849,8 +1851,6 @@ procedure TframeModuleExplorer.tvExplorerBeforeItemPaint(
   Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode;
   ItemRect: TRect; var CustomDraw: Boolean);
 
-Const
-  iTreeColour = clGray; //: @refactor Make into an option.
 
 Var
   iPos: Integer;
@@ -1860,6 +1860,8 @@ Var
   iCentre: Integer;
   P: PVirtualNode;
   sl : TStringList;
+  iOffset: Integer;
+  iTreeColour : TColor;
 
 begin
   {$IFDEF PROFILECODE}
@@ -1873,6 +1875,7 @@ begin
         TargetCanvas.Font.Name := BrowseAndDocItOptions.FontName;
         TargetCanvas.Font.Size := BrowseAndDocItOptions.FontSize;
         // Highlight selected item.
+        iOffset := Sender.Left;
         Brush.Color := tvExplorer.Color;
         FillRect(ItemRect);
         NodeData := Sender.GetNodeData(Node);
@@ -1888,7 +1891,7 @@ begin
               End;
             R := ItemRect;
             R.Left := (NodeData.FNode.Level + 1) * Integer(tvExplorer.Indent) -
-              Sender.ExplicitLeft + ilScopeImages.Width + tvExplorer.Margin +
+              iOffset + ilScopeImages.Width + tvExplorer.Margin +
               tvExplorer.TextMargin - 2;
             R.Right := R.Left + iPos;
             If Node = Sender.FocusedNode Then
@@ -1903,9 +1906,10 @@ begin
         iCentre := (R.Top + R.Bottom) Div 2;
         // Draw Tree
         R.Left := R.Left + (NodeData.FNode.Level * Integer(tvExplorer.Indent)) -
-          Sender.ExplicitLeft;
+          iOffset;
         // Draw vertical tree lines
         P := Node.Parent;
+        iTreeColour := BrowseAndDocItOptions.TreeColour;
         For i := NodeData.FNode.Level - 1 DownTo 0 Do
           Begin
             If (P <> Nil) And (P.Parent <> Nil) Then
@@ -1913,8 +1917,8 @@ begin
                 Begin
                   Pen.Color := iTreeColour;
                   Pen.Style := psSolid;
-                  MoveTo(Integer(tvExplorer.Indent) * i + 8 - Sender.ExplicitLeft, R.Top);
-                  LineTo(Integer(tvExplorer.Indent) * i + 8 - Sender.ExplicitLeft, R.Bottom);
+                  MoveTo(Integer(tvExplorer.Indent) * i + 8 - iOffset, R.Top);
+                  LineTo(Integer(tvExplorer.Indent) * i + 8 - iOffset, R.Bottom);
                 End;
             P := P.Parent;
           End;
@@ -1947,7 +1951,7 @@ begin
             Rectangle(R.Left + 4, iCentre - 4,
               R.Left + 13, iCentre + 5);
             // Draw negative side
-            Pen.Color := clBlack;
+            Pen.Color := iTreeColour;
             MoveTo(R.Left + 6, iCentre);
             LineTo(R.Left + 11, iCentre);
             If Not Sender.Expanded[Node] Then

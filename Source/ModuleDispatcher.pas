@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    15 Nov 2008
+  @Date    16 Nov 2008
   @Version 1.0
 
 **)
@@ -22,24 +22,27 @@ Uses
   Implementation
 
 Uses
-  Windows, PascalDocModule;
+  Windows, PascalDocModule, VBModule;
 
 Type
   (** A class type to define classes in the record structure. **)
   TBaseLanguageModuleClass = Class Of TBaseLanguageModule;
-  
+
   (** A record to describe the file extensions and parser modules. **)
   TDispatcherInfo = Record
     FExt : String;
     FCls : TBaseLanguageModuleClass;
   End;
-  
+
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
-  Modules : Array[1..3] of TDispatcherInfo = (
+  Modules : Array[1..6] of TDispatcherInfo = (
     (FExt: '.dpk'; FCls: TPascalModule),
     (FExt: '.dpr'; FCls: TPascalModule),
-    (FExt: '.pas'; FCls: TPascalModule)
+    (FExt: '.pas'; FCls: TPascalModule),
+    (FExt: '.bas'; FCls: TVBModule),
+    (FExt: '.cls'; FCls: TVBModule),
+    (FExt: '.frm'; FCls: TVBModule)
   );
 
 (**

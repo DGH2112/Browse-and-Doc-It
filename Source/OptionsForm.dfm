@@ -48,24 +48,34 @@ object frmOptions: TfrmOptions
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
+        DesignSize = (
+          675
+          34)
         object lblRefreshInterval: TLabel
-          Left = 8
-          Top = 12
+          Left = 0
+          Top = 9
           Width = 173
           Height = 13
           Caption = 'Refresh &Interval after Editor changes'
         end
+        object lblManagedNodesLife: TLabel
+          Left = 406
+          Top = 9
+          Width = 184
+          Height = 13
+          Caption = 'Life-time of Managed Nodes (in days)'
+        end
         object edtUpdateInterval: TEdit
-          Left = 200
-          Top = 11
+          Left = 194
+          Top = 6
           Width = 57
           Height = 21
           TabOrder = 0
           Text = '100'
         end
         object udUpdateInterval: TUpDown
-          Left = 257
-          Top = 11
+          Left = 251
+          Top = 6
           Width = 16
           Height = 21
           Associate = edtUpdateInterval
@@ -74,6 +84,26 @@ object frmOptions: TfrmOptions
           Increment = 100
           Position = 100
           TabOrder = 1
+        end
+        object edtManagedNodesLife: TEdit
+          Left = 596
+          Top = 6
+          Width = 57
+          Height = 21
+          Anchors = [akTop, akRight]
+          TabOrder = 2
+          Text = '100'
+        end
+        object udManagedNodesLife: TUpDown
+          Left = 659
+          Top = 6
+          Width = 16
+          Height = 21
+          Anchors = [akTop, akRight]
+          Associate = edtManagedNodesLife
+          Max = 365
+          Position = 100
+          TabOrder = 3
         end
       end
     end
@@ -223,11 +253,19 @@ object frmOptions: TfrmOptions
         Caption = 'Background &Colour'
       end
       object lblTokenLimit: TLabel
-        Left = 504
-        Top = 282
+        Left = 443
+        Top = 33
         Width = 55
         Height = 13
         Caption = '&Token Limit'
+      end
+      object lblTreeColour: TLabel
+        Left = 504
+        Top = 282
+        Width = 71
+        Height = 13
+        Anchors = [akTop, akRight]
+        Caption = 'Treeline &Colour'
       end
       object cbxFontName: TComboBox
         Left = 79
@@ -242,19 +280,17 @@ object frmOptions: TfrmOptions
       object edtFontSize: TEdit
         Left = 79
         Top = 30
-        Width = 575
+        Width = 184
         Height = 21
-        Anchors = [akLeft, akTop, akRight]
         ReadOnly = True
         TabOrder = 1
         Text = '8'
       end
       object udFontSize: TUpDown
-        Left = 654
+        Left = 263
         Top = 30
         Width = 16
         Height = 21
-        Anchors = [akTop, akRight]
         Associate = edtFontSize
         Min = 8
         Max = 72
@@ -268,7 +304,7 @@ object frmOptions: TfrmOptions
         Height = 255
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
-        TabOrder = 3
+        TabOrder = 5
         OnClick = lbxTokenTypesClick
       end
       object cbxFontColour: TColorBox
@@ -279,7 +315,7 @@ object frmOptions: TfrmOptions
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
         ItemHeight = 16
-        TabOrder = 4
+        TabOrder = 6
         OnChange = cbxFontColourChange
       end
       object gbxFontStyles: TGroupBox
@@ -289,7 +325,7 @@ object frmOptions: TfrmOptions
         Height = 116
         Anchors = [akTop, akRight]
         Caption = 'Font Styles'
-        TabOrder = 5
+        TabOrder = 7
         object chkBold: TCheckBox
           Left = 12
           Top = 21
@@ -335,26 +371,36 @@ object frmOptions: TfrmOptions
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
         ItemHeight = 16
-        TabOrder = 6
+        TabOrder = 8
       end
       object edtTokenLimit: TEdit
         Left = 504
-        Top = 301
+        Top = 30
         Width = 150
         Height = 21
-        TabOrder = 7
+        TabOrder = 3
         Text = '10'
       end
       object udTokenLimit: TUpDown
-        Left = 654
-        Top = 301
+        Left = 656
+        Top = 30
         Width = 16
         Height = 21
         Associate = edtTokenLimit
         Min = 10
         Max = 32600
         Position = 10
-        TabOrder = 8
+        TabOrder = 4
+      end
+      object clbxTreeColour: TColorBox
+        Left = 504
+        Top = 301
+        Width = 168
+        Height = 22
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
+        Anchors = [akTop, akRight]
+        ItemHeight = 16
+        TabOrder = 9
       end
     end
     object TabSheet2: TTabSheet
@@ -527,8 +573,8 @@ object frmOptions: TfrmOptions
     Kind = bkOK
   end
   object CheckedImages: TImageList
-    Left = 42
-    Top = 56
+    Left = 254
+    Top = 188
     Bitmap = {
       494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010

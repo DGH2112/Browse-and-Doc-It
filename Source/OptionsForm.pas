@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    28 Oct 2008
+  @Date    16 Nov 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -70,6 +70,11 @@ type
     udTokenLimit: TUpDown;
     hctlMethodDescriptions: THeaderControl;
     lbxMethodDescriptions: TListBox;
+    lblManagedNodesLife: TLabel;
+    edtManagedNodesLife: TEdit;
+    udManagedNodesLife: TUpDown;
+    lblTreeColour: TLabel;
+    clbxTreeColour: TColorBox;
     procedure btnAddClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
     procedure btnEditClick(Sender: TObject);
@@ -159,6 +164,8 @@ Begin
         lbxMethodDescriptions.Items.Add(BrowseAndDocItOptions.MethodDescriptions[j]);
       cbxBGColour.Selected := BrowseAndDocItOptions.BGColour;
       udTokenLimit.Position := BrowseAndDocItOptions.TokenLimit;
+      udManagedNodesLife.Position := BrowseAndDocItOptions.ManagedNodesLive;
+      clbxTreeColour.Selected := BrowseAndDocItOptions.TreeColour;
       If ShowModal = mrOK Then
         Begin
           Result := True;
@@ -183,6 +190,8 @@ Begin
             lbxMethodDescriptions.Items[j]);
           BrowseAndDocItOptions.BGColour := cbxBGColour.Selected;
           BrowseAndDocItOptions.TokenLimit := udTokenLimit.Position;
+          BrowseAndDocItOptions.ManagedNodesLive := udManagedNodesLife.Position;
+          BrowseAndDocItOptions.TreeColour := clbxTreeColour.Selected;
           BrowseAndDocItOptions.SaveSettings;
         End;
     Finally
@@ -379,17 +388,21 @@ procedure TfrmOptions.btnAddClick(Sender: TObject);
 
 Var
   strName, strDesc : String;
-  boolShow, boolExpand : Boolean;
+  boolShowInTree, boolExpand, boolShowInDoc : Boolean;
 
 begin
-  If TfrmSpecialTag.Execute(strName, strDesc, boolShow, boolExpand) Then
+  If TfrmSpecialTag.Execute(strName, strDesc, boolShowInTree, boolExpand,
+    boolShowInDoc) Then
     Begin
       If (strName = '') Or (strDesc = '') Then
         MessageDlg(strInvalidTag, mtWarning, [mbOK], 0)
       Else
         lbSpecialTags.Items.AddObject(Lowercase(strName) + '=' +
-          strDesc, TObject(Integer(boolShow) * iShowInTree +
-          Integer(boolExpand) * iAutoExpand));
+          strDesc, TObject(
+            Integer(boolShowInTree) * iShowInTree +
+            Integer(boolExpand) * iAutoExpand +
+            Integer(boolShowInDoc) * iShowinDoc)
+          );
     End;
 end;
 
@@ -465,7 +478,7 @@ procedure TfrmOptions.btnEditClick(Sender: TObject);
 
 Var
   strName, strDesc : String;
-  boolShow, boolExpand : Boolean;
+  boolShowInTree, boolExpand, boolShowInDoc : Boolean;
   iPos : Integer;
 
 begin
@@ -475,11 +488,14 @@ begin
       strName := Copy(lbSpecialTags.Items[lbSpecialTags.ItemIndex], 1, iPos - 1);
       strDesc := Copy(lbSpecialTags.Items[lbSpecialTags.ItemIndex], iPos + 1,
         Length(lbSpecialTags.Items[lbSpecialTags.ItemIndex]) - iPos);
-      boolShow := Integer(lbSpecialTags.Items.Objects[lbSpecialTags.ItemIndex])
+      boolShowInTree := Integer(lbSpecialTags.Items.Objects[lbSpecialTags.ItemIndex])
         And iShowInTree <> 0;
       boolExpand := Integer(lbSpecialTags.Items.Objects[lbSpecialTags.ItemIndex])
         And iAutoExpand <> 0;
-      If TfrmSpecialTag.Execute(strName, strDesc, boolShow, boolExpand) Then
+      boolShowInDoc := Integer(lbSpecialTags.Items.Objects[lbSpecialTags.ItemIndex])
+        And iShowInDoc <> 0;
+      If TfrmSpecialTag.Execute(strName, strDesc, boolShowInTree, boolExpand,
+        boolShowInDoc) Then
         Begin
           If (strName = '') Or (strDesc = '') Then
             MessageDlg(strInvalidTag, mtWarning, [mbOK], 0)
@@ -487,8 +503,11 @@ begin
             lbSpecialTags.Items[lbSpecialTags.ItemIndex] := Lowercase(strName) +
               '=' + strDesc;
             lbSpecialTags.Items.Objects[lbSpecialTags.ItemIndex] :=
-              TObject(Integer(boolShow) * iShowInTree +
-              Integer(boolExpand) * iAutoExpand);
+              TObject(
+                Integer(boolShowInTree) * iShowInTree +
+                Integer(boolExpand) * iAutoExpand +
+                Integer(boolShowInDoc) * iShowInDoc
+              );
         End;
     End;
 end;

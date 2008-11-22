@@ -18,6 +18,8 @@ Interface
 Uses
   SysUtils, Windows, Contnrs, Classes, BaseLanguageModule;
 
+{$INCLUDE CompilerDefinitions.inc}
+
 Type
   (** This is an enumerate to describe the type of constant expression. **)
   TExprType = (etUnknown, etConstExpr, etString, etInteger, etFloat);
@@ -29,23 +31,23 @@ Type
 
   (** This class represents a list of identifiers **)
   TIdentList = Class(TElementContainer)
-  Private
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Private
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
 
   (** This class represents a temporary list / collection **)
   TTempCntr = Class(TElementContainer)
-  Private
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Private
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
 
   (** This is a sub class for general type types **)
   TTypes = Class(TGenericTypeDecl)
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
@@ -136,9 +138,9 @@ Type
 
   (** This is a sub class for Array types **)
   TArrayType = Class(TStrucType)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FDimensions : Integer;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     Procedure AddDimension;
@@ -160,10 +162,10 @@ Type
 
   (** This is a class that represents a record definition. **)
   TRecordDecl = Class(TRestrictedType)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FPacked      : Boolean;
     FFieldsLabel : TLabelContainer;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment); Override;
@@ -188,7 +190,7 @@ Type
 
   (** A class to represent a Object Pascal Parameter. **)
   TPascalParameter = Class(TGenericParameter)
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
@@ -197,7 +199,7 @@ Type
 
   (** This is a class that defines method within Object Pascal code. **)
   TPascalMethod = Class(TGenericMethodDecl)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FDirectives           : TStringList;
     FResolved             : Boolean;
     FObjClsInt            : TObjectDecl;
@@ -206,7 +208,7 @@ Type
     FConstantsLabel       : TLabelContainer;
     FResourceStringsLabel : TLabelContainer;
     FLabelsLabel          : TLabelContainer;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetName : String; Override;
   Public
     Constructor Create(MethodType : TMethodType; strName : String; AScope : TScope;
@@ -279,7 +281,7 @@ Type
 
   (** This is a class that defines properties with Object Pascal code. **)
   TPascalProperty = Class(TGenericProperty)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FIndexSpec : String;
     FWriteSpec: String;
     FImplementsSpec: String;
@@ -290,7 +292,7 @@ Type
     FDispIDSpec: String;
     FReadOnlySpec: Boolean;
     FWriteOnlySpec: Boolean;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(strIdent: String; AScope: TScope; iLine, iCol : Integer;
       AImageIndex : TImageIndex; AComment : TComment); Override;
@@ -370,7 +372,7 @@ Type
 
   (** This class defines a property specifier. **)
   TPropertySpec = Class(TElementContainer)
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
@@ -378,10 +380,10 @@ Type
   (** This is a class the extends the record definition to handle an object
   definition **)
   TObjectDecl = Class(TRecordDecl)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FHeritage : TIdentList;
     FMethodsLabel: TLabelContainer;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment); Override;
@@ -408,7 +410,7 @@ Type
   (** This is a class the extends the object definition to handle an class
   definition **)
   TClassDecl = Class(TObjectDecl)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FAbstractClass: Boolean;
     FSealedClass  : Boolean;
     FHelper       : Boolean;
@@ -418,7 +420,7 @@ Type
     FVariablesLabel: TLabelContainer;
     FClassVarsLabel: TLabelContainer;
     FPropertiesLabel: TLabelContainer;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
@@ -495,9 +497,9 @@ Type
   (** This is a class the extends the class definition to handle an interface
   definition **)
   TInterfaceDecl = Class(TClassDecl)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FGUID : String;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
@@ -513,8 +515,8 @@ Type
   (** This is a class the extends the class definition to handle an interface
   definition **)
   TDispInterfaceDecl = Class(TInterfaceDecl)
-  private
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} private
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
@@ -522,9 +524,9 @@ Type
 
   (** This is a sub class for all constants. **)
   TConstant = Class(TGenericConstant)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FTyped : Boolean;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
@@ -546,7 +548,7 @@ Type
 
   (** This is a sub class for all variables. **)
   TVar = Class(TGenericVariable)
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
   End;
@@ -558,7 +560,7 @@ Type
 
   (** This class presents a field in a record, object, or class. **)
   TField = Class(TElementContainer)
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
@@ -566,15 +568,26 @@ Type
 
   (** This class represents an exported method. **)
   TExportsItem = Class(TElementContainer)
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Private
+    FResolved : Boolean;
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
+    Constructor Create(strName : String; AScope : TScope; iLine,
+      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    (**
+      This property gets and sets whether the symbol is resolved.
+      @precon  None.
+      @postcon Gets and sets whether the symbol is resolved.
+      @return  a Boolean
+    **)
+    Property Resolved : Boolean Read FResolved Write FResolved;
   End;
 
   (** A class to represent the initialization section **)
   TInitializationSection = Class(TElementContainer)
-  Private
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Private
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
@@ -582,8 +595,8 @@ Type
 
   (** A class to represent the finalization section **)
   TFinalizationSection = Class(TElementContainer)
-  Private
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Private
+  {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
@@ -611,7 +624,7 @@ Type
 
   **)
   TPascalModule = Class(TBaseLanguageModule)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FSourceStream            : TStream;
     FMethodStack             : TObjectList;
     FTypesLabel              : TLabelContainer;
@@ -620,6 +633,7 @@ Type
     FVariablesLabel          : TLabelContainer;
     FThreadVarsLabel         : TLabelContainer;
     FExportedHeadingsLabel   : TLabelContainer;
+    FExportsHeadingsLabel    : TLabelContainer;
     FImplementedMethodsLabel : TLabelContainer;
     FExternalSyms            : TStringList;
     { Grammar Parsers }
@@ -760,17 +774,19 @@ Type
     Procedure CheckReturnValue(Method : TPascalMethod);
     Procedure CheckAlias(Method : TPascalMethod);
     Function CheckNumberType(ExprType : TExprTypes) : Boolean;
-    Procedure UpdateTypeToken(var AToken : TTypeToken); {$IFDEF D0006}} InLine; {$ENDIF}
+    Procedure UpdateTypeToken(var AToken : TTypeToken); {$IFDEF D0006} InLine; {$ENDIF}
     Procedure AddToContainer(Container : TElementContainer; var Method : TPascalMethod);
     Procedure TidyUpEmptyElements;
     Procedure CheckUnResolvedMethods;
     procedure ResolveScopeOfImplementedClassMethods(StartLabel : TLabelContainer);
     procedure ResolveScopeOfImplementedExportedMethods;
+    procedure ResolveScopeOfImplementedExportsMethods;
     procedure FindUnresolvedObjectAndClassMethods(TypeLabel : TLabelContainer);
     procedure FindUnresolvedExportedMethods;
+    {procedure FindUnresolvedExportsMethods;}
     procedure FindUnresolvedImplementedClassMethods(StartLabel : TLabelContainer);
     Function FindObjClsInt(slClassNames : TStringList) : TObjectDecl;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     function GetCurrentMethod: TPascalMethod;
     Function GetModuleName : String; Override;
     (**
@@ -1576,6 +1592,29 @@ end;
 
 (**
 
+  This is a constructor for the TExportsItem class.
+
+  @precon  None.
+  @postcon Initialises the class. 
+
+  @param   strName     as a String
+  @param   AScope      as a TScope
+  @param   iLine       as an Integer
+  @param   iColumn     as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+
+**)
+Constructor TExportsItem.Create(strName : String; AScope : TScope; iLine,
+  iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment);
+
+Begin
+  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+  FResolved := False;
+End;
+
+(**
+
 
   This is a getter method for the AsString property.
 
@@ -1805,6 +1844,7 @@ Begin
   FVariablesLabel          := Nil;
   FThreadVarsLabel         := Nil;
   FExportedHeadingsLabel   := Nil;
+  FExportsHeadingsLabel    := Nil;
   FImplementedMethodsLabel := Nil;
   FExternalSyms := TStringList.Create;
   FExternalSyms.Sorted := True;
@@ -2220,10 +2260,10 @@ begin
         End;
       If Container Is TObjectDecl Then
         Begin
-          If (Container As TObjectDecl).FMethodsLabel = Nil Then
-            (Container As TObjectDecl).FMethodsLabel := Container.Add(
+          If (Container As TObjectDecl).MethodsLabel = Nil Then
+            (Container As TObjectDecl).MethodsLabel := Container.Add(
               strMethodsLabel, iiMethodsLabel, scNone, Nil) As TLabelContainer;
-          Container := (Container As TObjectDecl).FMethodsLabel;
+          Container := (Container As TObjectDecl).MethodsLabel;
         End;
       tmpMethod := Method;
       Method := Container.Add(tmpMethod) As TPascalMethod;
@@ -2871,17 +2911,16 @@ End;
 **)
 Function TPascalModule.ExportsStmt : Boolean;
 
-Var
-  Ex : TElementContainer;
-
 Begin
   Result := Token.UToken = 'EXPORTS';
   If Result Then
     Begin
-      Ex := Add(strExportsLabel, iiExportedFunctionsLabel, scNone, GetComment);
+      If FExportsHeadingsLabel = Nil Then
+        FExportsHeadingsLabel := Add(strExportsLabel,
+          iiExportedFunctionsLabel, scNone, Nil) As TLabelContainer;
       NextNonCommentToken;
       Repeat
-        ExportsItem(Ex);
+        ExportsItem(FExportsHeadingsLabel);
       Until Not IsToken(',', Nil);
       If Token.Token = ';' Then
         NextNonCommentToken
@@ -4903,6 +4942,9 @@ begin
   i := Find(strExportedHeadingsLabel);
   If (i > 0) And (Elements[i].ElementCount = 0) Then
     DeleteElement(i);
+  i := Find(strExportsLabel);
+  If (i > 0) And (Elements[i].ElementCount = 0) Then
+    DeleteElement(i);
 end;
 
 (**
@@ -6784,6 +6826,7 @@ Var
 begin
   ResolveScopeOfImplementedClassMethods(FImplementedMethodsLabel);
   ResolveScopeOfImplementedExportedMethods;
+  ResolveScopeOfImplementedExportsMethods;
   // Only resolved methods IF there are no other errors.
   Errors := FindElement(strErrors) As TLabelContainer;
   If Errors <> Nil Then
@@ -6791,6 +6834,7 @@ begin
       Exit;
   FindUnresolvedObjectAndClassMethods(FTypesLabel);
   FindUnresolvedExportedMethods;
+  FindUnresolvedExportsMethods;
   FindUnresolvedImplementedClassMethods(FImplementedMethodsLabel);
 end;
 
@@ -8935,6 +8979,25 @@ begin
           End;
 end;
 
+{procedure TPascalModule.FindUnresolvedExportsMethods;
+
+var
+  Method: TExportsItem;
+  k: Integer;
+  iIndex : Integer;
+
+begin
+  If FExportsHeadingsLabel <> Nil Then
+    For k := 1 To FExportsHeadingsLabel.ElementCount Do
+      If FExportsHeadingsLabel.Elements[k] Is TExportsItem Then
+        Begin
+          Method := FExportsHeadingsLabel.Elements[k] As TExportsItem;
+          If Not Method.Resolved And Not FExternalSyms.Find(Method.Identifier, iIndex) Then
+            AddIssue(Format(strUnSatisfiedForwardReference, [Method.Identifier]),
+              scNone, 'FindUnresolvedExportedMethods', Method.Line, Method.Column, etError);
+          End;
+end;}
+
 (**
 
 
@@ -9060,6 +9123,40 @@ begin
         Begin
           Method := FExportedHeadingsLabel.Elements[k] As TPascalMethod;
           ImplementedMethod := FImplementedMethodsLabel.FindElement(Method.Name);
+          If (ImplementedMethod <> Nil) And (ImplementedMethod Is TPascalMethod) Then
+            Begin
+              Method.Resolved := True;
+              (ImplementedMethod As TPascalMethod).Resolved := True;
+              (ImplementedMethod As TPascalMethod).Scope := Method.Scope;
+            End;
+        End;
+end;
+
+(**
+
+  This method resolved the references between the exports methods and
+  implemented methods marking each as resovled where a match is found.
+
+  @precon  None.
+  @postcon Resolved the references between the exports methods and
+           implemented methods marking each as resovled where a match is found.
+
+**)
+procedure TPascalModule.ResolveScopeOfImplementedExportsMethods;
+
+var
+  ImplementedMethod: TElementContainer;
+  Method: TExportsItem;
+  k: Integer;
+
+begin
+  If (FExportsHeadingsLabel <> Nil) And (FImplementedMethodsLabel <> Nil) Then
+    For k := 1 To FExportsHeadingsLabel.ElementCount Do
+      If FExportsHeadingsLabel.Elements[k] Is TExportsItem Then
+        Begin
+          Method := FExportsHeadingsLabel.Elements[k] As TExportsItem;
+          ImplementedMethod := FImplementedMethodsLabel.FindElement(
+            Method.Identifier, ftIdentifier);
           If (ImplementedMethod <> Nil) And (ImplementedMethod Is TPascalMethod) Then
             Begin
               Method.Resolved := True;

@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       15 Nov 2008
+  @Date       22 Nov 2008
   @Author     David Hoyle
 
 **)
@@ -2847,7 +2847,6 @@ Begin
   FMethodStack.Add(Method);
   Try
     DeclSection(AScope, Method);
-    ExportsStmt;
     bool := CompoundStmt;
     If Not bool Then
       AssemblerStatement;
@@ -2981,7 +2980,8 @@ Begin
     TypeSection(AScope, Container) Or
     VarSection(AScope, Container) Or
     ThreadVarSection(AScope) Or
-    ProcedureDeclSection(AScope)
+    ProcedureDeclSection(AScope) Or
+    ExportsStmt
   );
 End;
 

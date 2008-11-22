@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    16 Nov 2008
+  @Date    22 Nov 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -3691,7 +3691,7 @@ Function TElementContainer.BuildStringRepresentation(boolIdentifier,
   boolForDocumentation : Boolean; strDelimiter : String; iMaxWidth : Integer) : String;
 
 Const
-  strNoSpaceAfter : Set Of Char = ['(', '[', '{', '.'];
+  strNoSpaceAfter : Set Of Char = ['(', '[', '{', '.', '^'];
   strNoSpaceBefore : Set Of Char = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
   strSpaceAfter : Set Of Char = ['=', ':', '+', '-', '*', '\'];
 

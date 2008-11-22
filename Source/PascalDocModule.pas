@@ -6834,7 +6834,7 @@ begin
       Exit;
   FindUnresolvedObjectAndClassMethods(FTypesLabel);
   FindUnresolvedExportedMethods;
-  FindUnresolvedExportsMethods;
+  {FindUnresolvedExportsMethods;}
   FindUnresolvedImplementedClassMethods(FImplementedMethodsLabel);
 end;
 

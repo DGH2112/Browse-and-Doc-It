@@ -477,7 +477,7 @@ Type
     FTagName: String;
     FLine: Integer;
     FColumn: Integer;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     function GetToken(iTokenIndex: Integer): String;
     function GetTokenCount : Integer;
     function GetTokenType(iTokenIndex: Integer): TTokenType;
@@ -543,7 +543,7 @@ Type
     FCol : Integer;
     FTagLine : Integer;
     FTagColumn : Integer;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     function GetTag(iTagIndex: Integer): TTag;
     function GetTagCount: Integer;
     function GetToken(iTokenIndex: Integer): String;
@@ -633,6 +633,9 @@ Type
 
   TLabelContainer = Class;
 
+  (** This enumerate defind the type of information to find. **)
+  TFindType = (ftName, ftIdentifier);
+
   (** This class implements the IElementCollection interface so that this
       element container can be rendered with the module browser. **)
   TElementContainer = Class {$IFDEF D2005} Abstract {$ENDIF}
@@ -649,13 +652,13 @@ Type
     FReferenced : Boolean;
     FDocumentConflictLabel : TLabelContainer;
     FParent : TElementContainer;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetElementCount : Integer;
     Function GetElements(iIndex : Integer) : TElementContainer;
     Function GetTokenCount : Integer;
     Function GetTokens(iIndex : Integer) : TTokenInfo;
     Function GetImageIndexAdjustedForScope : Integer;
-    Function Find(strName : String) : Integer;
+    Function Find(strName : String; FindType : TFindType = ftName) : Integer;
     Function GetName: String; Virtual;
     Procedure SetSorted(boolValue : Boolean);
     Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
@@ -672,7 +675,7 @@ Type
     Procedure AppendToken(AToken : TTokenInfo); Overload; Virtual;
     Procedure AppendToken(strToken : String); Overload; Virtual;
     Procedure AddTokens(AElement : TElementContainer); Virtual;
-    Function  FindElement(strName : String) : TElementContainer;
+    Function  FindElement(strName : String; FindType : TFindType = ftName) : TElementContainer;
     Procedure Assign(Source : TElementContainer); Virtual;
     Function  FindToken(strToken : String) : Integer;
     Procedure DeleteElement(iIndex : Integer);
@@ -910,7 +913,7 @@ Type
     FClassMethod : Boolean;
     FAlias: String;
     FForwardDecl : Boolean;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     procedure SetMsg(const Value: String);
     procedure SetExt(const Value: String);
     Function GetQualifiedName : String;
@@ -1012,7 +1015,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
     FParameters : TObjectList;
     FTypeID : TGenericTypeDecl;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetParameterCount : Integer;
     Function GetParameters(iIndex : Integer) : TGenericParameter;
     procedure CheckPropertyDocumentation;
@@ -1107,7 +1110,7 @@ Type
     FPreviousTokenIndex : TTokenIndex;
     FCompilerConditionStack : TList;
     FLastComment: TTokenInfo;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetTokenCount : Integer;
     Function GetTokenInfo(iIndex : TTokenIndex) : TTokenInfo;
     Function GetToken : TTokenInfo;
@@ -1353,7 +1356,7 @@ Type
     FMaxDocOutputWidth: Integer;
     FManagedNodesLife : Integer;
     FTreeColour : TColor;
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetTokenFontInfo(ATokenType  : TTokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(ATokenType  : TTokenType; ATokenFontInfo : TTokenFontInfo);
   Public
@@ -3827,25 +3830,28 @@ end;
 
 (**
 
-  This method returns the position of the named container in the current
-  containers collection if found else returns the position (as a negative)
-  where the item should be inserted in the collection.
+  This method returns the position of the named container in the current 
+  containers collection if found else returns the position (as a negative) 
+  where the item should be inserted in the collection. 
 
-  @precon  None.
-  @postcon Returns the position of the named container in the current
-           containers collection if found else returns the position (as a
-           negative) where the item should be inserted in the collection.
+  @precon  None. 
+  @postcon Returns the position of the named container in the current 
+           containers collection if found else returns the position (as a 
+           negative) where the item should be inserted in the collection. 
 
-  @param   strName as a String
-  @return  an Integer
+  @param   strName  as a String
+  @param   FindType as a TFindType
+  @return  an Integer 
 
 **)
-function TElementContainer.Find(strName: String): Integer;
+function TElementContainer.Find(strName: String;
+  FindType : TFindType = ftName): Integer;
 
 Var
   iFirst : Integer;
   iMid : Integer;
   iLast : Integer;
+  iResult : Integer;
 
 begin
   Result := -1;
@@ -3856,12 +3862,16 @@ begin
       While iFirst <= iLast Do
         Begin
           iMid := (iFirst + iLast) Div 2;
-          If AnsiCompareText(Elements[iMid].Name, strName) = 0 Then
+          If FindType = ftName Then
+            iResult := AnsiCompareText(Elements[iMid].Name, strName)
+          Else
+            iResult := AnsiCompareText(Elements[iMid].Identifier, strName);
+          If iResult = 0 Then
             Begin
               Result := iMid;
               Break;
-            End Else
-          If AnsiCompareText(Elements[iMid].Name, strName) > 0 Then
+            End
+          Else If iResult > 0 Then
             iLast := iMid - 1
           Else
             iFirst := iMid + 1;
@@ -3882,24 +3892,26 @@ end;
 
 (**
 
-  This method searches the elements collection of and instance matching the
-  given name.
+  This method searches the elements collection of and instance matching the 
+  given name. 
 
-  @precon  None.
-  @postcon Returns either instance of the found item or returns nil.
+  @precon  None. 
+  @postcon Returns either instance of the found item or returns nil. 
 
-  @param   strName as a String
+  @param   strName  as a String
+  @param   FindType as a TFindType
   @return  a TElementContainer
 
 **)
-function TElementContainer.FindElement(strName: String): TElementContainer;
+function TElementContainer.FindElement(strName: String;
+  FindType : TFindType = ftName): TElementContainer;
 
 Var
   i : Integer;
 
 begin
   Result := Nil;
-  i := Find(strName);
+  i := Find(strName, FindType);
   If i > 0 Then
     Result := Elements[i];
 end;

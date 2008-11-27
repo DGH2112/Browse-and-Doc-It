@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    16 Nov 2008
+  @Date    27 Nov 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -1709,7 +1709,7 @@ begin
   Try
   {$ENDIF}
   C := Nil;
-  tvExplorer.GetHitTestInfoAt(X, Y, False, HitInfo);
+  tvExplorer.GetHitTestInfoAt(X, Y, True, HitInfo);
   If (hiOnItemLabel In HitInfo.HitPositions) Then
     Begin
       Node := HitInfo.HitNode;

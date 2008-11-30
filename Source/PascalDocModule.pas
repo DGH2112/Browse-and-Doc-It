@@ -6784,6 +6784,7 @@ Begin
       If (Token.TokenType In [ttIdentifier, ttDirective]) Or (Token.UToken = 'STRING') Then
         Begin
           Method.ReturnType := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
+          ReferenceSymbol(Token);
           TypeId(Method.ReturnType);
         End Else
           ErrorAndSeekToken(strIdentExpected, 'CheckReturnValue',

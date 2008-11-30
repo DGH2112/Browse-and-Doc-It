@@ -5,7 +5,7 @@
   version of PascalDoc.
 
   @Author  David Hoyle
-  @Date    25 Oct 2008
+  @Date    30 Nov 2008
   @Version 1.0
 
 **)
@@ -36,10 +36,12 @@ package BrowseAndDocIt2006;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'Browse and Doc It'}
+{$DESCRIPTION 'Browse and Doc It 2006'}
 {$DESIGNONLY}
-{$IMPLICITBUILD OFF}
+{$IMPLICITBUILD ON}
 {%File '..\..\..\LIBRARY\CompilerDefinitions.inc'}
+{%File '..\..\..\LIBRARY\Virtual Treeview\Source\MSAAIntf.hpp'}
+{%OBJTool '..\..\..\LIBRARY\Virtual Treeview\Source\MSAAIntf.obj'}
 
 requires
   rtl,
@@ -47,7 +49,8 @@ requires
   vcl,
   vclactnband,
   vclx,
-  vcljpg;
+  vcljpg,
+  VirtualTreesD10;
 
 contains
   BrowseAndDocItWizard in '..\Source\BrowseAndDocItWizard.pas',
@@ -72,6 +75,7 @@ contains
   Profiler in '..\..\..\LIBRARY\Profiler.pas',
   MSXML2_TLB in '..\..\..\LIBRARY\MSXML2_TLB.pas',
   checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
-  CheckForUpdatesForm in '..\..\..\LIBRARY\CheckForUpdatesForm.pas';
+  CheckForUpdatesForm in '..\..\..\LIBRARY\CheckForUpdatesForm.pas',
+  VBModule in '..\..\..\LIBRARY\VBModule.pas';
 
 end.

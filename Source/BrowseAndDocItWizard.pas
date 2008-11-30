@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    16 Nov 2008
+  @Date    30 Nov 2008
   @Version 1.0
 
 **)
@@ -216,7 +216,7 @@ Const
   (** A constant array of outputs for the ArrayOf property. **)
   strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
   (** This is the software ID for this module on the internet. **)
-  strSoftwareID = 'BrowseAndDocIt';
+  strSoftwareID = 'BrowseAndDocIt2006';
 
 Var
   (** This is an index for the wizard when register with the ide. Its required

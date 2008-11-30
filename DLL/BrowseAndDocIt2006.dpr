@@ -1,13 +1,13 @@
 (**
 
-  This module defines a DLL which can be loaded ny the BDS IDE.
+  This module defines a DLL which can be loaded by the BDS IDE.
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    04 Oct 2008
+  @Date    30 Nov 2008
 
 **)
-library BrowseAndDocIt;
+library BrowseAndDocIt2006;
 
 { Important note about DLL memory management: ShareMem must be the
   first unit in your library's USES clause AND your project's (select
@@ -30,8 +30,11 @@ library BrowseAndDocIt;
 {%File '..\..\..\LIBRARY\HTML Files\xhtml-lat1.ent'}
 {%File '..\..\..\LIBRARY\HTML Files\xhtml-special.ent'}
 {%File '..\..\..\LIBRARY\HTML Files\xhtml-symbol.ent'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt2006\default.txaPackage'}
+{%File '..\..\..\LIBRARY\CompilerDefinitions.inc'}
 uses
   ShareMem,
+  ExceptionLog,
   SysUtils,
   Classes,
   DGHLibrary in '..\..\..\Library\DGHLibrary.pas',
@@ -56,7 +59,11 @@ uses
   GenericTokenizer in '..\..\..\LIBRARY\GenericTokenizer.pas',
   checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
   CheckForUpdatesForm in '..\..\..\LIBRARY\CheckForUpdatesForm.pas' {frmCheckForUpdates},
-  MSXML2_TLB in '..\..\..\LIBRARY\MSXML2_TLB.pas';
+  MSXML2_TLB in '..\..\..\LIBRARY\MSXML2_TLB.pas',
+  VTAccessibilityFactory in '..\..\..\LIBRARY\Virtual Treeview\Source\VTAccessibilityFactory.pas',
+  VirtualTrees in '..\..\..\LIBRARY\Virtual Treeview\Source\VirtualTrees.pas',
+  MSAAIntf in '..\..\..\LIBRARY\Virtual Treeview\Source\MSAAIntf.pas',
+  VBModule in '..\..\..\LIBRARY\VBModule.pas';
 
 {$R *.res}
 

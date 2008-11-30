@@ -60,10 +60,12 @@ uses
   checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
   CheckForUpdatesForm in '..\..\..\LIBRARY\CheckForUpdatesForm.pas' {frmCheckForUpdates},
   MSXML2_TLB in '..\..\..\LIBRARY\MSXML2_TLB.pas',
-  VTAccessibilityFactory in '..\..\..\LIBRARY\Virtual Treeview\Source\VTAccessibilityFactory.pas',
-  VirtualTrees in '..\..\..\LIBRARY\Virtual Treeview\Source\VirtualTrees.pas',
+  VBModule in '..\..\..\LIBRARY\VBModule.pas',
   MSAAIntf in '..\..\..\LIBRARY\Virtual Treeview\Source\MSAAIntf.pas',
-  VBModule in '..\..\..\LIBRARY\VBModule.pas';
+  VirtualTrees in '..\..\..\LIBRARY\Virtual Treeview\Source\VirtualTrees.pas',
+  VTAccessibility in '..\..\..\LIBRARY\Virtual Treeview\Source\VTAccessibility.pas',
+  VTAccessibilityFactory in '..\..\..\LIBRARY\Virtual Treeview\Source\VTAccessibilityFactory.pas',
+  VTHeaderPopup in '..\..\..\LIBRARY\Virtual Treeview\Source\VTHeaderPopup.pas';
 
 {$R *.res}
 

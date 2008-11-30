@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       22 Nov 2008
+  @Date       30 Nov 2008
   @Author     David Hoyle
 
 **)
@@ -5041,13 +5041,7 @@ Begin
                       Begin
                         V.Comment := TComment.Create(I[j].Comment);
                         OwnedItems.Add(V.Comment);
-                      End Else
-                        If I[1].Comment <> Nil Then
-                          Begin
-                            V.Comment := TComment.Create(I[1].Comment);
-                            OwnedItems.Add(V.Comment);
-                            V.Comment.AddToken('(Copy)', ttIdentifier);
-                          End;
+                      End;
                   End;
               Result := True;
             Finally
@@ -5132,13 +5126,7 @@ Begin
                     Begin
                       V.Comment := TComment.Create(I[j].Comment);
                       OwnedItems.Add(V.Comment);
-                    End Else
-                      If I[1].Comment <> Nil Then
-                        Begin
-                          V.Comment := TComment.Create(I[0].Comment);
-                          OwnedItems.Add(V.Comment);
-                          V.Comment.AddToken('(Copy)', ttIdentifier);
-                        End;
+                    End;
                 End;
               Finally
                 FTemporaryElements.Free;
@@ -8351,14 +8339,24 @@ End;
 Procedure TPascalModule.IdentList(Container : TElementContainer;
   SeekTokens : Array Of String; iImageIndex : TImageIndex = iiNone);
 
+Var
+  C, AComment : TComment;
+
 Begin
+  AComment := Nil;
   If Token.TokenType In [ttIdentifier, ttDirective] Then
     Repeat
       If Token.TokenType In [ttIdentifier, ttDirective] Then
         Begin
+          C := GetComment;
+          If C <> Nil then
+            Begin
+              AComment := TComment.Create(C);
+              OwnedItems.Add(AComment);
+            End;
           If Container <> Nil Then
             Container.Add(TIdentList.Create(Token.Token, scNone, Token.Line,
-              Token.Column, iImageIndex, GetComment));
+              Token.Column, iImageIndex, AComment));
           NextNonCommentToken;
           If Token.UToken = 'IN' Then
             Begin

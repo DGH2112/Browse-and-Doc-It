@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       30 Nov 2008
+  @Date       11 Dec 2008
   @Author     David Hoyle
 
 **)
@@ -636,6 +636,7 @@ Type
     FExportsHeadingsLabel    : TLabelContainer;
     FImplementedMethodsLabel : TLabelContainer;
     FExternalSyms            : TStringList;
+    FModuleType : TModuleType;
     { Grammar Parsers }
     Procedure Goal;
     Function OPProgram : Boolean;
@@ -796,6 +797,13 @@ Type
       @return  a TPascalMethod
     **)
     Property CurrentMethod : TPascalMethod Read GetCurrentMethod;
+    (**
+      Returns the type of the modules, Program, Unit, Package, etc.
+      @precon  None.
+      @postcon Returns the type of the modules, Program, Unit, Package, etc.
+      @return  a TModuleType
+    **)
+    Property ModuleType : TModuleType Read FModuleType Write FModuleType;
   Public
     Constructor CreateParser(Source : TStream; strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
@@ -1846,6 +1854,7 @@ Begin
   FExportedHeadingsLabel   := Nil;
   FExportsHeadingsLabel    := Nil;
   FImplementedMethodsLabel := Nil;
+  FModuleType := mtUnit;
   FExternalSyms := TStringList.Create;
   FExternalSyms.Sorted := True;
   {$IFDEF D0006}
@@ -2418,7 +2427,7 @@ begin
         // Check for end of file else must be identifier
         If Not EndOfTokens Then
           Begin
-            ModuleComment := GetComment;
+            Comment := GetComment;
             boolHasProcessed := OPProgram;
             If Not boolHasProcessed  Then
               boolHasProcessed := OPLibrary;

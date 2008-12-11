@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    22 Nov 2008
+  @Date    11 Dec 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -25,8 +25,8 @@ Type
   TTokenIndex = Integer;
   (** An enumerate type to define the stream status and token types. **)
   TTokenType = (ttUnknown, ttWhiteSpace, ttReservedWord, ttIdentifier, ttNumber,
-    ttSymbol, ttLineEnd, ttArrayElement, ttStatementEnd, ttStringLiteral,
-    ttComment, ttHTMLTag, ttDirective, ttCompilerDirective, ttLinkTag,
+    ttSymbol, ttLineEnd, ttArrayElement, ttStringLiteral, ttComment, ttHTMLTag,
+    ttDirective, ttCompilerDirective, ttLinkTag,
     ttTreeHeader);
   (** An enumerate for the scoping of identifiers. **)
   TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic, scPublished);
@@ -1099,8 +1099,6 @@ Type
     FDocErrors: TElementContainer;
     FTickList : TStringList;
     FModuleName : String;
-    FModuleType : TModuleType;
-    FModuleComment : TComment;
     FBodyComment : TObjectList;
     FModuleNameCol: Integer;
     FModuleNameLine: Integer;
@@ -1240,20 +1238,6 @@ Type
       @return  a String
     **)
     Property ModuleName : String Read GetModuleName Write FModuleName;
-    (**
-      Returns the type of the modules, Program, Unit, Package, etc.
-      @precon  None.
-      @postcon Returns the type of the modules, Program, Unit, Package, etc.
-      @return  a TModuleType
-    **)
-    Property ModuleType : TModuleType Read FModuleType Write FModuleType;
-    (**
-      Returns a reference to the modules comment.
-      @precon  None.
-      @postcon Returns a reference to the modules comment.
-      @return  a TComment
-    **)
-    Property ModuleComment : TComment Read FModuleComment Write FModuleComment;
     (**
       Returns the specific indexed body comment from the collection.
       @precon  None.
@@ -2143,7 +2127,6 @@ Const
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : [fsBold]),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
@@ -2543,9 +2526,8 @@ Const
   (** A list of strings representing the token types. **)
   strTokenType : Array[Low(TTokenType)..High(TTokenType)] Of String = (
     'Unknown', 'WhiteSpace', 'ReservedWord', 'Identifier', 'Number',
-    'Symbol', 'LineEnd', 'ArrayElement', 'StatementEnd', 'StringLiteral',
-    'Comment', 'HTMLTag', 'Directive', 'CompilerDirective', 'LinkTag',
-    'TreeHeader');
+    'Symbol', 'LineEnd', 'ArrayElement', 'StringLiteral', 'Comment', 'HTMLTag',
+    'Directive', 'CompilerDirective', 'LinkTag', 'TreeHeader');
 
 Var
   (** This is a global variable for the Browse and Doc It options that need to
@@ -4694,11 +4676,9 @@ begin
   FPreviousTokenIndex := -1;
   FTickList := TStringList.Create;
   FBodyComment := TObjectList.Create(True);
-  FModuleComment := Nil;
   FModuleName := '';
   FModuleNameCol := 0;
   FModuleNameLine := 0;
-  FModuleType := mtUnit;
   FCompilerDefs := TStringList.Create;
   FCompilerDefs.Sorted := True;
   FCompilerDefs.Duplicates := dupIgnore;
@@ -5281,26 +5261,26 @@ Begin
     If Pos(Lowercase(BrowseAndDocItOptions.ExcludeDocFiles[i]),
       Lowercase(FFileName)) > 0 Then
       Exit;
-  If (ModuleComment <> Nil) And (ModuleComment.FindTag('stopdocumentation') >= 0) Then
+  If (Comment <> Nil) And (Comment.FindTag('stopdocumentation') >= 0) Then
     Begin
       boolCascade := False;
       Exit;
     End;
   If doShowUndocumentedModule In BrowseAndDocItOptions.Options Then
-    If (ModuleComment = Nil) Or (ModuleComment.TokenCount = 0) Then
-      AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
+    If (Comment = Nil) Or (Comment.TokenCount = 0) Then
+      AddDocumentConflict([], ModuleNameLine, ModuleNameCol, Comment,
         DocConflictTable[dctModuleMissingDocumentation]);
-  If ModuleComment <> Nil Then
+  If Comment <> Nil Then
     Begin
       If (doShowMissingModuleDate In BrowseAndDocItOptions.Options) Then
         Begin
-          i := ModuleComment.FindTag('date');
-          If (i = -1) Or (ModuleComment.Tag[i].TokenCount = 0) Then
-            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
+          i := Comment.FindTag('date');
+          If (i = -1) Or (Comment.Tag[i].TokenCount = 0) Then
+            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, Comment,
               DocConflictTable[dctModuleMissingDate])
           Else
             Begin
-              Tag := ModuleComment.Tag[i];
+              Tag := Comment.Tag[i];
               strDate := Tag.AsString(False);
               If Modified Then
                 dtFileDate := Now
@@ -5314,25 +5294,25 @@ Begin
                 dtDate := ConvertDate(strDate);
                 If Int(dtDate) <> Int(dtFileDate) Then
                   AddDocumentConflict([strDate, FormatDateTime('dd/mmm/yyyy', dtFileDate)],
-                    Tag.Line, Tag.Column, ModuleComment, DocConflictTable[dctModuleIncorrectDate]);
+                    Tag.Line, Tag.Column, Comment, DocConflictTable[dctModuleIncorrectDate]);
               Except
                 AddDocumentConflict([strDate, FormatDateTime('dd/mmm/yyyy', dtFileDate)],
-                  Tag.Line, Tag.Column, ModuleComment, DocConflictTable[dctModuleCheckDateError]);
+                  Tag.Line, Tag.Column, Comment, DocConflictTable[dctModuleCheckDateError]);
               End
             End;
         End;
       If (doShowMissingModuleVersion In BrowseAndDocItOptions.Options) Then
         Begin
-          i := ModuleComment.FindTag('version');
-          If (i = -1) Or (ModuleComment.Tag[i].TokenCount = 0) Then
-            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
+          i := Comment.FindTag('version');
+          If (i = -1) Or (Comment.Tag[i].TokenCount = 0) Then
+            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, Comment,
               DocConflictTable[dctModuleMissingVersion])
         End;
       If (doShowMissingModuleAuthor In BrowseAndDocItOptions.Options) Then
         Begin
-          i := ModuleComment.FindTag('author');
-          If (i = -1) Or (ModuleComment.Tag[i].TokenCount = 0) Then
-            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, ModuleComment,
+          i := Comment.FindTag('author');
+          If (i = -1) Or (Comment.Tag[i].TokenCount = 0) Then
+            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, Comment,
               DocConflictTable[dctModuleMissingAuthor])
         End;
     End;

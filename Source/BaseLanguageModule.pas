@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    11 Dec 2008
+  @Date    19 Dec 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -29,7 +29,8 @@ Type
     ttDirective, ttCompilerDirective, ttLinkTag,
     ttTreeHeader);
   (** An enumerate for the scoping of identifiers. **)
-  TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic, scPublished);
+  TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic,
+    scPublished, scFriend);
   (** A set to represent combinations of scopes. **)
   TScopes = Set Of TScope;
   (** An enumerate for the parameter modifiers of methods. **)
@@ -1089,6 +1090,9 @@ Type
       properties. **)
   TCharSet = Set of Char;
 
+  (** A type to define the type of token search. **)
+  TSeekToken = (stActual, stFirst);
+
   (** This is an abtract class from which all language modules should be
       derived. **)
   TBaseLanguageModule = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
@@ -1132,6 +1136,8 @@ Type
     Function GetModuleName : String; Virtual;
     function GetBytes: Int64;
     function GetLines: Integer;
+    Procedure ErrorAndSeekToken(strMsg, strMethod, strParam : String;
+      SeekTokens: Array Of String; SeekToken : TSeekToken);
     (**
       Returns a refernce the to owned items collection. This is used to manage
       the life time of all the ident lists and comments found in the module.
@@ -1702,6 +1708,8 @@ ResourceString
     'line %d column %d.';
   (** Document conflict message for a unreferenced locals. **)
   strUnreferencedLocal = 'The symbol ''%s'' has not been referenced in the code.';
+  (** This is an error message for not enough tokens. **)
+  strNotEnoughStrings = 'Not enough strings passed to ErrorAndSeekToken().';
 
   (** This is the tree branch under which module documentation error appear **)
   strModuleDocumentation = 'Module Documentation';
@@ -5133,6 +5141,66 @@ Function TBaseLanguageModule.EndOfTokens : Boolean;
 
 Begin
   Result := FTokenIndex >= FTokens.Count;
+End;
+
+(**
+
+  This method seeks the first non-comment token in the source code which match
+  one of the passed tokens.
+
+  @precon  The Tokens passed MUST be sorted in lowercase and in ascending order.
+  @postcon Seeks the first non-comment token in the source code which match
+           one of the passed tokens.
+
+  @param   strMsg      as a String
+  @param   strMethod   as a String
+  @param   strParam    as a String
+  @param   SeekTokens  as an Array Of string
+  @param   SeekToken   as a TSeekToken
+
+**)
+Procedure TBaseLanguageModule.ErrorAndSeekToken(strMsg, strMethod, strParam : String;
+  SeekTokens: Array Of String; SeekToken : TSeekToken);
+
+  (**
+
+    This method counts the number of occurrances of "%s" in the string and
+    returns that number.
+
+    @precon  None.
+    @postcon Returns the number of string parameters in the text.
+
+    @param   strText as a String
+    @return  an Integer
+
+  **)
+  Function StringCount(strText : String) : Integer;
+
+  Var
+    i : Integer;
+
+  Begin
+    Result := 0;
+    For i := 1 To Length(strText) - 1 Do
+      If Copy(strText, i, 2) = '%s' Then Inc(Result);
+  End;
+
+Begin
+  Case StringCount(strMsg) Of
+    0: AddIssue(Format(strMsg, [Token.Line, Token.Column]),
+           scGlobal, strMethod, Token.Line, Token.Column, etError);
+    1: AddIssue(Format(strMsg, [strParam, Token.Line, Token.Column]),
+           scGlobal, strMethod, Token.Line, Token.Column, etError);
+    2: AddIssue(Format(strMsg, [strParam, Token.Token, Token.Line,
+         Token.Column]), scGlobal, strMethod, Token.Line, Token.Column, etError);
+  Else
+    AddIssue(strNotEnoughStrings, scGlobal, strMethod, Token.Line, Token.Column, etError);
+  End;
+  NextNonCommentToken;
+  While Not IsKeyWord(Token.Token, SeekTokens) Do
+    NextNonCommentToken;
+  If SeekToken = stFirst Then
+    NextNonCommentToken;
 End;
 
 (**

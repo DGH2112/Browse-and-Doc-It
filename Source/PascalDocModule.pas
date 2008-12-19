@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       11 Dec 2008
+  @Date       19 Dec 2008
   @Author     David Hoyle
 
 **)
@@ -25,9 +25,6 @@ Type
   TExprType = (etUnknown, etConstExpr, etString, etInteger, etFloat);
   (** This is a set of TExprType enumerates. **)
   TExprTypes = Set of TExprType;
-
-  (** A type to define the type of token search. **)
-  TSeekToken = (stActual, stFirst);
 
   (** This class represents a list of identifiers **)
   TIdentList = Class(TElementContainer)
@@ -767,8 +764,6 @@ Type
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
-    procedure ErrorAndSeekToken(strMsg, strMethod, strParam: String;
-      SeekTokens: Array Of String; SeekToken : TSeekToken);
     Procedure AddToExpression(Container : TElementContainer);
     function IsToken(strToken: String; Container: TElementContainer): Boolean;
     procedure ArrayElement(C : TElementContainer; iStartDimension: Integer; AT : TArrayType);
@@ -822,8 +817,6 @@ Uses
 {$ENDIF}
 
 Resourcestring
-  (** This is an error message for not enough tokens. **)
-  strNotEnoughStrings = 'Not enough strings passed to ErrorAndSeekToken().';
   (** This is an error message for rendering a temporay container - SHOULDN'T do this **)
   strTriedToRenderTmpCntr = 'Tried to Render a Temporary Container!';
   (** This is an error message for duplicate identifiers. **)
@@ -1838,7 +1831,6 @@ Constructor TPascalModule.CreateParser(Source : TStream; strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
 var
   boolCascade: Boolean;
-  i : Integer;
 
 Begin
   {$IFDEF PROFILECODE}
@@ -1871,7 +1863,6 @@ Begin
       ParseTokens;
       AddTickCount('Parse');
       CheckUnResolvedMethods;
-      TidyUpEmptyElements;
       AddTickCount('Resolve');
       Add(strErrors, iiErrorFolder, scNone, Nil);
       Add(strWarnings, iiWarningFolder, scNone, Nil);
@@ -1884,19 +1875,8 @@ Begin
       If moCheckForDocumentConflicts In ModuleOptions Then
         CheckDocumentation(boolCascade);
       AddTickCount('Check');
-      i := Find(strErrors);
-      If (i > 0) And (Elements[i].ElementCount = 0) Then
-        DeleteElement(i);
-      i := Find(strWarnings);
-      If (i > 0) And (Elements[i].ElementCount = 0) Then
-        DeleteElement(i);
-      i := Find(strHints);
-      If (i > 0) And (Elements[i].ElementCount = 0) Then
-        DeleteElement(i);
-      i := Find(strDocumentationConflicts);
-      If (i > 0) And (Elements[i].ElementCount = 0) Then
-        DeleteElement(i);
-      End;
+      TidyUpEmptyElements;
+    End;
   {$IFDEF PROFILECODE}
   Finally
     CodeProfiler.Stop;
@@ -2143,66 +2123,6 @@ Begin
     On E : Exception Do
       AddIssue(E.Message, scGlobal, 'TokenizeStream', 0, 0, etError);
   End
-End;
-
-(**
-
-  This method seeks the first non-comment token in the source code which match
-  one of the passed tokens.
-
-  @precon  The Tokens passed MUST be sorted in lowercase and in ascending order.
-  @postcon Seeks the first non-comment token in the source code which match
-           one of the passed tokens.
-
-  @param   strMsg      as a String
-  @param   strMethod   as a String
-  @param   strParam    as a String
-  @param   SeekTokens  as an Array Of string
-  @param   SeekToken   as a TSeekToken
-
-**)
-Procedure TPascalModule.ErrorAndSeekToken(strMsg, strMethod, strParam : String;
-  SeekTokens: Array Of String; SeekToken : TSeekToken);
-
-  (**
-
-    This method counts the number of occurrances of "%s" in the string and
-    returns that number.
-
-    @precon  None.
-    @postcon Returns the number of string parameters in the text.
-
-    @param   strText as a String
-    @return  an Integer
-
-  **)
-  Function StringCount(strText : String) : Integer;
-
-  Var
-    i : Integer;
-
-  Begin
-    Result := 0;
-    For i := 1 To Length(strText) - 1 Do
-      If Copy(strText, i, 2) = '%s' Then Inc(Result);
-  End;
-
-Begin
-  Case StringCount(strMsg) Of
-    0: AddIssue(Format(strMsg, [Token.Line, Token.Column]),
-           scGlobal, strMethod, Token.Line, Token.Column, etError);
-    1: AddIssue(Format(strMsg, [strParam, Token.Line, Token.Column]),
-           scGlobal, strMethod, Token.Line, Token.Column, etError);
-    2: AddIssue(Format(strMsg, [strParam, Token.Token, Token.Line,
-         Token.Column]), scGlobal, strMethod, Token.Line, Token.Column, etError);
-  Else
-    AddIssue(strNotEnoughStrings, scGlobal, strMethod, Token.Line, Token.Column, etError);
-  End;
-  NextNonCommentToken;
-  While Not IsKeyWord(Token.Token, SeekTokens) Do
-    NextNonCommentToken;
-  If SeekToken = stFirst Then
-    NextNonCommentToken;
 End;
 
 (**
@@ -4942,18 +4862,18 @@ End;
 procedure TPascalModule.TidyUpEmptyElements;
 
 Var
-  i : Integer;
+  iElement : Integer;
 
 begin
-  i := Find(strImplementedMethodsLabel);
-  If (i > 0) And (Elements[i].ElementCount = 0) Then
-    DeleteElement(i);
-  i := Find(strExportedHeadingsLabel);
-  If (i > 0) And (Elements[i].ElementCount = 0) Then
-    DeleteElement(i);
-  i := Find(strExportsLabel);
-  If (i > 0) And (Elements[i].ElementCount = 0) Then
-    DeleteElement(i);
+  For iElement := ElementCount DownTo 1 Do
+    Begin
+      If Elements[iElement] Is TFinalizationSection Then
+        Continue;
+      If Elements[iElement] Is TInitializationSection Then
+        Continue;
+      If Elements[iElement].ElementCount = 0 Then
+        DeleteElement(iElement);
+    End;
 end;
 
 (**
@@ -7570,12 +7490,14 @@ Procedure TPascalModule.InitSection;
 Begin
   If Token.UToken = 'INITIALIZATION' Then
     Begin
-      Add(Token, scNone, iiInitialization, GetComment);
+      Add(TInitializationSection.Create(Token.Token, scNone, Token.Line,
+        Token.Column, iiInitialization, GetComment));
       NextNonCommentToken;
       StmtList;
       If Token.UToken = 'FINALIZATION' Then
         Begin
-          Add(Token, scNone, iiFinalization, GetComment);
+          Add(TFinalizationSection.Create(Token.Token, scNone, Token.Line,
+            Token.Column, iiFinalization, GetComment));
           NextNonCommentToken;
           StmtList;
         End;

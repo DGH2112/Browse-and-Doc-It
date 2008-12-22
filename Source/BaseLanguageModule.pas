@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    19 Dec 2008
+  @Date    22 Dec 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -1184,6 +1184,8 @@ Type
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function KeyWords : TKeyWords; Virtual; Abstract;
     Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Procedure AddToExpression(Container : TElementContainer);
+    function IsToken(strToken: String; Container: TElementContainer): Boolean;
     { Properties }
     (**
       Returns a reference to the modules error collection.
@@ -4892,7 +4894,7 @@ End;
 
 
   @param   boolForDocumentation as a Boolean
-  @return  a String              
+  @return  a String
 
 **)
 Function TBaseLanguageModule.AsString(boolForDocumentation : Boolean) : String;
@@ -4900,6 +4902,48 @@ Function TBaseLanguageModule.AsString(boolForDocumentation : Boolean) : String;
 begin
   Result := ExtractFileName(Name);
 end;
+
+(**
+
+  This method adds the current toen to the passed generic container if it is not
+  nil and moves to the next non comment token.
+
+  @precon  None.
+  @postcon Adds the current toen to the passed generic container if it is not
+           nil and moves to the next non comment token.
+
+  @param   Container as a TElementContainer
+
+**)
+Procedure TBaseLanguageModule.AddToExpression(Container : TElementContainer);
+
+Begin
+  If Container <> Nil Then
+    Container.AppendToken(Token);
+  NextNonCommentToken;
+End;
+
+(**
+
+  This method check the current token against the passed string and if true
+  returns true and addeds the token to the generic container.
+
+  @precon  None.
+  @postcon Check the current token against the passed string and if true
+           returns true and addeds the token to the generic container.
+
+  @param   strToken  as a String
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TBaseLanguageModule.IsToken(strToken : String; Container : TElementContainer): Boolean;
+
+Begin
+  Result := strToken = Token.Token;
+  If Result Then
+    AddToExpression(Container);
+End;
 
 (**
 

@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       19 Dec 2008
+  @Date       22 Dec 2008
   @Author     David Hoyle
 
 **)
@@ -764,8 +764,6 @@ Type
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
-    Procedure AddToExpression(Container : TElementContainer);
-    function IsToken(strToken: String; Container: TElementContainer): Boolean;
     procedure ArrayElement(C : TElementContainer; iStartDimension: Integer; AT : TArrayType);
     Procedure CheckReturnValue(Method : TPascalMethod);
     Procedure CheckAlias(Method : TPascalMethod);
@@ -2201,48 +2199,6 @@ begin
           scNone,  'AddToContainer', tmpMethod.Line, tmpMethod.Column, etError);
     End;
 end;
-
-(**
-
-  This method adds the current toen to the passed generic container if it is not
-  nil and moves to the next non comment token.
-
-  @precon  None.
-  @postcon Adds the current toen to the passed generic container if it is not
-           nil and moves to the next non comment token.
-
-  @param   Container as a TElementContainer
-
-**)
-Procedure TPascalModule.AddToExpression(Container : TElementContainer);
-
-Begin
-  If Container <> Nil Then
-    Container.AppendToken(Token);
-  NextNonCommentToken;
-End;
-
-(**
-
-  This method check the current token against the passed string and if true
-  returns true and addeds the token to the generic container.
-
-  @precon  None.
-  @postcon Check the current token against the passed string and if true
-           returns true and addeds the token to the generic container.
-
-  @param   strToken  as a String
-  @param   Container as a TElementContainer
-  @return  a Boolean
-
-**)
-Function TPascalModule.IsToken(strToken : String; Container : TElementContainer): Boolean;
-
-Begin
-  Result := strToken = Token.Token;
-  If Result Then
-    AddToExpression(Container);
-End;
 
 (**
 

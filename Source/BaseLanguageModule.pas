@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    22 Dec 2008
+  @Date    23 Dec 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -12,7 +12,7 @@ Unit BaseLanguageModule;
 
 Interface
 
-Uses             
+Uses
   SysUtils, Classes, Contnrs, Graphics;
 
 
@@ -394,7 +394,7 @@ Type
     FColumn : Integer;
     FBufferPos : Integer;
   End;
-  
+
   (** This enumerate defermines the status of the token's reference resolution. **)
   TTokenReference = (trUnknown, trUnresolved, trResolved);
 
@@ -463,9 +463,9 @@ Type
     **)
     Property TokenType : TTokenType read FTokenType;
     (**
-      This property gets and sets the reference information for the token. 
-      @precon  None. 
-      @postcon Gets and sets the reference information for the token. 
+      This property gets and sets the reference information for the token.
+      @precon  None.
+      @postcon Gets and sets the reference information for the token.
       @return  a TTokenReference
     **)
     Property Reference : TTokenReference Read FReference Write FReference;
@@ -556,7 +556,8 @@ Type
     Constructor Create(srcComment : TComment); Overload;
     Constructor Create(strComment : String; iLine, iCol : Integer); Overload;
     Destructor Destroy; Override;
-    Class Function CreateComment(strComment : String; iLine, iCol : Integer) : TComment;
+    Class Function CreateComment(strComment : String; iLine,
+      iCol : Integer) : TComment; Virtual;
     Procedure AddToken(strToken : String; iType : TTokenType);
     Procedure ParseComment(strComment : String);
     Procedure Assign(srcComment : TComment); Overload;
@@ -618,6 +619,9 @@ Type
     Property Col : Integer Read GetCol;
   End;
 
+  (** A class type for comment parsers. **)
+  TCommentClass = Class Of TComment;
+
   (** A record to describe document conflict information. **)
   TDocConflictTable = Record
     FCategory     : String;
@@ -664,6 +668,7 @@ Type
     Procedure SetSorted(boolValue : Boolean);
     Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
       strDelimiter : String; iMaxWidth : Integer) : String; Virtual;
+    Procedure AddToken(AToken : TTokenInfo); Virtual;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Virtual;
@@ -1098,7 +1103,6 @@ Type
   TBaseLanguageModule = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Private
     FOwnedItems : TObjectList;
-    FTokens : TObjectList;
     FTokenIndex : TTokenIndex;
     FDocErrors: TElementContainer;
     FTickList : TStringList;
@@ -1112,8 +1116,8 @@ Type
     FPreviousTokenIndex : TTokenIndex;
     FCompilerConditionStack : TList;
     FLastComment: TTokenInfo;
+    FCommentClass : TCommentClass;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function GetTokenCount : Integer;
     Function GetTokenInfo(iIndex : TTokenIndex) : TTokenInfo;
     Function GetToken : TTokenInfo;
     function GetOpTickCountName(iIndex: Integer): String;
@@ -1129,8 +1133,8 @@ Type
     Procedure RollBackToken;
     Function GetComment(
       CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
+      Virtual; Abstract;
     Procedure SetTokenIndex(iIndex : TTokenIndex);
-    Procedure AddToken(AToken : TTokenInfo);
     procedure AppendToLastToken(strToken : String);
     procedure ProcessCompilerDirective(var iSkip : Integer); Virtual; Abstract;
     Function GetModuleName : String; Virtual;
@@ -1172,9 +1176,24 @@ Type
       @return  a TStringList
     **)
     Property CompilerDefines : TStringList Read FCompilerDefs;
+    (**
+      This property returns the current index of the current Token.
+      @precon  None.
+      @postcon Returns the current index of the current Token.
+      @return  a TTokenIndex
+    **)
+    Property TokenIndex : TTokenIndex Read FTokenIndex;
+    (**
+      This property returns the comment class type for the parser.
+      @precon  None.
+      @postcon Returns the comment class type for the parser.
+      @return  a TCommentClass
+    **)
+    Property CommentClass : TCommentClass Read FCommentClass;
   Public
     Constructor CreateParser(Source : TStream; strFileName : String;
-      IsModified : Boolean; ModuleOptions : TModuleOptions); Virtual;
+      IsModified : Boolean; ModuleOptions : TModuleOptions;
+      CommentClass : TCommentClass); Virtual;
     Destructor Destroy; Override;
     Procedure AddTickCount(strLabel : String);
     Procedure AddDef(strDef : String);
@@ -1187,13 +1206,6 @@ Type
     Procedure AddToExpression(Container : TElementContainer);
     function IsToken(strToken: String; Container: TElementContainer): Boolean;
     { Properties }
-    (**
-      Returns a reference to the modules error collection.
-      @precon  None.
-      @postcon Returns a reference to the modules error collection.
-      @return  an Integer
-    **)
-    Property TokenCount : Integer Read GetTokenCount;
     (**
       Returns the token information for the specifically indexed token within
       the module.
@@ -2956,55 +2968,23 @@ end;
 
 (**
 
+  This is a constructor for the TComment class.
 
-  This method is a class method to first check the comment for being a
-  documentation comment and then creating an instance of a TComment class and
-  parsing the comment via the constructor.
-
-
-  @precon  strComment is the full comment to be checked and parsed, iLine is
-
-           the line number of the comment and iCol is the column number of
-
-           the comment.
-
-  @postcon Returns Nil if this is not a documentation comment or returns a
-
-           valid TComment class.
-
+  @precon  None.
+  @postcon Implements a basic comment with no start and end character removed.
+           This method should be overridden by descendants to handle their
+           different comment styles.
 
   @param   strComment as a String
   @param   iLine      as an Integer
   @param   iCol       as an Integer
-  @return  a TComment
+  @return  a TComment  
 
 **)
 class function TComment.CreateComment(strComment: String; iLine,
   iCol: Integer): TComment;
-
 begin
-  Result := Nil;
-  If Length(strComment) > 0 Then
-    Begin
-      Case strComment[1] Of
-        '/' : strComment := Copy(strComment, 3, Length(strComment) - 2);
-        '{' : strComment := Copy(strComment, 2, Length(strComment) - 2);
-        '(' : strComment := Copy(strComment, 3, Length(strComment) - 4);
-      End;
-      If Length(strComment) > 0 Then
-        Begin
-          If strComment[Length(strComment)] = '*' Then
-            SetLength(strComment, Length(strComment) - 1);
-          If Length(strComment) > 0 Then
-            Begin
-              If (strComment[1] In [':', '*']) Then
-                Begin;
-                  strComment := Copy(strComment, 2, Length(strComment) - 1);
-                  Result := Create(strComment, iLine, iCol);
-                End;
-            End;
-        End;
-    End;
+  Result := Create(strComment, iLine, iCol);
 end;
 
 (**
@@ -3108,6 +3088,80 @@ end;
 
 (**
 
+  This method resets the comment tag mode, i.e. the comment will accept text as
+  tokens and not tag tokens.
+
+  @precon  None.
+  @postcon Resets the comment tag mode, i.e. the comment will accept text as
+           tokens and not tag tokens.
+
+**)
+procedure TComment.ResetTagMode;
+begin
+  FTagMode := False;
+end;
+
+(**
+
+  This method is a getter method for the Line property.
+
+  @precon  None.
+  @postcon Returns the line property value.
+
+  @return  an Integer
+
+**)
+Function TComment.GetLine : Integer;
+
+Begin
+  Result := FLine;
+End;
+
+(**
+
+  This method is a getter method for the Column property.
+
+  @precon  None.
+  @postcon Returns the column property value.
+
+  @return  an Integer
+
+**)
+Function TComment.GetCol : Integer;
+
+Begin
+  Result := FCol;
+End;
+
+(**
+
+  This method tries to find the given tag in the tag collection. It returns
+  the index, else -1.
+
+  @precon  strTagName is the name of the tag to search for.
+  @postcon Returns the tags index if found else -1.
+
+  @param   strTagName as a String
+  @return  an Integer
+
+**)
+function TComment.FindTag(strTagName: String): Integer;
+
+Var
+  i : Integer;
+
+begin
+  Result := -1;
+  For i := 0 To TagCount - 1 Do
+    If AnsiCompareText(Tag[i].TagName, strTagName) = 0 Then
+      Begin
+        Result := i;
+        Break;
+      End;
+end;
+
+(**
+
   This method takes the given comment and parses it into tokens. It pulls out
   all the tags at the same time. Tag should be at the end of the comment.
 
@@ -3193,80 +3247,6 @@ begin
       If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
         AddToken(strToken, LastToken);
     End;
-end;
-
-(**
-
-  This method resets the comment tag mode, i.e. the comment will accept text as
-  tokens and not tag tokens.
-
-  @precon  None.
-  @postcon Resets the comment tag mode, i.e. the comment will accept text as
-           tokens and not tag tokens.
-
-**)
-procedure TComment.ResetTagMode;
-begin
-  FTagMode := False;
-end;
-
-(**
-
-  This method is a getter method for the Line property.
-
-  @precon  None.
-  @postcon Returns the line property value.
-
-  @return  an Integer
-
-**)
-Function TComment.GetLine : Integer;
-
-Begin
-  Result := FLine;
-End;
-
-(**
-
-  This method is a getter method for the Column property.
-
-  @precon  None.
-  @postcon Returns the column property value.
-
-  @return  an Integer
-
-**)
-Function TComment.GetCol : Integer;
-
-Begin
-  Result := FCol;
-End;
-
-(**
-
-  This method tries to find the given tag in the tag collection. It returns
-  the index, else -1.
-
-  @precon  strTagName is the name of the tag to search for.
-  @postcon Returns the tags index if found else -1.
-
-  @param   strTagName as a String
-  @return  an Integer
-
-**)
-function TComment.FindTag(strTagName: String): Integer;
-
-Var
-  i : Integer;
-
-begin
-  Result := -1;
-  For i := 0 To TagCount - 1 Do
-    If AnsiCompareText(Tag[i].TagName, strTagName) = 0 Then
-      Begin
-        Result := i;
-        Break;
-      End;
 end;
 
 (**
@@ -3565,6 +3545,22 @@ end;
 
 (**
 
+  This method added the passed token to the tokens collection.
+
+  @precon  AToken must be a valid token.
+  @postcon Added the passed token to the tokens collection.
+
+  @param   AToken as a TTokenInfo
+
+**)
+procedure TElementContainer.AddToken(AToken: TTokenInfo);
+
+begin
+  FTokens.Add(AToken);
+end;
+
+(**
+
   This methof adds the given elements tokens to the current containers tokens.
 
   @precon  None.
@@ -3657,7 +3653,7 @@ begin
   FColumn := Source.FColumn;
   FComment := Nil;
   If Source.Comment <> Nil Then
-    FComment := TComment.Create(Source.Comment);
+    FComment := TCommentClass(Source.ClassType).Create(Source.Comment);
   FImageIndex := Source.FImageIndex;
   FTokens.Clear;
   For iToken :=  0 To Source.TokenCount - 1 Do
@@ -4671,17 +4667,18 @@ end;
   @param   strFileName   as a String
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
+  @param   CommentClass  as a TCommentClass
 
 **)
 constructor TBaseLanguageModule.CreateParser(Source : TStream;
-  strFileName : String; IsModified : Boolean; ModuleOptions : TModuleOptions);
+  strFileName : String; IsModified : Boolean; ModuleOptions : TModuleOptions;
+  CommentClass : TCommentClass);
 
 begin
   Inherited Create(strFileName, scGlobal, 0, 0, iiModule, Nil);
   FFileName := strFileName;
   FModified := IsModified;
   FOwnedItems := TObjectList.Create(True);
-  FTokens := TObjectList.Create(True);
   FTokenIndex := 0;
   FPreviousTokenIndex := -1;
   FTickList := TStringList.Create;
@@ -4697,6 +4694,7 @@ begin
   {$ENDIF}
   FCompilerConditionStack := TList.Create;
   objModuleRootElement := Self;
+  FCommentClass := CommentClass;
 end;
 
 (**
@@ -4734,26 +4732,9 @@ begin
   FBodyComment.Free;
   FTickList.Free;
   FDocErrors.Free;
-  FTokens.Free;
   FOwnedItems.Free;
   inherited;
 end;
-
-(**
-
-  This method adds the given token to the underlying token collection.
-
-  @precon  AToken must be a valid instance of a TTokenInfo class..
-  @postcon Adds the given token to the underlying token collection.
-
-  @param   AToken as a TTokenInfo
-
-**)
-Procedure TBaseLanguageModule.AddToken(AToken : TTokenInfo);
-
-Begin
-  FTokens.Add(AToken);
-End;
 
 (**
 
@@ -4810,45 +4791,6 @@ end;
 
 (**
 
-  This method tries to get a document comment from the previous token and return
-  a TComment class to the calling routine.
-
-  @note    All comments found are automatically added to the comment collection
-           for disposal when the parser is destroyed.
-
-  @precon  None.
-  @postcon Returns the comment immediately before the current token else nil.
-
-  @param   CommentPosition as a TCommentPosition
-  @return  a TComment
-
-**)
-Function TBaseLanguageModule.GetComment(
-  CommentPosition : TCommentPosition) : TComment;
-
-Var
-  T : TTokenInfo;
-  iOffset : Integer;
-
-Begin
-  Result := Nil;
-  If CommentPosition = cpBeforeCurrentToken Then
-    iOffset := -1
-  Else
-    iOffset := -2;
-  If FTokenIndex + iOffset > -1 Then
-    Begin
-      T := FTokens[FTokenIndex + iOffset] As TTokenInfo;
-      If T.TokenType = ttComment Then
-        Begin
-          Result := TComment.CreateComment(T.Token, T.Line, T.Column);
-          OwnedItems.Add(Result);
-        End;
-    End;
-End;
-
-(**
-
   This is a getter method for the Lines property.
 
   @precon  None.
@@ -4860,8 +4802,8 @@ End;
 function TBaseLanguageModule.GetLines: Integer;
 begin
   Result := 0;
-  If FTokens.Count > 0 Then
-    Result := (FTokens[FTokens.Count - 1] As TTokenInfo).Line;
+  If TokenCount > 0 Then
+    Result := (Tokens[TokenCount - 1] As TTokenInfo).Line;
 end;
 
 (**
@@ -5103,21 +5045,6 @@ end;
 
 (**
 
-  This is a getter method for the TokenCount property.
-
-  @precon  None.
-  @postcon Returns the number of tokens in the collection.
-
-  @return  an Integer
-
-**)
-Function TBaseLanguageModule.GetTokenCount : Integer;
-
-Begin
-  Result := FTokens.Count;
-End;
-(**
-
   This is a getter method for the TokenInfo property.
 
   @precon  iIndex is the index of the token info object required.
@@ -5130,7 +5057,7 @@ End;
 function TBaseLanguageModule.GetTokenInfo(iIndex: TTokenIndex): TTokenInfo;
 
 begin
-  Result := FTokens[iIndex] As TTokenInfo;
+  Result := Tokens[iIndex] As TTokenInfo;
 end;
 
 (**
@@ -5146,12 +5073,12 @@ end;
 Function TBaseLanguageModule.GetToken : TTokenInfo;
 
 Begin
-  If FTokenIndex >= FTokens.Count Then
+  If FTokenIndex >= TokenCount Then
     Begin
       AddIssue(strUnExpectedEndOfFile, scNone, 'GetToken', 0, 0, etError);
       Raise EParserAbort.Create('Parsing Aborted!');
     End;
-  Result := FTokens[FTokenIndex] As TTokenInfo;
+  Result := Tokens[FTokenIndex] As TTokenInfo;
 End;
 
 (**
@@ -5184,7 +5111,7 @@ end;
 Function TBaseLanguageModule.EndOfTokens : Boolean;
 
 Begin
-  Result := FTokenIndex >= FTokens.Count;
+  Result := FTokenIndex >= TokenCount;
 End;
 
 (**
@@ -5269,7 +5196,8 @@ begin
   Repeat
     If (Token.TokenType = ttComment) And (FLastComment <> Token) Then
       Begin
-        C := TComment.CreateComment(Token.Token, Token.Line, Token.Column);
+        C := FCommentClass.CreateComment(Token.Token,
+          Token.Line, Token.Column);
         If C <> Nil Then
           Begin
             BodyComments.Add(C);
@@ -5309,13 +5237,13 @@ Var
 begin
   Result := Nil;
   If FPreviousTokenIndex >= 0 Then
-    Result := FTokens[FPreviousTokenIndex] As TTokenInfo
+    Result := Tokens[FPreviousTokenIndex] As TTokenInfo
   Else
     For i := FTokenIndex - 1 DownTo 0 Do
-      If Not ((FTokens[i] As TTokenInfo).TokenType In [ttComment,
+      If Not ((Tokens[i] As TTokenInfo).TokenType In [ttComment,
         ttCompilerDirective]) Then
         Begin
-          Result := FTokens[i] As TTokenInfo;
+          Result := Tokens[i] As TTokenInfo;
           Break;
         End;
 end;

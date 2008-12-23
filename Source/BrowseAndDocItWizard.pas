@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    30 Nov 2008
+  @Date    23 Dec 2008
   @Version 1.0
 
 **)
@@ -148,6 +148,7 @@ Type
     FModule: TBaseLanguageModule;
     FMemoryStream : TMemoryStream;
     FFileName: String;
+    FType    : String;
     FModified: Boolean;
     FSuccessfulParseProc : TParserNotify;
     Procedure SetName;
@@ -2211,6 +2212,7 @@ procedure TBrowseAndDocItThread.Execute;
 begin
   SetName;
   Try
+    FType := 'Parsing';
     FMemoryStream.Position := 0;
     FModule := Dispatcher(FMemoryStream, FFileName, FModified, [moParse,
       moCheckForDocumentConflicts]);
@@ -2228,6 +2230,7 @@ begin
                     FModule.AddIssue(Es[i].Text, scNone, 'IDE', Es[i].Start.Line,
                       Es[i].Start.CharIndex + 1, etError);
                 End;}
+      FType := 'Rendering';
       Synchronize(RenderModuleExplorer);
     Finally
       FModule.Free;
@@ -2295,8 +2298,13 @@ end;
 
 **)
 procedure TBrowseAndDocItThread.ShowException;
+
+Const
+  strMsg = 'Exception in TBrowseAndDocItThread:'#13#10 +
+    '  Type: %s'#13#10 +
+    '  Exception: %s' ;
 begin
-  ShowMessage('Exception in TBrowseAndDocItThread:'#13#10 + FFileName);
+  ShowMessage(Format(strMsg, [FType, FFileName]));
   If Assigned(FSuccessfulParseProc) Then
     FSuccessfulParseProc(False);
 end;

@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    27 Nov 2008
+  @Date    23 Dec 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -1187,6 +1187,7 @@ Begin
     tvExplorer.Font.Name := BrowseAndDocItOptions.FontName;
     tvExplorer.Font.Size := BrowseAndDocItOptions.FontSize;
     GetExpandedNodes(FModule);
+    FModule := Nil;
     // Find and store the top item and the selected item in the tree view
     strTop := GetNodePath(tvExplorer.TopNode);
     strSelection := GetNodePath(tvExplorer.FocusedNode);

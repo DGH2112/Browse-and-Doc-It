@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    16 Nov 2008
+  @Date    23 Dec 2008
   @Version 1.0
 
 **)
@@ -32,17 +32,18 @@ Type
   TDispatcherInfo = Record
     FExt : String;
     FCls : TBaseLanguageModuleClass;
+    FCmt : TCommentClass;
   End;
 
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
   Modules : Array[1..6] of TDispatcherInfo = (
-    (FExt: '.bas'; FCls: TVBModule),
-    (FExt: '.cls'; FCls: TVBModule),
-    (FExt: '.dpk'; FCls: TPascalModule),
-    (FExt: '.dpr'; FCls: TPascalModule),
-    (FExt: '.frm'; FCls: TVBModule),
-    (FExt: '.pas'; FCls: TPascalModule)
+    (FExt: '.bas'; FCls: TVBModule    ; FCmt : TVBComment),
+    (FExt: '.cls'; FCls: TVBModule    ; FCmt : TVBComment),
+    (FExt: '.dpk'; FCls: TPascalModule; FCmt : TPascalComment),
+    (FExt: '.dpr'; FCls: TPascalModule; FCmt : TPascalComment),
+    (FExt: '.frm'; FCls: TVBModule    ; FCmt : TVBComment),
+    (FExt: '.pas'; FCls: TPascalModule; FCmt : TPascalComment)
   );
 
 (**
@@ -111,7 +112,7 @@ Begin
   iIndex := Find(ExtractFileExt(strFileName));
   If iIndex > 0 Then
     Result := Modules[iIndex].FCls.CreateParser(Source, strFileName,
-      boolModified, ModuleOptions);
+      boolModified, ModuleOptions, Modules[iIndex].FCmt);
 End;
 
 (**

@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       22 Dec 2008
+  @Date       23 Dec 2008
   @Author     David Hoyle
 
 **)
@@ -21,6 +21,13 @@ Uses
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
+  (** A pascal specific implementation of comments. **)
+  TPascalComment = Class(TComment)
+  Public
+    Class Function CreateComment(strComment: String; iLine,
+      iCol: Integer): TComment; Override;
+  End;
+
   (** This is an enumerate to describe the type of constant expression. **)
   TExprType = (etUnknown, etConstExpr, etString, etInteger, etFloat);
   (** This is a set of TExprType enumerates. **)
@@ -783,6 +790,9 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     function GetCurrentMethod: TPascalMethod;
     Function GetModuleName : String; Override;
+    Function GetComment(
+      CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
+      Override;
     (**
       This property returns the method on top of the method stack.
       @precon  None.
@@ -799,7 +809,8 @@ Type
     Property ModuleType : TModuleType Read FModuleType Write FModuleType;
   Public
     Constructor CreateParser(Source : TStream; strFileName : String;
-      IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
+      IsModified : Boolean; ModuleOptions : TModuleOptions;
+      CommentClass : TCommentClass); Override;
     Destructor Destroy; Override;
     Function KeyWords : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
@@ -955,6 +966,59 @@ Begin
   Result.FContainer := Container;
   Assert(Container <> Nil, 'Conatiner in TTypeToken is NULL!');
 End;
+
+(**
+
+
+  This method is a class method to first check the comment for being a
+  documentation comment and then creating an instance of a TComment class and
+  parsing the comment via the constructor.
+
+
+  @precon  strComment is the full comment to be checked and parsed, iLine is
+
+           the line number of the comment and iCol is the column number of
+
+           the comment.
+
+  @postcon Returns Nil if this is not a documentation comment or returns a
+
+           valid TComment class.
+
+
+  @param   strComment as a String
+  @param   iLine      as an Integer
+  @param   iCol       as an Integer
+  @return  a TComment
+
+**)
+class function TPascalComment.CreateComment(strComment: String; iLine,
+  iCol: Integer): TComment;
+
+begin
+  Result := Nil;
+  If Length(strComment) > 0 Then
+    Begin
+      Case strComment[1] Of
+        '/' : strComment := Copy(strComment, 3, Length(strComment) - 2);
+        '{' : strComment := Copy(strComment, 2, Length(strComment) - 2);
+        '(' : strComment := Copy(strComment, 3, Length(strComment) - 4);
+      End;
+      If Length(strComment) > 0 Then
+        Begin
+          If strComment[Length(strComment)] = '*' Then
+            SetLength(strComment, Length(strComment) - 1);
+          If Length(strComment) > 0 Then
+            Begin
+              If (strComment[1] In [':', '*']) Then
+                Begin;
+                  strComment := Copy(strComment, 2, Length(strComment) - 1);
+                  Result := Create(strComment, iLine, iCol);
+                End;
+            End;
+        End;
+    End;
+end;
 
 (**
 
@@ -1811,22 +1875,25 @@ end;
 
 (**
 
-  This is the constructor method for the TPascalDocModule class.
+  This is the constructor method for the TPascalDocModule class. 
 
-  @precon  Source is a valid TStream descendant containing as stream of text,
-           that is the contents of a source code module and Filename is the file
-           name of the module being parsed and IsModified determines if the
-           source code module has been modified since the last save to disk.
-  @postcon Creates an instance of the module parser.
+  @precon  Source is a valid TStream descendant containing as stream of text, 
+           that is the contents of a source code module and Filename is the 
+           file name of the module being parsed and IsModified determines if 
+           the source code module has been modified since the last save to 
+           disk. 
+  @postcon Creates an instance of the module parser. 
 
   @param   Source        as a TStream
   @param   strFileName   as a String
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
+  @param   CommentClass  as a TCommentClass
 
 **)
 Constructor TPascalModule.CreateParser(Source : TStream; strFileName : String;
-  IsModified : Boolean; ModuleOptions : TModuleOptions);
+  IsModified : Boolean; ModuleOptions : TModuleOptions;
+  CommentClass : TCommentClass);
 var
   boolCascade: Boolean;
 
@@ -1835,7 +1902,8 @@ Begin
   CodeProfiler.Start('TPascalModule.Create');
   Try
   {$ENDIF}
-  Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
+  Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions,
+    CommentClass);
   FTypesLabel              := Nil;
   FConstantsLabel          := Nil;
   FResourceStringsLabel    := Nil;
@@ -2272,6 +2340,45 @@ Function TPascalModule.GetModuleName : String;
 Begin
   Result := Inherited GetModuleName;
   Result := strModuleTypes[ModuleType] + #32 + Result;
+End;
+
+(**
+
+  This method tries to get a document comment from the previous token and return
+  a TComment class to the calling routine.
+
+  @note    All comments found are automatically added to the comment collection
+           for disposal when the parser is destroyed.
+
+  @precon  None.
+  @postcon Returns the comment immediately before the current token else nil.
+
+  @param   CommentPosition as a TCommentPosition
+  @return  a TComment
+
+**)
+Function TPascalModule.GetComment(
+  CommentPosition : TCommentPosition) : TComment;
+
+Var
+  T : TTokenInfo;
+  iOffset : Integer;
+
+Begin
+  Result := Nil;
+  If CommentPosition = cpBeforeCurrentToken Then
+    iOffset := -1
+  Else
+    iOffset := -2;
+  If TokenIndex + iOffset > -1 Then
+    Begin
+      T := Tokens[TokenIndex + iOffset] As TTokenInfo;
+      If T.TokenType = ttComment Then
+        Begin
+          Result := TPascalComment.CreateComment(T.Token, T.Line, T.Column);
+          OwnedItems.Add(Result);
+        End;
+    End;
 End;
 
 (**
@@ -4924,7 +5031,7 @@ Begin
                     V.AddTokens(T);
                     If I[j].Comment <> Nil Then
                       Begin
-                        V.Comment := TComment.Create(I[j].Comment);
+                        V.Comment := TPascalComment.Create(I[j].Comment);
                         OwnedItems.Add(V.Comment);
                       End;
                   End;
@@ -5009,7 +5116,7 @@ Begin
                   V.AddTokens(T);
                   If I[j].Comment <> Nil Then
                     Begin
-                      V.Comment := TComment.Create(I[j].Comment);
+                      V.Comment := TPascalComment.Create(I[j].Comment);
                       OwnedItems.Add(V.Comment);
                     End;
                 End;
@@ -8239,7 +8346,7 @@ Begin
           C := GetComment;
           If C <> Nil then
             Begin
-              AComment := TComment.Create(C);
+              AComment := TPascalComment.Create(C);
               OwnedItems.Add(AComment);
             End;
           If Container <> Nil Then

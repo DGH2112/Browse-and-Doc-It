@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    01 Oct 2008
+  @Date    24 Dec 2008
   @Version 1.0
 
   @todo    Tokenize should also be language independant.
@@ -90,7 +90,7 @@ Begin
         End
       Else If strText[i] In [#10, #13] Then
         CurToken := ttLineEnd
-      Else If strText[i] In [''''] Then
+      Else If strText[i] In ['''', '"'] Then
         CurToken := ttStringLiteral
       Else If strText[i] In [#0..#255] - ['#', '_', 'a'..'z', 'A'..'Z', '$', '0'..'9'] Then
         CurToken := ttSymbol

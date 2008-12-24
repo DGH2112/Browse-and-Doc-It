@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       23 Dec 2008
+  @Date       24 Dec 2008
   @Author     David Hoyle
 
 **)
@@ -809,8 +809,7 @@ Type
     Property ModuleType : TModuleType Read FModuleType Write FModuleType;
   Public
     Constructor CreateParser(Source : TStream; strFileName : String;
-      IsModified : Boolean; ModuleOptions : TModuleOptions;
-      CommentClass : TCommentClass); Override;
+      IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function KeyWords : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
@@ -974,17 +973,12 @@ End;
   documentation comment and then creating an instance of a TComment class and
   parsing the comment via the constructor.
 
-
   @precon  strComment is the full comment to be checked and parsed, iLine is
-
            the line number of the comment and iCol is the column number of
-
            the comment.
 
   @postcon Returns Nil if this is not a documentation comment or returns a
-
            valid TComment class.
-
 
   @param   strComment as a String
   @param   iLine      as an Integer
@@ -1888,12 +1882,10 @@ end;
   @param   strFileName   as a String
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
-  @param   CommentClass  as a TCommentClass
 
 **)
 Constructor TPascalModule.CreateParser(Source : TStream; strFileName : String;
-  IsModified : Boolean; ModuleOptions : TModuleOptions;
-  CommentClass : TCommentClass);
+  IsModified : Boolean; ModuleOptions : TModuleOptions);
 var
   boolCascade: Boolean;
 
@@ -1902,8 +1894,7 @@ Begin
   CodeProfiler.Start('TPascalModule.Create');
   Try
   {$ENDIF}
-  Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions,
-    CommentClass);
+  Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   FTypesLabel              := Nil;
   FConstantsLabel          := Nil;
   FResourceStringsLabel    := Nil;
@@ -1922,6 +1913,7 @@ Begin
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSourceStream := Source;
   AddTickCount('Start');
+  CommentClass := TPascalComment;
   TokenizeStream;
   AddTickCount('Tokenize');
   If moParse In ModuleOptions Then

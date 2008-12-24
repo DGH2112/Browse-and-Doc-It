@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    23 Dec 2008
+  @Date    24 Dec 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -25,9 +25,8 @@ Type
   TTokenIndex = Integer;
   (** An enumerate type to define the stream status and token types. **)
   TTokenType = (ttUnknown, ttWhiteSpace, ttReservedWord, ttIdentifier, ttNumber,
-    ttSymbol, ttLineEnd, ttArrayElement, ttStringLiteral, ttComment, ttHTMLTag,
-    ttDirective, ttCompilerDirective, ttLinkTag,
-    ttTreeHeader);
+    ttSymbol, ttLineEnd, ttStringLiteral, ttComment, ttHTMLTag, ttDirective,
+    ttCompilerDirective, ttLinkTag, ttTreeHeader, ttFileEnd);
   (** An enumerate for the scoping of identifiers. **)
   TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic,
     scPublished, scFriend);
@@ -1189,11 +1188,10 @@ Type
       @postcon Returns the comment class type for the parser.
       @return  a TCommentClass
     **)
-    Property CommentClass : TCommentClass Read FCommentClass;
+    Property CommentClass : TCommentClass Read FCommentClass Write FCommentClass;
   Public
     Constructor CreateParser(Source : TStream; strFileName : String;
-      IsModified : Boolean; ModuleOptions : TModuleOptions;
-      CommentClass : TCommentClass); Virtual;
+      IsModified : Boolean; ModuleOptions : TModuleOptions); Virtual;
     Destructor Destroy; Override;
     Procedure AddTickCount(strLabel : String);
     Procedure AddDef(strDef : String);
@@ -2148,11 +2146,11 @@ Const
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : [fsBold]),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
-    (FColour : clMaroon; FStyles : [fsBold])
+    (FColour : clMaroon; FStyles : [fsBold]),
+    (FColour : clMaroon; FStyles : [])
   );
 
   (** This is a constant for special tag items to show in the tree **)
@@ -2548,8 +2546,8 @@ Const
   (** A list of strings representing the token types. **)
   strTokenType : Array[Low(TTokenType)..High(TTokenType)] Of String = (
     'Unknown', 'WhiteSpace', 'ReservedWord', 'Identifier', 'Number',
-    'Symbol', 'LineEnd', 'ArrayElement', 'StringLiteral', 'Comment', 'HTMLTag',
-    'Directive', 'CompilerDirective', 'LinkTag', 'TreeHeader');
+    'Symbol', 'LineEnd', 'StringLiteral', 'Comment', 'HTMLTag', 'Directive',
+    'CompilerDirective', 'LinkTag', 'TreeHeader', 'FileEnd');
 
 Var
   (** This is a global variable for the Browse and Doc It options that need to
@@ -4667,12 +4665,10 @@ end;
   @param   strFileName   as a String
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
-  @param   CommentClass  as a TCommentClass
 
 **)
 constructor TBaseLanguageModule.CreateParser(Source : TStream;
-  strFileName : String; IsModified : Boolean; ModuleOptions : TModuleOptions;
-  CommentClass : TCommentClass);
+  strFileName : String; IsModified : Boolean; ModuleOptions : TModuleOptions);
 
 begin
   Inherited Create(strFileName, scGlobal, 0, 0, iiModule, Nil);

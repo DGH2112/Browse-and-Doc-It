@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    24 Dec 2008
+  @Date    26 Dec 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -5107,7 +5107,7 @@ end;
 Function TBaseLanguageModule.EndOfTokens : Boolean;
 
 Begin
-  Result := FTokenIndex >= TokenCount;
+  Result := (Token.TokenType = ttFileEnd) Or (FTokenIndex >= TokenCount);
 End;
 
 (**

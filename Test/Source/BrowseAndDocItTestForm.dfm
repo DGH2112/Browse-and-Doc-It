@@ -19,7 +19,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
-    Left = 681
+    Left = 684
     Top = 26
     Height = 718
     ResizeStyle = rsUpdate
@@ -27,13 +27,23 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     ExplicitTop = 43
     ExplicitHeight = 690
   end
-  object pnlModuleExplorer: TPanel
+  object sptFiles: TSplitter
     Left = 265
+    Top = 26
+    Height = 718
+    ResizeStyle = rsUpdate
+    ExplicitLeft = 84
+    ExplicitTop = 295
+    ExplicitHeight = 100
+  end
+  object pnlModuleExplorer: TPanel
+    Left = 268
     Top = 26
     Width = 416
     Height = 718
     Align = alLeft
     TabOrder = 2
+    ExplicitLeft = 265
   end
   object pnlFileList: TPanel
     Left = 0

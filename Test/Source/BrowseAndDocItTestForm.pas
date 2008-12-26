@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    14 Nov 2008
+  @Date    26 Dec 2008
   @Author  David Hoyle
 
 **)
@@ -16,7 +16,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes,
   Graphics, Controls, Forms, Dialogs, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ExtCtrls, ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
-  FileCtrl, ComCtrls, Contnrs,
+  FileCtrl, ComCtrls, Contnrs, SynHighlighterVB,
   Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ActnCtrls, ToolWin,
   ActnMan, ActnMenus, XPStyleActnCtrls, ActnPopup;
 
@@ -56,6 +56,7 @@ type
     actViewShowTokens: TAction;
     actToolsOptions: TAction;
     actToolsDocumentation: TAction;
+    sptFiles: TSplitter;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
@@ -85,10 +86,13 @@ type
     FINIFileName : String;
     FSynEdit: TSynEdit;
     FSynPasSyn: TSynPasSyn;
+    FSynVBSyn: TSynVBSyn;
     FParseRecords : TObjectList;
     function GetFileName: String;
     procedure SetFileName(const Value: String);
     procedure SetDirectory(const Value: String);
+    procedure LoadSettings;
+    procedure SaveSettings;
   Strict Protected
     Procedure RecurseDirectories(strDirectory : String);
     Procedure RefreshExplorer(Sender : TObject);
@@ -369,7 +373,7 @@ End;
   This is an on refresh event handler for the module explorer called back.
 
   @precon  None.
-  @postcon Refreshes the module explorer. 
+  @postcon Refreshes the module explorer.
 
   @param   Sender as a TObject
 
@@ -382,12 +386,12 @@ end;
 (**
 
 
-  This method gets the number of errors for the given files name. 
+  This method gets the number of errors for the given files name.
 
 
-  @precon  None. 
+  @precon  None.
 
-  @postcon Gets the number of errors for the given files name. 
+  @postcon Gets the number of errors for the given files name.
 
 
   @param   strFileName as a String
@@ -472,9 +476,6 @@ end;
 **)
 procedure TfrmBrowseAndDocItTestForm.FormCreate(Sender: TObject);
 
-Var
-  j : Integer;
-
 begin
   FParseRecords := TObjectList.Create(True);
   FSynEdit := TSynEdit.Create(Nil);
@@ -504,7 +505,15 @@ begin
       CharAttri.Foreground := clTeal;
       SymbolAttri.Foreground := clGreen;
     End;
-  FSynEdit.Highlighter := FSynPasSyn;
+  FSynVBSyn := TSynVBSyn.Create(Nil);
+  With FSynVBSyn Do
+    Begin
+      CommentAttri.Foreground := clPurple;
+      IdentifierAttri.Foreground := clNavy;
+      NumberAttri.Foreground := clGreen;
+      StringAttri.Foreground := clTeal;
+      SymbolAttri.Foreground := clGreen;
+    End;
   FINIFileName := BuildRootKey(Nil, Nil);
   {$IFDEF WIN32}
   BrowseAndDocItOptions.Defines.Add('WIN32');
@@ -519,26 +528,7 @@ begin
   FModuleExplorerFrame.OnSelectionChange := SelectionChange;
   FModuleExplorerFrame.OnFocus := Focus;
   FModuleExplorerFrame.OnRefresh := RefreshExplorer;
-  With TIniFile.Create(FINIFileName) Do
-    Try
-      Top := ReadInteger('Position', 'Top', Top);
-      Left := ReadInteger('Position', 'Left', Left);
-      Height := ReadInteger('Position', 'Height', Height);
-      Width := ReadInteger('Position', 'Width', Width);
-      pnlModuleExplorer.Width := ReadInteger('Position', 'Splitter', pnlModuleExplorer.Width);
-      DirectoryListBox.Directory := ReadString('Position', 'Directory', GetCurrentDir);
-      j := ReadInteger('Setup', 'Selection', 0);
-      actFileRecurseFolders.Checked := ReadBool('Setup', 'Recurse', False);
-      RecurseFolders(Self);
-      chkErrors.Checked := ReadBool('Setup', 'Errors', False);
-      chkWarnings.Checked := ReadBool('Setup', 'Warnings', False);
-      chkHints.Checked := ReadBool('Setup', 'Hints', False);
-      chkConflicts.Checked := ReadBool('Setup', 'Conflicts', False);
-      If lvFileList.Items.Count > j Then
-        lvFileList.ItemIndex := j;
-    Finally
-      Free;
-    End;
+  LoadSettings;
 end;
 
 (**
@@ -556,24 +546,9 @@ procedure TfrmBrowseAndDocItTestForm.FormDestroy(Sender: TObject);
 begin
   FSynEdit.Highlighter := Nil;
   FSynEdit.Free;
+  FSynVBSyn.Free;
   FSynPasSyn.Free;
-  With TIniFile.Create(FINIFileName) Do
-    Try
-      WriteInteger('Position', 'Top', Top);
-      WriteInteger('Position', 'Left', Left);
-      WriteInteger('Position', 'Height', Height);
-      WriteInteger('Position', 'Width', Width);
-      WriteInteger('Position', 'Splitter', pnlModuleExplorer.Width);
-      WriteString('Position', 'Directory', DirectoryListBox.Directory);
-      WriteInteger('Setup', 'Selection', lvFileList.ItemIndex);
-      WriteBool('Setup', 'Recurse', actFileRecurseFolders.Checked);
-      WriteBool('Setup', 'Errors', chkErrors.Checked);
-      WriteBool('Setup', 'Warnings', chkWarnings.Checked);
-      WriteBool('Setup', 'Hints', chkHints.Checked);
-      WriteBool('Setup', 'Conflicts', chkConflicts.Checked);
-    Finally
-      Free;
-    End;
+  SaveSettings;
   FModuleExplorerFrame.Free;
   FProgressForm.Free;
   FParseRecords.Free;
@@ -711,6 +686,65 @@ begin
   End;
 end;
 
+procedure TfrmBrowseAndDocItTestForm.SaveSettings;
+begin
+  with TIniFile.Create(FINIFileName) do
+    try
+      WriteInteger('Position', 'Top', Top);
+      WriteInteger('Position', 'Left', Left);
+      WriteInteger('Position', 'Height', Height);
+      WriteInteger('Position', 'Width', Width);
+      WriteInteger('Position', 'FileSplitter', pnlFileList.Width);
+      WriteInteger('Columns', '1', lvFileList.Columns[0].Width);
+      WriteInteger('Columns', '2', lvFileList.Columns[1].Width);
+      WriteInteger('Columns', '3', lvFileList.Columns[2].Width);
+      WriteInteger('Columns', '4', lvFileList.Columns[3].Width);
+      WriteInteger('Columns', '5', lvFileList.Columns[4].Width);
+      WriteInteger('Position', 'Splitter', pnlModuleExplorer.Width);
+      WriteString('Position', 'Directory', DirectoryListBox.Directory);
+      WriteInteger('Setup', 'Selection', lvFileList.ItemIndex);
+      WriteBool('Setup', 'Recurse', actFileRecurseFolders.Checked);
+      WriteBool('Setup', 'Errors', chkErrors.Checked);
+      WriteBool('Setup', 'Warnings', chkWarnings.Checked);
+      WriteBool('Setup', 'Hints', chkHints.Checked);
+      WriteBool('Setup', 'Conflicts', chkConflicts.Checked);
+    finally
+      Free;
+    end;
+end;
+
+procedure TfrmBrowseAndDocItTestForm.LoadSettings;
+var
+  j: Integer;
+begin
+  with TIniFile.Create(FINIFileName) do
+    try
+      Top := ReadInteger('Position', 'Top', Top);
+      Left := ReadInteger('Position', 'Left', Left);
+      Height := ReadInteger('Position', 'Height', Height);
+      Width := ReadInteger('Position', 'Width', Width);
+      pnlFileList.Width := ReadInteger('Position', 'FileSplitter', pnlFileList.Width);
+      lvFileList.Columns[0].Width := ReadInteger('Columns', '1', lvFileList.Columns[0].Width);
+      lvFileList.Columns[1].Width := ReadInteger('Columns', '2', lvFileList.Columns[1].Width);
+      lvFileList.Columns[2].Width := ReadInteger('Columns', '3', lvFileList.Columns[2].Width);
+      lvFileList.Columns[3].Width := ReadInteger('Columns', '4', lvFileList.Columns[3].Width);
+      lvFileList.Columns[4].Width := ReadInteger('Columns', '5', lvFileList.Columns[4].Width);
+      pnlModuleExplorer.Width := ReadInteger('Position', 'Splitter', pnlModuleExplorer.Width);
+      DirectoryListBox.Directory := ReadString('Position', 'Directory', GetCurrentDir);
+      j := ReadInteger('Setup', 'Selection', 0);
+      actFileRecurseFolders.Checked := ReadBool('Setup', 'Recurse', False);
+      RecurseFolders(Self);
+      chkErrors.Checked := ReadBool('Setup', 'Errors', False);
+      chkWarnings.Checked := ReadBool('Setup', 'Warnings', False);
+      chkHints.Checked := ReadBool('Setup', 'Hints', False);
+      chkConflicts.Checked := ReadBool('Setup', 'Conflicts', False);
+      if lvFileList.Items.Count > j then
+        lvFileList.ItemIndex := j;
+    finally
+      Free;
+    end;
+end;
+
 (**
 
   This is an OnSelctionChange event handler for the module explorer.
@@ -747,11 +781,18 @@ end;
 
 **)
 procedure TfrmBrowseAndDocItTestForm.SetFileName(const Value: String);
+var
+  strExt: String;
 begin
   FFileName := Value;
   Caption := FFileName;
   FSynEdit.Lines.LoadFromFile(FFileName);
   FSynedit.Modified := False;
+  strExt := LowerCase(ExtractFileExt(FFileName));
+  If IsKeyWord(strExt, ['.dpk', '.dpr', '.pas']) Then
+    FSynEdit.Highlighter := FSynPasSyn
+  Else
+    FSynEdit.Highlighter := FSynVBSyn;
   SynEdit1Change(Self);
 end;
 
@@ -779,7 +820,7 @@ begin
     M := Dispatcher(Source, FileName, FSynEdit.Modified, [moParse, moCheckForDocumentConflicts]);
     If M <> Nil Then
       Try
-          FModuleExplorerFrame.RenderModule(M);
+        FModuleExplorerFrame.RenderModule(M);
       Finally
         M.Free;
       End;

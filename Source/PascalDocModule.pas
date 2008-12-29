@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       24 Dec 2008
+  @Date       29 Dec 2008
   @Author     David Hoyle
 
 **)
@@ -1986,8 +1986,8 @@ Var
   boolEOF : Boolean;
   (** Token buffer. **)
   strToken : String;
-  CurCharType : TTokenType;
-  LastCharType : TTokenType;
+  CurCharType : TBADITokenType;
+  LastCharType : TBADITokenType;
   BlockType : TBlockType;
   (** Current line number **)
   iLine : Integer;
@@ -2005,7 +2005,7 @@ Var
   LastChar : Char;
   (** Token size **)
   iTokenLen : Integer;
-  LastToken : TTokenType;
+  LastToken : TBADITokenType;
 
 Begin
   BlockType := btNoBlock;

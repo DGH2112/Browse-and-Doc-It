@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    04 Oct 2008
+  @Date    29 Dec 2008
   @Version 1.0
 
 **)
@@ -509,11 +509,11 @@ Var
   **)
   Procedure OutputCodeStyles;
   Var
-    i : BaseLanguageModule.TTokenType;
+    i : TBADITokenType;
 
   Begin
     With BrowseAndDocItOptions Do
-      For i := Low(BaseLanguageModule.TTokenType) to High(BaseLanguageModule.TTokenType) Do
+      For i := Low(TBADITokenType) to High(TBADITokenType) Do
         Begin
           sl.Add(Format('span.%s {', [strTokenType[i]]));
           sl.Add(Format('  color            : #%s;', [HTMLColour(TokenFontInfo[i].FColour)]));
@@ -1693,7 +1693,7 @@ begin
   sl := Tokenize(strText, FKeyWords);
   Try
     For i := 0 To sl.Count - 1 Do
-      Case BaseLanguageModule.TTokenType(sl.Objects[i]) Of
+      Case TBADITokenType(sl.Objects[i]) Of
         ttReservedWord : Result := Result + Format('<span class="ReservedWord">%s</span>', [N(sl[i])]);
         ttIdentifier   : Result := Result + Format('<span class="Identifier">%s</span>', [N(sl[i])]);
         ttSymbol       : Result := Result + Format('<span class="Symbol">%s</span>', [N(sl[i])]);

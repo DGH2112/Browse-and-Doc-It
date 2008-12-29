@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    23 Dec 2008
+  @Date    29 Dec 2008
   @Author  David Hoyle
   @Version 1.0
 
@@ -289,7 +289,7 @@ Begin
     Begin
       If Level <> 1 Then
         Begin
-          Case TTokenType(sl.Objects[i]) Of
+          Case TBADITokenType(sl.Objects[i]) Of
             ttIdentifier:
               Begin
                 Canvas.Font.Color := TokenFontInfo[ttIdentifier].FColour;

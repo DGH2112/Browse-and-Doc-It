@@ -61,7 +61,7 @@ object frmOptions: TfrmOptions
         object lblManagedNodesLife: TLabel
           Left = 406
           Top = 9
-          Width = 184
+          Width = 175
           Height = 13
           Caption = 'Life-time of Managed Nodes (in days)'
         end
@@ -95,7 +95,7 @@ object frmOptions: TfrmOptions
           Text = '100'
         end
         object udManagedNodesLife: TUpDown
-          Left = 659
+          Left = 653
           Top = 6
           Width = 16
           Height = 21
@@ -110,6 +110,10 @@ object frmOptions: TfrmOptions
     object Page2: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -217,6 +221,10 @@ object frmOptions: TfrmOptions
     object TabSheet1: TTabSheet
       Caption = 'Module Explorer'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -274,7 +282,7 @@ object frmOptions: TfrmOptions
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 0
       end
       object edtFontSize: TEdit
@@ -406,6 +414,10 @@ object frmOptions: TfrmOptions
     object TabSheet2: TTabSheet
       Caption = 'Code Browsing'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -428,6 +440,10 @@ object frmOptions: TfrmOptions
     object tabExcludeDocFiles: TTabSheet
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -445,6 +461,10 @@ object frmOptions: TfrmOptions
     object tabMethodDescriptions: TTabSheet
       Caption = 'Method Descriptions'
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         342)

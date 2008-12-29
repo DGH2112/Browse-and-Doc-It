@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    16 Nov 2008
+  @Date    29 Dec 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -99,7 +99,7 @@ type
       Index: Integer; Rect: TRect; State: TOwnerDrawState);
     { Private declarations }
   Private
-    FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
+    FTokenFontInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
   public
     { Public declarations }
     Class Function Execute : Boolean;
@@ -134,7 +134,7 @@ Class Function TfrmOptions.Execute : Boolean;
 Var
   i : TDocOption;
   j : Integer;
-  k : TTokenType;
+  k : TBADITokenType;
 
 Begin
   Result := False;
@@ -155,7 +155,7 @@ Begin
             cbxFontName.ItemIndex := j;
             Break;
           End;
-      For k := Low(TTokenType) to High(TTokenType) Do
+      For k := Low(TBADITokenType) to High(TBADITokenType) Do
         FTokenFontInfo[k] := BrowseAndDocItOptions.TokenFontInfo[k];
       udFontSize.Position := BrowseAndDocItOptions.FontSize;
       rgpBrowsePosition.ItemIndex := Integer(BrowseAndDocItOptions.BrowsePosition);
@@ -180,7 +180,7 @@ Begin
           BrowseAndDocItOptions.UpdateInterval := udUpdateInterval.Position;
           BrowseAndDocItOptions.FontName := cbxFontName.Text;
           BrowseAndDocItOptions.FontSize := udFontSize.Position;
-          For k := Low(TTokenType) to High(TTokenType) Do
+          For k := Low(TBADITokenType) to High(TBADITokenType) Do
             BrowseAndDocItOptions.TokenFontInfo[k] := FTokenFontInfo[k];
           BrowseAndDocItOptions.BrowsePosition := TBrowsePosition(rgpBrowsePosition.ItemIndex);
           BrowseAndDocItOptions.ExcludeDocFiles.Text := mmoExcludeDocFiles.Text;
@@ -215,12 +215,12 @@ procedure TfrmOptions.FormCreate(Sender: TObject);
 
 Var
   i : Integer;
-  j : TTokenType;
+  j : TBADITokenType;
 
 begin
   For i := 0 To Screen.Fonts.Count - 1 Do
     cbxFontName.Items.Add(Screen.Fonts[i]);
-  For j := Low(TTokenType) to High(TTokenType) Do
+  For j := Low(TBADITokenType) to High(TBADITokenType) Do
     lbxTokenTypes.Items.Add(strTokenType[j]);
   lbxTokenTypes.ItemIndex := 0;
 end;
@@ -348,11 +348,11 @@ begin
   With lbxTokenTypes Do
     If ItemIndex > -1 Then
       Begin
-        cbxFontColour.Selected := FTokenFontInfo[TTokenType(itemIndex)].FColour;
-        chkBold.Checked := fsBold In FTokenFontInfo[TTokenType(itemIndex)].FStyles;
-        chkItalic.Checked := fsItalic In FTokenFontInfo[TTokenType(itemIndex)].FStyles;
-        chkUnderline.Checked := fsUnderline In FTokenFontInfo[TTokenType(itemIndex)].FStyles;
-        chkStrikeout.Checked := fsStrikeout In FTokenFontInfo[TTokenType(itemIndex)].FStyles;
+        cbxFontColour.Selected := FTokenFontInfo[TBADITokenType(itemIndex)].FColour;
+        chkBold.Checked := fsBold In FTokenFontInfo[TBADITokenType(itemIndex)].FStyles;
+        chkItalic.Checked := fsItalic In FTokenFontInfo[TBADITokenType(itemIndex)].FStyles;
+        chkUnderline.Checked := fsUnderline In FTokenFontInfo[TBADITokenType(itemIndex)].FStyles;
+        chkStrikeout.Checked := fsStrikeout In FTokenFontInfo[TBADITokenType(itemIndex)].FStyles;
       End;
 end;
 
@@ -574,7 +574,7 @@ end;
 **)
 procedure TfrmOptions.cbxFontColourChange(Sender: TObject);
 begin
-  FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FColour := cbxFontColour.Selected;
+  FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FColour := cbxFontColour.Selected;
 end;
 
 (**
@@ -592,9 +592,9 @@ end;
 procedure TfrmOptions.chkBoldClick(Sender: TObject);
 begin
   If chkBold.Checked Then
-    Include(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsBold)
+    Include(FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FStyles, fsBold)
   Else
-    Exclude(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsBold);
+    Exclude(FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FStyles, fsBold);
 end;
 
 (**
@@ -612,9 +612,9 @@ end;
 procedure TfrmOptions.chkItalicClick(Sender: TObject);
 begin
   If chkItalic.Checked Then
-    Include(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsItalic)
+    Include(FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FStyles, fsItalic)
   Else
-    Exclude(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsItalic);
+    Exclude(FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FStyles, fsItalic);
 end;
 
 (**
@@ -632,9 +632,9 @@ end;
 procedure TfrmOptions.chkStrikeoutClick(Sender: TObject);
 begin
   If chkStrikeout.Checked Then
-    Include(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsStrikeOut)
+    Include(FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FStyles, fsStrikeOut)
   Else
-    Exclude(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsStrikeOut);
+    Exclude(FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FStyles, fsStrikeOut);
 end;
 
 (**
@@ -652,9 +652,9 @@ end;
 procedure TfrmOptions.chkUnderlineClick(Sender: TObject);
 begin
   If chkUnderline.Checked Then
-    Include(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsUnderline)
+    Include(FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FStyles, fsUnderline)
   Else
-    Exclude(FTokenFontInfo[TTokenType(lbxTokenTypes.ItemIndex)].FStyles, fsUnderline);
+    Exclude(FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FStyles, fsUnderline);
 end;
 
 (**

@@ -4,10 +4,8 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    24 Dec 2008
+  @Date    29 Dec 2008
   @Version 1.0
-
-  @todo    Tokenize should also be language independant.
 
 **)
 Unit GenericTokenizer;
@@ -53,8 +51,8 @@ Const
 Var
   (** Token buffer. **)
   strToken : String;
-  CurToken : BaseLanguageModule.TTokenType;
-  LastToken : BaseLanguageModule.TTokenType;
+  CurToken : TBADITokenType;
+  LastToken : TBADITokenType;
   BlockType : TBlockType;
   (** Token size **)
   iTokenLen : Integer;

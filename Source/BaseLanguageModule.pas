@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    26 Dec 2008
+  @Date    29 Dec 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -24,9 +24,9 @@ Type
   (** Type to distinguish Stream position from token index. **)
   TTokenIndex = Integer;
   (** An enumerate type to define the stream status and token types. **)
-  TTokenType = (ttUnknown, ttWhiteSpace, ttReservedWord, ttIdentifier, ttNumber,
-    ttSymbol, ttLineEnd, ttStringLiteral, ttComment, ttHTMLTag, ttDirective,
-    ttCompilerDirective, ttLinkTag, ttTreeHeader, ttFileEnd);
+  TBADITokenType = (ttUnknown, ttWhiteSpace, ttReservedWord, ttIdentifier,
+    ttNumber, ttSymbol, ttLineEnd, ttStringLiteral, ttComment, ttHTMLTag,
+    ttDirective, ttCompilerDirective, ttLinkTag, ttTreeHeader, ttFileEnd);
   (** An enumerate for the scoping of identifiers. **)
   TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic,
     scPublished, scFriend);
@@ -405,12 +405,12 @@ Type
     FBufferPos: Integer;
     FLine: Integer;
     FLength : Integer;
-    FTokenType: TTokenType;
+    FTokenType: TBADITokenType;
     FUToken : String;
     FReference : TTokenReference;
   Public
     Constructor Create(strToken : String; iPos, iLine, iCol,
-      iLength : Integer; TType : TTokenType); Overload;
+      iLength : Integer; TType : TBADITokenType); Overload;
     Procedure Append(strToken : String);
     (**
       Returns the token as a string.
@@ -458,9 +458,9 @@ Type
       Returns the token type for the token.
       @precon  None.
       @postcon Returns the token type for the token.
-      @return  a TTokenType
+      @return  a TBADITokenType
     **)
-    Property TokenType : TTokenType read FTokenType;
+    Property TokenType : TBADITokenType read FTokenType;
     (**
       This property gets and sets the reference information for the token.
       @precon  None.
@@ -480,11 +480,11 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     function GetToken(iTokenIndex: Integer): String;
     function GetTokenCount : Integer;
-    function GetTokenType(iTokenIndex: Integer): TTokenType;
+    function GetTokenType(iTokenIndex: Integer): TBADITokenType;
   Public
     Constructor Create(strName : String; iLine, iColumn : Integer); Overload;
     Destructor Destroy; Override;
-    Procedure AddToken(strToken : String; iType : TTokenType);
+    Procedure AddToken(strToken : String; iType : TBADITokenType);
     Function AsString(ShowHTML : Boolean) : String;
     (**
       Returns the tag name as a string.
@@ -506,9 +506,9 @@ Type
       @precon  iTokenIndex must be a valid index between 0 and TokenCount - 1.
       @postcon Returns the specifically index tokens type from the tags token collection.
       @param   iTokenIndex as       an Integer
-      @return  a TTokenType
+      @return  a TBADITokenType
     **)
-    Property TokenType[iTokenIndex : Integer] : TTokenType read GetTokenType;
+    Property TokenType[iTokenIndex : Integer] : TBADITokenType read GetTokenType;
     (**
       Returns the number of token in the tag.
       @precon  None.
@@ -548,7 +548,7 @@ Type
     function GetTagCount: Integer;
     function GetToken(iTokenIndex: Integer): String;
     function GetTokenCount: Integer;
-    function GetTokenType(iTokenIndex: Integer): TTokenType;
+    function GetTokenType(iTokenIndex: Integer): TBADITokenType;
     Function GetLine : Integer;
     Function GetCol : Integer;
   Public
@@ -557,7 +557,7 @@ Type
     Destructor Destroy; Override;
     Class Function CreateComment(strComment : String; iLine,
       iCol : Integer) : TComment; Virtual;
-    Procedure AddToken(strToken : String; iType : TTokenType);
+    Procedure AddToken(strToken : String; iType : TBADITokenType);
     Procedure ParseComment(strComment : String);
     Procedure Assign(srcComment : TComment); Overload;
     Procedure Assign(strComment : String); Overload;
@@ -584,9 +584,9 @@ Type
       @precon  iTokenIndex must be a valid index between 0 and TokenCount - 1.
       @postcon Returns the specifically indexed tokens type from the token collection.
       @param   iTokenIndex as       an Integer
-      @return  a TTokenType
+      @return  a TBADITokenType
     **)
-    Property TokenType[iTokenIndex : Integer] : TTokenType read GetTokenType;
+    Property TokenType[iTokenIndex : Integer] : TBADITokenType read GetTokenType;
     (**
       Returns the specifically indexed tag from the comments tag collection.
       @precon  iTagIndex must eb a valid index between 0 and TagCount - 1.
@@ -1349,7 +1349,7 @@ Type
     FBrowsePosition : TBrowsePosition;
     FFontName : String;
     FFontSize : Integer;
-    FTokenFontInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo;
+    FTokenFontInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
     FExcludeDocFiles : TStringList;
     FMethodDescriptions : TStringList;
     FScopesToDocument : TScopes;
@@ -1359,8 +1359,8 @@ Type
     FManagedNodesLife : Integer;
     FTreeColour : TColor;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function GetTokenFontInfo(ATokenType  : TTokenType) : TTokenFontInfo;
-    Procedure SetTokenFontInfo(ATokenType  : TTokenType; ATokenFontInfo : TTokenFontInfo);
+    Function GetTokenFontInfo(ATokenType  : TBADITokenType) : TTokenFontInfo;
+    Procedure SetTokenFontInfo(ATokenType  : TBADITokenType; ATokenFontInfo : TTokenFontInfo);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -1437,10 +1437,10 @@ Type
       module explorer
       @precon  None.
       @postcon Gets and sets the colour and style of the token.
-      @param   ATokenType as       a TTokenType
+      @param   ATokenType as       a TBADITokenType
       @return  a TTokenFontInfo
     **)
-    Property TokenFontInfo[ATokenType : TTokenType] : TTokenFontInfo Read
+    Property TokenFontInfo[ATokenType : TBADITokenType] : TTokenFontInfo Read
       GetTokenFontInfo Write SetTokenFontInfo;
     (**
       This properrty holds a list of files / partial or full which should not be
@@ -2135,7 +2135,7 @@ Const
   );
 
   (** This is a default set of font information for the application. **)
-  strTokenTypeInfo : Array[Low(TTokenType)..High(TTokenType)] Of TTokenFontInfo = (
+  strTokenTypeInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo = (
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : [fsBold]),
@@ -2544,7 +2544,7 @@ Const
   );
 
   (** A list of strings representing the token types. **)
-  strTokenType : Array[Low(TTokenType)..High(TTokenType)] Of String = (
+  strTokenType : Array[Low(TBADITokenType)..High(TBADITokenType)] Of String = (
     'Unknown', 'WhiteSpace', 'ReservedWord', 'Identifier', 'Number',
     'Symbol', 'LineEnd', 'StringLiteral', 'Comment', 'HTMLTag', 'Directive',
     'CompilerDirective', 'LinkTag', 'TreeHeader', 'FileEnd');
@@ -2628,22 +2628,17 @@ end;
 
 (**
 
-
   This method added the strToken to the tags token list with type iType.
 
-
   @precon  strToken is a string to be added as a token and iType is the token
-
            type of the token.
-
   @postcon Adds the token to the internal list.
 
-
   @param   strToken as a String
-  @param   iType    as a TTokenType
+  @param   iType    as a TBADITokenType
 
 **)
-procedure TTag.AddToken(strToken: String; iType: TTokenType);
+procedure TTag.AddToken(strToken: String; iType: TBADITokenType);
 begin
   FTokens.AddObject(strToken, TObject(iType));
 end;
@@ -2751,12 +2746,12 @@ end;
   @postcon Returns a token type for the specified token.
 
   @param   iTokenIndex as an Integer
-  @return  a TTokenType
+  @return  a TBADITokenType
 
 **)
-function TTag.GetTokenType(iTokenIndex: Integer): TTokenType;
+function TTag.GetTokenType(iTokenIndex: Integer): TBADITokenType;
 begin
-  Result := TTokenType(FTokens.Objects[iTokenIndex]);
+  Result := TBADITokenType(FTokens.Objects[iTokenIndex]);
 end;
 
 (** --------------------------------------------------------------------------
@@ -2774,10 +2769,10 @@ end;
   @postcon Added a token and its type to the token list.
 
   @param   strToken as a String
-  @param   iType    as a TTokenType
+  @param   iType    as a TBADITokenType
 
 **)
-procedure TComment.AddToken(strToken: String; iType: TTokenType);
+procedure TComment.AddToken(strToken: String; iType: TBADITokenType);
 
 begin
   If (strToken[1] = '@') And (Copy(strToken, 1, 2) <> '@@') Then
@@ -3076,12 +3071,12 @@ end;
   @postcon Returns a token type for the specified token.
 
   @param   iTokenIndex as an Integer
-  @return  a TTokenType
+  @return  a TBADITokenType
 
 **)
-function TComment.GetTokenType(iTokenIndex: Integer): TTokenType;
+function TComment.GetTokenType(iTokenIndex: Integer): TBADITokenType;
 begin
-  Result := TTokenType(FTokens.Objects[iTokenIndex]);
+  Result := TBADITokenType(FTokens.Objects[iTokenIndex]);
 end;
 
 (**
@@ -3180,8 +3175,8 @@ Const
 
 Var
   i : Integer;
-  CurToken : TTokenType;
-  LastToken : TTokenType;
+  CurToken : TBADITokenType;
+  LastToken : TBADITokenType;
   strToken : String;
   BlockType : TBlockType;
   iTokenLen : Integer;
@@ -3264,11 +3259,11 @@ end;
   @param   iLine    as an Integer
   @param   iCol     as an Integer
   @param   iLength  as an Integer
-  @param   TType    as a TTokenType
+  @param   TType    as a TBADITokenType
 
 **)
 Constructor TTokenInfo.Create(strToken : String; iPos, iLine, iCol,
-  iLength: Integer; TType : TTokenType);
+  iLength: Integer; TType : TBADITokenType);
 
 begin
   FToken := strToken;
@@ -5939,11 +5934,11 @@ End;
   @postcon Retursn the record information for the token type.
 
 
-  @param   ATokenType as a TTokenType
+  @param   ATokenType as a TBADITokenType
   @return  a TTokenFontInfo
 
 **)
-function TBrowseAndDocItOptions.GetTokenFontInfo(ATokenType: TTokenType): TTokenFontInfo;
+function TBrowseAndDocItOptions.GetTokenFontInfo(ATokenType: TBADITokenType): TTokenFontInfo;
 begin
   Result := FTokenFontInfo[ATokenType];
 end;
@@ -5963,7 +5958,7 @@ Var
   i : TDocOption;
   j : Integer;
   iValue : Integer;
-  T: TTokenType;
+  T: TBADITokenType;
 
 begin
   With TIniFile.Create(FINIFileName) Do
@@ -6000,7 +5995,7 @@ begin
         Integer(bpIdentifierCentreShowAllComment)));
       FFontName := ReadString('ModuleExplorer', 'Name', 'MS Sans Serif');
       FFontSize := ReadInteger('ModuleExplorer', 'Size', 8);
-      For T := Low(TTokenType) To High(TTokenType) Do
+      For T := Low(TBADITokenType) To High(TBADITokenType) Do
         Begin
           FTokenFontInfo[T].FColour := StringToColor(ReadString('TokenFontinfo',
             Format('%s.Colour', [strTokenType[T]]), ColorToString(strTokenTypeInfo[T].FColour)));
@@ -6044,7 +6039,7 @@ procedure TBrowseAndDocItOptions.SaveSettings;
 Var
   i : TDocOption;
   j : Integer;
-  T: TTokenType;
+  T: TBADITokenType;
 
 begin
   With TIniFile.Create(FINIFileName) Do
@@ -6070,7 +6065,7 @@ begin
       WriteInteger('Setup', 'BrowsePosition', Integer(FBrowsePosition));
       WriteString('ModuleExplorer', 'Name', FFontName);
       WriteInteger('ModuleExplorer', 'Size', FFontSize);
-      For T := Low(TTokenType) To High(TTokenType) Do
+      For T := Low(TBADITokenType) To High(TBADITokenType) Do
         Begin
           WriteString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
             ColorToString(FTokenFontInfo[T].FColour));
@@ -6109,11 +6104,11 @@ end;
   @postcon Sets the indexed Token Font Information record.
 
 
-  @param   ATokenType     as a TTokenType
+  @param   ATokenType     as a TBADITokenType
   @param   ATokenFontInfo as a TTokenFontInfo
 
 **)
-procedure TBrowseAndDocItOptions.SetTokenFontInfo(ATokenType: TTokenType;
+procedure TBrowseAndDocItOptions.SetTokenFontInfo(ATokenType: TBADITokenType;
   ATokenFontInfo: TTokenFontInfo);
 begin
   FTokenFontInfo[ATokenType] := ATokenFontInfo;

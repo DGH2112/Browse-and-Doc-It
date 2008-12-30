@@ -4,7 +4,7 @@
   profiles.
 
   @Version 1.0
-  @Date    06 Oct 2008
+  @Date    30 Dec 2008
   @Author  David Hoyle
 
 **)
@@ -45,6 +45,13 @@ Type
     Function StartProfile(strMethodName : String; iStackDepth : Integer) : TProfile;
     Function StopProfile : TProfile;
     Procedure DumpProfileInformation(slProfileFile : TStringList);
+    (**
+      This property returns the number of Call Counts on the profile.
+      @precon  None.
+      @postcon Returns the number of Call Counts on the profile.
+      @return  an Int64
+    **)
+    Property CallCount : Int64 Read FCallCount;
   End;
 
   (** This class handles all the TProfile instances in a tree structure. **)
@@ -313,58 +320,61 @@ Var
   {$ENDIF}
 
 Begin
-  {$IFNDEF CONSOLE}
-  frm := TfrmProgress.Create(Nil);
-  {$ENDIF}
-  Try
-    {$IFDEF CONSOLE}
-    WriteLn('Processing the profile information...');
-    {$ELSE}
-    frm.Init(3, 'Profiling', 'Processing the profile information...');
-    {$ENDIF}
-    GetModuleFileName(hInstance, strBuffer, MAX_PATH);
-    strFileName := StrPas(strBuffer);
-    strModuleFileName := strFileName;
-    strFileName := ChangeFileExt(strFileName, '.profile');
-    slProfile := TStringList.Create;
-    Try
+  If FRootProfile.CallCount > 0 Then
+    Begin
       {$IFNDEF CONSOLE}
-      frm.UpdateProgress(1, 'Loading existing data...');
-      {$ELSE}
-      frm.Init(3, 'Profiling', 'Loading existing data...');
+      frm := TfrmProgress.Create(Nil);
       {$ENDIF}
-      If FileExists(strFileName) Then
-        slProfile.LoadFromFile(strFileName);
-      slProfile.Add('Profile Dump For Application ' + strModuleFileName + ' on ' +
-        FormatDateTime('ddd dd/mmm/yyyy @ hh:mm:ss', Now));
-      slProfile.Add(Format('%s,%s,%s,%s,%s,%s', [
-        'Stack Depth',
-        'Class',
-        'Method Name',
-        'Total Tick Count (ms)',
-        'In Process Tick Count (ms)',
-        'Call Count'
-      ]));
-      {$IFNDEF CONSOLE}
-      frm.UpdateProgress(2, 'Processing new data...');
-      {$ELSE}
-      frm.Init(3, 'Profiling', 'Loading existing data...');
-      {$ENDIF}
-      FRootProfile.DumpProfileInformation(slProfile);
-      {$IFNDEF CONSOLE}
-      frm.UpdateProgress(3, 'Save data...');
-      {$ELSE}
-      frm.Init(3, 'Profiling', 'Save data...');
-      {$ENDIF}
-      slProfile.SaveToFile(strFileName);
-    Finally
-      slProfile.Free;
+      Try
+        {$IFDEF CONSOLE}
+        WriteLn('Processing the profile information...');
+        {$ELSE}
+        frm.Init(3, 'Profiling', 'Processing the profile information...');
+        {$ENDIF}
+        GetModuleFileName(hInstance, strBuffer, MAX_PATH);
+        strFileName := StrPas(strBuffer);
+        strModuleFileName := strFileName;
+        strFileName := ChangeFileExt(strFileName, '.profile');
+        slProfile := TStringList.Create;
+        Try
+          {$IFNDEF CONSOLE}
+          frm.UpdateProgress(1, 'Loading existing data...');
+          {$ELSE}
+          WriteLn('Loading existing data...');
+          {$ENDIF}
+          If FileExists(strFileName) Then
+            slProfile.LoadFromFile(strFileName);
+          slProfile.Add('Profile Dump For Application ' + strModuleFileName + ' on ' +
+            FormatDateTime('ddd dd/mmm/yyyy @ hh:mm:ss', Now));
+          slProfile.Add(Format('%s,%s,%s,%s,%s,%s', [
+            'Stack Depth',
+            'Class',
+            'Method Name',
+            'Total Tick Count (ms)',
+            'In Process Tick Count (ms)',
+            'Call Count'
+          ]));
+          {$IFNDEF CONSOLE}
+          frm.UpdateProgress(2, 'Processing new data...');
+          {$ELSE}
+          WriteLn('Loading existing data...');
+          {$ENDIF}
+          FRootProfile.DumpProfileInformation(slProfile);
+          {$IFNDEF CONSOLE}
+          frm.UpdateProgress(3, 'Saving data...');
+          {$ELSE}
+          WriteLn('Saving data...');
+          {$ENDIF}
+          slProfile.SaveToFile(strFileName);
+        Finally
+          slProfile.Free;
+        End;
+      Finally
+        {$IFNDEF CONSOLE}
+        frm.Free;
+        {$ENDIF}
+      End;
     End;
-  Finally
-    {$IFNDEF CONSOLE}
-    frm.Free;
-    {$ENDIF}
-  End;
 end;
 
 (**
@@ -403,8 +413,10 @@ begin
   FCurrentProfile := FCurrentProfile.StartProfile(strMethodName, FStackTop);
 end;
 
+(** Creates the profiler on loading the module. **)
 Initialization
   CodeProfiler := TProfiler.Create;
+(** Frees (and writes data) the profiler on unloading the module **)
 Finalization
   CodeProfiler.Free;
 End.

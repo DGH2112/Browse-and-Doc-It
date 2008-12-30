@@ -1129,7 +1129,7 @@ Type
     Function PrevToken : TTokenInfo;
     Procedure NextToken;
     Function EndOfTokens : Boolean;
-    Procedure NextNonCommentToken;
+    Procedure NextNonCommentToken; Virtual;
     Procedure RollBackToken;
     Function GetComment(
       CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;

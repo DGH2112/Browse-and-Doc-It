@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    29 Dec 2008
+  @Date    30 Dec 2008
   @Version 1.0
   @Author  David Hoyle
 
@@ -26,7 +26,8 @@ Type
   (** An enumerate type to define the stream status and token types. **)
   TBADITokenType = (ttUnknown, ttWhiteSpace, ttReservedWord, ttIdentifier,
     ttNumber, ttSymbol, ttLineEnd, ttStringLiteral, ttComment, ttHTMLTag,
-    ttDirective, ttCompilerDirective, ttLinkTag, ttTreeHeader, ttFileEnd);
+    ttDirective, ttCompilerDirective, ttLinkTag, ttTreeHeader, ttFileEnd,
+    ttLineContinuation);
   (** An enumerate for the scoping of identifiers. **)
   TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic,
     scPublished, scFriend);
@@ -2150,6 +2151,7 @@ Const
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
     (FColour : clMaroon; FStyles : [fsBold]),
+    (FColour : clMaroon; FStyles : []),
     (FColour : clMaroon; FStyles : [])
   );
 
@@ -2547,7 +2549,7 @@ Const
   strTokenType : Array[Low(TBADITokenType)..High(TBADITokenType)] Of String = (
     'Unknown', 'WhiteSpace', 'ReservedWord', 'Identifier', 'Number',
     'Symbol', 'LineEnd', 'StringLiteral', 'Comment', 'HTMLTag', 'Directive',
-    'CompilerDirective', 'LinkTag', 'TreeHeader', 'FileEnd');
+    'CompilerDirective', 'LinkTag', 'TreeHeader', 'FileEnd', 'LineContinuation');
 
 Var
   (** This is a global variable for the Browse and Doc It options that need to

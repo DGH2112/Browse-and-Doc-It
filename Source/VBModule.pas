@@ -274,6 +274,7 @@ Type
       CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
     Procedure NextNonCommentToken; Override;
+    Procedure CheckExceptionHandling;
   Public
     Constructor CreateParser(Source : TStream; strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
@@ -335,14 +336,14 @@ Const
     'writeonly', 'xor'
   );
 
-  (** A set of token to be searched for after an error. **)
-  strSeekTokens : Array[1..6] Of String = (
-    'const', 'dim', 'function', 'private', 'public', 'sub'
-  );
-
   (** A list of directives. **)
   strDirectives : Array[1..2] Of String = (
     'false', 'true'
+  );
+
+  (** A set of token to be searched for after an error. **)
+  strSeekTokens : Array[1..6] Of String = (
+    'const', 'dim', 'function', 'private', 'public', 'sub'
   );
 
   (** A constant array of method names. **)
@@ -359,6 +360,15 @@ ResourceString
   strProperyRequiresReturn = 'Propery ''%s'' requires a return parameter.';
   (** A message prompt for parameters in properties. **)
   strProperyRequireParam = 'Propery ''%s'' requires at least 1 parameter.';
+  (** A warning message for no push method. **)
+  strExceptionPush = 'The method ''%s'' has no Exception.Push method.';
+  (** A warning message for no pop method. **)
+  strExceptionPop = 'The method ''%s'' has no Exception.Pop method.';
+  (** A warning message for no error handling. **)
+  strErrorHandling = 'The method ''%s'' has no error handling.';
+  (** A warning message for an exit statement and error handling. **)
+  strExitStatement = 'The method ''%s'' has an Exit statement which may be i' +
+    'n conflict with the error handling.';
 
 { TVBComment }
 
@@ -1004,7 +1014,7 @@ Begin
       If FindElement(strErrors).ElementCount = 0 Then
         CheckReferences;
       AddTickCount('Refs');
-      //: @debug Check Exception Handling.
+      CheckExceptionHandling;
       boolCascade := True;
       If moCheckForDocumentConflicts In ModuleOptions Then
         CheckDocumentation(boolCascade);
@@ -1312,6 +1322,8 @@ begin
   iToken := TokenIndex + iOffset;
   While iToken > -1 Do
     Begin
+      If (Tokens[iToken] As TTokenInfo).TokenType In [ttLineEnd, ttLineContinuation] Then
+        Dec(iToken);
       T := Tokens[iToken] As TTokenInfo;
       iLine := T.Line;
       iColumn := T.Column;
@@ -1765,8 +1777,8 @@ Var
   C : TComment;
 
 Begin
-  C := GetComment;
   Repeat
+    C := GetComment;
     Result :=
       Privates(C) Or
       Publics(C) Or
@@ -2225,6 +2237,52 @@ Begin
         Vars(scPublic, C);
     End;
 End;
+
+(**
+
+  This method checks the methods and properties for exception handling code
+  (TException.Push / Pop etc).
+
+  @precon  None.
+  @postcon Checks the methods and properties for exception handling code.
+
+**)
+procedure TVBModule.CheckExceptionHandling;
+
+Var
+  I : TElementContainer;
+  j : Integer;
+  M : TVBMethod;
+  boolNoTag: Boolean;
+
+begin
+  I := FindElement(strImplementedMethodsLabel);
+  If i <> Nil Then
+    Begin
+      For j := 1 To I.ElementCount Do
+        Begin
+          M := I.Elements[j] As TVBMethod;
+          boolNoTag :=
+            (Comment <> Nil) And (Comment.FindTag('noexception') > -1) Or
+            (M.Comment <> Nil) And (M.Comment.FindTag('noexception') > -1);
+          If Not M.HasPush And Not boolNoTag Then
+            AddIssue(Format(strExceptionPush, [M.Identifier]), scNone,
+              'CheckExceptionHandling', M.Line, M.Column, etWarning);
+          If Not M.HasPop And Not boolNoTag Then
+            AddIssue(Format(strExceptionPop, [M.Identifier]), scNone,
+              'CheckExceptionHandling', M.Line, M.Column, etWarning);
+          boolNoTag :=
+            (Comment <> Nil) And (Comment.FindTag('noerror') > -1) Or
+            (M.Comment <> Nil) And (M.Comment.FindTag('noerror') > -1);
+          If Not M.HasErrorHnd And Not boolNoTag Then
+            AddIssue(Format(strErrorHandling, [M.Identifier]), scNone,
+              'CheckExceptionHandling', M.Line, M.Column, etWarning);
+          If M.HasExit And M.HasErrorHnd Then
+            AddIssue(Format(strExitStatement, [M.Identifier]), scNone,
+              'CheckExceptionHandling', M.Line, M.Column, etWarning);
+        End;
+    End;
+end;
 
 (**
 

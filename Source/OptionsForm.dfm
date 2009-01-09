@@ -31,6 +31,10 @@ object frmOptions: TfrmOptions
     TabOrder = 0
     object Page1: TTabSheet
       Caption = 'General Options'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object clbOptions: TCheckListBox
         Left = 0
         Top = 0

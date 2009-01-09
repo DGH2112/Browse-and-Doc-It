@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    29 Dec 2008
+  @Date    09 Jan 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -16,7 +16,7 @@ uses
 {$WARN UNIT_PLATFORM OFF} // For the FileCtrl unit
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, Buttons, ComCtrls, ExtCtrls, CheckLst, ImgList, FileCtrl,
-  BaseLanguageModule, PascalDocModule;
+  BaseLanguageModule;
 {$WARN UNIT_PLATFORM ON}
 
 type
@@ -108,7 +108,7 @@ type
 implementation
 
 Uses
-  SpecialTagForm, ModuleExplorerFrame, MethodDescriptionForm;
+  SpecialTagForm, MethodDescriptionForm;
 
 ResourceString
   (** This is a message to be displayed when a tag is not valid **)

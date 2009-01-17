@@ -7,7 +7,7 @@
               source code text to be parsed.
 
   @Version    1.0
-  @Date       29 Dec 2008
+  @Date       17 Jan 2009
   @Author     David Hoyle
 
 **)
@@ -3734,8 +3734,8 @@ Begin
             Result := TClassRefType.Create(FToken.Token, FScope, FToken.Line,
               FToken.Column, iiPublicType, FComment);
           Result := AToken.FContainer.Add(Result) As TClassRefType;
-          Result.AppendToken('Class');
-          Result.AppendToken('Of');
+          Result.AddToken('Class');
+          Result.AddToken('Of');
           If Not TypeId(Result) Then
             ErrorAndSeekToken(strTypeIdExpected, 'ClassRefType', Token.Token,
               strSeekableOnErrorTokens, stActual);
@@ -4075,7 +4075,7 @@ begin
           ConstExpr(Result, ExprType);
           If Token.Token = ']' Then
             Begin
-              Result.AppendToken(Token.Token);
+              Result.AddToken(Token.Token);
               NextNonCommentToken;
             End Else
               ErrorAndSeekToken(strLiteralExpected, 'StringType', ']',
@@ -4152,7 +4152,7 @@ Begin
           FToken.Column, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TArrayType;
       If boolPacked Then
-        Result.AppendToken('Packed');
+        Result.AddToken('Packed');
       Result.AppendToken(Token);
       NextNonCommentToken;
       FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
@@ -4550,7 +4550,7 @@ Begin
           FToken.Column, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TSetType;
       If boolPacked Then
-        Result.AppendToken('Packed');
+        Result.AddToken('Packed');
       Result.AppendToken(Token);
       NextNonCommentToken;
       If Token.UToken = 'OF' Then
@@ -4609,8 +4609,8 @@ Begin
               FToken.Column, iiPublicType, FComment);
           Result := AToken.FContainer.Add(Result) As TFileType;
           If boolPacked Then
-            Result.AppendToken('Packed');
-          Result.AppendToken('File');
+            Result.AddToken('Packed');
+          Result.AddToken('File');
           AddToExpression(Result);
           FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
           Try
@@ -4631,8 +4631,8 @@ Begin
               FToken.Column, iiPublicType, FComment);
           Result := AToken.FContainer.Add(Result) As TFileType;
           If boolPacked Then
-            Result.AppendToken('Packed');
-          Result.AppendToken('File');
+            Result.AddToken('Packed');
+          Result.AddToken('File');
         End;
     End;
 End;
@@ -4706,7 +4706,7 @@ begin
           Result := TProcedureType.Create(FToken.Token, FScope, FToken.Line,
             FToken.Column, iiPublicType, FComment);
         Result := AToken.FContainer.Add(Result) As TProcedureType;
-        Result.AppendToken(M.AsString);
+        Result.AddToken(M.AsString);
         If Token.UToken = 'OF' Then
           Begin
             AddToExpression(Result);
@@ -4986,7 +4986,7 @@ Begin
                 Begin
                   C := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
                   Try
-                    C.AppendToken(Token.Token);
+                    C.AddToken(Token.Token);
                     NextNonCommentToken;
                     ExprType := [etUnknown, etConstExpr];
                     ConstExpr(C, ExprType);
@@ -5000,7 +5000,7 @@ Begin
                 Begin
                   C := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
                   Try
-                    C.AppendToken(Token.Token);
+                    C.AddToken(Token.Token);
                     NextNonCommentToken;
                     ExprType := [etUnknown, etConstExpr];
                     ConstExpr(C, ExprType);

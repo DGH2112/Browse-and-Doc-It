@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       31 Dec 2008
+  @Date       18 Jan 2009
   @Author     David Hoyle
 
 **)
@@ -1322,8 +1322,11 @@ begin
   iToken := TokenIndex + iOffset;
   While iToken > -1 Do
     Begin
-      If (Tokens[iToken] As TTokenInfo).TokenType In [ttLineEnd, ttLineContinuation] Then
+      While (iToken > -1) And ((Tokens[iToken] As TTokenInfo).TokenType In
+        [ttLineEnd, ttLineContinuation]) Do
         Dec(iToken);
+      If iToken <= -1 Then
+        Break;
       T := Tokens[iToken] As TTokenInfo;
       iLine := T.Line;
       iColumn := T.Column;
@@ -1358,6 +1361,8 @@ var
 
 begin
   Try
+    While Token.TokenType In [ttComment, ttLineEnd] Do
+      NextNonCommentToken;
     Methods[1] := Version;
     Methods[2] := Attributes;
     Methods[3] := Options;
@@ -1865,16 +1870,16 @@ Begin
           NextNonCommentToken;
           If Token.Token = '.' Then
             Begin
-              ParamType.AppendToken('.');
+              ParamType.AddToken('.');
               NextNonCommentToken;
-              ParamType.AppendToken(Token.Token);
+              ParamType.AddToken(Token.Token);
               NextNonCommentToken;
             End;
         End Else
         Begin
           ParamType := TVBTypeDecl.Create('', scNone, Token.Line, Token.Column,
             iiNone, Nil);
-          ParamType.AppendToken('Variant');
+          ParamType.AddToken('Variant');
         End;
       DefaultValue := '';
       If (Token.Token = '=') And boolOptional Then
@@ -2055,7 +2060,7 @@ Begin
           NextNonCommentToken;
           If Token.Token = '.' Then
             Begin
-              M.ReturnType.AppendToken('.');
+              M.ReturnType.AddToken('.');
               NextNonCommentToken;
               M.ReturnType.AppendToken(Token);
               If Not EndOfTokens Then NextNonCommentToken Else Exit;
@@ -2328,7 +2333,7 @@ Begin
                     Begin
                       AddToExpression(Con);
                       If Token.TokenType In [ttIdentifier] Then
-                        Con.AppendToken(Token.Token)
+                        Con.AddToken(Token.Token)
                       Else
                         ErrorAndSeekToken(strIdentExpected, 'Consts',
                           Token.Token, strSeekTokens, stActual);

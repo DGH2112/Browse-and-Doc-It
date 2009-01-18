@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    30 Dec 2008
+  @Date    18 Jan 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -25,9 +25,9 @@ Type
   TTokenIndex = Integer;
   (** An enumerate type to define the stream status and token types. **)
   TBADITokenType = (ttUnknown, ttWhiteSpace, ttReservedWord, ttIdentifier,
-    ttNumber, ttSymbol, ttLineEnd, ttStringLiteral, ttComment, ttHTMLTag,
-    ttDirective, ttCompilerDirective, ttLinkTag, ttTreeHeader, ttFileEnd,
-    ttLineContinuation);
+    ttNumber, ttSymbol, ttLineEnd, ttStringLiteral, ttComment,
+    ttHTMLStartTag, ttHTMLEndTag, ttDirective, ttCompilerDirective, ttLinkTag,
+    ttTreeHeader, ttFileEnd, ttLineContinuation);
   (** An enumerate for the scoping of identifiers. **)
   TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic,
     scPublished, scFriend);
@@ -398,6 +398,9 @@ Type
   (** This enumerate defermines the status of the token's reference resolution. **)
   TTokenReference = (trUnknown, trUnresolved, trResolved);
 
+  (** A type of a set of Characters. **)
+  TSymbols = Set Of Char;
+
   (** This is a class the store information about each token **)
   TTokenInfo = Class
   {$IFDEF D2005} Strict {$ENDIF} Private
@@ -471,123 +474,122 @@ Type
     Property Reference : TTokenReference Read FReference Write FReference;
   End;
 
-  (** A class to hold text about a single tag **)
-  TTag = Class
+  (** this class defines an object that can contain tokens and has line and
+      column numbers. It is the anscester for TTag, TComment and
+      TElementContainer. **)
+  TBaseContainer = Class {$IFDEF D2005} Abstract {$ENDIF}
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FTokens : TStringList;
-    FTagName: String;
-    FLine: Integer;
-    FColumn: Integer;
+    FName : String;
+    FLine : Integer;
+    FColumn : Integer;
+    FTokens : TObjectList;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    function GetToken(iTokenIndex: Integer): String;
-    function GetTokenCount : Integer;
-    function GetTokenType(iTokenIndex: Integer): TBADITokenType;
+    Function GetTokenCount : Integer;
+    Function GetTokens(iIndex : Integer) : TTokenInfo;
+    Function GetName: String; Virtual;
+    Procedure SetName(Value : String); Virtual;
+  Public
+    Constructor Create(strName : String; iLine, iColumn  : Integer);
+    Destructor Destroy; Override;
+    Procedure AddToken(strToken : String; ATokenType : TBADITokenType = ttUnknown);
+      Overload; Virtual;
+    Procedure AddToken(AToken : TTokenInfo); Overload; Virtual;
+    Procedure AppendToken(AToken : TTokenInfo); Virtual;
+    Procedure ClearTokens;
+    Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
+      strDelimiter : String; iMaxWidth : Integer;
+      strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
+      strNoSpaceAfter : TSymbols = ['(', '[', '{', '.', '^'];
+      strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
+      boolShowHTML : Boolean = False) : String; Virtual;
+    (**
+      This property returns the name of the element.
+      @precon  None.
+      @postcon Returns the name of the element.
+      @return  a String
+    **)
+    Property Name : String Read GetName Write SetName;
+    (**
+      This property returns the identifier name (same as name) of the element.
+      @precon  None.
+      @postcon Returns the identifier name (same as name) of the element.
+      @return  a String
+    **)
+    Property Identifier : String read FName Write FName;
+    (**
+      This property returns the line number associated with this element.
+      @precon  None.
+      @postcon Returns the line number associated with this element.
+      @return  an Integer
+    **)
+    Property Line : Integer Read FLine Write FLine;
+    (**
+      This property returns the column number associated with this element.
+      @precon  None.
+      @postcon Returns the column number associated with this element.
+      @return  an Integer
+    **)
+    Property Column : Integer Read FColumn Write FColumn;
+    (**
+      This property returns an instance of the indexed token from the
+      collection.
+      @precon  iIndex must be a valid index.
+      @postcon Returns an instance of the indexed token from the collection.
+      @param   iIndex as       an Integer
+      @return  a TTokenInfo
+    **)
+    Property Tokens[iIndex : Integer] : TTokenInfo Read GetTokens;
+    (**
+      This property returns the number of tokens in the collection.
+      @precon  None.
+      @postcon Returns the number of tokens in the collection.
+      @return  an Integer
+    **)
+    Property TokenCount : Integer Read GetTokenCount;
+  End;
+
+  (** A class to hold text about a single tag **)
+  TTag = Class(TBaseContainer)
+  {$IFDEF D2005} Strict {$ENDIF} Private
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+    Function GetTagName : String;
   Public
     Constructor Create(strName : String; iLine, iColumn : Integer); Overload;
     Destructor Destroy; Override;
-    Procedure AddToken(strToken : String; iType : TBADITokenType);
-    Function AsString(ShowHTML : Boolean) : String;
+    Function AsString(boolShowHTML : Boolean) : String;
     (**
       Returns the tag name as a string.
       @precon  None.
       @postcon Returns the tag name as a string.
       @return  a String
     **)
-    Property TagName : String read FTagName write FTagName;
-    (**
-      Returns the specifically index token from the tags token collection.
-      @precon  iTokenIndex must be a valid index between 0 and TokenCount - 1.
-      @postcon Returns the specifically index token from the tags token collection.
-      @param   iTokenIndex as       an Integer
-      @return  a String
-    **)
-    Property Token[iTokenIndex : Integer] : String read GetToken; Default;
-    (**
-      Returns the specifically index tokens type from the tags token collection.
-      @precon  iTokenIndex must be a valid index between 0 and TokenCount - 1.
-      @postcon Returns the specifically index tokens type from the tags token collection.
-      @param   iTokenIndex as       an Integer
-      @return  a TBADITokenType
-    **)
-    Property TokenType[iTokenIndex : Integer] : TBADITokenType read GetTokenType;
-    (**
-      Returns the number of token in the tag.
-      @precon  None.
-      @postcon Returns the number of token in the tag.
-      @return  an Integer
-    **)
-    Property TokenCount : Integer read GetTokenCount;
-    (**
-      Returns the line number of the tag.
-      @precon  None.
-      @postcon Returns the line number of the tag.
-      @return  an Integer
-    **)
-    Property Line : Integer Read FLine;
-    (**
-      Returns the column position of the tag.
-      @precon  None.
-      @postcon Returns the column position of the tag.
-      @return  an Integer
-    **)
-    Property Column : Integer Read FColumn;
+    Property TagName : String Read GetTagName;
   End;
 
   (** A class the handles and stores all the comment information **)
-  TComment = Class
+  TComment = Class(TBaseContainer)
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FTokens : TStringList;
     FTags : TObjectList;
     FTagMode : Boolean;
     FLastTag : TTag;
-    FLine : Integer;
-    FCol : Integer;
     FTagLine : Integer;
     FTagColumn : Integer;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     function GetTag(iTagIndex: Integer): TTag;
     function GetTagCount: Integer;
-    function GetToken(iTokenIndex: Integer): String;
-    function GetTokenCount: Integer;
-    function GetTokenType(iTokenIndex: Integer): TBADITokenType;
-    Function GetLine : Integer;
-    Function GetCol : Integer;
+    Procedure ParseComment(strComment : String);
+    Procedure ResetTagMode;
   Public
     Constructor Create(srcComment : TComment); Overload;
     Constructor Create(strComment : String; iLine, iCol : Integer); Overload;
     Destructor Destroy; Override;
     Class Function CreateComment(strComment : String; iLine,
       iCol : Integer) : TComment; Virtual;
-    Procedure AddToken(strToken : String; iType : TBADITokenType);
-    Procedure ParseComment(strComment : String);
+    Procedure AddToken(strToken : String; iType : TBADITokenType = ttUnknown); Override;
     Procedure Assign(srcComment : TComment); Overload;
     Procedure Assign(strComment : String); Overload;
-    procedure ResetTagMode;
-    Function AsString(iIndent, iMaxWidth : Integer; ShowHTML : Boolean) : String;
+    Function AsString(iMaxWidth : Integer; boolShowHTML : Boolean) : String;
     Function FindTag(strTagName : String) : Integer;
-    (**
-      Returns the specifically indexed token from the collection.
-      @precon  iTokenIndex must a valid index between 0 and TokenCount - 1.
-      @postcon Returns the specifically indexed token from the collection.
-      @param   iTokenIndex as       an Integer
-      @return  a String
-    **)
-    Property Token[iTokenIndex : Integer] : String read GetToken; Default;
-    (**
-      Returns the number of tokens found in the comment.
-      @precon  None.
-      @postcon Returns the number of tokens found in the comment.
-      @return  an Integer
-    **)
-    Property TokenCount : Integer read GetTokenCount;
-    (**
-      Returns the specifically indexed tokens type from the token collection.
-      @precon  iTokenIndex must be a valid index between 0 and TokenCount - 1.
-      @postcon Returns the specifically indexed tokens type from the token collection.
-      @param   iTokenIndex as       an Integer
-      @return  a TBADITokenType
-    **)
-    Property TokenType[iTokenIndex : Integer] : TBADITokenType read GetTokenType;
     (**
       Returns the specifically indexed tag from the comments tag collection.
       @precon  iTagIndex must eb a valid index between 0 and TagCount - 1.
@@ -603,20 +605,6 @@ Type
       @return  an Integer
     **)
     Property TagCount : Integer Read GetTagCount;
-    (**
-      Returns the line number of the comment.
-      @precon  None.
-      @postcon Returns the line number of the comment.
-      @return  an Integer
-    **)
-    Property Line : Integer Read GetLine;
-    (**
-      Returns the column number of the comment.
-      @precon  None.
-      @postcon Returns the column number of the comment.
-      @return  an Integer
-    **)
-    Property Col : Integer Read GetCol;
   End;
 
   (** A class type for comment parsers. **)
@@ -643,13 +631,9 @@ Type
 
   (** This class implements the IElementCollection interface so that this
       element container can be rendered with the module browser. **)
-  TElementContainer = Class {$IFDEF D2005} Abstract {$ENDIF}
+  TElementContainer = Class {$IFDEF D2005} Abstract {$ENDIF} (TBaseContainer)
   {$IFDEF D2005} Strict {$ENDIF} Private
     FElements : TObjectList;
-    FTokens : TObjectList;
-    FName : String;
-    FLine : Integer;
-    FColumn : Integer;
     FComment : TComment;
     FScope : TScope;
     FImageIndex : TImageIndex;
@@ -660,15 +644,9 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetElementCount : Integer;
     Function GetElements(iIndex : Integer) : TElementContainer;
-    Function GetTokenCount : Integer;
-    Function GetTokens(iIndex : Integer) : TTokenInfo;
     Function GetImageIndexAdjustedForScope : Integer;
     Function Find(strName : String; FindType : TFindType = ftName) : Integer;
-    Function GetName: String; Virtual;
     Procedure SetSorted(boolValue : Boolean);
-    Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
-      strDelimiter : String; iMaxWidth : Integer) : String; Virtual;
-    Procedure AddToken(AToken : TTokenInfo); Virtual;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Virtual;
@@ -678,8 +656,6 @@ Type
       AComment : TComment) : TElementContainer; Overload; Virtual;
     Function  Add(strToken : String; AImageIndex : TImageIndex;
       AScope : TScope; AComment : TComment) : TElementContainer; Overload; Virtual;
-    Procedure AppendToken(AToken : TTokenInfo); Overload; Virtual;
-    Procedure AppendToken(strToken : String); Overload; Virtual;
     Procedure AddTokens(AElement : TElementContainer); Virtual;
     Function  FindElement(strName : String; FindType : TFindType = ftName) : TElementContainer;
     Procedure Assign(Source : TElementContainer); Virtual;
@@ -704,22 +680,6 @@ Type
     **)
     Property ElementCount : Integer Read GetElementCount;
     (**
-      This property returns an instance of the indexed token from the
-      collection.
-      @precon  iIndex must be a valid index.
-      @postcon Returns an instance of the indexed token from the collection.
-      @param   iIndex as       an Integer
-      @return  a TTokenInfo
-    **)
-    Property Tokens[iIndex : Integer] : TTokenInfo Read GetTokens;
-    (**
-      This property returns the number of tokens in the collection.
-      @precon  None.
-      @postcon Returns the number of tokens in the collection.
-      @return  an Integer
-    **)
-    Property TokenCount : Integer Read GetTokenCount;
-    (**
       This property returns an instance of the indexed element from the
       collection.
       @precon  iIndex must be a valid index.
@@ -728,34 +688,6 @@ Type
       @return  a TElementContainer
     **)
     Property Elements[iIndex : Integer] : TElementContainer Read GetElements; Default;
-    (**
-      This property returns the name of the element.
-      @precon  None.
-      @postcon Returns the name of the element.
-      @return  a String
-    **)
-    Property Name : String Read GetName;
-    (**
-      This property returns the identifier name (same as name) of the element.
-      @precon  None.
-      @postcon Returns the identifier name (same as name) of the element.
-      @return  a String
-    **)
-    Property Identifier : String read FName Write FName;
-    (**
-      This property returns the line number associated with this element.
-      @precon  None.
-      @postcon Returns the line number associated with this element.
-      @return  an Integer
-    **)
-    Property Line : Integer Read FLine Write FLine;
-    (**
-      This property returns the column number associated with this element.
-      @precon  None.
-      @postcon Returns the column number associated with this element.
-      @return  an Integer
-    **)
-    Property Column : Integer Read FColumn Write FColumn;
     (**
       This property returns the comment that is associated with this element.
       @precon  None.
@@ -2147,6 +2079,7 @@ Const
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : [fsBold]),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
@@ -2548,8 +2481,9 @@ Const
   (** A list of strings representing the token types. **)
   strTokenType : Array[Low(TBADITokenType)..High(TBADITokenType)] Of String = (
     'Unknown', 'WhiteSpace', 'ReservedWord', 'Identifier', 'Number',
-    'Symbol', 'LineEnd', 'StringLiteral', 'Comment', 'HTMLTag', 'Directive',
-    'CompilerDirective', 'LinkTag', 'TreeHeader', 'FileEnd', 'LineContinuation');
+    'Symbol', 'LineEnd', 'StringLiteral', 'Comment', 'HTMLStartTag',
+    'HTMLEndTag',  'Directive', 'CompilerDirective', 'LinkTag', 'TreeHeader',
+    'FileEnd', 'LineContinuation');
 
 Var
   (** This is a global variable for the Browse and Doc It options that need to
@@ -2566,6 +2500,7 @@ Uses
 Const
   (** This constant represent the maximum of issue / doc conflicts to add. **)
   iIssueLimit : Integer = 25;
+
 
 resourcestring
   (** An error message for tying to add one type of element but finding another
@@ -2628,21 +2563,246 @@ begin
     End;
 end;
 
+  { TBaseContainer }
+
 (**
 
-  This method added the strToken to the tags token list with type iType.
+  This method adds the given TTokenInfo object to the token collection.
 
-  @precon  strToken is a string to be added as a token and iType is the token
-           type of the token.
-  @postcon Adds the token to the internal list.
+  @precon  AToken must be a valid token instance.
+  @postcon Adds the given TTokenInfo object to the token collection. Note that
+           the calling code must not free this memeory - it will be freed by
+           this container.
 
-  @param   strToken as a String
-  @param   iType    as a TBADITokenType
+  @param   AToken as a TTokenInfo
 
 **)
-procedure TTag.AddToken(strToken: String; iType: TBADITokenType);
+procedure TBaseContainer.AddToken(AToken: TTokenInfo);
 begin
-  FTokens.AddObject(strToken, TObject(iType));
+  FTokens.Add(AToken);
+end;
+
+(**
+
+  This method adds a TTokenInfo class representation of the given string to the
+  token collection.
+
+  @precon  None.
+  @postcon Adds a TTokenInfo class representation of the given string to the
+           token collection.
+
+  @param   strToken   as a String
+  @param   ATokenType as a TBADITokenType
+
+**)
+procedure TBaseContainer.AddToken(strToken : String;
+  ATokenType : TBADITokenType = ttUnknown);
+
+begin
+  AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), ATokenType));
+end;
+
+(**
+
+  This method append a copy of the given token to the tokens collection.
+
+  @precon  AToken mustbe a valid instance of a TTokenInfo.
+  @postcon Append a copy of the given token to the tokens collection. Note, the
+           calling code is responsible for freeing the AToken instance only.
+
+  @param   AToken as a TTokenInfo
+
+**)
+procedure TBaseContainer.AppendToken(AToken: TTokenInfo);
+begin
+  AddToken(TTokenInfo.Create(AToken.Token, AToken.BufferPos, AToken.Line,
+    AToken.Column, AToken.Length, AToken.TokenType));
+end;
+
+(**
+
+  This method builds a string from the identifer and tokens and tries to 
+  present it with the style of code you would probably except. 
+
+  @precon  None. 
+  @postcon Builds a string from the identifer and tokens and tries to present 
+           it with the style of code you would probably except. 
+
+  @param   boolIdentifier       as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @param   strDelimiter         as a String
+  @param   iMaxWidth            as an Integer
+  @param   strNoSpaceBefore     as a TSymbols
+  @param   strNoSpaceAfter      as a TSymbols
+  @param   strSpaceAfter        as a TSymbols
+  @param   boolShowHTML         as a Boolean
+  @return  a String              
+
+**)
+Function TBaseContainer.BuildStringRepresentation(boolIdentifier,
+  boolForDocumentation : Boolean; strDelimiter : String; iMaxWidth : Integer;
+  strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
+  strNoSpaceAfter : TSymbols = ['(', '[', '{', '.', '^'];
+  strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
+  boolShowHTML : Boolean = False) : String;
+
+Var
+  iToken : Integer;
+  T, L, D : TTokenInfo;
+  boolSpace: Boolean;
+  iLength : Integer;
+
+Begin
+  Result := '';
+  If boolIdentifier Then
+    Result := Identifier;
+  If Length(strDelimiter) > 0 Then
+    Begin
+      If Not (strDelimiter[1] In strNoSpaceBefore) Then
+        Result := Result + #32;
+      Result := Result + strDelimiter;
+    End;
+  iLength := Length(Result);
+  D := TTokenInfo.Create(strDelimiter, 0, 0, 0, Length(strDelimiter), ttSymbol);
+  Try
+    L := D;
+    For iToken := 0 To TokenCount - 1 Do
+      If Not (Tokens[iToken].TokenType In [ttHTMLStartTag, ttHTMLEndTag]) Or
+        ((Tokens[iToken].TokenType In [ttHTMLStartTag, ttHTMLEndTag]) And boolShowHTML) Then
+        Begin
+          boolSpace := (iToken > 0) Or (strDelimiter <> '');
+          T := Tokens[iToken];
+          boolSpace := boolSpace And Not (T.Token[1] In strNoSpaceBefore);
+          If L <> Nil Then
+            boolSpace := boolSpace  And Not (L.Token[1] In strNoSpaceAfter);
+          If boolSpace Or ((L.Length > 0) And (L.Token[1] In strSpaceAfter)) Then
+            If Not (boolForDocumentation And (iLength + T.Length > iMaxWidth)) Then
+              Begin
+                If (L.TokenType <> ttHTMLStartTag) And (T.TokenType <> ttHTMLEndTag) Then
+                  Result := Result + #32;
+                Inc(iLength);
+              End Else
+              Begin
+                Result := Result + #13#10#32#32;
+                iLength := 2;
+              End;
+          Result := Result + T.Token;
+          Inc(iLength, T.Length);
+          L := T;
+        End;
+  Finally
+    D.Free;
+  End;
+End;
+(**
+
+  This method clears the tokens in the collection.
+
+  @precon  None.
+  @postcon Clears the tokens in the collection.
+
+**)
+procedure TBaseContainer.ClearTokens;
+begin
+  FTokens.Clear;
+end;
+
+(**
+
+  This is a constructor for the TBaseContainer class. 
+
+  @precon  None. 
+  @postcon Create the token collection and initialises the Line and Column 
+           data. 
+
+  @param   strName as a String
+  @param   iLine   as an Integer
+  @param   iColumn as an Integer
+
+**)
+constructor TBaseContainer.Create(strName : String; iLine, iColumn: Integer);
+begin
+  FTokens := TObjectList.Create(True);
+  FName := strName;
+  FLine := iLine;
+  FColumn := iColumn;
+end;
+
+(**
+
+  This is a destructor for the TBaseContainer class.
+
+  @precon  None.
+  @postcon Frees the token collection and the memory belonging to the tokens.
+
+**)
+destructor TBaseContainer.Destroy;
+begin
+  FTokens.Free;
+  Inherited Destroy;
+end;
+
+(**
+
+  This is a getter method for the Name property.
+
+  @precon  None.
+  @postcon Returns the name of the element. This can be override for the
+           purposes of find / sorting the elements. Identifier still returns
+           the FName variable.
+
+  @return  a String
+
+**)
+function TBaseContainer.GetName: String;
+begin
+  Result := FName;
+end;
+
+(**
+
+  This is a getter method for the TokenCount property.
+
+  @precon  None.
+  @postcon Returns the number of tokens in the collection.
+
+  @return  an Integer
+
+**)
+function TBaseContainer.GetTokenCount: Integer;
+begin
+  Result := FTokens.Count;
+end;
+
+(**
+
+  This is a getter method for the Tokens property.
+
+  @precon  iIndex must be a valid index between 0 and TokenCount - 1.
+  @postcon Returns the instance of the indexed token.
+
+  @param   iIndex as an Integer
+  @return  a TTokenInfo
+
+**)
+function TBaseContainer.GetTokens(iIndex: Integer): TTokenInfo;
+begin
+  Result := FTokens[iIndex] As TTokenInfo;
+end;
+
+(**
+
+  This is a setter method for the Name property.
+
+  @precon  None.
+  @postcon Sets the name of the container.
+
+  @param   Value as a String
+
+**)
+procedure TBaseContainer.SetName(Value: String);
+begin
+  FName := Value;
 end;
 
 (**
@@ -2660,11 +2820,7 @@ end;
 **)
 constructor TTag.Create(strName: String; iLine, iColumn : Integer);
 begin
-  Inherited Create;
-  FTagName := strName;
-  FTokens := TStringList.Create;
-  FLine := iLine;
-  FColumn := iColumn;
+  Inherited Create(strName, iLine, iColumn);
 end;
 
 (**
@@ -2677,8 +2833,22 @@ end;
 **)
 destructor TTag.Destroy;
 begin
-  FTokens.Free;
   Inherited Destroy;
+end;
+
+(**
+
+  This is a getter method for the TagName property.
+
+  @precon  None.
+  @postcon Gets the tah name for the tag from the identifer property.
+
+  @return  a String
+
+**)
+function TTag.GetTagName: String;
+begin
+  Result := Identifier;
 end;
 
 (**
@@ -2689,71 +2859,20 @@ end;
            resulting string.
   @postcon Returns a string representation of the tag.
 
-  @param   ShowHTML as a Boolean
+  @param   boolShowHTML as a Boolean
   @return  a String
 
 **)
-function TTag.AsString(ShowHTML : Boolean): String;
+function TTag.AsString(boolShowHTML : Boolean): String;
 
-Var
-  i : Integer;
-
-begin
-  Result := '';
-  For i := 0 To FTokens.Count - 1 Do
-    If (TokenType[i] <> ttHTMLTag) Or ((TokenType[i] = ttHTMLTag) And (ShowHTML)) Then
-    Result := Result + FTokens[i] + #32;
-end;
-
-(**
-
-  This is a getter method for the Token array property of the TTag class.
-  Return the token specified by the token index.
-
-  @precon  iTokenIndex is the index of the token required.
-  @postcon Returns the tokwen as a string.
-
-  @param   iTokenIndex as an Integer
-  @return  a String
-
-**)
-function TTag.GetToken(iTokenIndex: Integer): String;
+Const
+  strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
+  strNoSpaceAfter : TSymbols = ['(', '[', '{', '^'];
+  strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
 
 begin
-  Result := FTokens[iTokenIndex];
-end;
-
-(**
-
-  This is a getter method for the TokenCount property of the TTag class.
-  It returns the number of tokens in the token list.
-
-  @precon  None.
-  @postcon Returns the number of tokens in the collection.
-
-  @return  an Integer
-
-**)
-function TTag.GetTokenCount: Integer;
-begin
-  Result := FTokens.Count;
-end;
-
-(**
-
-  This is a getter method for the TokenType array property of the TComment
-  class. It returns the type of type indexed.
-
-  @precon  iTokenIndex is the index of the token required.
-  @postcon Returns a token type for the specified token.
-
-  @param   iTokenIndex as an Integer
-  @return  a TBADITokenType
-
-**)
-function TTag.GetTokenType(iTokenIndex: Integer): TBADITokenType;
-begin
-  Result := TBADITokenType(FTokens.Objects[iTokenIndex]);
+  Result := BuildStringRepresentation(False, False, '', 0, strNoSpaceBefore,
+    strNoSpaceAfter, strSpaceAfter, boolShowHTML)
 end;
 
 (** --------------------------------------------------------------------------
@@ -2785,12 +2904,9 @@ begin
       FTags.Add(FLastTag);
     End
   Else If Not FTagMode Then
-    Begin
-      If (strToken[1] = '<') And (strToken[Length(strToken)] = '>') Then
-        iType := ttHTMLTag;
-      FTokens.AddObject(strToken, TObject(iType))
-    End Else
-      FLastTag.AddToken(strToken, iType);
+    AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), iType))
+  Else
+    FLastTag.AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), iType));
 end;
 
 (**
@@ -2814,15 +2930,17 @@ begin
   If srcComment <> Nil Then
     Begin
       ResetTagMode;
+      Line := srcComment.Line;
+      Column := srcComment.Column;
       // Add tokens from one to the next.
       For i := 0 To srcComment.TokenCount - 1 Do
-        AddToken(srcComment.Token[i], srcComment.TokenType[i]);
+        AddToken(srcComment.Tokens[i].Token, srcComment.Tokens[i].TokenType);
       For i := 0 To srcComment.TagCount - 1 Do
         Begin
           AddToken('@' + srcComment.Tag[i].TagName, ttIdentifier);
           For j := 0 To srcComment.Tag[i].TokenCount - 1 Do
-            AddToken(srcComment.Tag[i].Token[j],
-              srcComment.Tag[i].TokenType[j]);
+            AddToken(srcComment.Tag[i].Tokens[j].Token,
+              srcComment.Tag[i].Tokens[j].TokenType);
           End;
     End;
 end;
@@ -2859,43 +2977,21 @@ end;
   @postcon Returns a string representation of the comment indented and broken
            into lines.
 
-  @param   iIndent   as an Integer
   @param   iMaxWidth as an Integer
-  @param   ShowHTML  as a Boolean
+  @param   boolShowHTML  as a Boolean
   @return  a String
 
 **)
-function TComment.AsString(iIndent, iMaxWidth: Integer; ShowHTML : Boolean): String;
+function TComment.AsString(iMaxWidth: Integer; boolShowHTML : Boolean): String;
 
-Var
-  str : String;
-  strToken : String;
-  i : Integer;
+Const
+  strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
+  strNoSpaceAfter : TSymbols = ['(', '[', '{', '^'];
+  strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
 
 begin
-  Result := '';
-  str := StringOfChar(#32, iIndent);
-  For i := 0 To TokenCount - 1 Do
-    If (TokenType[i] <> ttHTMLtag) Or ((TokenType[i] = ttHTMLtag) And ShowHTML) Then
-    Begin
-      If Copy(Token[i], 1, 2) = '@@' Then
-        strToken := Copy(Token[i], 2, Length(Token[i]) - 1) + #32
-      Else If Copy(Token[i], 1, 1) = '#' Then
-        strToken := #13 + Copy(Token[i], 2, Length(Token[i]) - 1) + #32
-      Else
-        strToken := Token[i] + #32;
-      If Length(str + strToken) > iMaxWidth Then
-        Begin
-          If Result <> '' Then
-            Result := Result + #13#10;
-          Result := Result + str;
-          str := StringOfChar(#32, iIndent);
-        End;
-      str := str + strToken;
-    End;
-  If Result <> '' Then
-    Result := Result + #13#10;
-  Result := Result + str;
+  Result := BuildStringRepresentation(False, True, '', iMaxWidth,
+    strNoSpaceBefore, strNoSpaceAfter,  strSpaceAfter, boolShowHTML);
 end;
 
 (**
@@ -2911,18 +3007,13 @@ end;
 Constructor TComment.Create(srcComment : TComment);
 
 Begin
-  Inherited Create;
+  If srcComment <> Nil Then
+    Inherited Create('', srcComment.Line, srcComment.Column)
+  Else
+    Inherited Create('', 0, 0);
   FLastTag := Nil;
-  FTokens := TStringList.Create;
   FTags := TObjectList.Create(True);
   FTagMode := False;
-  FLine := 0;
-  FCol := 0;
-  If srcComment <> Nil Then
-    Begin
-      FLine := srcComment.Line;
-      FCol := srcComment.Col;
-    End;
   Assign(srcComment);
 End;
 
@@ -2932,17 +3023,11 @@ End;
   This is the TComment constructor. It create a token list and a tag list. Then
   it passes the comment to the comment parser.
 
-
   @precon  strComment is a string of text to be parsed as a comment, iLine is
-
            the line number of the comment and iCol is the column number of
-
            the comment.
-
   @postcon It create a token list and a tag list. Then it passes the comment to
-
            the comment parser.
-
 
   @param   strComment as a String
   @param   iLine      as an Integer
@@ -2951,13 +3036,10 @@ End;
 **)
 constructor TComment.Create(strComment : String; iLine, iCol : Integer);
 begin
-  Inherited Create;
+  Inherited Create('', iLine, iCol);
   FLastTag := Nil;
-  FTokens := TStringList.Create;
   FTags := TObjectList.Create(True);
   FTagMode := False;
-  FLine := iLine;
-  FCol := iCol;
   ParseComment(strComment);
 end;
 
@@ -2994,7 +3076,6 @@ end;
 destructor TComment.Destroy;
 begin
   FTags.Free;
-  FTokens.Free;
   inherited;
 end;
 
@@ -3033,56 +3114,6 @@ end;
 
 (**
 
-  This is a getter method for the Token array property of the TComment class.
-  it return  the indexed Token.
-
-  @precon  iTokenIndex is the index of the token required.
-  @postcon Returns the token as a string.
-
-  @param   iTokenIndex as an Integer
-  @return  a String
-
-**)
-function TComment.GetToken(iTokenIndex: Integer): String;
-begin
-  Result := FTokens[iTokenIndex];
-end;
-
-(**
-
-  This is a getter method for the TokenCount property of the TComment class.
-  It returns the number of tokens in the token list.
-
-  @precon  None.
-  @postcon Returns the number of tokens in the collection.
-
-  @return  an Integer
-
-**)
-function TComment.GetTokenCount: Integer;
-begin
-  Result := FTokens.Count;
-end;
-
-(**
-
-  This is a getter method for the TokenType array property of the TComment
-  class. It returns the type of the token indexed.
-
-  @precon  iTokenIndex is the index of the token required.
-  @postcon Returns a token type for the specified token.
-
-  @param   iTokenIndex as an Integer
-  @return  a TBADITokenType
-
-**)
-function TComment.GetTokenType(iTokenIndex: Integer): TBADITokenType;
-begin
-  Result := TBADITokenType(FTokens.Objects[iTokenIndex]);
-end;
-
-(**
-
   This method resets the comment tag mode, i.e. the comment will accept text as
   tokens and not tag tokens.
 
@@ -3095,38 +3126,6 @@ procedure TComment.ResetTagMode;
 begin
   FTagMode := False;
 end;
-
-(**
-
-  This method is a getter method for the Line property.
-
-  @precon  None.
-  @postcon Returns the line property value.
-
-  @return  an Integer
-
-**)
-Function TComment.GetLine : Integer;
-
-Begin
-  Result := FLine;
-End;
-
-(**
-
-  This method is a getter method for the Column property.
-
-  @precon  None.
-  @postcon Returns the column property value.
-
-  @return  an Integer
-
-**)
-Function TComment.GetCol : Integer;
-
-Begin
-  Result := FCol;
-End;
 
 (**
 
@@ -3190,8 +3189,8 @@ begin
   iTokenLen := 0;
   SetLength(strToken, iTokenCapacity);
   BlockType := btNone;
-  FTagLine := FLine;
-  FTagColumn := FCol + 3;
+  FTagLine := Line;
+  FTagColumn := Column + 3;
   For i := 1 To Length(strComment) Do
     Begin
       LastToken := CurToken;
@@ -3199,6 +3198,8 @@ begin
         CurToken := ttWhiteSpace
       Else If strComment[i] In strLineEnd Then
         CurToken := ttLineEnd
+      Else If strComment[i] In [#33..#128] - ['a'..'z', 'A'..'Z', '@'] Then
+        CurToken := ttSymbol
       Else
         CurToken := ttIdentifier;
 
@@ -3211,7 +3212,7 @@ begin
               AddToken(strToken, LastToken);
           iTokenLen := 1;
           SetLength(strToken, iTokenCapacity);
-          strToken[iTokenLen] := strComment[i];;
+          strToken[iTokenLen] := strComment[i];
         End Else
         Begin
           Inc(iTokenLen);
@@ -3221,12 +3222,22 @@ begin
         End;
 
       If (BlockType = btNone) And (strToken[1] = '{') Then
-        BlockType := btLink;
+        BlockType := btLink
+      Else If (BlockType = btNone) And (strToken[1] = '<') Then
+        BlockType := btHTML;
 
       If (BlockType = btLink) And (strToken[iTokenLen] = '}') Then
         Begin
           BlockType := btNone;
           CurToken := ttLinkTag;
+        End;
+      If (BlockType = btHTML) And (strToken[iTokenLen] = '>') Then
+        Begin
+          BlockType := btNone;
+          If strToken[2] = '/' Then
+            CurToken := ttHTMLEndTag
+          Else
+            CurToken := ttHTMLStartTag;
         End;
 
       If strComment[i] = #10 Then
@@ -3439,7 +3450,7 @@ begin
   If AComment <> Nil Then
     Begin
       iL := AComment.Line;
-      iC := AComment.Col;
+      iC := AComment.Column;
     End;
   Case DocConflictRec.FConflictType Of
     dciMissing : iIcon := iiDocConflictMissing;
@@ -3540,22 +3551,6 @@ end;
 
 (**
 
-  This method added the passed token to the tokens collection.
-
-  @precon  AToken must be a valid token.
-  @postcon Added the passed token to the tokens collection.
-
-  @param   AToken as a TTokenInfo
-
-**)
-procedure TElementContainer.AddToken(AToken: TTokenInfo);
-
-begin
-  FTokens.Add(AToken);
-end;
-
-(**
-
   This methof adds the given elements tokens to the current containers tokens.
 
   @precon  None.
@@ -3589,40 +3584,10 @@ Procedure TTokenInfo.Append(strToken : String);
 
 Begin
   FToken := FToken + strToken;
+  Inc(FLength, System.Length(strToken));
   If FTokenType In [ttReservedWord, ttDirective] Then
     FUToken := FUtoken + UpperCase(strToken);
 End;
-
-(**
-
-  This method adds a TTokenInfo instance to the Token collection.
-
-  @precon  AToken must be a valid instance of a TTokenInfo class.
-  @postcon Adds a TTokenInfo instance to the Token collection.
-
-  @param   AToken as a TTokenInfo
-
-**)
-procedure TElementContainer.AppendToken(AToken: TTokenInfo);
-begin
-  FTokens.Add(TTokenInfo.Create(AToken.Token, AToken.BufferPos, AToken.Line,
-    AToken.Column, AToken.Length, AToken.TokenType));
-end;
-
-(**
-
-  This method appends the given string as a token in the containers token list.
-
-  @precon  None.
-  @postcon Appends the given string as a token in the containers token list.
-
-  @param   strToken as a String
-
-**)
-procedure TElementContainer.AppendToken(strToken: String);
-begin
-  FTokens.Add(TTokenInfo.Create(strToken, 0, 0, 0, 0, ttUnknown));
-end;
 
 (**
 
@@ -3642,90 +3607,17 @@ Var
   iToken : Integer;
 
 begin
-  FName := Source.FName;
+  Name := Source.Name;
   FScope := Source.FScope;
-  FLine := Source.FLine;
-  FColumn := Source.FColumn;
   FComment := Nil;
   If Source.Comment <> Nil Then
     FComment := TCommentClass(Source.ClassType).Create(Source.Comment);
   FImageIndex := Source.FImageIndex;
-  FTokens.Clear;
+  ClearTokens;
   For iToken :=  0 To Source.TokenCount - 1 Do
     AppendToken(Source.Tokens[iToken]);
 end;
 
-(**
-
-
-  This method builds a string from the identifer and tokens and tries to present
-  it with the style of code you would probably except.
-
-  @precon  None.
-  @postcon Builds a string from the identifer and tokens and tries to present
-           it with the style of code you would probably except.
-
-
-  @param   boolIdentifier       as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @param   strDelimiter         as a String
-  @param   iMaxWidth            as an Integer
-  @return  a String
-
-**)
-Function TElementContainer.BuildStringRepresentation(boolIdentifier,
-  boolForDocumentation : Boolean; strDelimiter : String; iMaxWidth : Integer) : String;
-
-Const
-  strNoSpaceAfter : Set Of Char = ['(', '[', '{', '.', '^'];
-  strNoSpaceBefore : Set Of Char = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
-  strSpaceAfter : Set Of Char = ['=', ':', '+', '-', '*', '\'];
-
-Var
-  iToken : Integer;
-  T, L, D : TTokenInfo;
-  boolSpace: Boolean;
-  iLength : Integer;
-
-Begin
-  Result := '';
-  If boolIdentifier Then
-    Result := Identifier;
-  If Length(strDelimiter) > 0 Then
-    Begin
-      If Not (strDelimiter[1] In strNoSpaceBefore) Then
-        Result := Result + #32;
-      Result := Result + strDelimiter;
-    End;
-  iLength := Length(Result);
-  D := TTokenInfo.Create(strDelimiter, 0, 0, 0, Length(strDelimiter), ttSymbol);
-  Try
-    L := D;
-    For iToken := 0 To TokenCount - 1 Do
-      Begin
-        boolSpace := (iToken > 0) Or (strDelimiter <> '');
-        T := Tokens[iToken];
-        boolSpace := boolSpace And Not (T.Token[1] In strNoSpaceBefore);
-        If L <> Nil Then
-          boolSpace := boolSpace  And Not (L.Token[1] In strNoSpaceAfter);
-        If boolSpace Or ((L.Length > 0) And (L.Token[1] In strSpaceAfter)) Then
-          If Not (boolForDocumentation And (iLength + T.Length > iMaxWidth)) Then
-            Begin
-              Result := Result + #32;
-              Inc(iLength);
-            End Else
-            Begin
-              Result := Result + #13#10#32#32;
-              iLength := 2;
-            End;
-        Result := Result + T.Token;
-        Inc(iLength, T.Length);
-        L := T;
-      End;
-  Finally
-    D.Free;
-  End;
-End;
 (**
 
   This method recrusively checks the documentation of the module. Descendants
@@ -3767,11 +3659,8 @@ constructor TElementContainer.Create(strName: String; AScope : TScope;
   iLine, iColumn : Integer; AImageIndex : TImageIndex; AComment: TComment);
 
 begin
+  Inherited Create(strName, iLine, iColumn);
   FElements := TObjectList.Create(True);
-  FTokens := TObjectList.Create(True);
-  FName := strName;
-  FLine := iLine;
-  FColumn := iColumn;
   FComment := AComment;
   FScope := AScope;
   FImageIndex := AImageIndex;
@@ -3806,7 +3695,6 @@ end;
 **)
 destructor TElementContainer.Destroy;
 begin
-  FTokens.Free;
   FElements.Free;
   Inherited Destroy;
 end;
@@ -3953,23 +3841,6 @@ End;
 
 (**
 
-  This is a getter method for the Name property.
-
-  @precon  None.
-  @postcon Returns the name of the element. This can be override for the
-           purposes of find / sorting the elements. Identifier still returns
-           the FName variable.
-
-  @return  a String
-
-**)
-function TElementContainer.GetName: String;
-begin
-  Result := FName;
-end;
-
-(**
-
   This is a getter method for the Count property.
 
   @precon  None.
@@ -3997,37 +3868,6 @@ end;
 function TElementContainer.GetElements(iIndex: Integer): TElementContainer;
 begin
   Result := FElements[iIndex - 1] As TElementContainer;
-end;
-
-(**
-
-  This is a getter method for the TokenCount property.
-
-  @precon  None.
-  @postcon Returns the number of Tokens in the elements collection.
-
-  @return  an Integer
-
-**)
-function TElementContainer.GetTokenCount: Integer;
-begin
-  Result := FTokens.Count;
-end;
-
-(**
-
-  This is a getter method for the Tokens property.
-
-  @precon  iIndex must be a valid index into the Token collection.
-  @postcon Returns the instance of the indexed token.
-
-  @param   iIndex as an Integer
-  @return  a TTokenInfo
-
-**)
-function TElementContainer.GetTokens(iIndex: Integer): TTokenInfo;
-begin
-  Result := FTokens[iIndex] As TTokenInfo;
 end;
 
 (**
@@ -5548,7 +5388,7 @@ Begin
       With Comment Do
         For j := 0 To TagCount - 1 Do
           If (LowerCase(Tag[j].TagName) = 'param') And (Tag[j].TokenCount > 0) And
-            (LowerCase(Tag[j][0]) = Lowercase(Parameters[i].Identifier)) Then
+            (LowerCase(Tag[j].Tokens[0].Token) = Lowercase(Parameters[i].Identifier)) Then
             Begin
               iFound := j;
               Break;
@@ -5562,13 +5402,13 @@ Begin
         With Comment Do
           Begin
             strType := '';
-            If Tag[iFound].TokenCount > 3 Then
-              If AnsiCompareText(Tag[iFound].Token[3], 'ARRAY') = 0 Then
+            If Tag[iFound].TokenCount > 3 Then   //: @bug Language specific
+              If AnsiCompareText(Tag[iFound].Tokens[3].Token, 'ARRAY') = 0 Then
                 Begin
                   If Tag[iFound].TokenCount > 5 Then
-                    strType := Tag[iFound].Token[5];
+                    strType := Tag[iFound].Tokens[5].Token;
                 End Else
-                  strType := Tag[iFound].Token[3];
+                  strType := Tag[iFound].Tokens[3].Token;
             strParam := Parameters[i].ParamReturn;
             If doShowMethodIncorrectParamType In BrowseAndDocItOptions.Options Then
               If Not (LowerCase(strType) = Lowercase(strParam)) Then
@@ -5627,7 +5467,7 @@ Begin
         Begin
           If doShowMethodIncorrectReturnType In BrowseAndDocItOptions.Options Then
             If ((Comment.Tag[iFound].TokenCount < 2) Or
-              (AnsiCompareText(ReturnType.AsString, Comment.Tag[iFound][1]) <> 0)) Then
+              (AnsiCompareText(ReturnType.AsString, Comment.Tag[iFound].Tokens[1].Token) <> 0)) Then
               AddDocumentConflict([QualifiedName], Comment.Tag[iFound].Line,
                 Comment.Tag[iFound].Column, Comment,
                 DocConflictTable[dctMethodIncorrectReturntype]);
@@ -5770,7 +5610,7 @@ Begin
       With Comment Do
         For j := 0 To TagCount - 1 Do
           If (LowerCase(Tag[j].TagName) = 'param') And (Tag[j].TokenCount > 0) And
-            (LowerCase(Tag[j][0]) = Lowercase(Parameters[i].Identifier)) Then
+            (LowerCase(Tag[j].Tokens[0].Token) = Lowercase(Parameters[i].Identifier)) Then
             Begin
               iFound := j;
               Break;
@@ -5785,12 +5625,12 @@ Begin
           Begin
             strType := '';
             If Tag[iFound].TokenCount > 3 Then
-              If AnsiCompareText(Tag[iFound].Token[3], 'ARRAY') = 0 Then
+              If AnsiCompareText(Tag[iFound].Tokens[3].Token, 'ARRAY') = 0 Then
                 Begin
                   If Tag[iFound].TokenCount > 5 Then
-                    strType := Tag[iFound].Token[5]
+                    strType := Tag[iFound].Tokens[5].Token;
                 End Else
-                  strType := Tag[iFound].Token[3];
+                  strType := Tag[iFound].Tokens[3].Token;
             strParam := Parameters[i].ParamReturn;
             If doShowPropertyIncorrectParamType In BrowseAndDocItOptions.Options Then
               If Not ((LowerCase(strType) = Lowercase(strParam))) Then
@@ -5849,7 +5689,7 @@ Begin
       Begin
         If doShowPropertyIncorrectReturnType In BrowseAndDocItOptions.Options Then
           If ((Comment.Tag[iFound].TokenCount < 2) Or
-            (AnsiCompareText(TypeId.AsString, Comment.Tag[iFound][1]) <> 0)) Then
+            (AnsiCompareText(TypeId.AsString, Comment.Tag[iFound].Tokens[1].Token) <> 0)) Then
             AddDocumentConflict([Identifier], Comment.Tag[iFound].Line,
               Comment.Tag[iFound].Column, Comment,
               DocConflictTable[dctPropertyIncorrectReturnType]);

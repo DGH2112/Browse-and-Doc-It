@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    18 Jan 2009
+  @Date    19 Jan 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -647,6 +647,7 @@ Type
     Function GetImageIndexAdjustedForScope : Integer;
     Function Find(strName : String; FindType : TFindType = ftName) : Integer;
     Procedure SetSorted(boolValue : Boolean);
+    Function FindRoot : TElementContainer;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Virtual;
@@ -2512,9 +2513,6 @@ Var
   (** This variable provides an incremental number of making doc conflict
       messages unique. **)
   iDocConflictCounter: Integer;
-  (** This private variable holds the root of the module for the insertion
-      of the documentation conflicts. It is set in TBaseLanguageModule.Create **)
-  objModuleRootElement : TElementContainer;
 
 (**
 
@@ -3326,7 +3324,7 @@ begin
         Result.Comment.Assign(AElement.Comment);
       If Not AElement.ClassNameIs(Result.ClassName) Then
         Begin
-          E := objModuleRootElement.Add(strErrors, iiErrorFolder, scNone, Nil);
+          E := FindRoot.Add(strErrors, iiErrorFolder, scNone, Nil);
           E.Add(TDocIssue.Create(Format(strTryingToAddType, [AElement.ClassName,
             Result.ClassName, AElement.Name]), scNone, 'TElementContainer.Add',
             AElement.Line, AElement.Column, iiError));
@@ -3440,7 +3438,7 @@ procedure TElementContainer.AddDocumentConflict(Const Args: Array of TVarRec;
   DocConflictRec : TDocConflictTable);
 
 Var
-  E, I : TElementContainer;
+  E, I, R : TElementContainer;
   iL, iC : Integer;
   iIcon : TImageIndex;
 
@@ -3458,14 +3456,14 @@ begin
   Else
     iIcon := iiDocConflictItem;
   End;
-  Assert(objModuleRootElement <> Nil, 'objModuleRootElement can not be null!');
-  E := objModuleRootElement.FDocumentConflictLabel;
+  R := FindRoot;
+  E := R.FDocumentConflictLabel;
   If E = Nil Then
     Begin
-      objModuleRootElement.FDocumentConflictLabel := objModuleRootElement.Add(
+      R.FDocumentConflictLabel := R.Add(
         TLabelContainer.Create(strDocumentationConflicts, scGlobal, 0, 0,
         iiDocConflictFolder, Nil)) As TLabelContainer;
-      E := objModuleRootElement.FDocumentConflictLabel;
+      E := R.FDocumentConflictLabel;
     End;
   I := E.FindElement(DocConflictRec.FCategory);
   If I = Nil Then
@@ -3537,8 +3535,7 @@ Var
   iCount : Integer;
 
 begin
-  Assert(objModuleRootElement <> Nil, 'objModuleRootElement can not be null!');
-  I := objModuleRootElement.Add(recIssues[ErrorType].FFolder,
+  I := FindRoot.Add(recIssues[ErrorType].FFolder,
     recIssues[ErrorType].FFolderImage, scNone, Nil);
   iCount := I.ElementCount;
   If iCount < iIssueLimit Then
@@ -3609,9 +3606,9 @@ Var
 begin
   Name := Source.Name;
   FScope := Source.FScope;
-  FComment := Nil;
-  If Source.Comment <> Nil Then
-    FComment := TCommentClass(Source.ClassType).Create(Source.Comment);
+  Line := Source.Line;
+  Column := Source.Column;
+  FComment :=  Source.Comment;
   FImageIndex := Source.FImageIndex;
   ClearTokens;
   For iToken :=  0 To Source.TokenCount - 1 Do
@@ -3764,10 +3761,10 @@ end;
 (**
 
   This method searches the elements collection of and instance matching the 
-  given name. 
+  given name.
 
-  @precon  None. 
-  @postcon Returns either instance of the found item or returns nil. 
+  @precon  None.
+  @postcon Returns either instance of the found item or returns nil.
 
   @param   strName  as a String
   @param   FindType as a TFindType
@@ -3785,6 +3782,24 @@ begin
   i := Find(strName, FindType);
   If i > 0 Then
     Result := Elements[i];
+end;
+
+(**
+
+  This method finds the root element of the tree containing the current element.
+
+  @precon  None.
+  @postcon Finds the root element of the tree containing the current element.
+
+  @return  a TElementContainer
+
+**)
+Function TElementContainer.FindRoot : TElementContainer;
+
+begin
+  Result := Self;
+  While Result.Parent <> Nil Do
+    Result := Result.Parent;
 end;
 
 (**
@@ -4526,7 +4541,6 @@ begin
   FCompilerDefs.CaseSensitive := False;
   {$ENDIF}
   FCompilerConditionStack := TList.Create;
-  objModuleRootElement := Self;
   FCommentClass := CommentClass;
 end;
 
@@ -6009,7 +6023,6 @@ end;
     BrowseAndDocItOption class. **)
 Initialization
   iDocConflictCounter := 1;
-  objModuleRootElement := Nil;
   BrowseAndDocItOptions := TBrowseAndDocItOptions.Create;
 (** This finalization section ensures that the BrowseAndDocItOptions class are
     destroyed. **)

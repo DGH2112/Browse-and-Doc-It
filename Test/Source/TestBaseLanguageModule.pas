@@ -21,6 +21,10 @@ type
   Public
     Procedure CheckEquals(ttExpected, ttActual : TBADITokenType;
       strMsg : String = ''); Overload;
+    Procedure CheckEquals(iiExpected, iiActual : TImageIndex;
+      strMsg : String = ''); Overload;
+    Procedure CheckEquals(iiExpected : TImageIndex; iActual : Integer;
+      strMsg : String = ''); Overload;
     Procedure CheckEquals(scExpected, scActual : TScope;
       strMsg : String = ''); Overload;
     Procedure CheckEquals(trExpected, trActual : TTokenReference;
@@ -68,6 +72,159 @@ type
     procedure TestFindTag;
   end;
 
+  // Test methods for class TElementContainer
+
+  TTestElementContainer = Class(TElementContainer)
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  End;
+
+  TTestIdent = Class(TIdent)
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  End;
+
+  TestTElementContainer = class(TExtendedTestCase)
+  strict private
+    FElementContainer: TTestElementContainer;
+    FComment : TComment;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    procedure TestCreate;
+    procedure TestAdd;
+    procedure TestAdd1;
+    procedure TestAdd2;
+    procedure TestAddTokens;
+    procedure TestFindElement;
+    procedure TestAssign;
+    procedure TestFindToken;
+    procedure TestDeleteElement;
+    procedure TestCheckDocumentation;
+    procedure TestReferenceSymbol;
+    procedure TestAddIssue;
+    procedure TestAddDocumentConflict;
+    procedure TestAsString;
+    procedure TestCheckReferences;
+    procedure TestReferenceSection;
+    procedure TestElementCount;
+    procedure TestElements;
+    procedure TestComment;
+    procedure TestScope;
+    procedure TestImageIndex;
+    procedure TestImageIndexAdjustedForScope;
+    procedure TestSorted;
+    procedure TestReferenced;
+    procedure TestParent;
+  end;
+
+  // Test methods for class TDocIssue
+
+  TestTDocIssue = class(TExtendedTestCase)
+  strict private
+    FDocIssue: TDocIssue;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    Procedure TestCreate;
+    procedure TestAsString;
+  end;
+
+  TTestGenericTypeDecl = Class(TGenericTypeDecl)
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  End;
+
+  // Test methods for class TGenericTypeDecl
+
+  TestTGenericTypeDecl = class(TExtendedTestCase)
+  strict private
+    FGenericTypeDecl: TGenericTypeDecl;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    Procedure TestCreate;
+    procedure TestCheckDocumentation;
+  end;
+
+  TTestGenericConstant = Class(TGenericConstant)
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  End;
+
+  // Test methods for class TGenericConstant
+
+  TestTGenericConstant = class(TExtendedTestCase)
+  strict private
+    FGenericConstant: TGenericConstant;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    Procedure TestCreate;
+    procedure TestCheckDocumentation;
+  end;
+
+  TTestGenericVariable = Class(TGenericVariable)
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  End;
+
+  // Test methods for class TGenericVariable
+
+  TestTGenericVariable = class(TExtendedTestCase)
+  strict private
+    FGenericVariable: TGenericVariable;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    Procedure TestCreate;
+    procedure TestCheckDocumentation;
+  end;
+
+  TTestGenericParameter = Class(TGenericParameter)
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  End;
+
+  // Test methods for class TGenericParameter
+
+  TestTGenericParameter = class(TExtendedTestCase)
+  private
+    FType: TTestGenericTypeDecl;
+  strict private
+    FGenericParameter: TGenericParameter;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    procedure TestCreate;
+    procedure TestParamReturn;
+  end;
+
+  TTestGenericMethodDecl = Class(TGenericMethodDecl)
+  Public
+    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  End;
+
+  // Test methods for class TGenericMethodDecl
+
+  TestTGenericMethodDecl = class(TExtendedTestCase)
+  strict private
+    FGenericMethodDecl: TGenericMethodDecl;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    Procedure TestCreate;
+    procedure TestAddParameter;
+    procedure TestCheckDocumentation;
+  end;
+
 implementation
 
 Uses
@@ -83,6 +240,16 @@ begin
   If AnsiCompareText(strTokenType[ttExpected], strTokenType[ttActual]) <> 0 Then
     FailNotEquals(strTokenType[ttExpected], strTokenType[ttActual], strMsg,
       CallerAddr);
+end;
+
+procedure TExtendedTestCase.CheckEquals(iiExpected, iiActual: TImageIndex;
+  strMsg: String = '');
+
+begin
+  FCheckCalled := True;
+  If iiExpected <> iiActual Then
+    FailNotEquals(ImageList[iiExpected].FResourcename, ImageList[iiActual].FResourcename,
+      strMsg, CallerAddr);
 end;
 
 procedure TExtendedTestCase.CheckEquals(scExpected, scActual: TScope;
@@ -112,6 +279,20 @@ begin
   If AnsiCompareText(strTokenReference[trExpected], strTokenReference[trActual]) <> 0 Then
     FailNotEquals(strTokenReference[trExpected], strTokenReference[trActual], strMsg,
       CallerAddr);
+end;
+
+procedure TExtendedTestCase.CheckEquals(iiExpected: TImageIndex;
+  iActual: Integer; strMsg: String);
+
+Var
+  i : Integer;
+
+begin
+  FCheckCalled := True;
+  i := Integer(iiExpected) - 1;
+  If i <> iActual Then
+    FailNotEquals(ImageList[iiExpected].FResourcename,
+      ImageList[TImageIndex(iActual + 1)].FResourcename, strMsg, CallerAddr);
 end;
 
 // Test methods for class TTokenInfo
@@ -386,10 +567,642 @@ begin
   CheckEquals(1, FComment.FindTag('see'));
 end;
 
+{ TTestElementContainer }
+
+function TTestElementContainer.AsString(boolForDocumentation: Boolean): String;
+begin
+  Result := Identifier;
+end;
+
+{ TTestIdent }
+
+function TTestIdent.AsString(boolForDocumentation: Boolean): String;
+begin
+  result := Identifier;
+end;
+
+// Test methods for class TElementContainer
+
+procedure TestTElementContainer.SetUp;
+begin
+  FComment := TComment.CreateComment('This is a test comment.', 12, 23);
+  FElementContainer := TTestElementContainer.Create('TestElement', scPrivate, 12, 23,
+    iiPublicConstant, FComment);
+end;
+
+procedure TestTElementContainer.TearDown;
+begin
+  FComment.Free;
+  FElementContainer.Free;
+  FElementContainer := nil;
+end;
+
+procedure TestTElementContainer.TestAdd;
+
+begin
+  FElementContainer.Add(TTestElementContainer.Create('Hello', scPrivate, 1, 2, iiUsesItem, Nil));
+  CheckEquals(1, FElementContainer.ElementCount);
+  CheckEquals('Hello', FElementContainer.Elements[1].Identifier);
+end;
+
+procedure TestTElementContainer.TestAdd1;
+
+begin
+  FElementContainer.Add('Hello', iiUsesItem, scPrivate, Nil);
+  CheckEquals(1, FElementContainer.ElementCount);
+  CheckEquals('Hello', FElementContainer.Elements[1].Identifier);
+end;
+
+procedure TestTElementContainer.TestAdd2;
+
+Var
+  T : TTokenInfo;
+
+begin
+  T := TTokenInfo.Create('Hello', 1, 2, 3, 5, ttUnknown);
+  Try
+    FElementContainer.Add(T, scPrivate, iiUsesItem, Nil);
+    CheckEquals(1, FElementContainer.ElementCount);
+    CheckEquals('Hello', FElementContainer.Elements[1].Identifier);
+  Finally
+    T.Free;
+  End;
+end;
+
+procedure TestTElementContainer.TestAddTokens;
+
+var
+  E : TElementContainer;
+
+begin
+  E := TTestElementContainer.Create('Tmp', scNone, 0, 0, iiNone, Nil);
+  Try
+    E.AddToken('Hello');
+    E.AddToken('Dave');
+    E.AddToken('.');
+    FElementContainer.AddTokens(E);
+    CheckEquals(3, FElementContainer.TokenCount);
+    CheckEquals('Hello', FElementContainer.Tokens[0].Token);
+    CheckEquals('Dave', FElementContainer.Tokens[1].Token);
+    CheckEquals('.', FElementContainer.Tokens[2].Token);
+  Finally
+    E.Free;
+  End;
+end;
+
+procedure TestTElementContainer.TestFindElement;
+
+var
+  E : TElementContainer;
+
+begin
+  E := TTestElementContainer.Create('Tmp3', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  E := TTestElementContainer.Create('Tmp2', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  E := TTestElementContainer.Create('Tmp1', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  Check(FElementContainer.FindElement('Tmp2') <> Nil, 'FindElement is null');
+  Check(FElementContainer.FindElement('Tmp3', ftIdentifier) <> Nil, 'FindElement is null');
+end;
+
+procedure TestTElementContainer.TestAssign;
+
+var
+  E: TElementContainer;
+
+begin
+  E := TTestElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    E.Assign(FElementContainer);
+    CheckEquals(scPrivate, E.Scope);
+    CheckEquals(12, E.Line);
+    CheckEquals(23, E.Column);
+    Check(E.Comment <> Nil, 'Comment is null');
+  Finally
+    E.Free;
+  End;
+end;
+
+procedure TestTElementContainer.TestFindToken;
+
+begin
+  FElementContainer.AddToken('Hello');
+  FElementContainer.AddToken('Dave');
+  FElementContainer.AddToken('.');
+  CheckEquals(1, FElementContainer.FindToken('Dave'));
+end;
+
+procedure TestTElementContainer.TestImageIndex;
+begin
+  CheckEquals(iiPublicConstant, FElementContainer.ImageIndex);
+end;
+
+procedure TestTElementContainer.TestImageIndexAdjustedForScope;
+begin
+  CheckEquals(iiPrivateConstant, FElementContainer.ImageIndexAdjustedForScope);
+end;
+
+procedure TestTElementContainer.TestParent;
+var
+  E: TElementContainer;
+begin
+  Check(FElementContainer.Parent = Nil, 'Parent is not null');
+  E := TTestElementContainer.Create('Test', scNone, 1, 2, iiNone, Nil);
+  FElementContainer.Add(E);
+  Check(E.Parent = FElementContainer, 'Parent is not FElementContainer');
+end;
+
+procedure TestTElementContainer.TestDeleteElement;
+
+var
+  E : TElementContainer;
+
+begin
+  E := TTestElementContainer.Create('Tmp3', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  E := TTestElementContainer.Create('Tmp2', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  E := TTestElementContainer.Create('Tmp1', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  CheckEquals(3, FElementContainer.ElementCount);
+  FElementContainer.DeleteElement(2);
+  CheckEquals(2, FElementContainer.ElementCount);
+  CheckEquals('Tmp1', FElementContainer.Elements[1].Identifier);
+  CheckEquals('Tmp3', FElementContainer.Elements[2].Identifier);
+end;
+
+procedure TestTElementContainer.TestElementCount;
+
+var
+  E : TElementContainer;
+
+begin
+  CheckEquals(0, FElementContainer.ElementCount);
+  E := TTestElementContainer.Create('Tmp3', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  CheckEquals(1, FElementContainer.ElementCount);
+  E := TTestElementContainer.Create('Tmp2', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  CheckEquals(2, FElementContainer.ElementCount);
+  E := TTestElementContainer.Create('Tmp1', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  CheckEquals(3, FElementContainer.ElementCount);
+end;
+
+procedure TestTElementContainer.TestElements;
+
+var
+  E : TElementContainer;
+
+begin
+  E := TTestElementContainer.Create('Tmp3', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  E := TTestElementContainer.Create('Tmp2', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  E := TTestElementContainer.Create('Tmp1', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  CheckEquals('Tmp1', FElementContainer.Elements[1].Identifier);
+  CheckEquals('Tmp2', FElementContainer.Elements[2].Identifier);
+  CheckEquals('Tmp3', FElementContainer.Elements[3].Identifier);
+end;
+
+procedure TestTElementContainer.TestCheckDocumentation;
+
+var
+  boolCascade: Boolean;
+
+begin
+  FElementContainer.CheckDocumentation(boolCascade);
+  Checkequals(0, FElementContainer.ElementCount);
+end;
+
+procedure TestTElementContainer.TestReferenceSymbol;
+
+var
+  AToken: TTokenInfo;
+
+begin
+  AToken := TTokenInfo.Create('Hello', 0, 1, 2, 5, ttUnknown);
+  Try
+    CheckEquals(False, FElementContainer.ReferenceSymbol(AToken));
+  Finally
+    AToken.Free;
+  End;
+end;
+
+procedure TestTElementContainer.TestScope;
+begin
+  CheckEquals(scPrivate, FElementContainer.Scope);
+end;
+
+procedure TestTElementContainer.TestSorted;
+begin
+  CheckEquals(True, FElementContainer.Sorted);
+end;
+
+procedure TestTElementContainer.TestAddIssue;
+
+begin
+  FElementContainer.AddIssue('This is a warning.', scNone,
+    'MyMethod', 1, 2, etWarning);
+  CheckEquals(1, FElementContainer.ElementCount);
+  CheckEquals('Warnings', FElementContainer.Elements[1].AsString(False));
+  CheckEquals('This is a warning. [MyMethod]',
+    FElementContainer.Elements[1].Elements[1].AsString(False));
+end;
+
+procedure TestTElementContainer.TestAddDocumentConflict;
+
+Var
+  rec : TDocConflictTable;
+  DC : TElementContainer;
+
+begin
+  rec.FCategory := 'Things';
+  rec.FMessage := 'This is a document conflict message (%s, %s).';
+  rec.FDescription := 'This is a document conflict description.';
+  rec.FConflictType := dciMissing;
+  FElementContainer.AddDocumentConflict(['First', 'Second'], 12, 23, Nil, rec);
+  DC := FElementContainer.FindElement(strDocumentationConflicts);
+  Check(DC <> Nil, 'DC is null');
+  CheckEquals(strDocumentationConflicts, DC.Identifier);
+  DC := DC.FindElement('Things');
+  Check(DC <> Nil, 'DC is null');
+  CheckEquals('Things', DC.Identifier);
+  DC := DC.Elements[1];
+  Check(DC Is TDocumentConflict, 'DC is not TDocIssue');
+  CheckEquals('This is a document conflict message (First, Second).',
+    (DC As TDocumentConflict).AsString);
+End;
+
+procedure TestTElementContainer.TestAsString;
+
+begin
+  CheckEquals('TestElement', FElementContainer.AsString(False));
+end;
+
+procedure TestTElementContainer.TestCheckReferences;
+begin
+  FElementContainer.Referenced := True;
+  FElementContainer.CheckReferences;
+  CheckEquals(0, FElementContainer.ElementCount);
+  FElementContainer.Referenced := False;
+  FElementContainer.CheckReferences;
+  CheckEquals(1, FElementContainer.ElementCount);
+end;
+
+procedure TestTElementContainer.TestComment;
+begin
+  CheckEquals('This is a test comment.', FElementContainer.Comment.AsString(9999, False));
+end;
+
+procedure TestTElementContainer.TestCreate;
+begin
+  CheckEquals('TestElement', FElementContainer.Identifier);
+  CheckEquals(scPrivate, FElementContainer.Scope);
+  CheckEquals(12, FElementContainer.Line);
+  CheckEquals(23, FElementContainer.Column);
+  CheckEquals(iiPrivateConstant, FElementContainer.ImageIndexAdjustedForScope);
+  Check(FElementContainer.Comment <> Nil, 'Comment is null');
+end;
+
+procedure TestTElementContainer.TestReferenced;
+begin
+  CheckEquals(False, FElementContainer.Referenced);
+  FElementContainer.Referenced := True;
+  CheckEquals(True, FElementContainer.Referenced);
+end;
+
+procedure TestTElementContainer.TestReferenceSection;
+
+var
+  V : TLabelContainer;
+  AToken: TTokenInfo;
+  T: TElementContainer;
+
+begin
+  V := TLabelContainer.Create(strVarsLabel, scNone, 0, 0, iiPublicVariablesLabel, Nil);
+  FElementContainer.Add(V);
+  T := TTestIdent.Create('Test', scPrivate, 1, 2, iiPublicVariable, Nil);
+  V.Add(T);
+  AToken := TTokenInfo.Create('Test', 0, 1, 2, 5, ttUnknown);
+  Try
+    CheckEquals(trUnknown, AToken.Reference);
+    CheckEquals(False, T.Referenced);
+    Check(FElementContainer.ReferenceSection(AToken, V));
+    CheckEquals(trResolved, AToken.Reference);
+    CheckEquals(True, T.Referenced);
+  Finally
+    AToken.Free;
+  End;
+end;
+
+// Test methods for class TDocIssue
+
+procedure TestTDocIssue.SetUp;
+begin
+  FDocIssue := TDocIssue.Create('This is a simple message.',
+    scNone, 'MyMethod', 1, 2, iiWarning);
+end;
+
+procedure TestTDocIssue.TearDown;
+begin
+  FDocIssue.Free;
+  FDocIssue := nil;
+end;
+
+procedure TestTDocIssue.TestAsString;
+
+begin
+  CheckEquals('This is a simple message. [MyMethod]', FDocIssue.AsString(False));
+end;
+
+procedure TestTDocIssue.TestCreate;
+begin
+  CheckEquals('This is a simple message.', FDocIssue.Msg);
+  CheckEquals(scNone, FDocIssue.Scope);
+  CheckEquals('MyMethod', FDocIssue.Method);
+  CheckEquals(1, FDocIssue.Line);
+  CheckEquals(2, FDocIssue.Column);
+  CheckEquals(iiWarning, FDocIssue.ImageIndex);
+end;
+
+{ TTestGenericTypeDecl }
+
+function TTestGenericTypeDecl.AsString(boolForDocumentation: Boolean): String;
+begin
+  Result := BuildStringRepresentation(True, boolForDocumentation, '', 9999);
+end;
+
+// Test methods for class TGenericTypeDecl;
+
+procedure TestTGenericTypeDecl.SetUp;
+begin
+  FGenericTypeDecl := TTestGenericTypeDecl.Create('MyType', scProtected, 23, 34,
+    iiPublicType, Nil);
+end;
+
+procedure TestTGenericTypeDecl.TearDown;
+begin
+  FGenericTypeDecl.Free;
+  FGenericTypeDecl := nil;
+end;
+
+procedure TestTGenericTypeDecl.TestCheckDocumentation;
+var
+  boolCascade: Boolean;
+begin
+  FGenericTypeDecl.CheckDocumentation(boolCascade);
+  CheckEquals(1, FGenericTypeDecl.ElementCount);
+  CheckEquals(strDocumentationConflicts, FGenericTypeDecl.Elements[1].AsString(False));
+end;
+
+procedure TestTGenericTypeDecl.TestCreate;
+begin
+  CheckEquals('MyType', FGenericTypeDecl.Identifier);
+  CheckEquals(scProtected, FGenericTypeDecl.Scope);
+  CheckEquals(23, FGenericTypeDecl.Line);
+  CheckEquals(34, FGenericTypeDecl.Column);
+  CheckEquals(iiPublicType, FGenericTypeDecl.ImageIndex);
+  CheckEquals(iiProtectedType, FGenericTypeDecl.ImageIndexAdjustedForScope);
+end;
+
+{ TTestGenericConstant }
+
+function TTestGenericConstant.AsString(boolForDocumentation: Boolean): String;
+begin
+  Result := Identifier;
+end;
+
+// Test methods for class TGenericConstant
+
+procedure TestTGenericConstant.SetUp;
+begin
+  FGenericConstant := TTestGenericConstant.Create('MyConstant', scPublished, 23,
+    34, iiPublicConstant, Nil);
+end;
+
+procedure TestTGenericConstant.TearDown;
+begin
+  FGenericConstant.Free;
+  FGenericConstant := nil;
+end;
+
+procedure TestTGenericConstant.TestCheckDocumentation;
+var
+  boolCascade: Boolean;
+begin
+  FGenericConstant.CheckDocumentation(boolCascade);
+  CheckEquals(1, FGenericConstant.ElementCount);
+  CheckEquals(strDocumentationConflicts, FGenericConstant.Elements[1].AsString(False));
+end;
+
+procedure TestTGenericConstant.TestCreate;
+begin
+  CheckEquals('MyConstant', FGenericConstant.Identifier);
+  CheckEquals(scPublished, FGenericConstant.Scope);
+  CheckEquals(23, FGenericConstant.Line);
+  CheckEquals(34, FGenericConstant.Column);
+  CheckEquals(iiPublicConstant, FGenericConstant.ImageIndex);
+  CheckEquals(iiPublishedConstant, FGenericConstant.ImageIndexAdjustedForScope);
+end;
+
+{ TTestGenericVariable }
+
+function TTestGenericVariable.AsString(boolForDocumentation: Boolean): String;
+begin
+  Result := Identifier;
+end;
+
+// Test methods for class TGenericVariable
+
+procedure TestTGenericVariable.SetUp;
+begin
+  FGenericVariable := TTestGenericVariable.Create('MyVariable', scPublic, 23,
+    34, iiPublicConstant, Nil);
+end;
+
+procedure TestTGenericVariable.TearDown;
+begin
+  FGenericVariable.Free;
+  FGenericVariable := nil;
+end;
+
+procedure TestTGenericVariable.TestCheckDocumentation;
+var
+  boolCascade: Boolean;
+begin
+  FGenericVariable.CheckDocumentation(boolCascade);
+  CheckEquals(1, FGenericVariable.ElementCount);
+  CheckEquals(strDocumentationConflicts, FGenericVariable.Elements[1].AsString(False));
+end;
+
+procedure TestTGenericVariable.TestCreate;
+begin
+  CheckEquals('MyVariable', FGenericVariable.Identifier);
+  CheckEquals(scPublic, FGenericVariable.Scope);
+  CheckEquals(23, FGenericVariable.Line);
+  CheckEquals(34, FGenericVariable.Column);
+  CheckEquals(iiPublicConstant, FGenericVariable.ImageIndex);
+  CheckEquals(iiPublicConstant, FGenericVariable.ImageIndexAdjustedForScope);
+end;
+
+{ TTestGenericParameter }
+
+function TTestGenericParameter.AsString(boolForDocumentation: Boolean): String;
+begin
+  Result := Identifier + #32'='#32 + ParamType.AsString;
+end;
+
+// Test method for class TGenericParameter
+
+procedure TestTGenericParameter.SetUp;
+begin
+  FType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  FType.AddToken('String');
+  FGenericParameter := TTestGenericParameter.Create(pamVar, 'MyParam', True,
+    FType, 'Something', scPrivate, 3, 4);
+end;
+
+procedure TestTGenericParameter.TearDown;
+begin
+  FGenericParameter.Free;
+  FGenericParameter := nil;
+  FType.Free;
+end;
+
+procedure TestTGenericParameter.TestCreate;
+
+Const
+  strPM : Array[Low(TParamModifier)..High(TParamModifier)] Of String = (
+    'pamNone', 'pamVar', 'pamConst', 'pamOut');
+
+begin
+  CheckEquals('MyParam', FGenericParameter.Identifier);
+  CheckEquals(strPM[pamVar], strPM[FGenericParameter.ParamModifier]);
+  CheckEquals(True, FGenericParameter.ArrayOf);
+  CheckEquals('Something', FGenericParameter.DefaultValue);
+  CheckEquals(scPrivate, FGenericParameter.Scope);
+  CheckEquals(3, FGenericParameter.Line);
+  CheckEquals(4, FGenericParameter.Column);
+end;
+
+procedure TestTGenericParameter.TestParamReturn;
+begin
+  CheckEquals('String', FGenericParameter.ParamReturn);
+end;
+
+{ TTestGenericMethodDecl }
+
+function TTestGenericMethodDecl.AsString(boolForDocumentation: Boolean): String;
+begin
+  Result := Identifier;
+end;
+
+// Test methods for class TGenericMethodDecl
+
+procedure TestTGenericMethodDecl.SetUp;
+begin
+  FGenericMethodDecl := TTestGenericMethodDecl.Create(mtFunction, 'MyFunction',
+    scProtected, 34, 45);
+end;
+
+procedure TestTGenericMethodDecl.TearDown;
+begin
+  FGenericMethodDecl.Free;
+  FGenericMethodDecl := nil;
+end;
+
+procedure TestTGenericMethodDecl.TestAddParameter;
+
+var
+  P: TGenericParameter;
+  AType: TGenericTypeDecl;
+
+begin
+  AType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    AType.AddToken('String');
+    P := TTestGenericParameter.Create(pamNone, 'Param1', False, AType, '', scNone, 0, 0);
+    FGenericMethodDecl.AddParameter(P);
+    CheckEquals(1, FGenericMethodDecl.ParameterCount);
+    CheckEquals('Param1 = String', FGenericMethodDecl.Parameters[0].AsString);
+  Finally
+    AType.Free;
+  End;
+end;
+
+procedure TestTGenericMethodDecl.TestCheckDocumentation;
+
+var
+  boolCascade: Boolean;
+  AType: TTestGenericTypeDecl;
+  P : TTestGenericParameter;
+  C: TComment;
+
+begin
+  AType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    AType.AddToken('String');
+    P := TTestGenericParameter.Create(pamNone, 'Param1', False, AType, '', scNone, 0, 0);
+    FGenericMethodDecl.AddParameter(P);
+    AType.ClearTokens;
+    AType.AddToken('Integer');
+    P := TTestGenericParameter.Create(pamVar, 'Param2', False, AType, '0', scNone, 0, 0);
+    FGenericMethodDecl.AddParameter(P);
+    AType.ClearTokens;
+    AType.AddToken('Byte');
+    P := TTestGenericParameter.Create(pamConst, 'Param3', False, AType, '', scNone, 0, 0);
+    FGenericMethodDecl.AddParameter(P);
+    AType.ClearTokens;
+    AType.AddToken('Double');
+    P := TTestGenericParameter.Create(pamOut, 'Param4', False, AType, '', scNone, 0, 0);
+    FGenericMethodDecl.AddParameter(P);
+    CheckEquals(4, FGenericMethodDecl.ParameterCount);
+    CheckEquals('Param1 = String', FGenericMethodDecl.Parameters[0].AsString);
+    CheckEquals('Param2 = Integer', FGenericMethodDecl.Parameters[1].AsString);
+    CheckEquals('Param3 = Byte', FGenericMethodDecl.Parameters[2].AsString);
+    CheckEquals('Param4 = Double', FGenericMethodDecl.Parameters[3].AsString);
+    C := TComment.Create('', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals(0, FGenericMethodDecl.ElementCount);
+    Finally
+      C.Free;
+    End;
+  Finally
+    AType.Free;
+  End;
+end;
+
+procedure TestTGenericMethodDecl.TestCreate;
+
+Const
+  strMT : Array[Low(TMethodType)..High(TMethodType)] Of String = (
+    'mtConstructor', 'mtDestructor', 'mtProcedure', 'mtFunction');
+
+begin
+  CheckEquals(strMT[mtFunction], strMT[FGenericMethodDecl.MethodType]);
+  CheckEquals('MyFunction', FGenericMethodDecl.Identifier);
+  CheckEquals(scProtected, FGenericMethodDecl.Scope);
+  CheckEquals(34, FGenericMethodDecl.Line);
+  CheckEquals(45, FGenericMethodDecl.Column);
+end;
+
 initialization
+  BrowseAndDocItOptions.Options := [doCustomDrawing..doStrictConstantExpressions];
   // Register any test cases with the test runner
   RegisterTest(TestTTokenInfo.Suite);
   RegisterTest(TestTTag.Suite);
   RegisterTest(TestTComment.Suite);
+  RegisterTest(TestTElementContainer.Suite);
+  RegisterTest(TestTDocIssue.Suite);
+  RegisterTest(TestTGenericTypeDecl.Suite);
+  RegisterTest(TestTGenericConstant.Suite);
+  RegisterTest(TestTGenericVariable.Suite);
+  RegisterTest(TestTGenericParameter.Suite);
+  RegisterTest(TestTGenericMethodDecl.Suite);
 end.
 

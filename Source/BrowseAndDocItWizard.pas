@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    23 Dec 2008
+  @Date    23 Jan 2009
   @Version 1.0
 
 **)
@@ -51,6 +51,7 @@ Type
     Procedure InsertInSituCommentClick(Sender : TObject);
     Procedure DocumentationClick(Sender : TObject);
     Procedure ModuleExplorerClick(Sender : TObject);
+    {: @todo Procedure DUnitCreator(Sender : TObject);}
   Protected
     { IOTAWizard }
     Function GetIDString: string;
@@ -184,7 +185,7 @@ Uses
   SysUtils, DockableModuleExplorer, IniFiles, ToolsAPIUtils, OptionsForm, Forms,
   Windows, ShellAPI, TokenForm, DGHLibrary, ModuleDispatcher, Dialogs, Controls,
   PsAPI, DocumentationOptionsForm, DocumentationDispatcher, BaseDocumentation,
-  CheckForUpdates, CheckForUpdatesForm;
+  CheckForUpdates, CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF};
 
 Resourcestring
   {$IFDEF D2005}
@@ -270,6 +271,25 @@ Begin
   {$ENDIF}
   iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
     TKeyboardBinding.Create(Wizard))
+End;
+
+(**
+
+  This function indent the text for a description.
+
+  @precon  None.
+  @postcon Returns an indented version of the passed text.
+
+  @param   strText as a String
+  @param   iIndent as an Integer
+  @return  a String 
+
+**)
+Function Indent(strText : String; iIndent : Integer) : String;
+
+Begin
+  Result := StringOfChar(#32, iIndent) + {StringReplace(strText, #13#10,
+    #13#10 + StringOfChar(#32, iIndent), [rfReplaceAll])} strText;
 End;
 
 {procedure TBrowseAndDocItWizard.AfterCompile(Succeeded: Boolean);
@@ -448,6 +468,12 @@ begin
           Free;
         End;
 end;
+
+{: @todo procedure TBrowseAndDocItWizard.DUnitCreator(Sender: TObject);
+
+begin
+  TfrmDUnit.Execute(FDUnitOptions);
+end;}
 
 {procedure TBrowseAndDocItWizard.Destroyed;
 begin
@@ -686,21 +712,18 @@ end;
 
 (**
 
-  This is a menu OnClick event for the insertion of a method comment. This
-  method searches the IDE for the current module being edited and then
-  creates a memory stream of the source and passes it to the Unit parser.
+  This is a menu OnClick event for the insertion of a method comment. This method
+  searches the IDE for the current module being edited and then creates a
+  memory stream of the source and passes it to the Unit parser. It then finds
+  the first method declaration prior to the cursor position, parses the
+  declaration and output the information in as comment immediately above the
+  method declaration. This comment block starts with '(**' to signify an
+  ObjectPascalDoc comment that can be used by the documentation system.
 
-  It then finds the first method declaration prior to the cursor position,
-  parses the declaration and output the information in as comment immediately
-  above the method declaration.
+  @precon  Sender is the object initiating the event .
+  @postcon Inserts a Method comment into the editor avoid the current method .
 
-  This comment block starts with '(**' to signify an ObjectPascalDoc comment
-  that can be used by the documentation system.
-
-  @precon  Sender is the object initiating the event.
-  @postcon Inserts a Method comment into the editor avoid the current method.
-
-  @param   Sender  As a TObject
+  @param   Sender as a TObject
 
 **)
 procedure TBrowseAndDocItWizard.InsertMethodCommentClick(Sender: TObject);
@@ -719,10 +742,10 @@ var
     This method recursively works throug the hierarchy of elements looking for
     the method which is closest to be on or just above the current cursor line.
 
-    @precon  Container must be a valid TElementContainer instance.
-    @postcon Recursively works throug the hierarchy of elements looking for
-             the method which is closest to be on or just above the current
-             cursor line.
+    @precon  Container must be a valid TElementContainer instance .
+    @postcon Recursively works throug the hierarchy of elements looking for the
+             method which is closest to be on or just above the current
+             cursor line .
 
     @param   Container as a TElementContainer
 
@@ -793,23 +816,15 @@ end;
 
 (**
 
-
   This method writes the method comment to the active editor.
 
-
-  @precon  Method is a valid instance of a method declaration to be commented,
-
-           Writer is a valid instance of an open tools api writer, iBufferPos
-
-           is the buffer position to insert the comment and iCol is the
-
-           column to indent the comment by.
-
-  @postcon A method comment is inserted into the editor.
-
+  @precon  Method is a valid instance of a method declaration to be commented ,
+           Writer is a valid instance of an open tools api writer ,
+           iBufferPos is the buffer position to insert the comment and iCol
+           is the column to indent the comment by .
+  @postcon A method comment is inserted into the editor .
 
   @param   Method   as a TGenericMethodDecl
-
   @param   Source   as an IOTASourceEditor
   @param   Writer   as an IOTAEditWriter
   @param   AComment as a TComment
@@ -843,7 +858,7 @@ begin
     Dec(CharPos.CharIndex, 6);
   If AComment <> Nil Then // Delete existing comment.
     Begin
-      C.CharIndex := AComment.Col;
+      C.CharIndex := AComment.Column;
       C.Line := AComment.Line;
       iBufferPos := Source.GetEditView(0).CharPosToPos(C);
       Writer.CopyTo(iBufferPos - 1);
@@ -870,7 +885,7 @@ begin
         iLen, Method.Parameters[i].Identifier])));
       If Method.Parameters[i].ParamType <> Nil Then
         Begin
-          strType := Method.Parameters[i].ParamReturn;
+          strType := Method.Parameters[i].ParamType.AsString(False, False);
           Writer.Insert(PChar(Format('%s %s%s%s'#13#10, [
             strAOrAn[(strType[1] In strVowels) Or Method.Parameters[i].ArrayOf],
             strArrayOf[Method.Parameters[i].ArrayOf], strType,
@@ -881,8 +896,8 @@ begin
     Begin
       Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
       Writer.Insert(PChar(Format('  @return  %s %-*s',
-        [strAOrAn[Method.ReturnType.AsString[1] In strVowels], iLen,
-        Method.ReturnType.AsString])));
+        [strAOrAn[Method.ReturnType.AsString(False, False)[1] In strVowels], iLen,
+        Method.ReturnType.AsString(False, False)])));
       Writer.Insert(PChar(#13#10));
     End;
   // Block Footer
@@ -900,20 +915,16 @@ end;
 
 (**
 
-
   This method returns a description for the method if it is a constructor,
-  destructor, getter or setter method, else it returns an empty string.
+  destructor, getter or setter method, else it returns an empty String.
 
-
-  @precon  Method is a valid instance of a method declatation to be described.
-
-  @postcon Returns a description of the method is applicable.
-
+  @precon  Method is a valid instance of a method declatation to be described .
+  @postcon Returns a description of the method is applicable .
 
   @param   Method       as a TGenericMethodDecl
   @param   AComment     as a TComment
   @param   iIndent      as an Integer
-  @param   CursorAdjust as a TPoint
+  @param   CursorAdjust as a TPoint as a reference
   @return  a String
 
 **)
@@ -935,7 +946,7 @@ begin
         Begin
           With TComment.Create(MethodDescriptions.ValueFromIndex[i], 0, 0) Do
             Try
-              strDescription := AsString(iIndent, 80, True);
+              strDescription := Indent(AsString(80 - iIndent, True), iIndent);
               If Pos('|', strDescription) > 0 Then
                 For j := 1 To Length(strDescription) Do
                   Begin
@@ -963,7 +974,7 @@ begin
     Result := Format('%s'#13#10#13#10, [strDescription])
   Else
     Begin
-      Result := Format('%s'#13#10#13#10, [AComment.AsString(iIndent, 80, True)]);
+      Result := Format('%s'#13#10#13#10, [Indent(AComment.AsString(80 - iIndent, True), iIndent)]);
       boolCon := False;
       i := AComment.FindTag('precon');
       If i > -1 Then
@@ -1019,12 +1030,12 @@ Var
 Begin
   str := Format('%s@%-8s', [StringOfChar(#32, iIndent), Tag.TagName]);
   For  i := 0 To Tag.TokenCount - 1 Do
-    If Length(str + Tag.Token[i]) < 80 Then
-      str := str + Tag.Token[i] + #32
+    If Length(str + Tag.Tokens[i].Token) < 80 Then
+      str := str + Tag.Tokens[i].Token + #32
     Else
       Begin
         Result := Result + str;
-        str := #13#10 + StringOfChar(#32, iIndent + 9) + Tag.Token[i] + #32;
+        str := #13#10 + StringOfChar(#32, iIndent + 9) + Tag.Tokens[i].Token + #32;
       End;
   Result := Result + str + #13#10;
 End;
@@ -1178,7 +1189,7 @@ Begin
   Dec(CharPos.CharIndex, 9);
   If AComment <> Nil Then // Delete existing comment.
     Begin
-      C.CharIndex := AComment.Col;
+      C.CharIndex := AComment.Column;
       C.Line := AComment.Line;
       iBufferPos := Source.GetEditView(0).CharPosToPos(C);
       Writer.CopyTo(iBufferPos - 1);
@@ -1202,7 +1213,7 @@ Begin
           Prop.Parameters[i].Identifier])));
       If Prop.Parameters[i].ParamType <> Nil Then
         Begin
-          strType := Prop.Parameters[i].ParamReturn;
+          strType := Prop.Parameters[i].ParamType.AsString(False, False);
           Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '  ' +
           Format('%s %s%s%s'#13#10, [strAOrAn[(strType[1] In
               strVowels) Or Prop.Parameters[i].ArrayOf],
@@ -1215,8 +1226,8 @@ Begin
     Begin
       Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
       Writer.Insert(PChar(Format('  @return  %s %-*s',
-        [strAOrAn[Prop.TypeId.AsString[1] In strVowels], iLen,
-        Prop.TypeId.AsString])));
+        [strAOrAn[Prop.TypeId.AsString(False, False)[1] In strVowels], iLen,
+        Prop.TypeId.AsString(False, False)])));
       Writer.Insert(PChar(#13#10));
     End;
   Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '**)'#13#10));
@@ -1258,7 +1269,7 @@ begin
       Result := #32#32#13#10;
     End Else
     Begin
-      Result := Format('%s'#13#10, [AComment.AsString(iIndent, 80, True)]);
+      Result := Format('%s'#13#10, [Indent(AComment.AsString(80 - iIndent, True), iIndent)]);
       i := AComment.FindTag('precon');
       If i > -1 Then
         Result := Result + OutputTag(iIndent, AComment.Tag[i]);
@@ -2236,10 +2247,19 @@ begin
       FModule.Free;
     End;
   Except
+    On E : EParserAbort Do
+      Exit;
     On E : Exception Do
       Begin
+        {$IFDEF EUREKALOG}
+        Exceptionlog.StandardEurekaNotify(GetLastExceptionObject,
+          GetLastExceptionAddress);
+        If Assigned(FSuccessfulParseProc) Then
+          FSuccessfulParseProc(False);
+        {$ELSE}
         FFileName := E.Message;
         Synchronize(ShowException);
+        {$ENDIF}
       End;
   End;
 end;

@@ -3,7 +3,7 @@
   This is a debug form for displaying the tokens and their information.
 
   @version      0.9
-  @date         29 Dec 2008
+  @date         25 Jan 2009
   @author       David Hoyle
 
 **)
@@ -111,13 +111,13 @@ begin
             Begin
               Item := lvListView1.Items.Add;
               Item.Caption := IntToStr(i);
-              Item.SubItems.Add(strTokenType[Source.TokenInfo[i].TokenType]);
-              Item.SubItems.Add(IntToStr(Source.TokenInfo[i].BufferPos));
-              Item.SubItems.Add(IntToStr(Source.TokenInfo[i].Line));
-              Item.SubItems.Add(IntToStr(Source.TokenInfo[i].Column));
-              Item.SubItems.Add(IntToStr(Source.TokenInfo[i].Length));
-              Item.SubItems.Add(Source.TokenInfo[i].Token);
-              Item.SubItems.Add(Format('%d', [Integer(Source.TokenInfo[i].TokenType)]));
+              Item.SubItems.Add(strTokenType[Source.Tokens[i].TokenType]);
+              Item.SubItems.Add(IntToStr(Source.Tokens[i].BufferPos));
+              Item.SubItems.Add(IntToStr(Source.Tokens[i].Line));
+              Item.SubItems.Add(IntToStr(Source.Tokens[i].Column));
+              Item.SubItems.Add(IntToStr(Source.Tokens[i].Length));
+              Item.SubItems.Add(Source.Tokens[i].Token);
+              Item.SubItems.Add(Format('%d', [Integer(Source.Tokens[i].TokenType)]));
               If i Mod 10 = 0 Then
                 frm.UpdateProgress(i, Format('Getting Tokens... %d', [i]));
             End;

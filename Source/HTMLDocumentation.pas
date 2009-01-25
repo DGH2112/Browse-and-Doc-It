@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    29 Dec 2008
+  @Date    25 Jan 2009
   @Version 1.0
 
 **)
@@ -449,7 +449,7 @@ Begin
       Begin
         boolIgnore := False;
         For j := Low(strSections) To High(strSections) Do
-          If AnsiCompareText(FCurrentModule[i].AsString(True), strSections[j]) = 0 Then
+          If AnsiCompareText(FCurrentModule[i].AsString(True, True), strSections[j]) = 0 Then
             Begin
               boolIgnore := True;
               Break;
@@ -607,15 +607,15 @@ begin
     Begin
       slContents.Add(Format('<!-- %s -->', [strDocumentationConflicts]));
       slContents.Add('<div class="Indent">');
-      slContents.Add(#32#32 + H(E[i].AsString(True), FHeaderLevel + 1, E[i].ImageIndex,
+      slContents.Add(#32#32 + H(E[i].AsString(True, True), FHeaderLevel + 1, E[i].ImageIndex,
         E[i].Scope));
       slContents.Add('  <ul>');
       For j := 1 To E[i].ElementCount Do
         Begin
           slContents.Add('    ' + LI(ImageList[E[i][j].ImageIndex].FResourcename,
-            N(E[i][j].AsString(True))));
-          SDC.Conflicts.Add(Format('%s=%s', [E[i].AsString(True),
-            E[i][j].AsString(True)]));
+            N(E[i][j].AsString(True, True))));
+          SDC.Conflicts.Add(Format('%s=%s', [E[i].AsString(True, True),
+            E[i][j].AsString(True, True)]));
         End;
       slContents.Add('  </ul>');
       slContents.Add('</div>');
@@ -662,9 +662,9 @@ begin
       For j := 1 To E.ElementCount Do
         Begin
           slContents.Add(#32#32 + LI(ImageList[E[j].ImageIndex].FResourcename,
-          N(E[j].AsString(True))));
+          N(E[j].AsString(True, True))));
           sls[i].Add(Format('%s=%s', [ExtractFileName(FCurrentModule.FileName),
-            E[j].AsString(True)]));
+            E[j].AsString(True, True)]));
         End;
       slContents.Add('</ul>');
       slContents.Add('');
@@ -914,8 +914,8 @@ Begin
       Begin
         E := FCurrentModule.Elements[i];
         sl.Add(strIndent + Format('<div class="Section">%s&nbsp;%s</div>', [
-          IMG(E.ImageIndex, E.Scope), A(E.AsString(True),
-          '#' + E.AsString(True) + '2')]));
+          IMG(E.ImageIndex, E.Scope), A(E.AsString(True, True),
+          '#' + E.AsString(True, True) + '2')]));
       End;
     slHTMLFile[iIns] := sl.Text;
   Finally
@@ -1222,10 +1222,10 @@ begin
   If (E = Nil) Or (E.Comment = Nil) Then
     Exit;
   For i := 0 To E.Comment.TokenCount - 1 Do
-    If E.Comment.TokenType[i] = ttLinkTag Then
-      strComment := strComment + Format('%s ', [ExpandLinkTag(E.Comment.Token[i])])
+    If E.Comment.Tokens[i].TokenType = ttLinkTag Then
+      strComment := strComment + Format('%s ', [ExpandLinkTag(E.Comment.Tokens[i].Token)])
     Else
-      strComment := strComment + N(Format('%s ', [E.Comment.Token[i]]));
+      strComment := strComment + N(Format('%s ', [E.Comment.Tokens[i].Token]));
   strIndent := StringOfChar(#32, 6 * iIndentLevel);
   slContents.Add(Format('%s  <p class="Comment">%s</p>', [strIndent, strComment]));
   If E.Comment.TagCount = 0 Then
@@ -1243,10 +1243,10 @@ begin
                 Begin
                   strTags := '';
                   For k := 0 To E.Comment.Tag[j].TokenCount - 1 Do
-                    If E.Comment.Tag[j].TokenType[k] = ttLinkTag Then
-                      strTags := strTags + Format('%s ', [ExpandLinkTag(E.Comment.Tag[j].Token[k])])
+                    If E.Comment.Tag[j].Tokens[k].TokenType = ttLinkTag Then
+                      strTags := strTags + Format('%s ', [ExpandLinkTag(E.Comment.Tag[j].Tokens[k].Token)])
                     Else
-                      strTags := strTags + Format('%s ', [N(E.Comment.Tag[j].Token[k])]);
+                      strTags := strTags + Format('%s ', [N(E.Comment.Tag[j].Tokens[k].Token)]);
                   slContents.Add(Format('%s    %s', [strIndent, LI('SpecialTag', strTags)]));
                 End;
             slContents.Add(Format('%s  </ul>', [strIndent]));
@@ -1282,11 +1282,11 @@ begin
   strIndent := StringOfChar(#32, 4 * iIndentLevel);
   boolHeader := False;
   boolIncHeader := False;
-  slContents.Add(Format('%s<!-- %s -->', [strIndent, N(Container.AsString(True))]));
+  slContents.Add(Format('%s<!-- %s -->', [strIndent, N(Container.AsString(True, True))]));
   If Container Is TLabelContainer Then
     Begin
-      slContents.Add(strIndent + H(A(Container.AsString(True), '',
-        Container.AsString(True) + IntToStr(FHeaderLevel)), FHeaderLevel,
+      slContents.Add(strIndent + H(A(Container.AsString(True, True), '',
+        Container.AsString(True, True) + IntToStr(FHeaderLevel)), FHeaderLevel,
         Container.ImageIndex, Container.Scope));
       OutputComment(slContents, Container, iIndentLevel);
       Inc(FHeaderLevel);
@@ -1320,7 +1320,7 @@ begin
             strContainerLabel + '.' + Container[i].Identifier)]));
           slContents.Add(strIndent + '        <td>');
           slContents.Add(strIndent + Format('          <pre>%s</pre>', [
-            P(Container[i].AsString(True))]));
+            P(Container[i].AsString(True, True))]));
           OutputComment(slContents, Container[i], iIndentLevel + 1);
           OutputContainers(slContents, Container[i], iIndentLevel + 1,
             strContainerLabel + '.' + Container[i].Identifier);

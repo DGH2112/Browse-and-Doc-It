@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       18 Jan 2009
+  @Date       25 Jan 2009
   @Author     David Hoyle
 
 **)
@@ -32,7 +32,7 @@ Type
     FParamArray: Boolean;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property determines of the parameter is optional or not.
       @precon  None.
@@ -63,7 +63,7 @@ Type
     Constructor Create(MethodType : TMethodType; strName : String;
       AScope : TScope; iLine, iCol : Integer); Override;
     Destructor Destroy; Override;
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property determine if the method has a Exception.Push handler.
       @precon  None.
@@ -112,7 +112,7 @@ Type
   TVBConstant = Class(TGenericConstant)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (** A type to define at upper and lower limits of an array. **)
@@ -129,7 +129,7 @@ Type
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure AddDimension(iLow, iHigh : Integer);
     (**
       This property returns the number of dimensions in the array variable.
@@ -157,7 +157,7 @@ Type
   Public
     Constructor Create(PropertyType : TPropertyType; strName : String;
       AScope : TScope; iLine, iCol : Integer); Reintroduce; Virtual;
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
@@ -165,14 +165,14 @@ Type
   TVBRecordDecl = Class(TGenericTypeDecl)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (** A class to represent types in visual basic. **)
   TVBTypeDecl = Class(TGenericTypeDecl)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (** An enumerate to represent the different module types in visual basic. **)
@@ -182,42 +182,42 @@ Type
   TVBAttribute = Class(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (** A class to represent options. **)
   TVBOption = Class(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (** A class to represent versions **)
   TVBVersion = Class(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (** A class to represent Enumerate Declarations **)
   TVBEnumerateDecl = Class(TGenericTypeDecl)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (** A class to represent Field Values **)
   TVBField = Class(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (** A class to represent VB Enumerate Value  **)
   TVBEnumIdent = Class(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (**
@@ -434,21 +434,23 @@ end;
 
   This method outputs a string presentation of the method.
 
-  @precon  None.
-  @postcon Outputs a string presentation of the method.
+  @precon  None . 
+  @postcon Outputs a string presentation of the method . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBMethod.AsString(boolForDocumentation : Boolean = False): String;
+function TVBMethod.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 
 Var
   i : Integer;
 
 begin
   Result := strMethodType[MethodType] + #32;
-  Result := Result + Identifier;
+  If boolShowIdentifier Then
+    Result := Result + Identifier;
   If Ext <> '' Then
     Result := Result + Format(' Lib %s', [Ext]);
   If Alias <> '' Then
@@ -467,14 +469,16 @@ begin
           Result := Result + #32;
       If boolForDocumentation Then
         Result := Result + #32#32;
-      Result := Result + Parameters[i].AsString(boolForDocumentation);
+      Result := Result + Parameters[i].AsString(boolShowIdentifier,
+        boolForDocumentation);
     End;
   If boolForDocumentation Then
     Result := Result + #13#10;
   Result := Result + ')';
   If (MethodType = mtFunction) And (ReturnType <> Nil) Then
     Begin
-      Result := Result + #32'As'#32 + ReturnType.AsString(boolForDocumentation);
+      Result := Result + #32'As'#32 + ReturnType.AsString(boolShowIdentifier,
+        boolForDocumentation);
     End;
 end;
 
@@ -484,16 +488,18 @@ end;
 
   This method returns a string representation of the visual basic constant.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic constant.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic constant . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBConstant.AsString(boolForDocumentation : Boolean = False): String;
+function TVBConstant.AsString(boolShowIdentifier,
+  boolForDocumentation : Boolean): String;
 begin
-  Result := BuildStringRepresentation(True, boolForDocumentation, 'As',
+  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, 'As',
     BrowseAndDocItOptions.MaxDocOutputWidth);
 End;
 
@@ -537,20 +543,23 @@ end;
 
   This method returns a string representation of the visual basic variable.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic variable.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic variable . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBVar.AsString(boolForDocumentation : Boolean = False): String;
+function TVBVar.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 
 Var
   i: Integer;
 
 begin
-  Result := Identifier;
+  Result := '';
+  If boolShowIdentifier Then
+    Result := Result + Identifier;
   If WithEvents Then
     Result := 'WithEvents' + #32 + Result;
   If Dimensions > 0 Then
@@ -626,16 +635,18 @@ end;
 
 (**
 
-  This methopd returns a string representation of a visual basic property.
+  This method returns a string representation of a visual basic property.
 
-  @precon  None.
-  @postcon Returns a string representation of a visual basic property.
+  @precon  None .
+  @postcon Returns a string representation of a visual basic property .
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TVBProperty.AsString(boolForDocumentation : Boolean = False): String;
+function TVBProperty.AsString(boolShowIdentifier,
+  boolForDocumentation : Boolean): String;
 
 Var
   i : Integer;
@@ -647,7 +658,8 @@ begin
     mtProcedure: Result := Result + 'Let ';
     mtConstructor: Result := Result + 'Set ';
   End;
-  Result := Result + Identifier;
+  If boolShowIdentifier Then
+    Result := Result + Identifier;
   Result := Result + '(';
   For i := 0 To ParameterCount - 1 Do
     Begin
@@ -660,14 +672,16 @@ begin
           Result := Result + #32;
       If boolForDocumentation Then
         Result := Result + #32#32;
-      Result := Result + Parameters[i].AsString(boolForDocumentation);
+      Result := Result + Parameters[i].AsString(boolShowIdentifier,
+        boolForDocumentation);
     End;
   If boolForDocumentation Then
     Result := Result + #13#10;
   Result := Result + ')';
   If (MethodType = mtFunction) And (ReturnType <> Nil) Then
     Begin
-      Result := Result + #32'As'#32 + ReturnType.AsString(boolForDocumentation);
+      Result := Result + #32'As'#32 + ReturnType.AsString(boolShowIdentifier,
+        boolForDocumentation);
     End;
 end;
 
@@ -735,16 +749,20 @@ end;
 
   This method returns a string representation of the visual basic record.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic record.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic record . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBRecordDecl.AsString(boolForDocumentation : Boolean = False): String;
+function TVBRecordDecl.AsString(boolShowIdentifier,
+  boolForDocumentation : Boolean): String;
 begin
-  Result := Format('Type %s', [Identifier]);
+  Result := 'Type';
+  If boolShowIdentifier Then
+    Result := Result + #32 + Identifier;
 end;
 
 { TVBParameter }
@@ -753,14 +771,15 @@ end;
 
   This method returns a string representation of the visual basic parameter.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic parameter.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic parameter . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBParameter.AsString(boolForDocumentation: Boolean): String;
+function TVBParameter.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
   Result := '';
   If Optional Then
@@ -780,8 +799,11 @@ begin
     End;
   If Result <> '' Then
     Result := Result + #32;
-  Result := Result + Identifier + #32 + 'As' + #32 + ParamType.AsString(
-    boolForDocumentation);
+  If boolShowIdentifier Then
+    Result := Result + Identifier;
+  If Result <> '' Then
+    Result := Result + #32'As'#32;
+  Result := Result + ParamType.AsString(boolShowIdentifier, boolForDocumentation);
   If DefaultValue <> '' Then
     Result := Result + #32 + '=' + #32 + DefaultValue;
 end;
@@ -792,14 +814,15 @@ end;
 
   This method returns a string representation of the visual basic return type.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic return type.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic return type . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBTypeDecl.AsString(boolForDocumentation: Boolean): String;
+function TVBTypeDecl.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
   Result := BuildStringRepresentation(False, boolForDocumentation, '',
    BrowseAndDocItOptions.MaxDocOutputWidth);
@@ -812,17 +835,18 @@ end;
 
   This method returns a string representation of the visual basic attribute.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic attribute.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic attribute . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBAttribute.AsString(boolForDocumentation: Boolean): String;
+function TVBAttribute.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
-  Result := BuildStringRepresentation(True, boolForDocumentation, '=',
-    BrowseAndDocItOptions.MaxDocOutputWidth);
+  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
+    '=', BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
 { TVBOption }
@@ -831,21 +855,23 @@ end;
 
   This method returns a string representation of the visual basic option.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic option.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic option . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBOption.AsString(boolForDocumentation: Boolean): String;
+function TVBOption.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
   Result := BuildStringRepresentation(False, boolForDocumentation,
     '', BrowseAndDocItOptions.MaxDocOutputWidth);
-  If Result <> '' Then
-    Result := Identifier + #32 + Result
-  Else
-    Result := Identifier;
+  If boolShowIdentifier Then
+    If Result <> '' Then
+      Result := Identifier + #32 + Result
+    Else
+      Result := Identifier;
 end;
 
 { TVBVersion }
@@ -854,21 +880,23 @@ end;
 
   This method returns a string representation of the visual basic version.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic version.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic version . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBVersion.AsString(boolForDocumentation: Boolean): String;
+function TVBVersion.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
   Result := BuildStringRepresentation(False, boolForDocumentation,
     '', BrowseAndDocItOptions.MaxDocOutputWidth);
-  If Result <> '' Then
-    Result := Identifier + #32 + Result
-  Else
-    Result := Identifier;
+  If boolShowIdentifier Then
+    If Result <> '' Then
+      Result := Identifier + #32 + Result
+    Else
+      Result := Identifier;
 end;
 
 { TVBEnumerateDecl }
@@ -878,17 +906,20 @@ end;
   This method returns a string representation of the visual basic enumerate
   declaration.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic enumerate
-           declaration.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic enumerate 
+           declaration . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBEnumerateDecl.AsString(boolForDocumentation: Boolean): String;
+function TVBEnumerateDecl.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
-  Result := Format('Enum %s', [Identifier]);
+  Result := 'Enum';
+  If boolShowIdentifier Then
+    Result := Result + #32 + Identifier;
 end;
 
 { TVBField }
@@ -897,17 +928,18 @@ end;
 
   This method returns a string representation of the visual basic field.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic field.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic field . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBField.AsString(boolForDocumentation: Boolean): String;
+function TVBField.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
-  Result := BuildStringRepresentation(True, boolForDocumentation, 'As',
-    BrowseAndDocItOptions.MaxDocOutputWidth);
+  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
+    'As', BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
 { TVBEnumIdent }
@@ -917,22 +949,19 @@ end;
   This method returns a string representation of the visual basic enumerate
   identifier.
 
-  @precon  None.
-  @postcon Returns a string representation of the visual basic enumerate
-           identifier.
+  @precon  None . 
+  @postcon Returns a string representation of the visual basic enumerate 
+           identifier . 
 
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String
+  @return  a String              
 
 **)
-function TVBEnumIdent.AsString(boolForDocumentation: Boolean): String;
+function TVBEnumIdent.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
-  Result := BuildStringRepresentation(False, boolForDocumentation, '',
+  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, '=',
     BrowseAndDocItOptions.MaxDocOutputWidth);
-  If Result <> '' Then
-    Result := Identifier + #32 + '=' + #32 + Result
-  Else
-    Result := Identifier;
 end;
 
 (**

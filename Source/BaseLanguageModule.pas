@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    19 Jan 2009
+  @Date    23 Jan 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -365,6 +365,8 @@ Type
     dctMissingFinalComment
   );
 
+  {: @todo TDUnitOptions = (duoDoSomething);}
+
   (** This record refined a pairing of Resource Name and Image Mask Colour for
       the imported images from the Executable File associated with the
       Image Index enumerate. **)
@@ -498,7 +500,7 @@ Type
     Procedure ClearTokens;
     Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
       strDelimiter : String; iMaxWidth : Integer;
-      strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
+      strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?'];
       strNoSpaceAfter : TSymbols = ['(', '[', '{', '.', '^'];
       strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
       boolShowHTML : Boolean = False) : String; Virtual;
@@ -639,7 +641,6 @@ Type
     FImageIndex : TImageIndex;
     FSorted  : Boolean;
     FReferenced : Boolean;
-    FDocumentConflictLabel : TLabelContainer;
     FParent : TElementContainer;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetElementCount : Integer;
@@ -666,11 +667,11 @@ Type
     Function  ReferenceSymbol(AToken : TTokenInfo) : Boolean; Virtual;
     Procedure AddIssue(strMsg : String; AScope : TScope; strMethod : String;
       iLine, iCol : Integer; ErrorType : TErrorType);
-    Procedure AddDocumentConflict(Const Args: Array of TVarRec;
+    Procedure AddDocumentConflict(Const Args: Array of Const;
       iIdentLine, iIdentColumn : Integer; AComment : TComment;
       DocConflictRec : TDocConflictTable);
-    Function  AsString(boolForDocumentation : Boolean = False) : String; Virtual;
-      Abstract;
+    Function  AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
+      Virtual; Abstract;
     Procedure CheckReferences; Virtual;
     Function ReferenceSection(AToken : TTokenInfo; Section: TLabelContainer) : Boolean;
     (**
@@ -749,10 +750,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
     FMsg: String;
     FMethod : String;
-  Public
-    Constructor Create(strMsg : String; AScope : TScope; strMethod : String; iLine,
-      iCol : Integer; AImageIndex : TImageIndex); Reintroduce; Overload;
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     (**
       Returns the exception method of the exception stored.
       @precon  None.
@@ -767,6 +765,10 @@ Type
       @return  a String
     **)
     Property Msg : String Read FMsg;
+  Public
+    Constructor Create(strMsg : String; AScope : TScope; strMethod : String; iLine,
+      iCol : Integer; AImageIndex : TImageIndex); Reintroduce; Overload;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (** This class represents a single identifier with line, col and comment
@@ -803,7 +805,6 @@ Type
       boolArrayOf : Boolean; AType : TGenericTypeDecl; Value : String;
       AScope : TScope; iLine, iCol : Integer); ReIntroduce; Overload;
     Destructor Destroy; Override;
-    Function ParamReturn : String;
     (**
       Returns the parameter modifier : const, var or out.
       @precon  None.
@@ -954,6 +955,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
     FParameters : TObjectList;
     FTypeID : TGenericTypeDecl;
+    function GetQualifiedName: String; Virtual;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetParameterCount : Integer;
     Function GetParameters(iIndex : Integer) : TGenericParameter;
@@ -989,6 +991,13 @@ Type
       @return  a TGenericTypeDecl
     **)
     Property TypeId : TGenericTypeDecl Read FTypeID Write FTypeID;
+    (**
+      This property returns the qualified name of the property.
+      @precon  None.
+      @postcon Returns the qualified name of the property.
+      @return  a String
+    **)
+    Property QualifiedName : String  Read GetQualifiedName;
   End;
 
   (** This is a class to represent a module documentation conflict. **)
@@ -998,12 +1007,12 @@ Type
     FCommentLine   : Integer;
     FCommentColumn : Integer;
   Public
-    Constructor Create(Const Args: Array of TVarRec; iIdentLine,
+    Constructor Create(Const Args: Array of Const; iIdentLine,
       iIdentColumn, iCommentLine, iCommentCol : Integer;
       strDocConflictMsg, strDocConflictDesc : String;
       AImageIndex : TImageIndex); ReIntroduce;
     Destructor Destroy; Override;
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property defines the line where the comment associated with the
       conflict starts.
@@ -1051,7 +1060,6 @@ Type
     FLastComment: TTokenInfo;
     FCommentClass : TCommentClass;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function GetTokenInfo(iIndex : TTokenIndex) : TTokenInfo;
     Function GetToken : TTokenInfo;
     function GetOpTickCountName(iIndex: Integer): String;
     function GetOpTickCountByIndex(iIndex: Integer): Integer;
@@ -1134,20 +1142,10 @@ Type
     Function IfNotDef(strDef : String) : Boolean;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function KeyWords : TKeyWords; Virtual; Abstract;
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure AddToExpression(Container : TElementContainer);
     function IsToken(strToken: String; Container: TElementContainer): Boolean;
     { Properties }
-    (**
-      Returns the token information for the specifically indexed token within
-      the module.
-      @precon  None.
-      @postcon Returns the token information for the specifically indexed token within
-      the module.
-      @param   iIndex as       a TTokenIndex
-      @return  a TTokenInfo
-    **)
-    Property TokenInfo[iIndex : TTokenIndex] : TTokenInfo Read GetTokenInfo;
     (**
       This property returns the tick count time between the 2 named tick counts
       previously stored using the AddTickCount() method.
@@ -1295,10 +1293,10 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetTokenFontInfo(ATokenType  : TBADITokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(ATokenType  : TBADITokenType; ATokenFontInfo : TTokenFontInfo);
+    Procedure LoadSettings;
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    Procedure LoadSettings;
     Procedure SaveSettings;
     (**
       This property contains the basic toggleable options for the application.
@@ -1446,7 +1444,7 @@ Type
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   (** A silent parser abort exception. **)
@@ -1657,6 +1655,8 @@ ResourceString
   (** This is an error message for not enough tokens. **)
   strNotEnoughStrings = 'Not enough strings passed to ErrorAndSeekToken().';
 
+  {----------------------- Documentation Conflict Messages --------------------}
+
   (** This is the tree branch under which module documentation error appear **)
   strModuleDocumentation = 'Module Documentation';
   (** This is a documentation error for a missing module description **)
@@ -1668,7 +1668,7 @@ ResourceString
     'contents of the module. #Example: #(** #  description #  @@Author David Hoyle ' +
     '#  @@Version 1.0 #  @@Date 07/Jan/2006 #**)';
   (** This is a documentation error for a missing documentation date **)
-  strModuleMissingDate = 'This module is missing a documentation date.';
+  strModuleMissingDate = 'This module is missing a documentation date (''%s'').';
   (** This is a documentation error description for a missing documentation
       date **)
   strModuleMissingDateDesc = 'Each module comment required an @@Date tag to ' +
@@ -1829,7 +1829,7 @@ ResourceString
     'furture developers regarding the purpose of the method.';
 
   (** Document conflict message for different number of parameters and tags. **)
-  strMethodDiffParamCount = 'Method ''%s'' has a different parameter count.';
+  strMethodDiffParamCount = 'Method ''%s'' has a different parameter count (%d not %d).';
   (** Document conflict message description for different number of parameters
       and tags. **)
   strMethodDiffParamCountDesc = 'There are a different number of @@param tags ' +
@@ -1840,7 +1840,7 @@ ResourceString
   strMethodUndocumentedParamDesc = 'The specified parameter in the documented ' +
     'method does not have a corresponding @@param tag in the comment header.';
   (** Document conflict message for an incorrect parameter type. **)
-  strMethodIncorrectParamType = 'The parameter type for ''%s'' in method ''%s'' is incorrect.';
+  strMethodIncorrectParamType = 'The parameter type for ''%s'' in method ''%s'' is incorrect (''%s'').';
   (** Document conflict message description for an incorrect parameter type. **)
   strMethodIncorrectParamTypeDesc = 'The type of the specified parameter ' +
     'differents from the type provided in the @@param tag of the method comment.';
@@ -1851,12 +1851,12 @@ ResourceString
   strMethodUndocumentedReturnDesc = 'A methods return type required an ' +
     '@@return tag in the method comment.';
   (** Document conflict message for an incorrect return type. **)
-  strMethodIncorrectReturnType = 'Method ''%s''`s return type is incorrect.';
+  strMethodIncorrectReturnType = 'Method ''%s''`s return type is incorrect (''%s'').';
   (** Document conflict message description for an incorrect return type. **)
   strMethodIncorrectReturnTypeDesc = 'The type of the method return is not the ' +
     'same as the type defined in the method.';
   (** Document conflict message for a return not required. **)
-  strMethodReturnNotRequired = 'Method ''%s''`s return type is not required.';
+  strMethodReturnNotRequired = 'Method ''%s''`s return type is not required (''%s'').';
   (** Document conflict message description for a return not required. **)
   strMethodReturnNotRequiredDesc = 'The type of the method return is not ' +
     'required for this type of method..';
@@ -1919,7 +1919,7 @@ ResourceString
     'furture developers regarding the purpose of the method.';
 
   (** Document conflict message for different number of parameters and tags. **)
-  strPropertyDiffParamCount = 'Property ''%s'' has a different parameter count.';
+  strPropertyDiffParamCount = 'Property ''%s'' has a different parameter count (%d not %d).';
   (** Document conflict message description for different number of parameters
       and tags. **)
   strPropertyDiffParamCountDesc = 'There are a different number of @@param tags ' +
@@ -1930,18 +1930,18 @@ ResourceString
   strPropertyUndocumentedParamDesc = 'The specified parameter in the documented ' +
     'property does not have a corresponding @@param tag in the comment header.';
   (** Document conflict message for an incorrect parameter type. **)
-  strPropertyIncorrectParamType = 'The parameter type for ''%s'' in property ''%s'' is incorrect.';
+  strPropertyIncorrectParamType = 'The parameter type for ''%s'' in property ''%s'' is incorrect (''%s'').';
   (** Document conflict message description for an incorrect parameter type. **)
   strPropertyIncorrectParamTypeDesc = 'The type of the specified parameter ' +
     'differents from the type provided in the @@param tag of the property comment.';
 
   (** Document conflict message for an undocumented return type. **)
-  strPropertyUndocumentedReturn = 'Property ''%s''`s return type is not documented.';
+  strPropertyUndocumentedReturn = 'Property ''%s''`s return type is not documented (''%s'').';
   (** Document conflict message description for an undocumented return type. **)
   strPropertyUndocumentedReturnDesc = 'A property return type required an ' +
     '@@return tag in the property comment.';
   (** Document conflict message for an incorrect return type. **)
-  strPropertyIncorrectReturnType = 'Property ''%s''`s return type is incorrect.';
+  strPropertyIncorrectReturnType = 'Property ''%s''`s return type is incorrect (''%s'').';
   (** Document conflict message description for an incorrect return type. **)
   strPropertyIncorrectReturnTypeDesc = 'The type of the property return is not ' +
     'the same as the type defined in the property.';
@@ -2486,6 +2486,10 @@ Const
     'HTMLEndTag',  'Directive', 'CompilerDirective', 'LinkTag', 'TreeHeader',
     'FileEnd', 'LineContinuation');
 
+  {: @todo strDUnitOptions : Array[Low(TDUnitOptions)..High(TDUnitOptions)] Of String = (
+    'Do Something...'
+  );}
+
 Var
   (** This is a global variable for the Browse and Doc It options that need to
       be available throughout the application. **)
@@ -2520,15 +2524,10 @@ Var
   This function returns true if the given word is in the supplied word list.
   It uses a binary search, so the word lists need to be sorted.
 
-
   @precon  strWord is the word to be searches for in the word list and
-
            strWordList is a static array of words in lowercase and
-
            alphabetical order.
-
   @postcon Returns true if the word is found in the list.
-
 
   @param   strWord     as a String
   @param   strWordList as an Array Of String
@@ -2639,7 +2638,7 @@ end;
 **)
 Function TBaseContainer.BuildStringRepresentation(boolIdentifier,
   boolForDocumentation : Boolean; strDelimiter : String; iMaxWidth : Integer;
-  strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
+  strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?'];
   strNoSpaceAfter : TSymbols = ['(', '[', '{', '.', '^'];
   strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
   boolShowHTML : Boolean = False) : String;
@@ -2655,11 +2654,12 @@ Begin
   If boolIdentifier Then
     Result := Identifier;
   If Length(strDelimiter) > 0 Then
-    Begin
-      If Not (strDelimiter[1] In strNoSpaceBefore) Then
-        Result := Result + #32;
-      Result := Result + strDelimiter;
-    End;
+    If TokenCount > 0 Then
+      Begin
+        If Not (strDelimiter[1] In strNoSpaceBefore) Then
+          Result := Result + #32;
+        Result := Result + strDelimiter;
+      End;
   iLength := Length(Result);
   D := TTokenInfo.Create(strDelimiter, 0, 0, 0, Length(strDelimiter), ttSymbol);
   Try
@@ -2983,7 +2983,7 @@ end;
 function TComment.AsString(iMaxWidth: Integer; boolShowHTML : Boolean): String;
 
 Const
-  strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
+  strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?'];
   strNoSpaceAfter : TSymbols = ['(', '[', '{', '^'];
   strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
 
@@ -3194,12 +3194,25 @@ begin
       LastToken := CurToken;
       If strComment[i] In strWhiteSpace Then
         CurToken := ttWhiteSpace
+      Else If strComment[i] In ['@', '_', 'a'..'z', 'A'..'Z'] Then
+        Begin
+          If (LastToken = ttNumber) And (strComment[i] In ['A'..'F', 'a'..'f']) Then
+            CurToken := ttNumber
+          Else
+            CurToken := ttIdentifier;
+        End
+      Else If strComment[i] In ['0'..'9'] Then
+        Begin
+          CurToken := ttNumber;
+          If LastToken = ttIdentifier Then
+            CurToken := ttIdentifier;
+        End
       Else If strComment[i] In strLineEnd Then
         CurToken := ttLineEnd
       Else If strComment[i] In [#33..#128] - ['a'..'z', 'A'..'Z', '@'] Then
         CurToken := ttSymbol
       Else
-        CurToken := ttIdentifier;
+        CurToken := ttUnknown;
 
       If ((CurToken <> LastToken) And (BlockType = btNone)) Or
         (strComment[i] = '<') Then
@@ -3207,7 +3220,10 @@ begin
           SetLength(strToken, iTokenLen);
           If iTokenLen > 0 Then
             If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
-              AddToken(strToken, LastToken);
+              Begin
+                AddToken(strToken, LastToken);
+                LastToken := CurToken;
+              End;
           iTokenLen := 1;
           SetLength(strToken, iTokenCapacity);
           strToken[iTokenLen] := strComment[i];
@@ -3426,19 +3442,19 @@ end;
   @postcon Adds a specific documentation conflict to the Docuemntation
            conflict collection.
 
-  @param   Args            as an Array Of TVarRec constant
+  @param   Args            as an Array Of Const
   @param   iIdentLine      as an Integer
   @param   iIdentColumn    as an Integer
   @param   AComment        as a TComment
   @param   DocConflictRec  as a TDocConflictTable
 
 **)
-procedure TElementContainer.AddDocumentConflict(Const Args: Array of TVarRec;
+procedure TElementContainer.AddDocumentConflict(Const Args: Array of Const;
   iIdentLine, iIdentColumn : Integer; AComment : TComment;
   DocConflictRec : TDocConflictTable);
 
 Var
-  E, I, R : TElementContainer;
+  E, I, R, D : TElementContainer;
   iL, iC : Integer;
   iIcon : TImageIndex;
 
@@ -3457,14 +3473,11 @@ begin
     iIcon := iiDocConflictItem;
   End;
   R := FindRoot;
-  E := R.FDocumentConflictLabel;
-  If E = Nil Then
-    Begin
-      R.FDocumentConflictLabel := R.Add(
-        TLabelContainer.Create(strDocumentationConflicts, scGlobal, 0, 0,
-        iiDocConflictFolder, Nil)) As TLabelContainer;
-      E := R.FDocumentConflictLabel;
-    End;
+  D := R.FindElement(strDocumentationConflicts);
+  If D = Nil Then
+    D := R.Add(TLabelContainer.Create(strDocumentationConflicts, scGlobal, 0,
+      0, iiDocConflictFolder, Nil)) As TLabelContainer;
+  E := D;
   I := E.FindElement(DocConflictRec.FCategory);
   If I = Nil Then
     Begin
@@ -4050,28 +4063,6 @@ begin
   inherited;
 end;
 
-(**
-
-  This method returns the type information for the parameter only.
-
-  @precon  None.
-  @postcon Returns the type information for the parameter only.
-
-  @return  a String
-
-**)
-function TGenericParameter.ParamReturn: String;
-
-Var
-  i : Integer;
-
-begin
-  Result := '';
-  If ParamType <> Nil Then
-    For i := 0 To ParamType.TokenCount - 1 Do
-      Result := Result + ParamType.Tokens[i].Token;
-end;
-
 (** --------------------------------------------------------------------------
 
   TProperty Methods
@@ -4166,6 +4157,21 @@ end;
 function TGenericProperty.GetParameters(iIndex: Integer): TGenericParameter;
 begin
   Result := FParameters[iIndex] As TGenericParameter;
+end;
+
+(**
+
+  This is a getter method for the QualifiedName property.
+
+  @precon  None.
+  @postcon Returns the qualified name of the property.
+
+  @return  a String
+
+**)
+function TGenericProperty.GetQualifiedName: String;
+begin
+  Result := Identifier;
 end;
 
 (** --------------------------------------------------------------------------
@@ -4300,6 +4306,7 @@ var
   i: Integer;
 
 Begin
+  Result := '';
   For i := 0 To FClassNames.Count - 1 Do
     Begin
       If Result <> '' Then
@@ -4383,20 +4390,17 @@ End;
 
 (**
 
+  This is a getter method for the AsString property.
 
-  This is a getter method for the AsString property. 
+  @precon  None . 
+  @postcon Override the default method and returns the Document Error Message . 
 
-
-  @precon  None. 
-
-  @postcon Override the default method and returns the Document Error Message. 
-
-
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
   @return  a String              
 
 **)
-Function TDocIssue.AsString(boolForDocumentation : Boolean): String;
+Function TDocIssue.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 
 begin
   Result := FMsg;
@@ -4413,7 +4417,7 @@ end;
   @precon  None.
   @postcon Initialises the Conflict class.
 
-  @param   Args               as an Array Of TVarRec constant
+  @param   Args               as an Array Of Const
   @param   iIdentLine         as an Integer
   @param   iIdentColumn       as an Integer
   @param   iCommentLine       as an Integer
@@ -4423,7 +4427,7 @@ end;
   @param   AImageIndex        as a TImageIndex
 
 **)
-constructor TDocumentConflict.Create(Const Args: Array of TVarRec; iIdentLine,
+constructor TDocumentConflict.Create(Const Args: Array of Const; iIdentLine,
       iIdentColumn, iCommentLine, iCommentCol : Integer;
       strDocConflictMsg, strDocConflictDesc : String; AImageIndex : TImageIndex);
 
@@ -4453,20 +4457,18 @@ end;
 
 (**
 
+  This is a getter method for the AsString property.
 
-  This is a getter method for the AsString property. 
+  @precon  None .
+  @postcon Return the document conflict message .
 
-
-  @precon  None. 
-
-  @postcon Return the document conflict message. 
-
-
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String              
+  @return  a String
 
 **)
-Function TDocumentConflict.AsString(boolForDocumentation : Boolean): String;
+Function TDocumentConflict.AsString(boolShowIdentifier,
+  boolForDocumentation : Boolean): String;
 
 begin
   Result := FMessage;
@@ -4596,7 +4598,7 @@ end;
 Procedure TBaseLanguageModule.AppendToLastToken(strToken : String);
 
 Begin
-  TokenInfo[TokenCount - 1].Append(strToken);
+  Tokens[TokenCount - 1].Append(strToken);
 End;
 
 (**
@@ -4671,22 +4673,19 @@ End;
 
 (**
 
+  This is a getter method for the AsString property.
 
-  This is a getter method for the AsString property. 
+  @precon  None.
+  @postcon Override and default GetAsString method and returns the name of the
+           module.
 
-
-  @precon  None. 
-
-  @postcon Override and default GetAsString method and returns the name of the 
-
-           module. 
-
-
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-Function TBaseLanguageModule.AsString(boolForDocumentation : Boolean) : String;
+Function TBaseLanguageModule.AsString(boolShowIdentifier,
+     boolForDocumentation : Boolean) : String;
 
 begin
   Result := ExtractFileName(Name);
@@ -4779,19 +4778,11 @@ End;
 **)
 function TBaseLanguageModule.GetBytes: Int64;
 
-Var
-  rec : TSearchRec;
-  i : Integer;
-
 begin
   Result := 0;
-  i := FindFirst(FFileName, faAnyFile, rec);
-  Try
-    If i = 0 Then
-      Result := rec.Size;
-  Finally
-    SysUtils.FindClose(rec);
-  End;
+  If TokenCount > 0 Then
+    Result := (Tokens[TokenCount - 1] As TTokenInfo).BufferPos +
+      (Tokens[TokenCount - 1] As TTokenInfo).Length - 1;
 end;
 
 (**
@@ -4836,10 +4827,12 @@ begin
   iFinish := 0;
   For i := 0 To FTickList.Count - 1 Do
     Begin
-      If AnsiComparetext(FTickList[i], strStart) = 0 Then iStart := i;
-      If AnsiComparetext(FTickList[i], strFinish) = 0 Then iFinish := i;
+      If AnsiComparetext(FTickList[i], strStart) = 0 Then
+        iStart := i;
+      If AnsiComparetext(FTickList[i], strFinish) = 0 Then
+        iFinish := i;
     End;
-  If iStart * iFinish > 0 Then
+  If (iStart > -1) And (iFinish > -1) Then
     Result := Integer(FTickList.Objects[iFinish]) - Integer(FTickList.Objects[iStart]);
 end;
 
@@ -4888,23 +4881,6 @@ end;
 function TBaseLanguageModule.GetOpTickCounts: Integer;
 begin
   Result := FTickList.Count;
-end;
-
-(**
-
-  This is a getter method for the TokenInfo property.
-
-  @precon  iIndex is the index of the token info object required.
-  @postcon Returns the token info object requested.
-
-  @param   iIndex as a TTokenIndex
-  @return  a TTokenInfo
-
-**)
-function TBaseLanguageModule.GetTokenInfo(iIndex: TTokenIndex): TTokenInfo;
-
-begin
-  Result := Tokens[iIndex] As TTokenInfo;
 end;
 
 (**
@@ -5051,7 +5027,7 @@ begin
             FLastComment := Token;
           End;
       End;
-    If Not (TokenInfo[FTokenIndex].TokenType In [ttComment, ttCompilerDirective])
+    If Not (Tokens[FTokenIndex].TokenType In [ttComment, ttCompilerDirective])
       And (iSkip = 0) Then
       FPreviousTokenIndex := FTokenIndex;
     NextToken;
@@ -5113,7 +5089,7 @@ Begin
   Else
     Begin
       Dec(FTokenIndex);
-      While (FTokenIndex > 0) And (TokenInfo[FTokenIndex].TokenType In [ttComment,
+      While (FTokenIndex > 0) And (Tokens[FTokenIndex].TokenType In [ttComment,
         ttCompilerDirective]) Do
         Dec(FTokenIndex);
       If FTokenIndex < 0 Then
@@ -5163,7 +5139,8 @@ Begin
         Begin
           i := Comment.FindTag('date');
           If (i = -1) Or (Comment.Tag[i].TokenCount = 0) Then
-            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, Comment,
+            AddDocumentConflict([FormatDateTime('dd mmm yyyy', Now)],
+              ModuleNameLine, ModuleNameCol, Comment,
               DocConflictTable[dctModuleMissingDate])
           Else
             Begin
@@ -5180,10 +5157,10 @@ Begin
               Try
                 dtDate := ConvertDate(strDate);
                 If Int(dtDate) <> Int(dtFileDate) Then
-                  AddDocumentConflict([strDate, FormatDateTime('dd/mmm/yyyy', dtFileDate)],
+                  AddDocumentConflict([strDate, FormatDateTime('dd mmm yyyy', dtFileDate)],
                     Tag.Line, Tag.Column, Comment, DocConflictTable[dctModuleIncorrectDate]);
               Except
-                AddDocumentConflict([strDate, FormatDateTime('dd/mmm/yyyy', dtFileDate)],
+                AddDocumentConflict([strDate, FormatDateTime('dd mmm yyyy', dtFileDate)],
                   Tag.Line, Tag.Column, Comment, DocConflictTable[dctModuleCheckDateError]);
               End
             End;
@@ -5345,6 +5322,7 @@ Procedure TGenericMethodDecl.CheckMethodParamCount;
 
 Var
   i, j, k : Integer;
+  boolMissing : Boolean;
 
 Begin
   j := 0;
@@ -5352,19 +5330,20 @@ Begin
     If LowerCase(Comment.Tag[i].TagName) = 'param' Then
       Inc(j);
   k := 0;
+  boolMissing := True;
   For i := 0 To Comment.TagCount - 1 Do
     If LowerCase(Comment.Tag[i].TagName) = 'precon' Then
       Begin
         Inc(k);
         If doShowMethodMissingPreCons In BrowseAndDocItOptions.Options Then
-          If Comment.Tag[i].TokenCount = 0 Then
-            AddDocumentConflict([QualifiedName], Comment.Tag[i].Line,
-              Comment.Tag[i].Column, Comment,
-              DocConflictTable[dctMethodPreconNotDocumented]);
+          boolMissing := boolMissing And (Comment.Tag[i].TokenCount = 0);
       End;
+  If boolMissing Then
+    AddDocumentConflict([QualifiedName], Comment.Line, Comment.Column, Comment,
+      DocConflictTable[dctMethodPreconNotDocumented]);
   If doShowMethodDiffParamCount In BrowseAndDocItOptions.Options Then
     If (ParameterCount <> j) Then
-      AddDocumentConflict([QualifiedName], Line, Column, Comment,
+      AddDocumentConflict([QualifiedName, ParameterCount, j], Line, Column, Comment,
         DocConflictTable[dctMethodDiffParamCount]);
   If doShowMethodMissingPreCons In BrowseAndDocItOptions.Options Then
     If k < 1 Then
@@ -5416,18 +5395,16 @@ Begin
         With Comment Do
           Begin
             strType := '';
-            If Tag[iFound].TokenCount > 3 Then   //: @bug Language specific
-              If AnsiCompareText(Tag[iFound].Tokens[3].Token, 'ARRAY') = 0 Then
-                Begin
-                  If Tag[iFound].TokenCount > 5 Then
-                    strType := Tag[iFound].Tokens[5].Token;
-                End Else
-                  strType := Tag[iFound].Tokens[3].Token;
-            strParam := Parameters[i].ParamReturn;
+            If Tag[iFound].TokenCount > 3 Then
+              strType := Tag[iFound].Tokens[3].Token;
+            If Parameters[i].ParamType <> Nil Then
+              strParam := Parameters[i].ParamType.AsString(False, False)
+            Else
+              strParam := '';
             If doShowMethodIncorrectParamType In BrowseAndDocItOptions.Options Then
               If Not (LowerCase(strType) = Lowercase(strParam)) Then
-                AddDocumentConflict([Parameters[i].Identifier, QualifiedName],
-                  Tag[iFound].Line, Tag[iFound].Column, Comment,
+                AddDocumentConflict([Parameters[i].Identifier, QualifiedName,
+                  strParam], Tag[iFound].Line, Tag[iFound].Column, Comment,
                   DocConflictTable[dctMethodIncorrectParamType]);
           End;
     End;
@@ -5481,7 +5458,7 @@ Begin
         Begin
           If doShowMethodIncorrectReturnType In BrowseAndDocItOptions.Options Then
             If ((Comment.Tag[iFound].TokenCount < 2) Or
-              (AnsiCompareText(ReturnType.AsString, Comment.Tag[iFound].Tokens[1].Token) <> 0)) Then
+              (AnsiCompareText(ReturnType.AsString(False, False), Comment.Tag[iFound].Tokens[1].Token) <> 0)) Then
               AddDocumentConflict([QualifiedName], Comment.Tag[iFound].Line,
                 Comment.Tag[iFound].Column, Comment,
                 DocConflictTable[dctMethodIncorrectReturntype]);
@@ -5639,17 +5616,15 @@ Begin
           Begin
             strType := '';
             If Tag[iFound].TokenCount > 3 Then
-              If AnsiCompareText(Tag[iFound].Tokens[3].Token, 'ARRAY') = 0 Then
-                Begin
-                  If Tag[iFound].TokenCount > 5 Then
-                    strType := Tag[iFound].Tokens[5].Token;
-                End Else
-                  strType := Tag[iFound].Tokens[3].Token;
-            strParam := Parameters[i].ParamReturn;
+              strType := Tag[iFound].Tokens[3].Token;
+            If Parameters[i].ParamType <> Nil Then
+              strParam := Parameters[i].ParamType.AsString(False, False)
+            Else
+              strParam := '';
             If doShowPropertyIncorrectParamType In BrowseAndDocItOptions.Options Then
               If Not ((LowerCase(strType) = Lowercase(strParam))) Then
-                AddDocumentConflict([Parameters[i].Identifier, Identifier],
-                  Tag[iFound].Line, Tag[iFound].Column, Comment,
+                AddDocumentConflict([Parameters[i].Identifier, QualifiedName,
+                  strParam], Tag[iFound].Line, Tag[iFound].Column, Comment,
                   DocConflictTable[dctPropertyIncorrectParamType]);
         End;
     End;
@@ -5703,7 +5678,7 @@ Begin
       Begin
         If doShowPropertyIncorrectReturnType In BrowseAndDocItOptions.Options Then
           If ((Comment.Tag[iFound].TokenCount < 2) Or
-            (AnsiCompareText(TypeId.AsString, Comment.Tag[iFound].Tokens[1].Token) <> 0)) Then
+            (AnsiCompareText(TypeId.AsString(False, False), Comment.Tag[iFound].Tokens[1].Token) <> 0)) Then
             AddDocumentConflict([Identifier], Comment.Tag[iFound].Line,
               Comment.Tag[iFound].Column, Comment,
               DocConflictTable[dctPropertyIncorrectReturnType]);
@@ -6001,20 +5976,18 @@ End;
 
 (**
 
-
   This is a getter method for the AsString property.
 
+  @precon  None .
+  @postcon Returns the name of the label as a string .
 
-  @precon  None.
-
-  @postcon Returns the name of the label as a string.
-
-
+  @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
   @return  a String
 
 **)
-function TLabelContainer.AsString(boolForDocumentation : Boolean): String;
+function TLabelContainer.AsString(boolShowIdentifier,
+  boolForDocumentation : Boolean): String;
 begin
   Result := Name;
 end;

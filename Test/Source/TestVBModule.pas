@@ -16,16 +16,6 @@ uses
   Controls, Windows, TestBaseLanguageModule;
 
 type
-  TTestBaseLanguageModule = Class Helper For TBaseLanguageModule
-    Function HeadingCount(strHeading : String) : Integer;
-    Function CurrentToken : TTokenInfo;
-    Function FirstError : String;
-  End;
-
-  TTestMemoryStream = Class Helper For TMemoryStream
-    Procedure LoadBufferFromString(strCode : String);
-  End;
-
   // Test methods for class TVBParameter
 
   TestTVBParameter = class(TTestCase)
@@ -106,47 +96,6 @@ implementation
 Uses
   ModuleDispatcher;
 
-{ TTestBaseLanguageModule }
-
-function TTestBaseLanguageModule.CurrentToken: TTokenInfo;
-begin
-  Result := Token;
-end;
-
-function TTestBaseLanguageModule.FirstError: String;
-
-Var
-  E : TElementContainer;
-
-begin
-  Result := '';
-  E := FindElement(strErrors);
-  If E <> Nil Then
-    Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString]), #13#10,
-      '(line-end)', [rfReplaceAll]);
-end;
-
-function TTestBaseLanguageModule.HeadingCount(strHeading : String): Integer;
-
-var
-  E: TElementContainer;
-
-begin
-  Result := 0;
-  E := FindElement(strHeading);
-  If E <> Nil Then
-    Result := E.ElementCount;
-end;
-
-{ TTestMemoryStream }
-
-procedure TTestMemoryStream.LoadBufferFromString(strCode: String);
-begin
-  Clear;
-  WriteBuffer(strCode[1], Length(strCode));
-  Position := 0;
-end;
-
 procedure TestTVBParameter.TestAsString;
 
 Var
@@ -159,7 +108,7 @@ begin
     ST.AddToken('Double');
     P := TVBParameter.Create(pamNone, 'Identifier', False, ST, '', scNone, 10, 12);
     Try
-      CheckEquals('Identifier As Double', P.AsString(False));
+      CheckEquals('Identifier As Double', P.AsString(True, False));
     Finally
       P.Free;
     End;
@@ -173,7 +122,7 @@ begin
     ST.AddToken('Integer');
     P := TVBParameter.Create(pamVar, 'Identifier', False, ST, '', scNone, 10, 12);
     Try
-      CheckEquals('ByRef Identifier As MSForms.Integer', P.AsString(False));
+      CheckEquals('ByRef Identifier As MSForms.Integer', P.AsString(True, False));
     Finally
       P.Free;
     End;
@@ -185,7 +134,7 @@ begin
     ST.AddToken('Integer');
     P := TVBParameter.Create(pamConst, 'Identifier', False, ST, '', scNone, 10, 12);
     Try
-      CheckEquals('ByVal Identifier As Integer', P.AsString(False));
+      CheckEquals('ByVal Identifier As Integer', P.AsString(True, False));
     Finally
       P.Free;
     End;
@@ -197,7 +146,7 @@ begin
     ST.AddToken('Integer');
     P := TVBParameter.Create(pamConst, 'Identifier', False, ST, '0', scNone, 10, 12);
     Try
-      CheckEquals('ByVal Identifier As Integer = 0', P.AsString(False));
+      CheckEquals('ByVal Identifier As Integer = 0', P.AsString(True, False));
     Finally
       P.Free;
     End;
@@ -209,7 +158,7 @@ begin
     ST.AddToken('String');
     P := TVBParameter.Create(pamConst, 'Identifier', False, ST, '""', scNone, 10, 12);
     Try
-      CheckEquals('ByVal Identifier As String = ""', P.AsString(False));
+      CheckEquals('ByVal Identifier As String = ""', P.AsString(True, False));
     Finally
       P.Free;
     End;
@@ -221,7 +170,7 @@ begin
     ST.AddToken('String');
     P := TVBParameter.Create(pamConst, 'Identifier', False, ST, '"Hello"', scNone, 10, 12);
     Try
-      CheckEquals('ByVal Identifier As String = "Hello"', P.AsString(False));
+      CheckEquals('ByVal Identifier As String = "Hello"', P.AsString(True, False));
     Finally
       P.Free;
     End;
@@ -239,8 +188,8 @@ Var
 begin
   M := TVBMethod.Create(mtProcedure, 'MyMethod', scPrivate, 10 ,12);
   Try
-    CheckEquals('Sub MyMethod()', M.AsString(False));
-    CheckEquals('Sub MyMethod('#13#10')', M.AsString(True));
+    CheckEquals('Sub MyMethod()', M.AsString(True, False));
+    CheckEquals('Sub MyMethod('#13#10')', M.AsString(True, True));
   Finally
     M.Free;
   End;
@@ -248,8 +197,8 @@ begin
   Try
     M.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     M.ReturnType.AddToken('String');
-    CheckEquals('Function MyMethod() As String', M.AsString(False));
-    CheckEquals('Function MyMethod('#13#10') As String', M.AsString(True));
+    CheckEquals('Function MyMethod() As String', M.AsString(True, False));
+    CheckEquals('Function MyMethod('#13#10') As String', M.AsString(True, True));
   Finally
     M.Free;
   End;
@@ -259,8 +208,8 @@ begin
     M.ReturnType.AddToken('MSForms');
     M.ReturnType.AddToken('.');
     M.ReturnType.AddToken('Integer');
-    CheckEquals('Function MyMethod() As MSForms.Integer', M.AsString(False));
-    CheckEquals('Function MyMethod('#13#10') As MSForms.Integer', M.AsString(True));
+    CheckEquals('Function MyMethod() As MSForms.Integer', M.AsString(True, False));
+    CheckEquals('Function MyMethod('#13#10') As MSForms.Integer', M.AsString(true, True));
   Finally
     M.Free;
   End;
@@ -277,8 +226,8 @@ begin
     M.ReturnType.AddToken('MSForms');
     M.ReturnType.AddToken('.');
     M.ReturnType.AddToken('Integer');
-    CheckEquals('Function MyMethod(Ident1 As String) As MSForms.Integer', M.AsString(False));
-    CheckEquals('Function MyMethod('#13#10'  Ident1 As String'#13#10') As MSForms.Integer', M.AsString(True));
+    CheckEquals('Function MyMethod(Ident1 As String) As MSForms.Integer', M.AsString(True, False));
+    CheckEquals('Function MyMethod('#13#10'  Ident1 As String'#13#10') As MSForms.Integer', M.AsString(True, True));
   Finally
     M.Free;
   End;
@@ -295,8 +244,8 @@ begin
     M.ReturnType.AddToken('MSForms');
     M.ReturnType.AddToken('.');
     M.ReturnType.AddToken('Integer');
-    CheckEquals('Function MyMethod(Ident1 As String = "Hello") As MSForms.Integer', M.AsString(False));
-    CheckEquals('Function MyMethod('#13#10'  Ident1 As String = "Hello"'#13#10') As MSForms.Integer', M.AsString(True));
+    CheckEquals('Function MyMethod(Ident1 As String = "Hello") As MSForms.Integer', M.AsString(True, False));
+    CheckEquals('Function MyMethod('#13#10'  Ident1 As String = "Hello"'#13#10') As MSForms.Integer', M.AsString(True, True));
   Finally
     M.Free;
   End;
@@ -322,8 +271,8 @@ begin
     M.ReturnType.AddToken('MSForms');
     M.ReturnType.AddToken('.');
     M.ReturnType.AddToken('Integer');
-    CheckEquals('Function MyMethod(ByRef Ident1 As MSForms.Integer, ByVal Ident2 As Integer) As MSForms.Integer', M.AsString(False));
-    CheckEquals('Function MyMethod('#13#10'  ByRef Ident1 As MSForms.Integer,'#13#10'  ByVal Ident2 As Integer'#13#10') As MSForms.Integer', M.AsString(True));
+    CheckEquals('Function MyMethod(ByRef Ident1 As MSForms.Integer, ByVal Ident2 As Integer) As MSForms.Integer', M.AsString(True, False));
+    CheckEquals('Function MyMethod('#13#10'  ByRef Ident1 As MSForms.Integer,'#13#10'  ByVal Ident2 As Integer'#13#10') As MSForms.Integer', M.AsString(True, True));
   Finally
     M.Free;
   End;
@@ -341,8 +290,8 @@ begin
     M.ReturnType.AddToken('MSForms');
     M.ReturnType.AddToken('.');
     M.ReturnType.AddToken('Integer');
-    CheckEquals('Function MyMethod Lib "Kernal32" (Ident1 As String) As MSForms.Integer', M.AsString(False));
-    CheckEquals('Function MyMethod Lib "Kernal32" ('#13#10'  Ident1 As String'#13#10') As MSForms.Integer', M.AsString(True));
+    CheckEquals('Function MyMethod Lib "Kernal32" (Ident1 As String) As MSForms.Integer', M.AsString(True, False));
+    CheckEquals('Function MyMethod Lib "Kernal32" ('#13#10'  Ident1 As String'#13#10') As MSForms.Integer', M.AsString(True, True));
   Finally
     M.Free;
   End;
@@ -357,7 +306,7 @@ begin
   C := TVBConstant.Create('Identifier', scPublic, 10, 12, iiPublicConstant, Nil);
   Try
     C.AddToken('Integer');
-    CheckEquals('Identifier As Integer', C.AsString(False));
+    CheckEquals('Identifier As Integer', C.AsString(True, False));
   Finally
     C.Free;
   End;
@@ -366,7 +315,7 @@ begin
     C.AddToken('MSForms');
     C.AddToken('.');
     C.AddToken('Integer');
-    CheckEquals('Identifier As MSForms.Integer', C.AsString(False));
+    CheckEquals('Identifier As MSForms.Integer', C.AsString(True, False));
   Finally
     C.Free;
   End;
@@ -377,7 +326,7 @@ begin
     C.AddToken('Integer');
     C.AddToken('=');
     C.AddToken('44');
-    CheckEquals('Identifier As MSForms.Integer = 44', C.AsString(False));
+    CheckEquals('Identifier As MSForms.Integer = 44', C.AsString(True, False));
   Finally
     C.Free;
   End;
@@ -392,7 +341,7 @@ begin
   V := TVBVar.Create('Identifier', scPrivate, 10, 12, iiPublicVariable, Nil);
   Try
     V.AddToken('String');
-    CheckEquals('Identifier As String', V.AsString(False));
+    CheckEquals('Identifier As String', V.AsString(True, False));
   Finally
     V.Free;
   End;
@@ -401,7 +350,7 @@ begin
     V.AddToken('MSForms');
     V.AddToken('.');
     V.AddToken('String');
-    CheckEquals('Identifier As MSForms.String', V.AsString(False));
+    CheckEquals('Identifier As MSForms.String', V.AsString(True, False));
   Finally
     V.Free;
   End;
@@ -409,7 +358,7 @@ begin
   Try
     V.AddToken('String');
     V.WithEvents := True;
-    CheckEquals('WithEvents Identifier As String', V.AsString(False));
+    CheckEquals('WithEvents Identifier As String', V.AsString(True, False));
   Finally
     V.Free;
   End;
@@ -417,7 +366,7 @@ begin
   Try
     V.AddDimension(-1, 0);
     V.AddToken('String');
-    CheckEquals('Identifier() As String', V.AsString(False));
+    CheckEquals('Identifier() As String', V.AsString(True, False));
   Finally
     V.Free;
   End;
@@ -427,7 +376,7 @@ begin
     V.AddToken('MSForms');
     V.AddToken('.');
     V.AddToken('String');
-    CheckEquals('Identifier(1 to 10) As MSForms.String', V.AsString(False));
+    CheckEquals('Identifier(1 to 10) As MSForms.String', V.AsString(True, False));
   Finally
     V.Free;
   End;
@@ -436,7 +385,7 @@ begin
     V.AddDimension(1, 2);
     V.AddDimension(0, 4);
     V.AddToken('String');
-    CheckEquals('Identifier(1 to 2, 0 to 4) As String', V.AsString(False));
+    CheckEquals('Identifier(1 to 2, 0 to 4) As String', V.AsString(True, False));
   Finally
     V.Free;
   End;
@@ -451,15 +400,15 @@ var
 begin
   P := TVBProperty.Create(ptLet, 'MyProperty', scPrivate, 10 ,12);
   Try
-    CheckEquals('Property Let MyProperty()', P.AsString(False));
-    CheckEquals('Property Let MyProperty('#13#10')', P.AsString(True));
+    CheckEquals('Property Let MyProperty()', P.AsString(True, False));
+    CheckEquals('Property Let MyProperty('#13#10')', P.AsString(True, True));
   Finally
     P.Free;
   End;
   P := TVBProperty.Create(ptSet, 'MyProperty', scPrivate, 10 ,12);
   Try
-    CheckEquals('Property Set MyProperty()', P.AsString(False));
-    CheckEquals('Property Set MyProperty('#13#10')', P.AsString(True));
+    CheckEquals('Property Set MyProperty()', P.AsString(True, False));
+    CheckEquals('Property Set MyProperty('#13#10')', P.AsString(True, True));
   Finally
     P.Free;
   End;
@@ -467,8 +416,8 @@ begin
   Try
     P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     P.ReturnType.AddToken('String');
-    CheckEquals('Property Get MyProperty() As String', P.AsString(False));
-    CheckEquals('Property Get MyProperty('#13#10') As String', P.AsString(True));
+    CheckEquals('Property Get MyProperty() As String', P.AsString(True, False));
+    CheckEquals('Property Get MyProperty('#13#10') As String', P.AsString(True, True));
   Finally
     P.Free;
   End;
@@ -478,8 +427,8 @@ begin
     P.ReturnType.AddToken('MSForms');
     P.ReturnType.AddToken('.');
     P.ReturnType.AddToken('Integer');
-    CheckEquals('Property Get MyProperty() As MSForms.Integer', P.AsString(False));
-    CheckEquals('Property Get MyProperty('#13#10') As MSForms.Integer', P.AsString(True));
+    CheckEquals('Property Get MyProperty() As MSForms.Integer', P.AsString(True, False));
+    CheckEquals('Property Get MyProperty('#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
     P.Free;
   End;
@@ -496,8 +445,8 @@ begin
     P.ReturnType.AddToken('MSForms');
     P.ReturnType.AddToken('.');
     P.ReturnType.AddToken('Integer');
-    CheckEquals('Property Get MyProperty(Ident1 As String) As MSForms.Integer', P.AsString(False));
-    CheckEquals('Property Get MyProperty('#13#10'  Ident1 As String'#13#10') As MSForms.Integer', P.AsString(True));
+    CheckEquals('Property Get MyProperty(Ident1 As String) As MSForms.Integer', P.AsString(True, False));
+    CheckEquals('Property Get MyProperty('#13#10'  Ident1 As String'#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
     P.Free;
   End;
@@ -514,8 +463,8 @@ begin
     P.ReturnType.AddToken('MSForms');
     P.ReturnType.AddToken('.');
     P.ReturnType.AddToken('Integer');
-    CheckEquals('Property Get MyProperty(ByRef Ident1 As String = "") As MSForms.Integer', P.AsString(False));
-    CheckEquals('Property Get MyProperty('#13#10'  ByRef Ident1 As String = ""'#13#10') As MSForms.Integer', P.AsString(True));
+    CheckEquals('Property Get MyProperty(ByRef Ident1 As String = "") As MSForms.Integer', P.AsString(True, False));
+    CheckEquals('Property Get MyProperty('#13#10'  ByRef Ident1 As String = ""'#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
     P.Free;
   End;
@@ -541,8 +490,8 @@ begin
     P.ReturnType.AddToken('MSForms');
     P.ReturnType.AddToken('.');
     P.ReturnType.AddToken('Integer');
-    CheckEquals('Property Get MyProperty(ByRef Ident1 As MSForms.Integer, ByVal Ident2 As Integer) As MSForms.Integer', P.AsString(False));
-    CheckEquals('Property Get MyProperty('#13#10'  ByRef Ident1 As MSForms.Integer,'#13#10'  ByVal Ident2 As Integer'#13#10') As MSForms.Integer', P.AsString(True));
+    CheckEquals('Property Get MyProperty(ByRef Ident1 As MSForms.Integer, ByVal Ident2 As Integer) As MSForms.Integer', P.AsString(True, False));
+    CheckEquals('Property Get MyProperty('#13#10'  ByRef Ident1 As MSForms.Integer,'#13#10'  ByVal Ident2 As Integer'#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
     P.Free;
   End;
@@ -556,7 +505,7 @@ Var
 begin
   R := TVBRecordDecl.Create('Identifier', scProtected, 12, 13, iiPublicRecord, Nil);
   Try
-    CheckEquals('Type Identifier', R.AsString(False));
+    CheckEquals('Type Identifier', R.AsString(True, False));
   Finally
     R.Free;
   End;
@@ -571,7 +520,7 @@ begin
   T := TVBTypeDecl.Create('temp', scNone, 0, 0, iiNone, Nil);
   Try
     T.AddToken('MSForm');
-    CheckEquals('MSForm', T.AsString(False));
+    CheckEquals('MSForm', T.AsString(True, False));
   Finally
     T.Free;
   End;
@@ -580,7 +529,7 @@ begin
     T.AddToken('MSForm');
     T.AddToken('.');
     T.AddToken('Integer');
-    CheckEquals('MSForm.Integer', T.AsString(False));
+    CheckEquals('MSForm.Integer', T.AsString(True, False));
   Finally
     T.Free;
   End;
@@ -616,11 +565,11 @@ begin
       CheckEquals(scNone, M.FindElement(strAttributesLabel).Elements[4].Scope);
       CheckEquals(scNone, M.FindElement(strAttributesLabel).Elements[5].Scope);
       // Remember these are now sorted...
-      CheckEquals('VB_Creatable = False', M.FindElement(strAttributesLabel).Elements[1].AsString(False));
-      CheckEquals('VB_Exposed = False', M.FindElement(strAttributesLabel).Elements[2].AsString(False));
-      CheckEquals('VB_GlobalNameSpace = False', M.FindElement(strAttributesLabel).Elements[3].AsString(False));
-      CheckEquals('VB_Name = "frmWireRunWizard"', M.FindElement(strAttributesLabel).Elements[4].AsString(False));
-      CheckEquals('VB_PredeclaredId = True', M.FindElement(strAttributesLabel).Elements[5].AsString(False));
+      CheckEquals('VB_Creatable = False', M.FindElement(strAttributesLabel).Elements[1].AsString(True, False));
+      CheckEquals('VB_Exposed = False', M.FindElement(strAttributesLabel).Elements[2].AsString(True, False));
+      CheckEquals('VB_GlobalNameSpace = False', M.FindElement(strAttributesLabel).Elements[3].AsString(True, False));
+      CheckEquals('VB_Name = "frmWireRunWizard"', M.FindElement(strAttributesLabel).Elements[4].AsString(True, False));
+      CheckEquals('VB_PredeclaredId = True', M.FindElement(strAttributesLabel).Elements[5].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -677,10 +626,10 @@ begin
       CheckEquals(scNone, M.FindElement(strAttributesLabel).Elements[3].Scope);
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[2].Scope);
 
-      CheckEquals('VB_GlobalNameSpace = False', M.FindElement(strAttributesLabel).Elements[3].AsString(False));
-      CheckEquals('VERSION 5.00', M.FindElement(strVersionLabel).Elements[1].AsString(False));
-      CheckEquals('ClientTop = 435', M.FindElement(strVersionLabel).Elements[1].Elements[4].AsString(False));
-      CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[2].AsString(False));
+      CheckEquals('VB_GlobalNameSpace = False', M.FindElement(strAttributesLabel).Elements[3].AsString(True, False));
+      CheckEquals('VERSION 5.00', M.FindElement(strVersionLabel).Elements[1].AsString(True, False));
+      CheckEquals('ClientTop = 435', M.FindElement(strVersionLabel).Elements[1].Elements[4].AsString(True, False));
+      CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[2].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -705,7 +654,7 @@ begin
 
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[2].Scope);
 
-      CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[2].AsString(False));
+      CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[2].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -733,7 +682,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strConstantsLabel));
       CheckEquals(scPublic, M.FindElement(strConstantsLabel).Elements[1].Scope);
-      CheckEquals('iLong As Long', M.FindElement(strConstantsLabel).Elements[1].AsString(False));
+      CheckEquals('iLong As Long', M.FindElement(strConstantsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -746,7 +695,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strConstantsLabel));
       CheckEquals(scPrivate, M.FindElement(strConstantsLabel).Elements[1].Scope);
-      CheckEquals('iLong As Long', M.FindElement(strConstantsLabel).Elements[1].AsString(False));
+      CheckEquals('iLong As Long', M.FindElement(strConstantsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -759,7 +708,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strConstantsLabel));
       CheckEquals(scPublic, M.FindElement(strConstantsLabel).Elements[1].Scope);
-      CheckEquals('iLong As Long', M.FindElement(strConstantsLabel).Elements[1].AsString(False));
+      CheckEquals('iLong As Long', M.FindElement(strConstantsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -772,7 +721,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strConstantsLabel));
       CheckEquals(scPublic, M.FindElement(strConstantsLabel).Elements[1].Scope);
-      CheckEquals('strText As String = "Hello"', M.FindElement(strConstantsLabel).Elements[1].AsString(False));
+      CheckEquals('strText As String = "Hello"', M.FindElement(strConstantsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -785,7 +734,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strConstantsLabel));
       CheckEquals(scPrivate, M.FindElement(strConstantsLabel).Elements[1].Scope);
-      CheckEquals('iLong As Long = 123', M.FindElement(strConstantsLabel).Elements[1].AsString(False));
+      CheckEquals('iLong As Long = 123', M.FindElement(strConstantsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -798,7 +747,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strConstantsLabel));
       CheckEquals(scPublic, M.FindElement(strConstantsLabel).Elements[1].Scope);
-      CheckEquals('iLong As Long = &HFF00', M.FindElement(strConstantsLabel).Elements[1].AsString(False));
+      CheckEquals('iLong As Long = &HFF00', M.FindElement(strConstantsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -815,9 +764,9 @@ begin
       CheckEquals(scPublic, M.FindElement(strConstantsLabel).Elements[1].Scope);
       CheckEquals(scPrivate, M.FindElement(strConstantsLabel).Elements[2].Scope);
       CheckEquals(scPublic, M.FindElement(strConstantsLabel).Elements[3].Scope);
-      CheckEquals('iLong1 As Long = &HFF00', M.FindElement(strConstantsLabel).Elements[1].AsString(False));
-      CheckEquals('iLong2 As Long = 123', M.FindElement(strConstantsLabel).Elements[2].AsString(False));
-      CheckEquals('iLong3 As Long', M.FindElement(strConstantsLabel).Elements[3].AsString(False));
+      CheckEquals('iLong1 As Long = &HFF00', M.FindElement(strConstantsLabel).Elements[1].AsString(True, False));
+      CheckEquals('iLong2 As Long = 123', M.FindElement(strConstantsLabel).Elements[2].AsString(True, False));
+      CheckEquals('iLong3 As Long', M.FindElement(strConstantsLabel).Elements[3].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -845,7 +794,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strDeclaresLabel));
       CheckEquals(scPublic, M.FindElement(strDeclaresLabel).Elements[1].Scope);
-      CheckEquals('Sub Test Lib "Kernal32" ()', M.FindElement(strDeclaresLabel).Elements[1].AsString(False));
+      CheckEquals('Sub Test Lib "Kernal32" ()', M.FindElement(strDeclaresLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -858,7 +807,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strDeclaresLabel));
       CheckEquals(scPublic, M.FindElement(strDeclaresLabel).Elements[1].Scope);
-      CheckEquals('Sub Test Lib "Kernal32" Alias "TestA" ()', M.FindElement(strDeclaresLabel).Elements[1].AsString(False));
+      CheckEquals('Sub Test Lib "Kernal32" Alias "TestA" ()', M.FindElement(strDeclaresLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -871,7 +820,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strDeclaresLabel));
       CheckEquals(scPublic, M.FindElement(strDeclaresLabel).Elements[1].Scope);
-      CheckEquals('Sub Test Lib "Kernal32" Alias "TestA" (i As Long)', M.FindElement(strDeclaresLabel).Elements[1].AsString(False));
+      CheckEquals('Sub Test Lib "Kernal32" Alias "TestA" (i As Long)', M.FindElement(strDeclaresLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -886,8 +835,8 @@ begin
       CheckEquals(2, M.HeadingCount(strDeclaresLabel));
       CheckEquals(scPublic, M.FindElement(strDeclaresLabel).Elements[1].Scope);
       CheckEquals(scPrivate, M.FindElement(strDeclaresLabel).Elements[2].Scope);
-      CheckEquals('Sub Test1 Lib "Kernal32" Alias "TestA" ()', M.FindElement(strDeclaresLabel).Elements[1].AsString(False));
-      CheckEquals('Sub Test2 Lib "Kernal32" Alias "TestA" (i As Long)', M.FindElement(strDeclaresLabel).Elements[2].AsString(False));
+      CheckEquals('Sub Test1 Lib "Kernal32" Alias "TestA" ()', M.FindElement(strDeclaresLabel).Elements[1].AsString(True, False));
+      CheckEquals('Sub Test2 Lib "Kernal32" Alias "TestA" (i As Long)', M.FindElement(strDeclaresLabel).Elements[2].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -900,7 +849,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strDeclaresLabel));
       CheckEquals(scPublic, M.FindElement(strDeclaresLabel).Elements[1].Scope);
-      CheckEquals('Function Test Lib "Kernal32" () As String', M.FindElement(strDeclaresLabel).Elements[1].AsString(False));
+      CheckEquals('Function Test Lib "Kernal32" () As String', M.FindElement(strDeclaresLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -913,7 +862,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strDeclaresLabel));
       CheckEquals(scPublic, M.FindElement(strDeclaresLabel).Elements[1].Scope);
-      CheckEquals('Function Test Lib "Kernal32" Alias "TestA" () As String', M.FindElement(strDeclaresLabel).Elements[1].AsString(False));
+      CheckEquals('Function Test Lib "Kernal32" Alias "TestA" () As String', M.FindElement(strDeclaresLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -926,7 +875,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strDeclaresLabel));
       CheckEquals(scPublic, M.FindElement(strDeclaresLabel).Elements[1].Scope);
-      CheckEquals('Function Test Lib "Kernal32" Alias "TestA" (i As Long) As String', M.FindElement(strDeclaresLabel).Elements[1].AsString(False));
+      CheckEquals('Function Test Lib "Kernal32" Alias "TestA" (i As Long) As String', M.FindElement(strDeclaresLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -941,8 +890,8 @@ begin
       CheckEquals(2, M.HeadingCount(strDeclaresLabel));
       CheckEquals(scPublic, M.FindElement(strDeclaresLabel).Elements[1].Scope);
       CheckEquals(scPrivate, M.FindElement(strDeclaresLabel).Elements[2].Scope);
-      CheckEquals('Function Test1 Lib "Kernal32" Alias "TestA" () As Long', M.FindElement(strDeclaresLabel).Elements[1].AsString(False));
-      CheckEquals('Function Test2 Lib "Kernal32" Alias "TestA" (i As Long) As String', M.FindElement(strDeclaresLabel).Elements[2].AsString(False));
+      CheckEquals('Function Test1 Lib "Kernal32" Alias "TestA" () As Long', M.FindElement(strDeclaresLabel).Elements[1].AsString(True, False));
+      CheckEquals('Function Test2 Lib "Kernal32" Alias "TestA" (i As Long) As String', M.FindElement(strDeclaresLabel).Elements[2].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -973,9 +922,9 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strTypesLabel));
       CheckEquals(scPublic, M.FindElement(strTypesLabel).Elements[1].Scope);
-      CheckEquals('Enum THello', M.FindElement(strTypesLabel).Elements[1].AsString(False));
-      CheckEquals('FID = 1', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(False));
-      CheckEquals('FName = 2', M.FindElement(strTypesLabel).Elements[1].Elements[2].AsString(False));
+      CheckEquals('Enum THello', M.FindElement(strTypesLabel).Elements[1].AsString(True, False));
+      CheckEquals('FID = 1', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(True, False));
+      CheckEquals('FName = 2', M.FindElement(strTypesLabel).Elements[1].Elements[2].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -991,9 +940,9 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strTypesLabel));
       CheckEquals(scPrivate, M.FindElement(strTypesLabel).Elements[1].Scope);
-      CheckEquals('Enum THello', M.FindElement(strTypesLabel).Elements[1].AsString(False));
-      CheckEquals('FID', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(False));
-      CheckEquals('FName', M.FindElement(strTypesLabel).Elements[1].Elements[2].AsString(False));
+      CheckEquals('Enum THello', M.FindElement(strTypesLabel).Elements[1].AsString(True, False));
+      CheckEquals('FID', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(True, False));
+      CheckEquals('FName', M.FindElement(strTypesLabel).Elements[1].Elements[2].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1022,7 +971,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Function Test() As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Function Test() As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1036,7 +985,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scPrivate, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Function Test(i As long) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Function Test(i As long) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1050,7 +999,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scFriend, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Function Test(i As long) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Function Test(i As long) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1064,7 +1013,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Function Test(Optional i As long = 0) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Function Test(Optional i As long = 0) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1078,7 +1027,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Function Test(i As msforms.long, str As String) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Function Test(i As msforms.long, str As String) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1092,7 +1041,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Function Test(ParamArray i As long) As MSForms.Integer', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Function Test(ParamArray i As long) As MSForms.Integer', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1112,9 +1061,9 @@ begin
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
       CheckEquals(scPrivate, M.FindElement(strImplementedMethodsLabel).Elements[2].Scope);
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[3].Scope);
-      CheckEquals('Function Test1(i As msforms.long, str As String) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
-      CheckEquals('Function Test2(i As msforms.long) As Long', M.FindElement(strImplementedMethodsLabel).Elements[2].AsString(False));
-      CheckEquals('Function Test3(Optional i As Long = 0) As Long', M.FindElement(strImplementedMethodsLabel).Elements[3].AsString(False));
+      CheckEquals('Function Test1(i As msforms.long, str As String) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
+      CheckEquals('Function Test2(i As msforms.long) As Long', M.FindElement(strImplementedMethodsLabel).Elements[2].AsString(True, False));
+      CheckEquals('Function Test3(Optional i As Long = 0) As Long', M.FindElement(strImplementedMethodsLabel).Elements[3].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1142,7 +1091,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strOptionsLabel));
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[1].Scope);
-      CheckEquals('Base 1', M.FindElement(strOptionsLabel).Elements[1].AsString(False));
+      CheckEquals('Base 1', M.FindElement(strOptionsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1155,7 +1104,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strOptionsLabel));
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[1].Scope);
-      CheckEquals('Base 0', M.FindElement(strOptionsLabel).Elements[1].AsString(False));
+      CheckEquals('Base 0', M.FindElement(strOptionsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1168,7 +1117,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strOptionsLabel));
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[1].Scope);
-      CheckEquals('Compare Binary', M.FindElement(strOptionsLabel).Elements[1].AsString(False));
+      CheckEquals('Compare Binary', M.FindElement(strOptionsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1181,7 +1130,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strOptionsLabel));
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[1].Scope);
-      CheckEquals('Compare Database', M.FindElement(strOptionsLabel).Elements[1].AsString(False));
+      CheckEquals('Compare Database', M.FindElement(strOptionsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1194,7 +1143,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strOptionsLabel));
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[1].Scope);
-      CheckEquals('Compare Text', M.FindElement(strOptionsLabel).Elements[1].AsString(False));
+      CheckEquals('Compare Text', M.FindElement(strOptionsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1207,7 +1156,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strOptionsLabel));
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[1].Scope);
-      CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[1].AsString(False));
+      CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1220,7 +1169,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strOptionsLabel));
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[1].Scope);
-      CheckEquals('Private Module', M.FindElement(strOptionsLabel).Elements[1].AsString(False));
+      CheckEquals('Private Module', M.FindElement(strOptionsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1237,9 +1186,9 @@ begin
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[1].Scope);
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[2].Scope);
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[3].Scope);
-      CheckEquals('Compare Text', M.FindElement(strOptionsLabel).Elements[1].AsString(False));
-      CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[2].AsString(False));
-      CheckEquals('Private Module', M.FindElement(strOptionsLabel).Elements[3].AsString(False));
+      CheckEquals('Compare Text', M.FindElement(strOptionsLabel).Elements[1].AsString(True, False));
+      CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[2].AsString(True, False));
+      CheckEquals('Private Module', M.FindElement(strOptionsLabel).Elements[3].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1268,7 +1217,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strPropertiesLabel));
       CheckEquals(scPublic, M.FindElement(strPropertiesLabel).Elements[1].Scope);
-      CheckEquals('Property Get Test() As String', M.FindElement(strPropertiesLabel).Elements[1].AsString(False));
+      CheckEquals('Property Get Test() As String', M.FindElement(strPropertiesLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1282,7 +1231,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strPropertiesLabel));
       CheckEquals(scPrivate, M.FindElement(strPropertiesLabel).Elements[1].Scope);
-      CheckEquals('Property Let Test(i As Long)', M.FindElement(strPropertiesLabel).Elements[1].AsString(False));
+      CheckEquals('Property Let Test(i As Long)', M.FindElement(strPropertiesLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1296,7 +1245,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strPropertiesLabel));
       CheckEquals(scFriend, M.FindElement(strPropertiesLabel).Elements[1].Scope);
-      CheckEquals('Property Let Test(i As Long)', M.FindElement(strPropertiesLabel).Elements[1].AsString(False));
+      CheckEquals('Property Let Test(i As Long)', M.FindElement(strPropertiesLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1310,7 +1259,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strPropertiesLabel));
       CheckEquals(scPublic, M.FindElement(strPropertiesLabel).Elements[1].Scope);
-      CheckEquals('Property Set Test(Obj As TObject)', M.FindElement(strPropertiesLabel).Elements[1].AsString(False));
+      CheckEquals('Property Set Test(Obj As TObject)', M.FindElement(strPropertiesLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1327,8 +1276,8 @@ begin
       CheckEquals(2, M.HeadingCount(strPropertiesLabel));
       CheckEquals(scPrivate, M.FindElement(strPropertiesLabel).Elements[1].Scope);
       CheckEquals(scPublic, M.FindElement(strPropertiesLabel).Elements[2].Scope);
-      CheckEquals('Property Let Test1(i As Long)', M.FindElement(strPropertiesLabel).Elements[1].AsString(False));
-      CheckEquals('Property Set Test2(Obj As TObject)', M.FindElement(strPropertiesLabel).Elements[2].AsString(False));
+      CheckEquals('Property Let Test1(i As Long)', M.FindElement(strPropertiesLabel).Elements[1].AsString(True, False));
+      CheckEquals('Property Set Test2(Obj As TObject)', M.FindElement(strPropertiesLabel).Elements[2].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1359,9 +1308,9 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strTypesLabel));
       CheckEquals(scPublic, M.FindElement(strTypesLabel).Elements[1].Scope);
-      CheckEquals('Type THello', M.FindElement(strTypesLabel).Elements[1].AsString(False));
-      CheckEquals('FID As Long', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(False));
-      CheckEquals('FName As String', M.FindElement(strTypesLabel).Elements[1].Elements[2].AsString(False));
+      CheckEquals('Type THello', M.FindElement(strTypesLabel).Elements[1].AsString(True, False));
+      CheckEquals('FID As Long', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(True, False));
+      CheckEquals('FName As String', M.FindElement(strTypesLabel).Elements[1].Elements[2].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1377,9 +1326,9 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strTypesLabel));
       CheckEquals(scPrivate, M.FindElement(strTypesLabel).Elements[1].Scope);
-      CheckEquals('Type THello', M.FindElement(strTypesLabel).Elements[1].AsString(False));
-      CheckEquals('FID As Long', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(False));
-      CheckEquals('FName As String', M.FindElement(strTypesLabel).Elements[1].Elements[2].AsString(False));
+      CheckEquals('Type THello', M.FindElement(strTypesLabel).Elements[1].AsString(True, False));
+      CheckEquals('FID As Long', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(True, False));
+      CheckEquals('FName As String', M.FindElement(strTypesLabel).Elements[1].Elements[2].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1408,7 +1357,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Sub Test()', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Sub Test()', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1422,7 +1371,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scPrivate, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Sub Test(i As long)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Sub Test(i As long)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1436,7 +1385,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scFriend, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Sub Test(i As long)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Sub Test(i As long)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1450,7 +1399,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Sub Test(Optional i As long = 0)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Sub Test(Optional i As long = 0)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1464,7 +1413,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Sub Test(i As msforms.long, str As String)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Sub Test(i As msforms.long, str As String)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1478,7 +1427,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strImplementedMethodsLabel));
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
-      CheckEquals('Sub Test(ParamArray i As long)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
+      CheckEquals('Sub Test(ParamArray i As long)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1498,9 +1447,9 @@ begin
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[1].Scope);
       CheckEquals(scPrivate, M.FindElement(strImplementedMethodsLabel).Elements[2].Scope);
       CheckEquals(scPublic, M.FindElement(strImplementedMethodsLabel).Elements[3].Scope);
-      CheckEquals('Sub Test1(i As msforms.long, str As String)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(False));
-      CheckEquals('Sub Test2(i As msforms.long)', M.FindElement(strImplementedMethodsLabel).Elements[2].AsString(False));
-      CheckEquals('Sub Test3(Optional i As Long = 0)', M.FindElement(strImplementedMethodsLabel).Elements[3].AsString(False));
+      CheckEquals('Sub Test1(i As msforms.long, str As String)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
+      CheckEquals('Sub Test2(i As msforms.long)', M.FindElement(strImplementedMethodsLabel).Elements[2].AsString(True, False));
+      CheckEquals('Sub Test3(Optional i As Long = 0)', M.FindElement(strImplementedMethodsLabel).Elements[3].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1528,7 +1477,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVarsLabel));
       CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[1].Scope);
-      CheckEquals('strText As String', M.FindElement(strVarsLabel).Elements[1].AsString(False));
+      CheckEquals('strText As String', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1541,7 +1490,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVarsLabel));
       CheckEquals(scPrivate, M.FindElement(strVarsLabel).Elements[1].Scope);
-      CheckEquals('strText As String', M.FindElement(strVarsLabel).Elements[1].AsString(False));
+      CheckEquals('strText As String', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1554,7 +1503,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVarsLabel));
       CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[1].Scope);
-      CheckEquals('strText As String', M.FindElement(strVarsLabel).Elements[1].AsString(False));
+      CheckEquals('strText As String', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1567,7 +1516,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVarsLabel));
       CheckEquals(scPrivate, M.FindElement(strVarsLabel).Elements[1].Scope);
-      CheckEquals('strText() As String', M.FindElement(strVarsLabel).Elements[1].AsString(False));
+      CheckEquals('strText() As String', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1580,7 +1529,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVarsLabel));
       CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[1].Scope);
-      CheckEquals('strText(1 to 10) As String', M.FindElement(strVarsLabel).Elements[1].AsString(False));
+      CheckEquals('strText(1 to 10) As String', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1593,7 +1542,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVarsLabel));
       CheckEquals(scPrivate, M.FindElement(strVarsLabel).Elements[1].Scope);
-      CheckEquals('strText(1 to 10, 1 to 2) As String', M.FindElement(strVarsLabel).Elements[1].AsString(False));
+      CheckEquals('strText(1 to 10, 1 to 2) As String', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1606,7 +1555,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVarsLabel));
       CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[1].Scope);
-      CheckEquals('strText(1 to 10, 1 to 2) As MSForms.Integer', M.FindElement(strVarsLabel).Elements[1].AsString(False));
+      CheckEquals('strText(1 to 10, 1 to 2) As MSForms.Integer', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1619,7 +1568,7 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVarsLabel));
       CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[1].Scope);
-      CheckEquals('WithEvents strText As Integer', M.FindElement(strVarsLabel).Elements[1].AsString(False));
+      CheckEquals('WithEvents strText As Integer', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1636,9 +1585,9 @@ begin
       CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[1].Scope);
       CheckEquals(scPrivate, M.FindElement(strVarsLabel).Elements[2].Scope);
       CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[3].Scope);
-      CheckEquals('strText1 As Integer', M.FindElement(strVarsLabel).Elements[1].AsString(False));
-      CheckEquals('strText2 As String', M.FindElement(strVarsLabel).Elements[2].AsString(False));
-      CheckEquals('strText3 As Double', M.FindElement(strVarsLabel).Elements[3].AsString(False));
+      CheckEquals('strText1 As Integer', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
+      CheckEquals('strText2 As String', M.FindElement(strVarsLabel).Elements[2].AsString(True, False));
+      CheckEquals('strText3 As Double', M.FindElement(strVarsLabel).Elements[3].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1669,8 +1618,8 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVersionLabel));
       CheckEquals(scNone, M.FindElement(strVersionLabel).Elements[1].Scope);
-      CheckEquals('VERSION 1.0 CLASS', M.FindElement(strVersionLabel).Elements[1].AsString(False));
-      CheckEquals('Multiuse = - 1', M.FindElement(strVersionLabel).Elements[1].Elements[1].AsString(False));
+      CheckEquals('VERSION 1.0 CLASS', M.FindElement(strVersionLabel).Elements[1].AsString(True, False));
+      CheckEquals('Multiuse = - 1', M.FindElement(strVersionLabel).Elements[1].Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1692,14 +1641,14 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVersionLabel));
       CheckEquals(scNone, M.FindElement(strVersionLabel).Elements[1].Scope);
-      CheckEquals('VERSION 5.00', M.FindElement(strVersionLabel).Elements[1].AsString(False));
-      CheckEquals('Caption = "Wire Run Wizard"', M.FindElement(strVersionLabel).Elements[1].Elements[1].AsString(False));
-      CheckEquals('ClientHeight = 4620', M.FindElement(strVersionLabel).Elements[1].Elements[2].AsString(False));
-      CheckEquals('ClientLeft = 45', M.FindElement(strVersionLabel).Elements[1].Elements[3].AsString(False));
-      CheckEquals('ClientTop = 435', M.FindElement(strVersionLabel).Elements[1].Elements[4].AsString(False));
-      CheckEquals('ClientWidth = 6180', M.FindElement(strVersionLabel).Elements[1].Elements[5].AsString(False));
-      CheckEquals('OleObjectBlob = "frmWireRunWizard.frx" : 0000', M.FindElement(strVersionLabel).Elements[1].Elements[6].AsString(False));
-      CheckEquals('StartUpPosition = 1', M.FindElement(strVersionLabel).Elements[1].Elements[7].AsString(False));
+      CheckEquals('VERSION 5.00', M.FindElement(strVersionLabel).Elements[1].AsString(True, False));
+      CheckEquals('Caption = "Wire Run Wizard"', M.FindElement(strVersionLabel).Elements[1].Elements[1].AsString(True, False));
+      CheckEquals('ClientHeight = 4620', M.FindElement(strVersionLabel).Elements[1].Elements[2].AsString(True, False));
+      CheckEquals('ClientLeft = 45', M.FindElement(strVersionLabel).Elements[1].Elements[3].AsString(True, False));
+      CheckEquals('ClientTop = 435', M.FindElement(strVersionLabel).Elements[1].Elements[4].AsString(True, False));
+      CheckEquals('ClientWidth = 6180', M.FindElement(strVersionLabel).Elements[1].Elements[5].AsString(True, False));
+      CheckEquals('OleObjectBlob = "frmWireRunWizard.frx" : 0000', M.FindElement(strVersionLabel).Elements[1].Elements[6].AsString(True, False));
+      CheckEquals('StartUpPosition = 1', M.FindElement(strVersionLabel).Elements[1].Elements[7].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1710,13 +1659,13 @@ end;
 
 initialization
   // Register any test cases with the test runner
-  RegisterTest(TestTVBParameter.Suite);
-  RegisterTest(TestTVBMethod.Suite);
-  RegisterTest(TestTVBConstant.Suite);
-  RegisterTest(TestTVBVar.Suite);
-  RegisterTest(TestTVBProperty.Suite);
-  RegisterTest(TestTVBRecordDecl.Suite);
-  RegisterTest(TestTVBTypeDecl.Suite);
-  RegisterTest(TestTVBModule.Suite);
-end.
+  RegisterTest('VB Module Tests', TestTVBParameter.Suite);
+  RegisterTest('VB Module Tests', TestTVBMethod.Suite);
+  RegisterTest('VB Module Tests', TestTVBConstant.Suite);
+  RegisterTest('VB Module Tests', TestTVBVar.Suite);
+  RegisterTest('VB Module Tests', TestTVBProperty.Suite);
+  RegisterTest('VB Module Tests', TestTVBRecordDecl.Suite);
+  RegisterTest('VB Module Tests', TestTVBTypeDecl.Suite);
+  RegisterTest('VB Module Tests', TestTVBModule.Suite);
+End.
 

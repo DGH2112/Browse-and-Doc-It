@@ -15,6 +15,20 @@ uses
   TestFramework, Graphics, SysUtils, Classes, BaseLanguageModule, Contnrs;
 
 type
+  TElementContainerHelper = Class Helper for TElementContainer
+    Function FirstError : String;
+    Function DocConflict(iConflict : Integer) : String;
+    Procedure DeleteDocumentConflicts;
+  End;
+
+  TBaseLanguageModuleHelper = Class Helper For TBaseLanguageModule
+    Function HeadingCount(strHeading : String) : Integer;
+    Function CurrentToken : TTokenInfo;
+  End;
+
+  TTestMemoryStream = Class Helper For TMemoryStream
+    Procedure LoadBufferFromString(strCode : String);
+  End;
 
   TExtendedTestCase = Class(TTestCase)
   Strict Private
@@ -76,12 +90,12 @@ type
 
   TTestElementContainer = Class(TElementContainer)
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   TTestIdent = Class(TIdent)
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   TestTElementContainer = class(TExtendedTestCase)
@@ -134,7 +148,7 @@ type
 
   TTestGenericTypeDecl = Class(TGenericTypeDecl)
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   // Test methods for class TGenericTypeDecl
@@ -152,7 +166,7 @@ type
 
   TTestGenericConstant = Class(TGenericConstant)
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   // Test methods for class TGenericConstant
@@ -170,7 +184,7 @@ type
 
   TTestGenericVariable = Class(TGenericVariable)
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   // Test methods for class TGenericVariable
@@ -188,7 +202,7 @@ type
 
   TTestGenericParameter = Class(TGenericParameter)
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   // Test methods for class TGenericParameter
@@ -203,12 +217,15 @@ type
     procedure TearDown; override;
   published
     procedure TestCreate;
-    procedure TestParamReturn;
+    Procedure TestParamModifier;
+    Procedure TestArrayOf;
+    Procedure TestParamType;
+    Procedure TestDefaultValue;
   end;
 
   TTestGenericMethodDecl = Class(TGenericMethodDecl)
   Public
-    Function AsString(boolForDocumentation : Boolean = False) : String; Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
   // Test methods for class TGenericMethodDecl
@@ -223,12 +240,204 @@ type
     Procedure TestCreate;
     procedure TestAddParameter;
     procedure TestCheckDocumentation;
+    Procedure TestMethodType;
+    Procedure TestClassNames;
+    Procedure TestParameterCount;
+    Procedure TestParameters;
+    Procedure TestReturnType;
+    Procedure TestMsg;
+    Procedure TestExt;
+    Procedure TestClassMethod;
+    Procedure TestQualifiedName;
+    Procedure TestAlias;
+    Procedure TestForwardDecl;
+  end;
+
+  TTestGenericProperty = Class(TGenericProperty)
+  Public
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+  End;
+
+  // Test methods for class TGenericProperty
+
+  TestTGenericProperty = class(TExtendedTestCase)
+  strict private
+    FGenericProperty: TGenericProperty;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    Procedure TestCreate;
+    procedure TestAddParameter;
+    procedure TestCheckDocumentation;
+    Procedure TestParameterCount;
+    Procedure TestParameters;
+    Procedure TestTypeId;
+  end;
+
+  // Test methods for class TDocumentConflict
+
+  TestTDocumentConflict = class(TExtendedTestCase)
+  strict private
+    FDocumentConflict: TDocumentConflict;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    Procedure TestCreate;
+    procedure TestAsString;
+    Procedure TestCommentLine;
+    Procedure TestCommentColumn;
+  end;
+
+  // Test methods for class TLabelContainer
+
+  TestTLabelContainer = class(TExtendedTestCase)
+  strict private
+    FLabelContainer: TLabelContainer;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    Procedure TestCreate;
+    procedure TestAsString;
+  end;
+
+  TTestBaseLanguageModule = Class(TBaseLanguageModule)
+  Public
+    Property CompilerDefines;
+    Function GetComment(CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment; Override;
+    procedure ProcessCompilerDirective(var iSkip : Integer); Override;
+    Function KeyWords : TKeyWords; Override;
+    Property BodyComments;
+  End;
+
+  // Test methods for class TBaseLanguageModule
+
+  TestTBaseLanguageModule = class(TTestCase)
+  strict private
+    FStream : TMemoryStream;
+    FBaseLanguageModule: TTestBaseLanguageModule;
+  public
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    procedure TestCreate;
+    Procedure TestAddTickCount;
+    Procedure TestAddDef;
+    Procedure TestDeleteDef;
+    Procedure TestIfDef;
+    Procedure TestIfNotDef;
+    Procedure TestCheckDocumentation;
+    Procedure TestAsString;
+    Procedure TestAddToExpression;
+    Procedure TestIsToken;
+    Procedure TestOpTickCount;
+    Procedure TestOpTickCounts;
+    Procedure TestOpTickCountByIndex;
+    Procedure TestOpTickCountName;
+    Procedure TestModuleName;
+    Procedure TestBodyComment;
+    Procedure TestBodyCommentCount;
+    Procedure TestModuleNameLine;
+    Procedure TestModuleNameCol;
+    Procedure TestFileName;
+    Procedure TestModified;
+    Procedure TestCompilerConditionStack;
+    Procedure TestBytes;
+    Procedure TestLines;
   end;
 
 implementation
 
 Uses
   Windows;
+
+{ TTestBaseLanguageModule }
+
+function TBaseLanguageModuleHelper.CurrentToken: TTokenInfo;
+begin
+  Result := Token;
+end;
+
+procedure TElementContainerHelper.DeleteDocumentConflicts;
+
+Var
+  i : Integer;
+
+begin
+  For i := ElementCount DownTo 1 Do
+    If Elements[i].AsString(True, False) = strDocumentationConflicts Then
+      DeleteElement(i);
+end;
+
+function TElementContainerHelper.DocConflict(iConflict : Integer): String;
+
+Var
+  E : TElementContainer;
+
+begin
+  Result := '(No Documentation Conflicts)';
+  E := FindElement(strDocumentationConflicts);
+  If (E <> Nil) And (E.ElementCount > 0) Then
+    Begin
+      E := E.Elements[1];
+      If E.ElementCount >= iConflict Then
+        Begin
+          E := E.Elements[iConflict];
+          Result := Format('%d) %s', [iConflict, E.AsString(True, False)]);
+        End;
+    End;
+end;
+
+function TElementContainerHelper.FirstError: String;
+
+Var
+  E : TElementContainer;
+
+begin
+  Result := '';
+  E := FindElement(strErrors);
+  If E <> Nil Then
+    Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
+      #13#10, '(line-end)', [rfReplaceAll]);
+end;
+
+function TBaseLanguageModuleHelper.HeadingCount(strHeading : String): Integer;
+
+var
+  E: TElementContainer;
+
+begin
+  Result := 0;
+  E := FindElement(strHeading);
+  If E <> Nil Then
+    Result := E.ElementCount;
+end;
+
+{ TTestBaseLanguageModule }
+
+function TTestBaseLanguageModule.GetComment(CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
+begin
+  Result := Nil;
+end;
+
+function TTestBaseLanguageModule.KeyWords: TKeyWords;
+begin
+end;
+
+procedure TTestBaseLanguageModule.ProcessCompilerDirective(var iSkip: Integer);
+begin
+end;
+
+{ TTestMemoryStream }
+
+procedure TTestMemoryStream.LoadBufferFromString(strCode: String);
+begin
+  Clear;
+  WriteBuffer(strCode[1], Length(strCode));
+  Position := 0;
+end;
 
 { TExtendedTestCase }
 
@@ -436,7 +645,7 @@ Const
     '  This method does something <b>wonderful</b>.'#13#10 +
     ''#13#10 +
     '  @todo  Requires <e>implementing</e>.'#13#10 +
-    '  @see   Something interesting.'#13#10 +
+    '  @see   Something1 interesting.'#13#10 +
     '';
 
 var
@@ -466,7 +675,7 @@ begin
     CheckEquals('Requires implementing.', ReturnValue.Tag[0].AsString(False));
     CheckEquals('Requires <e>implementing</e>.', ReturnValue.Tag[0].AsString(True));
     CheckEquals('see', ReturnValue.Tag[1].TagName);
-    CheckEquals('Something interesting.', ReturnValue.Tag[1].AsString(False));
+    CheckEquals('Something1 interesting.', ReturnValue.Tag[1].AsString(False));
     CheckEquals(2, ReturnValue.TagCount);
     CheckEquals(12, ReturnValue.Line);
     CheckEquals(23, ReturnValue.Column);
@@ -490,7 +699,7 @@ begin
     CheckEquals('does', srcComment.Tokens[2].Token);
     CheckEquals('something', srcComment.Tokens[3].Token);
     CheckEquals('wonderful', srcComment.Tokens[4].Token);
-    CheckEquals('.', srcComment.Tokens[5].Token);
+    CheckEquals('!', srcComment.Tokens[5].Token);
     CheckEquals(ttidentifier, srcComment.Tokens[0].TokenType);
     CheckEquals(ttidentifier, srcComment.Tokens[1].TokenType);
     CheckEquals(ttidentifier, srcComment.Tokens[2].TokenType);
@@ -569,14 +778,14 @@ end;
 
 { TTestElementContainer }
 
-function TTestElementContainer.AsString(boolForDocumentation: Boolean): String;
+function TTestElementContainer.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 begin
   Result := Identifier;
 end;
 
 { TTestIdent }
 
-function TTestIdent.AsString(boolForDocumentation: Boolean): String;
+function TTestIdent.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 begin
   result := Identifier;
 end;
@@ -807,9 +1016,9 @@ begin
   FElementContainer.AddIssue('This is a warning.', scNone,
     'MyMethod', 1, 2, etWarning);
   CheckEquals(1, FElementContainer.ElementCount);
-  CheckEquals('Warnings', FElementContainer.Elements[1].AsString(False));
+  CheckEquals('Warnings', FElementContainer.Elements[1].AsString(False, False));
   CheckEquals('This is a warning. [MyMethod]',
-    FElementContainer.Elements[1].Elements[1].AsString(False));
+    FElementContainer.Elements[1].Elements[1].AsString(False, False));
 end;
 
 procedure TestTElementContainer.TestAddDocumentConflict;
@@ -833,13 +1042,13 @@ begin
   DC := DC.Elements[1];
   Check(DC Is TDocumentConflict, 'DC is not TDocIssue');
   CheckEquals('This is a document conflict message (First, Second).',
-    (DC As TDocumentConflict).AsString);
+    (DC As TDocumentConflict).AsString(True, False));
 End;
 
 procedure TestTElementContainer.TestAsString;
 
 begin
-  CheckEquals('TestElement', FElementContainer.AsString(False));
+  CheckEquals('TestElement', FElementContainer.AsString(true, False));
 end;
 
 procedure TestTElementContainer.TestCheckReferences;
@@ -915,14 +1124,13 @@ end;
 procedure TestTDocIssue.TestAsString;
 
 begin
-  CheckEquals('This is a simple message. [MyMethod]', FDocIssue.AsString(False));
+  CheckEquals('This is a simple message. [MyMethod]', FDocIssue.AsString(True, False));
 end;
 
 procedure TestTDocIssue.TestCreate;
 begin
-  CheckEquals('This is a simple message.', FDocIssue.Msg);
+  CheckEquals('This is a simple message. [MyMethod]', FDocIssue.AsString(True, False));
   CheckEquals(scNone, FDocIssue.Scope);
-  CheckEquals('MyMethod', FDocIssue.Method);
   CheckEquals(1, FDocIssue.Line);
   CheckEquals(2, FDocIssue.Column);
   CheckEquals(iiWarning, FDocIssue.ImageIndex);
@@ -930,9 +1138,9 @@ end;
 
 { TTestGenericTypeDecl }
 
-function TTestGenericTypeDecl.AsString(boolForDocumentation: Boolean): String;
+function TTestGenericTypeDecl.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 begin
-  Result := BuildStringRepresentation(True, boolForDocumentation, '', 9999);
+  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, '', 9999);
 end;
 
 // Test methods for class TGenericTypeDecl;
@@ -952,10 +1160,20 @@ end;
 procedure TestTGenericTypeDecl.TestCheckDocumentation;
 var
   boolCascade: Boolean;
+  C: TComment;
 begin
   FGenericTypeDecl.CheckDocumentation(boolCascade);
   CheckEquals(1, FGenericTypeDecl.ElementCount);
-  CheckEquals(strDocumentationConflicts, FGenericTypeDecl.Elements[1].AsString(False));
+  CheckEquals('1) Type ''MyType'' is undocumented.', FGenericTypeDecl.DocConflict(1));
+  FGenericTypeDecl.DeleteDocumentConflicts;
+  C := TComment.Create('This is a comment.', 0, 0);
+  Try
+    FGenericTypeDecl.Comment := C;
+    FGenericTypeDecl.CheckDocumentation(boolCascade);
+    CheckEquals(0, FGenericTypeDecl.ElementCount, FGenericTypeDecl.DocConflict(1));
+  Finally
+    C.Free;
+  End;
 end;
 
 procedure TestTGenericTypeDecl.TestCreate;
@@ -970,7 +1188,7 @@ end;
 
 { TTestGenericConstant }
 
-function TTestGenericConstant.AsString(boolForDocumentation: Boolean): String;
+function TTestGenericConstant.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 begin
   Result := Identifier;
 end;
@@ -992,10 +1210,20 @@ end;
 procedure TestTGenericConstant.TestCheckDocumentation;
 var
   boolCascade: Boolean;
+  C: TComment;
 begin
   FGenericConstant.CheckDocumentation(boolCascade);
   CheckEquals(1, FGenericConstant.ElementCount);
-  CheckEquals(strDocumentationConflicts, FGenericConstant.Elements[1].AsString(False));
+  CheckEquals('1) Constant ''MyConstant'' is undocumented.', FGenericConstant.DocConflict(1));
+  FGenericConstant.DeleteDocumentConflicts;
+  C := TComment.Create('This is a comment.', 0, 0);
+  Try
+    FGenericConstant.Comment := C;
+    FGenericConstant.CheckDocumentation(boolCascade);
+    CheckEquals(0, FGenericConstant.ElementCount, FGenericConstant.DocConflict(1));
+  Finally
+    C.Free;
+  End;
 end;
 
 procedure TestTGenericConstant.TestCreate;
@@ -1010,7 +1238,7 @@ end;
 
 { TTestGenericVariable }
 
-function TTestGenericVariable.AsString(boolForDocumentation: Boolean): String;
+function TTestGenericVariable.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 begin
   Result := Identifier;
 end;
@@ -1032,10 +1260,20 @@ end;
 procedure TestTGenericVariable.TestCheckDocumentation;
 var
   boolCascade: Boolean;
+  C: TComment;
 begin
   FGenericVariable.CheckDocumentation(boolCascade);
   CheckEquals(1, FGenericVariable.ElementCount);
-  CheckEquals(strDocumentationConflicts, FGenericVariable.Elements[1].AsString(False));
+  CheckEquals('1) Variable ''MyVariable'' is undocumented.', FGenericVariable.DocConflict(1));
+  FGenericVariable.DeleteDocumentConflicts;
+  C := TComment.Create('This is a comment.', 0, 0);
+  Try
+    FGenericVariable.Comment := C;
+    FGenericVariable.CheckDocumentation(boolCascade);
+    CheckEquals(0, FGenericVariable.ElementCount, FGenericVariable.DocConflict(1));
+  Finally
+    C.Free;
+  End;
 end;
 
 procedure TestTGenericVariable.TestCreate;
@@ -1050,9 +1288,11 @@ end;
 
 { TTestGenericParameter }
 
-function TTestGenericParameter.AsString(boolForDocumentation: Boolean): String;
+function TTestGenericParameter.AsString(boolShowIdentifier,
+  boolForDocumentation : Boolean): String;
 begin
-  Result := Identifier + #32'='#32 + ParamType.AsString;
+  Result := Identifier + #32'='#32 + ParamType.AsString(boolShowIdentifier,
+    boolForDocumentation);
 end;
 
 // Test method for class TGenericParameter
@@ -1072,30 +1312,43 @@ begin
   FType.Free;
 end;
 
+procedure TestTGenericParameter.TestArrayOf;
+begin
+  CheckEquals(True, FGenericParameter.ArrayOf);
+end;
+
 procedure TestTGenericParameter.TestCreate;
+begin
+  CheckEquals('MyParam', FGenericParameter.Identifier);
+  CheckEquals(scPrivate, FGenericParameter.Scope);
+  CheckEquals(3, FGenericParameter.Line);
+  CheckEquals(4, FGenericParameter.Column);
+end;
+
+procedure TestTGenericParameter.TestDefaultValue;
+begin
+  CheckEquals('Something', FGenericParameter.DefaultValue);
+end;
+
+procedure TestTGenericParameter.TestParamModifier;
 
 Const
   strPM : Array[Low(TParamModifier)..High(TParamModifier)] Of String = (
     'pamNone', 'pamVar', 'pamConst', 'pamOut');
 
 begin
-  CheckEquals('MyParam', FGenericParameter.Identifier);
   CheckEquals(strPM[pamVar], strPM[FGenericParameter.ParamModifier]);
-  CheckEquals(True, FGenericParameter.ArrayOf);
-  CheckEquals('Something', FGenericParameter.DefaultValue);
-  CheckEquals(scPrivate, FGenericParameter.Scope);
-  CheckEquals(3, FGenericParameter.Line);
-  CheckEquals(4, FGenericParameter.Column);
 end;
 
-procedure TestTGenericParameter.TestParamReturn;
+procedure TestTGenericParameter.TestParamType;
 begin
-  CheckEquals('String', FGenericParameter.ParamReturn);
+  Checkequals('String', FGenericParameter.ParamType.AsString(False, False));
 end;
 
 { TTestGenericMethodDecl }
 
-function TTestGenericMethodDecl.AsString(boolForDocumentation: Boolean): String;
+function TTestGenericMethodDecl.AsString(boolShowIdentifier,
+  boolForDocumentation : Boolean): String;
 begin
   Result := Identifier;
 end;
@@ -1106,6 +1359,8 @@ procedure TestTGenericMethodDecl.SetUp;
 begin
   FGenericMethodDecl := TTestGenericMethodDecl.Create(mtFunction, 'MyFunction',
     scProtected, 34, 45);
+  FGenericMethodDecl.ReturnType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  FGenericMethodDecl.ReturnType.AddToken('Boolean');
 end;
 
 procedure TestTGenericMethodDecl.TearDown;
@@ -1127,10 +1382,17 @@ begin
     P := TTestGenericParameter.Create(pamNone, 'Param1', False, AType, '', scNone, 0, 0);
     FGenericMethodDecl.AddParameter(P);
     CheckEquals(1, FGenericMethodDecl.ParameterCount);
-    CheckEquals('Param1 = String', FGenericMethodDecl.Parameters[0].AsString);
+    CheckEquals('Param1 = String', FGenericMethodDecl.Parameters[0].AsString(False, False));
   Finally
     AType.Free;
   End;
+end;
+
+procedure TestTGenericMethodDecl.TestAlias;
+begin
+  CheckEquals('', FGenericMethodDecl.Alias);
+  FGenericMethodDecl.Alias := 'MyFunctionA';
+  CheckEquals('MyFunctionA', FGenericMethodDecl.Alias);
 end;
 
 procedure TestTGenericMethodDecl.TestCheckDocumentation;
@@ -1149,7 +1411,7 @@ begin
     FGenericMethodDecl.AddParameter(P);
     AType.ClearTokens;
     AType.AddToken('Integer');
-    P := TTestGenericParameter.Create(pamVar, 'Param2', False, AType, '0', scNone, 0, 0);
+    P := TTestGenericParameter.Create(pamVar, 'Param2', True, AType, '0', scNone, 0, 0);
     FGenericMethodDecl.AddParameter(P);
     AType.ClearTokens;
     AType.AddToken('Byte');
@@ -1160,15 +1422,55 @@ begin
     P := TTestGenericParameter.Create(pamOut, 'Param4', False, AType, '', scNone, 0, 0);
     FGenericMethodDecl.AddParameter(P);
     CheckEquals(4, FGenericMethodDecl.ParameterCount);
-    CheckEquals('Param1 = String', FGenericMethodDecl.Parameters[0].AsString);
-    CheckEquals('Param2 = Integer', FGenericMethodDecl.Parameters[1].AsString);
-    CheckEquals('Param3 = Byte', FGenericMethodDecl.Parameters[2].AsString);
-    CheckEquals('Param4 = Double', FGenericMethodDecl.Parameters[3].AsString);
+    CheckEquals('Param1 = String', FGenericMethodDecl.Parameters[0].AsString(False, False));
+    CheckEquals('Param2 = Integer', FGenericMethodDecl.Parameters[1].AsString(False, False));
+    CheckEquals('Param3 = Byte', FGenericMethodDecl.Parameters[2].AsString(False, False));
+    CheckEquals('Param4 = Double', FGenericMethodDecl.Parameters[3].AsString(False, False));
+    FGenericMethodDecl.CheckDocumentation(boolCascade);
+    CheckEquals('1) Method ''MyFunction'' has not been documented.', FGenericMethodDecl.DocConflict(1));
+    FGenericMethodDecl.DeleteDocumentConflicts;
     C := TComment.Create('', 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
-      CheckEquals(0, FGenericMethodDecl.ElementCount);
+      CheckEquals('1) Method ''MyFunction'' has no description.', FGenericMethodDecl.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericMethodDecl.DeleteDocumentConflicts;
+    C := TComment.Create('This is a description.', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals('1) A Pre-condition in Method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
+      CheckEquals('3) Method ''MyFunction'' has missing pre-condition tags.', FGenericMethodDecl.DocConflict(3));
+    Finally
+      C.Free;
+    End;
+    FGenericMethodDecl.DeleteDocumentConflicts;
+    C := TComment.Create('This is a description.'#13#10'@precon', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals('1) A Pre-condition in Method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericMethodDecl.DeleteDocumentConflicts;
+    C := TComment.Create('This is a description.'#13#10'@precon None.', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals('1) Method ''MyFunction'' has a different parameter count (4 not 0).', FGenericMethodDecl.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericMethodDecl.DeleteDocumentConflicts;
+    C := TComment.Create('This is a description.'#13#10'@precon None.'#13#10'@precon None.', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals('2) Method ''MyFunction'' has too many pre-condition tags.', FGenericMethodDecl.DocConflict(2));
     Finally
       C.Free;
     End;
@@ -1177,7 +1479,46 @@ begin
   End;
 end;
 
+procedure TestTGenericMethodDecl.TestClassMethod;
+begin
+  CheckEquals(False, FGenericMethodDecl.ClassMethod);
+  FGenericMethodDecl.ClassMethod := True;
+  CheckEquals(True, FGenericMethodDecl.ClassMethod);
+end;
+
+procedure TestTGenericMethodDecl.TestClassNames;
+begin
+  CheckEquals(0, FGenericMethodDecl.ClassNames.Count);
+  FGenericMethodDecl.ClassNames.Add('THello');
+  CheckEquals(1, FGenericMethodDecl.ClassNames.Count);
+  CheckEquals('THello', FGenericMethodDecl.ClassNames[0]);
+end;
+
 procedure TestTGenericMethodDecl.TestCreate;
+begin
+  CheckEquals('MyFunction', FGenericMethodDecl.Identifier);
+  CheckEquals(scProtected, FGenericMethodDecl.Scope);
+  CheckEquals(34, FGenericMethodDecl.Line);
+  CheckEquals(45, FGenericMethodDecl.Column);
+  CheckEquals(iiPublicFunction, FGenericMethodDecl.ImageIndex);
+  CheckEquals(iiProtectedFunction, FGenericMethodDecl.ImageIndexAdjustedForScope);
+end;
+
+procedure TestTGenericMethodDecl.TestExt;
+begin
+  CheckEquals('', FGenericMethodDecl.Ext);
+  FGenericMethodDecl.Ext := 'MyFunctionA';
+  CheckEquals('MyFunctionA', FGenericMethodDecl.Ext);
+end;
+
+procedure TestTGenericMethodDecl.TestForwardDecl;
+begin
+  CheckEquals(False, FGenericMethodDecl.ForwardDecl);
+  FGenericMethodDecl.ForwardDecl := True;
+  CheckEquals(True, FGenericMethodDecl.ForwardDecl);
+end;
+
+procedure TestTGenericMethodDecl.TestMethodType;
 
 Const
   strMT : Array[Low(TMethodType)..High(TMethodType)] Of String = (
@@ -1185,24 +1526,551 @@ Const
 
 begin
   CheckEquals(strMT[mtFunction], strMT[FGenericMethodDecl.MethodType]);
-  CheckEquals('MyFunction', FGenericMethodDecl.Identifier);
-  CheckEquals(scProtected, FGenericMethodDecl.Scope);
-  CheckEquals(34, FGenericMethodDecl.Line);
-  CheckEquals(45, FGenericMethodDecl.Column);
+end;
+
+procedure TestTGenericMethodDecl.TestMsg;
+begin
+  CheckEquals('', FGenericMethodDecl.Msg);
+  FGenericMethodDecl.Msg := 'WM_PAINT';
+  CheckEquals('WM_PAINT', FGenericMethodDecl.Msg);
+end;
+
+procedure TestTGenericMethodDecl.TestParameterCount;
+var
+  AType: TTestGenericTypeDecl;
+  P: TTestGenericParameter;
+begin
+  AType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    AType.AddToken('String');
+    P := TTestGenericParameter.Create(pamNone, 'Param1', False, AType, '', scNone, 0, 0);
+    FGenericMethodDecl.AddParameter(P);
+    CheckEquals(1, FGenericMethodDecl.ParameterCount);
+  Finally
+    AType.Free;
+  End;
+end;
+
+procedure TestTGenericMethodDecl.TestParameters;
+var
+  AType: TTestGenericTypeDecl;
+  P: TTestGenericParameter;
+begin
+  AType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    AType.AddToken('String');
+    P := TTestGenericParameter.Create(pamNone, 'Param1', False, AType, '', scNone, 0, 0);
+    FGenericMethodDecl.AddParameter(P);
+    CheckEquals('Param1 = String', FGenericMethodDecl.Parameters[0].AsString(False, False));
+  Finally
+    AType.Free;
+  End;
+end;
+
+procedure TestTGenericMethodDecl.TestQualifiedName;
+begin
+  CheckEquals('MyFunction', FGenericMethodDecl.QualifiedName);
+  FGenericMethodDecl.ClassNames.Add('THello');
+  CheckEquals('THello.MyFunction', FGenericMethodDecl.QualifiedName);
+end;
+
+procedure TestTGenericMethodDecl.TestReturnType;
+begin
+  CheckEquals('Boolean', FGenericMethodDecl.ReturnType.AsString(False, False));
+end;
+
+{ TTestGenericProperty }
+
+function TTestGenericProperty.AsString(boolShowIdentifier,
+  boolForDocumentation : Boolean): String;
+begin
+  Result := Identifier;
+end;
+
+// Test methods for the class TGenericProperty
+
+procedure TestTGenericProperty.SetUp;
+begin
+  FGenericProperty := TTestGenericProperty.Create('MyProperty', scProtected, 12,
+    23, iiPublicProperty, Nil);
+  FGenericProperty.TypeId := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  FGenericProperty.TypeId.AddToken('Boolean');
+end;
+
+procedure TestTGenericProperty.TearDown;
+begin
+  FGenericProperty.Free;
+  FGenericProperty := nil;
+end;
+
+procedure TestTGenericProperty.TestAddParameter;
+
+var
+  P: TGenericParameter;
+  AType: TTestGenericTypeDecl;
+
+begin
+  AType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    AType.AddToken('String');
+    P := TTestGenericParameter.Create(pamNone, 'Param1', False, AType, '', scNone, 0, 0);
+    FGenericProperty.AddParameter(P);
+    CheckEquals(1, FGenericProperty.ParameterCount);
+    CheckEquals('Param1 = String', FGenericProperty.Parameters[0].AsString(False, False));
+  Finally
+    AType.Free;
+  End;
+end;
+
+procedure TestTGenericProperty.TestCheckDocumentation;
+
+var
+  AType: TTestGenericTypeDecl;
+  P: TTestGenericParameter;
+  C: TComment;
+  boolCascade: Boolean;
+  strMsg: String;
+
+begin
+  AType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    AType.AddToken('String');
+    P := TTestGenericParameter.Create(pamNone, 'Param1', False, AType, '', scNone, 0, 0);
+    FGenericProperty.AddParameter(P);
+    AType.ClearTokens;
+    AType.AddToken('Integer');
+    P := TTestGenericParameter.Create(pamVar, 'Param2', True, AType, '0', scNone, 0, 0);
+    FGenericProperty.AddParameter(P);
+    AType.ClearTokens;
+    AType.AddToken('Byte');
+    P := TTestGenericParameter.Create(pamConst, 'Param3', False, AType, '', scNone, 0, 0);
+    FGenericProperty.AddParameter(P);
+    AType.ClearTokens;
+    AType.AddToken('Double');
+    P := TTestGenericParameter.Create(pamOut, 'Param4', False, AType, '', scNone, 0, 0);
+    FGenericProperty.AddParameter(P);
+    CheckEquals(4, FGenericProperty.ParameterCount);
+    CheckEquals('Param1 = String', FGenericProperty.Parameters[0].AsString(False, False));
+    CheckEquals('Param2 = Integer', FGenericProperty.Parameters[1].AsString(False, False));
+    CheckEquals('Param3 = Byte', FGenericProperty.Parameters[2].AsString(False, False));
+    CheckEquals('Param4 = Double', FGenericProperty.Parameters[3].AsString(False, False));
+    C := TComment.Create(
+      ''#13#10 +
+      '  This method does something interesting.'#13#10 +
+      ''#13#10 +
+      '  @precon  None.'#13#10 +
+      '  @postcon Does something very interesting.'#13#10 +
+      ''#13#10 +
+      '  @param   Param1 as a String'#13#10 +
+      '  @param   Param2 as an Integer'#13#10 +
+      '  @param   Param3 as a Byte'#13#10 +
+      '  @param   Param4 as a Double'#13#10 +
+      '  @return  a Boolean'#13#10 +
+      ''
+      , 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      strMsg := '';
+      If FGenericProperty.ElementCount > 0 Then
+        Begin
+          strMsg := FGenericProperty.Elements[1].AsString(False, False);
+          If FGenericProperty.Elements[1].ElementCount > 0 Then
+            Begin
+              strMsg := FGenericProperty.Elements[1].Elements[1].AsString(False, False);
+              If FGenericProperty.Elements[1].Elements[1].ElementCount > 0 Then
+                Begin
+                  strMsg := FGenericProperty.Elements[1].Elements[1].Elements[1].AsString(False, False);
+                End;
+            End;
+        End;
+      CheckEquals(0, FGenericProperty.ElementCount, strMsg);
+    Finally
+      C.Free;
+    End;
+  Finally
+    AType.Free;
+  End;
+end;
+
+procedure TestTGenericProperty.TestCreate;
+begin
+  CheckEquals('MyProperty', FGenericProperty.Identifier);
+  CheckEquals(scProtected, FGenericProperty.Scope);
+  CheckEquals(12, FGenericProperty.Line);
+  CheckEquals(23, FGenericProperty.Column);
+  CheckEquals(iiPublicProperty, FGenericProperty.ImageIndex);
+  CheckEquals(iiProtectedProperty, FGenericProperty.ImageIndexAdjustedForScope);
+end;
+
+procedure TestTGenericProperty.TestParameterCount;
+var
+  AType: TTestGenericTypeDecl;
+  P: TTestGenericParameter;
+begin
+  AType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    AType.AddToken('String');
+    P := TTestGenericParameter.Create(pamNone, 'Param1', False, AType, '', scNone, 0, 0);
+    FGenericProperty.AddParameter(P);
+    CheckEquals(1, FGenericProperty.ParameterCount);
+  Finally
+    AType.Free;
+  End;
+end;
+
+procedure TestTGenericProperty.TestParameters;
+var
+  AType: TTestGenericTypeDecl;
+  P: TTestGenericParameter;
+begin
+  AType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    AType.AddToken('String');
+    P := TTestGenericParameter.Create(pamNone, 'Param1', False, AType, '', scNone, 0, 0);
+    FGenericProperty.AddParameter(P);
+    CheckEquals(1, FGenericProperty.ParameterCount);
+  Finally
+    AType.Free;
+  End;
+end;
+
+procedure TestTGenericProperty.TestTypeId;
+begin
+  CheckEquals('Boolean', FGenericProperty.TypeId.AsString(False, False));
+end;
+
+// Test methods for class TDocumentConflict
+
+procedure TestTDocumentConflict.SetUp;
+begin
+  FDocumentConflict := TDocumentConflict.Create(['First', 'Second'], 12, 23, 34,
+    45, 'This is a message with a first parameter (%s) and a second parameter (%s).',
+    'This is a description string.', iiDocConflictMissing);
+end;
+
+procedure TestTDocumentConflict.TearDown;
+begin
+  FDocumentConflict.Free;
+  FDocumentConflict := nil;
+end;
+
+procedure TestTDocumentConflict.TestAsString;
+
+begin
+  Checkequals('This is a message with a first parameter (First) and a second ' +
+    'parameter (Second).', FDocumentConflict.AsString(True, False));
+end;
+
+procedure TestTDocumentConflict.TestCommentColumn;
+begin
+  CheckEquals(45, FDocumentConflict.CommentColumn);
+end;
+
+procedure TestTDocumentConflict.TestCommentLine;
+begin
+  CheckEquals(34, FDocumentConflict.CommentLine);
+end;
+
+procedure TestTDocumentConflict.TestCreate;
+begin
+  CheckEquals(12, FDocumentConflict.Line);
+  CheckEquals(23, FDocumentConflict.Column);
+end;
+
+// Test methods for class TLabelContainer
+
+procedure TestTLabelContainer.SetUp;
+begin
+  FLabelContainer := TLabelContainer.Create(strImplementedMethodsLabel, scNone,
+    12, 23, iiImplementedMethods, Nil);
+end;
+
+procedure TestTLabelContainer.TearDown;
+begin
+  FLabelContainer.Free;
+  FLabelContainer := nil;
+end;
+
+procedure TestTLabelContainer.TestAsString;
+begin
+  CheckEquals(strImplementedMethodsLabel, FLabelContainer.AsString(True, False));
+end;
+
+procedure TestTLabelContainer.TestCreate;
+begin
+  CheckEquals(strImplementedMethodsLabel, FLabelContainer.Identifier);
+  CheckEquals(scNone, FLabelContainer.Scope);
+  CheckEquals(12, FLabelContainer.Line);
+  CheckEquals(23, FLabelContainer.Column);
+  CheckEquals(iiImplementedMethods, FLabelContainer.ImageIndex);
+  CheckEquals(iiImplementedMethods, FLabelContainer.ImageIndexAdjustedForScope);
+end;
+
+// Test methods for class TBaseLanguageModule
+
+procedure TestTBaseLanguageModule.SetUp;
+begin
+  FStream := TMemoryStream.Create;
+  FStream.LoadBufferFromString('This is some text.');
+  FBaseLanguageModule := TTestBaseLanguageModule.CreateParser(FStream,
+    'D:\Path\TestFile.txt', True, [moParse, moCheckForDocumentConflicts]);
+  FBaseLanguageModule.AddToken(TTokenInfo.Create('Hello', 0, 1, 1, 5, ttIdentifier));
+  FBaseLanguageModule.AddToken(TTokenInfo.Create('Goodbye', 7, 1, 7, 7, ttIdentifier));
+end;
+
+procedure TestTBaseLanguageModule.TearDown;
+begin
+  FBaseLanguageModule.Free;
+  FBaseLanguageModule := nil;
+  FStream.Free;
+end;
+
+procedure TestTBaseLanguageModule.TestAddDef;
+begin
+  CheckEquals(0, FBaseLanguageModule.CompilerDefines.Count);
+  FBaseLanguageModule.AddDef('Compiler_Def');
+  CheckEquals(1, FBaseLanguageModule.CompilerDefines.Count);
+end;
+
+procedure TestTBaseLanguageModule.TestAddTickCount;
+begin
+  CheckEquals(0, FBaseLanguageModule.OpTickCounts);
+  FBaseLanguageModule.AddTickCount('Hello');
+  CheckEquals(1, FBaseLanguageModule.OpTickCounts);
+end;
+
+procedure TestTBaseLanguageModule.TestAddToExpression;
+var
+  C: TElementContainer;
+begin
+  C := TTestElementContainer.Create('', scNone, 0, 0, iiNone, Nil);
+  Try
+    Checkequals(0, C.TokenCount);
+    FBaseLanguageModule.AddToExpression(C);
+    Checkequals(1, C.TokenCount);
+  Finally
+    C.Free;
+  End;
+end;
+
+procedure TestTBaseLanguageModule.TestAsString;
+begin
+  CheckEquals('TestFile.txt', FBaseLanguageModule.AsString(True, False));
+end;
+
+procedure TestTBaseLanguageModule.TestBodyComment;
+begin
+  FBaseLanguageModule.BodyComments.Add(TComment.Create('Hello.', 0, 0));
+  CheckEquals('Hello.', FBaseLanguageModule.BodyComment[0].AsString(99, False));
+end;
+
+procedure TestTBaseLanguageModule.TestBodyCommentCount;
+begin
+  CheckEquals(0, FBaseLanguageModule.BodyCommentCount);
+  FBaseLanguageModule.BodyComments.Add(TComment.Create('Hello.', 0, 0));
+  CheckEquals(1, FBaseLanguageModule.BodyCommentCount);
+end;
+
+procedure TestTBaseLanguageModule.TestBytes;
+begin
+  CheckEquals(5 + 1 + 7, FBaseLanguageModule.Bytes);
+end;
+
+procedure TestTBaseLanguageModule.TestCheckDocumentation;
+var
+  boolCascade: Boolean;
+  C: TComment;
+begin
+  FBaseLanguageModule.CheckDocumentation(boolCascade);
+  Checkequals('1) This module has no document comment.', FBaseLanguageModule.DocConflict(1));
+  FBaseLanguageModule.DeleteDocumentConflicts;
+  C := TComment.Create('This is a description.', 0, 0);
+  Try
+    FBaseLanguageModule.Comment := C;
+    FBaseLanguageModule.CheckDocumentation(boolCascade);
+    Checkequals('1) This module is missing a documentation date (''' +
+      FormatDateTime('dd mmm yyyy', Now) + ''').', FBaseLanguageModule.DocConflict(1));
+  Finally
+    C.Free;
+  End;
+  FBaseLanguageModule.DeleteDocumentConflicts;
+  C := TComment.Create('This is a description.'#13#10 +
+    '@date ' + FormatDateTime('dd mmm yyyy', Now - 7), 0, 0);
+  Try
+    FBaseLanguageModule.Comment := C;
+    FBaseLanguageModule.CheckDocumentation(boolCascade);
+    Checkequals('1) The module documentation date ''' +
+      FormatDateTime('dd mmm yyyy', Now - 7) + ''' is incorrect (''' +
+      FormatDateTime('dd mmm yyyy', Now) + ''').', FBaseLanguageModule.DocConflict(1));
+  Finally
+    C.Free;
+  End;
+  FBaseLanguageModule.DeleteDocumentConflicts;
+  C := TComment.Create('This is a description.'#13#10 +
+    '@date ' + FormatDateTime('dd mmm yyyy', Now), 0, 0);
+  Try
+    FBaseLanguageModule.Comment := C;
+    FBaseLanguageModule.CheckDocumentation(boolCascade);
+    Checkequals('1) This module is missing a documentation version.', FBaseLanguageModule.DocConflict(1));
+  Finally
+    C.Free;
+  End;
+  FBaseLanguageModule.DeleteDocumentConflicts;
+  C := TComment.Create('This is a description.'#13#10 +
+    '@date ' + FormatDateTime('dd mmm yyyy', Now) +#13#10+
+    '@version 1.0', 0, 0);
+  Try
+    FBaseLanguageModule.Comment := C;
+    FBaseLanguageModule.CheckDocumentation(boolCascade);
+    Checkequals('1) This module is missing a documentation author.', FBaseLanguageModule.DocConflict(1));
+  Finally
+    C.Free;
+  End;
+  FBaseLanguageModule.DeleteDocumentConflicts;
+  C := TComment.Create('This is a description.'#13#10 +
+    '@date 32 jan 2008', 0, 0);
+  Try
+    FBaseLanguageModule.Comment := C;
+    FBaseLanguageModule.CheckDocumentation(boolCascade);
+    Checkequals('1) The module documentation date ''32 jan 2008'' is not valid (''' +
+      FormatDateTime('dd mmm yyyy', Now) + ''').', FBaseLanguageModule.DocConflict(1));
+  Finally
+    C.Free;
+  End;
+end;
+
+procedure TestTBaseLanguageModule.TestCompilerConditionStack;
+begin
+  CheckEquals(0, FBaseLanguageModule.CompilerConditionStack.Count);
+  FBaseLanguageModule.CompilerConditionStack.Add(Pointer(1));
+  CheckEquals(1, FBaseLanguageModule.CompilerConditionStack.Count);
+  FBaseLanguageModule.CompilerConditionStack.Clear;
+  CheckEquals(0, FBaseLanguageModule.CompilerConditionStack.Count);
+end;
+
+procedure TestTBaseLanguageModule.TestCreate;
+begin
+  CheckEquals(True, FBaseLanguageModule.Modified);
+  CheckEquals('D:\Path\TestFile.txt', FBaseLanguageModule.FileName);
+end;
+
+procedure TestTBaseLanguageModule.TestDeleteDef;
+begin
+  CheckEquals(0, FBaseLanguageModule.CompilerDefines.Count);
+  FBaseLanguageModule.AddDef('Hello');
+  CheckEquals(1, FBaseLanguageModule.CompilerDefines.Count);
+  FBaseLanguageModule.DeleteDef('Hello');
+  CheckEquals(0, FBaseLanguageModule.CompilerDefines.Count);
+end;
+
+procedure TestTBaseLanguageModule.TestFileName;
+begin
+  CheckEquals('D:\Path\TestFile.txt', FBaseLanguageModule.FileName);
+end;
+
+procedure TestTBaseLanguageModule.TestIfDef;
+begin
+  CheckEquals(False, FBaseLanguageModule.IfDef('Hello'));
+  FBaseLanguageModule.AddDef('Hello');
+  CheckEquals(True, FBaseLanguageModule.IfDef('Hello'));
+  FBaseLanguageModule.DeleteDef('Hello');
+  CheckEquals(False, FBaseLanguageModule.IfDef('Hello'));
+end;
+
+procedure TestTBaseLanguageModule.TestIfNotDef;
+begin
+  CheckEquals(True, FBaseLanguageModule.IfNotDef('Hello'));
+  FBaseLanguageModule.AddDef('Hello');
+  CheckEquals(False, FBaseLanguageModule.IfNotDef('Hello'));
+  FBaseLanguageModule.DeleteDef('Hello');
+  CheckEquals(True, FBaseLanguageModule.IfNotDef('Hello'));
+end;
+
+procedure TestTBaseLanguageModule.TestIsToken;
+begin
+  CheckEquals(True, FBaseLanguageModule.IsToken('Hello', Nil));
+end;
+
+procedure TestTBaseLanguageModule.TestLines;
+begin
+  CheckEquals(1, FBaseLanguageModule.Lines);
+end;
+
+procedure TestTBaseLanguageModule.TestModified;
+begin
+  CheckEquals(True, FBaseLanguageModule.Modified);
+end;
+
+procedure TestTBaseLanguageModule.TestModuleName;
+begin
+  CheckEquals('', FBaseLanguageModule.ModuleName);
+  FBaseLanguageModule.ModuleName := 'TestFile.txt';
+  CheckEquals('TestFile.txt', FBaseLanguageModule.ModuleName);
+end;
+
+procedure TestTBaseLanguageModule.TestModuleNameCol;
+begin
+  CheckEquals(0, FBaseLanguageModule.ModuleNameCol);
+  FBaseLanguageModule.ModuleNameCol := 1;
+  CheckEquals(1, FBaseLanguageModule.ModuleNameCol);
+end;
+
+procedure TestTBaseLanguageModule.TestModuleNameLine;
+begin
+  CheckEquals(0, FBaseLanguageModule.ModuleNameLine);
+  FBaseLanguageModule.ModuleNameLine := 1;
+  CheckEquals(1, FBaseLanguageModule.ModuleNameLine);
+end;
+
+procedure TestTBaseLanguageModule.TestOpTickCount;
+begin
+  FBaseLanguageModule.AddTickCount('Hello');
+  FBaseLanguageModule.AddTickCount('Goodbye');
+  CheckEquals(0, FBaseLanguageModule.OpTickCount['Hello', 'Goodbye']);
+end;
+
+procedure TestTBaseLanguageModule.TestOpTickCountByIndex;
+begin
+  FBaseLanguageModule.AddTickCount('Hello');
+  FBaseLanguageModule.AddTickCount('Goodbye');
+  Check(FBaseLanguageModule.OpTickCountByIndex[0] > 0);
+  Check(FBaseLanguageModule.OpTickCountByIndex[1] >= FBaseLanguageModule.OpTickCountByIndex[0]);
+end;
+
+procedure TestTBaseLanguageModule.TestOpTickCountName;
+begin
+  FBaseLanguageModule.AddTickCount('Hello');
+  FBaseLanguageModule.AddTickCount('Goodbye');
+  CheckEquals('Hello', FBaseLanguageModule.OpTickCountName[0]);
+  CheckEquals('Goodbye', FBaseLanguageModule.OpTickCountName[1]);
+end;
+
+procedure TestTBaseLanguageModule.TestOpTickCounts;
+begin
+  CheckEquals(0, FBaseLanguageModule.OpTickCounts);
+  FBaseLanguageModule.AddTickCount('Hello');
+  CheckEquals(1, FBaseLanguageModule.OpTickCounts);
+  FBaseLanguageModule.AddTickCount('Goodbye');
+  CheckEquals(2, FBaseLanguageModule.OpTickCounts);
 end;
 
 initialization
   BrowseAndDocItOptions.Options := [doCustomDrawing..doStrictConstantExpressions];
   // Register any test cases with the test runner
-  RegisterTest(TestTTokenInfo.Suite);
-  RegisterTest(TestTTag.Suite);
-  RegisterTest(TestTComment.Suite);
-  RegisterTest(TestTElementContainer.Suite);
-  RegisterTest(TestTDocIssue.Suite);
-  RegisterTest(TestTGenericTypeDecl.Suite);
-  RegisterTest(TestTGenericConstant.Suite);
-  RegisterTest(TestTGenericVariable.Suite);
-  RegisterTest(TestTGenericParameter.Suite);
-  RegisterTest(TestTGenericMethodDecl.Suite);
-end.
+  RegisterTest('BaseLanguageModule Tests', TestTTokenInfo.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTTag.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTComment.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTElementContainer.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTDocIssue.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTGenericTypeDecl.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTGenericConstant.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTGenericVariable.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTGenericParameter.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTGenericMethodDecl.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTGenericProperty.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTDocumentConflict.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTLabelContainer.Suite);
+  RegisterTest('BaseLanguageModule Tests', TestTBaseLanguageModule.Suite);
+End.
 

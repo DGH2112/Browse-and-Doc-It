@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    29 Dec 2008
+  @Date    23 Jan 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -497,7 +497,7 @@ Begin
           Refresh;
           Font.Style := [];
           Font.Color := clNavy;
-          str := FComment.AsString(0, MaxInt, False);
+          str := FComment.AsString(MaxInt, False);
           R := Rect(2, iHeight + 6 + iLine, Width - 2, Height);
           iPos := DrawText(Canvas.Handle, PChar(str), -1, R,
             DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
@@ -620,7 +620,7 @@ Begin
       Inc(Result.Bottom, 5);
       Refresh;
       Canvas.Font.Style := [];
-      str := Comment.AsString(0, MaxInt, False);
+      str := Comment.AsString(MaxInt, False);
       R := Rect(Result.Left + 2, 0, Result.Right - 2, 0);
       Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(str), -1, R,
         DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
@@ -896,8 +896,8 @@ begin
     If Container.Elements[i].Scope In BrowseAndDocItOptions.ScopesToRender +
       [scNone, scGlobal] Then
       Begin
-        NewNode := AddNode(RootNode, Container.Elements[i].AsString, iLevel,
-          Container.Elements[i].ImageIndexAdjustedForScope,
+        NewNode := AddNode(RootNode, Container.Elements[i].AsString(True, False),
+          iLevel, Container.Elements[i].ImageIndexAdjustedForScope,
           Container.Elements[i].Line, Container.Elements[i].Column,
           Container.Elements[i].Comment);
         RenderContainers(NewNode, Container[i], iLevel + 1);
@@ -1200,7 +1200,7 @@ Begin
       M.AddTickCount('Clear');
       SetLength(FSpecialTagNodes, BrowseAndDocItOptions.SpecialTags.Count);
       // Create Root Tree Node
-      FModule := AddNode(Nil, M.AsString, 0, M.ImageIndexAdjustedForScope,
+      FModule := AddNode(Nil, M.AsString(True, False), 0, M.ImageIndexAdjustedForScope,
         M.Line, M.Column, M.Comment);
       CreateSpecialTagNodes(M);
       OutputModuleInfo(M);
@@ -2017,7 +2017,7 @@ begin
                 NodeData.FNode.Line, NodeData.FNode.Col)
             Else
               FSelectionChange(NodeData.FNode.Line, NodeData.FNode.Col,
-                NodeData.FNode.Comment.Line, NodeData.FNode.Comment.Col);
+                NodeData.FNode.Comment.Line, NodeData.FNode.Comment.Column);
         End;
   Finally
     FSelectionChanging := False;

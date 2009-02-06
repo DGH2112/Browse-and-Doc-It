@@ -699,7 +699,7 @@ begin
     CheckEquals('does', srcComment.Tokens[2].Token);
     CheckEquals('something', srcComment.Tokens[3].Token);
     CheckEquals('wonderful', srcComment.Tokens[4].Token);
-    CheckEquals('!', srcComment.Tokens[5].Token);
+    CheckEquals('.', srcComment.Tokens[5].Token);
     CheckEquals(ttidentifier, srcComment.Tokens[0].TokenType);
     CheckEquals(ttidentifier, srcComment.Tokens[1].TokenType);
     CheckEquals(ttidentifier, srcComment.Tokens[2].TokenType);

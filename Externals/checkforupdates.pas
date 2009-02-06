@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    15 Oct 2008
+  @Date    06 Feb 2009
 
 **)
 Unit CheckForUpdates;
@@ -58,7 +58,7 @@ Uses
 
 ResourceString
   (** A resource string of the start of the checking process. **)
-  strCheckingForUpdates = 'Checking for updates...';
+  strCheckingForUpdates = 'Checking Updates for ''%s''...';
   (** A resource string to note the loading of MS XML. **)
   strLoadingMSXML = '  Loading MS XML...';
   (** A resource string to note the lading of the URL **)
@@ -294,7 +294,8 @@ Begin
   ReadLastUpdateDate;
   If boolForceUpdate Or (FLastUpdateDate + FUpdateInterval < Now) Then
     Begin
-      OutputMsg(strCheckingForUpdates, '', FMessageHeaderColour);
+      OutputMsg(Format(strCheckingForUpdates, [FSoftwareID]), '',
+        FMessageHeaderColour);
       iURLs := CharCount('|', FURLs) + 1;
       For iURL := 1 To iURLs Do
         If CheckForUpdates(GetField(FURLs, '|', iURL)) Then

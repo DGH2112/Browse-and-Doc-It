@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    23 Jan 2009
+  @Date    07 Feb 2009
   @Version 1.0
 
 **)
@@ -51,7 +51,7 @@ Type
     Procedure InsertInSituCommentClick(Sender : TObject);
     Procedure DocumentationClick(Sender : TObject);
     Procedure ModuleExplorerClick(Sender : TObject);
-    {: @todo Procedure DUnitCreator(Sender : TObject);}
+    Procedure DUnitClick(Sender : TObject);
   Protected
     { IOTAWizard }
     Function GetIDString: string;
@@ -185,7 +185,8 @@ Uses
   SysUtils, DockableModuleExplorer, IniFiles, ToolsAPIUtils, OptionsForm, Forms,
   Windows, ShellAPI, TokenForm, DGHLibrary, ModuleDispatcher, Dialogs, Controls,
   PsAPI, DocumentationOptionsForm, DocumentationDispatcher, BaseDocumentation,
-  CheckForUpdates, CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF};
+  CheckForUpdates, CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF},
+  DUnitForm, DUnitCreator;
 
 Resourcestring
   {$IFDEF D2005}
@@ -361,7 +362,11 @@ Begin
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Line Comment', InsertLineCommentClick);
   CreateMenuItem(mmiPascalDocMenu, 'Insert &In-Situ Comment', InsertInSituCommentClick);
   CreateMenuItem(mmiPascalDocMenu);
-  CreateMenuItem(mmiPascalDocMenu, '&Options', OptionsClick);
+  CreateMenuItem(mmiPascalDocMenu, '&Options...', OptionsClick,
+    Menus.ShortCut(Ord('O'), [ssCtrl, ssShift, ssAlt]));
+  CreateMenuItem(mmiPascalDocMenu);
+  CreateMenuItem(mmiPascalDocMenu, 'D&Unit...', DUnitClick,
+    Menus.ShortCut(Ord('U'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, 'Check for &Updates...', CheckForUpdatesClick);
   FKeyBinding := 0;
@@ -469,11 +474,23 @@ begin
         End;
 end;
 
-{: @todo procedure TBrowseAndDocItWizard.DUnitCreator(Sender: TObject);
+(**
+
+  This method creates an instance of a DUnit form and passes a class instance
+  that can create projects and units for the form.
+
+  @precon  None.
+  @postcon Creates an instance of a DUnit form and passes a class instance
+           that can create projects and units for the form.
+
+  @param   Sender as a TObject
+
+**)
+procedure TBrowseAndDocItWizard.DUnitClick(Sender: TObject);
 
 begin
-  TfrmDUnit.Execute(FDUnitOptions);
-end;}
+  TfrmDUnit.Execute(TDUnitCreator.Create);
+End;
 
 {procedure TBrowseAndDocItWizard.Destroyed;
 begin
@@ -2098,20 +2115,17 @@ constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(
   SuccessfulParseProc : TParserNotify);
 
 Var
-  SourceEditor : IOTASourceEditor;
-  Reader : IOTAEditReader;
-  iPosition : Integer;
-  iRead : Integer;
   Options : IOTAProjectOptions;
+  SE: IOTASourceEditor;
 
 begin
   Inherited Create(True);
   FreeOnTerminate := True; // Self Freeing...
   FSuccessfulParseProc := SuccessfulParseProc;
-  FMemoryStream := TMemoryStream.Create;
-  SourceEditor := ActiveSourceEditor;
-  If SourceEditor <> Nil Then
+  SE := ActiveSourceEditor;
+  If SE <> Nil Then
     Begin
+      FMemoryStream := EditorAsMemoryStream(SE);
       If ActiveProject <> Nil Then
         Begin
           Options := ActiveProject.ProjectOptions;
@@ -2121,20 +2135,10 @@ begin
           DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
         End;
       DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
-      Reader := SourceEditor.CreateReader;
-      Try
-        iPosition := 0;
-        Repeat
-          iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
-          FMemoryStream.WriteBuffer(Buffer, iRead);
-          Inc(iPosition, iRead);
-        Until iRead < iBufferSize;
-      Finally
-        Reader := Nil;
-      End;
-      FFileName := SourceEditor.FileName;
-      FModified := SourceEditor.Modified;
-    End;
+      FFileName := SE.FileName;
+      FModified := SE.Modified;
+    End Else
+      FMemoryStream := TMemoryStream.Create; // Ensure there's an instance.
   Resume;
 end;
 
@@ -2224,7 +2228,6 @@ begin
   SetName;
   Try
     FType := 'Parsing';
-    FMemoryStream.Position := 0;
     FModule := Dispatcher(FMemoryStream, FFileName, FModified, [moParse,
       moCheckForDocumentConflicts]);
     Try

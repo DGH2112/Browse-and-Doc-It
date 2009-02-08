@@ -2646,14 +2646,16 @@ Var
 Begin
   Result := '';
   If boolIdentifier Then
-    Result := Identifier;
-  If Length(strDelimiter) > 0 Then
-    If TokenCount > 0 Then
-      Begin
-        If Not (strDelimiter[1] In strNoSpaceBefore) Then
-          Result := Result + #32;
-        Result := Result + strDelimiter;
-      End;
+    Begin
+      Result := Identifier;
+      If Length(strDelimiter) > 0 Then
+        If TokenCount > 0 Then
+          Begin
+            If Not (strDelimiter[1] In strNoSpaceBefore) Then
+              Result := Result + #32;
+            Result := Result + strDelimiter;
+          End;
+    End;
   iLength := Length(Result);
   D := TTokenInfo.Create(strDelimiter, 0, 0, 0, Length(strDelimiter), ttSymbol);
   Try

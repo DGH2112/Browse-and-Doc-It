@@ -2648,7 +2648,7 @@ Begin
   If boolIdentifier Then
     Begin
       Result := Identifier;
-      If Length(strDelimiter) > 0 Then
+      If (Length(Result) > 0) And (Length(strDelimiter) > 0) Then
         If TokenCount > 0 Then
           Begin
             If Not (strDelimiter[1] In strNoSpaceBefore) Then

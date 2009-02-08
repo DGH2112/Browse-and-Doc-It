@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       25 Jan 2009
+  @Date       08 Feb 2009
   @Author     David Hoyle
 
 **)
@@ -575,8 +575,8 @@ begin
         End;
       Result := Result + ')';
     End;
-  Result := Result + BuildStringRepresentation(False,
-    boolForDocumentation, 'As', BrowseAndDocItOptions.MaxDocOutputWidth);
+  Result := Result + #32'As'#32 + BuildStringRepresentation(False,
+    boolForDocumentation, '', BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
 (**

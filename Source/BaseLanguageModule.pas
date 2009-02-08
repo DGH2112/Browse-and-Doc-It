@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    23 Jan 2009
+  @Date    08 Feb 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -364,8 +364,6 @@ Type
     dctMissingInitComment,
     dctMissingFinalComment
   );
-
-  {: @todo TDUnitOptions = (duoDoSomething);}
 
   (** This record refined a pairing of Resource Name and Image Mask Colour for
       the imported images from the Executable File associated with the
@@ -2486,10 +2484,6 @@ Const
     'HTMLEndTag',  'Directive', 'CompilerDirective', 'LinkTag', 'TreeHeader',
     'FileEnd', 'LineContinuation');
 
-  {: @todo strDUnitOptions : Array[Low(TDUnitOptions)..High(TDUnitOptions)] Of String = (
-    'Do Something...'
-  );}
-
 Var
   (** This is a global variable for the Browse and Doc It options that need to
       be available throughout the application. **)
@@ -2668,22 +2662,23 @@ Begin
       If Not (Tokens[iToken].TokenType In [ttHTMLStartTag, ttHTMLEndTag]) Or
         ((Tokens[iToken].TokenType In [ttHTMLStartTag, ttHTMLEndTag]) And boolShowHTML) Then
         Begin
-          boolSpace := (iToken > 0) Or (strDelimiter <> '');
+          boolSpace := (iToken > -1) Or (strDelimiter <> '');
           T := Tokens[iToken];
           boolSpace := boolSpace And Not (T.Token[1] In strNoSpaceBefore);
-          If L <> Nil Then
+          If (L <> Nil) And (L.Length > 0) Then
             boolSpace := boolSpace  And Not (L.Token[1] In strNoSpaceAfter);
-          If boolSpace Or ((L.Length > 0) And (L.Token[1] In strSpaceAfter)) Then
-            If Not (boolForDocumentation And (iLength + T.Length > iMaxWidth)) Then
-              Begin
-                If (L.TokenType <> ttHTMLStartTag) And (T.TokenType <> ttHTMLEndTag) Then
-                  Result := Result + #32;
-                Inc(iLength);
-              End Else
-              Begin
-                Result := Result + #13#10#32#32;
-                iLength := 2;
-              End;
+          If Result <> '' Then
+            If boolSpace Or ((L.Length > 0) And (L.Token[1] In strSpaceAfter)) Then
+              If Not (boolForDocumentation And (iLength + T.Length > iMaxWidth)) Then
+                Begin
+                  If (L.TokenType <> ttHTMLStartTag) And (T.TokenType <> ttHTMLEndTag) Then
+                    Result := Result + #32;
+                  Inc(iLength);
+                End Else
+                Begin
+                  Result := Result + #13#10#32#32;
+                  iLength := 2;
+                End;
           Result := Result + T.Token;
           Inc(iLength, T.Length);
           L := T;

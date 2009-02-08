@@ -2,18 +2,12 @@
 
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
-  @precon     Before this class con be constructed it requires an instance of a
-              TStream decendant passed to the constructor which contains the
-              source code text to be parsed.
-
   @Version    1.0
-  @Date       25 Jan 2009
+  @Date       08 Feb 2009
   @Author     David Hoyle
 
-  @todo       RENAME this module to "PascalModule".
-
 **)
-Unit PascalDocModule;
+Unit PascalModule;
 
 Interface
 
@@ -1171,7 +1165,7 @@ function TTypes.AsString(boolShowIdentifier, boolForDocumentation : Boolean): St
 
 begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    '', BrowseAndDocItOptions.MaxDocOutputWidth);
+    '=', BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
 (**
@@ -1245,8 +1239,10 @@ begin
     Begin
       Result := Result + #32':'#32;
       Result := Result + strArrayOf[ArrayOf];
-      Result := Result + ParamType.AsString(boolShowIdentifier, boolForDocumentation);
+      Result := Result + ParamType.AsString(False, boolForDocumentation);
     End;
+  If DefaultValue <> '' Then
+    Result := Result + #32'='#32 + DefaultValue;
 end;
 
 (**
@@ -1522,19 +1518,26 @@ function TPascalProperty.AsString(boolShowIdentifier,
 
     This is a shorthand routine for output the string specs to the result.
 
-    @precon  None.
-    @postcon Output the string specs to the result.
+    @precon  None . 
+    @postcon Output the string specs to the result . 
 
+    @param   strName  as a String
     @param   strValue as a String
 
   **)
-  Procedure OutputSpec(strValue : String);
+  Procedure OutputSpec(strName, strValue : String);
 
   Begin
     If strValue <> '' Then
       Begin
         If boolForDocumentation Then
           Result := Result + #32#32;
+        If strName <> '' Then
+          Begin
+            If Not boolForDocumentation Then
+              Result := Result + #32;
+            Result := Result + strName;
+          End;
         Result := Result + #32 + strValue;
         If boolForDocumentation Then
           Result := Result + #13#10;
@@ -1571,22 +1574,22 @@ begin
     Begin
       For i := 0 To TypeId.TokenCount - 1 Do
         Result := Result + TypeId.AsString(boolShowIdentifier, boolForDocumentation);
-      If boolForDocumentation Then
-        Result := Result + #13#10;
     End;
-  OutputSpec(FIndexSpec);
-  OutputSpec(FReadSpec);
-  OutputSpec(FWriteSpec);
-  OutputSpec(FStoredSpec);
-  OutputSpec(FDefaultSpec);
-  OutputSpec(FImplementsSpec);
+  If boolForDocumentation Then
+    Result := Result + #13#10;
+  OutputSpec('Index', FIndexSpec);
+  OutputSpec('Read', FReadSpec);
+  OutputSpec('Write', FWriteSpec);
+  OutputSpec('Stored', FStoredSpec);
+  OutputSpec('Default', FDefaultSpec);
+  OutputSpec('Implements', FImplementsSpec);
   If FReadOnlySpec Then
-    OutputSpec('ReadOnly');
+    OutputSpec('', 'ReadOnly');
   If FWriteOnlySpec Then
-    OutputSpec('WriteOnly');
-  OutputSpec(FDispIDSpec);
+    OutputSpec('', 'WriteOnly');
+  OutputSpec('DispID', FDispIDSpec);
   If FDefaultProperty Then
-    OutputSpec('Default');
+    OutputSpec('', 'Default');
 end;
 
 (**
@@ -1642,7 +1645,7 @@ begin
   If boolShowIdentifier Then
     Result := Result + Identifier;
   If Result <> '' Then
-    Result := Result + #32'=';
+    Result := Result + #32':';
   For iToken := 0 To TokenCount - 1 Do
     Result := Result + #32 + Tokens[iToken].Token;
 end;
@@ -1759,6 +1762,7 @@ constructor TObjectDecl.Create(strName: String; AScope: TScope; iLine,
 begin
   Inherited Create(strName, AScope, iLine, iColumn, iImageIndex, AComment);
   FHeritage := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
+  FHeritage.Sorted := False;
 end;
 
 (**
@@ -1865,7 +1869,7 @@ begin
     Result := Result + Identifier;
   If Result <> '' Then
     Result := Result + #32'='#32;
-  Result := Identifier + 'Class';
+  Result := Result + 'Class';
   If FAbstractClass Then
     Result := Result + #32'Abstract';
   If FSealedClass Then
@@ -1880,7 +1884,7 @@ begin
           Result := Result + Heritage.Elements[iToken].AsString(boolShowIdentifier,
             boolForDocumentation);
           If iToken < Heritage.ElementCount  Then
-            Result := Result + #32',';
+            Result := Result + ','#32;
         End;
       Result := Result + ')';
     End;
@@ -8053,7 +8057,7 @@ begin
     Begin
       NextNonCommentToken;
       ExprType := [etInteger, etConstExpr];
-      C := TPropertySpec.Create('Index', scNone, 0, 0, iiNone, Nil);
+      C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         ConstExpr(C, ExprType);
         Prop.IndexSpec := C.AsString(True, False);
@@ -8066,7 +8070,7 @@ begin
     Begin
       NextNonCommentToken;
       ExprType := [etUnknown];
-      C := TPropertySpec.Create('Read', scNone, 0, 0, iiNone, Nil);
+      C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         Designator(C, ExprType);
         Prop.ReadSpec := C.AsString(True, False);
@@ -8081,7 +8085,7 @@ begin
     Begin
       NextNonCommentToken;
       ExprType := [etUnknown];
-      C := TPropertySpec.Create('Write', scNone, 0, 0, iiNone, Nil);
+      C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         Designator(C, ExprType);
         Prop.WriteSpec := C.AsString(True, False);
@@ -8096,7 +8100,7 @@ begin
     Begin
       NextNonCommentToken;
       ExprType := [etInteger, etConstExpr];
-      C := TPropertySpec.Create('Stored', scNone, 0, 0, iiNone, Nil);
+      C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         ConstExpr(C, ExprType);
         Prop.StoredSpec := C.AsString(True, False);
@@ -8109,7 +8113,7 @@ begin
     Begin
       NextNonCommentToken;
       ExprType := [etUnknown, etConstExpr];
-      C := TPropertySpec.Create('Default', scNone, 0, 0, iiNone, Nil);
+      C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         ConstExpr(C, ExprType);
         Prop.DefaultSpec := C.AsString(True, False);
@@ -8140,7 +8144,7 @@ begin
     Begin
       NextNonCommentToken;
       ExprType := [etInteger, etConstExpr];
-      C := TPropertySpec.Create('DispID', scNone, 0, 0, iiNone, Nil);
+      C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         ConstExpr(C, ExprType);
         Prop.DispIdSpec := C.AsString(True, False);
@@ -8349,6 +8353,7 @@ Procedure TPascalModule.IdentList(Container : TElementContainer;
 
 Var
   C, AComment : TComment;
+  I: TIdentList;
 
 Begin
   AComment := Nil;
@@ -8362,18 +8367,25 @@ Begin
               AComment := TPascalComment.Create(C);
               OwnedItems.Add(AComment);
             End;
+          I := Nil;
           If Container <> Nil Then
-            Container.Add(TIdentList.Create(Token.Token, scNone, Token.Line,
-              Token.Column, iImageIndex, AComment));
+            I := Container.Add(TIdentList.Create(Token.Token, scNone, Token.Line,
+              Token.Column, iImageIndex, AComment)) As TIdentList;
           NextNonCommentToken;
           If Token.UToken = 'IN' Then
             Begin
+              If I <> Nil Then
+                I.AddToken(Token.Token);
               NextNonCommentToken;
               If Token.TokenType <> ttStringLiteral Then
                 ErrorAndSeekToken(strStringExpected, 'IdentList', Token.Token,
                   SeekTokens, stActual)
               Else
-                NextNonCommentToken;
+                Begin
+                  If I <> Nil Then
+                    I.AddToken(Token.Token);
+                  NextNonCommentToken;
+                End;
             End;
         End Else
           ErrorAndSeekToken(strIdentExpected, 'IdentList', Token.Token,
@@ -9233,12 +9245,10 @@ end;
   @return  a String              
 
 **)
-function TIdentList.AsString(boolShowIdentifier,
-  boolForDocumentation : Boolean): String;
+function TIdentList.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
+  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
+    '', BrowseAndDocItOptions.MaxDocOutputWidth)
 end;
 
 (**

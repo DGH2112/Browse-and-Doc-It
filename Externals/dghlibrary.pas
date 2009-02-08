@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    25 Oct 2008
+  @Date    08 Feb 2009
 
 **)
 Unit DGHLibrary;
@@ -20,6 +20,9 @@ Uses
 Type
   (** A custom exception for errors getting the building number. **)
   EBuildNumberException = Exception;
+
+  (** A custom exception for converting string dates to actual dates. **)
+  EDateConversionException = Exception;
 
   (** A record to describe the degrees, minutes and seconds of a bearing. **)
   TBearing = Record
@@ -1314,8 +1317,10 @@ Var
   Begin
     If iIndex > sl.Count - 1 Then Exit;
     Val(sl[iIndex], iValue, i);
-    If i <> 0 Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-    If Delete Then sl.Delete(iIndex);
+    If i <> 0 Then
+      Raise EDateConversionException.CreateFmt(strErrMsg, [strDate]);
+    If Delete Then
+      sl.Delete(iIndex);
   End;
 
   (**
@@ -1420,19 +1425,25 @@ Begin
               End;
         End;
     Else
-      If sl.Count <> 0 Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+      If sl.Count <> 0 Then
+        Raise EDateConversionException.CreateFmt(strErrMsg, [strDate]);
     End;
     // Output result.
     With recDate Do
       Begin
-        If Not (iHour In [0..23]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-        If Not (iMinute In [0..59]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-        If Not (iSecond In [0..59]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+        If Not (iHour In [0..23]) Then
+          Raise EDateConversionException.CreateFmt(strErrMsg, [strDate]);
+        If Not (iMinute In [0..59]) Then
+          Raise EDateConversionException.CreateFmt(strErrMsg, [strDate]);
+        If Not (iSecond In [0..59]) Then
+          Raise EDateConversionException.CreateFmt(strErrMsg, [strDate]);
         Result := EncodeTime(iHour, iMinute, iSecond, iMilli);
         If iYear * iMonth * iDay <> 0 Then
           Begin
-            If Not (iDay In [1..31]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
-            If Not (iMonth In [1..12]) Then Raise Exception.CreateFmt(strErrMsg, [strDate]);
+            If Not (iDay In [1..31]) Then
+              Raise EDateConversionException.CreateFmt(strErrMsg, [strDate]);
+            If Not (iMonth In [1..12]) Then
+              Raise EDateConversionException.CreateFmt(strErrMsg, [strDate]);
             Result := Result + EncodeDate(iYear, iMonth, iDay);
           End;
       End;

@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    24 Dec 2008
+  @Date    08 Feb 2009
   @Version 1.0
 
 **)
@@ -22,7 +22,7 @@ Uses
   Implementation
 
 Uses
-  Windows, PascalDocModule, VBModule;
+  Windows, PascalModule, VBModule;
 
 Type
   (** A class type to define classes in the record structure. **)

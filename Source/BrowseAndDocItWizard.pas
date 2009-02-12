@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    07 Feb 2009
+  @Date    12 Feb 2009
   @Version 1.0
 
 **)
@@ -283,7 +283,7 @@ End;
 
   @param   strText as a String
   @param   iIndent as an Integer
-  @return  a String 
+  @return  a String
 
 **)
 Function Indent(strText : String; iIndent : Integer) : String;
@@ -356,11 +356,16 @@ Begin
   CreateMenuItem(mmiPascalDocMenu, '&Documentation', DocumentationClick,
     Menus.ShortCut(Ord('D'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu);
-  CreateMenuItem(mmiPascalDocMenu, 'Insert &Method Comment', InsertMethodCommentClick);
-  CreateMenuItem(mmiPascalDocMenu, 'Insert &Property Comment', InsertPropertyCommentClick);
-  CreateMenuItem(mmiPascalDocMenu, 'Insert &Comment Block', InsertBlockCommentClick);
-  CreateMenuItem(mmiPascalDocMenu, 'Insert &Line Comment', InsertLineCommentClick);
-  CreateMenuItem(mmiPascalDocMenu, 'Insert &In-Situ Comment', InsertInSituCommentClick);
+  CreateMenuItem(mmiPascalDocMenu, 'Insert &Method Comment',
+    InsertMethodCommentClick);
+  CreateMenuItem(mmiPascalDocMenu, 'Insert &Property Comment',
+    InsertPropertyCommentClick);
+  CreateMenuItem(mmiPascalDocMenu, 'Insert &Comment Block',
+    InsertBlockCommentClick);
+  CreateMenuItem(mmiPascalDocMenu, 'Insert &Line Comment',
+    InsertLineCommentClick);
+  CreateMenuItem(mmiPascalDocMenu, 'Insert &In-Situ Comment',
+    InsertInSituCommentClick);
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, '&Options...', OptionsClick,
     Menus.ShortCut(Ord('O'), [ssCtrl, ssShift, ssAlt]));
@@ -378,14 +383,10 @@ End;
 
 (**
 
-
   This method creates menu items using the passed information.
 
-
-  @precon  mmiParent must be a valid parent menu item in the IDE.
-
-  @postcon A Sub menu ite is created under mmiParent.
-
+  @precon  mmiParent must be a valid parent menu item in the IDE .
+  @postcon A Sub menu ite is created under mmiParent .
 
   @param   mmiParent  as a TMenuItem
   @param   strCaption as a String
@@ -488,8 +489,23 @@ end;
 **)
 procedure TBrowseAndDocItWizard.DUnitClick(Sender: TObject);
 
+ResourceString
+  strSelectSourceCode = 'You must select a source code editor to create unit tests.';
+
+Var
+  D: TDUnitCreator;
+
 begin
-  TfrmDUnit.Execute(TDUnitCreator.Create);
+  If ActiveSourceEditor <> Nil Then
+    Begin
+      D := TDUnitCreator.Create;
+      Try
+        TfrmDUnit.Execute(D);
+      Finally
+        D.Free;
+      End;
+    End Else
+      MessageDlg(strSelectSourceCode, mtError, [mbOK], 0);
 End;
 
 {procedure TBrowseAndDocItWizard.Destroyed;

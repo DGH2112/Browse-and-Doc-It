@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    08 Feb 2009
+  @Date    13 Feb 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -1434,6 +1434,13 @@ Type
       @return  a TColor
     **)
     Property TreeColour : TColor Read FTreeColour Write FTreeColour;
+    (**
+      This property returns the name of the inifile.
+      @precon  None.
+      @postcon Returns the name of the inifile.
+      @return  a String
+    **)
+    Property INIFileName : String Read FINIFileName;
   End;
 
   (** A class to represent a label within the Module Explorer / Documentation **)

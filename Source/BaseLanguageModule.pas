@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    13 Feb 2009
+  @Date    18 Feb 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -3840,7 +3840,7 @@ var
 begin
   Result := -1;
   For i := 0 To TokenCount - 1 Do
-    If strToken = Tokens[i].Token Then
+    If AnsiCompareText(strToken, Tokens[i].Token) = 0 Then
       Begin
         Result := i;
         Break;

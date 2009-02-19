@@ -1,0 +1,14 @@
+Unit $TESTUNITNAME$;
+
+Interface
+
+Uses
+  TestFramework, $UNITTOBETESTED$;
+
+Type
+$TESTCLASSES$
+Implementation
+$TESTIMPLEMENTATION$
+Initialization
+$TESTSUITES$
+End.

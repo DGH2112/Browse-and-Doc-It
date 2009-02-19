@@ -1,0 +1,8 @@
+/*
+
+  This is a Windows Resource File which contains DUnit Templates.
+
+*/
+DUnitProjectSource RCDATA "Source\DUnit Templates\DUnitProjectTemplate.txt"
+DUnitUnitSource RCDATA "Source\DUnit Templates\DUnitUnitTemplate.txt"
+

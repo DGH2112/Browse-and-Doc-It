@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    12 Feb 2009
+  @Date    19 Feb 2009
   @Version 1.0
 
 **)
@@ -12,8 +12,7 @@ Unit BrowseAndDocItWizard;
 Interface
 
 Uses
-  Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, ModuleExplorerFrame,
-  DockForm, Types;
+  Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, DockForm, Types;
 
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 
@@ -117,6 +116,7 @@ Type
     FWizard : TBrowseAndDocItWizard;
     Procedure FocusModuleExplorer(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
+    {
     Procedure InsertMethodComment(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
     Procedure InsertPropertyComment(const Context: IOTAKeyContext;
@@ -127,6 +127,7 @@ Type
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
     Procedure InsertInSituComment(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
+    }
     Procedure ShowTokens(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
   Protected
@@ -351,21 +352,23 @@ Begin
   With mmiPascalDocMenu Do
     Caption := '&Browse and Doc It';
   mmiMainMenu.Items.Insert(mmiMainMenu.Items.Count - 2, mmiPascalDocMenu);
+  CreateMenuItem(mmiPascalDocMenu, 'Edi&tor', Focus,
+    Menus.ShortCut(Ord('E'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, 'Module &Explorer', ModuleExplorerClick,
     Menus.ShortCut(13, [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, '&Documentation', DocumentationClick,
     Menus.ShortCut(Ord('D'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Method Comment',
-    InsertMethodCommentClick);
+    InsertMethodCommentClick, Menus.ShortCut(Ord('M'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Property Comment',
-    InsertPropertyCommentClick);
+    InsertPropertyCommentClick, Menus.ShortCut(Ord('P'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Comment Block',
-    InsertBlockCommentClick);
+    InsertBlockCommentClick, Menus.ShortCut(Ord('B'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Line Comment',
-    InsertLineCommentClick);
+    InsertLineCommentClick, Menus.ShortCut(Ord('L'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, 'Insert &In-Situ Comment',
-    InsertInSituCommentClick);
+    InsertInSituCommentClick, Menus.ShortCut(Ord('I'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, '&Options...', OptionsClick,
     Menus.ShortCut(Ord('O'), [ssCtrl, ssShift, ssAlt]));
@@ -491,6 +494,7 @@ procedure TBrowseAndDocItWizard.DUnitClick(Sender: TObject);
 
 ResourceString
   strSelectSourceCode = 'You must select a source code editor to create unit tests.';
+  strNoSelectedProject = 'There is no active project in the project group.';
 
 Var
   D: TDUnitCreator;
@@ -498,12 +502,16 @@ Var
 begin
   If ActiveSourceEditor <> Nil Then
     Begin
-      D := TDUnitCreator.Create;
-      Try
-        TfrmDUnit.Execute(D);
-      Finally
-        D.Free;
-      End;
+      If ActiveProject <> Nil Then
+        Begin
+          D := TDUnitCreator.Create;
+          Try
+            TfrmDUnit.Execute(D);
+          Finally
+            D.Free;
+          End;
+        End Else
+          MessageDlg(strNoSelectedProject, mtError, [mbOK], 0);
     End Else
       MessageDlg(strSelectSourceCode, mtError, [mbOK], 0);
 End;
@@ -1871,11 +1879,13 @@ procedure TKeyboardBinding.BindKeyboard(
   const BindingServices: IOTAKeyBindingServices);
 begin
   BindingServices.AddKeyBinding([Shortcut(13, [ssCtrl, ssShift, ssAlt])], FocusModuleExplorer, Nil);
+  {
   BindingServices.AddKeyBinding([Shortcut(Ord('M'), [ssCtrl, ssShift, ssAlt])], InsertMethodComment, Nil);
   BindingServices.AddKeyBinding([Shortcut(Ord('P'), [ssCtrl, ssShift, ssAlt])], InsertPropertyComment, Nil);
   BindingServices.AddKeyBinding([Shortcut(Ord('B'), [ssCtrl, ssShift, ssAlt])], InsertBlockComment, Nil);
   BindingServices.AddKeyBinding([Shortcut(Ord('L'), [ssCtrl, ssShift, ssAlt])], InsertLineComment, Nil);
   BindingServices.AddKeyBinding([Shortcut(Ord('I'), [ssCtrl, ssShift, ssAlt])], InsertInSituComment, Nil);
+  }
   BindingServices.AddKeyBinding([Shortcut(Ord('T'), [ssCtrl, ssShift, ssAlt])], ShowTokens, Nil);
 end;
 
@@ -1891,13 +1901,13 @@ end;
   @param   KeyCode       as a TShortcut
   @param   BindingResult as a TKeyBindingResult as a reference
 
-**)
 procedure TKeyboardBinding.InsertBlockComment(const Context: IOTAKeyContext;
   KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
 begin
   FWizard.InsertBlockCommentClick(Self);
   BindingResult := krHandled;
 end;
+**)
 
 (**
 
@@ -1911,13 +1921,13 @@ end;
   @param   KeyCode       as a TShortcut
   @param   BindingResult as a TKeyBindingResult as a reference
 
-**)
 procedure TKeyboardBinding.InsertInSituComment(const Context: IOTAKeyContext;
   KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
 begin
   FWizard.InsertInSituCommentClick(Self);
   BindingResult := krHandled;
 end;
+**)
 
 (**
 
@@ -1931,13 +1941,13 @@ end;
   @param   KeyCode       as a TShortcut
   @param   BindingResult as a TKeyBindingResult as a reference
 
-**)
 procedure TKeyboardBinding.InsertLineComment(const Context: IOTAKeyContext;
   KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
 begin
   FWizard.InsertLineCommentClick(Self);
   BindingResult := krHandled;
 end;
+**)
 
 (**
 
@@ -1951,13 +1961,13 @@ end;
   @param   KeyCode       as a TShortcut
   @param   BindingResult as a TKeyBindingResult as a reference
 
-**)
 procedure TKeyboardBinding.InsertMethodComment(const Context: IOTAKeyContext;
   KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
 begin
   FWizard.InsertMethodCommentClick(Self);
   BindingResult := krHandled;
 end;
+**)
 
 (**
 
@@ -1971,13 +1981,13 @@ end;
   @param   KeyCode       as a TShortcut
   @param   BindingResult as a TKeyBindingResult as a reference
 
-**)
 procedure TKeyboardBinding.InsertPropertyComment(const Context: IOTAKeyContext;
   KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
 begin
   FWizard.InsertPropertyCommentClick(Self);
   BindingResult := krHandled;
 end;
+**)
 
 (**
 

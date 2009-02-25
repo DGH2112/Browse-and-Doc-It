@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    18 Feb 2009
+  @Date    25 Feb 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -750,16 +750,16 @@ Type
     FMethod : String;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     (**
-      Returns the exception method of the exception stored.
+      Returns the error method of the error stored.
       @precon  None.
-      @postcon Returns the exception method of the exception stored.
+      @postcon Returns the error method of the error stored.
       @return  a String
     **)
     Property Method : String Read FMethod;
     (**
-      Returns the exception message.
+      Returns the error message.
       @precon  None.
-      @postcon Returns the exception message.
+      @postcon Returns the error message.
       @return  a String
     **)
     Property Msg : String Read FMsg;
@@ -1594,65 +1594,67 @@ ResourceString
   (** Label for Methods. **)
   strMethodsLabel = 'Methods';
 
-  (** Resource string for a class not found. **)
+  (** Exception message an unexpected start of file. **)
   strUnExpectedStartOfFile = 'Unexpected start-of-file.';
   (** Exception message for an unexpected end of file. **)
   strUnExpectedEndOfFile = 'Unexpected end-of-file.';
-  (** Exception message when an identifier is expected but something else is found. **)
+  (** Error message when an identifier is expected but something else is found. **)
   strIdentExpected = 'Identifier expected but ''%s'' found at line %d column %d.';
-  (** Exception message when an string is expected but something else is found. **)
+  (** Error message when an string is expected but something else is found. **)
   strStringExpected = 'String literal expected but ''%s'' found at line %d column %d.';
-  (** Exception message when an number is expected but something else is found. **)
+  (** Error message when an number is expected but something else is found. **)
   strNumberExpected = 'Number expected but ''%s'' found at line %d column %d.';
-  (** Exception message when an reserved word is expected but something else is
+  (** Error message when an reserved word is expected but something else is
       found. **)
   strReservedWordExpected = 'Expected ''%s'' but ''%s'' found at line %d column %d.';
-  (** Exception message when an literal character is expected but something else
+  (** Error message when an literal character is expected but something else
       is found. **)
   strLiteralExpected = '''%s'' expected but ''%s'' found at line %d column %d.';
   (** Warning for a function not having a return parameter. **)
   strFunctionWarning = 'Function ''%s'' does not have a return type specified.';
-  (** An exception message for a non defined help file option. **)
+  (** An error message for a non defined help file option. **)
   strHelpFileNotDefined = 'There is no help file specified. Please specified a ' +
     'help file in the options dialogue.';
-  (** An exception message for a missing help file **)
+  (** An error message for a missing help file **)
   strHelpFileNotFound = 'The help file ''%s'' was not found.';
-  (** An exception message for an undeclared class method. **)
+  (** An error message for an undeclared class method. **)
   strUndeclaredClassMethod = 'Method ''%s'' has not been declared.';
-  (** An exception message for an unsatisfied forward reference. **)
+  (** An error message for an unsatisfied forward reference. **)
   strUnSatisfiedForwardReference = 'Method ''%s'' has an unsatisfied ' +
     'forward reference.';
-  (** An exception message for a type not found. **)
+  (** An error message for a type not found. **)
   strTypeNotFound = 'Type declaration missing but found ''%s'' at line %d column %d.';
-  (** An exception message when a TypeID is expected. **)
+  (** An error message when a TypeID is expected. **)
   strTypeIDExpected = 'A TypeID was expected but found ''%s'' at line %d column %d.';
   (** An execption message when a Expr conflict occurs in an expression **)
   strExprConflict = 'The token ''%s'' conflicts with the TYPE of the preceeding ' +
     'expression at line %d column %d.';
-  (** An exception message if a function is used in a constant expression **)
+  (** An error message if a function is used in a constant expression **)
   strConstExprDesignator = 'The token ''%s'' at line %d column %d is not allowed ' +
     'in a Constant Expression.';
-  (** An exception message if the first none comment token is not Program,
+  (** An error message if the first none comment token is not Program,
       Package, Unit or Library. **)
   strModuleKeyWordNotfound = '''%s'' found but module starting keyword PROGRAM, ' +
     'PACKAGE, UNIT or LIBRARY not found.';
-  (** An exception message for an undefined token in the stream. **)
+  (** An error message for an undefined token in the stream. **)
   strUnDefinedToken = 'The token ''%s'' at line %d column %d is not defined.';
-  (** An exception message for an $ELSE without a string $IFDEF / $FIFNDEF **)
+  (** An error message for an $ELSE without a string $IFDEF / $FIFNDEF **)
   strElseIfMissingIfDef = '$ELSE is missing a starting $IFDEF or $IFNDEF at ' +
     'line %d column %d.';
-  (** An exception message for an $ENDIF without a string $IFDEF / $FIFNDEF **)
+  (** An error message for an $ENDIF without a string $IFDEF / $FIFNDEF **)
   strEndIfMissingIfDef = '$ENDIF is missing a starting $IFDEF or $IFNDEF at ' +
     'line %d column %d.';
-  (** An exception message for an Ordinal Type not found. **)
+  (** An error message for an unknown compiler directive. **)
+  strUnknownComDir = 'Unknown compiler directive ''%s'' at line %d column %d.';
+  (** An error message for an Ordinal Type not found. **)
   strOrdinalTypeExpected = 'Ordinal type expected but ''%s'' found at line %d ' +
     'column %d.';
-  (** An exception message for a Type Declaration not found. **)
+  (** An error message for a Type Declaration not found. **)
   strTypeDeclExpected = 'Type Declaration expected but ''%s'' found at line %s ' +
     'column %d.';
-  (** An exception message for a Label not found. **)
+  (** An error message for a Label not found. **)
   strLabelExpected = 'Label expected but ''%s'' found at line %s column %d.';
-  (** An exception message for a Constant Expression found. **)
+  (** An error message for a Constant Expression found. **)
   strConstExprExpected = 'Constant Expression expected but ''%s'' found at ' +
     'line %d column %d.';
   (** Document conflict message for a unreferenced locals. **)
@@ -2559,6 +2561,32 @@ begin
           Break;
         End;
     End;
+end;
+
+(**
+
+  This method builds a language independant representation of the parameter.
+
+  @precon  None.
+  @postcon Returns a string language independant representation of the parameter.
+
+  @param   Param as a TGenericParameter
+  @return  a String
+
+**)
+function BuildLangIndepRep(Param: TGenericParameter): String;
+begin
+  Result := '';
+  If Param.ParamType = Nil Then
+    Exit;
+  If Param.ArrayOf Then
+    Result := 'Array Of ';
+  Result := Result + Param.ParamType.AsString(False, False);
+  Case Param.ParamModifier Of
+    pamVar: Result := Result + ' as a reference';
+    pamConst: Result := Result + ' as a constant';
+    pamOut: Result := Result + ' as an out parameter';
+  End;
 end;
 
   { TBaseContainer }
@@ -4329,7 +4357,7 @@ End;
   @precon  Value is the new value to assign to the Msg property.
   @postcon Sets the Message property for the method.
 
-  @param   Value as a String constant
+  @param   Value as a String as a constant
 
 **)
 procedure TGenericMethodDecl.SetMsg(const Value: String);
@@ -4345,7 +4373,7 @@ end;
   @precon  Value is the new value to assign to the Ext property.
   @postcon Setst the extension property for the method.
 
-  @param   Value as a String constant
+  @param   Value as a String as a constant
 
 **)
 procedure TGenericMethodDecl.SetExt(const Value: String);
@@ -4366,7 +4394,7 @@ end;
 
            message, strExceptionMethod is the name of the method the 
 
-           exception occurred in and ErrType determines if the mesage is a 
+           error occurred in and ErrType determines if the mesage is a 
 
            warning or an error. 
 
@@ -5376,6 +5404,7 @@ Var
   iFound : Integer;
   strType : String;
   strParam: String;
+  iLength: Integer;
 
 Begin
   For i := 0 To ParameterCount - 1 Do
@@ -5399,14 +5428,18 @@ Begin
         With Comment Do
           Begin
             strType := '';
-            If Tag[iFound].TokenCount > 3 Then
-              strType := Tag[iFound].Tokens[3].Token;
-            If Parameters[i].ParamType <> Nil Then
-              strParam := Parameters[i].ParamType.AsString(False, False)
-            Else
-              strParam := '';
+            For j := 3 To Tag[iFound].TokenCount - 1 Do
+              Begin
+                If strType <> '' Then
+                  strType := strType + #32;
+                strType := strType + Tag[iFound].Tokens[j].Token;
+              End;
+            strParam := BuildLangIndepRep(Parameters[i]);
+            iLength := Length(strType);
+            If Length(strParam) < iLength Then
+              iLength := Length(strParam);
             If doShowMethodIncorrectParamType In BrowseAndDocItOptions.Options Then
-              If Not (LowerCase(strType) = Lowercase(strParam)) Then
+              If AnsiCompareText(Copy(strType, 1, iLength), Copy(strParam, 1, iLength)) <> 0 Then
                 AddDocumentConflict([Parameters[i].Identifier, QualifiedName,
                   strParam], Tag[iFound].Line, Tag[iFound].Column, Comment,
                   DocConflictTable[dctMethodIncorrectParamType]);
@@ -5596,6 +5629,7 @@ Var
   iFound : Integer;
   strType : String;
   strParam: String;
+  iLength: Integer;
 
 Begin
   For i := 0 To ParameterCount - 1 Do
@@ -5621,12 +5655,12 @@ Begin
             strType := '';
             If Tag[iFound].TokenCount > 3 Then
               strType := Tag[iFound].Tokens[3].Token;
-            If Parameters[i].ParamType <> Nil Then
-              strParam := Parameters[i].ParamType.AsString(False, False)
-            Else
-              strParam := '';
+            strParam := BuildLangIndepRep(Parameters[i]);
+            iLength := Length(strType);
+            If Length(strParam) < iLength Then
+              iLength := Length(strParam);
             If doShowPropertyIncorrectParamType In BrowseAndDocItOptions.Options Then
-              If Not ((LowerCase(strType) = Lowercase(strParam))) Then
+              If AnsiCompareText(Copy(strType, 1, iLength), Copy(strParam, 1, iLength)) <> 0 Then
                 AddDocumentConflict([Parameters[i].Identifier, QualifiedName,
                   strParam], Tag[iFound].Line, Tag[iFound].Column, Comment,
                   DocConflictTable[dctPropertyIncorrectParamType]);

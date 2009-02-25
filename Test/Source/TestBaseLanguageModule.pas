@@ -17,6 +17,8 @@ uses
 type
   TElementContainerHelper = Class Helper for TElementContainer
     Function FirstError : String;
+    Function FirstWarning : String;
+    Function FirstHint : String;
     Function DocConflict(iConflict : Integer) : String;
     Procedure DeleteDocumentConflicts;
   End;
@@ -29,6 +31,8 @@ type
   TTestMemoryStream = Class Helper For TMemoryStream
     Procedure LoadBufferFromString(strCode : String);
   End;
+
+  TClassOfTGenericTypeDecl = Class Of TGenericTypeDecl;
 
   TExtendedTestCase = Class(TTestCase)
   Strict Private
@@ -398,6 +402,32 @@ Var
 begin
   Result := '';
   E := FindElement(strErrors);
+  If E <> Nil Then
+    Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
+      #13#10, '(line-end)', [rfReplaceAll]);
+end;
+
+function TElementContainerHelper.FirstHint: String;
+
+Var
+  E : TElementContainer;
+
+begin
+  Result := '';
+  E := FindElement(strHints);
+  If E <> Nil Then
+    Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
+      #13#10, '(line-end)', [rfReplaceAll]);
+end;
+
+function TElementContainerHelper.FirstWarning: String;
+
+Var
+  E : TElementContainer;
+
+begin
+  Result := '';
+  E := FindElement(strWarnings);
   If E <> Nil Then
     Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
       #13#10, '(line-end)', [rfReplaceAll]);
@@ -1662,9 +1692,9 @@ begin
       '  @postcon Does something very interesting.'#13#10 +
       ''#13#10 +
       '  @param   Param1 as a String'#13#10 +
-      '  @param   Param2 as an Integer'#13#10 +
-      '  @param   Param3 as a Byte'#13#10 +
-      '  @param   Param4 as a Double'#13#10 +
+      '  @param   Param2 as an array of Integer as a reference'#13#10 +
+      '  @param   Param3 as a Byte as a constant'#13#10 +
+      '  @param   Param4 as a Double as an out parameter'#13#10 +
       '  @return  a Boolean'#13#10 +
       ''
       , 0, 0);

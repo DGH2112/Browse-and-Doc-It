@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    23 Jan 2009
+  @Date    25 Feb 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -240,8 +240,7 @@ type
 implementation
 
 Uses
-  IniFiles, Types, Math, DGHLibrary, GenericTokenizer
-  {$IFDEF PROFILECODE}, Profiler {$ENDIF};
+  IniFiles, Types, Math, DGHLibrary, GenericTokenizer;
 
 Type
   (** This record described the data sorted in the virtual tree view. **)
@@ -281,10 +280,6 @@ Procedure GetFontInfo(sl : TStringList; i : Integer; Level : Integer;
   Canvas : TCanvas);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('GetFontInfo');
-  Try
-  {$ENDIF}
   With BrowseAndDocItOptions Do
     Begin
       If Level <> 1 Then
@@ -330,11 +325,6 @@ Begin
           Canvas.Font.Style := TokenFontInfo[ttTreeHeader].FStyles;
         End;
    End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -358,10 +348,6 @@ Constructor TTreeNodeInfo.Create(strText : String; iLevel : Integer;
   AComment : TComment = Nil);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TTreeNodeInfo.Create');
-  Try
-  {$ENDIF}
   Inherited Create;
   FText := strText;
   FLevel := iLevel;
@@ -370,11 +356,6 @@ Begin
   FComment := TComment.Create(AComment);
   FImageIndex:= iImageIndex;
   FTokens := Nil;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -388,18 +369,9 @@ End;
 Destructor TTreeNodeInfo.Destroy;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TTreeNodeInfo.Destroy');
-  Try
-  {$ENDIF}
   FTokens.Free;
   FComment.Free;
   Inherited Destroy;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -415,18 +387,9 @@ End;
 **)
 function TTreeNodeInfo.GetTokens: TStringList;
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('GetTokens');
-  Try
-  {$ENDIF}
   If FTokens = Nil Then
     FTokens := Tokenize(FText, strKeyWords, BrowseAndDocItOptions.TokenLimit);
   Result := FTokens;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -451,10 +414,6 @@ Var
   NodeData : ^TTreeData;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TCustomHintWindow.Paint');
-  Try
-  {$ENDIF}
   iLines := 1;
   iLine := 0;
   With Canvas Do
@@ -536,11 +495,6 @@ Begin
             End;
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -577,10 +531,6 @@ Var
   NodeData : ^TTreeData;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TCustomHintWindow.CalcHintRect');
-  Try
-  {$ENDIF}
   Canvas.Font.Assign(FTreeView.Font);
   Result := FTreeView.GetDisplayRect(Node, NoColumn, True);
   Inc(Result.Left, 2); // Adjustment for 
@@ -650,11 +600,6 @@ Begin
             End;
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -670,17 +615,8 @@ End;
 **)
 constructor TCustomHintWindow.Create(AOwner : TComponent; ATreeView: TVirtualStringTree);
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TCustomHintWindow.Create');
-  Try
-  {$ENDIF}
   Inherited Create(AOwner);
   FTreeView := ATreeView;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -708,21 +644,12 @@ Var
  NodeData : ^TTreeData;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TCustomHintWindow.ActivateHint');
-  Try
-  {$ENDIF}
   FComment := Comment;
   NodeData := FTreeView.GetNodeData(Node);
   FNodeLevel := NodeData.FNode.Level;
   FCustomDraw := SyntaxHighlight;
   FNode := Node;
   ActivateHint(Rect, NodeData.FNode.Text);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -745,10 +672,6 @@ Var
   i : Integer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TCustomHintWindow.DrawSpecialTag');
-  Try
-  {$ENDIF}
   Result := False;
   For i := 0 To Comment.TagCount - 1 Do
     If AnsiCompareText(strSpecialTag, Comment.Tag[i].TagName) = 0 Then
@@ -756,11 +679,6 @@ Begin
         Result := True;
         Exit;
       End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -779,10 +697,6 @@ Var
   i : TImageIndex;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.Create');
-  Try
-  {$ENDIF}
   Inherited;
   tvExplorer.NodeDataSize := SizeOf(TTreeData);
   FINIFileName := BuildRootKey(Nil, Nil);
@@ -795,11 +709,6 @@ begin
     If Not ilScopeImages.GetInstRes(hInstance, rtBitmap, ImageList[i].FResourceName, 16,
       [lrDefaultColor], ImageList[i].FMaskColour) Then
       ShowMessage(Format('Resource "%s" not found.', [ImageList[i].FResourceName]))
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -813,21 +722,12 @@ end;
 Destructor TframeModuleExplorer.Destroy;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.Destroy');
-  Try
-  {$ENDIF}
   FSpecialTagNodes := Nil;
   ManageExpandedNodes;
   GetExpandedNodes(FModule);
   FHintWin.Free;
   FNodeInfo.Free;
   Inherited;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -847,10 +747,6 @@ Var
   i, j, k : Integer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.GetBodyCommentTags');
-  Try
-  {$ENDIF}
   For i := 0 To M.BodyCommentCount - 1 Do
     With M.BodyComment[i] Do
       For j := 0 To TagCount - 1 Do
@@ -860,11 +756,6 @@ Begin
               AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(False), 2, 
                 Integer(iiToDoItem) - 1, M.BodyComment[i].Tag[j].Line,
                 M.BodyComment[i].Tag[j].Column, Nil);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -888,10 +779,6 @@ Var
   NewNode : PVirtualNode;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.RenderContainers');
-  Try
-  {$ENDIF}
   For i := 1 To Container.ElementCount Do
     If Container.Elements[i].Scope In BrowseAndDocItOptions.ScopesToRender +
       [scNone, scGlobal] Then
@@ -902,11 +789,6 @@ begin
           Container.Elements[i].Comment);
         RenderContainers(NewNode, Container[i], iLevel + 1);
       End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -929,10 +811,6 @@ Var
   NodeData : ^TTreeData;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.GetNodePath');
-  Try
-  {$ENDIF}
   str := '';
   P := Node;
   While P <> Nil Do
@@ -945,11 +823,6 @@ Begin
       P := tvExplorer.NodeParent[P];
     End;
   Result := str;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -969,10 +842,6 @@ Var
   dtDate: TDateTime;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('ManageExpandedNodes');
-  Try
-  {$ENDIF}
   With BrowseAndDocItOptions.ExpandedNodes Do
   For i := Count - 1 DownTo 0 Do
     Begin
@@ -980,11 +849,6 @@ begin
       If dtDate < Now - 90 Then
         Delete(i);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1007,10 +871,6 @@ Var
   Node : PVirtualNode;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.GetExpandedNodes');
-  Try
-  {$ENDIF}
   Node := tvExplorer.GetFirstChild(StartNode);
   While Node <> Nil Do
     Begin
@@ -1029,11 +889,6 @@ Begin
         End;
       Node := tvExplorer.GetNextSibling(Node);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -1054,10 +909,6 @@ Var
   Node : PVirtualNode;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.SetExpandedNodes');
-  Try
-  {$ENDIF}
   Node := tvExplorer.GetFirstChild(StartNode);
   While Node <> Nil Do
     Begin
@@ -1070,11 +921,6 @@ Begin
         End;
       Node := tvExplorer.GetNextSibling(Node);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -1110,10 +956,6 @@ Function TframeModuleExplorer.FindTreeItem(strText : String) : PVirtualNode;
     C : PVirtualNode;
 
   Begin
-    {$IFDEF PROFILECODE}
-    CodeProfiler.Start('FindNode');
-    Try
-    {$ENDIF}
       Result := Nil;
       C := tvExplorer.GetFirstChild(Node);
       While C <> Nil Do
@@ -1129,26 +971,12 @@ Function TframeModuleExplorer.FindTreeItem(strText : String) : PVirtualNode;
             End;
           C := tvExplorer.GetNextSibling(C);
         End;
-    {$IFDEF PROFILECODE}
-    Finally
-      CodeProfiler.Stop;
-    End;
-    {$ENDIF}
   End;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.FindTreeItem');
-  Try
-  {$ENDIF}
   Result := Nil;
   If strText <> '' Then
     Result := FindNode(FModule);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -1170,10 +998,6 @@ Var
   N : PVirtualNode;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.RenderModule');
-  Try
-  {$ENDIF}
   tvExplorer.Color := BrowseAndDocItOptions.BGColour;
   If M = Nil Then
     strKeyWords := Nil
@@ -1231,11 +1055,6 @@ Begin
   Finally
     FRendering := False;
   End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -1260,10 +1079,6 @@ var
   NodeData : ^TTreeData;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.OutputModuleInfo');
-  Try
-  {$ENDIF}
   RenderContainers(FModule, Container, 1);
   GetBodyCommentTags(Container As TBaseLanguageModule);
   For i := Low(strPromotedLabels) To High(strPromotedLabels) Do
@@ -1277,11 +1092,6 @@ begin
           Node := tvExplorer.GetNextSibling(Node);
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 
@@ -1308,10 +1118,6 @@ Var
   N: PVirtualNode;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.ExpandNodes');
-  Try
-  {$ENDIF}
   tvExplorer.Expanded[FModule] := True;
   For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
     If FSpecialTagNodes[i].Node.ChildCount = 0 Then
@@ -1352,11 +1158,6 @@ begin
           Node := tvExplorer.GetNextSibling(Node);
         End;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 
@@ -1376,10 +1177,6 @@ Var
   i : Integer;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.CreateSpecialTagNodes');
-  Try
-  {$ENDIF}
   For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
     Begin
       FSpecialTagNodes[i].strTagName := BrowseAndDocItOptions.SpecialTags.Names[i];
@@ -1392,11 +1189,6 @@ Begin
       FSpecialTagNodes[i].Node := AddNode(FModule, FSpecialTagNodes[i].strTagDesc,
         1, Integer(iiTodoFolder) - 1);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -1424,20 +1216,11 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
   procedure UpdateScopes(AScope : TScope);
 
   Begin
-    {$IFDEF PROFILECODE}
-    CodeProfiler.Start('UpdateScopes');
-    Try
-    {$ENDIF}
     With BrowseAndDocItOptions Do
       If AScope In ScopesToRender Then
         ScopesToRender := ScopesToRender - [AScope]
       Else
         ScopesToRender := ScopesToRender + [AScope];
-    {$IFDEF PROFILECODE}
-    Finally
-      CodeProfiler.Stop;
-    End;
-    {$ENDIF}
   End;
 
   (**
@@ -1453,27 +1236,14 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
   procedure UpdateOptions(Option : TDocOption);
 
   Begin
-    {$IFDEF PROFILECODE}
-    CodeProfiler.Start('UpdateOptions');
-    Try
-    {$ENDIF}
     With BrowseAndDocItOptions Do
       If Option In Options Then
         Options := Options - [Option]
       Else
         Options := Options + [Option];
-    {$IFDEF PROFILECODE}
-    Finally
-      CodeProfiler.Stop;
-    End;
-    {$ENDIF}
   End;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.actLocalExecute');
-  Try
-  {$ENDIF}
   With BrowseAndDocItOptions Do
     If Sender = actLocal Then
       UpdateScopes(scLocal)
@@ -1503,11 +1273,6 @@ begin
       UpdateOptions(doShowPropertyMissingDoc);
   If Assigned(FRefresh) Then
     FRefresh(Sender);
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1522,10 +1287,6 @@ end;
 **)
 procedure TframeModuleExplorer.actLocalUpdate(Sender: TObject);
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.actLocalUpdate');
-  Try
-  {$ENDIF}
   If Sender = actLocal Then
     (Sender As TAction).Checked := scLocal In BrowseAndDocItOptions.ScopesToRender
   Else If Sender = actPrivate Then
@@ -1552,11 +1313,6 @@ begin
     (Sender As TAction).Checked := doShowMethodMissingDocs In BrowseAndDocItOptions.Options
   Else If Sender = actProperties Then
     (Sender As TAction).Checked := doShowPropertyMissingDoc In BrowseAndDocItOptions.Options;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1587,20 +1343,11 @@ Var
   N : TTreeNodeInfo;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.AddNode');
-  Try
-  {$ENDIF}
   Result := tvExplorer.AddChild(P);
   NodeData := tvExplorer.GetNodeData(Result);
   N := TTreeNodeInfo.Create(strText, iLevel, iImageIndex, iLine, iColumn, AComment);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1627,17 +1374,8 @@ Var
   NodeData : ^TTreeData;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('tvExplorerGetImageIndex');
-  Try
-  {$ENDIF}
   NodeData := tvExplorer.GetNodeData(Node);
   ImageIndex := NodeData.FNode.ImageIndex;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1664,17 +1402,8 @@ Var
   NodeData : ^TTreeData;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('tvExplorerGetText');
-  Try
-  {$ENDIF}
   NodeData := tvExplorer.GetNodeData(Node);
   CellText := NodeData.FNode.Text;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1705,10 +1434,6 @@ Var
   NodeData : ^TTreeData;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.tvExplorerMouseMove');
-  Try
-  {$ENDIF}
   C := Nil;
   tvExplorer.GetHitTestInfoAt(X, Y, True, HitInfo);
   If (hiOnItemLabel In HitInfo.HitPositions) Then
@@ -1741,11 +1466,6 @@ begin
       FHintWin.ReleaseHandle;
       FLastNode := Nil;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1766,10 +1486,6 @@ Var
   i : Integer;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.UpdateStatusBar');
-  Try
-  {$ENDIF}
   If doShowPerformanceCountersInModuleExplorer In BrowseAndDocItOptions.Options Then
     Begin
       stbStatusBar.SimpleText := '';
@@ -1797,11 +1513,6 @@ begin
       stbStatusBar.SimpleText := Format(strStatusbarText, [
         Int(Integer(M.Bytes)), Int(M.TokenCount), Int(M.Lines)]);
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1818,16 +1529,7 @@ end;
 Procedure TframeModuleExplorer.CMMouseLeave(var Msg : TMessage);
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.CMMouseLeave');
-  Try
-  {$ENDIF}
   FHintWin.ReleaseHandle;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -1865,10 +1567,6 @@ Var
   iTreeColour : TColor;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.tvExplorerBeforeItemPaint');
-  Try
-  {$ENDIF}
   CustomDraw := (doCustomDrawing In BrowseAndDocItOptions.Options);
   With TargetCanvas Do
     If CustomDraw Then
@@ -1976,11 +1674,6 @@ begin
             Inc(iPos, TextWidth(sl[i]) + 1);
           End;
       End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -1999,10 +1692,6 @@ Var
   NodeData : ^TTreeData;
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.tvExplorerClick');
-  Try
-  {$ENDIF}
   If FSelectionChanging Then
     Exit;
   FSelectionChanging := True;
@@ -2022,11 +1711,6 @@ begin
   Finally
     FSelectionChanging := False;
   End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 (**
@@ -2044,10 +1728,6 @@ end;
 procedure TframeModuleExplorer.tvExplorerKeyPress(Sender: TObject; var Key: Char);
 
 begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TframeModuleExplorer.tvExplorerKeyPress');
-  Try
-  {$ENDIF}
   If Key = #13 Then
     Begin
       tvExplorerClick(Sender);
@@ -2055,11 +1735,6 @@ begin
         FFocus(Sender);
       Key := #0;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 end;
 
 end.

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       08 Feb 2009
+  @Date       25 Feb 2009
   @Author     David Hoyle
 
 **)
@@ -654,7 +654,7 @@ Type
     Function ExportsStmt : Boolean;
     procedure ExportsItem(Container : TElementContainer);
     Procedure DeclSection(AScope : TScope; Container : TElementContainer);
-    Function LabelDeclSection : Boolean;
+    Function LabelDeclSection(Container : TElementContainer) : Boolean;
     Function ConstSection(AScope : TScope; Container : TElementContainer) : Boolean;
     Function ConstantDecl(AScope : TScope; Container : TElementContainer) : Boolean;
     Function ResStringSection(AScope: TScope): Boolean;
@@ -691,7 +691,7 @@ Type
     Function ProcedureType(AToken : TTypeToken) : TProcedureType;
     Function VarSection(AScope : TScope; Container : TElementContainer) : Boolean;
     Function ClassVarSection(AScope : TScope; Cls : TClassDecl) : Boolean;
-    Function ThreadVarSection(AScope : TScope) : Boolean;
+    Function ThreadVarSection(AScope : TScope; Container : TElementContainer) : Boolean;
     Function VarDecl(AScope : TScope; VarSection : TElementContainer;
       AImageIndex : TImageIndex) : Boolean;
     Function ThreadVarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
@@ -815,16 +815,11 @@ Type
 
 Implementation
 
-{$IFDEF PROFILECODE}
-Uses
-  Profiler;
-{$ENDIF}
-
 Resourcestring
   (** This is an error message for rendering a temporay container - SHOULDN'T do this **)
   strTriedToRenderTmpCntr = 'Tried to Render a Temporary Container!';
   (** This is an error message for duplicate identifiers. **)
-  strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found.';
+  strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found at line %d column %d.';
 
 Const
   (** A set of characters for alpha characaters **)
@@ -883,7 +878,7 @@ Const
   directives. **)
   strMethodDirectives : Array[1..23] Of String = (
     'abstract', 'assembler', 'cdecl', 'dispid', 'dynamic', 'export',
-    'external', 'far', 'fina', 'forward',  'inline', 'local', 'message',
+    'external', 'far', 'final', 'forward',  'inline', 'local', 'message',
     'near', 'overload', 'override', 'pascal', 'register', 'reintroduce',
     'safecall', 'stdcall',  'varargs', 'virtual'
   );
@@ -1237,7 +1232,8 @@ begin
     Result := Result + Identifier;
   If ParamType <> Nil Then
     Begin
-      Result := Result + #32':'#32;
+      If boolShowIdentifier Then
+        Result := Result + #32':'#32;
       Result := Result + strArrayOf[ArrayOf];
       Result := Result + ParamType.AsString(False, boolForDocumentation);
     End;
@@ -1915,10 +1911,6 @@ var
   boolCascade: Boolean;
 
 Begin
-  {$IFDEF PROFILECODE}
-  CodeProfiler.Start('TPascalModule.Create');
-  Try
-  {$ENDIF}
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   FTypesLabel              := Nil;
   FConstantsLabel          := Nil;
@@ -1960,11 +1952,6 @@ Begin
       AddTickCount('Check');
       TidyUpEmptyElements;
     End;
-  {$IFDEF PROFILECODE}
-  Finally
-    CodeProfiler.Stop;
-  End;
-  {$ENDIF}
 End;
 
 (**
@@ -2280,8 +2267,9 @@ begin
       tmpMethod := Method;
       Method := Container.Add(tmpMethod) As TPascalMethod;
       If tmpMethod <> Method Then
-        AddIssue(Format(strDuplicateIdentifierFound, [Method.Identifier]),
-          scNone,  'AddToContainer', tmpMethod.Line, tmpMethod.Column, etError);
+        AddIssue(Format(strDuplicateIdentifierFound, [Method.Identifier,
+          Method.Line, Method.Column]), scNone,  'AddToContainer',
+          tmpMethod.Line, tmpMethod.Column, etError);
     End;
 end;
 
@@ -2794,7 +2782,7 @@ Begin
     ResStringSection(scPublic) Or
     TypeSection(scPublic, Self) Or
     VarSection(scPublic, Self) Or
-    ThreadVarSection(scPublic) Or
+    ThreadVarSection(scPublic, Self) Or
     ExportedHeading(FExportedHeadingsLabel) Or
     ExportsStmt
   );
@@ -2944,11 +2932,11 @@ End;
   This method parses an exports entry from the current token position using the
   following object pascal grammar.
 
-  @grammar ExportsEntry -> Ident [ INDEX IntegerConstant [ NAME StringConstant ]
-             [ RESIDENT ] ]</TD>
+  @precon  None . 
+  @postcon Parses an exports entry from the current token position . 
 
-  @precon  None.
-  @postcon Parses an exports entry from the current token position.
+  @grammar ExportsEntry -> Ident [ INDEX IntegerConstant [ NAME StringConstant
+           ] [ RESIDENT ] ] </TD>
 
   @param   Container as a TElementContainer
 
@@ -2966,19 +2954,22 @@ Begin
         Token.Column, iiPublicExportedFunction, GetComment);
       E := Container.Add(E);
       NextNonCommentToken;
-      // Check INDEX
-      If Token.UToken = 'INDEX' Then
+      While IsKeyWord(Token.Token, ['index', 'name']) Do
         Begin
-          AddToExpression(E);
-          ExprType := [etInteger, etConstExpr];
-          ConstExpr(E, ExprType);
-        End;
-      // Check NAME
-      If Token.UToken = 'NAME' Then
-        Begin
-          AddToExpression(E);
-          ExprType := [etString, etConstExpr];
-          ConstExpr(E, ExprType);
+          // Check INDEX
+          If Token.UToken = 'INDEX' Then
+            Begin
+              AddToExpression(E);
+              ExprType := [etInteger, etConstExpr];
+              ConstExpr(E, ExprType);
+            End;
+          // Check NAME
+          If Token.UToken = 'NAME' Then
+            Begin
+              AddToExpression(E);
+              ExprType := [etString, etConstExpr];
+              ConstExpr(E, ExprType);
+            End;
         End;
     End Else
       ErrorAndSeekToken(strIdentExpected, 'ExportsItem', Token.Token,
@@ -2987,30 +2978,19 @@ End;
 
 (**
 
+  This method parses a declaration section from the current token position using
+  the following object pascal grammar.
 
-  This method parses a declaration section from the current token position
-  using the following object pascal grammar.
-
-
-  @precon  On entry to this method, Scope defines the current scope of the
-
-           block i.e. private in in the implemenation section or public if in
-
-           the interface section and The Method parameter is nil for methods
-
-           in the implementation section or a reference to a method for a
-
-           local declaration section with in a method.
-
-  @postcon Parses a declaration section from the current token position.
-
+  @precon  On entry to this method , Scope defines the current scope of the 
+           block i . e . private in in the implemenation section or public if 
+           in the interface section and The Method parameter is nil for 
+           methods in the implementation section or a reference to a method 
+           for a local declaration section with in a method . 
+  @postcon Parses a declaration section from the current token position . 
 
   @grammar DeclSection -> LabelDeclSection -> ConstSection -> ResStringSection
-
            -> TypeSection -> VarSection -> ThreadVarSection ->
-
            ProcedureDeclSection -> ExportedProcs
-
 
   @param   AScope    as a TScope
   @param   Container as a TElementContainer
@@ -3022,12 +3002,12 @@ Begin
   Repeat
     {Do nothing}
   Until Not (
-    LabelDeclSection Or
+    LabelDeclSection(Container) Or
     ConstSection(AScope, Container) Or
     ResStringSection(AScope) Or
     TypeSection(AScope, Container) Or
     VarSection(AScope, Container) Or
-    ThreadVarSection(AScope) Or
+    ThreadVarSection(AScope, Container) Or
     ProcedureDeclSection(AScope) Or
     ExportsStmt
   );
@@ -3035,50 +3015,49 @@ End;
 
 (**
 
+  This method parses a label declaration section from the current token position
+  using the following object pascal grammar.
 
-  This method parses a label declaration section from the current token
-  position using the following object pascal grammar.
+  @precon  None . 
+  @postcon This method dicards the labels found and returns True if this method 
+           handles a label declaration section . 
 
+  @grammar LabelDeclSection -> LABEL LabelId 
 
-  @precon  None.
-
-  @postcon This method dicards the labels found and returns True if this method
-
-           handles a label declaration section.
-
-
-  @grammar LabelDeclSection -> LABEL LabelId
-
-
-  @return  a Boolean
+  @param   Container as a TElementContainer
+  @return  a Boolean  
 
 **)
-Function TPascalModule.LabelDeclSection : Boolean;
+Function TPascalModule.LabelDeclSection(Container : TElementContainer) : Boolean;
 
 Begin
-  Result := Token.UToken = 'LABEL';
-  If Result Then
+  Result := False;
+  If Container <> Nil Then
     Begin
-      Assert(CurrentMethod <> Nil, 'Method in LabelDeclSection is NULL!');
-      NextNonCommentToken;
-      Repeat
-        If Token.TokenType In [ttIdentifier, ttDirective] Then
-          Begin
-            CurrentMethod.LabelsLabel := CurrentMethod.Add(strLabelsLabel,
-              iiPublicLabelsLabel, scNone, Nil) As TLabelContainer;
-            CurrentMethod.LabelsLabel.Add(Token, scLocal, iiPublicLabel,
-              GetComment);
-            NextNonCommentToken;
-          End Else
-            ErrorAndSeekToken(strNumberExpected, 'LabelDeclSection', Token.Token,
+      Result := Token.UToken = 'LABEL';
+      If Result Then
+        Begin
+          Assert(CurrentMethod <> Nil, 'Method in LabelDeclSection is NULL!');
+          NextNonCommentToken;
+          Repeat
+            If Token.TokenType In [ttIdentifier, ttDirective] Then
+              Begin
+                CurrentMethod.LabelsLabel := CurrentMethod.Add(strLabelsLabel,
+                  iiPublicLabelsLabel, scNone, Nil) As TLabelContainer;
+                CurrentMethod.LabelsLabel.Add(Token, scLocal, iiPublicLabel,
+                  GetComment);
+                NextNonCommentToken;
+              End Else
+                ErrorAndSeekToken(strNumberExpected, 'LabelDeclSection', Token.Token,
+                  strSeekableOnErrorTokens, stFirst);
+          Until Not IsToken(',', Nil);
+          // Check for ';'
+          If Token.Token = ';' Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strLiteralExpected, 'LabelDeclSection', ';',
               strSeekableOnErrorTokens, stFirst);
-      Until Not IsToken(',', Nil);
-      // Check for ';'
-      If Token.Token = ';' Then
-        NextNonCommentToken
-      Else
-        ErrorAndSeekToken(strLiteralExpected, 'LabelDeclSection', ';',
-          strSeekableOnErrorTokens, stFirst);
+        End;
     End;
 End;
 
@@ -3209,8 +3188,9 @@ Begin
       C := Container.Add(tmpC) As TConstant;
       Result := True;
       If tmpC <> C Then
-        AddIssue(Format(strDuplicateIdentifierFound, [Token.Token]), scNone,
-          'ConstantDecl', Token.Line, Token.Column, etError);
+        AddIssue(Format(strDuplicateIdentifierFound, [Token.Token, Token.Line,
+          Token.Column]), scNone, 'ConstantDecl', Token.Line, Token.Column,
+          etError);
       NextNonCommentToken;
       If Token.Token = '=' Then        // ConstExpr
         Begin
@@ -3336,8 +3316,9 @@ Begin
         iiPublicResourceString, GetComment);
       C := Container.Add(tmpC);
       If tmpC <> C Then
-        AddIssue(Format(strDuplicateIdentifierFound, [Token.Token]), scNone,
-          'ResourceStringDecl', Token.Line, Token.Column, etError);
+        AddIssue(Format(strDuplicateIdentifierFound, [Token.Token, Token.Line,
+          Token.Column]), scNone, 'ResourceStringDecl', Token.Line,
+          Token.Column, etError);
       Result := True;
       NextNonCommentToken;
       If Token.Token = '=' then
@@ -4143,6 +4124,13 @@ begin
     Result := FileType(boolPacked, AToken);
   If Result = Nil Then
     Result := RecType(boolPacked, AToken);
+  If Token.UToken = 'PACKED' Then
+    Begin
+      //: @bug These types are all supposed to be packed!
+      //If Result Is TArrayType Then
+      //  (Result As TArrayType).Packed:= True;
+      NextNonCommentToken;
+    End;
 end;
 
 (**
@@ -4335,8 +4323,9 @@ Begin
                     iiPublicField, I[j].Comment);
                   P := Rec.Add(tmpP) As TField;
                   If P <> tmpP Then
-                    AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name]),
-                      scNone, 'FieldDecl', I[j].Line, I[j].Column, etError);
+                    AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name,
+                      I[j].Line, I[j].Column]), scNone, 'FieldDecl', I[j].Line,
+                      I[j].Column, etError);
                   If T <> Nil Then
                     P.AddTokens(T)
                   Else
@@ -4896,35 +4885,40 @@ End;
   This method parses a Thread var section declatation from the current token
   position.
 
-  @see     For object pascal grammar see {@link TPascalDocModule.VarSection}.
+  @precon  On entry to this method , Scope defines the current scope of the 
+           block i . e . private in in the implemenation section or public if 
+           in the interface section . 
+  @postcon This method returns True if this method handles a constant 
+           declaration section . 
 
-  @precon  On entry to this method, Scope defines the current scope of the
-           block i.e. private in in the implemenation section or public if in
-           the interface section.
-  @postcon This method returns True if this method handles a constant
-           declaration section.
+  @see     For object pascal grammar see {@link TPascalDocModule.VarSection} . 
 
-  @param   AScope as a TScope
-  @return  a Boolean
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean  
 
 **)
-Function TPascalModule.ThreadVarSection(AScope : TScope) : Boolean;
+Function TPascalModule.ThreadVarSection(AScope : TScope; Container : TElementContainer) : Boolean;
 
 Begin
-  Result := Token.UToken = 'THREADVAR';
-  If Result Then
+  Result := False;
+  If (Container = Nil) Or (Container = Self) Then // Not allowed in methods.
     Begin
-      If FThreadVarsLabel = Nil Then
-        FThreadVarsLabel := Add(strThreadVarsLabel, iiPublicThreadVarsLabel,
-          scNone, GetComment) As TLabelContainer;
-      NextNonCommentToken;
-      While ThreadVarDecl(AScope, FThreadVarsLabel) Do
+      Result := Token.UToken = 'THREADVAR';
+      If Result Then
         Begin
-          If Token.Token <> ';' Then
-            ErrorAndSeekToken(strLiteralExpected, 'ThreadVarSection', ';',
-              strSeekableOnErrorTokens, stFirst)
-          Else
-            NextNonCommentToken;
+          If FThreadVarsLabel = Nil Then
+            FThreadVarsLabel := Add(strThreadVarsLabel, iiPublicThreadVarsLabel,
+              scNone, GetComment) As TLabelContainer;
+          NextNonCommentToken;
+          While ThreadVarDecl(AScope, FThreadVarsLabel) Do
+            Begin
+              If Token.Token <> ';' Then
+                ErrorAndSeekToken(strLiteralExpected, 'ThreadVarSection', ';',
+                  strSeekableOnErrorTokens, stFirst)
+              Else
+                NextNonCommentToken;
+            End;
         End;
     End;
 End;
@@ -5043,7 +5037,8 @@ Begin
                       AImageIndex, I[j].Comment);
                     V := VarSection.Add(tmpV);
                     If tmpV <> V Then
-                      AddIssue(Format(strDuplicateIdentifierFound, [I[j].Identifier]),
+                      AddIssue(Format(strDuplicateIdentifierFound,
+                        [I[j].Identifier, I[j].Line, I[j].Column]),
                         scNone, 'VarDecl', I[j].Line, I[j].Column, etError);
                     V.AddTokens(T);
                     If I[j].Comment <> Nil Then
@@ -5128,7 +5123,8 @@ Begin
                     iiPublicThreadVar, I[j].Comment);
                   V := VarSection.Add(tmpV);
                   If tmpV <> V Then
-                    AddIssue(Format(strDuplicateIdentifierFound, [I[j].Identifier]),
+                    AddIssue(Format(strDuplicateIdentifierFound,
+                      [I[j].Identifier, I[j].Line, I[j].Column]),
                       scNone, 'VarDecl', I[j].Line, I[j].Column, etError);
                   V.AddTokens(T);
                   If I[j].Comment <> Nil Then
@@ -6244,7 +6240,9 @@ Begin
   If Result Then
     Begin
       NextNonCommentToken;
-      ExprList(Nil);
+      Repeat
+        ExprList(Nil);
+      Until Not IsToken(',', Nil);
       If Token.UToken = 'DO' Then
         Begin
           NextNonCommentToken;
@@ -6596,6 +6594,7 @@ Begin
         Begin
           NextNonCommentToken;
           Directive(Result);
+          PortabilityDirective;
           If Not Result.ForwardDecl Then
             Begin
               Block(scLocal, Result);
@@ -6635,17 +6634,18 @@ Begin
         Begin
           NextNonCommentToken;
           Directive(Result);
+          PortabilityDirective;
           If Not Result.ForwardDecl Then
             Begin
               Block(scLocal, Result);
               If Token.Token = ';' Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLiteralExpected, 'ConstructorDecl', ';',
+                ErrorAndSeekToken(strLiteralExpected, 'DestructorDecl', ';',
                   strSeekableOnErrorTokens, stActual);
             End;
         End Else
-          ErrorAndSeekToken(strLiteralExpected, 'ConstructorDecl', ';',
+          ErrorAndSeekToken(strLiteralExpected, 'DestructorDecl', ';',
             strSeekableOnErrorTokens, stActual);
     End;
 End;
@@ -7044,8 +7044,9 @@ Begin
           If T = Nil Then
             If Token.UToken = 'CONST' Then
               Begin
-                T := FTemporaryElements.Add(TTypes.Create(Token.Token, scPrivate,
+                T := FTemporaryElements.Add(TTypes.Create('tmp', scPrivate,
                   Token.Line, Token.Column, iiNone, Nil)) As TTypes;
+                T.AddToken(Token.Token);
                 NextNonCommentToken;
               End;
           // Get default value
@@ -7532,8 +7533,9 @@ begin
                   Nil) As TLabelContainer;
               P := Cls.FieldsLabel.Add(tmpP) As TField;
               If P <> tmpP Then
-                AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name]),
-                  scNone, 'ObjFieldDecl', I[j].Line, I[j].Column, etError);
+                AddIssue(Format(strDuplicateIdentifierFound, [I[j].Name,
+                  I[j].Line, I[j].Column]), scNone, 'ObjFieldDecl', I[j].Line,
+                  I[j].Column, etError);
               If T <> Nil Then
                 P.AddTokens(T)
               Else
@@ -7740,29 +7742,32 @@ end;
 **)
 procedure TPascalModule.ClassVisibility(var AScope : TScope);
 begin
-  While Token.UToken = 'STRICT' Do
+  While (Token.UToken = 'STRICT') Or IsKeyWord(Token.Token, strScope) Do
     Begin
-      NextNonCommentToken;
-      If IsKeyWord(Token.Token, strStrictedScope) Then
+      While Token.UToken = 'STRICT' Do
+        Begin
+          NextNonCommentToken;
+          If IsKeyWord(Token.Token, strStrictedScope) Then
+            Begin
+              If Token.UToken = 'PRIVATE' Then
+                AScope := scPrivate
+              Else If Token.UToken = 'PROTECTED' Then
+                AScope := scProtected;
+              NextNonCommentToken;
+            End;
+        End;
+      While IsKeyWord(Token.Token, strScope) Do
         Begin
           If Token.UToken = 'PRIVATE' Then
             AScope := scPrivate
           Else If Token.UToken = 'PROTECTED' Then
-            AScope := scProtected;
+            AScope := scProtected
+          Else If Token.UToken = 'PUBLIC' Then
+            AScope := scPublic
+          Else
+            AScope := scPublished;
           NextNonCommentToken;
         End;
-    End;
-  While IsKeyWord(Token.Token, strScope) Do
-    Begin
-      If Token.UToken = 'PRIVATE' Then
-        AScope := scPrivate
-      Else If Token.UToken = 'PROTECTED' Then
-        AScope := scProtected
-      Else If Token.UToken = 'PUBLIC' Then
-        AScope := scPublic
-      Else
-        AScope := scPublished;
-      NextNonCommentToken;
     End;
 end;
 
@@ -7905,11 +7910,13 @@ begin
             Token.Column, iiPublicProperty, C);
           P := Cls.PropertiesLabel.Add(tmpP) As TPascalProperty;
           If P <> tmpP Then
-            AddIssue(Format(strDuplicateIdentifierFound, [Token.Token]),
-              scNone,  'AddToContainer', Token.Line, Token.Column, etError);
+            AddIssue(Format(strDuplicateIdentifierFound, [Token.Token,
+              Token.Line, Token.Column]), scNone,  'AddToContainer', Token.Line,
+              Token.Column, etError);
           NextNonCommentToken;
           PropertyInterface(P);
           PropertySpecifiers(P);
+          PortabilityDirective;
         End Else
           ErrorAndSeekToken(strIdentExpected, 'PropertyList', Token.Token,
             strSeekableOnErrorTokens, stActual);
@@ -8802,7 +8809,7 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
   Begin
     Result := False;
     If Length(strText) >= Length(strStart) Then
-    Result := AnsiCompareText(Copy(strText, 1, Length(strStart)), strStart) = 0;
+      Result := AnsiCompareText(Copy(strText, 1, Length(strStart)), strStart) = 0;
   End;
 
   (**
@@ -8828,25 +8835,25 @@ Var
   iStack, iStackTop : Integer;
 
 begin
-  If Like(Token.Token, '{$DEFINE') Then
+  If Like(Token.Token, '{$DEFINE ') Then
     AddDef(GetDef)
-  Else If Like(Token.Token, '{$UNDEF') Then
+  Else If Like(Token.Token, '{$UNDEF ') Then
     DeleteDef(GetDef)
-  Else If Like(Token.Token, '{$IFDEF') Then
+  Else If Like(Token.Token, '{$IFDEF ') Then
     Begin
       If Not IfDef(GetDef) Then
         AddToStackAndInc(1)
       Else
         AddToStackAndInc(0);
     End
-  Else If Like(Token.Token, '{$IFOPT') Then
+  Else If Like(Token.Token, '{$IFOPT ') Then
     Begin
       If Not IfDef(GetDef) Then
         AddToStackAndInc(1)
       Else
         AddToStackAndInc(0);
     End
-  Else If Like(Token.Token, '{$IFNDEF') Then
+  Else If Like(Token.Token, '{$IFNDEF ') Then
     Begin
       If Not IfNotDef(GetDef) Then
         AddToStackAndInc(1)
@@ -8887,7 +8894,11 @@ begin
               scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etWarning);
     End
   Else If Like(Token.Token, '{$EXTERNALSYM') Then
-    FExternalSyms.Add(GetDef);
+    FExternalSyms.Add(GetDef) {
+  Else
+    If Copy(Token.Token, 1, 2) = '{$' Then
+      AddIssue(Format(strUnknownComDir, [Token.Token, Token.Line, Token.Column]),
+        scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etWarning)};
   If iSkip < 0 Then
     iSkip := 0;
 end;

@@ -272,23 +272,144 @@ type
     procedure TestCheckDocumentation;
   end;
 
-  (*
-  // Test methods for class TPascalModule
-
-  TestTPascalModule = class(TExtendedTestCase)
-  strict private
-    FPascalModule: TPascalModule;
-  public
-    procedure SetUp; override;
-    procedure TearDown; override;
-  published
-    procedure TestKeyWords;
-    procedure TestProcessCompilerDirective;
-    procedure TestReferenceSymbol;
-    procedure TestAsString;
-  end;
-
-  *)
+  //
+  // Test Class for the TPascalModule Class Methods.
+  //
+  TestTPascalModule = Class(TExtendedTestCase)
+  Strict Private
+    FSource: TMemoryStream;
+    FPascalModule : TPascalModule;
+  Public
+    Procedure SetUp; Override;
+    Procedure TearDown; Override;
+  Published
+    Procedure TestAsString;
+    Procedure TestCreateParser;
+    Procedure TestKeyWords;
+    Procedure TestProcessCompilerDirective;
+    Procedure TestReferenceSymbol;
+    Procedure TestGoal;
+    Procedure TestOPProgram;
+    Procedure TestOPUnit;
+    Procedure TestOPPackage;
+    Procedure TestOPLibrary;
+    Procedure TestProgramBlock;
+    procedure TestUsesClause;
+    Procedure TestPortabilityDirective;
+    Procedure TestInterfaceSection;
+    Procedure TestInterfaceDecl;
+    Procedure TestExportedHeading;
+    Procedure TestImplementationSection;
+    Procedure TestBlock;
+    Procedure TestExportsStmt;
+    procedure TestExportsItem;
+    Procedure TestDeclSection;
+    Procedure TestLabelDeclSection;
+    Procedure TestConstSection;
+    Procedure TestConstantDecl;
+    Procedure TestResStringSection;
+    Procedure TestResourceStringDecl;
+    Procedure TestTypeSection;
+    Procedure TestTypeDecl;
+    Procedure TestTypedConstant;
+    Procedure TestArrayConstant;
+    Procedure TestRecordConstant;
+    Procedure TestRecordFieldConstant;
+    Procedure TestOPType;
+    Procedure TestRestrictedType;
+    Procedure TestClassRefType;
+    Procedure TestSimpleType;
+    Procedure TestRealType;
+    Procedure TestOrdinalType;
+    Procedure TestOrdIdent;
+    Procedure TestVariantType;
+    Procedure TestSubRangeType;
+    Procedure TestEnumerateType;
+    Procedure TestEnumerateElement;
+    Procedure TestStringType;
+    Procedure TestStrucType;
+    Procedure TestArrayType;
+    Procedure TestRecType;
+    Procedure TestFieldList;
+    procedure TestFieldDecl;
+    Procedure TestVariantSection;
+    procedure TestRecVariant;
+    Procedure TestSetType;
+    Procedure TestFileType;
+    Procedure TestPointerType;
+    Procedure TestProcedureType;
+    Procedure TestVarSection;
+    Procedure TestClassVarSection;
+    Procedure TestThreadVarSection;
+    Procedure TestVarDecl;
+    Procedure TestThreadVarDecl;
+    Procedure TestExpression;
+    Procedure TestSimpleExpression;
+    Procedure TestTerm;
+    Procedure TestFactor;
+    Procedure TestRelOp;
+    Procedure TestAddOp;
+    Procedure TestMulOp;
+    Procedure TestDesignator;
+    Procedure TestSetConstructor;
+    Procedure TestSetElement;
+    Procedure TestExprList;
+    Procedure TestStatement;
+    Procedure TestStmtList;
+    Procedure TestSimpleStatement;
+    Procedure TestStructStmt;
+    Procedure TestCompoundStmt;
+    Procedure TestConditionalStmt;
+    Procedure TestIfStmt;
+    Procedure TestCaseStmt;
+    Procedure TestCaseSelector;
+    Procedure TestCaseLabel;
+    Procedure TestLoopStmt;
+    Procedure TestRepeatStmt;
+    Procedure TestWhileStmt;
+    Procedure TestForStmt;
+    Procedure TestWithStmt;
+    Procedure TestTryExceptAndFinallyStmt;
+    Procedure TestExceptionBlock;
+    Procedure TestRaiseStmt;
+    Procedure TestAssemblerStatement;
+    Procedure TestProcedureDeclSection;
+    Procedure TestProcedureDecl;
+    Procedure TestFunctionDecl;
+    Procedure TestConstructorDecl;
+    Procedure TestDestructorDecl;
+    Procedure TestFunctionHeading;
+    Procedure TestProcedureHeading;
+    Procedure TestFormalParameter;
+    Procedure TestFormalParam;
+    Procedure TestParameter;
+    Procedure TestDirective;
+    Procedure TestObjectType;
+    Procedure TestObjHeritage;
+    Procedure TestMethodList;
+    Procedure TestMethodHeading;
+    Procedure TestConstructorHeading;
+    Procedure TestDestructorHeading;
+    Procedure TestObjFieldList;
+    Procedure TestInitSection;
+    Procedure TestClassType;
+    Procedure TestClassHeritage;
+    procedure TestClassVisibility;
+    Procedure TestClassFieldList;
+    Procedure TestClassMethodList;
+    Procedure TestClassPropertyList;
+    Procedure TestPropertyList;
+    Procedure TestPropertyInterface;
+    Procedure TestPropertyParameterList;
+    Procedure TestPropertySpecifiers;
+    Procedure TestInterfaceType;
+    Procedure TestInterfaceHeritage;
+    Procedure TestRequiresClause;
+    procedure TestContainsClause;
+    Procedure TestCodeFailure01;
+    Procedure TestCodeFailure02;
+    Procedure TestCodeFailure03;
+  End;
 
 implementation
 
@@ -1318,58 +1439,5797 @@ begin
   CheckEquals(iiFinalization, FFinalizationSection.ImageIndexAdjustedForScope);
 end;
 
-(*
+//
+// Test methods for the class TPascalModule.
+//
+Procedure TestTPascalModule.Setup;
 
-procedure TestTPascalModule.SetUp;
+Begin
+  FSource := TMemoryStream.Create;
+  FSource.LoadBufferFromString(
+    '(**'#13#10 +
+    '  Hello description.'#13#10 +
+    '  @Date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+    '  @Author David Hoyle'#13#10 +
+    '  @Version 1.0'#13#10 +
+    '**)'#13#10 +
+    'Program Hello;'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  (** Hello variable **)'#13#10 +
+    '  Hello : Integer;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  // Do nothing.'#13#10 +
+    'End.'#13#10
+  );
+  FPascalModule := TPascalModule.CreateParser(FSource, 'Hello.dpr', True,
+    [moParse, moCheckForDocumentConflicts]);
+End;
+
+Procedure TestTPascalModule.TearDown;
+
+Begin
+  FPascalModule.Free;
+  FSource.Free;
+End;
+
+procedure TestTPascalModule.TestAddOp;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  i := 1 + 2;'#13#10 +
+    '  j := Hello - i;'#13#10 +
+    '  k := $FF OR $12;'#13#10 +
+    '  l := $FF XOR 123;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
 begin
-//  FPascalModule := TPascalModule.Create;
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
 end;
 
-procedure TestTPascalModule.TearDown;
+procedure TestTPascalModule.TestArrayConstant;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  j : Array[1..2] Of String = (''one'', ''two'');'#13#10 +
+    '  i : Array[1..2] Of Integer = (1, 2);'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
 begin
-//  FPascalModule.Free;
-//  FPascalModule := nil;
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
 end;
 
-procedure TestTPascalModule.TestKeyWords;
-var
-  ReturnValue: WideChar;
+procedure TestTPascalModule.TestArrayType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = Array of Integer;'#13#10 +
+    '  t02 = Array[1..2] Of String Platform;'#13#10 +
+    '  t03 = Array[1 + 2..3*9] of Byte;'#13#10 +
+    '  t04 = Array[1, 2, 3] of Integer;'#13#10 +
+    '  t05 = Array[1..2, 0..2] of String;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
 begin
-//  ReturnValue := FPascalModule.KeyWords;
-//  // TODO: Validate method results
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TArrayType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
 end;
 
-procedure TestTPascalModule.TestProcessCompilerDirective;
-var
-  iSkip: Integer;
+procedure TestTPascalModule.TestAssemblerStatement;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  asm'#13#10 +
+    '    MOV DX,BX'#13#10 +
+    '  end;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello2;'#13#10 +
+    ''#13#10 +
+    '  asm'#13#10 +
+    '    MOV DX,BX'#13#10 +
+    '  end;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
 begin
-//  // TODO: Setup method call parameters
-//  FPascalModule.ProcessCompilerDirective(iSkip);
-//  // TODO: Validate method results
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
 end;
 
-procedure TestTPascalModule.TestReferenceSymbol;
-var
-  ReturnValue: Boolean;
-  AToken: TTokenInfo;
+Procedure TestTPascalModule.TestAsString;
+
+Begin
+  CheckEquals('Program Hello', FPascalModule.AsString(True, False));
+End;
+
+procedure TestTPascalModule.TestBlock;
+
+Const
+  strSource =
+    'Program MyProgram;'#13#10 +
+    ''#13#10 +
+    'ResourceString'#13#10 +
+    '  strHello = ''Hello'';'#13#10 +
+    ''#13#10 +
+    'Exports'#13#10 +
+    ' DGHProc1;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(strHello);'#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
 begin
-//  // TODO: Setup method call parameters
-//  ReturnValue := FPascalModule.ReferenceSymbol(AToken);
-//  // TODO: Validate method results
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
 end;
 
-procedure TestTPascalModule.TestAsString;
-var
-  ReturnValue: string;
-  boolForDocumentation: Boolean;
-  boolShowIdentifier: Boolean;
+procedure TestTPascalModule.TestCaseLabel;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  case i of'#13#10 +
+    '    1..2 * 3 / 4: Hello;'#13#10 +
+    '  end;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
 begin
-//  // TODO: Setup method call parameters
-//  ReturnValue := FPascalModule.AsString(boolShowIdentifier, boolForDocumentation);
-//  // TODO: Validate method results
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
 end;
 
-*)
+procedure TestTPascalModule.TestCaseSelector;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  case i of'#13#10 +
+    '    1, 2, 3, 4: Hello;'#13#10 +
+    '  end;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestCaseStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  case i of'#13#10 +
+    '    1: Hello;'#13#10 +
+    '  end;'#13#10 +
+    '  case i of '#13#10 +
+    '    2: Goodbye;'#13#10 +
+    '  else'#13#10 +
+    '    exit;'#13#10 +
+    '  end;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestClassFieldList;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyClass = Class'#13#10 +
+    '  private'#13#10 +
+    '    MyPrivateField : Integer;'#13#10 +
+    '  protected'#13#10 +
+    '    MyProtectedField1, MyProtectedField2 : Integer;'#13#10 +
+    '  public'#13#10 +
+    '    MyPublicField : String;'#13#10 +
+    '  published'#13#10 +
+    '    MyPublishedField : Boolean;'#13#10 +
+    '  strict private'#13#10 +
+    '    MyStrictPrivateField : TMyClass;'#13#10 +
+    '  strict protected'#13#10 +
+    '    MyStrictProtectedField : TMyClass;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestClassHeritage;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyClass1 = Class(TObject)'#13#10 +
+    '  End;'#13#10 +
+    '  MyClass1 = Class(TObject, IMyInterface, IMyOtherInterface)'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestClassMethodList;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  private'#13#10 +
+    '    Procedure MyPrivateMethod;'#13#10 +
+    '  protected'#13#10 +
+    '    Function MyProtectedMethod : Boolean;'#13#10 +
+    '  public'#13#10 +
+    '    Constructor MyPublicMehod;'#13#10 +
+    '    Constructor MyPublicMehod2;'#13#10 +
+    '  published'#13#10 +
+    '    Destructor MyPublishedMethod;'#13#10 +
+    '  strict private'#13#10 +
+    '    Procedure MyStrictPrivateMethod;'#13#10 +
+    '  strict protected'#13#10 +
+    '    Function MyStrictProtectedMethod : String;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure TMyClass.MyPrivateMethod; Begin End;'#13#10 +
+    'Function TMyClass.MyProtectedMethod : Boolean; Begin End;'#13#10 +
+    'Constructor TMyClass.MyPublicMehod; Begin End;'#13#10 +
+    'Constructor TMyClass.MyPublicMehod2; Begin End;'#13#10 +
+    'Destructor TMyClass.MyPublishedMethod; Begin End;'#13#10 +
+    'Procedure TMyClass.MyStrictPrivateMethod; Begin End;'#13#10 +
+    'Function TMyClass.MyStrictProtectedMethod : String; Begin End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestClassPropertyList;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  private'#13#10 +
+    '    Property MyPrivateProperty;'#13#10 +
+    '  protected'#13#10 +
+    '    Property MyProtectedProperty : Boolean;'#13#10 +
+    '  public'#13#10 +
+    '    Property MyPublicProperty;'#13#10 +
+    '  published'#13#10 +
+    '    Property MyPublishedProperty;'#13#10 +
+    '  strict private'#13#10 +
+    '    Property MyStrictPrivateProperty;'#13#10 +
+    '  strict protected'#13#10 +
+    '    Property MyStrictProtectedProperty;'#13#10 +
+    '    Property MyStrictProtectedProperty2;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestClassRefType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  a = Class of TClass;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestClassType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyClass1 = Class'#13#10 +
+    '  End;'#13#10 +
+    '  MyClass2 = Class Abstract'#13#10 +
+    '  End;'#13#10 +
+    '  MyClass3 = Class Sealed'#13#10 +
+    '  End;'#13#10 +
+    '  MyClass4 = Class Helper For TMyClass'#13#10 +
+    '  End;'#13#10 +
+    '  MyClass5 = Class Helper (TMyClass) For TMyClass'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestClassVarSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  c1 = Class'#13#10 +
+    '  var'#13#10 +
+    '    v1, v2 : Integer;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  c1 = Class'#13#10 +
+    '  Field : TField;'#13#10 +
+    '  var'#13#10 +
+    '    v3, v4 : Integer;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T, C: TElementContainer;
+  i: Integer;
+  V: TElementContainer;
+  j: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          Begin
+            C := T.Elements[i];
+            V := C.FindElement(strClassVarsLabel);
+            Check(T <> Nil, 'Can not find ClassVars label.');
+            If V <> Nil Then
+              Begin
+                For j := 1 To V.ElementCount Do
+                  CheckEquals(TVar.ClassName, V.Elements[j].ClassName);
+              End;
+          End;
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestClassVisibility;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyClass = Class'#13#10 +
+    '  private'#13#10 +
+    '  protected'#13#10 +
+    '  public'#13#10 +
+    '  published'#13#10 +
+    '  strict private'#13#10 +
+    '  strict protected'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestCodeFailure01;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  With TMyClass.Create(Nil) Do '#13#10 +
+    '    DoSomething;'#13#10 +
+    '  With TMyClass.Create(Nil), MyObject Do '#13#10 +
+    '    DoSomething(MyObjectField);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestCodeFailure02;
+
+Const
+  strSource =
+    '(**'#13#10 +
+    '  This is a description.'#13#10 +
+    '  @date %s'#13#10 +
+    '  @author DGH'#13#10 +
+    '  @version 0.9'#13#10 +
+    '**)'#13#10 +
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    '(**'#13#10 +
+    '  This is a description.'#13#10 +
+    '  @precon  None.'#13#10 +
+    '  @postcon None.'#13#10 +
+    '  @param   Ident as an Array Of String'#13#10 +
+    '**)'#13#10 +
+    'Procedure Hello1(Ident : Array of String);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    '(**'#13#10 +
+    '  This is a description.'#13#10 +
+    '  @precon  None.'#13#10 +
+    '  @postcon None.'#13#10 +
+    '  @param   Ident as an Array Of Const'#13#10 +
+    '**)'#13#10 +
+    'Procedure Hello2(Ident : Array of Const);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  I: TElementContainer;
+  M: TPascalMethod;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(Format(strSource, [FormatDateTime('dd mmm yyyy', Now)]));
+    P := TPascalModule.CreateParser(Source, '', True, [moParse,
+      moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      I := P.FindElement(strImplementedMethodsLabel);
+      Check(I <> Nil, 'Implemented Methods Not Found!');
+      M := I.FindElement('Hello1', ftIdentifier) As TPascalMethod;
+      Check(M <> Nil, 'Method Hello1 NOT Found');
+      CheckEquals('Ident : Array Of String', M.Parameters[0].AsString(True, False));
+      M := I.FindElement('Hello2', ftIdentifier) As TPascalMethod;
+      Check(M <> Nil, 'Method Hello2 NOT Found');
+      CheckEquals('Ident : Array Of Const', M.Parameters[0].AsString(True, False));
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestCodeFailure03;
+
+Const
+  strSource =
+    '(**'#13#10 +
+    '  This is a description.'#13#10 +
+    '  @date %s'#13#10 +
+    '  @author DGH'#13#10 +
+    '  @version 0.9'#13#10 +
+    '**)'#13#10 +
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    '  {$R *.res}'#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(Format(strSource, [FormatDateTime('dd mmm yyyy', Now)]));
+    P := TPascalModule.CreateParser(Source, '', True, [moParse,
+      moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestCompoundStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  begin'#13#10 +
+    '    Hello;'#13#10 +
+    '    i := 1 + 2 * j;'#13#10 +
+    '    Print(j);'#13#10 +
+    '  end;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestConditionalStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  if Hello Then'#13#10 +
+    '    exit;'#13#10 +
+    '  case i of'#13#10 +
+    '    1: Exit;'#13#10 +
+    '  end;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestConstantDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  c = 0 platform;'#13#10 +
+    '  e : String = ''Hello'' library;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'procedure implode(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  c : Integer = 0;'#13#10 +
+    '  e = ''Hello'';'#13#10 +
+    ''#13#10 +
+    'begin'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestConstructorDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Constructor TMyClass.Create; Virtual; Platform'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestConstructorHeading;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    '  MySecondObject = Object(TObject)'#13#10 +
+    '    Constructor Create(str : String);'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    ''#13#10 +
+    'Constructor MySecondObject.Create(str : String);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestConstSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  c = 0;'#13#10 +
+    '  e = ''Hello'';'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'procedure implode(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  c = 0;'#13#10 +
+    '  e = ''Hello'';'#13#10 +
+    '  ex = 1 * 2 + 3 / 4;'#13#10 +
+    ''#13#10 +
+    'begin'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestContainsClause;
+
+Const
+  strSource =
+    'Package MyPackage;'#13#10 +
+    ''#13#10 +
+    'Requires'#13#10 +
+    '  VCL50;'#13#10 +
+    ''#13#10 +
+    'Contains'#13#10 +
+    '  DGHLibrary In ''DGHLibrary.pas'','#13#10 +
+    '  Library In ''Library.pas'';'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+Procedure TestTPascalModule.TestCreateParser;
+
+Begin
+  CheckEquals(0, FPascalModule.HeadingCount(strErrors), FPascalModule.FirstError);
+  CheckEquals(0, FPascalModule.HeadingCount(strDocumentationConflicts),
+    FPascalModule.DocConflict(1));
+End;
+
+procedure TestTPascalModule.TestDeclSection;
+
+Const
+  strSource =
+    'Program MyProgram;'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  c = 0;'#13#10 +
+    ''#13#10 +
+    'ResourceString'#13#10 +
+    '  rs = ''Hello'';'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t = Integer;'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  v : String;'#13#10 +
+    ''#13#10 +
+    'Threadvar'#13#10 +
+    '  tv : Integer;'#13#10 +
+    ''#13#10 +
+    '  Procedure MyProc;'#13#10 +
+    '  '#13#10 +
+    '  Label'#13#10 +
+    '    DGH;'#13#10 +
+    '  '#13#10 +
+    '  Const'#13#10 +
+    '    c = 0;'#13#10 +
+    '  '#13#10 +
+    '  ResourceString'#13#10 +
+    '    rs = ''Hello'';'#13#10 +
+    '  '#13#10 +
+    '  Type'#13#10 +
+    '    t = Integer;'#13#10 +
+    '  '#13#10 +
+    '  Var'#13#10 +
+    '    v : String;'#13#10 +
+    '  '#13#10 +
+    '  Begin'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestDesignator;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  QualId;'#13#10 +
+    '  QualId.Ident;'#13#10 +
+    '  Ident[1 + 2, Hello];'#13#10 +
+    '  QualId.ident[1 + 2, Hello];'#13#10 +
+    '  Ident^;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestDestructorDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Destructor TMyClass.Destroy; Override; Platform'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestDestructorHeading;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    '  MySecondObject = Object(TObject)'#13#10 +
+    '    Destructor Destroy(str : String);'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Destructor MySecondObject.Destroy(str : String);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestDirective;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Ident01; abstract;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident02; assembler;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident03; cdecl;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident04a; dispid 1;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident04; dynamic;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident05; export;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident06; external ''Hello'';'#13#10 +
+    ''#13#10 +
+    'Procedure Ident07; far;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident08; final;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident09; forward;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident10; inline;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident11; local;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident12; message WM_QUIT;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident13; near;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident14; overload;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident15; override;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident16; pascal;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident17; register;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident18; reintroduce;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident19; safecall;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident20; stdcall;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident21; varargs;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident22; virtual;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident23; virtual; overload;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident24; virtual overload;'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident25; virtual overload; platform'#13#10 +
+    'Begin End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestEnumerateElement;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = (emOne, emTwo, emThree);'#13#10 +
+    '  t02 = (emOne = 2, emTwo = 3 * 5, emThree = i * 100);'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TEnumerateType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestEnumerateType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = (emOne, emTwo, emThree);'#13#10 +
+    '  t02 = (emOne = 2, emTwo = 3 * 5, emThree = i * 100);'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TEnumerateType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestExceptionBlock;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  sl := tstringlist.create;'#13#10 +
+    '  try'#13#10 +
+    '    sl.clear;'#13#10 +
+    '  finally'#13#10 +
+    '    sl.free;'#13#10 +
+    '  end;'#13#10 +
+    '  '#13#10 +
+    '  try'#13#10 +
+    '    sl.clear;'#13#10 +
+    '  except'#13#10 +
+    '    on e : exception do'#13#10 +
+    '      exit;'#13#10 +
+    '  end;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestExportedHeading;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'procedure implode(i : Integer); stdcall;'#13#10 +
+    'function explode(i : Integer) : boolean; pascal;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'procedure implode(i : Integer);'#13#10 +
+    'begin'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'function explode(i : Integer) : boolean;'#13#10 +
+    'begin'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestExportsItem;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Exports'#13#10 +
+    '  DGHProc1 Name ''DGHProcA'', DGHProc2 Index 1,'#13#10 +
+    '  DGHProc3 Name ''Hello'' Index 2, DGHProc4 Index 3 Name ''Hello'';'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestExportsStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Exports'#13#10 +
+    '  DGHProc1, DGHProc2;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestExpression;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  i := Hello <> Goodbye;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestExprList;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  i := [1..2, 2, 3];'#13#10 +
+    '  i := MyFunc[Hello, 2, 3];'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestFactor;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Designator;'#13#10 +
+    '  Designator(1 + 2, Help);'#13#10 +
+    '  o := @Designator;'#13#10 +
+    '  i := 1.0;'#13#10 +
+    '  str := ''Hello'';'#13#10 +
+    '  i := (1 + 2 / 3  *4);'#13#10 +
+    '  bool := Not bool;'#13#10 +
+    '  Inherited Create;'#13#10 +
+    '  i := [1, 2, 3..6];'#13#10 +
+    '  TypeId(1 * 2 / 3 * 4);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestFieldDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = Record'#13#10 +
+    '    FField1 : Integer platform;'#13#10 +
+    '    FField2 : String;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestFieldList;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = Record'#13#10 +
+    '    FField1 : Integer;'#13#10 +
+    '    FField2 : String;'#13#10 +
+    '  End;'#13#10 +
+    '  THInfo = Record'#13#10 +
+    '    dblBearing : Double;'#13#10 +
+    '    Case THInfoType Of'#13#10 +
+    '      itSetout  : (dblEasting, dblNorthing  : Double);'#13#10 +
+    '      itMeasure, itCompare : (dblChainage : Double;'#13#10 +
+    '        Case THInfoType Of'#13#10 +
+    '          itMeasure: (dblOffset : Double);'#13#10 +
+    '          itCompare: (dblDistance : Double);'#13#10 +
+    '    );'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestFileType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = File Of Integer;'#13#10 +
+    '  t02 = File Of TSomething platform;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TFileType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestFormalParam;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Ident(i : Integer; var j : String; const k : Boolean; out l : String);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestFormalParameter;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Ident(i : Integer; j : String; k : Boolean);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestForStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  for i := 0 To 10 Do'#13#10 +
+    '    Inc(j);'#13#10 +
+    '  for i := 10 DownTo 0 Do'#13#10 +
+    '    Inc(j);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestFunctionDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Function Hello : Integer; StdCall; Library'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestFunctionHeading;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Function Ident : Boolean;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Function Ident2 : String;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Function Ident3(i : Integer) : String;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestGoal;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestIfStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  if Hello Then'#13#10 +
+    '    exit;'#13#10 +
+    '  if Hello then'#13#10 +
+    '    statement'#13#10 +
+    '  else'#13#10 +
+    '    anotherstatement;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestImplementationSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  Windows, DGHLibrary;'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  c = 1;'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  i : Integer;'#13#10 +
+    ''#13#10 +
+    'Exports'#13#10 +
+    '  DGHProc;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestInitSection;
+
+Const
+  strSource1 =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Initialization'#13#10 +
+    '  DoSomething;'#13#10 +
+    'End.'#13#10;
+  strSource2 =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Initialization'#13#10 +
+    '  DoSomething;'#13#10 +
+    'Finalization'#13#10 +
+    '  DoSomethingMore;'#13#10 +
+    'End.'#13#10;
+  strSource3 =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'BEGIN'#13#10 +
+    '  DoSomething;'#13#10 +
+    '  DoSomethingMore;'#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource1);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource2);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource3);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestInterfaceDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  Windows;'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t = Integer;'#13#10 +
+    ''#13#10 +
+    'const'#13#10 +
+    '  c = 0;'#13#10 +
+    ''#13#10 +
+    'resourcestring'#13#10 +
+    '  rs = ''hello.'';'#13#10 +
+    ''#13#10 +
+    'var'#13#10 +
+    '  v : string;'#13#10 +
+    ''#13#10 +
+    'threadvar'#13#10 +
+    '  tv : integer;'#13#10 +
+    ''#13#10 +
+    'Exports'#13#10 +
+    '  Blobby;'#13#10 +
+    ''#13#10 +
+    'procedure implode;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'procedure implode;'#13#10 +
+    'begin'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestInterfaceHeritage;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyInterface = Interface(IUnknown, IInterfaceedObject, ISomethingElse)'#13#10 +
+    '    Procedure MyProc;'#13#10 +
+    '    Procedure MyProc2;'#13#10 +
+    '    Property Count : Integer Read GetCount;'#13#10 +
+    '    Property Count2 : Integer Read GetCount2;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestInterfaceSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  Windows;'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t = Integer;'#13#10 +
+    ''#13#10 +
+    'var'#13#10 +
+    '  v : string;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestInterfaceType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyInterface1 = Interface'#13#10 +
+    '  End;'#13#10 +
+    '  TMyInterface2 = Interface(IUnknown)'#13#10 +
+    '  End;'#13#10 +
+    '  TMyInterface3 = Interface(IUnknown)'#13#10 +
+    '    Procedure MyProc;'#13#10 +
+    '    Procedure MyProc2;'#13#10 +
+    '    Property Count : Integer Read GetCount;'#13#10 +
+    '    Property Count2 : Integer Read GetCount2;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+Procedure TestTPascalModule.TestKeyWords;
+
+Begin
+  CheckEquals(0, Low(FPascalModule.KeyWords));
+  CheckEquals(70 + 47 - 1, High(FPascalModule.KeyWords));
+End;
+
+procedure TestTPascalModule.TestLabelDeclSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Label'#13#10 +
+    '  Dave, DGH, Hoyle;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(i);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestLoopStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  repeat'#13#10 +
+    '    Inc(i);'#13#10 +
+    '  until i > 10;'#13#10 +
+    '  while i < 0 Do'#13#10 +
+    '    Inc(i);'#13#10 +
+    '  for i := 0 To 10 Do'#13#10 +
+    '    Inc(j);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestMethodHeading;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    '  MySecondObject = Object(TObject)'#13#10 +
+    '    MyField : Integer;'#13#10 +
+    '    Procedure MyMethod;'#13#10 +
+    '    Function MyFunction : Integer;'#13#10 +
+    '    Constructor Create;'#13#10 +
+    '    Destructor Destroy;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyOtherObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Procedure MySecondObject.MyMethod;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Function MySecondObject.MyFunction : Integer;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Constructor MySecondObject.Create;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Destructor MySecondObject.Destroy;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestMethodList;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    '  MySecondObject = Object(TObject)'#13#10 +
+    '    MyField : Integer;'#13#10 +
+    '    Procedure MyMethod;'#13#10 +
+    '    Function MyFunction : Integer;'#13#10 +
+    '    Constructor Create;'#13#10 +
+    '    Destructor Destroy;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyOtherObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Procedure MySecondObject.MyMethod;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Function MySecondObject.MyFunction : Integer;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Constructor MySecondObject.Create;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Destructor MySecondObject.Destroy;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestMulOp;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  d := 1.2 * 2.3;'#13#10 +
+    '  d := 1.2 / 4.2;'#13#10 +
+    '  d := 1 Div 2;'#13#10 +
+    '  d := 1 Mod 2;'#13#10 +
+    '  d := 1 And 2;'#13#10 +
+    '  d := 1 Shr 2;'#13#10 +
+    '  d := 1 Shl 2;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestObjectType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyObject = Object'#13#10 +
+    '  End;'#13#10 +
+    '  MySecondObject = Object'#13#10 +
+    '    Procedure MyMethod;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyOtherObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Procedure MySecondObject.MyMethod;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestObjFieldList;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    '  MySecondObject = Object(TObject)'#13#10 +
+    '    MyField : Integer;'#13#10 +
+    '    MyField2, MyField3 : String;'#13#10 +
+    '    Procedure MyMethod;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyOtherObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Procedure MySecondObject.MyMethod;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestObjHeritage;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    '  MySecondObject = Object(TObject)'#13#10 +
+    '    MyField : Integer;'#13#10 +
+    '    Procedure MyMethod;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  MyOtherObject = Object(TObject)'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Procedure MySecondObject.MyMethod;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestOPLibrary;
+
+Const
+  strSource =
+    'Library MyLibrary;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestOPPackage;
+
+Const
+  strSource =
+    'Package MyPackage;'#13#10 +
+    ''#13#10 +
+    'Requires'#13#10 +
+    '  VCL50;'#13#10 +
+    ''#13#10 +
+    'Contains'#13#10 +
+    '  DGHLibrary In ''DGHLibrary.pas'';'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestOPProgram;
+
+Const
+  strSource =
+    'Program MyProgram;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestOPType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  a = THello;'#13#10 +
+    '  b = [1..2];'#13#10 +
+    '  c = (eOne, eTwo);'#13#10 +
+    '  d = record'#13#10 +
+    '      end;'#13#10 +
+    '  e = ^d;'#13#10 +
+    '  f = String;'#13#10 +
+    '  g = function(i : Integer) : integer;'#13#10 +
+    '  h = variant;'#13#10 +
+    '  i = class of THello;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestOPUnit;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  Windows;'#13#10 +
+    ''#13#10 +
+    '  Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  i = 10;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(i);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestOrdIdent;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = ShortInt;'#13#10 +
+    '  t02 = SmallInt;'#13#10 +
+    '  t03 = Integer;'#13#10 +
+    '  t04 = Byte;'#13#10 +
+    '  t05 = LongInt;'#13#10 +
+    '  t06 = Int64;'#13#10 +
+    '  t07 = Word;'#13#10 +
+    '  t08 = Boolean;'#13#10 +
+    '  t09 = Char;'#13#10 +
+    '  t10 = WideChar;'#13#10 +
+    '  t11 = LongWord;'#13#10 +
+    '  t12 = PChar;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TOrdIdent.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestOrdinalType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  a = 1..2;'#13#10 +
+    '  b = (eOne, eTwo);'#13#10 +
+    '  c = Byte;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestParameter;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Ident1(i);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident2(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident3(i : String);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident4(i : File);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident4(i : Array Of Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident5(i : Integer = 0);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestPointerType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = ^Integer;'#13#10 +
+    '  t02 = ^TSomething platform;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TPointerType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestPortabilityDirective;
+
+Const
+  strSource =
+    'Unit MyUnit platform;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t = Integer library;'#13#10 +
+    '  u = Class'#13#10 +
+    '    property oops library;'#13#10 +
+    '  End deprecated;'#13#10 +
+    '  a = Array[1..2] of Integer platform;'#13#10 +
+    '  r = record'#13#10 +
+    '    myField : String platform;'#13#10 +
+    '  end library;'#13#10 +
+    '  s = set of integer deprecated;'#13#10 +
+    '  f = file of integer deprecated;'#13#10 +
+    '  p = ^Integer platform;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  i = 1 deprecated;'#13#10 +
+    '  j : Integer = 2 deprecated;'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  k : Integer platform;'#13#10 +
+    ''#13#10 +
+    'ThreadVar'#13#10 +
+    '  str : Integer platform;'#13#10 +
+    ''#13#10 +
+    'procedure Hello; platform'#13#10 +
+    ''#13#10 +
+    'begin'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'function Hello1 : integer; platform'#13#10 +
+    ''#13#10 +
+    'begin'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'constructor create; platform'#13#10 +
+    ''#13#10 +
+    'begin'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'destructor destroy; platform'#13#10 +
+    ''#13#10 +
+    'begin'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestProcedureDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello; Virtual; Platform'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestProcedureDeclSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Function Hello2 : Boolean;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Constructor Create;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Destructor Destroy;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestProcedureHeading;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Ident;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident2;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Procedure Ident3(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestProcedureType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = Procedure;'#13#10 +
+    '  t02 = Procedure(i : Integer);'#13#10 +
+    '  t03 = Procedure(i, j : Integer);'#13#10 +
+    '  t04 = Procedure(i, j : Integer; k : Integer);'#13#10 +
+    '  t05 = Procedure(i : Integer) Of Object;'#13#10 +
+    '  t06 = Function(i, j : Integer; s : String) : Boolean Of Object;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TProcedureType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+Procedure TestTPascalModule.TestProcessCompilerDirective;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    '{$DEFINE DGH}'#13#10 +
+    '{$DEFINE DGH1}'#13#10 +
+    '{$UNDEF DGH1}'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    '{$IFDEF DGH}'#13#10 +
+    'Const iMyConstant : Integer = 1;'#13#10 +
+    '{$ELSE}'#13#10 +
+    'Const iMyConstant : Integer = 0;'#13#10 +
+    '{$ENDIF}'#13#10 +
+    ''#13#10 +
+    '{$IFNDEF DGH}'#13#10 +
+    'Var iMyVar : Integer;'#13#10 +
+    '{$ENDIF}'#13#10 +
+    ''#13#10 +
+    '{$IFOPT R=}'#13#10 +
+    '  WriteLn(''Hello!'');'#13#10 +
+    '{$ENDIF}'#13#10 +
+    ''#13#10 +
+    '{$EXTERNALSYM MySymbol}'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+Begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      CheckEquals(True, P.IfDef('DGH'));
+      CheckEquals(False, P.IfDef('DGH1'));
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+End;
+
+procedure TestTPascalModule.TestProgramBlock;
+
+Const
+  strSource =
+    'Program MyProgram;'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  SysUtils, Windows;'#13#10 +
+    ''#13#10 +
+    'ResourceString'#13#10 +
+    '  strHello = ''Hello'';'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(strHello);'#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestPropertyInterface;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  private'#13#10 +
+    '    Property MyPrivateProperty[Ident1, Ident2 : Integer; Ident3 : String] : Boolean;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestPropertyList;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  private'#13#10 +
+    '    Property MyPrivateProperty;'#13#10 +
+    '  protected'#13#10 +
+    '    Property MyProtectedProperty : Boolean;'#13#10 +
+    '  public'#13#10 +
+    '    Property MyPublicProperty[iIndex : Integer] : Boolean;'#13#10 +
+    '  published'#13#10 +
+    '    Property MyPublishedProperty : String Read FProp;'#13#10 +
+    '  strict private'#13#10 +
+    '    Property MyStrictPrivateProperty : String Write FProp;'#13#10 +
+    '  strict protected'#13#10 +
+    '    Property MyStrictProtectedProperty Platform;'#13#10 +
+    '    Property MyStrictProtectedProperty2;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestPropertyParameterList;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  private'#13#10 +
+    '    Property MyPrivateProperty[Ident1, Ident2 : Integer; Ident3 : String] : Boolean;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestPropertySpecifiers;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  private'#13#10 +
+    '    Property MyProperty1 : Boolean Index 1 + 2 / 3;'#13#10 +
+    '    Property MyProperty2 : Boolean Read FProp;'#13#10 +
+    '    Property MyProperty3 : Boolean Write FProp;'#13#10 +
+    '    Property MyProperty5 : Boolean Stored FIdent;'#13#10 +
+    '    Property MyProperty6 : Boolean Stored Value;'#13#10 +
+    '    Property MyProperty7 : Boolean default 1 + 2;'#13#10 +
+    '    Property MyProperty8 : Boolean nodefault ;'#13#10 +
+    '    Property MyProperty9 : Boolean implements mythingy;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestRaiseStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  raise exception.create;'#13#10 +
+    '  raise exception.create at $FFFFFFFF;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestRealType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  r1 = Real48;'#13#10 +
+    '  r2 = Real;'#13#10 +
+    '  r3 = Single;'#13#10 +
+    '  r4 = Double;'#13#10 +
+    '  r5 = Extended;'#13#10 +
+    '  r6 = Currency;'#13#10 +
+    '  r7 = Comp;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TRealType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestRecordConstant;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  k : Array[1..2] of TRec = ('#13#10 +
+    '    (Name: ''Hello''; Value : 1),'#13#10 +
+    '    (Name: ''Hello''; Value : 1)'#13#10 +
+    '  );'#13#10 +
+    ''#13#10 +
+    'Begin;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestRecordFieldConstant;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  k : Array[1..2] of TRec = ('#13#10 +
+    '    (Name: ''Hello''; Value : 1 * 2 + 3 /4),'#13#10 +
+    '    (Name: ''Hello''; Value : 1.0)'#13#10 +
+    '  );'#13#10 +
+    ''#13#10 +
+    'Begin;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestRecType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = Record'#13#10 +
+    '    FField : Integer;'#13#10 +
+    '  End;'#13#10 +
+    '  t02 = Record'#13#10 +
+    '    FField : Integer;'#13#10 +
+    '  End platform;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestRecVariant;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = Record'#13#10 +
+    '    FField1 : Integer;'#13#10 +
+    '    FField2 : String;'#13#10 +
+    '  End;'#13#10 +
+    '  THInfo = Record'#13#10 +
+    '    dblBearing : Double;'#13#10 +
+    '    Case THInfoType Of'#13#10 +
+    '      itSetout  : (dblEasting, dblNorthing  : Double);'#13#10 +
+    '      itMeasure, itCompare : (dblChainage : Double;'#13#10 +
+    '        Case THInfoType Of'#13#10 +
+    '          itMeasure: (dblOffset : Double);'#13#10 +
+    '          itCompare: (dblDistance : Double);'#13#10 +
+    '    );'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+Procedure TestTPascalModule.TestReferenceSymbol;
+
+Var
+  T : TTokenInfo;
+
+Begin
+  T := TTokenInfo.Create('Hello1', 0, 0, 0, 5, ttIdentifier);
+  Try
+    CheckEquals(False, FPascalModule.ReferenceSymbol(T));
+  Finally
+    T.Free;
+  End;
+  T := TTokenInfo.Create('Hello', 0, 0, 0, 5, ttIdentifier);
+  Try
+    CheckEquals(True, FPascalModule.ReferenceSymbol(T));
+  Finally
+    T.Free;
+  End;
+End;
+
+procedure TestTPascalModule.TestRelOp;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  bool := 1 > 2;'#13#10 +
+    '  bool := 1 < 2;'#13#10 +
+    '  bool := 1 <= 2;'#13#10 +
+    '  bool := 1 >= 2;'#13#10 +
+    '  bool := 1 <> 2;'#13#10 +
+    '  bool := fsBold In MyStyles;'#13#10 +
+    '  bool := MyClass Is TDGHObject;'#13#10 +
+    '  (MyObject As TClass);'#13#10 +
+    '  bool := 1 = 2;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestRepeatStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  repeat'#13#10 +
+    '    Inc(i);'#13#10 +
+    '  until i > 10;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestRequiresClause;
+
+Const
+  strSource =
+    'Package MyPackage;'#13#10 +
+    ''#13#10 +
+    'Requires'#13#10 +
+    '  VCL50,'#13#10 +
+    '  DesignIDE;'#13#10 +
+    ''#13#10 +
+    'Contains'#13#10 +
+    '  DGHLibrary In ''DGHLibrary.pas'';'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestResourceStringDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'ResourceString'#13#10 +
+    '  str1 = ''Hello'';'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'ResourceString'#13#10 +
+    '  str2 = ''Hello'' + '#13#10 +
+    '    '' Goodbye'';'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'ResourceString'#13#10 +
+    '  str3 = ''Hello'';'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(i);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestResStringSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'ResourceString'#13#10 +
+    '  str1 = ''Hello'';'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'ResourceString'#13#10 +
+    '  str2 = ''Hello'';'#13#10 +
+    '  str4 = ''Hello'';'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'ResourceString'#13#10 +
+    '  str3 = ''Hello'';'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(i);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestRestrictedType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  a = Object End;'#13#10 +
+    '  b = Object(TMyObject)'#13#10 +
+    '  End;'#13#10 +
+    '  c = Class;'#13#10 +
+    '  d = Class(TObecjt)'#13#10 +
+    '  End;'#13#10 +
+    '  e = Interface;'#13#10 +
+    '  f = Interface(IInterface)'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestSetConstructor;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  i := [1..2, 4..5, 6, 7];'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestSetElement;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  i := [1..2];'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestSetType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = Set Of TEnum;'#13#10 +
+    '  t02 = Set Of TEnums platform;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TSetType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestSimpleExpression;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  i := + 10 + 1;'#13#10 +
+    '  i := - 10 + 1;'#13#10 +
+    '  i := - 10 - 1;'#13#10 +
+    '  i := + 10 - 1;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestSimpleStatement;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Designator;'#13#10 +
+    '  Designator(1, 2, Hello, ''Qwerty'');'#13#10+
+    '  Designator := 1 + 2 / Hello * $FF;'#13#10 +
+    '  Inherited Create;'#13#10 +
+    '  Goto MyLabel;'#13#10 +
+    '  Designator := (Helli + 1 * 4 Shl 5);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestSimpleType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  a = 1..2;'#13#10 +
+    '  b = (eOne, eTwo);'#13#10 +
+    '  c = Byte;'#13#10 +
+    '  d = Single;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestStatement;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Label'#13#10 +
+    '  labelID;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'LabelId: Hello;'#13#10 +
+    '  SimpleStatement;'#13#10+
+    '  If True Then'#13#10 +
+    '    Exit;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestStmtList;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Label'#13#10 +
+    '  labelID;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'LabelId: Hello;'#13#10 +
+    '  SimpleStatement;'#13#10+
+    '  If True Then'#13#10 +
+    '    Exit;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestStringType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = String;'#13#10 +
+    '  t02 = AnsiString;'#13#10 +
+    '  t02 = WideString;'#13#10 +
+    '  t02 = String[10];'#13#10 +
+    '  t02 = String[1 + 2 * 3];'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TStringType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestStructStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  begin'#13#10 +
+    '    i := 1 + 2;'#13#10+
+    '  end;'#13#10 +
+    '  if i > 0 then'#13#10 +
+    '    exit;'#13#10 +
+    '  for i := 0 to 1 do'#13#10 +
+    '    Dosomething;'#13#10 +
+    '  with frogs do'#13#10 +
+    '    croak;'#13#10 +
+    '  sl := tstringlist.create;'#13#10 +
+    '  try'#13#10 +
+    '    sl.clear;'#13#10 +
+    '  finally'#13#10 +
+    '    sl.free;'#13#10 +
+    '  end;'#13#10 +
+    '  try'#13#10 +
+    '    dosomething;'#13#10 +
+    '  except'#13#10 +
+    '    on e : exception do'#13#10 +
+    '      break;'#13#10 +
+    '  end;'#13#10 +
+    '  raise exception.create(''Hello'');'#13#10 +
+    '  asm'#13#10 +
+    '    MOV DX,BX'#13#10 +
+    '    ADD DX,BS'#13#10 +
+    '  end;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestStrucType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = Packed Array of Integer;'#13#10 +
+    '  t02 = Set Of Integer;'#13#10 +
+    '  t03 = File Of Word;'#13#10 +
+    '  t04 = Record'#13#10 +
+    '  End;'#13#10 +
+    '  t05 = Array Of Byte Packed;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          If T.Elements[i].Identifier <> 't04' Then // Skip record as its derived from TStrictType deliberately
+            Check(T.Elements[i] Is TStrucType,
+              Format('Expected type ''%s'' but found ''%s''.', [
+              TStrucType.ClassName, T.Elements[i].ClassName]));
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestSubRangeType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = 1..2;'#13#10 +
+    '  t02 = i..j;'#13#10 +
+    '  t02 = 1 + 2..3 * 4;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TSubRangeType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestTerm;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  i := 10 * 1;'#13#10 +
+    '  i := 10 / 1;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestThreadVarDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'ThreadVar'#13#10 +
+    '  v1 : Integer;'#13#10 +
+    '  v2 : String;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'ThreadVar'#13#10 +
+    '  v3 : String;'#13#10 +
+    '  v4, v5, v6 : Integer;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  V: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      V := P.FindElement(strThreadVarsLabel);
+      Check(V <> Nil, 'Can not find ThreadVars label.');
+      If V <> Nil Then
+        For i := 1 To V.ElementCount Do
+          CheckEquals(TThreadVar.ClassName, V.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestThreadVarSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'ThreadVar'#13#10 +
+    '  v1 : Integer;'#13#10 +
+    '  v2 : String;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'ThreadVar'#13#10 +
+    '  v3 : String;'#13#10 +
+    '  v4, v5, v6 : Integer;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  V: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      V := P.FindElement(strThreadVarsLabel);
+      Check(V <> Nil, 'Can not find ThreadVars label.');
+      If V <> Nil Then
+        For i := 1 To V.ElementCount Do
+          CheckEquals(TThreadVar.ClassName, V.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestTryExceptAndFinallyStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  sl := tstringlist.create;'#13#10 +
+    '  try'#13#10 +
+    '    sl.clear;'#13#10 +
+    '  finally'#13#10 +
+    '    sl.free;'#13#10 +
+    '  end;'#13#10 +
+    '  '#13#10 +
+    '  try'#13#10 +
+    '    sl.clear;'#13#10 +
+    '  except'#13#10 +
+    '    on e : exception do'#13#10 +
+    '      exit;'#13#10 +
+    '  end;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestTypedConstant;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  i : integer = 1 * 2 + 3 /4;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  j : Array[1..2] Of String = (''one'', ''two'');'#13#10 +
+    ''#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  k : Array[1..2] of TRec = ('#13#10 +
+    '    (Name: ''Hello''; Value : 1),'#13#10 +
+    '    (Name: ''Hello''; Value : 1)'#13#10 +
+    '  );'#13#10 +
+    ''#13#10 +
+    'Begin;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestTypeDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t = type Integer platform;'#13#10 +
+    '  u = Class;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t1 = Integer;'#13#10 +
+    '  u2 = type Class;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t = type Integer;'#13#10 +
+    '  u = Class;'#13#10 +
+    ''#13#10 +
+    'Begin;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestTypeSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t = Integer;'#13#10 +
+    '  u = Class;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t1 = Integer;'#13#10 +
+    '  u2 = Class;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t = Integer;'#13#10 +
+    '  u = Class;'#13#10 +
+    ''#13#10 +
+    'Begin;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestUsesClause;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  SysUtils, Windows;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  Classes;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestVarDecl;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  v1 : Integer;'#13#10 +
+    '  v2 : String;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  v3 : String;'#13#10 +
+    '  v4, v5, v6 : Integer;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  v13 : String;'#13#10 +
+    '  v14, v25, v36 : Integer;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  V: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      V := P.FindElement(strVarsLabel);
+      Check(V <> Nil, 'Can not find Vars label.');
+      If V <> Nil Then
+        For i := 1 To V.ElementCount Do
+          CheckEquals(TVar.ClassName, V.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestVariantSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = Record'#13#10 +
+    '    FField1 : Integer;'#13#10 +
+    '    FField2 : String;'#13#10 +
+    '  End;'#13#10 +
+    '  THInfo = Record'#13#10 +
+    '    dblBearing : Double;'#13#10 +
+    '    Case THInfoType Of'#13#10 +
+    '      itSetout  : (dblEasting, dblNorthing  : Double);'#13#10 +
+    '      itMeasure, itCompare : (dblChainage : Double;'#13#10 +
+    '        Case THInfoType Of'#13#10 +
+    '          itMeasure: (dblOffset : Double);'#13#10 +
+    '          itCompare: (dblDistance : Double);'#13#10 +
+    '    );'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestVariantType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  t01 = Variant;'#13#10 +
+    '  t02 = OLEVariant;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  T: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      T := P.FindElement(strTypesLabel);
+      Check(T <> Nil, 'Can not find Types label.');
+      If T <> Nil Then
+        For i := 1 To T.ElementCount Do
+          CheckEquals(TVariantType.ClassName, T.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestVarSection;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  v1 : Integer;'#13#10 +
+    '  v2 : String;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  v3 : String;'#13#10 +
+    '  v4, v5, v6 : Integer;'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  v7, v8 : Byte;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+  V: TElementContainer;
+  i: Integer;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+      V := P.FindElement(strVarsLabel);
+      Check(V <> Nil, 'Can not find Vars label.');
+      If V <> Nil Then
+        For i := 1 To V.ElementCount Do
+          CheckEquals(TVar.ClassName, V.Elements[i].ClassName);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestWhileStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  while i < 0 Do'#13#10 +
+    '    Inc(i);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestWithStmt;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  with objDGH Do'#13#10 +
+    '    Inc(i);'#13#10 +
+    '  with objDGH, dghObject Do'#13#10 +
+    '    Inc(i);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
 
 initialization
   // Register any test cases with the test runner
@@ -1394,8 +7254,6 @@ initialization
   RegisterTest('PascalModule Tests', TestTExportsItem.Suite);
   RegisterTest('PascalModule Tests', TestTInitializationSection.Suite);
   RegisterTest('PascalModule Tests', TestTFinalizationSection.Suite);
- {
   RegisterTest('PascalModule Tests', TestTPascalModule.Suite);
-  }
 end.
 

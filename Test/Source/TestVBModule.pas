@@ -398,43 +398,48 @@ var
   T : TVBTypeDecl;
 
 begin
-  P := TVBProperty.Create(ptLet, 'MyProperty', scPrivate, 10 ,12);
+  P := TVBProperty.Create(ptLet, 'MyProperty', scPrivate, 10 ,12,
+    iiPublicProperty, Nil);
   Try
     CheckEquals('Property Let MyProperty()', P.AsString(True, False));
     CheckEquals('Property Let MyProperty('#13#10')', P.AsString(True, True));
   Finally
     P.Free;
   End;
-  P := TVBProperty.Create(ptSet, 'MyProperty', scPrivate, 10 ,12);
+  P := TVBProperty.Create(ptSet, 'MyProperty', scPrivate, 10 ,12,
+    iiPublicProperty, Nil);
   Try
     CheckEquals('Property Set MyProperty()', P.AsString(True, False));
     CheckEquals('Property Set MyProperty('#13#10')', P.AsString(True, True));
   Finally
     P.Free;
   End;
-  P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12);
+  P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12,
+    iiPublicProperty, Nil);
   Try
-    P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
-    P.ReturnType.AddToken('String');
+    P.TypeID := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    P.TypeID.AddToken('String');
     CheckEquals('Property Get MyProperty() As String', P.AsString(True, False));
     CheckEquals('Property Get MyProperty('#13#10') As String', P.AsString(True, True));
   Finally
     P.Free;
   End;
-  P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12);
+  P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12,
+    iiPublicProperty, Nil);
   Try
-    P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
-    P.ReturnType.AddToken('MSForms');
-    P.ReturnType.AddToken('.');
-    P.ReturnType.AddToken('Integer');
+    P.TypeId := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    P.TypeId.AddToken('MSForms');
+    P.TypeId.AddToken('.');
+    P.TypeId.AddToken('Integer');
     CheckEquals('Property Get MyProperty() As MSForms.Integer', P.AsString(True, False));
     CheckEquals('Property Get MyProperty('#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
     P.Free;
   End;
-  P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12);
+  P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12,
+    iiPublicProperty, Nil);
   Try
-    P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    P.TypeId := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     T := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     Try
       T.AddToken('String');
@@ -442,17 +447,18 @@ begin
     Finally
       T.Free;
     End;
-    P.ReturnType.AddToken('MSForms');
-    P.ReturnType.AddToken('.');
-    P.ReturnType.AddToken('Integer');
+    P.TypeId.AddToken('MSForms');
+    P.TypeId.AddToken('.');
+    P.TypeId.AddToken('Integer');
     CheckEquals('Property Get MyProperty(Ident1 As String) As MSForms.Integer', P.AsString(True, False));
     CheckEquals('Property Get MyProperty('#13#10'  Ident1 As String'#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
     P.Free;
   End;
-  P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12);
+  P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12,
+    iiPublicProperty, Nil);
   Try
-    P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    P.TypeId := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     T := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     Try
       T.AddToken('String');
@@ -460,17 +466,18 @@ begin
     Finally
       T.Free;
     End;
-    P.ReturnType.AddToken('MSForms');
-    P.ReturnType.AddToken('.');
-    P.ReturnType.AddToken('Integer');
+    P.TypeId.AddToken('MSForms');
+    P.TypeId.AddToken('.');
+    P.TypeId.AddToken('Integer');
     CheckEquals('Property Get MyProperty(ByRef Ident1 As String = "") As MSForms.Integer', P.AsString(True, False));
     CheckEquals('Property Get MyProperty('#13#10'  ByRef Ident1 As String = ""'#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
     P.Free;
   End;
-  P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12);
+  P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12,
+    iiPublicProperty, Nil);
   Try
-    P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    P.TypeId := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     T := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     Try
       T.AddToken('MSForms');
@@ -487,9 +494,9 @@ begin
     Finally
       T.Free;
     End;
-    P.ReturnType.AddToken('MSForms');
-    P.ReturnType.AddToken('.');
-    P.ReturnType.AddToken('Integer');
+    P.TypeId.AddToken('MSForms');
+    P.TypeId.AddToken('.');
+    P.TypeId.AddToken('Integer');
     CheckEquals('Property Get MyProperty(ByRef Ident1 As MSForms.Integer, ByVal Ident2 As Integer) As MSForms.Integer', P.AsString(True, False));
     CheckEquals('Property Get MyProperty('#13#10'  ByRef Ident1 As MSForms.Integer,'#13#10'  ByVal Ident2 As Integer'#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally

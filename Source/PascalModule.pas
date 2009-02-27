@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       25 Feb 2009
+  @Date       26 Feb 2009
   @Author     David Hoyle
 
 **)
@@ -2644,6 +2644,9 @@ begin
       Else
         NextNonCommentToken;
       ProgramBlock;
+      // Fix for Compiler accepting non-standard grammer (i.e. no begin)
+      If Token.UToken = 'END' Then
+        NextNonCommentToken;
       // Check for '.'
       If Token.Token <> '.' Then
         ErrorAndSeekToken(strLiteralExpected, 'OPLibrary', '.',
@@ -6338,7 +6341,8 @@ Begin
         If Token.UToken = 'DO' Then
           Begin
             NextNonCommentToken;
-            Statement;
+            If Not CompoundStmt Then
+               Statement;
             If Token.Token = ';' Then
               Begin
                 NextNonCommentToken;
@@ -6348,8 +6352,9 @@ Begin
                     StmtList;
                   End;
                 End Else
-                  ErrorAndSeekToken(strReservedWordExpected, 'ExceptionBlock', 'DO',
-                    strSeekableOnErrorTokens, stActual);
+                  If Token.UToken <> 'END' Then
+                    ErrorAndSeekToken(strReservedWordExpected, 'ExceptionBlock', 'DO',
+                      strSeekableOnErrorTokens, stActual);
               End Else
                 ErrorAndSeekToken(strLiteralExpected, 'ExceptionBlock', ';',
                   strSeekableOnErrorTokens, stActual);
@@ -8937,7 +8942,7 @@ begin
             If (Method.ObjClsInt <> Nil) And Not Method.Resolved Then
               AddIssue(Format(strUndeclaredClassMethod, [Method.QualifiedName]),
                   scNone, 'FindUnresolvedImplementedClassMethods', Method.Line,
-                  Method.Column, etError);
+                  Method.Column, etWarning);
           End Else
           Begin
             ClassLabel := StartLabel.Elements[k] as TLabelContainer;
@@ -9004,7 +9009,8 @@ begin
           Method := FExportedHeadingsLabel.Elements[k] As TPascalMethod;
           If Not Method.Resolved And Not FExternalSyms.Find(Method.Identifier, iIndex) Then
             AddIssue(Format(strUnSatisfiedForwardReference, [Method.Identifier]),
-              scNone, 'FindUnresolvedExportedMethods', Method.Line, Method.Column, etError);
+              scNone, 'FindUnresolvedExportedMethods', Method.Line, Method.Column,
+              etWarning);
           End;
 end;
 
@@ -9119,7 +9125,7 @@ begin
                       AddIssue(Format(strUnSatisfiedForwardReference,
                         [GetClassQualification(ObjectOrClass) + Method.Identifier]),
                         scNone, 'FindUnresolvedObjectAndClassMethods', Method.Line,
-                        Method.Column, etError);
+                        Method.Column, etWarning);
                   End;
             ClassTypeLabel := ObjectOrClass.FindElement(strTypesLabel) As TLabelContainer;
             If ClassTypeLabel <> Nil Then

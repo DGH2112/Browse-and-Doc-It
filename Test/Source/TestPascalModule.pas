@@ -409,6 +409,8 @@ type
     Procedure TestCodeFailure01;
     Procedure TestCodeFailure02;
     Procedure TestCodeFailure03;
+    Procedure TestCodeFailure04;
+    Procedure TestCodeFailure05;
   End;
 
 implementation
@@ -2348,6 +2350,91 @@ begin
     Try
       CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
       CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestCodeFailure04;
+
+Const
+  strSource =
+    'Library MyLibrary;'#13#10 +
+    ''#13#10 +
+    'Uses'#13#10 +
+    '  Windows;'#13#10 +
+    ''#13#10 +
+    'Exports'#13#10 +
+    '  MyFunc;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(strSource);
+    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    Try
+      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    Finally
+      P.Free;
+    End;
+  Finally
+    Source.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestCodeFailure05;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  try'#13#10 +
+    '    AMethod;'#13#10 +
+    '    fail(''Expected exception not raised'');'#13#10 +
+    '  except'#13#10 +
+    '    on E: Exception do'#13#10 +
+    '    begin'#13#10 +
+    '      if E.ClassType <> AExceptionClass then'#13#10 +
+    '        raise;'#13#10 +
+    '    end'#13#10 +
+    '  end;'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  Source: TMemoryStream;
+  P: TPascalModule;
+
+begin
+  Source := TMemoryStream.Create;
+  Try
+    Source.LoadBufferFromString(Format(strSource, [FormatDateTime('dd mmm yyyy', Now)]));
+    P := TPascalModule.CreateParser(Source, '', True, [moParse,
+      moCheckForDocumentConflicts]);
+    Try
+      //CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
+      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
       CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
       CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
     Finally

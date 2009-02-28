@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       08 Feb 2009
+  @Date       28 Feb 2009
   @Author     David Hoyle
 
 **)
@@ -49,15 +49,95 @@ Type
     Property ParamArray : Boolean Read FParamArray Write FParamArray;
   End;
 
-  (** A class to represent method (SUB & FUNCTION) in visual basic. **)
-  TVBMethod = Class(TGenericMethodDecl)
+  (** An interface to define exception handling capabilties which are
+      implemented by methods and properties. **)
+  IExceptionHandling = Interface
+    Function GetHasPush : Boolean;
+    Procedure SetHasPush(boolValue : Boolean);
+    Function GetHasPop : Boolean;
+    Procedure SetHasPop(boolValue : Boolean);
+    Function GetPushName : String;
+    Procedure SetPushName(strValue : String);
+    Function GetPushParams : TStringList;
+    Function GetHasErrorHnd : Boolean;
+    Procedure SetHasErrorHnd(boolValue : Boolean);
+    Function GetHasExit : Boolean;
+    Procedure SetHasExit(boolValue : Boolean);
+    (**
+      This property determine if the method has a Exception.Push handler.
+      @precon  None.
+      @postcon Determine if the method has a Exception.Push handler.
+      @return  a Boolean
+    **)
+    Property HasPush : Boolean Read GetHasPush Write SetHasPush;
+    (**
+      This property determine if the method has a Exception.Pop handler.
+      @precon  None.
+      @postcon Determine if the method has a Exception.Pop handler.
+      @return  a Boolean
+    **)
+    Property HasPop  : Boolean Read GetHasPop  Write SetHasPop;
+    (**
+      This property returns the name of the pushed method.
+      @precon  None.
+      @postcon Returns the name of the pushed method.
+      @return  a String
+    **)
+    Property PushName : String Read GetPushName Write SetPushName;
+    (**
+      This property returns a string list of the methods parameters.
+      @precon  None.
+      @postcon Returns a string list of the methods parameters.
+      @return  a TStringList
+    **)
+    Property PushParams : TStringList Read GetPushParams;
+    (**
+      This property determines if the method has an error handler.
+      @precon  None.
+      @postcon Determines if the method has an error handler.
+      @return  a Boolean
+    **)
+    Property HasErrorHnd : Boolean Read GetHasErrorHnd Write SetHasErrorHnd;
+    (**
+      This property determines if the method has an exit statement.
+      @precon  None.
+      @postcon Determines if the method has an exit statement.
+      @return  a Boolean
+    **)
+    Property HasExit : Boolean Read GetHasExit Write SetHasExit;
+  End;
+
+  (** A class to handle exception handling information for method and
+      properties. **)
+  TExceptionHandling = Class(TInterfacedObject, IExceptionHandling)
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FHasPush : Boolean;
-    FHasPop : Boolean;
-    FPushName : String;
-    FPushParams : TStringList;
     FHasErrorHnd : Boolean;
-    FHasExit : Boolean;
+    FHasExit     : Boolean;
+    FHasPop      : Boolean;
+    FHasPush     : Boolean;
+    FPushName    : String;
+    FPushParams  : TStringList;
+  Public
+    Constructor Create;
+    Destructor Destroy; Override;
+    function GetHasErrorHnd: Boolean;
+    function GetHasExit: Boolean;
+    function GetHasPop: Boolean;
+    function GetHasPush: Boolean;
+    function GetPushName: string;
+    function GetPushParams: TStringList;
+    procedure SetHasErrorHnd(boolValue: Boolean);
+    procedure SetHasExit(boolValue: Boolean);
+    procedure SetHasPop(boolValue: Boolean);
+    procedure SetHasPush(boolValue: Boolean);
+    procedure SetPushName(strValue: string);
+  End;
+
+  (** A class to represent method (SUB & FUNCTION) in visual basic. **)
+  TVBMethod = Class(TGenericMethodDecl, IExceptionHandling)
+  {$IFDEF D2005} Strict {$ENDIF} Private
+    FPushParams: TStringList;
+    FExceptionHandling : IExceptionHandling;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(MethodType : TMethodType; strName : String;
@@ -65,47 +145,13 @@ Type
     Destructor Destroy; Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
-      This property determine if the method has a Exception.Push handler.
+      This property implements the IExceptionHandling interface.
       @precon  None.
-      @postcon Determine if the method has a Exception.Push handler.
-      @return  a Boolean
+      @postcon Implements the IExceptionHandling interface.
+      @return  an IExceptionHandling
     **)
-    Property HasPush : Boolean Read FHasPush Write FHasPush;
-    (**
-      This property determine if the method has a Exception.Pop handler.
-      @precon  None.
-      @postcon Determine if the method has a Exception.Pop handler.
-      @return  a Boolean
-    **)
-    Property HasPop  : Boolean Read FHasPop  Write FHasPop;
-    (**
-      This property returns the name of the pushed method.
-      @precon  None.
-      @postcon Returns the name of the pushed method.
-      @return  a String
-    **)
-    Property PushName : String Read FPushName Write FPushName;
-    (**
-      This property returns a string list of the methods parameters.
-      @precon  None.
-      @postcon Returns a string list of the methods parameters.
-      @return  a TStringList
-    **)
-    Property PushParams : TStringList Read FPushParams;
-    (**
-      This property determines if the method has an error handler.
-      @precon  None.
-      @postcon Determines if the method has an error handler.
-      @return  a Boolean
-    **)
-    Property HasErrorHnd : Boolean Read FHasErrorHnd Write FHasErrorHnd;
-    (**
-      This property determines if the method has an exit statement.
-      @precon  None.
-      @postcon Determines if the method has an exit statement.
-      @return  a Boolean
-    **)
-    Property HasExit : Boolean Read FHasExit Write FHasExit;
+    Property ExceptionHandling : IExceptionHandling Read FExceptionHandling
+      Implements IExceptionHandling;
   End;
 
   (** A class to represent constants in visual basic. **)
@@ -151,14 +197,32 @@ Type
   TPropertyType = (ptUnknown, ptGet, ptLet, ptSet);
 
   (** A class to represent properties in visual basic. **)
-  TVBProperty = Class(TVBMethod)
+  TVBProperty = Class(TGenericProperty, IExceptionHandling)
   {$IFDEF D2005} Strict {$ENDIF} Private
+    FPropertyType: TPropertyType;
+    FExceptionHandling : IExceptionHandling;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(PropertyType : TPropertyType; strName : String;
-      AScope : TScope; iLine, iCol : Integer); Reintroduce; Virtual;
+    Constructor Create(APropertyType : TPropertyType; strName : String;
+      AScope : TScope; iLine, iCol : Integer; iImageIndex : TImageIndex;
+      AComment : TComment); Reintroduce; Virtual;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
+    (**
+      This property gets and sets the type of visula basic property.
+      @precon  None.
+      @postcon Gets and sets the type of visula basic property.
+      @return  a TPropertyType
+    **)
+    Property PropertyType : TPropertyType Read FPropertyType Write FPropertyType;
+    (**
+      This property implements the IExceptionHandling interface.
+      @precon  None.
+      @postcon Implements the IExceptionHandling interface.
+      @return  an IExceptionHandling
+    **)
+    Property ExceptionHandling : IExceptionHandling Read FExceptionHandling
+      Implements IExceptionHandling;
   End;
 
   (** A class to represent records in visual basic. **)
@@ -263,9 +327,9 @@ Type
     Function  Props(Scope : TScope; C : TComment; boolStatic : Boolean) : Boolean;
     Function  Records(Scope : TScope; C : TComment) : Boolean;
     Function  Enum(Scope : TScope; C: TComment) : Boolean;
-    Procedure Parameters(Method : TGenericMethodDecl);
+    Procedure Parameters(Container : TElementContainer);
     Procedure MethodDecl(M : TGenericMethodDecl; C : TComment);
-    Procedure FindMethodEnd(Method : TVBMethod; strMethodType : String);
+    Procedure FindMethodEnd(AExceptionHnd : IExceptionHandling; strMethodType : String);
     Function Vars(Scope : TScope; C : TComment) : Boolean;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
@@ -393,6 +457,201 @@ begin
     iLine, iCol);
 end;
 
+{ TExceptionHandling }
+
+(**
+
+  This is a constructor for the TExceptionHandling class.
+
+  @precon  None.
+  @postcon Initialises the push parameters string list.
+
+**)
+constructor TExceptionHandling.Create;
+begin
+  Inherited Create;
+  FPushParams := TStringList.Create;
+end;
+
+(**
+
+  This is a destructor for the TExceptionHandling class.
+
+  @precon  None.
+  @postcon Frees the push parameters string list.
+
+**)
+destructor TExceptionHandling.Destroy;
+begin
+  FPushParams.Free;
+  Inherited Destroy;
+end;
+
+(**
+
+  This is a getter method for the HasErrorHnd property.
+
+  @precon  None.
+  @postcon Returns whether the method / property has an error handler.
+
+  @return  a Boolean
+
+**)
+function TExceptionHandling.GetHasErrorHnd: Boolean;
+begin
+  Result := FHasErrorHnd;
+end;
+
+(**
+
+  This is a getter method for the HasExit property.
+
+  @precon  None.
+  @postcon Returns whether the method / property has an exit statement.
+
+  @return  a Boolean
+
+**)
+function TExceptionHandling.GetHasExit: Boolean;
+begin
+  Result := FHasExit;
+end;
+
+(**
+
+  This is a getter method for the HasPop property.
+
+  @precon  None.
+  @postcon Returns whether the method / property has a pop statement.
+
+  @return  a Boolean
+
+**)
+function TExceptionHandling.GetHasPop: Boolean;
+begin
+  Result := FHasPop;
+end;
+
+(**
+
+  This is a getter method for the HasPush property.
+
+  @precon  None.
+  @postcon Returns whether the method / property has a push statement.
+
+  @return  a Boolean
+
+**)
+function TExceptionHandling.GetHasPush: Boolean;
+begin
+  Result := FHasPush;
+end;
+
+(**
+
+  This is a getter method for the HasPush property.
+
+  @precon  None.
+  @postcon Returns whether the method / property has a push statement.
+
+  @return  a String
+
+**)
+function TExceptionHandling.GetPushName: string;
+begin
+  Result := FPushName;
+end;
+
+(**
+
+  This is a getter method for the PushParams property.
+
+  @precon  None.
+  @postcon Returns a string list of push parameters.
+
+  @return  a TStringList
+
+**)
+function TExceptionHandling.GetPushParams: TStringList;
+begin
+  Result := FPushParams;
+end;
+
+(**
+
+  This is a setter method for the HasErrorHnd property.
+
+  @precon  None.
+  @postcon Sets whether the method / property has an error handler.
+
+  @param   boolValue as a Boolean
+
+**)
+procedure TExceptionHandling.SetHasErrorHnd(boolValue: Boolean);
+begin
+  FHasErrorHnd := boolValue;
+end;
+
+(**
+
+  This is a setter method for the HasExit property.
+
+  @precon  None.
+  @postcon Sets whether the method / property has an exit statement.
+
+  @param   boolValue as a Boolean
+
+**)
+procedure TExceptionHandling.SetHasExit(boolValue: Boolean);
+begin
+  FHasExit := boolValue;
+end;
+
+(**
+
+  This is a setter method for the HasPop property.
+
+  @precon  None.
+  @postcon Sets whether the method / property has a pop statement.
+
+  @param   boolValue as a Boolean
+
+**)
+procedure TExceptionHandling.SetHasPop(boolValue: Boolean);
+begin
+  FHasPop := boolValue;
+End;
+
+(**
+
+  This is a setter method for the HasPush property.
+
+  @precon  None.
+  @postcon Sets whether the method / property has a push statement.
+
+  @param   boolValue as a Boolean
+
+**)
+procedure TExceptionHandling.SetHasPush(boolValue: Boolean);
+begin
+  FHasPush := boolValue;
+end;
+
+(**
+
+  This is a setter method for the PushName property.
+
+  @precon  None.
+  @postcon Sets the method / property push name.
+
+  @param   strValue as a String
+
+**)
+procedure TExceptionHandling.SetPushName(strValue: string);
+begin
+  FPushName := strValue;
+end;
+
 { TVBMethod }
 
 (**
@@ -414,6 +673,7 @@ constructor TVBMethod.Create(MethodType: TMethodType; strName: String;
 begin
   inherited;
   FPushParams := TStringList.Create;
+  FExceptionHandling := TExceptionHandling.Create;
 end;
 
 (**
@@ -653,10 +913,10 @@ Var
 
 begin
   Result := 'Property ';
-  Case MethodType Of
-    mtFunction: Result := Result + 'Get ';
-    mtProcedure: Result := Result + 'Let ';
-    mtConstructor: Result := Result + 'Set ';
+  Case PropertyType Of
+    ptGet: Result := Result + 'Get ';
+    ptLet: Result := Result + 'Let ';
+    ptSet: Result := Result + 'Set ';
   End;
   If boolShowIdentifier Then
     Result := Result + Identifier;
@@ -678,9 +938,9 @@ begin
   If boolForDocumentation Then
     Result := Result + #13#10;
   Result := Result + ')';
-  If (MethodType = mtFunction) And (ReturnType <> Nil) Then
+  If (PropertyType = ptGet) And (TypeId <> Nil) Then
     Begin
-      Result := Result + #32'As'#32 + ReturnType.AsString(boolShowIdentifier,
+      Result := Result + #32'As'#32 + TypeId.AsString(boolShowIdentifier,
         boolForDocumentation);
     End;
 end;
@@ -698,6 +958,7 @@ end;
 procedure TVBProperty.CheckDocumentation(var boolCascade: Boolean);
 begin
   Inherited CheckDocumentation(boolCascade);
+  {: @bug This outputs documentation conflicts as METHOD problems.
   If MethodType In [mtFunction] Then
     Begin
        If ReturnType = Nil Then
@@ -709,38 +970,34 @@ begin
          AddIssue(Format(strProperyRequireParam, [Identifier]), scNone,
            'CheckDocumentation', Line, Column, etError);
     End;
+  }
 end;
 
 (**
 
   This is a constructor for the TVBProperty class.
 
-  @precon  None.
-  @postcon Maps the property type to an internal method type + creates a string
-           list for pushed parameters.
+  @precon  None . 
+  @postcon Maps the property type to an internal method type + creates a string 
+           list for pushed parameters . 
 
-  @param   PropertyType as a TPropertyType
-  @param   strName      as a String
-  @param   AScope       as a TScope
-  @param   iLine        as an Integer
-  @param   iCol         as an Integer
+  @param   APropertyType as a TPropertyType
+  @param   strName       as a String
+  @param   AScope        as a TScope
+  @param   iLine         as an Integer
+  @param   iCol          as an Integer
+  @param   iImageIndex   as a TImageIndex
+  @param   AComment      as a TComment
 
 **)
-constructor TVBProperty.Create(PropertyType: TPropertyType; strName: String;
-  AScope: TScope; iLine, iCol: Integer);
-
-Var
-  MT : TMethodType;
+constructor TVBProperty.Create(APropertyType: TPropertyType; strName: String;
+  AScope: TScope; iLine, iCol: Integer; iImageIndex : TImageIndex;
+  AComment : TComment);
 
 begin
-  Case PropertyType Of
-    ptGet: MT := mtFunction;
-    ptLet: MT := mtProcedure;
-    ptSet: MT := mtConstructor;
-  Else
-    MT := mtFunction;
-  End;
-  Inherited Create(MT, strName, AScope, iLine, iCol);
+  Inherited Create(strName, AScope, iLine, iCol, iImageIndex, AComment);
+  FPropertyType := APropertyType;
+  FExceptionHandling := TExceptionHandling.Create;
 end;
 
 { TVBRecordDecl }
@@ -1839,13 +2096,13 @@ End;
 
   This method parses parameters for method and properties.
 
-  @precon  Method must be a valid instance of a method.
-  @postcon Parses parameters for method and properties.
+  @precon  Method must be a valid instance of a method . 
+  @postcon Parses parameters for method and properties . 
 
-  @param   Method as a TGenericMethodDecl
+  @param   Container as a TElementContainer
 
 **)
-Procedure TVBModule.Parameters(Method : TGenericMethodDecl);
+Procedure TVBModule.Parameters(Container : TElementContainer);
 
 Var
   boolOptional : Boolean;
@@ -1929,7 +2186,10 @@ Begin
         End;
       P := TVBParameter.Create(pm, Ident.Token, boolArray, ParamType,
         DefaultValue, scLocal, Token.Line, Token.Column);
-      Method.AddParameter(P);
+      If Container Is TVBMethod Then
+        (Container AS TVBMethod).AddParameter(P)
+      Else
+        (Container AS TVBProperty).AddParameter(P);
       P.Optional := boolOptional;
       P.ParamArray := boolParamArray;
     Finally
@@ -2132,18 +2392,19 @@ end;
 
 (**
 
-  This method attempts to find the end of the method while looking for
-  exception / error handling code and exit statements.
+  This method attempts to find the end of the method while looking for exception
+  / error handling code and exit statements.
 
-  @precon  Method must be a valid TVBMethod instance.
-  @postcon Attempts to find the end of the method while looking for
-           exception / error handling code and exit statements.
+  @precon  Method must be a valid TVBMethod instance . 
+  @postcon Attempts to find the end of the method while looking for exception / 
+           error handling code and exit statements . 
 
-  @param   Method        as a TVBMethod
+  @param   AExceptionHnd as an IExceptionHandling
   @param   strMethodType as a String
 
 **)
-Procedure TVBModule.FindMethodEnd(Method : TVBMethod; strMethodType : String);
+Procedure TVBModule.FindMethodEnd(AExceptionHnd : IExceptionHandling;
+  strMethodType : String);
 
 Begin
   RollBackToken;
@@ -2158,16 +2419,16 @@ Begin
             NextNonCommentToken;
             If AnsiCompareText(Token.Token, 'Push') = 0 Then
               Begin
-                Method.HasPush := True;
+                AExceptionHnd.HasPush := True;
                 NextNonCommentToken;
                 If Token.TokenType In [ttStringLiteral] Then
                   Begin
-                    Method.PushName := Token.Token;
+                    AExceptionHnd.PushName := Token.Token;
                     NextNonCommentToken;
                     While Token.Token = ',' Do
                       Begin
                         NextNonCommentToken;
-                        Method.PushParams.Add(Token.Token);
+                        AExceptionHnd.PushParams.Add(Token.Token);
                         NextNonCommentToken;
                       End;
                   End Else
@@ -2176,7 +2437,7 @@ Begin
               End;
             If AnsiCompareText(Token.Token, 'Pop') = 0 Then
               Begin
-                Method.HasPop := True;
+                AExceptionHnd.HasPop := True;
                 NextNonCommentToken;
               End;
           End;
@@ -2187,7 +2448,7 @@ Begin
         NextNonCommentToken;
         If AnsiCompareText(Token.Token, 'Error') = 0 Then
           Begin
-            Method.HasErrorHnd := True;
+            AExceptionHnd.HasErrorHnd := True;
             NextNonCommentToken;
           End;
       End;
@@ -2197,7 +2458,7 @@ Begin
         NextNonCommentToken;
         If IsKeyWord(Token.Token, ['function', 'sub']) Then
           Begin
-            Method.HasExit := True;
+            AExceptionHnd.HasExit := True;
             NextNonCommentToken;
           End;
       End;
@@ -2299,19 +2560,19 @@ begin
           boolNoTag :=
             (Comment <> Nil) And (Comment.FindTag('noexception') > -1) Or
             (M.Comment <> Nil) And (M.Comment.FindTag('noexception') > -1);
-          If Not M.HasPush And Not boolNoTag Then
+          If Not M.ExceptionHandling.HasPush And Not boolNoTag Then
             AddIssue(Format(strExceptionPush, [M.Identifier]), scNone,
               'CheckExceptionHandling', M.Line, M.Column, etWarning);
-          If Not M.HasPop And Not boolNoTag Then
+          If Not M.ExceptionHandling.HasPop And Not boolNoTag Then
             AddIssue(Format(strExceptionPop, [M.Identifier]), scNone,
               'CheckExceptionHandling', M.Line, M.Column, etWarning);
           boolNoTag :=
             (Comment <> Nil) And (Comment.FindTag('noerror') > -1) Or
             (M.Comment <> Nil) And (M.Comment.FindTag('noerror') > -1);
-          If Not M.HasErrorHnd And Not boolNoTag Then
+          If Not M.ExceptionHandling.HasErrorHnd And Not boolNoTag Then
             AddIssue(Format(strErrorHandling, [M.Identifier]), scNone,
               'CheckExceptionHandling', M.Line, M.Column, etWarning);
-          If M.HasExit And M.HasErrorHnd Then
+          If M.ExceptionHandling.HasExit And M.ExceptionHandling.HasErrorHnd Then
             AddIssue(Format(strExitStatement, [M.Identifier]), scNone,
               'CheckExceptionHandling', M.Line, M.Column, etWarning);
         End;
@@ -2519,12 +2780,12 @@ Begin
       If pt In [ptGet, ptLet, ptSet] Then
         Begin
           NextNonCommentToken;
-          P := TVBProperty.Create(pt, Token.Token, Scope, Token.Line, Token.Column);
+          P := TVBProperty.Create(pt, Token.Token, Scope, Token.Line,
+            Token.Column, iiPublicProperty, C);
           If FImplementedPropertiesLabel = Nil Then
             FImplementedPropertiesLabel := Add(TLabelContainer.Create(strPropertiesLabel,
               scNone, 0, 0, iiPropertiesLabel, Nil)) As TLabelContainer;
           P := FImplementedPropertiesLabel.Add(P) As TVBProperty;
-          P.Comment := C;
           NextNonCommentToken;
           If Token.Token = '(' Then
             Begin
@@ -2541,8 +2802,8 @@ Begin
                   NextNonCommentToken;
                   If Token.TokenType In [ttIdentifier, ttReservedWord] Then
                     Begin
-                      P.ReturnType := TVBTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
-                      AddToExpression(P.ReturnType);
+                      P.TypeId := TVBTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+                      AddToExpression(P.TypeId);
                     End;
                 End;
               FindMethodEnd(P, 'PROPERTY');
@@ -2577,7 +2838,7 @@ Begin
     Begin
       Result := True;
       NextNonCommentToken;
-      If Token.TokenType = ttIdentifier Then
+      If Token.TokenType In [ttIdentifier] Then
         Begin
           R := TVBRecordDecl.Create(Token.Token, Scope, Token.Line, Token.Column,
             iiPublicRecord, C);
@@ -2592,7 +2853,7 @@ Begin
               NextNonCommentToken;
               While Token.UToken <> 'END' Do
                 Begin
-                  If Token.TokenType In [ttIdentifier] Then
+                  If Token.TokenType In [ttReservedWord, ttIdentifier] Then
                     Begin
                       F := TVBField.Create(Token.Token, scPublic, Token.Line,
                         Token.Column, iiPublicField, GetComment);

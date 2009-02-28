@@ -1432,6 +1432,7 @@ var
   AType: TTestGenericTypeDecl;
   P : TTestGenericParameter;
   C: TComment;
+  M: TGenericMethodDecl;
 
 begin
   AType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
@@ -1468,26 +1469,33 @@ begin
       C.Free;
     End;
     FGenericMethodDecl.DeleteDocumentConflicts;
-    C := TComment.Create('This is a description.', 0, 0);
+    C := TComment.Create(
+      'This is a description.', 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
-      CheckEquals('1) A Pre-condition in Method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
+      CheckEquals('1) A pre-condition in method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
+      CheckEquals('2) Method ''MyFunction'' has a different parameter count (4 not 0).', FGenericMethodDecl.DocConflict(2));
       CheckEquals('3) Method ''MyFunction'' has missing pre-condition tags.', FGenericMethodDecl.DocConflict(3));
+      CheckEquals('4) Parameter ''Param1'' in method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(4));
     Finally
       C.Free;
     End;
     FGenericMethodDecl.DeleteDocumentConflicts;
-    C := TComment.Create('This is a description.'#13#10'@precon', 0, 0);
+    C := TComment.Create(
+      'This is a description.'#13#10 +
+      '@precon', 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
-      CheckEquals('1) A Pre-condition in Method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
+      CheckEquals('1) A pre-condition in method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
     Finally
       C.Free;
     End;
     FGenericMethodDecl.DeleteDocumentConflicts;
-    C := TComment.Create('This is a description.'#13#10'@precon None.', 0, 0);
+    C := TComment.Create(
+      'This is a description.'#13#10 +
+      '@precon None.', 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
@@ -1496,13 +1504,119 @@ begin
       C.Free;
     End;
     FGenericMethodDecl.DeleteDocumentConflicts;
-    C := TComment.Create('This is a description.'#13#10'@precon None.'#13#10'@precon None.', 0, 0);
+    C := TComment.Create(
+      'This is a description.'#13#10'@precon None.'#13#10 +
+      '@precon None.', 0, 0);
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
       CheckEquals('2) Method ''MyFunction'' has too many pre-condition tags.', FGenericMethodDecl.DocConflict(2));
     Finally
       C.Free;
+    End;
+    FGenericMethodDecl.DeleteDocumentConflicts;
+    C := TComment.Create(
+      'This is a description.'#13#10 +
+      '@precon None.'#13#10 +
+      '@postcon '#13#10 +
+      '@param param1 as an String'#13#10 +
+      '@param param2 as an Array of Integer as a reference'#13#10 +
+      '@param param3 as an Byte as a constant'#13#10 +
+      '@param param4 as a Double as an out parameter'#13#10 +
+      '@return a Boolean', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals('1) A post-condition in method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericMethodDecl.DeleteDocumentConflicts;
+    C := TComment.Create(
+      'This is a description.'#13#10 +
+      '@precon None.'#13#10 +
+      '@param param1 as an String'#13#10 +
+      '@param param2 as an Array of Integer as a reference'#13#10 +
+      '@param param3 as an Byte as a constant'#13#10 +
+      '@param param4 as a Double as an out parameter'#13#10 +
+      '@return a Boolean', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals('1) Method ''MyFunction'' has a missing post-condition tag.', FGenericMethodDecl.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericMethodDecl.DeleteDocumentConflicts;
+    C := TComment.Create(
+      'This is a description.'#13#10 +
+      '@precon None.'#13#10 +
+      '@postcon None.'#13#10 +
+      '@postcon None.'#13#10 +
+      '@param param1 as an String'#13#10 +
+      '@param param2 as an Array of Integer as a reference'#13#10 +
+      '@param param3 as an Byte as a constant'#13#10 +
+      '@param param4 as a Double as an out parameter'#13#10 +
+      '@return a Boolean', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals('1) Method ''MyFunction'' has too many post-condition tags.', FGenericMethodDecl.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericMethodDecl.DeleteDocumentConflicts;
+    C := TComment.Create(
+      'This is a description.'#13#10'@precon None.'#13#10 +
+      '@postcon None.'#13#10 +
+      '@param param1 as an Integer'#13#10 +
+      '@param param2 as an Array of Integer as a reference'#13#10 +
+      '@param param3 as an Byte as a constant'#13#10 +
+      '@param param4 as a Double as an out parameter', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals('1) The parameter type for ''Param1'' in method ''MyFunction'' is incorrect (''String'').',
+        FGenericMethodDecl.DocConflict(1));
+      CheckEquals('2) Method ''MyFunction''`s return type is not documented.',
+        FGenericMethodDecl.DocConflict(2));
+    Finally
+      C.Free;
+    End;
+    FGenericMethodDecl.DeleteDocumentConflicts;
+    C := TComment.Create(
+      'This is a description.'#13#10'@precon None.'#13#10 +
+      '@postcon None.'#13#10 +
+      '@param param1 as an String'#13#10 +
+      '@param param2 as an Array of Integer as a reference'#13#10 +
+      '@param param3 as an Byte as a constant'#13#10 +
+      '@param param4 as a Double as an out parameter'#13#10 +
+      '@return a Thingy', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals('1) Method ''MyFunction''`s return type is incorrect (''Boolean'').',
+        FGenericMethodDecl.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    M := TTestGenericMethodDecl.Create(mtProcedure, 'MyProcedure', scPrivate, 0, 0);
+    Try
+      M.DeleteDocumentConflicts;
+      C := TComment.Create(
+        'This is a description.'#13#10'@precon None.'#13#10 +
+        '@postcon None.'#13#10 +
+        '@return a Thingy', 0, 0);
+      Try
+        M.Comment := C;
+        M.CheckDocumentation(boolCascade);
+        CheckEquals('1) Method ''MyProcedure''`s return type is not required.',
+          M.DocConflict(1));
+      Finally
+        C.Free;
+      End;
+    Finally
+      M.Free;
     End;
   Finally
     AType.Free;
@@ -1659,7 +1773,6 @@ var
   P: TTestGenericParameter;
   C: TComment;
   boolCascade: Boolean;
-  strMsg: String;
 
 begin
   AType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
@@ -1684,37 +1797,189 @@ begin
     CheckEquals('Param2 = Integer', FGenericProperty.Parameters[1].AsString(False, False));
     CheckEquals('Param3 = Byte', FGenericProperty.Parameters[2].AsString(False, False));
     CheckEquals('Param4 = Double', FGenericProperty.Parameters[3].AsString(False, False));
+    FGenericProperty.CheckDocumentation(boolCascade);
+    CheckEquals('1) Property ''MyProperty'' has not been documented.', FGenericProperty.DocConflict(1));
+    FGenericProperty.DeleteDocumentConflicts;
+    C := TComment.Create(
+      '', 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      CheckEquals('1) Property ''MyProperty'' has no description.', FGenericProperty.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericProperty.DeleteDocumentConflicts;
+    C := TComment.Create(
+      'This is a description.', 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      CheckEquals('1) Property ''MyProperty'' has a different parameter count (4 not 0).', FGenericProperty.DocConflict(1));
+      CheckEquals('2) Property ''MyProperty'' has missing pre-condition tags.', FGenericProperty.DocConflict(2));
+      CheckEquals('3) Parameter ''Param1'' in property ''MyProperty'' is not documented.', FGenericProperty.DocConflict(3));
+    Finally
+      C.Free;
+    End;
+    FGenericProperty.DeleteDocumentConflicts;
     C := TComment.Create(
       ''#13#10 +
       '  This method does something interesting.'#13#10 +
-      ''#13#10 +
       '  @precon  None.'#13#10 +
       '  @postcon Does something very interesting.'#13#10 +
+      '  @param   Param1 as a Integer'#13#10 +
+      '  @param   Param2 as an array of Integer as a reference'#13#10 +
+      '  @param   Param3 as a Byte as a constant'#13#10 +
+      '  @param   Param4 as a Double as an out parameter'#13#10 +
+      '  @return  a Boolean', 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      CheckEquals('1) The parameter type for ''Param1'' in property ''MyProperty'' is incorrect (''String'').', FGenericProperty.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericProperty.DeleteDocumentConflicts;
+    C := TComment.Create(
       ''#13#10 +
+      '  This method does something interesting.'#13#10 +
+      '  @precon  None.'#13#10 +
+      '  @postcon Does something very interesting.'#13#10 +
+      '  @param   Param1 as a String'#13#10 +
+      '  @param   Param2 as an array of Integer as a reference'#13#10 +
+      '  @param   Param3 as a Byte as a constant'#13#10 +
+      '  @param   Param4 as a Double as an out parameter', 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      CheckEquals('1) Property ''MyProperty''`s return type is not documented (''Boolean'').', FGenericProperty.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericProperty.DeleteDocumentConflicts;
+    C := TComment.Create(
+      ''#13#10 +
+      '  This method does something interesting.'#13#10 +
+      '  @precon  None.'#13#10 +
+      '  @postcon Does something very interesting.'#13#10 +
       '  @param   Param1 as a String'#13#10 +
       '  @param   Param2 as an array of Integer as a reference'#13#10 +
       '  @param   Param3 as a Byte as a constant'#13#10 +
       '  @param   Param4 as a Double as an out parameter'#13#10 +
-      '  @return  a Boolean'#13#10 +
-      ''
-      , 0, 0);
+      '  @return  a String', 0, 0);
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
-      strMsg := '';
-      If FGenericProperty.ElementCount > 0 Then
-        Begin
-          strMsg := FGenericProperty.Elements[1].AsString(False, False);
-          If FGenericProperty.Elements[1].ElementCount > 0 Then
-            Begin
-              strMsg := FGenericProperty.Elements[1].Elements[1].AsString(False, False);
-              If FGenericProperty.Elements[1].Elements[1].ElementCount > 0 Then
-                Begin
-                  strMsg := FGenericProperty.Elements[1].Elements[1].Elements[1].AsString(False, False);
-                End;
-            End;
-        End;
-      CheckEquals(0, FGenericProperty.ElementCount, strMsg);
+      CheckEquals('1) Property ''MyProperty''`s return type is incorrect (''Boolean'').', FGenericProperty.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericProperty.DeleteDocumentConflicts;
+    C := TComment.Create(
+      ''#13#10 +
+      '  This method does something interesting.'#13#10 +
+      '  @precon '#13#10 +
+      '  @param   Param1 as a String'#13#10 +
+      '  @param   Param2 as an array of Integer as a reference'#13#10 +
+      '  @param   Param3 as a Byte as a constant'#13#10 +
+      '  @param   Param4 as a Double as an out parameter'#13#10 +
+      '  @return  a Boolean', 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      CheckEquals('1) A pre-condition in property ''MyProperty'' is not documented.', FGenericProperty.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericProperty.DeleteDocumentConflicts;
+    C := TComment.Create(
+      ''#13#10 +
+      '  This method does something interesting.'#13#10 +
+      '  @precon None'#13#10 +
+      '  @precon None'#13#10 +
+      '  @param   Param1 as a String'#13#10 +
+      '  @param   Param2 as an array of Integer as a reference'#13#10 +
+      '  @param   Param3 as a Byte as a constant'#13#10 +
+      '  @param   Param4 as a Double as an out parameter'#13#10 +
+      '  @return  a Boolean', 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      CheckEquals('1) Property ''MyProperty'' has too many pre-condition tags.', FGenericProperty.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericProperty.DeleteDocumentConflicts;
+    C := TComment.Create(
+      ''#13#10 +
+      '  This method does something interesting.'#13#10 +
+      '  @precon None'#13#10 +
+      '  @postcon'#13#10 +
+      '  @param   Param1 as a String'#13#10 +
+      '  @param   Param2 as an array of Integer as a reference'#13#10 +
+      '  @param   Param3 as a Byte as a constant'#13#10 +
+      '  @param   Param4 as a Double as an out parameter'#13#10 +
+      '  @return  a Boolean', 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      CheckEquals('1) A post-condition in Property ''MyProperty'' is not documented.', FGenericProperty.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericProperty.DeleteDocumentConflicts;
+    C := TComment.Create(
+      ''#13#10 +
+      '  This method does something interesting.'#13#10 +
+      '  @precon None'#13#10 +
+      '  @param   Param1 as a String'#13#10 +
+      '  @param   Param2 as an array of Integer as a reference'#13#10 +
+      '  @param   Param3 as a Byte as a constant'#13#10 +
+      '  @param   Param4 as a Double as an out parameter'#13#10 +
+      '  @return  a Boolean', 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      CheckEquals('1) Property ''MyProperty'' has a missing post-condition tag.', FGenericProperty.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+    FGenericProperty.DeleteDocumentConflicts;
+    C := TComment.Create(
+      ''#13#10 +
+      '  This method does something interesting.'#13#10 +
+      '  @precon None'#13#10 +
+      '  @postcon None'#13#10 +
+      '  @postcon None'#13#10 +
+      '  @param   Param1 as a String'#13#10 +
+      '  @param   Param2 as an array of Integer as a reference'#13#10 +
+      '  @param   Param3 as a Byte as a constant'#13#10 +
+      '  @param   Param4 as a Double as an out parameter'#13#10 +
+      '  @return  a Boolean', 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      CheckEquals('1) Property ''MyProperty'' has too many post-condition tags.', FGenericProperty.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+
+
+    FGenericProperty.DeleteDocumentConflicts;
+    C := TComment.Create(
+      ''#13#10 +
+      '  This method does something interesting.'#13#10 +
+      '  @precon  None.'#13#10 +
+      '  @postcon Does something very interesting.'#13#10 +
+      '  @param   Param1 as a String'#13#10 +
+      '  @param   Param2 as an array of Integer as a reference'#13#10 +
+      '  @param   Param3 as a Byte as a constant'#13#10 +
+      '  @param   Param4 as a Double as an out parameter'#13#10 +
+      '  @return  a Boolean', 0, 0);
+    Try
+      FGenericProperty.Comment := C;
+      FGenericProperty.CheckDocumentation(boolCascade);
+      CheckEquals(0, FGenericProperty.ElementCount, FGenericProperty.DocConflict(1));
     Finally
       C.Free;
     End;

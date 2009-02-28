@@ -607,6 +607,8 @@ begin
   CheckEquals(0, FRecordDecl.ElementCount);
   FRecordDecl.CheckDocumentation(boolCascade);
   CheckEquals(1, FRecordDecl.ElementCount);
+  CheckEquals('1) Record type ''MyRecord'' is undocumented.',
+    FRecordDecl.DocConflict(1));
   FRecordDecl.DeleteDocumentConflicts;
   C := TComment.Create('This is a comment for the record.', 0, 0);
   Try
@@ -899,6 +901,8 @@ begin
   CheckEquals(0, FObjectDecl.ElementCount);
   FObjectDecl.CheckDocumentation(boolCascade);
   CheckEquals(1, FObjectDecl.ElementCount);
+  CheckEquals('1) Object type ''MyObject'' is undocumented.',
+    FObjectDecl.DocConflict(1));
   FObjectDecl.DeleteDocumentConflicts;
   C := TComment.Create('This is a comment for the object.', 0, 0);
   Try
@@ -957,6 +961,8 @@ begin
   CheckEquals(0, FClassDecl.ElementCount);
   FClassDecl.CheckDocumentation(boolCascade);
   CheckEquals(1, FClassDecl.ElementCount);
+  CheckEquals('1) Class type ''MyClass'' is undocumented.',
+    FClassDecl.DocConflict(1));
   FClassDecl.DeleteDocumentConflicts;
   C := TComment.Create('This is a comment for the class.', 0, 0);
   Try
@@ -1043,6 +1049,8 @@ begin
   CheckEquals(0, FInterfaceDecl.ElementCount);
   FInterfaceDecl.CheckDocumentation(boolCascade);
   CheckEquals(1, FInterfaceDecl.ElementCount);
+  CheckEquals('1) Interface type ''MyInterface'' is undocumented.',
+    FInterfaceDecl.DocConflict(1));
   FInterfaceDecl.DeleteDocumentConflicts;
   C := TComment.Create('This is a comment for the Interface.', 0, 0);
   Try
@@ -1098,6 +1106,8 @@ begin
   CheckEquals(0, FDispInterfaceDecl.ElementCount);
   FDispInterfaceDecl.CheckDocumentation(boolCascade);
   CheckEquals(1, FDispInterfaceDecl.ElementCount);
+  CheckEquals('1) DispInterface type ''MyDispInterface'' is undocumented.',
+    FDispInterfaceDecl.DocConflict(1));
   FDispInterfaceDecl.DeleteDocumentConflicts;
   C := TComment.Create('This is a comment for the DispInterface.', 0, 0);
   Try
@@ -1187,6 +1197,8 @@ begin
   CheckEquals(0, FResourceString.ElementCount);
   FResourceString.CheckDocumentation(boolCascade);
   CheckEquals(1, FResourceString.ElementCount);
+  Checkequals('1) Resource string ''MyResourceString'' is undocumented.',
+    FResourceString.DocConflict(1));
   FResourceString.DeleteDocumentConflicts;
   C := TComment.Create('This is a comment for the resource string.', 0, 0);
   Try
@@ -1255,6 +1267,8 @@ begin
   CheckEquals(0, FThreadVar.ElementCount);
   FThreadVar.CheckDocumentation(boolCascade);
   CheckEquals(1, FThreadVar.ElementCount);
+  Checkequals('1) Thread variable ''MyThreadVar'' is undocumented.',
+    FThreadVar.DocConflict(1));
   FThreadVar.DeleteDocumentConflicts;
   C := TComment.Create('This is a comment for the threadvar.', 0, 0);
   Try
@@ -1301,6 +1315,8 @@ begin
   CheckEquals(0, FField.ElementCount);
   FField.CheckDocumentation(boolCascade);
   CheckEquals(1, FField.ElementCount);
+  Checkequals('1) Field ''MyField'' is undocumented.',
+    FField.DocConflict(1));
   FField.DeleteDocumentConflicts;
   C := TComment.Create('This is a comment for the field.', 0, 0);
   Try
@@ -1374,6 +1390,8 @@ begin
   CheckEquals(0, FInitializationSection.ElementCount);
   FInitializationSection.CheckDocumentation(boolCascade);
   CheckEquals(1, FInitializationSection.ElementCount);
+  CheckEquals('1) The module is missing an Initialization comment.',
+    FInitializationSection.DocConflict(1));
   FInitializationSection.DeleteDocumentConflicts;
   C := TComment.Create('This is a comment for the initialisation section.', 0, 0);
   Try
@@ -1420,6 +1438,8 @@ begin
   CheckEquals(0, FFinalizationSection.ElementCount);
   FFinalizationSection.CheckDocumentation(boolCascade);
   CheckEquals(1, FFinalizationSection.ElementCount);
+  CheckEquals('1) The module is missing an Finalization comment.',
+    FFinalizationSection.DocConflict(1));
   FFinalizationSection.DeleteDocumentConflicts;
   C := TComment.Create('This is a comment for the finalisation section.', 0, 0);
   Try

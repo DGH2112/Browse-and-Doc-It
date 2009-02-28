@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    25 Feb 2009
+  @Date    27 Feb 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -1863,7 +1863,7 @@ ResourceString
   strMethodIncorrectReturnTypeDesc = 'The type of the method return is not the ' +
     'same as the type defined in the method.';
   (** Document conflict message for a return not required. **)
-  strMethodReturnNotRequired = 'Method ''%s''`s return type is not required (''%s'').';
+  strMethodReturnNotRequired = 'Method ''%s''`s return type is not required.';
   (** Document conflict message description for a return not required. **)
   strMethodReturnNotRequiredDesc = 'The type of the method return is not ' +
     'required for this type of method..';
@@ -5496,14 +5496,14 @@ Begin
           If doShowMethodIncorrectReturnType In BrowseAndDocItOptions.Options Then
             If ((Comment.Tag[iFound].TokenCount < 2) Or
               (AnsiCompareText(ReturnType.AsString(False, False), Comment.Tag[iFound].Tokens[1].Token) <> 0)) Then
-              AddDocumentConflict([QualifiedName], Comment.Tag[iFound].Line,
+              AddDocumentConflict([QualifiedName, ReturnType.AsString(False, False)], Comment.Tag[iFound].Line,
                 Comment.Tag[iFound].Column, Comment,
                 DocConflictTable[dctMethodIncorrectReturntype]);
         End;
     End Else
       If Comment.FindTag('return') >= 0 Then
-        AddDocumentConflict([QualifiedName], Line, Column, Comment,
-          DocConflictTable[dctMethodReturnNotRequired]);
+        AddDocumentConflict([QualifiedName],
+          Line, Column, Comment, DocConflictTable[dctMethodReturnNotRequired]);
   If doShowMethodMissingPostCons in BrowseAndDocItOptions.Options Then
     If k = 0 Then
       AddDocumentConflict([QualifiedName], Line, Column, Comment,
@@ -5599,8 +5599,8 @@ Begin
       End;
   If doShowPropertyDiffPropParamCount In BrowseAndDocItOptions.Options Then
     If ParameterCount <> j Then
-      AddDocumentConflict([Identifier], Line, Column, Comment,
-      DocConflictTable[dctPropertyDiffParamCount]);
+      AddDocumentConflict([Identifier, Line, Column], Line, Column, Comment,
+        DocConflictTable[dctPropertyDiffParamCount]);
   If doShowPropertyMissingPreCons In BrowseAndDocItOptions.Options Then
     If k < 1 Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
@@ -5710,14 +5710,14 @@ Begin
     If iFound = -1 Then
       Begin
         If TypeId <> Nil Then
-          AddDocumentConflict([Identifier], Line, Column, Comment,
+          AddDocumentConflict([Identifier, TypeId.AsString(False, False)], Line, Column, Comment,
           DocConflictTable[dctPropertyUndocumentedReturn])
       End Else
       Begin
         If doShowPropertyIncorrectReturnType In BrowseAndDocItOptions.Options Then
           If ((Comment.Tag[iFound].TokenCount < 2) Or
             (AnsiCompareText(TypeId.AsString(False, False), Comment.Tag[iFound].Tokens[1].Token) <> 0)) Then
-            AddDocumentConflict([Identifier], Comment.Tag[iFound].Line,
+            AddDocumentConflict([Identifier, TypeId.AsString(False, False)], Comment.Tag[iFound].Line,
               Comment.Tag[iFound].Column, Comment,
               DocConflictTable[dctPropertyIncorrectReturnType]);
       End;

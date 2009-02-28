@@ -89,6 +89,7 @@ type
     Procedure TestRecords;
     Procedure TestEnums;
     Procedure TestCombinations;
+    Procedure TestFailure01;
   End;
 
 implementation
@@ -364,7 +365,7 @@ begin
   End;
   V := TVBVar.Create('Identifier', scPrivate, 10, 12, iiPublicVariable, Nil);
   Try
-    V.AddDimension(-1, 0);
+    V.AddDimension('', '');
     V.AddToken('String');
     CheckEquals('Identifier() As String', V.AsString(True, False));
   Finally
@@ -372,7 +373,7 @@ begin
   End;
   V := TVBVar.Create('Identifier', scPrivate, 10, 12, iiPublicVariable, Nil);
   Try
-    V.AddDimension(1, 10);
+    V.AddDimension('1', '10');
     V.AddToken('MSForms');
     V.AddToken('.');
     V.AddToken('String');
@@ -382,8 +383,8 @@ begin
   End;
   V := TVBVar.Create('Identifier', scPrivate, 10, 12, iiPublicVariable, Nil);
   Try
-    V.AddDimension(1, 2);
-    V.AddDimension(0, 4);
+    V.AddDimension('1', '2');
+    V.AddDimension('0', '4');
     V.AddToken('String');
     CheckEquals('Identifier(1 to 2, 0 to 4) As String', V.AsString(True, False));
   Finally
@@ -950,6 +951,47 @@ begin
       CheckEquals('Enum THello', M.FindElement(strTypesLabel).Elements[1].AsString(True, False));
       CheckEquals('FID', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(True, False));
       CheckEquals('FName', M.FindElement(strTypesLabel).Elements[1].Elements[2].AsString(True, False));
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure01;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      'Type RECT'#13#10 +
+      '  ''Specifies the x-coordinate of the upper-left corner of the rectangle.'#13#10 +
+      '  Left As Long'#13#10 +
+      '  ''Specifies the y-coordinate of the upper-left corner of the rectangle.'#13#10 +
+      '  Top As Long'#13#10 +
+      '  ''Specifies the x-coordinate of the lower-right corner of the rectangle.'#13#10 +
+      '  Right As Long'#13#10 +
+      '  ''Specifies the y-coordinate of the lower-right corner of the rectangle.'#13#10 +
+      '  Bottom As Long'#13#10 +
+      'End Type'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals(1, M.HeadingCount(strTypesLabel));
+      CheckEquals(scPublic, M.FindElement(strTypesLabel).Elements[1].Scope);
+      CheckEquals('Type RECT', M.FindElement(strTypesLabel).Elements[1].AsString(True, False));
+      CheckEquals('Left As Long', M.FindElement(strTypesLabel).Elements[1].Elements[2].AsString(True, False));
+      CheckEquals('Top As Long', M.FindElement(strTypesLabel).Elements[1].Elements[4].AsString(True, False));
+      CheckEquals('Right As Long', M.FindElement(strTypesLabel).Elements[1].Elements[3].AsString(True, False));
+      CheckEquals('Bottom As Long', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -1591,6 +1633,24 @@ begin
       CheckEquals(3, M.HeadingCount(strVarsLabel));
       CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[1].Scope);
       CheckEquals(scPrivate, M.FindElement(strVarsLabel).Elements[2].Scope);
+      CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[3].Scope);
+      CheckEquals('strText1 As Integer', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
+      CheckEquals('strText2 As String', M.FindElement(strVarsLabel).Elements[2].AsString(True, False));
+      CheckEquals('strText3 As Double', M.FindElement(strVarsLabel).Elements[3].AsString(True, False));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      'Public strText1 As Integer, strText2 As String'#13#10 +
+      'Dim strText3 As Double'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals(3, M.HeadingCount(strVarsLabel));
+      CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[1].Scope);
+      CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[2].Scope);
       CheckEquals(scPublic, M.FindElement(strVarsLabel).Elements[3].Scope);
       CheckEquals('strText1 As Integer', M.FindElement(strVarsLabel).Elements[1].AsString(True, False));
       CheckEquals('strText2 As String', M.FindElement(strVarsLabel).Elements[2].AsString(True, False));

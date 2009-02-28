@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    08 Feb 2009
+  @Date    28 Feb 2009
 
 **)
 Unit DGHLibrary;
@@ -19,10 +19,10 @@ Uses
 
 Type
   (** A custom exception for errors getting the building number. **)
-  EBuildNumberException = Exception;
+  EBuildNumberException = Class(Exception);
 
   (** A custom exception for converting string dates to actual dates. **)
-  EDateConversionException = Exception;
+  EDateConversionException = Class(Exception);
 
   (** A record to describe the degrees, minutes and seconds of a bearing. **)
   TBearing = Record
@@ -1065,10 +1065,10 @@ End;
   @postcon Creates a file association in the registry for the given file
            extension, class and description.
 
-  @param   strFileExt     as a String constant
-  @param   strFileClass   as a String constant
-  @param   strDescription as a String constant
-  @param   strDefaultIcon as a String constant
+  @param   strFileExt     as a String as a constant
+  @param   strFileClass   as a String as a constant
+  @param   strDescription as a String as a constant
+  @param   strDefaultIcon as a String as a constant
   @param   bAlwaysShowExt as a Boolean
   @param   bQuickView     as a Boolean
 
@@ -1099,15 +1099,15 @@ End;
   @postcon Registers verb for the explorer context menu, i.e. open, print.
 
 
-  @param   strFileExt         as a String constant
-  @param   strVerb            as a String constant
-  @param   strVerbCaption     as a String constant
-  @param   strVerbCommand     as a String constant
+  @param   strFileExt         as a String as a constant
+  @param   strVerb            as a String as a constant
+  @param   strVerbCaption     as a String as a constant
+  @param   strVerbCommand     as a String as a constant
   @param   bUseDDE            as a Boolean
-  @param   strService         as a String constant
-  @param   strTopic           as a String constant
-  @param   strMacro           as a String constant
-  @param   strMacroNotRunning as a String constant
+  @param   strService         as a String  as a constant
+  @param   strTopic           as a String  as a constant
+  @param   strMacro           as a String  as a constant
+  @param   strMacroNotRunning as a String  as a constant
 
 **)
 Procedure MakeAssociatedVerb(const strFileExt, strVerb, strVerbCaption,
@@ -2136,7 +2136,7 @@ End;
   @precon  None.
   @postcon Evaluates the given equation and returns the result as a double.
 
-  @param   strEquation as a String constant
+  @param   strEquation as a String as a constant
   @return  a Double
 
 **)
@@ -4136,7 +4136,7 @@ end;
   @precon  None.
   @postcon Sets the Coordinate error tolerance.
 
-  @param   Value as a Double constant
+  @param   Value as a Double as a constant
 
 **)
 procedure THAlignmentCollection.SetCoordinateError(const Value: Double);
@@ -4152,7 +4152,7 @@ end;
   @precon  None.
   @postcon Sets the bearing error tolerance.
 
-  @param   Value as a Double constant
+  @param   Value as a Double as a constant
 
 **)
 procedure THAlignmentCollection.SetBearingError(const Value: Double);
@@ -4168,7 +4168,7 @@ end;
   @precon  None.
   @postcon Sets whether the alignment has been modified.
 
-  @param   Value as a Boolean constant
+  @param   Value as a Boolean as a constant
 
 **)
 procedure THAlignmentCollection.SetModified(const Value: Boolean);
@@ -4816,7 +4816,7 @@ end;
   @precon  None.
   @postcon Sets the GradientError property.
 
-  @param   Value as a Double constant
+  @param   Value as a Double as a constant
 
 **)
 procedure TVAlignmentCollection.SetGradientError(const Value: Double);
@@ -4832,7 +4832,7 @@ end;
   @precon  None.
   @postcon Sets the LevelError property.
 
-  @param   Value as a Double constant
+  @param   Value as a Double as a constant
 
 **)
 procedure TVAlignmentCollection.SetLevelError(const Value: Double);
@@ -4848,7 +4848,7 @@ end;
   @precon  None.
   @postcon Sets the Modified property.
 
-  @param   Value as a Boolean constant
+  @param   Value as a Boolean as a constant
 
 **)
 procedure TVAlignmentCollection.SetModified(const Value: Boolean);
@@ -5393,7 +5393,7 @@ End;
            handle using the text and background colours provided.
 
   @param   hndConsole  as a THandle
-  @param   strText     as a String constant
+  @param   strText     as a String as a constant
   @param   iTextColour as a TColor
   @param   iBackColour as a TColor
   @param   boolUpdateCursor as a Boolean
@@ -5441,7 +5441,7 @@ End;
            handle using the text and background colours provided.
 
   @param   hndConsole  as a THandle
-  @param   strText     as a String constant
+  @param   strText     as a String as a constant
   @param   iTextColour as a TColor
   @param   iBackColour as a TColor
   @param   boolUpdateCursor as a Boolean
@@ -5623,7 +5623,7 @@ end;
            string list.
 
   @param   slTokens as a TStringList
-  @param   strMacro as a String constant
+  @param   strMacro as a String as a constant
 
 **)
 Procedure TokeniseMacro(slTokens : TStringList; Const strMacro : String);
@@ -5792,7 +5792,7 @@ End;
            this function returns true with the command and filename in the var
            parameters.
 
-  @param   strMacro      as a String constant
+  @param   strMacro      as a String as a constant
   @param   strCommand    as a String as a reference
   @param   strFileName   as a String as a reference
   @param   strCommands   as an Array Of String

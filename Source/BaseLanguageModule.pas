@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    27 Feb 2009
+  @Date    28 Feb 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -1869,7 +1869,7 @@ ResourceString
     'required for this type of method..';
 
   (** A documentation message for missing precondition text. **)
-  strMethodPreConNotDocumented = 'A Pre-condition in Method ''%s'' is not documented.';
+  strMethodPreConNotDocumented = 'A pre-condition in method ''%s'' is not documented.';
   (** A documentation message description for missing precondition text. **)
   strMethodPreConNotDocumentedDesc = 'The @@precon tag in the specified method ' +
     'is either not present or does not contain a statement. A pre-condition ' +
@@ -1888,7 +1888,7 @@ ResourceString
     'tags (@precon).';
 
   (** A documentation message for missing postcondition text. **)
-  strMethodPostConNotDocumented = 'A Post-condition in Method ''%s'' is not ' +
+  strMethodPostConNotDocumented = 'A post-condition in method ''%s'' is not ' +
     'documented.';
   (** A documentation message description for missing postcondition text. **)
   strMethodPostConNotDocumentedDesc = 'The @@prepost tag in the specified method ' +
@@ -1954,7 +1954,7 @@ ResourceString
     'the same as the type defined in the property.';
 
   (** A documentation message for missing precondition text. **)
-  strPropertyPreConNotDocumented = 'A Pre-condition in Property ''%s'' is not documented.';
+  strPropertyPreConNotDocumented = 'A pre-condition in property ''%s'' is not documented.';
   (** A documentation message descritpion for missing precondition text. **)
   strPropertyPreConNotDocumentedDesc = 'The @@precon tag in the specified property ' +
     'is either not present or does not contain a statement. A pre-condition ' +
@@ -1973,7 +1973,7 @@ ResourceString
     'tags (@precon).';
 
   (** A documentation message for missing postcondition text. **)
-  strPropertyPostConNotDocumented = 'A Post-condition in Property ''%s'' is not documented.';
+  strPropertyPostConNotDocumented = 'A post-condition in Property ''%s'' is not documented.';
   (** A documentation message description for missing postcondition text. **)
   strPropertyPostConNotDocumentedDesc = 'The @@prepost tag in the specified property ' +
     'is either not present or does not contain a statement. A post-condition ' +
@@ -1994,7 +1994,7 @@ ResourceString
   (** Label for Finalization Documentation Conflicts **)
   strModuleInitSection = 'Module Initialization Section';
   (** Document conflict message for a missing Finalialization Comment. **)
-  strMissingInitComment = 'The module is missing an Initialization Comment.';
+  strMissingInitComment = 'The module is missing an Initialization comment.';
   (** Document conflict message description a missing Finalialization Comment. **)
   strMissingInitCommentDesc = 'It is usually advised able to document the ' +
     'code contain in the Initialization section of the module so that ' +
@@ -2004,7 +2004,7 @@ ResourceString
   (** Label for Initialization Documentation Conflicts **)
   strModuleFinalSection = 'Module Finalization Section';
   (** Document conflict message for a missing Initialization Comment. **)
-  strMissingFinalComment = 'The module is missing an Finalization Comment.';
+  strMissingFinalComment = 'The module is missing an Finalization comment.';
   (** Document conflict message description a missing Initialization Comment. **)
   strMissingFinalCommentDesc = 'It is usually advised able to document the ' +
     'code contain in the Finalization section of the module so that ' +
@@ -5593,13 +5593,13 @@ Begin
         Inc(k);
         If doShowPropertyMissingPreCons In BrowseAndDocItOptions.Options Then
           If Comment.Tag[i].TokenCount = 0 Then
-            AddDocumentConflict(['Property', Identifier], Comment.Tag[i].Line,
+            AddDocumentConflict([Identifier], Comment.Tag[i].Line,
               Comment.Tag[i].Column, Comment,
               DocConflictTable[dctPropertyPreconNotDocumented]);
       End;
   If doShowPropertyDiffPropParamCount In BrowseAndDocItOptions.Options Then
     If ParameterCount <> j Then
-      AddDocumentConflict([Identifier, Line, Column], Line, Column, Comment,
+      AddDocumentConflict([Identifier, ParameterCount, j], Line, Column, Comment,
         DocConflictTable[dctPropertyDiffParamCount]);
   If doShowPropertyMissingPreCons In BrowseAndDocItOptions.Options Then
     If k < 1 Then

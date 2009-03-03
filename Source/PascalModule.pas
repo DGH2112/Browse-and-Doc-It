@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       26 Feb 2009
+  @Date       03 Mar 2009
   @Author     David Hoyle
 
 **)
@@ -2067,7 +2067,13 @@ Begin
               Else If ch In strQuote Then
                 CurCharType := ttStringLiteral
               Else If ch In strSymbols Then
-                CurCharType := ttSymbol
+                Begin
+                  If (LastCharType = ttNumber) And (LastChar In ['e', 'E']) And
+                    (Ch In ['-', '+']) Then
+                    CurCharType := ttNumber
+                  Else
+                    CurCharType := ttSymbol
+                End
               Else
                 CurCharType := ttUnknown;
 
@@ -3586,11 +3592,12 @@ Begin
       AddToExpression(C);
       Repeat
         If Not RecordFieldConstant(C, T) Then
-          Begin // If not handled treat as ConstExpr
-            ExprType := [etUnknown, etConstExpr];
-            ConstExpr(C, ExprType);
-          End;
-      Until Not IsToken(';', C);
+          If Token.Token <> ')' Then
+            Begin // If not handled treat as ConstExpr
+              ExprType := [etUnknown, etConstExpr];
+              ConstExpr(C, ExprType);
+            End;
+      Until Not IsToken(';', C) And Not IsToken(',', C);
       If Token.Token = ')' Then
         AddToExpression(C)
       Else
@@ -3632,17 +3639,6 @@ Begin
           TypedConstant(C, T)
         End Else
           RollBackToken;
-    End Else
-    Begin
-      Result := True;
-      While Token.TokenType In [ttNumber, ttStringLiteral] Do
-        Begin
-          AddToExpression(C);
-          If Token.Token = ',' Then
-            AddToExpression(C)
-          Else
-            Exit;
-        End;
     End;
 End;
 
@@ -5024,8 +5020,13 @@ Begin
                   Try
                     C.AddToken(Token.Token);
                     NextNonCommentToken;
-                    ExprType := [etUnknown, etConstExpr];
-                    ConstExpr(C, ExprType);
+                    If Not TypedConstant(C, T) Then
+                      Begin
+                        ExprType := [etUnknown, etConstExpr];
+                        ConstExpr(C, ExprType);
+                      End;
+                    If Token.UToken = 'NIL' Then
+                      AddToExpression(C);
                   Finally
                     If T <> Nil Then
                       T.AddTokens(C);
@@ -5299,11 +5300,14 @@ Begin
             Include(ExprType, etInteger);
           AddToExpression(C);
         End
-      Else If Not CheckNumberType(ExprType) Then
-        ErrorAndSeekToken(strExprConflict, 'Factor', Token.Token,
-          strSeekableOnErrorTokens, stActual)
       Else
-        AddToExpression(C);
+        Begin
+          If Not CheckNumberType(ExprType) Then
+            AddIssue(Format(strExprConflict, [Token.Token, Token.Line,
+              Token.Column]), scNone, 'Factor', Token.Line, Token.Column,
+              etWarning);
+          AddToExpression(C);
+        End;
     End
   { Else If Token.UToken = 'NIL' Then
     AddToExpression(C) }
@@ -6061,6 +6065,8 @@ Var
   ExprType : TExprTypes;
 
 Begin
+  If Token.Token = '^' Then
+    NextNonCommentToken;
   ExprType := [etUnknown, etConstExpr];
   ConstExpr(Nil, ExprType);
   If Token.Token = '..' Then
@@ -8895,7 +8901,7 @@ begin
             Dec(iSkip);
           CompilerConditionStack.Delete(iStackTop - 1);
         End Else
-          AddIssue(Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
+          AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
               scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etWarning);
     End
   Else If Like(Token.Token, '{$EXTERNALSYM') Then

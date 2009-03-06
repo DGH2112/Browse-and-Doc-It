@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       03 Mar 2009
+  @Date       06 Mar 2009
   @Author     David Hoyle
 
 **)
@@ -284,7 +284,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
     FIndexSpec : String;
     FWriteSpec: String;
-    FImplementsSpec: String;
+    FImplementsSpec: TIdentList;
     FStoredSpec: String;
     FDefaultSpec: String;
     FReadSpec: String;
@@ -296,6 +296,7 @@ Type
   Public
     Constructor Create(strIdent: String; AScope: TScope; iLine, iCol : Integer;
       AImageIndex : TImageIndex; AComment : TComment); Override;
+    Destructor Destroy; Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       Returns the
@@ -344,9 +345,9 @@ Type
       Returns the implements specification for the property.
       @precon  None.
       @postcon Returns the implements specification for the property.
-      @return  a String
+      @return  a TIdentList
     **)
-    Property ImplementsSpec : String Read FImplementsSpec Write FImplementsSpec;
+    Property ImplementsSpec : TIdentList Read FImplementsSpec Write FImplementsSpec;
     (**
       Returns the properties DispID reference.
       @precon  None.
@@ -645,7 +646,7 @@ Type
     Function OPLibrary : Boolean;
     Procedure ProgramBlock;
     procedure UsesClause;
-    Procedure PortabilityDirective;
+    Function PortabilityDirective : Boolean;
     Procedure InterfaceSection;
     Procedure InterfaceDecl;
     Function ExportedHeading(Container : TElementContainer) : Boolean;
@@ -768,7 +769,7 @@ Type
     Procedure TokenizeStream;
     Procedure ParseTokens;
     procedure ArrayElement(C : TElementContainer; iStartDimension: Integer; AT : TArrayType);
-    Procedure CheckReturnValue(Method : TPascalMethod);
+    Function CheckReturnValue(Method : TPascalMethod) : Boolean;
     Procedure CheckAlias(Method : TPascalMethod);
     Function CheckNumberType(ExprType : TExprTypes) : Boolean;
     Procedure UpdateTypeToken(var AToken : TTypeToken); {$IFDEF D2005} InLine; {$ENDIF}
@@ -783,6 +784,9 @@ Type
     {procedure FindUnresolvedExportsMethods;}
     procedure FindUnresolvedImplementedClassMethods(StartLabel : TLabelContainer);
     Function FindObjClsInt(slClassNames : TStringList) : TObjectDecl;
+    procedure ProcessClsIdents(Container : TElementContainer;
+      slClassNames : TStringList; var strIdentifier : String; var iLine,
+      iColumn : Integer);
   {$IFDEF D2005} Strict {$ENDIF} Protected
     function GetCurrentMethod: TPascalMethod;
     Function GetModuleName : String; Override;
@@ -827,8 +831,8 @@ Const
   (** A set of numbers **)
   strNumbers : Set Of Char = ['$', '0'..'9'];
   (** A set of characters for general symbols **)
-  strSymbols : Set Of Char = ['&', '(', ')', '*', '+',
-    ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
+  strSymbols : Set Of Char = ['&', '(', ')', '*', '+', ',', '-', '.', '/', ':',
+    ';', '<', '=', '>', '@', '[', ']', '^'];
   (** A set of characters for quotes **)
   strQuote : Set Of Char = [''''];
   (** A string representing the Array Of parameter type. **)
@@ -1375,9 +1379,14 @@ begin
   If Result = '' Then
     Result := Format('PROC%4.4d', [Random(9999)]);
   For i := 0 To ParameterCount - 1 Do
-    If Parameters[i].ParamType <> Nil Then
-      Result := Result + Format('.%s', [Parameters[i].ParamType.AsString(False,
-        False)]);
+    Begin
+      Result := Result + '.' + strParamModifier[Parameters[i].ParamModifier];
+      If Parameters[i].ParamType <> Nil Then
+        Begin
+          Result := Result + strArrayOf[Parameters[i].ArrayOf];
+          Result := Result + Parameters[i].ParamType.AsString(False, False);
+        End;
+    End;
   If HasDirective('forward') Then
     Result := Result + '.Forward';
 end;
@@ -1486,13 +1495,27 @@ begin
   FDefaultProperty := False;
   FDefaultSpec := '';
   FDispIDSpec := '';
-  FImplementsSpec := '';
+  FImplementsSpec := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
   FIndexSpec := '';
   FReadOnlySpec := False;
   FWriteOnlySpec := False;
   FReadSpec := '';
   FStoredSpec := '';
   FWriteSpec := '';
+end;
+
+(**
+
+  This is a destructor for the TPascalProperty class.
+
+  @precon  None.
+  @postcon Frees any memory used by the Imlpemented Specifications.
+
+**)
+destructor TPascalProperty.Destroy;
+begin
+  FImplementsSpec.Free;
+  Inherited Destroy;
 end;
 
 (**
@@ -1514,8 +1537,8 @@ function TPascalProperty.AsString(boolShowIdentifier,
 
     This is a shorthand routine for output the string specs to the result.
 
-    @precon  None . 
-    @postcon Output the string specs to the result . 
+    @precon  None .
+    @postcon Output the string specs to the result .
 
     @param   strName  as a String
     @param   strValue as a String
@@ -1578,7 +1601,22 @@ begin
   OutputSpec('Write', FWriteSpec);
   OutputSpec('Stored', FStoredSpec);
   OutputSpec('Default', FDefaultSpec);
-  OutputSpec('Implements', FImplementsSpec);
+  If FImplementsSpec.ElementCount > 0 Then
+    Begin
+      If boolForDocumentation Then
+        Result := Result + #32#32
+      Else
+        Result := Result + #32;
+      Result := Result + 'Implements ';
+      For i := 1 To FImplementsSpec.ElementCount Do
+        Begin
+          If i > 1 Then
+            Result := Result + ', ';
+          Result := Result + FImplementsSpec.Elements[i].Identifier;
+        End;
+      If boolForDocumentation Then
+        Result := Result + #13#10;
+    End;
   If FReadOnlySpec Then
     OutputSpec('', 'ReadOnly');
   If FWriteOnlySpec Then
@@ -2725,12 +2763,24 @@ End;
   @postcon Attempts to parse the current token position as a Portability
            directive.
 
+  @return  a Boolean
+
 **)
-Procedure TPascalModule.PortabilityDirective;
+Function TPascalModule.PortabilityDirective : Boolean;
 
 Begin
-  If IsKeyWord(Token.Token, strPortabilityDirective) Then
-    NextNonCommentToken; //: @note Does not get added to any symbols.
+  Result := False;
+  While IsKeyWord(Token.Token, strPortabilityDirective) Do
+    Begin
+      Result := True;
+      NextNonCommentToken; //: @note Does not get added to any symbols.
+      If Token.Token = ';' Then
+        Begin
+          NextNonCommentToken;
+          If Not IsKeyWord(Token.Token, strPortabilityDirective) Then
+            RollBackToken;
+        End;
+    End;
 End;
 
 (**
@@ -2832,6 +2882,9 @@ Begin
           Begin
             NextNonCommentToken;
             Directive(M);
+            If PortabilityDirective Then
+              If Token.Token = ';' Then
+                NextNonCommentToken;
           End Else
             ErrorAndSeekToken(strLiteralExpected, 'ExportedHeading', ';',
               strSeekableOnErrorTokens, stFirst);
@@ -5317,6 +5370,18 @@ Begin
       SetupSubExprType;
       Expression(C, SubExprType);
     End
+  Else If Token.Token = '&' Then
+    Begin
+      AddToExpression(C);
+      SetupSubExprType;
+      Expression(C, SubExprType);
+    End
+  Else If Token.Token = '^' Then
+    Begin
+      AddToExpression(C);
+      SetupSubExprType;
+      Expression(C, SubExprType);
+    End
   Else If Token.Token = '@@' Then
     Begin
       AddToExpression(C);
@@ -6065,8 +6130,6 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  If Token.Token = '^' Then
-    NextNonCommentToken;
   ExprType := [etUnknown, etConstExpr];
   ConstExpr(Nil, ExprType);
   If Token.Token = '..' Then
@@ -6221,6 +6284,23 @@ Begin
                 End Else
                   ErrorAndSeekToken(strReservedWordExpected, 'ForStmt',
                     'TO or DOWNTO', strSeekableOnErrorTokens, stActual);
+            End
+          Else If Token.UToken = 'IN' Then
+            Begin
+              NextNonCommentToken;
+              If Token.TokenType In [ttIdentifier] Then
+                Begin
+                  NextNonCommentToken;
+                  If Token.UToken = 'DO' Then
+                    Begin
+                      NextNonCommentToken;
+                      Statement;
+                    End Else
+                      ErrorAndSeekToken(strReservedWordExpected, 'ForStmt', 'DO',
+                        strSeekableOnErrorTokens, stActual);
+                End Else
+                  ErrorAndSeekToken(strIdentExpected, 'ForStmt', Token.Token,
+                    strSeekableOnErrorTokens, stActual);
             End Else
               ErrorAndSeekToken(strLiteralExpected, 'ForStmt', ':=',
                 strSeekableOnErrorTokens, stActual);
@@ -6350,20 +6430,16 @@ Begin
             If Not CompoundStmt Then
                Statement;
             If Token.Token = ';' Then
+              NextNonCommentToken;
+            If Token.UToken = 'ELSE' Then
               Begin
                 NextNonCommentToken;
-                If Token.UToken = 'ELSE' Then
-                  Begin
-                    NextNonCommentToken;
-                    StmtList;
-                  End;
-                End Else
-                  If Token.UToken <> 'END' Then
-                    ErrorAndSeekToken(strReservedWordExpected, 'ExceptionBlock', 'DO',
-                      strSeekableOnErrorTokens, stActual);
-              End Else
-                ErrorAndSeekToken(strLiteralExpected, 'ExceptionBlock', ';',
-                  strSeekableOnErrorTokens, stActual);
+                StmtList;
+              End;
+          End Else
+            If Token.UToken <> 'END' Then
+              ErrorAndSeekToken(strReservedWordExpected, 'ExceptionBlock', 'DO',
+                strSeekableOnErrorTokens, stActual);
       Finally
         Con.Free;
       End;
@@ -6525,7 +6601,9 @@ Begin
         Begin
           NextNonCommentToken;
           Directive(Result);
-          PortabilityDirective;
+          If PortabilityDirective Then
+            If Token.Token = ';' Then
+              NextNonCommentToken;
           If Not Result.ForwardDecl Then
             Begin
               Block(scLocal, Result);
@@ -6686,6 +6764,7 @@ Var
   slClassNames: TStringList;
   iLine: Integer;
   iColumn: Integer;
+  boolRequiresReturn: Boolean;
 
 Begin
   Result := Nil;
@@ -6714,19 +6793,8 @@ Begin
               iLine := Token.Line;
               iColumn := Token.Column;
               NextNonCommentToken;
-              // Check for '.' to signify a class method
-                While Token.Token = '.' Do
-                  Begin
-                    NextNonCommentToken;
-                    slClassNames.Add(strIdentifier);
-                    If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-                      ErrorAndSeekToken(strIdentExpected, 'FunctionHeading', Token.Token,
-                        strSeekableOnErrorTokens, stActual);
-                    strIdentifier := Token.Token;
-                    iLine := Token.Line;
-                    iColumn := Token.Column;
-                    NextNonCommentToken;
-                  End;
+              ProcessClsIdents(Container, slClassNames, strIdentifier, iLine,
+                iColumn);
             End;
         Finally
           Result := TPascalMethod.Create(mtFunction, strIdentifier, AScope,
@@ -6739,11 +6807,60 @@ Begin
         slClassNames.Free;
       End;
       FormalParameter(Result);
-      CheckAlias(Result);
-      CheckReturnValue(Result);
+      If boolIdent Then
+        CheckAlias(Result);
+      boolRequiresReturn := CheckReturnValue(Result);
       Directive(Result, True);
+      If boolRequiresReturn Then
+        If Result.Alias = '' Then
+          AddIssue(Format(strFunctionWarning, [Result.QualifiedName]), scNone,
+            'CheckReturnValue', Token.Line, Token.Column, etWarning);
     Finally
       AddToContainer(Container, Result);
+    End;
+End;
+
+(**
+
+  This method processes the class names and Identifier for the Procedure,
+  Function, Constructor or Destructor.
+
+  @precon  Container and slClassNames must be a valid instances.
+  @postcon Processes the class names and Identifier for the Procedure,
+           Function, Constructor or Destructor.
+
+  @param   Container     as a TElementContainer
+  @param   slClassNames  as a TStringList
+  @param   strIdentifier as a String as a reference
+  @param   iLine         as an Integer as a reference
+  @param   iColumn       as an Integer as a reference
+
+**)
+Procedure TPascalModule.ProcessClsIdents(Container : TElementContainer;
+  slClassNames : TStringList; var strIdentifier : String; var iLine,
+  iColumn : Integer);
+
+Begin
+  // Check for '.' to signify a class method or alias
+  While Token.Token = '.' Do 
+    Begin
+      NextNonCommentToken;
+      If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
+        ErrorAndSeekToken(strIdentExpected, 'ProcessClsIdents', Token.Token,
+          strSeekableOnErrorTokens, stActual);
+      If Not (Container Is TClassDecl) Then
+        Begin
+          slClassNames.Add(strIdentifier);
+          strIdentifier := Token.Token;
+          iLine := Token.Line;
+          iColumn := Token.Column;
+        End Else
+        Begin
+          If strIdentifier <> '' Then
+            strIdentifier := strIdentifier + '.';
+          strIdentifier := strIdentifier + Token.Token;
+        End;
+      NextNonCommentToken;
     End;
 End;
 
@@ -6789,15 +6906,17 @@ End;
 
   This method checks the returns value of the function.
 
-  @precon  Method must be a valid TPascalMethod instance.
-  @postcon Checks the returns value of the function.
+  @precon  Method must be a valid TPascalMethod instance . 
+  @postcon Checks the returns value of the function . 
 
   @param   Method as a TPascalMethod
+  @return  a Boolean
 
 **)
-Procedure TPascalModule.CheckReturnValue(Method : TPascalMethod);
+Function TPascalModule.CheckReturnValue(Method : TPascalMethod) : Boolean;
 
 Begin
+  Result := False;
   If Token.Token = ':' Then
     Begin
       NextNonCommentToken;
@@ -6810,9 +6929,7 @@ Begin
           ErrorAndSeekToken(strIdentExpected, 'CheckReturnValue',
             Token.Token, strSeekableOnErrorTokens, stActual);
     End Else
-      If Method.Alias = '' Then
-        AddIssue(Format(strFunctionWarning, [Method.QualifiedName]), scNone,
-          'FunctionHeading', Token.Line, Token.Column, etWarning);
+      Result := True;
 End;
 
 (**
@@ -6881,7 +6998,7 @@ Begin
       Else
         C := GetComment;
       NextNonCommentToken;
-      If (Token.TokenType In [ttIdentifier, ttDirective]) Xor boolIdent Then
+      If Not (Token.TokenType In [ttIdentifier, ttDirective]) And boolIdent Then
         Begin
           ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
             strSeekableOnErrorTokens, stActual);
@@ -6899,19 +7016,8 @@ Begin
               iLine := Token.Line;
               iColumn := Token.Column;
               NextNonCommentToken;
-              // Check for '.' to signify a class method
-              While Token.Token = '.' Do
-                Begin
-                  NextNonCommentToken;
-                  slClassNames.Add(strIdentifier);
-                  If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-                    ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
-                      strSeekableOnErrorTokens, stActual);
-                  strIdentifier := Token.Token;
-                  iLine := Token.Line;
-                  iColumn := Token.Column;
-                  NextNonCommentToken;
-                End;
+              ProcessClsIdents(Container, slClassNames, strIdentifier, iLine,
+                iColumn);
               End;
         Finally
           Result := TPascalMethod.Create(mtProcedure, strIdentifier, AScope,
@@ -6924,7 +7030,8 @@ Begin
         slClassNames.Free;
       End;
       FormalParameter(Result);
-      CheckAlias(Result);
+      If boolIdent Then
+        CheckAlias(Result);
       Directive(Result, True);
     Finally
       AddToContainer(Container, Result);
@@ -7164,8 +7271,9 @@ Begin
               If Not boolGrammarFix Then // function X() : Integer stdcall;
                 NextNonCommentToken
             End Else
-              ErrorAndSeekToken(strLiteralExpected, 'Directive', ';',
-                strSeekableOnErrorTokens, stActual);
+              If Token.Token <> '=' Then
+                ErrorAndSeekToken(strLiteralExpected, 'Directive', ';',
+                  strSeekableOnErrorTokens, stActual);
       Finally
         C.Free;
       End;
@@ -7337,7 +7445,9 @@ begin
         Begin
           NextNonCommentToken;
           Directive(M);
-          PortabilityDirective;
+          If PortabilityDirective Then
+            If Token.Token = ';' Then
+              NextNonCommentToken;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'MethodHeading', ';',
             strSeekableOnErrorTokens, stActual);
@@ -7389,19 +7499,8 @@ begin
               iLine := Token.Line;
               iColumn := Token.Column;
               NextNonCommentToken;
-              // Check for '.' to signify a class method
-              While Token.Token = '.' Do
-                Begin
-                  NextNonCommentToken;
-                  slClassNames.Add(strIdentifier);
-                  If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-                    ErrorAndSeekToken(strIdentExpected, 'ConstructorHeading', Token.Token,
-                      strSeekableOnErrorTokens, stActual);
-                  strIdentifier := Token.Token;
-                  iLine := Token.Line;
-                  iColumn := Token.Column;
-                  NextNonCommentToken;
-                End;
+              ProcessClsIdents(Container, slClassNames, strIdentifier, iLine,
+                iColumn);
             Finally
               Result := TPascalMethod.Create(mtConstructor, strIdentifier, AScope,
                 iLine, iColumn);
@@ -7462,19 +7561,8 @@ begin
               iLine := Token.Line;
               iColumn := Token.Column;
               NextNonCommentToken;
-              // Check for '.' to signify a class method
-              While Token.Token = '.' Do
-                Begin
-                  NextNonCommentToken;
-                  slClassNames.Add(strIdentifier);
-                  If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-                    ErrorAndSeekToken(strIdentExpected, 'DestructorHeading', Token.Token,
-                      strSeekableOnErrorTokens, stActual);
-                  strIdentifier := Token.Token;
-                  iLine := Token.Line;
-                  iColumn := Token.Column;
-                  NextNonCommentToken;
-                End;
+              ProcessClsIdents(Container, slClassNames, strIdentifier, iLine,
+                iColumn);
             Finally
               Result := TPascalMethod.Create(mtDestructor, strIdentifier, AScope,
                 iLine, iColumn);
@@ -8145,8 +8233,7 @@ begin
   If Token.UToken = 'IMPLEMENTS' Then
     Begin
       NextNonCommentToken;
-      Prop.ImplementsSpec := Token.Token;
-      NextNonCommentToken;
+      IdentList(Prop.ImplementsSpec, strSeekableOnErrorTokens);
     End;
   If Token.UToken = 'READONLY' Then
     Begin
@@ -8835,11 +8922,43 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
     @param   iValue as an Integer
 
   **)
-  Procedure AddToStackAndInc(iValue : Integer);
+  Procedure IncSkip(iValue : Integer);
 
   Begin
     CompilerConditionStack.Add(Pointer(iValue));
     Inc(iSkip, iValue);
+  End;
+
+  (**
+
+    This function removes the number from the stack and decrements the iSkip
+    variable by 1. Note this also added the removed value to the UNDO stack.
+
+    @precon  None.
+    @postcon Removes the number from the stack and decrements the iSkip
+             variable by 1.
+
+    @return  a Boolean
+
+  **)
+  Function DecSkip : Boolean;
+
+  Var
+    iStackTop : Integer;
+    iStack: Integer;
+
+  Begin
+    Result := False;
+    iStackTop := CompilerConditionStack.Count - 1;
+    If iStackTop >= 0 Then
+      Begin
+        iStack := Integer(CompilerConditionStack[iStackTop]);
+        CompilerConditionUndoStack.Add(Pointer(iStack));
+        If iStack = 1 Then
+          Dec(iSkip);
+        CompilerConditionStack.Delete(iStackTop);
+      End Else
+        Result := True;
   End;
 
 Var
@@ -8853,63 +8972,52 @@ begin
   Else If Like(Token.Token, '{$IFDEF ') Then
     Begin
       If Not IfDef(GetDef) Then
-        AddToStackAndInc(1)
+        IncSkip(1)
       Else
-        AddToStackAndInc(0);
+        IncSkip(0);
     End
   Else If Like(Token.Token, '{$IFOPT ') Then
     Begin
       If Not IfDef(GetDef) Then
-        AddToStackAndInc(1)
+        IncSkip(1)
       Else
-        AddToStackAndInc(0);
+        IncSkip(0);
     End
   Else If Like(Token.Token, '{$IFNDEF ') Then
     Begin
       If Not IfNotDef(GetDef) Then
-        AddToStackAndInc(1)
+        IncSkip(1)
       Else
-        AddToStackAndInc(0);
+        IncSkip(0);
     End
   Else If Like(Token.Token, '{$ELSE') Then
     Begin
-      iStackTop := CompilerConditionStack.Count;
-      If iStackTop > 0 Then
+      iStackTop := CompilerConditionStack.Count - 1;
+      If iStackTop >= 0 Then
         Begin
-          iStack := Integer(CompilerConditionStack[iStackTop - 1]);
+          iStack := Integer(CompilerConditionStack[iStackTop]);
           If iStack = 1 Then
             Begin
-              CompilerConditionStack[iStackTop - 1] := Pointer(0);
+              CompilerConditionStack[iStackTop] := Pointer(0);
               Dec(iSkip)
             End Else
             Begin
-              CompilerConditionStack[iStackTop - 1] := Pointer(1);
+              CompilerConditionStack[iStackTop] := Pointer(1);
               Inc(iSkip);
             End;
         End Else
           AddIssue(Format(strElseIfMissingIfDef, [Token.Line, Token.Column]),
               scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column,
-              etWarning);
+              etError);
     End
   Else If Like(Token.Token, '{$ENDIF') Then
     Begin
-      iStackTop := CompilerConditionStack.Count;
-      If iStackTop > 0 Then
-        Begin
-          iStack := Integer(CompilerConditionStack[iStackTop - 1]);
-          If iStack = 1 Then
-            Dec(iSkip);
-          CompilerConditionStack.Delete(iStackTop - 1);
-        End Else
-          AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
-              scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etWarning);
+      If DecSkip Then
+        AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
+            scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etError);
     End
   Else If Like(Token.Token, '{$EXTERNALSYM') Then
-    FExternalSyms.Add(GetDef) {
-  Else
-    If Copy(Token.Token, 1, 2) = '{$' Then
-      AddIssue(Format(strUnknownComDir, [Token.Token, Token.Line, Token.Column]),
-        scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etWarning)};
+    FExternalSyms.Add(GetDef);
   If iSkip < 0 Then
     iSkip := 0;
 end;
@@ -9269,6 +9377,7 @@ end;
 
 **)
 function TIdentList.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
+
 begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
     '', BrowseAndDocItOptions.MaxDocOutputWidth)

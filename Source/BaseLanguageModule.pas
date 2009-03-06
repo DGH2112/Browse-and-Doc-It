@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    28 Feb 2009
+  @Date    06 Mar 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -99,7 +99,8 @@ Type
     doShowUnReferencedSymbols,
     doShowPerformanceCountersInModuleExplorer,
     doShowPrefCountersInDocSummary,
-    doStrictConstantExpressions
+    doStrictConstantExpressions,
+    doShowMissingVBExceptionWarnings
   );
 
   (** An enumerate to associate images with different types of Elements. **)
@@ -1041,6 +1042,8 @@ Type
   (** This is an abtract class from which all language modules should be
       derived. **)
   TBaseLanguageModule = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
+  private
+    boolShouldUndoCompilerStack: Boolean;
   {$IFDEF D2005} Strict {$ENDIF} Private
     FOwnedItems : TObjectList;
     FTokenIndex : TTokenIndex;
@@ -1055,6 +1058,7 @@ Type
     FCompilerDefs : TStringList;
     FPreviousTokenIndex : TTokenIndex;
     FCompilerConditionStack : TList;
+    FCompilerConditionUndoStack : TList;
     FLastComment: TTokenInfo;
     FCommentClass : TCommentClass;
   {$IFDEF D2005} Strict {$ENDIF} Protected
@@ -1239,6 +1243,14 @@ Type
       @return  a TList
     **)
     Property CompilerConditionStack : TList Read FCompilerConditionStack;
+    (**
+      This property defines a compiler condition undo stack for use in the
+      ProcessCompilerDefintions method.
+      @precon  None.
+      @postcon Provides access to the compiler condition undo stack.
+      @return  a TList
+    **)
+    Property CompilerConditionUndoStack : TList Read FCompilerConditionUndoStack;
     (**
       This property returns the number of bytes in the file.
       @precon  None.
@@ -1548,6 +1560,8 @@ ResourceString
   strShowPerfCountersInDocSummary = 'Show performance counters in the documenation summary.';
   (** Options text for strict evaluation of constant expressions. **)
   strStrictConstantExpressions = 'Strict evaluation of constant expressions.';
+  (** Options text for showing missing VB/VBA exception warnings. **)
+  strShowMissingVBExceptionWarnings = 'Show missing VB/VBA exception warnings.';
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
@@ -2072,7 +2086,8 @@ Const
     (FDescription : strShowUnreferencedSymbols;            FEnabled : False),
     (FDescription : strShowPerfCountersInModuleExplorer;   FEnabled : False),
     (FDescription : strShowPerfCountersInDocSummary;       FEnabled : False),
-    (FDescription : strStrictConstantExpressions;          FEnabled : True)
+    (FDescription : strStrictConstantExpressions;          FEnabled : True),
+    (FDescription : strShowMissingVBExceptionWarnings;     FEnabled : False)
   );
 
   (** This is a default set of font information for the application. **)
@@ -4575,6 +4590,7 @@ begin
   FCompilerDefs.CaseSensitive := False;
   {$ENDIF}
   FCompilerConditionStack := TList.Create;
+  FCompilerConditionUndoStack := TList.Create;
   FCommentClass := CommentClass;
 end;
 
@@ -4608,6 +4624,7 @@ end;
 **)
 destructor TBaseLanguageModule.Destroy;
 begin
+  FCompilerConditionUndoStack.Free;
   FCompilerConditionStack.Free;
   FCompilerDefs.Free;
   FBodyComment.Free;
@@ -5046,8 +5063,12 @@ Var
 
 begin
   iSkip := 0;
+  boolShouldUndoCompilerStack := False;
   If Token.TokenType = ttCompilerDirective Then // Catch first token as directive
-    ProcessCompilerDirective(iSkip);
+    Begin
+      ProcessCompilerDirective(iSkip);
+      boolShouldUndoCompilerStack := True;
+    End;
   Repeat
     If (Token.TokenType = ttComment) And (FLastComment <> Token) Then
       Begin
@@ -5064,7 +5085,10 @@ begin
       FPreviousTokenIndex := FTokenIndex;
     NextToken;
     If Token.TokenType = ttCompilerDirective Then
-      ProcessCompilerDirective(iSkip);
+      Begin
+        ProcessCompilerDirective(iSkip);
+        boolShouldUndoCompilerStack := True;
+      End;
     boolContinue := (
       (
         Token.TokenType In [ttComment, ttCompilerDirective]
@@ -5114,8 +5138,19 @@ end;
 
 **)
 Procedure TBaseLanguageModule.RollBackToken;
+var
+  iStackTop: Integer;
 
 Begin
+  If boolShouldUndoCompilerStack Then
+    Begin
+      iStackTop := CompilerConditionUndoStack.Count - 1;
+      If iStackTop >= 0 Then
+        Begin
+          CompilerConditionStack.Add(CompilerConditionUndoStack[iStackTop]);
+          CompilerConditionUndoStack.Delete(iStackTop);
+        End;
+    End;
   If FPreviousTokenIndex >= 0 Then
     FTokenIndex := FPreviousTokenIndex
   Else

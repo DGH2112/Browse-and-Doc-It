@@ -4,10 +4,8 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    03 Mar 2009
+  @Date    06 Mar 2009
   @Author  David Hoyle
-
-  @todo    Add dialogue to delete excluded files.
 
 **)
 unit BrowseAndDocItTestForm;
@@ -72,6 +70,7 @@ type
     actFileExcludeFile: TAction;
     actFileDeleteFolder: TAction;
     ilDirStatus: TImageList;
+    actToolsExclusions: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
@@ -99,6 +98,9 @@ type
     procedure actFileDeleteFolderExecute(Sender: TObject);
     procedure lvDirectoriesCustomDrawItem(Sender: TCustomListView;
       Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure actToolsExclusionsExecute(Sender: TObject);
+    procedure lvDirectoriesChange(Sender: TObject; Item: TListItem;
+      Change: TItemChange);
   Strict Private
     { Private declarations }
     FFileName: String;
@@ -117,10 +119,11 @@ type
     procedure SaveSettings;
     function GetPathRoot: String;
     procedure SetPathRoot(const Value: String); Protected
-    Function RecurseDirectories(strRoot, strDirectory : String) : TScanResults;
+    Function RecurseDirectories(strRoot, strDirectory : String;
+      iPosition : Integer) : TScanResults;
     Procedure RefreshExplorer(Sender : TObject);
     Procedure PopulateListView;
-    Function ExcludeFileFromResults(strFileName, strRootPath : String) : Boolean;
+    Function ExcludeFileFromResults(strFileName : String) : Boolean;
     (**
       A property to define the currently selected file.
       @precon  None.
@@ -214,7 +217,7 @@ implementation
 Uses
   TokenForm, IniFiles, DGHLibrary, OptionsForm, ModuleDispatcher,
   DocumentationDispatcher, BaseDocumentation, ShellAPI, Math,
-  DocumentationOptionsForm;
+  DocumentationOptionsForm, ExclusionsForm;
 
 {$R *.dfm}
 
@@ -384,15 +387,18 @@ var
   R : TScanResults;
 
 begin
+  For i := 0 To lvDirectories.Items.Count - 1 Do
+    lvDirectories.Items[i].SubItems.Clear;
+  Application.ProcessMessages;
   lvFileList.Items.Clear;
   FParseRecords.Clear;
-  FProgressForm.Init(1, 'Scanning Directories', 'Please wait...');
+  FProgressForm.Init(lvDirectories.Items.Count, 'Scanning Directories', 'Please wait...');
   Try
     For i := 0 To lvDirectories.Items.Count - 1 Do
       If lvDirectories.Items[i].Checked Then
         Begin
           R := RecurseDirectories(lvDirectories.Items[i].Caption,
-            lvDirectories.Items[i].Caption);
+            lvDirectories.Items[i].Caption, i);
           lvDirectories.Items[i].SubItems.Add(Format('%d', [R.iDocConflicts]));
           lvDirectories.Items[i].SubItems.Add(Format('%d', [R.iHints]));
           lvDirectories.Items[i].SubItems.Add(Format('%d', [R.iWarnings]));
@@ -405,6 +411,21 @@ begin
       FProgressForm.Hide;
     End;
   End;
+end;
+
+(**
+
+  This is an on execute event handler for the Tools Exclusions action.
+
+  @precon  None.
+  @postcon Invokes a dialogue that allows the editing of the list of exclusions.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmBrowseAndDocItTestForm.actToolsExclusionsExecute(Sender: TObject);
+begin
+  TfrmExclusions.Execute(FFileExcludeList);
 end;
 
 (**
@@ -428,36 +449,30 @@ end;
   This method tests whether the given file should be included or excluded from
   the result set.
 
-  @precon  None . 
+  @precon  None .
   @postcon Returns true if the file should be excluded from the results . 
 
   @note    The exclusion text is only tested for in the path / filename section 
            after the root path , i . e . the root path is ignored . 
 
   @param   strFileName as a String
-  @param   strRootPath as a String
-  @return  a Boolean    
+  @return  a Boolean
 
 **)
 function TfrmBrowseAndDocItTestForm.ExcludeFileFromResults(
-  strFileName, strRootPath: String): Boolean;
+  strFileName : String): Boolean;
 
 Var
   i: Integer;
-  iLength : Integer;
 
 begin
   Result := False;
-  iLength := Length(strRootPath);
   For i := 0 To FFileExcludeList.Count - 1 Do
-    Begin
-      iPos := Pos(FFileExcludeList[i], strFileName);
-      If iPos > iLength Then
-        Begin
-          Result := True;
-          Break;
-        End;
-    End;
+    If Pos(FFileExcludeList[i], strFileName) > 0 Then
+      Begin
+        Result := True;
+        Break;
+      End;
 End;
 
 (**
@@ -538,11 +553,12 @@ end;
 
   @param   strRoot      as a String
   @param   strDirectory as a String
+  @param   iPosition    as an Integer
   @return  a TScanResults
 
 **)
 Function TfrmBrowseAndDocItTestForm.RecurseDirectories(strRoot,
-  strDirectory : String) : TScanResults;
+  strDirectory : String; iPosition : Integer) : TScanResults;
 
 Var
   recFile : TSearchRec;
@@ -564,25 +580,24 @@ Begin
         If CanParseDocument(ExtractFileExt(recFile.Name)) Then
           Begin
             strFileName := strDirectory + '\' + recFile.Name;
-            Delete(strFileName, 1, Length(strRoot));
             If Not ExcludeFileFromResults(strFileName) Then
               Begin
-                FProgressForm.UpdateProgress(0, strFileName);
-                GetErrors(strDirectory + '\' + recFile.Name, iHints, iWarnings,
-                  iErrors, iConflicts);
+                FProgressForm.UpdateProgress(iPosition, strFileName);
+                GetErrors(strFileName, iHints, iWarnings, iErrors, iConflicts);
                 Inc(Result.iDocConflicts, iConflicts);
                 Inc(Result.iHints, iHints);
                 Inc(Result.iWarnings, iWarnings);
                 Inc(Result.iErrors, iErrors);
-                FParseRecords.Add(TParseRecord.Create(strDirectory + '\' + recFile.Name,
-                  strRoot, iErrors, iWarnings, iHints, iConflicts));
+                FParseRecords.Add(TParseRecord.Create(strFileName, strRoot,
+                  iErrors, iWarnings, iHints, iConflicts));
                 Application.ProcessMessages;
               End;
           End;
         If actFileRecurseFolders.Checked Then
           If (recFile.Attr And faDirectory <> 0) And (recFile.Name[1] <> '.') Then
             Begin
-              R := RecurseDirectories(strRoot, strDirectory + '\' + recFile.Name);
+              R := RecurseDirectories(strRoot, strDirectory + '\' + recFile.Name,
+                iPosition);
               Inc(Result.iDocConflicts, R.iDocConflicts);
               Inc(Result.iHints, R.iHints);
               Inc(Result.iWarnings, R.iWarnings);
@@ -816,10 +831,29 @@ end;
 
 (**
 
+  This is an onchange event handler for the directories list view.
+
+  @precon  None.
+  @postcon Forces the list view of the files to be re-drawn based on selected
+           directories.
+
+  @param   Sender as a TObject
+  @param   Item   as a TListItem
+  @param   Change as a TItemChange
+
+**)
+procedure TfrmBrowseAndDocItTestForm.lvDirectoriesChange(Sender: TObject;
+  Item: TListItem; Change: TItemChange);
+begin
+  PopulateListView;
+end;
+
+(**
+
   This is an on custom draw item event handler for the list views.
 
   @precon  None.
-  @postcon Draws the list view items with colours, path ellipses and alignments. 
+  @postcon Draws the list view items with colours, path ellipses and alignments.
 
   @param   Sender      as a TCustomListView
   @param   Item        as a TListItem
@@ -888,6 +922,7 @@ begin
     Begin
       R := GetSubItemRect(i);
       Sender.Canvas.Brush.Color := clWindow;
+      Sender.Canvas.Font.Color := clWindowText;
       Val(Item.SubItems[i], iValue, iErrorCode);
       If iValue > 0 Then
         Begin
@@ -896,6 +931,12 @@ begin
             1: Sender.Canvas.Brush.Color := clGreen;
             2: Sender.Canvas.Brush.Color := clYellow;
             3: Sender.Canvas.Brush.Color := clRed;
+          End;
+          Case i Of
+            0: Sender.Canvas.Font.Color := clBlack;
+            1: Sender.Canvas.Font.Color := clWhite;
+            2: Sender.Canvas.Font.Color := clRed;
+            3: Sender.Canvas.Font.Color := clYellow;
           End;
         End;
       If Item.Selected Then
@@ -932,6 +973,7 @@ var
   Item: TListItem;
   strText : String;
   boolChecked : Boolean;
+  i: Integer;
 
 begin
   Item := (Source As TListView).GetItemAt(X, Y);
@@ -943,6 +985,12 @@ begin
       Item.Checked := Selected.Checked;
       Selected.Caption := strText;
       Selected.Checked := boolChecked;
+      For i := 0 to Item.SubItems.Count -1 Do
+        Begin
+          strText := Item.SubItems[i];
+          Item.SubItems[i] := Selected.SubItems[i];
+          Selected.SubItems[i] := strText;
+        End;
       Item.Selected := True;
       Selected := Item;
     End;
@@ -1020,6 +1068,39 @@ Var
   liItem: TListItem;
   boolInclude : Boolean;
 
+  (**
+
+    This function determines of the current record should be shown based on
+    whether the root directory is selected or no selection is present.
+
+    @precon  None.
+    @postcon Returns true if the record should be shown in the results set.
+
+    @return  a Boolean
+
+  **)
+  Function IsFolderSelected : Boolean;
+
+  Var
+    k : Integer;
+    S: TListItem;
+
+  Begin
+    k := 0;
+    S := lvDirectories.Selected;
+    While S <> Nil Do
+      Begin
+        Inc(k);
+        If S.Caption = rec.PathRoot Then
+          Begin
+            Result := True;
+            Exit;
+          End;
+        S := lvDirectories.GetNextItem(S, sdBelow, [isSelected]);
+      End;
+    Result := (k = 0);
+  End;
+
 begin
   Try
     lvFileList.Clear;
@@ -1036,6 +1117,7 @@ begin
         boolInclude := boolInclude Or (actViewWarnings.Checked And (rec.Warnings > 0));
         boolInclude := boolInclude Or (actViewHints.Checked And (rec.Hints > 0));
         boolInclude := boolInclude Or (actViewDocConflicts.Checked And (rec.Conflicts > 0));
+        boolInclude := boolInclude And IsFolderSelected;
         If boolInclude Then
           Begin
             liItem := lvFileList.Items.Add;

@@ -90,6 +90,7 @@ type
     Procedure TestEnums;
     Procedure TestCombinations;
     Procedure TestFailure01;
+    Procedure TestFailure02;
   End;
 
 implementation
@@ -636,7 +637,7 @@ begin
 
       CheckEquals('VB_GlobalNameSpace = False', M.FindElement(strAttributesLabel).Elements[3].AsString(True, False));
       CheckEquals('VERSION 5.00', M.FindElement(strVersionLabel).Elements[1].AsString(True, False));
-      CheckEquals('ClientTop = 435', M.FindElement(strVersionLabel).Elements[1].Elements[4].AsString(True, False));
+      CheckEquals('ClientTop = 435', M.FindElement(strVersionLabel).Elements[1].Elements[1].Elements[4].AsString(True, False));
       CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[2].AsString(True, False));
     Finally
       M.Free;
@@ -992,6 +993,72 @@ Begin
       CheckEquals('Top As Long', M.FindElement(strTypesLabel).Elements[1].Elements[4].AsString(True, False));
       CheckEquals('Right As Long', M.FindElement(strTypesLabel).Elements[1].Elements[3].AsString(True, False));
       CheckEquals('Bottom As Long', M.FindElement(strTypesLabel).Elements[1].Elements[1].AsString(True, False));
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure02;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      'VERSION 5.00'#13#10 +
+      'Begin VB.Form Form1'#13#10 +
+      '   Caption         =   "Form1"'#13#10 +
+      '   ClientHeight    =   5670'#13#10 +
+      '   ClientLeft      =   60'#13#10 +
+      '   ClientTop       =   345'#13#10 +
+      '   ClientWidth     =   6885'#13#10 +
+      '   LinkTopic       =   "Form1"'#13#10 +
+      '   ScaleHeight     =   5670'#13#10 +
+      '   ScaleWidth      =   6885'#13#10 +
+      '   StartUpPosition =   3  ''Windows Default'#13#10 +
+      '   Begin VB.CommandButton Command2'#13#10 +
+      '      Caption         =   "Create File"'#13#10 +
+      '      Height          =   495'#13#10 +
+      '      Left            =   3120'#13#10 +
+      '      TabIndex        =   2'#13#10 +
+      '      Top             =   240'#13#10 +
+      '      Width           =   3375'#13#10 +
+      '   End'#13#10 +
+      '   Begin VB.TextBox Text1'#13#10 +
+      '      Height          =   4695'#13#10 +
+      '      Left            =   240'#13#10 +
+      '      MultiLine       =   -1  ''True'#13#10 +
+      '      ScrollBars      =   3  ''Both'#13#10 +
+      '      TabIndex        =   1'#13#10 +
+      '      Top             =   840'#13#10 +
+      '      Width           =   6375'#13#10 +
+      '   End'#13#10 +
+      '   Begin VB.CommandButton Command1'#13#10 +
+      '      Caption         =   "LoadFile"'#13#10 +
+      '      Height          =   495'#13#10 +
+      '      Left            =   240'#13#10 +
+      '      TabIndex        =   0'#13#10 +
+      '      Top             =   240'#13#10 +
+      '      Width           =   2535'#13#10 +
+      '   End'#13#10 +
+      'End'#13#10 +
+      'Attribute VB_Name = "Form1"'#13#10 +
+      'Attribute VB_GlobalNameSpace = False'#13#10 +
+      'Attribute VB_Creatable = False'#13#10 +
+      'Attribute VB_PredeclaredId = True'#13#10 +
+      'Attribute VB_Exposed = False'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
     Finally
       M.Free;
     End;
@@ -1669,6 +1736,7 @@ Var
   S : TMemoryStream;
   M : TBaseLanguageModule;
   strCode : String;
+  VL: TElementContainer;
 
 begin
   S := TMemoryStream.Create;
@@ -1707,15 +1775,16 @@ begin
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(1, M.HeadingCount(strVersionLabel));
-      CheckEquals(scNone, M.FindElement(strVersionLabel).Elements[1].Scope);
-      CheckEquals('VERSION 5.00', M.FindElement(strVersionLabel).Elements[1].AsString(True, False));
-      CheckEquals('Caption = "Wire Run Wizard"', M.FindElement(strVersionLabel).Elements[1].Elements[1].AsString(True, False));
-      CheckEquals('ClientHeight = 4620', M.FindElement(strVersionLabel).Elements[1].Elements[2].AsString(True, False));
-      CheckEquals('ClientLeft = 45', M.FindElement(strVersionLabel).Elements[1].Elements[3].AsString(True, False));
-      CheckEquals('ClientTop = 435', M.FindElement(strVersionLabel).Elements[1].Elements[4].AsString(True, False));
-      CheckEquals('ClientWidth = 6180', M.FindElement(strVersionLabel).Elements[1].Elements[5].AsString(True, False));
-      CheckEquals('OleObjectBlob = "frmWireRunWizard.frx" : 0000', M.FindElement(strVersionLabel).Elements[1].Elements[6].AsString(True, False));
-      CheckEquals('StartUpPosition = 1', M.FindElement(strVersionLabel).Elements[1].Elements[7].AsString(True, False));
+      VL := M.FindElement(strVersionLabel);
+      CheckEquals(scNone, VL.Elements[1].Scope);
+      CheckEquals('VERSION 5.00', VL.Elements[1].AsString(True, False));
+      CheckEquals('Caption = "Wire Run Wizard"', VL.Elements[1].Elements[1].Elements[1].AsString(True, False));
+      CheckEquals('ClientHeight = 4620', VL.Elements[1].Elements[1].Elements[2].AsString(True, False));
+      CheckEquals('ClientLeft = 45', VL.Elements[1].Elements[1].Elements[3].AsString(True, False));
+      CheckEquals('ClientTop = 435', VL.Elements[1].Elements[1].Elements[4].AsString(True, False));
+      CheckEquals('ClientWidth = 6180', VL.Elements[1].Elements[1].Elements[5].AsString(True, False));
+      CheckEquals('OleObjectBlob = "frmWireRunWizard.frx" : 0000', VL.Elements[1].Elements[1].Elements[6].AsString(True, False));
+      CheckEquals('StartUpPosition = 1', VL.Elements[1].Elements[1].Elements[7].AsString(True, False));
     Finally
       M.Free;
     End;

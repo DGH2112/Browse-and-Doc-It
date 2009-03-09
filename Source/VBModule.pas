@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       28 Feb 2009
+  @Date       09 Mar 2009
   @Author     David Hoyle
 
 **)
@@ -162,7 +162,7 @@ Type
   End;
 
   (** A type to define at upper and lower limits of an array. **)
-  TArrayDimensions = Array[1..2] Of Integer;
+  TArrayDimensions = Array[1..2] Of String;
 
   (** A class to represent variables in visual basic. **)
   TVBVar = Class(TGenericVariable)
@@ -176,7 +176,7 @@ Type
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Procedure AddDimension(iLow, iHigh : Integer);
+    Procedure AddDimension(strLow, strHigh : String);
     (**
       This property returns the number of dimensions in the array variable.
       @precon  None.
@@ -202,6 +202,7 @@ Type
     FPropertyType: TPropertyType;
     FExceptionHandling : IExceptionHandling;
   {$IFDEF D2005} Strict {$ENDIF} Protected
+    Function GetName : String; Override;
   Public
     Constructor Create(APropertyType : TPropertyType; strName : String;
       AScope : TScope; iLine, iCol : Integer; iImageIndex : TImageIndex;
@@ -245,6 +246,7 @@ Type
   (** A class to represent attributes **)
   TVBAttribute = Class(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Protected
+    Function GetName : String; Override;
   Public
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
@@ -271,7 +273,7 @@ Type
   End;
 
   (** A class to represent Field Values **)
-  TVBField = Class(TElementContainer)
+  TVBField = Class(TVBVar)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
@@ -292,12 +294,12 @@ Type
 
   **)
   TVBModule = Class(TBaseLanguageModule)
+  private
+    procedure ProcessVar(Variable: TVBVar);
   {$IFDEF D2005} Strict {$ENDIF} Private
     FTypesLabel: TLabelContainer;
     FConstantsLabel: TLabelContainer;
-    FResourceStringsLabel: TLabelContainer;
     FVariablesLabel: TLabelContainer;
-    FThreadVarsLabel: TLabelContainer;
     FImplementedMethodsLabel: TLabelContainer;
     FDeclaredMethodsLabel: TLabelContainer;
     FImplementedPropertiesLabel: TLabelContainer;
@@ -309,9 +311,9 @@ Type
     { Grammer Parsers }
     Procedure Goal;
     Function  Version : Boolean;
-    procedure VBBegin(C : TElementContainer);
+    Function  VBBegin(C : TElementContainer) : Boolean;
     Function  Attributes : Boolean;
-    Procedure Attribute(C : TElementContainer);
+    Function  Attribute(C : TElementContainer) : Boolean;
     Function  Options : Boolean;
     Function  Declarations : Boolean;
     Function  Privates(C : TComment) : Boolean;
@@ -344,6 +346,7 @@ Type
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function KeyWords : TKeyWords; Override;
+    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
     { Properties }
   End;
 
@@ -368,7 +371,7 @@ Const
   (** A set of numbers **)
   strNumbers : Set Of Char = ['&', '0'..'9'];
   (** A set of characters for general symbols **)
-  strSymbols : Set Of Char = ['&', '(', ')', '*', '+',
+  strSymbols : Set Of Char = ['&', '(', ')', '*', '+', '%', '$', '&',
     ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
   (** A set of characters for quotes **)
   strQuote : Set Of Char = ['"'];
@@ -379,12 +382,12 @@ Const
     identifiers and as types.
 
   **)
-  strReservedWords : Array[1..139] Of String = (
+  strReservedWords : Array[1..138] Of String = (
     'addhandler', 'addressof', 'andalso', 'alias', 'and', 'ansi', 'as', 'assembly',
     'auto', 'base', 'boolean', 'byref', 'byte', 'byval', 'call', 'case', 'catch',
     'cbool', 'cbyte', 'cchar', 'cdate', 'cdec', 'cdbl', 'char', 'cint', 'class',
     'clng', 'cobj', 'compare', 'const', 'cshort', 'csng', 'cstr', 'ctype', 'date',
-    'decimal', 'declare', 'default', 'delegate', 'dim', 'directcast', 'do', 'double',
+    'decimal', 'declare', {'default', }'delegate', 'dim', 'directcast', 'do', 'double',
     'each', 'else', 'elseif', 'end', 'enum', 'erase', 'error', 'event', 'exit',
     'explicit', {'false', }'finally', 'for', 'friend', 'function', 'get', 'gettype',
     'gosub', 'goto', 'handles', 'if', 'implements', 'imports', 'in', 'inherits',
@@ -401,8 +404,8 @@ Const
   );
 
   (** A list of directives. **)
-  strDirectives : Array[1..2] Of String = (
-    'false', 'true'
+  strDirectives : Array[1..3] Of String = (
+    'default', 'false', 'true'
   );
 
   (** A set of token to be searched for after an error. **)
@@ -414,6 +417,9 @@ Const
   strMethodType : Array[Low(TMethodType)..High(TMethodType)] Of String = (
     '', '', 'Sub', 'Function'
   );
+  (** A constant array to define the property types. **)
+  strPropertyType : Array[Low(TPropertyType)..High(TPropertyType)] Of String = (
+    'Unknown', 'Get', 'Let', 'Set');
 
 ResourceString
   (** Exception message when an value is expected but something else is found. **)
@@ -769,14 +775,14 @@ End;
 
   This method adds an array dimension to the varaiable declaration.
 
-  @precon  None.
-  @postcon Adds an array dimension to the varaiable declaration.
+  @precon  None . 
+  @postcon Adds an array dimension to the varaiable declaration . 
 
-  @param   iLow  as an Integer
-  @param   iHigh as an Integer
+  @param   strLow  as a String
+  @param   strHigh as a String
 
 **)
-procedure TVBVar.AddDimension(iLow, iHigh: Integer);
+procedure TVBVar.AddDimension(strLow, strHigh : String);
 
 Var
   i : Integer;
@@ -786,16 +792,16 @@ begin
   If FDimensions = Nil Then
     Begin
       SetLength(FDimensions, 1);
-      FDimensions[0][1] := iLow;
-      FDimensions[0][2] := iHigh;
+      FDimensions[0][1] := strLow;
+      FDimensions[0][2] := strHigh;
     End Else
     Begin
-      T := Copy(FDimensions);
+      T := Copy(FDimensions, 1, Length(FDimensions));
       SetLength(FDimensions, Succ(Succ(High(FDimensions))));
       For i := Low(T) To High(T) Do
         FDimensions[i] := T[i];
-      FDimensions[High(FDimensions)][1] := iLow;
-      FDimensions[High(FDimensions)][2] := iHigh;
+      FDimensions[High(FDimensions)][1] := strLow;
+      FDimensions[High(FDimensions)][2] := strHigh;
     End;
 end;
 
@@ -829,8 +835,8 @@ begin
         Begin
           If i > 0 Then
             Result := Result + ', ';
-          If FDimensions[i][1] > -1 Then
-            Result := Result + Format('%d to %d', [FDimensions[i][1],
+          If FDimensions[i][1] <> '' Then
+            Result := Result + Format('%s to %s', [FDimensions[i][1],
               FDimensions[i][2]]);
         End;
       Result := Result + ')';
@@ -913,11 +919,7 @@ Var
 
 begin
   Result := 'Property ';
-  Case PropertyType Of
-    ptGet: Result := Result + 'Get ';
-    ptLet: Result := Result + 'Let ';
-    ptSet: Result := Result + 'Set ';
-  End;
+  Result := Result + strPropertyType[PropertyType] + ' ';
   If boolShowIdentifier Then
     Result := Result + Identifier;
   Result := Result + '(';
@@ -958,28 +960,26 @@ end;
 procedure TVBProperty.CheckDocumentation(var boolCascade: Boolean);
 begin
   Inherited CheckDocumentation(boolCascade);
-  {: @bug This outputs documentation conflicts as METHOD problems.
-  If MethodType In [mtFunction] Then
+  If PropertyType In [ptGet] Then
     Begin
-       If ReturnType = Nil Then
+       If TypeId = Nil Then
          AddIssue(Format(strProperyRequiresReturn, [Identifier]), scNone,
-           'CheckDocumentation', Line, Column, etError);
+           'CheckDocumentation', Line, Column, etWarning);
     End Else
     Begin
-       If ParamCount = 0 Then
+       If ParameterCount = 0 Then
          AddIssue(Format(strProperyRequireParam, [Identifier]), scNone,
-           'CheckDocumentation', Line, Column, etError);
+           'CheckDocumentation', Line, Column, etWarning);
     End;
-  }
 end;
 
 (**
 
   This is a constructor for the TVBProperty class.
 
-  @precon  None . 
-  @postcon Maps the property type to an internal method type + creates a string 
-           list for pushed parameters . 
+  @precon  None .
+  @postcon Maps the property type to an internal method type + creates a string
+           list for pushed parameters .
 
   @param   APropertyType as a TPropertyType
   @param   strName       as a String
@@ -1000,18 +1000,34 @@ begin
   FExceptionHandling := TExceptionHandling.Create;
 end;
 
+(**
+
+  This is a getter method for the TVBProperty property.
+
+  @precon  None.
+  @postcon Returns an altered identifier to distinguish between Get, Let and Set
+           properties with the same name.
+
+  @return  a String
+
+**)
+function TVBProperty.GetName: String;
+begin
+  Result := strPropertyType[PropertyType] + '.' + Identifier;
+end;
+
 { TVBRecordDecl }
 
 (**
 
   This method returns a string representation of the visual basic record.
 
-  @precon  None . 
-  @postcon Returns a string representation of the visual basic record . 
+  @precon  None .
+  @postcon Returns a string representation of the visual basic record .
 
   @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String              
+  @return  a String
 
 **)
 function TVBRecordDecl.AsString(boolShowIdentifier,
@@ -1028,12 +1044,12 @@ end;
 
   This method returns a string representation of the visual basic parameter.
 
-  @precon  None . 
-  @postcon Returns a string representation of the visual basic parameter . 
+  @precon  None .
+  @postcon Returns a string representation of the visual basic parameter .
 
   @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String              
+  @return  a String
 
 **)
 function TVBParameter.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
@@ -1097,13 +1113,28 @@ end;
 
   @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String              
+  @return  a String
 
 **)
 function TVBAttribute.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    '=', BrowseAndDocItOptions.MaxDocOutputWidth);
+    '', BrowseAndDocItOptions.MaxDocOutputWidth);
+end;
+
+(**
+
+  This is a getter method for the Name property.
+
+  @precon  None.
+  @postcon Returns an attribute name based on all tokens in the container.
+
+  @return  a String
+
+**)
+function TVBAttribute.GetName: String;
+begin
+  Result := BuildStringRepresentation(True, False, '', 9999);
 end;
 
 { TVBOption }
@@ -1268,9 +1299,7 @@ Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   FTypesLabel                 := Nil;
   FConstantsLabel             := Nil;
-  FResourceStringsLabel       := Nil;
   FVariablesLabel             := Nil;
-  FThreadVarsLabel            := Nil;
   FImplementedMethodsLabel    := Nil;
   FImplementedPropertiesLabel := Nil;
   FDeclaredMethodsLabel       := Nil;
@@ -1300,7 +1329,8 @@ Begin
       If FindElement(strErrors).ElementCount = 0 Then
         CheckReferences;
       AddTickCount('Refs');
-      CheckExceptionHandling;
+      If doShowMissingVBExceptionWarnings In BrowseAndDocItOptions.Options Then
+        CheckExceptionHandling;
       boolCascade := True;
       If moCheckForDocumentConflicts In ModuleOptions Then
         CheckDocumentation(boolCascade);
@@ -1446,10 +1476,14 @@ Begin
                 If (LastToken = ttNumber) And (Ch In ['A'..'F', 'H', 'a'..'f', 'h']) Then
                   CurCharType := ttNumber
                 Else
-                  If Not (LastToken In [ttIdentifier]) And (Ch In ['_']) Then
+                  If (LastToken In [ttWhiteSpace]) And (Ch In ['_']) Then
                     CurCharType := ttLineContinuation
                   Else
-                    CurCharType := ttIdentifier;
+                    Begin
+                      If LastToken In [ttLineContinuation] Then
+                        LastToken := ttIdentifier;
+                      CurCharType := ttIdentifier
+                    End;
               End
             Else If ch In strNumbers Then
               Begin
@@ -1466,6 +1500,8 @@ Begin
                 CurCharType := ttSymbol;
                 If (Ch = '.') And (LastToken = ttNumber) Then
                   CurCharType := ttNumber;
+                If (LastToken In [ttIdentifier]) And (Ch In ['%', '$', '&']) Then
+                  CurCharType := ttIdentifier;
               End
             Else
               CurCharType := ttUnknown;
@@ -1731,8 +1767,6 @@ function TVBModule.Vars(Scope: TScope; C: TComment): Boolean;
 Var
   boolWithEvents : Boolean;
   V : TVBVar;
-  iLow: Integer;
-  iHigh: Integer;
 
 begin
   Result := False;
@@ -1753,68 +1787,11 @@ begin
         V.Comment := C;
         V.WithEvents := boolWithEvents;
         NextNonCommentToken;
-        If Token.Token = '(' Then
-          Begin
-            NextNonCommentToken;
-            If Token.Token <> ')' Then
-              Begin
-                Repeat
-                  If Token.TokenType In [ttNumber] Then
-                    Begin
-                      iLow := StrToInt(Token.Token);
-                      iHigh := iLow;
-                      NextNonCommentToken;
-                      If Token.UToken = 'TO' Then
-                        Begin
-                          NextNonCommentToken;
-                          If Token.TokenType In [ttNumber] Then
-                            Begin
-                              iHigh := StrToInt(Token.Token);
-                              NextNonCommentToken;
-                            End Else
-                              ErrorAndSeekToken(strNumberExpected, 'Vars',
-                                Token.Token, strSeekTokens, stActual);
-                        End;
-                      V.AddDimension(iLow, iHigh);
-                    End Else
-                      ErrorAndSeekToken(strNumberExpected, 'Vars', Token.Token,
-                        strSeekTokens, stActual);
-                Until Not IsToken(',', Nil);
-                If Token.Token = ')' Then
-                  NextNonCommentToken
-                Else
-                  ErrorAndSeekToken(strLiteralExpected, 'Vars', Token.Token,
-                    strSeekTokens, stActual);
-              End Else
-              Begin
-                V.AddDimension(-1, 0);
-                NextNonCommentToken;
-              End;
-          End;
-        If Token.UToken = 'AS' Then
-          Begin
-            NextNonCommentToken;
-            If Token.UToken = 'NEW' Then
-              AddToExpression(V);
-            If Token.TokenType In [ttIdentifier, ttReservedWord] Then
-              AddToExpression(V)
-            Else
-              ErrorAndSeekToken(strIdentExpected, 'Vars', Token.Token,
-                strSeekTokens, stActual);
-            If Token.Token = '.' Then
-              Begin
-                AddToExpression(V);
-                If Token.TokenType In [ttIdentifier, ttReservedWord] Then
-                  AddToExpression(V)
-                Else
-                  ErrorAndSeekToken(strIdentExpected, 'Vars', Token.Token,
-                    strSeekTokens, stActual);
-              End;
-          End;
+        ProcessVar(V);
       End Else
         ErrorAndSeekToken(strIdentExpected, 'Vars', Token.Token,
           strSeekTokens, stActual);
-  Until Token.Token <> ',';
+  Until Not IsToken(',', Nil);
   If Token.TokenType In [ttLineEnd] Then
     NextNonCommentToken
   Else
@@ -1824,32 +1801,66 @@ end;
 
 (**
 
-  This method processes the BEGIN/END section of a module version clause. 
+  This method processes the BEGIN / END section of a module version clause.
 
-  @precon  None. 
-  @postcon Processes the BEGIN/END section of a module version clause. 
+  @precon  None .
+  @postcon Processes the BEGIN / END section of a module version clause .
 
   @param   C as a TElementContainer
+  @return  a Boolean
 
 **)
-Procedure TVBModule.VBBegin(C : TElementContainer);
+Function TVBModule.VBBegin(C : TElementContainer) : Boolean;
+
+Var
+  Container : TElementContainer;
+  strModifier: String;
 
 Begin
-  If IsKeyWord(Token.Token, ['begin']) Then
+  Result := False;
+  Container := C;
+  If IsKeyWord(Token.Token, ['begin', 'beginproperty']) Then
     Begin
+      Result := True;
+      strModifier := LowerCase(Token.Token);
+      Delete(strModifier, 1, 5);
       NextNonCommentToken;
-      If FModuleType = mtForm Then
-        If Token.TokenType In [ttIdentifier] Then
-          NextNonCommentToken
-        Else
-          ErrorAndSeekToken(strIdentExpected, 'VBBegin',
-            Token.Token, strSeekTokens, stActual);
+      If Token.TokenType In [ttIdentifier, ttDirective] Then
+        Begin
+          Container := TVBAttribute.Create(Token.Token, scNone, Token.Line,
+            Token.Column, iiUsesItem, Nil);
+          Container := C.Add(Container);
+          NextNonCommentToken;
+          If Token.Token = '.' Then
+            Begin
+              Container.AddToken(Token.Token);
+              NextNonCommentToken;
+              If Token.TokenType In [ttIdentifier, ttDirective] Then
+                Begin
+                  Container.AddToken(Token.Token);
+                  NextNonCommentToken;
+                  If Token.TokenType In [ttIdentifier, ttDirective] Then
+                    Begin
+                      Container.AddToken(Token.Token);
+                      NextNonCommentToken;
+                    End Else
+                      ErrorAndSeekToken(strIdentExpected, 'VBBegin',
+                        Token.Token, strSeekTokens, stActual);
+                End Else
+                  ErrorAndSeekToken(strIdentExpected, 'VBBegin',
+                    Token.Token, strSeekTokens, stActual);
+            End;
+        End;
       If Token.TokenType In [ttLineEnd] Then
         Begin
           NextNonCommentToken;
-          While Token.TokenType In [ttIdentifier] Do
-            Attribute(C);
-          If IsKeyWord(Token.Token, ['end']) Then
+          Repeat
+            // Do nothing
+          Until Not (
+            VBBegin(Container) Or
+            Attribute(Container)
+          );
+          If IsKeyWord(Token.Token, ['end' + strModifier]) Then
             Begin
               NextNonCommentToken;
               If Token.TokenType In [ttLineEnd] Then
@@ -1864,14 +1875,12 @@ Begin
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'VBBegin',
             'BEGIN', strSeekTokens, stActual);
-    End Else
-      ErrorAndSeekToken(strLineEndExpected, 'VBBegin',
-        Token.Token, strSeekTokens, stActual);
+    End;
 End;
 
 (**
 
-  This method processes a list of attributes declared at the header of a visual 
+  This method processes a list of attributes declared at the header of a visual
   basic module. 
 
   @precon  None. 
@@ -1898,27 +1907,41 @@ end;
 
 (**
 
-  This method parses a single attribute at the top of the module. 
+  This method parses a single attribute at the top of the module.
 
-  @precon  None.
-  @postcon Parses a single attribute at the top of the module. 
+  @precon  None . 
+  @postcon Parses a single attribute at the top of the module . 
 
   @param   C as a TElementContainer
+  @return  a Boolean
 
 **)
-Procedure TVBModule.Attribute(C : TElementContainer);
+Function TVBModule.Attribute(C : TElementContainer) : Boolean;
 
 Var
   A : TVBAttribute;
 
 begin
-  If Token.TokenType In [ttIdentifier] Then
+  Result := False;
+  If (Token.TokenType In [ttIdentifier, ttDirective]) And
+    (AnsiCompareText(Token.Token, 'endproperty') <> 0) Then
     Begin
+      Result := True;
       A := C.Add(TVBAttribute.Create(Token.Token, scNone, Token.Line,
         Token.Column, iiUsesItem, Nil)) As TVBAttribute;
       NextNonCommentToken;
+      If Token.Token = '.' Then
+        Begin
+          AddToExpression(A);
+          If Token.TokenType In [ttIdentifier, ttDirective] Then
+            AddToExpression(A)
+          Else
+            ErrorAndSeekToken(strIdentExpected, 'Attribute',
+              Token.Token, strSeekTokens, stActual);
+        End;
       If Token.Token = '=' Then
         Begin
+          A.AddToken(Token.Token);
           NextNonCommentToken;
           If Token.Token = '-' Then
             AddToExpression(A);
@@ -1952,17 +1975,15 @@ begin
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'Attribute',
             '=', strSeekTokens, stActual);
-    End Else
-      ErrorAndSeekToken(strIdentExpected, 'Attribute',
-        Token.Token, strSeekTokens, stActual);
+    End;
 end;
 
 (**
 
-  This method parsers the options statements at the top of the modules. 
+  This method parsers the options statements at the top of the modules.
 
-  @precon  None. 
-  @postcon Parsers the options statements at the top of the modules. 
+  @precon  None.
+  @postcon Parsers the options statements at the top of the modules.
 
   @return  a Boolean
 
@@ -2081,7 +2102,8 @@ Begin
       Friends(C) Or
       Props(scPublic, C, False) Or
       Records(scPublic, C) Or
-      Enum(scPublic, C);
+      Enum(scPublic, C) Or
+      Attributes;
     If Not Result Then
       If Not EndOfTokens Then
         If Token.TokenType In [ttLineEnd] Then
@@ -2122,7 +2144,7 @@ Begin
     PM := pamNone;
     If Token.UToken = 'BYVAL' Then
       Begin
-        PM := pamConst;
+        PM := pamNone;
         NextNonCommentToken;
       End;
     If Token.UToken = 'BYREF' Then
@@ -2377,6 +2399,7 @@ End;
 
 **)
 procedure TVBModule.NextNonCommentToken;
+
 begin
   Inherited NextNonCommentToken;
   If Token.TokenType In [ttLineContinuation] Then
@@ -2387,7 +2410,7 @@ begin
       Else
         ErrorAndSeekToken(strLineEndExpected, 'NextNonCommentToken',
           Token.Token, strSeekTokens, stActual);
-    End; 
+    End;
 end;
 
 (**
@@ -2410,6 +2433,8 @@ Begin
   RollBackToken;
   Repeat
     NextNonCommentToken;
+    If Token.TokenType In [ttIdentifier] Then
+      ReferenceSymbol(Token);
     // Check for Exception.Push & Exception.Pop
     If AnsiCompareText(Token.Token, 'Exception') = 0 Then
       Begin
@@ -2421,19 +2446,20 @@ Begin
               Begin
                 AExceptionHnd.HasPush := True;
                 NextNonCommentToken;
-                If Token.TokenType In [ttStringLiteral] Then
+                While Token.TokenType In [ttIdentifier, ttReservedWord,
+                  ttStringLiteral] Do
                   Begin
                     AExceptionHnd.PushName := Token.Token;
                     NextNonCommentToken;
-                    While Token.Token = ',' Do
-                      Begin
-                        NextNonCommentToken;
-                        AExceptionHnd.PushParams.Add(Token.Token);
-                        NextNonCommentToken;
-                      End;
-                  End Else
-                    ErrorAndSeekToken(strStringExpected, 'FindMethodEnd',
-                      Token.Token, strSeekTokens, stActual);
+                    If (Token.Token = '+') Or (Token.Token = '&') Then
+                      NextNonCommentToken;
+                  End;
+                While Token.Token = ',' Do
+                  Begin
+                    NextNonCommentToken;
+                    AExceptionHnd.PushParams.Add(Token.Token);
+                    NextNonCommentToken;
+                  End;
               End;
             If AnsiCompareText(Token.Token, 'Pop') = 0 Then
               Begin
@@ -2831,6 +2857,8 @@ Function TVBModule.Records(Scope : TScope; C : TComment) : Boolean;
 Var
   R : TVBRecordDecl;
   F : TVBField;
+  T: TTokenInfo;
+  Com: TComment;
 
 Begin
   Result := False;
@@ -2851,14 +2879,30 @@ Begin
           If Token.TokenType In [ttLineEnd] then
             Begin
               NextNonCommentToken;
-              While Token.UToken <> 'END' Do
+              Repeat
                 Begin
+                  If Token.TokenType In [ttLineEnd] Then
+                    NextNonCommentToken;
                   If Token.TokenType In [ttReservedWord, ttIdentifier] Then
                     Begin
-                      F := TVBField.Create(Token.Token, scPublic, Token.Line,
-                        Token.Column, iiPublicField, GetComment);
-                      F := R.Add(F) As TVBField;
+                      T := Token;
+                      Com := GetComment;
                       NextNonCommentToken;
+                      If (PrevToken.UToken = 'END') And (Token.UToken = 'TYPE')  Then
+                        Begin
+                          RollBackToken;
+                          Break;
+                        End;
+                      F := TVBField.Create(T.Token, scPublic, T.Line, T.Column,
+                        iiPublicField, Com);
+                      F := R.Add(F) As TVBField;
+                      ProcessVar(F);
+                      If Token.TokenType In [ttLineEnd] Then
+                        NextNonCommentToken
+                      Else
+                        ErrorAndSeekToken(strLineEndExpected, 'Vars', Token.Token,
+                          strSeekTokens, stActual);
+                      {
                       If Token.UToken = 'AS' Then
                         Begin
                           NextNonCommentToken;
@@ -2876,10 +2920,12 @@ Begin
                         End Else
                           ErrorAndSeekToken(strLiteralExpected, 'Records',
                             'AS', strSeekTokens, stActual);
+                      }
                     End Else
                       ErrorAndSeekToken(strIdentExpected, 'Records',
                         Token.Token, strSeekTokens, stActual);
                 End;
+              Until False;
             End Else
               ErrorAndSeekToken(strLineEndExpected, 'Records', Token.Token,
                 strSeekTokens, stActual);
@@ -2900,6 +2946,139 @@ Begin
             strSeekTokens, stActual);
     End;
 End;
+
+(**
+
+  This method refernces symbols found in the code with respect to the variables,
+  constants and types.
+
+  @precon  None.
+  @postcon Refernces symbols found in the code with respect to the variables,
+           constants and types.
+
+  @param   AToken as a TTokenInfo
+  @return  a Boolean
+
+**)
+function TVBModule.ReferenceSymbol(AToken: TTokenInfo): Boolean;
+
+Var
+  i: Integer;
+  E: TElementContainer;
+  boolFound: Boolean;
+
+begin
+  Result := ReferenceSection(AToken, FVariablesLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(AToken, FConstantsLabel);
+  If Result Then
+    Exit;
+  Result := ReferenceSection(AToken, FTypesLabel);
+  If Result Then
+    Exit;
+  // Check Module Local Methods
+  boolFound := False;
+  E := FImplementedMethodsLabel;
+  If E <> Nil Then
+    For i := 1 To E.ElementCount Do
+      If AnsiCompareText(E[i].Identifier, AToken.Token) = 0 Then
+        Begin
+          E[i].Referenced := True;
+          AToken.Reference := trResolved;
+          boolFound := True;
+        End;
+  Result := boolFound;
+  If Result Then
+    Exit;
+end;
+
+(**
+
+  This method processes a variable declaration on a line.
+
+  @precon  Variable must be a value instance of a previous created variable
+           descendant.
+  @postcon Processes a variable declaration on a line.
+
+  @param   Variable as a TVBVar
+
+**)
+procedure TVBModule.ProcessVar(Variable: TVBVar);
+
+var
+  strHigh: string;
+  strLow: string;
+
+begin
+  if Token.Token = '(' then
+    begin
+      NextNonCommentToken;
+      if Token.Token <> ')' then
+        begin
+          repeat
+            if Token.TokenType in [ttIdentifier, ttNumber] then
+            begin
+              strLow := Token.Token;
+              strHigh := strLow;
+              NextNonCommentToken;
+              if Token.UToken = 'TO' then
+              begin
+                NextNonCommentToken;
+                if Token.TokenType in [ttIdentifier, ttNumber] then
+                begin
+                  strHigh := Token.Token;
+                  NextNonCommentToken;
+                end
+                else
+                  ErrorAndSeekToken(strNumberExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+              end;
+              Variable.AddDimension(strLow, strHigh);
+            end
+            else
+              ErrorAndSeekToken(strNumberExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+          until not IsToken(',', nil);
+          if Token.Token = ')' then
+            NextNonCommentToken
+          else
+            ErrorAndSeekToken(strLiteralExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+        end
+        else
+        begin
+          Variable.AddDimension('', '');
+          NextNonCommentToken;
+        end;
+    end;
+  if Token.UToken = 'AS' then
+  begin
+    NextNonCommentToken;
+    if Token.UToken = 'NEW' then
+      AddToExpression(Variable);
+    if Token.TokenType in [ttIdentifier, ttReservedWord] then
+    begin
+      ReferenceSymbol(Token);
+      AddToExpression(Variable);
+      if (PrevToken.UToken = 'STRING') and (Token.Token = '*') then
+      begin
+        AddToExpression(Variable);
+        if Token.TokenType in [ttNumber] then
+          AddToExpression(Variable)
+        else
+          ErrorAndSeekToken(strNumberExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+      end;
+    end
+    else
+      ErrorAndSeekToken(strIdentExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+    if Token.Token = '.' then
+    begin
+      AddToExpression(Variable);
+      if Token.TokenType in [ttIdentifier, ttReservedWord] then
+        AddToExpression(Variable)
+      else
+        ErrorAndSeekToken(strIdentExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+    end;
+  end;
+end;
 
 (**
 

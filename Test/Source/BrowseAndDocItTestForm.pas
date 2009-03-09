@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    06 Mar 2009
+  @Date    09 Mar 2009
   @Author  David Hoyle
 
 **)
@@ -795,6 +795,7 @@ begin
   FFileExcludeList.Free;
   FModuleExplorerFrame.Free;
   FProgressForm.Free;
+  lvDirectories.OnChange := Nil;
   FParseRecords.Free;
 end;
 
@@ -991,8 +992,7 @@ begin
           Item.SubItems[i] := Selected.SubItems[i];
           Selected.SubItems[i] := strText;
         End;
-      Item.Selected := True;
-      Selected := Item;
+      Selected := Nil;
     End;
 end;
 

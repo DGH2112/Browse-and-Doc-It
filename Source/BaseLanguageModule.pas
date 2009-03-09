@@ -3,9 +3,13 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    06 Mar 2009
+  @Date    09 Mar 2009
   @Version 1.0
   @Author  David Hoyle
+
+  @todo    Fix the problem with the width of the module explorer not being
+           correct for the syntax highlighted output.
+  @todo    Provide and option to Wrap the content of the module explorer.
 
 **)
 Unit BaseLanguageModule;
@@ -496,6 +500,9 @@ Type
       Overload; Virtual;
     Procedure AddToken(AToken : TTokenInfo); Overload; Virtual;
     Procedure AppendToken(AToken : TTokenInfo); Virtual;
+    Procedure InsertToken(strToken : String; iIndex : Integer;
+      ATokenType : TBADITokenType = ttUnknown);
+    Procedure DeleteToken(iIndex : Integer);
     Procedure ClearTokens;
     Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
       strDelimiter : String; iMaxWidth : Integer;
@@ -580,6 +587,7 @@ Type
     function GetTagCount: Integer;
     Procedure ParseComment(strComment : String);
     Procedure ResetTagMode;
+    Procedure TrimTrailingWhiteSpace;
   Public
     Constructor Create(srcComment : TComment); Overload;
     Constructor Create(strComment : String; iLine, iCol : Integer); Overload;
@@ -2604,7 +2612,34 @@ begin
   End;
 end;
 
-  { TBaseContainer }
+(**
+
+  This function outputs the comment or tag as a string missing out HTML tags if
+  not required and any trialing whitespace.
+
+  @precon  C must eb a valid instance of a TBaseContainer.
+  @postcon Outputs the comment or tag as a string missing out HTML tags if
+           not required and any trialing whitespace.
+
+  @param   C            as a TBaseContainer
+  @param   boolShowHTML as a Boolean
+  @return  a String      
+
+**)
+Function OutputCommentAndTag(C : TBaseContainer; boolShowHTML: Boolean) : String;
+
+Var
+  i: Integer;
+
+begin
+  Result := '';
+  For i := 0 To C.TokenCount - 1 Do
+    If ((C.Tokens[i].TokenType In [ttHTMLStartTag, ttHTMLEndTag]) And boolShowHTML) Or
+      Not (C.Tokens[i].TokenType In [ttHTMLStartTag, ttHTMLEndTag]) Then
+      Result := Result + C.Tokens[i].Token;
+end;
+
+{ TBaseContainer }
 
 (**
 
@@ -2775,6 +2810,21 @@ end;
 
 (**
 
+  This method deletes the indexed token from the token collection.
+
+  @precon  iIndex must be a valid index between 0 and TokenCount - 1.
+  @postcon Deletes the indexed token from the token collection.
+
+  @param   iIndex as an Integer
+
+**)
+procedure TBaseContainer.DeleteToken(iIndex: Integer);
+begin
+  FTokens.Delete(iIndex);
+end;
+
+(**
+
   This is a destructor for the TBaseContainer class.
 
   @precon  None.
@@ -2833,6 +2883,30 @@ end;
 function TBaseContainer.GetTokens(iIndex: Integer): TTokenInfo;
 begin
   Result := FTokens[iIndex] As TTokenInfo;
+end;
+
+(**
+
+  This method inserts a token at the given index in the token collection.
+
+  @precon  None.
+  @postcon Inserts a token at the given index in the token collection.
+
+  @param   strToken   as a String
+  @param   iIndex     as an Integer
+  @param   ATokenType as a TBADITokenType
+
+**)
+procedure TBaseContainer.InsertToken(strToken: String; iIndex: Integer;
+  ATokenType : TBADITokenType = ttUnknown);
+
+begin
+  If iIndex >= FTokens.Count Then
+    iIndex := FTokens.Count - 1;
+  If iIndex < 0 Then
+    iIndex := 0;
+  FTokens.Insert(iIndex, TTokenInfo.Create(strToken, 0, 0, 0,
+    Length(strToken), ATokenType));
 end;
 
 (**
@@ -2910,14 +2984,8 @@ end;
 **)
 function TTag.AsString(boolShowHTML : Boolean): String;
 
-Const
-  strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.'];
-  strNoSpaceAfter : TSymbols = ['(', '[', '{', '^'];
-  strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
-
 begin
-  Result := BuildStringRepresentation(False, False, '', 0, strNoSpaceBefore,
-    strNoSpaceAfter, strSpaceAfter, boolShowHTML)
+  Result := OutputCommentAndTag(Self, boolShowHTML);
 end;
 
 (** --------------------------------------------------------------------------
@@ -2949,9 +3017,14 @@ begin
       FTags.Add(FLastTag);
     End
   Else If Not FTagMode Then
-    AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), iType))
-  Else
-    FLastTag.AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), iType));
+    Begin
+      If Not ((iType = ttWhiteSpace) And (TokenCount = 0)) Then
+        AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), iType));
+    End Else
+    Begin
+      If Not ((iType = ttWhiteSpace) And (FLastTag.TokenCount = 0)) Then
+        FLastTag.AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), iType));
+    End;
 end;
 
 (**
@@ -3029,14 +3102,8 @@ end;
 **)
 function TComment.AsString(iMaxWidth: Integer; boolShowHTML : Boolean): String;
 
-Const
-  strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?'];
-  strNoSpaceAfter : TSymbols = ['(', '[', '{', '^'];
-  strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
-
 begin
-  Result := BuildStringRepresentation(False, True, '', iMaxWidth,
-    strNoSpaceBefore, strNoSpaceAfter,  strSpaceAfter, boolShowHTML);
+  Result := OutputCommentAndTag(Self, boolShowHTML);
 end;
 
 (**
@@ -3174,6 +3241,44 @@ end;
 
 (**
 
+  This method removes trailing white space tokens from the parsed comments and
+  tags.
+
+  @precon  None.
+  @postcon Removes trailing white space tokens from the parsed comments and
+           tags.
+
+**)
+procedure TComment.TrimTrailingWhiteSpace;
+
+Var
+  iToken : Integer;
+  iTag: Integer;
+
+begin
+  If TokenCount = 0 Then
+    Exit;
+  iToken := TokenCount - 1;
+  While Tokens[iToken].TokenType In [ttWhiteSpace] Do
+    Begin
+      DeleteToken(iToken);
+      Dec(iToken);
+    End;
+  For iTag := 0 To TagCount - 1 Do
+    Begin
+      If Tag[iTag].TokenCount = 0 Then
+        Continue;
+      iToken := Tag[iTag].TokenCount - 1;
+      While Tag[iTag].Tokens[iToken].TokenType In [ttWhiteSpace] Do
+        Begin
+          Tag[iTag].DeleteToken(iToken);
+          Dec(iToken);
+        End;
+    End;
+end;
+
+(**
+
   This method tries to find the given tag in the tag collection. It returns
   the index, else -1.
 
@@ -3226,6 +3331,7 @@ Var
   strToken : String;
   BlockType : TBlockType;
   iTokenLen : Integer;
+  LastTokenAdded: TBADITokenType;
 
 begin
   CurToken := ttUnknown;
@@ -3236,6 +3342,7 @@ begin
   BlockType := btNone;
   FTagLine := Line;
   FTagColumn := Column + 3;
+  LastTokenAdded := ttUnknown;
   For i := 1 To Length(strComment) Do
     Begin
       LastToken := CurToken;
@@ -3266,11 +3373,19 @@ begin
         Begin
           SetLength(strToken, iTokenLen);
           If iTokenLen > 0 Then
-            If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
+            Begin
+              If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
+                Begin
+                  AddToken(strToken, LastToken);
+                  LastTokenAdded := LastToken;
+                End
+              Else If Not (LastTokenAdded In [ttWhiteSpace, ttLineEnd]) Then
               Begin
-                AddToken(strToken, LastToken);
-                LastToken := CurToken;
+                AddToken(#32, ttWhiteSpace);
+                LastTokenAdded := ttWhiteSpace;
               End;
+              LastToken := CurToken;
+            End;
           iTokenLen := 1;
           SetLength(strToken, iTokenCapacity);
           strToken[iTokenLen] := strComment[i];
@@ -3310,10 +3425,11 @@ begin
     End;
   If (iTokenLen > 0) Then
     Begin
-     SetLength(strToken, iTokenLen);
+      SetLength(strToken, iTokenLen);
       If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
         AddToken(strToken, LastToken);
     End;
+  TrimTrailingWhitespace;
 end;
 
 (**
@@ -5463,12 +5579,8 @@ Begin
         With Comment Do
           Begin
             strType := '';
-            For j := 3 To Tag[iFound].TokenCount - 1 Do
-              Begin
-                If strType <> '' Then
-                  strType := strType + #32;
-                strType := strType + Tag[iFound].Tokens[j].Token;
-              End;
+            For j := 6 To Tag[iFound].TokenCount - 1 Do
+              strType := strType + Tag[iFound].Tokens[j].Token;
             strParam := BuildLangIndepRep(Parameters[i]);
             iLength := Length(strType);
             If Length(strParam) < iLength Then
@@ -5497,6 +5609,8 @@ Procedure TGenericMethodDecl.CheckMethodReturns;
 Var
   i, j, k : Integer;
   iFound : Integer;
+  strType : String;
+  strReturn : String;
 
 Begin
   iFound := -1;
@@ -5529,11 +5643,18 @@ Begin
         End Else
         Begin
           If doShowMethodIncorrectReturnType In BrowseAndDocItOptions.Options Then
-            If ((Comment.Tag[iFound].TokenCount < 2) Or
-              (AnsiCompareText(ReturnType.AsString(False, False), Comment.Tag[iFound].Tokens[1].Token) <> 0)) Then
-              AddDocumentConflict([QualifiedName, ReturnType.AsString(False, False)], Comment.Tag[iFound].Line,
-                Comment.Tag[iFound].Column, Comment,
-                DocConflictTable[dctMethodIncorrectReturntype]);
+            Begin
+              strType := '';
+              strReturn := '';
+              For i := 2 To Comment.Tag[iFound].TokenCount - 1 Do
+                strType := strType + Comment.Tag[iFound].Tokens[i].Token;
+              If ReturnType <> Nil Then
+                strReturn := ReturnType.AsString(False, False);
+              If AnsiCompareText(strReturn, strType) <> 0 Then
+                AddDocumentConflict([QualifiedName, strReturn],
+                  Comment.Tag[iFound].Line, Comment.Tag[iFound].Column, Comment,
+                  DocConflictTable[dctMethodIncorrectReturntype]);
+            End;
         End;
     End Else
       If Comment.FindTag('return') >= 0 Then
@@ -5688,8 +5809,8 @@ Begin
         With Comment Do
           Begin
             strType := '';
-            If Tag[iFound].TokenCount > 3 Then
-              strType := Tag[iFound].Tokens[3].Token;
+            For j := 6 To Tag[iFound].TokenCount - 1 Do
+              strType := strType + Tag[iFound].Tokens[j].Token;
             strParam := BuildLangIndepRep(Parameters[i]);
             iLength := Length(strType);
             If Length(strParam) < iLength Then
@@ -5717,6 +5838,8 @@ Procedure TGenericProperty.CheckPropertyReturns;
 Var
   i, j, k : Integer;
   iFound : Integer;
+  strType: String;
+  strReturn: String;
 
 Begin
   iFound := -1;
@@ -5750,11 +5873,19 @@ Begin
       End Else
       Begin
         If doShowPropertyIncorrectReturnType In BrowseAndDocItOptions.Options Then
-          If ((Comment.Tag[iFound].TokenCount < 2) Or
-            (AnsiCompareText(TypeId.AsString(False, False), Comment.Tag[iFound].Tokens[1].Token) <> 0)) Then
-            AddDocumentConflict([Identifier, TypeId.AsString(False, False)], Comment.Tag[iFound].Line,
-              Comment.Tag[iFound].Column, Comment,
-              DocConflictTable[dctPropertyIncorrectReturnType]);
+          If doShowMethodIncorrectReturnType In BrowseAndDocItOptions.Options Then
+            Begin
+              strType := '';
+              strReturn := '';
+              For i := 2 To Comment.Tag[iFound].TokenCount - 1 Do
+                strType := strType + Comment.Tag[iFound].Tokens[i].Token;
+              If TypeId <> Nil Then
+                strReturn := TypeId.AsString(False, False);
+              If AnsiCompareText(strReturn, strType) <> 0 Then
+                AddDocumentConflict([Identifier, strReturn],
+                  Comment.Tag[iFound].Line, Comment.Tag[iFound].Column, Comment,
+                  DocConflictTable[dctPropertyIncorrectReturnType]);
+            End;
       End;
   If doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options Then
     Begin

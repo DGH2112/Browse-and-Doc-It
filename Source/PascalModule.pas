@@ -3,8 +3,15 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       06 Mar 2009
+  @Date       09 Mar 2009
   @Author     David Hoyle
+
+  @todo       Implement $IF
+  @todo       Implement $ELSEIF
+  @todo       Implement $IFEND
+  @todo       Implement an expression parser for the above compiler defines.
+              Needs to be able to evaluate constants in the code and use the
+              two functions Defined() and Declared().
 
 **)
 Unit PascalModule;
@@ -4178,9 +4185,7 @@ begin
     Result := RecType(boolPacked, AToken);
   If Token.UToken = 'PACKED' Then
     Begin
-      //: @bug These types are all supposed to be packed!
-      //If Result Is TArrayType Then
-      //  (Result As TArrayType).Packed:= True;
+      Result.InsertToken(Token.Token, 0);
       NextNonCommentToken;
     End;
 end;

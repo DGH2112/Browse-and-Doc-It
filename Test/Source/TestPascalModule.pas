@@ -441,51 +441,51 @@ begin
   ReturnValue := TPascalComment.CreateComment(
     '(** Sorry Dave, I can''t do that! **)', 12, 23);
   Try
-    CheckEquals(10, ReturnValue.TokenCount);
+    CheckEquals(15, ReturnValue.TokenCount);
     CheckEquals('Sorry', ReturnValue.Tokens[0].Token);
-    CheckEquals('Dave', ReturnValue.Tokens[1].Token);
-    CheckEquals(',', ReturnValue.Tokens[2].Token);
-    CheckEquals('I', ReturnValue.Tokens[3].Token);
-    CheckEquals('can', ReturnValue.Tokens[4].Token);
-    CheckEquals('''', ReturnValue.Tokens[5].Token);
-    CheckEquals('t', ReturnValue.Tokens[6].Token);
-    CheckEquals('do', ReturnValue.Tokens[7].Token);
-    CheckEquals('that', ReturnValue.Tokens[8].Token);
-    CheckEquals('!', ReturnValue.Tokens[9].Token);
+    CheckEquals('Dave', ReturnValue.Tokens[2].Token);
+    CheckEquals(',', ReturnValue.Tokens[3].Token);
+    CheckEquals('I', ReturnValue.Tokens[5].Token);
+    CheckEquals('can', ReturnValue.Tokens[7].Token);
+    CheckEquals('''', ReturnValue.Tokens[8].Token);
+    CheckEquals('t', ReturnValue.Tokens[9].Token);
+    CheckEquals('do', ReturnValue.Tokens[11].Token);
+    CheckEquals('that', ReturnValue.Tokens[13].Token);
+    CheckEquals('!', ReturnValue.Tokens[14].Token);
   Finally
     ReturnValue.Free;
   End;
   ReturnValue := TPascalComment.CreateComment(
     '//: Sorry Dave, I can''t do that!', 12, 23);
   Try
-    CheckEquals(10, ReturnValue.TokenCount);
+    CheckEquals(15, ReturnValue.TokenCount);
     CheckEquals('Sorry', ReturnValue.Tokens[0].Token);
-    CheckEquals('Dave', ReturnValue.Tokens[1].Token);
-    CheckEquals(',', ReturnValue.Tokens[2].Token);
-    CheckEquals('I', ReturnValue.Tokens[3].Token);
-    CheckEquals('can', ReturnValue.Tokens[4].Token);
-    CheckEquals('''', ReturnValue.Tokens[5].Token);
-    CheckEquals('t', ReturnValue.Tokens[6].Token);
-    CheckEquals('do', ReturnValue.Tokens[7].Token);
-    CheckEquals('that', ReturnValue.Tokens[8].Token);
-    CheckEquals('!', ReturnValue.Tokens[9].Token);
+    CheckEquals('Dave', ReturnValue.Tokens[2].Token);
+    CheckEquals(',', ReturnValue.Tokens[3].Token);
+    CheckEquals('I', ReturnValue.Tokens[5].Token);
+    CheckEquals('can', ReturnValue.Tokens[7].Token);
+    CheckEquals('''', ReturnValue.Tokens[8].Token);
+    CheckEquals('t', ReturnValue.Tokens[9].Token);
+    CheckEquals('do', ReturnValue.Tokens[11].Token);
+    CheckEquals('that', ReturnValue.Tokens[13].Token);
+    CheckEquals('!', ReturnValue.Tokens[14].Token);
   Finally
     ReturnValue.Free;
   End;
   ReturnValue := TPascalComment.CreateComment(
     '{: Sorry Dave, I can''t do that! }', 12, 23);
   Try
-    CheckEquals(10, ReturnValue.TokenCount);
+    CheckEquals(15, ReturnValue.TokenCount);
     CheckEquals('Sorry', ReturnValue.Tokens[0].Token);
-    CheckEquals('Dave', ReturnValue.Tokens[1].Token);
-    CheckEquals(',', ReturnValue.Tokens[2].Token);
-    CheckEquals('I', ReturnValue.Tokens[3].Token);
-    CheckEquals('can', ReturnValue.Tokens[4].Token);
-    CheckEquals('''', ReturnValue.Tokens[5].Token);
-    CheckEquals('t', ReturnValue.Tokens[6].Token);
-    CheckEquals('do', ReturnValue.Tokens[7].Token);
-    CheckEquals('that', ReturnValue.Tokens[8].Token);
-    CheckEquals('!', ReturnValue.Tokens[9].Token);
+    CheckEquals('Dave', ReturnValue.Tokens[2].Token);
+    CheckEquals(',', ReturnValue.Tokens[3].Token);
+    CheckEquals('I', ReturnValue.Tokens[5].Token);
+    CheckEquals('can', ReturnValue.Tokens[7].Token);
+    CheckEquals('''', ReturnValue.Tokens[8].Token);
+    CheckEquals('t', ReturnValue.Tokens[9].Token);
+    CheckEquals('do', ReturnValue.Tokens[11].Token);
+    CheckEquals('that', ReturnValue.Tokens[13].Token);
+    CheckEquals('!', ReturnValue.Tokens[14].Token);
   Finally
     ReturnValue.Free;
   End;

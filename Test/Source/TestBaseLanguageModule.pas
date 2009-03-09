@@ -88,6 +88,7 @@ type
     procedure TestAssign1;
     procedure TestAsString;
     procedure TestFindTag;
+    Procedure TestFailure01;
   end;
 
   // Test methods for class TElementContainer
@@ -602,13 +603,14 @@ procedure TestTTag.TestAsString;
 
 begin
   FTag.AddToken('Hello', ttIdentifier);
+  FTag.AddToken(#32, ttWhiteSpace);
   FTag.AddToken('<b>', ttHTMLStartTag);
   FTag.AddToken('Dave', ttIdentifier);
   FTag.AddToken('</b>', ttHTMLEndTag);
   FTag.AddToken('.', ttSymbol);
-  CheckEquals(ttHTMLStartTag, FTag.Tokens[1].TokenType);
-  CheckEquals(ttHTMLEndTag, FTag.Tokens[3].TokenType);
-  CheckEquals(5, FTag.TokenCount);
+  CheckEquals(ttHTMLStartTag, FTag.Tokens[2].TokenType);
+  CheckEquals(ttHTMLEndTag, FTag.Tokens[4].TokenType);
+  CheckEquals(6, FTag.TokenCount);
   CheckEquals('Hello Dave.', FTag.AsString(False));
   CheckEquals('Hello <b>Dave</b>.', FTag.AsString(True));
 end;
@@ -645,19 +647,19 @@ end;
 
 procedure TestTComment.TestCreate;
 begin
-  CheckEquals(6, FComment.TokenCount);
+  CheckEquals(10, FComment.TokenCount);
   CheckEquals('This', FComment.Tokens[0].Token);
-  CheckEquals('method', FComment.Tokens[1].Token);
-  CheckEquals('does', FComment.Tokens[2].Token);
-  CheckEquals('something', FComment.Tokens[3].Token);
-  CheckEquals('wonderful', FComment.Tokens[4].Token);
-  CheckEquals('.', FComment.Tokens[5].Token);
+  CheckEquals('method', FComment.Tokens[2].Token);
+  CheckEquals('does', FComment.Tokens[4].Token);
+  CheckEquals('something', FComment.Tokens[6].Token);
+  CheckEquals('wonderful', FComment.Tokens[8].Token);
+  CheckEquals('.', FComment.Tokens[9].Token);
   CheckEquals(ttidentifier, FComment.Tokens[0].TokenType);
-  CheckEquals(ttidentifier, FComment.Tokens[1].TokenType);
   CheckEquals(ttidentifier, FComment.Tokens[2].TokenType);
-  CheckEquals(ttidentifier, FComment.Tokens[3].TokenType);
   CheckEquals(ttidentifier, FComment.Tokens[4].TokenType);
-  CheckEquals(ttSymbol, FComment.Tokens[5].TokenType);
+  CheckEquals(ttidentifier, FComment.Tokens[6].TokenType);
+  CheckEquals(ttidentifier, FComment.Tokens[8].TokenType);
+  CheckEquals(ttSymbol, FComment.Tokens[9].TokenType);
   CheckEquals('todo', FComment.Tag[0].TagName);
   CheckEquals('Requires implementing.', FComment.Tag[0].AsString(False));
   CheckEquals('see', FComment.Tag[1].TagName);
@@ -684,23 +686,23 @@ var
 begin
   ReturnValue := FComment.CreateComment(strComment, 12, 23);
   Try
-    CheckEquals(8, ReturnValue.TokenCount);
+    CheckEquals(12, ReturnValue.TokenCount);
     CheckEquals('This', ReturnValue.Tokens[0].Token);
-    CheckEquals('method', ReturnValue.Tokens[1].Token);
-    CheckEquals('does', ReturnValue.Tokens[2].Token);
-    CheckEquals('something', ReturnValue.Tokens[3].Token);
-    CheckEquals('<b>', ReturnValue.Tokens[4].Token);
-    CheckEquals('wonderful', ReturnValue.Tokens[5].Token);
-    CheckEquals('</b>', ReturnValue.Tokens[6].Token);
-    CheckEquals('.', ReturnValue.Tokens[7].Token);
+    CheckEquals('method', ReturnValue.Tokens[2].Token);
+    CheckEquals('does', ReturnValue.Tokens[4].Token);
+    CheckEquals('something', ReturnValue.Tokens[6].Token);
+    CheckEquals('<b>', ReturnValue.Tokens[8].Token);
+    CheckEquals('wonderful', ReturnValue.Tokens[9].Token);
+    CheckEquals('</b>', ReturnValue.Tokens[10].Token);
+    CheckEquals('.', ReturnValue.Tokens[11].Token);
     CheckEquals(ttidentifier, ReturnValue.Tokens[0].TokenType);
-    CheckEquals(ttidentifier, ReturnValue.Tokens[1].TokenType);
     CheckEquals(ttidentifier, ReturnValue.Tokens[2].TokenType);
-    CheckEquals(ttidentifier, ReturnValue.Tokens[3].TokenType);
-    CheckEquals(ttHTMLStartTag, ReturnValue.Tokens[4].TokenType);
-    CheckEquals(ttidentifier, ReturnValue.Tokens[5].TokenType);
-    CheckEquals(ttHTMLEndTag, ReturnValue.Tokens[6].TokenType);
-    CheckEquals(ttSymbol, ReturnValue.Tokens[7].TokenType);
+    CheckEquals(ttidentifier, ReturnValue.Tokens[4].TokenType);
+    CheckEquals(ttidentifier, ReturnValue.Tokens[6].TokenType);
+    CheckEquals(ttHTMLStartTag, ReturnValue.Tokens[8].TokenType);
+    CheckEquals(ttidentifier, ReturnValue.Tokens[9].TokenType);
+    CheckEquals(ttHTMLEndTag, ReturnValue.Tokens[10].TokenType);
+    CheckEquals(ttSymbol, ReturnValue.Tokens[11].TokenType);
     CheckEquals('todo', ReturnValue.Tag[0].TagName);
     CheckEquals('Requires implementing.', ReturnValue.Tag[0].AsString(False));
     CheckEquals('Requires <e>implementing</e>.', ReturnValue.Tag[0].AsString(True));
@@ -723,19 +725,19 @@ begin
   srcComment := TComment.Create(Nil);
   Try
     srcComment.Assign(FComment);
-    CheckEquals(6, srcComment.TokenCount);
+    CheckEquals(10, srcComment.TokenCount);
     CheckEquals('This', srcComment.Tokens[0].Token);
-    CheckEquals('method', srcComment.Tokens[1].Token);
-    CheckEquals('does', srcComment.Tokens[2].Token);
-    CheckEquals('something', srcComment.Tokens[3].Token);
-    CheckEquals('wonderful', srcComment.Tokens[4].Token);
-    CheckEquals('.', srcComment.Tokens[5].Token);
+    CheckEquals('method', srcComment.Tokens[2].Token);
+    CheckEquals('does', srcComment.Tokens[4].Token);
+    CheckEquals('something', srcComment.Tokens[6].Token);
+    CheckEquals('wonderful', srcComment.Tokens[8].Token);
+    CheckEquals('.', srcComment.Tokens[9].Token);
     CheckEquals(ttidentifier, srcComment.Tokens[0].TokenType);
-    CheckEquals(ttidentifier, srcComment.Tokens[1].TokenType);
     CheckEquals(ttidentifier, srcComment.Tokens[2].TokenType);
-    CheckEquals(ttidentifier, srcComment.Tokens[3].TokenType);
     CheckEquals(ttidentifier, srcComment.Tokens[4].TokenType);
-    CheckEquals(ttSymbol, srcComment.Tokens[5].TokenType);
+    CheckEquals(ttidentifier, srcComment.Tokens[6].TokenType);
+    CheckEquals(ttidentifier, srcComment.Tokens[8].TokenType);
+    CheckEquals(ttSymbol, srcComment.Tokens[9].TokenType);
     CheckEquals('todo', srcComment.Tag[0].TagName);
     CheckEquals('Requires implementing.', srcComment.Tag[0].AsString(False));
     CheckEquals('see', srcComment.Tag[1].TagName);
@@ -766,19 +768,19 @@ begin
   C := TComment.Create(Nil);
   Try
     C.Assign(strComment);
-    CheckEquals(6, C.TokenCount);
+    CheckEquals(10, C.TokenCount);
     CheckEquals('This', C.Tokens[0].Token);
-    CheckEquals('method', C.Tokens[1].Token);
-    CheckEquals('does', C.Tokens[2].Token);
-    CheckEquals('something', C.Tokens[3].Token);
-    CheckEquals('wonderful', C.Tokens[4].Token);
-    CheckEquals('.', C.Tokens[5].Token);
+    CheckEquals('method', C.Tokens[2].Token);
+    CheckEquals('does', C.Tokens[4].Token);
+    CheckEquals('something', C.Tokens[6].Token);
+    CheckEquals('wonderful', C.Tokens[8].Token);
+    CheckEquals('.', C.Tokens[9].Token);
     CheckEquals(ttidentifier, C.Tokens[0].TokenType);
-    CheckEquals(ttidentifier, C.Tokens[1].TokenType);
     CheckEquals(ttidentifier, C.Tokens[2].TokenType);
-    CheckEquals(ttidentifier, C.Tokens[3].TokenType);
     CheckEquals(ttidentifier, C.Tokens[4].TokenType);
-    CheckEquals(ttSymbol, C.Tokens[5].TokenType);
+    CheckEquals(ttidentifier, C.Tokens[6].TokenType);
+    CheckEquals(ttidentifier, C.Tokens[8].TokenType);
+    CheckEquals(ttSymbol, C.Tokens[9].TokenType);
     CheckEquals('todo', C.Tag[0].TagName);
     CheckEquals('Requires implementing.', C.Tag[0].AsString(False));
     CheckEquals('see', C.Tag[1].TagName);
@@ -796,6 +798,29 @@ procedure TestTComment.TestAsString;
 begin
   CheckEquals('This method does something wonderful.', FComment.AsString(80, False));
   CheckEquals('This method does something wonderful.', FComment.AsString(80, True));
+end;
+
+procedure TestTComment.TestFailure01;
+
+Var
+  C: TComment;
+
+begin
+  C := TComment.Create(
+    ' This is a comment.'#13#10 +
+    ''#13#10 +
+    '@todo This is the first todo item.'#13#10 +
+    '@todo This is the second todo item.'#13#10 +
+    '@todo This is the third todo item.'#13#10, 0, 0);
+  Try
+    CheckEquals(8, C.TokenCount);
+    CheckEquals(3, C.TagCount);
+    CheckEquals('This is the first todo item.', C.Tag[0].AsString(False));
+    CheckEquals('This is the second todo item.', C.Tag[1].AsString(False));
+    CheckEquals('This is the third todo item.', C.Tag[2].AsString(False));
+  Finally
+    C.Free;
+  End;
 end;
 
 procedure TestTComment.TestFindTag;

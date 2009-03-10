@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    19 Feb 2009
+  @Date    10 Mar 2009
   @Version 1.0
 
 **)
@@ -214,7 +214,7 @@ Const
   strAOrAn : Array[False..True] Of String = ('a', 'an');
   (** An array of parameter modifier phases. **)
   strModifier : Array[pamNone..pamOut] Of String = ('', ' as a reference',
-    ' constant', ' as out');
+    ' as a constant', ' as an out parameter');
   (** A list of vowels. **)
   strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
   (** A constant array of outputs for the ArrayOf property. **)
@@ -1476,7 +1476,7 @@ End;
   @precon  None.
   @postcon Initialises the wizard.
 
-  @param   BorlandIDEServices as an IBorlandIDEServices constant
+  @param   BorlandIDEServices as an IBorlandIDEServices as a constant
   @param   RegisterProc       as a TWizardRegisterProc
   @param   Terminate          as a TWizardTerminateProc as a reference
   @return  a Boolean
@@ -1872,7 +1872,7 @@ End;
   @precon  None.
   @postcon All the keybinding are bound.
 
-  @param   BindingServices as an IOTAKeyBindingServices constant
+  @param   BindingServices as an IOTAKeyBindingServices as a constant
 
 **)
 procedure TKeyboardBinding.BindKeyboard(
@@ -1996,7 +1996,7 @@ end;
   @precon  None.
   @postcon Displays a form containsing the tokens in the current editor.
 
-  @param   Context       as an IOTAKeyContext constant
+  @param   Context       as an IOTAKeyContext as a constant
   @param   KeyCode       as a TShortcut
   @param   BindingResult as a TKeyBindingResult as a reference
 
@@ -2066,7 +2066,7 @@ end;
   @precon  None.
   @postcon Asks the main wizard for focus the module explorer.
 
-  @param   Context       as an IOTAKeyContext constant
+  @param   Context       as an IOTAKeyContext as a constant
   @param   KeyCode       as a TShortcut
   @param   BindingResult as a TKeyBindingResult as a reference
 

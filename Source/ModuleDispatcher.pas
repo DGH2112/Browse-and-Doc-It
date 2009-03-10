@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    08 Feb 2009
+  @Date    10 Mar 2009
   @Version 1.0
 
 **)
@@ -18,6 +18,7 @@ Uses
   Function Dispatcher(Source : TStream; strFileName : String;
     boolModified : Boolean; ModuleOptions : TModuleOptions) : TBaseLanguageModule;
   Function CanParseDocument(strFileName : String) : Boolean;
+  Function CanDocumentDocument(strFileName : String) : Boolean;
 
   Implementation
 
@@ -30,19 +31,20 @@ Type
 
   (** A record to describe the file extensions and parser modules. **)
   TDispatcherInfo = Record
-    FExt : String;
-    FCls : TBaseLanguageModuleClass;
+    FExt    : String;
+    FCls    : TBaseLanguageModuleClass;
+    FCanDoc : Boolean;
   End;
 
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
   Modules : Array[1..6] of TDispatcherInfo = (
-    (FExt: '.bas'; FCls: TVBModule    ),
-    (FExt: '.cls'; FCls: TVBModule    ),
-    (FExt: '.dpk'; FCls: TPascalModule),
-    (FExt: '.dpr'; FCls: TPascalModule),
-    (FExt: '.frm'; FCls: TVBModule    ),
-    (FExt: '.pas'; FCls: TPascalModule)
+    (FExt: '.bas'; FCls: TVBModule    ; FCanDoc: True),
+    (FExt: '.cls'; FCls: TVBModule    ; FCanDoc: True),
+    (FExt: '.dpk'; FCls: TPascalModule; FCanDoc: True),
+    (FExt: '.dpr'; FCls: TPascalModule; FCanDoc: True),
+    (FExt: '.frm'; FCls: TVBModule    ; FCanDoc: True),
+    (FExt: '.pas'; FCls: TPascalModule; FCanDoc: True)
   );
 
 (**
@@ -112,6 +114,31 @@ Begin
   If iIndex > 0 Then
     Result := Modules[iIndex].FCls.CreateParser(Source, strFileName,
       boolModified, ModuleOptions);
+End;
+
+(**
+
+  This method determines if the document can be documented in HTML, RTF, etc,
+  i.e. your wouldn't document a code type that you only wish to browse, say
+  XML or HTML.
+
+  @precon  None.
+  @postcon Determines if the document can be documented in HTML, RTF, etc.
+
+  @param   strFileName as a String
+  @return  a Boolean    
+
+**)
+Function CanDocumentDocument(strFileName : String) : Boolean;
+
+Var
+  iIndex: Integer;
+
+Begin
+  Result := False;
+  iIndex := Find(ExtractFileExt(strFileName));
+  If iIndex  > 0 Then
+    Result := Modules[iIndex].FCanDoc;
 End;
 
 (**

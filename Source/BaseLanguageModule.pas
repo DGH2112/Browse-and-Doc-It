@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    09 Mar 2009
+  @Date    10 Mar 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -3605,7 +3605,7 @@ end;
   @postcon Adds a specific documentation conflict to the Docuemntation
            conflict collection.
 
-  @param   Args            as an Array Of Const
+  @param   Args            as an Array Of Const as a constant
   @param   iIdentLine      as an Integer
   @param   iIdentColumn    as an Integer
   @param   AComment        as a TComment
@@ -3799,7 +3799,7 @@ end;
   @precon  None.
   @postcon Recrusively checks the documentation of the module.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 procedure TElementContainer.CheckDocumentation(var boolCascade : Boolean);
@@ -4580,7 +4580,7 @@ end;
   @precon  None.
   @postcon Initialises the Conflict class.
 
-  @param   Args               as an Array Of Const
+  @param   Args               as an Array Of Const as a constant
   @param   iIdentLine         as an Integer
   @param   iIdentColumn       as an Integer
   @param   iCommentLine       as an Integer
@@ -5291,7 +5291,7 @@ End;
   @precon  Module is the module to check.
   @postcon The modules comment is checked for errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 Procedure TBaseLanguageModule.CheckDocumentation(var boolCascade : Boolean);
@@ -5304,8 +5304,7 @@ Var
 
 Begin
   For i := 0 To BrowseAndDocItOptions.ExcludeDocFiles.Count -1 Do
-    If Pos(Lowercase(BrowseAndDocItOptions.ExcludeDocFiles[i]),
-      Lowercase(FFileName)) > 0 Then
+    If Like(BrowseAndDocItOptions.ExcludeDocFiles[i], FFileName) Then
       Exit;
   If (Comment <> Nil) And (Comment.FindTag('stopdocumentation') >= 0) Then
     Begin
@@ -5374,7 +5373,7 @@ End;
            documentation.
   @postcon Checks the passed clause for documentation errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 Procedure TGenericTypeDecl.CheckDocumentation(var boolCascade : Boolean);
@@ -5397,7 +5396,7 @@ End;
            documentation.
   @postcon Checks the passed clause for documentation errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 Procedure TGenericConstant.CheckDocumentation(var boolCascade : Boolean);
@@ -5420,7 +5419,7 @@ End;
            documentation.
   @postcon Checks the passed clause for documentation errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 Procedure TGenericVariable.CheckDocumentation(var boolCascade : Boolean);
@@ -5444,7 +5443,7 @@ End;
            conflicts.
   @postcon The passed method is systematicaly check for errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 procedure TGenericMethodDecl.CheckDocumentation(var boolCascade : Boolean);
@@ -5555,7 +5554,6 @@ Var
   iFound : Integer;
   strType : String;
   strParam: String;
-  iLength: Integer;
 
 Begin
   For i := 0 To ParameterCount - 1 Do
@@ -5582,11 +5580,8 @@ Begin
             For j := 6 To Tag[iFound].TokenCount - 1 Do
               strType := strType + Tag[iFound].Tokens[j].Token;
             strParam := BuildLangIndepRep(Parameters[i]);
-            iLength := Length(strType);
-            If Length(strParam) < iLength Then
-              iLength := Length(strParam);
             If doShowMethodIncorrectParamType In BrowseAndDocItOptions.Options Then
-              If AnsiCompareText(Copy(strType, 1, iLength), Copy(strParam, 1, iLength)) <> 0 Then
+              If AnsiCompareText(strType, strParam) <> 0 Then
                 AddDocumentConflict([Parameters[i].Identifier, QualifiedName,
                   strParam], Tag[iFound].Line, Tag[iFound].Column, Comment,
                   DocConflictTable[dctMethodIncorrectParamType]);
@@ -5678,7 +5673,7 @@ End;
            is valid property declaration to be checked for documentation.
   @postcon Checks the passed property for errors in the docuemntation tags.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 procedure TGenericProperty.CheckDocumentation(var boolCascade: Boolean);
@@ -5785,7 +5780,6 @@ Var
   iFound : Integer;
   strType : String;
   strParam: String;
-  iLength: Integer;
 
 Begin
   For i := 0 To ParameterCount - 1 Do
@@ -5812,11 +5806,8 @@ Begin
             For j := 6 To Tag[iFound].TokenCount - 1 Do
               strType := strType + Tag[iFound].Tokens[j].Token;
             strParam := BuildLangIndepRep(Parameters[i]);
-            iLength := Length(strType);
-            If Length(strParam) < iLength Then
-              iLength := Length(strParam);
             If doShowPropertyIncorrectParamType In BrowseAndDocItOptions.Options Then
-              If AnsiCompareText(Copy(strType, 1, iLength), Copy(strParam, 1, iLength)) <> 0 Then
+              If AnsiCompareText(strType, strParam) <> 0 Then
                 AddDocumentConflict([Parameters[i].Identifier, QualifiedName,
                   strParam], Tag[iFound].Line, Tag[iFound].Column, Comment,
                   DocConflictTable[dctPropertyIncorrectParamType]);

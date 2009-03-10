@@ -3091,6 +3091,12 @@ Const
     'Begin'#13#10 +
     'End;'#13#10 +
     ''#13#10 +
+    'Function TMyClass.PSExecuteStatement(const ASQL: string; AParams: TParams;'#13#10 +
+    '  ResultSet: Pointer = nil): Integer;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
     'End.'#13#10;
 
 Var

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       09 Mar 2009
+  @Date       10 Mar 2009
   @Author     David Hoyle
 
   @todo       Implement $IF
@@ -2270,7 +2270,7 @@ end;
            implemented methods.
 
   @param   Container as a TElementContainer
-  @param   Method    as a TPascalMethod
+  @param   Method    as a TPascalMethod as a reference
 
 **)
 procedure TPascalModule.AddToContainer(Container: TElementContainer;
@@ -5533,7 +5533,7 @@ End;
            returns false
 
   @param   C as a TElementContainer
-  @param   ExprType as a TExprTypes
+  @param   ExprType as a TExprTypes as a reference
   @return  a Boolean
 
 **)
@@ -6930,6 +6930,7 @@ Begin
           Method.ReturnType := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
           ReferenceSymbol(Token);
           TypeId(Method.ReturnType);
+          ReferenceSymbol(Token);
         End Else
           ErrorAndSeekToken(strIdentExpected, 'CheckReturnValue',
             Token.Token, strSeekableOnErrorTokens, stActual);
@@ -8579,7 +8580,7 @@ End;
            documentation.
   @postcon Checks the passed clause for documentation errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 Procedure TResourceString.CheckDocumentation(var boolCascade : Boolean);
@@ -8599,7 +8600,7 @@ End;
            documentation.
   @postcon Checks the passed clause for documentation errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 Procedure TThreadVar.CheckDocumentation(var boolCascade : Boolean);
@@ -8619,7 +8620,7 @@ End;
            documentation.
   @postcon Checks the passed class for documentation errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
  **)
 Procedure TRecordDecl.CheckDocumentation(var boolCascade : Boolean);
@@ -8660,7 +8661,7 @@ end;
            documentation.
   @postcon Checks the passed class for documentation errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
  **)
 Procedure TObjectDecl.CheckDocumentation(var boolCascade : Boolean);
@@ -8684,7 +8685,7 @@ End;
            documentation.
   @postcon Checks the passed class for documentation errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
  **)
 Procedure TClassDecl.CheckDocumentation(var boolCascade : Boolean);
@@ -8741,7 +8742,7 @@ end;
            documentation.
   @postcon Checks the passed class for documentation errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
  **)
 Procedure TInterfaceDecl.CheckDocumentation(var boolCascade : Boolean);
@@ -8765,7 +8766,7 @@ End;
            documentation.
   @postcon Checks the passed class for documentation errors.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
  **)
 Procedure TDispInterfaceDecl.CheckDocumentation(var boolCascade : Boolean);
@@ -8788,7 +8789,7 @@ End;
   @precon  None.
   @postcon Check the module's initialisation sections for comments.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 Procedure TInitializationSection.CheckDocumentation(var boolCascade : Boolean);
@@ -8827,7 +8828,7 @@ end;
   @precon  None.
   @postcon Check the module's finalisation sections for comments.
 
-  @param   boolCascade as a Boolean
+  @param   boolCascade as a Boolean as a reference
 
 **)
 Procedure TFinalizationSection.CheckDocumentation(var boolCascade : Boolean);
@@ -9203,7 +9204,7 @@ procedure TPascalModule.FindUnresolvedObjectAndClassMethods(TypeLabel : TLabelCo
 
     This method determines if the method should have an implementation.
 
-    @precon  Method must be a valid TPascalMethod instance..
+    @precon  Method must be a valid TPascalMethod instance.
     @postcon Determines if the method should have an implementation.
 
     @param   Method as a TPascalMethod
@@ -9211,10 +9212,10 @@ procedure TPascalModule.FindUnresolvedObjectAndClassMethods(TypeLabel : TLabelCo
 
   **)
   Function ShouldMethodHaveImplementation(Method : TPascalMethod) : Boolean;
-  
+
   Begin
     Result := Not Method.Resolved;
-    Result := Result And Not Method.HasDirective('virtual');
+    Result := Result And Not Method.HasDirective('abstract');
     Result := Result And (Method.Alias = '');
   End;
 

@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    25 Jan 2009
+  @Date    11 Mar 2009
   @Version 1.0
 
 **)
@@ -171,10 +171,10 @@ begin
   FScopesToDocument := BrowseAndDocItOptions.ScopesToDocument + [scNone, scGlobal];
   FTitle := strTitle;
   FModuleSpecialTagNodes := TObjectList.Create(true);
-  For i := 1 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
+  For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
     FModuleSpecialTagNodes.Add(TStringList.Create);
   FSummarySpecialTagNodes := TObjectList.Create(true);
-  For i := 1 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
+  For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
     FSummarySpecialTagNodes.Add(TStringList.Create);
   FIndex := TStringList.Create;
   FErrors := TStringList.Create;
@@ -330,7 +330,7 @@ begin
       Begin
         iIns := FindInsertionPoint(FSummaryContent, '*$PERFCOUNTERS$');
         For i := 0 To FPerfCounters.Count - 1 Do
-          FPerfCounters[i] := '      <th>' + FPerfCounters[i] + '</th>';
+          FPerfCounters[i] := '              <th>' + FPerfCounters[i] + '</th>';
         FSummaryContent[iIns] := FPerfCounters.Text;
       End;
     GenerateHTML(slSummary, 'Summary');
@@ -901,6 +901,8 @@ Var
   strIndent : String;
   i : Integer;
   E : TElementContainer;
+  strName: String;
+  strIdent: String;
 
 Begin
   iIns := FindInsertionPoint(slHTMLFile, '*$SECTIONLIST$');
@@ -910,6 +912,15 @@ Begin
   Try
     sl.Add(strIndent + Format('<div class="Section">%s&nbsp;%s</div>', [
       IMG(iiModule, scNone), A('Module Overview', '#ModuleOverview')]));
+    For i := 0 To FModuleSpecialTagNodes.Count - 1 Do
+      If (FModuleSpecialTagNodes[i] As TStringList).Count > 0 Then
+        Begin
+          strName := BrowseAndDocItOptions.SpecialTags.Values[
+            BrowseAndDocItOptions.SpecialTags.Names[i]];
+          strIdent := BrowseAndDocItOptions.SpecialTags.Names[i];
+          sl.Add(strIndent + Format('<div class="Section">%s&nbsp;%s</div>', [
+            IMG(iiToDoFolder, scNone), A(strName, '#' + strIdent)]));
+        End;
     For i := 1 To FCurrentModule.ElementCount Do
       Begin
         E := FCurrentModule.Elements[i];
@@ -931,7 +942,6 @@ End;
   @precon  slContents must be a valid instance of a string list.
   @postcon Outputs special tags (todos, bugs, etc) to the html file as an
            unordered list.
-
 
   @param   slContents as a TStringList
 
@@ -969,8 +979,8 @@ begin
         Continue;
       strSection := BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i];
       slContents.Add(Format('<!-- %s -->', [strSection]));
-      slContents.Add(H(A(strSection, '', strSection), FHeaderLevel,
-        iiToDoFolder, scNone));
+      slContents.Add(H(A(strSection, '', BrowseAndDocItOptions.SpecialTags.Names[i]),
+        FHeaderLevel, iiToDoFolder, scNone));
       slContents.Add('<ul>');
       For j := 0 To sl.Count - 1 Do
         slContents.Add(#32#32 + LI('ToDoItem', N(sl[j])));
@@ -1577,7 +1587,7 @@ begin
         FSummaryContent.Add(Format('        <th>%s</th>', [SpecialTags.ValueFromIndex[i]]));
   With BrowseAndDocItOptions Do
     If doShowPrefCountersInDocSummary In Options Then
-      FSummaryContent.Add('        $PERFCOUNTERS$');
+      FSummaryContent.Add('$PERFCOUNTERS$');
   FSummaryContent.Add('      </tr>');
   FSummaryContent.Add('    </thead>');
   FSummaryContent.Add('    <tbody>');
@@ -1655,10 +1665,10 @@ Begin
         Try
           GenerateHTML(CurrentHTMLFile, ExtractFileName(strFileName));
           GenerateModuleList(CurrentHTMLFile);
-          GenerateSectionList(CurrentHTMLFile);
           FHeaderLevel := 1;
           FHTMLFileName := FOutputDirectory + ChangeFileExt(ExtractFileName(strFileName), '.html');
           GenerateContent(CurrentHTMLFile);
+          GenerateSectionList(CurrentHTMLFile);
           CurrentHTMLFile.SaveToFile(FHTMLFileName);
         Finally
           CurrentHTMLFile.Free;

@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    10 Mar 2009
+  @Date    11 Mar 2009
   @Version 1.0
 
 **)
@@ -352,13 +352,15 @@ Begin
   With mmiPascalDocMenu Do
     Caption := '&Browse and Doc It';
   mmiMainMenu.Items.Insert(mmiMainMenu.Items.Count - 2, mmiPascalDocMenu);
-  CreateMenuItem(mmiPascalDocMenu, 'Edi&tor', Focus,
-    Menus.ShortCut(Ord('E'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, 'Module &Explorer', ModuleExplorerClick,
     Menus.ShortCut(13, [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, '&Documentation', DocumentationClick,
     Menus.ShortCut(Ord('D'), [ssCtrl, ssShift, ssAlt]));
+  CreateMenuItem(mmiPascalDocMenu, 'D&Unit...', DUnitClick,
+    Menus.ShortCut(Ord('U'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu);
+  CreateMenuItem(mmiPascalDocMenu, 'Focus Edi&tor', Focus,
+    Menus.ShortCut(Ord('E'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Method Comment',
     InsertMethodCommentClick, Menus.ShortCut(Ord('M'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, 'Insert &Property Comment',
@@ -372,9 +374,6 @@ Begin
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, '&Options...', OptionsClick,
     Menus.ShortCut(Ord('O'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(mmiPascalDocMenu);
-  CreateMenuItem(mmiPascalDocMenu, 'D&Unit...', DUnitClick,
-    Menus.ShortCut(Ord('U'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, 'Check for &Updates...', CheckForUpdatesClick);
   FKeyBinding := 0;

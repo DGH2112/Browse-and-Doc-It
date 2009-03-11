@@ -3,13 +3,15 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    10 Mar 2009
+  @Date    11 Mar 2009
   @Version 1.0
   @Author  David Hoyle
 
   @todo    Fix the problem with the width of the module explorer not being
            correct for the syntax highlighted output.
   @todo    Provide and option to Wrap the content of the module explorer.
+  @bug     Comments for documentation errors are not breaking on new lines with
+           a # sign or handling @@ tokens for an actually @ sign.
 
 **)
 Unit BaseLanguageModule;

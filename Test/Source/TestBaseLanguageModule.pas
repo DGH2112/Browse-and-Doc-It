@@ -21,10 +21,10 @@ type
     Function FirstHint : String;
     Function DocConflict(iConflict : Integer) : String;
     Procedure DeleteDocumentConflicts;
+    Function HeadingCount(strHeading : String) : Integer;
   End;
 
   TBaseLanguageModuleHelper = Class Helper For TBaseLanguageModule
-    Function HeadingCount(strHeading : String) : Integer;
     Function CurrentToken : TTokenInfo;
   End;
 
@@ -434,7 +434,7 @@ begin
       #13#10, '(line-end)', [rfReplaceAll]);
 end;
 
-function TBaseLanguageModuleHelper.HeadingCount(strHeading : String): Integer;
+function TElementContainerHelper.HeadingCount(strHeading : String): Integer;
 
 var
   E: TElementContainer;

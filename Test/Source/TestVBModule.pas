@@ -88,9 +88,129 @@ type
     Procedure TestProperties;
     Procedure TestRecords;
     Procedure TestEnums;
+    Procedure TestGetComment;
+    Procedure TestCheckDocumentation;
     Procedure TestCombinations;
     Procedure TestFailure01;
     Procedure TestFailure02;
+    Procedure TestFailure03;
+  End;
+
+  //
+  // Test Class for the TVBComment Class Methods.
+  //
+  TestTVBComment = Class(TTestCase)
+  Strict Private
+  Public
+  Published
+    Procedure TestCreateComment;
+  End;
+
+  //
+  // Test Class for the TExceptionHandling Class Methods.
+  //
+  TestTExceptionHandling = Class(TExtendedTestCase)
+  Strict Private
+    FExceptionHandling : TExceptionHandling;
+  Public
+    Procedure SetUp; Override;
+    Procedure TearDown; Override;
+  Published
+    Procedure TestGetHasErrorHnd;
+    Procedure TestGetHasExit;
+    Procedure TestGetHasPop;
+    Procedure TestGetHasPush;
+    Procedure TestGetPushName;
+    Procedure TestGetPushParams;
+    Procedure TestSetHasErrorHnd;
+    Procedure TestSetHasExit;
+    Procedure TestSetHasPop;
+    Procedure TestSetHasPush;
+    Procedure TestSetPushName;
+  End;
+
+  //
+  // Test Class for the TVBEnumerateDecl Class Methods.
+  //
+  TestTVBEnumerateDecl = Class(TExtendedTestCase)
+  Strict Private
+    FVBEnumerateDecl : TVBEnumerateDecl;
+  Public
+    Procedure SetUp; Override;
+    Procedure TearDown; Override;
+  Published
+    Procedure TestCreate;
+    Procedure TestAsString;
+  End;
+
+  //
+  // Test Class for the TVBEnumIdent Class Methods.
+  //
+  TestTVBEnumIdent = Class(TExtendedTestCase)
+  Strict Private
+    FVBEnumIdent : TVBEnumIdent;
+  Public
+    Procedure SetUp; Override;
+    Procedure TearDown; Override;
+  Published
+    Procedure TestCreate;
+    Procedure TestAsString;
+  End;
+
+  //
+  // Test Class for the TVBField Class Methods.
+  //
+  TestTVBField = Class(TExtendedTestCase)
+  Strict Private
+    FVBField : TVBField;
+  Public
+    Procedure SetUp; Override;
+    Procedure TearDown; Override;
+  Published
+    Procedure TestCreate;
+    Procedure TestAsString;
+  End;
+
+  //
+  // Test Class for the TVBOption Class Methods.
+  //
+  TestTVBOption = Class(TExtendedTestCase)
+  Strict Private
+    FVBOption : TVBOption;
+  Public
+    Procedure SetUp; Override;
+    Procedure TearDown; Override;
+  Published
+    Procedure TestCreate;
+    Procedure TestAsString;
+  End;
+
+  //
+  // Test Class for the TVBVersion Class Methods.
+  //
+  TestTVBVersion = Class(TExtendedTestCase)
+  Strict Private
+    FVBVersion : TVBVersion;
+  Public
+    Procedure SetUp; Override;
+    Procedure TearDown; Override;
+  Published
+    Procedure TestCreate;
+    Procedure TestAsString;
+  End;
+
+  //
+  // Test Class for the TVBAttribute Class Methods.
+  //
+  TestTVBAttribute = Class(TExtendedTestCase)
+  Strict Private
+    FVBAttribute : TVBAttribute;
+  Public
+    Procedure SetUp; Override;
+    Procedure TearDown; Override;
+  Published
+    Procedure TestCreate;
+    Procedure TestAsString;
   End;
 
 implementation
@@ -587,6 +707,471 @@ begin
   End;
 end;
 
+procedure TestTVBModule.TestCheckDocumentation;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      ''''#13#10 +
+      ''' This is a module comment.'#13#10 +
+      ''''#13#10 +
+      ''' @author David Hoyle'#13#10 +
+      ''' @version 1.0'#13#10 +
+      ''' @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      Check(M.Comment = Nil, 'Module Comment is NOT NIL!');
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''':'#13#10 +
+      ''' This is a module comment.'#13#10 +
+      ''''#13#10 +
+      ''' @author David Hoyle'#13#10 +
+      ''' @version 1.0'#13#10 +
+      ''' @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module Comment is NOT NIL!');
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals('1) This module has no document comment.', M.DocConflict(1));
+      CheckEquals('', M.Comment.AsString(9999, True));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''':'#13#10 +
+      ''': This is a module comment.'#13#10 +
+      ''''#13#10 +
+      ''' @author David Hoyle'#13#10 +
+      ''' @version 1.0'#13#10 +
+      ''' @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module Comment is NOT NIL!');
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals('This is a module comment.', M.Comment.AsString(9999, True));
+      CheckEquals('1) This module is missing a documentation date (''' + FormatDateTime('dd mmm yyyy', Now) + ''').', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''':'#13#10 +
+      ''': This is a module comment.'#13#10 +
+      ''':'#13#10 +
+      ''' @author David Hoyle'#13#10 +
+      ''' @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module Comment is NOT NIL!');
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals('This is a module comment.', M.Comment.AsString(9999, True));
+      CheckEquals('1) This module is missing a documentation version.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''':'#13#10 +
+      ''': This is a module comment.'#13#10 +
+      ''':'#13#10 +
+      ''' @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module Comment is NOT NIL!');
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals('This is a module comment.', M.Comment.AsString(9999, True));
+      CheckEquals('1) This module is missing a documentation author.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''':'#13#10 +
+      ''': This is a module comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module Comment is NOT NIL!');
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      'private const iCAPACITY AS Long = 1'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Constant ''iCAPACITY'' is undocumented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''' This is a standard comment.'#13#10 +
+      'private const iCAPACITY AS Long = 1'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Constant ''iCAPACITY'' is undocumented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''': This is a document comment.'#13#10 +
+      'private const iCAPACITY AS Long = 1'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      'private iCAPACITY AS Long'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Variable ''iCAPACITY'' is undocumented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''' This is a standard comment.'#13#10 +
+      'private iCAPACITY AS Long'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Variable ''iCAPACITY'' is undocumented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''': This is a document comment.'#13#10 +
+      'private iCAPACITY AS Long'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      'private type TMyType'#13#10 +
+      'end Type'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Type ''TMyType'' is undocumented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''' This is a standard comment.'#13#10 +
+      'private type TMyType'#13#10 +
+      'end Type'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Type ''TMyType'' is undocumented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''': This is a document comment.'#13#10 +
+      'private type TMyType'#13#10 +
+      'end Type'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      'private enum TMyType'#13#10 +
+      'end enum'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Type ''TMyType'' is undocumented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''' This is a standard comment.'#13#10 +
+      'private enum TMyType'#13#10 +
+      'end enum'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Type ''TMyType'' is undocumented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''': This is a document comment.'#13#10 +
+      'private enum TMyType'#13#10 +
+      'end enum'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      'function MyFunction(iParam As Long) As Boolean'#13#10 +
+      'end function'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Method ''MyFunction'' has not been documented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''' This is a standard comment.'#13#10 +
+      ''' @precon  None.'#13#10 +
+      ''' @Postcon None.'#13#10 +
+      ''' @param  iParam as a Long'#13#10 +
+      ''' @return a Boolean'#13#10 +
+      'function MyFunction(iParam As Long) As Boolean'#13#10 +
+      'end function'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Method ''MyFunction'' has not been documented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''': This is a standard comment.'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''': @param  iParam as a Long'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      'function MyFunction(iParam As Long) As Boolean'#13#10 +
+      'end function'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      'property get MyProperty(iParam As Long) As Boolean'#13#10 +
+      'end property'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Property ''MyProperty'' has not been documented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''' This is a standard comment.'#13#10 +
+      ''' @precon  None.'#13#10 +
+      ''' @Postcon None.'#13#10 +
+      ''' @param  iParam as a Long'#13#10 +
+      ''' @return a Boolean'#13#10 +
+      'property get MyProperty(iParam As Long) As Boolean'#13#10 +
+      'end property'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals('1) Property ''MyProperty'' has not been documented.', M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment.'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10 +
+      ''': This is a standard comment.'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''': @param  iParam as a Long'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      'property get MyProperty(iParam As Long) As Boolean'#13#10 +
+      'end property'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
 procedure TestTVBModule.TestCombinations;
 
 Var
@@ -614,10 +1199,10 @@ begin
       'Attribute VB_PredeclaredId = True'#13#10 +
       'Attribute VB_Exposed = False'#13#10 +
       ''#13#10 +
-      ''''#13#10 +
-      ''' Hello'#13#10 +
-      ''' @Something Else'#13#10 +
-      ''''#13#10 +
+      ''':'#13#10 +
+      ''': Hello'#13#10 +
+      ''': @Something Else'#13#10 +
+      ''':'#13#10 +
       'Option Explicit'#13#10 +
       'Option Compare Text'#13#10 +
       'Option Private Module'#13#10;
@@ -639,15 +1224,16 @@ begin
       CheckEquals('VERSION 5.00', M.FindElement(strVersionLabel).Elements[1].AsString(True, False));
       CheckEquals('ClientTop = 435', M.FindElement(strVersionLabel).Elements[1].Elements[1].Elements[4].AsString(True, False));
       CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[2].AsString(True, False));
+      Check(M.Comment <> Nil, 'Module Comment is NULL!');
     Finally
       M.Free;
     End;
     strCode :=
       ''#13#10 +
-      ''''#13#10 +
-      ''' Hello'#13#10 +
-      ''' @Something Else'#13#10 +
-      ''''#13#10 +
+      ''''''#13#10 +
+      ''''' Hello'#13#10 +
+      ''''' @Something Else'#13#10 +
+      ''''''#13#10 +
       'Option Explicit'#13#10 +
       'Option Compare Text'#13#10 +
       'Option Private Module'#13#10;
@@ -656,14 +1242,12 @@ begin
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
-
       CheckEquals(0, M.HeadingCount(strVersionLabel));
       CheckEquals(0, M.HeadingCount(strAttributesLabel));
       CheckEquals(3, M.HeadingCount(strOptionsLabel));
-
       CheckEquals(scNone, M.FindElement(strOptionsLabel).Elements[2].Scope);
-
       CheckEquals('Explicit', M.FindElement(strOptionsLabel).Elements[2].AsString(True, False));
+      Check(M.Comment <> Nil, 'Module Comment is NULL!');
     Finally
       M.Free;
     End;
@@ -1067,6 +1651,95 @@ Begin
   End;
 end;
 
+procedure TestTVBModule.TestFailure03;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+  I: TElementContainer;
+  F: TElementContainer;
+  C: TComment;
+  boolCascade: Boolean;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      'VERSION 5.00'#13#10 +
+      'Option Compare Text'#13#10 +
+      'Option Explicit'#13#10 +
+      ''#13#10 +
+      ''':'#13#10 +
+      ''': This is a method comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''':'#13#10 +
+      ''': @param  iParam as a Long as a Reference'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      ''':'#13#10 +
+      'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
+      'End Function'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      I := M.FindElement(strImplementedMethodsLabel);
+      Check(I <> Nil, 'Implemented Methods is NULL!');
+      F := I.FindElement('MyMethod', ftIdentifier);
+      Check(F <> Nil, 'MyMethod is NULL!');
+      C := F.Comment;
+      Check(C <> Nil, 'MyMethod.Comment is NULL!');
+      If F is TVBMethod Then
+        (F As TVBMethod).CheckDocumentation(boolCascade);
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      'VERSION 5.00'#13#10 +
+      'Option Compare Text'#13#10 +
+      'Option Explicit'#13#10 +
+      ''#13#10 +
+      ''''''#13#10 +
+      ''''' This is a method comment.'#13#10 +
+      ''''''#13#10 +
+      ''''' @precon  None.'#13#10 +
+      ''''' @postcon None.'#13#10 +
+      ''''''#13#10 +
+      ''''' @param  iParam as a Long as a Reference'#13#10 +
+      ''''' @return a Boolean'#13#10 +
+      ''''''#13#10 +
+      'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
+      'End Function'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      I := M.FindElement(strImplementedMethodsLabel);
+      Check(I <> Nil, 'Implemented Methods is NULL!');
+      F := I.FindElement('MyMethod', ftIdentifier);
+      Check(F <> Nil, 'MyMethod is NULL!');
+      C := F.Comment;
+      Check(C <> Nil, 'MyMethod.Comment is NULL!');
+      If F is TVBMethod Then
+        (F As TVBMethod).CheckDocumentation(boolCascade);
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
 procedure TestTVBModule.TestFunctions;
 
 Var
@@ -1180,6 +1853,42 @@ begin
       CheckEquals('Function Test1(i As msforms.long, str As String) As Long', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
       CheckEquals('Function Test2(i As msforms.long) As Long', M.FindElement(strImplementedMethodsLabel).Elements[2].AsString(True, False));
       CheckEquals('Function Test3(Optional i As Long = 0) As Long', M.FindElement(strImplementedMethodsLabel).Elements[3].AsString(True, False));
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestGetComment;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      ''':'#13#10 +
+      ''': This is a module comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @author David Hoyle'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
+      Check(M.Comment <> Nil, 'Module Comment is NIL!');
+      CheckEquals('This is a module comment.', M.Comment.AsString(9999, True));
+      CheckEquals('David Hoyle', M.Comment.Tag[0].AsString(True));
+      CheckEquals('1.0', M.Comment.Tag[1].AsString(True));
+      CheckEquals(FormatDateTime('dd mmm yyyy', Now), M.Comment.Tag[2].AsString(True));
     Finally
       M.Free;
     End;
@@ -1793,6 +2502,357 @@ begin
   End;
 end;
 
+//
+// Test methods for the class TVBComment.
+//
+Procedure TestTVBComment.TestCreateComment;
+
+Var
+  C: TComment;
+
+Begin
+  C := TVBComment.CreateComment('', 0, 0);
+  Try
+    Check(C = Nil, 'Comment is not NULL!');
+  Finally
+    C.Free;
+  End;
+  C := TVBComment.CreateComment(''' This is a standard VB Comment.', 0, 0);
+  Try
+    Check(C = Nil, 'Comment is not NULL!');
+  Finally
+    C.Free;
+  End;
+  C := TVBComment.CreateComment(''''' This is a standard VB Comment.', 0, 0);
+  Try
+    Check(C <> Nil, 'Comment is NULL!');
+    CheckEquals('This is a standard VB Comment.', C.AsString(9999, True));
+  Finally
+    C.Free;
+  End;
+  C := TVBComment.CreateComment(''': This is a standard VB Comment.', 0, 0);
+  Try
+    Check(C <> Nil, 'Comment is NULL!');
+    CheckEquals('This is a standard VB Comment.', C.AsString(9999, True));
+  Finally
+    C.Free;
+  End;
+  C := TVBComment.CreateComment(
+    ''': This is a standard VB Comment.'#13#10 +
+    ''': @todo Hello Dave.'#13#10, 0, 0);
+  Try
+    Check(C <> Nil, 'Comment is NULL!');
+    CheckEquals('This is a standard VB Comment.', C.AsString(9999, True));
+    CheckEquals(1, C.TagCount);
+    CheckEquals('Hello Dave.', C.Tag[0].AsString(True)); 
+  Finally
+    C.Free;
+  End;
+End;
+
+//
+// Test methods for the class TExceptionHandling.
+//
+Procedure TestTExceptionHandling.Setup;
+
+Begin
+  FExceptionHandling := TExceptionHandling.Create;
+End;
+
+Procedure TestTExceptionHandling.TearDown;
+
+Begin
+  FExceptionHandling.Free;
+End;
+
+Procedure TestTExceptionHandling.TestGetHasErrorHnd;
+
+Begin
+  CheckEquals(False, FExceptionHandling.GetHasErrorHnd);
+  FExceptionHandling.SetHasErrorHnd(True);
+  CheckEquals(True, FExceptionHandling.GetHasErrorHnd);
+End;
+
+Procedure TestTExceptionHandling.TestGetHasExit;
+
+Begin
+  CheckEquals(False, FExceptionHandling.GetHasExit);
+  FExceptionHandling.SetHasExit(True);
+  CheckEquals(True, FExceptionHandling.GetHasExit);
+End;
+
+Procedure TestTExceptionHandling.TestGetHasPop;
+
+Begin
+  CheckEquals(False, FExceptionHandling.GetHasPop);
+  FExceptionHandling.SetHasPop(True);
+  CheckEquals(True, FExceptionHandling.GetHasPop);
+End;
+
+Procedure TestTExceptionHandling.TestGetHasPush;
+
+Begin
+  CheckEquals(False, FExceptionHandling.GetHasPush);
+  FExceptionHandling.SetHasPush(True);
+  CheckEquals(True, FExceptionHandling.GetHasPush);
+End;
+
+Procedure TestTExceptionHandling.TestGetPushName;
+
+Begin
+  CheckEquals('', FExceptionHandling.GetPushName);
+  FExceptionHandling.SetPushName('MyPushName');
+  CheckEquals('MyPushName', FExceptionHandling.GetPushName);
+End;
+
+Procedure TestTExceptionHandling.TestGetPushParams;
+
+Begin
+  CheckEquals(0, FExceptionHandling.GetPushParams.Count);
+  FExceptionHandling.GetPushParams.Add('Hello');
+  CheckEquals(1, FExceptionHandling.GetPushParams.Count);
+End;
+
+Procedure TestTExceptionHandling.TestSetHasErrorHnd;
+
+Begin
+  CheckEquals(False, FExceptionHandling.GetHasErrorHnd);
+  FExceptionHandling.SetHasErrorHnd(True);
+  CheckEquals(True, FExceptionHandling.GetHasErrorHnd);
+End;
+
+Procedure TestTExceptionHandling.TestSetHasExit;
+
+Begin
+  CheckEquals(False, FExceptionHandling.GetHasExit);
+  FExceptionHandling.SetHasExit(True);
+  CheckEquals(True, FExceptionHandling.GetHasExit);
+End;
+
+Procedure TestTExceptionHandling.TestSetHasPop;
+
+Begin
+  CheckEquals(False, FExceptionHandling.GetHasPop);
+  FExceptionHandling.SetHasPop(True);
+  CheckEquals(True, FExceptionHandling.GetHasPop);
+End;
+
+Procedure TestTExceptionHandling.TestSetHasPush;
+
+Begin
+  CheckEquals(False, FExceptionHandling.GetHasPush);
+  FExceptionHandling.SetHasPush(True);
+  CheckEquals(True, FExceptionHandling.GetHasPush);
+End;
+
+Procedure TestTExceptionHandling.TestSetPushName;
+
+Begin
+  CheckEquals('', FExceptionHandling.GetPushName);
+  FExceptionHandling.SetPushName('MyPushName');
+  CheckEquals('MyPushName', FExceptionHandling.GetPushName);
+End;
+
+//
+// Test methods for the class TVBEnumerateDecl.
+//
+Procedure TestTVBEnumerateDecl.Setup;
+
+Begin
+  FVBEnumerateDecl := TVBEnumerateDecl.Create('MyEnumerate', scPrivate, 12, 23,
+    iiPublicType, Nil);
+End;
+
+Procedure TestTVBEnumerateDecl.TearDown;
+
+Begin
+  FVBEnumerateDecl.Free;
+End;
+
+Procedure TestTVBEnumerateDecl.TestAsString;
+
+Begin
+  CheckEquals('Enum MyEnumerate', FVBEnumerateDecl.AsString(true, True));
+End;
+
+procedure TestTVBEnumerateDecl.TestCreate;
+begin
+  CheckEquals('MyEnumerate', FVBEnumerateDecl.Identifier);
+  CheckEquals(scPrivate, FVBEnumerateDecl.Scope);
+  CheckEquals(12, FVBEnumerateDecl.Line);
+  CheckEquals(23, FVBEnumerateDecl.Column);
+  CheckEquals(iiPrivateType, FVBEnumerateDecl.ImageIndexAdjustedForScope);
+  Check(Nil = FVBEnumerateDecl.Comment);
+end;
+
+//
+// Test methods for the class TVBEnumIdent.
+//
+Procedure TestTVBEnumIdent.Setup;
+
+Begin
+  FVBEnumIdent := TVBEnumIdent.Create('MyEnumIdent', scPublic, 12, 23,
+    iiUsesItem, Nil);
+End;
+
+Procedure TestTVBEnumIdent.TearDown;
+
+Begin
+  FVBEnumIdent.Free;
+End;
+
+Procedure TestTVBEnumIdent.TestAsString;
+
+Begin
+  CheckEquals('MyEnumIdent', FVBEnumIdent.AsString(true, True));
+  FVBEnumIdent.AddToken('1');
+  CheckEquals('MyEnumIdent = 1', FVBEnumIdent.AsString(true, True));
+End;
+
+procedure TestTVBEnumIdent.TestCreate;
+begin
+  CheckEquals('MyEnumIdent', FVBEnumIdent.Identifier);
+  CheckEquals(scPublic, FVBEnumIdent.Scope);
+  CheckEquals(12, FVBEnumIdent.Line);
+  CheckEquals(23, FVBEnumIdent.Column);
+  CheckEquals(iiUsesItem, FVBEnumIdent.ImageIndexAdjustedForScope);
+  Check(Nil = FVBEnumIdent.Comment);
+end;
+
+//
+// Test methods for the class TVBField.
+//
+Procedure TestTVBField.Setup;
+
+Begin
+  FVBField := TVBField.Create('MyField', scPublic, 12, 23, iiPublicField, Nil);
+End;
+
+Procedure TestTVBField.TearDown;
+
+Begin
+  FVBField.Free;
+End;
+
+Procedure TestTVBField.TestAsString;
+
+Begin
+  CheckEquals('MyField', FVBField.AsString(True, True));
+  FVBField.AddToken('Long');
+  CheckEquals('MyField As Long', FVBField.AsString(True, True));
+End;
+
+procedure TestTVBField.TestCreate;
+begin
+  CheckEquals('MyField', FVBField.Identifier);
+  CheckEquals(scPublic, FVBField.Scope);
+  CheckEquals(12, FVBField.Line);
+  CheckEquals(23, FVBField.Column);
+  CheckEquals(iiPublicField, FVBField.ImageIndexAdjustedForScope);
+  Check(Nil = FVBField.Comment);
+end;
+
+//
+// Test methods for the class TVBOption.
+//
+Procedure TestTVBOption.Setup;
+
+Begin
+  FVBOption := TVBOption.Create('Option', scNone, 12, 23, iiUsesItem, Nil);
+End;
+
+Procedure TestTVBOption.TearDown;
+
+Begin
+  FVBOption.Free;
+End;
+
+Procedure TestTVBOption.TestAsString;
+
+Begin
+  CheckEquals('Option', FVBOption.AsString(True, True));
+End;
+
+procedure TestTVBOption.TestCreate;
+begin
+  CheckEquals('Option', FVBOption.Identifier);
+  CheckEquals(scNone, FVBOption.Scope);
+  CheckEquals(12, FVBOption.Line);
+  CheckEquals(23, FVBOption.Column);
+  CheckEquals(iiUsesItem, FVBOption.ImageIndexAdjustedForScope);
+  Check(Nil = FVBOption.Comment);
+end;
+
+//
+// Test methods for the class TVBVersion.
+//
+Procedure TestTVBVersion.Setup;
+
+Begin
+  FVBVersion := TVBVersion.Create('Version', scPublic, 12, 23, iiUsesItem, Nil);
+End;
+
+Procedure TestTVBVersion.TearDown;
+
+Begin
+  FVBVersion.Free;
+End;
+
+Procedure TestTVBVersion.TestAsString;
+
+Begin
+  CheckEquals('Version', FVBVersion.AsString(True, True));
+  FVBVersion.AddToken('1.0');
+  FVBVersion.AddToken('Class');
+  CheckEquals('Version 1.0 Class', FVBVersion.AsString(True, True));
+End;
+
+procedure TestTVBVersion.TestCreate;
+begin
+  CheckEquals('Version', FVBVersion.Identifier);
+  CheckEquals(scPublic, FVBVersion.Scope);
+  CheckEquals(12, FVBVersion.Line);
+  CheckEquals(23, FVBVersion.Column);
+  CheckEquals(iiUsesItem, FVBVersion.ImageIndexAdjustedForScope);
+  Check(Nil = FVBVersion.Comment);
+end;
+
+//
+// Test methods for the class TVBAttribute.
+//
+Procedure TestTVBAttribute.Setup;
+
+Begin
+  FVBAttribute := TVBAttribute.Create('Attribute', scPublic, 12, 23, iiUsesItem,
+    Nil);
+End;
+
+Procedure TestTVBAttribute.TearDown;
+
+Begin
+  FVBAttribute.Free;
+End;
+
+Procedure TestTVBAttribute.TestAsString;
+
+Begin
+  CheckEquals('Attribute', FVBAttribute.AsString(True, True));
+  FVBAttribute.AddToken('iThing');
+  FVBAttribute.AddToken('=');
+  FVBAttribute.AddToken('1');
+  CheckEquals('Attribute iThing = 1', FVBAttribute.AsString(True, True));
+End;
+
+procedure TestTVBAttribute.TestCreate;
+begin
+  CheckEquals('Attribute', FVBAttribute.Identifier);
+  CheckEquals(scPublic, FVBAttribute.Scope);
+  CheckEquals(12, FVBAttribute.Line);
+  CheckEquals(23, FVBAttribute.Column);
+  CheckEquals(iiUsesItem, FVBAttribute.ImageIndexAdjustedForScope);
+  Check(Nil = FVBAttribute.Comment);
+end;
+
 initialization
   // Register any test cases with the test runner
   RegisterTest('VB Module Tests', TestTVBParameter.Suite);
@@ -1803,5 +2863,13 @@ initialization
   RegisterTest('VB Module Tests', TestTVBRecordDecl.Suite);
   RegisterTest('VB Module Tests', TestTVBTypeDecl.Suite);
   RegisterTest('VB Module Tests', TestTVBModule.Suite);
+  RegisterTest('VB Module Tests', TestTVBComment.Suite);
+  RegisterTest('VB Module Tests', TestTExceptionHandling.Suite);
+  RegisterTest('VB Module Tests', TestTVBEnumerateDecl.Suite);
+  RegisterTest('VB Module Tests', TestTVBEnumIdent.Suite);
+  RegisterTest('VB Module Tests', TestTVBField.Suite);
+  RegisterTest('VB Module Tests', TestTVBOption.Suite);
+  RegisterTest('VB Module Tests', TestTVBVersion.Suite);
+  RegisterTest('VB Module Tests', TestTVBAttribute.Suite);
 End.
 

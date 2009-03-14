@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    11 Mar 2009
+  @Date    14 Mar 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -3713,6 +3713,11 @@ Var
   iCount : Integer;
 
 begin
+  Case ErrorType Of
+    etHint   : If Not (doShowHints In BrowseAndDocItOptions.Options) Then Exit;
+    etWarning: If Not (doShowWarnings In BrowseAndDocItOptions.Options) Then Exit;
+    etError  : If Not (doShowErrors In BrowseAndDocItOptions.Options) Then Exit;
+  End;
   I := FindRoot.Add(recIssues[ErrorType].FFolder,
     recIssues[ErrorType].FFolderImage, scNone, Nil);
   iCount := I.ElementCount;
@@ -5305,6 +5310,8 @@ Var
   Tag : TTag;
 
 Begin
+  If Not (doShowConflicts In BrowseAndDocItOptions.Options) Then
+    Exit;
   For i := 0 To BrowseAndDocItOptions.ExcludeDocFiles.Count -1 Do
     If Like(BrowseAndDocItOptions.ExcludeDocFiles[i], FFileName) Then
       Exit;

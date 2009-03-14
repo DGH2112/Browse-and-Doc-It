@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       09 Mar 2009
+  @Date       11 Mar 2009
   @Author     David Hoyle
 
 **)
@@ -458,9 +458,38 @@ ResourceString
 **)
 class function TVBComment.CreateComment(strComment: String; iLine,
   iCol: Integer): TComment;
+
+Var
+  sl : TStringList;
+  iCommentLine : Integer;
+  boolDocComment: Boolean;
+
 begin
-  Result := Inherited Create(StringReplace(strComment, '''', '', [rfReplaceAll]),
-    iLine, iCol);
+  Result := Nil;
+  boolDocComment := False;
+  If Length(strComment) > 0 Then
+    Begin
+      sl := TStringList.Create;
+      Try
+        sl.Text := strComment;
+        For iCommentLine := sl.Count - 1 DownTo 0 Do
+          Begin
+            If sl[iCommentLine][1] = '''' Then
+              sl[iCommentLine] := Copy(sl[iCommentLine], 2, Length(sl[iCommentLine]) - 1);
+            If Length(sl[iCommentLine]) > 0 Then
+              If (sl[iCommentLine][1] In [':', '''']) Then
+                Begin
+                  boolDocComment := True;
+                  sl[iCommentLine] := Copy(sl[iCommentLine], 2, Length(sl[iCommentLine]) - 1);
+                End Else
+                  sl.Delete(iCommentLine);
+          End;
+        If boolDocComment Then
+          Result := Create(sl.Text, iLine, iCol);
+      Finally
+        sl.Free;
+      End;
+    End;
 end;
 
 { TExceptionHandling }
@@ -1690,14 +1719,15 @@ begin
     Methods[3] := Options;
     Methods[4] := Declarations;
     For iMethod := Low(Methods) To High(Methods) Do
-      If  Not EndOfTokens Then
-        Begin
-          If Comment = Nil Then
-            Comment := GetComment;
-          If Methods[iMethod] Then
-            While Not EndOfTokens And (Token.TokenType In [ttLineEnd]) Do
-              NextNonCommentToken;
-        End;
+      Begin
+        If Comment = Nil Then
+          Comment := GetComment;
+        If EndOfTokens Then
+          Break;
+        If Methods[iMethod] Then
+          While Not EndOfTokens And (Token.TokenType In [ttLineEnd]) Do
+            NextNonCommentToken;
+      End;
   Except
     On E : EParserAbort Do
       AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);

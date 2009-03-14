@@ -91,6 +91,7 @@ type
     Procedure TestGetComment;
     Procedure TestCheckDocumentation;
     Procedure TestCombinations;
+    Procedure TestDisablers;
     Procedure TestFailure01;
     Procedure TestFailure02;
     Procedure TestFailure03;
@@ -1485,6 +1486,53 @@ begin
       CheckEquals(scPrivate, M.FindElement(strDeclaresLabel).Elements[2].Scope);
       CheckEquals('Function Test1 Lib "Kernal32" Alias "TestA" () As Long', M.FindElement(strDeclaresLabel).Elements[1].AsString(True, False));
       CheckEquals('Function Test2 Lib "Kernal32" Alias "TestA" (i As Long) As String', M.FindElement(strDeclaresLabel).Elements[2].AsString(True, False));
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestDisablers;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      'option compare text'#13#10 +
+      ''': @noerror'#13#10 +
+      ''': @noexception'#13#10 +
+      'sub mysub(iParam as Long)'#13#10 +
+      'end sub'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': @noerror'#13#10 +
+      ''': @noexception'#13#10 +
+      'option compare text'#13#10 +
+      'sub mysub(iParam as Long)'#13#10 +
+      'end sub'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstError);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
     Finally
       M.Free;
     End;

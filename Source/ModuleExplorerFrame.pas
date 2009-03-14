@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    25 Feb 2009
+  @Date    14 Mar 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -163,6 +163,14 @@ type
     tbtnHints: TToolButton;
     tbtnMethods: TToolButton;
     tbtnProperties: TToolButton;
+    tbtnSep2: TToolButton;
+    tbtnSep3: TToolButton;
+    tbtnConstants: TToolButton;
+    tbtnVariables: TToolButton;
+    tbtnTypes: TToolButton;
+    actConstants: TAction;
+    actVariables: TAction;
+    actTypes: TAction;
     procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure tvExplorerClick(Sender: TObject);
@@ -1270,7 +1278,19 @@ begin
     Else If Sender = actMethods Then
       UpdateOptions(doShowMethodMissingDocs)
     Else If Sender = actProperties Then
-      UpdateOptions(doShowPropertyMissingDoc);
+      UpdateOptions(doShowPropertyMissingDoc)
+    Else If Sender = actConstants Then
+      UpdateOptions(doShowUndocumentedConsts)
+    Else If Sender = actVariables Then
+      UpdateOptions(doShowUndocumentedVars)
+    Else If Sender = actTypes Then
+      Begin
+        UpdateOptions(doShowUndocumentedTypes);
+        UpdateOptions(doShowUndocumentedRecords);
+        UpdateOptions(doShowUndocumentedObjects);
+        UpdateOptions(doShowUndocumentedClasses);
+        UpdateOptions(doShowUndocumentedInterfaces);
+      End;
   If Assigned(FRefresh) Then
     FRefresh(Sender);
 end;
@@ -1312,7 +1332,13 @@ begin
   Else If Sender = actMethods Then
     (Sender As TAction).Checked := doShowMethodMissingDocs In BrowseAndDocItOptions.Options
   Else If Sender = actProperties Then
-    (Sender As TAction).Checked := doShowPropertyMissingDoc In BrowseAndDocItOptions.Options;
+    (Sender As TAction).Checked := doShowPropertyMissingDoc In BrowseAndDocItOptions.Options
+  Else If Sender = actConstants Then
+    (Sender As TAction).Checked := doShowUndocumentedConsts In BrowseAndDocItOptions.Options
+  Else If Sender = actVariables Then
+    (Sender As TAction).Checked := doShowUndocumentedVars In BrowseAndDocItOptions.Options
+  Else If Sender = actTypes Then
+    (Sender As TAction).Checked := doShowUndocumentedTypes In BrowseAndDocItOptions.Options
 end;
 
 (**

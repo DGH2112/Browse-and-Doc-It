@@ -17,8 +17,6 @@ object frameModuleExplorer: TframeModuleExplorer
     Width = 360
     Height = 19
     Panels = <>
-    ExplicitTop = 344
-    ExplicitWidth = 293
   end
   object tbrExplorerScope: TToolBar
     Left = 0
@@ -32,7 +30,6 @@ object frameModuleExplorer: TframeModuleExplorer
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
-    ExplicitWidth = 293
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
@@ -160,8 +157,6 @@ object frameModuleExplorer: TframeModuleExplorer
     OnGetImageIndex = tvExplorerGetImageIndex
     OnKeyPress = tvExplorerKeyPress
     OnMouseMove = tvExplorerMouseMove
-    ExplicitWidth = 293
-    ExplicitHeight = 326
     Columns = <>
   end
   object ilScopeImages: TImageList
@@ -174,7 +169,7 @@ object frameModuleExplorer: TframeModuleExplorer
     Left = 103
     Top = 36
     Bitmap = {
-      494C01011000130004000C000C00FFFFFFFFFF00FFFFFFFFFFFFFFFF424D3600
+      494C01011000130004000C000C00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000300000003C0000000100200000000000002D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -553,7 +548,8 @@ object frameModuleExplorer: TframeModuleExplorer
       C07801800FFF0000FFFFFFFFFFFF0000807FFFFFFFFF0000807F03F07FFF0000
       807F03F07FFF000087FF03F0FFFF000087FF03F07F9F000087FF03F0FF0F0000
       87FE03E07F0F000087FC03C03F9F000087FC07C03FFF000087FE07E07FFF0000
-      87FF0FF0FFFF0000FFFFFFFFFFFF0000}
+      87FF0FF0FFFF0000FFFFFFFFFFFF000000000000000000000000000000000000
+      000000000000}
   end
   object alToolbar: TActionList
     Images = ilToolbar

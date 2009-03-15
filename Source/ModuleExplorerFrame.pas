@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    14 Mar 2009
+  @Date    15 Mar 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -494,7 +494,7 @@ Begin
                         Font.Style := [];
                         Font.Color := clMaroon;
                         R := Rect(10, R.Top, Width - 2, Height);
-                        str := FComment.Tag[j].AsString(False);
+                        str := FComment.Tag[j].AsString(MaxInt, False);
                         Inc(R.Top, DrawText(Canvas.Handle, PChar(str), -1, R,
                           DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
                           DrawTextBiDiModeFlagsReadingOnly));
@@ -600,7 +600,7 @@ Begin
                     Refresh;
                     Canvas.Font.Style := [];
                     R := Rect(Result.Left + 2, 0, Result.Right - 12, 0);
-                    str := Comment.Tag[j].AsString(False);
+                    str := Comment.Tag[j].AsString(MaxInt, False);
                     Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(str), -1, R,
                       DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
                       DrawTextBiDiModeFlagsReadingOnly) + 2);
@@ -761,7 +761,7 @@ Begin
         For k := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
           If FSpecialTagNodes[k].boolShow Then
             If AnsiCompareText(Tag[j].TagName, FSpecialTagNodes[k].strTagName) = 0 Then
-              AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(False), 2, 
+              AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(MaxInt, False), 2, 
                 Integer(iiToDoItem) - 1, M.BodyComment[i].Tag[j].Line,
                 M.BodyComment[i].Tag[j].Column, Nil);
 End;

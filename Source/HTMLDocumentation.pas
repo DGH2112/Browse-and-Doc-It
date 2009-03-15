@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    11 Mar 2009
+  @Date    15 Mar 2009
   @Version 1.0
 
 **)
@@ -968,9 +968,9 @@ begin
               Begin
                 (FSummarySpecialTagNodes[k] As TStringList).Add(
                   Format('%s=%s', [ExtractFileName(FCurrentModule.FileName),
-                  Tag[j].AsString(False)]));
+                  Tag[j].AsString(MaxInt, False)]));
                 (FModuleSpecialTagNodes[k] As TStringList).Add(
-                  Tag[j].AsString(False));
+                  Tag[j].AsString(MaxInt, False));
               End;
   For i := 0 To FModuleSpecialTagNodes.Count - 1 Do
     Begin

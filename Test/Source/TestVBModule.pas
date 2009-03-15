@@ -1933,10 +1933,10 @@ begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
       CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
       Check(M.Comment <> Nil, 'Module Comment is NIL!');
-      CheckEquals('This is a module comment.', M.Comment.AsString(9999, True));
-      CheckEquals('David Hoyle', M.Comment.Tag[0].AsString(True));
-      CheckEquals('1.0', M.Comment.Tag[1].AsString(True));
-      CheckEquals(FormatDateTime('dd mmm yyyy', Now), M.Comment.Tag[2].AsString(True));
+      CheckEquals('This is a module comment.', M.Comment.AsString(80, True));
+      CheckEquals('David Hoyle', M.Comment.Tag[0].AsString(80, True));
+      CheckEquals('1.0', M.Comment.Tag[1].AsString(80, True));
+      CheckEquals(FormatDateTime('dd mmm yyyy', Now), M.Comment.Tag[2].AsString(80, True));
     Finally
       M.Free;
     End;
@@ -2592,7 +2592,7 @@ Begin
     Check(C <> Nil, 'Comment is NULL!');
     CheckEquals('This is a standard VB Comment.', C.AsString(9999, True));
     CheckEquals(1, C.TagCount);
-    CheckEquals('Hello Dave.', C.Tag[0].AsString(True)); 
+    CheckEquals('Hello Dave.', C.Tag[0].AsString(80, True)); 
   Finally
     C.Free;
   End;

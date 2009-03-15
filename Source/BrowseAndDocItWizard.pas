@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    11 Mar 2009
+  @Date    15 Mar 2009
   @Version 1.0
 
 **)
@@ -290,8 +290,8 @@ End;
 Function Indent(strText : String; iIndent : Integer) : String;
 
 Begin
-  Result := StringOfChar(#32, iIndent) + {StringReplace(strText, #13#10,
-    #13#10 + StringOfChar(#32, iIndent), [rfReplaceAll])} strText;
+  Result := StringOfChar(#32, iIndent) + StringReplace(strText, #13#10,
+    #13#10 + StringOfChar(#32, iIndent), [rfReplaceAll]);
 End;
 
 {procedure TBrowseAndDocItWizard.AfterCompile(Succeeded: Boolean);
@@ -1071,11 +1071,11 @@ Begin
   str := Format('%s@%-8s', [StringOfChar(#32, iIndent), Tag.TagName]);
   For  i := 0 To Tag.TokenCount - 1 Do
     If Length(str + Tag.Tokens[i].Token) < 80 Then
-      str := str + Tag.Tokens[i].Token + #32
+      str := str + Tag.Tokens[i].Token
     Else
       Begin
         Result := Result + str;
-        str := #13#10 + StringOfChar(#32, iIndent + 9) + Tag.Tokens[i].Token + #32;
+        str := #13#10 + StringOfChar(#32, iIndent + 9) + Tag.Tokens[i].Token;
       End;
   Result := Result + str + #13#10;
 End;

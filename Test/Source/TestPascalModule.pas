@@ -452,6 +452,7 @@ begin
     CheckEquals('do', ReturnValue.Tokens[11].Token);
     CheckEquals('that', ReturnValue.Tokens[13].Token);
     CheckEquals('!', ReturnValue.Tokens[14].Token);
+    CheckEquals('Sorry Dave, I can''t do that!', ReturnValue.AsString(999, True));
   Finally
     ReturnValue.Free;
   End;
@@ -469,6 +470,7 @@ begin
     CheckEquals('do', ReturnValue.Tokens[11].Token);
     CheckEquals('that', ReturnValue.Tokens[13].Token);
     CheckEquals('!', ReturnValue.Tokens[14].Token);
+    CheckEquals('Sorry Dave, I can''t do that!', ReturnValue.AsString(999, True));
   Finally
     ReturnValue.Free;
   End;
@@ -486,6 +488,7 @@ begin
     CheckEquals('do', ReturnValue.Tokens[11].Token);
     CheckEquals('that', ReturnValue.Tokens[13].Token);
     CheckEquals('!', ReturnValue.Tokens[14].Token);
+    CheckEquals('Sorry Dave, I can''t do that!', ReturnValue.AsString(999, True));
   Finally
     ReturnValue.Free;
   End;

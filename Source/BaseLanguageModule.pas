@@ -3,15 +3,13 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    14 Mar 2009
+  @Date    15 Mar 2009
   @Version 1.0
   @Author  David Hoyle
 
   @todo    Fix the problem with the width of the module explorer not being
            correct for the syntax highlighted output.
   @todo    Provide and option to Wrap the content of the module explorer.
-  @bug     Comments for documentation errors are not breaking on new lines with
-           a # sign or handling @@ tokens for an actually @ sign.
 
 **)
 Unit BaseLanguageModule;
@@ -566,7 +564,7 @@ Type
   Public
     Constructor Create(strName : String; iLine, iColumn : Integer); Overload;
     Destructor Destroy; Override;
-    Function AsString(boolShowHTML : Boolean) : String;
+    Function AsString(iMaxWidth : Integer; boolShowHTML : Boolean) : String;
     (**
       Returns the tag name as a string.
       @precon  None.
@@ -1850,7 +1848,7 @@ ResourceString
     'section should have a description which should provide information to ' +
     'future developers regarding the purpose of the method. # #In addition to ' +
     'the descrition each method should have a pre-condition statement ' +
-    '(@precon) and a post-condition statement (@postcon). # #Along with these ' +
+    '(@@precon) and a post-condition statement (@@postcon). # #Along with these ' +
     'there should be a list of the parameters and any return types.';
   (** Document conflict message for missing method description. **)
   strMethodHasNoDesc = 'Method ''%s'' has no description.';
@@ -1909,7 +1907,7 @@ ResourceString
   strMethodTooManyPreCons = 'Method ''%s'' has too many pre-condition tags.';
   (** Document conflict message description for too many pre-condition tag. **)
   strMethodTooManyPreConsDesc = 'The method comment has too many pre-condition ' +
-    'tags (@precon).';
+    'tags (@@precon).';
 
   (** A documentation message for missing postcondition text. **)
   strMethodPostConNotDocumented = 'A post-condition in method ''%s'' is not ' +
@@ -1929,7 +1927,7 @@ ResourceString
   strMethodTooManyPostCons = 'Method ''%s'' has too many post-condition tags.';
   (** Document conflict message description for too many post-condition tag. **)
   strMethodTooManyPostConsDesc = 'The method comment has too many post-condition ' +
-    'tags (@postcon).';
+    'tags (@@postcon).';
 
   (** Label for Property Documentation Conflicts **)
   strPropertyDocumentation = 'Property Documentation';
@@ -1940,7 +1938,7 @@ ResourceString
     'interface should have a description which should provide information to ' +
     'future developers regarding the purpose of the property. # #In addition to ' +
     'the descrition each property should have a pre-condition statement ' +
-    '(@precon) and a post-condition statement (@postcon). # #Along with these ' +
+    '(@@precon) and a post-condition statement (@@postcon). # #Along with these ' +
     'there should be a list of the parameters and any return types.';
   (** Document conflict message for missing property description. **)
   strPropertyHasNoDesc = 'Property ''%s'' has no description.';
@@ -1994,7 +1992,7 @@ ResourceString
   strPropertyTooManyPreCons = 'Property ''%s'' has too many pre-condition tags.';
   (** Document conflict message description for too many pre-condition tag. **)
   strPropertyTooManyPreConsDesc = 'The property comment has too many pre-condition ' +
-    'tags (@precon).';
+    'tags (@@precon).';
 
   (** A documentation message for missing postcondition text. **)
   strPropertyPostConNotDocumented = 'A post-condition in Property ''%s'' is not documented.';
@@ -2013,7 +2011,7 @@ ResourceString
   strPropertyTooManyPostCons = 'Property ''%s'' has too many post-condition tags.';
   (** Document conflict message description for too many post-condition tag. **)
   strPropertyTooManyPostConsDesc = 'The property comment has too many post-condition ' +
-    'tags (@postcon).';
+    'tags (@@postcon).';
 
   (** Label for Finalization Documentation Conflicts **)
   strModuleInitSection = 'Module Initialization Section';
@@ -2616,29 +2614,56 @@ end;
 
 (**
 
-  This function outputs the comment or tag as a string missing out HTML tags if
+  This function outputs the comment or tag as a string missing out HTML tags if 
   not required and any trialing whitespace.
 
   @precon  C must eb a valid instance of a TBaseContainer.
-  @postcon Outputs the comment or tag as a string missing out HTML tags if
-           not required and any trialing whitespace.
+  @postcon Outputs the comment or tag as a string missing out HTML tags if not 
+           required and any trialing whitespace.
 
   @param   C            as a TBaseContainer
+  @param   iMaxWidth    as an Integer
   @param   boolShowHTML as a Boolean
   @return  a String      
 
 **)
-Function OutputCommentAndTag(C : TBaseContainer; boolShowHTML: Boolean) : String;
+Function OutputCommentAndTag(C : TBaseContainer; iMaxWidth : Integer;
+  boolShowHTML: Boolean) : String;
 
 Var
-  i: Integer;
+  iToken: Integer;
+  iLength : Integer;
+  strToken: String;
 
 begin
   Result := '';
-  For i := 0 To C.TokenCount - 1 Do
-    If ((C.Tokens[i].TokenType In [ttHTMLStartTag, ttHTMLEndTag]) And boolShowHTML) Or
-      Not (C.Tokens[i].TokenType In [ttHTMLStartTag, ttHTMLEndTag]) Then
-      Result := Result + C.Tokens[i].Token;
+  iLength := 0;
+  For iToken := 0 To C.TokenCount - 1 Do
+    If ((C.Tokens[iToken].TokenType In [ttHTMLStartTag, ttHTMLEndTag]) And boolShowHTML) Or
+      Not (C.Tokens[iToken].TokenType In [ttHTMLStartTag, ttHTMLEndTag]) Then
+      Begin
+        If iLength + C.Tokens[iToken].Length > iMaxWidth Then
+          Begin
+            Result := Result + #13#10;
+            iLength := 0;
+          End;
+        If Not ((iLength = 0) And (C.Tokens[iToken].TokenType In [ttWhiteSpace])) Then
+          Begin
+            If C.Tokens[iToken].Token = '#' Then
+              Begin
+                iLength := 0;
+                Result := Result + #13#10;
+              End Else
+              Begin
+                strToken := C.Tokens[iToken].Token;
+                If (Length(strToken) >= 2) And (strToken[1] = '@') And
+                  (strToken[2] = '@') Then
+                  strToken := Copy(strToken, 2, Length(strToken) - 1);
+                Result := Result + strToken;
+              End;
+          End;
+        Inc(iLength, C.Tokens[iToken].Length);
+      End;
 end;
 
 { TBaseContainer }
@@ -2976,18 +3001,19 @@ end;
 
   This method returns all the tags tokens as a string with spaces in between.
 
-  @precon  ShowHTML determines of the routine output the HTML tags in the
+  @precon  ShowHTML determines of the routine output the HTML tags in the 
            resulting string.
   @postcon Returns a string representation of the tag.
 
+  @param   iMaxWidth    as an Integer
   @param   boolShowHTML as a Boolean
-  @return  a String
+  @return  a String      
 
 **)
-function TTag.AsString(boolShowHTML : Boolean): String;
+function TTag.AsString(iMaxWidth : Integer; boolShowHTML : Boolean): String;
 
 begin
-  Result := OutputCommentAndTag(Self, boolShowHTML);
+  Result := OutputCommentAndTag(Self, iMaxWidth, boolShowHTML);
 end;
 
 (** --------------------------------------------------------------------------
@@ -3105,7 +3131,7 @@ end;
 function TComment.AsString(iMaxWidth: Integer; boolShowHTML : Boolean): String;
 
 begin
-  Result := OutputCommentAndTag(Self, boolShowHTML);
+  Result := OutputCommentAndTag(Self, iMaxWidth, boolShowHTML);
 end;
 
 (**
@@ -3365,7 +3391,7 @@ begin
         End
       Else If strComment[i] In strLineEnd Then
         CurToken := ttLineEnd
-      Else If strComment[i] In [#33..#128] - ['a'..'z', 'A'..'Z', '@'] Then
+      Else If strComment[i] In [#33..#128] - ['a'..'z', 'A'..'Z', '@', '#'] Then
         CurToken := ttSymbol
       Else
         CurToken := ttUnknown;
@@ -5336,7 +5362,7 @@ Begin
           Else
             Begin
               Tag := Comment.Tag[i];
-              strDate := Tag.AsString(False);
+              strDate := Tag.AsString(80, False);
               If Modified Then
                 dtFileDate := Now
               Else

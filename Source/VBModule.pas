@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       11 Mar 2009
+  @Date       16 Mar 2009
   @Author     David Hoyle
 
 **)
@@ -359,6 +359,8 @@ ResourceString
   strOptionsLabel = 'Options';
   (** A label for declared functions and procedures. **)
   strDeclaresLabel = 'Declarations';
+  (** A label for implemented properties. **)
+  strImplementedPropertiesLabel = 'Imeplemented Properties';
 
 Implementation
 
@@ -1679,11 +1681,12 @@ begin
       If iToken <= -1 Then
         Break;
       T := Tokens[iToken] As TTokenInfo;
-      iLine := T.Line;
-      iColumn := T.Column;
       If T.TokenType = ttComment Then
         Begin
-          If strComment <> '' Then strComment := #13#10 + strComment;
+          iLine := T.Line;
+          iColumn := T.Column;
+          If strComment <> '' Then
+            strComment := #13#10 + strComment;
           strComment := T.Token + strComment;
         End Else
           Break;
@@ -2839,7 +2842,7 @@ Begin
           P := TVBProperty.Create(pt, Token.Token, Scope, Token.Line,
             Token.Column, iiPublicProperty, C);
           If FImplementedPropertiesLabel = Nil Then
-            FImplementedPropertiesLabel := Add(TLabelContainer.Create(strPropertiesLabel,
+            FImplementedPropertiesLabel := Add(TLabelContainer.Create(strImplementedPropertiesLabel,
               scNone, 0, 0, iiPropertiesLabel, Nil)) As TLabelContainer;
           P := FImplementedPropertiesLabel.Add(P) As TVBProperty;
           NextNonCommentToken;

@@ -1937,6 +1937,8 @@ begin
       CheckEquals('David Hoyle', M.Comment.Tag[0].AsString(80, True));
       CheckEquals('1.0', M.Comment.Tag[1].AsString(80, True));
       CheckEquals(FormatDateTime('dd mmm yyyy', Now), M.Comment.Tag[2].AsString(80, True));
+      Checkequals(1, M.Comment.Line);
+      Checkequals(1, M.Comment.Column);
     Finally
       M.Free;
     End;
@@ -2088,9 +2090,9 @@ begin
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
-      CheckEquals(1, M.HeadingCount(strPropertiesLabel));
-      CheckEquals(scPublic, M.FindElement(strPropertiesLabel).Elements[1].Scope);
-      CheckEquals('Property Get Test() As String', M.FindElement(strPropertiesLabel).Elements[1].AsString(True, False));
+      CheckEquals(1, M.HeadingCount(strImplementedPropertiesLabel));
+      CheckEquals(scPublic, M.FindElement(strImplementedPropertiesLabel).Elements[1].Scope);
+      CheckEquals('Property Get Test() As String', M.FindElement(strImplementedPropertiesLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -2102,9 +2104,9 @@ begin
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
-      CheckEquals(1, M.HeadingCount(strPropertiesLabel));
-      CheckEquals(scPrivate, M.FindElement(strPropertiesLabel).Elements[1].Scope);
-      CheckEquals('Property Let Test(i As Long)', M.FindElement(strPropertiesLabel).Elements[1].AsString(True, False));
+      CheckEquals(1, M.HeadingCount(strImplementedPropertiesLabel));
+      CheckEquals(scPrivate, M.FindElement(strImplementedPropertiesLabel).Elements[1].Scope);
+      CheckEquals('Property Let Test(i As Long)', M.FindElement(strImplementedPropertiesLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -2116,9 +2118,9 @@ begin
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
-      CheckEquals(1, M.HeadingCount(strPropertiesLabel));
-      CheckEquals(scFriend, M.FindElement(strPropertiesLabel).Elements[1].Scope);
-      CheckEquals('Property Let Test(i As Long)', M.FindElement(strPropertiesLabel).Elements[1].AsString(True, False));
+      CheckEquals(1, M.HeadingCount(strImplementedPropertiesLabel));
+      CheckEquals(scFriend, M.FindElement(strImplementedPropertiesLabel).Elements[1].Scope);
+      CheckEquals('Property Let Test(i As Long)', M.FindElement(strImplementedPropertiesLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -2130,9 +2132,9 @@ begin
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
-      CheckEquals(1, M.HeadingCount(strPropertiesLabel));
-      CheckEquals(scPublic, M.FindElement(strPropertiesLabel).Elements[1].Scope);
-      CheckEquals('Property Set Test(Obj As TObject)', M.FindElement(strPropertiesLabel).Elements[1].AsString(True, False));
+      CheckEquals(1, M.HeadingCount(strImplementedPropertiesLabel));
+      CheckEquals(scPublic, M.FindElement(strImplementedPropertiesLabel).Elements[1].Scope);
+      CheckEquals('Property Set Test(Obj As TObject)', M.FindElement(strImplementedPropertiesLabel).Elements[1].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -2146,11 +2148,11 @@ begin
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
-      CheckEquals(2, M.HeadingCount(strPropertiesLabel));
-      CheckEquals(scPrivate, M.FindElement(strPropertiesLabel).Elements[1].Scope);
-      CheckEquals(scPublic, M.FindElement(strPropertiesLabel).Elements[2].Scope);
-      CheckEquals('Property Let Test1(i As Long)', M.FindElement(strPropertiesLabel).Elements[1].AsString(True, False));
-      CheckEquals('Property Set Test2(Obj As TObject)', M.FindElement(strPropertiesLabel).Elements[2].AsString(True, False));
+      CheckEquals(2, M.HeadingCount(strImplementedPropertiesLabel));
+      CheckEquals(scPrivate, M.FindElement(strImplementedPropertiesLabel).Elements[1].Scope);
+      CheckEquals(scPublic, M.FindElement(strImplementedPropertiesLabel).Elements[2].Scope);
+      CheckEquals('Property Let Test1(i As Long)', M.FindElement(strImplementedPropertiesLabel).Elements[1].AsString(True, False));
+      CheckEquals('Property Set Test2(Obj As TObject)', M.FindElement(strImplementedPropertiesLabel).Elements[2].AsString(True, False));
     Finally
       M.Free;
     End;
@@ -2309,6 +2311,7 @@ begin
       'End Sub'#13#10 +
       'Private Sub Test2(i as msforms.long)'#13#10 +
       'End Sub'#13#10 +
+      ''': A comment'#13#10 +
       'Sub Test3(Optional i as Long = 0)'#13#10 +
       'End Sub'#13#10;
     S.LoadBufferFromString(strCode);
@@ -2323,6 +2326,7 @@ begin
       CheckEquals('Sub Test1(i As msforms.long, str As String)', M.FindElement(strImplementedMethodsLabel).Elements[1].AsString(True, False));
       CheckEquals('Sub Test2(i As msforms.long)', M.FindElement(strImplementedMethodsLabel).Elements[2].AsString(True, False));
       CheckEquals('Sub Test3(Optional i As Long = 0)', M.FindElement(strImplementedMethodsLabel).Elements[3].AsString(True, False));
+      CheckEquals(5, M.FindElement(strImplementedMethodsLabel).Elements[3].Comment.Line);
     Finally
       M.Free;
     End;

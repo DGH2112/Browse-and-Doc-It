@@ -829,8 +829,8 @@ procedure TestTPascalProperty.SetUp;
 begin
   FPascalProperty := TPascalProperty.Create('MyProperty', scProtected, 12, 23,
     iiPublicProperty, Nil);
-  FPascalProperty.TypeId := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
-  FPascalProperty.TypeId.AddToken('String');
+  FPascalProperty.ReturnType := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
+  FPascalProperty.ReturnType.AddToken('String');
 end;
 
 procedure TestTPascalProperty.TearDown;

@@ -4,9 +4,16 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       16 Mar 2009
+  @Date       19 Mar 2009
   @Author     David Hoyle
 
+  @bug        GetComment does not correctly account for the column positions in
+              the resulting comments (out by 2 columns).
+  @bug        Module comments are take as the first comment in the module, not
+              the comment associated with either:#
+              1) Options#
+              2) Attributes#
+              3) Versions
 **)
 Unit VBModule;
 
@@ -360,7 +367,7 @@ ResourceString
   (** A label for declared functions and procedures. **)
   strDeclaresLabel = 'Declarations';
   (** A label for implemented properties. **)
-  strImplementedPropertiesLabel = 'Imeplemented Properties';
+  strImplementedPropertiesLabel = 'Implemented Properties';
 
 Implementation
 
@@ -466,6 +473,29 @@ Var
   iCommentLine : Integer;
   boolDocComment: Boolean;
 
+  (**
+
+    This function replaces the indexed character in the passed string with the
+    new given character. This is a workaround for the immutable nature of
+    TStringList items Strings.
+
+    @precon  none.
+    @postcon Replaces the indexed character in the passed string with the
+             new given character.
+
+    @param   strText     as a String
+    @param   iIndex      as an Integer
+    @param   chCharacter as a Char
+    @return  a String     
+
+  **)
+  Function ReplaceCharacter(strText : String; iIndex : Integer; chCharacter : Char) : String;
+
+  Begin
+    strText[iIndex] := chCharacter;
+    Result := strText;
+  End;
+
 begin
   Result := Nil;
   boolDocComment := False;
@@ -477,12 +507,12 @@ begin
         For iCommentLine := sl.Count - 1 DownTo 0 Do
           Begin
             If sl[iCommentLine][1] = '''' Then
-              sl[iCommentLine] := Copy(sl[iCommentLine], 2, Length(sl[iCommentLine]) - 1);
-            If Length(sl[iCommentLine]) > 0 Then
-              If (sl[iCommentLine][1] In [':', '''']) Then
+              sl[iCommentLine] := ReplaceCharacter(sl[iCommentLine], 1, #32);
+            If Length(sl[iCommentLine]) > 1 Then
+              If (sl[iCommentLine][2] In [':', '''']) Then
                 Begin
                   boolDocComment := True;
-                  sl[iCommentLine] := Copy(sl[iCommentLine], 2, Length(sl[iCommentLine]) - 1);
+                  sl[iCommentLine] := ReplaceCharacter(sl[iCommentLine], 2, #32);
                 End Else
                   sl.Delete(iCommentLine);
           End;
@@ -971,9 +1001,9 @@ begin
   If boolForDocumentation Then
     Result := Result + #13#10;
   Result := Result + ')';
-  If (PropertyType = ptGet) And (TypeId <> Nil) Then
+  If (PropertyType = ptGet) And (ReturnType <> Nil) Then
     Begin
-      Result := Result + #32'As'#32 + TypeId.AsString(boolShowIdentifier,
+      Result := Result + #32'As'#32 + ReturnType.AsString(boolShowIdentifier,
         boolForDocumentation);
     End;
 end;
@@ -993,7 +1023,7 @@ begin
   Inherited CheckDocumentation(boolCascade);
   If PropertyType In [ptGet] Then
     Begin
-       If TypeId = Nil Then
+       If ReturnType = Nil Then
          AddIssue(Format(strProperyRequiresReturn, [Identifier]), scNone,
            'CheckDocumentation', Line, Column, etWarning);
     End Else
@@ -2861,8 +2891,8 @@ Begin
                   NextNonCommentToken;
                   If Token.TokenType In [ttIdentifier, ttReservedWord] Then
                     Begin
-                      P.TypeId := TVBTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
-                      AddToExpression(P.TypeId);
+                      P.ReturnType := TVBTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+                      AddToExpression(P.ReturnType);
                     End;
                 End;
               FindMethodEnd(P, 'PROPERTY');

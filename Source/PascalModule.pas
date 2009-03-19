@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       10 Mar 2009
+  @Date       19 Mar 2009
   @Author     David Hoyle
 
   @todo       Implement $IF
@@ -1596,10 +1596,10 @@ begin
       Result := Result + ']';
     End;
   Result := Result + #32':'#32;
-  If TypeID <> Nil Then
+  If ReturnType <> Nil Then
     Begin
-      For i := 0 To TypeId.TokenCount - 1 Do
-        Result := Result + TypeId.AsString(boolShowIdentifier, boolForDocumentation);
+      For i := 0 To ReturnType.TokenCount - 1 Do
+        Result := Result + ReturnType.AsString(boolShowIdentifier, boolForDocumentation);
     End;
   If boolForDocumentation Then
     Result := Result + #13#10;
@@ -1708,7 +1708,7 @@ begin
   If doShowUndocumentedFields In BrowseAndDocItOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
-        DocConflictTable[dctFieldClauseUndocumented]);
+        strFieldDocumentation, DocConflictTable[dctFieldClauseUndocumented]);
   Inherited CheckDocumentation(boolCascade);
 end;
 
@@ -8058,8 +8058,8 @@ Begin
       NextNonCommentToken;
       FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
       Try
-        Prop.TypeId := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
-        TypeId(Prop.TypeId);
+        Prop.ReturnType := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
+        TypeId(Prop.ReturnType);
       Finally
         FTemporaryElements.Free;
       End;
@@ -8589,6 +8589,7 @@ Begin
   If doShowUndocumentedConsts In BrowseAndDocItOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
+        strResourceStringDocumentation,
         DocConflictTable[dctResourceStringClauseUndocumented]);
 End;
 
@@ -8609,7 +8610,7 @@ Begin
   If doShowUndocumentedVars In BrowseAndDocItOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
-        DocConflictTable[dctThreadVarClauseUndocumented]);
+        strThreadVarDocumentation, DocConflictTable[dctThreadVarClauseUndocumented]);
 End;
 
 (**
@@ -8631,7 +8632,7 @@ Begin
   If doShowUndocumentedRecords In BrowseAndDocItOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
-        DocConflictTable[dctRecordClauseUndocumented]);
+        strRecordDocumentation, DocConflictTable[dctRecordClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
@@ -8672,7 +8673,7 @@ Begin
   If doShowUndocumentedObjects In BrowseAndDocItOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
-        DocConflictTable[dctObjectClauseUndocumented]);
+        strObjectDocumentation, DocConflictTable[dctObjectClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
@@ -8696,7 +8697,7 @@ Begin
   If doShowUndocumentedClasses In BrowseAndDocItOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
-        DocConflictTable[dctClassClauseUndocumented]);
+        strClassDocumentation, DocConflictTable[dctClassClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
@@ -8753,7 +8754,7 @@ Begin
   If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
-        DocConflictTable[dctInterfaceClauseUndocumented]);
+        strInterfaceDocumentation, DocConflictTable[dctInterfaceClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
@@ -8777,7 +8778,7 @@ Begin
   If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
-        DocConflictTable[dctDispInterfaceClauseUndocumented]);
+        strDispInterfaceDocumentation, DocConflictTable[dctDispInterfaceClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
 End;
@@ -8798,19 +8799,19 @@ Begin
   If doShowMissingInitComment In BrowseAndDocItOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([strInitializationLabel], Line, Column , Comment,
-        DocConflictTable[dctMissingInitComment]);
+        strModuleInitSection, DocConflictTable[dctMissingInitComment]);
 End;
 
 (**
 
   This is a getter method for the AsString property.
 
-  @precon  None . 
-  @postcon Returns the name of the Initialisation section as a String . 
+  @precon  None .
+  @postcon Returns the name of the Initialisation section as a String .
 
   @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String              
+  @return  a String
 
 **)
 function TInitializationSection.AsString(boolShowIdentifier,
@@ -8837,7 +8838,7 @@ Begin
   If doShowMissingFinalComment In BrowseAndDocItOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([strFinalizationLabel], Line, Column, Comment,
-        DocConflictTable[dctMissingFinalComment]);
+        strModuleFinalSection, DocConflictTable[dctMissingFinalComment]);
 End;
 
 (**

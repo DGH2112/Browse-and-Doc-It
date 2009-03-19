@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    18 Mar 2009
+  @Date    19 Mar 2009
   @Version 1.0
 
 **)
@@ -132,15 +132,15 @@ End;
 
 (**
 
-  This method returns a description for the method if it is a constructor, 
+  This method returns a description for the method if it is a constructor,
   destructor, getter or setter method, else it returns an empty String.
 
   @precon  Method is a valid instance of a method declatation to be described.
-  @postcon Returns a description of the method is applicable. CursorAdjust 
-           provide delta movements for the cursor from column 1 if the first 
+  @postcon Returns a description of the method is applicable. CursorAdjust
+           provide delta movements for the cursor from column 1 if the first
            line of the new comment.
 
-  @param   Element      as a TElementContainer
+  @param   Func        as a TGenericFunction
   @param   iIndent      as an Integer
   @param   boolPadOut   as a Boolean
   @param   CursorAdjust as a TPoint as a reference
@@ -298,7 +298,7 @@ End;
   @postcon The full comment to be inserted at the cursor is returns with the 
            new cursor position in Cursor.
 
-  @param   Element     as a TElementContainer
+  @param   Func        as a TGenericFunction
   @param   CommentType as a TCommentType
   @param   iIndent     as an Integer
   @param   boolPadOut  as a Boolean
@@ -408,6 +408,8 @@ begin
   // Get header in view if not already
   CursorDelta.X := 2 + P.X;
   CursorDelta.Y := 2 + P.Y;
+  If CommentType In [ctVBLine, ctCPPLine] Then
+    Dec(CursorDelta.Y);
 end;
 
 (**

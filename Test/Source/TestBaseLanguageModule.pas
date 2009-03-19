@@ -1142,13 +1142,15 @@ procedure TestTElementContainer.TestAddDocumentConflict;
 Var
   rec : TDocConflictTable;
   DC : TElementContainer;
+  strCategory : String;
 
 begin
-  rec.FCategory := 'Things';
+  strCategory := 'Things';
   rec.FMessage := 'This is a document conflict message (%s, %s).';
   rec.FDescription := 'This is a document conflict description.';
   rec.FConflictType := dciMissing;
-  FElementContainer.AddDocumentConflict(['First', 'Second'], 12, 23, Nil, rec);
+  FElementContainer.AddDocumentConflict(['First', 'Second'], 12, 23, Nil,
+    strCategory, rec);
   DC := FElementContainer.FindElement(strDocumentationConflicts);
   Check(DC <> Nil, 'DC is null');
   CheckEquals(strDocumentationConflicts, DC.Identifier);
@@ -1560,10 +1562,10 @@ begin
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
-      CheckEquals('1) A pre-condition in method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
+      CheckEquals('1) A pre-condition in Method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
       CheckEquals('2) Method ''MyFunction'' has a different parameter count (4 not 0).', FGenericMethodDecl.DocConflict(2));
       CheckEquals('3) Method ''MyFunction'' has missing pre-condition tags.', FGenericMethodDecl.DocConflict(3));
-      CheckEquals('4) Parameter ''Param1'' in method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(4));
+      CheckEquals('4) Parameter ''Param1'' in Method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(4));
     Finally
       C.Free;
     End;
@@ -1574,7 +1576,7 @@ begin
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
-      CheckEquals('1) A pre-condition in method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
+      CheckEquals('1) A pre-condition in Method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
     Finally
       C.Free;
     End;
@@ -1613,7 +1615,7 @@ begin
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
-      CheckEquals('1) A post-condition in method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
+      CheckEquals('1) A post-condition in Method ''MyFunction'' is not documented.', FGenericMethodDecl.DocConflict(1));
     Finally
       C.Free;
     End;
@@ -1662,7 +1664,7 @@ begin
     Try
       FGenericMethodDecl.Comment := C;
       FGenericMethodDecl.CheckDocumentation(boolCascade);
-      CheckEquals('1) The parameter type for ''Param1'' in method ''MyFunction'' is incorrect (''String'').',
+      CheckEquals('1) The parameter type for ''Param1'' in Method ''MyFunction'' is incorrect (''String'').',
         FGenericMethodDecl.DocConflict(1));
       CheckEquals('2) Method ''MyFunction''`s return type is not documented.',
         FGenericMethodDecl.DocConflict(2));
@@ -1823,8 +1825,8 @@ procedure TestTGenericProperty.SetUp;
 begin
   FGenericProperty := TTestGenericProperty.Create('MyProperty', scProtected, 12,
     23, iiPublicProperty, Nil);
-  FGenericProperty.TypeId := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
-  FGenericProperty.TypeId.AddToken('Boolean');
+  FGenericProperty.ReturnType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
+  FGenericProperty.ReturnType.AddToken('Boolean');
 end;
 
 procedure TestTGenericProperty.TearDown;
@@ -1901,9 +1903,9 @@ begin
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
-      CheckEquals('1) Property ''MyProperty'' has a different parameter count (4 not 0).', FGenericProperty.DocConflict(1));
-      CheckEquals('2) Property ''MyProperty'' has missing pre-condition tags.', FGenericProperty.DocConflict(2));
-      CheckEquals('3) Parameter ''Param1'' in property ''MyProperty'' is not documented.', FGenericProperty.DocConflict(3));
+      CheckEquals('1) A pre-condition in Property ''MyProperty'' is not documented.', FGenericProperty.DocConflict(1));
+      CheckEquals('2) Property ''MyProperty'' has a different parameter count (4 not 0).', FGenericProperty.DocConflict(2));
+      CheckEquals('3) Property ''MyProperty'' has missing pre-condition tags.', FGenericProperty.DocConflict(3));
     Finally
       C.Free;
     End;
@@ -1921,7 +1923,7 @@ begin
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
-      CheckEquals('1) The parameter type for ''Param1'' in property ''MyProperty'' is incorrect (''String'').', FGenericProperty.DocConflict(1));
+      CheckEquals('1) The parameter type for ''Param1'' in Property ''MyProperty'' is incorrect (''String'').', FGenericProperty.DocConflict(1));
     Finally
       C.Free;
     End;
@@ -1938,7 +1940,7 @@ begin
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
-      CheckEquals('1) Property ''MyProperty''`s return type is not documented (''Boolean'').', FGenericProperty.DocConflict(1));
+      CheckEquals('1) Property ''MyProperty''`s return type is not documented.', FGenericProperty.DocConflict(1));
     Finally
       C.Free;
     End;
@@ -1973,7 +1975,7 @@ begin
     Try
       FGenericProperty.Comment := C;
       FGenericProperty.CheckDocumentation(boolCascade);
-      CheckEquals('1) A pre-condition in property ''MyProperty'' is not documented.', FGenericProperty.DocConflict(1));
+      CheckEquals('1) A pre-condition in Property ''MyProperty'' is not documented.', FGenericProperty.DocConflict(1));
     Finally
       C.Free;
     End;
@@ -2118,7 +2120,7 @@ end;
 
 procedure TestTGenericProperty.TestTypeId;
 begin
-  CheckEquals('Boolean', FGenericProperty.TypeId.AsString(False, False));
+  CheckEquals('Boolean', FGenericProperty.ReturnType.AsString(False, False));
 end;
 
 // Test methods for class TDocumentConflict

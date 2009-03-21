@@ -83,45 +83,45 @@ begin
     Module := Dispatcher(Source, 'MyPascalFile.pas', False, [moParse]);
     Try
       CheckEquals(0, Module.HeadingCount(strErrors), Module.FirstError);
-      M := FindMethod(1, Module, TGenericMethodDecl);
+      M := FindFunction(1, Module, TGenericMethodDecl);
       Check(M = Nil, 'Method found');
-      M := FindMethod(7, Module, TGenericMethodDecl);
+      M := FindFunction(7, Module, TGenericMethodDecl);
       Check(M <> Nil, 'Method not found!');
       CheckEquals(M.Line, 7);
       Checkequals('Hello', M.Identifier);
-      M := FindMethod(8, Module, TGenericMethodDecl);
+      M := FindFunction(8, Module, TGenericMethodDecl);
       Check(M <> Nil, 'Method not found!');
       CheckEquals(M.Line, 7);
       Checkequals('Hello', M.Identifier);
-      M := FindMethod(9, Module, TGenericMethodDecl);
+      M := FindFunction(9, Module, TGenericMethodDecl);
       Check(M <> Nil, 'Method not found!');
       CheckEquals(M.Line, 7);
       Checkequals('Hello', M.Identifier);
-      M := FindMethod(10, Module, TGenericMethodDecl);
+      M := FindFunction(10, Module, TGenericMethodDecl);
       Check(M <> Nil, 'Method not found!');
       CheckEquals(M.Line, 10);
       Checkequals('Hello2', M.Identifier);
-      M := FindMethod(11, Module, TGenericMethodDecl);
+      M := FindFunction(11, Module, TGenericMethodDecl);
       Check(M <> Nil, 'Method not found!');
       CheckEquals(M.Line, 11);
       Checkequals('Hello3', M.Identifier);
-      M := FindMethod(12, Module, TGenericMethodDecl);
+      M := FindFunction(12, Module, TGenericMethodDecl);
       Check(M <> Nil, 'Method not found!');
       CheckEquals(M.Line, 12);
       Checkequals('Hello4', M.Identifier);
-      M := FindMethod(13, Module, TGenericMethodDecl);
+      M := FindFunction(13, Module, TGenericMethodDecl);
       Check(M <> Nil, 'Method not found!');
       CheckEquals(M.Line, 12);
       Checkequals('Hello4', M.Identifier);
-      M := FindMethod(14, Module, TGenericMethodDecl);
+      M := FindFunction(14, Module, TGenericMethodDecl);
       Check(M <> Nil, 'Method not found!');
       CheckEquals(M.Line, 12);
       Checkequals('Hello4', M.Identifier);
-      M := FindMethod(15, Module, TGenericMethodDecl);
+      M := FindFunction(15, Module, TGenericMethodDecl);
       Check(M <> Nil, 'Method not found!');
       CheckEquals(M.Line, 15);
       Checkequals('Hello5', M.Identifier);
-      M := FindMethod(19, Module, TGenericMethodDecl);
+      M := FindFunction(19, Module, TGenericMethodDecl);
       Check(M <> Nil, 'Method not found!');
       CheckEquals(M.Line, 15);
       Checkequals('Hello5', M.Identifier);
@@ -133,29 +133,29 @@ begin
     Module := Dispatcher(Source, 'MyPascalFile.pas', False, [moParse]);
     Try
       CheckEquals(0, Module.HeadingCount(strErrors), Module.FirstError);
-      M := FindMethod(1, Module, TGenericProperty);
+      M := FindFunction(1, Module, TGenericProperty);
       Check(M = Nil, 'Property found');
-      M := FindMethod(8, Module, TGenericProperty);
+      M := FindFunction(8, Module, TGenericProperty);
       Check(M <> Nil, 'Property not found!');
       CheckEquals(M.Line, 8);
       Checkequals('MyProperty1', M.Identifier);
-      M := FindMethod(9, Module, TGenericProperty);
+      M := FindFunction(9, Module, TGenericProperty);
       Check(M <> Nil, 'Property not found!');
       CheckEquals(M.Line, 9);
       Checkequals('MyProperty2', M.Identifier);
-      M := FindMethod(10, Module, TGenericProperty);
+      M := FindFunction(10, Module, TGenericProperty);
       Check(M <> Nil, 'Property not found!');
       CheckEquals(M.Line, 9);
       Checkequals('MyProperty2', M.Identifier);
-      M := FindMethod(11, Module, TGenericProperty);
+      M := FindFunction(11, Module, TGenericProperty);
       Check(M <> Nil, 'Property not found!');
       CheckEquals(M.Line, 11);
       Checkequals('MyProperty3', M.Identifier);
-      M := FindMethod(12, Module, TGenericProperty);
+      M := FindFunction(12, Module, TGenericProperty);
       Check(M <> Nil, 'Property not found!');
       CheckEquals(M.Line, 12);
       Checkequals('MyProperty4', M.Identifier);
-      M := FindMethod(17, Module, TGenericProperty);
+      M := FindFunction(17, Module, TGenericProperty);
       Check(M <> Nil, 'Property not found!');
       CheckEquals(M.Line, 12);
       Checkequals('MyProperty4', M.Identifier);
@@ -303,7 +303,7 @@ begin
         '    @refactorOops tag too long.'#13#10 +
         ''#13#10, #32, '.', [rfReplaceAll]);
       CheckEquals(strTestText, strText);
-      CheckEquals(0, CA.X);
+      CheckEquals(4, CA.X);
       CheckEquals(0, CA.Y);
       strText := StringReplace(Description(M, 2, False, CA), #32, '.', [rfReplaceAll]);
       strTestText := StringReplace(
@@ -316,7 +316,7 @@ begin
         '    @see     See how this works!'#13#10 +
         '    @refactorOops tag too long.'#13#10, #32, '.', [rfReplaceAll]);
       CheckEquals(strTestText, strText);
-      CheckEquals(0, CA.X);
+      CheckEquals(4, CA.X);
       CheckEquals(0, CA.Y);
     Finally
       M.Free;
@@ -431,6 +431,8 @@ begin
         ''#13#10 +
         '..**)'#13#10;
       CheckEquals(strTestText, strText);
+      CheckEquals(4, CursorDelta.X);
+      CheckEquals(2, CursorDelta.Y);
       strText := StringReplace(WriteComment(M, ctPascalBrace, 2, True, CursorDelta),
         #32, '.', [rfReplaceAll]);
       strTestText :=
@@ -452,6 +454,9 @@ begin
         '....@return..a.Boolean'#13#10 +
         ''#13#10 +
         '..}'#13#10;
+      CheckEquals(strTestText, strText);
+      CheckEquals(4, CursorDelta.X);
+      CheckEquals(2, CursorDelta.Y);
       strText := StringReplace(WriteComment(M, ctCPPBlock, 2, True, CursorDelta),
         #32, '.', [rfReplaceAll]);
       strTestText :=
@@ -474,6 +479,8 @@ begin
         ''#13#10 +
         '..**/'#13#10;
       CheckEquals(strTestText, strText);
+      CheckEquals(4, CursorDelta.X);
+      CheckEquals(2, CursorDelta.Y);
       strText := StringReplace(WriteComment(M, ctVBLine, 2, True, CursorDelta),
         #32, '.', [rfReplaceAll]);
       strTestText :=
@@ -494,6 +501,8 @@ begin
         '..'':..@return..a.Boolean'#13#10 +
         '..'':'#13#10;
       CheckEquals(strTestText, strText);
+      CheckEquals(6, CursorDelta.X);
+      CheckEquals(1, CursorDelta.Y);
       strText := StringReplace(WriteComment(M, ctCPPLine, 2, True, CursorDelta),
         #32, '.', [rfReplaceAll]);
       strTestText :=
@@ -514,6 +523,8 @@ begin
         '..//:..@return..a.Boolean'#13#10 +
         '..//:'#13#10;
       CheckEquals(strTestText, strText);
+      CheckEquals(7, CursorDelta.X);
+      CheckEquals(1, CursorDelta.Y);
       strText := StringReplace(WriteComment(M, ctPascalBlock, 2, False, CursorDelta),
         #32, '.', [rfReplaceAll]);
       strTestText :=
@@ -531,6 +542,8 @@ begin
         '....@return..a.Boolean'#13#10 +
         '..**)'#13#10;
       CheckEquals(strTestText, strText);
+      CheckEquals(4, CursorDelta.X);
+      CheckEquals(1, CursorDelta.Y);
       strText := StringReplace(WriteComment(M, ctPascalBrace, 2, False, CursorDelta),
         #32, '.', [rfReplaceAll]);
       strTestText :=
@@ -547,6 +560,9 @@ begin
         '....@param...strParam.as.a.String'#13#10 +
         '....@return..a.Boolean'#13#10 +
         '..}'#13#10;
+      CheckEquals(strTestText, strText);
+      CheckEquals(4, CursorDelta.X);
+      CheckEquals(1, CursorDelta.Y);
       strText := StringReplace(WriteComment(M, ctCPPBlock, 2, False, CursorDelta),
         #32, '.', [rfReplaceAll]);
       strTestText :=
@@ -564,6 +580,8 @@ begin
         '....@return..a.Boolean'#13#10 +
         '..**/'#13#10;
       CheckEquals(strTestText, strText);
+      CheckEquals(4, CursorDelta.X);
+      CheckEquals(1, CursorDelta.Y);
       strText := StringReplace(WriteComment(M, ctVBLine, 2, False, CursorDelta),
         #32, '.', [rfReplaceAll]);
       strTestText :=
@@ -579,6 +597,8 @@ begin
         '..'':..@param...strParam.as.a.String'#13#10 +
         '..'':..@return..a.Boolean'#13#10;
       CheckEquals(strTestText, strText);
+      CheckEquals(6, CursorDelta.X);
+      CheckEquals(0, CursorDelta.Y);
       strText := StringReplace(WriteComment(M, ctCPPLine, 2, False, CursorDelta),
         #32, '.', [rfReplaceAll]);
       strTestText :=
@@ -594,11 +614,90 @@ begin
         '..//:..@param...strParam.as.a.String'#13#10 +
         '..//:..@return..a.Boolean'#13#10;
       CheckEquals(strTestText, strText);
+      CheckEquals(7, CursorDelta.X);
+      CheckEquals(0, CursorDelta.Y);
+      strText := StringReplace(WriteComment(M, ctPascalBlock, 0, True, CursorDelta),
+        #32, '.', [rfReplaceAll]);
+      strTestText :=
+        '(**'#13#10 +
+        ''#13#10 +
+        '..This.is.a.longish.comment.used.as.a.test.for.the.Description.function.so.that.'#13#10+
+        '..the.function.can.demonstrated.that.it.can.correctly.extract.the.comment.'#13#10 +
+        '..information.from.the.text.along.with.the.tags.'#13#10 +
+        ''#13#10 +
+        '..@precon..None.'#13#10 +
+        '..@postcon.Do.something.wonderful.Hal.'#13#10 +
+        ''#13#10 +
+        '..@note....This.is.a.test.tag.'#13#10 +
+        '..@see.....See.how.this.works!'#13#10 +
+        '..@refactorOops.tag.too.long.'#13#10 +
+        ''#13#10 +
+        '..@param...iParam...as.an.Int64'#13#10 +
+        '..@param...strParam.as.a.String'#13#10 +
+        '..@return..a.Boolean'#13#10 +
+        ''#13#10 +
+        '**)'#13#10;
+      CheckEquals(strTestText, strText);
+      CheckEquals(2, CursorDelta.X);
+      CheckEquals(2, CursorDelta.Y);
     Finally
       M.Free;
     End;
   Finally
     C.Free;
+  End;
+  M := TTestGenericMethodDecl.Create(mtFunction, 'Create', scPrivate, 12, 23);
+  Try
+    T := TTestGenericTypeDecl.Create('', scLocal, 0, 0, iiNone, Nil);
+    Try
+      T.AddToken('Int64');
+      P := TTestGenericParameter.Create(pamNone, 'iParam', False, T, '', scLocal, 0, 0);
+    Finally
+      T.Free;
+    End;
+    M.AddParameter(P);
+    T := TTestGenericTypeDecl.Create('', scLocal, 0, 0, iiNone, Nil);
+    Try
+      T.AddToken('String');
+      P := TTestGenericParameter.Create(pamNone, 'strParam', False, T, '', scLocal, 0, 0);
+    Finally
+      T.Free;
+    End;
+    M.ReturnType := TTestGenericTypeDecl.Create('', scLocal, 0, 0, iiNone, Nil);
+    M.ReturnType.AddToken('Boolean');
+    M.AddParameter(P);
+    strText := StringReplace(WriteComment(M, ctPascalBlock, 0, True, CursorDelta),
+      #32, '.', [rfReplaceAll]);
+    strTestText :=
+      '(**'#13#10 +
+      ''#13#10 +
+      '..This.is.a.constructor.for.the..class.'#13#10 +
+      ''#13#10 +
+      '..@param...iParam...as.an.Int64'#13#10 +
+      '..@param...strParam.as.a.String'#13#10 +
+      '..@return..a.Boolean'#13#10 +
+      ''#13#10 +
+      '**)'#13#10;
+    CheckEquals(strTestText, strText);
+    CheckEquals(32, CursorDelta.X);
+    CheckEquals(2, CursorDelta.Y);
+    strText := StringReplace(WriteComment(M, ctPascalBlock, 2, True, CursorDelta),
+      #32, '.', [rfReplaceAll]);
+    strTestText :=
+      '..(**'#13#10 +
+      ''#13#10 +
+      '....This.is.a.constructor.for.the..class.'#13#10 +
+      ''#13#10 +
+      '....@param...iParam...as.an.Int64'#13#10 +
+      '....@param...strParam.as.a.String'#13#10 +
+      '....@return..a.Boolean'#13#10 +
+      ''#13#10 +
+      '..**)'#13#10;
+    CheckEquals(strTestText, strText);
+    CheckEquals(34, CursorDelta.X);
+    CheckEquals(2, CursorDelta.Y);
+  Finally
+    M.Free;
   End;
 End;
 

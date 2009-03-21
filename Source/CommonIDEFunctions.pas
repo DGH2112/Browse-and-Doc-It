@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    19 Mar 2009
+  @Date    21 Mar 2009
   @Version 1.0
 
 **)
@@ -20,8 +20,8 @@ Type
       WriteComment. **)
   TCommentType = (ctPascalBlock, ctPascalBrace, ctCPPBlock, ctCPPLine, ctVBLine);
 
-  Function FindMethod(iLine : Integer; Container : TElementContainer;
-    ContainerClass : TElementContainerClass) : TElementContainer;
+  Function FindFunction(iLine : Integer; Container : TElementContainer;
+    ContainerClass : TGenericFunctionClass) : TGenericFunction;
   Function Description(Func : TGenericFunction; iIndent : Integer;
     boolPadOut : Boolean; var CursorAdjust : TPoint) : String;
   Function Indent(strText : String; iIndent : Integer) : String;
@@ -78,16 +78,16 @@ Const
 
   @param   iLine          as an Integer
   @param   Container      as a TElementContainer
-  @param   ContainerClass as a TElementContainerClass
-  @return  a TElementContainer
+  @param   ContainerClass as a TGenericFunctionClass
+  @return  a TgenericFunction
 
 **)
-Function FindMethod(iLine : Integer; Container : TElementContainer;
-  ContainerClass : TElementContainerClass) : TElementContainer;
+Function FindFunction(iLine : Integer; Container : TElementContainer;
+  ContainerClass : TGenericFunctionClass) : TGenericFunction;
 
 Var
   i : Integer;
-  M : TElementContainer;
+  M : TGenericFunction;
 
   (**
 
@@ -119,12 +119,12 @@ Begin
     Begin
       If Container.Elements[i] Is ContainerClass Then
         Begin
-          M := Container.Elements[i];
+          M := Container.Elements[i] As TGenericFunction;
           CheckLine;
         End;
       If Container.Elements[i].ElementCount > 0 Then
         Begin
-          M := FindMethod(iLine, Container.Elements[i], ContainerClass);
+          M := FindFunction(iLine, Container.Elements[i], ContainerClass);
           CheckLine;
         End;
     End;
@@ -192,8 +192,6 @@ begin
               C.Free;
             End;
           End;
-      If strDescription = '' Then
-        CursorAdjust.X := 2 + iIndent;
       Result := Format('%s'#13#10, [strDescription]);
       If boolPadOut Then
         Result := Result + #13#10;
@@ -232,6 +230,8 @@ begin
         If boolPadOut Then
           Result := Result + #13#10;
     End;
+  If strDescription = '' Then
+    CursorAdjust.X := 2 + iIndent;
 end;
 
 (**
@@ -335,6 +335,8 @@ Var
   boolExtraLine : Boolean;
 
 begin
+  CursorDelta.X := 0;
+  CursorDelta.Y := 0;
   boolExtraLine := False;
   If CommentType In [ctPascalBlock..ctCPPBlock] Then
     AddToComment(StringOfChar(#32, iIndent));
@@ -405,9 +407,14 @@ begin
       sl.Free;
     End;
   End;
-  // Get header in view if not already
-  CursorDelta.X := 2 + P.X;
-  CursorDelta.Y := 2 + P.Y;
+  Inc(CursorDelta.X, P.X);
+  Inc(CursorDelta.Y, 2 + P.Y);
+  If CommentType In [ctVBLine] Then
+    Inc(CursorDelta.X, 2);
+  If CommentType In [ctCPPLine] Then
+    Inc(CursorDelta.X, 3);
+  If Not boolPadOut Then
+    Dec(CursorDelta.Y);
   If CommentType In [ctVBLine, ctCPPLine] Then
     Dec(CursorDelta.Y);
 end;

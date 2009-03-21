@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    19 Mar 2009
+  @Date    20 Mar 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -881,6 +881,9 @@ Type
     **)
     Property QualifiedName : String Read GetQualifiedName;
   End;
+
+  (** A type to define sub classes of TGenericFunction **)
+  TGenericFunctionClass = Class Of TGenericFunction;
 
   (** This class represents a method declaration. **)
   TGenericMethodDecl = Class {$IFDEF D2005} Abstract {$ENDIF} (TGenericFunction)
@@ -1800,100 +1803,100 @@ ResourceString
   (** Label for Method Documentation Conflicts **)
   strFunctionDocumentation = '%s Documentation';
   (** Document conflict message for missing method documentation. **)
-  strMethodUndocumented = '%s ''%s'' has not been documented.';
+  strFunctionUndocumented = '%s ''%s'' has not been documented.';
   (** Document conflict message description for missing method documentation. **)
-  strMethodUndocumentedDesc = 'Each method or property declaration should ' +
+  strFunctionUndocumentedDesc = 'Each method or property declaration should ' +
     'have a description which should provide information to future developers ' +
     'regarding the purpose of the method or property. # #In addition to ' +
     'the description each method or property should have a pre-condition statement ' +
     '(@@precon) and a post-condition statement (@@postcon). # #Along with these ' +
     'there should be a list of the parameters and any return types.';
   (** Document conflict message for missing method description. **)
-  strMethodHasNoDesc = '%s ''%s'' has no description.';
+  strFunctionHasNoDesc = '%s ''%s'' has no description.';
   (** Document conflict message descritpion for missing method description. **)
-  strMethodHasNoDescDesc = 'Each method or property declaration should have ' +
+  strFunctionHasNoDescDesc = 'Each method or property declaration should have ' +
     'a description which should provide information to furture developers ' +
     'regarding the purpose of the method or property.';
 
   (** Document conflict message for different number of parameters and tags. **)
-  strMethodDiffParamCount = '%s ''%s'' has a different parameter count (%d not %d).';
+  strFunctionDiffParamCount = '%s ''%s'' has a different parameter count (%d not %d).';
   (** Document conflict message description for different number of parameters
       and tags. **)
-  strMethodDiffParamCountDesc = 'There are a different number of @@param tags ' +
+  strFunctionDiffParamCountDesc = 'There are a different number of @@param tags ' +
     'in the comment compared to the prameters passed to the method or property.';
   (** Document conflict message for an undocumented parameter. **)
-  strMethodUndocumentedParam = 'Parameter ''%s'' in %s ''%s'' is not ' +
+  strFunctionUndocumentedParam = 'Parameter ''%s'' in %s ''%s'' is not ' +
     'documented.';
   (** Document conflict message description for an undocumented parameter. **)
-  strMethodUndocumentedParamDesc = 'The specified parameter in the documented ' +
+  strFunctionUndocumentedParamDesc = 'The specified parameter in the documented ' +
     'method or property does not have a corresponding @@param tag in the ' +
     'comment header.';
   (** Document conflict message for an incorrect parameter type. **)
-  strMethodIncorrectParamType = 'The parameter type for ''%s'' in %s ''%s'' is ' +
+  strFunctionIncorrectParamType = 'The parameter type for ''%s'' in %s ''%s'' is ' +
     'incorrect (''%s'').';
   (** Document conflict message description for an incorrect parameter type. **)
-  strMethodIncorrectParamTypeDesc = 'The type of the specified parameter ' +
+  strFunctionIncorrectParamTypeDesc = 'The type of the specified parameter ' +
     'differents from the type provided in the @@param tag of the method or ' +
     'property comment.';
 
   (** Document conflict message for an undocumented return type. **)
-  strMethodUndocumentedReturn = '%s ''%s''`s return type is not documented.';
+  strFunctionUndocumentedReturn = '%s ''%s''`s return type is not documented.';
   (** Document conflict message descritpion for an undocumented return type. **)
-  strMethodUndocumentedReturnDesc = 'A return type requires an @@return tag ' +
+  strFunctionUndocumentedReturnDesc = 'A return type requires an @@return tag ' +
     'in the method or property comment.';
   (** Document conflict message for an incorrect return type. **)
-  strMethodIncorrectReturnType = '%s ''%s''`s return type is incorrect (''%s'').';
+  strFunctionIncorrectReturnType = '%s ''%s''`s return type is incorrect (''%s'').';
   (** Document conflict message description for an incorrect return type. **)
-  strMethodIncorrectReturnTypeDesc = 'The type of the return is not the same ' +
+  strFunctionIncorrectReturnTypeDesc = 'The type of the return is not the same ' +
     'as the type defined in the method or property.';
   (** Document conflict message for a return not required. **)
-  strMethodReturnNotRequired = '%s ''%s''`s return type is not required.';
+  strFunctionReturnNotRequired = '%s ''%s''`s return type is not required.';
   (** Document conflict message description for a return not required. **)
-  strMethodReturnNotRequiredDesc = 'The type of the return is not ' +
+  strFunctionReturnNotRequiredDesc = 'The type of the return is not ' +
     'required for this type of method or property.';
 
   (** A documentation message for missing precondition text. **)
-  strMethodPreConNotDocumented = 'A pre-condition in %s ''%s'' is not ' +
+  strFunctionPreConNotDocumented = 'A pre-condition in %s ''%s'' is not ' +
     'documented.';
   (** A documentation message description for missing precondition text. **)
-  strMethodPreConNotDocumentedDesc = 'The @@precon tag in the specified method ' +
+  strFunctionPreConNotDocumentedDesc = 'The @@precon tag in the specified method ' +
     'or property is either not present or does not contain a statement. A ' +
     'pre-condition statement says something about the status of the input ' +
     'parameters for the method or property which must be valid for the method ' +
     'or property to function correctly.';
   (** Document conflict message for a missing pre-condition tag. **)
-  strMethodMissingPreCon = '%s ''%s'' has missing pre-condition tags.';
+  strFunctionMissingPreCon = '%s ''%s'' has missing pre-condition tags.';
   (** Document conflict message description for a missing pre-condition tag. **)
-  strMethodMissingPreConDesc = 'The method or property comment expected an ' +
+  strFunctionMissingPreConDesc = 'The method or property comment expected an ' +
     '@@precon tag which says something about the status of the input ' +
     'parameters for the method or property which must be valid for the method ' +
     'or property to function correctly.';
   (** Document conflict message for too many pre-condition tag. **)
-  strMethodTooManyPreCons = '%s ''%s'' has too many pre-condition tags.';
+  strFunctionTooManyPreCons = '%s ''%s'' has too many pre-condition tags.';
   (** Document conflict message description for too many pre-condition tag. **)
-  strMethodTooManyPreConsDesc = 'The method or property comment has too many ' +
+  strFunctionTooManyPreConsDesc = 'The method or property comment has too many ' +
     'pre-condition tags (@@precon).';
 
   (** A documentation message for missing postcondition text. **)
-  strMethodPostConNotDocumented = 'A post-condition in %s ''%s'' is not ' +
+  strFunctionPostConNotDocumented = 'A post-condition in %s ''%s'' is not ' +
     'documented.';
   (** A documentation message description for missing postcondition text. **)
-  strMethodPostConNotDocumentedDesc = 'The @@prepost tag in the specified ' +
+  strFunctionPostConNotDocumentedDesc = 'The @@prepost tag in the specified ' +
     'method or property is either not present or does not contain a ' +
     'statement. A post-condition statement says something about the status of ' +
     'the output from the method or property which will be valid for the method ' +
     'or property after being called.';
   (** Document conflict message for a missing post-condition tag. **)
-  strMethodMissingPostCon = '%s ''%s'' has a missing post-condition tag.';
+  strFunctionMissingPostCon = '%s ''%s'' has a missing post-condition tag.';
   (** Document conflict message description for a missing post-condition tag. **)
-  strMethodMissingPostConDesc = 'The method or property comment expected an ' +
+  strFunctionMissingPostConDesc = 'The method or property comment expected an ' +
     '@@postcon tag which says something about the status of the out of the ' +
     'method or property which will be valid after the method or property is ' +
     'called.';
   (** Document conflict message for too many post-condition tag. **)
-  strMethodTooManyPostCons = '%s ''%s'' has too many post-condition tags.';
+  strFunctionTooManyPostCons = '%s ''%s'' has too many post-condition tags.';
   (** Document conflict message description for too many post-condition tag. **)
-  strMethodTooManyPostConsDesc = 'The method or property comment has too many ' +
+  strFunctionTooManyPostConsDesc = 'The method or property comment has too many ' +
     'post-condition tags (@@postcon).';
 
   (** Label for Finalization Documentation Conflicts **)
@@ -2255,47 +2258,47 @@ Const
       FDescription: strDispInterfaceClauseUndocumentedDesc;
       FConflictType: dciMissing),
 
-    (FMessage: strMethodUndocumented;
-      FDescription: strMethodUndocumentedDesc;
+    (FMessage: strFunctionUndocumented;
+      FDescription: strFunctionUndocumentedDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodHasNoDesc;
-      FDescription: strMethodHasNoDescDesc;
+    (FMessage: strFunctionHasNoDesc;
+      FDescription: strFunctionHasNoDescDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodPreconNotDocumented;
-      FDescription: strMethodPreconNotDocumentedDesc;
+    (FMessage: strFunctionPreconNotDocumented;
+      FDescription: strFunctionPreconNotDocumentedDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodDiffParamCount;
-      FDescription: strMethodDiffParamCountDesc;
+    (FMessage: strFunctionDiffParamCount;
+      FDescription: strFunctionDiffParamCountDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodMissingPreCon;
-      FDescription: strMethodMissingPreConDesc;
+    (FMessage: strFunctionMissingPreCon;
+      FDescription: strFunctionMissingPreConDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodTooManyPrecons;
-      FDescription: strMethodTooManyPreconsDesc;
+    (FMessage: strFunctionTooManyPrecons;
+      FDescription: strFunctionTooManyPreconsDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodUndocumentedParam;
-      FDescription: strMethodUndocumentedParamDesc;
+    (FMessage: strFunctionUndocumentedParam;
+      FDescription: strFunctionUndocumentedParamDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodIncorrectParamType;
-      FDescription: strMethodIncorrectParamTypeDesc;
+    (FMessage: strFunctionIncorrectParamType;
+      FDescription: strFunctionIncorrectParamTypeDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodPostconNotDocumented;
-      FDescription: strMethodPostconNotDocumentedDesc;
+    (FMessage: strFunctionPostconNotDocumented;
+      FDescription: strFunctionPostconNotDocumentedDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodUndocumentedReturn;
-      FDescription: strMethodUndocumentedReturnDesc;
+    (FMessage: strFunctionUndocumentedReturn;
+      FDescription: strFunctionUndocumentedReturnDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodIncorrectReturntype;
-      FDescription: strMethodIncorrectReturntypeDesc;
+    (FMessage: strFunctionIncorrectReturntype;
+      FDescription: strFunctionIncorrectReturntypeDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodReturnNotRequired;
-      FDescription: strMethodReturnNotRequiredDesc;
+    (FMessage: strFunctionReturnNotRequired;
+      FDescription: strFunctionReturnNotRequiredDesc;
       FConflictType: dciItem),
-    (FMessage: strMethodMissingPostCon;
-      FDescription: strMethodMissingPostConDesc;
+    (FMessage: strFunctionMissingPostCon;
+      FDescription: strFunctionMissingPostConDesc;
       FConflictType: dciMissing),
-    (FMessage: strMethodTooManyPostCons;
-      FDescription: strMethodTooManyPostConsDesc;
+    (FMessage: strFunctionTooManyPostCons;
+      FDescription: strFunctionTooManyPostConsDesc;
       FConflictType: dciMissing),
 
     (FMessage: strMissingInitComment;
@@ -4109,7 +4112,7 @@ end;
 Function TGenericProperty.RequiresReturn : Boolean;
 
 Begin
-  Result := True;
+  Result := ReturnType <> Nil;
 End;
 
 (** --------------------------------------------------------------------------

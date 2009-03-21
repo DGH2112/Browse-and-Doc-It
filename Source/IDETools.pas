@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    19 Mar 2009
+  @Date    20 Mar 2009
   @Author  David Hoyle
 
 **)
@@ -103,6 +103,7 @@ Type
     Procedure Save;
     Function GetFileName(strProject, strModule : String; iType : Integer) : String;
     Function EditorAsMemoryStream : TMemoryStream;
+    procedure PositionCursorInFunction(CursorDelta: TPoint; iInsertLine: Integer; iIndent: Integer; strComment: string);
     (**
       This property reads and write the project paths to and from the registry.
       @precon  None.
@@ -303,6 +304,36 @@ begin
     FVBEIDE.CommandBars.Item['Menu Bar'].Controls_[strMenuCaption].Delete(False);
   Application.Handle := FOldHandle;
   inherited Destroy;
+end;
+
+(**
+
+  This method positions the comment and function according to the options and
+  then places the cursor in the appropriate position for editing.
+
+  @precon  None.
+  @postcon Positions the comment and function according to the options and
+           then places the cursor in the appropriate position for editing.
+
+  @param   CursorDelta as a TPoint
+  @param   iInsertLine as an Integer
+  @param   iIndent     as an Integer
+  @param   strComment  as a string
+
+**)
+procedure TIDETools.PositionCursorInFunction(CursorDelta: TPoint;
+  iInsertLine: Integer; iIndent: Integer; strComment: string);
+
+Var
+  Pt: TPoint;
+
+begin
+  SelectionChange(iInsertLine + CharCount(#13, strComment) + 1, 1, iInsertLine, 1);
+  Pt.Y := iInsertLine;
+  Pt.X := iIndent + 3;
+  Inc(Pt.Y, CursorDelta.Y);
+  Inc(Pt.X, CursorDelta.X);
+  FCodePane.SetSelection(Pt.Y, Pt.X, Pt.Y, Pt.X);
 end;
 
 (**
@@ -1302,8 +1333,7 @@ Var
   Module: TBaseLanguageModule;
   strFileName: String;
   T: TElementContainer;
-  N: TGenericMethodDecl;
-  EditPos: TEditPos;
+  N: TGenericFunction;
   iIndent: Integer;
   CursorDelta: TPoint;
   strComment: String;
@@ -1322,7 +1352,7 @@ begin
         T := Module.FindElement(strImplementedMethodsLabel);
         If T <> Nil Then
           Begin
-            N := FindMethod(CursorPosition.Line, T, TGenericMethodDecl) As TGenericMethodDecl;
+            N := FindFunction(CursorPosition.Line, T, TGenericMethodDecl);
             If N <> Nil Then
               Begin
                 If N.Comment <> Nil Then
@@ -1341,12 +1371,8 @@ begin
                 // Remove last #13#10 - not required as the IDE adds them
                 strComment := Copy(strComment, 1, Length(strComment) - 2);
                 FCodePane.CodeModule.InsertLines(iInsertLine, strComment);
-                EditPos.Line := iInsertLine;
-                EditPos.Col := iIndent + 3;
-                Inc(EditPos.Line, CursorDelta.Y);
-                Inc(EditPos.Col, CursorDelta.X);
-                FCodePane.SetSelection(EditPos.Line, EditPos.Col, EditPos.Line,
-                  EditPos.Col);
+                PositionCursorInFunction(CursorDelta, iInsertLine, iIndent,
+                  strComment);
               End Else
                 MessageDlg(strNoMethodFound, mtWarning, [mbOK], 0);
           End;
@@ -1382,8 +1408,7 @@ Var
   Module: TBaseLanguageModule;
   strFileName: String;
   T: TElementContainer;
-  N: TGenericProperty;
-  EditPos: TEditPos;
+  N: TGenericFunction;
   iInsertLine: Integer;
   iIndent: Integer;
   strComment: String;
@@ -1402,7 +1427,7 @@ begin
         T := Module.FindElement(strImplementedPropertiesLabel);
         If T <> Nil Then
           Begin
-            N := FindMethod(CursorPosition.Line, T, TGenericProperty) As TGenericProperty;
+            N := FindFunction(CursorPosition.Line, T, TGenericProperty);
             If N <> Nil Then
               Begin
                 If N.Comment <> Nil Then
@@ -1421,12 +1446,8 @@ begin
                 // Remove last #13#10 - not required as the IDE adds them
                 strComment := Copy(strComment, 1, Length(strComment) - 2);
                 FCodePane.CodeModule.InsertLines(iInsertLine, strComment);
-                EditPos.Line := iInsertLine;
-                EditPos.Col := iIndent + 3;
-                Inc(EditPos.Line, CursorDelta.Y);
-                Inc(EditPos.Col, CursorDelta.X);
-                FCodePane.SetSelection(EditPos.Line, EditPos.Col, EditPos.Line,
-                  EditPos.Col);
+                PositionCursorInFunction(CursorDelta, iInsertLine, iIndent,
+                  strComment);
               End Else
                 MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
           End;

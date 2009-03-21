@@ -699,6 +699,33 @@ begin
   Finally
     M.Free;
   End;
+  M := TTestGenericMethodDecl.Create(mtProcedure, 'Uodate', scPrivate, 12, 23);
+  Try
+    strText := StringReplace(WriteComment(M, ctPascalBlock, 0, True, CursorDelta),
+      #32, '.', [rfReplaceAll]);
+    strTestText :=
+      '(**'#13#10 +
+      ''#13#10 +
+      ''#13#10 +
+      ''#13#10 +
+      '**)'#13#10;
+    CheckEquals(strTestText, strText);
+    CheckEquals(2, CursorDelta.X);
+    CheckEquals(2, CursorDelta.Y);
+    strText := StringReplace(WriteComment(M, ctPascalBlock, 2, True, CursorDelta),
+      #32, '.', [rfReplaceAll]);
+    strTestText :=
+      '..(**'#13#10 +
+      ''#13#10 +
+      ''#13#10 +
+      ''#13#10 +
+      '..**)'#13#10;
+    CheckEquals(strTestText, strText);
+    CheckEquals(4, CursorDelta.X);
+    CheckEquals(2, CursorDelta.Y);
+  Finally
+    M.Free;
+  End;
 End;
 
 Initialization

@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    15 Mar 2009
+  @Date    21 Mar 2009
   @Version 1.0
 
 **)
@@ -35,12 +35,6 @@ Type
       iCommentCol : Integer);
     Procedure Focus(Sender : TObject);
     Procedure OptionsChange(Sender : TObject);
-    function GetMethodDescription(Method : TGenericMethodDecl; AComment : TComment;
-      iIndent : Integer; var CursorAdjust : TPoint) : String;
-    Function WriteMethodComment(Method : TGenericMethodDecl;
-      Source : IOTASourceEditor; Writer : IOTAEditWriter; AComment : TComment) : TOTAEditPos;
-    Function WritePropertyComment(Prop : TGenericProperty;
-      Source : IOTASourceEditor; Writer : IOTAEditWriter; AComment : TComment) : TOTAEditPos;
     procedure CreateMenuItem(mmiParent: TMenuItem;  strCaption: String = '';
       ClickProc: TNotifyEvent = Nil; AShortCut : TShortCut = 0);
     Procedure InsertMethodCommentClick(Sender : TObject);
@@ -51,6 +45,12 @@ Type
     Procedure DocumentationClick(Sender : TObject);
     Procedure ModuleExplorerClick(Sender : TObject);
     Procedure DUnitClick(Sender : TObject);
+    Procedure DeleteExistingComment(Source : IOTASourceEditor; iStartLine,
+      iEndLine : Integer);
+    procedure PositionCursorInFunction(CursorDelta: TPoint; iInsertLine,
+      iIndent: Integer; strComment: string);
+    procedure InsertComment(strComment: string; Writer: IOTAEditWriter;
+      iInsertLine: Integer; Source: IOTASourceEditor);
   Protected
     { IOTAWizard }
     Function GetIDString: string;
@@ -61,7 +61,6 @@ Type
     {$HINTS OFF}
     Function GetMenuText: string;
     {$HINTS ON}
-    Function OutputTag(iIndent : Integer; Tag : TTag) : String;
     function GetPropertyDescription(Prop: TGenericProperty;
       AComment: TComment; iIndent: Integer): String;
     { IOTAIDENotifier
@@ -187,38 +186,19 @@ Uses
   Windows, ShellAPI, TokenForm, DGHLibrary, ModuleDispatcher, Dialogs, Controls,
   PsAPI, DocumentationOptionsForm, DocumentationDispatcher, BaseDocumentation,
   CheckForUpdates, CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF},
-  DUnitForm, DUnitCreator;
+  DUnitForm, DUnitCreator, CommonIDEFunctions;
 
+{$IFDEF D2005}
 Resourcestring
-  {$IFDEF D2005}
   (** This is a text string of revision from nil and a to z. **)
   strRevision = ' abcdefghijklmnopqrstuvwxyz';
   (** This is a message string to appear in the BDS 2005/6 splash screen **)
   strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2006';
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
   strSplashScreenBuild = 'Open Source Freeware by David Hoyle (Build %d.%d.%d.%d)';
-  {$ENDIF}
-  (** This is a message for no methods to comment. **)
-  strNoMethodFound = 'No method found on or above the current cursor position.';
-  (** This is a message to confirm you wish to update the current comment. **)
-  strMethodAlreadyExists = 'The method "%s" already has a comment. Do you' +
-  ' want to update the comment with revised parameters and returns?';
-  (** This is a message for no property to comment. **)
-  strNoPropertyFound = 'No property found on or above the current cursor position.';
-  (** This is a message to confirm you wish to update the current comment. **)
-  strPropertyAlreadyExists = 'The property "%s" already has a comment. Do you' +
-  ' want to continue?';
+{$ENDIF}
 
 Const
-  (** A simple array for outputting a or an. **)
-  strAOrAn : Array[False..True] Of String = ('a', 'an');
-  (** An array of parameter modifier phases. **)
-  strModifier : Array[pamNone..pamOut] Of String = ('', ' as a reference',
-    ' as a constant', ' as an out parameter');
-  (** A list of vowels. **)
-  strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
-  (** A constant array of outputs for the ArrayOf property. **)
-  strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
   (** This is the software ID for this module on the internet. **)
   strSoftwareID = 'BrowseAndDocIt2006';
 
@@ -273,25 +253,6 @@ Begin
   {$ENDIF}
   iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
     TKeyboardBinding.Create(Wizard))
-End;
-
-(**
-
-  This function indent the text for a description.
-
-  @precon  None.
-  @postcon Returns an indented version of the passed text.
-
-  @param   strText as a String
-  @param   iIndent as an Integer
-  @return  a String
-
-**)
-Function Indent(strText : String; iIndent : Integer) : String;
-
-Begin
-  Result := StringOfChar(#32, iIndent) + StringReplace(strText, #13#10,
-    #13#10 + StringOfChar(#32, iIndent), [rfReplaceAll]);
 End;
 
 {procedure TBrowseAndDocItWizard.AfterCompile(Succeeded: Boolean);
@@ -419,6 +380,42 @@ End;
 
 (**
 
+  This method deletes the comment between the start and end lines of the editor.
+
+  @precon  None.
+  @postcon Deletes the comment between the start and end lines of the editor.
+
+  @param   Source     as an IOTASourceEditor
+  @param   iStartLine as an Integer
+  @param   iEndLine   as an Integer
+
+**)
+procedure TBrowseAndDocItWizard.DeleteExistingComment(Source : IOTASourceEditor;
+  iStartLine, iEndLine: Integer);
+
+Var
+  Writer : IOTAEditWriter;
+  ptStart, ptEnd : TOTACharPos;
+  iBufferStart, iBufferEnd : Integer;
+
+begin
+  Writer := Source.CreateUndoableWriter;
+    Try
+      ptStart.Line := iStartLine;
+      ptStart.CharIndex := 0;
+      iBufferStart := Source.GetEditView(0).CharPosToPos(ptStart);
+      Writer.CopyTo(iBufferStart);
+      ptEnd.Line := iEndLine;
+      ptEnd.CharIndex := 0;
+      iBufferEnd := Source.GetEditView(0).CharPosToPos(ptEnd);
+      Writer.DeleteTo(iBufferEnd);
+  Finally
+    Writer := Nil;
+  End;
+end;
+
+(**
+
   This is the destructor method for the TBrowseAndDocItWizard class.
 
   @precon  None.
@@ -431,6 +428,35 @@ begin
     mmiPascalDocMenu.Free;
   Inherited;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
+end;
+
+(**
+
+  This method inserts the given comment into the editor at the given insert
+  line.
+
+  @precon  None.
+  @postcon Inserts the given comment into the editor at the given insert line.
+
+  @param   strComment  as a string
+  @param   Writer      as an IOTAEditWriter
+  @param   iInsertLine as an Integer
+  @param   Source      as an IOTASourceEditor
+
+**)
+procedure TBrowseAndDocItWizard.InsertComment(strComment: string;
+  Writer: IOTAEditWriter; iInsertLine: Integer; Source: IOTASourceEditor);
+
+var
+  iBufferPos: Integer;
+  C: TOTACharPos;
+
+begin
+  C.Line := iInsertLine;
+  C.CharIndex := 0;
+  iBufferPos := Source.GetEditView(0).CharPosToPos(C);
+  Writer.CopyTo(iBufferPos);
+  Writer.Insert(PChar(strComment));
 end;
 
 (**
@@ -773,50 +799,15 @@ var
   Module : TBaseLanguageModule;
   EditPos: TOTAEditPos;
   T : TElementContainer;
-  N : TGenericMethodDecl;
+  F : TGenericFunction;
   Writer: IOTAEditWriter;
   Source: IOTASourceEditor;
-
-  (**
-
-    This method recursively works throug the hierarchy of elements looking for
-    the method which is closest to be on or just above the current cursor line.
-
-    @precon  Container must be a valid TElementContainer instance .
-    @postcon Recursively works throug the hierarchy of elements looking for the
-             method which is closest to be on or just above the current
-             cursor line .
-
-    @param   Container as a TElementContainer
-
-  **)
-  Procedure FindMethod(Container : TElementContainer);
-
-  Var
-    i : Integer;
-    M : TGenericMethodDecl;
-
-  Begin
-    For i := 1 To Container.ElementCount Do
-      Begin
-        If Container.Elements[i] Is TGenericMethodDecl Then
-          Begin
-            M := Container.Elements[i] As TGenericMethodDecl;
-            If (M.Line <= EditPos.Line) Then
-              Begin
-                If N = Nil Then
-                  N := M
-                Else
-                  If M.Line > N.Line Then
-                    N := M;
-              End;
-          End;
-        FindMethod(Container.Elements[i]);
-      End;
-  End;
+  CursorDelta: TPoint;
+  iIndent: Integer;
+  strComment: String;
+  iInsertLine: Integer;
 
 begin
-  N := Nil;
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
@@ -829,20 +820,28 @@ begin
         T := Module.FindElement(strImplementedMethodsLabel);
         If T <> Nil Then
           Begin
-            FindMethod(T);
-            If N <> Nil Then
+            F := FindFunction(EditPos.Line, T, TGenericMethodDecl);
+            If F <> Nil Then
               Begin
-                If N.Comment <> Nil Then
-                  If MessageDlg(Format(strMethodAlreadyExists, [N.QualifiedName]),
-                    mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
-                    Exit;
+                iIndent := FindIndentOfFirstTokenOnLine(Module, F.Line) - 1;
+                If F.Comment <> Nil Then
+                  Begin
+                    If MessageDlg(Format(strMethodAlreadyExists, [F.QualifiedName]),
+                      mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
+                      Exit;
+                    iInsertLine := F.Comment.Line;
+                    DeleteExistingComment(Source, F.Comment.Line, F.Line);
+                  End Else
+                    iInsertLine := F.Line;
                 Writer := Source.CreateUndoableWriter;
                 Try
-                  EditPos := WriteMethodComment(N, Source, Writer, N.Comment);
+                  strComment := WriteComment(F, ctPascalBlock, iIndent, True,
+                    CursorDelta);
+                  InsertComment(strComment, Writer, iInsertLine, Source);
                 Finally
                   Writer := Nil;
                 End;
-                Source.GetEditView(0).CursorPos := EditPos;
+                PositionCursorInFunction(CursorDelta, iInsertLine, iIndent, strComment);
               End Else
                 MessageDlg(strNoMethodFound, mtWarning, [mbOK], 0);
           End;
@@ -853,232 +852,6 @@ begin
    objMemStream.Free;
   End;
 end;
-
-(**
-
-  This method writes the method comment to the active editor.
-
-  @precon  Method is a valid instance of a method declaration to be commented ,
-           Writer is a valid instance of an open tools api writer ,
-           iBufferPos is the buffer position to insert the comment and iCol
-           is the column to indent the comment by .
-  @postcon A method comment is inserted into the editor .
-
-  @param   Method   as a TGenericMethodDecl
-  @param   Source   as an IOTASourceEditor
-  @param   Writer   as an IOTAEditWriter
-  @param   AComment as a TComment
-  @return  a TOTAEditPos
-
-**)
-Function TBrowseAndDocItWizard.WriteMethodComment(Method : TGenericMethodDecl;
-  Source : IOTASourceEditor; Writer : IOTAEditWriter; AComment : TComment) : TOTAEditPos;
-
-Const
-  strMethodTypes : Array[mtConstructor..mtFunction] Of String = (
-    'Constructor', 'Destructor', 'Procedure', 'Function');
-
-Var
-  iLen : Integer;
-  i : Integer;
-  C, CharPos: TOTACharPos;
-  iBufferPos: Integer;
-  iLines : Integer;
-  strType: String;
-  P : TPoint;
-
-begin
-  iLines := Method.Line;
-  CharPos.Line := Method.Line;
-  CharPos.CharIndex := Method.Column;
-  For i := 0 To Method.ClassNames.Count - 1 Do
-    Dec(CharPos.CharIndex, 1 + Length(Method.ClassNames[i]));
-  Dec(CharPos.CharIndex, 1 + Length(strMethodTypes[Method.MethodType]));
-  If Method.ClassMethod Then
-    Dec(CharPos.CharIndex, 6);
-  If AComment <> Nil Then // Delete existing comment.
-    Begin
-      C.CharIndex := AComment.Column;
-      C.Line := AComment.Line;
-      iBufferPos := Source.GetEditView(0).CharPosToPos(C);
-      Writer.CopyTo(iBufferPos - 1);
-      iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
-      Writer.DeleteTo(iBufferPos - 1);
-    End Else
-    Begin
-      iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
-      Writer.CopyTo(iBufferPos - 1);
-    End;
-  // Block Header
-  Writer.Insert('(**'#13#10#13#10);
-  Writer.Insert(PChar(GetMethodDescription(Method, AComment,
-    CharPos.CharIndex - 1 + 2, P)));
-  // Output method information
-  iLen := 0;
-  For i := 0 To Method.ParameterCount - 1 Do
-    If iLen < Length(Method.Parameters[i].Identifier) Then
-      iLen := Length(Method.Parameters[i].Identifier);
-  For i := 0 To Method.ParameterCount - 1 Do
-    Begin
-      Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
-      Writer.Insert(PChar(Format('  @param   %-*s as ', [
-        iLen, Method.Parameters[i].Identifier])));
-      If Method.Parameters[i].ParamType <> Nil Then
-        Begin
-          strType := Method.Parameters[i].ParamType.AsString(False, False);
-          Writer.Insert(PChar(Format('%s %s%s%s'#13#10, [
-            strAOrAn[(strType[1] In strVowels) Or Method.Parameters[i].ArrayOf],
-            strArrayOf[Method.Parameters[i].ArrayOf], strType,
-            strModifier[Method.Parameters[i].ParamModifier]])));
-        End;
-    End;
-  If Method.ReturnType <> Nil Then
-    Begin
-      Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
-      Writer.Insert(PChar(Format('  @return  %s %-*s',
-        [strAOrAn[Method.ReturnType.AsString(False, False)[1] In strVowels], iLen,
-        Method.ReturnType.AsString(False, False)])));
-      Writer.Insert(PChar(#13#10));
-    End;
-  // Block Footer
-  If (Method.ParameterCount > 0) Or (Method.ReturnType <> Nil) Then
-    Writer.Insert(PChar(#13#10));
-  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '**)'#13#10));
-  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
-  iLines := Writer.CurrentPos.Line - iLines;
-  // Get header in view if not already
-  Result.Col := CharPos.CharIndex + 2 + P.X;
-  Result.Line := CharPos.Line + 2 + P.Y;
-  SelectionChange(Result.Line + iLines, Result.Col, Result.Line - 2,
-    Result.Col);
-end;
-
-(**
-
-  This method returns a description for the method if it is a constructor,
-  destructor, getter or setter method, else it returns an empty String.
-
-  @precon  Method is a valid instance of a method declatation to be described .
-  @postcon Returns a description of the method is applicable .
-
-  @param   Method       as a TGenericMethodDecl
-  @param   AComment     as a TComment
-  @param   iIndent      as an Integer
-  @param   CursorAdjust as a TPoint as a reference
-  @return  a String
-
-**)
-function TBrowseAndDocItWizard.GetMethodDescription(Method : TGenericMethodDecl;
-  AComment : TComment; iIndent : Integer; var CursorAdjust : TPoint) : String;
-
-var
-  i: Integer;
-  boolCon: Boolean;
-  strDescription : String;
-  j: Integer;
-
-begin
-  CursorAdjust.X := 0;
-  CursorAdjust.Y := 0;
-  With BrowseAndDocItOptions Do
-    For i := 0 To MethodDescriptions.Count - 1 Do
-      If Like(MethodDescriptions.Names[i], Method.Identifier) Then
-        Begin
-          With TComment.Create(MethodDescriptions.ValueFromIndex[i], 0, 0) Do
-            Try
-              strDescription := Indent(AsString(80 - iIndent, True), iIndent);
-              If Pos('|', strDescription) > 0 Then
-                For j := 1 To Length(strDescription) Do
-                  Begin
-                    If strDescription[j] = '|' Then
-                      Begin
-                        Delete(strDescription, j, 1);
-                        Break;
-                      End;
-                    If strDescription[j] <> #10 Then
-                      Inc(CursorAdjust.X);
-                    If strDescription[j] = #13 Then
-                      Begin
-                        Inc(CursorAdjust.Y);
-                        CursorAdjust.X := 0;
-                      End;
-                  End;
-              If CursorAdjust.X > 0 Then
-                Dec(CursorAdJust.X, iIndent);
-              Break;
-            Finally
-              Free;
-            End;
-        End;
-  If AComment = Nil Then
-    Result := Format('%s'#13#10#13#10, [strDescription])
-  Else
-    Begin
-      Result := Format('%s'#13#10#13#10, [Indent(AComment.AsString(80 - iIndent, True), iIndent)]);
-      boolCon := False;
-      i := AComment.FindTag('precon');
-      If i > -1 Then
-        Begin
-          Result := Result + OutputTag(iIndent, AComment.Tag[i]);
-          boolCon := True;
-        End;
-      i := AComment.FindTag('postcon');
-      If i > -1 Then
-        Begin
-          Result := Result + OutputTag(iIndent, AComment.Tag[i]);
-          boolCon := True;
-        End;
-      If boolCon Then
-        Result := Result + #13#10;
-      boolCon := False;
-      For i := 0 To AComment.TagCount - 1 Do
-        If Not IsKeyWord(AComment.Tag[i].TagName, ['param', 'postcon', 'precon', 'return']) Then
-          Begin
-            Result := Result + OutputTag(iIndent, AComment.Tag[i]);
-            boolCon := True;
-          End;
-      If boolCon Then
-        Result := Result + #13#10;
-    End;
-end;
-
-(**
-
-
-  This function returns the tag information indented and broken into line no
-  wider than 80 characters.
-
-
-  @precon  Tag must be a valid comment tag.
-
-  @postcon Returns the tag information indented and broken into line no wider
-
-           than 80 characters.
-
-
-  @param   iIndent as an Integer
-  @param   Tag     as a TTag
-  @return  a String
-
-**)
-Function TBrowseAndDocItWizard.OutputTag(iIndent : Integer; Tag : TTag) : String;
-
-Var
-  str : String;
-  i : Integer;
-
-Begin
-  str := Format('%s@%-8s', [StringOfChar(#32, iIndent), Tag.TagName]);
-  For  i := 0 To Tag.TokenCount - 1 Do
-    If Length(str + Tag.Tokens[i].Token) < 80 Then
-      str := str + Tag.Tokens[i].Token
-    Else
-      Begin
-        Result := Result + str;
-        str := #13#10 + StringOfChar(#32, iIndent + 9) + Tag.Tokens[i].Token;
-      End;
-  Result := Result + str + #13#10;
-End;
 
 (**
 
@@ -1107,46 +880,12 @@ var
   EditPos: TOTAEditPos;
   Source : IOTASourceEditor;
   T : TElementContainer;
-  Q : TGenericProperty;
+  F : TGenericFunction;
   Writer: IOTAEditWriter;
-
-  (**
-
-    This method recursively works throug the hierarchy of elements looking for
-    the properties which is closest to be on or just above the current cursor line.
-
-    @precon  Container must be a valid TElementContainer instance.
-    @postcon Recursively works throug the hierarchy of elements looking for
-             the property which is closest to be on or just above the current
-             cursor line.
-
-    @param   Container as a TElementContainer
-
-  **)
-  Procedure FindProperty(Container : TElementContainer);
-
-  Var
-    i : Integer;
-    P : TGenericProperty;
-
-  Begin
-    For i := 1 To Container.ElementCount Do
-      Begin
-        If Container.Elements[i] Is TGenericProperty Then
-          Begin
-            P := Container.Elements[i] As TGenericProperty;
-            If (P.Line <= EditPos.Line) Then
-              Begin
-                If Q = Nil Then
-                  Q := P
-                Else
-                  If P.Line > Q.Line Then
-                    Q := P;
-              End;
-          End;
-        FindProperty(Container.Elements[i]);
-      End;
-  End;
+  iInsertLine: Integer;
+  iIndent: Integer;
+  strComment: String;
+  CursorDelta: TPoint;
 
 begin
   Source := ActiveSourceEditor;
@@ -1161,20 +900,28 @@ begin
         T := Module.FindElement(strTypesLabel);
         If T <> Nil Then
           Begin
-            FindProperty(T);
-            If Q <> Nil Then
+            F := FindFunction(EditPos.Line, Module, TGenericProperty);
+            If F <> Nil Then
               Begin
-                If Q.Comment <> Nil Then
-                  If MessageDlg(Format(strPropertyAlreadyExists, [Q.Identifier]),
-                    mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
-                    Exit;
+                iIndent := FindIndentOfFirstTokenOnLine(Module, F.Line) - 1;
+                If F.Comment <> Nil Then
+                  Begin
+                    If MessageDlg(Format(strPropertyAlreadyExists, [F.Identifier]),
+                      mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
+                      Exit;
+                    iInsertLine := F.Comment.Line;
+                    DeleteExistingComment(Source, F.Comment.Line, F.Line);
+                  End Else
+                    iInsertLine := F.Line;
                 Writer := Source.CreateUndoableWriter;
                 Try
-                  EditPos := WritePropertyComment(Q, Source, Writer, Q.Comment);
+                  strComment := WriteComment(F, ctPascalBlock, iIndent, True,
+                    CursorDelta);
+                  InsertComment(strComment, Writer, iInsertLine, Source);
                 Finally
                   Writer := Nil;
                 End;
-                Source.GetEditView(0).CursorPos := EditPos;
+                PositionCursorInFunction(CursorDelta, iInsertLine, iIndent, strComment);
               End Else
                 MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
           End;
@@ -1185,99 +932,6 @@ begin
    objMemStream.Free;
   End;
 end;
-
-(**
-
-
-  This method write the property comment to the active editor.
-
-
-  @precon  P is a valid instance of a property declaration to be commented,
-
-           Writer is a valid instance of an open tools api writer, iBufferPos
-
-           is the buffer position to insert the comment and iCol is the
-
-           column to indent the comment by.
-
-  @postcon A property comment it inserted into the editor.
-
-
-  @param   Prop     as a TGenericProperty
-
-  @param   Source   as an IOTASourceEditor
-  @param   Writer   as an IOTAEditWriter
-  @param   AComment as a TComment
-  @return  a TOTAEditPos
-
-**)
-Function TBrowseAndDocItWizard.WritePropertyComment(Prop : TGenericProperty;
-  Source : IOTASourceEditor; Writer : IOTAEditWriter; AComment : TComment) : TOTAEditPos;
-
-Var
-  i : Integer;
-  iLen : Integer;
-  C, CharPos: TOTACharPos;
-  iBufferPos: Integer;
-  iLines : Integer;
-  strType: String;
-
-Begin
-  iLines := Prop.Line;
-  CharPos.Line := Prop.Line;
-  CharPos.CharIndex := Prop.Column;
-  Dec(CharPos.CharIndex, 9);
-  If AComment <> Nil Then // Delete existing comment.
-    Begin
-      C.CharIndex := AComment.Column;
-      C.Line := AComment.Line;
-      iBufferPos := Source.GetEditView(0).CharPosToPos(C);
-      Writer.CopyTo(iBufferPos - 1);
-      iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
-      Writer.DeleteTo(iBufferPos - 1);
-    End Else
-    Begin
-      iBufferPos := Source.GetEditView(0).CharPosToPos(CharPos);
-      Writer.CopyTo(iBufferPos - 1);
-    End;
-  Writer.Insert(PChar('(**'#13#10));
-  Writer.Insert(PChar(GetPropertyDescription(Prop, AComment, CharPos.CharIndex - 1 + 2)));
-  iLen := 0;
-  For i := 0 To Prop.ParameterCount - 1 Do
-    If iLen < Length(Prop.Parameters[i].Identifier) Then
-      iLen := Length(Prop.Parameters[i].Identifier);
-  For i := 0 To Prop.ParameterCount - 1 Do
-    Begin
-      Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) +
-        Format('  @param   %-*s as ', [iLen,
-          Prop.Parameters[i].Identifier])));
-      If Prop.Parameters[i].ParamType <> Nil Then
-        Begin
-          strType := Prop.Parameters[i].ParamType.AsString(False, False);
-          Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '  ' +
-          Format('%s %s%s%s'#13#10, [strAOrAn[(strType[1] In
-              strVowels) Or Prop.Parameters[i].ArrayOf],
-            strArrayOf[Prop.Parameters[i].ArrayOf], strType,
-            strModifier[Prop.Parameters[i].ParamModifier]
-            ])));
-        End;
-    End;
-  If Prop.TypeId <> Nil Then
-    Begin
-      Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
-      Writer.Insert(PChar(Format('  @return  %s %-*s',
-        [strAOrAn[Prop.TypeId.AsString(False, False)[1] In strVowels], iLen,
-        Prop.TypeId.AsString(False, False)])));
-      Writer.Insert(PChar(#13#10));
-    End;
-  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1) + '**)'#13#10));
-  Writer.Insert(PChar(StringOfChar(#32, CharPos.CharIndex - 1)));
-  // Get header in view if not already
-  iLines := Writer.CurrentPos.Line - iLines;
-  Result.Col := CharPos.CharIndex + 2;
-  Result.Line := CharPos.Line + 1;
-  SelectionChange(Result.Line + iLines, Result.Col, Result.Line - 1, Result.Col);
-End;
 
 (**
 
@@ -1466,6 +1120,42 @@ Procedure TBrowseAndDocItWizard.OptionsChange(Sender : TObject);
 Begin
   iLastUpdateTickCount := 1;
 End;
+
+(**
+
+  This method positions the comment and function according to the options and
+  then places the cursor in the appropriate position for editing.
+
+  @precon  None.
+  @postcon Positions the comment and function according to the options and
+           then places the cursor in the appropriate position for editing.
+
+  @param   CursorDelta as a TPoint
+  @param   iInsertLine as an Integer
+  @param   iIndent     as an Integer
+  @param   strComment  as a string
+
+**)
+procedure TBrowseAndDocItWizard.PositionCursorInFunction(CursorDelta: TPoint;
+  iInsertLine: Integer; iIndent: Integer; strComment: string);
+
+Var
+  Pt: TPoint;
+  S: IOTASourceEditor;
+  C: TOTAEditPos;
+
+begin
+  SelectionChange(iInsertLine + CharCount(#13, strComment), 1, iInsertLine, 1);
+  Pt.Y := iInsertLine;
+  Pt.X := iIndent + 1;
+  Inc(Pt.Y, CursorDelta.Y);
+  Inc(Pt.X, CursorDelta.X);
+  C.Col := Pt.X;
+  C.Line := Pt.Y;
+  S := ActiveSourceEditor;
+  If S <> Nil Then
+    S.GetEditView(0).CursorPos := C;
+end;
 
 (**
 

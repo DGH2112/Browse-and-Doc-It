@@ -1147,7 +1147,7 @@ Var
 begin
   SelectionChange(iInsertLine + CharCount(#13, strComment), 1, iInsertLine, 1);
   Pt.Y := iInsertLine;
-  Pt.X := iIndent + 1;
+  Pt.X := 1;
   Inc(Pt.Y, CursorDelta.Y);
   Inc(Pt.X, CursorDelta.X);
   C.Col := Pt.X;

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    28 Feb 2009
+  @Date    22 Mar 2009
 
 **)
 Unit DGHLibrary;
@@ -1216,7 +1216,7 @@ end;
   @precon  strDate is the string to convert into a date.
   @postcon Returns a valid TDateTime value.
 
-  @param   strDate as a String
+  @param   strDate as a String as a Constant
   @return  a TDateTime
 
 **)

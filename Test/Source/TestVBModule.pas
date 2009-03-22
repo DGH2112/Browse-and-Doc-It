@@ -1,5 +1,5 @@
 unit TestVBModule;
-{
+{:
 
   Delphi DUnit Test Case
   ----------------------
@@ -95,6 +95,10 @@ type
     Procedure TestFailure01;
     Procedure TestFailure02;
     Procedure TestFailure03;
+    Procedure TestFailure04;
+    Procedure TestFailure05;
+    Procedure TestFailure06;
+    Procedure TestFailure07;
   End;
 
   //
@@ -741,7 +745,8 @@ begin
       ''''#13#10 +
       ''' @author David Hoyle'#13#10 +
       ''' @version 1.0'#13#10 +
-      ''' @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+      ''' @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'Option explicit'#13#10;
     S.LoadBufferFromString(strCode);
     M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
@@ -760,7 +765,8 @@ begin
       ''''#13#10 +
       ''' @author David Hoyle'#13#10 +
       ''' @version 1.0'#13#10 +
-      ''' @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+      ''' @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'version 1.0'#13#10;
     S.LoadBufferFromString(strCode);
     M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
@@ -779,7 +785,8 @@ begin
       ''':'#13#10 +
       ''' @author David Hoyle'#13#10 +
       ''' @version 1.0'#13#10 +
-      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'attribute iMyAttr = 1'#13#10;
     S.LoadBufferFromString(strCode);
     M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
@@ -798,7 +805,8 @@ begin
       ''':'#13#10 +
       ''' @author David Hoyle'#13#10 +
       ''': @version 1.0'#13#10 +
-      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10;
     S.LoadBufferFromString(strCode);
     M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
@@ -817,7 +825,8 @@ begin
       ''':'#13#10 +
       ''': @author David Hoyle'#13#10 +
       ''': @version 1.0'#13#10 +
-      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'option compare text'#13#10;
     S.LoadBufferFromString(strCode);
     M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
@@ -1788,6 +1797,350 @@ Begin
   End;
 end;
 
+procedure TestTVBModule.TestFailure04;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      ''':'#13#10 +
+      ''': This is a method comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''':'#13#10 +
+      ''': @param  iParam as a Long as a Reference'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      ''':'#13#10 +
+      'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
+      'End Function'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment = Nil, 'Module comment is NOT Nil!');
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      'VERSION 5.00'#13#10 +
+      ''#13#10 +
+      ''':'#13#10 +
+      ''': This is a method comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''':'#13#10 +
+      ''': @param  iParam as a Long as a Reference'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      ''':'#13#10 +
+      'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
+      'End Function'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment = Nil, 'Module comment is NOT Nil!');
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      'Option Compare Text'#13#10 +
+      ''#13#10 +
+      ''':'#13#10 +
+      ''': This is a method comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''':'#13#10 +
+      ''': @param  iParam as a Long as a Reference'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      ''':'#13#10 +
+      'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
+      'End Function'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment = Nil, 'Module comment is NOT Nil!');
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      'Attribute MyAttr = 1'#13#10 +
+      ''#13#10 +
+      ''':'#13#10 +
+      ''': This is a method comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''':'#13#10 +
+      ''': @param  iParam as a Long as a Reference'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      ''':'#13#10 +
+      'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
+      'End Function'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment = Nil, 'Module comment is NOT Nil!');
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''':'#13#10 +
+      ''': This is a method comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''':'#13#10 +
+      ''': @param  iParam as a Long as a Reference'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      ''':'#13#10 +
+      'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
+      'End Function'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment = Nil, 'Module comment is NOT Nil!');
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment'#13#10 +
+      ''': @date    ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @author  David Hoyle'#13#10 +
+      'VERSION 5.00'#13#10 +
+      ''#13#10 +
+      ''':'#13#10 +
+      ''': This is a method comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''':'#13#10 +
+      ''': @param  iParam as a Long as a Reference'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      ''':'#13#10 +
+      'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
+      'End Function'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module comment is NIL!');
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment'#13#10 +
+      ''': @date    ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @author  David Hoyle'#13#10 +
+      'Option Compare Text'#13#10 +
+      ''#13#10 +
+      ''':'#13#10 +
+      ''': This is a method comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''':'#13#10 +
+      ''': @param  iParam as a Long as a Reference'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      ''':'#13#10 +
+      'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
+      'End Function'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module comment is NIL!');
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      ''': This is a module comment'#13#10 +
+      ''': @date    ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @author  David Hoyle'#13#10 +
+      'Attribute MyAttr = 1'#13#10 +
+      ''#13#10 +
+      ''':'#13#10 +
+      ''': This is a method comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @precon  None.'#13#10 +
+      ''': @postcon None.'#13#10 +
+      ''':'#13#10 +
+      ''': @param  iParam as a Long as a Reference'#13#10 +
+      ''': @return a Boolean'#13#10 +
+      ''':'#13#10 +
+      'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
+      'End Function'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module comment is NIL!');
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure05;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      'Property Let Field(ByRef strText As String, iField As Long, strValue As String)'#13#10 +
+      '  Const iPipe As Long = 124'#13#10 +
+      '  Dim i As Long'#13#10 +
+      '  Dim iFields As Long'#13#10 +
+      '  Dim Result As String'#13#10 +
+      '  Exception.Push "TActAndRelDifferences.Field", strText, iField, strValue'#13#10 +
+      '  On Error GoTo ErrHnd'#13#10 +
+      '  Result = ""'#13#10 +
+      '  iFields = CharCount(strText, iPipe) + 1'#13#10 +
+      '  For i = 1 To iFields'#13#10 +
+      '    If Result <> "" Then Result = Result & "|"'#13#10 +
+      '    If i <> iField Then'#13#10 +
+      '      Result = Result & GetField(strText, i, iPipe)'#13#10 +
+      '    Else'#13#10 +
+      '      Result = Result & strValue'#13#10 +
+      '    End If'#13#10 +
+      '  Next i'#13#10 +
+      '  strText = Result'#13#10 +
+      'ErrHnd:'#13#10 +
+      '  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err'#13#10 +
+      '  Exception.Pop'#13#10 +
+      'End Property '#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure06;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      ''':'#13#10 +
+      ''': This is a module comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @version 1.0'#13#10 +
+      ''': @date    ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      ''': @author  David Hoyle'#13#10 +
+      'Option Compare Text'#13#10 +
+      ''#13#10 +
+      ''':'#13#10 +
+      ''': This is a function comment.'#13#10 +
+      ''':'#13#10 +
+      ''': @precon  '#13#10 +
+      ''': @postcon '#13#10 +
+      ''':'#13#10 +
+      'sub Hello()'#13#10 +
+      'end sub'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module comment is NIL!');
+      CheckEquals(1, M.Comment.Line);
+      CheckEquals(1, M.Comment.Column);
+      CheckEquals(4, M.Comment.Tag[0].Line);
+      CheckEquals(4, M.Comment.Tag[0].Column);
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure07;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      'Option Compare Text'#13#10 +
+      'function Hello() as string()'#13#10 +
+      'end function'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
 procedure TestTVBModule.TestFunctions;
 
 Var
@@ -1925,7 +2278,8 @@ begin
       ''':'#13#10 +
       ''': @author David Hoyle'#13#10 +
       ''': @version 1.0'#13#10 +
-      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
+      ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      'Option Explicit'#13#10;
     S.LoadBufferFromString(strCode);
     M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try

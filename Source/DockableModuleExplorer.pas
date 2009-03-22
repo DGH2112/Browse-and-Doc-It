@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    12 Aug 2008
+  @Date    22 Mar 2009
   @Version 1.0
 
 **)
@@ -84,7 +84,8 @@ End;
   @postcon The dockable form is registered with the IDE.
 
   @param   FormClass as a TfrmDockableModuleExplorerClass
-  @param   FormVar   as   @param   FormName  as a String constant
+  @param   FormVar
+  @param   FormName  as a String as a constant
 
 **)
 Procedure RegisterDockableForm(FormClass : TfrmDockableModuleExplorerClass;
@@ -103,7 +104,8 @@ End;
   @precon  None.
   @postcon The dockable form is unregistered with the IDE.
 
-  @param   FormVar  as   @param   FormName as a String constant
+  @param   FormVar
+  @param   FormName as a String as a constant
 
 **)
 Procedure UnRegisterDockableForm(var FormVar; Const FormName : String);

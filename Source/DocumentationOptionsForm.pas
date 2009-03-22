@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    28 Oct 2008
+  @Date    22 Mar 2009
 
 **)
 unit DocumentationOptionsForm;
@@ -53,7 +53,7 @@ Uses
   @postcon Returns the documentation type require in the var parameter if the
            dialogue is accepted while returning true, else returns false.
 
-  @param   ADocType as a TDocType
+  @param   ADocType as a TDocType as a Reference
   @return  a Boolean
 
 **)

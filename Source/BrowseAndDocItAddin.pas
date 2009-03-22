@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    06 Mar 2009
+  @Date    07 Mar 2009
 
 **)
 unit BrowseAndDocItAddin;
@@ -113,15 +113,9 @@ procedure TTVBDoc50Addin.OnConnection(
   const Application_: IDispatch; ConnectMode: ext_ConnectMode;
   const AddInInst: IDispatch; var custom: PSafeArray);
 
-Var
-  unk : Variant;
-
 begin
   Try
-    If Application_.QueryInterface(VBIDE_TLB.VBE, unk) = S_OK Then
-      FVBEIDE := TIDETools.Create(Application_ As VBIDE_TLB.VBE)
-    Else
-      DisplayException('The VBE IDE Interface is not supported.');
+    FVBEIDE := TIDETools.Create(Application_ As VBIDE_TLB.VBE)
   Except
     On E : Exception Do DisplayException('OnConnection: ' + E.Message);
   End;
@@ -143,8 +137,7 @@ procedure TTVBDoc50Addin.OnDisconnection(
   RemoveMode: ext_DisconnectMode; var custom: PSafeArray);
 begin
   Try
-    If FVBEIDE <> Nil Then
-      FVBEIDE.Free;
+    FVBEIDE.Free;
   Except
     On E : Exception Do DisplayException('OnDisconnection: ' + E.Message);
   End;

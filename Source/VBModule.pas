@@ -4,16 +4,9 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       19 Mar 2009
+  @Date       22 Mar 2009
   @Author     David Hoyle
 
-  @bug        GetComment does not correctly account for the column positions in
-              the resulting comments (out by 2 columns).
-  @bug        Module comments are take as the first comment in the module, not
-              the comment associated with either:#
-              1) Options#
-              2) Attributes#
-              3) Versions
 **)
 Unit VBModule;
 
@@ -1753,8 +1746,6 @@ begin
     Methods[4] := Declarations;
     For iMethod := Low(Methods) To High(Methods) Do
       Begin
-        If Comment = Nil Then
-          Comment := GetComment;
         If EndOfTokens Then
           Break;
         If Methods[iMethod] Then
@@ -1790,6 +1781,8 @@ begin
   If IsKeyWord(Token.Token, ['version']) Then
     Begin
       Result := True;
+      If Comment = Nil Then
+        Comment := GetComment;
       L := Add(TLabelContainer.Create(strVersionLabel, scNone, 0, 0,
         iiUsesLabel, Nil)) As TLabelContainer;
       V := L.Add(TVBVersion.Create(Token.Token, scNone, Token.Line,
@@ -1960,6 +1953,8 @@ Begin
   While IsKeyWord(Token.Token, ['attribute']) Do
     Begin
       Result := True;
+      If Comment = Nil Then
+        Comment := GetComment;
       If FAttributesLabel = Nil Then
         FAttributesLabel := Add(TLabelContainer.Create(strAttributesLabel,
           scNone, 0, 0, iiUsesLabel, Nil)) As TLabelContainer;
@@ -2065,6 +2060,8 @@ Begin
   While Token.UToken = 'OPTION' Do
     Begin
       Result := True;
+      If Comment = Nil Then
+        Comment := GetComment;
       If FOptionsLabel = Nil Then
         FOptionsLabel := Add(TLabelContainer.Create(strOptionsLabel, scNone,
           0, 0, iiUsesLabel, Nil)) As TLabelContainer;
@@ -2364,18 +2361,6 @@ Begin
         End Else
           M := DeclareLabel.Add(M) As TVBMethod;
       MethodDecl(M, C);
-      If Token.UToken = 'AS' Then
-        Begin
-          NextNonCommentToken;
-          If Token.TokenType In [ttIdentifier, ttReservedWord] Then
-            Begin
-              NextNonCommentToken;
-              M.ReturnType :=  TVBTypeDecl.Create(Token.Token, scNone,
-                Token.Line, Token.Column, iiNone, Nil);
-            End Else
-              ErrorAndSeekToken(strIdentExpected, 'Functions', Token.Token,
-                strSeekTokens, stActual);
-        End;
       If M.Ext = '' Then
         FindMethodEnd(M, 'FUNCTION');
     End;
@@ -2438,6 +2423,15 @@ Begin
               NextNonCommentToken;
               M.ReturnType.AppendToken(Token);
               If Not EndOfTokens Then NextNonCommentToken Else Exit;
+            End;
+          If Token.Token = '(' Then
+            Begin
+              NextNonCommentToken;
+              If Token.Token = ')' Then
+                NextNonCommentToken
+              Else
+                ErrorAndSeekToken(strLiteralExpected, 'MethodDecl',
+                  Token.Token, strSeekTokens, stActual);
             End;
         End Else
           ErrorAndSeekToken(strIdentExpected, 'MethodDecl', Token.Token,

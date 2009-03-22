@@ -20,6 +20,8 @@ uses
   Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ActnCtrls, ToolWin,
   ActnMan, ActnMenus, XPStyleActnCtrls, ActnPopup;
 
+{$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
+
 type
   (** A record to define the doc conflicts, hints and errors for files and
       directories. **)
@@ -101,7 +103,7 @@ type
     procedure actToolsExclusionsExecute(Sender: TObject);
     procedure lvDirectoriesChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
-  Strict Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     { Private declarations }
     FFileName: String;
     FPathRoot: String;
@@ -124,6 +126,7 @@ type
     Procedure RefreshExplorer(Sender : TObject);
     Procedure PopulateListView;
     Function ExcludeFileFromResults(strFileName : String) : Boolean;
+    Procedure GetErrors(strFileName : String; var iHints, iWarnings, iErrors, iConflicts : Integer);
     (**
       A property to define the currently selected file.
       @precon  None.
@@ -143,17 +146,9 @@ type
     { Public declarations }
   end;
 
-  (** This is an example helper class to demonstrate the coding, **)
-  TMyHelper = Class Helper For TfrmBrowseAndDocItTestForm
-  Private
-  Protected
-    Procedure GetErrors(strFileName : String; var iHints, iWarnings, iErrors, iConflicts : Integer);
-  Public
-  End;
-
   (** This is a class which represents a parser record of information. **)
   TParseRecord = Class
-  Strict Private
+  {$IFDEF D2006} Strict {$ENDIF} Private
     FFileName  : String;
     FPathRoot  : String;
     FErrors    : Integer;
@@ -643,7 +638,7 @@ end;
   @param   iConflicts  as an Integer as a reference
 
 **)
-Procedure TMyHelper.GetErrors(strFileName : String;
+Procedure TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String;
   var iHints, iWarnings, iErrors, iConflicts : Integer);
 
 Var

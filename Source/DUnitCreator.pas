@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Feb 2009
+  @Date    22 Mar 2009
 
 **)
 unit DUnitCreator;
@@ -951,7 +951,6 @@ begin
   SE := SourceEditor(Module);
   if SE <> nil then
     begin
-      SE.Show;
       if SE.EditViewCount > 0 then
         begin
           if SE.EditViews[0] <> nil then
@@ -1417,6 +1416,7 @@ begin
   FUnit.CurrentEditor.Show;
   SE := SourceEditor(FUnit);
   CheckReadOnlyStatus(FUnit, StrUnitReadOnly);
+  SE.Show;
   If FUnit <> Nil Then
     Begin
       Source := EditorAsMemoryStream(SourceEditor(FUnit));
@@ -1566,7 +1566,7 @@ end;
 **)
 function TProjectCreator.GetShowSource: Boolean;
 begin
-  Result := True;
+  Result := False;
 end;
 
 (**
@@ -1609,7 +1609,7 @@ end;
   @precon  None.
   @postcon Determines that there are no new options.
 
-  @param   ProjectName as a string constant
+  @param   ProjectName as a string  as a constant
   @return  an IOTAFile
 
 **)
@@ -1625,7 +1625,7 @@ end;
   @precon  None.
   @postcon Determines that there is no new project resource.
 
-  @param   Project as an IOTAProject constant
+  @param   Project as an IOTAProject as a constant
 
 **)
 procedure TProjectCreator.NewProjectResource(const Project: IOTAProject);
@@ -1639,7 +1639,7 @@ end;
   @precon  None.
   @postcon Creates the new project source file from a resource stream.
 
-  @param   ProjectName as a string constant
+  @param   ProjectName as a string as a constant
   @return  an IOTAFile
 
 **)
@@ -1656,7 +1656,7 @@ end;
   This is a constructor for the TUnitCreator class.
 
   @precon  None .
-  @postcon Sets the project file name and the project owner . 
+  @postcon Sets the project file name and the project owner .
 
   @param   strNewUnitName    as a String
   @param   strUnitToBeTested as a String
@@ -1686,7 +1686,7 @@ end;
   @precon  None.
   @postcon Not used in a unit.
 
-  @param   FormEditor as an IOTAFormEditor constant
+  @param   FormEditor as an IOTAFormEditor as a constant
 
 **)
 procedure TUnitCreator.FormCreated(const FormEditor: IOTAFormEditor);
@@ -1879,8 +1879,8 @@ end;
   @precon  None.
   @postcon Not used in a unit file.
 
-  @param   FormIdent     as a string constant
-  @param   AncestorIdent as a string constant
+  @param   FormIdent     as a string as a constant
+  @param   AncestorIdent as a string as a constant
   @return  an IOTAFile
 
 **)
@@ -1897,9 +1897,9 @@ end;
   @precon  None.
   @postcon Generates the source code for this new unit file.
 
-  @param   ModuleIdent   as a string constant
-  @param   FormIdent     as a string constant
-  @param   AncestorIdent as a string constant
+  @param   ModuleIdent   as a string as a constant
+  @param   FormIdent     as a string as a constant
+  @param   AncestorIdent as a string as a constant
   @return  an IOTAFile
 
 **)
@@ -1917,9 +1917,9 @@ end;
   @precon  None.
   @postcon Not used in Delphi.
 
-  @param   ModuleIdent   as a string constant
-  @param   FormIdent     as a string constant
-  @param   AncestorIdent as a string constant
+  @param   ModuleIdent   as a string as a constant
+  @param   FormIdent     as a string as a constant
+  @param   AncestorIdent as a string as a constant
   @return  an IOTAFile
 
 **)

@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    20 Mar 2009
+  @Date    22 Mar 2009
   @Author  David Hoyle
 
 **)
@@ -91,6 +91,7 @@ Type
     Procedure InsertCodeFragmentClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure ShowTokensClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure OptionsClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
+    Procedure CheckForUpdatesClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure FormActivate(Sender : TObject);
     Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
       iCommentCol : Integer);
@@ -180,8 +181,8 @@ ResourceString
   strShowTokens = '&Show Tokens...';
   (** This is the caption for the Options Menu Item. **)
   strOptions = '&Options...';
-  (** This is the caption for the Help Menu Item. **)
-  strHelp = '&Help';
+  (** This is the caption for the Check for Updates Menu Item. **)
+  strCheckForUpdates = 'Check for &Updates...';
   (** This is the caption for the Focus Editor Menu Item. **)
   strFocusEditor = 'Focus &Editor';
   (** This is the caption for the Insert Method Comment Menu Item. **)
@@ -209,7 +210,7 @@ Uses
   ExportForm, ProgressForm, Controls, FileCtrl, Functions, TokenForm,
   ModuleDispatcher, OptionsForm, DocumentationOptionsForm, ShellAPI,
   CodeFragmentsForm, Variants, Messages, VBEIDEModuleExplorer,
-  CommonIDEFunctions, DGHLibrary, Math, VBModule;
+  CommonIDEFunctions, DGHLibrary, Math, VBModule, checkforupdates;
 
 { TIDEMenuItem }
 
@@ -265,6 +266,8 @@ begin
   Try
     FOldHandle := Application.Handle;
     Application.Handle := VBEIDERef.MainWindow.HWnd;
+    TCheckForUpdates.Execute('BrowseAndDocIt2006',
+      BrowseAndDocItOptions.INIFileName, False);
     FPath := ExtractFilePath(BrowseAndDocItOptions.INIFileName) + 'Code Fragments\';
     ForceDirectories(FPath);
     TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
@@ -403,6 +406,7 @@ Begin
       CreateMenuItem(strSaveCodeFragment, SaveCodeFragmentClick, True, 'S');
       CreateMenuItem(strInsertCodeFragment,InsertCodeFragmentClick, False, 'N');
       CreateMenuItem(strOptions, OptionsClick, True, 'O');
+      CreateMenuItem(strCheckForUpdates, CheckForUpdatesClick, True, 'O');
     End;
 End;
 
@@ -841,6 +845,24 @@ end;
 procedure TIDETools.ImportClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 begin
   //: @todo Implement the Import Menu.
+end;
+
+(**
+
+  This is an on click event handler for the Check for Updates menu item.
+
+  @precon  None.
+  @postcon Invokes the checking for updates system.
+
+  @param   Ctrl          as a CommandBarButton as a constant
+  @param   CancelDefault as a WordBool as a reference
+
+**)
+procedure TIDETools.CheckForUpdatesClick(const Ctrl: CommandBarButton;
+  var CancelDefault: WordBool);
+begin
+  TCheckForUpdates.Execute('BrowseAndDocIt2006',
+    BrowseAndDocItOptions.INIFileName, True);
 end;
 
 (**

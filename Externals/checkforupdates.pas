@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    06 Feb 2009
+  @Date    22 Mar 2009
 
 **)
 Unit CheckForUpdates;
@@ -415,7 +415,7 @@ end;
   @param   iMinor       as an Integer
   @param   iBugFix      as an Integer
   @param   iBuild       as an Integer
-  @param   strAppVerNum as a String
+  @param   strAppVerNum as a String as a Reference
   @return  a Integer
 
 **)

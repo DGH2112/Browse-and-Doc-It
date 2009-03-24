@@ -31,10 +31,6 @@ object frmOptions: TfrmOptions
     TabOrder = 0
     object Page1: TTabSheet
       Caption = 'General Options'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object clbOptions: TCheckListBox
         Left = 0
         Top = 0
@@ -114,10 +110,6 @@ object frmOptions: TfrmOptions
     object Page2: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -225,10 +217,6 @@ object frmOptions: TfrmOptions
     object TabSheet1: TTabSheet
       Caption = 'Module Explorer'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -418,10 +406,6 @@ object frmOptions: TfrmOptions
     object TabSheet2: TTabSheet
       Caption = 'Code Browsing'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -444,10 +428,6 @@ object frmOptions: TfrmOptions
     object tabExcludeDocFiles: TTabSheet
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         675
         342)
@@ -465,10 +445,6 @@ object frmOptions: TfrmOptions
     object tabMethodDescriptions: TTabSheet
       Caption = 'Method Descriptions'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         675
         342)

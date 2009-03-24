@@ -33,8 +33,6 @@ object frmExclusions: TfrmExclusions
     ScrollBars = ssBoth
     TabOrder = 0
     WordWrap = False
-    ExplicitWidth = 384
-    ExplicitHeight = 197
   end
   object btnOK: TBitBtn
     Left = 324
@@ -44,8 +42,6 @@ object frmExclusions: TfrmExclusions
     Anchors = [akRight, akBottom]
     TabOrder = 1
     Kind = bkOK
-    ExplicitLeft = 178
-    ExplicitTop = 221
   end
   object btnCancel: TBitBtn
     Left = 405
@@ -55,7 +51,5 @@ object frmExclusions: TfrmExclusions
     Anchors = [akRight, akBottom]
     TabOrder = 2
     Kind = bkCancel
-    ExplicitLeft = 259
-    ExplicitTop = 221
   end
 end

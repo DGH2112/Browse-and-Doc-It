@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    20 Mar 2009
+  @Date    25 Mar 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -4218,13 +4218,13 @@ Begin
     If LowerCase(Comment.Tag[i].TagName) = 'precon' Then
       Begin
         Inc(k);
-        If doShowMethodMissingPreCons In BrowseAndDocItOptions.Options Then
-          boolMissing := boolMissing And (Comment.Tag[i].TokenCount = 0);
+        boolMissing := boolMissing And (Comment.Tag[i].TokenCount = 0);
       End;
-  If boolMissing Then
-    AddDocumentConflict([FunctionType, QualifiedName], Comment.Line,
-      Comment.Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
-      DocConflictTable[dctFunctionPreconNotDocumented]);
+  If doShowMethodMissingPreCons In BrowseAndDocItOptions.Options Then
+    If boolMissing Then
+      AddDocumentConflict([FunctionType, QualifiedName], Comment.Line,
+        Comment.Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
+        DocConflictTable[dctFunctionPreconNotDocumented]);
   If doShowMethodDiffParamCount In BrowseAndDocItOptions.Options Then
     If (ParameterCount <> j) Then
       AddDocumentConflict([FunctionType, QualifiedName, ParameterCount, j], Line,

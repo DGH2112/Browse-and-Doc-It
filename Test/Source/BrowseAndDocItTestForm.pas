@@ -17,8 +17,7 @@ uses
   Graphics, Controls, Forms, Dialogs, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ExtCtrls, ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
   FileCtrl, ComCtrls, Contnrs, SynHighlighterVB,
-  Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ActnCtrls, ToolWin,
-  ActnMan, ActnMenus, XPStyleActnCtrls, ActnPopup;
+  Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ToolWin;
 
 {$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
 
@@ -35,33 +34,24 @@ type
     pnlFileList: TPanel;
     Splitter1: TSplitter;
     lvFileList: TListView;
-    amActions: TActionManager;
-    atbToolbar: TActionToolBar;
     ilImages: TImageList;
+    sbrStatusBar: TStatusBar;
+    sptFiles: TSplitter;
+    sptDirs: TSplitter;
+    lvDirectories: TListView;
+    amActions: TActionList;
     actFileExit: TFileExit;
     actViewSpecialCharacters: TAction;
     actFileRecurseFolders: TAction;
-    sbrStatusBar: TStatusBar;
     actEditCut: TEditCut;
     actEditCopy: TEditCopy;
     actEditPaste: TEditPaste;
     actEditSelectAll: TEditSelectAll;
     actEditUndo: TEditUndo;
     actEditDelete: TEditDelete;
-    popActionBar: TPopupActionBar;
-    Undo1: TMenuItem;
-    Cut1: TMenuItem;
-    Copy1: TMenuItem;
-    Paste1: TMenuItem;
-    Delete1: TMenuItem;
-    SelectAll1: TMenuItem;
     actViewShowTokens: TAction;
     actToolsOptions: TAction;
     actToolsDocumentation: TAction;
-    sptFiles: TSplitter;
-    pabErrorsHintsWarnings: TPopupActionBar;
-    sptDirs: TSplitter;
-    lvDirectories: TListView;
     actFileAddFolder: TAction;
     actFileEditFolder: TAction;
     actViewDocConflicts: TAction;
@@ -71,8 +61,34 @@ type
     actFileScan: TAction;
     actFileExcludeFile: TAction;
     actFileDeleteFolder: TAction;
-    ilDirStatus: TImageList;
     actToolsExclusions: TAction;
+    atbToolbar: TToolBar;
+    tbtnFileScan: TToolButton;
+    tbtnFileAddFolder: TToolButton;
+    tbtnFileExit: TToolButton;
+    tbtnFileRecurseFolders: TToolButton;
+    tbtnFileEditFolder: TToolButton;
+    tbtnFileDeleteFolder: TToolButton;
+    tbtnFileExcludeFile: TToolButton;
+    btnViewDocConflicts: TToolButton;
+    tbtnViewHints: TToolButton;
+    tbtnViewWarnings: TToolButton;
+    tbtnViewErrors: TToolButton;
+    tbtnSep1: TToolButton;
+    tbtnViewSpecialChars: TToolButton;
+    tbtnViewShowTokens: TToolButton;
+    tbtnSep2: TToolButton;
+    tbtnToolsOptions: TToolButton;
+    tbtnToolsDocumentation: TToolButton;
+    tbtnToolsExclusions: TToolButton;
+    ilDirStatus: TImageList;
+    pmEdit: TPopupMenu;
+    Undo1: TMenuItem;
+    Cut1: TMenuItem;
+    Copy1: TMenuItem;
+    Paste1: TMenuItem;
+    Delete1: TMenuItem;
+    SelectAll1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
@@ -723,7 +739,7 @@ begin
       Align := alClient;
       ActiveLineColor := clSkyBlue;
       Gutter.ShowLineNumbers := True;
-      PopupMenu := popActionBar;
+      PopupMenu := pmEdit;
       OnChange := SynEdit1Change;
       OnStatusChange:= SynEdit1StatusChange;
     End;

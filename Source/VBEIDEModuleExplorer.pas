@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    07 Mar 2009
+  @Date    27 Mar 2009
   @Version 1.0
 
 **)

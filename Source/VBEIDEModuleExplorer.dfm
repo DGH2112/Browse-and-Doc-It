@@ -1,8 +1,9 @@
 object frmDockableModuleExplorer: TfrmDockableModuleExplorer
   Left = 456
   Top = 303
+  BorderStyle = bsSizeToolWin
   Caption = 'Module Explorer'
-  ClientHeight = 358
+  ClientHeight = 367
   ClientWidth = 257
   Color = clBtnFace
   Constraints.MinHeight = 250

@@ -102,6 +102,7 @@ type
     Procedure TestFailure08;
     procedure TestFailure09;
     procedure TestFailure10;
+    Procedure TestFailure11;
   End;
 
   //
@@ -2107,7 +2108,7 @@ Begin
       CheckEquals(1, M.Comment.Line);
       CheckEquals(1, M.Comment.Column);
       CheckEquals(4, M.Comment.Tag[0].Line);
-      CheckEquals(4, M.Comment.Tag[0].Column);
+      CheckEquals(5, M.Comment.Tag[0].Column);
     Finally
       M.Free;
     End;
@@ -2308,6 +2309,61 @@ Begin
     Finally
       BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options -
         [doShowMissingVBExceptionWarnings];
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure11;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      ''':'#13#10 +
+      ''': @todo Hello dave'#13#10 +
+      ''':'#13#10 +
+      'Option Compare Text'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module comment IS Nil');
+      CheckEquals('todo', M.Comment.Tag[0].TagName);
+      CheckEquals(2, M.Comment.Tag[0].Line);
+      CheckEquals(5, M.Comment.Tag[0].Column);
+    Finally
+      M.Free;
+    End;
+    strCode :=
+      '  '':'#13#10 +
+      '  '': @todo Hello dave'#13#10 +
+      '  '':'#13#10 +
+      'Option Compare Text'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module comment IS Nil');
+      CheckEquals('todo', M.Comment.Tag[0].TagName);
+      CheckEquals(2, M.Comment.Tag[0].Line);
+      CheckEquals(7, M.Comment.Tag[0].Column);
+    Finally
+      M.Free;
     End;
   Finally
     S.Free;

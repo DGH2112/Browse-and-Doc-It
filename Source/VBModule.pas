@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       22 Mar 2009
+  @Date       28 Mar 2009
   @Author     David Hoyle
 
 **)
@@ -307,6 +307,7 @@ Type
     FOptionsLabel: TLabelContainer;
     FSourceStream: TStream;
     FModuleType : TModuleType;
+    FUnResolvedSymbols : TStringList;
     Procedure TokenizeStream;
     { Grammer Parsers }
     Procedure Goal;
@@ -341,6 +342,7 @@ Type
       Override;
     Procedure NextNonCommentToken; Override;
     Procedure CheckExceptionHandling;
+    Procedure ResolvedForwardReferences;
   Public
     Constructor CreateParser(Source : TStream; strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
@@ -1359,6 +1361,9 @@ Begin
   FDeclaredMethodsLabel       := Nil;
   FAttributesLabel            := Nil;
   FOptionsLabel               := Nil;
+  FUnResolvedSymbols := TStringList.Create;
+  FUnResolvedSymbols.Duplicates := dupIgnore;
+  FUnResolvedSymbols.Sorted := True;
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSourceStream := Source;
   AddTickCount('Start');
@@ -1375,6 +1380,7 @@ Begin
     Begin
       Goal;
       AddTickCount('Parse');
+      ResolvedForwardReferences;
       AddTickCount('Resolve');
       Add(strErrors, iiErrorFolder, scNone, Nil);
       Add(strWarnings, iiWarningFolder, scNone, Nil);
@@ -1404,6 +1410,7 @@ End;
 Destructor TVBModule.Destroy;
 
 Begin
+  FUnResolvedSymbols.Free;
   Inherited Destroy;
 End;
 
@@ -2383,7 +2390,6 @@ Begin
   M.Comment := C;
   M.Identifier := Token.Token;
   M.ClassNames.Add(ModuleName);
-  M.Referenced := True;
   NextNonCommentToken;
   If Token.UToken = 'LIB' Then
     Begin
@@ -2491,7 +2497,8 @@ Begin
   Repeat
     NextNonCommentToken;
     If Token.TokenType In [ttIdentifier] Then
-      ReferenceSymbol(Token);
+      If Not ReferenceSymbol(Token) Then
+        FUnResolvedSymbols.Add(Token.Token);
     // Check for Exception.Push & Exception.Pop
     If AnsiCompareText(Token.Token, 'Exception') = 0 Then
       Begin
@@ -3052,6 +3059,36 @@ end;
 
 (**
 
+  This method tries to resolved the references for the symbols left over in
+  FUnResolvedSymbols as they could be forward referenced at the time of the
+  original check.
+
+  @precon  None.
+  @postcon Tries to resolved the references for the symbols left over in
+           FUnResolvedSymbols as they could be forward referenced at the time
+           of the original check.
+
+**)
+procedure TVBModule.ResolvedForwardReferences;
+
+var
+  i: Integer;
+  T : TTokenInfo;
+
+begin
+  For i := 0 To FUnResolvedSymbols.Count - 1 Do
+    Begin
+      T := TTokenInfo.Create(FUnResolvedSymbols[i], 0, 0, 0, 0, ttIdentifier);
+      Try
+        ReferenceSymbol(T)
+      Finally
+        T.Free;
+      End;
+    End;
+end;
+
+(**
+
   This method processes a variable declaration on a line.
 
   @precon  Variable must be a value instance of a previous created variable
@@ -3113,7 +3150,8 @@ begin
       AddToExpression(Variable);
     if Token.TokenType in [ttIdentifier, ttReservedWord] then
     begin
-      ReferenceSymbol(Token);
+      If ReferenceSymbol(Token) Then
+        FUnResolvedSymbols.Add(Token.Token);
       AddToExpression(Variable);
       if (PrevToken.UToken = 'STRING') and (Token.Token = '*') then
       begin

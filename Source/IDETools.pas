@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    22 Mar 2009
+  @Date    28 Mar 2009
   @Author  David Hoyle
 
 **)
@@ -1148,6 +1148,8 @@ end;
 **)
 procedure TIDETools.DocumentationClick(const Ctrl: CommandBarButton;
   var CancelDefault: WordBool);
+var
+  i: Integer;
 
 begin
   Try
@@ -1161,12 +1163,27 @@ begin
               Free;
             End;
           If Execute(FDocType) Then
-            With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
-              Try
-                WriteInteger('Documentation options', 'LastOption', Byte(FDocType));
-              Finally
-                Free;
-              End;
+            Begin
+              With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
+                Try
+                  WriteInteger('Documentation options', 'LastOption', Byte(FDocType));
+                Finally
+                  Free;
+                End;
+                With DocumentDispatcher(ProjectPath[FVBEIDE.ActiveVBProject.Name],
+                  FVBEIDE.ActiveVBProject.Description, FDocType) Do
+                  Try
+                    For i := 1 To FVBEIDE.ActiveVBProject.VBComponents.Count Do
+                      Add(GetFileName(FVBEIDE.ActiveVBProject.Name,
+                        FVBEIDE.ActiveVBProject.VBComponents.Item(i).Name,
+                        FVBEIDE.ActiveVBProject.VBComponents.Item(i).Type_));
+                    OutputDocumentation;
+                    ShellExecute(Application.Handle, 'Open', PChar(MainDocument), '', '',
+                      SW_SHOWNORMAL);
+                  Finally
+                    Free;
+                  End;
+            End;
         Finally
           Free;
         End

@@ -727,9 +727,13 @@ begin
     CheckEquals(ttHTMLEndTag, ReturnValue.Tokens[10].TokenType);
     CheckEquals(ttSymbol, ReturnValue.Tokens[11].TokenType);
     CheckEquals('todo', ReturnValue.Tag[0].TagName);
+    CheckEquals(15, ReturnValue.Tag[0].Line);
+    CheckEquals(26, ReturnValue.Tag[0].Column);
     CheckEquals('Requires implementing.', ReturnValue.Tag[0].AsString(80, False));
     CheckEquals('Requires <e>implementing</e>.', ReturnValue.Tag[0].AsString(80, True));
     CheckEquals('see', ReturnValue.Tag[1].TagName);
+    CheckEquals(16, ReturnValue.Tag[1].Line);
+    CheckEquals(26, ReturnValue.Tag[1].Column);
     CheckEquals('Something1 interesting.', ReturnValue.Tag[1].AsString(80, False));
     CheckEquals(2, ReturnValue.TagCount);
     CheckEquals(12, ReturnValue.Line);

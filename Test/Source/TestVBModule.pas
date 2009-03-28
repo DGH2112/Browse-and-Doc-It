@@ -100,6 +100,7 @@ type
     Procedure TestFailure06;
     Procedure TestFailure07;
     Procedure TestFailure08;
+    procedure TestFailure09;
   End;
 
   //
@@ -1066,7 +1067,7 @@ begin
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
-      CheckEquals('1) Method ''MyFunction'' has not been documented.', M.DocConflict(1));
+      CheckEquals('1) Method ''VBFile.MyFunction'' has not been documented.', M.DocConflict(1));
     Finally
       M.Free;
     End;
@@ -1089,7 +1090,7 @@ begin
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
-      CheckEquals('1) Method ''MyFunction'' has not been documented.', M.DocConflict(1));
+      CheckEquals('1) Method ''VBFile.MyFunction'' has not been documented.', M.DocConflict(1));
     Finally
       M.Free;
     End;
@@ -2172,6 +2173,73 @@ Begin
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
     Finally
       M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure09;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options +
+      [doShowMissingVBExceptionWarnings];
+    Try
+      strCode :=
+        'Option Compare Text'#13#10 +
+        ''#13#10 +
+        'Public Sub Hello()'#13#10 +
+        '  Exception.Push "VBFile.Hello1" '#13#10 +
+        '  On Error Goto ErrHnd'#13#10 +
+        '  DoSomething'#13#10 +
+        'ErrHnd:'#13#10 +
+        '  If Err.Number <> 0 Then Exception.DisplayException Err'#13#10 +
+        '  Exception.Pop'#13#10 +
+        'End Sub'#13#10 +
+        ''#13#10;
+      S.LoadBufferFromString(strCode);
+      M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+      Try
+        CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+        CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+        CheckEquals('  [The name passed to the Exception.Push method ("VBFile.Hello1") is incorrect (''VBFile.Hello''). [CheckExceptionHandling]]', M.firstwarning);
+        CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+        CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Finally
+        M.Free;
+      End;
+      strCode :=
+        'Option Compare Text'#13#10 +
+        ''#13#10 +
+        'Public Sub Hello()'#13#10 +
+        '  Exception.Push "VBFile.Hello"'#13#10 +
+        '  On Error Goto ErrHnd'#13#10 +
+        '  DoSomething'#13#10 +
+        'ErrHnd:'#13#10 +
+        '  If Err.Number <> 0 Then Exception.DisplayException Err'#13#10 +
+        '  Exception.Pop'#13#10 +
+        'End Sub'#13#10 +
+        ''#13#10;
+      S.LoadBufferFromString(strCode);
+      M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+      Try
+        CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+        CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+        CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+        CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Finally
+        M.Free;
+      End;
+    Finally
+      BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options -
+        [doShowMissingVBExceptionWarnings];
     End;
   Finally
     S.Free;

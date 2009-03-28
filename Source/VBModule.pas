@@ -296,6 +296,8 @@ Type
   TVBModule = Class(TBaseLanguageModule)
   private
     procedure ProcessVar(Variable: TVBVar);
+    procedure CheckElementExceptionHandling(M: TGenericFunction;
+      ExceptionHandler : IExceptionHandling);
   {$IFDEF D2005} Strict {$ENDIF} Private
     FTypesLabel: TLabelContainer;
     FConstantsLabel: TLabelContainer;
@@ -448,6 +450,9 @@ ResourceString
   (** A warning message for missing push names. **)
   strExceptionPushNameIncorrect = 'The name passed to the Exception.Push me' +
   'thod (%s) is incorrect (''%s.%s'').';
+  (** A warning message for missing push parameters. **)
+  strExceptionPushParameter = 'The parameter ''%s'' in ''%s.%s'' does not ha' +
+  've a corresponding parameter in the Exception.Push statement.';
 
 { TVBComment }
 
@@ -2647,46 +2652,21 @@ procedure TVBModule.CheckExceptionHandling;
 Var
   I : TElementContainer;
   j : Integer;
-  M : TVBMethod;
-  boolNoTag: Boolean;
 
 begin
   I := FindElement(strImplementedMethodsLabel);
   If i <> Nil Then
     Begin
       For j := 1 To I.ElementCount Do
-        Begin
-          M := I.Elements[j] As TVBMethod;
-          boolNoTag :=
-            (Comment <> Nil) And (Comment.FindTag('noexception') > -1) Or
-            (M.Comment <> Nil) And (M.Comment.FindTag('noexception') > -1);
-          If Not M.ExceptionHandling.HasPush And Not boolNoTag Then
-            AddIssue(Format(strExceptionPush, [M.Identifier]), scNone,
-              'CheckExceptionHandling', M.Line, M.Column, etWarning);
-          If (M.ExceptionHandling.PushName = '') And Not boolNoTag Then
-            AddIssue(Format(strExceptionPushName, [M.Identifier]), scNone,
-              'CheckExceptionHandling', M.Line, M.Column, etWarning);
-          If Not boolNoTag Then
-            If AnsiCompareText(Format('"%s.%s"', [ModuleName, M.Identifier]),
-              M.ExceptionHandling.PushName) <> 0 Then
-              AddIssue(Format(strExceptionPushNameIncorrect, [
-              M.ExceptionHandling.PushName, ModuleName,
-              M.Identifier]), scNone, 'CheckExceptionHandling', M.Line,
-              M.Column, etWarning);
-
-          If Not M.ExceptionHandling.HasPop And Not boolNoTag Then
-            AddIssue(Format(strExceptionPop, [M.Identifier]), scNone,
-              'CheckExceptionHandling', M.Line, M.Column, etWarning);
-          boolNoTag :=
-            (Comment <> Nil) And (Comment.FindTag('noerror') > -1) Or
-            (M.Comment <> Nil) And (M.Comment.FindTag('noerror') > -1);
-          If Not M.ExceptionHandling.HasErrorHnd And Not boolNoTag Then
-            AddIssue(Format(strErrorHandling, [M.Identifier]), scNone,
-              'CheckExceptionHandling', M.Line, M.Column, etWarning);
-          If M.ExceptionHandling.HasExit And M.ExceptionHandling.HasErrorHnd Then
-            AddIssue(Format(strExitStatement, [M.Identifier]), scNone,
-              'CheckExceptionHandling', M.Line, M.Column, etWarning);
-        End;
+        CheckElementExceptionHandling(I.Elements[j] As TVBMethod,
+          (I.Elements[j] As TVBMethod).ExceptionHandling);
+    End;
+  I := FindElement(strImplementedPropertiesLabel);
+  If i <> Nil Then
+    Begin
+      For j := 1 To I.ElementCount Do
+        CheckElementExceptionHandling(I.Elements[j] As TVBProperty,
+          (I.Elements[j] As TVBProperty).ExceptionHandling);
     End;
 end;
 
@@ -3076,6 +3056,63 @@ begin
   Result := boolFound;
   If Result Then
     Exit;
+end;
+
+(**
+
+  This method checks the exception handling for the given function and it's
+  exception handler.
+
+  @precon  M and ExceptionHandler must be valid instances.
+  @postcon Checks the exception handling for the given function and it's
+           exception handler and outputs an issue IF something is missing.
+
+  @param   M                as a TGenericFunction
+  @param   ExceptionHandler as an IExceptionHandling
+
+**)
+procedure TVBModule.CheckElementExceptionHandling(M: TGenericFunction;
+  ExceptionHandler : IExceptionHandling);
+
+var
+  boolNoTag: Boolean;
+  i: Integer;
+  j: Integer;
+
+begin
+  boolNoTag :=
+    (Comment <> Nil) And (Comment.FindTag('noexception') > -1) Or
+    (M.Comment <> Nil) And (M.Comment.FindTag('noexception') > -1);
+  If Not ExceptionHandler.HasPush And Not boolNoTag Then
+    AddIssue(Format(strExceptionPush, [M.Identifier]), scNone,
+     'CheckExceptionHandling', M.Line, M.Column, etWarning);
+  If (ExceptionHandler.PushName = '') And Not boolNoTag Then
+    AddIssue(Format(strExceptionPushName, [M.Identifier]), scNone,
+    'CheckExceptionHandling', M.Line, M.Column, etWarning);
+  If Not boolNoTag Then
+    If AnsiCompareText(Format('"%s.%s"', [ModuleName, M.Identifier]),
+      ExceptionHandler.PushName) <> 0 Then
+      AddIssue(Format(strExceptionPushNameIncorrect,
+        [ExceptionHandler.PushName, ModuleName, M.Identifier]), scNone,
+        'CheckExceptionHandling', M.Line, M.Column, etWarning);
+  If Not boolNoTag Then
+    For i := 0 To M.ParameterCount - 1 Do
+      If Not ExceptionHandler.PushParams.Find(M.Parameters[i].Identifier, j) Then
+        AddIssue(Format(strExceptionPushParameter, [M.Parameters[i].Identifier,
+          ModuleName, M.Identifier]), scNone, 'CheckExceptionHandling', M.Line,
+          M.Column, etWarning);
+  If Not ExceptionHandler.HasPop And Not boolNoTag Then
+    AddIssue(Format(strExceptionPop, [M.Identifier]), scNone,
+      'CheckExceptionHandling', M.Line, M.Column, etWarning);
+  boolNoTag :=
+    (Comment <> Nil) And (Comment.FindTag('noerror') > -1) Or
+    (M.Comment <> Nil) And (M.Comment.FindTag('noerror') > -1);
+  If Not ExceptionHandler.HasErrorHnd And Not boolNoTag Then
+    AddIssue(Format(strErrorHandling, [M.Identifier]), scNone,
+    'CheckExceptionHandling', M.Line, M.Column, etWarning);
+  If ExceptionHandler.HasExit And ExceptionHandler.HasErrorHnd Then
+    AddIssue(Format(strExitStatement, [M.Identifier]), scNone,
+    'CheckExceptionHandling', M.Line, M.Column, etWarning);
 end;
 
 (**

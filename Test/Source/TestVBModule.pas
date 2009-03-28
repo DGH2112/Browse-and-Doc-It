@@ -99,6 +99,7 @@ type
     Procedure TestFailure05;
     Procedure TestFailure06;
     Procedure TestFailure07;
+    Procedure TestFailure08;
   End;
 
   //
@@ -2132,6 +2133,42 @@ Begin
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure08;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      'Option Compare Text'#13#10 +
+      ''#13#10 +
+      'Public Sub Hello()'#13#10 +
+      '  ForwardRef(1)'#13#10 +
+      'End Sub'#13#10 +
+      ''#13#10 +
+      'Private Sub ForwardRef(i As Long)'#13#10 +
+      ''#13#10 +
+      'End Sub'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
     Finally
       M.Free;

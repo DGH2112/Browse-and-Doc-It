@@ -436,6 +436,8 @@ ResourceString
   strProperyRequireParam = 'Propery ''%s'' requires at least 1 parameter.';
   (** A warning message for no push method. **)
   strExceptionPush = 'The method ''%s'' has no Exception.Push method.';
+  (** A warning message for no push name. **)
+  strExceptionPushName = 'The method ''%s'' has no Exception.Push name.';
   (** A warning message for no pop method. **)
   strExceptionPop = 'The method ''%s'' has no Exception.Pop method.';
   (** A warning message for no error handling. **)
@@ -443,6 +445,9 @@ ResourceString
   (** A warning message for an exit statement and error handling. **)
   strExitStatement = 'The method ''%s'' has an Exit statement which may be i' +
     'n conflict with the error handling.';
+  (** A warning message for missing push names. **)
+  strExceptionPushNameIncorrect = 'The name passed to the Exception.Push me' +
+  'thod (%s) is incorrect (''%s.%s'').';
 
 { TVBComment }
 
@@ -1374,6 +1379,7 @@ Begin
     FModuleType := mtForm
   Else
     FModuleType := mtModule;
+  ModuleName := ChangeFileExt(ExtractFileName(strFileName), '');
   TokenizeStream;
   AddTickCount('Tokenize');
   If moParse In ModuleOptions Then
@@ -2513,10 +2519,14 @@ Begin
                 While Token.TokenType In [ttIdentifier, ttReservedWord,
                   ttStringLiteral] Do
                   Begin
-                    AExceptionHnd.PushName := Token.Token;
+                    AExceptionHnd.PushName := AExceptionHnd.PushName + Token.Token;
                     NextNonCommentToken;
                     If (Token.Token = '+') Or (Token.Token = '&') Then
-                      NextNonCommentToken;
+                      Begin
+                        AExceptionHnd.PushName := AExceptionHnd.PushName +
+                          Token.Token;
+                        NextNonCommentToken;
+                      End;
                   End;
                 While Token.Token = ',' Do
                   Begin
@@ -2653,6 +2663,17 @@ begin
           If Not M.ExceptionHandling.HasPush And Not boolNoTag Then
             AddIssue(Format(strExceptionPush, [M.Identifier]), scNone,
               'CheckExceptionHandling', M.Line, M.Column, etWarning);
+          If (M.ExceptionHandling.PushName = '') And Not boolNoTag Then
+            AddIssue(Format(strExceptionPushName, [M.Identifier]), scNone,
+              'CheckExceptionHandling', M.Line, M.Column, etWarning);
+          If Not boolNoTag Then
+            If AnsiCompareText(Format('"%s.%s"', [ModuleName, M.Identifier]),
+              M.ExceptionHandling.PushName) <> 0 Then
+              AddIssue(Format(strExceptionPushNameIncorrect, [
+              M.ExceptionHandling.PushName, ModuleName,
+              M.Identifier]), scNone, 'CheckExceptionHandling', M.Line,
+              M.Column, etWarning);
+
           If Not M.ExceptionHandling.HasPop And Not boolNoTag Then
             AddIssue(Format(strExceptionPop, [M.Identifier]), scNone,
               'CheckExceptionHandling', M.Line, M.Column, etWarning);

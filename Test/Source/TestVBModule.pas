@@ -101,6 +101,7 @@ type
     Procedure TestFailure07;
     Procedure TestFailure08;
     procedure TestFailure09;
+    procedure TestFailure10;
   End;
 
   //
@@ -2220,6 +2221,73 @@ Begin
         ''#13#10 +
         'Public Sub Hello()'#13#10 +
         '  Exception.Push "VBFile.Hello"'#13#10 +
+        '  On Error Goto ErrHnd'#13#10 +
+        '  DoSomething'#13#10 +
+        'ErrHnd:'#13#10 +
+        '  If Err.Number <> 0 Then Exception.DisplayException Err'#13#10 +
+        '  Exception.Pop'#13#10 +
+        'End Sub'#13#10 +
+        ''#13#10;
+      S.LoadBufferFromString(strCode);
+      M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+      Try
+        CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+        CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+        CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+        CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Finally
+        M.Free;
+      End;
+    Finally
+      BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options -
+        [doShowMissingVBExceptionWarnings];
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure10;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options +
+      [doShowMissingVBExceptionWarnings];
+    Try
+      strCode :=
+        'Option Compare Text'#13#10 +
+        ''#13#10 +
+        'Public Sub Hello(iParam as Long)'#13#10 +
+        '  Exception.Push "VBFile.Hello" '#13#10 +
+        '  On Error Goto ErrHnd'#13#10 +
+        '  DoSomething'#13#10 +
+        'ErrHnd:'#13#10 +
+        '  If Err.Number <> 0 Then Exception.DisplayException Err'#13#10 +
+        '  Exception.Pop'#13#10 +
+        'End Sub'#13#10 +
+        ''#13#10;
+      S.LoadBufferFromString(strCode);
+      M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+      Try
+        CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+        CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+        CheckEquals('  [The parameter ''iParam'' in ''VBFile.Hello'' does not have a corresponding parameter in the Exception.Push statement. [CheckExceptionHandling]]', M.firstwarning);
+        CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+        CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Finally
+        M.Free;
+      End;
+      strCode :=
+        'Option Compare Text'#13#10 +
+        ''#13#10 +
+        'Public Sub Hello(iParam as Long)'#13#10 +
+        '  Exception.Push "VBFile.Hello", iParam'#13#10 +
         '  On Error Goto ErrHnd'#13#10 +
         '  DoSomething'#13#10 +
         'ErrHnd:'#13#10 +

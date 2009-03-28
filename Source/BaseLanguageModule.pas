@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    25 Mar 2009
+  @Date    28 Mar 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -3169,7 +3169,7 @@ begin
   SetLength(strToken, iTokenCapacity);
   BlockType := btNone;
   FTagLine := Line;
-  FTagColumn := Column + 3;
+  FTagColumn := Column + 1;
   LastTokenAdded := ttUnknown;
   For i := 1 To Length(strComment) Do
     Begin
@@ -3246,7 +3246,7 @@ begin
 
       If strComment[i] = #10 Then
         Begin
-          FTagColumn := 1;
+          FTagColumn := Column + 1;
           Inc(FTagLine);
         End Else
           Inc(FTagColumn);

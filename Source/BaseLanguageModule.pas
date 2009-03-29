@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    28 Mar 2009
+  @Date    29 Mar 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -29,7 +29,7 @@ Type
   TTokenIndex = Integer;
   (** An enumerate type to define the stream status and token types. **)
   TBADITokenType = (ttUnknown, ttWhiteSpace, ttReservedWord, ttIdentifier,
-    ttNumber, ttSymbol, ttLineEnd, ttStringLiteral, ttComment,
+    ttNumber, ttSymbol, ttLineEnd, ttStringLiteral, ttLineComment, ttBlockComment,
     ttHTMLStartTag, ttHTMLEndTag, ttDirective, ttCompilerDirective, ttLinkTag,
     ttTreeHeader, ttFileEnd, ttLineContinuation);
   (** An enumerate for the scoping of identifiers. **)
@@ -569,7 +569,6 @@ Type
     function GetTagCount: Integer;
     Procedure ParseComment(strComment : String);
     Procedure ResetTagMode;
-    Procedure TrimTrailingWhiteSpace;
   Public
     Constructor Create(srcComment : TComment); Overload;
     Constructor Create(strComment : String; iLine, iCol : Integer); Overload;
@@ -581,6 +580,7 @@ Type
     Procedure Assign(strComment : String); Overload;
     Function AsString(iMaxWidth : Integer; boolShowHTML : Boolean) : String;
     Function FindTag(strTagName : String) : Integer;
+    Procedure TrimTrailingWhiteSpace;
     (**
       Returns the specifically indexed tag from the comments tag collection.
       @precon  iTagIndex must eb a valid index between 0 and TagCount - 1.
@@ -1011,8 +1011,6 @@ Type
   (** This is an abtract class from which all language modules should be
       derived. **)
   TBaseLanguageModule = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
-  private
-    boolShouldUndoCompilerStack: Boolean;
   {$IFDEF D2005} Strict {$ENDIF} Private
     FOwnedItems : TObjectList;
     FTokenIndex : TTokenIndex;
@@ -1030,6 +1028,8 @@ Type
     FCompilerConditionUndoStack : TList;
     FLastComment: TTokenInfo;
     FCommentClass : TCommentClass;
+    FShouldUndoCompilerStack: Boolean;
+    FLastBodyCommentLine: Integer;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetToken : TTokenInfo;
     function GetOpTickCountName(iIndex: Integer): String;
@@ -1074,13 +1074,6 @@ Type
     **)
     Property Token : TTokenInfo Read GetToken;
     (**
-      Returns a reference to the body comments collection.
-      @precon  None.
-      @postcon Returns a reference to the body comments collection.
-      @return  a TObjectList
-    **)
-    Property BodyComments : TObjectList Read FBodyComment;
-    (**
       This property provide access to a list of compiler defines as a string
       list.
       @precon  None.
@@ -1116,6 +1109,7 @@ Type
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure AddToExpression(Container : TElementContainer);
     function IsToken(strToken: String; Container: TElementContainer): Boolean;
+    Procedure AddBodyComment(C : TComment);
     { Properties }
     (**
       This property returns the tick count time between the 2 named tick counts
@@ -1997,6 +1991,7 @@ Const
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : [fsBold]),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
@@ -2312,9 +2307,9 @@ Const
   (** A list of strings representing the token types. **)
   strTokenType : Array[Low(TBADITokenType)..High(TBADITokenType)] Of String = (
     'Unknown', 'WhiteSpace', 'ReservedWord', 'Identifier', 'Number',
-    'Symbol', 'LineEnd', 'StringLiteral', 'Comment', 'HTMLStartTag',
-    'HTMLEndTag',  'Directive', 'CompilerDirective', 'LinkTag', 'TreeHeader',
-    'FileEnd', 'LineContinuation');
+    'Symbol', 'LineEnd', 'StringLiteral', 'LineComment', 'BlockComment',
+    'HTMLStartTag', 'HTMLEndTag',  'Directive', 'CompilerDirective', 'LinkTag',
+    'TreeHeader', 'FileEnd', 'LineContinuation');
 
 Var
   (** This is a global variable for the Browse and Doc It options that need to
@@ -3084,20 +3079,22 @@ Var
   iTag: Integer;
 
 begin
-  If TokenCount = 0 Then
-    Exit;
-  iToken := TokenCount - 1;
-  While Tokens[iToken].TokenType In [ttWhiteSpace] Do
+  If TokenCount > 0 Then
     Begin
-      DeleteToken(iToken);
-      Dec(iToken);
+      iToken := TokenCount - 1;
+      While Tokens[iToken].TokenType In [ttWhiteSpace] Do
+        Begin
+          DeleteToken(iToken);
+          Dec(iToken);
+        End;
     End;
   For iTag := 0 To TagCount - 1 Do
     Begin
       If Tag[iTag].TokenCount = 0 Then
         Continue;
       iToken := Tag[iTag].TokenCount - 1;
-      While Tag[iTag].Tokens[iToken].TokenType In [ttWhiteSpace] Do
+      While (iToken >= 0) And
+        (Tag[iTag].Tokens[iToken].TokenType In [ttWhiteSpace]) Do
         Begin
           Tag[iTag].DeleteToken(iToken);
           Dec(iToken);
@@ -4750,6 +4747,62 @@ end;
 
 (**
 
+  This method adds the comment to the comment collection if it has content
+  and is more than 1 line different from the last added comemnt, else appends
+  the contents of the comment to the last added comment and frees the passed
+  comment.
+
+  @precon  None.
+  @postcon Adds the comment to the comment collection if it has content
+           and is more than 1 line different from the last added comemnt, else
+           appends the contents of the comment to the last added comment and
+           frees the passed comment.
+
+  @param   C as a TComment
+
+**)
+procedure TBaseLanguageModule.AddBodyComment(C: TComment);
+
+var
+  Cmt: TComment;
+  i: Integer;
+  BC: TBaseContainer;
+  j: Integer;
+
+begin
+  If (C.TokenCount > 0) Or (C.TagCount > 0) Then
+    Begin
+      If FBodyComment.Count > 0 Then
+        Begin
+          Cmt := BodyComment[BodyCommentCount - 1];
+          If FLastBodyCommentLine + 1 = C.Line Then
+            Begin
+              BC := Cmt;
+              If Cmt.TagCount > 0 Then
+                BC := Cmt.Tag[Cmt.TagCount - 1];
+              BC.AddToken(#32, ttWhiteSpace);
+              For i := 0 To C.TokenCount - 1 Do
+                BC.AddToken(C.Tokens[i].Token , C.Tokens[i].TokenType);
+              For i := 0 To C.TagCount - 1 Do
+                Begin
+                  Cmt.AddToken('@' + C.Tag[i].Name);
+                  For j := 0 To C.Tag[i].TokenCount - 1 Do
+                    Cmt.AddToken(C.Tag[i].Tokens[j].Token,
+                      C.Tag[i].Tokens[j].TokenType);
+                End;
+              Cmt.TrimTrailingWhiteSpace;
+              C.Free;
+            End Else
+              FBodyComment.Add(C);
+        End Else
+          FBodyComment.Add(C);
+    End Else
+      C.Free;
+  FLastBodyCommentLine := C.Line;
+end;
+
+(**
+
   This method adds a Compiler Definition to the sources internal list.
 
   @precon  None.
@@ -5290,35 +5343,36 @@ Var
 
 begin
   iSkip := 0;
-  boolShouldUndoCompilerStack := False;
+  FShouldUndoCompilerStack := False;
   If Token.TokenType = ttCompilerDirective Then // Catch first token as directive
     Begin
       ProcessCompilerDirective(iSkip);
-      boolShouldUndoCompilerStack := True;
+      FShouldUndoCompilerStack := True;
     End;
   Repeat
-    If (Token.TokenType = ttComment) And (FLastComment <> Token) Then
+    If (Token.TokenType In [ttLineComment, ttBlockComment]) And
+      (FLastComment <> Token) Then
       Begin
         C := FCommentClass.CreateComment(Token.Token,
           Token.Line, Token.Column);
         If C <> Nil Then
           Begin
-            BodyComments.Add(C);
+            AddBodyComment(C);
             FLastComment := Token;
           End;
       End;
-    If Not (Tokens[FTokenIndex].TokenType In [ttComment, ttCompilerDirective])
-      And (iSkip = 0) Then
+    If Not (Tokens[FTokenIndex].TokenType In [ttLineComment, ttBlockComment,
+      ttCompilerDirective]) And (iSkip = 0) Then
       FPreviousTokenIndex := FTokenIndex;
     NextToken;
     If Token.TokenType = ttCompilerDirective Then
       Begin
         ProcessCompilerDirective(iSkip);
-        boolShouldUndoCompilerStack := True;
+        FShouldUndoCompilerStack := True;
       End;
     boolContinue := (
       (
-        Token.TokenType In [ttComment, ttCompilerDirective]
+        Token.TokenType In [ttLineComment, ttBlockComment, ttCompilerDirective]
       ) And
       Not EndOfTokens
     ) Or (iSkip > 0)
@@ -5346,8 +5400,8 @@ begin
     Result := Tokens[FPreviousTokenIndex] As TTokenInfo
   Else
     For i := FTokenIndex - 1 DownTo 0 Do
-      If Not ((Tokens[i] As TTokenInfo).TokenType In [ttComment,
-        ttCompilerDirective]) Then
+      If Not ((Tokens[i] As TTokenInfo).TokenType In [ttLineComment,
+        ttBlockComment, ttCompilerDirective]) Then
         Begin
           Result := Tokens[i] As TTokenInfo;
           Break;
@@ -5369,7 +5423,7 @@ var
   iStackTop: Integer;
 
 Begin
-  If boolShouldUndoCompilerStack Then
+  If FShouldUndoCompilerStack Then
     Begin
       iStackTop := CompilerConditionUndoStack.Count - 1;
       If iStackTop >= 0 Then
@@ -5383,8 +5437,8 @@ Begin
   Else
     Begin
       Dec(FTokenIndex);
-      While (FTokenIndex > 0) And (Tokens[FTokenIndex].TokenType In [ttComment,
-        ttCompilerDirective]) Do
+      While (FTokenIndex > 0) And (Tokens[FTokenIndex].TokenType In [ttLineComment,
+        ttBlockComment, ttCompilerDirective]) Do
         Dec(FTokenIndex);
       If FTokenIndex < 0 Then
         Begin

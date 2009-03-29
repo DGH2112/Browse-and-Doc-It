@@ -103,6 +103,7 @@ type
     procedure TestFailure09;
     procedure TestFailure10;
     Procedure TestFailure11;
+    Procedure TestFailure12;
   End;
 
   //
@@ -2362,6 +2363,47 @@ Begin
       CheckEquals('todo', M.Comment.Tag[0].TagName);
       CheckEquals(2, M.Comment.Tag[0].Line);
       CheckEquals(7, M.Comment.Tag[0].Column);
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure12;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      ''':'#13#10 +
+      ''': @todo Hello'#13#10 +
+      ''':       Dave.'#13#10 +
+      ''': @see  Goodbye.'#13#10 +
+      ''':'#13#10 +
+      'Option Compare Text'#13#10 +
+      ''#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      Check(M.Comment <> Nil, 'Module comment IS Nil');
+      CheckEquals('todo', M.Comment.Tag[0].TagName);
+      CheckEquals(2, M.Comment.Tag[0].Line);
+      CheckEquals(5, M.Comment.Tag[0].Column);
+      CheckEquals('Hello Dave.', M.Comment.Tag[0].AsString(9999, True));
+      CheckEquals(1, M.BodyCommentCount);
+      CheckEquals('Hello Dave.', M.BodyComment[0].Tag[0].AsString(9999, True));
+      CheckEquals('Goodbye.', M.BodyComment[0].Tag[1].AsString(9999, True));
     Finally
       M.Free;
     End;

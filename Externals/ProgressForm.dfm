@@ -14,6 +14,8 @@ object frmProgress: TfrmProgress
   FormStyle = fsStayOnTop
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object pnlPanel1: TPanel
@@ -33,14 +35,5 @@ object frmProgress: TfrmProgress
       Align = alClient
       TabOrder = 0
     end
-  end
-  object pnlMsg: TPanel
-    Left = 0
-    Top = 0
-    Width = 400
-    Height = 40
-    Align = alClient
-    BevelOuter = bvNone
-    TabOrder = 1
   end
 end

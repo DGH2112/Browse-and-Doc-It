@@ -3,7 +3,7 @@
   This is a generic progress dialogue for use in the ObjectPascalDocWizard.
 
   @version    0.9
-  @date       23 Sep 2008
+  @date       29 Mar 2009
   @author     David Hoyle
 
 **)
@@ -13,21 +13,23 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, ExtCtrls;
+  ComCtrls, ExtCtrls, DGHEllipsisLabel;
 
 type
   (**
-    
+
     This class represents a modeless progress dialogue for use throughout the
     application.
-    
+
   **)
   TfrmProgress = class(TForm)
     pnlPanel1: TPanel;
-    pnlMsg: TPanel;
     prbProgressBar1: TProgressBar;
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
+    FEllipsisLabel : TDGHEllipsisLabel;
   public
     { Public declarations }
     Procedure Init(iMax : Integer; strTitle, strMsg : String);
@@ -37,6 +39,38 @@ type
 implementation
 
 {$R *.DFM}
+
+(**
+
+  This is an OnFormCreate Event Hanlder for the TfrmProgress class.
+
+  @precon  None.
+  @postcon Creates an ellipsis path control and aligns it to the client area.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmProgress.FormCreate(Sender: TObject);
+begin
+  FEllipsisLabel := TDGHEllipsisLabel.Create(Nil);
+  FEllipsisLabel.Parent := Self;
+  FEllipsisLabel.Align := alClient;
+end;
+
+(**
+
+  This is an OnFormDestroy Event Hanlder for the TfrmProgress class.
+
+  @precon  None.
+  @postcon Frees the ellipsis path control.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmProgress.FormDestroy(Sender: TObject);
+begin
+  FEllipsisLabel.Free;
+end;
 
 (**
 
@@ -57,7 +91,7 @@ implementation
 Procedure TfrmProgress.Init(iMax: Integer; strTitle, strMsg: String);
 begin
   Caption := strTitle;
-  pnlMsg.Caption := strMsg;
+  FEllipsisLabel.Caption := strMsg;
   prbProgressBar1.Max := iMax;
   prbProgressBar1.Position := 0;
   Show;
@@ -79,7 +113,7 @@ end;
 procedure TfrmProgress.UpdateProgress(iPosition: Integer; strMsg : String);
 begin
   prbProgressBar1.Position := iPosition;
-  pnlMsg.Caption := strMsg;
+  FEllipsisLabel.Caption := strMsg;
   Application.ProcessMessages;
 end;
 

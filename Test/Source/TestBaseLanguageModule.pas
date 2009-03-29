@@ -317,7 +317,6 @@ type
     Function GetComment(CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment; Override;
     procedure ProcessCompilerDirective(var iSkip : Integer); Override;
     Function KeyWords : TKeyWords; Override;
-    Property BodyComments;
   End;
 
   // Test methods for class TBaseLanguageModule
@@ -2248,14 +2247,14 @@ end;
 
 procedure TestTBaseLanguageModule.TestBodyComment;
 begin
-  FBaseLanguageModule.BodyComments.Add(TComment.Create('Hello.', 0, 0));
+  FBaseLanguageModule.AddBodyComment(TComment.Create('Hello.', 0, 0));
   CheckEquals('Hello.', FBaseLanguageModule.BodyComment[0].AsString(99, False));
 end;
 
 procedure TestTBaseLanguageModule.TestBodyCommentCount;
 begin
   CheckEquals(0, FBaseLanguageModule.BodyCommentCount);
-  FBaseLanguageModule.BodyComments.Add(TComment.Create('Hello.', 0, 0));
+  FBaseLanguageModule.AddBodyComment(TComment.Create('Hello.', 0, 0));
   CheckEquals(1, FBaseLanguageModule.BodyCommentCount);
 end;
 

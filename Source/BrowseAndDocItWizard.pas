@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    21 Mar 2009
+  @Date    29 Mar 2009
   @Version 1.0
 
 **)
@@ -915,7 +915,7 @@ begin
                     iInsertLine := F.Line;
                 Writer := Source.CreateUndoableWriter;
                 Try
-                  strComment := WriteComment(F, ctPascalBlock, iIndent, True,
+                  strComment := WriteComment(F, ctPascalBlock, iIndent, False,
                     CursorDelta);
                   InsertComment(strComment, Writer, iInsertLine, Source);
                 Finally

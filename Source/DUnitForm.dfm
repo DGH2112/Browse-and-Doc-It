@@ -31,7 +31,6 @@ object frmDUnit: TfrmDUnit
     Anchors = [akLeft, akBottom]
     Caption = '&Base Class'
     FocusControl = cbxBaseClass
-    ExplicitTop = 412
   end
   object lblTestSuiteName: TLabel
     Left = 8
@@ -41,7 +40,6 @@ object frmDUnit: TfrmDUnit
     Anchors = [akLeft, akBottom]
     Caption = 'Test Suite &Name'
     FocusControl = edtTestSuiteName
-    ExplicitTop = 439
   end
   object gbxProject: TGroupBox
     Left = 8
@@ -70,7 +68,7 @@ object frmDUnit: TfrmDUnit
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 1
       OnChange = rdoNewExistingUnit
     end
@@ -140,7 +138,7 @@ object frmDUnit: TfrmDUnit
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 3
     end
     object rdoNewUnit: TRadioButton
@@ -191,7 +189,7 @@ object frmDUnit: TfrmDUnit
     Width = 292
     Height = 21
     Anchors = [akLeft, akRight, akBottom]
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 3
   end
   object edtTestSuiteName: TEdit

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       19 Mar 2009
+  @Date       29 Mar 2009
   @Author     David Hoyle
 
   @todo       Implement $IF
@@ -2157,8 +2157,8 @@ Begin
                                   LastCharType := ttStringLiteral;
                               End;
                             If BlockType = btLineComment Then
-                              LastCharType := ttComment;
-                            If (LastCharType = ttComment) And (Length(strToken) > 2) Then
+                              LastCharType := ttLineComment;
+                            If (LastCharType = ttBlockComment) And (Length(strToken) > 2) Then
                               If (strToken[1] = '{') And (strToken[2] = '$') Then
                                 LastCharType := ttCompilerDirective;
                             If ((LastToken = ttNumber) And ((strToken = '.') Or (LastCharType = ttNumber))) Or
@@ -2196,7 +2196,7 @@ Begin
               If (BlockType = btFullComment) And (LastChar = '*') And (Ch = ')') Then
                 Begin
                   BlockType := btNoBlock;
-                  CurCharType := ttComment;
+                  CurCharType := ttBlockComment;
                 End;
 
               // Check for string literals
@@ -2209,12 +2209,12 @@ Begin
               // Check for block Comments
               If (BlockType = btNoBlock) And (Ch = '{') Then
                 Begin
-                  CurCharType := ttComment;
+                  CurCharType := ttBlockComment;
                   BlockType := btBraceComment;
                 End;
               If (BlockType = btBraceComment) And (Ch = '}') Then
                 Begin
-                  CurCharType := ttComment;
+                  CurCharType := ttBlockComment;
                   BlockType := btNoBlock;
                 End;
               If BlockType = btCompoundSymbol Then
@@ -2429,7 +2429,7 @@ Begin
   If TokenIndex + iOffset > -1 Then
     Begin
       T := Tokens[TokenIndex + iOffset] As TTokenInfo;
-      If T.TokenType = ttComment Then
+      If T.TokenType In [ttLineComment, ttBlockComment] Then
         Begin
           Result := TPascalComment.CreateComment(T.Token, T.Line, T.Column);
           OwnedItems.Add(Result);
@@ -2461,7 +2461,8 @@ begin
     If TokenCount > 0 Then
       Begin
         // Find first non comment token
-        While (Token.TokenType In [ttComment, ttCompilerDirective]) And Not EndOfTokens Do
+        While (Token.TokenType In [ttLineComment, ttBlockComment,
+          ttCompilerDirective]) And Not EndOfTokens Do
           NextNonCommentToken;
         // Check for end of file else must be identifier
         If Not EndOfTokens Then

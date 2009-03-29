@@ -1601,8 +1601,8 @@ Begin
                                 LastToken := ttDirective;
                             End;
                           If BlockType = btLineComment Then
-                            LastToken := ttComment;
-                          If (LastToken = ttComment) And (Length(strToken) > 2) Then
+                            LastToken := ttLineComment;
+                          If (LastToken = ttLineComment) And (Length(strToken) > 2) Then
                             If (strToken[1] = '{') And (strToken[2] = '$') Then
                               LastToken := ttCompilerDirective;
                           AddToken(TTokenInfo.Create(strToken, iStreamPos,
@@ -1641,12 +1641,12 @@ Begin
               // Check for block Comments
               If (BlockType = btNoBlock) And (Ch = '{') Then
                 Begin
-                  CurCharType := ttComment;
+                  CurCharType := ttLineComment;
                   BlockType := btBraceComment;
                 End;
               If (BlockType = btBraceComment) And (Ch = '}') Then
                 Begin
-                  CurCharType := ttComment;
+                  CurCharType := ttLineComment;
                   BlockType := btNoBlock;
                 End;
 //              If BlockType = btCompoundSymbol Then
@@ -1722,7 +1722,7 @@ begin
       If iToken <= -1 Then
         Break;
       T := Tokens[iToken] As TTokenInfo;
-      If T.TokenType = ttComment Then
+      If T.TokenType In [ttLineComment] Then
         Begin
           iLine := T.Line;
           iColumn := T.Column;
@@ -1756,7 +1756,7 @@ var
 
 begin
   Try
-    While Token.TokenType In [ttComment, ttLineEnd] Do
+    While Token.TokenType In [ttLineComment, ttBlockComment, ttLineEnd] Do
       NextNonCommentToken;
     Methods[1] := Version;
     Methods[2] := Attributes;

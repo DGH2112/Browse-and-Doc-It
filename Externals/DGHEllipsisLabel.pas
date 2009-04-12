@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    29 Mar 2009
+  @Date    12 Apr 2009
 
 **)
 unit DGHEllipsisLabel;
@@ -33,12 +33,30 @@ Type
       @return  a String
     **)
     Property Caption : String Read FCaption Write SetCaption;
+  Published
+    (** Publish this existing property. @precon  None. @postcon None. **)
+    Property Align;
   End;
+
+  procedure Register;
 
 implementation
 
 Uses
   Windows, Graphics;
+
+(**
+
+  The standard Delphi register procedure..
+
+  @precon  None
+  @postcon Registers the component with the Delphi Palette.
+
+**)
+procedure Register;
+begin
+  RegisterComponents('DGH Controls', [TDGHEllipsisLabel]);
+end;
 
 { TEllipsisLabel }
 

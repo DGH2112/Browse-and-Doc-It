@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    22 Mar 2009
+  @Date    12 Apr 2009
 
 **)
 unit DUnitCreator;
@@ -247,8 +247,9 @@ Begin
   Result := False;
 
   S := SourceEditor(Project.CurrentEditor.Module);
-  MemoryStream := EditorAsMemoryStream(S);
+  MemoryStream := TMemoryStream.Create;
   Try
+    EditorAsMemoryStream(S, MemoryStream);
     strFilename := Project.CurrentEditor.FileName;
     M := Dispatcher(MemoryStream, strFileName, True, [moParse]);
     Try
@@ -1064,8 +1065,9 @@ Var
 begin
   FProjectCount := 0;
   FUnitCount := 0;
-  Source := EditorAsMemoryStream(ActiveSourceEditor);
+  Source := TMemoryStream.Create;
   Try
+    EditorAsMemoryStream(ActiveSourceEditor, Source);
     With ActiveSourceEditor Do
       FModule := Dispatcher(Source, FileName, Modified, [moParse]);
   Finally
@@ -1419,8 +1421,9 @@ begin
   SE.Show;
   If FUnit <> Nil Then
     Begin
-      Source := EditorAsMemoryStream(SourceEditor(FUnit));
+      Source := TMemoryStream.Create;
       Try
+        EditorAsMemoryStream(SourceEditor(FUnit), Source);
         M := Dispatcher(Source, FUnit.FileName, FUnit.CurrentEditor.Modified,
           [moParse]);
         Try

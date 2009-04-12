@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    29 Mar 2009
+  @Date    12 Apr 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -581,6 +581,7 @@ Type
     Function AsString(iMaxWidth : Integer; boolShowHTML : Boolean) : String;
     Function FindTag(strTagName : String) : Integer;
     Procedure TrimTrailingWhiteSpace;
+    Procedure AppendComment(BaseCmt, Source : TComment);
     (**
       Returns the specifically indexed tag from the comments tag collection.
       @precon  iTagIndex must eb a valid index between 0 and TagCount - 1.
@@ -2852,6 +2853,43 @@ end;
 
 (**
 
+  This method appends a source comments tokens and tabs onto this comment.
+
+  @precon  BaseCmt and Source must be valid instances of TComment.
+  @postcon Appends a source comments tokens and tabs onto this comment.
+
+  @param   BaseCmt as a TComment
+  @param   Source  as a TComment
+
+**)
+procedure TComment.AppendComment(BaseCmt, Source: TComment);
+
+Var
+  Tag : TBaseContainer;
+  i: Integer;
+  j: Integer;
+
+begin
+  Tag := Source;
+  If TagCount > 0 Then
+    Tag := BaseCmt.Tag[TagCount - 1];
+  Tag.AddToken(#32, ttWhiteSpace);
+  For i := 0 To Source.TokenCount - 1 Do
+    Tag.AddToken(Source.Tokens[i].Token , Source.Tokens[i].TokenType);
+  For i := 0 To Source.TagCount - 1 Do
+    Begin
+      FTagLine := Source.Tag[i].Line;
+      FTagColumn := Source.Tag[i].Column + Length(Source.Tag[i].Name) + 1;
+      AddToken('@' + Source.Tag[i].Name);
+      For j := 0 To Source.Tag[i].TokenCount - 1 Do
+        AddToken(Source.Tag[i].Tokens[j].Token,
+          Source.Tag[i].Tokens[j].TokenType);
+    End;
+
+end;
+
+(**
+
   This method appends all the tokens and tags from the source comment to this
   comment.
 
@@ -4765,9 +4803,6 @@ procedure TBaseLanguageModule.AddBodyComment(C: TComment);
 
 var
   Cmt: TComment;
-  i: Integer;
-  BC: TBaseContainer;
-  j: Integer;
 
 begin
   If (C.TokenCount > 0) Or (C.TagCount > 0) Then
@@ -4777,28 +4812,22 @@ begin
           Cmt := BodyComment[BodyCommentCount - 1];
           If FLastBodyCommentLine + 1 = C.Line Then
             Begin
-              BC := Cmt;
-              If Cmt.TagCount > 0 Then
-                BC := Cmt.Tag[Cmt.TagCount - 1];
-              BC.AddToken(#32, ttWhiteSpace);
-              For i := 0 To C.TokenCount - 1 Do
-                BC.AddToken(C.Tokens[i].Token , C.Tokens[i].TokenType);
-              For i := 0 To C.TagCount - 1 Do
-                Begin
-                  Cmt.AddToken('@' + C.Tag[i].Name);
-                  For j := 0 To C.Tag[i].TokenCount - 1 Do
-                    Cmt.AddToken(C.Tag[i].Tokens[j].Token,
-                      C.Tag[i].Tokens[j].TokenType);
-                End;
+              Cmt.AppendComment(Cmt, C);
               Cmt.TrimTrailingWhiteSpace;
+              FLastBodyCommentLine := C.Line;
               C.Free;
             End Else
+            Begin
               FBodyComment.Add(C);
+              FLastBodyCommentLine := C.Line;
+            End;
         End Else
+        Begin
           FBodyComment.Add(C);
+          FLastBodyCommentLine := C.Line;
+        End;
     End Else
       C.Free;
-  FLastBodyCommentLine := C.Line;
 end;
 
 (**

@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       28 Mar 2009
+  @Date       12 Apr 2009
   @Author     David Hoyle
 
 **)
@@ -277,6 +277,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** A class to represent VB Enumerate Value  **)
@@ -298,6 +299,7 @@ Type
     procedure ProcessVar(Variable: TVBVar);
     procedure CheckElementExceptionHandling(M: TGenericFunction;
       ExceptionHandler : IExceptionHandling);
+    procedure PatchAndCheckReferences;
   {$IFDEF D2005} Strict {$ENDIF} Private
     FTypesLabel: TLabelContainer;
     FConstantsLabel: TLabelContainer;
@@ -310,6 +312,7 @@ Type
     FSourceStream: TStream;
     FModuleType : TModuleType;
     FUnResolvedSymbols : TStringList;
+    FEventHandlerPatterns: TStringList;
     Procedure TokenizeStream;
     { Grammer Parsers }
     Procedure Goal;
@@ -369,7 +372,7 @@ ResourceString
 Implementation
 
 Uses
-  Windows;
+  Windows, DGHLibrary;
 
 Const
   (** A set of characters for alpha characaters **)
@@ -453,6 +456,9 @@ ResourceString
   (** A warning message for missing push parameters. **)
   strExceptionPushParameter = 'The parameter ''%s'' in ''%s.%s'' does not ha' +
   've a corresponding parameter in the Exception.Push statement.';
+  (** A warning message for push parameter out of order. **)
+  strExceptionPushParamPos = 'The parameter ''%s'' in ''%s.%s'' is not in the ' +
+    'the correct position (%d not %d) in the Exception.Push statement.';
 
 { TVBComment }
 
@@ -1374,6 +1380,8 @@ Begin
   FUnResolvedSymbols := TStringList.Create;
   FUnResolvedSymbols.Duplicates := dupIgnore;
   FUnResolvedSymbols.Sorted := True;
+  FEventHandlerPatterns := TStringList.Create;
+  FEventHandlerPatterns.Add('*_*');
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSourceStream := Source;
   AddTickCount('Start');
@@ -1397,8 +1405,7 @@ Begin
       Add(strWarnings, iiWarningFolder, scNone, Nil);
       Add(strHints, iiHintFolder, scNone, Nil);
       Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
-      If FindElement(strErrors).ElementCount = 0 Then
-        CheckReferences;
+      PatchAndCheckReferences;
       AddTickCount('Refs');
       If doShowMissingVBExceptionWarnings In BrowseAndDocItOptions.Options Then
         CheckExceptionHandling;
@@ -1421,6 +1428,7 @@ End;
 Destructor TVBModule.Destroy;
 
 Begin
+  FEventHandlerPatterns.Free;
   FUnResolvedSymbols.Free;
   Inherited Destroy;
 End;
@@ -1704,11 +1712,13 @@ Var
   iToken : Integer;
   iLine, iColumn : Integer;
   iOffset: Integer;
+  iLastCmtLine : Integer;
 
 begin
   Result := Nil;
   iLine := 0;
   iColumn := 0;
+  iLastCmtLine := Token.Line;
   If CommentPosition = cpBeforeCurrentToken Then
     iOffset := -1
   Else
@@ -1723,14 +1733,16 @@ begin
         Break;
       T := Tokens[iToken] As TTokenInfo;
       If T.TokenType In [ttLineComment] Then
-        Begin
-          iLine := T.Line;
-          iColumn := T.Column;
-          If strComment <> '' Then
-            strComment := #13#10 + strComment;
-          strComment := T.Token + strComment;
-        End Else
-          Break;
+        If T.Line = iLastCmtLine - 1 Then
+          Begin
+            iLine := T.Line;
+            iColumn := T.Column;
+            If strComment <> '' Then
+              strComment := #13#10 + strComment;
+            strComment := T.Token + strComment;
+            iLastCmtLine := T.Line;
+          End Else
+            Break;
       Dec(iToken);
     End;
   If strComment <> '' Then
@@ -3027,10 +3039,38 @@ End;
 **)
 function TVBModule.ReferenceSymbol(AToken: TTokenInfo): Boolean;
 
-Var
-  i: Integer;
-  E: TElementContainer;
-  boolFound: Boolean;
+  (**
+
+    This function checks the given element for an occurrance of the token.
+
+    @precon  None.
+    @postcon Marks the element item as referenced is the token is found.
+
+    @param   Section as a TElementContainer
+    @return  a Boolean
+
+  **)
+  Function CheckElement(Section : TElementContainer) : Boolean;
+
+  Var
+    boolFound: Boolean;
+    i: Integer;
+
+  Begin
+    // Check Module Local Methods, Properties, Declares, ...
+    boolFound := False;
+    If Section <> Nil Then
+      For i := 1 To Section.ElementCount Do
+        If AnsiCompareText(Section[i].Identifier, AToken.Token) = 0 Then
+          Begin
+            Section[i].Referenced := True;
+            AToken.Reference := trResolved;
+            boolFound := True;
+          End;
+    Result := boolFound;
+    If Result Then
+      Exit;
+  End;
 
 begin
   Result := ReferenceSection(AToken, FVariablesLabel);
@@ -3042,20 +3082,69 @@ begin
   Result := ReferenceSection(AToken, FTypesLabel);
   If Result Then
     Exit;
-  // Check Module Local Methods
-  boolFound := False;
-  E := FImplementedMethodsLabel;
-  If E <> Nil Then
-    For i := 1 To E.ElementCount Do
-      If AnsiCompareText(E[i].Identifier, AToken.Token) = 0 Then
-        Begin
-          E[i].Referenced := True;
-          AToken.Reference := trResolved;
-          boolFound := True;
-        End;
-  Result := boolFound;
+  Result := CheckElement(FImplementedMethodsLabel);
   If Result Then
     Exit;
+  Result := CheckElement(FImplementedPropertiesLabel);
+  If Result Then
+    Exit;
+  Result := CheckElement(FDeclaredMethodsLabel);
+  If Result Then
+    Exit;
+end;
+
+(**
+
+  This method checks the references and removes event handler from being shown.
+
+  @precon  None.
+  @postcon Checks the references and removes event handler from being shown.
+
+**)
+procedure TVBModule.PatchAndCheckReferences;
+
+  (**
+
+    This method returns true if the identifier contains an underscore.
+
+    @precon  None.
+    @postcon Returns true if the identifier contains an underscore.
+
+    @param   strIdentifier as a String
+    @return  a Boolean
+
+  **)
+  Function IsEventHandler(strIdentifier : String) : Boolean;
+
+  Var
+    i: Integer;
+
+  Begin
+    Result := False;
+    For i := 0 To FEventHandlerPatterns.Count - 1 Do
+      Begin
+        Result := Result Or Like(FEventHandlerPatterns[i], strIdentifier);
+        If Result Then
+          Break;
+      End;
+  End;
+
+Var
+  j: Integer;
+  I: TElementContainer;
+
+begin
+  If FindElement(strErrors).ElementCount = 0 Then
+    Begin
+      I := FindElement(strImplementedMethodsLabel);
+      If I <> Nil Then
+        Begin
+          For j := 1 To I.ElementCount Do
+            If Not I[j].Referenced Then
+              I[j].Referenced := IsEventHandler(I[j].Identifier);
+        End;
+      CheckReferences;
+    End;
 end;
 
 (**
@@ -3077,7 +3166,7 @@ procedure TVBModule.CheckElementExceptionHandling(M: TGenericFunction;
 var
   boolNoTag: Boolean;
   i: Integer;
-  j: Integer;
+  iIndex : Integer;
 
 begin
   boolNoTag :=
@@ -3097,10 +3186,17 @@ begin
         'CheckExceptionHandling', M.Line, M.Column, etWarning);
   If Not boolNoTag Then
     For i := 0 To M.ParameterCount - 1 Do
-      If Not ExceptionHandler.PushParams.Find(M.Parameters[i].Identifier, j) Then
-        AddIssue(Format(strExceptionPushParameter, [M.Parameters[i].Identifier,
-          ModuleName, M.Identifier]), scNone, 'CheckExceptionHandling', M.Line,
-          M.Column, etWarning);
+      Begin
+        iIndex := ExceptionHandler.PushParams.IndexOf(M.Parameters[i].Identifier);
+        If iIndex = -1 Then
+          AddIssue(Format(strExceptionPushParameter, [M.Parameters[i].Identifier,
+            ModuleName, M.Identifier]), scNone, 'CheckExceptionHandling', M.Line,
+            M.Column, etWarning)
+        Else if iIndex <> i Then
+          AddIssue(Format(strExceptionPushParamPos, [M.Parameters[i].Identifier,
+            ModuleName, M.Identifier, i, iIndex]), scNone, 'CheckExceptionHandling', M.Line,
+            M.Column, etWarning);
+      End;
   If Not ExceptionHandler.HasPop And Not boolNoTag Then
     AddIssue(Format(strExceptionPop, [M.Identifier]), scNone,
       'CheckExceptionHandling', M.Line, M.Column, etWarning);
@@ -3316,6 +3412,27 @@ Begin
           ErrorAndSeekToken(strReservedWordExpected, 'Enums', 'Enum',
             strSeekTokens, stActual);
     End;
+end;
+
+(**
+
+  This method checks the documentation of the field and outputs a documentation
+  conflict IF the options ask for one and it the documentation is missing.
+
+  @precon  None.
+  @postcon Checks the documentation of the field and outputs a documentation
+           conflict IF the options ask for one and it the documentation is
+           missing.
+
+  @param   boolCascade as a Boolean as a reference
+
+**)
+procedure TVBField.CheckDocumentation(var boolCascade: Boolean);
+begin
+  If doShowUndocumentedFields In BrowseAndDocItOptions.Options Then
+    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment,
+        strVariableDocumentation, DocConflictTable[dctFieldClauseUndocumented]);
 end;
 
 End.

@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    21 Oct 2008
+  @Date    12 Apr 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -30,7 +30,8 @@ Type
   Procedure OutputMessage(strFileName, strText, strPrefix : String; iLine, iCol : Integer); Overload;
   Procedure ClearMessages(Msg : TClearMessages);
   Function BufferSize(SourceEditor : IOTASourceEditor) : Integer;
-  Function EditorAsMemoryStream(SourceEditor : IOTASourceEditor) : TMemoryStream;
+  Procedure EditorAsMemoryStream(SourceEditor : IOTASourceEditor;
+    Stream : TStream);
 
 Const
   (** The buffer size for the copying of text from an editor to a memory
@@ -285,10 +286,11 @@ End;
   @postcon Returns a memory stream of the file.
 
   @param   SourceEditor as an IOTASourceEditor
-  @return  a TMemoryStream
+  @param   Stream       as a TStream
 
 **)
-Function EditorAsMemoryStream(SourceEditor : IOTASourceEditor) : TMemoryStream;
+Procedure EditorAsMemoryStream(SourceEditor : IOTASourceEditor;
+  Stream : TStream);
 
 Var
   Reader : IOTAEditReader;
@@ -296,19 +298,18 @@ Var
   iPosition : Integer;
 
 Begin
-  Result := TMemoryStream.Create;
   Reader := SourceEditor.CreateReader;
   Try
     iPosition := 0;
     Repeat
       iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
-      Result.WriteBuffer(Buffer, iRead);
+      Stream.WriteBuffer(Buffer, iRead);
       inc(iPosition, iRead);
     Until iRead < iBufferSize;
   Finally
     Reader := Nil;
   End;
-  Result.Position := 0;
+  Stream.Position := 0;
 End;
 
 End.

@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    29 Mar 2009
+  @Date    12 Apr 2009
   @Version 1.0
 
 **)
@@ -21,8 +21,8 @@ Type
   TCommentType = (ctBlock, ctLine, ctInSitu);
 
   (** This is the class which defined the Wizard interface. **)
-  TBrowseAndDocItWizard = Class(TNotifierObject, IOTAWizard{, IOTAIDENotifier})
-  Private
+  TBrowseAndDocItWizard = Class(TNotifierObject, IOTAWizard)
+  {$IFDEF D2005} Strict {$ENDIF} Private
     mmiPascalDocMenu : TMenuItem;
     FCounter : Integer;
     FFileName : String;
@@ -43,7 +43,6 @@ Type
     Procedure InsertLineCommentClick(Sender : TObject);
     Procedure InsertInSituCommentClick(Sender : TObject);
     Procedure DocumentationClick(Sender : TObject);
-    Procedure ModuleExplorerClick(Sender : TObject);
     Procedure DUnitClick(Sender : TObject);
     Procedure DeleteExistingComment(Source : IOTASourceEditor; iStartLine,
       iEndLine : Integer);
@@ -51,7 +50,9 @@ Type
       iIndent: Integer; strComment: string);
     procedure InsertComment(strComment: string; Writer: IOTAEditWriter;
       iInsertLine: Integer; Source: IOTASourceEditor);
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
+    Procedure ModuleExplorerClick(Sender : TObject);
     { IOTAWizard }
     Function GetIDString: string;
     Function GetName: string;
@@ -61,18 +62,6 @@ Type
     {$HINTS OFF}
     Function GetMenuText: string;
     {$HINTS ON}
-    function GetPropertyDescription(Prop: TGenericProperty;
-      AComment: TComment; iIndent: Integer): String;
-    { IOTAIDENotifier
-    procedure AfterCompile(Succeeded: Boolean);
-    procedure BeforeCompile(const Project: IOTAProject; var Cancel: Boolean);
-    procedure FileNotification(NotifyCode: TOTAFileNotification;
-      const FileName: string; var Cancel: Boolean);
-    procedure AfterSave;
-    procedure BeforeSave;
-    procedure Destroyed;
-    procedure Modified; }
-  Public
     Constructor Create;
     Destructor Destroy; Override;
   End;
@@ -81,7 +70,7 @@ Type
       editor can be displayed. **)
   TEditorNotifier = Class(TNotifierObject {$IFDEF D2005},
     INTAEditServicesNotifier {$ENDIF} )
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FUpdateTimer : TTimer;
     {$IFNDEF D2005}
     FLastSize : Int64;
@@ -91,7 +80,12 @@ Type
     FLastParserResult : Boolean;
     Procedure EnableTimer(boolSuccessfulParse : Boolean);
     Procedure TimerEventHandler(Sender : TObject);
-  Protected
+    Procedure EditorInfo(var strFileName : String; var boolModified : Boolean;
+      MemoryStream : TMemoryStream);
+    Procedure RenderDocument(Module : TBaseLanguageModule);
+    Procedure ExceptionMsg(strExceptionMsg : String);
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
     {$IFDEF D2005}
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
@@ -103,7 +97,6 @@ Type
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
     {$ENDIF}
-  Public
     Constructor Create;
     Destructor Destroy; Override;
   End;
@@ -111,65 +104,20 @@ Type
   (** This class represents a key binding notifier for installing and handling
       key bindings for this plugin. **)
   TKeyboardBinding = Class(TNotifierObject, IOTAKeyboardBinding)
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FWizard : TBrowseAndDocItWizard;
     Procedure FocusModuleExplorer(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-    {
-    Procedure InsertMethodComment(const Context: IOTAKeyContext;
-      KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-    Procedure InsertPropertyComment(const Context: IOTAKeyContext;
-      KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-    Procedure InsertBlockComment(const Context: IOTAKeyContext;
-      KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-    Procedure InsertLineComment(const Context: IOTAKeyContext;
-      KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-    Procedure InsertInSituComment(const Context: IOTAKeyContext;
-      KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-    }
     Procedure ShowTokens(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-  Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
     function GetBindingType: TBindingType;
     function GetDisplayName: string;
     function GetName: string;
     procedure BindKeyboard(const BindingServices: IOTAKeyBindingServices);
-  Protected
-  Public
     Constructor Create(Wizard : TBrowseAndDocItWizard);
   End;
-
-  (** This is a procedure to returns the success of the parse in the thread. **)
-  TParserNotify = Procedure(boolSuccessfulParse : Boolean) Of Object;
-
-  (** This class defines a thread in which the parsing of the code and
-      rendering of the module explorer is done. **)
-  TBrowseAndDocItThread = class(TThread)
-  Private
-    FModule: TBaseLanguageModule;
-    FMemoryStream : TMemoryStream;
-    FFileName: String;
-    FType    : String;
-    FModified: Boolean;
-    FSuccessfulParseProc : TParserNotify;
-    Procedure SetName;
-  Protected
-    Procedure Execute; Override;
-    Procedure RenderModuleExplorer;
-    Procedure DetermineCompilerDefinitions(slDefines : TStringList);
-    Procedure ShowException;
-  Public
-    Constructor CreateBrowseAndDocItThread(SuccessfulParseProc : TParserNotify);
-    Destructor Destroy; Override;
-  End;
-
-  (** This record defines information for use in naming threads. **)
-  TThreadNameInfo = record
-    FType: LongWord;     // must be 0x1000
-    FName: PChar;        // pointer to name (in user address space)
-    FThreadID: LongWord; // thread ID (-1 indicates caller thread)
-    FFlags: LongWord;    // reserved for future use, must be zero
-  end;
 
   Procedure Register;
   Function InitWizard(Const BorlandIDEServices : IBorlandIDEServices;
@@ -254,25 +202,6 @@ Begin
   iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
     TKeyboardBinding.Create(Wizard))
 End;
-
-{procedure TBrowseAndDocItWizard.AfterCompile(Succeeded: Boolean);
-begin
-  boolCompiling := False;
-end;
-
-procedure TBrowseAndDocItWizard.AfterSave;
-begin
-end;
-
-procedure TBrowseAndDocItWizard.BeforeCompile(const Project: IOTAProject;
-  var Cancel: Boolean);
-begin
-  boolCompiling := True;
-end;
-
-procedure TBrowseAndDocItWizard.BeforeSave;
-begin
-end;}
 
 (**
 
@@ -541,10 +470,6 @@ begin
       MessageDlg(strSelectSourceCode, mtError, [mbOK], 0);
 End;
 
-{procedure TBrowseAndDocItWizard.Destroyed;
-begin
-end;}
-
 (**
 
   This is an exceute method for the wizard. Since this wizard is not implemented
@@ -618,10 +543,6 @@ function TBrowseAndDocItWizard.GetState: TWizardState;
 begin
   Result := [wsEnabled];
 end;
-
-{procedure TBrowseAndDocItWizard.Modified;
-begin
-end;}
 
 (**
 
@@ -811,8 +732,9 @@ begin
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
-  objMemStream := EditorAsMemoryStream(Source);
+  objMemStream := TMemoryStream.Create;
   Try
+    EditorAsMemoryStream(Source, objMemStream);
     Module := Dispatcher(objMemStream, Source.FileName, Source.Modified, [moParse]);
     If Module <> Nil Then
       Try
@@ -891,8 +813,9 @@ begin
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
-  objMemStream := EditorAsMemoryStream(Source);
+  objMemStream := TMemoryStream.Create;
   Try
+    EditorAsMemoryStream(Source, objMemStream);
     Module := Dispatcher(objMemStream, Source.FileName, Source.Modified, [moParse]);
     If Module <> Nil Then
       Try
@@ -931,49 +854,6 @@ begin
   Finally
    objMemStream.Free;
   End;
-end;
-
-(**
-
-
-  This method returns a description for the method if it is a constructor,
-  destructor, getter or setter method, else it returns an empty string.
-
-
-  @precon  Method is a valid instance of a method declatation to be described.
-
-  @postcon Returns a description of the method is applicable.
-
-
-  @param   Prop     as a TGenericProperty
-  @param   AComment as a TComment
-  @param   iIndent  as an Integer
-  @return  a String
-
-**)
-function TBrowseAndDocItWizard.GetPropertyDescription(Prop : TGenericProperty;
-  AComment : TComment; iIndent : Integer) : String;
-
-var
-  i: Integer;
-
-begin
-  If AComment = Nil Then
-    Begin
-      Result := #32#32#13#10;
-    End Else
-    Begin
-      Result := Format('%s'#13#10, [Indent(AComment.AsString(80 - iIndent, True), iIndent)]);
-      i := AComment.FindTag('precon');
-      If i > -1 Then
-        Result := Result + OutputTag(iIndent, AComment.Tag[i]);
-      i := AComment.FindTag('postcon');
-      If i > -1 Then
-        Result := Result + OutputTag(iIndent, AComment.Tag[i]);
-      For i := 0 To AComment.TagCount - 1 Do
-        If Not IsKeyWord(AComment.Tag[i].TagName, ['param', 'postcon', 'precon', 'return']) Then
-          Result := Result + OutputTag(iIndent, AComment.Tag[i]);
-    End;
 end;
 
 (**
@@ -1063,13 +943,6 @@ begin
         End;
       End;
 end;
-
-{procedure TBrowseAndDocItWizard.FileNotification(
-  NotifyCode: TOTAFileNotification; const FileName: string;
-  var Cancel: Boolean);
-begin
-
-end;}
 
 (**
 
@@ -1240,6 +1113,80 @@ end;
 
 (**
 
+  This method extracts the filename, modified status and the editor stream of
+  code for the BrowseAndDocItThread.
+
+  @precon  None.
+  @postcon Extracts the filename, modified status and the editor stream of
+           code for the BrowseAndDocItThread.
+
+  @param   strFileName  as a String as a reference
+  @param   boolModified as a Boolean as a reference
+  @param   MemoryStream as a TMemoryStream
+
+  @refactor Perhaps in hindsight, the compiler defines should be passed to the
+            parsers create method rather than be part of the application options.
+
+**)
+procedure TEditorNotifier.EditorInfo(var strFileName: String;
+  var boolModified: Boolean; MemoryStream: TMemoryStream);
+
+Var
+  SE : IOTASourceEditor;
+  Options : IOTAProjectOptions;
+
+begin
+  SE := ActiveSourceEditor;
+  If SE <> Nil Then
+    Begin
+      strFileName := SE.FileName;
+      boolModified := SE.Modified;
+      EditorAsMemoryStream(SE, MemoryStream);
+      If ActiveProject <> Nil Then
+        Begin
+          Options := ActiveProject.ProjectOptions;
+          BrowseAndDocItOptions.Defines.Text :=
+            StringReplace(Options.Values['Defines'], ';', #13#10,
+            [rfReplaceAll]);
+        End;
+      {$IFDEF VER120} // Delphi 4
+      BrowseAndDocItOptions.Defines.Add('VER120');
+      {$ENDIF}
+      {$IFDEF VER130} // Delphi 5
+      BrowseAndDocItOptions.Defines.Add('VER130');
+      {$ENDIF}
+      {$IFDEF VER140} // Delphi 6
+      BrowseAndDocItOptions.Defines.Add('VER140');
+      {$ENDIF}
+      {$IFDEF VER150} // Delphi 7
+      BrowseAndDocItOptions.Defines.Add('VER150');
+      {$ENDIF}
+      {$IFDEF VER160} // Delphi for .NET
+      BrowseAndDocItOptions.Defines.Add('VER160');
+      {$ENDIF}
+      {$IFDEF VER170} // Delphi 2005
+      BrowseAndDocItOptions.Defines.Add('VER170');
+      {$ENDIF}
+      {$IFDEF VER180} // Delphi 2006
+      BrowseAndDocItOptions.Defines.Add('VER180');
+      {$ENDIF}
+      {$IFDEF VER190} // Delphi 2007
+      BrowseAndDocItOptions.Defines.Add('VER180');
+      {$ENDIF}
+      {$IFDEF VER200} // Delphi 2009
+      BrowseAndDocItOptions.Defines.Add('VER180');
+      {$ENDIF}
+      {$IFDEF WIN32}
+      BrowseAndDocItOptions.Defines.Add('WIN32');
+      BrowseAndDocItOptions.Defines.Add('MSWINDOWS');
+      {$ELSE}
+      BrowseAndDocItOptions.Defines.Add('LINUX');
+      {$ENDIF}
+    End;
+end;
+
+(**
+
   This method reenabled the timer and returns whether the parse failed or not.
 
   @precon  None.
@@ -1253,6 +1200,36 @@ Procedure TEditorNotifier.EnableTimer(boolSuccessfulParse : Boolean);
 begin
   FUpdateTimer.Enabled := True;
   FLastParserResult := boolSuccessfulParse;
+end;
+
+(**
+
+  This method displays an exception message in a dialogue box.
+
+  @precon  None.
+  @postcon Displays an exception message in a dialogue box.
+
+  @param   strExceptionMsg as a String
+
+**)
+procedure TEditorNotifier.ExceptionMsg(strExceptionMsg: String);
+begin
+  ShowMessage(strExceptionMsg);
+end;
+
+(**
+
+  This method renders the given module in the module explorer window.
+
+  @precon  None.
+  @postcon Renders the given module in the module explorer window.
+
+  @param   Module as a TBaseLanguageModule
+
+**)
+procedure TEditorNotifier.RenderDocument(Module: TBaseLanguageModule);
+begin
+  TfrmDockableModuleExplorer.RenderDocumentTree(Module);
 end;
 
 (**
@@ -1342,7 +1319,8 @@ begin
       FLastSize := MemStreamSize(Editor);
       {$ENDIF}
           FUpdateTimer.Enabled := False;
-          TBrowseAndDocItThread.CreateBrowseAndDocItThread(EnableTimer);
+          TBrowseAndDocItThread.CreateBrowseAndDocItThread(EnableTimer,
+            EditorInfo, RenderDocument, ExceptionMsg);
         End;
     End;
 end;
@@ -1568,115 +1546,8 @@ procedure TKeyboardBinding.BindKeyboard(
   const BindingServices: IOTAKeyBindingServices);
 begin
   BindingServices.AddKeyBinding([Shortcut(13, [ssCtrl, ssShift, ssAlt])], FocusModuleExplorer, Nil);
-  {
-  BindingServices.AddKeyBinding([Shortcut(Ord('M'), [ssCtrl, ssShift, ssAlt])], InsertMethodComment, Nil);
-  BindingServices.AddKeyBinding([Shortcut(Ord('P'), [ssCtrl, ssShift, ssAlt])], InsertPropertyComment, Nil);
-  BindingServices.AddKeyBinding([Shortcut(Ord('B'), [ssCtrl, ssShift, ssAlt])], InsertBlockComment, Nil);
-  BindingServices.AddKeyBinding([Shortcut(Ord('L'), [ssCtrl, ssShift, ssAlt])], InsertLineComment, Nil);
-  BindingServices.AddKeyBinding([Shortcut(Ord('I'), [ssCtrl, ssShift, ssAlt])], InsertInSituComment, Nil);
-  }
   BindingServices.AddKeyBinding([Shortcut(Ord('T'), [ssCtrl, ssShift, ssAlt])], ShowTokens, Nil);
 end;
-
-(**
-
-  This method calls the main wizards Insert Block Comment method.
-
-  @precon  None.
-  @postcon A block comment should be inserted into the editor at the current
-           cursor position.
-
-  @param   Context       as an IOTAKeyContext constant
-  @param   KeyCode       as a TShortcut
-  @param   BindingResult as a TKeyBindingResult as a reference
-
-procedure TKeyboardBinding.InsertBlockComment(const Context: IOTAKeyContext;
-  KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-begin
-  FWizard.InsertBlockCommentClick(Self);
-  BindingResult := krHandled;
-end;
-**)
-
-(**
-
-  This method calls the main wizards Insert In Situ comment at the position of
-  the current cursor in the editor.
-
-  @precon  None.
-  @postcon Should insert an insitu comment into the editor.
-
-  @param   Context       as an IOTAKeyContext constant
-  @param   KeyCode       as a TShortcut
-  @param   BindingResult as a TKeyBindingResult as a reference
-
-procedure TKeyboardBinding.InsertInSituComment(const Context: IOTAKeyContext;
-  KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-begin
-  FWizard.InsertInSituCommentClick(Self);
-  BindingResult := krHandled;
-end;
-**)
-
-(**
-
-  This method calls the main wizards Insert Line Comment at the position of
-  the current cursor in thr editor.
-
-  @precon  None.
-  @postcon Should insert a Line comment into the editor.
-
-  @param   Context       as an IOTAKeyContext constant
-  @param   KeyCode       as a TShortcut
-  @param   BindingResult as a TKeyBindingResult as a reference
-
-procedure TKeyboardBinding.InsertLineComment(const Context: IOTAKeyContext;
-  KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-begin
-  FWizard.InsertLineCommentClick(Self);
-  BindingResult := krHandled;
-end;
-**)
-
-(**
-
-  This method calls the main wizards Insert Method Comment at the position of
-  the current cursor in the editor.
-
-  @precon  None.
-  @postcon Should insert a method comment into the editor.
-
-  @param   Context       as an IOTAKeyContext constant
-  @param   KeyCode       as a TShortcut
-  @param   BindingResult as a TKeyBindingResult as a reference
-
-procedure TKeyboardBinding.InsertMethodComment(const Context: IOTAKeyContext;
-  KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-begin
-  FWizard.InsertMethodCommentClick(Self);
-  BindingResult := krHandled;
-end;
-**)
-
-(**
-
-  This method calls the main wizards Insert Property Comment at the position of
-  the current cursor in the editor.
-
-  @precon  None.
-  @postcon Should insert a property comment into the editor.
-
-  @param   Context       as an IOTAKeyContext constant
-  @param   KeyCode       as a TShortcut
-  @param   BindingResult as a TKeyBindingResult as a reference
-
-procedure TKeyboardBinding.InsertPropertyComment(const Context: IOTAKeyContext;
-  KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-begin
-  FWizard.InsertPropertyCommentClick(Self);
-  BindingResult := krHandled;
-end;
-**)
 
 (**
 
@@ -1810,241 +1681,6 @@ end;
 function TKeyboardBinding.GetName: string;
 begin
   Result := 'BrowseAndDocItBindings';
-end;
-
-{ TBrowseAndDocItThread }
-
-(**
-
-  This is a constructor for the TBrowseAndDocItThread class.
-
-  @precon  None.
-  @postcon Creates a suspended thread and sets up a stream with the contents of
-           the active editor and then resumed the thread in order to parse
-           the contents.
-
-  @param   SuccessfulParseProc as a TParserNotify
-
-**)
-constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(
-  SuccessfulParseProc : TParserNotify);
-
-Var
-  Options : IOTAProjectOptions;
-  SE: IOTASourceEditor;
-
-begin
-  Inherited Create(True);
-  FreeOnTerminate := True; // Self Freeing...
-  FSuccessfulParseProc := SuccessfulParseProc;
-  SE := ActiveSourceEditor;
-  If SE <> Nil Then
-    Begin
-      FMemoryStream := EditorAsMemoryStream(SE);
-      If ActiveProject <> Nil Then
-        Begin
-          Options := ActiveProject.ProjectOptions;
-          BrowseAndDocItOptions.Defines.Text :=
-            StringReplace(Options.Values['Defines'], ';', #13#10,
-            [rfReplaceAll]);
-          DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
-        End;
-      DetermineCompilerDefinitions(BrowseAndDocItOptions.Defines);
-      FFileName := SE.FileName;
-      FModified := SE.Modified;
-    End Else
-      FMemoryStream := TMemoryStream.Create; // Ensure there's an instance.
-  Resume;
-end;
-
-(**
-
-  This is a destructor for the TBrowseAndDocItThread class.
-
-  @precon  None.
-  @postcon Frees the stream memory.
-
-**)
-destructor TBrowseAndDocItThread.Destroy;
-begin
-  FMemoryStream.Free;
-  Inherited Destroy;
-end;
-
-(**
-
-  This method determines which sytem compiler definitions need to be put
-  in the definition list.
-
-  @precon  slDefines neds to be a valid TStringList
-  @postcon Adds the relavent compiler definitions.
-
-  @param   slDefines as a TStringList
-
-**)
-Procedure TBrowseAndDocItThread.DetermineCompilerDefinitions(slDefines : TStringList);
-
-Begin
-  // Delphi 4 - Starts here as this will be the earliest version that can run
-  // this addin.
-  {$IFDEF VER120} // Delphi 4
-  slDefines.Add('VER120');
-  {$ENDIF}
-  {$IFDEF VER130} // Delphi 5
-  slDefines.Add('VER130');
-  {$ENDIF}
-  {$IFDEF VER140} // Delphi 6
-  slDefines.Add('VER140');
-  {$ENDIF}
-  {$IFDEF VER150} // Delphi 7
-  slDefines.Add('VER150');
-  {$ENDIF}
-  {$IFDEF VER160} // Delphi for .NET
-  slDefines.Add('VER160');
-  {$ENDIF}
-  {$IFDEF VER170} // Delphi 2005
-  slDefines.Add('VER170');
-  {$ENDIF}
-  {$IFDEF VER180} // Delphi 2006
-  slDefines.Add('VER180');
-  {$ENDIF}
-  {$IFDEF VER190} // Delphi 2007
-  slDefines.Add('VER180');
-  {$ENDIF}
-  {$IFDEF VER200} // Delphi 2009
-  slDefines.Add('VER180');
-  {$ENDIF}
-  {$IFDEF WIN32}
-  slDefines.Add('WIN32');
-  slDefines.Add('MSWINDOWS');
-  {$ELSE}
-  slDefines.Add('LINUX');
-  {$ENDIF}
-End;
-
-(**
-
-  This execute method parses the code of the active editor stored in the
-  memory stream and render the information in the explorer module.
-
-  @precon  FMemoryStream must be a valid stream of chars to parse.
-  @postcon Parses the code of the active editor stored in the memory stream and
-           render the information in the explorer module.
-
-**)
-procedure TBrowseAndDocItThread.Execute;
-
-{Var
-  E : IOTAModuleErrors;
-  i : Integer;
-  Es : TOTAErrors;}
-
-begin
-  SetName;
-  Try
-    FType := 'Parsing';
-    FModule := Dispatcher(FMemoryStream, FFileName, FModified, [moParse,
-      moCheckForDocumentConflicts]);
-    Try
-      {: @note Can not use this due to lock up in the IDE when calling
-               QueryInterface of the module when compiling is happening.
-      If doShowIDEErrorsOnSuccessfulParse In BrowseAndDocItOptions.Options Then
-        If FModule <> Nil Then
-          If FModule.FindElement(strErrors) = Nil Then
-            If Not boolCompiling And CheckChildProcesses Then
-              If SourceEditor.Module.QueryInterface(IOTAModuleErrors, E) = S_OK Then
-                Begin
-                  Es := E.GetErrors;
-                  For i := Low(Es) to High(Es) Do
-                    FModule.AddIssue(Es[i].Text, scNone, 'IDE', Es[i].Start.Line,
-                      Es[i].Start.CharIndex + 1, etError);
-                End;}
-      FType := 'Rendering';
-      Synchronize(RenderModuleExplorer);
-    Finally
-      FModule.Free;
-    End;
-  Except
-    On E : EParserAbort Do
-      Exit;
-    On E : Exception Do
-      Begin
-        {$IFDEF EUREKALOG}
-        Exceptionlog.StandardEurekaNotify(GetLastExceptionObject,
-          GetLastExceptionAddress);
-        If Assigned(FSuccessfulParseProc) Then
-          FSuccessfulParseProc(False);
-        {$ELSE}
-        FFileName := E.Message;
-        Synchronize(ShowException);
-        {$ENDIF}
-      End;
-  End;
-end;
-
-(**
-
-  This method synchronizes with the main IDE thread and renders the module
-  explorer.
-
-  @precon  FModule must be a valid TBaseLanguageModule instance.
-  @postcon Synchronizes with the main IDE thread and renders the module
-           explorer.
-
-**)
-procedure TBrowseAndDocItThread.RenderModuleExplorer;
-
-begin
-  TfrmDockableModuleExplorer.RenderDocumentTree(FModule);
-  If Assigned(FSuccessfulParseProc) Then
-    FSuccessfulParseProc(True);
-end;
-
-(**
-
-  This is a setter method for the  property.
-
-  @precon  None.
-  @postcon Sets the name of the thread.
-
-**)
-procedure TBrowseAndDocItThread.SetName;
-
-var
-  ThreadNameInfo: TThreadNameInfo;
-
-begin
-  ThreadNameInfo.FType := $1000;
-  ThreadNameInfo.FName := 'BrowseAndDocItThread';
-  ThreadNameInfo.FThreadID := $FFFFFFFF;
-  ThreadNameInfo.FFlags := 0;
-  try
-    RaiseException( $406D1388, 0, sizeof(ThreadNameInfo) div sizeof(LongWord),
-      @ThreadNameInfo );
-  except
-  end;
-end;
-
-(**
-
-  This method displays the raised exception message pass via the FFileName
-  field.
-
-  @precon  None.
-  @postcon Displays the raised exception message pass via the FFileName
-           field.
-
-**)
-procedure TBrowseAndDocItThread.ShowException;
-
-Const
-  strMsg = 'Exception in TBrowseAndDocItThread:'#13#10 +
-    '  Type: %s'#13#10 +
-    '  Exception: %s' ;
-begin
-  ShowMessage(Format(strMsg, [FType, FFileName]));
-  If Assigned(FSuccessfulParseProc) Then
-    FSuccessfulParseProc(False);
 end;
 
 {$IFDEF D2005}

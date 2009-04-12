@@ -104,6 +104,7 @@ type
     procedure TestFailure10;
     Procedure TestFailure11;
     Procedure TestFailure12;
+    Procedure TestFailure13;
   End;
 
   //
@@ -1728,6 +1729,10 @@ Begin
   S := TMemoryStream.Create;
   Try
     strCode :=
+      ''': Comment.'#13#10 +
+      ''': @Author DGH'#13#10 +
+      ''': @Date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      ''': @version 1'#13#10 +
       'VERSION 5.00'#13#10 +
       'Option Compare Text'#13#10 +
       'Option Explicit'#13#10 +
@@ -1745,7 +1750,7 @@ Begin
       'End Function'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1763,6 +1768,10 @@ Begin
       M.Free;
     End;
     strCode :=
+      ''': Comment.'#13#10 +
+      ''': @Author DGH'#13#10 +
+      ''': @Date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      ''': @version 1'#13#10 +
       'VERSION 5.00'#13#10 +
       'Option Compare Text'#13#10 +
       'Option Explicit'#13#10 +
@@ -1780,7 +1789,7 @@ Begin
       'End Function'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1826,7 +1835,7 @@ Begin
       'End Function'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1851,7 +1860,7 @@ Begin
       'End Function'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1876,7 +1885,7 @@ Begin
       'End Function'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1901,7 +1910,7 @@ Begin
       'End Function'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1924,7 +1933,7 @@ Begin
       'End Function'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', False, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1953,7 +1962,7 @@ Begin
       'End Function'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1982,7 +1991,7 @@ Begin
       'End Function'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2011,7 +2020,7 @@ Begin
       'End Function'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2100,7 +2109,7 @@ Begin
       'sub Hello()'#13#10 +
       'end sub'#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2333,7 +2342,7 @@ Begin
       'Option Compare Text'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2353,7 +2362,7 @@ Begin
       'Option Compare Text'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2390,7 +2399,7 @@ Begin
       'Option Compare Text'#13#10 +
       ''#13#10;
     S.LoadBufferFromString(strCode);
-    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2404,6 +2413,83 @@ Begin
       CheckEquals(1, M.BodyCommentCount);
       CheckEquals('Hello Dave.', M.BodyComment[0].Tag[0].AsString(9999, True));
       CheckEquals('Goodbye.', M.BodyComment[0].Tag[1].AsString(9999, True));
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestFailure13;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      ''':'#13#10 +
+      ''':  This module contains a class to represent the preceeding relationships from an activity'#13#10 +
+      ''':  and calculate the driving path which is defined as the path where the predecessor activity +'#13#10 +
+      ''':  Lag - Successor date is a minimum for a specified relationship type (FS, SS, FF, etc).'#13#10 +
+      ''':'#13#10 +
+      ''':  @Author  David Hoyle'#13#10 +
+      ''':  @Date    ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
+      ''':  @Version 1.0'#13#10 +
+      ''':'#13#10 +
+      'Option Explicit'#13#10 +
+      'Option Compare Text'#13#10 +
+      ''#13#10 +
+      ''': A private constant to define the growth capacity of the relationship array'#13#10 +
+      'Private Const iCAPACITY As Long = 10'#13#10 +
+      ''#13#10 +
+      ''': A private array to hold the relationships'#13#10 +
+      'Private FRelationships() As TRelationship'#13#10 +
+      ''': A private variable to hold the number of relationships in the collection.'#13#10 +
+      'Private FCount As Long'#13#10 +
+      ''': A private variable to hold the selected relationship.'#13#10 +
+      'Private FIndex As Long'#13#10 +
+      ''': A private variable to hold the relationship selection form.'#13#10 +
+      'Private frm As New frmRelationships'#13#10 +
+      ''': A private variable to hold a collection of calendars'#13#10 +
+      'Private FCalendars As New TCalendars '': @bug Is not cached across Preds and Succ!'#13#10 +
+      ''#13#10 +
+      ''':'#13#10 +
+      ''':  This method calculates the relationships between the given activity and its predecessors'#13#10 +
+      ''':  a returns true if there are any.'#13#10 +
+      ''':'#13#10 +
+      ''':  @precon  iProjectID must be a valid project'#13#10 +
+      ''':  @postcon Returns true if relationships are found.'#13#10 +
+      ''':'#13#10 +
+      ''':  @param   iProject     as a Long'#13#10 +
+      ''':  @param   strSuccActID as a String'#13#10 +
+      ''':  @return  a Boolean'#13#10 +
+      ''':'#13#10 +
+      'Public Function GetPredecessor(iProject As Long, strSuccActID As String) As Boolean'#13#10 +
+      '  Exception.Push "TPredRelationships.GetPredecessor", iProject, strSuccActID'#13#10 +
+      '  On Error GoTo ErrHnd'#13#10 +
+      '  FCount = 0'#13#10 +
+      '  FIndex = 1'#13#10 +
+      '  BuildRelationshipList iProject, strSuccActID'#13#10 +
+      '  DeleteRelationships'#13#10 +
+      '  If FCount > 1 Then FIndex = frm.Execute(iProject, strSuccActID, Me)'#13#10 +
+      '  GetPredecessor = (FCount > 0)'#13#10 +
+      'ErrHnd:'#13#10 +
+      '  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err'#13#10 +
+      '  Exception.Pop'#13#10 +
+      'End Function'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+      CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
     Finally
       M.Free;
     End;

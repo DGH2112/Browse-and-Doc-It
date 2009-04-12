@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    27 Mar 2009
+  @Date    12 Apr 2009
   @Version 1.0
 
 **)
@@ -34,6 +34,7 @@ type
     Class Function IsVisible : Boolean;
     Class Procedure SetActivate(Handler : TNotifyEvent);
     Class Procedure SetVisible(boolVisible : Boolean);
+    Class Function GetVisible : Boolean;
     Class Function GetModuleExplorerPosition: TRect;
     Class Procedure SetModuleExplorerPosition(const Value: TRect);
   end;
@@ -217,8 +218,8 @@ end;
 
   This method sets the OnActivate event handler for the form instance.
 
-  @precon  None . 
-  @postcon Sets the OnActivate event handler for the form instance . 
+  @precon  None .
+  @postcon Sets the OnActivate event handler for the form instance .
 
   @param   Handler as a TNotifyEvent
 
@@ -227,6 +228,23 @@ class procedure TfrmDockableModuleExplorer.SetActivate(Handler: TNotifyEvent);
 begin
   If FormInstance  <> Nil Then
     FormInstance.OnActivate := Handler;
+end;
+
+(**
+
+  This is a getter method for the Visible property.
+
+  @precon  None.
+  @postcon Sets the forms visibility.
+
+  @return  a Boolean
+
+**)
+class function TfrmDockableModuleExplorer.GetVisible: Boolean;
+begin
+  Result := False;
+  If FormInstance <> Nil Then
+    Result := FormInstance.Visible;
 end;
 
 (**

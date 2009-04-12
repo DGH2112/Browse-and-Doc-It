@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    28 Mar 2009
+  @Date    12 Apr 2009
   @Author  David Hoyle
 
 **)
@@ -15,7 +15,7 @@ Interface
 Uses
   Office_TLB, VBIDE_TLB, SysUtils, Windows, EventSink, ComObj,
   IniFiles, ExtCtrls, Dialogs, Classes, Forms, DocumentationDispatcher,
-  BaseLanguageModule, Contnrs;
+  BaseLanguageModule, Contnrs, ActnList;
 
 Type
   (** This is a record to keep together the menu item and the event sink. **)
@@ -67,6 +67,7 @@ Type
     FPath : String;
     FWidth : Integer;
     FDocType : TDocType;
+    FActions : TActionList;
     procedure CreateMenu;
     function GetProjectPath(strName: String): String;
     procedure SetProjectPath(strName: String; strValue: String);
@@ -86,13 +87,12 @@ Type
     Procedure InsertLineCommentClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure InsertInSituCommentClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure ExportClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
-    Procedure ImportClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
+    {: @todo Procedure ImportClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);}
     Procedure SaveCodeFragmentClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure InsertCodeFragmentClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure ShowTokensClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure OptionsClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure CheckForUpdatesClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
-    Procedure FormActivate(Sender : TObject);
     Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
       iCommentCol : Integer);
     Procedure Focus(Sender : TObject);
@@ -210,7 +210,7 @@ Uses
   ExportForm, ProgressForm, Controls, FileCtrl, Functions, TokenForm,
   ModuleDispatcher, OptionsForm, DocumentationOptionsForm, ShellAPI,
   CodeFragmentsForm, Variants, Messages, VBEIDEModuleExplorer,
-  CommonIDEFunctions, DGHLibrary, Math, VBModule, checkforupdates;
+  CommonIDEFunctions, DGHLibrary, Math, VBModule, checkforupdates, Menus;
 
 { TIDEMenuItem }
 
@@ -273,7 +273,6 @@ begin
     TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
     TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus,
       ScopeChange);
-    TfrmDockableModuleExplorer.SetActivate(FormActivate);
     TfrmDockableModuleExplorer.SetModuleExplorerPosition(WindowPosition['ModuleExplorer']);
     FVBProject := Nil;
     FCodePane := Nil;
@@ -284,6 +283,13 @@ begin
     FTimer.Interval := 100;
     FTimer.OnTimer := TimerEvent;
     iCounter := 0;
+    FVBEIDE.MainWindow.SetFocus;
+    With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
+      Try
+        TfrmDockableModuleExplorer.SetVisible(ReadBool('ModuleExplorer', 'Visible', True));
+      Finally
+        Free;
+      End;
   Except
     On E : Exception Do DisplayException(E.Message);
   End;
@@ -299,6 +305,13 @@ end;
 **)
 destructor TIDETools.Destroy;
 begin
+  With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
+    Try
+      WriteBool('ModuleExplorer', 'Visible', TfrmDockableModuleExplorer.GetVisible);
+    Finally
+      Free;
+    End;
+  FActions.Free;
   WindowPosition['ModuleExplorer'] := TfrmDockableModuleExplorer.GetModuleExplorerPosition;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
   FTimer.Free;
@@ -378,8 +391,11 @@ Procedure TIDETools.CreateMenu;
       EmptyParam, EmptyParam, EmptyParam, EmptyParam) As CommandBarButton;
     S.Menu.Caption := strCaption;
     S.Menu.BeginGroup := boolBeginGroup;
+    {: @bug Not implemented since I can not handle shortcuts. Subclassing
+            of the main window fails with an AV.
     If strShortCut <> '' Then
       S.Menu.ShortCutText := 'Ctrl+Shift+Alt+' + strShortCut;
+    }
     InterfaceConnect(S.Menu, DIID__CommandBarButtonEvents, S.Sink, FCookies);
   End;
 
@@ -402,7 +418,7 @@ Begin
       CreateMenuItem(strInsertLineComment, InsertLineCommentClick, False, 'L');
       CreateMenuItem(strInsertInSituComment, InsertInSituCommentClick, False, 'I');
       CreateMenuItem(strExport, ExportClick, True, 'X');
-      CreateMenuItem(strImport, ImportClick, False, 'R');
+      {: @todo CreateMenuItem(strImport, ImportClick, False, 'R'); }
       CreateMenuItem(strSaveCodeFragment, SaveCodeFragmentClick, True, 'S');
       CreateMenuItem(strInsertCodeFragment,InsertCodeFragmentClick, False, 'N');
       CreateMenuItem(strOptions, OptionsClick, True, 'O');
@@ -430,7 +446,6 @@ Var
 
 begin
   Try
-    TfrmDockableModuleExplorer.SetVisible(FVBEIDE.MainWindow.Visible);
     If Not FVBEIDE.MainWindow.Visible Then
       Exit;
     Application.DoApplicationIdle;
@@ -841,11 +856,11 @@ end;
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
 
-**)
 procedure TIDETools.ImportClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 begin
   //: @todo Implement the Import Menu.
 end;
+**)
 
 (**
 
@@ -996,21 +1011,6 @@ procedure TIDETools.FocusEditorClick(const Ctrl: CommandBarButton;
   var CancelDefault: WordBool);
 begin
   Focus(Self);
-end;
-
-(**
-
-  This is an form on active event handler for the module explorer.
-
-  @precon  None.
-  @postcon refreshes the tree view when activated.
-
-  @param   Sender as a TObject
-
-**)
-procedure TIDETools.FormActivate(Sender: TObject);
-begin
-  RefreshTree;
 end;
 
 (**
@@ -1210,7 +1210,7 @@ Begin
   Result := '';
   If FCodePane <> Nil Then
     If FCodePane.CodeModule.CountOfLines > 0 Then
-      Result := FCodePane.CodeModule.Lines[1, FCodePane.CodeModule.CountOfLines];
+      Result := FCodePane.CodeModule.Lines[1, FCodePane.CodeModule.CountOfLines] + #13#10;
 End;
 
 (**

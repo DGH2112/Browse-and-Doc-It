@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    12 Apr 2009
+  @Date    13 Apr 2009
   @Version 1.0
 
 **)
@@ -69,16 +69,9 @@ Procedure ShowDockableForm(Form : TfrmDockableModuleExplorer);
 Begin
   If Not Assigned(Form) Then
     Exit;
-  If Not Form.Floating Then
-    Begin
-      Form.Show;
-      Form.SetFocus;
-      Form.Focus;
-    End Else
-    Begin
-      Form.Show;
-      Form.Focus;
-    End;
+  Form.Show;
+  Form.SetFocus;
+  Form.Focus;
 End;
 
 (**
@@ -166,7 +159,8 @@ begin
   If FModuleExplorerFrame <> Nil Then
     If FModuleExplorerFrame.Visible Then
       If FModuleExplorerFrame.tvExplorer.Visible Then
-        FModuleExplorerFrame.tvExplorer.SetFocus;
+        If FModuleExplorerFrame.tvExplorer.CanFocus Then
+          FModuleExplorerFrame.tvExplorer.SetFocus;
 end;
 
 (**
@@ -260,7 +254,10 @@ end;
 class procedure TfrmDockableModuleExplorer.SetVisible(boolVisible : Boolean);
 begin
   If FormInstance  <> Nil Then
-    FormInstance.Visible := boolVisible;
+    Begin
+      FormInstance.Visible := boolVisible;
+      FormInstance.Focus;
+    End;
 end;
 
 (**

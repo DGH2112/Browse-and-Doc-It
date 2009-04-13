@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    12 Apr 2009
+  @Date    13 Apr 2009
   @Author  David Hoyle
 
 **)
@@ -20,7 +20,7 @@ Uses
 Type
   (** This is a record to keep together the menu item and the event sink. **)
   TIDEMenuItem = Class
-  {$IFDEF D2005} Strict {$ENDIF} private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FMenu : CommandBarButton;
     FSink : TEventSink;
   Public
@@ -51,9 +51,9 @@ Type
   (** This class represents the VBE IDE Tools interface between the IDE and
       the available tools. **)
   TIDETools = Class
-  Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     FOldHandle : Integer;
-    iCounter : Cardinal;
+    FCounter : Cardinal;
     FOldLength : Integer;
     (** Reference for the current VBE IDE **)
     FVBEIDE : VBE;
@@ -68,6 +68,9 @@ Type
     FWidth : Integer;
     FDocType : TDocType;
     FActions : TActionList;
+    FIdleTimer : TTimer;
+    FMEVisible: Boolean;
+    FVisible: Boolean;
     procedure CreateMenu;
     function GetProjectPath(strName: String): String;
     procedure SetProjectPath(strName: String; strValue: String);
@@ -77,7 +80,8 @@ Type
     procedure SetWindowPosition(strName: String; const Value: TRect);
     function GetModuleCode: String;
     function GetCursorPosition: TEditPos;
-  Protected
+  {$IFDEF D2005} Strict
+    procedure SaveSettings; {$ENDIF} Protected
     Procedure ModuleExplorerClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure DocumentationClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure FocusEditorClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
@@ -97,14 +101,21 @@ Type
       iCommentCol : Integer);
     Procedure Focus(Sender : TObject);
     Procedure ScopeChange(Sender : TObject);
-    Procedure RefreshTree;
     Procedure TimerEvent(Sender : TObject);
     Procedure VBProjectChangeEvent(Project : VBProject);
     Procedure CodePaneChangeEvent(Pane : CodePane; Project : VBProject);
     Procedure Save;
     Function GetFileName(strProject, strModule : String; iType : Integer) : String;
-    Function EditorAsMemoryStream : TMemoryStream;
+    Procedure EditorAsMemoryStream(Stream : TStream);
     procedure PositionCursorInFunction(CursorDelta: TPoint; iInsertLine: Integer; iIndent: Integer; strComment: string);
+    Procedure SuccessfulParse(boolSuccessfulParse : Boolean);
+    Procedure EditorInfo(var strFileName : String; var boolModified : Boolean;
+      MemoryStream : TMemoryStream);
+    Procedure RenderDocument(Module : TBaseLanguageModule);
+    Procedure ExceptionMsg(strExceptionMsg : String);
+    Procedure IdleTimerEvent(Sender : TObject);
+    Procedure LoadSettings;
+    Procedure SaveSettings;
     (**
       This property reads and write the project paths to and from the registry.
       @precon  None.
@@ -157,7 +168,7 @@ Type
       @return  a TEditPos
     **)
     Property CursorPosition : TEditPos Read GetCursorPosition;
-  Published
+  Public
     Constructor Create(VBEIDERef : VBE);
     Destructor Destroy; Override;
   End;
@@ -282,14 +293,12 @@ begin
     FTimer := TTimer.Create(Nil);
     FTimer.Interval := 100;
     FTimer.OnTimer := TimerEvent;
-    iCounter := 0;
+    FCounter := 0;
     FVBEIDE.MainWindow.SetFocus;
-    With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
-      Try
-        TfrmDockableModuleExplorer.SetVisible(ReadBool('ModuleExplorer', 'Visible', True));
-      Finally
-        Free;
-      End;
+    LoadSettings;
+    FIdleTimer := TTimer.Create(Nil);
+    FIdleTimer.Interval := 100;
+    FIdleTimer.OnTimer := IdleTimerEvent;
   Except
     On E : Exception Do DisplayException(E.Message);
   End;
@@ -305,21 +314,36 @@ end;
 **)
 destructor TIDETools.Destroy;
 begin
-  With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
-    Try
-      WriteBool('ModuleExplorer', 'Visible', TfrmDockableModuleExplorer.GetVisible);
-    Finally
-      Free;
-    End;
+  SaveSettings;
   FActions.Free;
   WindowPosition['ModuleExplorer'] := TfrmDockableModuleExplorer.GetModuleExplorerPosition;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
+  FIdleTimer.Free;
   FTimer.Free;
   FSinks.Free;
   If (FVBEIDE <> Nil) And (FIDEMenu <> Nil) Then
     FVBEIDE.CommandBars.Item['Menu Bar'].Controls_[strMenuCaption].Delete(False);
   Application.Handle := FOldHandle;
   inherited Destroy;
+end;
+
+(**
+
+  This method saves the applications settings to the ini file.
+
+  @precon  None.
+  @postcon Saves the applications settings to the ini file.
+
+**)
+procedure TIDETools.SaveSettings;
+begin
+  with TIniFile.Create(BrowseAndDocItOptions.INIFileName) do
+    try
+      WriteBool('ModuleExplorer', 'Visible', FMEVisible);
+      WriteInteger('Documentation options', 'LastOption', Byte(FDocType));
+    finally
+      Free;
+    end;
 end;
 
 (**
@@ -448,39 +472,35 @@ begin
   Try
     If Not FVBEIDE.MainWindow.Visible Then
       Exit;
-    Application.DoApplicationIdle;
-    FTimer.Enabled := False;
-    Try
-      If FVBProject <> FVBEIDE.ActiveVBProject Then
-        Begin
-          FVBProject := FVBEIDE.ActiveVBProject;
-          If FVBPRoject <> Nil Then
-            If FVBProject.Protection = vbext_pp_locked Then
-              FVBProject := Nil;
-          VBProjectChangeEvent(FVBProject);
-        End;
-      If FCodePane <> FVBEIDE.ActiveCodePane Then
-        Begin
-          FCodePane := FVBEIDE.ActiveCodePane;
-          CodePaneChangeEvent(FCodePane, FVBProject);
-        End;
-      Inc(iCounter, 100);
-      boolRefresh := (iCounter >= BrowseAndDocItOptions.UpdateInterval) And
-        (iCounter <= BrowseAndDocItOptions.UpdateInterval + 100);
-      i := Length(ModuleCode);
-      If i <> FOldLength Then
-        Begin
-          iCounter := 0;
-          FOldLength := i;
-        End;
-      If boolRefresh Then
-        Begin
-          RefreshTree;
-          FOldLength := Length(ModuleCode);
-        End;
-    Finally
-      FTimer.Enabled := True;
-    End;
+    If FVBProject <> FVBEIDE.ActiveVBProject Then
+      Begin
+        FVBProject := FVBEIDE.ActiveVBProject;
+        If FVBPRoject <> Nil Then
+          If FVBProject.Protection = vbext_pp_locked Then
+            FVBProject := Nil;
+        VBProjectChangeEvent(FVBProject);
+      End;
+    If FCodePane <> FVBEIDE.ActiveCodePane Then
+      Begin
+        FCodePane := FVBEIDE.ActiveCodePane;
+        CodePaneChangeEvent(FCodePane, FVBProject);
+      End;
+    Inc(FCounter, 100);
+    boolRefresh := (FCounter >= BrowseAndDocItOptions.UpdateInterval) And
+      (FCounter <= BrowseAndDocItOptions.UpdateInterval + 100);
+    i := Length(ModuleCode);
+    If i <> FOldLength Then
+      Begin
+        FCounter := 0;
+        FOldLength := i;
+      End;
+    If boolRefresh Then
+      Begin
+        FTimer.Enabled := False;
+        TBrowseAndDocItThread.CreateBrowseAndDocItThread(
+          SuccessfulParse, EditorInfo, RenderDocument, ExceptionMsg);
+        FOldLength := Length(ModuleCode);
+      End;
   Except
     On E: Exception Do DisplayException(E.Message);
   End;
@@ -710,6 +730,38 @@ end;
 
 (**
 
+  This method re-enables the timer for the parsing of code once the parser has
+  parsed the code successfully.
+
+  @precon  None.
+  @postcon Re-enables the timer for the parsing of code once the parser has
+           parsed the code successfully.
+
+  @param   boolSuccessfulParse as a Boolean
+
+**)
+procedure TIDETools.SuccessfulParse(boolSuccessfulParse: Boolean);
+begin
+  FTimer.Enabled := True;
+end;
+
+(**
+
+  This method outputs an exception message from the browse and doc it thread.
+
+  @precon  None.
+  @postcon Outputs an exception message from the browse and doc it thread.
+
+  @param   strExceptionMsg as a String
+
+**)
+procedure TIDETools.ExceptionMsg(strExceptionMsg: String);
+begin
+  ShowMessage(strExceptionMsg);
+end;
+
+(**
+
   This is a button on click event handler for the Export button.
 
   @precon  None.
@@ -841,7 +893,7 @@ End;
 **)
 procedure TIDETools.ScopeChange(Sender: TObject);
 begin
-  RefreshTree;
+  FCounter := BrowseAndDocItOptions.UpdateInterval;
 end;
 
 (**
@@ -897,7 +949,7 @@ Var
   strFileName : String;
 
 begin
-  RefreshTree;
+  FCounter := BrowseAndDocItOptions.UpdateInterval;
   If Pane = Nil Then
     Exit;
   strFileName := GetFileName(FCodePane.CodeModule.Parent.Collection.Parent.Name,
@@ -975,7 +1027,7 @@ begin
   If TfrmOptions.Execute Then
     Begin
       FOldLength := 0;
-      RefreshTree;
+      FCounter := BrowseAndDocItOptions.UpdateInterval;
     End;
 end;
 
@@ -1086,53 +1138,22 @@ procedure TIDETools.ModuleExplorerClick(const Ctrl: CommandBarButton;
   var CancelDefault: WordBool);
 begin
   TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
-  RefreshTree;
+  FCounter := BrowseAndDocItOptions.UpdateInterval;
 end;
 
 (**
 
-  This method reparses the code window and presents it in the module explorer.
+  This method renders the passed module in the module explorer.
 
   @precon  None.
-  @postcon Reparses the code window and presents it in the module explorer.
+  @postcon Renders the passed module in the module explorer.
+
+  @param   Module as a TBaseLanguageModule
 
 **)
-procedure TIDETools.RefreshTree;
-
-Var
-  strFileName : String;
-  src : TMemoryStream;
-  strTemp : String;
-  doc : TBaseLanguageModule;
-
+procedure TIDETools.RenderDocument(Module: TBaseLanguageModule);
 begin
-  Try
-    If FCodePane = Nil Then
-      Begin
-        TfrmDockableModuleExplorer.RenderDocumentTree(Nil);
-        Exit;
-      End;
-    If Not TfrmDockableModuleExplorer.IsVisible Then
-      Exit;
-    strFileName := GetFileName(FCodePane.CodeModule.Parent.Collection.Parent.Name,
-      FCodePane.CodeModule.Parent.Name, FCodePane.CodeModule.Parent.Type_);
-    strTemp := ModuleCode;
-    FOldLength := Length(strTemp);
-    src := EditorAsMemoryStream;
-    Try
-      doc := Dispatcher(src, strFileName, Not FCodePane.CodeModule.Parent.Saved,
-        [moParse, moCheckForDocumentConflicts]);
-      Try
-        TfrmDockableModuleExplorer.RenderDocumentTree(doc);
-      Finally
-        doc.Free;
-      End;
-    Finally
-      src.Free;
-    End;
-  Except
-    On E: Exception Do DisplayException(E.Message);
-  End;
+  TfrmDockableModuleExplorer.RenderDocumentTree(Module);
 end;
 
 (**
@@ -1156,34 +1177,20 @@ begin
     If FVBProject <> Nil Then
       With TfrmDocumentationOptions.Create(Nil) Do
         Try
-          With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
-            Try
-              FDocType := TDocType(ReadInteger('Documentation options', 'LastOption', Byte(dtHTML)));
-            Finally
-              Free;
-            End;
           If Execute(FDocType) Then
-            Begin
-              With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
-                Try
-                  WriteInteger('Documentation options', 'LastOption', Byte(FDocType));
-                Finally
-                  Free;
-                End;
-                With DocumentDispatcher(ProjectPath[FVBEIDE.ActiveVBProject.Name],
-                  FVBEIDE.ActiveVBProject.Description, FDocType) Do
-                  Try
-                    For i := 1 To FVBEIDE.ActiveVBProject.VBComponents.Count Do
-                      Add(GetFileName(FVBEIDE.ActiveVBProject.Name,
-                        FVBEIDE.ActiveVBProject.VBComponents.Item(i).Name,
-                        FVBEIDE.ActiveVBProject.VBComponents.Item(i).Type_));
-                    OutputDocumentation;
-                    ShellExecute(Application.Handle, 'Open', PChar(MainDocument), '', '',
-                      SW_SHOWNORMAL);
-                  Finally
-                    Free;
-                  End;
-            End;
+            With DocumentDispatcher(ProjectPath[FVBEIDE.ActiveVBProject.Name],
+              FVBEIDE.ActiveVBProject.Description, FDocType) Do
+              Try
+                For i := 1 To FVBEIDE.ActiveVBProject.VBComponents.Count Do
+                  Add(GetFileName(FVBEIDE.ActiveVBProject.Name,
+                    FVBEIDE.ActiveVBProject.VBComponents.Item(i).Name,
+                    FVBEIDE.ActiveVBProject.VBComponents.Item(i).Type_));
+                OutputDocumentation;
+                ShellExecute(Application.Handle, 'Open', PChar(MainDocument), '', '',
+                  SW_SHOWNORMAL);
+              Finally
+                Free;
+              End;
         Finally
           Free;
         End
@@ -1212,6 +1219,29 @@ Begin
     If FCodePane.CodeModule.CountOfLines > 0 Then
       Result := FCodePane.CodeModule.Lines[1, FCodePane.CodeModule.CountOfLines] + #13#10;
 End;
+
+(**
+
+  This is an on timer event handler for the idle timer.
+
+  @precon  None.
+  @postcon Ensures that there is an equivalent message loop for the delphi code.
+
+  @param   Sender as a TObject
+
+**)
+procedure TIDETools.IdleTimerEvent(Sender: TObject);
+begin
+  Application.DoApplicationIdle;
+  If FVisible <> FVBEIDE.MainWindow.Visible Then
+    Begin
+      If Not FVBEIDE.MainWindow.Visible Then
+        TfrmDockableModuleExplorer.SetVisible(False)
+      Else
+        TfrmDockableModuleExplorer.SetVisible(FMEVisible);
+      FVisible := FVBEIDE.MainWindow.Visible;
+    End;
+end;
 
 (**
 
@@ -1380,8 +1410,9 @@ Var
 
 begin
   iInsertLine := 0;
-  objMemStream := EditorAsMemoryStream;
+  objMemStream := TMemoryStream.Create;
   Try
+    EditorAsMemoryStream(objMemStream);
     strFileName := GetFileName(FCodePane.CodeModule.Parent.Collection.Parent.Name,
       FCodePane.CodeModule.Parent.Name, FCodePane.CodeModule.Parent.Type_);
     Module := Dispatcher(objMemStream, strFileName,
@@ -1455,8 +1486,9 @@ Var
 
 begin
   iInsertLine := 0;
-  objMemStream := EditorAsMemoryStream;
+  objMemStream := TMemoryStream.Create;
   Try
+    EditorAsMemoryStream(objMemStream);
     strFileName := GetFileName(FCodePane.CodeModule.Parent.Collection.Parent.Name,
       FCodePane.CodeModule.Parent.Name, FCodePane.CodeModule.Parent.Type_);
     Module := Dispatcher(objMemStream, strFileName,
@@ -1496,6 +1528,26 @@ begin
   Finally
    objMemStream.Free;
   End;
+end;
+
+(**
+
+  This method loads the applications settings from the ini file.
+
+  @precon  None.
+  @postcon Loads the applications settings from the ini file.
+
+**)
+procedure TIDETools.LoadSettings;
+begin
+  With TIniFile.Create(BrowseAndDocItOptions.INIFileName) Do
+    Try
+      FMEVisible := ReadBool('ModuleExplorer', 'Visible', True);
+      FDocType := TDocType(ReadInteger('Documentation options', 'LastOption',
+        Byte(dtHTML)));
+    Finally
+      Free;
+    End;
 end;
 
 (**
@@ -1557,20 +1609,45 @@ end;
   @precon  None.
   @postcon Returns the code of the current editor as a memory stream.
 
-  @return  a TMemoryStream
+  @param   Stream as a TStream
 
 **)
-Function TIDETools.EditorAsMemoryStream : TMemoryStream;
+Procedure TIDETools.EditorAsMemoryStream(Stream : TStream);
 
 Var
   strModuleCode : String;
 
 Begin
-  Result := TMemoryStream.Create;
   strModuleCode := ModuleCode;
   If Length(strModuleCode) > 0 Then
-    Result.WriteBuffer(strModuleCode[1], Length(strModuleCode));
-  Result.Position := 0;
+    Stream.WriteBuffer(strModuleCode[1], Length(strModuleCode));
+  Stream.Position := 0;
 End;
+
+(**
+
+  This method returns filename, modified and code information back to the
+  Browse And Doc It thread for processing.
+
+  @precon  None.
+  @postcon Returns filename, modified and code information back to the
+           Browse And Doc It thread for processing.
+
+  @param   strFileName  as a String as a reference
+  @param   boolModified as a Boolean as a reference
+  @param   MemoryStream as a TMemoryStream
+
+**)
+procedure TIDETools.EditorInfo(var strFileName: String;
+  var boolModified: Boolean; MemoryStream: TMemoryStream);
+begin
+  If FCodePane <> Nil Then
+    Begin
+      strFileName := GetFileName(FCodePane.CodeModule.Parent.Collection.Parent.Name,
+        FCodePane.CodeModule.Parent.Name, FCodePane.CodeModule.Parent.Type_);
+      boolModified := Not FCodePane.CodeModule.Parent.Saved;
+      EditorAsMemoryStream(MemoryStream);
+    End;
+end;
 
 End.

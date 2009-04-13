@@ -65,7 +65,7 @@ Type
     FCodePane : CodePane;
     FIgnoreVBAProject: Boolean;
     FPath : String;
-    FWidth : Integer;
+    FCodeFragWidth : Integer;
     FDocType : TDocType;
     FActions : TActionList;
     FIdleTimer : TTimer;
@@ -341,6 +341,7 @@ begin
     try
       WriteBool('ModuleExplorer', 'Visible', FMEVisible);
       WriteInteger('Documentation options', 'LastOption', Byte(FDocType));
+      WriteInteger('Setup', 'CodeFragWidth', FCodeFragWidth);
     finally
       Free;
     end;
@@ -1300,7 +1301,7 @@ begin
     If FCodePane <> Nil Then
       Begin
         R := WindowPosition['CodeFragments'];
-        str := TfrmInsertCodeFragments.Execute(FPath, R, FWidth);
+        str := TfrmInsertCodeFragments.Execute(FPath, R, FCodeFragWidth);
         If str <> '' Then
           Begin
             FCodePane.GetSelection(iStartLine, iStartColumn, iEndLine, iEndColumn);
@@ -1545,6 +1546,7 @@ begin
       FMEVisible := ReadBool('ModuleExplorer', 'Visible', True);
       FDocType := TDocType(ReadInteger('Documentation options', 'LastOption',
         Byte(dtHTML)));
+      FCodeFragWidth := ReadInteger('Setup', 'CodeFragWidth', 100);
     Finally
       Free;
     End;

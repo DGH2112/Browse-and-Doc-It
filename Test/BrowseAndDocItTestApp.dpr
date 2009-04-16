@@ -2,7 +2,7 @@
 
   This is the test applications project file.
 
-  @Date    11 Dec 2008
+  @Date    16 Apr 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -11,6 +11,7 @@ program BrowseAndDocItTestApp;
 
 {$R '..\ExplorerImages.res' '..\ExplorerImages.RC'}
 {$R '..\..\..\Library\BrowseAndDocItHTMLResources.res' '..\..\..\Library\BrowseAndDocItHTMLResources.RC'}
+{$R '..\DUnitTemplateResources.res' '..\DUnitTemplateResources.RC'}
 {%File '..\..\..\Library\HTML Files\BrowseAndDocItScreen.css'}
 {%File '..\..\..\Library\HTML Files\BrowseAndDocItPrint.css'}
 {%HTMLTool '..\..\..\Library\HTML Files\BrowseAndDocItHTMLTemplate.html'}
@@ -20,6 +21,7 @@ program BrowseAndDocItTestApp;
 {%File '..\..\..\LIBRARY\HTML Files\xhtml-special.ent'}
 {%File '..\..\..\LIBRARY\HTML Files\xhtml-symbol.ent'}
 {%File '..\..\..\LIBRARY\CompilerDefinitions.inc'}
+{%File '..\Source\DUnit Templates\DUnitProjectTemplate.txt'}
 
 uses
   ExceptionLog,
@@ -29,7 +31,7 @@ uses
   BaseLanguageModule in '..\..\..\Library\BaseLanguageModule.pas',
   ModuleExplorerFrame in '..\..\..\Library\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
   OptionsForm in '..\..\..\Library\OptionsForm.pas' {frmOptions},
-  PascalDocModule in '..\..\..\Library\PascalDocModule.pas',
+  PascalModule in '..\..\..\LIBRARY\PascalModule.pas',
   ProgressForm in '..\..\..\Library\ProgressForm.pas' {frmProgressForm},
   TokenForm in '..\..\..\Library\TokenForm.pas' {frmTokenForm},
   dghlibrary in '..\..\..\Library\dghlibrary.pas',
@@ -41,7 +43,6 @@ uses
   GIFImage in '..\..\..\Library\TGIFImage\GIFImage.pas',
   DocumentationOptionsForm in '..\..\..\LIBRARY\DocumentationOptionsForm.pas' {frmDocumentationOptions},
   GenericTokenizer in '..\..\..\LIBRARY\GenericTokenizer.pas',
-  Profiler in '..\..\..\LIBRARY\Profiler.pas',
   SynEdit in '..\..\..\LIBRARY\SynEdit\Source\SynEdit.pas',
   SynEditHighlighter in '..\..\..\LIBRARY\SynEdit\Source\SynEditHighlighter.pas',
   SynHighlighterPas in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterPas.pas',
@@ -60,7 +61,10 @@ uses
   VirtualTrees in '..\..\..\LIBRARY\Virtual Treeview\Source\VirtualTrees.pas',
   VTAccessibilityFactory in '..\..\..\LIBRARY\Virtual Treeview\Source\VTAccessibilityFactory.pas',
   MSAAIntf in '..\..\..\LIBRARY\Virtual Treeview\Source\MSAAIntf.pas',
-  VBModule in '..\..\..\LIBRARY\VBModule.pas';
+  VBModule in '..\..\..\LIBRARY\VBModule.pas',
+  SynHighlighterVB in '..\..\..\Library\SynEdit\Source\SynHighlighterVB.pas',
+  ExclusionsForm in 'Source\ExclusionsForm.pas' {frmExclusions},
+  DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas';
 
 {$R *.res}
 

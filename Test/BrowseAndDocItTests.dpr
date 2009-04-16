@@ -35,7 +35,9 @@ uses
   TestVBModule in '..\..\..\Library\Test\Source\TestVBModule.pas',
   ModuleDispatcher in '..\..\..\LIBRARY\ModuleDispatcher.pas',
   PascalModule in '..\..\..\LIBRARY\PascalModule.pas',
-  TestPascalModule in '..\..\..\LIBRARY\Test\Source\TestPascalModule.pas';
+  TestPascalModule in '..\..\..\LIBRARY\Test\Source\TestPascalModule.pas',
+  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  TestCommonIDEFunctions in '..\Source\Tests\Source\TestCommonIDEFunctions.pas';
 
 {$R *.RES}
 
@@ -48,7 +50,9 @@ begin
   {$IFDEF D2006}
   ReportMemoryLeaksOnShutdown := DebugHook <> 0;
   {$ENDIF}
+  {$IFDEF EUREKALOG}
   SetEurekaLogState(DebugHook = 0);
+  {$ENDIF}
   Application.Initialize;
   If IsConsole Then
     Begin

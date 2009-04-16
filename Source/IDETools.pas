@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    13 Apr 2009
+  @Date    16 Apr 2009
   @Author  David Hoyle
 
 **)
@@ -15,7 +15,7 @@ Interface
 Uses
   Office_TLB, VBIDE_TLB, SysUtils, Windows, EventSink, ComObj,
   IniFiles, ExtCtrls, Dialogs, Classes, Forms, DocumentationDispatcher,
-  BaseLanguageModule, Contnrs, ActnList;
+  BaseLanguageModule, Contnrs, ActnList, Messages;
 
 Type
   (** This is a record to keep together the menu item and the event sink. **)
@@ -62,7 +62,6 @@ Type
     FCookies : LongInt;
     FTimer : TTimer;
     FVBProject : VBProject;
-    FCodePane : CodePane;
     FIgnoreVBAProject: Boolean;
     FPath : String;
     FCodeFragWidth : Integer;
@@ -71,6 +70,9 @@ Type
     FIdleTimer : TTimer;
     FMEVisible: Boolean;
     FVisible: Boolean;
+    FOldWndProc : TFarProc;
+    FNewWndProc : TFarProc;
+    FLastCodePane: CodePane;
     procedure CreateMenu;
     function GetProjectPath(strName: String): String;
     procedure SetProjectPath(strName: String; strValue: String);
@@ -80,8 +82,8 @@ Type
     procedure SetWindowPosition(strName: String; const Value: TRect);
     function GetModuleCode: String;
     function GetCursorPosition: TEditPos;
-  {$IFDEF D2005} Strict
-    procedure SaveSettings; {$ENDIF} Protected
+    Function GetCodePane : CodePane;
+  {$IFDEF D2005} Strict {$ENDIF} Protected
     Procedure ModuleExplorerClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure DocumentationClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure FocusEditorClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
@@ -116,6 +118,7 @@ Type
     Procedure IdleTimerEvent(Sender : TObject);
     Procedure LoadSettings;
     Procedure SaveSettings;
+    Procedure WndProc(var Msg : TMessage);
     (**
       This property reads and write the project paths to and from the registry.
       @precon  None.
@@ -168,6 +171,13 @@ Type
       @return  a TEditPos
     **)
     Property CursorPosition : TEditPos Read GetCursorPosition;
+    (**
+      This property returns the editor's current code pane.
+      @precon  None.
+      @postcon Returns the editor's current code pane.
+      @return  a CodePane
+    **)
+    Property CurrentCodePane : CodePane Read GetCodePane;
   Public
     Constructor Create(VBEIDERef : VBE);
     Destructor Destroy; Override;
@@ -220,7 +230,7 @@ Implementation
 Uses
   ExportForm, ProgressForm, Controls, FileCtrl, Functions, TokenForm,
   ModuleDispatcher, OptionsForm, DocumentationOptionsForm, ShellAPI,
-  CodeFragmentsForm, Variants, Messages, VBEIDEModuleExplorer,
+  CodeFragmentsForm, Variants, VBEIDEModuleExplorer,
   CommonIDEFunctions, DGHLibrary, Math, VBModule, checkforupdates, Menus;
 
 { TIDEMenuItem }
@@ -286,7 +296,6 @@ begin
       ScopeChange);
     TfrmDockableModuleExplorer.SetModuleExplorerPosition(WindowPosition['ModuleExplorer']);
     FVBProject := Nil;
-    FCodePane := Nil;
     FVBEIDE := VBEIDERef;
     FSinks := TObjectList.Create(True);
     CreateMenu;
@@ -299,6 +308,9 @@ begin
     FIdleTimer := TTimer.Create(Nil);
     FIdleTimer.Interval := 100;
     FIdleTimer.OnTimer := IdleTimerEvent;
+    FOldWndProc := TFarProc(GetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC));
+    FNewWndProc := Classes.MakeObjectInstance(WndProc);
+    //: @debug SetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC, LongWord(FNewWndProc));
   Except
     On E : Exception Do DisplayException(E.Message);
   End;
@@ -315,6 +327,8 @@ end;
 destructor TIDETools.Destroy;
 begin
   SaveSettings;
+  //: @debug SetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC, LongWord(FOldWndProc));
+  Classes.FreeObjectInstance(FNewWndProc);
   FActions.Free;
   WindowPosition['ModuleExplorer'] := TfrmDockableModuleExplorer.GetModuleExplorerPosition;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
@@ -367,6 +381,7 @@ procedure TIDETools.PositionCursorInFunction(CursorDelta: TPoint;
 
 Var
   Pt: TPoint;
+  CP: CodePane;
 
 begin
   SelectionChange(iInsertLine + CharCount(#13, strComment) + 1, 1, iInsertLine, 1);
@@ -374,7 +389,9 @@ begin
   Pt.X := iIndent + 3;
   Inc(Pt.Y, CursorDelta.Y);
   Inc(Pt.X, CursorDelta.X);
-  FCodePane.SetSelection(Pt.Y, Pt.X, Pt.Y, Pt.X);
+  CP := CurrentCodePane;
+  If CP <> Nil Then
+    CP.SetSelection(Pt.Y, Pt.X, Pt.Y, Pt.X);
 end;
 
 (**
@@ -417,7 +434,8 @@ Procedure TIDETools.CreateMenu;
     S.Menu.Caption := strCaption;
     S.Menu.BeginGroup := boolBeginGroup;
     {: @bug Not implemented since I can not handle shortcuts. Subclassing
-            of the main window fails with an AV.
+            of the main window fails on closedown IF there is another addin
+            which subclasses the IDE.
     If strShortCut <> '' Then
       S.Menu.ShortCutText := 'Ctrl+Shift+Alt+' + strShortCut;
     }
@@ -443,7 +461,7 @@ Begin
       CreateMenuItem(strInsertLineComment, InsertLineCommentClick, False, 'L');
       CreateMenuItem(strInsertInSituComment, InsertInSituCommentClick, False, 'I');
       CreateMenuItem(strExport, ExportClick, True, 'X');
-      {: @todo CreateMenuItem(strImport, ImportClick, False, 'R'); }
+      {: @debug CreateMenuItem(strImport, ImportClick, False, 'R'); }
       CreateMenuItem(strSaveCodeFragment, SaveCodeFragmentClick, True, 'S');
       CreateMenuItem(strInsertCodeFragment,InsertCodeFragmentClick, False, 'N');
       CreateMenuItem(strOptions, OptionsClick, True, 'O');
@@ -468,6 +486,7 @@ procedure TIDETools.TimerEvent(Sender: TObject);
 Var
   i : Integer;
   boolRefresh : Boolean;
+  CP: CodePane;
 
 begin
   Try
@@ -481,10 +500,11 @@ begin
             FVBProject := Nil;
         VBProjectChangeEvent(FVBProject);
       End;
-    If FCodePane <> FVBEIDE.ActiveCodePane Then
+    CP := CurrentCodePane;
+    If FLastCodePane <> CP Then
       Begin
-        FCodePane := FVBEIDE.ActiveCodePane;
-        CodePaneChangeEvent(FCodePane, FVBProject);
+        FLastCodePane := CP;
+        CodePaneChangeEvent(CP, FVBProject);
       End;
     Inc(FCounter, 100);
     boolRefresh := (FCounter >= BrowseAndDocItOptions.UpdateInterval) And
@@ -589,6 +609,23 @@ end;
 
 (**
 
+  This is a getter method for the CurrentCodePane property.
+
+  @precon  None.
+  @postcon Return the editors current code pane else returns nil.
+
+  @return  a CodePane
+
+**)
+function TIDETools.GetCodePane: CodePane;
+begin
+  Result := Nil;
+  If FVBEIDE <> Nil Then
+    Result := FVBEIDE.ActiveCodePane;
+end;
+
+(**
+
   This is a getter method for the CursorPosition property.
 
   @precon  None.
@@ -601,10 +638,12 @@ function TIDETools.GetCursorPosition : TEditPos;
 
 Var
   i, j : Integer;
+  CP: CodePane;
 
 begin
-  If FCodePane <> Nil Then
-    FCodePane.GetSelection(Result.Line, Result.Col, i, j);
+  CP := CurrentCodePane;
+  If CP <> Nil Then
+    CP.GetSelection(Result.Line, Result.Col, i, j);
 end;
 
 (**
@@ -702,19 +741,22 @@ Var
   doc : TBaseLanguageModule;
   strFileName : String;
   strTemp : String;
+  CP: CodePane;
 
 begin
   Try
-    If FCodePane = Nil Then Exit;
-    strFileName := GetFileName(FCodePane.CodeModule.Parent.Collection.Parent.Name,
-      FCodePane.CodeModule.Parent.Name, FCodePane.CodeModule.Parent.Type_);
+    CP := CurrentCodePane;
+    If CP = Nil Then
+      Exit;
+    strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
+      CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
     src := TMemoryStream.Create;
     Try
       strTemp := ModuleCode;
       If Length(strTemp) > 0 Then
         src.WriteBuffer(strTemp[1], Length(strTemp));
       src.Position := 0;
-      doc := Dispatcher(src, strFileName, Not FCodePane.CodeModule.Parent.Saved,
+      doc := Dispatcher(src, strFileName, Not CP.CodeModule.Parent.Saved,
         [moParse]);
       Try
         TfrmTokenForm.Execute(doc);
@@ -725,7 +767,8 @@ begin
       src.Free;
     End;
   Except
-    On E: Exception Do DisplayException(E.Message);
+    On E: Exception Do
+      DisplayException(E.Message);
   End;
 end;
 
@@ -948,17 +991,19 @@ procedure TIDETools.CodePaneChangeEvent(Pane : CodePane; Project : VBProject);
 
 Var
   strFileName : String;
+  CP: CodePane;
 
 begin
   FCounter := BrowseAndDocItOptions.UpdateInterval;
   If Pane = Nil Then
     Exit;
-  strFileName := GetFileName(FCodePane.CodeModule.Parent.Collection.Parent.Name,
-      FCodePane.CodeModule.Parent.Name, FCodePane.CodeModule.Parent.Type_);
+  CP := CurrentCodePane;
+  strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
+      CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
   If FileExists(strFileName) Then
     If FileGetAttr(strFileName) And faReadOnly <> 0 Then
-      If MessageDlg(Format(strLockedMsg, [FCodePane.CodeModule.Parent.Name,
-        FCodePane.CodeModule.Parent.Collection.Parent.Name]), mtWarning,
+      If MessageDlg(Format(strLockedMsg, [CP.CodeModule.Parent.Name,
+        CP.CodeModule.Parent.Collection.Parent.Name]), mtWarning,
         [mbOK, mbCancel], 0) = mrOK Then
         Pane.Window_.Close;
 end;
@@ -979,6 +1024,29 @@ begin
   If Project = Nil Then Exit;
   If IgnoreVBAProject And (Project.Name = 'VBAProject') Then
     Exit;
+end;
+
+(**
+
+  This is a Windows procedure for handling keyboard shortcuts in the IDE.
+
+  @precon  None.
+  @postcon NOT CURRENTLY IMPLEMENTED PENDING A SOLUTION TO THE SUBCLASS OF THE
+           IDE PROBLEM.
+
+  @param   Msg as a TMessage as a reference
+
+**)
+procedure TIDETools.WndProc(var Msg: TMessage);
+begin
+  Case Msg.Msg Of
+    WM_KEYDOWN:
+      Begin
+        OutputDebugString('Hello Dave.');
+      End;
+  End;
+  Msg.Result := CallWindowProc(FOldWndProc, FVBEIDE.MainWindow.HWnd, Msg.Msg,
+    Msg.WParam, Msg.LParam);
 end;
 
 (**
@@ -1043,10 +1111,15 @@ end;
 
 **)
 procedure TIDETools.Focus(Sender : TObject);
+
+var
+  CP: CodePane;
+
 begin
-  If FCodePane = Nil Then
+  CP := CurrentCodePane;
+  If CP = Nil Then
     Exit;
-  FCodePane.Window_.SetFocus;
+  CP.Window_.SetFocus;
 end;
 
 (**
@@ -1086,39 +1159,41 @@ procedure TIDETools.SelectionChange(iIdentLine, iIdentCol, iCommentLine,
 Var
   C : TEditPos;
   iLineInView: Integer;
+  CP: CodePane;
 
 begin
   Focus(Self);
-  If FCodePane <> Nil Then
+  CP := CurrentCodePane;
+  If CP <> Nil Then
     If iIdentCol * iIdentLine > 0 Then
       Begin
-        iLineInView := FCodePane.CountOfVisibleLines Div 2;
+        iLineInView := CP.CountOfVisibleLines Div 2;
         C.Col := iIdentCol;
         C.Line := iIdentLine;
-        FCodePane.SetSelection(C.Line, C.Col, C.Line, C.Col);
+        CP.SetSelection(C.Line, C.Col, C.Line, C.Col);
         Case BrowseAndDocItOptions.BrowsePosition Of
           bpCommentTop:
             Begin
               If iCommentLine > 0 Then
                 iIdentLine := iCommentLine;
-              FCodePane.TopLine := iIdentLine;
+              CP.TopLine := iIdentLine;
             End;
           bpCommentCentre:
             Begin
               If iCommentLine > 0 Then
                 iIdentLine := iCommentLine;
-              FCodePane.TopLine := Max(iIdentLine - iLineInView, 1);
+              CP.TopLine := Max(iIdentLine - iLineInView, 1);
             End;
           bpIdentifierTop:
-            FCodePane.TopLine := iIdentLine;
+            CP.TopLine := iIdentLine;
           bpIdentifierCentre:
-            FCodePane.TopLine := Max(iIdentLine - iLineInView, 1);
+            CP.TopLine := Max(iIdentLine - iLineInView, 1);
           bpIdentifierCentreShowAllComment:
             Begin
-              FCodePane.TopLine := Max(iIdentLine - iLineInView, 1);
+              CP.TopLine := Max(iIdentLine - iLineInView, 1);
               If iCommentLine > 0 Then
-                If iCommentLine < FCodePane.TopLine Then
-                  FCodePane.TopLine := iCommentLine;
+                If iCommentLine < CP.TopLine Then
+                  CP.TopLine := iCommentLine;
             End;
         End;
       End;
@@ -1214,11 +1289,16 @@ end;
 **)
 Function TIDETools.GetModuleCode : String;
 
+var
+  CP: CodePane;
+
 Begin
   Result := '';
-  If FCodePane <> Nil Then
-    If FCodePane.CodeModule.CountOfLines > 0 Then
-      Result := FCodePane.CodeModule.Lines[1, FCodePane.CodeModule.CountOfLines] + #13#10;
+  CP := CurrentCodePane;
+  If CP <> Nil Then
+    If CP.CodeModule.CountOfLines > 0 Then
+      Result := CP.CodeModule.Lines[1,
+        CP.CodeModule.CountOfLines] + #13#10;
 End;
 
 (**
@@ -1233,7 +1313,8 @@ End;
 **)
 procedure TIDETools.IdleTimerEvent(Sender: TObject);
 begin
-  Application.DoApplicationIdle;
+  If FVBEIDE.MainWindow.Visible Then
+    Application.DoApplicationIdle;
   If FVisible <> FVBEIDE.MainWindow.Visible Then
     Begin
       If Not FVBEIDE.MainWindow.Visible Then
@@ -1261,16 +1342,18 @@ procedure TIDETools.InsertBlockCommentClick(const Ctrl: CommandBarButton;
 Var
   iSL, iSC, iEL, iEC : Integer;
   strLine : String;
+  CP: CodePane;
 
 begin
-  If FCodePane <> Nil Then
+  CP := CurrentCodePane;
+  If CP <> Nil Then
     Begin
-      FCodePane.GetSelection(iSL, iSC, iEL, iEC);
+      CP.GetSelection(iSL, iSC, iEL, iEC);
       strLine :=
         StringOfChar(#32, iSC - 1) + ''':'#13#10 +
         StringOfChar(#32, iSC - 1) + ''':'#13#10 +
         StringOfChar(#32, iSC - 1) + ''':';
-      FCodePane.CodeModule.InsertLines(iSL, strLine);
+      CP.CodeModule.InsertLines(iSL, strLine);
       SelectionChange(iSL + 1, iSC + 2, iSL + 1, iSC + 2);
     End Else
       MessageDlg('There is no active Code Pane.', mtError, [mbOK], 0);
@@ -1295,19 +1378,21 @@ Var
   R : TRect;
   str : String;
   iStartLine, iStartColumn, iEndLine, iEndColumn : Integer;
+  CP: CodePane;
 
 begin
   Try
-    If FCodePane <> Nil Then
+    CP := CurrentCodePane;
+    If CP <> Nil Then
       Begin
         R := WindowPosition['CodeFragments'];
         str := TfrmInsertCodeFragments.Execute(FPath, R, FCodeFragWidth);
         If str <> '' Then
           Begin
-            FCodePane.GetSelection(iStartLine, iStartColumn, iEndLine, iEndColumn);
-            FCodePane.CodeModule.InsertLines(iStartLine, str);
-            FCodePane.SetSelection(iStartLine, iStartColumn, iEndLine, iEndColumn);
-            FCodePane.Set_TopLine(iStartLine + FCodePane.CountOfVisibleLines Div 2);
+            CP.GetSelection(iStartLine, iStartColumn, iEndLine, iEndColumn);
+            CP.CodeModule.InsertLines(iStartLine, str);
+            CP.SetSelection(iStartLine, iStartColumn, iEndLine, iEndColumn);
+            CP.Set_TopLine(iStartLine + CP.CountOfVisibleLines Div 2);
           End;
         WindowPosition['CodeFragments'] := R;
       End Else
@@ -1335,15 +1420,17 @@ procedure TIDETools.InsertInSituCommentClick(const Ctrl: CommandBarButton;
 Var
   iSL, iSC, iEL, iEC : Integer;
   strLine : String;
+  CP: CodePane;
 
 begin
-  If FCodePane <> Nil Then
+  CP := CurrentCodePane;
+  If CP <> Nil Then
     Begin
-      FCodePane.GetSelection(iSL, iSC, iEL, iEC);
-      strLine := FCodePane.CodeModule.Lines[iSL, iSL];
+      CP.GetSelection(iSL, iSC, iEL, iEC);
+      strLine := CP.CodeModule.Lines[iSL, iSL];
       strLine := Copy(strLine, 1, iSC - 1) + ''': ' +
         Copy(strLine, iSC, Length(strLine) - iSC + 1);
-      FCodePane.CodeModule.ReplaceLine(iSL, strLine);
+      CP.CodeModule.ReplaceLine(iSL, strLine);
       SelectionChange(iSL, iSC + 2, iSL, iSC + 2);
     End Else
       MessageDlg('There is no active Code Pane.', mtError, [mbOK], 0);
@@ -1367,13 +1454,15 @@ procedure TIDETools.InsertLineCommentClick(const Ctrl: CommandBarButton;
 Var
   iSL, iSC, iEL, iEC : Integer;
   strLine : String;
+  CP: CodePane;
 
 begin
-  If FCodePane <> Nil Then
+  CP := CurrentCodePane;
+  If CP <> Nil Then
     Begin
-      FCodePane.GetSelection(iSL, iSC, iEL, iEC);
+      CP.GetSelection(iSL, iSC, iEL, iEC);
       strLine := StringOfChar(#32, iSC - 1) + ''': ';
-      FCodePane.CodeModule.InsertLines(iSL, strLine);
+      CP.CodeModule.InsertLines(iSL, strLine);
       SelectionChange(iSL, iSC + 2, iSL, iSC + 2);
     End Else
       MessageDlg('There is no active Code Pane.', mtError, [mbOK], 0);
@@ -1408,16 +1497,20 @@ Var
   CursorDelta: TPoint;
   strComment: String;
   iInsertLine: Integer;
+  CP: CodePane;
 
 begin
   iInsertLine := 0;
+  CP := CurrentCodePane;
+    If CP = Nil Then
+      Exit;
   objMemStream := TMemoryStream.Create;
   Try
     EditorAsMemoryStream(objMemStream);
-    strFileName := GetFileName(FCodePane.CodeModule.Parent.Collection.Parent.Name,
-      FCodePane.CodeModule.Parent.Name, FCodePane.CodeModule.Parent.Type_);
+    strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
+      CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
     Module := Dispatcher(objMemStream, strFileName,
-      Not FCodePane.CodeModule.Parent.Saved, [moParse]);
+      Not CP.CodeModule.Parent.Saved, [moParse]);
     If Module <> Nil Then
       Try
         T := Module.FindElement(strImplementedMethodsLabel);
@@ -1431,7 +1524,7 @@ begin
                     If MessageDlg(Format(strMethodAlreadyExists, [N.QualifiedName]),
                       mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
                       Exit;
-                    FCodePane.CodeModule.DeleteLines(N.Comment.Line,
+                    CP.CodeModule.DeleteLines(N.Comment.Line,
                       N.Line - N.Comment.Line);
                     iInsertLine := N.Comment.Line;
                   End;
@@ -1441,7 +1534,7 @@ begin
                 strComment := WriteComment(N, ctVBLine, iIndent, True, CursorDelta);
                 // Remove last #13#10 - not required as the IDE adds them
                 strComment := Copy(strComment, 1, Length(strComment) - 2);
-                FCodePane.CodeModule.InsertLines(iInsertLine, strComment);
+                CP.CodeModule.InsertLines(iInsertLine, strComment);
                 PositionCursorInFunction(CursorDelta, iInsertLine, iIndent,
                   strComment);
               End Else
@@ -1484,16 +1577,20 @@ Var
   iIndent: Integer;
   strComment: String;
   CursorDelta: TPoint;
+  CP: CodePane;
 
 begin
   iInsertLine := 0;
+  CP := CurrentCodePane;
+  If CP = Nil Then
+    Exit;
   objMemStream := TMemoryStream.Create;
   Try
     EditorAsMemoryStream(objMemStream);
-    strFileName := GetFileName(FCodePane.CodeModule.Parent.Collection.Parent.Name,
-      FCodePane.CodeModule.Parent.Name, FCodePane.CodeModule.Parent.Type_);
+    strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
+      CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
     Module := Dispatcher(objMemStream, strFileName,
-      Not FCodePane.CodeModule.Parent.Saved, [moParse]);
+      Not CP.CodeModule.Parent.Saved, [moParse]);
     If Module <> Nil Then
       Try
         T := Module.FindElement(strImplementedPropertiesLabel);
@@ -1507,7 +1604,7 @@ begin
                     If MessageDlg(Format(strPropertyAlreadyExists, [N.QualifiedName]),
                       mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
                       Exit;
-                    FCodePane.CodeModule.DeleteLines(N.Comment.Line,
+                    CP.CodeModule.DeleteLines(N.Comment.Line,
                       N.Line - N.Comment.Line);
                     iInsertLine := N.Comment.Line;
                   End;
@@ -1517,7 +1614,7 @@ begin
                 strComment := WriteComment(N, ctVBLine, iIndent, True, CursorDelta);
                 // Remove last #13#10 - not required as the IDE adds them
                 strComment := Copy(strComment, 1, Length(strComment) - 2);
-                FCodePane.CodeModule.InsertLines(iInsertLine, strComment);
+                CP.CodeModule.InsertLines(iInsertLine, strComment);
                 PositionCursorInFunction(CursorDelta, iInsertLine, iIndent,
                   strComment);
               End Else
@@ -1570,20 +1667,22 @@ Var
   strFileName : String;
   sl : TStringList;
   iStartLine, iStartColumn, iEndLine, iEndColumn : Integer;
+  CP: CodePane;
 
 begin
   Try
     sl := TStringList.Create;
     Try
-      If FCodePane <> Nil Then
+      CP := CurrentCodePane;
+      If CP <> Nil Then
         Begin
-          FCodePane.GetSelection(iStartLine, iStartColumn, iEndLine, iEndColumn);
+          CP.GetSelection(iStartLine, iStartColumn, iEndLine, iEndColumn);
           If (iStartLine = iEndLine) And (iStartColumn = iEndColumn) Then
             Begin
               MessageDlg('You have not selected any code.', mtWarning, [mbOK], 0);
               Exit;
             End;
-          sl.Text := FCodePane.CodeModule.Lines[iStartLine, iEndLine - iStartLine + 1];
+          sl.Text := CP.CodeModule.Lines[iStartLine, iEndLine - iStartLine + 1];
         End;
       If InputQuery('Save Fragement', 'Fragment Name', strFileName) Then
         If strFileName <> '' Then
@@ -1642,12 +1741,17 @@ End;
 **)
 procedure TIDETools.EditorInfo(var strFileName: String;
   var boolModified: Boolean; MemoryStream: TMemoryStream);
+
+var
+  CP: CodePane;
+
 begin
-  If FCodePane <> Nil Then
+  CP := CurrentCodePane;
+  If CP <> Nil Then
     Begin
-      strFileName := GetFileName(FCodePane.CodeModule.Parent.Collection.Parent.Name,
-        FCodePane.CodeModule.Parent.Name, FCodePane.CodeModule.Parent.Type_);
-      boolModified := Not FCodePane.CodeModule.Parent.Saved;
+      strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
+        CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
+      boolModified := Not CP.CodeModule.Parent.Saved;
       EditorAsMemoryStream(MemoryStream);
     End;
 end;

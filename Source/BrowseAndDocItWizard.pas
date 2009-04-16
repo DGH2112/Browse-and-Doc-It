@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    12 Apr 2009
+  @Date    16 Apr 2009
   @Version 1.0
 
 **)
@@ -12,7 +12,8 @@ Unit BrowseAndDocItWizard;
 Interface
 
 Uses
-  Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, DockForm, Types;
+  Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, DockForm, Types,
+  Contnrs;
 
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 
@@ -28,6 +29,11 @@ Type
     FFileName : String;
     FKeyBinding : Integer;
     FINIFile: String;
+    {$IFNDEF D2005}
+    FMenuTimer : TTimer;
+    FMenus : TObjectList;
+    FMenuShortCuts : TList;
+    {$ENDIF}
     procedure InsertCommentBlock(CommentType: TCommentType);
     procedure OptionsClick(Sender: TObject);
     procedure CheckForUpdatesClick(Sender: TObject);
@@ -50,6 +56,9 @@ Type
       iIndent: Integer; strComment: string);
     procedure InsertComment(strComment: string; Writer: IOTAEditWriter;
       iInsertLine: Integer; Source: IOTASourceEditor);
+    {$IFNDEF D2005}
+    Procedure MenuTimerEvent(Sender : TObject);
+    {$ENDIF}
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Procedure ModuleExplorerClick(Sender : TObject);
@@ -239,9 +248,12 @@ Begin
     OptionsChange);
   mmiMainMenu := (BorlandIDEServices as INTAServices).MainMenu;
   mmiPascalDocMenu := TMenuItem.Create(mmiMainMenu);
-  With mmiPascalDocMenu Do
-    Caption := '&Browse and Doc It';
+  mmiPascalDocMenu.Caption := '&Browse and Doc It';
   mmiMainMenu.Items.Insert(mmiMainMenu.Items.Count - 2, mmiPascalDocMenu);
+  {$IFNDEF D2005}
+  FMenus := TObjectList.Create(False);
+  FMenuShortCuts := TList.Create;
+  {$ENDIF}
   CreateMenuItem(mmiPascalDocMenu, 'Module &Explorer', ModuleExplorerClick,
     Menus.ShortCut(13, [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, '&Documentation', DocumentationClick,
@@ -271,6 +283,12 @@ Begin
   FFileName := '';
   FINIFile := BuildRootKey(Nil, Nil);
   CheckForUpdatesClick(Nil);
+  {$IFNDEF D2005} // Code to patch shortcuts into the menus in D7 and below.
+  FMenuTimer := TTimer.Create(Nil);
+  FMenuTimer.OnTimer := MenuTimerEvent;
+  FMenuTimer.Interval := 1000;
+  FMenuTimer.Enabled := True;
+  {$ENDIF}
 End;
 
 (**
@@ -295,6 +313,10 @@ Var
 
 Begin
   mmiItem := TMenuItem.Create(mmiParent);
+  {$IFNDEF D2005}
+  FMenus.Add(mmiItem); // For Delphi7 and below
+  FMenuShortCuts.Add(Pointer(AShortCut));
+  {$ENDIF}
   With mmiItem Do
     Begin
       If strCaption = '' Then
@@ -355,6 +377,11 @@ destructor TBrowseAndDocItWizard.Destroy;
 begin
   If mmiPascalDocMenu <> Nil Then
     mmiPascalDocMenu.Free;
+  {$IFNDEF D2005}
+  FMenuShortCuts.Free;
+  FMenus.Free;
+  FMenuTimer.Free;
+  {$ENDIF}
   Inherited;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
 end;
@@ -543,6 +570,34 @@ function TBrowseAndDocItWizard.GetState: TWizardState;
 begin
   Result := [wsEnabled];
 end;
+
+{$IFNDEF D2005}
+(**
+
+  This is an on timer event handler for the menu timer.
+
+  @precon  None.
+  @postcon In Delphi 7 and below - it patches the shortcuts onto the menu items
+           as the Open Tools API "looses" the shortcuts.
+
+  @param   Sender as a TObject
+
+**)
+procedure TBrowseAndDocItWizard.MenuTimerEvent(Sender: TObject);
+
+Var
+  i : Integer;
+  M : TMenuItem;
+
+begin
+  For i := 0 To FMenus.Count - 1 Do
+    Begin
+      M := FMenus[i] As TMenuItem;
+      M.ShortCut := Integer(FMenuShortCuts[i]);
+    End;
+  FMenuTimer.Enabled:= False;
+end;
+{$ENDIF}
 
 (**
 
@@ -1269,8 +1324,9 @@ procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
     Result := 0;
     If Editor <> Nil Then
       Begin
-        MemStream := EditorAsMemoryStream(Editor);
+        MemStream := TMemoryStream.Create;
         Try
+          EditorAsMemoryStream(Editor, MemStream);
           Result := MemStream.Size;
         Finally
           MemStream.Free;

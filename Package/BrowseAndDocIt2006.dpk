@@ -5,7 +5,7 @@
   version of PascalDoc.
 
   @Author  David Hoyle
-  @Date    30 Nov 2008
+  @Date    21 Mar 2009
   @Version 1.0
 
 **)
@@ -15,6 +15,7 @@ package BrowseAndDocIt2006;
 {$R '..\ExplorerImages.res'}
 {$R '..\SplashScreenIcon.res'}
 {$R '..\..\..\Library\BrowseAndDocItHTMLResources.res'}
+{$R '..\DUnitTemplateResources.res'}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -40,8 +41,6 @@ package BrowseAndDocIt2006;
 {$DESIGNONLY}
 {$IMPLICITBUILD ON}
 {%File '..\..\..\LIBRARY\CompilerDefinitions.inc'}
-{%File '..\..\..\LIBRARY\Virtual Treeview\Source\MSAAIntf.hpp'}
-{%OBJTool '..\..\..\LIBRARY\Virtual Treeview\Source\MSAAIntf.obj'}
 
 requires
   rtl,
@@ -50,12 +49,14 @@ requires
   vclactnband,
   vclx,
   vcljpg,
-  VirtualTreesD10;
+  VirtualTreesD10,
+  xmlrtl,
+  ExceptionExpert10;
 
 contains
   BrowseAndDocItWizard in '..\Source\BrowseAndDocItWizard.pas',
   DockableModuleExplorer in '..\Source\DockableModuleExplorer.pas',
-  PascalDocModule in '..\..\..\Library\PascalDocModule.pas',
+  PascalModule in '..\..\..\LIBRARY\PascalModule.pas',
   OptionsForm in '..\..\..\Library\OptionsForm.pas',
   ToolsAPIUtils in '..\Source\ToolsAPIUtils.pas',
   SpecialTagForm in '..\..\..\Library\SpecialTagForm.pas',
@@ -72,10 +73,12 @@ contains
   GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas',
   DocumentationOptionsForm in '..\..\..\LIBRARY\DocumentationOptionsForm.pas',
   GenericTokenizer in '..\..\..\LIBRARY\GenericTokenizer.pas',
-  Profiler in '..\..\..\LIBRARY\Profiler.pas',
   MSXML2_TLB in '..\..\..\LIBRARY\MSXML2_TLB.pas',
   checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
   CheckForUpdatesForm in '..\..\..\LIBRARY\CheckForUpdatesForm.pas',
-  VBModule in '..\..\..\LIBRARY\VBModule.pas';
+  VBModule in '..\..\..\LIBRARY\VBModule.pas',
+  DUnitForm in '..\Source\DUnitForm.pas' {frmDUnit},
+  DUnitCreator in '..\Source\DUnitCreator.pas',
+  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas';
 
 end.

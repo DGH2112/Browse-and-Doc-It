@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    30 Nov 2008
+  @Date    16 Apr 2009
 
 **)
 library BrowseAndDocIt2006;
@@ -22,6 +22,7 @@ library BrowseAndDocIt2006;
 {$R '..\ExplorerImages.res' '..\ExplorerImages.RC'}
 {$R '..\SplashScreenIcon.res' '..\SplashScreenIcon.RC'}
 {$R '..\..\..\Library\BrowseAndDocItHTMLResources.res' '..\..\..\Library\BrowseAndDocItHTMLResources.RC'}
+{$R '..\DUnitTemplateResources.res' '..\DUnitTemplateResources.RC'}
 {%File '..\..\..\Library\HTML Files\BrowseAndDocItScreen.css'}
 {%File '..\..\..\Library\HTML Files\BrowseAndDocItPrint.css'}
 {%HTMLTool '..\..\..\Library\HTML Files\BrowseAndDocItHTMLTemplate.html'}
@@ -32,6 +33,10 @@ library BrowseAndDocIt2006;
 {%File '..\..\..\LIBRARY\HTML Files\xhtml-symbol.ent'}
 {%TogetherDiagram 'ModelSupport_BrowseAndDocIt2006\default.txaPackage'}
 {%File '..\..\..\LIBRARY\CompilerDefinitions.inc'}
+{%File '..\Source\DUnit Templates\DUnitProjectTemplate.txt'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt2006\DUnitCreator\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_BrowseAndDocIt2006\DUnitForm\default.txaPackage'}
+{%File '..\Source\DUnit Templates\DUnitUnitTemplate.txt'}
 uses
   ShareMem,
   ExceptionLog,
@@ -43,7 +48,7 @@ uses
   DockableModuleExplorer in '..\Source\DockableModuleExplorer.pas' {frmDockableModuleExplorer},
   ModuleExplorerFrame in '..\..\..\Library\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
   OptionsForm in '..\..\..\Library\OptionsForm.pas' {frmOptions},
-  PascalDocModule in '..\..\..\Library\PascalDocModule.pas',
+  PascalModule in '..\..\..\LIBRARY\PascalModule.pas',
   ProgressForm in '..\..\..\Library\ProgressForm.pas' {frmProgress},
   SpecialTagForm in '..\..\..\Library\SpecialTagForm.pas' {frmSpecialTag},
   TokenForm in '..\..\..\Library\TokenForm.pas' {frmTokenForm},
@@ -55,7 +60,6 @@ uses
   BaseDocumentation in '..\..\..\Library\BaseDocumentation.pas',
   GIFImage in '..\..\..\Library\TGIFImage\GIFImage.pas',
   DocumentationOptionsForm in '..\..\..\LIBRARY\DocumentationOptionsForm.pas' {frmDocumentationOptions},
-  Profiler in '..\..\..\LIBRARY\Profiler.pas',
   GenericTokenizer in '..\..\..\LIBRARY\GenericTokenizer.pas',
   checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
   CheckForUpdatesForm in '..\..\..\LIBRARY\CheckForUpdatesForm.pas' {frmCheckForUpdates},
@@ -65,7 +69,11 @@ uses
   VirtualTrees in '..\..\..\LIBRARY\Virtual Treeview\Source\VirtualTrees.pas',
   VTAccessibility in '..\..\..\LIBRARY\Virtual Treeview\Source\VTAccessibility.pas',
   VTAccessibilityFactory in '..\..\..\LIBRARY\Virtual Treeview\Source\VTAccessibilityFactory.pas',
-  VTHeaderPopup in '..\..\..\LIBRARY\Virtual Treeview\Source\VTHeaderPopup.pas';
+  VTHeaderPopup in '..\..\..\LIBRARY\Virtual Treeview\Source\VTHeaderPopup.pas',
+  DUnitForm in '..\Source\DUnitForm.pas' {frmDUnit},
+  DUnitCreator in '..\Source\DUnitCreator.pas',
+  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas';
 
 {$R *.res}
 

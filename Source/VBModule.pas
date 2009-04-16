@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       12 Apr 2009
+  @Date       16 Apr 2009
   @Author     David Hoyle
 
 **)
@@ -287,6 +287,13 @@ Type
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
+  (** A class to represent an Implements item. **)
+  TImplementedItem = Class(TElementContainer)
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+  End;
+
   (**
 
     This is the main class for dealing with object pascal units and program
@@ -309,6 +316,7 @@ Type
     FImplementedPropertiesLabel: TLabelContainer;
     FAttributesLabel: TLabelContainer;
     FOptionsLabel: TLabelContainer;
+    FImplementsLabel: TLabelContainer;
     FSourceStream: TStream;
     FModuleType : TModuleType;
     FUnResolvedSymbols : TStringList;
@@ -321,6 +329,7 @@ Type
     Function  Attributes : Boolean;
     Function  Attribute(C : TElementContainer) : Boolean;
     Function  Options : Boolean;
+    Function  Implements : Boolean;
     Function  Declarations : Boolean;
     Function  Privates(C : TComment) : Boolean;
     Function  Publics(C : TComment) : Boolean;
@@ -364,6 +373,8 @@ ResourceString
   strAttributesLabel = 'Attributes';
   (** A label for options. **)
   strOptionsLabel = 'Options';
+  (** A label for implements. **)
+  strImplementsLabel = 'Implements';
   (** A label for declared functions and procedures. **)
   strDeclaresLabel = 'Declarations';
   (** A label for implemented properties. **)
@@ -459,6 +470,9 @@ ResourceString
   (** A warning message for push parameter out of order. **)
   strExceptionPushParamPos = 'The parameter ''%s'' in ''%s.%s'' is not in the ' +
     'the correct position (%d not %d) in the Exception.Push statement.';
+  (** A warning message for push parameter count different. **)
+  strExceptionPushParamCount = 'The function ''%s.%s'' has the wrong number of ' +
+    'Exception.Push parameters (%d not %d).';
 
 { TVBComment }
 
@@ -1309,19 +1323,39 @@ end;
   This method returns a string representation of the visual basic enumerate
   identifier.
 
-  @precon  None . 
-  @postcon Returns a string representation of the visual basic enumerate 
-           identifier . 
+  @precon  None .
+  @postcon Returns a string representation of the visual basic enumerate
+           identifier .
 
   @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String              
+  @return  a String
 
 **)
 function TVBEnumIdent.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, '=',
     BrowseAndDocItOptions.MaxDocOutputWidth);
+end;
+
+{ TImplementedItem }
+
+(**
+
+  This method returns a string representation of the Implements item.
+
+  @precon  None .
+  @postcon Returns a string representation of the imlpements item.
+
+  @param   boolShowIdentifier   as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TImplementedItem.AsString(boolShowIdentifier,
+  boolForDocumentation: Boolean): String;
+begin
+  Result := Identifier;
 end;
 
 (**
@@ -1377,6 +1411,7 @@ Begin
   FDeclaredMethodsLabel       := Nil;
   FAttributesLabel            := Nil;
   FOptionsLabel               := Nil;
+  FImplementsLabel            := Nil;
   FUnResolvedSymbols := TStringList.Create;
   FUnResolvedSymbols.Duplicates := dupIgnore;
   FUnResolvedSymbols.Sorted := True;
@@ -1764,7 +1799,7 @@ procedure TVBModule.Goal;
 
 var
   iMethod : Integer;
-  Methods : Array[1..4] Of Function : Boolean Of Object;
+  Methods : Array[1..5] Of Function : Boolean Of Object;
 
 begin
   Try
@@ -1773,7 +1808,8 @@ begin
     Methods[1] := Version;
     Methods[2] := Attributes;
     Methods[3] := Options;
-    Methods[4] := Declarations;
+    Methods[4] := Implements;
+    Methods[5] := Declarations;
     For iMethod := Low(Methods) To High(Methods) Do
       Begin
         If EndOfTokens Then
@@ -1786,6 +1822,42 @@ begin
     On E : EParserAbort Do
       AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
   End;
+end;
+
+(**
+
+  This method parses any Implements delcarations in the module.
+
+  @precon  None.
+  @postcon Returns true if an implements delcaration was parsed.
+
+  @return  a Boolean
+
+**)
+Function TVBModule.Implements : Boolean;
+begin
+  Result := False;
+  While Token.UToken = 'IMPLEMENTS' Do
+    Begin
+      Result := True;
+      If FImplementsLabel = Nil Then
+        FImplementsLabel := Add(TLabelContainer.Create(strImplementsLabel, scNone,
+          0, 0, iiInterfacesLabel, Nil)) As TLabelContainer;
+      NextNonCommentToken;
+      If Token.TokenType In [ttIdentifier] Then
+        Begin
+          FImplementsLabel.Add(TImplementedItem.Create(Token.Token, scNone,
+            Token.Line, Token.Column, iiPublicInterface, Nil));
+          NextNonCommentToken
+        End Else
+          ErrorAndSeekToken(strIdentExpected, 'Implements',
+            Token.Token, strSeekTokens, stActual);
+      If Token.TokenType In [ttLineEnd] Then
+        NextNonCommentToken
+      Else
+        ErrorAndSeekToken(strLineEndExpected, 'Implements',
+          Token.Token, strSeekTokens, stActual);
+    End;
 end;
 
 (**
@@ -3197,6 +3269,11 @@ begin
             ModuleName, M.Identifier, i, iIndex]), scNone, 'CheckExceptionHandling', M.Line,
             M.Column, etWarning);
       End;
+  If Not boolNoTag Then
+    If M.ParameterCount <> ExceptionHandler.PushParams.Count Then
+      AddIssue(Format(strExceptionPushParamCount, [ModuleName, M.Identifier,
+        M.ParameterCount, ExceptionHandler.PushParams.Count]), scNone,
+        'CheckExceptionHandling', M.Line, M.Column, etWarning);
   If Not ExceptionHandler.HasPop And Not boolNoTag Then
     AddIssue(Format(strExceptionPop, [M.Identifier]), scNone,
       'CheckExceptionHandling', M.Line, M.Column, etWarning);

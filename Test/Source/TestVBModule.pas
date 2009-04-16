@@ -81,6 +81,7 @@ type
     Procedure TestAttributes;
     Procedure TestFunctions;
     Procedure TestOption;
+    Procedure TestImplements;
     Procedure TestConsts;
     Procedure TestVars;
     Procedure TestSubs;
@@ -105,6 +106,7 @@ type
     Procedure TestFailure11;
     Procedure TestFailure12;
     Procedure TestFailure13;
+    Procedure Testfailure14;
   End;
 
   //
@@ -2287,7 +2289,7 @@ Begin
       M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
       Try
         CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-        CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+        CheckEquals(2, M.HeadingCount(strWarnings), M.FirstWarning);
         CheckEquals('  [The parameter ''iParam'' in ''VBFile.Hello'' does not have a corresponding parameter in the Exception.Push statement. [CheckExceptionHandling]]', M.firstwarning);
         CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
         CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2498,6 +2500,56 @@ Begin
   End;
 end;
 
+procedure TestTVBModule.Testfailure14;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+Begin
+  S := TMemoryStream.Create;
+  Try
+    BrowseAndDocItOptions.Options := BrowseAndDocitOptions.Options +
+      [doShowMissingVBExceptionWarnings];
+    Try
+      strCode :=
+        'Option Explicit'#13#10 +
+        'Option Compare Text'#13#10 +
+        ''#13#10 +
+        'Public Function GetPredecessor() As Boolean'#13#10 +
+        '  Exception.Push "VBFile.GetPredecessor", iProject, strSuccActID'#13#10 +
+        '  On Error GoTo ErrHnd'#13#10 +
+        '  FCount = 0'#13#10 +
+        '  FIndex = 1'#13#10 +
+        '  BuildRelationshipList iProject, strSuccActID'#13#10 +
+        '  DeleteRelationships'#13#10 +
+        '  If FCount > 1 Then FIndex = frm.Execute(iProject, strSuccActID, Me)'#13#10 +
+        '  GetPredecessor = (FCount > 0)'#13#10 +
+        'ErrHnd:'#13#10 +
+        '  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err'#13#10 +
+        '  Exception.Pop'#13#10 +
+        'End Function'#13#10;
+      S.LoadBufferFromString(strCode);
+      M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+      Try
+        CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+        CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+        CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+        CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
+        CheckEquals('  [The function ''VBFile.GetPredecessor'' has the wrong number of Exception.Push parameters (0 not 2). [CheckExceptionHandling]]', M.FirstWarning)
+      Finally
+        M.Free;
+      End;
+    Finally
+      BrowseAndDocItOptions.Options := BrowseAndDocitOptions.Options -
+        [doShowMissingVBExceptionWarnings];
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
 procedure TestTVBModule.TestFunctions;
 
 Var
@@ -2650,6 +2702,35 @@ begin
       CheckEquals(FormatDateTime('dd mmm yyyy', Now), M.Comment.Tag[2].AsString(80, True));
       Checkequals(1, M.Comment.Line);
       Checkequals(1, M.Comment.Column);
+    Finally
+      M.Free;
+    End;
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTVBModule.TestImplements;
+
+Var
+  S : TMemoryStream;
+  M : TBaseLanguageModule;
+  strCode : String;
+
+begin
+  S := TMemoryStream.Create;
+  Try
+    strCode :=
+      'Option Explicit'#13#10 +
+      'Implements ITestCase'#13#10 +
+      'Implements ITestManager'#13#10;
+    S.LoadBufferFromString(strCode);
+    M := Dispatcher(S, 'VBFile.Cls', True, [moParse]);
+    Try
+      CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+      CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+      CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+      CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
     Finally
       M.Free;
     End;

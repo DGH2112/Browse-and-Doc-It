@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Mar 2009
+  @Date    22 Apr 2009
 
 **)
 Unit CheckForUpdates;
@@ -274,7 +274,7 @@ Var
 Begin
   FMessageWarningColour := clRed;
   LoadSettings;
-  FURLs := 'http://davidghoyle.googlepages.com/';
+  FURLs := 'http://www.davidghoyle.co.uk/';
   Buffer := StrAlloc(1024);
   Try
     GetModuleFileName(hInstance, Buffer, 1024);

@@ -55,6 +55,7 @@ type
     Procedure TestEvaluateEquation;
     Procedure TestLike;
     Procedure TestCalcColour;
+    Procedure TestDGHFindOnPath;
   End;
 
   THStraightElementTestClass = Class(THStraightElement)
@@ -401,6 +402,23 @@ end;
 procedure TestApplicationFunctions.TestDecToOct;
 begin
   CheckEquals('33', DecToOct('27'));
+end;
+
+procedure TestApplicationFunctions.TestDGHFindOnPath;
+
+var
+  strFileName: String;
+
+begin
+  strFileName := 'dcc32.exe';
+  Check(DGHFindOnPath(strFileName, ''), 'Check for dcc32.exe');
+  CheckEquals('C:\Program Files\Borland\Delphi7\Bin\dcc32.exe', strFileName);
+  strFileName := 'search.exe';
+  Check(DGHFindOnPath(strFileName, ''), 'Check for search.exe');
+  CheckEquals('E:\HoylD\Borland Studio Projects\Applications\Search\search.exe', strFileName);
+  strFileName := 'xmlChecker.exe';
+  Check(DGHFindOnPath(strFileName, ''), 'Check for xmlChecker.exe');
+  CheckEquals('E:\HoylD\Borland Studio Projects\Applications\XML Checker\xmlChecker.exe', strFileName);
 end;
 
 procedure TestApplicationFunctions.TestDMSAsDecToDecimal;

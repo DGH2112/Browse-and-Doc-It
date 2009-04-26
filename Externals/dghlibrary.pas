@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Mar 2009
+  @Date    26 Apr 2009
 
 **)
 Unit DGHLibrary;
@@ -704,6 +704,7 @@ Type
   Function CalcColour(dblValue, dblLowCriteria, dblMiddleCriteria,
     dblUpperCriteria : Double; iLowColour, iMiddleColour,
     iHighColour : TColor) : TColor;
+  Function DGHFindOnPath(var strEXEName : String; strDirs : String) : Boolean;
 
 { -------------------------------------------------------------------------
 
@@ -751,9 +752,6 @@ Const
   HexNums = OctNums + ['8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
   (** A list of valid equation delimiters. **)
   ValidDelimiters = ['(',')','*','/','+','-'];
-
-function PathFindOnPath(pszPath: PChar; var ppszOtherDirs: PChar): BOOL; stdcall;
-  external 'shlwapi' name 'PathFindOnPathA';
 
 (**
 
@@ -5964,31 +5962,25 @@ Var
   StartupInfo : TStartupInfo;
   ProcessInfo : TProcessInformation;
   iExitCode : Cardinal;
-  strBuffer : Array[0..MAX_PATH] Of Char;
-  OpDirs : PAnsiChar;
 
 Begin
   Result := 0;
   boolAbort := False;
-  If Process.boolEnabled Then
-    Try
-      If Not FileExists(Process.strEXE) Then
-        Begin
-          StrPCopy(strBuffer, Process.strEXE);
-          OpDirs := '';
-          If PathFindOnPath(strBuffer, OpDirs) Then
-            Process.strEXE := StrPas(strBuffer)
-          Else
-            Raise Exception.CreateFmt(strEXENotFound, [Process.strEXE]);
-        End;
-      If Not DirectoryExists(Process.strDir) Then
-        Raise Exception.CreateFmt(strDirectoryNotFound, [Process.strDir]);
-      FillChar(SecurityAttrib, SizeOf(SecurityAttrib), 0);
-      SecurityAttrib.nLength := SizeOf(SecurityAttrib);
-      SecurityAttrib.bInheritHandle := True;
-      SecurityAttrib.lpSecurityDescriptor := nil;
-      Win32Check(CreatePipe(hRead, hWrite, @SecurityAttrib, 4096));
+  FillChar(SecurityAttrib, SizeOf(SecurityAttrib), 0);
+  SecurityAttrib.nLength := SizeOf(SecurityAttrib);
+  SecurityAttrib.bInheritHandle := True;
+  SecurityAttrib.lpSecurityDescriptor := nil;
+  Win32Check(CreatePipe(hRead, hWrite, @SecurityAttrib, 4096));
+  Try
+    If Process.boolEnabled Then
       Try
+        If Not DirectoryExists(Process.strDir) Then
+          Raise Exception.CreateFmt(strDirectoryNotFound, [Process.strDir]);
+        If Not FileExists(Process.strEXE) Then
+          Begin
+            If Not DGHFindOnPath(Process.strEXE, '') Then
+              Raise Exception.CreateFmt(strEXENotFound, [Process.strEXE]);
+          End;
         FillChar(StartupInfo, SizeOf(TStartupInfo), 0);
         StartupInfo.cb := SizeOf(TStartupInfo);
         StartupInfo.cb          := SizeOf(StartupInfo);
@@ -6022,18 +6014,18 @@ Begin
           Win32Check(CloseHandle(ProcessInfo.hThread));
           Win32Check(CloseHandle(ProcessInfo.hProcess));
         End;
-      Finally
-        Win32Check(CloseHandle(hWrite));
-        Win32Check(CloseHandle(hRead));
+      Except
+        On E : Exception Do
+          If Assigned(ProcMsgHndr) Then
+            Begin
+              ProcMsgHndr.ProcessMsgHandler(E.Message, boolAbort);
+              Inc(Result);
+            End;
       End;
-    Except
-      On E : Exception Do
-        If Assigned(ProcMsgHndr) Then
-          Begin
-            ProcMsgHndr.ProcessMsgHandler(E.Message, boolAbort);
-            Inc(Result);
-          End;
-    End;
+  Finally
+    Win32Check(CloseHandle(hWrite));
+    Win32Check(CloseHandle(hRead));
+  End;
 End;
 
 (**
@@ -6207,6 +6199,68 @@ Begin
       dblUpperCriteria)
   Else
     Result := iHighColour;
+End;
+
+(**
+
+  This method searches the given paths (semi-colon delimited) and the enironment
+  path for the exe file name. If found the result is true and the full path to
+  the file is returned in strEXEName.
+
+  @precon  None.
+  @postcon Searches the given paths (semi-colon delimited) and the enironment
+           path for the exe file name. If found the result is true and the full
+           path to the file is returned in strEXEName.
+
+  @param   strEXEName as a String as a reference
+  @param   strDirs    as a String
+  @return  a Boolean
+
+**)
+Function DGHFindOnPath(var strEXEName : String; strDirs : String) : Boolean;
+
+Var
+  slPaths : TStringList;
+  iPath: Integer;
+  recSearch: TSearchRec;
+  iResult: Integer;
+  iLength: Integer;
+
+Begin
+  Result := False;
+  slPaths := TStringList.Create;
+  Try
+    slPaths.Text := GetEnvironmentVariable('path');
+    If strDirs <> '' Then
+      slPaths.Text := strDirs + ';' + slPaths.Text;
+    slPaths.Text := StringReplace(slPaths.Text, ';', #13#10, [rfReplaceAll]);
+    For iPath := slPaths.Count - 1 DownTo 0 Do
+      Begin
+        iLength := Length(slPaths[iPath]);
+        If iLength = 0 Then
+          slPaths.Delete(iPath)
+        Else
+          If slPaths[iPath][iLength] <> '\' Then
+            slPaths[iPath] := slPaths[iPath] + '\';
+      End;
+    strEXEName := ExtractFileName(strEXEName);
+    For iPath := 0 To slPaths.Count - 1 Do
+      Begin
+        iResult := FindFirst(slPaths[iPath] + strEXEName, faAnyFile, recSearch);
+        Try
+          If iResult = 0 Then
+            Begin
+              strEXEName := slPaths[iPath] + strEXEName;
+              Result := True;
+              Break;
+            End;
+        Finally
+          SysUtils.FindClose(recSearch);
+        End;
+      End;
+  Finally
+    slPaths.Free;
+  End;
 End;
 
 (** Initialises the console more to Unknown to force a call to the Win32 API **)

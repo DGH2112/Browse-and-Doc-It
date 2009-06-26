@@ -412,7 +412,7 @@ var
 begin
   strFileName := 'dcc32.exe';
   Check(DGHFindOnPath(strFileName, ''), 'Check for dcc32.exe');
-  CheckEquals('C:\Program Files\Borland\Delphi7\Bin\dcc32.exe', strFileName);
+  CheckEquals('C:\Program Files\CodeGear\RAD Studio\6.0\bin\dcc32.exe', strFileName);
   strFileName := 'search.exe';
   Check(DGHFindOnPath(strFileName, ''), 'Check for search.exe');
   CheckEquals('E:\HoylD\Borland Studio Projects\Applications\Search\search.exe', strFileName);

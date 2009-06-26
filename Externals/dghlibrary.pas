@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    26 Apr 2009
+  @Date    27 Jun 2009
 
 **)
 Unit DGHLibrary;
@@ -1151,7 +1151,11 @@ End;
 Function Capitalise(strText : String) : String;
 
 Const
+  {$IFNDEF D2009}
   strChars : Set Of Char = ['a'..'z', 'A'..'Z'];
+  {$ELSE}
+  strChars : Set Of AnsiChar = ['a'..'z', 'A'..'Z'];
+  {$ENDIF}
 
 Var
   i : Integer;
@@ -1161,7 +1165,11 @@ Begin
   If Length(Result) > 0 Then
     Result[1] := Upcase(Result[1]);
   For i := 2 To Length(Result) Do
+    {$IFNDEF D2009}
     If Not (Result[i - 1] In strChars) Then
+    {$ELSE}
+    If Not CharInSet(Result[i - 1], strChars) Then
+    {$ENDIF}
       Result[i]:= Upcase(Result[i]);
 End;
 
@@ -1228,7 +1236,11 @@ Type
 
 Const
   strErrMsg = 'Can not convert the date "%s" to a valid TDateTime value.';
+  {$IFNDEF D2009}
   Delimiters : Set Of Char = ['-', ' ', '\', '/', ':', '.'];
+  {$ELSE}
+  Delimiters : Set Of AnsiChar = ['-', ' ', '\', '/', ':', '.'];
+  {$ENDIF}
   Days : Array[1..7] Of String = ('fri', 'mon', 'sat', 'sun', 'thu', 'tue', 'wed');
   Months : Array[1..24] Of String = (
     'apr', 'april',
@@ -1347,20 +1359,43 @@ Var
     Try
       str := '';
       For j := 1 To Length(ShortDateFormat) Do
+        {$IFNDEF D2009}
         If ShortDateFormat[j] In Delimiters Then
+        {$ELSE}
+        If CharInSet(ShortDateFormat[j], Delimiters) Then
+        {$ENDIF}
           AddToken(slFormat, str)
         Else
           str := str + ShortDateFormat[j];
       AddToken(slFormat, str);
       // Remove day of week
       For j := slFormat.Count - 1 DownTo 0 Do
+        {$IFNDEF D2009}
         If (slFormat[j][1] In ['d', 'D']) And (Length(slFormat[j]) > 2) Then
+        {$ELSE}
+        If (CharInSet(slFormat[j][1], ['d', 'D'])) And (Length(slFormat[j]) > 2) Then
+        {$ENDIF}
           slFormat.Delete(j);
       For j := 0 To slFormat.Count - 1 Do
         Begin
-          If slFormat[j][1] In ['d', 'D'] Then iIndex0 := j;
-          If slFormat[j][1] In ['m', 'M'] Then iIndex1 := j;
-          If slFormat[j][1] In ['y', 'Y'] Then iIndex2 := j;
+          {$IFNDEF D2009}
+          If slFormat[j][1] In ['d', 'D'] Then
+          {$ELSE}
+          If CharInSet(slFormat[j][1], ['d', 'D']) Then
+          {$ENDIF}
+            iIndex0 := j;
+          {$IFNDEF D2009}
+          If slFormat[j][1] In ['m', 'M'] Then
+          {$ELSE}
+          If CharInSet(slFormat[j][1], ['m', 'M']) Then
+          {$ENDIF}
+            iIndex1 := j;
+          {$IFNDEF D2009}
+          If slFormat[j][1] In ['y', 'Y'] Then
+          {$ELSE}
+          If CharInSet(slFormat[j][1], ['y', 'Y']) Then
+          {$ENDIF}
+            iIndex2 := j;
         End;
     Finally
       slFormat.Free;
@@ -1374,10 +1409,19 @@ Begin
     strToken := '';
     iTime := -1;
     For i := 1 To Length(strDate) Do
+      {$IFNDEF D2009}
       If strDate[i] In Delimiters Then
+      {$ELSE}
+      If CharInSet(strDate[i], Delimiters) Then
+      {$ENDIF}
         Begin
           AddToken(sl, strToken);
-          If (strDate[i] In [':']) And (iTime = -1) Then iTime := sl.Count - 1;
+          {$IFNDEF D2009}
+          If (strDate[i] In [':']) And (iTime = -1) Then
+          {$ELSE}
+          If (CharInSet(strDate[i], [':'])) And (iTime = -1) Then
+          {$ENDIF}
+            iTime := sl.Count - 1;
         End Else
           strToken := strToken + strDate[i];
     AddToken(sl, strToken);
@@ -1655,7 +1699,11 @@ Var
 Begin
   bNegative := False;
   For iCount := 1 To Length(sDisplayNumber) Do
+    {$IFNDEF D2009}
     If Not (sDisplayNumber[iCount] In BinNums) Then
+    {$ELSE}
+    If Not (CharInSet(sDisplayNumber[iCount], BinNums)) Then
+    {$ENDIF}
       Raise Exception.Create('Invalid token (' + sDisplayNumber[iCount] +
         ') in binary number [' + sDisplayNumber + '].');
   sReturnString := '';
@@ -1700,7 +1748,11 @@ Var
 Begin
   bNegative := False;
   For iCount := 1 To Length(sDisplayNumber) Do
+    {$IFNDEF D2009}
     If Not (sDisplayNumber[iCount] In OctNums) Then
+    {$ELSE}
+    If Not (CharInSet(sDisplayNumber[iCount], OctNums)) Then
+    {$ENDIF}
       Raise Exception.Create('Invalid token (' + sDisplayNumber[iCount] +
         ') in octal number [' + sDisplayNumber + '].');
   sReturnString := '';
@@ -1746,7 +1798,11 @@ Var
 Begin
   bNegative := False;
   For iCount := 1 To Length(sDisplayNumber) Do
+    {$IFNDEF D2009}
     If Not (sDisplayNumber[iCount] In HexNums) Then
+    {$ELSE}
+    If Not (CharInSet(sDisplayNumber[iCount], HexNums)) Then
+    {$ENDIF}
       Raise Exception.Create('Invalid token (' + sDisplayNumber[iCount] +
         ') in hexidecimal number [' + sDisplayNumber + '].');
   sReturnString := '';
@@ -1884,8 +1940,13 @@ Begin
   For I := 2 To Length(EquStr) Do
     Begin
       K := I;
+      {$IFNDEF D2009}
       If (EquStr[I] In Delimiters) And (Not (EquStr[I-1] In Exponents))
         And (Not (EquStr[I-1] In Delimiters )) Then
+      {$ELSE}
+      If (CharInSet(EquStr[I], Delimiters)) And (Not (CharInSet(EquStr[I-1], Exponents)))
+        And (Not (CharInSet(EquStr[I-1], Delimiters))) Then
+      {$ENDIF}
         Begin
           If DelimiterCounter = 49 Then
             Raise Exception.Create('Expression too long to evaluate.');
@@ -1966,12 +2027,24 @@ Begin
     Raise Exception.Create('Error during parsing.');
   If (DelimiterCounter = 1) And (DelimiterStack[1] = ',') Then
     Begin
-      Str(ParamStack[1],TempStr);
+      {$IFNDEF D2009}
+      Str(ParamStack[1], TempStr);
+      {$ELSE}
+      TempStr := Format('%1.16f', [ParamStack[1]]);
+      {$ENDIF}
       ConTempStr := ConTempStr + TempStr + DelimiterStack[1];
-      Str(ParamStack[2],TempStr);
+      {$IFNDEF D2009}
+      Str(ParamStack[2], TempStr);
+      {$ELSE}
+      TempStr := Format('%1.16f', [ParamStack[2]]);
+      {$ENDIF}
       TempStr := ConTempStr + TempStr;
     End Else
-      Str(ParamStack[1],TempStr);
+      {$IFNDEF D2009}
+      Str(ParamStack[1], TempStr);
+      {$ELSE}
+      TempStr := Format('%1.16f', [ParamStack[1]]);
+      {$ENDIF}
   While Pos(' ',TempStr) <> 0 Do
     Delete(TempStr,Pos(' ',TempStr),1);
   Evaluate := TempStr;
@@ -2119,7 +2192,11 @@ Var
 Begin
   FindDelimiter := False;
   For iCount := 1 To Length(sString) Do
+    {$IFNDEF D2009}
     If sString[iCount] In ValidDelimiters Then
+    {$ELSE}
+    If CharInSet(sString[iCount], ValidDelimiters) Then
+    {$ENDIF}
       Begin
         FindDelimiter := True;
         Exit;
@@ -2187,11 +2264,21 @@ Begin
         str2 := Evaluate(tmpStr1);
 
         If ((iPStart - 1 <= Length(strCurEquation)) And (iPStart - 1 > 0)) And
-          Not (strCurEquation[iPStart - 1] In ValidDelimiters) And (iPStart <> 1) Then
+          {$IFNDEF D2009}
+          Not (strCurEquation[iPStart - 1] In ValidDelimiters) And
+          {$ELSE}
+          Not (CharInSet(strCurEquation[iPStart - 1], ValidDelimiters)) And
+          {$ENDIF}
+          (iPStart <> 1) Then
           Begin
             iFStart := iPStart - 1;
             strFunc := '';
-            While (iFStart > 0) And Not (strCurEquation[iFStart] In ValidDelimiters) Do
+            While (iFStart > 0) And
+              {$IFNDEF D2009}
+              Not (strCurEquation[iFStart] In ValidDelimiters) Do
+              {$ELSE}
+              Not (CharInSet(strCurEquation[iFStart], ValidDelimiters)) Do
+              {$ENDIF}
               Begin
                 strFunc := strCurEquation[iFStart] + strFunc;
                 Dec(iFStart)
@@ -5600,9 +5687,17 @@ begin
       For iParam := 1 To ParamCount Do
         Begin
           If Length(ParamStr(iParam)) > 0 Then
+            {$IFNDEF D2009}
             If ParamStr(iParam)[1] In ['-', '/'] Then
+            {$ELSE}
+            If CharInSet(ParamStr(iParam)[1], ['-', '/']) Then
+            {$ENDIF}
               If Length(ParamStr(iParam)) > 1 Then
+                {$IFNDEF D2009}
                 If ParamStr(iParam)[2] In ['@'] Then
+                {$ELSE}
+                If CharInSet(ParamStr(iParam)[2], ['@']) Then
+                {$ENDIF}
                   Begin
                     Result := ParseAlternateINIFile(Result, ParamStr(iParam));
                     Continue;
@@ -5631,8 +5726,13 @@ Type
     ttStringLiteral, ttSymbol, ttUnknown);
 
   Const
+    {$IFNDEF D2009}
     strWhiteSpace : Set Of Char = [#32, #9];
     strLineEnds   : Set of Char = [#10, #13];
+    {$ELSE}
+    strWhiteSpace : Set Of AnsiChar = [#32, #9];
+    strLineEnds   : Set of AnsiChar = [#10, #13];
+    {$ENDIF}
 
   (**
 
@@ -5651,13 +5751,22 @@ Type
   Function GetTokenType(Ch : Char; LastCharType : TTokenType) : TTokenType;
 
   Const
+    {$IFNDEF D2009}
     strTokenChars : Set Of Char = ['#', '_', 'a'..'z', 'A'..'Z'];
     strNumbers    : Set Of Char = ['0'..'9'];
     strSymbols    : Set Of Char = ['&', '(', ')', '*', '+', ',', '-', '.', '/',
       ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
     strQuotes     : Set Of Char = ['"', ''''];
+    {$ELSE}
+    strTokenChars : Set Of AnsiChar = ['#', '_', 'a'..'z', 'A'..'Z'];
+    strNumbers    : Set Of AnsiChar = ['0'..'9'];
+    strSymbols    : Set Of AnsiChar = ['&', '(', ')', '*', '+', ',', '-', '.', '/',
+      ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
+    strQuotes     : Set Of AnsiChar = ['"', ''''];
+    {$ENDIF}
 
   Begin
+    {$IFNDEF D2009}
     If ch In strWhiteSpace Then
       Result := ttWhiteSpace
     Else If ch In strTokenChars Then
@@ -5676,6 +5785,26 @@ Type
       Result := ttSymbol
     Else
       Result := ttUnknown;
+    {$ELSE}
+    If CharInSet(ch, strWhiteSpace) Then
+      Result := ttWhiteSpace
+    Else If CharInSet(ch, strTokenChars) Then
+      Result := ttIdentifier
+    Else If CharInSet(ch, strNumbers) Then
+      Begin
+        Result := ttNumber;
+        If LastCharType = ttIdentifier Then
+          Result := ttIdentifier;
+      End
+    Else If CharInSet(ch, strLineEnds) Then
+      Result := ttLineEnd
+    Else If CharInSet(ch, strQuotes) Then
+      Result := ttStringLiteral
+    Else If CharInSet(ch, strSymbols) Then
+      Result := ttSymbol
+    Else
+      Result := ttUnknown;
+    {$ENDIF}
   End;
 
   (**
@@ -5697,7 +5826,11 @@ Type
   Begin
     Result := True;
     For i := 1 To Length(strToken) Do
+      {$IFNDEF D2009}
       If Not (strToken[i] In strWhiteSpace) And Not (strToken[i] In strLineEnds)Then
+      {$ELSE}
+      If Not (CharInSet(strToken[i], strWhiteSpace)) And Not (CharInSet(strToken[i], strLineEnds)) Then
+      {$ENDIF}
         Result := False;
   End;
 
@@ -5858,9 +5991,17 @@ Begin
         Raise Exception.CreateFmt(strExpectedOpeningParenthesis, [slTokens[iToken]]);
       IncTokenPos;
       strFileName := slTokens[iToken];
+      {$IFNDEF D2009}
       If strFileName[1] In ['"', ''''] Then
+      {$ELSE}
+      If CharInSet(strFileName[1], ['"', '''']) Then
+      {$ENDIF}
         strFileName := Copy(strFileName, 2, Length(strFileName) - 1);
+      {$IFNDEF D2009}
       If strFileName[Length(strFileName)] In ['"', ''''] Then
+      {$ELSE}
+      If CharInSet(strFileName[Length(strFileName)], ['"', '''']) Then
+      {$ENDIF}
         strFileName := Copy(strFileName, 1, Length(strFileName) - 1);
       IncTokenPos;
       If slTokens[iToken] <> ')' Then

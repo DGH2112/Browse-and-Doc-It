@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Jun 2009
+  @Date    28 Jun 2009
 
 **)
 Unit DGHLibrary;
@@ -6068,7 +6068,11 @@ Var
   Var
     iTotalBytesInPipe : Cardinal;
     iBytesRead : Cardinal;
+    {$IFNDEF D2009}
     strOutput : String;
+    {$ELSE}
+    strOutput : AnsiString;
+    {$ENDIF}
 
   Begin
     ProcMsgHndr.IdleHandler;
@@ -6084,7 +6088,8 @@ Var
         SetLength(strOutput, iTotalBytesInPipe);
         ReadFile(hRead, strOutput[1], iTotalBytesInPipe, iBytesRead, Nil);
         SetLength(strOutput, iBytesRead);
-        slLines.Text := Copy(slLines.Text, 1, Length(slLines.text) - 2) + strOutput;
+        slLines.Text := Copy(slLines.Text, 1, Length(slLines.text) - 2) +
+          String(strOutput);
       End;
     // Use a string list to output each line except the last as it may not
     // be complete yet.

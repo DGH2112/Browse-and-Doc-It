@@ -56,6 +56,7 @@ type
     Procedure TestLike;
     Procedure TestCalcColour;
     Procedure TestDGHFindOnPath;
+    Procedure TestDGHCreateProcess;
   End;
 
   THStraightElementTestClass = Class(THStraightElement)
@@ -402,6 +403,70 @@ end;
 procedure TestApplicationFunctions.TestDecToOct;
 begin
   CheckEquals('33', DecToOct('27'));
+end;
+
+Type
+  TDGHCreateProcessHandler = Class(TInterfacedObject, IDGHCreateProcessEvents)
+  Strict Private
+    FOutput : TStringList;
+  Strict Protected
+  Public
+    Constructor Create(Output : TStringList);
+    procedure IdleHandler;
+    procedure ProcessMsgHandler(strMsg: string; var boolAbort: Boolean);
+    Property Output : TStringList Read FOutput;
+  End;
+
+{ TDGHCreateProcessHandler }
+
+constructor TDGHCreateProcessHandler.Create(Output : TStringList);
+begin
+  FOutput := Output;
+end;
+
+procedure TDGHCreateProcessHandler.IdleHandler;
+begin
+  // Do nothing;
+end;
+
+procedure TDGHCreateProcessHandler.ProcessMsgHandler(strMsg: string;
+  var boolAbort: Boolean);
+begin
+  FOutput.Add(strMsg);
+end;
+
+procedure TestApplicationFunctions.TestDGHCreateProcess;
+
+Var
+  Process : TProcessInfo;
+  ProcMsgHndr : TDGHCreateProcessHandler;
+  iResult : Integer;
+  slLines : TStringList;
+
+begin
+  Process.boolEnabled := True;
+  Process.strEXE := 'E:\HoylD\Borland Studio Projects\Library\Test\SuccessConsoleApp.exe';
+  Process.strParams := '';
+  Process.strDir := 'E:\HoylD\Borland Studio Projects\Library\Test\';
+  slLines := TStringList.Create;
+  Try
+    ProcMsgHndr := TDGHCreateProcessHandler.Create(slLines); // No free required (Interface)
+    iResult := DGHCreateProcess(Process, ProcMsgHndr);
+    CheckEquals(0, iResult, 'SuccessConsoleApp ERRORLEVEL');
+    CheckEquals(2, ProcMsgHndr.Output.Count);
+    CheckEquals('This allocation runs successfully and', ProcMsgHndr.Output[0]);
+    CheckEquals('returns an ERRORLEVEL = 0.', ProcMsgHndr.Output[1]);
+    slLines.Clear;
+    Process.strEXE := 'E:\HoylD\Borland Studio Projects\Library\Test\FailureConsoleApp.exe';
+    ProcMsgHndr := TDGHCreateProcessHandler.Create(slLines); // No free required (Interface)
+    iResult := DGHCreateProcess(Process, ProcMsgHndr);
+    CheckEquals(1, iResult, 'SuccessConsoleApp ERRORLEVEL');
+    CheckEquals(2, ProcMsgHndr.Output.Count);
+    CheckEquals('This allocation runs and fails and', ProcMsgHndr.Output[0]);
+    CheckEquals('in doing so returns an ERRORLEVEL = 1.', ProcMsgHndr.Output[1]);
+  Finally
+    slLines.Free;
+  End;
 end;
 
 procedure TestApplicationFunctions.TestDGHFindOnPath;

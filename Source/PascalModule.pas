@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       29 Mar 2009
+  @Date       22 Jun 2009
   @Author     David Hoyle
 
   @todo       Implement $IF
@@ -2583,6 +2583,18 @@ Begin
           ModuleNameLine := Token.Line;
           ModuleNameCol := Token.Column;
           NextNonCommentToken;
+        End;
+      While Token.Token = '.' Do
+        Begin
+          ModuleName := ModuleName + '.';
+          NextNonCommentToken;
+          If Token.TokenType In [ttIdentifier, ttDirective] Then
+            Begin
+              ModuleName := ModuleName + '.';
+              NextNonCommentToken;
+            End Else
+              ErrorAndSeekToken(strIdentExpected, 'OPUnit', Token.Token,
+                strSeekableOnErrorTokens, stActual)
         End;
       PortabilityDirective;
       // Check for ';'
@@ -8466,6 +8478,9 @@ Procedure TPascalModule.IdentList(Container : TElementContainer;
 Var
   C, AComment : TComment;
   I: TIdentList;
+  strUnit : String;
+  iLine: Integer;
+  iColumn: Integer;
 
 Begin
   AComment := Nil;
@@ -8479,11 +8494,27 @@ Begin
               AComment := TPascalComment.Create(C);
               OwnedItems.Add(AComment);
             End;
+          strUnit := Token.Token;
+          iLine := Token.Line;
+          iColumn := Token.Column;
+          NextNonCommentToken;
+          While Token.Token = '.' Do
+            Begin
+              strUnit := strUnit + Token.Token;
+              NextNonCommentToken;
+              If Token.TokenType In [ttIdentifier, ttDirective] Then
+                Begin
+                  strUnit := strUnit + Token.Token;
+                  NextNonCommentToken;
+                End
+              Else
+                ErrorAndSeekToken(strIdentExpected, 'IdentList', Token.Token,
+                  strSeekableOnErrorTokens, stFirst);
+            End;
           I := Nil;
           If Container <> Nil Then
-            I := Container.Add(TIdentList.Create(Token.Token, scNone, Token.Line,
-              Token.Column, iImageIndex, AComment)) As TIdentList;
-          NextNonCommentToken;
+            I := Container.Add(TIdentList.Create(strUnit, scNone, iLine,
+              iColumn, iImageIndex, AComment)) As TIdentList;
           If Token.UToken = 'IN' Then
             Begin
               If I <> Nil Then
@@ -8991,6 +9022,8 @@ begin
       Else
         IncSkip(0);
     End
+  Else If Like(Token.Token, '{$IF ') Then
+    IncSkip(0) // FAKE $IF by defaulting to TRUE
   Else If Like(Token.Token, '{$IFNDEF ') Then
     Begin
       If Not IfNotDef(GetDef) Then
@@ -9019,6 +9052,12 @@ begin
               etError);
     End
   Else If Like(Token.Token, '{$ENDIF') Then
+    Begin
+      If DecSkip Then
+        AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
+            scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etError);
+    End
+  Else If Like(Token.Token, '{$IFEND') Then
     Begin
       If DecSkip Then
         AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),

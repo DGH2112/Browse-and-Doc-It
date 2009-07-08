@@ -101,7 +101,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Width = 263
       Height = 141
       Align = alTop
-      Checkboxes = True
       Columns = <
         item
           Caption = 'Folder'

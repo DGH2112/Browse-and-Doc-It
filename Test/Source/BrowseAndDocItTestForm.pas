@@ -246,23 +246,15 @@ procedure TfrmBrowseAndDocItTestForm.ShowTokensClick(Sender: TObject);
 
 Var
   M : TBaseLanguageModule;
-  Source : TMemoryStream;
 
 begin
-  Source := TMemoryStream.Create;
-  Try
-    FSynEdit.Lines.SaveToStream(Source);
-    Source.Position := 0;
-    M := Dispatcher(Source, FileName, True, [moParse, moCheckForDocumentConflicts]);
-    If M <> Nil Then
-      Try
-        TfrmTokenForm.Execute(M);
-      Finally
-        M.Free;
-      End;
-  Finally
-    Source.Free;
-  End;
+  M := Dispatcher(FSynEdit.Text, FileName, True, [moParse, moCheckForDocumentConflicts]);
+  If M <> Nil Then
+    Try
+      TfrmTokenForm.Execute(M);
+    Finally
+      M.Free;
+    End;
 end;
 
 (**
@@ -658,7 +650,7 @@ Procedure TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String;
   var iHints, iWarnings, iErrors, iConflicts : Integer);
 
 Var
-  Source : TFileStream;
+  Source : TStringList;
   M : TBaseLanguageModule;
   i : Integer;
   C: TElementContainer;
@@ -668,10 +660,10 @@ Begin
   iWarnings := 0;
   iErrors := 0;
   iConflicts := 0;
-  Source := TFileStream.Create(strFileName, fmOpenRead);
+  Source := TStringList.Create;;
   Try
-    Source.Position := 0;
-    M := Dispatcher(Source, strFileName, False, [moParse, moCheckForDocumentConflicts]);
+    Source.LoadFromFile(strFileName);
+    M := Dispatcher(Source.Text, strFileName, False, [moParse, moCheckForDocumentConflicts]);
     If M <> Nil Then
       Try
         If M.FindElement(strHints) <> Nil Then
@@ -1338,23 +1330,15 @@ procedure TfrmBrowseAndDocItTestForm.SynEdit1Change(Sender: TObject);
 
 Var
   M : TBaseLanguageModule;
-  Source : TMemoryStream;
 
 begin
-  Source := TMemoryStream.Create;
-  Try
-    FSynEdit.Lines.SaveToStream(Source);
-    Source.Position := 0;
-    M := Dispatcher(Source, FileName, FSynEdit.Modified, [moParse, moCheckForDocumentConflicts]);
-    If M <> Nil Then
-      Try
-        FModuleExplorerFrame.RenderModule(M);
-      Finally
-        M.Free;
-      End;
-  Finally
-    Source.Free;
-  End;
+  M := Dispatcher(FSynEdit.Text, FileName, FSynEdit.Modified, [moParse, moCheckForDocumentConflicts]);
+  If M <> Nil Then
+    Try
+      FModuleExplorerFrame.RenderModule(M);
+    Finally
+      M.Free;
+    End;
 end;
 
 (**

@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    29 Dec 2008
+  @Date    10 Jul 2009
   @Version 1.0
 
 **)
@@ -12,8 +12,10 @@ Unit GenericTokenizer;
 
 Interface
 
+{$INCLUDE 'CompilerDefinitions.inc'}
+
 Uses
-  Classes, BaseLanguageModule;
+  SysUtils, Classes, BaseLanguageModule;
 
   Function Tokenize(strText : String; var KeyWords : TKeyWords;
     iLimit : Integer = 999999) : TStringList;
@@ -71,26 +73,54 @@ Begin
   For i := 1 To Length(strText) Do
     Begin
       LastToken := CurToken;
+      {$IFNDEF D2009}
       If strText[i] In [#32, #9] Then
+      {$ELSE}
+      If CharInSet(strText[i], [#32, #9]) Then
+      {$ENDIF}
         CurToken := ttWhiteSpace
+      {$IFNDEF D2009}
       Else If strText[i] In ['#', '_', 'a'..'z', 'A'..'Z'] Then
+      {$ELSE}
+      Else If CharInSet(strText[i], ['#', '_', 'a'..'z', 'A'..'Z']) Then
+      {$ENDIF}
         Begin
+          {$IFNDEF D2009}
           If (LastToken = ttNumber) And (strText[i] In ['A'..'F', 'a'..'f']) Then
+          {$ELSE}
+          If (LastToken = ttNumber) And (CharInSet(strText[i], ['A'..'F', 'a'..'f'])) Then
+          {$ENDIF}
             CurToken := ttNumber
           Else
             CurToken := ttIdentifier;
         End
+      {$IFNDEF D2009}
       Else If strText[i] In ['$', '0'..'9'] Then
+      {$ELSE}
+      Else If CharInSet(strText[i], ['$', '0'..'9']) Then
+      {$ENDIF}
         Begin
           CurToken := ttNumber;
           If LastToken = ttIdentifier Then
             CurToken := ttIdentifier;
         End
+      {$IFNDEF D2009}
       Else If strText[i] In [#10, #13] Then
+      {$ELSE}
+      Else If CharInSet(strText[i], [#10, #13]) Then
+      {$ENDIF}
         CurToken := ttLineEnd
+      {$IFNDEF D2009}
       Else If strText[i] In ['''', '"'] Then
+      {$ELSE}
+      Else If CharInSet(strText[i], ['''', '"']) Then
+      {$ENDIF}
         CurToken := ttStringLiteral
+      {$IFNDEF D2009}
       Else If strText[i] In [#0..#255] - ['#', '_', 'a'..'z', 'A'..'Z', '$', '0'..'9'] Then
+      {$ELSE}
+      Else If CharInSet(strText[i], [#0..#255] - ['#', '_', 'a'..'z', 'A'..'Z', '$', '0'..'9']) Then
+      {$ENDIF}
         CurToken := ttSymbol
       Else
         CurToken := ttUnknown;

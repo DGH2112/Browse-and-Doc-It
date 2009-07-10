@@ -1395,4 +1395,8 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Action = actEditSelectAll
     end
   end
+  object XPManifest: TXPManifest
+    Left = 432
+    Top = 136
+  end
 end

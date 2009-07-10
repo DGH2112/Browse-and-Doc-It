@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    09 Mar 2009
+  @Date    10 Jul 2009
   @Author  David Hoyle
 
 **)
@@ -17,7 +17,7 @@ uses
   Graphics, Controls, Forms, Dialogs, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ExtCtrls, ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
   FileCtrl, ComCtrls, Contnrs, SynHighlighterVB,
-  Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ToolWin;
+  Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ToolWin, XPMan;
 
 {$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
 
@@ -89,6 +89,7 @@ type
     Paste1: TMenuItem;
     Delete1: TMenuItem;
     SelectAll1: TMenuItem;
+    XPManifest: TXPManifest;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);

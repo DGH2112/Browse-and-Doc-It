@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    12 Apr 2009
+  @Date    10 Jul 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -11,6 +11,8 @@
 unit ToolsAPIUtils;
 
 interface
+
+{$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
 
 Uses
   SysUtils, Windows, ToolsAPI, Classes;
@@ -30,8 +32,8 @@ Type
   Procedure OutputMessage(strFileName, strText, strPrefix : String; iLine, iCol : Integer); Overload;
   Procedure ClearMessages(Msg : TClearMessages);
   Function BufferSize(SourceEditor : IOTASourceEditor) : Integer;
-  Procedure EditorAsMemoryStream(SourceEditor : IOTASourceEditor;
-    Stream : TStream);
+  Function EditorAsString(SourceEditor : IOTASourceEditor) : String;
+  Procedure OutputText(Writer : IOTAEditWriter; strText : String);
 
 Const
   (** The buffer size for the copying of text from an editor to a memory
@@ -41,9 +43,12 @@ Const
 Var
   (** This is a character buffer for the transfer of text from the editor
       to the parser. **)
-  Buffer : Array[1..iBufferSize] Of Char;
+  Buffer : Array[1..iBufferSize] Of AnsiChar;
 
 Implementation
+
+Uses
+  Character;
 
 (**
 
@@ -286,30 +291,53 @@ End;
   @postcon Returns a memory stream of the file.
 
   @param   SourceEditor as an IOTASourceEditor
-  @param   Stream       as a TStream
+  @return  a String
 
 **)
-Procedure EditorAsMemoryStream(SourceEditor : IOTASourceEditor;
-  Stream : TStream);
+Function EditorAsString(SourceEditor : IOTASourceEditor) : String;
 
 Var
   Reader : IOTAEditReader;
   iRead : Integer;
   iPosition : Integer;
+  strBuffer : AnsiString;
 
 Begin
+  Result := '';
   Reader := SourceEditor.CreateReader;
   Try
     iPosition := 0;
     Repeat
-      iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
-      Stream.WriteBuffer(Buffer, iRead);
-      inc(iPosition, iRead);
+      SetLength(strBuffer, iBufferSize);
+      iRead := Reader.GetText(iPosition, PAnsiChar(strBuffer), iBufferSize);
+      SetLength(strBuffer, iRead);
+      Result := Result + String(strBuffer);
+      Inc(iPosition, iRead);
     Until iRead < iBufferSize;
   Finally
     Reader := Nil;
   End;
-  Stream.Position := 0;
+End;
+
+(**
+
+  This procedure outputs the given text to the given edit writer.
+
+  @precon  Writer must be a valid instance of an IOTAEditWriter interface.
+  @postcon Outputs the given text to the given edit writer.
+
+  @param   Writer  as an IOTAEditWriter
+  @param   strText as a String
+
+**)
+Procedure OutputText(Writer : IOTAEditWriter; strText : String);
+
+Begin
+  {$IFNDEF D2009}
+  Writer.Insert(PAnsiChar(strText));
+  {$ELSE}
+  Writer.Insert(PAnsiChar(AnsiString(strText)));
+  {$ENDIF}
 End;
 
 End.

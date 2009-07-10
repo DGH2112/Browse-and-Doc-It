@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    16 Apr 2009
+  @Date    10 Jul 2009
   @Version 1.0
 
 **)
@@ -89,8 +89,8 @@ Type
     FLastParserResult : Boolean;
     Procedure EnableTimer(boolSuccessfulParse : Boolean);
     Procedure TimerEventHandler(Sender : TObject);
-    Procedure EditorInfo(var strFileName : String; var boolModified : Boolean;
-      MemoryStream : TMemoryStream);
+    Function EditorInfo(var strFileName : String;
+      var boolModified : Boolean) : String;
     Procedure RenderDocument(Module : TBaseLanguageModule);
     Procedure ExceptionMsg(strExceptionMsg : String);
   {$IFDEF D2005} Strict {$ENDIF} Protected
@@ -149,10 +149,24 @@ Uses
 Resourcestring
   (** This is a text string of revision from nil and a to z. **)
   strRevision = ' abcdefghijklmnopqrstuvwxyz';
-  (** This is a message string to appear in the BDS 2005/6 splash screen **)
+  {$IFDEF VER170}
+  (** This is a message string to appear in the BDS 2005 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2005';
+  {$ENDIF}
+  {$IFDEF VER180}
+  (** This is a message string to appear in the BDS 2006 splash screen **)
   strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2006';
+  {$ENDIF}
+  {$IFDEF VER190}
+  (** This is a message string to appear in the CDS 2007 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2007';
+  {$ENDIF}
+  {$IFDEF VER200}
+  (** This is a message string to appear in the CRS 2009 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2009';
+  {$ENDIF}
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
-  strSplashScreenBuild = 'Open Source Freeware by David Hoyle (Build %d.%d.%d.%d)';
+  strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
 {$ENDIF}
 
 Const
@@ -412,7 +426,7 @@ begin
   C.CharIndex := 0;
   iBufferPos := Source.GetEditView(0).CharPosToPos(C);
   Writer.CopyTo(iBufferPos);
-  Writer.Insert(PChar(strComment));
+  OutputText(Writer, strComment);
 end;
 
 (**
@@ -671,25 +685,25 @@ begin
     Case CommentType Of
       ctBlock:
         Begin
-          Writer.Insert('(**');
-          Writer.Insert(#13#10);
-          Writer.Insert(PChar(StringOfChar(#32, iLen - 1) + '  '#13#10));
-          Writer.Insert(PChar(StringOfChar(#32, iLen - 1) + '  '#13#10));
-          Writer.Insert(PChar(StringOfChar(#32, iLen - 1) + '  '#13#10));
-          Writer.Insert(PChar(StringOfChar(#32, iLen - 1)));
-          Writer.Insert(PChar('**)'#13#10));
-          Writer.Insert(PChar(StringOfChar(#32, iLen - 1)));
+          OutputText(Writer, '(**');
+          OutputText(Writer, #13#10);
+          OutputText(Writer, StringOfChar(#32, iLen - 1) + '  '#13#10);
+          OutputText(Writer, StringOfChar(#32, iLen - 1) + '  '#13#10);
+          OutputText(Writer, StringOfChar(#32, iLen - 1) + '  '#13#10);
+          OutputText(Writer, StringOfChar(#32, iLen - 1));
+          OutputText(Writer, '**)'#13#10);
+          OutputText(Writer, StringOfChar(#32, iLen - 1));
         End;
       ctLine :
         Begin
-          Writer.Insert('(**');
-          Writer.Insert(#32#32);
-          Writer.Insert(PChar('**)'#13#10));
-          Writer.Insert(PChar(StringOfChar(#32, iLen - 1)));
+          OutputText(Writer, '(**');
+          OutputText(Writer, #32#32);
+          OutputText(Writer, '**)'#13#10);
+          OutputText(Writer, StringOfChar(#32, iLen - 1));
         End;
       ctInSitu :
         Begin
-          Writer.Insert('(**  **) ');
+          OutputText(Writer, '(**  **) ');
         End;
     End;
   Finally
@@ -771,7 +785,6 @@ end;
 procedure TBrowseAndDocItWizard.InsertMethodCommentClick(Sender: TObject);
 
 var
-  objMemStream: TStream;
   Module : TBaseLanguageModule;
   EditPos: TOTAEditPos;
   T : TElementContainer;
@@ -787,47 +800,42 @@ begin
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
-  objMemStream := TMemoryStream.Create;
-  Try
-    EditorAsMemoryStream(Source, objMemStream);
-    Module := Dispatcher(objMemStream, Source.FileName, Source.Modified, [moParse]);
-    If Module <> Nil Then
-      Try
-        EditPos :=  Source.GetEditView(0).CursorPos;
-        T := Module.FindElement(strImplementedMethodsLabel);
-        If T <> Nil Then
-          Begin
-            F := FindFunction(EditPos.Line, T, TGenericMethodDecl);
-            If F <> Nil Then
-              Begin
-                iIndent := FindIndentOfFirstTokenOnLine(Module, F.Line) - 1;
-                If F.Comment <> Nil Then
-                  Begin
-                    If MessageDlg(Format(strMethodAlreadyExists, [F.QualifiedName]),
-                      mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
-                      Exit;
-                    iInsertLine := F.Comment.Line;
-                    DeleteExistingComment(Source, F.Comment.Line, F.Line);
-                  End Else
-                    iInsertLine := F.Line;
-                Writer := Source.CreateUndoableWriter;
-                Try
-                  strComment := WriteComment(F, ctPascalBlock, iIndent, True,
-                    CursorDelta);
-                  InsertComment(strComment, Writer, iInsertLine, Source);
-                Finally
-                  Writer := Nil;
-                End;
-                PositionCursorInFunction(CursorDelta, iInsertLine, iIndent, strComment);
-              End Else
-                MessageDlg(strNoMethodFound, mtWarning, [mbOK], 0);
-          End;
-      Finally
-        Module.Free;
-      End;
-  Finally
-   objMemStream.Free;
-  End;
+  Module := Dispatcher(EditorAsString(Source), Source.FileName, Source.Modified,
+    [moParse]);
+  If Module <> Nil Then
+    Try
+      EditPos :=  Source.GetEditView(0).CursorPos;
+      T := Module.FindElement(strImplementedMethodsLabel);
+      If T <> Nil Then
+        Begin
+          F := FindFunction(EditPos.Line, T, TGenericMethodDecl);
+          If F <> Nil Then
+            Begin
+              iIndent := FindIndentOfFirstTokenOnLine(Module, F.Line) - 1;
+              If F.Comment <> Nil Then
+                Begin
+                  If MessageDlg(Format(strMethodAlreadyExists, [F.QualifiedName]),
+                    mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
+                    Exit;
+                  iInsertLine := F.Comment.Line;
+                  DeleteExistingComment(Source, F.Comment.Line, F.Line);
+                End Else
+                  iInsertLine := F.Line;
+              Writer := Source.CreateUndoableWriter;
+              Try
+                strComment := WriteComment(F, ctPascalBlock, iIndent, True,
+                  CursorDelta);
+                InsertComment(strComment, Writer, iInsertLine, Source);
+              Finally
+                Writer := Nil;
+              End;
+              PositionCursorInFunction(CursorDelta, iInsertLine, iIndent, strComment);
+            End Else
+              MessageDlg(strNoMethodFound, mtWarning, [mbOK], 0);
+        End;
+    Finally
+      Module.Free;
+    End;
 end;
 
 (**
@@ -852,7 +860,6 @@ end;
 procedure TBrowseAndDocItWizard.InsertPropertyCommentClick(Sender: TObject);
 
 var
-  objMemStream: TStream;
   Module : TBaseLanguageModule;
   EditPos: TOTAEditPos;
   Source : IOTASourceEditor;
@@ -868,47 +875,42 @@ begin
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
-  objMemStream := TMemoryStream.Create;
-  Try
-    EditorAsMemoryStream(Source, objMemStream);
-    Module := Dispatcher(objMemStream, Source.FileName, Source.Modified, [moParse]);
-    If Module <> Nil Then
-      Try
-        EditPos :=  Source.GetEditView(0).CursorPos;
-        T := Module.FindElement(strTypesLabel);
-        If T <> Nil Then
-          Begin
-            F := FindFunction(EditPos.Line, Module, TGenericProperty);
-            If F <> Nil Then
-              Begin
-                iIndent := FindIndentOfFirstTokenOnLine(Module, F.Line) - 1;
-                If F.Comment <> Nil Then
-                  Begin
-                    If MessageDlg(Format(strPropertyAlreadyExists, [F.Identifier]),
-                      mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
-                      Exit;
-                    iInsertLine := F.Comment.Line;
-                    DeleteExistingComment(Source, F.Comment.Line, F.Line);
-                  End Else
-                    iInsertLine := F.Line;
-                Writer := Source.CreateUndoableWriter;
-                Try
-                  strComment := WriteComment(F, ctPascalBlock, iIndent, False,
-                    CursorDelta);
-                  InsertComment(strComment, Writer, iInsertLine, Source);
-                Finally
-                  Writer := Nil;
-                End;
-                PositionCursorInFunction(CursorDelta, iInsertLine, iIndent, strComment);
-              End Else
-                MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
-          End;
-      Finally
-        Module.Free;
-      End;
-  Finally
-   objMemStream.Free;
-  End;
+  Module := Dispatcher(EditorAsString(Source), Source.FileName, Source.Modified,
+    [moParse]);
+  If Module <> Nil Then
+    Try
+      EditPos :=  Source.GetEditView(0).CursorPos;
+      T := Module.FindElement(strTypesLabel);
+      If T <> Nil Then
+        Begin
+          F := FindFunction(EditPos.Line, Module, TGenericProperty);
+          If F <> Nil Then
+            Begin
+              iIndent := FindIndentOfFirstTokenOnLine(Module, F.Line) - 1;
+              If F.Comment <> Nil Then
+                Begin
+                  If MessageDlg(Format(strPropertyAlreadyExists, [F.Identifier]),
+                    mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
+                    Exit;
+                  iInsertLine := F.Comment.Line;
+                  DeleteExistingComment(Source, F.Comment.Line, F.Line);
+                End Else
+                  iInsertLine := F.Line;
+              Writer := Source.CreateUndoableWriter;
+              Try
+                strComment := WriteComment(F, ctPascalBlock, iIndent, False,
+                  CursorDelta);
+                InsertComment(strComment, Writer, iInsertLine, Source);
+              Finally
+                Writer := Nil;
+              End;
+              PositionCursorInFunction(CursorDelta, iInsertLine, iIndent, strComment);
+            End Else
+              MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
+        End;
+    Finally
+      Module.Free;
+    End;
 end;
 
 (**
@@ -1177,26 +1179,27 @@ end;
 
   @param   strFileName  as a String as a reference
   @param   boolModified as a Boolean as a reference
-  @param   MemoryStream as a TMemoryStream
+  @return  a String
 
   @refactor Perhaps in hindsight, the compiler defines should be passed to the
             parsers create method rather than be part of the application options.
 
 **)
-procedure TEditorNotifier.EditorInfo(var strFileName: String;
-  var boolModified: Boolean; MemoryStream: TMemoryStream);
+function TEditorNotifier.EditorInfo(var strFileName: String;
+  var boolModified: Boolean) : String;
 
 Var
   SE : IOTASourceEditor;
   Options : IOTAProjectOptions;
 
 begin
+  Result := '';
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
       strFileName := SE.FileName;
       boolModified := SE.Modified;
-      EditorAsMemoryStream(SE, MemoryStream);
+      Result := EditorAsString(SE);
       If ActiveProject <> Nil Then
         Begin
           Options := ActiveProject.ProjectOptions;
@@ -1226,10 +1229,10 @@ begin
       BrowseAndDocItOptions.Defines.Add('VER180');
       {$ENDIF}
       {$IFDEF VER190} // Delphi 2007
-      BrowseAndDocItOptions.Defines.Add('VER180');
+      BrowseAndDocItOptions.Defines.Add('VER190');
       {$ENDIF}
       {$IFDEF VER200} // Delphi 2009
-      BrowseAndDocItOptions.Defines.Add('VER180');
+      BrowseAndDocItOptions.Defines.Add('VER200');
       {$ENDIF}
       {$IFDEF WIN32}
       BrowseAndDocItOptions.Defines.Add('WIN32');
@@ -1621,42 +1624,21 @@ procedure TKeyboardBinding.ShowTokens(const Context: IOTAKeyContext;
   KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
 
 Var
-  objMemStream : TMemoryStream;
   SourceEditor : IOTASourceEditor;
-  Reader : IOTAEditReader;
-  iPosition : Integer;
-  iRead : Integer;
   Source : TBaseLanguageModule;
 
 begin
-  objMemStream := TMemoryStream.Create;
-  Try
-    SourceEditor := ActiveSourceEditor;
-    If SourceEditor = Nil Then
-      Exit;
-    Reader := SourceEditor.CreateReader;
+  SourceEditor := ActiveSourceEditor;
+  If SourceEditor = Nil Then
+    Exit;
+  Source := Dispatcher(EditorAsString(SourceEditor), SourceEditor.FileName,
+    SourceEditor.Modified, []);
+  If Source <> Nil Then
     Try
-      iPosition := 0;
-      Repeat
-        iRead := Reader.GetText(iPosition, @Buffer, iBufferSize);
-        objMemStream.WriteBuffer(Buffer, iRead);
-        Inc(iPosition, iRead);
-      Until iRead < iBufferSize;
+      TfrmTokenForm.Execute(Source);
     Finally
-      Reader := Nil;
+      Source.Free;
     End;
-    objMemStream.Position := 0;
-    Source := Dispatcher(objMemStream, SourceEditor.FileName,
-      SourceEditor.Modified, []);
-    If Source <> Nil Then
-      Try
-        TfrmTokenForm.Execute(Source);
-      Finally
-        Source.Free;
-      End;
-  Finally
-    objMemStream.Free;
-  End;
   BindingResult := krHandled;
 end;
 

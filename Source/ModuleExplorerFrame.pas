@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    15 Mar 2009
+  @Date    10 Jul 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -177,8 +177,13 @@ type
     procedure actLocalUpdate(Sender: TObject);
     procedure actLocalExecute(Sender: TObject);
     procedure tvExplorerKeyPress(Sender: TObject; var Key: Char);
+    {$IFNDEF D2009}
     procedure tvExplorerGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    {$ELSE}
+    procedure tvExplorerGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+    {$ENDIF}
     procedure tvExplorerGetImageIndex(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
       var Ghosted: Boolean; var ImageIndex: Integer);
@@ -541,7 +546,7 @@ Var
 Begin
   Canvas.Font.Assign(FTreeView.Font);
   Result := FTreeView.GetDisplayRect(Node, NoColumn, True);
-  Inc(Result.Left, 2); // Adjustment for 
+  Inc(Result.Left, 2); // Adjustment for
   Inc(Result.Top, 1);
   iMaxPos := FTreeView.ScreenToClient(Point(Screen.WorkAreaRect.Right, 0)).X -
     Result.Left;
@@ -716,7 +721,8 @@ begin
   For i := Succ(Low(TImageIndex)) to High(TImageIndex) Do
     If Not ilScopeImages.GetInstRes(hInstance, rtBitmap, ImageList[i].FResourceName, 16,
       [lrDefaultColor], ImageList[i].FMaskColour) Then
-      ShowMessage(Format('Resource "%s" not found.', [ImageList[i].FResourceName]))
+      ShowMessage(Format('Resource "%s" not found.', [ImageList[i].FResourceName]));
+  tvExplorer.OnGetText := tvExplorerGetText;
 end;
 
 (**
@@ -761,18 +767,18 @@ Begin
         For k := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
           If FSpecialTagNodes[k].boolShow Then
             If AnsiCompareText(Tag[j].TagName, FSpecialTagNodes[k].strTagName) = 0 Then
-              AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(MaxInt, False), 2, 
+              AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(MaxInt, False), 2,
                 Integer(iiToDoItem) - 1, M.BodyComment[i].Tag[j].Line,
                 M.BodyComment[i].Tag[j].Column, Nil);
 End;
 
 (**
 
-  This method renders the modules sub-containers recursively. 
+  This method renders the modules sub-containers recursively.
 
-  @precon  RootNode must be a valid tree node and Container must be a valid 
-           container. 
-  @postcon Renders the modules sub-containers recursively. 
+  @precon  RootNode must be a valid tree node and Container must be a valid
+           container.
+  @postcon Renders the modules sub-containers recursively.
 
   @param   RootNode  as a PVirtualNode
   @param   Container as a TElementContainer
@@ -1422,7 +1428,11 @@ end;
 **)
 procedure TframeModuleExplorer.tvExplorerGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
+{$IFNDEF D2009}
   var CellText: WideString);
+{$ELSE}
+  var CellText: string);
+{$ENDIF}
 
 Var
   NodeData : ^TTreeData;
@@ -1431,6 +1441,7 @@ begin
   NodeData := tvExplorer.GetNodeData(Node);
   CellText := NodeData.FNode.Text;
 end;
+
 
 (**
 

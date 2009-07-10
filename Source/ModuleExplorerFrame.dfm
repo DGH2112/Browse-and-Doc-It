@@ -153,7 +153,6 @@ object frameModuleExplorer: TframeModuleExplorer
     TabOrder = 2
     OnBeforeItemPaint = tvExplorerBeforeItemPaint
     OnClick = tvExplorerClick
-    OnGetText = tvExplorerGetText
     OnGetImageIndex = tvExplorerGetImageIndex
     OnKeyPress = tvExplorerKeyPress
     OnMouseMove = tvExplorerMouseMove

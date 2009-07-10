@@ -72,98 +72,90 @@ Const
     'End.'#13#10;                      // 17
 
 Var
-  Source: TMemoryStream;
   Module: TBaseLanguageModule;
   M: TElementContainer;
 
 begin
-  Source := TMemoryStream.Create;
+  Module := Dispatcher(strSourceMethods, 'MyPascalFile.pas', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSourceMethods);
-    Module := Dispatcher(Source, 'MyPascalFile.pas', False, [moParse]);
-    Try
-      CheckEquals(0, Module.HeadingCount(strErrors), Module.FirstError);
-      M := FindFunction(1, Module, TGenericMethodDecl);
-      Check(M = Nil, 'Method found');
-      M := FindFunction(7, Module, TGenericMethodDecl);
-      Check(M <> Nil, 'Method not found!');
-      CheckEquals(M.Line, 7);
-      Checkequals('Hello', M.Identifier);
-      M := FindFunction(8, Module, TGenericMethodDecl);
-      Check(M <> Nil, 'Method not found!');
-      CheckEquals(M.Line, 7);
-      Checkequals('Hello', M.Identifier);
-      M := FindFunction(9, Module, TGenericMethodDecl);
-      Check(M <> Nil, 'Method not found!');
-      CheckEquals(M.Line, 7);
-      Checkequals('Hello', M.Identifier);
-      M := FindFunction(10, Module, TGenericMethodDecl);
-      Check(M <> Nil, 'Method not found!');
-      CheckEquals(M.Line, 10);
-      Checkequals('Hello2', M.Identifier);
-      M := FindFunction(11, Module, TGenericMethodDecl);
-      Check(M <> Nil, 'Method not found!');
-      CheckEquals(M.Line, 11);
-      Checkequals('Hello3', M.Identifier);
-      M := FindFunction(12, Module, TGenericMethodDecl);
-      Check(M <> Nil, 'Method not found!');
-      CheckEquals(M.Line, 12);
-      Checkequals('Hello4', M.Identifier);
-      M := FindFunction(13, Module, TGenericMethodDecl);
-      Check(M <> Nil, 'Method not found!');
-      CheckEquals(M.Line, 12);
-      Checkequals('Hello4', M.Identifier);
-      M := FindFunction(14, Module, TGenericMethodDecl);
-      Check(M <> Nil, 'Method not found!');
-      CheckEquals(M.Line, 12);
-      Checkequals('Hello4', M.Identifier);
-      M := FindFunction(15, Module, TGenericMethodDecl);
-      Check(M <> Nil, 'Method not found!');
-      CheckEquals(M.Line, 15);
-      Checkequals('Hello5', M.Identifier);
-      M := FindFunction(19, Module, TGenericMethodDecl);
-      Check(M <> Nil, 'Method not found!');
-      CheckEquals(M.Line, 15);
-      Checkequals('Hello5', M.Identifier);
-    Finally
-      Module.Free;
-    End;
-
-    Source.LoadBufferFromString(strSourceProperties);
-    Module := Dispatcher(Source, 'MyPascalFile.pas', False, [moParse]);
-    Try
-      CheckEquals(0, Module.HeadingCount(strErrors), Module.FirstError);
-      M := FindFunction(1, Module, TGenericProperty);
-      Check(M = Nil, 'Property found');
-      M := FindFunction(8, Module, TGenericProperty);
-      Check(M <> Nil, 'Property not found!');
-      CheckEquals(M.Line, 8);
-      Checkequals('MyProperty1', M.Identifier);
-      M := FindFunction(9, Module, TGenericProperty);
-      Check(M <> Nil, 'Property not found!');
-      CheckEquals(M.Line, 9);
-      Checkequals('MyProperty2', M.Identifier);
-      M := FindFunction(10, Module, TGenericProperty);
-      Check(M <> Nil, 'Property not found!');
-      CheckEquals(M.Line, 9);
-      Checkequals('MyProperty2', M.Identifier);
-      M := FindFunction(11, Module, TGenericProperty);
-      Check(M <> Nil, 'Property not found!');
-      CheckEquals(M.Line, 11);
-      Checkequals('MyProperty3', M.Identifier);
-      M := FindFunction(12, Module, TGenericProperty);
-      Check(M <> Nil, 'Property not found!');
-      CheckEquals(M.Line, 12);
-      Checkequals('MyProperty4', M.Identifier);
-      M := FindFunction(17, Module, TGenericProperty);
-      Check(M <> Nil, 'Property not found!');
-      CheckEquals(M.Line, 12);
-      Checkequals('MyProperty4', M.Identifier);
-    Finally
-      Module.Free;
-    End;
+    CheckEquals(0, Module.HeadingCount(strErrors), Module.FirstError);
+    M := FindFunction(1, Module, TGenericMethodDecl);
+    Check(M = Nil, 'Method found');
+    M := FindFunction(7, Module, TGenericMethodDecl);
+    Check(M <> Nil, 'Method not found!');
+    CheckEquals(M.Line, 7);
+    Checkequals('Hello', M.Identifier);
+    M := FindFunction(8, Module, TGenericMethodDecl);
+    Check(M <> Nil, 'Method not found!');
+    CheckEquals(M.Line, 7);
+    Checkequals('Hello', M.Identifier);
+    M := FindFunction(9, Module, TGenericMethodDecl);
+    Check(M <> Nil, 'Method not found!');
+    CheckEquals(M.Line, 7);
+    Checkequals('Hello', M.Identifier);
+    M := FindFunction(10, Module, TGenericMethodDecl);
+    Check(M <> Nil, 'Method not found!');
+    CheckEquals(M.Line, 10);
+    Checkequals('Hello2', M.Identifier);
+    M := FindFunction(11, Module, TGenericMethodDecl);
+    Check(M <> Nil, 'Method not found!');
+    CheckEquals(M.Line, 11);
+    Checkequals('Hello3', M.Identifier);
+    M := FindFunction(12, Module, TGenericMethodDecl);
+    Check(M <> Nil, 'Method not found!');
+    CheckEquals(M.Line, 12);
+    Checkequals('Hello4', M.Identifier);
+    M := FindFunction(13, Module, TGenericMethodDecl);
+    Check(M <> Nil, 'Method not found!');
+    CheckEquals(M.Line, 12);
+    Checkequals('Hello4', M.Identifier);
+    M := FindFunction(14, Module, TGenericMethodDecl);
+    Check(M <> Nil, 'Method not found!');
+    CheckEquals(M.Line, 12);
+    Checkequals('Hello4', M.Identifier);
+    M := FindFunction(15, Module, TGenericMethodDecl);
+    Check(M <> Nil, 'Method not found!');
+    CheckEquals(M.Line, 15);
+    Checkequals('Hello5', M.Identifier);
+    M := FindFunction(19, Module, TGenericMethodDecl);
+    Check(M <> Nil, 'Method not found!');
+    CheckEquals(M.Line, 15);
+    Checkequals('Hello5', M.Identifier);
   Finally
-    Source.Free;
+    Module.Free;
+  End;
+
+  Module := Dispatcher(strSourceProperties, 'MyPascalFile.pas', False, [moParse]);
+  Try
+    CheckEquals(0, Module.HeadingCount(strErrors), Module.FirstError);
+    M := FindFunction(1, Module, TGenericProperty);
+    Check(M = Nil, 'Property found');
+    M := FindFunction(8, Module, TGenericProperty);
+    Check(M <> Nil, 'Property not found!');
+    CheckEquals(M.Line, 8);
+    Checkequals('MyProperty1', M.Identifier);
+    M := FindFunction(9, Module, TGenericProperty);
+    Check(M <> Nil, 'Property not found!');
+    CheckEquals(M.Line, 9);
+    Checkequals('MyProperty2', M.Identifier);
+    M := FindFunction(10, Module, TGenericProperty);
+    Check(M <> Nil, 'Property not found!');
+    CheckEquals(M.Line, 9);
+    Checkequals('MyProperty2', M.Identifier);
+    M := FindFunction(11, Module, TGenericProperty);
+    Check(M <> Nil, 'Property not found!');
+    CheckEquals(M.Line, 11);
+    Checkequals('MyProperty3', M.Identifier);
+    M := FindFunction(12, Module, TGenericProperty);
+    Check(M <> Nil, 'Property not found!');
+    CheckEquals(M.Line, 12);
+    Checkequals('MyProperty4', M.Identifier);
+    M := FindFunction(17, Module, TGenericProperty);
+    Check(M <> Nil, 'Property not found!');
+    CheckEquals(M.Line, 12);
+    Checkequals('MyProperty4', M.Identifier);
+  Finally
+    Module.Free;
   End;
 End;
 

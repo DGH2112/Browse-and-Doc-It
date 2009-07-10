@@ -28,10 +28,6 @@ type
     Function CurrentToken : TTokenInfo;
   End;
 
-  TTestMemoryStream = Class Helper For TMemoryStream
-    Procedure LoadBufferFromString(strCode : String);
-  End;
-
   TClassOfTGenericTypeDecl = Class Of TGenericTypeDecl;
 
   TExtendedTestCase = Class(TTestCase)
@@ -323,7 +319,7 @@ type
 
   TestTBaseLanguageModule = class(TTestCase)
   strict private
-    FStream : TMemoryStream;
+    FSource : String;
     FBaseLanguageModule: TTestBaseLanguageModule;
   public
     procedure SetUp; override;
@@ -461,15 +457,6 @@ end;
 
 procedure TTestBaseLanguageModule.ProcessCompilerDirective(var iSkip: Integer);
 begin
-end;
-
-{ TTestMemoryStream }
-
-procedure TTestMemoryStream.LoadBufferFromString(strCode: String);
-begin
-  Clear;
-  WriteBuffer(strCode[1], Length(strCode));
-  Position := 0;
 end;
 
 { TExtendedTestCase }
@@ -2197,9 +2184,8 @@ end;
 
 procedure TestTBaseLanguageModule.SetUp;
 begin
-  FStream := TMemoryStream.Create;
-  FStream.LoadBufferFromString('This is some text.');
-  FBaseLanguageModule := TTestBaseLanguageModule.CreateParser(FStream,
+  FSource := 'This is some text.';
+  FBaseLanguageModule := TTestBaseLanguageModule.CreateParser(FSource,
     'D:\Path\TestFile.txt', True, [moParse, moCheckForDocumentConflicts]);
   FBaseLanguageModule.AddToken(TTokenInfo.Create('Hello', 0, 1, 1, 5, ttIdentifier));
   FBaseLanguageModule.AddToken(TTokenInfo.Create('Goodbye', 7, 1, 7, 7, ttIdentifier));
@@ -2209,7 +2195,6 @@ procedure TestTBaseLanguageModule.TearDown;
 begin
   FBaseLanguageModule.Free;
   FBaseLanguageModule := nil;
-  FStream.Free;
 end;
 
 procedure TestTBaseLanguageModule.TestAddDef;

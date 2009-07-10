@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    10 Mar 2009
+  @Date    10 Jul 2009
   @Version 1.0
 
 **)
@@ -15,7 +15,7 @@ Interface
 Uses
   SysUtils, Classes, BaseLanguageModule;
 
-  Function Dispatcher(Source : TStream; strFileName : String;
+  Function Dispatcher(Source : String; strFileName : String;
     boolModified : Boolean; ModuleOptions : TModuleOptions) : TBaseLanguageModule;
   Function CanParseDocument(strFileName : String) : Boolean;
   Function CanDocumentDocument(strFileName : String) : Boolean;
@@ -95,14 +95,14 @@ End;
   @postcon Returns an instance of a TBaseLanguageModule assigned a specific
            language parser depending on the extension of the file passed.
 
-  @param   Source        as a TStream
+  @param   Source        as a String
   @param   strFileName   as a String
   @param   boolModified  as a Boolean
   @param   ModuleOptions as a TModuleOptions
   @return  a TBaseLanguageModule
 
 **)
-Function Dispatcher(Source : TStream; strFileName : String;
+Function Dispatcher(Source : String; strFileName : String;
   boolModified : Boolean; ModuleOptions : TModuleOptions) : TBaseLanguageModule;
 
 Var

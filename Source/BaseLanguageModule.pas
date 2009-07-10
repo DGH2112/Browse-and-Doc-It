@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    12 Apr 2009
+  @Date    10 Jul 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -386,7 +386,7 @@ Type
   TTokenReference = (trUnknown, trUnresolved, trResolved);
 
   (** A type of a set of Characters. **)
-  TSymbols = Set Of Char;
+  TSymbols = Set Of AnsiChar;
 
   (** This is a class the store information about each token **)
   TTokenInfo = Class
@@ -1004,7 +1004,7 @@ Type
 
   (** This is a type for a set of characters and the return type of several
       properties. **)
-  TCharSet = Set of Char;
+  TCharSet = Set of AnsiChar;
 
   (** A type to define the type of token search. **)
   TSeekToken = (stActual, stFirst);
@@ -1097,7 +1097,7 @@ Type
     **)
     Property CommentClass : TCommentClass Read FCommentClass Write FCommentClass;
   Public
-    Constructor CreateParser(Source : TStream; strFileName : String;
+    Constructor CreateParser(Source : String; strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Virtual;
     Destructor Destroy; Override;
     Procedure AddTickCount(strLabel : String);
@@ -1916,9 +1916,9 @@ ResourceString
 
 Const
   (** A set of characters for whitespace **)
-  strWhiteSpace : Set Of Char = [#32, #9];
+  strWhiteSpace : Set Of AnsiChar = [#32, #9];
   (** A set of characters for line feed and carriage return **)
-  strLineEnd : Set of Char = [#10, #13];
+  strLineEnd : Set of AnsiChar = [#10, #13];
 
   (** This is a string array representing the TDocOption enumerates. **)
   DocOptionInfo : Array[Low(TDocOption)..High(TDocOption)] Of TDocOptionRec = (
@@ -2414,7 +2414,7 @@ end;
   not required and any trialing whitespace.
 
   @precon  C must eb a valid instance of a TBaseContainer.
-  @postcon Outputs the comment or tag as a string missing out HTML tags if not 
+  @postcon Outputs the comment or tag as a string missing out HTML tags if not
            required and any trialing whitespace.
 
   @param   C            as a TBaseContainer
@@ -2559,7 +2559,11 @@ Begin
       If (Length(Result) > 0) And (Length(strDelimiter) > 0) Then
         If TokenCount > 0 Then
           Begin
+            {$IFNDEF D2009}
             If Not (strDelimiter[1] In strNoSpaceBefore) Then
+            {$ELSE}
+            If Not (CharInSet(strDelimiter[1], strNoSpaceBefore)) Then
+            {$ENDIF}
               Result := Result + #32;
             Result := Result + strDelimiter;
           End;
@@ -2574,11 +2578,23 @@ Begin
         Begin
           boolSpace := (iToken > -1) Or (strDelimiter <> '');
           T := Tokens[iToken];
+          {$IFNDEF D2009}
           boolSpace := boolSpace And Not (T.Token[1] In strNoSpaceBefore);
+          {$ELSE}
+          boolSpace := boolSpace And Not (CharInSet(T.Token[1], strNoSpaceBefore));
+          {$ENDIF}
           If (L <> Nil) And (L.Length > 0) Then
+            {$IFNDEF D2009}
             boolSpace := boolSpace  And Not (L.Token[1] In strNoSpaceAfter);
+            {$ELSE}
+            boolSpace := boolSpace  And Not (CharInSet(L.Token[1], strNoSpaceAfter));
+            {$ENDIF}
           If Result <> '' Then
+            {$IFNDEF D2009}
             If boolSpace Or ((L.Length > 0) And (L.Token[1] In strSpaceAfter)) Then
+            {$ELSE}
+            If boolSpace Or ((L.Length > 0) And (CharInSet(L.Token[1], strSpaceAfter))) Then
+            {$ENDIF}
               If Not (boolForDocumentation And (iLength + T.Length > iMaxWidth)) Then
                 Begin
                   If (L.TokenType <> ttHTMLStartTag) And (T.TokenType <> ttHTMLEndTag) Then
@@ -2803,7 +2819,7 @@ end;
 
   @param   iMaxWidth    as an Integer
   @param   boolShowHTML as a Boolean
-  @return  a String      
+  @return  a String
 
 **)
 function TTag.AsString(iMaxWidth : Integer; boolShowHTML : Boolean): String;
@@ -3209,24 +3225,48 @@ begin
   For i := 1 To Length(strComment) Do
     Begin
       LastToken := CurToken;
+      {$IFNDEF D2009}
       If strComment[i] In strWhiteSpace Then
+      {$ELSE}
+      If CharInSet(strComment[i], strWhiteSpace) Then
+      {$ENDIF}
         CurToken := ttWhiteSpace
+      {$IFNDEF D2009}
       Else If strComment[i] In ['@', '_', 'a'..'z', 'A'..'Z'] Then
+      {$ELSE}
+      Else If CharInSet(strComment[i], ['@', '_', 'a'..'z', 'A'..'Z']) Then
+      {$ENDIF}
         Begin
+          {$IFNDEF D2009}
           If (LastToken = ttNumber) And (strComment[i] In ['A'..'F', 'a'..'f']) Then
+          {$ELSE}
+          If (LastToken = ttNumber) And (CharInSet(strComment[i], ['A'..'F', 'a'..'f'])) Then
+          {$ENDIF}
             CurToken := ttNumber
           Else
             CurToken := ttIdentifier;
         End
+      {$IFNDEF D2009}
       Else If strComment[i] In ['0'..'9'] Then
+      {$ELSE}
+      Else If CharInSet(strComment[i], ['0'..'9']) Then
+      {$ENDIF}
         Begin
           CurToken := ttNumber;
           If LastToken = ttIdentifier Then
             CurToken := ttIdentifier;
         End
+      {$IFNDEF D2009}
       Else If strComment[i] In strLineEnd Then
+      {$ELSE}
+      Else If CharInSet(strComment[i], strLineEnd) Then
+      {$ENDIF}
         CurToken := ttLineEnd
+      {$IFNDEF D2009}
       Else If strComment[i] In [#33..#128] - ['a'..'z', 'A'..'Z', '@', '#'] Then
+      {$ELSE}
+      Else If CharInSet(strComment[i], [#33..#128] - ['a'..'z', 'A'..'Z', '@', '#']) Then
+      {$ENDIF}
         CurToken := ttSymbol
       Else
         CurToken := ttUnknown;
@@ -3237,7 +3277,11 @@ begin
           SetLength(strToken, iTokenLen);
           If iTokenLen > 0 Then
             Begin
+              {$IFNDEF D2009}
               If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
+              {$ELSE}
+              If Not (CharInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
+              {$ENDIF}
                 Begin
                   AddToken(strToken, LastToken);
                   LastTokenAdded := LastToken;
@@ -3289,7 +3333,11 @@ begin
   If (iTokenLen > 0) Then
     Begin
       SetLength(strToken, iTokenLen);
+      {$IFNDEF D2009}
       If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
+      {$ELSE}
+      If Not (CharInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
+      {$ENDIF}
         AddToken(strToken, LastToken);
     End;
   TrimTrailingWhitespace;
@@ -4871,13 +4919,13 @@ end;
   @postcon Initialise this base class and Tokensizes the passed stream of 
            characters. 
 
-  @param   Source        as a TStream
+  @param   Source        as a String
   @param   strFileName   as a String
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
 
 **)
-constructor TBaseLanguageModule.CreateParser(Source : TStream;
+constructor TBaseLanguageModule.CreateParser(Source : String;
   strFileName : String; IsModified : Boolean; ModuleOptions : TModuleOptions);
 
 begin

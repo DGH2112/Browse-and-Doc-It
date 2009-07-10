@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       16 Apr 2009
+  @Date       10 Jul 2009
   @Author     David Hoyle
 
 **)
@@ -317,7 +317,7 @@ Type
     FAttributesLabel: TLabelContainer;
     FOptionsLabel: TLabelContainer;
     FImplementsLabel: TLabelContainer;
-    FSourceStream: TStream;
+    FSource: String;
     FModuleType : TModuleType;
     FUnResolvedSymbols : TStringList;
     FEventHandlerPatterns: TStringList;
@@ -358,7 +358,7 @@ Type
     Procedure CheckExceptionHandling;
     Procedure ResolvedForwardReferences;
   Public
-    Constructor CreateParser(Source : TStream; strFileName : String;
+    Constructor CreateParser(Source : String; strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function KeyWords : TKeyWords; Override;
@@ -387,14 +387,14 @@ Uses
 
 Const
   (** A set of characters for alpha characaters **)
-  strTokenChars : Set Of Char = ['_', 'a'..'z', 'A'..'Z'];
+  strTokenChars : Set Of AnsiChar = ['_', 'a'..'z', 'A'..'Z'];
   (** A set of numbers **)
-  strNumbers : Set Of Char = ['&', '0'..'9'];
+  strNumbers : Set Of AnsiChar = ['&', '0'..'9'];
   (** A set of characters for general symbols **)
-  strSymbols : Set Of Char = ['&', '(', ')', '*', '+', '%', '$', '&',
+  strSymbols : Set Of AnsiChar = ['&', '(', ')', '*', '+', '%', '$', '&',
     ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}'];
   (** A set of characters for quotes **)
-  strQuote : Set Of Char = ['"'];
+  strQuote : Set Of AnsiChar = ['"'];
   (**
     A sorted list of keywords. Used for identifying tokens as keyword.
 
@@ -534,7 +534,11 @@ begin
             If sl[iCommentLine][1] = '''' Then
               sl[iCommentLine] := ReplaceCharacter(sl[iCommentLine], 1, #32);
             If Length(sl[iCommentLine]) > 1 Then
+              {$IFNDEF D2009}
               If (sl[iCommentLine][2] In [':', '''']) Then
+              {$ELSE}
+              If (CharInSet(sl[iCommentLine][2], [':', ''''])) Then
+              {$ENDIF}
                 Begin
                   boolDocComment := True;
                   sl[iCommentLine] := ReplaceCharacter(sl[iCommentLine], 2, #32);
@@ -1389,13 +1393,13 @@ end;
            source code module has been modified since the last save to disk.
   @postcon Initialise the class and parses the text stream.
 
-  @param   Source        as a TStream
+  @param   Source        as a String
   @param   strFileName   as a String
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
 
 **)
-Constructor TVBModule.CreateParser(Source : TStream; strFileName : String;
+Constructor TVBModule.CreateParser(Source : String; strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
 
 var
@@ -1418,7 +1422,7 @@ Begin
   FEventHandlerPatterns := TStringList.Create;
   FEventHandlerPatterns.Add('*_*');
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
-  FSourceStream := Source;
+  FSource := Source;
   AddTickCount('Start');
   CommentClass := TVBComment;
   If AnsiCompareText(ExtractFileExt(FileName), '.cls') = 0 Then
@@ -1537,7 +1541,6 @@ Const
   iTokenCapacity = 25;
 
 Var
-  boolEOF : Boolean;
   (** Token buffer. **)
   strToken : String;
   CurCharType : TBADITokenType;
@@ -1558,174 +1561,212 @@ Var
   Ch : Char;
   (** Token size **)
   iTokenLen : Integer;
+  iChar: Integer;
 
 Begin
   BlockType := btNoBlock;
   iStreamPos := 0;
   iTokenLine := 1;
   iTokenColumn := 1;
-  boolEOF := False;
   CurCharType := ttUnknown;
   LastToken := ttUnknown;
   iStreamCount := 0;
   iLine := 1;
   iColumn := 1;
-  Ch := #0;
   strToken := '';
-  
+
   iTokenLen := 0;
   SetLength(strToken, iTokenCapacity);
-  
-  If FSourceStream <> Nil Then
+
+  For iChar := 1 To Length(FSource) Do
     Begin
-      Repeat
-        If FSourceStream.Read(ch, 1) > 0 Then
-          Begin
-            Inc(iStreamCount);
-            LastToken := CurCharType;
+      ch := FSource[iChar];
+      Inc(iStreamCount);
+      LastToken := CurCharType;
 
-            If ch In strWhiteSpace Then
-              CurCharType := ttWhiteSpace
-            Else If ch In strTokenChars Then
-              Begin
-                If (LastToken = ttNumber) And (Ch In ['A'..'F', 'H', 'a'..'f', 'h']) Then
-                  CurCharType := ttNumber
-                Else
-                  If (LastToken In [ttWhiteSpace]) And (Ch In ['_']) Then
-                    CurCharType := ttLineContinuation
-                  Else
-                    Begin
-                      If LastToken In [ttLineContinuation] Then
-                        LastToken := ttIdentifier;
-                      CurCharType := ttIdentifier
-                    End;
-              End
-            Else If ch In strNumbers Then
-              Begin
-                CurCharType := ttNumber;
-                If LastToken = ttIdentifier Then
-                  CurCharType := ttIdentifier;
-              End
-            Else If ch In strLineEnd Then
-              CurCharType := ttLineEnd
-            Else If ch In strQuote Then
-              CurCharType := ttStringLiteral
-            Else If ch In strSymbols Then
-              Begin
-                CurCharType := ttSymbol;
-                If (Ch = '.') And (LastToken = ttNumber) Then
-                  CurCharType := ttNumber;
-                If (LastToken In [ttIdentifier]) And (Ch In ['%', '$', '&']) Then
-                  CurCharType := ttIdentifier;
-              End
+      {$IFNDEF D2009}
+      If ch In strWhiteSpace Then
+      {$ELSE}
+      If CharInSet(ch, strWhiteSpace) Then
+      {$ENDIF}
+        CurCharType := ttWhiteSpace
+      {$IFNDEF D2009}
+      Else If ch In strTokenChars Then
+      {$ELSE}
+      Else If CharInSet(ch, strTokenChars) Then
+      {$ENDIF}
+        Begin
+         {$IFNDEF D2009}
+          If (LastToken = ttNumber) And (Ch In ['A'..'F', 'H', 'a'..'f', 'h']) Then
+          {$ELSE}
+          If (LastToken = ttNumber) And (CharInSet(Ch, ['A'..'F', 'H', 'a'..'f', 'h'])) Then
+          {$ENDIF}
+            CurCharType := ttNumber
+          Else
+            {$IFNDEF D2009}
+            If (LastToken In [ttWhiteSpace]) And (Ch In ['_']) Then
+            {$ELSE}
+            If (LastToken In [ttWhiteSpace]) And (CharInSet(Ch, ['_'])) Then
+            {$ENDIF}
+              CurCharType := ttLineContinuation
             Else
-              CurCharType := ttUnknown;
-
-            If (LastToken <> CurCharType) Or (CurCharType = ttSymbol) Then
               Begin
-                If ((BlockType In [btStringLiteral, btLineComment]) And
-                  (CurCharType <> ttLineEnd)) Or (BlockType In [btBraceComment]) Then
-                  Begin
-                    Inc(iTokenLen);
-                    If iTokenLen > Length(strToken) Then
-                      SetLength(strToken, iTokenCapacity + Length(strToken));
-                    strToken[iTokenLen] := Ch;
-                  End Else
-                  Begin
-                    SetLength(strToken, iTokenLen);
-                    If iTokenLen > 0 Then
-                      If Not (strToken[1] In strWhiteSpace) Then
-                        Begin
-                          If LastToken = ttIdentifier Then
-                            Begin
-                              If IsKeyWord(strToken, strReservedWords) Then
-                                LastToken := ttReservedWord;
-                              If IsKeyWord(strToken, strDirectives) Then
-                                LastToken := ttDirective;
-                            End;
-                          If BlockType = btLineComment Then
-                            LastToken := ttLineComment;
-                          If (LastToken = ttLineComment) And (Length(strToken) > 2) Then
-                            If (strToken[1] = '{') And (strToken[2] = '$') Then
-                              LastToken := ttCompilerDirective;
-                          AddToken(TTokenInfo.Create(strToken, iStreamPos,
-                            iTokenLine, iTokenColumn, Length(strToken), LastToken));
-                          //Inc(iCounter);
-                        End;
-                   // Store Stream position, line number and column of
-                   // token start
-                   iStreamPos := iStreamCount;
-                   iTokenLine := iLine;
-                   iTokenColumn := iColumn;
-                   BlockType := btNoBlock;
-                   iTokenLen := 1;
-                   SetLength(strToken, iTokenCapacity);
-                   strToken[iTokenLen] := Ch;
-                  End;
-              End Else
-              Begin
-                Inc(iTokenLen);
-                If iTokenLen > Length(strToken) Then
-                  SetLength(strToken, iTokenCapacity + Length(strToken));
-                strToken[iTokenLen] := Ch;
+                If LastToken In [ttLineContinuation] Then
+                  LastToken := ttIdentifier;
+                CurCharType := ttIdentifier
               End;
+        End
+      {$IFNDEF D2009}
+      Else If ch In strNumbers Then
+      {$ELSE}
+      Else If CharInSet(ch, strNumbers) Then
+      {$ENDIF}
+        Begin
+          CurCharType := ttNumber;
+          If LastToken = ttIdentifier Then
+            CurCharType := ttIdentifier;
+        End
+      {$IFNDEF D2009}
+      Else If ch In strLineEnd Then
+      {$ELSE}
+      Else If CharInSet(ch, strLineEnd) Then
+      {$ENDIF}
+        CurCharType := ttLineEnd
+      {$IFNDEF D2009}
+      Else If ch In strQuote Then
+      {$ELSE}
+      Else If CharInSet(ch, strQuote) Then
+      {$ENDIF}
+        CurCharType := ttStringLiteral
+      {$IFNDEF D2009}
+      Else If ch In strSymbols Then
+      {$ELSE}
+      Else If CharInSet(ch, strSymbols) Then
+      {$ENDIF}
+        Begin
+          CurCharType := ttSymbol;
+          If (Ch = '.') And (LastToken = ttNumber) Then
+            CurCharType := ttNumber;
+          {$IFNDEF D2009}
+          If (LastToken In [ttIdentifier]) And (Ch In ['%', '$', '&']) Then
+          {$ELSE}
+          If (LastToken In [ttIdentifier]) And (CharInSet(Ch, ['%', '$', '&'])) Then
+          {$ENDIF}
+            CurCharType := ttIdentifier;
+        End
+      Else
+        CurCharType := ttUnknown;
 
-            // Check for line comments
-            If (BlockType = btNoBlock) And (Ch = '''') Then
-              BlockType := btLineComment;
+      If (LastToken <> CurCharType) Or (CurCharType = ttSymbol) Then
+        Begin
+          If ((BlockType In [btStringLiteral, btLineComment]) And
+            (CurCharType <> ttLineEnd)) Or (BlockType In [btBraceComment]) Then
+            Begin
+              Inc(iTokenLen);
+              If iTokenLen > Length(strToken) Then
+                SetLength(strToken, iTokenCapacity + Length(strToken));
+              strToken[iTokenLen] := Ch;
+            End Else
+            Begin
+              SetLength(strToken, iTokenLen);
+              If iTokenLen > 0 Then
+                {$IFNDEF D2009}
+                If Not (strToken[1] In strWhiteSpace) Then
+                {$ELSE}
+                If Not (CharInSet(strToken[1], strWhiteSpace)) Then
+                {$ENDIF}
+                  Begin
+                    If LastToken = ttIdentifier Then
+                      Begin
+                        If IsKeyWord(strToken, strReservedWords) Then
+                          LastToken := ttReservedWord;
+                        If IsKeyWord(strToken, strDirectives) Then
+                          LastToken := ttDirective;
+                      End;
+                    If BlockType = btLineComment Then
+                      LastToken := ttLineComment;
+                    If (LastToken = ttLineComment) And (Length(strToken) > 2) Then
+                      If (strToken[1] = '{') And (strToken[2] = '$') Then
+                        LastToken := ttCompilerDirective;
+                    AddToken(TTokenInfo.Create(strToken, iStreamPos,
+                      iTokenLine, iTokenColumn, Length(strToken), LastToken));
+                    //Inc(iCounter);
+                  End;
+              // Store Stream position, line number and column of
+              // token start
+              iStreamPos := iStreamCount;
+              iTokenLine := iLine;
+              iTokenColumn := iColumn;
+              BlockType := btNoBlock;
+              iTokenLen := 1;
+              SetLength(strToken, iTokenCapacity);
+              strToken[iTokenLen] := Ch;
+            End;
+        End Else
+        Begin
+          Inc(iTokenLen);
+          If iTokenLen > Length(strToken) Then
+            SetLength(strToken, iTokenCapacity + Length(strToken));
+          strToken[iTokenLen] := Ch;
+        End;
 
-            // Check for string literals
-            If CurCharType = ttStringLiteral Then
-              If BlockType = btStringLiteral Then
-                BlockType := btNoBlock
-              Else If BlockType = btNoBlock Then
-                BlockType := btStringLiteral;
+      // Check for line comments
+      If (BlockType = btNoBlock) And (Ch = '''') Then
+        BlockType := btLineComment;
 
-              // Check for block Comments
-              If (BlockType = btNoBlock) And (Ch = '{') Then
-                Begin
-                  CurCharType := ttLineComment;
-                  BlockType := btBraceComment;
-                End;
-              If (BlockType = btBraceComment) And (Ch = '}') Then
-                Begin
-                  CurCharType := ttLineComment;
-                  BlockType := btNoBlock;
-                End;
+      // Check for string literals
+      If CurCharType = ttStringLiteral Then
+        If BlockType = btStringLiteral Then
+          BlockType := btNoBlock
+        Else If BlockType = btNoBlock Then
+          BlockType := btStringLiteral;
+
+        // Check for block Comments
+        If (BlockType = btNoBlock) And (Ch = '{') Then
+          Begin
+            CurCharType := ttLineComment;
+            BlockType := btBraceComment;
+          End;
+        If (BlockType = btBraceComment) And (Ch = '}') Then
+          Begin
+            CurCharType := ttLineComment;
+            BlockType := btNoBlock;
+          End;
 //              If BlockType = btCompoundSymbol Then
 //                BlockType := btNoBlock;
 
-            Inc(iColumn);
-            If Ch = #10 Then
-              Begin
-                Inc(iLine);
-                iColumn := 1;
-                If BlockType In [btLineComment, btStringLiteral] Then
-                  BlockType := btNoBlock;
-              End;
-          End Else
-            boolEOF := True;
-      Until boolEOF;
-      If iTokenLen > 0 Then
+      Inc(iColumn);
+      If Ch = #10 Then
         Begin
-          SetLength(strToken, iTokenLen);
-          If iTokenLen > 0 Then
-            If Not (strToken[1] In strWhiteSpace) Then
-              Begin
-                If LastToken = ttIdentifier Then
-                  Begin
-                    If IsKeyWord(strToken, strReservedWords) Then
-                      LastToken := ttReservedWord;
-                    If IsKeyWord(strToken, strDirectives) Then
-                      LastToken := ttDirective;
-                  End;
-                AddToken(TTokenInfo.Create(strToken, iStreamPos,
-                  iTokenLine, iTokenColumn, Length(strToken), LastToken));
-              End;
+          Inc(iLine);
+          iColumn := 1;
+          If BlockType In [btLineComment, btStringLiteral] Then
+            BlockType := btNoBlock;
         End;
-      AddToken(TTokenInfo.Create('', iStreamPos, iTokenLine, iTokenColumn, 0,
-        ttFileEnd));
     End;
+  If iTokenLen > 0 Then
+    Begin
+      SetLength(strToken, iTokenLen);
+      If iTokenLen > 0 Then
+        {$IFNDEF D2009}
+        If Not (strToken[1] In strWhiteSpace) Then
+        {$ELSE}
+        If Not (CharInSet(strToken[1], strWhiteSpace)) Then
+        {$ENDIF}
+          Begin
+            If LastToken = ttIdentifier Then
+              Begin
+                If IsKeyWord(strToken, strReservedWords) Then
+                  LastToken := ttReservedWord;
+                If IsKeyWord(strToken, strDirectives) Then
+                  LastToken := ttDirective;
+              End;
+            AddToken(TTokenInfo.Create(strToken, iStreamPos,
+              iTokenLine, iTokenColumn, Length(strToken), LastToken));
+          End;
+    End;
+  AddToken(TTokenInfo.Create('', iStreamPos, iTokenLine, iTokenColumn, 0,
+    ttFileEnd));
 End;
 
 (**

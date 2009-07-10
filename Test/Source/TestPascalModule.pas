@@ -277,7 +277,7 @@ type
   //
   TestTPascalModule = Class(TExtendedTestCase)
   Strict Private
-    FSource: TMemoryStream;
+    FSource: String;
     FPascalModule : TPascalModule;
   Public
     Procedure SetUp; Override;
@@ -1491,8 +1491,7 @@ end;
 Procedure TestTPascalModule.Setup;
 
 Begin
-  FSource := TMemoryStream.Create;
-  FSource.LoadBufferFromString(
+  FSource :=
     '(**'#13#10 +
     '  Hello description.'#13#10 +
     '  @Date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
@@ -1507,8 +1506,7 @@ Begin
     ''#13#10 +
     'Begin'#13#10 +
     '  // Do nothing.'#13#10 +
-    'End.'#13#10
-  );
+    'End.'#13#10;
   FPascalModule := TPascalModule.CreateParser(FSource, 'Hello.dpr', True,
     [moParse, moCheckForDocumentConflicts]);
 End;
@@ -1517,7 +1515,6 @@ Procedure TestTPascalModule.TearDown;
 
 Begin
   FPascalModule.Free;
-  FSource.Free;
 End;
 
 procedure TestTPascalModule.TestAddOp;
@@ -1542,23 +1539,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -1579,23 +1569,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -1619,30 +1602,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TArrayType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TArrayType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -1673,23 +1649,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -1716,23 +1685,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -1757,23 +1719,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -1798,23 +1753,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -1844,23 +1792,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -1893,14 +1834,10 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
-  Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
     Try
       //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
       CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
@@ -1908,9 +1845,6 @@ begin
     Finally
       P.Free;
     End;
-  Finally
-    Source.Free;
-  End;
 end;
 
 procedure TestTPascalModule.TestClassHeritage;
@@ -1932,14 +1866,10 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
-  Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
     Try
       //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
       CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
@@ -1947,9 +1877,6 @@ begin
     Finally
       P.Free;
     End;
-  Finally
-    Source.Free;
-  End;
 end;
 
 procedure TestTPascalModule.TestClassMethodList;
@@ -1990,23 +1917,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2040,23 +1960,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2076,23 +1989,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2121,23 +2027,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2167,7 +2066,6 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T, C: TElementContainer;
   i: Integer;
@@ -2175,33 +2073,27 @@ Var
   j: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          Begin
-            C := T.Elements[i];
-            V := C.FindElement(strClassVarsLabel);
-            Check(T <> Nil, 'Can not find ClassVars label.');
-            If V <> Nil Then
-              Begin
-                For j := 1 To V.ElementCount Do
-                  CheckEquals(TVar.ClassName, V.Elements[j].ClassName);
-              End;
-          End;
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        Begin
+          C := T.Elements[i];
+          V := C.FindElement(strClassVarsLabel);
+          Check(T <> Nil, 'Can not find ClassVars label.');
+          If V <> Nil Then
+            Begin
+              For j := 1 To V.ElementCount Do
+                CheckEquals(TVar.ClassName, V.Elements[j].ClassName);
+            End;
+        End;
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2228,23 +2120,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2270,23 +2155,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2331,35 +2209,28 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   I: TElementContainer;
   M: TPascalMethod;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(Format(strSource, [FormatDateTime('dd mmm yyyy',
+    Now)]), '', True, [moParse, moCheckForDocumentConflicts]);
   Try
-    Source.LoadBufferFromString(Format(strSource, [FormatDateTime('dd mmm yyyy', Now)]));
-    P := TPascalModule.CreateParser(Source, '', True, [moParse,
-      moCheckForDocumentConflicts]);
-    Try
-      CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      I := P.FindElement(strImplementedMethodsLabel);
-      Check(I <> Nil, 'Implemented Methods Not Found!');
-      M := I.FindElement('Hello1', ftIdentifier) As TPascalMethod;
-      Check(M <> Nil, 'Method Hello1 NOT Found');
-      CheckEquals('Ident : Array Of String', M.Parameters[0].AsString(True, False));
-      M := I.FindElement('Hello2', ftIdentifier) As TPascalMethod;
-      Check(M <> Nil, 'Method Hello2 NOT Found');
-      CheckEquals('Ident : Array Of Const', M.Parameters[0].AsString(True, False));
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    I := P.FindElement(strImplementedMethodsLabel);
+    Check(I <> Nil, 'Implemented Methods Not Found!');
+    M := I.FindElement('Hello1', ftIdentifier) As TPascalMethod;
+    Check(M <> Nil, 'Method Hello1 NOT Found');
+    CheckEquals('Ident : Array Of String', M.Parameters[0].AsString(True, False));
+    M := I.FindElement('Hello2', ftIdentifier) As TPascalMethod;
+    Check(M <> Nil, 'Method Hello2 NOT Found');
+    CheckEquals('Ident : Array Of Const', M.Parameters[0].AsString(True, False));
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2382,25 +2253,18 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(Format(strSource, [FormatDateTime('dd mmm yyyy',
+    Now)]), '', True, [moParse, moCheckForDocumentConflicts]);
   Try
-    Source.LoadBufferFromString(Format(strSource, [FormatDateTime('dd mmm yyyy', Now)]));
-    P := TPascalModule.CreateParser(Source, '', True, [moParse,
-      moCheckForDocumentConflicts]);
-    Try
-      CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2419,23 +2283,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2467,25 +2324,18 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', True, [moParse,
+    moCheckForDocumentConflicts]);
   Try
-    Source.LoadBufferFromString(Format(strSource, [FormatDateTime('dd mmm yyyy', Now)]));
-    P := TPascalModule.CreateParser(Source, '', True, [moParse,
-      moCheckForDocumentConflicts]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2508,23 +2358,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2545,23 +2388,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2588,23 +2424,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2635,23 +2464,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2678,23 +2500,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2718,23 +2533,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2759,23 +2567,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2799,23 +2600,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2842,23 +2636,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2882,14 +2669,10 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
-  Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
+    P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
     Try
       //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
       CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
@@ -2897,9 +2680,6 @@ begin
     Finally
       P.Free;
     End;
-  Finally
-    Source.Free;
-  End;
 end;
 
 procedure TestTPascalModule.TestCodeFailure16;
@@ -2921,23 +2701,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -2961,23 +2734,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3005,23 +2771,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3051,23 +2810,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3103,23 +2855,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3143,23 +2888,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3186,23 +2924,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3229,23 +2960,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3275,23 +2999,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3313,23 +3030,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3359,23 +3069,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3406,23 +3109,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3442,23 +3138,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3515,23 +3204,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3558,23 +3240,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3596,23 +3271,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3641,23 +3309,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3749,23 +3410,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3786,30 +3440,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TEnumerateType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TEnumerateType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3830,30 +3477,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TEnumerateType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TEnumerateType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3888,23 +3528,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3932,23 +3565,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -3969,23 +3595,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4005,23 +3624,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4044,23 +3656,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4084,23 +3689,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4132,23 +3730,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4171,30 +3762,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4227,30 +3811,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4271,30 +3848,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TFileType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TFileType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4316,23 +3886,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4354,23 +3917,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4411,32 +3967,24 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource1, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource1);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
-    Source.LoadBufferFromString(strSource2);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
+  End;
+  P := TPascalModule.CreateParser(strSource2, '', False, [moParse]);
+  Try
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
   End;
 end;
 
@@ -4458,23 +4006,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4506,23 +4047,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4539,23 +4073,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4583,23 +4110,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4628,23 +4148,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4686,51 +4199,32 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource1, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource1);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource2, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource2);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource3, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource3);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4774,23 +4268,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4815,23 +4302,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4857,23 +4337,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4902,23 +4375,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4951,23 +4417,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -4996,23 +4455,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5065,23 +4517,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5134,23 +4579,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5179,23 +4617,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5229,23 +4660,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5281,23 +4705,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5332,23 +4749,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5363,23 +4773,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5398,23 +4801,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5429,23 +4825,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5474,23 +4863,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5521,23 +4903,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5568,30 +4943,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TOrdIdent.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TOrdIdent.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5613,23 +4981,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5676,23 +5037,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5713,30 +5067,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TPointerType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TPointerType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5806,23 +5153,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5844,25 +5184,18 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
-end;
+End;
 
 procedure TestTPascalModule.TestProcedureDeclSection;
 
@@ -5897,23 +5230,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5945,23 +5271,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -5986,30 +5305,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TProcedureType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TProcedureType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6046,24 +5358,17 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 Begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      CheckEquals(True, P.IfDef('DGH'));
-      CheckEquals(False, P.IfDef('DGH1'));
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    CheckEquals(True, P.IfDef('DGH'));
+    CheckEquals(False, P.IfDef('DGH1'));
   Finally
-    Source.Free;
+    P.Free;
   End;
 End;
 
@@ -6083,23 +5388,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6122,23 +5420,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6172,23 +5463,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6211,23 +5495,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6258,23 +5535,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6298,23 +5568,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6340,30 +5603,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TRealType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TRealType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6391,23 +5647,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6435,23 +5684,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6476,30 +5718,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6532,30 +5767,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6606,23 +5834,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6647,23 +5868,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6683,23 +5897,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6732,23 +5939,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6781,23 +5981,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6825,23 +6018,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6864,23 +6050,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6903,23 +6082,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6940,30 +6112,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TSetType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TSetType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -6989,23 +6154,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7033,23 +6191,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7072,23 +6223,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7117,23 +6261,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7162,23 +6299,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7202,30 +6332,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TStringType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TStringType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7273,23 +6396,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7314,33 +6430,26 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          If T.Elements[i].Identifier <> 't04' Then // Skip record as its derived from TStrictType deliberately
-            Check(T.Elements[i] Is TStrucType,
-              Format('Expected type ''%s'' but found ''%s''.', [
-              TStrucType.ClassName, T.Elements[i].ClassName]));
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        If T.Elements[i].Identifier <> 't04' Then // Skip record as its derived from TStrictType deliberately
+          Check(T.Elements[i] Is TStrucType,
+            Format('Expected type ''%s'' but found ''%s''.', [
+            TStrucType.ClassName, T.Elements[i].ClassName]));
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7362,30 +6471,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TSubRangeType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TSubRangeType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7409,23 +6511,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7455,30 +6550,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   V: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      V := P.FindElement(strThreadVarsLabel);
-      Check(V <> Nil, 'Can not find ThreadVars label.');
-      If V <> Nil Then
-        For i := 1 To V.ElementCount Do
-          CheckEquals(TThreadVar.ClassName, V.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    V := P.FindElement(strThreadVarsLabel);
+    Check(V <> Nil, 'Can not find ThreadVars label.');
+    If V <> Nil Then
+      For i := 1 To V.ElementCount Do
+        CheckEquals(TThreadVar.ClassName, V.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7508,30 +6596,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   V: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      V := P.FindElement(strThreadVarsLabel);
-      Check(V <> Nil, 'Can not find ThreadVars label.');
-      If V <> Nil Then
-        For i := 1 To V.ElementCount Do
-          CheckEquals(TThreadVar.ClassName, V.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    V := P.FindElement(strThreadVarsLabel);
+    Check(V <> Nil, 'Can not find ThreadVars label.');
+    If V <> Nil Then
+      For i := 1 To V.ElementCount Do
+        CheckEquals(TThreadVar.ClassName, V.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7566,23 +6647,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7617,23 +6691,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7667,23 +6734,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7717,23 +6777,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7756,23 +6809,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7806,30 +6852,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   V: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      V := P.FindElement(strVarsLabel);
-      Check(V <> Nil, 'Can not find Vars label.');
-      If V <> Nil Then
-        For i := 1 To V.ElementCount Do
-          CheckEquals(TVar.ClassName, V.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    V := P.FindElement(strVarsLabel);
+    Check(V <> Nil, 'Can not find Vars label.');
+    If V <> Nil Then
+      For i := 1 To V.ElementCount Do
+        CheckEquals(TVar.ClassName, V.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7862,30 +6901,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7906,30 +6938,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   T: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      T := P.FindElement(strTypesLabel);
-      Check(T <> Nil, 'Can not find Types label.');
-      If T <> Nil Then
-        For i := 1 To T.ElementCount Do
-          CheckEquals(TVariantType.ClassName, T.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement(strTypesLabel);
+    Check(T <> Nil, 'Can not find Types label.');
+    If T <> Nil Then
+      For i := 1 To T.ElementCount Do
+        CheckEquals(TVariantType.ClassName, T.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -7962,30 +6987,23 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
   V: TElementContainer;
   i: Integer;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-      V := P.FindElement(strVarsLabel);
-      Check(V <> Nil, 'Can not find Vars label.');
-      If V <> Nil Then
-        For i := 1 To V.ElementCount Do
-          CheckEquals(TVar.ClassName, V.Elements[i].ClassName);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    V := P.FindElement(strVarsLabel);
+    Check(V <> Nil, 'Can not find Vars label.');
+    If V <> Nil Then
+      For i := 1 To V.ElementCount Do
+        CheckEquals(TVar.ClassName, V.Elements[i].ClassName);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -8009,23 +7027,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 
@@ -8051,23 +7062,16 @@ Const
     'End.'#13#10;
 
 Var
-  Source: TMemoryStream;
   P: TPascalModule;
 
 begin
-  Source := TMemoryStream.Create;
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    Source.LoadBufferFromString(strSource);
-    P := TPascalModule.CreateParser(Source, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
-    Source.Free;
+    P.Free;
   End;
 end;
 

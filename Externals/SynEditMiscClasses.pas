@@ -12,6 +12,7 @@ The Original Code is: SynEditMiscClasses.pas, released 2000-04-07.
 The Original Code is based on the mwSupportClasses.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Michael Hieke.
+Unicode translation by Maël Hörz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -27,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditMiscClasses.pas,v 1.39 2005/10/15 05:13:55 etrusco Exp $
+$Id: SynEditMiscClasses.pas,v 1.35.2.9 2008/09/17 13:59:12 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -59,6 +60,7 @@ uses
   kTextDrawer,
   QSynEditTypes,
   QSynEditKeyConst,
+  QSynUnicode,
 {$ELSE}
   Consts,
   Windows,
@@ -71,6 +73,7 @@ uses
   Registry,
   SynEditTypes,
   SynEditKeyConst,
+  SynUnicode,
 {$ENDIF}
 {$IFDEF SYN_COMPILER_4_UP}
   Math,
@@ -141,6 +144,7 @@ type
     procedure SetGradientStartColor(const Value: TColor);
     procedure SetGradientEndColor(const Value: TColor);
     procedure SetGradientSteps(const Value: Integer);
+    function GetWidth: integer;
   public
     constructor Create;
     destructor Destroy; override;
@@ -169,7 +173,7 @@ type
     property UseFontStyle: boolean read fUseFontStyle write SetUseFontStyle
       default True;
     property Visible: boolean read fVisible write SetVisible default TRUE;
-    property Width: integer read fWidth write SetWidth default 30;
+    property Width: integer read GetWidth write SetWidth default 30;
     property ZeroStart: boolean read fZeroStart write SetZeroStart
       default False;
     property LineNumberStart: Integer read fLineNumberStart write SetLineNumberStart default 1;
@@ -360,19 +364,19 @@ type
 
   TSynEditSearchCustom = class(TComponent)
   protected
-    function GetPattern: string; virtual; abstract;
-    procedure SetPattern(const Value: string); virtual; abstract;
-    function GetLength(aIndex: integer): integer; virtual; abstract;
-    function GetResult(aIndex: integer): integer; virtual; abstract;
-    function GetResultCount: integer; virtual; abstract;
+    function GetPattern: UnicodeString; virtual; abstract;
+    procedure SetPattern(const Value: UnicodeString); virtual; abstract;
+    function GetLength(Index: Integer): Integer; virtual; abstract;
+    function GetResult(Index: Integer): Integer; virtual; abstract;
+    function GetResultCount: Integer; virtual; abstract;
     procedure SetOptions(const Value: TSynSearchOptions); virtual; abstract;
   public
-    function FindAll(const NewText: string): integer; virtual; abstract;
-    function Replace(const aOccurrence, aReplacement: string): string; virtual; abstract;     
-    property Pattern: string read GetPattern write SetPattern;
-    property ResultCount: integer read GetResultCount;
-    property Results[aIndex: integer]: integer read GetResult;
-    property Lengths[aIndex: integer]: integer read GetLength;
+    function FindAll(const NewText: UnicodeString): Integer; virtual; abstract;
+    function Replace(const aOccurrence, aReplacement: UnicodeString): UnicodeString; virtual; abstract;
+    property Pattern: UnicodeString read GetPattern write SetPattern;
+    property ResultCount: Integer read GetResultCount;
+    property Results[Index: Integer]: Integer read GetResult;
+    property Lengths[Index: Integer]: Integer read GetLength;
     property Options: TSynSearchOptions write SetOptions;
   end;
 
@@ -472,7 +476,8 @@ procedure TSynGutter.Assign(Source: TPersistent);
 var
   Src: TSynGutter;
 begin
-  if Assigned(Source) and (Source is TSynGutter) then begin
+  if Assigned(Source) and (Source is TSynGutter) then 
+  begin
     Src := TSynGutter(Source);
     fFont.Assign(src.Font);
     fUseFontStyle := src.fUseFontStyle;
@@ -495,7 +500,8 @@ begin
     fGradientEndColor := Src.fGradientEndColor;
     fGradientSteps := Src.fGradientSteps;
     if Assigned(fOnChange) then fOnChange(Self);
-  end else
+  end 
+  else
     inherited;
 end;
 
@@ -527,7 +533,7 @@ begin
     Dec(Line)
   else if fLineNumberStart > 1 then
     Inc(Line, fLineNumberStart - 1);
-  Str(Line : fAutoSizeDigitCount, Result);
+  Result := Format('%*d', [fAutoSizeDigitCount, Line]);
   if fLeadingZeros then
     for i := 1 to fAutoSizeDigitCount - 1 do begin
       if (Result[i] <> ' ') then break;
@@ -714,6 +720,14 @@ begin
       fGradientSteps := 2;
     if Assigned(fOnChange) then fOnChange(Self);
   end;
+end;
+
+function TSynGutter.GetWidth: integer;
+begin
+  if not Visible then
+    Result := 0
+  else
+    Result := fWidth;
 end;
 
 { TSynBookMarkOpt }
@@ -1047,6 +1061,7 @@ begin
   inherited Remove(TMethod(AEvent));
 end;
 
+
 { TSynInternalImage }
 
 type
@@ -1087,8 +1102,8 @@ begin
 
   { Search the list for the needed resource }
   for idx := 0 to InternalResources.Count - 1 do
-    if (TInternalResource (InternalResources[idx]).Name = UpperCase (Name)) then
-      with TInternalResource (InternalResources[idx]) do begin
+    if (TInternalResource(InternalResources[idx]).Name = UpperCase(Name)) then
+      with TInternalResource(InternalResources[idx]) do begin
         UsageCount := UsageCount + 1;
         Result := Bitmap;
         exit;
@@ -1096,14 +1111,14 @@ begin
 
   { There is no loaded resource in the list so let's create a new one }
   Result := TBitmap.Create;
-  Result.LoadFromResourceName( aModule, Name );
+  Result.LoadFromResourceName(aModule, Name);
 
   { Add the new resource to our list }
   newIntRes:= TInternalResource.Create;
   newIntRes.UsageCount := 1;
-  newIntRes.Name := UpperCase (Name);
+  newIntRes.Name := UpperCase(Name);
   newIntRes.Bitmap := Result;
-  InternalResources.Add (newIntRes);
+  InternalResources.Add(newIntRes);
 end;
 
 procedure TSynInternalImage.FreeBitmapFromInternalList;
@@ -1229,7 +1244,7 @@ begin
     Result := hcNone;
 end;
 
-function ShortCutToTextEx(Key: Word; Shift: TShiftState): WideString;
+function ShortCutToTextEx(Key: Word; Shift: TShiftState): UnicodeString;
 begin
   if ssCtrl in Shift then Result := SmkcCtrl;
   if ssShift in Shift then Result := Result + SmkcShift;
@@ -1307,8 +1322,8 @@ begin
     QEventType_FocusIn:
       begin
         Canvas.Font := Font;
-        CreateCaret(Self, 0, 1, Canvas.TextHeight('x') + 2);
-        SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+        CreateCaret(Self, 0, 1, TextHeight(Canvas, 'x') + 2);
+        SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
         ShowCaret(Self);
       end;
     QEventType_FocusOut:
@@ -1333,7 +1348,7 @@ begin
   begin
     Code := XKeysymToKeycode(Xlib.PDisplay(QtDisplay), Key);
     Key := XKeycodeToKeysym(Xlib.PDisplay(QtDisplay), Code, 0);
-    if Char(Key) in ['a'..'z'] then Key := Ord(UpCase(Char(Key)));
+    if AnsiChar(Key) in ['a'..'z'] then Key := Ord(UpCase(AnsiChar(Key)));
   end;
   {$ENDIF}
   
@@ -1362,7 +1377,7 @@ begin
   begin
     Text := ShortCutToTextEx(Key, Shift);
     Invalidate;
-    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
   end;
 
   Key := SavedKey;
@@ -1380,7 +1395,7 @@ begin
   begin
     Code := XKeysymToKeycode(Xlib.PDisplay(QtDisplay), Key);
     Key := XKeycodeToKeysym(Xlib.PDisplay(QtDisplay), Code, 0);
-    if Char(Key) in ['a'..'z'] then Key := Ord(UpCase(Char(Key)));
+    if AnsiChar(Key) in ['a'..'z'] then Key := Ord(UpCase(AnsiChar(Key)));
   end;
   {$ENDIF}
   
@@ -1388,7 +1403,7 @@ begin
   begin
     Text := srNone;
     Invalidate;
-    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
   end;
 end;
 
@@ -1414,7 +1429,7 @@ begin
   Canvas.Brush.Color := Color;
   InflateRect(r, -BorderWidth, -BorderWidth);
   Canvas.FillRect(r);
-  Canvas.TextRect(r, BorderWidth + 1, BorderWidth + 1, Text);
+  TextRect(Canvas, r, BorderWidth + 1, BorderWidth + 1, Text);
 end;
 
 procedure TSynHotKey.SetBorderStyle(const Value: TSynBorderStyle);
@@ -1447,7 +1462,7 @@ begin
   Text := ShortCutToTextEx(Key, Shift);
   Invalidate;
   if not Visible then
-    SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+    SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
 end;
 
 procedure TSynHotKey.SetInvalidKeys(const Value: THKInvalidKeys);
@@ -1484,10 +1499,11 @@ procedure TSynHotKey.WMSetFocus(var Msg: TWMSetFocus);
 begin
   Canvas.Font := Font;
   CreateCaret(Handle, 0, 1, -Canvas.Font.Height + 2);
-  SetCaretPos(BorderWidth + 1 + Canvas.TextWidth(Text), BorderWidth + 1);
+  SetCaretPos(BorderWidth + 1 + TextWidth(Canvas, Text), BorderWidth + 1);
   ShowCaret(Handle);
 end;
 {$ENDIF}
+
 
 {$IFNDEF SYN_CLX}
   {$IFNDEF SYN_COMPILER_4_UP}

@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    12 Apr 2009
+  @Date    10 Jul 2009
   @Version 1.0
 
 **)
@@ -22,8 +22,8 @@ Type
   TParserNotify = Procedure(boolSuccessfulParse : Boolean) Of Object;
   (** This is a procedure to allow the thread to get information from the
       calling IDE. **)
-  TEditorInformation = Procedure(var strFileName : String;
-    var boolModified : Boolean; MemoryStream : TMemoryStream) Of Object;
+  TEditorInformation = Function(var strFileName : String;
+    var boolModified : Boolean) : String Of Object;
   (** This is a procedure to allow the thread to render the module in the
       calling IDEs main thread. **)
   TRenderDocumentTree = Procedure(Module : TBaseLanguageModule) Of Object;
@@ -36,7 +36,7 @@ Type
   TBrowseAndDocItThread = class(TThread)
   {$IFDEF D2005} Strict {$ENDIF} Private
     FModule: TBaseLanguageModule;
-    FMemoryStream : TMemoryStream;
+    FSource  : String;
     FFileName: String;
     FType    : String;
     FModified: Boolean;
@@ -87,7 +87,7 @@ Const
   strModifier : Array[pamNone..pamOut] Of String = ('', ' as a reference',
     ' as a constant', ' as an out parameter');
   (** A list of vowels. **)
-  strVowels : Set Of Char = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+  strVowels : Set Of AnsiChar = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
   (** A constant array of outputs for the ArrayOf property. **)
   strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
 
@@ -411,7 +411,11 @@ begin
           Begin
             strType := Func.Parameters[i].ParamType.AsString(False, False);
             AddToComment(Format('%s %s%s%s'#13#10, [
+              {$IFNDEF D2009}
               strAOrAn[(strType[1] In strVowels) Or Func.Parameters[i].ArrayOf],
+              {$ELSE}
+              strAOrAn[(CharInSet(strType[1], strVowels)) Or Func.Parameters[i].ArrayOf],
+              {$ENDIF}
               strArrayOf[Func.Parameters[i].ArrayOf], strType,
               strModifier[Func.Parameters[i].ParamModifier]]));
           End;
@@ -421,7 +425,11 @@ begin
       boolExtraLine := boolExtraLine Or True;
       AddToComment(StringOfChar(#32, iIndent));
       AddToComment(Format('  @return  %s %s',
+        {$IFNDEF D2009}
         [strAOrAn[Func.ReturnType.AsString(False, False)[1] In strVowels],
+        {$ELSE}
+        [strAOrAn[CharInSet(Func.ReturnType.AsString(False, False)[1], strVowels)],
+        {$ENDIF}
         Func.ReturnType.AsString(False, False)]));
       AddToComment(#13#10);
     End;
@@ -527,9 +535,9 @@ begin
   FSuccessfulParseProc := SuccessfulParseProc;
   FRenderDocumentTree := RenderDocumentTree;
   FThreadExceptionMsg := ThreadExceptionMsg;
-  FMemoryStream := TMemoryStream.Create;
+  FSource := '';
   If Assigned(EditorInfo) Then
-    EditorInfo(FFileName, FModified, FMemoryStream);
+    FSource := EditorInfo(FFileName, FModified);
   Resume;
 end;
 
@@ -543,7 +551,6 @@ end;
 **)
 destructor TBrowseAndDocItThread.Destroy;
 begin
-  FMemoryStream.Free;
   Inherited Destroy;
 end;
 
@@ -563,7 +570,7 @@ begin
   SetName;
   Try
     FType := 'Parsing';
-    FModule := Dispatcher(FMemoryStream, FFileName, FModified, [moParse,
+    FModule := Dispatcher(FSource, FFileName, FModified, [moParse,
       moCheckForDocumentConflicts]);
     Try
       FType := 'Rendering';

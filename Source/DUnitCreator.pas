@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Apr 2009
+  @Date    10 Jul 2009
 
 **)
 unit DUnitCreator;
@@ -238,7 +238,6 @@ Function IsTestFramework(Project : IOTAProject) : Boolean;
 
 var
   S: IOTASourceEditor;
-  MemoryStream: TMemoryStream;
   M: TBaseLanguageModule;
   E: TElementContainer;
   strFileName : String;
@@ -247,29 +246,23 @@ Begin
   Result := False;
 
   S := SourceEditor(Project.CurrentEditor.Module);
-  MemoryStream := TMemoryStream.Create;
+  strFilename := Project.CurrentEditor.FileName;
+  M := Dispatcher(EditorAsString(S), strFileName, True, [moParse]);
   Try
-    EditorAsMemoryStream(S, MemoryStream);
-    strFilename := Project.CurrentEditor.FileName;
-    M := Dispatcher(MemoryStream, strFileName, True, [moParse]);
-    Try
-      If M <> Nil Then
-        Begin
-          E := M.FindElement(strUses);
-          If E <> Nil Then
-            Begin
-              If E.FindElement('TestFramework') <> Nil Then
-                Begin
-                  Result := True;
-                  Exit;
-                End;
-            End;
-        End;
-    Finally
-      M.Free;
-    End;
+    If M <> Nil Then
+      Begin
+        E := M.FindElement(strUses);
+        If E <> Nil Then
+          Begin
+            If E.FindElement('TestFramework') <> Nil Then
+              Begin
+                Result := True;
+                Exit;
+              End;
+          End;
+      End;
   Finally
-    MemoryStream.Free;
+    M.Free;
   End;
 End;
 
@@ -547,33 +540,28 @@ Begin
                   If strLastClass <> strClass Then
                     Begin
                       If boolEndClass Then
-                        Writer.Insert(PChar('  End;'#13#10#13#10));
-                      Writer.Insert(PChar('  //'#13#10));
-                      Writer.Insert(PChar(Format(
-                        '  // Test Class for the %s Class Methods.'#13#10,
-                        [strClass])));
-                      Writer.Insert(PChar('  //'#13#10));
-                      Writer.Insert(PChar(Format('  Test%s = Class(%s)'#13#10,
-                        [strClass, strBaseClass])));
-                      Writer.Insert(PChar('  Strict Private'#13#10));
+                        OutputText(Writer, '  End;'#13#10#13#10);
+                      OutputText(Writer, '  //'#13#10);
+                      OutputText(Writer, Format('  // Test Class for the %s Class Methods.'#13#10, [strClass]));
+                      OutputText(Writer, '  //'#13#10);
+                      OutputText(Writer, Format('  Test%s = Class(%s)'#13#10, [strClass, strBaseClass]));
+                      OutputText(Writer, '  Strict Private'#13#10);
                       If strClass <> 'Functions' Then
-                        Writer.Insert(PChar(Format('    F%s : %s;'#13#10,
-                          [Copy(strClass, 2, Length(strClass)), strClass])));
-                      Writer.Insert(PChar('  Public'#13#10));
+                        OutputText(Writer, Format('    F%s : %s;'#13#10, [Copy(strClass, 2, Length(strClass)), strClass]));
+                      OutputText(Writer, '  Public'#13#10);
                       If strClass <> 'Functions' Then
-                        Writer.Insert(PChar('    Procedure SetUp; Override;'#13#10));
+                        OutputText(Writer, '    Procedure SetUp; Override;'#13#10);
                       If strClass <> 'Functions' Then
-                        Writer.Insert(PChar('    Procedure TearDown; Override;'#13#10));
-                      Writer.Insert(PChar('  Published'#13#10));
+                        OutputText(Writer, '    Procedure TearDown; Override;'#13#10);
+                      OutputText(Writer, '  Published'#13#10);
                     End;
-                  Writer.Insert(PChar(Format('    Procedure Test%s;'#13#10,
-                    [strMethod])));
+                  OutputText(Writer, Format('    Procedure Test%s;'#13#10, [strMethod]));
                   boolEndClass := True;
                 End;
               strLastClass := strClass;
             End;
           If boolEndClass Then
-            Writer.Insert(PChar('  End;'#13#10#13#10));
+            OutputText(Writer, '  End;'#13#10#13#10);
         Finally
           Writer := Nil;
         End;
@@ -632,9 +620,8 @@ begin
                   strClass := TestClassName(slTestCases[i]);
                   If strLastClass <> strClass Then
                     If Not DoesClassExist(M, strClass) Then
-                      Writer.Insert(PChar(Format(
-                        '  RegisterTest(''%s'', Test%s.Suite);'#13#10,
-                        [strTestSuiteName, strClass])));
+                      OutputText(Writer, Format('  RegisterTest(''%s'', Test%s.Suite);'#13#10,
+                        [strTestSuiteName, strClass]));
                   strLastClass := strClass;
                 End;
             Finally
@@ -700,23 +687,23 @@ begin
                 Begin
                   If Not DoesClassExist(M, strClass) Then
                     Begin
-                      Writer.Insert(PChar('//'#13#10));
-                      Writer.Insert(PChar(Format('// Test methods for the class %s.'#13#10,[strClass])));
-                      Writer.Insert(PChar('//'#13#10));
+                      OutputText(Writer, '//'#13#10);
+                      OutputText(Writer, Format('// Test methods for the class %s.'#13#10,[strClass]));
+                      OutputText(Writer, '//'#13#10);
                       If strClass <> 'Functions' Then
                         Begin
-                          Writer.Insert(PChar(Format('Procedure Test%s.Setup;'#13#10,[strClass])));
-                          Writer.Insert(PChar(''#13#10));
-                          Writer.Insert(PChar('Begin'#13#10));
-                          Writer.Insert(PChar(Format('  F%s := %s.Create; //: @debug Setup constructor for %s.'#13#10,[Copy(strClass, 2, Length(strClass)), strClass, strClass])));
-                          Writer.Insert(PChar('End;'#13#10));
-                          Writer.Insert(PChar(''#13#10));
-                          Writer.Insert(PChar(Format('Procedure Test%s.TearDown;'#13#10,[strClass])));
-                          Writer.Insert(PChar(''#13#10));
-                          Writer.Insert(PChar('Begin'#13#10));
-                          Writer.Insert(PChar(Format('  F%s.Free;'#13#10,[Copy(strClass, 2, Length(strClass))])));
-                          Writer.Insert(PChar('End;'#13#10));
-                          Writer.Insert(PChar(''#13#10));
+                          OutputText(Writer, Format('Procedure Test%s.Setup;'#13#10,[strClass]));
+                          OutputText(Writer, ''#13#10);
+                          OutputText(Writer, 'Begin'#13#10);
+                          OutputText(Writer, Format('  F%s := %s.Create; //: @debug Setup constructor for %s.'#13#10,[Copy(strClass, 2, Length(strClass)), strClass, strClass]));
+                          OutputText(Writer, 'End;'#13#10);
+                          OutputText(Writer, ''#13#10);
+                          OutputText(Writer, Format('Procedure Test%s.TearDown;'#13#10,[strClass]));
+                          OutputText(Writer, ''#13#10);
+                          OutputText(Writer, 'Begin'#13#10);
+                          OutputText(Writer, Format('  F%s.Free;'#13#10,[Copy(strClass, 2, Length(strClass))]));
+                          OutputText(Writer, 'End;'#13#10);
+                          OutputText(Writer, ''#13#10);
                         End;
                     End;
                 End;
@@ -727,13 +714,13 @@ begin
                   Inc(iIndex);
                 End;
               slTestCases[i] := Format('%s=%s', [strClass, strMethod]);
-              Writer.Insert(PChar(Format('Procedure Test%s.Test%s;'#13#10,[strClass, strMethod])));
-              Writer.Insert(PChar(''#13#10));
-              Writer.Insert(PChar('Begin'#13#10));
-              Writer.Insert(PChar(Format('  //: @todo Implement Check for %s.%s.'#13#10,
-                [strClass, strMethod])));
-              Writer.Insert(PChar('End;'#13#10));
-              Writer.Insert(PChar(''#13#10));
+              OutputText(Writer, Format('Procedure Test%s.Test%s;'#13#10,[strClass, strMethod]));
+              OutputText(Writer, ''#13#10);
+              OutputText(Writer, 'Begin'#13#10);
+              OutputText(Writer, Format('  //: @todo Implement Check for %s.%s.'#13#10,
+                [strClass, strMethod]));
+              OutputText(Writer, 'End;'#13#10);
+              OutputText(Writer, ''#13#10);
               strLastClass := strClass;
             End;
         Finally
@@ -830,8 +817,8 @@ begin
               CharPos.Line := Integer(slTestCases.Objects[iMethod]);
               iPos := SE.EditViews[0].CharPosToPos(CharPos);
               Writer.CopyTo(iPos);
-              Writer.Insert(PChar(Format('    Procedure Test%s;'#13#10,
-                [GetField(slTestCases[iMethod], '=', 2)])));
+              OutputText(Writer, Format('    Procedure Test%s;'#13#10,
+                [GetField(slTestCases[iMethod], '=', 2)]));
             Finally
               Writer := Nil;
             End;
@@ -1036,9 +1023,9 @@ begin
           iPos := SE.EditViews[0].CharPosToPos(CharPos);
           Writer.CopyTo(iPos);
           If CharPos.CharIndex + Length(strUnitToBeTested) < 80 Then
-            Writer.Insert(PChar(Format(', %s', [strUnitToBeTested])))
+            OutputText(Writer, Format(', %s', [strUnitToBeTested]))
           Else
-            Writer.Insert(PChar(Format(','#13#10#32#32'%s', [strUnitToBeTested])));
+            OutputText(Writer, Format(','#13#10#32#32'%s', [strUnitToBeTested]));
         Finally
           Writer := Nil;
         End;
@@ -1059,20 +1046,12 @@ end;
 **)
 constructor TDUnitCreator.Create;
 
-Var
-  Source: TMemoryStream;
-
 begin
   FProjectCount := 0;
   FUnitCount := 0;
-  Source := TMemoryStream.Create;
-  Try
-    EditorAsMemoryStream(ActiveSourceEditor, Source);
-    With ActiveSourceEditor Do
-      FModule := Dispatcher(Source, FileName, Modified, [moParse]);
-  Finally
-    Source.Free;
-  End;
+  With ActiveSourceEditor Do
+    FModule := Dispatcher(EditorAsString(ActiveSourceEditor), FileName,
+      Modified, [moParse]);
 end;
 
 (**
@@ -1410,7 +1389,6 @@ ResourceString
 
 Var
   M : TBaseLanguageModule;
-  Source: TMemoryStream;
   SE: IOTASourceEditor;
 
 begin
@@ -1421,23 +1399,17 @@ begin
   SE.Show;
   If FUnit <> Nil Then
     Begin
-      Source := TMemoryStream.Create;
+      M := Dispatcher(EditorAsString(SourceEditor(FUnit)), FUnit.FileName,
+        FUnit.CurrentEditor.Modified, [moParse]);
       Try
-        EditorAsMemoryStream(SourceEditor(FUnit), Source);
-        M := Dispatcher(Source, FUnit.FileName, FUnit.CurrentEditor.Modified,
-          [moParse]);
-        Try
-          AddNewTestSuites(M,
-          slTestCases, strTestSuiteName);
-          AddNewTestImplementations(M, slTestCases);
-          AddNewTestClasses(M, slTestCases, strBaseClass);
-          AddNewTestMethodsToClass(M, slTestCases);
-          AddUnitToBeTestedToUsesClause(M, strUnitToBeTested);
-        Finally
-          M.Free;
-        End;
+        AddNewTestSuites(M,
+        slTestCases, strTestSuiteName);
+        AddNewTestImplementations(M, slTestCases);
+        AddNewTestClasses(M, slTestCases, strBaseClass);
+        AddNewTestMethodsToClass(M, slTestCases);
+        AddUnitToBeTestedToUsesClause(M, strUnitToBeTested);
       Finally
-        Source.Free;
+        M.Free;
       End;
     End Else
       RaiseError(strExistingUnitInterfaceNil);

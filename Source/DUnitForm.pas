@@ -5,12 +5,14 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    29 Mar 2009
+  @Date    10 Jul 2009
 
 **)
 unit DUnitForm;
 
 interface
+
+{$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
@@ -42,8 +44,13 @@ type
     procedure btnOKClick(Sender: TObject);
     procedure rdoNewExistingUnit(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    {$IFNDEF D2009}
     procedure vstTestCasesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    {$ELSE}
+    procedure vstTestCasesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
+    {$ENDIF}
     procedure vstTestCasesGetImageIndex(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
       var Ghosted: Boolean; var ImageIndex: Integer);
@@ -331,6 +338,7 @@ begin
       cbxBaseClass.ItemIndex := 0;
     End;
   vstTestCases.NodeDataSize := SizeOf(TTreeData);
+  vstTestCases.OnGetText := vstTestCasesGetText;
   ilScopeImages.Clear;
   For i := Succ(Low(T)) to High(T) Do
     If Not ilScopeImages.GetInstRes(hInstance, rtBitmap,
@@ -616,7 +624,11 @@ end;
 **)
 procedure TfrmDUnit.vstTestCasesGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
+{$IFNDEF D2009}
   var CellText: WideString);
+{$ELSE}
+  var CellText: String);
+{$ENDIF}
 
 Var
   NodeData : ^TTreeData;

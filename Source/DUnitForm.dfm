@@ -98,9 +98,11 @@ object frmDUnit: TfrmDUnit
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
+    DoubleBuffered = True
+    Kind = bkOK
+    ParentDoubleBuffered = False
     TabOrder = 5
     OnClick = btnOKClick
-    Kind = bkOK
   end
   object btnCancel: TBitBtn
     Left = 309
@@ -108,8 +110,10 @@ object frmDUnit: TfrmDUnit
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    TabOrder = 6
+    DoubleBuffered = True
     Kind = bkCancel
+    ParentDoubleBuffered = False
+    TabOrder = 6
   end
   object gbxUnit: TGroupBox
     Left = 8
@@ -179,7 +183,6 @@ object frmDUnit: TfrmDUnit
     Images = ilScopeImages
     TabOrder = 2
     TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-    OnGetText = vstTestCasesGetText
     OnGetImageIndex = vstTestCasesGetImageIndex
     Columns = <>
   end

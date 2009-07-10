@@ -4,13 +4,15 @@
   information.
 
   @Author  David Hoyle
-  @Date    15 Mar 2009
+  @Date    10 Jul 2009
   @Version 1.0
 
 **)
 Unit HTMLDocumentation;
 
 Interface
+
+{$INCLUDE 'CompilerDefinitions.inc'}
 
 Uses
   Classes, BaseLanguageModule, BaseDocumentation, Contnrs;
@@ -118,8 +120,9 @@ Type
 Implementation
 
 Uses
-  SysUtils, Windows, ModuleDispatcher, DGHLibrary, Graphics, GIFImage, Controls,
-  StrUtils, GenericTokenizer;
+  SysUtils, Windows, ModuleDispatcher, DGHLibrary, Graphics,
+  {$IFNDEF D2007} GIFImage {$ELSE} GIFImg {$ENDIF}, Controls, StrUtils,
+  GenericTokenizer;
 
 (**
 
@@ -1095,14 +1098,23 @@ function THTMLDocumentation.GetStringResource(strName: String): String;
 
 Var
   Res: TResourceStream;
+  {$IFDEF D2009}
+  strRes : AnsiString;
+  {$ENDIF}
 
 begin
   Res := TResourceStream.Create(HInstance, strName, RT_RCDATA);
   Try
     If Res.Size = 0 Then
       Raise Exception.CreateFmt(strName, [strName]);
+    {$IFNDEF D2009}
     SetLength(Result, Res.Size);
     Res.ReadBuffer(Result[1], Res.Size);
+    {$ELSE}
+    SetLength(strRes, Res.Size);
+    Res.ReadBuffer(strRes[1], Res.Size);
+    Result := String(strRes);
+    {$ENDIF}
   Finally
     Res.Free;
   End;
@@ -1614,7 +1626,7 @@ Const
     strDocumentationConflicts);
 
 Var
-  Stream : TMemoryStream;
+  Source : TStringList;
   i: Integer;
   E: TElementContainer;
   j: Integer;
@@ -1622,10 +1634,10 @@ Var
   CurrentHTMLFile: TStringList;
 
 Begin
-  Stream := TMemoryStream.Create;
+  Source := TStringList.Create;
   Try
-    Stream.LoadFromFile(strFileName);
-    FCurrentModule := Dispatcher(Stream, strFileName, False, [moParse,
+    Source.LoadFromFile(strFileName);
+    FCurrentModule := Dispatcher(Source.Text, strFileName, False, [moParse,
       moCheckForDocumentConflicts]);
     If FCurrentModule <> Nil Then
       Try
@@ -1677,7 +1689,7 @@ Begin
       FCurrentModule.Free;
     End;
   Finally
-    Stream.Free;
+    Source.Free;
   End;
 End;
 
@@ -1735,7 +1747,7 @@ end;
 function THTMLDocumentation.N(strText : String): String;
 
 Const
-  strValidHTMLChars : Set of Char = ['a'..'z', 'A'..'Z', '0'..'9', #32, '.',
+  strValidHTMLChars : Set of AnsiChar = ['a'..'z', 'A'..'Z', '0'..'9', #32, '.',
     ',', '!', '"', '£', '$', '%', '^', '*', '(', ')', '_', '+', '-', '=', '{',
     '}', '[', ']', ':', ';', '@', '''', '~', '?', '/', '\', '|', #13, #10, '#'];
 
@@ -1746,7 +1758,11 @@ begin
   Result := strText;
   For i := 1 To Length(strText) Do
     Begin
+      {$IFNDEF D2009}
       If Not (strText[i] In strValidHTMLChars) Then
+      {$ELSE}
+      If Not (CharInSet(strText[i], strValidHTMLChars)) Then
+      {$ENDIF}
         Result := StringReplace(Result, strText[i],
           Format('&#%d;', [Ord(strText[i])]), [rfReplaceAll]);
     End;

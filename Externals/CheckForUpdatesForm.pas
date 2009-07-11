@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    25 Sep 2008
+  @Date    11 Jul 2009
 
 **)
 unit CheckForUpdatesForm;
@@ -197,13 +197,26 @@ end;
 **)
 class procedure TfrmCheckForUpdates.ShowUpdates(strMsg, strURL: String;
   iColour: TColor);
+
+Var
+  sl : TStringList;
+  i : Integer;
+
 begin
   If frm = Nil Then
     frm := TfrmCheckForUpdates.Create(Nil);
   With frm Do
     Begin
       Show;
-      lbInformation.Items.AddObject(strMsg, TObject(iColour));
+      sl := TStringList.Create;
+      Try
+        sl.Text := strMsg;
+        For i := 0 To Sl.Count - 1 Do
+          If sl[i] <> '' Then
+            lbInformation.Items.AddObject(sl[i], TObject(iColour));
+      Finally
+        sl.Free;
+      End;
       lbInformation.ItemIndex := lbInformation.Items.Count - 1;
       lblWebSite.Caption := strURL;
     End;

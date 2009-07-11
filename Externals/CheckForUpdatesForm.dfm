@@ -69,10 +69,8 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     Cancel = True
     Caption = 'OK'
     Default = True
+    DoubleBuffered = True
     Enabled = False
-    ModalResult = 1
-    TabOrder = 1
-    OnClick = btnOKClick
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
       0400000000006801000000000000000000001000000000000000000000000000
@@ -90,7 +88,11 @@ object frmCheckForUpdates: TfrmCheckForUpdates
       3338F38F000033333333333333A223333333333333338F830000333333333333
       333A333333333333333338330000333333333333333333333333333333333333
       0000}
+    ModalResult = 1
     NumGlyphs = 2
+    ParentDoubleBuffered = False
+    TabOrder = 1
+    OnClick = btnOKClick
   end
   object tmFinish: TTimer
     Enabled = False

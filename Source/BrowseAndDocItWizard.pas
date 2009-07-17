@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    10 Jul 2009
+  @Date    17 Jul 2009
   @Version 1.0
 
 **)
@@ -1321,19 +1321,14 @@ procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
   Function MemStreamSize(Editor : IOTASourceEditor) : Int64;
 
   Var
-    MemStream : TMemoryStream;
+    strSource : String;
 
   Begin
     Result := 0;
     If Editor <> Nil Then
       Begin
-        MemStream := TMemoryStream.Create;
-        Try
-          EditorAsMemoryStream(Editor, MemStream);
-          Result := MemStream.Size;
-        Finally
-          MemStream.Free;
-        End;
+        strSource := EditorAsString(Editor);
+        Result := Length(strSource);
       End;
   End;
   {$ENDIF}

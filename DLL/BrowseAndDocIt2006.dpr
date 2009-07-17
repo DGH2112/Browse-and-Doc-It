@@ -7,7 +7,7 @@
   @Date    16 Apr 2009
 
 **)
-library BrowseAndDocIt2006;
+library BrowseAndDocIt2009;
 
 { Important note about DLL memory management: ShareMem must be the
   first unit in your library's USES clause AND your project's (select
@@ -23,20 +23,8 @@ library BrowseAndDocIt2006;
 {$R '..\SplashScreenIcon.res' '..\SplashScreenIcon.RC'}
 {$R '..\..\..\Library\BrowseAndDocItHTMLResources.res' '..\..\..\Library\BrowseAndDocItHTMLResources.RC'}
 {$R '..\DUnitTemplateResources.res' '..\DUnitTemplateResources.RC'}
-{%File '..\..\..\Library\HTML Files\BrowseAndDocItScreen.css'}
-{%File '..\..\..\Library\HTML Files\BrowseAndDocItPrint.css'}
-{%HTMLTool '..\..\..\Library\HTML Files\BrowseAndDocItHTMLTemplate.html'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt\default.txaPackage'}
-{%File '..\..\..\LIBRARY\HTML Files\xhtml1-strict.dtd'}
-{%File '..\..\..\LIBRARY\HTML Files\xhtml-lat1.ent'}
-{%File '..\..\..\LIBRARY\HTML Files\xhtml-special.ent'}
-{%File '..\..\..\LIBRARY\HTML Files\xhtml-symbol.ent'}
 {%TogetherDiagram 'ModelSupport_BrowseAndDocIt2006\default.txaPackage'}
 {%File '..\..\..\LIBRARY\CompilerDefinitions.inc'}
-{%File '..\Source\DUnit Templates\DUnitProjectTemplate.txt'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt2006\DUnitCreator\default.txaPackage'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocIt2006\DUnitForm\default.txaPackage'}
-{%File '..\Source\DUnit Templates\DUnitUnitTemplate.txt'}
 uses
   ShareMem,
   ExceptionLog,
@@ -58,7 +46,6 @@ uses
   DocumentationDispatcher in '..\..\..\Library\DocumentationDispatcher.pas',
   HTMLDocumentation in '..\..\..\Library\HTMLDocumentation.pas',
   BaseDocumentation in '..\..\..\Library\BaseDocumentation.pas',
-  GIFImage in '..\..\..\Library\TGIFImage\GIFImage.pas',
   DocumentationOptionsForm in '..\..\..\LIBRARY\DocumentationOptionsForm.pas' {frmDocumentationOptions},
   GenericTokenizer in '..\..\..\LIBRARY\GenericTokenizer.pas',
   checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
@@ -73,7 +60,8 @@ uses
   DUnitForm in '..\Source\DUnitForm.pas' {frmDUnit},
   DUnitCreator in '..\Source\DUnitCreator.pas',
   CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
-  DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas';
+  DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
+  GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas';
 
 {$R *.res}
 

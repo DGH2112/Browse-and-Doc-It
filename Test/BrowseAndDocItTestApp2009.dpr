@@ -7,21 +7,11 @@
   @Version 1.0
 
 **)
-program BrowseAndDocItTestApp;
+program BrowseAndDocItTestApp2009;
 
-{$R '..\ExplorerImages.res' '..\ExplorerImages.RC'}
-{$R '..\..\..\Library\BrowseAndDocItHTMLResources.res' '..\..\..\Library\BrowseAndDocItHTMLResources.RC'}
-{$R '..\DUnitTemplateResources.res' '..\DUnitTemplateResources.RC'}
-{%File '..\..\..\Library\HTML Files\BrowseAndDocItScreen.css'}
-{%File '..\..\..\Library\HTML Files\BrowseAndDocItPrint.css'}
-{%HTMLTool '..\..\..\Library\HTML Files\BrowseAndDocItHTMLTemplate.html'}
-{%TogetherDiagram 'ModelSupport_BrowseAndDocItTestApp\default.txaPackage'}
-{%File '..\..\..\LIBRARY\HTML Files\xhtml1-strict.dtd'}
-{%File '..\..\..\LIBRARY\HTML Files\xhtml-lat1.ent'}
-{%File '..\..\..\LIBRARY\HTML Files\xhtml-special.ent'}
-{%File '..\..\..\LIBRARY\HTML Files\xhtml-symbol.ent'}
-{%File '..\..\..\LIBRARY\CompilerDefinitions.inc'}
-{%File '..\Source\DUnit Templates\DUnitProjectTemplate.txt'}
+{$R 'ExplorerImages.res' '..\ExplorerImages.RC'}
+{$R 'BrowseAndDocItHTMLResources.res' '..\..\..\Library\BrowseAndDocItHTMLResources.RC'}
+{$R 'DUnitTemplateResources.res' '..\DUnitTemplateResources.RC'}
 
 uses
   ExceptionLog,
@@ -40,7 +30,6 @@ uses
   HTMLDocumentation in '..\..\..\Library\HTMLDocumentation.pas',
   BaseDocumentation in '..\..\..\Library\BaseDocumentation.pas',
   DocumentationDispatcher in '..\..\..\Library\DocumentationDispatcher.pas',
-  GIFImage in '..\..\..\Library\TGIFImage\GIFImage.pas',
   DocumentationOptionsForm in '..\..\..\LIBRARY\DocumentationOptionsForm.pas' {frmDocumentationOptions},
   GenericTokenizer in '..\..\..\LIBRARY\GenericTokenizer.pas',
   SynEdit in '..\..\..\LIBRARY\SynEdit\Source\SynEdit.pas',
@@ -64,6 +53,7 @@ uses
   VBModule in '..\..\..\LIBRARY\VBModule.pas',
   SynHighlighterVB in '..\..\..\Library\SynEdit\Source\SynHighlighterVB.pas',
   ExclusionsForm in 'Source\ExclusionsForm.pas' {frmExclusions},
+  SynUnicode in '..\..\..\LIBRARY\SynEdit\Source\SynUnicode.pas',
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas';
 
 {$R *.res}

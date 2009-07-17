@@ -1,4 +1,4 @@
-program BrowseAndDocItTests;
+program BrowseAndDocItTests2009;
 {
 
   Delphi DUnit Test Project
@@ -16,16 +16,18 @@ program BrowseAndDocItTests;
 
 {$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
 
-{%TogetherDiagram 'ModelSupport_BrowseAndDocItTests\default.txaPackage'}
+
+
+{%TogetherDiagram 'ModelSupport_BrowseAndDocItTests2006\default.txaPackage'}
 
 uses
   ExceptionLog,
   SysUtils,
   Forms,
   Windows,
-  JclDebug,
   TestFramework,
   GUITestRunner,
+  JclDebug,
   TextTestRunner,
   dghlibrary in '..\..\..\LIBRARY\dghlibrary.pas',
   TestDGHLibrary in '..\..\..\LIBRARY\Test\Source\TestDGHLibrary.pas',

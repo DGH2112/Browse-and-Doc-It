@@ -98,9 +98,7 @@ object frmDUnit: TfrmDUnit
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkOK
-    ParentDoubleBuffered = False
     TabOrder = 5
     OnClick = btnOKClick
   end
@@ -110,9 +108,7 @@ object frmDUnit: TfrmDUnit
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkCancel
-    ParentDoubleBuffered = False
     TabOrder = 6
   end
   object gbxUnit: TGroupBox

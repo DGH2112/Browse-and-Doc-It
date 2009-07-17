@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    10 Jul 2009
+  @Date    17 Jul 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -47,8 +47,10 @@ Var
 
 Implementation
 
+{$IFDEF D2009}
 Uses
   Character;
+{$ENDIF}
 
 (**
 

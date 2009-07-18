@@ -16,7 +16,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes,
   Graphics, Controls, Forms, Dialogs, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ExtCtrls, ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
-  FileCtrl, ComCtrls, Contnrs, SynHighlighterVB,
+  FileCtrl, ComCtrls, Contnrs, SynHighlighterVB, SynHighlighterCpp,
   Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ToolWin, XPMan;
 
 {$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
@@ -130,6 +130,7 @@ type
     FSynEdit: TSynEdit;
     FSynPasSyn: TSynPasSyn;
     FSynVBSyn: TSynVBSyn;
+    FSynCPPSyn : TSynCPPSyn;
     FParseRecords : TObjectList;
     FFileExcludeList : TStringList;
     function GetFileName: String;
@@ -760,6 +761,19 @@ begin
       StringAttri.Foreground := clTeal;
       SymbolAttri.Foreground := clGreen;
     End;
+  FSynCPPSyn := TSynCPPSyn.Create(Nil);
+  With FSynCPPSyn Do
+    Begin
+      AsmAttri.Foreground := clMaroon;
+      CommentAttri.Foreground := clPurple;
+      IdentifierAttri.Foreground := clNavy;
+      NumberAttri.Foreground := clGreen;
+      StringAttri.Foreground := clTeal;
+      SymbolAttri.Foreground := clGreen;
+      FloatAttri.Foreground := clGreen;
+      HexAttri.Foreground := clGreen;
+      CharAttri.Foreground := clOlive;
+    End;
   FINIFileName := BuildRootKey(Nil, Nil);
   {$IFDEF WIN32}
   BrowseAndDocItOptions.Defines.Add('WIN32');
@@ -795,6 +809,7 @@ begin
   FSynEdit.Free;
   FSynVBSyn.Free;
   FSynPasSyn.Free;
+  FSynCPPSyn.Free;
   SaveSettings;
   FFileExcludeList.Free;
   FModuleExplorerFrame.Free;
@@ -1307,6 +1322,8 @@ begin
   strExt := LowerCase(ExtractFileExt(FFileName));
   If IsKeyWord(strExt, ['.dpk', '.dpr', '.pas']) Then
     FSynEdit.Highlighter := FSynPasSyn
+  Else If IsKeyWord(strExt, ['.bnf']) Then
+    FSynEdit.Highlighter := FSynCPPSyn
   Else
     FSynEdit.Highlighter := FSynVBSyn;
   SynEdit1Change(Self);

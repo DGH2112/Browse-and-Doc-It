@@ -90,6 +90,8 @@ type
     Delete1: TMenuItem;
     SelectAll1: TMenuItem;
     XPManifest: TXPManifest;
+    actViewWordWrap: TAction;
+    btnWordwrap: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
@@ -120,6 +122,8 @@ type
     procedure actToolsExclusionsExecute(Sender: TObject);
     procedure lvDirectoriesChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
+    procedure actViewWordWrapExecute(Sender: TObject);
+    procedure actViewWordWrapUpdate(Sender: TObject);
   {$IFDEF D2005} Strict {$ENDIF} Private
     { Private declarations }
     FFileName: String;
@@ -435,6 +439,16 @@ end;
 procedure TfrmBrowseAndDocItTestForm.actToolsExclusionsExecute(Sender: TObject);
 begin
   TfrmExclusions.Execute(FFileExcludeList);
+end;
+
+procedure TfrmBrowseAndDocItTestForm.actViewWordWrapExecute(Sender: TObject);
+begin
+  FSynEdit.WordWrap := Not FSynEdit.WordWrap;
+end;
+
+procedure TfrmBrowseAndDocItTestForm.actViewWordWrapUpdate(Sender: TObject);
+begin
+  (Sender As TAction).Checked := FSynEdit.WordWrap;
 end;
 
 (**
@@ -1232,6 +1246,7 @@ begin
       WriteBool('Setup', 'Warnings', actViewWarnings.Checked);
       WriteBool('Setup', 'Hints', actViewHints.Checked);
       WriteBool('Setup', 'Conflicts', actViewDocConflicts.Checked);
+      WriteBool('Setup', 'WordWrap', FSynEdit.WordWrap);
     finally
       Free;
     end;
@@ -1297,6 +1312,7 @@ begin
       actViewDocConflicts.Checked := ReadBool('Setup', 'Conflicts', False);
       if lvFileList.Items.Count > j then
         lvFileList.ItemIndex := j;
+      FSynEdit.WordWrap := ReadBool('Setup', 'WordWrap', False);
     finally
       Free;
     end;

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    10 Jul 2009
+  @Date    18 Jul 2009
 
 **)
 unit DUnitCreator;
@@ -1955,14 +1955,23 @@ ResourceString
 
 Var
   Res: TResourceStream;
+  {$IFDEF D2009}
+  strTemp: AnsiString;
+  {$ENDIF}
 
 begin
   Res := TResourceStream.Create(HInstance, strDUnitProjectTemplate, RT_RCDATA);
   Try
     If Res.Size = 0 Then
       Raise Exception.CreateFmt(strTheDUnitProjectMsg, [strDUnitProjectTemplate]);
+    {$IFNDEF D2009}
     SetLength(Result, Res.Size);
     Res.ReadBuffer(Result[1], Res.Size);
+    {$ELSE}
+    SetLength(strTemp, Res.Size);
+    Res.ReadBuffer(strTemp[1], Res.Size);
+    Result := String(strTemp);
+    {$ENDIF}
   Finally
     Res.Free;
   End;
@@ -2029,14 +2038,23 @@ ResourceString
 
 Var
   Res: TResourceStream;
+  {$IFDEF D2009}
+  strTemp : AnsiString;
+  {$ENDIF}
 
 begin
   Res := TResourceStream.Create(HInstance, strDUnitUnitTemplate, RT_RCDATA);
   Try
     If Res.Size = 0 Then
       Raise Exception.CreateFmt(strTheDUnitUnitMsg, [strDUnitUnitTemplate]);
+    {$IFNDEF D2009}
     SetLength(Result, Res.Size);
     Res.ReadBuffer(Result[1], Res.Size);
+    {$ELSE}
+    SetLength(strTemp, Res.Size);
+    Res.ReadBuffer(strTemp[1], Res.Size);
+    Result := String(strTemp);
+    {$ENDIF}
   Finally
     Res.Free;
   End;

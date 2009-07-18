@@ -1416,6 +1416,7 @@ end;
 procedure TfrmBrowseAndDocItTestForm.SynEdit1StatusChange(Sender: TObject;
   Changes: TSynStatusChanges);
 begin
+  FLastEdit := GetTickCount;
   sbrStatusBar.SimpleText := Format('Line %d, Column %d', [FSynEdit.CaretY, FSynEdit.CaretX]);
 end;
 

@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    10 Jul 2009
+  @Date    18 Jul 2009
   @Version 1.0
 
 **)
@@ -23,7 +23,7 @@ Uses
   Implementation
 
 Uses
-  Windows, PascalModule, VBModule;
+  Windows, PascalModule, VBModule, BackusNaurModule;
 
 Type
   (** A class type to define classes in the record structure. **)
@@ -38,13 +38,14 @@ Type
 
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
-  Modules : Array[1..6] of TDispatcherInfo = (
-    (FExt: '.bas'; FCls: TVBModule    ; FCanDoc: True),
-    (FExt: '.cls'; FCls: TVBModule    ; FCanDoc: True),
-    (FExt: '.dpk'; FCls: TPascalModule; FCanDoc: True),
-    (FExt: '.dpr'; FCls: TPascalModule; FCanDoc: True),
-    (FExt: '.frm'; FCls: TVBModule    ; FCanDoc: True),
-    (FExt: '.pas'; FCls: TPascalModule; FCanDoc: True)
+  Modules : Array[1..7] of TDispatcherInfo = (
+    (FExt: '.bas'; FCls: TVBModule        ; FCanDoc: True),
+    (FExt: '.bnf'; FCls: TBackusNaurModule; FCanDoc: False),
+    (FExt: '.cls'; FCls: TVBModule        ; FCanDoc: True),
+    (FExt: '.dpk'; FCls: TPascalModule    ; FCanDoc: True),
+    (FExt: '.dpr'; FCls: TPascalModule    ; FCanDoc: True),
+    (FExt: '.frm'; FCls: TVBModule        ; FCanDoc: True),
+    (FExt: '.pas'; FCls: TPascalModule    ; FCanDoc: True)
   );
 
 (**

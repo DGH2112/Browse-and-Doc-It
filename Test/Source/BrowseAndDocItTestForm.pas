@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    10 Jul 2009
+  @Date    18 Jul 2009
   @Author  David Hoyle
 
 **)
@@ -1148,15 +1148,23 @@ end;
 
 **)
 procedure TfrmBrowseAndDocItTestForm.SaveSettings;
+
 var
   i: Integer;
+  recWndPlmt : TWindowPlacement;
+
 begin
   with TIniFile.Create(FINIFileName) do
     try
-      WriteInteger('Position', 'Top', Top);
-      WriteInteger('Position', 'Left', Left);
-      WriteInteger('Position', 'Height', Height);
-      WriteInteger('Position', 'Width', Width);
+      recWndPlmt.Length := SizeOf(TWindowPlacement);
+      GetWindowPlacement(Handle, @recWndPlmt);
+      WriteInteger('Position', 'Top', recWndPlmt.rcNormalPosition.Top);
+      WriteInteger('Position', 'Left', recWndPlmt.rcNormalPosition.Left);
+      WriteInteger('Position', 'Height',
+        recWndPlmt.rcNormalPosition.Bottom - recWndPlmt.rcNormalPosition.Top);
+      WriteInteger('Position', 'Width',
+        recWndPlmt.rcNormalPosition.Right - recWndPlmt.rcNormalPosition.Left);
+      WriteInteger('Position', 'WindowState', Integer(WindowState));
       WriteInteger('Position', 'FileSplitter', pnlFileList.Width);
       WriteInteger('Columns', '1', lvFileList.Columns[0].Width);
       WriteInteger('Columns', '2', lvFileList.Columns[1].Width);
@@ -1210,6 +1218,8 @@ begin
       Left := ReadInteger('Position', 'Left', Left);
       Height := ReadInteger('Position', 'Height', Height);
       Width := ReadInteger('Position', 'Width', Width);
+      WindowState := TWindowState(ReadInteger('Position', 'WindowState',
+        Integer(wsNormal)));
       pnlFileList.Width := ReadInteger('Position', 'FileSplitter', pnlFileList.Width);
       lvFileList.Columns[0].Width := ReadInteger('Columns', '1', lvFileList.Columns[0].Width);
       lvFileList.Columns[1].Width := ReadInteger('Columns', '2', lvFileList.Columns[1].Width);

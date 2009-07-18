@@ -101,6 +101,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Width = 263
       Height = 141
       Align = alTop
+      Checkboxes = True
       Columns = <
         item
           Caption = 'Folder'
@@ -133,7 +134,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       MultiSelect = True
       ReadOnly = True
       RowSelect = True
-      StateImages = ilDirStatus
       TabOrder = 1
       ViewStyle = vsReport
       OnChange = lvDirectoriesChange

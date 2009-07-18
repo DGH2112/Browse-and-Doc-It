@@ -133,18 +133,22 @@ type
     FSynCPPSyn : TSynCPPSyn;
     FParseRecords : TObjectList;
     FFileExcludeList : TStringList;
+    FTimer : TTimer;
+    FLastEdit: Int64;
     function GetFileName: String;
     procedure SetFileName(const Value: String);
     procedure LoadSettings;
     procedure SaveSettings;
     function GetPathRoot: String;
-    procedure SetPathRoot(const Value: String); Protected
+    procedure SetPathRoot(const Value: String);
     Function RecurseDirectories(strRoot, strDirectory : String;
       iPosition : Integer) : TScanResults;
     Procedure RefreshExplorer(Sender : TObject);
     Procedure PopulateListView;
     Function ExcludeFileFromResults(strFileName : String) : Boolean;
     Procedure GetErrors(strFileName : String; var iHints, iWarnings, iErrors, iConflicts : Integer);
+    Procedure TimerEvent(Sender : TObject);
+    Procedure RefreshModuleExplorer;
     (**
       A property to define the currently selected file.
       @precon  None.
@@ -630,6 +634,22 @@ begin
   SynEdit1Change(Sender);
 end;
 
+procedure TfrmBrowseAndDocItTestForm.RefreshModuleExplorer;
+
+Var
+  M : TbaseLanguageModule;
+
+begin
+  M := Dispatcher(FSynEdit.Text, FileName, FSynEdit.Modified, [moParse,
+    moCheckForDocumentConflicts]);
+  If M <> Nil Then
+    Try
+      FModuleExplorerFrame.RenderModule(M);
+    Finally
+      M.Free;
+    End;
+end;
+
 (**
 
 
@@ -790,6 +810,10 @@ begin
   FModuleExplorerFrame.OnRefresh := RefreshExplorer;
   FFileExcludeList := TStringList.Create;
   LoadSettings;
+  FLastEdit := 0;
+  FTimer := TTimer.Create(Self);
+  FTimer.Interval := 100;
+  FTimer.OnTimer := TimerEvent;
 end;
 
 (**
@@ -805,6 +829,7 @@ end;
 procedure TfrmBrowseAndDocItTestForm.FormDestroy(Sender: TObject);
 
 begin
+  FTimer.Free;
   FSynEdit.Highlighter := Nil;
   FSynEdit.Free;
   FSynVBSyn.Free;
@@ -1066,6 +1091,7 @@ begin
       Begin
         FileName := lvFileList.Selected.SubItems[4];
         PathRoot := lvFileList.Selected.SubItems[5];
+        RefreshModuleExplorer;
       End Else
         MessageDlg(Format('The file "%s" was not found.',
           [lvFileList.Selected.SubItems[4]]), mtError, [mbOK], 0);
@@ -1356,17 +1382,8 @@ end;
 **)
 procedure TfrmBrowseAndDocItTestForm.SynEdit1Change(Sender: TObject);
 
-Var
-  M : TBaseLanguageModule;
-
 begin
-  M := Dispatcher(FSynEdit.Text, FileName, FSynEdit.Modified, [moParse, moCheckForDocumentConflicts]);
-  If M <> Nil Then
-    Try
-      FModuleExplorerFrame.RenderModule(M);
-    Finally
-      M.Free;
-    End;
+  FLastEdit := GetTickCount;
 end;
 
 (**
@@ -1384,6 +1401,24 @@ procedure TfrmBrowseAndDocItTestForm.SynEdit1StatusChange(Sender: TObject;
   Changes: TSynStatusChanges);
 begin
   sbrStatusBar.SimpleText := Format('Line %d, Column %d', [FSynEdit.CaretY, FSynEdit.CaretX]);
+end;
+
+procedure TfrmBrowseAndDocItTestForm.TimerEvent(Sender: TObject);
+
+Const
+  iInterval : Integer = 1000; // 1 second
+
+begin
+  If (FLastEdit > 0)  And (FLastEdit + iInterval < GetTickCount) Then
+    Begin
+      FTimer.Enabled := False;
+      Try
+        RefreshModuleExplorer;
+      Finally
+        FTimer.Enabled := True;
+        FLastEdit := 0;
+      End;
+    End;
 end;
 
 (**

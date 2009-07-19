@@ -66,6 +66,8 @@
 			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestPascalModule.pas"/>
 			<DCCReference Include="..\Source\CommonIDEFunctions.pas"/>
 			<DCCReference Include="..\Source\Tests\Source\TestCommonIDEFunctions.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\BackusNaurModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestBackusNaurModule.pas"/>
 			<None Include="ModelSupport_BrowseAndDocItTests2009\default.txaPackage"/>
 			<None Include="..\..\..\LIBRARY\CompilerDefinitions.inc"/>
 			<BuildConfiguration Include="Base">

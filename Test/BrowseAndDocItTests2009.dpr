@@ -18,7 +18,7 @@ program BrowseAndDocItTests2009;
 
 
 
-{%TogetherDiagram 'ModelSupport_BrowseAndDocItTests2006\default.txaPackage'}
+
 
 uses
   ExceptionLog,
@@ -39,7 +39,9 @@ uses
   PascalModule in '..\..\..\LIBRARY\PascalModule.pas',
   TestPascalModule in '..\..\..\LIBRARY\Test\Source\TestPascalModule.pas',
   CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
-  TestCommonIDEFunctions in '..\Source\Tests\Source\TestCommonIDEFunctions.pas';
+  TestCommonIDEFunctions in '..\Source\Tests\Source\TestCommonIDEFunctions.pas',
+  BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas',
+  TestBackusNaurModule in '..\..\..\LIBRARY\Test\Source\TestBackusNaurModule.pas';
 
 {$R *.RES}
 

@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    16 Apr 2009
+  @Date    19 Jul 2009
 
 **)
 library BrowseAndDocIt2009;
@@ -61,7 +61,8 @@ uses
   DUnitCreator in '..\Source\DUnitCreator.pas',
   CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
-  GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas';
+  GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas',
+  BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas';
 
 {$R *.res}
 

@@ -58,7 +58,8 @@ uses
   DUnitForm in '..\Source\DUnitForm.pas' {frmDUnit},
   DUnitCreator in '..\Source\DUnitCreator.pas',
   CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
-  DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas';
+  DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
+  BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas';
 
 {$R *.res}
 

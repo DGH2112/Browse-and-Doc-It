@@ -54,7 +54,9 @@ uses
   SynHighlighterVB in '..\..\..\Library\SynEdit\Source\SynHighlighterVB.pas',
   ExclusionsForm in 'Source\ExclusionsForm.pas' {frmExclusions},
   SynUnicode in '..\..\..\LIBRARY\SynEdit\Source\SynUnicode.pas',
-  DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas';
+  DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
+  BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas',
+  SynHighlighterCpp in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterCpp.pas';
 
 {$R *.res}
 

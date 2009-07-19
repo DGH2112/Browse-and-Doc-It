@@ -1983,7 +1983,6 @@ Var
 
 begin
   Result := StartClass;
-  LastChar := #0;
   CurChar := #0;
   For i := 0 To LineBufLen - 1 Do
     Begin

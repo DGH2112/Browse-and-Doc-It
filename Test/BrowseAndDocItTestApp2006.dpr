@@ -14,6 +14,7 @@ program BrowseAndDocItTestApp2006;
 {$R '..\DUnitTemplateResources.res' '..\DUnitTemplateResources.RC'}
 {%TogetherDiagram 'ModelSupport_BrowseAndDocItTestApp2006\default.txaPackage'}
 {%File '..\..\..\LIBRARY\CompilerDefinitions.inc'}
+{%File '..\..\..\LIBRARY\SynEdit\Source\SynEdit.inc'}
 
 uses
   ExceptionLog,
@@ -57,7 +58,9 @@ uses
   ExclusionsForm in 'Source\ExclusionsForm.pas' {frmExclusions},
   SynUnicode in '..\..\..\LIBRARY\SynEdit\Source\SynUnicode.pas',
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
-  GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas';
+  GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas',
+  SynHighlighterCpp in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterCpp.pas',
+  BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas';
 
 {$R *.res}
 

@@ -12,8 +12,8 @@ Unit BrowseAndDocItWizard;
 Interface
 
 Uses
-  Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, DockForm, Types,
-  Contnrs, CommonIDEFunctions, ModuleDispatcher;
+  Classes, ToolsAPI, Menus, BaseLanguageModule, Types, CommonIDEFunctions,
+  ModuleDispatcher;
 
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 
@@ -84,10 +84,10 @@ Exports
 Implementation
 
 Uses
-  SysUtils, DockableModuleExplorer, IniFiles, ToolsAPIUtils, OptionsForm, Forms,
-  Windows, ShellAPI, DGHLibrary, Dialogs, Controls,
-  PsAPI, DocumentationOptionsForm, DocumentationDispatcher, BaseDocumentation,
-  CheckForUpdates, CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF},
+  SysUtils, DockableModuleExplorer, ToolsAPIUtils, OptionsForm, Forms, Windows,
+  ShellAPI, DGHLibrary, Dialogs, Controls, DocumentationOptionsForm,
+  DocumentationDispatcher, BaseDocumentation, CheckForUpdates,
+  CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF},
   DUnitForm, DUnitCreator, BNFHighlighter, KeyboardBindings, EditorNotifier;
 
 {$IFDEF D2005}

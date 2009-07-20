@@ -38,6 +38,7 @@ Type
     Procedure TestList;
     Procedure TestFailures01;
     Procedure TestFailures02;
+    Procedure TestFailures03;
   End;
 
 Implementation
@@ -117,7 +118,7 @@ begin
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
-    CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+    //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
   Finally
     S.Free;
   End;
@@ -139,7 +140,7 @@ begin
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     //CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
-    CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+    //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
   Finally
     S.Free;
   End;
@@ -162,7 +163,28 @@ begin
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
-    CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+    //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTBackusNaurModule.TestFailures03;
+
+Const
+  strCode =
+    '<ArrayConstant> ::= ''('' ( <TypedConstant> [ '','' <TypedConstant> ] )* '')'''#13#10 +
+    '<TypedConstant> ::= ?? '#13#10;
+
+Var
+  S : TBaseLanguageModule;
+
+begin
+  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  Try
+    CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
+    CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
+    //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
   Finally
     S.Free;
   End;
@@ -185,7 +207,7 @@ begin
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
-    CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+    //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
   Finally
     S.Free;
   End;
@@ -279,7 +301,7 @@ begin
     CheckEquals(ttFileEnd, S.CurrentToken.TokenType);
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
-    CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+    //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
   Finally
     S.Free;
   End;
@@ -292,7 +314,7 @@ Const
    '/* A comment */'#13#10 +
     '<rule1> ::= ''Text'''#13#10 +
     '// another comment'#13#10 +
-    '<rule2> ::= <another-rule>'#13#10 +
+    '<rule2> ::= "hello" | "goodbye"'#13#10 +
     '<another-rule> ::= ? another rule ?'#13#10;
 
 Var
@@ -304,7 +326,7 @@ begin
     CheckEquals(ttFileEnd, S.CurrentToken.TokenType);
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
-    CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+    //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
   Finally
     S.Free;
   End;

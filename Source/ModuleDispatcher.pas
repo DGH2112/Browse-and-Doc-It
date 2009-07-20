@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    18 Jul 2009
+  @Date    20 Jul 2009
   @Version 1.0
 
 **)
@@ -13,14 +13,16 @@ Unit ModuleDispatcher;
 Interface
 
 Uses
-  SysUtils, Classes, BaseLanguageModule;
+  SysUtils, Classes, BaseLanguageModule, CommonIDEFunctions;
 
   Function Dispatcher(Source : String; strFileName : String;
     boolModified : Boolean; ModuleOptions : TModuleOptions) : TBaseLanguageModule;
   Function CanParseDocument(strFileName : String) : Boolean;
   Function CanDocumentDocument(strFileName : String) : Boolean;
+  Function GetCommentType(strFileName : String;
+    CommentStyle : TCommentStyle) : TCommentType;
 
-  Implementation
+Implementation
 
 Uses
   Windows, PascalModule, VBModule, BackusNaurModule;
@@ -31,21 +33,31 @@ Type
 
   (** A record to describe the file extensions and parser modules. **)
   TDispatcherInfo = Record
-    FExt    : String;
-    FCls    : TBaseLanguageModuleClass;
-    FCanDoc : Boolean;
+    FExt       : String;
+    FCls       : TBaseLanguageModuleClass;
+    FCanDoc    : Boolean;
+    FBlockCmt  : TCommentType;
+    FLineCmt   : TCommentType;
+    FInSituCmt : TCommentType;
   End;
 
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
   Modules : Array[1..7] of TDispatcherInfo = (
-    (FExt: '.bas'; FCls: TVBModule        ; FCanDoc: True),
-    (FExt: '.bnf'; FCls: TBackusNaurModule; FCanDoc: False),
-    (FExt: '.cls'; FCls: TVBModule        ; FCanDoc: True),
-    (FExt: '.dpk'; FCls: TPascalModule    ; FCanDoc: True),
-    (FExt: '.dpr'; FCls: TPascalModule    ; FCanDoc: True),
-    (FExt: '.frm'; FCls: TVBModule        ; FCanDoc: True),
-    (FExt: '.pas'; FCls: TPascalModule    ; FCanDoc: True)
+    (FExt: '.bas'; FCls: TVBModule        ; FCanDoc: True;
+      FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
+    (FExt: '.bnf'; FCls: TBackusNaurModule; FCanDoc: True;
+      FBlockCmt: ctCPPBlock; FLineCmt: ctCPPBlock; FInSituCmt: ctCPPBlock),
+    (FExt: '.cls'; FCls: TVBModule        ; FCanDoc: True;
+      FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
+    (FExt: '.dpk'; FCls: TPascalModule    ; FCanDoc: True;
+      FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
+    (FExt: '.dpr'; FCls: TPascalModule    ; FCanDoc: True;
+      FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
+    (FExt: '.frm'; FCls: TVBModule        ; FCanDoc: True;
+      FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
+    (FExt: '.pas'; FCls: TPascalModule    ; FCanDoc: True;
+      FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock)
   );
 
 (**
@@ -159,6 +171,36 @@ Function CanParseDocument(strFileName : String) : Boolean;
 
 Begin
   Result := Find(ExtractFileExt(strFileName)) > 0;
+End;
+
+(**
+
+  This method returns the type of comment required for the file name given and
+  for the comment style given.
+
+  @precon  None.
+  @postcon Returns the type of comment required for the file name given and
+           for the comment style given.
+
+  @param   strFileName  as a String
+  @param   CommentStyle as a TCommentStyle
+  @return  a TCommentType
+
+**)
+Function GetCommentType(strFileName : String; CommentStyle : TCommentStyle) : TCommentType;
+
+Var
+  iIndex : Integer;
+
+Begin
+  Result := ctNone;
+  iIndex := Find(ExtractFileExt(strFileName));
+  If iIndex > -1 Then
+    Case CommentStyle Of
+      csBlock:  Result := Modules[iIndex].FBlockCmt;
+      csLine:   Result := Modules[iIndex].FLineCmt;
+      csInSitu: Result := Modules[iIndex].FInSituCmt;
+    End;
 End;
 
 End.

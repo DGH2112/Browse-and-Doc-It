@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    19 Jul 2009
+  @Date    20 Jul 2009
   @Version 1.0
 
 **)
@@ -13,14 +13,11 @@ Interface
 
 Uses
   Classes, ToolsAPI, Menus, ExtCtrls, BaseLanguageModule, DockForm, Types,
-  Contnrs;
+  Contnrs, CommonIDEFunctions, ModuleDispatcher;
 
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 
 Type
-  (** This emunerate descibed the different types of doc comment .**)
-  TCommentType = (ctBlock, ctLine, ctInSitu);
-
   (** This is the class which defined the Wizard interface. **)
   TBrowseAndDocItWizard = Class(TNotifierObject, IOTAWizard)
   {$IFDEF D2005} Strict {$ENDIF} Private
@@ -34,7 +31,8 @@ Type
     FMenus : TObjectList;
     FMenuShortCuts : TList;
     {$ENDIF}
-    procedure InsertCommentBlock(CommentType: TCommentType);
+    procedure InsertCommentBlock(CommentStyle: TCommentStyle;
+      CommentType : TCommentType);
     procedure OptionsClick(Sender: TObject);
     procedure CheckForUpdatesClick(Sender: TObject);
     procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
@@ -75,74 +73,6 @@ Type
     Destructor Destroy; Override;
   End;
 
-  (** This class handles notifications from the editor so that changes in the
-      editor can be displayed. **)
-  TEditorNotifier = Class(TNotifierObject {$IFDEF D2005},
-    INTAEditServicesNotifier {$ENDIF} )
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FUpdateTimer : TTimer;
-    {$IFNDEF D2005}
-    FLastSize : Int64;
-    {$ENDIF}
-    FLastEditorName : String;
-    FLastCursorPos: TOTAEditPos;
-    FLastParserResult : Boolean;
-    Procedure EnableTimer(boolSuccessfulParse : Boolean);
-    Procedure TimerEventHandler(Sender : TObject);
-    Function EditorInfo(var strFileName : String;
-      var boolModified : Boolean) : String;
-    Procedure RenderDocument(Module : TBaseLanguageModule);
-    Procedure ExceptionMsg(strExceptionMsg : String);
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    {$IFDEF D2005}
-    procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
-    procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
-    procedure WindowActivated(const EditWindow: INTAEditWindow);
-    procedure WindowCommand(const EditWindow: INTAEditWindow; Command, Param: Integer; var Handled: Boolean);
-    procedure EditorViewActivated(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
-    procedure EditorViewModified(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
-    procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    {$ENDIF}
-    Constructor Create;
-    Destructor Destroy; Override;
-  End;
-
-  (** This class represents a key binding notifier for installing and handling
-      key bindings for this plugin. **)
-  TKeyboardBinding = Class(TNotifierObject, IOTAKeyboardBinding)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FWizard : TBrowseAndDocItWizard;
-    Procedure FocusModuleExplorer(const Context: IOTAKeyContext;
-      KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-    Procedure ShowTokens(const Context: IOTAKeyContext;
-      KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    function GetBindingType: TBindingType;
-    function GetDisplayName: string;
-    function GetName: string;
-    procedure BindKeyboard(const BindingServices: IOTAKeyBindingServices);
-    Constructor Create(Wizard : TBrowseAndDocItWizard);
-  End;
-
-  (** A class to define an new IDE Highlighter for BNF Grammar **)
-  TBNFHighlighter = Class(TNotifierObject, IOTAHighlighter)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Constructor Create;
-    Destructor Destroy; Override;
-    function GetIDString: string;
-    function GetName: string;
-    procedure Tokenize(StartClass: Byte; LineBuf: PAnsiChar; LineBufLen: Word;
-      HighlightCodes: POTASyntaxCode);
-    function TokenizeLineClass(StartClass: Byte; LineBuf: PAnsiChar;
-      LineBufLen: Word): Byte;
-  End;
-
   Procedure Register;
   Function InitWizard(Const BorlandIDEServices : IBorlandIDEServices;
     RegisterProc : TWizardRegisterProc;
@@ -155,10 +85,10 @@ Implementation
 
 Uses
   SysUtils, DockableModuleExplorer, IniFiles, ToolsAPIUtils, OptionsForm, Forms,
-  Windows, ShellAPI, TokenForm, DGHLibrary, ModuleDispatcher, Dialogs, Controls,
+  Windows, ShellAPI, DGHLibrary, Dialogs, Controls,
   PsAPI, DocumentationOptionsForm, DocumentationDispatcher, BaseDocumentation,
   CheckForUpdates, CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF},
-  DUnitForm, DUnitCreator, CommonIDEFunctions;
+  DUnitForm, DUnitCreator, BNFHighlighter, KeyboardBindings, EditorNotifier;
 
 {$IFDEF D2005}
 Resourcestring
@@ -196,13 +126,10 @@ Var
   (** This is an index for the editor notifier required when the package is
       unloaded **)
   iEditorIndex : Integer;
-  {$ELSE}
+  {$ENDIF}
   (** This is a private reference for the Editor Notifier class when not
       registered with the IDE. **)
   objEditorNotifier : TEditorNotifier;
-  {$ENDIF}
-  (** A private variable to hold the time of the last editor update. **)
-  iLastUpdateTickCount : Cardinal;
   (** An index for the keybinding nofitier - required when the package is
       unloaded **)
   iKeyBinding: Integer;
@@ -232,10 +159,10 @@ Begin
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   Wizard := TBrowseAndDocItWizard.Create;
   iWizardIndex := (BorlandIDEServices As IOTAWizardServices).AddWizard(Wizard);
-  {iIDENotifier := (BorlandIDEServices As IOTAServices).AddNotifier(Wizard);}
   {$IFDEF D2005}
+  objEditorNotifier := TEditorNotifier.Create;
   iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
-    TEditorNotifier.Create);
+    objEditorNotifier);
   {$ELSE}
   objEditorNotifier := TEditorNotifier.Create;
   {$ENDIF}
@@ -243,6 +170,53 @@ Begin
     TKeyboardBinding.Create(Wizard));
   iBNFHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
     TBNFHighlighter.Create);
+End;
+
+(**
+
+  This is a procedure to initialising the wizard interface when loading the
+  package as a DLL wizard.
+
+  @precon  None.
+  @postcon Initialises the wizard.
+
+  @param   BorlandIDEServices as an IBorlandIDEServices as a constant
+  @param   RegisterProc       as a TWizardRegisterProc
+  @param   Terminate          as a TWizardTerminateProc as a reference
+  @return  a Boolean
+
+**)
+Function InitWizard(Const BorlandIDEServices : IBorlandIDEServices;
+  RegisterProc : TWizardRegisterProc;
+  var Terminate: TWizardTerminateProc) : Boolean; StdCall;
+
+Var
+  Svcs : IOTAServices;
+  Wizard : TBrowseAndDocItWizard;
+
+Begin
+  Application.Handle := Application.MainForm.Handle;
+  TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
+  Result := BorlandIDEServices <> Nil;
+  If Result Then
+    Begin
+      Svcs := BorlandIDEServices As IOTAServices;
+      ToolsAPI.BorlandIDEServices := BorlandIDEServices;
+      Application.Handle := Svcs.GetParentHandle;
+      Wizard := TBrowseAndDocItWizard.Create;
+      RegisterProc(Wizard);
+      {$IFDEF D2005}
+      objEditorNotifier := TEditorNotifier.Create;
+      iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
+        objEditorNotifier);
+      {$ELSE}
+      objEditorNotifier := TEditorNotifier.Create;
+      {$ENDIF}
+      iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
+        TKeyboardBinding.Create(Wizard));
+      iBNFHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
+        TBNFHighlighter.Create);
+    End;
 End;
 
 (**
@@ -663,8 +637,14 @@ end;
 
 **)
 procedure TBrowseAndDocItWizard.InsertBlockCommentClick(Sender: TObject);
+
+Var
+  SE : IOTASourceEditor;
+
 begin
-  InsertCommentBlock(ctBlock);
+  SE := ActiveSourceEditor;
+  If SE <> Nil Then
+    InsertCommentBlock(csBlock, GetCommentType(SE.FileName, csBlock));
 end;
 
 (**
@@ -675,64 +655,45 @@ end;
   @precon  None.
   @postcon Inserts the specified comment.
 
-  @param   CommentType as a TCommentType
+  @param   CommentStyle as a TCommentStyle
+  @param   CommentType  as a TCommentType
 
 **)
-procedure TBrowseAndDocItWizard.InsertCommentBlock(CommentType : TCommentType);
+procedure TBrowseAndDocItWizard.InsertCommentBlock(CommentStyle : TCommentStyle;
+  CommentType : TCommentType);
 
 Var
   SourceEditor : IOTASourceEditor;
   EditPos : TOTAEditPos;
   CharPos : TOTACharPos;
   Writer : IOTAEditWriter;
-  iLen : Integer;
+  iIndent : Integer;
 
 begin
+  If CommentType = ctNone Then
+    Exit;
   SourceEditor := ActiveSourceEditor;
   If SourceEditor = Nil Then
     Exit;
   With SourceEditor.GetEditView(0) Do
     Begin
       EditPos := CursorPos;
-      iLen := CursorPos.Col;
+      iIndent := CursorPos.Col;
     End;
   Writer := SourceEditor.CreateUndoableWriter;
   Try
     CharPos.Line := EditPos.Line;
     CharPos.CharIndex := EditPos.Col;
     Writer.CopyTo(SourceEditor.GetEditView(0).CharPosToPos(CharPos) - 1);
-    Case CommentType Of
-      ctBlock:
-        Begin
-          OutputText(Writer, '(**');
-          OutputText(Writer, #13#10);
-          OutputText(Writer, StringOfChar(#32, iLen - 1) + '  '#13#10);
-          OutputText(Writer, StringOfChar(#32, iLen - 1) + '  '#13#10);
-          OutputText(Writer, StringOfChar(#32, iLen - 1) + '  '#13#10);
-          OutputText(Writer, StringOfChar(#32, iLen - 1));
-          OutputText(Writer, '**)'#13#10);
-          OutputText(Writer, StringOfChar(#32, iLen - 1));
-        End;
-      ctLine :
-        Begin
-          OutputText(Writer, '(**');
-          OutputText(Writer, #32#32);
-          OutputText(Writer, '**)'#13#10);
-          OutputText(Writer, StringOfChar(#32, iLen - 1));
-        End;
-      ctInSitu :
-        Begin
-          OutputText(Writer, '(**  **) ');
-        End;
-    End;
+    OutputText(Writer, BuildBlockComment(CommentType, CommentStyle, iIndent));
   Finally
     Writer := Nil;
   End;
   // Get header in view if not already
   With SourceEditor.GetEditView(0) Do
     Begin
-      Case CommentType Of
-        ctBlock:
+      Case CommentStyle Of
+        csBlock:
           SelectionChange(EditPos.Line + 5, EditPos.Col, EditPos.Line + 5,
             EditPos.Col);
       Else
@@ -740,8 +701,8 @@ begin
           EditPos.Col);
       End;
       // Place cursor at start of comment
-      Case CommentType Of
-        ctBlock:
+      Case CommentStyle Of
+        csBlock:
           Begin
             EditPos.Line := EditPos.Line + 2;
             EditPos.Col := EditPos.Col + 2;
@@ -766,8 +727,13 @@ end;
 
 **)
 procedure TBrowseAndDocItWizard.InsertInSituCommentClick(Sender: TObject);
+Var
+  SE : IOTASourceEditor;
+
 begin
-  InsertCommentBlock(ctInSitu);
+  SE := ActiveSourceEditor;
+  If SE <> Nil Then
+    InsertCommentBlock(csInSitu, GetCommentType(SE.FileName, csInSitu));
 end;
 
 (**
@@ -781,8 +747,13 @@ end;
 
 **)
 procedure TBrowseAndDocItWizard.InsertLineCommentClick(Sender: TObject);
+Var
+  SE : IOTASourceEditor;
+
 begin
-  InsertCommentBlock(ctLine);
+  SE := ActiveSourceEditor;
+  If SE <> Nil Then
+    InsertCommentBlock(csLine, GetCommentType(SE.FileName, csLine));
 end;
 
 (**
@@ -842,7 +813,8 @@ begin
                   iInsertLine := F.Line;
               Writer := Source.CreateUndoableWriter;
               Try
-                strComment := WriteComment(F, ctPascalBlock, iIndent, True,
+                strComment := WriteComment(F, GetCommentType(Source.FileName,
+                  csBlock), iIndent, True,
                   CursorDelta);
                 InsertComment(strComment, Writer, iInsertLine, Source);
               Finally
@@ -917,7 +889,8 @@ begin
                   iInsertLine := F.Line;
               Writer := Source.CreateUndoableWriter;
               Try
-                strComment := WriteComment(F, ctPascalBlock, iIndent, False,
+                strComment := WriteComment(F, GetCommentType(Source.FileName,
+                  csBlock), iIndent, False,
                   CursorDelta);
                 InsertComment(strComment, Writer, iInsertLine, Source);
               Finally
@@ -946,7 +919,7 @@ procedure TBrowseAndDocItWizard.OptionsClick(Sender: TObject);
 
 begin
   If TfrmOptions.Execute Then
-    iLastUpdateTickCount := 1;
+    objEditorNotifier.ResetlastupdateTickCount;
 end;
 
 (**
@@ -1067,7 +1040,7 @@ End;
 Procedure TBrowseAndDocItWizard.OptionsChange(Sender : TObject);
 
 Begin
-  iLastUpdateTickCount := 1;
+  objEditorNotifier.ResetlastupdateTickCount(1);
 End;
 
 (**
@@ -1106,455 +1079,7 @@ begin
     S.GetEditView(0).CursorPos := C;
 end;
 
-(**
-
-  This is a procedure to initialising the wizard interface when loading the
-  package as a DLL wizard.
-
-  @precon  None.
-  @postcon Initialises the wizard.
-
-  @param   BorlandIDEServices as an IBorlandIDEServices as a constant
-  @param   RegisterProc       as a TWizardRegisterProc
-  @param   Terminate          as a TWizardTerminateProc as a reference
-  @return  a Boolean
-
-**)
-Function InitWizard(Const BorlandIDEServices : IBorlandIDEServices;
-  RegisterProc : TWizardRegisterProc;
-  var Terminate: TWizardTerminateProc) : Boolean; StdCall;
-
-Var
-  Svcs : IOTAServices;
-  Wizard : TBrowseAndDocItWizard;
-
-Begin
-  Application.Handle := Application.MainForm.Handle;
-  TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
-  Result := BorlandIDEServices <> Nil;
-  If Result Then
-    Begin
-      Svcs := BorlandIDEServices As IOTAServices;
-      ToolsAPI.BorlandIDEServices := BorlandIDEServices;
-      Application.Handle := Svcs.GetParentHandle;
-      Wizard := TBrowseAndDocItWizard.Create;
-      RegisterProc(Wizard);
-      {iIDENotifier := (BorlandIDEServices As IOTAServices).AddNotifier(Wizard);}
-      {$IFDEF D2005}
-      iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
-        TEditorNotifier.Create);
-      {$ELSE}
-      objEditorNotifier := TEditorNotifier.Create;
-      {$ENDIF}
-      iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
-        TKeyboardBinding.Create(Wizard));
-      iBNFHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
-        TBNFHighlighter.Create);
-    End;
-End;
-
-(**
-
-  This is the constructor method for the TEditorNotifier class.
-
-  @precon  None.
-  @postcon Initialise the class be creating a time for handling editor changes.
-
-**)
-constructor TEditorNotifier.Create;
-begin
-  FUpdateTimer := TTimer.Create(Nil);
-  {$IFDEF D2005}
-  FUpdateTimer.Interval := 100;
-  {$ELSE}
-  FUpdateTimer.Interval := 500;
-  {$ENDIF}
-  FUpdateTimer.OnTimer := TimerEventHandler;
-  FLastParserResult := True;
-  FUpdateTimer.Enabled := True;
-end;
-
-(**
-
-  This is the destructor method for the TEditorNotifier class.
-
-  @precon  None.
-  @postcon Frees the timer control.
-
-**)
-destructor TEditorNotifier.Destroy;
-begin
-  FUpdateTimer.Free;
-  inherited;
-end;
-
-(**
-
-  This method extracts the filename, modified status and the editor stream of
-  code for the BrowseAndDocItThread.
-
-  @precon  None.
-  @postcon Extracts the filename, modified status and the editor stream of
-           code for the BrowseAndDocItThread.
-
-  @param   strFileName  as a String as a reference
-  @param   boolModified as a Boolean as a reference
-  @return  a String
-
-  @refactor Perhaps in hindsight, the compiler defines should be passed to the
-            parsers create method rather than be part of the application options.
-
-**)
-function TEditorNotifier.EditorInfo(var strFileName: String;
-  var boolModified: Boolean) : String;
-
-Var
-  SE : IOTASourceEditor;
-  Options : IOTAProjectOptions;
-
-begin
-  Result := '';
-  SE := ActiveSourceEditor;
-  If SE <> Nil Then
-    Begin
-      strFileName := SE.FileName;
-      boolModified := SE.Modified;
-      Result := EditorAsString(SE);
-      If ActiveProject <> Nil Then
-        Begin
-          Options := ActiveProject.ProjectOptions;
-          BrowseAndDocItOptions.Defines.Text :=
-            StringReplace(Options.Values['Defines'], ';', #13#10,
-            [rfReplaceAll]);
-        End;
-      {$IFDEF VER120} // Delphi 4
-      BrowseAndDocItOptions.Defines.Add('VER120');
-      {$ENDIF}
-      {$IFDEF VER130} // Delphi 5
-      BrowseAndDocItOptions.Defines.Add('VER130');
-      {$ENDIF}
-      {$IFDEF VER140} // Delphi 6
-      BrowseAndDocItOptions.Defines.Add('VER140');
-      {$ENDIF}
-      {$IFDEF VER150} // Delphi 7
-      BrowseAndDocItOptions.Defines.Add('VER150');
-      {$ENDIF}
-      {$IFDEF VER160} // Delphi for .NET
-      BrowseAndDocItOptions.Defines.Add('VER160');
-      {$ENDIF}
-      {$IFDEF VER170} // Delphi 2005
-      BrowseAndDocItOptions.Defines.Add('VER170');
-      {$ENDIF}
-      {$IFDEF VER180} // Delphi 2006
-      BrowseAndDocItOptions.Defines.Add('VER180');
-      {$ENDIF}
-      {$IFDEF VER190} // Delphi 2007
-      BrowseAndDocItOptions.Defines.Add('VER190');
-      {$ENDIF}
-      {$IFDEF VER200} // Delphi 2009
-      BrowseAndDocItOptions.Defines.Add('VER200');
-      {$ENDIF}
-      {$IFDEF WIN32}
-      BrowseAndDocItOptions.Defines.Add('WIN32');
-      BrowseAndDocItOptions.Defines.Add('MSWINDOWS');
-      {$ELSE}
-      BrowseAndDocItOptions.Defines.Add('LINUX');
-      {$ENDIF}
-    End;
-end;
-
-(**
-
-  This method reenabled the timer and returns whether the parse failed or not.
-
-  @precon  None.
-  @postcon Reenabled the timer and returns whether the parse failed or not.
-
-  @param   boolSuccessfulParse as a Boolean
-
-**)
-Procedure TEditorNotifier.EnableTimer(boolSuccessfulParse : Boolean);
-
-begin
-  FUpdateTimer.Enabled := True;
-  FLastParserResult := boolSuccessfulParse;
-end;
-
-(**
-
-  This method displays an exception message in a dialogue box.
-
-  @precon  None.
-  @postcon Displays an exception message in a dialogue box.
-
-  @param   strExceptionMsg as a String
-
-**)
-procedure TEditorNotifier.ExceptionMsg(strExceptionMsg: String);
-begin
-  ShowMessage(strExceptionMsg);
-end;
-
-(**
-
-  This method renders the given module in the module explorer window.
-
-  @precon  None.
-  @postcon Renders the given module in the module explorer window.
-
-  @param   Module as a TBaseLanguageModule
-
-**)
-procedure TEditorNotifier.RenderDocument(Module: TBaseLanguageModule);
-begin
-  TfrmDockableModuleExplorer.RenderDocumentTree(Module);
-end;
-
-(**
-
-  This is a TTimer on Timer event handler.
-
-  @precon  None.
-  @postcon Checks to see if the last time the editor was changes is beyond the
-           wait time for the module to be updated. Creates an instance of the
-           thread to render the module explorer.
-
-  @param   Sender as a TObject
-
-**)
-procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
-
-  {$IFNDEF D2005}
-  (**
-
-    This function returns the size of the editor stream, i.e. size of the text
-    buffer.
-
-    @precon  If Editor is Nil 0 is returned.
-    @postcon Returns the size of the editor stream, i.e. size of the text
-             buffer.
-
-    @param   Editor as an IOTASourceEditor
-    @return  an Int64
-
-  **)
-  Function MemStreamSize(Editor : IOTASourceEditor) : Int64;
-
-  Var
-    strSource : String;
-
-  Begin
-    Result := 0;
-    If Editor <> Nil Then
-      Begin
-        strSource := EditorAsString(Editor);
-        Result := Length(strSource);
-      End;
-  End;
-  {$ENDIF}
-
-Var
-  Editor : IOTASourceEditor;
-  P : TOTAEditPos;
-
-begin
-  Editor := ActiveSourceEditor;
-  If Editor <> Nil Then
-    Begin
-      If Editor.GetEditViewCount > 0 Then
-        P := Editor.GetEditView(0).CursorPos;
-      If iLastUpdateTickCount > 0 Then
-        If (P.Col <> FLastCursorPos.Col) Or (P.Line <> FLastCursorPos.Line) Then
-          Begin
-            iLastUpdateTickCount := GetTickCount;
-            FLastCursorPos := P;
-          End;
-      If Editor.FileName <> FLastEditorName Then
-        Begin
-          iLastUpdateTickCount := 1;
-          FLastEditorName := Editor.FileName;
-        End
-      {$IFNDEF D2005}
-        Else If FLastSize <> MemStreamSize(Editor) Then
-            Begin
-              iLastUpdateTickCount := GetTickCount;
-              FLastSize := MemStreamSize(Editor);
-            End
-      {$ENDIF};
-    End;
-  If (iLastUpdateTickCount > 0) And
-    (GetTickCount > iLastUpdateTickCount + BrowseAndDocItOptions.UpdateInterval) Then
-    Begin
-      iLastUpdateTickCount := 0;
-      If (Application <> Nil) And (Application.MainForm <> Nil) And
-        Application.MainForm.Visible Then
-        Begin
-      {$IFNDEF D2005}
-      FLastSize := MemStreamSize(Editor);
-      {$ENDIF}
-          FUpdateTimer.Enabled := False;
-          TBrowseAndDocItThread.CreateBrowseAndDocItThread(EnableTimer,
-            EditorInfo, RenderDocument, ExceptionMsg);
-        End;
-    End;
-end;
-
 {$IFDEF D2005}
-(**
-
-  This an impementation of the DockFormRefresh method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Not used.
-
-  @param   EditWindow as an INTAEditWindow constant
-  @param   DockForm   as a TDockableForm
-
-**)
-procedure TEditorNotifier.DockFormRefresh(const EditWindow: INTAEditWindow;
-  DockForm: TDockableForm);
-begin
-end;
-
-(**
-
-  This an impementation of the DockFormUpdate method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Not used.
-
-  @param   EditWindow as an INTAEditWindow constant
-  @param   DockForm   as a TDockableForm
-
-**)
-procedure TEditorNotifier.DockFormUpdated(const EditWindow: INTAEditWindow;
-  DockForm: TDockableForm);
-begin
-end;
-
-(**
-
-  This an impementation of the DockFormVisibleChange method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Not used.
-
-  @param   EditWindow as an INTAEditWindow constant
-  @param   DockForm   as a TDockableForm
-
-**)
-procedure TEditorNotifier.DockFormVisibleChanged(
-  const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-begin
-end;
-
-(**
-
-  This an impementation of the EditorViewActivate method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Refreshes the module explorer IF the last parser was sucessful.
-
-  @param   EditWindow as an INTAEditWindow constant
-  @param   EditView   as an IOTAEditView constant
-
-**)
-procedure TEditorNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
-  const EditView: IOTAEditView);
-begin
-  If FLastParserResult Then
-    iLastUpdateTickCount := 1;
-end;
-
-(**
-
-  This an impementation of the EditorViewModified method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Logs the last time the editor was updated.
-
-  @param   EditWindow as an INTAEditWindow constant
-  @param   EditView   as an IOTAEditView constant
-
-**)
-procedure TEditorNotifier.EditorViewModified(const EditWindow: INTAEditWindow;
-  const EditView: IOTAEditView);
-begin
-  iLastUpdateTickCount := GetTickCount;
-end;
-
-(**
-
-  This an impementation of the WindowActivated method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Not used.
-
-  @param   EditWindow as an INTAEditWindow constant
-
-**)
-procedure TEditorNotifier.WindowActivated(const EditWindow: INTAEditWindow);
-begin
-end;
-
-(**
-
-  This an impementation of the WindowCommand method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Not used.
-
-  @param   EditWindow as an INTAEditWindow constant
-  @param   Command    as an Integer
-  @param   Param      as an Integer
-  @param   Handled    as a Boolean as a reference
-
-**)
-procedure TEditorNotifier.WindowCommand(const EditWindow: INTAEditWindow;
-  Command, Param: Integer; var Handled: Boolean);
-begin
-end;
-
-(**
-
-  This method is not used by this class and is therefore not implemented.
-
-  @precon  None.
-  @postcon None.
-
-  @param   EditWindow as an INTAEditWindow constant
-  @param   Operation  as a TOperation
-
-**)
-procedure TEditorNotifier.WindowNotification(const EditWindow: INTAEditWindow;
-  Operation: TOperation);
-begin
-end;
-
-(**
-
-  This method is not used by this class and is therefore not implemented.
-
-  @precon  None.
-  @postcon None.
-
-  @param   EditWindow        as an INTAEditWindow constant
-  @param   Show              as a Boolean
-  @param   LoadedFromDesktop as a Boolean
-
-**)
-procedure TEditorNotifier.WindowShow(const EditWindow: INTAEditWindow; Show,
-  LoadedFromDesktop: Boolean);
-begin
-end;
-
 (**
 
   This is a method which obtains information about the package from is
@@ -1603,140 +1128,7 @@ Begin
     End;
 
 End;
-{$ENDIF}
 
-(**
-
-  This method binds all the Browse and Doc It keybindings to the methods in this
-  class.
-
-  @precon  None.
-  @postcon All the keybinding are bound.
-
-  @param   BindingServices as an IOTAKeyBindingServices as a constant
-
-**)
-procedure TKeyboardBinding.BindKeyboard(
-  const BindingServices: IOTAKeyBindingServices);
-begin
-  BindingServices.AddKeyBinding([Shortcut(13, [ssCtrl, ssShift, ssAlt])], FocusModuleExplorer, Nil);
-  BindingServices.AddKeyBinding([Shortcut(Ord('T'), [ssCtrl, ssShift, ssAlt])], ShowTokens, Nil);
-end;
-
-(**
-
-  This is a keyboard binding event hanlder for showing the tokens in the parser.
-
-  @precon  None.
-  @postcon Displays a form containsing the tokens in the current editor.
-
-  @param   Context       as an IOTAKeyContext as a constant
-  @param   KeyCode       as a TShortcut
-  @param   BindingResult as a TKeyBindingResult as a reference
-
-**)
-procedure TKeyboardBinding.ShowTokens(const Context: IOTAKeyContext;
-  KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-
-Var
-  SourceEditor : IOTASourceEditor;
-  Source : TBaseLanguageModule;
-
-begin
-  SourceEditor := ActiveSourceEditor;
-  If SourceEditor = Nil Then
-    Exit;
-  Source := Dispatcher(EditorAsString(SourceEditor), SourceEditor.FileName,
-    SourceEditor.Modified, []);
-  If Source <> Nil Then
-    Try
-      TfrmTokenForm.Execute(Source);
-    Finally
-      Source.Free;
-    End;
-  BindingResult := krHandled;
-end;
-
-(**
-
-  This is the constructor method for the TKeyboardBinding class.
-
-  @precon  None.
-  @postcon Initialises the internal wizard reference.
-
-  @param   Wizard as a TBrowseAndDocItWizard
-
-**)
-constructor TKeyboardBinding.Create(Wizard: TBrowseAndDocItWizard);
-begin
-  FWizard := Wizard;
-end;
-
-(**
-
-  This method is a handler for the Focus Modul Explorer keyboatf binding.
-
-  @precon  None.
-  @postcon Asks the main wizard for focus the module explorer.
-
-  @param   Context       as an IOTAKeyContext as a constant
-  @param   KeyCode       as a TShortcut
-  @param   BindingResult as a TKeyBindingResult as a reference
-
-**)
-procedure TKeyboardBinding.FocusModuleExplorer(const Context: IOTAKeyContext;
-  KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-begin
-  FWizard.ModuleExplorerClick(Self);
-  BindingResult := krHandled;
-end;
-
-(**
-
-  This is a getter method for the BindingType property.
-
-  @precon  None.
-  @postcon Defines the keyboard binding as a partial binding set.
-
-  @return  a TBindingType
-
-**)
-function TKeyboardBinding.GetBindingType: TBindingType;
-begin
-  Result := btPartial;
-end;
-
-(**
-
-  This is a getter method for the DisplayName property.
-
-  @precon  None.
-  @postcon Returns the diosplay name for the set of Keyboard Bindings.
-
-  @return  a string
-
-**)
-function TKeyboardBinding.GetDisplayName: string;
-begin
-  Result := 'Browse And Doc It Comment Bindings';
-end;
-
-(**
-
-  This is a getter method for the Name property.
-
-  @precon  None.
-  @postcon Returns the name of th keyboard binding set.
-
-  @return  a string
-
-**)
-function TKeyboardBinding.GetName: string;
-begin
-  Result := 'BrowseAndDocItBindings';
-end;
-
-{$IFDEF D2005}
 Var
   (** This is a handle for the splash screen bitmap resource **)
   bmSplashScreen : HBITMAP;
@@ -1749,251 +1141,6 @@ Var
   (** This is a variable to hold the build number for the package. **)
   iBuild : Integer;
 {$ENDIF}
-
-
-(**
-
-  A constructor for the TBNFHighlighter class.
-
-  @precon  None.
-  @postcon Should create a set of BNF Edit Options but currently throws an AV.
-
-**)
-constructor TBNFHighlighter.Create;
-
-Var
-  EditOps : IOTAEditOptions;
-  iEditOps : Integer;
-
-begin
-  EditOps := Nil;
-  With (BorlandIDEServices As IOTAEditorServices) Do
-    For iEditOps := 0 To EditOptionsCount - 1 Do
-      If EditorOptions[iEditOps].IDString = 'Backus-Naur' Then
-        EditOps := EditorOptions[iEditOps];
-  If EditOps = Nil Then
-    Begin
-      //: @bug This causes an AV in the IDE - I think this is a bug in RAD Studio 2009.
-      //EditOps := (BorlandIDEServices As IOTAEditorServices).AddEditOptions('Backus-Naur');
-      //EditOps.Extensions := 'bnf';
-      //EditOps.OptionsName := 'Backus-Naur Grammar';
-      //EditOps.SyntaxHighlighter := Self;
-    End;
-end;
-
-(**
-
-  This method returns a unique string ID for the highlighter.
-
-  @precon  None.
-  @postcon Returns a unique string ID for the highlighter.
-
-  @return  a string
-
-**)
-destructor TBNFHighlighter.Destroy;
-begin
-  inherited;
-end;
-
-function TBNFHighlighter.GetIDString: string;
-begin
-  Result := 'DGH.Backus-Naur Grammar Highlighter';
-end;
-
-(**
-
-  This method returns the descriptive name for the highlighter.
-
-  @precon  None.
-  @postcon Returns the descriptive name for the highlighter.
-
-  @return  a string
-
-**)
-function TBNFHighlighter.GetName: string;
-begin
-  Result := 'Backus-Naur Grammar Highlighter';
-end;
-
-(**
-
-  This method returns the higlighter mark up codes for the given Line Buffer.
-
-  @precon  None.
-  @postcon Returns the higlighter mark up codes for the given Line Buffer.
-
-  @param   StartClass     as a Byte
-  @param   LineBuf        as a PAnsiChar
-  @param   LineBufLen     as a Word
-  @param   HighlightCodes as a POTASyntaxCode
-
-**)
-procedure TBNFHighlighter.Tokenize(StartClass: Byte; LineBuf: PAnsiChar;
-  LineBufLen: Word; HighlightCodes: POTASyntaxCode);
-
-Type
-  TBlockType = (btNone, btIdentifier, btSingleLiteral, btDoubleLiteral,
-     btTextDefinition, btLineComment, btBlockComment);
-
-Const
-  strValidSymbols : Set Of AnsiChar = ([':', '=', '(', ')', '[', ']', '+', '*', '|', '''', '"']);
-  strInvalidSymbols : Set Of AnsiChar = ([#33..#255] - ['A'..'Z'] - ['a'..'z'] -
-    ['0'..'9'] - [':', '=', '(', ')', '[', ']', '+', '*', '|', '''', '"']);
-
-Var
-  Codes : PAnsiChar;
-  i : Integer;
-  CurChar, LastCHar : AnsiChar;
-  BlockType : TBlockType;
-  iBlockStart : Integer;
-
-  (**
-
-    This procedure checks for the end of a block type.
-
-    @precon  None.
-    @postcon Checks for the end of a block type and returns the block to btNone
-             if found.
-
-    @param   cChar          as an AnsiChar
-    @param   CheckBlockType as a TBlockType
-
-  **)
-  Procedure CheckBlockEnd(cChar : AnsiChar; CheckBlockType : TBlockType);
-
-  Begin
-    If (LastChar = cChar) And (BlockType = CheckBlockType) And (i > iBlockStart + 1) Then
-      Begin
-        Codes[i] := AnsiChar($E);
-        BlockType := btNone;
-        iBlockStart := 0;
-      End;
-  End;
-
-  (**
-
-    This method checks to the start of a block section and set the block type.
-
-    @precon  None.
-    @postcon Checks to the start of a block section and set the block type.
-
-    @param   cChar          as an AnsiChar
-    @param   CheckBlockType as a TBlockType
-    @param   iAttribute     as an Integer
-    @return  a Boolean
-
-  **)
-  Function CheckBlockStart(cChar : AnsiChar; CheckBlockType : TBlockType;
-    iAttribute : Integer) : Boolean;
-
-  Begin
-    Result := False;
-    If ((CurChar = cChar) And (BlockType = btNone)) Or (BlockType = CheckBlockType) Then
-      Begin
-        Codes[i] := AnsiChar(iAttribute);
-        BlockType := CheckBlockType;
-        If iBlockStart = 0 Then
-          iBlockStart := i;
-        Result := True;
-      End Else
-  End;
-
-begin
-  CurChar := #0;
-  LastChar := #0;
-  BlockType := btNone;
-  iBlockStart := 0;
-  Codes := PAnsiChar(HighlightCodes);
-  FillChar(HighlightCodes^, LineBufLen, $E); // No highlighter
-  For i := 0 To LineBufLen - 1 Do
-    Begin
-      If StartClass = atComment Then
-        Begin
-          Codes[i] := Char(atComment);
-          If LineBuf[i] = '/' Then
-            StartClass := atWhiteSpace;
-        End Else
-        Begin
-          LastChar := CurChar;
-          CurChar := LineBuf[i];
-          If LastChar In ['>'] Then
-            Begin
-              Codes[i] := AnsiChar($E);
-              BlockType := btNone;
-            End;
-          CheckBlockEnd('''', btSingleLiteral);
-          CheckBlockEnd('"', btSingleLiteral);
-          //CheckBlockEnd('/', btLineComment);
-
-          If CheckBlockStart('''', btSingleLiteral, atString) Then
-          Else If CheckBlockStart('"', btDoubleLiteral, atString) Then
-          Else If CheckBlockStart('?', btTextDefinition, atPreproc) Then
-          Else If ((CurChar In ['<']) And (BlockType = btNone)) Or (BlockType = btIdentifier) Then
-            Begin
-              Codes[i] := AnsiChar(atIdentifier);
-              BlockType := btIdentifier;
-            End Else
-          If ((LastChar In ['/']) And (CurChar In ['/'])) Or (BlockType In [btLineComment]) Then
-            Begin
-              Codes[i - 1] := AnsiChar(atComment);
-              Codes[i] := AnsiChar(atComment);
-              BlockType := btLineComment;
-              If iBlockStart = 0 Then
-                iBlockStart := i - 1;
-            End Else
-          If ((LastChar In ['/']) And (CurChar In ['*'])) Or (BlockType In [btBlockComment]) Then
-            Begin
-              Codes[i - 1] := AnsiChar(atComment);
-              Codes[i] := AnsiChar(atComment);
-              BlockType := btBlockComment;
-              If iBlockStart = 0 Then
-                iBlockStart := i - 1;
-              StartClass := atComment;
-            End Else
-          If CurChar In strValidSymbols Then
-            Codes[i] := AnsiChar(atSymbol)
-          Else If CurChar In strInvalidSymbols Then
-            Codes[i] := AnsiChar(atIllegal);
-        End;
-    End;
-end;
-
-(**
-
-  This method returns the highlighter code for the next line in the editor. Used
-  for the block comment.
-
-  @precon  None.
-  @postcon Returns the highlighter code for the next line in the editor. Used
-           for the block comment.
-
-  @param   StartClass as a Byte
-  @param   LineBuf    as a PAnsiChar
-  @param   LineBufLen as a Word
-  @return  a Byte
-
-**)
-function TBNFHighlighter.TokenizeLineClass(StartClass: Byte; LineBuf: PAnsiChar;
-  LineBufLen: Word): Byte;
-
-Var
-  i : Integer;
-  LastChar, CurChar: AnsiChar;
-
-begin
-  Result := StartClass;
-  CurChar := #0;
-  For i := 0 To LineBufLen - 1 Do
-    Begin
-      LastChar := CurChar;
-      CurChar := LineBuf[i];
-      If (LastChar In ['/']) And (CurChar In ['*']) Then
-        Result := atComment
-      Else If (LastChar In ['*']) And (CurChar In ['/']) Then
-        Result := atWhiteSpace;
-    End;
-end;
 
 (** This initialization section installs an IDE Splash Screen item. **)
 Initialization

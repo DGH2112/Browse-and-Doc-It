@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       19 Jul 2009
+  @Date       20 Jul 2009
   @Author     David Hoyle
 
 **)
@@ -172,7 +172,10 @@ begin
     Begin
       For iRule := 1 To FRules.ElementCount Do
         If FRequiredRules.Find(FRules.Elements[iRule].Identifier, iIndex) Then
-          FRequiredRules.Objects[iIndex] := TObject(0);
+          Begin
+            FRequiredRules.Objects[iIndex] := TObject(0);
+            FRules.Elements[iRule].Referenced := True;
+          End;
       For iRule := 0 To FRequiredRules.Count - 1 Do
         If FRequiredRules.Objects[iRule] <> Nil Then
           Begin
@@ -183,6 +186,12 @@ begin
               [FRequiredRules[iRule]]), scNone, 'CheckRules', iLine, iColumn,
                 etWarning);
           End;
+      For iRule := 1 To FRules.ElementCount Do
+        If Not FRules.Elements[iRule].Referenced Then
+          If Not Like('<*Goal*>', FRules.Elements[iRule].Identifier) Then
+            AddIssue(Format('The rule ''%s'' has not been referenced in the code.',
+              [FRules.Elements[iRule].Identifier]), scNone, 'CheckRules',
+              FRules.Elements[iRule].Line, FRules.Elements[iRule].Column, etHint);
     End;
 end;
 
@@ -340,7 +349,6 @@ Var
   LastChar : Char;
   (** Token size **)
   iTokenLen : Integer;
-  LastToken : TBADITokenType;
   iChar: Integer;
 
 Begin
@@ -355,7 +363,6 @@ Begin
   iColumn := 1;
   LastChar := #0;
   strToken := '';
-  LastToken := ttUnknown;
 
   iTokenLen := 0;
   SetLength(strToken, iTokenCapacity);
@@ -443,7 +450,6 @@ Begin
                         LastCharType := ttLineComment;
                       AddToken(TTokenInfo.Create(strToken, iStreamPos,
                         iTokenLine, iTokenColumn, Length(strToken), LastCharType));
-                      LastToken := LastCharType;
                     End;
                // Store Stream position, line number and column of
                // token start
@@ -803,7 +809,7 @@ begin
     Begin
       If Like('<*>', Token.Token) Then
         Begin
-          R := TBNFRule.Create(Token.Token, scNone, Token.Line, Token.Column,
+          R := TBNFRule.Create(Token.Token, scPublic, Token.Line, Token.Column,
             iiPublicType, GetComment);
           If FRules = Nil Then
             FRules := Add(TLabelContainer.Create('Rules', scNone, 0, 0,
@@ -819,7 +825,7 @@ begin
               NextNonCommentToken;
               Expression(R);
             End Else
-              ErrorAndSeekToken('Expected ''<end-of-line>'' but ''%s'' found.', 'Syntax',
+              ErrorAndSeekToken('Expected ''::='' but ''%s'' found.', 'Syntax',
                 Token.Token, strSeekableOnErrorTokens, stActual);
           LineEnd;
           If R.TokenCount = 0 Then

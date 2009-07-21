@@ -238,7 +238,7 @@ Begin
   FBackusNaurModule := TBackusNaurModule.CreateParser(
     '// A line comment.'#13#10 +
     '<rule> ::= ( ''"'' <rule-name> ''"'' | ''Text'' "Somemore" )*'#13#10 +
-    '<rule-name> ::= ? All visible characters ? /* Hello */'#13#10,
+    '<rule-name> ::= ? All visible characters ? /* Hello */'#13#10#13#10,
     'D:\Path\Backus-Naur Grammar.bnf', True, [moParse])
 End;
 
@@ -257,7 +257,7 @@ End;
 Procedure TestTBackusNaurModule.TestCreateParser;
 
 Begin
-  CheckEquals(20, FBackusNaurModule.TokenCount);
+  CheckEquals(21, FBackusNaurModule.TokenCount);
   CheckEquals('D:\Path\Backus-Naur Grammar.bnf', FBackusNaurModule.FileName);
   CheckEquals(True, FBackusNaurModule.Modified);
 End;
@@ -307,9 +307,11 @@ begin
   CheckEquals(ttBlockComment, FBackusNaurModule.Tokens[17].TokenType);
   CheckEquals('<line-end>', FBackusNaurModule.Tokens[18].Token);
   CheckEquals(ttLineEnd, FBackusNaurModule.Tokens[18].TokenType);
+  CheckEquals('<line-end>', FBackusNaurModule.Tokens[19].Token);
+  CheckEquals(ttLineEnd, FBackusNaurModule.Tokens[19].TokenType);
 
-  CheckEquals('<end-of-file>', FBackusNaurModule.Tokens[19].Token);
-  CheckEquals(ttFileEnd, FBackusNaurModule.Tokens[19].TokenType);
+  CheckEquals('<end-of-file>', FBackusNaurModule.Tokens[20].Token);
+  CheckEquals(ttFileEnd, FBackusNaurModule.Tokens[20].TokenType);
 end;
 
 procedure TestTBackusNaurModule.TestRule;

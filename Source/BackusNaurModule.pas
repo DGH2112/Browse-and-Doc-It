@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       20 Jul 2009
+  @Date       21 Jul 2009
   @Author     David Hoyle
 
 **)
@@ -39,6 +39,7 @@ Type
     FSource        : String;
     FRules         : TLabelContainer;
     FRequiredRules : TStringList;
+    FUseSemiColon  : Boolean;
     { Grammar Parsers }
     Procedure Goal;
     Procedure Syntax;
@@ -47,7 +48,9 @@ Type
     Procedure RepeatOperator(R : TBNFRule);
     Procedure List(R : TBNFRule);
     Procedure Term(R : TBNFRule);
+    Procedure Terminator;
     Procedure LineEnd;
+    procedure SemiColon;
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
@@ -58,6 +61,7 @@ Type
       Override;
     procedure TidyUpEmptyElements;
     Procedure CheckRules;
+    Procedure ProcessTags;
   Public
     Constructor CreateParser(Source : String; strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
@@ -81,8 +85,10 @@ Const
   (** A set of characters for general symbols **)
   strSymbols : Set Of AnsiChar = ['&', '(', ')', '*', '+', ',', '-', '.', '/', ':',
     ';', '=', '@', '[', ']', '^', '|'];
-  (** A set of characters for quotes **)
-  strQuote : Set Of AnsiChar = ['''', '"'];
+  (** A set of characters for single quotes **)
+  strSingleQuotes : Set Of AnsiChar = [''''];
+  (** A set of characters for double quotes **)
+  strDoubleQuotes : Set Of AnsiChar = ['"'];
   (** A set of identifier characters. **)
   strIdentifiers :  Set Of AnsiChar = ['a'..'z', 'A'..'Z', '<', '>'];
 
@@ -92,7 +98,7 @@ Const
   (** This is a list of reserved, directives word and a semi colon which are
       token that can be sort as then next place to start parsing from when an
       error is  encountered. **)
-  strSeekableOnErrorTokens : Array[1..3] Of String = (#10, #13, #13#10);
+  strSeekableOnErrorTokens : Array[1..2] Of String = (#13#10, ';');
 
 (**
 
@@ -182,15 +188,16 @@ begin
             iCode := Integer(FRequiredRules.Objects[iRule]);
             iLine := iCode And $FFFF;
             iColumn := (iCode And $FFFF0000) Shr 16;
-            AddIssue(Format('The rule ''%s'' has not been defined.',
-              [FRequiredRules[iRule]]), scNone, 'CheckRules', iLine, iColumn,
+            AddIssue(Format('The rule ''%s'' has not been defined at line %d column %d.',
+              [FRequiredRules[iRule], iLine, iColumn]), scNone, 'CheckRules', iLine, iColumn,
                 etWarning);
           End;
       For iRule := 1 To FRules.ElementCount Do
         If Not FRules.Elements[iRule].Referenced Then
           If Not Like('<*Goal*>', FRules.Elements[iRule].Identifier) Then
-            AddIssue(Format('The rule ''%s'' has not been referenced in the code.',
-              [FRules.Elements[iRule].Identifier]), scNone, 'CheckRules',
+            AddIssue(Format('The rule ''%s'' has not been referenced in the code at line %d column %d.',
+              [FRules.Elements[iRule].Identifier, FRules.Elements[iRule].Line,
+              FRules.Elements[iRule].Column]), scNone, 'CheckRules',
               FRules.Elements[iRule].Line, FRules.Elements[iRule].Column, etHint);
     End;
 end;
@@ -226,6 +233,7 @@ Begin
   FRequiredRules := TStringList.Create;
   FRequiredRules.Duplicates := dupIgnore;
   FRequiredRules.Sorted := True;
+  FRequiredRules.CaseSensitive := True;
   AddTickCount('Start');
   CommentClass := TBackusNaurComment;
   TokenizeStream;
@@ -318,8 +326,8 @@ Procedure TBackusNaurModule.TokenizeStream;
 
 Type
   (** State machine for block types. **)
-  TBlockType = (btNoBlock, btStringLiteral, btLineComment, btFullComment,
-    btCompoundSymbol, btRule, btTextRule);
+  TBlockType = (btNoBlock, btSingleLiteral, btDoubleLiteral, btLineComment,
+    btFullComment, btCompoundSymbol, btRule, btTextRule);
 
 Const
   (** Growth size of the token buffer. **)
@@ -387,11 +395,17 @@ Begin
         {$ENDIF}
           CurCharType := ttLineEnd
         {$IFNDEF D2009}
-        Else If ch In strQuote Then
+        Else If ch In strSingleQuotes Then
         {$ELSE}
-        Else If CharInSet(ch, strQuote) Then
+        Else If CharInSet(ch, strSingleQuotes) Then
         {$ENDIF}
-          CurCharType := ttStringLiteral
+          CurCharType := ttSingleLiteral
+        {$IFNDEF D2009}
+        Else If ch In strDoubleQuotes Then
+        {$ELSE}
+        Else If CharInSet(ch, strDoubleQuotes) Then
+        {$ENDIF}
+          CurCharType := ttDoubleLiteral
         {$IFNDEF D2009}
         Else If ch In strSymbols Then
         {$ELSE}
@@ -407,29 +421,30 @@ Begin
         Else
           CurCharType := ttUnknown;
 
-        // Check for full block comments
-        If (BlockType = btNoBlock) And (LastChar = '/') And (Ch = '*') Then
-          BlockType := btFullComment;
-
-        // Check for line comments
-        If (BlockType = btNoBlock) And (LastChar = '/') And (Ch = '/') Then
-          BlockType := btLineComment;
-
-        If (BlockType = btNoBlock) And (LastChar = '<') Then
-          BlockType := btRule;
-
-        If (BlockType = btNoBlock) And (LastChar = '?') And (LastCharType <> ttDirective) Then
-          BlockType := btTextRule;
+        If (BlockType = btNoBlock) Then
+          Begin
+            // Check for full block comments
+            If (LastChar = '/') And (Ch = '*') Then
+              BlockType := btFullComment;
+            // Check for line comments
+            If (LastChar = '/') And (Ch = '/') Then
+              BlockType := btLineComment;
+            If (lastChar = '<') Then
+              BlockType := btRule;
+            If (LastChar = '?') And (LastCharType <> ttCustomUserToken) Then
+              BlockType := btTextRule;
+          End;
 
         {$IFNDEF D2009}
         If (LastCharType <> CurCharType) Or (Ch In strSingleSymbols) Or
-          (LastChar In strSingleSymbols)Then
+          (LastChar In strSingleSymbols) Then
         {$ELSE}
         If (LastCharType <> CurCharType) Or (CharInSet(Ch, strSingleSymbols)) Or
           (CharInSet(LastChar, strSingleSymbols)) Then
         {$ENDIF}
           Begin
-            If ((BlockType In [btStringLiteral, btLineComment, btRule, btTextRule]) And (CurCharType <> ttLineEnd)) Or
+            If ((BlockType In [btLineComment, btSingleLiteral, btDoubleLiteral,
+              btRule, btTextRule]) And (CurCharType <> ttLineEnd)) Or
               (BlockType In [btFullComment, btCompoundSymbol]) Then
               Begin
                 Inc(iTokenLen);
@@ -448,6 +463,8 @@ Begin
                     Begin
                       If BlockType = btLineComment Then
                         LastCharType := ttLineComment;
+                      If strToken[1] In strLineEnd Then
+                        strToken := StringReplace(strToken, #13#10, '<line-end>', [rfReplaceAll]);
                       AddToken(TTokenInfo.Create(strToken, iStreamPos,
                         iTokenLine, iTokenColumn, Length(strToken), LastCharType));
                     End;
@@ -481,18 +498,23 @@ Begin
             BlockType := btNoBlock;
             CurCharType := ttIdentifier;
           End;
+        // Check for single string literals
+        If CurCharType = ttSingleLiteral Then
+          If BlockType = btSingleLiteral Then
+            BlockType := btNoBlock
+          Else If BlockType = btNoBlock Then
+            BlockType := btSingleLiteral;
+        // Check for Double string literals
+        If CurCharType = ttDoubleLiteral Then
+          If BlockType = btDoubleLiteral Then
+            BlockType := btNoBlock
+          Else If BlockType = btNoBlock Then
+            BlockType := btDoubleLiteral;
         If (BlockType = btTextRule) And (Ch = '?') Then
           Begin
             BlockType := btNoBlock;
-            CurCharType := ttDirective;
+            CurCharType := ttCustomUserToken;
           End;
-
-        // Check for string literals
-        If CurCharType = ttStringLiteral Then
-          If BlockType = btStringLiteral Then
-            BlockType := btNoBlock
-          Else If BlockType = btNoBlock Then
-            BlockType := btStringLiteral;
 
         If BlockType = btCompoundSymbol Then
           BlockType := btNoBlock;
@@ -502,7 +524,7 @@ Begin
           Begin
             Inc(iLine);
             iColumn := 1;
-            If BlockType In [btLineComment, btStringLiteral] Then
+            If BlockType In [btLineComment, btSingleLiteral, btDoubleLiteral] Then
               BlockType := btNoBlock;
           End;
         LastChar := Ch;
@@ -515,10 +537,14 @@ Begin
           {$ELSE}
           If Not (CharInSet(strToken[1], strWhiteSpace)) Then
           {$ENDIF}
-            AddToken(TTokenInfo.Create(strToken, iStreamPos,
-              iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+            Begin
+              If strToken[1] In strLineEnd Then
+                strToken := StringReplace(strToken, #13#10, '<line-end>', [rfReplaceAll]);
+              AddToken(TTokenInfo.Create(strToken, iStreamPos,
+                iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+            End;
         End;
-    AddToken(TTokenInfo.Create('', iStreamPos, iTokenLine, iTokenColumn, 0,
+    AddToken(TTokenInfo.Create('<end-of-file>', iStreamPos, iTokenLine, iTokenColumn, 0,
       ttFileEnd));
   Except
     On E : Exception Do
@@ -571,12 +597,28 @@ end;
            the next token else raises and error and seeks the end of the line.
 
 **)
+procedure TBackusNaurModule.Terminator;
+begin
+  If Not FUseSemiColon Then
+    LineEnd
+  Else
+    SemiColon;
+end;
+
+(**
+
+  This method processes line end tokens IF the code is not using semi-colons.
+
+  @precon  None.
+  @postcon Processes line end tokens IF the code is not using semi-colons.
+
+**)
 procedure TBackusNaurModule.LineEnd;
 begin
   If Token.TokenType In [ttLineEnd] Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken('Expected ''<end-of-line>'' but ''%s'' found.', 'LineEnd',
+    ErrorAndSeekToken('Expected ''<end-of-line>'' but ''%s'' found at line %d column %d.', 'LineEnd',
       Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
@@ -708,6 +750,26 @@ End;
 
 (**
 
+  This method process the modules comment looking for options to use
+  case-insensitive rules and an options semi=colon for a rule terminator.
+
+  @precon  None.
+  @postcon Process the modules comment looking for options to use
+           case-insensitive rules and an options semi=colon for a rule
+           terminator.
+
+**)
+procedure TBackusNaurModule.ProcessTags;
+begin
+  If Comment <> Nil Then
+    Begin
+      FRequiredRules.CaseSensitive := Comment.FindTag('caseinsensitive') = -1;
+      FUseSemiColon := Comment.FindTag('usesemicolon') > -1;
+    End;
+end;
+
+(**
+
   This method returns false and does not reference any tokens.
 
   @precon  None.
@@ -756,6 +818,8 @@ var
   iCode: Integer;
 
 begin
+  If FUseSemiColon Then
+    EatLineEnds;
   If Token.TokenType In [ttIdentifier] Then
     Begin
       If Like('<*>', Token.Token) Then
@@ -765,10 +829,10 @@ begin
           AddToExpression(R)
         End
       Else
-        ErrorAndSeekToken('Rules should start and end with ''<'' and ''>'' respectively.',
+        ErrorAndSeekToken('Rules should start and end with ''<'' and ''>'' respectively at line %d column %d.',
           'Term', '', strSeekableOnErrorTokens, stActual);
     End Else
-  If Token.TokenType In [ttDirective, ttStringLiteral] Then
+  If Token.TokenType In [ttCustomUserToken, ttSingleLiteral, ttDoubleLiteral] Then
     AddToExpression(R);
 end;
 
@@ -825,18 +889,35 @@ begin
               NextNonCommentToken;
               Expression(R);
             End Else
-              ErrorAndSeekToken('Expected ''::='' but ''%s'' found.', 'Syntax',
+              ErrorAndSeekToken('Expected ''::='' but ''%s'' found at line %d column %d.', 'Rule',
                 Token.Token, strSeekableOnErrorTokens, stActual);
-          LineEnd;
+          Terminator;
           If R.TokenCount = 0 Then
-            AddIssue(Format('The rule ''%s'' has no definition.', [R.Identifier]),
+            AddIssue(Format('The rule ''%s'' has no definition at line %d column %d.', [R.Identifier, R.Line, R.Column]),
               scNone, 'Rule', R.Line, R.Column, etWarning);
         End Else
-          ErrorAndSeekToken('Expected ''<rule>'' but ''%s'' found.', 'Syntax', Token.Token,
+          ErrorAndSeekToken('Expected ''<rule>'' but ''%s'' found at line %d column %d.', 'Rule', Token.Token,
             strSeekableOnErrorTokens, stActual);
       End Else
-        ErrorAndSeekToken('Rules should start and end with ''<'' and ''>'' respectively.',
-          'Syntax', Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken('Rules should start and end with ''<'' and ''>'' respectively at line %d column %d.',
+          'Rule', Token.Token, strSeekableOnErrorTokens, stActual);
+end;
+
+(**
+
+  This method processes semi=colon tokens IF the code is using semi-colons.
+
+  @precon  None.
+  @postcon Processes semi-colon tokens IF the code is using semi-colons.
+
+**)
+procedure TBackusNaurModule.SemiColon;
+begin
+  If Token.Token = ';' Then
+    NextNonCommentToken
+  Else
+    ErrorAndSeekToken('Expected '';'' but ''%s'' found at line %d column %d.', 'SemiColon',
+      Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -903,11 +984,8 @@ begin
         If Not EndOfTokens Then
           Begin
             Comment := GetComment;
+            ProcessTags;
             Syntax;
-          End Else
-          Begin
-            AddIssue(strUnExpectedEndOfFile, scNone, 'Goal', 0, 0, etError);
-            Raise EParserAbort.Create('Parsing Aborted!');
           End;
       End;
   Except

@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    10 Jul 2009
+  @Date    21 Jul 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -323,10 +323,20 @@ Begin
                 Canvas.Font.Color := TokenFontInfo[ttNumber].FColour;
                 Canvas.Font.Style := TokenFontInfo[ttNumber].FStyles;
               End;
-            ttStringLiteral :
+            ttSingleLiteral :
               Begin
-                Canvas.Font.Color := TokenFontInfo[ttStringLiteral].FColour;
-                Canvas.Font.Style := TokenFontInfo[ttStringLiteral].FStyles;
+                Canvas.Font.Color := TokenFontInfo[ttSingleLiteral].FColour;
+                Canvas.Font.Style := TokenFontInfo[ttSingleLiteral].FStyles;
+              End;
+            ttDoubleLiteral :
+              Begin
+                Canvas.Font.Color := TokenFontInfo[ttDoubleLiteral].FColour;
+                Canvas.Font.Style := TokenFontInfo[ttDoubleLiteral].FStyles;
+              End;
+            ttCustomUserToken :
+              Begin
+                Canvas.Font.Color := TokenFontInfo[ttCustomUserToken].FColour;
+                Canvas.Font.Style := TokenFontInfo[ttCustomUserToken].FStyles;
               End;
           Else
             Canvas.Font.Color := clBlack;

@@ -514,7 +514,7 @@ begin
   CheckEquals('Hello = 1', FIdentList.AsString(True, False));
   FIdentList.ClearTokens;
   FIdentList.AddToken('In', ttReservedWord);
-  FIdentList.AddToken('''D:\Path\PascalFile.pas''', ttStringLiteral);
+  FIdentList.AddToken('''D:\Path\PascalFile.pas''', ttSingleLiteral);
   CheckEquals('Hello In ''D:\Path\PascalFile.pas''', FIdentList.AsString(True, False));
 end;
 

@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       10 Jul 2009
+  @Date       21 Jul 2009
   @Author     David Hoyle
 
 **)
@@ -1637,7 +1637,7 @@ Begin
       {$ELSE}
       Else If CharInSet(ch, strQuote) Then
       {$ENDIF}
-        CurCharType := ttStringLiteral
+        CurCharType := ttDoubleLiteral
       {$IFNDEF D2009}
       Else If ch In strSymbols Then
       {$ELSE}
@@ -1688,6 +1688,13 @@ Begin
                     If (LastToken = ttLineComment) And (Length(strToken) > 2) Then
                       If (strToken[1] = '{') And (strToken[2] = '$') Then
                         LastToken := ttCompilerDirective;
+                    {$IFNDEF D2009}
+                    If strToken[1] In strLineEnd Then
+                    {$ELSE}
+                    If CharInSet(strToken[1], strLineEnd) Then
+                    {$ENDIF}
+                      strToken := StringReplace(strToken, #13#10, '<line-end>',
+                        [rfReplaceAll]);
                     AddToken(TTokenInfo.Create(strToken, iStreamPos,
                       iTokenLine, iTokenColumn, Length(strToken), LastToken));
                     //Inc(iCounter);
@@ -1715,7 +1722,7 @@ Begin
         BlockType := btLineComment;
 
       // Check for string literals
-      If CurCharType = ttStringLiteral Then
+      If CurCharType = ttDoubleLiteral Then
         If BlockType = btStringLiteral Then
           BlockType := btNoBlock
         Else If BlockType = btNoBlock Then
@@ -1761,11 +1768,18 @@ Begin
                 If IsKeyWord(strToken, strDirectives) Then
                   LastToken := ttDirective;
               End;
+            {$IFNDEF D2009}
+            If strToken[1] In strLineEnd Then
+            {$ELSE}
+            If CharInSet(strToken[1], strLineEnd) Then
+            {$ENDIF}
+              strToken := StringReplace(strToken, #13#10, '<line-end>',
+                [rfReplaceAll]);
             AddToken(TTokenInfo.Create(strToken, iStreamPos,
               iTokenLine, iTokenColumn, Length(strToken), LastToken));
           End;
     End;
-  AddToken(TTokenInfo.Create('', iStreamPos, iTokenLine, iTokenColumn, 0,
+  AddToken(TTokenInfo.Create('<end-of-file>', iStreamPos, iTokenLine, iTokenColumn, 0,
     ttFileEnd));
 End;
 
@@ -2147,7 +2161,7 @@ begin
           If Token.Token = '-' Then
             AddToExpression(A);
           If Token.TokenType In [ttNumber, ttIdentifier, ttDirective,
-            ttStringLiteral] Then
+            ttDoubleLiteral] Then
             Begin
               AddToExpression(A);
               If Token.Token = ':' Then
@@ -2647,7 +2661,7 @@ Begin
                 AExceptionHnd.HasPush := True;
                 NextNonCommentToken;
                 While Token.TokenType In [ttIdentifier, ttReservedWord,
-                  ttStringLiteral] Do
+                  ttDoubleLiteral] Do
                   Begin
                     AExceptionHnd.PushName := AExceptionHnd.PushName + Token.Token;
                     NextNonCommentToken;

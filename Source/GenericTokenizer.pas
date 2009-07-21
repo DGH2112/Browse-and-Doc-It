@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    10 Jul 2009
+  @Date    21 Jul 2009
   @Version 1.0
 
 **)
@@ -44,7 +44,7 @@ Function Tokenize(strText : String; var KeyWords : TKeyWords;
 
 Type
   (** State machine for block types. **)
-  TBlockType = (btNoBlock, btStringLiteral);
+  TBlockType = (btNoBlock, btSingleLiteral, btDoubleLiteral, btCustomUserToken);
 
 Const
   (** Growth size of the token buffer. **)
@@ -111,11 +111,23 @@ Begin
       {$ENDIF}
         CurToken := ttLineEnd
       {$IFNDEF D2009}
-      Else If strText[i] In ['''', '"'] Then
+      Else If strText[i] In [''''] Then
       {$ELSE}
-      Else If CharInSet(strText[i], ['''', '"']) Then
+      Else If CharInSet(strText[i], ['''']) Then
       {$ENDIF}
-        CurToken := ttStringLiteral
+        CurToken := ttSingleLiteral
+      {$IFNDEF D2009}
+      Else If strText[i] In ['"'] Then
+      {$ELSE}
+      Else If CharInSet(strText[i], ['"']) Then
+      {$ENDIF}
+        CurToken := ttDoubleLiteral
+      {$IFNDEF D2009}
+      Else If strText[i] In ['?'] Then
+      {$ELSE}
+      Else If CharInSet(strText[i], ['?']) Then
+      {$ENDIF}
+        CurToken := ttCustomUserToken
       {$IFNDEF D2009}
       Else If strText[i] In [#0..#255] - ['#', '_', 'a'..'z', 'A'..'Z', '$', '0'..'9'] Then
       {$ELSE}
@@ -126,7 +138,8 @@ Begin
         CurToken := ttUnknown;
       If (LastToken <> CurToken) Or (CurToken = ttSymbol) Then
         Begin
-          If ((BlockType In [btStringLiteral]) And (CurToken <> ttLineEnd)) Then
+          If ((BlockType In [btSingleLiteral, btDoubleLiteral, btCustomUserToken]) And
+            (CurToken <> ttLineEnd)) Then
             Begin
               Inc(iTokenLen);
               If iTokenLen > Length(strToken) Then
@@ -161,11 +174,23 @@ Begin
         End;
 
       // Check for string literals
-      If CurToken = ttStringLiteral Then
-        If BlockType = btStringLiteral Then
+      If CurToken = ttSingleLiteral Then
+        If BlockType = btSingleLiteral Then
           BlockType := btNoBlock
         Else If BlockType = btNoBlock Then
-          BlockType := btStringLiteral;
+          BlockType := btSingleLiteral;
+      // Check for string literals
+      If CurToken = ttDoubleLiteral Then
+        If BlockType = btDoubleLiteral Then
+          BlockType := btNoBlock
+        Else If BlockType = btNoBlock Then
+          BlockType := btDoubleLiteral;
+      // Check for Custom User Token
+      If CurToken = ttCustomUserToken Then
+        If BlockType = btCustomUserToken Then
+          BlockType := btNoBlock
+        Else If BlockType = btNoBlock Then
+          BlockType := btCustomUserToken;
 
     End;
   If iTokenLen > 0 Then

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       10 Jul 2009
+  @Date       21 Jul 2009
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -2131,7 +2131,7 @@ Begin
         {$ELSE}
         Else If CharInSet(ch, strQuote) Then
         {$ENDIF}
-          CurCharType := ttStringLiteral
+          CurCharType := ttSingleLiteral
         {$IFNDEF D2009}
         Else If ch In strSymbols Then
         {$ELSE}
@@ -2193,7 +2193,7 @@ Begin
                           If IsKeyWord(strToken, strDirectives) Then
                             LastCharType := ttDirective;
                           If strToken[1] = '#' Then
-                            LastCharType := ttStringLiteral;
+                            LastCharType := ttSingleLiteral;
                         End;
                       If BlockType = btLineComment Then
                         LastCharType := ttLineComment;
@@ -2201,8 +2201,8 @@ Begin
                         If (strToken[1] = '{') And (strToken[2] = '$') Then
                           LastCharType := ttCompilerDirective;
                       If ((LastToken = ttNumber) And ((strToken = '.') Or (LastCharType = ttNumber))) Or
-                        ((LastToken = ttStringLiteral) And (strToken[1] = '#')) Or
-                        ((LastToken = ttStringLiteral) And (LastCharType = ttStringLiteral)) Then
+                        ((LastToken = ttSingleLiteral) And (strToken[1] = '#')) Or
+                        ((LastToken = ttSingleLiteral) And (LastCharType = ttSingleLiteral)) Then
                         Begin
                           AppendToLastToken(strToken);
                           LastToken := LastToken;
@@ -2239,7 +2239,7 @@ Begin
           End;
 
         // Check for string literals
-        If CurCharType = ttStringLiteral Then
+        If CurCharType = ttSingleLiteral Then
           If BlockType = btStringLiteral Then
             BlockType := btNoBlock
           Else If BlockType = btNoBlock Then
@@ -5386,7 +5386,7 @@ Var
   End;
 
 Begin
-  If Token.TokenType In [ttStringLiteral] Then
+  If Token.TokenType In [ttSingleLiteral] Then
     Begin
       If (etUnknown In ExprType) Then
         Begin
@@ -8386,7 +8386,7 @@ begin
           If Token.Token = '[' Then
             Begin
               NextNonCommentToken;
-              If Token.TokenType In [ttStringLiteral, ttIdentifier] Then
+              If Token.TokenType In [ttSingleLiteral, ttIdentifier] Then
                 Begin
                   Result.GUID := Token.Token;
                   NextNonCommentToken;
@@ -8560,7 +8560,7 @@ Begin
               If I <> Nil Then
                 I.AddToken(Token.Token);
               NextNonCommentToken;
-              If Token.TokenType <> ttStringLiteral Then
+              If Token.TokenType <> ttSingleLiteral Then
                 ErrorAndSeekToken(strStringExpected, 'IdentList', Token.Token,
                   SeekTokens, stActual)
               Else

@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    20 Jul 2009
+  @Date    21 Jul 2009
   @Version 1.0
 
 **)
@@ -88,31 +88,8 @@ Uses
   ShellAPI, DGHLibrary, Dialogs, Controls, DocumentationOptionsForm,
   DocumentationDispatcher, BaseDocumentation, CheckForUpdates,
   CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF},
-  DUnitForm, DUnitCreator, BNFHighlighter, KeyboardBindings, EditorNotifier;
-
-{$IFDEF D2005}
-Resourcestring
-  (** This is a text string of revision from nil and a to z. **)
-  strRevision = ' abcdefghijklmnopqrstuvwxyz';
-  {$IFDEF VER170}
-  (** This is a message string to appear in the BDS 2005 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2005';
-  {$ENDIF}
-  {$IFDEF VER180}
-  (** This is a message string to appear in the BDS 2006 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2006';
-  {$ENDIF}
-  {$IFDEF VER190}
-  (** This is a message string to appear in the CDS 2007 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2007';
-  {$ENDIF}
-  {$IFDEF VER200}
-  (** This is a message string to appear in the CRS 2009 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2009';
-  {$ENDIF}
-  (** This is another message string to appear in the BDS 2005/6 splash screen **)
-  strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
-{$ENDIF}
+  DUnitForm, DUnitCreator, BNFHighlighter, KeyboardBindings, EditorNotifier,
+  EidolonHighlighter;
 
 Const
   (** This is the software ID for this module on the internet. **)
@@ -133,9 +110,12 @@ Var
   (** An index for the keybinding nofitier - required when the package is
       unloaded **)
   iKeyBinding: Integer;
-  (** An index for the Highlighter notifier - required for unloading the
+  (** An index for the BNF Highlighter notifier - required for unloading the
       highlighter. **)
   iBNFHighlighter : Integer;
+  (** An index for the Eidolon Highlighter notifier - required for unloading the
+      highlighter. **)
+  iEidolonHighlighter : Integer;
 
 (**
 
@@ -170,6 +150,8 @@ Begin
     TKeyboardBinding.Create(Wizard));
   iBNFHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
     TBNFHighlighter.Create);
+  iEidolonHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
+    TEidolonHighlighter.Create);
 End;
 
 (**
@@ -216,6 +198,8 @@ Begin
         TKeyboardBinding.Create(Wizard));
       iBNFHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
         TBNFHighlighter.Create);
+      iEidolonHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
+        TEidolonHighlighter.Create);
     End;
 End;
 
@@ -919,7 +903,7 @@ procedure TBrowseAndDocItWizard.OptionsClick(Sender: TObject);
 
 begin
   If TfrmOptions.Execute Then
-    objEditorNotifier.ResetlastupdateTickCount;
+    objEditorNotifier.ResetLastupdateTickCount(1);
 end;
 
 (**
@@ -945,7 +929,7 @@ Var
   C : TOTAEditPos;
 
 begin
-  {: @note although you can get the regions by Query an IOTAModule for
+  {: @note Although you can get the regions by Query an IOTAModule for
            IOTAModuleRegions, you can not do anything with them!}
   SourceEditor := ActiveSourceEditor;
   If SourceEditor <> Nil Then
@@ -1129,6 +1113,30 @@ Begin
 
 End;
 
+{$IFDEF D2005}
+Resourcestring
+  (** This is a text string of revision from nil and a to z. **)
+  strRevision = ' abcdefghijklmnopqrstuvwxyz';
+  {$IFDEF VER170}
+  (** This is a message string to appear in the BDS 2005 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2005';
+  {$ENDIF}
+  {$IFDEF VER180}
+  (** This is a message string to appear in the BDS 2006 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2006';
+  {$ENDIF}
+  {$IFDEF VER190}
+  (** This is a message string to appear in the CDS 2007 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2007';
+  {$ENDIF}
+  {$IFDEF VER200}
+  (** This is a message string to appear in the CRS 2009 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2009';
+  {$ENDIF}
+  (** This is another message string to appear in the BDS 2005/6 splash screen **)
+  strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
+{$ENDIF}
+
 Var
   (** This is a handle for the splash screen bitmap resource **)
   bmSplashScreen : HBITMAP;
@@ -1157,6 +1165,7 @@ Initialization
 (** This finalization section removes this wizard from the IDE when the package
     is unloaded. **)
 Finalization
+  (BorlandIDEServices As IOTAHighlightServices).RemoveHighlighter(iEidolonHighlighter);
   (BorlandIDEServices As IOTAHighlightServices).RemoveHighlighter(iBNFHighlighter);
   (BorlandIDEServices As IOTAKeyboardServices).RemoveKeyboardBinding(iKeyBinding);
   {$IFDEF D2005}

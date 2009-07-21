@@ -1,12 +1,12 @@
 (**
-  
+
   This module contains a custom syntax highlighter for the Borland/Codegear
   IDE to show Backus-Naur grammar.
 
   @Version 1.0
-  @Date    20 Jul 2009
+  @Date    21 Jul 2009
   @Author  David Hoyle
-  
+
 **)
 Unit BNFHighlighter;
 
@@ -19,7 +19,7 @@ Uses
 
 Type
   (** A class to define an new IDE Highlighter for BNF Grammar **)
-  TBNFHighlighter = Class(TNotifierObject, IOTAHighlighter)
+  TBNFHighlighter = Class(TNotifierObject, IOTAHighlighter, IOTAHighlighterPreview)
   {$IFDEF D2005} Strict {$ENDIF} Private
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
@@ -30,6 +30,18 @@ Type
       HighlightCodes: POTASyntaxCode);
     function TokenizeLineClass(StartClass: Byte; LineBuf: PAnsiChar;
       LineBufLen: Word): Byte;
+    function  GetBlockEndCol: Integer;
+    function  GetBlockEndLine: Integer;
+    function  GetBlockStartCol: Integer;
+    function  GetBlockStartLine: Integer;
+    function  GetCurrentInstructionLine: Integer;
+    function  GetDisabledBreakpointLine: Integer;
+    function  GetDisplayName: string;
+    function  GetErrorLine: Integer;
+    function  GetInvalidBreakpointLine: Integer;
+    function  GetSampleSearchText: string;
+    function  GetSampleText: string;
+    function  GetValidBreakpointLine: Integer;
   End;
 
 Implementation
@@ -66,6 +78,128 @@ end;
 
 (**
 
+  This method returns the end column of the highlighted block in the preview.
+
+  @precon  None.
+  @postcon Returns the end column of the highlighted block in the preview.
+
+  @return  an Integer
+
+**)
+function TBNFHighlighter.GetBlockEndCol: Integer;
+begin
+  Result := 39;
+end;
+
+(**
+
+  This method returns the end line of the highlighted block in the preview.
+
+  @precon  None.
+  @postcon Returns the end line of the highlighted block in the preview.
+
+  @return  an Integer
+
+**)
+function TBNFHighlighter.GetBlockEndLine: Integer;
+begin
+  Result := 12;
+end;
+
+(**
+
+  This method returns the start column of the highlighted block in the preview.
+
+  @precon  None.
+  @postcon Returns the start column of the highlighted block in the preview.
+
+  @return  an Integer
+
+**)
+function TBNFHighlighter.GetBlockStartCol: Integer;
+begin
+  Result := 24;
+end;
+
+(**
+
+  This method returns the start line of the highlighted block in the preview.
+
+  @precon  None.
+  @postcon Returns the start line of the highlighted block in the preview.
+
+  @return  an Integer
+
+**)
+function TBNFHighlighter.GetBlockStartLine: Integer;
+begin
+  Result := 12;
+end;
+
+(**
+
+  This method returns the line number for the Current Instruction.
+
+  @precon  None.
+  @postcon Returns -1 signifying this not to be displayed.
+
+  @return  an Integer
+
+**)
+function TBNFHighlighter.GetCurrentInstructionLine: Integer;
+begin
+  Result := -1;
+end;
+
+(**
+
+  This method returns the line number for the Disabled Breakpoint.
+
+  @precon  None.
+  @postcon Returns -1 signifying this not to be displayed.
+
+  @return  an Integer
+
+**)
+function TBNFHighlighter.GetDisabledBreakpointLine: Integer;
+begin
+  Result := -1;
+end;
+
+(**
+
+  This method returns the display name of the highlighter preview in the
+  options dialogue.
+
+  @precon  None.
+  @postcon Returns the display name of the highlighter preview in the
+           options dialogue.
+
+  @return  a string
+
+**)
+function TBNFHighlighter.GetDisplayName: string;
+begin
+  Result := 'Backus-Naur';
+end;
+
+(**
+
+  This method returns the line number for the Error Line.
+
+  @precon  None.
+  @postcon Returns -1 signifying this not to be displayed.
+
+  @return  an Integer
+
+**)
+function TBNFHighlighter.GetErrorLine: Integer;
+begin
+  Result := -1;
+end;
+
+(**
+
   This method returns a unique string ID for the highlighter.
 
   @precon  None.
@@ -81,6 +215,21 @@ end;
 
 (**
 
+  This method returns the line number for the Invalid Breakpoint.
+
+  @precon  None.
+  @postcon Returns -1 signifying this not to be displayed.
+
+  @return  an Integer
+
+**)
+function TBNFHighlighter.GetInvalidBreakpointLine: Integer;
+begin
+  Result := -1;
+end;
+
+(**
+
   This method returns the descriptive name for the highlighter.
 
   @precon  None.
@@ -91,7 +240,85 @@ end;
 **)
 function TBNFHighlighter.GetName: string;
 begin
-  Result := 'Backus-Naur Grammar Highlighter';
+  Result := 'Backus-Naur Grammar';
+end;
+
+(**
+
+  This method returns the text to be highlighted in the preview as a search.
+
+  @precon  None.
+  @postcon Returns the text to be highlighted in the preview as a search.
+
+  @return  a string
+
+**)
+function TBNFHighlighter.GetSampleSearchText: string;
+begin
+  Result := '<expression>';
+end;
+
+(**
+
+  This method returns the tex to be shown in the highlighter preview.
+
+  @precon  None.
+  @postcon Returns the tex to be shown in the highlighter preview.
+
+  @return  a string
+
+**)
+function TBNFHighlighter.GetSampleText: string;
+begin
+  Result :=
+    '/**'#13#10 +
+    ''#13#10 +
+    '  Backus-Naur Language Grammar'#13#10 +
+    ''#13#10 +
+    '  @Version 1.0'#13#10 +
+    '  @Date    21 Jul 2009'#13#10 +
+    '  @Author  David Hoyle'#13#10 +
+    ''#13#10 +
+    '**/'#13#10 +
+    '<syntax>           ::= <rule> | <rule> <syntax>'#13#10 +
+    ''#13#10 +
+    '<rule>             ::= "<" <rule-name> ">" "::=" <expression> <terminator>'#13#10 +
+    ''#13#10 +
+    '<expression>       ::= <list> | <list> "|" <expression> // A line comment'#13#10 +
+    ''#13#10 +
+    '<list>             ::= ''('' <expression> '')'' <RepeatOperator> | ''['' <expression> '']'' <RepeatOperator> | ( <term> | <term> <list> )'#13#10 +
+    ''#13#10 +
+    '<RepeatOperator>   ::= "*" | "+"'#13#10 +
+    ''#13#10 +
+    '<term>             ::= <literal> | "<" <rule-name> ">"'#13#10 +
+    ''#13#10 +
+    '<literal>          ::= ''"'' <text> ''"'' | "''" <text> "''"'#13#10 +
+    ''#13#10 +
+    '<rule-name>        ::= <text>'#13#10 +
+    ''#13#10 +
+    '<text>             ::= ? All visible ASCII characters - [#33..#128] ?'#13#10 +
+    ''#13#10 +
+    '<EOL>              ::= ? Carriage Return and Line Feed characters - [#13, #10] ?'#13#10 +
+    ''#13#10 +
+    '/** General termiantor is <EOL> except if the module header contains a tag'#13#10 +
+    '    @@usesemicolon where upon the end of line is ignored and a semi-colon is'#13#10 +
+    '    used. **/'#13#10 +
+    '<terminator>       ::= '';'' | <EOL>'#13#10;
+end;
+
+(**
+
+  This method returns the line number for the Valid Breakpoint.
+
+  @precon  None.
+  @postcon Returns -1 signifying this not to be displayed.
+
+  @return  an Integer
+
+**)
+function TBNFHighlighter.GetValidBreakpointLine: Integer;
+begin
+  Result := -1;
 end;
 
 (**
@@ -115,7 +342,7 @@ Type
      btTextDefinition, btLineComment, btBlockComment);
 
 Const
-  strValidSymbols = ([':', '=', '(', ')', '[', ']', '-', '+', '*', '|', '''', '"']);
+  strValidSymbols = ([';', ':', '=', '(', ')', '[', ']', '-', '+', '*', '|', '''', '"']);
   strAllSymbols = ([#33..#255] - ['A'..'Z'] - ['a'..'z'] - ['0'..'9']);
   strInvalidSymbols = (strAllSymbols - strValidSymbols);
 
@@ -196,7 +423,8 @@ begin
               BlockType := btNone;
             End;
           CheckBlockEnd('''', btSingleLiteral);
-          CheckBlockEnd('"', btSingleLiteral);
+          CheckBlockEnd('"', btDoubleLiteral);
+          CheckBlockEnd('?', btTextDefinition);
           If ((LastChar In ['*']) And (CurChar In ['/']) And (BlockType In [btBlockComment])) Then
             Begin
               Codes[i] := AnsiChar(atComment);
@@ -206,7 +434,7 @@ begin
             End ;
 
           If CheckBlockStart('''', btSingleLiteral, atString) Then
-          Else If CheckBlockStart('"', btDoubleLiteral, atString) Then
+          Else If CheckBlockStart('"', btDoubleLiteral, atCharacter) Then
           Else If CheckBlockStart('?', btTextDefinition, atPreproc) Then
           Else If ((CurChar In ['<']) And (BlockType = btNone)) Or (BlockType = btIdentifier) Then
             Begin

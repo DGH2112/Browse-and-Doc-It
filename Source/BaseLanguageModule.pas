@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    10 Jul 2009
+  @Date    21 Jul 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -29,9 +29,10 @@ Type
   TTokenIndex = Integer;
   (** An enumerate type to define the stream status and token types. **)
   TBADITokenType = (ttUnknown, ttWhiteSpace, ttReservedWord, ttIdentifier,
-    ttNumber, ttSymbol, ttLineEnd, ttStringLiteral, ttLineComment, ttBlockComment,
-    ttHTMLStartTag, ttHTMLEndTag, ttDirective, ttCompilerDirective, ttLinkTag,
-    ttTreeHeader, ttFileEnd, ttLineContinuation);
+    ttNumber, ttSymbol, ttLineEnd, ttSingleLiteral, ttDoubleLiteral,
+    ttLineComment, ttBlockComment, ttHTMLStartTag, ttHTMLEndTag, ttDirective,
+    ttCompilerDirective, ttLinkTag, ttTreeHeader, ttFileEnd, ttLineContinuation,
+    ttCustomUserToken);
   (** An enumerate for the scoping of identifiers. **)
   TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic,
     scPublished, scFriend);
@@ -1993,12 +1994,14 @@ Const
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : [fsBold]),
     (FColour : clBlack;  FStyles : []),
     (FColour : clBlack;  FStyles : []),
     (FColour : clMaroon; FStyles : [fsBold]),
-    (FColour : clMaroon; FStyles : []),
-    (FColour : clMaroon; FStyles : [])
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : []),
+    (FColour : clBlack;  FStyles : [])
   );
 
   (** This is a constant for special tag items to show in the tree **)
@@ -2308,9 +2311,10 @@ Const
   (** A list of strings representing the token types. **)
   strTokenType : Array[Low(TBADITokenType)..High(TBADITokenType)] Of String = (
     'Unknown', 'WhiteSpace', 'ReservedWord', 'Identifier', 'Number',
-    'Symbol', 'LineEnd', 'StringLiteral', 'LineComment', 'BlockComment',
-    'HTMLStartTag', 'HTMLEndTag',  'Directive', 'CompilerDirective', 'LinkTag',
-    'TreeHeader', 'FileEnd', 'LineContinuation');
+    'Symbol', 'LineEnd', 'SingleLiteral', 'DoubleLiteral', 'LineComment',
+    'BlockComment', 'HTMLStartTag', 'HTMLEndTag',  'Directive',
+    'CompilerDirective', 'LinkTag', 'TreeHeader', 'FileEnd', 'LineContinuation',
+    'CustomUserToken');
 
 Var
   (** This is a global variable for the Browse and Doc It options that need to

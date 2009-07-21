@@ -463,7 +463,11 @@ Begin
                     Begin
                       If BlockType = btLineComment Then
                         LastCharType := ttLineComment;
+                      {$IFNDEF D2009}
                       If strToken[1] In strLineEnd Then
+                      {$ELSE}
+                      If CharInSet(strToken[1], strLineEnd) Then
+                      {$ENDIF}
                         strToken := StringReplace(strToken, #13#10, '<line-end>', [rfReplaceAll]);
                       AddToken(TTokenInfo.Create(strToken, iStreamPos,
                         iTokenLine, iTokenColumn, Length(strToken), LastCharType));
@@ -538,7 +542,11 @@ Begin
           If Not (CharInSet(strToken[1], strWhiteSpace)) Then
           {$ENDIF}
             Begin
+              {$IFNDEF D2009}
               If strToken[1] In strLineEnd Then
+              {$ELSE}
+              If CharInSet(strToken[1], strLineEnd) Then
+              {$ENDIF}
                 strToken := StringReplace(strToken, #13#10, '<line-end>', [rfReplaceAll]);
               AddToken(TTokenInfo.Create(strToken, iStreamPos,
                 iTokenLine, iTokenColumn, Length(strToken), LastCharType));

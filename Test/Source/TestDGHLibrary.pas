@@ -442,12 +442,14 @@ Var
   ProcMsgHndr : TDGHCreateProcessHandler;
   iResult : Integer;
   slLines : TStringList;
+  strDrive: String;
 
 begin
+  strDrive := ExtractFileDrive(ParamStr(0));
   Process.boolEnabled := True;
-  Process.strEXE := 'E:\HoylD\Borland Studio Projects\Library\Test\SuccessConsoleApp.exe';
+  Process.strEXE := strDrive + '\HoylD\Borland Studio Projects\Library\Test\SuccessConsoleApp.exe';
   Process.strParams := '';
-  Process.strDir := 'E:\HoylD\Borland Studio Projects\Library\Test\';
+  Process.strDir := strDrive + '\HoylD\Borland Studio Projects\Library\Test\';
   slLines := TStringList.Create;
   Try
     ProcMsgHndr := TDGHCreateProcessHandler.Create(slLines); // No free required (Interface)
@@ -457,7 +459,7 @@ begin
     CheckEquals('This allocation runs successfully and', ProcMsgHndr.Output[0]);
     CheckEquals('returns an ERRORLEVEL = 0.', ProcMsgHndr.Output[1]);
     slLines.Clear;
-    Process.strEXE := 'E:\HoylD\Borland Studio Projects\Library\Test\FailureConsoleApp.exe';
+    Process.strEXE := strDrive + '\HoylD\Borland Studio Projects\Library\Test\FailureConsoleApp.exe';
     ProcMsgHndr := TDGHCreateProcessHandler.Create(slLines); // No free required (Interface)
     iResult := DGHCreateProcess(Process, ProcMsgHndr);
     CheckEquals(1, iResult, 'SuccessConsoleApp ERRORLEVEL');

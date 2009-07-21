@@ -32,6 +32,7 @@ Type
     Procedure TestAsString;
     Procedure TestCreateParser;
     Procedure TestTokenizeStream;
+    Procedure TestGoal;
     Procedure TestSyntax;
     Procedure TestRule;
     Procedure TestExpression;
@@ -190,6 +191,25 @@ begin
   End;
 end;
 
+procedure TestTBackusNaurModule.TestGoal;
+
+Const
+  strCode = ''#13#10;
+
+Var
+  S : TBaseLanguageModule;
+
+begin
+  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  Try
+    CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
+    CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
+    //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+  Finally
+    S.Free;
+  End;
+end;
+
 procedure TestTBackusNaurModule.TestList;
 
 Const
@@ -217,7 +237,7 @@ Procedure TestTBackusNaurModule.Setup;
 Begin
   FBackusNaurModule := TBackusNaurModule.CreateParser(
     '// A line comment.'#13#10 +
-    '<rule> ::= ( <rule-name> | ''Text'' "Somemore" )*'#13#10 +
+    '<rule> ::= ( ''"'' <rule-name> ''"'' | ''Text'' "Somemore" )*'#13#10 +
     '<rule-name> ::= ? All visible characters ? /* Hello */'#13#10,
     'D:\Path\Backus-Naur Grammar.bnf', True, [moParse])
 End;
@@ -237,7 +257,7 @@ End;
 Procedure TestTBackusNaurModule.TestCreateParser;
 
 Begin
-  CheckEquals(18, FBackusNaurModule.TokenCount);
+  CheckEquals(20, FBackusNaurModule.TokenCount);
   CheckEquals('D:\Path\Backus-Naur Grammar.bnf', FBackusNaurModule.FileName);
   CheckEquals(True, FBackusNaurModule.Modified);
 End;
@@ -247,7 +267,7 @@ procedure TestTBackusNaurModule.TestTokenizeStream;
 begin
   CheckEquals('// A line comment.', FBackusNaurModule.Tokens[0].Token);
   CheckEquals(ttLineComment, FBackusNaurModule.Tokens[0].TokenType);
-  CheckEquals(#13#10, FBackusNaurModule.Tokens[1].Token);
+  CheckEquals('<line-end>', FBackusNaurModule.Tokens[1].Token);
   CheckEquals(ttLineEnd, FBackusNaurModule.Tokens[1].TokenType);
 
   CheckEquals('<rule>', FBackusNaurModule.Tokens[2].Token);
@@ -256,34 +276,40 @@ begin
   CheckEquals(ttSymbol, FBackusNaurModule.Tokens[3].TokenType);
   CheckEquals('(', FBackusNaurModule.Tokens[4].Token);
   CheckEquals(ttSymbol, FBackusNaurModule.Tokens[4].TokenType);
-  CheckEquals('<rule-name>', FBackusNaurModule.Tokens[5].Token);
-  CheckEquals(ttIdentifier, FBackusNaurModule.Tokens[5].TokenType);
-  CheckEquals('|', FBackusNaurModule.Tokens[6].Token);
-  CheckEquals(ttSymbol, FBackusNaurModule.Tokens[6].TokenType);
-  CheckEquals('''Text''', FBackusNaurModule.Tokens[7].Token);
-  CheckEquals(ttStringLiteral, FBackusNaurModule.Tokens[7].TokenType);
-  CheckEquals('"Somemore"', FBackusNaurModule.Tokens[8].Token);
-  CheckEquals(ttStringLiteral, FBackusNaurModule.Tokens[8].TokenType);
-  CheckEquals(')', FBackusNaurModule.Tokens[9].Token);
-  CheckEquals(ttSymbol, FBackusNaurModule.Tokens[9].TokenType);
-  CheckEquals('*', FBackusNaurModule.Tokens[10].Token);
-  CheckEquals(ttSymbol, FBackusNaurModule.Tokens[10].TokenType);
-  CheckEquals(#13#10, FBackusNaurModule.Tokens[11].Token);
-  CheckEquals(ttLineEnd, FBackusNaurModule.Tokens[11].TokenType);
 
-  CheckEquals('<rule-name>', FBackusNaurModule.Tokens[12].Token);
-  CheckEquals(ttIdentifier, FBackusNaurModule.Tokens[12].TokenType);
-  CheckEquals('::=', FBackusNaurModule.Tokens[13].Token);
-  CheckEquals(ttSymbol, FBackusNaurModule.Tokens[13].TokenType);
-  CheckEquals('? All visible characters ?', FBackusNaurModule.Tokens[14].Token);
-  CheckEquals(ttDirective, FBackusNaurModule.Tokens[14].TokenType);
-  CheckEquals('/* Hello */', FBackusNaurModule.Tokens[15].Token);
-  CheckEquals(ttBlockComment, FBackusNaurModule.Tokens[15].TokenType);
-  CheckEquals(#13#10, FBackusNaurModule.Tokens[16].Token);
-  CheckEquals(ttLineEnd, FBackusNaurModule.Tokens[16].TokenType);
+  CheckEquals('''"''', FBackusNaurModule.Tokens[5].Token);
+  CheckEquals(ttSingleLiteral, FBackusNaurModule.Tokens[5].TokenType);
+  CheckEquals('<rule-name>', FBackusNaurModule.Tokens[6].Token);
+  CheckEquals(ttIdentifier, FBackusNaurModule.Tokens[6].TokenType);
+  CheckEquals('''"''', FBackusNaurModule.Tokens[7].Token);
+  CheckEquals(ttSingleLiteral, FBackusNaurModule.Tokens[7].TokenType);
 
-  CheckEquals('', FBackusNaurModule.Tokens[17].Token);
-  CheckEquals(ttFileEnd, FBackusNaurModule.Tokens[17].TokenType);
+  CheckEquals('|', FBackusNaurModule.Tokens[8].Token);
+  CheckEquals(ttSymbol, FBackusNaurModule.Tokens[8].TokenType);
+  CheckEquals('''Text''', FBackusNaurModule.Tokens[9].Token);
+  CheckEquals(ttSingleLiteral, FBackusNaurModule.Tokens[9].TokenType);
+  CheckEquals('"Somemore"', FBackusNaurModule.Tokens[10].Token);
+  CheckEquals(ttDoubleLiteral, FBackusNaurModule.Tokens[10].TokenType);
+  CheckEquals(')', FBackusNaurModule.Tokens[11].Token);
+  CheckEquals(ttSymbol, FBackusNaurModule.Tokens[11].TokenType);
+  CheckEquals('*', FBackusNaurModule.Tokens[12].Token);
+  CheckEquals(ttSymbol, FBackusNaurModule.Tokens[12].TokenType);
+  CheckEquals('<line-end>', FBackusNaurModule.Tokens[13].Token);
+  CheckEquals(ttLineEnd, FBackusNaurModule.Tokens[13].TokenType);
+
+  CheckEquals('<rule-name>', FBackusNaurModule.Tokens[14].Token);
+  CheckEquals(ttIdentifier, FBackusNaurModule.Tokens[14].TokenType);
+  CheckEquals('::=', FBackusNaurModule.Tokens[15].Token);
+  CheckEquals(ttSymbol, FBackusNaurModule.Tokens[15].TokenType);
+  CheckEquals('? All visible characters ?', FBackusNaurModule.Tokens[16].Token);
+  CheckEquals(ttCustomUserToken, FBackusNaurModule.Tokens[16].TokenType);
+  CheckEquals('/* Hello */', FBackusNaurModule.Tokens[17].Token);
+  CheckEquals(ttBlockComment, FBackusNaurModule.Tokens[17].TokenType);
+  CheckEquals('<line-end>', FBackusNaurModule.Tokens[18].Token);
+  CheckEquals(ttLineEnd, FBackusNaurModule.Tokens[18].TokenType);
+
+  CheckEquals('<end-of-file>', FBackusNaurModule.Tokens[19].Token);
+  CheckEquals(ttFileEnd, FBackusNaurModule.Tokens[19].TokenType);
 end;
 
 procedure TestTBackusNaurModule.TestRule;

@@ -98,7 +98,7 @@ Const
   (** This is a list of reserved, directives word and a semi colon which are
       token that can be sort as then next place to start parsing from when an
       error is  encountered. **)
-  strSeekableOnErrorTokens : Array[1..2] Of String = (#13#10, ';');
+  strSeekableOnErrorTokens : Array[1..2] Of String = (';', '<line-end>');
 
 (**
 
@@ -437,21 +437,18 @@ Begin
 
         {$IFNDEF D2009}
         If (LastCharType <> CurCharType) Or (Ch In strSingleSymbols) Or
-          (LastChar In strSingleSymbols) Then
+          (LastChar In strSingleSymbols)  Or
+          ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
         {$ELSE}
         If (LastCharType <> CurCharType) Or (CharInSet(Ch, strSingleSymbols)) Or
-          (CharInSet(LastChar, strSingleSymbols)) Then
+          (CharInSet(LastChar, strSingleSymbols)) Or
+          ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
         {$ENDIF}
           Begin
-            If ((BlockType In [btLineComment, btSingleLiteral, btDoubleLiteral,
+            If Not (((BlockType In [btLineComment, btSingleLiteral, btDoubleLiteral,
               btRule, btTextRule]) And (CurCharType <> ttLineEnd)) Or
-              (BlockType In [btFullComment, btCompoundSymbol]) Then
-              Begin
-                Inc(iTokenLen);
-                If iTokenLen > Length(strToken) Then
-                  SetLength(strToken, iTokenCapacity + Length(strToken));
-                strToken[iTokenLen] := Ch;
-              End Else
+              (BlockType In [btFullComment, btCompoundSymbol])) Or
+              ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
               Begin
                 SetLength(strToken, iTokenLen);
                 If iTokenLen > 0 Then
@@ -468,7 +465,8 @@ Begin
                       {$ELSE}
                       If CharInSet(strToken[1], strLineEnd) Then
                       {$ENDIF}
-                        strToken := StringReplace(strToken, #13#10, '<line-end>', [rfReplaceAll]);
+                        strToken := StringReplace(strToken, #13#10, '<line-end>',
+                          [rfReplaceAll]);
                       AddToken(TTokenInfo.Create(strToken, iStreamPos,
                         iTokenLine, iTokenColumn, Length(strToken), LastCharType));
                     End;
@@ -481,6 +479,12 @@ Begin
                iTokenLen := 1;
                SetLength(strToken, iTokenCapacity);
                strToken[iTokenLen] := Ch;
+              End Else
+              Begin
+                Inc(iTokenLen);
+                If iTokenLen > Length(strToken) Then
+                  SetLength(strToken, iTokenCapacity + Length(strToken));
+                strToken[iTokenLen] := Ch;
               End;
           End Else
           Begin

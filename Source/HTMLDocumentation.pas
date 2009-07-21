@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    10 Jul 2009
+  @Date    21 Jul 2009
   @Version 1.0
 
 **)
@@ -155,12 +155,16 @@ End;
 
 (**
 
-  This is a constructor for the THTMLDocumentation class.
 
-  @precon  None. 
-  @postcon Initialises the Special Tag string lists. 
+  This is a constructor for the THTMLDocumentation class.
 
-  @param   strOutputDirectory as a String
+
+  @precon  None. 
+
+  @postcon Initialises the Special Tag string lists. 
+
+
+  @param   strOutputDirectory as a String
   @param   strTitle           as a String
 
 **)
@@ -308,7 +312,8 @@ End;
 
 (**
 
-  This method generates the finalisation information for the summary and outputs
+
+  This method generates the finalisation information for the summary and outputs
   the file.
 
   @precon  None.
@@ -376,12 +381,16 @@ end;
 
 (**
 
-  This method attempts to find the insert point in the doucmentation template. 
 
-  @precon  slHTML must be a valid TStringList instance. 
-  @postcon Return the index of the insert point line if found else returns -1. 
+  This method attempts to find the insert point in the doucmentation template. 
 
-  @param   slHTMLFile as a TStringList
+
+  @precon  slHTML must be a valid TStringList instance. 
+
+  @postcon Return the index of the insert point line if found else returns -1. 
+
+
+  @param   slHTMLFile as a TStringList
   @param   strText    as a String
   @return  an Integer
 
@@ -486,12 +495,14 @@ Var
 
   (**
 
-    This method returns a HTML hexidecimal colour from the given TColor.
+
+    This method returns a HTML hexidecimal colour from the given TColor.
 
     @precon  None.
     @postcon Returns a HTML hexidecimal colour from the given TColor.
 
-    @param   AColour as a TColor
+
+    @param   AColour as a TColor
     @return  a String
 
   **)
@@ -504,12 +515,14 @@ Var
 
   (**
 
-    This procedure outputs the code styles to the CSS file.
+
+    This procedure outputs the code styles to the CSS file.
 
     @precon  None.
     @postcon Outputs the code styles to the CSS file.
 
-  **)
+
+  **)
   Procedure OutputCodeStyles;
   Var
     i : TBADITokenType;
@@ -754,14 +767,16 @@ End;
 
 (**
 
-  This method generates an index from all the identifiers stored in the FIndex
+
+  This method generates an index from all the identifiers stored in the FIndex
   string list.
 
   @precon  None.
   @postcon Generates an index from all the identifiers stored in the FIndex
            string list.
 
-**)
+
+**)
 procedure THTMLDocumentation.GenerateIndex;
 
 var
@@ -1122,12 +1137,14 @@ end;
 
 (**
 
-  This is a getter method for the SumDocCons property.
+
+  This is a getter method for the SumDocCons property.
 
   @precon  iIndex must be a valid integer between 0 and Count - 1.
   @postcon Returns the instance of the TSumDocCons class.
 
-  @param   iIndex as an Integer
+
+  @param   iIndex as an Integer
   @return  a TSumDocCon
 
 **)
@@ -1138,12 +1155,16 @@ end;
 
 (**
 
-  This method returns a string representing a header tag. 
 
-  @precon  None. 
-  @postcon Returns a string representing a header tag. 
+  This method returns a string representing a header tag. 
 
-  @param   strText as a String
+
+  @precon  None. 
+
+  @postcon Returns a string representing a header tag. 
+
+
+  @param   strText as a String
   @param   iLevel  as an Integer
   @param   AImage  as a TImageIndex
   @param   AScope  as a TScope
@@ -1160,12 +1181,16 @@ end;
 
 (**
 
-  This method outputs an img tag with the image vertically aligned central. 
 
-  @precon  None. 
-  @postcon Outputs an img tag with the image vertically aligned central. 
+  This method outputs an img tag with the image vertically aligned central. 
 
-  @param   AImageIndex as a TImageIndex
+
+  @precon  None. 
+
+  @postcon Outputs an img tag with the image vertically aligned central. 
+
+
+  @param   AImageIndex as a TImageIndex
   @param   AScope      as a TScope
   @return  a String     
 
@@ -1278,13 +1303,18 @@ end;
 
 (**
 
-  This method output the tree of information stored in the module recursively. 
 
-  @precon  slContents must be a valid indtance of a string list and Container 
-           must ba a valid descendant of TElement Container. 
-  @postcon Output the tree of information stored in the module recursively. 
+  This method output the tree of information stored in the module recursively. 
 
-  @param   slContents        as a TStringList
+
+  @precon  slContents must be a valid indtance of a string list and Container 
+
+           must ba a valid descendant of TElement Container. 
+
+  @postcon Output the tree of information stored in the module recursively. 
+
+
+  @param   slContents        as a TStringList
   @param   Container         as a TElementContainer
   @param   iIndentLevel      as an Integer
   @param   strContainerLabel as a String
@@ -1409,14 +1439,16 @@ End;
 
 (**
 
-  This method outputs the documentation conflicts for all the modules to the
+
+  This method outputs the documentation conflicts for all the modules to the
   summary html page.
 
   @precon  None.
   @postcon Outputs the documentation conflicts for all the modules to the
            summary html page.
 
-**)
+
+**)
 procedure THTMLDocumentation.OutputSummaryDocumentationConflicts;
 
 var
@@ -1464,14 +1496,16 @@ end;
 
 (**
 
-  This method outputs the Errors, Warnings and Hints for all modules to the
+
+  This method outputs the Errors, Warnings and Hints for all modules to the
   summary html page.
 
   @precon  slEWH must be a valid instance of a string list.
   @postcon Outputs the Errors, Warnings and Hints for all modules to the
            summary html page.
 
-  @param   slEWH           as a TStringList
+
+  @param   slEWH           as a TStringList
   @param   strSectionTitle as a String
   @param   strLIType       as a String
   @param   AImageIndex     as a TImageIndex
@@ -1515,14 +1549,16 @@ end;
 
 (**
 
-  This method outputs the Special tags from all the modules to the summary
+
+  This method outputs the Special tags from all the modules to the summary
   html page.
 
   @precon  None.
   @postcon Outputs the Special tags from all the modules to the summary
            html page.
 
-**)
+
+**)
 procedure THTMLDocumentation.OutputSummarySpecialTags;
 
 var
@@ -1567,13 +1603,15 @@ end;
 
 (**
 
-  This method initialise the summary content so that it is ready to accept the
+
+  This method initialise the summary content so that it is ready to accept the
   summary information generate during the processing of the modules.
 
   @precon  None.
   @postcon Sets up the table header for the summary information.
 
-**)
+
+**)
 procedure THTMLDocumentation.InitialiseSummary;
 
 var
@@ -1695,12 +1733,14 @@ End;
 
 (**
 
-  This method parses the code and highlights it with syntax information.
+
+  This method parses the code and highlights it with syntax information.
 
   @precon  None.
   @postcon Parses the code and highlights it with syntax information.
 
-  @param   strText as a String
+
+  @param   strText as a String
   @return  a String 
 
 **)
@@ -1716,11 +1756,13 @@ begin
   Try
     For i := 0 To sl.Count - 1 Do
       Case TBADITokenType(sl.Objects[i]) Of
-        ttReservedWord : Result := Result + Format('<span class="ReservedWord">%s</span>', [N(sl[i])]);
-        ttIdentifier   : Result := Result + Format('<span class="Identifier">%s</span>', [N(sl[i])]);
-        ttSymbol       : Result := Result + Format('<span class="Symbol">%s</span>', [N(sl[i])]);
-        ttStringLiteral: Result := Result + Format('<span class="StringLiteral">%s</span>', [N(sl[i])]);
-        ttNumber       : Result := Result + Format('<span class="Number">%s</span>', [N(sl[i])]);
+        ttReservedWord    : Result := Result + Format('<span class="ReservedWord">%s</span>', [N(sl[i])]);
+        ttIdentifier      : Result := Result + Format('<span class="Identifier">%s</span>', [N(sl[i])]);
+        ttSymbol          : Result := Result + Format('<span class="Symbol">%s</span>', [N(sl[i])]);
+        ttSingleLiteral   : Result := Result + Format('<span class="SingleLiteral">%s</span>', [N(sl[i])]);
+        ttDoubleLiteral   : Result := Result + Format('<span class="DoubleLiteral">%s</span>', [N(sl[i])]);
+        ttNumber          : Result := Result + Format('<span class="Number">%s</span>', [N(sl[i])]);
+        ttCustomUserToken : Result := Result + Format('<span class="CustomUserToken">%s</span>', [N(sl[i])]);
       Else
         Result := Result + N(sl[i]);
       End;
@@ -1772,12 +1814,14 @@ end;
 
 (**
 
-  This is a constructor for the TSumDocCon class.
+
+  This is a constructor for the TSumDocCon class.
 
   @precon  None.
   @postcon Initialises the class.
 
-  @param   strModule as a String
+
+  @param   strModule as a String
 
 **)
 constructor TSumDocCon.Create(strModule : String);
@@ -1788,12 +1832,14 @@ end;
 
 (**
 
-  This is a destructor for the TSumDocCon class.
+
+  This is a destructor for the TSumDocCon class.
 
   @precon  None.
   @postcon Frees the memory used by the class.
 
-**)
+
+**)
 destructor TSumDocCon.Destroy;
 begin
   FConflicts.Free;

@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    21 Jul 2009
+  @Date    22 Jul 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -297,51 +297,8 @@ Begin
     Begin
       If Level <> 1 Then
         Begin
-          Case TBADITokenType(sl.Objects[i]) Of
-            ttIdentifier:
-              Begin
-                Canvas.Font.Color := TokenFontInfo[ttIdentifier].FColour;
-                Canvas.Font.Style := TokenFontInfo[ttIdentifier].FStyles;
-              End;
-            ttReservedWord:
-              Begin
-                Canvas.Font.Color := TokenFontInfo[ttReservedWord].FColour;
-                Canvas.Font.Style := TokenFontInfo[ttReservedWord].FStyles;
-              End;
-            ttDirective :
-              Begin
-                Canvas.Font.Color := TokenFontInfo[ttDirective].FColour;
-                Canvas.Font.Style := TokenFontInfo[ttDirective].FStyles;
-              End;
-            ttSymbol :
-              Begin
-                Canvas.Font.Color := TokenFontInfo[ttSymbol].FColour;
-                Canvas.Font.Style := TokenFontInfo[ttSymbol].FStyles;
-              End;
-            ttNumber :
-              Begin
-                Canvas.Font.Color := TokenFontInfo[ttNumber].FColour;
-                Canvas.Font.Style := TokenFontInfo[ttNumber].FStyles;
-              End;
-            ttSingleLiteral :
-              Begin
-                Canvas.Font.Color := TokenFontInfo[ttSingleLiteral].FColour;
-                Canvas.Font.Style := TokenFontInfo[ttSingleLiteral].FStyles;
-              End;
-            ttDoubleLiteral :
-              Begin
-                Canvas.Font.Color := TokenFontInfo[ttDoubleLiteral].FColour;
-                Canvas.Font.Style := TokenFontInfo[ttDoubleLiteral].FStyles;
-              End;
-            ttCustomUserToken :
-              Begin
-                Canvas.Font.Color := TokenFontInfo[ttCustomUserToken].FColour;
-                Canvas.Font.Style := TokenFontInfo[ttCustomUserToken].FStyles;
-              End;
-          Else
-            Canvas.Font.Color := clBlack;
-            Canvas.Font.Style := [];
-          End;
+          Canvas.Font.Color := TokenFontInfo[TBADITokenType(sl.Objects[i])].FColour;
+          Canvas.Font.Style := TokenFontInfo[TBADITokenType(sl.Objects[i])].FStyles;
         End Else
         Begin
           Canvas.Font.Color := TokenFontInfo[ttTreeHeader].FColour;

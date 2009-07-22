@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    21 Jul 2009
+  @Date    22 Jul 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -1051,7 +1051,7 @@ Type
     Procedure SetTokenIndex(iIndex : TTokenIndex);
     procedure AppendToLastToken(strToken : String);
     procedure ProcessCompilerDirective(var iSkip : Integer); Virtual; Abstract;
-    Function GetModuleName : String; Virtual;
+    Function GetModuleName : String; Virtual; Abstract;
     function GetBytes: Int64;
     function GetLines: Integer;
     Procedure ErrorAndSeekToken(strMsg, strMethod, strParam : String;

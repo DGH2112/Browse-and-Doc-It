@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       21 Jul 2009
+  @Date       22 Jul 2009
   @Author     David Hoyle
 
 **)
@@ -47,7 +47,13 @@ Type
     Procedure Expression(R : TBNFRule);
     Procedure RepeatOperator(R : TBNFRule);
     Procedure List(R : TBNFRule);
+    Procedure SimpleExpression(R : TBNFRule);
     Procedure Term(R : TBNFRule);
+    Procedure Literal(R : TBNFRule);
+    Function CharRef(R : TBNFRule) : Boolean;
+    Function LiteralChar(R : TBNFRule) : Boolean;
+    Function DecChar(R : TBNFRule) : Boolean;
+    Function HexChar(R : TBNFRule) : Boolean;
     Procedure Terminator;
     Procedure LineEnd;
     procedure SemiColon;
@@ -62,6 +68,7 @@ Type
     procedure TidyUpEmptyElements;
     Procedure CheckRules;
     Procedure ProcessTags;
+    Function GetModuleName : String; Override;
   Public
     Constructor CreateParser(Source : String; strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
@@ -79,18 +86,51 @@ Uses
 
 Resourcestring
   (** This is an error message for duplicate identifiers. **)
-  strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found at line %d column %d.';
+  strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found at line ' +
+    '%d column %d.';
+  (** This is an error message for a rule that has not been defined. **)
+  strRuleHasNotBeenDefined = 'The rule ''%s'' has not been defined at line ' +
+    '%d column %d.';
+  (** This is an error message for a rule that has not been referenced in code. **)
+  strTheRuleHasNotBeenRef = 'The rule ''%s'' has not been referenced in the ' +
+    'code at line %d column %d.';
+  (** This is an error message for an expected end of line. **)
+  strExpectedLineEnd = 'Expected ''<end-of-line>'' but ''%s'' found at line ' +
+    '%d column %d.';
+  (** This is an error message for rules not start and end with <>. **)
+  strRulesShouldStartAndEndWith = 'Rules should start and end with ''<'' and' +
+    ' ''>'' respectively at line %d column %d.';
+  (** This is an error message for expecting ::= but not found. **)
+  strExpectedEquality = 'Expected ''::='' but ''%s'' found at line %d column' +
+    ' %d.';
+  (** This is an error message for a rule with no definition. **)
+  strTheRuleHasNoDefinition = 'The rule ''%s'' has no definition at line %d ' +
+    'column %d.';
+  (** This is an error message for a rule expected but not found. **)
+  strExpectedRuleButFound = 'Expected ''<rule>'' but ''%s'' found at line %d' +
+    ' column %d.';
+  (** This is an error message for expecting a ; but one not found. **)
+  strExpectedSemiColon = 'Expected '';'' but ''%s'' found at line %d column ' +
+    '%d.';
+  (** This is an error message for an invalid hexidecimal character. **)
+  strInvalidHexCharRef = 'Invalid hexidecimal character reference ''%s'' at ' +
+    'line %d column %d.';
+  (** This is an error message for an invalid decimal character. **)
+  strInvalidDecCharRef = 'Invalid decimal character reference ''%s'' at line ' +
+    '%d column %d.';
 
 Const
   (** A set of characters for general symbols **)
-  strSymbols : Set Of AnsiChar = ['&', '(', ')', '*', '+', ',', '-', '.', '/', ':',
-    ';', '=', '@', '[', ']', '^', '|'];
+  strSymbols : Set Of AnsiChar = ['&', '(', ')', '*', '+', ',', '-', '.', '/',
+    ':', ';', '=', '@', '[', ']', '^', '|'];
   (** A set of characters for single quotes **)
   strSingleQuotes : Set Of AnsiChar = [''''];
   (** A set of characters for double quotes **)
   strDoubleQuotes : Set Of AnsiChar = ['"'];
   (** A set of identifier characters. **)
   strIdentifiers :  Set Of AnsiChar = ['a'..'z', 'A'..'Z', '<', '>'];
+  (** A set of number characters. **)
+  strNumbers:  Set Of AnsiChar = ['#', '$', '0'..'9'];
 
   (** A set of reserved words (not used in this parser.) **)
   strReservedWords : Array[1..1] Of String = ('(none)');
@@ -155,6 +195,27 @@ end;
 
 (**
 
+  This method checks for a CharRef and return true one was found.
+
+  @precon  T must be a valid instance of a TBNFRule class.
+  @postcon Checks for a CharRef and return true one was found. Additionally,
+           the token is added to the BNF rule.
+
+  @param   R as a TBNFRule
+  @return  a Boolean
+
+**)
+Function TBackusNaurModule.CharRef(R: TBNFRule) : Boolean;
+begin
+  Result := DecChar(R);
+  If Not Result Then
+    Result := HexChar(R);
+  If Not Result Then
+    Result := LiteralChar(R);
+end;
+
+(**
+
   This method checks the rules that have been collected in Term() to see if they
   have been defined in the grammar. Any missing rules are output as warnings.
 
@@ -188,14 +249,13 @@ begin
             iCode := Integer(FRequiredRules.Objects[iRule]);
             iLine := iCode And $FFFF;
             iColumn := (iCode And $FFFF0000) Shr 16;
-            AddIssue(Format('The rule ''%s'' has not been defined at line %d column %d.',
-              [FRequiredRules[iRule], iLine, iColumn]), scNone, 'CheckRules', iLine, iColumn,
-                etWarning);
+            AddIssue(Format(strRuleHasNotBeenDefined, [FRequiredRules[iRule],
+              iLine, iColumn]), scNone, 'CheckRules', iLine, iColumn, etWarning);
           End;
       For iRule := 1 To FRules.ElementCount Do
         If Not FRules.Elements[iRule].Referenced Then
           If Not Like('<*Goal*>', FRules.Elements[iRule].Identifier) Then
-            AddIssue(Format('The rule ''%s'' has not been referenced in the code at line %d column %d.',
+            AddIssue(Format(strTheRuleHasNotBeenRef,
               [FRules.Elements[iRule].Identifier, FRules.Elements[iRule].Line,
               FRules.Elements[iRule].Column]), scNone, 'CheckRules',
               FRules.Elements[iRule].Line, FRules.Elements[iRule].Column, etHint);
@@ -257,6 +317,47 @@ Begin
       TidyUpEmptyElements;
     End;
 End;
+
+(**
+
+  This method checks the token to see if its a Decimal Character, if so adds it
+  to the rule and returns true.
+
+  @precon  R must be a valid instance of a TBNFRule class.
+  @postcon Checks the token to see if its a Decimal Character, if so adds it
+           to the rule and returns true.
+
+  @param   R as a TBNFRule
+  @return  a Boolean
+
+**)
+Function TBackusNaurModule.DecChar(R: TBNFRule) : Boolean;
+
+var
+  i: Integer;
+  strToken : String;
+  iErrors: Integer;
+
+begin
+  strToken := Token.Token;
+  Result := strToken[1] = '#';
+  If Result Then
+    Begin
+      iErrors := 0;
+      For i := 2 To Length(strToken) Do
+        {$IFNDEF D2009}
+        If Not (strToken[i] In ['0'..'9']) Then
+        {$ELSE}
+        If Not CharInSet(strToken[i], ['0'..'9']) Then
+        {$ENDIF}
+          Inc(iErrors);
+      If iErrors = 0 Then
+        AddToExpression(R)
+      Else
+        ErrorAndSeekToken(strInvalidDecCharRef, 'DecChar', Token.Token,
+          strSeekableOnErrorTokens, stActual);
+    End;
+end;
 
 (**
 
@@ -327,7 +428,7 @@ Procedure TBackusNaurModule.TokenizeStream;
 Type
   (** State machine for block types. **)
   TBlockType = (btNoBlock, btSingleLiteral, btDoubleLiteral, btLineComment,
-    btFullComment, btCompoundSymbol, btRule, btTextRule);
+    btFullComment, btCompoundSymbol, btRule, btTextRule, btDecChar, btHexChar);
 
 Const
   (** Growth size of the token buffer. **)
@@ -417,7 +518,22 @@ Begin
         {$ELSE}
         Else If CharInSet(ch, strIdentifiers) Then
         {$ENDIF}
-          CurCharType := ttIdentifier
+          Begin
+            {$IFNDEF D2009}
+            If (LastCharType = ttNumber) And (Ch In ['A'..'F', 'a'..'f']) Then
+            {$ELSE}
+            If (LastCharType = ttNumber) And (CharInSet(Ch, ['A'..'F', 'a'..'f'])) Then
+            {$ENDIF}
+              CurCharType := ttNumber
+            Else
+              CurCharType := ttIdentifier;
+          End
+        {$IFNDEF D2009}
+        Else If ch In strNumbers Then
+        {$ELSE}
+        Else If CharInSet(ch, strNumbers) Then
+        {$ENDIF}
+          CurCharType := ttNumber
         Else
           CurCharType := ttUnknown;
 
@@ -429,8 +545,14 @@ Begin
             // Check for line comments
             If (LastChar = '/') And (Ch = '/') Then
               BlockType := btLineComment;
-            If (lastChar = '<') Then
+            If (LastChar = '<') Then
               BlockType := btRule;
+            {
+            If (LastChar = '#') Then
+              BlockType := btDecChar;
+            If (LastChar = '$') Then
+              BlockType := btHexChar;
+            }
             If (LastChar = '?') And (LastCharType <> ttCustomUserToken) Then
               BlockType := btTextRule;
           End;
@@ -523,7 +645,6 @@ Begin
             BlockType := btNoBlock;
             CurCharType := ttCustomUserToken;
           End;
-
         If BlockType = btCompoundSymbol Then
           BlockType := btNoBlock;
 
@@ -630,8 +751,8 @@ begin
   If Token.TokenType In [ttLineEnd] Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken('Expected ''<end-of-line>'' but ''%s'' found at line %d column %d.', 'LineEnd',
-      Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strExpectedLineEnd, 'LineEnd', Token.Token,
+      strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -676,10 +797,56 @@ begin
       List(R);
     End Else
     Begin
-      Term(R);
+      SimpleExpression(R);
       If StartToken <> Token Then
         List(R);
     End;
+end;
+
+(**
+
+  This method parses literal tokens and adds them to the rule if found.
+
+  @precon  R must be a valid instance of a TBNDRule class.
+  @postcon Parses literal tokens and adds them to the rule if found.
+
+  @param   R as a TBNFRule
+
+**)
+procedure TBackusNaurModule.Literal(R: TBNFRule);
+begin
+  If CharRef(R) Then
+    Begin
+      If Token.Token = '..' Then
+        Begin
+          AddToExpression(R);
+          CharRef(R);
+        End;
+    End Else
+      If Token.TokenType In [ttCustomUserToken, ttSingleLiteral, ttDoubleLiteral] Then
+        AddToExpression(R);
+end;
+
+(**
+
+  This method checks the token to see if its a single character literal and if
+  so adds it the rule and returns true.
+
+  @precon  R must be a valid instance of a TBNDRule class.
+  @postcon Checks the token to see if its a single character literal and if
+           so adds it the rule and returns true.
+
+  @param   R as a TBNFRule
+  @return  a Boolean
+
+**)
+Function TBackusNaurModule.LiteralChar(R: TBNFRule) : Boolean;
+
+begin
+  Result := (Token.TokenType In [ttSingleLiteral, ttDoubleLiteral]) And
+    (Length(Token.Token) = 3);
+  If Result Then
+    AddToExpression(R);
 end;
 
 (**
@@ -727,22 +894,21 @@ Begin
             End;
         End;
     End;
-{
-      T := Tokens[iToken] As TTokenInfo;
-      If T.TokenType In [ttLineComment] Then
-        If T.Line = iLastCmtLine - 1 Then
-          Begin
-            iLine := T.Line;
-            iColumn := T.Column;
-            If strComment <> '' Then
-              strComment := #13#10 + strComment;
-            strComment := T.Token + strComment;
-            iLastCmtLine := T.Line;
-          End Else
-            Break;
-      Dec(iToken);
-}
 End;
+
+(**
+
+  This method returns a string representing the name of the module.
+  @precon  None.
+  @postcon Returns a string representing the name of the module.
+
+  @return  a String
+
+**)
+function TBackusNaurModule.GetModuleName: String;
+begin
+  Result := ExtractFilename(FileName);
+end;
 
 (**
 
@@ -841,11 +1007,10 @@ begin
           AddToExpression(R)
         End
       Else
-        ErrorAndSeekToken('Rules should start and end with ''<'' and ''>'' respectively at line %d column %d.',
-          'Term', '', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strRulesShouldStartAndEndWith, 'Term', '',
+          strSeekableOnErrorTokens, stActual);
     End Else
-  If Token.TokenType In [ttCustomUserToken, ttSingleLiteral, ttDoubleLiteral] Then
-    AddToExpression(R);
+      Literal(R);
 end;
 
 (**
@@ -901,18 +1066,18 @@ begin
               NextNonCommentToken;
               Expression(R);
             End Else
-              ErrorAndSeekToken('Expected ''::='' but ''%s'' found at line %d column %d.', 'Rule',
-                Token.Token, strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strExpectedEquality, 'Rule', Token.Token,
+                strSeekableOnErrorTokens, stActual);
           Terminator;
           If R.TokenCount = 0 Then
-            AddIssue(Format('The rule ''%s'' has no definition at line %d column %d.', [R.Identifier, R.Line, R.Column]),
-              scNone, 'Rule', R.Line, R.Column, etWarning);
+            AddIssue(Format(strTheRuleHasNoDefinition, [R.Identifier, R.Line,
+              R.Column]), scNone, 'Rule', R.Line, R.Column, etWarning);
         End Else
-          ErrorAndSeekToken('Expected ''<rule>'' but ''%s'' found at line %d column %d.', 'Rule', Token.Token,
+          ErrorAndSeekToken(strExpectedRuleButFound, 'Rule', Token.Token,
             strSeekableOnErrorTokens, stActual);
       End Else
-        ErrorAndSeekToken('Rules should start and end with ''<'' and ''>'' respectively at line %d column %d.',
-          'Rule', Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strRulesShouldStartAndEndWith, 'Rule', Token.Token,
+          strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -928,8 +1093,28 @@ begin
   If Token.Token = ';' Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken('Expected '';'' but ''%s'' found at line %d column %d.', 'SemiColon',
-      Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strExpectedSemiColon, 'SemiColon', Token.Token,
+      strSeekableOnErrorTokens, stActual);
+end;
+
+(**
+
+  This method parsers a simple expression looking for an exception operator.
+
+  @precon  R must be a valid instance of a TBNFRule class.
+  @postcon Parsers a simple expression looking for an exception operator.
+
+  @param   R as a TBNFRule
+
+**)
+procedure TBackusNaurModule.SimpleExpression(R: TBNFRule);
+begin
+  Term(R);
+  If Token.Token = '-' Then
+    Begin
+      AddToExpression(R);
+      Term(R);
+    End;
 end;
 
 (**
@@ -1006,6 +1191,47 @@ begin
   End;
 end;
 
+(**
+
+  This method checks the token to see if its a Hexidecimal Character, if so adds it
+  to the rule and returns true.
+
+  @precon  R must be a valid instance of a TBNFRule class.
+  @postcon Checks the token to see if its a Hexidecimal Character, if so adds it
+           to the rule and returns true.
+
+  @param   R as a TBNFRule
+  @return  a Boolean
+
+**)
+Function TBackusNaurModule.HexChar(R: TBNFRule) : Boolean;
+
+var
+  i: Integer;
+  strToken : String;
+  iErrors: Integer;
+
+begin
+  strToken := Token.Token;
+  Result := strToken[1] = '$';
+  If Result Then
+    Begin
+      iErrors := 0;
+      For i := 2 To Length(strToken) Do
+        {$IFNDEF D2009}
+        If Not (strToken[i] In ['0'..'9', 'A'..'F', 'a'..'f']) Then
+        {$ELSE}
+        If Not CharInSet(strToken[i], ['0'..'9', 'A'..'F', 'a'..'f']) Then
+        {$ENDIF}
+          Inc(iErrors);
+      If iErrors = 0 Then
+        AddToExpression(R)
+      Else
+        ErrorAndSeekToken(strInvalidHexCharRef, 'HexChar', Token.Token,
+          strSeekableOnErrorTokens, stActual);
+    End;
+end;
+
 { TBNFRule }
 
 (**
@@ -1025,7 +1251,7 @@ function TBNFRule.AsString(boolShowIdenifier,
 begin
   Result := Name + ' ::= ' +
     BuildStringRepresentation(False, boolForDocumentation, '::=',
-      BrowseAndDocItOptions.MaxDocOutputWidth);
+      BrowseAndDocItOptions.MaxDocOutputWidth, ['.', '+', '*'], ['.']);
 end;
 
 End.

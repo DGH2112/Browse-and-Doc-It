@@ -431,7 +431,7 @@ begin
               Codes[i] := AnsiChar(atComment);
               BlockType := btNone;
               iBlockStart := 0;
-              Break;
+              Continue;
             End ;
           If (LastChar In ['$', '0'..'9']) And Not (CurChar In ['$', '0'..'9']) And (BlockType = btHexChar) Then
             Begin
@@ -448,8 +448,8 @@ begin
 
           If CheckBlockStart('''', btSingleLiteral, atString) Then
           Else If CheckBlockStart('"', btDoubleLiteral, atCharacter) Then
-          Else If CheckBlockStart('$', btHexChar, atCharacter) Then
-          Else If CheckBlockStart('#', btDecChar, atCharacter) Then
+          Else If CheckBlockStart('$', btHexChar, atNumber) Then
+          Else If CheckBlockStart('#', btDecChar, atNumber) Then
           Else If CheckBlockStart('?', btTextDefinition, atPreproc) Then
           Else If ((CurChar In ['<']) And (BlockType = btNone)) Or (BlockType = btIdentifier) Then
             Begin

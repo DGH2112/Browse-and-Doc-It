@@ -433,7 +433,8 @@ begin
               iBlockStart := 0;
               Continue;
             End ;
-          If (LastChar In ['$', '0'..'9']) And Not (CurChar In ['$', '0'..'9']) And (BlockType = btHexChar) Then
+          If (LastChar In ['$', '0'..'9', 'A'..'Z', 'a'..'z']) And
+            Not (CurChar In ['$', '0'..'9', 'A'..'Z', 'a'..'z']) And (BlockType = btHexChar) Then
             Begin
               Codes[i] := AnsiChar(atWhiteSpace);
               BlockType := btNone;

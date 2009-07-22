@@ -1,10 +1,10 @@
 (**
-  
+
   This module contains a routine for generically parsing code for use with the
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    21 Jul 2009
+  @Date    22 Jul 2009
   @Version 1.0
 
 **)
@@ -44,7 +44,8 @@ Function Tokenize(strText : String; var KeyWords : TKeyWords;
 
 Type
   (** State machine for block types. **)
-  TBlockType = (btNoBlock, btSingleLiteral, btDoubleLiteral, btCustomUserToken);
+  TBlockType = (btNoBlock, btSingleLiteral, btDoubleLiteral, btCustomUserToken,
+    btXMLTag);
 
 Const
   (** Growth size of the token buffer. **)
@@ -59,6 +60,7 @@ Var
   (** Token size **)
   iTokenLen : Integer;
   i : Integer;
+  LastChar : Char;
 
 Begin
   Result := TStringList.Create;
@@ -66,6 +68,7 @@ Begin
   strToken := '';
   CurToken := ttUnknown;
   strToken := '';
+  LastChar := #0;
 
   iTokenLen := 0;
   SetLength(strToken, iTokenCapacity);
@@ -136,9 +139,14 @@ Begin
         CurToken := ttSymbol
       Else
         CurToken := ttUnknown;
+
+      If (BlockType = btNoBlock) And (LastChar = '<') Then
+        BlockType := btXMLTag;
+
       If (LastToken <> CurToken) Or (CurToken = ttSymbol) Then
         Begin
-          If ((BlockType In [btSingleLiteral, btDoubleLiteral, btCustomUserToken]) And
+          If ((BlockType In [btSingleLiteral, btDoubleLiteral, btCustomUserToken,
+            btXMLTag]) And
             (CurToken <> ttLineEnd)) Then
             Begin
               Inc(iTokenLen);
@@ -173,6 +181,16 @@ Begin
           strToken[iTokenLen] := strText[i];
         End;
 
+      If (BlockType = btXMLTag) And (strText[i] = '>') Then
+        Begin
+          BlockType := btNoBlock;
+          CurToken := ttHTMLStartTag;
+          If Length(strToken) > 1 Then
+            If strToken[2] = '/' Then
+              CurToken := ttHTMLEndTag
+          Else
+        End;
+
       // Check for string literals
       If CurToken = ttSingleLiteral Then
         If BlockType = btSingleLiteral Then
@@ -192,6 +210,7 @@ Begin
         Else If BlockType = btNoBlock Then
           BlockType := btCustomUserToken;
 
+      LastChar := strText[i];
     End;
   If iTokenLen > 0 Then
     Begin

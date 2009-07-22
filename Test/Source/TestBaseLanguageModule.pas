@@ -2375,7 +2375,7 @@ end;
 
 procedure TestTBaseLanguageModule.TestModuleName;
 begin
-  CheckEquals('', FBaseLanguageModule.ModuleName);
+  CheckEquals('D:\Path\TestFile.txt', FBaseLanguageModule.ModuleName);
   FBaseLanguageModule.ModuleName := 'TestFile.txt';
   CheckEquals('TestFile.txt', FBaseLanguageModule.ModuleName);
 end;

@@ -37,6 +37,10 @@ Type
     Procedure TestRule;
     Procedure TestExpression;
     Procedure TestList;
+    Procedure TestSimpleExpression;
+    Procedure TestHexChar;
+    Procedure TestDecChar;
+    Procedure TestLiteral;
     Procedure TestFailures01;
     Procedure TestFailures02;
     Procedure TestFailures03;
@@ -210,6 +214,26 @@ begin
   End;
 end;
 
+procedure TestTBackusNaurModule.TestHexChar;
+
+Const
+  strCode =
+    '<rule> ::= $20'#13#10 +
+    '<myrule> ::= $8F'#13#10;
+
+Var
+  S : TBaseLanguageModule;
+
+begin
+  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  Try
+    CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
+    CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
+  Finally
+    S.Free;
+  End;
+end;
+
 procedure TestTBackusNaurModule.TestList;
 
 Const
@@ -227,7 +251,25 @@ begin
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
-    //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTBackusNaurModule.TestLiteral;
+
+Const
+  strCode =
+    '<rule> ::= #32..#128'#13#10;
+
+Var
+  S : TBaseLanguageModule;
+
+begin
+  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  Try
+    CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
+    CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
   Finally
     S.Free;
   End;
@@ -238,7 +280,8 @@ Begin
   FBackusNaurModule := TBackusNaurModule.CreateParser(
     '// A line comment.'#13#10 +
     '<rule> ::= ( ''"'' <rule-name> ''"'' | ''Text'' "Somemore" )*'#13#10 +
-    '<rule-name> ::= ? All visible characters ? /* Hello */'#13#10#13#10,
+    '<rule-name> ::= ? All visible characters ? /* Hello */'#13#10#13#10 +
+    '<myrule> ::= $20 | #32'#13#10,
     'D:\Path\Backus-Naur Grammar.bnf', True, [moParse])
 End;
 
@@ -257,11 +300,31 @@ End;
 Procedure TestTBackusNaurModule.TestCreateParser;
 
 Begin
-  CheckEquals(21, FBackusNaurModule.TokenCount);
+  CheckEquals(27, FBackusNaurModule.TokenCount);
   CheckEquals('D:\Path\Backus-Naur Grammar.bnf', FBackusNaurModule.FileName);
   CheckEquals(True, FBackusNaurModule.Modified);
 End;
 
+
+procedure TestTBackusNaurModule.TestDecChar;
+
+Const
+  strCode =
+    '<rule> ::= #13'#13#10 +
+    '<myrule> ::= #10'#13#10;
+
+Var
+  S : TBaseLanguageModule;
+
+begin
+  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  Try
+    CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
+    CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
+  Finally
+    S.Free;
+  End;
+end;
 
 procedure TestTBackusNaurModule.TestTokenizeStream;
 begin
@@ -310,8 +373,21 @@ begin
   CheckEquals('<line-end>', FBackusNaurModule.Tokens[19].Token);
   CheckEquals(ttLineEnd, FBackusNaurModule.Tokens[19].TokenType);
 
-  CheckEquals('<end-of-file>', FBackusNaurModule.Tokens[20].Token);
-  CheckEquals(ttFileEnd, FBackusNaurModule.Tokens[20].TokenType);
+  CheckEquals('<myrule>', FBackusNaurModule.Tokens[20].Token);
+  CheckEquals(ttIdentifier, FBackusNaurModule.Tokens[20].TokenType);
+  CheckEquals('::=', FBackusNaurModule.Tokens[21].Token);
+  CheckEquals(ttSymbol, FBackusNaurModule.Tokens[21].TokenType);
+  CheckEquals('$20', FBackusNaurModule.Tokens[22].Token);
+  CheckEquals(ttNumber, FBackusNaurModule.Tokens[22].TokenType);
+  CheckEquals('|', FBackusNaurModule.Tokens[23].Token);
+  CheckEquals(ttSymbol, FBackusNaurModule.Tokens[23].TokenType);
+  CheckEquals('#32', FBackusNaurModule.Tokens[24].Token);
+  CheckEquals(ttNumber, FBackusNaurModule.Tokens[24].TokenType);
+  CheckEquals('<line-end>', FBackusNaurModule.Tokens[25].Token);
+  CheckEquals(ttLineEnd, FBackusNaurModule.Tokens[25].TokenType);
+
+  CheckEquals('<end-of-file>', FBackusNaurModule.Tokens[26].Token);
+  CheckEquals(ttFileEnd, FBackusNaurModule.Tokens[26].TokenType);
 end;
 
 procedure TestTBackusNaurModule.TestRule;
@@ -330,6 +406,25 @@ begin
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
     //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTBackusNaurModule.TestSimpleExpression;
+
+Const
+  strCode =
+    '<rule> ::= <rule1> - <rule2>'#13#10;
+
+Var
+  S : TBaseLanguageModule;
+
+begin
+  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  Try
+    CheckEquals(ttFileEnd, S.CurrentToken.TokenType);
+    CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
   Finally
     S.Free;
   End;

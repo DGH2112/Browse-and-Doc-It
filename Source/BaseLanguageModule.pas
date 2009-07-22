@@ -1051,7 +1051,7 @@ Type
     Procedure SetTokenIndex(iIndex : TTokenIndex);
     procedure AppendToLastToken(strToken : String);
     procedure ProcessCompilerDirective(var iSkip : Integer); Virtual; Abstract;
-    Function GetModuleName : String; Virtual; Abstract;
+    Function GetModuleName : String; Virtual;
     function GetBytes: Int64;
     function GetLines: Integer;
     Procedure ErrorAndSeekToken(strMsg, strMethod, strParam : String;
@@ -1239,8 +1239,9 @@ Type
 
   (** A record to define the font information for each token type. **)
   TTokenFontInfo = Record
-    FColour : TColor;
-    FStyles : TFontStyles;
+    FForeColour : TColor;
+    FStyles     : TFontStyles;
+    FBackColour : TColor;
   End;
 
   (** This is a class to define a set of options for the application. **)
@@ -1982,26 +1983,26 @@ Const
 
   (** This is a default set of font information for the application. **)
   strTokenTypeInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo = (
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : [fsBold]),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : [fsBold]),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clMaroon; FStyles : [fsBold]),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : []),
-    (FColour : clBlack;  FStyles : [])
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [fsBold]; FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [fsBold]; FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clMaroon; FStyles : [fsBold]; FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow)
   );
 
   (** This is a constant for special tag items to show in the tree **)
@@ -4941,7 +4942,7 @@ begin
   FPreviousTokenIndex := -1;
   FTickList := TStringList.Create;
   FBodyComment := TObjectList.Create(True);
-  FModuleName := '';
+  FModuleName := strFileName;
   FModuleNameCol := 0;
   FModuleNameLine := 0;
   FCompilerDefs := TStringList.Create;
@@ -5815,10 +5816,12 @@ begin
       FFontSize := ReadInteger('ModuleExplorer', 'Size', 8);
       For T := Low(TBADITokenType) To High(TBADITokenType) Do
         Begin
-          FTokenFontInfo[T].FColour := StringToColor(ReadString('TokenFontinfo',
-            Format('%s.Colour', [strTokenType[T]]), ColorToString(strTokenTypeInfo[T].FColour)));
+          FTokenFontInfo[T].FForeColour := StringToColor(ReadString('TokenFontinfo',
+            Format('%s.Colour', [strTokenType[T]]), ColorToString(strTokenTypeInfo[T].FForeColour)));
           FTokenFontInfo[T].FStyles := TFontStyles(Byte(ReadInteger('TokenFontinfo',
             Format('%s.Styles', [strTokenType[T]]), Byte(strTokenTypeInfo[T].FStyles))));
+          FTokenFontInfo[T].FBackColour := StringToColor(ReadString('TokenFontinfo',
+            Format('%s.Colour', [strTokenType[T]]), ColorToString(strTokenTypeInfo[T].FBackColour)));
         End;
       FExcludeDocFiles.Text := StringReplace(ReadString('Setup', 'ExcludeDocFiles',
         ''), '|', #13#10, [rfReplaceAll]);
@@ -5886,9 +5889,11 @@ begin
       For T := Low(TBADITokenType) To High(TBADITokenType) Do
         Begin
           WriteString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
-            ColorToString(FTokenFontInfo[T].FColour));
+            ColorToString(FTokenFontInfo[T].FForeColour));
           WriteInteger('TokenFontinfo', Format('%s.Styles', [strTokenType[T]]),
             Byte(FTokenFontInfo[T].FStyles));
+          WriteString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
+            ColorToString(FTokenFontInfo[T].FBackColour));
         End;
       WriteString('Setup', 'ExcludeDocFiles', StringReplace(FExcludeDocFiles.Text,
         #13#10, '|', [rfReplaceAll]));

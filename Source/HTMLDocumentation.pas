@@ -1749,22 +1749,16 @@ function THTMLDocumentation.P(strText: String): String;
 Var
   sl : TStringList;
   i: Integer;
+  strTokenName : String;
 
 begin
   Result := '';
   sl := Tokenize(strText, FKeyWords);
   Try
     For i := 0 To sl.Count - 1 Do
-      Case TBADITokenType(sl.Objects[i]) Of
-        ttReservedWord    : Result := Result + Format('<span class="ReservedWord">%s</span>', [N(sl[i])]);
-        ttIdentifier      : Result := Result + Format('<span class="Identifier">%s</span>', [N(sl[i])]);
-        ttSymbol          : Result := Result + Format('<span class="Symbol">%s</span>', [N(sl[i])]);
-        ttSingleLiteral   : Result := Result + Format('<span class="SingleLiteral">%s</span>', [N(sl[i])]);
-        ttDoubleLiteral   : Result := Result + Format('<span class="DoubleLiteral">%s</span>', [N(sl[i])]);
-        ttNumber          : Result := Result + Format('<span class="Number">%s</span>', [N(sl[i])]);
-        ttCustomUserToken : Result := Result + Format('<span class="CustomUserToken">%s</span>', [N(sl[i])]);
-      Else
-        Result := Result + N(sl[i]);
+      Begin
+        strTokenName := strTokenType[TBADITokenType(sl.Objects[i])];
+        Result := Result + Format('<span class="%s">%s</span>', [strTokenName, N(sl[i])]);
       End;
   Finally
     sl.Free;

@@ -4,7 +4,7 @@
   IDE to show Backus-Naur grammar.
 
   @Version 1.0
-  @Date    21 Jul 2009
+  @Date    22 Jul 2009
   @Author  David Hoyle
 
 **)
@@ -339,10 +339,11 @@ procedure TBNFHighlighter.Tokenize(StartClass: Byte; LineBuf: PAnsiChar;
 
 Type
   TBlockType = (btNone, btIdentifier, btSingleLiteral, btDoubleLiteral,
-     btTextDefinition, btLineComment, btBlockComment);
+     btTextDefinition, btLineComment, btBlockComment, btHexChar, btDecChar);
 
 Const
-  strValidSymbols = ([';', ':', '=', '(', ')', '[', ']', '-', '+', '*', '|', '''', '"']);
+  strValidSymbols = ([';', ':', '=', '(', ')', '[', ']', '-', '+', '*', '|',
+    '''', '"', '.']);
   strAllSymbols = ([#33..#255] - ['A'..'Z'] - ['a'..'z'] - ['0'..'9']);
   strInvalidSymbols = (strAllSymbols - strValidSymbols);
 
@@ -432,9 +433,23 @@ begin
               iBlockStart := 0;
               Break;
             End ;
+          If (LastChar In ['$', '0'..'9']) And Not (CurChar In ['$', '0'..'9']) And (BlockType = btHexChar) Then
+            Begin
+              Codes[i] := AnsiChar(atWhiteSpace);
+              BlockType := btNone;
+              iBlockStart := 0;
+            End;
+          If (LastChar In ['#', '0'..'9']) And Not (CurChar In ['#', '0'..'9']) And (BlockType = btDecChar) Then
+            Begin
+              Codes[i] := AnsiChar(atWhiteSpace);
+              BlockType := btNone;
+              iBlockStart := 0;
+            End;
 
           If CheckBlockStart('''', btSingleLiteral, atString) Then
           Else If CheckBlockStart('"', btDoubleLiteral, atCharacter) Then
+          Else If CheckBlockStart('$', btHexChar, atCharacter) Then
+          Else If CheckBlockStart('#', btDecChar, atCharacter) Then
           Else If CheckBlockStart('?', btTextDefinition, atPreproc) Then
           Else If ((CurChar In ['<']) And (BlockType = btNone)) Or (BlockType = btIdentifier) Then
             Begin

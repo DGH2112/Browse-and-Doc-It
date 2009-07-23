@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    22 Jul 2009
+  @Date    23 Jul 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -297,12 +297,14 @@ Begin
     Begin
       If Level <> 1 Then
         Begin
-          Canvas.Font.Color := TokenFontInfo[TBADITokenType(sl.Objects[i])].FColour;
+          Canvas.Font.Color := TokenFontInfo[TBADITokenType(sl.Objects[i])].FForeColour;
           Canvas.Font.Style := TokenFontInfo[TBADITokenType(sl.Objects[i])].FStyles;
+          Canvas.Brush.Color := TokenFontInfo[TBADITokenType(sl.Objects[i])].FBackColour;
         End Else
         Begin
-          Canvas.Font.Color := TokenFontInfo[ttTreeHeader].FColour;
+          Canvas.Font.Color := TokenFontInfo[ttTreeHeader].FForeColour;
           Canvas.Font.Style := TokenFontInfo[ttTreeHeader].FStyles;
+          Canvas.Brush.Color := TokenFontInfo[ttTreeHeader].FBackColour;
         End;
    End;
 End;
@@ -407,8 +409,11 @@ Begin
           For i := 0 To sl.Count - 1 Do
             Begin
               If FCustomDraw Then
-                GetFontInfo(sl, i, FNodeLevel, Canvas)
-              Else
+                Begin
+                  GetFontInfo(sl, i, FNodeLevel, Canvas);
+                  If Brush.Color = clWindow Then
+                    Brush.Color := clInfoBk;
+                End Else
                 Begin
                   Refresh;
                   Font.Color := clInfoText;
@@ -1674,6 +1679,9 @@ begin
         For i := 0 To sl.Count - 1 Do
           Begin
             GetFontInfo(sl, i, NodeData.FNode.Level, TargetCanvas);
+            If Node = Sender.FocusedNode Then
+              If Brush.Color = clWindow Then
+                Brush.Color := clinfoBk;
             TextOut(iPos, R.Top + 1, sl[i]);
             Inc(iPos, TextWidth(sl[i]) + 1);
           End;

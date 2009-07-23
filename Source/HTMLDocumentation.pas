@@ -532,7 +532,8 @@ Var
       For i := Low(TBADITokenType) to High(TBADITokenType) Do
         Begin
           sl.Add(Format('span.%s {', [strTokenType[i]]));
-          sl.Add(Format('  color            : #%s;', [HTMLColour(TokenFontInfo[i].FColour)]));
+          sl.Add(Format('  color            : #%s;', [HTMLColour(TokenFontInfo[i].FForeColour)]));
+          sl.Add(Format('  background       : #%s;', [HTMLColour(TokenFontInfo[i].FBackColour)]));
           If fsBold In TokenFontInfo[i].FStyles Then
             sl.Add('  font-weight      : bold;');
           If fsItalic In TokenFontInfo[i].FStyles Then

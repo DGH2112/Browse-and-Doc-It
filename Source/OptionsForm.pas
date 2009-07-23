@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    09 Jan 2009
+  @Date    23 Jul 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -75,6 +75,9 @@ type
     udManagedNodesLife: TUpDown;
     lblTreeColour: TLabel;
     clbxTreeColour: TColorBox;
+    lblForeColour: TLabel;
+    lblBackColour: TLabel;
+    cbxBackColour: TColorBox;
     procedure btnAddClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
     procedure btnEditClick(Sender: TObject);
@@ -97,6 +100,7 @@ type
     procedure lbxMethodDescriptionsDblClick(Sender: TObject);
     procedure lbxMethodDescriptionsDrawItem(Control: TWinControl;
       Index: Integer; Rect: TRect; State: TOwnerDrawState);
+    procedure cbxBackColourChange(Sender: TObject);
     { Private declarations }
   Private
     FTokenFontInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
@@ -348,7 +352,8 @@ begin
   With lbxTokenTypes Do
     If ItemIndex > -1 Then
       Begin
-        cbxFontColour.Selected := FTokenFontInfo[TBADITokenType(itemIndex)].FColour;
+        cbxFontColour.Selected := FTokenFontInfo[TBADITokenType(itemIndex)].FForeColour;
+        cbxBackColour.Selected := FTokenFontInfo[TBADITokenType(itemIndex)].FBackColour;
         chkBold.Checked := fsBold In FTokenFontInfo[TBADITokenType(itemIndex)].FStyles;
         chkItalic.Checked := fsItalic In FTokenFontInfo[TBADITokenType(itemIndex)].FStyles;
         chkUnderline.Checked := fsUnderline In FTokenFontInfo[TBADITokenType(itemIndex)].FStyles;
@@ -562,6 +567,21 @@ end;
 
 (**
 
+  This is an on change event handler for the Back Colour control.
+
+  @precon  None.
+  @postcon Updates the background colour with the new selected colour.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.cbxBackColourChange(Sender: TObject);
+begin
+  FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FBackColour := cbxBackColour.Selected;
+end;
+
+(**
+
 
   This is an on change event handler for the Font Colour control.
 
@@ -574,7 +594,7 @@ end;
 **)
 procedure TfrmOptions.cbxFontColourChange(Sender: TObject);
 begin
-  FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FColour := cbxFontColour.Selected;
+  FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FForeColour := cbxFontColour.Selected;
 end;
 
 (**

@@ -3,7 +3,7 @@ object frmOptions: TfrmOptions
   Top = 269
   BorderStyle = bsDialog
   Caption = 'Options'
-  ClientHeight = 417
+  ClientHeight = 457
   ClientWidth = 699
   Color = clBtnFace
   Constraints.MinHeight = 350
@@ -18,14 +18,14 @@ object frmOptions: TfrmOptions
   OnCreate = FormCreate
   DesignSize = (
     699
-    417)
+    457)
   PixelsPerInch = 96
   TextHeight = 13
   object OptionTab: TPageControl
     Left = 8
     Top = 8
     Width = 683
-    Height = 370
+    Height = 410
     ActivePage = Page1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
@@ -35,14 +35,14 @@ object frmOptions: TfrmOptions
         Left = 0
         Top = 0
         Width = 675
-        Height = 308
+        Height = 348
         Align = alClient
         ItemHeight = 13
         TabOrder = 0
       end
       object IntervalPanel: TPanel
         Left = 0
-        Top = 308
+        Top = 348
         Width = 675
         Height = 34
         Align = alBottom
@@ -112,12 +112,12 @@ object frmOptions: TfrmOptions
       ImageIndex = 1
       DesignSize = (
         675
-        342)
+        382)
       object lbSpecialTags: TListBox
         Left = 3
         Top = 26
         Width = 669
-        Height = 282
+        Height = 322
         Style = lbOwnerDrawFixed
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 16
@@ -165,7 +165,7 @@ object frmOptions: TfrmOptions
       end
       object btnAdd: TBitBtn
         Left = 273
-        Top = 314
+        Top = 354
         Width = 75
         Height = 25
         Anchors = [akRight, akBottom]
@@ -175,7 +175,7 @@ object frmOptions: TfrmOptions
       end
       object btnDelete: TBitBtn
         Left = 435
-        Top = 314
+        Top = 354
         Width = 75
         Height = 25
         Anchors = [akRight, akBottom]
@@ -185,7 +185,7 @@ object frmOptions: TfrmOptions
       end
       object btnEdit: TBitBtn
         Left = 354
-        Top = 314
+        Top = 354
         Width = 75
         Height = 25
         Anchors = [akRight, akBottom]
@@ -195,7 +195,7 @@ object frmOptions: TfrmOptions
       end
       object btnMoveDown: TBitBtn
         Left = 597
-        Top = 314
+        Top = 354
         Width = 75
         Height = 25
         Anchors = [akRight, akBottom]
@@ -205,7 +205,7 @@ object frmOptions: TfrmOptions
       end
       object btnMoveUp: TBitBtn
         Left = 516
-        Top = 314
+        Top = 354
         Width = 75
         Height = 25
         Anchors = [akRight, akBottom]
@@ -219,7 +219,7 @@ object frmOptions: TfrmOptions
       ImageIndex = 3
       DesignSize = (
         675
-        342)
+        382)
       object lblFontName: TLabel
         Left = 3
         Top = 6
@@ -246,7 +246,7 @@ object frmOptions: TfrmOptions
       end
       object lblBackgroundColour: TLabel
         Left = 504
-        Top = 235
+        Top = 283
         Width = 91
         Height = 13
         Anchors = [akTop, akRight]
@@ -261,11 +261,27 @@ object frmOptions: TfrmOptions
       end
       object lblTreeColour: TLabel
         Left = 504
-        Top = 282
+        Top = 330
         Width = 71
         Height = 13
         Anchors = [akTop, akRight]
         Caption = 'Treeline &Colour'
+      end
+      object lblForeColour: TLabel
+        Left = 504
+        Top = 66
+        Width = 54
+        Height = 13
+        Caption = '&Fore Colour'
+        FocusControl = cbxFontColour
+      end
+      object lblBackColour: TLabel
+        Left = 504
+        Top = 112
+        Width = 58
+        Height = 13
+        Caption = '&Back Colour'
+        FocusControl = cbxBackColour
       end
       object cbxFontName: TComboBox
         Left = 79
@@ -274,7 +290,7 @@ object frmOptions: TfrmOptions
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 0
+        ItemHeight = 13
         TabOrder = 0
       end
       object edtFontSize: TEdit
@@ -301,7 +317,7 @@ object frmOptions: TfrmOptions
         Left = 3
         Top = 85
         Width = 495
-        Height = 255
+        Height = 295
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 5
@@ -320,12 +336,12 @@ object frmOptions: TfrmOptions
       end
       object gbxFontStyles: TGroupBox
         Left = 504
-        Top = 112
+        Top = 160
         Width = 168
         Height = 116
         Anchors = [akTop, akRight]
         Caption = 'Font Styles'
-        TabOrder = 7
+        TabOrder = 8
         object chkBold: TCheckBox
           Left = 12
           Top = 21
@@ -365,13 +381,13 @@ object frmOptions: TfrmOptions
       end
       object cbxBGColour: TColorBox
         Left = 504
-        Top = 254
+        Top = 302
         Width = 168
         Height = 22
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
         ItemHeight = 16
-        TabOrder = 8
+        TabOrder = 9
       end
       object edtTokenLimit: TEdit
         Left = 504
@@ -382,7 +398,7 @@ object frmOptions: TfrmOptions
         Text = '10'
       end
       object udTokenLimit: TUpDown
-        Left = 656
+        Left = 654
         Top = 30
         Width = 16
         Height = 21
@@ -394,13 +410,24 @@ object frmOptions: TfrmOptions
       end
       object clbxTreeColour: TColorBox
         Left = 504
-        Top = 301
+        Top = 349
         Width = 168
         Height = 22
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
         ItemHeight = 16
-        TabOrder = 9
+        TabOrder = 10
+      end
+      object cbxBackColour: TColorBox
+        Left = 504
+        Top = 132
+        Width = 168
+        Height = 22
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
+        Anchors = [akTop, akRight]
+        ItemHeight = 16
+        TabOrder = 7
+        OnChange = cbxBackColourChange
       end
     end
     object TabSheet2: TTabSheet
@@ -408,12 +435,12 @@ object frmOptions: TfrmOptions
       ImageIndex = 4
       DesignSize = (
         675
-        342)
+        382)
       object rgpBrowsePosition: TRadioGroup
         Left = 3
         Top = 3
         Width = 669
-        Height = 336
+        Height = 376
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = 'Browse Position'
         Items.Strings = (
@@ -430,12 +457,12 @@ object frmOptions: TfrmOptions
       ImageIndex = 5
       DesignSize = (
         675
-        342)
+        382)
       object mmoExcludeDocFiles: TMemo
         Left = 3
         Top = 3
         Width = 669
-        Height = 336
+        Height = 376
         Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'mmoExcludeDocFiles')
@@ -447,7 +474,7 @@ object frmOptions: TfrmOptions
       ImageIndex = 6
       DesignSize = (
         675
-        342)
+        382)
       object btnAddDesc: TBitBtn
         Left = 597
         Top = 3
@@ -455,8 +482,6 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Add'
-        TabOrder = 0
-        OnClick = btnAddDescClick
         Glyph.Data = {
           76010000424D7601000000000000760000002800000020000000100000000100
           04000000000000010000130B0000130B00001000000000000000000000000000
@@ -471,6 +496,8 @@ object frmOptions: TfrmOptions
           333333333337733333FF3333333C333330003333333733333777333333333333
           3000333333333333377733333333333333333333333333333333}
         NumGlyphs = 2
+        TabOrder = 0
+        OnClick = btnAddDescClick
       end
       object btnEditDesc: TBitBtn
         Left = 597
@@ -479,8 +506,6 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Edit'
-        TabOrder = 1
-        OnClick = btnEditDescClick
         Glyph.Data = {
           76010000424D7601000000000000760000002800000020000000100000000100
           04000000000000010000120B0000120B00001000000000000000000000000000
@@ -495,6 +520,8 @@ object frmOptions: TfrmOptions
           0FF03333737F37737F373330B00FFFFF0F033337F77F33337F733309030FFFFF
           00333377737FFFFF773333303300000003333337337777777333}
         NumGlyphs = 2
+        TabOrder = 1
+        OnClick = btnEditDescClick
       end
       object btnDeleteDesc: TBitBtn
         Left = 597
@@ -503,8 +530,6 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Delete'
-        TabOrder = 2
-        OnClick = btnDeleteDescClick
         Glyph.Data = {
           76010000424D7601000000000000760000002800000020000000100000000100
           04000000000000010000130B0000130B00001000000000000000000000000000
@@ -519,6 +544,8 @@ object frmOptions: TfrmOptions
           333333377F33333333FF3333C333333330003333733333333777333333333333
           3000333333333333377733333333333333333333333333333333}
         NumGlyphs = 2
+        TabOrder = 2
+        OnClick = btnDeleteDescClick
       end
       object hctlMethodDescriptions: THeaderControl
         Left = 3
@@ -544,7 +571,7 @@ object frmOptions: TfrmOptions
         Left = 3
         Top = 26
         Width = 588
-        Height = 313
+        Height = 353
         Style = lbOwnerDrawFixed
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 16
@@ -556,21 +583,21 @@ object frmOptions: TfrmOptions
   end
   object bbtnCancel: TBitBtn
     Left = 616
-    Top = 384
+    Top = 424
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    TabOrder = 1
     Kind = bkCancel
+    TabOrder = 1
   end
   object bbtnOK: TBitBtn
     Left = 535
-    Top = 384
+    Top = 424
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    TabOrder = 2
     Kind = bkOK
+    TabOrder = 2
   end
   object CheckedImages: TImageList
     Left = 254

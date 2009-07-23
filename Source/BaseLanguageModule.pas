@@ -5821,7 +5821,7 @@ begin
           FTokenFontInfo[T].FStyles := TFontStyles(Byte(ReadInteger('TokenFontinfo',
             Format('%s.Styles', [strTokenType[T]]), Byte(strTokenTypeInfo[T].FStyles))));
           FTokenFontInfo[T].FBackColour := StringToColor(ReadString('TokenFontinfo',
-            Format('%s.Colour', [strTokenType[T]]), ColorToString(strTokenTypeInfo[T].FBackColour)));
+            Format('%s.BackColour', [strTokenType[T]]), ColorToString(strTokenTypeInfo[T].FBackColour)));
         End;
       FExcludeDocFiles.Text := StringReplace(ReadString('Setup', 'ExcludeDocFiles',
         ''), '|', #13#10, [rfReplaceAll]);
@@ -5892,7 +5892,7 @@ begin
             ColorToString(FTokenFontInfo[T].FForeColour));
           WriteInteger('TokenFontinfo', Format('%s.Styles', [strTokenType[T]]),
             Byte(FTokenFontInfo[T].FStyles));
-          WriteString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
+          WriteString('TokenFontinfo', Format('%s.BackColour', [strTokenType[T]]),
             ColorToString(FTokenFontInfo[T].FBackColour));
         End;
       WriteString('Setup', 'ExcludeDocFiles', StringReplace(FExcludeDocFiles.Text,

@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       22 Jul 2009
+  @Date       23 Jul 2009
   @Author     David Hoyle
 
 **)
@@ -118,6 +118,9 @@ Resourcestring
   (** This is an error message for an invalid decimal character. **)
   strInvalidDecCharRef = 'Invalid decimal character reference ''%s'' at line ' +
     '%d column %d.';
+  (** This is an error message for a missing terminal character. **)
+  strMissingTerminalChar = 'Missing terminal character ''%s'' at line %d col' +
+  'umn %d.';
 
 Const
   (** A set of characters for general symbols **)
@@ -824,7 +827,11 @@ begin
         End;
     End Else
       If Token.TokenType In [ttCustomUserToken, ttSingleLiteral, ttDoubleLiteral] Then
-        AddToExpression(R);
+        If Token.Token[1] = Token.Token[Length(Token.Token)] Then
+          AddToExpression(R)
+        Else
+          ErrorAndSeekToken(strMissingTerminalChar, 'Literal', Token.Token,
+            strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -1057,8 +1064,10 @@ begin
               iiPublicTypesLabel, Nil)) As TLabelContainer;
           If FRules.Add(R) <> R Then
             Begin
-              AddIssue(Format(strDuplicateIdentifierFound, [Token.Token, Token.Line,
-                Token.Column]), scNone, 'Rule', Token.Line, Token.Column, etError);
+              AddIssue(Format(strDuplicateIdentifierFound, [Token.Token,
+                Token.Line, Token.Column]), scNone,'Rule', Token.Line,
+                Token.Column, etError);
+              R := Nil;
             End;
           NextNonCommentToken;
           If Token.Token = '::=' Then
@@ -1069,7 +1078,7 @@ begin
               ErrorAndSeekToken(strExpectedEquality, 'Rule', Token.Token,
                 strSeekableOnErrorTokens, stActual);
           Terminator;
-          If R.TokenCount = 0 Then
+          If (R <> Nil) And (R.TokenCount = 0) Then
             AddIssue(Format(strTheRuleHasNoDefinition, [R.Identifier, R.Line,
               R.Column]), scNone, 'Rule', R.Line, R.Column, etWarning);
         End Else

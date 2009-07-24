@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    22 Jul 2009
+  @Date    24 Jul 2009
   @Version 1.0
 
 **)
@@ -1795,11 +1795,7 @@ begin
   Result := strText;
   For i := 1 To Length(strText) Do
     Begin
-      {$IFNDEF D2009}
-      If Not (strText[i] In strValidHTMLChars) Then
-      {$ELSE}
-      If Not (CharInSet(strText[i], strValidHTMLChars)) Then
-      {$ENDIF}
+      If Not (IsInSet(strText[i], strValidHTMLChars)) Then
         Result := StringReplace(Result, strText[i],
           Format('&#%d;', [Ord(strText[i])]), [rfReplaceAll]);
     End;

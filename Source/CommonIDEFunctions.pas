@@ -436,11 +436,7 @@ begin
           Begin
             strType := Func.Parameters[i].ParamType.AsString(False, False);
             AddToComment(Format('%s %s%s%s'#13#10, [
-              {$IFNDEF D2009}
-              strAOrAn[(strType[1] In strVowels) Or Func.Parameters[i].ArrayOf],
-              {$ELSE}
-              strAOrAn[(CharInSet(strType[1], strVowels)) Or Func.Parameters[i].ArrayOf],
-              {$ENDIF}
+              strAOrAn[(IsInSet(strType[1], strVowels)) Or Func.Parameters[i].ArrayOf],
               strArrayOf[Func.Parameters[i].ArrayOf], strType,
               strModifier[Func.Parameters[i].ParamModifier]]));
           End;
@@ -450,11 +446,7 @@ begin
       boolExtraLine := boolExtraLine Or True;
       AddToComment(StringOfChar(#32, iIndent));
       AddToComment(Format('  @return  %s %s',
-        {$IFNDEF D2009}
-        [strAOrAn[Func.ReturnType.AsString(False, False)[1] In strVowels],
-        {$ELSE}
-        [strAOrAn[CharInSet(Func.ReturnType.AsString(False, False)[1], strVowels)],
-        {$ENDIF}
+        [strAOrAn[IsInSet(Func.ReturnType.AsString(False, False)[1], strVowels)],
         Func.ReturnType.AsString(False, False)]));
       AddToComment(#13#10);
     End;

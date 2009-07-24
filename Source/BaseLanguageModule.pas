@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    22 Jul 2009
+  @Date    24 Jul 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -48,6 +48,8 @@ Type
   TErrorType = (etHint, etWarning, etError);
   (** A type to return an array of strings **)
   TKeyWords = Array of String;
+  (** A type for a set of AnsiChar - used for the function IsInSet() **)
+  TSetOfAnsiChar = Set Of AnsiChar;
 
   (** This is a list of options valable for the display of module information
       **)
@@ -2323,6 +2325,7 @@ Var
   BrowseAndDocItOptions : TBrowseAndDocItOptions;
 
   Function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
+  Function IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; InLine;
 
 Implementation
 
@@ -2466,6 +2469,30 @@ begin
         Inc(iLength, C.Tokens[iToken].Length);
       End;
 end;
+
+(**
+
+  This function centralises the checking of characters in set for both AnsiChars
+  and Unicode Chars so that the parser tokeniser are not riddled with
+  conditional compilation statements.
+
+  @precon  None.
+  @postcon Checks to see if the char is in the set and returns true if so.
+
+  @param   C          as a Char
+  @param   strCharSet as a TSetOfAnsiChar
+  @return  a Boolean
+
+**)
+Function IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; InLine;
+
+Begin
+  {$IFNDEF D2009}
+  Result := C In strCharSet;
+  {$ELSE}
+  Result := CharInSet(C, strCharSet);
+  {$ENDIF}
+End;
 
 { TBaseContainer }
 
@@ -5836,7 +5863,7 @@ begin
       End;
       FScopesToDocument := TScopes(Byte(ReadInteger('Documentation', 'Scopes',
         Byte(FScopesToDocument))));
-      FModuleExplorerBGColour := StringToColor(ReadString('ModuleExploror',
+      FModuleExplorerBGColour := StringToColor(ReadString('ModuleExplorer',
         'BGColour', ColorToString(clWindow)));
       FTokenLimit := ReadInteger('ModuleExplorer', 'TokenLimit', 50);
       FMaxDocOutputWidth := ReadInteger('Documentation', 'MaxDocOutputWidth', 80);

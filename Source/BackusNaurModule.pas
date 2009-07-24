@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       23 Jul 2009
+  @Date       24 Jul 2009
   @Author     David Hoyle
 
 **)
@@ -40,6 +40,7 @@ Type
     FRules         : TLabelContainer;
     FRequiredRules : TStringList;
     FUseSemiColon  : Boolean;
+    FMainGoal      : String;
     { Grammar Parsers }
     Procedure Goal;
     Procedure Syntax;
@@ -50,10 +51,10 @@ Type
     Procedure SimpleExpression(R : TBNFRule);
     Procedure Term(R : TBNFRule);
     Procedure Literal(R : TBNFRule);
-    Function CharRef(R : TBNFRule) : Boolean;
-    Function LiteralChar(R : TBNFRule) : Boolean;
-    Function DecChar(R : TBNFRule) : Boolean;
-    Function HexChar(R : TBNFRule) : Boolean;
+    Function  CharRef(R : TBNFRule) : Boolean;
+    Function  LiteralChar(R : TBNFRule) : Boolean;
+    Function  DecChar(R : TBNFRule) : Boolean;
+    Function  HexChar(R : TBNFRule) : Boolean;
     Procedure Terminator;
     Procedure LineEnd;
     procedure SemiColon;
@@ -121,6 +122,9 @@ Resourcestring
   (** This is an error message for a missing terminal character. **)
   strMissingTerminalChar = 'Missing terminal character ''%s'' at line %d col' +
   'umn %d.';
+  (** This is an error message where a rule or literal is expected but not found. **)
+  strExpectedRuleOrLiteral = 'Expected rule or literal but ''%s'' found at l' +
+    'ine %d column %d.';
 
 Const
   (** A set of characters for general symbols **)
@@ -257,7 +261,7 @@ begin
           End;
       For iRule := 1 To FRules.ElementCount Do
         If Not FRules.Elements[iRule].Referenced Then
-          If Not Like('<*Goal*>', FRules.Elements[iRule].Identifier) Then
+          If Not Like('<' + FMainGoal + '>', FRules.Elements[iRule].Identifier) Then
             AddIssue(Format(strTheRuleHasNotBeenRef,
               [FRules.Elements[iRule].Identifier, FRules.Elements[iRule].Line,
               FRules.Elements[iRule].Column]), scNone, 'CheckRules',
@@ -293,6 +297,7 @@ Begin
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSource := Source;
   FRules := Nil;
+  FMainGoal := '*goal*';
   FRequiredRules := TStringList.Create;
   FRequiredRules.Duplicates := dupIgnore;
   FRequiredRules.Sorted := True;
@@ -348,11 +353,7 @@ begin
     Begin
       iErrors := 0;
       For i := 2 To Length(strToken) Do
-        {$IFNDEF D2009}
-        If Not (strToken[i] In ['0'..'9']) Then
-        {$ELSE}
-        If Not CharInSet(strToken[i], ['0'..'9']) Then
-        {$ENDIF}
+        If Not IsInSet(strToken[i], ['0'..'9']) Then
           Inc(iErrors);
       If iErrors = 0 Then
         AddToExpression(R)
@@ -407,8 +408,22 @@ end;
 
 **)
 procedure TBackusNaurModule.Expression(R : TBNFRule);
+
+Var
+  iTokens : Integer;
+
 begin
+  iTokens := 0;
+  If R <> Nil Then
+    iTokens := R.TokenCount;
   List(R);
+  If R <> Nil Then
+    If iTokens = R.TokenCount Then
+      Begin
+        ErrorAndSeekToken(strExpectedRuleOrLiteral, 'Expression', Token.Token,
+          strSeekableOnErrorTokens, stActual);
+        Exit;
+      End;
   If Token.Token = '|' Then
     Begin
       AddToExpression(R);
@@ -486,56 +501,24 @@ Begin
         Inc(iStreamCount);
         LastCharType := CurCharType;
 
-        {$IFNDEF D2009}
-        If ch In strWhiteSpace Then
-        {$ELSE}
-        If CharInSet(ch, strWhiteSpace) Then
-        {$ENDIF}
+        If IsInSet(ch, strWhiteSpace) Then
           CurCharType := ttWhiteSpace
-        {$IFNDEF D2009}
-        Else If ch In strLineEnd Then
-        {$ELSE}
-        Else If CharInSet(ch, strLineEnd) Then
-        {$ENDIF}
+        Else If IsInSet(ch, strLineEnd) Then
           CurCharType := ttLineEnd
-        {$IFNDEF D2009}
-        Else If ch In strSingleQuotes Then
-        {$ELSE}
-        Else If CharInSet(ch, strSingleQuotes) Then
-        {$ENDIF}
+        Else If IsInSet(ch, strSingleQuotes) Then
           CurCharType := ttSingleLiteral
-        {$IFNDEF D2009}
-        Else If ch In strDoubleQuotes Then
-        {$ELSE}
-        Else If CharInSet(ch, strDoubleQuotes) Then
-        {$ENDIF}
+        Else If IsInSet(ch, strDoubleQuotes) Then
           CurCharType := ttDoubleLiteral
-        {$IFNDEF D2009}
-        Else If ch In strSymbols Then
-        {$ELSE}
-        Else If CharInSet(ch, strSymbols) Then
-        {$ENDIF}
+        Else If IsInSet(ch, strSymbols) Then
           CurCharType := ttSymbol
-        {$IFNDEF D2009}
-        Else If ch In strIdentifiers Then
-        {$ELSE}
-        Else If CharInSet(ch, strIdentifiers) Then
-        {$ENDIF}
+        Else If IsInSet(ch, strIdentifiers) Then
           Begin
-            {$IFNDEF D2009}
-            If (LastCharType = ttNumber) And (Ch In ['A'..'F', 'a'..'f']) Then
-            {$ELSE}
-            If (LastCharType = ttNumber) And (CharInSet(Ch, ['A'..'F', 'a'..'f'])) Then
-            {$ENDIF}
+            If (LastCharType = ttNumber) And (IsInSet(Ch, ['A'..'F', 'a'..'f'])) Then
               CurCharType := ttNumber
             Else
               CurCharType := ttIdentifier;
           End
-        {$IFNDEF D2009}
-        Else If ch In strNumbers Then
-        {$ELSE}
-        Else If CharInSet(ch, strNumbers) Then
-        {$ENDIF}
+        Else If IsInSet(ch, strNumbers) Then
           CurCharType := ttNumber
         Else
           CurCharType := ttUnknown;
@@ -550,25 +533,13 @@ Begin
               BlockType := btLineComment;
             If (LastChar = '<') Then
               BlockType := btRule;
-            {
-            If (LastChar = '#') Then
-              BlockType := btDecChar;
-            If (LastChar = '$') Then
-              BlockType := btHexChar;
-            }
             If (LastChar = '?') And (LastCharType <> ttCustomUserToken) Then
               BlockType := btTextRule;
           End;
 
-        {$IFNDEF D2009}
-        If (LastCharType <> CurCharType) Or (Ch In strSingleSymbols) Or
-          (LastChar In strSingleSymbols)  Or
+        If (LastCharType <> CurCharType) Or (IsInSet(Ch, strSingleSymbols)) Or
+          (IsInSet(LastChar, strSingleSymbols)) Or
           ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
-        {$ELSE}
-        If (LastCharType <> CurCharType) Or (CharInSet(Ch, strSingleSymbols)) Or
-          (CharInSet(LastChar, strSingleSymbols)) Or
-          ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
-        {$ENDIF}
           Begin
             If Not (((BlockType In [btLineComment, btSingleLiteral, btDoubleLiteral,
               btRule, btTextRule]) And (CurCharType <> ttLineEnd)) Or
@@ -577,19 +548,11 @@ Begin
               Begin
                 SetLength(strToken, iTokenLen);
                 If iTokenLen > 0 Then
-                  {$IFNDEF D2009}
-                  If Not (strToken[1] In strWhiteSpace) Then
-                  {$ELSE}
-                  If Not (CharInSet(strToken[1], strWhiteSpace)) Then
-                  {$ENDIF}
+                  If Not (IsInSet(strToken[1], strWhiteSpace)) Then
                     Begin
                       If BlockType = btLineComment Then
                         LastCharType := ttLineComment;
-                      {$IFNDEF D2009}
-                      If strToken[1] In strLineEnd Then
-                      {$ELSE}
-                      If CharInSet(strToken[1], strLineEnd) Then
-                      {$ENDIF}
+                      If IsInSet(strToken[1], strLineEnd) Then
                         strToken := StringReplace(strToken, #13#10, '<line-end>',
                           [rfReplaceAll]);
                       AddToken(TTokenInfo.Create(strToken, iStreamPos,
@@ -664,17 +627,9 @@ Begin
       If iTokenLen > 0 Then
         Begin
           SetLength(strToken, iTokenLen);
-          {$IFNDEF D2009}
-          If Not (strToken[1] In strWhiteSpace) Then
-          {$ELSE}
-          If Not (CharInSet(strToken[1], strWhiteSpace)) Then
-          {$ENDIF}
+          If Not (IsInSet(strToken[1], strWhiteSpace)) Then
             Begin
-              {$IFNDEF D2009}
-              If strToken[1] In strLineEnd Then
-              {$ELSE}
-              If CharInSet(strToken[1], strLineEnd) Then
-              {$ENDIF}
+              If IsInSet(strToken[1], strLineEnd) Then
                 strToken := StringReplace(strToken, #13#10, '<line-end>', [rfReplaceAll]);
               AddToken(TTokenInfo.Create(strToken, iStreamPos,
                 iTokenLine, iTokenColumn, Length(strToken), LastCharType));
@@ -945,11 +900,18 @@ End;
 
 **)
 procedure TBackusNaurModule.ProcessTags;
+
+var
+  iTag: Integer;
+
 begin
   If Comment <> Nil Then
     Begin
       FRequiredRules.CaseSensitive := Comment.FindTag('caseinsensitive') = -1;
       FUseSemiColon := Comment.FindTag('usesemicolon') > -1;
+      iTag := Comment.FindTag('goal');
+      If iTag > -1 Then
+        FMainGoal := Comment.Tag[itag].AsString(999999, False);
     End;
 end;
 
@@ -1011,7 +973,8 @@ begin
         Begin
           iCode := Token.Line Or (Token.Column Shl 16);
           FRequiredRules.AddObject(Token.Token, TObject(iCode));
-          AddToExpression(R)
+          AddToExpression(R);
+          RepeatOperator(R);
         End
       Else
         ErrorAndSeekToken(strRulesShouldStartAndEndWith, 'Term', '',
@@ -1185,11 +1148,18 @@ begin
         // Find first non comment token
         While (Token.TokenType In [ttLineComment, ttBlockComment, ttLineEnd]) And
           Not EndOfTokens Do
-          NextNonCommentToken;
+          Begin
+            If (Comment = Nil) And (Token.TokenType In [ttLineComment, ttBlockComment]) Then
+              Begin
+                Comment := TBackusNaurComment.CreateComment(Token.Token,
+                  Token.Line, Token.Column);
+                OwnedItems.Add(Comment);
+              End;
+            NextToken;
+          End;
         // Check for end of file else must be identifier
         If Not EndOfTokens Then
           Begin
-            Comment := GetComment;
             ProcessTags;
             Syntax;
           End;
@@ -1227,11 +1197,7 @@ begin
     Begin
       iErrors := 0;
       For i := 2 To Length(strToken) Do
-        {$IFNDEF D2009}
-        If Not (strToken[i] In ['0'..'9', 'A'..'F', 'a'..'f']) Then
-        {$ELSE}
-        If Not CharInSet(strToken[i], ['0'..'9', 'A'..'F', 'a'..'f']) Then
-        {$ENDIF}
+        If Not IsInSet(strToken[i], ['0'..'9', 'A'..'F', 'a'..'f']) Then
           Inc(iErrors);
       If iErrors = 0 Then
         AddToExpression(R)

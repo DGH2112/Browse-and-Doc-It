@@ -2591,11 +2591,7 @@ Begin
       If (Length(Result) > 0) And (Length(strDelimiter) > 0) Then
         If TokenCount > 0 Then
           Begin
-            {$IFNDEF D2009}
-            If Not (strDelimiter[1] In strNoSpaceBefore) Then
-            {$ELSE}
-            If Not (CharInSet(strDelimiter[1], strNoSpaceBefore)) Then
-            {$ENDIF}
+            If Not (IsInSet(strDelimiter[1], strNoSpaceBefore)) Then
               Result := Result + #32;
             Result := Result + strDelimiter;
           End;
@@ -2610,23 +2606,11 @@ Begin
         Begin
           boolSpace := (iToken > -1) Or (strDelimiter <> '');
           T := Tokens[iToken];
-          {$IFNDEF D2009}
-          boolSpace := boolSpace And Not (T.Token[1] In strNoSpaceBefore);
-          {$ELSE}
-          boolSpace := boolSpace And Not (CharInSet(T.Token[1], strNoSpaceBefore));
-          {$ENDIF}
+          boolSpace := boolSpace And Not (IsInSet(T.Token[1], strNoSpaceBefore));
           If (L <> Nil) And (L.Length > 0) Then
-            {$IFNDEF D2009}
-            boolSpace := boolSpace  And Not (L.Token[1] In strNoSpaceAfter);
-            {$ELSE}
-            boolSpace := boolSpace  And Not (CharInSet(L.Token[1], strNoSpaceAfter));
-            {$ENDIF}
+            boolSpace := boolSpace  And Not (IsInSet(L.Token[1], strNoSpaceAfter));
           If Result <> '' Then
-            {$IFNDEF D2009}
-            If boolSpace Or ((L.Length > 0) And (L.Token[1] In strSpaceAfter)) Then
-            {$ELSE}
-            If boolSpace Or ((L.Length > 0) And (CharInSet(L.Token[1], strSpaceAfter))) Then
-            {$ENDIF}
+            If boolSpace Or ((L.Length > 0) And (IsInSet(L.Token[1], strSpaceAfter))) Then
               If Not (boolForDocumentation And (iLength + T.Length > iMaxWidth)) Then
                 Begin
                   If (L.TokenType <> ttHTMLStartTag) And (T.TokenType <> ttHTMLEndTag) Then
@@ -3257,48 +3241,24 @@ begin
   For i := 1 To Length(strComment) Do
     Begin
       LastToken := CurToken;
-      {$IFNDEF D2009}
-      If strComment[i] In strWhiteSpace Then
-      {$ELSE}
-      If CharInSet(strComment[i], strWhiteSpace) Then
-      {$ENDIF}
+      If IsInSet(strComment[i], strWhiteSpace) Then
         CurToken := ttWhiteSpace
-      {$IFNDEF D2009}
-      Else If strComment[i] In ['@', '_', 'a'..'z', 'A'..'Z'] Then
-      {$ELSE}
-      Else If CharInSet(strComment[i], ['@', '_', 'a'..'z', 'A'..'Z']) Then
-      {$ENDIF}
+      Else If IsInSet(strComment[i], ['@', '_', 'a'..'z', 'A'..'Z']) Then
         Begin
-          {$IFNDEF D2009}
-          If (LastToken = ttNumber) And (strComment[i] In ['A'..'F', 'a'..'f']) Then
-          {$ELSE}
-          If (LastToken = ttNumber) And (CharInSet(strComment[i], ['A'..'F', 'a'..'f'])) Then
-          {$ENDIF}
+          If (LastToken = ttNumber) And (IsInSet(strComment[i], ['A'..'F', 'a'..'f'])) Then
             CurToken := ttNumber
           Else
             CurToken := ttIdentifier;
         End
-      {$IFNDEF D2009}
-      Else If strComment[i] In ['0'..'9'] Then
-      {$ELSE}
-      Else If CharInSet(strComment[i], ['0'..'9']) Then
-      {$ENDIF}
+      Else If IsInSet(strComment[i], ['0'..'9']) Then
         Begin
           CurToken := ttNumber;
           If LastToken = ttIdentifier Then
             CurToken := ttIdentifier;
         End
-      {$IFNDEF D2009}
-      Else If strComment[i] In strLineEnd Then
-      {$ELSE}
-      Else If CharInSet(strComment[i], strLineEnd) Then
-      {$ENDIF}
+      Else If IsInSet(strComment[i], strLineEnd) Then
         CurToken := ttLineEnd
-      {$IFNDEF D2009}
-      Else If strComment[i] In [#33..#128] - ['a'..'z', 'A'..'Z', '@', '#'] Then
-      {$ELSE}
-      Else If CharInSet(strComment[i], [#33..#128] - ['a'..'z', 'A'..'Z', '@', '#']) Then
-      {$ENDIF}
+      Else If IsInSet(strComment[i], [#33..#128] - ['a'..'z', 'A'..'Z', '@', '#']) Then
         CurToken := ttSymbol
       Else
         CurToken := ttUnknown;
@@ -3309,11 +3269,7 @@ begin
           SetLength(strToken, iTokenLen);
           If iTokenLen > 0 Then
             Begin
-              {$IFNDEF D2009}
-              If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
-              {$ELSE}
-              If Not (CharInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
-              {$ENDIF}
+              If Not (IsInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
                 Begin
                   AddToken(strToken, LastToken);
                   LastTokenAdded := LastToken;
@@ -3365,11 +3321,7 @@ begin
   If (iTokenLen > 0) Then
     Begin
       SetLength(strToken, iTokenLen);
-      {$IFNDEF D2009}
-      If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
-      {$ELSE}
-      If Not (CharInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
-      {$ENDIF}
+      If Not (IsInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
         AddToken(strToken, LastToken);
     End;
   TrimTrailingWhitespace;

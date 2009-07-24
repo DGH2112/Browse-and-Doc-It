@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       21 Jul 2009
+  @Date       24 Jul 2009
   @Author     David Hoyle
 
 **)
@@ -534,11 +534,7 @@ begin
             If sl[iCommentLine][1] = '''' Then
               sl[iCommentLine] := ReplaceCharacter(sl[iCommentLine], 1, #32);
             If Length(sl[iCommentLine]) > 1 Then
-              {$IFNDEF D2009}
-              If (sl[iCommentLine][2] In [':', '''']) Then
-              {$ELSE}
-              If (CharInSet(sl[iCommentLine][2], [':', ''''])) Then
-              {$ENDIF}
+              If (IsInSet(sl[iCommentLine][2], [':', ''''])) Then
                 Begin
                   boolDocComment := True;
                   sl[iCommentLine] := ReplaceCharacter(sl[iCommentLine], 2, #32);
@@ -1584,30 +1580,14 @@ Begin
       Inc(iStreamCount);
       LastToken := CurCharType;
 
-      {$IFNDEF D2009}
-      If ch In strWhiteSpace Then
-      {$ELSE}
-      If CharInSet(ch, strWhiteSpace) Then
-      {$ENDIF}
+      If IsInSet(ch, strWhiteSpace) Then
         CurCharType := ttWhiteSpace
-      {$IFNDEF D2009}
-      Else If ch In strTokenChars Then
-      {$ELSE}
-      Else If CharInSet(ch, strTokenChars) Then
-      {$ENDIF}
+      Else If IsInSet(ch, strTokenChars) Then
         Begin
-         {$IFNDEF D2009}
-          If (LastToken = ttNumber) And (Ch In ['A'..'F', 'H', 'a'..'f', 'h']) Then
-          {$ELSE}
-          If (LastToken = ttNumber) And (CharInSet(Ch, ['A'..'F', 'H', 'a'..'f', 'h'])) Then
-          {$ENDIF}
+          If (LastToken = ttNumber) And (IsInSet(Ch, ['A'..'F', 'H', 'a'..'f', 'h'])) Then
             CurCharType := ttNumber
           Else
-            {$IFNDEF D2009}
-            If (LastToken In [ttWhiteSpace]) And (Ch In ['_']) Then
-            {$ELSE}
-            If (LastToken In [ttWhiteSpace]) And (CharInSet(Ch, ['_'])) Then
-            {$ENDIF}
+            If (LastToken In [ttWhiteSpace]) And (IsInSet(Ch, ['_'])) Then
               CurCharType := ttLineContinuation
             Else
               Begin
@@ -1616,42 +1596,22 @@ Begin
                 CurCharType := ttIdentifier
               End;
         End
-      {$IFNDEF D2009}
-      Else If ch In strNumbers Then
-      {$ELSE}
-      Else If CharInSet(ch, strNumbers) Then
-      {$ENDIF}
+      Else If IsInSet(ch, strNumbers) Then
         Begin
           CurCharType := ttNumber;
           If LastToken = ttIdentifier Then
             CurCharType := ttIdentifier;
         End
-      {$IFNDEF D2009}
-      Else If ch In strLineEnd Then
-      {$ELSE}
-      Else If CharInSet(ch, strLineEnd) Then
-      {$ENDIF}
+      Else If IsInSet(ch, strLineEnd) Then
         CurCharType := ttLineEnd
-      {$IFNDEF D2009}
-      Else If ch In strQuote Then
-      {$ELSE}
-      Else If CharInSet(ch, strQuote) Then
-      {$ENDIF}
+      Else If IsInSet(ch, strQuote) Then
         CurCharType := ttDoubleLiteral
-      {$IFNDEF D2009}
-      Else If ch In strSymbols Then
-      {$ELSE}
-      Else If CharInSet(ch, strSymbols) Then
-      {$ENDIF}
+      Else If IsInSet(ch, strSymbols) Then
         Begin
           CurCharType := ttSymbol;
           If (Ch = '.') And (LastToken = ttNumber) Then
             CurCharType := ttNumber;
-          {$IFNDEF D2009}
-          If (LastToken In [ttIdentifier]) And (Ch In ['%', '$', '&']) Then
-          {$ELSE}
-          If (LastToken In [ttIdentifier]) And (CharInSet(Ch, ['%', '$', '&'])) Then
-          {$ENDIF}
+          If (LastToken In [ttIdentifier]) And (IsInSet(Ch, ['%', '$', '&'])) Then
             CurCharType := ttIdentifier;
         End
       Else
@@ -1670,11 +1630,7 @@ Begin
             Begin
               SetLength(strToken, iTokenLen);
               If iTokenLen > 0 Then
-                {$IFNDEF D2009}
-                If Not (strToken[1] In strWhiteSpace) Then
-                {$ELSE}
-                If Not (CharInSet(strToken[1], strWhiteSpace)) Then
-                {$ENDIF}
+                If Not (IsInSet(strToken[1], strWhiteSpace)) Then
                   Begin
                     If LastToken = ttIdentifier Then
                       Begin
@@ -1688,11 +1644,7 @@ Begin
                     If (LastToken = ttLineComment) And (Length(strToken) > 2) Then
                       If (strToken[1] = '{') And (strToken[2] = '$') Then
                         LastToken := ttCompilerDirective;
-                    {$IFNDEF D2009}
-                    If strToken[1] In strLineEnd Then
-                    {$ELSE}
-                    If CharInSet(strToken[1], strLineEnd) Then
-                    {$ENDIF}
+                    If IsInSet(strToken[1], strLineEnd) Then
                       strToken := StringReplace(strToken, #13#10, '<line-end>',
                         [rfReplaceAll]);
                     AddToken(TTokenInfo.Create(strToken, iStreamPos,
@@ -1755,11 +1707,7 @@ Begin
     Begin
       SetLength(strToken, iTokenLen);
       If iTokenLen > 0 Then
-        {$IFNDEF D2009}
-        If Not (strToken[1] In strWhiteSpace) Then
-        {$ELSE}
-        If Not (CharInSet(strToken[1], strWhiteSpace)) Then
-        {$ENDIF}
+        If Not (IsInSet(strToken[1], strWhiteSpace)) Then
           Begin
             If LastToken = ttIdentifier Then
               Begin
@@ -1768,11 +1716,7 @@ Begin
                 If IsKeyWord(strToken, strDirectives) Then
                   LastToken := ttDirective;
               End;
-            {$IFNDEF D2009}
-            If strToken[1] In strLineEnd Then
-            {$ELSE}
-            If CharInSet(strToken[1], strLineEnd) Then
-            {$ENDIF}
+            If IsInSet(strToken[1], strLineEnd) Then
               strToken := StringReplace(strToken, #13#10, '<line-end>',
                 [rfReplaceAll]);
             AddToken(TTokenInfo.Create(strToken, iStreamPos,

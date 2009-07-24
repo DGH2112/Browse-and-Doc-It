@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       21 Jul 2009
+  @Date       24 Jul 2009
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -1003,11 +1003,7 @@ begin
             SetLength(strComment, Length(strComment) - 1);
           If Length(strComment) > 0 Then
             Begin
-              {$IFNDEF D2009}
-              If (strComment[1] In [':', '*']) Then
-              {$ELSE}
-              If (CharInSet(strComment[1], [':', '*'])) Then
-              {$ENDIF}
+              If (IsInSet(strComment[1], [':', '*'])) Then
                 Begin;
                   strComment := Copy(strComment, 2, Length(strComment) - 1);
                   Result := Create(strComment, iLine, iCol);
@@ -2089,62 +2085,29 @@ Begin
         Inc(iStreamCount);
         LastCharType := CurCharType;
 
-        {$IFNDEF D2009}
-        If ch In strWhiteSpace Then
-        {$ELSE}
-        If CharInSet(ch, strWhiteSpace) Then
-        {$ENDIF}
+        If IsInSet(ch, strWhiteSpace) Then
           CurCharType := ttWhiteSpace
-        {$IFNDEF D2009}
-        Else If ch In strTokenChars Then
-        {$ELSE}
-        Else If CharInSet(ch, strTokenChars) Then
-        {$ENDIF}
+        Else If isInSet(ch, strTokenChars) Then
           Begin
-            {$IFNDEF D2009}
-            If (LastCharType = ttNumber) And (Ch In ['A'..'F', 'a'..'f']) Then
-            {$ELSE}
-            If (LastCharType = ttNumber) And (CharInSet(Ch, ['A'..'F', 'a'..'f'])) Then
-            {$ENDIF}
+            If (LastCharType = ttNumber) And (IsInSet(Ch, ['A'..'F', 'a'..'f'])) Then
               CurCharType := ttNumber
             Else
               CurCharType := ttIdentifier;
           End
-        {$IFNDEF D2009}
-        Else If ch In strNumbers Then
-        {$ELSE}
-        Else If CharInSet(ch, strNumbers) Then
-        {$ENDIF}
+        Else If IsInSet(ch, strNumbers) Then
           Begin
             CurCharType := ttNumber;
             If LastCharType = ttIdentifier Then
               CurCharType := ttIdentifier;
           End
-        {$IFNDEF D2009}
-        Else If ch In strLineEnd Then
-        {$ELSE}
-        Else If CharInSet(ch, strLineEnd) Then
-        {$ENDIF}
+        Else If IsInSet(ch, strLineEnd) Then
           CurCharType := ttLineEnd
-        {$IFNDEF D2009}
-        Else If ch In strQuote Then
-        {$ELSE}
-        Else If CharInSet(ch, strQuote) Then
-        {$ENDIF}
+        Else If IsInSet(ch, strQuote) Then
           CurCharType := ttSingleLiteral
-        {$IFNDEF D2009}
-        Else If ch In strSymbols Then
-        {$ELSE}
-        Else If CharInSet(ch, strSymbols) Then
-        {$ENDIF}
+        Else If IsInSet(ch, strSymbols) Then
           Begin
-            {$IFNDEF D2009}
-            If (LastCharType = ttNumber) And (LastChar In ['e', 'E']) And
-              (Ch In ['-', '+']) Then
-            {$ELSE}
-            If (LastCharType = ttNumber) And (CharInSet(LastChar, ['e', 'E'])) And
-              (CharInSet(Ch, ['-', '+'])) Then
-            {$ENDIF}
+            If (LastCharType = ttNumber) And (IsInSet(LastChar, ['e', 'E'])) And
+              (IsInSet(Ch, ['-', '+'])) Then
               CurCharType := ttNumber
             Else
               CurCharType := ttSymbol
@@ -2160,13 +2123,8 @@ Begin
         If (BlockType = btNoBlock) And (LastChar = '/') And (Ch = '/') Then
           BlockType := btLineComment;
 
-        {$IFNDEF D2009}
-        If (LastCharType <> CurCharType) Or (Ch In strSingleSymbols) Or
-          (LastChar In strSingleSymbols)Then
-        {$ELSE}
-        If (LastCharType <> CurCharType) Or (CharInSet(Ch, strSingleSymbols)) Or
-          (CharInSet(LastChar, strSingleSymbols)) Then
-        {$ENDIF}
+        If (LastCharType <> CurCharType) Or (IsInSet(Ch, strSingleSymbols)) Or
+          (IsInSet(LastChar, strSingleSymbols)) Then
           Begin
             If ((BlockType In [btStringLiteral, btLineComment]) And
               (CurCharType <> ttLineEnd)) Or
@@ -2180,11 +2138,7 @@ Begin
               Begin
                 SetLength(strToken, iTokenLen);
                 If iTokenLen > 0 Then
-                  {$IFNDEF D2009}
-                  If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
-                  {$ELSE}
-                  If Not (CharInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
-                  {$ENDIF}
+                  If Not (IsInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
                     Begin
                       If LastCharType = ttIdentifier Then
                         Begin
@@ -2272,11 +2226,7 @@ Begin
       If iTokenLen > 0 Then
         Begin
           SetLength(strToken, iTokenLen);
-          {$IFNDEF D2009}
-          If Not (strToken[1] In strWhiteSpace + strLineEnd) Then
-          {$ELSE}
-          If Not (CharInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
-          {$ENDIF}
+          If Not (IsInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
             AddToken(TTokenInfo.Create(strToken, iStreamPos,
               iTokenLine, iTokenColumn, Length(strToken), LastCharType));
         End;

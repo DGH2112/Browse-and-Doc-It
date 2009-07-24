@@ -37,6 +37,7 @@ Type
     Procedure TestRule;
     Procedure TestExpression;
     Procedure TestList;
+    Procedure TestTerm;
     Procedure TestSimpleExpression;
     Procedure TestHexChar;
     Procedure TestDecChar;
@@ -321,6 +322,24 @@ begin
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTBackusNaurModule.TestTerm;
+
+Const
+  strCode =
+    '<rule> ::= <myrule1> | <myrule2>+ | <myrule3>*'#13#10;
+
+Var
+  S : TBaseLanguageModule;
+
+begin
+  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  Try
+    CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
   Finally
     S.Free;
   End;

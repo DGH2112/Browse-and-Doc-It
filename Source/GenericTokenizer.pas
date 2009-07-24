@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    22 Jul 2009
+  @Date    24 Jul 2009
   @Version 1.0
 
 **)
@@ -76,66 +76,30 @@ Begin
   For i := 1 To Length(strText) Do
     Begin
       LastToken := CurToken;
-      {$IFNDEF D2009}
-      If strText[i] In [#32, #9] Then
-      {$ELSE}
-      If CharInSet(strText[i], [#32, #9]) Then
-      {$ENDIF}
+      If IsInSet(strText[i], [#32, #9]) Then
         CurToken := ttWhiteSpace
-      {$IFNDEF D2009}
-      Else If strText[i] In ['#', '_', 'a'..'z', 'A'..'Z'] Then
-      {$ELSE}
-      Else If CharInSet(strText[i], ['#', '_', 'a'..'z', 'A'..'Z']) Then
-      {$ENDIF}
+      Else If IsInSet(strText[i], ['#', '_', 'a'..'z', 'A'..'Z']) Then
         Begin
-          {$IFNDEF D2009}
-          If (LastToken = ttNumber) And (strText[i] In ['A'..'F', 'a'..'f']) Then
-          {$ELSE}
-          If (LastToken = ttNumber) And (CharInSet(strText[i], ['A'..'F', 'a'..'f'])) Then
-          {$ENDIF}
+          If (LastToken = ttNumber) And (IsInSet(strText[i], ['A'..'F', 'a'..'f'])) Then
             CurToken := ttNumber
           Else
             CurToken := ttIdentifier;
         End
-      {$IFNDEF D2009}
-      Else If strText[i] In ['$', '0'..'9'] Then
-      {$ELSE}
-      Else If CharInSet(strText[i], ['$', '0'..'9']) Then
-      {$ENDIF}
+      Else If IsInSet(strText[i], ['$', '0'..'9']) Then
         Begin
           CurToken := ttNumber;
           If LastToken = ttIdentifier Then
             CurToken := ttIdentifier;
         End
-      {$IFNDEF D2009}
-      Else If strText[i] In [#10, #13] Then
-      {$ELSE}
-      Else If CharInSet(strText[i], [#10, #13]) Then
-      {$ENDIF}
+      Else If IsInSet(strText[i], [#10, #13]) Then
         CurToken := ttLineEnd
-      {$IFNDEF D2009}
-      Else If strText[i] In [''''] Then
-      {$ELSE}
-      Else If CharInSet(strText[i], ['''']) Then
-      {$ENDIF}
+      Else If IsInSet(strText[i], ['''']) Then
         CurToken := ttSingleLiteral
-      {$IFNDEF D2009}
-      Else If strText[i] In ['"'] Then
-      {$ELSE}
-      Else If CharInSet(strText[i], ['"']) Then
-      {$ENDIF}
+      Else If IsInSet(strText[i], ['"']) Then
         CurToken := ttDoubleLiteral
-      {$IFNDEF D2009}
-      Else If strText[i] In ['?'] Then
-      {$ELSE}
-      Else If CharInSet(strText[i], ['?']) Then
-      {$ENDIF}
+      Else If IsInSet(strText[i], ['?']) Then
         CurToken := ttCustomUserToken
-      {$IFNDEF D2009}
-      Else If strText[i] In [#0..#255] - ['#', '_', 'a'..'z', 'A'..'Z', '$', '0'..'9'] Then
-      {$ELSE}
-      Else If CharInSet(strText[i], [#0..#255] - ['#', '_', 'a'..'z', 'A'..'Z', '$', '0'..'9']) Then
-      {$ENDIF}
+      Else If IsInSet(strText[i], [#0..#255] - ['#', '_', 'a'..'z', 'A'..'Z', '$', '0'..'9']) Then
         CurToken := ttSymbol
       Else
         CurToken := ttUnknown;

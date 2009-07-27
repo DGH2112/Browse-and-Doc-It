@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    18 Jul 2009
+  @Date    27 Jul 2009
   @Author  David Hoyle
 
 **)
@@ -17,7 +17,8 @@ uses
   Graphics, Controls, Forms, Dialogs, SynEditHighlighter, SynHighlighterPas,
   SynEdit, ExtCtrls, ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
   FileCtrl, ComCtrls, Contnrs, SynHighlighterVB, SynHighlighterCpp,
-  Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ToolWin, XPMan;
+  Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ToolWin, XPMan,
+  SynHighlighterXML;
 
 {$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
 
@@ -135,6 +136,7 @@ type
     FSynPasSyn: TSynPasSyn;
     FSynVBSyn: TSynVBSyn;
     FSynCPPSyn : TSynCPPSyn;
+    FSynXMLSyn : TSynXMLSyn;
     FParseRecords : TObjectList;
     FFileExcludeList : TStringList;
     FTimer : TTimer;
@@ -441,11 +443,31 @@ begin
   TfrmExclusions.Execute(FFileExcludeList);
 end;
 
+(**
+
+  This is an on execute event handler for the Wire Word Wrap action.
+
+  @precon  None.
+  @postcon Toggles the word wrap of the editor.
+
+  @param   Sender as a TObject
+
+**)
 procedure TfrmBrowseAndDocItTestForm.actViewWordWrapExecute(Sender: TObject);
 begin
   FSynEdit.WordWrap := Not FSynEdit.WordWrap;
 end;
 
+(**
+
+  This is an on update event handler for the View Word Wrap action.
+
+  @precon  None.
+  @postcon Updates the checked property of the action.
+
+  @param   Sender as a TObject
+
+**)
 procedure TfrmBrowseAndDocItTestForm.actViewWordWrapUpdate(Sender: TObject);
 begin
   (Sender As TAction).Checked := FSynEdit.WordWrap;
@@ -648,6 +670,14 @@ begin
   SynEdit1Change(Sender);
 end;
 
+(**
+
+  This method updates the module explorer.
+
+  @precon  None.
+  @postcon Updates the module explorer.
+
+**)
 procedure TfrmBrowseAndDocItTestForm.RefreshModuleExplorer;
 
 Var
@@ -808,6 +838,19 @@ begin
       HexAttri.Foreground := clGreen;
       CharAttri.Foreground := clOlive;
     End;
+  FSynXMLSyn := TSynXMLSyn.Create(Nil);
+  With FSynCPPSyn Do
+    Begin
+      AsmAttri.Foreground := clMaroon;
+      CommentAttri.Foreground := clPurple;
+      IdentifierAttri.Foreground := clNavy;
+      NumberAttri.Foreground := clGreen;
+      StringAttri.Foreground := clTeal;
+      SymbolAttri.Foreground := clGreen;
+      FloatAttri.Foreground := clGreen;
+      HexAttri.Foreground := clGreen;
+      CharAttri.Foreground := clOlive;
+    End;
   FINIFileName := BuildRootKey(Nil, Nil);
   {$IFDEF WIN32}
   BrowseAndDocItOptions.Defines.Add('WIN32');
@@ -845,6 +888,7 @@ procedure TfrmBrowseAndDocItTestForm.FormDestroy(Sender: TObject);
 begin
   FTimer.Free;
   FSynEdit.Highlighter := Nil;
+  FSynXMLSyn.Free;
   FSynEdit.Free;
   FSynVBSyn.Free;
   FSynPasSyn.Free;
@@ -1366,6 +1410,8 @@ begin
     FSynEdit.Highlighter := FSynPasSyn
   Else If IsKeyWord(strExt, ['.bnf']) Then
     FSynEdit.Highlighter := FSynCPPSyn
+  Else If IsKeyWord(strExt, ['.htm', '.html', '.xml']) Then
+    FSynEdit.Highlighter := FSynXMLSyn
   Else
     FSynEdit.Highlighter := FSynVBSyn;
   SynEdit1Change(Self);
@@ -1420,6 +1466,17 @@ begin
   sbrStatusBar.SimpleText := Format('Line %d, Column %d', [FSynEdit.CaretY, FSynEdit.CaretX]);
 end;
 
+(**
+
+  This is an on timer event handler.
+
+  @precon  None.
+  @postcon Checks to see if the editor has been idle for more than a second
+           after changed, if so refreshes the module explorer.
+
+  @param   Sender as a TObject
+
+**)
 procedure TfrmBrowseAndDocItTestForm.TimerEvent(Sender: TObject);
 
 Const

@@ -3,13 +3,9 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    24 Jul 2009
+  @Date    31 Jul 2009
   @Version 1.0
   @Author  David Hoyle
-
-  @todo    Fix the problem with the width of the module explorer not being
-           correct for the syntax highlighted output.
-  @todo    Provide and option to Wrap the content of the module explorer.
 
 **)
 Unit BaseLanguageModule;
@@ -107,7 +103,8 @@ Type
     doShowPerformanceCountersInModuleExplorer,
     doShowPrefCountersInDocSummary,
     doStrictConstantExpressions,
-    doShowMissingVBExceptionWarnings
+    doShowMissingVBExceptionWarnings,
+    doAddPreAndPostToComment
   );
 
   (** An enumerate to associate images with different types of Elements. **)
@@ -1530,6 +1527,8 @@ ResourceString
   strStrictConstantExpressions = 'Strict evaluation of constant expressions.';
   (** Options text for showing missing VB/VBA exception warnings. **)
   strShowMissingVBExceptionWarnings = 'Show missing VB/VBA exception warnings.';
+  (** Options text for adding pre and post conditions to  comments. **)
+  strAddpreAndPostToComments = 'Add Pre and Post Conditions to Comments.';
 
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
@@ -1980,7 +1979,8 @@ Const
     (FDescription : strShowPerfCountersInModuleExplorer;   FEnabled : False),
     (FDescription : strShowPerfCountersInDocSummary;       FEnabled : False),
     (FDescription : strStrictConstantExpressions;          FEnabled : True),
-    (FDescription : strShowMissingVBExceptionWarnings;     FEnabled : False)
+    (FDescription : strShowMissingVBExceptionWarnings;     FEnabled : False),
+    (FDescription : strAddPreAndPostToComments;            FEnabled : False)
   );
 
   (** This is a default set of font information for the application. **)
@@ -2781,7 +2781,7 @@ end;
 
 (**
 
-  This is the TTag class's constructor method. It creates the token list.
+  This is the TTag class`s constructor method. It creates the token list.
 
   @precon  strName is the name of the new tag to be created, iLine is the line
            number of the tag and iColumn is the column position of the tag.
@@ -2854,7 +2854,7 @@ end;
 
   This method added a token and its type to the token list.
 
-  @precon  strToken is a string to be added as a token and iType is the token's
+  @precon  strToken is a string to be added as a token and iType is the tokens
            type.
   @postcon Added a token and its type to the token list.
 
@@ -3071,7 +3071,7 @@ end;
 
 (**
 
-  This is the TComment class's destructor. It disposes of the token list and
+  This is the TComment class`s destructor. It disposes of the token list and
   the tag list.
 
   @precon  None.
@@ -3214,7 +3214,7 @@ end;
 procedure TComment.ParseComment(strComment: String);
 
 Type
-  TBlockType = (btNone, btHTML, btLink);
+  TBlockType = (btNone, btHTML, btLink, btSingle, btDouble);
 
 Const
   iTokenCapacity = 25;
@@ -3243,6 +3243,10 @@ begin
       LastToken := CurToken;
       If IsInSet(strComment[i], strWhiteSpace) Then
         CurToken := ttWhiteSpace
+      Else If IsInSet(strComment[i], ['''']) Then
+        CurToken := ttSingleLiteral
+      Else If IsInSet(strComment[i], ['"']) Then
+        CurToken := ttDoubleLiteral
       Else If IsInSet(strComment[i], ['@', '_', 'a'..'z', 'A'..'Z']) Then
         Begin
           If (LastToken = ttNumber) And (IsInSet(strComment[i], ['A'..'F', 'a'..'f'])) Then
@@ -3310,6 +3314,19 @@ begin
           Else
             CurToken := ttHTMLStartTag;
         End;
+
+        // Check for single string literals
+        If CurToken = ttSingleLiteral Then
+          If BlockType = btSingle Then
+            BlockType := btNone
+          Else If BlockType = btNone Then
+            BlockType := btSingle;
+        // Check for Double string literals
+        If CurToken = ttDoubleLiteral Then
+          If BlockType = btDouble Then
+            BlockType := btNone
+          Else If BlockType = btNone Then
+            BlockType := btDouble;
 
       If strComment[i] = #10 Then
         Begin
@@ -3551,13 +3568,13 @@ end;
 (**
 
 
-  This method adds an error to the Base Language's Element Collection under a
+  This method adds an error to the Base Language`s Element Collection under a
   sub folder of strCategory.
 
 
   @precon  Error must be a valid TElementContainer.
 
-  @postcon Adds an error to the Base Language's Element Collection under a sub
+  @postcon Adds an error to the Base Language`s Element Collection under a sub
 
            folder of strCategory.
 

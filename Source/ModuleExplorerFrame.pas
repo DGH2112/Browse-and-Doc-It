@@ -268,6 +268,13 @@ type
       @return  a TNotifyEvent
     **)
     Property OnRefresh : TNotifyEvent Read FRefresh Write FRefresh;
+    (**
+      This property exposes the virtual tree view to ouside sources.
+      @precon  None.
+      @postcon Exposes the virtual tree view to ouside sources.
+      @return  a TBADIVirtualStringTree
+    **)
+    Property Explorer : TBADIVirtualStringTree Read FExplorer;
   end;
 
 implementation

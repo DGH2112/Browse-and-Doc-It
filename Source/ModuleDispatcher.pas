@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    24 Jul 2009
+  @Date    31 Jul 2009
   @Version 1.0
 
 **)
@@ -43,7 +43,7 @@ Type
 
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
-  Modules : Array[1..10] of TDispatcherInfo = (
+  Modules : Array[1..11] of TDispatcherInfo = (
     (FExt: '.bas';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
     (FExt: '.bnf';  FCls: TBackusNaurModule; FCanDoc: True;  FBlockCmt: ctCPPBlock; FLineCmt: ctCPPBlock; FInSituCmt: ctCPPBlock),
     (FExt: '.cls';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
@@ -53,7 +53,8 @@ Const
     (FExt: '.htm';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML),
     (FExt: '.html'; FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML),
     (FExt: '.pas';  FCls: TPascalModule    ; FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
-    (FExt: '.xml';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML)
+    (FExt: '.xml';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML),
+    (FExt: '.xsd';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML)
   );
 
 (**
@@ -128,7 +129,7 @@ End;
 (**
 
   This method determines if the document can be documented in HTML, RTF, etc,
-  i.e. your wouldn't document a code type that you only wish to browse, say
+  i.e. your wouldn`t document a code type that you only wish to browse, say
   XML or HTML.
 
   @precon  None.

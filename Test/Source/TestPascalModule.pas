@@ -439,7 +439,7 @@ var
 
 begin
   ReturnValue := TPascalComment.CreateComment(
-    '(** Sorry Dave, I can''t do that! **)', 12, 23);
+    '(** Sorry Dave, I can`t do that! **)', 12, 23);
   Try
     CheckEquals(15, ReturnValue.TokenCount);
     CheckEquals('Sorry', ReturnValue.Tokens[0].Token);
@@ -447,17 +447,17 @@ begin
     CheckEquals(',', ReturnValue.Tokens[3].Token);
     CheckEquals('I', ReturnValue.Tokens[5].Token);
     CheckEquals('can', ReturnValue.Tokens[7].Token);
-    CheckEquals('''', ReturnValue.Tokens[8].Token);
+    CheckEquals('`', ReturnValue.Tokens[8].Token);
     CheckEquals('t', ReturnValue.Tokens[9].Token);
     CheckEquals('do', ReturnValue.Tokens[11].Token);
     CheckEquals('that', ReturnValue.Tokens[13].Token);
     CheckEquals('!', ReturnValue.Tokens[14].Token);
-    CheckEquals('Sorry Dave, I can''t do that!', ReturnValue.AsString(999, True));
+    CheckEquals('Sorry Dave, I can`t do that!', ReturnValue.AsString(999, True));
   Finally
     ReturnValue.Free;
   End;
   ReturnValue := TPascalComment.CreateComment(
-    '//: Sorry Dave, I can''t do that!', 12, 23);
+    '//: Sorry Dave, I can`t do that!', 12, 23);
   Try
     CheckEquals(15, ReturnValue.TokenCount);
     CheckEquals('Sorry', ReturnValue.Tokens[0].Token);
@@ -465,17 +465,17 @@ begin
     CheckEquals(',', ReturnValue.Tokens[3].Token);
     CheckEquals('I', ReturnValue.Tokens[5].Token);
     CheckEquals('can', ReturnValue.Tokens[7].Token);
-    CheckEquals('''', ReturnValue.Tokens[8].Token);
+    CheckEquals('`', ReturnValue.Tokens[8].Token);
     CheckEquals('t', ReturnValue.Tokens[9].Token);
     CheckEquals('do', ReturnValue.Tokens[11].Token);
     CheckEquals('that', ReturnValue.Tokens[13].Token);
     CheckEquals('!', ReturnValue.Tokens[14].Token);
-    CheckEquals('Sorry Dave, I can''t do that!', ReturnValue.AsString(999, True));
+    CheckEquals('Sorry Dave, I can`t do that!', ReturnValue.AsString(999, True));
   Finally
     ReturnValue.Free;
   End;
   ReturnValue := TPascalComment.CreateComment(
-    '{: Sorry Dave, I can''t do that! }', 12, 23);
+    '{: Sorry Dave, I can`t do that! }', 12, 23);
   Try
     CheckEquals(15, ReturnValue.TokenCount);
     CheckEquals('Sorry', ReturnValue.Tokens[0].Token);
@@ -483,12 +483,12 @@ begin
     CheckEquals(',', ReturnValue.Tokens[3].Token);
     CheckEquals('I', ReturnValue.Tokens[5].Token);
     CheckEquals('can', ReturnValue.Tokens[7].Token);
-    CheckEquals('''', ReturnValue.Tokens[8].Token);
+    CheckEquals('`', ReturnValue.Tokens[8].Token);
     CheckEquals('t', ReturnValue.Tokens[9].Token);
     CheckEquals('do', ReturnValue.Tokens[11].Token);
     CheckEquals('that', ReturnValue.Tokens[13].Token);
     CheckEquals('!', ReturnValue.Tokens[14].Token);
-    CheckEquals('Sorry Dave, I can''t do that!', ReturnValue.AsString(999, True));
+    CheckEquals('Sorry Dave, I can`t do that!', ReturnValue.AsString(999, True));
   Finally
     ReturnValue.Free;
   End;

@@ -135,29 +135,6 @@ object frameModuleExplorer: TframeModuleExplorer
       Action = actTypes
     end
   end
-  object tvExplorer: TVirtualStringTree
-    Left = 0
-    Top = 18
-    Width = 360
-    Height = 376
-    Align = alClient
-    Header.AutoSizeIndex = 0
-    Header.Font.Charset = DEFAULT_CHARSET
-    Header.Font.Color = clWindowText
-    Header.Font.Height = -11
-    Header.Font.Name = 'Tahoma'
-    Header.Font.Style = []
-    Header.MainColumn = -1
-    Header.Options = [hoColumnResize, hoDrag]
-    Images = ilScopeImages
-    TabOrder = 2
-    OnBeforeItemPaint = tvExplorerBeforeItemPaint
-    OnClick = tvExplorerClick
-    OnGetImageIndex = tvExplorerGetImageIndex
-    OnKeyPress = tvExplorerKeyPress
-    OnMouseMove = tvExplorerMouseMove
-    Columns = <>
-  end
   object ilScopeImages: TImageList
     Left = 29
     Top = 35

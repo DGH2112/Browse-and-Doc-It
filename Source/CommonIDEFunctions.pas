@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    24 Jul 2009
+  @Date    31 Jul 2009
   @Version 1.0
 
 **)
@@ -407,6 +407,7 @@ Var
   sl: TStringList;
   strInsert: String;
   boolExtraLine : Boolean;
+  boolHasCons : Boolean;
 
 begin
   CursorDelta.X := 0;
@@ -422,6 +423,16 @@ begin
   If boolPadOut Then
     AddToComment(#13#10);
   AddToComment(Description(Func, iIndent, boolPadOut, P));
+  boolHasCons := False;
+  If Func.Comment <> Nil Then
+    boolHasCons := Func.Comment.FindTag('precon') > -1;
+  If (doAddPreAndPostToComment In BrowseAndDocItOptions.Options) And Not boolHasCons Then
+    Begin
+      AddToComment(StringOfChar(#32, iIndent) + '  @precon  '#13#10);
+      AddToComment(StringOfChar(#32, iIndent) + '  @postcon '#13#10);
+      If boolPadOut Then
+        AddToComment(#13#10);
+    End;
   iLen := 0;
   boolExtraLine := boolExtraLine Or (Func.ParameterCount > 0);
   For i := 0 To Func.ParameterCount - 1 Do

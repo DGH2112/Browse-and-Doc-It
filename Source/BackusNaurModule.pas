@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       24 Jul 2009
+  @Date       01 Aug 2009
   @Author     David Hoyle
 
 **)
@@ -985,10 +985,10 @@ end;
 
 (**
 
-  This method deletes any root elements which don't and items in them.
+  This method deletes any root elements which don`t and items in them.
 
   @precon  None.
-  @postcon Deletes any root elements which don't and items in them.
+  @postcon Deletes any root elements which don`t and items in them.
 
 **)
 procedure TBackusNaurModule.TidyUpEmptyElements;
@@ -1142,6 +1142,8 @@ End;
 procedure TBackusNaurModule.Goal;
 
 begin
+  Line := 1;
+  Column := 1;
   Try
     If TokenCount > 0 Then
       Begin

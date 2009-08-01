@@ -1,11 +1,11 @@
 (**
-  
+
   This module contains the keyboard bindings that the Browse And Doc It
   module installs into the IDE.
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    20 Jul 2009
+  @Date    01 Aug 2009
   
 **)
 Unit KeyboardBindings;
@@ -25,8 +25,8 @@ Type
     FWizard : TBrowseAndDocItWizard;
     Procedure FocusModuleExplorer(const Context: IOTAKeyContext;
       KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-    Procedure ShowTokens(const Context: IOTAKeyContext;
-      KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
+    //Procedure ShowTokens(const Context: IOTAKeyContext;
+    //  KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     function GetBindingType: TBindingType;
@@ -57,7 +57,7 @@ procedure TKeyboardBinding.BindKeyboard(
   const BindingServices: IOTAKeyBindingServices);
 begin
   BindingServices.AddKeyBinding([Shortcut(13, [ssCtrl, ssShift, ssAlt])], FocusModuleExplorer, Nil);
-  BindingServices.AddKeyBinding([Shortcut(Ord('T'), [ssCtrl, ssShift, ssAlt])], ShowTokens, Nil);
+  // BindingServices.AddKeyBinding([Shortcut(Ord('T'), [ssCtrl, ssShift, ssAlt])], ShowTokens, Nil);
 end;
 
 (**
@@ -71,7 +71,7 @@ end;
   @param   KeyCode       as a TShortcut
   @param   BindingResult as a TKeyBindingResult as a reference
 
-**)
+
 procedure TKeyboardBinding.ShowTokens(const Context: IOTAKeyContext;
   KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
 
@@ -92,7 +92,7 @@ begin
       Source.Free;
     End;
   BindingResult := krHandled;
-end;
+end; **)
 
 (**
 

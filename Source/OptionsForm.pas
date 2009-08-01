@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    23 Jul 2009
+  @Date    01 Aug 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -168,7 +168,7 @@ Begin
         lbxMethodDescriptions.Items.Add(BrowseAndDocItOptions.MethodDescriptions[j]);
       cbxBGColour.Selected := BrowseAndDocItOptions.BGColour;
       udTokenLimit.Position := BrowseAndDocItOptions.TokenLimit;
-      udManagedNodesLife.Position := BrowseAndDocItOptions.ManagedNodesLive;
+      udManagedNodesLife.Position := BrowseAndDocItOptions.ManagedNodesLife;
       clbxTreeColour.Selected := BrowseAndDocItOptions.TreeColour;
       If ShowModal = mrOK Then
         Begin
@@ -194,7 +194,7 @@ Begin
             lbxMethodDescriptions.Items[j]);
           BrowseAndDocItOptions.BGColour := cbxBGColour.Selected;
           BrowseAndDocItOptions.TokenLimit := udTokenLimit.Position;
-          BrowseAndDocItOptions.ManagedNodesLive := udManagedNodesLife.Position;
+          BrowseAndDocItOptions.ManagedNodesLife := udManagedNodesLife.Position;
           BrowseAndDocItOptions.TreeColour := clbxTreeColour.Selected;
           BrowseAndDocItOptions.SaveSettings;
         End;

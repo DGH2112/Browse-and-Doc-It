@@ -110,6 +110,10 @@ object frmOptions: TfrmOptions
     object Page2: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         382)
@@ -170,6 +174,8 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akRight, akBottom]
         Caption = '&Add'
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
         TabOrder = 2
         OnClick = btnAddClick
       end
@@ -180,6 +186,8 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akRight, akBottom]
         Caption = '&Delete'
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
         TabOrder = 3
         OnClick = btnDeleteClick
       end
@@ -190,6 +198,8 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akRight, akBottom]
         Caption = '&Edit'
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
         TabOrder = 4
         OnClick = btnEditClick
       end
@@ -200,6 +210,8 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akRight, akBottom]
         Caption = '&Move Down'
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
         TabOrder = 5
         OnClick = btnMoveDownClick
       end
@@ -210,6 +222,8 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akRight, akBottom]
         Caption = 'Move &Up'
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
         TabOrder = 6
         OnClick = btnMoveUpClick
       end
@@ -217,6 +231,10 @@ object frmOptions: TfrmOptions
     object TabSheet1: TTabSheet
       Caption = 'Module Explorer'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         382)
@@ -290,7 +308,7 @@ object frmOptions: TfrmOptions
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 0
       end
       object edtFontSize: TEdit
@@ -433,6 +451,10 @@ object frmOptions: TfrmOptions
     object TabSheet2: TTabSheet
       Caption = 'Code Browsing'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         382)
@@ -455,6 +477,10 @@ object frmOptions: TfrmOptions
     object tabExcludeDocFiles: TTabSheet
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         382)
@@ -472,6 +498,10 @@ object frmOptions: TfrmOptions
     object tabMethodDescriptions: TTabSheet
       Caption = 'Method Descriptions'
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         382)
@@ -482,6 +512,7 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Add'
+        DoubleBuffered = True
         Glyph.Data = {
           76010000424D7601000000000000760000002800000020000000100000000100
           04000000000000010000130B0000130B00001000000000000000000000000000
@@ -496,6 +527,7 @@ object frmOptions: TfrmOptions
           333333333337733333FF3333333C333330003333333733333777333333333333
           3000333333333333377733333333333333333333333333333333}
         NumGlyphs = 2
+        ParentDoubleBuffered = False
         TabOrder = 0
         OnClick = btnAddDescClick
       end
@@ -506,6 +538,7 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Edit'
+        DoubleBuffered = True
         Glyph.Data = {
           76010000424D7601000000000000760000002800000020000000100000000100
           04000000000000010000120B0000120B00001000000000000000000000000000
@@ -520,6 +553,7 @@ object frmOptions: TfrmOptions
           0FF03333737F37737F373330B00FFFFF0F033337F77F33337F733309030FFFFF
           00333377737FFFFF773333303300000003333337337777777333}
         NumGlyphs = 2
+        ParentDoubleBuffered = False
         TabOrder = 1
         OnClick = btnEditDescClick
       end
@@ -530,6 +564,7 @@ object frmOptions: TfrmOptions
         Height = 25
         Anchors = [akTop, akRight]
         Caption = '&Delete'
+        DoubleBuffered = True
         Glyph.Data = {
           76010000424D7601000000000000760000002800000020000000100000000100
           04000000000000010000130B0000130B00001000000000000000000000000000
@@ -544,6 +579,7 @@ object frmOptions: TfrmOptions
           333333377F33333333FF3333C333333330003333733333333777333333333333
           3000333333333333377733333333333333333333333333333333}
         NumGlyphs = 2
+        ParentDoubleBuffered = False
         TabOrder = 2
         OnClick = btnDeleteDescClick
       end
@@ -587,7 +623,9 @@ object frmOptions: TfrmOptions
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
+    DoubleBuffered = True
     Kind = bkCancel
+    ParentDoubleBuffered = False
     TabOrder = 1
   end
   object bbtnOK: TBitBtn
@@ -596,7 +634,9 @@ object frmOptions: TfrmOptions
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
+    DoubleBuffered = True
     Kind = bkOK
+    ParentDoubleBuffered = False
     TabOrder = 2
   end
   object CheckedImages: TImageList

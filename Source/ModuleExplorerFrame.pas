@@ -25,6 +25,7 @@ type
   TTreeNodeInfo = Class
   {$IFDEF D2005} Strict {$ENDIF} Private
     FText       : String;
+    FName       : String;
     FLine       : Integer;
     FCol        : Integer;
     FComment    : TComment;
@@ -35,7 +36,7 @@ type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     function GetTokens: TStringList;
   Public
-    Constructor Create(strText : String; iLevel : Integer; iImageIndex : Integer;
+    Constructor Create(strText, strName : String; iLevel : Integer; iImageIndex : Integer;
       iLine : Integer = 0; iColumn : Integer = 0; boolTitle : Boolean = False;
       AComment : TComment = Nil); Overload;
     Destructor Destroy; Override;
@@ -46,6 +47,13 @@ type
       @return  a String
     **)
     Property Text : String Read FText;
+    (**
+      This property returns the Name of the tree element.
+      @precon  None.
+      @postcon Returns the Name of the tree element.
+      @return  a String
+    **)
+    Property Name : String Read FName;
     (**
       This property returns the line number of the tree node comment.
       @precon  None.
@@ -225,7 +233,7 @@ type
     FExplorer : TBADIVirtualStringTree;
     { Private declarations }
     procedure GetBodyCommentTags(M : TBaseLanguageModule);
-    Function AddNode(P : PVirtualNode; strText : String; iLevel : Integer;
+    Function AddNode(P : PVirtualNode; strText, strName : String; iLevel : Integer;
       iImageIndex : Integer; iLine : Integer = 0; iColumn : Integer = 0;
       boolTitle : Boolean = False; AComment : TComment = Nil) : PVirtualNode;
     procedure CreateSpecialTagNodes(M : TBaseLanguageModule);
@@ -345,6 +353,7 @@ End;
   @postcon Initialises the class.
 
   @param   strText     as a String
+  @param   strName     as a String
   @param   iLevel      as an Integer
   @param   iImageIndex as an Integer
   @param   iLine       as an Integer
@@ -353,13 +362,14 @@ End;
   @param   AComment    as a TComment
 
 **)
-Constructor TTreeNodeInfo.Create(strText : String; iLevel : Integer;
+Constructor TTreeNodeInfo.Create(strText, strName : String; iLevel : Integer;
   iImageIndex : Integer; iLine : Integer = 0; iColumn : Integer = 0;
   boolTitle : Boolean = False; AComment : TComment = Nil);
 
 Begin
   Inherited Create;
   FText := strText;
+  FName  := strName;
   FLevel := iLevel;
   FTitle := boolTitle;
   FLine := iLine;
@@ -792,8 +802,8 @@ Begin
         For k := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
           If FSpecialTagNodes[k].boolShow Then
             If AnsiCompareText(Tag[j].TagName, FSpecialTagNodes[k].strTagName) = 0 Then
-              AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(MaxInt, False), 2,
-                Integer(iiToDoItem) - 1, M.BodyComment[i].Tag[j].Line,
+              AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(MaxInt, False),
+                Tag[j].Name, 2, Integer(iiToDoItem) - 1, M.BodyComment[i].Tag[j].Line,
                 M.BodyComment[i].Tag[j].Column, False, Nil);
 End;
 
@@ -823,7 +833,7 @@ begin
       [scNone, scGlobal] Then
       Begin
         NewNode := AddNode(RootNode, Container.Elements[i].AsString(True, False),
-          iLevel, Container.Elements[i].ImageIndexAdjustedForScope,
+          Container.Elements[i].Name, iLevel, Container.Elements[i].ImageIndexAdjustedForScope,
           Container.Elements[i].Line, Container.Elements[i].Column,
           Container.Elements[i] Is TLabelContainer, Container.Elements[i].Comment);
         RenderContainers(NewNode, Container[i], iLevel + 1);
@@ -857,7 +867,7 @@ Begin
       If FExplorer.NodeParent[P] <> Nil Then
         Begin
           NodeData := FExplorer.GetNodeData(P);
-          str := NodeData.FNode.Text + '.' + str;
+          str := NodeData.FNode.Name + '.' + str;
         End;
       P := FExplorer.NodeParent[P];
     End;
@@ -885,7 +895,7 @@ begin
   For i := Count - 1 DownTo 0 Do
     Begin
       dtDate := Integer(Objects[i]);
-      If dtDate < Now - 90 Then
+      If dtDate < Now - BrowseAndDocItOptions.ManagedNodesLife Then
         Delete(i);
     End;
 end;
@@ -1063,8 +1073,8 @@ Begin
       M.AddTickCount('Clear');
       SetLength(FSpecialTagNodes, BrowseAndDocItOptions.SpecialTags.Count);
       // Create Root Tree Node
-      FModule := AddNode(Nil, M.AsString(True, False), 0, M.ImageIndexAdjustedForScope,
-        M.Line, M.Column, False, M.Comment);
+      FModule := AddNode(Nil, M.AsString(True, False), M.Name, 0,
+        M.ImageIndexAdjustedForScope, M.Line, M.Column, False, M.Comment);
       CreateSpecialTagNodes(M);
       OutputModuleInfo(M);
       M.AddTickCount('Build');
@@ -1226,7 +1236,7 @@ Begin
       FSpecialTagNodes[i].boolExpand :=
         Integer(BrowseAndDocItOptions.SpecialTags.Objects[i]) And iAutoExpand <> 0;
       FSpecialTagNodes[i].Node := AddNode(FModule, FSpecialTagNodes[i].strTagDesc,
-        1, Integer(iiTodoFolder) - 1);
+        FSpecialTagNodes[i].strTagName, 1, Integer(iiTodoFolder) - 1);
     End;
 End;
 
@@ -1383,6 +1393,7 @@ end;
 
   @param   P           as a PVirtualNode
   @param   strText     as a String
+  @param   strName     as a String
   @param   iLevel      as an Integer
   @param   iImageIndex as an Integer
   @param   iLine       as an Integer
@@ -1392,7 +1403,7 @@ end;
   @return  a PVirtualNode
 
 **)
-Function TframeModuleExplorer.AddNode(P : PVirtualNode; strText : String;
+Function TframeModuleExplorer.AddNode(P : PVirtualNode; strText, strName : String;
   iLevel : Integer; iImageIndex : Integer; iLine : Integer = 0;
   iColumn : Integer = 0; boolTitle : Boolean = False;
   AComment : TComment = Nil) : PVirtualNode;
@@ -1404,8 +1415,8 @@ Var
 begin
   Result := FExplorer.AddChild(P);
   NodeData := FExplorer.GetNodeData(Result);
-  N := TTreeNodeInfo.Create(strText, iLevel, iImageIndex, iLine, iColumn,
-    boolTitle, AComment);
+  N := TTreeNodeInfo.Create(strText, strName, iLevel, iImageIndex, iLine,
+    iColumn, boolTitle, AComment);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
 end;

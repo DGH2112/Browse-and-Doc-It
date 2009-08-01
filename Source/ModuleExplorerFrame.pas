@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    31 Jul 2009
+  @Date    01 Aug 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -193,7 +193,7 @@ type
     procedure tvExplorerClick(Sender: TObject);
     procedure actLocalUpdate(Sender: TObject);
     procedure actLocalExecute(Sender: TObject);
-    procedure tvExplorerKeyPress(Sender: TObject; var Key: Char);
+    procedure tvExplorerKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     {$IFNDEF D2009}
     procedure tvExplorerGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -731,7 +731,7 @@ begin
       OnBeforeItemPaint := tvExplorerBeforeItemPaint;
       OnClick := tvExplorerClick;
       OnGetImageIndex := tvExplorerGetImageIndex;
-      OnKeyPress := tvExplorerKeyPress;
+      OnKeyDown := tvExplorerKeyDown;
       OnMeasureItem := tvExplorerMeasureItem;
       OnMouseMove := tvExplorerMouseMove;
     End;
@@ -1804,25 +1804,26 @@ end;
 
 (**
 
-
   This method is an on key down event handler for the tree view.
 
   @precon  None.
   @postcon If an on focus event handler is assigned it is fired.
 
   @param   Sender as a TObject
-  @param   Key    as a Char as a reference
+  @param   Key    as a Word as a reference
+  @param   Shift  as a TShiftState
 
 **)
-procedure TframeModuleExplorer.tvExplorerKeyPress(Sender: TObject; var Key: Char);
+procedure TframeModuleExplorer.tvExplorerKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
 
 begin
-  If Key = #13 Then
+  If Key = 13 Then
     Begin
       tvExplorerClick(Sender);
-      If Assigned(OnFocus) Then
-        FFocus(Sender);
-      Key := #0;
+      If Shift = [] Then
+        If Assigned(OnFocus) Then
+          FFocus(Sender);
     End;
 end;
 

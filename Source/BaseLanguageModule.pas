@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    31 Jul 2009
+  @Date    01 Aug 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -1403,7 +1403,7 @@ Type
                are alive for.
       @return  an Integer
     **)
-    Property ManagedNodesLive : Integer Read FManagedNodesLife Write FManagedNodesLife;
+    Property ManagedNodesLife : Integer Read FManagedNodesLife Write FManagedNodesLife;
     (**
       This property gets and sets the colour of the explorer tree lines.
       @precon  None.

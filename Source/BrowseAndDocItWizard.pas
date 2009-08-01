@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    21 Jul 2009
+  @Date    01 Aug 2009
   @Version 1.0
 
 **)
@@ -46,6 +46,7 @@ Type
     Procedure InsertBlockCommentClick(Sender : TObject);
     Procedure InsertLineCommentClick(Sender : TObject);
     Procedure InsertInSituCommentClick(Sender : TObject);
+    Procedure InsertToDoCommentClick(Sender : TObject);
     Procedure DocumentationClick(Sender : TObject);
     Procedure DUnitClick(Sender : TObject);
     Procedure DeleteExistingComment(Source : IOTASourceEditor; iStartLine,
@@ -264,6 +265,8 @@ Begin
     InsertLineCommentClick, Menus.ShortCut(Ord('L'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, 'Insert &In-Situ Comment',
     InsertInSituCommentClick, Menus.ShortCut(Ord('I'), [ssCtrl, ssShift, ssAlt]));
+  CreateMenuItem(mmiPascalDocMenu, 'Insert &ToDo Comment',
+    InsertToDoCommentClick, Menus.ShortCut(Ord('T'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, '&Options...', OptionsClick,
     Menus.ShortCut(Ord('O'), [ssCtrl, ssShift, ssAlt]));
@@ -886,6 +889,43 @@ begin
         End;
     Finally
       Module.Free;
+    End;
+end;
+
+(**
+
+  This in an on click event handler for the Insert ToDo Comment menu item.
+
+  @precon  None.
+  @postcon Inserts in the the menu at the cursor a todo line comment.
+
+  @param   Sender as a TObject
+
+**)
+procedure TBrowseAndDocItWizard.InsertToDoCommentClick(Sender: TObject);
+
+var
+  SE: IOTASourceEditor;
+  Writer: IOTAEditWriter;
+  EditPos: TOTAEditPos;
+  CharPos: TOTACharPos;
+
+begin
+  SE := ActiveSourceEditor;
+  If SE <> Nil Then
+    Begin
+      EditPos := SE.EditViews[0].CursorPos;
+      Writer := SE.CreateUndoableWriter;
+      Try
+        CharPos.Line := EditPos.Line;
+        CharPos.CharIndex := EditPos.Col;
+        Writer.CopyTo(SE.GetEditView(0).CharPosToPos(CharPos) - 1);
+        OutputText(Writer, '//: @todo ');
+        EditPos.Col := EditPos.Col + 10;
+      Finally
+        Writer := Nil;
+      End;
+      SE.EditViews[0].CursorPos := EditPos;
     End;
 end;
 

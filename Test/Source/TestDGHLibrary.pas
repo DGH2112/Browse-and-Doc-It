@@ -477,15 +477,15 @@ var
   strFileName: String;
 
 begin
-  strFileName := 'dcc32.exe';
-  Check(DGHFindOnPath(strFileName, ''), 'Check for dcc32.exe');
-  CheckEquals('C:\Program Files\CodeGear\RAD Studio\6.0\bin\dcc32.exe', strFileName);
-  strFileName := 'search.exe';
-  Check(DGHFindOnPath(strFileName, ''), 'Check for search.exe');
-  CheckEquals('E:\HoylD\Borland Studio Projects\Applications\Search\search.exe', strFileName);
-  strFileName := 'xmlChecker.exe';
-  Check(DGHFindOnPath(strFileName, ''), 'Check for xmlChecker.exe');
-  CheckEquals('E:\HoylD\Borland Studio Projects\Applications\XML Checker\xmlChecker.exe', strFileName);
+  strFileName := 'notepad.exe';
+  Check(DGHFindOnPath(strFileName, ''), 'Check for notepad.exe');
+  CheckEquals('C:\WINDOWS\system32\notepad.exe', strFileName);
+  strFileName := 'regedit.exe';
+  Check(DGHFindOnPath(strFileName, ''), 'Check for regedit.exe');
+  CheckEquals('C:\WINDOWS\regedit.exe', strFileName);
+  strFileName := 'cmd.exe';
+  Check(DGHFindOnPath(strFileName, ''), 'Check for cmd.exe');
+  CheckEquals('C:\WINDOWS\system32\cmd.exe', strFileName);
 end;
 
 procedure TestApplicationFunctions.TestDMSAsDecToDecimal;

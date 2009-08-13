@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    24 Jul 2009
+  @Date    13 Aug 2009
   @Version 1.0
 
 **)
@@ -537,7 +537,7 @@ Var
           If fsBold In TokenFontInfo[i].FStyles Then
             sl.Add('  font-weight      : bold;');
           If fsItalic In TokenFontInfo[i].FStyles Then
-            sl.Add('  font-stylet      : italic;');
+            sl.Add('  font-style       : italic;');
           If fsUnderline In TokenFontInfo[i].FStyles Then
             sl.Add('  font-decoration  : underline;');
           If fsStrikeout In TokenFontInfo[i].FStyles Then

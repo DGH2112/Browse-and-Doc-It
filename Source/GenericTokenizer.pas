@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    13 Aug 2009
+  @Date    14 Aug 2009
   @Version 1.0
 
 **)
@@ -208,6 +208,10 @@ Begin
           BlockType := btNoBlock
         Else If BlockType = btNoBlock Then
           BlockType := btCustomUserToken;
+
+      If strText[i] = #10 Then
+        If BlockType In [btLineComment, btSingleLiteral, btDoubleLiteral] Then
+          BlockType := btNoBlock;
 
       LastChar := strText[i];
     End;

@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       01 Aug 2009
+  @Date       18 Aug 2009
   @Author     David Hoyle
 
 **)
@@ -1141,6 +1141,9 @@ End;
 **)
 procedure TBackusNaurModule.Goal;
 
+var
+  C: TComment;
+
 begin
   Line := 1;
   Column := 1;
@@ -1151,11 +1154,13 @@ begin
         While (Token.TokenType In [ttLineComment, ttBlockComment, ttLineEnd]) And
           Not EndOfTokens Do
           Begin
-            If (Comment = Nil) And (Token.TokenType In [ttLineComment, ttBlockComment]) Then
+            If Token.TokenType In [ttLineComment, ttBlockComment] Then
               Begin
-                Comment := TBackusNaurComment.CreateComment(Token.Token,
-                  Token.Line, Token.Column);
-                OwnedItems.Add(Comment);
+                C := TBackusNaurComment.CreateComment(Token.Token, Token.Line,
+                  Token.Column);
+                AddBodyComment(C);
+                If Comment = Nil Then
+                  Comment := C;
               End;
             NextToken;
           End;

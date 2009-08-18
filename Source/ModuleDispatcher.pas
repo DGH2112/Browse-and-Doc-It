@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    31 Jul 2009
+  @Date    17 Aug 2009
   @Version 1.0
 
 **)
@@ -43,12 +43,13 @@ Type
 
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
-  Modules : Array[1..11] of TDispatcherInfo = (
+  Modules : Array[1..12] of TDispatcherInfo = (
     (FExt: '.bas';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
     (FExt: '.bnf';  FCls: TBackusNaurModule; FCanDoc: True;  FBlockCmt: ctCPPBlock; FLineCmt: ctCPPBlock; FInSituCmt: ctCPPBlock),
     (FExt: '.cls';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
     (FExt: '.dpk';  FCls: TPascalModule    ; FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
     (FExt: '.dpr';  FCls: TPascalModule    ; FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
+    (FExt: '.dtd';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML),
     (FExt: '.frm';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
     (FExt: '.htm';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML),
     (FExt: '.html'; FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML),

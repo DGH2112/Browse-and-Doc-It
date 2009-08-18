@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    01 Aug 2009
+  @Date    18 Aug 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -4854,29 +4854,30 @@ var
   Cmt: TComment;
 
 begin
-  If (C.TokenCount > 0) Or (C.TagCount > 0) Then
-    Begin
-      If FBodyComment.Count > 0 Then
-        Begin
-          Cmt := BodyComment[BodyCommentCount - 1];
-          If FLastBodyCommentLine + 1 = C.Line Then
-            Begin
-              Cmt.AppendComment(Cmt, C);
-              Cmt.TrimTrailingWhiteSpace;
-              FLastBodyCommentLine := C.Line;
-              C.Free;
-            End Else
-            Begin
-              FBodyComment.Add(C);
-              FLastBodyCommentLine := C.Line;
-            End;
-        End Else
-        Begin
-          FBodyComment.Add(C);
-          FLastBodyCommentLine := C.Line;
-        End;
-    End Else
-      C.Free;
+  If C <> Nil Then
+    If (C.TokenCount > 0) Or (C.TagCount > 0) Then
+      Begin
+        If FBodyComment.Count > 0 Then
+          Begin
+            Cmt := BodyComment[BodyCommentCount - 1];
+            If FLastBodyCommentLine + 1 = C.Line Then
+              Begin
+                Cmt.AppendComment(Cmt, C);
+                Cmt.TrimTrailingWhiteSpace;
+                FLastBodyCommentLine := C.Line;
+                C.Free;
+              End Else
+              Begin
+                FBodyComment.Add(C);
+                FLastBodyCommentLine := C.Line;
+              End;
+          End Else
+          Begin
+            FBodyComment.Add(C);
+            FLastBodyCommentLine := C.Line;
+          End;
+      End Else
+        C.Free;
 end;
 
 (**

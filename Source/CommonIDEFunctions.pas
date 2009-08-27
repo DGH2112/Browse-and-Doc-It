@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    31 Jul 2009
+  @Date    21 Aug 2009
   @Version 1.0
 
 **)
@@ -92,7 +92,8 @@ Type
   Function FindIndentOfFirstTokenOnLine(Module : TBaseLanguageModule;
     iLine : Integer) : Integer;
   Function BuildBlockComment(CommentType : TCommentType;
-    CommentStyle : TCommentStyle; iIndent : Integer) : String;
+    CommentStyle : TCommentStyle; iIndent : Integer;
+    strSelectedText : String) : String;
 
 Const
   (** A simple array for outputting a or an. **)
@@ -696,17 +697,19 @@ end;
   styles given.
 
   @precon  None.
-  @postcon Returns a string representation of a comment of the type and
-           styles given.
+  @postcon Returns a string representation of a comment of the type and styles 
+           given.
 
-  @param   CommentType  as a TCommentType
-  @param   CommentStyle as a TCommentStyle
-  @param   iIndent      as an Integer
+  @param   CommentType     as a TCommentType
+  @param   CommentStyle    as a TCommentStyle
+  @param   iIndent         as an Integer
+  @param   strSelectedText as a String
   @return  a String
 
 **)
 Function BuildBlockComment(CommentType : TCommentType;
-  CommentStyle : TCommentStyle; iIndent : Integer) : String;
+  CommentStyle : TCommentStyle; iIndent : Integer;
+  strSelectedText : String) : String;
 
 Var
   strAllCmtStart, strBlockCmtEnd, strLineCmtEnd : String;
@@ -723,19 +726,22 @@ Begin
       Begin
         Result := Result + strAllCmtStart + #13#10;
         Result := Result + StringOfChar(#32, iIndent - 1) + strCmtMiddle + '  '#13#10;
-        Result := Result + StringOfChar(#32, iIndent - 1) + strCmtMiddle + '  '#13#10;
+        Result := Result + StringOfChar(#32, iIndent - 1) + strCmtMiddle + '  ' +
+          strSelectedText + #13#10;
         Result := Result + StringOfChar(#32, iIndent - 1) + strCmtMiddle + '  '#13#10;
         Result := Result + StringOfChar(#32, iIndent - 1) + strBlockCmtEnd + #13#10;
         Result := Result + StringOfChar(#32, iIndent - 1);
       End;
     csLine :
       Begin
-        Result := Result + strAllCmtStart + #32#32 + strLineCmtEnd + #13#10;
+        Result := Result + strAllCmtStart + #32 + strSelectedText + #32 +
+          strLineCmtEnd + #13#10;
         Result := Result + StringOfChar(#32, iIndent - 1);
       End;
     csInSitu :
       Begin
-        Result := Result + strAllCmtStart + '  ' + strLineCmtEnd + ' ';
+        Result := Result + strAllCmtStart + #32 + strSelectedText + #32 +
+          strLineCmtEnd + ' ';
       End;
   End;
 End;

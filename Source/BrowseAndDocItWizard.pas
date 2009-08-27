@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    01 Aug 2009
+  @Date    27 Aug 2009
   @Version 1.0
 
 **)
@@ -55,6 +55,7 @@ Type
       iIndent: Integer; strComment: string);
     procedure InsertComment(strComment: string; Writer: IOTAEditWriter;
       iInsertLine: Integer; Source: IOTASourceEditor);
+    Function  SelectedText(boolDelete : Boolean) : String;
     {$IFNDEF D2005}
     Procedure MenuTimerEvent(Sender : TObject);
     {$ENDIF}
@@ -99,7 +100,7 @@ Const
 Var
   (** This is an index for the wizard when register with the ide. Its required
       in order to remove it from memory. **)
-  iWizardIndex : Integer;
+  iWizardIndex : Integer = 0;
   {$IFDEF D2005}
   (** This is an index for the editor notifier required when the package is
       unloaded **)
@@ -655,6 +656,7 @@ Var
   CharPos : TOTACharPos;
   Writer : IOTAEditWriter;
   iIndent : Integer;
+  strSelectedText: String;
 
 begin
   If CommentType = ctNone Then
@@ -662,6 +664,7 @@ begin
   SourceEditor := ActiveSourceEditor;
   If SourceEditor = Nil Then
     Exit;
+  strSelectedText := SelectedText(True);
   With SourceEditor.GetEditView(0) Do
     Begin
       EditPos := CursorPos;
@@ -672,7 +675,8 @@ begin
     CharPos.Line := EditPos.Line;
     CharPos.CharIndex := EditPos.Col;
     Writer.CopyTo(SourceEditor.GetEditView(0).CharPosToPos(CharPos) - 1);
-    OutputText(Writer, BuildBlockComment(CommentType, CommentStyle, iIndent));
+    OutputText(Writer, BuildBlockComment(CommentType, CommentStyle, iIndent,
+      strSelectedText));
   Finally
     Writer := Nil;
   End;
@@ -909,18 +913,20 @@ var
   Writer: IOTAEditWriter;
   EditPos: TOTAEditPos;
   CharPos: TOTACharPos;
+  strSelectedText: String;
 
 begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
+      strSelectedText := SelectedText(True);
       EditPos := SE.EditViews[0].CursorPos;
       Writer := SE.CreateUndoableWriter;
       Try
         CharPos.Line := EditPos.Line;
         CharPos.CharIndex := EditPos.Col;
         Writer.CopyTo(SE.GetEditView(0).CharPosToPos(CharPos) - 1);
-        OutputText(Writer, '//: @todo ');
+        OutputText(Writer, '//: @todo ' + strSelectedText); //: @bug Should be language dependent.
         EditPos.Col := EditPos.Col + 10;
       Finally
         Writer := Nil;
@@ -944,6 +950,66 @@ procedure TBrowseAndDocItWizard.OptionsClick(Sender: TObject);
 begin
   If TfrmOptions.Execute Then
     objEditorNotifier.ResetLastupdateTickCount(1);
+end;
+
+(**
+
+  This method returns the selected text in th active editor window and
+  optionally deletes this text.
+
+  @precon  None.
+  @postcon Returns the selected text in th active editor window and
+           optionally deletes this text.
+
+  @param   boolDelete as a Boolean
+  @return  a String
+
+**)
+function TBrowseAndDocItWizard.SelectedText(boolDelete : Boolean): String;
+
+Var
+  SE : IOTASourceEditor;
+  Reader : IOTAEditReader;
+  strBuffer : AnsiString;
+  iRead : Integer;
+  Block: IOTAEditBlock;
+  cpStart, cpEnd : TOTACharPos;
+  Writer: IOTAEditWriter;
+  iBufferPosStart, iBufferPosEnd: Integer;
+
+begin
+  Result := '';
+  SE := ActiveSourceEditor;
+  If SE <> Nil Then
+    Begin
+      Reader := SE.CreateReader;
+      Try
+        Block := SE.EditViews[0].Block;
+        cpStart.Line := Block.StartingRow;
+        cpStart.CharIndex := Block.StartingColumn - 1;
+        iBufferPosStart := SE.EditViews[0].CharPosToPos(cpStart);
+        cpEnd.Line := Block.EndingRow;
+        cpEnd.CharIndex := Block.EndingColumn - 1;
+        iBufferPosEnd := SE.EditViews[0].CharPosToPos(cpEnd);
+        SetLength(strBuffer, iBufferPosEnd - iBufferPosStart);
+        iRead := Reader.GetText(iBufferPosStart, PChar(strBuffer),
+          iBufferPosEnd - iBufferPosStart);
+        SetLength(strBuffer, iRead);
+        Result := strBuffer;
+      Finally
+        Reader := Nil;
+      End;
+      If boolDelete Then
+        Begin
+          Writer := SE.CreateUndoableWriter;
+          Try
+            Writer.CopyTo(iBufferPosStart);
+            Writer.DeleteTo(iBufferPosEnd);
+          Finally
+            Writer := Nil;
+          End;
+        End;
+    End;
 end;
 
 (**
@@ -1214,6 +1280,7 @@ Finalization
   objEditorNotifier.Free;
   {$ENDIF}
   {(BorlandIDEServices As IOTAServices).RemoveNotifier(iIDENotifier);}
-  (BorlandIDEServices As IOTAWizardServices).RemoveWizard(iWizardIndex);
+  If iWizardIndex > 0 Then
+    (BorlandIDEServices As IOTAWizardServices).RemoveWizard(iWizardIndex);
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
 End.

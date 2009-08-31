@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    27 Aug 2009
+  @Date    31 Aug 2009
   @Version 1.0
 
 **)
@@ -992,10 +992,14 @@ begin
         cpEnd.CharIndex := Block.EndingColumn - 1;
         iBufferPosEnd := SE.EditViews[0].CharPosToPos(cpEnd);
         SetLength(strBuffer, iBufferPosEnd - iBufferPosStart);
-        iRead := Reader.GetText(iBufferPosStart, PChar(strBuffer),
+        iRead := Reader.GetText(iBufferPosStart, PAnsiChar(strBuffer),
           iBufferPosEnd - iBufferPosStart);
         SetLength(strBuffer, iRead);
+        {$IFNDEF D2009}
         Result := strBuffer;
+        {$ELSE}
+        Result := String(strBuffer);
+        {$ENDIF}
       Finally
         Reader := Nil;
       End;

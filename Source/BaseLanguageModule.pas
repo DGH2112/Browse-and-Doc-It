@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    18 Aug 2009
+  @Date    05 Sep 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -5430,7 +5430,7 @@ begin
     End;
   Repeat
     If (Token.TokenType In [ttLineComment, ttBlockComment]) And
-      (FLastComment <> Token) Then
+      (FLastComment <> Token) And (FCommentClass <> Nil) Then
       Begin
         C := FCommentClass.CreateComment(Token.Token,
           Token.Line, Token.Column);

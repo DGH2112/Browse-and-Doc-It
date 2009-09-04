@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    17 Aug 2009
+  @Date    04 Sep 2009
   @Version 1.0
 
 **)
@@ -25,7 +25,7 @@ Uses
 Implementation
 
 Uses
-  Windows, PascalModule, VBModule, BackusNaurModule, XMLModule;
+  Windows, PascalModule, VBModule, BackusNaurModule, XMLModule, DFMModule;
 
 Type
   (** A class type to define classes in the record structure. **)
@@ -43,10 +43,11 @@ Type
 
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
-  Modules : Array[1..12] of TDispatcherInfo = (
+  Modules : Array[1..13] of TDispatcherInfo = (
     (FExt: '.bas';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
     (FExt: '.bnf';  FCls: TBackusNaurModule; FCanDoc: True;  FBlockCmt: ctCPPBlock; FLineCmt: ctCPPBlock; FInSituCmt: ctCPPBlock),
     (FExt: '.cls';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
+    (FExt: '.dfm';  FCls: TDFMModule       ; FCanDoc: False; FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
     (FExt: '.dpk';  FCls: TPascalModule    ; FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
     (FExt: '.dpr';  FCls: TPascalModule    ; FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
     (FExt: '.dtd';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML),

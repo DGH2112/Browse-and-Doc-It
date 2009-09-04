@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    27 Jul 2009
+  @Date    05 Sep 2009
   @Author  David Hoyle
 
 **)
@@ -1406,7 +1406,7 @@ begin
   FSynEdit.Lines.LoadFromFile(FFileName);
   FSynedit.Modified := False;
   strExt := LowerCase(ExtractFileExt(FFileName));
-  If IsKeyWord(strExt, ['.dpk', '.dpr', '.pas']) Then
+  If IsKeyWord(strExt, ['.dfm', '.dpk', '.dpr', '.pas']) Then
     FSynEdit.Highlighter := FSynPasSyn
   Else If IsKeyWord(strExt, ['.bnf']) Then
     FSynEdit.Highlighter := FSynCPPSyn

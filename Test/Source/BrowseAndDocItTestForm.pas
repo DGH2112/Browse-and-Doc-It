@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    05 Sep 2009
+  @Date    06 Sep 2009
   @Author  David Hoyle
 
 **)
@@ -148,7 +148,7 @@ type
     function GetPathRoot: String;
     procedure SetPathRoot(const Value: String);
     Function RecurseDirectories(strRoot, strDirectory : String;
-      iPosition : Integer) : TScanResults;
+      var iPosition : Integer; boolScan : Boolean = False) : TScanResults;
     Procedure RefreshExplorer(Sender : TObject);
     Procedure PopulateListView;
     Function ExcludeFileFromResults(strFileName : String) : Boolean;
@@ -400,6 +400,7 @@ procedure TfrmBrowseAndDocItTestForm.actFileScanExecute(Sender: TObject);
 var
   i: Integer;
   R : TScanResults;
+  iPosition : Integer;
 
 begin
   For i := 0 To lvDirectories.Items.Count - 1 Do
@@ -407,13 +408,20 @@ begin
   Application.ProcessMessages;
   lvFileList.Items.Clear;
   FParseRecords.Clear;
-  FProgressForm.Init(lvDirectories.Items.Count, 'Scanning Directories', 'Please wait...');
+  FProgressForm.Init(1, 'Preparing to Scan', 'Please wait...');
   Try
+    iPosition := 0;
+    For i := 0 To lvDirectories.Items.Count - 1 Do
+      If lvDirectories.Items[i].Checked Then
+        RecurseDirectories(lvDirectories.Items[i].Caption,
+            lvDirectories.Items[i].Caption, iPosition);
+    FProgressForm.Init(iPosition, 'Scanning Directories', 'Please wait...');
+    iPosition := 0;
     For i := 0 To lvDirectories.Items.Count - 1 Do
       If lvDirectories.Items[i].Checked Then
         Begin
           R := RecurseDirectories(lvDirectories.Items[i].Caption,
-            lvDirectories.Items[i].Caption, i);
+            lvDirectories.Items[i].Caption, iPosition, True);
           lvDirectories.Items[i].SubItems.Add(Format('%d', [R.iDocConflicts]));
           lvDirectories.Items[i].SubItems.Add(Format('%d', [R.iHints]));
           lvDirectories.Items[i].SubItems.Add(Format('%d', [R.iWarnings]));
@@ -513,7 +521,7 @@ Var
 begin
   Result := False;
   For i := 0 To FFileExcludeList.Count - 1 Do
-    If Pos(FFileExcludeList[i], strFileName) > 0 Then
+    If Pos(LowerCase(FFileExcludeList[i]), LowerCase(strFileName)) > 0 Then
       Begin
         Result := True;
         Break;
@@ -593,17 +601,18 @@ end;
 
   This method recurse the directories searching for files.
 
-  @precon  None . 
-  @postcon Recurse the directories searching for files . 
+  @precon  None.
+  @postcon Recurse the directories searching for files.
 
   @param   strRoot      as a String
   @param   strDirectory as a String
-  @param   iPosition    as an Integer
+  @param   iPosition    as an Integer as a reference
+  @param   boolScan     as a Boolean
   @return  a TScanResults
 
 **)
 Function TfrmBrowseAndDocItTestForm.RecurseDirectories(strRoot,
-  strDirectory : String; iPosition : Integer) : TScanResults;
+  strDirectory : String; var iPosition : Integer; boolScan : Boolean = False) : TScanResults;
 
 Var
   recFile : TSearchRec;
@@ -622,7 +631,8 @@ Begin
   Try
     While iResult = 0 Do
       Begin
-        If CanParseDocument(ExtractFileExt(recFile.Name)) Then
+        Inc(iPosition);
+        If boolScan And CanParseDocument(ExtractFileExt(recFile.Name)) Then
           Begin
             strFileName := strDirectory + '\' + recFile.Name;
             If Not ExcludeFileFromResults(strFileName) Then
@@ -642,7 +652,7 @@ Begin
           If (recFile.Attr And faDirectory <> 0) And (recFile.Name[1] <> '.') Then
             Begin
               R := RecurseDirectories(strRoot, strDirectory + '\' + recFile.Name,
-                iPosition);
+                iPosition, boolScan);
               Inc(Result.iDocConflicts, R.iDocConflicts);
               Inc(Result.iHints, R.iHints);
               Inc(Result.iWarnings, R.iWarnings);
@@ -1277,6 +1287,8 @@ begin
       WriteInteger('Columns', 'E', lvDirectories.Columns[4].Width);
       WriteInteger('Position', 'Splitter', pnlModuleExplorer.Width);
       WriteInteger('Position', 'DirHeight', lvDirectories.Height);
+      EraseSection('Folders');
+      EraseSection('FolderChecks');
       For i := 0 To lvDirectories.Items.Count - 1 Do
         Begin
           WriteString('Folders', Format('Folder%d', [i]), lvDirectories.Items[i].Caption);

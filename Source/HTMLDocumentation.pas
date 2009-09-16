@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    13 Aug 2009
+  @Date    16 Sep 2009
   @Version 1.0
 
 **)
@@ -145,7 +145,7 @@ Function THTMLDocumentation.A(strText, strHREF : String;
   strName : String = '') : String;
 
 Begin
-  //strHREF := StringReplace(strHREF, #32, '', [rfReplaceAll]);
+  strHREF := StringReplace(strHREF, #32, '', [rfReplaceAll]);
   strName := StringReplace(strName, #32, '', [rfReplaceAll]);
   If strHREF <> '' Then
     Result := Format('<a href="%s">%s</a>', [strHREF, strText])

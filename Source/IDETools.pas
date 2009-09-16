@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    16 Apr 2009
+  @Date    10 Sep 2009
   @Author  David Hoyle
 
 **)
@@ -108,11 +108,9 @@ Type
     Procedure CodePaneChangeEvent(Pane : CodePane; Project : VBProject);
     Procedure Save;
     Function GetFileName(strProject, strModule : String; iType : Integer) : String;
-    Procedure EditorAsMemoryStream(Stream : TStream);
     procedure PositionCursorInFunction(CursorDelta: TPoint; iInsertLine: Integer; iIndent: Integer; strComment: string);
     Procedure SuccessfulParse(boolSuccessfulParse : Boolean);
-    Procedure EditorInfo(var strFileName : String; var boolModified : Boolean;
-      MemoryStream : TMemoryStream);
+    Function  EditorInfo(var strFileName : String; var boolModified : Boolean) : String;
     Procedure RenderDocument(Module : TBaseLanguageModule);
     Procedure ExceptionMsg(strExceptionMsg : String);
     Procedure IdleTimerEvent(Sender : TObject);
@@ -172,9 +170,9 @@ Type
     **)
     Property CursorPosition : TEditPos Read GetCursorPosition;
     (**
-      This property returns the editor's current code pane.
+      This property returns the editor`s current code pane.
       @precon  None.
-      @postcon Returns the editor's current code pane.
+      @postcon Returns the editor`s current code pane.
       @return  a CodePane
     **)
     Property CurrentCodePane : CodePane Read GetCodePane;
@@ -737,7 +735,6 @@ procedure TIDETools.ShowTokensClick(const Ctrl: CommandBarButton;
   var CancelDefault: WordBool);
 
 Var
-  src : TMemoryStream;
   doc : TBaseLanguageModule;
   strFileName : String;
   strTemp : String;
@@ -750,21 +747,13 @@ begin
       Exit;
     strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
       CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
-    src := TMemoryStream.Create;
+    strTemp := ModuleCode;
+    doc := Dispatcher(strTemp, strFileName, Not CP.CodeModule.Parent.Saved,
+      [moParse]);
     Try
-      strTemp := ModuleCode;
-      If Length(strTemp) > 0 Then
-        src.WriteBuffer(strTemp[1], Length(strTemp));
-      src.Position := 0;
-      doc := Dispatcher(src, strFileName, Not CP.CodeModule.Parent.Saved,
-        [moParse]);
-      Try
-        TfrmTokenForm.Execute(doc);
-      Finally
-        doc.Free;
-      End;
+      TfrmTokenForm.Execute(doc);
     Finally
-      src.Free;
+      doc.Free;
     End;
   Except
     On E: Exception Do
@@ -1312,8 +1301,13 @@ End;
 
 **)
 procedure TIDETools.IdleTimerEvent(Sender: TObject);
+
+Var
+  recWndInfo : TWindowInfo;
+
 begin
-  If FVBEIDE.MainWindow.Visible Then
+  GetWindowInfo(FVBEIDE.MainWindow.HWnd, recWndInfo);
+  If FVBEIDE.MainWindow.Visible And (recWndInfo.dwOtherStuff And WS_ACTIVECAPTION > 0) Then
     Application.DoApplicationIdle;
   If FVisible <> FVBEIDE.MainWindow.Visible Then
     Begin
@@ -1488,7 +1482,6 @@ procedure TIDETools.InsertMethodCommentClick(const Ctrl: CommandBarButton;
   var CancelDefault: WordBool);
 
 Var
-  objMemStream: TMemoryStream;
   Module: TBaseLanguageModule;
   strFileName: String;
   T: TElementContainer;
@@ -1498,54 +1491,50 @@ Var
   strComment: String;
   iInsertLine: Integer;
   CP: CodePane;
+  strCode : String;
 
 begin
   iInsertLine := 0;
   CP := CurrentCodePane;
     If CP = Nil Then
       Exit;
-  objMemStream := TMemoryStream.Create;
-  Try
-    EditorAsMemoryStream(objMemStream);
-    strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
-      CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
-    Module := Dispatcher(objMemStream, strFileName,
-      Not CP.CodeModule.Parent.Saved, [moParse]);
-    If Module <> Nil Then
-      Try
-        T := Module.FindElement(strImplementedMethodsLabel);
-        If T <> Nil Then
-          Begin
-            N := FindFunction(CursorPosition.Line, T, TGenericMethodDecl);
-            If N <> Nil Then
-              Begin
-                If N.Comment <> Nil Then
-                  Begin
-                    If MessageDlg(Format(strMethodAlreadyExists, [N.QualifiedName]),
-                      mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
-                      Exit;
-                    CP.CodeModule.DeleteLines(N.Comment.Line,
-                      N.Line - N.Comment.Line);
-                    iInsertLine := N.Comment.Line;
-                  End;
-                If iInsertLine = 0 Then
-                  iInsertLine := N.Line;
-                iIndent := FindIndentOfFirstTokenOnLine(Module, N.Line) - 1;
-                strComment := WriteComment(N, ctVBLine, iIndent, True, CursorDelta);
-                // Remove last #13#10 - not required as the IDE adds them
-                strComment := Copy(strComment, 1, Length(strComment) - 2);
-                CP.CodeModule.InsertLines(iInsertLine, strComment);
-                PositionCursorInFunction(CursorDelta, iInsertLine, iIndent,
-                  strComment);
-              End Else
-                MessageDlg(strNoMethodFound, mtWarning, [mbOK], 0);
-          End;
-      Finally
-        Module.Free;
-      End;
-  Finally
-   objMemStream.Free;
-  End;
+  strCode := ModuleCode;
+  strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
+    CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
+  Module := Dispatcher(strCode, strFileName,
+    Not CP.CodeModule.Parent.Saved, [moParse]);
+  If Module <> Nil Then
+    Try
+      T := Module.FindElement(strImplementedMethodsLabel);
+      If T <> Nil Then
+        Begin
+          N := FindFunction(CursorPosition.Line, T, TGenericMethodDecl);
+          If N <> Nil Then
+            Begin
+              If N.Comment <> Nil Then
+                Begin
+                  If MessageDlg(Format(strMethodAlreadyExists, [N.QualifiedName]),
+                    mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
+                    Exit;
+                  CP.CodeModule.DeleteLines(N.Comment.Line,
+                    N.Line - N.Comment.Line);
+                  iInsertLine := N.Comment.Line;
+                End;
+              If iInsertLine = 0 Then
+                iInsertLine := N.Line;
+              iIndent := FindIndentOfFirstTokenOnLine(Module, N.Line) - 1;
+              strComment := WriteComment(N, ctVBLine, iIndent, True, CursorDelta);
+              // Remove last #13#10 - not required as the IDE adds them
+              strComment := Copy(strComment, 1, Length(strComment) - 2);
+              CP.CodeModule.InsertLines(iInsertLine, strComment);
+              PositionCursorInFunction(CursorDelta, iInsertLine, iIndent,
+                strComment);
+            End Else
+              MessageDlg(strNoMethodFound, mtWarning, [mbOK], 0);
+        End;
+    Finally
+      Module.Free;
+    End;
 end;
 
 (**
@@ -1568,7 +1557,6 @@ procedure TIDETools.InsertPropertyCommentClick(const Ctrl: CommandBarButton;
   var CancelDefault: WordBool);
 
 Var
-  objMemStream: TMemoryStream;
   Module: TBaseLanguageModule;
   strFileName: String;
   T: TElementContainer;
@@ -1578,54 +1566,50 @@ Var
   strComment: String;
   CursorDelta: TPoint;
   CP: CodePane;
+  strCode : String;
 
 begin
   iInsertLine := 0;
   CP := CurrentCodePane;
   If CP = Nil Then
     Exit;
-  objMemStream := TMemoryStream.Create;
-  Try
-    EditorAsMemoryStream(objMemStream);
-    strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
-      CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
-    Module := Dispatcher(objMemStream, strFileName,
-      Not CP.CodeModule.Parent.Saved, [moParse]);
-    If Module <> Nil Then
-      Try
-        T := Module.FindElement(strImplementedPropertiesLabel);
-        If T <> Nil Then
-          Begin
-            N := FindFunction(CursorPosition.Line, T, TGenericProperty);
-            If N <> Nil Then
-              Begin
-                If N.Comment <> Nil Then
-                  Begin
-                    If MessageDlg(Format(strPropertyAlreadyExists, [N.QualifiedName]),
-                      mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
-                      Exit;
-                    CP.CodeModule.DeleteLines(N.Comment.Line,
-                      N.Line - N.Comment.Line);
-                    iInsertLine := N.Comment.Line;
-                  End;
-                If iInsertLine = 0 Then
-                  iInsertLine := N.Line;
-                iIndent := FindIndentOfFirstTokenOnLine(Module, N.Line) - 1;
-                strComment := WriteComment(N, ctVBLine, iIndent, True, CursorDelta);
-                // Remove last #13#10 - not required as the IDE adds them
-                strComment := Copy(strComment, 1, Length(strComment) - 2);
-                CP.CodeModule.InsertLines(iInsertLine, strComment);
-                PositionCursorInFunction(CursorDelta, iInsertLine, iIndent,
-                  strComment);
-              End Else
-                MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
-          End;
-      Finally
-        Module.Free;
-      End;
-  Finally
-   objMemStream.Free;
-  End;
+  strCode := ModuleCode;
+  strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
+    CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
+  Module := Dispatcher(strCode, strFileName,
+    Not CP.CodeModule.Parent.Saved, [moParse]);
+  If Module <> Nil Then
+    Try
+      T := Module.FindElement(strImplementedPropertiesLabel);
+      If T <> Nil Then
+        Begin
+          N := FindFunction(CursorPosition.Line, T, TGenericProperty);
+          If N <> Nil Then
+            Begin
+              If N.Comment <> Nil Then
+                Begin
+                  If MessageDlg(Format(strPropertyAlreadyExists, [N.QualifiedName]),
+                    mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
+                    Exit;
+                  CP.CodeModule.DeleteLines(N.Comment.Line,
+                    N.Line - N.Comment.Line);
+                  iInsertLine := N.Comment.Line;
+                End;
+              If iInsertLine = 0 Then
+                iInsertLine := N.Line;
+              iIndent := FindIndentOfFirstTokenOnLine(Module, N.Line) - 1;
+              strComment := WriteComment(N, ctVBLine, iIndent, True, CursorDelta);
+              // Remove last #13#10 - not required as the IDE adds them
+              strComment := Copy(strComment, 1, Length(strComment) - 2);
+              CP.CodeModule.InsertLines(iInsertLine, strComment);
+              PositionCursorInFunction(CursorDelta, iInsertLine, iIndent,
+                strComment);
+            End Else
+              MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
+        End;
+    Finally
+      Module.Free;
+    End;
 end;
 
 (**
@@ -1705,42 +1689,20 @@ end;
 
 (**
 
-  This method returns the code of the current editor as a memory stream.
+  This method returns filename, modified and code information back to the Browse
+  And Doc It thread for processing.
 
   @precon  None.
-  @postcon Returns the code of the current editor as a memory stream.
-
-  @param   Stream as a TStream
-
-**)
-Procedure TIDETools.EditorAsMemoryStream(Stream : TStream);
-
-Var
-  strModuleCode : String;
-
-Begin
-  strModuleCode := ModuleCode;
-  If Length(strModuleCode) > 0 Then
-    Stream.WriteBuffer(strModuleCode[1], Length(strModuleCode));
-  Stream.Position := 0;
-End;
-
-(**
-
-  This method returns filename, modified and code information back to the
-  Browse And Doc It thread for processing.
-
-  @precon  None.
-  @postcon Returns filename, modified and code information back to the
-           Browse And Doc It thread for processing.
+  @postcon Returns filename, modified and code information back to the Browse 
+           And Doc It thread for processing.
 
   @param   strFileName  as a String as a reference
   @param   boolModified as a Boolean as a reference
-  @param   MemoryStream as a TMemoryStream
+  @return  a String
 
 **)
-procedure TIDETools.EditorInfo(var strFileName: String;
-  var boolModified: Boolean; MemoryStream: TMemoryStream);
+Function TIDETools.EditorInfo(var strFileName: String;
+  var boolModified: Boolean) : String;
 
 var
   CP: CodePane;
@@ -1752,7 +1714,7 @@ begin
       strFileName := GetFileName(CP.CodeModule.Parent.Collection.Parent.Name,
         CP.CodeModule.Parent.Name, CP.CodeModule.Parent.Type_);
       boolModified := Not CP.CodeModule.Parent.Saved;
-      EditorAsMemoryStream(MemoryStream);
+      Result := ModuleCode;
     End;
 end;
 

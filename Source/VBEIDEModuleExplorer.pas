@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    13 Apr 2009
+  @Date    09 Sep 2009
   @Version 1.0
 
 **)
@@ -158,9 +158,9 @@ procedure TfrmDockableModuleExplorer.Focus;
 begin
   If FModuleExplorerFrame <> Nil Then
     If FModuleExplorerFrame.Visible Then
-      If FModuleExplorerFrame.tvExplorer.Visible Then
-        If FModuleExplorerFrame.tvExplorer.CanFocus Then
-          FModuleExplorerFrame.tvExplorer.SetFocus;
+      If FModuleExplorerFrame.Explorer.Visible Then
+        If FModuleExplorerFrame.Explorer.CanFocus Then
+          FModuleExplorerFrame.Explorer.SetFocus;
 end;
 
 (**
@@ -337,7 +337,7 @@ end;
 (**
 
   This is a class method which accepots even handler from the calling class to
-  hand the dockable module explorer's SelectionChange event handler.
+  hand the dockable module explorer`s SelectionChange event handler.
 
   @precon  None.
   @postcon Sets the SelectionChange event handler for the dockable form.

@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    09 Sep 2009
+  @Date    22 Sep 2009
   @Version 1.0
 
 **)
@@ -31,12 +31,13 @@ type
     Class Procedure RenderDocumentTree(BaseLanguageModule : TBaseLanguageModule);
     Class Procedure HookEventHandlers(SelectionChangeProc : TSelectionChange;
       Focus, ScopeChange : TNotifyEvent);
-    Class Function IsVisible : Boolean;
+    Class Function  IsVisible : Boolean;
     Class Procedure SetActivate(Handler : TNotifyEvent);
     Class Procedure SetVisible(boolVisible : Boolean);
-    Class Function GetVisible : Boolean;
-    Class Function GetModuleExplorerPosition: TRect;
+    Class Function  GetVisible : Boolean;
+    Class Function  GetModuleExplorerPosition: TRect;
     Class Procedure SetModuleExplorerPosition(const Value: TRect);
+    Class Function  GetWndHnd : THandle;
   end;
 
   (** This is a classifier for the dockable form so that it can be registered
@@ -239,6 +240,23 @@ begin
   Result := False;
   If FormInstance <> Nil Then
     Result := FormInstance.Visible;
+end;
+
+(**
+
+  This method returns the module explorer main form window handle.
+
+  @precon  None.
+  @postcon Returns the module explorer main form window handle.
+
+  @return  a THandle
+
+**)
+class function TfrmDockableModuleExplorer.GetWndHnd: THandle;
+begin
+  Result := 0;
+  If FormInstance <> Nil Then
+    Result := FormInstance.Handle;
 end;
 
 (**

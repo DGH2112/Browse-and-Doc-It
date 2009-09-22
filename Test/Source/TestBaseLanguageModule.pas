@@ -1696,6 +1696,25 @@ begin
     Finally
       M.Free;
     End;
+
+    FGenericMethodDecl.DeleteDocumentConflicts;
+    C := TComment.Create(
+      'This is a description.'#13#10'@precon None.'#13#10 +
+      '@postcon None.'#13#10 +
+      '@param param1 as an String - a string'#13#10 +
+      '@param param2 as an Array of Integer as a reference - an array'#13#10 +
+      '@param param3 as an Byte as a constant - a constant'#13#10 +
+      '@param param4 as a Double as an out parameter - a double'#13#10 +
+      '@return a Boolean - something', 0, 0);
+    Try
+      FGenericMethodDecl.Comment := C;
+      FGenericMethodDecl.CheckDocumentation(boolCascade);
+      CheckEquals(0, FGenericMethodDecl.HeadingCount(strDocumentationConflicts),
+        FGenericMethodDecl.DocConflict(1));
+    Finally
+      C.Free;
+    End;
+
   Finally
     AType.Free;
   End;

@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       24 Jul 2009
+  @Date       22 Sep 2009
   @Author     David Hoyle
 
 **)
@@ -63,6 +63,11 @@ Type
     Procedure SetHasErrorHnd(boolValue : Boolean);
     Function GetHasExit : Boolean;
     Procedure SetHasExit(boolValue : Boolean);
+    Function GetExitLine : Integer;
+    Procedure SetExitLine(iLine : Integer);
+    Function GetExitCol : Integer;
+    Procedure SetExitCol(iCol : Integer);
+    Function GetMethodName : String;
     (**
       This property determine if the method has a Exception.Push handler.
       @precon  None.
@@ -105,6 +110,27 @@ Type
       @return  a Boolean
     **)
     Property HasExit : Boolean Read GetHasExit Write SetHasExit;
+    (**
+      This property determines the method line of the exit statement.
+      @precon  None.
+      @postcon Determines the method line of the exit statement.
+      @return  a Integer
+    **)
+    Property ExitLine : Integer Read GetExitLine Write SetExitLine;
+    (**
+      This property determines the method column of the exit statement.
+      @precon  None.
+      @postcon Determines the method column of the exit statement.
+      @return  a Integer
+    **)
+    Property ExitCol : Integer Read GetExitCol Write SetExitCol;
+    (**
+      This property returns the name of the method with the ExceptionHandling.
+      @precon  None.
+      @postcon R
+      @return  a String
+    **)
+    Property MethodName : String Read GetMethodName;
   End;
 
   (** A class to handle exception handling information for method and
@@ -117,8 +143,11 @@ Type
     FHasPush     : Boolean;
     FPushName    : String;
     FPushParams  : TStringList;
+    FExitLine    : Integer;
+    FExitCol     : Integer;
+    FMethodName  : String;
   Public
-    Constructor Create;
+    Constructor Create(strMethodName : String);
     Destructor Destroy; Override;
     function GetHasErrorHnd: Boolean;
     function GetHasExit: Boolean;
@@ -126,11 +155,16 @@ Type
     function GetHasPush: Boolean;
     function GetPushName: string;
     function GetPushParams: TStringList;
+    Function GetExitLine : Integer;
+    Function GetExitCol : Integer;
     procedure SetHasErrorHnd(boolValue: Boolean);
     procedure SetHasExit(boolValue: Boolean);
     procedure SetHasPop(boolValue: Boolean);
     procedure SetHasPush(boolValue: Boolean);
     procedure SetPushName(strValue: string);
+    Procedure SetExitLine(iLine : Integer);
+    Procedure SetExitCol(iCol : Integer);
+    Function GetMethodName : String;
   End;
 
   (** A class to represent method (SUB & FUNCTION) in visual basic. **)
@@ -473,6 +507,9 @@ ResourceString
   (** A warning message for push parameter count different. **)
   strExceptionPushParamCount = 'The function ''%s.%s'' has the wrong number of ' +
     'Exception.Push parameters (%d not %d).';
+  (** A hint message for keyword GOTO found in the code. **)
+  strKeywordGOTOFound = 'Keyword GOTO found in function ''%s'' at line %d co' +
+  'lumn %d.';
 
 { TVBComment }
 
@@ -558,10 +595,13 @@ end;
   @precon  None.
   @postcon Initialises the push parameters string list.
 
+  @param   strMethodName as a String
+
 **)
-constructor TExceptionHandling.Create;
+constructor TExceptionHandling.Create(strMethodName : String);
 begin
   Inherited Create;
+  FMethodName := strMethodName;
   FPushParams := TStringList.Create;
 end;
 
@@ -577,6 +617,36 @@ destructor TExceptionHandling.Destroy;
 begin
   FPushParams.Free;
   Inherited Destroy;
+end;
+
+(**
+
+  This is a getter method for the ExitCol property.
+
+  @precon  None.
+  @postcon Returns the Exit Column number.
+
+  @return  an Integer
+
+**)
+function TExceptionHandling.GetExitCol: Integer;
+begin
+  Result := FExitCol;
+end;
+
+(**
+
+  This is a getter method for the ExitLine property.
+
+  @precon  None.
+  @postcon Returns the Exit Line number.
+
+  @return  an Integer
+
+**)
+function TExceptionHandling.GetExitLine: Integer;
+begin
+  Result := FExitLine;
 end;
 
 (**
@@ -641,6 +711,21 @@ end;
 
 (**
 
+  This is a getter method for the MethodName property.
+
+  @precon  None.
+  @postcon Returns the name of the method. 
+
+  @return  a String
+
+**)
+function TExceptionHandling.GetMethodName: String;
+begin
+  Result := FMethodName;
+end;
+
+(**
+
   This is a getter method for the HasPush property.
 
   @precon  None.
@@ -667,6 +752,36 @@ end;
 function TExceptionHandling.GetPushParams: TStringList;
 begin
   Result := FPushParams;
+end;
+
+(**
+
+  This is a setter method for the ExitCol property.
+
+  @precon  None.
+  @postcon Sets the Exit Column Number.
+
+  @param   iCol as an Integer
+
+**)
+procedure TExceptionHandling.SetExitCol(iCol: Integer);
+begin
+  FExitCol := iCol;
+end;
+
+(**
+
+  This is a setter method for the ExitLine property.
+
+  @precon  None.
+  @postcon Sets the Exit Line Number.
+
+  @param   iLine as an Integer
+
+**)
+procedure TExceptionHandling.SetExitLine(iLine: Integer);
+begin
+  FExitLine := iLine;
 end;
 
 (**
@@ -765,7 +880,7 @@ constructor TVBMethod.Create(MethodType: TMethodType; strName: String;
 begin
   inherited;
   FPushParams := TStringList.Create;
-  FExceptionHandling := TExceptionHandling.Create;
+  FExceptionHandling := TExceptionHandling.Create(strName);
 end;
 
 (**
@@ -1083,7 +1198,7 @@ constructor TVBProperty.Create(APropertyType: TPropertyType; strName: String;
 begin
   Inherited Create(strName, AScope, iLine, iCol, iImageIndex, AComment);
   FPropertyType := APropertyType;
-  FExceptionHandling := TExceptionHandling.Create;
+  FExceptionHandling := TExceptionHandling.Create(strName);
 end;
 
 (**
@@ -2594,7 +2709,7 @@ Begin
       If Not ReferenceSymbol(Token) Then
         FUnResolvedSymbols.Add(Token.Token);
     // Check for Exception.Push & Exception.Pop
-    If AnsiCompareText(Token.Token, 'Exception') = 0 Then
+    If CompareText(Token.Token, 'Exception') = 0 Then
       Begin
         NextNonCommentToken;
         If Token.Token = '.' Then
@@ -2630,8 +2745,8 @@ Begin
               End;
           End;
       End;
-    // Check for On Error Goto
-    If AnsiCompareText(Token.Token, 'On') = 0 Then
+    // Check for On Error
+    If CompareText(Token.Token, 'On') = 0 Then
       Begin
         NextNonCommentToken;
         If AnsiCompareText(Token.Token, 'Error') = 0 Then
@@ -2640,16 +2755,21 @@ Begin
             NextNonCommentToken;
           End;
       End;
-    // Check for On Error Goto
-    If AnsiCompareText(Token.Token, 'Exit') = 0 Then
+    // Check for Exit Sub / Function
+    If CompareText(Token.Token, 'Exit') = 0 Then
       Begin
         NextNonCommentToken;
         If IsKeyWord(Token.Token, ['function', 'sub']) Then
           Begin
             AExceptionHnd.HasExit := True;
+            AExceptionHnd.ExitLine := PrevToken.Line;
+            AExceptionHnd.ExitCol := PrevToken.Column;
             NextNonCommentToken;
           End;
       End;
+    If (CompareText(Token.Token, 'GOTO') = 0) And (CompareText(PrevToken.Token, 'ERROR') <> 0) Then
+      AddIssue(Format(strKeywordGOTOFound, [AExceptionHnd.MethodName, Token.Line,
+        Token.Column]), scNone, 'FindMethodEnd', Token.Line, Token.Column, etHint);
   Until (PrevToken.UToken = 'END') And (Token.UToken = strMethodType);
   NextNonCommentToken;
   If Token.TokenType In [ttLineEnd] Then
@@ -3220,11 +3340,11 @@ end;
 
 (**
 
-  This method checks the exception handling for the given function and it's
+  This method checks the exception handling for the given function and it`s
   exception handler.
 
   @precon  M and ExceptionHandler must be valid instances.
-  @postcon Checks the exception handling for the given function and it's
+  @postcon Checks the exception handling for the given function and it`s
            exception handler and outputs an issue IF something is missing.
 
   @param   M                as a TGenericFunction
@@ -3240,6 +3360,7 @@ var
   iIndex : Integer;
 
 begin
+  // Check Exception Push and Pop
   boolNoTag :=
     (Comment <> Nil) And (Comment.FindTag('noexception') > -1) Or
     (M.Comment <> Nil) And (M.Comment.FindTag('noexception') > -1);
@@ -3255,6 +3376,14 @@ begin
       AddIssue(Format(strExceptionPushNameIncorrect,
         [ExceptionHandler.PushName, ModuleName, M.Identifier]), scNone,
         'CheckExceptionHandling', M.Line, M.Column, etWarning);
+  If Not ExceptionHandler.HasPop And Not boolNoTag Then
+    AddIssue(Format(strExceptionPop, [M.Identifier]), scNone,
+      'CheckExceptionHandling', M.Line, M.Column, etWarning);
+  // Check Exception Parameters
+  boolNoTag :=
+    (Comment <> Nil) And (Comment.FindTag('noexception') > -1) Or
+    (M.Comment <> Nil) And (M.Comment.FindTag('noexception') > -1) Or
+    (M.Comment <> Nil) And (M.Comment.FindTag('noexceptionparams') > -1);
   If Not boolNoTag Then
     For i := 0 To M.ParameterCount - 1 Do
       Begin
@@ -3273,18 +3402,17 @@ begin
       AddIssue(Format(strExceptionPushParamCount, [ModuleName, M.Identifier,
         M.ParameterCount, ExceptionHandler.PushParams.Count]), scNone,
         'CheckExceptionHandling', M.Line, M.Column, etWarning);
-  If Not ExceptionHandler.HasPop And Not boolNoTag Then
-    AddIssue(Format(strExceptionPop, [M.Identifier]), scNone,
-      'CheckExceptionHandling', M.Line, M.Column, etWarning);
+  // Check Error Handling
   boolNoTag :=
     (Comment <> Nil) And (Comment.FindTag('noerror') > -1) Or
     (M.Comment <> Nil) And (M.Comment.FindTag('noerror') > -1);
   If Not ExceptionHandler.HasErrorHnd And Not boolNoTag Then
     AddIssue(Format(strErrorHandling, [M.Identifier]), scNone,
-    'CheckExceptionHandling', M.Line, M.Column, etWarning);
-  If ExceptionHandler.HasExit And ExceptionHandler.HasErrorHnd Then
+      'CheckExceptionHandling', M.Line, M.Column, etWarning);
+  If ExceptionHandler.HasExit And ExceptionHandler.HasErrorHnd And Not boolNoTag Then
     AddIssue(Format(strExitStatement, [M.Identifier]), scNone,
-    'CheckExceptionHandling', M.Line, M.Column, etWarning);
+      'CheckExceptionHandling', ExceptionHandler.ExitLine,
+      ExceptionHandler.ExitCol, etWarning);
 end;
 
 (**

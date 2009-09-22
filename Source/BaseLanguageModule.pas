@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    05 Sep 2009
+  @Date    21 Sep 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -4368,7 +4368,13 @@ Begin
           Begin
             strType := '';
             For j := 6 To Tag[iFound].TokenCount - 1 Do
-              strType := strType + Tag[iFound].Tokens[j].Token;
+              Begin
+                If (Tag[iFound].Tokens[j].TokenType In [ttSymbol]) And
+                  (Tag[iFound].Tokens[j].Token <> '.') Then
+                  Break;
+                strType := strType + Tag[iFound].Tokens[j].Token;
+              End;
+            strType := Trim(strType);
             strParam := BuildLangIndepRep(Parameters[i]);
             If doShowMethodIncorrectParamType In BrowseAndDocItOptions.Options Then
               If AnsiCompareText(strType, strParam) <> 0 Then
@@ -4434,7 +4440,13 @@ Begin
               strType := '';
               strReturn := '';
               For i := 2 To Comment.Tag[iFound].TokenCount - 1 Do
-                strType := strType + Comment.Tag[iFound].Tokens[i].Token;
+                Begin
+                  If (Comment.Tag[iFound].Tokens[i].TokenType In [ttSymbol]) And
+                    (Comment.Tag[iFound].Tokens[i].Token <> '.') Then
+                    Break;
+                  strType := strType + Comment.Tag[iFound].Tokens[i].Token;
+                End;
+              strType := Trim(strType);
               If ReturnType <> Nil Then
                 strReturn := ReturnType.AsString(False, False);
               If AnsiCompareText(strReturn, strType) <> 0 Then

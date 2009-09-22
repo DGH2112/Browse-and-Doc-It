@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    10 Sep 2009
+  @Date    22 Sep 2009
   @Author  David Hoyle
 
 **)
@@ -1303,11 +1303,14 @@ End;
 procedure TIDETools.IdleTimerEvent(Sender: TObject);
 
 Var
-  recWndInfo : TWindowInfo;
+  recMainWndInfo, recModExplWndInfo : TWindowInfo;
 
 begin
-  GetWindowInfo(FVBEIDE.MainWindow.HWnd, recWndInfo);
-  If FVBEIDE.MainWindow.Visible And (recWndInfo.dwOtherStuff And WS_ACTIVECAPTION > 0) Then
+  GetWindowInfo(FVBEIDE.MainWindow.HWnd, recMainWndInfo);
+  GetWindowInfo(TfrmDockableModuleExplorer.GetWndHnd, recModExplWndInfo);
+  If FVBEIDE.MainWindow.Visible And (
+    (recMainWndInfo.dwOtherStuff And WS_ACTIVECAPTION > 0) Or
+    (recModExplWndInfo.dwOtherStuff And WS_ACTIVECAPTION > 0)) Then
     Application.DoApplicationIdle;
   If FVisible <> FVBEIDE.MainWindow.Visible Then
     Begin

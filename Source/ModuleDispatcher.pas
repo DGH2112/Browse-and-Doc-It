@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    04 Sep 2009
+  @Date    25 Sep 2009
   @Version 1.0
 
 **)
@@ -25,7 +25,8 @@ Uses
 Implementation
 
 Uses
-  Windows, PascalModule, VBModule, BackusNaurModule, XMLModule, DFMModule;
+  Windows, PascalModule, VBModule, BackusNaurModule, XMLModule, DFMModule,
+  EidolonModule;
 
 Type
   (** A class type to define classes in the record structure. **)
@@ -43,7 +44,7 @@ Type
 
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
-  Modules : Array[1..13] of TDispatcherInfo = (
+  Modules : Array[1..14] of TDispatcherInfo = (
     (FExt: '.bas';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
     (FExt: '.bnf';  FCls: TBackusNaurModule; FCanDoc: True;  FBlockCmt: ctCPPBlock; FLineCmt: ctCPPBlock; FInSituCmt: ctCPPBlock),
     (FExt: '.cls';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
@@ -54,6 +55,7 @@ Const
     (FExt: '.frm';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine; FLineCmt: ctVBLine; FInSituCmt: ctVBLine),
     (FExt: '.htm';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML),
     (FExt: '.html'; FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML),
+    (FExt: '.map';  FCls: TEidolonModule   ; FCanDoc: True;  FBlockCmt: ctCPPBlock; FLineCmt: ctCPPLine; FInSituCmt: ctCPPBlock),
     (FExt: '.pas';  FCls: TPascalModule    ; FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
     (FExt: '.xml';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML),
     (FExt: '.xsd';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML; FLineCmt: ctXML; FInSituCmt: ctXML)

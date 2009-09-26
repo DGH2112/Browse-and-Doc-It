@@ -3106,7 +3106,7 @@ End;
 Procedure TestTExceptionHandling.Setup;
 
 Begin
-  FExceptionHandling := TExceptionHandling.Create;
+  FExceptionHandling := TExceptionHandling.Create('MyMethod');
 End;
 
 Procedure TestTExceptionHandling.TearDown;

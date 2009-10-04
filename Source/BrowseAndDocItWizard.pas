@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    31 Aug 2009
+  @Date    04 Oct 2009
   @Version 1.0
 
 **)
@@ -985,21 +985,24 @@ begin
       Reader := SE.CreateReader;
       Try
         Block := SE.EditViews[0].Block;
-        cpStart.Line := Block.StartingRow;
-        cpStart.CharIndex := Block.StartingColumn - 1;
-        iBufferPosStart := SE.EditViews[0].CharPosToPos(cpStart);
-        cpEnd.Line := Block.EndingRow;
-        cpEnd.CharIndex := Block.EndingColumn - 1;
-        iBufferPosEnd := SE.EditViews[0].CharPosToPos(cpEnd);
-        SetLength(strBuffer, iBufferPosEnd - iBufferPosStart);
-        iRead := Reader.GetText(iBufferPosStart, PAnsiChar(strBuffer),
-          iBufferPosEnd - iBufferPosStart);
-        SetLength(strBuffer, iRead);
-        {$IFNDEF D2009}
-        Result := strBuffer;
-        {$ELSE}
-        Result := String(strBuffer);
-        {$ENDIF}
+        If Block.Visible Then
+          Begin
+            cpStart.Line := Block.StartingRow;
+            cpStart.CharIndex := Block.StartingColumn - 1;
+            iBufferPosStart := SE.EditViews[0].CharPosToPos(cpStart);
+            cpEnd.Line := Block.EndingRow;
+            cpEnd.CharIndex := Block.EndingColumn - 1;
+            iBufferPosEnd := SE.EditViews[0].CharPosToPos(cpEnd);
+            SetLength(strBuffer, iBufferPosEnd - iBufferPosStart);
+            iRead := Reader.GetText(iBufferPosStart, PAnsiChar(strBuffer),
+              iBufferPosEnd - iBufferPosStart);
+            SetLength(strBuffer, iRead);
+            {$IFNDEF D2009}
+            Result := strBuffer;
+            {$ELSE}
+            Result := String(strBuffer);
+            {$ENDIF}
+          End;
       Finally
         Reader := Nil;
       End;

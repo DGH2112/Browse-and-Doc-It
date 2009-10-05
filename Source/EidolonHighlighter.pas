@@ -3,7 +3,7 @@
   This module contains a custom syntax highlighter for the Eidolon MAP files.
 
   @Version 1.0
-  @Date    26 Sep 2009
+  @Date    05 Oct 2009
   @Author  David Hoyle
 
 **)
@@ -364,10 +364,10 @@ begin
           If ((LastChar In ['*']) And (CurChar In ['/']) And (BlockType In [btBlockComment])) Then
             Begin
               Codes[i] := AnsiChar(atComment);
-              BlockType := btNone;
-              iBlockStart := 0;
+              //BlockType := btNone;
+              //iBlockStart := 0;
               Break;
-            End ;
+            End Else
           If ((LastChar In ['/']) And (CurChar In ['/'])) Or (BlockType In [btLineComment]) Then
             Begin
               Codes[i - 1] := AnsiChar(atComment);

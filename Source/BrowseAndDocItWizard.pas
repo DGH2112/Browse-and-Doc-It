@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    04 Oct 2009
+  @Date    05 Oct 2009
   @Version 1.0
 
 **)
@@ -976,9 +976,13 @@ Var
   cpStart, cpEnd : TOTACharPos;
   Writer: IOTAEditWriter;
   iBufferPosStart, iBufferPosEnd: Integer;
+  boolVisible : Boolean;
 
 begin
   Result := '';
+  boolVisible := False;
+  iBufferPosStart := 0;
+  iBufferPosEnd := 0;
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
@@ -987,6 +991,7 @@ begin
         Block := SE.EditViews[0].Block;
         If Block.Visible Then
           Begin
+            boolVisible := True;
             cpStart.Line := Block.StartingRow;
             cpStart.CharIndex := Block.StartingColumn - 1;
             iBufferPosStart := SE.EditViews[0].CharPosToPos(cpStart);
@@ -1006,7 +1011,7 @@ begin
       Finally
         Reader := Nil;
       End;
-      If boolDelete Then
+      If boolVisible And boolDelete Then
         Begin
           Writer := SE.CreateUndoableWriter;
           Try

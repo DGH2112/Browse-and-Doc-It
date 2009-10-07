@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    28 Jun 2009
+  @Date    07 Oct 2009
 
 **)
 Unit DGHLibrary;
@@ -758,7 +758,7 @@ Const
   This routine converts the decimal bearing into a text representation,
   i.e.
 
-  12.3456 => 12°20'44.16"
+  12.3456 => 12°20''44.16""
 
   @precon  None.
   @postcon Converts the decimal bearing into a text representation.
@@ -791,7 +791,7 @@ end;
   This routine converts a decimal representation of a whole circle
   bearing into a decimal of a degree.
 
-  i.e. 12.345678 (12°34'56.78") => 12.582439
+  i.e. 12.345678 (12°34''56.78"") => 12.582439
 
   @precon  None.
   @postcon Converts a decimal representation of a whole circle
@@ -824,7 +824,7 @@ end;
 (**
 
   This routine converts a string representation of a degree into the
-  equivalent decimal, i.e. 12°34'56.78" => 12.582439
+  equivalent decimal, i.e. 12°34''56.78"" => 12.582439
 
   @precon  None.
   @postcon Converts a string representation of a degree into the equivalent
@@ -5232,10 +5232,10 @@ end;
 (**
 
   This method returns a string representation of the given bearing record as
-  ###°##'##.##".
+  ###°##''##.##"".
 
   @precon  None.
-  @postcon Returns a string representation of the given bearing record as ###°##'##.##".
+  @postcon Returns a string representation of the given bearing record as ###°##''##.##"".
 
   @param   recBearing as a TBearing
   @return  a String

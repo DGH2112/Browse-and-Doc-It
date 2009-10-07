@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Mar 2009
+  @Date    07 Oct 2009
 
 **)
 unit CodeFragmentsForm;
@@ -595,7 +595,7 @@ end;
   This is an on drag over event handler for the tree view.
 
   @precon  None.
-  @postcon If the item doesn't have any sub node that drag operation is
+  @postcon If the item doesn`t have any sub node that drag operation is
            accepted.
 
   @param   Sender as a TObject

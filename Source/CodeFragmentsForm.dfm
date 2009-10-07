@@ -65,8 +65,7 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Height = 25
       Anchors = [akTop, akRight]
       Caption = 'Cancel'
-      ModalResult = 2
-      TabOrder = 0
+      DoubleBuffered = True
       Glyph.Data = {
         DE010000424DDE01000000000000760000002800000024000000120000000100
         0400000000006801000000000000000000001000000000000000000000000000
@@ -84,7 +83,10 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
         38F338F300003333333333333919333333388333338FFF830000333333333333
         3333333333333333333888330000333333333333333333333333333333333333
         0000}
+      ModalResult = 2
       NumGlyphs = 2
+      ParentDoubleBuffered = False
+      TabOrder = 0
     end
     object btnInsert: TBitBtn
       Left = 514
@@ -93,8 +95,7 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Height = 25
       Anchors = [akTop, akRight]
       Caption = '&Insert'
-      ModalResult = 5
-      TabOrder = 2
+      DoubleBuffered = True
       Glyph.Data = {
         76010000424D7601000000000000760000002800000020000000100000000100
         04000000000000010000130B0000130B00001000000000000000000000000000
@@ -108,7 +109,10 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
         993337777777777F77F33CCCCCCCCCC3993337777777777377333333333CC333
         333333333337733333FF3333333C333330003333333733333777333333333333
         3000333333333333377733333333333333333333333333333333}
+      ModalResult = 5
       NumGlyphs = 2
+      ParentDoubleBuffered = False
+      TabOrder = 2
     end
     object btnOK: TBitBtn
       Left = 435
@@ -117,8 +121,7 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Height = 25
       Anchors = [akTop, akRight]
       Caption = 'OK'
-      ModalResult = 1
-      TabOrder = 1
+      DoubleBuffered = True
       Glyph.Data = {
         DE010000424DDE01000000000000760000002800000024000000120000000100
         0400000000006801000000000000000000001000000000000000000000000000
@@ -136,7 +139,10 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
         3338F38F000033333333333333A223333333333333338F830000333333333333
         333A333333333333333338330000333333333333333333333333333333333333
         0000}
+      ModalResult = 1
       NumGlyphs = 2
+      ParentDoubleBuffered = False
+      TabOrder = 1
     end
     object btnDelete: TBitBtn
       Left = 280
@@ -145,8 +151,7 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Height = 25
       Anchors = [akTop, akRight]
       Caption = '&Delete'
-      TabOrder = 3
-      OnClick = btnDeleteClick
+      DoubleBuffered = True
       Glyph.Data = {
         76010000424D7601000000000000760000002800000020000000100000000100
         04000000000000010000130B0000130B00001000000000000000000000000000
@@ -161,6 +166,9 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
         333333377F33333333FF3333C333333330003333733333333777333333333333
         3000333333333333377733333333333333333333333333333333}
       NumGlyphs = 2
+      ParentDoubleBuffered = False
+      TabOrder = 3
+      OnClick = btnDeleteClick
     end
     object btnCreate: TBitBtn
       Left = 200
@@ -169,6 +177,8 @@ object frmInsertCodeFragments: TfrmInsertCodeFragments
       Height = 25
       Anchors = [akTop, akRight]
       Caption = '&Create Dir'
+      DoubleBuffered = True
+      ParentDoubleBuffered = False
       TabOrder = 4
       OnClick = btnCreateClick
     end

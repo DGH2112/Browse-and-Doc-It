@@ -1,10 +1,10 @@
 (**
-  
+
   This method contains functions that are used global through out the application.
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    06 Mar 2009
+  @Date    07 Oct 2009
 
 **)
 Unit Functions;
@@ -49,7 +49,7 @@ End;
   @postcon Displays a formatted exception message then aborts.
 
   @param   strMsg as a String
-  @param   Params as an Array Of Const
+  @param   Params as an Array Of Const as a Constant
 
 **)
 Procedure DisplayException(strMsg : String; Const Params : Array Of Const);

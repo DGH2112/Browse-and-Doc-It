@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       24 Jul 2009
+  @Date       07 Oct 2009
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -5434,11 +5434,11 @@ End;
 (**
 
   This method checks the type of number in the expression to make sure Integers
-  and Floating point number aren't mixed.
+  and Floating point number aren`t mixed.
 
   @precon  None.
   @postcon Checks the type of number in the expression to make sure Integers
-           and Floating point number aren't mixed.
+           and Floating point number aren`t mixed.
 
   @param   ExprType as a TExprTypes
   @return  a Boolean
@@ -8807,10 +8807,10 @@ End;
 
 (**
 
-  This method check the module's initialisation sections for comments.
+  This method check the module`s initialisation sections for comments.
 
   @precon  None.
-  @postcon Check the module's initialisation sections for comments.
+  @postcon Check the module`s initialisation sections for comments.
 
   @param   boolCascade as a Boolean as a reference
 
@@ -8846,10 +8846,10 @@ end;
 
 (**
 
-  This method check the module's finalisation sections for comments.
+  This method check the module`s finalisation sections for comments.
 
   @precon  None.
-  @postcon Check the module's finalisation sections for comments.
+  @postcon Check the module`s finalisation sections for comments.
 
   @param   boolCascade as a Boolean as a reference
 

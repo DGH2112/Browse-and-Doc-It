@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    17 Jul 2009
+  @Date    07 Oct 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -156,7 +156,7 @@ End;
 (**
 
   This procedure provides a smiple procedural interface for sending a message
-  to the IDE's message window.
+  to the IDE`s message window.
 
   @precon  strText is the tool message to be displayed.
   @postcon Adds a simple message to the IDEs message window.
@@ -173,7 +173,7 @@ End;
 (**
 
   This procedure provides a smiple procedural interface for sending a message
-  to the IDE's message window.
+  to the IDE`s message window.
 
   @precon  strFileName is the name of the file associated with the message,
            strText is the message to be displayed, strPrefix is the prefix text

@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    21 Aug 2009
+  @Date    07 Oct 2009
   @Version 1.0
 
 **)
@@ -136,7 +136,7 @@ Const
     (FStart: '(**';  FMiddle: '';    FBlockEnd: '**)'; FLineEnd: '**)'),
     (FStart: '{:';   FMiddle: '';    FBlockEnd: '}';   FLineEnd: '}'  ),
     (FStart: '/**';  FMiddle: '';    FBlockEnd: '**/'; FLineEnd: '**/'),
-    (FStart: '//:';  FMiddle: '';    FBlockEnd: '';    FLineEnd: ''   ),
+    (FStart: '//:';  FMiddle: '//:'; FBlockEnd: '';    FLineEnd: ''   ),
     (FStart: ''':';  FMiddle: ''':'; FBlockEnd: ''':'; FLineEnd: ''   ),
     (FStart: '<!--'; FMiddle: '';    FBlockEnd: '-->'; FLineEnd: '-->')
   );
@@ -416,11 +416,8 @@ begin
   boolExtraLine := False;
   If CommentType In [ctPascalBlock..ctCPPBlock] Then
     AddToComment(StringOfChar(#32, iIndent));
-  Case CommentType Of
-    ctPascalBlock : AddToComment('(**'#13#10);
-    ctPascalBrace : AddToComment('{:'#13#10);
-    ctCPPBlock    : AddToComment('/**'#13#10);
-  End;
+  If CommentType In [ctPascalBlock, ctPascalBrace, ctCPPBlock] Then
+      AddToComment(strCmtTerminals[CommentType].FStart + #13#10);
   If boolPadOut Then
     AddToComment(#13#10);
   AddToComment(Description(Func, iIndent, boolPadOut, P));
@@ -468,31 +465,28 @@ begin
       AddToComment(#13#10);
   If CommentType In [ctPascalBlock..ctCPPBlock] Then
     AddToComment(StringOfChar(#32, iIndent));
-  Case CommentType Of
-    ctPascalBlock : AddToComment('**)'#13#10);
-    ctPascalBrace : AddToComment('}'#13#10);
-    ctCPPBlock    : AddToComment('**/'#13#10);
+  If CommentType In [ctPascalBlock, ctPascalBrace, ctCPPBlock] Then
+    AddToComment(strCmtTerminals[CommentType].FBlockEnd + #13#10)
   Else
-    Case CommentType Of
-      ctCPPLine: strInsert := '//:';
-      ctVBLine : strInsert := ''':';
-    Else
-      strInsert := '';
+    Begin
+      If CommentType In [ctCPPLine, ctVBLine] Then
+        strInsert := strCmtTerminals[CommentType].FMiddle
+      Else
+        strInsert := '';
+      sl := TStringList.Create;
+      Try
+        sl.Text := Result;
+        For i := 0 To sl.Count - 1 Do
+          If sl[i] <> '' Then
+            sl[i] := Copy(sl[i], 1, iIndent) + strInsert +
+              Copy(sl[i], iIndent + 1, Length(sl[i]) - iIndent)
+          Else
+            sl[i] := StringOfChar(#32, iIndent) + strInsert;
+        Result := sl.Text;
+      Finally
+        sl.Free;
+      End;
     End;
-    sl := TStringList.Create;
-    Try
-      sl.Text := Result;
-      For i := 0 To sl.Count - 1 Do
-        If sl[i] <> '' Then
-          sl[i] := Copy(sl[i], 1, iIndent) + strInsert +
-            Copy(sl[i], iIndent + 1, Length(sl[i]) - iIndent)
-        Else
-          sl[i] := StringOfChar(#32, iIndent) + strInsert;
-      Result := sl.Text;
-    Finally
-      sl.Free;
-    End;
-  End;
   Inc(CursorDelta.X, P.X);
   Inc(CursorDelta.Y, 2 + P.Y);
   If CommentType In [ctVBLine] Then

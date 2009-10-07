@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Jul 2009
+  @Date    07 Oct 2009
 
 **)
 unit DUnitCreator;
@@ -888,11 +888,11 @@ end;
 
 (**
 
-  This method adds the unit file to be tested to the project IF it doesn't
+  This method adds the unit file to be tested to the project IF it doesn`t
   already exist.
 
   @precon  None.
-  @postcon Adds the unit file to be tested to the project IF it doesn't
+  @postcon Adds the unit file to be tested to the project IF it doesn`t
            already exist.
 
   @param   strFileName as a String
@@ -1531,10 +1531,10 @@ end;
 
 (**
 
-  This method determines the project shouldn't be shown.
+  This method determines the project shouldn`t be shown.
 
   @precon  None.
-  @postcon Determines the project shouldn't be shown.
+  @postcon Determines the project shouldn`t be shown.
 
   @return  a Boolean
 

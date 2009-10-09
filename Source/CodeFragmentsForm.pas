@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    07 Oct 2009
+  @Date    09 Oct 2009
 
 **)
 unit CodeFragmentsForm;
@@ -124,14 +124,14 @@ ResourceString
 Function CleanFileName(strText : String) : String;
 
 Const
-  strValidChars : Set of Char = [#32..#255] - ['<', '>', ':', '"', '/', '|', '\'];
+  strValidChars = [#32..#255] - ['<', '>', ':', '"', '/', '|', '\'];
 
 Var
   i : Integer;
 
 Begin
   For i := 1 To Length(strText) Do
-    If strText[i] In strValidChars Then
+    If IsInSet(strText[i], strValidChars) Then
       Result := Result + strText[i];
 End;
 

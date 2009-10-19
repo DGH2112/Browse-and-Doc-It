@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    05 Oct 2009
+  @Date    07 Oct 2009
   @Version 1.0
 
 **)
@@ -56,6 +56,7 @@ Type
     procedure InsertComment(strComment: string; Writer: IOTAEditWriter;
       iInsertLine: Integer; Source: IOTASourceEditor);
     Function  SelectedText(boolDelete : Boolean) : String;
+    function  IsTextSelected: Boolean;
     {$IFNDEF D2005}
     Procedure MenuTimerEvent(Sender : TObject);
     {$ENDIF}
@@ -92,6 +93,12 @@ Uses
   CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF},
   DUnitForm, DUnitCreator, BNFHighlighter, KeyboardBindings, EditorNotifier,
   EidolonHighlighter;
+
+resourcestring
+  (** This is a resource message to confirm whether the selected text should be
+      moved. **)
+  strThereIsSelectedText = 'There is selected text in the editor. Do you wan' +
+  't to move this text within the new comment';
 
 Const
   (** This is the software ID for this module on the internet. **)
@@ -664,7 +671,14 @@ begin
   SourceEditor := ActiveSourceEditor;
   If SourceEditor = Nil Then
     Exit;
-  strSelectedText := SelectedText(True);
+  If IsTextSelected Then
+    Case MessageDlg(strThereIsSelectedText, mtConfirmation, [mbYes, mbNo,
+      mbCancel], 0) Of
+      mrCancel: Exit;
+      mrNo    : strSelectedText := '';
+    Else
+      strSelectedText := SelectedText(True);
+    End;
   With SourceEditor.GetEditView(0) Do
     Begin
       EditPos := CursorPos;
@@ -914,19 +928,33 @@ var
   EditPos: TOTAEditPos;
   CharPos: TOTACharPos;
   strSelectedText: String;
+  strComment: String;
+  CommentType: TCommentType;
+  iIndent: Integer;
 
 begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
-      strSelectedText := SelectedText(True);
+      If IsTextSelected Then
+        Case MessageDlg(strThereIsSelectedText, mtConfirmation, [mbYes, mbNo,
+          mbCancel], 0) Of
+          mrCancel : Exit;
+          mrNo     : strSelectedText := '';
+        Else
+          strSelectedText := SelectedText(True);
+        End;
       EditPos := SE.EditViews[0].CursorPos;
       Writer := SE.CreateUndoableWriter;
       Try
         CharPos.Line := EditPos.Line;
         CharPos.CharIndex := EditPos.Col;
         Writer.CopyTo(SE.GetEditView(0).CharPosToPos(CharPos) - 1);
-        OutputText(Writer, '//: @todo ' + strSelectedText); //: @bug Should be language dependent.
+        CommentType := GetCommentType(SE.FileName, csLine);
+        iIndent := EditPos.Col;
+        strComment := BuildBlockComment(CommentType, csLine, iIndent ,
+          '@todo ' + strSelectedText);
+        OutputText(Writer, strComment);
         EditPos.Col := EditPos.Col + 10;
       Finally
         Writer := Nil;
@@ -1021,6 +1049,36 @@ begin
             Writer := Nil;
           End;
         End;
+    End;
+end;
+
+(**
+
+  This method test whether there is selected text in the editors current view.
+
+  @precon  None.
+  @postcon Returns true of there is selected text.
+
+  @return  a Boolean
+
+**)
+function TBrowseAndDocItWizard.IsTextSelected: Boolean;
+
+Var
+  SE : IOTASourceEditor;
+  Reader : IOTAEditReader;
+
+begin
+  Result := False;
+  SE := ActiveSourceEditor;
+  If SE <> Nil Then
+    Begin
+      Reader := SE.CreateReader;
+      Try
+        Result := SE.EditViews[0].Block.Visible;
+      Finally
+        Reader := Nil;
+      End;
     End;
 end;
 

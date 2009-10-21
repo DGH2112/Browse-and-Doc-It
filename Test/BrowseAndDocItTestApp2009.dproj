@@ -125,6 +125,11 @@
 			<DCCReference Include="..\..\..\Components\Source\DGHEllipsisLabel.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\BackusNaurModule.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynHighlighterCpp.pas"/>
+			<DCCReference Include="..\Source\CommonIDEFunctions.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\XMLModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynHighlighterXML.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\DFMModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\EidolonModule.pas"/>
 			<None Include="..\..\..\Library\HTML Files\BrowseAndDocItScreen.css">
 				<ContainerId>File</ContainerId>
 			</None>
@@ -183,8 +188,8 @@
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>
-						<VersionInfo Name="Release">7</VersionInfo>
-						<VersionInfo Name="Build">1786</VersionInfo>
+						<VersionInfo Name="Release">8</VersionInfo>
+						<VersionInfo Name="Build">2129</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -196,7 +201,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName">Season&apos;s Fall  Music Limited (c) 1989</VersionInfoKeys>
 						<VersionInfoKeys Name="FileDescription">BrowseAndDocItTestApp2009.exe</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">1.0.7.1786</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.0.8.2129</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName">Browse and Doc It Test Application</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalCopyright">Season&apos;s Fall  Music Limited (c) 1989</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalTrademarks">Season&apos;s Fall  Music Limited (c) 1989</VersionInfoKeys>

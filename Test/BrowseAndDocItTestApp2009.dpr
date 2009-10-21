@@ -2,7 +2,7 @@
 
   This is the test applications project file.
 
-  @Date    16 Apr 2009
+  @Date    21 Oct 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -56,7 +56,12 @@ uses
   SynUnicode in '..\..\..\LIBRARY\SynEdit\Source\SynUnicode.pas',
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
   BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas',
-  SynHighlighterCpp in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterCpp.pas';
+  SynHighlighterCpp in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterCpp.pas',
+  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  XMLModule in '..\..\..\LIBRARY\XMLModule.pas',
+  SynHighlighterXML in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterXML.pas',
+  DFMModule in '..\..\..\LIBRARY\DFMModule.pas',
+  EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas';
 
 {$R *.res}
 

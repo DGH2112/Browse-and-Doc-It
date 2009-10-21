@@ -4,7 +4,7 @@
   VBE IDE.
 
   @Version 1.0
-  @Date    16 Apr 2009
+  @Date    21 Oct 2009
   @Author  David Hoyle
   
 **)
@@ -54,7 +54,6 @@ uses
   BaseDocumentation in '..\..\..\Library\BaseDocumentation.pas',
   HTMLDocumentation in '..\..\..\Library\HTMLDocumentation.pas',
   GenericTokenizer in '..\..\..\Library\GenericTokenizer.pas',
-  GIFImage in '..\..\..\Library\TGIFImage\GIFImage.pas',
   ModuleExplorerFrame in '..\..\..\Library\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
   VirtualTrees in '..\..\..\Library\Virtual Treeview\Source\VirtualTrees.pas',
   VTAccessibilityFactory in '..\..\..\Library\Virtual Treeview\Source\VTAccessibilityFactory.pas',
@@ -62,7 +61,12 @@ uses
   CheckForUpdatesForm in '..\..\..\LIBRARY\CheckForUpdatesForm.pas' {frmCheckForUpdates},
   checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
   MSXML2_TLB in '..\..\..\LIBRARY\MSXML2_TLB.pas',
-  DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas';
+  DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
+  SynUnicode in '..\..\..\Library\SynEdit\Source\SynUnicode.pas',
+  XMLModule in '..\..\..\Library\XMLModule.pas',
+  BackusNaurModule in '..\..\..\Library\BackusNaurModule.pas',
+  DFMModule in '..\..\..\Library\DFMModule.pas',
+  EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas';
 
 exports
   DllGetClassObject,

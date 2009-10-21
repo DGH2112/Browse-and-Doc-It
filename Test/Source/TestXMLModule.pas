@@ -138,6 +138,13 @@ Type
     Procedure TestEnumeration;
     Procedure TestNmToken;
     Procedure TestNameChar;
+    Procedure TestNotationType;
+    Procedure TestExtSubSet;
+    Procedure TestTextDecl;
+    Procedure TestExtSubSetDecl;
+    Procedure TestConditionalSect;
+    Procedure TestIncludeSect;
+    Procedure TestIngoreSect;
     Procedure TestExample01;
     Procedure TestExample02;
     Procedure TestExample03;
@@ -340,7 +347,7 @@ Var
 begin
   strCode :=
     '<!ATTLIST Name AnotherName CDATA #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -361,7 +368,7 @@ Var
 begin
   strCode :=
     '<!ATTLIST Name Hello IDREF #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -415,7 +422,7 @@ Var
 begin
   strCode :=
     '<!ATTLIST Name Name2 CDATA #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -427,7 +434,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 ID #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -439,7 +446,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 NOTATION (Name) #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -451,7 +458,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 NOTATION (Name|Name) #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -463,7 +470,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 (Name|Name) #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -774,7 +781,7 @@ Var
 begin
   strCode :=
     '<!ELEMENT Name (Name1 | Name2)?>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -786,7 +793,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT Name (Name1,Name2)*>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -798,7 +805,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT Name (Name1 , Name2, Name3)+>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -810,7 +817,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT Name (Name1 , (Name2 | Name4), Name3)+>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -822,7 +829,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT Name ((Name1|Name5)+, (Name2 | Name4)?, Name3)+>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -843,13 +850,36 @@ Var
 begin
   strCode :=
     '<!ELEMENT Name (Name1 | Name2)>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
     CheckEquals('!ELEMENT Name (Name1 | Name2)', M.Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTXMLModule.TestConditionalSect;
+
+Var
+ strCode : String;
+ M : TBaseLanguageModule;
+
+begin
+  strCode :=
+    '<![INCLUDE [<!ELEMENT Name EMPTY>]]>'#13#10;
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('INCLUDE []', M.Elements[1].AsString(True, True));
+    CheckEquals(1, M.Elements[1].ElementCount);
+    CheckEquals('!ELEMENT Name EMPTY', M.Elements[1].Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -903,7 +933,7 @@ Var
 begin
   strCode :=
     '<!ELEMENT Name EMPTY>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -915,7 +945,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT Name ANY>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -927,7 +957,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT Name (#PCDATA)>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -939,7 +969,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT Name (Name)>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -977,8 +1007,10 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
-    CheckEquals('!DOCTYPE html [%Name;]', M.Elements[1].AsString(True, True));
+    CheckEquals('!DOCTYPE html []', M.Elements[1].AsString(True, True));
     CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals(1, M.Elements[1].ElementCount);
+    CheckEquals('%Name;', M.Elements[1].Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1007,7 +1039,7 @@ Var
 begin
   strCode :=
     '<!ATTLIST Name Name2 CDATA #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1019,7 +1051,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 CDATA #IMPLIED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1031,7 +1063,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 CDATA #FIXED "%Name;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1043,7 +1075,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 CDATA "%Name;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1099,8 +1131,10 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
-    CheckEquals('!DOCTYPE html SYSTEM "123" [<!ELEMENT Name ANY>]', M.Elements[1].AsString(True, True));
+    CheckEquals('!DOCTYPE html SYSTEM "123" []', M.Elements[1].AsString(True, True));
     CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals(1, M.Elements[1].ElementCount);
+    CheckEquals('!ELEMENT Name ANY', M.Elements[1].Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1199,7 +1233,7 @@ Var
 begin
   strCode :=
     '<!ELEMENT name EMPTY>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1211,7 +1245,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT name ANY>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1320,7 +1354,7 @@ Var
 begin
   strCode :=
     '<!ENTITY Name "%Hello;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1332,7 +1366,7 @@ begin
   End;
   strCode :=
     '<!ENTITY % Name "%Hello;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1353,7 +1387,7 @@ Var
 begin
   strCode :=
     '<!ENTITY name SYSTEM "SystemLiteral">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1365,7 +1399,7 @@ begin
   End;
   strCode :=
     '<!ENTITY name SYSTEM "SystemLiteral" NDATA Name>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1377,7 +1411,7 @@ begin
   End;
   strCode :=
     '<!ENTITY name "%Name;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1419,7 +1453,7 @@ Var
 begin
   strCode :=
     '<!ENTITY Name "%Hello;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1431,7 +1465,7 @@ begin
   End;
   strCode :=
     '<!ENTITY Name ''%Hello;''>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1452,7 +1486,7 @@ Var
 begin
   strCode :=
     '<!ATTLIST Name Name2 NOTATION (Name) #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1464,7 +1498,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 (Name) #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1485,7 +1519,7 @@ Var
 begin
   strCode :=
     '<!ATTLIST Name Name2 (Name) #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1497,7 +1531,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 ( Name ) #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1509,7 +1543,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 (Name|Name2) #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1521,7 +1555,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 ( Name | Name2 ) #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1622,6 +1656,7 @@ begin
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1642,6 +1677,7 @@ begin
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(2, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1661,6 +1697,7 @@ begin
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1682,6 +1719,7 @@ begin
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1703,6 +1741,7 @@ begin
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1722,6 +1761,7 @@ begin
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(2, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1737,11 +1777,12 @@ begin
   strCode :=
     '<!ATTLIST peom xml:space (default|preserve) ''preserve''>'#13#10 +
     '<!ATTLIST pre xml:space (preserve) #FIXED ''preserve''>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(2, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1759,16 +1800,17 @@ begin
     '<p xml:lang="en-GB">What colour is it?</p>'#13#10 +
     '<p xml:lang="en-US">What color is it?</p>'#13#10 +
     '<sp who="Faust" desc=''leise'' xml:lang="de">'#13#10 +
-    '<l>Habe nun, ach! Philosophie,</l>'#13#10 +
-    '<l>Juristerei, und Medizin</l>'#13#10 +
-    '<l>und leider auch Theologie</l>'#13#10 +
-    '<l>durchaus studiert mit heißem Bemüh''n.</l>'#13#10 +
+    '  <l>Habe nun, ach! Philosophie,</l>'#13#10 +
+    '  <l>Juristerei, und Medizin</l>'#13#10 +
+    '  <l>und leider auch Theologie</l>'#13#10 +
+    '  <l>durchaus studiert mit heißem Bemüh`n.</l>'#13#10 +
     '</sp>'#13#10;
   M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(4, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1785,11 +1827,12 @@ begin
     '<!ATTLIST poem xml:lang CDATA ''fr''>'#13#10 +
     '<!ATTLIST gloss xml:lang CDATA ''en''>'#13#10 +
     '<!ATTLIST note xml:lang CDATA ''en''>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1812,6 +1855,7 @@ begin
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1829,11 +1873,12 @@ begin
     '<!ELEMENT p (#PCDATA|emph)* >'#13#10 +
     '<!ELEMENT %name.para; %content.para; >'#13#10 +
     '<!ELEMENT container ANY>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(4, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1849,12 +1894,14 @@ begin
   strCode :=
     '<!ELEMENT spec (front, body, back?)>'#13#10 +
     '<!ELEMENT div1 (head, (p | list | note)*, div2*)>'#13#10 +
-    '<!ELEMENT dictionary-body (%div.mix; | %dict.mix;)*>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+    '<!ELEMENT dictionary-body (%div.mix; | %dict.mix;)*>'#13#10
+    ;
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1871,11 +1918,12 @@ begin
     '<!ELEMENT p (#PCDATA|a|ul|b|i|em)*>'#13#10 +
     '<!ELEMENT p (#PCDATA | %font; | %phrase; | %special; | %form;)* >'#13#10 +
     '<!ELEMENT b (#PCDATA)>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1892,11 +1940,12 @@ begin
     '<!ATTLIST termdef id ID #REQUIRED name CDATA #IMPLIED>'#13#10 +
     '<!ATTLIST list type (bullets|ordered|glossary) "ordered">'#13#10 +
     '<!ATTLIST form method CDATA #FIXED "POST">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1913,11 +1962,12 @@ begin
     '<!ENTITY d "&#xD;">'#13#10 +
     '<!ENTITY a "&#xA;">'#13#10 +
     '<!ENTITY da "&#xD;&#xA;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1939,11 +1989,12 @@ begin
     '<![%final;['#13#10 +
     '<!ELEMENT book (title, body, supplements?)>'#13#10 +
     ']]>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1957,14 +2008,15 @@ Var
 
 begin
   strCode :=
-    'Type <key>less-than</key> (&#x3C;) to save options.'#13#10 +
+    '<Text>Type <key>less-than</key> (&#x3C;) to save options.'#13#10 +
     'This document was prepared on &docdate; and'#13#10 +
-    'is classified &security-level;.'#13#10;
+    'is classified &security-level;.</Text>'#13#10;
   M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -1983,11 +2035,12 @@ begin
     'SYSTEM "http://www.xml.com/iso/isolat2-xml.entities" >'#13#10 +
     '<!-- ... now reference it. -->'#13#10 +
     '%ISOLat2;'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2003,11 +2056,12 @@ begin
   strCode :=
     '<!ENTITY Pub-Status "This is a pre-release of the'#13#10 +
     'specification.">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2029,11 +2083,12 @@ begin
     '<!ENTITY hatch-pic'#13#10 +
     'SYSTEM "../grafix/OpenHatch.gif"'#13#10 +
     'NDATA gif >'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2049,11 +2104,12 @@ begin
   strCode :=
     '<?xml encoding=''UTF-8''?>'#13#10 +
     '<?xml encoding=''EUC-JP''?>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(2, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2069,11 +2125,12 @@ begin
   strCode :=
     '<!ENTITY % YN ''"Yes"'' >'#13#10 +
     '<!ENTITY WhatHeSaid "He said %YN;" >'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(2, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2089,11 +2146,12 @@ begin
   strCode :=
     '<!ENTITY EndAttr "27''" >'#13#10 +
     '<element attribute=''a-&EndAttr;>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(2, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2111,11 +2169,12 @@ begin
     '<!ENTITY rights "All rights reserved" >'#13#10 +
     '<!ENTITY book "La Peste: Albert Camus,'#13#10 +
     '&#xA9; 1947 %pub;. &rights;" >'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(3, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2129,13 +2188,14 @@ Var
 
 begin
   strCode :=
-    'La Peste: Albert Camus,'#13#10 +
-    '© 1947 Éditions Gallimard. &rights;'#13#10;
+    '<Text>La Peste: Albert Camus,'#13#10 +
+    '© 1947 Éditions Gallimard. &rights;</Text>'#13#10;
   M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2154,11 +2214,12 @@ begin
     '<!ENTITY amp "&#38;#38;">'#13#10 +
     '<!ENTITY apos "&#39;">'#13#10 +
     '<!ENTITY quot "&#34;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(5, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2175,11 +2236,12 @@ begin
     '<!ENTITY example "<p>An ampersand (&#38;#38;) may be escaped'#13#10 +
     'numerically (&#38;#38;#38;) or with a general entity'#13#10 +
     '(&amp;amp;).</p>" >'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2201,6 +2263,7 @@ begin
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2214,14 +2277,15 @@ Var
 
 begin
   strCode :=
-    'An ampersand (&) may be escaped'#13#10 +
+    '<Text>An ampersand (&) may be escaped'#13#10 +
     'numerically (&#38;) or with a general entity'#13#10 +
-    '(&amp;).'#13#10;
+    '(&amp;).</Text>'#13#10;
   M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2243,11 +2307,12 @@ begin
     '%xx;'#13#10 +
     ']>'#13#10 +
     '<test>This sample shows a &tricky; method.</test>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(6, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2265,11 +2330,12 @@ begin
     '<!ENTITY x "&lt;">'#13#10 +
     ']>'#13#10 +
     '<foo attr="&x;"/>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(2, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2284,11 +2350,12 @@ Var
 begin
   strCode :=
     '<!ENTITY x "&#60;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
   Finally
     M.Free;
   End;
@@ -2359,6 +2426,61 @@ begin
   End;
 end;
 
+procedure TestTXMLModule.TestExtSubSet;
+
+Var
+ strCode : String;
+ M : TBaseLanguageModule;
+
+begin
+  //: @bug Trim whitespace
+  strCode :=
+    '<?xml encoding="UFT-8"?>'#13#10;
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('?xml encoding="UFT-8"?', M.Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTXMLModule.TestExtSubSetDecl;
+
+Var
+ strCode : String;
+ M : TBaseLanguageModule;
+
+begin
+  strCode :=
+    '<?xml encoding="UFT-8"?>'#13#10;
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('?xml encoding="UFT-8"?', M.Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+  strCode :=
+    '<!ELEMENT Name EMPTY>'#13#10;
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('!ELEMENT Name EMPTY', M.Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+end;
+
 procedure TestTXMLModule.TestGEDecl;
 
 Var
@@ -2368,13 +2490,57 @@ Var
 begin
   strCode :=
     '<!ENTITY Name SYSTEM "PublicLiteral">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
     CheckEquals('!ENTITY Name SYSTEM "PublicLiteral"', M.Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTXMLModule.TestIncludeSect;
+
+Var
+ strCode : String;
+ M : TBaseLanguageModule;
+
+begin
+  strCode :=
+    '<![INCLUDE [<!ELEMENT Name EMPTY>]]>'#13#10;
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('INCLUDE []', M.Elements[1].AsString(True, True));
+    CheckEquals(1, M.Elements[1].ElementCount);
+    CheckEquals('!ELEMENT Name EMPTY', M.Elements[1].Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTXMLModule.TestIngoreSect;
+
+Var
+ strCode : String;
+ M : TBaseLanguageModule;
+
+begin
+  strCode :=
+    '<![IGNORE [Some Characters to ignore.<![Ignore even more.]]> Some more characters to ignore]]>'#13#10;
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('IGNORE []', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2396,8 +2562,10 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
-    CheckEquals('!DOCTYPE html [<!ELEMENT Name ANY>]', M.Elements[1].AsString(True, True));
+    CheckEquals('!DOCTYPE html []', M.Elements[1].AsString(True, True));
     CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals(1, M.Elements[1].ElementCount);
+    CheckEquals('!ELEMENT Name ANY', M.Elements[1].Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2410,8 +2578,10 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
-    CheckEquals('!DOCTYPE html [%Name;]', M.Elements[1].AsString(True, True));
+    CheckEquals('!DOCTYPE html []', M.Elements[1].AsString(True, True));
     CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals(1, M.Elements[1].ElementCount);
+    CheckEquals('%Name;', M.Elements[1].Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2426,7 +2596,7 @@ Var
 begin
   strCode :=
     '<!ELEMENT Name ANY>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2438,7 +2608,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Hello CDATA #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2450,7 +2620,7 @@ begin
   End;
   strCode :=
     '<!ENTITY Name "%Value;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2462,7 +2632,7 @@ begin
   End;
   strCode :=
     '<!NOTATION Name SYSTEM "Hello">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2474,7 +2644,7 @@ begin
   End;
   strCode :=
     '<?Name?>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2486,7 +2656,7 @@ begin
   End;
   strCode :=
     '<!-- Comment -->'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2546,7 +2716,7 @@ Var
 begin
   strCode :=
     '<!ELEMENT Name (#PCDATA)>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2558,7 +2728,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT Name ( #PCDATA )>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2570,7 +2740,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT Name (#PCDATA | Name1)*>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2582,7 +2752,7 @@ begin
   End;
   strCode :=
     '<!ELEMENT Name (#PCDATA|Name1|Name2)*>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2753,7 +2923,7 @@ Var
 begin
   strCode :=
     '<!ENTITY Name SYSTEM "Oops" NDATA AnotherName>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2774,7 +2944,7 @@ Var
 begin
   strCode :=
     '<!ATTLIST Name Name2 (Name | Name2 | Name3 | Name4) #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2795,7 +2965,7 @@ Var
 begin
   strCode :=
     '<!NOTATION Name SYSTEM "ExternalID">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2807,13 +2977,33 @@ begin
   End;
   strCode :=
     '<!NOTATION Name PUBLIC "PublicLiteral" "Hello">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
     CheckEquals('!NOTATION Name PUBLIC "PublicLiteral" "Hello"', M.Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTXMLModule.TestNotationType;
+
+Var
+ strCode : String;
+ M : TBaseLanguageModule;
+
+begin
+  strCode := '<!ATTLIST Name Name2 NOTATION (Name) #REQUIRED>'#13#10;
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('!ATTLIST Name Name2 NOTATION (Name) #REQUIRED', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2828,7 +3018,7 @@ Var
 begin
   strCode :=
     '<!ENTITY % Name "%Name;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2849,7 +3039,7 @@ Var
 begin
   strCode :=
     '<!ENTITY MyName "%Hello;">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2963,7 +3153,7 @@ Var
 begin
   strCode :=
     '<!NOTATION Name PUBLIC "PublicChars" "Hello">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2975,7 +3165,7 @@ begin
   End;
   strCode :=
     '<!NOTATION Name PUBLIC ''PublicChars'' ''Hello''>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2996,7 +3186,7 @@ Var
 begin
   strCode :=
     '<!NOTATION Name PUBLIC "PublicChars" "SystemLiteral">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3127,7 +3317,7 @@ Var
 begin
   strCode :=
     '<!ELEMENT Name (Name1,Name2)>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3205,7 +3395,7 @@ Var
 begin
   strCode :=
     '<!ATTLIST Name Name2 CDATA #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3226,7 +3416,7 @@ Var
 begin
   strCode :=
     '<!ENTITY Name SYSTEM "Oops">'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3238,13 +3428,46 @@ begin
   End;
   strCode :=
     '<!ENTITY Name SYSTEM ''Oops''>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
     CheckEquals('!ENTITY Name SYSTEM ''Oops''', M.Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTXMLModule.TestTextDecl;
+
+Var
+ strCode : String;
+ M : TBaseLanguageModule;
+
+begin
+  strCode :=
+    '<?xml encoding="UFT-8"?>'#13#10;
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('?xml encoding="UFT-8"?', M.Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+  strCode :=
+    '<?xml version="1.0" encoding="UFT-8"?>'#13#10;
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('?xml version="1.0" encoding="UFT-8"?', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3259,7 +3482,7 @@ Var
 begin
   strCode :=
     '<!ATTLIST Name Name2 ID #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3271,7 +3494,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 IDREF #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3283,7 +3506,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 IDREFS #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3295,7 +3518,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 ENTITY #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3307,7 +3530,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 NMTOKEN #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3319,7 +3542,7 @@ begin
   End;
   strCode :=
     '<!ATTLIST Name Name2 NMTOKENS #REQUIRED>'#13#10;
-  M := Dispatcher(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  M := Dispatcher(strCode, 'D:\Path\Filename.dtd', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);

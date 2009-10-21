@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    16 Apr 2009
+  @Date    21 Oct 2009
 
 **)
 library BrowseAndDocIt2009;
@@ -59,7 +59,14 @@ uses
   DUnitCreator in '..\Source\DUnitCreator.pas',
   CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
-  BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas';
+  BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas',
+  KeyboardBindings in '..\Source\KeyboardBindings.pas',
+  BNFHighlighter in '..\Source\BNFHighlighter.pas',
+  EditorNotifier in '..\Source\EditorNotifier.pas',
+  EidolonHighlighter in '..\Source\EidolonHighlighter.pas',
+  XMLModule in '..\..\..\LIBRARY\XMLModule.pas',
+  DFMModule in '..\..\..\LIBRARY\DFMModule.pas',
+  EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas';
 
 {$R *.res}
 

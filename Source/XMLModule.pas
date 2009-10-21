@@ -1754,7 +1754,9 @@ end;
 
 **)
 function TXMLModule.ExtSubSet(xmlParent: TElementContainer): Boolean;
+
 begin
+  DocTypeDecl(xmlParent);
   Result := TextDecl(xmlParent);
   Result := Result Or ExtSubSetDecl(xmlParent);
 end;

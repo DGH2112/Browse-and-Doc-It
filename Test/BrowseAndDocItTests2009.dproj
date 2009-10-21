@@ -68,6 +68,14 @@
 			<DCCReference Include="..\Source\Tests\Source\TestCommonIDEFunctions.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\BackusNaurModule.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestBackusNaurModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestGenericTokenizer.pas"/>
+			<DCCReference Include="..\..\..\library\GenericTokenizer.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\XMLModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestXMLModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\DFMModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestDFMModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\EidolonModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestEidolonModule.pas"/>
 			<None Include="ModelSupport_BrowseAndDocItTests2009\default.txaPackage"/>
 			<None Include="..\..\..\LIBRARY\CompilerDefinitions.inc"/>
 			<BuildConfiguration Include="Base">

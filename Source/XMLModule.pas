@@ -5,7 +5,7 @@
   implemented.
 
   @Version    1.0
-  @Date       28 Aug 2009
+  @Date       21 Oct 2009
   @Author     David Hoyle
 
 **)
@@ -93,6 +93,20 @@ Type
       Override;
   End;
 
+  (** This class represents the individual xml PERef declarations in the document. **)
+  TXMLIncludeElement = Class(TXMLBaseElement)
+  Public
+    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
+      Override;
+  End;
+
+  (** This class represents the individual xml PERef declarations in the document. **)
+  TXMLIgnoreElement = Class(TXMLBaseElement)
+  Public
+    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
+      Override;
+  End;
+
   (** An enumerate to describe whether the module is XHTML or XML. **)
   TModuleType = (mtXHTML, mtXML);
 
@@ -116,7 +130,7 @@ Type
     Function  XMLComment : Boolean;                                    // 12
     Function  XMLPI(xmlParent : TElementContainer) : Boolean;          // 13
     Function  Whitespace : Boolean;                                    // 14
-    Procedure VersionInfo(xmlParent : TElementContainer);              // 15
+    Function  VersionInfo(xmlParent : TElementContainer) : Boolean;    // 15
     Procedure EncodingDecl(xmlParent : TElementContainer);             // 16
     Procedure SDDecl(xmlParent : TElementContainer);                   // 17
     Function  ExternalID(xmlParent : TElementContainer) : Boolean;     // 18
@@ -125,13 +139,13 @@ Type
     Procedure Eq(xmlParent : TElementContainer);                       // 21
     Procedure VersionNum(xmlParent : TElementContainer);               // 22
     Procedure EncName(xmlParent : TElementContainer);                  // 23
-    Function  PITarget(xmlParent : TElementContainer) : TXMLPI;         // 24
+    Function  PITarget(xmlParent : TElementContainer) : TXMLPI;        // 24
     Function  EntityValue(xmlParent : TElementContainer) : Boolean;    // 25
     Procedure NDataDecl(xmlParent : TElementContainer);                // 26
     Procedure SystemLiteral(xmlParent : TElementContainer);            // 27
     Procedure PubIDLiteral(xmlParent : TElementContainer);             // 28
     Function  MarkupDecl(xmlParent : TElementContainer) : Boolean;     // 29
-    Procedure DeclSep(xmlParent : TElementContainer);                  // 30
+    Function  DeclSep(xmlParent : TElementContainer) : Boolean;        // 30
     Function  ElementDecl(xmlParent : TElementContainer) : Boolean;    // 31
     Function  AttListDecl(xmlParent : TElementContainer) : Boolean;    // 32
     Function  EntityDecl(xmlParent : TElementContainer) : Boolean;     // 33
@@ -145,7 +159,7 @@ Type
     Function  CDSect : Boolean;                                        // 42
     Procedure AttValue(xmlParent : TElementContainer);                 // 43
     Function  PEReference(xmlParent : TElementContainer) : Boolean;    // 44
-    Procedure AttDef(xmlParent : TElementContainer);                   // 45
+    Function  AttDef(xmlParent : TElementContainer) : Boolean;         // 45
     Function  GEDecl(xmlParent : TElementContainer) : Boolean;         // 46
     Function  PEDecl(xmlParent : TElementContainer) : Boolean;         // 47
     Procedure PublicID(xmlParent : TElementContainer);                 // 48
@@ -166,6 +180,14 @@ Type
     Function  CombiningChar : Boolean;                                 // 64
     Function  Extender : Boolean;                                      // 65
     Function  NotationType(xmlParent : TElementContainer) : Boolean;   // 66
+    Function  ExtSubSet(xmlParent : TElementContainer) : Boolean;
+    Function  TextDecl(xmlParent : TElementContainer) : Boolean;
+    Function  ExtSubSetDecl(xmlParent : TElementContainer) : Boolean;
+    Function  ConditionalSect(xmlParent : TElementContainer) : Boolean;
+    Function  IncludeSect(xmlParent : TElementContainer) : Boolean;
+    Function  IgnoreSect(xmlParent : TElementContainer) : Boolean;
+    Procedure IgnoreSectContents;
+    Procedure Ignore;
     // ----------------------------------------------------------------
     Function  EatCharData : Boolean;
     (* Helper method to the grammar parsers *)
@@ -236,7 +258,13 @@ Resourcestring
 Const
 
   (** A set of reserved words (not used in this parser.) **)
-  strReservedWords : Array[1..1] Of String = ('ID');
+  strReservedWords : Array[1..27] Of String = (
+    'any', 'attlist', 'cdata', 'doctype', 'element', 'empty', 'encoding',
+    'entities', 'entity', 'fixed', 'id', 'idref', 'idrefs', 'ignored', 'implied',
+    'ndata', 'nmtoken', 'nmtokens', 'include', 'notation', 'pcdata', 'public',
+    'required', 'standalone', 'system', 'version', 'xml'
+  );
+
 
   (** This is a list of reserved, directives word and a semi colon which are
       token that can be sort as then next place to start parsing from when an
@@ -519,6 +547,48 @@ begin
     boolForDocumentation, '', BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
+{ TXMLIgnoreElement }
+
+(**
+
+  This method returns a string presentation of the XML PE Ref element.
+
+  @precon  None.
+  @postcon Returns a string presentation of the XML PE Ref element.
+
+  @param   boolShowIdenifier    as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TXMLIncludeElement.AsString(boolShowIdenifier,
+  boolForDocumentation: Boolean): String;
+begin
+  Result := BuildStringRepresentation(True, False, '',
+    BrowseAndDocItOptions.MaxDocOutputWidth, [']'], ['[']);
+end;
+
+{ TXMLIgnoreElement }
+
+(**
+
+  This method returns a string presentation of the XML PE Ref element.
+
+  @precon  None.
+  @postcon Returns a string presentation of the XML PE Ref element.
+
+  @param   boolShowIdenifier    as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TXMLIgnoreElement.AsString(boolShowIdenifier,
+  boolForDocumentation: Boolean): String;
+begin
+  Result := BuildStringRepresentation(True, False, '',
+    BrowseAndDocItOptions.MaxDocOutputWidth, [']'], ['[']);
+end;
+
 (**
 
   This method parses the AttDef element of the grammar.
@@ -527,29 +597,32 @@ end;
   @postcon Parses the AttDef element of the grammar.
 
   @param   xmlParent as a TElementContainer
+  @return  a Boolean
 
 **)
-procedure TXMLModule.AttDef(xmlParent: TElementContainer);
+Function TXMLModule.AttDef(xmlParent: TElementContainer) : Boolean;
 
 var
   strName: String;
+  T : TTokenInfo;
 
 begin
+  Result := False;
   If Whitespace Then
     Begin
+      Result := True;
+      T := Token;
       strName := XMLName;
       If strName = '' Then
-        ErrorAndSeekToken(strExpectedWord, 'AttDef', '<name>',
-          strSeekableOnErrorTokens, stActual)
+        AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
+          scNone,'AttDef', T.Line, T.Column, etError)
       Else
         xmlParent.AddToken(strName);
       Whitespace;
       AttType(xmlParent);
       Whitespace;
       DefaultDecl(xmlParent);
-    End Else
-      ErrorAndSeekToken(strExpectedWhitespace, 'AttDef', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+    End;
 end;
 
 (**
@@ -582,7 +655,7 @@ begin
           WhiteSpace;
           strName := XMLName;
           A.AddToken(strName);
-          AttDef(A);
+          While AttDef(A) Do;
           Whitespace;
           If Token.Token = '>' Then
             NextNonCommentToken
@@ -811,6 +884,32 @@ end;
 **)
 procedure TXMLModule.CheckDocumentation(var boolCascade: Boolean);
 
+  (**
+
+    This method searches for an element starting with the name passed.
+
+    @precon  None.
+    @postcon Returns true if the name was matched.
+
+    @param   strName as a String
+    @return  a Boolean
+
+  **)
+  Function FindMatch(strName : String) : Boolean;
+
+  var
+    i: Integer;
+
+  Begin
+    Result := False;
+    For i := 1 To ElementCount Do
+      If Like(strName, Elements[i].Name) Then
+        Begin
+          Result := True;
+          Break;
+        End;
+  End;
+
 Var
   recDocCon : TDocConflictTable;
 
@@ -820,14 +919,14 @@ begin
     'the first element.';
   recDocCon.FConflictType := dciMissing;
   If FModuleType = mtXHTML Then
-    If FindElement('!DOCTYPE') = Nil Then //: @bug Does not work now GetName is implemented. Use Like().
+    If Not FindMatch('!DOCTYPE*') Then
       AddDocumentConflict([ModuleName], 1, 1, Nil, strModuleDocumentation, recDocCon);
   recDocCon.FMessage := 'Module ''%s'' is missing a ''?xml'' element.';
   recDocCon.FDescription := 'XML files should have a ?xml element as ' +
     'the first element.';
   recDocCon.FConflictType := dciMissing;
   If FModuleType = mtXML Then
-    If FindElement('?xml') = Nil Then
+    If Not FindMatch('?xml*')  Then
       AddDocumentConflict([ModuleName], 1, 1, Nil, strModuleDocumentation, recDocCon);
 end;
 
@@ -877,17 +976,23 @@ var
   **)
   Procedure ProcessNames;
 
+  var
+    T: TTokenInfo;
+
   Begin
     If Token.Token = '(' Then
       ChoiceSeq(xmlParent)
     Else
       Begin
+        T := Token;
         strName := XMLName;
         If strName = '' Then
-          ErrorAndSeekToken(strExpectedWord, 'ChoiceSeq', '<name>',
-            strSeekableOnErrorTokens, stActual)
+          AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
+            scNone, 'ChoiceSeq', T.Line, T.Column, etError)
         Else
           xmlParent.AddToken(strName);
+        If IsKeyWord(Token.Token, ['*', '+', '?']) Then
+          AddToExpression(xmlParent);
       End;
     Whitespace;
   End;
@@ -932,6 +1037,22 @@ end;
 function TXMLModule.CombiningChar: Boolean;
 begin
   Result := False;
+end;
+
+(**
+
+  This method parses the ConditionalSect element of the grammar.
+
+  @precon  xmlParent must be a valid instance of a container.
+  @postcon Returns true of a IncludeSect or IgnoreSect was found and parsed.
+
+  @param   xmlParent as a TElementContainer
+  @return  a Boolean
+
+**)
+function TXMLModule.ConditionalSect(xmlParent: TElementContainer): Boolean;
+begin
+  Result := IncludeSect(xmlParent) or IgnoreSect(xmlParent);
 end;
 
 (**
@@ -1043,11 +1164,13 @@ End;
   @postcon Parses the DeclSep element of the grammar.
 
   @param   xmlParent as a TElementContainer
+  @return  a Boolean
 
 **)
-procedure TXMLModule.DeclSep(xmlParent : TElementContainer);
+Function TXMLModule.DeclSep(xmlParent : TElementContainer) : Boolean;
 begin
-  If Not PEReference(xmlParent) Then
+  Result := PEReference(xmlParent);
+  If Not Result Then
     Whitespace;
 end;
 
@@ -1111,8 +1234,7 @@ end;
 function TXMLModule.DocTypeDecl(xmlParent : TElementContainer): Boolean;
 
 Var
-  DocType : TXMLDocType;
-  T: TElementContainer;
+  D : TXMLDocType;
 
 begin
   Result := False;
@@ -1124,32 +1246,19 @@ begin
           Result := True;
           NextNonCommentToken;
           Whitespace;
-          DocType := xmlParent.Add(TXMLDocType.Create('!DOCTYPE', scNone,
+          D := xmlParent.Add(TXMLDocType.Create('!DOCTYPE', scNone,
             Token.Line, Token.Column, iiPublicType, Nil)) As TXMLDocType;
-          DocType.AddToken(XMLName);
+          D.AddToken(XMLName);
           If Whitespace Then
-            ExternalID(DocType);
+            ExternalID(D);
           WhiteSpace;
           If Token.Token = '[' Then
             Begin
-              AddToExpression(DocType);
-              T := TXMLBaseElement.Create('tmp', scNone, 0, 0, iiNone, Nil);
-              Try
-                IntSubSet(T);
-                If T.ElementCount > 0 Then
-                  Begin
-                    If Not (T.Elements[1] Is TXMLPERef) Then
-                      DocType.AddToken('<', ttSymbol);
-                    DocType.AddToken(T.Elements[1].AsString(True, True));
-                    If Not (T.Elements[1] Is TXMLPERef) Then
-                      DocType.AddToken('>', ttSymbol);
-                  End;
-              Finally
-                T.Free;
-              End;
+              AddToExpression(D);
+              IntSubSet(D);
               If Token.Token =  ']' Then
                 Begin
-                  AddToExpression(DocType);
+                  AddToExpression(D);
                   WhiteSpace;
                 End Else
                   ErrorAndSeekToken(strLiteralExpected, 'DocTypeDecl', ']',
@@ -1184,8 +1293,6 @@ begin
   Prolog(Self, iElements);
   Repeat
     boolFound := Element(Self);
-    If Not boolFound Then //: @note Allow access to DTD elements.
-      boolFound := MarkupDecl(Self);
     If boolFound Then
       Begin
         Inc(iElements);
@@ -1259,6 +1366,7 @@ function TXMLModule.ElementDecl(xmlParent : TElementContainer): Boolean;
 var
   E: TXMLElemDecl;
   strName : String;
+  T: TTokenInfo;
 
 begin
   Result := False;
@@ -1273,10 +1381,11 @@ begin
           NextNonCommentToken;
           If WhiteSpace Then
             Begin
+              T := Token;
               strName := XMLName;
               If strName = '' then
-                ErrorAndSeekToken(strExpectedWord, 'ElementDecl', '<name>',
-                  strSeekableOnErrorTokens, stActual)
+                AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
+                  T.Column]), scNone, 'ElementDecl', T.Line, T.Column, etError)
               Else
                 E.AddToken(strName);
               If WhiteSpace Then
@@ -1407,6 +1516,7 @@ function TXMLModule.EntityRef(xmlParent: TElementContainer): Boolean;
 
 Var
   strName  : String;
+  T: TTokenInfo;
 
 begin
   Result := False;
@@ -1414,12 +1524,13 @@ begin
     Begin
       Result := True;
       AddToExpression(xmlParent);
+      T := Token;
       strName := XMLName;
       If strName <> '' Then
         xmlParent.AddToken(strName)
       Else
-        ErrorAndSeekToken(strExpectedWord, 'Entityref', Token.Token,
-          strSeekableOnErrorTokens, stActual);
+        AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
+          scNone, 'EntityRef', T.Line, T.Column, etError);
       If Token.Token = ';' Then
         AddToExpression(xmlParent)
       Else
@@ -1443,7 +1554,6 @@ function TXMLModule.EntityValue(xmlParent : TElementContainer): Boolean;
 
 var
   strValue: String;
-  i: Integer;
 
 begin
   Result := False;
@@ -1454,19 +1564,14 @@ begin
       strValue := Copy(strValue, 2, Length(strValue) - 2);
       If Length(strValue) > 1 Then
         Begin
-          If strValue[1] <> '%' Then
-            ErrorAndSeekToken(strLiteralExpected, 'EntityValue', '%',
-              strSeekableOnErrorTokens, stActual);
-          If strValue[Length(strValue)] <> ';' Then
-            ErrorAndSeekToken(strLiteralExpected, 'EntityValue', ';',
-              strSeekableOnErrorTokens, stActual);
-          For i := 2 To Length(strValue) - 1 Do
-            If Not IsInSet(strValue[i], ['A'..'Z', 'a'..'z', '_', ':', '.', '-']) Then
-              Begin
-                ErrorAndSeekToken(strExpectedWord, 'EntityValue', '<name>',
-                  strSeekableOnErrorTokens, stActual);
-                Exit;
-              End;
+          If strValue[1] = '%' Then
+            Begin
+              If Not Like('%*;', strValue) Then
+                AddIssue(Format(strExpectedWord, ['<PEReference>', Token.Line,
+                  Token.Column]), scNone, 'EntityValue', Token.Line,
+                  Token.Column, etError);
+            End;
+          //: @todo Should be either %Name; or &Name; or &#Number; or &#xHexNumber;
         End;
       AddToExpression(xmlParent);
     End Else
@@ -1639,6 +1744,45 @@ end;
 
 (**
 
+  This method parses the ExtSubSet element of the grammar.
+
+  @precon  xmlParent must be a valid instance of a container.
+  @postcon Returns true of a TextDecl or ExtSubSetDecl was parsed.
+
+  @param   xmlParent as a TElementContainer
+  @return  a Boolean
+
+**)
+function TXMLModule.ExtSubSet(xmlParent: TElementContainer): Boolean;
+begin
+  Result := TextDecl(xmlParent);
+  Result := Result Or ExtSubSetDecl(xmlParent);
+end;
+
+(**
+
+  This method parses the ExtSubSetDecl element of the grammar.
+
+  @precon  xmlParent must be a valid instance of a container.
+  @postcon Returns true of a Markup, ConditionalSect or DeclSep was found and
+           parsed.
+
+  @param   xmlParent as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TXMLModule.ExtSubSetDecl(xmlParent: TElementContainer) : Boolean;
+begin
+  Result := False;
+  While (MarkupDecl(xmlParent) Or ConditionalSect(xmlParent) or DeclSep(xmlParent)) Do
+    Begin
+      Result := True;
+      Whitespace;
+    End;
+end;
+
+(**
+
   This method parses the TokenizedType element of the grammar.
 
   @precon  xmlParent must be a valid instance of a container.
@@ -1681,7 +1825,8 @@ Const
   (** A set of characters for double quotes **)
   strDoubleQuotes = ['"'];
   (** A set of identifier characters. **)
-  strIdentifiers = ['#', 'a'..'z', 'A'..'Z', '_', '.'];
+  strIdentifiers = ['#', 'a'..'z', 'A'..'Z', '_', '.', #192..#214, #216..#246,
+    #248..#255];
   (** A set of number characters. **)
   strNumbers  = ['#', '$', '0'..'9'];
   strAllChars = [#32..#255];
@@ -1791,6 +1936,7 @@ Begin
           IsInSet(Ch, strSingleSymbols) Or
           IsInSet(LastChar, strSingleSymbols) Or
           (Not (BlockType In [btSingleLiteral, btDoubleLiteral]) And
+          (
             (Not (IsInSet(Ch, ['>', '-'])) And (LastChar = '-')) Or
             ((Ch = '<') Or (LastChar = '>')) Or
             ((Ch = '>') And (LastChar = ']')) Or
@@ -1799,13 +1945,14 @@ Begin
             ((Ch = '>') And (LastChar = '<')) Or
             ((Ch = ']') And (LastChar = '[')) Or
             ((Ch = ']') And (LastChar <> ']'))
-          ) Or
+          )) Or
           ((BlockType In [btNoBlock]) And
           (CurCharType = ttLineEnd) And (Ch = #13)) Then
           Begin
-            If Not (((BlockType In [btSingleLiteral, btDoubleLiteral]) And (CurCharType <> ttLineEnd))) Or
+            If Not (BlockType In [btSingleLiteral, btDoubleLiteral]) Or
               ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Or
               (Not (BlockType In [btSingleLiteral, btDoubleLiteral]) And
+              (
                 (Not (IsInSet(Ch, ['>', '-'])) And (LastChar = '-')) Or
                 ((Ch = '<') OR (LastChar = '>')) Or
                 ((Ch = '>') And (LastChar = ']')) Or
@@ -1814,7 +1961,7 @@ Begin
                 ((Ch = '>') And (LastChar = '<')) Or
                 ((Ch = ']') And (LastChar = '[')) Or
                 ((Ch = ']') And (LastChar <> ']'))
-              ) Then
+              )) Then
               Begin
                 SetLength(strToken, iTokenLen);
                 If iTokenLen > 0 Then
@@ -1891,19 +2038,20 @@ End;
   @postcon Parses the VersionInfo element of the grammar.
 
   @param   xmlParent as a TElementContainer
+  @return  a Boolean
 
 **)
-procedure TXMLModule.VersionInfo(xmlParent : TElementContainer);
+Function TXMLModule.VersionInfo(xmlParent : TElementContainer) : Boolean;
 begin
+  Result := False;
   WhiteSpace;
   If CompareText(Token.Token, 'version') = 0 Then
     Begin
+      Result := True;
       AddToExpression(xmlParent);
       Eq(xmlParent);
       VersionNum(xmlParent);
-    End Else
-      ErrorAndSeekToken(strExpectedWord, 'VersionInfo', 'version',
-        strSeekableOnErrorTokens, stActual);
+    End;
 end;
 
 (**
@@ -1922,21 +2070,25 @@ var
   strNum: String;
   iNum: Integer;
   iErrorCode: Integer;
+  strQuote: String;
 
 begin
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     Begin
       strNum := Copy(Token.Token, 2, Token.Length - 2);
+      strQuote := Copy(Token.Token, 1, 1);
       If Copy(strNum, 1, 2) = '1.' Then
         Begin
           If Length(strNum) = 3 Then
             Begin
               Val(Copy(strNum, 3, 1), iNum, iErrorCode);
               If iErrorCode = 0 Then
-                AddToExpression(xmlParent)
-              Else
-                ErrorAndSeekToken(strIsNotAValidVersionNum, 'VersionNum',
-                  Token.Token, strSeekableOnErrorTokens, stActual);
+                Begin
+                  xmlParent.AddToken(Format('%s1.%d%s', [strQuote, iNum, strQuote]));
+                  NextNonCommentToken;
+                End Else
+                  ErrorAndSeekToken(strIsNotAValidVersionNum, 'VersionNum',
+                    Token.Token, strSeekableOnErrorTokens, stActual);
             End Else
               ErrorAndSeekToken(strExpectedVersionNum, 'VersionNum', Token.Token,
                 strSeekableOnErrorTokens, stActual);
@@ -2016,7 +2168,9 @@ begin
           xmlParent := xmlParent.Add(TXMLDecl.Create('?' + Token.Token, scNone,
             Token.Line, Token.Column, iiPublicObject, Nil));
           NextNonCommentToken;
-          VersionInfo(xmlParent);
+          If Not VersionInfo(xmlParent) Then
+            ErrorAndSeekToken(strExpectedWord, 'XMLDecl', 'version',
+              strSeekableOnErrorTokens, stActual);
           Whitespace;
           EncodingDecl(xmlParent);
           Whitespace;
@@ -2052,8 +2206,18 @@ end;
 **)
 Function TXMLModule.XMLName : String;
 
+Var
+  boolPRRef : Boolean;
+
 begin
   Result := '';
+  boolPRRef := False;
+  If Token.Token = '%' Then
+    Begin
+      Result := Result + Token.Token;
+      boolPRRef := True;
+      NextNonCommentToken;
+    End;
   If (Token.TokenType In [ttIdentifier]) Or (IsKeyWord(Token.Token, ['-', ':'])) Then
     Begin
       Result := Result + Token.Token;
@@ -2064,6 +2228,14 @@ begin
           NextNonCommentToken;
         End;
     End;
+  If boolPRRef Then
+    If Token.Token = ';' Then
+      Begin
+        Result := Result + Token.Token;
+        NextNonCommentToken;
+      End Else
+        ErrorAndSeekToken(strLiteralExpected, 'XMLname', ';',
+          strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -2137,6 +2309,7 @@ Function TXMLModule.PEDecl(xmlParent: TElementContainer) : Boolean;
 
 Var
   strName : String;
+  T: TTokenInfo;
 
 begin
   Result := False;
@@ -2147,10 +2320,11 @@ begin
       If Not WhiteSpace Then
         ErrorAndSeekToken(strExpectedWhitespace, 'PEDecl', Token.Token,
           strSeekableOnErrorTokens, stActual);
+      T := Token;
       strName := XMLName;
       If strName = '' Then
-        ErrorAndSeekToken(strExpectedWord, 'PEDecl', '<name>',
-          strSeekableOnErrorTokens, stActual)
+        AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
+          scNone, 'PEDecl', T.Line, T.Column, etError)
       Else
         xmlParent.AddToken(strName);
       If Not WhiteSpace Then
@@ -2316,6 +2490,7 @@ function TXMLModule.Mixed(xmlParent : TElementContainer): Boolean;
 var
   strName: String;
   iNames : Integer;
+  T: TTokenInfo;
 
 begin
   Result := False;
@@ -2333,6 +2508,7 @@ begin
             Begin
               AddToExpression(xmlParent);
               Whitespace;
+              T := Token;
               strName := XMLName;
               If strName <> '' Then
                 Begin
@@ -2340,8 +2516,8 @@ begin
                   Inc(iNames);
                   Whitespace;
                 End Else
-                  ErrorAndSeekToken(strExpectedWord, 'Mixed', '<name>',
-                    strSeekableOnErrorTokens, stActual);
+                  AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
+                    T.Column]), scNone, 'Mixed', T.Line, T.Column, etError);
             End;
           If Token.Token = ')' Then
             AddToExpression(xmlParent)
@@ -2394,8 +2570,11 @@ end;
 
 **)
 procedure TXMLModule.NDataDecl(xmlParent : TElementContainer);
+
 var
   strName: String;
+  T: TTokenInfo;
+
 begin
   If Whitespace Then
     Begin
@@ -2407,12 +2586,13 @@ begin
       If Not Whitespace Then
         ErrorAndSeekToken(strExpectedWhitespace, 'NDataDecl', Token.Token,
           strSeekableOnErrorTokens, stActual);
+      T := Token;
       strName := XMLName;
       If strName <> '' Then
         xmlParent.AddToken(strName)
       Else
-        ErrorAndSeekToken(strExpectedWord, 'NDataDecl', '<name>',
-          strSeekableOnErrorTokens, stActual);
+        AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
+          scNone, 'NDataDecl', T.Line, T.Column, etError);
     End;
 end;
 
@@ -2453,6 +2633,7 @@ function TXMLModule.NotationDecl(xmlParent : TElementContainer): Boolean;
 var
   strName: String;
   N: TXMLElemDecl;
+  T: TTokenInfo;
 
 begin
   Result := False;
@@ -2466,10 +2647,11 @@ begin
             Token.Line, Token.Column, iiPublicDispInterface, Nil)) As TXMLElemDecl;
           NextNonCommentToken;
           Whitespace;
+          T := Token;
           strName := XMLName;
           If strName = '' Then
-            ErrorAndSeekToken(strExpectedWord, 'NotationDecl', '<Name>',
-              strSeekableOnErrorTokens, stActual)
+            AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
+              scNone, 'NotationDecl', T.Line, T.Column, etError)
           Else
             N.AddToken(strName);
           Whitespace;
@@ -2501,6 +2683,7 @@ function TXMLModule.NotationType(xmlParent: TElementContainer): Boolean;
 
 var
   strName: String;
+  T: TTokenInfo;
 
 begin
   Result := False;
@@ -2514,10 +2697,11 @@ begin
             Begin
               AddToExpression(xmlParent);
               Whitespace;
+              T := Token;
               strName := XMLName;
               If strName = '' Then
-                ErrorAndSeekToken(strExpectedWord, 'NotationType', '<name>',
-                  strSeekableOnErrorTokens, stActual)
+                AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
+                  T.Column]), scNone, 'NotationType', T.Line, T.Column, etError)
               Else
                 xmlParent.AddToken(strName);
               Whitespace;
@@ -2525,10 +2709,11 @@ begin
                 Begin
                   AddToExpression(xmlParent);
                   Whitespace;
+                  T := Token;
                   strName := XMLName;
                   If strName = '' Then
-                    ErrorAndSeekToken(strExpectedWord, 'NotationType', '<name>',
-                      strSeekableOnErrorTokens, stActual)
+                    AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
+                      T.Column]), scNone, 'NotationType', T.Line, T.Column, etError)
                   Else
                     xmlParent.AddToken(strName);
                   Whitespace;
@@ -2564,6 +2749,7 @@ function TXMLModule.GEDecl(xmlParent: TElementContainer): Boolean;
 var
   strName: String;
   E : TXMLElemDecl;
+  T: TTokenInfo;
 
 begin
   Result := False;
@@ -2581,10 +2767,11 @@ begin
               strSeekableOnErrorTokens, stActual);
           If Not PEDecl(E) Then
             Begin
+              T := Token;
               strName := XMLName;
               If strName = '' Then
-                ErrorAndSeekToken(strExpectedWord, 'GEDecl', '<name>',
-                  strSeekableOnErrorTokens, stActual)
+                AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
+                  T.Column]), scNone, 'GEDecl', T.Line, T.Column, etError)
               Else
                 E.AddToken(strName);
               If Not WhiteSpace Then
@@ -2849,33 +3036,32 @@ end;
 Function TXMLModule.STag(xmlParent : TElementContainer) : TElementContainer;
 
 Var
-  iLine, iColumn : Integer;
   strXMLName: String;
   X: TXMLElement;
+  T: TTokenInfo;
 
 begin
   Result := Nil;
   If Token.Token = '<' Then
     Begin
       NextNonCommentToken;
-      iLine := Token.Line;
-      iColumn := Token.Column;
+      T := Token;
       strXMLName := XMLName;
       If strXMLName <> '' Then
         Begin
           X := xmlParent.Add(TXMLElement.Create(strXMLName, scNone,
-            iLine, iColumn, iiPublicRecord, Nil)) As TXMLElement;
+            T.Line, T.Column, iiPublicRecord, Nil)) As TXMLElement;
           Result := X;
           If FModuleType In [mtXHTML] Then
             If LowerCase(strXMLName) <> strXMLName Then
-              AddIssue(Format(strHTMLElementLowercase, [strXMLName, iLine,
-                iColumn]), scNone, 'STag', iLine, iColumn, etWarning);
+              AddIssue(Format(strHTMLElementLowercase, [strXMLName, T.Line,
+                T.Column]), scNone, 'STag', T.Line, T.Column, etWarning);
           Whitespace;
           While Attribute(X) Do
             WhiteSpace;
         End Else
-          ErrorAndSeekToken(strExpectedWord, 'STag', '<name>',
-            strSeekableOnErrorTokens, stActual);
+          AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
+            scNone, 'STag', T.Line, T.Column, etError);
       If Token.Token = '/>' Then
         Result.Referenced := True;
       If IsKeyWord(Token.Token, ['/>', '>']) Then
@@ -2924,6 +3110,49 @@ begin
   Else
     ErrorAndSeekToken(strStringExpected, 'SystemLiteral', Token.Token,
       strSeekableOnErrorTokens, stActual);
+end;
+
+(**
+
+  This method parses the TextDecl element of the grammar.
+
+  @precon  xmlParent must be a valid container.
+  @postcon Returns true of a TextDecl was found and parsed.
+
+  @param   xmlParent as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TXMLModule.TextDecl(xmlParent: TElementContainer) : Boolean;
+begin
+  Result := False;
+  If Token.Token = '<?' Then
+    Begin
+      NextNonCommentToken;
+      If CompareText(Token.Token, 'xml') = 0 Then
+        Begin
+          Result := True;
+          xmlParent := xmlParent.Add(TXMLDecl.Create('?' + Token.Token, scNone,
+            Token.Line, Token.Column, iiPublicObject, Nil));
+          NextNonCommentToken;
+          VersionInfo(xmlParent);
+          Whitespace;
+          EncodingDecl(xmlParent);
+          Whitespace;
+          If Token.Token = '?' Then
+            Begin
+              AddToExpression(xmlParent);
+              If Token.Token = '>' Then
+                NextNonCommentToken
+              Else
+                ErrorAndSeekToken(strLiteralExpected, 'XMLDecl', '?>',
+                  strSeekableOnErrorTokens, stActual);
+            End Else
+              ErrorAndSeekToken(strLiteralExpected, 'XMLDecl', '?>',
+                strSeekableOnErrorTokens, stActual);
+        End Else
+          RollBackToken;
+    End;
 end;
 
 (**
@@ -3003,12 +3232,161 @@ begin
           End;
         // Check for end of file else must be identifier
         If Not EndOfTokens Then
-          Document;
+          If Like('*.dtd', FileName) Then
+            ExtSubSet(Self)
+          Else
+            Document;
       End;
   Except
     On E : EParserAbort Do
       AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
   End;
+end;
+
+(**
+
+  This method parses the Ignore element of the grammar.
+
+  @precon  None.
+  @postcon Parses the Ignore element of the grammar.
+
+**)
+procedure TXMLModule.Ignore;
+begin
+  While (Token.Token <> '<![') And (Token.Token <> ']]') Do
+    NextNonCommentToken;
+end;
+
+(**
+
+  This method parses the IgnoreSect element of the grammar.
+
+  @precon  xmlParent must be a valid container.
+  @postcon Returns true if an IgnoreSect element was found and parsed.
+
+  @param   xmlParent as a TElementContainer
+  @return  a Boolean
+
+**)
+function TXMLModule.IgnoreSect(xmlParent: TElementContainer): Boolean;
+
+Var
+  I : TXMLIgnoreElement;
+
+begin
+  Result := False;
+  If Token.Token = '<![' Then
+    Begin
+      NextNonCommentToken;
+      If CompareText(Token.Token, 'IGNORE') = 0 Then
+        Begin
+          I := xmlParent.Add(TXMLIgnoreElement.Create('IGNORE', scNone, Token.Line,
+            Token.Column, iiPublicConstant, Nil)) As TXMLIgnoreElement;
+          NextNonCommentToken;
+          Whitespace;
+          If Token.Token = '[' Then
+            Begin
+              AddToExpression(I);
+              IgnoreSectContents;
+              If Token.Token = ']]' Then
+                Begin
+                  I.AddToken(']', ttSymbol);
+                  NextNonCommentToken;
+                  If Token.Token = '>' Then
+                    NextNonCommentToken
+                  Else
+                    ErrorAndSeekToken(strLiteralExpected, 'IgnoreSect', '>',
+                      strSeekableOnErrorTokens, stActual);
+                End Else
+                  ErrorAndSeekToken(strLiteralExpected, 'IgnoreSect', ']]>',
+                    strSeekableOnErrorTokens, stActual);
+            End Else
+              ErrorAndSeekToken(strLiteralExpected, 'IgnoreSec', '[',
+                strSeekableOnErrorTokens, stActual);
+        End Else
+          RollBackToken;
+    End;
+end;
+
+(**
+
+  This method parses the IgnoreSectContents element of the grammar.
+
+  @precon  None.
+  @postcon Parses the IgnoreSectContents element of the grammar.
+
+**)
+procedure TXMLModule.IgnoreSectContents;
+begin
+  Ignore;
+  While Token.Token = '<![' Do
+    Begin
+      NextNonCommentToken;
+      IgnoreSectContents;
+      If Token.Token = ']]' Then
+        Begin
+          NextNonCommentToken;
+          If Token.Token = '>' Then
+            NextNonCommentToken
+          Else
+            RollBackToken;
+        End Else
+          ErrorAndSeekToken(strLiteralExpected, 'IgnoreSectContents', ']]>',
+            strSeekableOnErrorTokens, stActual);
+      Ignore;
+    End;
+end;
+
+(**
+
+  This method parses the IncludeSect element of the grammar.
+
+  @precon  xmlParent must be a valid container.
+  @postcon Returns true IF an IncludeSect was found and parsed.
+
+  @param   xmlParent as a TElementContainer
+  @return  a Boolean
+
+**)
+function TXMLModule.IncludeSect(xmlParent: TElementContainer): Boolean;
+
+Var
+  I : TXMLIncludeElement;
+
+begin
+  Result := False;
+  If Token.Token = '<![' Then
+    Begin
+      NextNonCommentToken;
+      If CompareText(Token.Token, 'INCLUDE') = 0 Then
+        Begin
+          Result := True;
+          I := xmlParent.Add(TXMLIncludeElement.Create('INCLUDE', scNone, Token.Line,
+            Token.Column, iiPublicConstant, Nil)) As TXMLIncludeElement;
+          NextNonCommentToken;
+          Whitespace;
+          If Token.Token = '[' Then
+            Begin
+              AddToExpression(I);
+              ExtSubsetDecl(I);
+              If Token.Token = ']]' Then
+                Begin
+                  I.AddToken(']', ttSymbol);
+                  NextNonCommentToken;
+                  If Token.Token = '>' Then
+                    NextNonCommentToken
+                  Else
+                    ErrorAndSeekToken(strLiteralExpected, 'IncludeSect', '>',
+                      strSeekableOnErrorTokens, stActual);
+                End Else
+                  ErrorAndSeekToken(strLiteralExpected, 'IncludeSect', ']]>',
+                    strSeekableOnErrorTokens, stActual);
+            End Else
+              ErrorAndSeekToken(strLiteralExpected, 'IncludeSect', '[',
+                strSeekableOnErrorTokens, stActual);
+        End Else
+          RollBackToken;
+    End;
 end;
 
 (**

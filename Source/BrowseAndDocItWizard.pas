@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    07 Oct 2009
+  @Date    23 Oct 2009
   @Version 1.0
 
 **)
@@ -13,7 +13,7 @@ Interface
 
 Uses
   Classes, ToolsAPI, Menus, BaseLanguageModule, Types, CommonIDEFunctions,
-  ModuleDispatcher;
+  ModuleDispatcher {$IFNDEF D2005}, ExtCtrls, Contnrs {$ENDIF};
 
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 

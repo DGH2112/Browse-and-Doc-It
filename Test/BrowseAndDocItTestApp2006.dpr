@@ -2,7 +2,7 @@
 
   This is the test applications project file.
 
-  @Date    17 Jul 2009
+  @Date    23 Oct 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -13,8 +13,8 @@ program BrowseAndDocItTestApp2006;
 {$R '..\..\..\Library\BrowseAndDocItHTMLResources.res' '..\..\..\Library\BrowseAndDocItHTMLResources.RC'}
 {$R '..\DUnitTemplateResources.res' '..\DUnitTemplateResources.RC'}
 {%TogetherDiagram 'ModelSupport_BrowseAndDocItTestApp2006\default.txaPackage'}
-{%File '..\..\..\LIBRARY\CompilerDefinitions.inc'}
-{%File '..\..\..\LIBRARY\SynEdit\Source\SynEdit.inc'}
+{%file '..\..\..\Library\SynEdit\Source\SynEdit.inc'}
+
 
 uses
   ExceptionLog,
@@ -60,7 +60,12 @@ uses
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
   GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas',
   SynHighlighterCpp in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterCpp.pas',
-  BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas';
+  XMLModule in '..\..\..\Library\XMLModule.pas',
+  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  BackusNaurModule in '..\..\..\Library\BackusNaurModule.pas',
+  SynHighlighterXML in '..\..\..\Library\SynEdit\Source\SynHighlighterXML.pas',
+  DFMModule in '..\..\..\Library\DFMModule.pas',
+  EidolonModule in '..\..\..\Library\EidolonModule.pas';
 
 {$R *.res}
 

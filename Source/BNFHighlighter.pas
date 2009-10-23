@@ -4,7 +4,7 @@
   IDE to show Backus-Naur grammar.
 
   @Version 1.0
-  @Date    22 Jul 2009
+  @Date    23 Oct 2009
   @Author  David Hoyle
 
 **)
@@ -19,7 +19,7 @@ Uses
 
 Type
   (** A class to define an new IDE Highlighter for BNF Grammar **)
-  TBNFHighlighter = Class(TNotifierObject, IOTAHighlighter, IOTAHighlighterPreview)
+  TBNFHighlighter = Class(TNotifierObject, IOTAHighlighter {$IFDEF D2005}, IOTAHighlighterPreview {$ENDIF})
   {$IFDEF D2005} Strict {$ENDIF} Private
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public

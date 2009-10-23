@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       07 Oct 2009
+  @Date       23 Oct 2009
   @Author     David Hoyle
 
 **)
@@ -2304,7 +2304,7 @@ Var
     @param   strToken as a String as a reference
 
   **)
-  Procedure ProcessWhiteSpace(var strToken : String); InLine;
+  Procedure ProcessWhiteSpace(var strToken : String); {$IFDEF D2005} InLine; {$ENDIF}
 
   Begin
     If strToken = #13 Then

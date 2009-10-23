@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    21 Jul 2009
+  @Date    23 Oct 2009
   @Author  David Hoyle
 
 **)
@@ -302,7 +302,7 @@ begin
       {$IFNDEF D2005}
         Else If FLastSize <> MemStreamSize(Editor) Then
             Begin
-              iLastUpdateTickCount := GetTickCount;
+              FLastUpdateTickCount := GetTickCount;
               FLastSize := MemStreamSize(Editor);
             End
       {$ENDIF};

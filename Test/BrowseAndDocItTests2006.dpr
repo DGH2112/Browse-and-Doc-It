@@ -39,8 +39,16 @@ uses
   TestPascalModule in '..\..\..\LIBRARY\Test\Source\TestPascalModule.pas',
   CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
   TestCommonIDEFunctions in '..\Source\Tests\Source\TestCommonIDEFunctions.pas',
-  BackusNaurModule in '..\..\..\library\BackusNaurModule.pas',
-  TestBackusNaurModule in '..\..\..\LIBRARY\Test\Source\TestBackusNaurModule.pas';
+  XMLModule in '..\..\..\Library\XMLModule.pas',
+  TestBackusNaurModule in '..\..\..\LIBRARY\Test\Source\TestBackusNaurModule.pas',
+  GenericTokenizer in '..\..\..\Library\GenericTokenizer.pas',
+  TestGenericTokenizer in '..\..\..\Library\Test\Source\TestGenericTokenizer.pas',
+  BackusNaurModule in '..\..\..\Library\BackusNaurModule.pas',
+  TestXMLModule in '..\..\..\Library\Test\Source\TestXMLModule.pas',
+  DFMModule in '..\..\..\Library\DFMModule.pas',
+  EidolonModule in '..\..\..\Library\EidolonModule.pas',
+  TestEidolonModule in '..\..\..\Library\Test\Source\TestEidolonModule.pas',
+  TestDFMModule in '..\..\..\Library\Test\Source\TestDFMModule.pas';
 
 {$R *.RES}
 

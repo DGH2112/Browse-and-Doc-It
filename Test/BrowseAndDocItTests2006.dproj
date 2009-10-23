@@ -1,183 +1,140 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<PersonalityInfo>
-		<Option>
-			<Option Name="Personality">Delphi.Personality</Option>
-			<Option Name="ProjectType"></Option>
-			<Option Name="Version">1.0</Option>
-			<Option Name="GUID">{77CE066E-3A47-45D3-9A15-E1CE209D5008}</Option>
-		</Option>
-	</PersonalityInfo>
-	<Delphi.Personality>
-		<Source>
-			<Source Name="MainSource">BrowseAndDocItTests2006.dpr</Source>
-		</Source>
-		<FileVersion>
-			<FileVersion Name="Version">7.0</FileVersion>
-		</FileVersion>
-		<Compiler>
-			<Compiler Name="A">8</Compiler>
-			<Compiler Name="B">0</Compiler>
-			<Compiler Name="C">1</Compiler>
-			<Compiler Name="D">1</Compiler>
-			<Compiler Name="E">0</Compiler>
-			<Compiler Name="F">0</Compiler>
-			<Compiler Name="G">1</Compiler>
-			<Compiler Name="H">1</Compiler>
-			<Compiler Name="I">1</Compiler>
-			<Compiler Name="J">0</Compiler>
-			<Compiler Name="K">0</Compiler>
-			<Compiler Name="L">1</Compiler>
-			<Compiler Name="M">0</Compiler>
-			<Compiler Name="N">1</Compiler>
-			<Compiler Name="O">0</Compiler>
-			<Compiler Name="P">1</Compiler>
-			<Compiler Name="Q">1</Compiler>
-			<Compiler Name="R">1</Compiler>
-			<Compiler Name="S">0</Compiler>
-			<Compiler Name="T">0</Compiler>
-			<Compiler Name="U">0</Compiler>
-			<Compiler Name="V">1</Compiler>
-			<Compiler Name="W">1</Compiler>
-			<Compiler Name="X">1</Compiler>
-			<Compiler Name="Y">1</Compiler>
-			<Compiler Name="Z">1</Compiler>
-			<Compiler Name="ShowHints">True</Compiler>
-			<Compiler Name="ShowWarnings">True</Compiler>
-			<Compiler Name="UnitAliases">WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;</Compiler>
-			<Compiler Name="NamespacePrefix"></Compiler>
-			<Compiler Name="GenerateDocumentation">False</Compiler>
-			<Compiler Name="DefaultNamespace"></Compiler>
-			<Compiler Name="SymbolDeprecated">True</Compiler>
-			<Compiler Name="SymbolLibrary">True</Compiler>
-			<Compiler Name="SymbolPlatform">False</Compiler>
-			<Compiler Name="SymbolExperimental">True</Compiler>
-			<Compiler Name="UnitLibrary">True</Compiler>
-			<Compiler Name="UnitPlatform">True</Compiler>
-			<Compiler Name="UnitDeprecated">True</Compiler>
-			<Compiler Name="UnitExperimental">True</Compiler>
-			<Compiler Name="HResultCompat">True</Compiler>
-			<Compiler Name="HidingMember">True</Compiler>
-			<Compiler Name="HiddenVirtual">True</Compiler>
-			<Compiler Name="Garbage">True</Compiler>
-			<Compiler Name="BoundsError">True</Compiler>
-			<Compiler Name="ZeroNilCompat">True</Compiler>
-			<Compiler Name="StringConstTruncated">True</Compiler>
-			<Compiler Name="ForLoopVarVarPar">True</Compiler>
-			<Compiler Name="TypedConstVarPar">True</Compiler>
-			<Compiler Name="AsgToTypedConst">True</Compiler>
-			<Compiler Name="CaseLabelRange">True</Compiler>
-			<Compiler Name="ForVariable">True</Compiler>
-			<Compiler Name="ConstructingAbstract">True</Compiler>
-			<Compiler Name="ComparisonFalse">True</Compiler>
-			<Compiler Name="ComparisonTrue">True</Compiler>
-			<Compiler Name="ComparingSignedUnsigned">True</Compiler>
-			<Compiler Name="CombiningSignedUnsigned">True</Compiler>
-			<Compiler Name="UnsupportedConstruct">True</Compiler>
-			<Compiler Name="FileOpen">True</Compiler>
-			<Compiler Name="FileOpenUnitSrc">True</Compiler>
-			<Compiler Name="BadGlobalSymbol">True</Compiler>
-			<Compiler Name="DuplicateConstructorDestructor">True</Compiler>
-			<Compiler Name="InvalidDirective">True</Compiler>
-			<Compiler Name="PackageNoLink">True</Compiler>
-			<Compiler Name="PackageThreadVar">True</Compiler>
-			<Compiler Name="ImplicitImport">True</Compiler>
-			<Compiler Name="HPPEMITIgnored">True</Compiler>
-			<Compiler Name="NoRetVal">True</Compiler>
-			<Compiler Name="UseBeforeDef">True</Compiler>
-			<Compiler Name="ForLoopVarUndef">True</Compiler>
-			<Compiler Name="UnitNameMismatch">True</Compiler>
-			<Compiler Name="NoCFGFileFound">True</Compiler>
-			<Compiler Name="ImplicitVariants">True</Compiler>
-			<Compiler Name="UnicodeToLocale">True</Compiler>
-			<Compiler Name="LocaleToUnicode">True</Compiler>
-			<Compiler Name="ImagebaseMultiple">True</Compiler>
-			<Compiler Name="SuspiciousTypecast">True</Compiler>
-			<Compiler Name="PrivatePropAccessor">True</Compiler>
-			<Compiler Name="UnsafeType">False</Compiler>
-			<Compiler Name="UnsafeCode">False</Compiler>
-			<Compiler Name="UnsafeCast">False</Compiler>
-			<Compiler Name="OptionTruncated">True</Compiler>
-			<Compiler Name="WideCharReduced">True</Compiler>
-			<Compiler Name="DuplicatesIgnored">True</Compiler>
-			<Compiler Name="UnitInitSeq">True</Compiler>
-			<Compiler Name="LocalPInvoke">True</Compiler>
-			<Compiler Name="MessageDirective">True</Compiler>
-			<Compiler Name="CodePage"></Compiler>
-		</Compiler>
-		<Linker>
-			<Linker Name="MapFile">3</Linker>
-			<Linker Name="OutputObjs">0</Linker>
-			<Linker Name="GenerateHpps">False</Linker>
-			<Linker Name="ConsoleApp">1</Linker>
-			<Linker Name="DebugInfo">False</Linker>
-			<Linker Name="RemoteSymbols">False</Linker>
-			<Linker Name="GenerateDRC">False</Linker>
-			<Linker Name="MinStackSize">16384</Linker>
-			<Linker Name="MaxStackSize">1048576</Linker>
-			<Linker Name="ImageBase">4194304</Linker>
-			<Linker Name="ExeDescription"></Linker>
-		</Linker>
-		<Directories>
-			<Directories Name="OutputDir"></Directories>
-			<Directories Name="UnitOutputDir">..\2006DCUs\</Directories>
-			<Directories Name="PackageDLLOutputDir"></Directories>
-			<Directories Name="PackageDCPOutputDir"></Directories>
-			<Directories Name="SearchPath">$(BDSPROJECTSDIR)\Library\DUnit\src;$(BDSPROJECTSDIR)\Library\JCL\source;$(BDSPROJECTSDIR)\Library\JCL\source\common;$(BDSPROJECTSDIR)\Library\JCL\source\windows;$(BDSPROJECTSDIR)\LIBRARY\JCL\source\include</Directories>
-			<Directories Name="Packages">vclx;vcl;rtl;dbrtl;vcldb;adortl;dbxcds;dbexpress;xmlrtl;vclie;inet;inetdbbde;inetdbxpress;dclOfficeXP;soaprtl;dsnap;vclactnband;bdertl;vcldbx</Directories>
-			<Directories Name="Conditionals">EUREKALOG;CONSOLE_TESTRUNNER;USE_JEDI_JCL;EUREKALOG_VER6</Directories>
-			<Directories Name="DebugSourceDirs"></Directories>
-			<Directories Name="UsePackages">False</Directories>
-		</Directories>
-		<Parameters>
-			<Parameters Name="RunParams"></Parameters>
-			<Parameters Name="HostApplication"></Parameters>
-			<Parameters Name="Launcher"></Parameters>
-			<Parameters Name="UseLauncher">False</Parameters>
-			<Parameters Name="DebugCWD"></Parameters>
-			<Parameters Name="Debug Symbols Search Path"></Parameters>
-			<Parameters Name="LoadAllSymbols">True</Parameters>
-			<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
-		</Parameters>
-		<Language>
-			<Language Name="ActiveLang"></Language>
-			<Language Name="ProjectLang">$00000000</Language>
-			<Language Name="RootDir"></Language>
-		</Language>
-		<VersionInfo>
-			<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
-			<VersionInfo Name="AutoIncBuild">False</VersionInfo>
-			<VersionInfo Name="MajorVer">1</VersionInfo>
-			<VersionInfo Name="MinorVer">0</VersionInfo>
-			<VersionInfo Name="Release">0</VersionInfo>
-			<VersionInfo Name="Build">8</VersionInfo>
-			<VersionInfo Name="Debug">False</VersionInfo>
-			<VersionInfo Name="PreRelease">False</VersionInfo>
-			<VersionInfo Name="Special">False</VersionInfo>
-			<VersionInfo Name="Private">False</VersionInfo>
-			<VersionInfo Name="DLL">False</VersionInfo>
-			<VersionInfo Name="Locale">2057</VersionInfo>
-			<VersionInfo Name="CodePage">1252</VersionInfo>
-		</VersionInfo>
-		<VersionInfoKeys>
-			<VersionInfoKeys Name="CompanyName"></VersionInfoKeys>
-			<VersionInfoKeys Name="FileDescription"></VersionInfoKeys>
-			<VersionInfoKeys Name="FileVersion">1.0.0.8</VersionInfoKeys>
-			<VersionInfoKeys Name="InternalName"></VersionInfoKeys>
-			<VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys>
-			<VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
-			<VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys>
-			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
-			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
-			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
-		</VersionInfoKeys>
-	</Delphi.Personality>
-	<ModelSupport>True</ModelSupport>
-	<UnitTesting>
-		<TestFramework>DUnit / Delphi Win32</TestFramework>
-		<TestRunner>Console</TestRunner>
-	</UnitTesting>
-	<!-- EurekaLog First Line
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{77CE066E-3A47-45D3-9A15-E1CE209D5008}</ProjectGuid>
+			<MainSource>BrowseAndDocItTests2006.dpr</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+			<ProjectVersion>12.0</ProjectVersion>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_UnitSearchPath>$(BDSPROJECTSDIR)\Library\DUnit\src;$(BDSPROJECTSDIR)\Library\JCL\source;$(BDSPROJECTSDIR)\Library\JCL\source\common;$(BDSPROJECTSDIR)\Library\JCL\source\windows;$(BDSPROJECTSDIR)\LIBRARY\JCL\source\include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_Platform>x86</DCC_Platform>
+			<DCC_DependencyCheckOutputName>BrowseAndDocItTests2006.exe</DCC_DependencyCheckOutputName>
+			<DCC_MapFile>3</DCC_MapFile>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
+			<DCC_RangeChecking>true</DCC_RangeChecking>
+			<DCC_Define>EUREKALOG;CONSOLE_TESTRUNNER;USE_JEDI_JCL;EUREKALOG_VER6;$(DCC_Define)</DCC_Define>
+			<DCC_Optimize>false</DCC_Optimize>
+			<DCC_F>false</DCC_F>
+			<DCC_E>false</DCC_E>
+			<DCC_K>false</DCC_K>
+			<DCC_S>false</DCC_S>
+			<DCC_N>true</DCC_N>
+			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+			<DCC_UsePackage>vclx;vcl;rtl;dbrtl;vcldb;adortl;dbxcds;dbexpress;xmlrtl;vclie;inet;inetdbbde;inetdbxpress;dclOfficeXP;soaprtl;dsnap;vclactnband;bdertl;vcldbx</DCC_UsePackage>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+			<DCC_DcuOutput>..\2006DCUs\</DCC_DcuOutput>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="BrowseAndDocItTests2006.dpr">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<None Include="ModelSupport_BrowseAndDocItTests2006\default.txaPackage"/>
+			<None Include="..\..\..\LIBRARY\CompilerDefinitions.inc">
+				<ContainerId>File</ContainerId>
+			</None>
+			<DCCReference Include="..\..\..\LIBRARY\dghlibrary.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestDGHLibrary.pas"/>
+			<DCCReference Include="..\..\..\Library\BaseLanguageModule.pas"/>
+			<DCCReference Include="..\..\..\Library\Test\Source\TestBaseLanguageModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\VBModule.pas"/>
+			<DCCReference Include="..\..\..\Library\Test\Source\TestVBModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\ModuleDispatcher.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\PascalModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestPascalModule.pas"/>
+			<DCCReference Include="..\Source\CommonIDEFunctions.pas"/>
+			<DCCReference Include="..\Source\Tests\Source\TestCommonIDEFunctions.pas"/>
+			<DCCReference Include="..\..\..\Library\XMLModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestBackusNaurModule.pas"/>
+			<DCCReference Include="..\..\..\Library\GenericTokenizer.pas"/>
+			<DCCReference Include="..\..\..\Library\Test\Source\TestGenericTokenizer.pas"/>
+			<DCCReference Include="..\..\..\Library\BackusNaurModule.pas"/>
+			<DCCReference Include="..\..\..\Library\Test\Source\TestXMLModule.pas"/>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Source>
+						<Source Name="MainSource">BrowseAndDocItTests2006.dpr</Source>
+					</Source>
+					<Parameters>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">1</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">8</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">2057</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName"/>
+						<VersionInfoKeys Name="FileDescription"/>
+						<VersionInfoKeys Name="FileVersion">1.0.0.8</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName"/>
+						<VersionInfoKeys Name="LegalCopyright"/>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName"/>
+						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+					</VersionInfoKeys>
+				</Delphi.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>
+
+<!-- EurekaLog First Line
 [Exception Log]
 EurekaLog Version=6020
 Activate=1
@@ -204,21 +161,21 @@ AutoCloseDialogSecs=0
 WebSendMode=0
 SupportULR=
 HTMLLayout Count=15
-HTMLLine0="%3Chtml%3E"
-HTMLLine1="  %3Chead%3E"
-HTMLLine2="  %3C/head%3E"
-HTMLLine3="  %3Cbody TopMargin=10 LeftMargin=10%3E"
-HTMLLine4="    %3Ctable width="100%%" border="0"%3E"
-HTMLLine5="      %3Ctr%3E"
-HTMLLine6="        %3Ctd nowrap%3E"
-HTMLLine7="          %3Cfont face="Lucida Console, Courier" size="2"%3E"
-HTMLLine8="            %3C%%HTML_TAG%%%3E"
-HTMLLine9="          %3C/font%3E"
-HTMLLine10="        %3C/td%3E"
-HTMLLine11="      %3C/tr%3E"
-HTMLLine12="    %3C/table%3E"
-HTMLLine13="  %3C/body%3E"
-HTMLLine14="%3C/html%3E"
+HTMLLine0="%U003Chtml%U003E"
+HTMLLine1="  %U003Chead%U003E"
+HTMLLine2="  %U003C/head%U003E"
+HTMLLine3="  %U003Cbody TopMargin=10 LeftMargin=10%U003E"
+HTMLLine4="    %U003Ctable width="100%%" border="0"%U003E"
+HTMLLine5="      %U003Ctr%U003E"
+HTMLLine6="        %U003Ctd nowrap%U003E"
+HTMLLine7="          %U003Cfont face="Lucida Console, Courier" size="2"%U003E"
+HTMLLine8="            %U003C%%HTML_TAG%%%U003E"
+HTMLLine9="          %U003C/font%U003E"
+HTMLLine10="        %U003C/td%U003E"
+HTMLLine11="      %U003C/tr%U003E"
+HTMLLine12="    %U003C/table%U003E"
+HTMLLine13="  %U003C/body%U003E"
+HTMLLine14="%U003C/html%U003E"
 AutoCrashOperation=2
 AutoCrashNumber=10
 AutoCrashMinutes=1
@@ -381,21 +338,21 @@ mtDialog_CPUCaption0="CPU"
 Count mtDialog_CPUHeader=1
 mtDialog_CPUHeader0="CPU Information"
 Count mtDialog_OKButtonCaption=1
-mtDialog_OKButtonCaption0="%26OK"
+mtDialog_OKButtonCaption0="%U0026OK"
 Count mtDialog_TerminateButtonCaption=1
-mtDialog_TerminateButtonCaption0="%26Terminate"
+mtDialog_TerminateButtonCaption0="%U0026Terminate"
 Count mtDialog_RestartButtonCaption=1
-mtDialog_RestartButtonCaption0="%26Restart"
+mtDialog_RestartButtonCaption0="%U0026Restart"
 Count mtDialog_DetailsButtonCaption=1
-mtDialog_DetailsButtonCaption0="%26Details"
+mtDialog_DetailsButtonCaption0="%U0026Details"
 Count mtDialog_CustomButtonCaption=1
-mtDialog_CustomButtonCaption0="%26Help"
+mtDialog_CustomButtonCaption0="%U0026Help"
 Count mtDialog_SendMessage=1
-mtDialog_SendMessage0="%26Send this error via Internet"
+mtDialog_SendMessage0="%U0026Send this error via Internet"
 Count mtDialog_ScreenshotMessage=1
-mtDialog_ScreenshotMessage0="%26Attach a Screenshot image"
+mtDialog_ScreenshotMessage0="%U0026Attach a Screenshot image"
 Count mtDialog_CopyMessage=1
-mtDialog_CopyMessage0="%26Copy to Clipboard"
+mtDialog_CopyMessage0="%U0026Copy to Clipboard"
 Count mtDialog_SupportMessage=1
 mtDialog_SupportMessage0="Go to the Support Page"
 Count mtMSDialog_ErrorMsgCaption=1
@@ -417,9 +374,9 @@ mtMSDialog_HowToReproduceCaption0="What were you doing when the problem happened
 Count mtMSDialog_EmailCaption=1
 mtMSDialog_EmailCaption0="Email address (optional):"
 Count mtMSDialog_SendButtonCaption=1
-mtMSDialog_SendButtonCaption0="%26Send Error Report"
+mtMSDialog_SendButtonCaption0="%U0026Send Error Report"
 Count mtMSDialog_NoSendButtonCaption=1
-mtMSDialog_NoSendButtonCaption0="%26Don't Send"
+mtMSDialog_NoSendButtonCaption0="%U0026Don't Send"
 Count mtLog_AppHeader=1
 mtLog_AppHeader0="Application"
 Count mtLog_AppStartDate=1
@@ -597,7 +554,7 @@ mtReproduceDialog_Caption0="Request"
 Count mtReproduceDialog_Request=1
 mtReproduceDialog_Request0="Please describe the steps to reproduce the error:"
 Count mtReproduceDialog_OKButtonCaption=1
-mtReproduceDialog_OKButtonCaption0="%26OK"
+mtReproduceDialog_OKButtonCaption0="%U0026OK"
 Count mtModules_Handle=1
 mtModules_Handle0="Handle"
 Count mtModules_Name=1
@@ -666,4 +623,3 @@ Count mtInvalidEmailMsg=1
 mtInvalidEmailMsg0="Invalid email."
 TextsCollection=
 EurekaLog Last Line -->
-</BorlandProject>

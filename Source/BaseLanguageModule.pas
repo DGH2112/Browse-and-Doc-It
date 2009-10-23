@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    21 Sep 2009
+  @Date    23 Oct 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -2325,7 +2325,7 @@ Var
   BrowseAndDocItOptions : TBrowseAndDocItOptions;
 
   Function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
-  Function IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; InLine;
+  Function IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; {$IFDEF D2005} InLine; {$ENDIF}
 
 Implementation
 
@@ -2484,7 +2484,7 @@ end;
   @return  a Boolean
 
 **)
-Function IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; InLine;
+Function IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; {$IFDEF D2005} InLine; {$ENDIF}
 
 Begin
   {$IFNDEF D2009}

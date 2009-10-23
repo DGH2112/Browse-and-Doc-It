@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Jul 2009
+  @Date    23 Oct 2009
 
 **)
 library BrowseAndDocIt2009;
@@ -33,6 +33,9 @@ uses
   DGHLibrary in '..\..\..\Library\DGHLibrary.pas',
   BaseLanguageModule in '..\..\..\Library\BaseLanguageModule.pas',
   BrowseAndDocItWizard in '..\Source\BrowseAndDocItWizard.pas',
+  BNFHighlighter in '..\Source\BNFHighlighter.pas',
+  KeyboardBindings in '..\Source\KeyboardBindings.pas',
+  EditorNotifier in '..\Source\EditorNotifier.pas',
   DockableModuleExplorer in '..\Source\DockableModuleExplorer.pas' {frmDockableModuleExplorer},
   ModuleExplorerFrame in '..\..\..\Library\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
   OptionsForm in '..\..\..\Library\OptionsForm.pas' {frmOptions},
@@ -62,7 +65,11 @@ uses
   CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
   GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas',
-  BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas';
+  XMLModule in '..\..\..\Library\XMLModule.pas',
+  EidolonHighlighter in '..\Source\EidolonHighlighter.pas',
+  BackusNaurModule in '..\..\..\Library\BackusNaurModule.pas',
+  EidolonModule in '..\..\..\Library\EidolonModule.pas',
+  DFMModule in '..\..\..\Library\DFMModule.pas';
 
 {$R *.res}
 

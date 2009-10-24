@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    23 Oct 2009
+  @Date    24 Oct 2009
   @Version 1.0
 
 **)

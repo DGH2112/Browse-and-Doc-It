@@ -4,7 +4,7 @@
   IDE to show Backus-Naur grammar.
 
   @Version 1.0
-  @Date    23 Oct 2009
+  @Date    24 Oct 2009
   @Author  David Hoyle
 
 **)
@@ -19,7 +19,7 @@ Uses
 
 Type
   (** A class to define an new IDE Highlighter for BNF Grammar **)
-  TBNFHighlighter = Class(TNotifierObject, IOTAHighlighter {$IFDEF D2005}, IOTAHighlighterPreview {$ENDIF})
+  TBNFHighlighter = Class(TNotifierObject, IOTANotifier, IOTAHighlighter {$IFDEF D2005}, IOTAHighlighterPreview {$ENDIF})
   {$IFDEF D2005} Strict {$ENDIF} Private
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
@@ -30,6 +30,7 @@ Type
       HighlightCodes: POTASyntaxCode);
     function TokenizeLineClass(StartClass: Byte; LineBuf: PAnsiChar;
       LineBufLen: Word): Byte;
+  {$IFDEF D2005}
     function  GetBlockEndCol: Integer;
     function  GetBlockEndLine: Integer;
     function  GetBlockStartCol: Integer;
@@ -42,6 +43,7 @@ Type
     function  GetSampleSearchText: string;
     function  GetSampleText: string;
     function  GetValidBreakpointLine: Integer;
+  {$ENDIF}
   End;
 
 Implementation
@@ -76,6 +78,7 @@ begin
     End;
 end;
 
+{$IFDEF D2005}
 (**
 
   This method returns the end column of the highlighted block in the preview.
@@ -198,6 +201,8 @@ begin
   Result := -1;
 end;
 
+{$ENDIF}
+
 (**
 
   This method returns a unique string ID for the highlighter.
@@ -212,6 +217,8 @@ function TBNFHighlighter.GetIDString: string;
 begin
   Result := 'DGH.Backus-Naur Grammar Highlighter';
 end;
+
+{$IFDEF D2005}
 
 (**
 
@@ -228,6 +235,8 @@ begin
   Result := -1;
 end;
 
+{$ENDIF}
+
 (**
 
   This method returns the descriptive name for the highlighter.
@@ -242,6 +251,8 @@ function TBNFHighlighter.GetName: string;
 begin
   Result := 'Backus-Naur Grammar';
 end;
+
+{$IFDEF D2005}
 
 (**
 
@@ -320,6 +331,8 @@ function TBNFHighlighter.GetValidBreakpointLine: Integer;
 begin
   Result := -1;
 end;
+
+{$ENDIF}
 
 (**
 

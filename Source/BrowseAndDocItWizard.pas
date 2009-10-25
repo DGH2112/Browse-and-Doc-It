@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    24 Oct 2009
+  @Date    25 Oct 2009
   @Version 1.0
 
 **)
@@ -19,7 +19,7 @@ Uses
 
 Type
   (** This is the class which defined the Wizard interface. **)
-  TBrowseAndDocItWizard = Class(TNotifierObject, IOTAWizard)
+  TBrowseAndDocItWizard = Class(TNotifierObject, IOTANotifier, IOTAWizard)
   {$IFDEF D2005} Strict {$ENDIF} Private
     mmiPascalDocMenu : TMenuItem;
     FCounter : Integer;
@@ -380,6 +380,8 @@ begin
   If mmiPascalDocMenu <> Nil Then
     mmiPascalDocMenu.Free;
   {$IFNDEF D2005}
+  FMenuTimer.Enabled := False;
+  FMenuTimer.OnTimer := Nil;
   FMenuShortCuts.Free;
   FMenus.Free;
   FMenuTimer.Free;

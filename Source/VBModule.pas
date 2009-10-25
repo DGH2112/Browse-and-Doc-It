@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       22 Sep 2009
+  @Date       25 Oct 2009
   @Author     David Hoyle
 
 **)
@@ -1536,9 +1536,9 @@ Begin
   FSource := Source;
   AddTickCount('Start');
   CommentClass := TVBComment;
-  If AnsiCompareText(ExtractFileExt(FileName), '.cls') = 0 Then
+  If CompareText(ExtractFileExt(FileName), '.cls') = 0 Then
     FModuleType := mtClass
-  Else If AnsiCompareText(ExtractFileExt(FileName), '.frm') = 0 Then
+  Else If CompareText(ExtractFileExt(FileName), '.frm') = 0 Then
     FModuleType := mtForm
   Else
     FModuleType := mtModule;
@@ -2198,7 +2198,7 @@ Var
 begin
   Result := False;
   If (Token.TokenType In [ttIdentifier, ttDirective]) And
-    (AnsiCompareText(Token.Token, 'endproperty') <> 0) Then
+    (CompareText(Token.Token, 'endproperty') <> 0) Then
     Begin
       Result := True;
       A := C.Add(TVBAttribute.Create(Token.Token, scNone, Token.Line,
@@ -2715,7 +2715,7 @@ Begin
         If Token.Token = '.' Then
           Begin
             NextNonCommentToken;
-            If AnsiCompareText(Token.Token, 'Push') = 0 Then
+            If CompareText(Token.Token, 'Push') = 0 Then
               Begin
                 AExceptionHnd.HasPush := True;
                 NextNonCommentToken;
@@ -2738,7 +2738,7 @@ Begin
                     NextNonCommentToken;
                   End;
               End;
-            If AnsiCompareText(Token.Token, 'Pop') = 0 Then
+            If CompareText(Token.Token, 'Pop') = 0 Then
               Begin
                 AExceptionHnd.HasPop := True;
                 NextNonCommentToken;
@@ -2749,7 +2749,7 @@ Begin
     If CompareText(Token.Token, 'On') = 0 Then
       Begin
         NextNonCommentToken;
-        If AnsiCompareText(Token.Token, 'Error') = 0 Then
+        If CompareText(Token.Token, 'Error') = 0 Then
           Begin
             AExceptionHnd.HasErrorHnd := True;
             NextNonCommentToken;
@@ -3252,7 +3252,7 @@ function TVBModule.ReferenceSymbol(AToken: TTokenInfo): Boolean;
     boolFound := False;
     If Section <> Nil Then
       For i := 1 To Section.ElementCount Do
-        If AnsiCompareText(Section[i].Identifier, AToken.Token) = 0 Then
+        If CompareText(Section[i].Identifier, AToken.Token) = 0 Then
           Begin
             Section[i].Referenced := True;
             AToken.Reference := trResolved;
@@ -3371,7 +3371,7 @@ begin
     AddIssue(Format(strExceptionPushName, [M.Identifier]), scNone,
     'CheckExceptionHandling', M.Line, M.Column, etWarning);
   If Not boolNoTag Then
-    If AnsiCompareText(Format('"%s.%s"', [ModuleName, M.Identifier]),
+    If CompareText(Format('"%s.%s"', [ModuleName, M.Identifier]),
       ExceptionHandler.PushName) <> 0 Then
       AddIssue(Format(strExceptionPushNameIncorrect,
         [ExceptionHandler.PushName, ModuleName, M.Identifier]), scNone,

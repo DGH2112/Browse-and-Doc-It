@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    16 Sep 2009
+  @Date    25 Oct 2009
   @Version 1.0
 
 **)
@@ -461,7 +461,7 @@ Begin
       Begin
         boolIgnore := False;
         For j := Low(strSections) To High(strSections) Do
-          If AnsiCompareText(FCurrentModule[i].AsString(True, True), strSections[j]) = 0 Then
+          If CompareText(FCurrentModule[i].AsString(True, True), strSections[j]) = 0 Then
             Begin
               boolIgnore := True;
               Break;
@@ -808,12 +808,12 @@ begin
         For i := 0 To FIndex.Count - 1 Do
           Begin
             strCurAlpha := UpperCase(FIndex[i][1]);
-            If (strLastAlpha <> '') And (AnsiCompareText(strCurAlpha, strLastAlpha) <> 0) Then
+            If (strLastAlpha <> '') And (CompareText(strCurAlpha, strLastAlpha) <> 0) Then
               Begin
                 slC.Add('  </table>');
                 slC.Add('</div>');
               End;
-            If AnsiCompareText(strCurAlpha, strLastAlpha) <> 0 Then
+            If CompareText(strCurAlpha, strLastAlpha) <> 0 Then
               Begin
                 slC.Add('<hr/>');
                 slC.Add(H(A(strCurAlpha, '', strCurAlpha), 2, iiNone, scNone));
@@ -982,7 +982,7 @@ begin
       For j := 0 To TagCount - 1 Do
         For k := 0 To FModuleSpecialTagNodes.Count - 1 Do
           If Integer(BrowseAndDocItOptions.SpecialTags.Objects[k]) And iShowInDoc > 0 Then
-            If AnsiCompareText(Tag[j].TagName,
+            If CompareText(Tag[j].TagName,
               BrowseAndDocItOptions.SpecialTags.Names[k]) = 0 Then
               Begin
                 (FSummarySpecialTagNodes[k] As TStringList).Add(
@@ -1287,7 +1287,7 @@ begin
               strIndent, SpecialTags.ValueFromIndex[i]]));
             slContents.Add(Format('%s  <ul>', [strIndent]));
             For j := 0 To E.Comment.TagCount - 1 Do
-              If AnsiCompareText(E.Comment.Tag[j].TagName, SpecialTags.Names[i]) = 0 Then
+              If CompareText(E.Comment.Tag[j].TagName, SpecialTags.Names[i]) = 0 Then
                 Begin
                   strTags := '';
                   For k := 0 To E.Comment.Tag[j].TokenCount - 1 Do

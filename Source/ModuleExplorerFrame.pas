@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    01 Aug 2009
+  @Date    25 Oct 2009
   @Author  David Hoyle
   @Version 1.0
 
@@ -501,7 +501,7 @@ Begin
                     DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
                     DrawTextBiDiModeFlagsReadingOnly) + 1);
                   For j := 0 To FComment.TagCount - 1 Do
-                    If AnsiCompareText(BrowseAndDocItOptions.SpecialTags.Names[i], FComment.Tag[j].TagName) = 0 Then
+                    If CompareText(BrowseAndDocItOptions.SpecialTags.Names[i], FComment.Tag[j].TagName) = 0 Then
                       Begin
                         Pen.Color := clBlack;
                         Brush.Color := clBlack;
@@ -612,7 +612,7 @@ Begin
                 DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
                 DrawTextBiDiModeFlagsReadingOnly) + 2);
               For j := 0 To Comment.TagCount - 1 Do
-                If AnsiCompareText(BrowseAndDocItOptions.SpecialTags.Names[i], Comment.Tag[j].TagName) = 0 Then
+                If CompareText(BrowseAndDocItOptions.SpecialTags.Names[i], Comment.Tag[j].TagName) = 0 Then
                   Begin
                     Refresh;
                     Canvas.Font.Style := [];
@@ -699,7 +699,7 @@ Var
 Begin
   Result := False;
   For i := 0 To Comment.TagCount - 1 Do
-    If AnsiCompareText(strSpecialTag, Comment.Tag[i].TagName) = 0 Then
+    If CompareText(strSpecialTag, Comment.Tag[i].TagName) = 0 Then
       Begin
         Result := True;
         Exit;
@@ -801,7 +801,7 @@ Begin
       For j := 0 To TagCount - 1 Do
         For k := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
           If FSpecialTagNodes[k].boolShow Then
-            If AnsiCompareText(Tag[j].TagName, FSpecialTagNodes[k].strTagName) = 0 Then
+            If CompareText(Tag[j].TagName, FSpecialTagNodes[k].strTagName) = 0 Then
               AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(MaxInt, False),
                 Tag[j].Name, 2, Integer(iiToDoItem) - 1, M.BodyComment[i].Tag[j].Line,
                 M.BodyComment[i].Tag[j].Column, False, Nil);
@@ -1013,7 +1013,7 @@ Function TframeModuleExplorer.FindTreeItem(strText : String) : PVirtualNode;
             Result := FindNode(C);
           If Result <> Nil Then
             Exit;
-          If AnsiCompareText(GetNodePath(C), strText) = 0 Then
+          If CompareText(GetNodePath(C), strText) = 0 Then
             Begin
               Result := C;
               Exit;
@@ -1184,7 +1184,7 @@ begin
       While Node <> Nil Do
         Begin
           NodeData := FExplorer.GetNodeData(Node);
-          If AnsiCompareText(NodeData.FNode.Text, strDocumentationConflicts) = 0 Then
+          If CompareText(NodeData.FNode.Text, strDocumentationConflicts) = 0 Then
             If doShowConflicts In BrowseAndDocItOptions.Options Then
               Begin
                 FExplorer.Expanded[Node] := True;
@@ -1195,13 +1195,13 @@ begin
                     N := FExplorer.GetNextSibling(N);
                   End;
               End;
-          If AnsiCompareText(NodeData.FNode.Text, strHints) = 0 Then
+          If CompareText(NodeData.FNode.Text, strHints) = 0 Then
             If doShowHints In BrowseAndDocItOptions.Options Then
               FExplorer.Expanded[Node] := True;
-          If AnsiCompareText(NodeData.FNode.Text, strWarnings) = 0 Then
+          If CompareText(NodeData.FNode.Text, strWarnings) = 0 Then
             If doShowWarnings In BrowseAndDocItOptions.Options Then
               FExplorer.Expanded[Node] := True;
-          If AnsiCompareText(NodeData.FNode.Text, strErrors) = 0 Then
+          If CompareText(NodeData.FNode.Text, strErrors) = 0 Then
             If doShowErrors In BrowseAndDocItOptions.Options Then
               FExplorer.Expanded[Node] := True;
           Node := FExplorer.GetNextSibling(Node);

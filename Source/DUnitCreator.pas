@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    07 Oct 2009
+  @Date    25 Oct 2009
 
 **)
 unit DUnitCreator;
@@ -464,7 +464,7 @@ Function SortClassEndTokens(List: TStringList; Index1, Index2: Integer): Integer
 Begin
   Result := Integer(List.Objects[Index1]) - Integer(List.Objects[Index2]);
   If Result = 0 Then
-    Result := AnsiCompareText(List[Index1], List[Index2]);
+    Result := CompareText(List[Index1], List[Index2]);
 End;
 
 (**
@@ -1197,7 +1197,7 @@ begin
   G := ProjectGroup;
   If G <> Nil Then
     For i := 0 To G.ProjectCount - 1 Do
-      If AnsiCompareText(ExtractFileName(G.Projects[i].CurrentEditor.FileName),
+      If CompareText(ExtractFileName(G.Projects[i].CurrentEditor.FileName),
         strProjectName) = 0 Then
         Begin
           Result := True;
@@ -1230,7 +1230,7 @@ begin
   Result := False;
   P := FProjects[iProject];
   For i := 0 To P.GetModuleCount - 1 Do
-    If AnsiCompareText(ExtractFileName(P.GetModule(i).FileName),
+    If CompareText(ExtractFileName(P.GetModule(i).FileName),
       strUnitName) = 0 Then
       Begin
         Result := True;

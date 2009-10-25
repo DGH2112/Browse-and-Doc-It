@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    07 Oct 2009
+  @Date    25 Oct 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -119,8 +119,15 @@ End;
 **)
 Function ActiveSourceEditor : IOTASourceEditor;
 
+Var
+  CM : IOTAModule;
+
 Begin
-  Result := SourceEditor((BorlandIDEServices as IOTAModuleServices).CurrentModule);
+  Result := Nil;
+  If BorlandIDEServices = Nil Then
+    Exit;
+  CM := (BorlandIDEServices as IOTAModuleServices).CurrentModule;
+  Result := SourceEditor(CM);
 End;
 
 (**

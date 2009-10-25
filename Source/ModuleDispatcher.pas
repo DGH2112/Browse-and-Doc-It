@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    07 Oct 2009
+  @Date    25 Oct 2009
   @Version 1.0
 
 **)
@@ -87,7 +87,7 @@ Begin
   While iFirst <= iLast Do
     Begin
       iMid := (iFirst + iLast) Div 2;
-      i := AnsiCompareText(Modules[iMid].FExt, strExt);
+      i := CompareText(Modules[iMid].FExt, strExt);
       If i = 0 Then
         Begin
           Result := iMid;

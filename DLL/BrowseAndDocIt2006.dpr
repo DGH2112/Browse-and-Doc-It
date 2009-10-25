@@ -1,4 +1,4 @@
-(**
+Í(**
 
   This module defines a DLL which can be loaded by the BDS IDE.
 

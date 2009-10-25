@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Apr 2009
+  @Date    25 Oct 2009
 
 **)
 Unit CheckForUpdates;
@@ -372,7 +372,7 @@ Var
 Begin
   Result := '';
   For i := 0 To P.childNodes.length - 1 Do
-    If AnsiCompareText(P.childNodes[i].nodeName, strName) = 0 Then
+    If CompareText(P.childNodes[i].nodeName, strName) = 0 Then
       Begin
         Result := P.childNodes[i].text;
         Break;

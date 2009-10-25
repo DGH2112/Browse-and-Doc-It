@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Aug 2009
+  @Date    25 Oct 2009
   
 **)
 Unit KeyboardBindings;
@@ -20,7 +20,7 @@ Uses
 Type
   (** This class represents a key binding notifier for installing and handling
       key bindings for this plugin. **)
-  TKeyboardBinding = Class(TNotifierObject, IOTAKeyboardBinding)
+  TKeyboardBinding = Class(TNotifierObject, IOTANotifier, IOTAKeyboardBinding)
   {$IFDEF D2005} Strict {$ENDIF} Private
     FWizard : TBrowseAndDocItWizard;
     Procedure FocusModuleExplorer(const Context: IOTAKeyContext;

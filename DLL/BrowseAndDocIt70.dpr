@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Feb 2009
+  @Date    24 Oct 2009
 
 **)
 library BrowseAndDocIt70;

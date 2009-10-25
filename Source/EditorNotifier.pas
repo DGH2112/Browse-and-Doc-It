@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    23 Oct 2009
+  @Date    25 Oct 2009
   @Author  David Hoyle
 
 **)
@@ -92,6 +92,8 @@ end;
 **)
 destructor TEditorNotifier.Destroy;
 begin
+  FupdateTimer.Enabled := False;
+  FUpdateTimer.OnTimer := Nil;
   FUpdateTimer.Free;
   inherited;
 end;

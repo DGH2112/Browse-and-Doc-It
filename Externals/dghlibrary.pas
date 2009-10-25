@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    07 Oct 2009
+  @Date    25 Oct 2009
 
 **)
 Unit DGHLibrary;
@@ -6198,7 +6198,8 @@ Var
   MatchTypes : TMatchTypes;
   sl : TStringList;
   i: Integer;
-  iIndex : Integer;
+  iTokenIndex : Integer;
+  iStartIndex : Integer;
   iPos: Integer;
 
 Begin
@@ -6219,21 +6220,22 @@ Begin
     For i := 1 To CharCount('*', strPattern) + 1 Do
       sl.Add(lowercase(GetField(strPattern, '*', i)));
     // Check start
-    iIndex := 1;
+    iTokenIndex := 1;
+    iStartIndex := 1;
     If sl.Count > 0 Then
       If mtStart In MatchTypes Then
         If AnsiCompareText(sl[0], Copy(strText, 1, Length(sl[0]))) <> 0 Then
           Exit
         Else
-          Inc(iIndex, Length(sl[0]));
+          Inc(iStartIndex, Length(sl[0]));
     // Check in between
     For i := Integer(mtStart In MatchTypes) To sl.Count - 1 - Integer(mtEnd In MatchTypes) Do
       Begin
         iPos := Pos(sl[i], lowercase(strText));
-        If (iPos = 0) Or (iPos < iIndex) Then
+        If (iPos = 0) Or (iPos < iStartIndex) Then
           Exit;
-        Inc(iIndex, iPos);
-        Inc(iIndex, Length(sl[i]));
+        Inc(iTokenIndex, iPos);
+        Inc(iStartIndex, Length(sl[i]));
       End;
     // Check end
     If sl.Count > 0 Then

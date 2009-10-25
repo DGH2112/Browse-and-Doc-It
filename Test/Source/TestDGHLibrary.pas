@@ -583,6 +583,7 @@ Begin
   Check(    Like('*had*little*', strText), '7');
   Check(Not Like('*had*litle*', strText), '8');
   Check(Not Like('*little*had*', strText), '9');
+  Check(Like('*library*testprojectdll*;*', 'Library TestProjectDLL;'), '10');
 End;
 
 procedure TestApplicationFunctions.TestExtractFileNameOnly;

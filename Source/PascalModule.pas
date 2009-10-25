@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       07 Oct 2009
+  @Date       25 Oct 2009
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -1415,7 +1415,7 @@ Var
 begin
   Result := False;
   For i := 0 To Directives.Count - 1 Do
-    If AnsiCompareText(strDirective,
+    If CompareText(strDirective,
       Copy(Directives[i], 1, Length(strDirective))) = 0 Then
       Begin
         Result := True;
@@ -1458,7 +1458,7 @@ begin
     If Elements[i] Is TPascalMethod Then
       Begin
         M := Elements[i] As TPascalMethod;
-        If AnsiCompareText(AToken.Token, M.Identifier) = 0 Then
+        If CompareText(AToken.Token, M.Identifier) = 0 Then
           Begin
             M.Referenced := True;
             AToken.Reference := trResolved;
@@ -1842,7 +1842,7 @@ begin
   If FMethodsLabel <> Nil Then
     Begin
       For i := 1 To FMethodslabel.ElementCount Do
-        If AnsiCompareText(AToken.Token, FMethodslabel[i].Identifier) = 0 Then
+        If CompareText(AToken.Token, FMethodslabel[i].Identifier) = 0 Then
           Begin
             FMethodslabel[i].Referenced := True;
             AToken.Reference := trResolved;
@@ -4565,7 +4565,7 @@ begin
   E := FImplementedMethodsLabel;
   If E <> Nil Then
     For i := 1 To E.ElementCount Do
-      If AnsiCompareText(E[i].Identifier, AToken.Token) = 0 Then
+      If CompareText(E[i].Identifier, AToken.Token) = 0 Then
         Begin
           E[i].Referenced := True;
           AToken.Reference := trResolved;
@@ -4583,7 +4583,7 @@ begin
           E := M.ObjClsInt.MethodsLabel;
           If E <> Nil Then
             For i := 1 To E.ElementCount Do
-              If AnsiCompareText(E[i].Identifier, AToken.Token) = 0 Then
+              If CompareText(E[i].Identifier, AToken.Token) = 0 Then
                 Begin
                   E[i].Referenced := True;
                   AToken.Reference := trResolved;
@@ -8936,7 +8936,7 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
   Begin
     Result := False;
     If Length(strText) >= Length(strStart) Then
-      Result := AnsiCompareText(Copy(strText, 1, Length(strStart)), strStart) = 0;
+      Result := CompareText(Copy(strText, 1, Length(strStart)), strStart) = 0;
   End;
 
   (**

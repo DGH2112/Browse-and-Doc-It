@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    22 Sep 2009
+  @Date    25 Oct 2009
   @Author  David Hoyle
 
 **)
@@ -591,11 +591,11 @@ Var
 begin
   Result := Nil;
   For i := 1 To FVBEIDE.VBProjects.Count Do
-    If AnsiCompareText(FVBEIDE.VBProjects.Item(i).Name, strProject) = 0 Then
+    If CompareText(FVBEIDE.VBProjects.Item(i).Name, strProject) = 0 Then
       Begin
         Project := FVBEIDE.VBProjects.Item(i);
         For j := 1 To Project.VBComponents.Count Do
-          If AnsiCompareText(Project.VBComponents.Item(j).Name, strModule) = 0 Then
+          If CompareText(Project.VBComponents.Item(j).Name, strModule) = 0 Then
             Begin
               Result := Project.VBComponents.Item(j);
               Exit;

@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    23 Oct 2009
+  @Date    25 Oct 2009
   @Version 1.0
   @Author  David Hoyle
 
@@ -3192,7 +3192,7 @@ Var
 begin
   Result := -1;
   For i := 0 To TagCount - 1 Do
-    If AnsiCompareText(Tag[i].TagName, strTagName) = 0 Then
+    If CompareText(Tag[i].TagName, strTagName) = 0 Then
       Begin
         Result := i;
         Break;
@@ -3825,9 +3825,9 @@ begin
         Begin
           iMid := (iFirst + iLast) Div 2;
           If FindType = ftName Then
-            iResult := AnsiCompareText(Elements[iMid].Name, strName)
+            iResult := CompareText(Elements[iMid].Name, strName)
           Else
-            iResult := AnsiCompareText(Elements[iMid].Identifier, strName);
+            iResult := CompareText(Elements[iMid].Identifier, strName);
           If iResult = 0 Then
             Begin
               Result := iMid;
@@ -3841,7 +3841,7 @@ begin
     End Else
     Begin // Sequential search...
       For iFirst := 1 To ElementCount Do
-        If AnsiCompareText(Elements[iFirst].Name, strName) = 0 Then
+        If CompareText(Elements[iFirst].Name, strName) = 0 Then
           Begin
             Result := iFirst;
             Break;
@@ -3917,7 +3917,7 @@ var
 begin
   Result := -1;
   For i := 0 To TokenCount - 1 Do
-    If AnsiCompareText(strToken, Tokens[i].Token) = 0 Then
+    If CompareText(strToken, Tokens[i].Token) = 0 Then
       Begin
         Result := i;
         Break;
@@ -4377,7 +4377,7 @@ Begin
             strType := Trim(strType);
             strParam := BuildLangIndepRep(Parameters[i]);
             If doShowMethodIncorrectParamType In BrowseAndDocItOptions.Options Then
-              If AnsiCompareText(strType, strParam) <> 0 Then
+              If CompareText(strType, strParam) <> 0 Then
                 AddDocumentConflict([Parameters[i].Identifier, FunctionType, 
                   QualifiedName, strParam], Tag[iFound].Line, Tag[iFound].Column,
                   Comment, Format(strFunctionDocumentation, [FunctionType]),
@@ -4422,7 +4422,7 @@ Begin
       If ReturnType <> Nil Then
         With Comment Do
           For j := 0 To TagCount - 1 Do
-            If AnsiCompareText(Tag[j].TagName, 'return') = 0 Then
+            If CompareText(Tag[j].TagName, 'return') = 0 Then
               Begin
                 iFound := j;
                 Break;
@@ -4449,7 +4449,7 @@ Begin
               strType := Trim(strType);
               If ReturnType <> Nil Then
                 strReturn := ReturnType.AsString(False, False);
-              If AnsiCompareText(strReturn, strType) <> 0 Then
+              If CompareText(strReturn, strType) <> 0 Then
                 AddDocumentConflict([FunctionType, QualifiedName, strReturn],
                   Comment.Tag[iFound].Line, Comment.Tag[iFound].Column, Comment,
                   Format(strFunctionDocumentation, [FunctionType]),
@@ -5247,9 +5247,9 @@ begin
   iFinish := 0;
   For i := 0 To FTickList.Count - 1 Do
     Begin
-      If AnsiComparetext(FTickList[i], strStart) = 0 Then
+      If Comparetext(FTickList[i], strStart) = 0 Then
         iStart := i;
-      If AnsiComparetext(FTickList[i], strFinish) = 0 Then
+      If Comparetext(FTickList[i], strFinish) = 0 Then
         iFinish := i;
     End;
   If (iStart > -1) And (iFinish > -1) Then

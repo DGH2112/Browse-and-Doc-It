@@ -1453,7 +1453,7 @@ Begin
           If IsKeyWord(sl[iIndex1], Months) Then
             Begin
               For i := Low(Months) To High(Months) Do
-                If SysUtils.AnsiCompareText(Months[i], sl[iIndex1]) = 0 Then
+                If CompareText(Months[i], sl[iIndex1]) = 0 Then
                   Begin
                     recDate.iMonth := MonthIndexes[i];
                     Break;
@@ -5682,7 +5682,7 @@ begin
   strModulePathAndName := ChangeFileExt(StrPas(Buffer), '');
   Result := Format('%s Settings for %s on %s.INI', [strModulePathAndName,
     strUserName, strComputerName]);
-  If AnsiCompareText(ExtractFileExt(StrPas(Buffer)), '.exe') = 0 Then
+  If CompareText(ExtractFileExt(StrPas(Buffer)), '.exe') = 0 Then
     If slParams <> Nil Then
       For iParam := 1 To ParamCount Do
         Begin
@@ -6224,7 +6224,7 @@ Begin
     iStartIndex := 1;
     If sl.Count > 0 Then
       If mtStart In MatchTypes Then
-        If AnsiCompareText(sl[0], Copy(strText, 1, Length(sl[0]))) <> 0 Then
+        If CompareText(sl[0], Copy(strText, 1, Length(sl[0]))) <> 0 Then
           Exit
         Else
           Inc(iStartIndex, Length(sl[0]));
@@ -6240,7 +6240,7 @@ Begin
     // Check end
     If sl.Count > 0 Then
       If mtEnd In MatchTypes Then
-        If AnsiCompareText(sl[sl.Count - 1], Copy(strText, Length(strText) -
+        If CompareText(sl[sl.Count - 1], Copy(strText, Length(strText) -
           Length(sl[sl.Count - 1]) + 1, Length(sl[sl.Count - 1]))) <> 0 Then
           Exit;
     Result := True;

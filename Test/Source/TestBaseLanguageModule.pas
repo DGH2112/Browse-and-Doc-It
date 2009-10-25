@@ -466,7 +466,7 @@ procedure TExtendedTestCase.CheckEquals(ttExpected, ttActual: TBADITokenType;
 
 begin
   FCheckCalled := True;
-  If AnsiCompareText(strTokenType[ttExpected], strTokenType[ttActual]) <> 0 Then
+  If CompareText(strTokenType[ttExpected], strTokenType[ttActual]) <> 0 Then
     FailNotEquals(strTokenType[ttExpected], strTokenType[ttActual], strMsg,
       CallerAddr);
 end;
@@ -491,7 +491,7 @@ Const
 
 begin
   FCheckCalled := True;
-  If AnsiCompareText(strScopes[scExpected], strScopes[scActual]) <> 0 Then
+  If CompareText(strScopes[scExpected], strScopes[scActual]) <> 0 Then
     FailNotEquals(strScopes[scExpected], strScopes[scActual], strMsg,
       CallerAddr);
 end;
@@ -505,7 +505,7 @@ Const
 
 begin
   FCheckCalled := True;
-  If AnsiCompareText(strTokenReference[trExpected], strTokenReference[trActual]) <> 0 Then
+  If CompareText(strTokenReference[trExpected], strTokenReference[trActual]) <> 0 Then
     FailNotEquals(strTokenReference[trExpected], strTokenReference[trActual], strMsg,
       CallerAddr);
 end;

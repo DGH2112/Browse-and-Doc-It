@@ -57,6 +57,7 @@ type
     Procedure TestCalcColour;
     Procedure TestDGHFindOnPath;
     Procedure TestDGHCreateProcess;
+    Procedure TestDGHPathRelativePathTo;
   End;
 
   THStraightElementTestClass = Class(THStraightElement)
@@ -486,6 +487,32 @@ begin
   strFileName := 'cmd.exe';
   Check(DGHFindOnPath(strFileName, ''), 'Check for cmd.exe');
   CheckEquals('C:\WINDOWS\system32\cmd.exe', strFileName);
+end;
+
+procedure TestApplicationFunctions.TestDGHPathRelativePathTo;
+
+Var
+  strFile : String;
+
+begin
+  strFile := 'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
+  CheckEquals(True, DGHPathRelativePathTo('E:\Hoyld\Borland Studio Projects\', strFile));
+  CheckEquals('.\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+  strFile := 'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
+  CheckEquals(True, DGHPathRelativePathTo('E:\Hoyld\Borland Studio Projects\Library\', strFile));
+  CheckEquals('..\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+  strFile := 'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
+  CheckEquals(True, DGHPathRelativePathTo('E:\Hoyld\borland studio projects\Library\Tests\', strFile));
+  CheckEquals('..\..\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+  strFile := 'TestingHelperWizard.pas';
+  CheckEquals(False, DGHPathRelativePathTo('E:\Hoyld\borland studio projects\', strFile));
+  CheckEquals('TestingHelperWizard.pas', strFile);
+  strFile := '\\CJVRUG1\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
+  CheckEquals(True, DGHPathRelativePathTo('\\CJVRUG1\Grouped\Hoyld\borland studio projects\', strFile));
+  CheckEquals('.\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+  strFile := '\\CJVRUG2\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
+  CheckEquals(False, DGHPathRelativePathTo('\\CJVRUG1\Grouped\Hoyld\borland studio projects\', strFile));
+  CheckEquals('\\CJVRUG2\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
 end;
 
 procedure TestApplicationFunctions.TestDMSAsDecToDecimal;

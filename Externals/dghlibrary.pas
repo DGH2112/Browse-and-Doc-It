@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    25 Oct 2009
+  @Date    12 Dec 2009
 
 **)
 Unit DGHLibrary;
@@ -705,6 +705,7 @@ Type
     dblUpperCriteria : Double; iLowColour, iMiddleColour,
     iHighColour : TColor) : TColor;
   Function DGHFindOnPath(var strEXEName : String; strDirs : String) : Boolean;
+  Function DGHPathRelativePathTo(strBasePath : String; var strFileName : String) : Boolean;
 
 { -------------------------------------------------------------------------
 
@@ -6409,6 +6410,58 @@ Begin
   Finally
     slPaths.Free;
   End;
+End;
+
+(**
+
+  This method returns true and the given filename as a relative path IF the
+  filename and the base path share the same root else returns false.
+
+  @precon  None.
+  @postcon Returns true and the given filename as a relative path IF the
+           filename and the base path share the same root else returns false.
+
+  @param   strBasePath as a String
+  @param   strFileName as a String as a reference
+  @return  a Boolean
+
+**)
+Function DGHPathRelativePathTo(strBasePath : String; var strFileName : String) : Boolean;
+
+Var
+  iPos : Integer;
+  strFile : String;
+
+Begin
+  Result := False;
+  strFile := strFileName;
+  If (Copy(strBasePath, 1, 2) = '\\') And (Copy(strFile, 1, 2) = '\\') Then
+    Begin
+      strBasePath := Copy(strBasePath, 3, MAX_PATH);
+      strFile := Copy(strFile, 3, MAX_PATH);
+    End;
+  iPos := Pos('\', strBasePath);
+  While (iPos > 0) And (CompareText(Copy(strBasePath, 1, iPos), Copy(strFile, 1, iPos)) = 0) Do
+    Begin
+      Result := True;
+      strBasePath := Copy(strBasePath, iPos + 1, MAX_PATH);
+      strFile := Copy(strFile, iPos + 1, MAX_PATH);
+      iPos := Pos('\', strBasePath);
+    End;
+  If Result Then
+    Begin
+      If strBasePath = '' Then
+        strFileName := '.\'
+      Else
+        strFileName := '';
+      While iPos > 0 Do
+        Begin
+          strBasePath := Copy(strBasePath, iPos + 1, MAX_PATH);
+          iPos := Pos('\', strBasePath);
+          strFileName := strFileName + '..\';
+        End;
+      strFileName := strFileName + strFile;
+    End;
 End;
 
 (** Initialises the console more to Unknown to force a call to the Win32 API **)

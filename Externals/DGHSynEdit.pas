@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    16 Aug 2008
+  @Date    27 Dec 2009
 
 **)
 
@@ -17,6 +17,8 @@ Interface
 Uses
   SysUtils, Classes, ComCtrls, SynEdit, SynEditTypes, SynEditKeyCmds,
   SynEditHighlighter, Controls;
+
+{$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
 
 Type
   (** A declaration for a call back proc to exceptions. **)
@@ -141,12 +143,12 @@ Uses
 (**
 
   This function returns the Highlighter name from the first part of the
-  Highlighter's Default Filter string.
+  Highlighter`s Default Filter string.
 
   @precon  Highlighter must be a valid instance.
   @postcon Returns the Highlighter name from the first part of the
-           Highlighter's Default Filter string.
-           
+           Highlighter`s Default Filter string.
+
   @param   Highlighter as a TSynCustomHighlighter
   @return  a String
 
@@ -167,11 +169,11 @@ End;
 (**
 
   This function returns the Highlighter extensions from the second part of the
-  Highlighter's Default Filter string.
+  Highlighter`s Default Filter string.
 
   @precon  Highlighter must be a valid instance.
   @postcon Returns the Highlighter extensions from the second part of the
-           Highlighter's Default Filter string.
+           Highlighter`s Default Filter string.
 
   @param   Highlighter as a TSynCustomHighlighter
   @return  a String
@@ -341,7 +343,7 @@ end;
 procedure TDGHSynEdit.LoadFromFile(strFileName: String);
 begin
   FFileName := strFileName;
-  {$IFDEF VER180}
+  {$IFDEF D2005}
   FileAge(FFileName, FFileDateTime);
   {$ELSE}
   FFileDateTime := FileDateToDateTime(FileAge(FFileName));
@@ -422,7 +424,7 @@ begin
   FFileName := strFileName;
   Try
     Lines.SaveToFile(FFileName);
-    {$IFDEF VER180}
+    {$IFDEF D2005}
     FileAge(FFileName, FFileDateTime);
     {$ELSE}
     FFileDateTime := FileDateToDateTime(FileAge(FFileName));
@@ -483,7 +485,7 @@ end;
   @precon  None.
   @postcon Sets the caption of the parent tan sheet control.
 
-  @param   Value as a String constant
+  @param   Value as a String as a constant
 
 **)
 procedure TDGHSynEdit.SetTabCaption(const Value: String);
@@ -555,7 +557,7 @@ end;
   @precon  None.
   @postcon Sets the files date and time.
 
-  @param   Value as a TDateTime constant
+  @param   Value as a TDateTime as a constant
 
 **)
 procedure TDGHSynEdit.SetFileDateTime(const Value: TDateTime);

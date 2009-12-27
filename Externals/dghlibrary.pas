@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Dec 2009
+  @Date    27 Dec 2009
 
 **)
 Unit DGHLibrary;
@@ -6199,7 +6199,7 @@ Var
   MatchTypes : TMatchTypes;
   sl : TStringList;
   i: Integer;
-  iTokenIndex : Integer;
+  //iTokenIndex : Integer;
   iStartIndex : Integer;
   iPos: Integer;
 
@@ -6221,7 +6221,7 @@ Begin
     For i := 1 To CharCount('*', strPattern) + 1 Do
       sl.Add(lowercase(GetField(strPattern, '*', i)));
     // Check start
-    iTokenIndex := 1;
+    //iTokenIndex := 1;
     iStartIndex := 1;
     If sl.Count > 0 Then
       If mtStart In MatchTypes Then
@@ -6235,7 +6235,7 @@ Begin
         iPos := Pos(sl[i], lowercase(strText));
         If (iPos = 0) Or (iPos < iStartIndex) Then
           Exit;
-        Inc(iTokenIndex, iPos);
+        //Inc(iTokenIndex, iPos);
         Inc(iStartIndex, Length(sl[i]));
       End;
     // Check end

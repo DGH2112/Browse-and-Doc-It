@@ -683,7 +683,21 @@ Const
 
 ResourceString
   (** A resource string for the Text Table definitions. **)
-  strTextTableDefinitions = 'Text Table Definitions';
+  strTextTableDefsLabel = 'Text Table Definitions';
+  (** A resource string for the Database Table definitions. **)
+  strDatabaseTableDefsLabel = 'Database Table Definitions';
+  (** A resource string for the Time Location Table definitions. **)
+  strTimeLocationTableDefsLabel = 'Time Location Table Definitions';
+  (** A resource string for the Output Table definitions. **)
+  strOutputTableDefsLabel = 'Output Table Definitions';
+  (** A resource string for the Requirements Table definitions. **)
+  strRequirementsTableDefsLabel = 'Requirements Table Definitions';
+  (** A resource string for the Database reference. **)
+  strDatabaseLabel = 'Database';
+  (** A resource string for the Connection reference. **)
+  strConnectionLabel = 'Connection';
+  (** A resource string for the Table Name reference. **)
+  strTableNameLabel = 'Tablename';
 
 Implementation
 
@@ -1786,7 +1800,7 @@ begin
   If Token.Token = strConnectionType[ConnectionType] Then
     Begin
       NextNonCommentToken;
-      If CompareText(Token.Token, 'CONNECTION') = 0 Then
+      If CompareText(Token.Token, strConnectionLabel) = 0 Then
         Begin
           Case ConnectionType Of
             ctPrimary:
@@ -1837,15 +1851,15 @@ Constructor TEidolonModule.CreateParser(Source : String; strFileName : String;
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   FSource := Source;
-  FTextTableDefs := Add(TLabelContainer.Create(strTextTableDefinitions, scNone,
+  FTextTableDefs := Add(TLabelContainer.Create(strTextTableDefsLabel, scNone,
     0, 0, iiPublicThreadVarsLabel, Nil)) As TLabelContainer;
-  FDBTableDefs := Add(TLabelContainer.Create('Database Table Definitions', scNone,
+  FDBTableDefs := Add(TLabelContainer.Create(strDatabaseTableDefsLabel, scNone,
     0, 0, iiPublicConstantsLabel, Nil)) As TLabelContainer;
-  FTimeLocationTableDefs := Add(TLabelContainer.Create('Time Location Table Definitions',
+  FTimeLocationTableDefs := Add(TLabelContainer.Create(strTimeLocationTableDefsLabel,
     scNone, 0, 0, iiPublicVariablesLabel, Nil)) As TLabelContainer;
-  FOutputTableDefs := Add(TLabelContainer.Create('Output Table Definitions', scNone,
+  FOutputTableDefs := Add(TLabelContainer.Create(strOutputTableDefsLabel, scNone,
     0, 0, iiInterfacesLabel, Nil)) As TLabelContainer;
-  FRequirementsTableDefs := Add(TLabelContainer.Create('Requirements Table Definitions', scNone,
+  FRequirementsTableDefs := Add(TLabelContainer.Create(strRequirementsTableDefsLabel, scNone,
     0, 0, iiDispInterfacesLabel, Nil)) As TLabelContainer;
   AddTickCount('Start');
   CommentClass := TEidolonComment;
@@ -1890,7 +1904,7 @@ begin
   If Token.Token = strConnectionType[ConnectionType] Then
     Begin
       NextNonCommentToken;
-      If CompareText(Token.Token, 'Database') =  0 Then
+      If CompareText(Token.Token, strDatabaseLabel) =  0 Then
         Begin
           Result := True;
           Case ConnectionType Of
@@ -3104,7 +3118,7 @@ begin
   If Token.Token = strConnectionType[ConnectionType] Then
     Begin
       NextNonCommentToken;
-      If CompareText(Token.Token, 'TABLENAME') = 0 Then
+      If CompareText(Token.Token, strTableNameLabel) = 0 Then
         Begin
           Case ConnectionType Of
             ctPrimary:

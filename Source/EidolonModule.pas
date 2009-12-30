@@ -3207,7 +3207,6 @@ end;
 procedure TEidolonModule.TextTableDef(TextTable : TTextTable);
 
 Var
-  strFileName : String;
   TTD: TTextTableDef;
 
 begin
@@ -3221,10 +3220,15 @@ begin
           NextNonCommentToken;
           If CheckLiteral('=', 'TextTableDef') Then
             Begin
-              strFileName := '';
               While Not (Token.TokenType In [ttLineEnd]) Do
                 AddToExpression(TTD);
-              TextTable.FileName := strFileName;
+              TextTable.FileName := TTD.AsString(False, False);
+              If (TextTable.FileName <> '') And
+                Not FileExists(TextTable.FFileName) And
+                Not DirectoryExists(TextTable.FileName) Then
+                AddIssue(Format(strThisFileDirDoesNotExist, [TextTable.FileName,
+                  TTD.Line, TTD.Column]), scNone, 'TextTableDef', TTD.Line,
+                  TTD.Column, etWarning);
               CheckLineEnd('TextTableDef');
             End;
         End Else

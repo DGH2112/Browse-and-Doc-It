@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       23 Oct 2009
+  @Date       30 Dec 2009
   @Author     David Hoyle
 
 **)
@@ -671,6 +671,10 @@ Const
       Secondary connections. **)
   strConnectionType : Array[Low(TConnectionType)..High(TConnectionType)] Of
     String = ('#', '@');
+
+ResourceString
+  (** A resource string for the Text Table definitions. **)
+  strTextTableDefinitions = 'Text Table Definitions';
 
 Implementation
 
@@ -1798,7 +1802,7 @@ Constructor TEidolonModule.CreateParser(Source : String; strFileName : String;
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   FSource := Source;
-  FTextTableDefs := Add(TLabelContainer.Create('Text Table Definitions', scNone,
+  FTextTableDefs := Add(TLabelContainer.Create(strTextTableDefinitions, scNone,
     0, 0, iiPublicThreadVarsLabel, Nil)) As TLabelContainer;
   FDBTableDefs := Add(TLabelContainer.Create('Database Table Definitions', scNone,
     0, 0, iiPublicConstantsLabel, Nil)) As TLabelContainer;

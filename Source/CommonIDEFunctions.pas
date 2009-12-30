@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    07 Oct 2009
+  @Date    30 Dec 2009
   @Version 1.0
 
 **)
@@ -16,7 +16,7 @@ Uses
   SysUtils, Windows, Classes, BaselanguageModule;
 
 Type
-  {$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
+  {$INCLUDE 'CompilerDefinitions.inc'}
 
   (** This is a procedure to returns the success of the parse in the thread. **)
   TParserNotify = Procedure(boolSuccessfulParse : Boolean) Of Object;

@@ -27,7 +27,8 @@ Type
 
   (** An enumerate to define the field type for the data. **)
   TFieldType = (ftBoolean, ftByte, ftInteger, ftLong, ftCurrency, ftSingle,
-    ftDouble, ftDate, ftText, ftLongBinary, ftMemo);
+    ftDouble, ftDate, ftBinary, ftText, ftLongBinary, ftMemo, ftGUID, ftBigInt,
+    ftvarBinary, ftChar, ftNumeric, ftDecimal, ftFloat, ftTime, ftTimeStamp);
 
   (** A class to represent a Database definition. **)
   TFieldDef = Class(TElementContainer)
@@ -35,7 +36,8 @@ Type
     FOutputName : String;
     FFieldType  : TFieldType;
     FFieldWidth : Integer;
-    FPrimaryKey: Boolean;
+    FPrimaryKey : Boolean;
+    FSheetIndex : Integer;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
@@ -68,6 +70,13 @@ Type
       @return  a Boolean
     **)
     Property PrimaryKey : Boolean Read FPrimaryKey Write FPrimaryKey;
+    (**
+      This property gets and sets the Sheet Index.
+      @precon  None.
+      @postcon Gets and sets the Sheet Index.
+      @return  a Integer
+    **)
+    Property SheetIndex  :Integer Read FSheetIndex Write FSheetIndex;
   End;
 
   (** A base class from which all the tables are derived. **)
@@ -461,7 +470,7 @@ Type
     Function  DBTable(strName : String; StartToken : TTokenInfo) : Boolean;
     Function  TimeLocationTable(strName : String; StartToken : TTokenInfo) : Boolean;
     Procedure TextTableDef(TextTable : TTextTable);
-    Function  FieldDef(Table : TBaseTable): Boolean;
+    Function  FieldDef(Table : TBaseTable; var iSheetIndex : Integer): Boolean;
     Procedure TypeInfo(Field : TFieldDef);
     Function  DatabaseDef(DBTable : TDBTable; ConnectionType : TConnectionType) : Boolean;
     Procedure ConnectionDef(DBTable : TDBTable; ConnectionType : TConnectionType);
@@ -1004,7 +1013,33 @@ function TFieldDef.AsString(boolShowIdentifier,
 
 Const
   strFieldType : Array[Low(TFieldType)..High(TFieldType)] Of String = (
-    'B', 'Y', 'I', 'L', 'U', 'S', 'F', 'D', 'C', 'O', 'M');
+    'B', 'Y', 'I', 'L', 'U', 'S', 'F', 'D', '?', 'C', 'O', 'M', '?',
+    '?', '?', '?', '?', '?', '?', '?', '?');
+  {
+  Unknown = $00000000
+  Boolean = $00000001
+  Byte = $00000002
+  Integer = $00000003
+  Long = $00000004
+  Currency = $00000005
+  Single = $00000006
+  Double = $00000007
+  Date = $00000008
+  Binary = $00000009
+  Text = $0000000A
+  LongBinary = $0000000B
+  Memo = $0000000C
+  GUID = $0000000F
+  BigInt = $00000010
+  VarBinary = $00000011
+  Char = $00000012
+  Numeric = $00000013
+  Decimal = $00000014
+  Float = $00000015
+  Time = $00000016
+  TimeStamp = $00000017
+  }
+
   strPrimaryKey : Array[False..True] Of String = ('', '*');
 
 begin
@@ -1899,6 +1934,7 @@ end;
 Function TEidolonModule.DBTable(strName : String; StartToken : TTokenInfo) : Boolean;
 var
   DBT: TDBTable;
+  iSheetIndex: Integer;
 
 begin
   Result := False;
@@ -1927,7 +1963,8 @@ begin
                             EatWhitespace;
                             TableNameDef(DBT, ctPrimary);
                           End;
-                        While FieldDef(DBT) Do;
+                        iSheetIndex := 1;
+                        While FieldDef(DBT, iSheetIndex) Do;
                         If CheckLiteral('}', 'DBTable') Then
                           Begin
                             EatWhitespace;
@@ -2178,11 +2215,13 @@ end;
   @precon  Container must be a valid instance of a TElementContainer class.
   @postcon Returns true if a field def was parsed.
 
-  @param   Table as a TBaseTable
+  @param   Table       as a TBaseTable
+  @param   iSheetIndex as an Integer as a reference
   @return  a Boolean
 
 **)
-function TEidolonModule.FieldDef(Table : TBaseTable): Boolean;
+function TEidolonModule.FieldDef(Table : TBaseTable;
+  var iSheetIndex : Integer): Boolean;
 
 Var
   strName : String;
@@ -2215,6 +2254,8 @@ begin
           F := Table.AddField(TFieldDef.Create(strName, scNone, T.Line, T.Column,
             iiPublicField, Nil));
           F.PrimaryKey := boolPrimaryKey;
+          F.SheetIndex := iSheetIndex;
+          Inc(iSheetIndex);
           If CheckLiteral(':', 'FieldDef') Then
             Begin
               TypeInfo(F);
@@ -2721,6 +2762,7 @@ function TEidolonModule.OutputTable(strName: String;
 
 var
   OT: TOutputTable;
+  iSheetIndex: Integer;
 
 begin
   Result := False;
@@ -2758,7 +2800,8 @@ begin
                             EatWhitespace;
                             TableNameDef(OT, ctSecondary);
                           End;
-                        While FieldDef(OT) Do;
+                        iSheetIndex := 1;
+                        While FieldDef(OT, iSheetIndex) Do;
                         If CheckLiteral('}', 'OutputTable') Then
                           Begin
                             EatWhitespace;
@@ -2923,6 +2966,7 @@ function TEidolonModule.RequirementsTable(strName: String;
 
 Var
   RT : TRequirementsTable;
+  iSheetIndex: Integer;
 
 begin
   Result := False;
@@ -2952,7 +2996,8 @@ begin
                             EatWhitespace;
                             TableNameDef(RT, ctPrimary);
                           End;
-                        While FieldDef(RT) Do;
+                        iSheetIndex := 1;
+                        While FieldDef(RT, iSheetIndex) Do;
                         While AssociationDef(RT) Do;
                         EatWhitespace;
                         If DatabaseDef(RT, ctSecondary) Then
@@ -2962,7 +3007,8 @@ begin
                             EatWhitespace;
                             TableNameDef(RT, ctSecondary);
                           End;
-                        While FieldDef(RT) Do;
+                        iSheetIndex := 1;
+                        While FieldDef(RT, iSheetIndex) Do;
                         While AssociationDef(RT) Do;
                         If CheckLiteral('}', 'RequirementsTable') Then
                           Begin
@@ -3095,6 +3141,7 @@ Function TEidolonModule.TextTable(strName : String; StartToken : TTokenInfo) : B
 
 Var
   TT : TTextTable;
+  iSheetIndex: Integer;
 
 begin
   Result := False;
@@ -3117,7 +3164,8 @@ begin
                       Begin
                         EatWhiteSpace;
                         TextTableDef(TT);
-                        While FieldDef(TT) Do;
+                        iSheetIndex := 1;
+                        While FieldDef(TT, iSheetIndex) Do;
                         If CheckLiteral('}', 'TextTable') Then
                           Begin
                             EatWhitespace;
@@ -3256,6 +3304,7 @@ Function TEidolonModule.TimeLocationTable(strName : String; StartToken : TTokenI
 
 var
   TLT: TTimeLocationTable;
+  iSheetIndex: Integer;
 
 begin
   Result := False;
@@ -3277,7 +3326,8 @@ begin
                     EatWhitespace;
                     If CheckLineEnd('TimeLocationTable') Then
                       Begin
-                        While FieldDef(TLT) Or EmptyLine Do;
+                        iSheetIndex := 1;
+                        While FieldDef(TLT, iSheetIndex) Or EmptyLine Do;
                         While TimeLocationDef(TLT) Or EmptyLine Do;
                         If CheckLiteral('}', 'TimeLocationTable') Then
                           Begin

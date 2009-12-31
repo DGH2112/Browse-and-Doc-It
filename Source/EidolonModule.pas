@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       30 Dec 2009
+  @Date       31 Dec 2009
   @Author     David Hoyle
 
 **)
@@ -698,6 +698,8 @@ ResourceString
   strConnectionLabel = 'Connection';
   (** A resource string for the Table Name reference. **)
   strTableNameLabel = 'Tablename';
+  (** A resource string for the Primary reference. **)
+  strPrimaryLabel = 'Primary';
 
 Implementation
 
@@ -764,28 +766,6 @@ Const
       token that can be sort as then next place to start parsing from when an
       error is  encountered. **)
   strSeekableOnErrorTokens : Array[1..2] Of String = ('<CR>', '<LF>');
-
-(**
-
-  This function returns a literal representation of the passed element.
-
-  @precon  Element must be a valid instance of a TElementContainer.
-  @postcon Returns a literal representation of the passed element.
-
-  @param   Element as a TElementContainer
-  @return  a String
-
-**)
-Function BuildLiteralString(Element : TElementContainer) : String;
-
-Var
-  i : Integer;
-
-Begin
-  Result := '';
-  For i := 0 To Element.TokenCount - 1 Do
-    Result := Result + Element.Tokens[i].Token;
-End;
 
 (**
 
@@ -900,7 +880,7 @@ end;
 function TDBTable.AddPrimary(DBConnection: TDBConnection): TDBConnection;
 begin
   If FPrimary = Nil Then
-    FPrimary := Add(TLabelContainer.Create('Primary', scNone, 0, 0,
+    FPrimary := Add(TLabelContainer.Create(strPrimaryLabel, scNone, 0, 0,
       iiPublicTypesLabel, Nil)) As TLabelContainer;
   Result := FPrimary.Add(DBConnection) As TDBConnection;
 end;
@@ -1107,7 +1087,9 @@ function TDatabaseDef.AsString(boolShowIdentifier,
   boolForDocumentation: Boolean): String;
 
 begin
-  Result := Identifier + '=' + BuildLiteralString(Self);
+  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
+    '=', BrowseAndDocItOptions.MaxDocOutputWidth, ['=', ':', '\', '.', ';', #32],
+    ['=', ':', '\', '.', ';', #32], []);
 end;
 
 { TConnectionDef }
@@ -1128,7 +1110,9 @@ function TConnectionDef.AsString(boolShowIdentifier,
   boolForDocumentation: Boolean): String;
 
 begin
-  Result := Identifier + '=' + BuildLiteralString(Self);
+  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
+    '=', BrowseAndDocItOptions.MaxDocOutputWidth, ['=', ':', '\', '.', ';', #32],
+    ['=', ':', '\', '.', ';', #32], []);
 end;
 
 { TTableNameDef }

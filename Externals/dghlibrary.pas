@@ -668,7 +668,8 @@ Type
   Function DMSToDecimal(strBearing : String) : Double;
   Function DMSAsDecToDecimal(dblBearingAsDec : Double) : Double;
   Function ExtractFileNameOnly(strFileName : String) : String;
-  Function GetField(strText : String; Ch : Char; iIndex : Integer): String;
+  Function GetField(strText : String; Ch : Char; iIndex : Integer;
+    boolIgnoreQuotes : Boolean = True): String;
   Function GetVector(dblStE, dblStN, dblEndE, dblEndN : Double) : TVector;
   Function HexToBin(sDisplayNumber : String) : String;
   Function HexToDec(sDisplayNumber : String) : String;
@@ -1011,31 +1012,33 @@ End;
 
 (**
 
-  This function returns the contents of the specified field in the
-  delimited text.
+  This function returns the contents of the specified field in the delimited
+  text.
 
   @precon  None.
   @postcon Returns the contents of the specified field in the delimited text.
 
-  @param   strText as a String
-  @param   Ch      as a Char
-  @param   iIndex  as an Integer
+  @param   strText          as a String
+  @param   Ch               as a Char
+  @param   iIndex           as an Integer
+  @param   boolIgnoreQuotes as a Boolean
   @return  a String
 
 **)
-Function GetField(strText : String; Ch : Char; iIndex : Integer): String;
+Function GetField(strText : String; Ch : Char; iIndex : Integer;
+    boolIgnoreQuotes : Boolean = True): String;
 
 Var
   iNumOfFields : Integer;
   iStart, iEnd : Integer;
 
 Begin
-  iNumOfFields := CharCount(Ch, strText) + 1;
+  iNumOfFields := CharCount(Ch, strText, boolIgnoreQuotes) + 1;
   If iIndex = 1 Then
     Begin
       If iNumOfFields > 1  Then
         Begin
-          iEnd := Pos(Ch, strText);
+          iEnd := PosOfNthChar(strText, Ch, 1, boolIgnoreQuotes);
           Result := Copy(strText, 1, iEnd - 1);
         End Else
           Result := strText;
@@ -1043,14 +1046,14 @@ Begin
     End;
   If (iIndex > 1) And (iIndex < iNumOfFields) Then
     Begin
-      iStart := PosOfNthChar(strText, Ch, iIndex - 1);
-      iEnd := PosOfNthChar(strText, Ch, iIndex);
+      iStart := PosOfNthChar(strText, Ch, iIndex - 1, boolIgnoreQuotes);
+      iEnd := PosOfNthChar(strText, Ch, iIndex, boolIgnoreQuotes);
       Result := Copy(strText, iStart + 1, iEnd - iStart - 1);
       Exit;
     End;
   If iIndex = iNumOfFields Then
     Begin
-      iStart := PosOfNthChar(strText, Ch, iIndex - 1);
+      iStart := PosOfNthChar(strText, Ch, iIndex - 1, boolIgnoreQuotes);
       Result := Copy(strText, iStart + 1, Length(strText) - iStart);
       Exit;
     End;

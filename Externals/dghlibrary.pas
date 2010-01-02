@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Dec 2009
+  @Date    02 Jan 2010
 
 **)
 Unit DGHLibrary;
@@ -658,7 +658,8 @@ Type
   Function BinToHex(sDisplayNumber : String) : String;
   Function BinToOct(sDisplayNumber : String) : String;
   Function Capitalise(strText : String) : String;
-  Function CharCount(cChar : Char; strText : String) : Integer;
+  Function CharCount(cChar : Char; strText : String;
+    boolIgnoreQuotes : Boolean = True) : Integer;
   Function ConvertDate(Const strDate : String) : TDateTime;
   Function DecimalToDMS(dblBearing : Double) : TBearing;
   Function DecToBin(sDisplayNumber : String) : String;
@@ -929,27 +930,37 @@ End;
 
 (**
 
-  This routine returns the number of occurrances of the char found in the
-  string.
+  This routine returns the number of occurrances of the char found in the string
+  .
 
   @precon  None.
   @postcon Returns the number of occurrances of the char found in the string.
 
-  @param   cChar   as a Char
-  @param   strText as a String
+  @param   cChar            as a Char
+  @param   strText          as a String
+  @param   boolIgnoreQuotes as a Boolean
   @return  an Integer
 
 **)
-Function CharCount(cChar : Char; strText : String) : Integer;
+Function CharCount(cChar : Char; strText : String;
+  boolIgnoreQuotes : Boolean = True) : Integer;
 
 Var
   iCount : Integer;
+  boolInQuotes : Boolean;
 
 Begin
   Result := 0;
+  boolInQuotes := False;
   For iCount := 1 to Length(strText) Do
-    If strText[iCount] = cChar Then
-      Inc(Result);
+    Begin
+      If Not boolIgnoreQuotes Then
+        If strText[iCount] = '"' Then
+          boolInQuotes := Not boolInQuotes;
+      If strText[iCount] = cChar Then
+        If Not boolInQuotes Then
+          Inc(Result);
+    End;
 End;
 
 

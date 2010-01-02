@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    25 Oct 2009
+  @Date    02 Jan 2010
   @Author  David Hoyle
   @Version 1.0
 
@@ -770,6 +770,8 @@ end;
 Destructor TframeModuleExplorer.Destroy;
 
 begin
+  If FModule <> Nil Then
+    GetExpandedNodes(FModule);
   FExplorer.Free;
   FSpecialTagNodes := Nil;
   ManageExpandedNodes;

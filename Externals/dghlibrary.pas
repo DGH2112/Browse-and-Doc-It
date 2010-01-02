@@ -682,7 +682,8 @@ Type
   Function OctToBin(sDisplayNumber : String) : String;
   Function OctToDec(sDisplayNumber : String) : String;
   Function OctToHex(sDisplayNumber : String) : String;
-  Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer): Integer;
+  Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer;
+    boolIgnoreQuotes : Boolean = True): Integer;
   Function Pow(X, Y : Real) : Real;
   Function ReduceBearing(dblBearing : Double) : Double;
   Function GetBuildNumber(strFileName : String; var iMajor, iMinor, iBugfix,
@@ -966,32 +967,40 @@ End;
 
 (**
 
-  This routine returns the position of the Nth occurrance of the character
-  in the text.
+  This routine returns the position of the Nth occurrance of the character in
+  the text.
 
   @precon  None.
-  @postcon Returns the position of the Nth occurrance of the character
-           in the text.
+  @postcon Returns the position of the Nth occurrance of the character in the
+           text.
 
-  @param   strText as a String
-  @param   Ch      as a Char
-  @param   iIndex  as an Integer
+  @param   strText          as a String
+  @param   Ch               as a Char
+  @param   iIndex           as an Integer
+  @param   boolIgnoreQuotes as a Boolean
   @return  an Integer
 
 **)
-Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer): Integer;
+Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer;
+  boolIgnoreQuotes : Boolean = True): Integer;
 
 Var
   i : Integer;
   iCount : Integer;
+  boolInQuotes : Boolean;
 
 Begin
   Result := 0;
   iCount := 0;
+  boolInQuotes := False;
   For i := 1 To Length(strText) Do
     Begin
+      If Not boolIgnoreQuotes Then
+        If strText[i] = '"' Then
+          boolInQuotes := Not boolInQuotes;
       If strText[i] = Ch Then
-        Inc(iCount);
+        If Not boolInQuotes Then
+          Inc(iCount);
       If iIndex = iCount Then
         Begin
           Result := i;

@@ -766,6 +766,28 @@ Const
 
 (**
 
+  This function returns a literal representation of the passed element.
+
+  @precon  Element must be a valid instance of a TElementContainer.
+  @postcon Returns a literal representation of the passed element.
+
+  @param   Element as a TElementContainer
+  @return  a String
+
+**)
+Function BuildLiteralString(Element : TElementContainer) : String;
+
+Var
+  i : Integer;
+
+Begin
+  Result := '';
+  For i := 0 To Element.TokenCount - 1 Do
+    Result := Result + Element.Tokens[i].Token;
+End;
+
+(**
+
 
   This method is a class method to first check the comment for being a
   documentation comment and then creating an instance of a TComment class and
@@ -1084,9 +1106,10 @@ function TDatabaseDef.AsString(boolShowIdentifier,
   boolForDocumentation: Boolean): String;
 
 begin
-  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    '=', BrowseAndDocItOptions.MaxDocOutputWidth, ['=', ':', '\', '.', ';', #32],
-    ['=', ':', '\', '.', ';', #32], []);
+  Result := '';
+  If boolShowIdentifier Then
+    Result := Result + Identifier + '=';
+  Result:= Result + BuildLiteralString(Self);
 end;
 
 { TConnectionDef }
@@ -1107,9 +1130,10 @@ function TConnectionDef.AsString(boolShowIdentifier,
   boolForDocumentation: Boolean): String;
 
 begin
-  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    '=', BrowseAndDocItOptions.MaxDocOutputWidth, ['=', ':', '\', '.', ';', #32],
-    ['=', ':', '\', '.', ';', #32], []);
+  Result := '';
+  If boolShowIdentifier Then
+    Result := Result + Identifier + '=';
+  Result:= Result + BuildLiteralString(Self);
 end;
 
 { TTableNameDef }
@@ -1129,9 +1153,10 @@ end;
 function TTableNameDef.AsString(boolShowIdentifier,
   boolForDocumentation: Boolean): String;
 begin
-  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    '=', BrowseAndDocItOptions.MaxDocOutputWidth, ['=', ':', '\', '.', ';', #32],
-    ['=', ':', '\', '.', ';', #32], []);
+  Result := '';
+  If boolShowIdentifier Then
+    Result := Result + Identifier + '=';
+  Result:= Result + BuildLiteralString(Self);
 end;
 
 (**

@@ -2066,9 +2066,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -2089,9 +2089,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -2112,9 +2112,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5301,9 +5301,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5715,9 +5715,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5738,9 +5738,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5761,9 +5761,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5784,9 +5784,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5807,9 +5807,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5830,9 +5830,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5853,9 +5853,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5876,9 +5876,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5899,9 +5899,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5922,9 +5922,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));
@@ -5945,9 +5945,9 @@ begin
   M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
-    CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
-    CheckEquals(2, M.ElementCount);
+    CheckEquals(1, M.ElementCount);
     CheckEquals('Text Table Definitions', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('This is a text table=Class(TextTable)', M.Elements[1].Elements[1].AsString(True, True));

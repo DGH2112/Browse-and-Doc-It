@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       31 Dec 2009
+  @Date       02 Jan 2010
   @Author     David Hoyle
 
 **)
@@ -737,9 +737,6 @@ resourcestring
   strInvalidTableType = 'Invalid table type ''%s'' at line %d column %d.';
   (** A resource string for an null name message. **)
   strNullName = 'The name can not by null at line %d column %d.';
-  (** A resource string for a dir or file that does not exist. **)
-  strThisFileDirDoesNotExist = 'This file/directory ''%s'' does not exists a' +
-  't line %d column %d.';
   (** A resource string for an invalid connection string. **)
   strIsNotAValidConnection = '''%s'' is not a valid connection string at lin' +
   'e %d column %d.';
@@ -1908,9 +1905,6 @@ begin
               strFileName := '';
               For iToken := 0 To D.TokenCount - 1 Do
                 strFileName := strFileName + D.Tokens[iToken].Token;
-              If Not FileExists(strFileName) And Not DirectoryExists(strFileName) Then
-                AddIssue(Format(strThisFileDirDoesNotExist, [strFileName, D.Line,
-                  D.Column]), scNone, 'DatabaseDef', D.Line, D.Column, etWarning);
             End;
         End Else
           RollBackToken;
@@ -3207,12 +3201,6 @@ begin
               While Not (Token.TokenType In [ttLineEnd]) Do
                 AddToExpression(TTD);
               TextTable.FileName := TTD.AsString(False, False);
-              If (TextTable.FileName <> '') And
-                Not FileExists(TextTable.FFileName) And
-                Not DirectoryExists(TextTable.FileName) Then
-                AddIssue(Format(strThisFileDirDoesNotExist, [TextTable.FileName,
-                  TTD.Line, TTD.Column]), scNone, 'TextTableDef', TTD.Line,
-                  TTD.Column, etWarning);
               CheckLineEnd('TextTableDef');
             End;
         End Else

@@ -371,6 +371,10 @@ end;
 procedure TestApplicationFunctions.TestCharCount;
 begin
   CheckEquals(4, CharCount(',', 'First,Second,Third,Fourth,Fifth'));
+  CheckEquals(4, CharCount(',', '"First,Second",Third,"Fourth,Fifth"'));
+  CheckEquals(4, CharCount(',', 'First,"Second,Third",Fourth,Fifth'));
+  CheckEquals(2, CharCount(',', '"First,Second",Third,"Fourth,Fifth"', False));
+  CheckEquals(3, CharCount(',', 'First,"Second,Third",Fourth,Fifth', False));
 end;
 
 procedure TestApplicationFunctions.TestConvertDate;
@@ -622,7 +626,12 @@ procedure TestApplicationFunctions.TestGetField;
 begin
   CheckEquals('First', GetField('First,Second,Third,Fourth,Fifth', ',', 1), 'First');
   CheckEquals('Third', GetField('First,Second,Third,Fourth,Fifth', ',', 3), 'Third');
-  CheckEquals('Fifth', GetField('First,Second,Third,Fourth,Fifth', ',', 5), 'Last');
+  CheckEquals('Fifth', GetField('First,Second,Third,Fourth,Fifth', ',', 5), 'Third');
+
+  CheckEquals('Third', GetField('"First,Second",Third,"Fourth,Fifth"', ',', 3), 'Fourth');
+  CheckEquals('"Fourth,Fifth"', GetField('"First,Second",Third,"Fourth,Fifth"', ',', 3, False), 'Fifth');
+  CheckEquals('Third"', GetField('First,"Second,Third",Fourth,Fifth"', ',', 3), 'Sixth');
+  CheckEquals('Fourth', GetField('First,"Second,Third",Fourth,Fifth"', ',', 3, False), 'Seventh');
 end;
 
 procedure TestApplicationFunctions.TestGetVector;
@@ -700,6 +709,10 @@ end;
 procedure TestApplicationFunctions.TestPosOfNthChar;
 begin
   CheckEquals(19, PosOfNthChar('First,Second,Third,Fourth,Fifth', ',', 3));
+  CheckEquals(21, PosOfNthChar('"First,Second",Third,"Fourth,Fifth"', ',', 3));
+  CheckEquals(21, PosOfNthChar('First,"Second,Third",Fourth,Fifth"', ',', 3));
+  CheckEquals(21, PosOfNthChar('"First,Second",Third,"Fourth,Fifth"', ',', 2, False));
+  CheckEquals(21, PosOfNthChar('First,"Second,Third",Fourth,Fifth"', ',', 2, False));
 end;
 
 procedure TestApplicationFunctions.TestPow;

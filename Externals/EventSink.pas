@@ -1,11 +1,11 @@
 (**
-  
+
   This module contains a class to provide COM event handling adapter between
   the COM events and the VCL event.
 
   @Version 1.0
   @Author  Steve Trefethen
-  @Date    15 Mar 2009
+  @Date    04 Jan 2010
 
 **)
 unit EventSink;
@@ -39,6 +39,11 @@ type
   end;
 
 implementation
+
+
+Uses
+  {$IFDEF EUREKALOG} ExceptionLog, {$ENDIF} SysUtils, Dialogs;
+
 
 { TEventSink }
 
@@ -192,7 +197,7 @@ end;
   @param   VarResult as a Pointer
   @param   ExcepInfo as a Pointer
   @param   ArgErr    as a Pointer
-  @return  a HResult  
+  @return  a HResult
 
 **)
 function TEventSink.Invoke(DispID: Integer; const IID: TGUID;
@@ -206,7 +211,18 @@ Begin
   DispParams := TDispParams(Params).rgvarg;
   // Pass click event back to add-in
   if DispID = 1 then
-    FClickProc(CommandBarButton(DispParams^[0].dispVal), DispParams^[1].pBool^);
+    Try
+      FClickProc(CommandBarButton(DispParams^[0].dispVal), DispParams^[1].pBool^);
+    Except
+      On E : Exception Do
+        Begin
+          {$IFDEF EUREKALOG}
+          If Not StandardEurekaNotify(GetLastExceptionObject,
+            GetLastExceptionAddress) Then
+          {$ENDIF}
+            ShowMessage('Exception: ' + E.Message);
+        End;
+    End;
   Result := S_OK;
 end;
 

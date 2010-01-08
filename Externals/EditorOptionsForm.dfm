@@ -29,104 +29,91 @@ object frmEditorOptions: TfrmEditorOptions
     ActivePage = VisualTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
-    ExplicitWidth = 402
-    ExplicitHeight = 391
     object VisualTab: TTabSheet
       Caption = 'Visual'
-      ExplicitWidth = 394
-      ExplicitHeight = 363
       DesignSize = (
         418
         281)
       object lblActiveLineColour: TLabel
         Left = 3
         Top = 34
-        Width = 110
+        Width = 86
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         Caption = '&Active Line Colour'
         FocusControl = cbxActiveLineColour
-        ExplicitWidth = 86
       end
       object lblEditorFontName: TLabel
         Left = 3
         Top = 62
-        Width = 106
+        Width = 82
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Editor Font &Name'
         FocusControl = cbxFontName
-        ExplicitWidth = 82
       end
       object lblEditorFontSize: TLabel
         Left = 3
         Top = 89
-        Width = 98
+        Width = 74
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Editor Font &Size'
         FocusControl = edtFontSize
-        ExplicitWidth = 74
       end
       object lblRightEdgePosition: TLabel
         Left = 3
         Top = 116
-        Width = 117
+        Width = 93
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         Caption = '&Right Edge Position'
         FocusControl = edtRightEdge
-        ExplicitWidth = 93
       end
       object lblRightEdgeColour: TLabel
         Left = 3
         Top = 143
-        Width = 110
+        Width = 86
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Right &Edge Colour'
         FocusControl = cbxRightEdgeColour
-        ExplicitWidth = 86
       end
       object lblForeColour: TLabel
         Left = 3
         Top = 171
-        Width = 147
+        Width = 123
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Selected Text &Fore Colour'
         FocusControl = cbxSelectedForeground
-        ExplicitWidth = 123
       end
       object lblBackColour: TLabel
         Left = 3
         Top = 199
-        Width = 151
+        Width = 127
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Selected &Text Back Colour'
         FocusControl = cbxSelectedBackground
-        ExplicitWidth = 127
       end
       object lblEditorBackgroundColour: TLabel
         Left = 3
         Top = 6
-        Width = 145
+        Width = 121
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Editor &Background Colour'
         FocusControl = cbxEditorBackgroundColour
-        ExplicitWidth = 121
       end
       object lblTabWidth: TLabel
         Left = 3
         Top = 227
-        Width = 121
+        Width = 97
         Height = 13
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Tab &width in Spaces'
         FocusControl = edtTabWidth
-        ExplicitWidth = 97
       end
       object cbxActiveLineColour: TColorBox
         Left = 233
@@ -137,7 +124,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 1
-        ExplicitLeft = 209
       end
       object cbxFontName: TComboBox
         Left = 233
@@ -149,7 +135,6 @@ object frmEditorOptions: TfrmEditorOptions
         ItemHeight = 13
         Sorted = True
         TabOrder = 2
-        ExplicitLeft = 209
       end
       object edtFontSize: TEdit
         Left = 233
@@ -159,7 +144,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight]
         TabOrder = 3
         Text = '6'
-        ExplicitLeft = 209
       end
       object udEditorFontSize: TUpDown
         Left = 400
@@ -172,7 +156,6 @@ object frmEditorOptions: TfrmEditorOptions
         Max = 72
         Position = 6
         TabOrder = 4
-        ExplicitLeft = 376
       end
       object chxLineNumbers: TCheckBox
         Left = 3
@@ -182,7 +165,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akLeft, akTop, akRight]
         Caption = 'S&how Line Numbers in the Editor Gutter'
         TabOrder = 12
-        ExplicitWidth = 388
       end
       object edtRightEdge: TEdit
         Left = 233
@@ -192,7 +174,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight]
         TabOrder = 5
         Text = '0'
-        ExplicitLeft = 209
       end
       object udRightEdgePosition: TUpDown
         Left = 400
@@ -203,7 +184,6 @@ object frmEditorOptions: TfrmEditorOptions
         Associate = edtRightEdge
         Max = 1024
         TabOrder = 6
-        ExplicitLeft = 376
       end
       object cbxRightEdgeColour: TColorBox
         Left = 233
@@ -214,7 +194,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 7
-        ExplicitLeft = 209
       end
       object cbxSelectedForeground: TColorBox
         Left = 233
@@ -225,7 +204,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 8
-        ExplicitLeft = 209
       end
       object cbxSelectedBackground: TColorBox
         Left = 233
@@ -236,7 +214,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 9
-        ExplicitLeft = 209
       end
       object cbxEditorBackgroundColour: TColorBox
         Left = 233
@@ -247,7 +224,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight]
         ItemHeight = 16
         TabOrder = 0
-        ExplicitLeft = 209
       end
       object edtTabWidth: TEdit
         Left = 233
@@ -257,7 +233,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight]
         TabOrder = 10
         Text = '1'
-        ExplicitLeft = 209
       end
       object udTabWidth: TUpDown
         Left = 400
@@ -270,12 +245,13 @@ object frmEditorOptions: TfrmEditorOptions
         Max = 8
         Position = 1
         TabOrder = 11
-        ExplicitLeft = 376
       end
     end
     object BehaviourTab: TTabSheet
       Caption = 'Behaviour'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 394
       ExplicitHeight = 363
       DesignSize = (
@@ -289,13 +265,13 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akLeft, akTop, akRight, akBottom]
         ItemHeight = 13
         TabOrder = 0
-        ExplicitWidth = 388
-        ExplicitHeight = 357
       end
     end
     object SyntaxTab: TTabSheet
       Caption = 'Syntax Highlighting'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 394
       ExplicitHeight = 363
       DesignSize = (
@@ -354,8 +330,6 @@ object frmEditorOptions: TfrmEditorOptions
         ItemHeight = 13
         TabOrder = 0
         OnClick = lbAttributesClick
-        ExplicitWidth = 229
-        ExplicitHeight = 304
       end
       object cbxAttrForeColour: TColorBox
         Left = 262
@@ -436,10 +410,10 @@ object frmEditorOptions: TfrmEditorOptions
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    TabOrder = 2
+    DoubleBuffered = True
     Kind = bkOK
-    ExplicitLeft = 335
-    ExplicitTop = 405
+    ParentDoubleBuffered = False
+    TabOrder = 2
   end
   object btnCancel: TBitBtn
     Left = 278
@@ -447,9 +421,9 @@ object frmEditorOptions: TfrmEditorOptions
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    TabOrder = 1
+    DoubleBuffered = True
     Kind = bkCancel
-    ExplicitLeft = 254
-    ExplicitTop = 406
+    ParentDoubleBuffered = False
+    TabOrder = 1
   end
 end

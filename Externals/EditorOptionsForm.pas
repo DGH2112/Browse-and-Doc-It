@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    05 Jul 2008
+  @Date    08 Jan 2010
 
 **)
 unit EditorOptionsForm;
@@ -427,7 +427,7 @@ End;
   @precon  Editor must be a valid instance of a TSynEdit cvontrol.
   @postcon nvokes a form for editing the given instance of the TSynEdit control.
 
-  @param   Editor as a TSynEdit as a reference
+  @param   Editor as a TSynEdit
   @param   boolIncTag as a Boolean
   @return  a Boolean
 
@@ -522,7 +522,7 @@ End;
 
 (**
 
-  This is the attribute list box's on click event handler.
+  This is the attribute list box`s on click event handler.
 
   @precon  None.
   @postcon Updates the attribute conotrols with the selected attribute in the

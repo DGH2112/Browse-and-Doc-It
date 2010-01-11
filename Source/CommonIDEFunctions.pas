@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    30 Dec 2009
+  @Date    11 Jan 2010
   @Version 1.0
 
 **)
@@ -607,13 +607,12 @@ begin
     On E : Exception Do
       Begin
         {$IFDEF EUREKALOG}
-        StandardEurekaNotify(GetLastExceptionObject, GetLastExceptionAddress);
-        If Assigned(FSuccessfulParseProc) Then
-          FSuccessfulParseProc(False);
-        {$ELSE}
+        If StandardEurekaNotify(GetLastExceptionObject, GetLastExceptionAddress) Then
+        {$ENDIF}
+          If Assigned(FSuccessfulParseProc) Then
+            FSuccessfulParseProc(False);
         FFileName := E.Message;
         Synchronize(ShowException);
-        {$ENDIF}
       End;
   End;
 end;

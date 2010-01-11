@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    02 Jan 2010
+  @Date    11 Jan 2010
   @Author  David Hoyle
   @Version 1.0
 
@@ -1238,7 +1238,7 @@ Begin
       FSpecialTagNodes[i].boolExpand :=
         Integer(BrowseAndDocItOptions.SpecialTags.Objects[i]) And iAutoExpand <> 0;
       FSpecialTagNodes[i].Node := AddNode(FModule, FSpecialTagNodes[i].strTagDesc,
-        FSpecialTagNodes[i].strTagName, 1, Integer(iiTodoFolder) - 1);
+        FSpecialTagNodes[i].strTagName, 1, Integer(iiTodoFolder) - 1, 0, 0, True);
     End;
 End;
 

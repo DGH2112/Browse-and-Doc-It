@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       02 Jan 2010
+  @Date       14 Jan 2010
   @Author     David Hoyle
 
 **)
@@ -139,51 +139,51 @@ Type
   End;
 
   (** An enumerate for the symbol types. **)
-  TSymbolType = (stRectangle, stBar, stLine, stEllipse, stTriangle, stDiamond);
+  TSymbolType = (tstRectangle, tstBar, tstLine, tstEllipse, tstTriangle, tstDiamond);
 
   (** An enumerate to defined the Excel Colour Indexes **)
   TColour = (
-    xlcNONE           = -1,
-    xlcBLACK          =  1,
-    xlcBROWN          = 53,
-    xlcOLIVEGREEN     = 52,
-    xlcDARKGREEN      = 51,
-    xlcDARKTEAL       = 49,
-    xlcDARKBLUE       = 11,
-    xlcINDIGO         = 55,
-    xlcGRAY80         = 56,
-    xlcDARKRED        =  9,
-    xlcORANGE         = 46,
-    xlcDARKYELLOW     = 12,
-    xlcGREEN          = 10,
-    xlcTEAL           = 14,
-    xlcBLUE           =  5,
-    xlcBLUEGRAY       = 47,
-    xlcGRAY50         = 16,
-    xlcRED            =  3,
-    xlcLIGHTORANGE    = 45,
-    xlcLIME           = 43,
-    xlcSEAGREEN       = 50,
-    xlcAQUA           = 42,
-    xlcLIGHTBLUE      = 41,
-    xlcVIOLET         = 13,
-    xlcGRAY40         = 48,
-    xlcPINK           =  7,
-    xlcGOLD           = 44,
-    xlcYELLOW         =  6,
-    xlcBRIGHTGREEN    =  4,
-    xlcTURQUOISE      =  8,
-    xlcSKYBLUE        = 33,
-    xlcPLUM           = 54,
-    xlcGRAY25         = 15,
-    xlcROSE           = 38,
-    xlcTAN            = 40,
-    xlcLIGHTYELLOW    = 36,
-    xlcLIGHTGREEN     = 35,
-    xlcLIGHTTURQUOISE = 34,
-    xlcPALEBLUE       = 37,
-    xlcLAVENDER       = 39,
-    xlcWHITE          =  2
+    xlcNONE,
+    xlcBLACK,
+    xlcBROWN,
+    xlcOLIVEGREEN,
+    xlcDARKGREEN,
+    xlcDARKTEAL,
+    xlcDARKBLUE,
+    xlcINDIGO,
+    xlcGRAY80,
+    xlcDARKRED,
+    xlcORANGE,
+    xlcDARKYELLOW,
+    xlcGREEN,
+    xlcTEAL,
+    xlcBLUE,
+    xlcBLUEGRAY,
+    xlcGRAY50,
+    xlcRED,
+    xlcLIGHTORANGE,
+    xlcLIME,
+    xlcSEAGREEN,
+    xlcAQUA,
+    xlcLIGHTBLUE,
+    xlcVIOLET,
+    xlcGRAY40,
+    xlcPINK,
+    xlcGOLD,
+    xlcYELLOW,
+    xlcBRIGHTGREEN,
+    xlcTURQUOISE,
+    xlcSKYBLUE,
+    xlcPLUM,
+    xlcGRAY25,
+    xlcROSE,
+    xlcTAN,
+    xlcLIGHTYELLOW,
+    xlcLIGHTGREEN,
+    xlcLIGHTTURQUOISE,
+    xlcPALEBLUE,
+    xlcLAVENDER,
+    xlcWHITE
   );
 
   (** An enumerate to define the line styles available in Excel. **)
@@ -531,64 +531,47 @@ Const
 
   (** A constant array providing names for the enumerated colours. **)
   strColours : Array[Low(TColour)..High(TColour)] Of String = (
-    'None',               // = -1
-    '',
-    'Black',              // =  1
-    'White',              // =  2
-    'Red',                // =  3
-    'BrightGreen',        // =  4
-    'Blue',               // =  5
-    'Yellow',             // =  6
-    'Pink',               // =  7
-    'Turquoise',          // =  8
-    'DarkRed',            // =  9
-    'Green',              // = 10
-    'DarkBlue',           // = 11
-    'DarkYellow',         // = 12
-    'Violet',             // = 13
-    'Teal',               // = 14
-    'Gray-25%',           // = 15
-    'Gray-50%',           // = 16
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    'SkyBlue',            // = 33
-    'LightTurquoise',     // = 34
-    'LightGreen',         // = 35
-    'LightYellow',        // = 36
-    'PaleBlue',           // = 37
-    'Rose',               // = 38
-    'Lavender',           // = 39
-    'Tan',                // = 40
-    'LightBlue',          // = 41
-    'Aqua',               // = 42
-    'Lime',               // = 43
-    'Gold',               // = 44
-    'LightOrange',        // = 45
-    'Orange',             // = 46
-    'Blue-Gray',          // = 47
-    'Gray-40%',           // = 48
-    'DarkTeal',           // = 49
-    'SeaGreen',           // = 50
-    'DarkGreen',          // = 51
-    'OliveGreen',         // = 52
-    'Brown',              // = 53
-    'Plum',               // = 54
-    'Indigo',             // = 55
-    'Gray-80%'            // = 56
+    'None',          
+    'Black',
+    'Brown',
+    'OliveGreen',
+    'DarkGreen',
+    'DarkTeal',
+    'DarkBlue',
+    'Indigo',
+    'Gray-80%',
+    'DarkRed',
+    'Orange',
+    'DarkYellow',
+    'Green',
+    'Teal',
+    'Blue',
+    'Blue-Gray',
+    'Gray-50%',
+    'Red',
+    'LightOrange',
+    'Lime',
+    'SeaGreen',
+    'Aqua',
+    'LightBlue',
+    'Violet',
+    'Gray-40%',
+    'Pink',
+    'Gold',
+    'Yellow',
+    'BrightGreen',
+    'Turquoise',
+    'SkyBlue',
+    'Plum',
+    'Gray-25%',
+    'Rose',
+    'Tan',
+    'LightYellow',
+    'LightGreen',
+    'LightTurquoise',
+    'PaleBlue',
+    'Lavender',
+    'White'
   );
 
   (** A constant array of line style names for the enumerated styles **)
@@ -700,6 +683,8 @@ ResourceString
   strTableNameLabel = 'Tablename';
   (** A resource string for the Primary reference. **)
   strPrimaryLabel = 'Primary';
+  (** A resource string for the Symbols reference. **)
+  strSymbolsLabel = 'Symbols';
 
 Implementation
 
@@ -960,8 +945,8 @@ end;
 function TTimeLocationTable.AddSymbol(Symbol: TSymbol): TSymbol;
 begin
   If FSymbols = Nil Then
-    FSymbols := Add(TLabelContainer.Create('Symbols', scNone, 0, 0, iiObjectsLabel,
-      Nil)) As TLabelContainer;
+    FSymbols := Add(TLabelContainer.Create(strSymbolsLabel, scNone, 0, 0,
+      iiObjectsLabel, Nil)) As TLabelContainer;
   Result := FSymbols.Add(Symbol) As TSymbol;
 end;
 
@@ -1187,7 +1172,7 @@ begin
       NextNonCommentToken;
       B := TLT.AddSymbol(TBar.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TBar;
-      B.SymbolType := stBar;
+      B.SymbolType := tstBar;
       EatWhitespace;
       If CheckLiteral(',', 'TLBar') Then
         Begin
@@ -2070,7 +2055,7 @@ begin
       NextNonCommentToken;
       D := TLT.AddSymbol(TDiamond.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TDiamond;
-      D.SymbolType := stDiamond;
+      D.SymbolType := tstDiamond;
       EatWhitespace;
       If CheckLiteral(',', 'TLDiamond') Then
         Begin
@@ -2204,7 +2189,7 @@ begin
       NextNonCommentToken;
       E := TLT.AddSymbol(TEllipse.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TEllipse;
-      E.SymbolType := stEllipse;
+      E.SymbolType := tstEllipse;
       EatWhitespace;
       If CheckLiteral(',', 'TLEllipse') Then
         Begin
@@ -2617,7 +2602,7 @@ begin
       NextNonCommentToken;
       T := TLT.AddSymbol(TTriangle.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TTriangle;
-      T.SymbolType := stTriangle;
+      T.SymbolType := tstTriangle;
       EatWhitespace;
       If CheckLiteral(',', 'TLTriangle') Then
         Begin
@@ -2861,7 +2846,7 @@ begin
       NextNonCommentToken;
       L := TLT.AddSymbol(TLine.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TLine;
-      L.SymbolType := stLine;
+      L.SymbolType := tstLine;
       EatWhitespace;
       If CheckLiteral(',', 'TLLine') Then
         Begin
@@ -3386,7 +3371,7 @@ begin
       NextNonCommentToken;
       R := TLT.AddSymbol(TRectangle.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TRectangle;
-      R.SymbolType := stRectangle;
+      R.SymbolType := tstRectangle;
       EatWhitespace;
       If CheckLiteral(',', 'TLRectangle') Then
         Begin

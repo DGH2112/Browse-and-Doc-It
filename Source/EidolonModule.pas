@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       14 Jan 2010
+  @Date       15 Jan 2010
   @Author     David Hoyle
 
 **)
@@ -273,6 +273,7 @@ Type
     FBorderLineStyle : TLineStyle;
     FBorderWeight : TLineWeight;
     FSymbolType: TSymbolType;
+    FLayerIndex : Integer;
   Public
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
@@ -303,6 +304,13 @@ Type
       @return  a TLineWeight
     **)
     Property BorderWeight : TLineWeight Read FBorderWeight Write FBorderWeight;
+    (**
+      This property gets and sets the layer index of the symbol.
+      @precon  None.
+      @postcon Gets and sets the layer index of the symbol.
+      @return  an Integer
+    **)
+    Property LayerIndex : Integer Read FLayerIndex Write FLayerIndex;
   End;
 
   (** A class to represent a TimeLocationTable definition. **)
@@ -476,23 +484,29 @@ Type
     Procedure ConnectionDef(DBTable : TDBTable; ConnectionType : TConnectionType);
     Procedure TableNameDef(DBTable : TDBTable; ConnectionType : TConnectionType);
     Function  TimeLocationDef(Table : TTimeLocationTable) : Boolean;
-    Function  TLLine(strName : String; StartToken : TTokenInfo; TLT : TTimeLocationTable) : Boolean;
+    Function  TLLine(strName : String; StartToken : TTokenInfo;
+      TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
     Procedure BorderDef(Symbol : TSymbol);
     Procedure BorderColour(Symbol : TSymbol);
     Function  ColourName : TColour;
     Procedure BorderLineStyle(Symbol : TSymbol);
     Procedure BorderWeight(Symbol : TSymbol);
-    Function  TLRectangle(strName : String; StartToken : TTokenInfo; TLT : TTimeLocationTable) : Boolean;
-    Function  TLBar(strName : String; StartToken : TTokenInfo; TLT : TTimeLocationTable) : Boolean;
+    Function  TLRectangle(strName : String; StartToken : TTokenInfo;
+      TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
+    Function  TLBar(strName : String; StartToken : TTokenInfo;
+      TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
     Procedure InteriorDef(CustomSymbol : TCustomFillSymbol);
     Procedure Transparency(CustomSymbol : TCustomFillSymbol);
     Procedure InteriorColour(CustomSymbol : TCustomFillSymbol);
     Procedure InteriorPattern(CustomSymbol : TCustomFillSymbol);
     Procedure InteriorPatternColour(CustomSymbol : TCustomFillSymbol);
     Procedure BarWidth(Bar : TBar);
-    Function  TLDiamond(strName : String; StartToken : TTokenInfo; TLT : TTimeLocationTable) : Boolean;
-    Function  TLTriangle(strName : String; StartToken : TTokenInfo; TLT : TTimeLocationTable) : Boolean;
-    Function  TLEllipse(strName : String; StartToken : TTokenInfo; TLT : TTimeLocationTable) : Boolean;
+    Function  TLDiamond(strName : String; StartToken : TTokenInfo;
+      TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
+    Function  TLTriangle(strName : String; StartToken : TTokenInfo;
+      TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
+    Function  TLEllipse(strName : String; StartToken : TTokenInfo;
+      TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
     Procedure DiamondSize(Diamond : TDiamond);
     Procedure TriangleType(Triangle : TTriangle);
     Procedure EllipseSize(Ellipse : TEllipse);
@@ -1148,18 +1162,19 @@ end;
 
   This method parses the Bar element of the grammar.
 
-  @precon  StartToken must ba a valid instance of a TTokenInfo class and
-           TLT must be a valid instance of a TTimeLocationTable class.
+  @precon  StartToken must ba a valid instance of a TTokenInfo class and TLT
+           must be a valid instance of a TTimeLocationTable class.
   @postcon Returns true if a BAR was parsed.
 
-  @param   strName    as a String
-  @param   StartToken as a TTokenInfo
-  @param   TLT        as a TTimeLocationTable
+  @param   strName     as a String
+  @param   StartToken  as a TTokenInfo
+  @param   TLT         as a TTimeLocationTable
+  @param   iLayerIndex as an Integer as a reference
   @return  a Boolean
 
 **)
 function TEidolonModule.TLBar(strName: String; StartToken : TTokenInfo;
-  TLT : TTimeLocationTable): Boolean;
+  TLT : TTimeLocationTable; var iLayerIndex : Integer): Boolean;
 
 Var
   B : TBar;
@@ -1173,6 +1188,7 @@ begin
       B := TLT.AddSymbol(TBar.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TBar;
       B.SymbolType := tstBar;
+      B.LayerIndex := iLayerIndex;
       EatWhitespace;
       If CheckLiteral(',', 'TLBar') Then
         Begin
@@ -2031,18 +2047,19 @@ end;
 
   This meothd parses the Diamond element of the grammar.
 
-  @precon  StartToken must ba a valid instance of a TTokenInfo class and
-           TLT must be a valid instance of a TTimeLocationTable class.
+  @precon  StartToken must ba a valid instance of a TTokenInfo class and TLT
+           must be a valid instance of a TTimeLocationTable class.
   @postcon Returns true if a DIAMOND was parsed.
 
-  @param   strName    as a String
-  @param   StartToken as a TTokenInfo
-  @param   TLT        as a TTimeLocationTable
+  @param   strName     as a String
+  @param   StartToken  as a TTokenInfo
+  @param   TLT         as a TTimeLocationTable
+  @param   iLayerIndex as an Integer as a reference
   @return  a Boolean
 
 **)
 function TEidolonModule.TLDiamond(strName: String; StartToken : TTokenInfo;
-  TLT : TTimeLocationTable): Boolean;
+  TLT : TTimeLocationTable; var iLayerIndex : Integer): Boolean;
 
 Var
   D : TDiamond;
@@ -2056,6 +2073,7 @@ begin
       D := TLT.AddSymbol(TDiamond.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TDiamond;
       D.SymbolType := tstDiamond;
+      D.LayerIndex := iLayerIndex;
       EatWhitespace;
       If CheckLiteral(',', 'TLDiamond') Then
         Begin
@@ -2165,18 +2183,19 @@ end;
 
   This method parses the Ellipse element of the grammar.
 
-  @precon  StartToken must ba a valid instance of a TTokenInfo class and
-           TLT must be a valid instance of a TTimeLocationTable class.
+  @precon  StartToken must ba a valid instance of a TTokenInfo class and TLT
+           must be a valid instance of a TTimeLocationTable class.
   @postcon Returns true if a ELLIPSE was parsed.
 
-  @param   strName    as a String
-  @param   StartToken as a TTokenInfo
-  @param   TLT        as a TTimeLocationTable
+  @param   strName     as a String
+  @param   StartToken  as a TTokenInfo
+  @param   TLT         as a TTimeLocationTable
+  @param   iLayerIndex as an Integer as a reference
   @return  a Boolean
 
 **)
 function TEidolonModule.TLEllipse(strName: String; StartToken : TTokenInfo;
-  TLT : TTimeLocationTable): Boolean;
+  TLT : TTimeLocationTable; var iLayerIndex : Integer): Boolean;
 
 Var
   E : TEllipse;
@@ -2190,6 +2209,7 @@ begin
       E := TLT.AddSymbol(TEllipse.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TEllipse;
       E.SymbolType := tstEllipse;
+      E.LayerIndex := iLayerIndex;
       EatWhitespace;
       If CheckLiteral(',', 'TLEllipse') Then
         Begin
@@ -2578,18 +2598,19 @@ end;
 
   This method parses the Triangle element of the grammar.
 
-  @precon  StartToken must ba a valid instance of a TTokenInfo class and
-           TLT must be a valid instance of a TTimeLocationTable class.
+  @precon  StartToken must ba a valid instance of a TTokenInfo class and TLT
+           must be a valid instance of a TTimeLocationTable class.
   @postcon Returns true if a TRIANGLE was parsed.
 
-  @param   strName    as a String
-  @param   StartToken as a TTokenInfo
-  @param   TLT        as a TTimeLocationTable
+  @param   strName     as a String
+  @param   StartToken  as a TTokenInfo
+  @param   TLT         as a TTimeLocationTable
+  @param   iLayerIndex as an Integer as a reference
   @return  a Boolean
 
 **)
 function TEidolonModule.TLTriangle(strName: String; StartToken : TTokenInfo;
-  TLT : TTimeLocationTable): Boolean;
+  TLT : TTimeLocationTable; var iLayerIndex : Integer): Boolean;
 
 Var
   T : TTriangle;
@@ -2603,6 +2624,7 @@ begin
       T := TLT.AddSymbol(TTriangle.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TTriangle;
       T.SymbolType := tstTriangle;
+      T.LayerIndex := iLayerIndex;
       EatWhitespace;
       If CheckLiteral(',', 'TLTriangle') Then
         Begin
@@ -2822,18 +2844,19 @@ end;
 
   This method parses the Line element of the grammar.
 
-  @precon  StartToken must ba a valid instance of a TTokenInfo class and
-           TLT must be a valid instance of a TTimeLocationTable class.
+  @precon  StartToken must ba a valid instance of a TTokenInfo class and TLT
+           must be a valid instance of a TTimeLocationTable class.
   @postcon Returns true if a LINE symbol was parsed.
 
-  @param   strName    as a String
-  @param   StartToken as a TTokenInfo
-  @param   TLT        as a TTimeLocationTable
+  @param   strName     as a String
+  @param   StartToken  as a TTokenInfo
+  @param   TLT         as a TTimeLocationTable
+  @param   iLayerIndex as an Integer as a reference
   @return  a Boolean
 
 **)
 function TEidolonModule.TLLine(strName: String; StartToken : TTokenInfo;
-  TLT : TTimeLocationTable): Boolean;
+  TLT : TTimeLocationTable; var iLayerIndex : Integer): Boolean;
 
 Var
   L : TLine;
@@ -2847,6 +2870,7 @@ begin
       L := TLT.AddSymbol(TLine.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TLine;
       L.SymbolType := tstLine;
+      L.LayerIndex := iLayerIndex;
       EatWhitespace;
       If CheckLiteral(',', 'TLLine') Then
         Begin
@@ -3254,6 +3278,7 @@ function TEidolonModule.TimeLocationDef(Table : TTimeLocationTable): Boolean;
 Var
   strName : String;
   StartToken : TTokenInfo;
+  iLayerIndex: Integer;
 
 begin
   Result := False;
@@ -3275,12 +3300,14 @@ begin
           If CheckLiteral('=', 'TimeLocationDef') Then
             Begin
               EatWhitespace;
-              If TLRectangle(strName, StartToken, Table) Or
-                TLBar(strName, StartToken, Table) Or
-                TLLine(strName, StartToken, Table) Or
-                TLTriangle(strName, StartToken, Table) Or
-                TLEllipse(strName, StartToken, Table) Or
-                TLDiamond(strName, StartToken, Table) Then;
+              iLayerIndex := 1;
+              If TLRectangle(strName, StartToken, Table, iLayerIndex) Or
+                TLBar(strName, StartToken, Table, iLayerIndex) Or
+                TLLine(strName, StartToken, Table, iLayerIndex) Or
+                TLTriangle(strName, StartToken, Table, iLayerIndex) Or
+                TLEllipse(strName, StartToken, Table, iLayerIndex) Or
+                TLDiamond(strName, StartToken, Table, iLayerIndex) Then
+                Inc(iLayerIndex);
             End;
         End Else
           ErrorAndSeekToken(strNullName, 'TimeLocationDef', Token.Token,
@@ -3347,18 +3374,19 @@ end;
 
   This method parses the Rectangle element of the grammar.
 
-  @precon  StartToken must ba a valid instance of a TTokenInfo class and
-           TLT must be a valid instance of a TTimeLocationTable class.
+  @precon  StartToken must ba a valid instance of a TTokenInfo class and TLT
+           must be a valid instance of a TTimeLocationTable class.
   @postcon Returns true is a RECTANGLE was parsed.
 
-  @param   strName    as a String
-  @param   StartToken as a TTokenInfo
-  @param   TLT        as a TTimeLocationTable
+  @param   strName     as a String
+  @param   StartToken  as a TTokenInfo
+  @param   TLT         as a TTimeLocationTable
+  @param   iLayerIndex as an Integer as a reference
   @return  a Boolean
 
 **)
 function TEidolonModule.TLRectangle(strName: String; StartToken : TTokenInfo;
-  TLT : TTimeLocationTable): Boolean;
+  TLT : TTimeLocationTable; var iLayerIndex : Integer): Boolean;
 
 Var
   R : TRectangle;
@@ -3372,6 +3400,7 @@ begin
       R := TLT.AddSymbol(TRectangle.Create(strName, scNone, StartToken.Line,
         StartToken.Column, iiPublicObject, Nil)) As TRectangle;
       R.SymbolType := tstRectangle;
+      R.LayerIndex := iLayerIndex;
       EatWhitespace;
       If CheckLiteral(',', 'TLRectangle') Then
         Begin

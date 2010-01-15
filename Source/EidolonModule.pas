@@ -2268,6 +2268,8 @@ begin
         Begin
           If T = Nil Then
             T := Token;
+          If Token.TokenType In [ttLineEnd] Then
+            Break;
           strName := strName + Token.Token;
           NextNonCommentToken;
         End;
@@ -3292,6 +3294,8 @@ begin
         Begin
           If StartToken = Nil Then
             StartToken := Token;
+          If Token.TokenType In [ttLineEnd] Then
+            Break;
           strName := strName + Token.Token;
           NextNonCommentToken;
         End;

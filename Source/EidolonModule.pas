@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       15 Jan 2010
+  @Date       16 Jan 2010
   @Author     David Hoyle
 
 **)
@@ -200,6 +200,7 @@ Type
 
   (** An enumerate for line weights. **)
   TLineWeight = (
+    lw0,
     lw0_25,
     lw0_5,
     lw1,
@@ -602,6 +603,7 @@ Const
 
   (** A constant array of line weights names for the enumerated weights **)
   strLineWeights : Array[Low(TLineWeight)..High(TLineWeight)] Of String = (
+    'None',
     '0.25',
     '0.5',
     '1',

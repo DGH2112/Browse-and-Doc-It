@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       16 Jan 2010
+  @Date       23 Jan 2010
   @Author     David Hoyle
 
 **)
@@ -484,7 +484,8 @@ Type
     Function  DatabaseDef(DBTable : TDBTable; ConnectionType : TConnectionType) : Boolean;
     Procedure ConnectionDef(DBTable : TDBTable; ConnectionType : TConnectionType);
     Procedure TableNameDef(DBTable : TDBTable; ConnectionType : TConnectionType);
-    Function  TimeLocationDef(Table : TTimeLocationTable) : Boolean;
+    Function  TimeLocationDef(Table : TTimeLocationTable;
+      var iLayerIndex : Integer) : Boolean;
     Function  TLLine(strName : String; StartToken : TTokenInfo;
       TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
     Procedure BorderDef(Symbol : TSymbol);
@@ -3273,16 +3274,17 @@ end;
   @precon  Table must be a valid instance of a TTimeLocationTable class.
   @postcon Parses the TimeLocationDef elements of the grammar.
 
-  @param   Table as a TTimeLocationTable
+  @param   Table       as a TTimeLocationTable
+  @param   iLayerIndex as an Integer as a reference
   @return  a Boolean
 
 **)
-function TEidolonModule.TimeLocationDef(Table : TTimeLocationTable): Boolean;
+function TEidolonModule.TimeLocationDef(Table : TTimeLocationTable;
+  var iLayerIndex : Integer): Boolean;
 
 Var
   strName : String;
   StartToken : TTokenInfo;
-  iLayerIndex: Integer;
 
 begin
   Result := False;
@@ -3306,7 +3308,6 @@ begin
           If CheckLiteral('=', 'TimeLocationDef') Then
             Begin
               EatWhitespace;
-              iLayerIndex := 1;
               If TLRectangle(strName, StartToken, Table, iLayerIndex) Or
                 TLBar(strName, StartToken, Table, iLayerIndex) Or
                 TLLine(strName, StartToken, Table, iLayerIndex) Or
@@ -3338,6 +3339,7 @@ Function TEidolonModule.TimeLocationTable(strName : String; StartToken : TTokenI
 var
   TLT: TTimeLocationTable;
   iSheetIndex: Integer;
+  iLayerIndex : Integer;
 
 begin
   Result := False;
@@ -3361,7 +3363,8 @@ begin
                       Begin
                         iSheetIndex := 1;
                         While FieldDef(TLT, iSheetIndex) Or EmptyLine Do;
-                        While TimeLocationDef(TLT) Or EmptyLine Do;
+                        iLayerIndex := 1;
+                        While TimeLocationDef(TLT, iLayerIndex) Or EmptyLine Do;
                         If CheckLiteral('}', 'TimeLocationTable') Then
                           Begin
                             EatWhitespace;

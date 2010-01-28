@@ -1,5 +1,5 @@
 (** @stopdocumentation **)
-unit Office_TLB;
+unit Office2000_TLB;
 
 // ************************************************************************ //
 // WARNING                                                                  //

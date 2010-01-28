@@ -5,14 +5,14 @@
 
   @Version 1.0
   @Author  Steve Trefethen
-  @Date    04 Jan 2010
+  @Date    28 Jan 2010
 
 **)
 unit EventSink;
 
 interface
 
-uses Windows, ActiveX, Office_TLB;
+uses Windows, ActiveX, Office2000_TLB;
 
 type
   (** An event type for the VCL events to be attached to the COM events. **)

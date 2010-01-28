@@ -26,7 +26,7 @@ unit VBIDE_TLB;
 interface
 
 uses Windows, ActiveX, Classes, Graphics, OleCtrls, StdVCL, 
-  Office_TLB;
+  Office2000_TLB;
 
 // *********************************************************************//
 // GUIDS declared in the TypeLibrary. Following prefixes are used:      //

@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    01 Aug 2009
+  @Date    07 Feb 2010
   @Version 1.0
   @Author  David Hoyle
 
@@ -20,15 +20,21 @@ uses
 {$WARN UNIT_PLATFORM ON}
 
 type
+  (** An enumerate to define the visisble tabs in the dialogue. **)
+  TVisibleTab = (vtGeneralOptions, vtSpecialTags, vtModuleExplorer,
+    vtCodeBrowsing, vtExcludeDocFiles, vtMethodDescriptions);
+  (** A set of visible tabs. **)
+  TVisibleTabs = Set of TVisibleTab;
+
   (** This class represents an options dialogue where the user can change the
       display options of the application. **)
   TfrmOptions = class(TForm)
     bbtnOK: TBitBtn;
     bbtnCancel: TBitBtn;
     OptionTab: TPageControl;
-    Page1: TTabSheet;
+    tabGeneralOptions: TTabSheet;
     clbOptions: TCheckListBox;
-    Page2: TTabSheet;
+    tabSpecialTags: TTabSheet;
     lbSpecialTags: TListBox;
     IntervalPanel: TPanel;
     lblRefreshInterval: TLabel;
@@ -41,8 +47,8 @@ type
     edtUpdateInterval: TEdit;
     udUpdateInterval: TUpDown;
     CheckedImages: TImageList;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
+    tabModuleExplorer: TTabSheet;
+    tabCodeBrowsing: TTabSheet;
     lblFontName: TLabel;
     cbxFontName: TComboBox;
     lblFontSize: TLabel;
@@ -106,7 +112,7 @@ type
     FTokenFontInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
   public
     { Public declarations }
-    Class Function Execute : Boolean;
+    Class Function Execute(VisibleTabs : TVisibleTabs) : Boolean;
   end;
 
 implementation
@@ -123,17 +129,18 @@ ResourceString
 (**
 
   This method creates an instance of the options dialogue and sets all the
-  controls based on the passed Options parameter. If OK is selected then
-  the Options parameter is updated to suit the new options.
+  controls based on the passed Options parameter. If OK is selected then the
+  Options parameter is updated to suit the new options.
 
   @precon  iInt is the timer interval to be represented in the dialogue,
            DocHelpFile is the directory of the modules help file.
   @postcon Returns true if the OK button on the dialogue was pressed.
 
+  @param   VisibleTabs as a TVisibleTabs
   @return  a Boolean
 
 **)
-Class Function TfrmOptions.Execute : Boolean;
+Class Function TfrmOptions.Execute(VisibleTabs : TVisibleTabs) : Boolean;
 
 Var
   i : TDocOption;
@@ -170,6 +177,13 @@ Begin
       udTokenLimit.Position := BrowseAndDocItOptions.TokenLimit;
       udManagedNodesLife.Position := BrowseAndDocItOptions.ManagedNodesLife;
       clbxTreeColour.Selected := BrowseAndDocItOptions.TreeColour;
+      OptionTab.ActivePage := tabGeneralOptions;
+      tabGeneralOptions.TabVisible := vtGeneralOptions In VisibleTabs;
+      tabSpecialTags.TabVisible := vtSpecialTags In VisibleTabs;
+      tabModuleExplorer.TabVisible := vtModuleExplorer In VisibleTabs;
+      tabCodeBrowsing.TabVisible := vtCodeBrowsing In VisibleTabs;
+      tabExcludeDocFiles.TabVisible := vtExcludeDocFiles In VisibleTabs;
+      tabMethodDescriptions.TabVisible := vtMethodDescriptions In VisibleTabs;
       If ShowModal = mrOK Then
         Begin
           Result := True;

@@ -250,10 +250,6 @@ object frmEditorOptions: TfrmEditorOptions
     object BehaviourTab: TTabSheet
       Caption = 'Behaviour'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 394
-      ExplicitHeight = 363
       DesignSize = (
         418
         281)
@@ -270,10 +266,6 @@ object frmEditorOptions: TfrmEditorOptions
     object SyntaxTab: TTabSheet
       Caption = 'Syntax Highlighting'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 394
-      ExplicitHeight = 363
       DesignSize = (
         418
         281)
@@ -285,7 +277,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight]
         Caption = 'Attribute &Foreground Colour'
         FocusControl = cbxAttrForeColour
-        ExplicitLeft = 143
       end
       object lblAttrBackColour: TLabel
         Left = 266
@@ -295,7 +286,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight]
         Caption = 'Attribute Background &Colour'
         FocusControl = cbxAttrBackColour
-        ExplicitLeft = 147
       end
       object lblAttributes: TLabel
         Left = 3
@@ -319,7 +309,6 @@ object frmEditorOptions: TfrmEditorOptions
         Font.Name = 'MS Sans Serif'
         Font.Style = []
         ParentFont = False
-        ExplicitWidth = 294
       end
       object lbAttributes: TListBox
         Left = 3
@@ -341,7 +330,6 @@ object frmEditorOptions: TfrmEditorOptions
         ItemHeight = 16
         TabOrder = 1
         OnChange = AttributeChange
-        ExplicitLeft = 238
       end
       object cbxAttrBackColour: TColorBox
         Left = 262
@@ -353,7 +341,6 @@ object frmEditorOptions: TfrmEditorOptions
         ItemHeight = 16
         TabOrder = 2
         OnChange = AttributeChange
-        ExplicitLeft = 238
       end
       object grpFontStyles: TGroupBox
         Left = 262
@@ -363,8 +350,6 @@ object frmEditorOptions: TfrmEditorOptions
         Anchors = [akTop, akRight, akBottom]
         Caption = 'Attribute Font Styles'
         TabOrder = 3
-        ExplicitLeft = 238
-        ExplicitHeight = 228
         object cbxBold: TCheckBox
           Left = 8
           Top = 24
@@ -410,9 +395,7 @@ object frmEditorOptions: TfrmEditorOptions
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkOK
-    ParentDoubleBuffered = False
     TabOrder = 2
   end
   object btnCancel: TBitBtn
@@ -421,9 +404,7 @@ object frmEditorOptions: TfrmEditorOptions
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkCancel
-    ParentDoubleBuffered = False
     TabOrder = 1
   end
 end

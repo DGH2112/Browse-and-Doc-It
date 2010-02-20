@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Dec 2009
+  @Date    20 Feb 2010
 
 **)
 
@@ -18,7 +18,7 @@ Uses
   SysUtils, Classes, ComCtrls, SynEdit, SynEditTypes, SynEditKeyCmds,
   SynEditHighlighter, Controls;
 
-{$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
+{$INCLUDE 'CompilerDefinitions.inc'}
 
 Type
   (** A declaration for a call back proc to exceptions. **)

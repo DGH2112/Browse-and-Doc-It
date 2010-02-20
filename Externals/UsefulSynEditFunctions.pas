@@ -3,7 +3,7 @@
   This module contains useful functions for working with SynEdit code.
 
   @Version 1.0
-  @Date    27 Dec 2009
+  @Date    20 Feb 2010
   @Author  David Hoyle
 
 **)
@@ -14,8 +14,8 @@ interface
 Uses
   IniFiles, SynEditHighlighter, SynHighlighterMulti;
 
-  procedure LoadHighlighterFromINIFile(FINIFile : String; Highlighter: TSynCustomHighlighter);
-  procedure SaveHighlighterToINIFile(INIFile : TINIFile; Highlighter: TSynCustomHighlighter);
+  procedure LoadHighlighterFromINIFile(iniFile : TIniFile; Highlighter: TSynCustomHighlighter);
+  procedure SaveHighlighterToINIFile(iniFile : TINIFile; Highlighter: TSynCustomHighlighter);
 
 implementation
 
@@ -29,11 +29,11 @@ Uses
   @precon  INIFile and Highlighter must be valid instances.
   @postcon Loads the given highlighter information from the given ini file.
 
-  @param   FINIFile    as a String
+  @param   iniFile     as a TIniFile
   @param   Highlighter as a TSynCustomHighlighter
 
 **)
-procedure LoadHighlighterFromINIFile(FINIFile : String; Highlighter: TSynCustomHighlighter);
+procedure LoadHighlighterFromINIFile(iniFile : TIniFile; Highlighter: TSynCustomHighlighter);
 
 Var
   iAttr : Integer;
@@ -45,13 +45,13 @@ Var
   iScheme : Integer;
 
 begin
-  With TIniFile.Create(FINIFile) Do
-    Try
+  With IniFile Do
+    Begin
       If Highlighter Is TSynMultiSyn Then
         Begin
           M := Highlighter As TSynMultiSyn;
           If M.DefaultHighlighter.Tag < 0 Then
-            LoadHighlighterFromINIFile(FINIFile, M.DefaultHighlighter);
+            LoadHighlighterFromINIFile(iniFile, M.DefaultHighlighter);
           For iScheme := 0 To M.Schemes.Count - 1 Do
             Begin
               S := M.Schemes[iScheme] As TScheme;
@@ -65,7 +65,7 @@ begin
               A.Style := TFontStyles(Byte(ReadInteger(strKey, strName + '.Style',
                 Byte(A.Style))));
               If Highlighter.Tag < 0 Then
-                LoadHighlighterFromINIFile(FINIFile, S.Highlighter);
+                LoadHighlighterFromINIFile(iniFile, S.Highlighter);
             End;
         End Else
           For iAttr := 0 To Highlighter.AttrCount - 1 Do
@@ -80,8 +80,6 @@ begin
                 Byte(A.Style))));
             End;
       Highlighter.Tag := 0;
-    Finally
-      Free;
     End;
 end;
 

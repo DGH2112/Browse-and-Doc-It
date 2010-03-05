@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    02 Jan 2010
+  @Date    05 Mar 2010
 
 **)
 Unit DGHLibrary;
@@ -5385,25 +5385,18 @@ Begin
     clBlack  : Result := 0;
     clMaroon  :Result := FOREGROUND_RED;
     clGreen   :Result := FOREGROUND_GREEN;
-    clOlive   :Result := FOREGROUND_RED Or FOREGROUND_GREEN;
     clNavy    :Result := FOREGROUND_BLUE;
-    //clPurple  :;
+    clOlive   :Result := FOREGROUND_RED Or FOREGROUND_GREEN;
+    clPurple  :Result := FOREGROUND_RED Or FOREGROUND_BLUE;
     clTeal    :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN;
-    clGray    :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN Or
-                 FOREGROUND_RED;
-    //clSilver  :;
+    clGray    :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN Or FOREGROUND_RED;
     clRed     :Result := FOREGROUND_RED   Or FOREGROUND_INTENSITY;
     clLime    :Result := FOREGROUND_GREEN Or FOREGROUND_INTENSITY;
-    clYellow  :Result := FOREGROUND_RED Or FOREGROUND_GREEN Or
-                 FOREGROUND_INTENSITY;
     clBlue    :Result := FOREGROUND_BLUE  Or FOREGROUND_INTENSITY;
-    //clFuchsia :;
-    clAqua    :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN  Or
-                 FOREGROUND_INTENSITY;
-    //clLtGray  :;
-    //clDkGray  :;
-    clWhite   :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN Or
-                 FOREGROUND_RED Or FOREGROUND_INTENSITY;
+    clFuchsia :Result := FOREGROUND_RED Or FOREGROUND_BLUE Or FOREGROUND_INTENSITY;
+    clYellow  :Result := FOREGROUND_RED Or FOREGROUND_GREEN Or FOREGROUND_INTENSITY;
+    clAqua    :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN  Or FOREGROUND_INTENSITY;
+    clWhite   :Result := FOREGROUND_BLUE Or FOREGROUND_GREEN Or FOREGROUND_RED Or FOREGROUND_INTENSITY;
     clNone  : Result  := iNone;
   Else
     Raise Exception.Create('Invalid console colour.');
@@ -5431,25 +5424,18 @@ Begin
     clBlack  : Result := 0;
     clMaroon  :Result := BACKGROUND_RED;
     clGreen   :Result := BACKGROUND_GREEN;
-    clOlive   :Result := BACKGROUND_RED Or BACKGROUND_GREEN;
     clNavy    :Result := BACKGROUND_BLUE;
-    //clPurple  :;
+    clOlive   :Result := BACKGROUND_RED Or BACKGROUND_GREEN;
+    clPurple  :Result := BACKGROUND_RED or BACKGROUND_GREEN;
     clTeal    :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN;
-    clGray    :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN Or
-                 BACKGROUND_RED;
-    //clSilver  :;
+    clGray    :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN Or BACKGROUND_RED;
     clRed     :Result := BACKGROUND_RED   Or BACKGROUND_INTENSITY;
     clLime    :Result := BACKGROUND_GREEN Or BACKGROUND_INTENSITY;
-    clYellow  :Result := BACKGROUND_RED Or BACKGROUND_GREEN Or
-                 BACKGROUND_INTENSITY;
     clBlue    :Result := BACKGROUND_BLUE  Or BACKGROUND_INTENSITY;
-    //clFuchsia :;
-    clAqua    :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN  Or
-                 BACKGROUND_INTENSITY;
-    //clLtGray  :;
-    //clDkGray  :;
-    clWhite   :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN Or
-                 BACKGROUND_RED Or BACKGROUND_INTENSITY;
+    clYellow  :Result := BACKGROUND_RED Or BACKGROUND_GREEN Or BACKGROUND_INTENSITY;
+    clFuchsia :Result := BACKGROUND_BLUE Or BACKGROUND_RED  Or BACKGROUND_INTENSITY;
+    clAqua    :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN  Or BACKGROUND_INTENSITY;
+    clWhite   :Result := BACKGROUND_BLUE Or BACKGROUND_GREEN Or BACKGROUND_RED Or BACKGROUND_INTENSITY;
     clNone  : Result  := iNone;
   Else
     Raise Exception.Create('Invalid console colour.');
@@ -5558,7 +5544,7 @@ End;
 **)
 Procedure OutputToConsole(hndConsole : THandle; Const strText : String = '';
   iTextColour : TColor = clNone; iBackColour : TColor = clNone;
-    boolUpdateCursor : Boolean = True);
+  boolUpdateCursor : Boolean = True);
 
 Var
   ConsoleInfo : TConsoleScreenBufferInfo;

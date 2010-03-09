@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    11 Jan 2010
+  @Date    09 Mar 2010
   @Version 1.0
 
 **)
@@ -18,7 +18,7 @@ Uses
 Type
   {$INCLUDE 'CompilerDefinitions.inc'}
 
-  (** This is a procedure to returns the success of the parse in the thread. **)
+  (** This is a procedure to return the success of the parse in the thread. **)
   TParserNotify = Procedure(boolSuccessfulParse : Boolean) Of Object;
   (** This is a procedure to allow the thread to get information from the
       calling IDE. **)
@@ -31,39 +31,23 @@ Type
       the calling IDEs main thread. **)
   TThreadExceptionMsg = Procedure(strExceptionMsg : String) Of Object;
 
-  (** This class defines a thread in which the parsing of the code and
-      rendering of the module explorer is done. **)
-  TBrowseAndDocItThread = class(TThread)
+  (** This is a class to manage thread used to parse code. Its main aim is
+      to ensure that only 1 thread is active at a time and provide a mechanism
+      to terminate a working thread. **)
+  TBrowseAndDocItThreadManager = Class
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FModule: TBaseLanguageModule;
-    FSource  : String;
-    FFileName: String;
-    FType    : String;
-    FModified: Boolean;
-    FSuccessfulParseProc : TParserNotify;
-    FRenderDocumentTree: TRenderDocumentTree;
-    FThreadExceptionMsg: TThreadExceptionMsg;
-    Procedure SetName;
+    FThread : TThread;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure Execute; Override;
-    Procedure RenderModuleExplorer;
-    Procedure ShowException;
+    Procedure TerminateThread(Sender : TObject);
   Public
-    Constructor CreateBrowseAndDocItThread(
+    Constructor Create;
+    Destructor Destroy; Override;
+    Function Parse(
       SuccessfulParseProc : TParserNotify;
       EditorInfo : TEditorInformation;
       RenderDocumentTree : TRenderDocumentTree;
-      ThreadExceptionMsg : TThreadExceptionMsg);
-    Destructor Destroy; Override;
+      ThreadExceptionMsg : TThreadExceptionMsg) : Boolean;
   End;
-
-  (** This record defines information for use in naming threads. **)
-  TThreadNameInfo = record
-    FType: LongWord;     // must be 0x1000
-    FName: PChar;        // pointer to name (in user address space)
-    FThreadID: LongWord; // thread ID (-1 indicates caller thread)
-    FFlags: LongWord;    // reserved for future use, must be zero
-  end;
 
   (** This emunerate descibed the different types of doc comment .**)
   TCommentStyle = (csBlock, csLine, csInSitu);
@@ -122,6 +106,42 @@ Implementation
 
 uses
   DGHLibrary, ModuleDispatcher {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF};
+
+Type
+  (** This class defines a thread in which the parsing of the code and
+      rendering of the module explorer is done. **)
+  TBrowseAndDocItThread = class(TThread)
+  {$IFDEF D2005} Strict {$ENDIF} Private
+    FModule: TBaseLanguageModule;
+    FSource  : String;
+    FFileName: String;
+    FType    : String;
+    FModified: Boolean;
+    FSuccessfulParseProc : TParserNotify;
+    FRenderDocumentTree: TRenderDocumentTree;
+    FThreadExceptionMsg: TThreadExceptionMsg;
+    Procedure SetName;
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+    Procedure Execute; Override;
+    Procedure RenderModuleExplorer;
+    Procedure ShowException;
+  Public
+    Constructor CreateBrowseAndDocItThread(
+      SuccessfulParseProc : TParserNotify;
+      EditorInfo : TEditorInformation;
+      RenderDocumentTree : TRenderDocumentTree;
+      ThreadExceptionMsg : TThreadExceptionMsg;
+      TerminateThread : TNotifyEvent);
+    Destructor Destroy; Override;
+  End;
+
+  (** This record defines information for use in naming threads. **)
+  TThreadNameInfo = record
+    FType: LongWord;     // must be 0x1000
+    FName: PChar;        // pointer to name (in user address space)
+    FThreadID: LongWord; // thread ID (-1 indicates caller thread)
+    FFlags: LongWord;    // reserved for future use, must be zero
+  end;
 
 Const
   (** A constant to define the maximim width of a comment in the source code. **)
@@ -529,6 +549,87 @@ Begin
       End;
 End;
 
+{ TBrowseAndDocItThreadManager }
+
+(**
+
+  A constructor for the TBrowseAndDocItThreadManager class.
+
+  @precon  None.
+  @postcon Intialises the thread variable to null.
+
+**)
+Constructor TBrowseAndDocItThreadManager.Create;
+
+Begin
+  FThread := Nil;
+End;
+
+(**
+
+  A destructor for the TBrowseAndDocItThreadManager class.
+
+  @precon  None.
+  @postcon Terminate any working thread.
+
+**)
+Destructor TBrowseAndDocItThreadManager.Destroy;
+
+Begin
+  If FThread <> Nil Then
+    FThread.Terminate;
+  Inherited Destroy;
+End;
+
+(**
+
+  This method parses the given code reference ONLY IF there is no current
+  parsing thread.
+
+  @precon  None.
+  @postcon Parses the given code reference ONLY IF there is no current
+           parsing thread.
+
+  @param   SuccessfulParseProc as a TParserNotify
+  @param   EditorInfo          as a TEditorInformation
+  @param   RenderDocumentTree  as a TRenderDocumentTree
+  @param   ThreadExceptionMsg  as a TThreadExceptionMsg
+  @return  a Boolean
+
+**)
+Function TBrowseAndDocItThreadManager.Parse(
+  SuccessfulParseProc : TParserNotify;
+  EditorInfo : TEditorInformation;
+  RenderDocumentTree : TRenderDocumentTree;
+  ThreadExceptionMsg : TThreadExceptionMsg) : Boolean;
+
+Begin
+  Result := False;
+  If FThread = Nil Then
+    Begin
+      FThread := TBrowseAndDocItThread.CreateBrowseAndDocItThread(
+        SuccessfulParseProc, EditorInfo, RenderDocumentTree, ThreadExceptionMsg,
+        TerminateThread);
+      Result := True;
+    End;
+End;
+
+(**
+
+  This method is an on terminate event handler for threads.
+
+  @precon  None.
+  @postcon Called by the freeing thread which sets the thread variable to nil.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBrowseAndDocItThreadManager.TerminateThread(Sender : TObject);
+
+Begin
+  FThread := Nil;
+End;
+
 { TBrowseAndDocItThread }
 
 (**
@@ -544,13 +645,15 @@ End;
   @param   EditorInfo          as a TEditorInformation
   @param   RenderDocumentTree  as a TRenderDocumentTree
   @param   ThreadExceptionMsg  as a TThreadExceptionMsg
+  @param   TerminateThread     as a TNotifyEvent
 
 **)
 constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(
   SuccessfulParseProc : TParserNotify;
   EditorInfo : TEditorInformation;
   RenderDocumentTree : TRenderDocumentTree;
-  ThreadExceptionMsg : TThreadExceptionMsg);
+  ThreadExceptionMsg : TThreadExceptionMsg;
+  TerminateThread : TNotifyEvent);
 
 begin
   Inherited Create(True);
@@ -558,6 +661,7 @@ begin
   FSuccessfulParseProc := SuccessfulParseProc;
   FRenderDocumentTree := RenderDocumentTree;
   FThreadExceptionMsg := ThreadExceptionMsg;
+  OnTerminate := TerminateThread;
   FSource := '';
   If Assigned(EditorInfo) Then
     FSource := EditorInfo(FFileName, FModified);
@@ -596,6 +700,8 @@ begin
     FModule := Dispatcher(FSource, FFileName, FModified, [moParse,
       moCheckForDocumentConflicts]);
     Try
+      If Terminated Then
+        Exit;
       FType := 'Rendering';
       Synchronize(RenderModuleExplorer);
     Finally

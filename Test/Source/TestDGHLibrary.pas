@@ -501,19 +501,24 @@ Var
 begin
   strFile := 'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
   CheckEquals(True, DGHPathRelativePathTo('E:\Hoyld\Borland Studio Projects\', strFile));
-  CheckEquals('.\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+  CheckEquals('IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+
   strFile := 'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
   CheckEquals(True, DGHPathRelativePathTo('E:\Hoyld\Borland Studio Projects\Library\', strFile));
   CheckEquals('..\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+
   strFile := 'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
   CheckEquals(True, DGHPathRelativePathTo('E:\Hoyld\borland studio projects\Library\Tests\', strFile));
   CheckEquals('..\..\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+
   strFile := 'TestingHelperWizard.pas';
   CheckEquals(False, DGHPathRelativePathTo('E:\Hoyld\borland studio projects\', strFile));
   CheckEquals('TestingHelperWizard.pas', strFile);
+
   strFile := '\\CJVRUG1\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
   CheckEquals(True, DGHPathRelativePathTo('\\CJVRUG1\Grouped\Hoyld\borland studio projects\', strFile));
-  CheckEquals('.\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+  CheckEquals('IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+
   strFile := '\\CJVRUG2\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
   CheckEquals(False, DGHPathRelativePathTo('\\CJVRUG1\Grouped\Hoyld\borland studio projects\', strFile));
   CheckEquals('\\CJVRUG2\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);

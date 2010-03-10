@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    05 Mar 2010
+  @Date    10 Mar 2010
 
 **)
 Unit DGHLibrary;
@@ -6459,10 +6459,7 @@ Begin
     End;
   If Result Then
     Begin
-      If strBasePath = '' Then
-        strFileName := '.\'
-      Else
-        strFileName := '';
+      strFileName := '';
       While iPos > 0 Do
         Begin
           strBasePath := Copy(strBasePath, iPos + 1, MAX_PATH);

@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    25 Oct 2009
+  @Date    13 Mar 2010
   @Version 1.0
 
 **)
@@ -13,7 +13,8 @@ Unit ModuleDispatcher;
 Interface
 
 Uses
-  SysUtils, Classes, BaseLanguageModule, CommonIDEFunctions;
+  SysUtils, Classes, BaseLanguageModule, CommonIDEFunctions, PascalModule,
+  VBModule, BackusNaurModule, XMLModule, DFMModule, EidolonModule;
 
   Function Dispatcher(Source : String; strFileName : String;
     boolModified : Boolean; ModuleOptions : TModuleOptions) : TBaseLanguageModule;
@@ -22,11 +23,6 @@ Uses
   Function GetCommentType(strFileName : String;
     CommentStyle : TCommentStyle) : TCommentType;
 
-Implementation
-
-Uses
-  Windows, PascalModule, VBModule, BackusNaurModule, XMLModule, DFMModule,
-  EidolonModule;
 
 Type
   (** A class type to define classes in the record structure. **)
@@ -44,7 +40,7 @@ Type
 
 Const
   (** A constant array of file extensions with the appropriate parser modules. **)
-  Modules : Array[1..14] of TDispatcherInfo = (
+  Modules : Array[0..13] of TDispatcherInfo = (
     (FExt: '.bas';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine;      FLineCmt: ctVBLine;      FInSituCmt: ctVBLine),
     (FExt: '.bnf';  FCls: TBackusNaurModule; FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock),
     (FExt: '.cls';  FCls: TVBModule        ; FCanDoc: True;  FBlockCmt: ctVBLine;      FLineCmt: ctVBLine;      FInSituCmt: ctVBLine),
@@ -61,6 +57,10 @@ Const
     (FExt: '.xsd';  FCls: TXMLModule       ; FCanDoc: False; FBlockCmt: ctXML;         FLineCmt: ctXML;         FInSituCmt: ctXML)
   );
 
+Implementation
+
+Uses
+  Windows;
 (**
 
   This function returns the index of the parser information corresponding to the

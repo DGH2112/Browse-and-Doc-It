@@ -31,6 +31,10 @@ object frmOptions: TfrmOptions
     TabOrder = 0
     object tabGeneralOptions: TTabSheet
       Caption = 'General Options'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object clbOptions: TCheckListBox
         Left = 0
         Top = 0
@@ -110,6 +114,10 @@ object frmOptions: TfrmOptions
     object tabSpecialTags: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         382)
@@ -227,6 +235,10 @@ object frmOptions: TfrmOptions
     object tabModuleExplorer: TTabSheet
       Caption = 'Module Explorer'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         382)
@@ -300,7 +312,7 @@ object frmOptions: TfrmOptions
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 0
       end
       object edtFontSize: TEdit
@@ -443,6 +455,10 @@ object frmOptions: TfrmOptions
     object tabCodeBrowsing: TTabSheet
       Caption = 'Code Browsing'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         382)
@@ -465,6 +481,10 @@ object frmOptions: TfrmOptions
     object tabExcludeDocFiles: TTabSheet
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         382)
@@ -482,6 +502,10 @@ object frmOptions: TfrmOptions
     object tabMethodDescriptions: TTabSheet
       Caption = 'Method Descriptions'
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         675
         382)

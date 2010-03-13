@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    25 Oct 2009
+  @Date    13 Mar 2010
   @Version 1.0
 
 **)
@@ -978,7 +978,7 @@ end;
 procedure TBrowseAndDocItWizard.OptionsClick(Sender: TObject);
 
 begin
-  If TfrmOptions.Execute Then
+  If TfrmOptions.Execute([Low(TVisibleTab)..High(TVisibleTab)]) Then
     objEditorNotifier.ResetLastupdateTickCount(1);
 end;
 

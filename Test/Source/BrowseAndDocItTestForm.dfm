@@ -1,7 +1,6 @@
 object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   Left = 161
   Top = 170
-  ActiveControl = lvFileList
   Caption = 'frmBrowseAndDocItTestForm'
   ClientHeight = 763
   ClientWidth = 907
@@ -13,134 +12,29 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   Font.Style = []
   OldCreateOrder = False
   Position = poDefault
-  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
-    Left = 684
+    Left = 670
     Top = 30
     Height = 714
     ResizeStyle = rsUpdate
   end
   object sptFiles: TSplitter
-    Left = 265
+    Left = 251
     Top = 30
     Height = 714
     ResizeStyle = rsUpdate
   end
   object pnlModuleExplorer: TPanel
-    Left = 268
+    Left = 254
     Top = 30
     Width = 416
     Height = 714
     Align = alLeft
-    TabOrder = 1
-  end
-  object pnlFileList: TPanel
-    Left = 0
-    Top = 30
-    Width = 265
-    Height = 714
-    Align = alLeft
     TabOrder = 0
-    object sptDirs: TSplitter
-      Left = 1
-      Top = 142
-      Width = 263
-      Height = 3
-      Cursor = crVSplit
-      Align = alTop
-    end
-    object lvFileList: TListView
-      Left = 1
-      Top = 145
-      Width = 263
-      Height = 568
-      Align = alClient
-      Columns = <
-        item
-          Caption = 'FileName'
-          Width = 125
-        end
-        item
-          Alignment = taRightJustify
-          Caption = 'C'
-          Width = 25
-        end
-        item
-          Alignment = taRightJustify
-          Caption = 'H'
-          Width = 25
-        end
-        item
-          Alignment = taRightJustify
-          Caption = 'W'
-          Width = 25
-        end
-        item
-          Alignment = taRightJustify
-          Caption = 'E'
-          Width = 25
-        end>
-      ColumnClick = False
-      GridLines = True
-      HideSelection = False
-      ReadOnly = True
-      RowSelect = True
-      StateImages = ilDirStatus
-      TabOrder = 0
-      ViewStyle = vsReport
-      OnCustomDrawItem = lvDirectoriesCustomDrawItem
-      OnSelectItem = lvFileListSelectItem
-    end
-    object lvDirectories: TListView
-      Left = 1
-      Top = 1
-      Width = 263
-      Height = 141
-      Align = alTop
-      Checkboxes = True
-      Columns = <
-        item
-          Caption = 'Folder'
-          Width = 125
-        end
-        item
-          Alignment = taRightJustify
-          Caption = 'C'
-          Width = 25
-        end
-        item
-          Alignment = taRightJustify
-          Caption = 'H'
-          Width = 25
-        end
-        item
-          Alignment = taRightJustify
-          Caption = 'W'
-          Width = 25
-        end
-        item
-          Alignment = taRightJustify
-          Caption = 'E'
-          Width = 25
-        end>
-      ColumnClick = False
-      DragMode = dmAutomatic
-      GridLines = True
-      HideSelection = False
-      MultiSelect = True
-      ReadOnly = True
-      RowSelect = True
-      TabOrder = 1
-      ViewStyle = vsReport
-      OnChange = lvDirectoriesChange
-      OnCustomDrawItem = lvDirectoriesCustomDrawItem
-      OnDragDrop = lvDirectoriesDragDrop
-      OnDragOver = lvDirectoriesDragOver
-    end
   end
   object sbrStatusBar: TStatusBar
     Left = 0
@@ -166,7 +60,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     ParentColor = False
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 3
+    TabOrder = 2
     object tbtnFileExit: TToolButton
       Left = 0
       Top = 0
@@ -177,28 +71,13 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Top = 0
       Action = actFileScan
     end
-    object tbtnFileAddFolder: TToolButton
-      Left = 54
-      Top = 0
-      Action = actFileAddFolder
-    end
-    object tbtnFileEditFolder: TToolButton
-      Left = 81
-      Top = 0
-      Action = actFileEditFolder
-    end
-    object tbtnFileDeleteFolder: TToolButton
-      Left = 108
-      Top = 0
-      Action = actFileDeleteFolder
-    end
     object tbtnFileExcludeFile: TToolButton
-      Left = 135
+      Left = 54
       Top = 0
       Action = actFileExcludeFile
     end
     object tbtnSep1: TToolButton
-      Left = 162
+      Left = 81
       Top = 0
       Width = 8
       Caption = 'tbtnSep1'
@@ -206,47 +85,47 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Style = tbsSeparator
     end
     object tbtnFileRecurseFolders: TToolButton
-      Left = 170
+      Left = 89
       Top = 0
       Action = actFileRecurseFolders
     end
     object btnViewDocConflicts: TToolButton
-      Left = 197
+      Left = 116
       Top = 0
       Action = actViewDocConflicts
     end
     object tbtnViewHints: TToolButton
-      Left = 224
+      Left = 143
       Top = 0
       Action = actViewHints
     end
     object tbtnViewWarnings: TToolButton
-      Left = 251
+      Left = 170
       Top = 0
       Action = actViewWarnings
     end
     object tbtnViewErrors: TToolButton
-      Left = 278
+      Left = 197
       Top = 0
       Action = actViewErrors
     end
     object tbtnViewSpecialChars: TToolButton
-      Left = 305
+      Left = 224
       Top = 0
       Action = actViewSpecialCharacters
     end
     object tbtnViewShowTokens: TToolButton
-      Left = 332
+      Left = 251
       Top = 0
       Action = actViewShowTokens
     end
     object btnWordwrap: TToolButton
-      Left = 359
+      Left = 278
       Top = 0
       Action = actViewWordWrap
     end
     object tbtnSep2: TToolButton
-      Left = 386
+      Left = 305
       Top = 0
       Width = 8
       Caption = 'tbtnSep2'
@@ -254,26 +133,80 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Style = tbsSeparator
     end
     object tbtnToolsOptions: TToolButton
-      Left = 394
+      Left = 313
       Top = 0
       Action = actToolsOptions
     end
     object tbtnToolsDocumentation: TToolButton
-      Left = 421
+      Left = 340
       Top = 0
       Action = actToolsDocumentation
     end
     object tbtnToolsExclusions: TToolButton
-      Left = 448
+      Left = 367
       Top = 0
       Action = actToolsExclusions
     end
+    object tbtnSep3: TToolButton
+      Left = 394
+      Top = 0
+      Width = 8
+      Caption = 'tbtnSep3'
+      ImageIndex = 21
+      Style = tbsSeparator
+    end
+    object tbtnFolderCongih: TToolButton
+      Left = 402
+      Top = 0
+      Action = actFileFolders
+    end
+  end
+  object lvFileList: TListView
+    Left = 0
+    Top = 30
+    Width = 251
+    Height = 714
+    Align = alLeft
+    Columns = <
+      item
+        Caption = 'FileName'
+        Width = 125
+      end
+      item
+        Alignment = taRightJustify
+        Caption = 'C'
+        Width = 25
+      end
+      item
+        Alignment = taRightJustify
+        Caption = 'H'
+        Width = 25
+      end
+      item
+        Alignment = taRightJustify
+        Caption = 'W'
+        Width = 25
+      end
+      item
+        Alignment = taRightJustify
+        Caption = 'E'
+        Width = 25
+      end>
+    ColumnClick = False
+    HideSelection = False
+    ReadOnly = True
+    RowSelect = True
+    StateImages = ilDirStatus
+    TabOrder = 3
+    ViewStyle = vsReport
+    OnCustomDrawItem = lvFilesCustomDrawItem
+    OnSelectItem = lvFileListSelectItem
   end
   object ilImages: TImageList
     Left = 330
     Top = 139
     Bitmap = {
-      494C010116001800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010117001D00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000006000000001002000000000000060
       00000000000000000000000000000000000000009C000000FF00000063000000
       0000000000000000000000180000001800000018000000000000001800000018
@@ -303,64 +236,64 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       FF000000630000FFE600E6FFE60000FFFF000000000002FFFF0002FFFF0017FF
       FD0017FFFD0017FFFD000000FF00001800000000000000000000FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000FF00FFFFFF00FFFF
-      FF00FFFFFF000000000080808000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FFFFFF000000000080808000000000000000000000000000008080000080
+      8000008080000080800000808000008080000080800000808000008080000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000E6FF00000018000000009C000061
       FF0000009C000000630000180000000000000000000002FFFF0002FFFF0017FF
       FD0017FFFD000000FF0000006300001800000000000000000000FFFFFF00FF00
       0000FFFFFF00FF000000FFFFFF00FF0000000000FF000000FF000000FF000000
-      FF00FFFFFF000000000080808000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FFFFFF000000000080808000000000000000000000FFFF00000000000080
+      8000008080000080800000808000008080000080800000808000008080000080
+      8000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000FFFF000000180000FFFFFF000000
       9C000041FF0000006300E6FFE60000FFFF00FFFFFF000000000017FFFD000018
       00000000FF000000630017FFFD00000000000000000000000000FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000FF00FFFFFF00FFFF
-      FF000000FF000000000080808000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF000000FF0000000000808080000000000000000000FFFFFF0000FFFF000000
+      0000008080000080800000808000008080000080800000808000008080000080
+      8000008080000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000E6FF00000000000000FFE600FFFF
       FF0000009C000000FF0000006300000000000000000000000000001800000000
       FF000000630017FFFD0017FFFD00000000000000000000000000FFFFFF00FF00
       0000FF000000FF000000FFFFFF00FF000000FF000000FFFFFF000000FF000000
-      FF00FFFFFF000000000080808000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FFFFFF000000000080808000000000000000000000FFFF00FFFFFF0000FF
+      FF00000000000080800000808000008080000080800000808000008080000080
+      8000008080000080800000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000E6FF000000180000FFFFFF0000FF
       E600FFFFFF0000009C000000FF0000006300E6FFE60000FFE6000000FF000000
       630017FFFD0019FFFF0019FFFF00000000000000000000000000FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-      FF00FFFFFF000000000080808000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FFFFFF0000000000808080000000000000000000FFFFFF0000FFFF00FFFF
+      FF0000FFFF000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000E6FF00000018000000FFE600FFFF
       FF00001800000000000000009C000000FF00000063000000FF000000630017FF
       FD0017FFFD0019FFFF0019FFFF00000000000000000000000000FFFFFF00FF00
       0000FFFFFF00FF000000FF000000FF000000FFFFFF00FFFFFF00FFFFFF00FFFF
-      FF00FFFFFF000000000080808000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FFFFFF000000000080808000000000000000000000FFFF00FFFFFF0000FF
+      FF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000180000001800000018000000FF
       E600FFFFFF0000FFE6000018000000009C000000FF000000630017FFFD0017FF
       FD00000000000018000017FFFD00001800000000000000000000FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000FF00FFFFFF00FFFF
-      FF00FFFFFF000000000080808000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FFFFFF0000000000808080000000000000000000FFFFFF0000FFFF00FFFF
+      FF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF00000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000018
       0000001800000000000000009C000000FF000000630000009C000000630019FF
       FF0017FFFD0019FFFF0017FFFD00001800000000000000000000FFFFFF00FF00
       0000FFFFFF00FF000000FF000000FFFFFF000000FF000000FF000000FF000000
-      FF00FFFFFF000000000080808000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FF00FFFFFF000000000080808000000000000000000000FFFF00FFFFFF0000FF
+      FF00000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1045,11 +978,11 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000424D3E000000000000003E000000
       2800000040000000600000000100010000000000000300000000000000000000
-      000000000000000000000000FFFFFF001C00FFFF000000000C00C00100000000
-      0000800100000000000080010000000000008001000000000000800100000000
-      0000800100000000000080010000000000008001000000000000800100000000
-      E000800100000000F800800100000000E0008001000000008001800100000000
-      04018003000000000C06FFFF00000000FFFFFFFF01FF1C00F01FF01F00FF0C00
+      000000000000000000000000FFFFFF001C00FFFFFFFF00000C00C001FFFF0000
+      00008001001F000000008001000F000000008001000700000000800100030000
+      0000800100010000000080010000000000008001001F000000008001001F0000
+      E0008001001F0000F80080018FF10000E0008001FFF9000080018001FF750000
+      04018003FF8F00000C06FFFFFFFF0000FFFFFFFF01FF1C00F01FF01F00FF0C00
       E00FE00F007F0000C007C007007F000080038003006700000001000100670000
       00010001007F0000000100010067000000010001006700000001000100630000
       00010001FFF0E00000010001FF18F80000030003FF80E00080078007FF808001
@@ -1162,20 +1095,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       ShortCut = 16452
       OnExecute = DocumentationClick
     end
-    object actFileAddFolder: TAction
-      Category = 'File'
-      Caption = '&Add'
-      ImageIndex = 11
-      ShortCut = 16449
-      OnExecute = actFileAddFolderExecute
-    end
-    object actFileEditFolder: TAction
-      Category = 'File'
-      Caption = '&Edit'
-      ImageIndex = 12
-      ShortCut = 16457
-      OnExecute = actFileEditFolderExecute
-    end
     object actViewDocConflicts: TAction
       Category = 'View'
       AutoCheck = True
@@ -1227,7 +1146,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Caption = 'De&lete'
       ImageIndex = 13
       ShortCut = 16460
-      OnExecute = actFileDeleteFolderExecute
     end
     object actToolsExclusions: TAction
       Category = 'Tools'
@@ -1242,6 +1160,13 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       ShortCut = 24663
       OnExecute = actViewWordWrapExecute
       OnUpdate = actViewWordWrapUpdate
+    end
+    object actFileFolders: TAction
+      Category = 'File'
+      Caption = '&Folders'
+      ImageIndex = 22
+      ShortCut = 24646
+      OnExecute = actFileFoldersExecute
     end
   end
   object ilDirStatus: TImageList

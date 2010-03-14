@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    06 Sep 2009
+  @Date    14 Mar 2010
   @Author  David Hoyle
 
 **)
@@ -32,14 +32,11 @@ type
   (** This is thre class that defined the main interface form. **)
   TfrmBrowseAndDocItTestForm = class(TForm)
     pnlModuleExplorer: TPanel;
-    pnlFileList: TPanel;
     Splitter1: TSplitter;
     lvFileList: TListView;
     ilImages: TImageList;
     sbrStatusBar: TStatusBar;
     sptFiles: TSplitter;
-    sptDirs: TSplitter;
-    lvDirectories: TListView;
     amActions: TActionList;
     actFileExit: TFileExit;
     actViewSpecialCharacters: TAction;
@@ -53,8 +50,6 @@ type
     actViewShowTokens: TAction;
     actToolsOptions: TAction;
     actToolsDocumentation: TAction;
-    actFileAddFolder: TAction;
-    actFileEditFolder: TAction;
     actViewDocConflicts: TAction;
     actViewHints: TAction;
     actViewWarnings: TAction;
@@ -65,11 +60,8 @@ type
     actToolsExclusions: TAction;
     atbToolbar: TToolBar;
     tbtnFileScan: TToolButton;
-    tbtnFileAddFolder: TToolButton;
     tbtnFileExit: TToolButton;
     tbtnFileRecurseFolders: TToolButton;
-    tbtnFileEditFolder: TToolButton;
-    tbtnFileDeleteFolder: TToolButton;
     tbtnFileExcludeFile: TToolButton;
     btnViewDocConflicts: TToolButton;
     tbtnViewHints: TToolButton;
@@ -93,6 +85,9 @@ type
     XPManifest: TXPManifest;
     actViewWordWrap: TAction;
     btnWordwrap: TToolButton;
+    tbtnSep3: TToolButton;
+    actFileFolders: TAction;
+    tbtnFolderCongih: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
@@ -102,29 +97,21 @@ type
     procedure ShowTokensClick(Sender: TObject);
     procedure SpecialCharactersClick(Sender: TObject);
     procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure lvFileListSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
     procedure btnOptionsClick(Sender: TObject);
     procedure DocumentationClick(Sender: TObject);
     procedure FilterChange(Sender: TObject);
-    procedure actFileAddFolderExecute(Sender: TObject);
-    procedure actFileEditFolderExecute(Sender: TObject);
     procedure actFileScanExecute(Sender: TObject);
     procedure ChangeVisibleItems(Sender: TObject);
     procedure actFileRecurseFoldersExecute(Sender: TObject);
     procedure actFileExcludeFileExecute(Sender: TObject);
-    procedure lvDirectoriesDragOver(Sender, Source: TObject; X, Y: Integer;
-      State: TDragState; var Accept: Boolean);
-    procedure lvDirectoriesDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure actFileDeleteFolderExecute(Sender: TObject);
-    procedure lvDirectoriesCustomDrawItem(Sender: TCustomListView;
+    procedure lvFilesCustomDrawItem(Sender: TCustomListView;
       Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure actToolsExclusionsExecute(Sender: TObject);
-    procedure lvDirectoriesChange(Sender: TObject; Item: TListItem;
-      Change: TItemChange);
     procedure actViewWordWrapExecute(Sender: TObject);
     procedure actViewWordWrapUpdate(Sender: TObject);
+    procedure actFileFoldersExecute(Sender: TObject);
   {$IFDEF D2005} Strict {$ENDIF} Private
     { Private declarations }
     FFileName: String;
@@ -141,6 +128,7 @@ type
     FFileExcludeList : TStringList;
     FTimer : TTimer;
     FLastEdit: Int64;
+    FFolders : TStringList;
     function GetFileName: String;
     procedure SetFileName(const Value: String);
     procedure LoadSettings;
@@ -148,11 +136,13 @@ type
     function GetPathRoot: String;
     procedure SetPathRoot(const Value: String);
     Function RecurseDirectories(strRoot, strDirectory : String;
-      var iPosition : Integer; boolScan : Boolean = False) : TScanResults;
+      var iPosition : Integer; strExtensions : String;
+      boolScan : Boolean = False) : TScanResults;
     Procedure RefreshExplorer(Sender : TObject);
     Procedure PopulateListView;
     Function ExcludeFileFromResults(strFileName : String) : Boolean;
-    Procedure GetErrors(strFileName : String; var iHints, iWarnings, iErrors, iConflicts : Integer);
+    Procedure GetErrors(strFileName, strSource : String; var iHints, iWarnings,
+      iErrors, iConflicts : Integer);
     Procedure TimerEvent(Sender : TObject);
     Procedure RefreshModuleExplorer;
     (**
@@ -240,7 +230,7 @@ implementation
 Uses
   TokenForm, IniFiles, DGHLibrary, OptionsForm, ModuleDispatcher,
   DocumentationDispatcher, BaseDocumentation, ShellAPI, Math,
-  DocumentationOptionsForm, ExclusionsForm;
+  DocumentationOptionsForm, ExclusionsForm, FolderConfig, ZipForge;
 
 {$R *.dfm}
 
@@ -271,50 +261,6 @@ end;
 
 (**
 
-  This is an on execute event handler for the Add Folder action.
-
-  @precon  None.
-  @postcon Allows the user to select a directory to add to the list. 
-
-  @param   Sender as a TObject
-
-**)
-procedure TfrmBrowseAndDocItTestForm.actFileAddFolderExecute(Sender: TObject);
-var
-  Item: TListItem;
-  strDir: String;
-begin
-  If SelectDirectory(strDir, [], 0) Then
-    Begin
-      Item := lvDirectories.Items.Add;
-      Item.Caption := strDir;
-    End;
-end;
-
-(**
-
-  This is an on execute event handler for the File Delete Folder action.
-
-  @precon  None.
-  @postcon Deletes the selected folder.
-
-  @param   Sender as a TObject
-
-**)
-procedure TfrmBrowseAndDocItTestForm.actFileDeleteFolderExecute(
-  Sender: TObject);
-
-begin
-  If lvDirectories.Selected = Nil Then
-    Exit;
-  If MessageDlg(Format('Are you sure your wish to delete ''%s''?', [
-    lvDirectories.Selected.Caption]),  mtConfirmation, [mbOK, mbYes,
-    mbCancel], 0) = mrYes Then
-    lvDirectories.DeleteSelected;
-end;
-
-(**
-
   This is an on execute event handler for the Edit Folder action.
 
   @precon  None.
@@ -323,21 +269,6 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmBrowseAndDocItTestForm.actFileEditFolderExecute(Sender: TObject);
-
-Var
-  Item : TListItem;
-  strDir: String;
-
-begin
-  If lvDirectories.Selected = Nil Then
-    Exit;
-  Item := lvDirectories.Selected;
-  strDir := Item.Caption;
-  If SelectDirectory(strDir, [], 0) Then
-    Item.Caption := strDir;
-end;
-
 (**
 
   This is an on execute event handler for the Exclude File action.
@@ -366,6 +297,22 @@ begin
       FFileExcludeList.Add(strFileName);
       actFileRecurseFoldersExecute(Sender);
     End;
+end;
+
+(**
+
+  This is an on execute event handler for the Folder Options action.
+
+  @precon  None.
+  @postcon Displays the folder options dialogue.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmBrowseAndDocItTestForm.actFileFoldersExecute(Sender: TObject);
+
+begin
+  TfrmFolders.Execute(FINIFileName, FFolders);
 end;
 
 (**
@@ -403,29 +350,29 @@ var
   iPosition : Integer;
 
 begin
-  For i := 0 To lvDirectories.Items.Count - 1 Do
-    lvDirectories.Items[i].SubItems.Clear;
   Application.ProcessMessages;
   lvFileList.Items.Clear;
   FParseRecords.Clear;
   FProgressForm.Init(1, 'Preparing to Scan', 'Please wait...');
   Try
     iPosition := 0;
-    For i := 0 To lvDirectories.Items.Count - 1 Do
-      If lvDirectories.Items[i].Checked Then
-        RecurseDirectories(lvDirectories.Items[i].Caption,
-            lvDirectories.Items[i].Caption, iPosition);
+    For i := 0 To FFolders.Count - 1 Do
+      If Integer(FFolders.Objects[i]) > 0 Then
+        RecurseDirectories(FFolders.Names[i], FFolders.Names[i],
+          iPosition, FFolders.ValueFromIndex[i]);
     FProgressForm.Init(iPosition, 'Scanning Directories', 'Please wait...');
     iPosition := 0;
-    For i := 0 To lvDirectories.Items.Count - 1 Do
-      If lvDirectories.Items[i].Checked Then
+    For i := 0 To FFolders.Count - 1 Do
+      If Integer(FFolders.Objects[i]) > 0 Then
         Begin
-          R := RecurseDirectories(lvDirectories.Items[i].Caption,
-            lvDirectories.Items[i].Caption, iPosition, True);
-          lvDirectories.Items[i].SubItems.Add(Format('%d', [R.iDocConflicts]));
-          lvDirectories.Items[i].SubItems.Add(Format('%d', [R.iHints]));
-          lvDirectories.Items[i].SubItems.Add(Format('%d', [R.iWarnings]));
-          lvDirectories.Items[i].SubItems.Add(Format('%d', [R.iErrors]));
+          R := RecurseDirectories(FFolders.Names[i], FFolders.Names[i], iPosition,
+            FFolders.ValueFromIndex[i], True);
+          {
+          FFolders.[i].SubItems.Add(Format('%d', [R.iDocConflicts]));
+          FFolders.[i].SubItems.Add(Format('%d', [R.iHints]));
+          FFolders.[i].SubItems.Add(Format('%d', [R.iWarnings]));
+          FFolders.[i].SubItems.Add(Format('%d', [R.iErrors]));
+          }
         End;
   Finally
     Try
@@ -541,7 +488,7 @@ End;
 procedure TfrmBrowseAndDocItTestForm.btnOptionsClick(Sender: TObject);
 
 begin
-  If TfrmOptions.Execute Then
+  If TfrmOptions.Execute([Low(TVisibleTab)..High(TVisibleTab)]) Then
     SynEdit1Change(Sender);
 end;
 
@@ -604,15 +551,17 @@ end;
   @precon  None.
   @postcon Recurse the directories searching for files.
 
-  @param   strRoot      as a String
-  @param   strDirectory as a String
-  @param   iPosition    as an Integer as a reference
-  @param   boolScan     as a Boolean
+  @param   strRoot       as a String
+  @param   strDirectory  as a String
+  @param   iPosition     as an Integer as a reference
+  @param   strExtensions as a String
+  @param   boolScan      as a Boolean
   @return  a TScanResults
 
 **)
 Function TfrmBrowseAndDocItTestForm.RecurseDirectories(strRoot,
-  strDirectory : String; var iPosition : Integer; boolScan : Boolean = False) : TScanResults;
+  strDirectory : String; var iPosition : Integer; strExtensions : String;
+  boolScan : Boolean = False) : TScanResults;
 
 Var
   recFile : TSearchRec;
@@ -621,43 +570,118 @@ Var
   iConflicts: Integer;
   strFileName: String;
   R: TScanResults;
+  slExts : TStringList;
+  i : Integer;
+  Z: TZipForge;
+  recZip: TZFArchiveItem;
+  boolResult: Boolean;
+  strSource: String;
 
 Begin
   Result.iDocConflicts := 0;
   Result.iHints := 0;
   Result.iWarnings := 0;
   Result.iErrors := 0;
+  slExts := TStringList.Create;
+  Try
+    slExts.Text := strExtensions;
+    slExts.Text := StringReplace(slExts.Text, ';', #13#10, [rfReplaceAll]);
+    For i := 0 To slExts.Count - 1 Do
+      Begin
+        iResult := FindFirst(strDirectory + '\*' + slExts[i], faAnyFile, recFile);
+        Try
+          While iResult = 0 Do
+            Begin
+              Inc(iPosition);
+              If boolScan And CanParseDocument(ExtractFileExt(recFile.Name)) Then
+                Begin
+                  strFileName := strDirectory + '\' + recFile.Name;
+                  If Not ExcludeFileFromResults(strFileName) Then
+                    Begin
+                      FProgressForm.UpdateProgress(iPosition, strFileName);
+                      GetErrors(strFileName, strSource, iHints, iWarnings,
+                        iErrors, iConflicts);
+                      Inc(Result.iDocConflicts, iConflicts);
+                      Inc(Result.iHints, iHints);
+                      Inc(Result.iWarnings, iWarnings);
+                      Inc(Result.iErrors, iErrors);
+                      FParseRecords.Add(TParseRecord.Create(strFileName, strRoot,
+                        iErrors, iWarnings, iHints, iConflicts));
+                      Application.ProcessMessages;
+                    End;
+                End;
+              iResult := FindNext(recFile);
+            End;
+        Finally
+          FindClose(recFile);
+        End;
+      End;
+  Finally
+    slExts.Free;
+  End;
   iResult := FindFirst(strDirectory + '\*.*', faAnyFile, recFile);
   Try
     While iResult = 0 Do
       Begin
-        Inc(iPosition);
-        If boolScan And CanParseDocument(ExtractFileExt(recFile.Name)) Then
+        If (recFile.Attr And faDirectory <> 0) And (recFile.Name[1] <> '.') Then
           Begin
-            strFileName := strDirectory + '\' + recFile.Name;
-            If Not ExcludeFileFromResults(strFileName) Then
-              Begin
-                FProgressForm.UpdateProgress(iPosition, strFileName);
-                GetErrors(strFileName, iHints, iWarnings, iErrors, iConflicts);
-                Inc(Result.iDocConflicts, iConflicts);
-                Inc(Result.iHints, iHints);
-                Inc(Result.iWarnings, iWarnings);
-                Inc(Result.iErrors, iErrors);
-                FParseRecords.Add(TParseRecord.Create(strFileName, strRoot,
-                  iErrors, iWarnings, iHints, iConflicts));
-                Application.ProcessMessages;
-              End;
+            R := RecurseDirectories(strRoot, strDirectory + '\' + recFile.Name,
+              iPosition, strExtensions, boolScan);
+            Inc(Result.iDocConflicts, R.iDocConflicts);
+            Inc(Result.iHints, R.iHints);
+            Inc(Result.iWarnings, R.iWarnings);
+            Inc(Result.iErrors, R.iErrors);
           End;
-        If actFileRecurseFolders.Checked Then
-          If (recFile.Attr And faDirectory <> 0) And (recFile.Name[1] <> '.') Then
-            Begin
-              R := RecurseDirectories(strRoot, strDirectory + '\' + recFile.Name,
-                iPosition, boolScan);
-              Inc(Result.iDocConflicts, R.iDocConflicts);
-              Inc(Result.iHints, R.iHints);
-              Inc(Result.iWarnings, R.iWarnings);
-              Inc(Result.iErrors, R.iErrors);
+        If Like('*.zip', recFile.Name) Then
+          Begin
+            Z := TZipForge.Create(Nil);
+            Try
+              Z.FileName := strDirectory + '\' + recFile.Name;
+              Z.OpenArchive;
+              Try
+                slExts := TStringList.Create;
+                Try
+                  slExts.Text := strExtensions;
+                  slExts.Text := StringReplace(slExts.Text, ';', #13#10, [rfReplaceAll]);
+                  For i := 0 To slExts.Count - 1 Do
+                    Begin
+                      boolResult := Z.FindFirst('*' + slExts[i], recZip);
+                      While boolResult Do
+                        Begin
+                          Inc(iPosition);
+                          If boolScan And CanParseDocument(ExtractFileExt(recZip.FileName)) Then
+                            Begin
+                              strFileName := strDirectory + '\' + recFile.Name + '\' +
+                                recZip.StoredPath + recZip.FileName;
+                              If Not ExcludeFileFromResults(strFileName) Then
+                                Begin
+                                  FProgressForm.UpdateProgress(iPosition, strFileName);
+                                  Z.ExtractToString(recZip.StoredPath +
+                                    recZip.FileName, strSource);
+                                  GetErrors(strFileName, strSource, iHints,
+                                    iWarnings, iErrors, iConflicts);
+                                  Inc(Result.iDocConflicts, iConflicts);
+                                  Inc(Result.iHints, iHints);
+                                  Inc(Result.iWarnings, iWarnings);
+                                  Inc(Result.iErrors, iErrors);
+                                  FParseRecords.Add(TParseRecord.Create(strFileName, strRoot,
+                                    iErrors, iWarnings, iHints, iConflicts));
+                                  Application.ProcessMessages;
+                                End;
+                            End;
+                          boolResult := Z.FindNext(recZip);
+                        End;
+                    End;
+                Finally
+                  slExts.Free;
+                End;
+              Finally
+                Z.CloseArchive;
+              End;
+            Finally
+              Z.Free;
             End;
+          End;
         iResult := FindNext(recFile);
       End;
   Finally
@@ -706,23 +730,20 @@ end;
 
 (**
 
-
   This method gets the number of errors for the given files name.
 
-
   @precon  None.
-
   @postcon Gets the number of errors for the given files name.
 
-
   @param   strFileName as a String
+  @param   strSource   as a String
   @param   iHints      as an Integer as a reference
   @param   iWarnings   as an Integer as a reference
   @param   iErrors     as an Integer as a reference
   @param   iConflicts  as an Integer as a reference
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.GetErrors(strFileName : String;
+Procedure TfrmBrowseAndDocItTestForm.GetErrors(strFileName, strSource : String;
   var iHints, iWarnings, iErrors, iConflicts : Integer);
 
 Var
@@ -738,7 +759,10 @@ Begin
   iConflicts := 0;
   Source := TStringList.Create;;
   Try
-    Source.LoadFromFile(strFileName);
+    If strSource = '' Then
+      Source.LoadFromFile(strFileName)
+    Else
+      Source.Text := strSource;
     M := Dispatcher(Source.Text, strFileName, False, [moParse, moCheckForDocumentConflicts]);
     If M <> Nil Then
       Try
@@ -764,28 +788,6 @@ End;
 
 (**
 
-  This is an on close event handler for the main form.
-
-  @precon  None.
-  @postcon Prompts to save the file if the file has been modified.
-
-  @param   Sender   as a TObject
-  @param   CanClose as a Boolean as a reference
-
-**)
-procedure TfrmBrowseAndDocItTestForm.FormCloseQuery(Sender: TObject;
-  var CanClose: Boolean);
-
-begin
-  If FSynEdit.Modified Then
-    Begin
-      FSynEdit.Lines.SaveToFile(FFileName);
-      FSynEdit.Modified := False;
-    End;
-end;
-
-(**
-
   This is the forms on create event handler.
 
   @precon  None.
@@ -807,6 +809,7 @@ begin
       Align := alClient;
       ActiveLineColor := clSkyBlue;
       Gutter.ShowLineNumbers := True;
+      ReadOnly := True;
       PopupMenu := pmEdit;
       OnChange := SynEdit1Change;
       OnStatusChange:= SynEdit1StatusChange;
@@ -876,6 +879,7 @@ begin
   FModuleExplorerFrame.OnFocus := Focus;
   FModuleExplorerFrame.OnRefresh := RefreshExplorer;
   FFileExcludeList := TStringList.Create;
+  FFolders := TStringList.Create;
   LoadSettings;
   FLastEdit := 0;
   FTimer := TTimer.Create(Self);
@@ -904,10 +908,10 @@ begin
   FSynPasSyn.Free;
   FSynCPPSyn.Free;
   SaveSettings;
+  FFolders.Free;
   FFileExcludeList.Free;
   FModuleExplorerFrame.Free;
   FProgressForm.Free;
-  lvDirectories.OnChange := Nil;
   FParseRecords.Free;
 end;
 
@@ -944,25 +948,6 @@ end;
 
 (**
 
-  This is an onchange event handler for the directories list view.
-
-  @precon  None.
-  @postcon Forces the list view of the files to be re-drawn based on selected
-           directories.
-
-  @param   Sender as a TObject
-  @param   Item   as a TListItem
-  @param   Change as a TItemChange
-
-**)
-procedure TfrmBrowseAndDocItTestForm.lvDirectoriesChange(Sender: TObject;
-  Item: TListItem; Change: TItemChange);
-begin
-  PopulateListView;
-end;
-
-(**
-
   This is an on custom draw item event handler for the list views.
 
   @precon  None.
@@ -974,7 +959,7 @@ end;
   @param   DefaultDraw as a Boolean as a reference
 
 **)
-procedure TfrmBrowseAndDocItTestForm.lvDirectoriesCustomDrawItem(
+procedure TfrmBrowseAndDocItTestForm.lvFilesCustomDrawItem(
   Sender: TCustomListView; Item: TListItem; State: TCustomDrawState;
   var DefaultDraw: Boolean);
 
@@ -1020,12 +1005,6 @@ begin
       Sender.Canvas.Font.Color := clHighlightText;
     End;
   Sender.Canvas.FillRect(R);
-  If Sender = lvDirectories Then
-    Begin
-      R := Item.DisplayRect(drBounds);
-      Sender.Canvas.FillRect(R);
-      ilDirStatus.Draw(Sender.Canvas, R.Left, R.Top, Integer(Item.Checked), True);
-    End;
   R := Item.DisplayRect(drLabel);
   Dec(R.Right);
   iLength := Length(Item.Caption);
@@ -1068,74 +1047,6 @@ End;
 
 (**
 
-  This is an on drag drop event handler for the directory list view.
-
-  @precon  None.
-  @postcon Swaps the selected item for the item the selected item is drop on.
-
-  @param   Sender as a TObject
-  @param   Source as a TObject
-  @param   X      as an Integer
-  @param   Y      as an Integer
-
-**)
-procedure TfrmBrowseAndDocItTestForm.lvDirectoriesDragDrop(Sender,
-  Source: TObject; X, Y: Integer);
-
-var
-  Item: TListItem;
-  strText : String;
-  boolChecked : Boolean;
-  i: Integer;
-
-begin
-  Item := (Source As TListView).GetItemAt(X, Y);
-  With (Source As TListView) Do
-    Begin
-      strText := Item.Caption;
-      boolChecked := Item.Checked;
-      Item.Caption := Selected.Caption;
-      Item.Checked := Selected.Checked;
-      Selected.Caption := strText;
-      Selected.Checked := boolChecked;
-      For i := 0 to Item.SubItems.Count -1 Do
-        Begin
-          strText := Item.SubItems[i];
-          Item.SubItems[i] := Selected.SubItems[i];
-          Selected.SubItems[i] := strText;
-        End;
-      Selected := Nil;
-    End;
-end;
-
-(**
-
-  This is an on drag over event handler for the directory list view.
-
-  @precon  None.
-  @postcon Enabled or disbled the drop based on where the drop is.
-
-  @param   Sender as a TObject
-  @param   Source as a TObject
-  @param   X      as an Integer
-  @param   Y      as an Integer
-  @param   State  as a TDragState
-  @param   Accept as a Boolean as a reference
-
-**)
-procedure TfrmBrowseAndDocItTestForm.lvDirectoriesDragOver(Sender,
-  Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
-
-Var
-  OverItem : TListItem;
-
-begin
-  OverItem := (Source As TListView).GetItemAt(X, Y);
-  Accept := (OverItem <> (Source As TListView).Selected) And (OverItem <> Nil);
-end;
-
-(**
-
   This is a Select item event handler for the list view.
 
   @precon  None.
@@ -1149,20 +1060,13 @@ end;
 procedure TfrmBrowseAndDocItTestForm.lvFileListSelectItem(Sender: TObject;
   Item: TListItem; Selected: Boolean);
 
-Var
-  boolCanClose :Boolean;
-
 begin
-  FormCloseQuery(Self, boolCanClose);
   If lvFileList.Selected <> Nil Then
-    If FileExists(lvFileList.Selected.SubItems[4]) Then
-      Begin
-        FileName := lvFileList.Selected.SubItems[4];
-        PathRoot := lvFileList.Selected.SubItems[5];
-        RefreshModuleExplorer;
-      End Else
-        MessageDlg(Format('The file "%s" was not found.',
-          [lvFileList.Selected.SubItems[4]]), mtError, [mbOK], 0);
+    Begin
+      FileName := lvFileList.Selected.SubItems[4];
+      PathRoot := lvFileList.Selected.SubItems[5];
+      RefreshModuleExplorer;
+    End;
 end;
 
 (**
@@ -1181,39 +1085,6 @@ Var
   liItem: TListItem;
   boolInclude : Boolean;
 
-  (**
-
-    This function determines of the current record should be shown based on
-    whether the root directory is selected or no selection is present.
-
-    @precon  None.
-    @postcon Returns true if the record should be shown in the results set.
-
-    @return  a Boolean
-
-  **)
-  Function IsFolderSelected : Boolean;
-
-  Var
-    k : Integer;
-    S: TListItem;
-
-  Begin
-    k := 0;
-    S := lvDirectories.Selected;
-    While S <> Nil Do
-      Begin
-        Inc(k);
-        If S.Caption = rec.PathRoot Then
-          Begin
-            Result := True;
-            Exit;
-          End;
-        S := lvDirectories.GetNextItem(S, sdBelow, [isSelected]);
-      End;
-    Result := (k = 0);
-  End;
-
 begin
   Try
     lvFileList.Clear;
@@ -1230,7 +1101,6 @@ begin
         boolInclude := boolInclude Or (actViewWarnings.Checked And (rec.Warnings > 0));
         boolInclude := boolInclude Or (actViewHints.Checked And (rec.Hints > 0));
         boolInclude := boolInclude Or (actViewDocConflicts.Checked And (rec.Conflicts > 0));
-        boolInclude := boolInclude And IsFolderSelected;
         If boolInclude Then
           Begin
             liItem := lvFileList.Items.Add;
@@ -1259,7 +1129,7 @@ end;
 procedure TfrmBrowseAndDocItTestForm.SaveSettings;
 
 var
-  i: Integer;
+  i : Integer;
   recWndPlmt : TWindowPlacement;
 
 begin
@@ -1274,26 +1144,22 @@ begin
       WriteInteger('Position', 'Width',
         recWndPlmt.rcNormalPosition.Right - recWndPlmt.rcNormalPosition.Left);
       WriteInteger('Position', 'WindowState', Integer(WindowState));
-      WriteInteger('Position', 'FileSplitter', pnlFileList.Width);
+      WriteInteger('Position', 'FileSplitter', lvFileList.Width);
       WriteInteger('Columns', '1', lvFileList.Columns[0].Width);
       WriteInteger('Columns', '2', lvFileList.Columns[1].Width);
       WriteInteger('Columns', '3', lvFileList.Columns[2].Width);
       WriteInteger('Columns', '4', lvFileList.Columns[3].Width);
       WriteInteger('Columns', '5', lvFileList.Columns[4].Width);
-      WriteInteger('Columns', 'A', lvDirectories.Columns[0].Width);
-      WriteInteger('Columns', 'B', lvDirectories.Columns[1].Width);
-      WriteInteger('Columns', 'B', lvDirectories.Columns[2].Width);
-      WriteInteger('Columns', 'D', lvDirectories.Columns[3].Width);
-      WriteInteger('Columns', 'E', lvDirectories.Columns[4].Width);
       WriteInteger('Position', 'Splitter', pnlModuleExplorer.Width);
-      WriteInteger('Position', 'DirHeight', lvDirectories.Height);
       EraseSection('Folders');
-      EraseSection('FolderChecks');
-      For i := 0 To lvDirectories.Items.Count - 1 Do
+      EraseSection('Folders.Enabled');
+      For i := 0 To FFolders.Count - 1 Do
         Begin
-          WriteString('Folders', Format('Folder%d', [i]), lvDirectories.Items[i].Caption);
-          WriteBool('FolderChecks', Format('Folder%d', [i]), lvDirectories.Items[i].Checked);
+          WriteString('Folders', FFolders.Names[i], FFolders.ValueFromIndex[i]);
+          WriteBool('Folders.Enabled', FFolders.Names[i],
+            Boolean(Integer(FFolders.Objects[i])));
         End;
+      EraseSection('ExcludedFiles');
       For i := 0 To FFileExcludeList.Count - 1 Do
         WriteString('ExcludedFiles', Format('File%d', [i]), FFileExcludeList[i]);
       WriteInteger('Setup', 'Selection', lvFileList.ItemIndex);
@@ -1319,9 +1185,8 @@ end;
 procedure TfrmBrowseAndDocItTestForm.LoadSettings;
 
 var
-  j: Integer;
+  i: Integer;
   sl : TStringList;
-  Item : TListItem;
 
 begin
   with TIniFile.Create(FINIFileName) do
@@ -1332,42 +1197,34 @@ begin
       Width := ReadInteger('Position', 'Width', Width);
       WindowState := TWindowState(ReadInteger('Position', 'WindowState',
         Integer(wsNormal)));
-      pnlFileList.Width := ReadInteger('Position', 'FileSplitter', pnlFileList.Width);
+      lvFileList.Width := ReadInteger('Position', 'FileSplitter', lvFileList.Width);
       lvFileList.Columns[0].Width := ReadInteger('Columns', '1', lvFileList.Columns[0].Width);
       lvFileList.Columns[1].Width := ReadInteger('Columns', '2', lvFileList.Columns[1].Width);
       lvFileList.Columns[2].Width := ReadInteger('Columns', '3', lvFileList.Columns[2].Width);
       lvFileList.Columns[3].Width := ReadInteger('Columns', '4', lvFileList.Columns[3].Width);
       lvFileList.Columns[4].Width := ReadInteger('Columns', '5', lvFileList.Columns[4].Width);
-      lvDirectories.Columns[0].Width := ReadInteger('Columns', 'A', lvDirectories.Columns[0].Width);
-      lvDirectories.Columns[1].Width := ReadInteger('Columns', 'B', lvDirectories.Columns[1].Width);
-      lvDirectories.Columns[2].Width := ReadInteger('Columns', 'B', lvDirectories.Columns[2].Width);
-      lvDirectories.Columns[3].Width := ReadInteger('Columns', 'D', lvDirectories.Columns[3].Width);
-      lvDirectories.Columns[4].Width := ReadInteger('Columns', 'E', lvDirectories.Columns[4].Width);
       pnlModuleExplorer.Width := ReadInteger('Position', 'Splitter', pnlModuleExplorer.Width);
-      lvDirectories.Height := ReadInteger('Position', 'DirHeight', lvDirectories.Height);
       sl := TStringList.Create;
       Try
         ReadSection('Folders', sl);
-        For j := 0 To sl.Count - 1 Do
-          Begin
-            Item := lvDirectories.Items.Add;
-            Item.Caption := ReadString('Folders', sl[j], '#Error#');
-            Item.Checked := ReadBool('FolderChecks', sl[j], False);
-          End;
+        For i := 0 To sl.Count - 1 Do
+          FFolders.AddObject(Format('%s=%s', [sl[i],
+            ReadString('Folders', sl[i], '')]),
+            TObject(ReadBool('Folders.Enabled', sl[i], False)));
         ReadSection('ExcludedFiles', sl);
-        For j := 0 To sl.Count - 1 Do
-          FFileExcludeList.Add(ReadString('ExcludedFiles', sl[j], ''));
+        For i := 0 To sl.Count - 1 Do
+          FFileExcludeList.Add(ReadString('ExcludedFiles', sl[i], ''));
       Finally
         sl.Free;
       End;
-      j := ReadInteger('Setup', 'Selection', 0);
+      i := ReadInteger('Setup', 'Selection', 0);
       actFileRecurseFolders.Checked := ReadBool('Setup', 'Recurse', False);
       actViewErrors.Checked := ReadBool('Setup', 'Errors', False);
       actViewWarnings.Checked := ReadBool('Setup', 'Warnings', False);
       actViewHints.Checked := ReadBool('Setup', 'Hints', False);
       actViewDocConflicts.Checked := ReadBool('Setup', 'Conflicts', False);
-      if lvFileList.Items.Count > j then
-        lvFileList.ItemIndex := j;
+      if lvFileList.Items.Count > i then
+        lvFileList.ItemIndex := i;
       FSynEdit.WordWrap := ReadBool('Setup', 'WordWrap', False);
     finally
       Free;
@@ -1410,12 +1267,37 @@ end;
 
 **)
 procedure TfrmBrowseAndDocItTestForm.SetFileName(const Value: String);
+
 var
   strExt: String;
+  Z: TZipForge;
+  strSource: String;
+  strFileName: String;
+  iPos: Integer;
+
 begin
   FFileName := Value;
   Caption := FFileName;
-  FSynEdit.Lines.LoadFromFile(FFileName);
+  If Not Like('*.zip\*', FFileName) Then
+    FSynEdit.Lines.LoadFromFile(FFileName)
+  Else
+    Begin
+      Z := TZipForge.Create(Nil);
+      Try
+        strFileName := LowerCase(FFileName);
+        iPos := Pos('.zip', strFileName);
+        Z.FileName := Copy(FFileName, 1, iPos + 3);
+        Z.OpenArchive;
+        Try
+          Z.ExtractToString(Copy(FFileName, iPos + 5, MAX_PATH), strSource);
+          FSynEdit.Lines.Text := strSource;
+        Finally
+          Z.CloseArchive;
+        End;
+      Finally
+        Z.Free;
+      End;
+    End;
   FSynedit.Modified := False;
   strExt := LowerCase(ExtractFileExt(FFileName));
   If IsKeyWord(strExt, ['.dfm', '.dpk', '.dpr', '.pas']) Then

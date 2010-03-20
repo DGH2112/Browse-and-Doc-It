@@ -2153,6 +2153,102 @@ begin
   Finally
     M.Free;
   End;
+  strSource :=
+    '/**'#13#10 +
+    '  This is a test comment.'#13#10 +
+    '**/'#13#10 +
+    'This is a test table=Class(TextTable)'#13#10 +
+    '{'#13#10 +
+    '  First Field:C(10)'#13#10 +
+    '  Second Field:I'#13#10 +
+    '}'#13#10;
+  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals(1, M.Elements[1].ElementCount);
+    Check(M.Elements[1].Elements[1].Comment <> Nil, 'Test for associated comment');
+    CheckEquals('This is a test comment.', M.Elements[1].Elements[1].Comment.AsString(9999, True));
+  Finally
+    M.Free;
+  End;
+  strSource :=
+    'This is a test table=Class(TextTable)'#13#10 +
+    '{'#13#10 +
+    '  First Field:C(10)'#13#10 +
+    '//  Second Field:I'#13#10 +
+    '  Third Field:C(25)'#13#10 +
+    '}'#13#10;
+  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals(1, M.Elements[1].ElementCount);
+  Finally
+    M.Free;
+  End;
+  strSource :=
+    'This is a test table=Class(TextTable)'#13#10 +
+    '{'#13#10 +
+    '  First Field:C(10)'#13#10 +
+    ''#13#10 +
+    '  '#13#10 +
+    '  //Second Field:I'#13#10 +
+    '  //  Second Field:I'#13#10 +
+    '  Third Field:C(25)'#13#10 +
+    '}'#13#10;
+  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals(1, M.Elements[1].ElementCount);
+  Finally
+    M.Free;
+  End;
+  strSource :=
+    'This is a test table=Class(TextTable)'#13#10 +
+    '{'#13#10 +
+    '  // #TABLENAME='#13#10 +
+    '  First Field:C(10)'#13#10 +
+    '  Second Field:I'#13#10 +
+    '  Third Field:C(25)'#13#10 +
+    '}'#13#10;
+  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals(1, M.Elements[1].ElementCount);
+  Finally
+    M.Free;
+  End;
+  strSource :=
+    'This is a test table=Class(DBTable)'#13#10 +
+    '{'#13#10 +
+    '  #Database='#13#10 +
+    '  //  #Connection='#13#10 +
+    '  #TABLENAME='#13#10 +
+    '  First Field:C(10)'#13#10 +
+    '  Second Field:I'#13#10 +
+    '  Third Field:C(25)'#13#10 +
+    '}'#13#10;
+  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals(1, M.Elements[1].ElementCount);
+  Finally
+    M.Free;
+  End;
 end;
 
 procedure TestTEidolonModule.TestGoal;

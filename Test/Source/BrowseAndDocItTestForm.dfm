@@ -1017,8 +1017,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Hint = 'Exit|Quits the application'
       ImageIndex = 0
       ShortCut = 32856
-      SecondaryShortCuts.Strings = (
-        'Esc')
     end
     object actViewSpecialCharacters: TAction
       Category = 'View'

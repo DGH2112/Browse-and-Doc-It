@@ -3,7 +3,7 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       05 Sep 2009
+  @Date       20 Mar 2010
   @Author     David Hoyle
 
 **)
@@ -569,6 +569,8 @@ Begin
               ttIdentifier   : CurCharType := ttIdentifier;
               ttDoubleLiteral: CurCharType := ttDoubleLiteral;
             End;
+            If IsInSet(LastChar, ['-', '+']) Then
+              LastCharType := ttNumber;
           End
         Else If IsInSet(ch, strLineEnd) Then
           CurCharType := ttLineEnd

@@ -1763,7 +1763,7 @@ procedure TestTGenericMethodDecl.TestMethodType;
 
 Const
   strMT : Array[Low(TMethodType)..High(TMethodType)] Of String = (
-    'mtConstructor', 'mtDestructor', 'mtProcedure', 'mtFunction');
+    'mtConstructor', 'mtDestructor', 'mtProcedure', 'mtFunction', 'mtOperator');
 
 begin
   CheckEquals(strMT[mtFunction], strMT[FGenericMethodDecl.MethodType]);

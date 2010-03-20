@@ -742,6 +742,7 @@ Type
     procedure ProcessClsIdents(Container : TElementContainer;
       slClassNames : TStringList; var strIdentifier : String; var iLine,
       iColumn : Integer);
+    Procedure EatDotNETAttribute;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     function GetCurrentMethod: TPascalMethod;
     Function GetModuleName : String; Override;
@@ -2714,6 +2715,7 @@ end;
 procedure TPascalModule.ProgramBlock;
 begin
   UsesClause;
+  EatDotNETAttribute;
   Block(scPrivate, Nil);
 end;
 
@@ -4063,6 +4065,34 @@ Begin
           strSeekableOnErrorTokens, stActual);
     End;
 End;
+
+(**
+
+  This method eats .NET attributes.
+
+  @precon  None.
+  @postcon Eats .NET attributes.
+
+**)
+procedure TPascalModule.EatDotNETAttribute;
+
+begin
+  If Token.Token = '[' Then
+    Begin
+      NextNonCommentToken;
+      If Token.TokenType In [ttIdentifier] Then
+        Begin
+          NextNonCommentToken;
+          If Token.Token = ']' Then
+            NextNonCommentToken
+          Else
+            ErrorAndSeekToken(strLiteralExpected, 'EatDotNETAttribute', ']',
+              strSeekableOnErrorTokens, stActual);
+        End Else
+          ErrorAndSeekToken(strLiteralExpected, 'EatDotNETAttribute', '[',
+            strSeekableOnErrorTokens, stActual);
+    End;
+end;
 
 (**
 

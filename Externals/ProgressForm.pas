@@ -3,7 +3,7 @@
   This is a generic progress dialogue for use in the ObjectPascalDocWizard.
 
   @version    0.9
-  @date       29 Mar 2009
+  @date       20 Mar 2010
   @author     David Hoyle
 
 **)
@@ -13,7 +13,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, ExtCtrls, DGHEllipsisLabel;
+  ComCtrls, ExtCtrls, DGHEllipsisLabel, StdCtrls, Buttons;
 
 type
   (**
@@ -25,8 +25,12 @@ type
   TfrmProgress = class(TForm)
     pnlPanel1: TPanel;
     prbProgressBar1: TProgressBar;
+    pnlInfo: TPanel;
+    pnlButton: TPanel;
+    btnCancel: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure btnCancelClick(Sender: TObject);
   private
     { Private declarations }
     FEllipsisLabel : TDGHEllipsisLabel;
@@ -50,10 +54,30 @@ implementation
   @param   Sender as a TObject
 
 **)
+procedure TfrmProgress.btnCancelClick(Sender: TObject);
+
+Const
+  strMsg = 'Are you sure you want to cancel the scanning and parsing?';
+
+begin
+  If MessageDlg(strMsg, mtConfirmation, [mbYes, mbNo], 0) = mrYes Then
+    Abort;
+end;
+
+(**
+
+  This is an on create event handler for the form.
+
+  @precon  None.
+  @postcon Creates a DGH Ellipsis label control.
+
+  @param   Sender as a TObject
+
+**)
 procedure TfrmProgress.FormCreate(Sender: TObject);
 begin
   FEllipsisLabel := TDGHEllipsisLabel.Create(Nil);
-  FEllipsisLabel.Parent := Self;
+  FEllipsisLabel.Parent := pnlInfo;
   FEllipsisLabel.Align := alClient;
 end;
 

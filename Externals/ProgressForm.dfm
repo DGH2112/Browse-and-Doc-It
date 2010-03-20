@@ -3,7 +3,7 @@ object frmProgress: TfrmProgress
   Top = 426
   BorderStyle = bsToolWindow
   Caption = 'Progress'
-  ClientHeight = 66
+  ClientHeight = 97
   ClientWidth = 400
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,7 +20,7 @@ object frmProgress: TfrmProgress
   TextHeight = 13
   object pnlPanel1: TPanel
     Left = 0
-    Top = 40
+    Top = 38
     Width = 400
     Height = 26
     Align = alBottom
@@ -34,6 +34,34 @@ object frmProgress: TfrmProgress
       Height = 16
       Align = alClient
       TabOrder = 0
+    end
+  end
+  object pnlInfo: TPanel
+    Left = 0
+    Top = 0
+    Width = 400
+    Height = 38
+    Align = alClient
+    BevelOuter = bvNone
+    BorderWidth = 5
+    TabOrder = 1
+  end
+  object pnlButton: TPanel
+    Left = 0
+    Top = 64
+    Width = 400
+    Height = 33
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 2
+    object btnCancel: TBitBtn
+      Left = 166
+      Top = 1
+      Width = 75
+      Height = 25
+      Kind = bkCancel
+      TabOrder = 0
+      OnClick = btnCancelClick
     end
   end
 end

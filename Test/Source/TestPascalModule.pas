@@ -406,6 +406,7 @@ type
     Procedure TestInterfaceHeritage;
     Procedure TestRequiresClause;
     procedure TestContainsClause;
+    Procedure TestAdvancedRecords;
     Procedure TestCodeFailure01;
     Procedure TestCodeFailure02;
     Procedure TestCodeFailure03;
@@ -427,6 +428,7 @@ type
     Procedure TestCodeFailure19;
     Procedure TestCodeFailure21;
     Procedure TestCodeFailure22;
+    Procedure TestCodeFailure23;
   Public
   End;
 
@@ -1535,6 +1537,65 @@ Const
     '  k := $FF OR $12;'#13#10 +
     '  l := $FF XOR 123;'#13#10 +
     'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P: TPascalModule;
+
+begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestAdvancedRecords;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyRec1 = Record'#13#10 +
+    '  private '#13#10 +
+    '    Field1 : String'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    '  TMyRec2 = Record'#13#10 +
+    '  strict protected '#13#10 +
+    '    Field1 : String'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    '  TMyRec3 = Record'#13#10 +
+    '  strict protected '#13#10 +
+    '    Field1 : String'#13#10 +
+    '    Field2 : String'#13#10 +
+    '  strict protected '#13#10 +
+    '    function hello : string;'#13#10 +
+    '  public '#13#10 +
+    '    procedure goodbye;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    '  TMyRec4 = Record'#13#10 +
+    '  strict protected '#13#10 +
+    '    Field1 : String'#13#10 +
+    '    Field2 : String'#13#10 +
+    '  strict protected '#13#10 +
+    '    function hello : string;'#13#10 +
+    '  public '#13#10 +
+    '    procedure goodbye;'#13#10 +
+    '  published '#13#10 +
+    '    class operator Implicit(A : Integer) : Integer;'#13#10 +
+    '  End;'#13#10 +
     ''#13#10 +
     'End.'#13#10;
 
@@ -2869,6 +2930,39 @@ begin
 end;
 
 procedure TestTPascalModule.TestCodeFailure22;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure Test;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Str(dblValue:3:4, strValue);'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P: TPascalModule;
+
+begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+end;
+
+procedure TestTPascalModule.TestCodeFailure23;
 
 Const
   strSource =
@@ -4392,7 +4486,7 @@ Procedure TestTPascalModule.TestKeyWords;
 
 Begin
   CheckEquals(0, Low(FPascalModule.KeyWords));
-  CheckEquals(70 + 47 - 1, High(FPascalModule.KeyWords));
+  CheckEquals(71 + 48 - 1, High(FPascalModule.KeyWords));
 End;
 
 procedure TestTPascalModule.TestLabelDeclSection;

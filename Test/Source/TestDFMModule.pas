@@ -33,6 +33,7 @@ Type
     Procedure TestIdentList;
     Procedure TestItem;
     Procedure TestListDataElements;
+    Procedure TestFailure01;
   End;
 
   //
@@ -339,6 +340,52 @@ begin
     Checkequals('Object Identifier : TfrmMyForm', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     Checkequals('MyIdentifier = []', M.Elements[1].Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTDFMModule.TestFailure01;
+
+var
+  strSource : String;
+
+Var
+  M : TBaseLanguageModule;
+
+begin
+  strSource :=
+    'object frmLoadFromCRD: TfrmLoadFromCRD'#13#10 +
+    '  object pnlPanel1: TPanel'#13#10 +
+    '    Left = 4'#13#10 +
+    '    Top = 4'#13#10 +
+    '    Width = 229'#13#10 +
+    '    Height = 201'#13#10 +
+    '    Caption = ''pnlPanel1'''#13#10 +
+    '    TabOrder = 0'#13#10 +
+    '    object lbStrings: TRzTabbedListBox'#13#10 +
+    '      Left = 1'#13#10 +
+    '      Top = 18'#13#10 +
+    '      Width = 227'#13#10 +
+    '      Height = 182'#13#10 +
+    '      TabStops.Min = -2147483647'#13#10 +
+    '      TabStops.Max = 2147483647'#13#10 +
+    '      TabStops.Integers = ('#13#10 +
+    '        -21'#13#10 +
+    '        -31)'#13#10 +
+    '      Align = alClient'#13#10 +
+    '      ItemHeight = 13'#13#10 +
+    '      TabOrder = 1'#13#10 +
+    '      OnDblClick = lbStringsDblClick'#13#10 +
+    '    end'#13#10 +
+    '  end'#13#10 +
+    'end'#13#10;
+  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
   Finally
     M.Free;
   End;

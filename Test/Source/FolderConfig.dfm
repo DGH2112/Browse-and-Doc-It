@@ -41,7 +41,9 @@ object frmFolders: TfrmFolders
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
+    DoubleBuffered = True
     Kind = bkOK
+    ParentDoubleBuffered = False
     TabOrder = 1
   end
   object btnCancel: TBitBtn
@@ -50,7 +52,9 @@ object frmFolders: TfrmFolders
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
+    DoubleBuffered = True
     Kind = bkCancel
+    ParentDoubleBuffered = False
     TabOrder = 2
   end
   object btnAdd: TBitBtn
@@ -60,6 +64,8 @@ object frmFolders: TfrmFolders
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = '&Add'
+    DoubleBuffered = True
+    ParentDoubleBuffered = False
     TabOrder = 3
     OnClick = btnAddClick
   end
@@ -70,6 +76,8 @@ object frmFolders: TfrmFolders
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = '&Delete'
+    DoubleBuffered = True
+    ParentDoubleBuffered = False
     TabOrder = 4
     OnClick = btnDeleteClick
   end

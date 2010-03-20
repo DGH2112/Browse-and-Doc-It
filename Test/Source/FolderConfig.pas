@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    13 Mar 2010
+  @Date    20 Mar 2010
 
 **)
 unit FolderConfig;
@@ -279,7 +279,6 @@ begin
                   Item.SubItems[j - 1] := '1'
                 Else
                   Item.SubItems[j - 1] := '0';
-                lvFolders.Invalidate;
                 Exit;
               End;
             Inc(iPosition, lvFolders.Column[j].Width);

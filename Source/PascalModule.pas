@@ -658,7 +658,7 @@ Type
     Function MulOp(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
     Function Designator(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
     Procedure DesignatorSubElement(C : TElementContainer; var ExprType : TExprTypes;
-      strValidSymbols : Array of String);
+      strValidSymbols : Array of String; boolIsStr : Boolean);
     Function SetConstructor(C : TElementContainer) : Boolean;
     Procedure SetElement(C : TElementContainer);
     Procedure ExprList(C : TElementContainer);
@@ -5409,7 +5409,7 @@ Begin
       If Token.Token = ')' Then
         Begin
           AddToExpression(C);
-          DesignatorSubElement(C, SubExprType, ['.', '^']); // Type cast handler
+          DesignatorSubElement(C, SubExprType, ['.', '^'], False); // Type cast handler
         End
       Else
         ErrorAndSeekToken(strLiteralExpected, 'Factor', ')',
@@ -5570,6 +5570,7 @@ Function TPascalModule.Designator(C : TElementContainer; var ExprType : TExprTyp
 
 var
   M : TPascalMethod;
+  boolIsStr : Boolean;
 
 Begin
   Result := (Token.TokenType In [ttIdentifier, ttDirective]) Or
@@ -5585,8 +5586,9 @@ Begin
           End Else
             If Not ReferenceSymbol(Token) Then
               Token.Reference := trUnresolved;
+      boolIsStr := CompareText('STR', Token.Token) = 0;
       AddToExpression(C);
-      DesignatorSubElement(C, ExprType, ['.', '[', '^', '(']);
+      DesignatorSubElement(C, ExprType, ['.', '[', '^', '('], boolIsStr);
     End;
 End;
 
@@ -5594,17 +5596,19 @@ End;
 
   This method handles the sub elements of a designator, i. e. period,[,(and ^.
 
-  @precon  None . 
-  @postcon Handles the sub elements of a designator , i . e . period , [, ( and 
-           ^. 
+  @precon  None .
+  @postcon Handles the sub elements of a designator , i . e . period , [, ( and
+           ^.
 
   @param   C               as a TElementContainer
   @param   ExprType        as a TExprTypes as a reference
   @param   strValidSymbols as an Array Of String
+  @param   boolIsStr       as a Boolean
 
 **)
 Procedure TPascalModule.DesignatorSubElement(C : TElementContainer;
-  var ExprType : TExprTypes; strValidSymbols : Array of String);
+  var ExprType : TExprTypes; strValidSymbols : Array of String;
+  boolIsStr : Boolean);
 
 var
   M: TPascalMethod;
@@ -5612,78 +5616,79 @@ var
 Begin
   M := CurrentMethod As TPascalMethod;
   While IsKeyWord(Token.Token, strValidSymbols) Or (IsKeyWord(Token.Token, ['(', '['])) Do // Always check for proc/func
-  If Token.Token = '.' Then
-    Begin
-      AddToExpression(C);
-      If Token.TokenType In [ttIdentifier, ttDirective] Then
-        Begin
-          If Token.Reference In [trUnknown] Then
-            If M <> Nil Then
-              Begin
-                If Not M.ReferenceSymbol(Token) Then
-                  Token.Reference := trUnresolved;
-              End Else
-                If Not ReferenceSymbol(Token) Then
-                  Token.Reference := trUnresolved;
-          AddToExpression(C);
-        End
-      Else
-        ErrorAndSeekToken(strIdentExpected, 'DesignatorSubElement', Token.Token,
-          strSeekableOnErrorTokens, stActual);
-    End
-  Else If Token.Token = '[' Then
-    Begin
-      If Token.Reference In [trUnknown] Then
-        If M <> Nil Then
+    If Token.Token = '.' Then
+      Begin
+        AddToExpression(C);
+        If Token.TokenType In [ttIdentifier, ttDirective] Then
           Begin
-            If Not M.ReferenceSymbol(Token) Then
-              Token.Reference := trUnresolved;
-          End Else
-            If Not ReferenceSymbol(Token) Then
-              Token.Reference := trUnresolved;
-      AddToExpression(C);
-      ExprList(C);
-      If Token.Token = ']' Then
-        AddToExpression(C)
-      Else
-        ErrorAndSeekToken(strLiteralExpected, 'DesignatorSubElement', ']',
-          strSeekableOnErrorTokens, stActual);
-    End
-  Else If Token.Token = '^' Then
-    Begin
-      If Token.Reference In [trUnknown] Then
-        If M <> Nil Then
-          Begin
-            If Not M.ReferenceSymbol(Token) Then
-              Token.Reference := trUnresolved;
-          End Else
-            If Not ReferenceSymbol(Token) Then
-              Token.Reference := trUnresolved;
-      AddToExpression(C);
-    End
-  Else If (Token.Token = '(') Then
-    Begin
-      If doStrictConstantExpressions In BrowseAndDocItOptions.Options Then
-        If etConstExpr In ExprType Then
-          If Not IsKeyWord(PrevToken.Token, strConstExprDesignators) Then
+            If Token.Reference In [trUnknown] Then
+              If M <> Nil Then
+                Begin
+                  If Not M.ReferenceSymbol(Token) Then
+                    Token.Reference := trUnresolved;
+                End Else
+                  If Not ReferenceSymbol(Token) Then
+                    Token.Reference := trUnresolved;
+            AddToExpression(C);
+          End
+        Else
+          ErrorAndSeekToken(strIdentExpected, 'DesignatorSubElement', Token.Token,
+            strSeekableOnErrorTokens, stActual);
+      End
+    Else If Token.Token = '[' Then
+      Begin
+        If Token.Reference In [trUnknown] Then
+          If M <> Nil Then
             Begin
-              ErrorAndSeekToken(strConstExprDesignator, 'DesignatorSubElement',
-                PrevToken.Token, strSeekableOnErrorTokens, stActual);
-              Exit;
+              If Not M.ReferenceSymbol(Token) Then
+                Token.Reference := trUnresolved;
+            End Else
+              If Not ReferenceSymbol(Token) Then
+                Token.Reference := trUnresolved;
+        AddToExpression(C);
+        ExprList(C);
+        If Token.Token = ']' Then
+          AddToExpression(C)
+        Else
+          ErrorAndSeekToken(strLiteralExpected, 'DesignatorSubElement', ']',
+            strSeekableOnErrorTokens, stActual);
+      End
+    Else If Token.Token = '^' Then
+      Begin
+        If Token.Reference In [trUnknown] Then
+          If M <> Nil Then
+            Begin
+              If Not M.ReferenceSymbol(Token) Then
+                Token.Reference := trUnresolved;
+            End Else
+              If Not ReferenceSymbol(Token) Then
+                Token.Reference := trUnresolved;
+        AddToExpression(C);
+      End
+    Else If (Token.Token = '(') Then
+      Begin
+        If doStrictConstantExpressions In BrowseAndDocItOptions.Options Then
+          If etConstExpr In ExprType Then
+            If Not IsKeyWord(PrevToken.Token, strConstExprDesignators) Then
+              Begin
+                ErrorAndSeekToken(strConstExprDesignator, 'DesignatorSubElement',
+                  PrevToken.Token, strSeekableOnErrorTokens, stActual);
+                Exit;
+              End;
+        AddToExpression(C);
+        ExprList(C);
+        If boolIsStr Then
+          While Token.Token = ':' Do
+            Begin
+              AddToExpression(C);
+              ExprList(C);
             End;
-      AddToExpression(C);
-      ExprList(C);
-      If Token.Token = ':' Then // Handle Str(Line : value, Value)
-        Begin
-          AddToExpression(C);
-          ExprList(C);
-        End;
-      If Token.Token = ')' Then
-        AddToExpression(C)
-      Else
-        ErrorAndSeekToken(strLiteralExpected, 'DesignatorSubElement', ')',
-          strSeekableOnErrorTokens, stActual);
-    End;
+        If Token.Token = ')' Then
+          AddToExpression(C)
+        Else
+          ErrorAndSeekToken(strLiteralExpected, 'DesignatorSubElement', ')',
+            strSeekableOnErrorTokens, stActual);
+      End;
 End;
 
 (**
@@ -5889,7 +5894,7 @@ Begin
           Else
             ErrorAndSeekToken(strLiteralExpected, 'SimpleStatement', ')',
               strSeekableOnErrorTokens, stActual);
-          DesignatorSubElement(Nil, ExprType, ['.', '^']);
+          DesignatorSubElement(Nil, ExprType, ['.', '^'], False);
         End Else
       If Token.Token = '@' Then
         Begin

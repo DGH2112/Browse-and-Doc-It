@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       26 Jan 2010
+  @Date       17 Mar 2010
   @Author     David Hoyle
 
 **)
@@ -475,9 +475,12 @@ Type
     { Grammar Parsers }
     Procedure Goal;
     Function  Table : Boolean;
-    Function  TextTable(strName : String; StartToken : TTokenInfo) : Boolean;
-    Function  DBTable(strName : String; StartToken : TTokenInfo) : Boolean;
-    Function  TimeLocationTable(strName : String; StartToken : TTokenInfo) : Boolean;
+    Function  TextTable(strName : String; StartToken : TTokenInfo;
+      C : TComment) : Boolean;
+    Function  DBTable(strName : String; StartToken : TTokenInfo;
+      C : TComment) : Boolean;
+    Function  TimeLocationTable(strName : String; StartToken : TTokenInfo;
+      C : TComment) : Boolean;
     Procedure TextTableDef(TextTable : TTextTable);
     Function  FieldDef(Table : TBaseTable; var iSheetIndex : Integer): Boolean;
     Procedure TypeInfo(Field : TFieldDef);
@@ -512,8 +515,10 @@ Type
     Procedure DiamondSize(Diamond : TDiamond);
     Procedure TriangleType(Triangle : TTriangle);
     Procedure EllipseSize(Ellipse : TEllipse);
-    Function  OutputTable(strName : String; StartToken : TTokenInfo) : Boolean;
-    Function  RequirementsTable(strName : String; StartToken : TTokenInfo) : Boolean;
+    Function  OutputTable(strName : String; StartToken : TTokenInfo;
+      C : TComment) : Boolean;
+    Function  RequirementsTable(strName : String; StartToken : TTokenInfo;
+      C : TComment) : Boolean;
     Function  AssociationDef(RequirementsTable : TRequirementsTable): Boolean;
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
@@ -1958,10 +1963,12 @@ end;
 
   @param   strName    as a String
   @param   StartToken as a TTokenInfo
+  @param   C          as a TComment
   @return  a Boolean
 
 **)
-Function TEidolonModule.DBTable(strName : String; StartToken : TTokenInfo) : Boolean;
+Function TEidolonModule.DBTable(strName : String; StartToken : TTokenInfo;
+  C : TComment) : Boolean;
 var
   DBT: TDBTable;
   iSheetIndex: Integer;
@@ -1975,7 +1982,7 @@ begin
       If strName <> '' Then
         Begin
           DBT := FDBTableDefs.Add(TDBTable.Create(strName, scNone, StartToken.Line,
-            StartToken.Column, iiPublicConstant, Nil)) As TDBTable;
+            StartToken.Column, iiPublicConstant, C)) As TDBTable;
           If CheckLiteral(')', 'DBTable') Then
             If CheckLineEnd('DBTable') Then
               Begin
@@ -1985,16 +1992,19 @@ begin
                     EatWhitespace;
                     If CheckLineEnd('DBTable') Then
                       Begin
+                        While EmptyLine Do;
                         EatWhitespace;
                         If DatabaseDef(DBT, ctPrimary) Then
                           Begin
+                            While EmptyLine Do;
                             EatWhitespace;
                             ConnectionDef(DBT, ctPrimary);
+                            While EmptyLine Do;
                             EatWhitespace;
                             TableNameDef(DBT, ctPrimary);
                           End;
                         iSheetIndex := 1;
-                        While FieldDef(DBT, iSheetIndex) Do;
+                        While FieldDef(DBT, iSheetIndex) Or EmptyLine Do;
                         If CheckLiteral('}', 'DBTable') Then
                           Begin
                             EatWhitespace;
@@ -2792,11 +2802,12 @@ end;
 
   @param   strName    as a String
   @param   StartToken as a TTokenInfo
+  @param   C          as a TComment
   @return  a Boolean
 
 **)
-function TEidolonModule.OutputTable(strName: String;
-  StartToken: TTokenInfo): Boolean;
+function TEidolonModule.OutputTable(strName: String; StartToken: TTokenInfo;
+  C : TComment): Boolean;
 
 var
   OT: TOutputTable;
@@ -2811,7 +2822,7 @@ begin
       If strName <> '' Then
         Begin
           OT := FOutputTableDefs.Add(TOutputTable.Create(strName, scNone,
-            StartToken.Line, StartToken.Column, iiPublicInterface, Nil)) As
+            StartToken.Line, StartToken.Column, iiPublicInterface, C)) As
             TOutputTable;
           If CheckLiteral(')', 'OutputTable') Then
             If CheckLineEnd('OutputTable') Then
@@ -2839,7 +2850,7 @@ begin
                             TableNameDef(OT, ctSecondary);
                           End;
                         iSheetIndex := 1;
-                        While FieldDef(OT, iSheetIndex) Do;
+                        While FieldDef(OT, iSheetIndex) Or EmptyLine Do;
                         If CheckLiteral('}', 'OutputTable') Then
                           Begin
                             EatWhitespace;
@@ -2998,11 +3009,12 @@ End;
 
   @param   strName    as a String
   @param   StartToken as a TTokenInfo
+  @param   C          as a TComment
   @return  a Boolean
 
 **)
-function TEidolonModule.RequirementsTable(strName: String;
-  StartToken: TTokenInfo): Boolean;
+function TEidolonModule.RequirementsTable(strName: String; StartToken: TTokenInfo;
+  C : TComment): Boolean;
 
 Var
   RT : TRequirementsTable;
@@ -3017,7 +3029,7 @@ begin
       If strName <> '' Then
         Begin
           RT := FRequirementsTableDefs.Add(TRequirementsTable.Create(strName, scNone,
-            StartToken.Line, StartToken.Column, iiPublicDispInterface, Nil)) As
+            StartToken.Line, StartToken.Column, iiPublicDispInterface, C)) As
             TRequirementsTable;
           If CheckLiteral(')', 'RequirementsTable') Then
             If CheckLineEnd('RequirementsTable') Then
@@ -3037,7 +3049,7 @@ begin
                             TableNameDef(RT, ctPrimary);
                           End;
                         iSheetIndex := 1;
-                        While FieldDef(RT, iSheetIndex) Do;
+                        While FieldDef(RT, iSheetIndex) Or EmptyLine Do;
                         While AssociationDef(RT) Do;
                         EatWhitespace;
                         If DatabaseDef(RT, ctSecondary) Then
@@ -3048,7 +3060,7 @@ begin
                             TableNameDef(RT, ctSecondary);
                           End;
                         iSheetIndex := 1;
-                        While FieldDef(RT, iSheetIndex) Do;
+                        While FieldDef(RT, iSheetIndex) Or EmptyLine Do;
                         While AssociationDef(RT) Do;
                         If CheckLiteral('}', 'RequirementsTable') Then
                           Begin
@@ -3081,8 +3093,10 @@ function TEidolonModule.Table: Boolean;
 var
   strName: String;
   StartToken : TTokenInfo;
+  C : TComment;
 
 begin
+  C := GetComment;
   EatWhitespace;
   Result := False;
   strName := '';
@@ -3104,11 +3118,11 @@ begin
             Begin
               NextNonCommentToken;
               Result :=
-                TextTable(strName, StartToken) Or
-                DBTable(strName, StartToken) Or
-                TimeLocationTable(strName, StartToken) Or
-                OutputTable(strName, StartToken) Or
-                RequirementsTable(strName, StartToken);
+                TextTable(strName, StartToken, C) Or
+                DBTable(strName, StartToken, C) Or
+                TimeLocationTable(strName, StartToken, C) Or
+                OutputTable(strName, StartToken, C) Or
+                RequirementsTable(strName, StartToken, C);
               If Not Result Then
                 ErrorAndSeekToken(strInvalidTableType, 'Table', Token.Token,
                   strSeekableOnErrorTokens, stActual);
@@ -3174,10 +3188,12 @@ end;
 
   @param   strName    as a String
   @param   StartToken as a TTokenInfo
+  @param   C          as a TComment
   @return  a Boolean
 
 **)
-Function TEidolonModule.TextTable(strName : String; StartToken : TTokenInfo) : Boolean;
+Function TEidolonModule.TextTable(strName : String; StartToken : TTokenInfo;
+  C : TComment) : Boolean;
 
 Var
   TT : TTextTable;
@@ -3192,7 +3208,7 @@ begin
       If strName <> '' Then
         Begin
           TT := FTextTableDefs.Add(TTextTable.Create(strName, scNone,
-            StartToken.Line, StartToken.Column, iiPublicThreadVar, Nil)) As TTextTable;
+            StartToken.Line, StartToken.Column, iiPublicThreadVar, C)) As TTextTable;
           If CheckLiteral(')', 'TextTable') Then
             If CheckLineEnd('TextTable') Then
               Begin
@@ -3202,10 +3218,11 @@ begin
                     EatWhitespace;
                     If CheckLineEnd('TextTable') Then
                       Begin
+                        While EmptyLine Do;
                         EatWhiteSpace;
                         TextTableDef(TT);
                         iSheetIndex := 1;
-                        While FieldDef(TT, iSheetIndex) Do;
+                        While FieldDef(TT, iSheetIndex) Or EmptyLine Do;
                         If CheckLiteral('}', 'TextTable') Then
                           Begin
                             EatWhitespace;
@@ -3340,10 +3357,12 @@ end;
 
   @param   strName    as a String
   @param   StartToken as a TTokenInfo
+  @param   C          as a TComment
   @return  a Boolean
 
 **)
-Function TEidolonModule.TimeLocationTable(strName : String; StartToken : TTokenInfo) : Boolean;
+Function TEidolonModule.TimeLocationTable(strName : String; StartToken : TTokenInfo;
+  C : TComment) : Boolean;
 
 var
   TLT: TTimeLocationTable;
@@ -3360,7 +3379,7 @@ begin
         Begin
           TLT := FTimeLocationTableDefs.Add(TTimeLocationTable.Create(strName,
             scNone, StartToken.Line, StartToken.Column, iiPublicVariable,
-            Nil)) As TTimeLocationTable;
+            C)) As TTimeLocationTable;
           If CheckLiteral(')', 'TimeLocationTable') Then
             If CheckLineEnd('TimeLocationTable') Then
               Begin

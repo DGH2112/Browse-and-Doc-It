@@ -1,7 +1,9 @@
 object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
   Left = 161
   Top = 170
-  Caption = 'frmBrowseAndDocItTestForm'
+  Caption = 
+    'Browse And Doc It Test Framework for Scanning Directories of Cod' +
+    'e'
   ClientHeight = 763
   ClientWidth = 907
   Color = clBtnFace

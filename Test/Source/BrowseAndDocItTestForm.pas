@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    14 Mar 2010
+  @Date    20 Mar 2010
   @Author  David Hoyle
 
 **)
@@ -592,11 +592,11 @@ Begin
         Try
           While iResult = 0 Do
             Begin
-              Inc(iPosition);
-              If boolScan And CanParseDocument(ExtractFileExt(recFile.Name)) Then
+              strFileName := strDirectory + '\' + recFile.Name;
+              If Not ExcludeFileFromResults(strFileName) Then
                 Begin
-                  strFileName := strDirectory + '\' + recFile.Name;
-                  If Not ExcludeFileFromResults(strFileName) Then
+                  Inc(iPosition);
+                  If boolScan And CanParseDocument(ExtractFileExt(recFile.Name)) Then
                     Begin
                       FProgressForm.UpdateProgress(iPosition, strFileName);
                       GetErrors(strFileName, strSource, iHints, iWarnings,
@@ -648,12 +648,12 @@ Begin
                       boolResult := Z.FindFirst('*' + slExts[i], recZip);
                       While boolResult Do
                         Begin
-                          Inc(iPosition);
-                          If boolScan And CanParseDocument(ExtractFileExt(recZip.FileName)) Then
+                          strFileName := strDirectory + '\' + recFile.Name + '\' +
+                            recZip.StoredPath + recZip.FileName;
+                          If Not ExcludeFileFromResults(strFileName) Then
                             Begin
-                              strFileName := strDirectory + '\' + recFile.Name + '\' +
-                                recZip.StoredPath + recZip.FileName;
-                              If Not ExcludeFileFromResults(strFileName) Then
+                              Inc(iPosition);
+                              If boolScan And CanParseDocument(ExtractFileExt(recZip.FileName)) Then
                                 Begin
                                   FProgressForm.UpdateProgress(iPosition, strFileName);
                                   Z.ExtractToString(recZip.StoredPath +
@@ -668,9 +668,9 @@ Begin
                                     iErrors, iWarnings, iHints, iConflicts));
                                   Application.ProcessMessages;
                                 End;
-                            End;
-                          boolResult := Z.FindNext(recZip);
-                        End;
+                          End;
+                        boolResult := Z.FindNext(recZip);
+                      End;
                     End;
                 Finally
                   slExts.Free;

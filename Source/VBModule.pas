@@ -469,7 +469,7 @@ Const
 
   (** A constant array of method names. **)
   strMethodType : Array[Low(TMethodType)..High(TMethodType)] Of String = (
-    '', '', 'Sub', 'Function'
+    '', '', 'Sub', 'Function', ''
   );
   (** A constant array to define the property types. **)
   strPropertyType : Array[Low(TPropertyType)..High(TPropertyType)] Of String = (

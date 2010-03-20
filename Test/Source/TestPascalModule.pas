@@ -2966,19 +2966,10 @@ procedure TestTPascalModule.TestCodeFailure23;
 
 Const
   strSource =
-    'Unit MyUnit;'#13#10 +
+    'Program MyUnit;'#13#10 +
     ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    ''#13#10 +
-    ''#13#10 +
-    ''#13#10 +
-    ''#13#10 +
-    ''#13#10 +
-    ''#13#10 +
-    ''#13#10 +
+    '[DotNETAttribute]'#13#10 +
+    'Begin'#13#10 +
     'End.'#13#10;
 
 Var

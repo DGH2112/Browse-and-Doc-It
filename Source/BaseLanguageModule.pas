@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    25 Oct 2009
+  @Date    20 Mar 2010
   @Version 1.0
   @Author  David Hoyle
 
@@ -39,7 +39,7 @@ Type
   (** An enumerate for the types of modules that can be parsed. **)
   TModuleType = (mtProgram, mtPackage, mtLibrary, mtUnit);
   (** An enumerate for the different methods. **)
-  TMethodType = (mtConstructor, mtDestructor, mtProcedure, mtFunction);
+  TMethodType = (mtConstructor, mtDestructor, mtProcedure, mtFunction, mtOperator);
   (** An enumerate for warning and errors. **)
   TErrorType = (etHint, etWarning, etError);
   (** A type to return an array of strings **)

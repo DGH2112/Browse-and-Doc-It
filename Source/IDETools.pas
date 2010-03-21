@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    25 Oct 2009
+  @Date    21 Mar 2010
   @Author  David Hoyle
 
 **)
@@ -13,9 +13,9 @@ Unit IDETools;
 Interface
 
 Uses
-  Office_TLB, VBIDE_TLB, SysUtils, Windows, EventSink, ComObj,
+  Office2000_TLB, VBIDE_TLB, SysUtils, Windows, EventSink, ComObj,
   IniFiles, ExtCtrls, Dialogs, Classes, Forms, DocumentationDispatcher,
-  BaseLanguageModule, Contnrs, ActnList, Messages;
+  BaseLanguageModule, Contnrs, ActnList, Messages, CommonIDEFunctions;
 
 Type
   (** This is a record to keep together the menu item and the event sink. **)
@@ -73,6 +73,7 @@ Type
     FOldWndProc : TFarProc;
     FNewWndProc : TFarProc;
     FLastCodePane: CodePane;
+    FBADIThreadMgr : TBrowseAndDocItThreadManager;
     procedure CreateMenu;
     function GetProjectPath(strName: String): String;
     procedure SetProjectPath(strName: String; strValue: String);
@@ -229,7 +230,7 @@ Uses
   ExportForm, ProgressForm, Controls, FileCtrl, Functions, TokenForm,
   ModuleDispatcher, OptionsForm, DocumentationOptionsForm, ShellAPI,
   CodeFragmentsForm, Variants, VBEIDEModuleExplorer,
-  CommonIDEFunctions, DGHLibrary, Math, VBModule, checkforupdates, Menus;
+  DGHLibrary, Math, VBModule, checkforupdates, Menus;
 
 { TIDEMenuItem }
 
@@ -297,6 +298,7 @@ begin
     FVBEIDE := VBEIDERef;
     FSinks := TObjectList.Create(True);
     CreateMenu;
+    FBADIThreadMgr := TBrowseAndDocItThreadManager.Create;
     FTimer := TTimer.Create(Nil);
     FTimer.Interval := 100;
     FTimer.OnTimer := TimerEvent;
@@ -332,6 +334,7 @@ begin
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
   FIdleTimer.Free;
   FTimer.Free;
+  FBADIThreadMgr.Free;
   FSinks.Free;
   If (FVBEIDE <> Nil) And (FIDEMenu <> Nil) Then
     FVBEIDE.CommandBars.Item['Menu Bar'].Controls_[strMenuCaption].Delete(False);
@@ -516,8 +519,8 @@ begin
     If boolRefresh Then
       Begin
         FTimer.Enabled := False;
-        TBrowseAndDocItThread.CreateBrowseAndDocItThread(
-          SuccessfulParse, EditorInfo, RenderDocument, ExceptionMsg);
+        FBADIThreadMgr.Parse(SuccessfulParse, EditorInfo, RenderDocument,
+          ExceptionMsg);
         FOldLength := Length(ModuleCode);
       End;
   Except
@@ -1082,7 +1085,7 @@ procedure TIDETools.OptionsClick(const Ctrl: CommandBarButton;
   var CancelDefault: WordBool);
 
 begin
-  If TfrmOptions.Execute Then
+  If TfrmOptions.Execute([Low(TVisibleTab)..High(TVisibleTab)]) Then
     Begin
       FOldLength := 0;
       FCounter := BrowseAndDocItOptions.UpdateInterval;

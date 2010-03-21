@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    07 Mar 2009
+  @Date    21 Mar 2010
 
 **)
 unit BrowseAndDocItAddin;
@@ -14,7 +14,7 @@ interface
 
 uses
   Windows, ComObj, ActiveX, BrowseAndDocItVBEIDE_TLB, AddInDesignerObjects_TLB,
-  Office_TLB, StdVcl, IDETools;
+  Office2000_TLB, StdVcl, IDETools;
 
 type
   (** A the addin automation object **)

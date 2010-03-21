@@ -5644,7 +5644,7 @@ Begin
     If Token.Token = '.' Then
       Begin
         AddToExpression(C);
-        If Token.TokenType In [ttIdentifier, ttDirective] Then
+        If Token.TokenType In [ttIdentifier, ttDirective, ttReservedWord] Then
           Begin
             If Token.Reference In [trUnknown] Then
               If M <> Nil Then

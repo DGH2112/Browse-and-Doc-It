@@ -8133,7 +8133,7 @@ begin
     Begin
       C := GetComment;
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier, ttDirective] Then
+      If Token.TokenType In [ttIdentifier, ttDirective, ttReservedWord] Then
         Begin
           PropertiesLabel := Cls.FindElement(strPropertiesLabel) As TLabelContainer;
           If PropertiesLabel = Nil Then

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       20 Mar 2010
+  @Date       21 Mar 2010
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -658,7 +658,7 @@ Type
     Function MulOp(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
     Function Designator(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
     Procedure DesignatorSubElement(C : TElementContainer; var ExprType : TExprTypes;
-      strValidSymbols : Array of String; boolIsStr : Boolean);
+      strValidSymbols : Array of String);
     Function SetConstructor(C : TElementContainer) : Boolean;
     Procedure SetElement(C : TElementContainer);
     Procedure ExprList(C : TElementContainer);
@@ -4366,7 +4366,6 @@ end;
 Function TPascalModule.FieldList(Rec: TRecordDecl; InternalScope : TScope) : Boolean;
 
 begin
-  Result := False;
   Repeat
     Result := VariantSection(Rec, InternalScope);
     If Not Result Then
@@ -5439,7 +5438,7 @@ Begin
       If Token.Token = ')' Then
         Begin
           AddToExpression(C);
-          DesignatorSubElement(C, SubExprType, ['.', '^'], False); // Type cast handler
+          DesignatorSubElement(C, SubExprType, ['.', '^']); // Type cast handler
         End
       Else
         ErrorAndSeekToken(strLiteralExpected, 'Factor', ')',
@@ -5600,7 +5599,6 @@ Function TPascalModule.Designator(C : TElementContainer; var ExprType : TExprTyp
 
 var
   M : TPascalMethod;
-  boolIsStr : Boolean;
 
 Begin
   Result := (Token.TokenType In [ttIdentifier, ttDirective]) Or
@@ -5616,9 +5614,8 @@ Begin
           End Else
             If Not ReferenceSymbol(Token) Then
               Token.Reference := trUnresolved;
-      boolIsStr := CompareText('STR', Token.Token) = 0;
       AddToExpression(C);
-      DesignatorSubElement(C, ExprType, ['.', '[', '^', '('], boolIsStr);
+      DesignatorSubElement(C, ExprType, ['.', '[', '^', '(']);
     End;
 End;
 
@@ -5633,12 +5630,10 @@ End;
   @param   C               as a TElementContainer
   @param   ExprType        as a TExprTypes as a reference
   @param   strValidSymbols as an Array Of String
-  @param   boolIsStr       as a Boolean
 
 **)
 Procedure TPascalModule.DesignatorSubElement(C : TElementContainer;
-  var ExprType : TExprTypes; strValidSymbols : Array of String;
-  boolIsStr : Boolean);
+  var ExprType : TExprTypes; strValidSymbols : Array of String);
 
 var
   M: TPascalMethod;
@@ -5707,12 +5702,11 @@ Begin
               End;
         AddToExpression(C);
         ExprList(C);
-        If boolIsStr Then
-          While Token.Token = ':' Do
-            Begin
-              AddToExpression(C);
-              ExprList(C);
-            End;
+        While Token.Token = ':' Do
+          Begin
+            AddToExpression(C);
+            ExprList(C);
+          End;
         If Token.Token = ')' Then
           AddToExpression(C)
         Else
@@ -5924,7 +5918,7 @@ Begin
           Else
             ErrorAndSeekToken(strLiteralExpected, 'SimpleStatement', ')',
               strSeekableOnErrorTokens, stActual);
-          DesignatorSubElement(Nil, ExprType, ['.', '^'], False);
+          DesignatorSubElement(Nil, ExprType, ['.', '^']);
         End Else
       If Token.Token = '@' Then
         Begin

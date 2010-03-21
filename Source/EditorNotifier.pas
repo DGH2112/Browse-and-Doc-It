@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    25 Oct 2009
+  @Date    21 Mar 2010
   @Author  David Hoyle
 
 **)
@@ -13,7 +13,7 @@ Unit EditorNotifier;
 Interface
 
 Uses
-  Classes, ToolsApi, ExtCtrls, BaseLanguageModule, DockForm;
+  Classes, ToolsApi, ExtCtrls, BaseLanguageModule, DockForm, CommonIDEFunctions;
 
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 
@@ -31,6 +31,7 @@ Type
     FLastCursorPos: TOTAEditPos;
     FLastParserResult : Boolean;
     FLastUpdateTickCount : Cardinal;
+    FBADIThreadMgr : TBrowseAndDocItThreadManager;
     Procedure EnableTimer(boolSuccessfulParse : Boolean);
     Procedure TimerEventHandler(Sender : TObject);
     Function EditorInfo(var strFileName : String;
@@ -58,8 +59,7 @@ Type
 Implementation
 
 Uses
-  SysUtils, ToolsAPIUtils, Dialogs, DockableModuleExplorer, Windows, Forms,
-  CommonIDEFunctions;
+  SysUtils, ToolsAPIUtils, Dialogs, DockableModuleExplorer, Windows, Forms;
 
 (**
 
@@ -71,6 +71,7 @@ Uses
 **)
 constructor TEditorNotifier.Create;
 begin
+  FBADIThreadMgr := TBrowseAndDocItThreadManager.Create;
   FUpdateTimer := TTimer.Create(Nil);
   {$IFDEF D2005}
   FUpdateTimer.Interval := 100;
@@ -95,7 +96,8 @@ begin
   FupdateTimer.Enabled := False;
   FUpdateTimer.OnTimer := Nil;
   FUpdateTimer.Free;
-  inherited;
+  FBADIThreadMgr.Free;
+  Inherited;
 end;
 
 (**
@@ -320,8 +322,8 @@ begin
       FLastSize := MemStreamSize(Editor);
       {$ENDIF}
           FUpdateTimer.Enabled := False;
-          TBrowseAndDocItThread.CreateBrowseAndDocItThread(EnableTimer,
-            EditorInfo, RenderDocument, ExceptionMsg);
+          FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument,
+            ExceptionMsg);
         End;
     End;
 end;

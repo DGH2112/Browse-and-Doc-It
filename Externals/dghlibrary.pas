@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    10 Mar 2010
+  @Date    02 May 2010
 
 **)
 Unit DGHLibrary;
@@ -709,6 +709,7 @@ Type
     iHighColour : TColor) : TColor;
   Function DGHFindOnPath(var strEXEName : String; strDirs : String) : Boolean;
   Function DGHPathRelativePathTo(strBasePath : String; var strFileName : String) : Boolean;
+  Function IsDebuggerPresent : Boolean;
 
 { -------------------------------------------------------------------------
 
@@ -6468,6 +6469,31 @@ Begin
         End;
       strFileName := strFileName + strFile;
     End;
+End;
+
+(**
+
+  This function uses the Window API to determine if the application is being
+  run under a debugger (DebugHook does not seem to work correct all the time.).
+
+  @precon  None.
+  @postcon Returns true if the application is begin debugged else returns false.
+
+  @return  a Boolean
+
+**)
+Function IsDebuggerPresent : Boolean;
+
+Var
+  IsDebuggerPresentProc : Function : Boolean; Stdcall;
+  KernalHandle : THandle;
+
+Begin
+  Result := False;
+  KernalHandle := GetModuleHandle(kernel32);
+  @IsDebuggerPresentProc := GetProcAddress(KernalHandle, 'IsDebuggerPresent');
+  If @IsDebuggerPresentProc <> Nil Then
+    Result := IsDebuggerPresentProc;
 End;
 
 (** Initialises the console more to Unknown to force a call to the Win32 API **)

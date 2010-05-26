@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    09 Mar 2010
+  @Date    26 May 2010
   @Version 1.0
 
 **)
@@ -656,7 +656,6 @@ constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(
   TerminateThread : TNotifyEvent);
 
 begin
-  Inherited Create(True);
   FreeOnTerminate := True; // Self Freeing...
   FSuccessfulParseProc := SuccessfulParseProc;
   FRenderDocumentTree := RenderDocumentTree;
@@ -665,7 +664,7 @@ begin
   FSource := '';
   If Assigned(EditorInfo) Then
     FSource := EditorInfo(FFileName, FModified);
-  Resume;
+  Inherited Create(False);
 end;
 
 (**

@@ -5,7 +5,7 @@
   available.
 
   @Version 1.0
-  @Date    21 Aug 2008
+  @Date    26 May 2010
   @Author  David Hoyle
 
 **)
@@ -121,4 +121,19 @@
   {$DEFINE D2006}
   {$DEFINE D2007}
   {$DEFINE D2009}
+{$ENDIF}
+
+{$IFDEF VER210}
+  {$DEFINE D0002}
+  {$DEFINE D0003}
+  {$DEFINE D0004}
+  {$DEFINE D0005}
+  {$DEFINE D0006}
+  {$DEFINE D0007}
+  {$DEFINE D0008}
+  {$DEFINE D2005}
+  {$DEFINE D2006}
+  {$DEFINE D2007}
+  {$DEFINE D2009}
+  {$DEFINE D2010}
 {$ENDIF}

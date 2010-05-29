@@ -1773,7 +1773,7 @@ begin
           Begin
             GetFontInfo(sl, i, NodeData.FNode.Title, TargetCanvas);
             If Node = Sender.FocusedNode Then
-              If Brush.Color = clWindow Then
+              If Brush.Color = BrowseAndDocItOptions.BGColour Then
                 Brush.Color := clinfoBk;
             TextOut(iPos, R.Top, sl[i]);
             Inc(iPos, TextWidth(sl[i]) + 1);

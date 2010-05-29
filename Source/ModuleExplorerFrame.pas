@@ -450,7 +450,7 @@ Begin
               If FCustomDraw Then
                 Begin
                   GetFontInfo(sl, i, FTitle, Canvas);
-                  If Brush.Color = clWindow Then
+                  If Brush.Color = BrowseAndDocItOptions.BGColour Then
                     Brush.Color := clInfoBk;
                 End Else
                 Begin

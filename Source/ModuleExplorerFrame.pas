@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    11 Jan 2010
+  @Date    29 May 2010
   @Author  David Hoyle
   @Version 1.0
 
@@ -468,7 +468,10 @@ Begin
               Inc(iPos, TextWidth(sl[i]) + 1);
             End;
           End Else
+          Begin
+            Dec(iLine);
             TextOut(iPos, iLine, NodeData.FNode.Text);
+          End;
       Brush.Color := clInfoBk;
       If (FComment <> Nil) And ((FComment.TokenCount > 0) Or
         (FComment.TagCount > 0)) Then

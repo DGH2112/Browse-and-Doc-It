@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    20 Mar 2010
+  @Date    21 Mar 2010
   @Author  David Hoyle
 
 **)
@@ -18,7 +18,7 @@ uses
   SynEdit, ExtCtrls, ModuleExplorerFrame, BaseLanguageModule, StdCtrls,
   FileCtrl, ComCtrls, Contnrs, SynHighlighterVB, SynHighlighterCpp,
   Menus, StdActns, ActnList, ProgressForm, Buttons, ImgList, ToolWin, XPMan,
-  SynHighlighterXML;
+  SynHighlighterXML, DGHSynEdit, SynHighlighterDfm;
 
 {$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
 
@@ -88,6 +88,8 @@ type
     tbtnSep3: TToolButton;
     actFileFolders: TAction;
     tbtnFolderCongih: TToolButton;
+    actToolsSynEditOptions: TAction;
+    ToolButton: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SynEdit1Change(Sender: TObject);
@@ -112,6 +114,7 @@ type
     procedure actViewWordWrapExecute(Sender: TObject);
     procedure actViewWordWrapUpdate(Sender: TObject);
     procedure actFileFoldersExecute(Sender: TObject);
+    procedure actToolsSynEditOptionsExecute(Sender: TObject);
   {$IFDEF D2005} Strict {$ENDIF} Private
     { Private declarations }
     FFileName: String;
@@ -119,11 +122,12 @@ type
     FModuleExplorerFrame : TframeModuleExplorer;
     FProgressForm : TfrmProgress;
     FINIFileName : String;
-    FSynEdit: TSynEdit;
+    FSynEdit: TDGHSynEdit;
     FSynPasSyn: TSynPasSyn;
     FSynVBSyn: TSynVBSyn;
     FSynCPPSyn : TSynCPPSyn;
     FSynXMLSyn : TSynXMLSyn;
+    FSynDFMSyn : TSynDFMSyn;
     FParseRecords : TObjectList;
     FFileExcludeList : TStringList;
     FTimer : TTimer;
@@ -145,6 +149,8 @@ type
       iErrors, iConflicts : Integer);
     Procedure TimerEvent(Sender : TObject);
     Procedure RefreshModuleExplorer;
+    Procedure SaveResults;
+    Procedure LoadResults;
     (**
       A property to define the currently selected file.
       @precon  None.
@@ -160,6 +166,8 @@ type
       @return  a String
     **)
     Property PathRoot : String Read GetPathRoot Write SetPathRoot;
+  private
+    FIndex: Integer;
   public
     { Public declarations }
   end;
@@ -230,7 +238,8 @@ implementation
 Uses
   TokenForm, IniFiles, DGHLibrary, OptionsForm, ModuleDispatcher,
   DocumentationDispatcher, BaseDocumentation, ShellAPI, Math,
-  DocumentationOptionsForm, ExclusionsForm, FolderConfig, ZipForge;
+  DocumentationOptionsForm, ExclusionsForm, FolderConfig, ZipForge,
+  UsefulSynEditFunctions, EditorOptionsForm;
 
 {$R *.dfm}
 
@@ -400,6 +409,22 @@ end;
 
 (**
 
+  This is an on execute event handler for the Tools SynEdit Options action.
+
+  @precon  None.
+  @postcon Allows the editing of the editor options.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmBrowseAndDocItTestForm.actToolsSynEditOptionsExecute(
+  Sender: TObject);
+begin
+  TfrmEditorOptions.Execute(FSynEdit, False);
+end;
+
+(**
+
   This is an on execute event handler for the Wire Word Wrap action.
 
   @precon  None.
@@ -468,7 +493,7 @@ Var
 begin
   Result := False;
   For i := 0 To FFileExcludeList.Count - 1 Do
-    If Pos(LowerCase(FFileExcludeList[i]), LowerCase(strFileName)) > 0 Then
+    If Like(FFileExcludeList[i], strFileName) Then
       Begin
         Result := True;
         Break;
@@ -608,7 +633,9 @@ Begin
                       FParseRecords.Add(TParseRecord.Create(strFileName, strRoot,
                         iErrors, iWarnings, iHints, iConflicts));
                       Application.ProcessMessages;
-                    End;
+                    End Else
+                      FProgressForm.UpdateProgress(iPosition,
+                        Format('Please wait... %1.0n', [Int(iPosition)]));
                 End;
               iResult := FindNext(recFile);
             End;
@@ -667,7 +694,9 @@ Begin
                                   FParseRecords.Add(TParseRecord.Create(strFileName, strRoot,
                                     iErrors, iWarnings, iHints, iConflicts));
                                   Application.ProcessMessages;
-                                End;
+                                End Else
+                                  FProgressForm.UpdateProgress(iPosition,
+                                    Format('Please wait... %1.0n', [Int(iPosition)]));
                           End;
                         boolResult := Z.FindNext(recZip);
                       End;
@@ -800,71 +829,21 @@ End;
 procedure TfrmBrowseAndDocItTestForm.FormCreate(Sender: TObject);
 
 begin
-  FParseRecords := TObjectList.Create(True);
-  FSynEdit := TSynEdit.Create(Nil);
-  With FSynEdit Do
-    Begin
-      Parent := Self;
-      Highlighter := FSynPasSyn;
-      Align := alClient;
-      ActiveLineColor := clSkyBlue;
-      Gutter.ShowLineNumbers := True;
-      ReadOnly := True;
-      PopupMenu := pmEdit;
-      OnChange := SynEdit1Change;
-      OnStatusChange:= SynEdit1StatusChange;
-    End;
-  FSynPasSyn := TSynPasSyn.Create(Nil);
-  With FSynPasSyn Do
-    Begin
-      AsmAttri.Foreground := clMaroon;
-      CommentAttri.Foreground := clPurple;
-      DirectiveAttri.Foreground := clGreen;
-      DirectiveAttri.Style := [fsBold];
-      IdentifierAttri.Foreground := clNavy;
-      NumberAttri.Foreground := clGreen;
-      FloatAttri.Foreground := clGreen;
-      HexAttri.Foreground := clGreen;
-      StringAttri.Foreground := clTeal;
-      CharAttri.Foreground := clTeal;
-      SymbolAttri.Foreground := clGreen;
-    End;
-  FSynVBSyn := TSynVBSyn.Create(Nil);
-  With FSynVBSyn Do
-    Begin
-      CommentAttri.Foreground := clPurple;
-      IdentifierAttri.Foreground := clNavy;
-      NumberAttri.Foreground := clGreen;
-      StringAttri.Foreground := clTeal;
-      SymbolAttri.Foreground := clGreen;
-    End;
-  FSynCPPSyn := TSynCPPSyn.Create(Nil);
-  With FSynCPPSyn Do
-    Begin
-      AsmAttri.Foreground := clMaroon;
-      CommentAttri.Foreground := clPurple;
-      IdentifierAttri.Foreground := clNavy;
-      NumberAttri.Foreground := clGreen;
-      StringAttri.Foreground := clTeal;
-      SymbolAttri.Foreground := clGreen;
-      FloatAttri.Foreground := clGreen;
-      HexAttri.Foreground := clGreen;
-      CharAttri.Foreground := clOlive;
-    End;
-  FSynXMLSyn := TSynXMLSyn.Create(Nil);
-  With FSynCPPSyn Do
-    Begin
-      AsmAttri.Foreground := clMaroon;
-      CommentAttri.Foreground := clPurple;
-      IdentifierAttri.Foreground := clNavy;
-      NumberAttri.Foreground := clGreen;
-      StringAttri.Foreground := clTeal;
-      SymbolAttri.Foreground := clGreen;
-      FloatAttri.Foreground := clGreen;
-      HexAttri.Foreground := clGreen;
-      CharAttri.Foreground := clOlive;
-    End;
   FINIFileName := BuildRootKey(Nil, Nil);
+  FParseRecords := TObjectList.Create(True);
+  FSynEdit := TDGHSynEdit.Create(Nil);
+  FSynEdit.Parent := Self;
+  FSynEdit.Align := alClient;
+  FSynEdit.HideSelection := False;
+  FSynEdit.PopupMenu := pmEdit;
+  FSynEdit.OnChange := SynEdit1Change;
+  FSynEdit.OnStatusChange:= SynEdit1StatusChange;
+  FSynEdit.LoadFromINIFile(FINIFileName);
+  FSynPasSyn := TSynPasSyn.Create(Nil);
+  FSynVBSyn := TSynVBSyn.Create(Nil);
+  FSynCPPSyn := TSynCPPSyn.Create(Nil);
+  FSynXMLSyn := TSynXMLSyn.Create(Nil);
+  FSynDFMSyn := TSynDFMSyn.Create(Nil);
   {$IFDEF WIN32}
   BrowseAndDocItOptions.Defines.Add('WIN32');
   BrowseAndDocItOptions.Defines.Add('MSWINDOWS');
@@ -878,9 +857,12 @@ begin
   FModuleExplorerFrame.OnSelectionChange := SelectionChange;
   FModuleExplorerFrame.OnFocus := Focus;
   FModuleExplorerFrame.OnRefresh := RefreshExplorer;
+  ActiveControl := lvFileList;
   FFileExcludeList := TStringList.Create;
   FFolders := TStringList.Create;
+  LoadResults;
   LoadSettings;
+  PopulateListView;
   FLastEdit := 0;
   FTimer := TTimer.Create(Self);
   FTimer.Interval := 100;
@@ -901,13 +883,16 @@ procedure TfrmBrowseAndDocItTestForm.FormDestroy(Sender: TObject);
 
 begin
   FTimer.Free;
+  SaveResults;
+  SaveSettings;
   FSynEdit.Highlighter := Nil;
-  FSynXMLSyn.Free;
+  FSynEdit.SaveToINIFile(FINIFileName);
   FSynEdit.Free;
+  FSynDFMSyn.Free;
+  FSynXMLSyn.Free;
   FSynVBSyn.Free;
   FSynPasSyn.Free;
   FSynCPPSyn.Free;
-  SaveSettings;
   FFolders.Free;
   FFileExcludeList.Free;
   FModuleExplorerFrame.Free;
@@ -1113,8 +1098,50 @@ begin
             liItem.SubItems.Add(rec.PathRoot);
           End;
       End;
+    If FIndex > lvFileList.Items.Count - 1 Then
+      FIndex := lvFileList.Items.Count - 1;
+    lvFileList.ItemIndex := FIndex;
+    If lvFileList.Selected <> Nil Then
+      lvFileList.Selected.MakeVisible(False);
   Finally
     lvFileList.Items.EndUpdate;
+  End;
+end;
+
+(**
+
+  This method saves the results to a text file.
+
+  @precon  None.
+  @postcon Saves the results to a text file.
+
+**)
+procedure TfrmBrowseAndDocItTestForm.SaveResults;
+
+Var
+  sl : TStringList;
+  iRecord: Integer;
+
+begin
+  sl := TStringList.Create;
+  Try
+    FProgressForm.Init(FParseRecords.Count, 'Shutting Down',
+      'Saving Scan Results...');
+    Try
+      For iRecord := 0 To FParseRecords.Count - 1 Do
+        With FParseRecords[iRecord] As TParseRecord Do
+          Begin
+            If iRecord Mod 10 = 0 Then
+              FProgressForm.UpdateProgress(iRecord, FileName);
+            sl.Add(Format('%s=%d,%d,%d,%d', [Filename, Errors, Warnings, Hints,
+              Conflicts]));
+          End;
+      sl.SaveToFile(ChangeFileExt(FINIFileName, '.txt'));
+    Finally
+      FProgressForm.Hide;
+    End;
+  Finally
+    sl.Free;
   End;
 end;
 
@@ -1131,10 +1158,12 @@ procedure TfrmBrowseAndDocItTestForm.SaveSettings;
 var
   i : Integer;
   recWndPlmt : TWindowPlacement;
+  iniFile : TIniFile;
 
 begin
-  with TIniFile.Create(FINIFileName) do
-    try
+  iniFile := TIniFile.Create(FINIFileName);
+  With iniFile Do
+    Try
       recWndPlmt.Length := SizeOf(TWindowPlacement);
       GetWindowPlacement(Handle, @recWndPlmt);
       WriteInteger('Position', 'Top', recWndPlmt.rcNormalPosition.Top);
@@ -1168,10 +1197,59 @@ begin
       WriteBool('Setup', 'Warnings', actViewWarnings.Checked);
       WriteBool('Setup', 'Hints', actViewHints.Checked);
       WriteBool('Setup', 'Conflicts', actViewDocConflicts.Checked);
-      WriteBool('Setup', 'WordWrap', FSynEdit.WordWrap);
-    finally
+      WriteInteger('Setup', 'SelectedItem', lvFileList.ItemIndex);
+      SaveHighlighterToINIFile(iniFile, FSynPasSyn);
+      SaveHighlighterToINIFile(iniFile, FSynVBSyn);
+      SaveHighlighterToINIFile(iniFile, FSynCPPSyn);
+      SaveHighlighterToINIFile(iniFile, FSynXMLSyn);
+      SaveHighlighterToINIFile(iniFile, FSynDFMSyn);
+    Finally
       Free;
-    end;
+    End;
+end;
+
+(**
+
+  This method loads previous results from a text file.
+
+  @precon  None.
+  @postcon Loads previous results from a text file.
+
+**)
+procedure TfrmBrowseAndDocItTestForm.LoadResults;
+
+Var
+  sl : TStringList;
+  iRecord: Integer;
+  iErrors, iWarnings, iHints, iConflicts : Integer;
+  strFileName : String;
+  iErrorCode: Integer;
+
+begin
+  sl := TStringList.Create;
+  Try
+    If FileExists(ChangeFileExt(FINIFileName, '.txt')) Then
+      sl.LoadFromFile(ChangeFileExt(FINIFileName, '.txt'));
+    FProgressForm.Init(sl.Count, 'Starting Up...', 'Loading Scan Results...');
+    Try
+      For iRecord := 0 To sl.Count - 1 Do
+        Begin
+          strFileName := sl.Names[iRecord];
+          Val(GetField(sl.ValueFromIndex[iRecord], ',', 1), iErrors, iErrorCode);
+          Val(GetField(sl.ValueFromIndex[iRecord], ',', 2), iWarnings, iErrorCode);
+          Val(GetField(sl.ValueFromIndex[iRecord], ',', 3), iHints, iErrorCode);
+          Val(GetField(sl.ValueFromIndex[iRecord], ',', 4), iConflicts, iErrorCode);
+          FParseRecords.Add(TParseRecord.Create(strFileName, '', iErrors,
+            iWarnings, iHints, iConflicts));
+          If iRecord Mod 10 = 0 Then
+            FProgressForm.UpdateProgress(iRecord, strFileName);
+        End;
+    Finally
+      FProgressForm.Hide;
+    End;
+  Finally
+    sl.Free;
+  End;
 end;
 
 (**
@@ -1187,10 +1265,12 @@ procedure TfrmBrowseAndDocItTestForm.LoadSettings;
 var
   i: Integer;
   sl : TStringList;
+  iniFile : TIniFile;
 
 begin
-  with TIniFile.Create(FINIFileName) do
-    try
+  iniFile := TIniFile.Create(FINIFileName);
+  With iniFile Do
+    Try
       Top := ReadInteger('Position', 'Top', Top);
       Left := ReadInteger('Position', 'Left', Left);
       Height := ReadInteger('Position', 'Height', Height);
@@ -1225,10 +1305,15 @@ begin
       actViewDocConflicts.Checked := ReadBool('Setup', 'Conflicts', False);
       if lvFileList.Items.Count > i then
         lvFileList.ItemIndex := i;
-      FSynEdit.WordWrap := ReadBool('Setup', 'WordWrap', False);
-    finally
+      FIndex := ReadInteger('Setup', 'SelectedItem', -1);
+      LoadHighlighterFromINIFile(iniFile, FSynPasSyn);
+      LoadHighlighterFromINIFile(iniFile, FSynVBSyn);
+      LoadHighlighterFromINIFile(iniFile, FSynCPPSyn);
+      LoadHighlighterFromINIFile(iniFile, FSynXMLSyn);
+      LoadHighlighterFromINIFile(iniFile, FSynDFMSyn);
+    Finally
       Free;
-    end;
+    End;
 end;
 
 (**
@@ -1300,14 +1385,18 @@ begin
     End;
   FSynedit.Modified := False;
   strExt := LowerCase(ExtractFileExt(FFileName));
-  If IsKeyWord(strExt, ['.dfm', '.dpk', '.dpr', '.pas']) Then
+  If IsKeyWord(strExt, ['.dpk', '.dpr', '.pas']) Then
     FSynEdit.Highlighter := FSynPasSyn
+  Else If IsKeyWord(strExt, ['.dfm']) Then
+    FSynEdit.Highlighter := FSynDFMSyn
   Else If IsKeyWord(strExt, ['.bnf']) Then
     FSynEdit.Highlighter := FSynCPPSyn
   Else If IsKeyWord(strExt, ['.htm', '.html', '.xml']) Then
     FSynEdit.Highlighter := FSynXMLSyn
+  Else If IsKeyWord(strExt, ['.bas', '.cls', '.frm']) Then
+    FSynEdit.Highlighter := FSynVBSyn
   Else
-    FSynEdit.Highlighter := FSynVBSyn;
+    FSynEdit.Highlighter := Nil;
   SynEdit1Change(Self);
 end;
 

@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    21 Mar 2010
+  @Date    31 May 2010
   @Author  David Hoyle
 
 **)
@@ -1309,6 +1309,7 @@ Var
   recMainWndInfo, recModExplWndInfo : TWindowInfo;
 
 begin
+  CheckSynchronize;
   GetWindowInfo(FVBEIDE.MainWindow.HWnd, recMainWndInfo);
   GetWindowInfo(TfrmDockableModuleExplorer.GetWndHnd, recModExplWndInfo);
   If FVBEIDE.MainWindow.Visible And (

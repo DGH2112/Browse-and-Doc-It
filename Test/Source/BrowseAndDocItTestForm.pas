@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    21 Mar 2010
+  @Date    31 May 2010
   @Author  David Hoyle
 
 **)
@@ -28,6 +28,9 @@ type
   TScanResults = Record
     iDocConflicts, iHints, iWarnings, iErrors : Integer;
   End;
+
+  (** An enumerate to define the type of information passed to GetErrors. **)
+  TSourceType = (stFile, stCode);
 
   (** This is thre class that defined the main interface form. **)
   TfrmBrowseAndDocItTestForm = class(TForm)
@@ -146,7 +149,7 @@ type
     Procedure PopulateListView;
     Function ExcludeFileFromResults(strFileName : String) : Boolean;
     Procedure GetErrors(strFileName, strSource : String; var iHints, iWarnings,
-      iErrors, iConflicts : Integer);
+      iErrors, iConflicts : Integer; SourceType : TSourceType);
     Procedure TimerEvent(Sender : TObject);
     Procedure RefreshModuleExplorer;
     Procedure SaveResults;
@@ -625,7 +628,7 @@ Begin
                     Begin
                       FProgressForm.UpdateProgress(iPosition, strFileName);
                       GetErrors(strFileName, strSource, iHints, iWarnings,
-                        iErrors, iConflicts);
+                        iErrors, iConflicts, stFile);
                       Inc(Result.iDocConflicts, iConflicts);
                       Inc(Result.iHints, iHints);
                       Inc(Result.iWarnings, iWarnings);
@@ -673,6 +676,8 @@ Begin
                   For i := 0 To slExts.Count - 1 Do
                     Begin
                       boolResult := Z.FindFirst('*' + slExts[i], recZip);
+                      If recZip.Encrypted Then
+                        boolResult := False;
                       While boolResult Do
                         Begin
                           strFileName := strDirectory + '\' + recFile.Name + '\' +
@@ -686,7 +691,7 @@ Begin
                                   Z.ExtractToString(recZip.StoredPath +
                                     recZip.FileName, strSource);
                                   GetErrors(strFileName, strSource, iHints,
-                                    iWarnings, iErrors, iConflicts);
+                                    iWarnings, iErrors, iConflicts, stCode);
                                   Inc(Result.iDocConflicts, iConflicts);
                                   Inc(Result.iHints, iHints);
                                   Inc(Result.iWarnings, iWarnings);
@@ -770,10 +775,12 @@ end;
   @param   iWarnings   as an Integer as a reference
   @param   iErrors     as an Integer as a reference
   @param   iConflicts  as an Integer as a reference
+  @param   SourceType  as a TSourceType
 
 **)
 Procedure TfrmBrowseAndDocItTestForm.GetErrors(strFileName, strSource : String;
-  var iHints, iWarnings, iErrors, iConflicts : Integer);
+  var iHints, iWarnings, iErrors, iConflicts : Integer;
+  SourceType : TSourceType);
 
 Var
   Source : TStringList;
@@ -788,7 +795,7 @@ Begin
   iConflicts := 0;
   Source := TStringList.Create;;
   Try
-    If strSource = '' Then
+    If SourceType = stFile Then
       Source.LoadFromFile(strFileName)
     Else
       Source.Text := strSource;

@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    20 Mar 2010
+  @Date    31 May 2010
   @Version 1.0
   @Author  David Hoyle
 
@@ -840,17 +840,12 @@ Type
     Function GetQualifiedName : String; Virtual; Abstract;
     Function GetParameterCount : Integer;
     Function GetParameters(iIndex : Integer) : TGenericParameter;
-    procedure CheckMethodDocumentation;
-    procedure CheckMethodParamCount;
-    Procedure CheckMethodParameters;
-    Procedure CheckMethodReturns;
     Function RequiresReturn : Boolean; Virtual; Abstract;
     Function FunctionType : String; Virtual; Abstract;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
-    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Procedure AddParameter(AParameter : TGenericParameter);
     (**
       This property returns the number of parameter in the parameter collection.
@@ -902,6 +897,10 @@ Type
     Function GetQualifiedName : String; Override;
     Function RequiresReturn : Boolean; Override;
     Function FunctionType : String; Override;
+    procedure CheckMethodDocumentation;
+    procedure CheckMethodParamCount;
+    Procedure CheckMethodParameters;
+    Procedure CheckMethodReturns;
   Public
     Constructor Create(MethodType : TMethodType; strName : String; AScope : TScope;
       iLine, iCol : Integer); ReIntroduce; Virtual;
@@ -966,7 +965,12 @@ Type
     function GetQualifiedName: String; Override;
     Function RequiresReturn : Boolean; Override;
     Function FunctionType : String; Override;
+    procedure CheckPropertyDocumentation;
+    procedure CheckPropertyParamCount;
+    Procedure CheckPropertyParameters;
+    Procedure CheckPropertyReturns;
   Public
+    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
   (** This is a class to represent a module documentation conflict. **)
@@ -4152,6 +4156,260 @@ end;
 
 (**
 
+  This method checks the property passed against the property comments tags and
+  highlights missing parameter comments, return tags and missing descriptions.
+
+  @precon  Method is the property declaration that requires checking for document
+           conflicts.
+  @postcon The passed property is systematicaly check for errors.
+
+  @param   boolCascade as a Boolean as a reference
+
+**)
+procedure TGenericProperty.CheckDocumentation(var boolCascade: Boolean);
+begin
+  If Identifier <> '' Then
+    Begin
+      CheckPropertyDocumentation;
+      If doShowMethodMissingDocs In BrowseAndDocItOptions.Options Then
+        If Comment <> Nil Then
+          Begin
+            CheckPropertyParamCount;
+            CheckPropertyParameters;
+            CheckPropertyReturns;
+          End;
+      Inherited CheckDocumentation(boolCascade);
+    End;
+end;
+
+(**
+
+  This method check the given property for general document problems, i.e.
+  missing or no description.
+
+  @precon  Method is valid property declaration to be checked for documentation.
+  @postcon Checks the passed property for docuemntation errors.
+
+**)
+procedure TGenericProperty.CheckPropertyDocumentation;
+begin
+  If doShowPropertyMissingDoc In BrowseAndDocItOptions.Options Then
+    Begin
+      If Comment = Nil Then
+        Begin
+          AddDocumentConflict([FunctionType, QualifiedName], Line, Column,
+            Comment, Format(strFunctionDocumentation, [FunctionType]),
+            DocConflictTable[dctFunctionUndocumented]);
+          Exit;
+        End;
+      If Comment.TokenCount = 0 Then
+        AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+          Format(strFunctionDocumentation, [FunctionType]),
+          DocConflictTable[dctFunctionHasNoDesc]);
+    End;
+end;
+
+(**
+
+  This method checks the given property for the correct number of parameters and
+  tags.
+
+  @precon  Method is a property declaration that needs the be check for document
+           conflicts.
+  @postcon Checks the passed property for errors in the parameter count
+           documentation.
+
+**)
+procedure TGenericProperty.CheckPropertyParamCount;
+
+Var
+  i, j, k : Integer;
+  boolMissing : Boolean;
+
+Begin
+  j := 0;
+  For i := 0 To Comment.TagCount - 1 Do
+    If LowerCase(Comment.Tag[i].TagName) = 'param' Then
+      Inc(j);
+  k := 0;
+  boolMissing := True;
+  For i := 0 To Comment.TagCount - 1 Do
+    If LowerCase(Comment.Tag[i].TagName) = 'precon' Then
+      Begin
+        Inc(k);
+        boolMissing := boolMissing And (Comment.Tag[i].TokenCount = 0);
+      End;
+  If doShowPropertyMissingPreCons In BrowseAndDocItOptions.Options Then
+    If boolMissing Then
+      AddDocumentConflict([FunctionType, QualifiedName], Comment.Line,
+        Comment.Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
+        DocConflictTable[dctFunctionPreconNotDocumented]);
+  If doShowPropertyDiffPropParamCount In BrowseAndDocItOptions.Options Then
+    If (ParameterCount <> j) Then
+      AddDocumentConflict([FunctionType, QualifiedName, ParameterCount, j], Line,
+        Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
+        DocConflictTable[dctFunctionDiffParamCount]);
+  If doShowPropertyMissingPreCons In BrowseAndDocItOptions.Options Then
+    If k < 1 Then
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+        Format(strFunctionDocumentation, [FunctionType]),
+        DocConflictTable[dctFunctionMissingPreCon]);
+  If doShowPropertyMissingPreCons In BrowseAndDocItOptions.Options Then
+    If k > 1 Then
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+        Format(strFunctionDocumentation, [FunctionType]),
+        DocConflictTable[dctFunctionTooManyPrecons]);
+end;
+
+(**
+
+  This method checks the given Property for the correct parameter tags and
+  pre conditions.
+
+  @precon  Method is a property declaration that needs the be check for document
+           conflicts.
+  @postcon Checks the passed method for errors in the parameter documentation.
+
+**)
+procedure TGenericProperty.CheckPropertyParameters;
+
+Var
+  i, j : Integer;
+  iFound : Integer;
+  strType : String;
+  strParam: String;
+
+Begin
+  For i := 0 To ParameterCount - 1 Do
+    Begin
+      // Parameter name
+      iFound := -1;
+      With Comment Do
+        For j := 0 To TagCount - 1 Do
+          If (LowerCase(Tag[j].TagName) = 'param') And (Tag[j].TokenCount > 0) And
+            (LowerCase(Tag[j].Tokens[0].Token) = Lowercase(Parameters[i].Identifier)) Then
+            Begin
+              iFound := j;
+              Break;
+            End;
+      If doShowPropertyUndocumentedParams In BrowseAndDocItOptions.Options Then
+        If iFound = -1 Then
+          AddDocumentConflict([Parameters[i].Identifier, FunctionType, QualifiedName],
+            Line, Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
+            DocConflictTable[dctFunctionUndocumentedParam]);
+      // Parameter type
+      If iFound > -1 Then
+        With Comment Do
+          Begin
+            strType := '';
+            For j := 6 To Tag[iFound].TokenCount - 1 Do
+              Begin
+                If (Tag[iFound].Tokens[j].TokenType In [ttSymbol]) And
+                  (Tag[iFound].Tokens[j].Token <> '.') Then
+                  Break;
+                strType := strType + Tag[iFound].Tokens[j].Token;
+              End;
+            strType := Trim(strType);
+            strParam := BuildLangIndepRep(Parameters[i]);
+            If doShowPropertyIncorrectParamType In BrowseAndDocItOptions.Options Then
+              If CompareText(strType, strParam) <> 0 Then
+                AddDocumentConflict([Parameters[i].Identifier, FunctionType,
+                  QualifiedName, strParam], Tag[iFound].Line, Tag[iFound].Column,
+                  Comment, Format(strFunctionDocumentation, [FunctionType]),
+                  DocConflictTable[dctFunctionIncorrectParamType]);
+          End;
+    End;
+end;
+
+(**
+
+  This method checks the given property for the correct return information and
+  tags.
+
+  @precon  Method is a property declaration that needs the be check for
+           document conflicts.
+  @postcon The passed method return is checked for errors.
+
+**)
+procedure TGenericProperty.CheckPropertyReturns;
+
+Var
+  i, j, k : Integer;
+  iFound : Integer;
+  strType : String;
+  strReturn : String;
+
+Begin
+  iFound := -1;
+  k := 0;
+  For i := 0 To Comment.TagCount - 1 Do
+    If LowerCase(Comment.Tag[i].TagName) = 'postcon' Then
+      Begin
+        Inc(k);
+        If doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options Then
+          If Comment.Tag[i].TokenCount = 0 Then
+            AddDocumentConflict([FunctionType, QualifiedName], Comment.Tag[i].Line,
+              Comment.Tag[i].Column, Comment, Format(strFunctionDocumentation,
+              [FunctionType]), DocConflictTable[dctFunctionPostconNotDocumented]);
+      End;
+  If RequiresReturn Then
+    Begin;
+      If ReturnType <> Nil Then
+        With Comment Do
+          For j := 0 To TagCount - 1 Do
+            If CompareText(Tag[j].TagName, 'return') = 0 Then
+              Begin
+                iFound := j;
+                Break;
+              End;
+      If iFound = -1 Then
+        Begin
+          If doShowPropertyUndocumentedReturn In BrowseAndDocItOptions.Options Then
+            AddDocumentConflict([FunctionType, QualifiedName], Line, Column,
+              Comment, Format(strFunctionDocumentation, [FunctionType]),
+              DocConflictTable[dctFunctionUndocumentedReturn])
+        End Else
+        Begin
+          If doShowPropertyIncorrectReturnType In BrowseAndDocItOptions.Options Then
+            Begin
+              strType := '';
+              strReturn := '';
+              For i := 2 To Comment.Tag[iFound].TokenCount - 1 Do
+                Begin
+                  If (Comment.Tag[iFound].Tokens[i].TokenType In [ttSymbol]) And
+                    (Comment.Tag[iFound].Tokens[i].Token <> '.') Then
+                    Break;
+                  strType := strType + Comment.Tag[iFound].Tokens[i].Token;
+                End;
+              strType := Trim(strType);
+              If ReturnType <> Nil Then
+                strReturn := ReturnType.AsString(False, False);
+              If CompareText(strReturn, strType) <> 0 Then
+                AddDocumentConflict([FunctionType, QualifiedName, strReturn],
+                  Comment.Tag[iFound].Line, Comment.Tag[iFound].Column, Comment,
+                  Format(strFunctionDocumentation, [FunctionType]),
+                  DocConflictTable[dctFunctionIncorrectReturntype]);
+            End;
+        End;
+    End Else
+      If Comment.FindTag('return') >= 0 Then
+        AddDocumentConflict([FunctionType, QualifiedName],
+          Line, Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
+          DocConflictTable[dctFunctionReturnNotRequired]);
+  If doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options Then
+    If k = 0 Then
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+        Format(strFunctionDocumentation, [FunctionType]),
+        DocConflictTable[dctFunctionMissingPostCon]);
+  If doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options Then
+    If (k > 1) And (iFound <> -1) Then
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+        Format(strFunctionDocumentation, [FunctionType]),
+        DocConflictTable[dctFunctionTooManyPostCons]);
+end;
+
+(**
+
   This method returns the function type of 'Property' for the documentation
   of problems with methods.
 
@@ -4232,18 +4490,21 @@ end;
   @param   boolCascade as a Boolean as a reference
 
 **)
-procedure TGenericFunction.CheckDocumentation(var boolCascade : Boolean);
+procedure TGenericMethodDecl.CheckDocumentation(var boolCascade : Boolean);
 
 Begin
-  CheckMethodDocumentation;
-  If doShowMethodMissingDocs In BrowseAndDocItOptions.Options Then
-    If Comment <> Nil Then
-      Begin
-        CheckMethodParamCount;
-        CheckMethodParameters;
-        CheckMethodReturns;
-      End;
-  Inherited CheckDocumentation(boolCascade);
+  If (Not FForwardDecl) And (Identifier <> '') Then
+    Begin
+      CheckMethodDocumentation;
+      If doShowMethodMissingDocs In BrowseAndDocItOptions.Options Then
+        If Comment <> Nil Then
+          Begin
+            CheckMethodParamCount;
+            CheckMethodParameters;
+            CheckMethodReturns;
+          End;
+      Inherited CheckDocumentation(boolCascade);
+    End;
 end;
 
 (**
@@ -4255,7 +4516,7 @@ end;
   @postcon Checks the passed method for docuemntation errors.
 
 **)
-Procedure TGenericFunction.CheckMethodDocumentation;
+Procedure TGenericMethodDecl.CheckMethodDocumentation;
 
 Begin
   If doShowMethodMissingDocs In BrowseAndDocItOptions.Options Then
@@ -4285,7 +4546,7 @@ End;
            documentation.
 
 **)
-Procedure TGenericFunction.CheckMethodParamCount;
+Procedure TGenericMethodDecl.CheckMethodParamCount;
 
 Var
   i, j, k : Integer;
@@ -4336,7 +4597,7 @@ End;
   @postcon Checks the passed method for errors in the parameter documentation.
 
 **)
-Procedure TGenericFunction.CheckMethodParameters;
+Procedure TGenericMethodDecl.CheckMethodParameters;
 
 Var
   i, j : Integer;
@@ -4378,7 +4639,7 @@ Begin
             strParam := BuildLangIndepRep(Parameters[i]);
             If doShowMethodIncorrectParamType In BrowseAndDocItOptions.Options Then
               If CompareText(strType, strParam) <> 0 Then
-                AddDocumentConflict([Parameters[i].Identifier, FunctionType, 
+                AddDocumentConflict([Parameters[i].Identifier, FunctionType,
                   QualifiedName, strParam], Tag[iFound].Line, Tag[iFound].Column,
                   Comment, Format(strFunctionDocumentation, [FunctionType]),
                   DocConflictTable[dctFunctionIncorrectParamType]);
@@ -4396,7 +4657,7 @@ End;
   @postcon The passed method return is checked for errors.
 
 **)
-Procedure TGenericFunction.CheckMethodReturns;
+Procedure TGenericMethodDecl.CheckMethodReturns;
 
 Var
   i, j, k : Integer;
@@ -4548,25 +4809,6 @@ end;
   TMethodDecl Methods
 
  -------------------------------------------------------------------------- **)
-
-(**
-
-  This method checks the method passed against the method comments tags and
-  highlights missing parameter comments, return tags and missing descriptions.
-
-  @precon  Method is the method declaration that requires checking for document
-           conflicts.
-  @postcon The passed method is systematicaly check for errors.
-
-  @param   boolCascade as a Boolean as a reference
-
-**)
-procedure TGenericMethodDecl.CheckDocumentation(var boolCascade : Boolean);
-
-Begin
-  If Not FForwardDecl And (Identifier <> '') Then
-    Inherited CheckDocumentation(boolCascade);
-end;
 
 (**
 

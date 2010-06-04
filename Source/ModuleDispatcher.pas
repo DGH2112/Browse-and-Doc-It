@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    13 Mar 2010
+  @Date    04 Jun 2010
   @Version 1.0
 
 **)
@@ -125,7 +125,7 @@ Var
 Begin
   Result := Nil;
   iIndex := Find(ExtractFileExt(strFileName));
-  If iIndex > 0 Then
+  If iIndex > -1 Then
     Result := Modules[iIndex].FCls.CreateParser(Source, strFileName,
       boolModified, ModuleOptions);
 End;
@@ -140,7 +140,7 @@ End;
   @postcon Determines if the document can be documented in HTML, RTF, etc.
 
   @param   strFileName as a String
-  @return  a Boolean    
+  @return  a Boolean
 
 **)
 Function CanDocumentDocument(strFileName : String) : Boolean;
@@ -151,7 +151,7 @@ Var
 Begin
   Result := False;
   iIndex := Find(ExtractFileExt(strFileName));
-  If iIndex  > 0 Then
+  If iIndex  > -1 Then
     Result := Modules[iIndex].FCanDoc;
 End;
 
@@ -171,7 +171,7 @@ End;
 Function CanParseDocument(strFileName : String) : Boolean;
 
 Begin
-  Result := Find(ExtractFileExt(strFileName)) > 0;
+  Result := Find(ExtractFileExt(strFileName)) > -1;
 End;
 
 (**

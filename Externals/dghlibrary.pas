@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    02 May 2010
+  @Date    06 Jun 2010
 
 **)
 Unit DGHLibrary;
@@ -636,12 +636,10 @@ Type
   (** This is a procedure type for handling Exception messages in ParseMacro. **)
   TExceptionProcedure = Procedure(strExceptionMsg : String) Of Object;
 
-  (** An interface that needs to be implemented by an class passed to
-      DGHCreateProcess so that messages can be handled. **)
-  IDGHCreateProcessEvents = Interface
-    Procedure ProcessMsgHandler(strMsg : String; var boolAbort : Boolean);
-    Procedure IdleHandler;
-  End;
+  (** A method signature for the DGHCreateProcess message event handler. **)
+  TProcessMsgHandler = Procedure(strMsg : String; var boolAbort : Boolean) Of Object;
+  (** A method signature for the DGHCreateProcess idle event handler. **)
+  TIdleHandler = Procedure Of Object;
 
   (** A record to describe the information required by DGHCreateProcess. **)
   TProcessInfo = Record
@@ -651,7 +649,9 @@ Type
     strDir : String;
   End;
 
-  Function DGHCreateProcess(Process : TProcessInfo; ProcMsgHndr : IDGHCreateProcessEvents) : Integer;
+  Function DGHCreateProcess(Process : TProcessInfo;
+    ProcessMsgHandler : TProcessMsgHandler;
+    IdleHandler : TIdleHandler) : Integer;
   Function AdjustBearing(dblBearing : Double) : Double;
   Function BearingToString(recBearing : TBearing) : String;
   Function BinToDec(sDisplayNumber : String) : String;
@@ -6036,21 +6036,23 @@ End;
 (**
 
   This function creates a process with message handlers which must be
-  implemented by the passed interface in order for the calling process to
-  get messages from the process console and handle idle and abort.
+  implemented by the passed interface in order for the calling process to get
+  messages from the process console and handle idle and abort.
 
-  @precon  ProcMsgHndr must be a valid class implementing TDGHCreateProcessEvent.
+  @precon  ProcMsgHndr must be a valid class implementing
+           TDGHCreateProcessEvent.
   @postcon Creates a process with message handlers which must be implemented by
-           the passed interface in order for the calling process to get messages
-           from the process console and handle idle and abort.
+           the passed interface in order for the calling process to get
+           messages from the process console and handle idle and abort.
 
-  @param   Process     as a TProcessInfo
-  @param   ProcMsgHndr as an IDGHCreateProcessEvents
+  @param   Process           as a TProcessInfo
+  @param   ProcessMsgHandler as a TProcessMsgHandler
+  @param   IdleHandler       as a TIdleHandler
   @return  an Integer
 
 **)
 Function  DGHCreateProcess(Process : TProcessInfo;
-  ProcMsgHndr : IDGHCreateProcessEvents) : Integer;
+  ProcessMsgHandler : TProcessMsgHandler; IdleHandler : TIdleHandler) : Integer;
 
 Var
   boolAbort: Boolean;
@@ -6086,11 +6088,12 @@ Var
     {$ENDIF}
 
   Begin
-    ProcMsgHndr.IdleHandler;
+    If Assigned(Idlehandler) Then
+      IdleHandler;
     If boolAbort Then
       Begin
-        If Assigned(ProcMsgHndr) Then
-          ProcMsgHndr.ProcessMsgHandler(strUserAbort, boolAbort);
+        If Assigned(ProcessMsgHandler) Then
+          ProcessMsgHandler(strUserAbort, boolAbort);
         Exit;
       End;
     Win32Check(PeekNamedPipe(hRead, Nil, 0, Nil, @iTotalBytesInPipe, Nil));
@@ -6104,10 +6107,10 @@ Var
       End;
     // Use a string list to output each line except the last as it may not
     // be complete yet.
-    If Assigned(ProcMsgHndr) Then
+    If Assigned(ProcessMsgHandler) Then
       While slLines.Count > 1 - Integer(Purge) Do
         Begin
-          ProcMsgHndr.ProcessMsgHandler(slLines[0], boolAbort);
+          ProcessMsgHandler(slLines[0], boolAbort);
           slLines.Delete(0);
         End;
   End;
@@ -6173,9 +6176,9 @@ Begin
         End;
       Except
         On E : Exception Do
-          If Assigned(ProcMsgHndr) Then
+          If Assigned(ProcessMsgHandler) Then
             Begin
-              ProcMsgHndr.ProcessMsgHandler(E.Message, boolAbort);
+              ProcessMsgHandler(E.Message, boolAbort);
               Inc(Result);
             End;
       End;

@@ -411,7 +411,7 @@ begin
 end;
 
 Type
-  TDGHCreateProcessHandler = Class(TInterfacedObject, IDGHCreateProcessEvents)
+  TDGHCreateProcessHandler = Class
   Strict Private
     FOutput : TStringList;
   Strict Protected
@@ -457,20 +457,25 @@ begin
   Process.strDir := strDrive + '\HoylD\Borland Studio Projects\Library\Test\';
   slLines := TStringList.Create;
   Try
-    ProcMsgHndr := TDGHCreateProcessHandler.Create(slLines); // No free required (Interface)
-    iResult := DGHCreateProcess(Process, ProcMsgHndr);
-    CheckEquals(0, iResult, 'SuccessConsoleApp ERRORLEVEL');
-    CheckEquals(2, ProcMsgHndr.Output.Count);
-    CheckEquals('This allocation runs successfully and', ProcMsgHndr.Output[0]);
-    CheckEquals('returns an ERRORLEVEL = 0.', ProcMsgHndr.Output[1]);
-    slLines.Clear;
-    Process.strEXE := strDrive + '\HoylD\Borland Studio Projects\Library\Test\FailureConsoleApp.exe';
-    ProcMsgHndr := TDGHCreateProcessHandler.Create(slLines); // No free required (Interface)
-    iResult := DGHCreateProcess(Process, ProcMsgHndr);
-    CheckEquals(1, iResult, 'SuccessConsoleApp ERRORLEVEL');
-    CheckEquals(2, ProcMsgHndr.Output.Count);
-    CheckEquals('This allocation runs and fails and', ProcMsgHndr.Output[0]);
-    CheckEquals('in doing so returns an ERRORLEVEL = 1.', ProcMsgHndr.Output[1]);
+    ProcMsgHndr := TDGHCreateProcessHandler.Create(slLines);
+    Try
+      iResult := DGHCreateProcess(Process, ProcMsgHndr.ProcessMsgHandler,
+        ProcMsgHndr.IdleHandler);
+      CheckEquals(0, iResult, 'SuccessConsoleApp ERRORLEVEL');
+      CheckEquals(2, ProcMsgHndr.Output.Count);
+      CheckEquals('This allocation runs successfully and', ProcMsgHndr.Output[0]);
+      CheckEquals('returns an ERRORLEVEL = 0.', ProcMsgHndr.Output[1]);
+      slLines.Clear;
+      Process.strEXE := strDrive + '\HoylD\Borland Studio Projects\Library\Test\FailureConsoleApp.exe';
+      iResult := DGHCreateProcess(Process, ProcMsgHndr.ProcessMsgHandler,
+        ProcMsgHndr.IdleHandler);
+      CheckEquals(1, iResult, 'SuccessConsoleApp ERRORLEVEL');
+      CheckEquals(2, ProcMsgHndr.Output.Count);
+      CheckEquals('This allocation runs and fails and', ProcMsgHndr.Output[0]);
+      CheckEquals('in doing so returns an ERRORLEVEL = 1.', ProcMsgHndr.Output[1]);
+    Finally
+      ProcMsgHndr.Free;
+    End;
   Finally
     slLines.Free;
   End;

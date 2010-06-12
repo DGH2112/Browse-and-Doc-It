@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    26 May 2010
+  @Date    12 Jun 2010
   @Version 1.0
 
 **)
@@ -37,6 +37,7 @@ Type
   TBrowseAndDocItThreadManager = Class
   {$IFDEF D2005} Strict {$ENDIF} Private
     FThread : TThread;
+    FSuccessfulParseProc : TParserNotify;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Procedure TerminateThread(Sender : TObject);
   Public
@@ -117,7 +118,6 @@ Type
     FFileName: String;
     FType    : String;
     FModified: Boolean;
-    FSuccessfulParseProc : TParserNotify;
     FRenderDocumentTree: TRenderDocumentTree;
     FThreadExceptionMsg: TThreadExceptionMsg;
     Procedure SetName;
@@ -127,7 +127,6 @@ Type
     Procedure ShowException;
   Public
     Constructor CreateBrowseAndDocItThread(
-      SuccessfulParseProc : TParserNotify;
       EditorInfo : TEditorInformation;
       RenderDocumentTree : TRenderDocumentTree;
       ThreadExceptionMsg : TThreadExceptionMsg;
@@ -605,10 +604,11 @@ Function TBrowseAndDocItThreadManager.Parse(
 
 Begin
   Result := False;
+  FSuccessfulParseProc := SuccessfulParseProc;
   If FThread = Nil Then
     Begin
       FThread := TBrowseAndDocItThread.CreateBrowseAndDocItThread(
-        SuccessfulParseProc, EditorInfo, RenderDocumentTree, ThreadExceptionMsg,
+        EditorInfo, RenderDocumentTree, ThreadExceptionMsg,
         TerminateThread);
       Result := True;
     End;
@@ -628,6 +628,8 @@ Procedure TBrowseAndDocItThreadManager.TerminateThread(Sender : TObject);
 
 Begin
   FThread := Nil;
+  If Assigned(FSuccessfulParseProc) Then
+    FSuccessfulParseProc(True);
 End;
 
 { TBrowseAndDocItThread }
@@ -638,10 +640,9 @@ End;
 
   @precon  None.
   @postcon Creates a suspended thread and sets up a stream with the contents of
-           the active editor and then resumed the thread in order to parse 
+           the active editor and then resumed the thread in order to parse
            the contents.
 
-  @param   SuccessfulParseProc as a TParserNotify
   @param   EditorInfo          as a TEditorInformation
   @param   RenderDocumentTree  as a TRenderDocumentTree
   @param   ThreadExceptionMsg  as a TThreadExceptionMsg
@@ -649,7 +650,6 @@ End;
 
 **)
 constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(
-  SuccessfulParseProc : TParserNotify;
   EditorInfo : TEditorInformation;
   RenderDocumentTree : TRenderDocumentTree;
   ThreadExceptionMsg : TThreadExceptionMsg;
@@ -657,7 +657,6 @@ constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(
 
 begin
   FreeOnTerminate := True; // Self Freeing...
-  FSuccessfulParseProc := SuccessfulParseProc;
   FRenderDocumentTree := RenderDocumentTree;
   FThreadExceptionMsg := ThreadExceptionMsg;
   OnTerminate := TerminateThread;
@@ -712,10 +711,8 @@ begin
     On E : Exception Do
       Begin
         {$IFDEF EUREKALOG}
-        If StandardEurekaNotify(GetLastExceptionObject, GetLastExceptionAddress) Then
+        StandardEurekaNotify(GetLastExceptionObject, GetLastExceptionAddress);
         {$ENDIF}
-          If Assigned(FSuccessfulParseProc) Then
-            FSuccessfulParseProc(False);
         FFileName := E.Message;
         Synchronize(ShowException);
       End;
@@ -737,8 +734,6 @@ procedure TBrowseAndDocItThread.RenderModuleExplorer;
 begin
   If Assigned(FRenderDocumentTree) Then
     FRenderDocumentTree(FModule);
-  If Assigned(FSuccessfulParseProc) Then
-    FSuccessfulParseProc(True);
 end;
 
 (**
@@ -785,8 +780,6 @@ Const
 begin
   If Assigned(FThreadExceptionMsg) Then
     FThreadExceptionMsg(Format(strMsg, [FType, FFileName]));
-  If Assigned(FSuccessfulParseProc) Then
-    FSuccessfulParseProc(False);
 end;
 
 (**

@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    22 Sep 2009
+  @Date    12 Jun 2010
   @Version 1.0
 
 **)
@@ -30,7 +30,7 @@ type
     Class Procedure CreateDockableModuleExplorer;
     Class Procedure RenderDocumentTree(BaseLanguageModule : TBaseLanguageModule);
     Class Procedure HookEventHandlers(SelectionChangeProc : TSelectionChange;
-      Focus, ScopeChange : TNotifyEvent);
+      Focus, ScopeChange : TNotifyEvent; FormClose : TCloseEvent);
     Class Function  IsVisible : Boolean;
     Class Procedure SetActivate(Handler : TNotifyEvent);
     Class Procedure SetVisible(boolVisible : Boolean);
@@ -363,16 +363,19 @@ end;
   @param   SelectionChangeProc as a TSelectionChange
   @param   Focus               as a TNotifyEvent
   @param   ScopeChange         as a TNotifyEvent
+  @param   FormClose           as a TCloseEvent
 
 **)
 class procedure TfrmDockableModuleExplorer.HookEventHandlers(
-  SelectionChangeProc: TSelectionChange; Focus, ScopeChange : TNotifyEvent);
+  SelectionChangeProc: TSelectionChange; Focus, ScopeChange : TNotifyEvent;
+  FormClose : TCloseEvent);
 begin
   If Assigned(FormInstance) Then
     Begin
       FormInstance.FModuleExplorerFrame.OnSelectionChange := SelectionChangeProc;
       FormInstance.FModuleExplorerFrame.OnFocus := Focus;
       FormInstance.FModuleExplorerFrame.OnRefresh := ScopeChange;
+      FormInstance.OnClose := FormClose;
     End;
 end;
 

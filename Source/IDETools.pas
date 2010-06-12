@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    31 May 2010
+  @Date    12 Jun 2010
   @Author  David Hoyle
 
 **)
@@ -94,7 +94,7 @@ Type
     Procedure InsertLineCommentClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure InsertInSituCommentClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure ExportClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
-    {: @todo Procedure ImportClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);}
+    Procedure ImportClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure SaveCodeFragmentClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure InsertCodeFragmentClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
     Procedure ShowTokensClick(Const Ctrl : CommandBarButton; Var CancelDefault : WordBool);
@@ -118,6 +118,7 @@ Type
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure WndProc(var Msg : TMessage);
+    Procedure MEFormClose(Sender : TObject; var CloseAction : TCloseAction);
     (**
       This property reads and write the project paths to and from the registry.
       @precon  None.
@@ -290,12 +291,12 @@ begin
       BrowseAndDocItOptions.INIFileName, False);
     FPath := ExtractFilePath(BrowseAndDocItOptions.INIFileName) + 'Code Fragments\';
     ForceDirectories(FPath);
+    FVBEIDE := VBEIDERef;
     TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
     TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus,
-      ScopeChange);
+      ScopeChange, MEFormClose);
     TfrmDockableModuleExplorer.SetModuleExplorerPosition(WindowPosition['ModuleExplorer']);
     FVBProject := Nil;
-    FVBEIDE := VBEIDERef;
     FSinks := TObjectList.Create(True);
     CreateMenu;
     FBADIThreadMgr := TBrowseAndDocItThreadManager.Create;
@@ -491,7 +492,9 @@ Var
 
 begin
   Try
-    If Not FVBEIDE.MainWindow.Visible Then
+    If Not TfrmDockableModuleExplorer.IsVisible Then
+      Exit;
+    If FVBEIDE.CodePanes.Count = 0 Then
       Exit;
     If FVBProject <> FVBEIDE.ActiveVBProject Then
       Begin
@@ -943,12 +946,12 @@ end;
 
   @param   Ctrl          as a CommandBarButton as a constant
   @param   CancelDefault as a WordBool as a reference
-
+**)
 procedure TIDETools.ImportClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
 begin
   //: @todo Implement the Import Menu.
 end;
-**)
+
 
 (**
 
@@ -1193,6 +1196,22 @@ end;
 
 (**
 
+  This is an on form event handler for the module explorer.
+
+  @precon  None.
+  @postcon Sets the visible variable to false if the module explorer is closed.
+
+  @param   Sender      as a TObject
+  @param   CloseAction as a TCloseAction as a reference
+
+**)
+procedure TIDETools.MEFormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  FMEVisible := False;
+end;
+
+(**
+
   This is an on click event handler for the module explorer menu option.
 
   @precon  None.
@@ -1206,6 +1225,7 @@ procedure TIDETools.ModuleExplorerClick(const Ctrl: CommandBarButton;
   var CancelDefault: WordBool);
 begin
   TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
+  FMEVisible := True;
   FCounter := BrowseAndDocItOptions.UpdateInterval;
 end;
 

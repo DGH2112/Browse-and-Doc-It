@@ -70,8 +70,6 @@ Type
     FIdleTimer : TTimer;
     FMEVisible: Boolean;
     FVisible: Boolean;
-    FOldWndProc : TFarProc;
-    FNewWndProc : TFarProc;
     FLastCodePane: CodePane;
     FBADIThreadMgr : TBrowseAndDocItThreadManager;
     procedure CreateMenu;
@@ -117,8 +115,9 @@ Type
     Procedure IdleTimerEvent(Sender : TObject);
     Procedure LoadSettings;
     Procedure SaveSettings;
-    Procedure WndProc(var Msg : TMessage);
     Procedure MEFormClose(Sender : TObject; var CloseAction : TCloseAction);
+    Function  VBFileExists(strFileName : String) : VBComponent;
+    Procedure CheckForKeyboardShortcuts;
     (**
       This property reads and write the project paths to and from the registry.
       @precon  None.
@@ -224,6 +223,9 @@ ResourceString
   strFileReadOnly = 'The file "%s" is read only.';
   (** This is a message for a code fragment that already exists. **)
   strFileExists = 'The code fragment "%s" already exists. Do you want to overwrite this fragment?';
+  (** A resource string to prompt for overwriting an imported file. **)
+  strTheFileAlreadyExists = 'The file "%s" already exists in this project. ' +
+  'Do you want to overwrite it?';
 
 Implementation
 
@@ -232,6 +234,7 @@ Uses
   ModuleDispatcher, OptionsForm, DocumentationOptionsForm, ShellAPI,
   CodeFragmentsForm, Variants, VBEIDEModuleExplorer,
   DGHLibrary, Math, VBModule, checkforupdates, Menus;
+
 
 { TIDEMenuItem }
 
@@ -309,9 +312,6 @@ begin
     FIdleTimer := TTimer.Create(Nil);
     FIdleTimer.Interval := 100;
     FIdleTimer.OnTimer := IdleTimerEvent;
-    FOldWndProc := TFarProc(GetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC));
-    FNewWndProc := Classes.MakeObjectInstance(WndProc);
-    //: @debug SetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC, LongWord(FNewWndProc));
   Except
     On E : Exception Do DisplayException(E.Message);
   End;
@@ -328,8 +328,6 @@ end;
 destructor TIDETools.Destroy;
 begin
   SaveSettings;
-  //: @debug SetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC, LongWord(FOldWndProc));
-  Classes.FreeObjectInstance(FNewWndProc);
   FActions.Free;
   WindowPosition['ModuleExplorer'] := TfrmDockableModuleExplorer.GetModuleExplorerPosition;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
@@ -463,7 +461,7 @@ Begin
       CreateMenuItem(strInsertLineComment, InsertLineCommentClick, False, 'L');
       CreateMenuItem(strInsertInSituComment, InsertInSituCommentClick, False, 'I');
       CreateMenuItem(strExport, ExportClick, True, 'X');
-      {: @debug CreateMenuItem(strImport, ImportClick, False, 'R'); }
+      CreateMenuItem(strImport, ImportClick, False, 'R');
       CreateMenuItem(strSaveCodeFragment, SaveCodeFragmentClick, True, 'S');
       CreateMenuItem(strInsertCodeFragment,InsertCodeFragmentClick, False, 'N');
       CreateMenuItem(strOptions, OptionsClick, True, 'O');
@@ -948,10 +946,54 @@ end;
   @param   CancelDefault as a WordBool as a reference
 **)
 procedure TIDETools.ImportClick(const Ctrl: CommandBarButton; var CancelDefault: WordBool);
+
+Var
+  dlg : TOpenDialog;
+  iFile: Integer;
+  vbc: VBComponent;
+
 begin
-  //: @todo Implement the Import Menu.
+  If FVBEIDE.ActiveVBProject = Nil Then
+    Exit;
+  FVBProject := FVBEIDE.ActiveVBProject;
+  dlg := TOpenDialog.Create(Nil);
+  Try
+    dlg.Filter := 'Visual Basic Files (*.cls;*.bas;*.frm)|*.cls;*.bas;*.frm|All Files|*.*';
+    dlg.FilterIndex := 0;
+    dlg.Options := dlg.Options + [ofFileMustExist, ofAllowMultiSelect];
+    If dlg.Execute Then
+      Begin
+        For iFile := 0 To dlg.Files.Count - 1 Do
+          Begin
+            vbc := VBFileExists(dlg.Files[iFile]);
+            If vbc <> Nil Then
+              Case MessageDlg(Format(strTheFileAlreadyExists, [dlg.Files[iFile]]),
+                mtConfirmation, [mbYes, mbNo, mbCancel], 0) Of
+                mrYes   : FVBEIDE.ActiveVBProject.VBComponents.Remove(vbc);
+                mrNo    : Break;
+                mrCancel: Exit;
+              End;
+            vbc := FVBEIDE.ActiveVBProject.VBComponents.Import(dlg.Files[iFile]);
+            vbc.Activate;
+          End;
+      End;
+  Finally
+    dlg.Free;
+  End;
 end;
 
+procedure TIDETools.CheckForKeyboardShortcuts;
+
+Var
+  Msg : tagMSG;
+
+begin
+  If PeekMessage(Msg, FVBEIDE.MainWindow.HWnd, WM_KEYFIRST, WM_KEYLAST, PM_NOREMOVE) Then
+    Begin
+      If Msg.wParam = VK_F11 Then
+        ShowMessage('Hello');
+    End;
+end;
 
 (**
 
@@ -1005,6 +1047,41 @@ end;
 
 (**
 
+  This method returns the vb component interface for the named file if found in
+  the active VB Project else returns nil.
+
+  @precon  None.
+  @postcon Returns the vb component interface for the named file if found in
+           the active VB Project else returns nil.
+
+  @param   strFileName as a String
+  @return  a VBComponent
+
+**)
+function TIDETools.VBFileExists(strFileName: String): VBComponent;
+
+Var
+  iFile : Integer;
+  strVBCName : String;
+
+begin
+  Result := Nil;
+  If FVBProject = Nil Then
+    Exit;
+  strFileName := ChangeFileExt(ExtractFileName(strFileName), '');
+  For iFile := 1 To FVBProject.VBComponents.Count Do
+    Begin
+      strVBCName := FVBProject.VBComponents.Item(iFile).Name;
+      If CompareText(strFileName, strVBCName) = 0 Then
+        Begin
+          Result := FVBProject.VBComponents.Item(iFile);
+          Exit;
+        End;
+    End;
+end;
+
+(**
+
   This is an event handler that is fired when ever the current VB project changes.
 
   @precon  None.
@@ -1019,29 +1096,6 @@ begin
   If Project = Nil Then Exit;
   If IgnoreVBAProject And (Project.Name = 'VBAProject') Then
     Exit;
-end;
-
-(**
-
-  This is a Windows procedure for handling keyboard shortcuts in the IDE.
-
-  @precon  None.
-  @postcon NOT CURRENTLY IMPLEMENTED PENDING A SOLUTION TO THE SUBCLASS OF THE
-           IDE PROBLEM.
-
-  @param   Msg as a TMessage as a reference
-
-**)
-procedure TIDETools.WndProc(var Msg: TMessage);
-begin
-  Case Msg.Msg Of
-    WM_KEYDOWN:
-      Begin
-        OutputDebugString('Hello Dave.');
-      End;
-  End;
-  Msg.Result := CallWindowProc(FOldWndProc, FVBEIDE.MainWindow.HWnd, Msg.Msg,
-    Msg.WParam, Msg.LParam);
 end;
 
 (**
@@ -1330,6 +1384,7 @@ Var
 
 begin
   CheckSynchronize;
+  CheckForKeyboardShortcuts;
   GetWindowInfo(FVBEIDE.MainWindow.HWnd, recMainWndInfo);
   GetWindowInfo(TfrmDockableModuleExplorer.GetWndHnd, recModExplWndInfo);
   If FVBEIDE.MainWindow.Visible And (

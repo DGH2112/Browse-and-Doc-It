@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    21 Mar 2010
+  @Date    14 Jun 2010
   @Author  David Hoyle
 
 **)
@@ -126,6 +126,8 @@ Var
 
 begin
   Result := '';
+  strFileName := '';
+  boolModified := False;
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
@@ -486,3 +488,4 @@ end;
 {$ENDIF}
 
 End.
+

@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    12 Jun 2010
+  @Date    15 Jun 2010
   @Author  David Hoyle
 
 **)
@@ -70,6 +70,8 @@ Type
     FIdleTimer : TTimer;
     FMEVisible: Boolean;
     FVisible: Boolean;
+    //FOldWndProc : TFarProc;
+    //FNewWndProc : TFarProc;
     FLastCodePane: CodePane;
     FBADIThreadMgr : TBrowseAndDocItThreadManager;
     procedure CreateMenu;
@@ -117,7 +119,7 @@ Type
     Procedure SaveSettings;
     Procedure MEFormClose(Sender : TObject; var CloseAction : TCloseAction);
     Function  VBFileExists(strFileName : String) : VBComponent;
-    Procedure CheckForKeyboardShortcuts;
+    //Procedure WndProc(var Msg : TMessage);
     (**
       This property reads and write the project paths to and from the registry.
       @precon  None.
@@ -312,6 +314,9 @@ begin
     FIdleTimer := TTimer.Create(Nil);
     FIdleTimer.Interval := 100;
     FIdleTimer.OnTimer := IdleTimerEvent;
+    //FOldWndProc := TFarProc(GetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC));
+    //FNewWndProc := Classes.MakeObjectInstance(WndProc);
+    //SetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC, LongWord(FNewWndProc));
   Except
     On E : Exception Do DisplayException(E.Message);
   End;
@@ -328,6 +333,10 @@ end;
 destructor TIDETools.Destroy;
 begin
   SaveSettings;
+  // Check that our WndProc is the current WndProc before removing.
+  //If TFarProc(GetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC)) = FNewWndProc Then
+  //  SetWindowLong(FVBEIDE.MainWindow.HWnd, GWL_WNDPROC, LongWord(FOldWndProc));
+  //Classes.FreeObjectInstance(FNewWndProc);
   FActions.Free;
   WindowPosition['ModuleExplorer'] := TfrmDockableModuleExplorer.GetModuleExplorerPosition;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
@@ -982,19 +991,6 @@ begin
   End;
 end;
 
-procedure TIDETools.CheckForKeyboardShortcuts;
-
-Var
-  Msg : tagMSG;
-
-begin
-  If PeekMessage(Msg, FVBEIDE.MainWindow.HWnd, WM_KEYFIRST, WM_KEYLAST, PM_NOREMOVE) Then
-    Begin
-      If Msg.wParam = VK_F11 Then
-        ShowMessage('Hello');
-    End;
-end;
-
 (**
 
   This is an on click event handler for the Check for Updates menu item.
@@ -1384,7 +1380,6 @@ Var
 
 begin
   CheckSynchronize;
-  CheckForKeyboardShortcuts;
   GetWindowInfo(FVBEIDE.MainWindow.HWnd, recMainWndInfo);
   GetWindowInfo(TfrmDockableModuleExplorer.GetWndHnd, recModExplWndInfo);
   If FVBEIDE.MainWindow.Visible And (
@@ -1790,6 +1785,9 @@ var
   CP: CodePane;
 
 begin
+  Result := '';
+  strFileName := '';
+  boolModified := False;
   CP := CurrentCodePane;
   If CP <> Nil Then
     Begin
@@ -1800,4 +1798,28 @@ begin
     End;
 end;
 
+(**
+
+  This is a Windows procedure for handling keyboard shortcuts in the IDE.
+
+  @precon  None.
+  @postcon
+
+  @param   Msg as a TMessage as a reference
+
+
+procedure TIDETools.WndProc(var Msg: TMessage);
+begin
+  Case Msg.Msg Of
+    WM_KEYDOWN:
+      Begin
+        OutputDebugString('Hello Dave.');
+      End;
+  End;
+  Msg.Result := CallWindowProc(FOldWndProc, FVBEIDE.MainWindow.HWnd, Msg.Msg,
+    Msg.WParam, Msg.LParam);
+end;**)
+
 End.
+
+

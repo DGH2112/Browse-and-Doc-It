@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    12 Jun 2010
+  @Date    14 Jun 2010
   @Version 1.0
 
 **)
@@ -695,8 +695,11 @@ begin
   SetName;
   Try
     FType := 'Parsing';
-    FModule := Dispatcher(FSource, FFileName, FModified, [moParse,
-      moCheckForDocumentConflicts]);
+    If FFileName <> '' Then
+      FModule := Dispatcher(FSource, FFileName, FModified, [moParse,
+        moCheckForDocumentConflicts])
+    Else
+      FModule := Nil;
     Try
       If Terminated Then
         Exit;
@@ -838,3 +841,5 @@ Begin
 End;
 
 End.
+
+

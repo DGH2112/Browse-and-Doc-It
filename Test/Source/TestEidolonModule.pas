@@ -72,8 +72,6 @@ Type
 
 Implementation
 
-Uses
-  ModuleDispatcher;
 
 //
 // Test Methods for Class TEidolonComment.
@@ -146,7 +144,7 @@ begin
     '    @LevelType=Level'#13#10 +
     '    @TotalType=Total'#13#10 +
     '  }'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -182,7 +180,7 @@ begin
     '{'#13#10 +
     '  &Drainage= bar , Black , Solid , 0.25 , Blue , None  , None , 5 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -203,7 +201,7 @@ begin
     '{'#13#10 +
     '  &Drainage= bar , Black , Solid , 0.25 , Blue , None  , None , 5, 25 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -233,7 +231,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Bar, Black, Solid, 0.5, White, None, None, 5'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -254,7 +252,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Bar, Black, Solid, 0.5, White, None, None, 100'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -287,7 +285,7 @@ begin
     'Korax 97 Info 2=Class(TextTable)'#13#10 +
     '  {'#13#10 +
     '  }'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -310,7 +308,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, None, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -331,7 +329,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -352,7 +350,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Brown, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -373,7 +371,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, OliveGreen, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -394,7 +392,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, DarkGreen, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -415,7 +413,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, DarkTeal, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -436,7 +434,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, DarkBlue, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -457,7 +455,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Indigo, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -478,7 +476,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Gray-80%, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -499,7 +497,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, DarkRed, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -520,7 +518,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Orange, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -541,7 +539,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, DarkYellow, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -562,7 +560,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Green, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -583,7 +581,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Teal, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -604,7 +602,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Blue, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -625,7 +623,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Blue-Gray, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -646,7 +644,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Gray-50%, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -667,7 +665,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Red, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -688,7 +686,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, LightOrange, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -709,7 +707,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Lime, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -730,7 +728,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, SeaGreen, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -751,7 +749,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Aqua, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -772,7 +770,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, LightBlue, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -793,7 +791,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Violet, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -814,7 +812,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Gray-40%, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -835,7 +833,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Pink, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -856,7 +854,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Gold, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -877,7 +875,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Yellow, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -898,7 +896,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, BrightGreen, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -919,7 +917,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Turquoise, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -940,7 +938,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, SkyBlue, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -961,7 +959,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Plum, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -982,7 +980,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Gray-25%, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1003,7 +1001,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Rose, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1024,7 +1022,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Tan, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1045,7 +1043,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, LightYellow, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1066,7 +1064,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, LightGreen, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1087,7 +1085,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, LightTurquoise, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1108,7 +1106,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, PaleBlue, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1129,7 +1127,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Lavender, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1150,7 +1148,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, White, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1187,7 +1185,7 @@ begin
     '  Time Location Symbol:C(255)'#13#10 +
     '  &Drainage=Line,Blue,Solid,0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1221,7 +1219,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1242,7 +1240,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, RoundDot, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1263,7 +1261,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, SquareDot, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1284,7 +1282,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Dash, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1305,7 +1303,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, DashDot, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1326,7 +1324,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, LongDash, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1347,7 +1345,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, LongDashDot, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1368,7 +1366,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, DashDotDot, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1398,7 +1396,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1419,7 +1417,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, 0.5'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1440,7 +1438,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, 1'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1461,7 +1459,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, 1.5'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1482,7 +1480,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, 2.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1503,7 +1501,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, 3'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1524,7 +1522,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, 4.5'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1545,7 +1543,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, 6'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1566,7 +1564,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, Double'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1587,7 +1585,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, DoubleThinThick'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1608,7 +1606,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, DoubleThickThin'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1629,7 +1627,7 @@ begin
     '{'#13#10 +
     '  &Drainage=Line, Black, Solid, TripleThickBetweenThin'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1661,7 +1659,7 @@ begin
     '  #CONNECTION='#13#10 +
     '  Activity ID:C(255)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1688,7 +1686,7 @@ begin
     '  #CONNECTION=Paradox 4.x;'#13#10 +
     '  Activity ID:C(255)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1715,7 +1713,7 @@ begin
     '  #CONNECTION=dBase IV;'#13#10 +
     '  Activity ID:C(255)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1742,7 +1740,7 @@ begin
     '  #CONNECTION=FoxPro 2.6;'#13#10 +
     '  Activity ID:C(255)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1769,7 +1767,7 @@ begin
     '  #CONNECTION=Text;'#13#10 +
     '  Activity ID:C(255)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1817,7 +1815,7 @@ begin
     '{'#13#10 +
     '  #Database=' + Copy(ParamStr(0), 1, 1) + ':\HoylD\Excel\Korax 97\Database (Full)\Korax97.mdb'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1838,7 +1836,7 @@ begin
     '{'#13#10 +
     '  #Database=' + Copy(ParamStr(0), 1, 1) + ':\HoylD\Excel\Korax 97\Database (Full)\'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1867,7 +1865,7 @@ begin
     'This is a database table=Class(DBTable)'#13#10 +
     '{'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1883,7 +1881,7 @@ begin
     'This is a database table=Class(DBTable)'#13#10 +
     '  {  '#13#10 +
     '  }  '#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1909,7 +1907,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Diamond , Black , Solid , 0.25 , Blue , None  , None , 5 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1930,7 +1928,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Diamond , Black , Solid , 0.25 , Blue , None  , None , 5, 25 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1960,7 +1958,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Ellipse , Black , Solid , 0.25 , Blue , None  , None , 5 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1981,7 +1979,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Ellipse , Black , Solid , 0.25 , Blue , None  , None , 5, 25 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2011,7 +2009,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Ellipse , Black , Solid , 0.25 , Blue , None  , None , 1 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2032,7 +2030,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Ellipse , Black , Solid , 0.25 , Blue , None  , None , 100 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2063,7 +2061,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:C(255)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2086,7 +2084,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:C(255)=Act ID'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2109,7 +2107,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  *Activity ID:C(255)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2136,7 +2134,7 @@ var
 
 begin
   strSource := '// This is a comment.'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2145,7 +2143,7 @@ begin
     M.Free;
   End;
   strSource := '/* This is a comment. */'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2162,7 +2160,7 @@ begin
     '  First Field:C(10)'#13#10 +
     '  Second Field:I'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2181,7 +2179,7 @@ begin
     '//  Second Field:I'#13#10 +
     '  Third Field:C(25)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2201,7 +2199,7 @@ begin
     '  //  Second Field:I'#13#10 +
     '  Third Field:C(25)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2219,7 +2217,7 @@ begin
     '  Second Field:I'#13#10 +
     '  Third Field:C(25)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2239,7 +2237,7 @@ begin
     '  Second Field:I'#13#10 +
     '  Third Field:C(25)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2259,7 +2257,7 @@ var
 
 begin
   strSource := '';
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2281,7 +2279,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, None, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2302,7 +2300,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Black, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2323,7 +2321,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Brown, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2344,7 +2342,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, OliveGreen, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2365,7 +2363,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, DarkGreen, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2386,7 +2384,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, DarkTeal, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2407,7 +2405,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, DarkBlue, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2428,7 +2426,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Indigo, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2449,7 +2447,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Gray-80%, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2470,7 +2468,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, DarkRed, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2491,7 +2489,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Orange, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2512,7 +2510,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, DarkYellow, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2533,7 +2531,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Green, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2554,7 +2552,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Teal, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2575,7 +2573,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Blue, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2596,7 +2594,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Blue-Gray, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2617,7 +2615,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Gray-50%, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2638,7 +2636,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Red, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2659,7 +2657,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, LightOrange, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2680,7 +2678,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Lime, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2701,7 +2699,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, SeaGreen, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2722,7 +2720,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Aqua, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2743,7 +2741,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, LightBlue, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2764,7 +2762,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Violet, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2785,7 +2783,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Gray-40%, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2806,7 +2804,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Pink, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2827,7 +2825,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Gold, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2848,7 +2846,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Yellow, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2869,7 +2867,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, BrightGreen, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2890,7 +2888,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Turquoise, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2911,7 +2909,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, SkyBlue, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2932,7 +2930,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Plum, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2953,7 +2951,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Gray-25%, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2974,7 +2972,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Rose, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2995,7 +2993,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Tan, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3016,7 +3014,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, LightYellow, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3037,7 +3035,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, LightGreen, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3058,7 +3056,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, LightTurquoise, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3079,7 +3077,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, PaleBlue, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3100,7 +3098,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, Lavender, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3121,7 +3119,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3151,7 +3149,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Rectangle , Black , Solid , 0.25 , Blue , None  , None '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3181,7 +3179,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3202,7 +3200,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 10Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3223,7 +3221,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 20Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3244,7 +3242,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 25Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3265,7 +3263,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 30Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3286,7 +3284,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 40Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3307,7 +3305,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 50Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3328,7 +3326,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 5Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3349,7 +3347,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 60Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3370,7 +3368,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 70Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3391,7 +3389,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 75Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3412,7 +3410,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 80Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3433,7 +3431,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, 90Percent, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3454,7 +3452,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, DarkDownwardDiagonal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3475,7 +3473,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Darkhorizontal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3496,7 +3494,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, DarkUpwardDiagonal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3517,7 +3515,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, DarkVertical, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3538,7 +3536,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, DashedDownwardDiagonal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3559,7 +3557,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, DashedHorizontal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3580,7 +3578,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, DashedUpwardDiagonal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3601,7 +3599,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, DashedVertical, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3622,7 +3620,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, DiagonalBrick, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3643,7 +3641,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3664,7 +3662,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, DottedGrid, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3685,7 +3683,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, HorizontalBrick, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3706,7 +3704,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, LargeCheckerBoard, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3727,7 +3725,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, LargeConfetti, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3748,7 +3746,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, LargeGrid, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3769,7 +3767,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, LightDownwardDiagonal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3790,7 +3788,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, LightHorizontal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3811,7 +3809,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, LightUpwardDiagonal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3832,7 +3830,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, LightVertical, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3853,7 +3851,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, NarrowHorizontal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3874,7 +3872,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, NarrowVertical, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3895,7 +3893,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, OutlinedDiamond, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3916,7 +3914,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Plaid, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3937,7 +3935,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Shingle, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3958,7 +3956,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, SmallCheckerBoard, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -3979,7 +3977,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, SmallConfetti, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4000,7 +3998,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, SmallGrid, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4021,7 +4019,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, SolidDiamond, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4042,7 +4040,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Sphere, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4063,7 +4061,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Trellis, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4084,7 +4082,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Wave, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4105,7 +4103,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Weave, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4126,7 +4124,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, WideDownwardDiagonal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4147,7 +4145,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, WideUpwardDiagonal, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4168,7 +4166,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Zigzag, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4198,7 +4196,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, None, None'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4219,7 +4217,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Black'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4240,7 +4238,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Brown'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4261,7 +4259,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, OliveGreen'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4282,7 +4280,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, DarkGreen'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4303,7 +4301,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, DarkTeal'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4324,7 +4322,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, DarkBlue'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4345,7 +4343,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Indigo'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4366,7 +4364,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Gray-80%'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4387,7 +4385,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, DarkRed'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4408,7 +4406,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Orange'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4429,7 +4427,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, DarkYellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4450,7 +4448,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Green'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4471,7 +4469,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Teal'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4492,7 +4490,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Blue'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4513,7 +4511,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Blue-Gray'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4534,7 +4532,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Gray-50%'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4555,7 +4553,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Red'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4576,7 +4574,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, LightOrange'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4597,7 +4595,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Lime'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4618,7 +4616,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, SeaGreen'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4639,7 +4637,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Aqua'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4660,7 +4658,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, LightBlue'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4681,7 +4679,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Violet'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4702,7 +4700,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Gray-40%'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4723,7 +4721,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Pink'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4744,7 +4742,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Gold'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4765,7 +4763,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Yellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4786,7 +4784,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, BrightGreen'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4807,7 +4805,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Turquoise'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4828,7 +4826,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, SkyBlue'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4849,7 +4847,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Plum'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4870,7 +4868,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Gray-25%'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4891,7 +4889,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Rose'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4912,7 +4910,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Tan'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4933,7 +4931,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, LightYellow'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4954,7 +4952,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, LightGreen'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4975,7 +4973,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, LightTurquoise'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -4996,7 +4994,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, PaleBlue'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5017,7 +5015,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, Lavender'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5038,7 +5036,7 @@ Begin
     '{'#13#10 +
     '  &Drainage=Rectangle, Black, Solid, 0.5, White, Divot, White'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5087,7 +5085,7 @@ begin
     '  Time Location Symbol:C(255)'#13#10 +
     '  &Drainage= Line , Blue , Solid , 0.25 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5133,7 +5131,7 @@ begin
     '    Area:C(50)'#13#10 +
     '    For Buffer:B'#13#10 +
     '  }'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5168,7 +5166,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Rectangle , Black , Solid , 0.25 , Blue , None  , None '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5189,7 +5187,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Rectangle , Black , Solid , 0.25 , Blue , None  , None , 25 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5234,7 +5232,7 @@ begin
     '    @LevelType=Level'#13#10 +
     '    @TotalType=Total'#13#10 +
     '  }'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5264,7 +5262,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Diamond , Black , Solid , 0.25 , Blue , None  , None , 1 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5285,7 +5283,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Diamond , Black , Solid , 0.25 , Blue , None  , None , 100 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5318,7 +5316,7 @@ begin
     '  #TABLENAME=My Table Name'#13#10 +
     '  Activity ID:C(255)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5352,7 +5350,7 @@ begin
     'This is a text table=Class(TextTable)'#13#10 +
     '{'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5368,7 +5366,7 @@ begin
     'This is a text table=Class(TextTable)'#13#10 +
     '  {  '#13#10 +
     '  }  '#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5394,7 +5392,7 @@ begin
     '{'#13#10 +
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5429,7 +5427,7 @@ begin
     '  Time Location Symbol:C(255)'#13#10 +
     '  &Drainage=Line, Blue, Solid, 0.25'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5462,7 +5460,7 @@ begin
     'This is a time location table=Class(TimeLocationTable)'#13#10 +
     '{'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5478,7 +5476,7 @@ begin
     'This is a time location table=Class(TimeLocationTable)'#13#10 +
     '  {  '#13#10 +
     '  }  '#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5505,7 +5503,7 @@ begin
   '  Activity ID:C(255)'#13#10 +
   '//  Description:C(255)'#13#10 +
   '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(33, M.TokenCount);
     CheckEquals('/* This is a comment. */', M.Tokens[0].Token);
@@ -5591,7 +5589,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Rectangle , Black , Solid , 0.25 , Blue , None  , None '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5612,7 +5610,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Rectangle , Black , Solid , 0.25 , Blue , None  , None , 0 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5633,7 +5631,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Rectangle , Black , Solid , 0.25 , Blue , None  , None , 100 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5663,7 +5661,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Triangle , Black , Solid , 0.25 , Blue , None  , None , StartAndEarly '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5684,7 +5682,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Triangle , Black , Solid , 0.25 , Blue , None  , None , StartAndEarly, 25 '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5714,7 +5712,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Triangle , Black , Solid , 0.25 , Blue , None  , None , StartAndEarly '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5735,7 +5733,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Triangle , Black , Solid , 0.25 , Blue , None  , None , EndAndEarly '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5756,7 +5754,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Triangle , Black , Solid , 0.25 , Blue , None  , None , EndAndLate '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5777,7 +5775,7 @@ begin
     '{'#13#10 +
     '  &Drainage= Triangle , Black , Solid , 0.25 , Blue , None  , None , StartAndLate '#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5808,7 +5806,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:C(255)'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5831,7 +5829,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:B'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5854,7 +5852,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:Y'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5877,7 +5875,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:I'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5900,7 +5898,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:L'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5923,7 +5921,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:U'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5946,7 +5944,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:F'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5969,7 +5967,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:S'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -5992,7 +5990,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:D'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -6015,7 +6013,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:O'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -6038,7 +6036,7 @@ begin
     '  #TABLENAME=D:\Path\Text Table.txt'#13#10 +
     '  Activity ID:M'#13#10 +
     '}'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);

@@ -49,8 +49,6 @@ Type
 
 Implementation
 
-uses ModuleDispatcher;
-
 //
 // Test Methods for Class TBackusNaurComment.
 //
@@ -120,7 +118,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
@@ -142,7 +140,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     //CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
@@ -165,7 +163,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
@@ -186,7 +184,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
@@ -205,7 +203,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
@@ -226,7 +224,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
@@ -248,7 +246,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
@@ -267,7 +265,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
@@ -318,7 +316,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
@@ -337,7 +335,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
   Finally
@@ -419,7 +417,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(ttFileEnd, S.CurrentToken.TokenType);
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
@@ -440,7 +438,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(ttFileEnd, S.CurrentToken.TokenType);
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
@@ -463,7 +461,7 @@ Var
   S : TBaseLanguageModule;
 
 begin
-  S := Dispatcher(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
   Try
     CheckEquals(ttFileEnd, S.CurrentToken.TokenType);
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);

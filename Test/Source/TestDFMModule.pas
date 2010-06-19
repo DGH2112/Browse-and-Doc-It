@@ -67,7 +67,7 @@ Type
 Implementation
 
 Uses
-  BaseLanguageModule, ModuleDispatcher;
+  BaseLanguageModule;
 
 //
 // Test Methods for Class TDFMModule.
@@ -104,7 +104,7 @@ begin
     '    123456ffabced'#13#10 +
     '    87450382384df}'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -139,7 +139,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = AnIdentifier'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -156,7 +156,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = Oops.AnIdentifier'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -173,7 +173,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = MoreOops.Oops.AnIdentifier'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -200,7 +200,7 @@ begin
   strSource :=
     'object Identifier : TfrmMyForm'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -216,7 +216,7 @@ begin
     '  object MyIdentifier : TObject'#13#10 +
     '  end'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -236,7 +236,7 @@ begin
     '  object MyIdentifier2 : TObject'#13#10 +
     '  end'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -255,7 +255,7 @@ begin
     '  object MyIdentifier : TObject[1]'#13#10 +
     '  end'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -283,7 +283,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = AnIdentifier'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -301,7 +301,7 @@ begin
     '  MyIdentifier = AnIdentifier'#13#10 +
     '  MyIdentifier2 = AnIdentifier2'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -330,7 +330,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = []'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -380,7 +380,7 @@ begin
     '    end'#13#10 +
     '  end'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -404,7 +404,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = [Ident1]'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -422,7 +422,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = [Ident1, Ident2]'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -440,7 +440,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = [Ident1, Ident2, Ident3]'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -472,7 +472,7 @@ begin
     '    end'#13#10 +
     '  >'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -495,7 +495,7 @@ begin
     '    end'#13#10 +
     '  >'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -528,7 +528,7 @@ begin
     '  MyIdentifier = <'#13#10 +
     '  >'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -545,7 +545,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = <>'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -586,7 +586,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = 1000'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -603,7 +603,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = -1000'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -620,7 +620,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = $1000'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -637,7 +637,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = $00FF'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -654,7 +654,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = 10.00'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -684,7 +684,7 @@ begin
     '    123'#13#10 +
     '    456)'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -703,7 +703,7 @@ begin
     '    ''Hello'''#13#10 +
     '    ''Goodbye'')'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -723,7 +723,7 @@ begin
     '      ''o'''#13#10 +
     '    ''Goodbye'')'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -752,7 +752,7 @@ begin
     '  MyIdentifier = ('#13#10+
     '    )'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -781,7 +781,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = 1234'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -799,7 +799,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  Oops.MyIdentifier = 1234'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -817,7 +817,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MoreOops.Oops.MyIdentifier = 1234'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -846,7 +846,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = ''This is a string literal.'''#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -864,7 +864,7 @@ begin
     '  MyIdentifier = ''This is a string literal.'' +'#13#10 +
     '    ''This is a second string.'''#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -881,7 +881,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = ''This is a string literal.''#9''This is a second string.'''#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -910,7 +910,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = 12.00'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, []);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, []);
   Try
     CheckEquals(9, M.TokenCount);
     CheckEquals('object', M.Tokens[0].Token);
@@ -938,7 +938,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = ''Hello''#9''Goodbye'''#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, []);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, []);
   Try
     CheckEquals(11, M.TokenCount);
     CheckEquals('object', M.Tokens[0].Token);
@@ -972,7 +972,7 @@ begin
     '    ''#Hello'''#13#10 +
     '    ''#Goodbye'')'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, []);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, []);
   Try
     CheckEquals(12, M.TokenCount);
     CheckEquals('object', M.Tokens[0].Token);
@@ -1008,7 +1008,7 @@ begin
     '    ''Hello%'''#13#10 +
     '    ''Good%bye'')'#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, []);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, []);
   Try
     CheckEquals(12, M.TokenCount);
     CheckEquals('object', M.Tokens[0].Token);
@@ -1042,7 +1042,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = ''1234567890-=!"£$%^&*()_+qwertyuiop[]QWERTYUIOP{}asdfghjkl;#ASDFGHJKL:@~zxcvbnm,./ZXCVBNM<>?`¬'''#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, []);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, []);
   Try
     CheckEquals(9, M.TokenCount);
     CheckEquals('object', M.Tokens[0].Token);
@@ -1070,7 +1070,7 @@ begin
     'object Identifier : TfrmMyForm'#13#10 +
     '  MyIdentifier = ''!"#$%&''#39''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`'''#13#10 +
     'end'#13#10;
-  M := Dispatcher(strSource, 'D:\Path\DFMFile.dfm', True, []);
+  M := TDFMModule.CreateParser(strSource, 'D:\Path\DFMFile.dfm', True, []);
   Try
     CheckEquals(11, M.TokenCount);
     CheckEquals('object', M.Tokens[0].Token);

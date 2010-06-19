@@ -228,9 +228,6 @@ type
 
 implementation
 
-Uses
-  ModuleDispatcher;
-
 procedure TestTVBParameter.TestAsString;
 
 Var
@@ -692,7 +689,7 @@ begin
     'Attribute VB_Creatable = False'#13#10 +
     'Attribute VB_PredeclaredId = True'#13#10 +
     'Attribute VB_Exposed = False'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -727,7 +724,7 @@ begin
     ''' @author David Hoyle'#13#10 +
     ''' @version 1.0'#13#10 +
     ''' @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -744,7 +741,7 @@ begin
     ''' @version 1.0'#13#10 +
     ''' @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
     'Option explicit'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -763,7 +760,7 @@ begin
     ''' @version 1.0'#13#10 +
     ''' @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
     'version 1.0'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -782,7 +779,7 @@ begin
     ''' @version 1.0'#13#10 +
     ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
     'attribute iMyAttr = 1'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -801,7 +798,7 @@ begin
     ''': @version 1.0'#13#10 +
     ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
     'option compare text'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -820,7 +817,7 @@ begin
     ''': @version 1.0'#13#10 +
     ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
     'option compare text'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -836,7 +833,7 @@ begin
     ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
     'option compare text'#13#10 +
     'private const iCAPACITY AS Long = 1'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -853,7 +850,7 @@ begin
     'option compare text'#13#10 +
     ''' This is a standard comment.'#13#10 +
     'private const iCAPACITY AS Long = 1'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -870,7 +867,7 @@ begin
     'option compare text'#13#10 +
     ''': This is a document comment.'#13#10 +
     'private const iCAPACITY AS Long = 1'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -885,7 +882,7 @@ begin
     ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
     'option compare text'#13#10 +
     'private iCAPACITY AS Long'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -902,7 +899,7 @@ begin
     'option compare text'#13#10 +
     ''' This is a standard comment.'#13#10 +
     'private iCAPACITY AS Long'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -919,7 +916,7 @@ begin
     'option compare text'#13#10 +
     ''': This is a document comment.'#13#10 +
     'private iCAPACITY AS Long'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -935,7 +932,7 @@ begin
     'option compare text'#13#10 +
     'private type TMyType'#13#10 +
     'end Type'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -953,7 +950,7 @@ begin
     ''' This is a standard comment.'#13#10 +
     'private type TMyType'#13#10 +
     'end Type'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -971,7 +968,7 @@ begin
     ''': This is a document comment.'#13#10 +
     'private type TMyType'#13#10 +
     'end Type'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -987,7 +984,7 @@ begin
     'option compare text'#13#10 +
     'private enum TMyType'#13#10 +
     'end enum'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -1005,7 +1002,7 @@ begin
     ''' This is a standard comment.'#13#10 +
     'private enum TMyType'#13#10 +
     'end enum'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -1023,7 +1020,7 @@ begin
     ''': This is a document comment.'#13#10 +
     'private enum TMyType'#13#10 +
     'end enum'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -1039,7 +1036,7 @@ begin
     'option compare text'#13#10 +
     'function MyFunction(iParam As Long) As Boolean'#13#10 +
     'end function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -1061,7 +1058,7 @@ begin
     ''' @return a Boolean'#13#10 +
     'function MyFunction(iParam As Long) As Boolean'#13#10 +
     'end function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -1083,7 +1080,7 @@ begin
     ''': @return a Boolean'#13#10 +
     'function MyFunction(iParam As Long) As Boolean'#13#10 +
     'end function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -1099,7 +1096,7 @@ begin
     'option compare text'#13#10 +
     'property get MyProperty(iParam As Long) As Boolean'#13#10 +
     'end property'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -1121,7 +1118,7 @@ begin
     ''' @return a Boolean'#13#10 +
     'property get MyProperty(iParam As Long) As Boolean'#13#10 +
     'end property'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(1, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -1143,7 +1140,7 @@ begin
     ''': @return a Boolean'#13#10 +
     'property get MyProperty(iParam As Long) As Boolean'#13#10 +
     'end property'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strDocumentationConflicts), M.DocConflict(1));
@@ -1184,7 +1181,7 @@ begin
     'Option Explicit'#13#10 +
     'Option Compare Text'#13#10 +
     'Option Private Module'#13#10;
-  M := Dispatcher(strCode, 'VBFile.frm', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.frm', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1214,7 +1211,7 @@ begin
     'Option Explicit'#13#10 +
     'Option Compare Text'#13#10 +
     'Option Private Module'#13#10;
-  M := Dispatcher(strCode, 'VBFile.frm', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.frm', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1238,7 +1235,7 @@ Var
 begin
   strCode :=
     'Const iLong As Long'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1250,7 +1247,7 @@ begin
   End;
   strCode :=
     'Private Const iLong As Long'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1262,7 +1259,7 @@ begin
   End;
   strCode :=
     'Public Const iLong As Long'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1274,7 +1271,7 @@ begin
   End;
   strCode :=
     'Const strText As String = "Hello"'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1286,7 +1283,7 @@ begin
   End;
   strCode :=
     'Private Const iLong As Long = 123'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1298,7 +1295,7 @@ begin
   End;
   strCode :=
     'Public Const iLong As Long = &HFF00'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1312,7 +1309,7 @@ begin
     'Public Const iLong1 As Long = &HFF00'#13#10 +
     'Private Const iLong2 As Long = 123'#13#10 +
     'Public Const iLong3 As Long'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1337,7 +1334,7 @@ Var
 begin
   strCode :=
     'Declare Sub Test Lib "Kernal32" ()'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1349,7 +1346,7 @@ begin
   End;
   strCode :=
     'Declare Sub Test Lib "Kernal32" Alias "TestA" ()'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1361,7 +1358,7 @@ begin
   End;
   strCode :=
     'Declare Sub Test Lib "Kernal32" Alias "TestA" (i As Long)'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1374,7 +1371,7 @@ begin
   strCode :=
     'Declare Sub Test1 Lib "Kernal32" Alias "TestA" ()'#13#10 +
     'Private Declare Sub Test2 Lib "Kernal32" Alias "TestA" (i As Long)'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1388,7 +1385,7 @@ begin
   End;
   strCode :=
     'Declare Function Test Lib "Kernal32" () As String'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1400,7 +1397,7 @@ begin
   End;
   strCode :=
     'Declare Function Test Lib "Kernal32" Alias "TestA" () As String'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1412,7 +1409,7 @@ begin
   End;
   strCode :=
     'Declare Function Test Lib "Kernal32" Alias "TestA" (i As Long) As String'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1425,7 +1422,7 @@ begin
   strCode :=
     'Declare Function Test1 Lib "Kernal32" Alias "TestA" () As Long'#13#10 +
     'Private Declare Function Test2 Lib "Kernal32" Alias "TestA" (i As Long) As String'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1453,7 +1450,7 @@ begin
     'sub mysub(iParam as Long)'#13#10 +
     'end sub'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstError);
@@ -1468,7 +1465,7 @@ begin
     'sub mysub(iParam as Long)'#13#10 +
     'end sub'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstError);
@@ -1490,7 +1487,7 @@ begin
     '  FID = 1'#13#10 +
     '  FName = 2'#13#10 +
     'End Enum'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1507,7 +1504,7 @@ begin
     '  FID'#13#10 +
     '  FName'#13#10 +
     'End Enum'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1539,7 +1536,7 @@ Begin
     '  ''Specifies the y-coordinate of the lower-right corner of the rectangle.'#13#10 +
     '  Bottom As Long'#13#10 +
     'End Type'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1605,7 +1602,7 @@ Begin
     'Attribute VB_Creatable = False'#13#10 +
     'Attribute VB_PredeclaredId = True'#13#10 +
     'Attribute VB_Exposed = False'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -1646,7 +1643,7 @@ Begin
     'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
     'End Function'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1684,7 +1681,7 @@ Begin
     'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
     'End Function'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1723,7 +1720,7 @@ Begin
     'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
     'End Function'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1747,7 +1744,7 @@ Begin
     'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
     'End Function'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1771,7 +1768,7 @@ Begin
     'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
     'End Function'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1795,7 +1792,7 @@ Begin
     'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
     'End Function'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1817,7 +1814,7 @@ Begin
     'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
     'End Function'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1845,7 +1842,7 @@ Begin
     'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
     'End Function'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1873,7 +1870,7 @@ Begin
     'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
     'End Function'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1901,7 +1898,7 @@ Begin
     'Private Function MyMethod(ByRef iParam as Long) As Boolean'#13#10 +
     'End Function'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1942,7 +1939,7 @@ Begin
     '  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err'#13#10 +
     '  Exception.Pop'#13#10 +
     'End Property '#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -1976,7 +1973,7 @@ Begin
     ''':'#13#10 +
     'sub Hello()'#13#10 +
     'end sub'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2002,7 +1999,7 @@ Begin
     'Option Compare Text'#13#10 +
     'function Hello() as string()'#13#10 +
     'end function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2030,7 +2027,7 @@ Begin
     ''#13#10 +
     'End Sub'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2063,7 +2060,7 @@ Begin
       '  Exception.Pop'#13#10 +
       'End Sub'#13#10 +
       ''#13#10;
-    M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse]);
+    M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2085,7 +2082,7 @@ Begin
       '  Exception.Pop'#13#10 +
       'End Sub'#13#10 +
       ''#13#10;
-    M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse]);
+    M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2122,7 +2119,7 @@ Begin
       '  Exception.Pop'#13#10 +
       'End Sub'#13#10 +
       ''#13#10;
-    M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse]);
+    M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(2, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2144,7 +2141,7 @@ Begin
       '  Exception.Pop'#13#10 +
       'End Sub'#13#10 +
       ''#13#10;
-    M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse]);
+    M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2172,7 +2169,7 @@ Begin
     ''':'#13#10 +
     'Option Compare Text'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2191,7 +2188,7 @@ Begin
     '  '':'#13#10 +
     'Option Compare Text'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2221,7 +2218,7 @@ Begin
     ''':'#13#10 +
     'Option Compare Text'#13#10 +
     ''#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2298,7 +2295,7 @@ Begin
     '  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err'#13#10 +
     '  Exception.Pop'#13#10 +
     'End Function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2337,7 +2334,7 @@ Begin
       '  If Err.Number <> 0 Then Exception.DisplayErrorMessage Err'#13#10 +
       '  Exception.Pop'#13#10 +
       'End Function'#13#10;
-    M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse]);
+    M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse]);
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2363,7 +2360,7 @@ begin
   strCode :=
     'Function Test() As Long'#13#10 +
     'End Function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2376,7 +2373,7 @@ begin
   strCode :=
     'Private Function Test(i as long) As Long'#13#10 +
     'End Function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2389,7 +2386,7 @@ begin
   strCode :=
     'Friend Function Test(i as long) As Long'#13#10 +
     'End Function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2402,7 +2399,7 @@ begin
   strCode :=
     'Public Function Test(Optional i as long = 0) As Long'#13#10 +
     'End Function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2415,7 +2412,7 @@ begin
   strCode :=
     'Public Function Test(i as msforms.long, str as String) As Long'#13#10 +
     'End Function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2428,7 +2425,7 @@ begin
   strCode :=
     'Public Function Test(ParamArray i as long) As MSForms.Integer'#13#10 +
     'End Function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2445,7 +2442,7 @@ begin
     'End Function'#13#10 +
     'Function Test3(Optional i as Long = 0) As Long'#13#10 +
     'End Function'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2476,7 +2473,7 @@ begin
     ''': @version 1.0'#13#10 +
     ''': @date ' + FormatDateTime('dd mmm yyyy', Now) + #13#10 +
     'Option Explicit'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse, moCheckForDocumentConflicts]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2504,7 +2501,7 @@ begin
     'Option Explicit'#13#10 +
     'Implements ITestCase'#13#10 +
     'Implements ITestManager'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', True, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', True, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
@@ -2524,7 +2521,7 @@ Var
 begin
   strCode :=
     'Option Base 1'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2536,7 +2533,7 @@ begin
   End;
   strCode :=
     'Option Base 0'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2548,7 +2545,7 @@ begin
   End;
   strCode :=
     'Option Compare Binary'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2560,7 +2557,7 @@ begin
   End;
   strCode :=
     'Option Compare Database'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2572,7 +2569,7 @@ begin
   End;
   strCode :=
     'Option Compare Text'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2584,7 +2581,7 @@ begin
   End;
   strCode :=
     'Option Explicit'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2596,7 +2593,7 @@ begin
   End;
   strCode :=
     'Option Private Module'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2610,7 +2607,7 @@ begin
     'Option Explicit'#13#10 +
     'Option Compare Text'#13#10 +
     'Option Private Module'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2636,7 +2633,7 @@ begin
   strCode :=
     'Property Get Test() As String'#13#10 +
     'End Property'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2649,7 +2646,7 @@ begin
   strCode :=
     'Private Property Let Test(i As Long)'#13#10 +
     'End Property'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2662,7 +2659,7 @@ begin
   strCode :=
     'Friend Property Let Test(i As Long)'#13#10 +
     'End Property'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2675,7 +2672,7 @@ begin
   strCode :=
     'Public Property Set Test(Obj As TObject)'#13#10 +
     'End Property'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2690,7 +2687,7 @@ begin
     'End Property'#13#10 +
     'Public Property Set Test2(Obj As TObject)'#13#10 +
     'End Property'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2716,7 +2713,7 @@ begin
     '  FID As Long'#13#10 +
     '  FName As String'#13#10 +
     'End Type'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2733,7 +2730,7 @@ begin
     '  FID As Long'#13#10 +
     '  FName As String'#13#10 +
     'End Type'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2757,7 +2754,7 @@ begin
   strCode :=
     'Sub Test()'#13#10 +
     'End Sub'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2770,7 +2767,7 @@ begin
   strCode :=
     'Private Sub Test(i as long)'#13#10 +
     'End Sub'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2783,7 +2780,7 @@ begin
   strCode :=
     'Friend Sub Test(i as long)'#13#10 +
     'End Sub'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2796,7 +2793,7 @@ begin
   strCode :=
     'Public Sub Test(Optional i as long = 0)'#13#10 +
     'End Sub'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2809,7 +2806,7 @@ begin
   strCode :=
     'Public Sub Test(i as msforms.long, str as String)'#13#10 +
     'End Sub'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2822,7 +2819,7 @@ begin
   strCode :=
     'Public Sub Test(ParamArray i as long)'#13#10 +
     'End Sub'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2840,7 +2837,7 @@ begin
     ''': A comment'#13#10 +
     'Sub Test3(Optional i as Long = 0)'#13#10 +
     'End Sub'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2866,7 +2863,7 @@ Var
 begin
   strCode :=
     'Dim strText As String'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2878,7 +2875,7 @@ begin
   End;
   strCode :=
     'Private strText As String'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2890,7 +2887,7 @@ begin
   End;
   strCode :=
     'Public strText As String'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2902,7 +2899,7 @@ begin
   End;
   strCode :=
     'Private strText() As String'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2914,7 +2911,7 @@ begin
   End;
   strCode :=
     'Public strText(1 to 10) As String'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2926,7 +2923,7 @@ begin
   End;
   strCode :=
     'Private strText(1 to 10, 1 to 2) As String'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2938,7 +2935,7 @@ begin
   End;
   strCode :=
     'Public strText(1 to 10, 1 to 2) As MSForms.Integer'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2950,7 +2947,7 @@ begin
   End;
   strCode :=
     'Public WithEvents strText As Integer'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2964,7 +2961,7 @@ begin
     'Public strText1 As Integer'#13#10 +
     'Private strText2 As String'#13#10 +
     'Dim strText3 As Double'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -2981,7 +2978,7 @@ begin
   strCode :=
     'Public strText1 As Integer, strText2 As String'#13#10 +
     'Dim strText3 As Double'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -3010,7 +3007,7 @@ begin
     'BEGIN'#13#10 +
     '  Multiuse = -1  ''True'#13#10 +
     'END'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Cls', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Cls', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
@@ -3032,7 +3029,7 @@ begin
     '   OleObjectBlob   =   "frmWireRunWizard.frx":0000'#13#10 +
     '   StartUpPosition =   1  ''CenterOwner'#13#10 +
     'End'#13#10;
-  M := Dispatcher(strCode, 'VBFile.Frm', False, [moParse]);
+  M := TVBModule.CreateParser(strCode, 'VBFile.Frm', False, [moParse]);
   Try
     CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
     CheckEquals(ttFileEnd, M.CurrentToken.TokenType);

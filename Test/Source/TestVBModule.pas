@@ -75,8 +75,13 @@ type
 
   TestTVBModule = Class(TExtendedTestCase)
   Strict Private
+    FVBModule: TVBModule;
   Public
+    Procedure Setup; Override;
+    Procedure TearDown; Override;
   Published
+    Procedure TestReservedWords;
+    Procedure TestDirectives;
     Procedure TestVersion;
     Procedure TestAttributes;
     Procedure TestFunctions;
@@ -675,6 +680,28 @@ begin
 end;
 
 { TestTVBModule }
+
+procedure TestTVBModule.TestDirectives;
+
+Var
+  Words : TKeyWords;
+  i : Integer;
+
+begin
+  Words :=  FVBModule.Directives;
+  For i := Low(Words) To Pred(High(Words)) Do
+    Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
+end;
+
+procedure TestTVBModule.Setup;
+begin
+  FVBModule := TVBModule.CreateParser('', 'VBFile.cls', False, [moParse]);
+end;
+
+procedure TestTVBModule.TearDown;
+begin
+  FVBModule.Free;
+end;
 
 procedure TestTVBModule.TestAttributes;
 
@@ -2742,6 +2769,18 @@ begin
   Finally
     M.Free;
   End;
+end;
+
+procedure TestTVBModule.TestReservedWords;
+
+Var
+  Words : TKeyWords;
+  i : Integer;
+
+begin
+  Words := FVBModule.ReservedWords;
+  For i := Low(Words) To Pred(High(Words)) Do
+    Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
 end;
 
 procedure TestTVBModule.TestSubs;

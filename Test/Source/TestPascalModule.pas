@@ -285,7 +285,8 @@ type
   Published
     Procedure TestAsString;
     Procedure TestCreateParser;
-    Procedure TestKeyWords;
+    Procedure TestReservedWords;
+    Procedure TestDirectives;
     Procedure TestProcessCompilerDirective;
     Procedure TestReferenceSymbol;
     Procedure TestGoal;
@@ -3508,6 +3509,20 @@ begin
   End;
 end;
 
+procedure TestTPascalModule.TestDirectives;
+
+Var
+  Words : TKeyWords;
+  i : Integer;
+
+begin
+  Words := FPascalModule.Directives;
+  CheckEquals(0, Low(Words));
+  CheckEquals(44, High(Words));
+  For i := Low(Words) To Pred(High(Words)) Do
+    Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
+end;
+
 procedure TestTPascalModule.TestEnumerateElement;
 
 Const
@@ -4473,11 +4488,18 @@ begin
   End;
 end;
 
-Procedure TestTPascalModule.TestKeyWords;
+Procedure TestTPascalModule.TestReservedWords;
+
+Var
+  Words : TKeyWords;
+  i : Integer;
 
 Begin
-  CheckEquals(0, Low(FPascalModule.KeyWords));
-  CheckEquals(71 + 48 - 1, High(FPascalModule.KeyWords));
+  Words := FPascalModule.ReservedWords;
+  CheckEquals(0, Low(Words));
+  CheckEquals(73, High(Words));
+  For i := Low(Words) To Pred(High(Words)) Do
+    Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
 End;
 
 procedure TestTPascalModule.TestLabelDeclSection;
@@ -4525,7 +4547,7 @@ Const
     ''#13#10 +
     'Implementation'#13#10 +
     ''#13#10 +
-    'Procedure Hello;'#13#10 +
+    'Procedure H73ello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  repeat'#13#10 +

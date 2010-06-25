@@ -41,16 +41,17 @@ Const
     'End;'#13#10;
 
 Var
-  strKeyWords : TKeyWords;
+  strReservedWords, strDirectives : TKeyWords;
 
 Var
   sl : TStringList;
 
 Begin
-  SetLength(strKeyWords, 2);
-  strKeyWords[0] := 'begin';
-  strKeyWords[1] := 'end';
-  sl := Tokenize(strCode, strKeyWords);
+  SetLength(strReservedWords, 2);
+  strReservedWords[0] := 'begin';
+  strReservedWords[1] := 'end';
+  strDirectives := Nil;
+  sl := Tokenize(strCode, strReservedWords, strDirectives);
   Try
     CheckEquals(21, sl.Count);
     CheckEquals('Begin', sl[0]);
@@ -111,16 +112,17 @@ Const
     'End;'#13#10;
 
 Var
-  strKeyWords : TKeyWords;
+  strReservedWords, strDirectives : TKeyWords;
 
 Var
   sl : TStringList;
 
 Begin
-  SetLength(strKeyWords, 2);
-  strKeyWords[0] := 'begin';
-  strKeyWords[1] := 'end';
-  sl := Tokenize(strCode, strKeyWords);
+  SetLength(strReservedWords, 2);
+  strReservedWords[0] := 'begin';
+  strReservedWords[1] := 'end';
+  strDirectives := Nil;
+  sl := Tokenize(strCode, strReservedWords, strDirectives);
   Try
     CheckEquals(21, sl.Count);
     CheckEquals('Begin', sl[0]);
@@ -183,16 +185,17 @@ Const
     'End;'#13#10;
 
 Var
-  strKeyWords : TKeyWords;
+  strReservedWords, strDirectives : TKeyWords;
 
 Var
   sl : TStringList;
 
 Begin
-  SetLength(strKeyWords, 2);
-  strKeyWords[0] := 'begin';
-  strKeyWords[1] := 'end';
-  sl := Tokenize(strCode, strKeyWords);
+  SetLength(strReservedWords, 2);
+  strReservedWords[0] := 'begin';
+  strReservedWords[1] := 'end';
+  strDirectives := Nil;
+  sl := Tokenize(strCode, strReservedWords, strDirectives);
   Try
     CheckEquals(21, sl.Count);
     CheckEquals('Begin', sl[0]);
@@ -253,16 +256,17 @@ Const
     'End;'#13#10;
 
 Var
-  strKeyWords : TKeyWords;
+  strReservedWords, strDirectives : TKeyWords;
 
 Var
   sl : TStringList;
 
 Begin
-  SetLength(strKeyWords, 2);
-  strKeyWords[0] := 'begin';
-  strKeyWords[1] := 'end';
-  sl := Tokenize(strCode, strKeyWords);
+  SetLength(strReservedWords, 2);
+  strReservedWords[0] := 'begin';
+  strReservedWords[1] := 'end';
+  strDirectives := Nil;
+  sl := Tokenize(strCode, strReservedWords, strDirectives);
   Try
     CheckEquals(21, sl.Count);
     CheckEquals('Begin', sl[0]);
@@ -323,16 +327,17 @@ Const
     'End;'#13#10;
 
 Var
-  strKeyWords : TKeyWords;
+  strReservedWords, strDirectives : TKeyWords;
 
 Var
   sl : TStringList;
 
 Begin
-  SetLength(strKeyWords, 2);
-  strKeyWords[0] := 'begin';
-  strKeyWords[1] := 'end';
-  sl := Tokenize(strCode, strKeyWords);
+  SetLength(strReservedWords, 2);
+  strReservedWords[0] := 'begin';
+  strReservedWords[1] := 'end';
+  strDirectives := Nil;
+  sl := Tokenize(strCode, strReservedWords, strDirectives);
   Try
     CheckEquals(21, sl.Count);
     CheckEquals('Begin', sl[0]);
@@ -395,16 +400,17 @@ Const
     'End;'#13#10;
 
 Var
-  strKeyWords : TKeyWords;
+  strReservedWords, strDirectives : TKeyWords;
 
 Var
   sl : TStringList;
 
 Begin
-  SetLength(strKeyWords, 2);
-  strKeyWords[0] := 'begin';
-  strKeyWords[1] := 'end';
-  sl := Tokenize(strCode, strKeyWords);
+  SetLength(strReservedWords, 2);
+  strReservedWords[0] := 'begin';
+  strReservedWords[1] := 'end';
+  strDirectives := Nil;
+  sl := Tokenize(strCode, strReservedWords, strDirectives);
   Try
     CheckEquals(21, sl.Count);
     CheckEquals('Begin', sl[0]);
@@ -460,16 +466,17 @@ Const
   strCode = 'qwerty = one + two + ''q'' - "p" - Hello * ? Custom ? + <p> '''' "" </p>';
 
 Var
-  strKeyWords : TKeyWords;
+  strReservedWords, strDirectives : TKeyWords;
 
 Var
   sl : TStringList;
 
 Begin
-  SetLength(strKeyWords, 2);
-  strKeyWords[0] := 'one';
-  strKeyWords[1] := 'two';
-  sl := Tokenize(strCode, strKeyWords);
+  SetLength(strReservedWords, 2);
+  strReservedWords[0] := 'one';
+  strReservedWords[1] := 'two';
+  strDirectives := Nil;
+  sl := Tokenize(strCode, strReservedWords, strDirectives);
   Try
     CheckEquals(35, sl.Count);
     CheckEquals('qwerty', sl[0]);

@@ -31,7 +31,7 @@ Type
   Published
     Procedure TestAsString;
     Procedure TestCreateParser;
-    Procedure TestKeyWords;
+    Procedure TestReservedWords;
     Procedure TestGetComment;
     Procedure TestTokenizeStream;
     Procedure TestGoal;
@@ -5054,15 +5054,18 @@ Begin
   End;
 end;
 
-Procedure TestTEidolonModule.TestKeyWords;
+Procedure TestTEidolonModule.TestReservedWords;
 
 Var
-  KeyWords : TKeyWords;
+  Words : TKeyWords;
+  i : Integer;
 
 Begin
-  KeyWords := FEidolonModule.KeyWords;
-  CheckEquals('bar', KeyWords[0]);
-  CheckEquals('triangle', KeyWords[11]);
+  Words := FEidolonModule.ReservedWords;
+  CheckEquals('bar', Words[0]);
+  CheckEquals('triangle', Words[11]);
+  For i := Low(Words) To Pred(High(Words)) Do
+    Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
 End;
 
 

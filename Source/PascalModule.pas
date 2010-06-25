@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       21 Mar 2010
+  @Date       25 Jun 2010
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -768,7 +768,8 @@ Type
     Constructor CreateParser(Source : String; strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
-    Function KeyWords : TKeyWords; Override;
+    Function ReservedWords : TKeyWords; Override;
+    Function Directives : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
     Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
@@ -2307,38 +2308,44 @@ end;
 
 (**
 
-
   This method returns an array of key words for use in the explorer module.
 
-
   @precon  None.
-
   @postcon Returns an array of key words for use in the explorer module.
-
 
   @return  a TKeyWords
 
 **)
-function TPascalModule.KeyWords: TKeyWords;
+function TPascalModule.ReservedWords: TKeyWords;
 
 Var
-  i, j : Integer;
-  str : String;
+  i : Integer;
 
 begin
-  SetLength(Result, Succ(High(strReservedWords)) + Succ(High(strDirectives)));
+  SetLength(Result, Succ(High(strReservedWords)));
   For i := Low(strReservedWords) To High(strReservedWords) Do
     Result[i] := strReservedWords[i];
+end;
+
+(**
+
+  This method returns an array of key words for use in the explorer module.
+
+  @precon  None.
+  @postcon Returns an array of key words for use in the explorer module.
+
+  @return  a TKeyWords
+
+**)
+function TPascalModule.Directives: TKeyWords;
+
+Var
+  i : Integer;
+
+begin
+  SetLength(Result, Succ(High(strDirectives)));
   For i := Low(strDirectives) To High(strDirectives) Do
-    Result[High(strReservedWords) + i] := strDirectives[i];
-  For i := Low(Result) To Pred(High(Result)) Do
-    For j := i + 1 To High(Result) Do
-      If Result[i] > Result[j] Then
-        Begin
-          str := Result[i];
-          Result[i] := Result[j];
-          Result[j] := str;
-        End;
+    Result[i] := strDirectives[i];
 end;
 
 (**

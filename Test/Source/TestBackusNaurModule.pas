@@ -42,9 +42,10 @@ Type
     Procedure TestHexChar;
     Procedure TestDecChar;
     Procedure TestLiteral;
-    Procedure TestFailures01;
-    Procedure TestFailures02;
-    Procedure TestFailures03;
+    Procedure TestFailure01;
+    Procedure TestFailure02;
+    Procedure TestFailure03;
+    Procedure TestFailure04;
   End;
 
 Implementation
@@ -128,7 +129,7 @@ begin
   End;
 end;
 
-procedure TestTBackusNaurModule.TestFailures01;
+procedure TestTBackusNaurModule.TestFailure01;
 
 Const
   strCode =
@@ -150,7 +151,7 @@ begin
   End;
 end;
 
-procedure TestTBackusNaurModule.TestFailures02;
+procedure TestTBackusNaurModule.TestFailure02;
 
 Const
   strCode =
@@ -173,7 +174,7 @@ begin
   End;
 end;
 
-procedure TestTBackusNaurModule.TestFailures03;
+procedure TestTBackusNaurModule.TestFailure03;
 
 Const
   strCode =
@@ -189,6 +190,32 @@ begin
     CheckEquals(0, S.HeadingCount(strErrors), S.FirstError);
     CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
     //CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
+  Finally
+    S.Free;
+  End;
+end;
+
+procedure TestTBackusNaurModule.TestFailure04;
+
+Const
+  strCode =
+    '<goal> ::= <rule1>'#13#10 +
+    ''#13#10 +
+    '/*/---------'#13#10 + // Error line
+    ''#13#10 +
+    '<rule1> ::= ? Something ?'#13#10 +
+    ''#13#10 +
+    ''#13#10;
+
+Var
+  S : TBaseLanguageModule;
+
+begin
+  S := TBackusNaurModule.CreateParser(strCode, 'D:\Path\Backus-Naur Grammar.bnf', True, [moParse]);
+  Try
+    CheckEquals(1, S.HeadingCount(strErrors), S.FirstError);
+    CheckEquals(0, S.HeadingCount(strWarnings), S.FirstWarning);
+    CheckEquals(0, S.HeadingCount(strHints), S.FirstHint);
   Finally
     S.Free;
   End;

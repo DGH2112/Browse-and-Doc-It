@@ -19,7 +19,7 @@ Type
     Procedure TestAsString;
     Procedure TestCreateParser;
     Procedure TestTokenizeStream;
-    Procedure TestKeyWords;
+    Procedure TestReservedWords;
     Procedure TestDFMObject;
     Procedure TestDFMProperty;
     Procedure TestDFMIdentifier;
@@ -560,17 +560,20 @@ begin
   End;
 end;
 
-Procedure TestTDFMModule.TestKeyWords;
+Procedure TestTDFMModule.TestReservedWords;
 
 Var
   Words : TKeyWords;
+  i : Integer;
 
 Begin
-  Words := FDFMModule.KeyWords;
+  Words := FDFMModule.ReservedWords;
   CheckEquals(3, Length(Words));
   CheckEquals('end', Words[0]);
   CheckEquals('inherited', Words[1]);
   CheckEquals('object', Words[2]);
+  For i := Low(Words) To Pred(High(Words)) Do
+    Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
 End;
 
 procedure TestTDFMModule.TestNumber;

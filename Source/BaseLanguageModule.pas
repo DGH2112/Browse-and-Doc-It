@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    31 May 2010
+  @Date    25 Jun 2010
   @Version 1.0
   @Author  David Hoyle
 
@@ -1110,7 +1110,8 @@ Type
     Function IfDef(strDef : String) : Boolean;
     Function IfNotDef(strDef : String) : Boolean;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
-    Function KeyWords : TKeyWords; Virtual; Abstract;
+    Function ReservedWords : TKeyWords; Virtual; Abstract;
+    Function Directives : TKeyWords; Virtual; Abstract;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure AddToExpression(Container : TElementContainer);
     function IsToken(strToken: String; Container: TElementContainer): Boolean;

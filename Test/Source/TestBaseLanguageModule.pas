@@ -312,7 +312,8 @@ type
     Property CompilerDefines;
     Function GetComment(CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment; Override;
     procedure ProcessCompilerDirective(var iSkip : Integer); Override;
-    Function KeyWords : TKeyWords; Override;
+    Function ReservedWords : TKeyWords; Override;
+    Function Directives : TKeyWords; Override;
   End;
 
   // Test methods for class TBaseLanguageModule
@@ -451,7 +452,11 @@ begin
   Result := Nil;
 end;
 
-function TTestBaseLanguageModule.KeyWords: TKeyWords;
+function TTestBaseLanguageModule.ReservedWords: TKeyWords;
+begin
+end;
+
+function TTestBaseLanguageModule.Directives: TKeyWords;
 begin
 end;
 

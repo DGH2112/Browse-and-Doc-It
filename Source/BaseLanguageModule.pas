@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    25 Jun 2010
+  @Date    26 Jun 2010
   @Version 1.0
   @Author  David Hoyle
 
@@ -1990,26 +1990,26 @@ Const
 
   (** This is a default set of font information for the application. **)
   strTokenTypeInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo = (
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [fsBold]; FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [fsBold]; FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clMaroon; FStyles : [fsBold]; FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;  FStyles : [];       FBackColour: clWindow)
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [fsBold]; FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [fsBold]; FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clMaroon; FStyles : [fsBold]; FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone),
+    (FForeColour : clBlack;  FStyles : [];       FBackColour: clNone)
   );
 
   (** This is a constant for special tag items to show in the tree **)

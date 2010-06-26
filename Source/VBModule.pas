@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       25 Oct 2009
+  @Date       26 Jun 2010
   @Author     David Hoyle
 
 **)
@@ -395,7 +395,8 @@ Type
     Constructor CreateParser(Source : String; strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
-    Function KeyWords : TKeyWords; Override;
+    Function ReservedWords : TKeyWords; Override;
+    Function Directives : TKeyWords; Override;
     Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
     { Properties }
   End;
@@ -437,9 +438,9 @@ Const
 
   **)
   strReservedWords : Array[1..138] Of String = (
-    'addhandler', 'addressof', 'andalso', 'alias', 'and', 'ansi', 'as', 'assembly',
+    'addhandler', 'addressof', 'alias', 'and', 'andalso', 'ansi', 'as', 'assembly',
     'auto', 'base', 'boolean', 'byref', 'byte', 'byval', 'call', 'case', 'catch',
-    'cbool', 'cbyte', 'cchar', 'cdate', 'cdec', 'cdbl', 'char', 'cint', 'class',
+    'cbool', 'cbyte', 'cchar', 'cdate', 'cdbl', 'cdec', 'char', 'cint', 'class',
     'clng', 'cobj', 'compare', 'const', 'cshort', 'csng', 'cstr', 'ctype', 'date',
     'decimal', 'declare', {'default', }'delegate', 'dim', 'directcast', 'do', 'double',
     'each', 'else', 'elseif', 'end', 'enum', 'erase', 'error', 'event', 'exit',
@@ -1585,6 +1586,26 @@ End;
 
 (**
 
+  This method returns an array of key words for use in the explorer module.
+
+  @precon  None.
+  @postcon Returns an array of key words for use in the explorer module.
+
+  @return  a TKeyWords
+
+**)
+function TVBModule.ReservedWords: TKeyWords;
+
+Var
+  i : Integer;
+
+begin
+  SetLength(Result, Succ(High(strReservedWords)));
+  For i := Low(strReservedWords) To High(strReservedWords) Do
+    Result[i] := strReservedWords[i];
+end;
+
+(**
 
   This method returns an array of key words for use in the explorer module.
 
@@ -1594,26 +1615,15 @@ End;
   @return  a TKeyWords
 
 **)
-function TVBModule.KeyWords: TKeyWords;
+function TVBModule.Directives: TKeyWords;
 
 Var
-  i, j : Integer;
-  str : String;
+  i : Integer;
 
 begin
-  SetLength(Result, Succ(High(strReservedWords)) + Succ(High(strDirectives)));
-  For i := Low(strReservedWords) To High(strReservedWords) Do
-    Result[i] := strReservedWords[i];
+  SetLength(Result, Succ(High(strDirectives)));
   For i := Low(strDirectives) To High(strDirectives) Do
-    Result[High(strReservedWords) + i] := strDirectives[i];
-  For i := Low(Result) To Pred(High(Result)) Do
-    For j := i + 1 To High(Result) Do
-      If Result[i] > Result[j] Then
-        Begin
-          str := Result[i];
-          Result[i] := Result[j];
-          Result[j] := str;
-        End;
+    Result[i] := strDirectives[i];
 end;
 
 (**

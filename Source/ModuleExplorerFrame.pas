@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    29 May 2010
+  @Date    26 Jun 2010
   @Author  David Hoyle
   @Version 1.0
 
@@ -304,7 +304,7 @@ Resourcestring
 
 Var
   (** A private variable which is assigned the key words array. **)
-  strKeyWords : TKeyWords;
+  strReservedWords, strDirectives : TKeyWords;
 
 (**
 
@@ -341,7 +341,9 @@ Begin
           Canvas.Font.Style := TokenFontInfo[ttTreeHeader].FStyles;
           Canvas.Brush.Color := TokenFontInfo[ttTreeHeader].FBackColour;
         End;
-   End;
+      If Canvas.Brush.Color = clNone Then
+        Canvas.Brush.Color := BGColour;
+    End;
 End;
 
 (**
@@ -409,7 +411,8 @@ End;
 function TTreeNodeInfo.GetTokens: TStringList;
 begin
   If FTokens = Nil Then
-    FTokens := Tokenize(FText, strKeyWords, BrowseAndDocItOptions.TokenLimit);
+    FTokens := Tokenize(FText, strReservedWords, strDirectives,
+      BrowseAndDocItOptions.TokenLimit);
   Result := FTokens;
 end;
 
@@ -1054,9 +1057,14 @@ Var
 Begin
   FExplorer.Color := BrowseAndDocItOptions.BGColour;
   If M = Nil Then
-    strKeyWords := Nil
-  Else
-    strKeyWords := M.KeyWords;
+    Begin
+      strReservedWords := Nil;
+      strDirectives := Nil;
+    End Else
+    Begin
+      strReservedWords := M.ReservedWords;
+      strDirectives := M.Directives;
+    End;
   If FRendering Then
     Exit;
   FRendering := True;

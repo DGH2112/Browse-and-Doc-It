@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    14 Jun 2010
+  @Date    26 Jun 2010
   @Author  David Hoyle
 
 **)
@@ -306,11 +306,11 @@ begin
           FLastEditorName := Editor.FileName;
         End
       {$IFNDEF D2005}
-        Else If FLastSize <> MemStreamSize(Editor) Then
-            Begin
-              FLastUpdateTickCount := GetTickCount;
-              FLastSize := MemStreamSize(Editor);
-            End
+      Else If FLastSize <> MemStreamSize(Editor) Then
+        Begin
+          FLastUpdateTickCount := GetTickCount;
+          FLastSize := MemStreamSize(Editor);
+        End
       {$ENDIF};
     End;
   If (FLastUpdateTickCount > 0) And
@@ -320,12 +320,13 @@ begin
       If (Application <> Nil) And (Application.MainForm <> Nil) And
         Application.MainForm.Visible Then
         Begin
-      {$IFNDEF D2005}
-      FLastSize := MemStreamSize(Editor);
-      {$ENDIF}
+          {$IFNDEF D2005}
+          FLastSize := MemStreamSize(Editor);
+          {$ENDIF}
           FUpdateTimer.Enabled := False;
-          FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument,
-            ExceptionMsg);
+          If FLastParserResult Then
+            FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument,
+              ExceptionMsg);
         End;
     End;
 end;
@@ -397,8 +398,8 @@ end;
 procedure TEditorNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
   const EditView: IOTAEditView);
 begin
-  If FLastParserResult Then
-    FLastUpdateTickCount := 1;
+  FLastParserResult := True;
+  FLastUpdateTickCount := 1;
 end;
 
 (**

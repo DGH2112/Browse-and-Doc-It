@@ -3,7 +3,7 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       20 Mar 2010
+  @Date       26 Jun 2010
   @Author     David Hoyle
 
 **)
@@ -94,7 +94,8 @@ Type
     Constructor CreateParser(Source : String; strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
-    Function KeyWords : TKeyWords; Override;
+    Function ReservedWords : TKeyWords; Override;
+    Function Directives : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
@@ -724,6 +725,26 @@ end;
 
 (**
 
+  This method returns an array of key words for use in the explorer module.
+
+  @precon  None.
+  @postcon Returns an array of key words for use in the explorer module.
+
+  @return  a TKeyWords
+
+**)
+function TDFMModule.ReservedWords: TKeyWords;
+
+Var
+  i : Integer;
+
+begin
+  SetLength(Result, Succ(High(strReservedWords)));
+  For i := Low(strReservedWords) To High(strReservedWords) Do
+    Result[i] := strReservedWords[i];
+end;
+
+(**
 
   This method returns an array of key words for use in the explorer module.
 
@@ -733,24 +754,10 @@ end;
   @return  a TKeyWords
 
 **)
-function TDFMModule.KeyWords: TKeyWords;
-
-Var
-  i, j : Integer;
-  str : String;
+function TDFMModule.Directives: TKeyWords;
 
 begin
-  SetLength(Result, Succ(High(strReservedWords)));
-  For i := Low(strReservedWords) To High(strReservedWords) Do
-    Result[i] := strReservedWords[i];
-  For i := Low(Result) To Pred(High(Result)) Do
-    For j := i + 1 To High(Result) Do
-      If Result[i] > Result[j] Then
-        Begin
-          str := Result[i];
-          Result[i] := Result[j];
-          Result[j] := str;
-        End;
+  Result := Nil;
 end;
 
 (**

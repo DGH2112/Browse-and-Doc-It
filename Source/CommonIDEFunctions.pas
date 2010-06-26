@@ -715,7 +715,7 @@ begin
         Exit;
       FType := 'Rendering';
       Synchronize(RenderModuleExplorer);
-      FSuccessfulParse := False;
+      FSuccessfulParse := True;
     Finally
       FModule.Free;
     End;

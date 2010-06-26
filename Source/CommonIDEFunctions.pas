@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    14 Jun 2010
+  @Date    26 Jun 2010
   @Version 1.0
 
 **)
@@ -120,6 +120,7 @@ Type
     FModified: Boolean;
     FRenderDocumentTree: TRenderDocumentTree;
     FThreadExceptionMsg: TThreadExceptionMsg;
+    FSuccessfulParse : Boolean;
     Procedure SetName;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Procedure Execute; Override;
@@ -132,6 +133,13 @@ Type
       ThreadExceptionMsg : TThreadExceptionMsg;
       TerminateThread : TNotifyEvent);
     Destructor Destroy; Override;
+    (**
+      This property gets and sets the SuccessfulParse variable of the thread.
+      @precon  None.
+      @postcon Gets and sets the SuccessfulParse variable of the thread.
+      @return  a Boolean
+    **)
+    Property SuccessfulParse : Boolean Read FSuccessfulParse Write FSuccessfulParse;
   End;
 
   (** This record defines information for use in naming threads. **)
@@ -629,7 +637,8 @@ Procedure TBrowseAndDocItThreadManager.TerminateThread(Sender : TObject);
 Begin
   FThread := Nil;
   If Assigned(FSuccessfulParseProc) Then
-    FSuccessfulParseProc(True);
+    If Sender Is TBrowseAndDocItThread Then
+      FSuccessfulParseProc((Sender As TBrowseAndDocItThread).SuccessfulParse);
 End;
 
 { TBrowseAndDocItThread }
@@ -656,6 +665,7 @@ constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(
   TerminateThread : TNotifyEvent);
 
 begin
+  FSuccessfulParse := False;
   FreeOnTerminate := True; // Self Freeing...
   FRenderDocumentTree := RenderDocumentTree;
   FThreadExceptionMsg := ThreadExceptionMsg;
@@ -705,6 +715,7 @@ begin
         Exit;
       FType := 'Rendering';
       Synchronize(RenderModuleExplorer);
+      FSuccessfulParse := False;
     Finally
       FModule.Free;
     End;
@@ -714,10 +725,11 @@ begin
     On E : Exception Do
       Begin
         {$IFDEF EUREKALOG}
-        StandardEurekaNotify(GetLastExceptionObject, GetLastExceptionAddress);
-        {$ENDIF}
+        StandardEurekaNotify(E, GetLastExceptionAddress);
+        {$ELSE}
         FFileName := E.Message;
         Synchronize(ShowException);
+        {$ENDIF}
       End;
   End;
 end;

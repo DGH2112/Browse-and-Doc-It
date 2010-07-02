@@ -4,7 +4,7 @@
   and an enumerate for the type of code.
 
   @Author  David Hoyle
-  @Date    04 Jun 2010
+  @Date    02 Jul 2010
   @Version 1.0
 
 **)
@@ -81,7 +81,7 @@ Var
   i: Integer;
 
 Begin
-  Result := 0;
+  Result := -1;
   iFirst := Low(Modules);
   iLast := High(Modules);
   While iFirst <= iLast Do

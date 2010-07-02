@@ -12,7 +12,8 @@ unit TestBaseLanguageModule;
 interface
 
 uses
-  TestFramework, Graphics, SysUtils, Classes, BaseLanguageModule, Contnrs;
+  TestFramework, Graphics, SysUtils, Classes, BaseLanguageModule, Contnrs,
+  CommonIDEFunctions;
 
 type
   TElementContainerHelper = Class Helper for TElementContainer
@@ -42,6 +43,8 @@ type
     Procedure CheckEquals(scExpected, scActual : TScope;
       strMsg : String = ''); Overload;
     Procedure CheckEquals(trExpected, trActual : TTokenReference;
+      strMsg : String = ''); Overload;
+    Procedure CheckEquals(ctExpected, ctActual : TCommentType;
       strMsg : String = ''); Overload;
   Published
   End;
@@ -512,6 +515,21 @@ begin
   FCheckCalled := True;
   If CompareText(strTokenReference[trExpected], strTokenReference[trActual]) <> 0 Then
     FailNotEquals(strTokenReference[trExpected], strTokenReference[trActual], strMsg,
+      CallerAddr);
+end;
+
+procedure TExtendedTestCase.CheckEquals(ctExpected, ctActual: TCommentType;
+  strMsg: String);
+
+Const
+  strCommentTypes : Array[Low(TCommentType)..High(TCommentType)] Of String = (
+    'ctNone', 'ctPascalBlock', 'ctPascalBrace', 'ctCPPBlock', 'ctCPPLine',
+    'ctVBLine', 'ctXML');
+
+begin
+  FCheckCalled := True;
+  If CompareText(strCommentTypes[ctExpected], strCommentTypes[ctActual]) <> 0 Then
+    FailNotEquals(strCommentTypes[ctExpected], strCommentTypes[ctActual], strMsg,
       CallerAddr);
 end;
 

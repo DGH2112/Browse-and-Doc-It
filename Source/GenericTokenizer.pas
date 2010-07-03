@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    21 Oct 2009
+  @Date    25 Jun 2010
   @Version 1.0
 
 **)
@@ -17,28 +17,29 @@ Interface
 Uses
   SysUtils, Classes, BaseLanguageModule;
 
-  Function Tokenize(strText : String; var KeyWords : TKeyWords;
+  Function Tokenize(strText : String; var ReservedWords, Directives : TKeyWords;
     iLimit : Integer = 999999) : TStringList;
 
 Implementation
 
 (**
 
-  This function returns a string list contains the tokenized representation of
+  This function returns a string list contains the tokenized representation of
   the passed string with respect to some basic object pascal grammer.
 
-  @precon  strText si the line of text to be tokenised
-  @postcon Returns a new string list of the tokenized string
+  @precon  strText si the line of text to be tokenised
+  @postcon Returns a new string list of the tokenized string
 
-  @note    The string list returnsed must be destroyed be the calling method.
+  @note    The string list returnsed must be destroyed be the calling method.
 
-  @param   strText  as a String
-  @param   KeyWords as a TKeyWords as a reference
-  @param   iLimit   as an Integer
+  @param   strText       as a String
+  @param   ReservedWords as a TKeyWords as a reference
+  @param   Directives    as a TKeyWords as a reference
+  @param   iLimit        as an Integer
   @return  a TStringList
 
 **)
-Function Tokenize(strText : String; var KeyWords : TKeyWords;
+Function Tokenize(strText : String; var ReservedWords, Directives : TKeyWords;
   iLimit : Integer = 999999) : TStringList;
 
 
@@ -132,9 +133,12 @@ Begin
               SetLength(strToken, iTokenLen);
               If iTokenLen > 0 Then
                 Begin
-                  If KeyWords <> Nil Then
-                    If IsKeyWord(strToken, KeyWords) Then
+                  If ReservedWords <> Nil Then
+                    If IsKeyWord(strToken, ReservedWords) Then
                       LastToken := ttReservedWord;
+                  If Directives <> Nil Then
+                    If IsKeyWord(strToken, Directives) Then
+                      LastToken := ttDirective;
                   If BlockType = btLineComment Then
                     LastToken := ttLineComment;
                   Result.AddObject(strToken, TObject(LastToken));
@@ -218,9 +222,12 @@ Begin
   If iTokenLen > 0 Then
     Begin
       SetLength(strToken, iTokenLen);
-      If KeyWords <> Nil Then
-        If IsKeyWord(strToken, KeyWords) Then
+      If ReservedWords <> Nil Then
+        If IsKeyWord(strToken, ReservedWords) Then
           CurToken := ttReservedWord;
+      If Directives <> Nil Then
+        If IsKeyWord(strToken, Directives) Then
+          CurToken := ttDirective;
       Result.AddObject(strToken, TObject(CurToken));
     End;
 End;

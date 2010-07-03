@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    26 Jun 2010
+  @Date    03 Jul 2010
   @Version 1.0
   @Author  David Hoyle
 
@@ -4335,18 +4335,18 @@ end;
 procedure TGenericProperty.CheckPropertyReturns;
 
 Var
-  i, j, k : Integer;
-  iFound : Integer;
+  i, iNumOfPostCons : Integer;
+  iReturnTagIndex : Integer;
   strType : String;
   strReturn : String;
 
 Begin
-  iFound := -1;
-  k := 0;
+  iReturnTagIndex := Comment.FindTag('return');
+  iNumOfPostCons := 0;
   For i := 0 To Comment.TagCount - 1 Do
     If LowerCase(Comment.Tag[i].TagName) = 'postcon' Then
       Begin
-        Inc(k);
+        Inc(iNumOfPostCons);
         If doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options Then
           If Comment.Tag[i].TokenCount = 0 Then
             AddDocumentConflict([FunctionType, QualifiedName], Comment.Tag[i].Line,
@@ -4355,15 +4355,7 @@ Begin
       End;
   If RequiresReturn Then
     Begin;
-      If ReturnType <> Nil Then
-        With Comment Do
-          For j := 0 To TagCount - 1 Do
-            If CompareText(Tag[j].TagName, 'return') = 0 Then
-              Begin
-                iFound := j;
-                Break;
-              End;
-      If iFound = -1 Then
+      If iReturnTagIndex = -1 Then
         Begin
           If doShowPropertyUndocumentedReturn In BrowseAndDocItOptions.Options Then
             AddDocumentConflict([FunctionType, QualifiedName], Line, Column,
@@ -4375,19 +4367,19 @@ Begin
             Begin
               strType := '';
               strReturn := '';
-              For i := 2 To Comment.Tag[iFound].TokenCount - 1 Do
+              For i := 2 To Comment.Tag[iReturnTagIndex].TokenCount - 1 Do
                 Begin
-                  If (Comment.Tag[iFound].Tokens[i].TokenType In [ttSymbol]) And
-                    (Comment.Tag[iFound].Tokens[i].Token <> '.') Then
+                  If (Comment.Tag[iReturnTagIndex].Tokens[i].TokenType In [ttSymbol]) And
+                    (Comment.Tag[iReturnTagIndex].Tokens[i].Token <> '.') Then
                     Break;
-                  strType := strType + Comment.Tag[iFound].Tokens[i].Token;
+                  strType := strType + Comment.Tag[iReturnTagIndex].Tokens[i].Token;
                 End;
               strType := Trim(strType);
               If ReturnType <> Nil Then
                 strReturn := ReturnType.AsString(False, False);
               If CompareText(strReturn, strType) <> 0 Then
                 AddDocumentConflict([FunctionType, QualifiedName, strReturn],
-                  Comment.Tag[iFound].Line, Comment.Tag[iFound].Column, Comment,
+                  Comment.Tag[iReturnTagIndex].Line, Comment.Tag[iReturnTagIndex].Column, Comment,
                   Format(strFunctionDocumentation, [FunctionType]),
                   DocConflictTable[dctFunctionIncorrectReturntype]);
             End;
@@ -4398,12 +4390,12 @@ Begin
           Line, Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
           DocConflictTable[dctFunctionReturnNotRequired]);
   If doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options Then
-    If k = 0 Then
+    If iNumOfPostCons = 0 Then
       AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionMissingPostCon]);
   If doShowPropertyMissingPostCons in BrowseAndDocItOptions.Options Then
-    If (k > 1) And (iFound <> -1) Then
+    If (iNumOfPostCons > 1) And (iReturnTagIndex > -1) Then
       AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionTooManyPostCons]);
@@ -4661,18 +4653,18 @@ End;
 Procedure TGenericMethodDecl.CheckMethodReturns;
 
 Var
-  i, j, k : Integer;
-  iFound : Integer;
+  i, iNumOfPostCons : Integer;
+  iReturnTagIndex : Integer;
   strType : String;
   strReturn : String;
 
 Begin
-  iFound := -1;
-  k := 0;
+  iReturnTagIndex := Comment.FindTag('return');
+  iNumOfPostCons := 0;
   For i := 0 To Comment.TagCount - 1 Do
     If LowerCase(Comment.Tag[i].TagName) = 'postcon' Then
       Begin
-        Inc(k);
+        Inc(iNumOfPostCons);
         If doShowMethodMissingPostCons in BrowseAndDocItOptions.Options Then
           If Comment.Tag[i].TokenCount = 0 Then
             AddDocumentConflict([FunctionType, QualifiedName], Comment.Tag[i].Line,
@@ -4681,15 +4673,7 @@ Begin
       End;
   If RequiresReturn Then
     Begin;
-      If ReturnType <> Nil Then
-        With Comment Do
-          For j := 0 To TagCount - 1 Do
-            If CompareText(Tag[j].TagName, 'return') = 0 Then
-              Begin
-                iFound := j;
-                Break;
-              End;
-      If iFound = -1 Then
+      If iReturnTagIndex = -1 Then
         Begin
           If doShowMethodUndocumentedReturn In BrowseAndDocItOptions.Options Then
             AddDocumentConflict([FunctionType, QualifiedName], Line, Column,
@@ -4701,19 +4685,19 @@ Begin
             Begin
               strType := '';
               strReturn := '';
-              For i := 2 To Comment.Tag[iFound].TokenCount - 1 Do
+              For i := 2 To Comment.Tag[iReturnTagIndex].TokenCount - 1 Do
                 Begin
-                  If (Comment.Tag[iFound].Tokens[i].TokenType In [ttSymbol]) And
-                    (Comment.Tag[iFound].Tokens[i].Token <> '.') Then
+                  If (Comment.Tag[iReturnTagIndex].Tokens[i].TokenType In [ttSymbol]) And
+                    (Comment.Tag[iReturnTagIndex].Tokens[i].Token <> '.') Then
                     Break;
-                  strType := strType + Comment.Tag[iFound].Tokens[i].Token;
+                  strType := strType + Comment.Tag[iReturnTagIndex].Tokens[i].Token;
                 End;
               strType := Trim(strType);
               If ReturnType <> Nil Then
                 strReturn := ReturnType.AsString(False, False);
               If CompareText(strReturn, strType) <> 0 Then
                 AddDocumentConflict([FunctionType, QualifiedName, strReturn],
-                  Comment.Tag[iFound].Line, Comment.Tag[iFound].Column, Comment,
+                  Comment.Tag[iReturnTagIndex].Line, Comment.Tag[iReturnTagIndex].Column, Comment,
                   Format(strFunctionDocumentation, [FunctionType]),
                   DocConflictTable[dctFunctionIncorrectReturntype]);
             End;
@@ -4724,12 +4708,12 @@ Begin
           Line, Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
           DocConflictTable[dctFunctionReturnNotRequired]);
   If doShowMethodMissingPostCons in BrowseAndDocItOptions.Options Then
-    If k = 0 Then
+    If iNumOfPostCons = 0 Then
       AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionMissingPostCon]);
   If doShowMethodMissingPostCons in BrowseAndDocItOptions.Options Then
-    If (k > 1) And (iFound <> -1) Then
+    If (iNumOfPostCons > 1) And (iReturnTagIndex <> -1) Then
       AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionTooManyPostCons]);

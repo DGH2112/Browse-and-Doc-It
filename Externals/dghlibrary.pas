@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    06 Jun 2010
+  @Date    03 Jul 2010
 
 **)
 Unit DGHLibrary;
@@ -1870,11 +1870,7 @@ Function Pow(X, Y : Real) : Real;
 
 Begin
   If X = 0 Then
-    Begin
-      Raise EMathException.Create('Invalid number passed to Power Routine.');
-      Pow := 0;
-      Exit;
-    End;
+    Raise EMathException.Create('Invalid number passed to Power Routine.');
   If X < 0 Then
     Pow := - Exp(Y * Ln(Abs(X)))
   Else
@@ -2639,8 +2635,6 @@ Var
   dblP : Double;
   dblS : Double;
   dblA : Double;
-  dblK : Double;
-//  dblFF : Double;
   dblQ : Double;
   dblE : Double;
   dblI, dblJ : Double;
@@ -2667,7 +2661,7 @@ begin
     dblA := 0;
   If (Easting - dblEasting) < 0 Then
     dblA := PI * 2 - dblA;
-  dblK := 1;
+//: @note dblK := 1; I think this is something to do with switching between the different intersections.
   dblQ := ArcSin(dblS * Sin(dblA - DegToRad(dblBearing)) / (Abs(FRadius)));
   dblE := DegToRad(dblBearing) - dblQ;
 
@@ -2697,10 +2691,10 @@ begin
       dblCz := dblCz - 2 * PI * Abs(FRadius);
     If (dblCz > 0) And (dblCz + Chainage < GetEndChainage) then
       Break;
-    if dblK < 0 then
-      Break;
+//    if dblK < 0 then
+//      Break;
     dblE := DegToRad(dblBearing) + dblQ + PI;
-    dblK := -1;
+//    dblK := -1;
   Until False;
 
   Result.dblEasting := dblI;

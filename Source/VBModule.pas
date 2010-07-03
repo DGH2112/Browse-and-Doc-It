@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       26 Jun 2010
+  @Date       03 Jul 2010
   @Author     David Hoyle
 
 **)
@@ -2478,14 +2478,11 @@ Begin
       DefaultValue := '';
       If (Token.Token = '=') And boolOptional Then
         Begin
-          If boolOptional Then
-            If Token.Token = '=' Then
-              NextNonCommentToken
-            Else
-              ErrorAndSeekToken(strLiteralExpected, 'Parameters', '=',
-                strSeekTokens, stActual)
+          If Token.Token = '=' Then
+            NextNonCommentToken
           Else
-            NextNonCommentToken;
+            ErrorAndSeekToken(strLiteralExpected, 'Parameters', '=',
+              strSeekTokens, stActual);
           While (Token.Token <> ',') And (Token.Token <> ')') Do
             Begin
               DefaultValue := DefaultValue + Token.Token;

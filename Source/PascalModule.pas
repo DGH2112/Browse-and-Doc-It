@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       25 Jun 2010
+  @Date       03 Jul 2010
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -9162,7 +9162,7 @@ begin
           If iStack = 1 Then
             Begin
               CompilerConditionStack[iStackTop] := Pointer(0);
-              Dec(iSkip)
+              Dec(iSkip);
             End Else
             Begin
               CompilerConditionStack[iStackTop] := Pointer(1);

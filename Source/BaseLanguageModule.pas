@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    03 Jul 2010
+  @Date    30 Jul 2010
   @Version 1.0
   @Author  David Hoyle
 
@@ -834,8 +834,11 @@ Type
       can be handled generically (parameters and returntypes). **)
   TGenericFunction = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FParameters : TObjectList;
-    FReturnType : TGenericTypeDecl;
+    FParameters   : TObjectList;
+    FReturnType   : TGenericTypeDecl;
+    FStartLine    : Integer;
+    FEndLine      : Integer;
+    FHasProfiling : Boolean;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetQualifiedName : String; Virtual; Abstract;
     Function GetParameterCount : Integer;
@@ -847,6 +850,7 @@ Type
       iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
     Procedure AddParameter(AParameter : TGenericParameter);
+    Function LineofCode : Integer;
     (**
       This property returns the number of parameter in the parameter collection.
       @precon  None.
@@ -876,6 +880,33 @@ Type
       @return  a String
     **)
     Property QualifiedName : String Read GetQualifiedName;
+    (**
+      This property gets and sets the start line number for the code within the
+      function.
+      @precon  None.
+      @postcon Gets and sets the start line number for the code within the
+               function.
+      @return  an Integer
+    **)
+    Property StartLine : Integer Read FStartLine Write FStartLine;
+    (**
+      This property gets and sets the end line number for the code within the
+      function.
+      @precon  None.
+      @postcon Gets and sets the end line number for the code within the
+               function.
+      @return  an Integer
+    **)
+    Property EndLine : Integer Read FEndLine Write FEndLine;
+    (**
+      This property gets and sets whether the function has code profiling
+      instrumentation installed.
+      @precon  None.
+      @postcon Gets and sets whether the function has code profiling
+               instrumentation installed.
+      @return  a Boolean
+    **)
+    Property HasProfiling : Boolean Read FHasProfiling Write FHasProfiling;
   End;
 
   (** A type to define sub classes of TGenericFunction **)
@@ -4741,6 +4772,8 @@ begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FParameters := TObjectList.Create(True);
   FReturnType := Nil;
+  FStartLine  := -1;
+  FEndLine    := -1;
 end;
 
 (**
@@ -4787,6 +4820,21 @@ end;
 function TGenericFunction.GetParameters(iIndex: Integer): TGenericParameter;
 begin
   Result := FParameters[iIndex] As TGenericParameter;
+end;
+
+(**
+
+  This method returns the number of lines of code in the function.
+
+  @precon  None.
+  @postcon Returns the number of lines of code in the function.
+
+  @return  an Integer
+
+**)
+function TGenericFunction.LineofCode: Integer;
+begin
+  Result := FEndLine - FStartLine + 1;
 end;
 
 (** --------------------------------------------------------------------------

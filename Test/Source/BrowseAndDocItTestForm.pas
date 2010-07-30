@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    31 May 2010
+  @Date    30 Jul 2010
   @Author  David Hoyle
 
 **)
@@ -649,6 +649,8 @@ Begin
   Finally
     slExts.Free;
   End;
+  If Not actFileRecurseFolders.Checked Then
+    Exit;
   iResult := FindFirst(strDirectory + '\*.*', faAnyFile, recFile);
   Try
     While iResult = 0 Do

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       03 Jul 2010
+  @Date       30 Jul 2010
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -666,7 +666,7 @@ Type
     Procedure StmtList;
     Procedure SimpleStatement;
     Function StructStmt : Boolean;
-    Function CompoundStmt : Boolean;
+    Function CompoundStmt(Method : TGenericFunction) : Boolean;
     Function ConditionalStmt : Boolean;
     Function IfStmt : Boolean;
     Function CaseStmt : Boolean;
@@ -2956,7 +2956,7 @@ Begin
   FMethodStack.Add(Method);
   Try
     DeclSection(AScope, Method);
-    bool := CompoundStmt;
+    bool := CompoundStmt(Method);
     If Not bool Then
       AssemblerStatement;
     ExportsStmt;
@@ -5967,7 +5967,7 @@ Function TPascalModule.StructStmt : Boolean;
 
 Begin
   Result :=
-    CompoundStmt Or
+    CompoundStmt(Nil) Or
     ConditionalStmt Or
     LoopStmt Or
     WithStmt Or
@@ -5977,7 +5977,6 @@ Begin
 End;
 
 (**
-
 
   This method parses the compound statement section of a procedure
   implementation from the current token position using the following object
@@ -5989,22 +5988,28 @@ End;
 
   @grammar CompoundStmt -> BEGIN StmtList END
 
+  @param   Method as a TGenericFunction
   @return  a Boolean
 
 **)
-Function TPascalModule.CompoundStmt : Boolean;
+Function TPascalModule.CompoundStmt(Method : TGenericFunction) : Boolean;
 
 begin
   Result := Token.UToken = 'BEGIN';
   If Result Then
     Begin
       NextNonCommentToken;
+      If Method <> Nil Then
+        Method.StartLine := Token.Line;
       StmtList;
       If Token.UToken = 'END' Then
-        NextNonCommentToken
-      Else
-        ErrorAndSeekToken(strReservedWordExpected, 'CompoundStmt', 'END',
-          ['end']{strSeekableOnErrorTokens}, stActual);
+        Begin
+          If Method <> Nil Then
+            Method.EndLine := Token.Line - 1;
+          NextNonCommentToken;
+        End Else
+          ErrorAndSeekToken(strReservedWordExpected, 'CompoundStmt', 'END',
+            ['end']{strSeekableOnErrorTokens}, stActual);
     End;
 end;
 
@@ -6460,7 +6465,7 @@ Begin
         If Token.UToken = 'DO' Then
           Begin
             NextNonCommentToken;
-            If Not CompoundStmt Then
+            If Not CompoundStmt(Nil) Then
                Statement;
             If Token.Token = ';' Then
               NextNonCommentToken;
@@ -7845,7 +7850,7 @@ Begin
         ErrorAndSeekToken(strReservedWordExpected, 'Initsection',
           'END', strSeekableOnErrorTokens, stActual);
     End
-  Else If CompoundStmt Then
+  Else If CompoundStmt(Nil) Then
     Begin
       // Do Nothing...
     End

@@ -77,7 +77,7 @@ type
   Strict Private
     FVBModule: TVBModule;
   Public
-    Procedure Setup; Override;
+    Procedure SetUp; Override;
     Procedure TearDown; Override;
   Published
     Procedure TestReservedWords;
@@ -693,7 +693,7 @@ begin
     Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
 end;
 
-procedure TestTVBModule.Setup;
+procedure TestTVBModule.SetUp;
 begin
   FVBModule := TVBModule.CreateParser('', 'VBFile.cls', False, [moParse]);
 end;

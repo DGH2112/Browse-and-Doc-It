@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    30 Jul 2010
+  @Date    07 Aug 2010
   @Version 1.0
   @Author  David Hoyle
 
@@ -300,7 +300,7 @@ Type
   TDocOptions = Set of TDocOption;
 
   (** This is an enumerate to define the options for the parsing of a module. **)
-  TModuleOption = (moParse, moCheckForDocumentConflicts);
+  TModuleOption = (moParse, moCheckForDocumentConflicts, moProfiling);
   (** This is a set of Module Option enumerates. **)
   TModuleOptions = Set Of TModuleOption;
 
@@ -839,6 +839,7 @@ Type
     FStartLine    : Integer;
     FEndLine      : Integer;
     FHasProfiling : Boolean;
+    FIndent       : Integer;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetQualifiedName : String; Virtual; Abstract;
     Function GetParameterCount : Integer;
@@ -907,6 +908,13 @@ Type
       @return  a Boolean
     **)
     Property HasProfiling : Boolean Read FHasProfiling Write FHasProfiling;
+    (**
+      This property gets and sets the Indent of the method.
+      @precon  None.
+      @postcon Gets and sets the Indent of the method.
+      @return  an Integer
+    **)
+    Property Indent : Integer Read FIndent Write FIndent;
   End;
 
   (** A type to define sub classes of TGenericFunction **)
@@ -1066,6 +1074,7 @@ Type
     FCommentClass : TCommentClass;
     FShouldUndoCompilerStack: Boolean;
     FLastBodyCommentLine: Integer;
+    FModuleOptions : TModuleOptions;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetToken : TTokenInfo;
     function GetOpTickCountName(iIndex: Integer): String;
@@ -1076,6 +1085,7 @@ Type
     Function GetBodyCommentCount : Integer;
     Function PrevToken : TTokenInfo;
     Procedure NextToken;
+    Procedure PreviousToken;
     Function EndOfTokens : Boolean;
     Procedure NextNonCommentToken; Virtual;
     Procedure RollBackToken;
@@ -1265,6 +1275,13 @@ Type
       @return  an Integer
     **)
     Property Lines : Integer Read GetLines;
+    (**
+      This property exposes the Module Options for the module.
+      @precon  None.
+      @postcon Returns the Module Options for the module.
+      @return  a TModuleOptions
+    **)
+    Property ModOptions : TModuleOptions Read FModuleOptions;
   End;
 
   (** This enumerate define the position of the editor when an item is selected
@@ -1301,10 +1318,13 @@ Type
     FMaxDocOutputWidth: Integer;
     FManagedNodesLife : Integer;
     FTreeColour : TColor;
+    FProfilingCode : TStringList;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetTokenFontInfo(ATokenType  : TBADITokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(ATokenType  : TBADITokenType; ATokenFontInfo : TTokenFontInfo);
     Procedure LoadSettings;
+    function GetProfilingCode(strFileName: String): String;
+    procedure SetProfilingCode(strFileName: String; const strValue: String);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -1454,6 +1474,15 @@ Type
       @return  a String
     **)
     Property INIFileName : String Read FINIFileName;
+    (**
+      This property gets and sets the profiling code for the given filenames.
+      @precon  None.
+      @postcon Gets and sets the profiling code for the given filenames.
+      @param   strFileExt as a String
+      @return  a String
+    **)
+    Property ProfilingCode[strFileExt : String] : String Read GetProfilingCode
+      Write SetProfilingCode;
   End;
 
   (** A class to represent a label within the Module Explorer / Documentation **)
@@ -5219,6 +5248,7 @@ constructor TBaseLanguageModule.CreateParser(Source : String;
 
 begin
   Inherited Create(strFileName, scGlobal, 0, 0, iiModule, Nil);
+  FModuleOptions := ModuleOptions;
   FFileName := strFileName;
   FModified := IsModified;
   FOwnedItems := TObjectList.Create(True);
@@ -5747,6 +5777,21 @@ end;
 
 (**
 
+  This method moves the toke to the previous token in the token list or raises
+  an EDocException.
+
+  @precon  None.
+  @postcon Moves the token to the previous token in the token list or raises an
+           EDocException.
+
+**)
+procedure TBaseLanguageModule.PreviousToken;
+begin
+  Dec(FTokenIndex);
+end;
+
+(**
+
   This method returns the previous token in the token list, else returns nil.
 
   @precon  None.
@@ -6005,6 +6050,7 @@ Begin
   FExcludeDocFiles := TStringList.Create;
   FMethodDescriptions := TStringList.Create;
   FScopesToDocument := [scPublished, scPublic, scProtected, scPrivate];
+  FProfilingCode := TStringList.Create;
   LoadSettings;
 End;
 
@@ -6020,6 +6066,7 @@ Destructor TBrowseAndDocItOptions.Destroy;
 
 Begin
   SaveSettings;
+  FProfilingCode.Free;
   FMethodDescriptions.Free;
   FExcludeDocFiles.Free;
   FExpandedNodes.Free;
@@ -6027,6 +6074,27 @@ Begin
   FDefines.Free;
   Inherited Destroy;
 End;
+
+(**
+
+  This is a getter method for the ProfilingCode property.
+
+  @precon  None.
+  @postcon Returns the profiling code template for the given filename.
+
+  @param   strFileName as a String
+  @return  a String
+
+**)
+function TBrowseAndDocItOptions.GetProfilingCode(strFileName: String): String;
+
+Var
+  strExt : String;
+
+begin
+  strExt := ExtractFileExt(strFileName);
+  Result := StringReplace(FProfilingCode.Values[strExt], '|', #13#10, [rfReplaceAll]);
+end;
 
 (**
 
@@ -6126,6 +6194,14 @@ begin
       FMaxDocOutputWidth := ReadInteger('Documentation', 'MaxDocOutputWidth', 80);
       FManagedNodesLife := ReadInteger('ModuleExplorer', 'ManagedNodesLife', 90);
       FTreeColour := StringToColor(ReadString('ModuleExplorer', 'TreeColour', 'clGray'));
+      sl := TStringList.Create;
+      Try
+        ReadSection('ProfilingCode', sl);
+        For j := 0 To sl.Count - 1 Do
+          FProfilingCode.Values[sl[j]] := ReadString('ProfilingCode', sl[j], '');
+      Finally
+        sl.Free;
+      End;
     Finally
       Free;
     End;
@@ -6197,9 +6273,39 @@ begin
       WriteInteger('Documentation', 'MaxDocOutputWidth', FMaxDocOutputWidth);
       WriteInteger('ModuleExplorer', 'ManagedNodesLife', FManagedNodesLife);
       WriteString('ModuleExplorer', 'TreeColour', ColorToString(FTreeColour));
+      For j := 0 To FProfilingCode.Count - 1 Do
+        {$IFDEF D0006}
+        WriteString('ProfilingCode', FProfilingCode.Names[j],
+          FProfilingCode.ValueFromIndex[j]);
+        {$ELSE}
+        WriteString('ProfilingCode', FProfilingCode.Names[j],
+          FProfilingCode.Values[FProfilingCode.Names[j]]);
+        {$ENDIF}
     Finally
       Free;
     End;
+end;
+
+(**
+
+  This is a setter method for the ProfilingCode property.
+
+  @precon  None.
+  @postcon saves the profiling code for the given filename.
+
+  @param   strFileName as a String
+  @param   strValue    as a String as a constant
+
+**)
+procedure TBrowseAndDocItOptions.SetProfilingCode(strFileName: String;
+  const strValue: String);
+
+Var
+  strExt : String;
+
+begin
+  strExt := ExtractFileExt(strFileName);
+  FProfilingCode.Values[strExt] := StringReplace(strValue, #13#10, '|', [rfReplaceAll]);
 end;
 
 (**

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       30 Jul 2010
+  @Date       06 Aug 2010
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -590,7 +590,8 @@ Type
     FExportsHeadingsLabel    : TLabelContainer;
     FImplementedMethodsLabel : TLabelContainer;
     FExternalSyms            : TStringList;
-    FModuleType : TModuleType;
+    FModuleType              : TModuleType;
+    FProfileFirstLine        : String;
     { Grammar Parsers }
     Procedure Goal;
     Function OPProgram : Boolean;
@@ -776,6 +777,8 @@ Type
   End;
 
 Implementation
+
+uses DGHLibrary;
 
 Resourcestring
   (** This is an error message for rendering a temporay container - SHOULDN'T do this **)
@@ -1941,6 +1944,7 @@ Constructor TPascalModule.CreateParser(Source : String; strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
 var
   boolCascade: Boolean;
+  sl: TStringList;
 
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
@@ -1961,6 +1965,18 @@ Begin
   FMethodStack := TObjectList.Create(False);
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSource := Source;
+  If moProfiling In ModuleOptions Then
+    Begin
+      sl := TStringList.Create;
+      Try
+        sl.Text := StringReplace(BrowseAndDocItOptions.ProfilingCode[strFileName],
+          '|', #13#10, [rfReplaceAll]);
+        If sl.Count > 0 Then
+          FProfileFirstLine := sl[0];
+      Finally
+        sl.Free;
+      End;
+    End;
   AddTickCount('Start');
   CommentClass := TPascalComment;
   TokenizeStream;
@@ -5998,14 +6014,22 @@ begin
   Result := Token.UToken = 'BEGIN';
   If Result Then
     Begin
+      If moProfiling In ModOptions Then
+        If Method <> Nil Then
+          Begin
+            Method.StartLine := Token.Line + 1;
+            Method.Indent := Token.Column - 1;
+            NextToken;
+            Method.HasProfiling := Like('*' + FProfileFirstLine + '*', Token.Token);
+            PreviousToken;
+          End;
       NextNonCommentToken;
-      If Method <> Nil Then
-        Method.StartLine := Token.Line;
       StmtList;
       If Token.UToken = 'END' Then
         Begin
-          If Method <> Nil Then
-            Method.EndLine := Token.Line - 1;
+          If moProfiling In ModOptions Then
+            If Method <> Nil Then
+              Method.EndLine := Token.Line - 1;
           NextNonCommentToken;
         End Else
           ErrorAndSeekToken(strReservedWordExpected, 'CompoundStmt', 'END',

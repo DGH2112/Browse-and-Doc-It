@@ -1,7 +1,7 @@
 object frmProfiling: TfrmProfiling
   Left = 0
   Top = 0
-  ActiveControl = vstTestCases
+  ActiveControl = vstMethods
   BorderIcons = []
   Caption = 'DUnit'
   ClientHeight = 677
@@ -34,8 +34,6 @@ object frmProfiling: TfrmProfiling
     ParentDoubleBuffered = False
     TabOrder = 1
     OnClick = btnOKClick
-    ExplicitLeft = 228
-    ExplicitTop = 436
   end
   object btnCancel: TBitBtn
     Left = 426
@@ -47,8 +45,6 @@ object frmProfiling: TfrmProfiling
     Kind = bkCancel
     ParentDoubleBuffered = False
     TabOrder = 2
-    ExplicitLeft = 309
-    ExplicitTop = 436
   end
   object pnlPanel: TPanel
     Left = 8
@@ -59,8 +55,6 @@ object frmProfiling: TfrmProfiling
     BevelOuter = bvNone
     Caption = 'pnlPanel'
     TabOrder = 0
-    ExplicitWidth = 527
-    ExplicitHeight = 718
     object Splitter: TSplitter
       Left = 0
       Top = 445
@@ -68,10 +62,8 @@ object frmProfiling: TfrmProfiling
       Height = 3
       Cursor = crVSplit
       Align = alBottom
-      ExplicitTop = 441
-      ExplicitWidth = 55
     end
-    object vstTestCases: TVirtualStringTree
+    object vstMethods: TVirtualStringTree
       Left = 0
       Top = 0
       Width = 493
@@ -90,7 +82,7 @@ object frmProfiling: TfrmProfiling
       Images = ilScopeImages
       TabOrder = 0
       TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-      OnGetImageIndex = vstTestCasesGetImageIndex
+      OnGetImageIndex = vstMethodsGetImageIndex
       Columns = <
         item
           Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring, coFixed, coSmartResize, coAllowFocus]
@@ -115,8 +107,6 @@ object frmProfiling: TfrmProfiling
       ScrollBars = ssBoth
       TabOrder = 1
       WordWrap = False
-      ExplicitTop = 496
-      ExplicitWidth = 446
     end
   end
   object ilScopeImages: TImageList

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    07 Aug 2010
+  @Date    09 Aug 2010
 
 **)
 unit ProfilingForm;
@@ -107,7 +107,7 @@ type
   TfrmProfiling = class(TForm)
     btnOK: TBitBtn;
     btnCancel: TBitBtn;
-    vstTestCases: TVirtualStringTree;
+    vstMethods: TVirtualStringTree;
     ilScopeImages: TImageList;
     mmoCode: TMemo;
     pnlPanel: TPanel;
@@ -115,13 +115,13 @@ type
     procedure btnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     {$IFNDEF D2009}
-    procedure vstTestCasesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+    procedure vstMethodsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
     {$ELSE}
-    procedure vstTestCasesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+    procedure vstMethodsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
     {$ENDIF}
-    procedure vstTestCasesGetImageIndex(Sender: TBaseVirtualTree;
+    procedure vstMethodsGetImageIndex(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
       var Ghosted: Boolean; var ImageIndex: Integer);
     procedure FormDestroy(Sender: TObject);
@@ -179,13 +179,19 @@ Var
   NodeData : ^TTreeData;
 
 begin
-  Result := vstTestCases.AddChild(P);
-  NodeData := vstTestCases.GetNodeData(Result);
+  Result := vstMethods.AddChild(P);
+  NodeData := vstMethods.GetNodeData(Result);
   NodeData.Element := Element;
   Result.CheckType := ctTriStateCheckBox;
   If Nodedata.Element Is TGenericFunction Then
-    If (NodeData.Element As TGenericFunction).HasProfiling Then
-      vstTestCases.CheckState[Result] := csCheckedNormal;
+    With (NodeData.Element As TGenericFunction) Do
+      Begin
+        If HasProfiling Then
+          vstMethods.CheckState[Result] := csCheckedNormal;
+        If StartLine = -1 Then
+          Include(Result.States, vsDisabled);
+      End;
+
 end;
 
 (**
@@ -264,8 +270,8 @@ Var
 
 begin
   LoadSettings;
-  vstTestCases.NodeDataSize := SizeOf(TTreeData);
-  vstTestCases.OnGetText := vstTestCasesGetText;
+  vstMethods.NodeDataSize := SizeOf(TTreeData);
+  vstMethods.OnGetText := vstMethodsGetText;
   ilScopeImages.Clear;
   For i := Succ(Low(T)) to High(T) Do
     If Not ilScopeImages.GetInstRes(hInstance, rtBitmap,
@@ -311,7 +317,7 @@ begin
     Begin
       FModule := AddNode(Nil, FRootElement);
       RenderContainers(FModule, I);
-      vstTestCases.Expanded[FModule] := True;
+      vstMethods.Expanded[FModule] := True;
     End;
 end;
 
@@ -376,25 +382,26 @@ procedure TfrmProfiling.ProcessJobs(Collection: TProfileJobs);
     While N <> Nil Do
       Begin
         RecurseNodes(N);
-        NodeData := vstTestCases.GetNodeData(N);
+        NodeData := vstMethods.GetNodeData(N);
         If NodeData.Element Is TGenericFunction Then
-          Begin
-            F := NodeDAta.Element As TGenericFunction;
-            If N.CheckState = csCheckedNormal Then
-              If Not F.HasProfiling Then
-                Collection.Add(F.QualifiedName, pctInsert, F.StartLine,
-                  F.EndLine, F.Indent);
-            If N.CheckState = csUncheckedNormal Then
-              If F.HasProfiling Then
-                Collection.Add(F.QualifiedName, pctRemove, F.StartLine,
-                  F.EndLine, F.Indent);
-          End;
+          If Not (vsDisabled In N.States) Then
+            Begin
+              F := NodeDAta.Element As TGenericFunction;
+              If N.CheckState = csCheckedNormal Then
+                If Not F.HasProfiling Then
+                  Collection.Add(F.QualifiedName, pctInsert, F.StartLine,
+                    F.EndLine, F.Indent);
+              If N.CheckState = csUncheckedNormal Then
+                If F.HasProfiling Then
+                  Collection.Add(F.QualifiedName, pctRemove, F.StartLine,
+                    F.EndLine, F.Indent);
+            End;
         N := N.NextSibling;
       End;
   End;
 
 begin
-  RecurseNodes(vstTestCases.RootNode);
+  RecurseNodes(vstMethods.RootNode);
 end;
 
 (**
@@ -464,7 +471,7 @@ end;
   @param   ImageIndex as an Integer as a reference
 
 **)
-procedure TfrmProfiling.vstTestCasesGetImageIndex(Sender: TBaseVirtualTree;
+procedure TfrmProfiling.vstMethodsGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
   var Ghosted: Boolean; var ImageIndex: Integer);
 
@@ -474,7 +481,7 @@ Var
 begin
   If Column = 0 Then
     Begin
-      NodeData := vstTestCases.GetNodeData(Node);
+      NodeData := vstMethods.GetNodeData(Node);
       ImageIndex := NodeData.Element.ImageIndexAdjustedForScope;
     End;
 end;
@@ -493,7 +500,7 @@ end;
   @param   CellText as a WideString as a reference
 
 **)
-procedure TfrmProfiling.vstTestCasesGetText(Sender: TBaseVirtualTree;
+procedure TfrmProfiling.vstMethodsGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
 {$IFNDEF D2009}
   var CellText: WideString);
@@ -505,7 +512,7 @@ Var
   NodeData : ^TTreeData;
 
 begin
-  NodeData := vstTestCases.GetNodeData(Node);
+  NodeData := vstMethods.GetNodeData(Node);
   Case Column Of
     0: CellText := NodeData.Element.AsString(True, False);
   Else

@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    25 Oct 2009
+  @Date    09 Aug 2010
   @Version 1.0
 
 **)
@@ -56,7 +56,8 @@ Type
     FHeaderLevel: Integer;
     FSummaryContent: TStringList;
     FTitle: String;
-    FKeyWords : TKeyWords;
+    FReservedWords : TKeyWords;
+    FDirectives : TKeyWords;
     FScopesToDocument: TScopes;
     FIndex : TStringList;
     FHTMLFileName: String;
@@ -1687,7 +1688,8 @@ Begin
                 FPerfCounters.Add(FCurrentModule.OpTickCountName[i]);
               FPerfCounters.Add('Total');
             End;
-        FKeyWords := FCurrentModule.KeyWords;
+        FReservedWords := FCurrentModule.ReservedWords;
+        FDirectives := FCurrentModule.Directives;
         FSummaryContent.Add('      <tr>');
         FSummaryContent.Add(Format('        <td>%s</td>', [
           A(FCurrentModule.ModuleName,
@@ -1754,7 +1756,7 @@ Var
 
 begin
   Result := '';
-  sl := Tokenize(strText, FKeyWords);
+  sl := Tokenize(strText, FReservedWords, FDirectives);
   Try
     For i := 0 To sl.Count - 1 Do
       Begin

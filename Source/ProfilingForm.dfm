@@ -29,9 +29,7 @@ object frmProfiling: TfrmProfiling
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkOK
-    ParentDoubleBuffered = False
     TabOrder = 1
     OnClick = btnOKClick
   end
@@ -41,9 +39,7 @@ object frmProfiling: TfrmProfiling
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkCancel
-    ParentDoubleBuffered = False
     TabOrder = 2
   end
   object pnlPanel: TPanel

@@ -120,7 +120,6 @@ object frmOptions: TfrmOptions
         Height = 322
         Style = lbOwnerDrawFixed
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ItemHeight = 16
         TabOrder = 0
         OnDblClick = btnEditClick
         OnDrawItem = lbSpecialTagsDrawItem
@@ -290,7 +289,6 @@ object frmOptions: TfrmOptions
         Height = 21
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
-        ItemHeight = 0
         TabOrder = 0
       end
       object edtFontSize: TEdit
@@ -328,9 +326,8 @@ object frmOptions: TfrmOptions
         Top = 84
         Width = 168
         Height = 22
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 6
         OnChange = cbxFontColourChange
       end
@@ -384,9 +381,8 @@ object frmOptions: TfrmOptions
         Top = 302
         Width = 168
         Height = 22
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 9
       end
       object edtTokenLimit: TEdit
@@ -413,9 +409,8 @@ object frmOptions: TfrmOptions
         Top = 349
         Width = 168
         Height = 22
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 10
       end
       object cbxBackColour: TColorBox
@@ -423,9 +418,8 @@ object frmOptions: TfrmOptions
         Top = 132
         Width = 168
         Height = 22
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbCustomColor, cbPrettyNames]
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 7
         OnChange = cbxBackColourChange
       end
@@ -574,7 +568,6 @@ object frmOptions: TfrmOptions
         Height = 353
         Style = lbOwnerDrawFixed
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ItemHeight = 16
         TabOrder = 4
         OnDblClick = lbxMethodDescriptionsDblClick
         OnDrawItem = lbxMethodDescriptionsDrawItem

@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    07 Feb 2010
+  @Date    13 Aug 2010
   @Version 1.0
   @Author  David Hoyle
 

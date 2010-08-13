@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    13 Mar 2010
+  @Date    13 Aug 2010
   @Version 1.0
 
 **)
@@ -13,7 +13,7 @@ Interface
 
 Uses
   Classes, ToolsAPI, Menus, BaseLanguageModule, Types, CommonIDEFunctions,
-  ModuleDispatcher {$IFNDEF D2005}, ExtCtrls, Contnrs {$ENDIF};
+  ModuleDispatcher {$IFNDEF D2005}, ExtCtrls, Contnrs {$ENDIF}, ProfilingForm;
 
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 
@@ -49,6 +49,7 @@ Type
     Procedure InsertToDoCommentClick(Sender : TObject);
     Procedure DocumentationClick(Sender : TObject);
     Procedure DUnitClick(Sender : TObject);
+    Procedure ProfilingClick(Sender : TObject);
     Procedure DeleteExistingComment(Source : IOTASourceEditor; iStartLine,
       iEndLine : Integer);
     procedure PositionCursorInFunction(CursorDelta: TPoint; iInsertLine,
@@ -57,6 +58,14 @@ Type
       iInsertLine: Integer; Source: IOTASourceEditor);
     Function  SelectedText(boolDelete : Boolean) : String;
     function  IsTextSelected: Boolean;
+    Procedure ProcessProfilingCode(SE : IOTASourceEditor; ProfileJob : TProfileJob;
+      iTabs : Integer);
+    Procedure InsertProfileCode(SE : IOTASourceEditor; ProfileJob : TProfileJob;
+      strProlog, strEpilog : String);
+    Procedure RemoveProfileCode(SE : IOTASourceEditor; ProfileJob : TProfileJob;
+      slProlog, slEpilog : TStringList);
+    procedure DeleteProfileCode(SE: IOTASourceEditor; iStartLine,
+      iEndLine : Integer);
     {$IFNDEF D2005}
     Procedure MenuTimerEvent(Sender : TObject);
     {$ENDIF}
@@ -260,6 +269,8 @@ Begin
     Menus.ShortCut(Ord('D'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu, 'D&Unit...', DUnitClick,
     Menus.ShortCut(Ord('U'), [ssCtrl, ssShift, ssAlt]));
+  CreateMenuItem(mmiPascalDocMenu, 'Pro&filing...', ProfilingClick,
+    Menus.ShortCut(Ord('F'), [ssCtrl, ssShift, ssAlt]));
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, 'Focus Edi&tor', Focus,
     Menus.ShortCut(Ord('E'), [ssCtrl, ssShift, ssAlt]));
@@ -389,6 +400,42 @@ begin
   Inherited;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
 end;
+
+(**
+
+  This method deletes the profile code from the editor window.
+
+  @precon  SE must be a valid instance.
+  @postcon Deletes the profile text between the given line numbers.
+
+  @param   SE         as an IOTASourceEditor
+  @param   iStartLine as an Integer
+  @param   iEndLine   as an Integer
+
+**)
+Procedure TBrowseAndDocItWizard.DeleteProfileCode(SE: IOTASourceEditor;
+  iStartLine, iEndLine : Integer);
+
+Var
+  Writer: IOTAEditWriter;
+  C1, C2: TOTACharPos;
+  iBufferPos1, iBufferPos2 : Integer;
+
+Begin
+  Writer := SE.CreateUndoableWriter;
+  Try
+    C1.Line := iStartLine;
+    C1.CharIndex := 0;
+    iBufferPos1 := SE.GetEditView(0).CharPosToPos(C1);
+    C2.Line := iEndLine + 1;
+    C2.CharIndex := 0;
+    iBufferPos2 := SE.GetEditView(0).CharPosToPos(C2);
+    Writer.CopyTo(iBufferPos1);
+    Writer.DeleteTo(iBufferPos2);
+  Finally
+    Writer := Nil;
+  End;
+End;
 
 (**
 
@@ -838,6 +885,190 @@ end;
 
 (**
 
+  This method processes each of the profiling jobs given determining whether
+  they are insertions or removals.
+
+  @precon  SE and ProfileJob must be valid instances.
+  @postcon Processes each of the profiling jobs given determining whether they
+           are insertions or removals.
+
+  @param   SE         as an IOTASourceEditor
+  @param   ProfileJob as a TProfileJob
+  @param   iTabs      as an Integer
+
+**)
+procedure TBrowseAndDocItWizard.ProcessProfilingCode(SE: IOTASourceEditor;
+  ProfileJob : TProfileJob; iTabs : Integer);
+
+Var
+  strTemplate : String;
+  slProlog, slEpilog : TStringList;
+  iLine: Integer;
+  iCodeLine: Integer;
+  strPadding : String;
+
+begin
+  strPadding := StringOfChar(#32, ProfileJob.Indent + iTabs);
+  strTemplate := StringReplace(BrowseAndDocItOptions.ProfilingCode[SE.FileName],
+    '|', #13#10, [rfReplaceAll]);
+  strTemplate := StringReplace(strTemplate, '$METHODNAME$', ProfileJob.Method, [rfReplaceAll]);
+  slProlog := TStringList.Create;
+  Try
+    slProlog.Text := strTemplate;
+    For iLine := 0 To slProlog.Count - 1 Do
+      slProlog[iLine] := strPadding + slProlog[iLine];
+  Finally
+    slEpilog := TStringList.Create;
+    Try
+      slEpilog.Text := slProlog.Text;
+    Finally
+      iCodeLine := -1;
+      For iLine := 0 To slProlog.Count - 1 Do
+        If Like('*$METHODCODE$*', slProlog[iLine]) Then
+          Begin
+            iCodeLine := iLine;
+            Break;
+          End;
+      If iCodeLine = -1 Then
+        Raise Exception.Create('$METHODCODE$ not found.');
+      While slProlog.Count > iCodeLine Do
+        slProlog.Delete(iCodeLine);
+      For iLine := 0 To iCodeLine Do
+        slEpilog.Delete(0);
+      Case ProfileJob.CodeType Of
+        pctInsert: InsertProfileCode(SE, ProfileJob, slProlog.Text, slEpilog.Text);
+        pctRemove: RemoveProfileCode(SE, ProfileJob, slProlog, slEpilog);
+      End;
+    End;
+  End;
+end;
+
+(**
+
+  This method inserts profiling code into the editor.
+
+  @precon  SE and ProfileJob must be valid instances.
+  @postcon Inserts into the editor profiling code for the given profiling job.
+
+  @param   SE         as an IOTASourceEditor
+  @param   ProfileJob as a TProfileJob
+  @param   strProlog  as a String
+  @param   strEpilog  as a String
+
+**)
+procedure TBrowseAndDocItWizard.InsertProfileCode(SE : IOTASourceEditor;
+  ProfileJob : TProfileJob; strProlog, strEpilog : String);
+
+Var
+  Writer: IOTAEditWriter;
+  iBufferPos: Integer;
+  C: TOTACharPos;
+
+begin
+  Writer := SE.CreateUndoableWriter;
+  Try
+    C.Line := ProfileJob.EndLine + 1;
+    C.CharIndex := 0;
+    iBufferPos := SE.GetEditView(0).CharPosToPos(C);
+    Writer.CopyTo(iBufferPos);
+    OutputText(Writer, strEpilog);
+  Finally
+    Writer := Nil;
+  End;
+  Writer := SE.CreateUndoableWriter;
+  Try
+    C.Line := ProfileJob.StartLine;
+    C.CharIndex := 0;
+    iBufferPos := SE.GetEditView(0).CharPosToPos(C);
+    Writer.CopyTo(iBufferPos);
+    OutputText(Writer, strProlog);
+  Finally
+    Writer := Nil;
+  End;
+end;
+
+(**
+
+  This method removes the profiling code from the editor after checking that the
+  code is what is expected.
+
+  @precon  SE and ProfileJob must be valid instances.
+  @postcon Removes the profiling code from the editor after checking that the
+           code is what is expected.
+
+  @param   SE         as an IOTASourceEditor
+  @param   ProfileJob as a TProfileJob
+  @param   slProlog   as a TStringList
+  @param   slEpilog   as a TStringList
+
+**)
+procedure TBrowseAndDocItWizard.RemoveProfileCode(SE : IOTASourceEditor;
+  ProfileJob : TProfileJob; slProlog, slEpilog : TStringList);
+
+Var
+  Reader : IOTAEditReader;
+  C1, C2: TOTACharPos;
+  iLine: Integer;
+  iBufferPos1: Integer;
+  iBufferPos2: Integer;
+  strBuffer : AnsiString;
+  iRead : Integer;
+  iBufferSize : Integer;
+
+begin
+  Reader := SE.CreateReader;
+  Try
+    For iLine := 0 To slEpilog.Count - 1 Do
+      Begin
+        C1.Line := ProfileJob.EndLine - iLine;
+        C1.CharIndex := 0;
+        iBufferPos1 := SE.GetEditView(0).CharPosToPos(C1);
+        C2.Line := ProfileJob.EndLine - iLine + 1;
+        C2.CharIndex := 0;
+        iBufferPos2 := SE.GetEditView(0).CharPosToPos(C2);
+        iBufferSize := iBufferPos2 - iBufferPos1;
+        SetLength(strBuffer, iBufferSize);
+        iRead := Reader.GetText(iBufferPos1, PAnsiChar(strBuffer), iBufferSize);
+        SetLength(strBuffer, iRead);
+        If Not Like('*' + Trim(slEpilog[slEpilog.Count - 1 - iLine]) + '*',
+          String(strBuffer)) Then
+          Begin
+            OutputMessage(Format('Profiling does not match Epilog code in method ''%s''.', [ProfileJob.Method]));
+            Exit;
+          End;
+      End;
+  Finally
+    Reader := Nil;
+  End;
+  DeleteProfileCode(SE, ProfileJob.EndLine - slEpilog.Count + 1, ProfileJob.EndLine);
+  Reader := SE.CreateReader;
+  Try
+    For iLine := 0 To slProlog.Count - 1 Do
+      Begin
+        C1.Line := ProfileJob.StartLine + iLine;
+        C1.CharIndex := 0;
+        iBufferPos1 := SE.GetEditView(0).CharPosToPos(C1);
+        C2.Line := ProfileJob.StartLine + iLine + 1;
+        C2.CharIndex := 0;
+        iBufferPos2 := SE.GetEditView(0).CharPosToPos(C2);
+        iBufferSize := iBufferPos2 - iBufferPos1;
+        SetLength(strBuffer, iBufferSize);
+        iRead := Reader.GetText(iBufferPos1, PAnsiChar(strBuffer), iBufferSize);
+        SetLength(strBuffer, iRead);
+        If Not Like('*' + Trim(slProlog[iLine]) + '*', String(strBuffer)) Then
+          Begin
+            OutputMessage(Format('Profiling does not match Prolog code in method ''%s''.', [ProfileJob.Method]));
+            Exit;
+          End;
+      End;
+  Finally
+    Reader := Nil;
+  End;
+  DeleteProfileCode(SE, ProfileJob.StartLine, ProfileJob.StartLine + slProlog.Count - 1);
+end;
+
+(**
+
   This is a menu OnClick event for the insertion of a property comment. This
   method searches the IDE for the current module being edited and then
   creates a memory stream of the source and passes it to the Unit parser.
@@ -1241,6 +1472,62 @@ begin
     S.GetEditView(0).CursorPos := C;
 end;
 
+(**
+
+  This is an on click event handler for the Porfiling menu item.
+
+  @precon  None.
+  @postcon Invokes the profiling dialogue for selecting the methods to be
+           profiled.
+
+  @param   Sender as a TObject
+
+**)
+procedure TBrowseAndDocItWizard.ProfilingClick(Sender: TObject);
+
+ResourceString
+  strSelectSourceCode = 'You must select a source code editor to create unit tests.';
+
+Var
+  SE : IOTASourceEditor;
+  M : TBaseLanguageModule;
+  ProfileJobs: TProfileJobs;
+  i: Integer;
+  iTabs : Integer;
+
+begin
+  SE := ActiveSourceEditor;
+  If SE <> Nil Then
+    Begin
+      If Not SE.EditViews[0].Buffer.IsReadOnly Then
+        Begin
+          M := Dispatcher(EditorAsString(SE), SE.FileName,
+            SE.Modified, [moParse, moProfiling]);
+          Try
+            ProfileJobs := TfrmProfiling.Execute(M);
+            Try
+              If ProfileJobs <> Nil Then
+                Begin
+                  If (ProfileJobs.Count > 0) Then
+                    Begin
+                      iTabs := (BorlandIDEServices As IOTAEditorServices).EditOptions.BlockIndent;
+                      For i := 0 To ProfileJobs.Count - 1 Do
+                        ProcessProfilingCode(SE, ProfileJobs.ProfileJob[i], iTabs);
+                    End Else
+                      MessageDlg('Nothing to do!', mtError, [mbOK], 0);
+                End;
+            Finally
+              ProfileJobs.Free;
+            End;
+          Finally
+            M.Free;
+          End;
+        End Else
+          MessageDlg('The editor buffer is read only.', mtError, [mbOK], 0);
+    End Else
+      MessageDlg(strSelectSourceCode, mtError, [mbOK], 0);
+end;
+
 {$IFDEF D2005}
 (**
 
@@ -1310,6 +1597,10 @@ Resourcestring
   {$IFDEF VER200}
   (** This is a message string to appear in the CRS 2009 splash screen **)
   strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2009';
+  {$ENDIF}
+  {$IFDEF VER210}
+  (** This is a message string to appear in the CRS 2009 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio 2010';
   {$ENDIF}
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
   strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';

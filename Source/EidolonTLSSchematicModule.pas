@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       21 Aug 2010
+  @Date       24 Aug 2010
   @Author     David Hoyle
 
 **)
@@ -109,6 +109,7 @@ Type
     FSource        : String;
     FRoad          : Integer;
     FSettings      : Array[Low(TSetting)..High(TSetting)] Of Integer;
+    FMaxRoads: Double;
     { Grammar Parsers }
     Procedure Goal;
     Function Road : Boolean;
@@ -128,6 +129,7 @@ Type
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
+    function GetSettings(S: TSetting): Double;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetComment(
       CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
@@ -143,7 +145,28 @@ Type
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
     Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    (**
+      This property returns the specific percentage setting as a value between
+      0 and 1.
+      @precon  None.
+      @postcon Returns the specific percentage setting as a value between
+               0 and 1.
+      @param   S as a TSetting
+      @return  a Double
+    **)
+    Property Settings[S : TSetting] : Double Read GetSettings;
+    (**
+      This property returns the maximum offset of the roads in the script.
+      @precon  None.
+      @postcon Returns the maximum offset of the roads in the script.
+      @return  a Double
+    **)
+    Property MaxRoads : Double Read FMaxRoads;
   End;
+
+ResourceString
+  (** A resource string for the Roads node in the tree. **)
+  strRoads = 'Roads';
 
 Implementation
 
@@ -288,6 +311,7 @@ Begin
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSource := Source;
   FRoad := 1;
+  FmaxRoads := 1;
   FSettings[seMargins] := 2;
   FSettings[seRoads] := 20;
   FSettings[seObjects] := 20;
@@ -690,9 +714,6 @@ end;
 **)
 function TTLSSchematicModule.Road: Boolean;
 
-ResourceString
-  strRoads = 'Roads';
-
 var
   Rs: TElementContainer;
   R : TTLSRoad;
@@ -887,6 +908,8 @@ begin
       If iErrorCode = 0 Then
         Begin
           R.StartOffset := i;
+          If i > FMaxRoads Then
+            FMaxRoads := i;
           NextNonCommentToken;
           Result := True;
         End Else
@@ -969,6 +992,8 @@ begin
       If iErrorCode = 0 Then
         Begin
           R.EndOffset := i;
+          If i > FMaxRoads Then
+            FMaxRoads := i;
           NextNonCommentToken;
           Result := True;
         End Else
@@ -1036,6 +1061,22 @@ End;
 function TTLSSchematicModule.GetModuleName: String;
 begin
   Result := ExtractFilename(FileName);
+end;
+
+(**
+
+  This is a getter method for the Settings property.
+
+  @precon  None.
+  @postcon Returns the Setting percentage as a value between 0 and 1.
+
+  @param   S as a TSetting
+  @return  a Double
+
+**)
+function TTLSSchematicModule.GetSettings(S: TSetting): Double;
+begin
+  Result := FSettings[S] / 100.0;
 end;
 
 (**

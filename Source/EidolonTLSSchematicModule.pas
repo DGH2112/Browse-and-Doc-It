@@ -3,7 +3,6 @@
   This module contains a parser for the Eidolon Time Location Schematic Diagram
   Language.
 
-  @bug        Start chainage less than end chainage
   @todo       Add OBJECT grammar.
 
   @Version    1.0
@@ -220,6 +219,9 @@ ResourceString
   (** A resource string for an unexpected start offset. **)
   strExpectedAStartOffet = 'Expected a start offset but found ''%s'' at line' +
   ' %d column %d.';
+  (** An error message for chainages the wrong way around. **)
+  strChainageError = 'The end chainage is less than or equal to the start ch' +
+  'ainage (''%s'') at line %d column %d.';
 
 (**
 
@@ -922,6 +924,9 @@ begin
             R.EndChainage := -dbl
           Else
             R.EndChainage := dbl;
+          If R.StartChainage >= R.EndChainage Then
+            ErrorAndSeekToken(strChainageError, 'EndChainage', Token.Token,
+              strSeekableOnErrorTokens, stActual);
           NextNonCommentToken;
           Result := True;
         End Else

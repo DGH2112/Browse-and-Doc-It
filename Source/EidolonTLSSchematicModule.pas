@@ -3,8 +3,6 @@
   This module contains a parser for the Eidolon Time Location Schematic Diagram
   Language.
 
-  @bug        Handle negative chainages.
-  @bug        Offsets must be greater than 1
   @bug        Start chainage less than end chainage
   @todo       Add OBJECT grammar.
 

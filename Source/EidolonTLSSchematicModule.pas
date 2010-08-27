@@ -3,8 +3,13 @@
   This module contains a parser for the Eidolon Time Location Schematic Diagram
   Language.
 
+  @bug        Handle negative chainages.
+  @bug        Offsets must be greater than 1
+  @bug        Start chainage less than end chainage
+  @todo       Add OBJECT grammar.
+
   @Version    1.0
-  @Date       24 Aug 2010
+  @Date       27 Aug 2010
   @Author     David Hoyle
 
 **)
@@ -22,7 +27,7 @@ Type
   TLocation = (loLeft, loRight);
 
   (** An enumerate to define the mearsurement percentages for the diagrams. **)
-  TSetting = (seMargins, seText, seObjects, seRoads, seSpacing);
+  TSetting = (seMargins, seObjects, seRoads, seSpacing);
 
   (** A class to represent the roads in the diagram. **)
   TTLSRoad = Class(TElementContainer)
@@ -117,7 +122,6 @@ Type
     Function Roads : Boolean;
     Function Margins : Boolean;
     Function Spacing : Boolean;
-    Function Text_ : Boolean;
     Function StartChainage(R : TTLSRoad) : Boolean;
     Function EndChainage(R : TTLSRoad) : Boolean;
     Function StartOffset(R : TTLSRoad) : Boolean;
@@ -176,13 +180,13 @@ Uses
 Const
   (** A set of characters for general symbols **)
   strSymbols : Set Of AnsiChar = ['&', '(', ')', '*', '+', ',', '.', '/',
-    ':', '=', '@', '[', ']', '^', '|', '%'];
+    ':', '=', '@', '[', ']', '^', '|', '%', '-'];
   (** A set of characters for single quotes **)
   strSingleQuotes : Set Of AnsiChar = [''''];
   (** A set of characters for double quotes **)
   strDoubleQuotes : Set Of AnsiChar = ['"'];
   (** A set of identifier characters. **)
-  strIdentifiers :  Set Of AnsiChar = ['-', '_', 'a'..'z', 'A'..'Z', '<', '>'];
+  strIdentifiers :  Set Of AnsiChar = ['_', 'a'..'z', 'A'..'Z', '<', '>'];
   (** A set of number characters. **)
   strNumbers:  Set Of AnsiChar = ['#', '$', '0'..'9'];
 
@@ -206,14 +210,6 @@ ResourceString
   (** A resource string for an invalid colour name. **)
   (** A resource string for an invalid colour. **)
   strInvalidColourName = 'Invalid colour name ''%s'' at line %d column %d.';
-  (** A resource string for percentages that don`t add up to 100. **)
-  strThePercentageSpacings = 'The Percentage spacings for elements does not ' +
-    'add up to 100%% (Total: %d%%, ' +
-    'Margins: %d%%, ' +
-    'Text: %d%%, ' +
-    'Roads: %d%%, ' +
-    'Objects: %d%% and ' +
-    'Spacing: %d%%';
   (** A resource string for an unexpected end chainage. **)
   strExpectedAnEndChainage = 'Expected an end chainage but ''%s'' found at l' +
   'ine %d column %d.';
@@ -304,7 +300,6 @@ Constructor TTLSSchematicModule.CreateParser(Source : String; strFileName : Stri
 
 Var
   boolCascade : Boolean;
-  i: Integer;
 
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
@@ -313,10 +308,9 @@ Begin
   FRoad := 1;
   FmaxRoads := 1;
   FSettings[seMargins] := 2;
-  FSettings[seRoads] := 20;
-  FSettings[seObjects] := 20;
+  FSettings[seRoads] := 5;
+  FSettings[seObjects] := 5;
   FSettings[seSpacing] := 2;
-  FSettings[seText] := 6;
   AddTickCount('Start');
   CommentClass := TTLSSchematicComment;
   TokenizeStream;
@@ -335,12 +329,6 @@ Begin
       boolCascade := True;
       If moCheckForDocumentConflicts In ModuleOptions Then
         CheckDocumentation(boolCascade);
-      i := (FSettings[seMargins] + FSettings[seText] + FSettings[seObjects] +
-        FSettings[seRoads] + FSettings[seSpacing]) * 2;
-      If i <> 100 Then
-        AddIssue(Format(strThePercentageSpacings, [i, FSettings[seMargins],
-          FSettings[seText], FSettings[seRoads], FSettings[seObjects],
-          FSettings[seSpacing]]), scNone, 'CreateParser', 0, 0, etWarning);
       AddTickCount('Check');
       TidyUpEmptyElements;
     End;
@@ -359,45 +347,6 @@ End;
 Destructor TTLSSchematicModule.Destroy;
 begin
   Inherited Destroy;
-end;
-
-(**
-
-  This method parses the text element of the grammar.
-
-  @precon  None.
-  @postcon Returns true if the element was a text element.
-
-  @return  a Boolean
-
-**)
-function TTLSSchematicModule.Text_: Boolean;
-
-var
-  Ts: TElementContainer;
-  T: TSchematicSetting;
-
-begin
-  Result := False;
-  If Token.UToken = 'TEXT' Then
-    Begin
-      Ts := FindElement(strSettings);
-      If Ts = Nil Then
-        Ts := Add(TLabelContainer.Create(strSettings, scNone, 0, 0,
-          iiPublicTypesLabel, Nil)) As TLabelContainer;
-      T := Ts.Add(TSchematicSetting.Create('Text', scNone, Token.Line,
-        Token.Column, iiPublicType, Nil)) As TSchematicSetting;
-      NextNonCommentToken;
-      Percentage(T);
-      FSettings[seText] := T.Percentage;
-      If Token.Token = ';' Then
-        Begin
-          NextNonCommentToken;
-          Result := True;
-        End Else
-          ErrorAndSeekToken(strLiteralExpected, 'Text_', ';',
-            strSeekableOnErrorTokens, stActual);
-    End;
 end;
 
 (**
@@ -499,7 +448,7 @@ Begin
           Begin
             If (ch = '.') And (LastCharType = ttNumber) Then
               CurCharType := ttNumber
-            Else If (ch = '%') And (LastCharType = ttIdentifier) Then
+            Else If CharInSet(ch, ['%', '-']) And (LastCharType = ttIdentifier) Then
               CurCharType := ttIdentifier
             Else
               CurCharType := ttSymbol;
@@ -866,21 +815,30 @@ function TTLSSchematicModule.StartChainage(R : TTLSRoad): Boolean;
 Var
   dbl : Double;
   iErrorCode : Integer;
+  boolNeg : Boolean;
 
 begin
   Result := False;
+  boolNeg := Token.Token = '-';
+  If boolNeg Then
+      NextNonCommentToken;
   If Token.TokenType In [ttNumber] Then
     Begin
       Val(Token.Token, dbl, iErrorCode);
       If iErrorCode = 0 Then
         Begin
-          R.StartChainage := dbl;
+          If boolNeg Then
+            R.StartChainage := -dbl
+          Else
+            R.StartChainage := dbl;
           NextNonCommentToken;
           Result := True;
         End Else
           ErrorAndSeekToken(strNumberExpected, 'StartChainage', Token.Token,
             strSeekableOnErrorTokens, stActual);
-    End;
+    End Else
+      If boolNeg Then
+        RollBackToken;
 end;
 
 (**
@@ -950,21 +908,30 @@ function TTLSSchematicModule.EndChainage(R : TTLSRoad): Boolean;
 Var
   dbl : Double;
   iErrorCode : Integer;
+  boolNeg: Boolean;
 
 begin
   Result := False;
+  boolNeg := Token.Token = '-';
+  If boolNeg Then
+      NextNonCommentToken;
   If Token.TokenType In [ttNumber] Then
     Begin
       Val(Token.Token, dbl, iErrorCode);
       If iErrorCode = 0 Then
         Begin
-          R.EndChainage := dbl;
+          If boolNeg Then
+            R.EndChainage := -dbl
+          Else
+            R.EndChainage := dbl;
           NextNonCommentToken;
           Result := True;
         End Else
           ErrorAndSeekToken(strNumberExpected, 'EndChainage', Token.Token,
             strSeekableOnErrorTokens, stActual);
-    End;
+    End Else
+      If boolNeg Then
+        RollBackToken;
 end;
 
 (**
@@ -1209,8 +1176,7 @@ begin
           End;
         // Check for end of file else must be identifier
         If Not EndOfTokens Then
-          While Road or Objects Or Roads Or Margins Or Spacing Or Text_ Or
-            UnknownToken Do;
+          While Road or Objects Or Roads Or Margins Or Spacing Or UnknownToken Do;
         If Not (Token.TokenType In [ttFileEnd]) Then
           Raise EParserAbort.Create(strUnExpectedEndOfFile);
       End;

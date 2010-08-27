@@ -19,7 +19,7 @@ Uses
 
 Type
   (** An enumerate to define the location for Roads. **)
-  TLocation = (loLeft, loRight);
+  TLocation = (loLeft, loRight, loBoth, loOver, loUnder);
 
   (** An enumerate to define the mearsurement percentages for the diagrams. **)
   TSetting = (seMargins, seObjects, seRoads, seSpacing);
@@ -221,7 +221,7 @@ Const
   strSeekableOnErrorTokens : Array[1..1] Of String = (';');
   (** A constant array of Locations. **)
   strLocations : Array[Low(TLocation)..High(TLocation)] Of String = (
-    'Left', 'Right');
+    'Left', 'Right', 'Both', 'Over', 'Under');
 
 ResourceString
   (** A resource string for the settings node. **)
@@ -1329,11 +1329,17 @@ begin
       Inc(FRoad);
       NextNonCommentToken;
       If Chainages(O) Then
-        If IsKeyWord(Token.Token, ['left', 'right']) Then
+        If IsKeyWord(Token.Token, ['both', 'left', 'over', 'right', 'under']) Then
           Begin
             O.Location := loLeft;
             If CompareText(Token.Token, 'RIGHT') = 0 Then
-              O.Location := loRight;
+              O.Location := loRight
+            Else If CompareText(Token.Token, 'BOTH') = 0 Then
+              O.Location := loBoth
+            Else If CompareText(Token.Token, 'OVER') = 0 Then
+              O.Location := loOver
+            Else If CompareText(Token.Token, 'UNDER') = 0 Then
+              O.Location := loUnder;
             NextNonCommentToken;
             If Token.Token = ',' Then
               Begin

@@ -3,8 +3,6 @@
   This module contains a parser for the Eidolon Time Location Schematic Diagram
   Language.
 
-  @todo       Add OBJECT grammar.
-
   @Version    1.0
   @Date       27 Aug 2010
   @Author     David Hoyle
@@ -26,22 +24,19 @@ Type
   (** An enumerate to define the mearsurement percentages for the diagrams. **)
   TSetting = (seMargins, seObjects, seRoads, seSpacing);
 
-  (** A class to represent the roads in the diagram. **)
-  TTLSRoad = Class(TElementContainer)
+  (** An abstract class from which Road and Object are derived. **)
+  TTLSShape = Class {$IFDEF D2005} Abstract {$ENDIF}(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Private
     FStartChainage : Double;
     FEndChainage : Double;
-    FStartOffset : Integer;
-    FEndOffset : Integer;
     FLocation : TLocation;
     FColour : TColour;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
-      This property gets and sets the Road Start Chainage.
+      This property gets and sets the Road start chainage.
       @precon  None.
-      @postcon Gets and sets the Road Start Chainage.
+      @postcon Gets and sets the Road start chainage.
       @return  a Double
     **)
     Property StartChainage : Double Read FStartChainage Write FStartChainage;
@@ -52,20 +47,6 @@ Type
       @return  a Double
     **)
     Property EndChainage : Double Read FEndChainage Write FEndChainage;
-    (**
-      This property gets and sets the Road end offset.
-      @precon  None.
-      @postcon Gets and sets the Road end offset.
-      @return  a Integer
-    **)
-    Property StartOffset : Integer Read FStartOffset Write FStartOffset;
-    (**
-      This property gets and sets the Road start offset.
-      @precon  None.
-      @postcon Gets and sets the Road start offset.
-      @return  a Integer
-    **)
-    Property EndOffset : Integer Read FEndOffset Write FEndOffset;
     (**
       This property gets and sets the Road location.
       @precon  None.
@@ -80,6 +61,46 @@ Type
       @return  a TColour
     **)
     Property Colour : TColour Read FColour Write FColour;
+  End;
+
+  (** A class to represent the roads in the diagram. **)
+  TTLSRoad = Class(TTLSShape)
+  {$IFDEF D2005} Strict {$ENDIF} Private
+    FStartOffset : Integer;
+    FEndOffset : Integer;
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    (**
+      This property gets and sets the Road Start Offset.
+      @precon  None.
+      @postcon Gets and sets the Road Start Offset.
+      @return  a Integer
+    **)
+    Property StartOffset : Integer Read FStartOffset Write FStartOffset;
+    (**
+      This property gets and sets the Road start offset.
+      @precon  None.
+      @postcon Gets and sets the Road start offset.
+      @return  a Integer
+    **)
+    Property EndOffset : Integer Read FEndOffset Write FEndOffset;
+  End;
+
+  (** A class to represent the objects on the schematic diagram. **)
+  TTLSObject = Class(TTLSShape)
+  {$IFDEF D2005} Strict {$ENDIF} Private
+    FText: String;
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    (**
+      This property gets and sets the text of the object.
+      @precon  None.
+      @postcon Gets and sets the text of the object.
+      @return  a String
+    **)
+    Property Text : String Read FText Write FText;
   End;
 
   (** A class to represent a schematic setting. **)
@@ -115,15 +136,16 @@ Type
     { Grammar Parsers }
     Procedure Goal;
     Function Road : Boolean;
+    Function Object_ : Boolean;
     Function Objects : Boolean;
     Function Roads : Boolean;
     Function Margins : Boolean;
     Function Spacing : Boolean;
-    Function StartChainage(R : TTLSRoad) : Boolean;
-    Function EndChainage(R : TTLSRoad) : Boolean;
+    Function StartChainage(R : TTLSShape) : Boolean;
+    Function EndChainage(R : TTLSShape) : Boolean;
     Function StartOffset(R : TTLSRoad) : Boolean;
     Function EndOffset(R : TTLSRoad) : Boolean;
-    Function Chainages(R : TTLSRoad) : Boolean;
+    Function Chainages(R : TTLSShape) : Boolean;
     Function Offsets(R : TTLSRoad) : Boolean;
     Procedure Percentage(S : TSchematicSetting);
     Function UnknownToken : Boolean;
@@ -168,6 +190,8 @@ Type
 ResourceString
   (** A resource string for the Roads node in the tree. **)
   strRoads = 'Roads';
+  (** A resource string for the Objects node in the tree. **)
+  strObjects = 'Objects';
 
 Implementation
 
@@ -188,8 +212,8 @@ Const
   strNumbers:  Set Of AnsiChar = ['#', '$', '0'..'9'];
 
   (** A set of reserved words (not used in this parser.) **)
-  strReservedWords : Array[0..5] Of String = ('margins', 'objects', 'road',
-    'roads', 'spacing', 'text');
+  strReservedWords : Array[0..6] Of String = ('margins', 'object', 'objects',
+    'road', 'roads', 'spacing', 'text');
 
   (** This is a list of reserved, directives word and a semi colon which are
       token that can be sort as then next place to start parsing from when an
@@ -383,7 +407,7 @@ Procedure TTLSSchematicModule.TokenizeStream;
 
 Type
   (** State machine for block types. **)
-  TBlockType = (btNoBlock, btLineComment, btFullComment);
+  TBlockType = (btNoBlock, btLineComment, btFullComment, btSingleLiteral);
 
 Const
   (** Growth size of the token buffer. **)
@@ -482,7 +506,7 @@ Begin
 
         If (LastCharType <> CurCharType) Or ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
           Begin
-            If Not (((BlockType In [btLineComment]) And (CurCharType <> ttLineEnd)) Or
+            If Not (((BlockType In [btLineComment, btSingleLiteral]) And (CurCharType <> ttLineEnd)) Or
               (BlockType In [btFullComment])) Or
               ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
               Begin
@@ -527,6 +551,13 @@ Begin
             BlockType := btNoBlock;
             CurCharType := ttBlockComment;
           End;
+
+        // Check for single string literals
+        If CurCharType = ttSingleLiteral Then
+          If BlockType = btSingleLiteral Then
+            BlockType := btNoBlock
+          Else If BlockType = btNoBlock Then
+            BlockType := btSingleLiteral;
 
         Inc(iColumn);
         If Ch = #10 Then
@@ -806,11 +837,11 @@ end;
   @precon  R must be a valid instance.
   @postcon Returns true if a number was parsed.
 
-  @param   R as a TTLSRoad
+  @param   R as a TTLSShape
   @return  a Boolean
 
 **)
-function TTLSSchematicModule.StartChainage(R : TTLSRoad): Boolean;
+function TTLSSchematicModule.StartChainage(R : TTLSShape): Boolean;
 
 Var
   dbl : Double;
@@ -899,11 +930,11 @@ end;
   @precon  R must be a valid instance.
   @postcon Returns true if an double was parsed.
 
-  @param   R as a TTLSRoad
+  @param   R as a TTLSShape
   @return  a Boolean
 
 **)
-function TTLSSchematicModule.EndChainage(R : TTLSRoad): Boolean;
+function TTLSSchematicModule.EndChainage(R : TTLSShape): Boolean;
 
 Var
   dbl : Double;
@@ -1107,11 +1138,11 @@ End;
   @precon  R must be a valid instance.
   @postcon Returns true if the chainages were successfully parsed.
 
-  @param   R as a TTLSRoad
+  @param   R as a TTLSShape
   @return  a Boolean
 
 **)
-Function TTLSSchematicModule.Chainages(R : TTLSRoad): Boolean;
+Function TTLSSchematicModule.Chainages(R : TTLSShape): Boolean;
 
 Begin
   Result := False;
@@ -1179,7 +1210,8 @@ begin
           End;
         // Check for end of file else must be identifier
         If Not EndOfTokens Then
-          While Road or Objects Or Roads Or Margins Or Spacing Or UnknownToken Do;
+          While Road or Object_ Or Objects Or Roads Or Margins Or Spacing Or
+            UnknownToken Do;
         If Not (Token.TokenType In [ttFileEnd]) Then
           Raise EParserAbort.Create(strUnExpectedEndOfFile);
       End;
@@ -1269,6 +1301,88 @@ end;
 
 (**
 
+  This method parses the Object grammar element of the language.
+
+  @precon  None.
+  @postcon Returns true if the language element was parsed correctly.
+
+  @return  a Boolean
+
+**)
+function TTLSSchematicModule.Object_: Boolean;
+
+var
+  Os: TElementContainer;
+  O: TTLSObject;
+  boolFound: Boolean;
+  iColour: TColour;
+
+begin
+  Result := False;
+  If Token.UToken = 'OBJECT' Then
+    Begin
+      Os := FindElement(strObjects);
+      If Os = Nil Then
+        Os := Add(TLabelContainer.Create(strObjects, scNone, 0, 0, iiPublicClass, Nil));
+      O := Os.Add(TTLSObject.Create(Format('Object%4.4d', [FRoad]), scPublic, Token.Line,
+        Token.Column, iiPublicClass, GetComment)) As TTLSObject;
+      Inc(FRoad);
+      NextNonCommentToken;
+      If Chainages(O) Then
+        If IsKeyWord(Token.Token, ['left', 'right']) Then
+          Begin
+            O.Location := loLeft;
+            If CompareText(Token.Token, 'RIGHT') = 0 Then
+              O.Location := loRight;
+            NextNonCommentToken;
+            If Token.Token = ',' Then
+              Begin
+                NextNonCommentToken;
+                boolFound := False;
+                For iColour := Low(TColour) To High(TColour) Do
+                  If CompareText(Token.Token, strColours[iColour]) = 0 Then
+                    Begin
+                      O.Colour := iColour;
+                      boolFound := True;
+                      Break;
+                    End;
+                If boolFound Then
+                  Begin
+                    NextNonCommentToken;
+                    If Token.Token = ',' Then
+                      Begin
+                        NextNonCommentToken;
+                        If Token.TokenType In [ttSingleLiteral] Then
+                          Begin
+                            O.Text := Copy(Token.Token, 2, Length(Token.Token) - 2);
+                            NextNonCommentToken;
+                          End Else
+                            ErrorAndSeekToken(strStringExpected, 'Object', Token.Token,
+                              strSeekableOnErrorTokens, stActual);
+                      End Else
+                        ErrorAndSeekToken(strLiteralExpected, 'Object', ',',
+                          strSeekableOnErrorTokens, stActual);
+                    If Token.Token = ';' Then
+                      Begin
+                        NextNonCommentToken;
+                        Result := True;
+                      End Else
+                        ErrorAndSeekToken(strLiteralExpected, 'Object', ';',
+                          strSeekableOnErrorTokens, stActual);
+                  End Else
+                    ErrorAndSeekToken(strInvalidColourName, 'Object',
+                      Token.Token, strSeekableOnErrorTokens, stActual);
+              End Else
+                ErrorAndSeekToken(strLiteralExpected, 'Object', ',',
+                  strSeekableOnErrorTokens, stActual);
+          End Else
+            ErrorAndSeekToken(strReservedWordExpected, 'Object', 'Left or Right',
+              strSeekableOnErrorTokens, stActual);
+    End;
+end;
+
+(**
+
   This method processes the offsets portion of the road grammar element.
 
   @precon  R must be a valid instance.
@@ -1325,9 +1439,9 @@ End;
 Function TTLSRoad.AsString(boolShowIdentifier, boolForDocumentation: Boolean) : String;
 
 Begin
-  Result := Format('Road %1.1f, %1.1f, %d, %d, %s, %s', [FStartChainage,
-    FEndChainage, FStartOffset, FEndOffset, strLocations[FLocation],
-    strColours[FColour]]);
+  Result := Format('Road %1.1f, %1.1f, %d, %d, %s, %s', [StartChainage,
+    EndChainage, StartOffset, EndOffset, strLocations[Location],
+    strColours[Colour]]);
 End;
 
 { TSchematicSetting }
@@ -1348,6 +1462,27 @@ function TSchematicSetting.AsString(boolShowIdentifier, boolForDocumentation: Bo
 
 begin
   Result := Format('%s %d%%', [Identifier, FPercentage]);
+end;
+
+{ TTLSObject }
+
+(**
+
+  This method returns a string representation of a schematic object.
+
+  @precon  None.
+  @postcon Returns a string representation of a schematic object.
+
+  @param   boolShowIdentifier   as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TTLSObject.AsString(boolShowIdentifier,
+  boolForDocumentation: Boolean): String;
+begin
+  Result := Format('Object %1.1f, %1.1f, %s, %s, ''%s''', [StartChainage,
+    EndChainage, strLocations[Location], strColours[Colour], Text]);
 end;
 
 End.

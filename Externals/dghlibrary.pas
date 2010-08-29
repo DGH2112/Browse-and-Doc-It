@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Jul 2010
+  @Date    29 Aug 2010
 
 **)
 Unit DGHLibrary;
@@ -6215,14 +6215,20 @@ Begin
   MatchTypes := [];
   If Length(strPattern) = 0 Then
     Exit;
+  If strPattern = '*' Then
+    Begin
+      Result := True;
+      Exit;
+    End;
   If strPattern[1] <> '*' Then
     Include(MatchTypes, mtStart)
   Else
     Delete(strPattern, 1, 1);
-  If strPattern[Length(strPattern)] <> '*' Then
-    Include(MatchTypes, mtEnd)
-  Else
-    Delete(strPattern, Length(strPattern), 1);
+  If Length(strPattern) > 0 Then
+    If strPattern[Length(strPattern)] <> '*' Then
+      Include(MatchTypes, mtEnd)
+    Else
+      Delete(strPattern, Length(strPattern), 1);
   sl := TStringList.Create;
   Try
     For i := 1 To CharCount('*', strPattern) + 1 Do

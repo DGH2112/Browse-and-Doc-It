@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       26 Jun 2010
+  @Date       31 Aug 2010
   @Author     David Hoyle
 
 **)
@@ -13,7 +13,7 @@ Unit EidolonModule;
 Interface
 
 Uses
-  SysUtils, Windows, Contnrs, Classes, BaseLanguageModule;
+  SysUtils, Windows, Contnrs, Classes, BaseLanguageModule, RenderingLibrary;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -137,135 +137,6 @@ Type
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Function AddAssociation(Association : TAssociation) : TAssociation;
   End;
-
-  (** An enumerate for the symbol types. **)
-  TSymbolType = (tstRectangle, tstBar, tstLine, tstEllipse, tstTriangle, tstDiamond);
-
-  (** An enumerate to defined the Excel Colour Indexes **)
-  TColour = (
-    xlcNONE,
-    xlcBLACK,
-    xlcBROWN,
-    xlcOLIVEGREEN,
-    xlcDARKGREEN,
-    xlcDARKTEAL,
-    xlcDARKBLUE,
-    xlcINDIGO,
-    xlcGRAY80,
-    xlcDARKRED,
-    xlcORANGE,
-    xlcDARKYELLOW,
-    xlcGREEN,
-    xlcTEAL,
-    xlcBLUE,
-    xlcBLUEGRAY,
-    xlcGRAY50,
-    xlcRED,
-    xlcLIGHTORANGE,
-    xlcLIME,
-    xlcSEAGREEN,
-    xlcAQUA,
-    xlcLIGHTBLUE,
-    xlcVIOLET,
-    xlcGRAY40,
-    xlcPINK,
-    xlcGOLD,
-    xlcYELLOW,
-    xlcBRIGHTGREEN,
-    xlcTURQUOISE,
-    xlcSKYBLUE,
-    xlcPLUM,
-    xlcGRAY25,
-    xlcROSE,
-    xlcTAN,
-    xlcLIGHTYELLOW,
-    xlcLIGHTGREEN,
-    xlcLIGHTTURQUOISE,
-    xlcPALEBLUE,
-    xlcLAVENDER,
-    xlcWHITE
-  );
-
-  (** An enumerate to define the line styles available in Excel. **)
-  TLineStyle = (
-    lsSOLID,
-    lsROUNDDOT,
-    lsSQUAREDOT,
-    lsDASH,
-    lsDASHDOT,
-    lsLONGDASH,
-    lsLONGDASHDOT,
-    lsDASHDOTDOT
-  );
-
-  (** An enumerate for line weights. **)
-  TLineWeight = (
-    lw0,
-    lw0_25,
-    lw0_5,
-    lw1,
-    lw1_5,
-    lw2_25,
-    lw3,
-    lw4_5,
-    lw6,
-    lwDOUBLE,
-    lwDOUBLETHINTHICK,
-    lwDOUBLETHICKTHIN,
-    lwTRIPLETHICKBETWEENTHIN
-  );
-
-  (** An enumerate for the interior patterns. **)
-  TInteriorPattern = (
-    ipNONE,
-    ip10PERCENT,
-    ip20PERCENT,
-    ip25PERCENT,
-    ip30PERCENT,
-    ip40PERCENT,
-    ip50PERCENT,
-    ip5PERCENT,
-    ip60PERCENT,
-    ip70PERCENT,
-    ip75PERCENT,
-    ip80PERCENT,
-    ip90PERCENT,
-    ipDARKDOWNWARDDIAGONAL,
-    ipDARKHORIZONTAL,
-    ipDARKUPWARDDIAGONAL,
-    ipDARKVERTICAL,
-    ipDASHEDDOWNWARDDIAGONAL,
-    ipDASHEDHORIZONTAL,
-    ipDASHEDUPWARDDIAGONAL,
-    ipDASHEDVERTICAL,
-    ipDIAGONALBRICK,
-    ipDIVOT,
-    ipDOTTEDGRID,
-    ipHORIZONTALBRICK,
-    ipLARGECHECKERBOARD,
-    ipLARGECONFETTI,
-    ipLARGEGRID,
-    ipLIGHTDOWNWARDDIAGONAL,
-    ipLIGHTHORIZONTAL,
-    ipLIGHTUPWARDDIAGONAL,
-    ipLIGHTVERTICAL,
-    ipNARROWHORIZONTAL,
-    ipNARROWVERTICAL,
-    ipOUTLINEDDIAMOND,
-    ipPLAID,
-    ipSHINGLE,
-    ipSMALLCHECKERBOARD,
-    ipSMALLCONFETTI,
-    ipSMALLGRID,
-    ipSOLIDDIAMOND,
-    ipSPHERE,
-    ipTRELLIS,
-    ipWAVE,
-    ipWEAVE,
-    ipWIDEDOWNWARDDIAGONAL,
-    ipWIDEUPWARDDIAGONAL,
-    ipZIGZAG
-  );
 
   (** A base class for all Time Location Symbols **)
   TSymbol = Class(TElementContainer)
@@ -427,9 +298,6 @@ Type
     Property DiamondSize : Integer Read FDiamondSize Write FDiamondSize;
   End;
 
-  (** An enumerate to define the types of Triangle. **)
-  TTriangleType = (ttStartAndEarly, ttStartAndLate, ttEndAndEarly, ttEndAndLate);
-
   (** A class to represent a DIAMOND time location symbol **)
   TTriangle = Class(TCustomFillSymbol)
   {$IFDEF D2005} Strict {$ENDIF} Private
@@ -546,155 +414,10 @@ Type
   End;
 
 Const
-  (** A constant array of names for the enumerated symbols types. **)
-  strSymbolTypes : Array[Low(TSymbolType)..High(TSymbolType)] Of String = (
-    'Rectangle', 'Bar', 'Line', 'Ellipse', 'Triangle', 'Diamond'
-  );
-
-  (** A constant array providing names for the enumerated colours. **)
-  strColours : Array[Low(TColour)..High(TColour)] Of String = (
-    'None',          
-    'Black',
-    'Brown',
-    'OliveGreen',
-    'DarkGreen',
-    'DarkTeal',
-    'DarkBlue',
-    'Indigo',
-    'Gray-80%',
-    'DarkRed',
-    'Orange',
-    'DarkYellow',
-    'Green',
-    'Teal',
-    'Blue',
-    'Blue-Gray',
-    'Gray-50%',
-    'Red',
-    'LightOrange',
-    'Lime',
-    'SeaGreen',
-    'Aqua',
-    'LightBlue',
-    'Violet',
-    'Gray-40%',
-    'Pink',
-    'Gold',
-    'Yellow',
-    'BrightGreen',
-    'Turquoise',
-    'SkyBlue',
-    'Plum',
-    'Gray-25%',
-    'Rose',
-    'Tan',
-    'LightYellow',
-    'LightGreen',
-    'LightTurquoise',
-    'PaleBlue',
-    'Lavender',
-    'White'
-  );
-
-  (** A constant array of line style names for the enumerated styles **)
-  strLineStyles : Array[Low(TLineStyle)..High(TLineStyle)] Of String = (
-    'Solid',
-    'RoundDot',
-    'SquareDot',
-    'Dash',
-    'DashDot',
-    'LongDash',
-    'LongDashDot',
-    'DashDotDot'
-  );
-
-  (** A constant array of line weights names for the enumerated weights **)
-  strLineWeights : Array[Low(TLineWeight)..High(TLineWeight)] Of String = (
-    'None',
-    '0.25',
-    '0.5',
-    '1',
-    '1.5',
-    '2.25',
-    '3',
-    '4.5',
-    '6',
-    'Double',
-    'DoubleThinThick',
-    'DoubleThickThin',
-    'TripleThickBetweenThin'
-  );
-
-  (** A constant array of names for the enumerated interior patterns. **)
-  strInteriorPatterns : Array[Low(TInteriorPattern)..High(TInteriorPattern)] Of String = (
-    'None',
-    '10Percent',
-    '20Percent',
-    '25Percent',
-    '30Percent',
-    '40Percent',
-    '50Percent',
-    '5Percent',
-    '60Percent',
-    '70Percent',
-    '75Percent',
-    '80Percent',
-    '90Percent',
-    'DarkDownwardDiagonal',
-    'DarkHorizontal',
-    'DarkUpwardDiagonal',
-    'DarkVertical',
-    'DashedDownwardDiagonal',
-    'DashedHorizontal',
-    'DashedUpwardDiagonal',
-    'DashedVertical',
-    'DiagonalBrick',
-    'Divot',
-    'DottedGrid',
-    'HorizontalBrick',
-    'LargeCheckerBoard',
-    'LargeConfetti',
-    'LargeGrid',
-    'LightDownwardDiagonal',
-    'LightHorizontal',
-    'LightUpwardDiagonal',
-    'LightVertical',
-    'NarrowHorizontal',
-    'NarrowVertical',
-    'OutlinedDiamond',
-    'Plaid',
-    'Shingle',
-    'SmallCheckerBoard',
-    'SmallConfetti',
-    'SmallGrid',
-    'SolidDiamond',
-    'Sphere',
-    'Trellis',
-    'Wave',
-    'Weave',
-    'WideDownwardDiagonal',
-    'WideUpwardDiagonal',
-    'Zigzag'
-  );
-
-  (** A constant array to defines the names of the triangle types. **)
-  strTriangleTypes : Array[Low(TTriangleType)..High(TTriangleType)] Of String = (
-    'StartAndEarly', 'StartAndLate', 'EndAndEarly', 'EndAndLate'
-  );
-
   (** This is a class to represent the starting symbols for Primary and
       Secondary connections. **)
   strConnectionType : Array[Low(TConnectionType)..High(TConnectionType)] Of
     String = ('#', '@');
-
-  (** A constant array of RGB colours for the excel palette. **)
-  Colours : Array[Low(TColour)..High(TColour)] of Integer = (
-    -1,
-    $000000, $003399, $003333, $003300, $663300, $800000, $993333, $333333,
-    $000080, $0066FF, $008080, $008000, $808000, $FF0000, $996666, $808080,
-    $0000FF, $0099FF, $00CC99, $669933, $CCCC33, $FF6633, $800080, $969696,
-    $FF00FF, $00CCFF, $00FFFF, $00FF00, $FFFF00, $FFCC00, $663399, $C0C0C0,
-    $CC99FF, $99CCFF, $99FFFF, $CCFFCC, $FFFFCC, $FFCC99, $FF99CC, $FFFFFF);
 
 ResourceString
   (** A resource string for the Text Table definitions. **)

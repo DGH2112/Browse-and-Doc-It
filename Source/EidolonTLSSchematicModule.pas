@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       31 Aug 2010
+  @Date       03 Sep 2010
   @Author     David Hoyle
 
 **)
@@ -18,12 +18,6 @@ Uses
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  (** An enumerate to define the location for Roads. **)
-  TLocation = (loLeft, loRight, loBoth, loOver, loUnder);
-
-  (** An enumerate to define the mearsurement percentages for the diagrams. **)
-  TSetting = (seMargins, seObjects, seRoads, seSpacing);
-
   (** An abstract class from which Road and Object are derived. **)
   TTLSShape = Class {$IFDEF D2005} Abstract {$ENDIF}(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Private
@@ -31,6 +25,7 @@ Type
     FEndChainage : Double;
     FLocation : TLocation;
     FColour : TColour;
+    FRouteCode: String;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     (**
@@ -61,6 +56,13 @@ Type
       @return  a TColour
     **)
     Property Colour : TColour Read FColour Write FColour;
+    (**
+      This property gets and sets the Route Code of the shape.
+      @precon  None.
+      @postcon Gets and sets the Route Code of the shape.
+      @return  a String
+    **)
+    Property RouteCode : String Read FRouteCode Write FRouteCode;
   End;
 
   (** A class to represent the roads in the diagram. **)
@@ -149,6 +151,7 @@ Type
     Function Offsets(R : TTLSRoad) : Boolean;
     Procedure Percentage(S : TSchematicSetting);
     Function UnknownToken : Boolean;
+    Procedure RouteCode(S : TTLSShape);
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
@@ -733,6 +736,7 @@ begin
                   If boolFound Then
                     Begin
                       NextNonCommentToken;
+                      RouteCode(R);
                       If Token.Token = ';' Then
                         Begin
                           NextNonCommentToken;
@@ -787,6 +791,31 @@ begin
           Result := True;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'Roads', ';',
+            strSeekableOnErrorTokens, stActual);
+    End;
+end;
+
+(**
+
+  This method parses the route code element of the grammar.
+
+  @precon  S must be a valid instance.
+  @postcon Parses the route code element of the grammar.
+
+  @param   S as a TTLSShape
+
+**)
+procedure TTLSSchematicModule.RouteCode(S : TTLSShape);
+begin
+  If Token.Token = ',' Then
+    Begin
+      NextNonCommentToken;
+      If Token.TokenType In [ttSingleLiteral] Then
+        Begin
+          S.RouteCode := Copy(Token.Token, 2, Length(Token.Token) - 2);
+          NextNonCommentToken;
+        End Else
+          ErrorAndSeekToken(strStringExpected, 'RouteCode', Token.Token,
             strSeekableOnErrorTokens, stActual);
     End;
 end;
@@ -1362,6 +1391,7 @@ begin
                           Begin
                             O.Text := Copy(Token.Token, 2, Length(Token.Token) - 2);
                             NextNonCommentToken;
+                            RouteCode(O);
                           End Else
                             ErrorAndSeekToken(strStringExpected, 'Object', Token.Token,
                               strSeekableOnErrorTokens, stActual);
@@ -1448,6 +1478,8 @@ Begin
   Result := Format('Road %1.1f, %1.1f, %d, %d, %s, %s', [StartChainage,
     EndChainage, StartOffset, EndOffset, strLocations[Location],
     strColours[Colour]]);
+  If RouteCode <> '' Then
+    Result := Result + Format(', ''%s''', [RouteCode]);
 End;
 
 { TSchematicSetting }
@@ -1489,6 +1521,8 @@ function TTLSObject.AsString(boolShowIdentifier,
 begin
   Result := Format('Object %1.1f, %1.1f, %s, %s, ''%s''', [StartChainage,
     EndChainage, strLocations[Location], strColours[Colour], Text]);
+  If RouteCode <> '' Then
+    Result := Result + Format(', ''%s''', [RouteCode]);
 end;
 
 End.

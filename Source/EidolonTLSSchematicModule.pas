@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       11 Sep 2010
+  @Date       12 Sep 2010
   @Author     David Hoyle
 
 **)
@@ -108,7 +108,7 @@ Interface
     (** A class to represent a schematic setting. **)
     TSchematicSetting = Class(TElementContainer)
     {$IFDEF D2005} Strict {$ENDIF} Private
-      FPercentage : Integer;
+      FPercentage : Double;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Public
       Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
@@ -116,9 +116,9 @@ Interface
         This property gets ans sets the percentage of the settings.
         @precon  None.
         @postcon Gets ans sets the percentage of the settings.
-        @return  an Integer
+        @return  an Double
       **)
-      Property Percentage : Integer Read FPercentage Write FPercentage;
+      Property Percentage : Double Read FPercentage Write FPercentage;
     End;
 
     (** A pascal specific implementation of comments. **)
@@ -133,7 +133,7 @@ Interface
     {$IFDEF D2005} Strict {$ENDIF} Private
       FSource        : String;
       FRoad          : Integer;
-      FSettings      : Array[Low(TSetting)..High(TSetting)] Of Integer;
+      FSettings      : Array[Low(TSetting)..High(TSetting)] Of Double;
       FMaxRoads      : Double;
       FDebug         : Boolean;
       { Grammar Parsers }
@@ -680,16 +680,16 @@ Implementation
   Procedure TTLSSchematicModule.Percentage(S: TSchematicSetting);
 
   Var
-    i : Integer;
+    dbl : Double;
     iErrorCode : Integer;
 
   begin
     If Token.TokenType In [ttNumber] Then
       Begin
-        Val(Token.Token, i, iErrorCode);
+        Val(Token.Token, dbl, iErrorCode);
         If iErrorCode = 0 Then
           Begin
-            S.Percentage := i;
+            S.Percentage := dbl;
             NextNonCommentToken;
             If Token.Token = '%' Then
               NextNonCommentToken
@@ -1539,7 +1539,7 @@ Implementation
   function TSchematicSetting.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 
   begin
-    Result := Format('%s %d%%', [Identifier, FPercentage]);
+    Result := Format('%s %1.1f%%', [Identifier, FPercentage]);
   end;
 
   { TTLSObject }

@@ -22,10 +22,11 @@ Interface
     TTLSShape = Class {$IFDEF D2005} Abstract {$ENDIF}(TElementContainer)
     {$IFDEF D2005} Strict {$ENDIF} Private
       FStartChainage : Double;
-      FEndChainage : Double;
-      FLocation : TLocation;
-      FColour : TColour;
-      FRouteCode: String;
+      FEndChainage   : Double;
+      FLocation      : TLocation;
+      FColour        : TColour;
+      FRouteCode     : String;
+      FWidth         : Double;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Public
       (**
@@ -63,6 +64,13 @@ Interface
         @return  a String
       **)
       Property RouteCode : String Read FRouteCode Write FRouteCode;
+      (**
+        This property gets and sets the width of the shape.
+        @precon  None.
+        @postcon Gets and sets the width of the shape.
+        @return  a Double
+      **)
+      Property Width : Double Read FWidth Write FWidth;
     End;
 
     (** A class to represent the roads in the diagram. **)
@@ -136,6 +144,8 @@ Interface
       FSettings      : Array[Low(TSetting)..High(TSetting)] Of Double;
       FMaxRoads      : Double;
       FDebug         : Boolean;
+      FCurrentRoad   : Double;
+      FCurrentObject : Double;
       { Grammar Parsers }
       Procedure Goal;
       Function Road : Boolean;
@@ -150,7 +160,7 @@ Interface
       Function EndOffset(R : TTLSRoad) : Boolean;
       Function Chainages(R : TTLSShape) : Boolean;
       Function Offsets(R : TTLSRoad) : Boolean;
-      Procedure Percentage(S : TSchematicSetting);
+      Function Percentage(S : TSchematicSetting) : Double;
       Function CentreLine : Boolean;
       Function Debugging : Boolean;
       Function UnknownToken : Boolean;
@@ -207,6 +217,8 @@ Interface
     strRoads = 'Roads';
     (** A resource string for the Objects node in the tree. **)
     strObjects = 'Objects';
+    (** A resource string for named width objects in the tree. **)
+    strNamedWidths = 'Named Widths';
 
 Implementation
 
@@ -215,7 +227,7 @@ Implementation
 
   Const
     (** A set of characters for general symbols **)
-    strSymbols : Set Of AnsiChar = ['&', '(', ')', '*', '+', ',', '.', '/',
+    strSymbols : Set Of AnsiChar = ['&', '(', ')', '*', '+', '.', '/',
       ':', '=', '@', '[', ']', '^', '|', '%', '-'];
     (** A set of characters for single quotes **)
     strSingleQuotes : Set Of AnsiChar = [''''];
@@ -347,8 +359,8 @@ Implementation
     FRoad := 1;
     FmaxRoads := 1;
     FSettings[seMargins] := 2;
-    FSettings[seRoads] := 5;
-    FSettings[seObjects] := 5;
+    FCurrentRoad := 5;
+    FCurrentObject := 5;
     FSettings[seSpacing] := 2;
     FDebug := False;
     AddTickCount('Start');
@@ -676,21 +688,23 @@ Implementation
     @postcon Parses the Percentage element of the Grammar.
 
     @param   S as a TSchematicSetting
+    @return  a Double
 
   **)
-  Procedure TTLSSchematicModule.Percentage(S: TSchematicSetting);
+  Function TTLSSchematicModule.Percentage(S: TSchematicSetting) : Double;
 
   Var
-    dbl : Double;
     iErrorCode : Integer;
 
   begin
+    Result := 0;
     If Token.TokenType In [ttNumber] Then
       Begin
-        Val(Token.Token, dbl, iErrorCode);
+        Val(Token.Token, Result, iErrorCode);
         If iErrorCode = 0 Then
           Begin
-            S.Percentage := dbl;
+            If S <> Nil Then
+              S.Percentage := Result;
             NextNonCommentToken;
             If Token.Token = '%' Then
               NextNonCommentToken
@@ -754,6 +768,7 @@ Implementation
         R := Rs.Add(TTLSRoad.Create(Format('Road%4.4d', [FRoad]), scPublic, Token.Line,
           Token.Column, iiPublicClass, GetComment)) As TTLSRoad;
         Inc(FRoad);
+        R.Width := FCurrentRoad;
         NextNonCommentToken;
         If Chainages(R) Then
           If Offsets(R) Then
@@ -809,23 +824,12 @@ Implementation
   **)
   function TTLSSchematicModule.Roads: Boolean;
 
-  var
-    Rs: TElementContainer;
-    R: TSchematicSetting;
-
   begin
     Result := False;
     If Token.UToken = 'ROADS' Then
       Begin
-        Rs := FindElement(strSettings);
-        If Rs = Nil Then
-          Rs := Add(TLabelContainer.Create(strSettings, scNone, 0, 0,
-            iiPublicTypesLabel, Nil)) As TLabelContainer;
-        R := Rs.Add(TSchematicSetting.Create('Roads', scNone, Token.Line,
-          Token.Column, iiPublicType, Nil)) As TSchematicSetting;
         NextNonCommentToken;
-        Percentage(R);
-        FSettings[seRoads] := R.Percentage;
+        FCurrentRoad := Percentage(Nil);
         If Token.Token = ';' Then
           Begin
             NextNonCommentToken;
@@ -1382,22 +1386,42 @@ Implementation
   function TTLSSchematicModule.Objects: Boolean;
 
   var
-    Os: TElementContainer;
-    O: TSchematicSetting;
+    strName: String;
+    NWs: TElementContainer;
+    T : TTokenInfo;
+    NW: TSchematicSetting;
+    dblPercentage : Double;
 
   begin
     Result := False;
     If Token.UToken = 'OBJECTS' Then
       Begin
-        Os := FindElement(strSettings);
-        If Os = Nil Then
-          Os := Add(TLabelContainer.Create(strSettings, scNone, 0, 0,
-            iiPublicTypesLabel, Nil)) As TLabelContainer;
-        O := Os.Add(TSchematicSetting.Create('Objects', scNone, Token.Line,
-          Token.Column, iiPublicType, Nil)) As TSchematicSetting;
+        T := Token;
         NextNonCommentToken;
-        Percentage(O);
-        FSettings[seObjects] := O.Percentage;
+        dblPercentage := Percentage(Nil);
+        If Token.Token = ';' Then
+          FCurrentObject := dblPercentage
+        Else
+          Begin
+            If Token.Token = ',' Then
+              Begin
+                NextNonCommentToken;
+                If Token.TokenType In [ttSingleLiteral] Then
+                  Begin
+                    strName := Copy(Token.Token, 2, Length(Token.Token) - 2);
+                    NWs := FindElement(strNamedWidths);
+                    If NWs = Nil Then
+                      NWs := Add(TlabelContainer.Create(strNamedWidths, scNone,
+                        0,  0, iiPublicVariablesLabel, Nil));
+                    NW := Nws.Add(TSchematicSetting.Create(strName, scNone,
+                      T.Line, T.Column, iiPublicVariable, Nil)) As TSchematicSetting;
+                    NW.Percentage := dblPercentage;
+                    NextNonCommentToken;
+                  End Else
+                    ErrorAndSeekToken(strStringExpected, 'Objects', Token.Token,
+                      strSeekableOnErrorTokens, stActual);
+              End;
+          End;
         If Token.Token = ';' Then
           Begin
             NextNonCommentToken;
@@ -1436,6 +1460,7 @@ Implementation
         O := Os.Add(TTLSObject.Create(Format('Object%4.4d', [FRoad]), scPublic, Token.Line,
           Token.Column, iiPublicClass, GetComment)) As TTLSObject;
         Inc(FRoad);
+        O.Width := FCurrentObject;
         NextNonCommentToken;
         If Chainages(O) Then
           If IsKeyWord(Token.Token, ['both', 'left', 'over', 'right', 'under']) Then
@@ -1555,9 +1580,9 @@ Implementation
   Function TTLSRoad.AsString(boolShowIdentifier, boolForDocumentation: Boolean) : String;
 
   Begin
-    Result := Format('Road %1.1f, %1.1f, %d, %d, %s, %s', [StartChainage,
+    Result := Format('Road %1.1f, %1.1f, %d, %d, %s, %s, %1.1f%%', [StartChainage,
       EndChainage, StartOffset, EndOffset, strLocations[Location],
-      strColours[Colour]]);
+      strColours[Colour], Width]);
     If RouteCode <> '' Then
       Result := Result + Format(', ''%s''', [RouteCode]);
   End;
@@ -1599,8 +1624,8 @@ Implementation
   function TTLSObject.AsString(boolShowIdentifier,
     boolForDocumentation: Boolean): String;
   begin
-    Result := Format('Object %1.1f, %1.1f, %s, %s, ''%s''', [StartChainage,
-      EndChainage, strLocations[Location], strColours[Colour], Text]);
+    Result := Format('Object %1.1f, %1.1f, %s, %s, ''%s'', %1.1f%%', [StartChainage,
+      EndChainage, strLocations[Location], strColours[Colour], Text, Width]);
     If RouteCode <> '' Then
       Result := Result + Format(', ''%s''', [RouteCode]);
   end;

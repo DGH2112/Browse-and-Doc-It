@@ -151,6 +151,7 @@ Interface
       Function Chainages(R : TTLSShape) : Boolean;
       Function Offsets(R : TTLSRoad) : Boolean;
       Procedure Percentage(S : TSchematicSetting);
+      Function CentreLine : Boolean;
       Function Debugging : Boolean;
       Function UnknownToken : Boolean;
       Procedure RouteCode(S : TTLSShape);
@@ -226,8 +227,8 @@ Implementation
     strNumbers:  Set Of AnsiChar = ['#', '$', '0'..'9'];
 
     (** A set of reserved words (not used in this parser.) **)
-    strReservedWords : Array[0..7] Of String = ('debug', 'margins', 'object',
-      'objects', 'road', 'roads', 'spacing', 'text');
+    strReservedWords : Array[0..8] Of String = ('centreline', 'debug',
+      'margins', 'object', 'objects', 'road', 'roads', 'spacing', 'text');
 
     (** This is a list of reserved, directives word and a semi colon which are
         token that can be sort as then next place to start parsing from when an
@@ -1202,6 +1203,45 @@ Implementation
 
   (**
 
+    This method parses the centre Line element of the grammar.
+
+    @precon  None.
+    @postcon Parses the centre Line element of the grammar.
+
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.CentreLine: Boolean;
+
+  var
+    Ss: TElementContainer;
+    S: TSchematicSetting;
+
+  begin
+    Result := False;
+    If Token.UToken = 'CENTRELINE' Then
+      Begin
+        Ss := FindElement(strSettings);
+        If Ss = Nil Then
+          Ss := Add(TLabelContainer.Create(strSettings, scNone, 0, 0,
+            iiPublicTypesLabel, Nil)) As TLabelContainer;
+        S := Ss.Add(TSchematicSetting.Create('CentreLine', scNone, Token.Line,
+          Token.Column, iiPublicType, Nil)) As TSchematicSetting;
+        NextNonCommentToken;
+        Percentage(S);
+        FSettings[seCentreLine] := S.Percentage;
+        If Token.Token = ';' Then
+          Begin
+            NextNonCommentToken;
+            Result := True;
+          End Else
+            ErrorAndSeekToken(strLiteralExpected, 'CentreLine', ';',
+              strSeekableOnErrorTokens, stActual);
+      End;
+  end;
+
+  (**
+
     This method processes the chinages from the road element of the grammar.
 
     @precon  R must be a valid instance.
@@ -1280,7 +1320,7 @@ Implementation
           // Check for end of file else must be identifier
           If Not EndOfTokens Then
             While Road or Object_ Or Objects Or Roads Or Margins Or Spacing Or
-              Debugging Or UnknownToken Do;
+              Debugging Or CentreLine Or UnknownToken Do;
           If Not (Token.TokenType In [ttFileEnd]) Then
             Raise EParserAbort.Create(strUnExpectedEndOfFile);
         End;

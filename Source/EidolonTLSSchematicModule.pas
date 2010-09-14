@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       12 Sep 2010
+  @Date       14 Sep 2010
   @Author     David Hoyle
 
 **)
@@ -27,6 +27,9 @@ Interface
       FColour        : TColour;
       FRouteCode     : String;
       FWidth         : Double;
+      FLineColour    : TColour;
+      FLineStyle     : TLineStyle;
+      FLineWeight    : TLineWeight;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Public
       (**
@@ -71,6 +74,27 @@ Interface
         @return  a Double
       **)
       Property Width : Double Read FWidth Write FWidth;
+      (**
+        This property gets and sets the line colour for the shape.
+        @precon  None.
+        @postcon Gets and sets the line colour for the shape.
+        @return  a TColour
+      **)
+      Property LineColour : TColour Read FLineColour Write FLineColour;
+      (**
+        This property gets and sets the line style for the shape.
+        @precon  None.
+        @postcon Gets and sets the line style for the shape.
+        @return  a TLineStyle
+      **)
+      Property LineStyle : TLineStyle Read FLineStyle Write FLineStyle;
+      (**
+        This property gets and sets the line weight for the shape.
+        @precon  None.
+        @postcon Gets and sets the line weight for the shape.
+        @return  a TLineWeight
+      **)
+      Property LineWeight : TLineWeight Read FLineWeight Write FLineWeight;
     End;
 
     (** A class to represent the roads in the diagram. **)
@@ -146,6 +170,9 @@ Interface
       FDebug         : Boolean;
       FCurrentRoad   : Double;
       FCurrentObject : Double;
+      FLineColour    : TColour;
+      FLineStyle     : TLineStyle;
+      FLineWeight    : TLineWeight;
       { Grammar Parsers }
       Procedure Goal;
       Function Road : Boolean;
@@ -165,10 +192,15 @@ Interface
       Function Debugging : Boolean;
       Function UnknownToken : Boolean;
       Procedure RouteCode(S : TTLSShape);
+      Function Lines: Boolean;
+      Function LineStyle: Boolean;
+      Function LineWeight: Boolean;
+      Function LineColour : Boolean;
       (* Helper method to the grammar parsers *)
       Procedure TokenizeStream;
       Procedure ParseTokens;
       function GetSettings(S: TSetting): Double;
+      Function CheckLiteral(strLiteral, strMethod: String): Boolean;
     {$IFDEF D2005} Strict {$ENDIF} Protected
       Function GetComment(
         CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
@@ -239,8 +271,9 @@ Implementation
     strNumbers:  Set Of AnsiChar = ['#', '$', '0'..'9'];
 
     (** A set of reserved words (not used in this parser.) **)
-    strReservedWords : Array[0..8] Of String = ('centreline', 'debug',
-      'margins', 'object', 'objects', 'road', 'roads', 'spacing', 'text');
+    strReservedWords : Array[0..9] Of String = ('centreline', 'debug',
+      'lines', 'margins', 'object', 'objects', 'road', 'roads', 'spacing',
+      'text');
 
     (** This is a list of reserved, directives word and a semi colon which are
         token that can be sort as then next place to start parsing from when an
@@ -273,6 +306,10 @@ Implementation
     (** An error message for chainages the wrong way around. **)
     strChainageError = 'The end chainage is less than or equal to the start ch' +
     'ainage (''%s'') at line %d column %d.';
+    (** A resource string for an invalid line style. **)
+    strInvalidLineStyle = 'Invalid line style ''%s'' at line %d column %d.';
+    (** A resource string for an invalid line weight. **)
+    strInvalidLineWeight = 'Invalid line weight ''%s'' at line %d column %d.';
 
   (**
 
@@ -363,6 +400,9 @@ Implementation
     FCurrentObject := 5;
     FSettings[seSpacing] := 2;
     FDebug := False;
+    FLineColour := xlcBlack;
+    FLineStyle := lsSOLID;
+    FLineWeight := lw0_25;
     AddTickCount('Start');
     CommentClass := TTLSSchematicComment;
     TokenizeStream;
@@ -403,14 +443,11 @@ Implementation
     If Token.UToken = 'DEBUG' Then
       Begin
         NextNonCommentToken;
-        If Token.Token = ';' Then
+        If CheckLiteral(';', 'Debugging') Then
           Begin
-            NextNonCommentToken;
             FDebug := True;
             Result := True;
-          End Else
-            ErrorAndSeekToken(strLiteralExpected, 'Debugging', ';',
-              strSeekableOnErrorTokens, stActual);
+          End;
       End;
   end;
 
@@ -706,11 +743,7 @@ Implementation
             If S <> Nil Then
               S.Percentage := Result;
             NextNonCommentToken;
-            If Token.Token = '%' Then
-              NextNonCommentToken
-            Else
-              ErrorAndSeekToken(strLiteralExpected, 'Percentage', '%',
-                strSeekableOnErrorTokens, stActual);
+            CheckLiteral('%', 'Percentage');
           End Else
             ErrorAndSeekToken(strIntegerExpected, 'Percentage', Token.Token,
               strSeekableOnErrorTokens, stActual);
@@ -769,6 +802,9 @@ Implementation
           Token.Column, iiPublicClass, GetComment)) As TTLSRoad;
         Inc(FRoad);
         R.Width := FCurrentRoad;
+        R.LineColour := FLineColour;
+        R.LineStyle := FLineStyle;
+        R.LineWeight := FLineWeight;
         NextNonCommentToken;
         If Chainages(R) Then
           If Offsets(R) Then
@@ -778,9 +814,8 @@ Implementation
                 If CompareText(Token.Token, 'RIGHT') = 0 Then
                   R.Location := loRight;
                 NextNonCommentToken;
-                If Token.Token = ',' Then
+                If CheckLiteral(',', 'Road') Then
                   Begin
-                    NextNonCommentToken;
                     boolFound := False;
                     For iColour := Low(TColour) To High(TColour) Do
                       If CompareText(Token.Token, strColours[iColour]) = 0 Then
@@ -793,19 +828,12 @@ Implementation
                       Begin
                         NextNonCommentToken;
                         RouteCode(R);
-                        If Token.Token = ';' Then
-                          Begin
-                            NextNonCommentToken;
-                            Result := True;
-                          End Else
-                            ErrorAndSeekToken(strLiteralExpected, 'Road', ';',
-                              strSeekableOnErrorTokens, stActual);
+                        If CheckLiteral(';', 'Road') Then
+                          Result := True;
                       End Else
                         ErrorAndSeekToken(strInvalidColourName, 'Road',
                           Token.Token, strSeekableOnErrorTokens, stActual);
-                  End Else
-                    ErrorAndSeekToken(strLiteralExpected, 'Road', ',',
-                      strSeekableOnErrorTokens, stActual);
+                  End;
               End Else
                 ErrorAndSeekToken(strReservedWordExpected, 'Road', 'Left or Right',
                   strSeekableOnErrorTokens, stActual);
@@ -830,13 +858,8 @@ Implementation
       Begin
         NextNonCommentToken;
         FCurrentRoad := Percentage(Nil);
-        If Token.Token = ';' Then
-          Begin
-            NextNonCommentToken;
-            Result := True;
-          End Else
-            ErrorAndSeekToken(strLiteralExpected, 'Roads', ';',
-              strSeekableOnErrorTokens, stActual);
+        If CheckLiteral(';', 'Roads') Then
+          Result := True;
       End;
   end;
 
@@ -894,13 +917,8 @@ Implementation
         NextNonCommentToken;
         Percentage(S);
         FSettings[seSpacing] := S.Percentage;
-        If Token.Token = ';' Then
-          Begin
-            NextNonCommentToken;
-            Result := True;
-          End Else
-            ErrorAndSeekToken(strLiteralExpected, 'Spacing', ';',
-              strSeekableOnErrorTokens, stActual);
+        If CheckLiteral(';', 'Spacing') Then
+          Result := True;
       End;
   end;
 
@@ -1234,13 +1252,8 @@ Implementation
         NextNonCommentToken;
         Percentage(S);
         FSettings[seCentreLine] := S.Percentage;
-        If Token.Token = ';' Then
-          Begin
-            NextNonCommentToken;
-            Result := True;
-          End Else
-            ErrorAndSeekToken(strLiteralExpected, 'CentreLine', ';',
-              strSeekableOnErrorTokens, stActual);
+        If CheckLiteral(';', 'CentreLine') Then
+          Result := True;
       End;
   end;
 
@@ -1261,25 +1274,14 @@ Implementation
     Result := False;
     If StartChainage(R) Then
       Begin
-        If Token.Token = ',' Then
-          Begin
-            NextNonCommentToken;
-            If EndChainage(R) Then
-              Begin
-                If Token.Token = ',' Then
-                  Begin
-                    NextNonCommentToken;
-                    Result := True
-                  End Else
-                    ErrorAndSeekToken(strLiteralExpected, 'Chainages', ';',
-                      strSeekableOnErrorTokens, stActual);
-              End Else
-                ErrorAndSeekToken(strExpectedAnEndChainage, 'Chainages',
-                  Token.Token, strSeekableOnErrorTokens, stActual);
-          End
-        Else
-          ErrorAndSeekToken(strLiteralExpected, 'Chainages', ',',
-            strSeekableOnErrorTokens, stActual);
+        If CheckLiteral(',', 'Chainage') Then
+          If EndChainage(R) Then
+            Begin
+              If CheckLiteral(',', 'Chainage') Then
+                Result := True;
+            End Else
+              ErrorAndSeekToken(strExpectedAnEndChainage, 'Chainages',
+                Token.Token, strSeekableOnErrorTokens, stActual);
       End Else
         ErrorAndSeekToken(strExpectedAStartChainage, 'Chainages', Token.Token,
           strSeekableOnErrorTokens, stActual);
@@ -1324,7 +1326,7 @@ Implementation
           // Check for end of file else must be identifier
           If Not EndOfTokens Then
             While Road or Object_ Or Objects Or Roads Or Margins Or Spacing Or
-              Debugging Or CentreLine Or UnknownToken Do;
+              Debugging Or CentreLine Or Lines Or UnknownToken Do;
           If Not (Token.TokenType In [ttFileEnd]) Then
             Raise EParserAbort.Create(strUnExpectedEndOfFile);
         End;
@@ -1363,13 +1365,8 @@ Implementation
         NextNonCommentToken;
         Percentage(M);
         FSettings[seMargins] := M.Percentage;
-        If Token.Token = ';' Then
-          Begin
-            NextNonCommentToken;
-            Result := True;
-          End Else
-            ErrorAndSeekToken(strLiteralExpected, 'Margins', ';',
-              strSeekableOnErrorTokens, stActual);
+        If CheckLiteral(';', 'Margins') Then
+          Result := True;
       End;
   end;
 
@@ -1422,13 +1419,8 @@ Implementation
                       strSeekableOnErrorTokens, stActual);
               End;
           End;
-        If Token.Token = ';' Then
-          Begin
-            NextNonCommentToken;
-            Result := True;
-          End Else
-            ErrorAndSeekToken(strLiteralExpected, 'Objects', ';',
-              strSeekableOnErrorTokens, stActual);
+        If CheckLiteral(';', 'Objects') Then
+          Result := True;
       End;
   end;
 
@@ -1461,6 +1453,9 @@ Implementation
           Token.Column, iiPublicClass, GetComment)) As TTLSObject;
         Inc(FRoad);
         O.Width := FCurrentObject;
+        O.LineColour := FLineColour;
+        O.LineStyle := FLineStyle;
+        O.LineWeight := FLineWeight;
         NextNonCommentToken;
         If Chainages(O) Then
           If IsKeyWord(Token.Token, ['both', 'left', 'over', 'right', 'under']) Then
@@ -1475,9 +1470,8 @@ Implementation
               Else If CompareText(Token.Token, 'UNDER') = 0 Then
                 O.Location := loUnder;
               NextNonCommentToken;
-              If Token.Token = ',' Then
+              If CheckLiteral(',', 'Object_') Then
                 Begin
-                  NextNonCommentToken;
                   boolFound := False;
                   For iColour := Low(TColour) To High(TColour) Do
                     If CompareText(Token.Token, strColours[iColour]) = 0 Then
@@ -1489,9 +1483,8 @@ Implementation
                   If boolFound Then
                     Begin
                       NextNonCommentToken;
-                      If Token.Token = ',' Then
+                      If CheckLiteral(',', 'Object_') Then
                         Begin
-                          NextNonCommentToken;
                           If Token.TokenType In [ttSingleLiteral] Then
                             Begin
                               O.Text := Copy(Token.Token, 2, Length(Token.Token) - 2);
@@ -1500,22 +1493,13 @@ Implementation
                             End Else
                               ErrorAndSeekToken(strStringExpected, 'Object', Token.Token,
                                 strSeekableOnErrorTokens, stActual);
-                        End Else
-                          ErrorAndSeekToken(strLiteralExpected, 'Object', ',',
-                            strSeekableOnErrorTokens, stActual);
-                      If Token.Token = ';' Then
-                        Begin
-                          NextNonCommentToken;
-                          Result := True;
-                        End Else
-                          ErrorAndSeekToken(strLiteralExpected, 'Object', ';',
-                            strSeekableOnErrorTokens, stActual);
+                        End;
+                      If CheckLiteral(';', 'Object_') Then
+                        Result := True;
                     End Else
                       ErrorAndSeekToken(strInvalidColourName, 'Object',
                         Token.Token, strSeekableOnErrorTokens, stActual);
-                End Else
-                  ErrorAndSeekToken(strLiteralExpected, 'Object', ',',
-                    strSeekableOnErrorTokens, stActual);
+                End;
             End Else
               ErrorAndSeekToken(strReservedWordExpected, 'Object', 'Left or Right',
                 strSeekableOnErrorTokens, stActual);
@@ -1539,29 +1523,168 @@ Implementation
     Result := False;
     If StartOffset(R) Then
       Begin
-        If Token.Token = ',' Then
-          Begin
-            NextNonCommentToken;
-            If EndOffset(R) Then
-              Begin
-                If Token.Token = ',' Then
-                  Begin
-                    NextNonCommentToken;
-                    Result := True
-                  End Else
-                    ErrorAndSeekToken(strLiteralExpected, 'Offset', ',',
-                      strSeekableOnErrorTokens, stActual);
-              End Else
-                ErrorAndSeekToken(strExpectedAnEndOffset, 'Offsets',
-                  Token.Token, strSeekableOnErrorTokens, stActual);
-          End
-        Else
-          ErrorAndSeekToken(strLiteralExpected, 'Offset', ',',
-            strSeekableOnErrorTokens, stActual);
+        If CheckLiteral(',', 'Offsets') Then
+          If EndOffset(R) Then
+            Begin
+              If CheckLiteral(',', 'Offsets') Then
+                Result := True;
+            End Else
+              ErrorAndSeekToken(strExpectedAnEndOffset, 'Offsets',
+                Token.Token, strSeekableOnErrorTokens, stActual);
       End Else
         ErrorAndSeekToken(strExpectedAStartOffet, 'Offsets', Token.Token,
           strSeekableOnErrorTokens, stActual);
   End;
+
+  (**
+
+    This method parses the LineColour element of the grammar.
+
+    @precon  None.
+    @postcon Returns true if the element was parsed successfully and sets the
+             FLineColour variable to the new line colour.
+
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.LineColour: Boolean;
+
+  Var
+    iColour : TColour;
+
+  begin
+    Result := False;
+    For iColour := Low(TColour) To High(TColour) Do
+      If CompareText(Token.Token, strColours[iColour]) = 0 Then
+        Begin
+          FLineColour := iColour;
+          Result := True;
+          NextNonCommentToken;
+          Break;
+        End;
+    If Not Result Then
+      ErrorAndSeekToken(strInvalidColourName, 'LineColour', Token.Token,
+        strSeekableOnErrorTokens, stActual);
+  end;
+
+  (**
+
+    This method parses the Lines element of the grammar.
+
+    @precon  None.
+    @postcon Returns true if the element was parsed successfully.
+
+    @return  a Boolean
+
+  **)
+  Function TTLSSchematicModule.Lines : Boolean;
+
+  begin
+    Result := False;
+    If Token.UToken = 'LINES' Then
+      Begin
+        NextNonCommentToken;
+        If LineColour Then
+          If CheckLiteral(',', 'Lines') Then
+            Begin
+              If LineStyle Then;
+                If CheckLiteral(',', 'Lines') Then
+                  If LineWeight Then
+                    If CheckLiteral(';', 'Lines') Then
+                      Result := True;
+            End;
+      End;
+  end;
+
+  (**
+
+    This method parses the LineStyle element of the grammar.
+
+    @precon  None.
+    @postcon Returns true if the element was parsed successfully and sets the
+             FLineStyle variable to the new line style.
+
+    @return  a Boolean
+
+  **)
+  Function TTLSSchematicModule.LineStyle : Boolean;
+
+  var
+    iLineStyle: TLineStyle;
+
+  begin
+    Result := False;
+    For iLineStyle := Low(TLineStyle) To High(TLineStyle) Do
+      If CompareText(Token.Token, strLineStyles[iLineStyle]) = 0 Then
+        Begin
+          FLineStyle := iLineStyle;
+          Result := True;
+          Break;
+        End;
+    If Result Then
+      NextNonCommentToken
+    Else
+      ErrorAndSeekToken(strInvalidLineStyle, 'LineStyle', Token.Token,
+        strSeekableOnErrorTokens, stActual);
+  end;
+
+  (**
+
+    This method parses the LineWeight element of the grammar.
+
+    @precon  None.
+    @postcon Returns true if the element was parsed successfully and sets the
+             FLineWeight variable to the new line weight.
+
+    @return  a Boolean
+
+  **)
+  Function TTLSSchematicModule.LineWeight : Boolean;
+
+  var
+    iLineWeight: TLineWeight;
+
+  begin
+    Result := False;
+    For iLineWeight := Low(TLineWeight) To High(TLineWeight) Do
+      If CompareText(Token.Token, strLineWeights[iLineWeight]) = 0 Then
+        Begin
+          FLineWeight := iLineWeight;
+          Result := True;
+          Break;
+        End;
+    If Result Then
+      NextNonCommentToken
+    Else
+      ErrorAndSeekToken(strInvalidLineWeight, 'LineWeight', Token.Token,
+        strSeekableOnErrorTokens, stActual);
+  end;
+
+  (**
+
+    This method checks for the presents of a literal in the token stream and
+    returns true if found and moves to the next non comment token.
+
+    @precon  None.
+    @postcon Checks for the presents of a literal in the token stream and
+             returns true if found and moves to the next non comment token.
+
+    @param   strLiteral as a String
+    @param   strMethod  as a String
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.CheckLiteral(strLiteral, strMethod: String): Boolean;
+  begin
+    Result := False;
+    If Token.Token = strLiteral Then
+      Begin
+        Result := True;
+        NextNonCommentToken;
+      End Else
+        ErrorAndSeekToken(strLiteralExpected, strMethod, strLiteral,
+          strSeekableOnErrorTokens, stActual);
+  end;
 
   { TTLSRoad }
 

@@ -4,7 +4,7 @@
   profiles.
 
   @Version 1.0
-  @Date    30 Dec 2008
+  @Date    19 Sep 2010
   @Author  David Hoyle
 
 **)
@@ -320,61 +320,58 @@ Var
   {$ENDIF}
 
 Begin
-  If FRootProfile.CallCount > 0 Then
-    Begin
+  {$IFNDEF CONSOLE}
+  frm := TfrmProgress.Create(Nil);
+  {$ENDIF}
+  Try
+    {$IFDEF CONSOLE}
+    WriteLn('Processing the profile information...');
+    {$ELSE}
+    frm.Init(3, 'Profiling', 'Processing the profile information...');
+    {$ENDIF}
+    GetModuleFileName(hInstance, strBuffer, MAX_PATH);
+    strFileName := StrPas(strBuffer);
+    strModuleFileName := strFileName;
+    strFileName := ChangeFileExt(strFileName, '.profile');
+    slProfile := TStringList.Create;
+    Try
       {$IFNDEF CONSOLE}
-      frm := TfrmProgress.Create(Nil);
+      frm.UpdateProgress(1, 'Loading existing data...');
+      {$ELSE}
+      WriteLn('Loading existing data...');
       {$ENDIF}
-      Try
-        {$IFDEF CONSOLE}
-        WriteLn('Processing the profile information...');
-        {$ELSE}
-        frm.Init(3, 'Profiling', 'Processing the profile information...');
-        {$ENDIF}
-        GetModuleFileName(hInstance, strBuffer, MAX_PATH);
-        strFileName := StrPas(strBuffer);
-        strModuleFileName := strFileName;
-        strFileName := ChangeFileExt(strFileName, '.profile');
-        slProfile := TStringList.Create;
-        Try
-          {$IFNDEF CONSOLE}
-          frm.UpdateProgress(1, 'Loading existing data...');
-          {$ELSE}
-          WriteLn('Loading existing data...');
-          {$ENDIF}
-          If FileExists(strFileName) Then
-            slProfile.LoadFromFile(strFileName);
-          slProfile.Add('Profile Dump For Application ' + strModuleFileName + ' on ' +
-            FormatDateTime('ddd dd/mmm/yyyy @ hh:mm:ss', Now));
-          slProfile.Add(Format('%s,%s,%s,%s,%s,%s', [
-            'Stack Depth',
-            'Class',
-            'Method Name',
-            'Total Tick Count (ms)',
-            'In Process Tick Count (ms)',
-            'Call Count'
-          ]));
-          {$IFNDEF CONSOLE}
-          frm.UpdateProgress(2, 'Processing new data...');
-          {$ELSE}
-          WriteLn('Loading existing data...');
-          {$ENDIF}
-          FRootProfile.DumpProfileInformation(slProfile);
-          {$IFNDEF CONSOLE}
-          frm.UpdateProgress(3, 'Saving data...');
-          {$ELSE}
-          WriteLn('Saving data...');
-          {$ENDIF}
-          slProfile.SaveToFile(strFileName);
-        Finally
-          slProfile.Free;
-        End;
-      Finally
-        {$IFNDEF CONSOLE}
-        frm.Free;
-        {$ENDIF}
-      End;
+      If FileExists(strFileName) Then
+        slProfile.LoadFromFile(strFileName);
+      slProfile.Add('Profile Dump For Application ' + strModuleFileName + ' on ' +
+        FormatDateTime('ddd dd/mmm/yyyy @ hh:mm:ss', Now));
+      slProfile.Add(Format('%s,%s,%s,%s,%s,%s', [
+        'Stack Depth',
+        'Class',
+        'Method Name',
+        'Total Tick Count (ms)',
+        'In Process Tick Count (ms)',
+        'Call Count'
+      ]));
+      {$IFNDEF CONSOLE}
+      frm.UpdateProgress(2, 'Processing new data...');
+      {$ELSE}
+      WriteLn('Loading existing data...');
+      {$ENDIF}
+      FRootProfile.DumpProfileInformation(slProfile);
+      {$IFNDEF CONSOLE}
+      frm.UpdateProgress(3, 'Saving data...');
+      {$ELSE}
+      WriteLn('Saving data...');
+      {$ENDIF}
+      slProfile.SaveToFile(strFileName);
+    Finally
+      slProfile.Free;
     End;
+  Finally
+    {$IFNDEF CONSOLE}
+    frm.Free;
+    {$ENDIF}
+  End;
 end;
 
 (**

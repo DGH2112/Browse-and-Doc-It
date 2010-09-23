@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       14 Sep 2010
+  @Date       23 Sep 2010
   @Author     David Hoyle
 
 **)
@@ -399,6 +399,7 @@ Implementation
     FCurrentRoad := 5;
     FCurrentObject := 5;
     FSettings[seSpacing] := 2;
+    FSettings[seCentreLine] := 50;
     FDebug := False;
     FLineColour := xlcBlack;
     FLineStyle := lsSOLID;

@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       23 Sep 2010
+  @Date       28 Sep 2010
   @Author     David Hoyle
 
 **)
@@ -279,9 +279,6 @@ Implementation
         token that can be sort as then next place to start parsing from when an
         error is  encountered. **)
     strSeekableOnErrorTokens : Array[1..1] Of String = (';');
-    (** A constant array of Locations. **)
-    strLocations : Array[Low(TLocation)..High(TLocation)] Of String = (
-      'Left', 'Right', 'Both', 'Over', 'Under');
 
   ResourceString
     (** A resource string for the settings node. **)
@@ -1705,7 +1702,7 @@ Implementation
 
   Begin
     Result := Format('Road %1.1f, %1.1f, %d, %d, %s, %s, %1.1f%%', [StartChainage,
-      EndChainage, StartOffset, EndOffset, strLocations[Location],
+      EndChainage, StartOffset, EndOffset, Locations[Location],
       strColours[Colour], Width]);
     If RouteCode <> '' Then
       Result := Result + Format(', ''%s''', [RouteCode]);
@@ -1749,7 +1746,7 @@ Implementation
     boolForDocumentation: Boolean): String;
   begin
     Result := Format('Object %1.1f, %1.1f, %s, %s, ''%s'', %1.1f%%', [StartChainage,
-      EndChainage, strLocations[Location], strColours[Colour], Text, Width]);
+      EndChainage, Locations[Location], strColours[Colour], Text, Width]);
     If RouteCode <> '' Then
       Result := Result + Format(', ''%s''', [RouteCode]);
   end;

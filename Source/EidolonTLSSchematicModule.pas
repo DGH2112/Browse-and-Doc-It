@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       28 Sep 2010
+  @Date       29 Sep 2010
   @Author     David Hoyle
 
 **)
@@ -153,6 +153,22 @@ Interface
       Property Percentage : Double Read FPercentage Write FPercentage;
     End;
 
+    (** A class to represent a schematic setting. **)
+    TNoText = Class(TElementContainer)
+    {$IFDEF D2005} Strict {$ENDIF} Private
+      FText : String;
+    {$IFDEF D2005} Strict {$ENDIF} Protected
+    Public
+      Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+      (**
+        This property gets and sets the Text property of the class.
+        @precon  None.
+        @postcon Gets and sets the Text property of the class.
+        @return  a String
+      **)
+      Property Text : String Read FText Write FText;
+    End;
+
     (** A pascal specific implementation of comments. **)
     TTLSSchematicComment = Class(TComment)
     Public
@@ -165,6 +181,8 @@ Interface
     {$IFDEF D2005} Strict {$ENDIF} Private
       FSource        : String;
       FRoad          : Integer;
+      FObject        : Integer;
+      FNoText        : Integer;
       FSettings      : Array[Low(TSetting)..High(TSetting)] Of Double;
       FMaxRoads      : Double;
       FDebug         : Boolean;
@@ -196,11 +214,13 @@ Interface
       Function LineStyle: Boolean;
       Function LineWeight: Boolean;
       Function LineColour : Boolean;
+      Function NoText : Boolean;
       (* Helper method to the grammar parsers *)
       Procedure TokenizeStream;
       Procedure ParseTokens;
       function GetSettings(S: TSetting): Double;
       Function CheckLiteral(strLiteral, strMethod: String): Boolean;
+      function GetSuppressedText(strName : String): Boolean;
     {$IFDEF D2005} Strict {$ENDIF} Protected
       Function GetComment(
         CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
@@ -242,6 +262,16 @@ Interface
         @return  a Boolean
       **)
       Property Debug : Boolean Read FDebug;
+      (**
+        This property returns true if the name exists in the list of suppressed
+        texts.
+        @precon  None.
+        @postcon Returns true if the name exists in the list of suppressed
+                 texts.
+        @param   strName as a String
+        @return  a Boolean
+      **)
+      Property SuppressedText[strName : String] : Boolean Read GetSuppressedText;
     End;
 
   ResourceString
@@ -251,6 +281,9 @@ Interface
     strObjects = 'Objects';
     (** A resource string for named width objects in the tree. **)
     strNamedWidths = 'Named Widths';
+    (** A resource string for the node underwhich suppressed text objects are
+        listed. **)
+    strNoTexts = 'Suppressed Text Objects';
 
 Implementation
 
@@ -271,9 +304,9 @@ Implementation
     strNumbers:  Set Of AnsiChar = ['#', '$', '0'..'9'];
 
     (** A set of reserved words (not used in this parser.) **)
-    strReservedWords : Array[0..9] Of String = ('centreline', 'debug',
-      'lines', 'margins', 'object', 'objects', 'road', 'roads', 'spacing',
-      'text');
+    strReservedWords : Array[0..10] Of String = ('centreline', 'debug',
+      'lines', 'margins', 'notext', 'object', 'objects', 'road', 'roads',
+      'spacing', 'text');
 
     (** This is a list of reserved, directives word and a semi colon which are
         token that can be sort as then next place to start parsing from when an
@@ -391,7 +424,9 @@ Implementation
     CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
     FSource := Source;
     FRoad := 1;
-    FmaxRoads := 1;
+    FObject := 1;
+    FNoText := 1;
+    FMaxRoads := 1;
     FSettings[seMargins] := 2;
     FCurrentRoad := 5;
     FCurrentObject := 5;
@@ -1172,6 +1207,30 @@ Implementation
 
   (**
 
+    This is a getter method for the SuppressedText property.
+
+    @precon  None.
+    @postcon Returns true if the named text exists in the list of suppressed
+             text.
+
+    @param   strName as a String
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.GetSuppressedText(strName : String): Boolean;
+
+  var
+    N: TElementContainer;
+
+  begin
+    Result := False;
+    N := FindElement(strNoTexts);
+    If N <> Nil Then
+      Result := N.FindElement(strName) <> Nil;
+  end;
+
+  (**
+
     This method process conditional compiler directives.
 
     @precon  None.
@@ -1324,7 +1383,7 @@ Implementation
           // Check for end of file else must be identifier
           If Not EndOfTokens Then
             While Road or Object_ Or Objects Or Roads Or Margins Or Spacing Or
-              Debugging Or CentreLine Or Lines Or UnknownToken Do;
+              Debugging Or CentreLine Or Lines Or NoText Or UnknownToken Do;
           If Not (Token.TokenType In [ttFileEnd]) Then
             Raise EParserAbort.Create(strUnExpectedEndOfFile);
         End;
@@ -1365,6 +1424,47 @@ Implementation
         FSettings[seMargins] := M.Percentage;
         If CheckLiteral(';', 'Margins') Then
           Result := True;
+      End;
+  end;
+
+  (**
+
+    This method parses the NoText element of the grammar.
+
+    @precon  None.
+    @postcon Returns true if the grammar element was correctly parsed.
+
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.NoText: Boolean;
+
+  var
+    Ns: TElementContainer;
+    N : TNoText;
+    T : TTokenInfo;
+
+  begin
+    Result := False;
+    If Token.UToken = 'NOTEXT' Then
+      Begin
+        T := Token;
+        NextNonCommentToken;
+        If Token.TokenType In [ttSingleLiteral] Then
+          Begin
+            Ns := FindElement(strNoTexts);
+            If Ns = Nil Then
+              Ns := Add(TLabelContainer.Create(strNoTexts, scNone, 0, 0,
+                iiPublicThreadVarsLabel, Nil));
+            N := Ns.Add(TNoText.Create(Format('NoText%4.4d', [FNoText]),
+              scPublic, T.Line, T.Column, iiPublicThreadVar, Nil)) As TNoText;
+            N.Text := Copy(Token.Token, 2, Length(Token.Token) - 2);
+            NextNonCommentToken;
+            If CheckLiteral(';', 'NoText') Then
+              Result := True;
+          End Else
+            ErrorAndSeekToken(strStringExpected, 'NoText', Token.Token,
+              strSeekableOnErrorTokens, stActual);
       End;
   end;
 
@@ -1447,9 +1547,9 @@ Implementation
         Os := FindElement(strObjects);
         If Os = Nil Then
           Os := Add(TLabelContainer.Create(strObjects, scNone, 0, 0, iiPublicClass, Nil));
-        O := Os.Add(TTLSObject.Create(Format('Object%4.4d', [FRoad]), scPublic, Token.Line,
+        O := Os.Add(TTLSObject.Create(Format('Object%4.4d', [FObject]), scPublic, Token.Line,
           Token.Column, iiPublicClass, GetComment)) As TTLSObject;
-        Inc(FRoad);
+        Inc(FObject);
         O.Width := FCurrentObject;
         O.LineColour := FLineColour;
         O.LineStyle := FLineStyle;
@@ -1749,6 +1849,26 @@ Implementation
       EndChainage, Locations[Location], strColours[Colour], Text, Width]);
     If RouteCode <> '' Then
       Result := Result + Format(', ''%s''', [RouteCode]);
+  end;
+
+  { TNoText }
+
+  (**
+
+    This method returns a string representation of a schematic object.
+
+    @precon  None.
+    @postcon Returns a string representation of a schematic object.
+
+    @param   boolShowIdentifier   as a Boolean
+    @param   boolForDocumentation as a Boolean
+    @return  a String
+
+  **)
+  function TNoText.AsString(boolShowIdentifier,
+    boolForDocumentation: Boolean): String;
+  begin
+    Result := Format('NoText ''%s''', [FText]);
   end;
 
 End.

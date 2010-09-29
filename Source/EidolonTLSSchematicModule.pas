@@ -156,17 +156,9 @@ Interface
     (** A class to represent a schematic setting. **)
     TNoText = Class(TElementContainer)
     {$IFDEF D2005} Strict {$ENDIF} Private
-      FText : String;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Public
       Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-      (**
-        This property gets and sets the Text property of the class.
-        @precon  None.
-        @postcon Gets and sets the Text property of the class.
-        @return  a String
-      **)
-      Property Text : String Read FText Write FText;
     End;
 
     (** A pascal specific implementation of comments. **)
@@ -182,7 +174,6 @@ Interface
       FSource        : String;
       FRoad          : Integer;
       FObject        : Integer;
-      FNoText        : Integer;
       FSettings      : Array[Low(TSetting)..High(TSetting)] Of Double;
       FMaxRoads      : Double;
       FDebug         : Boolean;
@@ -425,7 +416,6 @@ Implementation
     FSource := Source;
     FRoad := 1;
     FObject := 1;
-    FNoText := 1;
     FMaxRoads := 1;
     FSettings[seMargins] := 2;
     FCurrentRoad := 5;
@@ -1456,9 +1446,8 @@ Implementation
             If Ns = Nil Then
               Ns := Add(TLabelContainer.Create(strNoTexts, scNone, 0, 0,
                 iiPublicThreadVarsLabel, Nil));
-            N := Ns.Add(TNoText.Create(Format('NoText%4.4d', [FNoText]),
+            N := Ns.Add(TNoText.Create(Copy(Token.Token, 2, Length(Token.Token) - 2),
               scPublic, T.Line, T.Column, iiPublicThreadVar, Nil)) As TNoText;
-            N.Text := Copy(Token.Token, 2, Length(Token.Token) - 2);
             NextNonCommentToken;
             If CheckLiteral(';', 'NoText') Then
               Result := True;
@@ -1868,7 +1857,7 @@ Implementation
   function TNoText.AsString(boolShowIdentifier,
     boolForDocumentation: Boolean): String;
   begin
-    Result := Format('NoText ''%s''', [FText]);
+    Result := Identifier;
   end;
 
 End.

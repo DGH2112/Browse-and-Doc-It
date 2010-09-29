@@ -124,7 +124,8 @@ Interface
     (** A class to represent the objects on the schematic diagram. **)
     TTLSObject = Class(TTLSShape)
     {$IFDEF D2005} Strict {$ENDIF} Private
-      FText: String;
+      FText            : String;
+      FTextOrientation : TTextOrientation;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Public
       Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
@@ -135,6 +136,14 @@ Interface
         @return  a String
       **)
       Property Text : String Read FText Write FText;
+      (**
+        This property gets and sets the text orientation of the object.
+        @precon  None.
+        @postcon Gets and sets the text orientation of the object.
+        @return  a TTextOrientation
+      **)
+      Property TextOrientation : TTextOrientation Read FTextOrientation
+        Write FTextOrientation;
     End;
 
     (** A class to represent a schematic setting. **)
@@ -171,17 +180,19 @@ Interface
     (** This is the main class for dealing with backus-naur grammar files. **)
     TTLSSchematicModule = Class(TBaseLanguageModule)
     {$IFDEF D2005} Strict {$ENDIF} Private
-      FSource        : String;
-      FRoad          : Integer;
-      FObject        : Integer;
-      FSettings      : Array[Low(TSetting)..High(TSetting)] Of Double;
-      FMaxRoads      : Double;
-      FDebug         : Boolean;
-      FCurrentRoad   : Double;
-      FCurrentObject : Double;
-      FLineColour    : TColour;
-      FLineStyle     : TLineStyle;
-      FLineWeight    : TLineWeight;
+      FSource           : String;
+      FRoad             : Integer;
+      FObject           : Integer;
+      FSettings         : Array[Low(TSetting)..High(TSetting)] Of Double;
+      FMaxRoads         : Double;
+      FDebug            : Boolean;
+      FCurrentRoad      :  Double;
+      FCurrentObject    : Double;
+      FLineColour       : TColour;
+      FLineStyle        : TLineStyle;
+      FLineWeight       : TLineWeight;
+      FTextOrientation  : TTextOrientation;
+      FTextOrientations : TStringList;
       { Grammar Parsers }
       Procedure Goal;
       Function Road : Boolean;
@@ -206,12 +217,15 @@ Interface
       Function LineWeight: Boolean;
       Function LineColour : Boolean;
       Function NoText : Boolean;
+      Function TextOrientationElement : Boolean;
+      Function Orientation : TTextOrientation;
       (* Helper method to the grammar parsers *)
       Procedure TokenizeStream;
       Procedure ParseTokens;
       function GetSettings(S: TSetting): Double;
       Function CheckLiteral(strLiteral, strMethod: String): Boolean;
       function GetSuppressedText(strName : String): Boolean;
+      Function GetTextOrientation(strName : String) : TTextOrientation;
     {$IFDEF D2005} Strict {$ENDIF} Protected
       Function GetComment(
         CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
@@ -263,6 +277,15 @@ Interface
         @return  a Boolean
       **)
       Property SuppressedText[strName : String] : Boolean Read GetSuppressedText;
+      (**
+        This property gets the text orientation of the named symbol.
+        @precon  None.
+        @postcon Returns the text orientation of the named symbol.
+        @param   strName as a String
+        @return  a TTextOrientation
+      **)
+      Property TextOrientation[strName : String] : TTextOrientation
+        Read GetTextOrientation;
     End;
 
   ResourceString
@@ -295,9 +318,9 @@ Implementation
     strNumbers:  Set Of AnsiChar = ['#', '$', '0'..'9'];
 
     (** A set of reserved words (not used in this parser.) **)
-    strReservedWords : Array[0..10] Of String = ('centreline', 'debug',
+    strReservedWords : Array[0..11] Of String = ('centreline', 'debug',
       'lines', 'margins', 'notext', 'object', 'objects', 'road', 'roads',
-      'spacing', 'text');
+      'spacing', 'text', 'textorientation');
 
     (** This is a list of reserved, directives word and a semi colon which are
         token that can be sort as then next place to start parsing from when an
@@ -331,6 +354,9 @@ Implementation
     strInvalidLineStyle = 'Invalid line style ''%s'' at line %d column %d.';
     (** A resource string for an invalid line weight. **)
     strInvalidLineWeight = 'Invalid line weight ''%s'' at line %d column %d.';
+    (** A resource string message for an invalid text orientation. **)
+    strExpectedHORIZONTALVERTICAL = 'Expected HORIZONTAL or VERTICAL but found' +
+    ' ''%s'' at line %d column %d.';
 
   (**
 
@@ -389,7 +415,7 @@ Implementation
 
   (**
 
-    This is the constructor method for the TBackusnaurModule class.
+    This is the constructor method for the TTLSSchematicModule class.
 
     @precon  Source is a valid TStream descendant containing as stream of text,
              that is the contents of a source code module and Filename is the
@@ -426,6 +452,8 @@ Implementation
     FLineColour := xlcBlack;
     FLineStyle := lsSOLID;
     FLineWeight := lw0_25;
+    FTextOrientation := toHorizontal;
+    FTextOrientations := TStringList.Create;
     AddTickCount('Start');
     CommentClass := TTLSSchematicComment;
     TokenizeStream;
@@ -476,17 +504,60 @@ Implementation
 
   (**
 
-
-    This is a destructor for the TBackusNaurModule class.
+    This is a destructor for the TTLSSchematicModule class.
 
     @precon  None.
     @postcon Fress the memory fo this instance.
 
-
   **)
   Destructor TTLSSchematicModule.Destroy;
   begin
+    FTextOrientations.Free;
     Inherited Destroy;
+  end;
+
+  (**
+
+    This method parses the TextOrientation element of the grammar.
+
+    @precon  None.
+    @postcon Returns true if the element was parsed correctly.
+
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.TextOrientationElement: Boolean;
+
+  var
+    O: TTextOrientation;
+    strName: String;
+
+  begin
+    Result := False;
+    If Token.UToken = 'TEXTORIENTATION' Then
+      Begin
+        NextNonCommentToken;
+        O := Orientation;
+        If Token.Token = ';' Then
+          FTextOrientation := O
+        Else
+          Begin
+            If Token.Token = ',' Then
+              Begin
+                NextNonCommentToken;
+                If Token.TokenType In [ttSingleLiteral] Then
+                  Begin
+                    strName := Copy(Token.Token, 2, Length(Token.Token) - 2);
+                    FTextOrientations.AddObject(strName, TObject(Integer(O)));
+                    NextNonCommentToken;
+                  End Else
+                    ErrorAndSeekToken(strStringExpected, 'Objects', Token.Token,
+                      strSeekableOnErrorTokens, stActual);
+              End;
+          End;
+        If CheckLiteral(';', 'Objects') Then
+          Result := True;
+      End;
   end;
 
   (**
@@ -1221,6 +1292,29 @@ Implementation
 
   (**
 
+    This is a getter method for the TextOrientation property.
+
+    @precon  None.
+    @postcon Returns the text orientation of the named symbol.
+
+    @param   strName as a String
+    @return  a TTextOrientation
+
+  **)
+  function TTLSSchematicModule.GetTextOrientation(strName: String): TTextOrientation;
+
+  var
+    iIndex: Integer;
+
+  begin
+    Result := toHorizontal;
+    iIndex := FTextOrientations.IndexOf(strName);
+    If iIndex > -1 Then
+      Result := TTextOrientation(Integer(FTextOrientations.Objects[iIndex]));
+  end;
+
+  (**
+
     This method process conditional compiler directives.
 
     @precon  None.
@@ -1372,8 +1466,9 @@ Implementation
             End;
           // Check for end of file else must be identifier
           If Not EndOfTokens Then
-            While Road or Object_ Or Objects Or Roads Or Margins Or Spacing Or
-              Debugging Or CentreLine Or Lines Or NoText Or UnknownToken Do;
+            While Road Or Object_ Or Objects Or Roads Or Margins Or Spacing Or
+              Debugging Or CentreLine Or Lines Or NoText Or
+              TextOrientationElement Or UnknownToken Do;
           If Not (Token.TokenType In [ttFileEnd]) Then
             Raise EParserAbort.Create(strUnExpectedEndOfFile);
         End;
@@ -1542,6 +1637,7 @@ Implementation
         O.LineColour := FLineColour;
         O.LineStyle := FLineStyle;
         O.LineWeight := FLineWeight;
+        O.TextOrientation := FTextOrientation;
         NextNonCommentToken;
         If Chainages(O) Then
           If IsKeyWord(Token.Token, ['both', 'left', 'over', 'right', 'under']) Then
@@ -1621,6 +1717,31 @@ Implementation
         ErrorAndSeekToken(strExpectedAStartOffet, 'Offsets', Token.Token,
           strSeekableOnErrorTokens, stActual);
   End;
+
+  (**
+
+    This method parses the Orientation element of the grammar.
+
+    @precon  None.
+    @postcon Returns the text orienation requested.
+
+
+    @return  a TTextOrientation
+
+  **)
+  function TTLSSchematicModule.Orientation: TTextOrientation;
+
+  begin
+    Result := toHorizontal;
+    If IsKeyWord(Token.Token, ['horizontal', 'vertical']) Then
+      Begin
+        If CompareText(Token.Token, 'VERTICAL') = 0 Then
+          Result := toVertical;
+        NextNonCommentToken;
+      End Else
+        ErrorAndSeekToken(strExpectedHORIZONTALVERTICAL, 'Orientation',
+          Token.Token, strSeekableOnErrorTokens, stActual);
+  end;
 
   (**
 

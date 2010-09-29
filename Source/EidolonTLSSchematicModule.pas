@@ -1431,7 +1431,6 @@ Implementation
 
   var
     Ns: TElementContainer;
-    N : TNoText;
     T : TTokenInfo;
 
   begin
@@ -1446,8 +1445,8 @@ Implementation
             If Ns = Nil Then
               Ns := Add(TLabelContainer.Create(strNoTexts, scNone, 0, 0,
                 iiPublicThreadVarsLabel, Nil));
-            N := Ns.Add(TNoText.Create(Copy(Token.Token, 2, Length(Token.Token) - 2),
-              scPublic, T.Line, T.Column, iiPublicThreadVar, Nil)) As TNoText;
+            Ns.Add(TNoText.Create(Copy(Token.Token, 2, Length(Token.Token) - 2),
+              scPublic, T.Line, T.Column, iiPublicThreadVar, Nil));
             NextNonCommentToken;
             If CheckLiteral(';', 'NoText') Then
               Result := True;

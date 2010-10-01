@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       29 Sep 2010
+  @Date       01 Oct 2010
   @Author     David Hoyle
 
 **)
@@ -126,6 +126,7 @@ Interface
     {$IFDEF D2005} Strict {$ENDIF} Private
       FText            : String;
       FTextOrientation : TTextOrientation;
+      FTextPosition    : TTextPosition;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Public
       Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
@@ -144,6 +145,13 @@ Interface
       **)
       Property TextOrientation : TTextOrientation Read FTextOrientation
         Write FTextOrientation;
+      (**
+        This property gets and sets the text position of the object text.
+        @precon  None.
+        @postcon Gets and sets the text position of the object text.
+        @return  a TTextPosition
+      **)
+      Property TextPosition : TTextPosition Read FTextPosition Write FTextPosition;
     End;
 
     (** A class to represent a schematic setting. **)
@@ -193,6 +201,7 @@ Interface
       FLineWeight       : TLineWeight;
       FTextOrientation  : TTextOrientation;
       FTextOrientations : TStringList;
+      FTextPosition     : TTextPosition;
       { Grammar Parsers }
       Procedure Goal;
       Function Road : Boolean;
@@ -219,6 +228,7 @@ Interface
       Function NoText : Boolean;
       Function TextOrientationElement : Boolean;
       Function Orientation : TTextOrientation;
+      Function Text : Boolean;
       (* Helper method to the grammar parsers *)
       Procedure TokenizeStream;
       Procedure ParseTokens;
@@ -357,6 +367,9 @@ Implementation
     (** A resource string message for an invalid text orientation. **)
     strExpectedHORIZONTALVERTICAL = 'Expected HORIZONTAL or VERTICAL but found' +
     ' ''%s'' at line %d column %d.';
+    (** A resource string message for an invalid text position. **)
+    strExpectedOUTSIDEINSIDE = 'Expected OUTSIDE or INSIDE but found ''%s'' at' +
+    ' line %d column %d.';
 
   (**
 
@@ -454,6 +467,7 @@ Implementation
     FLineWeight := lw0_25;
     FTextOrientation := toHorizontal;
     FTextOrientations := TStringList.Create;
+    FTextPosition := tpOutside;
     AddTickCount('Start');
     CommentClass := TTLSSchematicComment;
     TokenizeStream;
@@ -514,6 +528,36 @@ Implementation
   begin
     FTextOrientations.Free;
     Inherited Destroy;
+  end;
+
+  (**
+
+    This method parses the text element of the grammar.
+
+    @precon  None.
+    @postcon Returns true if the element was parsed correctly.
+
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.Text: Boolean;
+  begin
+    Result := False;
+    If Token.UToken = 'TEXT' Then
+      Begin
+        NextNonCommentToken;
+        If IsKeyWord(Token.Token, ['inside', 'outside']) Then
+          Begin
+            FTextPosition := tpOutside;
+            If CompareText(Token.Token, 'INSIDE') = 0 Then
+              FTextPosition := tpInside;
+            NextNonCommentToken;
+            If CheckLiteral(';', 'Text') Then
+              Result := True;
+          End Else
+            ErrorAndSeekToken(strExpectedOUTSIDEINSIDE, 'Text', Token.Token,
+              strSeekableOnErrorTokens, stActual);
+      End;
   end;
 
   (**
@@ -1468,7 +1512,7 @@ Implementation
           If Not EndOfTokens Then
             While Road Or Object_ Or Objects Or Roads Or Margins Or Spacing Or
               Debugging Or CentreLine Or Lines Or NoText Or
-              TextOrientationElement Or UnknownToken Do;
+              TextOrientationElement Or Text Or UnknownToken Do;
           If Not (Token.TokenType In [ttFileEnd]) Then
             Raise EParserAbort.Create(strUnExpectedEndOfFile);
         End;
@@ -1638,6 +1682,7 @@ Implementation
         O.LineStyle := FLineStyle;
         O.LineWeight := FLineWeight;
         O.TextOrientation := FTextOrientation;
+        O.TextPosition := FTextPosition;
         NextNonCommentToken;
         If Chainages(O) Then
           If IsKeyWord(Token.Token, ['both', 'left', 'over', 'right', 'under']) Then

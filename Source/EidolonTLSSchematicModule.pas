@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       01 Oct 2010
+  @Date       02 Oct 2010
   @Author     David Hoyle
 
 **)
@@ -202,6 +202,7 @@ Interface
       FTextOrientation  : TTextOrientation;
       FTextOrientations : TStringList;
       FTextPosition     : TTextPosition;
+      FTextPositions    : TStringList;
       { Grammar Parsers }
       Procedure Goal;
       Function Road : Boolean;
@@ -229,6 +230,7 @@ Interface
       Function TextOrientationElement : Boolean;
       Function Orientation : TTextOrientation;
       Function Text : Boolean;
+      Function TextPositionElement : TTextPosition;
       (* Helper method to the grammar parsers *)
       Procedure TokenizeStream;
       Procedure ParseTokens;
@@ -236,6 +238,7 @@ Interface
       Function CheckLiteral(strLiteral, strMethod: String): Boolean;
       function GetSuppressedText(strName : String): Boolean;
       Function GetTextOrientation(strName : String) : TTextOrientation;
+      Function GetTextPosition(strName : String) : TTextPosition;
     {$IFDEF D2005} Strict {$ENDIF} Protected
       Function GetComment(
         CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
@@ -296,6 +299,15 @@ Interface
       **)
       Property TextOrientation[strName : String] : TTextOrientation
         Read GetTextOrientation;
+      (**
+        This property gets the text position of the named symbol.
+        @precon  None.
+        @postcon Returns the text position of the named symbol.
+        @param   strName as a String
+        @return  a TTextPosition
+      **)
+      Property TextPosition[strName : String] : TTextPosition
+        Read GetTextPosition;
     End;
 
   ResourceString
@@ -468,6 +480,7 @@ Implementation
     FTextOrientation := toHorizontal;
     FTextOrientations := TStringList.Create;
     FTextPosition := tpOutside;
+    FTextPositions := TStringList.Create;
     AddTickCount('Start');
     CommentClass := TTLSSchematicComment;
     TokenizeStream;
@@ -526,6 +539,7 @@ Implementation
   **)
   Destructor TTLSSchematicModule.Destroy;
   begin
+    FTextPositions.Free;
     FTextOrientations.Free;
     Inherited Destroy;
   end;
@@ -541,22 +555,36 @@ Implementation
 
   **)
   function TTLSSchematicModule.Text: Boolean;
+
+  var
+    O: TTextPosition;
+    strName: String;
+
   begin
     Result := False;
     If Token.UToken = 'TEXT' Then
       Begin
         NextNonCommentToken;
-        If IsKeyWord(Token.Token, ['inside', 'outside']) Then
+        O := TextPositionElement;
+        If Token.Token = ';' Then
+          FTextPosition := O
+        Else
           Begin
-            FTextPosition := tpOutside;
-            If CompareText(Token.Token, 'INSIDE') = 0 Then
-              FTextPosition := tpInside;
-            NextNonCommentToken;
-            If CheckLiteral(';', 'Text') Then
-              Result := True;
-          End Else
-            ErrorAndSeekToken(strExpectedOUTSIDEINSIDE, 'Text', Token.Token,
-              strSeekableOnErrorTokens, stActual);
+            If Token.Token = ',' Then
+              Begin
+                NextNonCommentToken;
+                If Token.TokenType In [ttSingleLiteral] Then
+                  Begin
+                    strName := Copy(Token.Token, 2, Length(Token.Token) - 2);
+                    FTextPositions.AddObject(strName, TObject(Integer(O)));
+                    NextNonCommentToken;
+                  End Else
+                    ErrorAndSeekToken(strStringExpected, 'Objects', Token.Token,
+                      strSeekableOnErrorTokens, stActual);
+              End;
+          End;
+        If CheckLiteral(';', 'Objects') Then
+          Result := True;
       End;
   end;
 
@@ -602,6 +630,29 @@ Implementation
         If CheckLiteral(';', 'Objects') Then
           Result := True;
       End;
+  end;
+
+  (**
+
+    This method parses the TextPosition element of the grammar.
+
+    @precon  None.
+    @postcon Returns the text position specified.
+
+    @return  a TTextPosition
+
+  **)
+  function TTLSSchematicModule.TextPositionElement: TTextPosition;
+  begin
+    Result := tpOutside;
+    If IsKeyWord(Token.Token, ['inside', 'outside']) Then
+      Begin
+        If CompareText(Token.Token, 'INSIDE') = 0 Then
+          Result := tpInside;
+        NextNonCommentToken;
+      End Else
+        ErrorAndSeekToken(strExpectedOUTSIDEINSIDE, 'TextPosition',
+          Token.Token, strSeekableOnErrorTokens, stActual);
   end;
 
   (**
@@ -1355,6 +1406,29 @@ Implementation
     iIndex := FTextOrientations.IndexOf(strName);
     If iIndex > -1 Then
       Result := TTextOrientation(Integer(FTextOrientations.Objects[iIndex]));
+  end;
+
+  (**
+
+    This is a getter method for the TextPosition property.
+
+    @precon  None.
+    @postcon Returns the text position for the named symbol.
+
+    @param   strName as a String
+    @return  a TTextPosition
+
+  **)
+  function TTLSSchematicModule.GetTextPosition(strName: String): TTextPosition;
+
+  var
+    iIndex: Integer;
+
+  begin
+    Result := tpOutside;
+    iIndex := FTextPositions.IndexOf(strName);
+    If iIndex > -1 Then
+      Result := TTextPosition(Integer(FTextPositions.Objects[iIndex]));
   end;
 
   (**

@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       02 Oct 2010
+  @Date       22 Oct 2010
   @Author     David Hoyle
 
 **)
@@ -185,6 +185,34 @@ Interface
         iCol: Integer): TComment; Override;
     End;
 
+    (** A class to represent a n Ellipse shape. **)
+    TTLSEllipse = Class(TTLSObject)
+    {$IFDEF D2005} Strict {$ENDIF} Private
+      FStartOffset : Double;
+      FEndOffset   : Double;
+    {$IFDEF D2005} Strict {$ENDIF} Protected
+    Public
+      Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+      (**
+        This property gets and sets the start offset of the bounding rectangle
+        to the ellipse.
+        @precon  None.
+        @postcon Gets and sets the start offset of the bounding rectangle
+                 to the ellipse.
+        @return  a Double
+      **)
+      Property StartOffset : Double Read FStartOffset Write FStartOffset;
+      (**
+        This property gets and sets the end offset of the bounding rectangle
+        to the ellipse.
+        @precon  None.
+        @postcon Gets and sets the start offset of the bounding rectangle
+                 to the ellipse.
+        @return  a Double
+      **)
+      Property EndOffset : Double Read FEndOffset Write FEndOffset;
+    End;
+
     (** This is the main class for dealing with backus-naur grammar files. **)
     TTLSSchematicModule = Class(TBaseLanguageModule)
     {$IFDEF D2005} Strict {$ENDIF} Private
@@ -217,7 +245,7 @@ Interface
       Function EndOffset(R : TTLSRoad) : Boolean;
       Function Chainages(R : TTLSShape) : Boolean;
       Function Offsets(R : TTLSRoad) : Boolean;
-      Function Percentage(S : TSchematicSetting) : Double;
+      Function Percentage(var dblPercentage : Double) : Boolean;
       Function CentreLine : Boolean;
       Function Debugging : Boolean;
       Function UnknownToken : Boolean;
@@ -231,6 +259,10 @@ Interface
       Function Orientation : TTextOrientation;
       Function Text : Boolean;
       Function TextPositionElement : TTextPosition;
+      Function Ellipse : Boolean;
+      Function Location(S : TTLSShape) : Boolean;
+      Function LocationEx(S : TTLSShape) : Boolean;
+      Function Percentages(S : TTLSEllipse) : Boolean;
       (* Helper method to the grammar parsers *)
       Procedure TokenizeStream;
       Procedure ParseTokens;
@@ -340,9 +372,9 @@ Implementation
     strNumbers:  Set Of AnsiChar = ['#', '$', '0'..'9'];
 
     (** A set of reserved words (not used in this parser.) **)
-    strReservedWords : Array[0..11] Of String = ('centreline', 'debug',
-      'lines', 'margins', 'notext', 'object', 'objects', 'road', 'roads',
-      'spacing', 'text', 'textorientation');
+    strReservedWords : Array[0..12] Of String = ('centreline', 'debug',
+      'ellipse', 'lines', 'margins', 'notext', 'object', 'objects', 'road',
+      'roads', 'spacing', 'text', 'textorientation');
 
     (** This is a list of reserved, directives word and a semi colon which are
         token that can be sort as then next place to start parsing from when an
@@ -913,32 +945,62 @@ Implementation
     @precon  S must be a valid instance.
     @postcon Parses the Percentage element of the Grammar.
 
-    @param   S as a TSchematicSetting
-    @return  a Double
+    @param   dblPercentage as a Double as a reference
+    @return  a Boolean
 
   **)
-  Function TTLSSchematicModule.Percentage(S: TSchematicSetting) : Double;
+  Function TTLSSchematicModule.Percentage(var dblPercentage : Double) : Boolean;
 
   Var
     iErrorCode : Integer;
 
   begin
-    Result := 0;
+    Result := False;
     If Token.TokenType In [ttNumber] Then
       Begin
-        Val(Token.Token, Result, iErrorCode);
+        Val(Token.Token, dblPercentage, iErrorCode);
         If iErrorCode = 0 Then
           Begin
-            If S <> Nil Then
-              S.Percentage := Result;
             NextNonCommentToken;
             CheckLiteral('%', 'Percentage');
+            Result := True;
           End Else
             ErrorAndSeekToken(strIntegerExpected, 'Percentage', Token.Token,
               strSeekableOnErrorTokens, stActual);
       End Else
         ErrorAndSeekToken(strNumberExpected, 'Percentage', Token.Token,
           strSeekableOnErrorTokens, stActual);
+  end;
+
+  (**
+
+    This method parses the start and end percentages for the Ellipse command.
+
+    @precon  S must be a valid instance of a TTLSShape.
+    @postcon Returns true if the element was parsed successfully.
+
+    @param   S as a TTLSEllipse
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.Percentages(S: TTLSEllipse): Boolean;
+
+  Var
+    dbl : Double;
+
+  begin
+    Result := False;
+    If Percentage(dbl) Then
+      Begin
+        S.StartOffset := dbl;
+        If CheckLiteral(',', 'Percentages') Then
+          If Percentage(dbl) Then
+            Begin
+              S.EndOffset := dbl;
+              If CheckLiteral(',', 'Percentages') Then
+                Result := True;
+            End;
+      End;
   end;
 
   (**
@@ -997,32 +1059,25 @@ Implementation
         NextNonCommentToken;
         If Chainages(R) Then
           If Offsets(R) Then
-            If IsKeyWord(Token.Token, ['left', 'right']) Then
+            If Location(R) Then
               Begin
-                R.Location := loLeft;
-                If CompareText(Token.Token, 'RIGHT') = 0 Then
-                  R.Location := loRight;
-                NextNonCommentToken;
-                If CheckLiteral(',', 'Road') Then
+                boolFound := False;
+                For iColour := Low(TColour) To High(TColour) Do
+                  If CompareText(Token.Token, strColours[iColour]) = 0 Then
+                    Begin
+                      R.Colour := iColour;
+                      boolFound := True;
+                      Break;
+                    End;
+                If boolFound Then
                   Begin
-                    boolFound := False;
-                    For iColour := Low(TColour) To High(TColour) Do
-                      If CompareText(Token.Token, strColours[iColour]) = 0 Then
-                        Begin
-                          R.Colour := iColour;
-                          boolFound := True;
-                          Break;
-                        End;
-                    If boolFound Then
-                      Begin
-                        NextNonCommentToken;
-                        RouteCode(R);
-                        If CheckLiteral(';', 'Road') Then
-                          Result := True;
-                      End Else
-                        ErrorAndSeekToken(strInvalidColourName, 'Road',
-                          Token.Token, strSeekableOnErrorTokens, stActual);
-                  End;
+                    NextNonCommentToken;
+                    RouteCode(R);
+                    If CheckLiteral(';', 'Road') Then
+                      Result := True;
+                  End Else
+                    ErrorAndSeekToken(strInvalidColourName, 'Road',
+                      Token.Token, strSeekableOnErrorTokens, stActual);
               End Else
                 ErrorAndSeekToken(strReservedWordExpected, 'Road', 'Left or Right',
                   strSeekableOnErrorTokens, stActual);
@@ -1041,14 +1096,20 @@ Implementation
   **)
   function TTLSSchematicModule.Roads: Boolean;
 
+  Var
+    dbl : Double;
+
   begin
     Result := False;
     If Token.UToken = 'ROADS' Then
       Begin
         NextNonCommentToken;
-        FCurrentRoad := Percentage(Nil);
-        If CheckLiteral(';', 'Roads') Then
-          Result := True;
+        If Percentage(dbl) Then
+          Begin
+            FCurrentRoad := dbl;
+            If CheckLiteral(';', 'Roads') Then
+              Result := True;
+          End;
       End;
   end;
 
@@ -1092,6 +1153,7 @@ Implementation
   var
     Ss: TElementContainer;
     S: TSchematicSetting;
+    dbl : Double;
 
   begin
     Result := False;
@@ -1104,10 +1166,13 @@ Implementation
         S := Ss.Add(TSchematicSetting.Create('Spacing', scNone, Token.Line,
           Token.Column, iiPublicType, Nil)) As TSchematicSetting;
         NextNonCommentToken;
-        Percentage(S);
-        FSettings[seSpacing] := S.Percentage;
-        If CheckLiteral(';', 'Spacing') Then
-          Result := True;
+        If Percentage(dbl) Then
+          Begin
+            S.Percentage := dbl;
+            FSettings[seSpacing] := S.Percentage;
+            If CheckLiteral(';', 'Spacing') Then
+              Result := True;
+          End;
       End;
   end;
 
@@ -1202,6 +1267,79 @@ Implementation
 
   begin
     Result := Nil;
+  end;
+
+  (**
+
+    This method parses the Ellipse element of the grammar.
+
+    @precon  R must be a valid instance.
+    @postcon Returns true the element was parsed successfully.
+
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.Ellipse: Boolean;
+
+  var
+    Os: TElementContainer;
+    E : TTLSEllipse;
+    boolFound : Boolean;
+    iColour : TColour;
+
+  begin
+    Result := False;
+    If Token.UToken = 'ELLIPSE' Then
+      Begin
+        Os := FindElement(strObjects);
+        If Os = Nil Then
+          Os := Add(TLabelContainer.Create(strObjects, scNone, 0, 0, iiPublicClass, Nil));
+        E := Os.Add(TTLSEllipse.Create(Format('Object%4.4d', [FObject]), scPublic,
+          Token.Line, Token.Column, iiPublicClass, GetComment)) As TTLSEllipse;
+        Inc(FObject);
+        E.Width := FCurrentObject;
+        E.LineColour := FLineColour;
+        E.LineStyle := FLineStyle;
+        E.LineWeight := FLineWeight;
+        E.TextOrientation := FTextOrientation;
+        E.TextPosition := FTextPosition;
+        NextNonCommentToken;
+        If Chainages(E) Then
+          If Percentages(E) Then
+            If LocationEx(E) Then
+              Begin
+                boolFound := False;
+                For iColour := Low(TColour) To High(TColour) Do
+                  If CompareText(Token.Token, strColours[iColour]) = 0 Then
+                    Begin
+                      E.Colour := iColour;
+                      boolFound := True;
+                      Break;
+                    End;
+                If boolFound Then
+                  Begin
+                    NextNonCommentToken;
+                    If CheckLiteral(',', 'Ellipse') Then
+                      Begin
+                        If Token.TokenType In [ttSingleLiteral] Then
+                          Begin
+                            E.Text := Copy(Token.Token, 2, Length(Token.Token) - 2);
+                            NextNonCommentToken;
+                            RouteCode(E);
+                          End Else
+                            ErrorAndSeekToken(strStringExpected, 'Ellipse', Token.Token,
+                              strSeekableOnErrorTokens, stActual);
+                      End;
+                    If CheckLiteral(';', 'Ellipse') Then
+                      Result := True;
+                  End Else
+                    ErrorAndSeekToken(strInvalidColourName, 'Ellipse',
+                      Token.Token, strSeekableOnErrorTokens, stActual);
+              End Else
+                ErrorAndSeekToken(strReservedWordExpected, 'Ellipse',
+                  'Left, Right, Over, OverLeft, OverRight, Under or Both',
+                  strSeekableOnErrorTokens, stActual);
+      End;
   end;
 
   (**
@@ -1497,6 +1635,7 @@ Implementation
   var
     Ss: TElementContainer;
     S: TSchematicSetting;
+    dbl : Double;
 
   begin
     Result := False;
@@ -1509,10 +1648,13 @@ Implementation
         S := Ss.Add(TSchematicSetting.Create('CentreLine', scNone, Token.Line,
           Token.Column, iiPublicType, Nil)) As TSchematicSetting;
         NextNonCommentToken;
-        Percentage(S);
-        FSettings[seCentreLine] := S.Percentage;
-        If CheckLiteral(';', 'CentreLine') Then
-          Result := True;
+        If Percentage(dbl) Then
+          Begin
+            S.Percentage := dbl;
+            FSettings[seCentreLine] := S.Percentage;
+            If CheckLiteral(';', 'CentreLine') Then
+              Result := True;
+          End;
       End;
   end;
 
@@ -1586,7 +1728,7 @@ Implementation
           If Not EndOfTokens Then
             While Road Or Object_ Or Objects Or Roads Or Margins Or Spacing Or
               Debugging Or CentreLine Or Lines Or NoText Or
-              TextOrientationElement Or Text Or UnknownToken Do;
+              TextOrientationElement Or Text Or Ellipse Or UnknownToken Do;
           If Not (Token.TokenType In [ttFileEnd]) Then
             Raise EParserAbort.Create(strUnExpectedEndOfFile);
         End;
@@ -1611,6 +1753,7 @@ Implementation
   var
     Ms: TElementContainer;
     M: TSchematicSetting;
+    dbl : Double;
 
   begin
     Result := False;
@@ -1623,10 +1766,13 @@ Implementation
         M := Ms.Add(TSchematicSetting.Create('Margins', scNone, Token.Line,
           Token.Column, iiPublicType, Nil)) As TSchematicSetting;
         NextNonCommentToken;
-        Percentage(M);
-        FSettings[seMargins] := M.Percentage;
-        If CheckLiteral(';', 'Margins') Then
-          Result := True;
+        If Percentage(dbl) Then
+          Begin
+            M.Percentage := dbl;
+            FSettings[seMargins] := M.Percentage;
+            If CheckLiteral(';', 'Margins') Then
+              Result := True;
+          End;
       End;
   end;
 
@@ -1694,28 +1840,30 @@ Implementation
       Begin
         T := Token;
         NextNonCommentToken;
-        dblPercentage := Percentage(Nil);
-        If Token.Token = ';' Then
-          FCurrentObject := dblPercentage
-        Else
+        If Percentage(dblPercentage) Then
           Begin
-            If Token.Token = ',' Then
+            If Token.Token = ';' Then
+              FCurrentObject := dblPercentage
+            Else
               Begin
-                NextNonCommentToken;
-                If Token.TokenType In [ttSingleLiteral] Then
+                If Token.Token = ',' Then
                   Begin
-                    strName := Copy(Token.Token, 2, Length(Token.Token) - 2);
-                    NWs := FindElement(strNamedWidths);
-                    If NWs = Nil Then
-                      NWs := Add(TlabelContainer.Create(strNamedWidths, scNone,
-                        0,  0, iiPublicVariablesLabel, Nil));
-                    NW := Nws.Add(TSchematicSetting.Create(strName, scNone,
-                      T.Line, T.Column, iiPublicVariable, Nil)) As TSchematicSetting;
-                    NW.Percentage := dblPercentage;
                     NextNonCommentToken;
-                  End Else
-                    ErrorAndSeekToken(strStringExpected, 'Objects', Token.Token,
-                      strSeekableOnErrorTokens, stActual);
+                    If Token.TokenType In [ttSingleLiteral] Then
+                      Begin
+                        strName := Copy(Token.Token, 2, Length(Token.Token) - 2);
+                        NWs := FindElement(strNamedWidths);
+                        If NWs = Nil Then
+                          NWs := Add(TlabelContainer.Create(strNamedWidths, scNone,
+                            0,  0, iiPublicVariablesLabel, Nil));
+                        NW := Nws.Add(TSchematicSetting.Create(strName, scNone,
+                          T.Line, T.Column, iiPublicVariable, Nil)) As TSchematicSetting;
+                        NW.Percentage := dblPercentage;
+                        NextNonCommentToken;
+                      End Else
+                        ErrorAndSeekToken(strStringExpected, 'Objects', Token.Token,
+                          strSeekableOnErrorTokens, stActual);
+                  End;
               End;
           End;
         If CheckLiteral(';', 'Objects') Then
@@ -1759,50 +1907,38 @@ Implementation
         O.TextPosition := FTextPosition;
         NextNonCommentToken;
         If Chainages(O) Then
-          If IsKeyWord(Token.Token, ['both', 'left', 'over', 'right', 'under']) Then
+          If LocationEx(O) Then
             Begin
-              O.Location := loLeft;
-              If CompareText(Token.Token, 'RIGHT') = 0 Then
-                O.Location := loRight
-              Else If CompareText(Token.Token, 'BOTH') = 0 Then
-                O.Location := loBoth
-              Else If CompareText(Token.Token, 'OVER') = 0 Then
-                O.Location := loOver
-              Else If CompareText(Token.Token, 'UNDER') = 0 Then
-                O.Location := loUnder;
-              NextNonCommentToken;
-              If CheckLiteral(',', 'Object_') Then
+              boolFound := False;
+              For iColour := Low(TColour) To High(TColour) Do
+                If CompareText(Token.Token, strColours[iColour]) = 0 Then
+                  Begin
+                    O.Colour := iColour;
+                    boolFound := True;
+                    Break;
+                  End;
+              If boolFound Then
                 Begin
-                  boolFound := False;
-                  For iColour := Low(TColour) To High(TColour) Do
-                    If CompareText(Token.Token, strColours[iColour]) = 0 Then
-                      Begin
-                        O.Colour := iColour;
-                        boolFound := True;
-                        Break;
-                      End;
-                  If boolFound Then
+                  NextNonCommentToken;
+                  If CheckLiteral(',', 'Object_') Then
                     Begin
-                      NextNonCommentToken;
-                      If CheckLiteral(',', 'Object_') Then
+                      If Token.TokenType In [ttSingleLiteral] Then
                         Begin
-                          If Token.TokenType In [ttSingleLiteral] Then
-                            Begin
-                              O.Text := Copy(Token.Token, 2, Length(Token.Token) - 2);
-                              NextNonCommentToken;
-                              RouteCode(O);
-                            End Else
-                              ErrorAndSeekToken(strStringExpected, 'Object', Token.Token,
-                                strSeekableOnErrorTokens, stActual);
-                        End;
-                      If CheckLiteral(';', 'Object_') Then
-                        Result := True;
-                    End Else
-                      ErrorAndSeekToken(strInvalidColourName, 'Object',
-                        Token.Token, strSeekableOnErrorTokens, stActual);
-                End;
+                          O.Text := Copy(Token.Token, 2, Length(Token.Token) - 2);
+                          NextNonCommentToken;
+                          RouteCode(O);
+                        End Else
+                          ErrorAndSeekToken(strStringExpected, 'Object', Token.Token,
+                            strSeekableOnErrorTokens, stActual);
+                    End;
+                  If CheckLiteral(';', 'Object_') Then
+                    Result := True;
+                End Else
+                  ErrorAndSeekToken(strInvalidColourName, 'Object',
+                    Token.Token, strSeekableOnErrorTokens, stActual);
             End Else
-              ErrorAndSeekToken(strReservedWordExpected, 'Object', 'Left or Right',
+              ErrorAndSeekToken(strReservedWordExpected, 'Object',
+                'Left, Right, Over, OverLeft, OverRight, Under or Both',
                 strSeekableOnErrorTokens, stActual);
       End;
   end;
@@ -1988,6 +2124,67 @@ Implementation
 
   (**
 
+    This method parses the Location element of the grammar.
+
+    @precon  S must be a valid instance of a TTLSShape.
+    @postcon Returns true if the element was parsed correctly;
+
+    @param   S as a TTLSShape
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.Location(S : TTLSShape): Boolean;
+
+  begin
+    Result := False;
+    If IsKeyWord(Token.Token, ['left', 'right']) Then
+      Begin
+        S.Location := loLeft;
+        If CompareText(Token.Token, 'RIGHT') = 0 Then
+          S.Location := loRight;
+        NextNonCommentToken;
+        If CheckLiteral(',', 'LocationEx') Then
+          Result := True;
+      End;
+  end;
+
+  (**
+
+    This method parses the LocationEx element of the grammar.
+
+    @precon  S must be a valid instance of a TTLSShape.
+    @postcon Returns true if the element was parsed correctly;
+
+    @param   S as a TTLSShape
+    @return  a Boolean
+
+  **)
+  function TTLSSchematicModule.LocationEx(S : TTLSShape): Boolean;
+
+  begin
+    Result := True;
+    If Not Location(S) Then
+      If IsKeyWord(Token.Token, ['both', 'over', 'overleft', 'overright',
+        'under']) Then
+        Begin
+          If CompareText(Token.Token, 'BOTH') = 0 Then
+            S.Location := loBoth
+          Else If CompareText(Token.Token, 'OVER') = 0 Then
+            S.Location := loOver
+          Else If CompareText(Token.Token, 'OVERLEFT') = 0 Then
+            S.Location := loOverLeft
+          Else If CompareText(Token.Token, 'OVERRIGHT') = 0 Then
+            S.Location := loOverRight
+          Else If CompareText(Token.Token, 'UNDER') = 0 Then
+            S.Location := loUnder;
+          NextNonCommentToken;
+          If CheckLiteral(',', 'LocationEx') Then
+            Result := True;
+        End;
+  end;
+
+(**
+
     This method checks for the presents of a literal in the token stream and
     returns true if found and moves to the next non comment token.
 
@@ -2097,6 +2294,34 @@ Implementation
     boolForDocumentation: Boolean): String;
   begin
     Result := Identifier;
+  end;
+
+  { TTLSEllipse }
+
+  (**
+
+    This method returns a string representation of a schematic object.
+
+    @precon  None.
+    @postcon Returns a string representation of a schematic object.
+
+    @param   boolShowIdentifier   as a Boolean
+    @param   boolForDocumentation as a Boolean
+    @return  a String
+
+  **)
+  function TTLSEllipse.AsString(boolShowIdentifier,
+    boolForDocumentation: Boolean): String;
+  begin
+    Result := Format('Ellipse %1.1f, %1.1f, %1.0f%%, %1.0f%%, %s, %s, ''%s''', [
+      StartChainage,
+      EndChainage,
+      StartOffset,
+      EndOffset,
+      Locations[Location],
+      strColours[Colour],
+      Text
+    ]);
   end;
 
 End.

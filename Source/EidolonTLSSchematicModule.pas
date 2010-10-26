@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       22 Oct 2010
+  @Date       26 Oct 2010
   @Author     David Hoyle
 
 **)
@@ -32,6 +32,8 @@ Interface
       FLineWeight    : TLineWeight;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Public
+      Constructor Create(strName : String; AScope : TScope; iLine,
+        iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
       (**
         This property gets and sets the Road start chainage.
         @precon  None.
@@ -2322,6 +2324,31 @@ Implementation
       strColours[Colour],
       Text
     ]);
+  end;
+
+  { TTLSShape }
+
+  (**
+
+    A constructor for the TTLSShape class.
+
+    @precon  None.
+    @postcon Sets the route code to a wilcard to match ALL route codes.
+
+    @param   strName     as a String
+    @param   AScope      as a TScope
+    @param   iLine       as an Integer
+    @param   iColumn     as an Integer
+    @param   AImageIndex as a TImageIndex
+    @param   AComment    as a TComment
+
+  **)
+  constructor TTLSShape.Create(strName: String; AScope: TScope; iLine,
+    iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
+
+  begin
+    Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+    FRouteCode := '*'; // Match all routes.
   end;
 
 End.

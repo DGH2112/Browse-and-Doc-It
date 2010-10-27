@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       26 Oct 2010
+  @Date       27 Oct 2010
   @Author     David Hoyle
 
 **)
@@ -1236,15 +1236,22 @@ Implementation
   Var
     i : Integer;
     iErrorCode : Integer;
+    boolNeg : Boolean;
 
   begin
     Result := False;
+    boolNeg := Token.Token = '-';
+    If boolNeg Then
+        NextNonCommentToken;
     If Token.TokenType In [ttNumber] Then
       Begin
         Val(Token.Token, i, iErrorCode);
         If iErrorCode = 0 Then
           Begin
-            R.StartOffset := i;
+            If boolNeg Then
+              R.StartOffset := -i
+            Else
+              R.StartOffset := i;
             If i > FMaxRoads Then
               FMaxRoads := i;
             NextNonCommentToken;
@@ -1252,7 +1259,9 @@ Implementation
           End Else
             ErrorAndSeekToken(strNumberExpected, 'StartOffset', Token.Token,
               strSeekableOnErrorTokens, stActual);
-      End;
+      End Else
+        If boolNeg Then
+          RollBackToken;
   end;
 
   (**
@@ -1405,15 +1414,22 @@ Implementation
   Var
     i : Integer;
     iErrorCode : Integer;
+    boolNeg : Boolean;
 
   begin
     Result := False;
+    boolNeg := Token.Token = '-';
+    If boolNeg Then
+        NextNonCommentToken;
     If Token.TokenType In [ttNumber] Then
       Begin
         Val(Token.Token, i, iErrorCode);
         If iErrorCode = 0 Then
           Begin
-            R.EndOffset := i;
+            If boolNeg Then
+              R.EndOffset := -i
+            Else
+              R.EndOffset := i;
             If i > FMaxRoads Then
               FMaxRoads := i;
             NextNonCommentToken;
@@ -1421,7 +1437,9 @@ Implementation
           End Else
             ErrorAndSeekToken(strNumberExpected, 'EndOffset', Token.Token,
               strSeekableOnErrorTokens, stActual);
-      End;
+      End Else
+        If boolNeg Then
+          RollBackToken;
   end;
 
   (**

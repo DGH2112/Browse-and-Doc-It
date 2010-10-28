@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       27 Oct 2010
+  @Date       28 Oct 2010
   @Author     David Hoyle
 
 **)
@@ -2182,7 +2182,7 @@ Implementation
   function TTLSSchematicModule.LocationEx(S : TTLSShape): Boolean;
 
   begin
-    Result := True;
+    Result := False;
     If Not Location(S) Then
       If IsKeyWord(Token.Token, ['both', 'over', 'overleft', 'overright',
         'under']) Then

@@ -2182,8 +2182,8 @@ Implementation
   function TTLSSchematicModule.LocationEx(S : TTLSShape): Boolean;
 
   begin
-    Result := False;
-    If Not Location(S) Then
+    Result := Location(S);
+    If Not Result Then
       If IsKeyWord(Token.Token, ['both', 'over', 'overleft', 'overright',
         'under']) Then
         Begin

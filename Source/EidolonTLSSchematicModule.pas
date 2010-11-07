@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       28 Oct 2010
+  @Date       07 Nov 2010
   @Author     David Hoyle
 
 **)
@@ -129,6 +129,7 @@ Interface
       FText            : String;
       FTextOrientation : TTextOrientation;
       FTextPosition    : TTextPosition;
+      FShape           : TSymbolType;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Public
       Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
@@ -154,6 +155,13 @@ Interface
         @return  a TTextPosition
       **)
       Property TextPosition : TTextPosition Read FTextPosition Write FTextPosition;
+      (**
+        This property gets and sets the shape of the object.
+        @precon  None.
+        @postcon Gets and sets the shape of the object.
+        @return  a TSymbolType
+      **)
+      Property Shape : TSymbolType Read FShape Write FShape;
     End;
 
     (** A class to represent a schematic setting. **)
@@ -188,7 +196,7 @@ Interface
     End;
 
     (** A class to represent a n Ellipse shape. **)
-    TTLSEllipse = Class(TTLSObject)
+    TTLSStatic = Class(TTLSObject)
     {$IFDEF D2005} Strict {$ENDIF} Private
       FStartOffset : Double;
       FEndOffset   : Double;
@@ -261,10 +269,10 @@ Interface
       Function Orientation : TTextOrientation;
       Function Text : Boolean;
       Function TextPositionElement : TTextPosition;
-      Function Ellipse : Boolean;
+      Function Static : Boolean;
       Function Location(S : TTLSShape) : Boolean;
       Function LocationEx(S : TTLSShape) : Boolean;
-      Function Percentages(S : TTLSEllipse) : Boolean;
+      Function Percentages(S : TTLSStatic) : Boolean;
       (* Helper method to the grammar parsers *)
       Procedure TokenizeStream;
       Procedure ParseTokens;
@@ -374,14 +382,19 @@ Implementation
     strNumbers:  Set Of AnsiChar = ['#', '$', '0'..'9'];
 
     (** A set of reserved words (not used in this parser.) **)
-    strReservedWords : Array[0..12] Of String = ('centreline', 'debug',
+    strReservedWords : Array[0..14] Of String = ('centreline', 'debug',
       'ellipse', 'lines', 'margins', 'notext', 'object', 'objects', 'road',
-      'roads', 'spacing', 'text', 'textorientation');
+      'roads', 'spacing', 'staticellipse', 'staticobject', 'text',
+      'textorientation');
 
     (** This is a list of reserved, directives word and a semi colon which are
         token that can be sort as then next place to start parsing from when an
         error is  encountered. **)
     strSeekableOnErrorTokens : Array[1..1] Of String = (';');
+
+    (** A constant array of shape types. **)
+    ObjectType : Array [Low(TSymbolType)..High(TSymbolType)] Of String = (
+      'OBJECT', '', '', 'ELLIPSE', '', '');
 
   ResourceString
     (** A resource string for the settings node. **)
@@ -981,11 +994,11 @@ Implementation
     @precon  S must be a valid instance of a TTLSShape.
     @postcon Returns true if the element was parsed successfully.
 
-    @param   S as a TTLSEllipse
+    @param   S as a TTLSStatic
     @return  a Boolean
 
   **)
-  function TTLSSchematicModule.Percentages(S: TTLSEllipse): Boolean;
+  function TTLSSchematicModule.Percentages(S: TTLSStatic): Boolean;
 
   Var
     dbl : Double;
@@ -1290,23 +1303,23 @@ Implementation
     @return  a Boolean
 
   **)
-  function TTLSSchematicModule.Ellipse: Boolean;
+  function TTLSSchematicModule.Static: Boolean;
 
   var
     Os: TElementContainer;
-    E : TTLSEllipse;
+    E : TTLSStatic;
     boolFound : Boolean;
     iColour : TColour;
 
   begin
     Result := False;
-    If Token.UToken = 'ELLIPSE' Then
+    If IsKeyWord(Token.Token, ['staticellipse', 'staticobject']) Then
       Begin
         Os := FindElement(strObjects);
         If Os = Nil Then
           Os := Add(TLabelContainer.Create(strObjects, scNone, 0, 0, iiPublicClass, Nil));
-        E := Os.Add(TTLSEllipse.Create(Format('Object%4.4d', [FObject]), scPublic,
-          Token.Line, Token.Column, iiPublicClass, GetComment)) As TTLSEllipse;
+        E := Os.Add(TTLSStatic.Create(Format('Object%4.4d', [FObject]), scPublic,
+          Token.Line, Token.Column, iiPublicClass, GetComment)) As TTLSStatic;
         Inc(FObject);
         E.Width := FCurrentObject;
         E.LineColour := FLineColour;
@@ -1314,6 +1327,9 @@ Implementation
         E.LineWeight := FLineWeight;
         E.TextOrientation := FTextOrientation;
         E.TextPosition := FTextPosition;
+        E.Shape := tstRectangle;
+        If Token.UToken = 'STATICELLIPSE' Then
+          E.Shape := tstEllipse;
         NextNonCommentToken;
         If Chainages(E) Then
           If Percentages(E) Then
@@ -1748,7 +1764,7 @@ Implementation
           If Not EndOfTokens Then
             While Road Or Object_ Or Objects Or Roads Or Margins Or Spacing Or
               Debugging Or CentreLine Or Lines Or NoText Or
-              TextOrientationElement Or Text Or Ellipse Or UnknownToken Do;
+              TextOrientationElement Or Text Or Static Or UnknownToken Do;
           If Not (Token.TokenType In [ttFileEnd]) Then
             Raise EParserAbort.Create(strUnExpectedEndOfFile);
         End;
@@ -1911,7 +1927,7 @@ Implementation
 
   begin
     Result := False;
-    If Token.UToken = 'OBJECT' Then
+    If IsKeyWord(Token.Token, ['ellipse', 'object']) Then
       Begin
         Os := FindElement(strObjects);
         If Os = Nil Then
@@ -1925,6 +1941,9 @@ Implementation
         O.LineWeight := FLineWeight;
         O.TextOrientation := FTextOrientation;
         O.TextPosition := FTextPosition;
+        O.Shape := tstRectangle;
+        If Token.UToken = 'ELLIPSE' Then
+          O.Shape := tstEllipse;
         NextNonCommentToken;
         If Chainages(O) Then
           If LocationEx(O) Then
@@ -2290,7 +2309,8 @@ Implementation
   function TTLSObject.AsString(boolShowIdentifier,
     boolForDocumentation: Boolean): String;
   begin
-    Result := Format('Object %1.1f, %1.1f, %s, %s, ''%s'', %1.1f%%', [StartChainage,
+    Result := Format('%s %1.1f, %1.1f, %s, %s, ''%s'', %1.1f%%', [
+      ObjectType[Shape] ,StartChainage,
       EndChainage, Locations[Location], strColours[Colour], Text, Width]);
     If RouteCode <> '' Then
       Result := Result + Format(', ''%s''', [RouteCode]);
@@ -2330,10 +2350,11 @@ Implementation
     @return  a String
 
   **)
-  function TTLSEllipse.AsString(boolShowIdentifier,
+  function TTLSStatic.AsString(boolShowIdentifier,
     boolForDocumentation: Boolean): String;
   begin
-    Result := Format('Ellipse %1.1f, %1.1f, %1.0f%%, %1.0f%%, %s, %s, ''%s''', [
+    Result := Format('STATIC%s %1.1f, %1.1f, %1.0f%%, %1.0f%%, %s, %s, ''%s''', [
+      ObjectType[Shape],
       StartChainage,
       EndChainage,
       StartOffset,

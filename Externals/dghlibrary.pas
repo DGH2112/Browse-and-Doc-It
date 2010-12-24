@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    29 Aug 2010
+  @Date    24 Dec 2010
 
 **)
 Unit DGHLibrary;
@@ -5596,6 +5596,84 @@ End;
 
 (**
 
+  This function returns the users logon name as a String.
+
+  @precon  None.
+  @postcon Returns the users logon name as a String.
+
+  @return  a String
+
+**)
+Function UserName : String;
+
+Var
+  i : Cardinal;
+
+Begin
+  i := 1024;
+  SetLength(Result, i);
+  GetUserName(@Result[1], i);
+  Win32Check(LongBool(i));
+  SetLength(Result, i - 1);
+End;
+
+(**
+
+  This function returns the users computer name as a String.
+
+  @precon  None.
+  @postcon Returns the users computer name as a String.
+
+  @return  a String
+
+**)
+Function ComputerName : String;
+
+Var
+  i : Cardinal;
+
+Begin
+  i := 1024;
+  SetLength(Result, i);
+  GetComputerName(@Result[1], i);
+  Win32Check(LongBool(i));
+  SetLength(Result, i);
+End;
+
+(**
+
+  This procedure searches for old INI files and moves them to a new directory.
+
+  @precon  None.
+  @postcon Searches for old INI files and moves them to a new directory.
+
+  @param   strOldPath as a String
+  @param   strNewPath as a String
+  @param   strPattern as a String
+
+**)
+Procedure MoveOldINIFiles(strOldPath, strNewPath, strPattern : String);
+
+Var
+  iResult : Integer;
+  recSearch : TSearchRec;
+
+Begin
+  iResult := FindFirst(strOldPath + strPattern, faAnyFile, recSearch);
+  Try
+    While iResult = 0 Do
+      Begin
+        MoveFile(PChar(strOldPath + recSearch.Name),
+          PChar(strNewPath + recSearch.Name));
+        iResult := FindNext(recSearch);
+      End;
+  Finally
+    SysUtils.FindClose(recSearch);
+  End;
+End;
+
+(**
+
   This method builds the root key INI filename for the loading and saving of
   settings from the instance handle for the module.
 
@@ -5615,6 +5693,8 @@ ResourceString
   strExpectedSquare = 'Expected "[" at position 3 in alternate INI file parameter.';
   strExpectedClosingSquare = 'Expected a closing "]" in alternate INI file parameter.';
   strPathDoesNotExist = 'The path "%s" does not exist for the alternate INI file.';
+  strINIPattern = '%s Settings for %s on %s.INI';
+  strSeasonsFall = '\Season''s Fall\';
 
   (**
 
@@ -5665,28 +5745,23 @@ ResourceString
   End;
 
 var
-  i: Cardinal;
-  strUserName: string;
-  strComputerName: string;
-  strModulePathAndName : String;
+  strModulePath : String;
+  strINIFileName : String;
+  strUserAppDataPath : String;
   Buffer : Array[0..MAX_PATH] Of Char;
   iParam : Integer;
 
 begin
-  i := 1024;
-  SetLength(strUserName, i);
-  GetUserName(@strUserName[1], i);
-  Win32Check(LongBool(i));
-  SetLength(strUserName, i - 1);
-  i := 1024;
-  SetLength(strComputerName, i);
-  GetComputerName(@strComputerName[1], i);
-  Win32Check(LongBool(i));
-  SetLength(strComputerName, i);
   GetModuleFileName(hInstance, Buffer, MAX_PATH);
-  strModulePathAndName := ChangeFileExt(StrPas(Buffer), '');
-  Result := Format('%s Settings for %s on %s.INI', [strModulePathAndName,
-    strUserName, strComputerName]);
+  strModulePath := ExtractFilePath(StrPas(Buffer));
+  strINIFileName :=  Format(strINIPattern,
+    [ChangeFileExt(ExtractFileName(StrPas(Buffer)), ''), UserName, ComputerName]);
+  SHGetFolderPath(0, CSIDL_APPDATA Or CSIDL_FLAG_CREATE, 0, SHGFP_TYPE_CURRENT, @Buffer);
+  strUserAppDataPath := StrPas(Buffer) + strSeasonsFall;
+  If Not DirectoryExists(strUserAppDataPath) Then
+    ForceDirectories(strUserAppDataPath);
+  Result := strUserAppDataPath + strINIFileName;
+  MoveOldINIFiles(strModulePath, strUserAppDataPath, ChangeFileExt(strINIFileName, '.*'));
   If CompareText(ExtractFileExt(StrPas(Buffer)), '.exe') = 0 Then
     If slParams <> Nil Then
       For iParam := 1 To ParamCount Do

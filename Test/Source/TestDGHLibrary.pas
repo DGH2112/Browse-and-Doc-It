@@ -489,13 +489,13 @@ var
 begin
   strFileName := 'notepad.exe';
   Check(DGHFindOnPath(strFileName, ''), 'Check for notepad.exe');
-  CheckEquals('C:\WINDOWS\system32\notepad.exe', strFileName);
+  CheckEquals('C:\Windows\system32\notepad.exe', strFileName);
   strFileName := 'regedit.exe';
   Check(DGHFindOnPath(strFileName, ''), 'Check for regedit.exe');
-  CheckEquals('C:\WINDOWS\regedit.exe', strFileName);
+  CheckEquals('C:\Windows\system32\regedit.exe', strFileName);
   strFileName := 'cmd.exe';
   Check(DGHFindOnPath(strFileName, ''), 'Check for cmd.exe');
-  CheckEquals('C:\WINDOWS\system32\cmd.exe', strFileName);
+  CheckEquals('C:\Windows\system32\cmd.exe', strFileName);
 end;
 
 procedure TestApplicationFunctions.TestDGHPathRelativePathTo;

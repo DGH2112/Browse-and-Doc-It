@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  Steve Trefethen
-  @Date    28 Jan 2010
+  @Date    27 Dec 2010
 
 **)
 unit EventSink;
@@ -214,6 +214,8 @@ Begin
     Try
       FClickProc(CommandBarButton(DispParams^[0].dispVal), DispParams^[1].pBool^);
     Except
+      On E : EAbort Do
+        Begin End;
       On E : Exception Do
         Begin
           {$IFDEF EUREKALOG}

@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       07 Nov 2010
+  @Date       16 Jan 2011
   @Author     David Hoyle
 
 **)
@@ -382,10 +382,10 @@ Implementation
     strNumbers:  Set Of AnsiChar = ['#', '$', '0'..'9'];
 
     (** A set of reserved words (not used in this parser.) **)
-    strReservedWords : Array[0..14] Of String = ('centreline', 'debug',
-      'ellipse', 'lines', 'margins', 'notext', 'object', 'objects', 'road',
-      'roads', 'spacing', 'staticellipse', 'staticobject', 'text',
-      'textorientation');
+    strReservedWords : Array[0..16] Of String = ('centreline', 'debug',
+      'diamond', 'ellipse', 'lines', 'margins', 'notext', 'object', 'objects',
+      'road', 'roads', 'spacing', 'staticdiamond', 'staticellipse',
+      'staticobject', 'text', 'textorientation');
 
     (** This is a list of reserved, directives word and a semi colon which are
         token that can be sort as then next place to start parsing from when an
@@ -394,7 +394,7 @@ Implementation
 
     (** A constant array of shape types. **)
     ObjectType : Array [Low(TSymbolType)..High(TSymbolType)] Of String = (
-      'OBJECT', '', '', 'ELLIPSE', '', '');
+      'OBJECT', '', '', 'ELLIPSE', '', 'DIAMOND');
 
   ResourceString
     (** A resource string for the settings node. **)
@@ -1313,7 +1313,7 @@ Implementation
 
   begin
     Result := False;
-    If IsKeyWord(Token.Token, ['staticellipse', 'staticobject']) Then
+    If IsKeyWord(Token.Token, ['staticdiamond', 'staticellipse', 'staticobject']) Then
       Begin
         Os := FindElement(strObjects);
         If Os = Nil Then
@@ -1329,7 +1329,9 @@ Implementation
         E.TextPosition := FTextPosition;
         E.Shape := tstRectangle;
         If Token.UToken = 'STATICELLIPSE' Then
-          E.Shape := tstEllipse;
+          E.Shape := tstEllipse
+        Else If Token.UToken = 'STATICDIAMOND' Then
+          E.Shape := tstDiamond;
         NextNonCommentToken;
         If Chainages(E) Then
           If Percentages(E) Then
@@ -1927,7 +1929,7 @@ Implementation
 
   begin
     Result := False;
-    If IsKeyWord(Token.Token, ['ellipse', 'object']) Then
+    If IsKeyWord(Token.Token, ['diamond', 'ellipse', 'object']) Then
       Begin
         Os := FindElement(strObjects);
         If Os = Nil Then
@@ -1943,7 +1945,9 @@ Implementation
         O.TextPosition := FTextPosition;
         O.Shape := tstRectangle;
         If Token.UToken = 'ELLIPSE' Then
-          O.Shape := tstEllipse;
+          O.Shape := tstEllipse
+        Else If Token.UToken = 'DIAMOND' Then
+          O.Shape := tstDiamond;
         NextNonCommentToken;
         If Chainages(O) Then
           If LocationEx(O) Then

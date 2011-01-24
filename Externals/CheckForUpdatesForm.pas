@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    11 Jul 2009
+  @Date    24 Jan 2011
 
 **)
 unit CheckForUpdatesForm;
@@ -98,7 +98,7 @@ begin
       If iColour <> clNone Then
         Font.Color := iColour;
       FillRect(Rect);
-      strText := Trim((Control As TListBox).Items[Index]);
+      strText := (Control As TListBox).Items[Index];
       R := (Control As TListBox).ItemRect(Index);
       Inc(R.Left, 4);
       Dec(R.Right, 4);
@@ -127,7 +127,7 @@ Var
   R : TRect;
 
 begin
-  strText := Trim((Control As TListBox).Items[Index]);
+  strText := (Control As TListBox).Items[Index];
   R := (Control As TListBox).ItemRect(Index);
   Inc(R.Left, 4);
   Dec(R.Right, 4);

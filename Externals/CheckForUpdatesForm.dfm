@@ -4,8 +4,8 @@ object frmCheckForUpdates: TfrmCheckForUpdates
   ActiveControl = lbInformation
   BorderStyle = bsToolWindow
   Caption = 'Checking for Software Updates...'
-  ClientHeight = 171
-  ClientWidth = 544
+  ClientHeight = 244
+  ClientWidth = 609
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,17 +17,18 @@ object frmCheckForUpdates: TfrmCheckForUpdates
   Position = poScreenCenter
   OnClose = FormClose
   DesignSize = (
-    544
-    171)
+    609
+    244)
   PixelsPerInch = 96
   TextHeight = 13
   object lblWebSite: TLabel
     Left = 8
-    Top = 143
+    Top = 223
     Width = 50
     Height = 13
     Cursor = crHandPoint
     Hint = 'Click to open this website...'
+    Anchors = [akLeft, akBottom]
     Caption = 'lblWebSite'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlue
@@ -40,12 +41,13 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     OnClick = lblWebSiteClick
     OnMouseEnter = lblWebSiteMouseEnter
     OnMouseLeave = lblWebSiteMouseLeave
+    ExplicitTop = 147
   end
   object lbInformation: TListBox
     Left = 8
     Top = 8
-    Width = 528
-    Height = 124
+    Width = 593
+    Height = 197
     Style = lbOwnerDrawVariable
     Anchors = [akLeft, akTop, akRight, akBottom]
     Color = clBlack
@@ -54,21 +56,23 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
-    ItemHeight = 16
     ParentFont = False
     TabOrder = 0
     OnDrawItem = lbInformationDrawItem
     OnMeasureItem = lbInformationMeasureItem
+    ExplicitWidth = 528
+    ExplicitHeight = 124
   end
   object btnOK: TBitBtn
-    Left = 461
-    Top = 138
+    Left = 526
+    Top = 211
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'OK'
     Default = True
+    DoubleBuffered = True
     Enabled = False
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
@@ -89,8 +93,11 @@ object frmCheckForUpdates: TfrmCheckForUpdates
       0000}
     ModalResult = 1
     NumGlyphs = 2
+    ParentDoubleBuffered = False
     TabOrder = 1
     OnClick = btnOKClick
+    ExplicitLeft = 461
+    ExplicitTop = 138
   end
   object tmFinish: TTimer
     Enabled = False

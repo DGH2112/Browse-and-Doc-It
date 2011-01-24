@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    24 Dec 2010
+  @Date    24 Jan 2011
 
 **)
 Unit DGHLibrary;
@@ -5745,24 +5745,31 @@ ResourceString
   End;
 
 var
-  strModulePath : String;
+  strModuleName : String;
   strINIFileName : String;
   strUserAppDataPath : String;
-  Buffer : Array[0..MAX_PATH] Of Char;
+  strBuffer : String;
   iParam : Integer;
+  iSize : Integer;
 
 begin
-  GetModuleFileName(hInstance, Buffer, MAX_PATH);
-  strModulePath := ExtractFilePath(StrPas(Buffer));
+  SetLength(strBuffer, MAX_PATH);
+  iSize := GetModuleFileName(hInstance, PChar(strBuffer), MAX_PATH);
+  SetLength(strBuffer, iSize);
+  strModuleName := strBuffer;
   strINIFileName :=  Format(strINIPattern,
-    [ChangeFileExt(ExtractFileName(StrPas(Buffer)), ''), UserName, ComputerName]);
-  SHGetFolderPath(0, CSIDL_APPDATA Or CSIDL_FLAG_CREATE, 0, SHGFP_TYPE_CURRENT, @Buffer);
-  strUserAppDataPath := StrPas(Buffer) + strSeasonsFall;
+    [ChangeFileExt(ExtractFileName(strBuffer), ''), UserName, ComputerName]);
+  SetLength(strBuffer, MAX_PATH);
+  SHGetFolderPath(0, CSIDL_APPDATA Or CSIDL_FLAG_CREATE, 0, SHGFP_TYPE_CURRENT,
+    PChar(strBuffer));
+  strBuffer := StrPas(PChar(strBuffer));
+  strUserAppDataPath := strBuffer + strSeasonsFall;
   If Not DirectoryExists(strUserAppDataPath) Then
     ForceDirectories(strUserAppDataPath);
   Result := strUserAppDataPath + strINIFileName;
-  MoveOldINIFiles(strModulePath, strUserAppDataPath, ChangeFileExt(strINIFileName, '.*'));
-  If CompareText(ExtractFileExt(StrPas(Buffer)), '.exe') = 0 Then
+  MoveOldINIFiles(ExtractFilePath(strModuleName), strUserAppDataPath,
+    ChangeFileExt(strINIFileName, '.*'));
+  If Like('*.exe', ExtractFileExt(strModuleName)) Then
     If slParams <> Nil Then
       For iParam := 1 To ParamCount Do
         Begin

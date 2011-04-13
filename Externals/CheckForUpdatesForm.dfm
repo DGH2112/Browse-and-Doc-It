@@ -41,7 +41,6 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     OnClick = lblWebSiteClick
     OnMouseEnter = lblWebSiteMouseEnter
     OnMouseLeave = lblWebSiteMouseLeave
-    ExplicitTop = 147
   end
   object lbInformation: TListBox
     Left = 8
@@ -60,8 +59,6 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     TabOrder = 0
     OnDrawItem = lbInformationDrawItem
     OnMeasureItem = lbInformationMeasureItem
-    ExplicitWidth = 528
-    ExplicitHeight = 124
   end
   object btnOK: TBitBtn
     Left = 526
@@ -72,7 +69,6 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     Cancel = True
     Caption = 'OK'
     Default = True
-    DoubleBuffered = True
     Enabled = False
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
@@ -93,11 +89,8 @@ object frmCheckForUpdates: TfrmCheckForUpdates
       0000}
     ModalResult = 1
     NumGlyphs = 2
-    ParentDoubleBuffered = False
     TabOrder = 1
     OnClick = btnOKClick
-    ExplicitLeft = 461
-    ExplicitTop = 138
   end
   object tmFinish: TTimer
     Enabled = False

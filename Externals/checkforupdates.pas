@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    24 Jan 2011
+  @Date    15 Apr 2011
 
 **)
 Unit CheckForUpdates;
@@ -55,7 +55,7 @@ Interface
 Implementation
 
   Uses
-    DGHLibrary, IniFiles, OLEAuto {$IFNDEF CONSOLE}, CheckForUpdatesForm {$ENDIF};
+    DGHLibrary, IniFiles {$IFNDEF CONSOLE}, CheckForUpdatesForm {$ENDIF};
 
   ResourceString
     (** A resource string of the start of the checking process. **)
@@ -89,7 +89,7 @@ Implementation
     (** A resource strin to define the INI file section for update information. **)
     strCheckForUpdatesSection = 'CheckForUpdates';
     (** An error message for failing to start MS XML. **)
-    strFailedMSXML = '  Failed to start or find MS XML on your system.';
+    strFailedMSXML = '  Failed to start or find MS XML on your system (%s).';
 
   Type
     (** An enumerate type to describe the internet connection status. **)
@@ -369,8 +369,8 @@ Implementation
         xmlDoc := Nil;
       End;
     Except
-      On E : EOLESysError Do
-        OutputMsg(strFailedMSXML, '', FMessageWarningColour);
+      On E : Exception Do
+        OutputMsg(Format(strFailedMSXML, [E.Message]), '', FMessageWarningColour);
     End;
   End;
 
@@ -657,3 +657,4 @@ Implementation
   End;
 
 End.
+

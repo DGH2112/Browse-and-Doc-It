@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    24 Jan 2011
+  @Date    13 Apr 2011
 
 **)
 Unit DGHLibrary;
@@ -733,7 +733,7 @@ ResourceString
 Implementation
 
 Uses
-  Math, ComObj, ShlObj, IniFiles {$IFNDEF D2005}, FileCtrl {$ENDIF};
+  Math, ComObj, SHFolder, ShlObj, IniFiles {$IFNDEF D2005}, FileCtrl {$ENDIF};
 
 Resourcestring
   (** A resource string to define the output format of a bearing. **)
@@ -5750,7 +5750,13 @@ var
   strUserAppDataPath : String;
   strBuffer : String;
   iParam : Integer;
-  iSize : Integer;
+  iSize : Integer;                                                              
+
+{$IFDEF D0007}
+// Delphi 7s SHFolder.pas file is missing this constant.
+Const
+  SHGFP_TYPE_CURRENT = 0; { current value for user, verify it exists }
+{$ENDIF}
 
 begin
   SetLength(strBuffer, MAX_PATH);
@@ -6585,3 +6591,5 @@ End;
 Initialization
   ConsoleMode := cmUnknown;
 End.
+
+

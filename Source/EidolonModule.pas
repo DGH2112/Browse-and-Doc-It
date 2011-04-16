@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       31 Aug 2010
+  @Date       16 Apr 2011
   @Author     David Hoyle
 
 **)
@@ -13,7 +13,7 @@ Unit EidolonModule;
 Interface
 
 Uses
-  SysUtils, Windows, Contnrs, Classes, BaseLanguageModule, RenderingLibrary;
+  SysUtils, Windows, Contnrs, Classes, BaseLanguageModule, EidolonTypes;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -141,11 +141,11 @@ Type
   (** A base class for all Time Location Symbols **)
   TSymbol = Class(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FBorderColour :TColour;
+    FBorderColour    : TColour;
     FBorderLineStyle : TLineStyle;
-    FBorderWeight : TLineWeight;
-    FSymbolType: TSymbolType;
-    FLayerIndex : Integer;
+    FBorderWeight    : TLineWeight;
+    FSymbolType      : TSymbolType;
+    FLayerIndex      : Integer;
   Public
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
@@ -223,8 +223,8 @@ Type
   (** A custom class to contain the main properties of symbols with areas. **)
   TCustomFillSymbol = Class(TLine)
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FInteriorColour : TColour;
-    FInteriorPattern : TInteriorPattern;
+    FInteriorColour        : TColour;
+    FInteriorPattern       : TInteriorPattern;
     FInteriorPatternColour : TColour;
     FTransparency : Integer;
   Public

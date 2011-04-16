@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       16 Jan 2011
+  @Date       16 Apr 2011
   @Author     David Hoyle
 
 **)
@@ -13,7 +13,7 @@ Unit EidolonTLSSchematicModule;
 Interface
 
   Uses
-    SysUtils, Windows, Contnrs, Classes, BaseLanguageModule, RenderingLibrary;
+    SysUtils, Windows, Contnrs, Classes, BaseLanguageModule, EidolonTypes;
 
   {$INCLUDE CompilerDefinitions.inc}
 

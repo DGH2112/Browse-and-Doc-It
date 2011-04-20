@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    16 Apr 2011
+  @Date    20 Apr 2011
   @Version 1.0
 
 **)
@@ -307,6 +307,15 @@ Const
       'Over Right',
       'Under'
     );
+
+    (** A constant array of RGB colours for the excel palette. **)
+    Colours : Array[Low(TColour)..High(TColour)] of Integer = (
+      -1,
+      $000000, $003399, $003333, $003300, $663300, $800000, $993333, $333333,
+      $000080, $0066FF, $008080, $008000, $808000, $FF0000, $996666, $808080,
+      $0000FF, $0099FF, $00CC99, $669933, $CCCC33, $FF6633, $800080, $969696,
+      $FF00FF, $00CCFF, $00FFFF, $00FF00, $FFFF00, $FFCC00, $663399, $C0C0C0,
+      $CC99FF, $99CCFF, $99FFFF, $CCFFCC, $FFFFCC, $FFCC99, $FF99CC, $FFFFFF);
 
 Implementation
 

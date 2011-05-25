@@ -46,6 +46,7 @@ Type
     Procedure TestTableNameDef;
     Procedure TestTimeLocationDef;
     Procedure TestLine;
+    Procedure TestLine2;
     Procedure TestBorderDef;
     Procedure TestBorderColour;
     Procedure TestBorderLineStyle;
@@ -5105,6 +5106,63 @@ begin
     CheckEquals('Time Location Symbol:C(255)', M.Elements[1].Elements[1].Elements[1].Elements[7].AsString(True, True));
     Checkequals(1, M.Elements[1].Elements[1].Elements[2].ElementCount);
     CheckEquals('Drainage=Line, Blue, Solid, 0.25', M.Elements[1].Elements[1].Elements[2].Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTEidolonModule.TestLine2;
+
+var
+  M: TBaseLanguageModule;
+  strSource : String;
+
+begin
+  strSource :=
+    'This is a time location table=Class(TimeLocationTable)'#13#10 +
+    '{'#13#10 +
+    '  Activity ID:C(255)'#13#10 +
+    '  Description:C(255)=Activity Name'#13#10 +
+    '  Start Date:D'#13#10 +
+    '  Finish Date:D'#13#10 +
+    '  Start Chainage:F'#13#10 +
+    '  Finish Chainage:F'#13#10 +
+    '  Time Location Symbol:C(255)'#13#10 +
+    '  &Drainage01= Line , Blue , Solid , 0.25, None      , ShortNarrow , None      , ShortNarrow '#13#10 +
+    '  &Drainage02= Line , Blue , Solid , 0.25, Diamond   , ShortMedium , Diamond   , ShortMedium '#13#10 +
+    '  &Drainage03= Line , Blue , Solid , 0.25, Open      , ShortWide   , Open      , ShortWide   '#13#10 +
+    '  &Drainage04= Line , Blue , Solid , 0.25, Oval      , MediumNarrow, Oval      , MediumNarrow'#13#10 +
+    '  &Drainage05= Line , Blue , Solid , 0.25, Stealth   , MediumMedium, Stealth   , MediumMedium'#13#10 +
+    '  &Drainage06= Line , Blue , Solid , 0.25, Triangle  , MediumWide  , None      , MediumWide  '#13#10 +
+    '  &Drainage07= Line , Blue , Solid , 0.25, None      , LongNarrow  , Triangle  , LongNarrow  '#13#10 +
+    '  &Drainage08= Line , Blue , Solid , 0.25, Oval      , LongMedium  , None      , LongMedium  '#13#10 +
+    '  &Drainage09= Line , Blue , Solid , 0.25, None      , LongWide    , Open      , LongWide    '#13#10 +
+    '}'#13#10;
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('Time Location Table Definitions', M.Elements[1].AsString(True, True));
+    CheckEquals(1, M.Elements[1].ElementCount);
+    CheckEquals('This is a time location table=Class(TimeLocationTable)', M.Elements[1].Elements[1].AsString(True, True));
+    Checkequals(2, M.Elements[1].Elements[1].ElementCount);
+    CheckEquals('Fields', M.Elements[1].Elements[1].Elements[1].AsString(True, True));
+    CheckEquals('Symbols', M.Elements[1].Elements[1].Elements[2].AsString(True, True));
+    Checkequals(7, M.Elements[1].Elements[1].Elements[1].ElementCount);
+    CheckEquals('Activity ID:C(255)', M.Elements[1].Elements[1].Elements[1].Elements[1].AsString(True, True));
+    CheckEquals('Time Location Symbol:C(255)', M.Elements[1].Elements[1].Elements[1].Elements[7].AsString(True, True));
+    Checkequals(9, M.Elements[1].Elements[1].Elements[2].ElementCount);
+    CheckEquals('Drainage01=Line, Blue, Solid, 0.25', M.Elements[1].Elements[1].Elements[2].Elements[1].AsString(True, True));
+    CheckEquals('Drainage02=Line, Blue, Solid, 0.25, Diamond, ShortMedium, Diamond, ShortMedium', M.Elements[1].Elements[1].Elements[2].Elements[2].AsString(True, True));
+    CheckEquals('Drainage03=Line, Blue, Solid, 0.25, Open, ShortWide, Open, ShortWide', M.Elements[1].Elements[1].Elements[2].Elements[3].AsString(True, True));
+    CheckEquals('Drainage04=Line, Blue, Solid, 0.25, Oval, MediumNarrow, Oval, MediumNarrow', M.Elements[1].Elements[1].Elements[2].Elements[4].AsString(True, True));
+    CheckEquals('Drainage05=Line, Blue, Solid, 0.25, Stealth, MediumMedium, Stealth, MediumMedium', M.Elements[1].Elements[1].Elements[2].Elements[5].AsString(True, True));
+    CheckEquals('Drainage06=Line, Blue, Solid, 0.25, Triangle, MediumWide, None, MediumWide', M.Elements[1].Elements[1].Elements[2].Elements[6].AsString(True, True));
+    CheckEquals('Drainage07=Line, Blue, Solid, 0.25, None, LongNarrow, Triangle, LongNarrow', M.Elements[1].Elements[1].Elements[2].Elements[7].AsString(True, True));
+    CheckEquals('Drainage08=Line, Blue, Solid, 0.25, Oval, LongMedium, None, LongMedium', M.Elements[1].Elements[1].Elements[2].Elements[8].AsString(True, True));
+    CheckEquals('Drainage09=Line, Blue, Solid, 0.25, None, LongWide, Open, LongWide', M.Elements[1].Elements[1].Elements[2].Elements[9].AsString(True, True));
   Finally
     M.Free;
   End;

@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    18 May 2011
+  @Date    25 May 2011
   @Version 1.0
 
 **)
@@ -164,6 +164,16 @@ Type
   TDimension = (diHeight, diWidth, diLegendWidth, diTitleHeight,
     diOverheadHeight, diDateWidth, diLegendLabel, diWeekNoWidth);
 
+  (** An enumerate to define the line end style. **)
+  TLineEndType = (atNone, atDiamond, atOpen, atOval, atStealth, atTriangle);
+
+  (** An enumerate to define the line end length and width. **)
+  TLineEndSize = (
+    asShortNarrow, asMediumNarrow, asLongNarrow,
+    asShortMedium, asMediumMedium, asLongMedium,
+    asShortWide,   asMediumWide,   asLongWide
+  );
+
 Const
   (** A constant array of names for the enumerated symbols types. **)
   strSymbolTypes : Array[Low(TSymbolType)..High(TSymbolType)] Of String = (
@@ -321,6 +331,18 @@ Const
     $0000FF, $0099FF, $00CC99, $669933, $CCCC33, $FF6633, $800080, $969696,
     $FF00FF, $00CCFF, $00FFFF, $00FF00, $FFFF00, $FFCC00, $663399, $C0C0C0,
     $CC99FF, $99CCFF, $99FFFF, $CCFFCC, $FFFFCC, $FFCC99, $FF99CC, $FFFFFF);
+
+  (** A constant array of strings describing Line End Types. **)
+  strLineEndTypes : Array[Low(TLineEndType)..High(TLineEndType)] Of String = (
+    'None', 'Diamond', 'Open', 'Oval', 'Stealth', 'Triangle'
+  );
+
+  (** A constant array of strings describing Line End Sizes. **)
+  strLineEndSizes : Array[Low(TLineEndSize)..High(TLineEndSize)] Of String = (
+    'ShortNarrow', 'MediumNarrow', 'LongNarrow',
+    'ShortMedium', 'MediumMedium', 'LongMedium',
+    'ShortWide',   'MediumWide',   'LongWide'
+  );
 
 Implementation
 

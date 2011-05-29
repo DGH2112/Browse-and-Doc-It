@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       16 Apr 2011
+  @Date       29 May 2011
   @Author     David Hoyle
 
 **)
@@ -147,6 +147,8 @@ Type
     FSymbolType      : TSymbolType;
     FLayerIndex      : Integer;
   Public
+    Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
+      AImageIndex : TImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the symbol type.
@@ -218,7 +220,46 @@ Type
   End;
 
   (** A class to represent a LINE time location symbol **)
-  TLine = Class(TSymbol);
+  TLine = Class(TSymbol)
+  {$IFDEF D2005} Strict {$ENDIF} Private
+    FLineStartType : TLineEndType;
+    FLineStartSize : TLineEndSize;
+    FLineEndType : TLineEndType;
+    FLineEndSize : TLineEndSize;
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
+    Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
+      AImageIndex : TImageIndex; AComment: TComment); Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    (**
+      A property to get and set the Line Start Type.
+      @precon  None.
+      @postcon Get and set the Line Start Type.
+      @return  a TLineEndType
+    **)
+    Property LineStartType : TLineEndType Read FLineStartType Write FLineStartType;
+    (**
+      A property to get and set the Line Start Size.
+      @precon  None.
+      @postcon Get and set the Line Start Size.
+      @return  a TLineEndSize
+    **)
+    Property LineStartSize : TLineEndSize Read FLineStartSize Write FLineStartSize;
+    (**
+      A property to get and set the Line End Type.
+      @precon  None.
+      @postcon Get and set the Line End Type.
+      @return  a TLineEndType
+    **)
+    Property LineEndType   : TLineEndType Read FLineEndType   Write FLineEndType;
+    (**
+      A property to get and set the Line End Size.
+      @precon  None.
+      @postcon Get and set the Line End Size.
+      @return  a TLineEndSize
+    **)
+    Property LineEndSize   : TLineEndSize Read FLineEndSize   Write FLineEndSize;
+  End;
 
   (** A custom class to contain the main properties of symbols with areas. **)
   TCustomFillSymbol = Class(TLine)
@@ -273,6 +314,8 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
     FBarWidth : Integer;
   Public
+    Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
+      AImageIndex : TImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the bar width of the bar.
@@ -288,6 +331,8 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
     FDiamondSize : Integer;
   Public
+    Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
+      AImageIndex : TImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the bar width of the bar.
@@ -303,6 +348,8 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
     FTriangleType : TTriangleType;
   Public
+    Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
+      AImageIndex : TImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the bar width of the bar.
@@ -318,6 +365,8 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
     FEllipseSize : Integer;
   Public
+    Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
+      AImageIndex : TImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the bar width of the bar.
@@ -330,6 +379,9 @@ Type
 
   (** This is an enumerate to define the two types of connection. **)
   TConnectionType = (ctPrimary, ctSecondary);
+
+  (** An enumerate to describe which end is being parsed. **)
+  TLineEnd = (leStart, leEnd);
 
   (** This is the main class for dealing with backus-naur grammar files. **)
   TEidolonModule = Class(TBaseLanguageModule)
@@ -388,6 +440,13 @@ Type
     Function  RequirementsTable(strName : String; StartToken : TTokenInfo;
       C : TComment) : Boolean;
     Function  AssociationDef(RequirementsTable : TRequirementsTable): Boolean;
+    Procedure LineEndDefs(Line : TLine);
+    Procedure StartType(Line : TLine);
+    Procedure StartSize(Line : TLine);
+    Procedure EndType(Line : TLine);
+    Procedure EndSize(Line : TLine);
+    Procedure LineEndType(Line : TLine; LineEnd : TLineEnd);
+    Procedure LineEndSize(Line : TLine; LineEnd : TLineEnd);
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
@@ -467,6 +526,10 @@ resourcestring
   strInvalidPattern = 'Invalid pattern ''%s'' at line %d column %d.';
   (** A resource string for an invalid number. **)
   strInvalidNumber = 'Invalid number ''%s'' at line %d column %d.';
+  (** A resource string for an invalid line end type. **)
+  strInvalidLineType = 'Invalid Line Type ''%s'' at line %d column %d.';
+  (** A resource string for an invalid line end size. **)
+  strInvalidLineSize = 'Invalid Line Size ''%s'' at line %d column %d.';
   (** A resource string for an interior colour with no pattern **)
   strYouHaveSpecifiedAColour = 'You have specified an interior colour ''%s''' +
   ' when the pattern is None';
@@ -1019,6 +1082,9 @@ constructor TCustomFillSymbol.Create(strName: String; AScope: TScope; iLine,
   iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+  FInteriorColour := xlcWHITE;
+  FInteriorPattern := ipNONE;
+  FInteriorPatternColour := xlcNONE;
   FTransparency := -1;
 end;
 
@@ -1927,6 +1993,36 @@ end;
 
 (**
 
+  This method parses the EndSize element of the grammar.
+
+  @precon  Line must be a valid instance.
+  @postcon Parses the EndSize element of the grammar.
+
+  @param   Line as a TLine
+
+**)
+procedure TEidolonModule.EndSize(Line: TLine);
+begin
+  LineEndSize(Line, leEnd);
+end;
+
+(**
+
+  This method parses the EndType element of the grammar.
+
+  @precon  Line must be a valid instance.
+  @postcon Parses the EndType element of the grammar.
+
+  @param   Line as a TLine
+
+**)
+procedure TEidolonModule.EndType(Line: TLine);
+begin
+  LineEndType(Line, leEnd);
+end;
+
+(**
+
   This method parses the Ellipse element of the grammar.
 
   @precon  StartToken must ba a valid instance of a TTokenInfo class and TLT
@@ -2519,6 +2615,36 @@ end;
 
 (**
 
+  This method parses the StartSize element of the grammar.
+
+  @precon  Line must be a valid instance.
+  @postcon Parses the StartSize element of the grammar.
+
+  @param   Line as a TLine
+
+**)
+procedure TEidolonModule.StartSize(Line: TLine);
+begin
+  LineEndSize(Line, leStart);
+end;
+
+(**
+
+  This method parses the StartType element of the grammar.
+
+  @precon  Line must be a valid instance.
+  @postcon Parses the StartType element of the grammar.
+
+  @param   Line as a TLine
+
+**)
+procedure TEidolonModule.StartType(Line: TLine);
+begin
+  LineEndType(Line, leStart);
+end;
+
+(**
+
   This method returns an array of key words for use in the explorer module.
 
   @precon  None.
@@ -2636,11 +2762,17 @@ begin
         StartToken.Column, iiPublicObject, Nil)) As TLine;
       L.SymbolType := tstLine;
       L.LayerIndex := iLayerIndex;
+      L.LineStartType := atNone;
+      L.LineStartSize := asMediumMedium;
+      L.LineEndType := atNone;
+      L.LineEndSize := asMediumMedium;
       EatWhitespace;
       If CheckLiteral(',', 'TLLine') Then
         Begin
           BorderDef(L);
           EatWhitespace;
+          If Not (Token.TokenType In [ttLineEnd]) Then
+            LineEndDefs(L);
           CheckLineEnd('TLLine');
         End;
     End;
@@ -2722,6 +2854,111 @@ Procedure TEidolonModule.ProcessCompilerDirective(var iSkip : Integer);
 Begin
   // Do nothing, i.e. Conditional Compilation is NOT supported.
 End;
+
+(**
+
+  This method parses the LineEndDefs element of the grammar.
+
+  @precon  Line must be a valid instance.
+  @postcon Parses the LineEndDefs element of the grammar.
+
+  @param   Line as a TLine
+
+**)
+procedure TEidolonModule.LineEndDefs(Line : TLine);
+
+begin
+  If CheckLiteral(',', 'LineEndDefs') Then
+    Begin
+      StartType(Line);
+      If CheckLiteral(',', 'LineEndDefs') Then
+        Begin
+          StartSize(Line);
+          If CheckLiteral(',', 'LineEndDefs') Then
+            Begin
+              EndType(Line);
+              If CheckLiteral(',', 'LineEndDefs') Then
+                EndSize(Line);
+            End;
+        End;
+    End;
+end;
+
+(**
+
+  This method parses the LineEndSize element of the grammar.
+
+  @precon  None.
+  @postcon Parses the LineEndSize element of the grammar.
+
+  @param   Line    as a TLine
+  @param   LineEnd as a TLineEnd
+
+**)
+procedure TEidolonModule.LineEndSize(Line: TLine; LineEnd : TLineEnd);
+
+Var
+  boolFound : Boolean;
+  i: TLineEndSize;
+
+begin
+  boolFound := False;
+  EatWhitespace;
+  For i := Low(TLineEndSize) To High(TLineEndSize) Do
+    If CompareText(strLineEndSizes[i], Token.Token) = 0 Then
+      Begin
+        boolFound := True;
+        Case LineEnd Of
+          leStart: Line.LineStartSize := i;
+          leEnd:   Line.LineEndSize := i;
+        End;
+        Break;
+      End;
+  If boolFound Then
+    NextNonCommentToken
+  Else
+    ErrorAndSeekToken(strInvalidLineSize, 'LineEndSize', Token.Token,
+      strSeekableOnErrorTokens, stActual);
+  EatWhitespace;
+end;
+
+(**
+
+  This method parses the LineEndType element of the grammar.
+
+  @precon  None.
+  @postcon Parses the LineEndType element of the grammar.
+
+  @param   Line    as a TLine
+  @param   LineEnd as a TLineEnd
+
+**)
+procedure TEidolonModule.LineEndType(Line: TLine; LineEnd : TLineEnd);
+
+Var
+  boolFound : Boolean;
+  i: TLineEndType;
+
+begin
+  boolFound := False;
+  EatWhitespace;
+  For i := Low(TLineEndType) To High(TLineEndType) Do
+    If CompareText(strLineEndTypes[i], Token.Token) = 0 Then
+      Begin
+        boolFound := True;
+        Case LineEnd Of
+          leStart: Line.LineStartType := i;
+          leEnd:   Line.LineEndType := i;
+        End;
+        Break;
+      End;
+  If boolFound Then
+    NextNonCommentToken
+  Else
+    ErrorAndSeekToken(strInvalidLineType, 'LineEndType', Token.Token,
+      strSeekableOnErrorTokens, stActual);
+  EatWhitespace;
+end;
 
 (**
 
@@ -3344,6 +3581,171 @@ begin
     AddIssue(Format(strYouHaveSpecifiedAPattern,
       [strInteriorPatterns[CustomSymbol.InteriorPattern]]), scNone,
       'InteriorPatternColour', CustomSymbol.Line, CustomSymbol.Column, etWarning);
+end;
+
+{ TLine }
+
+(**
+
+  This method returns a string representation of the line.
+
+  @precon  None.
+  @postcon Returns a string representation of the line.
+
+  @param   boolShowIdentifier   as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+function TLine.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+begin
+  Result := Inherited AsString(boolShowIdentifier, boolForDocumentation);
+  If (LineStartType <> atNone) Or (LineEndType <> atNone) Then
+    Begin
+      Result := Result + ', ' + strLineEndTypes[LineStartType];
+      Result := Result + ', ' + strLineEndSizes[LineStartSize];
+      Result := Result + ', ' + strLineEndTypes[LineEndType];
+      Result := Result + ', ' + strLineEndSizes[LineEndSize];
+    End;
+end;
+
+(**
+
+  A constructor for the TSymbol class.
+
+  @precon  None.
+  @postcon Creates a TSymbol as a default Rectangle.
+
+  @param   strName     as a String
+  @param   AScope      as a TScope
+  @param   iLine       as an Integer
+  @param   iColumn     as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+
+**)
+constructor TSymbol.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
+  AImageIndex: TImageIndex; AComment: TComment);
+begin
+  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+  FSymbolType := tstRectangle;
+  FBorderColour := xlcBLACK;
+  FBorderLineStyle := lsSOLID;
+  FBorderWeight := lw0_25;
+  FLayerIndex := 0;
+end;
+
+(**
+
+  A constructor for the TBar class.
+
+  @precon  None.
+  @postcon Creates an intsance of the TBar class initialising the properties.
+
+  @param   strName     as a String
+  @param   AScope      as a TScope
+  @param   iLine       as an Integer
+  @param   iColumn     as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+
+**)
+constructor TBar.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
+  AImageIndex: TImageIndex; AComment: TComment);
+begin
+  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+  FBarWidth := 5;
+end;
+
+(**
+
+  A constructor for the TDiamond class.
+
+  @precon  None.
+  @postcon Creates an intsance of the TDiamond class initialising the properties.
+
+  @param   strName     as a String
+  @param   AScope      as a TScope
+  @param   iLine       as an Integer
+  @param   iColumn     as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+
+**)
+constructor TDiamond.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
+  AImageIndex: TImageIndex; AComment: TComment);
+begin
+  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+  FDiamondSize := 5;
+end;
+
+(**
+
+  A constructor for the TTriangle class.
+
+  @precon  None.
+  @postcon Creates an intsance of the TTriangle class initialising the properties.
+
+  @param   strName     as a String
+  @param   AScope      as a TScope
+  @param   iLine       as an Integer
+  @param   iColumn     as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+
+**)
+constructor TTriangle.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
+  AImageIndex: TImageIndex; AComment: TComment);
+begin
+  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+  FTriangleType := ttStartAndEarly;
+end;
+
+(**
+
+  A constructor for the TEllipse class.
+
+  @precon  None.
+  @postcon Creates an intsance of the TEllipse class initialising the properties.
+
+  @param   strName     as a String
+  @param   AScope      as a TScope
+  @param   iLine       as an Integer
+  @param   iColumn     as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+
+**)
+constructor TEllipse.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
+  AImageIndex: TImageIndex; AComment: TComment);
+begin
+  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+  FEllipseSize := 5;
+end;
+
+(**
+
+  A constructor for the TLine class.
+
+  @precon  None.
+  @postcon Creates an intsance of the TLine class initialising the properties.
+
+  @param   strName     as a String
+  @param   AScope      as a TScope
+  @param   iLine       as an Integer
+  @param   iColumn     as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+
+**)
+constructor TLine.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
+  AImageIndex: TImageIndex; AComment: TComment);
+begin
+  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+  FLineStartType := atNone;
+  FLineStartSize := asMediumMedium;
+  FLineEndType := atNone;
+  FLineEndSize := asMediumMedium;
 end;
 
 End.

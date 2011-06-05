@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    25 May 2011
+  @Date    05 Jun 2011
   @Version 1.0
 
 **)
@@ -343,6 +343,14 @@ Const
     'ShortMedium', 'MediumMedium', 'LongMedium',
     'ShortWide',   'MediumWide',   'LongWide'
   );
+
+  (** A constant array of line end widths to be associated with the LineEndSizes **)
+  LineEndWidths : Array[Low(TLineEndSize)..High(TLineEndSize)] Of Integer = (
+    2, 2, 2, 3, 3, 3, 5, 5, 5);
+
+  (** A constant array of line end lengths to be associated with the LineEndSizes **)
+  LineEndLengths : Array[Low(TLineEndSize)..High(TLineEndSize)] Of Integer = (
+    2, 3, 5, 2, 3, 5, 2, 3, 5);
 
 Implementation
 

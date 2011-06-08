@@ -346,11 +346,11 @@ Const
 
   (** A constant array of line end widths to be associated with the LineEndSizes **)
   LineEndWidths : Array[Low(TLineEndSize)..High(TLineEndSize)] Of Integer = (
-    2, 2, 2, 3, 3, 3, 5, 5, 5);
+    2, 2, 2, 4, 4, 4, 6, 6, 6);
 
   (** A constant array of line end lengths to be associated with the LineEndSizes **)
   LineEndLengths : Array[Low(TLineEndSize)..High(TLineEndSize)] Of Integer = (
-    2, 3, 5, 2, 3, 5, 2, 3, 5);
+    2, 4, 6, 2, 4, 6, 2, 4, 6);
 
 Implementation
 

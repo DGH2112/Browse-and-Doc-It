@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    15 Apr 2011
+  @Date    13 Jun 2011
 
 **)
 Unit CheckForUpdates;
@@ -407,9 +407,11 @@ Implementation
           CheckForUpdates(strURL)
           {$IFNDEF CONSOLE}
         Else
-          SysUtils.Beep;
-          TfrmCheckForUpdates.Finish(60)
-          {$ENDIF};
+          Begin
+            SysUtils.Beep;
+            TfrmCheckForUpdates.Finish(60)
+          {$ENDIF}
+          End;
         WriteLastUpdateDate;
       End;
   End;

@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    05 Jun 2011
+  @Date    13 Jun 2011
   @Version 1.0
 
 **)
@@ -173,6 +173,13 @@ Type
     asShortMedium, asMediumMedium, asLongMedium,
     asShortWide,   asMediumWide,   asLongWide
   );
+
+  (** A record to describe the dimension information for the constant array **)
+  TDimensionRec = Record
+    FDisplayName : String;
+    FININame     : String;
+    FDefault     : Double;
+  End;
 
 Const
   (** A constant array of names for the enumerated symbols types. **)
@@ -351,6 +358,18 @@ Const
   (** A constant array of line end lengths to be associated with the LineEndSizes **)
   LineEndLengths : Array[Low(TLineEndSize)..High(TLineEndSize)] Of Integer = (
     2, 4, 6, 2, 4, 6, 2, 4, 6);
+
+  (** A constant array of dimension names for the INI file. **)
+  Dimensions : Array[Low(TDimension)..High(TDimension)] Of TDimensionRec = (
+    (FDisplayName: 'Height';          FININame: 'Height';         FDefault:  841.0),
+    (FDisplayName: 'Width';           FININame: 'Width';          FDefault: 1189.0),
+    (FDisplayName: 'Legend Width';    FININame: 'LegendWidth';    FDefault:  150.0),
+    (FDisplayName: 'Title Height';    FININame: 'TitleHeight';    FDefault:  150.0),
+    (FDisplayName: 'Overhead Height'; FININame: 'OverheadHeight'; FDefault:  150.0),
+    (FDisplayName: 'Date Width';      FININame: 'DateWidth';      FDefault:   75.0),
+    (FDisplayName: 'Legend Label';    FININame: 'LegendLabel';    FDefault:   52.0),
+    (FDisplayName: 'Week No Width';   FININame: 'WeekNoWidth';    FDefault:   25.0)
+  );
 
 Implementation
 

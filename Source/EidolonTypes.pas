@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    13 Jun 2011
+  @Date    19 Jun 2011
   @Version 1.0
 
 **)
@@ -173,6 +173,11 @@ Type
     asShortMedium, asMediumMedium, asLongMedium,
     asShortWide,   asMediumWide,   asLongWide
   );
+
+  (** An enumerate to define the locations where Time Location Symbols can be shown. **)
+  TDisplayOp = (doRender, doLegend);
+  (** A set of the above enumerate. **)
+  TDisplayOps = Set Of TDisplayOp;
 
   (** A record to describe the dimension information for the constant array **)
   TDimensionRec = Record

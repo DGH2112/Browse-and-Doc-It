@@ -57,17 +57,24 @@ uses
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
   BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas',
   SynHighlighterCpp in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterCpp.pas',
-  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  CommonIDEFunctions in '..\..\..\Library\CommonIDEFunctions.pas',
   XMLModule in '..\..\..\LIBRARY\XMLModule.pas',
   SynHighlighterXML in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterXML.pas',
   DFMModule in '..\..\..\LIBRARY\DFMModule.pas',
-  EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas';
+  EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas',
+  FolderConfig in 'Source\FolderConfig.pas' {frmFolders},
+  UsefulSynEditFunctions in '..\..\..\LIBRARY\UsefulSynEditFunctions.pas',
+  DGHSynEdit in '..\..\..\LIBRARY\DGHSynEdit.pas',
+  EditorOptionsForm in '..\..\..\LIBRARY\EditorOptionsForm.pas' {frmEditorOptions},
+  SynHighlighterDfm in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterDfm.pas';
 
 {$R *.res}
 
 begin
   ReportMemoryLeaksOnShutdown := DebugHook <> 0;
+  {$IFDEF EUREKALOG}
   SetEurekaLogState(DebugHook = 0);
+  {$ENDIF}
   Application.Initialize;
   Application.CreateForm(TfrmBrowseAndDocItTestForm, frmBrowseAndDocItTestForm);
   Application.Run;

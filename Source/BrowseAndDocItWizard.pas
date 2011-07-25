@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    13 Aug 2010
+  @Date    25 Jul 2011
   @Version 1.0
 
 **)
@@ -1336,10 +1336,12 @@ procedure TBrowseAndDocItWizard.SelectionChange(iIdentLine, iIdentCol,
 Var
   SourceEditor : IOTASourceEditor;
   C : TOTAEditPos;
+  EV: IOTAEditView;
+  {$IFDEF D2006}
+  EA : IOTAElideActions;
+  {$ENDIF}
 
 begin
-  {: @note Although you can get the regions by Query an IOTAModule for
-           IOTAModuleRegions, you can not do anything with them!}
   SourceEditor := ActiveSourceEditor;
   If SourceEditor <> Nil Then
     Begin
@@ -1349,36 +1351,40 @@ begin
           If iIdentCol * iIdentLine > 0 Then
             Begin
               SourceEditor.Show;
-              {$IFDEF D2005}
-              If SourceEditor.GetSubViewCount > 0 Then
-                SourceEditor.SwitchToView(0);
+              EV := (BorlandIDEServices As IOTAEditorServices).TopView;
+              {$IFDEF D2006}
+              EV.QueryInterface(IOTAElideActions, EA);
               {$ENDIF}
               C.Col := iIdentCol;
               C.Line := iIdentLine;
-              SourceEditor.GetEditView(0).CursorPos := C;
+              {$IFDEF D2006}
+              If EA <> Nil Then
+                EA.UnElideNearestBlock;
+              {$ENDIF}
+              EV.CursorPos := C;
               Case BrowseAndDocItOptions.BrowsePosition Of
                 bpCommentTop:
                   Begin
                     If iCommentLine > 0 Then
                       iIdentLine := iCommentLine;
-                    SourceEditor.GetEditView(0).SetTopLeft(iIdentLine, 1);
+                    EV.SetTopLeft(iIdentLine, 1);
                   End;
                 bpCommentCentre:
                   Begin
                     If iCommentLine > 0 Then
                       iIdentLine := iCommentLine;
-                    SourceEditor.GetEditView(0).Center(iIdentLine, 1);
+                    EV.Center(iIdentLine, 1);
                   End;
                 bpIdentifierTop:
-                  SourceEditor.GetEditView(0).SetTopLeft(iIdentLine, 1);
+                  EV.SetTopLeft(iIdentLine, 1);
                 bpIdentifierCentre:
-                  SourceEditor.GetEditView(0).Center(iIdentLine, 1);
+                  EV.Center(iIdentLine, 1);
                 bpIdentifierCentreShowAllComment:
                   Begin
-                    SourceEditor.GetEditView(0).Center(iIdentLine, 1);
+                    EV.Center(iIdentLine, 1);
                     If iCommentLine > 0 Then
-                      If iCommentLine < SourceEditor.EditViews[0].TopRow Then
-                        SourceEditor.GetEditView(0).SetTopLeft(iCommentLine, 1);
+                      If iCommentLine < EV.TopRow Then
+                        EV.SetTopLeft(iCommentLine, 1);
                   End;
               End;
             End;

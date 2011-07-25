@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    24 Oct 2009
+  @Date    29 Mar 2010
 
 **)
 library BrowseAndDocIt70;
@@ -65,7 +65,7 @@ uses
   VBModule in '..\..\..\LIBRARY\VBModule.pas',
   DUnitForm in '..\Source\DUnitForm.pas' {frmDUnit},
   DUnitCreator in '..\Source\DUnitCreator.pas',
-  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  CommonIDEFunctions in '..\..\..\Library\CommonIDEFunctions.pas',
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
   BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas',
   XMLModule in '..\..\..\LIBRARY\XMLModule.pas',
@@ -74,9 +74,13 @@ uses
   BNFHighlighter in '..\Source\BNFHighlighter.pas',
   KeyboardBindings in '..\Source\KeyboardBindings.pas',
   EditorNotifier in '..\Source\EditorNotifier.pas',
-  EidolonHighlighter in '..\Source\EidolonHighlighter.pas';
+  EidolonHighlighter in '..\Source\EidolonHighlighter.pas',
+  ProfilingForm in '..\Source\ProfilingForm.pas' {frmProfiling},
+  EidolonTypes in '..\..\..\LIBRARY\EidolonTypes.pas';
 
 {$R *.res}
 
 begin
 end.
+
+

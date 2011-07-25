@@ -4,9 +4,9 @@
   VBE IDE.
 
   @Version 1.0
-  @Date    21 Oct 2009
+  @Date    12 Jun 2010
   @Author  David Hoyle
-  
+
 **)
 library BrowseAndDocItVBEIDE;
 
@@ -37,7 +37,7 @@ uses
   SynTextDrawer in '..\..\..\LIBRARY\SynEdit\Source\SynTextDrawer.pas',
   SynEditWordWrap in '..\..\..\LIBRARY\SynEdit\Source\SynEditWordWrap.pas',
   PascalModule in '..\..\..\LIBRARY\PascalModule.pas',
-  Office_TLB in '..\..\..\Library\Office_TLB.pas',
+  Office2000_TLB in '..\..\..\Library\Office2000_TLB.pas',
   EventSink in '..\..\..\Library\EventSink.pas',
   VBEIDEModuleExplorer in '..\Source\VBEIDEModuleExplorer.pas' {frmDockableModuleExplorer},
   ProgressForm in '..\..\..\Library\ProgressForm.pas' {frmProgress},
@@ -57,7 +57,7 @@ uses
   ModuleExplorerFrame in '..\..\..\Library\ModuleExplorerFrame.pas' {frameModuleExplorer: TFrame},
   VirtualTrees in '..\..\..\Library\Virtual Treeview\Source\VirtualTrees.pas',
   VTAccessibilityFactory in '..\..\..\Library\Virtual Treeview\Source\VTAccessibilityFactory.pas',
-  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  CommonIDEFunctions in '..\..\..\Library\CommonIDEFunctions.pas',
   CheckForUpdatesForm in '..\..\..\LIBRARY\CheckForUpdatesForm.pas' {frmCheckForUpdates},
   checkforupdates in '..\..\..\LIBRARY\checkforupdates.pas',
   MSXML2_TLB in '..\..\..\LIBRARY\MSXML2_TLB.pas',
@@ -66,7 +66,8 @@ uses
   XMLModule in '..\..\..\Library\XMLModule.pas',
   BackusNaurModule in '..\..\..\Library\BackusNaurModule.pas',
   DFMModule in '..\..\..\Library\DFMModule.pas',
-  EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas';
+  EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas',
+  EidolonTypes in '..\..\..\Library\EidolonTypes.pas';
 
 exports
   DllGetClassObject,

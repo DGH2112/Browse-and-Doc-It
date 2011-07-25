@@ -40,7 +40,7 @@
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 			<DCC_UNIT_PLATFORM>false</DCC_UNIT_PLATFORM>
 			<DCC_E>false</DCC_E>
-			<DCC_DcuOutput>..\2009DCUs\</DCC_DcuOutput>
+			<DCC_DcuOutput>..\2010DCUs\</DCC_DcuOutput>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -83,7 +83,7 @@
 			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynTextDrawer.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\SynEdit\Source\SynEditWordWrap.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\PascalModule.pas"/>
-			<DCCReference Include="..\..\..\Library\Office_TLB.pas"/>
+			<DCCReference Include="..\..\..\Library\Office2000_TLB.pas"/>
 			<DCCReference Include="..\..\..\Library\EventSink.pas"/>
 			<DCCReference Include="..\Source\VBEIDEModuleExplorer.pas">
 				<Form>frmDockableModuleExplorer</Form>
@@ -120,7 +120,7 @@
 			</DCCReference>
 			<DCCReference Include="..\..\..\Library\Virtual Treeview\Source\VirtualTrees.pas"/>
 			<DCCReference Include="..\..\..\Library\Virtual Treeview\Source\VTAccessibilityFactory.pas"/>
-			<DCCReference Include="..\Source\CommonIDEFunctions.pas"/>
+			<DCCReference Include="..\..\..\Library\CommonIDEFunctions.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\CheckForUpdatesForm.pas">
 				<Form>frmCheckForUpdates</Form>
 			</DCCReference>
@@ -132,6 +132,7 @@
 			<DCCReference Include="..\..\..\Library\BackusNaurModule.pas"/>
 			<DCCReference Include="..\..\..\Library\DFMModule.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\EidolonModule.pas"/>
+			<DCCReference Include="..\..\..\Library\EidolonTypes.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -154,7 +155,7 @@
 						<Source Name="MainSource">BrowseAndDocItVBEIDE.dpr</Source>
 					</Source>
 					<Parameters>
-						<Parameters Name="HostApplication">C:\Program Files\Microsoft Office\OFFICE10\EXCEL.EXE</Parameters>
+						<Parameters Name="HostApplication">C:\Program Files\Microsoft Office\Office10\EXCEL.EXE</Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
 						<Parameters Name="LoadAllSymbols">True</Parameters>
 						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
@@ -164,8 +165,8 @@
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>
-						<VersionInfo Name="Release">8</VersionInfo>
-						<VersionInfo Name="Build">2135</VersionInfo>
+						<VersionInfo Name="Release">9</VersionInfo>
+						<VersionInfo Name="Build">2586</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -177,7 +178,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName">Season&apos;s Fall Music Limited (c) 1989</VersionInfoKeys>
 						<VersionInfoKeys Name="FileDescription">BrowseAndDocItVBEIDE</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">1.0.8.2135</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.0.9.2586</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName">BrowseAndDocItVBEIDE</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalCopyright">Season&apos;s Fall Music Limited (c) 1989</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalTrademarks">Season&apos;s Fall Music Limited (c) 1989</VersionInfoKeys>
@@ -197,14 +198,14 @@
 
 <!-- EurekaLog First Line
 [Exception Log]
-EurekaLog Version=6020
+EurekaLog Version=6101
 Activate=1
 Activate Handle=1
 Save Log File=1
 Foreground Tab=0
-Freeze Activate=1
+Freeze Activate=0
 Freeze Timeout=60
-SMTP From=
+SMTP From=username@domain.com
 SMTP Host=
 SMTP Port=25
 SMTP UserID=
@@ -214,7 +215,7 @@ TerminateBtn Operation=2
 Errors Number=64
 Errors Terminate=3
 Email Address=davidghoyle@gmail.com
-Email Object=%%_ExceptModuleDesc%% raised an exception "%%_ExceptMsg%%"
+Email Object=%%_ExceptModuleName%% (%%_ExceptModuleVer%%) raised an exception "%%_ExceptMsg%%"
 Email Send Options=1
 Output Path=
 Encrypt Password=
@@ -222,28 +223,28 @@ AutoCloseDialogSecs=0
 WebSendMode=0
 SupportULR=
 HTMLLayout Count=15
-HTMLLine0="%U003Chtml%U003E"
-HTMLLine1="  %U003Chead%U003E"
-HTMLLine2="  %U003C/head%U003E"
-HTMLLine3="  %U003Cbody TopMargin=10 LeftMargin=10%U003E"
-HTMLLine4="    %U003Ctable width="100%%" border="0"%U003E"
-HTMLLine5="      %U003Ctr%U003E"
-HTMLLine6="        %U003Ctd nowrap%U003E"
-HTMLLine7="          %U003Cfont face="Lucida Console, Courier" size="2"%U003E"
-HTMLLine8="            %U003C%%HTML_TAG%%%U003E"
-HTMLLine9="          %U003C/font%U003E"
-HTMLLine10="        %U003C/td%U003E"
-HTMLLine11="      %U003C/tr%U003E"
-HTMLLine12="    %U003C/table%U003E"
-HTMLLine13="  %U003C/body%U003E"
-HTMLLine14="%U003C/html%U003E"
+HTMLLine0="%%3Chtml%%3E"
+HTMLLine1="  %%3Chead%%3E"
+HTMLLine2="  %%3C/head%%3E"
+HTMLLine3="  %%3Cbody TopMargin=10 LeftMargin=10%%3E"
+HTMLLine4="    %%3Ctable width="100%%%%" border="0"%%3E"
+HTMLLine5="      %%3Ctr%%3E"
+HTMLLine6="        %%3Ctd nowrap%%3E"
+HTMLLine7="          %%3Cfont face="Lucida Console, Courier" size="2"%%3E"
+HTMLLine8="            %%3C%%%%HTML_TAG%%%%%%3E"
+HTMLLine9="          %%3C/font%%3E"
+HTMLLine10="        %%3C/td%%3E"
+HTMLLine11="      %%3C/tr%%3E"
+HTMLLine12="    %%3C/table%%3E"
+HTMLLine13="  %%3C/body%%3E"
+HTMLLine14="%%3C/html%%3E"
 AutoCrashOperation=2
 AutoCrashNumber=10
 AutoCrashMinutes=1
 WebURL=
 WebUserID=
 WebPassword=
-WebPort=80
+WebPort=0
 AttachedFiles=
 ProxyURL=
 ProxyUser=
@@ -363,6 +364,7 @@ loFreeAllLeaks=1
 loCatchLeaksExceptions=1
 cfoReduceFileSize=1
 cfoCheckFileCorruption=1
+cfoUseEL7=0
 Count mtInformationMsgCaption=1
 mtInformationMsgCaption0="Information."
 Count mtQuestionMsgCaption=1

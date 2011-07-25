@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<PersonalityInfo>
 		<Option>
@@ -10,7 +10,7 @@
 	</PersonalityInfo>
 	<Delphi.Personality>
 		<Source>
-			<Source Name="MainSource">BrowseAndDocIt2006.dpr</Source>
+			<Source Name="MainSource">BrowseAndDocIt2009.dpr</Source>
 		</Source>
 		<FileVersion>
 			<FileVersion Name="Version">7.0</FileVersion>
@@ -120,7 +120,7 @@
 		</Linker>
 		<Directories>
 			<Directories Name="OutputDir">..\</Directories>
-			<Directories Name="UnitOutputDir">..\2006DCUs\</Directories>
+			<Directories Name="UnitOutputDir">..\2009DCUs\</Directories>
 			<Directories Name="PackageDLLOutputDir"></Directories>
 			<Directories Name="PackageDCPOutputDir"></Directories>
 			<Directories Name="SearchPath"></Directories>
@@ -149,8 +149,8 @@
 			<VersionInfo Name="AutoIncBuild">True</VersionInfo>
 			<VersionInfo Name="MajorVer">1</VersionInfo>
 			<VersionInfo Name="MinorVer">0</VersionInfo>
-			<VersionInfo Name="Release">5</VersionInfo>
-			<VersionInfo Name="Build">1566</VersionInfo>
+			<VersionInfo Name="Release">8</VersionInfo>
+			<VersionInfo Name="Build">2252</VersionInfo>
 			<VersionInfo Name="Debug">False</VersionInfo>
 			<VersionInfo Name="PreRelease">False</VersionInfo>
 			<VersionInfo Name="Special">False</VersionInfo>
@@ -161,12 +161,12 @@
 		</VersionInfo>
 		<VersionInfoKeys>
 			<VersionInfoKeys Name="CompanyName">Season's Fall Music Limit (c) 1989</VersionInfoKeys>
-			<VersionInfoKeys Name="FileDescription">BrowseAndDocIt2006.DLL</VersionInfoKeys>
-			<VersionInfoKeys Name="FileVersion">1.0.5.1566</VersionInfoKeys>
-			<VersionInfoKeys Name="InternalName">BrowseAndDocIt2006.DLL</VersionInfoKeys>
+			<VersionInfoKeys Name="FileDescription">BrowseAndDocIt2009.DLL</VersionInfoKeys>
+			<VersionInfoKeys Name="FileVersion">1.0.8.2252</VersionInfoKeys>
+			<VersionInfoKeys Name="InternalName">BrowseAndDocIt2009.DLL</VersionInfoKeys>
 			<VersionInfoKeys Name="LegalCopyright">Season's Fall Music Limit (c) 1989</VersionInfoKeys>
 			<VersionInfoKeys Name="LegalTrademarks">Season's Fall Music Limit (c) 1989</VersionInfoKeys>
-			<VersionInfoKeys Name="OriginalFilename">BrowseAndDocIt2006.DLL</VersionInfoKeys>
+			<VersionInfoKeys Name="OriginalFilename">BrowseAndDocIt2009.DLL</VersionInfoKeys>
 			<VersionInfoKeys Name="ProductName">Browse and Doc It</VersionInfoKeys>
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments">IDE tool to help browse and document source code.</VersionInfoKeys>

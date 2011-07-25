@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Oct 2009
+  @Date    21 Mar 2010
 
 **)
 library BrowseAndDocIt2009;
@@ -57,7 +57,7 @@ uses
   VTHeaderPopup in '..\..\..\LIBRARY\Virtual Treeview\Source\VTHeaderPopup.pas',
   DUnitForm in '..\Source\DUnitForm.pas' {frmDUnit},
   DUnitCreator in '..\Source\DUnitCreator.pas',
-  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  CommonIDEFunctions in '..\..\..\Library\CommonIDEFunctions.pas',
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
   BackusNaurModule in '..\..\..\LIBRARY\BackusNaurModule.pas',
   KeyboardBindings in '..\Source\KeyboardBindings.pas',
@@ -66,9 +66,13 @@ uses
   EidolonHighlighter in '..\Source\EidolonHighlighter.pas',
   XMLModule in '..\..\..\LIBRARY\XMLModule.pas',
   DFMModule in '..\..\..\LIBRARY\DFMModule.pas',
-  EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas';
+  EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas',
+  ProfilingForm in '..\Source\ProfilingForm.pas' {frmProfiling},
+  EidolonTypes in '..\..\..\LIBRARY\EidolonTypes.pas';
 
 {$R *.res}
 
 begin
 end.
+
+

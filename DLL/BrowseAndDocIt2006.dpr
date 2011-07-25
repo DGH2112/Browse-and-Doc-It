@@ -1,4 +1,4 @@
-Í(**
+(**
 
   This module defines a DLL which can be loaded by the BDS IDE.
 
@@ -62,16 +62,21 @@ uses
   VTHeaderPopup in '..\..\..\LIBRARY\Virtual Treeview\Source\VTHeaderPopup.pas',
   DUnitForm in '..\Source\DUnitForm.pas' {frmDUnit},
   DUnitCreator in '..\Source\DUnitCreator.pas',
-  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  CommonIDEFunctions in '..\..\..\LIBRARY\CommonIDEFunctions.pas',
   DGHEllipsisLabel in '..\..\..\Components\Source\DGHEllipsisLabel.pas',
   GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas',
   XMLModule in '..\..\..\Library\XMLModule.pas',
   EidolonHighlighter in '..\Source\EidolonHighlighter.pas',
   BackusNaurModule in '..\..\..\Library\BackusNaurModule.pas',
   EidolonModule in '..\..\..\Library\EidolonModule.pas',
-  DFMModule in '..\..\..\Library\DFMModule.pas';
+  DFMModule in '..\..\..\Library\DFMModule.pas',
+  ProfilingForm in '..\Source\ProfilingForm.pas' {frmProfiling},
+  EidolonTypes in '..\..\..\Library\EidolonTypes.pas';
 
 {$R *.res}
 
 begin
 end.
+
+
+

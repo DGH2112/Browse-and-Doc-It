@@ -2,7 +2,7 @@
 
   This is the test applications project file.
 
-  @Date    23 Oct 2009
+  @Date    09 Apr 2010
   @Author  David Hoyle
   @Version 1.0
 
@@ -14,6 +14,10 @@ program BrowseAndDocItTestApp2006;
 {$R '..\DUnitTemplateResources.res' '..\DUnitTemplateResources.RC'}
 {%TogetherDiagram 'ModelSupport_BrowseAndDocItTestApp2006\default.txaPackage'}
 {%file '..\..\..\Library\SynEdit\Source\SynEdit.inc'}
+{%File '..\..\..\Library\SynEdit\Source\jedi.inc'}
+{%File '..\..\..\Library\CompilerDefinitions.inc'}
+{%File '..\..\..\Library\Virtual Treeview\Source\Compilers.inc'}
+{%File '..\..\..\Library\Virtual Treeview\Source\VTConfig.inc'}
 
 
 uses
@@ -61,11 +65,16 @@ uses
   GIFImage in '..\..\..\LIBRARY\TGIFImage\GIFImage.pas',
   SynHighlighterCpp in '..\..\..\LIBRARY\SynEdit\Source\SynHighlighterCpp.pas',
   XMLModule in '..\..\..\Library\XMLModule.pas',
-  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  CommonIDEFunctions in '..\..\..\Library\CommonIDEFunctions.pas',
   BackusNaurModule in '..\..\..\Library\BackusNaurModule.pas',
   SynHighlighterXML in '..\..\..\Library\SynEdit\Source\SynHighlighterXML.pas',
   DFMModule in '..\..\..\Library\DFMModule.pas',
-  EidolonModule in '..\..\..\Library\EidolonModule.pas';
+  EidolonModule in '..\..\..\Library\EidolonModule.pas',
+  FolderConfig in 'Source\FolderConfig.pas' {frmFolders},
+  DGHSynEdit in '..\..\..\Library\DGHSynEdit.pas',
+  SynHighlighterDfm in '..\..\..\Library\SynEdit\Source\SynHighlighterDfm.pas',
+  UsefulSynEditFunctions in '..\..\..\Library\UsefulSynEditFunctions.pas',
+  EditorOptionsForm in '..\..\..\Library\EditorOptionsForm.pas' {frmEditorOptions};
 
 {$R *.res}
 
@@ -76,3 +85,4 @@ begin
   Application.CreateForm(TfrmBrowseAndDocItTestForm, frmBrowseAndDocItTestForm);
   Application.Run;
 end.
+

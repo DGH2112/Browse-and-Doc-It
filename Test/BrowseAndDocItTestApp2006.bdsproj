@@ -150,7 +150,7 @@
 			<VersionInfo Name="MajorVer">1</VersionInfo>
 			<VersionInfo Name="MinorVer">0</VersionInfo>
 			<VersionInfo Name="Release">8</VersionInfo>
-			<VersionInfo Name="Build">2135</VersionInfo>
+			<VersionInfo Name="Build">2229</VersionInfo>
 			<VersionInfo Name="Debug">False</VersionInfo>
 			<VersionInfo Name="PreRelease">False</VersionInfo>
 			<VersionInfo Name="Special">False</VersionInfo>
@@ -162,7 +162,7 @@
 		<VersionInfoKeys>
 			<VersionInfoKeys Name="CompanyName">Season's Fall  Music Limited (c) 1989</VersionInfoKeys>
 			<VersionInfoKeys Name="FileDescription">BrowseAndDocItTestApp2006.exe</VersionInfoKeys>
-			<VersionInfoKeys Name="FileVersion">1.0.8.2135</VersionInfoKeys>
+			<VersionInfoKeys Name="FileVersion">1.0.8.2229</VersionInfoKeys>
 			<VersionInfoKeys Name="InternalName">Browse and Doc It Test Application</VersionInfoKeys>
 			<VersionInfoKeys Name="LegalCopyright">Season's Fall  Music Limited (c) 1989</VersionInfoKeys>
 			<VersionInfoKeys Name="LegalTrademarks">Season's Fall  Music Limited (c) 1989</VersionInfoKeys>
@@ -173,7 +173,7 @@
 		</VersionInfoKeys>
 	</Delphi.Personality>
 	<ModelSupport>True</ModelSupport>
-<!-- EurekaLog First Line
+	<!-- EurekaLog First Line
 [Exception Log]
 EurekaLog Version=6020
 Activate=1

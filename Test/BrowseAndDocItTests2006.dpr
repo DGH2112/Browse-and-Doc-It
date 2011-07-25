@@ -1,4 +1,4 @@
-﻿program BrowseAndDocItTests2006;
+program BrowseAndDocItTests2006;
 {
 
   Delphi DUnit Test Project
@@ -26,7 +26,6 @@ uses
   Windows,
   TestFramework,
   GUITestRunner,
-  JclDebug,
   TextTestRunner,
   dghlibrary in '..\..\..\LIBRARY\dghlibrary.pas',
   TestDGHLibrary in '..\..\..\LIBRARY\Test\Source\TestDGHLibrary.pas',
@@ -34,10 +33,12 @@ uses
   TestBaseLanguageModule in '..\..\..\Library\Test\Source\TestBaseLanguageModule.pas',
   VBModule in '..\..\..\LIBRARY\VBModule.pas',
   TestVBModule in '..\..\..\Library\Test\Source\TestVBModule.pas',
+  VBModuleFull in '..\..\..\LIBRARY\VBModuleFull.pas',
+  TestVBModuleFull in '..\..\..\Library\Test\Source\TestVBModuleFull.pas',
   ModuleDispatcher in '..\..\..\LIBRARY\ModuleDispatcher.pas',
   PascalModule in '..\..\..\LIBRARY\PascalModule.pas',
   TestPascalModule in '..\..\..\LIBRARY\Test\Source\TestPascalModule.pas',
-  CommonIDEFunctions in '..\Source\CommonIDEFunctions.pas',
+  CommonIDEFunctions in '..\..\..\Library\CommonIDEFunctions.pas',
   TestCommonIDEFunctions in '..\Source\Tests\Source\TestCommonIDEFunctions.pas',
   XMLModule in '..\..\..\Library\XMLModule.pas',
   TestBackusNaurModule in '..\..\..\LIBRARY\Test\Source\TestBackusNaurModule.pas',
@@ -67,7 +68,6 @@ begin
   Application.Initialize;
   If IsConsole Then
     Begin
-      JclDebug.RemoveIgnoredException(EAbort);
       T := TextTestRunner.RunRegisteredTests;
       Try
         iErrors := T.FailureCount + T.ErrorCount;
@@ -85,5 +85,6 @@ begin
     End else
       GUITestRunner.RunRegisteredTests;
 end.
+
 
 

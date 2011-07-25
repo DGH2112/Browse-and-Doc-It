@@ -125,7 +125,7 @@
 			<Directories Name="PackageDCPOutputDir"></Directories>
 			<Directories Name="SearchPath">$(BDSPROJECTSDIR)\Library\DUnit\src;$(BDSPROJECTSDIR)\Library\JCL\source;$(BDSPROJECTSDIR)\Library\JCL\source\common;$(BDSPROJECTSDIR)\Library\JCL\source\windows;$(BDSPROJECTSDIR)\LIBRARY\JCL\source\include</Directories>
 			<Directories Name="Packages">vclx;vcl;rtl;dbrtl;vcldb;adortl;dbxcds;dbexpress;xmlrtl;vclie;inet;inetdbbde;inetdbxpress;dclOfficeXP;soaprtl;dsnap;vclactnband;bdertl;vcldbx</Directories>
-			<Directories Name="Conditionals">EUREKALOG;CONSOLE_TESTRUNNER;USE_JEDI_JCL;EUREKALOG_VER6</Directories>
+			<Directories Name="Conditionals">EUREKALOG;CONSOLE_TESTRUNNER;EUREKALOG_VER6</Directories>
 			<Directories Name="DebugSourceDirs"></Directories>
 			<Directories Name="UsePackages">False</Directories>
 		</Directories>

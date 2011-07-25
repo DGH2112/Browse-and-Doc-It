@@ -28,7 +28,7 @@
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
 			<DCC_RangeChecking>true</DCC_RangeChecking>
-			<DCC_Define>EUREKALOG;CONSOLE_TESTRUNNER;USE_JEDI_JCL;EUREKALOG_VER6;$(DCC_Define)</DCC_Define>
+			<DCC_Define>EUREKALOG;CONSOLE_TESTRUNNER;EUREKALOG_VER6;$(DCC_Define)</DCC_Define>
 			<DCC_Optimize>false</DCC_Optimize>
 			<DCC_F>false</DCC_F>
 			<DCC_E>false</DCC_E>
@@ -61,10 +61,14 @@
 			<DCCReference Include="..\..\..\Library\Test\Source\TestBaseLanguageModule.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\VBModule.pas"/>
 			<DCCReference Include="..\..\..\Library\Test\Source\TestVBModule.pas"/>
+			<DCCReference Include="..\..\..\LIBRARY\VBModuleFul.pas">
+				<ModuleName>VBModuleFull</ModuleName>
+			</DCCReference>
+			<DCCReference Include="..\..\..\Library\Test\Source\TestVBModuleFull.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\ModuleDispatcher.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\PascalModule.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestPascalModule.pas"/>
-			<DCCReference Include="..\Source\CommonIDEFunctions.pas"/>
+			<DCCReference Include="..\..\..\Library\CommonIDEFunctions.pas"/>
 			<DCCReference Include="..\Source\Tests\Source\TestCommonIDEFunctions.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\BackusNaurModule.pas"/>
 			<DCCReference Include="..\..\..\LIBRARY\Test\Source\TestBackusNaurModule.pas"/>
@@ -142,7 +146,7 @@
 
 <!-- EurekaLog First Line
 [Exception Log]
-EurekaLog Version=6020
+EurekaLog Version=6021
 Activate=1
 Activate Handle=1
 Save Log File=1

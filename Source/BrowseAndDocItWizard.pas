@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    25 Jul 2011
+  @Date    04 Aug 2011
   @Version 1.0
 
 **)
@@ -101,7 +101,7 @@ Uses
   DocumentationDispatcher, BaseDocumentation, CheckForUpdates,
   CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF},
   DUnitForm, DUnitCreator, BNFHighlighter, KeyboardBindings, EditorNotifier,
-  EidolonHighlighter;
+  EidolonHighlighter, ProgressForm;
 
 resourcestring
   (** This is a resource message to confirm whether the selected text should be
@@ -903,43 +903,23 @@ procedure TBrowseAndDocItWizard.ProcessProfilingCode(SE: IOTASourceEditor;
 Var
   strTemplate : String;
   slProlog, slEpilog : TStringList;
-  iLine: Integer;
-  iCodeLine: Integer;
-  strPadding : String;
 
 begin
-  strPadding := StringOfChar(#32, ProfileJob.Indent + iTabs);
   strTemplate := StringReplace(BrowseAndDocItOptions.ProfilingCode[SE.FileName],
     '|', #13#10, [rfReplaceAll]);
-  strTemplate := StringReplace(strTemplate, '$METHODNAME$', ProfileJob.Method, [rfReplaceAll]);
-  slProlog := TStringList.Create;
+  slProlog := PrologCode(strTemplate, ProfileJob.Method, ProfileJob.Indent + iTabs);
   Try
-    slProlog.Text := strTemplate;
-    For iLine := 0 To slProlog.Count - 1 Do
-      slProlog[iLine] := strPadding + slProlog[iLine];
-  Finally
-    slEpilog := TStringList.Create;
+    slEpilog := EpilogCode(strTemplate, ProfileJob.Method, ProfileJob.Indent + iTabs);
     Try
-      slEpilog.Text := slProlog.Text;
-    Finally
-      iCodeLine := -1;
-      For iLine := 0 To slProlog.Count - 1 Do
-        If Like('*$METHODCODE$*', slProlog[iLine]) Then
-          Begin
-            iCodeLine := iLine;
-            Break;
-          End;
-      If iCodeLine = -1 Then
-        Raise Exception.Create('$METHODCODE$ not found.');
-      While slProlog.Count > iCodeLine Do
-        slProlog.Delete(iCodeLine);
-      For iLine := 0 To iCodeLine Do
-        slEpilog.Delete(0);
       Case ProfileJob.CodeType Of
         pctInsert: InsertProfileCode(SE, ProfileJob, slProlog.Text, slEpilog.Text);
         pctRemove: RemoveProfileCode(SE, ProfileJob, slProlog, slEpilog);
       End;
+    Finally
+      slEpilog.Free;
     End;
+  Finally
+    slProlog.Free;
   End;
 end;
 
@@ -1005,6 +985,12 @@ end;
 procedure TBrowseAndDocItWizard.RemoveProfileCode(SE : IOTASourceEditor;
   ProfileJob : TProfileJob; slProlog, slEpilog : TStringList);
 
+ResourceString
+  strRemoveMsg =
+    'The current profiling does not match the %s code in the method "%s". ' +
+      'Expected "%s" but found "%s". Profiling code has NOT been ' +
+      'removed for this method. Do you want to continue processing?';
+
 Var
   Reader : IOTAEditReader;
   C1, C2: TOTACharPos;
@@ -1014,6 +1000,7 @@ Var
   strBuffer : AnsiString;
   iRead : Integer;
   iBufferSize : Integer;
+  strLine : String;
 
 begin
   Reader := SE.CreateReader;
@@ -1030,17 +1017,18 @@ begin
         SetLength(strBuffer, iBufferSize);
         iRead := Reader.GetText(iBufferPos1, PAnsiChar(strBuffer), iBufferSize);
         SetLength(strBuffer, iRead);
-        If Not Like('*' + Trim(slEpilog[slEpilog.Count - 1 - iLine]) + '*',
-          String(strBuffer)) Then
-          Begin
-            OutputMessage(Format('Profiling does not match Epilog code in method ''%s''.', [ProfileJob.Method]));
-            Exit;
+        strLine := slEpilog[slEpilog.Count - 1 - iLine];
+        strBuffer := Copy(strBuffer, 1, Length(strBuffer) - 2);
+        If Not Like('*' + Trim(strLine) + '*', String(strBuffer)) Then
+          Case MessageDlg(Format(strRemoveMsg, ['Epilog', ProfileJob.Method,
+            strBuffer, strLine]), mtError, [mbYes, mbNo], 0) Of
+            mrYes: Exit;
+            mrNo: Abort;
           End;
       End;
   Finally
     Reader := Nil;
   End;
-  DeleteProfileCode(SE, ProfileJob.EndLine - slEpilog.Count + 1, ProfileJob.EndLine);
   Reader := SE.CreateReader;
   Try
     For iLine := 0 To slProlog.Count - 1 Do
@@ -1055,15 +1043,19 @@ begin
         SetLength(strBuffer, iBufferSize);
         iRead := Reader.GetText(iBufferPos1, PAnsiChar(strBuffer), iBufferSize);
         SetLength(strBuffer, iRead);
-        If Not Like('*' + Trim(slProlog[iLine]) + '*', String(strBuffer)) Then
-          Begin
-            OutputMessage(Format('Profiling does not match Prolog code in method ''%s''.', [ProfileJob.Method]));
-            Exit;
+        strLine := Trim(slProlog[iLine]);
+        strBuffer := Copy(strBuffer, 1, Length(strBuffer) - 2);
+        If Not Like('*' + strLine + '*', String(strBuffer)) Then
+          Case MessageDlg(Format(strRemoveMsg, ['Prolog', ProfileJob.Method,
+            strBuffer, strLine]), mtError, [mbYes, mbNo], 0) Of
+            mrYes: Exit;
+            mrNo: Abort;
           End;
       End;
   Finally
     Reader := Nil;
   End;
+  DeleteProfileCode(SE, ProfileJob.EndLine - slEpilog.Count + 1, ProfileJob.EndLine);
   DeleteProfileCode(SE, ProfileJob.StartLine, ProfileJob.StartLine + slProlog.Count - 1);
 end;
 
@@ -1500,6 +1492,7 @@ Var
   ProfileJobs: TProfileJobs;
   i: Integer;
   iTabs : Integer;
+  frm: TfrmProgress;
 
 begin
   SE := ActiveSourceEditor;
@@ -1517,8 +1510,19 @@ begin
                   If (ProfileJobs.Count > 0) Then
                     Begin
                       iTabs := (BorlandIDEServices As IOTAEditorServices).EditOptions.BlockIndent;
-                      For i := 0 To ProfileJobs.Count - 1 Do
-                        ProcessProfilingCode(SE, ProfileJobs.ProfileJob[i], iTabs);
+                      frm := TfrmProgress.Create(Nil);
+                      Try
+                        frm.Init(ProfileJobs.Count - 1, 'Profiling',
+                          'Starting to processing profiling information...');
+                        For i := 0 To ProfileJobs.Count - 1 Do
+                          Begin
+                            ProcessProfilingCode(SE, ProfileJobs.ProfileJob[i], iTabs);
+                            frm.UpdateProgress(i, 'Processing method "' +
+                              ProfileJobs.ProfileJob[i].Method + '"...');
+                          End;
+                      Finally
+                        frm.Free;
+                      End;
                     End Else
                       MessageDlg('Nothing to do!', mtError, [mbOK], 0);
                 End;

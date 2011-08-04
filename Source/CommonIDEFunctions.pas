@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    26 Jun 2010
+  @Date    04 Aug 2011
   @Version 1.0
 
 **)
@@ -69,11 +69,12 @@ Type
   Function FindFunction(iLine : Integer; Container : TElementContainer;
     ContainerClass : TGenericFunctionClass) : TGenericFunction;
   Function Description(Func : TGenericFunction; iIndent : Integer;
-    boolPadOut : Boolean; var CursorAdjust : TPoint) : String;
+    boolPadOut : Boolean; var CursorAdjust : TPoint; iMaxCommentWidth : Integer) : String;
   Function Indent(strText : String; iIndent : Integer) : String;
-  Function OutputTag(iIndent : Integer; Tag : TTag) : String;
+  Function OutputTag(iIndent : Integer; Tag : TTag; iMaxCommentWidth : Integer) : String;
   Function WriteComment(Func : TGenericFunction; CommentType : TCommentType;
-    iIndent : Integer; boolPadOut : Boolean; var CursorDelta : TPoint) : String;
+    iIndent : Integer; boolPadOut : Boolean; var CursorDelta : TPoint;
+    iMaxCommentWidth : Integer) : String;
   Function FindIndentOfFirstTokenOnLine(Module : TBaseLanguageModule;
     iLine : Integer) : Integer;
   Function BuildBlockComment(CommentType : TCommentType;
@@ -151,8 +152,6 @@ Type
   end;
 
 Const
-  (** A constant to define the maximim width of a comment in the source code. **)
-  iMaxCommentWidth : Integer = 80;
   (** A constant to define the with of the tag formatting in method / property
       comments. **)
   iTagWidth : Integer = 8;
@@ -242,15 +241,16 @@ End;
            provide delta movements for the cursor from column 1 if the first
            line of the new comment.
 
-  @param   Func        as a TGenericFunction
-  @param   iIndent      as an Integer
-  @param   boolPadOut   as a Boolean
-  @param   CursorAdjust as a TPoint as a reference
-  @return  a String      
+  @param   Func             as a TGenericFunction
+  @param   iIndent          as an Integer
+  @param   boolPadOut       as a Boolean
+  @param   CursorAdjust     as a TPoint as a reference
+  @param   iMaxCommentWidth as an Integer
+  @return  a String
 
 **)
 function Description(Func : TGenericFunction; iIndent : Integer;
-  boolPadOut : Boolean; var CursorAdjust : TPoint) : String;
+  boolPadOut : Boolean; var CursorAdjust : TPoint; iMaxCommentWidth : Integer) : String;
 
 var
   i: Integer;
@@ -308,13 +308,13 @@ begin
       i := Func.Comment.FindTag('precon');
       If i > -1 Then
         Begin
-          Result := Result + OutputTag(2 + iIndent, Func.Comment.Tag[i]);
+          Result := Result + OutputTag(2 + iIndent, Func.Comment.Tag[i], iMaxCommentWidth);
           boolCon := True;
         End;
       i := Func.Comment.FindTag('postcon');
       If i > -1 Then
         Begin
-          Result := Result + OutputTag(2 + iIndent, Func.Comment.Tag[i]);
+          Result := Result + OutputTag(2 + iIndent, Func.Comment.Tag[i], iMaxCommentWidth);
           boolCon := True;
         End;
       If boolCon Then
@@ -325,7 +325,7 @@ begin
         If Not IsKeyWord(Func.Comment.Tag[i].TagName, ['param', 'postcon', 'precon',
           'return']) Then
           Begin
-            Result := Result + OutputTag(2 + iIndent, Func.Comment.Tag[i]);
+            Result := Result + OutputTag(2 + iIndent, Func.Comment.Tag[i], iMaxCommentWidth);
             boolCon := True;
           End;
       If boolCon Then
@@ -357,7 +357,6 @@ End;
 
 (**
 
-
   This function returns the tag information indented and broken into line no
   wider than iMaxCommentWidth characters.
 
@@ -365,12 +364,13 @@ End;
   @postcon Returns the tag information indented and broken into line no wider
            than iMaxCommentWidth characters.
 
-  @param   iIndent as an Integer
-  @param   Tag     as a TTag
+  @param   iIndent          as an Integer
+  @param   Tag              as a TTag
+  @param   iMaxCommentWidth as an Integer
   @return  a String
 
 **)
-Function OutputTag(iIndent : Integer; Tag : TTag) : String;
+Function OutputTag(iIndent : Integer; Tag : TTag; iMaxCommentWidth : Integer) : String;
 
 Var
   str : String;
@@ -397,19 +397,21 @@ End;
   This method writes the method comment to the active editor.
 
   @precon  Method is a valid instance of a method declaration to be commented.
-  @postcon The full comment to be inserted at the cursor is returns with the 
+  @postcon The full comment to be inserted at the cursor is returns with the
            new cursor position in Cursor.
 
-  @param   Func        as a TGenericFunction
-  @param   CommentType as a TCommentType
-  @param   iIndent     as an Integer
-  @param   boolPadOut  as a Boolean
-  @param   CursorDelta as a TPoint as a reference
+  @param   Func             as a TGenericFunction
+  @param   CommentType      as a TCommentType
+  @param   iIndent          as an Integer
+  @param   boolPadOut       as a Boolean
+  @param   CursorDelta      as a TPoint as a reference
+  @param   iMaxCommentWidth as an Integer
   @return  a String
 
 **)
 Function WriteComment(Func : TGenericFunction;  CommentType : TCommentType;
-  iIndent : Integer; boolPadOut : Boolean; var CursorDelta : TPoint) : String;
+  iIndent : Integer; boolPadOut : Boolean; var CursorDelta : TPoint;
+  iMaxCommentWidth : Integer) : String;
 
   (**
 
@@ -447,7 +449,7 @@ begin
       AddToComment(strCmtTerminals[CommentType].FStart + #13#10);
   If boolPadOut Then
     AddToComment(#13#10);
-  AddToComment(Description(Func, iIndent, boolPadOut, P));
+  AddToComment(Description(Func, iIndent, boolPadOut, P, iMaxCommentWidth));
   boolHasCons := False;
   If Func.Comment <> Nil Then
     boolHasCons := Func.Comment.FindTag('precon') > -1;

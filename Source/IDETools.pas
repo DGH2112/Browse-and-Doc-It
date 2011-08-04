@@ -4,7 +4,7 @@
   available tools.
 
   @Version 1.0
-  @Date    15 Jun 2010
+  @Date    04 Aug 2011
   @Author  David Hoyle
 
 **)
@@ -1600,7 +1600,7 @@ begin
               If iInsertLine = 0 Then
                 iInsertLine := N.Line;
               iIndent := FindIndentOfFirstTokenOnLine(Module, N.Line) - 1;
-              strComment := WriteComment(N, ctVBLine, iIndent, True, CursorDelta);
+              strComment := WriteComment(N, ctVBLine, iIndent, True, CursorDelta, 80);
               // Remove last #13#10 - not required as the IDE adds them
               strComment := Copy(strComment, 1, Length(strComment) - 2);
               CP.CodeModule.InsertLines(iInsertLine, strComment);
@@ -1675,7 +1675,7 @@ begin
               If iInsertLine = 0 Then
                 iInsertLine := N.Line;
               iIndent := FindIndentOfFirstTokenOnLine(Module, N.Line) - 1;
-              strComment := WriteComment(N, ctVBLine, iIndent, True, CursorDelta);
+              strComment := WriteComment(N, ctVBLine, iIndent, True, CursorDelta, 80);
               // Remove last #13#10 - not required as the IDE adds them
               strComment := Copy(strComment, 1, Length(strComment) - 2);
               CP.CodeModule.InsertLines(iInsertLine, strComment);

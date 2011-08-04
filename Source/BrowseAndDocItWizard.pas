@@ -839,6 +839,7 @@ var
   iIndent: Integer;
   strComment: String;
   iInsertLine: Integer;
+  iMaxCommentWidth : Integer;
 
 begin
   Source := ActiveSourceEditor;
@@ -865,11 +866,12 @@ begin
                   DeleteExistingComment(Source, F.Comment.Line, F.Line);
                 End Else
                   iInsertLine := F.Line;
+              iMaxCommentWidth := Source.EditViews[0].Buffer.BufferOptions.RightMargin;
               Writer := Source.CreateUndoableWriter;
               Try
                 strComment := WriteComment(F, GetCommentType(Source.FileName,
                   csBlock), iIndent, True,
-                  CursorDelta);
+                  CursorDelta, iMaxCommentWidth);
                 InsertComment(strComment, Writer, iInsertLine, Source);
               Finally
                 Writer := Nil;
@@ -1091,6 +1093,7 @@ var
   iIndent: Integer;
   strComment: String;
   CursorDelta: TPoint;
+  iMaxCommentWidth: Integer;
 
 begin
   Source := ActiveSourceEditor;
@@ -1119,9 +1122,9 @@ begin
                   iInsertLine := F.Line;
               Writer := Source.CreateUndoableWriter;
               Try
+                iMaxCommentWidth := Source.EditViews[0].Buffer.BufferOptions.RightMargin;
                 strComment := WriteComment(F, GetCommentType(Source.FileName,
-                  csBlock), iIndent, False,
-                  CursorDelta);
+                  csBlock), iIndent, False, CursorDelta, iMaxCommentWidth);
                 InsertComment(strComment, Writer, iInsertLine, Source);
               Finally
                 Writer := Nil;

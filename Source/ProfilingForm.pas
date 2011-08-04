@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    09 Aug 2010
+  @Date    04 Aug 2011
 
 **)
 unit ProfilingForm;
@@ -146,11 +146,6 @@ implementation
 Uses
   ToolsAPIUtils, PascalModule, IniFiles, dghlibrary;
 
-resourcestring
-  (** A resource string to signify a missing expansion point in the template. **)
-  strProfilingTemplate = 'You profiling template code MUST contain a refe' +
-    'rnce to %s.';
-
 Type
   (** This is a record to describe the data stored in the virtual tree view. **)
   TTreeData = Record
@@ -206,17 +201,27 @@ end;
 **)
 procedure TfrmProfiling.btnOKClick(Sender: TObject);
 
+Resourcestring
+  strProfilingTemplate = 'You profiling template code MUST contain a ' +
+    'reference to %s on its own line without any other code.';
+
+Var
+  iLine : Integer;
+  boolFound : Boolean;
+
 begin
-  If Not Like('*$METHODCODE$*', mmoCode.Lines.Text) Then
+  boolFound:= False;
+  For iLine := 0 To mmoCode.Lines.Count - 1 Do
+    If CompareText(Trim(mmoCode.Lines[iLine]), strMethodCode) = 0 Then
+      Begin
+        boolFound := True;
+        Break;
+      End;
+  If Not boolFound Then
     Begin
-      MessageDlg(Format(strProfilingTemplate, ['$METHODCODE$']), mtError, [mbOK], 0);
+      MessageDlg(Format(strProfilingTemplate, [strMethodCode]), mtError, [mbOK], 0);
       ModalResult := mrNone;
     End Else
-  If Not Like('*$METHODNAME$*', mmoCode.Lines.Text) Then
-    Begin
-      MessageDlg(Format(strProfilingTemplate, ['$METHODNAME$']), mtError, [mbOK], 0);
-      ModalResult := mrNone;
-    End;
 end;
 
 (**
@@ -334,10 +339,10 @@ procedure TfrmProfiling.LoadSettings;
 begin
   With TIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
     Try
-      Top := ReadInteger('DUnitDlg', 'Top', (Screen.Height - Height) Div 2);
-      Left := ReadInteger('DUnitDlg', 'Left', (Screen.Width - Width) Div 2);
-      Height := ReadInteger('DUnitDlg', 'Height', Height);
-      Width := ReadInteger('DUnitDlg', 'Width', Width);
+      Top := ReadInteger('ProfilingDlg', 'Top', (Screen.Height - Height) Div 2);
+      Left := ReadInteger('ProfilingDlg', 'Left', (Screen.Width - Width) Div 2);
+      Height := ReadInteger('ProfilingDlg', 'Height', Height);
+      Width := ReadInteger('ProfilingDlg', 'Width', Width);
     Finally
       Free;
     End;
@@ -446,10 +451,10 @@ procedure TfrmProfiling.SaveSettings;
 begin
   With TIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
     Try
-      WriteInteger('DUnitDlg', 'Top', Top);
-      WriteInteger('DUnitDlg', 'Left', Left);
-      WriteInteger('DUnitDlg', 'Height', Height);
-      WriteInteger('DUnitDlg', 'Width', Width);
+      WriteInteger('ProfilingDlg', 'Top', Top);
+      WriteInteger('ProfilingDlg', 'Left', Left);
+      WriteInteger('ProfilingDlg', 'Height', Height);
+      WriteInteger('ProfilingDlg', 'Width', Width);
     Finally
       Free;
     End;

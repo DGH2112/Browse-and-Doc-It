@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    07 Aug 2010
+  @Date    04 Aug 2011
   @Version 1.0
   @Author  David Hoyle
 
@@ -2384,6 +2384,13 @@ Const
     'CompilerDirective', 'LinkTag', 'TreeHeader', 'FileEnd', 'LineContinuation',
     'CustomUserToken');
 
+  (** A constant string to represent the position of the main procedure code in
+      a profiling code block. **)
+  strMethodCode = '$METHODCODE$';
+  (** A constant string to represent the position to insert the method name into
+      the profiling code block. **)
+  strMethodName = '$METHODNAME$';
+
 Var
   (** This is a global variable for the Browse and Doc It options that need to
       be available throughout the application. **)
@@ -2391,6 +2398,8 @@ Var
 
   Function IsKeyWord(strWord : String; strWordList : Array Of String): Boolean;
   Function IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; {$IFDEF D2005} InLine; {$ENDIF}
+  Function PrologCode(strTemplate, strMethod : String; iPadding : Integer) : TStringList;
+  Function EpilogCode(strTemplate, strMethod : String; iPadding : Integer) : TStringList;
 
 Implementation
 
@@ -2557,6 +2566,86 @@ Begin
   {$ELSE}
   Result := CharInSet(C, strCharSet);
   {$ENDIF}
+End;
+
+(**
+
+  This procedure returns a string list containing the prolog element of code passed in the
+  template parameter.
+
+  @precon  strTemplate must contain the macro $METHODCODE$.
+  @postcon Returns a string list containing the prolog element of code passed in the
+           template parameter.
+
+  @param   strTemplate as a String
+  @param   strMethod   as a String
+  @param   iPadding    as an Integer
+  @return  a TStringList
+
+**)
+Function PrologCode(strTemplate, strMethod : String; iPadding : Integer) : TStringList;
+
+Var
+  strPadding : String;
+  iLine : Integer;
+  boolFound : Boolean;
+
+Begin
+  Result := TStringList.Create;
+  strTemplate := StringReplace(strTemplate, strMethodName, strMethod, [rfReplaceAll]);
+  Result.Text := strTemplate;
+  If Not Like('*' + strMethodCode + '*', strTemplate) Then
+    Raise Exception.Create(strMethodCode + ' Not Found in Template.');
+  boolFound := False;
+  While Not boolFound And (Result.Count > 0) Do
+    Begin
+      If CompareText(Trim(Result[Result.Count - 1]), strMethodCode) = 0 Then
+        boolFound := True;
+      Result.Delete(Result.Count - 1);
+    End;
+  strPadding := StringOfChar(#32, iPadding);
+  For iLine := 0 To Result.Count - 1 Do
+    Result[iLine] := strPadding + Result[iLine];
+End;
+
+(**
+
+  This procedure returns a string list containing the epilog element of code passed in the
+  template parameter.
+
+  @precon  strTemplate must contain the macro $METHODCODE$.
+  @postcon Returns a string list containing the epilog element of code passed in the
+           template parameter.
+
+  @param   strTemplate as a String
+  @param   strMethod   as a String
+  @param   iPadding    as an Integer
+  @return  a TStringList
+
+**)
+Function EpilogCode(strTemplate, strMethod : String; iPadding : Integer) : TStringList;
+
+Var
+  strPadding : String;
+  iLine : Integer;
+  boolFound : Boolean;
+
+Begin
+  Result := TStringList.Create;
+  strTemplate := StringReplace(strTemplate, strMethodName, strMethod, [rfReplaceAll]);
+  Result.Text := strTemplate;
+  If Not Like('*' + strMethodCode + '*', strTemplate) Then
+    Raise Exception.Create(strMethodCode + ' Not Found in Template.');
+  boolFound := False;
+  While Not boolFound And (Result.Count > 0) Do
+    Begin
+      If CompareText(Trim(Result[0]), strMethodCode) = 0 Then
+        boolFound := True;
+      Result.Delete(0);
+    End;
+  strPadding := StringOfChar(#32, iPadding);
+  For iLine := 0 To Result.Count - 1 Do
+    Result[iLine] := strPadding + Result[iLine];
 End;
 
 { TBaseContainer }

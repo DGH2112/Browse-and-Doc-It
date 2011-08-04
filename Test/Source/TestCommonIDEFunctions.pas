@@ -170,7 +170,7 @@ Var
 begin
   M := TTestGenericMethodDecl.Create(mtFunction, 'MyFunction', scPrivate, 12, 23);
   Try
-    strText := StringReplace(Description(M, 2, True, CA), #32, '.', [rfReplaceAll]);
+    strText := StringReplace(Description(M, 2, True, CA, 80), #32, '.', [rfReplaceAll]);
     CheckEquals(#13#10#13#10, strText);
     CheckEquals(4, CA.X);
     CheckEquals(0, CA.Y);
@@ -179,7 +179,7 @@ begin
   End;
   M := TTestGenericMethodDecl.Create(mtFunction, 'btnOKClick', scPrivate, 12, 23);
   Try
-    strText := StringReplace(Description(M, 2, True, CA), #32, '.', [rfReplaceAll]);
+    strText := StringReplace(Description(M, 2, True, CA, 80), #32, '.', [rfReplaceAll]);
     CheckEquals('....This.is.an.on.click.event.handler.for.the..button.'#13#10#13#10, strText);
     CheckEquals(46, CA.X);
     CheckEquals(0, CA.Y);
@@ -188,7 +188,7 @@ begin
   End;
   M := TTestGenericMethodDecl.Create(mtFunction, 'MyLongFunction', scPrivate, 12, 23);
   Try
-    strText := StringReplace(Description(M, 2, True, CA), #32, '.', [rfReplaceAll]);
+    strText := StringReplace(Description(M, 2, True, CA, 80), #32, '.', [rfReplaceAll]);
     CheckEquals('....This.is.a.very.long.description.with.a.cursor.position.' +
       'not.on.the.first.line'#13#10'....so.that.we.can.test.the.Description.' +
       'function.'#13#10#13#10, strText);
@@ -199,7 +199,7 @@ begin
   End;
   M := TTestGenericMethodDecl.Create(mtFunction, 'MyFunction', scPrivate, 12, 23);
   Try
-    strText := StringReplace(Description(M, 2, False, CA), #32, '.', [rfReplaceAll]);
+    strText := StringReplace(Description(M, 2, False, CA, 80), #32, '.', [rfReplaceAll]);
     CheckEquals(#13#10, strText);
     CheckEquals(4, CA.X);
     CheckEquals(0, CA.Y);
@@ -208,7 +208,7 @@ begin
   End;
   M := TTestGenericMethodDecl.Create(mtFunction, 'btnOKClick', scPrivate, 12, 23);
   Try
-    strText := StringReplace(Description(M, 2, False, CA), #32, '.', [rfReplaceAll]);
+    strText := StringReplace(Description(M, 2, False, CA, 80), #32, '.', [rfReplaceAll]);
     CheckEquals('....This.is.an.on.click.event.handler.for.the..button.'#13#10, strText);
     CheckEquals(46, CA.X);
     CheckEquals(0, CA.Y);
@@ -217,7 +217,7 @@ begin
   End;
   M := TTestGenericMethodDecl.Create(mtFunction, 'MyLongFunction', scPrivate, 12, 23);
   Try
-    strText := StringReplace(Description(M, 2, False, CA), #32, '.', [rfReplaceAll]);
+    strText := StringReplace(Description(M, 2, False, CA, 80), #32, '.', [rfReplaceAll]);
     CheckEquals('....This.is.a.very.long.description.with.a.cursor.position.' +
       'not.on.the.first.line'#13#10'....so.that.we.can.test.the.Description.' +
       'function.'#13#10, strText);
@@ -281,7 +281,7 @@ begin
       M.ReturnType := TTestGenericTypeDecl.Create('', scLocal, 0, 0, iiNone, Nil);
       M.ReturnType.AddToken('Boolean');
       M.AddParameter(P);
-      strText := StringReplace(Description(M, 2, True, CA), #32, '.', [rfReplaceAll]);
+      strText := StringReplace(Description(M, 2, True, CA, 80), #32, '.', [rfReplaceAll]);
       strTestText := StringReplace(
         '    This is a longish comment used as a test for the Description function so '#13#10 +
         '    that the function can demonstrated that it can correctly extract the comment'#13#10 +
@@ -297,7 +297,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(4, CA.X);
       CheckEquals(0, CA.Y);
-      strText := StringReplace(Description(M, 2, False, CA), #32, '.', [rfReplaceAll]);
+      strText := StringReplace(Description(M, 2, False, CA, 80), #32, '.', [rfReplaceAll]);
       strTestText := StringReplace(
         '    This is a longish comment used as a test for the Description function so '#13#10 +
         '    that the function can demonstrated that it can correctly extract the comment'#13#10 +
@@ -356,7 +356,7 @@ Begin
     For i := Low(strTagTokens) To High(strTagTokens) Do
       T.AddToken(strTagTokens[i]);
     // Replace space with period to ease debugging output
-    strText := StringReplace(OutputTag(2, T), #32, '.', [rfReplaceAll]);
+    strText := StringReplace(OutputTag(2, T, 80), #32, '.', [rfReplaceAll]);
     CheckEquals(
       '..@todo....This.is.an.example.todo.item.that.should.span.past.the.80ish.'#13#10 +
       '...........character.in.the.editor.so.that.it.can.be.demonstrated.that.the.'#13#10 +
@@ -401,7 +401,7 @@ begin
       M.ReturnType := TTestGenericTypeDecl.Create('', scLocal, 0, 0, iiNone, Nil);
       M.ReturnType.AddToken('Boolean');
       M.AddParameter(P);
-      strText := StringReplace(WriteComment(M, ctPascalBlock, 2, True, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctPascalBlock, 2, True, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '..(**'#13#10 +
@@ -425,7 +425,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(4, CursorDelta.X);
       CheckEquals(2, CursorDelta.Y);
-      strText := StringReplace(WriteComment(M, ctPascalBrace, 2, True, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctPascalBrace, 2, True, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '..{:'#13#10 +
@@ -449,7 +449,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(4, CursorDelta.X);
       CheckEquals(2, CursorDelta.Y);
-      strText := StringReplace(WriteComment(M, ctCPPBlock, 2, True, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctCPPBlock, 2, True, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '../**'#13#10 +
@@ -473,7 +473,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(4, CursorDelta.X);
       CheckEquals(2, CursorDelta.Y);
-      strText := StringReplace(WriteComment(M, ctVBLine, 2, True, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctVBLine, 2, True, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '..'':'#13#10 +
@@ -495,7 +495,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(6, CursorDelta.X);
       CheckEquals(1, CursorDelta.Y);
-      strText := StringReplace(WriteComment(M, ctCPPLine, 2, True, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctCPPLine, 2, True, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '..//:'#13#10 +
@@ -517,7 +517,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(7, CursorDelta.X);
       CheckEquals(1, CursorDelta.Y);
-      strText := StringReplace(WriteComment(M, ctPascalBlock, 2, False, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctPascalBlock, 2, False, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '..(**'#13#10 +
@@ -536,7 +536,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(4, CursorDelta.X);
       CheckEquals(1, CursorDelta.Y);
-      strText := StringReplace(WriteComment(M, ctPascalBrace, 2, False, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctPascalBrace, 2, False, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '..{:'#13#10 +
@@ -555,7 +555,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(4, CursorDelta.X);
       CheckEquals(1, CursorDelta.Y);
-      strText := StringReplace(WriteComment(M, ctCPPBlock, 2, False, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctCPPBlock, 2, False, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '../**'#13#10 +
@@ -574,7 +574,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(4, CursorDelta.X);
       CheckEquals(1, CursorDelta.Y);
-      strText := StringReplace(WriteComment(M, ctVBLine, 2, False, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctVBLine, 2, False, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '..'':..This.is.a.longish.comment.used.as.a.test.for.the.Description.function.so.'#13#10+
@@ -591,7 +591,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(6, CursorDelta.X);
       CheckEquals(0, CursorDelta.Y);
-      strText := StringReplace(WriteComment(M, ctCPPLine, 2, False, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctCPPLine, 2, False, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '..//:..This.is.a.longish.comment.used.as.a.test.for.the.Description.function.so.'#13#10+
@@ -608,7 +608,7 @@ begin
       CheckEquals(strTestText, strText);
       CheckEquals(7, CursorDelta.X);
       CheckEquals(0, CursorDelta.Y);
-      strText := StringReplace(WriteComment(M, ctPascalBlock, 0, True, CursorDelta),
+      strText := StringReplace(WriteComment(M, ctPascalBlock, 0, True, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
       strTestText :=
         '(**'#13#10 +
@@ -658,7 +658,7 @@ begin
     M.ReturnType := TTestGenericTypeDecl.Create('', scLocal, 0, 0, iiNone, Nil);
     M.ReturnType.AddToken('Boolean');
     M.AddParameter(P);
-    strText := StringReplace(WriteComment(M, ctPascalBlock, 0, True, CursorDelta),
+    strText := StringReplace(WriteComment(M, ctPascalBlock, 0, True, CursorDelta, 80),
       #32, '.', [rfReplaceAll]);
     strTestText :=
       '(**'#13#10 +
@@ -673,7 +673,7 @@ begin
     CheckEquals(strTestText, strText);
     CheckEquals(32, CursorDelta.X);
     CheckEquals(2, CursorDelta.Y);
-    strText := StringReplace(WriteComment(M, ctPascalBlock, 2, True, CursorDelta),
+    strText := StringReplace(WriteComment(M, ctPascalBlock, 2, True, CursorDelta, 80),
       #32, '.', [rfReplaceAll]);
     strTestText :=
       '..(**'#13#10 +
@@ -693,7 +693,7 @@ begin
   End;
   M := TTestGenericMethodDecl.Create(mtProcedure, 'Uodate', scPrivate, 12, 23);
   Try
-    strText := StringReplace(WriteComment(M, ctPascalBlock, 0, True, CursorDelta),
+    strText := StringReplace(WriteComment(M, ctPascalBlock, 0, True, CursorDelta, 80),
       #32, '.', [rfReplaceAll]);
     strTestText :=
       '(**'#13#10 +
@@ -704,7 +704,7 @@ begin
     CheckEquals(strTestText, strText);
     CheckEquals(2, CursorDelta.X);
     CheckEquals(2, CursorDelta.Y);
-    strText := StringReplace(WriteComment(M, ctPascalBlock, 2, True, CursorDelta),
+    strText := StringReplace(WriteComment(M, ctPascalBlock, 2, True, CursorDelta, 80),
       #32, '.', [rfReplaceAll]);
     strTestText :=
       '..(**'#13#10 +

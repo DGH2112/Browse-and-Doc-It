@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       06 Aug 2010
+  @Date       03 Aug 2011
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -591,7 +591,7 @@ Type
     FImplementedMethodsLabel : TLabelContainer;
     FExternalSyms            : TStringList;
     FModuleType              : TModuleType;
-    FProfileFirstLine        : String;
+    FSourceCodeForProfiling  : TStringList;
     { Grammar Parsers }
     Procedure Goal;
     Function OPProgram : Boolean;
@@ -1944,7 +1944,6 @@ Constructor TPascalModule.CreateParser(Source : String; strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
 var
   boolCascade: Boolean;
-  sl: TStringList;
 
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
@@ -1963,20 +1962,11 @@ Begin
   FExternalSyms.CaseSensitive := False;
   {$ENDIF}
   FMethodStack := TObjectList.Create(False);
+  FSourceCodeForProfiling := TStringList.Create;
+  If moProfiling In ModuleOptions Then
+    FSourceCodeForProfiling.Text := Source;
   CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
   FSource := Source;
-  If moProfiling In ModuleOptions Then
-    Begin
-      sl := TStringList.Create;
-      Try
-        sl.Text := StringReplace(BrowseAndDocItOptions.ProfilingCode[strFileName],
-          '|', #13#10, [rfReplaceAll]);
-        If sl.Count > 0 Then
-          FProfileFirstLine := sl[0];
-      Finally
-        sl.Free;
-      End;
-    End;
   AddTickCount('Start');
   CommentClass := TPascalComment;
   TokenizeStream;
@@ -2014,6 +2004,7 @@ End;
 **)
 Destructor TPascalModule.Destroy;
 begin
+  FSourceCodeForProfiling.Free;
   FExternalSyms.Free;
   FMethodStack.Free;
   Inherited Destroy;
@@ -6010,6 +6001,11 @@ End;
 **)
 Function TPascalModule.CompoundStmt(Method : TGenericFunction) : Boolean;
 
+Var
+  strTemplate: String;
+  slProlog: TStringList;
+  i: Integer;
+
 begin
   Result := Token.UToken = 'BEGIN';
   If Result Then
@@ -6020,7 +6016,20 @@ begin
             Method.StartLine := Token.Line + 1;
             Method.Indent := Token.Column - 1;
             NextToken;
-            Method.HasProfiling := Like('*' + FProfileFirstLine + '*', Token.Token);
+            // Check Profiling Prolog Code for a match
+            strTemplate := StringReplace(
+              BrowseAndDocItOptions.ProfilingCode[FileName],
+              '|', #13#10, [rfReplaceAll]);
+            slProlog := PrologCode(strTemplate, Method.QualifiedName, 0);
+            Try
+              Method.HasProfiling := slProlog.Count > 0;
+              For i := 0 To slProlog.Count - 1 Do
+                Method.HasProfiling := Method.HasProfiling And
+                  (CompareText(Trim(slProlog[i]),
+                  Trim(FSourceCodeForProfiling[Method.StartLine + i - 1])) = 0);
+            Finally
+              slProlog.Free;
+            End;
             PreviousToken;
           End;
       NextNonCommentToken;

@@ -1612,8 +1612,16 @@ Resourcestring
   strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2009';
   {$ENDIF}
   {$IFDEF VER210}
-  (** This is a message string to appear in the CRS 2009 splash screen **)
+  (** This is a message string to appear in the ERS 2010 splash screen **)
   strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio 2010';
+  {$ENDIF}
+  {$IFDEF VER220}
+  (** This is a message string to appear in the ERS XE splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE';
+  {$ENDIF}
+  {$IFDEF VER230}
+  (** This is a message string to appear in the ERS XE2 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE2';
   {$ENDIF}
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
   strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';

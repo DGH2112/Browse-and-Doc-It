@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    04 Aug 2011
+  @Date    05 Aug 2011
   @Version 1.0
   @Author  David Hoyle
 
@@ -6221,7 +6221,7 @@ Var
   T: TBADITokenType;
 
 begin
-  With TIniFile.Create(FINIFileName) Do
+  With TMemIniFile.Create(FINIFileName) Do
     Try
       For i := Low(TDocOption) to High(TDocOption) Do
         If ReadBool('Options', DocOptionInfo[i].FDescription,
@@ -6312,7 +6312,7 @@ Var
   T: TBADITokenType;
 
 begin
-  With TIniFile.Create(FINIFileName) Do
+  With TMemIniFile.Create(FINIFileName) Do
     Try
       For i := Low(TDocOption) to High(TDocOption) Do
         WriteBool('Options', DocOptionInfo[i].FDescription, i In FOptions);
@@ -6370,6 +6370,7 @@ begin
         WriteString('ProfilingCode', FProfilingCode.Names[j],
           FProfilingCode.Values[FProfilingCode.Names[j]]);
         {$ENDIF}
+      UpdateFile;
     Finally
       Free;
     End;

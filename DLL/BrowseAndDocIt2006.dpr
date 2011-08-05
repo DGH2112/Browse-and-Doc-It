@@ -4,10 +4,10 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    23 Oct 2009
+  @Date    05 Aug 2011
 
 **)
-library BrowseAndDocIt2009;
+library BrowseAndDocIt2006;
 
 { Important note about DLL memory management: ShareMem must be the
   first unit in your library's USES clause AND your project's (select
@@ -71,12 +71,14 @@ uses
   EidolonModule in '..\..\..\Library\EidolonModule.pas',
   DFMModule in '..\..\..\Library\DFMModule.pas',
   ProfilingForm in '..\Source\ProfilingForm.pas' {frmProfiling},
-  EidolonTypes in '..\..\..\Library\EidolonTypes.pas';
+  EidolonTypes in '..\..\..\Library\EidolonTypes.pas',
+  CheckForUpdatesOptionsForm in '..\..\..\Library\CheckForUpdatesOptionsForm.pas' {frmCheckForUpdatesOptions};
 
 {$R *.res}
 
 begin
 end.
+
 
 
 

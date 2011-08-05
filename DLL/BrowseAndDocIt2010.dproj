@@ -137,6 +137,9 @@
 				<Form>frmProfiling</Form>
 			</DCCReference>
 			<DCCReference Include="..\..\..\Library\EidolonTypes.pas"/>
+			<DCCReference Include="..\..\..\Library\CheckForUpdatesOptionsForm.pas">
+				<Form>frmCheckForUpdatesOptions</Form>
+			</DCCReference>
 			<None Include="..\..\..\Library\HTML Files\BrowseAndDocItScreen.css">
 				<ContainerId>File</ContainerId>
 			</None>
@@ -192,7 +195,7 @@
 					</Source>
 					<Parameters>
 						<Parameters Name="RunParams">-pDelphi -rBrowseAndDocItDPR</Parameters>
-						<Parameters Name="HostApplication">C:\Program Files\Embarcadero\RAD Studio\7.0\bin\bds.exe</Parameters>
+						<Parameters Name="HostApplication">C:\Program Files (x86)\Embarcadero\RAD Studio\7.0\bin\bds.exe</Parameters>
 						<Parameters Name="UseLauncher">False</Parameters>
 						<Parameters Name="Debug Symbols Search Path">\\elrukbonfap0001\Users$\hoyld\Documents\Browse And Doc It</Parameters>
 						<Parameters Name="LoadAllSymbols">True</Parameters>
@@ -203,8 +206,8 @@
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>
-						<VersionInfo Name="Release">9</VersionInfo>
-						<VersionInfo Name="Build">2587</VersionInfo>
+						<VersionInfo Name="Release">10</VersionInfo>
+						<VersionInfo Name="Build">2623</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -214,15 +217,15 @@
 						<VersionInfo Name="CodePage">1252</VersionInfo>
 					</VersionInfo>
 					<VersionInfoKeys>
-						<VersionInfoKeys Name="CompanyName">Season's Fall Music Limit (c) 1989</VersionInfoKeys>
-						<VersionInfoKeys Name="FileDescription">BrowseAndDocIt2009.DLL</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">1.0.9.2587</VersionInfoKeys>
-						<VersionInfoKeys Name="InternalName">BrowseAndDocIt2009.DLL</VersionInfoKeys>
-						<VersionInfoKeys Name="LegalCopyright">Season's Fall Music Limit (c) 1989</VersionInfoKeys>
-						<VersionInfoKeys Name="LegalTrademarks">Season's Fall Music Limit (c) 1989</VersionInfoKeys>
-						<VersionInfoKeys Name="OriginalFilename">BrowseAndDocIt2009.DLL</VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName">Season's Fall Music Limited (c) 1989</VersionInfoKeys>
+						<VersionInfoKeys Name="FileDescription">BrowseAndDocIt2010.DLL</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">1.0.10.2623</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName">BrowseAndDocIt2010.DLL</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalCopyright">Season's Fall Music Limited (c) 1989</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalTrademarks">Season's Fall Music Limited (c) 1989</VersionInfoKeys>
+						<VersionInfoKeys Name="OriginalFilename">BrowseAndDocIt2010.DLL</VersionInfoKeys>
 						<VersionInfoKeys Name="ProductName">Browse and Doc It</VersionInfoKeys>
-						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductVersion">1.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments">IDE tool to help browse and document source code.</VersionInfoKeys>
 					</VersionInfoKeys>
 					<Excluded_Packages>

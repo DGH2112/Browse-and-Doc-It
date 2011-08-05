@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Mar 2010
+  @Date    05 Aug 2011
 
 **)
 library BrowseAndDocIt2009;
@@ -68,11 +68,13 @@ uses
   DFMModule in '..\..\..\LIBRARY\DFMModule.pas',
   EidolonModule in '..\..\..\LIBRARY\EidolonModule.pas',
   ProfilingForm in '..\Source\ProfilingForm.pas' {frmProfiling},
-  EidolonTypes in '..\..\..\LIBRARY\EidolonTypes.pas';
+  EidolonTypes in '..\..\..\LIBRARY\EidolonTypes.pas',
+  CheckForUpdatesOptionsForm in '..\..\..\Library\CheckForUpdatesOptionsForm.pas' {frmCheckForUpdatesOptions};
 
 {$R *.res}
 
 begin
 end.
+
 
 

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    04 Aug 2011
+  @Date    05 Aug 2011
 
 **)
 unit ProfilingForm;
@@ -337,7 +337,7 @@ end;
 procedure TfrmProfiling.LoadSettings;
 
 begin
-  With TIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
+  With TMemIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
     Try
       Top := ReadInteger('ProfilingDlg', 'Top', (Screen.Height - Height) Div 2);
       Left := ReadInteger('ProfilingDlg', 'Left', (Screen.Width - Width) Div 2);
@@ -449,12 +449,13 @@ end;
 procedure TfrmProfiling.SaveSettings;
 
 begin
-  With TIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
+  With TMemIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
     Try
       WriteInteger('ProfilingDlg', 'Top', Top);
       WriteInteger('ProfilingDlg', 'Left', Left);
       WriteInteger('ProfilingDlg', 'Height', Height);
       WriteInteger('ProfilingDlg', 'Width', Width);
+      UpdateFile;
     Finally
       Free;
     End;

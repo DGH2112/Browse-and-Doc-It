@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    13 Apr 2011
+  @Date    05 Aug 2011
 
 **)
 Unit DGHLibrary;
@@ -3893,10 +3893,10 @@ procedure THAlignmentCollection.LoadFromFile(strFileName: String);
 Var
   iTotalElements : Integer;
   iElement : Integer;
-  iniFile: TIniFile;
+  iniFile: TMemIniFile;
 
 begin
-  iniFile := TIniFile.Create(strFileName);
+  iniFile := TMemIniFile.Create(strFileName);
   Try
     iTotalElements := iniFile.ReadInteger('GeneralInfo', 'NumOfHElements', 0);
     For iElement := 1 To iTotalElements Do
@@ -3950,7 +3950,7 @@ end;
 procedure THAlignmentCollection.SaveToFile(strFileName: String);
 
 Var
-  iniFile : TIniFile;
+  iniFile : TMemIniFile;
   iElement : Integer;
   recElement : THElement;
 
@@ -3995,7 +3995,7 @@ Var
   End;
 
 begin
-  iniFile := TIniFile.Create(strFileName);
+  iniFile := TMemIniFile.Create(strFileName);
   Try
     iniFile.WriteInteger('GeneralInfo', 'NumOfHElements', Count);
     For iElement := 0 To Count - 1 Do
@@ -4034,6 +4034,7 @@ begin
             WriteItem(iElement, 'StChainage', recElement.dblStChainage);
           End;
       End;
+    iniFile.UpdateFile;
   Finally
     iniFile.Free;
   End;
@@ -4793,10 +4794,10 @@ procedure TVAlignmentCollection.LoadFromFile(strFileName: String);
 Var
   iTotalElements : Integer;
   iElement : Integer;
-  iniFile: TIniFile;
+  iniFile: TMemIniFile;
 
 begin
-  iniFile := TIniFile.Create(strFileName);
+  iniFile := TMemIniFile.Create(strFileName);
   Try
     iTotalElements := iniFile.ReadInteger('GeneralInfo', 'NumOfVElements', 0);
     For iElement := 1 To iTotalElements Do
@@ -4838,7 +4839,7 @@ end;
 procedure TVAlignmentCollection.SaveToFile(strFileName: String);
 
 Var
-  iniFile : TIniFile;
+  iniFile : TMemIniFile;
   iElement : Integer;
   recStraight : TVElement;
   recCircular : TVElement;
@@ -4882,7 +4883,7 @@ Var
   End;
 
 begin
-  iniFile := TIniFile.Create(strFileName);
+  iniFile := TMemIniFile.Create(strFileName);
   Try
     iniFile.WriteInteger('GeneralInfo', 'NumOfVElements', Count);
     For iElement := 0 To Count - 1 Do
@@ -4907,6 +4908,7 @@ begin
             WriteItem(iElement, 'Radius', recCircular.dblRadius);
           End;
       End;
+    iniFile.UpdateFile;
   Finally
     iniFile.Free;
   End;

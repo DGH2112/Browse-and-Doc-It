@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    13 Aug 2010
+  @Date    05 Aug 2011
   @Version 1.0
   @Author  David Hoyle
 
@@ -84,6 +84,7 @@ type
     lblForeColour: TLabel;
     lblBackColour: TLabel;
     cbxBackColour: TColorBox;
+    btnCheckForUpdates: TBitBtn;
     procedure btnAddClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
     procedure btnEditClick(Sender: TObject);
@@ -107,6 +108,7 @@ type
     procedure lbxMethodDescriptionsDrawItem(Control: TWinControl;
       Index: Integer; Rect: TRect; State: TOwnerDrawState);
     procedure cbxBackColourChange(Sender: TObject);
+    procedure btnCheckForUpdatesClick(Sender: TObject);
     { Private declarations }
   Private
     FTokenFontInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
@@ -118,7 +120,7 @@ type
 implementation
 
 Uses
-  SpecialTagForm, MethodDescriptionForm;
+  SpecialTagForm, MethodDescriptionForm, CheckForUpdatesOptionsForm;
 
 ResourceString
   (** This is a message to be displayed when a tag is not valid **)
@@ -445,6 +447,21 @@ Var
 begin
   If TfrmMethodDescriptions.Execute(strPattern, strDescription) Then
     lbxMethodDescriptions.Items.Add(Format('%s=%s', [strPattern, strDescription]));
+end;
+
+(**
+
+  This is an on click event handler for the CheckforUpdates button.
+
+  @precon  None.
+  @postcon Displays the dialogue for configuring Check for Updates.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.btnCheckForUpdatesClick(Sender: TObject);
+begin
+  TfrmCheckForUpdatesOptions.Execute(BrowseAndDocItOptions.INIFileName);
 end;
 
 (**

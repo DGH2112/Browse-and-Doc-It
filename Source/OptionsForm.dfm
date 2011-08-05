@@ -3,11 +3,11 @@ object frmOptions: TfrmOptions
   Top = 269
   BorderStyle = bsDialog
   Caption = 'Options'
-  ClientHeight = 457
-  ClientWidth = 699
+  ClientHeight = 562
+  ClientWidth = 860
   Color = clBtnFace
-  Constraints.MinHeight = 350
-  Constraints.MinWidth = 550
+  Constraints.MinHeight = 431
+  Constraints.MinWidth = 677
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -17,67 +17,98 @@ object frmOptions: TfrmOptions
   Position = poScreenCenter
   OnCreate = FormCreate
   DesignSize = (
-    699
-    457)
+    860
+    562)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object OptionTab: TPageControl
-    Left = 8
-    Top = 8
-    Width = 683
-    Height = 410
+    Left = 10
+    Top = 10
+    Width = 840
+    Height = 504
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     ActivePage = tabGeneralOptions
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object tabGeneralOptions: TTabSheet
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'General Options'
       object clbOptions: TCheckListBox
         Left = 0
         Top = 0
-        Width = 675
-        Height = 348
+        Width = 832
+        Height = 431
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Align = alClient
-        ItemHeight = 13
         TabOrder = 0
       end
       object IntervalPanel: TPanel
         Left = 0
-        Top = 348
-        Width = 675
-        Height = 34
+        Top = 431
+        Width = 832
+        Height = 42
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
         DesignSize = (
-          675
-          34)
+          832
+          42)
         object lblRefreshInterval: TLabel
           Left = 0
-          Top = 9
-          Width = 173
-          Height = 13
+          Top = 11
+          Width = 215
+          Height = 16
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = 'Refresh &Interval after Editor changes'
         end
         object lblManagedNodesLife: TLabel
-          Left = 406
-          Top = 9
-          Width = 175
-          Height = 13
+          Left = 500
+          Top = 11
+          Width = 223
+          Height = 16
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = 'Life-time of Managed Nodes (in days)'
         end
         object edtUpdateInterval: TEdit
-          Left = 194
-          Top = 6
-          Width = 57
-          Height = 21
+          Left = 239
+          Top = 7
+          Width = 70
+          Height = 24
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           TabOrder = 0
           Text = '100'
         end
         object udUpdateInterval: TUpDown
-          Left = 251
-          Top = 6
-          Width = 16
-          Height = 21
+          Left = 309
+          Top = 7
+          Width = 20
+          Height = 24
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Associate = edtUpdateInterval
           Min = 100
           Max = 30000
@@ -86,19 +117,27 @@ object frmOptions: TfrmOptions
           TabOrder = 1
         end
         object edtManagedNodesLife: TEdit
-          Left = 596
-          Top = 6
-          Width = 57
-          Height = 21
+          Left = 735
+          Top = 7
+          Width = 70
+          Height = 24
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Anchors = [akTop, akRight]
           TabOrder = 2
           Text = '100'
         end
         object udManagedNodesLife: TUpDown
-          Left = 653
-          Top = 6
-          Width = 16
-          Height = 21
+          Left = 805
+          Top = 7
+          Width = 19
+          Height = 24
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Anchors = [akTop, akRight]
           Associate = edtManagedNodesLife
           Max = 365
@@ -108,16 +147,24 @@ object frmOptions: TfrmOptions
       end
     end
     object tabSpecialTags: TTabSheet
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'Special Tags'
       ImageIndex = 1
       DesignSize = (
-        675
-        382)
+        832
+        473)
       object lbSpecialTags: TListBox
-        Left = 3
-        Top = 26
-        Width = 669
-        Height = 322
+        Left = 4
+        Top = 32
+        Width = 823
+        Height = 396
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = lbOwnerDrawFixed
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 0
@@ -126,10 +173,14 @@ object frmOptions: TfrmOptions
         OnMouseDown = lbSpecialTagsMouseDown
       end
       object HeaderControl1: THeaderControl
-        Left = 3
-        Top = 3
-        Width = 669
-        Height = 17
+        Left = 4
+        Top = 4
+        Width = 823
+        Height = 21
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Align = alNone
         Anchors = [akLeft, akTop, akRight]
         FullDrag = False
@@ -163,50 +214,70 @@ object frmOptions: TfrmOptions
         Style = hsFlat
       end
       object btnAdd: TBitBtn
-        Left = 273
-        Top = 354
-        Width = 75
-        Height = 25
+        Left = 336
+        Top = 436
+        Width = 92
+        Height = 30
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akRight, akBottom]
         Caption = '&Add'
         TabOrder = 2
         OnClick = btnAddClick
       end
       object btnDelete: TBitBtn
-        Left = 435
-        Top = 354
-        Width = 75
-        Height = 25
+        Left = 535
+        Top = 436
+        Width = 93
+        Height = 30
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akRight, akBottom]
         Caption = '&Delete'
         TabOrder = 3
         OnClick = btnDeleteClick
       end
       object btnEdit: TBitBtn
-        Left = 354
-        Top = 354
-        Width = 75
-        Height = 25
+        Left = 436
+        Top = 436
+        Width = 92
+        Height = 30
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akRight, akBottom]
         Caption = '&Edit'
         TabOrder = 4
         OnClick = btnEditClick
       end
       object btnMoveDown: TBitBtn
-        Left = 597
-        Top = 354
-        Width = 75
-        Height = 25
+        Left = 735
+        Top = 436
+        Width = 92
+        Height = 30
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akRight, akBottom]
         Caption = '&Move Down'
         TabOrder = 5
         OnClick = btnMoveDownClick
       end
       object btnMoveUp: TBitBtn
-        Left = 516
-        Top = 354
-        Width = 75
-        Height = 25
+        Left = 635
+        Top = 436
+        Width = 92
+        Height = 30
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akRight, akBottom]
         Caption = 'Move &Up'
         TabOrder = 6
@@ -214,97 +285,145 @@ object frmOptions: TfrmOptions
       end
     end
     object tabModuleExplorer: TTabSheet
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'Module Explorer'
       ImageIndex = 3
       DesignSize = (
-        675
-        382)
+        832
+        473)
       object lblFontName: TLabel
-        Left = 3
-        Top = 6
-        Width = 55
-        Height = 13
+        Left = 4
+        Top = 7
+        Width = 69
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = 'Font &Name:'
         FocusControl = cbxFontName
       end
       object lblFontSize: TLabel
-        Left = 3
-        Top = 33
-        Width = 44
-        Height = 13
+        Left = 4
+        Top = 41
+        Width = 55
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = 'Font &Size'
         FocusControl = edtFontSize
       end
       object lblTokenTypes: TLabel
-        Left = 3
-        Top = 66
-        Width = 63
-        Height = 13
+        Left = 4
+        Top = 81
+        Width = 81
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = '&Token Types'
         FocusControl = lbxTokenTypes
       end
       object lblBackgroundColour: TLabel
-        Left = 504
-        Top = 283
-        Width = 91
-        Height = 13
+        Left = 620
+        Top = 348
+        Width = 115
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = 'Background &Colour'
       end
       object lblTokenLimit: TLabel
-        Left = 443
-        Top = 33
-        Width = 55
-        Height = 13
+        Left = 545
+        Top = 41
+        Width = 69
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = '&Token Limit'
       end
       object lblTreeColour: TLabel
-        Left = 504
-        Top = 330
-        Width = 71
-        Height = 13
+        Left = 620
+        Top = 406
+        Width = 92
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = 'Treeline &Colour'
       end
       object lblForeColour: TLabel
-        Left = 504
-        Top = 66
-        Width = 54
-        Height = 13
+        Left = 620
+        Top = 81
+        Width = 70
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = '&Fore Colour'
         FocusControl = cbxFontColour
       end
       object lblBackColour: TLabel
-        Left = 504
-        Top = 112
-        Width = 58
-        Height = 13
+        Left = 620
+        Top = 138
+        Width = 73
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = '&Back Colour'
         FocusControl = cbxBackColour
       end
       object cbxFontName: TComboBox
-        Left = 79
-        Top = 3
-        Width = 594
-        Height = 21
+        Left = 97
+        Top = 4
+        Width = 731
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 0
       end
       object edtFontSize: TEdit
-        Left = 79
-        Top = 30
-        Width = 184
-        Height = 21
+        Left = 97
+        Top = 37
+        Width = 227
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         ReadOnly = True
         TabOrder = 1
         Text = '8'
       end
       object udFontSize: TUpDown
-        Left = 263
-        Top = 30
-        Width = 16
-        Height = 21
+        Left = 324
+        Top = 37
+        Width = 19
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Associate = edtFontSize
         Min = 8
         Max = 72
@@ -312,92 +431,131 @@ object frmOptions: TfrmOptions
         TabOrder = 2
       end
       object lbxTokenTypes: TListBox
-        Left = 3
-        Top = 85
-        Width = 495
-        Height = 295
+        Left = 4
+        Top = 105
+        Width = 609
+        Height = 363
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ItemHeight = 13
         TabOrder = 5
         OnClick = lbxTokenTypesClick
       end
       object cbxFontColour: TColorBox
-        Left = 504
-        Top = 84
-        Width = 168
+        Left = 620
+        Top = 103
+        Width = 207
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
         TabOrder = 6
         OnChange = cbxFontColourChange
       end
       object gbxFontStyles: TGroupBox
-        Left = 504
-        Top = 160
-        Width = 168
-        Height = 116
+        Left = 620
+        Top = 197
+        Width = 207
+        Height = 143
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = 'Font Styles'
         TabOrder = 8
         object chkBold: TCheckBox
-          Left = 12
-          Top = 21
-          Width = 97
-          Height = 17
+          Left = 15
+          Top = 26
+          Width = 119
+          Height = 21
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = '&Bold'
           TabOrder = 0
           OnClick = chkBoldClick
         end
         object chkItalic: TCheckBox
-          Left = 13
-          Top = 44
-          Width = 97
-          Height = 17
+          Left = 16
+          Top = 54
+          Width = 119
+          Height = 21
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = '&Italic'
           TabOrder = 1
           OnClick = chkItalicClick
         end
         object chkUnderline: TCheckBox
-          Left = 13
-          Top = 67
-          Width = 97
-          Height = 17
+          Left = 16
+          Top = 82
+          Width = 119
+          Height = 21
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = '&Underline'
           TabOrder = 2
           OnClick = chkUnderlineClick
         end
         object chkStrikeout: TCheckBox
-          Left = 12
-          Top = 90
-          Width = 97
-          Height = 17
+          Left = 15
+          Top = 111
+          Width = 119
+          Height = 21
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = '&Strikeout'
           TabOrder = 3
           OnClick = chkStrikeoutClick
         end
       end
       object cbxBGColour: TColorBox
-        Left = 504
-        Top = 302
-        Width = 168
+        Left = 620
+        Top = 372
+        Width = 207
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
         TabOrder = 9
       end
       object edtTokenLimit: TEdit
-        Left = 504
-        Top = 30
-        Width = 150
-        Height = 21
+        Left = 620
+        Top = 37
+        Width = 185
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         TabOrder = 3
         Text = '10'
       end
       object udTokenLimit: TUpDown
-        Left = 654
-        Top = 30
-        Width = 16
-        Height = 21
+        Left = 805
+        Top = 37
+        Width = 20
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Associate = edtTokenLimit
         Min = 10
         Max = 32600
@@ -405,19 +563,27 @@ object frmOptions: TfrmOptions
         TabOrder = 4
       end
       object clbxTreeColour: TColorBox
-        Left = 504
-        Top = 349
-        Width = 168
+        Left = 620
+        Top = 430
+        Width = 207
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
         TabOrder = 10
       end
       object cbxBackColour: TColorBox
-        Left = 504
-        Top = 132
-        Width = 168
+        Left = 620
+        Top = 162
+        Width = 207
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
         Anchors = [akTop, akRight]
         TabOrder = 7
@@ -425,16 +591,24 @@ object frmOptions: TfrmOptions
       end
     end
     object tabCodeBrowsing: TTabSheet
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'Code Browsing'
       ImageIndex = 4
       DesignSize = (
-        675
-        382)
+        832
+        473)
       object rgpBrowsePosition: TRadioGroup
-        Left = 3
-        Top = 3
-        Width = 669
-        Height = 376
+        Left = 4
+        Top = 4
+        Width = 823
+        Height = 462
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = 'Browse Position'
         Items.Strings = (
@@ -447,16 +621,24 @@ object frmOptions: TfrmOptions
       end
     end
     object tabExcludeDocFiles: TTabSheet
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
       DesignSize = (
-        675
-        382)
+        832
+        473)
       object mmoExcludeDocFiles: TMemo
-        Left = 3
-        Top = 3
-        Width = 669
-        Height = 376
+        Left = 4
+        Top = 4
+        Width = 823
+        Height = 462
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'mmoExcludeDocFiles')
@@ -464,16 +646,24 @@ object frmOptions: TfrmOptions
       end
     end
     object tabMethodDescriptions: TTabSheet
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'Method Descriptions'
       ImageIndex = 6
       DesignSize = (
-        675
-        382)
+        832
+        473)
       object btnAddDesc: TBitBtn
-        Left = 597
-        Top = 3
-        Width = 75
-        Height = 25
+        Left = 735
+        Top = 4
+        Width = 92
+        Height = 30
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = '&Add'
         Glyph.Data = {
@@ -494,10 +684,14 @@ object frmOptions: TfrmOptions
         OnClick = btnAddDescClick
       end
       object btnEditDesc: TBitBtn
-        Left = 597
-        Top = 34
-        Width = 75
-        Height = 25
+        Left = 735
+        Top = 42
+        Width = 92
+        Height = 31
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = '&Edit'
         Glyph.Data = {
@@ -518,10 +712,14 @@ object frmOptions: TfrmOptions
         OnClick = btnEditDescClick
       end
       object btnDeleteDesc: TBitBtn
-        Left = 597
-        Top = 65
-        Width = 75
-        Height = 25
+        Left = 735
+        Top = 80
+        Width = 92
+        Height = 31
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = '&Delete'
         Glyph.Data = {
@@ -542,10 +740,14 @@ object frmOptions: TfrmOptions
         OnClick = btnDeleteDescClick
       end
       object hctlMethodDescriptions: THeaderControl
-        Left = 3
-        Top = 3
-        Width = 588
-        Height = 17
+        Left = 4
+        Top = 4
+        Width = 723
+        Height = 21
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Align = alNone
         Anchors = [akLeft, akTop, akRight]
         Sections = <
@@ -562,10 +764,14 @@ object frmOptions: TfrmOptions
         Style = hsFlat
       end
       object lbxMethodDescriptions: TListBox
-        Left = 3
-        Top = 26
-        Width = 588
-        Height = 353
+        Left = 4
+        Top = 32
+        Width = 723
+        Height = 434
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = lbOwnerDrawFixed
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 4
@@ -575,28 +781,55 @@ object frmOptions: TfrmOptions
     end
   end
   object bbtnCancel: TBitBtn
-    Left = 616
-    Top = 424
-    Width = 75
-    Height = 25
+    Left = 758
+    Top = 522
+    Width = 92
+    Height = 31
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Anchors = [akRight, akBottom]
     Kind = bkCancel
-    TabOrder = 1
+    TabOrder = 2
   end
   object bbtnOK: TBitBtn
-    Left = 535
-    Top = 424
-    Width = 75
-    Height = 25
+    Left = 658
+    Top = 522
+    Width = 93
+    Height = 31
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Anchors = [akRight, akBottom]
     Kind = bkOK
-    TabOrder = 2
+    TabOrder = 3
+  end
+  object btnCheckForUpdates: TBitBtn
+    Left = 8
+    Top = 521
+    Width = 221
+    Height = 32
+    Anchors = [akLeft, akBottom]
+    Caption = 'Configure Check for Updates...'
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      8000008000000080800080000000800080008080000080808000C0C0C0000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00DDDDDDDDDDDD
+      DDDDDDDDDDDDDDDDDDDDDCDCDCDDCDCDDDDDDCDCDCDDCDCDDDCDDCCCDCDDCDCC
+      CDDDDCDC1CDDCDCDCDCDDCD9CCCCCCCCCDDDDDDD1DDDDDDDDDDDDDD91DDDDDA2
+      DDDDDDD91DDDDDAA2DDDDDDD91DDDAAAA2DDDDDDD91DDA2DAA2DDDDDD91DAADD
+      DAA2D91119DDADDDDDAADD999DDDDDDDDDDADDDDDDDDDDDDDDDD}
+    TabOrder = 1
+    OnClick = btnCheckForUpdatesClick
   end
   object CheckedImages: TImageList
     Left = 254
     Top = 188
     Bitmap = {
-      494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000400080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

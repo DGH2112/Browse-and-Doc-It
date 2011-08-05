@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    29 Mar 2010
+  @Date    05 Aug 2011
 
 **)
 library BrowseAndDocIt70;
@@ -76,11 +76,13 @@ uses
   EditorNotifier in '..\Source\EditorNotifier.pas',
   EidolonHighlighter in '..\Source\EidolonHighlighter.pas',
   ProfilingForm in '..\Source\ProfilingForm.pas' {frmProfiling},
-  EidolonTypes in '..\..\..\LIBRARY\EidolonTypes.pas';
+  EidolonTypes in '..\..\..\LIBRARY\EidolonTypes.pas',
+  CheckForUpdatesOptionsForm in '..\..\..\Library\CheckForUpdatesOptionsForm.pas' {frmCheckForUpdatesOptions};
 
 {$R *.res}
 
 begin
 end.
+
 
 

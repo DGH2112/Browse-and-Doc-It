@@ -32,12 +32,8 @@ object frmCheckForUpdatesOptions: TfrmCheckForUpdatesOptions
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkOK
-    ParentDoubleBuffered = False
     TabOrder = 4
-    ExplicitLeft = 274
-    ExplicitTop = 263
   end
   object btnCancel: TBitBtn
     Left = 246
@@ -45,12 +41,8 @@ object frmCheckForUpdatesOptions: TfrmCheckForUpdatesOptions
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkCancel
-    ParentDoubleBuffered = False
     TabOrder = 5
-    ExplicitLeft = 355
-    ExplicitTop = 263
   end
   object gbxLastUpdate: TGroupBox
     Left = 8
@@ -60,7 +52,6 @@ object frmCheckForUpdatesOptions: TfrmCheckForUpdatesOptions
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Last Check Date'
     TabOrder = 0
-    ExplicitWidth = 422
     DesignSize = (
       313
       57)
@@ -73,7 +64,6 @@ object frmCheckForUpdatesOptions: TfrmCheckForUpdatesOptions
       BevelOuter = bvNone
       Caption = 'Never checked.'
       TabOrder = 0
-      ExplicitWidth = 416
     end
   end
   object chkEnabled: TCheckBox
@@ -84,7 +74,6 @@ object frmCheckForUpdatesOptions: TfrmCheckForUpdatesOptions
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Enable Check for Updates periodically on Application startup.'
     TabOrder = 1
-    ExplicitWidth = 321
   end
   object edtInterval: TEdit
     Left = 214
@@ -95,7 +84,6 @@ object frmCheckForUpdatesOptions: TfrmCheckForUpdatesOptions
     ReadOnly = True
     TabOrder = 2
     Text = '0'
-    ExplicitLeft = 268
   end
   object udInterval: TUpDown
     Left = 305
@@ -107,6 +95,5 @@ object frmCheckForUpdatesOptions: TfrmCheckForUpdatesOptions
     Min = 1
     Max = 365
     TabOrder = 3
-    ExplicitLeft = 359
   end
 end

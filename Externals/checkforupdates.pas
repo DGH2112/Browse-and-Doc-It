@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    13 Jun 2011
+  @Date    05 Aug 2011
 
 **)
 Unit CheckForUpdates;
@@ -501,7 +501,7 @@ Implementation
   **)
   procedure TCheckForUpdates.LoadSettings;
   begin
-    With TiniFile.Create(FRegRoot) Do
+    With TMeminiFile.Create(FRegRoot) Do
       Try
         FMessageTextColour := StringToColor(ReadString('Colours', 'MessageText', 'clNone'));
         FMessageConfirmColour := StringToColor(ReadString('Colours', 'MessageConfirm', 'clWhite'));
@@ -595,7 +595,7 @@ Implementation
     iDay, iMonth, iYear : Word;
 
   Begin
-    With TIniFile.Create(FRegRoot) Do
+    With TMemIniFile.Create(FRegRoot) Do
       Try
         iDay := ReadInteger(strCheckForUpdatesSection, 'Day', 01);
         iMonth := ReadInteger(strCheckForUpdatesSection, 'Month', 01);
@@ -618,7 +618,7 @@ Implementation
   **)
   procedure TCheckForUpdates.SaveSettings;
   begin
-    With TiniFile.Create(FRegRoot) Do
+    With TMemIniFile.Create(FRegRoot) Do
       Try
         WriteString('Colours', 'MessageText', ColorToString(FMessageTextColour));
         WriteString('Colours', 'MessageConfirm', ColorToString(FMessageConfirmColour));
@@ -626,6 +626,7 @@ Implementation
         WriteString('Colours', 'MessageNote', ColorToString(FMessageNoteColour));
         WriteString('Colours', 'MessageDescription', ColorToString(FMessageDescriptionColour));
         WriteString('Colours', 'MessageHeader', ColorToString(FMessageHeaderColour));
+        UpdateFile;
       Finally
         Free;
       End;
@@ -645,7 +646,7 @@ Implementation
     iDay, iMonth, iYear : Word;
 
   Begin
-    With TIniFile.Create(FRegRoot) Do
+    With TMemIniFile.Create(FRegRoot) Do
       Try
         WriteInteger(strCheckForUpdatesSection, 'Interval', FUpdateInterval);
         DecodeDate(Now, iYear, iMonth, iDay);
@@ -653,6 +654,7 @@ Implementation
         WriteInteger(strCheckForUpdatesSection, 'Month', iMonth);
         WriteInteger(strCheckForUpdatesSection, 'Year', iYear);
         WriteBool(strCheckForUpdatesSection, 'Enabled', FEnabled);
+        UpdateFile;
       Finally
         Free;
       End;

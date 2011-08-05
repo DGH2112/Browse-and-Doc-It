@@ -68,7 +68,6 @@ object frmDUnit: TfrmDUnit
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 13
       TabOrder = 1
       OnChange = rdoNewExistingUnit
     end
@@ -138,7 +137,6 @@ object frmDUnit: TfrmDUnit
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
-      ItemHeight = 13
       TabOrder = 3
     end
     object rdoNewUnit: TRadioButton
@@ -169,6 +167,7 @@ object frmDUnit: TfrmDUnit
     Anchors = [akLeft, akTop, akRight, akBottom]
     CheckImageKind = ckXP
     Header.AutoSizeIndex = 0
+    Header.DefaultHeight = 17
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
@@ -188,7 +187,6 @@ object frmDUnit: TfrmDUnit
     Width = 292
     Height = 21
     Anchors = [akLeft, akRight, akBottom]
-    ItemHeight = 13
     TabOrder = 3
   end
   object edtTestSuiteName: TEdit

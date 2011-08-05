@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    10 Jul 2009
+  @Date    05 Aug 2011
 
 **)
 unit DUnitForm;
@@ -443,7 +443,7 @@ Var
   sl : TStringList;
 
 begin
-  With TIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
+  With TMemIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
     Try
       Top := ReadInteger('DUnitDlg', 'Top', (Screen.Height - Height) Div 2);
       Left := ReadInteger('DUnitDlg', 'Left', (Screen.Width - Width) Div 2);
@@ -564,7 +564,7 @@ Var
   i: Integer;
 
 begin
-  With TIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
+  With TMemIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
     Try
       WriteInteger('DUnitDlg', 'Top', Top);
       WriteInteger('DUnitDlg', 'Left', Left);
@@ -575,6 +575,7 @@ begin
           cbxBaseClass.Items[i]);
       WriteString('DUnitDlg', 'BaseClass', cbxBaseClass.Text);
       WriteString('DUnitDlg', 'TestSuiteName', edtTestSuiteName.Text);
+      UpdateFile;
     Finally
       Free;
     End;

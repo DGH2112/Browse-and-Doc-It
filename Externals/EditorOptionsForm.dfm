@@ -4,11 +4,11 @@ object frmEditorOptions: TfrmEditorOptions
   ActiveControl = cbxEditorBackgroundColour
   BorderIcons = []
   Caption = 'Editor Options'
-  ClientHeight = 356
-  ClientWidth = 442
+  ClientHeight = 442
+  ClientWidth = 544
   Color = clBtnFace
-  Constraints.MinHeight = 390
-  Constraints.MinWidth = 450
+  Constraints.MinHeight = 480
+  Constraints.MinWidth = 554
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -17,139 +17,197 @@ object frmEditorOptions: TfrmEditorOptions
   OldCreateOrder = False
   Position = poMainFormCenter
   DesignSize = (
-    442
-    356)
+    544
+    442)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object PageControl1: TPageControl
-    Left = 8
-    Top = 8
-    Width = 426
-    Height = 309
+    Left = 10
+    Top = 10
+    Width = 524
+    Height = 384
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     ActivePage = VisualTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object VisualTab: TTabSheet
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'Visual'
       DesignSize = (
-        418
-        281)
+        516
+        353)
       object lblActiveLineColour: TLabel
-        Left = 3
-        Top = 34
-        Width = 86
-        Height = 13
+        Left = 4
+        Top = 42
+        Width = 107
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = '&Active Line Colour'
         FocusControl = cbxActiveLineColour
       end
       object lblEditorFontName: TLabel
-        Left = 3
-        Top = 62
-        Width = 82
-        Height = 13
+        Left = 4
+        Top = 76
+        Width = 104
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Editor Font &Name'
         FocusControl = cbxFontName
       end
       object lblEditorFontSize: TLabel
-        Left = 3
-        Top = 89
-        Width = 74
-        Height = 13
+        Left = 4
+        Top = 110
+        Width = 93
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Editor Font &Size'
         FocusControl = edtFontSize
       end
       object lblRightEdgePosition: TLabel
-        Left = 3
-        Top = 116
-        Width = 93
-        Height = 13
+        Left = 4
+        Top = 143
+        Width = 118
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = '&Right Edge Position'
         FocusControl = edtRightEdge
       end
       object lblRightEdgeColour: TLabel
-        Left = 3
-        Top = 143
-        Width = 86
-        Height = 13
+        Left = 4
+        Top = 176
+        Width = 109
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Right &Edge Colour'
         FocusControl = cbxRightEdgeColour
       end
       object lblForeColour: TLabel
-        Left = 3
-        Top = 171
-        Width = 123
-        Height = 13
+        Left = 4
+        Top = 210
+        Width = 156
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Selected Text &Fore Colour'
         FocusControl = cbxSelectedForeground
       end
       object lblBackColour: TLabel
-        Left = 3
-        Top = 199
-        Width = 127
-        Height = 13
+        Left = 4
+        Top = 245
+        Width = 159
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Selected &Text Back Colour'
         FocusControl = cbxSelectedBackground
       end
       object lblEditorBackgroundColour: TLabel
-        Left = 3
-        Top = 6
-        Width = 121
-        Height = 13
+        Left = 4
+        Top = 7
+        Width = 153
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Editor &Background Colour'
         FocusControl = cbxEditorBackgroundColour
       end
       object lblTabWidth: TLabel
-        Left = 3
-        Top = 227
-        Width = 97
-        Height = 13
+        Left = 4
+        Top = 279
+        Width = 121
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Tab &width in Spaces'
         FocusControl = edtTabWidth
       end
       object cbxActiveLineColour: TColorBox
-        Left = 233
-        Top = 31
-        Width = 182
+        Left = 287
+        Top = 38
+        Width = 224
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 1
       end
       object cbxFontName: TComboBox
-        Left = 233
-        Top = 59
-        Width = 182
-        Height = 21
+        Left = 287
+        Top = 73
+        Width = 224
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = csDropDownList
         Anchors = [akTop, akRight]
-        ItemHeight = 13
         Sorted = True
         TabOrder = 2
       end
       object edtFontSize: TEdit
-        Left = 233
-        Top = 86
-        Width = 167
-        Height = 21
+        Left = 287
+        Top = 106
+        Width = 205
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         TabOrder = 3
         Text = '6'
       end
       object udEditorFontSize: TUpDown
-        Left = 400
-        Top = 86
-        Width = 16
-        Height = 21
+        Left = 492
+        Top = 106
+        Width = 20
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Associate = edtFontSize
         Min = 6
@@ -158,87 +216,119 @@ object frmEditorOptions: TfrmEditorOptions
         TabOrder = 4
       end
       object chxLineNumbers: TCheckBox
-        Left = 3
-        Top = 256
-        Width = 412
-        Height = 17
+        Left = 4
+        Top = 315
+        Width = 507
+        Height = 21
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'S&how Line Numbers in the Editor Gutter'
         TabOrder = 12
       end
       object edtRightEdge: TEdit
-        Left = 233
-        Top = 113
-        Width = 167
-        Height = 21
+        Left = 287
+        Top = 139
+        Width = 205
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         TabOrder = 5
         Text = '0'
       end
       object udRightEdgePosition: TUpDown
-        Left = 400
-        Top = 113
-        Width = 16
-        Height = 21
+        Left = 492
+        Top = 139
+        Width = 20
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Associate = edtRightEdge
         Max = 1024
         TabOrder = 6
       end
       object cbxRightEdgeColour: TColorBox
-        Left = 233
-        Top = 140
-        Width = 183
+        Left = 287
+        Top = 172
+        Width = 225
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 7
       end
       object cbxSelectedForeground: TColorBox
-        Left = 233
-        Top = 168
-        Width = 183
+        Left = 287
+        Top = 207
+        Width = 225
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 8
       end
       object cbxSelectedBackground: TColorBox
-        Left = 233
-        Top = 196
-        Width = 183
+        Left = 287
+        Top = 241
+        Width = 225
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 9
       end
       object cbxEditorBackgroundColour: TColorBox
-        Left = 233
-        Top = 3
-        Width = 182
+        Left = 287
+        Top = 4
+        Width = 224
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 0
       end
       object edtTabWidth: TEdit
-        Left = 233
-        Top = 224
-        Width = 167
-        Height = 21
+        Left = 287
+        Top = 276
+        Width = 205
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         TabOrder = 10
         Text = '1'
       end
       object udTabWidth: TUpDown
-        Left = 400
-        Top = 224
-        Width = 16
-        Height = 21
+        Left = 492
+        Top = 276
+        Width = 20
+        Height = 24
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Associate = edtTabWidth
         Min = 1
@@ -248,140 +338,196 @@ object frmEditorOptions: TfrmEditorOptions
       end
     end
     object BehaviourTab: TTabSheet
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'Behaviour'
       ImageIndex = 1
       DesignSize = (
-        418
-        281)
+        516
+        353)
       object clbOptions: TCheckListBox
-        Left = 3
-        Top = 3
-        Width = 412
-        Height = 275
+        Left = 4
+        Top = 4
+        Width = 507
+        Height = 342
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ItemHeight = 13
         TabOrder = 0
       end
     end
     object SyntaxTab: TTabSheet
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Caption = 'Syntax Highlighting'
       ImageIndex = 2
       DesignSize = (
-        418
-        281)
+        516
+        353)
       object lblAttrForeColour: TLabel
-        Left = 262
-        Top = 40
-        Width = 129
-        Height = 13
+        Left = 322
+        Top = 49
+        Width = 163
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = 'Attribute &Foreground Colour'
         FocusControl = cbxAttrForeColour
       end
       object lblAttrBackColour: TLabel
-        Left = 266
-        Top = 87
-        Width = 133
-        Height = 13
+        Left = 327
+        Top = 107
+        Width = 166
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = 'Attribute Background &Colour'
         FocusControl = cbxAttrBackColour
       end
       object lblAttributes: TLabel
-        Left = 3
-        Top = 37
-        Width = 44
-        Height = 13
+        Left = 4
+        Top = 46
+        Width = 55
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = '&Attributes'
         FocusControl = lbAttributes
       end
       object lblHighlighterType: TLabel
-        Left = 3
-        Top = 3
-        Width = 413
-        Height = 21
+        Left = 4
+        Top = 4
+        Width = 508
+        Height = 26
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 'No Highligher Available'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clNavy
-        Font.Height = -13
+        Font.Height = -16
         Font.Name = 'MS Sans Serif'
         Font.Style = []
         ParentFont = False
       end
       object lbAttributes: TListBox
-        Left = 3
-        Top = 56
-        Width = 253
-        Height = 222
+        Left = 4
+        Top = 69
+        Width = 311
+        Height = 277
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ItemHeight = 13
         TabOrder = 0
         OnClick = lbAttributesClick
       end
       object cbxAttrForeColour: TColorBox
-        Left = 262
-        Top = 59
-        Width = 153
+        Left = 322
+        Top = 73
+        Width = 189
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 1
         OnChange = AttributeChange
       end
       object cbxAttrBackColour: TColorBox
-        Left = 262
-        Top = 104
-        Width = 153
+        Left = 322
+        Top = 128
+        Width = 189
         Height = 22
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
-        ItemHeight = 16
         TabOrder = 2
         OnChange = AttributeChange
       end
       object grpFontStyles: TGroupBox
-        Left = 262
-        Top = 132
-        Width = 153
-        Height = 146
+        Left = 322
+        Top = 162
+        Width = 189
+        Height = 184
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Anchors = [akTop, akRight, akBottom]
         Caption = 'Attribute Font Styles'
         TabOrder = 3
         object cbxBold: TCheckBox
-          Left = 8
-          Top = 24
-          Width = 97
-          Height = 17
+          Left = 10
+          Top = 30
+          Width = 119
+          Height = 20
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = '&Bold'
           TabOrder = 0
           OnClick = AttributeChange
         end
         object cbxItalic: TCheckBox
-          Left = 8
-          Top = 48
-          Width = 97
-          Height = 17
+          Left = 10
+          Top = 59
+          Width = 119
+          Height = 21
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = '&Italic'
           TabOrder = 1
           OnClick = AttributeChange
         end
         object cbxUnderlined: TCheckBox
-          Left = 8
-          Top = 72
-          Width = 97
-          Height = 17
+          Left = 10
+          Top = 89
+          Width = 119
+          Height = 21
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = '&Underlined'
           TabOrder = 2
           OnClick = AttributeChange
         end
         object cbxStrikeout: TCheckBox
-          Left = 8
-          Top = 96
-          Width = 97
-          Height = 17
+          Left = 10
+          Top = 118
+          Width = 119
+          Height = 21
+          Margins.Left = 4
+          Margins.Top = 4
+          Margins.Right = 4
+          Margins.Bottom = 4
           Caption = '&Strikeout'
           TabOrder = 3
           OnClick = AttributeChange
@@ -390,21 +536,33 @@ object frmEditorOptions: TfrmEditorOptions
     end
   end
   object btnOK: TBitBtn
-    Left = 359
-    Top = 323
-    Width = 75
-    Height = 25
+    Left = 343
+    Top = 403
+    Width = 92
+    Height = 30
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Anchors = [akRight, akBottom]
+    DoubleBuffered = True
     Kind = bkOK
-    TabOrder = 2
+    ParentDoubleBuffered = False
+    TabOrder = 1
   end
   object btnCancel: TBitBtn
-    Left = 278
-    Top = 324
-    Width = 75
-    Height = 25
+    Left = 443
+    Top = 402
+    Width = 92
+    Height = 31
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Anchors = [akRight, akBottom]
+    DoubleBuffered = True
     Kind = bkCancel
-    TabOrder = 1
+    ParentDoubleBuffered = False
+    TabOrder = 2
   end
 end

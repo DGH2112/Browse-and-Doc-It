@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    20 Feb 2010
+  @Date    21 Aug 2011
 
 **)
 
@@ -377,7 +377,7 @@ Var
   strKey : String;
 
 begin
-  With TIniFile.Create(strRootKey) Do
+  With TMemIniFile.Create(strRootKey) Do
     Try
       If Assigned(Highlighter) Then
         strKey := HighlighterName(Highlighter)
@@ -456,7 +456,7 @@ Var
   strKey : String;
 
 begin
-  With TIniFile.Create(strRootKey) Do
+  With TMemIniFile.Create(strRootKey) Do
     Try
       If Assigned(Highlighter) Then
         strKey := HighlighterName(Highlighter)
@@ -473,6 +473,7 @@ begin
       WriteInteger(strKey, 'Selected Foreground', SelectedColor.Foreground);
       WriteInteger(strKey, 'Selected Background', SelectedColor.Background);
       WriteInteger(strKey, 'Tab Width', TabWidth);
+      UpdateFile;
     Finally
       Free;
     End;

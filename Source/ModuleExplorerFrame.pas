@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    26 Jun 2010
+  @Date    02 Sep 2011
   @Author  David Hoyle
   @Version 1.0
 
@@ -781,7 +781,6 @@ begin
   FExplorer.Free;
   FSpecialTagNodes := Nil;
   ManageExpandedNodes;
-  GetExpandedNodes(FModule);
   FHintWin.Free;
   FNodeInfo.Free;
   Inherited;

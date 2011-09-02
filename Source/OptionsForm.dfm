@@ -26,28 +26,16 @@ object frmOptions: TfrmOptions
     Top = 10
     Width = 840
     Height = 504
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
     ActivePage = tabGeneralOptions
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object tabGeneralOptions: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'General Options'
       object clbOptions: TCheckListBox
         Left = 0
         Top = 0
         Width = 832
         Height = 431
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Align = alClient
         TabOrder = 0
       end
@@ -56,10 +44,6 @@ object frmOptions: TfrmOptions
         Top = 431
         Width = 832
         Height = 42
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
@@ -71,10 +55,6 @@ object frmOptions: TfrmOptions
           Top = 11
           Width = 215
           Height = 16
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Caption = 'Refresh &Interval after Editor changes'
         end
         object lblManagedNodesLife: TLabel
@@ -82,10 +62,6 @@ object frmOptions: TfrmOptions
           Top = 11
           Width = 223
           Height = 16
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Caption = 'Life-time of Managed Nodes (in days)'
         end
         object edtUpdateInterval: TEdit
@@ -93,10 +69,6 @@ object frmOptions: TfrmOptions
           Top = 7
           Width = 70
           Height = 24
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           TabOrder = 0
           Text = '100'
         end
@@ -105,10 +77,6 @@ object frmOptions: TfrmOptions
           Top = 7
           Width = 20
           Height = 24
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Associate = edtUpdateInterval
           Min = 100
           Max = 30000
@@ -121,10 +89,6 @@ object frmOptions: TfrmOptions
           Top = 7
           Width = 70
           Height = 24
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Anchors = [akTop, akRight]
           TabOrder = 2
           Text = '100'
@@ -134,10 +98,6 @@ object frmOptions: TfrmOptions
           Top = 7
           Width = 19
           Height = 24
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Anchors = [akTop, akRight]
           Associate = edtManagedNodesLife
           Max = 365
@@ -147,10 +107,6 @@ object frmOptions: TfrmOptions
       end
     end
     object tabSpecialTags: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'Special Tags'
       ImageIndex = 1
       DesignSize = (
@@ -161,10 +117,6 @@ object frmOptions: TfrmOptions
         Top = 32
         Width = 823
         Height = 396
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Style = lbOwnerDrawFixed
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 0
@@ -177,10 +129,6 @@ object frmOptions: TfrmOptions
         Top = 4
         Width = 823
         Height = 21
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Align = alNone
         Anchors = [akLeft, akTop, akRight]
         FullDrag = False
@@ -218,10 +166,6 @@ object frmOptions: TfrmOptions
         Top = 436
         Width = 92
         Height = 30
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akRight, akBottom]
         Caption = '&Add'
         TabOrder = 2
@@ -232,10 +176,6 @@ object frmOptions: TfrmOptions
         Top = 436
         Width = 93
         Height = 30
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akRight, akBottom]
         Caption = '&Delete'
         TabOrder = 3
@@ -246,10 +186,6 @@ object frmOptions: TfrmOptions
         Top = 436
         Width = 92
         Height = 30
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akRight, akBottom]
         Caption = '&Edit'
         TabOrder = 4
@@ -260,10 +196,6 @@ object frmOptions: TfrmOptions
         Top = 436
         Width = 92
         Height = 30
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akRight, akBottom]
         Caption = '&Move Down'
         TabOrder = 5
@@ -274,10 +206,6 @@ object frmOptions: TfrmOptions
         Top = 436
         Width = 92
         Height = 30
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akRight, akBottom]
         Caption = 'Move &Up'
         TabOrder = 6
@@ -285,10 +213,6 @@ object frmOptions: TfrmOptions
       end
     end
     object tabModuleExplorer: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'Module Explorer'
       ImageIndex = 3
       DesignSize = (
@@ -299,10 +223,6 @@ object frmOptions: TfrmOptions
         Top = 7
         Width = 69
         Height = 16
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Caption = 'Font &Name:'
         FocusControl = cbxFontName
       end
@@ -311,10 +231,6 @@ object frmOptions: TfrmOptions
         Top = 41
         Width = 55
         Height = 16
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Caption = 'Font &Size'
         FocusControl = edtFontSize
       end
@@ -323,10 +239,6 @@ object frmOptions: TfrmOptions
         Top = 81
         Width = 81
         Height = 16
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Caption = '&Token Types'
         FocusControl = lbxTokenTypes
       end
@@ -335,10 +247,6 @@ object frmOptions: TfrmOptions
         Top = 348
         Width = 115
         Height = 16
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = 'Background &Colour'
       end
@@ -347,10 +255,6 @@ object frmOptions: TfrmOptions
         Top = 41
         Width = 69
         Height = 16
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Caption = '&Token Limit'
       end
       object lblTreeColour: TLabel
@@ -358,10 +262,6 @@ object frmOptions: TfrmOptions
         Top = 406
         Width = 92
         Height = 16
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = 'Treeline &Colour'
       end
@@ -370,10 +270,6 @@ object frmOptions: TfrmOptions
         Top = 81
         Width = 70
         Height = 16
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Caption = '&Fore Colour'
         FocusControl = cbxFontColour
       end
@@ -382,10 +278,6 @@ object frmOptions: TfrmOptions
         Top = 138
         Width = 73
         Height = 16
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Caption = '&Back Colour'
         FocusControl = cbxBackColour
       end
@@ -394,10 +286,6 @@ object frmOptions: TfrmOptions
         Top = 4
         Width = 731
         Height = 24
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 0
@@ -407,10 +295,6 @@ object frmOptions: TfrmOptions
         Top = 37
         Width = 227
         Height = 24
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         ReadOnly = True
         TabOrder = 1
         Text = '8'
@@ -420,10 +304,6 @@ object frmOptions: TfrmOptions
         Top = 37
         Width = 19
         Height = 24
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Associate = edtFontSize
         Min = 8
         Max = 72
@@ -435,10 +315,6 @@ object frmOptions: TfrmOptions
         Top = 105
         Width = 609
         Height = 363
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 5
         OnClick = lbxTokenTypesClick
@@ -448,11 +324,7 @@ object frmOptions: TfrmOptions
         Top = 103
         Width = 207
         Height = 22
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
         TabOrder = 6
         OnChange = cbxFontColourChange
@@ -462,10 +334,6 @@ object frmOptions: TfrmOptions
         Top = 197
         Width = 207
         Height = 143
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = 'Font Styles'
         TabOrder = 8
@@ -474,10 +342,6 @@ object frmOptions: TfrmOptions
           Top = 26
           Width = 119
           Height = 21
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Caption = '&Bold'
           TabOrder = 0
           OnClick = chkBoldClick
@@ -487,10 +351,6 @@ object frmOptions: TfrmOptions
           Top = 54
           Width = 119
           Height = 21
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Caption = '&Italic'
           TabOrder = 1
           OnClick = chkItalicClick
@@ -500,10 +360,6 @@ object frmOptions: TfrmOptions
           Top = 82
           Width = 119
           Height = 21
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Caption = '&Underline'
           TabOrder = 2
           OnClick = chkUnderlineClick
@@ -513,10 +369,6 @@ object frmOptions: TfrmOptions
           Top = 111
           Width = 119
           Height = 21
-          Margins.Left = 4
-          Margins.Top = 4
-          Margins.Right = 4
-          Margins.Bottom = 4
           Caption = '&Strikeout'
           TabOrder = 3
           OnClick = chkStrikeoutClick
@@ -527,11 +379,7 @@ object frmOptions: TfrmOptions
         Top = 372
         Width = 207
         Height = 22
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
         TabOrder = 9
       end
@@ -540,10 +388,6 @@ object frmOptions: TfrmOptions
         Top = 37
         Width = 185
         Height = 24
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         TabOrder = 3
         Text = '10'
       end
@@ -552,10 +396,6 @@ object frmOptions: TfrmOptions
         Top = 37
         Width = 20
         Height = 24
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Associate = edtTokenLimit
         Min = 10
         Max = 32600
@@ -567,11 +407,7 @@ object frmOptions: TfrmOptions
         Top = 430
         Width = 207
         Height = 22
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
         TabOrder = 10
       end
@@ -580,21 +416,13 @@ object frmOptions: TfrmOptions
         Top = 162
         Width = 207
         Height = 22
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
-        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames, cbCustomColors]
+        Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
         Anchors = [akTop, akRight]
         TabOrder = 7
         OnChange = cbxBackColourChange
       end
     end
     object tabCodeBrowsing: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'Code Browsing'
       ImageIndex = 4
       DesignSize = (
@@ -605,10 +433,6 @@ object frmOptions: TfrmOptions
         Top = 4
         Width = 823
         Height = 462
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = 'Browse Position'
         Items.Strings = (
@@ -621,10 +445,6 @@ object frmOptions: TfrmOptions
       end
     end
     object tabExcludeDocFiles: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
       DesignSize = (
@@ -635,10 +455,6 @@ object frmOptions: TfrmOptions
         Top = 4
         Width = 823
         Height = 462
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'mmoExcludeDocFiles')
@@ -646,10 +462,6 @@ object frmOptions: TfrmOptions
       end
     end
     object tabMethodDescriptions: TTabSheet
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'Method Descriptions'
       ImageIndex = 6
       DesignSize = (
@@ -660,10 +472,6 @@ object frmOptions: TfrmOptions
         Top = 4
         Width = 92
         Height = 30
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = '&Add'
         Glyph.Data = {
@@ -688,10 +496,6 @@ object frmOptions: TfrmOptions
         Top = 42
         Width = 92
         Height = 31
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = '&Edit'
         Glyph.Data = {
@@ -716,10 +520,6 @@ object frmOptions: TfrmOptions
         Top = 80
         Width = 92
         Height = 31
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = '&Delete'
         Glyph.Data = {
@@ -744,10 +544,6 @@ object frmOptions: TfrmOptions
         Top = 4
         Width = 723
         Height = 21
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Align = alNone
         Anchors = [akLeft, akTop, akRight]
         Sections = <
@@ -768,10 +564,6 @@ object frmOptions: TfrmOptions
         Top = 32
         Width = 723
         Height = 434
-        Margins.Left = 4
-        Margins.Top = 4
-        Margins.Right = 4
-        Margins.Bottom = 4
         Style = lbOwnerDrawFixed
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 4
@@ -785,10 +577,6 @@ object frmOptions: TfrmOptions
     Top = 522
     Width = 92
     Height = 31
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
     Anchors = [akRight, akBottom]
     Kind = bkCancel
     TabOrder = 2
@@ -798,10 +586,6 @@ object frmOptions: TfrmOptions
     Top = 522
     Width = 93
     Height = 31
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
     Anchors = [akRight, akBottom]
     Kind = bkOK
     TabOrder = 3
@@ -829,7 +613,7 @@ object frmOptions: TfrmOptions
     Left = 254
     Top = 188
     Bitmap = {
-      494C010102000400080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101020004000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

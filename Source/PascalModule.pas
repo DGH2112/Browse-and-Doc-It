@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       03 Aug 2011
+  @Date       02 Sep 2011
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -2789,7 +2789,14 @@ Begin
   While IsKeyWord(Token.Token, strPortabilityDirective) Do
     Begin
       Result := True;
-      NextNonCommentToken; //: @note Does not get added to any symbols.
+      If CompareText(Token.Token, 'deprecated') = 0  Then
+        Begin
+          NextNonCommentToken;
+          // Skip optional new Depreciate message.
+          If Token.TokenType In [ttSingleLiteral] Then
+            NextNonCommentToken;
+        End Else
+          NextNonCommentToken; //: @note Does not get added to any symbols.
       If Token.Token = ';' Then
         Begin
           NextNonCommentToken;

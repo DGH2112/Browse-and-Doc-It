@@ -69,6 +69,9 @@ Type
     Procedure TestEllipseSize;
     Procedure TestAssociationDef;
     Procedure TestBlankLinesBetweenDefs;
+    Procedure TestDuplicateTables;
+    Procedure TestDuplicateFields;
+    Procedure TestDuplicateTLSymbols;
   End;
 
 Implementation
@@ -1942,6 +1945,77 @@ begin
     CheckEquals('Symbols', M.Elements[1].Elements[1].Elements[1].AsString(True, True));
     Checkequals(1, M.Elements[1].Elements[1].Elements[1].ElementCount);
     CheckEquals('Drainage=Diamond, Black, Solid, 0.25, Blue, None, None, 5, 25', M.Elements[1].Elements[1].Elements[1].Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTEidolonModule.TestDuplicateFields;
+
+var
+  M: TBaseLanguageModule;
+  strSource : String;
+
+begin
+  strSource :=
+    'This is a time location table=Class(TimeLocationTable)'#13#10 +
+    '{'#13#10 +
+    '  My Field:C(255)'#13#10 +
+    '  My Field:C(255)'#13#10 +
+    '}'#13#10;
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  Try
+    CheckEquals(1, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTEidolonModule.TestDuplicateTables;
+
+var
+  M: TBaseLanguageModule;
+  strSource : String;
+
+begin
+  strSource :=
+    'This is a time location table=Class(TimeLocationTable)'#13#10 +
+    '{'#13#10 +
+    '}'#13#10 +
+    'This is a time location table=Class(TimeLocationTable)'#13#10 +
+    '{'#13#10 +
+    '}'#13#10;
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  Try
+    CheckEquals(1, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+  Finally
+    M.Free;
+  End;
+end;
+
+procedure TestTEidolonModule.TestDuplicateTLSymbols;
+
+var
+  M: TBaseLanguageModule;
+  strSource : String;
+
+begin
+  strSource :=
+    'This is a time location table=Class(TimeLocationTable)'#13#10 +
+    '{'#13#10 +
+    '  My Field:C(255)'#13#10 +
+    '  &My Symbol=Line,Red,Solid,0.25'#13#10 +
+    '  &My Symbol=Line,Red,Solid,0.25'#13#10 +
+    '}'#13#10;
+  M := TEidolonModule.CreateParser(strSource, 'D:\Path\MyMapFile.map', False, [moParse]);
+  Try
+    CheckEquals(1, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
   Finally
     M.Free;
   End;

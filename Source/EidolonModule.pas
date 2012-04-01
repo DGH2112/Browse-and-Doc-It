@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       29 May 2011
+  @Date       01 Apr 2012
   @Author     David Hoyle
 
 **)
@@ -543,6 +543,10 @@ resourcestring
   (** A resource string for an invalid connection string. **)
   strIsNotAValidConnection = '''%s'' is not a valid connection string at lin' +
   'e %d column %d.';
+  //(** A resource string for an error with LINE border colours. **)
+  //strLineColourOfNoneError = 'You can not have a border colour of NONE for a' +
+  //  ' LINE at line %d column %d. If you do not want to see the line, either ma' +
+  //  'ke it the same colour as the interior or use a line weight of NONE. ';
 
 Const
 
@@ -658,9 +662,9 @@ end;
 function TBaseTable.AddField(Field: TFieldDef): TFieldDef;
 begin
   If FFields = Nil Then
-    FFields := Add(TLabelContainer.Create('Fields', scNone, 0, 0, iiFieldsLabel,
+    FFields := Addunique(TLabelContainer.Create('Fields', scNone, 0, 0, iiFieldsLabel,
       Nil)) As TLabelContainer;
-  Result := FFields.Add(Field) As TFieldDef;
+  Result := FFields.AddUnique(Field) As TFieldDef;
 end;
 
 { TTextTable }
@@ -702,9 +706,9 @@ end;
 function TDBTable.AddPrimary(DBConnection: TDBConnection): TDBConnection;
 begin
   If FPrimary = Nil Then
-    FPrimary := Add(TLabelContainer.Create(strPrimaryLabel, scNone, 0, 0,
+    FPrimary := AddUnique(TLabelContainer.Create(strPrimaryLabel, scNone, 0, 0,
       iiPublicTypesLabel, Nil)) As TLabelContainer;
-  Result := FPrimary.Add(DBConnection) As TDBConnection;
+  Result := FPrimary.AddUnique(DBConnection) As TDBConnection;
 end;
 
 (**
@@ -723,9 +727,9 @@ end;
 function TDBTable.AddSecondary(DBConnection: TDBConnection): TDBConnection;
 begin
   If FSecondary = Nil Then
-    FSecondary := Add(TLabelContainer.Create('Secondary', scNone, 0, 0,
+    FSecondary := AddUnique(TLabelContainer.Create('Secondary', scNone, 0, 0,
       iiPublicTypesLabel, Nil)) As TLabelContainer;
-  Result := FSecondary.Add(DBConnection) As TDBConnection;
+  Result := FSecondary.AddUnique(DBConnection) As TDBConnection;
 end;
 
 (**
@@ -761,11 +765,13 @@ end;
 
 **)
 function TTimeLocationTable.AddSymbol(Symbol: TSymbol): TSymbol;
+
+
 begin
   If FSymbols = Nil Then
-    FSymbols := Add(TLabelContainer.Create(strSymbolsLabel, scNone, 0, 0,
+    FSymbols := AddUnique(TLabelContainer.Create(strSymbolsLabel, scNone, 0, 0,
       iiObjectsLabel, Nil)) As TLabelContainer;
-  Result := FSymbols.Add(Symbol) As TSymbol;
+  Result := FSymbols.AddUnique(Symbol) As TSymbol;
 end;
 
 (**
@@ -1268,9 +1274,9 @@ function TRequirementsTable.AddAssociation(
   Association: TAssociation): TAssociation;
 begin
   If FAssociations = Nil Then
-    FAssociations := Add(TLabelContainer.Create('Associations', scNone, 0, 0,
+    FAssociations := AddUnique(TLabelContainer.Create('Associations', scNone, 0, 0,
       iiClassesLabel, Nil)) As TLabelContainer;
-  Result := FAssociations.Add(Association) As TAssociation;
+  Result := FAssociations.AddUnique(Association) As TAssociation;
 end;
 
 (**
@@ -1405,6 +1411,10 @@ end;
 procedure TEidolonModule.BorderColour(Symbol: TSymbol);
 begin
   Symbol.BorderColour := ColourName;
+  //: @debug This does not seem to cause an error here!!!!
+  {If (Symbol Is TLine) And (Symbol.BorderColour = xlcNONE)  Then
+    AddIssue(Format(strLineColourOfNoneError, [Token.Line, Token.Column]), scPublic,
+      'BorderColour', Token.Line, Token.Column, etError);}
 end;
 
 (**
@@ -1665,15 +1675,15 @@ Constructor TEidolonModule.CreateParser(Source : String; strFileName : String;
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
   FSource := Source;
-  FTextTableDefs := Add(TLabelContainer.Create(strTextTableDefsLabel, scNone,
+  FTextTableDefs := AddUnique(TLabelContainer.Create(strTextTableDefsLabel, scNone,
     0, 0, iiPublicThreadVarsLabel, Nil)) As TLabelContainer;
-  FDBTableDefs := Add(TLabelContainer.Create(strDatabaseTableDefsLabel, scNone,
+  FDBTableDefs := AddUnique(TLabelContainer.Create(strDatabaseTableDefsLabel, scNone,
     0, 0, iiPublicConstantsLabel, Nil)) As TLabelContainer;
-  FTimeLocationTableDefs := Add(TLabelContainer.Create(strTimeLocationTableDefsLabel,
+  FTimeLocationTableDefs := AddUnique(TLabelContainer.Create(strTimeLocationTableDefsLabel,
     scNone, 0, 0, iiPublicVariablesLabel, Nil)) As TLabelContainer;
-  FOutputTableDefs := Add(TLabelContainer.Create(strOutputTableDefsLabel, scNone,
+  FOutputTableDefs := AddUnique(TLabelContainer.Create(strOutputTableDefsLabel, scNone,
     0, 0, iiInterfacesLabel, Nil)) As TLabelContainer;
-  FRequirementsTableDefs := Add(TLabelContainer.Create(strRequirementsTableDefsLabel, scNone,
+  FRequirementsTableDefs := AddUnique(TLabelContainer.Create(strRequirementsTableDefsLabel, scNone,
     0, 0, iiDispInterfacesLabel, Nil)) As TLabelContainer;
   AddTickCount('Start');
   CommentClass := TEidolonComment;
@@ -1771,7 +1781,7 @@ begin
       NextNonCommentToken;
       If strName <> '' Then
         Begin
-          DBT := FDBTableDefs.Add(TDBTable.Create(strName, scNone, StartToken.Line,
+          DBT := FDBTableDefs.AddUnique(TDBTable.Create(strName, scNone, StartToken.Line,
             StartToken.Column, iiPublicConstant, C)) As TDBTable;
           If CheckLiteral(')', 'DBTable') Then
             If CheckLineEnd('DBTable') Then
@@ -2687,7 +2697,7 @@ begin
       NextNonCommentToken;
       If strName <> '' Then
         Begin
-          OT := FOutputTableDefs.Add(TOutputTable.Create(strName, scNone,
+          OT := FOutputTableDefs.AddUnique(TOutputTable.Create(strName, scNone,
             StartToken.Line, StartToken.Column, iiPublicInterface, C)) As
             TOutputTable;
           If CheckLiteral(')', 'OutputTable') Then
@@ -3005,7 +3015,7 @@ begin
       NextNonCommentToken;
       If strName <> '' Then
         Begin
-          RT := FRequirementsTableDefs.Add(TRequirementsTable.Create(strName, scNone,
+          RT := FRequirementsTableDefs.AddUnique(TRequirementsTable.Create(strName, scNone,
             StartToken.Line, StartToken.Column, iiPublicDispInterface, C)) As
             TRequirementsTable;
           If CheckLiteral(')', 'RequirementsTable') Then
@@ -3184,7 +3194,7 @@ begin
       NextNonCommentToken;
       If strName <> '' Then
         Begin
-          TT := FTextTableDefs.Add(TTextTable.Create(strName, scNone,
+          TT := FTextTableDefs.AddUnique(TTextTable.Create(strName, scNone,
             StartToken.Line, StartToken.Column, iiPublicThreadVar, C)) As TTextTable;
           If CheckLiteral(')', 'TextTable') Then
             If CheckLineEnd('TextTable') Then
@@ -3235,7 +3245,7 @@ begin
       NextNonCommentToken;
       If CompareText(Token.Token, 'TABLENAME') = 0 Then
         Begin
-          TTD := TextTable.Add(TTextTableDef.Create('TableName', scNone, Token.Line,
+          TTD := TextTable.AddUnique(TTextTableDef.Create('TableName', scNone, Token.Line,
             Token.Column, iiPublicRecord, Nil)) As TTextTableDef;
           NextNonCommentToken;
           If CheckLiteral('=', 'TextTableDef') Then
@@ -3354,7 +3364,7 @@ begin
       NextNonCommentToken;
       If strName <> '' Then
         Begin
-          TLT := FTimeLocationTableDefs.Add(TTimeLocationTable.Create(strName,
+          TLT := FTimeLocationTableDefs.AddUnique(TTimeLocationTable.Create(strName,
             scNone, StartToken.Line, StartToken.Column, iiPublicVariable,
             C)) As TTimeLocationTable;
           If CheckLiteral(')', 'TimeLocationTable') Then

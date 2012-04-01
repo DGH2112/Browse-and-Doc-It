@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    05 Aug 2011
+  @Date    01 Apr 2012
   @Version 1.0
   @Author  David Hoyle
 
@@ -647,6 +647,7 @@ Type
       AComment : TComment) : TElementContainer; Overload; Virtual;
     Function  Add(strToken : String; AImageIndex : TImageIndex;
       AScope : TScope; AComment : TComment) : TElementContainer; Overload; Virtual;
+    Function AddUnique(AElement : TElementContainer) : TElementContainer; Virtual;
     Procedure AddTokens(AElement : TElementContainer); Virtual;
     Function  FindElement(strName : String; FindType : TFindType = ftName) : TElementContainer;
     Procedure Assign(Source : TElementContainer); Virtual;
@@ -3813,6 +3814,38 @@ begin
   Assert(AElement <> Nil, 'Can not add a null element to the collection!');
   For i := 0 To AElement.TokenCount - 1 Do
     AppendToken(AElement.Tokens[i]);
+end;
+
+(**
+
+  This method attempts to adds an element to the collection but raises an error IF there
+  is already an object of the same name in the collection (duplicate detection).
+
+  @precon  None.
+  @postcon Attempts to adds an element to the collection but raises an error IF there is
+           already an object of the same name in the collection (duplicate detection).
+
+  @param   AElement as a TElementContainer
+  @return  a TElementContainer
+
+**)
+function TElementContainer.AddUnique(AElement: TElementContainer): TElementContainer;
+
+ResourceString
+  strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found at line %d column %d.';
+
+Var
+  iLine, iCol : Integer;
+  strI : String;
+
+begin
+  iLine := AElement.Line;
+  iCol := AElement.Column;
+  strI := AElement.Identifier;
+  Result := Add(AElement);
+  If Result <> AElement Then
+    AddIssue(Format(strDuplicateIdentifierFound, [strI, iLine, iCol]), scNone,
+      'AddUnique', iLine, iCol, etError);
 end;
 
 (**

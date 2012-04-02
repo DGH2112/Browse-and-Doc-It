@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    19 Jun 2011
+  @Date    02 Apr 2012
   @Version 1.0
 
 **)
@@ -174,8 +174,12 @@ Type
     asShortWide,   asMediumWide,   asLongWide
   );
 
-  (** An enumerate to define the locations where Time Location Symbols can be shown. **)
-  TDisplayOp = (doRender, doLegend);
+  (** An enumerate to define the display properties of time location symbols. **)
+  TDisplayOp = (
+    doRender,         // Show the Time Location Symbol on the Diagram
+    doLegend,         // Show the Time Location Symbol in the Legend
+    doHideText        // Hide the text on the diagram associated with the Time Location Symbol
+  );
   (** A set of the above enumerate. **)
   TDisplayOps = Set Of TDisplayOp;
 

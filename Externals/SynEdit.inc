@@ -42,10 +42,12 @@
 (* SYN_COMPILER_11_UP   : Delphi 2007 or higher is the compiler.              *)
 (* SYN_COMPILER_12      : Delphi 2009 is the compiler.                        *)
 (* SYN_COMPILER_12_UP   : Delphi 2009 or higher is the compiler.              *)
-
-(* SYN_COMPILER_13      : Delphi 2010 is the compiler.                        *)
-(* SYN_COMPILER_13_UP   : Delphi 2010 or higher is the compiler.              *)
-
+(* SYN_COMPILER_14      : Delphi 2010 is the compiler.                        *)
+(* SYN_COMPILER_14_UP   : Delphi 2010 or higher is the compiler.              *)
+(* SYN_COMPILER_15      : Delphi XE   is the compiler.                        *)
+(* SYN_COMPILER_15_UP   : Delphi XE   or higher is the compiler.              *)
+(* SYN_COMPILER_16      : Delphi XE2  is the compiler.                        *)
+(* SYN_COMPILER_16_UP   : Delphi XE2  or higher is the compiler.              *)
 (* SYN_CPPB             : Any version of C++Builder is being used.            *)
 (* SYN_CPPB_1           : C++B v1.0x is being used.                           *)
 (* SYN_CPPB_3           : C++B v3.0x is being used.                           *)
@@ -80,10 +82,12 @@
 (* SYN_DELPHI_2007_UP   : Delphi 2007 or higher is being used.                *)
 (* SYN_DELPHI_2009      : Delphi 2009 is being used.                          *)
 (* SYN_DELPHI_2009_UP   : Delphi 2009 or higher is being used.                *)
-
 (* SYN_DELPHI_2010      : Delphi 2010 is being used.                          *)
 (* SYN_DELPHI_2010_UP   : Delphi 2010 or higher is being used.                *)
-
+(* SYN_DELPHI_XE        : Delphi XE   is being used.                          *)
+(* SYN_DELPHI_XE_UP     : Delphi XE   or higher is being used.                *)
+(* SYN_DELPHI_XE2       : Delphi XE2  is being used.                          *)
+(* SYN_DELPHI_XE2_UP    : Delphi XE2  or higher is being used.                *)
 (* SYN_KYLIX            : Kylix 1.0 is being using.                           *)
 (* SYN_CLX              : A CLX application is being created.                 *)
 (******************************************************************************)
@@ -103,11 +107,12 @@
 {$ENDIF}
 
 {------------------------------------------------------------------------------}
-{ Pull in all defines from jedi.inc (must be done after the common compiler    }
-{ defines to  work correctly)                                                  }
+{ Pull in all defines from SynEditJedi.inc (must be done after the common      }
+{ compiler defines to  work correctly). Use SynEdit-prefix to avoid problems   }
+{ with other versions of jedi.inc in the search-path.                          }
 {------------------------------------------------------------------------------}
 
-{$I jedi.inc}
+{$I SynEditJedi.inc}
 
 {------------------------------------------------------------------------------}
 { SYN_WIN32, SYN_LINUX and SYN_KYLIX defines                                   }
@@ -129,8 +134,20 @@
 { VERXXX to SYN_COMPILERX, SYN_DELPHIX and SYN_CPPBX mappings                  }
 {------------------------------------------------------------------------------}
 
+{$IFDEF VER230}
+  {$DEFINE SYN_COMPILER_16}
+  {$DEFINE SYN_DELPHI}
+  {$DEFINE SYN_DELPHI_XE2}
+{$ENDIF}
+
+{$IFDEF VER220}
+  {$DEFINE SYN_COMPILER_15}
+  {$DEFINE SYN_DELPHI}
+  {$DEFINE SYN_DELPHI_XE}
+{$ENDIF}
+
 {$IFDEF VER210}
-  {$DEFINE SYN_COMPILER_13}
+  {$DEFINE SYN_COMPILER_14}
   {$DEFINE SYN_DELPHI}
   {$DEFINE SYN_DELPHI_2010}
 {$ENDIF}
@@ -344,7 +361,7 @@
   {$DEFINE SYN_COMPILER_12_UP}
 {$ENDIF}
 
-{$IFDEF SYN_COMPILER_13}
+{$IFDEF SYN_COMPILER_14}
   {$DEFINE SYN_COMPILER_1_UP}
   {$DEFINE SYN_COMPILER_2_UP}
   {$DEFINE SYN_COMPILER_3_UP}
@@ -357,7 +374,42 @@
   {$DEFINE SYN_COMPILER_10_UP}
   {$DEFINE SYN_COMPILER_11_UP}
   {$DEFINE SYN_COMPILER_12_UP}
-  {$DEFINE SYN_COMPILER_13_UP}
+  {$DEFINE SYN_COMPILER_14_UP}
+{$ENDIF}
+
+{$IFDEF SYN_COMPILER_15}
+  {$DEFINE SYN_COMPILER_1_UP}
+  {$DEFINE SYN_COMPILER_2_UP}
+  {$DEFINE SYN_COMPILER_3_UP}
+  {$DEFINE SYN_COMPILER_4_UP}
+  {$DEFINE SYN_COMPILER_5_UP}
+  {$DEFINE SYN_COMPILER_6_UP}
+  {$DEFINE SYN_COMPILER_7_UP}
+  {$DEFINE SYN_COMPILER_8_UP}
+  {$DEFINE SYN_COMPILER_9_UP}
+  {$DEFINE SYN_COMPILER_10_UP}
+  {$DEFINE SYN_COMPILER_11_UP}
+  {$DEFINE SYN_COMPILER_12_UP}
+  {$DEFINE SYN_COMPILER_14_UP}
+  {$DEFINE SYN_COMPILER_15_UP}
+{$ENDIF}
+
+{$IFDEF SYN_COMPILER_16}
+  {$DEFINE SYN_COMPILER_1_UP}
+  {$DEFINE SYN_COMPILER_2_UP}
+  {$DEFINE SYN_COMPILER_3_UP}
+  {$DEFINE SYN_COMPILER_4_UP}
+  {$DEFINE SYN_COMPILER_5_UP}
+  {$DEFINE SYN_COMPILER_6_UP}
+  {$DEFINE SYN_COMPILER_7_UP}
+  {$DEFINE SYN_COMPILER_8_UP}
+  {$DEFINE SYN_COMPILER_9_UP}
+  {$DEFINE SYN_COMPILER_10_UP}
+  {$DEFINE SYN_COMPILER_11_UP}
+  {$DEFINE SYN_COMPILER_12_UP}
+  {$DEFINE SYN_COMPILER_14_UP}
+  {$DEFINE SYN_COMPILER_15_UP}
+  {$DEFINE SYN_COMPILER_16_UP}
 {$ENDIF}
 
 {$IFDEF SYN_DELPHI_2}
@@ -474,6 +526,39 @@
   {$DEFINE SYN_DELPHI_2010_UP}
 {$ENDIF}
 
+{$IFDEF SYN_DELPHI_XE}
+  {$DEFINE SYN_DELPHI_2_UP}
+  {$DEFINE SYN_DELPHI_3_UP}
+  {$DEFINE SYN_DELPHI_4_UP}
+  {$DEFINE SYN_DELPHI_5_UP}
+  {$DEFINE SYN_DELPHI_6_UP}
+  {$DEFINE SYN_DELPHI_7_UP}
+  {$DEFINE SYN_DELPHI_8_UP}
+  {$DEFINE SYN_DELPHI_2005_UP}
+  {$DEFINE SYN_DELPHI_2006_UP}
+  {$DEFINE SYN_DELPHI_2007_UP}
+  {$DEFINE SYN_DELPHI_2009_UP}
+  {$DEFINE SYN_DELPHI_2010_UP}
+  {$DEFINE SYN_DELPHI_XE_UP}
+{$ENDIF}
+
+{$IFDEF SYN_DELPHI_XE2}
+  {$DEFINE SYN_DELPHI_2_UP}
+  {$DEFINE SYN_DELPHI_3_UP}
+  {$DEFINE SYN_DELPHI_4_UP}
+  {$DEFINE SYN_DELPHI_5_UP}
+  {$DEFINE SYN_DELPHI_6_UP}
+  {$DEFINE SYN_DELPHI_7_UP}
+  {$DEFINE SYN_DELPHI_8_UP}
+  {$DEFINE SYN_DELPHI_2005_UP}
+  {$DEFINE SYN_DELPHI_2006_UP}
+  {$DEFINE SYN_DELPHI_2007_UP}
+  {$DEFINE SYN_DELPHI_2009_UP}
+  {$DEFINE SYN_DELPHI_2010_UP}
+  {$DEFINE SYN_DELPHI_XE_UP}
+  {$DEFINE SYN_DELPHI_XE2_UP}
+{$ENDIF}
+
 {$IFDEF SYN_CPPB_6}
   {$DEFINE SYN_CPPB_3_UP}
   {$DEFINE SYN_CPPB_4_UP}
@@ -533,5 +618,4 @@
 // Turn this off if you don't need complex script support, since it is slower
 {.$DEFINE SYN_UNISCRIBE}
 
-// $Id: SynEdit.inc,v 1.16.2.17 2008/09/17 13:59:11 maelh Exp $
-
+// $Id: SynEdit.inc,v 1.16.2.19 2009/06/14 13:41:44 maelh Exp $

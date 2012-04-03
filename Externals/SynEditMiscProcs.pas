@@ -28,7 +28,7 @@ replace them with the notice and other provisions required by the GPL.
 If you do not delete the provisions above, a recipient may use your version
 of this file under either the MPL or the GPL.
 
-$Id: SynEditMiscProcs.pas,v 1.35.2.7 2008/09/14 16:24:58 maelh Exp $
+$Id: SynEditMiscProcs.pas,v 1.35.2.8 2009/09/28 17:54:20 maelh Exp $
 
 You may retrieve the latest version of this file at the SynEdit home page,
 located at http://SynEdit.SourceForge.net
@@ -64,9 +64,12 @@ uses
 {$ENDIF}
   Classes;
 
+const
+  MaxIntArraySize = MaxInt div 16;
+
 type
   PIntArray = ^TIntArray;
-  TIntArray = array[0..MaxListSize - 1] of Integer;
+  TIntArray = array[0..MaxIntArraySize - 1] of Integer;
 
 {$IFNDEF SYN_COMPILER_4_UP}
 function Max(x, y: Integer): Integer;
@@ -172,6 +175,8 @@ function CalcFCS(const ABuf; ABufSize: Cardinal): Word;
 
 procedure SynDrawGradient(const ACanvas: TCanvas; const AStartColor, AEndColor: TColor;
   ASteps: Integer; const ARect: TRect; const AHorizontal: Boolean);
+
+function DeleteTypePrefixAndSynSuffix(S: string): string;
 
 implementation
 
@@ -844,7 +849,7 @@ begin
 
       for i := 0 to Schemes.Count - 1 do
       begin
-        UniqueAttriName := DeleteTypePrefixAndSynSuffix(Highlighter.ClassName) +
+        UniqueAttriName := Highlighter.ExportName +
           IntToStr(GetHighlighterIndex(Highlighter, HighlighterList)) + '.' +
           Schemes[i].MarkerAttri.Name + IntToStr(i + 1);
 
@@ -860,7 +865,7 @@ begin
   else if Assigned(Highlighter) then
     for i := 0 to Highlighter.AttrCount - 1 do
     begin
-      UniqueAttriName := DeleteTypePrefixAndSynSuffix(Highlighter.ClassName) +
+      UniqueAttriName := Highlighter.ExportName +
         IntToStr(GetHighlighterIndex(Highlighter, HighlighterList)) + '.' +
         Highlighter.Attribute[i].Name;
 

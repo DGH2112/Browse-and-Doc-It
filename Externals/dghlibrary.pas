@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    05 Aug 2011
+  @Date    04 Jun 2012
 
 **)
 Unit DGHLibrary;
@@ -644,9 +644,10 @@ Type
   (** A record to describe the information required by DGHCreateProcess. **)
   TProcessInfo = Record
     boolEnabled : Boolean;
-    strEXE : String;
+    strEXE    : String;
     strParams : String;
-    strDir : String;
+    strDir    : String;
+    strTitle  : String;
   End;
 
   Function DGHCreateProcess(Process : TProcessInfo;
@@ -1383,15 +1384,15 @@ Var
     slFormat := TStringList.Create;
     Try
       str := '';
-      For j := 1 To Length(ShortDateFormat) Do
+      For j := 1 To Length({$IFDEF DXE00}FormatSettings.{$ENDIF}ShortDateFormat) Do
         {$IFNDEF D2009}
         If ShortDateFormat[j] In Delimiters Then
         {$ELSE}
-        If CharInSet(ShortDateFormat[j], Delimiters) Then
+        If CharInSet({$IFDEF DXE00}FormatSettings.{$ENDIF}ShortDateFormat[j], Delimiters) Then
         {$ENDIF}
           AddToken(slFormat, str)
         Else
-          str := str + ShortDateFormat[j];
+          str := str + {$IFDEF DXE00}FormatSettings.{$ENDIF}ShortDateFormat[j];
       AddToken(slFormat, str);
       // Remove day of week
       For j := slFormat.Count - 1 DownTo 0 Do

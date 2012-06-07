@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    04 Jun 2012
+  @Date    07 Jun 2012
 
 **)
 Unit DGHLibrary;
@@ -1035,6 +1035,7 @@ Var
   iStart, iEnd : Integer;
 
 Begin
+  Result := '';
   iNumOfFields := CharCount(Ch, strText, boolIgnoreQuotes) + 1;
   If iIndex = 1 Then
     Begin
@@ -1045,15 +1046,15 @@ Begin
         End Else
           Result := strText;
       Exit;
-    End;
-  If (iIndex > 1) And (iIndex < iNumOfFields) Then
+    End
+  Else If (iIndex > 1) And (iIndex < iNumOfFields) Then
     Begin
       iStart := PosOfNthChar(strText, Ch, iIndex - 1, boolIgnoreQuotes);
       iEnd := PosOfNthChar(strText, Ch, iIndex, boolIgnoreQuotes);
       Result := Copy(strText, iStart + 1, iEnd - iStart - 1);
       Exit;
-    End;
-  If iIndex = iNumOfFields Then
+    End
+  Else If iIndex = iNumOfFields Then
     Begin
       iStart := PosOfNthChar(strText, Ch, iIndex - 1, boolIgnoreQuotes);
       Result := Copy(strText, iStart + 1, Length(strText) - iStart);

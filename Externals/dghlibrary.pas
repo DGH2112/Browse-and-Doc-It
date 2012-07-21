@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    07 Jun 2012
+  @Date    19 Jul 2012
 
 **)
 Unit DGHLibrary;
@@ -711,6 +711,7 @@ Type
   Function DGHFindOnPath(var strEXEName : String; strDirs : String) : Boolean;
   Function DGHPathRelativePathTo(strBasePath : String; var strFileName : String) : Boolean;
   Function IsDebuggerPresent : Boolean;
+  Function ExtractEXEFromExt(strExt : String) : String;
 
 { -------------------------------------------------------------------------
 
@@ -6589,6 +6590,42 @@ Begin
   @IsDebuggerPresentProc := GetProcAddress(KernalHandle, 'IsDebuggerPresent');
   If @IsDebuggerPresentProc <> Nil Then
     Result := IsDebuggerPresentProc;
+End;
+
+(**
+
+  This function extracts from the registry the EXE name that is associated with the
+  passed file extension.
+
+  @precon  None.
+  @postcon Returns the executable file associated with the file extension.
+
+  @param   strExt as a String
+  @return  a String
+
+**)
+Function ExtractEXEFromExt(strExt : String) : String;
+
+Const
+  iSize = 1024;
+
+Var
+  strFileClass : String;
+  strExpanded : String;
+  iOutputSize : Integer;
+
+Begin
+  strFileClass := GetRegStringValue(strExt, '');
+  If strFileClass <> '' Then
+    Result := GetRegStringValue(strFileClass + '\shell\open\command', '');
+  SetLength(strExpanded, iSize);
+  iOutputSize := ExpandEnvironmentStrings(PChar(Result), PChar(strExpanded), iSize);
+  SetLength(strExpanded, iOutputSize - 1);
+  strExpanded := Trim(StringReplace(strExpanded, '%1', '', [rfReplaceAll]));
+  If (Length(strExpanded) > 0) And (strExpanded[1] = '"') And
+    (strExpanded[Length(strExpanded)] = '"') Then
+    strExpanded := Copy(strExpanded, 2, Length(strExpanded) - 2);
+  Result := strExpanded;
 End;
 
 (** Initialises the console more to Unknown to force a call to the Win32 API **)

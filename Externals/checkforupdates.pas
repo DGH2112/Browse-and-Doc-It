@@ -5,660 +5,787 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    05 Aug 2011
+  @Date    01 Aug 2012
 
 **)
 Unit CheckForUpdates;
 
 Interface
 
-  Uses
-    SysUtils, MSXML2_TLB, Graphics, Windows;
+Uses
+  SysUtils,
+  XMLDoc,
+  XMLIntf,
+  Graphics,
+  Windows;
 
-  Type
+{$INCLUDE 'CompilerDefinitions.inc'}
+
+Type
+    (** An enumerate type to describe the internet connection status. **)
+  TINetConnection = (icUnknown, icMissingDLL, icMissingFunction, icNotConnected,
+    icConnected);
+
     (** This class handles the checking of software vesions against the
         internet. **)
-    TCheckForUpdates = Class
-    Private
-      FConHnd : THandle;
-      FSoftwareID : String;
-      FLastUpdateDate : TDateTime;
-      FRegRoot : String;
-      FMessageTextColour: TColor;
-      FMessageConfirmColour: TColor;
-      FMessageWarningColour: TColor;
-      FMessageNoteColour: TColor;
-      FMessageDescriptionColour: TColor;
-      FMessageHeaderColour: TColor;
-      FUpdateInterval : Integer;
-      FEnabled : Boolean;
-    Protected
-      Function CheckForUpdates(strURL : String) : Boolean;
-      Function FindPackage(xmlNodeList : IXMLDOMNodeList) : IXMLDOMNode;
-      Function GetNamedNodeText(P : IXMLDOMNode; strName : String) : String;
-      Function CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer;
-        var strAppVerNum : String) : Integer;
-      Procedure OutputMsg(strText, strURL : String; iColour : TColor = clNone);
-      procedure ReadLastUpdateDate;
-      procedure WriteLastUpdateDate;
-      Function BuildVersionNumber(iMajor, iMinor, iBugFix, iBuild : Integer) : String;
-      Procedure LoadSettings;
-      Procedure SaveSettings;
-      Function CheckForConnection : Boolean;
-    Public
-      Constructor Create(strSoftwareID, strRegRoot : String; boolForceUpdate : Boolean);
-      Destructor Destroy; Override;
-      Class Procedure Execute(strSoftwareID, strRegRoot : String;
-        boolForceUpdate : Boolean);
-    End;
+  TCheckForUpdates = Class
+    {$IFDEF D2005} Strict {$ENDIF} Private
+    {$IFDEF CONSOLE}
+    FConHnd: THandle;
+    {$ENDIF}
+    FSoftwareID              : String;
+    FLastUpdateDate          : TDateTime;
+    FRegRoot                 : String;
+    FMessageTextColour       : TColor;
+    FMessageConfirmColour    : TColor;
+    FMessageWarningColour    : TColor;
+    FMessageNoteColour       : TColor;
+    FMessageDescriptionColour: TColor;
+    FMessageHeaderColour     : TColor;
+    FUpdateInterval          : Integer;
+    FEnabled                 : Boolean;
+    FDLLHnd                  : THandle;
+    {$IFDEF D2005} Strict {$ENDIF} Protected
+    Function CheckForUpdates(strURL, strXMLFile: String): Boolean;
+    Function FindPackage(xmlDocumentElement: IXMLNode): IXMLNode;
+    Function GetNamedNodeText(P: IXMLNode; strName: String): String;
+    Function CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild: Integer;
+      Var strAppVerNum: String): Integer;
+    Procedure OutputMsg(strText, strURL: String; iColour: TColor = clNone);
+    Procedure ReadLastUpdateDate;
+    Procedure WriteLastUpdateDate;
+    Function BuildVersionNumber(iMajor, iMinor, iBugFix, iBuild: Integer): String;
+    Procedure LoadSettings;
+    Procedure SaveSettings;
+    Function CheckForConnection: Boolean;
+    Function InternetAvailable(Var strConnection: String): TINetConnection;
+    Function DownloadFile(strURL, strOutputFile: String): Boolean;
+  Public
+    Constructor Create(strSoftwareID, strRegRoot: String; boolForceUpdate: Boolean);
+    Destructor Destroy; Override;
+    Class Procedure Execute(strSoftwareID, strRegRoot: String; boolForceUpdate: Boolean);
+  End;
 
 Implementation
 
-  Uses
-    DGHLibrary, IniFiles {$IFNDEF CONSOLE}, CheckForUpdatesForm {$ENDIF};
+Uses
+  DGHLibrary,
+  IniFiles {$IFNDEF CONSOLE},
+  CheckForUpdatesForm {$ENDIF};
 
-  ResourceString
+ResourceString
     (** A resource string of the start of the checking process. **)
-    strCheckingForUpdates = 'Checking Updates for ''%s''...';
+  strCheckingForUpdates = 'Checking Updates for ''%s''...';
     (** A resource string to note the loading of MS XML. **)
-    strLoadingMSXML = '  Loading MS XML...';
+  strLoadingMSXML = '  Loading XML Parser...';
     (** A resource string to note the lading of the URL **)
-    strLoadingURL = '  Loading "%s"...';
+  strLoadingURL = '  Loading "%s"...';
     (** A resource string to note the searching for packages. **)
-    strGettingPackages = '  Getting packages...';
+  strGettingPackages = '  Getting packages...';
     (** A resource string to note the package was found. **)
-    strFoundPackage = '  Found "%s"...';
+  strFoundPackage = '  Found "%s"...';
     (** A resource string to note the checking of the software version. **)
-    strCheckingSoftwareVerNum = '  Checking software version number...';
+  strCheckingSoftwareVerNum = '  Checking software version number...';
     (** A resource string to note that the software is up to date. **)
-    strYourSoftwareIsUpToDate = '  Your software is up to date!';
+  strYourSoftwareIsUpToDate = '  Your software is up to date!';
     (** A resource string to note that there is an update available. **)
-    strThereIsASoftwareUpdate = '  There is a software update available ' +
-      '[New %s, Old %s] @ %s! See the description below for update details...';
+  strThereIsASoftwareUpdate = '  There is a software update available ' +
+    '[New %s, Old %s] @ %s! See the description below for update details...';
     (** A resource string to define that the package was not found. **)
-    strPackageNotFound = '  Package "%s" not found!';
+  strPackageNotFound = '  Package "%s" not found!';
     (** A resource string for an exception message. **)
-    strExceptionS = '  Exception: %s';
-    {$IFDEF CONSOLE}
+  strExceptionS = '  Exception: %s';
+  {$IFDEF CONSOLE}
     (** A resource string to prompt to continue. **)
-    strPressEnterToContinue = 'Press <Enter> to continue...';
-    {$ENDIF}
+  strPressEnterToContinue = 'Press <Enter> to continue...';
+  {$ENDIF}
     (** A resource string to prompt that you are using a newer version of software. **)
-    strYouAreUsingANewerVersion = '  You are using a newer version of the ' +
-      'software [%s] than is available from the internet [%s] @ %s.';
+  strYouAreUsingANewerVersion = '  You are using a newer version of the ' +
+    'software [%s] than is available from the internet [%s] @ %s.';
     (** A resource strin to define the INI file section for update information. **)
-    strCheckForUpdatesSection = 'CheckForUpdates';
+  strCheckForUpdatesSection = 'CheckForUpdates';
     (** An error message for failing to start MS XML. **)
-    strFailedMSXML = '  Failed to start or find MS XML on your system (%s).';
+  strFailedMSXML = '  Failed to start or find an XML Parser on your system (%s).';
 
-  Type
-    (** An enumerate type to describe the internet connection status. **)
-    TINetConnection = (icUnknown, icMissingDLL, icMissingFunction,
-      icNotConnected, icConnected);
+(**
 
-  (**
+  This is the main interface method for checking the software version.
 
-    This method determines the status of the internet connection and returns
-    an enumerate informing the caller of the internet status.
+  @precon  None.
+  @postcon Main interface method for checking the software version.
 
-    @precon  None.
-    @postcon Determines the status of the internet connection and returns
-             an enumerate informing the caller of the internet status.
+  @param   strSoftwareID   as a String
+  @param   strRegRoot      as a String
+  @param   boolForceUpdate as a Boolean
 
-    @param   strConnection as a String as a Reference
-    @return  a TINetConnection
+**)
+Class Procedure TCheckForUpdates.Execute(strSoftwareID, strRegRoot: String;
+  boolForceUpdate: Boolean);
 
-  **)
-   Function InternetAvailable(var strConnection : String) : TINetConnection;
+Begin
+  TCheckForUpdates.Create(strSoftwareID, strRegRoot, boolForceUpdate).Free;
+End;
 
-   Type
-     TConnectionInfo = Record
-       FState       : Integer;
-       FDescription : String;
-     End;
+(**
 
-   Const
-     Connections : Array[1..6] Of TConnectionInfo = (
-       (FState: $01; FDescription: 'Modem'),
-       (FState: $02; FDescription: 'Lan'),
-       (FState: $04; FDescription: 'Proxy'),
-       (FState: $08; FDescription: 'Modem Busy'),
-       (FState: $20; FDescription: 'Off Line'),
-       (FState: $49; FDescription: 'Connection Configured')
-     );
+  This method builds a string representation of the build information.
 
-   Var
-     iDLLHnd : THandle;
-     InternetGetConnectedStateEx : Function(lpdwFlags : LPDWORD;
-       lpszConnectionname : PChar; dwSize : DWORD; dwReserved : DWORD) : BOOL; StdCall;
-     lpdwFlags : DWORD;
-     iSize : DWORD;
-     strOptions : String;
-     i: Integer;
+  @precon  None.
+  @postcon Builds a string representation of the build information.
 
-   Begin
-     iDLLHnd := LoadLibrary('WININET.DLL');
-     If iDLLHnd <> 0 Then
-       Begin
-         @InternetGetConnectedStateEx := GetProcAddress(iDLLHnd,
-           'InternetGetConnectedStateExW');
-         If @InternetGetConnectedStateEx <> Nil Then
-           Begin
-             lpdwFLags := 0;
-             iSize := 1024;
-             SetLength(strConnection, iSize);
-             If InternetGetConnectedStateEx(@lpdwFlags, PChar(strConnection), iSize, 0) Then
-               Result := icConnected
-             Else
-               Result := icNotConnected;
-             strConnection := StrPas(PChar(strConnection)) + '(%s)';
-             strOptions := '';
-             For i := Low(Connections) To High(Connections) Do
-               If lpdwFlags And Connections[i].FState <> 0 Then
-                 Begin
-                   If strOptions <> '' Then
-                     strOptions := strOptions + ', ';
-                   strOptions := strOptions + Connections[i].FDescription;
-                 End;
-             strConnection := Format(strConnection, [strOptions]);
-           End Else
-             Result := icMissingFunction;
-         FreeLibrary(iDLLHnd);
-       End Else
-         Result := icMissingDLL;
-   End;
+  @param   iMajor  as an Integer
+  @param   iMinor  as an Integer
+  @param   iBugFix as an Integer
+  @param   iBuild  as an Integer
+  @return  a String
 
-  (**
+**)
+Function TCheckForUpdates.BuildVersionNumber(iMajor, iMinor, iBugFix,
+  iBuild: Integer): String;
 
-    This is the main interface method for checking the software version.
+Const
+  strBuild = '%d.%d%s (Build %d.%d.%d.%d)';
 
-    @precon  None.
-    @postcon Main interface method for checking the software version.
+Begin
+  Result := Format(strBuild, [iMajor, iMinor, strBugFix[Succ(iBugFix)], iMajor, iMinor,
+    iBugFix, iBuild]);
+End;
 
-    @param   strSoftwareID   as a String
-    @param   strRegRoot      as a String
-    @param   boolForceUpdate as a Boolean
+(**
 
-  **)
-  Class Procedure TCheckForUpdates.Execute(strSoftwareID, strRegRoot : String;
-    boolForceUpdate : Boolean);
+  This method determines if there is an internet connection and returns true
+  if this is the case else returns false.
 
-  Begin
-    TCheckForUpdates.Create(strSoftwareID, strRegRoot, boolForceUpdate).Free;
-  End;
+  @precon  None.
+  @postcon Determines if there is an internet connection and returns true
+           if this is the case else returns false.
 
-  (**
+  @return  a Boolean
 
-    This method builds a string representation of the build information.
+**)
+Function TCheckForUpdates.CheckForConnection: Boolean;
 
-    @precon  None.
-    @postcon Builds a string representation of the build information.
+Var
+  strConnection: String;
 
-    @param   iMajor  as an Integer
-    @param   iMinor  as an Integer
-    @param   iBugFix as an Integer
-    @param   iBuild  as an Integer
-    @return  a String
-
-  **)
-  function TCheckForUpdates.BuildVersionNumber(iMajor, iMinor, iBugFix,
-    iBuild: Integer): String;
-
-  Const
-    strBuild = '%d.%d%s (Build %d.%d.%d.%d)';
-
-  begin
-    Result := Format(strBuild, [iMajor, iMinor, strBugFix[Succ(iBugFix)], iMajor,
-      iMinor, iBugFix, iBuild]);
-  end;
-
-  (**
-
-    This method determines if there is an internet connection and returns true
-    if this is the case else returns false.
-
-    @precon  None.
-    @postcon Determines if there is an internet connection and returns true
-             if this is the case else returns false.
-
-    @return  a Boolean
-
-  **)
-  function TCheckForUpdates.CheckForConnection: Boolean;
-
-  Var
-    strConnection : String;
-
-  begin
-    Result := False;
-    Case InternetAvailable(strConnection) Of
-      icMissingDLL: OutputMsg('  Internet Connection: Missing DLL.', '',
-        FMessageWarningColour);
-      icMissingFunction: OutputMsg('  Internet Connection: Missing Function.',
-        '', FMessageWarningColour);
-      icNotConnected: OutputMsg('  Internet Connection: Not Connected.', '',
-        FMessageWarningColour);
-      icConnected:
-        Begin
-          OutputMsg(Format('  Internet Connection: Connected (%s).',
-            [strConnection]), '', FMessageTextColour);
-          Result := True;
-        End;
-    Else
-      OutputMsg('  Internet Connection: Unknown.', '', FMessageWarningColour);
-    End;
-  end;
-
-  (**
-
-    This procedure checks the build number of the software against the XML file
-    at the given URL to see if there are any updates available.
-
-    @precon  None.
-    @postcon Displays messages to the console regarding the versioning of the
-             software.
-
-    @param   strURL as a String
-    @return  a Boolean
-
-  **)
-  Function TCheckForUpdates.CheckForUpdates(strURL : String) : Boolean;
-
-  Var
-    xmlDoc : DOMDocument;
-    xmlNodeList : IXMLDOMNodeList;
-    P : IXMLDOMNode;
-    iMajor, iMinor, iBugFix, iBuild : Integer;
-    iResult : Integer;
-    strInternet, strApplication : String;
-
-  Begin
-    Result := False;
-    OutputMsg(strLoadingMSXML, strURL, FMessageTextColour);
-    Try
-      xmlDoc := CoDOMDocument40.Create;
-      Try
-        Try
-          xmlDoc.ValidateOnParse := True;
-          OutputMsg(Format(strLoadingURL, [strURL + 'HoylD.xml']), strURL, FMessageTextColour);
-          xmlDoc.async := False;
-          xmlDoc.validateOnParse := True;
-          If xmlDoc.load(strURL + 'HoylD.xml') And (xmlDoc.parseError.errorCode = 0) Then
-            Begin
-              OutputMsg(strGettingPackages, strURL, FMessageTextColour);
-              xmlNodeList := xmlDoc.getElementsByTagName('Package');
-              P := FindPackage(xmlNodeList);
-              If P <> Nil Then
-                Begin
-                  OutputMsg(Format(strFoundPackage, [FSoftwareID]), strURL, FMessageTextColour);
-                  OutputMsg(strCheckingSoftwareVerNum, strURL, FMessageTextColour);
-                  iMajor := StrToInt(GetNamedNodeText(P, 'Major'));
-                  iMinor := StrToInt(GetNamedNodeText(P, 'Minor'));
-                  iBugFix := StrToInt(GetNamedNodeText(P, 'BugFix'));
-                  iBuild := StrToInt(GetNamedNodeText(P, 'Build'));
-                  strInternet := BuildVersionNumber(iMajor, iMinor, iBugFix, iBuild);
-                  iResult := CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild,
-                    strApplication);
-                  If iResult = 0 Then
-                    Begin
-                      OutputMsg(strYourSoftwareIsUpToDate, strURL, FMessageConfirmColour);
-                      {$IFNDEF CONSOLE}
-                      TfrmCheckForUpdates.Finish(5);
-                      {$ENDIF}
-                    End Else
-                  If iResult > 0 Then
-                    Begin
-                      OutputMsg(Format(strYouAreUsingANewerVersion,
-                        [strApplication, strInternet, strURL]), strURL,
-                        FMessageWarningColour);
-                      {$IFDEF CONSOLE}
-                      OutputMsg('', strURL);
-                      If CheckConsoleMode(FConHnd) Then
-                        Begin
-                          OutputMsg(strPressEnterToContinue, strURL, FMessageTextColour);
-                          SysUtils.Beep;
-                          ReadLn;
-                        End;
-                      {$ELSE}
-                      SysUtils.Beep;
-                      TfrmCheckForUpdates.Finish(60);
-                      {$ENDIF}
-                    End Else
-                    Begin
-                      OutputMsg(Format(strThereIsASoftwareUpdate,
-                        [strInternet, strApplication, strURL]), strURL,
-                        FMessageNoteColour);
-                      OutputMsg('', strURL);
-                      OutputMsg('  ' +
-                        StringReplace(GetNamedNodeText(P, 'Description'), #13#10,
-                        #32#32#13#10, [rfReplaceAll]), strURL, FMessageDescriptionColour);
-                      {$IFDEF CONSOLE}
-                      OutputMsg('', strURL);
-                      OutputMsg(strPressEnterToContinue, strURL, FMessageTextColour);
-                      SysUtils.Beep;
-                      ReadLn;
-                      {$ELSE}
-                      SysUtils.Beep;
-                      TfrmCheckForUpdates.Finish(60);
-                      {$ENDIF}
-                    End;
-                  Result := True;
-                End Else
-                Begin
-                  OutputMsg(Format(strPackageNotFound, [FSoftwareID]), strURL, FMessageNoteColour);
-                  SysUtils.Beep;
-                  {$IFNDEF CONSOLE}
-                  TfrmCheckForUpdates.Finish(60);
-                  {$ENDIF}
-                End;
-            End Else
-            Begin
-              OutputMsg(Format('  %s ("%s")', [xmlDoc.parseError.reason, strURL]), strURL,
-                FMessageWarningColour);
-              {$IFNDEF CONSOLE}
-              SysUtils.Beep;
-              TfrmCheckForUpdates.Finish(60);
-              {$ENDIF}
-            End;
-        Except
-          On E : Exception Do
-            OutputMsg(Format(strExceptionS, [E.Message]), strURL, FMessageWarningColour);
-        End;
-        OutputMsg('', strURL);
-      Finally
-        xmlDoc := Nil;
-      End;
-    Except
-      On E : Exception Do
-        OutputMsg(Format(strFailedMSXML, [E.Message]), '', FMessageWarningColour);
-    End;
-  End;
-
-  (**
-
-    This is the constructor method for the TConsoleCheckForupdates class.
-
-    @precon  None.
-    @postcon Initialises the class.
-
-    @param   strSoftwareID   as a String
-    @param   strRegRoot      as a String
-    @param   boolForceUpdate as a Boolean
-
-  **)
-  Constructor TCheckForUpdates.Create(strSoftwareID, strRegRoot : String;
-    boolForceUpdate : Boolean);
-
-  ResourceString
-    strURL = 'http://www.davidghoyle.co.uk/';
-
-  Begin
-    FMessageWarningColour := clRed;
-    LoadSettings;
-    FSoftwareID := strSoftwareID;
-    FRegRoot := strRegRoot;
-    FConHnd := GetStdHandle(STD_OUTPUT_HANDLE);
-    ReadLastUpdateDate;
-    If boolForceUpdate Or (FEnabled And (FLastUpdateDate + FUpdateInterval < Now)) Then
+Begin
+  Result := False;
+  Case InternetAvailable(strConnection) Of
+    icMissingDLL:
+      OutputMsg('  Internet Connection: Missing DLL.', '', FMessageWarningColour);
+    icMissingFunction:
+      OutputMsg('  Internet Connection: Missing Function.', '', FMessageWarningColour);
+    icNotConnected:
+      OutputMsg('  Internet Connection: Not Connected.', '', FMessageWarningColour);
+    icConnected:
       Begin
-        OutputMsg(Format(strCheckingForUpdates, [FSoftwareID]), '',
-          FMessageHeaderColour);
-        If CheckForConnection Then
-          CheckForUpdates(strURL)
-          {$IFNDEF CONSOLE}
+        OutputMsg(Format('  Internet Connection: Connected (%s).', [strConnection]), '',
+          FMessageTextColour);
+        Result := True;
+      End;
+  Else
+    OutputMsg('  Internet Connection: Unknown.', '', FMessageWarningColour);
+  End;
+End;
+
+(**
+
+  This procedure checks the build number of the software against the XML file at the given
+  URL to see if there are any updates available.
+
+  @precon  strXMLFile must be a valid XMLfile.
+  @postcon Displays messages to the console regarding the versioning of the software.
+
+  @param   strURL     as a String
+  @param   strXMLFile as a String
+  @return  a Boolean
+
+**)
+Function TCheckForUpdates.CheckForUpdates(strURL, strXMLFile: String): Boolean;
+
+Var
+  xmlDoc                         : IXMLDocument;
+  P                              : IXMLNode;
+  iMajor, iMinor, iBugFix, iBuild: Integer;
+  iResult                        : Integer;
+  strInternet, strApplication    : String;
+
+Begin
+  Result := False;
+  OutputMsg(strLoadingMSXML, strURL, FMessageTextColour);
+  Try
+    xmlDoc := TXMLDocument.Create(Nil);
+    Try
+      Try
+        xmlDoc.ParseOptions := [poValidateOnParse, poAsyncLoad];
+        OutputMsg(Format(strLoadingURL, [strURL + 'HoylD.xml']), strURL,
+          FMessageTextColour);
+        xmlDoc.LoadFromFile(strXMLFile);
+        If xmlDoc.Active Then
+          Begin
+            OutputMsg(strGettingPackages, strURL, FMessageTextColour);
+            P           := FindPackage(xmlDoc.DocumentElement);
+            If P <> Nil Then
+              Begin
+                OutputMsg(Format(strFoundPackage, [FSoftwareID]), strURL,
+                  FMessageTextColour);
+                OutputMsg(strCheckingSoftwareVerNum, strURL, FMessageTextColour);
+                iMajor      := StrToInt(GetNamedNodeText(P, 'Major'));
+                iMinor      := StrToInt(GetNamedNodeText(P, 'Minor'));
+                iBugFix     := StrToInt(GetNamedNodeText(P, 'BugFix'));
+                iBuild      := StrToInt(GetNamedNodeText(P, 'Build'));
+                strInternet := BuildVersionNumber(iMajor, iMinor, iBugFix, iBuild);
+                iResult     := CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild,
+                  strApplication);
+                If iResult = 0 Then
+                  Begin
+                    OutputMsg(strYourSoftwareIsUpToDate, strURL, FMessageConfirmColour);
+                    {$IFNDEF CONSOLE}
+                    TfrmCheckForUpdates.Finish(5);
+                    {$ENDIF}
+                  End
+                Else If iResult > 0 Then
+                  Begin
+                    OutputMsg(Format(strYouAreUsingANewerVersion,
+                      [strApplication, strInternet, strURL]), strURL,
+                      FMessageWarningColour);
+                    {$IFDEF CONSOLE}
+                    OutputMsg('', strURL);
+                    If CheckConsoleMode(FConHnd) Then
+                      Begin
+                        OutputMsg(strPressEnterToContinue, strURL, FMessageTextColour);
+                        SysUtils.Beep;
+                        ReadLn;
+                      End;
+                    {$ELSE}
+                    SysUtils.Beep;
+                    TfrmCheckForUpdates.Finish(60);
+                    {$ENDIF}
+                  End
+                Else
+                  Begin
+                    OutputMsg(Format(strThereIsASoftwareUpdate,
+                      [strInternet, strApplication, strURL]), strURL, FMessageNoteColour);
+                    OutputMsg('', strURL);
+                    OutputMsg('  ' + StringReplace(GetNamedNodeText(P, 'Description'),
+                      #13#10, #32#32#13#10, [rfReplaceAll]), strURL,
+                      FMessageDescriptionColour);
+                    {$IFDEF CONSOLE}
+                    OutputMsg('', strURL);
+                    OutputMsg(strPressEnterToContinue, strURL, FMessageTextColour);
+                    SysUtils.Beep;
+                    ReadLn;
+                    {$ELSE}
+                    SysUtils.Beep;
+                    TfrmCheckForUpdates.Finish(60);
+                    {$ENDIF}
+                  End;
+                Result := True;
+              End
+            Else
+              Begin
+                OutputMsg(Format(strPackageNotFound, [FSoftwareID]), strURL,
+                  FMessageNoteColour);
+                SysUtils.Beep;
+                {$IFNDEF CONSOLE}
+                TfrmCheckForUpdates.Finish(60);
+                {$ENDIF}
+              End;
+          End
         Else
           Begin
+            OutputMsg(Format('  Failed to Parse the XML file ("%s")', [strURL]), strURL,
+              FMessageWarningColour);
+            {$IFNDEF CONSOLE}
             SysUtils.Beep;
-            TfrmCheckForUpdates.Finish(60)
-          {$ENDIF}
+            TfrmCheckForUpdates.Finish(60);
+            {$ENDIF}
           End;
-        WriteLastUpdateDate;
+      Except
+        On E: Exception Do
+          OutputMsg(Format(strExceptionS, [E.Message]), strURL, FMessageWarningColour);
       End;
+      OutputMsg('', strURL);
+    Finally
+      xmlDoc := Nil;
+    End;
+  Except
+    On E: Exception Do
+      OutputMsg(Format(strFailedMSXML, [E.Message]), '', FMessageWarningColour);
+  End;
+End;
+
+(**
+
+  This is the constructor method for the TConsoleCheckForupdates class.
+
+  @precon  None.
+  @postcon Initialises the class.
+
+  @param   strSoftwareID   as a String
+  @param   strRegRoot      as a String
+  @param   boolForceUpdate as a Boolean
+
+**)
+Constructor TCheckForUpdates.Create(strSoftwareID, strRegRoot: String;
+  boolForceUpdate: Boolean);
+
+ResourceString
+  strURL = 'http://www.davidghoyle.co.uk/';
+
+Var  
+  strTempFile : String;
+  strTempPath : String;
+  iSize : Integer;
+
+Begin
+  FMessageWarningColour := clRed;
+  LoadSettings;
+  FSoftwareID := strSoftwareID;
+  FRegRoot    := strRegRoot;
+  {$IFDEF CONSOLE}
+  FConHnd := GetStdHandle(STD_OUTPUT_HANDLE);
+  {$ENDIF}
+  ReadLastUpdateDate;
+  FDLLHnd := LoadLibrary('WININET.DLL');
+  If boolForceUpdate Or (FEnabled And (FLastUpdateDate + FUpdateInterval < Now)) Then
+    Begin
+      OutputMsg(Format(strCheckingForUpdates, [FSoftwareID]), '', FMessageHeaderColour);
+      If CheckForConnection Then
+        Begin
+          SetLength(strTempPath, 1024);
+          iSize := GetTempPath(1024, PChar(strTempPath));
+          SetLength(StrTempPath, iSize);
+          SetLength(strTempFile, 1024);
+          GetTempFileName(PChar(strTempPath), PChar(strSoftwareID), Random(123456789),
+            PChar(strTempFile));
+          iSize := StrLen(PChar(strTempFile));
+          SetLength(strTempFile, iSize);
+          If DownloadFile(strURL + '/HoylD.xml', strTempFile) Then
+            Try
+              CheckForUpdates(strURL, strTempFile);
+            Finally
+              DeleteFile(PChar(strTempFile));
+            End;
+        End
+        {$IFNDEF CONSOLE}
+      Else
+        Begin
+          SysUtils.Beep;
+          TfrmCheckForUpdates.Finish(60)
+        End
+        {$ENDIF};
+      WriteLastUpdateDate;
+    End;
+End;
+
+(**
+
+  This is the destructor method for the TCheckForUpdates class.
+
+  @precon  None.
+  @postcon Saves the INI settings for Colours.
+
+**)
+Destructor TCheckForUpdates.Destroy;
+
+Begin
+  SaveSettings;
+  FreeLibrary(FDLLHnd);
+  Inherited Destroy;
+End;
+
+(**
+
+  This method use raw WinINet to download an XML file from the web and put the contents
+  in a temporary file so that the XML parser can open the file and search for the
+  relative information.
+
+  @precon  strURL and strOutputFile must be valid URL and filename respectively.
+  @postcon The XML file is download to the specified file.
+
+  @param   strURL        as a String
+  @param   strOutputFile as a String
+  @return  a Boolean
+
+**)
+Function TCheckForUpdates.DownloadFile(strURL, strOutputFile: String): Boolean;
+
+Type
+  HINTERNET = Pointer;
+
+Const
+  INTERNET_OPEN_TYPE_PREFONFIG = 0;
+  BufferSize = 1024;
+
+Var
+  InternetOpen: Function(lpszAgent: PWideChar; dwAccessType: DWORD;
+    lpszProxy, lpszProxyBypass: PWideChar; dwFlags: DWORD): HINTERNET; stdcall;
+  InternetOpenURL: Function(hInet: HINTERNET; lpszUrl: PWideChar;
+    lpszHeaders: PWideChar; dwHeadersLength: DWORD; dwFlags: DWORD;
+    dwContext: DWORD_PTR): HINTERNET; stdcall;
+  InternetCloseHandle: Function(hInet: HINTERNET): BOOL; stdcall;
+  InternetReadFile: Function(hFile: HINTERNET; lpBuffer: Pointer;
+    dwNumberOfBytesToRead: DWORD; var lpdwNumberOfBytesRead: DWORD): BOOL; stdcall;
+  hndSession : HINTERNET;
+  hndURL : HINTERNET;
+  F : File;
+  Buffer: Array[1..BufferSize] Of Byte;
+  BufferLen : DWORD;
+
+Begin
+  Result := False;
+  If FDLLHnd <> 0 Then
+    Begin
+      @InternetOpen := GetProcAddress(FDLLHnd, 'InternetOpenW');
+      If @InternetOpen <> Nil Then
+        Begin
+          @InternetCloseHandle := GetProcAddress(FDLLHnd, 'InternetCloseHandle');
+          If @InternetCloseHandle <> Nil Then
+            Begin
+              @InternetOpenURL := GetProcAddress(FDLLHnd, 'InternetOpenUrlW');
+              If @InternetOpenURL <> Nil Then
+                Begin
+                  @InternetReadFile := GetProcAddress(FDLLHnd, 'InternetReadFile');
+                  If @InternetReadFile <> Nil Then
+                    Begin
+                      hndSession := InternetOpen('Check for Updates',
+                        INTERNET_OPEN_TYPE_PREFONFIG, Nil, Nil, 0);
+                      Try
+                        hndURL := InternetOpenURL(hndSession, PChar(strURL), Nil, 0, 0,
+                          0);
+                        Try
+                          OutputMsg('  Downloading file ' + strURL + '...', '');
+                          AssignFile(F, strOutputFile);
+                          ReWrite(F, 1);
+                          Repeat
+                            InternetReadFile(hndURL, @Buffer, SizeOf(Buffer), BufferLen);
+                            BlockWrite(F, Buffer, BufferLen);
+                          Until BufferLen = 0;
+                          CloseFile(F);
+                          Result := True;
+                          OutputMsg('  File downloaded...', '');
+                        Finally
+                          InternetCloseHandle(hndURL);
+                        End;
+                      Finally
+                        InternetCloseHandle(hndSession);
+                      End;
+                    End Else
+                      OutputMsg('  Missing function InternetReadFile!', '',
+                        FMessageWarningColour);
+                End Else
+                  OutputMsg('  Missing function InternetOpenURLW!', '',
+                    FMessageWarningColour);
+            End Else
+              OutputMsg('  Missing function InternetCloseHandle!', '',
+                FMessageWarningColour);
+        End Else
+          OutputMsg('  Missing function InternetOpenW!', '', FMessageWarningColour);
+    End;
+End;
+
+(**
+
+  This function searches through the packages looking for the packages with the correct ID
+  .
+
+  @precon  xmlDocumentElement must be a valid list of nodes to search.
+  @postcon Searches through the folders and packages looking for the packages with the
+           correct ID.
+
+  @param   xmlDocumentElement as an IXMLNode
+  @return  an IXMLNode
+
+**)
+Function TCheckForUpdates.FindPackage(xmlDocumentElement: IXMLNode): IXMLNode;
+
+Var
+  i, j   : Integer;
+  Fldr, S: IXMLNode;
+
+Begin
+  Result  := Nil;
+  For i   := 0 To xmlDocumentElement.childNodes.Count - 1 Do
+    Begin
+      Fldr := xmlDocumentElement.ChildNodes[i];
+      For j := 0 To Fldr.ChildNodes.Count - 1 Do
+        Begin
+          S := Fldr.ChildNodes[j];
+          If S.Attributes['ID'] = FSoftwareID Then
+            Begin
+              Result := S;
+              Exit;
+            End;
+        End;
+    End;
+End;
+
+(**
+
+  This function returns the text associated with the named node.
+
+  @precon  P must be a valid IXMLDOMNode.
+  @postcon Returns the text associated with the named node.
+
+  @param   P       as an IXMLNode
+  @param   strName as a String
+  @return  a String
+
+**)
+Function TCheckForUpdates.GetNamedNodeText(P: IXMLNode; strName: String): String;
+
+Var
+  i: Integer;
+
+Begin
+  Result := '';
+  For i  := 0 To P.childNodes.Count - 1 Do
+    If CompareText(P.childNodes[i].nodeName, strName) = 0 Then
+      Begin
+        Result := P.childNodes[i].text;
+        Break;
+      End;
+End;
+
+(**
+
+  This method determines the status of the internet connection and returns
+  an enumerate informing the caller of the internet status.
+
+  @precon  None.
+  @postcon Determines the status of the internet connection and returns
+           an enumerate informing the caller of the internet status.
+
+  @param   strConnection as a String as a Reference
+  @return  a TINetConnection
+
+**)
+Function TCheckForUpdates.InternetAvailable(Var strConnection: String): TINetConnection;
+
+Type
+  TConnectionInfo = Record
+    FState: Integer;
+    FDescription: String;
   End;
 
-  (**
+Const
+  Connections: Array [1 .. 6] Of TConnectionInfo = ((FState: $01; FDescription: 'Modem'),
+    (FState: $02; FDescription: 'Lan'), (FState: $04; FDescription: 'Proxy'),
+    (FState: $08; FDescription: 'Modem Busy'), (FState: $20; FDescription: 'Off Line'),
+    (FState: $49; FDescription: 'Connection Configured'));
 
-    This is the destructor method for the TCheckForUpdates class.
+Var
+  InternetGetConnectedStateEx: Function(lpdwFlags: LPDWORD; lpszConnectionname: PChar;
+    dwSize: DWORD; dwReserved: DWORD): BOOL; StdCall;
+  lpdwFlags : DWORD;
+  iSize     : DWORD;
+  strOptions: String;
+  i         : Integer;
 
-    @precon  None.
-    @postcon Saves the INI settings for Colours.
-
-  **)
-  destructor TCheckForUpdates.Destroy;
-  begin
-    SaveSettings;
-    Inherited Destroy;
-  end;
-
-  (**
-
-    This function searches through the packages looking for the packages with
-    the correct ID.
-
-    @precon  xmlNodeList must be a valid list of nodes to search.
-    @postcon Searches through the packages looking for the packages with
-             the correct ID.
-
-    @param   xmlNodeList as an IXMLDOMNodeList
-    @return  an IXMLDOMNode
-
-  **)
-  Function TCheckForUpdates.FindPackage(xmlNodeList : IXMLDOMNodeList) : IXMLDOMNode;
-
-  Var
-    i, j : Integer;
-    Attrib : IXMLDOMNode;
-
-  Begin
-    Result := Nil;
-    For i := 0 To xmlNodeList.length - 1 Do
-      For j := 0 To xmlNodeList.Item[i].attributes.length - 1 Do
+Begin
+  If FDLLHnd <> 0 Then
+    Begin
+      @InternetGetConnectedStateEx := GetProcAddress(FDLLHnd,
+        'InternetGetConnectedStateExW');
+      If @InternetGetConnectedStateEx <> Nil Then
         Begin
-          Attrib := xmlNodeList.item[i].attributes.item[j];
-          If Attrib.nodeName = 'ID' Then
-            If Attrib.nodeValue = FSoftwareID Then
+          lpdwFlags := 0;
+          iSize     := 1024;
+          SetLength(strConnection, iSize);
+          If InternetGetConnectedStateEx(@lpdwFlags, PChar(strConnection), iSize, 0) Then
+            Result := icConnected
+          Else
+            Result      := icNotConnected;
+          strConnection := StrPas(PChar(strConnection)) + '(%s)';
+          strOptions    := '';
+          For i         := Low(Connections) To High(Connections) Do
+            If lpdwFlags And Connections[i].FState <> 0 Then
               Begin
-                Result := xmlNodeList.Item[i];
-                Break;
+                If strOptions <> '' Then
+                  strOptions := strOptions + ', ';
+                strOptions   := strOptions + Connections[i].FDescription;
               End;
-        End;
-  End;
+          strConnection := Format(strConnection, [strOptions]);
+        End
+      Else
+        Result := icMissingFunction;
+    End
+  Else
+    Result := icMissingDLL;
+End;
 
-  (**
+(**
 
-    This function returns the text associated with the named node.
+  This method loads the Colours settings from the INI file.
 
-    @precon  P must be a valid IXMLDOMNode.
-    @postcon Returns the text associated with the named node.
+  @precon  None.
+  @postcon Loads the Colours settings from the INI file.
 
-    @param   P       as an IXMLDOMNode
-    @param   strName as a String
-    @return  a String
+**)
+Procedure TCheckForUpdates.LoadSettings;
 
-  **)
-  Function TCheckForUpdates.GetNamedNodeText(P : IXMLDOMNode; strName : String) : String;
+Begin
+  With TMeminiFile.Create(FRegRoot) Do
+    Try
+      FMessageTextColour := StringToColor(ReadString('Colours', 'MessageText', 'clNone'));
+      FMessageConfirmColour := StringToColor(ReadString('Colours', 'MessageConfirm',
+        'clWhite'));
+      FMessageWarningColour := StringToColor(ReadString('Colours', 'MessageWarning',
+        'clRed'));
+      FMessageNoteColour := StringToColor(ReadString('Colours', 'MessageNote',
+        'clYellow'));
+      FMessageDescriptionColour :=
+        StringToColor(ReadString('Colours', 'MessageDescription', 'clLime'));
+      FMessageHeaderColour := StringToColor(ReadString('Colours', 'MessageHeader',
+        'clWhite'));
+    Finally
+      Free;
+    End;
+End;
 
-  Var
-    i : Integer;
+(**
 
-  Begin
-    Result := '';
-    For i := 0 To P.childNodes.length - 1 Do
-      If CompareText(P.childNodes[i].nodeName, strName) = 0 Then
-        Begin
-          Result := P.childNodes[i].text;
-          Break;
-        End;
-  End;
+  This method returns -ve if the software of older than the internet version,
+  0 if the same or +ve if it is newer than the internet version.
 
-  (**
+  @precon  None.
+  @postcon Returns -ve if the software of older than the internet version,
+           0 if the same or +ve if it is..
 
-    This method loads the Colours settings from the INI file.
+  @param   iMajor       as an Integer
+  @param   iMinor       as an Integer
+  @param   iBugFix      as an Integer
+  @param   iBuild       as an Integer
+  @param   strAppVerNum as a String as a Reference
+  @return  a Integer
 
-    @precon  None.
-    @postcon Loads the Colours settings from the INI file.
+**)
+Function TCheckForUpdates.CheckVersionNumber(iMajor, iMinor, iBugFix, iBuild: Integer;
+  Var strAppVerNum: String): Integer;
 
-  **)
-  procedure TCheckForUpdates.LoadSettings;
-  begin
-    With TMeminiFile.Create(FRegRoot) Do
-      Try
-        FMessageTextColour := StringToColor(ReadString('Colours', 'MessageText', 'clNone'));
-        FMessageConfirmColour := StringToColor(ReadString('Colours', 'MessageConfirm', 'clWhite'));
-        FMessageWarningColour := StringToColor(ReadString('Colours', 'MessageWarning', 'clRed'));
-        FMessageNoteColour := StringToColor(ReadString('Colours', 'MessageNote', 'clYellow'));
-        FMessageDescriptionColour := StringToColor(ReadString('Colours', 'MessageDescription', 'clLime'));
-        FMessageHeaderColour := StringToColor(ReadString('Colours', 'MessageHeader', 'clWhite'));
-      Finally
-        Free;
-      End;
-  end;
+Var
+  iMaj, iMin, iBug, iBui: Integer;
+  Buffer                : Array [0 .. MAX_PATH] Of Char;
+  strModuleFileName     : String;
 
-  (**
+Begin
+  GetModuleFilename(hInstance, Buffer, MAX_PATH);
+  strModuleFileName := StrPas(Buffer);
+  GetBuildNumber(strModuleFileName, iMaj, iMin, iBug, iBui);
+  Result := iMaj - iMajor;
+  If Result = 0 Then
+    Result := iMin - iMinor;
+  If Result = 0 Then
+    Result := iBug - iBugFix;
+  If Result = 0 Then
+    Result     := iBui - iBuild;
+  strAppVerNum := BuildVersionNumber(iMaj, iMin, iBug, iBui);
+End;
 
-    This method returns -ve if the software of older than the internet version,
-    0 if the same or +ve if it is newer than the internet version.
+(**
 
-    @precon  None.
-    @postcon Returns -ve if the software of older than the internet version,
-             0 if the same or +ve if it is..
+  This procedure outputs a message to the console IF boolOutputMsgs is true.
 
-    @param   iMajor       as an Integer
-    @param   iMinor       as an Integer
-    @param   iBugFix      as an Integer
-    @param   iBuild       as an Integer
-    @param   strAppVerNum as a String as a Reference
-    @return  a Integer
+  @precon  None.
+  @postcon Outputs a message to the console IF boolOutputMsgs is true.
 
-  **)
-  Function TCheckForUpdates.CheckVersionNumber(iMajor, iMinor, iBugFix,
-    iBuild : Integer; var strAppVerNum : String) : Integer;
+  @param   strText as a String
+  @param   strURL  as a String
+  @param   iColour as a TColor
 
-  Var
-    iMaj, iMin, iBug, iBui : Integer;
-    Buffer : Array[0..MAX_PATH] Of Char;
-    strModuleFileName : String;
+**)
+Procedure TCheckForUpdates.OutputMsg(strText, strURL: String; iColour: TColor = clNone);
 
-  begin
-    GetModuleFilename(hInstance, Buffer, MAX_PATH);
-    strModuleFileName := StrPas(Buffer);
-    GetBuildNumber(strModuleFileName, iMaj, iMin, iBug, iBui);
-    Result := iMaj - iMajor;
-    If Result = 0 Then
-      Result := iMin - iMinor;
-    If Result = 0 Then
-      Result := iBug - iBugFix;
-    If Result = 0 Then
-      Result := iBui - iBuild;
-    strAppVerNum := BuildVersionNumber(iMaj, iMin, iBug, iBui);
-  End;
+Begin
+  {$IFDEF CONSOLE}
+  OutputToConsoleLn(FConHnd, StringReplace(strText, #13#10, #32, [rfReplaceAll]),
+    iColour);
+  {$ELSE}
+  If strText <> '' Then
+    TfrmCheckForUpdates.ShowUpdates(StringReplace(strText, #13#10, #32, [rfReplaceAll]),
+      strURL, iColour);
+  {$ENDIF}
+End;
 
-  (**
+(**
 
-    This procedure outputs a message to the console IF boolOutputMsgs is true.
+  This method reads the last update date from the INI File.
 
-    @precon  None.
-    @postcon Outputs a message to the console IF boolOutputMsgs is true.
+  @precon  None.
+  @postcon Reads the last update date from the INI File.
 
-    @param   strText as a String
-    @param   strURL  as a String
-    @param   iColour as a TColor
+**)
+Procedure TCheckForUpdates.ReadLastUpdateDate;
 
-  **)
-  Procedure TCheckForUpdates.OutputMsg(strText, strURL : String;
-    iColour : TColor = clNone);
+Var
+  iDay, iMonth, iYear: Word;
 
-  Begin
-    {$IFDEF CONSOLE}
-    OutputToConsoleLn(FConHnd, StringReplace(strText, #13#10, #32, [rfReplaceAll]),
-      iColour);
-    {$ELSE}
-    If strText <> '' Then
-      TfrmCheckForUpdates.ShowUpdates(
-        StringReplace(strText, #13#10, #32, [rfReplaceAll]),
-        strURL,
-        iColour);
-    {$ENDIF}
-  End;
+Begin
+  With TMeminiFile.Create(FRegRoot) Do
+    Try
+      iDay            := ReadInteger(strCheckForUpdatesSection, 'Day', 01);
+      iMonth          := ReadInteger(strCheckForUpdatesSection, 'Month', 01);
+      iYear           := ReadInteger(strCheckForUpdatesSection, 'Year', 1900);
+      FLastUpdateDate := EncodeDate(iYear, iMonth, iDay);
+      FUpdateInterval := ReadInteger(strCheckForUpdatesSection, 'Interval', 28);
+      FEnabled        := ReadBool(strCheckForUpdatesSection, 'Enabled', False);
+    Finally
+      Free;
+    End;
+End;
 
-  (**
+(**
 
-    This method reads the last update date from the INI File.
+  This method saves the Colour settings to the INI file.
 
-    @precon  None.
-    @postcon Reads the last update date from the INI File.
+  @precon  None.
+  @postcon Saves the Colour settings to the INI file.
 
-  **)
-  Procedure TCheckForUpdates.ReadLastUpdateDate;
+**)
+Procedure TCheckForUpdates.SaveSettings;
+Begin
+  With TMeminiFile.Create(FRegRoot) Do
+    Try
+      WriteString('Colours', 'MessageText', ColorToString(FMessageTextColour));
+      WriteString('Colours', 'MessageConfirm', ColorToString(FMessageConfirmColour));
+      WriteString('Colours', 'MessageWarning', ColorToString(FMessageWarningColour));
+      WriteString('Colours', 'MessageNote', ColorToString(FMessageNoteColour));
+      WriteString('Colours', 'MessageDescription',
+        ColorToString(FMessageDescriptionColour));
+      WriteString('Colours', 'MessageHeader', ColorToString(FMessageHeaderColour));
+      UpdateFile;
+    Finally
+      Free;
+    End;
+End;
 
-  Var
-    iDay, iMonth, iYear : Word;
+(**
 
-  Begin
-    With TMemIniFile.Create(FRegRoot) Do
-      Try
-        iDay := ReadInteger(strCheckForUpdatesSection, 'Day', 01);
-        iMonth := ReadInteger(strCheckForUpdatesSection, 'Month', 01);
-        iYear := ReadInteger(strCheckForUpdatesSection, 'Year', 1900);
-        FLastUpdateDate :=  EncodeDate(iYear, iMonth, iDay);
-        FUpdateInterval := ReadInteger(strCheckForUpdatesSection, 'Interval', 28);
-        FEnabled := ReadBool(strCheckForUpdatesSection, 'Enabled', False);
-      Finally
-        Free;
-      End;
-  End;
+  This method writes the last update date to the INI File.
 
-  (**
+  @precon  None.
+  @postcon Writes the last update date to the INI File.
 
-    This method saves the Colour settings to the INI file.
+**)
+Procedure TCheckForUpdates.WriteLastUpdateDate;
 
-    @precon  None.
-    @postcon Saves the Colour settings to the INI file.
+Var
+  iDay, iMonth, iYear: Word;
 
-  **)
-  procedure TCheckForUpdates.SaveSettings;
-  begin
-    With TMemIniFile.Create(FRegRoot) Do
-      Try
-        WriteString('Colours', 'MessageText', ColorToString(FMessageTextColour));
-        WriteString('Colours', 'MessageConfirm', ColorToString(FMessageConfirmColour));
-        WriteString('Colours', 'MessageWarning', ColorToString(FMessageWarningColour));
-        WriteString('Colours', 'MessageNote', ColorToString(FMessageNoteColour));
-        WriteString('Colours', 'MessageDescription', ColorToString(FMessageDescriptionColour));
-        WriteString('Colours', 'MessageHeader', ColorToString(FMessageHeaderColour));
-        UpdateFile;
-      Finally
-        Free;
-      End;
-  end;
-
-  (**
-
-    This method writes the last update date to the INI File.
-
-    @precon  None.
-    @postcon Writes the last update date to the INI File.
-
-  **)
-  Procedure TCheckForUpdates.WriteLastUpdateDate;
-
-  Var
-    iDay, iMonth, iYear : Word;
-
-  Begin
-    With TMemIniFile.Create(FRegRoot) Do
-      Try
-        WriteInteger(strCheckForUpdatesSection, 'Interval', FUpdateInterval);
-        DecodeDate(Now, iYear, iMonth, iDay);
-        WriteInteger(strCheckForUpdatesSection, 'Day', iDay);
-        WriteInteger(strCheckForUpdatesSection, 'Month', iMonth);
-        WriteInteger(strCheckForUpdatesSection, 'Year', iYear);
-        WriteBool(strCheckForUpdatesSection, 'Enabled', FEnabled);
-        UpdateFile;
-      Finally
-        Free;
-      End;
-  End;
+Begin
+  With TMeminiFile.Create(FRegRoot) Do
+    Try
+      WriteInteger(strCheckForUpdatesSection, 'Interval', FUpdateInterval);
+      DecodeDate(Now, iYear, iMonth, iDay);
+      WriteInteger(strCheckForUpdatesSection, 'Day', iDay);
+      WriteInteger(strCheckForUpdatesSection, 'Month', iMonth);
+      WriteInteger(strCheckForUpdatesSection, 'Year', iYear);
+      WriteBool(strCheckForUpdatesSection, 'Enabled', FEnabled);
+      UpdateFile;
+    Finally
+      Free;
+    End;
+End;
 
 End.
-

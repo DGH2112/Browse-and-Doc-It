@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       01 Apr 2012
+  @Date       18 Aug 2012
   @Author     David Hoyle
 
 **)
@@ -1091,7 +1091,7 @@ begin
   FInteriorColour := xlcWHITE;
   FInteriorPattern := ipNONE;
   FInteriorPatternColour := xlcNONE;
-  FTransparency := -1;
+  FTransparency := 0;
 end;
 
 { TRectangle }

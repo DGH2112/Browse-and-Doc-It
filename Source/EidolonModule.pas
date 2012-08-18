@@ -1091,7 +1091,7 @@ begin
   FInteriorColour := xlcWHITE;
   FInteriorPattern := ipNONE;
   FInteriorPatternColour := xlcNONE;
-  FTransparency := 0;
+  FTransparency := -1;
 end;
 
 { TRectangle }

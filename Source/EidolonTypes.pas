@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    02 Apr 2012
+  @Date    30 Aug 2012
   @Version 1.0
 
 **)
@@ -161,8 +161,8 @@ Type
 
   (** An enumerate to define the drawing dimensions which can be changed
       by the user. **)
-  TDimension = (diHeight, diWidth, diLegendWidth, diTitleHeight,
-    diOverheadHeight, diDateWidth, diLegendLabel, diWeekNoWidth);
+  TDimension = (diHeight, diWidth, diLegendWidth, diTitleHeight, diOverheadHeight,
+    diDateWidth, diLegendLabel, diWeekNoWidth, diFrameGap);
 
   (** An enumerate to define the line end style. **)
   TLineEndType = (atNone, atDiamond, atOpen, atOval, atStealth, atTriangle);
@@ -377,7 +377,8 @@ Const
     (FDisplayName: 'Overhead Height'; FININame: 'OverheadHeight'; FDefault:  150.0),
     (FDisplayName: 'Date Width';      FININame: 'DateWidth';      FDefault:   75.0),
     (FDisplayName: 'Legend Label';    FININame: 'LegendLabel';    FDefault:   52.0),
-    (FDisplayName: 'Week No Width';   FININame: 'WeekNoWidth';    FDefault:   25.0)
+    (FDisplayName: 'Week No Width';   FININame: 'WeekNoWidth';    FDefault:   25.0),
+    (FDisplayName: 'Frame Gap';       FININame: 'FrameGap';       FDefault:   10.0)
   );
 
 Implementation

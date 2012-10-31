@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       18 Aug 2012
+  @Date       31 Oct 2012
   @Author     David Hoyle
 
 **)
@@ -3277,7 +3277,8 @@ begin
   For iElement := ElementCount DownTo 1 Do
     If Elements[iElement].ElementCount = 0 Then
       If Elements[iElement] Is TLabelContainer Then
-        DeleteElement(iElement);
+        If Pos('Definitions', Elements[iElement].Identifier)  = 0 Then
+          DeleteElement(iElement);
 end;
 
 (**

@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       31 Oct 2012
+  @Date       08 Nov 2012
   @Author     David Hoyle
 
 **)
@@ -807,14 +807,15 @@ end;
   @return  a String
 
 **)
-function TTextTableDef.AsString(boolShowIdentifier,
+Function TTextTableDef.AsString(boolShowIdentifier,
   boolForDocumentation: Boolean): String;
 
-begin
-  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    '=', BrowseAndDocItOptions.MaxDocOutputWidth, ['=', ':', '\', #32],
-    ['=', ':', '\', #32], []);
-end;
+Begin
+  Result := '';
+  If boolShowIdentifier Then
+    Result := Identifier + '=';
+  Result := Result + BuildLiteralString(Self);
+End;
 
 { TFieldDef }
 

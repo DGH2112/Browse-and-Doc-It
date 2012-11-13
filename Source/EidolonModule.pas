@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       08 Nov 2012
+  @Date       13 Nov 2012
   @Author     David Hoyle
 
 **)
@@ -326,6 +326,31 @@ Type
     Property BarWidth : Integer Read FBarWidth Write FBarWidth;
   End;
 
+  (** A class to represent a SUPERBAR time location symbol **)
+  TSuperBar = Class(TCustomFillSymbol)
+  {$IFDEF D2005} Strict {$ENDIF} Private
+    FDateWidth     : Double;
+    FLocationWidth : Double;
+  Public
+    Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
+      AImageIndex : TImageIndex; AComment: TComment); Override;
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    (**
+      This property gets and sets the bars date width of the bar.
+      @precon  None.
+      @postcon Gets and sets the bars date width of the bar.
+      @return  a Double
+    **)
+    Property DateWidth : Double Read FDateWidth Write FDateWidth;
+    (**
+      This property gets and sets the bars location width of the bar.
+      @precon  None.
+      @postcon Gets and sets the bars location width of the bar.
+      @return  a Double
+    **)
+    Property LocationWidth : Double Read FLocationWidth Write FLocationWidth;
+  End;
+
   (** A class to represent a DIAMOND time location symbol **)
   TDiamond = Class(TCustomFillSymbol)
   {$IFDEF D2005} Strict {$ENDIF} Private
@@ -420,12 +445,16 @@ Type
       TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
     Function  TLBar(strName : String; StartToken : TTokenInfo;
       TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
+    Function  TLSuperBar(strName : String; StartToken : TTokenInfo;
+      TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
     Procedure InteriorDef(CustomSymbol : TCustomFillSymbol);
     Procedure Transparency(CustomSymbol : TCustomFillSymbol);
     Procedure InteriorColour(CustomSymbol : TCustomFillSymbol);
     Procedure InteriorPattern(CustomSymbol : TCustomFillSymbol);
     Procedure InteriorPatternColour(CustomSymbol : TCustomFillSymbol);
     Procedure BarWidth(Bar : TBar);
+    Procedure DateWidth(SuperBar : TSuperBar);
+    Procedure LocationWidth(SuperBar : TSuperBar);
     Function  TLDiamond(strName : String; StartToken : TTokenInfo;
       TLT : TTimeLocationTable; var iLayerIndex : Integer) : Boolean;
     Function  TLTriangle(strName : String; StartToken : TTokenInfo;
@@ -551,7 +580,7 @@ resourcestring
 Const
 
   (** A set of reserved words (not used in this parser.) **)
-  strReservedWords : Array[0..11] Of String = (
+  strReservedWords : Array[0..12] Of String = (
     'bar',
     'class',
     'dbtable',
@@ -561,6 +590,7 @@ Const
     'outputtable',
     'rectangle',
     'requirementstable',
+    'superbar',
     'texttable',
     'timelocationtable',
     'triangle'
@@ -1388,7 +1418,7 @@ begin
   If Token.TokenType In [ttNumber] Then
     Begin
       Val(Token.Token, iWidth, iErrorCode);
-      If (iErrorCode > 0) Or (Not (iWidth In [1..100]))  Then
+      If (iErrorCode > 0) Or (iWidth <= 0.0) Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
           Token.Column]), scNone, 'BarWidth', Token.Line, Token.Column,
           etError);
@@ -1757,6 +1787,39 @@ end;
 
 (**
 
+  This method parses the DateWidth element of the grammar.
+
+  @precon  SuperBar must be a valid instance.
+  @postcon If the width is valid, it is assigned to the super bar else an exception is
+           raised.
+
+  @param   SuperBar as a TSuperBar
+
+**)
+Procedure TEidolonModule.DateWidth(SuperBar: TSuperBar);
+
+Var
+  dblWidth : Double;
+  iErrorCode : Integer;
+
+Begin
+  EatWhitespace;
+  If Token.TokenType In [ttNumber] Then
+    Begin
+      Val(Token.Token, dblWidth, iErrorCode);
+      If (iErrorCode > 0) Or (dblWidth <= 0.0) Then
+        AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
+          Token.Column]), scNone, 'DateWidth', Token.Line, Token.Column,
+          etError);
+      SuperBar.DateWidth := dblWidth;
+      NextNonCommentToken;
+    End Else
+      ErrorAndSeekToken(strNumberExpected, 'DateWidth', Token.Token,
+        strSeekableOnErrorTokens, stActual);
+End;
+
+(**
+
   This method parses the DBTable element of the grammar.
 
   @precon  StartToken must be a valid instance of a TTokenInfo class.
@@ -1855,7 +1918,7 @@ begin
   If Token.TokenType In [ttNumber] Then
     Begin
       Val(Token.Token, iSize, iErrorCode);
-      If (iErrorCode > 0) Or (Not (iSize In [1..100]))  Then
+      If (iErrorCode > 0) Or (iSize <= 0)  Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
           Token.Column]), scNone, 'DiamondSize', Token.Line, Token.Column,
           etError);
@@ -1969,7 +2032,7 @@ begin
   If Token.TokenType In [ttNumber] Then
     Begin
       Val(Token.Token, iSize, iErrorCode);
-      If (iErrorCode > 0) Or (Not (iSize In [1..100]))  Then
+      If (iErrorCode > 0) Or (iSize <= 0)  Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
           Token.Column]), scNone, 'EllipseSize', Token.Line, Token.Column,
           etError);
@@ -2973,6 +3036,40 @@ end;
 
 (**
 
+  This method parses the LocationWidth element of the grammar.
+
+  @precon  SuperBar must be a valid instance.
+  @postcon If the width is valid, it is assigned to the super bar else an exception is
+           raised.
+
+  @param   SuperBar as a TSuperBar
+
+**)
+Procedure TEidolonModule.LocationWidth(SuperBar: TSuperBar);
+
+Var
+  dblWidth : Double;
+  iErrorCode : Integer;
+
+Begin
+  EatWhitespace;
+  If Token.TokenType In [ttNumber] Then
+    Begin
+      Val(Token.Token, dblWidth, iErrorCode);
+      If (iErrorCode > 0) Or (dblWidth <= 0.0) Then
+        AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
+          Token.Column]), scNone, 'LocationWidth', Token.Line, Token.Column,
+          etError);
+      SuperBar.LocationWidth := dblWidth;
+      NextNonCommentToken;
+    End
+  Else
+    ErrorAndSeekToken(strNumberExpected, 'LocationWidth', Token.Token,
+      strSeekableOnErrorTokens, stActual);
+End;
+
+(**
+
   This method does nothing as we are not referencing symbols in XML.
 
   @precon  None.
@@ -3328,7 +3425,8 @@ begin
                 TLLine(strName, StartToken, Table, iLayerIndex) Or
                 TLTriangle(strName, StartToken, Table, iLayerIndex) Or
                 TLEllipse(strName, StartToken, Table, iLayerIndex) Or
-                TLDiamond(strName, StartToken, Table, iLayerIndex) Then
+                TLDiamond(strName, StartToken, Table, iLayerIndex) Or
+                TLSuperBar(strName, StartToken, Table, iLayerIndex) Then
                 Inc(iLayerIndex);
             End;
         End Else
@@ -3441,6 +3539,60 @@ begin
         End;
     End;
 end;
+
+(**
+
+  This method parses the SuperBar element of the time location grammar.
+
+  @precon  TLT must be a valid instance.
+  @postcon Parses and creates a super bar element if found in the AMP file.
+
+  @param   strName     as a String
+  @param   StartToken  as a TTokenInfo
+  @param   TLT         as a TTimeLocationTable
+  @param   iLayerIndex as an Integer as a reference
+  @return  a Boolean
+
+**)
+Function TEidolonModule.TLSuperBar(strName: String; StartToken: TTokenInfo;
+  TLT: TTimeLocationTable; var iLayerIndex: Integer): Boolean;
+
+Var
+  B: TSuperBar;
+
+Begin
+  Result := False;
+  If CompareText(Token.Token, 'SUPERBAR') = 0 Then
+    Begin
+      Result := True;
+      NextNonCommentToken;
+      B := TLT.AddSymbol(TSuperBar.Create(strName, scNone, StartToken.Line,
+        StartToken.Column, iiPublicObject, Nil)) As TSuperBar;
+      B.SymbolType := tstSuperBar;
+      B.LayerIndex := iLayerIndex;
+      EatWhitespace;
+      If CheckLiteral(',', 'TLBar') Then
+        Begin
+          BorderDef(B);
+          EatWhitespace;
+          If CheckLiteral(',', 'TLBar') Then
+            Begin
+              InteriorDef(B);
+              EatWhiteSpace;
+              If CheckLiteral(',', 'TLBar') Then
+                Begin
+                  DateWidth(B);
+                  If CheckLiteral(',', 'TLBar') Then
+                    Begin
+                      LocationWidth(B);
+                      Transparency(B);
+                      CheckLineEnd('TLBar');
+                    End;
+                End;
+            End;
+        End;
+    End;
+End;
 
 (**
 
@@ -3759,5 +3911,53 @@ begin
   FLineEndType := atNone;
   FLineEndSize := asMediumMedium;
 end;
+
+{ TSuperBar }
+
+(**
+
+  Returns a representation of the TSuperBar element.
+
+  @precon  None.
+  @postcon Returns a representation of the TSuperBar element.
+
+  @param   boolShowIdentifier   as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+Function TSuperBar.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+
+Begin
+  Result := Inherited AsString(boolShowIdentifier, boolForDocumentation);
+  Result := Result + ', ' + Format('%1.2n', [FDateWidth]);
+  Result := Result + ', ' + Format('%1.2n', [FLocationWidth]);
+  If Transparency >= 0.0 Then
+    Result := Result + ', ' + Format('%d', [Transparency]);
+End;
+
+(**
+
+  This is a constructor for the TSuperBar class.
+
+  @precon  None.
+  @postcon Creates a default TSuperBar class.
+
+  @param   strName     as a String
+  @param   AScope      as a TScope
+  @param   iLine       as an Integer
+  @param   iColumn     as an Integer
+  @param   AImageIndex as a TImageIndex
+  @param   AComment    as a TComment
+
+**)
+Constructor TSuperBar.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
+  AImageIndex: TImageIndex; AComment: TComment);
+
+Begin
+  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
+  FDateWidth := 7;
+  FLocationWidth := 100;
+End;
 
 End.

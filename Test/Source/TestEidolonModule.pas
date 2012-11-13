@@ -5138,7 +5138,7 @@ Var
 Begin
   Words := FEidolonModule.ReservedWords;
   CheckEquals('bar', Words[0]);
-  CheckEquals('triangle', Words[11]);
+  CheckEquals('triangle', Words[12]);
   For i := Low(Words) To Pred(High(Words)) Do
     Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
 End;

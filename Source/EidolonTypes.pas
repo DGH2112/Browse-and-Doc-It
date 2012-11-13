@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    30 Aug 2012
+  @Date    12 Nov 2012
   @Version 1.0
 
 **)
@@ -14,7 +14,7 @@ Interface
 Type
   (** An enumerate for the symbol types. **)
   TSymbolType = (tstRectangle, tstBar, tstLine, tstEllipse, tstTriangle,
-    tstDiamond);
+    tstDiamond, tstSuperBar);
 
   (** An enumerate to defined the Excel Colour Indexes **)
   TColour = (
@@ -193,7 +193,7 @@ Type
 Const
   (** A constant array of names for the enumerated symbols types. **)
   strSymbolTypes : Array[Low(TSymbolType)..High(TSymbolType)] Of String = (
-    'Rectangle', 'Bar', 'Line', 'Ellipse', 'Triangle', 'Diamond'
+    'Rectangle', 'Bar', 'Line', 'Ellipse', 'Triangle', 'Diamond', 'SuperBar'
   );
 
   (** A constant array providing names for the enumerated colours. **)

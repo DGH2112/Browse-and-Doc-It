@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       16 Apr 2011
+  @Date       12 Nov 2012
   @Author     David Hoyle
 
 **)
@@ -394,7 +394,7 @@ Implementation
 
     (** A constant array of shape types. **)
     ObjectType : Array [Low(TSymbolType)..High(TSymbolType)] Of String = (
-      'OBJECT', '', '', 'ELLIPSE', '', 'DIAMOND');
+      'OBJECT', '', '', 'ELLIPSE', '', 'DIAMOND', '');
 
   ResourceString
     (** A resource string for the settings node. **)

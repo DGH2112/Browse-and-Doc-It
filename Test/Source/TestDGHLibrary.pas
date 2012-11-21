@@ -10,17 +10,23 @@
 
 **)
 
-unit TestDGHLibrary;
+Unit TestDGHLibrary;
 
-interface
+Interface
 
-uses
-  TestFramework, Windows, SysUtils, Classes, Graphics, DGHLibrary;
-type
+Uses
+  TestFramework,
+  Windows,
+  SysUtils,
+  Classes,
+  Graphics,
+  DGHLibrary;
+
+Type
   TDGHTestCase = Class(TTestCase)
   Public
-    Procedure CheckEquals(dblExpected, dblActual, dblTolerance : Double;
-      strMsg : String = ''); Overload;
+    Procedure CheckEquals(dblExpected, dblActual, dblTolerance: Double;
+      strMsg: String = ''); Overload;
   End;
 
   TestApplicationFunctions = Class(TDGHTestCase)
@@ -41,6 +47,7 @@ type
     Procedure TestDMSAsDecToDecimal;
     Procedure TestExtractFileNameOnly;
     Procedure TestGetField;
+    Procedure TestSetField;
     Procedure TestGetVector;
     Procedure TestHexToBin;
     Procedure TestHexToDec;
@@ -62,298 +69,298 @@ type
 
   THStraightElementTestClass = Class(THStraightElement)
   Public
-    Function GetElementType : TElementType; Override;
-    Function GetStartPoint : THInfo; Override;
-    Function GetEndPoint : THInfo; Override;
-    Function GetStartChainage : Double; Override;
-    Function GetEndChainage : Double; Override;
-    Function GetRadius(dblChainage : Double) : Double; Override;
-    Function Setout(dblChainage, dblOffset : Double) : THInfo; Override;
-    Function Measure(dblEasting, dblNorthing : Double) : THInfo; Override;
-    Function Compare(dblEasting, dblNorthing, dblBearing : Double) : THCompInfo; Override;
-    Function GetElementDetails : THElement; Override;
+    Function GetElementType: TElementType; Override;
+    Function GetStartPoint: THInfo; Override;
+    Function GetEndPoint: THInfo; Override;
+    Function GetStartChainage: Double; Override;
+    Function GetEndChainage: Double; Override;
+    Function GetRadius(dblChainage: Double): Double; Override;
+    Function Setout(dblChainage, dblOffset: Double): THInfo; Override;
+    Function Measure(dblEasting, dblNorthing: Double): THInfo; Override;
+    Function Compare(dblEasting, dblNorthing, dblBearing: Double): THCompInfo; Override;
+    Function GetElementDetails: THElement; Override;
     Constructor Create(dblEasting, dblNorthing, dblBearing, dblChainage,
-      dblLength : Double); Override;
+      dblLength: Double); Override;
   End;
 
   // Test methods for class THStraightElement
 
-  TestTHStraightElement = class(TDGHTestCase)
-  private
+  TestTHStraightElement = Class(TDGHTestCase)
+  Private
     FHStraightElement: THStraightElementTestClass;
-  published
-    procedure TestElementType;
-    procedure TestGetRadius;
-    procedure TestSetout;
-    procedure TestMeasure;
-    procedure TestCompare;
-    procedure TestGetElementDetails;
-  end;
+  Published
+    Procedure TestElementType;
+    Procedure TestGetRadius;
+    Procedure TestSetout;
+    Procedure TestMeasure;
+    Procedure TestCompare;
+    Procedure TestGetElementDetails;
+  End;
   // Test methods for class THCircularElement
 
   THCircularElementTestClass = Class(THCircularElement)
   Public
-    Function GetElementType : TElementType; Override;
-    Function GetStartPoint : THInfo; Override;
-    Function GetEndPoint : THInfo; Override;
-    Function GetStartChainage : Double; Override;
-    Function GetEndChainage : Double; Override;
-    Function GetRadius(dblChainage : Double) : Double; Override;
-    Function Setout(dblChainage, dblOffset : Double) : THInfo; Override;
-    Function Measure(dblEasting, dblNorthing : Double) : THInfo; Override;
-    Function Compare(dblEasting, dblNorthing, dblBearing : Double) : THCompInfo; Override;
-    Function GetElementDetails : THElement; Override;
+    Function GetElementType: TElementType; Override;
+    Function GetStartPoint: THInfo; Override;
+    Function GetEndPoint: THInfo; Override;
+    Function GetStartChainage: Double; Override;
+    Function GetEndChainage: Double; Override;
+    Function GetRadius(dblChainage: Double): Double; Override;
+    Function Setout(dblChainage, dblOffset: Double): THInfo; Override;
+    Function Measure(dblEasting, dblNorthing: Double): THInfo; Override;
+    Function Compare(dblEasting, dblNorthing, dblBearing: Double): THCompInfo; Override;
+    Function GetElementDetails: THElement; Override;
     Constructor Create(dblEasting, dblNorthing, dblChainage, dblBearing,
-      dblLength, dblRadius : Double; bCentre : Boolean); Override;
+      dblLength, dblRadius: Double; bCentre: Boolean); Override;
   End;
 
-  TestTHCircularElement = class(TDGHTestCase)
-  private
+  TestTHCircularElement = Class(TDGHTestCase)
+  Private
     FHCircularElement: THCircularElementTestClass;
-  published
-    procedure TestElementType;
-    procedure TestGetRadius;
-    procedure TestSetout;
-    procedure TestMeasure;
-    procedure TestCompare;
-    procedure TestGetElementDetails;
-  end;
+  Published
+    Procedure TestElementType;
+    Procedure TestGetRadius;
+    Procedure TestSetout;
+    Procedure TestMeasure;
+    Procedure TestCompare;
+    Procedure TestGetElementDetails;
+  End;
 
   THClothoidElementTestClass = Class(THClothoidElement)
   Public
-    function GetX(dblDistance: Double): Double; override;
-    function GetY(dblDistance: Double): Double; override;
-    function GetTheta(dblDistance: Double): Double; override;
-    function Compare(dblEasting: Double; dblNorthing: Double;
-      dblBearing: Double): THCompInfo; override;
-    constructor Create(dblEasting, dblNorthing, dblChainage,
+    Function GetX(dblDistance: Double): Double; Override;
+    Function GetY(dblDistance: Double): Double; Override;
+    Function GetTheta(dblDistance: Double): Double; Override;
+    Function Compare(dblEasting: Double; dblNorthing: Double;
+      dblBearing: Double): THCompInfo; Override;
+    Constructor Create(dblEasting, dblNorthing, dblChainage,
       dblBearing, dblLength, dblStChainageOrRadius, dblRLValueOrEndRadius: Double;
-      boolFalse : Boolean); override;
-    function GetElementType: TElementType; override;
-    function GetEndChainage: Double; override;
-    function GetEndPoint: THInfo; override;
-    function GetRadius(dblChainage: Double): Double; override;
-    function GetStartChainage: Double; override;
-    function GetStartPoint: THInfo; override;
-    function Measure(dblEasting: Double; dblNorthing: Double): THInfo; override;
-    Function GetElementDetails : THElement; Override;
+      boolFalse: Boolean); Override;
+    Function GetElementType: TElementType; Override;
+    Function GetEndChainage: Double; Override;
+    Function GetEndPoint: THInfo; Override;
+    Function GetRadius(dblChainage: Double): Double; Override;
+    Function GetStartChainage: Double; Override;
+    Function GetStartPoint: THInfo; Override;
+    Function Measure(dblEasting: Double; dblNorthing: Double): THInfo; Override;
+    Function GetElementDetails: THElement; Override;
   End;
   // Test methods for class THClothoidElement
 
-  TestTHClothoidElement = class(TDGHTestCase)
-  private
+  TestTHClothoidElement = Class(TDGHTestCase)
+  Private
     FHClothoidElement: THClothoidElementTestClass;
-  published
+  Published
     Procedure TestGetX;
     Procedure TestGetY;
     Procedure TestGetTheta;
-    procedure TestElementType;
-    procedure TestSetout;
-    procedure TestMeasure;
-    procedure TestCompare;
-    procedure TestGetRadius;
-    procedure TestGetElementDetails;
-  end;
+    Procedure TestElementType;
+    Procedure TestSetout;
+    Procedure TestMeasure;
+    Procedure TestCompare;
+    Procedure TestGetRadius;
+    Procedure TestGetElementDetails;
+  End;
 
   TVStraightElementTestClass = Class(TVStraightElement)
   Public
-    function GetElementType: TElementType; override;
-    function GetEndChainage: Double; override;
-    function GetEndPoint: TVInfo; override;
-    function GetRadius(dblChainage: Double): Double; override;
-    function GetStartChainage: Double; override;
-    function GetStartPoint: TVInfo; override;
-    function Setout(dblChainage: Double): TVInfo; override;
+    Function GetElementType: TElementType; Override;
+    Function GetEndChainage: Double; Override;
+    Function GetEndPoint: TVInfo; Override;
+    Function GetRadius(dblChainage: Double): Double; Override;
+    Function GetStartChainage: Double; Override;
+    Function GetStartPoint: TVInfo; Override;
+    Function Setout(dblChainage: Double): TVInfo; Override;
   End;
 
   // Test methods for class TVStraightElement
 
-  TestTVStraightElement = class(TDGHTestCase)
-  private
+  TestTVStraightElement = Class(TDGHTestCase)
+  Private
     FVStraightElement: TVStraightElementTestClass;
-  public
-    procedure SetUp; override;
-    procedure TearDown; override;
-  published
-    procedure TestElementType;
-    procedure TestGetRadius;
-    procedure TestSetout;
-    procedure TestGetElementDetails;
-  end;
+  Public
+    Procedure SetUp; Override;
+    Procedure TearDown; Override;
+  Published
+    Procedure TestElementType;
+    Procedure TestGetRadius;
+    Procedure TestSetout;
+    Procedure TestGetElementDetails;
+  End;
 
   TVCircularElementTestClass = Class(TVCircularElement)
   Public
-    function GetElementType: TElementType; override;
-    function GetEndChainage: Double; override;
-    function GetEndPoint: TVInfo; override;
-    function GetRadius(dblChainage: Double): Double; override;
-    function GetStartChainage: Double; override;
-    function GetStartPoint: TVInfo; override;
-    function Setout(dblChainage: Double): TVInfo; override;
+    Function GetElementType: TElementType; Override;
+    Function GetEndChainage: Double; Override;
+    Function GetEndPoint: TVInfo; Override;
+    Function GetRadius(dblChainage: Double): Double; Override;
+    Function GetStartChainage: Double; Override;
+    Function GetStartPoint: TVInfo; Override;
+    Function Setout(dblChainage: Double): TVInfo; Override;
   End;
 
   // Test methods for class TVCircularElement
 
-  TestTVCircularElement = class(TDGHTestCase)
-  private
+  TestTVCircularElement = Class(TDGHTestCase)
+  Private
     FVCircularElement: TVCircularElementTestClass;
-  public
-    procedure SetUp; override;
-    procedure TearDown; override;
-  published
-    procedure TestElementType;
-    procedure TestGetRadius;
-    procedure TestSetout;
-    procedure TestGetElementDetails;
-  end;
+  Public
+    Procedure SetUp; Override;
+    Procedure TearDown; Override;
+  Published
+    Procedure TestElementType;
+    Procedure TestGetRadius;
+    Procedure TestSetout;
+    Procedure TestGetElementDetails;
+  End;
 
   // Test methods for class THAlignmentCollection
 
-  TestTHAlignmentCollection = class(TDGHTestCase)
-  private
+  TestTHAlignmentCollection = Class(TDGHTestCase)
+  Private
     FHAlignmentCollection: THAlignmentCollection;
-  published
-    procedure TestCount;
-    procedure TestElementType;
-    procedure TestGetElementStart;
-    procedure TestGetElementEnd;
-    procedure TestGetStartChainage;
-    procedure TestGetEndChainage;
-    procedure TestGetRadius;
-    procedure TestAddStraight;
-    procedure TestAddCircular;
-    procedure TestAddClothoid;
-    procedure TestAddClothoidFalse;
-    procedure TestUpdateStraight;
-    procedure TestUpdateCircular;
-    procedure TestUpdateClothoid;
-    procedure TestLoadFromFileSaveToFile;
-    procedure TestGetStraight;
-    procedure TestGetCircular;
-    procedure TestGetClothoid;
-    procedure TestStartChainage;
-    procedure TestEndChainage;
-    procedure TestClear;
-    procedure TestSetout;
-    procedure TestMeasure;
-    procedure TestCompare;
-  end;
+  Published
+    Procedure TestCount;
+    Procedure TestElementType;
+    Procedure TestGetElementStart;
+    Procedure TestGetElementEnd;
+    Procedure TestGetStartChainage;
+    Procedure TestGetEndChainage;
+    Procedure TestGetRadius;
+    Procedure TestAddStraight;
+    Procedure TestAddCircular;
+    Procedure TestAddClothoid;
+    Procedure TestAddClothoidFalse;
+    Procedure TestUpdateStraight;
+    Procedure TestUpdateCircular;
+    Procedure TestUpdateClothoid;
+    Procedure TestLoadFromFileSaveToFile;
+    Procedure TestGetStraight;
+    Procedure TestGetCircular;
+    Procedure TestGetClothoid;
+    Procedure TestStartChainage;
+    Procedure TestEndChainage;
+    Procedure TestClear;
+    Procedure TestSetout;
+    Procedure TestMeasure;
+    Procedure TestCompare;
+  End;
   // Test methods for class TVAlignmentCollection
 
-  TestTVAlignmentCollection = class(TDGHTestCase)
-  private
+  TestTVAlignmentCollection = Class(TDGHTestCase)
+  Private
     FVAlignmentCollection: TVAlignmentCollection;
-  published
-    procedure TestCount;
-    procedure TestElementType;
-    procedure TestGetElementStart;
-    procedure TestGetElementEnd;
-    procedure TestGetStartChainage;
-    procedure TestGetEndChainage;
-    procedure TestGetRadius;
-    procedure TestLoadFromFileSaveToFile;
-    procedure TestAddStraight;
-    procedure TestAddCircular;
-    procedure TestUpdateStraight;
-    procedure TestUpdateCircular;
-    procedure TestGetStraight;
-    procedure TestGetCircular;
-    procedure TestStartChainage;
-    procedure TestEndChainage;
-    procedure TestClear;
-    procedure TestSetout;
-  end;
+  Published
+    Procedure TestCount;
+    Procedure TestElementType;
+    Procedure TestGetElementStart;
+    Procedure TestGetElementEnd;
+    Procedure TestGetStartChainage;
+    Procedure TestGetEndChainage;
+    Procedure TestGetRadius;
+    Procedure TestLoadFromFileSaveToFile;
+    Procedure TestAddStraight;
+    Procedure TestAddCircular;
+    Procedure TestUpdateStraight;
+    Procedure TestUpdateCircular;
+    Procedure TestGetStraight;
+    Procedure TestGetCircular;
+    Procedure TestStartChainage;
+    Procedure TestEndChainage;
+    Procedure TestClear;
+    Procedure TestSetout;
+  End;
   // Test methods for class TStringAlignment
 
-  TestTStringAlignment = class(TDGHTestCase)
-  private
+  TestTStringAlignment = Class(TDGHTestCase)
+  Private
     FStringAlignment: TStringAlignment;
-  published
-    procedure TestSaveToFileLoadFromFile;
-    procedure TestClear;
-    procedure TestSetout;
-    procedure TestMeasure;
-    procedure TestCompare;
-  end;
+  Published
+    Procedure TestSaveToFileLoadFromFile;
+    Procedure TestClear;
+    Procedure TestSetout;
+    Procedure TestMeasure;
+    Procedure TestCompare;
+  End;
 
-implementation
+Implementation
 
 Uses
   Math;
 
 Const
-  iBearingTolerance = 0.0005;
+  iBearingTolerance    = 0.0005;
   iCoordinateTolerance = 0.001;
 
 { TDGHTestCase }
 
-procedure TDGHTestCase.CheckEquals(dblExpected, dblActual,
+Procedure TDGHTestCase.CheckEquals(dblExpected, dblActual,
   dblTolerance: Double; strMsg: String = '');
-begin
+Begin
   FCheckCalled := True;
   If Abs(dblExpected - dblActual) >= dblTolerance Then
     FailNotEquals(Format('%1.4f', [dblExpected]), Format('%1.4f', [dblActual]),
       Format('%s : Expected %1.4f, Actual %1.4f (Delta %1.4f)',
       [strMsg, dblExpected, dblActual, Abs(dblExpected - dblActual)]),
       CallerAddr);
-end;
+End;
 
 { TestExportedFunctions }
 
-procedure TestApplicationFunctions.TestAdjustBearing;
+Procedure TestApplicationFunctions.TestAdjustBearing;
 
 Var
-  dblBearing, dblNewBearing : Double;
+  dblBearing, dblNewBearing: Double;
 
-begin
-  dblBearing := -45;
+Begin
+  dblBearing    := -45;
   dblNewBearing := AdjustBearing(dblBearing);
   CheckEquals(315, dblNewBearing, iBearingTolerance, 'Less Than 0');
-  dblBearing := 45;
+  dblBearing    := 45;
   dblNewBearing := AdjustBearing(dblBearing);
   CheckEquals(45, dblNewBearing, iBearingTolerance, 'Between 0 and 360');
-  dblBearing := 445;
+  dblBearing    := 445;
   dblNewBearing := AdjustBearing(dblBearing);
   CheckEquals(85, dblNewBearing, iBearingTolerance, 'Greater Than 360');
-end;
+End;
 
-procedure TestApplicationFunctions.TestBearingToString;
+Procedure TestApplicationFunctions.TestBearingToString;
 
 Var
-  recBearing : TBearing;
+  recBearing: TBearing;
 
-begin
-  recBearing.iDegrees := 12;
-  recBearing.iMinutes := 34;
-  recBearing.iSeconds := 56;
+Begin
+  recBearing.iDegrees  := 12;
+  recBearing.iMinutes  := 34;
+  recBearing.iSeconds  := 56;
   recBearing.iHundreds := 78;
   CheckEquals('12° 34'' 56.78"', BearingToString(recBearing));
-end;
+End;
 
-procedure TestApplicationFunctions.TestBinToDec;
+Procedure TestApplicationFunctions.TestBinToDec;
 
-begin
+Begin
   CheckEquals('27', BinToDec('011011'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestBinToHex;
-begin
+Procedure TestApplicationFunctions.TestBinToHex;
+Begin
   CheckEquals('1B', BinToHex('011011'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestBinToOct;
-begin
+Procedure TestApplicationFunctions.TestBinToOct;
+Begin
   CheckEquals('33', BinToOct('011011'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestCalcColour;
+Procedure TestApplicationFunctions.TestCalcColour;
 
 Const
-  iLow    : TColor = $0000FF;
-  iMiddle : TColor = $FF0000;
-  iHigh   : TColor = $00FF00;
+  iLow: TColor    = $0000FF;
+  iMiddle: TColor = $FF0000;
+  iHigh: TColor   = $00FF00;
 
-begin
+Begin
   CheckEquals($0000FF, CalcColour(05, 10, 50, 90, iLow, iMiddle, iHigh), 'CalcColour 1');
   CheckEquals($0000FF, CalcColour(10, 10, 50, 90, iLow, iMiddle, iHigh), 'CalcColour 2');
   CheckEquals($7F0080, CalcColour(30, 10, 50, 90, iLow, iMiddle, iHigh), 'CalcColour 3');
@@ -361,101 +368,103 @@ begin
   CheckEquals($7F7F00, CalcColour(70, 10, 50, 90, iLow, iMiddle, iHigh), 'CalcColour 5');
   CheckEquals($00FF00, CalcColour(90, 10, 50, 90, iLow, iMiddle, iHigh), 'CalcColour 6');
   CheckEquals($00FF00, CalcColour(95, 10, 50, 90, iLow, iMiddle, iHigh), 'CalcColour 7');
-end;
+End;
 
-procedure TestApplicationFunctions.TestCapitalise;
-begin
+Procedure TestApplicationFunctions.TestCapitalise;
+Begin
   CheckEquals('Capitalise This Sentence!', Capitalise('capitalise this sentence!'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestCharCount;
-begin
+Procedure TestApplicationFunctions.TestCharCount;
+Begin
   CheckEquals(4, CharCount(',', 'First,Second,Third,Fourth,Fifth'));
   CheckEquals(4, CharCount(',', '"First,Second",Third,"Fourth,Fifth"'));
   CheckEquals(4, CharCount(',', 'First,"Second,Third",Fourth,Fifth'));
   CheckEquals(2, CharCount(',', '"First,Second",Third,"Fourth,Fifth"', False));
   CheckEquals(3, CharCount(',', 'First,"Second,Third",Fourth,Fifth', False));
-end;
+End;
 
-procedure TestApplicationFunctions.TestConvertDate;
-begin
-  CheckEquals(EncodeDate(2007,01,07) + EncodeTime(12,34,56,0), ConvertDate('07 Jan 2007 12:34:56'), iBearingTolerance);
-end;
+Procedure TestApplicationFunctions.TestConvertDate;
+Begin
+  CheckEquals(EncodeDate(2007, 01, 07) + EncodeTime(12, 34, 56, 0),
+    ConvertDate('07 Jan 2007 12:34:56'), iBearingTolerance);
+End;
 
-procedure TestApplicationFunctions.TestDecimalToDMS;
+Procedure TestApplicationFunctions.TestDecimalToDMS;
 
 Var
-  R : TBearing;
+  R: TBearing;
 
-begin
+Begin
   R := DecimalToDMS(123.456789);
   CheckEquals(123, R.iDegrees, 'Degrees');
   CheckEquals(27, R.iMinutes, 'Minutes');
   CheckEquals(24, R.iSeconds, 'Seconds');
   CheckEquals(44, R.iHundreds, 'Hundreds');
-end;
+End;
 
-procedure TestApplicationFunctions.TestDecToBin;
-begin
+Procedure TestApplicationFunctions.TestDecToBin;
+Begin
   CheckEquals('11011', DecToBin('27'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestDecToHex;
-begin
+Procedure TestApplicationFunctions.TestDecToHex;
+Begin
   CheckEquals('1B', DecToHex('27'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestDecToOct;
-begin
+Procedure TestApplicationFunctions.TestDecToOct;
+Begin
   CheckEquals('33', DecToOct('27'));
-end;
+End;
 
 Type
   TDGHCreateProcessHandler = Class
   Strict Private
-    FOutput : TStringList;
+    FOutput: TStringList;
   Strict Protected
   Public
-    Constructor Create(Output : TStringList);
-    procedure IdleHandler;
-    procedure ProcessMsgHandler(strMsg: string; var boolAbort: Boolean);
-    Property Output : TStringList Read FOutput;
+    Constructor Create(Output: TStringList);
+    Procedure IdleHandler;
+    Procedure ProcessMsgHandler(strMsg: String; Var boolAbort: Boolean);
+    Property Output: TStringList Read FOutput;
   End;
 
 { TDGHCreateProcessHandler }
 
-constructor TDGHCreateProcessHandler.Create(Output : TStringList);
-begin
+Constructor TDGHCreateProcessHandler.Create(Output: TStringList);
+Begin
   FOutput := Output;
-end;
+End;
 
-procedure TDGHCreateProcessHandler.IdleHandler;
-begin
+Procedure TDGHCreateProcessHandler.IdleHandler;
+Begin
   // Do nothing;
-end;
+End;
 
-procedure TDGHCreateProcessHandler.ProcessMsgHandler(strMsg: string;
-  var boolAbort: Boolean);
-begin
+Procedure TDGHCreateProcessHandler.ProcessMsgHandler(strMsg: String;
+  Var boolAbort: Boolean);
+Begin
   FOutput.Add(strMsg);
-end;
+End;
 
-procedure TestApplicationFunctions.TestDGHCreateProcess;
+Procedure TestApplicationFunctions.TestDGHCreateProcess;
 
 Var
-  Process : TProcessInfo;
-  ProcMsgHndr : TDGHCreateProcessHandler;
-  iResult : Integer;
-  slLines : TStringList;
-  strDrive: String;
+  Process    : TProcessInfo;
+  ProcMsgHndr: TDGHCreateProcessHandler;
+  iResult    : Integer;
+  slLines    : TStringList;
+  strDrive   : String;
 
-begin
-  strDrive := ExtractFileDrive(ParamStr(0));
+Begin
+  strDrive            := ExtractFileDrive(ParamStr(0));
   Process.boolEnabled := True;
-  Process.strEXE := strDrive + '\HoylD\Borland Studio Projects\Library\Test\SuccessConsoleApp.exe';
+  Process.strEXE      := strDrive +
+    '\HoylD\Borland Studio Projects\Library\Test\SuccessConsoleApp.exe';
   Process.strParams := '';
-  Process.strDir := strDrive + '\HoylD\Borland Studio Projects\Library\Test\';
-  slLines := TStringList.Create;
+  Process.strDir    := strDrive + '\HoylD\Borland Studio Projects\Library\Test\';
+  slLines           := TStringList.Create;
   Try
     ProcMsgHndr := TDGHCreateProcessHandler.Create(slLines);
     Try
@@ -466,7 +475,8 @@ begin
       CheckEquals('This allocation runs successfully and', ProcMsgHndr.Output[0]);
       CheckEquals('returns an ERRORLEVEL = 0.', ProcMsgHndr.Output[1]);
       slLines.Clear;
-      Process.strEXE := strDrive + '\HoylD\Borland Studio Projects\Library\Test\FailureConsoleApp.exe';
+      Process.strEXE := strDrive +
+        '\HoylD\Borland Studio Projects\Library\Test\FailureConsoleApp.exe';
       iResult := DGHCreateProcess(Process, ProcMsgHndr.ProcessMsgHandler,
         ProcMsgHndr.IdleHandler);
       CheckEquals(1, iResult, 'SuccessConsoleApp ERRORLEVEL');
@@ -479,14 +489,14 @@ begin
   Finally
     slLines.Free;
   End;
-end;
+End;
 
-procedure TestApplicationFunctions.TestDGHFindOnPath;
+Procedure TestApplicationFunctions.TestDGHFindOnPath;
 
-var
+Var
   strFileName: String;
 
-begin
+Begin
   strFileName := 'notepad.exe';
   Check(DGHFindOnPath(strFileName, ''), 'Check for notepad.exe');
   CheckEquals('C:\Windows\system32\notepad.exe', strFileName);
@@ -496,55 +506,71 @@ begin
   strFileName := 'cmd.exe';
   Check(DGHFindOnPath(strFileName, ''), 'Check for cmd.exe');
   CheckEquals('C:\Windows\system32\cmd.exe', strFileName);
-end;
+End;
 
-procedure TestApplicationFunctions.TestDGHPathRelativePathTo;
+Procedure TestApplicationFunctions.TestDGHPathRelativePathTo;
 
 Var
-  strFile : String;
+  strFile: String;
 
-begin
-  strFile := 'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
+Begin
+  strFile :=
+    'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
   CheckEquals(True, DGHPathRelativePathTo('E:\Hoyld\Borland Studio Projects\', strFile));
-  CheckEquals('IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+  CheckEquals
+    ('IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
 
-  strFile := 'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
-  CheckEquals(True, DGHPathRelativePathTo('E:\Hoyld\Borland Studio Projects\Library\', strFile));
-  CheckEquals('..\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+  strFile :=
+    'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
+  CheckEquals(True, DGHPathRelativePathTo('E:\Hoyld\Borland Studio Projects\Library\',
+    strFile));
+  CheckEquals
+    ('..\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
 
-  strFile := 'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
-  CheckEquals(True, DGHPathRelativePathTo('E:\Hoyld\borland studio projects\Library\Tests\', strFile));
-  CheckEquals('..\..\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+  strFile :=
+    'E:\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
+  CheckEquals(True, DGHPathRelativePathTo
+    ('E:\Hoyld\borland studio projects\Library\Tests\', strFile));
+  CheckEquals
+    ('..\..\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas',
+    strFile);
 
   strFile := 'TestingHelperWizard.pas';
   CheckEquals(False, DGHPathRelativePathTo('E:\Hoyld\borland studio projects\', strFile));
   CheckEquals('TestingHelperWizard.pas', strFile);
 
-  strFile := '\\CJVRUG1\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
-  CheckEquals(True, DGHPathRelativePathTo('\\CJVRUG1\Grouped\Hoyld\borland studio projects\', strFile));
-  CheckEquals('IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
+  strFile :=
+    '\\CJVRUG1\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
+  CheckEquals(True, DGHPathRelativePathTo
+    ('\\CJVRUG1\Grouped\Hoyld\borland studio projects\', strFile));
+  CheckEquals
+    ('IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
 
-  strFile := '\\CJVRUG2\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
-  CheckEquals(False, DGHPathRelativePathTo('\\CJVRUG1\Grouped\Hoyld\borland studio projects\', strFile));
-  CheckEquals('\\CJVRUG2\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas', strFile);
-end;
+  strFile :=
+    '\\CJVRUG2\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas';
+  CheckEquals(False, DGHPathRelativePathTo
+    ('\\CJVRUG1\Grouped\Hoyld\borland studio projects\', strFile));
+  CheckEquals
+    ('\\CJVRUG2\Grouped\Hoyld\Borland Studio Projects\IDE Addins\Integrated Testing Helper\Source\TestingHelperWizard.pas',
+    strFile);
+End;
 
-procedure TestApplicationFunctions.TestDMSAsDecToDecimal;
-begin
+Procedure TestApplicationFunctions.TestDMSAsDecToDecimal;
+Begin
   CheckEquals(123.456789, DMSAsDecToDecimal(123.272444), iBearingTolerance);
-end;
+End;
 
-procedure TestApplicationFunctions.TestDMSToDecimal;
-begin
+Procedure TestApplicationFunctions.TestDMSToDecimal;
+Begin
   CheckEquals(123.456789, DMSToDecimal('123° 27'' 24.44"'), iBearingTolerance);
-end;
+End;
 
-procedure TestApplicationFunctions.TestEvaluateEquation;
+Procedure TestApplicationFunctions.TestEvaluateEquation;
 
 Var
-  dblResult : Double;
+  dblResult: Double;
 
-begin
+Begin
   dblResult := EvaluateEquation('1+2/3-4*5');
   CheckEquals(-18.333333, dblResult, 0.00001, 'BODMAS1');
   dblResult := EvaluateEquation('1+2/(3-4*5)');
@@ -607,7 +633,7 @@ begin
   CheckEquals(108, dblResult, 0.00001, 'SHL');
   dblResult := EvaluateEquation('SHR(108,2)'); // 1101100 SHR(2) 00110110
   CheckEquals(27, dblResult, 0.00001, 'SHR');
-end;
+End;
 
 Procedure TestApplicationFunctions.TestLike;
 
@@ -615,43 +641,45 @@ Const
   strText = 'Mary had a little lamb';
 
 Begin
-  Check(    Like('mary*', strText), '1');
+  Check(Like('mary*', strText), '1');
   Check(Not Like('mry*', strText), '2');
-  Check(    Like('*lamb', strText), '3');
+  Check(Like('*lamb', strText), '3');
   Check(Not Like('*lmb', strText), '4');
-  Check(    Like('*little*', strText), '5');
+  Check(Like('*little*', strText), '5');
   Check(Not Like('*litle*', strText), '6');
-  Check(    Like('*had*little*', strText), '7');
+  Check(Like('*had*little*', strText), '7');
   Check(Not Like('*had*litle*', strText), '8');
   Check(Not Like('*little*had*', strText), '9');
-  Check(    Like('*library*testprojectdll*;*', 'Library TestProjectDLL;'), '10');
-  Check(    Like('*', ''));
-  Check(    Like('*', strText));
+  Check(Like('*library*testprojectdll*;*', 'Library TestProjectDLL;'), '10');
+  Check(Like('*', ''));
+  Check(Like('*', strText));
 End;
 
-procedure TestApplicationFunctions.TestExtractFileNameOnly;
-begin
+Procedure TestApplicationFunctions.TestExtractFileNameOnly;
+Begin
   CheckEquals('FileName', ExtractFileNameOnly('C:\Folder\FileName.Ext'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestGetField;
-begin
+Procedure TestApplicationFunctions.TestGetField;
+Begin
   CheckEquals('First', GetField('First,Second,Third,Fourth,Fifth', ',', 1), 'First');
   CheckEquals('Third', GetField('First,Second,Third,Fourth,Fifth', ',', 3), 'Third');
   CheckEquals('Fifth', GetField('First,Second,Third,Fourth,Fifth', ',', 5), 'Third');
 
   CheckEquals('Third', GetField('"First,Second",Third,"Fourth,Fifth"', ',', 3), 'Fourth');
-  CheckEquals('"Fourth,Fifth"', GetField('"First,Second",Third,"Fourth,Fifth"', ',', 3, False), 'Fifth');
+  CheckEquals('"Fourth,Fifth"', GetField('"First,Second",Third,"Fourth,Fifth"', ',', 3,
+    False), 'Fifth');
   CheckEquals('Third"', GetField('First,"Second,Third",Fourth,Fifth"', ',', 3), 'Sixth');
-  CheckEquals('Fourth', GetField('First,"Second,Third",Fourth,Fifth"', ',', 3, False), 'Seventh');
-end;
+  CheckEquals('Fourth', GetField('First,"Second,Third",Fourth,Fifth"', ',', 3, False),
+    'Seventh');
+End;
 
-procedure TestApplicationFunctions.TestGetVector;
+Procedure TestApplicationFunctions.TestGetVector;
 
 Var
-  V : TVector;
+  V: TVector;
 
-begin
+Begin
   V := GetVector(0, 0, 3, 4);
   CheckEquals(36.8698, V.dblBearing, iBearingTolerance, 'Bearing');
   CheckEquals(5, V.dblDistance, iBearingTolerance, 'Distance');
@@ -664,27 +692,27 @@ begin
   V := GetVector(0, 0, -3, 4);
   CheckEquals(-36.8698, V.dblBearing, iBearingTolerance, 'Bearing');
   CheckEquals(5, V.dblDistance, iBearingTolerance, 'Distance');
-end;
+End;
 
-procedure TestApplicationFunctions.TestHexToBin;
-begin
+Procedure TestApplicationFunctions.TestHexToBin;
+Begin
   CheckEquals('11011', HexToBin('1B'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestHexToDec;
-begin
+Procedure TestApplicationFunctions.TestHexToDec;
+Begin
   CheckEquals('27', HexToDec('1B'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestHexToOct;
-begin
+Procedure TestApplicationFunctions.TestHexToOct;
+Begin
   CheckEquals('33', HexToOct('1B'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestIsKeyWord;
+Procedure TestApplicationFunctions.TestIsKeyWord;
 
 Const
-  strValues : Array[1..10] Of String = (
+  strValues: Array [1 .. 10] Of String = (
     'eighth',
     'fifth',
     'first',
@@ -695,57 +723,73 @@ Const
     'sixth',
     'tenth',
     'third'
-  );
-begin
+    );
+Begin
   Check(IsKeyWord('Eighth', strValues), 'Eighth = true');
   Check(IsKeyWord('Fourth', strValues), 'Fourth = true');
   Check(IsKeyWord('Third', strValues), 'Third = true');
   Check(Not IsKeyWord('Eleventh', strValues), 'Eleventh = false');
-end;
+End;
 
-procedure TestApplicationFunctions.TestOctToBin;
-begin
+Procedure TestApplicationFunctions.TestOctToBin;
+Begin
   CheckEquals('11011', OctToBin('33'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestOctToDec;
-begin
+Procedure TestApplicationFunctions.TestOctToDec;
+Begin
   CheckEquals('27', OctToDec('33'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestOctToHex;
-begin
+Procedure TestApplicationFunctions.TestOctToHex;
+Begin
   CheckEquals('1B', OctToHex('33'));
-end;
+End;
 
-procedure TestApplicationFunctions.TestPosOfNthChar;
-begin
+Procedure TestApplicationFunctions.TestPosOfNthChar;
+Begin
   CheckEquals(19, PosOfNthChar('First,Second,Third,Fourth,Fifth', ',', 3));
   CheckEquals(21, PosOfNthChar('"First,Second",Third,"Fourth,Fifth"', ',', 3));
   CheckEquals(21, PosOfNthChar('First,"Second,Third",Fourth,Fifth"', ',', 3));
   CheckEquals(21, PosOfNthChar('"First,Second",Third,"Fourth,Fifth"', ',', 2, False));
   CheckEquals(21, PosOfNthChar('First,"Second,Third",Fourth,Fifth"', ',', 2, False));
-end;
+End;
 
-procedure TestApplicationFunctions.TestPow;
-begin
+Procedure TestApplicationFunctions.TestPow;
+Begin
   CheckEquals(1292304.6121, Pow(12.34, 5.6), iBearingTolerance);
-end;
+End;
 
-procedure TestApplicationFunctions.TestReduceBearing;
-begin
+Procedure TestApplicationFunctions.TestReduceBearing;
+Begin
   CheckEquals(45, ReduceBearing(45), iBearingTolerance, '45');
   CheckEquals(135, ReduceBearing(135), iBearingTolerance, '135');
   CheckEquals(-135, ReduceBearing(225), iBearingTolerance, '225');
   CheckEquals(-45, ReduceBearing(315), iBearingTolerance, '315');
-end;
+End;
 
-procedure TestTHStraightElement.TestElementType;
+Procedure TestApplicationFunctions.TestSetField;
 
-var
+Var
+  strFields : String;
+
+Begin
+  strFields := 'First,Second,Third,Fourth';
+  CheckEquals('New', SetField('First', ',', 1, 'New'));
+  CheckEquals('New,Second,Third,Fourth', SetField(strFields, ',', 1, 'New'));
+  CheckEquals('First,New,Third,Fourth', SetField(strFields, ',', 2, 'New'));
+  CheckEquals('First,Second,New,Fourth', SetField(strFields, ',', 3, 'New'));
+  CheckEquals('First,Second,Third,New', SetField(strFields, ',', 4, 'New'));
+  CheckEquals('First,Second,Third,Fourth,New', SetField(strFields, ',', 5, 'New'));
+  CheckEquals('First,Second,Third,Fourth,,New', SetField(strFields, ',', 6, 'New'));
+End;
+
+Procedure TestTHStraightElement.TestElementType;
+
+Var
   ReturnValue: TElementType;
 
-begin
+Begin
   FHStraightElement := THStraightElementTestClass.Create(0, 0, 0, 0, 100);
   Try
     ReturnValue := FHStraightElement.GetElementType;
@@ -753,15 +797,15 @@ begin
   Finally
     FHStraightElement.Free;
   End;
-end;
+End;
 
-procedure TestTHStraightElement.TestGetRadius;
+Procedure TestTHStraightElement.TestGetRadius;
 
-var
+Var
   ReturnValue: Double;
   dblChainage: Double;
 
-begin
+Begin
   FHStraightElement := THStraightElementTestClass.Create(0, 0, 0, 0, 100);
   Try
     dblChainage := FHStraightElement.GetStartChainage + 10;
@@ -770,27 +814,27 @@ begin
   Finally
     FHStraightElement.Free;
   End;
-end;
+End;
 
-procedure TestTHStraightElement.TestSetout;
+Procedure TestTHStraightElement.TestSetout;
 
-var
+Var
   ReturnValue: THInfo;
-  dblOffset: Double;
+  dblOffset  : Double;
   dblChainage: Double;
 
-begin
+Begin
   FHStraightElement := THStraightElementTestClass.Create(12345.678, 23456.789,
     54.3678, 100, 100);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHStraightElement.Setout(dblChainage, dblOffset);
     CheckEquals(12370.187, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23462.859, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(54.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHStraightElement.Setout(dblChainage, dblOffset);
     CheckEquals(12366.580, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23486.960, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -802,13 +846,13 @@ begin
     144.3678, 100, 100);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHStraightElement.Setout(dblChainage, dblOffset);
     CheckEquals(12351.748, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23432.280, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(144.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHStraightElement.Setout(dblChainage, dblOffset);
     CheckEquals(12375.849, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23435.887, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -820,13 +864,13 @@ begin
     234.3678, 100, 100);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHStraightElement.Setout(dblChainage, dblOffset);
     CheckEquals(12321.169, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23450.719, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(234.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHStraightElement.Setout(dblChainage, dblOffset);
     CheckEquals(12324.776, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23426.618, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -838,13 +882,13 @@ begin
     324.3678, 100, 100);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHStraightElement.Setout(dblChainage, dblOffset);
     CheckEquals(12339.608, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23481.298, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(324.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHStraightElement.Setout(dblChainage, dblOffset);
     CheckEquals(12315.507, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23477.691, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -852,26 +896,26 @@ begin
   Finally
     FHStraightElement.Free;
   End;
-end;
+End;
 
-procedure TestTHStraightElement.TestMeasure;
+Procedure TestTHStraightElement.TestMeasure;
 
-var
+Var
   ReturnValue: THInfo;
   dblNorthing: Double;
-  dblEasting: Double;
+  dblEasting : Double;
 
-begin
+Begin
   FHStraightElement := THStraightElementTestClass.Create(12345.678, 23456.789,
     54.3678, 100, 100);
   Try
-    dblEasting := 12370.187;
+    dblEasting  := 12370.187;
     dblNorthing := 23462.859;
     ReturnValue := FHStraightElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(54.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12366.580;
+    dblEasting  := 12366.580;
     dblNorthing := 23486.960;
     ReturnValue := FHStraightElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -883,13 +927,13 @@ begin
   FHStraightElement := THStraightElementTestClass.Create(12345.678, 23456.789,
     144.3678, 100, 100);
   Try
-    dblEasting := 12351.748;
+    dblEasting  := 12351.748;
     dblNorthing := 23432.280;
     ReturnValue := FHStraightElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(144.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12375.849;
+    dblEasting  := 12375.849;
     dblNorthing := 23435.887;
     ReturnValue := FHStraightElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -901,13 +945,13 @@ begin
   FHStraightElement := THStraightElementTestClass.Create(12345.678, 23456.789,
     234.3678, 100, 100);
   Try
-    dblEasting := 12321.169;
+    dblEasting  := 12321.169;
     dblNorthing := 23450.719;
     ReturnValue := FHStraightElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(234.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12324.776;
+    dblEasting  := 12324.776;
     dblNorthing := 23426.618;
     ReturnValue := FHStraightElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -919,13 +963,13 @@ begin
   FHStraightElement := THStraightElementTestClass.Create(12345.678, 23456.789,
     324.3678, 100, 100);
   Try
-    dblEasting := 12339.608;
+    dblEasting  := 12339.608;
     dblNorthing := 23481.298;
     ReturnValue := FHStraightElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(324.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12315.507;
+    dblEasting  := 12315.507;
     dblNorthing := 23477.691;
     ReturnValue := FHStraightElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -934,30 +978,30 @@ begin
   Finally
     FHStraightElement.Free;
   End;
-end;
+End;
 
-procedure TestTHStraightElement.TestCompare;
-var
+Procedure TestTHStraightElement.TestCompare;
+Var
   ReturnValue: THCompInfo;
-  dblBearing: Double;
+  dblBearing : Double;
   dblNorthing: Double;
-  dblEasting: Double;
-begin
+  dblEasting : Double;
+Begin
   FHStraightElement := THStraightElementTestClass.Create(12345.678, 23456.789,
     54.3678, 100, 100);
   Try
-    dblEasting := 12386.005;
+    dblEasting  := 12386.005;
     dblNorthing := 23476.970;
-    dblBearing := 122.2643;
+    dblBearing  := 122.2643;
     ReturnValue := FHStraightElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12379.533, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23481.056, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(54.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12348.425;
+    dblEasting  := 12348.425;
     dblNorthing := 23476.251;
-    dblBearing := 122.2643;
+    dblBearing  := 122.2643;
     ReturnValue := FHStraightElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.401, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23468.059, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -970,18 +1014,18 @@ begin
   FHStraightElement := THStraightElementTestClass.Create(12345.678, 23456.789,
     144.3678, 100, 100);
   Try
-    dblEasting := 12365.859;
+    dblEasting  := 12365.859;
     dblNorthing := 23416.462;
-    dblBearing := 212.2643;
+    dblBearing  := 212.2643;
     ReturnValue := FHStraightElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12369.945, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23422.934, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(144.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12365.140;
+    dblEasting  := 12365.140;
     dblNorthing := 23454.042;
-    dblBearing := 212.2643;
+    dblBearing  := 212.2643;
     ReturnValue := FHStraightElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12356.948, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23441.066, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -994,18 +1038,18 @@ begin
   FHStraightElement := THStraightElementTestClass.Create(12345.678, 23456.789,
     234.3678, 100, 100);
   Try
-    dblEasting := 12305.351;
+    dblEasting  := 12305.351;
     dblNorthing := 23436.608;
-    dblBearing := 302.2643;
+    dblBearing  := 302.2643;
     ReturnValue := FHStraightElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12311.823, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23432.522, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(234.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12342.931;
+    dblEasting  := 12342.931;
     dblNorthing := 23437.327;
-    dblBearing := 302.2643;
+    dblBearing  := 302.2643;
     ReturnValue := FHStraightElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12329.955, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23445.519, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1018,18 +1062,18 @@ begin
   FHStraightElement := THStraightElementTestClass.Create(12345.678, 23456.789,
     324.3678, 100, 100);
   Try
-    dblEasting := 12325.497;
+    dblEasting  := 12325.497;
     dblNorthing := 23497.116;
-    dblBearing := 32.2643;
+    dblBearing  := 32.2643;
     ReturnValue := FHStraightElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12321.411, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23490.644, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(324.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12326.216;
+    dblEasting  := 12326.216;
     dblNorthing := 23459.536;
-    dblBearing := 32.2643;
+    dblBearing  := 32.2643;
     ReturnValue := FHStraightElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12334.408, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23472.512, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1039,12 +1083,12 @@ begin
   Finally
     FHStraightElement.Free;
   End;
-end;
+End;
 
-procedure TestTHStraightElement.TestGetElementDetails;
-var
+Procedure TestTHStraightElement.TestGetElementDetails;
+Var
   ReturnValue: THElement;
-begin
+Begin
   FHStraightElement := THStraightElementTestClass.Create(12345.678, 23456.789,
     123.456789, 100, 100);
   Try
@@ -1057,15 +1101,15 @@ begin
   Finally
     FHStraightElement.Free;
   End;
-end;
+End;
 
-procedure TestTHCircularElement.TestElementType;
+Procedure TestTHCircularElement.TestElementType;
 
-var
+Var
   ReturnValue: TElementType;
 
-begin
-  FHCircularElement := THCircularElementTestClass.Create(12345,678, 23456.789,
+Begin
+  FHCircularElement := THCircularElementTestClass.Create(12345, 678, 23456.789,
     54.3678, 100, 1000, False);
   Try
     ReturnValue := FHCircularElement.GetElementType;
@@ -1073,16 +1117,16 @@ begin
   Finally
     FHCircularElement.Free;
   End;
-end;
+End;
 
-procedure TestTHCircularElement.TestGetRadius;
+Procedure TestTHCircularElement.TestGetRadius;
 
-var
+Var
   ReturnValue: Double;
   dblChainage: Double;
 
-begin
-  FHCircularElement := THCircularElementTestClass.Create(12345,678, 23456.789,
+Begin
+  FHCircularElement := THCircularElementTestClass.Create(12345, 678, 23456.789,
     54.3678, 100, 1000, False);
   Try
     dblChainage := 150;
@@ -1091,27 +1135,27 @@ begin
   Finally
     FHCircularElement.Free;
   End;
-end;
+End;
 
-procedure TestTHCircularElement.TestSetout;
+Procedure TestTHCircularElement.TestSetout;
 
-var
+Var
   ReturnValue: THInfo;
-  dblOffset: Double;
+  dblOffset  : Double;
   dblChainage: Double;
 
-begin
+Begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 54.3678, 100, 1000, False);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12370.165, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23462.508, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(55.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12367.274, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23486.713, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1123,13 +1167,13 @@ begin
     12345.678, 23456.789, 100, 144.3678, 100, 1000, False);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12351.397, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23432.302, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(145.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12375.602, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23435.193, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1141,13 +1185,13 @@ begin
     12345.678, 23456.789, 100, 234.3678, 100, 1000, False);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12321.191, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23451.070, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(235.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12324.082, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23426.865, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1159,13 +1203,13 @@ begin
     12345.678, 23456.789, 100, 324.3678, 100, 1000, False);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12339.959, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23481.276, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(325.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12315.754, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23478.385, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1177,13 +1221,13 @@ begin
     12345.678, 23456.789, 100, 54.3678, 100, -1000, False);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12370.201, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23463.211, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(53.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12365.884, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23487.187, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1195,13 +1239,13 @@ begin
     12345.678, 23456.789, 100, 144.3678, 100, -1000, False);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12352.100, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23432.266, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(143.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12376.076, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23436.583, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1213,13 +1257,13 @@ begin
     12345.678, 23456.789, 100, 234.3678, 100, -1000, False);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12321.155, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23450.367, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(233.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12325.472, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23426.391, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1231,13 +1275,13 @@ begin
     12345.678, 23456.789, 100, 324.3678, 100, -1000, False);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12339.256, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23481.312, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(323.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12315.280, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23476.995, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1250,13 +1294,13 @@ begin
     12928.258, 22644.016, 100, 54.3678, 100, 1000, True);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12370.165, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23462.508, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(55.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12367.274, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23486.713, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1268,13 +1312,13 @@ begin
     11532.905, 22874.209, 100, 144.3678, 100, 1000, True);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12351.397, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23432.302, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(145.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12375.602, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23435.193, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1286,13 +1330,13 @@ begin
     11763.098, 24269.562, 100, 234.3678, 100, 1000, True);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12321.191, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23451.070, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(235.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12324.082, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23426.865, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1304,13 +1348,13 @@ begin
     13158.451, 24039.369, 100, 324.3678, 100, 1000, True);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12339.959, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23481.276, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(325.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12315.754, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23478.385, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1322,13 +1366,13 @@ begin
     11763.098, 24269.562, 100, 54.3678, 100, -1000, True);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12370.201, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23463.211, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(53.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12365.884, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23487.187, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1340,13 +1384,13 @@ begin
     13158.451, 24039.369, 100, 144.3678, 100, -1000, True);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12352.100, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23432.266, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(143.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12376.076, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23436.583, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1358,13 +1402,13 @@ begin
     12928.258, 22644.016, 100, 234.3678, 100, -1000, True);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12321.155, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23450.367, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(233.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12325.472, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23426.391, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1376,13 +1420,13 @@ begin
     11532.905, 22874.209, 100, 324.3678, 100, -1000, True);
   Try
     dblChainage := 123.456;
-    dblOffset := 9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12339.256, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23481.312, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(323.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset := -12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHCircularElement.Setout(dblChainage, dblOffset);
     CheckEquals(12315.280, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23476.995, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1390,26 +1434,26 @@ begin
   Finally
     FHCircularElement.Free;
   End;
-end;
+End;
 
-procedure TestTHCircularElement.TestMeasure;
+Procedure TestTHCircularElement.TestMeasure;
 
-var
+Var
   ReturnValue: THInfo;
   dblNorthing: Double;
-  dblEasting: Double;
+  dblEasting : Double;
 
-begin
+Begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 54.3678, 100, 1000, False);
   Try
-    dblEasting := 12370.165;
+    dblEasting  := 12370.165;
     dblNorthing := 23462.508;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(55.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12367.274;
+    dblEasting  := 12367.274;
     dblNorthing := 23486.713;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1421,13 +1465,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 144.3678, 100, 1000, False);
   Try
-    dblEasting := 12351.397;
+    dblEasting  := 12351.397;
     dblNorthing := 23432.302;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(145.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12375.602;
+    dblEasting  := 12375.602;
     dblNorthing := 23435.193;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1439,13 +1483,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 234.3678, 100, 1000, False);
   Try
-    dblEasting := 12321.191;
+    dblEasting  := 12321.191;
     dblNorthing := 23451.070;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(235.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12324.082;
+    dblEasting  := 12324.082;
     dblNorthing := 23426.865;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1457,13 +1501,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 324.3678, 100, 1000, False);
   Try
-    dblEasting := 12339.959;
+    dblEasting  := 12339.959;
     dblNorthing := 23481.276;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(325.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12315.754;
+    dblEasting  := 12315.754;
     dblNorthing := 23478.385;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1475,13 +1519,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 54.3678, 100, -1000, False);
   Try
-    dblEasting := 12370.201;
+    dblEasting  := 12370.201;
     dblNorthing := 23463.211;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(53.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12365.884;
+    dblEasting  := 12365.884;
     dblNorthing := 23487.187;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1493,13 +1537,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 144.3678, 100, -1000, False);
   Try
-    dblEasting := 12352.100;
+    dblEasting  := 12352.100;
     dblNorthing := 23432.266;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(143.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12376.076;
+    dblEasting  := 12376.076;
     dblNorthing := 23436.583;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1511,13 +1555,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 234.3678, 100, -1000, False);
   Try
-    dblEasting := 12321.155;
+    dblEasting  := 12321.155;
     dblNorthing := 23450.367;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(233.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12325.472;
+    dblEasting  := 12325.472;
     dblNorthing := 23426.391;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1529,13 +1573,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 324.3678, 100, -1000, False);
   Try
-    dblEasting := 12339.256;
+    dblEasting  := 12339.256;
     dblNorthing := 23481.312;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(323.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12315.280;
+    dblEasting  := 12315.280;
     dblNorthing := 23476.995;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1548,13 +1592,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12928.258, 22644.016, 100, 54.3678, 100, 1000, True);
   Try
-    dblEasting := 12370.165;
+    dblEasting  := 12370.165;
     dblNorthing := 23462.508;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(55.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12367.274;
+    dblEasting  := 12367.274;
     dblNorthing := 23486.713;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1566,13 +1610,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     11532.905, 22874.209, 100, 144.3678, 100, 1000, True);
   Try
-    dblEasting := 12351.397;
+    dblEasting  := 12351.397;
     dblNorthing := 23432.302;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(145.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12375.602;
+    dblEasting  := 12375.602;
     dblNorthing := 23435.193;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1584,13 +1628,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     11763.098, 24269.562, 100, 234.3678, 100, 1000, True);
   Try
-    dblEasting := 12321.191;
+    dblEasting  := 12321.191;
     dblNorthing := 23451.070;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(235.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12324.082;
+    dblEasting  := 12324.082;
     dblNorthing := 23426.865;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1602,13 +1646,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     13158.451, 24039.369, 100, 324.3678, 100, 1000, True);
   Try
-    dblEasting := 12339.959;
+    dblEasting  := 12339.959;
     dblNorthing := 23481.276;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(325.71173, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12315.754;
+    dblEasting  := 12315.754;
     dblNorthing := 23478.385;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1620,13 +1664,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     11763.098, 24269.562, 100, 54.3678, 100, -1000, True);
   Try
-    dblEasting := 12370.201;
+    dblEasting  := 12370.201;
     dblNorthing := 23463.211;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(53.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12365.884;
+    dblEasting  := 12365.884;
     dblNorthing := 23487.187;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1638,13 +1682,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     13158.451, 24039.369, 100, 144.3678, 100, -1000, True);
   Try
-    dblEasting := 12352.100;
+    dblEasting  := 12352.100;
     dblNorthing := 23432.266;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(143.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12376.076;
+    dblEasting  := 12376.076;
     dblNorthing := 23436.583;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1656,13 +1700,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12928.258, 22644.016, 100, 234.3678, 100, -1000, True);
   Try
-    dblEasting := 12321.155;
+    dblEasting  := 12321.155;
     dblNorthing := 23450.367;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(233.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12325.472;
+    dblEasting  := 12325.472;
     dblNorthing := 23426.391;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1674,13 +1718,13 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     11532.905, 22874.209, 100, 324.3678, 100, -1000, True);
   Try
-    dblEasting := 12339.256;
+    dblEasting  := 12339.256;
     dblNorthing := 23481.312;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(323.02387, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblEasting := 12315.280;
+    dblEasting  := 12315.280;
     dblNorthing := 23476.995;
     ReturnValue := FHCircularElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
@@ -1689,32 +1733,32 @@ begin
   Finally
     FHCircularElement.Free;
   End;
-end;
+End;
 
-procedure TestTHCircularElement.TestCompare;
+Procedure TestTHCircularElement.TestCompare;
 
-var
+Var
   ReturnValue: THCompInfo;
-  dblBearing: Double;
+  dblBearing : Double;
   dblNorthing: Double;
-  dblEasting: Double;
+  dblEasting : Double;
 
-begin
+Begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 54.3678, 100, 1000, False);
   Try
-    dblEasting := 12386.325;
+    dblEasting  := 12386.325;
     dblNorthing := 23475.992;
-    dblBearing := 124.65090;
+    dblBearing  := 124.65090;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12380.029, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23480.344, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(56.7544, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12348.694;
+    dblEasting  := 12348.694;
     dblNorthing := 23476.347;
-    dblBearing := 123.37269;
+    dblBearing  := 123.37269;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.509, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23467.906, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1727,18 +1771,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 144.3678, 100, 1000, False);
   Try
-    dblEasting := 12364.881;
+    dblEasting  := 12364.881;
     dblNorthing := 23416.142;
-    dblBearing := 214.65090;
+    dblBearing  := 214.65090;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12369.233, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23422.438, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(146.75440, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12365.236;
+    dblEasting  := 12365.236;
     dblNorthing := 23453.773;
-    dblBearing := 213.37269;
+    dblBearing  := 213.37269;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12356.795, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23440.958, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1751,18 +1795,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 234.3678, 100, 1000, False);
   Try
-    dblEasting := 12305.031;
+    dblEasting  := 12305.031;
     dblNorthing := 23437.586;
-    dblBearing := 304.65090;
+    dblBearing  := 304.65090;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12311.327, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23433.234, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(236.75440, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12342.662;
+    dblEasting  := 12342.662;
     dblNorthing := 23437.231;
-    dblBearing := 303.37269;
+    dblBearing  := 303.37269;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12329.847, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23445.672, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1775,18 +1819,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 324.3678, 100, 1000, False);
   Try
-    dblEasting := 12326.475;
+    dblEasting  := 12326.475;
     dblNorthing := 23497.436;
-    dblBearing := 34.65090;
+    dblBearing  := 34.65090;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12322.123, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23491.140, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(326.75440, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12326.120;
+    dblEasting  := 12326.120;
     dblNorthing := 23459.805;
-    dblBearing := 33.37269;
+    dblBearing  := 33.37269;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12334.561, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23472.620, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1799,18 +1843,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 54.3678, 100, -1000, False);
   Try
-    dblEasting := 12385.655;
+    dblEasting  := 12385.655;
     dblNorthing := 23477.941;
-    dblBearing := 119.8777;
+    dblBearing  := 119.8777;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12379.018, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23481.754, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(51.98120, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12348.159;
+    dblEasting  := 12348.159;
     dblNorthing := 23476.149;
-    dblBearing := 121.15591;
+    dblBearing  := 121.15591;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.291, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23468.210, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1823,18 +1867,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 144.3678, 100, -1000, False);
   Try
-    dblEasting := 12366.830;
+    dblEasting  := 12366.830;
     dblNorthing := 23416.812;
-    dblBearing := 209.8777;
+    dblBearing  := 209.8777;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12370.643, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23423.449, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(141.98120, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12365.038;
+    dblEasting  := 12365.038;
     dblNorthing := 23454.308;
-    dblBearing := 211.15591;
+    dblBearing  := 211.15591;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12357.099, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23441.176, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1847,18 +1891,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 234.3678, 100, -1000, False);
   Try
-    dblEasting := 12305.701;
+    dblEasting  := 12305.701;
     dblNorthing := 23435.637;
-    dblBearing := 299.8777;
+    dblBearing  := 299.8777;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12312.338, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23431.824, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(231.98120, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12343.197;
+    dblEasting  := 12343.197;
     dblNorthing := 23437.429;
-    dblBearing := 301.15591;
+    dblBearing  := 301.15591;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12330.065, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23445.368, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1871,18 +1915,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 324.3678, 100, -1000, False);
   Try
-    dblEasting := 12324.526;
+    dblEasting  := 12324.526;
     dblNorthing := 23496.766;
-    dblBearing := 29.8777;
+    dblBearing  := 29.8777;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12320.713, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23490.129, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(321.98120, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12326.318;
+    dblEasting  := 12326.318;
     dblNorthing := 23459.270;
-    dblBearing := 31.15591;
+    dblBearing  := 31.15591;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12334.257, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23472.402, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1896,18 +1940,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12928.258, 22644.016, 100, 54.3678, 100, 1000, True);
   Try
-    dblEasting := 12386.325;
+    dblEasting  := 12386.325;
     dblNorthing := 23475.992;
-    dblBearing := 124.65090;
+    dblBearing  := 124.65090;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12380.029, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23480.344, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(56.7544, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12348.694;
+    dblEasting  := 12348.694;
     dblNorthing := 23476.347;
-    dblBearing := 123.37269;
+    dblBearing  := 123.37269;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.509, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23467.906, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1920,18 +1964,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     11532.905, 22874.209, 100, 144.3678, 100, 1000, True);
   Try
-    dblEasting := 12364.881;
+    dblEasting  := 12364.881;
     dblNorthing := 23416.142;
-    dblBearing := 214.65090;
+    dblBearing  := 214.65090;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12369.233, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23422.438, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(146.75440, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12365.236;
+    dblEasting  := 12365.236;
     dblNorthing := 23453.773;
-    dblBearing := 213.37269;
+    dblBearing  := 213.37269;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12356.795, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23440.958, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1944,18 +1988,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     11763.098, 24269.562, 100, 234.3678, 100, 1000, True);
   Try
-    dblEasting := 12305.031;
+    dblEasting  := 12305.031;
     dblNorthing := 23437.586;
-    dblBearing := 304.65090;
+    dblBearing  := 304.65090;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12311.327, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23433.234, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(236.75440, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12342.662;
+    dblEasting  := 12342.662;
     dblNorthing := 23437.231;
-    dblBearing := 303.37269;
+    dblBearing  := 303.37269;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12329.847, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23445.672, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1968,18 +2012,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     13158.451, 24039.369, 100, 324.3678, 100, 1000, True);
   Try
-    dblEasting := 12326.475;
+    dblEasting  := 12326.475;
     dblNorthing := 23497.436;
-    dblBearing := 34.65090;
+    dblBearing  := 34.65090;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12322.123, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23491.140, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(326.75440, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12326.120;
+    dblEasting  := 12326.120;
     dblNorthing := 23459.805;
-    dblBearing := 33.37269;
+    dblBearing  := 33.37269;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12334.561, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23472.620, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -1992,18 +2036,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     11763.098, 24269.562, 100, 54.3678, 100, -1000, True);
   Try
-    dblEasting := 12385.655;
+    dblEasting  := 12385.655;
     dblNorthing := 23477.941;
-    dblBearing := 119.8777;
+    dblBearing  := 119.8777;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12379.018, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23481.754, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(51.98120, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12348.159;
+    dblEasting  := 12348.159;
     dblNorthing := 23476.149;
-    dblBearing := 121.15591;
+    dblBearing  := 121.15591;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.291, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23468.210, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -2016,18 +2060,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     13158.451, 24039.369, 100, 144.3678, 100, -1000, True);
   Try
-    dblEasting := 12366.830;
+    dblEasting  := 12366.830;
     dblNorthing := 23416.812;
-    dblBearing := 209.8777;
+    dblBearing  := 209.8777;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12370.643, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23423.449, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(141.98120, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12365.038;
+    dblEasting  := 12365.038;
     dblNorthing := 23454.308;
-    dblBearing := 211.15591;
+    dblBearing  := 211.15591;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12357.099, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23441.176, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -2040,18 +2084,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     12928.258, 22644.016, 100, 234.3678, 100, -1000, True);
   Try
-    dblEasting := 12305.701;
+    dblEasting  := 12305.701;
     dblNorthing := 23435.637;
-    dblBearing := 299.8777;
+    dblBearing  := 299.8777;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12312.338, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23431.824, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(231.98120, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12343.197;
+    dblEasting  := 12343.197;
     dblNorthing := 23437.429;
-    dblBearing := 301.15591;
+    dblBearing  := 301.15591;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12330.065, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23445.368, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -2064,18 +2108,18 @@ begin
   FHCircularElement := THCircularElementTestClass.Create(
     11532.905, 22874.209, 100, 324.3678, 100, -1000, True);
   Try
-    dblEasting := 12324.526;
+    dblEasting  := 12324.526;
     dblNorthing := 23496.766;
-    dblBearing := 29.8777;
+    dblBearing  := 29.8777;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12320.713, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23490.129, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(321.98120, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Distance');
-    dblEasting := 12326.318;
+    dblEasting  := 12326.318;
     dblNorthing := 23459.270;
-    dblBearing := 31.15591;
+    dblBearing  := 31.15591;
     ReturnValue := FHCircularElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12334.257, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23472.402, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -2085,14 +2129,14 @@ begin
   Finally
     FHCircularElement.Free;
   End;
-end;
+End;
 
-procedure TestTHCircularElement.TestGetElementDetails;
+Procedure TestTHCircularElement.TestGetElementDetails;
 
-var
+Var
   ReturnValue: THElement;
 
-begin
+Begin
   FHCircularElement := THCircularElementTestClass.Create(
     12345.678, 23456.789, 100, 54.3678, 100, 1000, False);
   Try
@@ -2106,12 +2150,12 @@ begin
   Finally
     FHCircularElement.Free;
   End;
-end;
+End;
 
-procedure TestTHClothoidElement.TestElementType;
-var
+Procedure TestTHClothoidElement.TestElementType;
+Var
   ReturnValue: TElementType;
-begin
+Begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.567, 23456.789,
     100, 54.3678, 100, 100, 10000, False);
   Try
@@ -2120,14 +2164,14 @@ begin
   Finally
     FHClothoidElement.Free;
   End;
-end;
+End;
 
-procedure TestTHClothoidElement.TestGetX;
+Procedure TestTHClothoidElement.TestGetX;
 
 Var
-  R : Double;
+  R: Double;
 
-begin
+Begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.567, 23456.789,
     100, 54.3678, 100, 100, 10000, False);
   Try
@@ -2449,14 +2493,14 @@ begin
   Finally
     FHClothoidElement.Free;
   End;
-end;
+End;
 
-procedure TestTHClothoidElement.TestGetY;
+Procedure TestTHClothoidElement.TestGetY;
 
 Var
-  R : Double;
+  R: Double;
 
-begin
+Begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.567, 23456.789,
     100, 54.3678, 100, 100, 10000, False);
   Try
@@ -2714,14 +2758,14 @@ begin
   Finally
     FHClothoidElement.Free;
   End;
-end;
+End;
 
-procedure TestTHClothoidElement.TestGetTheta;
+Procedure TestTHClothoidElement.TestGetTheta;
 
 Var
-  R : Double;
+  R: Double;
 
-begin
+Begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.567, 23456.789,
     100, 54.3678, 100, 100, 10000, False);
   Try
@@ -3043,29 +3087,29 @@ begin
   Finally
     FHClothoidElement.Free;
   End;
-end;
+End;
 
-procedure TestTHClothoidElement.TestSetout;
-var
+Procedure TestTHClothoidElement.TestSetout;
+Var
   ReturnValue: THInfo;
-  dblOffset: Double;
+  dblOffset  : Double;
   dblChainage: Double;
-begin
+Begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 54.3678, 100, 100, 10000, False);
   Try
     dblChainage := 123.456;
-    dblOffset   :=   9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12370.100, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23462.536, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals( 55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12367.583, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23486.805, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals( 57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
@@ -3073,7 +3117,7 @@ begin
     100, 144.3678, 100, 100, 10000, False);
   Try
     dblChainage := 123.456;
-    dblOffset   :=   9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12351.425, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23432.367, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -3091,7 +3135,7 @@ begin
     100, 234.3678, 100, 100, 10000, False);
   Try
     dblChainage := 123.456;
-    dblOffset   :=   9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12321.256, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23451.042, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -3109,7 +3153,7 @@ begin
     100, 324.3678, 100, 100, 10000, False);
   Try
     dblChainage := 123.456;
-    dblOffset   :=   9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12339.931, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23481.211, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -3127,17 +3171,17 @@ begin
     100, 54.3678, 100, 100, -10000, False);
   Try
     dblChainage := 123.456;
-    dblOffset   :=   9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12370.267, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23463.185, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals( 52.79164, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(52.79164, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12365.583, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23487.065, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals( 50.94493, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(50.94493, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
@@ -3145,7 +3189,7 @@ begin
     100, 144.3678, 100, 100, -10000, False);
   Try
     dblChainage := 123.456;
-    dblOffset   :=   9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12352.074, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23432.200, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -3163,7 +3207,7 @@ begin
     100, 234.3678, 100, 100, -10000, False);
   Try
     dblChainage := 123.456;
-    dblOffset   :=   9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12321.089, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23450.393, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -3181,7 +3225,7 @@ begin
     100, 324.3678, 100, 100, -10000, False);
   Try
     dblChainage := 123.456;
-    dblOffset   :=   9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12339.282, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23481.378, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -3198,13 +3242,13 @@ begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 54.3678, 100, 0, 10000, False);
   Try
-    dblChainage :=  76.544;
-    dblOffset   :=   9.345;
+    dblChainage := 76.544;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12332.391, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23435.507, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(52.79164, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblChainage :=  65.434;
+    dblChainage := 65.434;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12310.216, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
@@ -3216,13 +3260,13 @@ begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 144.3678, 100, 0, 10000, False);
   Try
-    dblChainage :=  76.544;
-    dblOffset   :=   9.345;
+    dblChainage := 76.544;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12324.396, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23470.076, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(142.79164, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblChainage :=  65.434;
+    dblChainage := 65.434;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12334.575, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
@@ -3234,13 +3278,13 @@ begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 234.3678, 100, 0, 10000, False);
   Try
-    dblChainage :=  76.544;
-    dblOffset   :=   9.345;
+    dblChainage := 76.544;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12358.965, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23478.071, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(232.79164, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblChainage :=  65.434;
+    dblChainage := 65.434;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12381.140, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
@@ -3252,13 +3296,13 @@ begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 324.3678, 100, 0, 10000, False);
   Try
-    dblChainage :=  76.544;
-    dblOffset   :=   9.345;
+    dblChainage := 76.544;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12366.960, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23443.502, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(322.79164, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblChainage :=  65.434;
+    dblChainage := 65.434;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12356.781, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
@@ -3270,31 +3314,31 @@ begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 54.3678, 100, 0, -10000, False);
   Try
-    dblChainage :=  76.544;
-    dblOffset   :=   9.345;
+    dblChainage := 76.544;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12331.723, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23435.558, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals( 55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblChainage :=  65.434;
+    CheckEquals(55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    dblChainage := 65.434;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12310.613, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23447.663, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals( 57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 144.3678, 100, 0, -10000, False);
   Try
-    dblChainage :=  76.544;
-    dblOffset   :=   9.345;
+    dblChainage := 76.544;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12324.447, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23470.744, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(145.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblChainage :=  65.434;
+    dblChainage := 65.434;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12336.552, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
@@ -3306,13 +3350,13 @@ begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 234.3678, 100, 0, -10000, False);
   Try
-    dblChainage :=  76.544;
-    dblOffset   :=   9.345;
+    dblChainage := 76.544;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12359.633, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23478.020, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(235.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblChainage :=  65.434;
+    dblChainage := 65.434;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12380.743, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
@@ -3324,13 +3368,13 @@ begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 324.3678, 100, 0, -10000, False);
   Try
-    dblChainage :=  76.544;
-    dblOffset   :=   9.345;
+    dblChainage := 76.544;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12366.909, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23442.834, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(325.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblChainage :=  65.434;
+    dblChainage := 65.434;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12354.804, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
@@ -3344,17 +3388,17 @@ begin
     12353.815, 23462.601, 110, 54.65428, 90, 1000, 100, True);
   Try
     dblChainage := 123.456;
-    dblOffset   :=   9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12370.100, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23462.536, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals( 55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12367.583, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23486.805, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals( 57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
@@ -3362,7 +3406,7 @@ begin
     12351.517, 23448.671, 110, 144.08132, 90, -1000, -100, True);
   Try
     dblChainage := 123.456;
-    dblOffset   :=   9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12352.074, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23432.200, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -3379,13 +3423,13 @@ begin
   FHClothoidElement := THClothoidElementTestClass.Create(
     12385.041, 23487.564, 50, 227.20583, 40, 200, 1000, True);
   Try
-    dblChainage :=  76.544;
-    dblOffset   :=   9.345;
+    dblChainage := 76.544;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12358.965, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23478.071, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(232.79164, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblChainage :=  65.434;
+    dblChainage := 65.434;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12381.140, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
@@ -3397,13 +3441,13 @@ begin
   FHClothoidElement := THClothoidElementTestClass.Create(
     12373.070, 23415.001, 50, 331.52977, 40, -200, -1000, True);
   Try
-    dblChainage :=  76.544;
-    dblOffset   :=   9.345;
+    dblChainage := 76.544;
+    dblOffset   := 9.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12366.909, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23442.834, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
     CheckEquals(325.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    dblChainage :=  65.434;
+    dblChainage := 65.434;
     dblOffset   := -12.345;
     ReturnValue := FHClothoidElement.Setout(dblChainage, dblOffset);
     CheckEquals(12354.804, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
@@ -3412,16 +3456,16 @@ begin
   Finally
     FHClothoidElement.Free;
   End;
-end;
+End;
 
-procedure TestTHClothoidElement.TestMeasure;
+Procedure TestTHClothoidElement.TestMeasure;
 
-var
+Var
   ReturnValue: THInfo;
   dblNorthing: Double;
-  dblEasting: Double;
+  dblEasting : Double;
 
-begin
+Begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 54.3678, 100, 100, 10000, False);
   Try
@@ -3430,13 +3474,13 @@ begin
     ReturnValue := FHClothoidElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
-    CheckEquals( 55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12367.583;
     dblNorthing := 23486.805;
     ReturnValue := FHClothoidElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-12.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
-    CheckEquals( 57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
@@ -3646,13 +3690,13 @@ begin
     ReturnValue := FHClothoidElement.Measure(dblEasting, dblNorthing);
     CheckEquals(76.544, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
-    CheckEquals( 55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12310.613;
     dblNorthing := 23447.663;
     ReturnValue := FHClothoidElement.Measure(dblEasting, dblNorthing);
     CheckEquals(65.434, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-12.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
-    CheckEquals( 57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
@@ -3718,13 +3762,13 @@ begin
     ReturnValue := FHClothoidElement.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
-    CheckEquals( 55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12367.583;
     dblNorthing := 23486.805;
     ReturnValue := FHClothoidElement.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-12.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
-    CheckEquals( 57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
@@ -3782,38 +3826,38 @@ begin
   Finally
     FHClothoidElement.Free;
   End;
-end;
+End;
 
-procedure TestTHClothoidElement.TestCompare;
+Procedure TestTHClothoidElement.TestCompare;
 
-var
+Var
   ReturnValue: THCompInfo;
-  dblBearing: Double;
+  dblBearing : Double;
   dblNorthing: Double;
-  dblEasting: Double;
+  dblEasting : Double;
 
-begin
+Begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 54.3678, 100, 100, 10000, False);
   Try
     dblEasting  := 12386.303;
     dblNorthing := 23475.428;
-    dblBearing  :=   127.23487;
+    dblBearing  := 127.23487;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12380.209, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23480.059, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
-    CheckEquals( 59.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(59.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12348.651;
     dblNorthing := 23476.393;
-    dblBearing  :=   123.33639;
+    dblBearing  := 123.33639;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.471, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23467.961, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
-    CheckEquals( 55.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(55.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
@@ -3822,21 +3866,21 @@ begin
   Try
     dblEasting  := 12364.317;
     dblNorthing := 23416.164;
-    dblBearing  :=   217.23487;
+    dblBearing  := 217.23487;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12368.948, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23422.258, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(149.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12365.282;
     dblNorthing := 23453.816;
-    dblBearing  :=   213.33639;
+    dblBearing  := 213.33639;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12356.850, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23440.996, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(145.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -3846,21 +3890,21 @@ begin
   Try
     dblEasting  := 12305.053;
     dblNorthing := 23438.150;
-    dblBearing  :=   307.23487;
+    dblBearing  := 307.23487;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12311.147, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23433.519, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(239.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12342.705;
     dblNorthing := 23437.185;
-    dblBearing  :=   303.33639;
+    dblBearing  := 303.33639;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12329.885, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23445.617, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(235.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -3870,21 +3914,21 @@ begin
   Try
     dblEasting  := 12327.039;
     dblNorthing := 23497.414;
-    dblBearing  :=   37.23487;
+    dblBearing  := 37.23487;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12322.408, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23491.320, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(329.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12326.074;
     dblNorthing := 23459.762;
-    dblBearing  :=   33.33639;
+    dblBearing  := 33.33639;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12334.506, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23472.582, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(325.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -3898,18 +3942,18 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12378.806, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23482.016, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
-    CheckEquals( 49.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(49.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12348.204;
     dblNorthing := 23476.104;
     dblBearing  := 121.19221;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.330, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23468.157, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
-    CheckEquals( 53.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(53.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
@@ -3922,8 +3966,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12370.905, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23423.661, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(139.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12364.993;
     dblNorthing := 23454.263;
@@ -3931,8 +3975,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12357.046, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23441.137, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(143.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -3946,8 +3990,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12312.550, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23431.562, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(229.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12343.152;
     dblNorthing := 23437.474;
@@ -3955,8 +3999,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12330.026, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23445.421, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(233.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -3970,8 +4014,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12320.451, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23489.917, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(319.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12326.363;
     dblNorthing := 23459.315;
@@ -3979,8 +4023,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12334.310, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23472.441, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(323.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -3994,8 +4038,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12312.550, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23431.562, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(49.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12316.899;
     dblNorthing := 23453.369;
@@ -4003,8 +4047,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12330.026, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23445.421, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(53.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -4018,8 +4062,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12320.451, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23489.917, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(139.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12342.258;
     dblNorthing := 23485.568;
@@ -4027,14 +4071,14 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12334.310, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23472.441, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(143.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
-    100, 234.3678, 100, 0, 10000, FAlse);
+    100, 234.3678, 100, 0, 10000, False);
   Try
     dblEasting  := 12372.005;
     dblNorthing := 23485.526;
@@ -4042,8 +4086,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12378.806, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23482.016, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(229.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12374.457;
     dblNorthing := 23460.209;
@@ -4051,8 +4095,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.330, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23468.157, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(233.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -4066,8 +4110,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12370.905, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23423.661, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(319.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12349.098;
     dblNorthing := 23428.010;
@@ -4075,8 +4119,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12357.046, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23441.137, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(323.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -4090,18 +4134,18 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12311.147, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23433.519, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
-    CheckEquals( 59.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(59.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12317.065;
     dblNorthing := 23454.050;
     dblBearing  := 123.33639;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12329.885, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23445.617, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
-    CheckEquals( 55.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(55.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
@@ -4114,8 +4158,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12322.408, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23491.320, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(149.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12342.939;
     dblNorthing := 23485.402;
@@ -4123,8 +4167,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12334.506, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23472.582, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(145.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -4138,8 +4182,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12380.209, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23480.059, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(239.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12374.291;
     dblNorthing := 23459.528;
@@ -4147,8 +4191,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.471, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23467.961, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(235.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -4162,8 +4206,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12368.948, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23422.258, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(329.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12348.417;
     dblNorthing := 23428.176;
@@ -4171,8 +4215,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12356.850, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23440.996, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(325.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -4183,22 +4227,22 @@ begin
   Try
     dblEasting  := 12386.303;
     dblNorthing := 23475.428;
-    dblBearing  :=   127.23487;
+    dblBearing  := 127.23487;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12380.209, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23480.059, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
-    CheckEquals( 59.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(59.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12348.651;
     dblNorthing := 23476.393;
-    dblBearing  :=   123.33639;
+    dblBearing  := 123.33639;
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.471, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23467.961, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
-    CheckEquals( 55.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(55.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
@@ -4211,8 +4255,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12370.905, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23423.661, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(141.654, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(139.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12364.993;
     dblNorthing := 23454.263;
@@ -4220,8 +4264,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12357.046, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23441.137, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(119.345, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(143.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -4235,8 +4279,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12378.806, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23482.016, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(229.39723, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12374.457;
     dblNorthing := 23460.209;
@@ -4244,8 +4288,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12361.330, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23468.157, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(233.29571, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
@@ -4259,8 +4303,8 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12368.948, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23422.258, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals(   -7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(58.346, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(-7.654, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(329.33837, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12348.417;
     dblNorthing := 23428.176;
@@ -4268,25 +4312,25 @@ begin
     ReturnValue := FHClothoidElement.Compare(dblEasting, dblNorthing, dblBearing);
     CheckEquals(12356.850, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23440.996, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
+    CheckEquals(80.655, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
+    CheckEquals(15.345, ReturnValue.dblDistance, iCoordinateTolerance, 'Offset');
     CheckEquals(325.43989, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHClothoidElement.Free;
   End;
-end;
+End;
 
-procedure TestTHClothoidElement.TestGetRadius;
+Procedure TestTHClothoidElement.TestGetRadius;
 
-var
+Var
   R: Double;
 
-begin
+Begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.567, 23456.789,
     100, 54.3678, 100, 100, 10000, False);
   Try
     R := FHClothoidElement.GetRadius(150);
-    CheckEquals(10000/50, R, iCoordinateTolerance);
+    CheckEquals(10000 / 50, R, iCoordinateTolerance);
   Finally
     FHClothoidElement.Free;
   End;
@@ -4294,18 +4338,18 @@ begin
     100, 54.3678, 100, 100, -10000, False);
   Try
     R := FHClothoidElement.GetRadius(150);
-    CheckEquals(-10000/50, R, iCoordinateTolerance);
+    CheckEquals(-10000 / 50, R, iCoordinateTolerance);
   Finally
     FHClothoidElement.Free;
   End;
-end;
+End;
 
-procedure TestTHClothoidElement.TestGetElementDetails;
+Procedure TestTHClothoidElement.TestGetElementDetails;
 
-var
+Var
   R: THElement;
 
-begin
+Begin
   FHClothoidElement := THClothoidElementTestClass.Create(12345.678, 23456.789,
     100, 54.3678, 100, 100, 10000, False);
   Try
@@ -4334,116 +4378,116 @@ begin
   Finally
     FHClothoidElement.Free;
   End;
-end;
+End;
 
-procedure TestTVStraightElement.SetUp;
-begin
+Procedure TestTVStraightElement.SetUp;
+Begin
   FVStraightElement := TVStraightElementTestClass.Create(123.456, 0.12345, 100, 100);
-end;
+End;
 
-procedure TestTVStraightElement.TearDown;
-begin
+Procedure TestTVStraightElement.TearDown;
+Begin
   FVStraightElement.Free;
-  FVStraightElement := nil;
-end;
+  FVStraightElement := Nil;
+End;
 
-procedure TestTVStraightElement.TestElementType;
-var
+Procedure TestTVStraightElement.TestElementType;
+Var
   ReturnValue: TElementType;
-begin
+Begin
   ReturnValue := FVStraightElement.GetElementType;
   Check(etStraight = ReturnValue);
-end;
+End;
 
-procedure TestTVStraightElement.TestGetRadius;
-var
+Procedure TestTVStraightElement.TestGetRadius;
+Var
   ReturnValue: Double;
   dblChainage: Double;
-begin
+Begin
   dblChainage := 150;
   ReturnValue := FVStraightElement.GetRadius(dblChainage);
   CheckEquals(999999.9, ReturnValue, iCoordinateTolerance);
-end;
+End;
 
-procedure TestTVStraightElement.TestSetout;
-var
+Procedure TestTVStraightElement.TestSetout;
+Var
   ReturnValue: TVInfo;
   dblChainage: Double;
-begin
+Begin
   dblChainage := 150;
   ReturnValue := FVStraightElement.Setout(dblChainage);
   CheckEquals(129.6285, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
   CheckEquals(0.12345, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
-end;
+End;
 
-procedure TestTVStraightElement.TestGetElementDetails;
-var
+Procedure TestTVStraightElement.TestGetElementDetails;
+Var
   ReturnValue: TVElement;
-begin
+Begin
   ReturnValue := FVStraightElement.ElementDetails;
   CheckEquals(123.456, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
   CheckEquals(0.12345, ReturnValue.dblGradient, iBearingTolerance, 'Gradient');
   CheckEquals(100, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
   CheckEquals(100, ReturnValue.dblLength, iCoordinateTolerance, 'Length');
-end;
+End;
 
-procedure TestTVCircularElement.SetUp;
-begin
+Procedure TestTVCircularElement.SetUp;
+Begin
   FVCircularElement := TVCircularElementTestClass.Create(123.456, 0.12345, 100,
     100, -1000);
-end;
+End;
 
-procedure TestTVCircularElement.TearDown;
-begin
+Procedure TestTVCircularElement.TearDown;
+Begin
   FVCircularElement.Free;
-  FVCircularElement := nil;
-end;
+  FVCircularElement := Nil;
+End;
 
-procedure TestTVCircularElement.TestElementType;
-var
+Procedure TestTVCircularElement.TestElementType;
+Var
   ReturnValue: TElementType;
-begin
+Begin
   ReturnValue := FVCircularElement.GetElementType;
   Check(etCircular = ReturnValue);
-end;
+End;
 
-procedure TestTVCircularElement.TestGetRadius;
-var
+Procedure TestTVCircularElement.TestGetRadius;
+Var
   ReturnValue: Double;
   dblChainage: Double;
-begin
+Begin
   dblChainage := 150;
   ReturnValue := FVCircularElement.GetRadius(dblChainage);
   CheckEquals(-1000, ReturnValue, iCoordinateTolerance);
-end;
+End;
 
-procedure TestTVCircularElement.TestSetout;
-var
+Procedure TestTVCircularElement.TestSetout;
+Var
   ReturnValue: TVInfo;
   dblChainage: Double;
-begin
+Begin
   dblChainage := 150;
   ReturnValue := FVCircularElement.Setout(dblChainage);
   CheckEquals(128.3785, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
   CheckEquals(0.07345, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
-end;
+End;
 
-procedure TestTVCircularElement.TestGetElementDetails;
-var
+Procedure TestTVCircularElement.TestGetElementDetails;
+Var
   ReturnValue: TVElement;
-begin
+Begin
   ReturnValue := FVCircularElement.ElementDetails;
   CheckEquals(123.456, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
   CheckEquals(0.12345, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
   CheckEquals(100, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
   CheckEquals(100, ReturnValue.dblLength, iCoordinateTolerance, 'Length');
   CheckEquals(-1000, ReturnValue.dblRadius, iCoordinateTolerance, 'Radius');
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestCount;
-var
+Procedure TestTHAlignmentCollection.TestCount;
+Var
   ReturnValue: Integer;
-begin
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
@@ -4452,33 +4496,33 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestElementType;
-var
+Procedure TestTHAlignmentCollection.TestElementType;
+Var
   ReturnValue: TElementType;
-  iElement: Integer;
-begin
+  iElement   : Integer;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
-    iElement := 0;
+    iElement    := 0;
     ReturnValue := FHAlignmentCollection.ElementType(iElement);
     Check(etStraight = ReturnValue);
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestGetElementStart;
-var
+Procedure TestTHAlignmentCollection.TestGetElementStart;
+Var
   ReturnValue: THInfo;
-  iElement: Integer;
-begin
+  iElement   : Integer;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
-    iElement := 0;
+    iElement    := 0;
     ReturnValue := FHAlignmentCollection.GetElementStart(iElement);
     CheckEquals(12345.678, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23456.789, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -4486,17 +4530,17 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestGetElementEnd;
-var
+Procedure TestTHAlignmentCollection.TestGetElementEnd;
+Var
   ReturnValue: THInfo;
-  iElement: Integer;
-begin
+  iElement   : Integer;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
-    iElement := 0;
+    iElement    := 0;
     ReturnValue := FHAlignmentCollection.GetElementEnd(iElement);
     CheckEquals(12429.108, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23401.658, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
@@ -4504,62 +4548,62 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestGetStartChainage;
-var
+Procedure TestTHAlignmentCollection.TestGetStartChainage;
+Var
   ReturnValue: Double;
-  iElement: Integer;
-begin
+  iElement   : Integer;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
-    iElement := 0;
+    iElement    := 0;
     ReturnValue := FHAlignmentCollection.GetStartChainage(iElement);
     CheckEquals(100, ReturnValue, iCoordinateTolerance);
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestGetEndChainage;
-var
+Procedure TestTHAlignmentCollection.TestGetEndChainage;
+Var
   ReturnValue: Double;
-  iElement: Integer;
-begin
+  iElement   : Integer;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
-    iElement := 0;
+    iElement    := 0;
     ReturnValue := FHAlignmentCollection.GetEndChainage(iElement);
     CheckEquals(200, ReturnValue, iCoordinateTolerance);
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestGetRadius;
-var
+Procedure TestTHAlignmentCollection.TestGetRadius;
+Var
   ReturnValue: Double;
-  iElement: Integer;
-begin
+  iElement   : Integer;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
-    iElement := 0;
+    iElement    := 0;
     ReturnValue := FHAlignmentCollection.GetRadius(iElement, 150);
     CheckEquals(999999.9, ReturnValue, iCoordinateTolerance);
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestAddStraight;
+Procedure TestTHAlignmentCollection.TestAddStraight;
 
-var
-  i : Integer;
+Var
+  i: Integer;
 
-begin
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     i := FHAlignmentCollection.Count;
@@ -4568,31 +4612,31 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestAddCircular;
+Procedure TestTHAlignmentCollection.TestAddCircular;
 
-var
-  i : Integer;
+Var
+  i: Integer;
 
-begin
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     i := FHAlignmentCollection.Count;
     FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 100,
-      100, false);
+      100, False);
     CheckEquals(i + 1, FHAlignmentCollection.Count);
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestAddClothoid;
+Procedure TestTHAlignmentCollection.TestAddClothoid;
 
-var
-  i : Integer;
+Var
+  i: Integer;
 
-begin
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     i := FHAlignmentCollection.Count;
@@ -4602,14 +4646,14 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestAddClothoidFalse;
+Procedure TestTHAlignmentCollection.TestAddClothoidFalse;
 
-var
-  i : Integer;
+Var
+  i: Integer;
 
-begin
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     i := FHAlignmentCollection.Count;
@@ -4619,14 +4663,14 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestUpdateStraight;
+Procedure TestTHAlignmentCollection.TestUpdateStraight;
 
-var
-  R : THElement;
+Var
+  R: THElement;
 
-begin
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
@@ -4640,16 +4684,18 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestUpdateCircular;
-var
-  R : THElement;
-begin
+Procedure TestTHAlignmentCollection.TestUpdateCircular;
+Var
+  R: THElement;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
-    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000, 100, True);
-    FHAlignmentCollection.UpdateCircular(0, -12345.678, -23456.789, 234.5678, 110, -1000, 230, true);
+    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000,
+      100, True);
+    FHAlignmentCollection.UpdateCircular(0, -12345.678, -23456.789, 234.5678, 110, -1000,
+      230, True);
     R := FHAlignmentCollection.GetCircular(0);
     CheckEquals(-12345.678, R.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(-23456.789, R.dblNorthing, iCoordinateTolerance, 'Easting');
@@ -4660,16 +4706,18 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestUpdateClothoid;
-var
-  R : THElement;
-begin
+Procedure TestTHAlignmentCollection.TestUpdateClothoid;
+Var
+  R: THElement;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
-    FHAlignmentCollection.AddClothoid(12345.678, 23456.789, 123.456789, 100, 100, 10000, 100);
-    FHAlignmentCollection.UpdateClothoid(0, -12345.678, -23456.789, 234.5678, 110, 110, -10000, 230, false);
+    FHAlignmentCollection.AddClothoid(12345.678, 23456.789, 123.456789, 100, 100,
+      10000, 100);
+    FHAlignmentCollection.UpdateClothoid(0, -12345.678, -23456.789, 234.5678, 110, 110,
+      -10000, 230, False);
     R := FHAlignmentCollection.GetClothoid(0);
     CheckEquals(-12345.678, R.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(-23456.789, R.dblNorthing, iCoordinateTolerance, 'Easting');
@@ -4680,17 +4728,18 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestLoadFromFileSaveToFile;
+Procedure TestTHAlignmentCollection.TestLoadFromFileSaveToFile;
 Var
-  strFileName : String;
-  R : THElement;
-begin
-  strFileName := ExtractFilePath(ParamStr(0)) + 'TestAlignment.TXT';
+  strFileName: String;
+  R          : THElement;
+Begin
+  strFileName           := ExtractFilePath(ParamStr(0)) + 'TestAlignment.TXT';
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
-    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000, 100, True);
+    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000,
+      100, True);
     Check(Not FileExists(strFileName), 'Before Create');
     FHAlignmentCollection.SaveToFile(strFileName);
     Check(FileExists(strFileName), 'After Create');
@@ -4709,14 +4758,14 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestGetStraight;
+Procedure TestTHAlignmentCollection.TestGetStraight;
 
-var
-  R : THElement;
+Var
+  R: THElement;
 
-begin
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
@@ -4729,15 +4778,16 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestGetCircular;
-var
-  R : THElement;
-begin
+Procedure TestTHAlignmentCollection.TestGetCircular;
+Var
+  R: THElement;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
-    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000, 100, True);
+    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000,
+      100, True);
     R := FHAlignmentCollection.GetCircular(0);
     CheckEquals(12345.678, R.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23456.789, R.dblNorthing, iCoordinateTolerance, 'Easting');
@@ -4748,15 +4798,16 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestGetClothoid;
-var
-  R : THElement;
-begin
+Procedure TestTHAlignmentCollection.TestGetClothoid;
+Var
+  R: THElement;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
-    FHAlignmentCollection.AddClothoid(12345.678, 23456.789, 123.456789, 100, 100, 10000, 100);
+    FHAlignmentCollection.AddClothoid(12345.678, 23456.789, 123.456789, 100, 100,
+      10000, 100);
     R := FHAlignmentCollection.GetClothoid(0);
     CheckEquals(12345.678, R.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23456.789, R.dblNorthing, iCoordinateTolerance, 'Easting');
@@ -4767,68 +4818,74 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestStartChainage;
-var
-  dbl : Double;
-begin
+Procedure TestTHAlignmentCollection.TestStartChainage;
+Var
+  dbl: Double;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
     dbl := FHAlignmentCollection.GetStartChainage(0);
     CheckEquals(100, dbl, iCoordinateTolerance, 'Straight');
-    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000, 100, True);
+    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000,
+      100, True);
     dbl := FHAlignmentCollection.GetStartChainage(1);
     CheckEquals(100, dbl, iCoordinateTolerance, 'Circular');
-    FHAlignmentCollection.AddClothoid(12345.678, 23456.789, 123.456789, 100, 100, 10000, 100);
+    FHAlignmentCollection.AddClothoid(12345.678, 23456.789, 123.456789, 100, 100,
+      10000, 100);
     dbl := FHAlignmentCollection.GetStartChainage(2);
     CheckEquals(100, dbl, iCoordinateTolerance, 'Circular');
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestEndChainage;
-var
-  dbl : Double;
-begin
+Procedure TestTHAlignmentCollection.TestEndChainage;
+Var
+  dbl: Double;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
     dbl := FHAlignmentCollection.GetEndChainage(0);
     CheckEquals(200, dbl, iCoordinateTolerance, 'Straight');
-    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000, 100, True);
+    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000,
+      100, True);
     dbl := FHAlignmentCollection.GetEndChainage(1);
     CheckEquals(200, dbl, iCoordinateTolerance, 'Circular');
-    FHAlignmentCollection.AddClothoid(12345.678, 23456.789, 123.456789, 100, 100, 10000, 100);
+    FHAlignmentCollection.AddClothoid(12345.678, 23456.789, 123.456789, 100, 100,
+      10000, 100);
     dbl := FHAlignmentCollection.GetEndChainage(2);
     CheckEquals(200, dbl, iCoordinateTolerance, 'Circular');
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestClear;
-begin
+Procedure TestTHAlignmentCollection.TestClear;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 123.456789, 100, 100);
-    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000, 100, True);
-    FHAlignmentCollection.AddClothoid(12345.678, 23456.789, 123.456789, 100, 100, 10000, 100);
+    FHAlignmentCollection.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000,
+      100, True);
+    FHAlignmentCollection.AddClothoid(12345.678, 23456.789, 123.456789, 100, 100,
+      10000, 100);
     FHAlignmentCollection.Clear;
     Check(FHAlignmentCollection.Count = 0);
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestSetout;
-var
+Procedure TestTHAlignmentCollection.TestSetout;
+Var
   ReturnValue: THInfo;
-  dblOffset: Double;
+  dblOffset  : Double;
   dblChainage: Double;
-begin
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 54.3678, 0, 100);
@@ -4837,52 +4894,52 @@ begin
     FHAlignmentCollection.AddCircular(12515.762, 23558.559, 83.01569, 200,
       1000, 100, False);
     dblChainage := 23.456;
-    dblOffset   :=  9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHAlignmentCollection.Setout(dblChainage, dblOffset);
     CheckEquals(12370.187, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23462.859, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  54.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(54.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 34.566;
-    dblOffset   :=-12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHAlignmentCollection.Setout(dblChainage, dblOffset);
     CheckEquals(12366.580, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23486.960, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  54.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(54.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 123.456;
-    dblOffset   :=  9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHAlignmentCollection.Setout(dblChainage, dblOffset);
     CheckEquals(12451.377, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23520.794, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 134.566;
-    dblOffset   :=-12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHAlignmentCollection.Setout(dblChainage, dblOffset);
     CheckEquals(12448.860, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23545.063, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 223.456;
-    dblOffset   :=  9.345;
+    dblOffset   := 9.345;
     ReturnValue := FHAlignmentCollection.Setout(dblChainage, dblOffset);
     CheckEquals(12539.994, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23551.838, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  84.35962, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(84.35962, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblChainage := 234.566;
-    dblOffset   :=-12.345;
+    dblOffset   := -12.345;
     ReturnValue := FHAlignmentCollection.Setout(dblChainage, dblOffset);
     CheckEquals(12549.060, ReturnValue.dblEasting, iCoordinateTolerance, 'Easting');
     CheckEquals(23574.466, ReturnValue.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  84.99618, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(84.99618, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestMeasure;
-var
+Procedure TestTHAlignmentCollection.TestMeasure;
+Var
   ReturnValue: THInfo;
   dblNorthing: Double;
-  dblEasting: Double;
-begin
+  dblEasting : Double;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 54.3678, 0, 100);
@@ -4894,7 +4951,7 @@ begin
     dblNorthing := 23462.859;
     ReturnValue := FHAlignmentCollection.Measure(dblEasting, dblNorthing);
     CheckEquals(23.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
+    CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(54.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12366.580;
     dblNorthing := 23486.960;
@@ -4906,7 +4963,7 @@ begin
     dblNorthing := 23520.794;
     ReturnValue := FHAlignmentCollection.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
+    CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12448.860;
     dblNorthing := 23545.063;
@@ -4918,7 +4975,7 @@ begin
     dblNorthing := 23551.838;
     ReturnValue := FHAlignmentCollection.Measure(dblEasting, dblNorthing);
     CheckEquals(223.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
+    CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(84.35962, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
     dblEasting  := 12549.060;
     dblNorthing := 23574.466;
@@ -4929,15 +4986,15 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTHAlignmentCollection.TestCompare;
-var
+Procedure TestTHAlignmentCollection.TestCompare;
+Var
   ReturnValue: THCompInfo;
-  dblBearing: Double;
+  dblBearing : Double;
   dblNorthing: Double;
-  dblEasting: Double;
-begin
+  dblEasting : Double;
+Begin
   FHAlignmentCollection := THAlignmentCollection.Create;
   Try
     FHAlignmentCollection.AddStraight(12345.678, 23456.789, 54.3678, 0, 100);
@@ -5002,12 +5059,12 @@ begin
   Finally
     FHAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestCount;
-var
+Procedure TestTVAlignmentCollection.TestCount;
+Var
   ReturnValue: Integer;
-begin
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5016,12 +5073,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestElementType;
-var
+Procedure TestTVAlignmentCollection.TestElementType;
+Var
   ReturnValue: TElementType;
-begin
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5030,12 +5087,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestGetElementStart;
-var
+Procedure TestTVAlignmentCollection.TestGetElementStart;
+Var
   ReturnValue: TVInfo;
-begin
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5045,12 +5102,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestGetElementEnd;
-var
+Procedure TestTVAlignmentCollection.TestGetElementEnd;
+Var
   ReturnValue: TVInfo;
-begin
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5060,12 +5117,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestGetStartChainage;
-var
+Procedure TestTVAlignmentCollection.TestGetStartChainage;
+Var
   ReturnValue: Double;
-begin
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5074,12 +5131,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestGetEndChainage;
-var
+Procedure TestTVAlignmentCollection.TestGetEndChainage;
+Var
   ReturnValue: Double;
-begin
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5088,12 +5145,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestGetRadius;
-var
+Procedure TestTVAlignmentCollection.TestGetRadius;
+Var
   ReturnValue: Double;
-begin
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5102,14 +5159,14 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestLoadFromFileSaveToFile;
+Procedure TestTVAlignmentCollection.TestLoadFromFileSaveToFile;
 Var
-  strFileName : String;
-  R : TVElement;
-begin
-  strFileName := ExtractFilePath(ParamStr(0)) + 'TestAlignment.TXT';
+  strFileName: String;
+  R          : TVElement;
+Begin
+  strFileName           := ExtractFilePath(ParamStr(0)) + 'TestAlignment.TXT';
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5129,12 +5186,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestAddStraight;
-var
-  S : TVElement;
-begin
+Procedure TestTVAlignmentCollection.TestAddStraight;
+Var
+  S: TVElement;
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     CheckEquals(0, FVAlignmentCollection.Count);
@@ -5148,12 +5205,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestAddCircular;
-var
-  C : TVElement;
-begin
+Procedure TestTVAlignmentCollection.TestAddCircular;
+Var
+  C: TVElement;
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     CheckEquals(0, FVAlignmentCollection.Count);
@@ -5168,12 +5225,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestUpdateStraight;
-var
-  S : TVElement;
-begin
+Procedure TestTVAlignmentCollection.TestUpdateStraight;
+Var
+  S: TVElement;
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5191,12 +5248,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestUpdateCircular;
-var
-  C : TVElement;
-begin
+Procedure TestTVAlignmentCollection.TestUpdateCircular;
+Var
+  C: TVElement;
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddCircular(100, 0.1, 100, 100, -1000);
@@ -5216,12 +5273,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestGetStraight;
-var
-  S : TVElement;
-begin
+Procedure TestTVAlignmentCollection.TestGetStraight;
+Var
+  S: TVElement;
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5233,12 +5290,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestGetCircular;
-var
-  C : TVElement;
-begin
+Procedure TestTVAlignmentCollection.TestGetCircular;
+Var
+  C: TVElement;
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddCircular(100, 0.1, 100, 100, -1000);
@@ -5251,12 +5308,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestStartChainage;
-var
+Procedure TestTVAlignmentCollection.TestStartChainage;
+Var
   ReturnValue: Double;
-begin
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddCircular(100, 0.1, 100, 100, -1000);
@@ -5265,12 +5322,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestEndChainage;
-var
+Procedure TestTVAlignmentCollection.TestEndChainage;
+Var
   ReturnValue: Double;
-begin
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddCircular(100, 0.1, 100, 100, -1000);
@@ -5279,10 +5336,10 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestClear;
-begin
+Procedure TestTVAlignmentCollection.TestClear;
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     CheckEquals(0, FVAlignmentCollection.Count);
@@ -5294,12 +5351,12 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTVAlignmentCollection.TestSetout;
-var
+Procedure TestTVAlignmentCollection.TestSetout;
+Var
   ReturnValue: TVInfo;
-begin
+Begin
   FVAlignmentCollection := TVAlignmentCollection.Create;
   Try
     FVAlignmentCollection.AddStraight(100, 0.1, 100, 100);
@@ -5313,17 +5370,18 @@ begin
   Finally
     FVAlignmentCollection.Free;
   End;
-end;
+End;
 
-procedure TestTStringAlignment.TestSaveToFileLoadFromFile;
-var
-  strFileName: string;
-  R : THElement;
-begin
-  strFileName := ExtractFilePath(ParamStr(0)) + 'TestAlignment.TXT';
+Procedure TestTStringAlignment.TestSaveToFileLoadFromFile;
+Var
+  strFileName: String;
+  R          : THElement;
+Begin
+  strFileName      := ExtractFilePath(ParamStr(0)) + 'TestAlignment.TXT';
   FStringAlignment := TStringAlignment.Create;
   Try
-    FStringAlignment.HAlignment.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000, 100, True);
+    FStringAlignment.HAlignment.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000,
+      100, True);
     FStringAlignment.VAlignment.AddStraight(100, 0.1, 100, 100);
     Check(Not FileExists(strFileName), 'Before Create');
     FStringAlignment.SaveToFile(strFileName);
@@ -5344,13 +5402,14 @@ begin
   Finally
     FStringAlignment.Free;
   End;
-end;
+End;
 
-procedure TestTStringAlignment.TestClear;
-begin
+Procedure TestTStringAlignment.TestClear;
+Begin
   FStringAlignment := TStringAlignment.Create;
   Try
-    FStringAlignment.HAlignment.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000, 100, True);
+    FStringAlignment.HAlignment.AddCircular(12345.678, 23456.789, 123.456789, 100, 1000,
+      100, True);
     FStringAlignment.VAlignment.AddStraight(100, 0.1, 100, 100);
     Check(FStringAlignment.HAlignment.Count = 1, 'Check Clear');
     Check(FStringAlignment.VAlignment.Count = 1, 'Check Clear');
@@ -5360,14 +5419,14 @@ begin
   Finally
     FStringAlignment.Free;
   End;
-end;
+End;
 
-procedure TestTStringAlignment.TestSetout;
-var
+Procedure TestTStringAlignment.TestSetout;
+Var
   ReturnValue: TInfo;
-  dblOffset: Double;
+  dblOffset  : Double;
   dblChainage: Double;
-begin
+Begin
   FStringAlignment := TStringAlignment.Create;
   Try
     FStringAlignment.HAlignment.AddStraight(12345.678, 23456.789, 54.3678, 0, 100);
@@ -5378,64 +5437,70 @@ begin
     FStringAlignment.VAlignment.AddStraight(100, 0.1, 0, 100);
     FStringAlignment.VAlignment.AddCircular(110, 0.1, 100, 200, -1000);
     dblChainage := 23.456;
-    dblOffset   :=  9.345;
+    dblOffset   := 9.345;
     ReturnValue := FStringAlignment.Setout(dblChainage, dblOffset);
     CheckEquals(12370.187, ReturnValue.HInfo.dblEasting, iCoordinateTolerance, 'Easting');
-    CheckEquals(23462.859, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  54.3678, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  102.345, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(      0.1, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(23462.859, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance,
+      'Northing');
+    CheckEquals(54.3678, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(102.345, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(0.1, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
     dblChainage := 34.566;
-    dblOffset   :=-12.345;
+    dblOffset   := -12.345;
     ReturnValue := FStringAlignment.Setout(dblChainage, dblOffset);
     CheckEquals(12366.580, ReturnValue.HInfo.dblEasting, iCoordinateTolerance, 'Easting');
-    CheckEquals(23486.960, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  54.3678, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  103.456, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(      0.1, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(23486.960, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance,
+      'Northing');
+    CheckEquals(54.3678, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(103.456, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(0.1, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
     dblChainage := 123.456;
-    dblOffset   :=  9.345;
+    dblOffset   := 9.345;
     ReturnValue := FStringAlignment.Setout(dblChainage, dblOffset);
     CheckEquals(12451.377, ReturnValue.HInfo.dblEasting, iCoordinateTolerance, 'Easting');
-    CheckEquals(23520.794, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  55.94396, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  112.070, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(    0.077, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(23520.794, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance,
+      'Northing');
+    CheckEquals(55.94396, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(112.070, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(0.077, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
     dblChainage := 134.566;
-    dblOffset   :=-12.345;
+    dblOffset   := -12.345;
     ReturnValue := FStringAlignment.Setout(dblChainage, dblOffset);
     CheckEquals(12448.860, ReturnValue.HInfo.dblEasting, iCoordinateTolerance, 'Easting');
-    CheckEquals(23545.063, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  57.79067, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  112.859, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(    0.065, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(23545.063, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance,
+      'Northing');
+    CheckEquals(57.79067, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(112.859, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(0.065, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
     dblChainage := 223.456;
-    dblOffset   :=  9.345;
+    dblOffset   := 9.345;
     ReturnValue := FStringAlignment.Setout(dblChainage, dblOffset);
     CheckEquals(12539.994, ReturnValue.HInfo.dblEasting, iCoordinateTolerance, 'Easting');
-    CheckEquals(23551.838, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  84.35962, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  114.725, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(   -0.023, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(23551.838, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance,
+      'Northing');
+    CheckEquals(84.35962, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(114.725, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(-0.023, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
     dblChainage := 234.566;
-    dblOffset   :=-12.345;
+    dblOffset   := -12.345;
     ReturnValue := FStringAlignment.Setout(dblChainage, dblOffset);
     CheckEquals(12549.060, ReturnValue.HInfo.dblEasting, iCoordinateTolerance, 'Easting');
-    CheckEquals(23574.466, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance, 'Northing');
-    CheckEquals(  84.99618, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  114.402, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(   -0.035, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(23574.466, ReturnValue.HInfo.dblNorthing, iCoordinateTolerance,
+      'Northing');
+    CheckEquals(84.99618, ReturnValue.HInfo.dblBearing, iBearingTolerance, 'Bearing');
+    CheckEquals(114.402, ReturnValue.VInfo.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(-0.035, ReturnValue.VInfo.dblGradient, iCoordinateTolerance, 'Gradient');
   Finally
     FStringAlignment.Free;
   End;
-end;
+End;
 
-procedure TestTStringAlignment.TestMeasure;
-var
+Procedure TestTStringAlignment.TestMeasure;
+Var
   ReturnValue: TMeasureInfo;
   dblNorthing: Double;
-  dblEasting: Double;
-begin
+  dblEasting : Double;
+Begin
   FStringAlignment := TStringAlignment.Create;
   Try
     FStringAlignment.HAlignment.AddStraight(12345.678, 23456.789, 54.3678, 0, 100);
@@ -5449,62 +5514,62 @@ begin
     dblNorthing := 23462.859;
     ReturnValue := FStringAlignment.Measure(dblEasting, dblNorthing);
     CheckEquals(23.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
+    CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(54.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  102.345, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(      0.1, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(102.345, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(0.1, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
     dblEasting  := 12366.580;
     dblNorthing := 23486.960;
     ReturnValue := FStringAlignment.Measure(dblEasting, dblNorthing);
     CheckEquals(34.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-12.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(54.3678, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  103.456, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(      0.1, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(103.456, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(0.1, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
     dblEasting  := 12451.377;
     dblNorthing := 23520.794;
     ReturnValue := FStringAlignment.Measure(dblEasting, dblNorthing);
     CheckEquals(123.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
+    CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(55.94396, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  112.070, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(    0.077, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(112.070, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(0.077, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
     dblEasting  := 12448.860;
     dblNorthing := 23545.063;
     ReturnValue := FStringAlignment.Measure(dblEasting, dblNorthing);
     CheckEquals(134.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-12.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(57.79067, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  112.859, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(    0.065, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(112.859, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(0.065, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
     dblEasting  := 12539.994;
     dblNorthing := 23551.838;
     ReturnValue := FStringAlignment.Measure(dblEasting, dblNorthing);
     CheckEquals(223.456, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
-    CheckEquals( 9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
+    CheckEquals(9.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(84.35962, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  114.725, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(   -0.023, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(114.725, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(-0.023, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
     dblEasting  := 12549.060;
     dblNorthing := 23574.466;
     ReturnValue := FStringAlignment.Measure(dblEasting, dblNorthing);
     CheckEquals(234.566, ReturnValue.dblChainage, iCoordinateTolerance, 'Chainage');
     CheckEquals(-12.345, ReturnValue.dblOffset, iCoordinateTolerance, 'Offset');
     CheckEquals(84.99618, ReturnValue.dblBearing, iBearingTolerance, 'Bearing');
-    CheckEquals(  114.402, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
-    CheckEquals(   -0.035, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
+    CheckEquals(114.402, ReturnValue.dblLevel, iCoordinateTolerance, 'Level');
+    CheckEquals(-0.035, ReturnValue.dblGradient, iCoordinateTolerance, 'Gradient');
   Finally
     FStringAlignment.Free;
   End;
-end;
+End;
 
-procedure TestTStringAlignment.TestCompare;
-var
+Procedure TestTStringAlignment.TestCompare;
+Var
   ReturnValue: TCompareInfo;
-  dblBearing: Double;
+  dblBearing : Double;
   dblNorthing: Double;
-  dblEasting: Double;
-begin
+  dblEasting : Double;
+Begin
   FStringAlignment := TStringAlignment.Create;
   Try
     FStringAlignment.HAlignment.AddStraight(12345.678, 23456.789, 54.3678, 0, 100);
@@ -5583,283 +5648,283 @@ begin
   Finally
     FStringAlignment.Free;
   End;
-end;
+End;
 
 { THStraightElementTestClass }
 
-function THStraightElementTestClass.Compare(dblEasting, dblNorthing,
+Function THStraightElementTestClass.Compare(dblEasting, dblNorthing,
   dblBearing: Double): THCompInfo;
-begin
+Begin
   Result := Inherited Compare(dblEasting, dblNorthing, dblBearing);
-end;
+End;
 
-constructor THStraightElementTestClass.Create(dblEasting, dblNorthing,
+Constructor THStraightElementTestClass.Create(dblEasting, dblNorthing,
   dblBearing, dblChainage, dblLength: Double);
-begin
-  inherited;
-end;
+Begin
+  Inherited;
+End;
 
-function THStraightElementTestClass.GetElementType: TElementType;
-begin
+Function THStraightElementTestClass.GetElementType: TElementType;
+Begin
   Result := Inherited GetElementType;
-end;
+End;
 
-function THStraightElementTestClass.GetElementDetails: THElement;
-begin
+Function THStraightElementTestClass.GetElementDetails: THElement;
+Begin
   Result := Inherited GetElementDetails;
-end;
+End;
 
-function THStraightElementTestClass.GetEndChainage: Double;
-begin
+Function THStraightElementTestClass.GetEndChainage: Double;
+Begin
   Result := Inherited GetEndChainage;
-end;
+End;
 
-function THStraightElementTestClass.GetEndPoint: THInfo;
-begin
+Function THStraightElementTestClass.GetEndPoint: THInfo;
+Begin
   Result := Inherited GetEndPoint;
-end;
+End;
 
-function THStraightElementTestClass.GetRadius(dblChainage: Double): Double;
-begin
+Function THStraightElementTestClass.GetRadius(dblChainage: Double): Double;
+Begin
   Result := Inherited GetRadius(dblChainage);
-end;
+End;
 
-function THStraightElementTestClass.GetStartChainage: Double;
-begin
+Function THStraightElementTestClass.GetStartChainage: Double;
+Begin
   Result := Inherited GetStartChainage;
-end;
+End;
 
-function THStraightElementTestClass.GetStartPoint: THInfo;
-begin
+Function THStraightElementTestClass.GetStartPoint: THInfo;
+Begin
   Result := Inherited GetStartPoint;
-end;
+End;
 
-function THStraightElementTestClass.Measure(dblEasting, dblNorthing: Double): THInfo;
-begin
+Function THStraightElementTestClass.Measure(dblEasting, dblNorthing: Double): THInfo;
+Begin
   Result := Inherited Measure(dblEasting, dblNorthing);
-end;
+End;
 
-function THStraightElementTestClass.Setout(dblChainage, dblOffset: Double): THInfo;
-begin
+Function THStraightElementTestClass.Setout(dblChainage, dblOffset: Double): THInfo;
+Begin
   Result := Inherited Setout(dblChainage, dblOffset);
-end;
+End;
 
 { THCircularElementTestClass }
 
-function THCircularElementTestClass.Compare(dblEasting, dblNorthing,
+Function THCircularElementTestClass.Compare(dblEasting, dblNorthing,
   dblBearing: Double): THCompInfo;
-begin
+Begin
   Result := Inherited Compare(dblEasting, dblNorthing, dblBearing);
-end;
+End;
 
-constructor THCircularElementTestClass.Create(dblEasting, dblNorthing,
+Constructor THCircularElementTestClass.Create(dblEasting, dblNorthing,
   dblChainage, dblBearing, dblLength, dblRadius: Double; bCentre: Boolean);
-begin
+Begin
   Inherited Create(dblEasting, dblNorthing, dblChainage, dblBearing, dblLength,
     dblRadius, bCentre);
-end;
+End;
 
-function THCircularElementTestClass.GetElementType: TElementType;
-begin
+Function THCircularElementTestClass.GetElementType: TElementType;
+Begin
   Result := Inherited GetElementType;
-end;
+End;
 
-function THCircularElementTestClass.GetElementDetails: THElement;
-begin
+Function THCircularElementTestClass.GetElementDetails: THElement;
+Begin
   Result := Inherited GetElementDetails;
-end;
+End;
 
-function THCircularElementTestClass.GetEndChainage: Double;
-begin
+Function THCircularElementTestClass.GetEndChainage: Double;
+Begin
   Result := Inherited GetEndChainage;
-end;
+End;
 
-function THCircularElementTestClass.GetEndPoint: THInfo;
-begin
+Function THCircularElementTestClass.GetEndPoint: THInfo;
+Begin
   Result := Inherited GetEndPoint;
-end;
+End;
 
-function THCircularElementTestClass.GetRadius(dblChainage: Double): Double;
-begin
+Function THCircularElementTestClass.GetRadius(dblChainage: Double): Double;
+Begin
   Result := Inherited GetRadius(dblChainage);
-end;
+End;
 
-function THCircularElementTestClass.GetStartChainage: Double;
-begin
+Function THCircularElementTestClass.GetStartChainage: Double;
+Begin
   Result := Inherited GetStartChainage;
-end;
+End;
 
-function THCircularElementTestClass.GetStartPoint: THInfo;
-begin
+Function THCircularElementTestClass.GetStartPoint: THInfo;
+Begin
   Result := Inherited GetStartPoint;
-end;
+End;
 
-function THCircularElementTestClass.Measure(dblEasting, dblNorthing: Double): THInfo;
-begin
+Function THCircularElementTestClass.Measure(dblEasting, dblNorthing: Double): THInfo;
+Begin
   Result := Inherited Measure(dblEasting, dblNorthing);
-end;
+End;
 
-function THCircularElementTestClass.Setout(dblChainage, dblOffset: Double): THInfo;
-begin
+Function THCircularElementTestClass.Setout(dblChainage, dblOffset: Double): THInfo;
+Begin
   Result := Inherited Setout(dblChainage, dblOffset);
-end;
+End;
 
 { THClothoidElementTestClass }
 
-function THClothoidElementTestClass.Compare(dblEasting, dblNorthing,
+Function THClothoidElementTestClass.Compare(dblEasting, dblNorthing,
   dblBearing: Double): THCompInfo;
-begin
+Begin
   Result := Inherited Compare(dblEasting, dblNorthing, dblBearing);
-end;
+End;
 
-constructor THClothoidElementTestClass.Create(dblEasting, dblNorthing,
+Constructor THClothoidElementTestClass.Create(dblEasting, dblNorthing,
   dblChainage, dblBearing, dblLength, dblStChainageOrRadius,
-  dblRLValueOrEndRadius: Double; boolFalse : Boolean);
-begin
-  inherited;
-end;
+  dblRLValueOrEndRadius: Double; boolFalse: Boolean);
+Begin
+  Inherited;
+End;
 
-function THClothoidElementTestClass.GetElementType: TElementType;
-begin
+Function THClothoidElementTestClass.GetElementType: TElementType;
+Begin
   Result := Inherited GetElementType;
-end;
+End;
 
-function THClothoidElementTestClass.GetElementDetails: THElement;
-begin
+Function THClothoidElementTestClass.GetElementDetails: THElement;
+Begin
   Result := Inherited GetElementDetails;
-end;
+End;
 
-function THClothoidElementTestClass.GetEndChainage: Double;
-begin
+Function THClothoidElementTestClass.GetEndChainage: Double;
+Begin
   Result := Inherited GetEndChainage;
-end;
+End;
 
-function THClothoidElementTestClass.GetEndPoint: THInfo;
-begin
+Function THClothoidElementTestClass.GetEndPoint: THInfo;
+Begin
   Result := Inherited GetEndPoint;
-end;
+End;
 
-function THClothoidElementTestClass.GetRadius(dblChainage: Double): Double;
-begin
+Function THClothoidElementTestClass.GetRadius(dblChainage: Double): Double;
+Begin
   Result := Inherited GetRadius(dblChainage);
-end;
+End;
 
-function THClothoidElementTestClass.GetStartChainage: Double;
-begin
+Function THClothoidElementTestClass.GetStartChainage: Double;
+Begin
   Result := Inherited GetStartChainage;
-end;
+End;
 
-function THClothoidElementTestClass.GetStartPoint: THInfo;
-begin
+Function THClothoidElementTestClass.GetStartPoint: THInfo;
+Begin
   Result := Inherited GetStartPoint;
-end;
+End;
 
-function THClothoidElementTestClass.GetTheta(dblDistance: Double): Double;
-begin
+Function THClothoidElementTestClass.GetTheta(dblDistance: Double): Double;
+Begin
   Result := Inherited GetTheta(dblDistance);
-end;
+End;
 
-function THClothoidElementTestClass.GetX(dblDistance: Double): Double;
-begin
+Function THClothoidElementTestClass.GetX(dblDistance: Double): Double;
+Begin
   Result := Inherited GetX(dblDistance);
-end;
+End;
 
-function THClothoidElementTestClass.GetY(dblDistance: Double): Double;
-begin
+Function THClothoidElementTestClass.GetY(dblDistance: Double): Double;
+Begin
   Result := Inherited GetY(dblDistance);
-end;
+End;
 
-function THClothoidElementTestClass.Measure(dblEasting,
+Function THClothoidElementTestClass.Measure(dblEasting,
   dblNorthing: Double): THInfo;
-begin
+Begin
   Result := Inherited Measure(dblEasting, dblNorthing);
-end;
+End;
 
 { TVStraightElementTestClass }
 
-function TVStraightElementTestClass.GetElementType: TElementType;
-begin
+Function TVStraightElementTestClass.GetElementType: TElementType;
+Begin
   Result := Inherited GetElementType;
-end;
+End;
 
-function TVStraightElementTestClass.GetEndChainage: Double;
-begin
+Function TVStraightElementTestClass.GetEndChainage: Double;
+Begin
   Result := Inherited GetEndChainage;
-end;
+End;
 
-function TVStraightElementTestClass.GetEndPoint: TVInfo;
-begin
+Function TVStraightElementTestClass.GetEndPoint: TVInfo;
+Begin
   Result := Inherited GetEndPoint;
-end;
+End;
 
-function TVStraightElementTestClass.GetRadius(dblChainage: Double): Double;
-begin
+Function TVStraightElementTestClass.GetRadius(dblChainage: Double): Double;
+Begin
   Result := Inherited GetRadius(dblChainage);
-end;
+End;
 
-function TVStraightElementTestClass.GetStartChainage: Double;
-begin
+Function TVStraightElementTestClass.GetStartChainage: Double;
+Begin
   Result := Inherited GetStartChainage;
-end;
+End;
 
-function TVStraightElementTestClass.GetStartPoint: TVInfo;
-begin
+Function TVStraightElementTestClass.GetStartPoint: TVInfo;
+Begin
   Result := Inherited GetStartPoint;
-end;
+End;
 
-function TVStraightElementTestClass.Setout(dblChainage: Double): TVInfo;
-begin
+Function TVStraightElementTestClass.Setout(dblChainage: Double): TVInfo;
+Begin
   Result := Inherited Setout(dblChainage);
-end;
+End;
 
 { TVCircularElementTestClass }
 
-function TVCircularElementTestClass.GetElementType: TElementType;
-begin
+Function TVCircularElementTestClass.GetElementType: TElementType;
+Begin
   Result := Inherited GetElementType;
-end;
+End;
 
-function TVCircularElementTestClass.GetEndChainage: Double;
-begin
+Function TVCircularElementTestClass.GetEndChainage: Double;
+Begin
   Result := Inherited GetEndChainage;
-end;
+End;
 
-function TVCircularElementTestClass.GetEndPoint: TVInfo;
-begin
+Function TVCircularElementTestClass.GetEndPoint: TVInfo;
+Begin
   Result := Inherited GetEndPoint;
-end;
+End;
 
-function TVCircularElementTestClass.GetRadius(dblChainage: Double): Double;
-begin
+Function TVCircularElementTestClass.GetRadius(dblChainage: Double): Double;
+Begin
   Result := Inherited GetRadius(dblChainage);
-end;
+End;
 
-function TVCircularElementTestClass.GetStartChainage: Double;
-begin
+Function TVCircularElementTestClass.GetStartChainage: Double;
+Begin
   Result := Inherited GetStartChainage;
-end;
+End;
 
-function TVCircularElementTestClass.GetStartPoint: TVInfo;
-begin
+Function TVCircularElementTestClass.GetStartPoint: TVInfo;
+Begin
   Result := Inherited GetStartPoint;
-end;
+End;
 
-function TVCircularElementTestClass.Setout(dblChainage: Double): TVInfo;
-begin
+Function TVCircularElementTestClass.Setout(dblChainage: Double): TVInfo;
+Begin
   Result := Inherited Setout(dblChainage);
-end;
+End;
 
-initialization
-  // Register any test cases with the test runner
-  RegisterTest('Exported Functions', TestApplicationFunctions.Suite);
-  RegisterTest('Horizontal Elements', TestTHStraightElement.Suite);
-  RegisterTest('Horizontal Elements', TestTHCircularElement.Suite);
-  RegisterTest('Horizontal Elements', TestTHClothoidElement.Suite);
-  RegisterTest('Vertical Elements', TestTVStraightElement.Suite);
-  RegisterTest('Vertical Elements', TestTVCircularElement.Suite);
-  RegisterTest('Alignment Collections', TestTHAlignmentCollection.Suite);
-  RegisterTest('Alignment Collections', TestTVAlignmentCollection.Suite);
-  RegisterTest('Alignment Collections', TestTStringAlignment.Suite);
-end.
+Initialization
 
+// Register any test cases with the test runner
+RegisterTest('Exported Functions', TestApplicationFunctions.Suite);
+RegisterTest('Horizontal Elements', TestTHStraightElement.Suite);
+RegisterTest('Horizontal Elements', TestTHCircularElement.Suite);
+RegisterTest('Horizontal Elements', TestTHClothoidElement.Suite);
+RegisterTest('Vertical Elements', TestTVStraightElement.Suite);
+RegisterTest('Vertical Elements', TestTVCircularElement.Suite);
+RegisterTest('Alignment Collections', TestTHAlignmentCollection.Suite);
+RegisterTest('Alignment Collections', TestTVAlignmentCollection.Suite);
+RegisterTest('Alignment Collections', TestTStringAlignment.Suite);
 
+End.

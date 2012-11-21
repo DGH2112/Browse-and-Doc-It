@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Jul 2012
+  @Date    21 Nov 2012
 
 **)
 Unit DGHLibrary;
@@ -671,6 +671,8 @@ Type
   Function ExtractFileNameOnly(strFileName : String) : String;
   Function GetField(strText : String; Ch : Char; iIndex : Integer;
     boolIgnoreQuotes : Boolean = True): String;
+  Function SetField(strText : String; Ch : Char; iIndex : Integer;
+    strValue : String; boolIgnoreQuotes : Boolean = True): String;
   Function GetVector(dblStE, dblStN, dblEndE, dblEndN : Double) : TVector;
   Function HexToBin(sDisplayNumber : String) : String;
   Function HexToDec(sDisplayNumber : String) : String;
@@ -1046,21 +1048,68 @@ Begin
           Result := Copy(strText, 1, iEnd - 1);
         End Else
           Result := strText;
-      Exit;
     End
   Else If (iIndex > 1) And (iIndex < iNumOfFields) Then
     Begin
       iStart := PosOfNthChar(strText, Ch, iIndex - 1, boolIgnoreQuotes);
       iEnd := PosOfNthChar(strText, Ch, iIndex, boolIgnoreQuotes);
       Result := Copy(strText, iStart + 1, iEnd - iStart - 1);
-      Exit;
     End
   Else If iIndex = iNumOfFields Then
     Begin
       iStart := PosOfNthChar(strText, Ch, iIndex - 1, boolIgnoreQuotes);
       Result := Copy(strText, iStart + 1, Length(strText) - iStart);
-      Exit;
     End;
+End;
+
+(**
+
+  This method updates the indexed field in the given string with the given value and
+  returns a new string of all of the fields.
+
+  @precon  None.
+  @postcon Returns a new string of all of the fields.
+
+  @param   strText          as a String
+  @param   Ch               as a Char
+  @param   iIndex           as an Integer
+  @param   strValue         as a String
+  @param   boolIgnoreQuotes as a Boolean
+  @return  a String
+
+**)
+Function SetField(strText : String; Ch : Char; iIndex : Integer;
+    strValue : String; boolIgnoreQuotes : Boolean = True): String;
+var
+  iNumOfFields: Integer;
+  iStart, iEnd : Integer;
+
+Begin
+  Result := strText;
+  iNumOfFields := CharCount(Ch, strText, boolIgnoreQuotes) + 1;
+  If iIndex = 1 Then
+    Begin
+      If iNumOfFields > 1  Then
+        Begin
+          iEnd := PosOfNthChar(strText, Ch, 1, boolIgnoreQuotes);
+          Result := strValue + Copy(strText, iEnd, Length(strText) - iEnd + 1);
+        End Else
+          Result := strValue;
+    End
+  Else If (iIndex > 1) And (iIndex < iNumOfFields) Then
+    Begin
+      iStart := PosOfNthChar(strText, Ch, iIndex - 1, boolIgnoreQuotes);
+      iEnd := PosOfNthChar(strText, Ch, iIndex, boolIgnoreQuotes);
+      Result := Copy(strText, 1, iStart) + strValue +
+        Copy(strText, iEnd, Length(strText) - iEnd + 1);
+    End
+  Else If iIndex = iNumOfFields Then
+    Begin
+      iStart := PosOfNthChar(strText, Ch, iIndex - 1, boolIgnoreQuotes);
+      Result := Copy(strText, 1, iStart) + strValue;
+    End
+  Else If iIndex > iNumOfFields Then
+    Result := strText + StringOfChar(Ch, iIndex - iNumOfFields) + strValue;
 End;
 
 (**

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Nov 2012
+  @Date    22 Dec 2012
 
 **)
 Unit DGHLibrary;
@@ -5392,11 +5392,17 @@ Var
   iMajor, iMinor, iBugfix, iBuild : Integer;
   strBuildNumber  : String;
   dtDate : TDateTime;
+  strPlatform : String;
 
 Begin
   strBuildNumber := GetBuildNumber(ParamStr(0), iMajor, iMinor, iBugFix, iBuild);
+  {$IFDEF WIN64}
+  strPlatform := '64-bit';
+  {$ELSE}
+  strPlatform := '32-bit';
+  {$ENDIF}
   Result := Format(strTitle, [iMajor, iMinor, strBugFix[iBugFix + 1],
-    strBuildNumber]);
+    strBuildNumber, strPlatform]);
   {$IFDEF D2006}
   FileAge(ParamStr(0), dtDate);
   {$ELSE}

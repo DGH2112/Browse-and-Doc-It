@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    24 Jan 2011
+  @Date    20 Dec 2012
 
 **)
 unit CheckForUpdatesForm;
@@ -93,7 +93,7 @@ Var
 begin
   With (Control As TListBox).Canvas Do
     Begin
-      iColour := Integer(lbInformation.Items.Objects[Index]);
+      iColour := NativeInt(lbInformation.Items.Objects[Index]);
       Brush.Color := clBlack;
       If iColour <> clNone Then
         Font.Color := iColour;

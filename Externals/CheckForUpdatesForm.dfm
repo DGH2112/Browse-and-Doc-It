@@ -49,7 +49,6 @@ object frmCheckForUpdates: TfrmCheckForUpdates
     Height = 197
     Style = lbOwnerDrawVariable
     Anchors = [akLeft, akTop, akRight, akBottom]
-    Color = clBlack
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clAqua
     Font.Height = -11

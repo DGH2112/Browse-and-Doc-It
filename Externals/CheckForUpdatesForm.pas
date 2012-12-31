@@ -5,53 +5,65 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    20 Dec 2012
+  @Date    31 Dec 2012
 
 **)
-unit CheckForUpdatesForm;
+Unit CheckForUpdatesForm;
 
-interface
+Interface
 
-uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls;
+Uses
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  Buttons,
+  ExtCtrls;
 
-type
+Type
   (** This class represents for the form interface. **)
-  TfrmCheckForUpdates = class(TForm)
+  TfrmCheckForUpdates = Class(TForm)
     lbInformation: TListBox;
     btnOK: TBitBtn;
     tmFinish: TTimer;
     lblWebSite: TLabel;
-    procedure lbInformationDrawItem(Control: TWinControl; Index: Integer;
-      Rect: TRect; State: TOwnerDrawState);
-    procedure lbInformationMeasureItem(Control: TWinControl; Index: Integer;
-      var Height: Integer);
-    procedure tmFinishTimer(Sender: TObject);
-    procedure btnOKClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure lblWebSiteClick(Sender: TObject);
-    procedure lblWebSiteMouseEnter(Sender: TObject);
-    procedure lblWebSiteMouseLeave(Sender: TObject);
-  private
+    Procedure lbInformationDrawItem(Control: TWinControl; Index: Integer; Rect: TRect;
+      State: TOwnerDrawState);
+    Procedure lbInformationMeasureItem(Control: TWinControl; Index: Integer;
+      Var Height: Integer);
+    Procedure tmFinishTimer(Sender: TObject);
+    Procedure btnOKClick(Sender: TObject);
+    Procedure FormClose(Sender: TObject; Var Action: TCloseAction);
+    Procedure lblWebSiteClick(Sender: TObject);
+    Procedure lblWebSiteMouseEnter(Sender: TObject);
+    Procedure lblWebSiteMouseLeave(Sender: TObject);
+  Private
     { Private declarations }
-  public
+    Function CountSpaces(strText: String): Integer;
+  Public
     { Public declarations }
-    Class Procedure ShowUpdates(strMsg, strURL : String; iColour : TColor);
-    Class Procedure Finish(iSeconds : Integer);
+    Class Procedure ShowUpdates(strMsg, strURL: String);
+    Class Procedure Finish(iSeconds: Integer);
     Class Procedure HideUpdates;
-  end;
+  End;
 
-implementation
+Implementation
 
 {$R *.dfm}
 
 Uses
-  ShellAPI;
+  ShellAPI,
+  Themes;
 
 Var
   (** This is an private variable for the Singleton Form reference. **)
-  frm : TfrmCheckForUpdates;
+  frm: TfrmCheckForUpdates;
 
 { TfrmCheckForUpdatesForm }
 
@@ -63,11 +75,12 @@ Var
   @postcon Frees and Nils the form.
 
 **)
-class procedure TfrmCheckForUpdates.HideUpdates;
-begin
+Class Procedure TfrmCheckForUpdates.HideUpdates;
+
+Begin
   If Assigned(frm) Then
     FreeAndNil(frm);
-end;
+End;
 
 (**
 
@@ -82,30 +95,33 @@ end;
   @param   State   as a TOwnerDrawState
 
 **)
-procedure TfrmCheckForUpdates.lbInformationDrawItem(Control: TWinControl;
-  Index: Integer; Rect: TRect; State: TOwnerDrawState);
+Procedure TfrmCheckForUpdates.lbInformationDrawItem(Control: TWinControl; Index: Integer;
+  Rect: TRect; State: TOwnerDrawState);
 
 Var
-  iColour : TColor;
-  strText : String;
-  R : TRect;
+  strText: String;
+  iIndent: Integer;
+  lbx: TListBox;
 
-begin
-  With (Control As TListBox).Canvas Do
+Begin
+  lbx := (Control As TListBox);
+  lbx.Canvas.Brush.Color := StyleServices.GetSystemColor(clWindow);
+  lbx.Canvas.Font.Color  := StyleServices.GetSystemColor(clWindowText);
+  If odSelected In State Then
     Begin
-      iColour := NativeInt(lbInformation.Items.Objects[Index]);
-      Brush.Color := clBlack;
-      If iColour <> clNone Then
-        Font.Color := iColour;
-      FillRect(Rect);
-      strText := (Control As TListBox).Items[Index];
-      R := (Control As TListBox).ItemRect(Index);
-      Inc(R.Left, 4);
-      Dec(R.Right, 4);
-      DrawText((Control As TListBox).Canvas.Handle, PChar(strText), Length(strText), R,
-        DT_LEFT Or DT_NOCLIP Or DT_NOPREFIX Or DT_WORDBREAK);
+      lbx.Canvas.Brush.Color := StyleServices.GetSystemColor(clHighlight);
+      lbx.Canvas.Font.Color  := StyleServices.GetSystemColor(clHighlightText);
+      lbx.Canvas.DrawFocusRect(Rect);
     End;
-end;
+  strText := lbx.Items[Index];
+  iIndent := CountSpaces(strText);
+  strText := Trim(strText);
+  lbx.Canvas.FillRect(Rect);
+  Inc(Rect.Left, 4 + 5 * iIndent);
+  Dec(Rect.Right, 4);
+  DrawText(lbx.Canvas.Handle, PChar(strText), Length(strText), Rect,
+    DT_LEFT Or DT_VCENTER Or DT_NOCLIP Or DT_NOPREFIX Or DT_WORDBREAK);
+End;
 
 (**
 
@@ -119,23 +135,26 @@ end;
   @param   Height  as an Integer as a reference
 
 **)
-procedure TfrmCheckForUpdates.lbInformationMeasureItem(Control: TWinControl;
-  Index: Integer; var Height: Integer);
+Procedure TfrmCheckForUpdates.lbInformationMeasureItem(Control: TWinControl;
+  Index: Integer; Var Height: Integer);
 
 Var
-  strText : String;
-  R : TRect;
+  strText: String;
+  R      : TRect;
+  iIndent : Integer;
 
-begin
+Begin
   strText := (Control As TListBox).Items[Index];
-  R := (Control As TListBox).ItemRect(Index);
-  Inc(R.Left, 4);
+  iIndent := CountSpaces(strText);
+  strText := Trim(strText);
+  R       := (Control As TListBox).ItemRect(Index);
+  Inc(R.Left, 4 + 5 * iIndent);
   Dec(R.Right, 4);
   DrawText((Control As TListBox).Canvas.Handle, PChar(strText), Length(strText), R,
-    DT_CALCRECT Or DT_LEFT Or DT_NOCLIP Or DT_NOPREFIX Or DT_WORDBREAK);
-  If R.Bottom - R.Top > Height Then
-    Height := R.Bottom - R.Top + 3;
-end;
+    DT_CALCRECT Or DT_LEFT Or DT_VCENTER Or DT_NOCLIP Or DT_NOPREFIX Or DT_WORDBREAK);
+  //If R.Bottom - R.Top > Height Then
+  Height := R.Bottom - R.Top + 4;
+End;
 
 (**
 
@@ -147,11 +166,12 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmCheckForUpdates.lblWebSiteClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle, 'OPEN', PChar(lblWebSite.Caption),
-    '', '', SW_SHOWNORMAL);
-end;
+Procedure TfrmCheckForUpdates.lblWebSiteClick(Sender: TObject);
+
+Begin
+  ShellExecute(Application.Handle, 'OPEN', PChar(lblWebSite.Caption), '', '',
+    SW_SHOWNORMAL);
+End;
 
 (**
 
@@ -163,10 +183,11 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmCheckForUpdates.lblWebSiteMouseEnter(Sender: TObject);
-begin
+Procedure TfrmCheckForUpdates.lblWebSiteMouseEnter(Sender: TObject);
+
+Begin
   lblWebSite.Font.Style := lblWebSite.Font.Style + [fsUnderline];
-end;
+End;
 
 (**
 
@@ -178,10 +199,11 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmCheckForUpdates.lblWebSiteMouseLeave(Sender: TObject);
-begin
+Procedure TfrmCheckForUpdates.lblWebSiteMouseLeave(Sender: TObject);
+
+Begin
   lblWebSite.Font.Style := lblWebSite.Font.Style - [fsUnderline];
-end;
+End;
 
 (**
 
@@ -192,36 +214,35 @@ end;
 
   @param   strMsg  as a String
   @param   strURL  as a String
-  @param   iColour as a TColor
 
 **)
-class procedure TfrmCheckForUpdates.ShowUpdates(strMsg, strURL: String;
-  iColour: TColor);
+Class Procedure TfrmCheckForUpdates.ShowUpdates(strMsg, strURL: String);
 
 Var
-  sl : TStringList;
+  sl: TStringList;
   i : Integer;
 
-begin
+Begin
   If frm = Nil Then
     frm := TfrmCheckForUpdates.Create(Nil);
-  With frm Do
+  If Not frm.Visible Then
     Begin
-      Show;
-      sl := TStringList.Create;
-      Try
-        sl.Text := strMsg;
-        For i := 0 To Sl.Count - 1 Do
-          If sl[i] <> '' Then
-            lbInformation.Items.AddObject(sl[i], TObject(iColour));
-      Finally
-        sl.Free;
-      End;
-      lbInformation.ItemIndex := lbInformation.Items.Count - 1;
-      lblWebSite.Caption := strURL;
+      frm.lbInformation.Clear;
+      frm.Show;
     End;
+  sl := TStringList.Create;
+  Try
+    sl.Text := strMsg;
+    For i   := 0 To sl.Count - 1 Do
+      If sl[i] <> '' Then
+        frm.lbInformation.Items.Add(sl[i]);
+  Finally
+    sl.Free;
+  End;
+  frm.lbInformation.ItemIndex := frm.lbInformation.Items.Count - 1;
+  frm.lblWebSite.Caption      := strURL;
   Application.ProcessMessages;
-end;
+End;
 
 (**
 
@@ -233,10 +254,11 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmCheckForUpdates.tmFinishTimer(Sender: TObject);
-begin
+Procedure TfrmCheckForUpdates.tmFinishTimer(Sender: TObject);
+
+Begin
   Close;
-end;
+End;
 
 (**
 
@@ -248,10 +270,36 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmCheckForUpdates.btnOKClick(Sender: TObject);
-begin
+Procedure TfrmCheckForUpdates.btnOKClick(Sender: TObject);
+
+Begin
   Close;
-end;
+End;
+
+(**
+
+  This method returns the number of spaces at the start of a line of text.
+
+  @precon  None.
+  @postcon Returns the number of spaces at the start of a line of text.
+
+  @param   strText as a String
+  @return  an Integer
+
+**)
+Function TfrmCheckForUpdates.CountSpaces(strText: String): Integer;
+
+Var
+  i : Integer;
+  
+Begin
+  Result := 0;
+  For i := 1 To Length(strText) Do
+    If strText[i] <>#32 Then
+      Break
+    Else
+      Inc(Result);
+End;
 
 (**
 
@@ -265,12 +313,13 @@ end;
   @param   iSeconds as an Integer
 
 **)
-class procedure TfrmCheckForUpdates.Finish(iSeconds : Integer);
-begin
-  frm.btnOK.Enabled := True;
+Class Procedure TfrmCheckForUpdates.Finish(iSeconds: Integer);
+
+Begin
+  frm.btnOK.Enabled     := True;
   frm.tmFinish.Interval := iSeconds * 1000;
-  frm.tmFinish.Enabled := True;
-end;
+  frm.tmFinish.Enabled  := True;
+End;
 
 (**
 
@@ -283,17 +332,17 @@ end;
   @param   Action as a TCloseAction as a reference
 
 **)
-procedure TfrmCheckForUpdates.FormClose(Sender: TObject;
-  var Action: TCloseAction);
-begin
+Procedure TfrmCheckForUpdates.FormClose(Sender: TObject; Var Action: TCloseAction);
+
+Begin
   tmFinish.Enabled := False;
-end;
+End;
 
 (** Nothing the intialise. **)
 Initialization
+
 (** Make sure the form is freed is its been created. **)
 Finalization
   If frm <> Nil Then
     frm.Free;
-end.
-
+End.

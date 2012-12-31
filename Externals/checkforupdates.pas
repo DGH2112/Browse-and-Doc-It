@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Aug 2012
+  @Date    31 Dec 2012
 
 **)
 Unit CheckForUpdates;
@@ -704,7 +704,7 @@ Begin
   {$ELSE}
   If strText <> '' Then
     TfrmCheckForUpdates.ShowUpdates(StringReplace(strText, #13#10, #32, [rfReplaceAll]),
-      strURL, iColour);
+      strURL);
   {$ENDIF}
 End;
 

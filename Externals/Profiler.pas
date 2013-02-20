@@ -4,7 +4,7 @@
   profiles.
 
   @Version 1.0
-  @Date    18 Feb 2013
+  @Date    20 Feb 2013
   @Author  David Hoyle
 
 **)
@@ -18,6 +18,7 @@ Uses
   Forms,
   StdCtrls {$ENDIF};
 
+{$IFDEF PROFILECODE}
 Type
   (** This class represent a single element of profile information. It can
       contain sub elements of itself to build up and stack similar to that
@@ -83,6 +84,7 @@ Var
   (** This is a public variable which give the calling code access to the
       instance of the TPRofiler class. **)
   CodeProfiler: TProfiler;
+{$ENDIF}
 
 Implementation
 
@@ -91,6 +93,7 @@ Uses
   Windows {$IFNDEF CONSOLE},
   Controls {$ENDIF};
 
+{$IFDEF PROFILECODE}
 (**
 
   This method returns the performance tick count from the system.
@@ -344,9 +347,7 @@ End;
 **)
 Destructor TProfiler.Destroy;
 Begin
-  {$IFDEF PROFILECODE}
   DumpProfileInformation;
-  {$ENDIF}
   FRootProfile.Free;
   {$IFNDEF CONSOLE}
   FProgressForm.Free;
@@ -478,11 +479,16 @@ Begin
   FCurrentProfile   := FCurrentProfile.StartProfile(strMethodName, FStackTop);
   Msg('Profiling: ' + strMethodName);
 End;
+{$ENDIF}
 
 (** Creates the profiler on loading the module. **)
 Initialization
+  {$IFDEF PROFILECODE}
   CodeProfiler := TProfiler.Create;
+  {$ENDIF}
 (** Frees (and writes data) the profiler on unloading the module **)
 Finalization
+  {$IFDEF PROFILECODE}
   CodeProfiler.Free;
+  {$ENDIF}
 End.

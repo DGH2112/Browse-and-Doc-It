@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    06 Dec 2012
+  @Date    10 Mar 2013
 
 **)
 Unit DGHMemoryMonitorControl;
@@ -371,7 +371,7 @@ End;
 Procedure TDGHMemoryMonitor.SetLowPoint(Const Value: TPercentage);
 
 Begin
-  If (Value < FHalfPoint) And (Value > 0) Then
+  //If (Value < FHalfPoint) And (Value > 0) Then
     FLowPoint := Value;
 End;
 
@@ -388,7 +388,7 @@ End;
 Procedure TDGHMemoryMonitor.SetHighPoint(Const Value: TPercentage);
 
 Begin
-  If (Value > FHalfPoint) And (Value <= 100) Then
+  //If (Value > FHalfPoint) And (Value <= 100) Then
     FHighPoint := Value;
 End;
 
@@ -405,7 +405,7 @@ End;
 Procedure TDGHMemoryMonitor.SetHalfPoint(Const Value: TPercentage);
 
 Begin
-  If (Value > FLowPoint) And (Value < FHighPoint) Then
+  //If (Value > FLowPoint) And (Value < FHighPoint) Then
     FHalfPoint := Value;
 End;
 

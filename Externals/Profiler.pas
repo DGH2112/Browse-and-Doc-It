@@ -4,7 +4,7 @@
   profiles.
 
   @Version 1.0
-  @Date    20 Feb 2013
+  @Date    14 Apr 2013
   @Author  David Hoyle
 
 **)
@@ -71,7 +71,7 @@ Type
   Strict Protected
     Procedure DumpProfileInformation;
     {$IFNDEF CONSOLE}
-    Procedure Msg(strMsg: String);
+    Procedure Msg(strMsg: String; boolForce : Boolean = False);
     {$ENDIF}
   Public
     Constructor Create;
@@ -94,6 +94,15 @@ Uses
   Controls {$ENDIF};
 
 {$IFDEF PROFILECODE}
+
+Const
+  (** This is the time in millisecond between outputting messages to the form. **)
+  iUpdateTime = 10;
+
+Var
+  (** This is the time in milliseconds of the last output message. **)
+  iLastMsg : Int64;
+  
 (**
 
   This method returns the performance tick count from the system.
@@ -108,6 +117,7 @@ Function TickTime: Double;
 
 Var
   t, f: Int64;
+  
 Begin
   QueryPerformanceCounter(t);
   QueryPerformanceFrequency(f);
@@ -311,24 +321,27 @@ Constructor TProfiler.Create;
 Begin
   {$IFNDEF CONSOLE}
   FProgressForm               := TForm.Create(Nil);
-  FProgressForm.BorderStyle   := bsToolWindow;
-  FProgressForm.Caption       := 'Profiling...';
+  FProgressForm.BorderStyle   := bsSingle;
+  FProgressForm.Caption       := 'Code Profiling...';
   FProgressForm.ClientWidth   := 400;
   FProgressForm.ClientHeight  := 50;
-  FProgressForm.Top           := Screen.Height - FProgressForm.Height;
-  FProgressForm.Left          := Screen.Width - FProgressForm.Width;
+  FProgressForm.Top           := Screen.WorkAreaHeight - FProgressForm.Height;
+  FProgressForm.Left          := Screen.WorkAreaWidth - FProgressForm.Width;
   FProgressForm.FormStyle     := fsStayOnTop;
   FProgressForm.Margins.Left  := 5;
   FProgressForm.Margins.Right := 5;
-  FLabel                     := TLabel.Create(FProgressForm);
-  FLabel.Parent              := FProgressForm;
-  FLabel.Align               := alClient;
-  FLabel.Layout              := tlCenter;
-  FLabel.Caption             := 'Loading...';
-  FLabel.Font.Name           := 'Arial';
-  FLabel.Font.Size           := 9;
-  FLabel.WordWrap            := True;
-  FLabel.EllipsisPosition    := epEndEllipsis;
+  FProgressForm.BorderIcons   := [];
+  FLabel                      := TLabel.Create(FProgressForm);
+  FLabel.Parent               := FProgressForm;
+  FLabel.Align                := alClient;
+  FLabel.Layout               := tlCenter;
+  FLabel.Caption              := 'Loading...';
+  FLabel.Font.Name            := 'Arial';
+  FLabel.Font.Size            := 9;
+  FLabel.WordWrap             := False;
+  FLabel.EllipsisPosition     := epEndEllipsis;
+  FLabel.AlignWithMargins     := True;
+  FLabel.Margins.SetBounds(10, 5, 10, 5);
   FProgressForm.Show;
   Msg('Profiler started!');
   {$ENDIF}
@@ -426,14 +439,19 @@ End;
   @precon  None.
   @postcon Outputs a message to the profile form.
 
-  @param   strMsg as a String
+  @param   strMsg    as a String
+  @param   boolForce as a Boolean
 
 **)
-Procedure TProfiler.Msg(strMsg: String);
+Procedure TProfiler.Msg(strMsg: String; boolForce : Boolean = False);
 
 Begin
-  FLabel.Caption := strMsg;
-  Application.ProcessMessages;
+  If (iLastMsg + iUpdateTime < GetTickCount) Or boolForce Then
+    Begin
+      FLabel.Caption := strMsg;
+      Application.ProcessMessages;
+      iLastMsg := GetTickCount;
+    End;
 End;
 {$ENDIF}
 
@@ -455,7 +473,7 @@ Begin
     FStackTop     := 0;
   FCurrentProfile := FCurrentProfile.StopProfile;
   If FStackTop <= 0 Then
-    Msg('Idle.');
+    Msg('Idle.', True);
 End;
 
 (**
@@ -484,6 +502,7 @@ End;
 (** Creates the profiler on loading the module. **)
 Initialization
   {$IFDEF PROFILECODE}
+  iLastMsg := 0;
   CodeProfiler := TProfiler.Create;
   {$ENDIF}
 (** Frees (and writes data) the profiler on unloading the module **)

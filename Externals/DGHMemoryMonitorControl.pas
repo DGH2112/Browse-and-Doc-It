@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    10 Mar 2013
+  @Date    17 Apr 2013
 
 **)
 Unit DGHMemoryMonitorControl;
@@ -22,6 +22,9 @@ Uses
   DGHCustomGraphicsControl;
 
 Type
+  (** An enumerate to define the different memory block types. **)
+  TDGHMemType = (dmtLarge, dmtMedium, dmtSmall);
+
   (** A class to represent the Battery Monitor Grasphics control. **)
   TDGHMemoryMonitor = Class(TDGHCustomGraphicControl)
   Private
@@ -42,6 +45,7 @@ Type
     FLowPoint      : TPercentage;
     FHalfPoint     : TPercentage;
     FBackFontColour: TColor;
+    FMemBlocks     : Array[Low(TDGHMemType)..High(TDGHMemType)] Of Cardinal;
   Protected
     { Protected declarations }
     Procedure Paint; Override;
@@ -284,10 +288,14 @@ Var
 Begin
   GetMemoryManagerState(MMS);
   FUsed     := MMS.TotalAllocatedLargeBlockSize + MMS.TotalAllocatedMediumBlockSize;
+  FMemBlocks[dmtLarge]  := MMS.AllocatedLargeBlockCount;
+  FMemBlocks[dmtMedium] := MMS.AllocatedMediumBlockCount;
+  FMemBlocks[dmtSmall]  := 0;
   FReserved := MMS.ReservedLargeBlockAddressSpace + MMS.ReservedMediumBlockAddressSpace;
   For i     := Low(MMS.SmallBlockTypeStates) To High(MMS.SmallBlockTypeStates) Do
     Begin
       SBTS := MMS.SmallBlockTypeStates[i];
+      Inc(FMemBlocks[dmtSmall], SBTS.AllocatedBlockCount);
       Inc(FUsed, SBTS.UseableBlockSize * SBTS.AllocatedBlockCount);
       Inc(FReserved, SBTS.ReservedAddressSpace);
     End;
@@ -325,7 +333,11 @@ Begin
     // Write Background text
   strU      := CalcSize(FUsed);
   strR      := CalcSize(FReserved);
-  strStatus := Format('Used %s in %s bytes (%1.1n%%)', [strU, strR, Int(FPercentage)]);
+  strStatus := Format('Used %s in %s bytes (%1.1n%%) [Blocks: %dL, %dM, %dS]',
+    [strU, strR, Int(FPercentage), FMemBlocks[dmtLarge], FMemBlocks[dmtMedium],
+    FMemBlocks[dmtSmall]]);
+  If Canvas.TextWidth(strStatus) > R.Right - R.Left - iMargin Then
+    strStatus := Format('Used %s in %s bytes (%1.1n%%)', [strU, strR, Int(FPercentage)]);
   If Canvas.TextWidth(strStatus) > R.Right - R.Left - iMargin Then
     strStatus := Format('%s in %s (%1.1n%%)', [strU, strR, Int(FPercentage)]);
   If Canvas.TextWidth(strStatus) > R.Right - R.Left - iMargin Then

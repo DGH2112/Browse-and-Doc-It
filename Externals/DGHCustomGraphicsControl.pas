@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    06 Dec 2012
+  @Date    17 Apr 2013
 
 **)
 Unit DGHCustomGraphicsControl;
@@ -90,6 +90,12 @@ Type
     **)
     Property CanInvalidate: Boolean Read FCanInvalidate;
   Published
+    (** Published underlying property @precon None @postcon None **)
+    Property Anchors;
+    (** Published underlying property @precon None @postcon None **)
+    Property Constraints;
+    (** Published underlying property @precon None @postcon None **)
+    Property OnContextPopup;
     (** Published underlying property @precon None @postcon None **)
     Property OnMouseEnter;
     (** Published underlying property @precon None @postcon None **)

@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    30 Jul 2010
+  @Date    18 Apr 2013
   @Author  David Hoyle
 
 **)
@@ -1167,10 +1167,10 @@ procedure TfrmBrowseAndDocItTestForm.SaveSettings;
 var
   i : Integer;
   recWndPlmt : TWindowPlacement;
-  iniFile : TIniFile;
+  iniFile : TMemIniFile;
 
 begin
-  iniFile := TIniFile.Create(FINIFileName);
+  iniFile := TMemIniFile.Create(FINIFileName);
   With iniFile Do
     Try
       recWndPlmt.Length := SizeOf(TWindowPlacement);
@@ -1212,6 +1212,7 @@ begin
       SaveHighlighterToINIFile(iniFile, FSynCPPSyn);
       SaveHighlighterToINIFile(iniFile, FSynXMLSyn);
       SaveHighlighterToINIFile(iniFile, FSynDFMSyn);
+      UpdateFile;
     Finally
       Free;
     End;
@@ -1274,10 +1275,10 @@ procedure TfrmBrowseAndDocItTestForm.LoadSettings;
 var
   i: Integer;
   sl : TStringList;
-  iniFile : TIniFile;
+  iniFile : TMemIniFile;
 
 begin
-  iniFile := TIniFile.Create(FINIFileName);
+  iniFile := TMemIniFile.Create(FINIFileName);
   With iniFile Do
     Try
       Top := ReadInteger('Position', 'Top', Top);

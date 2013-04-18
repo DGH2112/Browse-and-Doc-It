@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    04 Aug 2011
+  @Date    18 Apr 2013
   @Version 1.0
 
 **)
@@ -12,214 +12,120 @@ Unit BrowseAndDocItWizard;
 Interface
 
 Uses
-  Classes, ToolsAPI, Menus, BaseLanguageModule, Types, CommonIDEFunctions,
-  ModuleDispatcher {$IFNDEF D2005}, ExtCtrls, Contnrs {$ENDIF}, ProfilingForm;
+  Classes,
+  ToolsAPI,
+  Menus,
+  BaseLanguageModule,
+  Types,
+  CommonIDEFunctions,
+  ModuleDispatcher
+  {$IFNDEF D2005},
+  ExtCtrls,
+  Contnrs
+  {$ENDIF},
+  ProfilingForm,
+  EditorNotifier;
 
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 
 Type
   (** This is the class which defined the Wizard interface. **)
   TBrowseAndDocItWizard = Class(TNotifierObject, IOTANotifier, IOTAWizard)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    mmiPascalDocMenu : TMenuItem;
-    FCounter : Integer;
-    FFileName : String;
-    FKeyBinding : Integer;
-    FINIFile: String;
+    {$IFDEF D2005} Strict {$ENDIF} Private
+    mmiPascalDocMenu: TMenuItem;
+    FCounter        : Integer;
+    FFileName       : String;
+    FKeyBinding     : Integer;
+    FINIFile        : String;
     {$IFNDEF D2005}
-    FMenuTimer : TTimer;
-    FMenus : TObjectList;
-    FMenuShortCuts : TList;
+    FMenuTimer      : TTimer;
+    FMenus          : TObjectList;
+    FMenuShortCuts  : TList;
     {$ENDIF}
-    procedure InsertCommentBlock(CommentStyle: TCommentStyle;
-      CommentType : TCommentType);
-    procedure OptionsClick(Sender: TObject);
-    procedure CheckForUpdatesClick(Sender: TObject);
-    procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol : Integer);
-    Procedure Focus(Sender : TObject);
-    Procedure OptionsChange(Sender : TObject);
-    procedure CreateMenuItem(mmiParent: TMenuItem;  strCaption: String = '';
-      ClickProc: TNotifyEvent = Nil; AShortCut : TShortCut = 0);
-    Procedure InsertMethodCommentClick(Sender : TObject);
-    Procedure InsertPropertyCommentClick(Sender : TObject);
-    Procedure InsertBlockCommentClick(Sender : TObject);
-    Procedure InsertLineCommentClick(Sender : TObject);
-    Procedure InsertInSituCommentClick(Sender : TObject);
-    Procedure InsertToDoCommentClick(Sender : TObject);
-    Procedure DocumentationClick(Sender : TObject);
-    Procedure DUnitClick(Sender : TObject);
-    Procedure ProfilingClick(Sender : TObject);
-    Procedure DeleteExistingComment(Source : IOTASourceEditor; iStartLine,
-      iEndLine : Integer);
-    procedure PositionCursorInFunction(CursorDelta: TPoint; iInsertLine,
-      iIndent: Integer; strComment: string);
-    procedure InsertComment(strComment: string; Writer: IOTAEditWriter;
+    FEditorNotifier : TEditorNotifier;
+    Procedure InsertCommentBlock(CommentStyle: TCommentStyle;
+      CommentType: TCommentType);
+    Procedure OptionsClick(Sender: TObject);
+    Procedure CheckForUpdatesClick(Sender: TObject);
+    Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
+      iCommentCol: Integer);
+    Procedure Focus(Sender: TObject);
+    Procedure OptionsChange(Sender: TObject);
+    Procedure CreateMenuItem(mmiParent: TMenuItem; strCaption: String = '';
+      ClickProc: TNotifyEvent = Nil; AShortCut: TShortCut = 0);
+    Procedure InsertMethodCommentClick(Sender: TObject);
+    Procedure InsertPropertyCommentClick(Sender: TObject);
+    Procedure InsertBlockCommentClick(Sender: TObject);
+    Procedure InsertLineCommentClick(Sender: TObject);
+    Procedure InsertInSituCommentClick(Sender: TObject);
+    Procedure InsertToDoCommentClick(Sender: TObject);
+    Procedure DocumentationClick(Sender: TObject);
+    Procedure DUnitClick(Sender: TObject);
+    Procedure ProfilingClick(Sender: TObject);
+    Procedure DeleteExistingComment(Source: IOTASourceEditor; iStartLine,
+      iEndLine: Integer);
+    Procedure PositionCursorInFunction(CursorDelta: TPoint; iInsertLine,
+      iIndent: Integer; strComment: String);
+    Procedure InsertComment(strComment: String; Writer: IOTAEditWriter;
       iInsertLine: Integer; Source: IOTASourceEditor);
-    Function  SelectedText(boolDelete : Boolean) : String;
-    function  IsTextSelected: Boolean;
-    Procedure ProcessProfilingCode(SE : IOTASourceEditor; ProfileJob : TProfileJob;
-      iTabs : Integer);
-    Procedure InsertProfileCode(SE : IOTASourceEditor; ProfileJob : TProfileJob;
-      strProlog, strEpilog : String);
-    Procedure RemoveProfileCode(SE : IOTASourceEditor; ProfileJob : TProfileJob;
-      slProlog, slEpilog : TStringList);
-    procedure DeleteProfileCode(SE: IOTASourceEditor; iStartLine,
-      iEndLine : Integer);
+    Function SelectedText(boolDelete: Boolean): String;
+    Function IsTextSelected: Boolean;
+    Procedure ProcessProfilingCode(SE: IOTASourceEditor; ProfileJob: TProfileJob;
+      iTabs: Integer);
+    Procedure InsertProfileCode(SE: IOTASourceEditor; ProfileJob: TProfileJob;
+      strProlog, strEpilog: String);
+    Procedure RemoveProfileCode(SE: IOTASourceEditor; ProfileJob: TProfileJob;
+      slProlog, slEpilog: TStringList);
+    Procedure DeleteProfileCode(SE: IOTASourceEditor; iStartLine,
+      iEndLine: Integer);
     {$IFNDEF D2005}
-    Procedure MenuTimerEvent(Sender : TObject);
+    Procedure MenuTimerEvent(Sender: TObject);
     {$ENDIF}
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+    {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Procedure ModuleExplorerClick(Sender : TObject);
+    Procedure ModuleExplorerClick(Sender: TObject);
     { IOTAWizard }
-    Function GetIDString: string;
-    Function GetName: string;
+    Function GetIDString: String;
+    Function GetName: String;
     Function GetState: TWizardState;
     Procedure Execute;
     { IOTAMenuWizard }
     {$HINTS OFF}
-    Function GetMenuText: string;
+    Function GetMenuText: String;
     {$HINTS ON}
-    Constructor Create;
+    Constructor Create(EditorNotifier : TEditorNotifier);
     Destructor Destroy; Override;
   End;
-
-  Procedure Register;
-  Function InitWizard(Const BorlandIDEServices : IBorlandIDEServices;
-    RegisterProc : TWizardRegisterProc;
-    var Terminate: TWizardTerminateProc) : Boolean; StdCall;
-
-Exports
-  InitWizard Name WizardEntryPoint;
 
 Implementation
 
 Uses
-  SysUtils, DockableModuleExplorer, ToolsAPIUtils, OptionsForm, Forms, Windows,
-  ShellAPI, DGHLibrary, Dialogs, Controls, DocumentationOptionsForm,
-  DocumentationDispatcher, BaseDocumentation, CheckForUpdates,
-  CheckForUpdatesForm {$IFDEF EUREKALOG}, ExceptionLog {$ENDIF},
-  DUnitForm, DUnitCreator, BNFHighlighter, KeyboardBindings, EditorNotifier,
-  EidolonHighlighter, ProgressForm;
+  SysUtils,
+  CheckForUpdates,
+  CheckForUpdatesForm,
+  DockableModuleExplorer,
+  DGHLibrary,
+  ToolsAPIUtils,
+  BaseDocumentation,
+  DocumentationOptionsForm,
+  DocumentationDispatcher,
+  ShellAPI,
+  Forms,
+  Windows,
+  DUnitCreator,
+  DUnitForm,
+  Dialogs,
+  Controls, OptionsForm, ProgressForm;
 
-resourcestring
+ResourceString
   (** This is a resource message to confirm whether the selected text should be
       moved. **)
   strThereIsSelectedText = 'There is selected text in the editor. Do you wan' +
-  't to move this text within the new comment';
+    't to move this text within the new comment';
 
 Const
   (** This is the software ID for this module on the internet. **)
   strSoftwareID = 'BrowseAndDocIt2006';
-
-Var
-  (** This is an index for the wizard when register with the ide. Its required
-      in order to remove it from memory. **)
-  iWizardIndex : Integer = 0;
-  {$IFDEF D2005}
-  (** This is an index for the editor notifier required when the package is
-      unloaded **)
-  iEditorIndex : Integer;
-  {$ENDIF}
-  (** This is a private reference for the Editor Notifier class when not
-      registered with the IDE. **)
-  objEditorNotifier : TEditorNotifier;
-  (** An index for the keybinding nofitier - required when the package is
-      unloaded **)
-  iKeyBinding: Integer;
-  (** An index for the BNF Highlighter notifier - required for unloading the
-      highlighter. **)
-  iBNFHighlighter : Integer;
-  (** An index for the Eidolon Highlighter notifier - required for unloading the
-      highlighter. **)
-  iEidolonHighlighter : Integer;
-
-(**
-
-  This is the modules registry procedure so that the Delphi IDE can registry
-  the wizard.
-
-  @precon  None.
-  @postcon Creates the following wizards and notifiers:
-           1) Browse And Doc It Wizard
-           2) Editor Notifier
-           3) Keyboard Binding Notifier
-
-**)
-Procedure Register();
-
-Var
-  Wizard : TBrowseAndDocItWizard;
-
-Begin
-  Application.Handle := Application.MainForm.Handle;
-  TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
-  Wizard := TBrowseAndDocItWizard.Create;
-  iWizardIndex := (BorlandIDEServices As IOTAWizardServices).AddWizard(Wizard);
-  {$IFDEF D2005}
-  objEditorNotifier := TEditorNotifier.Create;
-  iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
-    objEditorNotifier);
-  {$ELSE}
-  objEditorNotifier := TEditorNotifier.Create;
-  {$ENDIF}
-  iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
-    TKeyboardBinding.Create(Wizard));
-  iBNFHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
-    TBNFHighlighter.Create);
-  iEidolonHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
-    TEidolonHighlighter.Create);
-End;
-
-(**
-
-  This is a procedure to initialising the wizard interface when loading the
-  package as a DLL wizard.
-
-  @precon  None.
-  @postcon Initialises the wizard.
-
-  @param   BorlandIDEServices as an IBorlandIDEServices as a constant
-  @param   RegisterProc       as a TWizardRegisterProc
-  @param   Terminate          as a TWizardTerminateProc as a reference
-  @return  a Boolean
-
-**)
-Function InitWizard(Const BorlandIDEServices : IBorlandIDEServices;
-  RegisterProc : TWizardRegisterProc;
-  var Terminate: TWizardTerminateProc) : Boolean; StdCall;
-
-Var
-  Svcs : IOTAServices;
-  Wizard : TBrowseAndDocItWizard;
-
-Begin
-  Application.Handle := Application.MainForm.Handle;
-  TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
-  Result := BorlandIDEServices <> Nil;
-  If Result Then
-    Begin
-      Svcs := BorlandIDEServices As IOTAServices;
-      ToolsAPI.BorlandIDEServices := BorlandIDEServices;
-      Application.Handle := Svcs.GetParentHandle;
-      Wizard := TBrowseAndDocItWizard.Create;
-      RegisterProc(Wizard);
-      {$IFDEF D2005}
-      objEditorNotifier := TEditorNotifier.Create;
-      iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
-        objEditorNotifier);
-      {$ELSE}
-      objEditorNotifier := TEditorNotifier.Create;
-      {$ENDIF}
-      iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
-        TKeyboardBinding.Create(Wizard));
-      iBNFHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
-        TBNFHighlighter.Create);
-      iEidolonHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
-        TEidolonHighlighter.Create);
-    End;
-End;
 
 (**
 
@@ -231,36 +137,40 @@ End;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.CheckForUpdatesClick(Sender: TObject);
-begin
+Procedure TBrowseAndDocItWizard.CheckForUpdatesClick(Sender: TObject);
+
+Begin
   TCheckForUpdates.Execute(strSoftwareID, FINIFile, Sender <> Nil);
-end;
+End;
 
 (**
 
-  This is the constructor method for the TPascalDocWizard class. This
-  constructor create the explorer form and menus.
+  This is the constructor method for the TPascalDocWizard class. This constructor create 
+  the explorer form and menus.
 
   @precon  None.
-  @postcon Initialises the wizard's internal data structures and creates a menu
+  @postcon Initialises the wizard`s internal data structures and creates a menu
            interface in the IDE.
 
+  @param   EditorNotifier as a TEditorNotifier
+
 **)
-Constructor TBrowseAndDocItWizard.Create;
+Constructor TBrowseAndDocItWizard.Create(EditorNotifier : TEditorNotifier);
 
 Var
-  mmiMainMenu : TMainMenu;
+  mmiMainMenu: TMainMenu;
 
 Begin
   Inherited Create;
+  FEditorNotifier := EditorNotifier;
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus,
     OptionsChange);
-  mmiMainMenu := (BorlandIDEServices as INTAServices).MainMenu;
-  mmiPascalDocMenu := TMenuItem.Create(mmiMainMenu);
+  mmiMainMenu              := (BorlandIDEServices As INTAServices).MainMenu;
+  mmiPascalDocMenu         := TMenuItem.Create(mmiMainMenu);
   mmiPascalDocMenu.Caption := '&Browse and Doc It';
   mmiMainMenu.Items.Insert(mmiMainMenu.Items.Count - 2, mmiPascalDocMenu);
   {$IFNDEF D2005}
-  FMenus := TObjectList.Create(False);
+  FMenus         := TObjectList.Create(False);
   FMenuShortCuts := TList.Create;
   {$ENDIF}
   CreateMenuItem(mmiPascalDocMenu, 'Module &Explorer', ModuleExplorerClick,
@@ -292,15 +202,15 @@ Begin
   CreateMenuItem(mmiPascalDocMenu);
   CreateMenuItem(mmiPascalDocMenu, 'Check for &Updates...', CheckForUpdatesClick);
   FKeyBinding := 0;
-  FCounter := 0;
-  FFileName := '';
-  FINIFile := BuildRootKey(Nil, Nil);
+  FCounter    := 0;
+  FFileName   := '';
+  FINIFile    := BuildRootKey(Nil, Nil);
   CheckForUpdatesClick(Nil);
   {$IFNDEF D2005} // Code to patch shortcuts into the menus in D7 and below.
-  FMenuTimer := TTimer.Create(Nil);
-  FMenuTimer.OnTimer := MenuTimerEvent;
+  FMenuTimer          := TTimer.Create(Nil);
+  FMenuTimer.OnTimer  := MenuTimerEvent;
   FMenuTimer.Interval := 1000;
-  FMenuTimer.Enabled := True;
+  FMenuTimer.Enabled  := True;
   {$ENDIF}
 End;
 
@@ -317,12 +227,12 @@ End;
   @param   AShortCut  as a TShortCut
 
 **)
-Procedure TBrowseAndDocItWizard.CreateMenuItem(mmiParent : TMenuItem;
-  strCaption : String = ''; ClickProc : TNotifyEvent = Nil;
-  AShortCut : TShortCut = 0);
+Procedure TBrowseAndDocItWizard.CreateMenuItem(mmiParent: TMenuItem;
+  strCaption: String = ''; ClickProc: TNotifyEvent = Nil;
+  AShortCut: TShortCut = 0);
 
 Var
-  mmiItem : TMenuItem;
+  mmiItem: TMenuItem;
 
 Begin
   mmiItem := TMenuItem.Create(mmiParent);
@@ -333,10 +243,10 @@ Begin
   With mmiItem Do
     Begin
       If strCaption = '' Then
-        Caption  := '-'
+        Caption := '-'
       Else
-        Caption := strCaption;
-      OnClick := ClickProc;
+        Caption        := strCaption;
+      OnClick          := ClickProc;
       mmiItem.ShortCut := AShortCut;
       mmiParent.Add(mmiItem);
     End;
@@ -354,29 +264,29 @@ End;
   @param   iEndLine   as an Integer
 
 **)
-procedure TBrowseAndDocItWizard.DeleteExistingComment(Source : IOTASourceEditor;
+Procedure TBrowseAndDocItWizard.DeleteExistingComment(Source: IOTASourceEditor;
   iStartLine, iEndLine: Integer);
 
 Var
-  Writer : IOTAEditWriter;
-  ptStart, ptEnd : TOTACharPos;
-  iBufferStart, iBufferEnd : Integer;
+  Writer                  : IOTAEditWriter;
+  ptStart, ptEnd          : TOTACharPos;
+  iBufferStart, iBufferEnd: Integer;
 
-begin
+Begin
   Writer := Source.CreateUndoableWriter;
-    Try
-      ptStart.Line := iStartLine;
-      ptStart.CharIndex := 0;
-      iBufferStart := Source.GetEditView(0).CharPosToPos(ptStart);
-      Writer.CopyTo(iBufferStart);
-      ptEnd.Line := iEndLine;
-      ptEnd.CharIndex := 0;
-      iBufferEnd := Source.GetEditView(0).CharPosToPos(ptEnd);
-      Writer.DeleteTo(iBufferEnd);
+  Try
+    ptStart.Line      := iStartLine;
+    ptStart.CharIndex := 0;
+    iBufferStart      := Source.GetEditView(0).CharPosToPos(ptStart);
+    Writer.CopyTo(iBufferStart);
+    ptEnd.Line      := iEndLine;
+    ptEnd.CharIndex := 0;
+    iBufferEnd      := Source.GetEditView(0).CharPosToPos(ptEnd);
+    Writer.DeleteTo(iBufferEnd);
   Finally
     Writer := Nil;
   End;
-end;
+End;
 
 (**
 
@@ -386,8 +296,8 @@ end;
   @postcon Saves the wizards settings and frees memory for interval structures.
 
 **)
-destructor TBrowseAndDocItWizard.Destroy;
-begin
+Destructor TBrowseAndDocItWizard.Destroy;
+Begin
   If mmiPascalDocMenu <> Nil Then
     mmiPascalDocMenu.Free;
   {$IFNDEF D2005}
@@ -399,7 +309,7 @@ begin
   {$ENDIF}
   Inherited;
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
-end;
+End;
 
 (**
 
@@ -414,22 +324,22 @@ end;
 
 **)
 Procedure TBrowseAndDocItWizard.DeleteProfileCode(SE: IOTASourceEditor;
-  iStartLine, iEndLine : Integer);
+  iStartLine, iEndLine: Integer);
 
 Var
-  Writer: IOTAEditWriter;
-  C1, C2: TOTACharPos;
-  iBufferPos1, iBufferPos2 : Integer;
+  Writer                  : IOTAEditWriter;
+  C1, C2                  : TOTACharPos;
+  iBufferPos1, iBufferPos2: Integer;
 
 Begin
   Writer := SE.CreateUndoableWriter;
   Try
-    C1.Line := iStartLine;
+    C1.Line      := iStartLine;
     C1.CharIndex := 0;
-    iBufferPos1 := SE.GetEditView(0).CharPosToPos(C1);
-    C2.Line := iEndLine + 1;
+    iBufferPos1  := SE.GetEditView(0).CharPosToPos(C1);
+    C2.Line      := iEndLine + 1;
     C2.CharIndex := 0;
-    iBufferPos2 := SE.GetEditView(0).CharPosToPos(C2);
+    iBufferPos2  := SE.GetEditView(0).CharPosToPos(C2);
     Writer.CopyTo(iBufferPos1);
     Writer.DeleteTo(iBufferPos2);
   Finally
@@ -451,20 +361,20 @@ End;
   @param   Source      as an IOTASourceEditor
 
 **)
-procedure TBrowseAndDocItWizard.InsertComment(strComment: string;
+Procedure TBrowseAndDocItWizard.InsertComment(strComment: String;
   Writer: IOTAEditWriter; iInsertLine: Integer; Source: IOTASourceEditor);
 
-var
+Var
   iBufferPos: Integer;
-  C: TOTACharPos;
+  C         : TOTACharPos;
 
-begin
-  C.Line := iInsertLine;
+Begin
+  C.Line      := iInsertLine;
   C.CharIndex := 0;
-  iBufferPos := Source.GetEditView(0).CharPosToPos(C);
+  iBufferPos  := Source.GetEditView(0).CharPosToPos(C);
   Writer.CopyTo(iBufferPos);
   OutputText(Writer, strComment);
-end;
+End;
 
 (**
 
@@ -478,14 +388,14 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.DocumentationClick(Sender: TObject);
+Procedure TBrowseAndDocItWizard.DocumentationClick(Sender: TObject);
 
-var
+Var
   ADocType: TDocType;
   AProject: IOTAProject;
-  i: Integer;
+  i       : Integer;
 
-begin
+Begin
   AProject := ActiveProject;
   If AProject <> Nil Then
     If TfrmDocumentationOptions.Execute(ADocType) Then
@@ -493,9 +403,9 @@ begin
         ExtractFilePath(AProject.FileName) + 'Documentation',
         {$IFDEF D2005}
         ExtractFileName(AProject.ProjectOptions.TargetName), ADocType)
-        {$ELSE}
+      {$ELSE}
         ExtractFileName(AProject.FileName), ADocType)
-        {$ENDIF} Do
+      {$ENDIF} Do
         Try
           Add(AProject.FileName);
           For i := 0 To AProject.ModuleFileCount - 1 Do
@@ -508,7 +418,7 @@ begin
         Finally
           Free;
         End;
-end;
+End;
 
 (**
 
@@ -522,7 +432,7 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.DUnitClick(Sender: TObject);
+Procedure TBrowseAndDocItWizard.DUnitClick(Sender: TObject);
 
 ResourceString
   strSelectSourceCode = 'You must select a source code editor to create unit tests.';
@@ -531,7 +441,7 @@ ResourceString
 Var
   D: TDUnitCreator;
 
-begin
+Begin
   If ActiveSourceEditor <> Nil Then
     Begin
       If ActiveProject <> Nil Then
@@ -542,10 +452,12 @@ begin
           Finally
             D.Free;
           End;
-        End Else
-          MessageDlg(strNoSelectedProject, mtError, [mbOK], 0);
-    End Else
-      MessageDlg(strSelectSourceCode, mtError, [mbOK], 0);
+        End
+      Else
+        MessageDlg(strNoSelectedProject, mtError, [mbOK], 0);
+    End
+  Else
+    MessageDlg(strSelectSourceCode, mtError, [mbOK], 0);
 End;
 
 (**
@@ -557,10 +469,10 @@ End;
   @postcon None.
 
 **)
-procedure TBrowseAndDocItWizard.Execute;
-begin
+Procedure TBrowseAndDocItWizard.Execute;
+Begin
   { Do nothing, this is not called }
-end;
+End;
 
 (**
 
@@ -572,10 +484,10 @@ end;
   @return  a string
 
 **)
-function TBrowseAndDocItWizard.GetIDString: string;
-begin
+Function TBrowseAndDocItWizard.GetIDString: String;
+Begin
   Result := 'David Hoyle.Browse An Doc It';
-end;
+End;
 
 (**
 
@@ -587,10 +499,10 @@ end;
   @return  a string
 
 **)
-function TBrowseAndDocItWizard.GetMenuText: string;
-begin
+Function TBrowseAndDocItWizard.GetMenuText: String;
+Begin
   Result := 'Browse and Doc It...';
-end;
+End;
 
 (**
 
@@ -602,10 +514,10 @@ end;
   @return  a string
 
 **)
-function TBrowseAndDocItWizard.GetName: string;
-begin
+Function TBrowseAndDocItWizard.GetName: String;
+Begin
   Result := 'David Hoyle.Browse An Doc It';
-end;
+End;
 
 (**
 
@@ -617,12 +529,13 @@ end;
   @return  a TWizardState
 
 **)
-function TBrowseAndDocItWizard.GetState: TWizardState;
-begin
+Function TBrowseAndDocItWizard.GetState: TWizardState;
+Begin
   Result := [wsEnabled];
-end;
+End;
 
 {$IFNDEF D2005}
+
 (**
 
   This is an on timer event handler for the menu timer.
@@ -634,21 +547,22 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.MenuTimerEvent(Sender: TObject);
+Procedure TBrowseAndDocItWizard.MenuTimerEvent(Sender: TObject);
 
 Var
-  i : Integer;
-  M : TMenuItem;
+  i: Integer;
+  M: TMenuItem;
 
-begin
+Begin
   For i := 0 To FMenus.Count - 1 Do
     Begin
-      M := FMenus[i] As TMenuItem;
+      M          := FMenus[i] As TMenuItem;
       M.ShortCut := Integer(FMenuShortCuts[i]);
     End;
-  FMenuTimer.Enabled:= False;
-end;
+  FMenuTimer.Enabled := False;
+End;
 {$ENDIF}
+
 
 (**
 
@@ -661,10 +575,10 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.ModuleExplorerClick(Sender: TObject);
-begin
+Procedure TBrowseAndDocItWizard.ModuleExplorerClick(Sender: TObject);
+Begin
   TfrmDockableModuleExplorer.ShowDockableModuleExplorer;
-end;
+End;
 
 (**
 
@@ -680,16 +594,16 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.InsertBlockCommentClick(Sender: TObject);
+Procedure TBrowseAndDocItWizard.InsertBlockCommentClick(Sender: TObject);
 
 Var
-  SE : IOTASourceEditor;
+  SE: IOTASourceEditor;
 
-begin
+Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     InsertCommentBlock(csBlock, GetCommentType(SE.FileName, csBlock));
-end;
+End;
 
 (**
 
@@ -703,18 +617,18 @@ end;
   @param   CommentType  as a TCommentType
 
 **)
-procedure TBrowseAndDocItWizard.InsertCommentBlock(CommentStyle : TCommentStyle;
-  CommentType : TCommentType);
+Procedure TBrowseAndDocItWizard.InsertCommentBlock(CommentStyle: TCommentStyle;
+  CommentType: TCommentType);
 
 Var
-  SourceEditor : IOTASourceEditor;
-  EditPos : TOTAEditPos;
-  CharPos : TOTACharPos;
-  Writer : IOTAEditWriter;
-  iIndent : Integer;
+  SourceEditor   : IOTASourceEditor;
+  EditPos        : TOTAEditPos;
+  CharPos        : TOTACharPos;
+  Writer         : IOTAEditWriter;
+  iIndent        : Integer;
   strSelectedText: String;
 
-begin
+Begin
   If CommentType = ctNone Then
     Exit;
   SourceEditor := ActiveSourceEditor;
@@ -723,8 +637,10 @@ begin
   If IsTextSelected Then
     Case MessageDlg(strThereIsSelectedText, mtConfirmation, [mbYes, mbNo,
       mbCancel], 0) Of
-      mrCancel: Exit;
-      mrNo    : strSelectedText := '';
+      mrCancel:
+        Exit;
+      mrNo:
+        strSelectedText := '';
     Else
       strSelectedText := SelectedText(True);
     End;
@@ -735,7 +651,7 @@ begin
     End;
   Writer := SourceEditor.CreateUndoableWriter;
   Try
-    CharPos.Line := EditPos.Line;
+    CharPos.Line      := EditPos.Line;
     CharPos.CharIndex := EditPos.Col;
     Writer.CopyTo(SourceEditor.GetEditView(0).CharPosToPos(CharPos) - 1);
     OutputText(Writer, BuildBlockComment(CommentType, CommentStyle, iIndent,
@@ -759,7 +675,7 @@ begin
         csBlock:
           Begin
             EditPos.Line := EditPos.Line + 2;
-            EditPos.Col := EditPos.Col + 2;
+            EditPos.Col  := EditPos.Col + 2;
           End;
       Else
         EditPos.Col := EditPos.Col + 4;
@@ -767,7 +683,7 @@ begin
       CursorPos := EditPos;
       Paint;
     End;
-end;
+End;
 
 (**
 
@@ -780,15 +696,15 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.InsertInSituCommentClick(Sender: TObject);
+Procedure TBrowseAndDocItWizard.InsertInSituCommentClick(Sender: TObject);
 Var
-  SE : IOTASourceEditor;
+  SE: IOTASourceEditor;
 
-begin
+Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     InsertCommentBlock(csInSitu, GetCommentType(SE.FileName, csInSitu));
-end;
+End;
 
 (**
 
@@ -800,15 +716,15 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.InsertLineCommentClick(Sender: TObject);
+Procedure TBrowseAndDocItWizard.InsertLineCommentClick(Sender: TObject);
 Var
-  SE : IOTASourceEditor;
+  SE: IOTASourceEditor;
 
-begin
+Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     InsertCommentBlock(csLine, GetCommentType(SE.FileName, csLine));
-end;
+End;
 
 (**
 
@@ -826,22 +742,22 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.InsertMethodCommentClick(Sender: TObject);
+Procedure TBrowseAndDocItWizard.InsertMethodCommentClick(Sender: TObject);
 
-var
-  Module : TBaseLanguageModule;
-  EditPos: TOTAEditPos;
-  T : TElementContainer;
-  F : TGenericFunction;
-  Writer: IOTAEditWriter;
-  Source: IOTASourceEditor;
-  CursorDelta: TPoint;
-  iIndent: Integer;
-  strComment: String;
-  iInsertLine: Integer;
-  iMaxCommentWidth : Integer;
+Var
+  Module          : TBaseLanguageModule;
+  EditPos         : TOTAEditPos;
+  T               : TElementContainer;
+  F               : TGenericFunction;
+  Writer          : IOTAEditWriter;
+  Source          : IOTASourceEditor;
+  CursorDelta     : TPoint;
+  iIndent         : Integer;
+  strComment      : String;
+  iInsertLine     : Integer;
+  iMaxCommentWidth: Integer;
 
-begin
+Begin
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
@@ -849,8 +765,8 @@ begin
     [moParse]);
   If Module <> Nil Then
     Try
-      EditPos :=  Source.GetEditView(0).CursorPos;
-      T := Module.FindElement(strImplementedMethodsLabel);
+      EditPos := Source.GetEditView(0).CursorPos;
+      T       := Module.FindElement(strImplementedMethodsLabel);
       If T <> Nil Then
         Begin
           F := FindFunction(EditPos.Line, T, TGenericMethodDecl);
@@ -864,10 +780,11 @@ begin
                     Exit;
                   iInsertLine := F.Comment.Line;
                   DeleteExistingComment(Source, F.Comment.Line, F.Line);
-                End Else
-                  iInsertLine := F.Line;
+                End
+              Else
+                iInsertLine    := F.Line;
               iMaxCommentWidth := Source.EditViews[0].Buffer.BufferOptions.RightMargin;
-              Writer := Source.CreateUndoableWriter;
+              Writer           := Source.CreateUndoableWriter;
               Try
                 strComment := WriteComment(F, GetCommentType(Source.FileName,
                   csBlock), iIndent, True,
@@ -877,13 +794,14 @@ begin
                 Writer := Nil;
               End;
               PositionCursorInFunction(CursorDelta, iInsertLine, iIndent, strComment);
-            End Else
-              MessageDlg(strNoMethodFound, mtWarning, [mbOK], 0);
+            End
+          Else
+            MessageDlg(strNoMethodFound, mtWarning, [mbOK], 0);
         End;
     Finally
       Module.Free;
     End;
-end;
+End;
 
 (**
 
@@ -899,14 +817,14 @@ end;
   @param   iTabs      as an Integer
 
 **)
-procedure TBrowseAndDocItWizard.ProcessProfilingCode(SE: IOTASourceEditor;
-  ProfileJob : TProfileJob; iTabs : Integer);
+Procedure TBrowseAndDocItWizard.ProcessProfilingCode(SE: IOTASourceEditor;
+  ProfileJob: TProfileJob; iTabs: Integer);
 
 Var
-  strTemplate : String;
-  slProlog, slEpilog : TStringList;
+  strTemplate       : String;
+  slProlog, slEpilog: TStringList;
 
-begin
+Begin
   strTemplate := StringReplace(BrowseAndDocItOptions.ProfilingCode[SE.FileName],
     '|', #13#10, [rfReplaceAll]);
   slProlog := PrologCode(strTemplate, ProfileJob.Method, ProfileJob.Indent + iTabs);
@@ -914,8 +832,10 @@ begin
     slEpilog := EpilogCode(strTemplate, ProfileJob.Method, ProfileJob.Indent + iTabs);
     Try
       Case ProfileJob.CodeType Of
-        pctInsert: InsertProfileCode(SE, ProfileJob, slProlog.Text, slEpilog.Text);
-        pctRemove: RemoveProfileCode(SE, ProfileJob, slProlog, slEpilog);
+        pctInsert:
+          InsertProfileCode(SE, ProfileJob, slProlog.Text, slEpilog.Text);
+        pctRemove:
+          RemoveProfileCode(SE, ProfileJob, slProlog, slEpilog);
       End;
     Finally
       slEpilog.Free;
@@ -923,7 +843,7 @@ begin
   Finally
     slProlog.Free;
   End;
-end;
+End;
 
 (**
 
@@ -938,20 +858,20 @@ end;
   @param   strEpilog  as a String
 
 **)
-procedure TBrowseAndDocItWizard.InsertProfileCode(SE : IOTASourceEditor;
-  ProfileJob : TProfileJob; strProlog, strEpilog : String);
+Procedure TBrowseAndDocItWizard.InsertProfileCode(SE: IOTASourceEditor;
+  ProfileJob: TProfileJob; strProlog, strEpilog: String);
 
 Var
-  Writer: IOTAEditWriter;
+  Writer    : IOTAEditWriter;
   iBufferPos: Integer;
-  C: TOTACharPos;
+  C         : TOTACharPos;
 
-begin
+Begin
   Writer := SE.CreateUndoableWriter;
   Try
-    C.Line := ProfileJob.EndLine + 1;
+    C.Line      := ProfileJob.EndLine + 1;
     C.CharIndex := 0;
-    iBufferPos := SE.GetEditView(0).CharPosToPos(C);
+    iBufferPos  := SE.GetEditView(0).CharPosToPos(C);
     Writer.CopyTo(iBufferPos);
     OutputText(Writer, strEpilog);
   Finally
@@ -959,15 +879,15 @@ begin
   End;
   Writer := SE.CreateUndoableWriter;
   Try
-    C.Line := ProfileJob.StartLine;
+    C.Line      := ProfileJob.StartLine;
     C.CharIndex := 0;
-    iBufferPos := SE.GetEditView(0).CharPosToPos(C);
+    iBufferPos  := SE.GetEditView(0).CharPosToPos(C);
     Writer.CopyTo(iBufferPos);
     OutputText(Writer, strProlog);
   Finally
     Writer := Nil;
   End;
-end;
+End;
 
 (**
 
@@ -984,48 +904,50 @@ end;
   @param   slEpilog   as a TStringList
 
 **)
-procedure TBrowseAndDocItWizard.RemoveProfileCode(SE : IOTASourceEditor;
-  ProfileJob : TProfileJob; slProlog, slEpilog : TStringList);
+Procedure TBrowseAndDocItWizard.RemoveProfileCode(SE: IOTASourceEditor;
+  ProfileJob: TProfileJob; slProlog, slEpilog: TStringList);
 
 ResourceString
   strRemoveMsg =
     'The current profiling does not match the %s code in the method "%s". ' +
-      'Expected "%s" but found "%s". Profiling code has NOT been ' +
-      'removed for this method. Do you want to continue processing?';
+    'Expected "%s" but found "%s". Profiling code has NOT been ' +
+    'removed for this method. Do you want to continue processing?';
 
 Var
-  Reader : IOTAEditReader;
-  C1, C2: TOTACharPos;
-  iLine: Integer;
+  Reader     : IOTAEditReader;
+  C1, C2     : TOTACharPos;
+  iLine      : Integer;
   iBufferPos1: Integer;
   iBufferPos2: Integer;
-  strBuffer : AnsiString;
-  iRead : Integer;
-  iBufferSize : Integer;
-  strLine : String;
+  strBuffer  : AnsiString;
+  iRead      : Integer;
+  iBufferSize: Integer;
+  strLine    : String;
 
-begin
+Begin
   Reader := SE.CreateReader;
   Try
     For iLine := 0 To slEpilog.Count - 1 Do
       Begin
-        C1.Line := ProfileJob.EndLine - iLine;
+        C1.Line      := ProfileJob.EndLine - iLine;
         C1.CharIndex := 0;
-        iBufferPos1 := SE.GetEditView(0).CharPosToPos(C1);
-        C2.Line := ProfileJob.EndLine - iLine + 1;
+        iBufferPos1  := SE.GetEditView(0).CharPosToPos(C1);
+        C2.Line      := ProfileJob.EndLine - iLine + 1;
         C2.CharIndex := 0;
-        iBufferPos2 := SE.GetEditView(0).CharPosToPos(C2);
-        iBufferSize := iBufferPos2 - iBufferPos1;
+        iBufferPos2  := SE.GetEditView(0).CharPosToPos(C2);
+        iBufferSize  := iBufferPos2 - iBufferPos1;
         SetLength(strBuffer, iBufferSize);
         iRead := Reader.GetText(iBufferPos1, PAnsiChar(strBuffer), iBufferSize);
         SetLength(strBuffer, iRead);
-        strLine := slEpilog[slEpilog.Count - 1 - iLine];
+        strLine   := slEpilog[slEpilog.Count - 1 - iLine];
         strBuffer := Copy(strBuffer, 1, Length(strBuffer) - 2);
         If Not Like('*' + Trim(strLine) + '*', String(strBuffer)) Then
           Case MessageDlg(Format(strRemoveMsg, ['Epilog', ProfileJob.Method,
             strBuffer, strLine]), mtError, [mbYes, mbNo], 0) Of
-            mrYes: Exit;
-            mrNo: Abort;
+            mrYes:
+              Exit;
+            mrNo:
+              Abort;
           End;
       End;
   Finally
@@ -1035,23 +957,25 @@ begin
   Try
     For iLine := 0 To slProlog.Count - 1 Do
       Begin
-        C1.Line := ProfileJob.StartLine + iLine;
+        C1.Line      := ProfileJob.StartLine + iLine;
         C1.CharIndex := 0;
-        iBufferPos1 := SE.GetEditView(0).CharPosToPos(C1);
-        C2.Line := ProfileJob.StartLine + iLine + 1;
+        iBufferPos1  := SE.GetEditView(0).CharPosToPos(C1);
+        C2.Line      := ProfileJob.StartLine + iLine + 1;
         C2.CharIndex := 0;
-        iBufferPos2 := SE.GetEditView(0).CharPosToPos(C2);
-        iBufferSize := iBufferPos2 - iBufferPos1;
+        iBufferPos2  := SE.GetEditView(0).CharPosToPos(C2);
+        iBufferSize  := iBufferPos2 - iBufferPos1;
         SetLength(strBuffer, iBufferSize);
         iRead := Reader.GetText(iBufferPos1, PAnsiChar(strBuffer), iBufferSize);
         SetLength(strBuffer, iRead);
-        strLine := Trim(slProlog[iLine]);
+        strLine   := Trim(slProlog[iLine]);
         strBuffer := Copy(strBuffer, 1, Length(strBuffer) - 2);
         If Not Like('*' + strLine + '*', String(strBuffer)) Then
           Case MessageDlg(Format(strRemoveMsg, ['Prolog', ProfileJob.Method,
             strBuffer, strLine]), mtError, [mbYes, mbNo], 0) Of
-            mrYes: Exit;
-            mrNo: Abort;
+            mrYes:
+              Exit;
+            mrNo:
+              Abort;
           End;
       End;
   Finally
@@ -1059,7 +983,7 @@ begin
   End;
   DeleteProfileCode(SE, ProfileJob.EndLine - slEpilog.Count + 1, ProfileJob.EndLine);
   DeleteProfileCode(SE, ProfileJob.StartLine, ProfileJob.StartLine + slProlog.Count - 1);
-end;
+End;
 
 (**
 
@@ -1080,22 +1004,22 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.InsertPropertyCommentClick(Sender: TObject);
+Procedure TBrowseAndDocItWizard.InsertPropertyCommentClick(Sender: TObject);
 
-var
-  Module : TBaseLanguageModule;
-  EditPos: TOTAEditPos;
-  Source : IOTASourceEditor;
-  T : TElementContainer;
-  F : TGenericFunction;
-  Writer: IOTAEditWriter;
-  iInsertLine: Integer;
-  iIndent: Integer;
-  strComment: String;
-  CursorDelta: TPoint;
+Var
+  Module          : TBaseLanguageModule;
+  EditPos         : TOTAEditPos;
+  Source          : IOTASourceEditor;
+  T               : TElementContainer;
+  F               : TGenericFunction;
+  Writer          : IOTAEditWriter;
+  iInsertLine     : Integer;
+  iIndent         : Integer;
+  strComment      : String;
+  CursorDelta     : TPoint;
   iMaxCommentWidth: Integer;
 
-begin
+Begin
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
@@ -1103,8 +1027,8 @@ begin
     [moParse]);
   If Module <> Nil Then
     Try
-      EditPos :=  Source.GetEditView(0).CursorPos;
-      T := Module.FindElement(strTypesLabel);
+      EditPos := Source.GetEditView(0).CursorPos;
+      T       := Module.FindElement(strTypesLabel);
       If T <> Nil Then
         Begin
           F := FindFunction(EditPos.Line, Module, TGenericProperty);
@@ -1118,25 +1042,27 @@ begin
                     Exit;
                   iInsertLine := F.Comment.Line;
                   DeleteExistingComment(Source, F.Comment.Line, F.Line);
-                End Else
-                  iInsertLine := F.Line;
-              Writer := Source.CreateUndoableWriter;
+                End
+              Else
+                iInsertLine := F.Line;
+              Writer        := Source.CreateUndoableWriter;
               Try
                 iMaxCommentWidth := Source.EditViews[0].Buffer.BufferOptions.RightMargin;
-                strComment := WriteComment(F, GetCommentType(Source.FileName,
+                strComment       := WriteComment(F, GetCommentType(Source.FileName,
                   csBlock), iIndent, False, CursorDelta, iMaxCommentWidth);
                 InsertComment(strComment, Writer, iInsertLine, Source);
               Finally
                 Writer := Nil;
               End;
               PositionCursorInFunction(CursorDelta, iInsertLine, iIndent, strComment);
-            End Else
-              MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
+            End
+          Else
+            MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
         End;
     Finally
       Module.Free;
     End;
-end;
+End;
 
 (**
 
@@ -1148,39 +1074,41 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.InsertToDoCommentClick(Sender: TObject);
+Procedure TBrowseAndDocItWizard.InsertToDoCommentClick(Sender: TObject);
 
-var
-  SE: IOTASourceEditor;
-  Writer: IOTAEditWriter;
-  EditPos: TOTAEditPos;
-  CharPos: TOTACharPos;
+Var
+  SE             : IOTASourceEditor;
+  Writer         : IOTAEditWriter;
+  EditPos        : TOTAEditPos;
+  CharPos        : TOTACharPos;
   strSelectedText: String;
-  strComment: String;
-  CommentType: TCommentType;
-  iIndent: Integer;
+  strComment     : String;
+  CommentType    : TCommentType;
+  iIndent        : Integer;
 
-begin
+Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
       If IsTextSelected Then
         Case MessageDlg(strThereIsSelectedText, mtConfirmation, [mbYes, mbNo,
           mbCancel], 0) Of
-          mrCancel : Exit;
-          mrNo     : strSelectedText := '';
+          mrCancel:
+            Exit;
+          mrNo:
+            strSelectedText := '';
         Else
           strSelectedText := SelectedText(True);
         End;
       EditPos := SE.EditViews[0].CursorPos;
-      Writer := SE.CreateUndoableWriter;
+      Writer  := SE.CreateUndoableWriter;
       Try
-        CharPos.Line := EditPos.Line;
+        CharPos.Line      := EditPos.Line;
         CharPos.CharIndex := EditPos.Col;
         Writer.CopyTo(SE.GetEditView(0).CharPosToPos(CharPos) - 1);
         CommentType := GetCommentType(SE.FileName, csLine);
-        iIndent := EditPos.Col;
-        strComment := BuildBlockComment(CommentType, csLine, iIndent ,
+        iIndent     := EditPos.Col;
+        strComment  := BuildBlockComment(CommentType, csLine, iIndent,
           '@todo ' + strSelectedText);
         OutputText(Writer, strComment);
         EditPos.Col := EditPos.Col + 10;
@@ -1189,7 +1117,7 @@ begin
       End;
       SE.EditViews[0].CursorPos := EditPos;
     End;
-end;
+End;
 
 (**
 
@@ -1201,12 +1129,12 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.OptionsClick(Sender: TObject);
+Procedure TBrowseAndDocItWizard.OptionsClick(Sender: TObject);
 
-begin
-  If TfrmOptions.Execute([Low(TVisibleTab)..High(TVisibleTab)]) Then
-    objEditorNotifier.ResetLastupdateTickCount(1);
-end;
+Begin
+  If TfrmOptions.Execute([Low(TVisibleTab) .. High(TVisibleTab)]) Then
+    FEditorNotifier.ResetLastupdateTickCount(1);
+End;
 
 (**
 
@@ -1221,25 +1149,25 @@ end;
   @return  a String
 
 **)
-function TBrowseAndDocItWizard.SelectedText(boolDelete : Boolean): String;
+Function TBrowseAndDocItWizard.SelectedText(boolDelete: Boolean): String;
 
 Var
-  SE : IOTASourceEditor;
-  Reader : IOTAEditReader;
-  strBuffer : AnsiString;
-  iRead : Integer;
-  Block: IOTAEditBlock;
-  cpStart, cpEnd : TOTACharPos;
-  Writer: IOTAEditWriter;
+  SE                            : IOTASourceEditor;
+  Reader                        : IOTAEditReader;
+  strBuffer                     : AnsiString;
+  iRead                         : Integer;
+  Block                         : IOTAEditBlock;
+  cpStart, cpEnd                : TOTACharPos;
+  Writer                        : IOTAEditWriter;
   iBufferPosStart, iBufferPosEnd: Integer;
-  boolVisible : Boolean;
+  boolVisible                   : Boolean;
 
-begin
-  Result := '';
-  boolVisible := False;
+Begin
+  Result          := '';
+  boolVisible     := False;
   iBufferPosStart := 0;
-  iBufferPosEnd := 0;
-  SE := ActiveSourceEditor;
+  iBufferPosEnd   := 0;
+  SE              := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
       Reader := SE.CreateReader;
@@ -1247,13 +1175,13 @@ begin
         Block := SE.EditViews[0].Block;
         If Block.Visible Then
           Begin
-            boolVisible := True;
-            cpStart.Line := Block.StartingRow;
+            boolVisible       := True;
+            cpStart.Line      := Block.StartingRow;
             cpStart.CharIndex := Block.StartingColumn - 1;
-            iBufferPosStart := SE.EditViews[0].CharPosToPos(cpStart);
-            cpEnd.Line := Block.EndingRow;
-            cpEnd.CharIndex := Block.EndingColumn - 1;
-            iBufferPosEnd := SE.EditViews[0].CharPosToPos(cpEnd);
+            iBufferPosStart   := SE.EditViews[0].CharPosToPos(cpStart);
+            cpEnd.Line        := Block.EndingRow;
+            cpEnd.CharIndex   := Block.EndingColumn - 1;
+            iBufferPosEnd     := SE.EditViews[0].CharPosToPos(cpEnd);
             SetLength(strBuffer, iBufferPosEnd - iBufferPosStart);
             iRead := Reader.GetText(iBufferPosStart, PAnsiChar(strBuffer),
               iBufferPosEnd - iBufferPosStart);
@@ -1278,7 +1206,7 @@ begin
           End;
         End;
     End;
-end;
+End;
 
 (**
 
@@ -1290,15 +1218,15 @@ end;
   @return  a Boolean
 
 **)
-function TBrowseAndDocItWizard.IsTextSelected: Boolean;
+Function TBrowseAndDocItWizard.IsTextSelected: Boolean;
 
 Var
-  SE : IOTASourceEditor;
-  Reader : IOTAEditReader;
+  SE    : IOTASourceEditor;
+  Reader: IOTAEditReader;
 
-begin
+Begin
   Result := False;
-  SE := ActiveSourceEditor;
+  SE     := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
       Reader := SE.CreateReader;
@@ -1308,7 +1236,7 @@ begin
         Reader := Nil;
       End;
     End;
-end;
+End;
 
 (**
 
@@ -1325,18 +1253,18 @@ end;
   @param   iCommentCol  as an Integer
 
 **)
-procedure TBrowseAndDocItWizard.SelectionChange(iIdentLine, iIdentCol,
-  iCommentLine, iCommentCol : Integer);
+Procedure TBrowseAndDocItWizard.SelectionChange(iIdentLine, iIdentCol,
+  iCommentLine, iCommentCol: Integer);
 
 Var
-  SourceEditor : IOTASourceEditor;
-  C : TOTAEditPos;
-  EV: IOTAEditView;
+  SourceEditor: IOTASourceEditor;
+  C           : TOTAEditPos;
+  EV          : IOTAEditView;
   {$IFDEF D2006}
-  EA : IOTAElideActions;
+  EA: IOTAElideActions;
   {$ENDIF}
 
-begin
+Begin
   SourceEditor := ActiveSourceEditor;
   If SourceEditor <> Nil Then
     Begin
@@ -1350,7 +1278,7 @@ begin
               {$IFDEF D2006}
               EV.QueryInterface(IOTAElideActions, EA);
               {$ENDIF}
-              C.Col := iIdentCol;
+              C.Col  := iIdentCol;
               C.Line := iIdentLine;
               {$IFDEF D2006}
               If EA <> Nil Then
@@ -1384,8 +1312,8 @@ begin
               End;
             End;
         End;
-      End;
-end;
+    End;
+End;
 
 (**
 
@@ -1398,10 +1326,10 @@ end;
   @param   Sender as a TObject
 
 **)
-Procedure TBrowseAndDocItWizard.Focus(Sender : TObject);
+Procedure TBrowseAndDocItWizard.Focus(Sender: TObject);
 
 Var
-  i : Integer;
+  i  : Integer;
   frm: TCustomForm;
 
 Begin
@@ -1409,7 +1337,7 @@ Begin
     Begin
       ActiveSourceEditor.Show;
       // IDE hack to focus the editor window because the above line doesn't do it
-      frm := ActiveSourceEditor.EditViews[0].GetEditWindow.Form;
+      frm   := ActiveSourceEditor.EditViews[0].GetEditWindow.Form;
       For i := 0 To frm.ComponentCount - 1 Do
         If frm.Components[i].ClassName = 'TEditControl' Then
           Begin
@@ -1431,10 +1359,10 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TBrowseAndDocItWizard.OptionsChange(Sender : TObject);
+Procedure TBrowseAndDocItWizard.OptionsChange(Sender: TObject);
 
 Begin
-  objEditorNotifier.ResetlastupdateTickCount(1);
+  FEditorNotifier.ResetLastupdateTickCount(1);
 End;
 
 (**
@@ -1452,26 +1380,26 @@ End;
   @param   strComment  as a string
 
 **)
-procedure TBrowseAndDocItWizard.PositionCursorInFunction(CursorDelta: TPoint;
-  iInsertLine: Integer; iIndent: Integer; strComment: string);
+Procedure TBrowseAndDocItWizard.PositionCursorInFunction(CursorDelta: TPoint;
+  iInsertLine: Integer; iIndent: Integer; strComment: String);
 
 Var
   Pt: TPoint;
-  S: IOTASourceEditor;
-  C: TOTAEditPos;
+  S : IOTASourceEditor;
+  C : TOTAEditPos;
 
-begin
+Begin
   SelectionChange(iInsertLine + CharCount(#13, strComment), 1, iInsertLine, 1);
   Pt.Y := iInsertLine;
   Pt.X := 1;
   Inc(Pt.Y, CursorDelta.Y);
   Inc(Pt.X, CursorDelta.X);
-  C.Col := Pt.X;
+  C.Col  := Pt.X;
   C.Line := Pt.Y;
-  S := ActiveSourceEditor;
+  S      := ActiveSourceEditor;
   If S <> Nil Then
     S.GetEditView(0).CursorPos := C;
-end;
+End;
 
 (**
 
@@ -1484,20 +1412,20 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TBrowseAndDocItWizard.ProfilingClick(Sender: TObject);
+Procedure TBrowseAndDocItWizard.ProfilingClick(Sender: TObject);
 
 ResourceString
   strSelectSourceCode = 'You must select a source code editor to create unit tests.';
 
 Var
-  SE : IOTASourceEditor;
-  M : TBaseLanguageModule;
+  SE         : IOTASourceEditor;
+  M          : TBaseLanguageModule;
   ProfileJobs: TProfileJobs;
-  i: Integer;
-  iTabs : Integer;
-  frm: TfrmProgress;
+  i          : Integer;
+  iTabs      : Integer;
+  frm        : TfrmProgress;
 
-begin
+Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
     Begin
@@ -1512,7 +1440,8 @@ begin
                 Begin
                   If (ProfileJobs.Count > 0) Then
                     Begin
-                      iTabs := (BorlandIDEServices As IOTAEditorServices).EditOptions.BlockIndent;
+                      iTabs := (BorlandIDEServices As IOTAEditorServices)
+                        .EditOptions.BlockIndent;
                       frm := TfrmProgress.Create(Nil);
                       Try
                         frm.Init(ProfileJobs.Count - 1, 'Profiling',
@@ -1526,8 +1455,9 @@ begin
                       Finally
                         frm.Free;
                       End;
-                    End Else
-                      MessageDlg('Nothing to do!', mtError, [mbOK], 0);
+                    End
+                  Else
+                    MessageDlg('Nothing to do!', mtError, [mbOK], 0);
                 End;
             Finally
               ProfileJobs.Free;
@@ -1535,136 +1465,12 @@ begin
           Finally
             M.Free;
           End;
-        End Else
-          MessageDlg('The editor buffer is read only.', mtError, [mbOK], 0);
-    End Else
-      MessageDlg(strSelectSourceCode, mtError, [mbOK], 0);
-end;
-
-{$IFDEF D2005}
-(**
-
-  This is a method which obtains information about the package from is
-  version information with the package resources.
-
-  @precon  None.
-  @postcon Extracts and display the applications version number present within
-           the EXE file.
-
-  @param   iMajor  as an Integer
-  @param   iMinor  as an Integer
-  @param   iBugFix as an Integer
-  @param   iBuild  as an Integer
-
-**)
-Procedure BuildNumber(var iMajor, iMinor, iBugFix, iBuild : Integer);
-
-Var
-  VerInfoSize: DWORD;
-  VerInfo: Pointer;
-  VerValueSize: DWORD;
-  VerValue: PVSFixedFileInfo;
-  Dummy: DWORD;
-  strBuffer : Array[0..MAX_PATH] Of Char;
-
-Begin
-  { Build Number }
-  GetModuleFilename(hInstance, strBuffer, MAX_PATH);
-  VerInfoSize := GetFileVersionInfoSize(strBuffer, Dummy);
-  If VerInfoSize <> 0 Then
-    Begin
-      GetMem(VerInfo, VerInfoSize);
-      Try
-        GetFileVersionInfo(strBuffer, 0, VerInfoSize, VerInfo);
-        VerQueryValue(VerInfo, '\', Pointer(VerValue), VerValueSize);
-        With VerValue^ Do
-          Begin
-            iMajor := dwFileVersionMS shr 16;
-            iMinor := dwFileVersionMS and $FFFF;
-            iBugFix := dwFileVersionLS shr 16;
-            iBuild := dwFileVersionLS and $FFFF;
-          End;
-      Finally
-        FreeMem(VerInfo, VerInfoSize);
-      End;
-    End;
-
+        End
+      Else
+        MessageDlg('The editor buffer is read only.', mtError, [mbOK], 0);
+    End
+  Else
+    MessageDlg(strSelectSourceCode, mtError, [mbOK], 0);
 End;
 
-{$IFDEF D2005}
-Resourcestring
-  (** This is a text string of revision from nil and a to z. **)
-  strRevision = ' abcdefghijklmnopqrstuvwxyz';
-  {$IFDEF VER170}
-  (** This is a message string to appear in the BDS 2005 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2005';
-  {$ENDIF}
-  {$IFDEF VER180}
-  (** This is a message string to appear in the BDS 2006 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2006';
-  {$ENDIF}
-  {$IFDEF VER190}
-  (** This is a message string to appear in the CDS 2007 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2007';
-  {$ENDIF}
-  {$IFDEF VER200}
-  (** This is a message string to appear in the CRS 2009 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2009';
-  {$ENDIF}
-  {$IFDEF VER210}
-  (** This is a message string to appear in the ERS 2010 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio 2010';
-  {$ENDIF}
-  {$IFDEF VER220}
-  (** This is a message string to appear in the ERS XE splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE';
-  {$ENDIF}
-  {$IFDEF VER230}
-  (** This is a message string to appear in the ERS XE2 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE2';
-  {$ENDIF}
-  (** This is another message string to appear in the BDS 2005/6 splash screen **)
-  strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
-{$ENDIF}
-
-Var
-  (** This is a handle for the splash screen bitmap resource **)
-  bmSplashScreen : HBITMAP;
-  (** This is a variable to hold the major version number for the package. **)
-  iMajor : Integer;
-  (** This is a variable to hold the minor version number for the package. **)
-  iMinor : Integer;
-  (** This is a variable to hold the bug fix version number for the package. **)
-  iBugFix : Integer;
-  (** This is a variable to hold the build number for the package. **)
-  iBuild : Integer;
-{$ENDIF}
-
-(** This initialization section installs an IDE Splash Screen item. **)
-Initialization
-  {$IFDEF D2005}
-  bmSplashScreen := LoadBitmap(hInstance, 'BrowseAndDocItSplashScreenBitMap');
-  BuildNumber(iMajor, iMinor, iBugFix, iBuild);
-  (SplashScreenServices As IOTASplashScreenServices).AddPluginBitmap(
-    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1)]),
-    bmSplashScreen,
-    False,
-    Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]), ''
-    );
-  {$ENDIF}
-(** This finalization section removes this wizard from the IDE when the package
-    is unloaded. **)
-Finalization
-  (BorlandIDEServices As IOTAHighlightServices).RemoveHighlighter(iEidolonHighlighter);
-  (BorlandIDEServices As IOTAHighlightServices).RemoveHighlighter(iBNFHighlighter);
-  (BorlandIDEServices As IOTAKeyboardServices).RemoveKeyboardBinding(iKeyBinding);
-  {$IFDEF D2005}
-  (BorlandIDEServices As IOTAEditorServices).RemoveNotifier(iEditorIndex);
-  {$ELSE}
-  objEditorNotifier.Free;
-  {$ENDIF}
-  {(BorlandIDEServices As IOTAServices).RemoveNotifier(iIDENotifier);}
-  If iWizardIndex > 0 Then
-    (BorlandIDEServices As IOTAWizardServices).RemoveWizard(iWizardIndex);
-  TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
 End.

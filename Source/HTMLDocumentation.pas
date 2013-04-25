@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    09 Aug 2010
+  @Date    25 Apr 2013
   @Version 1.0
 
 **)
@@ -121,7 +121,7 @@ Type
 Implementation
 
 Uses
-  SysUtils, Windows, ModuleDispatcher, DGHLibrary, Graphics,
+  SysUtils, Windows, DGHLibrary, Graphics,
   {$IFNDEF D2007} GIFImage {$ELSE} GIFImg {$ENDIF}, Controls, StrUtils,
   GenericTokenizer;
 
@@ -1677,8 +1677,8 @@ Begin
   Source := TStringList.Create;
   Try
     Source.LoadFromFile(strFileName);
-    FCurrentModule := Dispatcher(Source.Text, strFileName, False, [moParse,
-      moCheckForDocumentConflicts]);
+    FCurrentModule := ModuleDispatcher.Dispatcher(Source.Text, strFileName, False,
+      [moParse, moCheckForDocumentConflicts]);
     If FCurrentModule <> Nil Then
       Try
         If doShowPrefCountersInDocSummary In BrowseAndDocItOptions.Options Then

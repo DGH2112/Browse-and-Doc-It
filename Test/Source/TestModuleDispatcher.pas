@@ -3,7 +3,7 @@ Unit TestModuleDispatcher;
 Interface
 
 Uses
-  TestFramework, ModuleDispatcher, TestBaseLanguageModule;
+  TestFramework, TestBaseLanguageModule;
 
 Type
   //
@@ -31,41 +31,41 @@ Uses
 Procedure TestFunctions.TestCanDocumentDocument;
 
 Begin
-  Check(Not CanDocumentDocument('MyFile.ini'), 'MyFile.ini');
-  Check(CanDocumentDocument('MyFile.bas'), 'MyFile.bas');
-  Check(CanDocumentDocument('MyFile.bnf'), 'MyFile.bnf');
-  Check(CanDocumentDocument('MyFile.cls'), 'MyFile.cls');
-  Check(Not CanDocumentDocument('MyFile.dfm'), 'MyFile.dfm');
-  Check(CanDocumentDocument('MyFile.dpk'), 'MyFile.dpk');
-  Check(CanDocumentDocument('MyFile.dpr'), 'MyFile.dpr');
-  Check(Not CanDocumentDocument('MyFile.dtd'), 'MyFile.dtd');
-  Check(CanDocumentDocument('MyFile.frm'), 'MyFile.frm');
-  Check(Not CanDocumentDocument('MyFile.htm'), 'MyFile.htm');
-  Check(Not CanDocumentDocument('MyFile.html'), 'MyFile.html');
-  Check(CanDocumentDocument('MyFile.map'), 'MyFile.map');
-  Check(CanDocumentDocument('MyFile.pas'), 'MyFile.pas');
-  Check(Not CanDocumentDocument('MyFile.xml'), 'MyFile.xml');
-  Check(Not CanDocumentDocument('MyFile.xsd'), 'MyFile.xsd');
+  Check(Not ModuleDispatcher.CanDocumentDocument('MyFile.ini'), 'MyFile.ini');
+  Check(ModuleDispatcher.CanDocumentDocument('MyFile.bas'), 'MyFile.bas');
+  Check(ModuleDispatcher.CanDocumentDocument('MyFile.bnf'), 'MyFile.bnf');
+  Check(ModuleDispatcher.CanDocumentDocument('MyFile.cls'), 'MyFile.cls');
+  Check(Not ModuleDispatcher.CanDocumentDocument('MyFile.dfm'), 'MyFile.dfm');
+  Check(ModuleDispatcher.CanDocumentDocument('MyFile.dpk'), 'MyFile.dpk');
+  Check(ModuleDispatcher.CanDocumentDocument('MyFile.dpr'), 'MyFile.dpr');
+  Check(Not ModuleDispatcher.CanDocumentDocument('MyFile.dtd'), 'MyFile.dtd');
+  Check(ModuleDispatcher.CanDocumentDocument('MyFile.frm'), 'MyFile.frm');
+  Check(Not ModuleDispatcher.CanDocumentDocument('MyFile.htm'), 'MyFile.htm');
+  Check(Not ModuleDispatcher.CanDocumentDocument('MyFile.html'), 'MyFile.html');
+  Check(ModuleDispatcher.CanDocumentDocument('MyFile.map'), 'MyFile.map');
+  Check(ModuleDispatcher.CanDocumentDocument('MyFile.pas'), 'MyFile.pas');
+  Check(Not ModuleDispatcher.CanDocumentDocument('MyFile.xml'), 'MyFile.xml');
+  Check(Not ModuleDispatcher.CanDocumentDocument('MyFile.xsd'), 'MyFile.xsd');
 End;
 
 Procedure TestFunctions.TestCanParseDocument;
 
 Begin
-  Check(Not CanParseDocument('MyFile.ini'), 'MyFile.ini');
-  Check(CanParseDocument('MyFile.bas'), 'MyFile.bas');
-  Check(CanParseDocument('MyFile.bnf'), 'MyFile.bnf');
-  Check(CanParseDocument('MyFile.cls'), 'MyFile.cls');
-  Check(CanParseDocument('MyFile.dfm'), 'MyFile.dfm');
-  Check(CanParseDocument('MyFile.dpk'), 'MyFile.dpk');
-  Check(CanParseDocument('MyFile.dpr'), 'MyFile.dpr');
-  Check(CanParseDocument('MyFile.dtd'), 'MyFile.dtd');
-  Check(CanParseDocument('MyFile.frm'), 'MyFile.frm');
-  Check(CanParseDocument('MyFile.htm'), 'MyFile.htm');
-  Check(CanParseDocument('MyFile.html'), 'MyFile.html');
-  Check(CanParseDocument('MyFile.map'), 'MyFile.map');
-  Check(CanParseDocument('MyFile.pas'), 'MyFile.pas');
-  Check(CanParseDocument('MyFile.xml'), 'MyFile.xml');
-  Check(CanParseDocument('MyFile.xsd'), 'MyFile.xsd');
+  Check(Not ModuleDispatcher.CanParseDocument('MyFile.ini'), 'MyFile.ini');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.bas'), 'MyFile.bas');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.bnf'), 'MyFile.bnf');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.cls'), 'MyFile.cls');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.dfm'), 'MyFile.dfm');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.dpk'), 'MyFile.dpk');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.dpr'), 'MyFile.dpr');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.dtd'), 'MyFile.dtd');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.frm'), 'MyFile.frm');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.htm'), 'MyFile.htm');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.html'), 'MyFile.html');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.map'), 'MyFile.map');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.pas'), 'MyFile.pas');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.xml'), 'MyFile.xml');
+  Check(ModuleDispatcher.CanParseDocument('MyFile.xsd'), 'MyFile.xsd');
 End;
 
 Procedure TestFunctions.TestDispatcher;
@@ -169,51 +169,51 @@ End;
 Procedure TestFunctions.TestGetCommentType;
 
 Begin
-  CheckEquals(GetCommentType('MyFile.ini',  csBlock),  ctNone, 'MyFile.ini - Block');
-  CheckEquals(GetCommentType('MyFile.ini',  csLine),   ctNone, 'MyFile.ini - Line');
-  CheckEquals(GetCommentType('MyFile.ini',  csInSitu), ctNone, 'MyFile.ini - InSitu');
-  CheckEquals(GetCommentType('MyFile.bas',  csBlock),  ctVBLine, 'MyFile.bas - Block');
-  CheckEquals(GetCommentType('MyFile.bas',  csLine),   ctVBLine, 'MyFile.bas - Line');
-  CheckEquals(GetCommentType('MyFile.bas',  csInSitu), ctVBLine, 'MyFile.bas - InSitu');
-  CheckEquals(GetCommentType('MyFile.bnf',  csBlock),  ctCPPBlock, 'MyFile.bnf - Block');
-  CheckEquals(GetCommentType('MyFile.bnf',  csLine),   ctCPPBlock, 'MyFile.bnf - Line');
-  CheckEquals(GetCommentType('MyFile.bnf',  csInSitu), ctCPPBlock, 'MyFile.bnf - InSitu');
-  CheckEquals(GetCommentType('MyFile.cls',  csBlock),  ctVBLine, 'MyFile.cls - Block');
-  CheckEquals(GetCommentType('MyFile.cls',  csLine),   ctVBLine, 'MyFile.cls - Line');
-  CheckEquals(GetCommentType('MyFile.cls',  csInSitu), ctVBLine, 'MyFile.cls - InSitu');
-  CheckEquals(GetCommentType('MyFile.dfm',  csBlock),  ctPascalBlock, 'MyFile.dfm - Block');
-  CheckEquals(GetCommentType('MyFile.dfm',  csLine),   ctPascalBlock, 'MyFile.dfm - Line');
-  CheckEquals(GetCommentType('MyFile.dfm',  csInSitu), ctPascalBlock, 'MyFile.dfm - InSitu');
-  CheckEquals(GetCommentType('MyFile.dpk',  csBlock),  ctPascalBlock, 'MyFile.dpk - Block');
-  CheckEquals(GetCommentType('MyFile.dpk',  csLine),   ctPascalBlock, 'MyFile.dpk - Line');
-  CheckEquals(GetCommentType('MyFile.dpk',  csInSitu), ctPascalBlock, 'MyFile.dpk - InSitu');
-  CheckEquals(GetCommentType('MyFile.dpr',  csBlock),  ctPascalBlock, 'MyFile.dpr - Block');
-  CheckEquals(GetCommentType('MyFile.dpr',  csLine),   ctPascalBlock, 'MyFile.dpr - Line');
-  CheckEquals(GetCommentType('MyFile.dpr',  csInSitu), ctPascalBlock, 'MyFile.dpr - InSitu');
-  CheckEquals(GetCommentType('MyFile.dtd',  csBlock),  ctXML, 'MyFile.dtd - Block');
-  CheckEquals(GetCommentType('MyFile.dtd',  csLine),   ctXML, 'MyFile.dtd - Line');
-  CheckEquals(GetCommentType('MyFile.dtd',  csInSitu), ctXML, 'MyFile.dtd - InSitu');
-  CheckEquals(GetCommentType('MyFile.frm',  csBlock),  ctVBLine, 'MyFile.frm - Block');
-  CheckEquals(GetCommentType('MyFile.frm',  csLine),   ctVBLine, 'MyFile.frm - Line');
-  CheckEquals(GetCommentType('MyFile.frm',  csInSitu), ctVBLine, 'MyFile.frm - InSitu');
-  CheckEquals(GetCommentType('MyFile.htm',  csBlock),  ctXML, 'MyFile.htm - Block');
-  CheckEquals(GetCommentType('MyFile.htm',  csLine),   ctXML, 'MyFile.htm - Line');
-  CheckEquals(GetCommentType('MyFile.htm',  csInSitu), ctXML, 'MyFile.htm - InSitu');
-  CheckEquals(GetCommentType('MyFile.html', csBlock),  ctXML, 'MyFile.html - Block');
-  CheckEquals(GetCommentType('MyFile.html', csLine),   ctXML, 'MyFile.html - Line');
-  CheckEquals(GetCommentType('MyFile.html', csInSitu), ctXML, 'MyFile.html - InSitu');
-  CheckEquals(GetCommentType('MyFile.map',  csBlock),  ctCPPBlock, 'MyFile.map - Block');
-  CheckEquals(GetCommentType('MyFile.map',  csLine),   ctCPPLine, 'MyFile.map - Line');
-  CheckEquals(GetCommentType('MyFile.map',  csInSitu), ctCPPBlock, 'MyFile.map - InSitu');
-  CheckEquals(GetCommentType('MyFile.pas',  csBlock),  ctPascalBlock, 'MyFile.pas - Block');
-  CheckEquals(GetCommentType('MyFile.pas',  csLine),   ctPascalBlock, 'MyFile.pas - Line');
-  CheckEquals(GetCommentType('MyFile.pas',  csInSitu), ctPascalBlock, 'MyFile.pas - InSitu');
-  CheckEquals(GetCommentType('MyFile.xml',  csBlock),  ctXML, 'MyFile.xml - Block');
-  CheckEquals(GetCommentType('MyFile.xml',  csLine),   ctXML, 'MyFile.xml - Line');
-  CheckEquals(GetCommentType('MyFile.xml',  csInSitu), ctXML, 'MyFile.xml - InSitu');
-  CheckEquals(GetCommentType('MyFile.xsd',  csBlock),  ctXML, 'MyFile.xsd - Block');
-  CheckEquals(GetCommentType('MyFile.xsd',  csLine),   ctXML, 'MyFile.xsd - Line');
-  CheckEquals(GetCommentType('MyFile.xsd',  csInSitu), ctXML, 'MyFile.xsd - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.ini',  csBlock),  ctNone, 'MyFile.ini - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.ini',  csLine),   ctNone, 'MyFile.ini - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.ini',  csInSitu), ctNone, 'MyFile.ini - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.bas',  csBlock),  ctVBLine, 'MyFile.bas - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.bas',  csLine),   ctVBLine, 'MyFile.bas - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.bas',  csInSitu), ctVBLine, 'MyFile.bas - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.bnf',  csBlock),  ctCPPBlock, 'MyFile.bnf - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.bnf',  csLine),   ctCPPBlock, 'MyFile.bnf - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.bnf',  csInSitu), ctCPPBlock, 'MyFile.bnf - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.cls',  csBlock),  ctVBLine, 'MyFile.cls - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.cls',  csLine),   ctVBLine, 'MyFile.cls - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.cls',  csInSitu), ctVBLine, 'MyFile.cls - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dfm',  csBlock),  ctPascalBlock, 'MyFile.dfm - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dfm',  csLine),   ctPascalBlock, 'MyFile.dfm - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dfm',  csInSitu), ctPascalBlock, 'MyFile.dfm - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dpk',  csBlock),  ctPascalBlock, 'MyFile.dpk - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dpk',  csLine),   ctPascalBlock, 'MyFile.dpk - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dpk',  csInSitu), ctPascalBlock, 'MyFile.dpk - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dpr',  csBlock),  ctPascalBlock, 'MyFile.dpr - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dpr',  csLine),   ctPascalBlock, 'MyFile.dpr - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dpr',  csInSitu), ctPascalBlock, 'MyFile.dpr - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dtd',  csBlock),  ctXML, 'MyFile.dtd - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dtd',  csLine),   ctXML, 'MyFile.dtd - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.dtd',  csInSitu), ctXML, 'MyFile.dtd - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.frm',  csBlock),  ctVBLine, 'MyFile.frm - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.frm',  csLine),   ctVBLine, 'MyFile.frm - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.frm',  csInSitu), ctVBLine, 'MyFile.frm - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.htm',  csBlock),  ctXML, 'MyFile.htm - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.htm',  csLine),   ctXML, 'MyFile.htm - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.htm',  csInSitu), ctXML, 'MyFile.htm - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.html', csBlock),  ctXML, 'MyFile.html - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.html', csLine),   ctXML, 'MyFile.html - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.html', csInSitu), ctXML, 'MyFile.html - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.map',  csBlock),  ctCPPBlock, 'MyFile.map - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.map',  csLine),   ctCPPLine, 'MyFile.map - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.map',  csInSitu), ctCPPBlock, 'MyFile.map - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.pas',  csBlock),  ctPascalBlock, 'MyFile.pas - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.pas',  csLine),   ctPascalBlock, 'MyFile.pas - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.pas',  csInSitu), ctPascalBlock, 'MyFile.pas - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.xml',  csBlock),  ctXML, 'MyFile.xml - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.xml',  csLine),   ctXML, 'MyFile.xml - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.xml',  csInSitu), ctXML, 'MyFile.xml - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.xsd',  csBlock),  ctXML, 'MyFile.xsd - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.xsd',  csLine),   ctXML, 'MyFile.xsd - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.xsd',  csInSitu), ctXML, 'MyFile.xsd - InSitu');
 End;
 
 
@@ -223,8 +223,9 @@ Var
   i : Integer;
 
 begin
-  For i := Low(Modules) To Pred(High(Modules)) Do
-    Check(Modules[i].FExt < Modules[i + 1].FExt, Modules[i].FExt + '!<' + Modules[i + 1].FExt);
+  For i := 0 To ModuleDispatcher.Count - 2 Do
+    Check(ModuleDispatcher.Modules[i].Ext < ModuleDispatcher.Modules[i + 1].Ext,
+      ModuleDispatcher.Modules[i].Ext + '!<' + ModuleDispatcher.Modules[i + 1].Ext);
 end;
 
 Initialization

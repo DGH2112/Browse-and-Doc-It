@@ -24,7 +24,7 @@ Type
 Implementation
 
 Uses
-  BaseLanguageModule, Classes, ModuleDispatcher, SysUtils, Windows;
+  BaseLanguageModule, Classes, SysUtils, Windows;
 
 //
 // Test Methods for Class Functions.
@@ -76,7 +76,7 @@ Var
   M: TElementContainer;
 
 begin
-  Module := Dispatcher(strSourceMethods, 'MyPascalFile.pas', False, [moParse]);
+  Module := ModuleDispatcher.Dispatcher(strSourceMethods, 'MyPascalFile.pas', False, [moParse]);
   Try
     CheckEquals(0, Module.HeadingCount(strErrors), Module.FirstError);
     M := FindFunction(1, Module, TGenericMethodDecl);
@@ -125,7 +125,7 @@ begin
     Module.Free;
   End;
 
-  Module := Dispatcher(strSourceProperties, 'MyPascalFile.pas', False, [moParse]);
+  Module := ModuleDispatcher.Dispatcher(strSourceProperties, 'MyPascalFile.pas', False, [moParse]);
   Try
     CheckEquals(0, Module.HeadingCount(strErrors), Module.FirstError);
     M := FindFunction(1, Module, TGenericProperty);

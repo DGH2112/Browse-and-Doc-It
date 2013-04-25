@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       03 Jul 2010
+  @Date       25 Apr 2013
   @Author     David Hoyle
 
 **)
@@ -3646,6 +3646,11 @@ begin
         strVariableDocumentation, DocConflictTable[dctFieldClauseUndocumented]);
 end;
 
+(** Register the file source code extensions that can be parsed by this module. **)
+Initialization
+  ModuleDispatcher.Add('.bas', TVBModule, True, ctVBLine, ctVBLine, ctVBLine);
+  ModuleDispatcher.Add('.cls', TVBModule, True, ctVBLine, ctVBLine, ctVBLine);
+  ModuleDispatcher.Add('.frm', TVBModule, True, ctVBLine, ctVBLine, ctVBLine);
 End.
 
 

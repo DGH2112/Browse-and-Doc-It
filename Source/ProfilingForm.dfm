@@ -30,6 +30,7 @@ object frmProfiling: TfrmProfiling
     Height = 25
     Anchors = [akRight, akBottom]
     Kind = bkOK
+    NumGlyphs = 2
     TabOrder = 1
     OnClick = btnOKClick
   end
@@ -40,6 +41,7 @@ object frmProfiling: TfrmProfiling
     Height = 25
     Anchors = [akRight, akBottom]
     Kind = bkCancel
+    NumGlyphs = 2
     TabOrder = 2
   end
   object pnlPanel: TPanel
@@ -67,14 +69,12 @@ object frmProfiling: TfrmProfiling
       Align = alClient
       CheckImageKind = ckXP
       Header.AutoSizeIndex = 0
-      Header.DefaultHeight = 17
       Header.Font.Charset = DEFAULT_CHARSET
       Header.Font.Color = clWindowText
       Header.Font.Height = -11
       Header.Font.Name = 'Tahoma'
       Header.Font.Style = []
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs]
-      Header.Style = hsXPStyle
       Images = ilScopeImages
       TabOrder = 0
       TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning]

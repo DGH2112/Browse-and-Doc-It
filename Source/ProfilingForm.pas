@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    05 Aug 2011
+  @Date    20 Apr 2013
 
 **)
 unit ProfilingForm;
@@ -242,12 +242,12 @@ Begin
   With TfrmProfiling.Create(Nil) Do
     Try
       InitialiseTreeView(Module);
-      mmoCode.Lines.Text := BrowseAndDocItOptions.ProfilingCode[Module.FileName];
+      mmoCode.Lines.Text := BrowseAndDocItOptions.ProfilingCode[Module];
       If ShowModal = mrOK Then
         Begin
           Result := TProfileJobs.Create;
           ProcessJobs(Result);
-          BrowseAndDocItOptions.ProfilingCode[Module.FileName] := mmoCode.Lines.Text;
+          BrowseAndDocItOptions.ProfilingCode[Module] := mmoCode.Lines.Text;
           SaveSettings;
         End;
     Finally

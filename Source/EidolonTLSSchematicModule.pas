@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       12 Nov 2012
+  @Date       25 Apr 2013
   @Author     David Hoyle
 
 **)
@@ -2394,4 +2394,8 @@ Implementation
     FRouteCode := '*'; // Match all routes.
   end;
 
+(** Register the file source code extensions that can be parsed by this module. **)
+Initialization
+  ModuleDispatcher.Add('.schematic', TTLSSchematicModule, False, ctCPPBlock, ctCPPLine,
+    ctCPPLine);
 End.

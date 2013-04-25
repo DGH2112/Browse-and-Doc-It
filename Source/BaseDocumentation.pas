@@ -3,7 +3,7 @@
   This module contains a base class for all documentation modules.
 
   @Author  David Hoyle
-  @Date    10 Mar 2009
+  @Date    25 Apr 2013
   @Version 1.0
 
 **)
@@ -47,7 +47,7 @@ Type
 Implementation
 
 Uses
-  ModuleDispatcher, BaseLanguageModule {$IFNDEF D0006}, FileCtrl {$ENDIF};
+  BaseLanguageModule {$IFNDEF D0006}, FileCtrl {$ENDIF};
 
 (**
 
@@ -64,7 +64,7 @@ Uses
 Procedure TBaseDocumentation.Add(strFileName : String);
 
 Begin
-  If CanDocumentDocument(strFileName) Then
+  If ModuleDispatcher.CanDocumentDocument(strFileName) Then
     FFileNames.Add(strFileName);
 End;
 

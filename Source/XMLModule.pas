@@ -5,7 +5,7 @@
   implemented.
 
   @Version    1.0
-  @Date       26 Jun 2010
+  @Date       25 Apr 2013
   @Author     David Hoyle
 
 **)
@@ -3424,4 +3424,11 @@ begin
     DeclSep(xmlParent);
 end;
 
+(** Register the file source code extensions that can be parsed by this module. **)
+Initialization
+  ModuleDispatcher.Add('.dtd',  TXMLModule, False, ctXML, ctXML, ctXML);
+  ModuleDispatcher.Add('.htm',  TXMLModule, False, ctXML, ctXML, ctXML);
+  ModuleDispatcher.Add('.html', TXMLModule, False, ctXML, ctXML, ctXML);
+  ModuleDispatcher.Add('.xml',  TXMLModule, False, ctXML, ctXML, ctXML);
+  ModuleDispatcher.Add('.xsd',  TXMLModule, False, ctXML, ctXML, ctXML);
 End.

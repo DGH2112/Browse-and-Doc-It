@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    18 Apr 2013
+  @Date    20 Apr 2013
   @Version 1.0
 
 **)
@@ -70,8 +70,8 @@ Type
       iInsertLine: Integer; Source: IOTASourceEditor);
     Function SelectedText(boolDelete: Boolean): String;
     Function IsTextSelected: Boolean;
-    Procedure ProcessProfilingCode(SE: IOTASourceEditor; ProfileJob: TProfileJob;
-      iTabs: Integer);
+    Procedure ProcessProfilingCode(Module : TBaseLanguageModule; SE: IOTASourceEditor;
+      ProfileJob: TProfileJob; iTabs: Integer);
     Procedure InsertProfileCode(SE: IOTASourceEditor; ProfileJob: TProfileJob;
       strProlog, strEpilog: String);
     Procedure RemoveProfileCode(SE: IOTASourceEditor; ProfileJob: TProfileJob;
@@ -81,7 +81,8 @@ Type
     {$IFNDEF D2005}
     Procedure MenuTimerEvent(Sender: TObject);
     {$ENDIF}
-    {$IFDEF D2005} Strict {$ENDIF} Protected
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+    Procedure SetEditorNotifier(EditorNotifier : TEditorNotifier);
   Public
     Procedure ModuleExplorerClick(Sender: TObject);
     { IOTAWizard }
@@ -93,8 +94,15 @@ Type
     {$HINTS OFF}
     Function GetMenuText: String;
     {$HINTS ON}
-    Constructor Create(EditorNotifier : TEditorNotifier);
+    Constructor Create;
     Destructor Destroy; Override;
+    (**
+      This property sets the editor notifier for the wizard to interface with.
+      @precon  None.
+      @postcon Sets the editor notifier for the wizard to interface with.
+      @return  a TEditorNotifier
+    **)
+    Property EditorNotifier : TEditorNotifier Write SetEditorNotifier;
   End;
 
 Implementation
@@ -152,17 +160,14 @@ End;
   @postcon Initialises the wizard`s internal data structures and creates a menu
            interface in the IDE.
 
-  @param   EditorNotifier as a TEditorNotifier
-
 **)
-Constructor TBrowseAndDocItWizard.Create(EditorNotifier : TEditorNotifier);
+Constructor TBrowseAndDocItWizard.Create;
 
 Var
   mmiMainMenu: TMainMenu;
 
 Begin
   Inherited Create;
-  FEditorNotifier := EditorNotifier;
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus,
     OptionsChange);
   mmiMainMenu              := (BorlandIDEServices As INTAServices).MainMenu;
@@ -805,27 +810,28 @@ End;
 
 (**
 
-  This method processes each of the profiling jobs given determining whether
-  they are insertions or removals.
+  This method processes each of the profiling jobs given determining whether they are 
+  insertions or removals.
 
   @precon  SE and ProfileJob must be valid instances.
-  @postcon Processes each of the profiling jobs given determining whether they
-           are insertions or removals.
+  @postcon Processes each of the profiling jobs given determining whether they are 
+           insertions or removals.
 
+  @param   Module     as a TBaseLanguageModule
   @param   SE         as an IOTASourceEditor
   @param   ProfileJob as a TProfileJob
   @param   iTabs      as an Integer
 
 **)
-Procedure TBrowseAndDocItWizard.ProcessProfilingCode(SE: IOTASourceEditor;
-  ProfileJob: TProfileJob; iTabs: Integer);
+Procedure TBrowseAndDocItWizard.ProcessProfilingCode(Module : TBaseLanguageModule;
+  SE: IOTASourceEditor; ProfileJob: TProfileJob; iTabs: Integer);
 
 Var
   strTemplate       : String;
   slProlog, slEpilog: TStringList;
 
 Begin
-  strTemplate := StringReplace(BrowseAndDocItOptions.ProfilingCode[SE.FileName],
+  strTemplate := StringReplace(BrowseAndDocItOptions.ProfilingCode[Module],
     '|', #13#10, [rfReplaceAll]);
   slProlog := PrologCode(strTemplate, ProfileJob.Method, ProfileJob.Indent + iTabs);
   Try
@@ -1317,6 +1323,22 @@ End;
 
 (**
 
+  This is a setter method for the EditorNotifier property.
+
+  @precon  None.
+  @postcon Sets the editor notifier for the wizard to interface with.
+
+  @param   EditorNotifier as a TEditorNotifier
+
+**)
+Procedure TBrowseAndDocItWizard.SetEditorNotifier(EditorNotifier: TEditorNotifier);
+
+Begin
+  FEditorNotifier := EditorNotifier;
+End;
+
+(**
+
   This method is an event handler for the On Focus event from the explorer
   frame.
 
@@ -1448,7 +1470,7 @@ Begin
                           'Starting to processing profiling information...');
                         For i := 0 To ProfileJobs.Count - 1 Do
                           Begin
-                            ProcessProfilingCode(SE, ProfileJobs.ProfileJob[i], iTabs);
+                            ProcessProfilingCode(M, SE, ProfileJobs.ProfileJob[i], iTabs);
                             frm.UpdateProgress(i, 'Processing method "' +
                               ProfileJobs.ProfileJob[i].Method + '"...');
                           End;

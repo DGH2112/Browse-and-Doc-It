@@ -1,9 +1,9 @@
-(**
+﻿(**
 
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       02 Sep 2011
+  @Date       23 Apr 2013
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -774,6 +774,7 @@ Type
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
     Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function DefaultProfilingTemplate : String; Override;
   End;
 
 Implementation
@@ -3097,6 +3098,32 @@ Begin
     ProcedureDeclSection(AScope) Or
     ExportsStmt
   );
+End;
+
+(**
+
+  This method returns the pascal profiling code for the module.
+
+  @precon  None.
+  @postcon Returns the pascal profiling code for the module.
+
+  @return  a String
+
+**)
+Function TPascalModule.DefaultProfilingTemplate: String;
+
+Begin
+  Result := 
+    '{$IFDEF PROFILECODE}'#13#10 +
+    'CodeProfiler.Start(''$METHODNAME$'');'#13#10 +
+    'Try'#13#10 +
+    '{$ENDIF}'#13#10 +
+    '$METHODCODE$'#13#10 +
+    '{$IFDEF PROFILECODE}'#13#10 +
+    'Finally'#13#10 +
+    '  CodeProfiler.Stop;'#13#10 +
+    'End;'#13#10 +
+    '{$ENDIF}';
 End;
 
 (**
@@ -6025,7 +6052,7 @@ begin
             NextToken;
             // Check Profiling Prolog Code for a match
             strTemplate := StringReplace(
-              BrowseAndDocItOptions.ProfilingCode[FileName],
+              BrowseAndDocItOptions.ProfilingCode[Self],
               '|', #13#10, [rfReplaceAll]);
             slProlog := PrologCode(strTemplate, Method.QualifiedName, 0);
             Try
@@ -9624,7 +9651,7 @@ end;
 
   @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String              
+  @return  a String
 
 **)
 function TArrayType.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
@@ -9634,4 +9661,12 @@ begin
     boolForDocumentation, '=', BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
+(** Register the file source code extensions that can be parsed by this module. **)
+Initialization
+  ModuleDispatcher.Add('.dpk', TPascalModule, True, ctPascalBlock, ctPascalBlock,
+    ctPascalBlock);
+  ModuleDispatcher.Add('.dpr', TPascalModule, True, ctPascalBlock, ctPascalBlock,
+    ctPascalBlock);
+  ModuleDispatcher.Add('.pas', TPascalModule, True, ctPascalBlock, ctPascalBlock,
+    ctPascalBlock);
 End.

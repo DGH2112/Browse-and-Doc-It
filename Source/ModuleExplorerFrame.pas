@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    02 Sep 2011
+  @Date    25 Apr 2013
   @Author  David Hoyle
   @Version 1.0
 
@@ -450,17 +450,18 @@ Begin
           sl := NodeData.FNode.Tokens;
           For i := 0 To sl.Count - 1 Do
             Begin
-              If FCustomDraw Then
-                Begin
-                  GetFontInfo(sl, i, FTitle, Canvas);
-                  If Brush.Color = BrowseAndDocItOptions.BGColour Then
-                    Brush.Color := clInfoBk;
-                End Else
-                Begin
-                  Refresh;
-                  Font.Color := clInfoText;
-                  Font.Style := [];
-                End;
+//              If FCustomDraw Then
+//                Begin
+              GetFontInfo(sl, i, FTitle, Canvas);
+              If Brush.Color = BrowseAndDocItOptions.BGColour Then
+                Brush.Color :=
+                  BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+//                End Else
+//                Begin
+//                  Refresh;
+//                  Font.Color := clInfoText;
+//                  Font.Style := [];
+//                End;
               If iPos + TextWidth(sl[i]) > Width Then
                 Begin
                   iPos := 2 + 10; // Indent multiple lines
@@ -475,7 +476,7 @@ Begin
             Dec(iLine);
             TextOut(iPos, iLine, NodeData.FNode.Text);
           End;
-      Brush.Color := clInfoBk;
+      Brush.Color := BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
       If (FComment <> Nil) And ((FComment.TokenCount > 0) Or
         (FComment.TagCount > 0)) Then
         Begin
@@ -507,12 +508,14 @@ Begin
                     DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
                     DrawTextBiDiModeFlagsReadingOnly) + 1);
                   For j := 0 To FComment.TagCount - 1 Do
-                    If CompareText(BrowseAndDocItOptions.SpecialTags.Names[i], FComment.Tag[j].TagName) = 0 Then
+                    If CompareText(BrowseAndDocItOptions.SpecialTags.Names[i],
+                      FComment.Tag[j].TagName) = 0 Then
                       Begin
                         Pen.Color := clBlack;
                         Brush.Color := clBlack;
                         Ellipse(3, R.Top + 5, 7, R.Top + 9);
-                        Brush.Color := clInfoBk;
+                        Brush.Color := 
+                          BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
                         Refresh;
                         Font.Style := [];
                         Font.Color := clMaroon;
@@ -680,6 +683,7 @@ Begin
   FNodeLevel := NodeData.FNode.Level;
   FCustomDraw := SyntaxHighlight;
   FNode := Node;
+  Color := BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
   ActivateHint(Rect, NodeData.FNode.Text);
 End;
 
@@ -755,7 +759,7 @@ begin
   FINIFileName := BuildRootKey(Nil, Nil);
   FNodeInfo := TObjectList.Create(True);
   FHintWin := TCustomHintWindow.Create(Self, FExplorer);
-  FHintWin.Color := clInfoBk;
+  FHintWin.Color := BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
   FHintWin.Canvas.Font.Assign(FExplorer.Font);
   ilScopeImages.Clear;
   For i := Succ(Low(TImageIndex)) to High(TImageIndex) Do
@@ -1674,6 +1678,7 @@ Var
   sl : TStringList;
   iOffset: Integer;
   iTreeColour : TColor;
+  HL: TTokenFontInfo;
 
 begin
   CustomDraw := (doCustomDrawing In BrowseAndDocItOptions.Options);
@@ -1702,12 +1707,14 @@ begin
               iOffset + ilScopeImages.Width + FExplorer.Margin +
               FExplorer.TextMargin - 2;
             R.Right := R.Left + iPos;
+            Pen.Color := clBlack;
+            HL := BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight];
             If Node = Sender.FocusedNode Then
               Begin
-                Brush.Color := clInfoBk;
+                Brush.Color := HL.FBackColour;
+                Pen.Color := HL.FForeColour;
                 FillRect(R);
               End;
-            Pen.Color := clBlack;
             Rectangle(R);
           End;
         R := ItemRect;
@@ -1781,7 +1788,8 @@ begin
             GetFontInfo(sl, i, NodeData.FNode.Title, TargetCanvas);
             If Node = Sender.FocusedNode Then
               If Brush.Color = BrowseAndDocItOptions.BGColour Then
-                Brush.Color := clinfoBk;
+                Brush.Color :=
+                  BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
             TextOut(iPos, R.Top, sl[i]);
             Inc(iPos, TextWidth(sl[i]) + 1);
           End;

@@ -5,46 +5,59 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    20 Mar 2010
+  @Date    27 Apr 2013
 
 **)
-unit FolderConfig;
+Unit FolderConfig;
 
-interface
+Interface
 
-uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ComCtrls;
+Uses
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  Buttons,
+  ComCtrls;
 
-type
+Type
   (** A class to represent the form interface. **)
-  TfrmFolders = class(TForm)
+  TfrmFolders = Class(TForm)
     lvFolders: TListView;
     btnOK: TBitBtn;
     btnCancel: TBitBtn;
     btnAdd: TBitBtn;
     btnDelete: TBitBtn;
-    procedure btnAddClick(Sender: TObject);
-    procedure btnDeleteClick(Sender: TObject);
-    procedure lvFoldersMouseDown(Sender: TObject; Button: TMouseButton;
+    Procedure btnAddClick(Sender: TObject);
+    Procedure btnDeleteClick(Sender: TObject);
+    Procedure lvFoldersMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure lvFoldersCustomDrawSubItem(Sender: TCustomListView;
+    Procedure lvFoldersCustomDrawSubItem(Sender: TCustomListView;
       Item: TListItem; SubItem: Integer; State: TCustomDrawState;
-      var DefaultDraw: Boolean);
-  private
+      Var DefaultDraw: Boolean);
+  Private
     { Private declarations }
-    Procedure LoadSettings(strINIFileName : String);
-    Procedure SaveSettings(strINIFileName : String);
-    Function GetExtList(iIndex : Integer) : String;
-  public
+    Procedure LoadSettings(strINIFileName: String);
+    Procedure SaveSettings(strINIFileName: String);
+    Function GetExtList(iIndex: Integer): String;
+  Public
     { Public declarations }
-    Class Procedure Execute(strINIFileName : String; Folders : TStringList);
-  end;
+    Class Procedure Execute(strINIFileName: String; Folders: TStringList);
+  End;
 
-implementation
+Implementation
 
 Uses
-  IniFiles, FileCtrl, ModuleDispatcher, DGHLibrary;
+  IniFiles,
+  FileCtrl,
+  DGHLibrary,
+  BaseLanguageModule;
 
 {$R *.dfm}
 
@@ -60,23 +73,23 @@ Uses
   @param   Sender as a TObject
 
 **)
-procedure TfrmFolders.btnAddClick(Sender: TObject);
+Procedure TfrmFolders.btnAddClick(Sender: TObject);
 
-var
-  Item: TListItem;
-  strDir : String;
-  j : Integer;
+Var
+  Item  : TListItem;
+  strDir: String;
+  j     : Integer;
 
-begin
+Begin
   If SelectDirectory(strDir, [], 0) Then
     Begin
-      Item := lvFolders.Items.Add;
+      Item         := lvFolders.Items.Add;
       Item.Caption := strDir;
       Item.Checked := True;
-      For j := Low(Modules) To High(Modules) Do
+      For j        := 0 To ModuleDispatcher.Count - 1 Do
         Item.SubItems.Add('0')
     End;
-end;
+End;
 
 (**
 
@@ -88,22 +101,22 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmFolders.btnDeleteClick(Sender: TObject);
+Procedure TfrmFolders.btnDeleteClick(Sender: TObject);
 
-var
+Var
   iIndex: Integer;
 
-begin
+Begin
   If lvFolders.ItemIndex > -1 Then
     Begin
       iIndex := lvFolders.ItemIndex;
       lvFolders.Items.Delete(iIndex);
       If iIndex > lvFolders.Items.Count - 1 Then
         Dec(iIndex);
-      lvFolders.ItemIndex := iIndex;
+      lvFolders.ItemIndex              := iIndex;
       lvFolders.Items[iIndex].Selected := True;
     End;
-end;
+End;
 
 (**
 
@@ -116,34 +129,34 @@ end;
   @param   Folders        as a TStringList
 
 **)
-class procedure TfrmFolders.Execute(strINIFileName : String; Folders: TStringList);
+Class Procedure TfrmFolders.Execute(strINIFileName: String; Folders: TStringList);
 
-var
-  Item: TListItem;
-  i, j : Integer;
+Var
+  Item  : TListItem;
+  i, j  : Integer;
   Column: TListColumn;
 
-begin
+Begin
   With TfrmFolders.Create(Nil) Do
     Try
       // Columns
-      For j := Low(Modules) To High(Modules) Do
+      For j := 0 To ModuleDispatcher.Count - 1 Do
         Begin
-          Column := lvFolders.Columns.Add;
-          Column.Caption := Modules[j].FExt;
+          Column           := lvFolders.Columns.Add;
+          Column.Caption   := ModuleDispatcher.Modules[j].Ext;
           Column.Alignment := taCenter;
-          Column.MaxWidth := 50;
-          Column.MaxWidth := 50;
+          Column.MaxWidth  := 50;
+          Column.MaxWidth  := 50;
         End;
       LoadSettings(strINIFileName);
       // Items
       For i := 0 To Folders.Count - 1 Do
         Begin
-          Item := lvFolders.Items.Add;
+          Item         := lvFolders.Items.Add;
           Item.Caption := Folders.Names[i];
           Item.Checked := Integer(Folders.Objects[i]) > 0;
-          For j := Low(Modules) To High(Modules) Do
-            If Like(';*' + Modules[j].FExt + '*;', ';' +
+          For j        := 0 To ModuleDispatcher.Count - 1 Do
+            If Like(';*' + ModuleDispatcher.Modules[j].Ext + '*;', ';' +
               Folders.ValueFromIndex[i] + ';') Then
               Item.SubItems.Add('1')
             Else
@@ -160,7 +173,7 @@ begin
     Finally
       Free;
     End;
-end;
+End;
 
 (**
 
@@ -175,19 +188,19 @@ end;
   @return  a String
 
 **)
-Function TfrmFolders.GetExtList(iIndex : Integer) : String;
+Function TfrmFolders.GetExtList(iIndex: Integer): String;
 
 Var
-  i : Integer;
+  i: Integer;
 
 Begin
   Result := '';
-  For i := Low(Modules) To High(Modules) Do
+  For i  := 0 To ModuleDispatcher.Count - 1 Do
     If lvFolders.Items[iIndex].SubItems[i] = '1' Then
       Begin
         If Result <> '' Then
           Result := Result + ';';
-        Result := Result + Modules[i].FExt;
+        Result   := Result + ModuleDispatcher.Modules[i].Ext;
       End;
 End;
 
@@ -201,19 +214,19 @@ End;
   @param   strINIFileName as a String
 
 **)
-procedure TfrmFolders.LoadSettings(strINIFileName : String);
-begin
+Procedure TfrmFolders.LoadSettings(strINIFileName: String);
+Begin
   With TIniFile.Create(strINIFileName) Do
     Try
-      Top := ReadInteger('FoldersDlg', 'Top', Screen.Height Div 2 - Height Div 2);
-      Left := ReadInteger('FoldersDlg', 'Left', Screen.Width Div 2 - Width Div 2);
+      Top    := ReadInteger('FoldersDlg', 'Top', Screen.Height Div 2 - Height Div 2);
+      Left   := ReadInteger('FoldersDlg', 'Left', Screen.Width Div 2 - Width Div 2);
       Height := ReadInteger('FoldersDlg', 'Height', Height);
-      Width := ReadInteger('FoldersDlg', 'Width', Width);
+      Width  := ReadInteger('FoldersDlg', 'Width', Width);
       lvFolders.Column[0].Width := ReadInteger('FoldersDlg', 'FolderWidth', 250);
     Finally
       Free;
     End;
-end;
+End;
 
 (**
 
@@ -229,16 +242,16 @@ end;
   @param   DefaultDraw as a Boolean as a reference
 
 **)
-procedure TfrmFolders.lvFoldersCustomDrawSubItem(Sender: TCustomListView;
+Procedure TfrmFolders.lvFoldersCustomDrawSubItem(Sender: TCustomListView;
   Item: TListItem; SubItem: Integer; State: TCustomDrawState;
-  var DefaultDraw: Boolean);
+  Var DefaultDraw: Boolean);
 
-begin
+Begin
   If Item.SubItems[SubItem - 1] = '1' Then
     Sender.Canvas.Brush.Color := clGreen
   Else
     Sender.Canvas.Brush.Color := clRed;
-end;
+End;
 
 (**
 
@@ -255,21 +268,21 @@ end;
   @param   Y      as an Integer
 
 **)
-procedure TfrmFolders.lvFoldersMouseDown(Sender: TObject; Button: TMouseButton;
+Procedure TfrmFolders.lvFoldersMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 
 Var
-  i, j : Integer;
-  Item : TListItem;
-  R : TRect;
-  iPosition : Integer;
+  i, j     : Integer;
+  Item     : TListItem;
+  R        : TRect;
+  iPosition: Integer;
 
-begin
+Begin
   iPosition := lvFolders.Columns[0].Width;
-  For i := 0 To lvFolders.Items.Count - 1 Do
+  For i     := 0 To lvFolders.Items.Count - 1 Do
     Begin
       Item := lvFolders.Items[i];
-      R := Item.DisplayRect(drBounds);
+      R    := Item.DisplayRect(drBounds);
       If (Y >= Item.Top) And (Y < Item.Top + R.Bottom - R.Top) Then
         For j := 1 To lvFolders.Columns.Count - 1 Do
           Begin
@@ -284,7 +297,7 @@ begin
             Inc(iPosition, lvFolders.Column[j].Width);
           End;
     End;
-end;
+End;
 
 (**
 
@@ -296,8 +309,8 @@ end;
   @param   strINIFileName as a String
 
 **)
-procedure TfrmFolders.SaveSettings(strINIFileName : String);
-begin
+Procedure TfrmFolders.SaveSettings(strINIFileName: String);
+Begin
   With TIniFile.Create(strINIFileName) Do
     Try
       WriteInteger('FoldersDlg', 'Top', Top);
@@ -308,6 +321,6 @@ begin
     Finally
       Free;
     End;
-end;
+End;
 
-end.
+End.

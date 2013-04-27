@@ -42,6 +42,7 @@ object frmFolders: TfrmFolders
     Height = 25
     Anchors = [akRight, akBottom]
     Kind = bkOK
+    NumGlyphs = 2
     TabOrder = 1
   end
   object btnCancel: TBitBtn
@@ -51,6 +52,7 @@ object frmFolders: TfrmFolders
     Height = 25
     Anchors = [akRight, akBottom]
     Kind = bkCancel
+    NumGlyphs = 2
     TabOrder = 2
   end
   object btnAdd: TBitBtn

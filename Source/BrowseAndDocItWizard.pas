@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    20 Apr 2013
+  @Date    28 Apr 2013
   @Version 1.0
 
 **)
@@ -17,8 +17,7 @@ Uses
   Menus,
   BaseLanguageModule,
   Types,
-  CommonIDEFunctions,
-  ModuleDispatcher
+  CommonIDEFunctions
   {$IFNDEF D2005},
   ExtCtrls,
   Contnrs
@@ -123,7 +122,9 @@ Uses
   DUnitCreator,
   DUnitForm,
   Dialogs,
-  Controls, OptionsForm, ProgressForm;
+  Controls,
+  OptionsForm,
+  ProgressForm;
 
 ResourceString
   (** This is a resource message to confirm whether the selected text should be
@@ -607,7 +608,7 @@ Var
 Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
-    InsertCommentBlock(csBlock, GetCommentType(SE.FileName, csBlock));
+    InsertCommentBlock(csBlock, ModuleDispatcher.GetCommentType(SE.FileName, csBlock));
 End;
 
 (**
@@ -708,7 +709,7 @@ Var
 Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
-    InsertCommentBlock(csInSitu, GetCommentType(SE.FileName, csInSitu));
+    InsertCommentBlock(csInSitu, ModuleDispatcher.GetCommentType(SE.FileName, csInSitu));
 End;
 
 (**
@@ -728,7 +729,7 @@ Var
 Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
-    InsertCommentBlock(csLine, GetCommentType(SE.FileName, csLine));
+    InsertCommentBlock(csLine, ModuleDispatcher.GetCommentType(SE.FileName, csLine));
 End;
 
 (**
@@ -766,8 +767,8 @@ Begin
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
-  Module := Dispatcher(EditorAsString(Source), Source.FileName, Source.Modified,
-    [moParse]);
+  Module := ModuleDispatcher.Dispatcher(EditorAsString(Source), Source.FileName,
+    Source.Modified, [moParse]);
   If Module <> Nil Then
     Try
       EditPos := Source.GetEditView(0).CursorPos;
@@ -791,9 +792,9 @@ Begin
               iMaxCommentWidth := Source.EditViews[0].Buffer.BufferOptions.RightMargin;
               Writer           := Source.CreateUndoableWriter;
               Try
-                strComment := WriteComment(F, GetCommentType(Source.FileName,
-                  csBlock), iIndent, True,
-                  CursorDelta, iMaxCommentWidth);
+                strComment := WriteComment(F,
+                  ModuleDispatcher.GetCommentType(Source.FileName, csBlock), iIndent,
+                  True, CursorDelta, iMaxCommentWidth);
                 InsertComment(strComment, Writer, iInsertLine, Source);
               Finally
                 Writer := Nil;
@@ -1029,8 +1030,8 @@ Begin
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
-  Module := Dispatcher(EditorAsString(Source), Source.FileName, Source.Modified,
-    [moParse]);
+  Module := ModuleDispatcher.Dispatcher(EditorAsString(Source), Source.FileName,
+    Source.Modified, [moParse]);
   If Module <> Nil Then
     Try
       EditPos := Source.GetEditView(0).CursorPos;
@@ -1054,7 +1055,8 @@ Begin
               Writer        := Source.CreateUndoableWriter;
               Try
                 iMaxCommentWidth := Source.EditViews[0].Buffer.BufferOptions.RightMargin;
-                strComment       := WriteComment(F, GetCommentType(Source.FileName,
+                strComment       := WriteComment(F,
+                  ModuleDispatcher.GetCommentType(Source.FileName,
                   csBlock), iIndent, False, CursorDelta, iMaxCommentWidth);
                 InsertComment(strComment, Writer, iInsertLine, Source);
               Finally
@@ -1112,7 +1114,7 @@ Begin
         CharPos.Line      := EditPos.Line;
         CharPos.CharIndex := EditPos.Col;
         Writer.CopyTo(SE.GetEditView(0).CharPosToPos(CharPos) - 1);
-        CommentType := GetCommentType(SE.FileName, csLine);
+        CommentType := ModuleDispatcher.GetCommentType(SE.FileName, csLine);
         iIndent     := EditPos.Col;
         strComment  := BuildBlockComment(CommentType, csLine, iIndent,
           '@todo ' + strSelectedText);
@@ -1453,7 +1455,7 @@ Begin
     Begin
       If Not SE.EditViews[0].Buffer.IsReadOnly Then
         Begin
-          M := Dispatcher(EditorAsString(SE), SE.FileName,
+          M := ModuleDispatcher.Dispatcher(EditorAsString(SE), SE.FileName,
             SE.Modified, [moParse, moProfiling]);
           Try
             ProfileJobs := TfrmProfiling.Execute(M);

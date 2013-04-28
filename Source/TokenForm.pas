@@ -3,7 +3,7 @@
   This is a debug form for displaying the tokens and their information.
 
   @version      0.9
-  @date         23 Jul 2009
+  @date         28 Apr 2013
   @author       David Hoyle
 
 **)
@@ -58,12 +58,16 @@ procedure TfrmTokenForm.lvListView1CustomDrawItem(Sender: TCustomListView;
 
 Var
   T : TBADITokenType;
+  BG: TColor;
 
 begin
   T := TBADITokenType(StrToInt(Item.SubItems[6]));
   lvListView1.Canvas.Font.Color := BrowseAndDocItOptions.TokenFontInfo[T].FForeColour;
   lvListView1.Canvas.Font.Style := BrowseAndDocItOptions.TokenFontInfo[T].FStyles;
-  lvListView1.Canvas.Brush.Color := BrowseAndDocItOptions.TokenFontInfo[T].FBackColour;
+  BG := BrowseAndDocItOptions.TokenFontInfo[T].FBackColour;
+  If BG = clNone Then
+    BG := clWindow;
+  lvListView1.Canvas.Brush.Color := BG;
 end;
 
 (**

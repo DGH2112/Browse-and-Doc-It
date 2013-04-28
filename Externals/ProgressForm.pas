@@ -116,7 +116,12 @@ Procedure TfrmProgress.Init(iMax: Integer; strTitle, strMsg: String);
 begin
   Caption := strTitle;
   FEllipsisLabel.Caption := strMsg;
-  prbProgressBar1.Max := iMax;
+  If iMax > 0 Then
+    Begin
+      prbProgressBar1.Style := pbstNormal;
+      prbProgressBar1.Max := iMax;
+    End Else
+      prbProgressBar1.Style := pbstMarquee;
   prbProgressBar1.Position := 0;
   Show;
   Application.ProcessMessages;
@@ -135,11 +140,15 @@ end;
 
 **)
 procedure TfrmProgress.UpdateProgress(iPosition: Integer; strMsg : String);
+
 begin
-  prbProgressBar1.Position := iPosition;
-  prbProgressBar1.Position := iPosition - 1;
-  prbProgressBar1.Position := iPosition;
-  FEllipsisLabel.Caption := strMsg;
+  If prbProgressBar1.Style = pbstNormal Then
+    Begin
+      prbProgressBar1.Position := iPosition;
+      prbProgressBar1.Position := iPosition - 1;
+      prbProgressBar1.Position := iPosition;
+      FEllipsisLabel.Caption := strMsg;
+    End;
   Application.ProcessMessages;
 end;
 

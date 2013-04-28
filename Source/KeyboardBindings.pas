@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    25 Oct 2009
+  @Date    28 Apr 2013
   
 **)
 Unit KeyboardBindings;
@@ -15,32 +15,36 @@ Interface
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 
 Uses
-  ToolsAPI, BrowseAndDocItWizard, Classes;
+  ToolsAPI,
+  BrowseAndDocItWizard,
+  Classes;
 
 Type
   (** This class represents a key binding notifier for installing and handling
       key bindings for this plugin. **)
   TKeyboardBinding = Class(TNotifierObject, IOTANotifier, IOTAKeyboardBinding)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FWizard : TBrowseAndDocItWizard;
-    Procedure FocusModuleExplorer(const Context: IOTAKeyContext;
-      KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
+    {$IFDEF D2005} Strict {$ENDIF} Private
+    FWizard: TBrowseAndDocItWizard;
+    Procedure FocusModuleExplorer(Const Context: IOTAKeyContext; KeyCode: TShortcut;
+      Var BindingResult: TKeyBindingResult);
     //Procedure ShowTokens(const Context: IOTAKeyContext;
     //  KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+    {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    function GetBindingType: TBindingType;
-    function GetDisplayName: string;
-    function GetName: string;
-    procedure BindKeyboard(const BindingServices: IOTAKeyBindingServices);
-    Constructor Create(Wizard : TBrowseAndDocItWizard);
+    Function GetBindingType: TBindingType;
+    Function GetDisplayName: String;
+    Function GetName: String;
+    Procedure BindKeyboard(Const BindingServices: IOTAKeyBindingServices);
+    Constructor Create(Wizard: TBrowseAndDocItWizard);
   End;
-
 
 Implementation
 
 Uses
-  Menus, BaseLanguageModule, ToolsAPIUtils, ModuleDispatcher, TokenForm;
+  Menus,
+  BaseLanguageModule,
+  ToolsAPIUtils,
+  TokenForm;
 
 (**
 
@@ -53,12 +57,12 @@ Uses
   @param   BindingServices as an IOTAKeyBindingServices as a constant
 
 **)
-procedure TKeyboardBinding.BindKeyboard(
-  const BindingServices: IOTAKeyBindingServices);
-begin
-  BindingServices.AddKeyBinding([Shortcut(13, [ssCtrl, ssShift, ssAlt])], FocusModuleExplorer, Nil);
+Procedure TKeyboardBinding.BindKeyboard(Const BindingServices: IOTAKeyBindingServices);
+Begin
+  BindingServices.AddKeyBinding([Shortcut(13, [ssCtrl, ssShift, ssAlt])],
+    FocusModuleExplorer, Nil);
   // BindingServices.AddKeyBinding([Shortcut(Ord('T'), [ssCtrl, ssShift, ssAlt])], ShowTokens, Nil);
-end;
+End;
 
 (**
 
@@ -104,10 +108,10 @@ end; **)
   @param   Wizard as a TBrowseAndDocItWizard
 
 **)
-constructor TKeyboardBinding.Create(Wizard: TBrowseAndDocItWizard);
-begin
+Constructor TKeyboardBinding.Create(Wizard: TBrowseAndDocItWizard);
+Begin
   FWizard := Wizard;
-end;
+End;
 
 (**
 
@@ -121,12 +125,12 @@ end;
   @param   BindingResult as a TKeyBindingResult as a reference
 
 **)
-procedure TKeyboardBinding.FocusModuleExplorer(const Context: IOTAKeyContext;
-  KeyCode: TShortcut; var BindingResult: TKeyBindingResult);
-begin
+Procedure TKeyboardBinding.FocusModuleExplorer(Const Context: IOTAKeyContext;
+  KeyCode: TShortcut; Var BindingResult: TKeyBindingResult);
+Begin
   FWizard.ModuleExplorerClick(Self);
   BindingResult := krHandled;
-end;
+End;
 
 (**
 
@@ -138,10 +142,10 @@ end;
   @return  a TBindingType
 
 **)
-function TKeyboardBinding.GetBindingType: TBindingType;
-begin
+Function TKeyboardBinding.GetBindingType: TBindingType;
+Begin
   Result := btPartial;
-end;
+End;
 
 (**
 
@@ -153,10 +157,10 @@ end;
   @return  a string
 
 **)
-function TKeyboardBinding.GetDisplayName: string;
-begin
+Function TKeyboardBinding.GetDisplayName: String;
+Begin
   Result := 'Browse And Doc It Comment Bindings';
-end;
+End;
 
 (**
 
@@ -168,9 +172,9 @@ end;
   @return  a string
 
 **)
-function TKeyboardBinding.GetName: string;
-begin
+Function TKeyboardBinding.GetName: String;
+Begin
   Result := 'BrowseAndDocItBindings';
-end;
+End;
 
 End.

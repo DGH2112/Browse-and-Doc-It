@@ -71,11 +71,13 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     object tbtnFileScan: TToolButton
       Left = 27
       Top = 0
+      Hint = 'Scan|Scan for files to parse...'
       Action = actFileScan
     end
     object tbtnFileExcludeFile: TToolButton
       Left = 54
       Top = 0
+      Hint = 'Exclude File|Exclude this file from the scans...'
       Action = actFileExcludeFile
     end
     object tbtnSep1: TToolButton
@@ -89,6 +91,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     object tbtnFileRecurseFolders: TToolButton
       Left = 89
       Top = 0
+      Hint = 'Recurse Folders|Recurse Folders when scanning...'
       Action = actFileRecurseFolders
     end
     object btnViewDocConflicts: TToolButton
@@ -99,26 +102,31 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     object tbtnViewHints: TToolButton
       Left = 143
       Top = 0
+      Hint = 'Hints|View Hints...'
       Action = actViewHints
     end
     object tbtnViewWarnings: TToolButton
       Left = 170
       Top = 0
+      Hint = 'Warnings|View Warnings...'
       Action = actViewWarnings
     end
     object tbtnViewErrors: TToolButton
       Left = 197
       Top = 0
+      Hint = 'Errors|View Errors...'
       Action = actViewErrors
     end
     object tbtnViewSpecialChars: TToolButton
       Left = 224
       Top = 0
+      Hint = 'Special Tokens|Show special tokens in the editor...'
       Action = actViewSpecialCharacters
     end
     object tbtnViewShowTokens: TToolButton
       Left = 251
       Top = 0
+      Hint = 'Show Tokens|Show the tokens from the current file...'
       Action = actViewShowTokens
     end
     object btnWordwrap: TToolButton
@@ -137,21 +145,25 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     object tbtnToolsOptions: TToolButton
       Left = 313
       Top = 0
+      Hint = 'Options|Options...'
       Action = actToolsOptions
     end
     object ToolButton: TToolButton
       Left = 340
       Top = 0
+      Hint = 'Editor Options|Displays the Editor Options...'
       Action = actToolsSynEditOptions
     end
     object tbtnToolsDocumentation: TToolButton
       Left = 367
       Top = 0
+      Hint = 'Docmentation|Document files...'
       Action = actToolsDocumentation
     end
     object tbtnToolsExclusions: TToolButton
       Left = 394
       Top = 0
+      Hint = 'Exclusions|Display Exclusions...'
       Action = actToolsExclusions
     end
     object tbtnSep3: TToolButton
@@ -165,6 +177,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     object tbtnFolderCongih: TToolButton
       Left = 429
       Top = 0
+      Hint = 'Folder Configuration|Configure the folders to scan...'
       Action = actFileFolders
     end
   end
@@ -213,7 +226,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Left = 330
     Top = 139
     Bitmap = {
-      494C010118001D00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010118001D000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000007000000001002000000000000070
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1316,7 +1329,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Left = 332
     Top = 198
     Bitmap = {
-      494C010102000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101020004000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

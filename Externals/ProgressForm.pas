@@ -3,7 +3,7 @@
   This is a generic progress dialogue for use in the ObjectPascalDocWizard.
 
   @version    0.9
-  @date       20 Mar 2010
+  @date       28 Apr 2013
   @author     David Hoyle
 
 **)
@@ -136,6 +136,8 @@ end;
 **)
 procedure TfrmProgress.UpdateProgress(iPosition: Integer; strMsg : String);
 begin
+  prbProgressBar1.Position := iPosition;
+  prbProgressBar1.Position := iPosition - 1;
   prbProgressBar1.Position := iPosition;
   FEllipsisLabel.Caption := strMsg;
   Application.ProcessMessages;

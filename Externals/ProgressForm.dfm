@@ -3,8 +3,8 @@ object frmProgress: TfrmProgress
   Top = 426
   BorderStyle = bsToolWindow
   Caption = 'Progress'
-  ClientHeight = 97
-  ClientWidth = 400
+  ClientHeight = 119
+  ClientWidth = 492
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,12 +17,16 @@ object frmProgress: TfrmProgress
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object pnlPanel1: TPanel
     Left = 0
-    Top = 38
-    Width = 400
-    Height = 26
+    Top = 47
+    Width = 492
+    Height = 32
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alBottom
     BevelOuter = bvNone
     BorderWidth = 5
@@ -30,8 +34,12 @@ object frmProgress: TfrmProgress
     object prbProgressBar1: TProgressBar
       Left = 5
       Top = 5
-      Width = 390
-      Height = 16
+      Width = 482
+      Height = 22
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Align = alClient
       TabOrder = 0
     end
@@ -39,8 +47,12 @@ object frmProgress: TfrmProgress
   object pnlInfo: TPanel
     Left = 0
     Top = 0
-    Width = 400
-    Height = 38
+    Width = 492
+    Height = 47
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
@@ -48,18 +60,27 @@ object frmProgress: TfrmProgress
   end
   object pnlButton: TPanel
     Left = 0
-    Top = 64
-    Width = 400
-    Height = 33
+    Top = 79
+    Width = 492
+    Height = 40
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
     object btnCancel: TBitBtn
-      Left = 166
+      Left = 204
       Top = 1
-      Width = 75
-      Height = 25
+      Width = 93
+      Height = 31
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Kind = bkCancel
+      NumGlyphs = 2
       TabOrder = 0
       OnClick = btnCancelClick
     end

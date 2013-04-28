@@ -6555,14 +6555,16 @@ begin
       WriteInteger('Documentation', 'MaxDocOutputWidth', FMaxDocOutputWidth);
       WriteInteger('ModuleExplorer', 'ManagedNodesLife', FManagedNodesLife);
       WriteString('ModuleExplorer', 'TreeColour', ColorToString(FTreeColour));
+      EraseSection('ProfilingCode');
       For j := 0 To FProfilingCode.Count - 1 Do
-        {$IFDEF D0006}
-        WriteString('ProfilingCode', FProfilingCode.Names[j],
-          FProfilingCode.ValueFromIndex[j]);
-        {$ELSE}
-        WriteString('ProfilingCode', FProfilingCode.Names[j],
-          FProfilingCode.Values[FProfilingCode.Names[j]]);
-        {$ENDIF}
+        If FProfilingCode.Names[j] <> '' Then
+          {$IFDEF D0006}
+          WriteString('ProfilingCode', FProfilingCode.Names[j],
+            FProfilingCode.ValueFromIndex[j]);
+          {$ELSE}
+          WriteString('ProfilingCode', FProfilingCode.Names[j],
+            FProfilingCode.Values[FProfilingCode.Names[j]]);
+          {$ENDIF}
       UpdateFile;
     Finally
       Free;

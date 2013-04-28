@@ -5,15 +5,17 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    25 Oct 2009
+  @Date    28 Apr 2013
 
 **)
-unit DUnitCreator;
+Unit DUnitCreator;
 
-interface
+Interface
 
 Uses
-  Classes, ToolsAPI, BaseLanguageModule;
+  Classes,
+  ToolsAPI,
+  BaseLanguageModule;
 
 {$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
 
@@ -24,56 +26,54 @@ Type
   TUnitsArray = Array Of IOTAModuleInfo;
 
   (** A procedural type for error event handlers. **)
-  TErrorProc = Procedure(strMsg : String) Of Object;
+  TErrorProc = Procedure(strMsg: String) Of Object;
 
   (** A class to handle the creation of the DUnit files. **)
   TDUnitCreator = Class
-  private
-    procedure CheckReadOnlyStatus(Module : IOTAModule; strModuleReadOnly: string);
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FProjects : TProjectsArray;
-    FProjectCount : Integer;
-    FUnits : TUnitsArray;
-    FUnitCount : Integer;
-    FProject : IOTAProject;
-    FModule : TBaseLanguageModule;
-    FUnit: IOTAModule;
-    FErrors : TErrorProc;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure AddProject(Project : IOTAProject);
-    Procedure AddUnit(AUnit : IOTAModuleInfo);
-    Procedure AddNewTestSuites(M : TBaseLanguageModule; slTestCases : TStrings;
-      strTestSuiteName : String);
-    Procedure AddNewTestImplementations(M : TBaseLanguageModule;
-      slTestCases : TStrings);
-    Procedure AddNewTestClasses(M : TBaseLanguageModule; slTestCases : TStrings;
-      strBaseClass : String);
-    Function DoesClassExist(M : TBaseLanguageModule; strClassName : String) : Boolean;
-    Function DoesMethodExist(M : TBaseLanguageModule; strClassName,
-      strMethodName : String) : Boolean;
-    Procedure RaiseError(strMsg : String);
-    Procedure AddUnitToBeTestedToUsesClause(M : TBaseLanguageModule;
-      strUnitToBeTested : String);
-    Procedure AddNewTestMethodsToClass(M : TBaseLanguageModule;
-      slTestCases : TStringList);
+  Private
+    Procedure CheckReadOnlyStatus(Module: IOTAModule; strModuleReadOnly: String);
+    {$IFDEF D2005} Strict {$ENDIF} Private
+    FProjects    : TProjectsArray;
+    FProjectCount: Integer;
+    FUnits       : TUnitsArray;
+    FUnitCount   : Integer;
+    FProject     : IOTAProject;
+    FModule      : TBaseLanguageModule;
+    FUnit        : IOTAModule;
+    FErrors      : TErrorProc;
+    {$IFDEF D2005} Strict {$ENDIF} Protected
+    Procedure AddProject(Project: IOTAProject);
+    Procedure AddUnit(AUnit: IOTAModuleInfo);
+    Procedure AddNewTestSuites(M: TBaseLanguageModule; slTestCases: TStrings;
+      strTestSuiteName: String);
+    Procedure AddNewTestImplementations(M: TBaseLanguageModule; slTestCases: TStrings);
+    Procedure AddNewTestClasses(M: TBaseLanguageModule; slTestCases: TStrings;
+      strBaseClass: String);
+    Function DoesClassExist(M: TBaseLanguageModule; strClassName: String): Boolean;
+    Function DoesMethodExist(M: TBaseLanguageModule;
+      strClassName, strMethodName: String): Boolean;
+    Procedure RaiseError(strMsg: String);
+    Procedure AddUnitToBeTestedToUsesClause(M: TBaseLanguageModule;
+      strUnitToBeTested: String);
+    Procedure AddNewTestMethodsToClass(M: TBaseLanguageModule; slTestCases: TStringList);
   Public
     Constructor Create;
     Destructor Destroy; Override;
     Procedure GetExistingDUnitProjects;
-    Procedure CreateTestProject(strNewProjectName : String);
+    Procedure CreateTestProject(strNewProjectName: String);
     Procedure ActivateProject(iProject: Integer);
     Function GetProject(iProject: Integer): String;
     Function GetProjectCount: Integer;
-    function GetUnit(iUnit: Integer): string;
-    function GetUnitCount: Integer;
+    Function GetUnit(iUnit: Integer): String;
+    Function GetUnitCount: Integer;
     Procedure GetExistingDUnitUnits(iProject: Integer);
-    procedure CreateTestUnit(strNewUnitName, strUnitToBeTested : String;
-      slTestCases : TStringList; strBaseClass, strTestSuiteName : String);
-    procedure UpdateTestUnit(iUnit : Integer; strUnitToBeTested : String;
-      slTestCases : TStringList; strBaseClass, strTestSuiteName : String);
-    Function DoesProjectExist(strProjectName : String) : Boolean;
-    Function DoesUnitExist(iProject : Integer; strUnitName : String) : Boolean;
-    Procedure AddUnitToBeTested(strFileName : String);
+    Procedure CreateTestUnit(strNewUnitName, strUnitToBeTested: String;
+      slTestCases: TStringList; strBaseClass, strTestSuiteName: String);
+    Procedure UpdateTestUnit(iUnit: Integer; strUnitToBeTested: String;
+      slTestCases: TStringList; strBaseClass, strTestSuiteName: String);
+    Function DoesProjectExist(strProjectName: String): Boolean;
+    Function DoesUnitExist(iProject: Integer; strUnitName: String): Boolean;
+    Procedure AddUnitToBeTested(strFileName: String);
     (**
       This property returns the indexed project reference.
       @precon  None.
@@ -81,14 +81,14 @@ Type
       @param   iProject as       an Integer
       @return  a String
     **)
-    Property Projects[iProject : Integer] : String Read GetProject;
+    Property Projects[iProject: Integer]: String Read GetProject;
     (**
       This property returns the number of projects referenced.
       @precon  None.
       @postcon Returns the indexed project reference.
       @return  an Integer
     **)
-    Property ProjectCount : Integer Read GetProjectCount;
+    Property ProjectCount: Integer Read GetProjectCount;
     (**
       This property returns the indexed unit reference.
       @precon  None.
@@ -96,127 +96,129 @@ Type
       @param   iUnit as       an Integer
       @return  a String
     **)
-    Property Units[iUnit : Integer] : String Read GetUnit;
+    Property Units[iUnit: Integer]: String Read GetUnit;
     (**
       This property returns the number of units referenced.
       @precon  None.
       @postcon Returns the indexed unit reference.
       @return  an Integer
     **)
-    Property UnitCount : Integer Read GetUnitCount;
+    Property UnitCount: Integer Read GetUnitCount;
     (**
       This property returns the base language module interface.
       @precon  None.
       @postcon Returns the base language module interface.
       @return  a TBaseLanguageModule
     **)
-    Property Module : TBaseLanguageModule Read FModule;
+    Property Module: TBaseLanguageModule Read FModule;
     (**
       This property gets and sets the event handler for errors.
       @precon  None.
       @postcon Gets and sets the event handler for errors.
       @return  a TErrorProc
     **)
-    Property Errors : TErrorProc Read FErrors Write FErrors;
+    Property Errors: TErrorProc Read FErrors Write FErrors;
   End;
 
-implementation
+Implementation
 
 Uses
-  SysUtils, Windows, ToolsAPIUtils, ModuleDispatcher, DGHLibrary;
+  SysUtils,
+  Windows,
+  ToolsAPIUtils,
+  DGHLibrary;
 
 Const
   (** A constant to define the growth capacity of the collections. **)
-  iCAPACITY : Integer = 25;
+  iCAPACITY: Integer = 25;
 
 Type
   (** A class to handle the creation of the DUnit project file. **)
   TProjectCreator = Class(TInterfacedObject, IOTACreator, IOTAProjectCreator
     {$IFDEF D0005}, IOTAProjectCreator50 {$ENDIF}
     {$IFDEF D2005}, IOTAProjectCreator80 {$ENDIF})
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FNewProjectName : String;
+    {$IFDEF D2005} Strict {$ENDIF} Private
+    FNewProjectName: String;
   Public
-    Constructor Create(strNewProjectName : String);
+    Constructor Create(strNewProjectName: String);
     Function GetCreatorType: String;
     Function GetExisting: Boolean;
     Function GetFileSystem: String;
     Function GetOwner: IOTAModule;
     Function GetUnnamed: Boolean;
-    function GetFileName: string;
-    function GetOptionFileName: string;
-    function GetShowSource: Boolean;
-    procedure NewDefaultModule;
-    function NewOptionSource(const ProjectName: string): IOTAFile;
-    procedure NewProjectResource(const Project: IOTAProject);
-    function NewProjectSource(const ProjectName: string): IOTAFile;
+    Function GetFileName: String;
+    Function GetOptionFileName: String;
+    Function GetShowSource: Boolean;
+    Procedure NewDefaultModule;
+    Function NewOptionSource(Const ProjectName: String): IOTAFile;
+    Procedure NewProjectResource(Const Project: IOTAProject);
+    Function NewProjectSource(Const ProjectName: String): IOTAFile;
     {$IFDEF D0005}
-    procedure NewDefaultProjectModule(const Project: IOTAProject);
+    Procedure NewDefaultProjectModule(Const Project: IOTAProject);
     {$ENDIF}
     {$IFDEF D2005}
-    function GetProjectPersonality: string;
+    Function GetProjectPersonality: String;
     {$ENDIF}
   End;
 
   (** This class creates a IOTAFIle interface for generating the project file
       source. **)
   TProjectCreatorFile = Class(TInterfacedObject, IOTAFile)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FProjectName : String;
+    {$IFDEF D2005} Strict {$ENDIF} Private
+    FProjectName: String;
   Public
-    Constructor Create(strProjectName : String);
-    function GetAge: TDateTime;
-    function GetSource: string;
+    Constructor Create(strProjectName: String);
+    Function GetAge: TDateTime;
+    Function GetSource: String;
   End;
 
   (** This class creates the test unit file. **)
   TUnitCreator = Class(TInterfacedObject, IOTACreator, IOTAModuleCreator)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FNewUnitName : String;
-    FOwner : IOTAProject;
+    {$IFDEF D2005} Strict {$ENDIF} Private
+    FNewUnitName   : String;
+    FOwner         : IOTAProject;
     FUnitToBeTested: String;
-    FTestCases: TStringList;
-    FBaseClass: String;
-    FTestSuiteName: String;
+    FTestCases     : TStringList;
+    FBaseClass     : String;
+    FTestSuiteName : String;
   Public
-    Constructor Create(strNewUnitName, strUnitToBeTested : String;
-      slTestCases : TStringList; Owner : IOTAProject; strBaseClass,
-      strTestSuiteName : String);
-    function GetCreatorType: string;
-    function GetExisting: Boolean;
-    function GetFileSystem: string;
-    function GetOwner: IOTAModule;
-    function GetUnnamed: Boolean;
-    procedure FormCreated(const FormEditor: IOTAFormEditor);
-    function GetAncestorName: string;
-    function GetFormName: string;
-    function GetImplFileName: string;
-    function GetIntfFileName: string;
-    function GetMainForm: Boolean;
-    function GetShowForm: Boolean;
-    function GetShowSource: Boolean;
-    function NewFormFile(const FormIdent: string;
-      const AncestorIdent: string): IOTAFile;
-    function NewImplSource(const ModuleIdent: string; const FormIdent: string;
-      const AncestorIdent: string): IOTAFile;
-    function NewIntfSource(const ModuleIdent: string; const FormIdent: string;
-      const AncestorIdent: string): IOTAFile;
+    Constructor Create(strNewUnitName, strUnitToBeTested: String;
+      slTestCases: TStringList; Owner: IOTAProject;
+      strBaseClass, strTestSuiteName: String);
+    Function GetCreatorType: String;
+    Function GetExisting: Boolean;
+    Function GetFileSystem: String;
+    Function GetOwner: IOTAModule;
+    Function GetUnnamed: Boolean;
+    Procedure FormCreated(Const FormEditor: IOTAFormEditor);
+    Function GetAncestorName: String;
+    Function GetFormName: String;
+    Function GetImplFileName: String;
+    Function GetIntfFileName: String;
+    Function GetMainForm: Boolean;
+    Function GetShowForm: Boolean;
+    Function GetShowSource: Boolean;
+    Function NewFormFile(Const FormIdent: String; Const AncestorIdent: String): IOTAFile;
+    Function NewImplSource(Const ModuleIdent: String; Const FormIdent: String;
+      Const AncestorIdent: String): IOTAFile;
+    Function NewIntfSource(Const ModuleIdent: String; Const FormIdent: String;
+      Const AncestorIdent: String): IOTAFile;
   End;
 
   (** This class creates a IOTAFile interface for generating the unit file
       source. **)
   TUnitCreatorFile = Class(TInterfacedObject, IOTAFile)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FUnitName : String;
+    {$IFDEF D2005} Strict {$ENDIF} Private
+    FUnitName      : String;
     FUnitToBeTested: String;
-    FTestCases: TStringList;
-    FBaseClass: String;
-    FTestSuiteName: String;
+    FTestCases     : TStringList;
+    FBaseClass     : String;
+    FTestSuiteName : String;
   Public
-    Constructor Create(strUnitName, strUnitToBeTested : String;
-      slTestCases : TStringList; strBaseClass, strTestSuiteName : String);
-    function GetAge: TDateTime;
-    function GetSource: string;
+    Constructor Create(strUnitName, strUnitToBeTested: String; slTestCases: TStringList;
+      strBaseClass, strTestSuiteName: String);
+    Function GetAge: TDateTime;
+    Function GetSource: String;
   End;
 
 { TDUnitCreator }
@@ -234,20 +236,21 @@ Type
   @return  a Boolean
 
 **)
-Function IsTestFramework(Project : IOTAProject) : Boolean;
+Function IsTestFramework(Project: IOTAProject): Boolean;
 
-var
-  S: IOTASourceEditor;
-  M: TBaseLanguageModule;
-  E: TElementContainer;
-  strFileName : String;
+Var
+  S          : IOTASourceEditor;
+  M          : TBaseLanguageModule;
+  E          : TElementContainer;
+  strFileName: String;
 
 Begin
   Result := False;
 
-  S := SourceEditor(Project.CurrentEditor.Module);
-  strFilename := Project.CurrentEditor.FileName;
-  M := Dispatcher(EditorAsString(S), strFileName, True, [moParse]);
+  S           := SourceEditor(Project.CurrentEditor.Module);
+  strFileName := Project.CurrentEditor.FileName;
+  M           := ModuleDispatcher.Dispatcher(EditorAsString(S), strFileName, True,
+    [moParse]);
   Try
     If M <> Nil Then
       Begin
@@ -279,7 +282,7 @@ End;
   @return  a String
 
 **)
-Function TestClassName(strText : String) : String;
+Function TestClassName(strText: String): String;
 
 Begin
   Result := GetField(strText, '=', 1);
@@ -301,27 +304,27 @@ End;
   @return  a String      
 
 **)
-Function TestClasses(slTestCases : TStringList; strBaseClass : String): String;
+Function TestClasses(slTestCases: TStringList; strBaseClass: String): String;
 
 Var
   strLastClass: String;
-  i: Integer;
-  strClass : String;
-  strMethod : String;
+  i           : Integer;
+  strClass    : String;
+  strMethod   : String;
 
-begin
-  Result := '';
+Begin
+  Result       := '';
   strLastClass := '';
-  For i := 0 to slTestCases.Count - 1 Do
+  For i        := 0 To slTestCases.Count - 1 Do
     Begin
-      strClass := TestClassName(slTestCases[i]);
+      strClass  := TestClassName(slTestCases[i]);
       strMethod := GetField(slTestCases[i], '=', 2);
       If strLastClass <> strClass Then
         Begin
           If Result <> '' Then
             Result := Result + '  End;'#13#10#13#10;
-          Result := Result + '  //'#13#10;
-          Result := Result + Format('  // Test Class for the %s Class Methods.'#13#10,
+          Result   := Result + '  //'#13#10;
+          Result   := Result + Format('  // Test Class for the %s Class Methods.'#13#10,
             [strClass]);
           Result := Result + '  //'#13#10;
           Result := Result + Format('  Test%s = Class(%s)'#13#10,
@@ -335,13 +338,13 @@ begin
             Result := Result + '    Procedure SetUp; Override;'#13#10;
           If strClass <> 'Functions' Then
             Result := Result + '    Procedure TearDown; Override;'#13#10;
-          Result := Result + '  Published'#13#10;
+          Result   := Result + '  Published'#13#10;
         End;
-      Result := Result + Format('    Procedure Test%s;'#13#10, [strMethod]);
+      Result       := Result + Format('    Procedure Test%s;'#13#10, [strMethod]);
       strLastClass := strClass;
     End;
   Result := Result + '  End;'#13#10;
-end;
+End;
 
 (**
 
@@ -354,38 +357,36 @@ end;
   @return  a String
 
 **)
-Function TestImplementation(slTestCases : TStringList): String;
+Function TestImplementation(slTestCases: TStringList): String;
 
 Var
   strLastClass: String;
-  i: Integer;
-  strClass : String;
-  strMethod : String;
+  i           : Integer;
+  strClass    : String;
+  strMethod   : String;
 
-begin
-  Result := #13#10;
+Begin
+  Result       := #13#10;
   strLastClass := '';
-  For i := 0 to slTestCases.Count - 1 Do
+  For i        := 0 To slTestCases.Count - 1 Do
     Begin
-      strClass := TestClassName(slTestCases[i]);
+      strClass  := TestClassName(slTestCases[i]);
       strMethod := GetField(slTestCases[i], '=', 2);
       If strLastClass <> strClass Then
         Begin
           Result := Result + '//'#13#10;
-          Result := Result + Format('// Test Methods for Class %s.'#13#10,
-            [strClass]);
+          Result := Result + Format('// Test Methods for Class %s.'#13#10, [strClass]);
           Result := Result + '//'#13#10;
           If strClass <> 'Functions' Then
             Begin
               Result := Result + Format('Procedure Test%s.Setup;'#13#10, [strClass]);
               Result := Result + 'Begin'#13#10;
-              Result := Result + Format(
-                '  F%s := %s.Create; //: @debug Setup constructor for %s.'#13#10,
+              Result := Result +
+                Format('  F%s := %s.Create; //: @debug Setup constructor for %s.'#13#10,
                 [Copy(strClass, 2, Length(strClass)), strClass, strClass]);
               Result := Result + 'End;'#13#10;
               Result := Result + ''#13#10;
-              Result := Result + Format('Procedure Test%s.TearDown;'#13#10,
-                [strClass]);
+              Result := Result + Format('Procedure Test%s.TearDown;'#13#10, [strClass]);
               Result := Result + ''#13#10;
               Result := Result + 'Begin'#13#10;
               Result := Result + Format('  F%s.Free;'#13#10,
@@ -394,17 +395,16 @@ begin
               Result := Result + ''#13#10;
             End;
         End;
-      Result := Result + Format('Procedure Test%s.Test%s;'#13#10, [strClass,
-        strMethod]);
+      Result := Result + Format('Procedure Test%s.Test%s;'#13#10, [strClass, strMethod]);
       Result := Result + ''#13#10;
       Result := Result + 'Begin'#13#10;
       Result := Result + Format('  //: @todo Implement Check for %s.%s.'#13#10,
         [strClass, strMethod]);
-      Result := Result + 'End;'#13#10;
-      Result := Result + ''#13#10;
+      Result       := Result + 'End;'#13#10;
+      Result       := Result + ''#13#10;
       strLastClass := strClass;
     End;
-end;
+End;
 
 (**
 
@@ -420,29 +420,29 @@ end;
   @return  a String
 
 **)
-Function TestSuites(slTestCases : TStringList; strTestSuiteName : String): String;
+Function TestSuites(slTestCases: TStringList; strTestSuiteName: String): String;
 
 Var
-  i : Integer;
-  strLastClass : String;
-  strClass : String;
+  i           : Integer;
+  strLastClass: String;
+  strClass    : String;
 
-begin
-  Result := '';
+Begin
+  Result       := '';
   strLastClass := '';
-  For i := 0 to slTestCases.Count - 1 Do
+  For i        := 0 To slTestCases.Count - 1 Do
     Begin
       strClass := TestClassName(slTestCases[i]);
       If strLastClass <> strClass Then
         Begin
           If Result <> '' Then
             Result := Result + #13#10;
-          Result := Result + Format('  RegisterTest(''%s'', Test%s.Suite);',
+          Result   := Result + Format('  RegisterTest(''%s'', Test%s.Suite);',
             [strTestSuiteName, strClass]);
         End;
       strLastClass := strClass;
     End;
-end;
+End;
 
 (**
 
@@ -477,16 +477,16 @@ End;
   @param   iProject as an Integer
 
 **)
-procedure TDUnitCreator.ActivateProject(iProject: Integer);
+Procedure TDUnitCreator.ActivateProject(iProject: Integer);
 
 ResourceString
   strProjectReadOnly = 'Project source module is read only!';
 
-begin
-  FProject := FProjects[iProject];
+Begin
+  FProject                   := FProjects[iProject];
   ProjectGroup.ActiveProject := FProject;
   CheckReadOnlyStatus(FProject, strProjectReadOnly);
-end;
+End;
 
 (**
 
@@ -502,38 +502,38 @@ end;
   @param   strBaseClass as a String
 
 **)
-Procedure TDUnitCreator.AddNewTestClasses(M : TBaseLanguageModule;
-  slTestCases : TStrings; strBaseClass : String);
+Procedure TDUnitCreator.AddNewTestClasses(M: TBaseLanguageModule; slTestCases: TStrings;
+  strBaseClass: String);
 
 Var
-  i : Integer;
-  SE: IOTASourceEditor;
-  Writer: IOTAEditWriter;
+  i           : Integer;
+  SE          : IOTASourceEditor;
+  Writer      : IOTAEditWriter;
   strLastClass: String;
-  iPos: Integer;
-  CharPos: TOTACharPos;
-  strClass : String;
-  strMethod : String;
-  iToken : Integer;
-  boolEndClass : Boolean;
+  iPos        : Integer;
+  CharPos     : TOTACharPos;
+  strClass    : String;
+  strMethod   : String;
+  iToken      : Integer;
+  boolEndClass: Boolean;
 
 Begin
   iToken := M.FindToken('Implementation');
-  if iToken > -1 Then
+  If iToken > -1 Then
     Begin
       SE := SourceEditor(FUnit);
       Try
-        Writer :=  SE.CreateUndoableWriter;
+        Writer := SE.CreateUndoableWriter;
         Try
           CharPos.CharIndex := 0;
-          CharPos.Line := M.Tokens[iToken].Line;
-          iPos := SE.EditViews[0].CharPosToPos(CharPos);
+          CharPos.Line      := M.Tokens[iToken].Line;
+          iPos              := SE.EditViews[0].CharPosToPos(CharPos);
           Writer.CopyTo(iPos);
           strLastClass := '';
           boolEndClass := False;
-          For i := 0 To slTestCases.Count -1 Do
+          For i        := 0 To slTestCases.Count - 1 Do
             Begin
-              strClass := TestClassName(slTestCases[i]);
+              strClass  := TestClassName(slTestCases[i]);
               strMethod := GetField(slTestCases[i], '=', 2);
               If Not DoesClassExist(M, strClass) Then
                 Begin
@@ -542,12 +542,16 @@ Begin
                       If boolEndClass Then
                         OutputText(Writer, '  End;'#13#10#13#10);
                       OutputText(Writer, '  //'#13#10);
-                      OutputText(Writer, Format('  // Test Class for the %s Class Methods.'#13#10, [strClass]));
+                      OutputText(Writer,
+                        Format('  // Test Class for the %s Class Methods.'#13#10,
+                          [strClass]));
                       OutputText(Writer, '  //'#13#10);
-                      OutputText(Writer, Format('  Test%s = Class(%s)'#13#10, [strClass, strBaseClass]));
+                      OutputText(Writer, Format('  Test%s = Class(%s)'#13#10,
+                          [strClass, strBaseClass]));
                       OutputText(Writer, '  Strict Private'#13#10);
                       If strClass <> 'Functions' Then
-                        OutputText(Writer, Format('    F%s : %s;'#13#10, [Copy(strClass, 2, Length(strClass)), strClass]));
+                        OutputText(Writer, Format('    F%s : %s;'#13#10,
+                            [Copy(strClass, 2, Length(strClass)), strClass]));
                       OutputText(Writer, '  Public'#13#10);
                       If strClass <> 'Functions' Then
                         OutputText(Writer, '    Procedure SetUp; Override;'#13#10);
@@ -585,43 +589,44 @@ End;
   @param   strTestSuiteName as a String
 
 **)
-procedure TDUnitCreator.AddNewTestSuites(M: TBaseLanguageModule;
-  slTestCases : TStrings; strTestSuiteName : String);
+Procedure TDUnitCreator.AddNewTestSuites(M: TBaseLanguageModule; slTestCases: TStrings;
+  strTestSuiteName: String);
 
 ResourceString
   strFinalEndNotFound = 'Final reserved word ''End'' not found.';
   strFinalPeriodNotFound = 'Final period (.) not found.';
 
 Var
-  i : Integer;
-  SE: IOTASourceEditor;
-  Writer: IOTAEditWriter;
+  i           : Integer;
+  SE          : IOTASourceEditor;
+  Writer      : IOTAEditWriter;
   strLastClass: String;
-  iPos: Integer;
-  CharPos: TOTACharPos;
-  strClass : String;
+  iPos        : Integer;
+  CharPos     : TOTACharPos;
+  strClass    : String;
 
-begin
+Begin
   If M.Tokens[M.TokenCount - 1].Token = '.' Then
     Begin
       If M.Tokens[M.TokenCount - 2].UToken = 'END' Then
         Begin
           SE := SourceEditor(FUnit);
           Try
-            Writer :=  SE.CreateUndoableWriter;
+            Writer := SE.CreateUndoableWriter;
             Try
               CharPos.CharIndex := 0;
-              CharPos.Line := M.Tokens[M.TokenCount - 2].Line;
-              iPos := SE.EditViews[0].CharPosToPos(CharPos);
+              CharPos.Line      := M.Tokens[M.TokenCount - 2].Line;
+              iPos              := SE.EditViews[0].CharPosToPos(CharPos);
               Writer.CopyTo(iPos);
               strLastClass := '';
-              For i := 0 To slTestCases.Count -1 Do
+              For i        := 0 To slTestCases.Count - 1 Do
                 Begin
                   strClass := TestClassName(slTestCases[i]);
                   If strLastClass <> strClass Then
                     If Not DoesClassExist(M, strClass) Then
-                      OutputText(Writer, Format('  RegisterTest(''%s'', Test%s.Suite);'#13#10,
-                        [strTestSuiteName, strClass]));
+                      OutputText(Writer,
+                        Format('  RegisterTest(''%s'', Test%s.Suite);'#13#10,
+                          [strTestSuiteName, strClass]));
                   strLastClass := strClass;
                 End;
             Finally
@@ -630,11 +635,13 @@ begin
           Finally
             SE := Nil;
           End;
-        End Else
-          RaiseError(strFinalEndNotFound);
-    End Else
-      RaiseError(strFinalPeriodNotFound);
-end;
+        End
+      Else
+        RaiseError(strFinalEndNotFound);
+    End
+  Else
+    RaiseError(strFinalPeriodNotFound);
+End;
 
 (**
 
@@ -651,57 +658,63 @@ end;
   @param   slTestCases as a TStrings
 
 **)
-procedure TDUnitCreator.AddNewTestImplementations(M: TBaseLanguageModule;
-  slTestCases : TStrings);
+Procedure TDUnitCreator.AddNewTestImplementations(M: TBaseLanguageModule;
+  slTestCases: TStrings);
 
 Var
-  i : Integer;
-  SE: IOTASourceEditor;
-  Writer: IOTAEditWriter;
+  i           : Integer;
+  SE          : IOTASourceEditor;
+  Writer      : IOTAEditWriter;
   strLastClass: String;
-  iPos: Integer;
-  CharPos: TOTACharPos;
-  strClass : String;
-  strMethod : String;
-  iToken : Integer;
-  iIndex : Integer;
+  iPos        : Integer;
+  CharPos     : TOTACharPos;
+  strClass    : String;
+  strMethod   : String;
+  iToken      : Integer;
+  iIndex      : Integer;
 
-begin
+Begin
   iToken := M.FindToken('Initialization');
-  if iToken > -1 Then
+  If iToken > -1 Then
     Begin
       SE := SourceEditor(FUnit);
       Try
-        Writer :=  SE.CreateUndoableWriter;
+        Writer := SE.CreateUndoableWriter;
         Try
           CharPos.CharIndex := 0;
-          CharPos.Line := M.Tokens[iToken].Line;
-          iPos := SE.EditViews[0].CharPosToPos(CharPos);
+          CharPos.Line      := M.Tokens[iToken].Line;
+          iPos              := SE.EditViews[0].CharPosToPos(CharPos);
           Writer.CopyTo(iPos);
           strLastClass := '';
-          For i := 0 To slTestCases.Count -1 Do
+          For i        := 0 To slTestCases.Count - 1 Do
             Begin
-              strClass := TestClassName(slTestCases[i]);
+              strClass  := TestClassName(slTestCases[i]);
               strMethod := GetField(slTestCases[i], '=', 2);
               If strLastClass <> strClass Then
                 Begin
                   If Not DoesClassExist(M, strClass) Then
                     Begin
                       OutputText(Writer, '//'#13#10);
-                      OutputText(Writer, Format('// Test methods for the class %s.'#13#10,[strClass]));
+                      OutputText(Writer, Format('// Test methods for the class %s.'#13#10,
+                          [strClass]));
                       OutputText(Writer, '//'#13#10);
                       If strClass <> 'Functions' Then
                         Begin
-                          OutputText(Writer, Format('Procedure Test%s.Setup;'#13#10,[strClass]));
+                          OutputText(Writer, Format('Procedure Test%s.Setup;'#13#10,
+                              [strClass]));
                           OutputText(Writer, ''#13#10);
                           OutputText(Writer, 'Begin'#13#10);
-                          OutputText(Writer, Format('  F%s := %s.Create; //: @debug Setup constructor for %s.'#13#10,[Copy(strClass, 2, Length(strClass)), strClass, strClass]));
+                          OutputText(Writer,
+                            Format('  F%s := %s.Create; //: @debug Setup constructor for %s.'#13#10,
+                              [Copy(strClass, 2, Length(strClass)), strClass, strClass]));
                           OutputText(Writer, 'End;'#13#10);
                           OutputText(Writer, ''#13#10);
-                          OutputText(Writer, Format('Procedure Test%s.TearDown;'#13#10,[strClass]));
+                          OutputText(Writer, Format('Procedure Test%s.TearDown;'#13#10,
+                              [strClass]));
                           OutputText(Writer, ''#13#10);
                           OutputText(Writer, 'Begin'#13#10);
-                          OutputText(Writer, Format('  F%s.Free;'#13#10,[Copy(strClass, 2, Length(strClass))]));
+                          OutputText(Writer, Format('  F%s.Free;'#13#10,
+                              [Copy(strClass, 2, Length(strClass))]));
                           OutputText(Writer, 'End;'#13#10);
                           OutputText(Writer, ''#13#10);
                         End;
@@ -714,11 +727,12 @@ begin
                   Inc(iIndex);
                 End;
               slTestCases[i] := Format('%s=%s', [strClass, strMethod]);
-              OutputText(Writer, Format('Procedure Test%s.Test%s;'#13#10,[strClass, strMethod]));
+              OutputText(Writer, Format('Procedure Test%s.Test%s;'#13#10,
+                  [strClass, strMethod]));
               OutputText(Writer, ''#13#10);
               OutputText(Writer, 'Begin'#13#10);
               OutputText(Writer, Format('  //: @todo Implement Check for %s.%s.'#13#10,
-                [strClass, strMethod]));
+                  [strClass, strMethod]));
               OutputText(Writer, 'End;'#13#10);
               OutputText(Writer, ''#13#10);
               strLastClass := strClass;
@@ -730,7 +744,7 @@ begin
         SE := Nil;
       End;
     End;
-end;
+End;
 
 (**
 
@@ -744,17 +758,17 @@ end;
   @param   slTestCases as a TStringList
 
 **)
-procedure TDUnitCreator.AddNewTestMethodsToClass(M: TBaseLanguageModule;
+Procedure TDUnitCreator.AddNewTestMethodsToClass(M: TBaseLanguageModule;
   slTestCases: TStringList);
 
 Var
-  SE: IOTASourceEditor;
-  Writer: IOTAEditWriter;
-  iPos: Integer;
-  CharPos: TOTACharPos;
-  strClass : String;
-  T: TElementContainer;
-  iMethod: Integer;
+  SE      : IOTASourceEditor;
+  Writer  : IOTAEditWriter;
+  iPos    : Integer;
+  CharPos : TOTACharPos;
+  strClass: String;
+  T       : TElementContainer;
+  iMethod : Integer;
 
   (**
 
@@ -770,15 +784,15 @@ Var
     @return  an Integer     
 
   **)
-  Function FindEndOfClass(strClassName : String) : Integer;
+  Function FindEndOfClass(strClassName: String): Integer;
 
   Var
-    C : TElementContainer;
-    i : Integer;
+    C: TElementContainer;
+    i: Integer;
 
   Begin
     Result := -1;
-    C := T.FindElement('Test' + strClassName);
+    C      := T.FindElement('Test' + strClassName);
     If C <> Nil Then
       For i := 0 To M.TokenCount - 1 Do
         If (M.Tokens[i].Line >= C.Line) And (M.Tokens[i].UToken = 'END') Then
@@ -788,14 +802,14 @@ Var
           End;
   End;
 
-begin
+Begin
   T := M.FindElement(strTypesLabel);
-  If T <> Nil then
+  If T <> Nil Then
     Begin
       // Find class end tokens
       For iMethod := 0 To slTestCases.Count - 1 Do
         Begin
-          strClass := TestClassName(slTestCases[iMethod]);
+          strClass                     := TestClassName(slTestCases[iMethod]);
           slTestCases.Objects[iMethod] := TObject(FindEndOfClass(strClass));
         End;
       // Delete test with no end token (i.e. only ones to insert)
@@ -804,21 +818,21 @@ begin
           slTestCases.Delete(iMethod);
       // Sort by end token line number descending
       slTestCases.CustomSort(SortClassEndTokens);
-      For iMethod := 0 To slTestCases.Count - 1 Do
+      For iMethod                    := 0 To slTestCases.Count - 1 Do
         slTestCases.Objects[iMethod] :=
           TObject(Integer(slTestCases.Objects[iMethod]) + iMethod);
       For iMethod := 0 To slTestCases.Count - 1 Do
         Begin
           SE := SourceEditor(FUnit);
           Try
-            Writer :=  SE.CreateUndoableWriter;
+            Writer := SE.CreateUndoableWriter;
             Try
               CharPos.CharIndex := 0;
-              CharPos.Line := Integer(slTestCases.Objects[iMethod]);
-              iPos := SE.EditViews[0].CharPosToPos(CharPos);
+              CharPos.Line      := Integer(slTestCases.Objects[iMethod]);
+              iPos              := SE.EditViews[0].CharPosToPos(CharPos);
               Writer.CopyTo(iPos);
               OutputText(Writer, Format('    Procedure Test%s;'#13#10,
-                [GetField(slTestCases[iMethod], '=', 2)]));
+                  [GetField(slTestCases[iMethod], '=', 2)]));
             Finally
               Writer := Nil;
             End;
@@ -826,9 +840,10 @@ begin
             SE := Nil;
           End;
         End;
-    End Else
-      RaiseError('Could not find Types!');
-end;
+    End
+  Else
+    RaiseError('Could not find Types!');
+End;
 
 (**
 
@@ -840,23 +855,23 @@ end;
   @param   Project as an IOTAProject
 
 **)
-procedure TDUnitCreator.AddProject(Project: IOTAProject);
+Procedure TDUnitCreator.AddProject(Project: IOTAProject);
 
 Var
-  T : TProjectsArray;
+  T: TProjectsArray;
   i: Integer;
 
-begin
+Begin
   Inc(FProjectCount);
   If FProjectCount >= High(FProjects) Then
     Begin
       SetLength(T, Succ(High(FProjects)) + iCAPACITY);
-      For i := Low(FProjects) To High(FProjects) Do
-        T[i] := FProjects[i];
+      For i     := Low(FProjects) To High(FProjects) Do
+        T[i]    := FProjects[i];
       FProjects := T;
     End;
   FProjects[FProjectCount - 1] := Project;
-end;
+End;
 
 (**
 
@@ -868,23 +883,23 @@ end;
   @param   AUnit as an IOTAModuleInfo
 
 **)
-procedure TDUnitCreator.AddUnit(AUnit: IOTAModuleInfo);
+Procedure TDUnitCreator.AddUnit(AUnit: IOTAModuleInfo);
 
 Var
-  T : TUnitsArray;
+  T: TUnitsArray;
   i: Integer;
 
-begin
+Begin
   Inc(FUnitCount);
   If FUnitCount >= High(FUnits) Then
     Begin
       SetLength(T, Succ(High(FUnits)) + iCAPACITY);
-      For i := Low(FUnits) To High(FUnits) Do
+      For i  := Low(FUnits) To High(FUnits) Do
         T[i] := FUnits[i];
       FUnits := T;
     End;
   FUnits[FUnitCount - 1] := AUnit;
-end;
+End;
 
 (**
 
@@ -898,23 +913,23 @@ end;
   @param   strFileName as a String
 
 **)
-procedure TDUnitCreator.AddUnitToBeTested(strFileName: String);
+Procedure TDUnitCreator.AddUnitToBeTested(strFileName: String);
 
 Var
-  i : Integer;
-  boolFound : Boolean;
+  i        : Integer;
+  boolFound: Boolean;
 
-begin
+Begin
   boolFound := False;
-  For i := 0 To FProject.GetModuleCount - 1 Do
-    If AnsiCompareFileName(strFileName, FProject.GetModule(i).FileName)= 0 Then
+  For i     := 0 To FProject.GetModuleCount - 1 Do
+    If AnsiCompareFileName(strFileName, FProject.GetModule(i).FileName) = 0 Then
       Begin
         boolFound := True;
         Break;
       End;
   If Not boolFound Then
     FProject.AddFile(strFileName, True);
-end;
+End;
 
 (**
 
@@ -929,32 +944,32 @@ end;
   @param   strModuleReadOnly as a string
 
 **)
-procedure TDUnitCreator.CheckReadOnlyStatus(Module : IOTAModule;
-  strModuleReadOnly: string);
+Procedure TDUnitCreator.CheckReadOnlyStatus(Module: IOTAModule;
+  strModuleReadOnly: String);
 
 Var
   SE: IOTASourceEditor;
 
-begin
+Begin
   SE := SourceEditor(Module);
-  if SE <> nil then
-    begin
-      if SE.EditViewCount > 0 then
-        begin
-          if SE.EditViews[0] <> nil then
-            begin
-              if SE.EditViews[0].Buffer <> nil then
-                begin
-                  if SE.EditViews[0].Buffer.IsReadOnly then
-                    begin
+  If SE <> Nil Then
+    Begin
+      If SE.EditViewCount > 0 Then
+        Begin
+          If SE.EditViews[0] <> Nil Then
+            Begin
+              If SE.EditViews[0].Buffer <> Nil Then
+                Begin
+                  If SE.EditViews[0].Buffer.IsReadOnly Then
+                    Begin
                       RaiseError(strModuleReadOnly);
                       Abort;
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
+                    End;
+                End;
+            End;
+        End;
+    End;
+End;
 
 (**
 
@@ -969,7 +984,7 @@ end;
   @param   strUnitToBeTested as a String
 
 **)
-procedure TDUnitCreator.AddUnitToBeTestedToUsesClause(M: TBaseLanguageModule;
+Procedure TDUnitCreator.AddUnitToBeTestedToUsesClause(M: TBaseLanguageModule;
   strUnitToBeTested: String);
 
 ResourceString
@@ -977,17 +992,17 @@ ResourceString
   strInterfaceNotFound = 'Interface not found!';
 
 Var
-  U: TElementContainer;
-  iToken : Integer;
-  i: Integer;
-  iImplLine : Integer;
-  CharPos : TOTACharPos;
-  SE: IOTASourceEditor;
-  Writer: IOTAEditWriter;
-  iPos: Integer;
-  C: TElementContainer;
+  U        : TElementContainer;
+  iToken   : Integer;
+  i        : Integer;
+  iImplLine: Integer;
+  CharPos  : TOTACharPos;
+  SE       : IOTASourceEditor;
+  Writer   : IOTAEditWriter;
+  iPos     : Integer;
+  C        : TElementContainer;
 
-begin
+Begin
   U := M.FindElement(strUses);
   If U = Nil Then
     Begin
@@ -997,12 +1012,12 @@ begin
   If U.FindElement(strUnitToBeTested) <> Nil Then
     Exit;
   CharPos.CharIndex := 0;
-  CharPos.Line := 0;
-  iToken := M.FindToken('Implementation');
+  CharPos.Line      := 0;
+  iToken            := M.FindToken('Implementation');
   If iToken > -1 Then
     Begin
       iImplLine := M.Tokens[iToken].Line;
-      For i := 1 To U.ElementCount Do
+      For i     := 1 To U.ElementCount Do
         Begin
           C := U.Elements[i];
           If C.Line < iImplLine Then
@@ -1017,7 +1032,7 @@ begin
         End;
       SE := SourceEditor(FUnit);
       Try
-        Writer :=  SE.CreateUndoableWriter;
+        Writer := SE.CreateUndoableWriter;
         Try
           Dec(CharPos.CharIndex, 1);
           iPos := SE.EditViews[0].CharPosToPos(CharPos);
@@ -1032,9 +1047,10 @@ begin
       Finally
         SE := Nil;
       End;
-    End Else
-      RaiseError(strInterfaceNotFound);
-end;
+    End
+  Else
+    RaiseError(strInterfaceNotFound);
+End;
 
 (**
 
@@ -1044,15 +1060,15 @@ end;
   @postcon Initialise the array sizes.
 
 **)
-constructor TDUnitCreator.Create;
+Constructor TDUnitCreator.Create;
 
-begin
+Begin
   FProjectCount := 0;
-  FUnitCount := 0;
+  FUnitCount    := 0;
   With ActiveSourceEditor Do
-    FModule := Dispatcher(EditorAsString(ActiveSourceEditor), FileName,
+    FModule := ModuleDispatcher.Dispatcher(EditorAsString(ActiveSourceEditor), FileName,
       Modified, [moParse]);
-end;
+End;
 
 (**
 
@@ -1064,13 +1080,13 @@ end;
   @param   strNewProjectName as a String
 
 **)
-procedure TDUnitCreator.CreateTestProject(strNewProjectName : String);
+Procedure TDUnitCreator.CreateTestProject(strNewProjectName: String);
 
 Var
   P: TProjectCreator;
 
-begin
-  P := TProjectCreator.Create(strNewProjectName);
+Begin
+  P        := TProjectCreator.Create(strNewProjectName);
   FProject := (BorlandIDEServices As IOTAModuleServices).CreateModule(P) As IOTAProject;
 End;
 
@@ -1088,15 +1104,14 @@ End;
   @param   strTestSuiteName  as a String
 
 **)
-procedure TDUnitCreator.CreateTestUnit(strNewUnitName,
-  strUnitToBeTested : String; slTestCases : TStringList; strBaseClass,
-    strTestSuiteName : String);
-    
-begin
-  (BorlandIDEServices As IOTAModuleServices).CreateModule(
-    TUnitCreator.Create(strNewUnitName, strUnitToBeTested, slTestCases, FProject,
-      strBaseClass, strTestSuiteName));
-end;
+Procedure TDUnitCreator.CreateTestUnit(strNewUnitName, strUnitToBeTested: String;
+  slTestCases: TStringList; strBaseClass, strTestSuiteName: String);
+
+Begin
+  (BorlandIDEServices As IOTAModuleServices)
+    .CreateModule(TUnitCreator.Create(strNewUnitName, strUnitToBeTested, slTestCases,
+      FProject, strBaseClass, strTestSuiteName));
+End;
 
 (**
 
@@ -1106,13 +1121,13 @@ end;
   @postcon Frees the arrays.
 
 **)
-destructor TDUnitCreator.Destroy;
-begin
+Destructor TDUnitCreator.Destroy;
+Begin
   FModule.Free;
   FProjects := Nil;
-  FUnits := Nil;
+  FUnits    := Nil;
   Inherited Destroy;
-end;
+End;
 
 (**
 
@@ -1126,15 +1141,15 @@ end;
   @return  a Boolean
   
 **)
-Function TDUnitCreator.DoesClassExist(M : TBaseLanguageModule;
-  strClassName : String) : Boolean;
-  
+Function TDUnitCreator.DoesClassExist(M: TBaseLanguageModule;
+  strClassName: String): Boolean;
+
 Var
-  T : TElementContainer;
+  T: TElementContainer;
 
 Begin
   Result := False;
-  T := M.FindElement(strTypesLabel);
+  T      := M.FindElement(strTypesLabel);
   If T <> Nil Then
     Result := T.FindElement('Test' + strClassName) <> Nil;
 End;
@@ -1152,15 +1167,15 @@ End;
   @return  a Boolean
 
 **)
-Function TDUnitCreator.DoesMethodExist(M : TBaseLanguageModule;
-  strClassName, strMethodName : String) : Boolean;
+Function TDUnitCreator.DoesMethodExist(M: TBaseLanguageModule;
+  strClassName, strMethodName: String): Boolean;
 
 Var
-  T, C, L : TElementContainer;
+  T, C, L: TElementContainer;
 
 Begin
   Result := False;
-  T := M.FindElement(strTypesLabel);
+  T      := M.FindElement(strTypesLabel);
   If T <> Nil Then
     Begin
       C := T.FindElement('Test' + strClassName);
@@ -1186,15 +1201,15 @@ End;
   @return  a Boolean
 
 **)
-function TDUnitCreator.DoesProjectExist(strProjectName: String): Boolean;
+Function TDUnitCreator.DoesProjectExist(strProjectName: String): Boolean;
 
 Var
   G: IOTAProjectGroup;
   i: Integer;
 
-begin
+Begin
   Result := False;
-  G := ProjectGroup;
+  G      := ProjectGroup;
   If G <> Nil Then
     For i := 0 To G.ProjectCount - 1 Do
       If CompareText(ExtractFileName(G.Projects[i].CurrentEditor.FileName),
@@ -1203,7 +1218,7 @@ begin
           Result := True;
           Exit;
         End;
-end;
+End;
 
 (**
 
@@ -1219,24 +1234,22 @@ end;
   @return  a Boolean
 
 **)
-function TDUnitCreator.DoesUnitExist(iProject: Integer;
-  strUnitName: String): Boolean;
+Function TDUnitCreator.DoesUnitExist(iProject: Integer; strUnitName: String): Boolean;
 
 Var
   P: IOTAProject;
   i: Integer;
 
-begin
+Begin
   Result := False;
-  P := FProjects[iProject];
-  For i := 0 To P.GetModuleCount - 1 Do
-    If CompareText(ExtractFileName(P.GetModule(i).FileName),
-      strUnitName) = 0 Then
+  P      := FProjects[iProject];
+  For i  := 0 To P.GetModuleCount - 1 Do
+    If CompareText(ExtractFileName(P.GetModule(i).FileName), strUnitName) = 0 Then
       Begin
         Result := True;
         Exit;
       End;
-end;
+End;
 
 (**
 
@@ -1246,12 +1259,12 @@ end;
   @postcon Adds DUnit test projects to the project list.
 
 **)
-procedure TDUnitCreator.GetExistingDUnitProjects;
+Procedure TDUnitCreator.GetExistingDUnitProjects;
 
 Var
   i: Integer;
 
-begin
+Begin
   SetLength(FProjects, iCAPACITY);
   FProjectCount := 0;
   With ProjectGroup Do
@@ -1260,7 +1273,7 @@ begin
         If IsTestFramework(Projects[i]) Then
           AddProject(Projects[i]);
     End;
-end;
+End;
 
 (**
 
@@ -1272,19 +1285,19 @@ end;
   @param   iProject as an Integer
 
 **)
-procedure TDUnitCreator.GetExistingDUnitUnits(iProject: Integer);
-var
+Procedure TDUnitCreator.GetExistingDUnitUnits(iProject: Integer);
+Var
   i: Integer;
-begin
+Begin
   SetLength(FUnits, iCAPACITY);
   FUnitCount := 0;
   If iProject > -1 Then
     Begin
       For i := 0 To FProjects[iProject].GetModuleCount - 1 Do
-        If Like('Test*', ExtractFilename(FProjects[iProject].GetModule(i).FileName)) Then
+        If Like('Test*', ExtractFileName(FProjects[iProject].GetModule(i).FileName)) Then
           AddUnit(FProjects[iProject].GetModule(i));
     End;
-end;
+End;
 
 (**
 
@@ -1297,10 +1310,10 @@ end;
   @return  a String
 
 **)
-function TDUnitCreator.GetProject(iProject: Integer): String;
-begin
+Function TDUnitCreator.GetProject(iProject: Integer): String;
+Begin
   Result := IOTAProject(FProjects[iProject]).CurrentEditor.FileName;
-end;
+End;
 
 (**
 
@@ -1312,10 +1325,10 @@ end;
   @return  an Integer
 
 **)
-function TDUnitCreator.GetProjectCount: Integer;
-begin
+Function TDUnitCreator.GetProjectCount: Integer;
+Begin
   Result := FProjectCount;
-end;
+End;
 
 (**
 
@@ -1328,10 +1341,10 @@ end;
   @return  a string
 
 **)
-function TDUnitCreator.GetUnit(iUnit: Integer): string;
-begin
+Function TDUnitCreator.GetUnit(iUnit: Integer): String;
+Begin
   Result := IOTAModuleInfo(FUnits[iUnit]).FileName;
-end;
+End;
 
 (**
 
@@ -1343,10 +1356,10 @@ end;
   @return  an Integer
 
 **)
-function TDUnitCreator.GetUnitCount: Integer;
-begin
+Function TDUnitCreator.GetUnitCount: Integer;
+Begin
   Result := FUnitCount;
-end;
+End;
 
 (**
 
@@ -1358,7 +1371,7 @@ end;
   @param   strMsg as a String
 
 **)
-Procedure TDUnitCreator.RaiseError(strMsg : String);
+Procedure TDUnitCreator.RaiseError(strMsg: String);
 
 Begin
   If Assigned(FErrors) Then
@@ -1379,9 +1392,8 @@ End;
   @param   strTestSuiteName  as a String
 
 **)
-procedure TDUnitCreator.UpdateTestUnit(iUnit: Integer;
-  strUnitToBeTested: String; slTestCases: TStringList; strBaseClass,
-  strTestSuiteName: String);
+Procedure TDUnitCreator.UpdateTestUnit(iUnit: Integer; strUnitToBeTested: String;
+  slTestCases: TStringList; strBaseClass, strTestSuiteName: String);
 
 ResourceString
   strUnitReadOnly = 'Unit source module is read only!';
@@ -1391,19 +1403,18 @@ Var
   M : TBaseLanguageModule;
   SE: IOTASourceEditor;
 
-begin
+Begin
   FUnit := FUnits[iUnit].OpenModule;
   FUnit.CurrentEditor.Show;
   SE := SourceEditor(FUnit);
-  CheckReadOnlyStatus(FUnit, StrUnitReadOnly);
+  CheckReadOnlyStatus(FUnit, strUnitReadOnly);
   SE.Show;
   If FUnit <> Nil Then
     Begin
-      M := Dispatcher(EditorAsString(SourceEditor(FUnit)), FUnit.FileName,
-        FUnit.CurrentEditor.Modified, [moParse]);
+      M := ModuleDispatcher.Dispatcher(EditorAsString(SourceEditor(FUnit)),
+        FUnit.FileName, FUnit.CurrentEditor.Modified, [moParse]);
       Try
-        AddNewTestSuites(M,
-        slTestCases, strTestSuiteName);
+        AddNewTestSuites(M, slTestCases, strTestSuiteName);
         AddNewTestImplementations(M, slTestCases);
         AddNewTestClasses(M, slTestCases, strBaseClass);
         AddNewTestMethodsToClass(M, slTestCases);
@@ -1411,9 +1422,10 @@ begin
       Finally
         M.Free;
       End;
-    End Else
-      RaiseError(strExistingUnitInterfaceNil);
-end;
+    End
+  Else
+    RaiseError(strExistingUnitInterfaceNil);
+End;
 
 { TProjectCreator }
 
@@ -1427,10 +1439,10 @@ end;
   @param   strNewProjectName as a String
 
 **)
-constructor TProjectCreator.Create(strNewProjectName: String);
-begin
+Constructor TProjectCreator.Create(strNewProjectName: String);
+Begin
   FNewProjectName := strNewProjectName;
-end;
+End;
 
 (**
 
@@ -1442,10 +1454,10 @@ end;
   @return  a String
 
 **)
-function TProjectCreator.GetCreatorType: String;
-begin
+Function TProjectCreator.GetCreatorType: String;
+Begin
   Result := '' // Custom source code;
-end;
+End;
 
 (**
 
@@ -1457,10 +1469,10 @@ end;
   @return  a Boolean
 
 **)
-function TProjectCreator.GetExisting: Boolean;
-begin
+Function TProjectCreator.GetExisting: Boolean;
+Begin
   Result := False;
-end;
+End;
 
 (**
 
@@ -1472,10 +1484,10 @@ end;
   @return  a string
 
 **)
-function TProjectCreator.GetFileName: string;
-begin
+Function TProjectCreator.GetFileName: String;
+Begin
   Result := GetCurrentDir + '\' + FNewProjectName;
-end;
+End;
 
 (**
 
@@ -1487,10 +1499,10 @@ end;
   @return  a String
 
 **)
-function TProjectCreator.GetFileSystem: String;
-begin
+Function TProjectCreator.GetFileSystem: String;
+Begin
   Result := '';
-end;
+End;
 
 (**
 
@@ -1502,10 +1514,10 @@ end;
   @return  a string
 
 **)
-function TProjectCreator.GetOptionFileName: string;
-begin
+Function TProjectCreator.GetOptionFileName: String;
+Begin
   Result := '';
-end;
+End;
 
 (**
 
@@ -1517,16 +1529,17 @@ end;
   @return  an IOTAModule
 
 **)
-function TProjectCreator.GetOwner: IOTAModule;
-begin
+Function TProjectCreator.GetOwner: IOTAModule;
+Begin
   Result := ProjectGroup;
-end;
+End;
 
 {$IFDEF D2005}
-function TProjectCreator.GetProjectPersonality: string;
-begin
+
+Function TProjectCreator.GetProjectPersonality: String;
+Begin
   Result := sDelphiPersonality;
-end;
+End;
 {$ENDIF}
 
 (**
@@ -1539,10 +1552,10 @@ end;
   @return  a Boolean
 
 **)
-function TProjectCreator.GetShowSource: Boolean;
-begin
+Function TProjectCreator.GetShowSource: Boolean;
+Begin
   Result := False;
-end;
+End;
 
 (**
 
@@ -1554,10 +1567,10 @@ end;
   @return  a Boolean
 
 **)
-function TProjectCreator.GetUnnamed: Boolean;
-begin
+Function TProjectCreator.GetUnnamed: Boolean;
+Begin
   Result := True;
-end;
+End;
 
 (**
 
@@ -1567,14 +1580,15 @@ end;
   @postcon Determines that there are no new modules.
 
 **)
-procedure TProjectCreator.NewDefaultModule;
-begin
-end;
+Procedure TProjectCreator.NewDefaultModule;
+Begin
+End;
 
 {$IFDEF D0005}
-procedure TProjectCreator.NewDefaultProjectModule(const Project: IOTAProject);
-begin
-end;
+
+Procedure TProjectCreator.NewDefaultProjectModule(Const Project: IOTAProject);
+Begin
+End;
 {$ENDIF}
 
 (**
@@ -1588,10 +1602,10 @@ end;
   @return  an IOTAFile
 
 **)
-function TProjectCreator.NewOptionSource(const ProjectName: string): IOTAFile;
-begin
+Function TProjectCreator.NewOptionSource(Const ProjectName: String): IOTAFile;
+Begin
   Result := Nil;
-end;
+End;
 
 (**
 
@@ -1603,9 +1617,9 @@ end;
   @param   Project as an IOTAProject as a constant
 
 **)
-procedure TProjectCreator.NewProjectResource(const Project: IOTAProject);
-begin
-end;
+Procedure TProjectCreator.NewProjectResource(Const Project: IOTAProject);
+Begin
+End;
 
 (**
 
@@ -1618,11 +1632,11 @@ end;
   @return  an IOTAFile
 
 **)
-function TProjectCreator.NewProjectSource(const ProjectName: string): IOTAFile;
+Function TProjectCreator.NewProjectSource(Const ProjectName: String): IOTAFile;
 
-begin
+Begin
   Result := TProjectCreatorFile.Create(ProjectName);
-end;
+End;
 
 { TUnitCreator }
 
@@ -1641,18 +1655,17 @@ end;
   @param   strTestSuiteName  as a String
 
 **)
-constructor TUnitCreator.Create(strNewUnitName, strUnitToBeTested : String;
-  slTestCases : TStringList; Owner : IOTAProject; strBaseClass,
-  strTestSuiteName : String);
+Constructor TUnitCreator.Create(strNewUnitName, strUnitToBeTested: String;
+  slTestCases: TStringList; Owner: IOTAProject; strBaseClass, strTestSuiteName: String);
 
-begin
-  FOwner := Owner;
-  FNewUnitName := strNewUnitName;
+Begin
+  FOwner          := Owner;
+  FNewUnitName    := strNewUnitName;
   FUnitToBeTested := strUnitToBeTested;
-  FTestCases := slTestCases;
-  FBaseClass := strBaseClass;
-  FTestSuiteName := strTestSuiteName;
-end;
+  FTestCases      := slTestCases;
+  FBaseClass      := strBaseClass;
+  FTestSuiteName  := strTestSuiteName;
+End;
 
 (**
 
@@ -1664,9 +1677,9 @@ end;
   @param   FormEditor as an IOTAFormEditor as a constant
 
 **)
-procedure TUnitCreator.FormCreated(const FormEditor: IOTAFormEditor);
-begin
-end;
+Procedure TUnitCreator.FormCreated(Const FormEditor: IOTAFormEditor);
+Begin
+End;
 
 (**
 
@@ -1678,10 +1691,10 @@ end;
   @return  a string
 
 **)
-function TUnitCreator.GetAncestorName: string;
-begin
+Function TUnitCreator.GetAncestorName: String;
+Begin
   Result := '';
-end;
+End;
 
 (**
 
@@ -1693,10 +1706,10 @@ end;
   @return  a string
 
 **)
-function TUnitCreator.GetCreatorType: string;
-begin
+Function TUnitCreator.GetCreatorType: String;
+Begin
   Result := sUnit;
-end;
+End;
 
 (**
 
@@ -1707,10 +1720,10 @@ end;
   @return  a Boolean
 
 **)
-function TUnitCreator.GetExisting: Boolean;
-begin
+Function TUnitCreator.GetExisting: Boolean;
+Begin
   Result := False;
-end;
+End;
 
 (**
 
@@ -1722,10 +1735,10 @@ end;
   @return  a string
 
 **)
-function TUnitCreator.GetFileSystem: string;
-begin
+Function TUnitCreator.GetFileSystem: String;
+Begin
   Result := '';
-end;
+End;
 
 (**
 
@@ -1737,10 +1750,10 @@ end;
   @return  a string
 
 **)
-function TUnitCreator.GetFormName: string;
-begin
+Function TUnitCreator.GetFormName: String;
+Begin
   Result := '';
-end;
+End;
 
 (**
 
@@ -1752,10 +1765,10 @@ end;
   @return  a string
 
 **)
-function TUnitCreator.GetImplFileName: string;
-begin
-  Result :=  GetCurrentDir + '\' + FNewUnitName;
-end;
+Function TUnitCreator.GetImplFileName: String;
+Begin
+  Result := GetCurrentDir + '\' + FNewUnitName;
+End;
 
 (**
 
@@ -1767,10 +1780,10 @@ end;
   @return  a string
 
 **)
-function TUnitCreator.GetIntfFileName: string;
-begin
+Function TUnitCreator.GetIntfFileName: String;
+Begin
   Result := '';
-end;
+End;
 
 (**
 
@@ -1782,10 +1795,10 @@ end;
   @return  a Boolean
 
 **)
-function TUnitCreator.GetMainForm: Boolean;
-begin
+Function TUnitCreator.GetMainForm: Boolean;
+Begin
   Result := False;
-end;
+End;
 
 (**
 
@@ -1797,10 +1810,10 @@ end;
   @return  an IOTAModule
 
 **)
-function TUnitCreator.GetOwner: IOTAModule;
-begin
+Function TUnitCreator.GetOwner: IOTAModule;
+Begin
   Result := FOwner;
-end;
+End;
 
 (**
 
@@ -1812,10 +1825,10 @@ end;
   @return  a Boolean
 
 **)
-function TUnitCreator.GetShowForm: Boolean;
-begin
+Function TUnitCreator.GetShowForm: Boolean;
+Begin
   Result := False;
-end;
+End;
 
 (**
 
@@ -1827,10 +1840,10 @@ end;
   @return  a Boolean
 
 **)
-function TUnitCreator.GetShowSource: Boolean;
-begin
+Function TUnitCreator.GetShowSource: Boolean;
+Begin
   Result := True;
-end;
+End;
 
 (**
 
@@ -1842,10 +1855,10 @@ end;
   @return  a Boolean
 
 **)
-function TUnitCreator.GetUnnamed: Boolean;
-begin
+Function TUnitCreator.GetUnnamed: Boolean;
+Begin
   Result := True;
-end;
+End;
 
 (**
 
@@ -1859,11 +1872,10 @@ end;
   @return  an IOTAFile
 
 **)
-function TUnitCreator.NewFormFile(const FormIdent,
-  AncestorIdent: string)  : IOTAFile;
-begin
+Function TUnitCreator.NewFormFile(Const FormIdent, AncestorIdent: String): IOTAFile;
+Begin
   Result := Nil;
-end;
+End;
 
 (**
 
@@ -1878,12 +1890,12 @@ end;
   @return  an IOTAFile
 
 **)
-function TUnitCreator.NewImplSource(const ModuleIdent, FormIdent,
-  AncestorIdent: String): IOTAFile;
-begin
-  Result := TUnitCreatorFile.Create(ModuleIdent, FUnitToBeTested, FTestCases,
-    FBaseClass, FTestSuiteName);
-end;
+Function TUnitCreator.NewImplSource(Const ModuleIdent, FormIdent, AncestorIdent: String)
+  : IOTAFile;
+Begin
+  Result := TUnitCreatorFile.Create(ModuleIdent, FUnitToBeTested, FTestCases, FBaseClass,
+    FTestSuiteName);
+End;
 
 (**
 
@@ -1898,11 +1910,11 @@ end;
   @return  an IOTAFile
 
 **)
-function TUnitCreator.NewIntfSource(const ModuleIdent, FormIdent,
-  AncestorIdent: string): IOTAFile;
-begin
+Function TUnitCreator.NewIntfSource(Const ModuleIdent, FormIdent, AncestorIdent: String)
+  : IOTAFile;
+Begin
   Result := Nil;
-end;
+End;
 
 { TProjectCreatorFile }
 
@@ -1916,10 +1928,10 @@ end;
   @param   strProjectName as a String
 
 **)
-constructor TProjectCreatorFile.Create(strProjectName: String);
-begin
+Constructor TProjectCreatorFile.Create(strProjectName: String);
+Begin
   FProjectName := strProjectName;
-end;
+End;
 
 (**
 
@@ -1931,10 +1943,10 @@ end;
   @return  a TDateTime
 
 **)
-function TProjectCreatorFile.GetAge: TDateTime;
-begin
+Function TProjectCreatorFile.GetAge: TDateTime;
+Begin
   Result := -1;
-end;
+End;
 
 (**
 
@@ -1947,7 +1959,7 @@ end;
   @return  a string
 
 **)
-function TProjectCreatorFile.GetSource: string;
+Function TProjectCreatorFile.GetSource: String;
 
 ResourceString
   strDUnitProjectTemplate = 'DUnitProjectSource';
@@ -1958,8 +1970,7 @@ Var
   {$IFDEF D2009}
   strTemp: AnsiString;
   {$ENDIF}
-
-begin
+Begin
   Res := TResourceStream.Create(HInstance, strDUnitProjectTemplate, RT_RCDATA);
   Try
     If Res.Size = 0 Then
@@ -1976,7 +1987,7 @@ begin
     Res.Free;
   End;
   Result := Format(Result, [FProjectName]);
-end;
+End;
 
 { TUnitCreatorFile }
 
@@ -1994,16 +2005,16 @@ end;
   @param   strTestSuiteName  as a String
 
 **)
-constructor TUnitCreatorFile.Create(strUnitName, strUnitToBeTested : String;
-  slTestCases : TStringList; strBaseClass, strTestSuiteName : String);
+Constructor TUnitCreatorFile.Create(strUnitName, strUnitToBeTested: String;
+  slTestCases: TStringList; strBaseClass, strTestSuiteName: String);
 
-begin
-  FUnitName := strUnitName;
+Begin
+  FUnitName       := strUnitName;
   FUnitToBeTested := strUnitToBeTested;
-  FTestCases := slTestCases;
-  FBaseClass := strBaseClass;
-  FTestSuiteName := strTestSuiteName;
-end;
+  FTestCases      := slTestCases;
+  FBaseClass      := strBaseClass;
+  FTestSuiteName  := strTestSuiteName;
+End;
 
 (**
 
@@ -2015,10 +2026,10 @@ end;
   @return  a TDateTime
 
 **)
-function TUnitCreatorFile.GetAge: TDateTime;
-begin
+Function TUnitCreatorFile.GetAge: TDateTime;
+Begin
   Result := -1;
-end;
+End;
 
 (**
 
@@ -2030,7 +2041,7 @@ end;
   @return  a string
 
 **)
-function TUnitCreatorFile.GetSource: string;
+Function TUnitCreatorFile.GetSource: String;
 
 ResourceString
   strDUnitUnitTemplate = 'DUnitUnitSource';
@@ -2039,10 +2050,9 @@ ResourceString
 Var
   Res: TResourceStream;
   {$IFDEF D2009}
-  strTemp : AnsiString;
+  strTemp: AnsiString;
   {$ENDIF}
-
-begin
+Begin
   Res := TResourceStream.Create(HInstance, strDUnitUnitTemplate, RT_RCDATA);
   Try
     If Res.Size = 0 Then
@@ -2060,12 +2070,12 @@ begin
   End;
   Result := StringReplace(Result, '$TESTUNITNAME$', FUnitName, []);
   Result := StringReplace(Result, '$UNITTOBETESTED$', FUnitToBeTested, []);
-  Result := StringReplace(Result, '$TESTCLASSES$', TestClasses(FTestCases,
-    FBaseClass), []);
+  Result := StringReplace(Result, '$TESTCLASSES$',
+    TestClasses(FTestCases, FBaseClass), []);
   Result := StringReplace(Result, '$TESTIMPLEMENTATION$',
     TestImplementation(FTestCases), []);
-  Result := StringReplace(Result, '$TESTSUITES$', TestSuites(FTestCases,
-    FTestSuiteName), []);
-end;
+  Result := StringReplace(Result, '$TESTSUITES$',
+    TestSuites(FTestCases, FTestSuiteName), []);
+End;
 
-end.
+End.

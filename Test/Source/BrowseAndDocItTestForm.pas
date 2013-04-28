@@ -412,7 +412,7 @@ Begin
   Application.ProcessMessages;
   lvFileList.Items.Clear;
   FParseRecords.Clear;
-  FProgressForm.Init(1, 'Preparing to Scan', 'Please wait...');
+  FProgressForm.Init(-1, 'Preparing to Scan', 'Please wait...');
   Try
     iPosition := 0;
     For i     := 0 To FFolders.Count - 1 Do

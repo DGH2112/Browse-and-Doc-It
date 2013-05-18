@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Dec 2012
+  @Date    18 May 2013
 
 **)
 Unit DGHLibrary;
@@ -5823,8 +5823,11 @@ begin
   iSize := GetModuleFileName(hInstance, PChar(strBuffer), MAX_PATH);
   SetLength(strBuffer, iSize);
   strModuleName := strBuffer;
-  strINIFileName :=  Format(strINIPattern,
-    [ChangeFileExt(ExtractFileName(strBuffer), ''), UserName, ComputerName]);
+  strINIFileName := ChangeFileExt(ExtractFileName(strBuffer), '');
+  While (Length(strIniFilename) > 0) And
+    (CharInSet(strIniFileName[Length(strIniFilename)], ['0'..'9'])) Do
+    strIniFileName := Copy(strIniFileName, 1, Length(strIniFileName) - 1);
+  strINIFileName :=  Format(strINIPattern, [strIniFileName, UserName, ComputerName]);
   SetLength(strBuffer, MAX_PATH);
   SHGetFolderPath(0, CSIDL_APPDATA Or CSIDL_FLAG_CREATE, 0, SHGFP_TYPE_CURRENT,
     PChar(strBuffer));

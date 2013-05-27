@@ -380,8 +380,8 @@ Const
     (FDisplayName: 'Legend Label';    FININame: 'LegendLabel';    FDefault:   52.0),
     (FDisplayName: 'Week No Width';   FININame: 'WeekNoWidth';    FDefault:   25.0),
     (FDisplayName: 'Frame Gap';       FININame: 'FrameGap';       FDefault:   10.0),
-    (FDisplayName: 'Quantity Height'; FININame: 'QuantityHeight'; FDefault:  150.0),
-    (FDisplayName: 'Quantity Width';  FININame: 'QuantityWidth';  FDefault:  150.0)
+    (FDisplayName: 'Quantity Height'; FININame: 'QuantityHeight'; FDefault:  100.0),
+    (FDisplayName: 'Quantity Width';  FININame: 'QuantityWidth';  FDefault:  100.0)
   );
 
 Implementation

@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    28 Apr 2013
+  @Date    01 Sep 2013
   @Version 1.0
   @Author  David Hoyle
 
@@ -3916,6 +3916,13 @@ begin
     etWarning: If Not (doShowWarnings In BrowseAndDocItOptions.Options) Then Exit;
     etError  : If Not (doShowErrors In BrowseAndDocItOptions.Options) Then Exit;
   End;
+  If Comment <> Nil Then
+    Begin
+      Case ErrorType Of
+        etHint   : If Comment.FindTag('nohint') > -1 Then Exit;
+        etWarning: If Comment.FindTag('nowarning') > -1 Then Exit;
+      End;
+    End;
   I := FindRoot.Add(recIssues[ErrorType].FFolder,
     recIssues[ErrorType].FFolderImage, scNone, Nil);
   iCount := I.ElementCount;

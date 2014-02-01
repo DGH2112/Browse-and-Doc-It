@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       25 Apr 2013
+  @Date       01 Feb 2014
   @Author     David Hoyle
 
 **)
@@ -328,6 +328,13 @@ Type
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
+  (** A class to represent an event item. **)
+  TEventDecl = Class(TVBMethod)
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
+    //Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+  End;
+
   (**
 
     This is the main class for dealing with object pascal units and program
@@ -351,6 +358,7 @@ Type
     FAttributesLabel: TLabelContainer;
     FOptionsLabel: TLabelContainer;
     FImplementsLabel: TLabelContainer;
+    FEventsLabel: TLabelContainer;
     FSource: String;
     FModuleType : TModuleType;
     FUnResolvedSymbols : TStringList;
@@ -381,7 +389,8 @@ Type
     Procedure Parameters(Container : TElementContainer);
     Procedure MethodDecl(M : TGenericMethodDecl; C : TComment);
     Procedure FindMethodEnd(AExceptionHnd : IExceptionHandling; strMethodType : String);
-    Function Vars(Scope : TScope; C : TComment) : Boolean;
+    Function  Vars(Scope : TScope; C : TComment) : Boolean;
+    Function  Events(Scope : TScope; C : TComment) : Boolean;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
     procedure TidyUpEmptyElements;
@@ -511,6 +520,8 @@ ResourceString
   (** A hint message for keyword GOTO found in the code. **)
   strKeywordGOTOFound = 'Keyword GOTO found in function ''%s'' at line %d co' +
   'lumn %d.';
+  (** A label mesaage for VB events. **)
+  strEventsLabel = 'Events';
 
 { TVBComment }
 
@@ -1528,6 +1539,7 @@ Begin
   FAttributesLabel            := Nil;
   FOptionsLabel               := Nil;
   FImplementsLabel            := Nil;
+  FEventsLabel                := Nil;
   FUnResolvedSymbols := TStringList.Create;
   FUnResolvedSymbols.Duplicates := dupIgnore;
   FUnResolvedSymbols.Sorted := True;
@@ -2461,6 +2473,7 @@ Begin
           ParamType := TVBTypeDecl.Create('', scNone, Token.Line, Token.Column,
             iiNone, Nil);
           ParamType.AppendToken(Token);
+          ReferenceSymbol(Token);
           NextNonCommentToken;
           If Token.Token = '.' Then
             Begin
@@ -2811,6 +2824,7 @@ Begin
         Functions(scPrivate, C, False, Nil) Or
         Props(scPrivate, C, False) Or
         Declares(scPrivate, C) Or
+        Events(scPrivate, C) Or
         Records(scPrivate, C) Or
         Enum(scPrivate, C) Or
         Vars(scPrivate, C);
@@ -2842,6 +2856,7 @@ Begin
         Functions(scPublic, C, False, Nil) Or
         Props(scPublic, C, False) Or
         Declares(scPublic, C) Or
+        Events(scPublic, C) Or
         Records(scPublic, C) Or
         Enum(scPublic, C) Or
         Vars(scPublic, C);
@@ -3588,7 +3603,7 @@ Begin
                       If Token.Token = '=' Then
                         Begin
                           NextNonCommentToken;
-                          If Token.TokenType In [ttNumber] Then
+                          If Token.TokenType In [ttNumber, ttIdentifier] Then
                             Begin
                               AddToExpression(I);
                             End Else
@@ -3627,6 +3642,57 @@ end;
 
 (**
 
+  This method parses the event element of the grammar.
+
+  @precon  None.
+  @postcon The event if found is parsed and added to the module tree.
+
+  @param   Scope as a TScope
+  @param   C     as a TComment
+  @return  a Boolean
+
+**)
+Function TVBModule.Events(Scope: TScope; C: TComment): Boolean;
+
+Var
+  E : TEventDecl;
+
+Begin
+  Result := False;
+  If Token.UToken = 'EVENT' Then
+    Begin
+      Result := True;
+      NextNonCommentToken;
+      If Token.TokenType In [ttIdentifier] Then
+        Begin
+          E := TEventDecl.Create(mtProcedure, Token.Token, Scope, Token.Line,
+            Token.Column);
+          NextNonCommentToken;
+          If FEventsLabel = Nil Then
+            FEventsLabel := Add(TLabelContainer.Create(strEventsLabel,
+              scNone, 0, 0, iiDispInterfacesLabel, Nil)) As TLabelContainer;
+          E := FEventsLabel.Add(E) As TEventDecl;
+          If Token.Token = '(' Then
+            Begin
+              NextNonCommentToken;
+              If Token.Token <> ')' Then
+                Parameters(E);
+              If Token.Token = ')' Then
+                NextNonCommentToken
+              Else
+                ErrorAndSeekToken(strLiteralExpected, 'Events', ')',
+                  strSeekTokens, stActual);
+            End Else
+              ErrorAndSeekToken(strLiteralExpected, 'Events', '(',
+                strSeekTokens, stActual);
+      End Else
+        ErrorAndSeekToken(strIdentExpected, 'Events', Token.Token,
+          strSeekTokens, stActual);
+    End;
+End;
+
+(**
+
   This method checks the documentation of the field and outputs a documentation
   conflict IF the options ask for one and it the documentation is missing.
 
@@ -3652,5 +3718,3 @@ Initialization
   ModuleDispatcher.Add('.cls', TVBModule, True, ctVBLine, ctVBLine, ctVBLine);
   ModuleDispatcher.Add('.frm', TVBModule, True, ctVBLine, ctVBLine, ctVBLine);
 End.
-
-

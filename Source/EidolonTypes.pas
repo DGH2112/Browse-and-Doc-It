@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    27 May 2013
+  @Date    30 Aug 2014
   @Version 1.0
 
 **)
@@ -165,6 +165,9 @@ Type
     diDateWidth, diLegendLabel, diWeekNoWidth, diFrameGap, diQuantityHeight,
     diQuantityWidth);
 
+  (** A list of ISO paper sizes for the time location diagrams. **)
+  TPaperSize = (psA4P, psA4L, psA3P, psA3L, psA2P, psA2L, psA1P, psA1L, psA0P, psA0L);
+
   (** An enumerate to define the line end style. **)
   TLineEndType = (atNone, atDiamond, atOpen, atOval, atStealth, atTriangle);
 
@@ -188,7 +191,7 @@ Type
   TDimensionRec = Record
     FDisplayName : String;
     FININame     : String;
-    FDefault     : Double;
+    FDefaults    : Array[Low(TPaperSize)..High(TPaperSize)] Of Double;
   End;
 
 Const
@@ -371,17 +374,18 @@ Const
 
   (** A constant array of dimension names for the INI file. **)
   Dimensions : Array[Low(TDimension)..High(TDimension)] Of TDimensionRec = (
-    (FDisplayName: 'Height';          FININame: 'Height';         FDefault:  841.0),
-    (FDisplayName: 'Width';           FININame: 'Width';          FDefault: 1189.0),
-    (FDisplayName: 'Legend Width';    FININame: 'LegendWidth';    FDefault:  150.0),
-    (FDisplayName: 'Title Height';    FININame: 'TitleHeight';    FDefault:  150.0),
-    (FDisplayName: 'Overhead Height'; FININame: 'OverheadHeight'; FDefault:  150.0),
-    (FDisplayName: 'Date Width';      FININame: 'DateWidth';      FDefault:   75.0),
-    (FDisplayName: 'Legend Label';    FININame: 'LegendLabel';    FDefault:   52.0),
-    (FDisplayName: 'Week No Width';   FININame: 'WeekNoWidth';    FDefault:   25.0),
-    (FDisplayName: 'Frame Gap';       FININame: 'FrameGap';       FDefault:   10.0),
-    (FDisplayName: 'Quantity Height'; FININame: 'QuantityHeight'; FDefault:  100.0),
-    (FDisplayName: 'Quantity Width';  FININame: 'QuantityWidth';  FDefault:  100.0)
+                                                             //               A4P, A4L, A3P, A3L, A2P, A2L, A1P, A1L,  A0P,  A0L
+    (FDisplayName: 'Height';          FININame: 'Height';         FDefaults: (297, 210, 420, 297, 594, 420, 841, 594, 1089,  841)),
+    (FDisplayName: 'Width';           FININame: 'Width';          FDefaults: (210, 297, 297, 420, 420, 594, 594, 841,  841, 1189)),
+    (FDisplayName: 'Legend Width';    FININame: 'LegendWidth';    FDefaults: ( 40,  40,  55,  55,  75,  75, 110, 110,  150,  150)),
+    (FDisplayName: 'Title Height';    FININame: 'TitleHeight';    FDefaults: ( 40,  40,  55,  55,  75,  75, 110, 110,  150,  150)),
+    (FDisplayName: 'Overhead Height'; FININame: 'OverheadHeight'; FDefaults: ( 40,  40,  55,  55,  75,  75, 110, 110,  150,  150)),
+    (FDisplayName: 'Date Width';      FININame: 'DateWidth';      FDefaults: ( 25,  25,  30,  30,  40,  40,  55,  55,   75,   75)),
+    (FDisplayName: 'Legend Label';    FININame: 'LegendLabel';    FDefaults: ( 15,  15,  20,  20,  30,  30,  40,  40,   52,   52)),
+    (FDisplayName: 'Week No Width';   FININame: 'WeekNoWidth';    FDefaults: (  6,   8,  10,  10,  15,  15,  20,  20,   25,   25)),
+    (FDisplayName: 'Frame Gap';       FININame: 'FrameGap';       FDefaults: (  6,   6,   7,   7,   8,   8,   9,   9,   10,   10)),
+    (FDisplayName: 'Quantity Height'; FININame: 'QuantityHeight'; FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100)),
+    (FDisplayName: 'Quantity Width';  FININame: 'QuantityWidth';  FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100))
   );
 
 Implementation

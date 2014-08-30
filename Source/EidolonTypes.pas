@@ -388,6 +388,20 @@ Const
     (FDisplayName: 'Quantity Width';  FININame: 'QuantityWidth';  FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100))
   );
 
+  (** A constant array of string representations of paper sizes. **)
+  strPaperSizes : Array[Low(TPaperSize)..High(TPaperSize)] Of String = (
+    'A4 Portrait', 
+    'A4 Landscape', 
+    'A3 Portrait', 
+    'A3 Landscape', 
+    'A2 Portrait', 
+    'A2 Landscape', 
+    'A1 Portrait', 
+    'A1 Landscape', 
+    'A0 Portrait', 
+    'A0 Landscape'
+  );
+
 Implementation
 
 End.

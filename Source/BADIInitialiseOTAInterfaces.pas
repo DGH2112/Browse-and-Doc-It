@@ -79,6 +79,26 @@ Resourcestring
   (** This is a message string to appear in the ERS XE2 splash screen **)
   strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE2';
   {$ENDIF}
+  {$IFDEF VER240}
+  (** This is a message string to appear in the ERS XE3 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE3';
+  {$ENDIF}
+  {$IFDEF VER250}
+  (** This is a message string to appear in the ERS XE4 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE4';
+  {$ENDIF}
+  {$IFDEF VER260}
+  (** This is a message string to appear in the ERS XE5 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE5';
+  {$ENDIF}
+  {$IFDEF VER270}
+  (** This is a message string to appear in the ERS XE6 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE6';
+  {$ENDIF}
+  {$IFDEF VER280}
+  (** This is a message string to appear in the ERS XE7 splash screen **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE7';
+  {$ENDIF}
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
   strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
 

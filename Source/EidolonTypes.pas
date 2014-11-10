@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    30 Aug 2014
+  @Date    10 Nov 2014
   @Version 1.0
 
 **)
@@ -401,6 +401,31 @@ Const
     'A0 Portrait', 
     'A0 Landscape'
   );
+
+  (** This is the multiplier by which ALL millimetre dimensions are scaled to
+      get the drawing to about the right size. **)
+  iMULTIPLIER    : DOUBLE =  2.5;
+  (** This is the margin between the top / left of an excel worksheet and the
+      outside frame. **)
+  iOUTSIDEMARGIN : DOUBLE = 10.0;
+  (** This is the margin between the outside frame and the inside elements. **)
+  iINSIDEMARGIN  : DOUBLE = 30.0;
+  (** This constant represent the padding at the left and right of each Title Block text
+      element. **)
+  iTITLEPADDING : Double = 10;
+  (** This constant represents the height of an item in the title block. **)
+  iTITLEITEMHEIGHT : Double = 40;
+  (** This constant reporesent the maximum height between legend items. **)
+  iLEGENDTEXTHEIGHT : Integer = 40;
+  (** This constant represent the vertical margin between legend items. **)
+  iLEGENDSMALLMARGIN: Integer = 5;
+  (** This constant represents the padding on either side of a legend element. **)
+  iLEGENDLARGEMARGIN: Integer = 10;
+  (** This constant represent the height of the date title on the drawing. **)
+  iDATETITLEHEIGHT : Integer = 30;
+  (** This constant represent the space between the Overhead / Quantity frames and their
+      adjacent frames. **)
+  iFRAMEMARGIN : Integer = 5;
 
 Implementation
 

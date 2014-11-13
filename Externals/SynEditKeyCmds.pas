@@ -36,22 +36,15 @@ Known Issues:
 -------------------------------------------------------------------------------}
 // TODO: introduce friendly Names for the Commands (EditorCommandStrs is not good enough for end-users)
 
-{$IFNDEF QSYNEDITKEYCMDS}
 unit SynEditKeyCmds;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  QMenus,
-  QSynUnicode,
-{$ELSE}
   Menus,
   SynUnicode,
-{$ENDIF}
   Classes,
   SysUtils;
 
@@ -228,9 +221,7 @@ type
     procedure SetShortCut(const Value: TShortCut);
     procedure SetShortCut2(const Value: TShortCut);
   protected
-{$IFDEF SYN_COMPILER_3_UP}
     function GetDisplayName: string; override;
-{$ENDIF}
   public
     procedure Assign(Source: TPersistent); override;
     procedure LoadFromStream(AStream: TStream);
@@ -254,9 +245,7 @@ type
     function GetItem(Index: Integer): TSynEditKeyStroke;
     procedure SetItem(Index: Integer; Value: TSynEditKeyStroke);
   protected
-{$IFDEF SYN_COMPILER_3_UP}
     function GetOwner: TPersistent; override;
-{$ENDIF}
   public
     constructor Create(AOwner: TPersistent);
     function Add: TSynEditKeyStroke;
@@ -294,28 +283,11 @@ function IndexToEditorCommand(const AIndex: Integer): Integer;
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  kTextDrawer,
-  Types,
-  Qt,
-  QSynEditKeyConst,
-  QSynEditStrConst;
-{$ELSE}
   Windows,
   SynEditKeyConst,
   SynEditStrConst;
-{$ENDIF}
 
 { Command mapping routines }
-
-{$IFDEF SYN_COMPILER_2}
-// This is defined in D3/C3 and up.
-type
-  TIdentMapEntry = record
-    Value: TSynEditorCommand;
-    Name: string;
-  end;
-{$ENDIF}
 
 const
   EditorCommandStrs: array[0..100] of TIdentMapEntry = (
@@ -438,43 +410,13 @@ begin
 end;
 
 function IdentToEditorCommand(const Ident: string; var Cmd: longint): boolean;
-{$IFDEF SYN_COMPILER_2}
-var
-  I: Integer;
-{$ENDIF}
 begin
-{$IFDEF SYN_COMPILER_2}
-  Result := FALSE;
-  for I := Low(EditorCommandStrs) to High(EditorCommandStrs) do
-    if CompareText(EditorCommandStrs[I].Name, Ident) = 0 then
-    begin
-      Result := TRUE;
-      Cmd := EditorCommandStrs[I].Value;
-      break;
-    end;
-{$ELSE}
     Result := IdentToInt(Ident, Cmd, EditorCommandStrs);
-{$ENDIF}
 end;
 
 function EditorCommandToIdent(Cmd: longint; var Ident: string): boolean;
-{$IFDEF SYN_COMPILER_2}
-var
-  I: Integer;
-{$ENDIF}
 begin
-{$IFDEF SYN_COMPILER_2}
-  Result := FALSE;
-  for I := Low(EditorCommandStrs) to High(EditorCommandStrs) do
-    if EditorCommandStrs[I].Value = Cmd then
-    begin
-      Result := TRUE;
-      Ident := EditorCommandStrs[I].Name;
-      break;
-    end;
-{$ELSE}
   Result := IntToIdent(Cmd, Ident, EditorCommandStrs);
-{$ENDIF}
 end;
 
 function EditorCommandToDescrString(Cmd: TSynEditorCommand): string;
@@ -504,7 +446,6 @@ begin
     inherited Assign(Source);
 end;
 
-{$IFDEF SYN_COMPILER_3_UP}
 function TSynEditKeyStroke.GetDisplayName: string;
 begin
   Result := EditorCommandToCodeString(Command) + ' - ' + ShortCutToText(ShortCut);
@@ -513,15 +454,10 @@ begin
   if Result = '' then
     Result := inherited GetDisplayName;
 end;
-{$ENDIF}
 
 function TSynEditKeyStroke.GetShortCut: TShortCut;
 begin
-{$IFDEF SYN_CLX}
-  Result := QMenus.ShortCut(Key, Shift);
-{$ELSE}
   Result := Menus.ShortCut(Key, Shift);
-{$ENDIF}
 end;
 
 procedure TSynEditKeyStroke.SetCommand(const Value: TSynEditorCommand);
@@ -559,11 +495,7 @@ begin
       end;
   end;
 
-{$IFDEF SYN_CLX}
-  QMenus.ShortCutToKey(Value, NewKey, NewShift);
-{$ELSE}
   Menus.ShortCutToKey(Value, NewKey, NewShift);
-{$ENDIF}
 
   if (NewKey <> Key) or (NewShift <> Shift) then
   begin
@@ -599,11 +531,7 @@ begin
       raise ESynKeyError.Create(SYNS_EDuplicateShortCut);
   end;
 
-{$IFDEF SYN_CLX}
-  QMenus.ShortCutToKey(Value, NewKey, NewShift);
-{$ELSE}
   Menus.ShortCutToKey(Value, NewKey, NewShift);
-{$ENDIF}
   if (NewKey <> Key2) or (NewShift <> Shift2) then
   begin
     Key2 := NewKey;
@@ -613,11 +541,7 @@ end;
 
 function TSynEditKeyStroke.GetShortCut2: TShortCut;
 begin
-{$IFDEF SYN_CLX}
-  Result := QMenus.ShortCut(Key2, Shift2);
-{$ELSE}
   Result := Menus.ShortCut(Key2, Shift2);
-{$ENDIF}
 end;
 
 procedure TSynEditKeyStroke.LoadFromStream(AStream: TStream);
@@ -761,12 +685,10 @@ begin
  Result := TSynEditKeyStroke(inherited GetItem(Index));
 end;
 
-{$IFDEF SYN_COMPILER_3_UP}
 function TSynEditKeyStrokes.GetOwner: TPersistent;
 begin
   Result := FOwner;
 end;
-{$ENDIF}
 
 procedure TSynEditKeyStrokes.LoadFromStream(AStream: TStream);
 var

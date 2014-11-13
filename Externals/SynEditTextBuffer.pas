@@ -37,27 +37,17 @@ Known Issues:
 -------------------------------------------------------------------------------}
 //todo: Avoid calculating expanded string unncessarily (just calculate expandedLength instead).
 
-{$IFNDEF QSYNEDITTEXTBUFFER}
 unit SynEditTextBuffer;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  kTextDrawer,
-  Types,
-  QSynEditTypes,
-  QSynEditMiscProcs,
-  QSynUnicode,
-{$ELSE}
   Windows,
   SynEditTypes,
   SynEditMiscProcs,
   SynUnicode,
-{$ENDIF}
   Classes,
   SysUtils,
   Graphics;
@@ -137,15 +127,13 @@ type
   protected
     FStreaming: Boolean;
     function Get(Index: Integer): UnicodeString; override;
-    function GetCapacity: integer;
-      {$IFDEF SYN_COMPILER_3_UP} override; {$ENDIF}
+    function GetCapacity: integer; override;
     function GetCount: integer; override;
     function GetObject(Index: integer): TObject; override;
     function GetTextStr: UnicodeString; override;
     procedure Put(Index: integer; const S: UnicodeString); override;
     procedure PutObject(Index: integer; AObject: TObject); override;
-    procedure SetCapacity(NewCapacity: integer);
-      {$IFDEF SYN_COMPILER_3_UP} override; {$ENDIF}
+    procedure SetCapacity(NewCapacity: integer); override;
     procedure SetTabWidth(Value: integer);
     procedure SetUpdateState(Updating: Boolean); override;
     procedure UpdateCharIndexes;
@@ -156,17 +144,14 @@ type
     procedure AddStrings(Strings: TUnicodeStrings); override;
     procedure Clear; override;
     procedure Delete(Index: integer); override;
-    procedure DeleteLines(Index, NumLines: integer);                            
+    procedure DeleteLines(Index, NumLines: integer);
     procedure Exchange(Index1, Index2: integer); override;
     procedure Insert(Index: integer; const S: UnicodeString); override;
     procedure InsertLines(Index, NumLines: integer);
     procedure InsertStrings(Index: integer; NewStrings: TUnicodeStrings);
     procedure InsertText(Index: integer; NewText: UnicodeString);
-{$IFDEF UNICODE}
     procedure SaveToStream(Stream: TStream; Encoding: TEncoding); override;
-{$ELSE}
-    procedure SaveToStream(Stream: TStream; WithBOM: Boolean = True); override;
-{$ENDIF}
+    function GetSeparatedText(Separators: UnicodeString): UnicodeString;
     procedure SetTextStr(const Value: UnicodeString); override;
     procedure LoadFromStream(Stream: TStream); override;
     procedure FontChanged;
@@ -282,11 +267,7 @@ type
 
 implementation
 
-{$IFDEF SYN_COMPILER_3_UP}
 resourcestring
-{$ELSE}
-const
-{$ENDIF}
   SListIndexOutOfBounds = 'Invalid stringlist index %d';
   SInvalidCapacity = 'Stringlist capacity cannot be smaller than count';
 
@@ -643,98 +624,87 @@ begin
     Result := nil;
 end;
 
-function TSynEditStringList.GetTextStr: UnicodeString;
+function TSynEditStringList.GetSeparatedText(Separators: UnicodeString): UnicodeString;
+{Optimized by Eric Grange}
+var
+  I, L, Size, LineBreakSize: Integer;
+  P, PLineBreak: PChar;
+  PRec: PSynEditStringRec;
+begin
+  if fCount = 0 then begin
+     Result := '';
+     exit;
+  end;
+  LineBreakSize := Length(Separators);
+  PLineBreak := Pointer(Separators);
 
-  {$IFDEF UNICODE}
-  function FastGetTextStr : String;
-  var
-    I, L, Size, LineBreakSize: Integer;
-    P, PLineBreak: PChar;
-    PRec: PSynEditStringRec;
+  // compute buffer size
+  Size :=   (fCount-1) * LineBreakSize
+          + LineCharIndex( fCount-1 )
+          + Length( fList^[fCount-1].FString );
+  SetLength(Result, Size);
+
+  P := Pointer(Result);
+  PRec := @fList^[0];
+
+  // handle 1st line separately (to avoid trailing line break)
+  L := Length(PRec.FString);
+  if L <> 0 then
   begin
-    if fCount = 0 then begin
-       Result := '';
-       exit;
+    System.Move(Pointer(PRec.FString)^, P^, L * SizeOf(Char));
+    Inc(P, L);
+  end;
+  Inc(PRec);
+
+  for I := 1 to fCount-1 do
+  begin
+    case LineBreakSize of
+      0 : ;
+      1 : begin
+        P^ := PLineBreak^;
+        Inc(P);
+      end;
+      2 : begin
+        PSynEditTwoWideChars(P)^ := PSynEditTwoWideChars(PLineBreak)^;
+        Inc(P, 2);
+      end;
+    else
+      System.Move(PLineBreak^, P^, LineBreakSize * SizeOf(Char));
+      Inc(P, LineBreakSize);
     end;
-    LineBreakSize := Length(LineBreak);
-    PLineBreak := Pointer(LineBreak);
-
-    // compute buffer size
-    Size :=   (fCount-1) * LineBreakSize
-            + LineCharIndex( fCount-1 )
-            + Length( fList^[fCount-1].FString );
-    SetLength(Result, Size);
-
-    P := Pointer(Result);
-    PRec := @fList^[0];
-
-    // handle 1st line separately (to avoid trailing line break)
-    L := Length(PRec.FString);
-    if L <> 0 then
+    if Pointer( PRec.FString ) <> nil then
     begin
+      L := Length(PRec.FString);
       System.Move(Pointer(PRec.FString)^, P^, L * SizeOf(Char));
       Inc(P, L);
     end;
     Inc(PRec);
-
-    for I := 1 to fCount-1 do
-    begin
-      case LineBreakSize of
-        0 : ;
-        1 : begin
-          P^ := PLineBreak^;
-          Inc(P);
-        end;
-        2 : begin
-          PSynEditTwoWideChars(P)^ := PSynEditTwoWideChars(PLineBreak)^;
-          Inc(P, 2);
-        end;
-      else
-        System.Move(PLineBreak^, P^, LineBreakSize * SizeOf(Char));
-        Inc(P, LineBreakSize);
-      end;
-      if Pointer( PRec.FString ) <> nil then
-      begin
-        L := Length(PRec.FString);
-        System.Move(Pointer(PRec.FString)^, P^, L * SizeOf(Char));
-        Inc(P, L);
-      end;
-      Inc(PRec);
-    end;
   end;
-  {$ENDIF}
+end;
 
+function TSynEditStringList.GetTextStr: UnicodeString;
 var
-  SLineBreak: UnicodeString;
+  LB: UnicodeString;
 begin
   if not FStreaming then
   begin
-{$IFDEF UNICODE}
-    Result := FastGetTextStr;
-{$ELSE}
-    Result := inherited GetTextStr;
-{$ENDIF}
+    Result := GetSeparatedText(sLineBreak);
   end
   else
   begin
-{$IFDEF UNICODE}
-    SLineBreak := LineBreak;
-    Result := FastGetTextStr;
-{$ELSE}
     case FileFormat of
       sffDos:
-        SLineBreak := WideCRLF;
+        LB := WideCRLF;
       sffUnix:
-        SLineBreak := WideLF;
+        LB := WideLF;
       sffMac:
-        SLineBreak := WideCR;
+        LB := WideCR;
       sffUnicode:
-        SLineBreak := WideLineSeparator;
+        LB := WideLineSeparator;
     end;
-    Result := GetSeparatedText(SLineBreak);
-{$ENDIF}
+    Result := GetSeparatedText(LB);
     if AppendNewLineAtEOF then
-      Result := Result + SLineBreak;
+      Result := Result + LB;
   end;
 end;
 
@@ -863,21 +833,12 @@ begin
   FStreaming := False;
 end;
 
-{$IFDEF UNICODE}
 procedure TSynEditStringList.SaveToStream(Stream: TStream; Encoding: TEncoding);
 begin
   FStreaming := True;
   inherited;
   FStreaming := False;
 end;
-{$ELSE}
-procedure TSynEditStringList.SaveToStream(Stream: TStream; WithBOM: Boolean);
-begin
-  FStreaming := True;
-  inherited;
-  FStreaming := False;
-end;
-{$ENDIF}
 
 procedure TSynEditStringList.Put(Index: integer; const S: UnicodeString);
 begin
@@ -941,7 +902,6 @@ end;
 procedure TSynEditStringList.SetFileFormat(const Value: TSynEditFileFormat);
 begin
   fFileFormat := Value;
-{$IFDEF UNICODE}
   case FileFormat of
     sffDos:
       LineBreak := WideCRLF;
@@ -952,7 +912,6 @@ begin
     sffUnicode:
       LineBreak := WideLineSeparator;
   end;
-{$ENDIF}
 end;
 
 {$IFDEF OWN_UnicodeString_MEMMGR}
@@ -1050,20 +1009,19 @@ begin
       then
         InsertItem(fCount, '');
     end;
-    if Assigned(OnInserted) then
+    if Assigned(OnInserted) and (fCount > 0) then
       OnInserted(Self, 0, fCount);
   finally
     EndUpdate;
   end;
-// TODO: IFDEF UNICODE, LineBreak setzen
   if fLINESEPARATOR then
-    fFileFormat := sffUnicode
+    FileFormat := sffUnicode
   else if fCR and not fLF then
-    fFileFormat := sffMac
+    FileFormat := sffMac
   else if fLF and not fCR then
-    fFileFormat := sffUnix
+    FileFormat := sffUnix
   else
-    fFileFormat := sffDos;
+    FileFormat := sffDos;
 end;
 
 procedure TSynEditStringList.SetUpdateState(Updating: Boolean);

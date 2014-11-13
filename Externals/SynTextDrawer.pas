@@ -261,10 +261,8 @@ function UniversalExtTextOut(DC: HDC; X, Y: Integer; Options: TTextOutOptions;
 
 implementation
 
-{$IFDEF SYN_UNISCRIBE}
 uses
-  SynUsp10;
-{$ENDIF}
+  Types, UITypes{$IFDEF SYN_UNISCRIBE}, SynUsp10{$ENDIF};
 
 var
   gFontsInfoManager: TheFontsInfoManager;
@@ -915,7 +913,9 @@ procedure TheTextDrawer.ExtTextOut(X, Y: Integer; Options: TTextOutOptions;
     for i := 0 to Length - 1 do
     begin
       Size := TextExtent(PWideChar(@Text[i]), 1);
-      FETODist[i] := Ceil(Size.cx / CharWidth) * CharWidth;
+      if Size.cx <> CharWidth then
+         FETODist[i] := Ceil(Size.cx / CharWidth) * CharWidth
+      else FETODist[i] := CharWidth;
     end;
   end;
 

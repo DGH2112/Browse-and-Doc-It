@@ -43,25 +43,17 @@ This highlighter can be used to highlight text in which several languages are pr
 For example, in HTML as well as HTML tags there can also be JavaScript and/or VBScript present.
 }
 
-{$IFNDEF QSYNHIGHLIGHTERMULTI}
 unit SynHighlighterMulti;
-{$ENDIF}
 
 {$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  QSynEditTypes,
-  QSynEditHighlighter,
-  QSynUnicode,  
-{$ELSE}
   Windows,
   SynEditTypes,
   SynEditHighlighter,
   SynUnicode,
-{$ENDIF}
   Classes;
 
 type
@@ -87,10 +79,8 @@ type
     procedure SetCaseSensitive(const Value: Boolean);
   protected
     procedure DefineProperties(Filer: TFiler); override;
-{$IFDEF SYN_COMPILER_3_UP}
     function GetDisplayName: string; override;
     procedure SetDisplayName(const Value: string); override;
-{$ENDIF}
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
@@ -117,11 +107,9 @@ type
     fOwner: TSynMultiSyn;
     function GetItems(Index: integer): TScheme;
     procedure SetItems(Index: integer; const Value: TScheme);
-{$IFDEF SYN_COMPILER_3_UP}
   protected
     function GetOwner: TPersistent; override;
     procedure Update(Item: TCollectionItem); override;
-{$ENDIF}
   public
     constructor Create(aOwner: TSynMultiSyn);
     property Items[aIndex: integer]: TScheme read GetItems write SetItems;
@@ -143,11 +131,7 @@ type
 
   TRangeOperation = (roGet, roSet);
 
-{$IFDEF SYN_COMPILER_16_UP}
   TRangeUNativeInt = NativeUInt;
-{$ELSE}
-  TRangeUNativeInt = Cardinal;
-{$ENDIF}
   TRangeProc = procedure (Operation: TRangeOperation; var Range: TRangeUNativeInt) of object;
 
   TCustomRangeEvent = procedure (Sender: TSynMultiSyn; Operation: TRangeOperation;
@@ -241,10 +225,8 @@ type
     function UpdateRangeProcs: Boolean;
     property CurrScheme: Integer read fCurrScheme write fCurrScheme;
     property CurrLine: UnicodeString read fLineStr;
-{$IFNDEF SYN_CLX}
     function LoadFromRegistry(RootKey: HKEY; Key: string): Boolean; override;
     function SaveToRegistry(RootKey: HKEY; Key: string): Boolean; override;
-{$ENDIF}
     function IsIdentChar(AChar: WideChar): Boolean; override;
   published
     property Schemes: TSchemes read fSchemes write SetSchemes;
@@ -258,17 +240,10 @@ type
 implementation
 
 uses
-{$IFDEF SYN_CLX}
-  QGraphics,
-  QSynEditMiscProcs,
-  QSynRegExpr,
-  QSynEditStrConst,
-{$ELSE}
   Graphics,
   SynEditMiscProcs,
   SynRegExpr,
   SynEditStrConst,
-{$ENDIF}
   SysUtils;
 
 procedure CheckExpression(const Expr: UnicodeString);
@@ -690,9 +665,7 @@ end;
 procedure TSynMultiSyn.UnhookHighlighter(aHL: TSynCustomHighlighter);
 begin
   aHL.UnhookAttrChangeEvent(DefHighlightChange);
-{$IFDEF SYN_COMPILER_5_UP}
   aHL.RemoveFreeNotification(Self);
-{$ENDIF}
 end;
 
 function TSynMultiSyn.GetSampleSource: UnicodeString;
@@ -705,7 +678,6 @@ begin
   fSampleSource := Value;
 end;
 
-{$IFNDEF SYN_CLX}
 function TSynMultiSyn.LoadFromRegistry(RootKey: HKEY;
   Key: string): Boolean;
 var
@@ -764,7 +736,6 @@ begin
     r.Free;
   end;
 end;
-{$ENDIF}
 
 function TSynMultiSyn.GetRange: Pointer;
 begin
@@ -980,19 +951,16 @@ begin
   Result := inherited Items[Index] as TScheme;
 end;
 
-{$IFDEF SYN_COMPILER_3_UP}
 function TSchemes.GetOwner: TPersistent;
 begin
   Result := fOwner;
 end;
-{$ENDIF}
 
 procedure TSchemes.SetItems(Index: Integer; const Value: TScheme);
 begin
   inherited Items[Index] := Value;
 end;
 
-{$IFDEF SYN_COMPILER_3_UP}
 procedure TSchemes.Update(Item: TCollectionItem);
 begin
   if Item <> nil then
@@ -1000,7 +968,6 @@ begin
   else // pass the MultiSyn as the Sender so Editors reparse their text
     fOwner.DefHighlightChange(fOwner);
 end;
-{$ENDIF}
 
 { TScheme }
 
@@ -1034,12 +1001,8 @@ end;
 procedure TScheme.DefineProperties(Filer: TFiler);
 begin
   inherited;
-{$IFNDEF UNICODE}
-  UnicodeDefineProperties(Filer, Self);
-{$ENDIF}
 end;
 
-{$IFDEF SYN_COMPILER_3_UP}
 function TScheme.GetDisplayName: string;
 begin
   if SchemeName <> '' then
@@ -1047,7 +1010,6 @@ begin
   else
     Result := inherited GetDisplayName;
 end;
-{$ENDIF SYN_COMPILER_3_UP}
 
 procedure TScheme.MarkerAttriChanged(Sender: TObject);
 begin
@@ -1063,12 +1025,10 @@ begin
   end;
 end;
 
-{$IFDEF SYN_COMPILER_3_UP}
 procedure TScheme.SetDisplayName(const Value: string);
 begin
   SchemeName := Value;
 end;
-{$ENDIF SYN_COMPILER_3_UP}
 
 procedure TScheme.SetEndExpr(const Value: UnicodeString);
 var

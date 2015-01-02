@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    10 Nov 2014
+  @Date    01 Jan 2015
   @Version 1.0
 
 **)
@@ -162,8 +162,8 @@ Type
   (** An enumerate to define the drawing dimensions which can be changed
       by the user. **)
   TDimension = (diHeight, diWidth, diLegendWidth, diTitleHeight, diOverheadHeight,
-    diDateWidth, diLegendLabel, diWeekNoWidth, diFrameGap, diQuantityHeight,
-    diQuantityWidth);
+    diDateWidth, diLegendLabel, diWeekNoWidth, diFrameGap, diFrameMargin,
+    diQuantityHeight, diQuantityWidth);
 
   (** A list of ISO paper sizes for the time location diagrams. **)
   TPaperSize = (psA4P, psA4L, psA3P, psA3L, psA2P, psA2L, psA1P, psA1L, psA0P, psA0L);
@@ -384,6 +384,7 @@ Const
     (FDisplayName: 'Legend Label';    FININame: 'LegendLabel';    FDefaults: ( 15,  15,  20,  20,  30,  30,  40,  40,   52,   52)),
     (FDisplayName: 'Week No Width';   FININame: 'WeekNoWidth';    FDefaults: (  6,   8,  10,  10,  15,  15,  20,  20,   25,   25)),
     (FDisplayName: 'Frame Gap';       FININame: 'FrameGap';       FDefaults: (  6,   6,   7,   7,   8,   8,   9,   9,   10,   10)),
+    (FDisplayName: 'Frame Margin';    FININame: 'FrameMargin';    FDefaults: (  2,   2,   3,   3,   3,   3,   4,   4,    5,    5)),
     (FDisplayName: 'Quantity Height'; FININame: 'QuantityHeight'; FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100)),
     (FDisplayName: 'Quantity Width';  FININame: 'QuantityWidth';  FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100))
   );
@@ -401,31 +402,6 @@ Const
     'A0 Portrait', 
     'A0 Landscape'
   );
-
-  (** This is the multiplier by which ALL millimetre dimensions are scaled to
-      get the drawing to about the right size. **)
-  iMULTIPLIER    : DOUBLE =  2.5;
-  (** This is the margin between the top / left of an excel worksheet and the
-      outside frame. **)
-  iOUTSIDEMARGIN : DOUBLE = 10.0;
-  (** This is the margin between the outside frame and the inside elements. **)
-  iINSIDEMARGIN  : DOUBLE = 30.0;
-  (** This constant represent the padding at the left and right of each Title Block text
-      element. **)
-  iTITLEPADDING : Double = 10;
-  (** This constant represents the height of an item in the title block. **)
-  iTITLEITEMHEIGHT : Double = 40;
-  (** This constant reporesent the maximum height between legend items. **)
-  iLEGENDTEXTHEIGHT : Integer = 40;
-  (** This constant represent the vertical margin between legend items. **)
-  iLEGENDSMALLMARGIN: Integer = 5;
-  (** This constant represents the padding on either side of a legend element. **)
-  iLEGENDLARGEMARGIN: Integer = 10;
-  (** This constant represent the height of the date title on the drawing. **)
-  iDATETITLEHEIGHT : Integer = 30;
-  (** This constant represent the space between the Overhead / Quantity frames and their
-      adjacent frames. **)
-  iFRAMEMARGIN : Integer = 5;
 
 Implementation
 

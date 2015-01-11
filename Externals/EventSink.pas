@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  Steve Trefethen
-  @Date    27 Dec 2010
+  @Date    11 Jan 2015
 
 **)
 unit EventSink;
@@ -204,7 +204,13 @@ function TEventSink.Invoke(DispID: Integer; const IID: TGUID;
   LocaleID: Integer; Flags: Word; var Params; VarResult, ExcepInfo,
   ArgErr: Pointer): HResult;
 
-var
+Const
+  strMsg =
+    'An exception has occurred in the application!'#13#10#13#10 +
+    'Class  : %s'#13#10 +
+    'Message: %s';
+
+Var
   DispParams: PVariantArgList;
 
 Begin
@@ -222,7 +228,7 @@ Begin
           If Not StandardEurekaNotify(GetLastExceptionObject,
             GetLastExceptionAddress) Then
           {$ENDIF}
-            ShowMessage('Exception: ' + E.Message);
+            MessageDlg(Format(strMsg, [E.ClassName, E.Message]), mtError, [mbOK], 0);
         End;
     End;
   Result := S_OK;

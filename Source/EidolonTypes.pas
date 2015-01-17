@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    01 Jan 2015
+  @Date    17 Jan 2015
   @Version 1.0
 
 **)
@@ -193,6 +193,65 @@ Type
     FININame     : String;
     FDefaults    : Array[Low(TPaperSize)..High(TPaperSize)] Of Double;
   End;
+
+  (** An enumerate for the Time Location boolean options. **)
+  TTLSOption = (
+    tlsoOverhead,
+    tlsoTransposeChainage,
+    tlsoLayerBySymbol,
+    tlsoShowYearlyGrid,
+    tlsoShowMonthlyGrid,
+    tlsoShowWeeklyGrid,
+    tlsoShowProgress,
+    tlsoTransposeTimeScale,
+    tlsoSuppressDescriptions,
+    tlsoRenderSchematic,
+    tlsoRenderByRoute,
+    tlsoRenderUsedLegends,
+    tlsoIncrementDrawingRev,
+    tlsoRouteCodeOnSingleDrn,
+    tlsoRenderTLInTime,
+    tlsoGroupObjectsInLayers
+  );
+
+  (** A set of the above options. **)
+  TTLSOptions = Set of TTLSOption;
+
+  (** This enumerate define a list of the reference points on the time location from the
+      far left to the far right. **)
+  THorizontalPosition = (
+    hpLeftOuterFrame,           // Left edge of the outer frame
+    hpLeftDateDivider,          // Left Date divider between the date and the week number
+    hpLeftInnerFrames,          // Left edge of the left most inner frame
+    hpRightInnerFrames,         // Right edge of the right most inner frame
+    hpRightDateDivider,         // Right Date divider between the date and the week number
+    hpVerticalQuantityDivider,  // Left edge of the Vertical Quantities area
+    hpLeftOfVQuantityFrame,     // Left edge of the vertical quantities frame
+    hpRightOfVQuantityFrame,    // Right edge of the vertical quantities frame
+    hpLegendDivider,            // Left edge of the Legend area
+    hpLeftLegendText,           // Left edge of the legend text
+    hpLegendLabel,              // Right edge of the legend label area
+    hpRightLegendLabel,         // Right edge of the legend label position
+    hpRightLegendText,          // Right edge of the legend text
+    hpRightOuterFrame           // Right edge of the outer frame
+  );
+  (** This enumerate define a list of the reference points on the time location from the
+      top to the bottom. **)
+  TVerticalPosition = (
+    vpTopOuterFrame,            // Top edge of the outer frame
+    vpTopOfOverheadFrame,       // Top of the overhead frame
+    vpBottomOfOverheadFrame,    // Bottom of the overhead frame
+    vpOverheadDivider,          // Bottom edge of the Overhead divider
+    vpTopOfHQuantityFrame,      // Top of the horizontal quantities frame
+    vpBottomOfHQuantityFrame,   // Bottom of the horizontal quantities frame
+    vpBottomOfHQuantityDivider, // Bottom edge of the horizontal quantities divider
+    vpTopInnerFrame,            // Top edge of the Inner frames
+    vpTitleDivider,             // Top edge of the Title area
+    vpTopTitleText,             // Top of the title box text area
+    vpBottomTitleText,          // Bottom of the title box text area
+    vpBottomInnerFrame,         // Bottom edge of the Inner Frames
+    vpBottomOuterFrame          // Bottom edge of the outer frame
+  );
 
 Const
   (** A constant array of names for the enumerated symbols types. **)

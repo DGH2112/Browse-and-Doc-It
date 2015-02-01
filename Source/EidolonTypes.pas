@@ -3,13 +3,16 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    17 Jan 2015
+  @Date    01 Feb 2015
   @Version 1.0
 
 **)
 Unit EidolonTypes;
 
 Interface
+
+Uses
+  Graphics;
 
 Type
   (** An enumerate for the symbol types. **)
@@ -161,9 +164,24 @@ Type
 
   (** An enumerate to define the drawing dimensions which can be changed
       by the user. **)
-  TDimension = (diHeight, diWidth, diLegendWidth, diTitleHeight, diOverheadHeight,
-    diDateWidth, diLegendLabel, diWeekNoWidth, diFrameGap, diFrameMargin,
-    diQuantityHeight, diQuantityWidth);
+  TDimension = (
+    diHeight,
+    diWidth,
+    diLegendWidth,
+    diTitleHeight,
+    diOverheadHeight,
+    diDateWidth,
+    diLegendLabel,
+    diWeekNoWidth,
+    diFrameGap,
+    diFrameMargin,
+    diPrimaryQuantityHeight,
+    diSecondaryQuantityHeight,
+    diTertiaryQuantityHeight,
+    diPrimaryQuantityWidth,
+    diSecondaryQuantityWidth,
+    diTertiaryQuantityWidth
+  );
 
   (** A list of ISO paper sizes for the time location diagrams. **)
   TPaperSize = (psA4P, psA4L, psA3P, psA3L, psA2P, psA2L, psA1P, psA1L, psA0P, psA0L);
@@ -220,38 +238,191 @@ Type
   (** This enumerate define a list of the reference points on the time location from the
       far left to the far right. **)
   THorizontalPosition = (
-    hpLeftOuterFrame,           // Left edge of the outer frame
-    hpLeftDateDivider,          // Left Date divider between the date and the week number
-    hpLeftInnerFrames,          // Left edge of the left most inner frame
-    hpRightInnerFrames,         // Right edge of the right most inner frame
-    hpRightDateDivider,         // Right Date divider between the date and the week number
-    hpVerticalQuantityDivider,  // Left edge of the Vertical Quantities area
-    hpLeftOfVQuantityFrame,     // Left edge of the vertical quantities frame
-    hpRightOfVQuantityFrame,    // Right edge of the vertical quantities frame
-    hpLegendDivider,            // Left edge of the Legend area
-    hpLeftLegendText,           // Left edge of the legend text
-    hpLegendLabel,              // Right edge of the legend label area
-    hpRightLegendLabel,         // Right edge of the legend label position
-    hpRightLegendText,          // Right edge of the legend text
-    hpRightOuterFrame           // Right edge of the outer frame
+    hpLeftOuterFrame,                   // Left edge of the outer frame
+    hpLeftDateDivider,                  // Left Date divider between the date and the week number
+    hpLeftInnerFrames,                  // Left edge of the left most inner frame
+    hpRightInnerFrames,                 // Right edge of the right most inner frame
+    hpRightDateDivider,                 // Right Date divider between the date and the week number
+    hpTertiaryVerticalQuantityDivider,  // Left edge of the tertiary vertical Quantities area
+    hpLeftOfTertiaryVQuantityFrame,     // Left edge of the tertiary vertical quantities frame
+    hpRightOfTertiaryVQuantityFrame,    // Right edge of the tertiary vertical quantities frame
+    hpSecondaryVerticalQuantityDivider, // Left edge of the secondary vertical Quantities area
+    hpLeftOfSecondaryVQuantityFrame,    // Left edge of the secondary vertical quantities frame
+    hpRightOfSecondaryVQuantityFrame,   // Right edge of the secondary vertical quantities frame
+    hpPrimaryVerticalQuantityDivider,   // Left edge of the primary vertical Quantities area
+    hpLeftOfPrimaryVQuantityFrame,      // Left edge of the primary vertical quantities frame
+    hpRightOfPrimaryVQuantityFrame,     // Right edge of the primary vertical quantities frame
+    hpLegendDivider,                    // Left edge of the Legend area
+    hpLeftLegendText,                   // Left edge of the legend text
+    hpLegendLabel,                      // Right edge of the legend label area
+    hpRightLegendLabel,                 // Right edge of the legend label position
+    hpRightLegendText,                  // Right edge of the legend text
+    hpRightOuterFrame                   // Right edge of the outer frame
   );
   (** This enumerate define a list of the reference points on the time location from the
       top to the bottom. **)
   TVerticalPosition = (
-    vpTopOuterFrame,            // Top edge of the outer frame
-    vpTopOfOverheadFrame,       // Top of the overhead frame
-    vpBottomOfOverheadFrame,    // Bottom of the overhead frame
-    vpOverheadDivider,          // Bottom edge of the Overhead divider
-    vpTopOfHQuantityFrame,      // Top of the horizontal quantities frame
-    vpBottomOfHQuantityFrame,   // Bottom of the horizontal quantities frame
-    vpBottomOfHQuantityDivider, // Bottom edge of the horizontal quantities divider
-    vpTopInnerFrame,            // Top edge of the Inner frames
-    vpTitleDivider,             // Top edge of the Title area
-    vpTopTitleText,             // Top of the title box text area
-    vpBottomTitleText,          // Bottom of the title box text area
-    vpBottomInnerFrame,         // Bottom edge of the Inner Frames
-    vpBottomOuterFrame          // Bottom edge of the outer frame
+    vpTopOuterFrame,                     // Top edge of the outer frame
+    vpTopOfOverheadFrame,                // Top of the overhead frame
+    vpBottomOfOverheadFrame,             // Bottom of the overhead frame
+    vpOverheadDivider,                   // Bottom edge of the Overhead divider
+    vpTopOfPrimaryHQuantityFrame,        // Top of the primary horizontal quantities frame
+    vpBottomOfPrimaryHQuantityFrame,     // Bottom of the primary horizontal quantities frame
+    vpBottomOfPrimaryHQuantityDivider,   // Bottom edge of the primary horizontal quantities divider
+    vpTopOfSecondaryHQuantityFrame,      // Top of the secondary horizontal quantities frame
+    vpBottomOfSecondaryHQuantityFrame,   // Bottom of the secondary horizontal quantities frame
+    vpBottomOfSecondaryHQuantityDivider, // Bottom edge of the secondary horizontal quantities divider
+    vpTopOfTertiaryHQuantityFrame,       // Top of the tertiary horizontal quantities frame
+    vpBottomOfTertiaryHQuantityFrame,    // Bottom of the tertiary horizontal quantities frame
+    vpBottomOfTertiaryHQuantityDivider,  // Bottom edge of the tertiary horizontal quantities divider
+    vpTopInnerFrame,                     // Top edge of the Inner frames
+    vpTitleDivider,                      // Top edge of the Title area
+    vpTopTitleText,                      // Top of the title box text area
+    vpBottomTitleText,                   // Bottom of the title box text area
+    vpBottomInnerFrame,                  // Bottom edge of the Inner Frames
+    vpBottomOuterFrame                   // Bottom edge of the outer frame
   );
+
+  (** An enumerate to define the Primary, Secondray and Tertiary quantity graphs. **)
+  TGraphHierarchy = (ghPrimary, ghSecondary, ghTertiary);
+
+  (** An enumerate to define a series of options for the quantity graphs rather than
+      managing numerous boolean properties. **)
+  TQuantityGraphOption = (
+    qgoShowHorizontalGraph,
+    qgoShowHorizontalData,
+    qgoStackHorizontalGraph,
+    qgoShowVerticalGraph,
+    qgoShowVerticalData,
+    qgoStackVerticalGraph
+  );
+
+  (** A set of the quantity graph options. **)
+  TGraphOptions = Set Of TQuantityGraphOption;
+
+  (** An array of graph options for all the graph hierarchies. **)
+  TQuantityGraphOptions = Array[Low(TGraphHierarchy)..High(TGraphHierarchy)] Of TGraphOptions;
+
+  (** This is a record structure to define the items in the quantity graph options
+      constant array. **)
+  TQuantityGraphOptionsRec = Record
+    FININame     : String;
+    FDefault     : Boolean;
+  End;
+
+  (** An array of double for the intervals associated with a H or V quantities graph. **)
+  TQuantityIntervals = Array[Low(TGraphHierarchy)..High(TGraphHierarchy)] Of Double;
+
+  (** An enumerate to define the number of fonts required for TL rendering. **)
+  TFontType = (
+    ftLegendHeader,
+    ftLegendText,
+    ftShape,
+    ftChainageGrid,
+    ftDateHeader,
+    ftDateGrid,
+    ftSchematicText,
+    ftQuantityText,
+    ftQuantityTitleText,
+    ftFrameWatermark
+  );
+
+  (** An enumerate to describe the drawing objects on a time location diagram which can
+      be edited if required. **)
+  TTLSDrawingObject = (
+    tdoOuterFrame,
+    tdoLegendDivider,
+    tdoTitleDivider,
+    tdoInnerFrame,
+    tdoProgress,
+    tdoHoliday,
+    tdoYearlyGridline,
+    tdoMonthlyGridline,
+    tdoWeeklyGridline,
+    tdoDailyGridLine,
+    tdoChainageGridline,
+    tdoTimeNowLine,
+    tdoDateSeparator,
+    tdoSchematicFrame,
+    tdoSchematicCentreLine,
+    tdoOverheadFrame,
+    tdoQuantityFrame,
+    tdoQuantityGridLines
+  );
+
+  (** A record to describe the font name and ini key. **)
+  TFontTypeRec = Record
+    FDisplayName : String;
+    FININame     : String;
+    FFontName    : String;
+    FFontStyle   : TFontStyles;
+    FFontSize    : Integer;
+    FFontColour  : TColour;
+  End;
+
+  (** An enumerate to define the portions of Time Location Information that can be copied
+      between profiles. **)
+  TProfileData = (pdTLSOptions, pdDimensions, pdTitleBlock, pdMaxMinDateChaiange,
+    pdHolidays, pdHolidayOptions, pdFonts, pdDrawingObjects, pdGeneralOptions,
+    pdSchematicScript, pdSchematicSymbols);
+
+  (** A set of the above Time Location Information copying portions. **)
+  TProfileDatas = Set Of TProfileData;
+
+  (** A record to describe the default properties of TLS Object Types. **)
+  TTLSObjectRec = Record
+    FName   : String;
+    FSymbol : String;
+  End;
+
+  (** This is an enumerate to define the grouping under which the the TLSOptions are
+      defined. **)
+  TTLSOptionGroup = (
+    tgoLayout,
+    tgoGridlines,
+    tgoRouteCode,
+    tgoProgress,
+    tgoMiscellaneous
+  );
+
+  (** This is an record to describe the attributes that are need to each TLSOption. **)
+  TTLSOptionRec = Record
+    strDescription : String;
+    strName        : String;
+    GroupID        : TTLSOptionGroup;
+  End;
+
+  (** An enumerate to describe the different variant portions of the below record. **)
+  TTLSLegendInfo = (liObject, liInteger, liLegendInfo);
+
+  (** A record to descibe the information stored in the FTimeLocationSymbols Data pointer. **)
+  TTLSLegendRec = Record
+    Case TTLSLegendInfo Of
+      liObject :    (PObject : TObject);
+      liInteger:    (iData : Cardinal);
+      liLegendInfo: (iOrder : SmallInt; iDisplayOps : TDisplayOps);
+  End;
+
+  (** This record described a start and finish chainage for each frame. **)
+  TFrameRecord = Record
+    dblStart  : Double;
+    dblFinish : Double;
+  End;
+
+  (** A type to define an array of TFrameRecords. **)
+  TFrameRecordArray = Array Of TFrameRecord;
+
+  (** A record to describe the information associated with a single quantity. **)
+  TQuantity = Record
+    FName       : String;
+    FSheetIndex : Integer;
+  End;
+
+  (** A type to define an array of TQuantity records. **)
+  TQuantityArray = Array Of TQuantity;
+
+  (** An enumerate to define the types of graph that can be rendered. **)
+  TGraphType = (gtNone, gtBar, gtLine, gtArea);
 
 Const
   (** A constant array of names for the enumerated symbols types. **)
@@ -433,34 +604,285 @@ Const
 
   (** A constant array of dimension names for the INI file. **)
   Dimensions : Array[Low(TDimension)..High(TDimension)] Of TDimensionRec = (
-                                                             //               A4P, A4L, A3P, A3L, A2P, A2L, A1P, A1L,  A0P,  A0L
-    (FDisplayName: 'Height';          FININame: 'Height';         FDefaults: (297, 210, 420, 297, 594, 420, 841, 594, 1089,  841)),
-    (FDisplayName: 'Width';           FININame: 'Width';          FDefaults: (210, 297, 297, 420, 420, 594, 594, 841,  841, 1189)),
-    (FDisplayName: 'Legend Width';    FININame: 'LegendWidth';    FDefaults: ( 40,  40,  55,  55,  75,  75, 110, 110,  150,  150)),
-    (FDisplayName: 'Title Height';    FININame: 'TitleHeight';    FDefaults: ( 40,  40,  55,  55,  75,  75, 110, 110,  150,  150)),
-    (FDisplayName: 'Overhead Height'; FININame: 'OverheadHeight'; FDefaults: ( 40,  40,  55,  55,  75,  75, 110, 110,  150,  150)),
-    (FDisplayName: 'Date Width';      FININame: 'DateWidth';      FDefaults: ( 25,  25,  30,  30,  40,  40,  55,  55,   75,   75)),
-    (FDisplayName: 'Legend Label';    FININame: 'LegendLabel';    FDefaults: ( 15,  15,  20,  20,  30,  30,  40,  40,   52,   52)),
-    (FDisplayName: 'Week No Width';   FININame: 'WeekNoWidth';    FDefaults: (  6,   8,  10,  10,  15,  15,  20,  20,   25,   25)),
-    (FDisplayName: 'Frame Gap';       FININame: 'FrameGap';       FDefaults: (  6,   6,   7,   7,   8,   8,   9,   9,   10,   10)),
-    (FDisplayName: 'Frame Margin';    FININame: 'FrameMargin';    FDefaults: (  2,   2,   3,   3,   3,   3,   4,   4,    5,    5)),
-    (FDisplayName: 'Quantity Height'; FININame: 'QuantityHeight'; FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100)),
-    (FDisplayName: 'Quantity Width';  FININame: 'QuantityWidth';  FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100))
+    //                                                                                           A4P, A4L, A3P, A3L, A2P, A2L, A1P, A1L,  A0P,  A0L
+    (FDisplayName: 'Height';                    FININame: 'Height';                  FDefaults: (297, 210, 420, 297, 594, 420, 841, 594, 1089,  841)),
+    (FDisplayName: 'Width';                     FININame: 'Width';                   FDefaults: (210, 297, 297, 420, 420, 594, 594, 841,  841, 1189)),
+    (FDisplayName: 'Legend Width';              FININame: 'LegendWidth';             FDefaults: ( 40,  40,  55,  55,  75,  75, 110, 110,  150,  150)),
+    (FDisplayName: 'Title Height';              FININame: 'TitleHeight';             FDefaults: ( 40,  40,  55,  55,  75,  75, 110, 110,  150,  150)),
+    (FDisplayName: 'Overhead Height';           FININame: 'OverheadHeight';          FDefaults: ( 40,  40,  55,  55,  75,  75, 110, 110,  150,  150)),
+    (FDisplayName: 'Date Width';                FININame: 'DateWidth';               FDefaults: ( 25,  25,  30,  30,  40,  40,  55,  55,   75,   75)),
+    (FDisplayName: 'Legend Label';              FININame: 'LegendLabel';             FDefaults: ( 15,  15,  20,  20,  30,  30,  40,  40,   52,   52)),
+    (FDisplayName: 'Week No Width';             FININame: 'WeekNoWidth';             FDefaults: (  6,   8,  10,  10,  15,  15,  20,  20,   25,   25)),
+    (FDisplayName: 'Frame Gap';                 FININame: 'FrameGap';                FDefaults: (  6,   6,   7,   7,   8,   8,   9,   9,   10,   10)),
+    (FDisplayName: 'Frame Margin';              FININame: 'FrameMargin';             FDefaults: (  2,   2,   3,   3,   3,   3,   4,   4,    5,    5)),
+    (FDisplayName: 'Primary Quantity Height';   FININame: 'PrimaryQuantityHeight';   FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100)),
+    (FDisplayName: 'Secondary Quantity Height'; FININame: 'SecondaryQuantityHeight'; FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100)),
+    (FDisplayName: 'Tertiary Quantity Height';  FININame: 'TertiaryQuantityHeight';  FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100)),
+    (FDisplayName: 'Primary Quantity Width';    FININame: 'PrimaryQuantityWidth';    FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100)),
+    (FDisplayName: 'Secondary Quantity Width';  FININame: 'SecondaryQuantityWidth';  FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100)),
+    (FDisplayName: 'Tertiary Quantity Width';   FININame: 'TertiaryQuantityWidth';   FDefaults: ( 30,  30,  40,  40,  55,  55,  75,  75,  100,  100))
   );
 
   (** A constant array of string representations of paper sizes. **)
   strPaperSizes : Array[Low(TPaperSize)..High(TPaperSize)] Of String = (
-    'A4 Portrait', 
-    'A4 Landscape', 
-    'A3 Portrait', 
-    'A3 Landscape', 
-    'A2 Portrait', 
-    'A2 Landscape', 
-    'A1 Portrait', 
-    'A1 Landscape', 
-    'A0 Portrait', 
+    'A4 Portrait',
+    'A4 Landscape',
+    'A3 Portrait',
+    'A3 Landscape',
+    'A2 Portrait',
+    'A2 Landscape',
+    'A1 Portrait',
+    'A1 Landscape',
+    'A0 Portrait',
     'A0 Landscape'
   );
+
+  (** This is an constant array of information contain the INI name for the quantity graph
+      options and there display descriptions. **)
+  QuantityGraphOptions : Array[Low(TGraphHierarchy)..High(TGraphHierarchy),
+    Low(TQuantityGraphOption)..High(TQuantityGraphOption)] Of
+    TQuantityGraphOptionsRec = (
+    (
+      (FININame: 'ShowPrimaryHorizontalGraph';    FDefault: False),
+      (FININame: 'ShowPrimaryHorizontalData';     FDefault: True),
+      (FININame: 'StackPrimaryHorizontalGraph';   FDefault: True),
+      (FININame: 'ShowPrimaryVerticalGraph';      FDefault: False),
+      (FININame: 'ShowPrimaryVerticalData';       FDefault: True),
+      (FININame: 'StackPrimaryVerticalGraph';     FDefault: True)
+    ),
+    (
+      (FININame: 'ShowSecondaryHorizontalGraph';  FDefault: False),
+      (FININame: 'ShowSecondaryHorizontalData';   FDefault: True),
+      (FININame: 'StackSecondaryHorizontalGraph'; FDefault: True),
+      (FININame: 'ShowSecondaryVerticalGraph';    FDefault: False),
+      (FININame: 'ShowSecondaryVerticalData';     FDefault: True),
+      (FININame: 'StackSecondaryVerticalGraph';   FDefault: True)
+    ),
+    (
+      (FININame: 'ShowTertiaryHorizontalGraph';   FDefault: False),
+      (FININame: 'ShowTertiaryHorizontalData';    FDefault: True),
+      (FININame: 'StackTertiaryHorizontalGraph';  FDefault: True),
+      (FININame: 'ShowTertiaryVerticalGraph';     FDefault: False),
+      (FININame: 'ShowTertiaryVerticalData';      FDefault: True),
+      (FININame: 'StackTertiaryVerticalGraph';    FDefault: True)
+    )
+  );
+
+  (** This is a constant array of strings to represent the graph options. **)
+  GraphOptions : Array[Low(TQuantityGraphOption)..High(TQuantityGraphOption)] Of
+    String = (
+    'Show Horizontal Graph',
+    'Show Horizontal Data',
+    'Stack Horizontal Graph',
+    'Show Vertical Graph',
+    'Show Vertical Data',
+    'Stack Vertical Graph'
+  );
+  (** A constant array of strings representing the graph hierarchies. **)
+  GraphHierarchies : Array[Low(TGraphHierarchy)..High(TGraphHierarchy)] Of String = (
+    'Primary', 'Secondary', 'Tertiary');
+
+  (** A constant array providing descriptions of the boolean options. **)
+  Options : Array[Low(TTLSOption)..High(TTLSOption)] Of TTLSOptionRec = (
+    ( strDescription: 'Allow room in the drawing for a overhead image.';
+      strName: 'tlsoOverhead';
+      GroupID: tgoLayout),
+    ( strDescription: 'Transpose Chainage (High to Low instead of Low to High).';
+      strName: 'tlsoTransposeChainage';
+      GroupID: tgoLayout),
+    ( strDescription: 'Layer diagram by symbol order in map definition.';
+      strName: 'tlsoLayerBySymbol';
+      GroupID: tgoMiscellaneous),
+    ( strDescription: 'Show yearly grid lines';
+      strName: 'tlsoShowYearlyGrid';
+      GroupID: tgoGridlines),
+    ( strDescription: 'Show monthly grid lines';
+      strName: 'tlsoShowMonthlyGrid';
+      GroupID: tgoGridlines),
+    ( strDescription: 'Show weekly grid lines';
+      strName: 'tlsoShowWeeklyGrid';
+      GroupID: tgoGridlines),
+    ( strDescription: 'Show Progress on the Time Location Symbols.';
+      strName: 'tlsoShowProgress';
+      GroupID: tgoProgress),
+    ( strDescription: 'Transpose the Time Scale (Late to Early instead of Early to Late)';
+      strName: 'tlsoTransposeTimeScale';
+      GroupID: tgoLayout),
+    ( strDescription: 'Suppress Descriptions on the Time Location diagrams.';
+      strName: 'tlsoSuppressDescriptions';
+      GroupID: tgoMiscellaneous),
+    ( strDescription: 'Render Schematic Time Location Diagram in the Overhead area.';
+      strName: 'tlsoRenderSchematic';
+      GroupID: tgoLayout),
+    ( strDescription: 'Render Time Location information by Route Code (separate diagram ' +
+      'for each route).';
+      strName: 'tlsoRenderByRoute';
+      GroupID: tgoRouteCode),
+    ( strDescription: 'Render only used Time Location Symbols in the Legend.';
+      strName: 'tlsoRenderUsedLegends';
+      GroupID: tgoMiscellaneous),
+    ( strDescription: 'Automatically increment the drawing revision (on loading of settings).';
+      strName: 'tlsoIncrementDrawingRev';
+      GroupID: tgoMiscellaneous),
+    ( strDescription: 'Render Route Codes on a single drawing as individual frames.';
+      strName: 'tlsoRenderRouteCodesSingleDrn';
+      GroupID: tgoRouteCode),
+    ( strDescription: 'Render Time Location in time (Hours and Minutes) instead of days.';
+      strName: 'tlsoRenderTLInHours';
+      GroupID: tgoProgress),
+    ( strDescription: 'Groups objects in layers on the diagram.';
+      strName: 'tlsoGroupObjectsInLayers';
+      GroupID: tgoLayout)
+  );
+
+  (** A constant array of names for each of the option groups. **)
+  Groups : Array[Low(TTLSOptionGroup)..High(TTLSOptionGroup)] Of String = (
+    'Layout Options',
+    'Gridline Options',
+    'Route Code Options',
+    'Progress Options',
+    'Miscellaneous Options'
+  );
+
+  (** A constant array to describe the font names and ini keys. **)
+  FontTypes : Array[Low(TFontType)..High(TFontType)] Of TFontTypeRec = (
+    (FDisplayName: 'Legend Header Font';  FININame: 'LegendHeaderFont';
+      FFontName: 'Arial'; FFontStyle: []; FFontSize: 24; FFontColour: xlcBlack),
+    (FDisplayName: 'Legend Text Font';  FININame: 'LegendTextFont';
+      FFontName: 'Arial'; FFontStyle: []; FFontSize: 10; FFontColour: xlcBlack),
+    (FDisplayName: 'Shape Font'; FININame: 'ShapeFont';
+      FFontName: 'Arial'; FFontStyle: []; FFontSize: 10; FFontColour: xlcBlack),
+    (FDisplayName: 'Chainage Grid Font';  FININame: 'GridFont';
+      FFontName: 'Arial'; FFontStyle: []; FFontSize: 10; FFontColour: xlcBlack),
+    (FDisplayName: 'Date Header Font';  FININame: 'DateHeaderFont';
+      FFontName: 'Arial'; FFontStyle: [fsBold]; FFontSize: 10; FFontColour: xlcBlack),
+    (FDisplayName: 'Date and Week Number Font';  FININame: 'DateFont';
+      FFontName: 'Arial'; FFontStyle: []; FFontSize: 10; FFontColour: xlcBlack),
+    (FDisplayName: 'Schematic Text Font';  FININame: 'SchematicTextFont';
+      FFontName: 'Arial'; FFontStyle: []; FFontSize: 10; FFontColour: xlcBlack),
+    (FDisplayName: 'Quantity Text Font';  FININame: 'QuantityTextFont';
+      FFontName: 'Arial'; FFontStyle: []; FFontSize: 10; FFontColour: xlcBlack),
+    (FDisplayName: 'Quantity Title Text Font';  FININame: 'QuantityTitleTextFont';
+      FFontName: 'Arial'; FFontStyle: [fsBold]; FFontSize: 10; FFontColour: xlcBlack),
+    (FDisplayName: 'Frame Watermark Font';  FININame: 'FrameWatermarkFont';
+      FFontName: 'Arial'; FFontStyle: []; FFontSize: 32; FFontColour: xlcGRAY25)
+  );
+
+  (** A constant array of defaults for TLS Object Types. **)
+  TLSDrawingObjects : Array[Low(TTLSDrawingObject)..High(TTLSDrawingObject)] Of TTLSObjectRec = (
+    (FName: 'Outer Frame'; FSymbol: 'RECTANGLE,Black,Solid,3,None,None,None,0'),
+    (FName: 'Title Divider'; FSymbol: 'LINE,Black,Solid,3'),
+    (FName: 'Legend Divider'; FSymbol: 'LINE,Black,Solid,3'),
+    (FName: 'Inner Frame'; FSymbol: 'RECTANGLE,Black,Solid,1.5,None,None,None,0'),
+    (FName: 'Progress'; FSymbol: 'RECTANGLE,Gray-50%,Solid,0.25,Gray-25%,DarkDownwardDiagonal,White,0'),
+    (FName: 'Holiday'; FSymbol: 'RECTANGLE,Gray-50%,Solid,0.25,Gray-25%,None,None,50'),
+    (FName: 'Yearly Gridline'; FSymbol: 'LINE,Gray-50%,Solid,1.5'),
+    (FName: 'Monthly Gridline'; FSymbol: 'LINE,Gray-50%,Solid,1'),
+    (FName: 'Weekly Gridline'; FSymbol: 'LINE,Gray-50%,Solid,0.5'),
+    (FName: 'Daily Gridline'; FSymbol: 'LINE,Gray-50%,Solid,0.25'),
+    (FName: 'Chainage Gridline'; FSymbol: 'LINE,Gray-50%,Solid,0.5'),
+    (FName: 'Time Now'; FSymbol: 'LINE,Red,Solid,2.25'),
+    (FName: 'Date Separator'; FSymbol: 'LINE,Black,Solid,1'),
+    (FName: 'Schematic Frame'; FSymbol: 'RECTANGLE,Black,Solid,1.5,None,None,None,0'),
+    (FName: 'Schematic Centre Line'; FSymbol: 'LINE,Red,LongDashDot,0.25'),
+    (FName: 'Overhead Frame'; FSymbol: 'RECTANGLE,Black,Solid,1.5,None,None,None,0'),
+    (FName: 'Quantity Frame'; FSymbol: 'RECTANGLE,Black,Solid,1.5,None,None,None,0'),
+    (FName: 'Quantity Gridlines'; FSymbol: 'RECTANGLE,Gray-50%,Solid,0.25,None,None,None,0')
+  );
+
+  (** A constant string to represent the holiday section of a profile in the TLI file. **)
+  strHolidays = '.Holidays';
+  (** A constant string to represent the Schematic Script section of a profile in the TLI
+      file. **)
+  strSchematicScript = '.SchematicScript';
+  (** A constant string to represent the Schematic Symbols section of a profile in the
+      TLI file. **)
+  strSchematicSymbols = '.SchematicSymbols';
+  (** A constant string to represent the Time Location Symbols section of a profile in the
+      TLI file. **)
+  strTimeLocationSymbols = '.TimeLocationSymbols';
+  (** A constant string to represent the Title Block Objects section of a profile in the
+      TLI file. **)
+  strTitleBlockObjects = '.TitleBlockObjects';
+  (** A constant string to represent the Horizontal Quantities section of a profile in the
+      TLI file. **)
+  strHorizontalQuantities = '.HorizontalQuantities';
+  (** A constant string to represent the Vertical Quantities section of a profile in the
+      TLI file. **)
+  strVerticalQuantities = '.VerticalQuantities';
+  (** A constant array of section ends to exclude from being shown in the Profiles
+      dropdown. **)
+  strExcludedSections : Array[1..7] Of String = (
+    strHolidays,
+    strSchematicScript,
+    strSchematicSymbols,
+    strTimeLocationSymbols,
+    strTitleBlockObjects,
+    strHorizontalQuantities,
+    strVerticalQuantities
+  );
+
+  (** A constant array to provide string representation of the TProfileData enumerates. **)
+  strProfileData : Array[Low(TProfileData)..High(TProfileData)] of String = (
+    'Time Location Symbol Options',
+    'Dimensions',
+    'Title Block',
+    'Max & Min Dates & Chaianges',
+    'Holidays',
+    'Holiday Options',
+    'Fonts',
+    'Drawing Objects',
+    'General Options',
+    'Schematic Script',
+    'Schematic Symbols'
+  );
+
+  (** A default set of colours to be assigned to NEW graphs as defaults. **)
+  DefaultColours : Array[1..36] Of TColour = (
+    xlcRED,
+    xlcYELLOW,
+    xlcLIME,
+    xlcAQUA,
+    xlcBLUE,
+
+    xlcDARKRED,
+    xlcDARKYELLOW,
+    xlcGREEN,
+    xlcTEAL,
+    xlcDARKBLUE,
+
+    xlcBROWN,
+    xlcOLIVEGREEN,
+    xlcDARKGREEN,
+    xlcDARKTEAL,
+    xlcBLUEGRAY,
+
+    xlcINDIGO,
+    xlcORANGE,
+    xlcGRAY50,
+    xlcLIGHTORANGE,
+    xlcSEAGREEN,
+    xlcLIGHTBLUE,
+    xlcVIOLET,
+    xlcPINK,
+    xlcGOLD,
+    xlcBRIGHTGREEN,
+    xlcTURQUOISE,
+    xlcSKYBLUE,
+    xlcPLUM,
+    xlcGRAY25,
+    xlcROSE,
+    xlcTAN,
+    xlcLIGHTYELLOW,
+    xlcLIGHTGREEN,
+    xlcLIGHTTURQUOISE,
+    xlcPALEBLUE,
+    xlcLAVENDER
+  );
+
+  (** A constant array of strings to represent the graph types. **)
+  GraphTypes : Array[Low(TGraphType)..High(TGraphType)] Of String = (
+    'None', 'Bar', 'Line', 'Area');
 
 Implementation
 

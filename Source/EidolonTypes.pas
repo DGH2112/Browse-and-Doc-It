@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    01 Feb 2015
+  @Date    07 Feb 2015
   @Version 1.0
 
 **)
@@ -810,16 +810,28 @@ Const
   (** A constant string to represent the Vertical Quantities section of a profile in the
       TLI file. **)
   strVerticalQuantities = '.VerticalQuantities';
+  (** A constant string to represent the Quantities Grid Intervals section of a profile in
+      the TLI file. **)
+  strQuantityGridIntervals = '.QuantityGridIntervals';
+  (** A constant string to represent the Quantities Time Intervals section of a profile in
+      the TLI file. **)
+  strQuantityTimeIntervals = '.QuantityTimeIntervals';
+  (** A constant string to represent the Quantities Graph Options section of a profile in
+      the TLI file. **)
+  strQuantityGraphOptions = '.QuantityGraphOptions';
   (** A constant array of section ends to exclude from being shown in the Profiles
       dropdown. **)
-  strExcludedSections : Array[1..7] Of String = (
+  strExcludedSections : Array[1..10] Of String = (
     strHolidays,
     strSchematicScript,
     strSchematicSymbols,
     strTimeLocationSymbols,
     strTitleBlockObjects,
     strHorizontalQuantities,
-    strVerticalQuantities
+    strVerticalQuantities,
+    strQuantityGridIntervals,
+    strQuantityTimeIntervals,
+    strQuantityGraphOptions
   );
 
   (** A constant array to provide string representation of the TProfileData enumerates. **)

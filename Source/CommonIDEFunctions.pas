@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    28 Apr 2013
+  @Date    07 Feb 2015
   @Version 1.0
 
 **)
@@ -99,7 +99,7 @@ Implementation
 
 Uses
   DGHLibrary {$IFDEF EUREKALOG},
-  ExceptionLog {$ENDIF};
+  ExceptionLog7 {$ENDIF};
 
 Type
   (** This class defines a thread in which the parsing of the code and

@@ -645,26 +645,26 @@ Const
     (
       (FININame: 'ShowPrimaryHorizontalGraph';    FDefault: False),
       (FININame: 'ShowPrimaryHorizontalData';     FDefault: True),
-      (FININame: 'StackPrimaryHorizontalGraph';   FDefault: True),
+      (FININame: 'StackPrimaryHorizontalGraph';   FDefault: False),
       (FININame: 'ShowPrimaryVerticalGraph';      FDefault: False),
       (FININame: 'ShowPrimaryVerticalData';       FDefault: True),
-      (FININame: 'StackPrimaryVerticalGraph';     FDefault: True)
+      (FININame: 'StackPrimaryVerticalGraph';     FDefault: False)
     ),
     (
       (FININame: 'ShowSecondaryHorizontalGraph';  FDefault: False),
       (FININame: 'ShowSecondaryHorizontalData';   FDefault: True),
-      (FININame: 'StackSecondaryHorizontalGraph'; FDefault: True),
+      (FININame: 'StackSecondaryHorizontalGraph'; FDefault: False),
       (FININame: 'ShowSecondaryVerticalGraph';    FDefault: False),
       (FININame: 'ShowSecondaryVerticalData';     FDefault: True),
-      (FININame: 'StackSecondaryVerticalGraph';   FDefault: True)
+      (FININame: 'StackSecondaryVerticalGraph';   FDefault: False)
     ),
     (
       (FININame: 'ShowTertiaryHorizontalGraph';   FDefault: False),
       (FININame: 'ShowTertiaryHorizontalData';    FDefault: True),
-      (FININame: 'StackTertiaryHorizontalGraph';  FDefault: True),
+      (FININame: 'StackTertiaryHorizontalGraph';  FDefault: False),
       (FININame: 'ShowTertiaryVerticalGraph';     FDefault: False),
       (FININame: 'ShowTertiaryVerticalData';      FDefault: True),
-      (FININame: 'StackTertiaryVerticalGraph';    FDefault: True)
+      (FININame: 'StackTertiaryVerticalGraph';    FDefault: False)
     )
   );
 

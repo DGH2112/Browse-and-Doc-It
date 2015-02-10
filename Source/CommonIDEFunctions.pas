@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    07 Feb 2015
+  @Date    10 Feb 2015
   @Version 1.0
 
 **)
@@ -98,8 +98,11 @@ ResourceString
 Implementation
 
 Uses
-  DGHLibrary {$IFDEF EUREKALOG},
-  ExceptionLog7 {$ENDIF};
+  {$IFDEF EUREKALOG_VER7}
+  ExceptionLog7,
+  EExceptionManager,
+  {$ENDIF}
+  DGHLibrary;
 
 Type
   (** This class defines a thread in which the parsing of the code and
@@ -710,8 +713,8 @@ Begin
       Exit;
     On E: Exception Do
       Begin
-        {$IFDEF EUREKALOG}
-        StandardEurekaNotify(E, GetLastExceptionAddress);
+        {$IFDEF EUREKALOG_VER7}
+        ExceptionManager.StandardEurekaNotify(ExceptObject, ExceptAddr)
         {$ELSE}
         FFileName := E.Message;
         Synchronize(ShowException);

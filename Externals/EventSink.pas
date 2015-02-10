@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  Steve Trefethen
-  @Date    07 Feb 2015
+  @Date    10 Feb 2015
 
 **)
 unit EventSink;
@@ -42,7 +42,14 @@ implementation
 
 
 Uses
-  {$IFDEF EUREKALOG} ExceptionLog7, EExceptionManager, ETypes, {$ENDIF} SysUtils, Dialogs;
+  {$IFDEF EUREKALOG_VER7}
+  ExceptionLog7,
+  EExceptionManager,
+  ETypes,
+  {$ENDIF}
+  SysUtils,
+  Dialogs,
+  UITypes;
 
 
 { TEventSink }
@@ -224,7 +231,7 @@ Begin
         Begin End;
       On E : Exception Do
         Begin
-          {$IFDEF EUREKALOG}
+          {$IFDEF EUREKALOG_VER7}
           If Not (ExceptionManager.StandardEurekaNotify(ExceptObject,
             ExceptAddr).ErrorCode = ERROR_SUCCESS) Then
           {$ENDIF}

@@ -363,9 +363,21 @@ Type
 
   (** An enumerate to define the portions of Time Location Information that can be copied
       between profiles. **)
-  TProfileData = (pdTLSOptions, pdDimensions, pdTitleBlock, pdMaxMinDateChaiange,
-    pdHolidays, pdHolidayOptions, pdFonts, pdDrawingObjects, pdGeneralOptions,
-    pdSchematicScript, pdSchematicSymbols);
+  TProfileData = (
+    pdTLSOptions,
+    pdDimensions,
+    pdTitleBlock,
+    pdMaxMinDateChaiange,
+    pdHolidays,
+    pdHolidayOptions,
+    pdFonts,
+    pdDrawingObjects,
+    pdGeneralOptions,
+    pdSchematicScript,
+    pdSchematicSymbols,
+    pdQuantityOptions,
+    pdQuantityGraphData
+  );
 
   (** A set of the above Time Location Information copying portions. **)
   TProfileDatas = Set Of TProfileData;
@@ -850,7 +862,9 @@ Const
     'Drawing Objects',
     'General Options',
     'Schematic Script',
-    'Schematic Symbols'
+    'Schematic Symbols',
+    'Quantity Options',
+    'Quantity Graph Data'
   );
 
   (** A default set of colours to be assigned to NEW graphs as defaults. **)

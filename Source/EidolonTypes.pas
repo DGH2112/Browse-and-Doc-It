@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    07 Feb 2015
+  @Date    16 Feb 2015
   @Version 1.0
 
 **)
@@ -229,7 +229,8 @@ Type
     tlsoIncrementDrawingRev,
     tlsoRouteCodeOnSingleDrn,
     tlsoRenderTLInTime,
-    tlsoGroupObjectsInLayers
+    tlsoGroupObjectsInLayers,
+    tlsoHolidaysInGraphs
   );
 
   (** A set of the above options. **)
@@ -732,7 +733,10 @@ Const
       GroupID: tgoProgress),
     ( strDescription: 'Groups objects in layers on the diagram.';
       strName: 'tlsoGroupObjectsInLayers';
-      GroupID: tgoLayout)
+      GroupID: tgoLayout),
+    ( strDescription: 'Render holidays in the vertical quantities graphs.';
+      strName: 'tlsoHolidaysInGraphs';
+      GroupID: tgoMiscellaneous)
   );
 
   (** A constant array of names for each of the option groups. **)

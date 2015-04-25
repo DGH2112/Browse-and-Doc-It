@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Aug 2011
+  @Date    25 Apr 2015
 
 **)
 unit EditorOptionsForm;
@@ -134,6 +134,7 @@ type
     udTabWidth: TUpDown;
     lblAttributes: TLabel;
     lblHighlighterType: TLabel;
+    chkWordWrap: TCheckBox;
     procedure lbAttributesClick(Sender: TObject);
     procedure AttributeChange(Sender: TObject);
   private
@@ -145,7 +146,8 @@ type
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
-    Class Function Execute(Editor : TSynEdit; boolIncTag : Boolean) : Boolean;
+    Class Function Execute(OwnerForm : TForm; Editor : TSynEdit;
+      boolIncTag : Boolean) : Boolean;
   end;
 
 implementation
@@ -427,12 +429,13 @@ End;
   @precon  Editor must be a valid instance of a TSynEdit cvontrol.
   @postcon nvokes a form for editing the given instance of the TSynEdit control.
 
-  @param   Editor as a TSynEdit
+  @param   OwnerForm  as a TForm
+  @param   Editor     as a TSynEdit
   @param   boolIncTag as a Boolean
   @return  a Boolean
 
 **)
-Class Function TfrmEditorOptions.Execute(Editor : TSynEdit;
+Class Function TfrmEditorOptions.Execute(OwnerForm : TForm; Editor : TSynEdit;
   boolIncTag : Boolean) : Boolean;
 
 Var
@@ -444,7 +447,7 @@ Var
 
 Begin
   Result := False;
-  With TfrmEditorOptions.Create(Nil) Do
+  With TfrmEditorOptions.Create(OwnerForm) Do
     Try
       // Visual
       udTabWidth.Position := Editor.TabWidth;
@@ -453,6 +456,7 @@ Begin
       cbxFontName.ItemIndex := cbxFontName.Items.IndexOf(Editor.Font.Name);
       udEditorFontSize.Position := Editor.Font.Size;
       chxLineNumbers.Checked := Editor.Gutter.ShowLineNumbers;
+      chkWordWrap.Checked := Editor.WordWrap;
       udRightEdgePosition.Position := Editor.RightEdge;
       cbxRightEdgeColour.Selected := Editor.RightEdgeColor;
       cbxSelectedForeground.Selected := Editor.SelectedColor.Foreground;
@@ -483,13 +487,14 @@ Begin
               AddHighlighter(Editor.Highlighter);
             End;
         End Else
-          SyntaxTab.Visible := False;
+          SyntaxTab.TabVisible := False;
       // Initialise the Highlighter Attributes.
       If lbAttributes.Items.Count > 0 Then
         Begin
           lbAttributes.ItemIndex := 0;
           lbAttributesClick(Nil);
         End;
+      PageControl1.ActivePageIndex := 0;
       If ShowModal = mrOK Then
         Begin
           // Visual
@@ -501,6 +506,7 @@ Begin
           Editor.Gutter.Font.Name := cbxFontName.Text;
           Editor.Gutter.Font.Size := udEditorFontSize.Position;
           Editor.Gutter.ShowLineNumbers := chxLineNumbers.Checked;
+          Editor.WordWrap := chkWordWrap.Checked;
           Editor.RightEdge := udRightEdgePosition.Position;
           Editor.RightEdgeColor := cbxRightEdgeColour.Selected;
           Editor.SelectedColor.Foreground := cbxSelectedForeground.Selected;

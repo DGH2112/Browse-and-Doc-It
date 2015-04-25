@@ -1,10 +1,10 @@
 object frmEditorOptions: TfrmEditorOptions
   Left = 493
   Top = 291
-  ActiveControl = cbxEditorBackgroundColour
+  ActiveControl = lbAttributes
   BorderIcons = []
   Caption = 'Editor Options'
-  ClientHeight = 442
+  ClientHeight = 468
   ClientWidth = 544
   Color = clBtnFace
   Constraints.MinHeight = 480
@@ -15,22 +15,22 @@ object frmEditorOptions: TfrmEditorOptions
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
-  Position = poMainFormCenter
+  Position = poOwnerFormCenter
   DesignSize = (
     544
-    442)
+    468)
   PixelsPerInch = 96
   TextHeight = 16
   object PageControl1: TPageControl
     Left = 10
     Top = 10
     Width = 524
-    Height = 384
+    Height = 410
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
     Margins.Bottom = 4
-    ActivePage = VisualTab
+    ActivePage = SyntaxTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object VisualTab: TTabSheet
@@ -41,7 +41,7 @@ object frmEditorOptions: TfrmEditorOptions
       Caption = 'Visual'
       DesignSize = (
         516
-        353)
+        379)
       object lblActiveLineColour: TLabel
         Left = 4
         Top = 42
@@ -50,7 +50,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = '&Active Line Colour'
         FocusControl = cbxActiveLineColour
@@ -63,7 +62,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Editor Font &Name'
         FocusControl = cbxFontName
@@ -76,7 +74,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Editor Font &Size'
         FocusControl = edtFontSize
@@ -89,7 +86,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = '&Right Edge Position'
         FocusControl = edtRightEdge
@@ -102,7 +98,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Right &Edge Colour'
         FocusControl = cbxRightEdgeColour
@@ -115,7 +110,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Selected Text &Fore Colour'
         FocusControl = cbxSelectedForeground
@@ -128,7 +122,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Selected &Text Back Colour'
         FocusControl = cbxSelectedBackground
@@ -141,7 +134,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Editor &Background Colour'
         FocusControl = cbxEditorBackgroundColour
@@ -154,7 +146,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Tab &width in Spaces'
         FocusControl = edtTabWidth
@@ -336,6 +327,19 @@ object frmEditorOptions: TfrmEditorOptions
         Position = 1
         TabOrder = 11
       end
+      object chkWordWrap: TCheckBox
+        Left = 4
+        Top = 343
+        Width = 507
+        Height = 21
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
+        Anchors = [akLeft, akTop, akRight]
+        Caption = '&Word Wrap text in editor'
+        TabOrder = 13
+      end
     end
     object BehaviourTab: TTabSheet
       Margins.Left = 4
@@ -346,12 +350,12 @@ object frmEditorOptions: TfrmEditorOptions
       ImageIndex = 1
       DesignSize = (
         516
-        353)
+        379)
       object clbOptions: TCheckListBox
         Left = 4
         Top = 4
         Width = 507
-        Height = 342
+        Height = 368
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -369,7 +373,7 @@ object frmEditorOptions: TfrmEditorOptions
       ImageIndex = 2
       DesignSize = (
         516
-        353)
+        379)
       object lblAttrForeColour: TLabel
         Left = 322
         Top = 49
@@ -378,7 +382,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = 'Attribute &Foreground Colour'
         FocusControl = cbxAttrForeColour
@@ -391,7 +394,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akTop, akRight]
         Caption = 'Attribute Background &Colour'
         FocusControl = cbxAttrBackColour
@@ -404,7 +406,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Caption = '&Attributes'
         FocusControl = lbAttributes
       end
@@ -416,7 +417,6 @@ object frmEditorOptions: TfrmEditorOptions
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
-        Margins.Bottom = 4
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 'No Highligher Available'
@@ -431,7 +431,7 @@ object frmEditorOptions: TfrmEditorOptions
         Left = 4
         Top = 69
         Width = 311
-        Height = 277
+        Height = 303
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -472,7 +472,7 @@ object frmEditorOptions: TfrmEditorOptions
         Left = 322
         Top = 162
         Width = 189
-        Height = 184
+        Height = 210
         Margins.Left = 4
         Margins.Top = 4
         Margins.Right = 4
@@ -537,22 +537,21 @@ object frmEditorOptions: TfrmEditorOptions
   end
   object btnOK: TBitBtn
     Left = 343
-    Top = 403
-    Width = 92
-    Height = 30
+    Top = 428
+    Width = 91
+    Height = 31
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
     Margins.Bottom = 4
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkOK
-    ParentDoubleBuffered = False
+    NumGlyphs = 2
     TabOrder = 1
   end
   object btnCancel: TBitBtn
     Left = 443
-    Top = 402
+    Top = 428
     Width = 92
     Height = 31
     Margins.Left = 4
@@ -560,9 +559,8 @@ object frmEditorOptions: TfrmEditorOptions
     Margins.Right = 4
     Margins.Bottom = 4
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkCancel
-    ParentDoubleBuffered = False
+    NumGlyphs = 2
     TabOrder = 2
   end
 end

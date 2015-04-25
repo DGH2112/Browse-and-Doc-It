@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Aug 2011
+  @Date    25 Apr 2015
 
 **)
 
@@ -389,6 +389,7 @@ begin
       Font.Name := ReadString(strKey, 'Font Name', Font.Name);
       Font.Size := ReadInteger(strKey, 'Font Size', Font.Size);
       Gutter.Font.Assign(Font);
+      WordWrap := ReadBool(strKey, 'Wordwrap', False);
       Gutter.ShowLineNumbers := ReadBool(strKey, 'Show Line Numbers',
         Gutter.ShowLineNumbers);
       Options := TSynEditorOptions(ReadInteger(strKey, 'Editor Options',
@@ -467,6 +468,7 @@ begin
       WriteString(strKey, 'Font Name', Font.Name);
       WriteInteger(strKey, 'Font Size', Font.Size);
       WriteBool(strKey, 'Show Line Numbers', Gutter.ShowLineNumbers);
+      WriteBool(strKey, 'Wordwrap', WordWrap);
       WriteInteger(strKey, 'Editor Options', Integer(Options));
       WriteInteger(strKey, 'Right Edge', RightEdge);
       WriteInteger(strKey, 'Right Edge Colour', RightEdgeColor);

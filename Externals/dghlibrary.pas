@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    18 May 2013
+  @Date    05 Oct 2015
 
 **)
 Unit DGHLibrary;
@@ -13,7 +13,10 @@ Unit DGHLibrary;
 Interface
 
 Uses
-  SysUtils, Classes, Windows, Graphics;
+  SysUtils,
+  Classes,
+  Windows,
+  Graphics;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -5409,7 +5412,7 @@ Begin
   dtDate := FileDateToDateTime(FileAge(ParamStr(0)));
   {$ENDIF}
   Result := Result + #13#10 +
-    Format('Written by David Hoyle (c) %s', [FormatDateTime('mmm/yyyy', dtDate)]);
+    Format('Written by David Hoyle (c) %s', [FormatDateTime('ddd dd/mmm/yyyy', dtDate)]);
 End;
 
 (**

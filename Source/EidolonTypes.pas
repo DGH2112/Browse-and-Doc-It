@@ -3,7 +3,7 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    16 Feb 2015
+  @Date    17 Oct 2015
   @Version 1.0
 
 **)
@@ -806,49 +806,47 @@ Const
     (FName: 'Quantity Gridlines'; FSymbol: 'RECTANGLE,Gray-50%,Solid,0.25,None,None,None,0')
   );
 
+  (** A constant string to represent the general settings of a profile in the TLI file. **)
+  strSettings = 'Settings';
+  (** A constant string to represent the dimensions of a profile in the TLI file. **)
+  strDimensions = 'Dimensions';
   (** A constant string to represent the holiday section of a profile in the TLI file. **)
-  strHolidays = '.Holidays';
+  strHolidays = 'Holidays';
   (** A constant string to represent the Schematic Script section of a profile in the TLI
       file. **)
-  strSchematicScript = '.SchematicScript';
+  strHolidayOptions = 'HolidayOptions';
+  (** A constant string to represent the fonts of a profile in the TLI file. **)
+  strFonts = 'Fonts';
+  (** A constant string to represent the drawing objects of a profile in the TLI file. **)
+  strDrawingObjects = 'DrawingObjects';
+  (** A constant string to represent the schematic script of a profile in the TLI file. **)
+  strSchematicScript = 'SchematicScript';
   (** A constant string to represent the Schematic Symbols section of a profile in the
       TLI file. **)
-  strSchematicSymbols = '.SchematicSymbols';
+  strSchematicSymbols = 'SchematicSymbols';
   (** A constant string to represent the Time Location Symbols section of a profile in the
       TLI file. **)
-  strTimeLocationSymbols = '.TimeLocationSymbols';
+  strTimeLocationSymbols = 'TimeLocationSymbols';
   (** A constant string to represent the Title Block Objects section of a profile in the
       TLI file. **)
-  strTitleBlockObjects = '.TitleBlockObjects';
+  strTitleBlockObjects = 'TitleBlockObjects';
   (** A constant string to represent the Horizontal Quantities section of a profile in the
       TLI file. **)
-  strHorizontalQuantities = '.HorizontalQuantities';
+  strHorizontalQuantities = 'HorizontalQuantities';
   (** A constant string to represent the Vertical Quantities section of a profile in the
       TLI file. **)
-  strVerticalQuantities = '.VerticalQuantities';
+  strVerticalQuantities = 'VerticalQuantities';
   (** A constant string to represent the Quantities Grid Intervals section of a profile in
       the TLI file. **)
-  strQuantityGridIntervals = '.QuantityGridIntervals';
+  strQuantityGridIntervals = 'QuantityGridIntervals';
   (** A constant string to represent the Quantities Time Intervals section of a profile in
       the TLI file. **)
-  strQuantityTimeIntervals = '.QuantityTimeIntervals';
+  strQuantityTimeIntervals = 'QuantityTimeIntervals';
   (** A constant string to represent the Quantities Graph Options section of a profile in
       the TLI file. **)
-  strQuantityGraphOptions = '.QuantityGraphOptions';
+  strQuantityGraphOptions = 'QuantityGraphOptions';
   (** A constant array of section ends to exclude from being shown in the Profiles
       dropdown. **)
-  strExcludedSections : Array[1..10] Of String = (
-    strHolidays,
-    strSchematicScript,
-    strSchematicSymbols,
-    strTimeLocationSymbols,
-    strTitleBlockObjects,
-    strHorizontalQuantities,
-    strVerticalQuantities,
-    strQuantityGridIntervals,
-    strQuantityTimeIntervals,
-    strQuantityGraphOptions
-  );
 
   (** A constant array to provide string representation of the TProfileData enumerates. **)
   strProfileData : Array[Low(TProfileData)..High(TProfileData)] of String = (

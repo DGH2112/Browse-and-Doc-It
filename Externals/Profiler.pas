@@ -4,7 +4,7 @@
   profiles.
 
   @Version 1.0
-  @Date    14 Apr 2013
+  @Date    19 Oct 2015
   @Author  David Hoyle
 
 **)
@@ -14,9 +14,11 @@ Interface
 
 Uses
   Classes,
-  Contnrs {$IFNDEF CONSOLE},
+  Contnrs
+  {$IFNDEF CONSOLE},
   Forms,
-  StdCtrls {$ENDIF};
+  StdCtrls
+  {$ENDIF};
 
 {$IFDEF PROFILECODE}
 Type
@@ -66,7 +68,7 @@ Type
     FCurrentProfile: TProfile;
     {$IFNDEF CONSOLE}
     FProgressForm  : TForm;
-    FLabel         : TLabel; 
+    FLabel         : TLabel;
     {$ENDIF}
   Strict Protected
     Procedure DumpProfileInformation;
@@ -90,8 +92,11 @@ Implementation
 
 Uses
   SysUtils,
-  Windows {$IFNDEF CONSOLE},
-  Controls {$ENDIF};
+  Windows
+  {$IFNDEF CONSOLE},
+  Controls,
+  ExtCtrls
+  {$ENDIF};
 
 {$IFDEF PROFILECODE}
 
@@ -102,7 +107,7 @@ Const
 Var
   (** This is the time in milliseconds of the last output message. **)
   iLastMsg : Int64;
-  
+
 (**
 
   This method returns the performance tick count from the system.
@@ -117,7 +122,7 @@ Function TickTime: Double;
 
 Var
   t, f: Int64;
-  
+
 Begin
   QueryPerformanceCounter(t);
   QueryPerformanceFrequency(f);
@@ -318,10 +323,13 @@ End;
 **)
 Constructor TProfiler.Create;
 
+Var
+  P: TPanel;
+
 Begin
   {$IFNDEF CONSOLE}
-  FProgressForm               := TForm.Create(Nil);
-  FProgressForm.BorderStyle   := bsSingle;
+  FProgressForm               := TForm.CreateNew(Application.MainForm);
+  FProgressForm.BorderStyle   := bsNone;
   FProgressForm.Caption       := 'Code Profiling...';
   FProgressForm.ClientWidth   := 400;
   FProgressForm.ClientHeight  := 50;
@@ -331,8 +339,13 @@ Begin
   FProgressForm.Margins.Left  := 5;
   FProgressForm.Margins.Right := 5;
   FProgressForm.BorderIcons   := [];
+  P                           := TPanel.Create(FProgressForm);
+  P.Parent                    := FProgressForm;
+  P.BevelInner                := bvLowered;
+  P.BevelOuter                := bvRaised;
+  P.Align                     := alClient;
   FLabel                      := TLabel.Create(FProgressForm);
-  FLabel.Parent               := FProgressForm;
+  FLabel.Parent               := P;
   FLabel.Align                := alClient;
   FLabel.Layout               := tlCenter;
   FLabel.Caption              := 'Loading...';

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    05 Oct 2015
+  @Date    19 Oct 2015
 
 **)
 Unit DGHLibrary;
@@ -16,6 +16,9 @@ Uses
   SysUtils,
   Classes,
   Windows,
+  {$IFNDEF CONSOLE}
+  Forms,
+  {$ENDIF}
   Graphics;
 
 {$INCLUDE CompilerDefinitions.inc}
@@ -717,6 +720,9 @@ Type
   Function DGHPathRelativePathTo(strBasePath : String; var strFileName : String) : Boolean;
   Function IsDebuggerPresent : Boolean;
   Function ExtractEXEFromExt(strExt : String) : String;
+  {$IFNDEF CONSOLE}
+  Procedure CheckFormIsOnDesktop(AForm : TForm);
+  {$ENDIF}
 
 { -------------------------------------------------------------------------
 
@@ -6688,6 +6694,43 @@ Begin
     strExpanded := Copy(strExpanded, 2, Length(strExpanded) - 2);
   Result := strExpanded;
 End;
+
+{$IFNDEF CONSOLE}
+(**
+
+  This method makes sure the given form is visible on the Desktop WorkArea.
+
+  @precon  AForm must be a valid instance.
+  @postcon If the form is not fully visible on the desktop it is moved onto the desktop.
+
+  @param   AForm as a TForm
+
+**)
+Procedure CheckFormIsOnDesktop(AForm : TForm);
+
+Var
+  R : TRect;
+
+Begin
+  R := Screen.WorkAreaRect;
+  // Check Left and then Width
+  If AForm.Left < R.Left Then
+    AForm.Left := R.Left;
+  If AForm.Width > R.Width Then
+    AForm.Width := R.Width;
+  // Check Top and then Height
+  If AForm.Top < R.Top Then
+    AForm.Top := R.Top;
+  If AForm.Height > R.Height Then
+    AForm.Height := R.Height;
+  // Check Right
+  If AForm.Left + AForm.Width > R.Left + R.Width Then
+    AForm.Left := R.Left + R.Width - AForm.Width;
+  // Check Top
+  If AForm.Top + AForm.Height > R.Top + R.Height Then
+    AForm.Top := R.Top + R.Height - AForm.Height;
+End;
+{$ENDIF}
 
 (** Initialises the console more to Unknown to force a call to the Win32 API **)
 Initialization

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    23 Apr 2013
+  @Date    26 Mar 2016
   
 **)
 Unit BADIInitialiseOTAInterfaces;
@@ -46,59 +46,12 @@ Type
 Const
   (** A constant to represent the initial (failed) position of a wizard reference. **)
   iWizardFailState = -1;
-  
+
 {$IFDEF D2005}
 Resourcestring
   (** This is a text string of revision from nil and a to z. **)
   strRevision = ' abcdefghijklmnopqrstuvwxyz';
-  {$IFDEF VER170}
-  (** This is a message string to appear in the BDS 2005 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2005';
-  {$ENDIF}
-  {$IFDEF VER180}
-  (** This is a message string to appear in the BDS 2006 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Borland Developer Studio 2006';
-  {$ENDIF}
-  {$IFDEF VER190}
-  (** This is a message string to appear in the CDS 2007 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2007';
-  {$ENDIF}
-  {$IFDEF VER200}
-  (** This is a message string to appear in the CRS 2009 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for CodeGear RAD Studio 2009';
-  {$ENDIF}
-  {$IFDEF VER210}
-  (** This is a message string to appear in the ERS 2010 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio 2010';
-  {$ENDIF}
-  {$IFDEF VER220}
-  (** This is a message string to appear in the ERS XE splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE';
-  {$ENDIF}
-  {$IFDEF VER230}
-  (** This is a message string to appear in the ERS XE2 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE2';
-  {$ENDIF}
-  {$IFDEF VER240}
-  (** This is a message string to appear in the ERS XE3 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE3';
-  {$ENDIF}
-  {$IFDEF VER250}
-  (** This is a message string to appear in the ERS XE4 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE4';
-  {$ENDIF}
-  {$IFDEF VER260}
-  (** This is a message string to appear in the ERS XE5 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE5';
-  {$ENDIF}
-  {$IFDEF VER270}
-  (** This is a message string to appear in the ERS XE6 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE6';
-  {$ENDIF}
-  {$IFDEF VER280}
-  (** This is a message string to appear in the ERS XE7 splash screen **)
-  strSplashScreenName = 'Browse and Doc It %d.%d%s for Embarcadero RAD Studio XE7';
-  {$ENDIF}
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for %s';
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
   strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
 
@@ -182,7 +135,7 @@ Begin
   {$IFDEF D2010}
   bmSplashScreen := LoadBitmap(hInstance, 'BrowseAndDocItSplashScreenBitMap');
   iAboutPlugin := (BorlandIDEServices As IOTAAboutBoxServices).AddPluginInfo(
-    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1)]),
+    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1), Application.Title]),
     'An IDE expert to browse and document your source code.',
     bmSplashScreen,
     False,
@@ -291,7 +244,7 @@ Initialization
   bmSplashScreen := LoadBitmap(hInstance, 'BrowseAndDocItSplashScreenBitMap');
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
   (SplashScreenServices As IOTASplashScreenServices).AddPluginBitmap(
-    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1)]),
+    Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1), Application.Title]),
     bmSplashScreen,
     False,
     Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]), ''

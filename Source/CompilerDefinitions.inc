@@ -5,7 +5,7 @@
   available.
 
   @Version 1.0
-  @Date    25 Mar 2016
+  @Date    30 Apr 2016
   @Author  David Hoyle
 
 **)
@@ -226,7 +226,7 @@
   {$DEFINE DXE30}
 {$ENDIF}
 
-// Embarcadero Delphi XE4 (RAD Studio 1?.0), Version 18, Package version 180
+// Embarcadero Delphi XE4 (RAD Studio 11.0), Version 18, Package version 180
 {$IFDEF VER250}
   {$DEFINE D0002}
   {$DEFINE D0003}
@@ -246,7 +246,7 @@
   {$DEFINE DXE40}
 {$ENDIF}
 
-// Embarcadero Delphi XE5 (RAD Studio 1?.0), Version 19, Package version 190
+// Embarcadero Delphi XE5 (RAD Studio 12.0), Version 19, Package version 190
 {$IFDEF VER260}
   {$DEFINE D0002}
   {$DEFINE D0003}
@@ -267,7 +267,7 @@
   {$DEFINE DXE50}
 {$ENDIF}
 
-// Embarcadero Delphi XE6 (RAD Studio 1?.0), Version 20, Package version 200
+// Embarcadero Delphi XE6 (RAD Studio 14.0), Version 20, Package version 200
 {$IFDEF VER270}
   {$DEFINE D0002}
   {$DEFINE D0003}
@@ -312,7 +312,7 @@
   {$DEFINE DXE70}
 {$ENDIF}
 
-// Embarcadero Delphi XE8 (Studio 1?.0), Version 22, Package version 220
+// Embarcadero Delphi XE8 (Studio 16.0), Version 22, Package version 220
 {$IFDEF VER290}
   {$DEFINE D0002}
   {$DEFINE D0003}
@@ -336,7 +336,7 @@
   {$DEFINE DXE80}
 {$ENDIF}
 
-// Embarcadero Delphi XE10 Seattle (Studio 1?.0), Version 23, Package version 230
+// Embarcadero Delphi XE10 Seattle (Studio 17.0), Version 23, Package version 230
 {$IFDEF VER300}
   {$DEFINE D0002}
   {$DEFINE D0003}
@@ -359,6 +359,32 @@
   {$DEFINE DXE70}
   {$DEFINE DXE80}
   {$DEFINE DXE100}
+{$ENDIF}
+
+// Embarcadero Delphi XE10.1 Berlin (Studio 18.0), Version 24, Package version 240
+{$IFDEF VER310}
+  {$DEFINE D0002}
+  {$DEFINE D0003}
+  {$DEFINE D0004}
+  {$DEFINE D0005}
+  {$DEFINE D0006}
+  {$DEFINE D0007}
+  {$DEFINE D0008}
+  {$DEFINE D2005}
+  {$DEFINE D2006}
+  {$DEFINE D2007}
+  {$DEFINE D2009}
+  {$DEFINE D2010}
+  {$DEFINE DXE00}
+  {$DEFINE DXE20}
+  {$DEFINE DXE30}
+  {$DEFINE DXE40}
+  {$DEFINE DXE50}
+  {$DEFINE DXE60}
+  {$DEFINE DXE70}
+  {$DEFINE DXE80}
+  {$DEFINE DXE100}
+  {$DEFINE DXE101}
 {$ENDIF}
 
 

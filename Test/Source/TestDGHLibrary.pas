@@ -461,9 +461,9 @@ Begin
   strDrive            := ExtractFileDrive(ParamStr(0));
   Process.boolEnabled := True;
   Process.strEXE      := strDrive +
-    '\HoylD\Borland Studio Projects\Library\Test\SuccessConsoleApp.exe';
+    '\HoylD\RAD Studio\Library\Test\SuccessConsoleApp.exe';
   Process.strParams := '';
-  Process.strDir    := strDrive + '\HoylD\Borland Studio Projects\Library\Test\';
+  Process.strDir    := strDrive + '\HoylD\RAD Studio\Library\Test\';
   slLines           := TStringList.Create;
   Try
     ProcMsgHndr := TDGHCreateProcessHandler.Create(slLines);
@@ -476,7 +476,7 @@ Begin
       CheckEquals('returns an ERRORLEVEL = 0.', ProcMsgHndr.Output[1]);
       slLines.Clear;
       Process.strEXE := strDrive +
-        '\HoylD\Borland Studio Projects\Library\Test\FailureConsoleApp.exe';
+        '\HoylD\RAD Studio\Library\Test\FailureConsoleApp.exe';
       iResult := DGHCreateProcess(Process, ProcMsgHndr.ProcessMsgHandler,
         ProcMsgHndr.IdleHandler);
       CheckEquals(1, iResult, 'SuccessConsoleApp ERRORLEVEL');

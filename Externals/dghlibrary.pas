@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Oct 2015
+  @Date    10 Jun 2016
 
 **)
 Unit DGHLibrary;
@@ -6547,6 +6547,8 @@ Var
   recSearch: TSearchRec;
   iResult: Integer;
   iLength: Integer;
+  strPath, strExPath : String;
+  iSize: Integer;
 
 Begin
   Result := False;
@@ -6568,11 +6570,15 @@ Begin
     strEXEName := ExtractFileName(strEXEName);
     For iPath := 0 To slPaths.Count - 1 Do
       Begin
-        iResult := FindFirst(slPaths[iPath] + strEXEName, faAnyFile, recSearch);
+        strPath := slPaths[iPath];
+        SetLength(strExPath, MAX_PATH);
+        iSize := ExpandEnvironmentStrings(PChar(strPath), PChar(strExPath), MAX_PATH);
+        SetLength(strExPath, Pred(iSize));
+        iResult := FindFirst(strExPath + strEXEName, faAnyFile, recSearch);
         Try
           If iResult = 0 Then
             Begin
-              strEXEName := slPaths[iPath] + strEXEName;
+              strEXEName := strExPath + strEXEName;
               Result := True;
               Break;
             End;

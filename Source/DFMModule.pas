@@ -3,7 +3,7 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       25 Apr 2013
+  @Date       30 Jun 2016
   @Author     David Hoyle
 
 **)
@@ -665,9 +665,12 @@ Begin
       If iTokenLen > 0 Then
         Begin
           SetLength(strToken, iTokenLen);
+          If CurCharType = ttIdentifier Then
+            If IsKeyWord(strToken, strReservedWords) Then
+              CurCharType := ttReservedWord;
           If Not (IsInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
             AddToken(TTokenInfo.Create(strToken, iStreamPos,
-              iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+              iTokenLine, iTokenColumn, Length(strToken), CurCharType));
         End;
     AddToken(TTokenInfo.Create('<FileEnd>', iTokenLine, iTokenColumn,
       Length(FSource), 0, ttFileEnd));

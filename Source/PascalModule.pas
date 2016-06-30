@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       23 Apr 2013
+  @Date       30 Jun 2016
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -2224,9 +2224,16 @@ Begin
       If iTokenLen > 0 Then
         Begin
           SetLength(strToken, iTokenLen);
+          If CurCharType = ttIdentifier Then
+            Begin
+              If IsKeyWord(strToken, strReservedWords) Then
+                CurCharType := ttReservedWord;
+              If IsKeyWord(strToken, strDirectives) Then
+                CurCharType := ttDirective;
+            End;
           If Not (IsInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
             AddToken(TTokenInfo.Create(strToken, iStreamPos,
-              iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+              iTokenLine, iTokenColumn, Length(strToken), CurCharType));
         End;
   Except
     On E : Exception Do

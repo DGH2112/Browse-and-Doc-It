@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       25 Apr 2013
+  @Date       30 Jun 2016
   @Author     David Hoyle
 
 **)
@@ -904,9 +904,9 @@ Implementation
             If Not (IsInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
               Begin
                 If IsKeyWord(strToken, strReservedWords) Then
-                  LastCharType := ttReservedWord;
+                  CurCharType := ttReservedWord;
                 AddToken(TTokenInfo.Create(strToken, iStreamPos,
-                  iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+                  iTokenLine, iTokenColumn, Length(strToken), CurCharType));
               End;
           End;
       AddToken(TTokenInfo.Create('<end-of-file>', iStreamPos, iTokenLine, iTokenColumn, 0,

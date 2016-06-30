@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       25 Apr 2013
+  @Date       30 Jun 2016
   @Author     David Hoyle
 
 **)
@@ -2429,8 +2429,11 @@ Begin
         Begin
           SetLength(strToken, iTokenLen);
           ProcessWhiteSpace(strToken);
+          If CurCharType = ttIdentifier Then
+            If IsKeyWord(strToken, strReservedWords) Then
+              CurCharType := ttReservedWord;
           AddToken(TTokenInfo.Create(strToken, iStreamPos,
-            iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+            iTokenLine, iTokenColumn, Length(strToken), CurCharType));
         End;
     AddToken(TTokenInfo.Create('<end-of-file>', iStreamPos, iTokenLine, iTokenColumn, 0,
       ttFileEnd));

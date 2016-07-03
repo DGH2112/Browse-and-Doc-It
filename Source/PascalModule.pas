@@ -3841,7 +3841,7 @@ Begin
       If Token.Token = ']' Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strLiteralExpected, 'RTTIAttributes', Token.Token,
+        ErrorAndSeekToken(strLiteralExpected, 'RTTIAttributes', ']',
           strSeekableOnErrorTokens, stActual);
     End;
 End;
@@ -4418,6 +4418,7 @@ begin
   Repeat
     Result := VariantSection(Rec, InternalScope);
     If Not Result Then
+      RTTIAttributes;
       Result := FieldDecl(Rec, InternalScope);
   Until Not IsToken(';', Nil);
 end;
@@ -6661,12 +6662,13 @@ Begin
             NextNonCommentToken;
             If Token.Token = ')' Then
               Break;
+            iExprType := [etUnknown];
             ConstExpr(Nil, iExprType);
           Until Token.Token <> ',';
           If Token.Token = ')' Then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLiteralExpected, 'AttributeDeclaration', Token.Token,
+            ErrorAndSeekToken(strLiteralExpected, 'AttributeDeclaration', ')',
               strSeekableOnErrorTokens, stActual);
         End;
     End Else
@@ -8583,7 +8585,7 @@ begin
           If Token.Token = '[' Then
             Begin
               NextNonCommentToken;
-              If Token.TokenType In [ttSingleLiteral, ttIdentifier] Then
+              If Token.TokenType In [ttSingleLiteral] Then
                 Begin
                   Result.GUID := Token.Token;
                   NextNonCommentToken;
@@ -8593,8 +8595,7 @@ begin
                     ErrorAndSeekToken(strLiteralExpected, 'InterfaceType', ']',
                       strSeekableOnErrorTokens, stActual);
                 End Else
-                  ErrorAndSeekToken(strStringExpected, 'InterfaceType', '',
-                    strSeekableOnErrorTokens, stActual);
+                  RollBackToken;
             End;
           Repeat
             ClassVisibility(InternalScope);

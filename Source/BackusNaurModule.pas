@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       30 Jun 2016
+  @Date       03 Jul 2016
   @Author     David Hoyle
 
 **)
@@ -498,153 +498,148 @@ Begin
   iTokenLen := 0;
   SetLength(strToken, iTokenCapacity);
 
-  Try
-    For iChar := 1 To Length(FSource) Do
-      Begin
-        ch := FSource[iChar];
-        Inc(iStreamCount);
-        LastCharType := CurCharType;
+  For iChar := 1 To Length(FSource) Do
+    Begin
+      ch := FSource[iChar];
+      Inc(iStreamCount);
+      LastCharType := CurCharType;
 
-        If IsInSet(ch, strWhiteSpace) Then
-          CurCharType := ttWhiteSpace
-        Else If IsInSet(ch, strLineEnd) Then
-          CurCharType := ttLineEnd
-        Else If IsInSet(ch, strSingleQuotes) Then
-          CurCharType := ttSingleLiteral
-        Else If IsInSet(ch, strDoubleQuotes) Then
-          CurCharType := ttDoubleLiteral
-        Else If IsInSet(ch, strSymbols) Then
-          CurCharType := ttSymbol
-        Else If IsInSet(ch, strIdentifiers) Then
-          Begin
-            If (LastCharType = ttNumber) And (IsInSet(Ch, ['A'..'F', 'a'..'f'])) Then
-              CurCharType := ttNumber
-            Else
-              CurCharType := ttIdentifier;
-          End
-        Else If IsInSet(ch, strNumbers) Then
-          CurCharType := ttNumber
-        Else
-          CurCharType := ttUnknown;
-
-        If (BlockType = btNoBlock) Then
-          Begin
-            // Check for full block comments
-            If (LastChar = '/') And (Ch = '*') Then
-              BlockType := btFullComment;
-            // Check for line comments
-            If (LastChar = '/') And (Ch = '/') Then
-              BlockType := btLineComment;
-            If (LastChar = '<') Then
-              BlockType := btRule;
-            If (LastChar = '?') And (LastCharType <> ttCustomUserToken) Then
-              BlockType := btTextRule;
-          End;
-
-        If (LastCharType <> CurCharType) Or (IsInSet(Ch, strSingleSymbols)) Or
-          (IsInSet(LastChar, strSingleSymbols)) Or
-          ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
-          Begin
-            If Not (((BlockType In [btLineComment, btSingleLiteral, btDoubleLiteral,
-              btRule, btTextRule]) And (CurCharType <> ttLineEnd)) Or
-              (BlockType In [btFullComment, btCompoundSymbol])) Or
-              ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
-              Begin
-                SetLength(strToken, iTokenLen);
-                If iTokenLen > 0 Then
-                  If Not (IsInSet(strToken[1], strWhiteSpace)) Then
-                    Begin
-                      If BlockType = btLineComment Then
-                        LastCharType := ttLineComment;
-                      If IsInSet(strToken[1], strLineEnd) Then
-                        strToken := StringReplace(strToken, #13#10, '<line-end>',
-                          [rfReplaceAll]);
-                      AddToken(TTokenInfo.Create(strToken, iStreamPos,
-                        iTokenLine, iTokenColumn, Length(strToken), LastCharType));
-                    End;
-               // Store Stream position, line number and column of
-               // token start
-               iStreamPos := iStreamCount;
-               iTokenLine := iLine;
-               iTokenColumn := iColumn;
-               BlockType := btNoBlock;
-               iTokenLen := 1;
-               SetLength(strToken, iTokenCapacity);
-               strToken[iTokenLen] := Ch;
-              End Else
-              Begin
-                Inc(iTokenLen);
-                If iTokenLen > Length(strToken) Then
-                  SetLength(strToken, iTokenCapacity + Length(strToken));
-                strToken[iTokenLen] := Ch;
-              End;
-          End Else
-          Begin
-            Inc(iTokenLen);
-            If iTokenLen > Length(strToken) Then
-              SetLength(strToken, iTokenCapacity + Length(strToken));
-            strToken[iTokenLen] := Ch;
-          End;
-
-        // Check for the end of a block comment
-        If (BlockType = btFullComment) And (LastChar = '*') And (Ch = '/') Then
-          Begin
-            BlockType := btNoBlock;
-            CurCharType := ttBlockComment;
-          End;
-
-        If (BlockType = btRule) And (Ch = '>') Then
-          Begin
-            BlockType := btNoBlock;
-            CurCharType := ttIdentifier;
-          End;
-        // Check for single string literals
-        If CurCharType = ttSingleLiteral Then
-          If BlockType = btSingleLiteral Then
-            BlockType := btNoBlock
-          Else If BlockType = btNoBlock Then
-            BlockType := btSingleLiteral;
-        // Check for Double string literals
-        If CurCharType = ttDoubleLiteral Then
-          If BlockType = btDoubleLiteral Then
-            BlockType := btNoBlock
-          Else If BlockType = btNoBlock Then
-            BlockType := btDoubleLiteral;
-        If (BlockType = btTextRule) And (Ch = '?') Then
-          Begin
-            BlockType := btNoBlock;
-            CurCharType := ttCustomUserToken;
-          End;
-        If BlockType = btCompoundSymbol Then
-          BlockType := btNoBlock;
-
-        Inc(iColumn);
-        If Ch = #10 Then
-          Begin
-            Inc(iLine);
-            iColumn := 1;
-            If BlockType In [btLineComment, btSingleLiteral, btDoubleLiteral] Then
-              BlockType := btNoBlock;
-          End;
-        LastChar := Ch;
-      End;
-      If iTokenLen > 0 Then
+      If IsInSet(ch, strWhiteSpace) Then
+        CurCharType := ttWhiteSpace
+      Else If IsInSet(ch, strLineEnd) Then
+        CurCharType := ttLineEnd
+      Else If IsInSet(ch, strSingleQuotes) Then
+        CurCharType := ttSingleLiteral
+      Else If IsInSet(ch, strDoubleQuotes) Then
+        CurCharType := ttDoubleLiteral
+      Else If IsInSet(ch, strSymbols) Then
+        CurCharType := ttSymbol
+      Else If IsInSet(ch, strIdentifiers) Then
         Begin
-          SetLength(strToken, iTokenLen);
-          If Not (IsInSet(strToken[1], strWhiteSpace)) Then
-            Begin
-              If IsInSet(strToken[1], strLineEnd) Then
-                strToken := StringReplace(strToken, #13#10, '<line-end>', [rfReplaceAll]);
-              AddToken(TTokenInfo.Create(strToken, iStreamPos,
-                iTokenLine, iTokenColumn, Length(strToken), CurCharType));
-            End;
+          If (LastCharType = ttNumber) And (IsInSet(Ch, ['A'..'F', 'a'..'f'])) Then
+            CurCharType := ttNumber
+          Else
+            CurCharType := ttIdentifier;
+        End
+      Else If IsInSet(ch, strNumbers) Then
+        CurCharType := ttNumber
+      Else
+        CurCharType := ttUnknown;
+
+      If (BlockType = btNoBlock) Then
+        Begin
+          // Check for full block comments
+          If (LastChar = '/') And (Ch = '*') Then
+            BlockType := btFullComment;
+          // Check for line comments
+          If (LastChar = '/') And (Ch = '/') Then
+            BlockType := btLineComment;
+          If (LastChar = '<') Then
+            BlockType := btRule;
+          If (LastChar = '?') And (LastCharType <> ttCustomUserToken) Then
+            BlockType := btTextRule;
         End;
-    AddToken(TTokenInfo.Create('<end-of-file>', iStreamPos, iTokenLine, iTokenColumn, 0,
-      ttFileEnd));
-  Except
-    On E : Exception Do
-      AddIssue(E.Message, scGlobal, 'TokenizeStream', 0, 0, etError);
-  End
+
+      If (LastCharType <> CurCharType) Or (IsInSet(Ch, strSingleSymbols)) Or
+        (IsInSet(LastChar, strSingleSymbols)) Or
+        ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
+        Begin
+          If Not (((BlockType In [btLineComment, btSingleLiteral, btDoubleLiteral,
+            btRule, btTextRule]) And (CurCharType <> ttLineEnd)) Or
+            (BlockType In [btFullComment, btCompoundSymbol])) Or
+            ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Then
+            Begin
+              SetLength(strToken, iTokenLen);
+              If iTokenLen > 0 Then
+                If Not (IsInSet(strToken[1], strWhiteSpace)) Then
+                  Begin
+                    If BlockType = btLineComment Then
+                      LastCharType := ttLineComment;
+                    If IsInSet(strToken[1], strLineEnd) Then
+                      strToken := StringReplace(strToken, #13#10, '<line-end>',
+                        [rfReplaceAll]);
+                    AddToken(TTokenInfo.Create(strToken, iStreamPos,
+                      iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+                  End;
+             // Store Stream position, line number and column of
+             // token start
+             iStreamPos := iStreamCount;
+             iTokenLine := iLine;
+             iTokenColumn := iColumn;
+             BlockType := btNoBlock;
+             iTokenLen := 1;
+             SetLength(strToken, iTokenCapacity);
+             strToken[iTokenLen] := Ch;
+            End Else
+            Begin
+              Inc(iTokenLen);
+              If iTokenLen > Length(strToken) Then
+                SetLength(strToken, iTokenCapacity + Length(strToken));
+              strToken[iTokenLen] := Ch;
+            End;
+        End Else
+        Begin
+          Inc(iTokenLen);
+          If iTokenLen > Length(strToken) Then
+            SetLength(strToken, iTokenCapacity + Length(strToken));
+          strToken[iTokenLen] := Ch;
+        End;
+
+      // Check for the end of a block comment
+      If (BlockType = btFullComment) And (LastChar = '*') And (Ch = '/') Then
+        Begin
+          BlockType := btNoBlock;
+          CurCharType := ttBlockComment;
+        End;
+
+      If (BlockType = btRule) And (Ch = '>') Then
+        Begin
+          BlockType := btNoBlock;
+          CurCharType := ttIdentifier;
+        End;
+      // Check for single string literals
+      If CurCharType = ttSingleLiteral Then
+        If BlockType = btSingleLiteral Then
+          BlockType := btNoBlock
+        Else If BlockType = btNoBlock Then
+          BlockType := btSingleLiteral;
+      // Check for Double string literals
+      If CurCharType = ttDoubleLiteral Then
+        If BlockType = btDoubleLiteral Then
+          BlockType := btNoBlock
+        Else If BlockType = btNoBlock Then
+          BlockType := btDoubleLiteral;
+      If (BlockType = btTextRule) And (Ch = '?') Then
+        Begin
+          BlockType := btNoBlock;
+          CurCharType := ttCustomUserToken;
+        End;
+      If BlockType = btCompoundSymbol Then
+        BlockType := btNoBlock;
+
+      Inc(iColumn);
+      If Ch = #10 Then
+        Begin
+          Inc(iLine);
+          iColumn := 1;
+          If BlockType In [btLineComment, btSingleLiteral, btDoubleLiteral] Then
+            BlockType := btNoBlock;
+        End;
+      LastChar := Ch;
+    End;
+    If iTokenLen > 0 Then
+      Begin
+        SetLength(strToken, iTokenLen);
+        If Not (IsInSet(strToken[1], strWhiteSpace)) Then
+          Begin
+            If IsInSet(strToken[1], strLineEnd) Then
+              strToken := StringReplace(strToken, #13#10, '<line-end>', [rfReplaceAll]);
+            AddToken(TTokenInfo.Create(strToken, iStreamPos,
+              iTokenLine, iTokenColumn, Length(strToken), CurCharType));
+          End;
+      End;
+  AddToken(TTokenInfo.Create('<end-of-file>', iStreamPos, iTokenLine, iTokenColumn, 0,
+    ttFileEnd));
 End;
 
 (**

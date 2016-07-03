@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    10 Jun 2016
+  @Date    03 Jul 2016
 
 **)
 Unit DGHLibrary;
@@ -6100,6 +6100,9 @@ Function ParseMacro(Const strMacro : String; var strCommand,
   strFileName : String; strCommands : Array Of String;
   ExceptionProc : TExceptionProcedure) : Boolean;
 
+Type
+  ParseMacroException = Exception;
+
 ResourceString
   strExceptionMsg =
     'Error (%s),'#13#10 +
@@ -6146,14 +6149,14 @@ Begin
       TokeniseMacro(slTokens, strMacro);
       iToken := 0;
       If slTokens[iToken] <> '[' Then
-        Raise Exception.CreateFmt(strExpectedOpeningBracket, [slTokens[iToken]]);
+        Raise ParseMacroException.CreateFmt(strExpectedOpeningBracket, [slTokens[iToken]]);
       IncTokenPos;
       If Not IsKeyWord(slTokens[iToken], strCommands) Then
-        Raise Exception.CreateFmt(strNotValidCommand, [slTokens[iToken]]);
+        Raise ParseMacroException.CreateFmt(strNotValidCommand, [slTokens[iToken]]);
       strCommand := slTokens[iToken];
       IncTokenPos;
       If slTokens[iToken] <> '(' Then
-        Raise Exception.CreateFmt(strExpectedOpeningParenthesis, [slTokens[iToken]]);
+        Raise ParseMacroException.CreateFmt(strExpectedOpeningParenthesis, [slTokens[iToken]]);
       IncTokenPos;
       strFileName := slTokens[iToken];
       {$IFNDEF D2009}
@@ -6170,15 +6173,15 @@ Begin
         strFileName := Copy(strFileName, 1, Length(strFileName) - 1);
       IncTokenPos;
       If slTokens[iToken] <> ')' Then
-        Raise Exception.CreateFmt(strExpectedClosingParenthesis, [slTokens[iToken]]);
+        Raise ParseMacroException.CreateFmt(strExpectedClosingParenthesis, [slTokens[iToken]]);
       IncTokenPos;
       If slTokens[iToken] <> ']' Then
-        Raise Exception.CreateFmt(strExpectedClosingBracket, [slTokens[iToken]]);
+        Raise ParseMacroException.CreateFmt(strExpectedClosingBracket, [slTokens[iToken]]);
       If iToken > slTokens.Count - 1 Then
-        Raise Exception.CreateFmt(strExpectedEndOfMacro, [slTokens[iToken]]);
+        Raise ParseMacroException.CreateFmt(strExpectedEndOfMacro, [slTokens[iToken]]);
       Result := True;
     Except
-      On E : Exception Do
+      On E : ParseMacroException Do
         If Assigned(ExceptionProc) Then
           ExceptionProc(Format(strExceptionMsg, [E.Message, strMacro]));
     End;

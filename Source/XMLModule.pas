@@ -5,7 +5,7 @@
   implemented.
 
   @Version    1.0
-  @Date       30 Jun 2016
+  @Date       03 Jul 2016
   @Author     David Hoyle
 
 **)
@@ -1902,135 +1902,130 @@ Begin
   iTokenLen := 0;
   SetLength(strToken, iTokenCapacity);
 
-  Try
-    For iChar := 1 To Length(FSource) Do
-      Begin
-        Ch := FSource[iChar];
-        Inc(iStreamCount);
-        LastCharType := CurCharType;
+  For iChar := 1 To Length(FSource) Do
+    Begin
+      Ch := FSource[iChar];
+      Inc(iStreamCount);
+      LastCharType := CurCharType;
 
-        If IsInSet(ch, strWhiteSpace) Then
-          CurCharType := ttWhiteSpace
-        Else If isInSet(Ch, strLineEnd) Then
-          CurCharType := ttLineEnd
-        Else If IsInSet(ch, strSingleQuotes) Then
-          CurCharType := ttSingleLiteral
-        Else If IsInSet(ch, strDoubleQuotes) Then
-          CurCharType := ttDoubleLiteral
-        Else If IsInSet(ch, strSymbols) Then
-          CurCharType := ttSymbol
-        Else If IsInSet(ch, strIdentifiers) Then
-          Begin
-            If (LastCharType = ttNumber) And (IsInSet(Ch, ['A'..'F', 'a'..'f'])) Then
-              CurCharType := ttNumber
-            Else
-              CurCharType := ttIdentifier;
-          End
-        Else If IsInSet(ch, strNumbers) Then
-          Begin
-            CurCharType := ttNumber;
-            If LastCharType = ttIdentifier Then
-              CurCharType := ttIdentifier;
-          End
-        Else
-          CurCharType := ttUnknown;
-
-        If (LastCharType <> CurCharType) Or
-          IsInSet(Ch, strSingleSymbols) Or
-          IsInSet(LastChar, strSingleSymbols) Or
-          (Not (BlockType In [btSingleLiteral, btDoubleLiteral]) And
-          (
-            (Not (IsInSet(Ch, ['>', '-'])) And (LastChar = '-')) Or
-            ((Ch = '<') Or (LastChar = '>')) Or
-            ((Ch = '>') And (LastChar = ']')) Or
-            ((Ch = '>') And (LastChar = ')')) Or
-            ((Ch = '>') And (LastChar = '?')) Or
-            ((Ch = '>') And (LastChar = '<')) Or
-            ((Ch = ']') And (LastChar = '[')) Or
-            ((Ch = ']') And (LastChar <> ']'))
-          )) Or
-          ((BlockType In [btNoBlock]) And
-          (CurCharType = ttLineEnd) And (Ch = #13)) Then
-          Begin
-            If Not (BlockType In [btSingleLiteral, btDoubleLiteral]) Or
-              ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Or
-              (Not (BlockType In [btSingleLiteral, btDoubleLiteral]) And
-              (
-                (Not (IsInSet(Ch, ['>', '-'])) And (LastChar = '-')) Or
-                ((Ch = '<') OR (LastChar = '>')) Or
-                ((Ch = '>') And (LastChar = ']')) Or
-                ((Ch = '>') And (LastChar = ')')) Or
-                ((Ch = '>') And (LastChar = '?')) Or
-                ((Ch = '>') And (LastChar = '<')) Or
-                ((Ch = ']') And (LastChar = '[')) Or
-                ((Ch = ']') And (LastChar <> ']'))
-              )) Then
-              Begin
-                SetLength(strToken, iTokenLen);
-                If iTokenLen > 0 Then
-                  Begin
-                    ProcessWhiteSpace(strToken);
-                    AddToken(TTokenInfo.Create(strToken, iStreamPos,
-                      iTokenLine, iTokenColumn, Length(strToken), LastCharType));
-                  End;
-               // Store Stream position, line number and column of
-               // token start
-               iStreamPos := iStreamCount;
-               iTokenLine := iLine;
-               iTokenColumn := iColumn;
-               BlockType := btNoBlock;
-               iTokenLen := 1;
-               SetLength(strToken, iTokenCapacity);
-               strToken[iTokenLen] := Ch;
-              End Else
-              Begin
-                Inc(iTokenLen);
-                If iTokenLen > Length(strToken) Then
-                  SetLength(strToken, iTokenCapacity + Length(strToken));
-                strToken[iTokenLen] := Ch;
-              End;
-          End Else
-          Begin
-            Inc(iTokenLen);
-            If iTokenLen > Length(strToken) Then
-              SetLength(strToken, iTokenCapacity + Length(strToken));
-            strToken[iTokenLen] := Ch;
-          End;
-
-        // Check for single string literals
-        If CurCharType = ttSingleLiteral Then
-          If BlockType = btSingleLiteral Then
-            BlockType := btNoBlock
-          Else If BlockType = btNoBlock Then
-            BlockType := btSingleLiteral;
-        // Check for Double string literals
-        If CurCharType = ttDoubleLiteral Then
-          If BlockType = btDoubleLiteral Then
-            BlockType := btNoBlock
-          Else If BlockType = btNoBlock Then
-            BlockType := btDoubleLiteral;
-
-        Inc(iColumn);
-        If Ch = #10 Then
-          Begin
-            Inc(iLine);
-            iColumn := 1;
-          End;
-        LastChar := Ch;
-      End;
-      If iTokenLen > 0 Then
+      If IsInSet(ch, strWhiteSpace) Then
+        CurCharType := ttWhiteSpace
+      Else If isInSet(Ch, strLineEnd) Then
+        CurCharType := ttLineEnd
+      Else If IsInSet(ch, strSingleQuotes) Then
+        CurCharType := ttSingleLiteral
+      Else If IsInSet(ch, strDoubleQuotes) Then
+        CurCharType := ttDoubleLiteral
+      Else If IsInSet(ch, strSymbols) Then
+        CurCharType := ttSymbol
+      Else If IsInSet(ch, strIdentifiers) Then
         Begin
-          SetLength(strToken, iTokenLen);
-          ProcessWhiteSpace(strToken);
-          AddToken(TTokenInfo.Create(strToken, iStreamPos,
-            iTokenLine, iTokenColumn, Length(strToken), CurCharType));
+          If (LastCharType = ttNumber) And (IsInSet(Ch, ['A'..'F', 'a'..'f'])) Then
+            CurCharType := ttNumber
+          Else
+            CurCharType := ttIdentifier;
+        End
+      Else If IsInSet(ch, strNumbers) Then
+        Begin
+          CurCharType := ttNumber;
+          If LastCharType = ttIdentifier Then
+            CurCharType := ttIdentifier;
+        End
+      Else
+        CurCharType := ttUnknown;
+
+      If (LastCharType <> CurCharType) Or
+        IsInSet(Ch, strSingleSymbols) Or
+        IsInSet(LastChar, strSingleSymbols) Or
+        (Not (BlockType In [btSingleLiteral, btDoubleLiteral]) And
+        (
+          (Not (IsInSet(Ch, ['>', '-'])) And (LastChar = '-')) Or
+          ((Ch = '<') Or (LastChar = '>')) Or
+          ((Ch = '>') And (LastChar = ']')) Or
+          ((Ch = '>') And (LastChar = ')')) Or
+          ((Ch = '>') And (LastChar = '?')) Or
+          ((Ch = '>') And (LastChar = '<')) Or
+          ((Ch = ']') And (LastChar = '[')) Or
+          ((Ch = ']') And (LastChar <> ']'))
+        )) Or
+        ((BlockType In [btNoBlock]) And
+        (CurCharType = ttLineEnd) And (Ch = #13)) Then
+        Begin
+          If Not (BlockType In [btSingleLiteral, btDoubleLiteral]) Or
+            ((BlockType In [btNoBlock]) And (CurCharType = ttLineEnd) And (Ch = #13)) Or
+            (Not (BlockType In [btSingleLiteral, btDoubleLiteral]) And
+            (
+              (Not (IsInSet(Ch, ['>', '-'])) And (LastChar = '-')) Or
+              ((Ch = '<') OR (LastChar = '>')) Or
+              ((Ch = '>') And (LastChar = ']')) Or
+              ((Ch = '>') And (LastChar = ')')) Or
+              ((Ch = '>') And (LastChar = '?')) Or
+              ((Ch = '>') And (LastChar = '<')) Or
+              ((Ch = ']') And (LastChar = '[')) Or
+              ((Ch = ']') And (LastChar <> ']'))
+            )) Then
+            Begin
+              SetLength(strToken, iTokenLen);
+              If iTokenLen > 0 Then
+                Begin
+                  ProcessWhiteSpace(strToken);
+                  AddToken(TTokenInfo.Create(strToken, iStreamPos,
+                    iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+                End;
+             // Store Stream position, line number and column of
+             // token start
+             iStreamPos := iStreamCount;
+             iTokenLine := iLine;
+             iTokenColumn := iColumn;
+             BlockType := btNoBlock;
+             iTokenLen := 1;
+             SetLength(strToken, iTokenCapacity);
+             strToken[iTokenLen] := Ch;
+            End Else
+            Begin
+              Inc(iTokenLen);
+              If iTokenLen > Length(strToken) Then
+                SetLength(strToken, iTokenCapacity + Length(strToken));
+              strToken[iTokenLen] := Ch;
+            End;
+        End Else
+        Begin
+          Inc(iTokenLen);
+          If iTokenLen > Length(strToken) Then
+            SetLength(strToken, iTokenCapacity + Length(strToken));
+          strToken[iTokenLen] := Ch;
         End;
-    AddToken(TTokenInfo.Create('<end-of-file>', iStreamPos, iTokenLine, iTokenColumn, 0,
-      ttFileEnd));
-  Except
-    On E : Exception Do
-      AddIssue(E.Message, scGlobal, 'TokenizeStream', 0, 0, etError);
-  End
+
+      // Check for single string literals
+      If CurCharType = ttSingleLiteral Then
+        If BlockType = btSingleLiteral Then
+          BlockType := btNoBlock
+        Else If BlockType = btNoBlock Then
+          BlockType := btSingleLiteral;
+      // Check for Double string literals
+      If CurCharType = ttDoubleLiteral Then
+        If BlockType = btDoubleLiteral Then
+          BlockType := btNoBlock
+        Else If BlockType = btNoBlock Then
+          BlockType := btDoubleLiteral;
+
+      Inc(iColumn);
+      If Ch = #10 Then
+        Begin
+          Inc(iLine);
+          iColumn := 1;
+        End;
+      LastChar := Ch;
+    End;
+    If iTokenLen > 0 Then
+      Begin
+        SetLength(strToken, iTokenLen);
+        ProcessWhiteSpace(strToken);
+        AddToken(TTokenInfo.Create(strToken, iStreamPos,
+          iTokenLine, iTokenColumn, Length(strToken), CurCharType));
+      End;
+  AddToken(TTokenInfo.Create('<end-of-file>', iStreamPos, iTokenLine, iTokenColumn, 0,
+    ttFileEnd));
 End;
 
 (**

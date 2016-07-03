@@ -408,6 +408,14 @@ type
     Procedure TestRequiresClause;
     procedure TestContainsClause;
     Procedure TestAdvancedRecords;
+    Procedure TestRTTIAttributesSingleClass;
+    Procedure TestRTTIAttributesSingleMethod;
+    Procedure TestRTTIAttributesSingleRecord;
+    Procedure TestRTTIAttributesComplexType;
+    Procedure TestRTTIAttributesMultiFields;
+    Procedure TestRTTIAttributesMultiFunction;
+    Procedure TestRTTIAttributesSingleTypeConst;
+    Procedure TestRTTIAttributesSingleProperty;
     Procedure TestCodeFailure01;
     Procedure TestCodeFailure02;
     Procedure TestCodeFailure03;
@@ -429,7 +437,6 @@ type
     Procedure TestCodeFailure19;
     Procedure TestCodeFailure21;
     Procedure TestCodeFailure22;
-    Procedure TestCodeFailure23;
   Public
   End;
 
@@ -2947,30 +2954,6 @@ Const
     'End;'#13#10 +
     ''#13#10 +
     ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure23;
-
-Const
-  strSource =
-    'Program MyUnit;'#13#10 +
-    ''#13#10 +
-    '[DotNETAttribute]'#13#10 +
-    'Begin'#13#10 +
     'End.'#13#10;
 
 Var
@@ -6138,6 +6121,282 @@ begin
   End;
 end;
 
+Procedure TestTPascalModule.TestRTTIAttributesComplexType;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  [Custom(Arguemnt1, Argument2, Argument3)]'#13#10 +
+    '  TSimpleType = Set Of (stOne, stTwo, stThree);'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+End;
+
+Procedure TestTPascalModule.TestRTTIAttributesMultiFunction;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '    [Custom1, Custom2(MyAergument)]'#13#10 +
+    '    Function IsReady : Boolean;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Function TMyClass.IsReady : Boolean;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+End;
+
+Procedure TestTPascalModule.TestRTTIAttributesMultiFields;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '    [Custom1]'#13#10 +
+    '    [Custom2(MyArgument)]'#13#10 +
+    '    FString : String;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+End;
+
+Procedure TestTPascalModule.TestRTTIAttributesSingleClass;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  [CustomAttribute]'#13#10 +
+    '  TMyClass = Class;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+End;
+
+Procedure TestTPascalModule.TestRTTIAttributesSingleMethod;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '    [Custom]'#13#10 +
+    '    Procedure DoSomething;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Procedure TMyClass.DoSomething;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+End;
+
+Procedure TestTPascalModule.TestRTTIAttributesSingleProperty;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '    [Custom1, Custom2(MyAergument)]'#13#10 +
+    '    Property IsReady : Boolean;'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+End;
+
+Procedure TestTPascalModule.TestRTTIAttributesSingleRecord;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  [Custom()]'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+End;
+
+Procedure TestTPascalModule.TestRTTIAttributesSingleTypeConst;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'Const'#13#10 +
+    '  a = 10;'#13#10 +
+    '  b = 20;'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  [Something(a + b)]'#13#10 +
+    '  TSomeType = Record'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Procedure DoSomething;'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  rec : TSomeType;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  rec;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Initialization'#13#10 +
+    ' DoSomething;'#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+End;
+
 procedure TestTPascalModule.TestSetConstructor;
 
 Const
@@ -7207,4 +7466,3 @@ initialization
   RegisterTest('PascalModule Tests', TestTFinalizationSection.Suite);
   RegisterTest('PascalModule Tests', TestTPascalModule.Suite);
 end.
-

@@ -6101,7 +6101,7 @@ Function ParseMacro(Const strMacro : String; var strCommand,
   ExceptionProc : TExceptionProcedure) : Boolean;
 
 Type
-  ParseMacroException = Exception;
+  EParseMacroException = Exception;
 
 ResourceString
   strExceptionMsg =
@@ -6138,7 +6138,7 @@ Var
     If iToken < slTokens.Count - 1 Then
       Inc(iToken)
     Else
-      Raise Exception.Create(strUnexpectedEndOfMacro);
+      Raise EParseMacroException.Create(strUnexpectedEndOfMacro);
   End;
 
 Begin
@@ -6149,14 +6149,14 @@ Begin
       TokeniseMacro(slTokens, strMacro);
       iToken := 0;
       If slTokens[iToken] <> '[' Then
-        Raise ParseMacroException.CreateFmt(strExpectedOpeningBracket, [slTokens[iToken]]);
+        Raise EParseMacroException.CreateFmt(strExpectedOpeningBracket, [slTokens[iToken]]);
       IncTokenPos;
       If Not IsKeyWord(slTokens[iToken], strCommands) Then
-        Raise ParseMacroException.CreateFmt(strNotValidCommand, [slTokens[iToken]]);
+        Raise EParseMacroException.CreateFmt(strNotValidCommand, [slTokens[iToken]]);
       strCommand := slTokens[iToken];
       IncTokenPos;
       If slTokens[iToken] <> '(' Then
-        Raise ParseMacroException.CreateFmt(strExpectedOpeningParenthesis, [slTokens[iToken]]);
+        Raise EParseMacroException.CreateFmt(strExpectedOpeningParenthesis, [slTokens[iToken]]);
       IncTokenPos;
       strFileName := slTokens[iToken];
       {$IFNDEF D2009}
@@ -6173,15 +6173,15 @@ Begin
         strFileName := Copy(strFileName, 1, Length(strFileName) - 1);
       IncTokenPos;
       If slTokens[iToken] <> ')' Then
-        Raise ParseMacroException.CreateFmt(strExpectedClosingParenthesis, [slTokens[iToken]]);
+        Raise EParseMacroException.CreateFmt(strExpectedClosingParenthesis, [slTokens[iToken]]);
       IncTokenPos;
       If slTokens[iToken] <> ']' Then
-        Raise ParseMacroException.CreateFmt(strExpectedClosingBracket, [slTokens[iToken]]);
+        Raise EParseMacroException.CreateFmt(strExpectedClosingBracket, [slTokens[iToken]]);
       If iToken > slTokens.Count - 1 Then
-        Raise ParseMacroException.CreateFmt(strExpectedEndOfMacro, [slTokens[iToken]]);
+        Raise EParseMacroException.CreateFmt(strExpectedEndOfMacro, [slTokens[iToken]]);
       Result := True;
     Except
-      On E : ParseMacroException Do
+      On E : EParseMacroException Do
         If Assigned(ExceptionProc) Then
           ExceptionProc(Format(strExceptionMsg, [E.Message, strMacro]));
     End;
@@ -6210,6 +6210,9 @@ End;
 **)
 Function  DGHCreateProcess(Process : TProcessInfo;
   ProcessMsgHandler : TProcessMsgHandler; IdleHandler : TIdleHandler) : Integer;
+
+Type
+  EDGHCreateProcessException = Exception;
 
 Var
   boolAbort: Boolean;
@@ -6292,11 +6295,11 @@ Begin
     If Process.boolEnabled Then
       Try
         If Not DirectoryExists(Process.strDir) Then
-          Raise Exception.CreateFmt(strDirectoryNotFound, [Process.strDir]);
+          Raise EDGHCreateProcessException.CreateFmt(strDirectoryNotFound, [Process.strDir]);
         If Not FileExists(Process.strEXE) Then
           Begin
             If Not DGHFindOnPath(Process.strEXE, '') Then
-              Raise Exception.CreateFmt(strEXENotFound, [Process.strEXE]);
+              Raise EDGHCreateProcessException.CreateFmt(strEXENotFound, [Process.strEXE]);
           End;
         FillChar(StartupInfo, SizeOf(TStartupInfo), 0);
         StartupInfo.cb := SizeOf(TStartupInfo);
@@ -6332,7 +6335,7 @@ Begin
           Win32Check(CloseHandle(ProcessInfo.hProcess));
         End;
       Except
-        On E : Exception Do
+        On E : EDGHCreateProcessException Do
           If Assigned(ProcessMsgHandler) Then
             Begin
               ProcessMsgHandler(E.Message, boolAbort);

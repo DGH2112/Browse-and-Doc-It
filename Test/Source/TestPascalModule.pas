@@ -419,6 +419,7 @@ type
     Procedure TestRTTIAttributesRecord;
     Procedure TestRTTIAttributesClass;
     Procedure TestRTTIAttributesInterface;
+    Procedure TestRTTIAttributesMultiPerFuncton;
     Procedure TestCodeFailure01;
     Procedure TestCodeFailure02;
     Procedure TestCodeFailure03;
@@ -6247,6 +6248,45 @@ Const
     ''#13#10 +
     'Begin'#13#10 +
     'End;'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+End;
+
+Procedure TestTPascalModule.TestRTTIAttributesMultiPerFuncton;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  [Custom(''Hello'')]'#13#10 +
+    '  [Custom1(''Hello'')]'#13#10 +
+    '  [Custom2(''Hello'')]'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    [Custom1, Custom2(MyArgument)]'#13#10 +
+    '    [Custom4(MyArgument)]'#13#10 +
+    '    FField : Boolean;'#13#10 +
+    '    [Custom2(), Custom3, Custom4(i, x, y, z)]'#13#10 +
+    '    [Custom5, Custom7(x, y, z)]'#13#10 +
+    '    Procedure MyProc( i : Integer);'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
     ''#13#10 +
     'End.'#13#10;
 

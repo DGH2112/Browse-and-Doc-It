@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       03 Jul 2016
+  @Date       05 Jul 2016
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -3832,7 +3832,7 @@ End;
 Procedure TPascalModule.RTTIAttributes;
 
 Begin
-  If Token.Token = '[' Then
+  While Token.Token = '[' Do
     Begin
       Repeat
         NextNonCommentToken;

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    1.0
-  @Date       05 Jul 2016
+  @Date       06 Jul 2016
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -2417,6 +2417,8 @@ Function TPascalModule.GetComment(
 Var
   T : TTokenInfo;
   iOffset : Integer;
+  iToken: TTokenIndex;
+  iBracket: Integer;
 
 Begin
   Result := Nil;
@@ -2424,9 +2426,25 @@ Begin
     iOffset := -1
   Else
     iOffset := -2;
-  If TokenIndex + iOffset > -1 Then
+  iToken := TokenIndex + iOffset;
+  // If there is an RTTI Attribute, walk backwards through the tokens to just before.
+  If iToken > -1 Then
+    While Tokens[iToken].Token = ']' Do
+      Begin
+        iBracket := 1;
+        Dec(iToken);
+        While (iToken > -1) And (iBracket > 0) Do
+          Begin
+            If Tokens[iToken].Token = ']' Then
+              Inc(iBracket);
+            If Tokens[iToken].Token = '[' Then
+              Dec(iBracket);
+            Dec(iToken);
+          End;
+      End;
+  If iToken > -1 Then
     Begin
-      T := Tokens[TokenIndex + iOffset] As TTokenInfo;
+      T := Tokens[iToken] As TTokenInfo;
       If T.TokenType In [ttLineComment, ttBlockComment] Then
         Begin
           Result := TPascalComment.CreateComment(T.Token, T.Line, T.Column);

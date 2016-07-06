@@ -420,6 +420,8 @@ type
     Procedure TestRTTIAttributesClass;
     Procedure TestRTTIAttributesInterface;
     Procedure TestRTTIAttributesMultiPerFuncton;
+    Procedure TestRTTIAttributesMultiPerLine;
+    Procedure TestRTTIAttributesMultiOnTypeWithComment;
     Procedure TestCodeFailure01;
     Procedure TestCodeFailure02;
     Procedure TestCodeFailure03;
@@ -6265,6 +6267,61 @@ Begin
   End;
 End;
 
+Procedure TestTPascalModule.TestRTTIAttributesMultiOnTypeWithComment;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  (** This is a comment. **)'#13#10+
+    '  [Custom(''Hello'')]'#13#10 +
+    '  [Custom1(''Hello'')]'#13#10 +
+    '  [Custom2(''Hello'')]'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    [Custom1, Custom2(MyArgument)]'#13#10 +
+    '    [Custom4(MyArgument)]'#13#10 +
+    '    FField : Boolean;'#13#10 +
+    '    [Custom2(), Custom3, Custom4(i, x, y, z)]'#13#10 +
+    '    [Custom5, Custom7(x, y, z)]'#13#10 +
+    '    Procedure MyProc( i : Integer);'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+  T: TElementContainer;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+    T := P.FindElement('Types');
+    Check(T <> Nil, 'Types container');
+    If T <> Nil Then
+      Begin
+        T := T.FindElement('TMyRecord');
+        Check(T <> Nil, 'TMyRecord');
+        If T <> Nil Then
+          Begin
+            Check(T.Comment <> Nil, 'Check for nil comment');
+            If T.Comment <> Nil Then
+              CheckEquals('This is a comment.', T.Comment.AsString(999, false),
+                'Comment text');
+          End;
+      End;
+  Finally
+    P.Free;
+  End;
+End;
+
 Procedure TestTPascalModule.TestRTTIAttributesMultiPerFuncton;
 
 Const
@@ -6283,6 +6340,41 @@ Const
     '    FField : Boolean;'#13#10 +
     '    [Custom2(), Custom3, Custom4(i, x, y, z)]'#13#10 +
     '    [Custom5, Custom7(x, y, z)]'#13#10 +
+    '    Procedure MyProc( i : Integer);'#13#10 +
+    '  End;'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+
+Var
+  P : TPascalModule;
+
+Begin
+  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
+  Try
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
+    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
+  Finally
+    P.Free;
+  End;
+End;
+
+Procedure TestTPascalModule.TestRTTIAttributesMultiPerLine;
+
+Const
+  strSource =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    'Type'#13#10 +
+    '  [Custom(''Hello'')][Custom1][Custom2(x, y)]'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    [Custom1, Custom2(MyArgument)]'#13#10 +
+    '    FField : Boolean;'#13#10 +
+    '    [Custom2(), Custom3, Custom4(i, x, y, z)]'#13#10 +
     '    Procedure MyProc( i : Integer);'#13#10 +
     '  End;'#13#10 +
     ''#13#10 +

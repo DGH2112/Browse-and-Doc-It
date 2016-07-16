@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       01 Feb 2014
+  @Date       16 Jul 2016
   @Author     David Hoyle
 
 **)
@@ -207,7 +207,7 @@ Type
     Function GetDimensions : Integer;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure AddDimension(strLow, strHigh : String);
@@ -239,7 +239,7 @@ Type
     Function GetName : String; Override;
   Public
     Constructor Create(APropertyType : TPropertyType; strName : String;
-      AScope : TScope; iLine, iCol : Integer; iImageIndex : TImageIndex;
+      AScope : TScope; iLine, iCol : Integer; iImageIndex : TBADIImageIndex;
       AComment : TComment); Reintroduce; Virtual;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
@@ -1069,12 +1069,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 Constructor TVBVar.Create(strName : String; AScope : TScope; iLine,
-  iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment);
+  iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment);
 
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
@@ -1199,12 +1199,12 @@ end;
   @param   AScope        as a TScope
   @param   iLine         as an Integer
   @param   iCol          as an Integer
-  @param   iImageIndex   as a TImageIndex
+  @param   iImageIndex   as a TBADIImageIndex
   @param   AComment      as a TComment
 
 **)
 constructor TVBProperty.Create(APropertyType: TPropertyType; strName: String;
-  AScope: TScope; iLine, iCol: Integer; iImageIndex : TImageIndex;
+  AScope: TScope; iLine, iCol: Integer; iImageIndex : TBADIImageIndex;
   AComment : TComment);
 
 begin
@@ -1846,18 +1846,18 @@ Begin
       If iTokenLen > 0 Then
         If Not (IsInSet(strToken[1], strWhiteSpace)) Then
           Begin
-            If LastToken = ttIdentifier Then
+            If CurCharType = ttIdentifier Then
               Begin
                 If IsKeyWord(strToken, strReservedWords) Then
-                  LastToken := ttReservedWord;
+                  CurCharType := ttReservedWord;
                 If IsKeyWord(strToken, strDirectives) Then
-                  LastToken := ttDirective;
+                  CurCharType := ttDirective;
               End;
             If IsInSet(strToken[1], strLineEnd) Then
               strToken := StringReplace(strToken, #13#10, '<line-end>',
                 [rfReplaceAll]);
             AddToken(TTokenInfo.Create(strToken, iStreamPos,
-              iTokenLine, iTokenColumn, Length(strToken), LastToken));
+              iTokenLine, iTokenColumn, Length(strToken), CurCharType));
           End;
     End;
   AddToken(TTokenInfo.Create('<end-of-file>', iStreamPos, iTokenLine, iTokenColumn, 0,
@@ -3672,6 +3672,7 @@ Begin
             FEventsLabel := Add(TLabelContainer.Create(strEventsLabel,
               scNone, 0, 0, iiDispInterfacesLabel, Nil)) As TLabelContainer;
           E := FEventsLabel.Add(E) As TEventDecl;
+          E.Comment := C;
           If Token.Token = '(' Then
             Begin
               NextNonCommentToken;

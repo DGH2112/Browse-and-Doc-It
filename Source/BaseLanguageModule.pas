@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    28 Sep 2013
+  @Date    16 Jul 2016
   @Version 1.0
   @Author  David Hoyle
 
@@ -795,6 +795,7 @@ Type
       boolArrayOf : Boolean; AType : TGenericTypeDecl; Value : String;
       AScope : TScope; iLine, iCol : Integer); ReIntroduce; Overload;
     Destructor Destroy; Override;
+    Function IsEquals(Parameter : TGenericParameter) : Boolean; Virtual;
     (**
       Returns the parameter modifier : const, var or out.
       @precon  None.
@@ -4469,6 +4470,25 @@ begin
   FParamType.Free;
   inherited;
 end;
+
+(**
+
+  This method compares the current parameter with the given parameter and returns
+  true if they have the same signature else returns false.
+
+  @precon  None.
+  @postcon Returns true if they signatures are the same else returns false.
+
+  @param   Parameter as a TGenericParameter
+  @return  a Boolean
+
+**)
+Function TGenericParameter.IsEquals(Parameter : TGenericParameter) : Boolean;
+
+Begin
+  Result := (ParamModifier = Parameter.ParamModifier) And
+    (ParamType.AsString(False, False) = Parameter.ParamType.AsString(False, False));
+End;
 
 (** --------------------------------------------------------------------------
 

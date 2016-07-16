@@ -46,6 +46,8 @@ type
       strMsg : String = ''); Overload;
     Procedure CheckEquals(ctExpected, ctActual : TCommentType;
       strMsg : String = ''); Overload;
+    Procedure CheckEquals(strExpected, strActual : String;
+      strMsg : String = ''); Overload; Override;
   Published
   End;
 
@@ -546,6 +548,34 @@ begin
     FailNotEquals(ImageList[iiExpected].FResourcename,
       ImageList[TImageIndex(iActual + 1)].FResourcename, strMsg, CallerAddr);
 end;
+
+Procedure TExtendedTestCase.CheckEquals(strExpected, strActual: String;
+  strMsg: String);
+
+Var
+  i : Integer;
+  iPosition : Integer;
+
+Begin
+  FCheckCalled := True;
+  If CompareText(strExpected, strActual) <> 0 Then
+    Begin
+      iPosition := 0;
+      For i := 1 To Length(strExpected) Do
+        If Length(strActual) >= i Then
+           If strActual[i] <> strExpected[i] Then
+             Begin
+               iPosition := i;
+               Break;
+             End;
+      If iPosition = 0 Then
+        strMsg := strMsg + ' {Actual too small}'
+      Else
+        strMsg := strMsg + Format( ' [[Difference @ character %d: %s]]',
+          [iPosition, Copy(strActual, 1, iPosition)]);
+      FailNotEquals(strExpected, strActual, strMsg, CallerAddr);
+    End;
+End;
 
 // Test methods for class TTokenInfo
 
@@ -2445,7 +2475,8 @@ end;
 
 procedure TestTBaseLanguageModule.TestOpTickCountByIndex;
 begin
-  FBaseLanguageModule.AddTickCount('Hello');
+  FBaseLanguageModule.AddTickCount('Hello'); // more than 24 days since last restart.
+  //Role over of GetTickCount() due to being put in a 32 Int instead of a 64 bit int
   FBaseLanguageModule.AddTickCount('Goodbye');
   Check(FBaseLanguageModule.OpTickCountByIndex[0] > 0);
   Check(FBaseLanguageModule.OpTickCountByIndex[1] >= FBaseLanguageModule.OpTickCountByIndex[0]);

@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       03 Jul 2016
+  @Date       16 Jul 2016
   @Author     David Hoyle
 
 **)
@@ -33,7 +33,7 @@ Interface
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Public
       Constructor Create(strName : String; AScope : TScope; iLine,
-        iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+        iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
       (**
         This property gets and sets the Road start chainage.
         @precon  None.
@@ -2377,12 +2377,12 @@ Implementation
     @param   AScope      as a TScope
     @param   iLine       as an Integer
     @param   iColumn     as an Integer
-    @param   AImageIndex as a TImageIndex
+    @param   AImageIndex as a TBADIImageIndex
     @param   AComment    as a TComment
 
   **)
   constructor TTLSShape.Create(strName: String; AScope: TScope; iLine,
-    iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
+    iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
 
   begin
     Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);

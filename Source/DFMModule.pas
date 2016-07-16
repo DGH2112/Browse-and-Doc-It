@@ -3,7 +3,7 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       03 Jul 2016
+  @Date       16 Jul 2016
   @Author     David Hoyle
 
 **)
@@ -24,7 +24,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property sets and gets the whether the object is Inherited or not.
@@ -51,7 +51,7 @@ Type
     Function GetName : String; Override;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
@@ -155,12 +155,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TDFMObject.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
+  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FIsInherited := False;
@@ -221,12 +221,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TDFMItem.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
+  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FItemName := Format('%s:%4.4d:%4.4d', [strName, iLine, iColumn]);

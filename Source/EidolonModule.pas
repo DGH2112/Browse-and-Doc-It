@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       03 Jul 2016
+  @Date       16 Jul 2016
   @Author     David Hoyle
 
 **)
@@ -40,7 +40,7 @@ Type
     FSheetIndex : Integer;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the output name of the field.
@@ -148,7 +148,7 @@ Type
     FLayerIndex      : Integer;
   Public
     Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
-      AImageIndex : TImageIndex; AComment: TComment); Override;
+      AImageIndex : TBADIImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the symbol type.
@@ -229,7 +229,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
-      AImageIndex : TImageIndex; AComment: TComment); Override;
+      AImageIndex : TBADIImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       A property to get and set the Line Start Type.
@@ -270,7 +270,7 @@ Type
     FTransparency : Integer;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the Interior Colour of the rectangle.
@@ -315,7 +315,7 @@ Type
     FBarWidth : Integer;
   Public
     Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
-      AImageIndex : TImageIndex; AComment: TComment); Override;
+      AImageIndex : TBADIImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the bar width of the bar.
@@ -333,7 +333,7 @@ Type
     FLocationWidth : Double;
   Public
     Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
-      AImageIndex : TImageIndex; AComment: TComment); Override;
+      AImageIndex : TBADIImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the bars date width of the bar.
@@ -357,7 +357,7 @@ Type
     FDiamondSize : Integer;
   Public
     Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
-      AImageIndex : TImageIndex; AComment: TComment); Override;
+      AImageIndex : TBADIImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the bar width of the bar.
@@ -374,7 +374,7 @@ Type
     FTriangleType : TTriangleType;
   Public
     Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
-      AImageIndex : TImageIndex; AComment: TComment); Override;
+      AImageIndex : TBADIImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the bar width of the bar.
@@ -391,7 +391,7 @@ Type
     FEllipseSize : Integer;
   Public
     Constructor Create(strName: String; AScope : TScope; iLine, iColumn : Integer;
-      AImageIndex : TImageIndex; AComment: TComment); Override;
+      AImageIndex : TBADIImageIndex; AComment: TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the bar width of the bar.
@@ -915,12 +915,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TFieldDef.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
+  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FFieldType := ftText;
@@ -1111,12 +1111,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TCustomFillSymbol.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
+  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FInteriorColour := xlcWHITE;
@@ -3782,12 +3782,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TSymbol.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TImageIndex; AComment: TComment);
+  AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FSymbolType := tstRectangle;
@@ -3808,12 +3808,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TBar.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TImageIndex; AComment: TComment);
+  AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FBarWidth := 5;
@@ -3830,12 +3830,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TDiamond.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TImageIndex; AComment: TComment);
+  AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FDiamondSize := 5;
@@ -3852,12 +3852,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TTriangle.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TImageIndex; AComment: TComment);
+  AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FTriangleType := ttStartAndEarly;
@@ -3874,12 +3874,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TEllipse.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TImageIndex; AComment: TComment);
+  AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FEllipseSize := 5;
@@ -3896,12 +3896,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TLine.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TImageIndex; AComment: TComment);
+  AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FLineStartType := atNone;
@@ -3945,12 +3945,12 @@ End;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 Constructor TSuperBar.Create(strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TImageIndex; AComment: TComment);
+  AImageIndex: TBADIImageIndex; AComment: TComment);
 
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);

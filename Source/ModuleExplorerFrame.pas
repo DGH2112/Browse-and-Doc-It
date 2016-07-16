@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    25 Apr 2013
+  @Date    16 Jul 2016
   @Author  David Hoyle
   @Version 1.0
 
@@ -15,7 +15,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ImgList, ComCtrls, ExtCtrls, Contnrs, BaseLanguageModule,
-  ActnList, ToolWin, VirtualTrees;
+  ActnList, ToolWin, VirtualTrees, System.Actions, ImageList;
 
 {$INCLUDE CompilerDefinitions.Inc}
 
@@ -729,7 +729,7 @@ End;
 Constructor TframeModuleExplorer.Create(AOwner: TComponent);
 
 Var
-  i : TImageIndex;
+  i : TBADIImageIndex;
 
 begin
   Inherited;
@@ -762,10 +762,10 @@ begin
   FHintWin.Color := BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
   FHintWin.Canvas.Font.Assign(FExplorer.Font);
   ilScopeImages.Clear;
-  For i := Succ(Low(TImageIndex)) to High(TImageIndex) Do
-    If Not ilScopeImages.GetInstRes(hInstance, rtBitmap, ImageList[i].FResourceName, 16,
-      [lrDefaultColor], ImageList[i].FMaskColour) Then
-      ShowMessage(Format('Resource "%s" not found.', [ImageList[i].FResourceName]));
+  For i := Succ(Low(TBADIImageIndex)) to High(TBADIImageIndex) Do
+    If Not ilScopeImages.GetInstRes(hInstance, rtBitmap, BADIImageList[i].FResourceName,
+      16, [lrDefaultColor], BADIImageList[i].FMaskColour) Then
+      ShowMessage(Format('Resource "%s" not found.', [BADIImageList[i].FResourceName]));
   FExplorer.OnGetText := tvExplorerGetText;
 end;
 

@@ -142,10 +142,10 @@ object frameModuleExplorer: TframeModuleExplorer
   object ilToolbar: TImageList
     Height = 12
     Width = 12
-    Left = 103
-    Top = 36
+    Left = 31
+    Top = 84
     Bitmap = {
-      494C01011000130008000C000C00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011000130010000C000C00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000300000003C0000000100200000000000002D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -529,8 +529,8 @@ object frameModuleExplorer: TframeModuleExplorer
   end
   object alToolbar: TActionList
     Images = ilToolbar
-    Left = 105
-    Top = 93
+    Left = 33
+    Top = 133
     object actLocal: TAction
       Category = 'Scope'
       Caption = 'actLocal'

@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       03 Jul 2016
+  @Date       16 Jul 2016
   @Author     David Hoyle
 
 **)
@@ -126,6 +126,8 @@ Resourcestring
   (** This is an error message where a rule or literal is expected but not found. **)
   strExpectedRuleOrLiteral = 'Expected rule or literal but ''%s'' found at l' +
     'ine %d column %d.';
+  (** This is an error message where a rule is NULL. **)
+  strNULLIdentifierFound = 'NULL Identifier ''%s'' found at line %d column %d.';
 
 Const
   (** A set of characters for general symbols **)
@@ -1037,6 +1039,10 @@ begin
         Begin
           R := TBNFRule.Create(Token.Token, scPublic, Token.Line, Token.Column,
             iiPublicType, GetComment);
+          If R.Identifier = '' Then
+            AddIssue(Format(strNULLIdentifierFound, [Token.Token,
+                Token.Line, Token.Column]), scNone,'Rule', Token.Line,
+                Token.Column, etError);
           If FRules = Nil Then
             FRules := Add(TLabelContainer.Create('Rules', scNone, 0, 0,
               iiPublicTypesLabel, Nil)) As TLabelContainer;

@@ -108,7 +108,7 @@ Type
   );
 
   (** An enumerate to associate images with different types of Elements. **)
-  TImageIndex = (
+  TBADIImageIndex = (
     iiNone,
 
     iiModule,
@@ -627,7 +627,7 @@ Type
     FElements : TObjectList;
     FComment : TComment;
     FScope : TScope;
-    FImageIndex : TImageIndex;
+    FImageIndex : TBADIImageIndex;
     FSorted  : Boolean;
     FReferenced : Boolean;
     FParent : TElementContainer;
@@ -640,12 +640,12 @@ Type
     Function FindRoot : TElementContainer;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Virtual;
+      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Virtual;
     Destructor Destroy; Override;
     Function  Add(AElement : TElementContainer) : TElementContainer; Overload; Virtual;
-    Function  Add(Token : TTokenInfo; AScope : TScope; AImageIndex : TImageIndex;
+    Function  Add(Token : TTokenInfo; AScope : TScope; AImageIndex : TBADIImageIndex;
       AComment : TComment) : TElementContainer; Overload; Virtual;
-    Function  Add(strToken : String; AImageIndex : TImageIndex;
+    Function  Add(strToken : String; AImageIndex : TBADIImageIndex;
       AScope : TScope; AComment : TComment) : TElementContainer; Overload; Virtual;
     Function AddUnique(AElement : TElementContainer) : TElementContainer; Virtual;
     Procedure AddTokens(AElement : TElementContainer); Virtual;
@@ -698,9 +698,9 @@ Type
       This property returns the Image Index of the element.
       @precon  None.
       @postcon Returns the Image Index of the element.
-      @return  a TImageIndex
+      @return  a TBADIImageIndex
     **)
-    Property ImageIndex : TImageIndex Read FImageIndex Write FImageIndex;
+    Property ImageIndex : TBADIImageIndex Read FImageIndex Write FImageIndex;
     (**
       This property returns the image index associated with the element based on
       its Image Index and Scope.
@@ -757,7 +757,7 @@ Type
     Property Msg : String Read FMsg;
   Public
     Constructor Create(strMsg : String; AScope : TScope; strMethod : String; iLine,
-      iCol : Integer; AImageIndex : TImageIndex); Reintroduce; Overload;
+      iCol : Integer; AImageIndex : TBADIImageIndex); Reintroduce; Overload;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
@@ -850,7 +850,7 @@ Type
     Function FunctionType : String; Virtual; Abstract;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
     Procedure AddParameter(AParameter : TGenericParameter);
     Function LineofCode : Integer;
@@ -1024,7 +1024,7 @@ Type
     Constructor Create(Const Args: Array of Const; iIdentLine,
       iIdentColumn, iCommentLine, iCommentCol : Integer;
       strDocConflictMsg, strDocConflictDesc : String;
-      AImageIndex : TImageIndex); ReIntroduce;
+      AImageIndex : TBADIImageIndex); ReIntroduce;
     Destructor Destroy; Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
@@ -1517,7 +1517,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
@@ -2212,7 +2212,7 @@ Const
   iShowInDoc = $0004;
 
   (** This is a list of Image Resource name to be loaded fom the executable. **)
-  ImageList : Array[Succ(Low(TImageIndex))..High(TImageIndex)] Of TImageIndexInfo = (
+  BADIImageList : Array[Succ(Low(TBADIImageIndex))..High(TBADIImageIndex)] Of TImageIndexInfo = (
     (FResourceName : 'Module';                        FMaskColour: clLime),
 
     (FResourceName : 'DocConflictFolder';             FMaskColour: clLime),
@@ -3726,13 +3726,13 @@ end;
 
   @param   Token       as a TTokenInfo
   @param   AScope      as a TScope
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
   @return  a TElementContainer
 
 **)
 Function TElementContainer.Add(Token: TTokenInfo; AScope : TScope;
-  AImageIndex : TImageIndex; AComment: TComment) : TElementContainer;
+  AImageIndex : TBADIImageIndex; AComment: TComment) : TElementContainer;
 
 Var
   i : Integer;
@@ -3766,13 +3766,13 @@ end;
 
 
   @param   strToken    as a String
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AScope      as a TScope
   @param   AComment    as a TComment
   @return  a TElementContainer
 
 **)
-function TElementContainer.Add(strToken: String; AImageIndex: TImageIndex;
+function TElementContainer.Add(strToken: String; AImageIndex: TBADIImageIndex;
   AScope : TScope; AComment: TComment): TElementContainer;
 
 Var
@@ -3820,7 +3820,7 @@ procedure TElementContainer.AddDocumentConflict(Const Args: Array of Const;
 Var
   E, I, R, D : TElementContainer;
   iL, iC : Integer;
-  iIcon : TImageIndex;
+  iIcon : TBADIImageIndex;
 
 begin
   iL := 0;
@@ -3881,8 +3881,8 @@ Procedure TElementContainer.AddIssue(strMsg : String; AScope : TScope;
 Type
   TIssueRec = Record
     FFolder       : String;
-    FFolderImage  : TImageIndex;
-    FItemImage    : TImageIndex;
+    FFolderImage  : TBADIImageIndex;
+    FItemImage    : TBADIImageIndex;
     FTooMany      : String;
   End;
 
@@ -4069,12 +4069,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TElementContainer.Create(strName: String; AScope : TScope;
-  iLine, iColumn : Integer; AImageIndex : TImageIndex; AComment: TComment);
+  iLine, iColumn : Integer; AImageIndex : TBADIImageIndex; AComment: TComment);
 
 begin
   Inherited Create(strName, iLine, iColumn);
@@ -5072,12 +5072,12 @@ End;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TGenericFunction.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
+  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FParameters := TObjectList.Create(True);
@@ -5175,7 +5175,7 @@ Constructor TGenericMethodDecl.Create(MethodType : TMethodType; strName : String
   AScope : TScope; iLine, iCol : Integer);
 
 Var
-  AImageIndex : TImageIndex;
+  AImageIndex : TBADIImageIndex;
 
 Begin
   Case MethodType Of
@@ -5329,11 +5329,11 @@ end;
   @param   strMethod   as a String
   @param   iLine       as an Integer
   @param   iCol        as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
 
 **)
 constructor TDocIssue.Create(strMsg : String; AScope : TScope; strMethod: String;
-  iLine, iCol: Integer; AImageIndex : TImageIndex);
+  iLine, iCol: Integer; AImageIndex : TBADIImageIndex);
 
 Begin
   Inherited Create(Format('%4.4d', [iDocConflictCounter]), AScope, iLine, iCol,
@@ -5379,12 +5379,12 @@ end;
   @param   iCommentCol        as an Integer
   @param   strDocConflictMsg  as a String
   @param   strDocConflictDesc as a String
-  @param   AImageIndex        as a TImageIndex
+  @param   AImageIndex        as a TBADIImageIndex
 
 **)
 constructor TDocumentConflict.Create(Const Args: Array of Const; iIdentLine,
       iIdentColumn, iCommentLine, iCommentCol : Integer;
-      strDocConflictMsg, strDocConflictDesc : String; AImageIndex : TImageIndex);
+      strDocConflictMsg, strDocConflictDesc : String; AImageIndex : TBADIImageIndex);
 
 begin
   Inherited Create(Format('%4.4d', [iDocConflictCounter]), scGlobal, iIdentLine,
@@ -6656,12 +6656,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 Constructor TLabelContainer.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
+  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
 
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);

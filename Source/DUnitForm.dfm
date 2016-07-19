@@ -98,6 +98,7 @@ object frmDUnit: TfrmDUnit
     Height = 25
     Anchors = [akRight, akBottom]
     Kind = bkOK
+    NumGlyphs = 2
     TabOrder = 5
     OnClick = btnOKClick
   end
@@ -108,6 +109,7 @@ object frmDUnit: TfrmDUnit
     Height = 25
     Anchors = [akRight, akBottom]
     Kind = bkCancel
+    NumGlyphs = 2
     TabOrder = 6
   end
   object gbxUnit: TGroupBox
@@ -173,6 +175,7 @@ object frmDUnit: TfrmDUnit
     Header.Font.Height = -11
     Header.Font.Name = 'Tahoma'
     Header.Font.Style = []
+    Header.Height = 17
     Header.MainColumn = -1
     Header.Options = [hoColumnResize, hoDrag]
     Images = ilScopeImages

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    05 Aug 2011
+  @Date    19 Jul 2016
 
 **)
 unit DUnitForm;
@@ -17,7 +17,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, DUnitCreator, VirtualTrees, BaseLanguageModule,
-  ImgList;
+  ImgList, System.ImageList;
 
 type
   (** A class to represent the form interface. **)
@@ -322,7 +322,7 @@ End;
 procedure TfrmDUnit.FormCreate(Sender: TObject);
 
 Type
-  T = BaseLanguageModule.TImageIndex;
+  T = BaseLanguageModule.TBADIImageIndex;
 
 Var
   strFileName : String;
@@ -342,8 +342,9 @@ begin
   ilScopeImages.Clear;
   For i := Succ(Low(T)) to High(T) Do
     If Not ilScopeImages.GetInstRes(hInstance, rtBitmap,
-      ImageList[i].FResourceName, 16, [lrDefaultColor], ImageList[i].FMaskColour) Then
-      ShowMessage(Format('Resource "%s" not found.', [ImageList[i].FResourceName]));
+      BADIImageList[i].FResourceName, 16, [lrDefaultColor],
+      BADIImageList[i].FMaskColour) Then
+      ShowMessage(Format('Resource "%s" not found.', [BADIImageList[i].FResourceName]));
   strFileName := ChangeFileExt(ExtractFileName(ActiveProject.FileName), '') +
     'Tests.dpr';
   edtNewProjectName.Text := AddUniqueName(cbxExistingProject.Items, strFileName);

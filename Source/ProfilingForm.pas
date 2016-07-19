@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    20 Apr 2013
+  @Date    19 Jul 2016
 
 **)
 unit ProfilingForm;
@@ -17,7 +17,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, VirtualTrees, BaseLanguageModule, ImgList, Contnrs,
-  ExtCtrls;
+  ExtCtrls, System.ImageList;
 
 type
   (** An enumerate to define if the profile job is an insertion or a removal. **)
@@ -268,7 +268,7 @@ End;
 procedure TfrmProfiling.FormCreate(Sender: TObject);
 
 Type
-  T = BaseLanguageModule.TImageIndex;
+  T = BaseLanguageModule.TBADIImageIndex;
 
 Var
   i : T;
@@ -280,8 +280,9 @@ begin
   ilScopeImages.Clear;
   For i := Succ(Low(T)) to High(T) Do
     If Not ilScopeImages.GetInstRes(hInstance, rtBitmap,
-      ImageList[i].FResourceName, 16, [lrDefaultColor], ImageList[i].FMaskColour) Then
-      ShowMessage(Format('Resource "%s" not found.', [ImageList[i].FResourceName]));
+      BADIImageList[i].FResourceName, 16, [lrDefaultColor],
+      BADIImageList[i].FMaskColour) Then
+      ShowMessage(Format('Resource "%s" not found.', [BADIImageList[i].FResourceName]));
 end;
 
 (**

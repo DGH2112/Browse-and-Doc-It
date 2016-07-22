@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    16 Jul 2016
+  @Date    20 Jul 2016
   @Version 1.0
   @Author  David Hoyle
 
@@ -1078,6 +1078,9 @@ Type
     Property Count : Int64 Read FCount;
   End;
 
+  (** A type to define an array of integers. **)
+  TArrayOfInteger = Array Of Integer;
+
   (** This is an abtract class from which all language modules should be
       derived. **)
   TBaseLanguageModule = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
@@ -1101,6 +1104,8 @@ Type
     FShouldUndoCompilerStack: Boolean;
     FLastBodyCommentLine: Integer;
     FModuleOptions : TModuleOptions;
+    FTokenStack : TArrayOfInteger;
+    FTokenStackTop : Integer;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetToken : TTokenInfo;
     function GetOpTickCountName(iIndex: Integer): String;
@@ -1114,7 +1119,9 @@ Type
     Procedure PreviousToken;
     Function EndOfTokens : Boolean;
     Procedure NextNonCommentToken; Virtual;
-    Procedure RollBackToken;
+    Procedure RollBackToken; deprecated;
+    Procedure PushTokenPosition;
+    Procedure PopTokenPosition;
     Function GetComment(
       CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Virtual; Abstract;
@@ -1588,7 +1595,7 @@ Type
     **)
     Property InSituCmt : TCommentType Read FInSituCmt;
   End;
-  
+
   (** A class to handle all the registered modules in the system. **)
   TModuleDispatcher = Class
   {$IFDEF D2005} Strict {$ENDIF} Private
@@ -2627,7 +2634,7 @@ end;
 
 (**
 
-  This function outputs the comment or tag as a string missing out HTML tags if 
+  This function outputs the comment or tag as a string missing out HTML tags if
   not required and any trialing whitespace.
 
   @precon  C must eb a valid instance of a TBaseContainer.
@@ -2637,7 +2644,7 @@ end;
   @param   C            as a TBaseContainer
   @param   iMaxWidth    as an Integer
   @param   boolShowHTML as a Boolean
-  @return  a String      
+  @return  a String
 
 **)
 Function OutputCommentAndTag(C : TBaseContainer; iMaxWidth : Integer;
@@ -2840,12 +2847,12 @@ end;
 
 (**
 
-  This method builds a string from the identifer and tokens and tries to 
-  present it with the style of code you would probably except. 
+  This method builds a string from the identifer and tokens and tries to
+  present it with the style of code you would probably except.
 
-  @precon  None. 
-  @postcon Builds a string from the identifer and tokens and tries to present 
-           it with the style of code you would probably except. 
+  @precon  None.
+  @postcon Builds a string from the identifer and tokens and tries to present
+           it with the style of code you would probably except.
 
   @param   boolIdentifier       as a Boolean
   @param   boolForDocumentation as a Boolean
@@ -2855,7 +2862,7 @@ end;
   @param   strNoSpaceAfter      as a TSymbols
   @param   strSpaceAfter        as a TSymbols
   @param   boolShowHTML         as a Boolean
-  @return  a String              
+  @return  a String
 
 **)
 Function TBaseContainer.BuildStringRepresentation(boolIdentifier,
@@ -2932,11 +2939,11 @@ end;
 
 (**
 
-  This is a constructor for the TBaseContainer class. 
+  This is a constructor for the TBaseContainer class.
 
-  @precon  None. 
-  @postcon Create the token collection and initialises the Line and Column 
-           data. 
+  @precon  None.
+  @postcon Create the token collection and initialises the Line and Column
+           data.
 
   @param   strName as a String
   @param   iLine   as an Integer
@@ -3117,7 +3124,7 @@ end;
 
   This method returns all the tags tokens as a string with spaces in between.
 
-  @precon  ShowHTML determines of the routine output the HTML tags in the 
+  @precon  ShowHTML determines of the routine output the HTML tags in the
            resulting string.
   @postcon Returns a string representation of the tag.
 
@@ -3348,7 +3355,7 @@ end;
   @param   strComment as a String
   @param   iLine      as an Integer
   @param   iCol       as an Integer
-  @return  a TComment  
+  @return  a TComment
 
 **)
 class function TComment.CreateComment(strComment: String; iLine,
@@ -4119,18 +4126,18 @@ end;
 
 (**
 
-  This method returns the position of the named container in the current 
-  containers collection if found else returns the position (as a negative) 
-  where the item should be inserted in the collection. 
+  This method returns the position of the named container in the current
+  containers collection if found else returns the position (as a negative)
+  where the item should be inserted in the collection.
 
-  @precon  None. 
-  @postcon Returns the position of the named container in the current 
-           containers collection if found else returns the position (as a 
-           negative) where the item should be inserted in the collection. 
+  @precon  None.
+  @postcon Returns the position of the named container in the current
+           containers collection if found else returns the position (as a
+           negative) where the item should be inserted in the collection.
 
   @param   strName  as a String
   @param   FindType as a TFindType
-  @return  an Integer 
+  @return  an Integer
 
 **)
 function TElementContainer.Find(strName: String;
@@ -4181,7 +4188,7 @@ end;
 
 (**
 
-  This method searches the elements collection of and instance matching the 
+  This method searches the elements collection of and instance matching the
   given name.
 
   @precon  None.
@@ -4308,11 +4315,11 @@ end;
 
 (**
 
-  This method searches for references to the passed symbol in the passed 
-  section. 
+  This method searches for references to the passed symbol in the passed
+  section.
 
-  @precon  None. 
-  @postcon Returns true if the symbol was found. 
+  @precon  None.
+  @postcon Returns true if the symbol was found.
 
   @param   AToken  as a TTokenInfo
   @param   Section as a TLabelContainer
@@ -4342,12 +4349,12 @@ End;
 
 (**
 
-  This method does nothing other than call its parents ReferenceSymbol method. 
-  Descendant should override this method to resolve symbols in the code. 
+  This method does nothing other than call its parents ReferenceSymbol method.
+  Descendant should override this method to resolve symbols in the code.
 
-  @precon  None. 
-  @postcon Passes the processing of the symbol to its parent IF the parent 
-           exists. 
+  @precon  None.
+  @postcon Passes the processing of the symbol to its parent IF the parent
+           exists.
 
   @param   AToken as a TTokenInfo
   @return  a Boolean
@@ -5308,20 +5315,20 @@ end;
 (**
 
 
-  This is the constructor method for the TDocError class. 
+  This is the constructor method for the TDocError class.
 
 
-  @precon  strMsg is the error message to create a doc error for, iLine is the 
+  @precon  strMsg is the error message to create a doc error for, iLine is the
 
-           line number of the error, iCol is the column number for the 
+           line number of the error, iCol is the column number for the
 
-           message, strExceptionMethod is the name of the method the 
+           message, strExceptionMethod is the name of the method the
 
-           error occurred in and ErrType determines if the mesage is a 
+           error occurred in and ErrType determines if the mesage is a
 
-           warning or an error. 
+           warning or an error.
 
-  @postcon Initialises the class. 
+  @postcon Initialises the class.
 
 
   @param   strMsg      as a String
@@ -5347,12 +5354,12 @@ End;
 
   This is a getter method for the AsString property.
 
-  @precon  None . 
-  @postcon Override the default method and returns the Document Error Message . 
+  @precon  None .
+  @postcon Override the default method and returns the Document Error Message .
 
   @param   boolShowIdentifier   as a Boolean
   @param   boolForDocumentation as a Boolean
-  @return  a String              
+  @return  a String
 
 **)
 Function TDocIssue.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
@@ -5513,11 +5520,11 @@ end;
 
 (**
 
-  This is the constructor method for the TBaseLanguageModule class. 
+  This is the constructor method for the TBaseLanguageModule class.
 
-  @precon  None. 
-  @postcon Initialise this base class and Tokensizes the passed stream of 
-           characters. 
+  @precon  None.
+  @postcon Initialise this base class and Tokensizes the passed stream of
+           characters.
 
   @param   Source        as a String
   @param   strFileName   as a String
@@ -5550,6 +5557,8 @@ begin
   FCompilerConditionStack := TList.Create;
   FCompilerConditionUndoStack := TList.Create;
   FCommentClass := CommentClass;
+  FTokenStackTop := -1;
+  SetLength(FTokenStack, 10);
 end;
 
 (**
@@ -6079,6 +6088,27 @@ end;
 
 (**
 
+  This method removes the token position from the stack and sets the token position to
+  that value.
+
+  @precon  None.
+  @postcon The token is moved back to the position of the token  on the top of the stack
+           and the stack is decremented.
+
+**)
+Procedure TBaseLanguageModule.PopTokenPosition;
+
+Begin
+  If FTokenStackTop > -1 Then
+    Begin
+      FTokenIndex := FTokenStack[FTokenStackTop];
+      Dec(FTokenStackTop);
+    End Else
+      Raise EParserError.Create('Cannot pop the token position stack.');
+End;
+
+(**
+
   This method moves the toke to the previous token in the token list or raises
   an EDocException.
 
@@ -6120,6 +6150,32 @@ begin
           Break;
         End;
 end;
+
+(**
+
+  This method pushes the current token position on to the top of a stack.
+
+  @precon  None.
+  @postcon the current token position is pushed ont to the top of a stack.
+
+**)
+Procedure TBaseLanguageModule.PushTokenPosition;
+
+Var
+  T : TArrayOfInteger;
+  i: Integer;
+
+Begin
+  Inc(FTokenStackTop);
+  If FTokenStackTop > High(FTokenStack) Then
+    Begin
+      SetLength(T, Length(FTokenStack) + 10);
+      For i := Low(FTokenStack) To High(FTokenStack) Do
+        T[i] := FTokenStack[i];
+      FTokenStack := T;
+    End;
+  FTokenStack[FTokenStackTop] := FTokenIndex;
+End;
 
 (**
 

@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    24 Jul 2016
+  @Date    27 Jul 2016
   @Version 1.0
   @Author  David Hoyle
 
@@ -2550,7 +2550,7 @@ Uses
 
 Const
   (** This constant represent the maximum of issue / doc conflicts to add. **)
-  iIssueLimit : Integer = 25;
+  iIssueLimit : Integer = 25; //: @todo Add this as a configurable option.
 
 
 ResourceString
@@ -3894,9 +3894,9 @@ Type
   End;
 
 ResourceString
-  strTooManyHints = 'Too many hints...';
-  strTooManyWarnings = 'Too many warnings...';
-  strTooManyErrors = 'Too many errors...';
+  strTooManyHints = 'Too many hints (%d)...';
+  strTooManyWarnings = 'Too many warnings (%d)...';
+  strTooManyErrors = 'Too many errors (%d)...';
 
 Const
   recIssues : Array[Low(TErrorType)..High(TErrorType)] Of TIssueRec = (
@@ -3920,26 +3920,36 @@ Var
 
 begin
   Case ErrorType Of
-    etHint   : If Not (doShowHints In BrowseAndDocItOptions.Options) Then Exit;
-    etWarning: If Not (doShowWarnings In BrowseAndDocItOptions.Options) Then Exit;
-    etError  : If Not (doShowErrors In BrowseAndDocItOptions.Options) Then Exit;
+    etHint:
+      If Not (doShowHints In BrowseAndDocItOptions.Options) Then
+        Exit;
+    etWarning:
+      If Not (doShowWarnings In BrowseAndDocItOptions.Options) Then
+        Exit;
+    etError:
+      If Not (doShowErrors In BrowseAndDocItOptions.Options) Then
+        Exit;
   End;
   If Comment <> Nil Then
     Begin
       Case ErrorType Of
-        etHint   : If Comment.FindTag('nohint') > -1 Then Exit;
-        etWarning: If Comment.FindTag('nowarning') > -1 Then Exit;
+        etHint:
+          If Comment.FindTag('nohint') > -1 Then
+           Exit;
+        etWarning:
+          If Comment.FindTag('nowarning') > -1 Then
+            Exit;
       End;
     End;
-  I := FindRoot.Add(recIssues[ErrorType].FFolder,
-    recIssues[ErrorType].FFolderImage, scNone, Nil);
+  I := FindRoot.Add(recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage,
+    scNone, Nil);
   iCount := I.ElementCount;
   If iCount < iIssueLimit Then
     I.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol,
       recIssues[ErrorType].FItemImage))
   Else If iCount = iIssueLimit Then
-    I.Add(TDocIssue.Create(recIssues[ErrorType].FTooMany, scNone, 'AddIssue', 0,
-      0, recIssues[ErrorType].FItemImage));
+    I.Add(TDocIssue.Create(Format(recIssues[ErrorType].FTooMany, [iCount]), scNone,
+      'AddIssue', 0, 0, recIssues[ErrorType].FItemImage));
 end;
 
 (**

@@ -4503,9 +4503,10 @@ end;
 Function TGenericParameter.IsEquals(Parameter : TGenericParameter) : Boolean;
 
 Begin
-  Result := (ParamModifier = Parameter.ParamModifier);
-  If Result And (ParamType <> Nil) Then
+  Result := False;
+  If Result And (ParamType <> Nil) And (Parameter.ParamType <> Nil) Then
     Result := Result And
+      (ParamModifier = Parameter.ParamModifier) And
       (ParamType.AsString(False, False) = Parameter.ParamType.AsString(False, False));
 End;
 

@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    27 Jul 2016
+  @Date    29 Jul 2016
   @Version 1.0
   @Author  David Hoyle
 
@@ -4504,9 +4504,8 @@ Function TGenericParameter.IsEquals(Parameter : TGenericParameter) : Boolean;
 
 Begin
   Result := False;
-  If Result And (ParamType <> Nil) And (Parameter.ParamType <> Nil) Then
-    Result := Result And
-      (ParamModifier = Parameter.ParamModifier) And
+  If (ParamType <> Nil) And (Parameter.ParamType <> Nil) Then
+    Result := (ParamModifier = Parameter.ParamModifier) And
       (ParamType.AsString(False, False) = Parameter.ParamType.AsString(False, False));
 End;
 

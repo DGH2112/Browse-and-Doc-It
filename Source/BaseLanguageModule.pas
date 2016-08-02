@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    29 Jul 2016
+  @Date    02 Aug 2016
   @Version 1.0
   @Author  David Hoyle
 
@@ -461,6 +461,16 @@ Type
     Property Reference : TTokenReference Read FReference Write FReference;
   End;
 
+Const
+  (** A default list of symbols which should not have spaces before them. **)
+  strNoSpaceBeforeSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?', '<', '>'];
+  (** A default list of symbols which should not have spaces after them. **)
+  strNoSpaceAfterSymbols = ['(', '[', '{', '.', '^', '<'];
+  (** A default list of symbols which should have spaces after them. **)
+  strSpaceAfterSymbols = ['=', ':', '+', '-', '*', '\', ','];
+
+
+Type
   (** this class defines an object that can contain tokens and has line and
       column numbers. It is the anscester for TTag, TComment and
       TElementContainer. **)
@@ -488,9 +498,9 @@ Type
     Procedure ClearTokens;
     Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
       strDelimiter : String; iMaxWidth : Integer;
-      strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?'];
-      strNoSpaceAfter : TSymbols = ['(', '[', '{', '.', '^'];
-      strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
+      strNoSpaceBefore : TSymbols = strNoSpaceBeforeSymbols;
+      strNoSpaceAfter : TSymbols = strNoSpaceAfterSymbols;
+      strSpaceAfter : TSymbols = strSpaceAfterSymbols;
       boolShowHTML : Boolean = False) : String; Virtual;
     (**
       This property returns the name of the element.
@@ -2867,9 +2877,9 @@ end;
 **)
 Function TBaseContainer.BuildStringRepresentation(boolIdentifier,
   boolForDocumentation : Boolean; strDelimiter : String; iMaxWidth : Integer;
-  strNoSpaceBefore : TSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?'];
-  strNoSpaceAfter : TSymbols = ['(', '[', '{', '.', '^'];
-  strSpaceAfter : TSymbols = ['=', ':', '+', '-', '*', '\'];
+  strNoSpaceBefore : TSymbols = strNoSpaceBeforeSymbols;
+  strNoSpaceAfter : TSymbols = strNoSpaceAfterSymbols;
+  strSpaceAfter : TSymbols = strSpaceAfterSymbols;
   boolShowHTML : Boolean = False) : String;
 
 Var

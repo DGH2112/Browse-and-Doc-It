@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    25 Apr 2013
+  @Date    06 Aug 2016
   @Version 1.0
 
 **)
@@ -94,13 +94,13 @@ Type
     Function P(strText : String) : String;
     Procedure InitialiseSummary;
     Procedure OutputErrorsWarningsAndHints(slEWH : TStringList; strSectionTitle,
-      strLIType : String; AImageIndex : TImageIndex);
+      strLIType : String; AImageIndex : TBADIImageIndex);
     Procedure OutputSummaryDocumentationConflicts;
     { HTML Tag Outputs }
     Function A(strText, strHREF : String; strName : String = '') : String;
-    Function H(strText : String; iLevel : Integer; AImage : TImageIndex;
+    Function H(strText : String; iLevel : Integer; AImage : TBADIImageIndex;
       AScope : TScope) : String;
-    Function IMG(AImageIndex : TImageIndex; AScope : TScope) : String;
+    Function IMG(AImageIndex : TBADIImageIndex; AScope : TScope) : String;
     Function LI(strClass, strText : String) : String;
     (**
       This property provides access to an array of documentation conflicts for
@@ -365,7 +365,7 @@ begin
     Try
       For i := 0 To FSections.Count - 1 Do
         slSections.Add(Format('<div class="Section">%s&nbsp;%s</div>', [
-          IMG(TImageIndex(FSections.Objects[i]), scNone),
+          IMG(TBADIImageIndex(FSections.Objects[i]), scNone),
           A(FSections[i], '#' + FSections[i])]));
       For i := 0 To slSections.Count - 1 Do
         slSections[i] := strIndent + slSections[i];
@@ -630,7 +630,7 @@ begin
       slContents.Add('  <ul>');
       For j := 1 To E[i].ElementCount Do
         Begin
-          slContents.Add('    ' + LI(ImageList[E[i][j].ImageIndex].FResourcename,
+          slContents.Add('    ' + LI(BADIImageList[E[i][j].ImageIndex].FResourcename,
             N(E[i][j].AsString(True, True))));
           SDC.Conflicts.Add(Format('%s=%s', [E[i].AsString(True, True),
             E[i][j].AsString(True, True)]));
@@ -679,7 +679,7 @@ begin
       slContents.Add('<ul>');
       For j := 1 To E.ElementCount Do
         Begin
-          slContents.Add(#32#32 + LI(ImageList[E[j].ImageIndex].FResourcename,
+          slContents.Add(#32#32 + LI(BADIImageList[E[j].ImageIndex].FResourcename,
           N(E[j].AsString(True, True))));
           sls[i].Add(Format('%s=%s', [ExtractFileName(FCurrentModule.FileName),
             E[j].AsString(True, True)]));
@@ -731,7 +731,7 @@ End;
 Procedure THTMLDocumentation.GenerateImages(strImageDirectory : String);
 
 Var
-  i : TImageIndex;
+  i : TBADIImageIndex;
   BitMap : TBitMap;
   GIF : TGIFImage;
   strFileName: String;
@@ -739,23 +739,23 @@ Var
 
 Begin
   ForceDirectories(strImageDirectory);
-  For i := Succ(Low(TImageIndex)) To High(TImageIndex) Do
+  For i := Succ(Low(TBADIImageIndex)) To High(TBADIImageIndex) Do
     Begin
       Update(FProgressIndex, Format('Generating Image %s...', [
-        ImageList[i].FResourcename]));
+        BADIImageList[i].FResourcename]));
       Inc(FProgressIndex);
       BitMap := TBitMap.Create;
       try
-        BitMap.LoadFromResourceName(hInstance, ImageList[i].FResourcename);
+        BitMap.LoadFromResourceName(hInstance, BADIImageList[i].FResourcename);
         BitMap.Transparent := True;
-        BitMap.TransparentColor := ImageList[i].FMaskColour;
+        BitMap.TransparentColor := BADIImageList[i].FMaskColour;
         BitMap.TransparentMode := tmFixed;
         GIF := TGIFImage.Create;
         Try
           GIF.Transparent := True;
           GIF.Assign(BitMap);
           strFileName := Format('%s%s.gif', [strImageDirectory,
-            ImageList[i].FResourcename]);
+            BADIImageList[i].FResourcename]);
           If Not FileExists(strFileName) Then
             GIF.SaveToFile(strFileName);
         Finally
@@ -1168,13 +1168,13 @@ end;
 
   @param   strText as a String
   @param   iLevel  as an Integer
-  @param   AImage  as a TImageIndex
+  @param   AImage  as a TBADIImageIndex
   @param   AScope  as a TScope
   @return  a String 
 
 **)
 function THTMLDocumentation.H(strText: String; iLevel: Integer;
-  AImage : TImageIndex; AScope : TScope): String;
+  AImage : TBADIImageIndex; AScope : TScope): String;
 
 begin
   Result := Format('<h%d>%s&nbsp;%s</h%d>', [iLevel, IMG(AImage, AScope),
@@ -1192,15 +1192,15 @@ end;
   @postcon Outputs an img tag with the image vertically aligned central. 
 
 
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AScope      as a TScope
   @return  a String     
 
 **)
-function THTMLDocumentation.IMG(AImageIndex: TImageIndex; AScope : TScope): String;
+function THTMLDocumentation.IMG(AImageIndex: TBADIImageIndex; AScope : TScope): String;
 
 Var
-  iImage : TImageIndex;
+  iImage : TBADIImageIndex;
 
 begin
   Result := '';
@@ -1215,7 +1215,7 @@ begin
         iImage := AImageIndex; // scPublic, scGlobal, scNone
       End;
       Result := Format('<img class="verticallymiddle" src="Images/%s.gif" alt=""/>',
-        [ImageList[iImage].FResourcename]);
+        [BADIImageList[iImage].FResourcename]);
     End;
 end;
 
@@ -1418,7 +1418,7 @@ Var
   i : Integer;
 
 Begin
-  Initialise(5 + Integer(High(TImageIndex)) + FFileNames.Count, 'HTML Documentation',
+  Initialise(5 + Integer(High(TBADIImageIndex)) + FFileNames.Count, 'HTML Documentation',
     'Processing source code, please wait...');
   Try
     GenerateCSS;
@@ -1510,11 +1510,11 @@ end;
   @param   slEWH           as a TStringList
   @param   strSectionTitle as a String
   @param   strLIType       as a String
-  @param   AImageIndex     as a TImageIndex
+  @param   AImageIndex     as a TBADIImageIndex
 
 **)
 procedure THTMLDocumentation.OutputErrorsWarningsAndHints(slEWH: TStringList;
-  strSectionTitle, strLIType : String; AImageIndex : TImageIndex);
+  strSectionTitle, strLIType : String; AImageIndex : TBADIImageIndex);
 
 var
   strModuleName: String;

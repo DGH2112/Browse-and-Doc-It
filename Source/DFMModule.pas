@@ -3,7 +3,7 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       16 Jul 2016
+  @Date       06 Aug 2016
   @Author     David Hoyle
 
 **)
@@ -17,22 +17,25 @@ Uses
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
+  (** An enumerate to define the type of an object definition. **)
+  TObjectType = (otObject, otInherited, otinline);
+
   (** This class represent a DFM object in the file. **)
   TDFMObject = Class(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FIsInherited: Boolean;
+    FObjectType: TObjectType;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
-      This property sets and gets the whether the object is Inherited or not.
+      This property sets and gets the whether the Object, Inherited or Inline.
       @precon  None.
-      @postcon Sets and gets the whether the object is Inherited or not.
-      @return  a Boolean
+      @postcon Sets and gets the whether the Object, Inherited or Inline.
+      @return  a TObjectType
     **)
-    Property IsInherited : Boolean Read FIsInherited Write FIsInherited;
+    Property ObjectType : TObjectType Read FObjectType Write FObjectType;
   End;
 
   (** This class represent a DFM property in the file. **)
@@ -110,8 +113,8 @@ Const
     identifiers and as types.
 
   **)
-  strReservedWords : Array[0..2] Of String = (
-    'end', 'inherited', 'object'
+  strReservedWords : Array[0..3] Of String = (
+    'end', 'inherited', 'inline', 'object'
   );
 
   (** This is a list of reserved, directives word and a semi colon which are
@@ -136,10 +139,11 @@ Const
 function TDFMObject.AsString(boolShowIdentifier,
   boolForDocumentation: Boolean): String;
 begin
-  If FIsInherited Then
-    Result := 'Inherited'
-  Else
-    Result := 'Object';
+  Case ObjectType Of
+    otObject:    Result := 'Object';
+    otInherited: Result := 'Inherited';
+    otinline:    Result := 'Inline';
+  End;
   Result := Result + #32 + BuildStringRepresentation(True, boolForDocumentation,
     ':', BrowseAndDocItOptions.MaxDocOutputWidth)
 end;
@@ -163,7 +167,7 @@ constructor TDFMObject.Create(strName: String; AScope: TScope; iLine,
   iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
-  FIsInherited := False;
+  FObjectType := otObject;
 end;
 
 { TDFMProperty }
@@ -368,20 +372,24 @@ function TDFMModule.DFMObject(Container : TElementContainer): Boolean;
 
 Var
   O : TDFMObject;
-  boolInherited : Boolean;
+  AObjectType : TObjectType;
 
 begin
   Result := False;
-  If IsKeyWord(Token.UToken, ['inherited', 'object']) Then
+  If IsKeyWord(Token.UToken, ['inherited', 'inline', 'object']) Then
     Begin
       Result := True;
-      boolInherited := Token.UToken = 'INHERITED';
+      AObjectType := otObject;
+      If Token.UToken = 'INHERITED' Then
+        AObjectType := otInherited
+      Else If Token.UToken = 'INLINE' Then
+        AObjectType := otinline;
       NextNonCommentToken;
       If Token.TokenType In [ttIdentifier] Then
         Begin
           O := Container.Add(TDFMObject.Create(Token.Token, scPublic, Token.Line,
             Token.Column, iiPublicObject, Nil)) As TDFMObject;
-          O.IsInherited := boolInherited;
+          O.ObjectType := AObjectType;
           NextNonCommentToken;
           If Token.Token = ':' Then
             Begin

@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    28 Apr 2013
+  @Date    02 Aug 2016
   @Author  David Hoyle
 
 **)
@@ -46,10 +46,13 @@ Uses
   SynHighlighterXML,
   DGHSynEdit,
   ZipForge,
-  SynHighlighterDfm;
+  SynHighlighterDfm,
+  System.Actions,
+  System.ImageList,
+  DGHCustomGraphicsControl,
+  DGHMemoryMonitorControl;
 
 {$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
-
 
 Type
   (** A record to define the doc conflicts, hints and errors for files and
@@ -122,6 +125,7 @@ Type
     tbtnFolderCongih: TToolButton;
     actToolsSynEditOptions: TAction;
     ToolButton: TToolButton;
+    DGHMemoryMonitor: TDGHMemoryMonitor;
     Procedure FormCreate(Sender: TObject);
     Procedure FormDestroy(Sender: TObject);
     Procedure SynEdit1Change(Sender: TObject);
@@ -147,7 +151,7 @@ Type
     Procedure actViewWordWrapUpdate(Sender: TObject);
     Procedure actFileFoldersExecute(Sender: TObject);
     Procedure actToolsSynEditOptionsExecute(Sender: TObject);
-    {$IFDEF D2005} Strict {$ENDIF} Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     { Private declarations }
     FFileName           : String;
     FPathRoot           : String;
@@ -166,6 +170,7 @@ Type
     FTimer              : TTimer;
     FLastEdit           : Int64;
     FFolders            : TStringList;
+    FIndex              : Integer;
     Function GetFileName: String;
     Procedure SetFileName(Const Value: String);
     Procedure LoadSettings;
@@ -184,6 +189,12 @@ Type
     Procedure RefreshModuleExplorer;
     Procedure SaveResults;
     Procedure LoadResults;
+    Procedure ProcessFileFailure(Sender: TObject; FileName: String;
+      Operation: TZFProcessOperation; NativeError: Integer; ErrorCode: Integer;
+      ErrorMessage: String; var Action: TZFAction);
+    Procedure ExtractFile(Sender: TObject; var FileName: String; var FileAttr: LongWord;
+      const Comment: AnsiString);
+    Procedure UpdateStatusBar;
     (**
       A property to define the currently selected file.
       @precon  None.
@@ -199,13 +210,6 @@ Type
       @return  a String
     **)
     Property PathRoot: String Read GetPathRoot Write SetPathRoot;
-  Private
-    FIndex: Integer;
-    Procedure ProcessFileFailure(Sender: TObject; FileName: String;
-      Operation: TZFProcessOperation; NativeError: Integer; ErrorCode: Integer; 
-      ErrorMessage: String; var Action: TZFAction);
-    Procedure ExtractFile(Sender: TObject; var FileName: String; var FileAttr: LongWord;
-      const Comment: AnsiString);
   Public
     { Public declarations }
   End;
@@ -242,28 +246,28 @@ Type
       @postcon Returns the number of errors in the file.
       @return  an Integer
     **)
-    Property Errors: Integer Read FErrors;
+    Property Errors: Integer Read FErrors Write FErrors;
     (**
       This property returns the number of warnings in the file.
       @precon  None.
       @postcon Returns the number of warnings in the file.
       @return  an Integer
     **)
-    Property Warnings: Integer Read FWarnings;
+    Property Warnings: Integer Read FWarnings Write FWarnings;
     (**
       This property returns the number of hints in the file.
       @precon  None.
       @postcon Returns the number of hints in the file.
       @return  an Integer
     **)
-    Property Hints: Integer Read FHints;
+    Property Hints: Integer Read FHints Write FHints;
     (**
       This property returns the number of conflicts in the file.
       @precon  None.
       @postcon Returns the number of conflicts in the file.
       @return  an Integer
     **)
-    Property Conflicts: Integer Read FConflicts;
+    Property Conflicts: Integer Read FConflicts Write FConflicts;
   End;
 
 Var
@@ -287,7 +291,8 @@ Uses
   ExclusionsForm,
   FolderConfig,
   UsefulSynEditFunctions,
-  EditorOptionsForm;
+  EditorOptionsForm,
+  UITypes;
 
 {$R *.dfm}
 
@@ -470,7 +475,7 @@ End;
 Procedure TfrmBrowseAndDocItTestForm.actToolsSynEditOptionsExecute(
   Sender: TObject);
 Begin
-  TfrmEditorOptions.Execute(FSynEdit, False);
+  TfrmEditorOptions.Execute(Self, FSynEdit, False);
 End;
 
 (**
@@ -525,10 +530,10 @@ End;
   the result set.
 
   @precon  None .
-  @postcon Returns true if the file should be excluded from the results . 
+  @postcon Returns true if the file should be excluded from the results .
 
-  @note    The exclusion text is only tested for in the path / filename section 
-           after the root path , i . e . the root path is ignored . 
+  @note    The exclusion text is only tested for in the path / filename section
+           after the root path , i . e . the root path is ignored .
 
   @param   strFileName as a String
   @return  a Boolean
@@ -565,7 +570,7 @@ End;
 **)
 procedure TfrmBrowseAndDocItTestForm.ExtractFile(Sender: TObject;
   var FileName: String; var FileAttr: LongWord; const Comment: AnsiString);
-  
+
 begin
   CodeSite.Send('Extract File Failure', FileName);
 end;
@@ -775,9 +780,14 @@ Begin
                                     Inc(Result.iHints, iHints);
                                     Inc(Result.iWarnings, iWarnings);
                                     Inc(Result.iErrors, iErrors);
-                                    FParseRecords.Add(TParseRecord.Create(strFileName,
-                                      strRoot,
-                                      iErrors, iWarnings, iHints, iConflicts));
+                                    FParseRecords.Add(
+                                      TParseRecord.Create(
+                                        strFileName,
+                                        strRoot,
+                                        iErrors,
+                                        iWarnings,
+                                        iHints,
+                                        iConflicts));
                                     Application.ProcessMessages;
                                   End
                                 Else
@@ -835,6 +845,13 @@ Procedure TfrmBrowseAndDocItTestForm.RefreshModuleExplorer;
 
 Var
   M: TBaseLanguageModule;
+  iErrors : Integer;
+  iWarnings : Integer;
+  iHints : Integer;
+  iConflicts : Integer;
+  C: TElementContainer;
+  i: Integer;
+  R: TParseRecord;
 
 Begin
   M := ModuleDispatcher.Dispatcher(FSynEdit.Text, FileName, FSynEdit.Modified, [moParse,
@@ -842,9 +859,39 @@ Begin
   If M <> Nil Then
     Try
       FModuleExplorerFrame.RenderModule(M);
+      iHints := 0;
+      If M.FindElement(strHints) <> Nil Then
+        iHints := M.FindElement(strHints).ElementCount;
+      iWarnings := 0;
+      If M.FindElement(strWarnings) <> Nil Then
+        iWarnings := M.FindElement(strWarnings).ElementCount;
+      iErrors := 0;
+      If M.FindElement(strErrors) <> Nil Then
+        iErrors := M.FindElement(strErrors).ElementCount;
+      iConflicts := 0;
+      C         := M.FindElement(strDocumentationConflicts);
+      If C <> Nil Then
+        Begin
+          For i := 1 To C.ElementCount Do
+            Inc(iConflicts, C.Elements[i].ElementCount);
+        End;
+      R := FParseRecords[StrToInt(lvFileList.Selected.Caption)] As TParseRecord;
+      R.Errors := iErrors;
+      R.Warnings := iWarnings;
+      R.Hints := iHints;
+      R.Conflicts := iConflicts;
+      UpdateStatusBar;
+      If lvFileList.Selected <> Nil Then
+        Begin
+          lvFileList.Selected.SubItems[4] := IntToStr(iErrors);
+          lvFileList.Selected.SubItems[3] := IntToStr(iWarnings);
+          lvFileList.Selected.SubItems[2] := IntToStr(iHints);
+          lvFileList.Selected.SubItems[1] := IntToStr(iConflicts);
+        End;
     Finally
       M.Free;
     End;
+  FLastEdit := 0; // Reset code timer to no changes
 End;
 
 (**
@@ -1090,7 +1137,11 @@ Begin
   iLength := Length(Item.Caption);
   DrawText(Sender.Canvas.Handle, PChar(Item.Caption), iLength, R,
     DT_LEFT Or DT_PATH_ELLIPSIS);
-  For i := 0 To Min(Item.SubItems.Count - 1, 3) Do
+  R := GetSubItemRect(0);
+  iLength := Length(Item.SubItems[0]);
+  DrawText(Sender.Canvas.Handle, PChar(Item.SubItems[0]), iLength, R,
+    DT_LEFT Or DT_PATH_ELLIPSIS);
+  For i := 1 To Min(Item.SubItems.Count - 1, 4) Do
     Begin
       R                         := GetSubItemRect(i);
       Sender.Canvas.Brush.Color := clWindow;
@@ -1099,24 +1150,16 @@ Begin
       If iValue > 0 Then
         Begin
           Case i Of
-            0:
-              Sender.Canvas.Brush.Color := clSkyBlue;
-            1:
-              Sender.Canvas.Brush.Color := clGreen;
-            2:
-              Sender.Canvas.Brush.Color := clYellow;
-            3:
-              Sender.Canvas.Brush.Color := clRed;
+            1: Sender.Canvas.Brush.Color := clSkyBlue;
+            2: Sender.Canvas.Brush.Color := clGreen;
+            3: Sender.Canvas.Brush.Color := clYellow;
+            4: Sender.Canvas.Brush.Color := clRed;
           End;
           Case i Of
-            0:
-              Sender.Canvas.Font.Color := clBlack;
-            1:
-              Sender.Canvas.Font.Color := clWhite;
-            2:
-              Sender.Canvas.Font.Color := clRed;
-            3:
-              Sender.Canvas.Font.Color := clYellow;
+            1: Sender.Canvas.Font.Color := clBlack;
+            2: Sender.Canvas.Font.Color := clWhite;
+            3: Sender.Canvas.Font.Color := clRed;
+            4: Sender.Canvas.Font.Color := clYellow;
           End;
         End;
       If Item.Selected Then
@@ -1151,8 +1194,8 @@ Procedure TfrmBrowseAndDocItTestForm.lvFileListSelectItem(Sender: TObject;
 Begin
   If lvFileList.Selected <> Nil Then
     Begin
-      FileName := lvFileList.Selected.SubItems[4];
-      PathRoot := lvFileList.Selected.SubItems[5];
+      FileName := lvFileList.Selected.SubItems[5];
+      PathRoot := lvFileList.Selected.SubItems[6];
       RefreshModuleExplorer;
     End;
 End;
@@ -1193,7 +1236,8 @@ Begin
         If boolInclude Then
           Begin
             liItem         := lvFileList.Items.Add;
-            liItem.Caption := ExtractFileName(rec.FileName);
+            liItem.Caption := IntToStr(i);
+            liItem.SubItems.Add(ExtractFileName(rec.FileName));
             liItem.SubItems.Add(Format('%d', [rec.Conflicts]));
             liItem.SubItems.Add(Format('%d', [rec.Hints]));
             liItem.SubItems.Add(Format('%d', [rec.Warnings]));
@@ -1210,6 +1254,7 @@ Begin
   Finally
     lvFileList.Items.EndUpdate;
   End;
+  UpdateStatusBar;
 End;
 
 (**
@@ -1490,19 +1535,30 @@ End;
 **)
 Procedure TfrmBrowseAndDocItTestForm.SetFileName(Const Value: String);
 
+Const
+  strMsg : String = 'The file "%s" has changed.'#13#10'Do you want to save the changes?';
 Var
-  strExt     : String;
-  Z          : TZipForge;
-  strSource  : String;
-  strFileName: String;
-  iPos       : Integer;
+  strExt       : String;
+  Z            : TZipForge;
+  strSource    : String;
+  strFileName  : String;
+  iPos         : Integer;
 
 Begin
+  If FSynEdit.Modified Then
+    Case MessageDlg(Format(strMsg, [FFilename]), mtConfirmation, [mbYes, mbNo,
+      mbCancel], 0) Of
+      mrYes: FSynEdit.Lines.SaveToFile(FFileName);
+      mrNo: ;
+      mrCancel: Abort;
+    End;
   FFileName := Value;
   Caption   := FFileName;
   If Not Like('*.zip\*', FFileName) Then
-    FSynEdit.Lines.LoadFromFile(FFileName)
-  Else
+    Begin
+      FSynEdit.Lines.LoadFromFile(FFileName);
+      FSynEdit.ReadOnly := (GetFileAttributes(PChar(FFileName)) And FILE_ATTRIBUTE_READONLY > 0)
+    End Else
     Begin
       Z := TZipForge.Create(Nil);
       Try
@@ -1513,6 +1569,7 @@ Begin
         Try
           Z.ExtractToString(Copy(FFileName, iPos + 5, MAX_PATH), strSource);
           FSynEdit.Lines.Text := strSource;
+          FSynEdit.ReadOnly := True;
         Finally
           Z.CloseArchive;
         End;
@@ -1585,7 +1642,7 @@ Procedure TfrmBrowseAndDocItTestForm.SynEdit1StatusChange(Sender: TObject;
   Changes: TSynStatusChanges);
 Begin
   FLastEdit               := GetTickCount;
-  sbrStatusBar.SimpleText := Format('Line %d, Column %d',
+  sbrStatusBar.Panels[4].Text := Format('Line %d, Column %d',
     [FSynEdit.CaretY, FSynEdit.CaretX]);
 End;
 
@@ -1613,7 +1670,6 @@ Begin
         RefreshModuleExplorer;
       Finally
         FTimer.Enabled := True;
-        FLastEdit      := 0;
       End;
     End;
 End;
@@ -1650,14 +1706,48 @@ Begin
   FSynEdit.SetFocus;
 End;
 
+(**
+
+  This method updates the statusbar with the current number of errors, warnings, etc.
+
+  @precon  None.
+  @postcon Teh status bar is updated.
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.UpdateStatusbar;
+
+Var
+  iErrors, iWarnings, iHints, iConflicts : Integer;
+  i : Integer;
+  R : TParseRecord;
+
+Begin
+  iErrors := 0;
+  iWarnings := 0;
+  iHints := 0;
+  iConflicts := 0;
+  For i := 0 To FParseRecords.Count - 1 Do
+    Begin
+      R := FParseRecords[i] As TParseRecord;
+      Inc(iErrors, R.Errors);
+      Inc(iWarnings, R.Warnings);
+      Inc(iHints, R.Hints);
+      Inc(iConflicts, R.Conflicts);
+    End;
+  sbrStatusBar.Panels[0].Text := Format('%1.0n Conflicts', [Int(iConflicts)]);
+  sbrStatusBar.Panels[1].Text := Format('%1.0n Hints', [Int(iHints)]);
+  sbrStatusBar.Panels[2].Text := Format('%1.0n Warnings', [Int(iWarnings)]);
+  sbrStatusBar.Panels[3].Text := Format('%1.0n Errors', [Int(iErrors)]);
+End;
+
 { TParseRecord }
 
 (**
 
   This is a constructor for the TParseRecord class.
 
-  @precon  None . 
-  @postcon Initialises the record class with information . 
+  @precon  None .
+  @postcon Initialises the record class with information .
 
   @param   strFileName as a String
   @param   strPathRoot as a String

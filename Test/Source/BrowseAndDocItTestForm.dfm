@@ -37,13 +37,30 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Height = 714
     Align = alLeft
     TabOrder = 0
+    ExplicitTop = 60
+    ExplicitHeight = 684
   end
   object sbrStatusBar: TStatusBar
     Left = 0
     Top = 744
     Width = 907
     Height = 19
-    Panels = <>
+    Panels = <
+      item
+        Width = 100
+      end
+      item
+        Width = 100
+      end
+      item
+        Width = 100
+      end
+      item
+        Width = 100
+      end
+      item
+        Width = 100
+      end>
   end
   object atbToolbar: TToolBar
     Left = 0
@@ -180,6 +197,13 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Hint = 'Folder Configuration|Configure the folders to scan...'
       Action = actFileFolders
     end
+    object DGHMemoryMonitor: TDGHMemoryMonitor
+      Left = 456
+      Top = 0
+      Width = 440
+      Height = 22
+      UpdateInterval = 500
+    end
   end
   object lvFileList: TListView
     Left = 0
@@ -188,6 +212,9 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Height = 714
     Align = alLeft
     Columns = <
+      item
+        Caption = 'Index'
+      end
       item
         Caption = 'FileName'
         Width = 125
@@ -226,7 +253,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Left = 330
     Top = 139
     Bitmap = {
-      494C010118001D000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010118001D00280010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000007000000001002000000000000070
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1329,7 +1356,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Left = 332
     Top = 198
     Bitmap = {
-      494C0101020004000C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000400280010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

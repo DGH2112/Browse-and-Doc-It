@@ -31,14 +31,17 @@ type
 
   TClassOfTGenericTypeDecl = Class Of TGenericTypeDecl;
 
+  TTestType = (ttErrors, ttWarnings, ttHints);
+  TTestTypes = Set of TTestType;
+
   TExtendedTestCase = Class(TTestCase)
   Strict Private
   Public
     Procedure CheckEquals(ttExpected, ttActual : TBADITokenType;
       strMsg : String = ''); Overload;
-    Procedure CheckEquals(iiExpected, iiActual : TImageIndex;
+    Procedure CheckEquals(iiExpected, iiActual : TBADIImageIndex;
       strMsg : String = ''); Overload;
-    Procedure CheckEquals(iiExpected : TImageIndex; iActual : Integer;
+    Procedure CheckEquals(iiExpected : TBADIImageIndex; iActual : Integer;
       strMsg : String = ''); Overload;
     Procedure CheckEquals(scExpected, scActual : TScope;
       strMsg : String = ''); Overload;
@@ -48,6 +51,9 @@ type
       strMsg : String = ''); Overload;
     Procedure CheckEquals(strExpected, strActual : String;
       strMsg : String = ''); Overload; Override;
+    Procedure TestGrammarForErrors(Parser : TBaseLanguageModuleClass;
+      strTemplate : String; strInterface, strImplementation : String;
+      TestTypes : TTestTypes; Const strCheckValues : Array Of String);
   Published
   End;
 
@@ -360,7 +366,8 @@ type
 implementation
 
 Uses
-  Windows;
+  Windows,
+  TypInfo;
 
 { TTestBaseLanguageModule }
 
@@ -471,6 +478,93 @@ end;
 
 { TExtendedTestCase }
 
+Procedure TExtendedTestCase.TestGrammarForErrors(Parser : TBaseLanguageModuleClass;
+  strTemplate : String; strInterface, strImplementation: String; TestTypes : TTestTypes;
+  Const strCheckValues : Array Of String);
+
+Const
+  cDelimiter : Char = '\';
+
+  Function GetElements(Element, ParentElement  : TElementContainer) : String;
+
+  Var
+    i : Integer;
+
+  Begin
+    Result := '';
+    If Element = Nil Then
+      Begin
+        For i := 1 To ParentElement.ElementCount Do
+          Begin
+            If Result <> '' Then
+              Result := Result + ', ';
+            Result := Result + '[' + ParentElement.Elements[i].Identifier + ']';
+          End;
+      End;
+  End;
+
+  Function SearchForElement(Element : TElementContainer; strValue : String) : TElementContainer;
+
+  Begin
+    Result := Element.FindElement(strValue);
+    If Result = Nil Then
+      Result := Element.FindElement(strValue, ftIdentifier);
+  End;
+
+Var
+  P: TBaseLanguageModule;
+  T, U : TElementContainer;
+  strValue: String;
+  iCheck: Integer;
+  strCheckValue: String;
+  i : Integer;
+  strKey : String;
+  strValueScope : String;
+
+Begin
+  P := Parser.CreateParser(Format(strTemplate, [strInterface,
+    strImplementation]), 'TestSource.pas', False, [moParse]);
+  Try
+    If ttHints In TestTypes Then
+      CheckEquals(0, P.HeadingCount(strHints), 'HINTS: ' + P.FirstHint);
+    If ttWarnings In TestTypes Then
+      CheckEquals(0, P.HeadingCount(strWarnings), 'WARNINGS: ' + P.FirstWarning);
+    If ttErrors In TestTypes Then
+      CheckEquals(0, P.HeadingCount(strErrors), 'ERRORS: ' + P.FirstError);
+    For iCheck := Low(strCheckValues) to High(strCheckValues) Do
+      If strCheckValues[iCheck] <> '' Then
+        Begin
+         strCheckValue := strCheckValues[iCheck];
+          T := P;
+          While (Pos(cDelimiter, strCheckValue) > 0) And (Pos(cDelimiter, strCheckValue) < Pos('|', strCheckValue)) Do
+            Begin
+              strValue := Copy(strCheckValue, 1, Pos(cDelimiter, strCheckValue) - 1);
+              Delete(strCheckValue, 1, Pos(cDelimiter, strCheckValue));
+              U := SearchForElement(T, strValue);
+              Check(U <> Nil, Format('%d.2) %s not found (found %s): %s', [Succ(iCheck), strValue, GetElements(U, T), strCheckValues[iCheck]]));
+              T := U;
+            End;
+          Check(T.ElementCount > 0, Format('%d.3) Element Count: ', [Succ(iCheck), strCheckValues[iCheck]]));
+          i := Pos('|', strCheckValue);
+          Check(i > 0, Format('%d.4) Cannot find KEY to search for! ', [Succ(iCheck), strCheckValues[iCheck]]));
+          strKey := Copy(strCheckvalue, 1, i - 1);
+          Delete(strCheckValue, 1, i);
+          i := Pos('|', strCheckValue);
+          Check(i > 0, Format('%d.5) Cannot get scope: %s', [Succ(iCheck), strCheckvalues[iCheck]]));
+          strValueScope := Copy(strCheckValue, i + 1, Length(strCheckValue) - i);
+          Delete(strCheckValue, i, Length(strCheckValue) - (i - 1));
+
+          U := SearchForElement(T, strKey);
+          Check(U <> Nil, Format('%d.6) Cannot find KEY to check (%s): %s', [Succ(iCheck), GetElements(U, T), strCheckValues[iCheck]]));
+          CheckEquals(strCheckValue, U.AsString(True, False), Format('%d.7) Value check failed: ', [Succ(iCheck), strCheckValues[iCheck]]));
+          CheckEquals(strValueScope, GetEnumName(TypeInfo(TScope), Ord(U.Scope)), Format('%d.8) Incorrect Scope: %s', [Succ(iCheck), strCheckValues[iCheck]]));
+        End Else
+          Check(strCheckValue <> '', Format('%d.1) strCheckValue is NULL!', [Succ(iCheck)]));
+  Finally
+    P.Free;
+  End;
+End;
+
 procedure TExtendedTestCase.CheckEquals(ttExpected, ttActual: TBADITokenType;
   strMsg: String = '');
 
@@ -478,17 +572,18 @@ begin
   FCheckCalled := True;
   If CompareText(strTokenType[ttExpected], strTokenType[ttActual]) <> 0 Then
     FailNotEquals(strTokenType[ttExpected], strTokenType[ttActual], strMsg,
-      CallerAddr);
+      ReturnAddress);
 end;
 
-procedure TExtendedTestCase.CheckEquals(iiExpected, iiActual: TImageIndex;
+procedure TExtendedTestCase.CheckEquals(iiExpected, iiActual: TBADIImageIndex;
   strMsg: String = '');
 
 begin
   FCheckCalled := True;
   If iiExpected <> iiActual Then
-    FailNotEquals(ImageList[iiExpected].FResourcename, ImageList[iiActual].FResourcename,
-      strMsg, CallerAddr);
+    FailNotEquals(BADIImageList[iiExpected].FResourcename,
+      BADIImageList[iiActual].FResourcename,
+      strMsg, ReturnAddress);
 end;
 
 procedure TExtendedTestCase.CheckEquals(scExpected, scActual: TScope;
@@ -503,7 +598,7 @@ begin
   FCheckCalled := True;
   If CompareText(strScopes[scExpected], strScopes[scActual]) <> 0 Then
     FailNotEquals(strScopes[scExpected], strScopes[scActual], strMsg,
-      CallerAddr);
+      ReturnAddress);
 end;
 
 procedure TExtendedTestCase.CheckEquals(trExpected, trActual: TTokenReference;
@@ -517,7 +612,7 @@ begin
   FCheckCalled := True;
   If CompareText(strTokenReference[trExpected], strTokenReference[trActual]) <> 0 Then
     FailNotEquals(strTokenReference[trExpected], strTokenReference[trActual], strMsg,
-      CallerAddr);
+      ReturnAddress);
 end;
 
 procedure TExtendedTestCase.CheckEquals(ctExpected, ctActual: TCommentType;
@@ -532,10 +627,10 @@ begin
   FCheckCalled := True;
   If CompareText(strCommentTypes[ctExpected], strCommentTypes[ctActual]) <> 0 Then
     FailNotEquals(strCommentTypes[ctExpected], strCommentTypes[ctActual], strMsg,
-      CallerAddr);
+      ReturnAddress);
 end;
 
-procedure TExtendedTestCase.CheckEquals(iiExpected: TImageIndex;
+procedure TExtendedTestCase.CheckEquals(iiExpected: TBADIImageIndex;
   iActual: Integer; strMsg: String);
 
 Var
@@ -545,8 +640,8 @@ begin
   FCheckCalled := True;
   i := Integer(iiExpected) - 1;
   If i <> iActual Then
-    FailNotEquals(ImageList[iiExpected].FResourcename,
-      ImageList[TImageIndex(iActual + 1)].FResourcename, strMsg, CallerAddr);
+    FailNotEquals(BADIImageList[iiExpected].FResourcename,
+      BADIImageList[TBADIImageIndex(iActual + 1)].FResourcename, strMsg, ReturnAddress);
 end;
 
 Procedure TExtendedTestCase.CheckEquals(strExpected, strActual: String;
@@ -573,7 +668,7 @@ Begin
       Else
         strMsg := strMsg + Format( ' [[Difference @ character %d: %s]]',
           [iPosition, Copy(strActual, 1, iPosition)]);
-      FailNotEquals(strExpected, strActual, strMsg, CallerAddr);
+      FailNotEquals(strExpected, strActual, strMsg, ReturnAddress);
     End;
 End;
 

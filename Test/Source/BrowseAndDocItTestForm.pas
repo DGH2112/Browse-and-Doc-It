@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    02 Aug 2016
+  @Date    06 Aug 2016
   @Author  David Hoyle
 
 **)
@@ -126,6 +126,8 @@ Type
     actToolsSynEditOptions: TAction;
     ToolButton: TToolButton;
     DGHMemoryMonitor: TDGHMemoryMonitor;
+    actResurseZipFiles: TAction;
+    btnRecurseZipFiles: TToolButton;
     Procedure FormCreate(Sender: TObject);
     Procedure FormDestroy(Sender: TObject);
     Procedure SynEdit1Change(Sender: TObject);
@@ -151,6 +153,8 @@ Type
     Procedure actViewWordWrapUpdate(Sender: TObject);
     Procedure actFileFoldersExecute(Sender: TObject);
     Procedure actToolsSynEditOptionsExecute(Sender: TObject);
+    procedure actResurseZipFilesExecute(Sender: TObject);
+    procedure actResurseZipFilesUpdate(Sender: TObject);
   {$IFDEF D2005} Strict {$ENDIF} Private
     { Private declarations }
     FFileName           : String;
@@ -171,6 +175,7 @@ Type
     FLastEdit           : Int64;
     FFolders            : TStringList;
     FIndex              : Integer;
+    FRecurseZipFiles    : Boolean;
     Function GetFileName: String;
     Procedure SetFileName(Const Value: String);
     Procedure LoadSettings;
@@ -445,6 +450,40 @@ Begin
       FProgressForm.Hide;
     End;
   End;
+End;
+
+(**
+
+  This is an on execute event handler for the Recurse Zip Files action.
+
+  @precon  None.
+  @postcon Toggles the ability to recurse zip folders.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.actResurseZipFilesExecute(Sender: TObject);
+
+Begin
+  FRecurseZipFiles := Not FRecurseZipFiles;
+End;
+
+(**
+
+  This is an on update event handler for the Recurse Zip Files action.
+
+  @precon  None.
+  @postcon Updates the checked property of the action based on the recurse zip files
+           property.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmBrowseAndDocItTestForm.actResurseZipFilesUpdate(Sender: TObject);
+
+Begin
+  If Sender Is TAction Then
+    (Sender As TAction).Checked := FRecurseZipFiles;
 End;
 
 (**
@@ -739,7 +778,7 @@ Begin
             Inc(Result.iWarnings, R.iWarnings);
             Inc(Result.iErrors, R.iErrors);
           End;
-        If Like('*.zip', recFile.Name) Then
+        If FRecurseZipFiles And Like('*.zip', recFile.Name) Then
           Begin
             Z := TZipForge.Create(Nil);
             Try
@@ -1347,6 +1386,7 @@ Begin
         recWndPlmt.rcNormalPosition.Right - recWndPlmt.rcNormalPosition.Left);
       WriteInteger('Position', 'WindowState', Integer(WindowState));
       WriteInteger('Position', 'FileSplitter', lvFileList.Width);
+      WriteBool('ZipFiles', 'Recuse', FRecurseZipFiles);
       WriteInteger('Columns', '1', lvFileList.Columns[0].Width);
       WriteInteger('Columns', '2', lvFileList.Columns[1].Width);
       WriteInteger('Columns', '3', lvFileList.Columns[2].Width);
@@ -1450,6 +1490,7 @@ Begin
       Left        := ReadInteger('Position', 'Left', Left);
       Height      := ReadInteger('Position', 'Height', Height);
       Width       := ReadInteger('Position', 'Width', Width);
+      FRecurseZipFiles := ReadBool('ZipFiles', 'Recuse', False);
       WindowState := TWindowState(ReadInteger('Position', 'WindowState',
         Integer(wsNormal)));
       lvFileList.Width := ReadInteger('Position', 'FileSplitter', lvFileList.Width);

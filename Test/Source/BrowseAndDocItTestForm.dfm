@@ -37,8 +37,6 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Height = 714
     Align = alLeft
     TabOrder = 0
-    ExplicitTop = 60
-    ExplicitHeight = 684
   end
   object sbrStatusBar: TStatusBar
     Left = 0
@@ -78,6 +76,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     List = True
     ParentColor = False
     ParentShowHint = False
+    AllowTextButtons = True
     ShowHint = True
     TabOrder = 2
     object tbtnFileExit: TToolButton
@@ -86,19 +85,25 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Action = actFileExit
     end
     object tbtnFileScan: TToolButton
-      Left = 27
+      Left = 24
       Top = 0
       Hint = 'Scan|Scan for files to parse...'
       Action = actFileScan
     end
+    object btnRecurseZipFiles: TToolButton
+      Left = 48
+      Top = 0
+      Action = actResurseZipFiles
+      Caption = 'Recurse Zip Files'
+    end
     object tbtnFileExcludeFile: TToolButton
-      Left = 54
+      Left = 75
       Top = 0
       Hint = 'Exclude File|Exclude this file from the scans...'
       Action = actFileExcludeFile
     end
     object tbtnSep1: TToolButton
-      Left = 81
+      Left = 99
       Top = 0
       Width = 8
       Caption = 'tbtnSep1'
@@ -106,36 +111,36 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Style = tbsSeparator
     end
     object tbtnFileRecurseFolders: TToolButton
-      Left = 89
+      Left = 107
       Top = 0
       Hint = 'Recurse Folders|Recurse Folders when scanning...'
       Action = actFileRecurseFolders
     end
     object btnViewDocConflicts: TToolButton
-      Left = 116
+      Left = 131
       Top = 0
       Action = actViewDocConflicts
     end
     object tbtnViewHints: TToolButton
-      Left = 143
+      Left = 155
       Top = 0
       Hint = 'Hints|View Hints...'
       Action = actViewHints
     end
     object tbtnViewWarnings: TToolButton
-      Left = 170
+      Left = 179
       Top = 0
       Hint = 'Warnings|View Warnings...'
       Action = actViewWarnings
     end
     object tbtnViewErrors: TToolButton
-      Left = 197
+      Left = 203
       Top = 0
       Hint = 'Errors|View Errors...'
       Action = actViewErrors
     end
     object tbtnViewSpecialChars: TToolButton
-      Left = 224
+      Left = 227
       Top = 0
       Hint = 'Special Tokens|Show special tokens in the editor...'
       Action = actViewSpecialCharacters
@@ -147,12 +152,12 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Action = actViewShowTokens
     end
     object btnWordwrap: TToolButton
-      Left = 278
+      Left = 275
       Top = 0
       Action = actViewWordWrap
     end
     object tbtnSep2: TToolButton
-      Left = 305
+      Left = 299
       Top = 0
       Width = 8
       Caption = 'tbtnSep2'
@@ -160,31 +165,31 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Style = tbsSeparator
     end
     object tbtnToolsOptions: TToolButton
-      Left = 313
+      Left = 307
       Top = 0
       Hint = 'Options|Options...'
       Action = actToolsOptions
     end
     object ToolButton: TToolButton
-      Left = 340
+      Left = 331
       Top = 0
       Hint = 'Editor Options|Displays the Editor Options...'
       Action = actToolsSynEditOptions
     end
     object tbtnToolsDocumentation: TToolButton
-      Left = 367
+      Left = 355
       Top = 0
       Hint = 'Docmentation|Document files...'
       Action = actToolsDocumentation
     end
     object tbtnToolsExclusions: TToolButton
-      Left = 394
+      Left = 379
       Top = 0
       Hint = 'Exclusions|Display Exclusions...'
       Action = actToolsExclusions
     end
     object tbtnSep3: TToolButton
-      Left = 421
+      Left = 403
       Top = 0
       Width = 8
       Caption = 'tbtnSep3'
@@ -192,13 +197,13 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       Style = tbsSeparator
     end
     object tbtnFolderCongih: TToolButton
-      Left = 429
+      Left = 411
       Top = 0
       Hint = 'Folder Configuration|Configure the folders to scan...'
       Action = actFileFolders
     end
     object DGHMemoryMonitor: TDGHMemoryMonitor
-      Left = 456
+      Left = 435
       Top = 0
       Width = 440
       Height = 22
@@ -253,7 +258,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Left = 330
     Top = 139
     Bitmap = {
-      494C010118001D00280010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010118001D002C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000007000000001002000000000000070
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1311,6 +1316,13 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
       ShortCut = 16467
       OnExecute = actFileScanExecute
     end
+    object actResurseZipFiles: TAction
+      Category = 'File'
+      Caption = 'actRecurseZipFiles'
+      Hint = 'Recurse Zip Files|Toggles the ability to recuse zip files...'
+      OnExecute = actResurseZipFilesExecute
+      OnUpdate = actResurseZipFilesUpdate
+    end
     object actFileExcludeFile: TAction
       Category = 'File'
       Caption = 'Exclude &File'
@@ -1356,7 +1368,7 @@ object frmBrowseAndDocItTestForm: TfrmBrowseAndDocItTestForm
     Left = 332
     Top = 198
     Bitmap = {
-      494C010102000400280010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101020004002C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

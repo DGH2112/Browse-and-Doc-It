@@ -315,6 +315,28 @@ begin
   Finally
     M.Free;
   End;
+  TestGrammarForErrors(
+    TDFMModule,
+    '%s',
+    'object Identifier : TfrmMyForm'#13#10 +
+    '  MyIdentifier = AnIdentifier'#13#10 +
+    '  MyIdentifier2 = AnIdentifier2'#13#10 +
+    '  inline Identifier10 : TfrmMyFrame'#13#10 +
+    '    MyIdentifier11 = AnIdentifier11'#13#10 +
+    '    MyIdentifier12 = AnIdentifier12'#13#10 +
+    '  end'#13#10 +
+    'end',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Identifier|Object Identifier : TfrmMyForm|scPublic',
+      'Identifier\MyIdentifier|MyIdentifier = AnIdentifier|scPublic',
+      'Identifier\MyIdentifier2|MyIdentifier2 = AnIdentifier2|scPublic',
+      'Identifier\Identifier10|Inline Identifier10 : TfrmMyFrame|scPublic',
+      'Identifier\Identifier10\MyIdentifier11|MyIdentifier11 = AnIdentifier11|scPublic',
+      'Identifier\Identifier10\MyIdentifier12|MyIdentifier12 = AnIdentifier12|scPublic'
+    ]
+  );
 end;
 
 procedure TestTDFMModule.TestDFMSet;
@@ -568,10 +590,12 @@ Var
 
 Begin
   Words := FDFMModule.ReservedWords;
-  CheckEquals(3, Length(Words));
+  CheckEquals(0, Low(Words));
+  CheckEquals(3, High(Words));
   CheckEquals('end', Words[0]);
   CheckEquals('inherited', Words[1]);
-  CheckEquals('object', Words[2]);
+  CheckEquals('inline', Words[2]);
+  CheckEquals('object', Words[3]);
   For i := Low(Words) To Pred(High(Words)) Do
     Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
 End;

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Apr 2013
+  @Date    06 Aug 2016
 
 **)
 Unit FolderConfig;
@@ -113,8 +113,13 @@ Begin
       lvFolders.Items.Delete(iIndex);
       If iIndex > lvFolders.Items.Count - 1 Then
         Dec(iIndex);
-      lvFolders.ItemIndex              := iIndex;
-      lvFolders.Items[iIndex].Selected := True;
+      If lvFolders.Items.Count > 0 Then
+        Begin
+          If iIndex > lvFolders.Items.Count - 1 Then
+            iIndex := lvFolders.Items.Count - 1;
+          lvFolders.ItemIndex              := iIndex;
+          lvFolders.Items[iIndex].Selected := True;
+        End;
     End;
 End;
 

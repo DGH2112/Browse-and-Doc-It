@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    16 Jul 2016
+  @Date    06 Aug 2016
   @Author  David Hoyle
   @Version 1.0
 
@@ -15,7 +15,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ImgList, ComCtrls, ExtCtrls, Contnrs, BaseLanguageModule,
-  ActnList, ToolWin, VirtualTrees, System.Actions, ImageList;
+  ActnList, ToolWin, VirtualTrees, System.Actions, ImageList, Vcl.StdCtrls;
 
 {$INCLUDE CompilerDefinitions.Inc}
 
@@ -217,6 +217,8 @@ type
       var CustomDraw: Boolean);
     procedure tvExplorerMeasureItem(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
+    procedure FilterChange;
+    procedure FrameEnter(Sender: TObject);
   {$IFDEF D2005} Strict {$ENDIF} private
     { Private declarations }
     FModule : PVirtualNode;
@@ -231,6 +233,7 @@ type
     FRendering: Boolean;
     FRefresh : TNotifyEvent;
     FExplorer : TBADIVirtualStringTree;
+    FExplorerFilter : String;
     { Private declarations }
     procedure GetBodyCommentTags(M : TBaseLanguageModule);
     Function AddNode(P : PVirtualNode; strText, strName : String; iLevel : Integer;
@@ -247,6 +250,16 @@ type
       Container : TElementContainer; iLevel : Integer);
     Procedure UpdateStatusBar(M : TBaseLanguageModule);
     Procedure ManageExpandedNodes;
+    procedure FilterProc(Sender: TBaseVirtualTree; Node: PVirtualNode; Data: Pointer;
+      var Abort: Boolean);
+    Procedure SetExplorerFilter(strValue : String);
+    (**
+      This property gets and sets the filter for the module explorer treeview.
+      @precon  None.
+      @postcon Gets or sets the filter for the module explorer treeview.
+      @return  a String
+    **)
+    Property ExplorerFilter : String Read FExplorerFilter Write SetExplorerFilter;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Procedure CMMouseLeave(var Msg : TMessage); Message CM_MOUSELEAVE;
   public
@@ -288,7 +301,13 @@ type
 implementation
 
 Uses
-  IniFiles, Types, Math, DGHLibrary, GenericTokenizer;
+  //CodeSiteLogging,
+  IniFiles,
+  Types,
+  Math,
+  DGHLibrary,
+  GenericTokenizer,
+  UITypes;
 
 Type
   (** This record described the data sorted in the virtual tree view. **)
@@ -514,7 +533,7 @@ Begin
                         Pen.Color := clBlack;
                         Brush.Color := clBlack;
                         Ellipse(3, R.Top + 5, 7, R.Top + 9);
-                        Brush.Color := 
+                        Brush.Color :=
                           BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
                         Refresh;
                         Font.Style := [];
@@ -732,7 +751,7 @@ Var
   i : TBADIImageIndex;
 
 begin
-  Inherited;
+  Inherited Create(AOwner);
   FExplorer := TBADIVirtualStringTree.Create(Self);
   With FExplorer Do
     Begin
@@ -789,6 +808,33 @@ begin
   FNodeInfo.Free;
   Inherited;
 end;
+
+(**
+
+  This method updates the filtering of the treeview.
+
+  @precon  None.
+  @postcon The treeview filter is updated onyl showing node that match the filter text.
+
+**)
+Procedure TframeModuleExplorer.FilterChange;
+
+Var
+  N : PVirtualNode;
+
+Begin
+  FExplorer.BeginUpdate;
+  Try
+    N := FExplorer.RootNode.FirstChild;
+    While N <> Nil Do
+      Begin
+        FExplorer.IterateSubtree(N, FilterProc, Nil);
+        N := FExplorer.GetNextSibling(N);
+      End;
+  Finally
+    FExplorer.EndUpdate;
+  End;
+End;
 
 (**
 
@@ -913,12 +959,12 @@ end;
 
 (**
 
-  This method gets the tree nodes that are currently expanded and stores them 
-  in a string list. 
+  This method gets the tree nodes that are currently expanded and stores them
+  in a string list.
 
-  @precon  Node is the tree node to be tested for expansion. 
-  @postcon Adds, update or deletes nodes from the expanded node list depending 
-           whether thhey are now expanded. 
+  @precon  Node is the tree node to be tested for expansion.
+  @postcon Adds, update or deletes nodes from the expanded node list depending
+           whether thhey are now expanded.
 
   @param   StartNode as a PVirtualNode
 
@@ -985,6 +1031,69 @@ End;
 
 (**
 
+  This is a setter method for the ExplorerFilter property.
+
+  @precon  None.
+  @postcon The filter text is updated and the tree filtered and the statusbar updated.
+
+  @param   strValue as a String
+
+**)
+Procedure TframeModuleExplorer.SetExplorerFilter(strValue: String);
+
+Begin
+  If strValue <> FExplorerFilter Then
+    Begin
+      FExplorerFilter := strValue;
+      FilterChange;
+    End;
+  If FExplorerFilter = '' Then
+    stbStatusBar.Panels[0].Text := 'Showing all explorer nodes.'
+  Else
+    stbStatusBar.Panels[0].Text := Format('Filtering for "%s"...', [FExplorerFilter]);
+End;
+
+(**
+
+  This is a call back mechanism for the tree view in otder to determine whether a node
+  when iterated can be visible.
+
+  @precon  None.
+  @postcon Filters the visible cells in the tree view if they match the filter text.
+
+  @param   Sender as a TBaseVirtualTree
+  @param   Node   as a PVirtualNode
+  @param   Data   as a Pointer
+  @param   Abort  as a Boolean as a reference
+
+**)
+Procedure TframeModuleExplorer.FilterProc(Sender: TBaseVirtualTree; Node: PVirtualNode;
+  Data: Pointer; Var Abort: Boolean);
+
+Var
+  NodeData : ^TTreeData;
+  N : PVirtualNode;
+
+Begin
+  NodeData := Sender.GetNodeData(Node);
+  If FExplorerFilter <> '' Then
+    Begin
+      Sender.IsVisible[Node] := (Pos(LowerCase(FExplorerFilter), LowerCase(NodeData.FNode.Text)) > 0);
+      If Sender.IsVisible[Node] Then
+        Begin
+          N := FExplorer.NodeParent[Node];
+          While N <> Nil Do
+            Begin
+              Sender.IsVisible[N] := True;
+              N := FExplorer.NodeParent[N];
+            End;
+        End;
+    End Else
+      Sender.IsVisible[Node] := True;
+End;
+
+(**
+
   This function finds the tree node that has the path specified by the passed
   text.
 
@@ -1041,6 +1150,22 @@ End;
 
 (**
 
+  This method sets the explorer frame as the focus when the form is activated.
+
+  @precon  None.
+  @postcon The explorer frame is focused.
+
+  @param   Sender as a TObject
+
+**)
+procedure TframeModuleExplorer.FrameEnter(Sender: TObject);
+
+begin
+  FExplorer.SetFocus;
+end;
+
+(**
+
   This method displays the specified module in the treeview.
 
   @precon  M is a valid instance of a TBaseLanguageModule that has been parsed and
@@ -1056,6 +1181,7 @@ Var
   strTop : String;
   strSelection : String;
   N : PVirtualNode;
+  C : Word;
 
 Begin
   FExplorer.Color := BrowseAndDocItOptions.BGColour;
@@ -1082,6 +1208,7 @@ Begin
     strSelection := GetNodePath(FExplorer.FocusedNode);
     FExplorer.BeginUpdate;
     Try
+      ExplorerFilter := '';
       FExplorer.Clear;
       FNodeInfo.Clear;
       If M = Nil Then
@@ -1120,6 +1247,8 @@ Begin
   Finally
     FRendering := False;
   End;
+  C := 0;
+  tvExplorerKeyDown(Nil, C, []);
 End;
 
 (**
@@ -1597,11 +1726,12 @@ Var
   strTickLabel: String;
   iTicks: Integer;
   i : Integer;
+  strText : String;
 
 begin
   If doShowPerformanceCountersInModuleExplorer In BrowseAndDocItOptions.Options Then
     Begin
-      stbStatusBar.SimpleText := '';
+      strText := '';
       For i := 1 To M.OpTickCounts - 1 Do
         Begin
           strTickLabel := M.OpTickCountName[i];
@@ -1610,20 +1740,20 @@ begin
           iTicks := M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1];
           If iTicks > 0 Then
             Begin
-              If stbStatusBar.SimpleText <> '' Then
-                stbStatusBar.SimpleText := stbStatusBar.SimpleText + ', ';
-              stbStatusBar.SimpleText := stbStatusBar.SimpleText +
-                Format('%s%d', [strTickLabel, iTicks]);
+              If strText <> '' Then
+                strText := strText + ', ';
+              strText := strText + Format('%s%d', [strTickLabel, iTicks]);
             End;
         End;
-      If stbStatusBar.SimpleText <> '' Then
-        stbStatusBar.SimpleText := stbStatusBar.SimpleText + ', ';
-      stbStatusBar.SimpleText := stbStatusBar.SimpleText +
+      If strText <> '' Then
+        strText := strText + ', ';
+      strText := strText +
         Format('%s: %d', ['Total', M.OpTickCountByIndex[M.OpTickCounts - 1] -
         M.OpTickCountByIndex[0]]);
+      stbStatusBar.Panels[1].Text := strText;
     End Else
     Begin
-      stbStatusBar.SimpleText := Format(strStatusbarText, [
+      stbStatusBar.Panels[1].Text := Format(strStatusbarText, [
         Int(Integer(M.Bytes)), Int(M.TokenCount), Int(M.Lines)]);
     End;
 end;
@@ -1849,12 +1979,20 @@ procedure TframeModuleExplorer.tvExplorerKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 
 begin
-  If Key = 13 Then
-    Begin
-      tvExplorerClick(Sender);
-      If Shift = [] Then
-        If Assigned(OnFocus) Then
-          FFocus(Sender);
+  If Shift = [] Then
+    Case Key Of
+      13:
+        Begin
+          tvExplorerClick(Sender);
+          If Shift = [] Then
+            If Assigned(OnFocus) Then
+              FFocus(Sender);
+        End;
+      32, 48..57, 65..90, 97..122: ExplorerFilter := ExplorerFilter + Chr(Key);
+      8 :
+        If Length(ExplorerFilter) > 0 Then
+          ExplorerFilter := Copy(ExplorerFilter, 1, Length(ExplorerFilter) - 1);
+      27: ExplorerFilter := '';
     End;
 end;
 

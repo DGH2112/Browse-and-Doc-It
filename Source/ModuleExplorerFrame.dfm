@@ -1,7 +1,7 @@
 object frameModuleExplorer: TframeModuleExplorer
   Left = 0
   Top = 0
-  Width = 360
+  Width = 354
   Height = 413
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,25 +11,32 @@ object frameModuleExplorer: TframeModuleExplorer
   ParentFont = False
   TabOrder = 0
   TabStop = True
+  OnEnter = FrameEnter
   object stbStatusBar: TStatusBar
     Left = 0
     Top = 394
-    Width = 360
+    Width = 354
     Height = 19
-    Panels = <>
+    Panels = <
+      item
+        Width = 150
+      end
+      item
+        Width = 50
+      end>
   end
   object tbrExplorerScope: TToolBar
     Left = 0
     Top = 0
-    Width = 360
-    Height = 18
+    Width = 354
+    Height = 21
     AutoSize = True
-    ButtonHeight = 18
+    ButtonHeight = 21
     ButtonWidth = 19
     Images = ilToolbar
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 1
+    TabOrder = 0
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
@@ -145,7 +152,7 @@ object frameModuleExplorer: TframeModuleExplorer
     Left = 31
     Top = 84
     Bitmap = {
-      494C01011000130010000C000C00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011000130044000C000C00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000300000003C0000000100200000000000002D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

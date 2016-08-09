@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       16 Jul 2016
+  @Date       09 Aug 2016
   @Author     David Hoyle
 
 **)
@@ -490,7 +490,7 @@ Begin
   iTokenLine := 1;
   iTokenColumn := 1;
   CurCharType := ttUnknown;
-  LastCharType := ttUnknown;
+  //: @debug LastCharType := ttUnknown;
   iStreamCount := 0;
   iLine := 1;
   iColumn := 1;

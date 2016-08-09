@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    02 Aug 2016
+  @Date    09 Aug 2016
   @Version 1.0
   @Author  David Hoyle
 
@@ -776,9 +776,11 @@ Type
   TIdent = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer);
 
   (** This is a sub class for all types **)
-  TGenericTypeDecl = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
+  TGenericTypeDecl = Class(TElementContainer)
   Public
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
+    Function  AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String;
+      Override;
   End;
 
   (** This is a sub class for all constants **)
@@ -885,7 +887,7 @@ Type
       @postcon Returns the type corresponding to the method return.
       @return  a TGenericTypeDecl
     **)
-    Property ReturnType : TGenericTypeDecl Read FReturnType Write FReturnType;
+    Property ReturnType : TGenericTypeDecl Read FReturnType;
     (**
       Returns the Qualified name of the method.
       @precon  None.
@@ -5110,7 +5112,7 @@ constructor TGenericFunction.Create(strName: String; AScope: TScope; iLine,
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FParameters := TObjectList.Create(True);
-  FReturnType := Nil;
+  FReturnType := TGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
   FStartLine  := -1;
   FEndLine    := -1;
 end;
@@ -6323,6 +6325,27 @@ Begin
         End;
     End;
   Inherited CheckDocumentation(boolCascade);
+End;
+
+(**
+
+  This method returns a string representation of the function return type.
+
+  @precon  None.
+  @postcon Returns a string representation of the functions return type.
+
+  @param   boolShowIdentifier   as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+Function TGenericTypeDecl.AsString(boolShowIdentifier,
+  boolForDocumentation: Boolean): String;
+
+Begin
+  Result := '';
+  If ElementCount > 0 Then
+    Result := Elements[1].AsString(boolShowIdentifier, boolForDocumentation);
 End;
 
 (**

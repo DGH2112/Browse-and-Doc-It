@@ -278,8 +278,9 @@ begin
       Finally
         T.Free;
       End;
-      M.ReturnType := TTestGenericTypeDecl.Create('', scLocal, 0, 0, iiNone, Nil);
-      M.ReturnType.AddToken('Boolean');
+      T := TTestGenericTypeDecl.Create('Boolean', scLocal, 0, 0, iiNone, Nil);
+      M.ReturnType.Add(T);
+      T.AddToken('Boolean');
       M.AddParameter(P);
       strText := StringReplace(Description(M, 2, True, CA, 80), #32, '.', [rfReplaceAll]);
       strTestText := StringReplace(
@@ -398,8 +399,9 @@ begin
       Finally
         T.Free;
       End;
-      M.ReturnType := TTestGenericTypeDecl.Create('', scLocal, 0, 0, iiNone, Nil);
-      M.ReturnType.AddToken('Boolean');
+      T := TTestGenericTypeDecl.Create('Boolean', scLocal, 0, 0, iiNone, Nil);
+      M.ReturnType.Add(T);
+      T.AddToken('Boolean');
       M.AddParameter(P);
       strText := StringReplace(WriteComment(M, ctPascalBlock, 2, True, CursorDelta, 80),
         #32, '.', [rfReplaceAll]);
@@ -655,8 +657,9 @@ begin
     Finally
       T.Free;
     End;
-    M.ReturnType := TTestGenericTypeDecl.Create('', scLocal, 0, 0, iiNone, Nil);
-    M.ReturnType.AddToken('Boolean');
+    T := TTestGenericTypeDecl.Create('Boolean', scLocal, 0, 0, iiNone, Nil);
+    M.ReturnType.Add(T);
+    T.AddToken('Boolean');
     M.AddParameter(P);
     strText := StringReplace(WriteComment(M, ctPascalBlock, 0, True, CursorDelta, 80),
       #32, '.', [rfReplaceAll]);

@@ -1612,11 +1612,17 @@ end;
 // Test methods for class TGenericMethodDecl
 
 procedure TestTGenericMethodDecl.SetUp;
+
+Var
+  T : TTestGenericTypeDecl;
+
 begin
   FGenericMethodDecl := TTestGenericMethodDecl.Create(mtFunction, 'MyFunction',
     scProtected, 34, 45);
-  FGenericMethodDecl.ReturnType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
-  FGenericMethodDecl.ReturnType.AddToken('Boolean');
+  T := TTestGenericTypeDecl.Create('Boolean', scNone, 0, 0, iiNone, Nil);
+  T.AddToken('Boolean');
+  FGenericMethodDecl.ReturnType.Add(T);
+
 end;
 
 procedure TestTGenericMethodDecl.TearDown;
@@ -1979,11 +1985,16 @@ end;
 // Test methods for the class TGenericProperty
 
 procedure TestTGenericProperty.SetUp;
+
+Var
+  T : TTestGenericTypeDecl;
+
 begin
   FGenericProperty := TTestGenericProperty.Create('MyProperty', scProtected, 12,
     23, iiPublicProperty, Nil);
-  FGenericProperty.ReturnType := TTestGenericTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
-  FGenericProperty.ReturnType.AddToken('Boolean');
+  T := TTestGenericTypeDecl.Create('Boolean', scNone, 0, 0, iiNone, Nil);
+  T.AddToken('Boolean');
+  FGenericProperty.ReturnType.Add(T);
 end;
 
 procedure TestTGenericProperty.TearDown;

@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    10 Feb 2015
+  @Date    08 Aug 2016
   @Version 1.0
 
 **)
@@ -431,6 +431,7 @@ Var
   strInsert    : String;
   boolExtraLine: Boolean;
   boolHasCons  : Boolean;
+  strReturnType: String;
 
 Begin
   CursorDelta.X := 0;
@@ -475,9 +476,13 @@ Begin
     Begin
       boolExtraLine := boolExtraLine Or True;
       AddToComment(StringOfChar(#32, iIndent));
-      AddToComment(Format('  @return  %s %s',
-          [strAOrAn[IsInSet(Func.ReturnType.AsString(False, False)[1], strVowels)],
-            Func.ReturnType.AsString(False, False)]));
+      If True Then
+      strReturnType := Func.ReturnType.AsString(False, False);
+      If Length(strReturnType) > 0 Then
+        AddToComment(Format('  @return  %s %s', [
+          strAOrAn[IsInSet(strReturnType[1], strVowels)],
+          strReturnType]
+        ));
       AddToComment(#13#10);
     End;
   // Block Footer

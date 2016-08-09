@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       16 Jul 2016
+  @Date       09 Aug 2016
   @Author     David Hoyle
 
 **)
@@ -956,8 +956,7 @@ begin
   Result := Result + ')';
   If (MethodType = mtFunction) And (ReturnType <> Nil) Then
     Begin
-      Result := Result + #32'As'#32 + ReturnType.AsString(boolShowIdentifier,
-        boolForDocumentation);
+      Result := Result + #32'As'#32 + ReturnType.AsString(False, boolForDocumentation);
     End;
 end;
 
@@ -1155,7 +1154,7 @@ begin
   Result := Result + ')';
   If (PropertyType = ptGet) And (ReturnType <> Nil) Then
     Begin
-      Result := Result + #32'As'#32 + ReturnType.AsString(boolShowIdentifier,
+      Result := Result + #32'As'#32 + ReturnType.AsString(False,
         boolForDocumentation);
     End;
 end;
@@ -1310,7 +1309,7 @@ end;
 **)
 function TVBTypeDecl.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 begin
-  Result := BuildStringRepresentation(False, boolForDocumentation, '',
+  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, '',
    BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
@@ -1702,7 +1701,7 @@ Begin
   iTokenLine := 1;
   iTokenColumn := 1;
   CurCharType := ttUnknown;
-  LastToken := ttUnknown;
+  //: @debug LastToken := ttUnknown;
   iStreamCount := 0;
   iLine := 1;
   iColumn := 1;
@@ -2615,6 +2614,9 @@ End;
 **)
 Procedure TVBModule.MethodDecl(M : TGenericMethodDecl; C : TComment);
 
+Var
+  T : TVBTypeDecl;
+
 Begin
   M.Comment := C;
   M.Identifier := Token.Token;
@@ -2647,17 +2649,21 @@ Begin
   If Token.UToken = 'AS' Then
     Begin
       NextNonCommentToken;
-      M.ReturnType := TVBTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
-      M.ReturnType.AppendToken(Token);
+      T := TVBTypeDecl.Create(Token.Token, scNone, 0, 0, iiNone, Nil);
+      T.AppendToken(Token);
+      M.ReturnType.Add(T);
       If Token.TokenType In [ttIdentifier, ttReservedWord] Then
         Begin
           NextNonCommentToken;
           If Token.Token = '.' Then
             Begin
-              M.ReturnType.AddToken('.');
+              T.AddToken('.');
               NextNonCommentToken;
-              M.ReturnType.AppendToken(Token);
-              If Not EndOfTokens Then NextNonCommentToken Else Exit;
+              T.AppendToken(Token);
+              If Not EndOfTokens Then
+                NextNonCommentToken
+              Else
+                Exit;
             End;
           If Token.Token = '(' Then
             Begin
@@ -3076,6 +3082,7 @@ Function TVBModule.Props(Scope : TScope; C : TComment; boolStatic : Boolean) : B
 Var
   pt : TPropertyType;
   P : TVBProperty;
+  T : TVBTypeDecl;
 
 Begin
   Result := False;
@@ -3118,8 +3125,9 @@ Begin
                   NextNonCommentToken;
                   If Token.TokenType In [ttIdentifier, ttReservedWord] Then
                     Begin
-                      P.ReturnType := TVBTypeDecl.Create('', scNone, 0, 0, iiNone, Nil);
-                      AddToExpression(P.ReturnType);
+                      T := TVBTypeDecl.Create(Token.Token, scNone, 0, 0, iiNone, Nil);
+                      P.ReturnType.Add(T);
+                      AddToExpression(T);
                     End;
                 End;
               FindMethodEnd(P, 'PROPERTY');

@@ -332,8 +332,9 @@ begin
   End;
   M := TVBMethod.Create(mtFunction, 'MyMethod', scPrivate, 10 ,12);
   Try
-    M.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
-    M.ReturnType.AddToken('String');
+    T := TVBTypeDecl.Create('String', scNone, 10, 12, iiNone, Nil);
+    T.AddToken('String');
+    M.ReturnType.Add(T);
     CheckEquals('Function MyMethod() As String', M.AsString(True, False));
     CheckEquals('Function MyMethod('#13#10') As String', M.AsString(True, True));
   Finally
@@ -341,10 +342,11 @@ begin
   End;
   M := TVBMethod.Create(mtFunction, 'MyMethod', scPrivate, 10 ,12);
   Try
-    M.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
-    M.ReturnType.AddToken('MSForms');
-    M.ReturnType.AddToken('.');
-    M.ReturnType.AddToken('Integer');
+    T := TVBTypeDecl.Create('Integer', scNone, 10, 12, iiNone, Nil);
+    T.AddToken('MSForms');
+    T.AddToken('.');
+    T.AddToken('Integer');
+    M.ReturnType.Add(T);
     CheckEquals('Function MyMethod() As MSForms.Integer', M.AsString(True, False));
     CheckEquals('Function MyMethod('#13#10') As MSForms.Integer', M.AsString(true, True));
   Finally
@@ -352,7 +354,11 @@ begin
   End;
   M := TVBMethod.Create(mtFunction, 'MyMethod', scPrivate, 10 ,12);
   Try
-    M.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    T := TVBTypeDecl.Create('Integer', scNone, 10, 12, iiNone, Nil);
+    T.AddToken('MSForms');
+    T.AddToken('.');
+    T.AddToken('Integer');
+    M.ReturnType.Add(T);
     T := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     Try
       T.AddToken('String');
@@ -360,9 +366,6 @@ begin
     Finally
       T.Free;
     End;
-    M.ReturnType.AddToken('MSForms');
-    M.ReturnType.AddToken('.');
-    M.ReturnType.AddToken('Integer');
     CheckEquals('Function MyMethod(Ident1 As String) As MSForms.Integer', M.AsString(True, False));
     CheckEquals('Function MyMethod('#13#10'  Ident1 As String'#13#10') As MSForms.Integer', M.AsString(True, True));
   Finally
@@ -370,7 +373,11 @@ begin
   End;
   M := TVBMethod.Create(mtFunction, 'MyMethod', scPrivate, 10 ,12);
   Try
-    M.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    T := TVBTypeDecl.Create('Integer', scNone, 10, 12, iiNone, Nil);
+    M.ReturnType.Add(T);
+    T.AddToken('MSForms');
+    T.AddToken('.');
+    T.AddToken('Integer');
     T := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     Try
       T.AddToken('String');
@@ -378,9 +385,6 @@ begin
     Finally
       T.Free;
     End;
-    M.ReturnType.AddToken('MSForms');
-    M.ReturnType.AddToken('.');
-    M.ReturnType.AddToken('Integer');
     CheckEquals('Function MyMethod(Ident1 As String = "Hello") As MSForms.Integer', M.AsString(True, False));
     CheckEquals('Function MyMethod('#13#10'  Ident1 As String = "Hello"'#13#10') As MSForms.Integer', M.AsString(True, True));
   Finally
@@ -388,7 +392,11 @@ begin
   End;
   M := TVBMethod.Create(mtFunction, 'MyMethod', scPrivate, 10 ,12);
   Try
-    M.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    T := TVBTypeDecl.Create('Integer', scNone, 10, 12, iiNone, Nil);
+    M.ReturnType.Add(T);
+    T.AddToken('MSForms');
+    T.AddToken('.');
+    T.AddToken('Integer');
     T := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     Try
       T.AddToken('MSForms');
@@ -405,9 +413,6 @@ begin
     Finally
       T.Free;
     End;
-    M.ReturnType.AddToken('MSForms');
-    M.ReturnType.AddToken('.');
-    M.ReturnType.AddToken('Integer');
     CheckEquals('Function MyMethod(ByRef Ident1 As MSForms.Integer, ByVal Ident2 As Integer) As MSForms.Integer', M.AsString(True, False));
     CheckEquals('Function MyMethod('#13#10'  ByRef Ident1 As MSForms.Integer,'#13#10'  ByVal Ident2 As Integer'#13#10') As MSForms.Integer', M.AsString(True, True));
   Finally
@@ -416,7 +421,11 @@ begin
   M := TVBMethod.Create(mtFunction, 'MyMethod', scPrivate, 10 ,12);
   Try
     M.Ext := '"Kernal32"';
-    M.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    T := TVBTypeDecl.Create('Integer', scNone, 10, 12, iiNone, Nil);
+    M.ReturnType.Add(T);
+    T.AddToken('MSForms');
+    T.AddToken('.');
+    T.AddToken('Integer');
     T := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     Try
       T.AddToken('String');
@@ -424,9 +433,6 @@ begin
     Finally
       T.Free;
     End;
-    M.ReturnType.AddToken('MSForms');
-    M.ReturnType.AddToken('.');
-    M.ReturnType.AddToken('Integer');
     CheckEquals('Function MyMethod Lib "Kernal32" (Ident1 As String) As MSForms.Integer', M.AsString(True, False));
     CheckEquals('Function MyMethod Lib "Kernal32" ('#13#10'  Ident1 As String'#13#10') As MSForms.Integer', M.AsString(True, True));
   Finally
@@ -554,8 +560,9 @@ begin
   P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12,
     iiPublicProperty, Nil);
   Try
-    P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
-    P.ReturnType.AddToken('String');
+    T := TVBTypeDecl.Create('String', scNone, 10, 12, iiNone, Nil);
+    P.ReturnType.Add(T);
+    T.AddToken('String');
     CheckEquals('Property Get MyProperty() As String', P.AsString(True, False));
     CheckEquals('Property Get MyProperty('#13#10') As String', P.AsString(True, True));
   Finally
@@ -564,10 +571,11 @@ begin
   P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12,
     iiPublicProperty, Nil);
   Try
-    P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
-    P.ReturnType.AddToken('MSForms');
-    P.ReturnType.AddToken('.');
-    P.ReturnType.AddToken('Integer');
+    T := TVBTypeDecl.Create('Integer', scNone, 10, 12, iiNone, Nil);
+    P.ReturnType.Add(T);
+    T.AddToken('MSForms');
+    T.AddToken('.');
+    T.AddToken('Integer');
     CheckEquals('Property Get MyProperty() As MSForms.Integer', P.AsString(True, False));
     CheckEquals('Property Get MyProperty('#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
@@ -576,7 +584,11 @@ begin
   P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12,
     iiPublicProperty, Nil);
   Try
-    P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    T := TVBTypeDecl.Create('Integer', scNone, 10, 12, iiNone, Nil);
+    P.ReturnType.Add(T);
+    T.AddToken('MSForms');
+    T.AddToken('.');
+    T.AddToken('Integer');
     T := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     Try
       T.AddToken('String');
@@ -584,9 +596,6 @@ begin
     Finally
       T.Free;
     End;
-    P.ReturnType.AddToken('MSForms');
-    P.ReturnType.AddToken('.');
-    P.ReturnType.AddToken('Integer');
     CheckEquals('Property Get MyProperty(Ident1 As String) As MSForms.Integer', P.AsString(True, False));
     CheckEquals('Property Get MyProperty('#13#10'  Ident1 As String'#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
@@ -595,7 +604,11 @@ begin
   P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12,
     iiPublicProperty, Nil);
   Try
-    P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    T := TVBTypeDecl.Create('Integer', scNone, 10, 12, iiNone, Nil);
+    P.ReturnType.Add(T);
+    T.AddToken('MSForms');
+    T.AddToken('.');
+    T.AddToken('Integer');
     T := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     Try
       T.AddToken('String');
@@ -603,9 +616,6 @@ begin
     Finally
       T.Free;
     End;
-    P.ReturnType.AddToken('MSForms');
-    P.ReturnType.AddToken('.');
-    P.ReturnType.AddToken('Integer');
     CheckEquals('Property Get MyProperty(ByRef Ident1 As String = "") As MSForms.Integer', P.AsString(True, False));
     CheckEquals('Property Get MyProperty('#13#10'  ByRef Ident1 As String = ""'#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
@@ -614,7 +624,11 @@ begin
   P := TVBProperty.Create(ptGet, 'MyProperty', scPrivate, 10 ,12,
     iiPublicProperty, Nil);
   Try
-    P.ReturnType := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
+    T := TVBTypeDecl.Create('Integer', scNone, 10, 12, iiNone, Nil);
+    P.ReturnType.Add(T);
+    T.AddToken('MSForms');
+    T.AddToken('.');
+    T.AddToken('Integer');
     T := TVBTypeDecl.Create('', scNone, 10, 12, iiNone, Nil);
     Try
       T.AddToken('MSForms');
@@ -631,9 +645,6 @@ begin
     Finally
       T.Free;
     End;
-    P.ReturnType.AddToken('MSForms');
-    P.ReturnType.AddToken('.');
-    P.ReturnType.AddToken('Integer');
     CheckEquals('Property Get MyProperty(ByRef Ident1 As MSForms.Integer, ByVal Ident2 As Integer) As MSForms.Integer', P.AsString(True, False));
     CheckEquals('Property Get MyProperty('#13#10'  ByRef Ident1 As MSForms.Integer,'#13#10'  ByVal Ident2 As Integer'#13#10') As MSForms.Integer', P.AsString(True, True));
   Finally
@@ -664,7 +675,7 @@ begin
   T := TVBTypeDecl.Create('temp', scNone, 0, 0, iiNone, Nil);
   Try
     T.AddToken('MSForm');
-    CheckEquals('MSForm', T.AsString(True, False));
+    CheckEquals('MSForm', T.AsString(False, False));
   Finally
     T.Free;
   End;
@@ -673,7 +684,7 @@ begin
     T.AddToken('MSForm');
     T.AddToken('.');
     T.AddToken('Integer');
-    CheckEquals('MSForm.Integer', T.AsString(True, False));
+    CheckEquals('MSForm.Integer', T.AsString(False, False));
   Finally
     T.Free;
   End;

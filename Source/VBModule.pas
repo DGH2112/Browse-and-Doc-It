@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       09 Aug 2016
+  @Date       10 Aug 2016
   @Author     David Hoyle
 
 **)
@@ -954,10 +954,8 @@ begin
   If boolForDocumentation Then
     Result := Result + #13#10;
   Result := Result + ')';
-  If (MethodType = mtFunction) And (ReturnType <> Nil) Then
-    Begin
-      Result := Result + #32'As'#32 + ReturnType.AsString(False, boolForDocumentation);
-    End;
+  If (MethodType = mtFunction) And (ReturnType.ElementCount > 0) Then
+    Result := Result + #32'As'#32 + ReturnType.AsString(False, boolForDocumentation);
 end;
 
 { TVBConstant }
@@ -1152,11 +1150,9 @@ begin
   If boolForDocumentation Then
     Result := Result + #13#10;
   Result := Result + ')';
-  If (PropertyType = ptGet) And (ReturnType <> Nil) Then
-    Begin
-      Result := Result + #32'As'#32 + ReturnType.AsString(False,
-        boolForDocumentation);
-    End;
+  If (PropertyType = ptGet) And (ReturnType.ElementCount > 0) Then
+    Result := Result + #32'As'#32 + ReturnType.AsString(False,
+      boolForDocumentation);
 end;
 
 (**

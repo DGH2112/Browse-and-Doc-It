@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    08 Aug 2016
+  @Date    10 Aug 2016
   @Version 1.0
 
 **)
@@ -472,7 +472,7 @@ Begin
                 strModifier[Func.Parameters[i].ParamModifier]]));
         End;
     End;
-  If Func.ReturnType <> Nil Then
+  If Func.ReturnType.ElementCount > 0 Then
     Begin
       boolExtraLine := boolExtraLine Or True;
       AddToComment(StringOfChar(#32, iIndent));

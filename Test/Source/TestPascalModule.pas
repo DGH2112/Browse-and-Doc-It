@@ -279,6 +279,7 @@ type
   Strict Private
     FSource: String;
     FPascalModule : TPascalModule;
+  Strict Protected
   Public
     Procedure SetUp; Override;
     Procedure TearDown; Override;
@@ -422,6 +423,78 @@ type
     Procedure TestRTTIAttributesMultiPerFuncton;
     Procedure TestRTTIAttributesMultiPerLine;
     Procedure TestRTTIAttributesMultiOnTypeWithComment;
+    Procedure TestRTTIAttributesGalore;
+    Procedure TestGenericsTStack;
+    Procedure TestGenericTMultipleTypes;
+    Procedure TestGenericProcVariable;
+    Procedure TestGenericSimplyConstraint;
+    Procedure TestGenericMultiConstraint;
+    Procedure TestGenericTypeConstructor;
+    Procedure TestGenericClassConstraintTObjectList;
+    Procedure TestGenericClassConstraint;
+    Procedure TestGenericClassConstraintWithConstructor;
+    Procedure TestGenericClassRecordConstraint;
+    Procedure TestGenericInterfaceConstraint;
+    Procedure TestGenericPassingRecordsAsParameters;
+    Procedure TestGenericInterfaces;
+    Procedure TestGenericMethod;
+    Procedure TestGenericCollections;
+    Procedure TestGenericEntities;
+    Procedure TestGenericTEnum;
+    Procedure TestGenericTEnumDemo;
+    Procedure TestGenericMultiDefType;
+    Procedure TestGenericFunctionTArrayResult;
+    Procedure TestOperatorImplicit;
+    Procedure TestOperatorExplicit;
+    Procedure TestOperatorNegative;
+    Procedure TestOperatorPositive;
+    Procedure TestOperatorInc;
+    Procedure TestOperatorDec;
+    Procedure TestOperatorLogicalNot;
+    Procedure TestOperatorBitwiseNot;
+    Procedure TestOperatorTrunc;
+    Procedure TestOperatorRound;
+    Procedure TestOperatorEqual;
+    Procedure TestOperatorNotEqual;
+    Procedure TestOperatorGreaterThan;
+    Procedure TestOperatorGreaterThanOrEqual;
+    Procedure TestOperatorLessThan;
+    Procedure TestOperatorLessThanOrEqual;
+    Procedure TestOperatorAdd;
+    Procedure TestOperatorSubtract;
+    Procedure TestOperatorMultiply;
+    Procedure TestOperatorDivide;
+    Procedure TestOperatorIntDivide;
+    Procedure TestOperatorModulus;
+    Procedure TestOperatorLeftShift;
+    Procedure TestOperatorRightShift;
+    Procedure TestOperatorLogicalAnd;
+    Procedure TestOperatorLogicalOr;
+    Procedure TestOperatorLogicalXor;
+    Procedure TestOperatorBitwiseAnd;
+    Procedure TestOperatorBitwiseOr;
+    Procedure TestOperatorBitwiseXor;
+    Procedure TestRecordEmpty;
+    Procedure TestRecordVisibilityOnly;
+    Procedure TestRecordOneMemberPerVisibility;
+    Procedure TestRecordHelper;
+    Procedure TestRecordHelperWithHeritage;
+    Procedure TestObjectEmpty;
+    Procedure TestObjectOneOfEachMember;
+    Procedure TestClassEmpty;
+    Procedure TestClassVisibilityOnly;
+    Procedure TestClassOneMemberPerVisibility;
+    Procedure TestClassProperty;
+    Procedure TestAnonymousProcRef;
+    Procedure TestAnonymousFuncRef;
+    Procedure TestAnonymousProcAssignment;
+    Procedure TestAnonymousInLineDef;
+    Procedure TestAnonymousMethodAsVariable;
+    Procedure TestAnonymousMethodsStdProcDecl;
+    Procedure TestAnonymousMethodsImplStdProcDecl;
+    Procedure TestAnonymousMethodsStdFuncDecl;
+    Procedure TestAnonymousMethodsImplStdFuncDecl;
+    Procedure TestAnonymousMethodsUsing;
     Procedure TestCodeFailure01;
     Procedure TestCodeFailure02;
     Procedure TestCodeFailure03;
@@ -431,7 +504,7 @@ type
     Procedure TestCodeFailure07;
     Procedure TestCodeFailure08;
     procedure TestCodeFailure09;
-    Procedure TestCodeFaliure10;
+    Procedure TestCodeFailure10;
     Procedure TestCodeFailure11;
     Procedure TestCodeFailure12;
     Procedure TestCodeFailure13;
@@ -443,10 +516,36 @@ type
     Procedure TestCodeFailure19;
     Procedure TestCodeFailure21;
     Procedure TestCodeFailure22;
+    Procedure TestCodeFailure23;
+    Procedure TestCodeFailure24;
+    Procedure TestCodeFailure25;
   Public
   End;
 
-implementation
+Implementation
+
+Const
+  strNone = '%s';
+  strUnit =
+    'Unit MyUnit;'#13#10 +
+    ''#13#10 +
+    'Interface'#13#10 +
+    ''#13#10 +
+    '%s'#13#10 +
+    ''#13#10 +
+    'Implementation'#13#10 +
+    ''#13#10 +
+    '%s'#13#10 +
+    ''#13#10 +
+    'End.'#13#10;
+  strProgram =
+    'Program MyProgram;'#13#10 +
+    ''#13#10 +
+    '%s'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '%s'#13#10 +
+    'End.'#13#10;
 
 procedure TestTPascalComment.TestCreateComment;
 
@@ -755,10 +854,15 @@ begin
 end;
 
 procedure TestTPascalMethod.SetUp;
+
+var
+  T: TElementContainer;
+
 begin
   FPascalMethod := TPascalMethod.Create(mtFunction, 'MyFunction', scPrivate, 12, 23);
-  FPascalMethod.ReturnType := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
-  FPascalMethod.ReturnType.AddToken('Integer');
+  T := TTypes.Create('Integer', scNone, 0, 0, iiNone, Nil);
+  T.AddToken('Integer', ttIdentifier);
+  FPascalMethod.ReturnType.Add(T);
 end;
 
 procedure TestTPascalMethod.TearDown;
@@ -842,11 +946,16 @@ begin
 end;
 
 procedure TestTPascalProperty.SetUp;
+
+var
+  T: TTypes;
+
 begin
   FPascalProperty := TPascalProperty.Create('MyProperty', scProtected, 12, 23,
     iiPublicProperty, Nil);
-  FPascalProperty.ReturnType := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
-  FPascalProperty.ReturnType.AddToken('String');
+  T := TTypes.Create('String', scNone, 0, 0, iiNone, Nil);
+  T.AddToken('String', ttIdentifier);
+  FPascalProperty.ReturnType.Add(T);
 end;
 
 procedure TestTPascalProperty.TearDown;
@@ -881,15 +990,15 @@ begin
     AType.Free;
   End;
   CheckEquals('Property MyProperty[Param1 : Integer; Param2 : String] : String', FPascalProperty.AsString(True, False));
-  CheckEquals('Property MyProperty['#13#10#32#32'Param1 : Integer; '#13#10#32#32'Param2 : String'#13#10'] : String'#13#10, FPascalProperty.AsString(True, True));
+  CheckEquals('Property MyProperty['#13#10#32#32'Param1 : Integer;'#13#10#32#32'Param2 : String'#13#10'] : String'#13#10, FPascalProperty.AsString(True, True));
   FPascalProperty.ReadSpec := 'FValue';
   FPascalProperty.WriteSpec := 'FValue';
   CheckEquals('Property MyProperty[Param1 : Integer; Param2 : String] : String Read FValue Write FValue', FPascalProperty.AsString(True, False));
-  CheckEquals('Property MyProperty['#13#10#32#32'Param1 : Integer; '#13#10#32#32'Param2 : String'#13#10'] : String'#13#10'  Read FValue'#13#10'  Write FValue'#13#10, FPascalProperty.AsString(True, True));
+  CheckEquals('Property MyProperty['#13#10#32#32'Param1 : Integer;'#13#10#32#32'Param2 : String'#13#10'] : String'#13#10'  Read FValue'#13#10'  Write FValue'#13#10, FPascalProperty.AsString(True, True));
   FPascalProperty.ImplementsSpec.Add('mythingy', iiNone, scNone, Nil);
   FPascalProperty.ImplementsSpec.Add('mythingy2', iiNone, scNone, Nil);
   CheckEquals('Property MyProperty[Param1 : Integer; Param2 : String] : String Read FValue Write FValue Implements mythingy, mythingy2', FPascalProperty.AsString(True, False));
-  CheckEquals('Property MyProperty['#13#10#32#32'Param1 : Integer; '#13#10#32#32'Param2 : String'#13#10'] : String'#13#10'  Read FValue'#13#10'  Write FValue'#13#10'  Implements mythingy, mythingy2'#13#10, FPascalProperty.AsString(True, True));
+  CheckEquals('Property MyProperty['#13#10#32#32'Param1 : Integer;'#13#10#32#32'Param2 : String'#13#10'] : String'#13#10'  Read FValue'#13#10'  Write FValue'#13#10'  Implements mythingy, mythingy2'#13#10, FPascalProperty.AsString(True, True));
 end;
 
 procedure TestTPascalProperty.TestCreate;
@@ -1533,16 +1642,13 @@ Begin
   FPascalModule.Free;
 End;
 
-procedure TestTPascalModule.TestAddOp;
+Procedure TestTPascalModule.TestAddOp;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -1550,34 +1656,19 @@ Const
     '  j := Hello - i;'#13#10 +
     '  k := $FF OR $12;'#13#10 +
     '  l := $FF XOR 123;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
 procedure TestTPascalModule.TestAdvancedRecords;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  TMyRec1 = Record'#13#10 +
     '  private '#13#10 +
@@ -1585,128 +1676,354 @@ Const
     '  End;'#13#10 +
     ''#13#10 +
     '  TMyRec2 = Record'#13#10 +
-    '  strict protected '#13#10 +
+    '  strict private '#13#10 +
     '    Field1 : String'#13#10 +
     '  End;'#13#10 +
     ''#13#10 +
     '  TMyRec3 = Record'#13#10 +
-    '  strict protected '#13#10 +
+    '  strict  private'#13#10 +
     '    Field1 : String'#13#10 +
     '    Field2 : String'#13#10 +
-    '  strict protected '#13#10 +
+    '  strict private '#13#10 +
     '    function hello : string;'#13#10 +
     '  public '#13#10 +
     '    procedure goodbye;'#13#10 +
     '  End;'#13#10 +
     ''#13#10 +
     '  TMyRec4 = Record'#13#10 +
-    '  strict protected '#13#10 +
+    '  strict private '#13#10 +
     '    Field1 : String'#13#10 +
     '    Field2 : String'#13#10 +
-    '  strict protected '#13#10 +
+    '  strict private '#13#10 +
     '    function hello : string;'#13#10 +
     '  public '#13#10 +
     '    procedure goodbye;'#13#10 +
-    '  published '#13#10 +
+    '  public '#13#10 +
     '    class operator Implicit(A : Integer) : Integer;'#13#10 +
     '  End;'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
+    'Function TMyRec3.Hello : String; Begin End;'#13#10 +
+    'Procedure TMyRec3.Goodbye; Begin End;'#13#10 +
+    'Function TMyRec4.Hello : String; Begin End;'#13#10 +
+    'Procedure TMyRec4.Goodbye; Begin End;'#13#10 +
+    'Class Operator TMyRec4.Implicit(A : Integer) : Integer; Begin End;',
+    [ttErrors, ttWarnings],
+    [ 'Types\TMyRec1|TMyRec1 = Record|scPrivate',
+      'Types\TMyRec1\Fields\Field1|Field1 : String|scPrivate',
+      'Types\TMyRec2|TMyRec2 = Record|scPrivate',
+      'Types\TMyRec2\Fields\Field1|Field1 : String|scPrivate',
+      'Types\TMyRec3|TMyRec3 = Record|scPrivate',
+      'Types\TMyRec3\Fields\Field1|Field1 : String|scPrivate',
+      'Types\TMyRec3\Fields\Field2|Field2 : String|scPrivate',
+      'Types\TMyRec3\Methods\Hello|Function hello : string|scPrivate',
+      'Types\TMyRec3\Methods\goodbye|Procedure goodbye|scPublic',
+      'Types\TMyRec4|TMyRec4 = Record|scPrivate',
+      'Types\TMyRec4\Fields\Field1|Field1 : String|scPrivate',
+      'Types\TMyRec4\Fields\Field2|Field2 : String|scPrivate',
+      'Types\TMyRec4\Methods\Hello|Function hello : string|scPrivate',
+      'Types\TMyRec4\Methods\Goodbye|Procedure goodbye|scPublic',
+      'Types\TMyRec4\Methods\Implicit|Class Operator Implicit(A : Integer) : Integer|scPublic',
+      'Implemented Methods\TMyRec3\Hello|Function hello : string|scPrivate',
+      'Implemented Methods\TMyRec3\Goodbye|Procedure goodbye|scPublic',
+      'Implemented Methods\TMyRec4\Hello|Function hello : string|scPrivate',
+      'Implemented Methods\TMyRec4\Goodbye|Procedure goodbye|scPublic',
+      'Implemented Methods\TMyRec4\Implicit|Class Operator Implicit(A : Integer) : Integer|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestAnonymousFuncRef;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TIntegerFunction = reference to function(const x, y: integer): integer;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TIntegerFunction|TIntegerFunction = Reference To Function(Const x, y : Integer) : Integer|scPublic'
+    ]
+  );
+End;
 
-procedure TestTPascalModule.TestArrayConstant;
+Procedure TestTPascalModule.TestAnonymousProcRef;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  TOutputProc = reference to procedure(const aString: string);',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TOutputProc|TOutputProc = Reference To Procedure(Const aString : String)|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestAnonymousProcAssignment;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Hello;'#13#10 +
     ''#13#10 +
-    'Interface'#13#10 +
+    'Begin'#13#10 +
+    '  OutputProc := procedure(const aString: string)'#13#10 +
+    '    begin'#13#10 +
+    '      WriteLn(aString);'#13#10 +
+    '    end; '#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestAnonymousInLineDef;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TIntegerCalculator = Class'#13#10 +
+    '    Procedure RegisterOperators;'#13#10 +
+    '  End;',
+    'procedure TIntegerCalculator.RegisterOperators;'#13#10 +
+    'begin'#13#10 +
+    '  RegisterMathOperator(''Add'', function(x, y: integer): integer'#13#10 +
+    '    begin'#13#10 +
+    '      Result := x + y;'#13#10 +
+    '    end);'#13#10 +
+    '  RegisterMathOperator(''Subtract'', function(x, y: integer): integer'#13#10 +
+    '    begin'#13#10 +
+    '      Result := x - y;'#13#10 +
+    '    end);'#13#10 +
+    '  RegisterMathOperator(''Multiply'', function(x, y: integer): integer'#13#10 +
+    '    begin'#13#10 +
+    '      Result := x * y;'#13#10 +
+    '    end);'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TIntegerCalculator|TIntegerCalculator = Class|scPublic',
+      'Types\TIntegerCalculator\Methods\RegisterOperators|Procedure RegisterOperators|scPublished',
+      'Implemented Methods\TIntegerCalculator\RegisterOperators|Procedure RegisterOperators|scPublished'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestAnonymousMethodAsVariable;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Hello;'#13#10 +
     ''#13#10 +
-    'Implementation'#13#10 +
+    'var'#13#10 +
+    'SubtractCalc: TIntegerFunction;'#13#10 +
     ''#13#10 +
+    'Begin'#13#10 +
+    '  SubtractCalc := function(x, y: integer): integer'#13#10 +
+    '    begin'#13#10 +
+    '      Result := x - y;'#13#10 +
+    '    end;'#13#10 +
+    'RegisterMathCalculation(''Subtract'', SubtractCalc);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Variables\SubtractCalc|SubtractCalc : TIntegerFunction|scLocal'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestAnonymousMethodsStdProcDecl;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  TProc = reference to procedure;'#13#10 +
+    '  TProc<T> = reference to procedure (Arg1: T);'#13#10 +
+    '  TProc<T1, T2> = reference to procedure (Arg1: T1; Arg2: T2);'#13#10 +
+    '  TProc<T1, T2, T3> = reference to procedure (Arg1: T1; Arg2: T2; Arg3: T3);'#13#10 +
+    '  TProc<T1, T2, T3, T4> = reference to procedure (Arg1: T1; Arg2: T2; Arg3: T3; Arg4 : T4);',
+    '',
+    [ttErrors, ttWarnings],
+    [
+       'Types\TProc|TProc = Reference to Procedure|scPublic',
+       'Types\TProc<T>|TProc<T> = Reference to Procedure(Arg1 : T)|scPublic',
+       'Types\TProc<T1, T2>|TProc<T1, T2> = Reference to Procedure(Arg1 : T1; Arg2 : T2)|scPublic',
+       'Types\TProc<T1, T2, T3>|TProc<T1, T2, T3> = Reference to Procedure(Arg1 : T1; Arg2 : T2; Arg3 : T3)|scPublic',
+       'Types\TProc<T1, T2, T3, T4>|TProc<T1, T2, T3, T4> = Reference to Procedure(Arg1 : T1; Arg2 : T2; Arg3 : T3; Arg4 : T4)|scPublic'
+    ]
+  )
+End;
+
+Procedure TestTPascalModule.TestAnonymousMethodsImplStdProcDecl;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'var'#13#10 +
+    '  StringDoubleProc: TProc<string, double>;'#13#10 +
+    ''#13#10 +
+    'begin'#13#10 +
+    '  StringDoubleProc := procedure(aString: string; aDouble: Double)'#13#10 +
+    '    begin'#13#10 +
+    '      ShowMessage(aString + '' '' + FloatToStr(aDouble));'#13#10 +
+    '    end;'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Variables\StringDoubleProc|StringDoubleProc : TProc<String, Double>|scLocal'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestAnonymousMethodsStdFuncDecl;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TFunc<TResult> = reference to function: TResult;'#13#10 +
+    '  TFunc<T,TResult> = reference to function (Arg1: T): TResult;'#13#10 +
+    '  TFunc<T1, T2,TResult> = reference to function (Arg1: T1; Arg2: T2): TResult;'#13#10 +
+    '  TFunc<T1, T2, T3,TResult> = reference to function (Arg1: T1; Arg2: T2; Arg3: T3): TResult;'#13#10 +
+    '  TFunc<T1, T2, T3, T4,TResult> = reference to function (Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4): TResult;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TFunc<TResult>|TFunc<TResult> = Reference To Function : TResult|scPublic',
+      'Types\TFunc<T, TResult>|TFunc<T, TResult> = Reference To Function(Arg1 : T) : TResult|scPublic',
+      'Types\TFunc<T1, T2, TResult>|TFunc<T1, T2, TResult> = Reference To Function(Arg1 : T1; Arg2 : T2) : TResult|scPublic',
+      'Types\TFunc<T1, T2, T3, TResult>|TFunc<T1, T2, T3, TResult> = Reference To Function(Arg1 : T1; Arg2 : T2; Arg3 : T3) : TResult|scPublic',
+      'Types\TFunc<T1, T2, T3, T4, TResult>|TFunc<T1, T2, T3, T4, TResult> = Reference To Function(Arg1 : T1; Arg2 : T2; Arg3 : T3; Arg4 : T4) : TResult|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestAnonymousMethodsImplStdFuncDecl;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'function AddIntegers(a, b: integer): integer;'#13#10 +
+    ''#13#10 +
+    'var'#13#10 +
+    '  AddFunc: TFunc<integer, integer, integer>;'#13#10 +
+    ''#13#10 +
+    'begin'#13#10 +
+    '  AddFunc := function(x, y: integer): integer'#13#10 +
+    '    begin'#13#10 +
+    '      Result := x + y;'#13#10 +
+    '    end;'#13#10 +
+    '  Result := AddFunc(a, b);'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\AddIntegers|Function AddIntegers(a, b : Integer) : Integer|scPrivate',
+      'Implemented Methods\AddIntegers\Variables\AddFunc|AddFunc : TFunc<integer, integer, integer>|scLocal'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestAnonymousMethodsUsing;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  Obj = class'#13#10 +
+    '    class procedure Using<T: class>(O: T; Proc: TProc<T>); static;'#13#10 +
+    '  end;',
+    'class procedure Obj.Using<T>(O: T; Proc: TProc<T>);'#13#10 +
+    ''#13#10 +
+    'begin'#13#10 +
+    '  try'#13#10 +
+    '    Proc(O);'#13#10 +
+    '  finally'#13#10 +
+    '    O.Free;'#13#10 +
+    '  end;'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\Obj|Obj = Class|scPublic',
+      'Types\Obj\Methods\Using<T>|Class Procedure Using<T>(O : T; Proc : TProc<T>); Static|scPublished',
+      'Implemented Methods\Obj\Using<T>|Class Procedure Using<T>(O : T; Proc : TProc<T>)|scPublished'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestArrayConstant;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Const'#13#10 +
     '  j : Array[1..2] Of String = (''one'', ''two'');'#13#10 +
-    '  i : Array[1..2] Of Integer = (1, 2);'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  i : Array[1..2] Of Integer = (1, 2);',
+    [ttErrors, ttWarnings],
+    [ 'Constants\j|j : Array[1..2] Of String = (''one'', ''two'')|scPrivate',
+      'Constants\i|i : Array[1..2] Of Integer = (1, 2)|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestArrayType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestArrayType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
-    '  t01 = Array of Integer;'#13#10 +
+    '  t01 = Array Of Integer;'#13#10 +
     '  t02 = Array[1..2] Of String Platform;'#13#10 +
-    '  t03 = Array[1 + 2..3*9] of Byte;'#13#10 +
+    '  t03 = Array[1 + 2..3*9] Of Byte;'#13#10 +
     '  t04 = Array[1, 2, 3] of Integer;'#13#10 +
-    '  t05 = Array[1..2, 0..2] of String;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  t05 = Array[1..2, 0..2] Of String;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = Array Of Integer|scPrivate',
+      'Types\t02|t02 = Array[1..2] Of String|scPrivate',
+      'Types\t03|t03 = Array[1 + 2..3 * 9] Of Byte|scPrivate',
+      'Types\t04|t04 = Array[1, 2, 3] of Integer|scPrivate',
+      'Types\t05|t05 = Array[1..2, 0..2] Of String|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestAssemblerStatement;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TArrayType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestAssemblerStatement;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -1719,23 +2036,14 @@ Const
     ''#13#10 +
     '  asm'#13#10 +
     '    MOV DX,BX'#13#10 +
-    '  end;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+    '  end;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello2|Procedure Hello2|scPrivate'
+    ]
+  );
+End;
 
 Procedure TestTPascalModule.TestAsString;
 
@@ -1743,114 +2051,71 @@ Begin
   CheckEquals('Program Hello', FPascalModule.AsString(True, False));
 End;
 
-procedure TestTPascalModule.TestBlock;
+Procedure TestTPascalModule.TestBlock;
 
-Const
-  strSource =
-    'Program MyProgram;'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
     'ResourceString'#13#10 +
     '  strHello = ''Hello'';'#13#10 +
     ''#13#10 +
     'Exports'#13#10 +
-    ' DGHProc1;'#13#10 +
-    ''#13#10 +
-    'Begin'#13#10 +
-    '  WriteLn(strHello);'#13#10 +
-    'End.'#13#10;
+    '  DGHProc1;',
+    '  WriteLn(strHello);',
+    [ttErrors, ttWarnings],
+    [
+      'Resource Strings\strHello|strHello = ''Hello''|scPrivate',
+      'Exports\DGHProc1|DGHProc1|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCaseLabel;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCaseLabel;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  case i of'#13#10 +
     '    1..2 * 3 / 4: Hello;'#13#10 +
     '  end;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCaseSelector;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCaseSelector;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  case i of'#13#10 +
     '    1, 2, 3, 4: Hello;'#13#10 +
     '  end;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCaseStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCaseStmt;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -1862,32 +2127,38 @@ Const
     '  else'#13#10 +
     '    exit;'#13#10 +
     '  end;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestClassEmpty;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyClass = Class;'#13#10 +
+    '  TMyOtherClass = Class'#13#10 +
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyOtherClass|TMyOtherClass = Class|scPublic'
+    ]
+  );
+End;
 
-procedure TestTPascalModule.TestClassFieldList;
+Procedure TestTPascalModule.TestClassFieldList;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  MyClass = Class'#13#10 +
     '  private'#13#10 +
@@ -1902,66 +2173,47 @@ Const
     '    MyStrictPrivateField : TMyClass;'#13#10 +
     '  strict protected'#13#10 +
     '    MyStrictProtectedField : TMyClass;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\MyClass|MyClass = Class|scPrivate',
+      'Types\MyClass\Fields\MyPrivateField|MyPrivateField : Integer|scPrivate',
+      'Types\MyClass\Fields\MyProtectedField1|MyProtectedField1 : Integer|scProtected',
+      'Types\MyClass\Fields\MyProtectedField2|MyProtectedField2 : Integer|scProtected',
+      'Types\MyClass\Fields\MyPublicField|MyPublicField : String|scPublic',
+      'Types\MyClass\Fields\MyPublishedField|MyPublishedField : Boolean|scPublished',
+      'Types\MyClass\Fields\MyStrictPrivateField|MyStrictPrivateField : TMyClass|scPrivate',
+      'Types\MyClass\Fields\MyStrictProtectedField|MyStrictProtectedField : TMyClass|scProtected'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestClassHeritage;
 
-begin
-    P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
-end;
-
-procedure TestTPascalModule.TestClassHeritage;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  MyClass1 = Class(TObject)'#13#10 +
     '  End;'#13#10 +
-    '  MyClass1 = Class(TObject, IMyInterface, IMyOtherInterface)'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  MyClass2 = Class(TObject, IMyInterface, IMyOtherInterface)'#13#10 +
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\MyClass1|MyClass1 = Class(TObject)|scPublic',
+      'Types\MyClass2|MyClass2 = Class(TObject, IMyInterface, IMyOtherInterface)|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestClassMethodList;
 
-begin
-    P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
-end;
-
-procedure TestTPascalModule.TestClassMethodList;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '  private'#13#10 +
@@ -1969,50 +2221,93 @@ Const
     '  protected'#13#10 +
     '    Function MyProtectedMethod : Boolean;'#13#10 +
     '  public'#13#10 +
-    '    Constructor MyPublicMehod;'#13#10 +
-    '    Constructor MyPublicMehod2;'#13#10 +
+    '    Constructor MyPublicMethod;'#13#10 +
+    '    Constructor MyPublicMethod2;'#13#10 +
     '  published'#13#10 +
     '    Destructor MyPublishedMethod;'#13#10 +
     '  strict private'#13#10 +
     '    Procedure MyStrictPrivateMethod;'#13#10 +
     '  strict protected'#13#10 +
-    '    Function MyStrictProtectedMethod : String;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '    Class Function MyStrictProtectedMethod : String;'#13#10 +
+    '  End;',
     'Procedure TMyClass.MyPrivateMethod; Begin End;'#13#10 +
     'Function TMyClass.MyProtectedMethod : Boolean; Begin End;'#13#10 +
-    'Constructor TMyClass.MyPublicMehod; Begin End;'#13#10 +
-    'Constructor TMyClass.MyPublicMehod2; Begin End;'#13#10 +
+    'Constructor TMyClass.MyPublicMethod; Begin End;'#13#10 +
+    'Constructor TMyClass.MyPublicMethod2; Begin End;'#13#10 +
     'Destructor TMyClass.MyPublishedMethod; Begin End;'#13#10 +
     'Procedure TMyClass.MyStrictPrivateMethod; Begin End;'#13#10 +
-    'Function TMyClass.MyStrictProtectedMethod : String; Begin End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'Class Function TMyClass.MyStrictProtectedMethod : String; Begin End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Methods\MyPrivateMethod|Procedure MyPrivateMethod|scPrivate',
+      'Types\TMyClass\Methods\MyProtectedMethod|Function MyProtectedMethod : Boolean|scProtected',
+      'Types\TMyClass\Methods\MyPublicMethod|Constructor MyPublicMethod|scPublic',
+      'Types\TMyClass\Methods\MyPublicMethod2|Constructor MyPublicMethod2|scPublic',
+      'Types\TMyClass\Methods\MyPublishedMethod|Destructor MyPublishedMethod|scPublished',
+      'Types\TMyClass\Methods\MyStrictPrivateMethod|Procedure MyStrictPrivateMethod|scPrivate',
+      'Types\TMyClass\Methods\MyStrictProtectedMethod|Class Function MyStrictProtectedMethod : String|scProtected',
+      'Implemented Methods\TMyClass\MyPrivateMethod|Procedure MyPrivateMethod|scPrivate',
+      'Implemented Methods\TMyClass\MyProtectedMethod|Function MyProtectedMethod : Boolean|scProtected',
+      'Implemented Methods\TMyClass\MyPublicMethod|Constructor MyPublicMethod|scPublic',
+      'Implemented Methods\TMyClass\MyPublicMethod2|Constructor MyPublicMethod2|scPublic',
+      'Implemented Methods\TMyClass\MyPublishedMethod|Destructor MyPublishedMethod|scPublished',
+      'Implemented Methods\TMyClass\MyStrictPrivateMethod|Procedure MyStrictPrivateMethod|scPrivate',
+      'Implemented Methods\TMyClass\MyStrictProtectedMethod|Class Function MyStrictProtectedMethod : String|scProtected'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestClassOneMemberPerVisibility;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  Private'#13#10 +
+    '  Strict Private'#13#10 +
+    '  Protected'#13#10 +
+    '  Strict Protected'#13#10 +
+    '  Public'#13#10 +
+    '  Published'#13#10 +
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    ['Types\TMyClass|TMyClass = Class|scPublic']
+  );
+End;
 
-procedure TestTPascalModule.TestClassPropertyList;
+Procedure TestTPascalModule.TestClassProperty;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  Strict Private'#13#10 +
+    '    Class Var FClassVariable : Integer;'#13#10 +
+    '  Public'#13#10 +
+    '    Class Property Variable : Integer Read FClassVariable Write FClassVariable;'#13#10 +
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Class Variables\FClassVariable|FClassVariable : Integer|scPrivate',
+      'Types\TMyClass\Properties\Variable|Class Property Variable : Integer Read FClassVariable Write FClassVariable|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestClassPropertyList;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '  private'#13#10 +
@@ -2028,158 +2323,101 @@ Const
     '  strict protected'#13#10 +
     '    Property MyStrictProtectedProperty;'#13#10 +
     '    Property MyStrictProtectedProperty2;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Properties\MyPrivateProperty|Property MyPrivateProperty|scPrivate',
+      'Types\TMyClass\Properties\MyProtectedProperty|Property MyProtectedProperty : Boolean|scProtected',
+      'Types\TMyClass\Properties\MyPublicProperty|Property MyPublicProperty|scPublic',
+      'Types\TMyClass\Properties\MyPublishedProperty|Property MyPublishedProperty|scPublished',
+      'Types\TMyClass\Properties\MyStrictPrivateProperty|Property MyStrictPrivateProperty|scPrivate',
+      'Types\TMyClass\Properties\MyStrictProtectedProperty|Property MyStrictProtectedProperty|scProtected',
+      'Types\TMyClass\Properties\MyStrictProtectedProperty2|Property MyStrictProtectedProperty2|scProtected'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestClassRefType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestClassRefType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
-    '  a = Class of TClass;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  a = Class of TClass;',
+    '',
+    [ttErrors, ttWarnings],
+    ['Types\a|a = Class Of TClass|scPublic']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestClassType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestClassType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
-    '  MyClass1 = Class'#13#10 +
+    '  TMyClass1 = Class'#13#10 +
     '  End;'#13#10 +
-    '  MyClass2 = Class Abstract'#13#10 +
+    '  TMyClass2 = Class Abstract'#13#10 +
     '  End;'#13#10 +
-    '  MyClass3 = Class Sealed'#13#10 +
+    '  TMyClass3 = Class Sealed'#13#10 +
     '  End;'#13#10 +
-    '  MyClass4 = Class Helper For TMyClass'#13#10 +
+    '  TMyClass4 = Class Helper For TMyClass'#13#10 +
     '  End;'#13#10 +
-    '  MyClass5 = Class Helper (TMyClass) For TMyClass'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  TMyClass5 = Class Helper (TMyClassHelper) For TMyClass'#13#10 +
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass1|TMyClass1 = Class|scPublic',
+      'Types\TMyClass2|TMyClass2 = Class Abstract|scPublic',
+      'Types\TMyClass3|TMyClass3 = Class Sealed|scPublic',
+      'Types\TMyClass4|TMyClass4 = Class Helper For TMyClass|scPublic',
+      'Types\TMyClass5|TMyClass5 = Class Helper(TMyClassHelper) For TMyClass|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestClassVarSection;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestClassVarSection;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  c1 = Class'#13#10 +
     '  var'#13#10 +
     '    v1, v2 : Integer;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  End;',
     'Type'#13#10 +
     '  c2 = Class'#13#10 +
     '  Field : TField;'#13#10 +
     '  var'#13#10 +
     '    v3, v4 : Integer;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\c1|c1 = Class|scPublic',
+      'Types\c1\Variables\v1|v1 : Integer|scPublished',
+      'Types\c1\Variables\v2|v2 : Integer|scPublished',
+      'Types\c2|c2 = Class|scPrivate',
+      'Types\c2\Fields\Field|Field : TField|scPublished',
+      'Types\c2\Variables\v3|v3 : Integer|scPublished',
+      'Types\c2\Variables\v4|v4 : Integer|scPublished'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T, C: TElementContainer;
-  i: Integer;
-  V: TElementContainer;
-  j: Integer;
+Procedure TestTPascalModule.TestClassVisibility;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        Begin
-          C := T.Elements[i];
-          V := C.FindElement(strClassVarsLabel);
-          Check(T <> Nil, 'Can not find ClassVars label.');
-          If V <> Nil Then
-            Begin
-              For j := 1 To V.ElementCount Do
-                CheckEquals(TVar.ClassName, V.Elements[j].ClassName);
-            End;
-        End;
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestClassVisibility;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  MyClass = Class'#13#10 +
     '  private'#13#10 +
@@ -2188,36 +2426,41 @@ Const
     '  published'#13#10 +
     '  strict private'#13#10 +
     '  strict protected'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    ['Types\MyClass|MyClass = Class|scPublic']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestClassVisibilityOnly;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  Strict Private'#13#10 +
+    '  Private'#13#10 +
+    '  Strict Protected'#13#10 +
+    '  Protected'#13#10 +
+    '  Public'#13#10 +
+    '  Published'#13#10 +
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    ['Types\TMyClass|TMyClass = Class|scPublic']
+  );
+End;
 
-procedure TestTPascalModule.TestCodeFailure01;
+Procedure TestTPascalModule.TestCodeFailure01;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -2225,28 +2468,18 @@ Const
     '    DoSomething;'#13#10 +
     '  With TMyClass.Create(Nil), MyObject Do '#13#10 +
     '    DoSomething(MyObjectField);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure02;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure02;
-
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     '(**'#13#10 +
     '  This is a description.'#13#10 +
     '  @date %s'#13#10 +
@@ -2281,38 +2514,22 @@ Const
     'Begin'#13#10 +
     'End;'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello1|Procedure Hello1(Ident : Array Of String)|scPrivate',
+      'Implemented Methods\Hello2|Procedure Hello2(Ident : Array Of Const)|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  I: TElementContainer;
-  M: TPascalMethod;
+Procedure TestTPascalModule.TestCodeFailure03;
 
-begin
-  P := TPascalModule.CreateParser(Format(strSource, [FormatDateTime('dd mmm yyyy',
-    Now)]), '', True, [moParse, moCheckForDocumentConflicts]);
-  Try
-    CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    I := P.FindElement(strImplementedMethodsLabel);
-    Check(I <> Nil, 'Implemented Methods Not Found!');
-    M := I.FindElement('Hello1', ftIdentifier) As TPascalMethod;
-    Check(M <> Nil, 'Method Hello1 NOT Found');
-    CheckEquals('Ident : Array Of String', M.Parameters[0].AsString(True, False));
-    M := I.FindElement('Hello2', ftIdentifier) As TPascalMethod;
-    Check(M <> Nil, 'Method Hello2 NOT Found');
-    CheckEquals('Ident : Array Of Const', M.Parameters[0].AsString(True, False));
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure03;
-
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     '(**'#13#10 +
     '  This is a description.'#13#10 +
     '  @date %s'#13#10 +
@@ -2325,28 +2542,19 @@ Const
     ''#13#10 +
     'Implementation'#13#10 +
     '  {$R *.res}'#13#10 +
-    'End.'#13#10;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    []
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure04;
 
-begin
-  P := TPascalModule.CreateParser(Format(strSource, [FormatDateTime('dd mmm yyyy',
-    Now)]), '', True, [moParse, moCheckForDocumentConflicts]);
-  Try
-    CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure04;
-
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     'Library MyLibrary;'#13#10 +
     ''#13#10 +
     'Uses'#13#10 +
@@ -2355,32 +2563,23 @@ Const
     'Exports'#13#10 +
     '  MyFunc;'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Uses\Windows|Windows|scNone',
+      'Exports\MyFunc|MyFunc|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure05;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure05;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -2394,134 +2593,79 @@ Const
     '        raise;'#13#10 +
     '    end'#13#10 +
     '  end;'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'end;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure06;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', True, [moParse,
-    moCheckForDocumentConflicts]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strDocumentationConflicts), P.DocConflict(1));
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure06;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Const'#13#10 +
     '  ProtectedFields: string ='#13#10 +
     '    (''Call_Number,DatIns,DatFup,DatFin,EmpIns,EmpFup,EmpFin,Status,DIS_FileOrg,'''#13#10 +
     '    +''DIS_MailFrom,DIS_MailTo,Emp_Email,Dep_Email,Act_CallID,DIS_CallID'''#13#10 +
-    '    +''EmpChg,DatChg,Act_Memo,Cost_CallID,Cost_Value,Call_Cost'');'#13#10 +
-    '    '#13#10 +
-    'End.'#13#10;
+    '    +''EmpChg,DatChg,Act_Memo,Cost_CallID,Cost_Value,Call_Cost'');',
+    [ttErrors, ttWarnings],
+    ['Constants\ProtectedFields|ProtectedFields : string = (''Call_Number,DatIns,DatFup,DatFin,EmpIns,EmpFup,EmpFin,Status,DIS_FileOrg,''' +
+    ' + ''DIS_MailFrom,DIS_MailTo,Emp_Email,Dep_Email,Act_CallID,DIS_CallID''' +
+    ' + ''EmpChg,DatChg,Act_Memo,Cost_CallID,Cost_Value,Call_Cost'')|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure07;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure07;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'var'#13#10 +
     '  TagSymbols: array[TTag] of string ='#13#10 +
-    '    ('''', ''LINK'', ''IMAGE'', ''TABLE'', ''IMAGEMAP'', ''OBJECT'', ''EMBED'');'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '    ('''', ''LINK'', ''IMAGE'', ''TABLE'', ''IMAGEMAP'', ''OBJECT'', ''EMBED'');',
+    [ttErrors, ttWarnings],
+    ['Variables\TagSymbols|TagSymbols : array[TTag] of string = ('''', ''LINK'', ''IMAGE'', ''TABLE'', ''IMAGEMAP'', ''OBJECT'', ''EMBED'')|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure08;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure08;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Const'#13#10 +
     '  a = 123;'#13#10 +
     '  b = 234.567;'#13#10 +
     '  c = $123;'#13#10 +
     '  d = $FFEE00;'#13#10 +
     '  e = 12.345e-12;'#13#10 +
-    '  f = 23.456e+34;'#13#10 +
-    '  '#13#10 +
-    '  '#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  f = 23.456e+34;',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\a|a = 123|scPrivate',
+      'Constants\b|b = 234.567|scPrivate',
+      'Constants\c|c = $123|scPrivate',
+      'Constants\d|d = $FFEE00|scPrivate',
+      'Constants\e|e = 12.345e-12|scPrivate',
+      'Constants\f|f = 23.456e+34|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure11;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure11;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'var'#13#10 +
     '  StandardOLEFormat: TFormatEtc = ('#13#10 +
     '    // Format must later be set.'#13#10 +
@@ -2534,34 +2678,19 @@ Const
     '    lindex: -1;'#13#10 +
     '    // Acceptable storage formats are IStream and global memory. The first is preferred.'#13#10 +
     '    tymed: TYMED_ISTREAM or TYMED_HGLOBAL;'#13#10 +
-    '  );'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  );',
+    [ttErrors, ttWarnings],
+    ['Variables\StandardOLEFormat|StandardOLEFormat : TFormatEtc = (cfFormat : 0; ptd : nil; dwAspect : DVASPECT_CONTENT; lindex : - 1; tymed : TYMED_ISTREAM or TYMED_HGLOBAL;)|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure12;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure12;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -2570,134 +2699,82 @@ Const
     '  Else'#13#10 +
     '    DoSomethingElse;'#13#10 +
     '  End;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure13;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure13;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Const'#13#10 +
     '  MyProc01 : Procedure = Nil;'#13#10 +
     '  MyFunc01 : Function : Integer = Nil;'#13#10 +
     ''#13#10 +
     '  MyProc02 : Procedure StdCall = Nil;'#13#10 +
-    '  MyFunc02 : Function : Integer StdCall = Nil;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  MyFunc02 : Function : Integer StdCall = Nil;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\MyProc01|MyProc01 : Procedure = Nil|scPublic',
+      'Constants\MyFunc01|MyFunc01 : Function : Integer = Nil|scPublic',
+      'Constants\MyProc02|MyProc02 : Procedure; StdCall = Nil|scPublic',
+      'Constants\MyFunc02|MyFunc02 : Function : Integer; StdCall = Nil|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure09;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-// THIS FAILS DUE TO ROLLBACK NOT REINSTATING THE COMPILERSTACK
-procedure TestTPascalModule.TestCodeFailure09;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '    {$IFNDEF DELPHI7_UP}'#13#10 +
     '    property Size: LongInt read GetSize;'#13#10 +
     '    {$ENDIF}'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    [ttErrors, ttWarnings],
+    ['Types\TMyClass|TMyClass = Class|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure10;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFaliure10;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Const'#13#10 +
     '    IID_IDropTargetHelper: TGUID = (D1: $4657278B; D2: $411B; D3: $11D2; D4: ($83, $9A, $00, $C0, $4F, $D9, $18, $D0));'#13#10 +
     '    IID_IDragSourceHelper: TGUID = (D1: $DE5BF786; D2: $477A; D3: $11D2; D4: ($83, $9D, $00, $C0, $4F, $D9, $18, $D0));'#13#10 +
     '    IID_IDropTarget: TGUID = (D1: $00000122; D2: $0000; D3: $0000; D4: ($C0, $00, $00, $00, $00, $00, $00, $46));'#13#10 +
-    '    CLSID_DragDropHelper: TGUID = (D1: $4657278A; D2: $411B; D3: $11D2; D4: ($83, $9A, $00, $C0, $4F, $D9, $18, $D0));'#13#10 +
-    '  '#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '    CLSID_DragDropHelper: TGUID = (D1: $4657278A; D2: $411B; D3: $11D2; D4: ($83, $9A, $00, $C0, $4F, $D9, $18, $D0));',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\IID_IDropTargetHelper|IID_IDropTargetHelper : TGUID = (D1 : $4657278B; D2 : $411B; D3 : $11D2; D4 : ($83, $9A, $00, $C0, $4F, $D9, $18, $D0))|scPrivate',
+      'Constants\IID_IDragSourceHelper|IID_IDragSourceHelper : TGUID = (D1 : $DE5BF786; D2 : $477A; D3 : $11D2; D4 : ($83, $9D, $00, $C0, $4F, $D9, $18, $D0))|scPrivate',
+      'Constants\IID_IDropTarget|IID_IDropTarget : TGUID = (D1 : $00000122; D2 : $0000; D3 : $0000; D4 : ($C0, $00, $00, $00, $00, $00, $00, $46))|scPrivate',
+      'Constants\CLSID_DragDropHelper|CLSID_DragDropHelper : TGUID = (D1 : $4657278A; D2 : $411B; D3 : $11D2; D4 : ($83, $9A, $00, $C0, $4F, $D9, $18, $D0))|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure14;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure14;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  TMyClass = Class(TObject, IMyInterface)'#13#10 +
     '  Protected'#13#10 +
@@ -2706,132 +2783,88 @@ Const
     '  End;'#13#10 +
     ''#13#10 +
     'Function TMyClass.DoSomething : Integer;'#13#10 +
-    'Begin End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'Begin End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class(TObject, iMyInterface)|scPrivate',
+      //: @debug 'Types\TMyClass\Methods\DoSomething|Function IMyInterface.DoSomething = DoSomething|scProtected',
+      //: @debug 'Types\TMyClass\Methods\DoSomething|Function DoSomething : Integer; StdCall|scProtected',
+      'Implemented Methods\TMyClass\DoSomething|Function DoSomething : Integer|scProtected'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure15;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure15;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '  Private'#13#10 +
     '    property PropertyPageImpl: TPropertyPageImpl read FPropertyPageImpl'#13#10 +
     '      implements IPropertyPage, IPropertyPage2;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPrivate',
+      'Types\TMyClass\Properties\PropertyPageImpl|Property PropertyPageImpl : ' +
+        'TPropertyPageImpl Read FPropertyPageImpl Implements IPropertyPage, IPropertyPage2|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure16;
 
-begin
-    P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-    Try
-      //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-      CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-      CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    Finally
-      P.Free;
-    End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure16;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TBasicAction = Class'#13#10 +
+    '    procedure UnRegisterChanges(Value: TBasicActionLink);'#13#10 +
+    '  End;',
     'procedure TBasicAction.UnRegisterChanges(Value: TBasicActionLink);'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  Value.{!}FAction := nil;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TBasicAction|TBasicAction = Class|scPublic',
+      'Types\TBasicAction\Methods\UnRegisterChanges|Procedure UnRegisterChanges(Value : TBasicActionLink)|scPublished',
+      'Implemented Methods\TBasicAction\UnRegisterChanges|Procedure UnRegisterChanges(Value : TBasicActionLink)|scPublished'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure17;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure17;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  if (goEditing in Options) and (Char(Msg.CharCode) in [^H, #32..#255]) then'#13#10 +
     '    ShowEditorChar(Char(Msg.CharCode))'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure18;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure18;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -2841,34 +2874,19 @@ Const
     '    on EConvertError do'#13#10 +
     '    else raise;'#13#10 +
     '  end;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure19;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure19;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '    procedure Add(Item: TMenuItem); overload;'#13#10 +
@@ -2880,36 +2898,25 @@ Const
     'Begin End;'#13#10 +
     ''#13#10 +
     'Procedure TMyClass.Add(const AItems : array of TMenuItem);'#13#10 +
-    'Begin End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'Begin End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPrivate'
+      //: @debug 'Types\TMyClass\Methods\Add|Procedure Add(Item : TMenuItem); Overload|scPublic'
+      //: @debug 'Types\TMyClass\Methods\Add|Procedure Add(Const AItems : Array Of TMenuItem); Overload|scPublic'
+      //: @debug 'Implemented Methods\TMyClass\Add.P0.TMenuItem|Procedure Add(Item : TMenuItem); Overload|scPublic',
+      //: @debug 'Implemented Methods\TMyClass\Add.P0.Const.Array Of TMenu|Procedure Add(const AItems : Array Of TMenuItem); Overload|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure21;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure21;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Procedure Hello; deprecated;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure Hello; deprecated;',
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '    function PSExecuteStatement(const ASQL: string; AParams: TParams;'#13#10 +
@@ -2925,67 +2932,148 @@ Const
     '  ResultSet: Pointer = nil): Integer;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Exported Headings\Hello|Procedure Hello|scPublic',
+      'Types\TMyClass|TMyClass = Class|scPrivate',
+      'Types\TMyClass\Methods\PSExecuteStatement|Function PSExecuteStatement(const ASQL : string; AParams : TParams; ResultSet : Pointer = nil) : Integer; overload; virtual|scPublished',
+      'Implemented Methods\Hello|Procedure Hello|scPublic',
+      'Implemented Methods\TMyClass\PSExecuteStatement|Function PSExecuteStatement(const ASQL : string; AParams : TParams; ResultSet : Pointer = nil) : Integer|scPublished'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure22;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestCodeFailure22;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Test;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  Str(dblValue:3:4, strValue);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Test|Procedure Test|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestCodeFailure23;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '  Private'#13#10 +
+    '    Type TMyEnum = (myFirst, meLast); // NOT ADDED TO RECORD'#13#10 +
+    '    Var i : Integer;                  // NOT ADDED TO RECORD'#13#10 +
+    '    Const j = 10;                     // NOT ADDED TO RECORD'#13#10 +
+    '    Class Var q : String;'#13#10 +
+    '  Strict Private'#13#10 +
+    '    FInt : Integer;'#13#10 +
+    '  Public'#13#10 +
+    '    Procedure AddItem;'#13#10 +
+    '    Constructor Create(i : Integer);'#13#10 +
+    '    //: @note this is not allowed here Destructor Destroy;'#13#10 +
+    '    Class Operator Add(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    '    Property Hello : Integer Read FInt;'#13#10 +
+    '  End;',
+    'Procedure TMyRecord.AddItem; Begin End;'#13#10 +
+    'Constructor TMyRecord.Create(i : Integer); Begin End;'#13#10 +
+    'Class Operator TMyRecord.Add(a, b : TMyRecord) : TMyRecord; Begin End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Types\TMyEnum|TMyEnum = (myFirst, meLast)|scPrivate',
+      'Types\TMyRecord\Variables\i|i : Integer|scPrivate',
+      'Types\TMyRecord\Constants\j|j = 10|scPrivate',
+      'Types\TMyRecord\Class Variables\q|q : String|scPrivate',
+      'Types\TMyRecord\Fields\FInt|FInt : Integer|scPrivate',
+      'Types\TMyRecord\Methods\AddItem|Procedure AddItem|scPublic',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Add|Class Operator Add(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Types\TMyRecord\Properties\Hello|Property Hello : Integer Read FInt|scPublic'
+    ]
+  );
+End;
 
-procedure TestTPascalModule.TestCompoundStmt;
+Procedure TestTPascalModule.TestCodeFailure24;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TFirst = Class'#13#10 +
+    '  Public Type'#13#10 +
+    '    TSecond = Class'#13#10 +
+    '    Public Type'#13#10 +
+    '      TThird = Class'#13#10 +
+    '      Public Type'#13#10 +
+    '        TFourth = Class'#13#10 +
+    '          Procedure Hello;'#13#10 +
+    '        End;'#13#10 +
+    '      End;'#13#10 +
+    '    End;'#13#10 +
+    '  End;',
+    'Procedure TFirst.TSecond.TThird.TFourth.Hello;'#13#10 +
     ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TFirst|TFirst = Class|scPublic',
+      'Types\TFirst\Types\TSecond|TSecond = Class|scPublic',
+      'Types\TFirst\Types\TSecond\Types\TThird|TThird = Class|scPublic',
+      'Types\TFirst\Types\TSecond\Types\TThird\Types\TFourth|TFourth = Class|scPublic',
+      'Types\TFirst\Types\TSecond\Types\TThird\Types\TFourth\Methods\Hello|Procedure Hello|scPublished',
+      'Implemented Methods\TFirst\TSecond\TThird\TFourth\Hello|Procedure Hello|scPublished'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure25;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '    TInt64Ex = Record '#13#10 +
+    '    Case Integer Of'#13#10 +
+    '      1: (Value : Int64);'#13#10 +
+    '      2: ('#13#10 +
+    '        iFirst  : Word;'#13#10 +
+    '        iSecond : Word;'#13#10 +
+    '        iThird  : Word;'#13#10 +
+    '        iFourth : Word;'#13#10 +
+    '      );'#13#10 +
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TInt64Ex|TInt64Ex = Record|scPublic',
+      'Types\TInt64Ex\Fields\Value|Value : Int64|scPublic',
+      'Types\TInt64Ex\Fields\iFirst|iFirst : Word|scPublic',
+      'Types\TInt64Ex\Fields\iSecond|iSecond : Word|scPublic',
+      'Types\TInt64Ex\Fields\iThird|iThird : Word|scPublic',
+      'Types\TInt64Ex\Fields\iFourth|iFourth : Word|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestCompoundStmt;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -2994,34 +3082,19 @@ Const
     '    i := 1 + 2 * j;'#13#10 +
     '    Print(j);'#13#10 +
     '  end;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestConditionalStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestConditionalStmt;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -3030,38 +3103,21 @@ Const
     '  case i of'#13#10 +
     '    1: Exit;'#13#10 +
     '  end;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestConstantDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestConstantDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Const'#13#10 +
     '  c = 0 platform;'#13#10 +
-    '  e : String = ''Hello'' library;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  e : String = ''Hello'' library;',
     'procedure implode(i : Integer);'#13#10 +
     ''#13#10 +
     'Const'#13#10 +
@@ -3069,108 +3125,76 @@ Const
     '  e = ''Hello'';'#13#10 +
     ''#13#10 +
     'begin'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\c|c = 0|scPublic',
+      'Constants\e|e : String = ''Hello''|scPublic',
+      'Implemented Methods\implode|Procedure implode(i : Integer)|scPrivate',
+      'Implemented Methods\implode\Constants\c|c : Integer = 0|scLocal',
+      'Implemented Methods\implode\Constants\e|e = ''Hello''|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestConstructorDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestConstructorDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '    Constructor Create; Virtual;'#13#10 +
+    'End;',
     'Constructor TMyClass.Create; Virtual; Platform'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Methods\Create|Constructor Create; Virtual|scPublished',
+      'Implemented Methods\TMyClass\Create|Constructor Create; Virtual|scPublished'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestConstructorHeading;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestConstructorHeading;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  MyObject = Object(TObject)'#13#10 +
     '  End;'#13#10 +
     '  MySecondObject = Object(TObject)'#13#10 +
     '    Constructor Create(str : String);'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    ''#13#10 +
+    '  End;',
     'Constructor MySecondObject.Create(str : String);'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\MyObject|MyObject = Object(TObject)|scPublic',
+      'Types\MySecondObject|MySecondObject = Object(TObject)|scPublic',
+      'Types\MySecondObject\Methods\Create|Constructor Create(str : String)|scPublic',
+      'Implemented Methods\MySecondObject\Create|Constructor Create(str : String)|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestConstSection;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestConstSection;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Const'#13#10 +
     '  c = 0;'#13#10 +
-    '  e = ''Hello'';'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  e = ''Hello'';',
     'procedure implode(i : Integer);'#13#10 +
     ''#13#10 +
     'Const'#13#10 +
@@ -3179,28 +3203,25 @@ Const
     '  ex = 1 * 2 + 3 / 4;'#13#10 +
     ''#13#10 +
     'begin'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\c|c = 0|scPublic',
+      'Constants\e|e = ''Hello''|scPublic',
+      'Implemented Methods\implode|Procedure implode(i : Integer)|scPrivate',
+      'Implemented Methods\implode\Constants\c|c = 0|scLocal',
+      'Implemented Methods\implode\Constants\e|e = ''Hello''|scLocal',
+      'Implemented Methods\implode\Constants\ex|ex = 1 * 2 + 3 / 4|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestContainsClause;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestContainsClause;
-
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     'Package MyPackage;'#13#10 +
     ''#13#10 +
     'Requires'#13#10 +
@@ -3210,21 +3231,16 @@ Const
     '  DGHLibrary In ''DGHLibrary.pas'','#13#10 +
     '  Library In ''Library.pas'';'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Requires\VCL50|VCL50|scNone',
+      'Contains\DGHLibrary|DGHLibrary In ''DGHLibrary.pas''|scNone',
+      'Contains\Library|Library In ''Library.pas''|scNone'
+    ]
+  );
+End;
 
 Procedure TestTPascalModule.TestCreateParser;
 
@@ -3234,12 +3250,12 @@ Begin
     FPascalModule.DocConflict(1));
 End;
 
-procedure TestTPascalModule.TestDeclSection;
+Procedure TestTPascalModule.TestDeclSection;
 
-Const
-  strSource =
-    'Program MyProgram;'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
     'Const'#13#10 +
     '  c = 0;'#13#10 +
     ''#13#10 +
@@ -3273,35 +3289,32 @@ Const
     '    v : String;'#13#10 +
     '  '#13#10 +
     '  Begin'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Begin'#13#10 +
-    'End.'#13#10;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\c|c = 0|scPrivate',
+      'Resource Strings\rs|rs = ''Hello''|scPrivate',
+      'Types\t|t = Integer|scPrivate',
+      'Variables\v|v : String|scPrivate',
+      'Thread Variables\tv|tv : Integer|scPrivate',
+      'Implemented Methods\MyProc|Procedure MyProc|scPrivate',
+      'Implemented Methods\MyProc\Labels\DGH|DGH|scLocal',
+      'Implemented Methods\MyProc\Constants\c|c = 0|scLocal',
+      'Implemented Methods\MyProc\Resource Strings\rs|rs = ''Hello''|scLocal',
+      'Implemented Methods\MyProc\Types\t|t = Integer|scLocal',
+      'Implemented Methods\MyProc\Variables\v|v : String|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestDesignator;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestDesignator;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -3310,103 +3323,68 @@ Const
     '  Ident[1 + 2, Hello];'#13#10 +
     '  QualId.ident[1 + 2, Hello];'#13#10 +
     '  Ident^;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestDestructorDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestDestructorDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '    Destructor Destroy; Override;'#13#10 +
+    '  End;',
     'Destructor TMyClass.Destroy; Override; Platform'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Methods\Destroy|Destructor Destroy; Override|scPublished',
+      'Implemented Methods\TMyClass\Destroy|Destructor Destroy; Override|scPublished'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestDestructorHeading;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+   'Type'#13#10 +
+   '  MyObject = Object(TObject)'#13#10 +
+   '  End;'#13#10 +
+   '  MySecondObject = Object(TObject)'#13#10 +
+   '    Destructor Destroy(str : String);'#13#10 +
+   '  End;',
+   'Destructor MySecondObject.Destroy(str : String);'#13#10 +
+   ''#13#10 +
+   'Begin'#13#10 +
+   'End;',
+   [ttErrors, ttWarnings],
+   [
+     'Types\MyObject|MyObject = Object(TObject)|scPublic',
+     'Types\MySecondObject|MySecondObject = Object(TObject)|scPublic',
+     'Types\MySecondObject\Methods\Destroy|Destructor Destroy(str : String)|scPublic',
+     'Implemented Methods\MySecondObject\Destroy|Destructor Destroy(str : String)|scPublic'
+   ]
+  );
+End;
 
-procedure TestTPascalModule.TestDestructorHeading;
+Procedure TestTPascalModule.TestDirective;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Type'#13#10 +
-    '  MyObject = Object(TObject)'#13#10 +
-    '  End;'#13#10 +
-    '  MySecondObject = Object(TObject)'#13#10 +
-    '    Destructor Destroy(str : String);'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'Destructor MySecondObject.Destroy(str : String);'#13#10 +
-    ''#13#10 +
-    'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestDirective;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Ident01; abstract;'#13#10 +
     ''#13#10 +
     'Procedure Ident02; assembler;'#13#10 +
@@ -3480,25 +3458,40 @@ Const
     'Begin End;'#13#10 +
     ''#13#10 +
     'Procedure Ident25; virtual overload; platform'#13#10 +
-    'Begin End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'Begin End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Ident01|Procedure Ident01; abstract|scPrivate',
+      'Implemented Methods\Ident02|Procedure Ident02; assembler|scPrivate',
+      'Implemented Methods\Ident03|Procedure Ident03; cdecl|scPrivate',
+      'Implemented Methods\Ident04a|Procedure Ident04a; dispid 1|scPrivate',
+      'Implemented Methods\Ident04|Procedure Ident04; dynamic|scPrivate',
+      'Implemented Methods\Ident05|Procedure Ident05; export|scPrivate',
+      'Implemented Methods\Ident06|Procedure Ident06; External; ''Hello''|scPrivate',
+      'Implemented Methods\Ident07|Procedure Ident07; far|scPrivate',
+      'Implemented Methods\Ident08|Procedure Ident08; final|scPrivate',
+      'Implemented Methods\Ident09|Procedure Ident09; forward|scPrivate',
+      'Implemented Methods\Ident10|Procedure Ident10; inline|scPrivate',
+      'Implemented Methods\Ident11|Procedure Ident11; local|scPrivate',
+      'Implemented Methods\Ident12|Procedure Ident12; message WM_QUIT|scPrivate',
+      'Implemented Methods\Ident13|Procedure Ident13; near|scPrivate',
+      'Implemented Methods\Ident14|Procedure Ident14; overload|scPrivate',
+      'Implemented Methods\Ident15|Procedure Ident15; override|scPrivate',
+      'Implemented Methods\Ident16|Procedure Ident16; pascal|scPrivate',
+      'Implemented Methods\Ident17|Procedure Ident17; register|scPrivate',
+      'Implemented Methods\Ident18|Procedure Ident18; reintroduce|scPrivate',
+      'Implemented Methods\Ident19|Procedure Ident19; safecall|scPrivate',
+      'Implemented Methods\Ident20|Procedure Ident20; stdcall|scPrivate',
+      'Implemented Methods\Ident21|Procedure Ident21; varargs|scPrivate',
+      'Implemented Methods\Ident22|Procedure Ident22; virtual|scPrivate',
+      'Implemented Methods\Ident23|Procedure Ident23; virtual; overload|scPrivate',
+      'Implemented Methods\Ident24|Procedure Ident24; virtual; overload|scPrivate',
+      'Implemented Methods\Ident25|Procedure Ident25; virtual; overload|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestDirectives;
+Procedure TestTPascalModule.TestDirectives;
 
 Var
   Words : TKeyWords;
@@ -3512,90 +3505,49 @@ begin
     Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
 end;
 
-procedure TestTPascalModule.TestEnumerateElement;
+Procedure TestTPascalModule.TestEnumerateElement;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = (emOne, emTwo, emThree);'#13#10 +
-    '  t02 = (emOne = 2, emTwo = 3 * 5, emThree = i * 100);'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  t02 = (emOne = 2, emTwo = 3 * 5, emThree = i * 100);',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = (emOne, emTwo, emThree)|scPrivate',
+      'Types\t02|t02 = (emOne = 2, emTwo = 3 * 5, emThree = i * 100)|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestEnumerateType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TEnumerateType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestEnumerateType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = (emOne, emTwo, emThree);'#13#10 +
-    '  t02 = (emOne = 2, emTwo = 3 * 5, emThree = i * 100);'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TEnumerateType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
+    '  t02 = (emOne = 2, emTwo = 3 * 5, emThree = i * 100);',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = (emOne, emTwo, emThree)|scPrivate',
+      'Types\t02|t02 = (emOne = 2, emTwo = 3 * 5, emThree = i * 100)|scPrivate'
+    ]
+  );
+End;
 
 procedure TestTPascalModule.TestExceptionBlock;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -3612,60 +3564,36 @@ Const
     '    on e : exception do'#13#10 +
     '      exit;'#13#10 +
     '  end;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestExportedHeading;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestExportedHeading;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'procedure implode(i : Integer); stdcall;'#13#10 +
-    'function explode(i : Integer) : boolean; pascal;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    'function explode(i : Integer) : boolean; pascal;',
     'procedure implode(i : Integer);'#13#10 +
     'begin'#13#10 +
     'end;'#13#10 +
     ''#13#10 +
     'function explode(i : Integer) : boolean;'#13#10 +
     'begin'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Exported Headings\implode|Procedure implode(i : Integer); StdCall|scPublic',
+      'Exported Headings\explode|Function explode(i : Integer) : boolean; pascal|scPublic',
+      'Implemented Methods\implode|Procedure implode(i : Integer)|scPublic',
+      'Implemented Methods\explode|Function explode(i : Integer) : boolean|scPublic'
+    ]
+  );
+End;
 
 procedure TestTPascalModule.TestExportsItem;
 
@@ -3750,7 +3678,7 @@ Var
 begin
   P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
     CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
     CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
@@ -3783,7 +3711,7 @@ Var
 begin
   P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
   Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
+    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
     CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
     CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
   Finally
@@ -3791,16 +3719,13 @@ begin
   End;
 end;
 
-procedure TestTPascalModule.TestFactor;
+Procedure TestTPascalModule.TestFactor;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -3814,73 +3739,40 @@ Const
     '  Inherited Create;'#13#10 +
     '  i := [1, 2, 3..6];'#13#10 +
     '  TypeId(1 * 2 / 3 * 4);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestFieldDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestFieldDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = Record'#13#10 +
     '    FField1 : Integer platform;'#13#10 +
     '    FField2 : String;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = Record|scPrivate',
+      'Types\t01\Fields\FField1|FField1 : Integer|scPublic',
+      'Types\t01\Fields\FField2|FField2 : String|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestFieldList;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestFieldList;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = Record'#13#10 +
     '    FField1 : Integer;'#13#10 +
@@ -3895,140 +3787,79 @@ Const
     '          itMeasure: (dblOffset : Double);'#13#10 +
     '          itCompare: (dblDistance : Double);'#13#10 +
     '    );'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '   End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = Record|scPrivate',
+      'Types\t01\Fields\FField1|FField1 : Integer|scPublic',
+      'Types\t01\Fields\FField2|FField2 : String|scPublic',
+      'Types\THInfo|THInfo = Record|scPrivate',
+      'Types\THInfo\Fields\dblEasting|dblEasting : Double|scPublic',
+      'Types\THInfo\Fields\dblNorthing|dblNorthing : Double|scPublic',
+      'Types\THInfo\Fields\dblChainage|dblChainage : Double|scPublic',
+      'Types\THInfo\Fields\dblOffset|dblOffset : Double|scPublic',
+      'Types\THInfo\Fields\dblDistance|dblDistance : Double|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestFileType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestFileType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = File Of Integer;'#13#10 +
-    '  t02 = File Of TSomething platform;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  t02 = File Of TSomething platform;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = File Of Integer|scPrivate',
+      'Types\t02|t02 = File Of TSomething|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestFormalParam;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TFileType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestFormalParam;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Ident(i : Integer; var j : String; const k : Boolean; out l : String);'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Ident|Procedure Ident(i : Integer; var j : String; const k : Boolean; out l : String)|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestFormalParameter;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestFormalParameter;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Ident(i : Integer; j : String; k : Boolean);'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Ident|Procedure Ident(i : Integer; j : String; k : Boolean)|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestForStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestForStmt;
-
-Const
-  strSource1 =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -4036,88 +3867,48 @@ Const
     '    Inc(j);'#13#10 +
     '  for i := 10 DownTo 0 Do'#13#10 +
     '    Inc(j);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-  strSource2 =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  for i in names Do'#13#10 +
     '    Inc(i);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestFunctionDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource1, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-  P := TPascalModule.CreateParser(strSource2, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestFunctionDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Function Hello : Integer; StdCall; Library'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Function Hello : Integer; StdCall|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestFunctionHeading;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestFunctionHeading;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Function Ident : Boolean;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -4131,60 +3922,561 @@ Const
     'Function Ident3(i : Integer) : String;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Ident|Function Ident : Boolean|scPrivate',
+      'Implemented Methods\Ident2|Function Ident2 : String|scPrivate',
+      'Implemented Methods\Ident3|Function Ident3(i : Integer) : String|scPrivate'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericClassConstraintTObjectList;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TObjectList<T: class> = class(TList<T>)'#13#10 +
+    '  private'#13#10 +
+    '    FOwnsObjects: Boolean;'#13#10 +
+    '  protected'#13#10 +
+    '    procedure Notify(const Value: T; Action: TCollectionNotification); override;'#13#10 +
+    '  public'#13#10 +
+    '    constructor Create(AOwnsObjects: Boolean = True); overload;'#13#10 +
+    '    constructor Create(const AComparer: IComparer<T>; AOwnsObjects: Boolean = True); overload;'#13#10 +
+    '    constructor Create(Collection: TEnumerable<T>; AOwnsObjects: Boolean = True); overload;'#13#10 +
+    '    property OwnsObjects: Boolean read FOwnsObjects write FOwnsObjects;'#13#10 +
+    '  end;',
+    '',
+    [ttErrors],
+    [
+      'Types\TObjectList<T>|TObjectList<T> = Class(TList<T>)|scPublic',
+      'Types\TObjectList<T>\Fields\FOwnsObjects|FOwnsObjects : Boolean|scPrivate',
+      'Types\TObjectList<T>\Methods\Notify|Procedure Notify(const Value : T; Action : TCollectionNotification); override|scProtected',
+      //: @debug 'Types\TObjectList<T>\Methods\Create|Constructor Create(AOwnsObjects : Boolean = True); Overload|scPublic',
+      //: @debug 'Types\TObjectList<T>\Methods\Create|Create(Const AComparer : IComparer<T>; AOwnsObjects : Boolean = True); Overload|scPublic',
+      //: @debug 'Types\TObjectList<T>\Methods\Create|Constructor Create(Collection : TEnumerable<T>; AOwnsObjects : Boolean = True); Overload|scPublic',
+      'Types\TObjectList<T>\Properties\OwnsObjects|Property OwnsObjects : Boolean read FOwnsObjects write FOwnsObjects|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericClassConstraintWithConstructor;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  // Notice the addition of the constructor constraint'#13#10 +
+    '  TSomeClass<T: class, constructor> = class'#13#10 +
+    '    function GetType: T;'#13#10 +
+    '  end;',
+    '{ TSomeClass<T> }'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
+    'function TSomeClass<T>.GetType: T;'#13#10 +
+    'begin'#13#10 +
+    '  Result := T.Create;'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TSomeClass<T>|TSomeClass<T> = Class|scPublic',
+      'Types\TSomeClass<T>\Methods\GetType|Function GetType : T|scPublished',
+      'Implemented Methods\TSomeClass<T>\GetType|Function GetType : T|scPublished'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestGenericClassRecordConstraint;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  TSomeClass<T: record> = class'#13#10 +
+    '  private'#13#10 +
+    '    FType: T;'#13#10 +
+    '  public'#13#10 +
+    '    constructor Create(aType: T);'#13#10 +
+    '    function GetType: T;'#13#10 +
+    '  end;',
+    'constructor TSomeClass<T>.Create(aType: T);'#13#10 +
+    'begin'#13#10 +
+    '  inherited Create;'#13#10 +
+    '  FType := aType;'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'function TSomeClass<T>.GetType: T;'#13#10 +
+    'begin'#13#10 +
+    '  Result := FType;'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TSomeClass<T>|TSomeClass<T> = Class|scPublic',
+      'Types\TSomeClass<T>\Fields\FType|FType : T|scPrivate',
+      'Types\TSomeClass<T>\Methods\Create|Constructor Create(aType : T)|scPublic',
+      'Types\TSomeClass<T>\Methods\GetType|Function GetType : T|scPublic',
+      'Implemented Methods\TSomeClass<T>\Create|Constructor Create(aType : T)|scPublic',
+      'Implemented Methods\TSomeClass<T>\GetType|Function GetType : T|scPublic'
+    ]
+  );
+End;
 
-procedure TestTPascalModule.TestGoal;
+Procedure TestTPascalModule.TestGenericCollections;
 
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TList<T> = Class;'#13#10 +
+    '  TThreadedList<T> = Class;'#13#10 +
+    '  TQueue<T> = Class;'#13#10 +
+    '  TStack<T> = Class;'#13#10 +
+    '  TDictionary<TKey, TValue> = Class;'#13#10 +
+    '  TObjectList<T> = Class;'#13#10 +
+    '  TObjectStack<T> = Class;'#13#10 +
+    '  TObjectDictionary<TKey, TValue> = Class;'#13#10 +
+    '  TThreadedQueue<T> = Class;',
+    '',
+    [ttErrors],
+    [
+      'Types\TList<T>|TList<T> = Class|scPublic',
+      'Types\TThreadedList<T>|TThreadedList<T> = Class|scPublic',
+      'Types\TQueue<T>|TQueue<T> = Class|scPublic',
+      'Types\TStack<T>|TStack<T> = Class|scPublic',
+      'Types\TDictionary<TKey, TValue>|TDictionary<TKey, TValue> = Class|scPublic',
+      'Types\TObjectList<T>|TObjectList<T> = Class|scPublic',
+      'Types\TObjectStack<T>|TObjectStack<T> = Class|scPublic',
+      'Types\TObjectDictionary<TKey, TValue>|TObjectDictionary<TKey, TValue> = Class|scPublic',
+      'Types\TThreadedQueue<T>|TThreadedQueue<T> = Class|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericEntities;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  TEntity<T> = class'#13#10 +
+    '    ID: T;'#13#10 +
+    '  end;'#13#10 +
+    ''#13#10 +
+    '  TOrderItem = class(TEntity<integer>)'#13#10 +
+    '  end;'#13#10 +
+    ''#13#10 +
+    '  TOrder = class(TEntity<integer>)'#13#10 +
+    '  end;'#13#10 +
+    ''#13#10 +
+    '  TCustomer = class(TEntity<TGUID>)'#13#10 +
+    '  end;',
+    '',
+    [ttErrors],
+    [
+      'Types\TEntity<T>|TEntity<T> = Class|scPublic',
+      'Types\TEntity<T>\Fields\ID|ID : T|scPublished',
+      'Types\TOrderItem|TOrderItem = Class(TEntity<integer>)|scPublic',
+      'Types\TOrder|TOrder = Class(TEntity<integer>)|scPublic',
+      'Types\TCustomer|TCustomer = Class(TEntity<TGUID>)|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericInterfaceConstraint;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  IStoppable = interface'#13#10 +
+    '    procedure Stop;'#13#10 +
+    '  end;'#13#10 +
+    ''#13#10 +
+    '  TWidget<T: IStoppable> = class'#13#10 +
+    '    FProcess: T;'#13#10 +
+    '    procedure StopProcess;'#13#10 +
+    '  end;',
+    'procedure TWidget<T>.StopProcess;'#13#10 +
+    'begin'#13#10 +
+    '  FProcess.Stop;'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\IStoppable|IStoppable = Interface|scPublic',
+      'Types\IStoppable\Methods\Stop|Procedure Stop|scPublic',
+      'Types\TWidget<T>|TWidget<T> = Class|scPublic',
+      'Types\TWidget<T>\Fields\FProcess|FProcess : T|scPublished',
+      'Types\TWidget<T>\Methods\StopProcess|Procedure StopProcess|scPublished',
+      'Implemented Methods\TWidget<T>\StopProcess|Procedure StopProcess|scPublished'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericInterfaces;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  IMyInterface<T> = interface'#13#10 +
+    '    procedure DoSomething(aType: T);'#13#10 +
+    '  end;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\IMyInterface<T>|IMyInterface<T> = Interface|scPublic',
+      'Types\IMyInterface<T>\Methods\DoSomething|Procedure DoSomething(aType : T)|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericClassConstraint;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  TSomeClass<T: class> = class'#13#10 +
+    '    function GetType: T;'#13#10 +
+    '  end;',
+    '',
+    [ttErrors],
+    [
+      'Types\TSomeClass<T>|TSomeClass<T> = Class|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericMethod;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  TWidgetMaker = class'#13#10 +
+    '  public'#13#10 +
+    '    function CreateWidget<T: TWidget>(aWidgetName: string): T;'#13#10 +
+    '  end;',
+    'Procedure Test;'#13#10 +
+    'begin'#13#10 +
+    '  MyWidget := TWidgetMaker.CreateWidget<TSpecialWidget>(''SpecialWidget'');'#13#10 +
+    'end;'#13#10,
+    [ttErrors],
+    [
+      'Types\TWidgetMaker|TWidgetMaker = Class|scPublic',
+      'Types\TWidgetMaker\Methods\CreateWidget<T>|Function CreateWidget<T>(aWidgetName : String) : T|scPublic',
+      'Implemented Methods\Test|Procedure Test|scPrivate'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericMultiConstraint;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TConstraintedType<T: constraint1, constraint2> = class'#13#10 +
+    '  '#13#10 +
+    '  end;',
+    '',
+    [ttErrors],
+    [
+      'Types\TConstraintedType<T>|TConstraintedType<T> = Class|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericMultiDefType;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyType = TDictionary<Integer, String>;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyType|TMyType = TDictionary<Integer, String>|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericPassingRecordsAsParameters;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  TFoo<T> = class'#13#10 +
+    '    AnyType: T;'#13#10 +
+    '  end;'#13#10 +
+    ''#13#10 +
+    '  TSomeRecord = record'#13#10 +
+    '    procedure Blech;'#13#10 +
+    '  end;',
+    'var'#13#10 +
+    '  Foo: TFoo<TSomeRecord>;'#13#10 +
+    ''#13#10 +
+    'procedure TSomeRecord.Blech;'#13#10 +
+    'begin'#13#10 +
+    '  WriteLn(''Blech!'');'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'Procedure Test;'#13#10 +
+    'begin'#13#10 +
+    '  Foo := TFoo<TSomeRecord>.Create;'#13#10 +
+    '  try'#13#10 +
+    '    Foo.AnyType.Blech;'#13#10 +
+    '  finally'#13#10 +
+    '    Foo.Free;'#13#10 +
+    '  end;'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TFoo<T>|TFoo<T> = Class|scPublic',
+      'Types\TFoo<T>\Fields\AnyType|AnyType : T|scPublished',
+      'Types\TSomeRecord|TSomeRecord = Record|scPublic',
+      'Types\TSomeRecord\Methods\Blech|Procedure Blech|scPublic',
+      'Variables\Foo|Foo : TFoo<TSomeRecord>|scPrivate',
+      'Implemented Methods\TSomeRecord\Blech|Procedure Blech|scPublic',
+      'Implemented Methods\Test|Procedure Test|scPrivate'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericProcVariable;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Test();'#13#10 +
+    'var '#13#10 +
+    '  ButtonStack: TStack<TButton>; '#13#10 +
+    'Begin'#13#10 +
+    '  ButtonStack := TStack<TButton>.Create;'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Test\Variables\ButtonStack|ButtonStack : TStack<TButton>|scLocal',
+      'Implemented Methods\Test|Procedure Test|scPrivate'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericSimplyConstraint;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TConstraintedType<T: constraint> = class'#13#10 +
+    '  end;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TConstraintedType<T>|TConstraintedType<T> = Class|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericsTStack;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TStack<T> = class'#13#10 +
+    '  private'#13#10 +
+    '    FStack : array of T;'#13#10 +
+    '  public'#13#10 +
+    '    procedure Push(X : T);'#13#10 +
+    '    function Pop : T;'#13#10 +
+    '  end;',
+    '',
+    [ttErrors],
+    [
+      'Types\TStack<T>|TStack<T> = Class|scPublic',
+      'Types\TStack<T>\Fields\FStack|FStack : Array Of T|scPrivate',
+      'Types\TStack<T>\Methods\Push|Procedure Push(X : T)|scPublic',
+      'Types\TStack<T>\Methods\Pop|Function Pop : T|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericFunctionTArrayResult;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '    Function  GetBytes: TArray<Byte>;'#13#10 +
+    '  End;',
+    'Function TMyClass.GetBytes : TArray<Byte>; Begin End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Methods\GetBytes|Function GetBytes : TArray<Byte>|scPublished',
+      'Implemented Methods\TMyClass\GetBytes|Function GetBytes : TArray<Byte>|scPublished'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericTEnum;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  TEnum = record'#13#10 +
+    '  public'#13#10 +
+    '    class function AsString<T>(aEnum: T): string; static;'#13#10 +
+    '    class function AsInteger<T>(aEnum: T): Integer; static;'#13#10 +
+    '  end;',
+    'class function TEnum.AsString<T>(aEnum: T): string;'#13#10 +
+    'begin'#13#10 +
+    '  Result := GetEnumName(TypeInfo(T), AsInteger(aEnum));'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'class function TEnum.AsInteger<T>(aEnum: T): Integer;'#13#10 +
+    'begin'#13#10 +
+    '  case Sizeof(T) of'#13#10 +
+    '    1: Result := pByte(@aEnum)^;'#13#10 +
+    '    2: Result := pWord(@aEnum)^;'#13#10 +
+    '    4: Result := pCardinal(@aEnum)^;'#13#10 +
+    '  end;'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TEnum|TEnum = Record|scPublic',
+      'Types\TEnum\Methods\AsString<T>|Class Function AsString<T>(aEnum : T) : String; Static|scPublic',
+      'Types\TEnum\Methods\AsInteger<T>|Class Function AsInteger<T>(aEnum : T) : Integer; Static|scPublic',
+      'Implemented Methods\TEnum\AsString<T>|Class Function AsString<T>(aEnum : T) : String|scPublic',
+      'Implemented Methods\TEnum\AsInteger<T>|Class Function AsInteger<T>(aEnum : T) : Integer|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericTEnumDemo;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'type'#13#10 +
+    '  TNick = (Blah, Yech, Floo);'#13#10 +
+    'Procedure Test;'#13#10 +
+    'begin'#13#10 +
+    '  WriteLn(TEnum.AsString<TNick>(Blah)); // writes ‘Blah’'#13#10 +
+    '  WriteLn(TEnum.AsString<TNick>(Yech)); // writes ‘Yech’'#13#10 +
+    '  WriteLn(TEnum.AsString<TNick>(Floo)); // writes ‘Floo’'#13#10 +
+    ''#13#10 +
+    '  WriteLn(TEnum.AsInteger<TNick>(Blah)); // writes 0'#13#10 +
+    '  WriteLn(TEnum.AsInteger<TNick>(Yech)); // writes 1'#13#10 +
+    '  WriteLn(TEnum.AsInteger<TNick>(Floo)); // writes 2'#13#10 +
+    ''#13#10 +
+    '  ReadLn;'#13#10 +
+    'end;',
+    [ttErrors],
+    [
+      'Types\TNick|TNick = (Blah, Yech, Floo)|scPrivate',
+      'Implemented Methods\Test|Procedure Test|scPrivate'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericTMultipleTypes;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMultipleTypes<T1, T2, T3, T4> = class;',
+    '',
+    [ttErrors],
+    [
+      'Types\TMultipleTypes<T1, T2, T3, T4>|TMultipleTypes<T1, T2, T3, T4> = Class|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGenericTypeConstructor;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  TSomeClass<T: constructor> = class'#13#10 +
+    '    function GetType: T;'#13#10 +
+    '  end;',
+    'function TSomeClass<T>.GetType: T;'#13#10 +
+    'begin'#13#10 +
+    '  Result := T.Create;'#13#10 +
+    'end;'#13#10 +
+    'procedure Test;'#13#10 +
+    'begin'#13#10 +
+    '  SomeClass := TSomeClass<SomeObject>;'#13#10 +
+    'end;'#13#10,
+    [ttErrors, ttWarnings],
+    [
+      'Types\TSomeClass<T>|TSomeClass<T> = Class|scPublic',
+      'Types\TSomeClass<T>\Methods\GetType|Function GetType : T|scPublished',
+      'Implemented Methods\TSomeClass<T>\GetType|Function GetType : T|scPublished',
+      'Implemented Methods\Test|Procedure Test|scPrivate'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestGoal;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     'Unit MyUnit;'#13#10 +
     ''#13#10 +
     'Interface'#13#10 +
     ''#13#10 +
     'Implementation'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    []
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestIfStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestIfStmt;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -4194,34 +4486,21 @@ Const
     '    statement'#13#10 +
     '  else'#13#10 +
     '    anotherstatement;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestImplementationSection;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestImplementationSection;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Uses'#13#10 +
     '  Windows, DGHLibrary;'#13#10 +
     ''#13#10 +
@@ -4232,99 +4511,59 @@ Const
     '  i : Integer;'#13#10 +
     ''#13#10 +
     'Exports'#13#10 +
-    '  DGHProc;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  DGHProc;',
+    [ttErrors, ttWarnings],
+    [
+      'Uses\Windows|Windows|scNone',
+      'Uses\DGHLibrary|DGHLibrary|scNone',
+      'Constants\c|c = 1|scPrivate',
+      'Variables\i|i : Integer|scPrivate',
+      'Exports\DGHProc|DGHProc|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestInitSection;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestInitSection;
-
-Const
-  strSource1 =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Initialization'#13#10 +
-    '  DoSomething;'#13#10 +
-    'End.'#13#10;
-  strSource2 =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  DoSomething;',
+    [ttErrors, ttwarnings],
+    []
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Initialization'#13#10 +
     '  DoSomething;'#13#10 +
     'Finalization'#13#10 +
-    '  DoSomethingMore;'#13#10 +
-    'End.'#13#10;
-  strSource3 =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  DoSomethingMore;',
+    [ttErrors, ttwarnings],
+    []
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'BEGIN'#13#10 +
     '  DoSomething;'#13#10 +
-    '  DoSomethingMore;'#13#10 +
-    'End.'#13#10;
+    '  DoSomethingMore;',
+    [ttErrors, ttwarnings],
+    []
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestInterfaceDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource1, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-  P := TPascalModule.CreateParser(strSource2, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-  P := TPascalModule.CreateParser(strSource3, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestInterfaceDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Uses'#13#10 +
     '  Windows;'#13#10 +
     ''#13#10 +
@@ -4346,72 +4585,56 @@ Const
     'Exports'#13#10 +
     '  Blobby;'#13#10 +
     ''#13#10 +
-    'procedure implode;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    'procedure implode;',
     'procedure implode;'#13#10 +
     'begin'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Uses\Windows|Windows|scNone',
+      'Types\t|t = Integer|scPublic',
+      'Constants\c|c = 0|scPublic',
+      'Resource Strings\rs|rs = ''hello.''|scPublic',
+      'Variables\v|v : String|scPublic',
+      'Thread Variables\tv|tv : Integer|scPublic',
+      'Exports\Blobby|Blobby|scPublic',
+      'Exported Headings\implode|Procedure implode|scPublic',
+      'Implemented Methods\implode|Procedure implode|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestInterfaceHeritage;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestInterfaceHeritage;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  TMyInterface = Interface(IUnknown, IInterfaceedObject, ISomethingElse)'#13#10 +
     '    Procedure MyProc;'#13#10 +
     '    Procedure MyProc2;'#13#10 +
     '    Property Count : Integer Read GetCount;'#13#10 +
     '    Property Count2 : Integer Read GetCount2;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyInterface|TMyInterface = Interface(IUnknown, IInterfaceedObject, ISomethingElse)|scPrivate',
+      'Types\TMyInterface\Methods\MyProc|Procedure MyProc|scPublic',
+      'Types\TMyInterface\Methods\MyProc2|Procedure MyProc2|scPublic',
+      'Types\TMyInterface\Properties\Count|Property Count : Integer Read GetCount|scPublic',
+      'Types\TMyInterface\Properties\Count2|Property Count2 : Integer Read GetCount2|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestInterfaceSection;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestInterfaceSection;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Uses'#13#10 +
     '  Windows;'#13#10 +
     ''#13#10 +
@@ -4419,34 +4642,24 @@ Const
     '  t = Integer;'#13#10 +
     ''#13#10 +
     'var'#13#10 +
-    '  v : string;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  v : string;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Uses\Windows|Windows|ScNone',
+      'Types\t|t = Integer|scPublic',
+      'Variables\v|v : String|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestInterfaceType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestInterfaceType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  TMyInterface1 = Interface'#13#10 +
     '  End;'#13#10 +
@@ -4457,25 +4670,19 @@ Const
     '    Procedure MyProc2;'#13#10 +
     '    Property Count : Integer Read GetCount;'#13#10 +
     '    Property Count2 : Integer Read GetCount2;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+    '  End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyInterface1|TMyInterface1 = Interface|scPrivate',
+      'Types\TMyInterface2|TMyInterface2 = Interface(IUnknown)|scPrivate',
+      'Types\TMyInterface3|TMyInterface3 = Interface(IUnknown)|scPrivate',
+      'Types\TMyInterface3\Methods\MyProc|Procedure MyProc|scPublic',
+      'Types\TMyInterface3\Methods\MyProc2|Procedure MyProc2|scPublic',
+      'Types\TMyInterface3\Properties\Count|Property Count : Integer Read GetCount|scPublic',
+      'Types\TMyInterface3\Properties\Count2|Property Count2 : Integer Read GetCount2|scPublic'
+    ]
+  );
+End;
 
 Procedure TestTPascalModule.TestReservedWords;
 
@@ -4491,16 +4698,13 @@ Begin
     Check(Words[i] < Words[i + 1], Words[i] + '!<' + Words[i + 1]);
 End;
 
-procedure TestTPascalModule.TestLabelDeclSection;
+Procedure TestTPascalModule.TestLabelDeclSection;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Label'#13#10 +
@@ -4508,34 +4712,24 @@ Const
     ''#13#10 +
     'Begin'#13#10 +
     '  WriteLn(i);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Labels\Dave|Dave|scLocal',
+      'Implemented Methods\Hello\Labels\DGH|DGH|scLocal',
+      'Implemented Methods\Hello\Labels\Hoyle|Hoyle|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestLoopStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestLoopStmt;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure H73ello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -4546,32 +4740,18 @@ Const
     '    Inc(i);'#13#10 +
     '  for i := 0 To 10 Do'#13#10 +
     '    Inc(j);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\H73ello|Procedure H73ello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestMethodHeading;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestMethodHeading;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  MyObject = Object(TObject)'#13#10 +
     '  End;'#13#10 +
@@ -4581,11 +4761,7 @@ Const
     '    Function MyFunction : Integer;'#13#10 +
     '    Constructor Create;'#13#10 +
     '    Destructor Destroy;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    ''#13#10 +
+    '  End;',
     'Type'#13#10 +
     '  MyOtherObject = Object(TObject)'#13#10 +
     '  End;'#13#10 +
@@ -4608,32 +4784,31 @@ Const
     'Destructor MySecondObject.Destroy;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\MyObject|MyObject = Object(TObject)|scPublic',
+      'Types\MySecondObject|MySecondObject = Object(TObject)|scPublic',
+      'Types\MySecondObject\Fields\MyField|MyField : Integer|scPublic',
+      'Types\MySecondObject\Methods\MyMethod|Procedure MyMethod|scPublic',
+      'Types\MySecondObject\Methods\MyFunction|Function MyFunction : Integer|scPublic',
+      'Types\MySecondObject\Methods\Create|Constructor Create|scPublic',
+      'Types\MySecondObject\Methods\Destroy|Destructor Destroy|scPublic',
+      'Types\MyOtherObject|MyOtherObject = Object(TObject)|scPrivate',
+      'Implemented Methods\MySecondObject\MyMethod|Procedure MyMethod|scPublic',
+      'Implemented Methods\MySecondObject\MyFunction|Function MyFunction : Integer|scPublic',
+      'Implemented Methods\MySecondObject\Create|Constructor Create|scPublic',
+      'Implemented Methods\MySecondObject\Destroy|Destructor Destroy|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestMethodList;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestMethodList;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  MyObject = Object(TObject)'#13#10 +
     '  End;'#13#10 +
@@ -4643,11 +4818,7 @@ Const
     '    Function MyFunction : Integer;'#13#10 +
     '    Constructor Create;'#13#10 +
     '    Destructor Destroy;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    ''#13#10 +
+    '  End;',
     'Type'#13#10 +
     '  MyOtherObject = Object(TObject)'#13#10 +
     '  End;'#13#10 +
@@ -4670,34 +4841,32 @@ Const
     'Destructor MySecondObject.Destroy;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\MyObject|MyObject = Object(TObject)|scPublic',
+      'Types\MySecondObject|MySecondObject = Object(TObject)|scPublic',
+      'Types\MySecondObject\Fields\MyField|MyField : Integer|scPublic',
+      'Types\MySecondObject\Methods\MyMethod|Procedure MyMethod|scPublic',
+      'Types\MySecondObject\Methods\MyFunction|Function MyFunction : Integer|scPublic',
+      'Types\MySecondObject\Methods\Create|Constructor Create|scPublic',
+      'Types\MySecondObject\Methods\Destroy|Destructor Destroy|scPublic',
+      'Types\MyOtherObject|MyOtherObject = Object(TObject)|scPrivate',
+      'Implemented Methods\MySecondObject\MyMethod|Procedure MyMethod|scPublic',
+      'Implemented Methods\MySecondObject\MyFunction|Function MyFunction : Integer|scPublic',
+      'Implemented Methods\MySecondObject\Create|Constructor Create|scPublic',
+      'Implemented Methods\MySecondObject\Destroy|Destructor Destroy|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestMulOp;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestMulOp;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -4708,42 +4877,96 @@ Const
     '  d := 1 And 2;'#13#10 +
     '  d := 1 Shr 2;'#13#10 +
     '  d := 1 Shl 2;'#13#10 +
-    'End;'#13#10 +
+    'End;',
+    [ttErrors, ttwarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
+
+Procedure TestTPascalModule.TestObjectEmpty;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyObject = Object'#13#10 +
+    '  Strict Private'#13#10 +
+    '  Private'#13#10 +
+    '  Strict Protected'#13#10 +
+    '  Protected'#13#10 +
+    '  Public'#13#10 +
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    ['Types\TMyObject|TMyObject = Object|scPublic']
+  );
+End;
+
+Procedure TestTPascalModule.TestObjectOneOfEachMember;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyObject = Object'#13#10 +
+    '  Strict Private'#13#10 +
+    '    FInt : Integer;'#13#10 +
+    '  Private'#13#10 +
+    '    Const i = 10;'#13#10 +
+    '    Var j : Integer;'#13#10 +
+    '    Type T = (First, Last);'#13#10 +
+    '    Class Var q : String;'#13#10 +
+    '  Protected'#13#10 +
+    '    Constructor Create;'#13#10 +
+    '    Destructor Destroy;'#13#10 +
+    '    Procedure Add;'#13#10 +
+    '  Public'#13#10 +
+    '    Function Hello : String;'#13#10 +
+    '    Property Qwerty : Integer Read FInt;'#13#10 +
+    '    //Class Operator Implicit(a, b : Integer) : Integer;'#13#10 +
+    '  End;',
+    'Constructor TMyObject.Create; Begin End;'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestObjectType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
+    'Destructor TMyObject.Destroy; Begin End;'#13#10 +
     ''#13#10 +
-    'Interface'#13#10 +
+    'Procedure TMyObject.Add; Begin End;'#13#10 +
     ''#13#10 +
+    'Function TMyObject.Hello : String; Begin End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyObject|TMyObject = Object|scPublic',
+      'Types\TMyObject\Fields\FInt|FInt : Integer|scPrivate',
+      'Types\TMyObject\Constants\i|i = 10|scPrivate',
+      'Types\TMyObject\Variables\j|j : Integer|scPrivate',
+      'Types\TMyObject\Types\T|T = (First, Last)|scPrivate',
+      'Types\TMyObject\Class Variables\q|q : String|scPrivate',
+      'Types\TMyObject\Methods\Create|Constructor Create|scProtected',
+      'Types\TMyObject\Methods\Destroy|Destructor Destroy|scProtected',
+      'Types\TMyObject\Methods\Add|Procedure Add|scProtected',
+      'Types\TMyObject\Methods\Hello|Function Hello : String|scPublic',
+      'Types\TMyObject\Properties\Qwerty|Property Qwerty : Integer Read FInt|scPublic',
+      'Implemented Methods\TMyObject\Create|Constructor Create|scProtected',
+      'Implemented Methods\TMyObject\Destroy|Destructor Destroy|scProtected',
+      'Implemented Methods\TMyObject\Add|Procedure Add|scProtected',
+      'Implemented Methods\TMyObject\Hello|Function Hello : String|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestObjectType;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  MyObject = Object'#13#10 +
     '  End;'#13#10 +
     '  MySecondObject = Object'#13#10 +
     '    Procedure MyMethod;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    ''#13#10 +
+    '  End;',
     'Type'#13#10 +
     '  MyOtherObject = Object(TObject)'#13#10 +
     '  End;'#13#10 +
@@ -4751,32 +4974,24 @@ Const
     'Procedure MySecondObject.MyMethod;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\MyObject|MyObject = Object|scPublic',
+      'Types\MySecondObject|MySecondObject = Object|scPublic',
+      'Types\MySecondObject\Methods\MyMethod|Procedure MyMethod|scPublic',
+      'Types\MyOtherObject|MyOtherObject = Object(TObject)|scPrivate',
+      'Implemented Methods\MySecondObject\MyMethod|Procedure MyMethod|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestObjFieldList;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestObjFieldList;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  MyObject = Object(TObject)'#13#10 +
     '  End;'#13#10 +
@@ -4784,11 +4999,7 @@ Const
     '    MyField : Integer;'#13#10 +
     '    MyField2, MyField3 : String;'#13#10 +
     '    Procedure MyMethod;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    ''#13#10 +
+    '  End;',
     'Type'#13#10 +
     '  MyOtherObject = Object(TObject)'#13#10 +
     '  End;'#13#10 +
@@ -4796,43 +5007,34 @@ Const
     'Procedure MySecondObject.MyMethod;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\MyObject|MyObject = Object(TObject)|scPublic',
+      'Types\MySecondObject|MySecondObject = Object(TObject)|scPublic',
+      'Types\MySecondObject\Fields\MyField|MyField : Integer|scPublic',
+      'Types\MySecondObject\Fields\MyField2|MyField2 : String|scPublic',
+      'Types\MySecondObject\Fields\MyField3|MyField3 : String|scPublic',
+      'Types\MySecondObject\Methods\MyMethod|Procedure MyMethod|scPublic',
+      'Types\MyOtherObject|MyOtherObject = Object(TObject)|scPrivate',
+      'Implemented Methods\MySecondObject\MyMethod|Procedure MyMethod|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestObjHeritage;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestObjHeritage;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  MyObject = Object(TObject)'#13#10 +
     '  End;'#13#10 +
     '  MySecondObject = Object(TObject)'#13#10 +
     '    MyField : Integer;'#13#10 +
     '    Procedure MyMethod;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    ''#13#10 +
+    '  End;',
     'Type'#13#10 +
     '  MyOtherObject = Object(TObject)'#13#10 +
     '  End;'#13#10 +
@@ -4840,52 +5042,1150 @@ Const
     'Procedure MySecondObject.MyMethod;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\MyObject|MyObject = Object(TObject)|scPublic',
+      'Types\MySecondObject|MySecondObject = Object(TObject)|scPublic',
+      'Types\MySecondObject\Fields\MyField|MyField : Integer|scPublic',
+      'Types\MySecondObject\Methods\MyMethod|Procedure MyMethod|scPublic',
+      'Types\MyOtherObject|MyOtherObject = Object(TObject)|scPrivate',
+      'Implemented Methods\MySecondObject\MyMethod|Procedure MyMethod|scPublic'
+    ]
+  );
+End;
+
+procedure TestTPascalModule.TestOperatorAdd;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Add(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
     'End;'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
+    'Class Operator TMyRecord.Add(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Add|Class Operator Add(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Add|Class Operator Add(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestOperatorBitwiseAnd;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator BitwiseAnd(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.BitwiseAnd(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\BitwiseAnd|Class Operator BitwiseAnd(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\BitwiseAnd|Class Operator BitwiseAnd(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
 
-procedure TestTPascalModule.TestOPLibrary;
+Procedure TestTPascalModule.TestOperatorBitwiseNot;
 
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator BitwiseNot(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.BitwiseNot(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\BitwiseNot|Class Operator BitwiseNot(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\BitwiseNot|Class Operator BitwiseNot(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorBitwiseOr;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator BitwiseOr(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.BitwiseOr(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\BitwiseOr|Class Operator BitwiseOr(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\BitwiseOr|Class Operator BitwiseOr(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorBitwiseXor;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator BitwiseXor(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.BitwiseXor(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|FInt : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\BitwiseXor|Class Operator BitwiseXor(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\BitwiseXor|Class Operator BitwiseXor(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorDec;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Inc(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Inc(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Inc|Class Operator Inc(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Inc|Class Operator Inc(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorDivide;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Divide(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Divide(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Divide|Class Operator Divide(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Divide|Class Operator Divide(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorEqual;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Equal(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Equal(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Equal|Class Operator Equal(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Equal|Class Operator Equal(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorExplicit;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Explicit(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Explicit(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Explicit|Class Operator Explicit(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Explicit|Class Operator Explicit(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorGreaterThan;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator GreaterThan(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.GreaterThan(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\GreaterThan|Class Operator GreaterThan(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\GreaterThan|Class Operator GreaterThan(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorGreaterThanOrEqual;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator GreaterThanOrEqual(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.GreaterThanOrEqual(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\GreaterThanOrEqual|Class Operator GreaterThanOrEqual(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\GreaterThanOrEqual|Class Operator GreaterThanOrEqual(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorImplicit;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Implicit(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Implicit(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|FInt : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Implicit|Class Operator Implicit(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Implicit|Class Operator Implicit(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorInc;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Inc(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Inc(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Inc|Class Operator Inc(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Inc|Class Operator Inc(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorIntDivide;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator IntDivide(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.IntDivide(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\IntDivide|Class Operator IntDivide(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\IntDivide|Class Operator IntDivide(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorLeftShift;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator LeftShift(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.LeftShift(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\LeftShift|Class Operator LeftShift(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\LeftShift|Class Operator LeftShift(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorLessThan;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator LessThan(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.LessThan(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\LessThan|Class Operator LessThan(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\LessThan|Class Operator LessThan(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorLessThanOrEqual;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator LessThanOrEqual(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.LessThanOrEqual(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [ 'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\LessThanOrEqual|Class Operator LessThanOrEqual(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\LessThanOrEqual|Class Operator LessThanOrEqual(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorLogicalAnd;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator LogicalAnd(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.LogicalAnd(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\LogicalAnd|Class Operator LogicalAnd(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\LogicalAnd|Class Operator LogicalAnd(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorLogicalNot;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator LogicalNot(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.LogicalNot(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [ 'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\LogicalNot|Class Operator LogicalNot(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\LogicalNot|Class Operator LogicalNot(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorLogicalOr;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator LogicalOr(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.LogicalOr(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\LogicalOr|Class Operator LogicalOr(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\LogicalOr|Class Operator LogicalOr(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorLogicalXor;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator LogicalXor(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.LogicalXor(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\LogicalXor|Class Operator LogicalXor(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\LogicalXor|Class Operator LogicalXor(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorModulus;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Modulus(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Modulus(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Modulus|Class Operator Modulus(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Modulus|Class Operator Modulus(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorMultiply;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Multiply(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Multiply(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Multiply|Class Operator Multiply(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Multiply|Class Operator Multiply(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorNegative;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Negative(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Negative(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Negative|Class Operator Negative(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Negative|Class Operator Negative(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorNotEqual;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator NotEqual(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.NotEqual(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\NotEqual|Class Operator NotEqual(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\NotEqual|Class Operator NotEqual(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorPositive;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Positive(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Positive(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Positive|Class Operator Positive(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Positive|Class Operator Positive(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorRightShift;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator RightShift(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.RightShift(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\RightShift|Class Operator RightShift(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\RightShift|Class Operator RightShift(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorRound;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Round(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Round(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Round|Class Operator Round(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Round|Class Operator Round(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorSubtract;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Subtract(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Subtract(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Subtract|Class Operator Subtract(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Subtract|Class Operator Subtract(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOperatorTrunc;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Record'#13#10 +
+    '    Strict Private'#13#10 +
+    '      FInt : Integer;'#13#10 +
+    '    Public'#13#10 +
+    '      Constructor Create(i : Integer);'#13#10 +
+    '      Class Operator Trunc(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    'End;',
+    'Constructor TMyRecord.Create(i : Integer);'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  FInt := i;'#13#10 +
+    'End;'#13#10 +
+    ''#13#10 +
+    'Class Operator TMyRecord.Trunc(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Result := TMyRecord.Create(a + b);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|Fint : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Create|Constructor Create(i : Integer)|scPublic',
+      'Types\TMyRecord\Methods\Trunc|Class Operator Trunc(a, b : TMyRecord) : TMyRecord|scPublic',
+      'Implemented Methods\TMyRecord\Create|Constructor Create(i : Integer)|scPublic',
+      'Implemented Methods\TMyRecord\Trunc|Class Operator Trunc(a, b : TMyRecord) : TMyRecord|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestOPLibrary;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     'Library MyLibrary;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  WriteLn(''Hello'');'#13#10 +
-    'End.'#13#10;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    []
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestOPPackage;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestOPPackage;
-
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     'Package MyPackage;'#13#10 +
     ''#13#10 +
     'Requires'#13#10 +
@@ -4894,54 +6194,39 @@ Const
     'Contains'#13#10 +
     '  DGHLibrary In ''DGHLibrary.pas'';'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Requires\VCL50|VCL50|scNone',
+      'Contains\DGHLibrary|DGHLibrary In ''DGHLibrary.pas''|scNone'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestOPProgram;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestOPProgram;
-
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     'Program MyProgram;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  WriteLn(''Hello'');'#13#10 +
-    'End.'#13#10;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    []
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestOPType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestOPType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  a = THello;'#13#10 +
     '  b = [1..2];'#13#10 +
@@ -4952,30 +6237,29 @@ Const
     '  f = String;'#13#10 +
     '  g = function(i : Integer) : integer;'#13#10 +
     '  h = variant;'#13#10 +
-    '  i = class of THello;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  i = class of THello;',
+    '',
+    [ttErrors, ttwarnings],
+    [
+      'Types\a|a = THello|scPublic',
+      'Types\b|b = [1..2]|scPublic',
+      'Types\c|c = (eOne, eTwo)|scPublic',
+      'Types\d|d = Record|scPublic',
+      'Types\e|e = ^d|scPublic',
+      'Types\f|f = String|scPublic',
+      'Types\g|g = Function(i : Integer) : Integer|scPublic',
+      'Types\h|h = Variant|scPublic',
+      'Types\i|i = Class Of THello|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestOPUnit;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestOPUnit;
-
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     'Unit MyUnit;'#13#10 +
     ''#13#10 +
     'Interface'#13#10 +
@@ -4996,32 +6280,25 @@ Const
     '  WriteLn(i);'#13#10 +
     'End;'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Uses\Windows|Windows|scNone',
+      'Exported Headings\Hello|Procedure Hello|scPublic',
+      'Constants\i|i = 10|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestOrdIdent;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestOrdIdent;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = ShortInt;'#13#10 +
     '  t02 = SmallInt;'#13#10 +
@@ -5034,72 +6311,52 @@ Const
     '  t09 = Char;'#13#10 +
     '  t10 = WideChar;'#13#10 +
     '  t11 = LongWord;'#13#10 +
-    '  t12 = PChar;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  t12 = PChar;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = ShortInt|scPrivate',
+      'Types\t02|t02 = Smallint|scPrivate',
+      'Types\t03|t03 = Integer|scPrivate',
+      'Types\t04|t04 = Byte|scPrivate',
+      'Types\t05|t05 = LongInt|scPrivate',
+      'Types\t06|t06 = Int64|scPrivate',
+      'Types\t07|t07 = Word|scPrivate',
+      'Types\t08|t08 = Boolean|scPrivate',
+      'Types\t09|t09 = Char|scPrivate',
+      'Types\t10|t10 = WideChar|scPrivate',
+      'Types\t11|t11 = LongWord|scPrivate',
+      'Types\t12|t12 = PChar|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestOrdinalType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TOrdIdent.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestOrdinalType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  a = 1..2;'#13#10 +
     '  b = (eOne, eTwo);'#13#10 +
-    '  c = Byte;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  c = Byte;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\a|a = 1..2|scPrivate',
+      'Types\b|b = (eOne, eTwo)|scPrivate',
+      'Types\c|c = Byte|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestParameter;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestParameter;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Ident1(i);'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -5120,77 +6377,51 @@ Const
     'Begin'#13#10 +
     'End;'#13#10 +
     ''#13#10 +
-    'Procedure Ident4(i : Array Of Integer);'#13#10 +
+    'Procedure Ident5(i : Array Of Integer);'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     'End;'#13#10 +
     ''#13#10 +
-    'Procedure Ident5(i : Integer = 0);'#13#10 +
+    'Procedure Ident6(i : Integer = 0);'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Ident1|Procedure Ident1(i)|scPrivate',
+      'Implemented Methods\Ident2|Procedure Ident2(i : Integer)|scPrivate',
+      'Implemented Methods\Ident3|Procedure Ident3(i : String)|scPrivate',
+      'Implemented Methods\Ident4|Procedure Ident4(i : File)|scPrivate',
+      'Implemented Methods\Ident5|Procedure Ident5(i : Array Of Integer)|scPrivate',
+      'Implemented Methods\Ident6|Procedure Ident6(i : Integer = 0)|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestPointerType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestPointerType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = ^Integer;'#13#10 +
-    '  t02 = ^TSomething platform;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  t02 = ^TSomething platform;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = ^Integer|scPrivate',
+      'Types\t02|t02 = ^TSomething|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestPortabilityDirective;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TPointerType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestPortabilityDirective;
-
-Const
-  strSource =
-    'Unit MyUnit platform;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  t = Integer library;'#13#10 +
     '  u = Class'#13#10 +
@@ -5202,10 +6433,7 @@ Const
     '  end library;'#13#10 +
     '  s = set of integer deprecated;'#13#10 +
     '  f = file of integer deprecated;'#13#10 +
-    '  p = ^Integer platform;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  p = ^Integer platform;',
     'Const'#13#10 +
     '  i = 1 deprecated;'#13#10 +
     '  j : Integer = 2 deprecated;'#13#10 +
@@ -5244,65 +6472,55 @@ Const
     'destructor destroy; platform'#13#10 +
     ''#13#10 +
     'begin'#13#10 +
-    'end;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t|t = Integer|scPublic',
+      'Types\u|u = Class|scPublic',
+      'Types\u\Properties\oops|Property oops|scPublished',
+      'Types\a|a = Array[1..2] of Integer|scPublic',
+      'Types\r|r = Record|scPublic',
+      'Types\r\Fields\myField|myField : String|scPublic',
+      'Types\s|s = set of integer|scPublic',
+      'Types\f|f = file of integer|scPublic',
+      'Types\p|p = ^Integer|scPublic',
+      'Constants\i|i = 1|scPrivate',
+      'Constants\j|j : Integer = 2|scPrivate',
+      'Variables\k|k : Integer|scPrivate',
+      'Thread Variables\str|str : Integer|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello1|Function Hello1 : integer|scPrivate',
+      'Implemented Methods\Hello2|Function Hello2 : integer|scPrivate',
+      'Implemented Methods\Hello3|Procedure Hello3|scPrivate',
+      'Implemented Methods\Create|Constructor Create|scPrivate',
+      'Implemented Methods\Destroy|Destructor Destroy|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestProcedureDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestProcedureDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello; Virtual; Platform'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello; Virtual|scPrivate']
+  );
 End;
 
-procedure TestTPascalModule.TestProcedureDeclSection;
+Procedure TestTPascalModule.TestProcedureDeclSection;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -5321,34 +6539,24 @@ Const
     'Destructor Destroy;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello2|Function Hello2 : Boolean|scPrivate',
+      'Implemented Methods\Create|Constructor Create|scPrivate',
+      'Implemented Methods\Destroy|Destructor Destroy|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestProcedureHeading;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestProcedureHeading;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Ident;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -5362,79 +6570,51 @@ Const
     'Procedure Ident3(i : Integer);'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Ident|Procedure Ident|scPrivate',
+      'Implemented Methods\Ident2|Procedure Ident2|scPrivate',
+      'Implemented Methods\Ident3|Procedure Ident3(i : Integer)|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestProcedureType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestProcedureType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = Procedure;'#13#10 +
     '  t02 = Procedure(i : Integer);'#13#10 +
     '  t03 = Procedure(i, j : Integer);'#13#10 +
     '  t04 = Procedure(i, j : Integer; k : Integer);'#13#10 +
     '  t05 = Procedure(i : Integer) Of Object;'#13#10 +
-    '  t06 = Function(i, j : Integer; s : String) : Boolean Of Object;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TProcedureType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
+    '  t06 = Function(i, j : Integer; s : String) : Boolean Of Object;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = Procedure|scPrivate',
+      'Types\t02|t02 = Procedure(i : Integer)|scPrivate',
+      'Types\t03|t03 = Procedure(i, j : Integer)|scPrivate',
+      'Types\t04|t04 = Procedure(i, j, k : Integer)|scPrivate',
+      'Types\t05|t05 = Procedure(i : Integer) Of Object|scPrivate',
+      'Types\t06|t06 = Function(i, j : Integer; s : String) : Boolean Of Object|scPrivate'
+    ]
+  );
+End;
 
 Procedure TestTPascalModule.TestProcessCompilerDirective;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     '{$DEFINE DGH}'#13#10 +
     '{$DEFINE DGH1}'#13#10 +
-    '{$UNDEF DGH1}'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '{$UNDEF DGH1}',
     '{$IFDEF DGH}'#13#10 +
     'Const iMyConstant : Integer = 1;'#13#10 +
     '{$ELSE}'#13#10 +
@@ -5449,29 +6629,20 @@ Const
     '  WriteLn(''Hello!'');'#13#10 +
     '{$ENDIF}'#13#10 +
     ''#13#10 +
-    '{$EXTERNALSYM MySymbol}'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    CheckEquals(True, P.IfDef('DGH'));
-    CheckEquals(False, P.IfDef('DGH1'));
-  Finally
-    P.Free;
-  End;
+    '{$EXTERNALSYM MySymbol}',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\iMyConstant|iMyConstant : Integer = 1|scPrivate'
+    ]
+  );
 End;
 
-procedure TestTPascalModule.TestProgramBlock;
+Procedure TestTPascalModule.TestProgramBlock;
 
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     'Program MyProgram;'#13#10 +
     ''#13#10 +
     'Uses'#13#10 +
@@ -5481,62 +6652,43 @@ Const
     '  strHello = ''Hello'';'#13#10 +
     'Begin'#13#10 +
     '  WriteLn(strHello);'#13#10 +
-    'End.'#13#10;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Uses\SysUtils|SysUtils|scNone',
+      'Uses\Windows|Windows|scNone',
+      'Resource Strings\strHello|strHello = ''Hello''|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestPropertyInterface;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestPropertyInterface;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '  private'#13#10 +
     '    Property MyPrivateProperty[Ident1, Ident2 : Integer; Ident3 : String] : Boolean;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPrivate',
+      'Types\TMyClass\Properties\MyPrivateProperty|Property MyPrivateProperty[Ident1, Ident2 : Integer; Ident3 : String] : Boolean|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestPropertyList;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestPropertyList;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '  private'#13#10 +
@@ -5552,66 +6704,48 @@ Const
     '  strict protected'#13#10 +
     '    Property MyStrictProtectedProperty Platform;'#13#10 +
     '    Property MyStrictProtectedProperty2;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Properties\MyPrivateProperty|Property MyPrivateProperty|scPrivate',
+      'Types\TMyClass\Properties\MyProtectedProperty|Property MyProtectedProperty : Boolean|scProtected',
+      'Types\TMyClass\Properties\MyPublicProperty|Property MyPublicProperty[iIndex : Integer] : Boolean|scPublic',
+      'Types\TMyClass\Properties\MyPublishedProperty|Property MyPublishedProperty : String Read FProp|scPublished',
+      'Types\TMyClass\Properties\MyStrictPrivateProperty|Property MyStrictPrivateProperty : String Write FProp|scPrivate',
+      'Types\TMyClass\Properties\MyStrictProtectedProperty|Property MyStrictProtectedProperty|scProtected',
+      'Types\TMyClass\Properties\MyStrictProtectedProperty2|Property MyStrictProtectedProperty2|scProtected'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestPropertyParameterList;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestPropertyParameterList;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '  private'#13#10 +
     '    Property MyPrivateProperty[Ident1, Ident2 : Integer; Ident3 : String] : Boolean;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Properties\MyPrivateProperty|Property MyPrivateProperty[Ident1, Ident2 : Integer; Ident3 : String] : Boolean|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestPropertySpecifiers;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestPropertySpecifiers;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '  private'#13#10 +
@@ -5624,69 +6758,49 @@ Const
     '    Property MyProperty8 : Boolean nodefault ;'#13#10 +
     '    Property MyProperty9 : Boolean implements mythingy;'#13#10 +
     '    Property MyPropertyA : Boolean implements mythingy, mythingy2;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Properties\MyProperty1|Property MyProperty1 : Boolean Index 1 + 2 / 3|scPrivate',
+      'Types\TMyClass\Properties\MyProperty2|Property MyProperty2 : Boolean Read FProp|scPrivate',
+      'Types\TMyClass\Properties\MyProperty3|Property MyProperty3 : Boolean Write FProp|scPrivate',
+      'Types\TMyClass\Properties\MyProperty5|Property MyProperty5 : Boolean Stored FIdent|scPrivate',
+      'Types\TMyClass\Properties\MyProperty6|Property MyProperty6 : Boolean Stored Value|scPrivate',
+      'Types\TMyClass\Properties\MyProperty7|Property MyProperty7 : Boolean Default 1 + 2|scPrivate',
+      'Types\TMyClass\Properties\MyProperty8|Property MyProperty8 : Boolean|scPrivate',
+      'Types\TMyClass\Properties\MyProperty9|Property MyProperty9 : Boolean Implements mythingy|scPrivate',
+      'Types\TMyClass\Properties\MyPropertyA|Property MyPropertyA : Boolean Implements mythingy, mythingy2|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestRaiseStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestRaiseStmt;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  raise exception.create;'#13#10 +
     '  raise exception.create at $FFFFFFFF;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestRealType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestRealType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  r1 = Real48;'#13#10 +
     '  r2 = Real;'#13#10 +
@@ -5694,41 +6808,27 @@ Const
     '  r4 = Double;'#13#10 +
     '  r5 = Extended;'#13#10 +
     '  r6 = Currency;'#13#10 +
-    '  r7 = Comp;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  r7 = Comp;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\r1|r1 = Real48|scPrivate',
+      'Types\r2|r2 = Real|scPrivate',
+      'Types\r3|r3 = Single|scPrivate',
+      'Types\r4|r4 = Double|scPrivate',
+      'Types\r5|r5 = Extended|scPrivate',
+      'Types\r6|r6 = Currency|scPrivate',
+      'Types\r7|r7 = Comp|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestRecordConstant;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TRealType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestRecordConstant;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Const'#13#10 +
@@ -5738,34 +6838,39 @@ Const
     '  );'#13#10 +
     ''#13#10 +
     'Begin;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Constants\k|k : Array[1..2] of TRec = ((Name : ''Hello''; Value : 1), (Name : ''Hello''; Value : 1))|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestRecordEmpty;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Packed Record'#13#10 +
+    '  End;',
+    '',
+    [ttErrors],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic'
+    ]
+  );
+End;
 
-procedure TestTPascalModule.TestRecordFieldConstant;
+Procedure TestTPascalModule.TestRecordFieldConstant;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Const'#13#10 +
@@ -5775,75 +6880,147 @@ Const
     '  );'#13#10 +
     ''#13#10 +
     'Begin;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Constants\k|k : Array[1..2] of TRec = ((Name : ''Hello''; Value : 1 * 2 + 3 / 4), (Name : ''Hello''; Value : 1.0))|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+procedure TestTPascalModule.TestRecordHelper;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TRecordHelper = Record Helper For Integer'#13#10 +
+    '    Function AsString(i : Integer) : String;'#13#10 +
+    '  End;',
+    'Function TRecordHelper.AsString(i : Integer) : String;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TRecordHelper|TRecordHelper = Record Helper For Integer|scPublic',
+      'Types\TRecordHelper\Methods\AsString|Function AsString(i : Integer) : String|scPublic',
+      'Implemented Methods\TRecordHelper\AsString|Function AsString(i : Integer) : String|scPublic'
+    ]
+  );
+End;
 
-procedure TestTPascalModule.TestRecType;
+procedure TestTPascalModule.TestRecordHelperWithHeritage;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TRecordHelper = Record Helper (TOtherRecordHelper) For Integer'#13#10 +
+    '    Function AsString(i : Integer) : String;'#13#10 +
+    '  End;',
+    'Function TRecordHelper.AsString(i : Integer) : String;'#13#10 +
     ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TRecordHelper|TRecordHelper = Record Helper(TOtherRecordHelper) For Integer|scPublic',
+      'Types\TRecordHelper\Methods\AsString|Function AsString(i : Integer) : String|scPublic',
+      'Implemented Methods\TRecordHelper\AsString|Function AsString(i : Integer) : String|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestRecordOneMemberPerVisibility;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Packed Record'#13#10 +
+    '  Private'#13#10 +
+    '    FInt : Integer;'#13#10 +
+    '  Strict Private'#13#10 +
+    '    Procedure Add;'#13#10 +
+    '  Private'#13#10 +
+    '    Const i = 10;'#13#10 +
+    '  Strict Private'#13#10 +
+    '    Var j : Integer;'#13#10 +
+    '  Public'#13#10 +
+    '    Type TEnum = (First, Last);'#13#10 +
+    '  Public'#13#10 +
+    '    Class Var k : String;'#13#10 +
+    '  End;',
+    '',
+    [ttErrors],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FInt|FInt : Integer|scPrivate',
+      'Types\TMyRecord\Methods\Add|Procedure Add|scPrivate',
+      'Types\TMyRecord\Constants\i|i = 10|scPrivate',
+      'Types\TMyRecord\Variables\j|j : Integer|scPrivate',
+      'Types\TMyRecord\Types\TEnum|TEnum = (First, Last)|scPublic',
+      'Types\TMyRecord\Class Variables\k|k : String|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestRecordVisibilityOnly;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyRecord = Packed Record'#13#10 +
+    '  Private'#13#10 +
+    '  Strict Private'#13#10 +
+    '  Public'#13#10 +
+    '  End;',
+    '',
+    [ttErrors],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestRecType;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = Record'#13#10 +
     '    FField : Integer;'#13#10 +
     '  End;'#13#10 +
     '  t02 = Record'#13#10 +
     '    FField : Integer;'#13#10 +
-    '  End platform;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End platform;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = Record|scPrivate',
+      'Types\t01\Fields\FField|FField : Integer|scPublic',
+      'Types\t02|t02 = Record|scPrivate',
+      'Types\t02\Fields\FField|FField : Integer|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestRecVariant;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestRecVariant;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = Record'#13#10 +
     '    FField1 : Integer;'#13#10 +
@@ -5858,30 +7035,22 @@ Const
     '          itMeasure: (dblOffset : Double);'#13#10 +
     '          itCompare: (dblDistance : Double);'#13#10 +
     '    );'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
+    '  End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = Record|scPrivate',
+      'Types\t01\Fields\FField1|FField1 : Integer|scPublic',
+      'Types\t01\Fields\FField2|FField2 : String|scPublic',
+      'Types\THInfo|THInfo = Record|scPrivate',
+      'Types\THInfo\Fields\dblBearing|dblBearing : Double|scPublic',
+      'Types\THInfo\Fields\dblEasting|dblEasting : Double|scPublic',
+      'Types\THInfo\Fields\dblNorthing|dblNorthing : Double|scPublic',
+      'Types\THInfo\Fields\dblChainage|dblChainage : Double|scPublic',
+      'Types\THInfo\Fields\dblOffset|dblOffset : Double|scPublic',
+      'Types\THInfo\Fields\dblDistance|dblDistance : Double|scPublic'
+    ]
+  );
+End;
 
 Procedure TestTPascalModule.TestReferenceSymbol;
 
@@ -5903,16 +7072,13 @@ Begin
   End;
 End;
 
-procedure TestTPascalModule.TestRelOp;
+Procedure TestTPascalModule.TestRelOp;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -5925,62 +7091,37 @@ Const
     '  bool := MyClass Is TDGHObject;'#13#10 +
     '  (MyObject As TClass);'#13#10 +
     '  bool := 1 = 2;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestRepeatStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestRepeatStmt;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  repeat'#13#10 +
     '    Inc(i);'#13#10 +
     '  until i > 10;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestRequiresClause;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestRequiresClause;
-
-Const
-  strSource =
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strNone,
     'Package MyPackage;'#13#10 +
     ''#13#10 +
     'Requires'#13#10 +
@@ -5990,35 +7131,25 @@ Const
     'Contains'#13#10 +
     '  DGHLibrary In ''DGHLibrary.pas'';'#13#10 +
     ''#13#10 +
-    'End.'#13#10;
+    'End.',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Requires\VCL50|VCL50|scNone',
+      'Requires\DesignIDE|DesignIDE|scNone',
+      'Contains\DGHLibrary|DGHLibrary In ''DGHLibrary.pas''|scNone'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestResourceStringDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestResourceStringDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'ResourceString'#13#10 +
-    '  str1 = ''Hello'';'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  str1 = ''Hello'';',
     'ResourceString'#13#10 +
     '  str2 = ''Hello'' + '#13#10 +
     '    '' Goodbye'';'#13#10 +
@@ -6030,37 +7161,25 @@ Const
     ''#13#10 +
     'Begin'#13#10 +
     '  WriteLn(i);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Resource Strings\str1|str1 = ''Hello''|scPublic',
+      'Resource Strings\str2|str2 = ''Hello'' + '' Goodbye''|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Resource Strings\str3|str3 = ''Hello''|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestResStringSection;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestResStringSection;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'ResourceString'#13#10 +
-    '  str1 = ''Hello'';'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  str1 = ''Hello'';',
     'ResourceString'#13#10 +
     '  str2 = ''Hello'';'#13#10 +
     '  str4 = ''Hello'';'#13#10 +
@@ -6072,32 +7191,24 @@ Const
     ''#13#10 +
     'Begin'#13#10 +
     '  WriteLn(i);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Resource Strings\str1|str1 = ''Hello''|scPublic',
+      'Resource Strings\str2|str2 = ''Hello''|scPrivate',
+      'Resource Strings\str4|str4 = ''Hello''|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Resource Strings\str3|str3 = ''Hello''|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestRestrictedType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestRestrictedType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  a = Object End;'#13#10 +
     '  b = Object(TMyObject)'#13#10 +
@@ -6107,34 +7218,26 @@ Const
     '  End;'#13#10 +
     '  e = Interface;'#13#10 +
     '  f = Interface(IInterface)'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\a|a = Object|scPublic',
+      'Types\b|b = Object(TMyObject)|scPublic',
+      'Types\c|c = Class|scPublic',
+      'Types\d|d = Class(TObecjt)|scPublic',
+      'Types\e|e = Interface|scPublic',
+      'Types\f|f = Interface(IInterface)|scPublic'
+    ]
+  );
+End;
 
 Procedure TestTPascalModule.TestRTTIAttributesClass;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  [Custom]'#13#10 +
     '  TMyClass = Class(TObject)'#13#10 +
@@ -6147,63 +7250,173 @@ Const
     '  Public'#13#10 +
     '    [Custom2()]'#13#10 +
     '    Property Int : Integer Read FInteger;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    '  End;',
+    'Procedure TMyClass.MyProc(i : Integer); Begin End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class(TObject)|scPublic',
+      'Types\TMyClass\Fields\FInteger|FInteger : Integer|scPrivate',
+      'Types\TMyClass\Methods\MyProc|Procedure MyProc(i : Integer); Abstract|scProtected',
+      'Types\TMyClass\Properties\Int|Property Int : Integer Read FInteger|scPublic'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesComplexType;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  [Custom(Arguemnt1, Argument2, Argument3)]'#13#10 +
-    '  TSimpleType = Set Of (stOne, stTwo, stThree);'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  TSimpleType = Set Of (stOne, stTwo, stThree);',
+    '',
+    [ttErrors, ttWarnings],
+    ['Types\TSimpleType|TSimpleType = Set Of (stOne, stTwo, stThree)|scPublic']
+  );
+End;
 
-Var
-  P : TPascalModule;
+procedure TestTPascalModule.TestRTTIAttributesGalore;
 
 Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +                                              //   5
+    '  SimpleAttribute = Class(TCustomAttribute);'#13#10 +      //
+    ''#13#10 +                                                  //
+    '  [Simple]'#13#10 +                                        //
+    '  TMyRecord = Record'#13#10 +                              //
+    '  Strict Private'#13#10 +                                  //  10
+    '    [Simple]'#13#10 +                                      //
+    '    FInt : Integer;'#13#10 +                               //
+    '  Private'#13#10 +                                         //
+    '    Type'#13#10 +                                          //
+    '    [Simple]'#13#10 +                                      //  15
+    '      TMyEnum = (myFirst, meLast);'#13#10 +                //
+    '  //Strict Protected // Not permitted'#13#10 +             //
+    '    Var'#13#10 +                                           //
+    '    [Simple]'#13#10 +                                      //
+    '      i : Integer;'#13#10 +                                //  20
+    '    Const'#13#10 +                                         //
+    '    [Simple]'#13#10 +                                      //
+    '      j = 10;'#13#10 +                                     //
+    '    Class Var'#13#10 +                                     //
+    '    [Simple]'#13#10 +                                      //  25
+    '      q : String;'#13#10 +                                 //
+    '  Public'#13#10 +                                          //
+    '    [Simple]'#13#10 +                                      //
+    '    Procedure Add;'#13#10 +                                //
+    '    [Simple]'#13#10 +                                      //  30
+    '    Constructor Create(i : Integer);'#13#10 +              //
+    '    //: @note this is not allowed here Destructor Destroy;'#13#10 +
+    '    [Simple]'#13#10 +                                      //
+    '    Class Operator Add(a, b : TMyRecord) : TMyRecord;'#13#10 +
+    '    [Simple]'#13#10 +                                      //  35
+    '    Property Hello : Integer Read FInt;'#13#10 +           //
+    '  End;'#13#10 +                                            //
+    ''#13#10 +                                                  //
+    '  [Simple]'#13#10 +                                        //
+    '  TMyObject = Object'#13#10 +                              //  40
+    '  Strict Private'#13#10 +                                  //
+    '    [Simple]'#13#10 +                                      //
+    '    FInt : Integer;'#13#10 +                               //
+    '  Private'#13#10 +                                         //
+    '    Const'#13#10 +                                         //  45
+    '    [Simple]'#13#10 +                                      //
+    '      i = 10;'#13#10 +                                     //
+    '    Var'#13#10 +                                           //
+    '    [Simple]'#13#10 +                                      //
+    '      j : Integer;'#13#10 +                                //  50
+    '    Type'#13#10 +                                          //
+    '    [Simple]'#13#10 +                                      //
+    '      T = (First, Last);'#13#10 +                          //
+    '  Strict Protected'#13#10 +                                //
+    '    Class Var'#13#10 +                                     //  55
+    '    [Simple] q : String;'#13#10 +                          //
+    '  Protected'#13#10 +                                       //
+    '    [Simple]'#13#10 +                                      //
+    '    Constructor Create;'#13#10 +                           //
+    '    [Simple]'#13#10 +                                      //  60
+    '    Destructor Destroy;'#13#10 +                           //
+    '    [Simple]'#13#10 +                                      //
+    '    Procedure Add;'#13#10 +                                //
+    '  Public'#13#10 +                                          //
+    '    [Simple]'#13#10 +                                      //  65
+    '    Function Hello : String;'#13#10 +                      //
+    '  //Published // Not permitted'#13#10 +                    //
+    '    [Simple]'#13#10 +                                      //
+    '    Property Qwerty : Integer Read FInt;'#13#10 +          //  69
+    '    //Class Operator Implicit(a, b : Integer) : Integer;'#13#10 +
+    '  End;'#13#10 +                                            //
+    ''#13#10 +                                                  //
+    '  [Simple]'#13#10 +                                        //
+    '  TMyClass = Class'#13#10 +                                //
+    '  Strict Private'#13#10 +                                  //  75
+    '    [Simple]'#13#10 +                                      //
+    '    FInt : Integer;'#13#10 +                               //
+    '    Const'#13#10 +                                         //
+    '    [Simple] i = 10;'#13#10 +                              //
+    '    Var'#13#10 +                                           //  80
+    '    [Simple] j : Integer;'#13#10 +                         //
+    '    Type'#13#10 +                                          //
+    '    [Simple] T = (qFirst, qLast);'#13#10 +                 //
+    '    Class Var'#13#10 +                                     //
+    '    [Simple] q : String;'#13#10 +                          //  85
+    '  Protected'#13#10 +                                       //
+    '  Public'#13#10 +                                          //
+    '    [Simple]'#13#10 +                                      //
+    '    Procedure Add;'#13#10 +                                //
+    '  Published'#13#10 +                                       //  90
+    '  End;'#13#10 +                                            //
+    ''#13#10 +                                                  //
+    '  [Simple]'#13#10 +                                        //
+    '  TMyInterface = Interface'#13#10 +                        //
+    '  //: @note Private'#13#10 +                               //  95
+    '    //FInt : Integer;'#13#10 +                             //
+    '    Function GetHello : Boolean;'#13#10 +                  //
+    '    Procedure Add;'#13#10 +                                //
+    '    Property Hello : Boolean Read GetHello;'#13#10 +       //
+    '  End;',                                                   // 100
+    'Var'#13#10 +                                               // 104
+    '  [Simple]'#13#10 +                                        // 105
+    '  iHello : INteger;'#13#10 +                               //
+    ''#13#10 +                                                  //
+    '[Custom]'#13#10 +                                          //
+    'Class Operator TMyRecord.Add(a, b : TMyRecord) : TMyRecord; Begin End;'#13#10 +
+    ''#13#10 +                                                  // 110
+    '[Custom]'#13#10 +                                          //
+    'Constructor TMyRecord.Create(i : Integer); Begin ENd;'#13#10 +
+    ''#13#10 +                                                  //
+    '[Custom]'#13#10 +                                          //
+    'Procedure TMyRecord.Add; Begin End;'#13#10 +               // 115
+    ''#13#10 +                                                  //
+    '[Custom]'#13#10 +                                          //
+    'Constructor TMyObject.Create; Begin End;'#13#10 +          //
+    ''#13#10 +                                                  //
+    '[Custom]'#13#10 +                                          //
+    'Destructor TMyObject.Destroy; Begin End;'#13#10 +          //
+    ''#13#10 +                                                  //
+    '[Custom]'#13#10 +                                          //
+    'Procedure TMyObject.Add; Begin End;'#13#10 +               //
+    ''#13#10 +                                                  //
+    '[Custom]'#13#10 +                                          //
+    'Function TMyObject.Hello : String; Begin End;'#13#10 +     //
+    ''#13#10 +                                                  //
+    '[Custom]'#13#10 +                                          //
+    'Procedure TMyClass.Add; Begin End;',                       //
+    [ttErrors, ttWarnings],
+    []
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesInterface;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  [Custom(MyInterface, 1)]'#13#10 +
     '  TMyInterface = Interface'#13#10 +
@@ -6211,70 +7424,47 @@ Const
     '    Function GetSomething : Boolean;'#13#10 +
     '    [Custom1(MyProc, 1, 2, 3, x, y, z)]'#13#10 +
     '    Property Something : Boolean Read GetSomething;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyInterface|TMyInterface = Interface|scPublic',
+      'Types\TMyInterface\Methods\GetSomething|Function GetSomething : Boolean|scPublic',
+      'Types\TMyInterface\Properties\Something|Property Something : Boolean Read GetSomething|scPublic'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesMultiFunction;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '    [Custom1, Custom2(MyAergument)]'#13#10 +
     '    Function IsReady : Boolean;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  End;',
     'Function TMyClass.IsReady : Boolean;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Methods\IsReady|Function IsReady : Boolean|scPublished',
+      'Implemented Methods\TMyClass\IsReady|Function IsReady : Boolean|scPublished'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesMultiOnTypeWithComment;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  (** This is a comment. **)'#13#10+
     '  [Custom(''Hello'')]'#13#10 +
@@ -6287,49 +7477,23 @@ Const
     '    [Custom2(), Custom3, Custom4(i, x, y, z)]'#13#10 +
     '    [Custom5, Custom7(x, y, z)]'#13#10 +
     '    Procedure MyProc( i : Integer);'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-  T: TElementContainer;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement('Types');
-    Check(T <> Nil, 'Types container');
-    If T <> Nil Then
-      Begin
-        T := T.FindElement('TMyRecord');
-        Check(T <> Nil, 'TMyRecord');
-        If T <> Nil Then
-          Begin
-            Check(T.Comment <> Nil, 'Check for nil comment');
-            If T.Comment <> Nil Then
-              CheckEquals('This is a comment.', T.Comment.AsString(999, false),
-                'Comment text');
-          End;
-      End;
-  Finally
-    P.Free;
-  End;
+    '  End;',
+    '',
+    [ttErrors],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FField|FField : Boolean|scPublic',
+      'Types\TMyRecord\Methods\MyProc|Procedure MyProc(i : Integer)|scPublic'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesMultiPerFuncton;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  [Custom(''Hello'')]'#13#10 +
     '  [Custom1(''Hello'')]'#13#10 +
@@ -6341,34 +7505,23 @@ Const
     '    [Custom2(), Custom3, Custom4(i, x, y, z)]'#13#10 +
     '    [Custom5, Custom7(x, y, z)]'#13#10 +
     '    Procedure MyProc( i : Integer);'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    '  End;',
+    '',
+    [ttErrors],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FField|FField : Boolean|scPublic',
+      'Types\TMyRecord\Methods\MyProc|Procedure MyProc(i : Integer)|scPublic'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesMultiPerLine;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  [Custom(''Hello'')][Custom1][Custom2(x, y)]'#13#10 +
     '  TMyRecord = Record'#13#10 +
@@ -6376,34 +7529,23 @@ Const
     '    FField : Boolean;'#13#10 +
     '    [Custom2(), Custom3, Custom4(i, x, y, z)]'#13#10 +
     '    Procedure MyProc( i : Integer);'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    '  End;',
+    '',
+    [ttErrors],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FField|FField : Boolean|scPublic',
+      'Types\TMyRecord\Methods\MyProc|Procedure MyProc(i : Integer)|scPublic'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesRecord;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  [Custom(''Hello'')]'#13#10 +
     '  TMyRecord = Record'#13#10 +
@@ -6411,199 +7553,120 @@ Const
     '    FField : Boolean;'#13#10 +
     '    [Custom2(), Custom3, Custom4(i, x, y, z)]'#13#10 +
     '    Procedure MyProc( i : Integer);'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    '  End;',
+    '',
+    [ttErrors],
+    [
+      'Types\TMyRecord|TMyRecord = Record|scPublic',
+      'Types\TMyRecord\Fields\FField|FField : Boolean|scPublic',
+      'Types\TMyRecord\Methods\MyProc|Procedure MyProc(i : Integer)|scPublic'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesMultiFields;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '    [Custom1]'#13#10 +
     '    [Custom2(MyArgument)]'#13#10 +
     '    FString : String;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Fields\FString|FString : String|scPublished'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesSingleClass;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  [CustomAttribute]'#13#10 +
-    '  TMyClass = Class;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    '  TMyClass = Class;',
+    '',
+    [ttErrors, ttWarnings],
+    ['Types\TMyClass|TMyClass = Class|scPublic']
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesSingleMethod;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
     '    [Custom]'#13#10 +
     '    Procedure DoSomething;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  End;',
     'Procedure TMyClass.DoSomething;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Methods\DoSomething|Procedure DoSomething|scPublished',
+      'Implemented Methods\TMyClass\DoSomething|Procedure DoSomething|scPublished'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesSingleProperty;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  TMyClass = Class'#13#10 +
-    '    [Custom1, Custom2(MyAergument)]'#13#10 +
+    '    [Custom1, Custom2(MyArgument)]'#13#10 +
     '    Property IsReady : Boolean;'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Properties\IsReady|Property IsReady : Boolean|scPublished'
+    ]
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesSingleRecord;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  [Custom()]'#13#10 +
     '  TMyRecord = Record'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    '  End;',
+    '',
+    [ttErrors, ttWarnings],
+    ['Types\TMyRecord|TMyRecord = Record|scPublic']
+  );
 End;
 
 Procedure TestTPascalModule.TestRTTIAttributesSingleTypeConst;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Const'#13#10 +
     '  a = 10;'#13#10 +
     '  b = 20;'#13#10 +
@@ -6623,134 +7686,77 @@ Const
     'End;'#13#10 +
     ''#13#10 +
     'Initialization'#13#10 +
-    ' DoSomething;'#13#10 +
-    'End.'#13#10;
-
-Var
-  P : TPascalModule;
-
-Begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
+    ' DoSomething;',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\a|a = 10|scPrivate',
+      'Constants\b|b = 20|scPrivate',
+      'Types\TSomeType|TSomeType = Record|scPrivate',
+      'Implemented Methods\DoSomething|Procedure DoSomething|scPrivate',
+      'Implemented Methods\DoSomething\Variables\rec|rec : TSomeType|scLocal'
+    ]
+  );
 End;
 
-procedure TestTPascalModule.TestSetConstructor;
+Procedure TestTPascalModule.TestSetConstructor;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  i := [1..2, 4..5, 6, 7];'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestSetElement;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestSetElement;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  i := [1..2];'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestSetType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestSetType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = Set Of TEnum;'#13#10 +
-    '  t02 = Set Of TEnums platform;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  t02 = Set Of TEnums platform;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = Set Of TEnum|scPrivate',
+      'Types\t02|t02 = Set Of TEnums|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestSimpleExpression;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TSetType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestSimpleExpression;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -6758,34 +7764,19 @@ Const
     '  i := - 10 + 1;'#13#10 +
     '  i := - 10 - 1;'#13#10 +
     '  i := + 10 - 1;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
 procedure TestTPascalModule.TestSimpleStatement;
 
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -6795,66 +7786,41 @@ Const
     '  Inherited Create;'#13#10 +
     '  Goto MyLabel;'#13#10 +
     '  Designator := (Helli + 1 * 4 Shl 5);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestSimpleType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestSimpleType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
-    'Type'#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+   strUnit,
+   '',
+   'Type'#13#10 +
     '  a = 1..2;'#13#10 +
     '  b = (eOne, eTwo);'#13#10 +
     '  c = Byte;'#13#10 +
-    '  d = Single;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  d = Single;',
+   [ttErrors, ttWarnings],
+   [
+     'Types\a|a = 1..2|scPrivate',
+     'Types\b|b = (eOne, eTwo)|scPrivate',
+     'Types\c|c = Byte|scPrivate',
+     'Types\d|d = Single|scPrivate'
+   ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestStatement;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestStatement;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Label'#13#10 +
@@ -6865,34 +7831,22 @@ Const
     '  SimpleStatement;'#13#10+
     '  If True Then'#13#10 +
     '    Exit;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Labels\labelID|labelID|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestStmtList;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestStmtList;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Label'#13#10 +
@@ -6903,74 +7857,46 @@ Const
     '  SimpleStatement;'#13#10+
     '  If True Then'#13#10 +
     '    Exit;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Labels\labelID|labelID|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestStringType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestStringType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = String;'#13#10 +
     '  t02 = AnsiString;'#13#10 +
     '  t03 = WideString;'#13#10 +
     '  t04 = String[10];'#13#10 +
-    '  t05 = String[1 + 2 * 3];'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  t05 = String[1 + 2 * 3];',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = String|scPrivate',
+      'Types\t02|t02 = AnsiString|scPrivate',
+      'Types\t03|t03 = WideString|scPrivate',
+      'Types\t04|t04 = String[10]|scPrivate',
+      'Types\t05|t05 = String[1 + 2 * 3]|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestStructStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TStringType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestStructStmt;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -7000,153 +7926,84 @@ Const
     '    MOV DX,BX'#13#10 +
     '    ADD DX,BS'#13#10 +
     '  end;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestStrucType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestStrucType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = Packed Array of Integer;'#13#10 +
     '  t02 = Set Of Integer;'#13#10 +
     '  t03 = File Of Word;'#13#10 +
     '  t04 = Record'#13#10 +
     '  End;'#13#10 +
-    '  t05 = Array Of Byte Packed;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  t05 = Array Of Byte Packed;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = Packed Array of Integer|scPrivate',
+      'Types\t02|t02 = Set Of Integer|scPrivate',
+      'Types\t03|t03 = File of Word|scPrivate',
+      'Types\t04|t04 = Record|scPrivate',
+      'Types\t05|t05 = Packed Array of Byte|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestSubRangeType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        If T.Elements[i].Identifier <> 't04' Then // Skip record as its derived from TStrictType deliberately
-          Check(T.Elements[i] Is TStrucType,
-            Format('Expected type ''%s'' but found ''%s''.', [
-            TStrucType.ClassName, T.Elements[i].ClassName]));
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestSubRangeType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = 1..2;'#13#10 +
     '  t02 = i..j;'#13#10 +
-    '  t03 = 1 + 2..3 * 4;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  t03 = 1 + 2..3 * 4;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = 1..2|scPrivate',
+      'Types\t02|t02 = i..j|scPrivate',
+      'Types\t03|t03 = 1 + 2..3 * 4|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestTerm;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TSubRangeType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestTerm;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  i := 10 * 1;'#13#10 +
     '  i := 10 / 1;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestThreadVarDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestThreadVarDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'ThreadVar'#13#10 +
     '  v1 : Integer;'#13#10 +
-    '  v2 : String;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  v2 : String;',
     'ThreadVar'#13#10 +
     '  v3 : String;'#13#10 +
     '  v4, v5, v6 : Integer;'#13#10 +
@@ -7154,45 +8011,29 @@ Const
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Thread Variables\v1|v1 : Integer|scPublic',
+      'Thread Variables\v2|v2 : String|scPublic',
+      'Thread Variables\v3|v3 : String|scPrivate',
+      'Thread Variables\v4|v4 : Integer|scPrivate',
+      'Thread Variables\v5|v5 : Integer|scPrivate',
+      'Thread Variables\v6|v6 : Integer|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  V: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestThreadVarSection;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    V := P.FindElement(strThreadVarsLabel);
-    Check(V <> Nil, 'Can not find ThreadVars label.');
-    If V <> Nil Then
-      For i := 1 To V.ElementCount Do
-        CheckEquals(TThreadVar.ClassName, V.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestThreadVarSection;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'ThreadVar'#13#10 +
     '  v1 : Integer;'#13#10 +
-    '  v2 : String;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  v2 : String;',
     'ThreadVar'#13#10 +
     '  v3 : String;'#13#10 +
     '  v4, v5, v6 : Integer;'#13#10 +
@@ -7200,41 +8041,27 @@ Const
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Thread Variables\v1|v1 : Integer|scPublic',
+      'Thread Variables\v2|v2 : String|scPublic',
+      'Thread Variables\v3|v3 : String|scPrivate',
+      'Thread Variables\v4|v4 : Integer|scPrivate',
+      'Thread Variables\v5|v5 : Integer|scPrivate',
+      'Thread Variables\v6|v6 : Integer|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  V: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestTryExceptAndFinallyStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    V := P.FindElement(strThreadVarsLabel);
-    Check(V <> Nil, 'Can not find ThreadVars label.');
-    If V <> Nil Then
-      For i := 1 To V.ElementCount Do
-        CheckEquals(TThreadVar.ClassName, V.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestTryExceptAndFinallyStmt;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -7251,37 +8078,20 @@ Const
     '    on e : exception do'#13#10 +
     '      exit;'#13#10 +
     '  end;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestTypedConstant;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestTypedConstant;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Const'#13#10 +
-    '  i : integer = 1 * 2 + 3 /4;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  i : integer = 1 * 2 + 3 /4;',
     'Const'#13#10 +
     '  j : Array[1..2] Of String = (''one'', ''two'');'#13#10 +
     ''#13#10 +
@@ -7295,38 +8105,26 @@ Const
     '  );'#13#10 +
     ''#13#10 +
     'Begin;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Constants\i|i : Integer = 1 * 2 + 3 / 4|scPublic',
+      'Constants\j|j : Array[1..2] Of String = (''one'', ''two'')|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Constants\k|k : Array[1..2] of TRec = ((Name : ''Hello''; Value : 1), (Name : ''Hello''; Value : 1))|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestTypeDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestTypeDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  t = type Integer platform;'#13#10 +
-    '  u = Class;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  u = Class;',
     'Type'#13#10 +
     '  t1 = Integer;'#13#10 +
     '  u2 = type Class;'#13#10 +
@@ -7338,38 +8136,29 @@ Const
     '  u = Class;'#13#10 +
     ''#13#10 +
     'Begin;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t|t = type Integer|scPublic',
+      'Types\u|u = Class|scPublic',
+      'Types\t1|t1 = Integer|scPrivate',
+      'Types\u2|u2 = type Class|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Types\t|t = type Integer|scLocal',
+      'Implemented Methods\Hello\Types\u|u = Class|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestTypeSection;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestTypeSection;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Type'#13#10 +
     '  t = Integer;'#13#10 +
-    '  u = Class;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  u = Class;',
     'Type'#13#10 +
     '  t1 = Integer;'#13#10 +
     '  u2 = Class;'#13#10 +
@@ -7381,70 +8170,48 @@ Const
     '  u = Class;'#13#10 +
     ''#13#10 +
     'Begin;'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t|t = Integer|scPublic',
+      'Types\u|u = Class|scPublic',
+      'Types\t1|t1 = Integer|scPrivate',
+      'Types\u2|u2 = Class|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Types\t|t = Integer|scLocal',
+      'Implemented Methods\Hello\Types\u|u = Class|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestUsesClause;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestUsesClause;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Uses'#13#10 +
-    '  SysUtils, Windows;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  SysUtils, Windows;',
     'Uses'#13#10 +
-    '  Classes;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  Classes;',
+    [ttErrors, ttWarnings],
+    [
+      'Uses\SysUtils|SysUtils|scNone',
+      'Uses\Windows|Windows|scNone',
+      'Uses\Classes|Classes|scNone'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestVarDecl;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestVarDecl;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Var'#13#10 +
     '  v1 : Integer;'#13#10 +
-    '  v2 : String;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  v2 : String;',
     'Var'#13#10 +
     '  v3 : String;'#13#10 +
     '  v4, v5, v6 : Integer;'#13#10 +
@@ -7456,41 +8223,31 @@ Const
     '  v14, v25, v36 : Integer;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Variables\v1|v1 : Integer|scPublic',
+      'Variables\v2|v2 : String|scPublic',
+      'Variables\v3|v3 : String|scPrivate',
+      'Variables\v4|v4 : Integer|scPrivate',
+      'Variables\v5|v5 : Integer|scPrivate',
+      'Variables\v6|v6 : Integer|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Variables\v13|v13 : String|scLocal',
+      'Implemented Methods\Hello\Variables\v14|v14 : Integer|scLocal',
+      'Implemented Methods\Hello\Variables\v25|v25 : Integer|scLocal',
+      'Implemented Methods\Hello\Variables\v36|v36 : Integer|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  V: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestVariantSection;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    V := P.FindElement(strVarsLabel);
-    Check(V <> Nil, 'Can not find Vars label.');
-    If V <> Nil Then
-      For i := 1 To V.ElementCount Do
-        CheckEquals(TVar.ClassName, V.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestVariantSection;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = Record'#13#10 +
     '    FField1 : Integer;'#13#10 +
@@ -7505,82 +8262,49 @@ Const
     '          itMeasure: (dblOffset : Double);'#13#10 +
     '          itCompare: (dblDistance : Double);'#13#10 +
     '    );'#13#10 +
-    '  End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  End;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = Record|scPrivate',
+      'Types\t01\Fields\FField1|FField1 : Integer|scPublic',
+      'Types\t01\Fields\FField2|FField2 : String|scPublic',
+      'Types\THInfo|THInfo = Record|scPrivate',
+      'Types\THInfo\Fields\dblEasting|dblEasting : Double|scPublic',
+      'Types\THInfo\Fields\dblNorthing|dblNorthing : Double|scPublic',
+      'Types\THInfo\Fields\dblChainage|dblChainage : Double|scPublic',
+      'Types\THInfo\Fields\dblOffset|dblOffset : Double|scPublic',
+      'Types\THInfo\Fields\dblDistance|dblDistance : Double|scPublic'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestVariantType;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TRecordDecl.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestVariantType;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Type'#13#10 +
     '  t01 = Variant;'#13#10 +
-    '  t02 = OLEVariant;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    '  t02 = OLEVariant;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\t01|t01 = Variant|scPrivate',
+      'Types\t02|t02 = OLEVariant|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  T: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestVarSection;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    T := P.FindElement(strTypesLabel);
-    Check(T <> Nil, 'Can not find Types label.');
-    If T <> Nil Then
-      For i := 1 To T.ElementCount Do
-        CheckEquals(TVariantType.ClassName, T.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestVarSection;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
     'Var'#13#10 +
     '  v1 : Integer;'#13#10 +
-    '  v2 : String;'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+    '  v2 : String;',
     'Var'#13#10 +
     '  v3 : String;'#13#10 +
     '  v4, v5, v6 : Integer;'#13#10 +
@@ -7591,74 +8315,49 @@ Const
     '  v7, v8 : Byte;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Variables\v1|v1 : Integer|scPublic',
+      'Variables\v2|v2 : String|scPublic',
+      'Variables\v3|v3 : String|scPrivate',
+      'Variables\v4|v4 : Integer|scPrivate',
+      'Variables\v5|v5 : Integer|scPrivate',
+      'Variables\v6|v6 : Integer|scPrivate',
+      'Implemented Methods\Hello|Procedure Hello|scPrivate',
+      'Implemented Methods\Hello\Variables\v7|v7 : Byte|scLocal',
+      'Implemented Methods\Hello\Variables\v8|v8 : Byte|scLocal'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
-  V: TElementContainer;
-  i: Integer;
+Procedure TestTPascalModule.TestWhileStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-    V := P.FindElement(strVarsLabel);
-    Check(V <> Nil, 'Can not find Vars label.');
-    If V <> Nil Then
-      For i := 1 To V.ElementCount Do
-        CheckEquals(TVar.ClassName, V.Elements[i].ClassName);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestWhileStmt;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
     '  while i < 0 Do'#13#10 +
     '    Inc(i);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate'
+    ]
+  );
+End;
 
-Var
-  P: TPascalModule;
+Procedure TestTPascalModule.TestWithStmt;
 
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
-
-procedure TestTPascalModule.TestWithStmt;
-
-Const
-  strSource =
-    'Unit MyUnit;'#13#10 +
-    ''#13#10 +
-    'Interface'#13#10 +
-    ''#13#10 +
-    'Implementation'#13#10 +
-    ''#13#10 +
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
     'Procedure Hello;'#13#10 +
     ''#13#10 +
     'Begin'#13#10 +
@@ -7666,23 +8365,11 @@ Const
     '    Inc(i);'#13#10 +
     '  with objDGH, dghObject Do'#13#10 +
     '    Inc(i);'#13#10 +
-    'End;'#13#10 +
-    ''#13#10 +
-    'End.'#13#10;
-
-Var
-  P: TPascalModule;
-
-begin
-  P := TPascalModule.CreateParser(strSource, '', False, [moParse]);
-  Try
-    //CheckEquals(0, P.HeadingCount(strHints), P.FirstHint);
-    CheckEquals(0, P.HeadingCount(strWarnings), P.FirstWarning);
-    CheckEquals(0, P.HeadingCount(strErrors), P.FirstError);
-  Finally
-    P.Free;
-  End;
-end;
+    'End;',
+    [ttErrors, ttWarnings],
+    ['Implemented Methods\Hello|Procedure Hello|scPrivate']
+  );
+End;
 
 initialization
   // Register any test cases with the test runner

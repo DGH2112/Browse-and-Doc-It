@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    09 Aug 2016
+  @Date    10 Aug 2016
   @Version 1.0
   @Author  David Hoyle
 
@@ -4747,7 +4747,7 @@ Begin
                   strType := strType + Comment.Tag[iReturnTagIndex].Tokens[i].Token;
                 End;
               strType := Trim(strType);
-              If ReturnType <> Nil Then
+              If ReturnType.ElementCount > 0 Then
                 strReturn := ReturnType.AsString(False, False);
               If CompareText(strReturn, strType) <> 0 Then
                 AddDocumentConflict([FunctionType, QualifiedName, strReturn],
@@ -4819,7 +4819,7 @@ end;
 Function TGenericProperty.RequiresReturn : Boolean;
 
 Begin
-  Result := ReturnType <> Nil;
+  Result := ReturnType.ElementCount > 0;
 End;
 
 (** --------------------------------------------------------------------------
@@ -5065,7 +5065,7 @@ Begin
                   strType := strType + Comment.Tag[iReturnTagIndex].Tokens[i].Token;
                 End;
               strType := Trim(strType);
-              If ReturnType <> Nil Then
+              If ReturnType.ElementCount > 0 Then
                 strReturn := ReturnType.AsString(False, False);
               If CompareText(strReturn, strType) <> 0 Then
                 AddDocumentConflict([FunctionType, QualifiedName, strReturn],

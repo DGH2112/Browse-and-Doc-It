@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    06 Aug 2016
+  @Date    12 Aug 2016
   @Author  David Hoyle
 
 **)
@@ -284,6 +284,10 @@ Implementation
 
 Uses
   CodeSiteLogging,
+  {$IFDEF EUREKALOG_VER7}
+  ExceptionLog7,
+  EExceptionManager,
+  {$ENDIF}
   TokenForm,
   IniFiles,
   DGHLibrary,
@@ -359,6 +363,7 @@ Begin
     Exit;
   strFileName := FileName;
   Delete(strFileName, 1, Length(PathRoot));
+  strFileName := '*' + strFileName;
   If InputQuery('Exclude File from Result',
     'Are you sure you want to exclude the below file from the results.',
     strFileName) Then
@@ -970,25 +975,37 @@ Begin
       Source.LoadFromFile(strFileName)
     Else
       Source.Text := strSource;
-    M             := ModuleDispatcher.Dispatcher(Source.Text, strFileName, False,
-      [moParse, moCheckForDocumentConflicts]);
-    If M <> Nil Then
-      Try
-        If M.FindElement(strHints) <> Nil Then
-          iHints := M.FindElement(strHints).ElementCount;
-        If M.FindElement(strWarnings) <> Nil Then
-          iWarnings := M.FindElement(strWarnings).ElementCount;
-        If M.FindElement(strErrors) <> Nil Then
-          iErrors := M.FindElement(strErrors).ElementCount;
-        C         := M.FindElement(strDocumentationConflicts);
-        If C <> Nil Then
-          Begin
-            For i := 1 To C.ElementCount Do
-              Inc(iConflicts, C.Elements[i].ElementCount);
-          End;
-      Finally
-        M.Free;
-      End;
+    Try
+      M             := ModuleDispatcher.Dispatcher(Source.Text, strFileName, False,
+        [moParse, moCheckForDocumentConflicts]);
+      If M <> Nil Then
+        Try
+          If M.FindElement(strHints) <> Nil Then
+            iHints := M.FindElement(strHints).ElementCount;
+          If M.FindElement(strWarnings) <> Nil Then
+            iWarnings := M.FindElement(strWarnings).ElementCount;
+          If M.FindElement(strErrors) <> Nil Then
+            iErrors := M.FindElement(strErrors).ElementCount;
+          C         := M.FindElement(strDocumentationConflicts);
+          If C <> Nil Then
+            Begin
+              For i := 1 To C.ElementCount Do
+                Inc(iConflicts, C.Elements[i].ElementCount);
+            End;
+        Finally
+          M.Free;
+        End;
+    Except
+      On E: Exception Do
+        Begin
+          {$IFDEF EUREKALOG_VER7}
+          ExceptionManager.StandardEurekaNotify(ExceptObject, ExceptAddr)
+          {$ELSE}
+          FFileName := E.Message;
+          Synchronize(ShowException);
+          {$ENDIF}
+        End;
+    End;
   Finally
     Source.Free;
   End;
@@ -1333,6 +1350,7 @@ Procedure TfrmBrowseAndDocItTestForm.SaveResults;
 Var
   sl     : TStringList;
   iRecord: Integer;
+  P: TParseRecord;
 
 Begin
   sl := TStringList.Create;
@@ -1341,13 +1359,13 @@ Begin
       'Saving Scan Results...');
     Try
       For iRecord := 0 To FParseRecords.Count - 1 Do
-        With FParseRecords[iRecord] As TParseRecord Do
-          Begin
-            If iRecord Mod 10 = 0 Then
-              FProgressForm.UpdateProgress(iRecord, FileName);
-            sl.Add(Format('%s=%d,%d,%d,%d', [FileName, Errors, Warnings, Hints,
-              Conflicts]));
-          End;
+        Begin
+          P := FParseRecords[iRecord] As TParseRecord;
+          If iRecord Mod 10 = 0 Then
+            FProgressForm.UpdateProgress(iRecord, P.FileName);
+            sl.Add(Format('%s=%d,%d,%d,%d,%d', [P.FileName, P.Errors, P.Warnings,
+              P.Hints, P.Conflicts, Length(P.PathRoot)]));
+        End;
       sl.SaveToFile(ChangeFileExt(FINIFileName, '.txt'));
     Finally
       FProgressForm.Hide;
@@ -1439,6 +1457,7 @@ Var
   iErrors, iWarnings, iHints, iConflicts: Integer;
   strFileName                           : String;
   iErrorCode                            : Integer;
+  iRootPath                             : Integer;
 
 Begin
   sl := TStringList.Create;
@@ -1454,8 +1473,17 @@ Begin
           Val(GetField(sl.ValueFromIndex[iRecord], ',', 2), iWarnings, iErrorCode);
           Val(GetField(sl.ValueFromIndex[iRecord], ',', 3), iHints, iErrorCode);
           Val(GetField(sl.ValueFromIndex[iRecord], ',', 4), iConflicts, iErrorCode);
-          FParseRecords.Add(TParseRecord.Create(strFileName, '', iErrors,
-            iWarnings, iHints, iConflicts));
+          Val(GetField(sl.ValueFromIndex[iRecord], ',', 5), iRootPath, iErrorCode);
+          FParseRecords.Add(
+            TParseRecord.Create(
+              strFileName,
+              Copy(strFileName, 1, iRootPath),
+              iErrors,
+              iWarnings,
+              iHints,
+              iConflicts
+            )
+          );
           If iRecord Mod 10 = 0 Then
             FProgressForm.UpdateProgress(iRecord, strFileName);
         End;

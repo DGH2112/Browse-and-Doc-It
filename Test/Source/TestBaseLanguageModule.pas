@@ -53,7 +53,8 @@ type
       strMsg : String = ''); Overload; Override;
     Procedure TestGrammarForErrors(Parser : TBaseLanguageModuleClass;
       strTemplate : String; strInterface, strImplementation : String;
-      TestTypes : TTestTypes; Const strCheckValues : Array Of String);
+      TestTypes : TTestTypes; Const strCheckValues : Array Of String;
+      iErrors : Integer = 0; iWarnings : Integer = 0; iHints : Integer = 0);
   Published
   End;
 
@@ -480,7 +481,8 @@ end;
 
 Procedure TExtendedTestCase.TestGrammarForErrors(Parser : TBaseLanguageModuleClass;
   strTemplate : String; strInterface, strImplementation: String; TestTypes : TTestTypes;
-  Const strCheckValues : Array Of String);
+  Const strCheckValues : Array Of String; iErrors : Integer = 0; iWarnings : Integer = 0;
+  iHints : Integer = 0);
 
 Const
   cDelimiter : Char = '\';
@@ -525,12 +527,12 @@ Begin
   P := Parser.CreateParser(Format(strTemplate, [strInterface,
     strImplementation]), 'TestSource.pas', False, [moParse]);
   Try
-    If ttHints In TestTypes Then
-      CheckEquals(0, P.HeadingCount(strHints), 'HINTS: ' + P.FirstHint);
-    If ttWarnings In TestTypes Then
-      CheckEquals(0, P.HeadingCount(strWarnings), 'WARNINGS: ' + P.FirstWarning);
     If ttErrors In TestTypes Then
-      CheckEquals(0, P.HeadingCount(strErrors), 'ERRORS: ' + P.FirstError);
+      CheckEquals(iErrors, P.HeadingCount(strErrors), 'ERRORS: ' + P.FirstError);
+    If ttWarnings In TestTypes Then
+      CheckEquals(iWarnings, P.HeadingCount(strWarnings), 'WARNINGS: ' + P.FirstWarning);
+    If ttHints In TestTypes Then
+      CheckEquals(iHints, P.HeadingCount(strHints), 'HINTS: ' + P.FirstHint);
     For iCheck := Low(strCheckValues) to High(strCheckValues) Do
       If strCheckValues[iCheck] <> '' Then
         Begin
@@ -556,7 +558,7 @@ Begin
 
           U := SearchForElement(T, strKey);
           Check(U <> Nil, Format('%d.6) Cannot find KEY to check (%s): %s', [Succ(iCheck), GetElements(U, T), strCheckValues[iCheck]]));
-          CheckEquals(strCheckValue, U.AsString(True, False), Format('%d.7) Value check failed: ', [Succ(iCheck), strCheckValues[iCheck]]));
+          CheckEquals(strCheckValue, U.AsString(True, False), Format('%d.7) Value check failed (%s, %s): ', [Succ(iCheck), U.ClassName, strCheckValues[iCheck]]));
           CheckEquals(strValueScope, GetEnumName(TypeInfo(TScope), Ord(U.Scope)), Format('%d.8) Incorrect Scope: %s', [Succ(iCheck), strCheckValues[iCheck]]));
         End Else
           Check(strCheckValue <> '', Format('%d.1) strCheckValue is NULL!', [Succ(iCheck)]));

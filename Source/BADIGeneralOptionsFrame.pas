@@ -92,6 +92,7 @@ Var
   i : TDocOption;
 
 Begin
+  BrowseAndDocItOptions.Options := [];
   For i := Low(TDocOption) To High(TDocOption) Do
     If clbOptions.Checked[Integer(i)] Then
       BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [i];

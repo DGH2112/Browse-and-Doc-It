@@ -12,9 +12,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     Align = alClient
     ItemHeight = 13
     TabOrder = 0
-    ExplicitLeft = -83
-    ExplicitWidth = 832
-    ExplicitHeight = 431
   end
   object IntervalPanel: TPanel
     Left = 0
@@ -24,9 +21,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitLeft = -83
-    ExplicitTop = 431
-    ExplicitWidth = 832
     DesignSize = (
       749
       42)
@@ -72,7 +66,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Anchors = [akTop, akRight]
       TabOrder = 2
       Text = '100'
-      ExplicitLeft = 735
     end
     object udManagedNodesLife: TUpDown
       Left = 722
@@ -84,7 +77,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Max = 365
       Position = 100
       TabOrder = 3
-      ExplicitLeft = 805
     end
   end
 end

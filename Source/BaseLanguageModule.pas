@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    10 Aug 2016
+  @Date    26 Aug 2016
   @Version 1.0
   @Author  David Hoyle
 
@@ -24,14 +24,40 @@ Type
   (** Type to distinguish Stream position from token index. **)
   TTokenIndex = Integer;
   (** An enumerate type to define the stream status and token types. **)
-  TBADITokenType = (ttUnknown, ttWhiteSpace, ttReservedWord, ttIdentifier,
-    ttNumber, ttSymbol, ttLineEnd, ttSingleLiteral, ttDoubleLiteral,
-    ttLineComment, ttBlockComment, ttHTMLStartTag, ttHTMLEndTag, ttDirective,
-    ttCompilerDirective, ttLinkTag, ttTreeHeader, ttFileEnd, ttLineContinuation,
-    ttCustomUserToken, ttExplorerHighlight);
+  TBADITokenType = (
+    ttUnknown,
+    ttWhiteSpace,
+    ttReservedWord,
+    ttIdentifier,
+    ttNumber,
+    ttSymbol,
+    ttLineEnd,
+    ttSingleLiteral,
+    ttDoubleLiteral,
+    ttLineComment,
+    ttBlockComment,
+    ttHTMLStartTag,
+    ttHTMLEndTag,
+    ttDirective,
+    ttCompilerDirective,
+    ttLinkTag,
+    ttTreeHeader,
+    ttFileEnd,
+    ttLineContinuation,
+    ttCustomUserToken,
+    ttExplorerHighlight
+  );
   (** An enumerate for the scoping of identifiers. **)
-  TScope = (scNone, scGlobal, scLocal, scPrivate, scProtected, scPublic,
-    scPublished, scFriend);
+  TScope = (
+    scNone,
+    scGlobal,
+    scLocal,
+    scPrivate,
+    scProtected,
+    scPublic,
+    scPublished,
+    scFriend
+  );
   (** A set to represent combinations of scopes. **)
   TScopes = Set Of TScope;
   (** An enumerate for the parameter modifiers of methods. **)
@@ -349,7 +375,9 @@ Type
     dctFunctionTooManyPostCons,
 
     dctMissingInitComment,
-    dctMissingFinalComment
+    dctMissingFinalComment,
+
+    dctTooManyConflicts
   );
 
   (** This record refined a pairing of Resource Name and Image Mask Colour for
@@ -1332,8 +1360,13 @@ Type
 
   (** This enumerate define the position of the editor when an item is selected
       in the module explorer. **)
-  TBrowsePosition = (bpCommentTop, bpCommentCentre, bpIdentifierTop,
-    bpIdentifierCentre, bpIdentifierCentreShowAllComment);
+  TBrowsePosition = (
+    bpCommentTop,
+    bpCommentCentre,
+    bpIdentifierTop,
+    bpIdentifierCentre,
+    bpIdentifierCentreShowAllComment
+  );
 
   (** A record to define the font information for each token type. **)
   TTokenFontInfo = Record
@@ -1341,6 +1374,9 @@ Type
     FStyles     : TFontStyles;
     FBackColour : TColor;
   End;
+
+  (** An enumerate to define the different types of issues to limit output for. **)
+  TLimitType = (ltErrors, ltWarnings, ltHints, ltConflicts);
 
   (** This is a class to define a set of options for the application. **)
   TBrowseAndDocItOptions = Class
@@ -1365,12 +1401,15 @@ Type
     FManagedNodesLife : Integer;
     FTreeColour : TColor;
     FProfilingCode : TStringList;
+    FIssueLimits : Array[Low(TLimitType)..High(TLimitType)] of Integer;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetTokenFontInfo(ATokenType  : TBADITokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(ATokenType  : TBADITokenType; ATokenFontInfo : TTokenFontInfo);
     Procedure LoadSettings;
     function  GetProfilingCode(Module : TBaseLanguageModule): String;
     procedure SetProfilingCode(Module : TBaseLanguageModule; const strValue: String);
+    Function  GetIssueLimit(LimitType : TLimitType) : Integer;
+    Procedure SetIssueLimit(LimitType : TLimitType; iValue : Integer);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -1529,6 +1568,17 @@ Type
     **)
     Property ProfilingCode[Module : TBaseLanguageModule] : String Read GetProfilingCode
       Write SetProfilingCode;
+    (**
+      This property gets and sets the numerical limits for the output of errors, warnings,
+      hints and conflicts.
+      @precon  None.
+      @postcon Gets and sets the numerical limits for the output of errors, warnings,
+               hints and conflicts.
+      @param   LimitType as a TLimitType
+      @return  an Integer
+    **)
+    Property IssueLimits[LimitType : TLimitType] : Integer Read GetIssueLimit
+      Write SetIssueLimit;
   End;
 
   (** A class to represent a label within the Module Explorer / Documentation **)
@@ -1729,7 +1779,7 @@ ResourceString
   (** Options text for Show Missing Finalization Comment **)
   strShowMissingFinalComment = 'Show Missing Finalization Comments';
   (** Options text for Showing IDE error messages when no parser messages. **)
-  {strShowIDEErrorsOnSuccessfulParse = 'Show IDE Error messages if parser is successfully.';}
+  {: @todo strShowIDEErrorsOnSuccessfulParse = 'Show IDE Error messages if parser is successfully.';}
   (** Options text for showing the origin method of the parser errors. **)
   strShowParserErrorOrigin = 'Show the origin method of the Parser error.';
   (** Options text for showing unreferenced locals and privates. **)
@@ -2131,6 +2181,11 @@ ResourceString
     'code contain in the Finalization section of the module so that ' +
     'developers known which portion of the module are automatically ' +
     'destroyed.';
+  (** Label for too many document conflicts. **)
+  strTooManyConflicts = 'Too many documentation conflicts';
+  (** Document conflicts message for too many documentation conflicts. **)
+  strTooManyConflictsDesc = 'Browse and Doc It limits the number of conflicts that ' +
+    'can be see at any time. This can be changed in the options.';
 
 Const
   (** A set of characters for whitespace **)
@@ -2524,6 +2579,9 @@ Const
       FConflictType: dciMissing),
     (FMessage: strMissingFinalComment;
       FDescription: strMissingFinalCommentDesc;
+      FConflictType: dciMissing),
+    (FMessage: strTooManyConflicts;
+      FDescription: strTooManyConflictsDesc;
       FConflictType: dciMissing)
   );
 
@@ -2559,11 +2617,6 @@ Implementation
 
 Uses
   Windows, DGHLibrary, INIFiles;
-
-Const
-  (** This constant represent the maximum of issue / doc conflicts to add. **)
-  iIssueLimit : Integer = 25; //: @todo Add this as a configurable option.
-
 
 ResourceString
   (** An error message for tying to add one type of element but finding another
@@ -3868,8 +3921,15 @@ begin
         iiDocConflictFolder, Nil);
       I := E.Add(I);
     End;
+  If I.ElementCount < BrowseAndDocItOptions.IssueLimits[ltConflicts] Then
   I.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iL, iC,
-    DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon));
+      DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon))
+  Else If I.ElementCount = BrowseAndDocItOptions.IssueLimits[ltConflicts] Then
+    //: @todo Fix!!!
+    //I.Add(TDocIssue.Create(Format(recIssues[ErrorType].FTooMany, [iCount]), scNone,
+    //  'AddIssue', 0, 0, recIssues[ErrorType].FItemImage));
+    I.Add(TDocumentConflict.Create([], 0, 0, 0, 0,
+      strTooManyConflicts, strTooManyConflictsDesc, iiDocConflictMissing));
 end;
 
 (**
@@ -3906,9 +3966,9 @@ Type
   End;
 
 ResourceString
-  strTooManyHints = 'Too many hints (%d)...';
-  strTooManyWarnings = 'Too many warnings (%d)...';
-  strTooManyErrors = 'Too many errors (%d)...';
+  strTooManyHints = 'Too many hints...';
+  strTooManyWarnings = 'Too many warnings...';
+  strTooManyErrors = 'Too many errors...';
 
 Const
   recIssues : Array[Low(TErrorType)..High(TErrorType)] Of TIssueRec = (
@@ -3929,6 +3989,7 @@ Const
 Var
   I : TElementContainer;
   iCount : Integer;
+  iIssueLimit : Integer;
 
 begin
   Case ErrorType Of
@@ -3945,6 +4006,9 @@ begin
   If Comment <> Nil Then
     Begin
       Case ErrorType Of
+        etError:
+          If Comment.FindTag('noerror') > -1 Then
+           Exit;
         etHint:
           If Comment.FindTag('nohint') > -1 Then
            Exit;
@@ -3956,12 +4020,19 @@ begin
   I := FindRoot.Add(recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage,
     scNone, Nil);
   iCount := I.ElementCount;
+  Case ErrorType Of
+    etError:   iIssueLimit := BrowseAndDocItOptions.IssueLimits[ltErrors];
+    etWarning: iIssueLimit := BrowseAndDocItOptions.IssueLimits[ltWarnings];
+    etHint:    iIssueLimit := BrowseAndDocItOptions.IssueLimits[ltHints];
+  Else
+    iIssueLimit := BrowseAndDocItOptions.IssueLimits[ltErrors];
+  End;
   If iCount < iIssueLimit Then
     I.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol,
       recIssues[ErrorType].FItemImage))
   Else If iCount = iIssueLimit Then
-    I.Add(TDocIssue.Create(Format(recIssues[ErrorType].FTooMany, [iCount]), scNone,
-      'AddIssue', 0, 0, recIssues[ErrorType].FItemImage));
+    I.Add(TDocIssue.Create(recIssues[ErrorType].FTooMany, scNone, 'AddIssue', 0, 0,
+      recIssues[ErrorType].FItemImage));
 end;
 
 (**
@@ -6075,12 +6146,14 @@ Var
 begin
   iSkip := 0;
   FShouldUndoCompilerStack := False;
-  If Token.TokenType = ttCompilerDirective Then // Catch first token as directive
+  // Catch first token as directive
+  If Token.TokenType = ttCompilerDirective Then
     Begin
       ProcessCompilerDirective(iSkip);
       FShouldUndoCompilerStack := True;
     End;
   Repeat
+    // Get body comments and add to collection
     If (Token.TokenType In [ttLineComment, ttBlockComment]) And
       (FLastComment <> Token) And (FCommentClass <> Nil) Then
       Begin
@@ -6480,6 +6553,23 @@ End;
 
 (**
 
+  This is a getter method for the IssueLimit property.
+
+  @precon  None.
+  @postcon Returns the numerical limit for the given limit type.
+
+  @param   LimitType as a TLimitType
+  @return  an Integer
+
+**)
+Function TBrowseAndDocItOptions.GetIssueLimit(LimitType : TLimitType) : Integer;
+
+Begin
+  Result := FIssueLimits[LimitType];
+End;
+
+(**
+
   This is a getter method for the ProfilingCode property.
 
   @precon  None.
@@ -6612,6 +6702,10 @@ begin
       Finally
         sl.Free;
       End;
+      FIssueLimits[ltErrors] := ReadInteger('Issues Limits', 'Errors', 10);
+      FIssueLimits[ltWarnings] := ReadInteger('Issues Limits', 'Errors', 10);
+      FIssueLimits[ltHints] := ReadInteger('Issues Limits', 'Errors', 10);
+      FIssueLimits[ltConflicts] := ReadInteger('Issues Limits', 'Errors', 10);
     Finally
       Free;
     End;
@@ -6693,11 +6787,32 @@ begin
           WriteString('ProfilingCode', FProfilingCode.Names[j],
             FProfilingCode.Values[FProfilingCode.Names[j]]);
           {$ENDIF}
+      WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltErrors]);
+      WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltWarnings]);
+      WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltHints]);
+      WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltConflicts]);
       UpdateFile;
     Finally
       Free;
     End;
 end;
+
+(**
+
+  This is a setter method for the IssueLimit property.
+
+  @precon  None.
+  @postcon Sets the numerical limit for the given limit type.
+
+  @param   LimitType as a TLimitType
+  @param   iValue as an Integer
+
+**)
+Procedure TBrowseAndDocItOptions.SetIssueLimit(LimitType : TLimitType; iValue : Integer);
+
+Begin
+  FIssueLimits[LimitType] := iValue;
+End;
 
 (**
 

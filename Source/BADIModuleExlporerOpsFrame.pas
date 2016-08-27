@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    20 Aug 2016
+  @Date    27 Aug 2016
 
 **)
 Unit BADIModuleExlporerOpsFrame;
@@ -24,11 +24,12 @@ Uses
   StdCtrls,
   ComCtrls,
   ExtCtrls,
-  BaseLanguageModule;
+  BaseLanguageModule,
+  BADICustomOptionsFrame;
 
 Type
   (** This is a class which represents the frame interface. **)
-  TfmBADIModuleExplorerFrame = Class(TFrame)
+  TfmBADIModuleExplorerFrame = Class(TFrame, IBADIOptionsFrame)
     cbxFontName: TComboBox;
     cbxBackColour: TColorBox;
     clbxTreeColour: TColorBox;

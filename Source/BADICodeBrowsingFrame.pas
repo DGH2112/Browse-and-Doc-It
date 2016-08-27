@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Aug 2016
+  @Date    27 Aug 2016
 
 **)
 Unit BADICodeBrowsingFrame;
@@ -23,11 +23,12 @@ Uses
   Forms,
   Dialogs,
   StdCtrls,
-  ExtCtrls;
+  ExtCtrls,
+  BADICustomOptionsFrame;
 
 Type
   (** A class to represent the frame interface. **)
-  TfmBADICodeBrowsingFrame = Class(TFrame)
+  TfmBADICodeBrowsingFrame = Class(TFrame, IBADIOptionsFrame)
     rgpBrowsePosition: TRadioGroup;
   Private
     { Private declarations }

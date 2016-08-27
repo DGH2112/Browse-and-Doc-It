@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    21 Aug 2016
+  @Date    27 Aug 2016
 
 **)
 Unit BADIEcludedDocFilesFrame;
@@ -22,11 +22,12 @@ Uses
   Controls,
   Forms,
   Dialogs,
-  StdCtrls;
+  StdCtrls,
+  BADICustomOptionsFrame;
 
 Type
   (** A class to represent the frame interface. **)
-  TfmBADIExcludedDocFilesFrame = Class(TFrame)
+  TfmBADIExcludedDocFilesFrame = Class(TFrame, IBADIOptionsFrame)
     mmoExcludeDocFiles: TMemo;
   Private
     { Private declarations }

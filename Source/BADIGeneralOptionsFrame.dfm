@@ -1,45 +1,54 @@
 object fmBADIGeneralOptions: TfmBADIGeneralOptions
   Left = 0
   Top = 0
-  Width = 749
-  Height = 476
+  Width = 508
+  Height = 291
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  ParentFont = False
   TabOrder = 0
   object clbOptions: TCheckListBox
     Left = 0
     Top = 0
-    Width = 749
-    Height = 434
+    Width = 508
+    Height = 249
     Align = alClient
     ItemHeight = 13
     TabOrder = 0
   end
   object IntervalPanel: TPanel
     Left = 0
-    Top = 434
-    Width = 749
+    Top = 249
+    Width = 508
     Height = 42
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      749
+      508
       42)
     object lblRefreshInterval: TLabel
-      Left = 0
-      Top = 11
-      Width = 180
+      Left = 7
+      Top = 10
+      Width = 79
       Height = 13
-      Caption = 'Refresh &Interval after Editor changes'
+      Caption = 'Refresh &Interval'
     end
     object lblManagedNodesLife: TLabel
-      Left = 500
-      Top = 11
-      Width = 179
+      Left = 184
+      Top = 10
+      Width = 221
       Height = 13
+      Alignment = taRightJustify
+      Anchors = [akLeft, akTop, akRight]
+      AutoSize = False
       Caption = 'Life-time of Managed Nodes (in days)'
     end
     object edtUpdateInterval: TEdit
-      Left = 239
+      Left = 92
       Top = 7
       Width = 70
       Height = 21
@@ -47,7 +56,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Text = '100'
     end
     object udUpdateInterval: TUpDown
-      Left = 309
+      Left = 162
       Top = 7
       Width = 16
       Height = 21
@@ -59,7 +68,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       TabOrder = 1
     end
     object edtManagedNodesLife: TEdit
-      Left = 652
+      Left = 411
       Top = 7
       Width = 70
       Height = 21
@@ -68,7 +77,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Text = '100'
     end
     object udManagedNodesLife: TUpDown
-      Left = 722
+      Left = 481
       Top = 7
       Width = 16
       Height = 21

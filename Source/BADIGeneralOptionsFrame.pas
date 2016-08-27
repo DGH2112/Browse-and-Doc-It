@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    20 Aug 2016
+  @Date    27 Aug 2016
 
 **)
 Unit BADIGeneralOptionsFrame;
@@ -13,23 +13,24 @@ Unit BADIGeneralOptionsFrame;
 Interface
 
 Uses
-  Winapi.Windows,
-  Winapi.Messages,
-  System.SysUtils,
-  System.Variants,
-  System.Classes,
-  Vcl.Graphics,
-  Vcl.Controls,
-  Vcl.Forms,
-  Vcl.Dialogs,
-  Vcl.ComCtrls,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls,
-  Vcl.CheckLst;
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  ComCtrls,
+  StdCtrls,
+  ExtCtrls,
+  CheckLst,
+  BADICustomOptionsFrame;
 
 Type
   (** A class to represent the frame interface. **)
-  TfmBADIGeneralOptions = Class(TFrame)
+  TfmBADIGeneralOptions = Class(TFrame, IBADIOptionsFrame)
     clbOptions: TCheckListBox;
     IntervalPanel: TPanel;
     lblRefreshInterval: TLabel;

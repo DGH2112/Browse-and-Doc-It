@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    28 Apr 2013
+  @Date    27 Aug 2016
   @Version 1.0
 
 **)
@@ -17,20 +17,28 @@ Uses
   Menus,
   BaseLanguageModule,
   Types,
-  CommonIDEFunctions
-  {$IFNDEF D2005},
+  CommonIDEFunctions,
+  {$IFNDEF D2005}
   ExtCtrls,
-  Contnrs
-  {$ENDIF},
+  Contnrs,
+  {$ENDIF}
   ProfilingForm,
-  EditorNotifier;
+  EditorNotifier,
+  BADICustomOptionsFrame,
+  BADIIDEOptionsHandler,
+  BADIGeneralOptionsFrame,
+  BADICodeBrowsingFrame,
+  BADIEcludedDocFilesFrame,
+  BADIMethodDescriptionsFrame,
+  BADIModuleExlporerOpsFrame,
+  BADISpecialTagsFrame;
 
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 
 Type
   (** This is the class which defined the Wizard interface. **)
   TBrowseAndDocItWizard = Class(TNotifierObject, IOTANotifier, IOTAWizard)
-    {$IFDEF D2005} Strict {$ENDIF} Private
+  {$IFDEF D2005} Strict {$ENDIF} Private
     mmiPascalDocMenu: TMenuItem;
     FCounter        : Integer;
     FFileName       : String;
@@ -42,6 +50,14 @@ Type
     FMenuShortCuts  : TList;
     {$ENDIF}
     FEditorNotifier : TEditorNotifier;
+    {$IFDEF DXE00}
+    FBADIGeneralOptions : TBADIIDEOptionsHandler;
+    FBADISpecialtags    : TBADIIDEOptionsHandler;
+    FBADIModuleExplorer : TBADIIDEOptionsHandler;
+    FBADICodeBrowsing   : TBADIIDEOptionsHandler;
+    FBADIExcludedDocs   : TBADIIDEOptionsHandler;
+    FBADIMethodDesc     : TBADIIDEOptionsHandler;
+    {$ENDIF}
     Procedure InsertCommentBlock(CommentStyle: TCommentStyle;
       CommentType: TCommentType);
     Procedure OptionsClick(Sender: TObject);
@@ -218,6 +234,20 @@ Begin
   FMenuTimer.Interval := 1000;
   FMenuTimer.Enabled  := True;
   {$ENDIF}
+  {$IFDEF DXE00}
+  FBADIGeneralOptions := TBADIIDEOptionsHandler.Create(TfmBADIGeneralOptions, 'General Options');
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIGeneralOptions);
+  FBADISpecialtags := TBADIIDEOptionsHandler.Create(TfmBADISpecialTagsFrame, 'Special Tags');
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADISpecialtags);
+  FBADIModuleExplorer := TBADIIDEOptionsHandler.Create(TfmBADIModuleExplorerFrame, 'Module Explorer');
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIModuleExplorer);
+  FBADICodeBrowsing := TBADIIDEOptionsHandler.Create(TfmBADICodeBrowsingFrame, 'Code Browsing');
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADICodeBrowsing);
+  FBADIExcludedDocs := TBADIIDEOptionsHandler.Create(TfmBADIExcludedDocFilesFrame, 'Excluded Documentation Files');
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIExcludedDocs);
+  FBADIMethodDesc := TBADIIDEOptionsHandler.Create(TfmBADIMethodDescriptionsFrame, 'Method Descriptions');
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIMethodDesc);
+  {$ENDIF}
 End;
 
 (**
@@ -303,7 +333,16 @@ End;
 
 **)
 Destructor TBrowseAndDocItWizard.Destroy;
+
 Begin
+  {$IFDEF DXE00}
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIGeneralOptions);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADISpecialtags);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIModuleExplorer);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADICodeBrowsing);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIExcludedDocs);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIMethodDesc);
+  {$ENDIF}
   If mmiPascalDocMenu <> Nil Then
     mmiPascalDocMenu.Free;
   {$IFNDEF D2005}
@@ -1140,8 +1179,13 @@ End;
 Procedure TBrowseAndDocItWizard.OptionsClick(Sender: TObject);
 
 Begin
+  {$IFDEF DXE00}
+  (BorlandIDEServices As IOTAServices).GetEnvironmentOptions.EditOptions('',
+    'Browse And Doc It.General Options');
+  {$ELSE}
   If TfrmOptions.Execute([Low(TVisibleTab) .. High(TVisibleTab)]) Then
     FEditorNotifier.ResetLastupdateTickCount(1);
+  {$ENDIF}
 End;
 
 (**

@@ -1,17 +1,23 @@
 object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
   Left = 0
   Top = 0
-  Width = 675
-  Height = 350
+  Width = 519
+  Height = 373
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  ParentFont = False
   TabOrder = 0
   DesignSize = (
-    675
-    350)
+    519
+    373)
   object lbSpecialTags: TListBox
     Left = 3
     Top = 30
-    Width = 669
-    Height = 286
+    Width = 513
+    Height = 309
     Style = lbOwnerDrawFixed
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
@@ -19,11 +25,13 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     OnDblClick = lbSpecialTagsDblClick
     OnDrawItem = lbSpecialTagsDrawItem
     OnMouseDown = lbSpecialTagsMouseDown
+    ExplicitWidth = 1596
+    ExplicitHeight = 1357
   end
   object HeaderControl: THeaderControl
     Left = 3
     Top = 3
-    Width = 669
+    Width = 513
     Height = 21
     Align = alNone
     Anchors = [akLeft, akTop, akRight]
@@ -58,8 +66,8 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     Style = hsFlat
   end
   object btnDelete: TBitBtn
-    Left = 435
-    Top = 322
+    Left = 279
+    Top = 345
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -80,10 +88,12 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 3
     OnClick = btnDeleteClick
+    ExplicitLeft = 1362
+    ExplicitTop = 1393
   end
   object btnEdit: TBitBtn
-    Left = 354
-    Top = 322
+    Left = 198
+    Top = 345
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -104,10 +114,12 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 4
     OnClick = btnEditClick
+    ExplicitLeft = 1281
+    ExplicitTop = 1393
   end
   object btnMoveDown: TBitBtn
-    Left = 597
-    Top = 322
+    Left = 441
+    Top = 345
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -128,10 +140,12 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 5
     OnClick = btnMoveDownClick
+    ExplicitLeft = 1524
+    ExplicitTop = 1393
   end
   object btnMoveUp: TBitBtn
-    Left = 516
-    Top = 322
+    Left = 360
+    Top = 345
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -152,10 +166,12 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 6
     OnClick = btnMoveUpClick
+    ExplicitLeft = 1443
+    ExplicitTop = 1393
   end
   object btnAdd: TBitBtn
-    Left = 273
-    Top = 322
+    Left = 117
+    Top = 345
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -176,12 +192,14 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 2
     OnClick = btnAddClick
+    ExplicitLeft = 1200
+    ExplicitTop = 1393
   end
   object CheckedImages: TImageList
     Left = 94
     Top = 92
     Bitmap = {
-      494C010102000400200010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000400440010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

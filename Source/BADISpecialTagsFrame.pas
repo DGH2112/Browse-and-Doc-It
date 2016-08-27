@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    20 Aug 2016
+  @Date    27 Aug 2016
 
 **)
 Unit BADISpecialTagsFrame;
@@ -25,11 +25,12 @@ Uses
   Buttons,
   ComCtrls,
   ImageList,
-  ImgList;
+  ImgList,
+  BADICustomOptionsFrame;
 
 Type
   (** This is a class to represent the frame interface. **)
-  TfmBADISpecialTagsFrame = Class(TFrame)
+  TfmBADISpecialTagsFrame = Class(TFrame, IBADIOptionsFrame)
     lbSpecialTags: TListBox;
     HeaderControl: THeaderControl;
     btnDelete: TBitBtn;

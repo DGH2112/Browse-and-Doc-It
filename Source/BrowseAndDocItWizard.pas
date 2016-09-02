@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    27 Aug 2016
+  @Date    02 Sep 2016
   @Version 1.0
 
 **)
@@ -23,15 +23,7 @@ Uses
   Contnrs,
   {$ENDIF}
   ProfilingForm,
-  EditorNotifier,
-  BADICustomOptionsFrame,
-  BADIIDEOptionsHandler,
-  BADIGeneralOptionsFrame,
-  BADICodeBrowsingFrame,
-  BADIEcludedDocFilesFrame,
-  BADIMethodDescriptionsFrame,
-  BADIModuleExlporerOpsFrame,
-  BADISpecialTagsFrame;
+  EditorNotifier, BADIIDEOptionsInstaller;
 
 {$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
 
@@ -50,14 +42,7 @@ Type
     FMenuShortCuts  : TList;
     {$ENDIF}
     FEditorNotifier : TEditorNotifier;
-    {$IFDEF DXE00}
-    FBADIGeneralOptions : TBADIIDEOptionsHandler;
-    FBADISpecialtags    : TBADIIDEOptionsHandler;
-    FBADIModuleExplorer : TBADIIDEOptionsHandler;
-    FBADICodeBrowsing   : TBADIIDEOptionsHandler;
-    FBADIExcludedDocs   : TBADIIDEOptionsHandler;
-    FBADIMethodDesc     : TBADIIDEOptionsHandler;
-    {$ENDIF}
+    FBADIIDEOptionsInstaller : TBADIIDEOptionsInstaller;
     Procedure InsertCommentBlock(CommentStyle: TCommentStyle;
       CommentType: TCommentType);
     Procedure OptionsClick(Sender: TObject);
@@ -234,20 +219,7 @@ Begin
   FMenuTimer.Interval := 1000;
   FMenuTimer.Enabled  := True;
   {$ENDIF}
-  {$IFDEF DXE00}
-  FBADIGeneralOptions := TBADIIDEOptionsHandler.Create(TfmBADIGeneralOptions, 'General Options');
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIGeneralOptions);
-  FBADISpecialtags := TBADIIDEOptionsHandler.Create(TfmBADISpecialTagsFrame, 'Special Tags');
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADISpecialtags);
-  FBADIModuleExplorer := TBADIIDEOptionsHandler.Create(TfmBADIModuleExplorerFrame, 'Module Explorer');
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIModuleExplorer);
-  FBADICodeBrowsing := TBADIIDEOptionsHandler.Create(TfmBADICodeBrowsingFrame, 'Code Browsing');
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADICodeBrowsing);
-  FBADIExcludedDocs := TBADIIDEOptionsHandler.Create(TfmBADIExcludedDocFilesFrame, 'Excluded Documentation Files');
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIExcludedDocs);
-  FBADIMethodDesc := TBADIIDEOptionsHandler.Create(TfmBADIMethodDescriptionsFrame, 'Method Descriptions');
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIMethodDesc);
-  {$ENDIF}
+  FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create;
 End;
 
 (**
@@ -335,14 +307,7 @@ End;
 Destructor TBrowseAndDocItWizard.Destroy;
 
 Begin
-  {$IFDEF DXE00}
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIGeneralOptions);
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADISpecialtags);
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIModuleExplorer);
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADICodeBrowsing);
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIExcludedDocs);
-  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIMethodDesc);
-  {$ENDIF}
+  FBADIIDEOptionsInstaller.Free;
   If mmiPascalDocMenu <> Nil Then
     mmiPascalDocMenu.Free;
   {$IFNDEF D2005}

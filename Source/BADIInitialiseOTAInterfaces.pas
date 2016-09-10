@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    26 Mar 2016
+  @Date    10 Sep 2016
   
 **)
 Unit BADIInitialiseOTAInterfaces;
@@ -32,8 +32,6 @@ Uses
   Forms,
   BrowseAndDocItWizard,
   DockableModuleExplorer,
-  EditorNotifier,
-  KeyboardBindings,
   BNFHighlighter,
   EidolonHighlighter,
   Windows,
@@ -43,14 +41,11 @@ Type
   (** An enumerate to define the type of wizard. **)
   TWizardType = (wtPackageWizard, wtDLLWizard);
 
-Const
-  (** A constant to represent the initial (failed) position of a wizard reference. **)
-  iWizardFailState = -1;
-
 {$IFDEF D2005}
 Resourcestring
   (** This is a text string of revision from nil and a to z. **)
   strRevision = ' abcdefghijklmnopqrstuvwxyz';
+  (** Universal name for all IDEs for use in the splash screen and about boxes. **)
   strSplashScreenName = 'Browse and Doc It %d.%d%s for %s';
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
   strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
@@ -72,17 +67,6 @@ Var
   (** This is an index for the wizard when register with the ide. Its required
       in order to remove it from memory. **)
   iWizardIndex : Integer = iWizardFailState;
-  {$IFDEF D2005}
-  (** This is an index for the editor notifier required when the package is
-      unloaded **)
-  iEditorIndex : Integer = iWizardFailState;
-  {$ENDIF}
-  (** This is a private reference for the Editor Notifier class when not
-      registered with the IDE. **)
-  objEditorNotifier : TEditorNotifier;
-  (** An index for the keybinding nofitier - required when the package is
-      unloaded **)
-  iKeyBinding: Integer = iWizardFailState;
   (** An index for the BNF Highlighter notifier - required for unloading the
       highlighter. **)
   iBNFHighlighter : Integer = iWizardFailState;
@@ -118,16 +102,9 @@ Begin
   Result := TBrowseAndDocItWizard.Create;
   If WizardType = wtPackageWizard Then
     iWizardIndex := (BorlandIDEServices As IOTAWizardServices).AddWizard(Result);
-  {$IFDEF D2005}
-  objEditorNotifier := TEditorNotifier.Create;
-  iEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
-    objEditorNotifier);
-  {$ELSE}
-  objEditorNotifier := TEditorNotifier.Create;
-  {$ENDIF}
-  Result.EditorNotifier := objEditorNotifier;
-  iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
-    TKeyboardBinding.Create(Result));
+
+  //iKeyBinding := (BorlandIDEServices As IOTAKeyboardServices).AddKeyboardBinding(
+  //  TKeyboardBinding.Create(Result));
   iBNFHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
     TBNFHighlighter.Create);
   iEidolonHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
@@ -257,14 +234,8 @@ Finalization
     (BorlandIDEServices As IOTAHighlightServices).RemoveHighlighter(iEidolonHighlighter);
   If iBNFHighlighter > iWizardFailState Then
     (BorlandIDEServices As IOTAHighlightServices).RemoveHighlighter(iBNFHighlighter);
-  If iKeyBinding > iWizardFailState Then
-    (BorlandIDEServices As IOTAKeyboardServices).RemoveKeyboardBinding(iKeyBinding);
-  {$IFDEF D2005}
-  If iEditorIndex > iWizardFailState Then
-    (BorlandIDEServices As IOTAEditorServices).RemoveNotifier(iEditorIndex);
-  {$ELSE}
-  objEditorNotifier.Free;
-  {$ENDIF}
+  //If iKeyBinding > iWizardFailState Then
+  //  (BorlandIDEServices As IOTAKeyboardServices).RemoveKeyboardBinding(iKeyBinding);
   If iWizardIndex > iWizardFailState Then
     (BorlandIDEServices As IOTAWizardServices).RemoveWizard(iWizardIndex);
   {$IFDEF D2010}

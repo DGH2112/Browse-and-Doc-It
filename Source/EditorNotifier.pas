@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    04 Aug 2011
+  @Date    22 Sep 2016
   @Author  David Hoyle
 
 **)
@@ -176,6 +176,30 @@ begin
       {$ENDIF}
       {$IFDEF VER230} // Delphi XE2
       BrowseAndDocItOptions.Defines.Add('VER230');
+      {$ENDIF}
+      {$IFDEF VER230} // Delphi XE3
+      BrowseAndDocItOptions.Defines.Add('VER240');
+      {$ENDIF}
+      {$IFDEF VER230} // Delphi XE4
+      BrowseAndDocItOptions.Defines.Add('VER250');
+      {$ENDIF}
+      {$IFDEF VER230} // Delphi XE5
+      BrowseAndDocItOptions.Defines.Add('VER260');
+      {$ENDIF}
+      {$IFDEF VER230} // Delphi XE6
+      BrowseAndDocItOptions.Defines.Add('VER270');
+      {$ENDIF}
+      {$IFDEF VER230} // Delphi XE7
+      BrowseAndDocItOptions.Defines.Add('VER280');
+      {$ENDIF}
+      {$IFDEF VER230} // Delphi XE8
+      BrowseAndDocItOptions.Defines.Add('VER290');
+      {$ENDIF}
+      {$IFDEF VER230} // Delphi XE10
+      BrowseAndDocItOptions.Defines.Add('VER300');
+      {$ENDIF}
+      {$IFDEF VER230} // Delphi XE10.1
+      BrowseAndDocItOptions.Defines.Add('VER310');
       {$ENDIF}
       {$IFDEF WIN32}
       BrowseAndDocItOptions.Defines.Add('WIN32');

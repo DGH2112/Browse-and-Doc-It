@@ -3,8 +3,9 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    26 Aug 2016
+  @Date    22 Sep 2016
   @Version 1.0
+
   @Author  David Hoyle
 
 **)
@@ -1121,6 +1122,52 @@ Type
   (** A type to define an array of integers. **)
   TArrayOfInteger = Array Of Integer;
 
+  (** An enumerate to define the condition of the compiler definition. **)
+  TCompilerCondition = (ccIncludeCode, ccExcludeCode);
+
+  (** This class represents a single stack entry on the CompilerCondition stacks. **)
+  TCompilerConditionData = Class
+  {$IFDEF D2005} Strict {$ENDIF} Private
+    FCompilerCondition : TCompilerCondition;
+    FTokenIndex        : TTokenIndex;
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
+    Constructor Create(iCompilerCondition : TCompilerCondition;
+      iTokenIndex : TTokenIndex);
+    (**
+      This property gets and sets the compiler condition (include code or exclude code).
+      @precon  None.
+      @postcon Gets and sets the compiler condition (include code or exclude code).
+      @return  a TCompilerCondition
+    **)
+    Property CompilerCondition : TCompilerCondition Read FCompilerCondition
+      Write FCompilerCondition;
+    (**
+      This property gets or sets the token index of the compiler condition.
+      @precon  None.
+      @postcon Gets or sets the token index of the compiler condition.
+      @return  a TTokenIndex
+    **)
+    Property TokenIndex : TTokenIndex Read FTokenIndex Write FTokenIndex;
+  End;
+
+  (** A type to handle the stack of compiler condition visibilities. **)
+  TCompilerConditionStack = Class
+  {$IFDEF D2005} Strict {$ENDIF} Private
+    FStack : TObjectList;
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
+    Constructor Create;
+    Destructor Destroy; Override;
+    Procedure Push(iCompilerCondition : TCompilerCondition;
+      iTokenIndex : TTokenIndex); Overload;
+    Procedure Push(CompilerConditionData : TCompilerConditionData); Overload;
+    Procedure Pop();
+    Function  Peek : TCompilerConditionData;
+    Procedure Poke(iCompilerCondition : TCompilerCondition; iTokenIndex : TTokenIndex);
+    Function  CanPop : Boolean;
+  End;
+
   (** This is an abtract class from which all language modules should be
       derived. **)
   TBaseLanguageModule = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
@@ -1137,8 +1184,8 @@ Type
     FModified : Boolean;
     FCompilerDefs : TStringList;
     FPreviousTokenIndex : TTokenIndex;
-    FCompilerConditionStack : TList;
-    FCompilerConditionUndoStack : TList;
+    FCompilerConditionStack : TCompilerConditionStack;
+    FCompilerConditionUndoStack : TCompilerConditionStack;
     FLastComment: TTokenInfo;
     FCommentClass : TCommentClass;
     FShouldUndoCompilerStack: Boolean;
@@ -1324,17 +1371,19 @@ Type
       ProcessCompilerDefintions method.
       @precon  None.
       @postcon Provides access to the compiler condition stack.
-      @return  a TList
+      @return  a TCompilerConditionStack
     **)
-    Property CompilerConditionStack : TList Read FCompilerConditionStack;
+    Property CompilerConditionStack : TCompilerConditionStack
+      Read FCompilerConditionStack;
     (**
       This property defines a compiler condition undo stack for use in the
       ProcessCompilerDefintions method.
       @precon  None.
       @postcon Provides access to the compiler condition undo stack.
-      @return  a TList
+      @return  a TCompilerConditionStack
     **)
-    Property CompilerConditionUndoStack : TList Read FCompilerConditionUndoStack;
+    Property CompilerConditionUndoStack : TCompilerConditionStack
+      Read FCompilerConditionUndoStack;
     (**
       This property returns the number of bytes in the file.
       @precon  None.
@@ -2619,10 +2668,14 @@ Uses
   Windows, DGHLibrary, INIFiles;
 
 ResourceString
-  (** An error message for tying to add one type of element but finding another
+  (** An error message for trying to add one type of element but finding another
       with the same name. **)
   strTryingToAddType = 'Trying to add type ''%s'' but found type ''%s'' with the' +
   ' same name (%s).';
+  (** An error message for trying to pop a compiler condition where there isnt one. **)
+  strCannotPopCompilerCondition = 'Cannot pop the token position stack.';
+  (** An error message for trying to peek a compiler condition where there isnt one. **)
+  strCannotPeekTheCompilerCondition = 'Cannot peek the compiler condition stack.';
 
 Var
   (** This variable provides an incremental number of making doc conflict
@@ -3922,12 +3975,9 @@ begin
       I := E.Add(I);
     End;
   If I.ElementCount < BrowseAndDocItOptions.IssueLimits[ltConflicts] Then
-  I.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iL, iC,
+    I.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iL, iC,
       DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon))
   Else If I.ElementCount = BrowseAndDocItOptions.IssueLimits[ltConflicts] Then
-    //: @todo Fix!!!
-    //I.Add(TDocIssue.Create(Format(recIssues[ErrorType].FTooMany, [iCount]), scNone,
-    //  'AddIssue', 0, 0, recIssues[ErrorType].FItemImage));
     I.Add(TDocumentConflict.Create([], 0, 0, 0, 0,
       strTooManyConflicts, strTooManyConflictsDesc, iiDocConflictMissing));
 end;
@@ -5649,8 +5699,8 @@ begin
   {$IFDEF D0006}
   FCompilerDefs.CaseSensitive := False;
   {$ENDIF}
-  FCompilerConditionStack := TList.Create;
-  FCompilerConditionUndoStack := TList.Create;
+  FCompilerConditionStack := TCompilerConditionStack.Create;
+  FCompilerConditionUndoStack := TCompilerConditionStack.Create;
   FCommentClass := CommentClass;
   FTokenStackTop := -1;
   SetLength(FTokenStack, 10);
@@ -6200,8 +6250,14 @@ Begin
     Begin
       FTokenIndex := FTokenStack[FTokenStackTop];
       Dec(FTokenStackTop);
+      While CompilerConditionStack.CanPop And
+        (CompilerConditionStack.Peek.TokenIndex > FTokenIndex) Do
+        Begin
+          CompilerConditionUndoStack.Push(CompilerConditionStack.Peek);
+          CompilerConditionStack.Pop;
+        End;
     End Else
-      Raise EParserError.Create('Cannot pop the token position stack.');
+      Raise EParserError.Create(strCannotPopCompilerCondition);
 End;
 
 (**
@@ -6285,17 +6341,14 @@ End;
 
 **)
 Procedure TBaseLanguageModule.RollBackToken;
-var
-  iStackTop: Integer;
 
 Begin
   If FShouldUndoCompilerStack Then
     Begin
-      iStackTop := CompilerConditionUndoStack.Count - 1;
-      If iStackTop >= 0 Then
+      If CompilerConditionUndoStack.CanPop Then
         Begin
-          CompilerConditionStack.Add(CompilerConditionUndoStack[iStackTop]);
-          CompilerConditionUndoStack.Delete(iStackTop);
+          CompilerConditionStack.Push(CompilerConditionUndoStack.Peek);
+          CompilerConditionUndoStack.Pop;
         End;
     End;
   If FPreviousTokenIndex >= 0 Then
@@ -7196,6 +7249,167 @@ Function TModuleDispatcher.GetModules(iIndex: Integer): TModuleInfo;
 
 Begin
   Result := FModules[iIndex] As TModuleInfo;
+End;
+
+{ TCompilerConditionStack }
+
+(**
+
+  This method determines whether there is anything to pop from the stack.
+
+  @precon  None.
+  @postcon Returns true of there is anything on the stack to pop.
+
+  @return  a Boolean
+
+**)
+Function TCompilerConditionStack.CanPop: Boolean;
+
+Begin
+  Result := FStack.Count > 0;
+End;
+
+(**
+
+  A constructor for the TCompilerConditionStack class.
+
+  @precon  None.
+  @postcon The class is initialised.
+
+**)
+Constructor TCompilerConditionStack.Create;
+
+Begin
+  FStack := TObjectList.Create(True);
+End;
+
+(**
+
+  A destructor for the TCompilerCondition class.
+
+  @precon  None.
+  @postcon Frees the memory used by the class.
+
+**)
+Destructor TCompilerConditionStack.Destroy;
+
+Begin
+  FStack.Free;
+  Inherited Destroy;
+End;
+
+(**
+
+  This method allow the caller to see the value on the top of the stack.
+
+  @precon  None.
+  @postcon Returns the value on the top of the stack.
+
+  @return  a TCompilerConditionData
+
+**)
+Function TCompilerConditionStack.Peek: TCompilerConditionData;
+
+Begin
+  If FStack.Count > 0 Then
+    Result := FStack[Pred(FStack.Count)] As TCompilerConditionData
+  Else
+    Raise EParserError.Create(strCannotPeekTheCompilerCondition);
+End;
+
+(**
+
+  This method allows the caller to modify the top item on the stack.
+
+  @precon  There must be an item on the stack top.
+  @postcon The top item on the stack is changed.
+
+  @param   iCompilerCondition as a TCompilerCondition
+  @param   iTokenIndex        as a TTokenIndex
+
+**)
+Procedure TCompilerConditionStack.Poke(iCompilerCondition: TCompilerCondition;
+  iTokenIndex : TTokenIndex);
+
+Begin
+  If FStack.Count > 0 Then
+    Begin
+      (FStack[Pred(FStack.Count)] As TCompilerConditionData).CompilerCondition :=
+        iCompilerCondition;
+      (FStack[Pred(FStack.Count)] As TCompilerConditionData).TokenIndex := iTokenIndex;
+    End;
+End;
+
+(**
+
+  This method removes the last item from the top of the stack.
+
+  @precon  None.
+  @postcon The value on the top of the stack is removed.
+
+**)
+Procedure TCompilerConditionStack.Pop;
+
+Begin
+  If FStack.Count > 0 Then
+    FStack.Delete(Pred(FStack.Count))
+  Else
+    Raise EParserError.Create(strCannotPopCompilerCondition);
+End;
+
+(**
+
+  This method pushes the given compiler condition data on to the top of the stack.
+
+  @precon  CompilerConditionData must be a valdi instance.
+  @postcon The compiler condition data is placed on top of the stack.
+
+  @param   CompilerConditionData as a TCompilerConditionData
+
+**)
+Procedure TCompilerConditionStack.Push(CompilerConditionData: TCompilerConditionData);
+
+Begin
+  Push(CompilerConditionData.CompilerCondition, CompilerConditionData.TokenIndex);
+End;
+
+(**
+
+  This method adds the given valud to the top of the stack.
+
+  @precon  None.
+  @postcon Adds the given valud to the top of the stack.
+
+  @param   iCompilerCondition as a TCompilerCondition
+  @param   iTokenIndex        as a TTokenIndex
+
+**)
+Procedure TCompilerConditionStack.Push(iCompilerCondition : TCompilerCondition;
+  iTokenIndex : TTokenIndex);
+
+Begin
+  FStack.Add(TCompilerConditionData.Create(iCompilerCondition, iTokenIndex));
+End;
+
+{ TCompilerConditionData }
+
+(**
+
+  A constructor for the TCompilerConditionData class.
+
+  @precon  None.
+  @postcon Initialises the class with data.
+
+  @param   iCompilerCondition as a TCompilerCondition
+  @param   iTokenIndex        as a TTokenIndex
+
+**)
+Constructor TCompilerConditionData.Create(iCompilerCondition: TCompilerCondition;
+  iTokenIndex: TTokenIndex);
+
+Begin
+  FCompilerCondition := iCompilerCondition;
+  FTokenIndex := iTokenIndex;
 End;
 
 (** This initializations section ensures that there is a valid instance of the

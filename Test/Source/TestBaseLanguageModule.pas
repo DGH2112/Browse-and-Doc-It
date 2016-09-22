@@ -2493,11 +2493,11 @@ end;
 
 procedure TestTBaseLanguageModule.TestCompilerConditionStack;
 begin
-  CheckEquals(0, FBaseLanguageModule.CompilerConditionStack.Count);
-  FBaseLanguageModule.CompilerConditionStack.Add(Pointer(1));
-  CheckEquals(1, FBaseLanguageModule.CompilerConditionStack.Count);
-  FBaseLanguageModule.CompilerConditionStack.Clear;
-  CheckEquals(0, FBaseLanguageModule.CompilerConditionStack.Count);
+  CheckEquals(False, FBaseLanguageModule.CompilerConditionStack.CanPop);
+  FBaseLanguageModule.CompilerConditionStack.Push(ccIncludeCode, 1);
+  CheckEquals(True, FBaseLanguageModule.CompilerConditionStack.CanPop);
+  FBaseLanguageModule.CompilerConditionStack.Pop;
+  CheckEquals(False, FBaseLanguageModule.CompilerConditionStack.CanPop);
 end;
 
 procedure TestTBaseLanguageModule.TestCreate;

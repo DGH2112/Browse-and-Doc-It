@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    22 Sep 2016
+  @Date    30 Sep 2016
   @Version 1.0
 
   @Author  David Hoyle
@@ -14,7 +14,10 @@ Unit BaseLanguageModule;
 Interface
 
 Uses
-  SysUtils, Classes, Contnrs, Graphics;
+  SysUtils,
+  Classes,
+  Contnrs,
+  Graphics;
 
 
 {$INCLUDE CompilerDefinitions.inc}
@@ -2665,7 +2668,9 @@ Var
 Implementation
 
 Uses
-  Windows, DGHLibrary, INIFiles;
+  Windows,
+  DGHLibrary,
+  INIFiles;
 
 ResourceString
   (** An error message for trying to add one type of element but finding another
@@ -6245,16 +6250,20 @@ end;
 **)
 Procedure TBaseLanguageModule.PopTokenPosition;
 
+Var
+  iTokenIndex : TTokenIndex;
+
 Begin
   If FTokenStackTop > -1 Then
     Begin
+      iTokenIndex := FTokenIndex;
       FTokenIndex := FTokenStack[FTokenStackTop];
       Dec(FTokenStackTop);
-      While CompilerConditionStack.CanPop And
-        (CompilerConditionStack.Peek.TokenIndex > FTokenIndex) Do
+      While CompilerConditionUndoStack.CanPop And
+        (CompilerConditionUndoStack.Peek.TokenIndex > FTokenIndex) Do
         Begin
-          CompilerConditionUndoStack.Push(CompilerConditionStack.Peek);
-          CompilerConditionStack.Pop;
+          CompilerConditionStack.Push(CompilerConditionUndoStack.Peek);
+          CompilerConditionUndoStack.Pop;
         End;
     End Else
       Raise EParserError.Create(strCannotPopCompilerCondition);

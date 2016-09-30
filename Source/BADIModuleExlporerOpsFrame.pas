@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Aug 2016
+  @Date    30 Sep 2016
 
 **)
 Unit BADIModuleExlporerOpsFrame;
@@ -53,6 +53,9 @@ Type
     lblTokenTypes: TLabel;
     lblFontSize: TLabel;
     lblFontName: TLabel;
+    cbxLimits: TComboBox;
+    edtLimits: TEdit;
+    udLimits: TUpDown;
     Procedure lbxTokenTypesClick(Sender: TObject);
     procedure cbxBackColourChange(Sender: TObject);
     procedure cbxFontColourChange(Sender: TObject);
@@ -60,9 +63,13 @@ Type
     procedure chkItalicClick(Sender: TObject);
     procedure chkStrikeoutClick(Sender: TObject);
     procedure chkUnderlineClick(Sender: TObject);
+    procedure cbxLimitsChange(Sender: TObject);
+    procedure udLimitsChangingEx(Sender: TObject; var AllowChange: Boolean;
+      NewValue: Integer; Direction: TUpDownDirection);
   Private
     { Private declarations }
     FTokenFontInfo: Array [Low(TBADITokenType) .. High(TBADITokenType)] Of TTokenFontInfo;
+    FIssueLimits : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
   Public
     { Public declarations }
     Constructor Create(AOwner: TComponent); Override;
@@ -112,6 +119,28 @@ Begin
   FTokenFontInfo[TBADITokenType(lbxTokenTypes.ItemIndex)].FForeColour :=
     cbxFontColour.Selected;
 End;
+
+(**
+
+  This is an on change event handler for the Limits combo control.
+
+  @precon  None.
+  @postcon Disables the up down control and updates the up down controls position then
+           reenables the up down control.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfmBADIModuleExplorerFrame.cbxLimitsChange(Sender: TObject);
+
+begin
+  udLimits.OnChangingEx := Nil;
+  Try
+    udLimits.Position := FIssueLimits[TLimitType(cbxLimits.ItemIndex)];
+  Finally
+    udLimits.OnChangingEx := udLimitsChangingEx;
+  End;
+end;
 
 (**
 
@@ -220,7 +249,10 @@ Begin
   For j := Low(TBADITokenType) To High(TBADITokenType) Do
     lbxTokenTypes.Items.Add(strTokenType[j]);
   lbxTokenTypes.ItemIndex := 0;
-
+  cbxLimits.Items.Add('Errors');
+  cbxLimits.Items.Add('Warnings');
+  cbxLimits.Items.Add('Hints');
+  cbxLimits.Items.Add('Conflicts');
 End;
 
 (**
@@ -281,6 +313,12 @@ Begin
   udTokenLimit.Position := BrowseAndDocItOptions.TokenLimit;
   clbxTreeColour.Selected := BrowseAndDocItOptions.TreeColour;
   lbxTokenTypesClick(Nil);
+  FIssueLimits[ltErrors] := BrowseAndDocItOptions.IssueLimits[ltErrors];
+  FIssueLimits[ltWarnings] := BrowseAndDocItOptions.IssueLimits[ltWarnings];
+  FIssueLimits[ltHints] := BrowseAndDocItOptions.IssueLimits[ltHints];
+  FIssueLimits[ltConflicts] := BrowseAndDocItOptions.IssueLimits[ltConflicts];
+  cbxLimits.ItemIndex := 0;
+  cbxLimitsChange(Nil);
 End;
 
 (**
@@ -304,6 +342,31 @@ Begin
   BrowseAndDocItOptions.BGColour := cbxBGColour.Selected;
   BrowseAndDocItOptions.TokenLimit := udTokenLimit.Position;
   BrowseAndDocItOptions.TreeColour := clbxTreeColour.Selected;
+  BrowseAndDocItOptions.IssueLimits[ltErrors] := FIssueLimits[ltErrors];
+  BrowseAndDocItOptions.IssueLimits[ltWarnings] := FIssueLimits[ltWarnings];
+  BrowseAndDocItOptions.IssueLimits[ltHints] := FIssueLimits[ltHints];
+  BrowseAndDocItOptions.IssueLimits[ltConflicts] := FIssueLimits[ltConflicts];
+End;
+
+(**
+
+  This is an on change ex event handler for the limits up down control.
+
+  @precon  None.
+  @postcon Updates the Issue limits private variable with changes.
+
+  @param   Sender      as a TObject
+  @param   AllowChange as a Boolean as a reference
+  @param   NewValue    as an Integer
+  @param   Direction   as a TUpDownDirection
+
+**)
+Procedure TfmBADIModuleExplorerFrame.udLimitsChangingEx(Sender: TObject;
+  Var AllowChange: Boolean; NewValue: Integer; Direction: TUpDownDirection);
+
+Begin
+  AllowChange := (NewValue > 0) And (NewValue <= 100);
+  FIssueLimits[TLimitType(cbxLimits.ItemIndex)] := NewValue;
 End;
 
 End.

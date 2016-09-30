@@ -519,6 +519,11 @@ type
     Procedure TestCodeFailure23;
     Procedure TestCodeFailure24;
     Procedure TestCodeFailure25;
+    Procedure TestCodeFailure26;
+    Procedure TestCodeFailure27;
+    Procedure TestCodeFailure28;
+    Procedure TestCodeFailure29;
+    Procedure TestCodeFaliure30;
   Public
   End;
 
@@ -3067,6 +3072,216 @@ Begin
   );
 End;
 
+Procedure TestTPascalModule.TestCodeFailure26;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'type'#13#10 +
+    '  TEnumerableFilter<F; T: TFmxObject> = class(TEnumerable<T>)'#13#10 +
+    '  private'#13#10 +
+    '    FBaseEnum: TEnumerable<F>;'#13#10 +
+    '    FSelfDestruct: Boolean;'#13#10 +
+    '    FPredicate: TPredicate<T>;'#13#10 +
+    '  protected'#13#10 +
+    '    function DoGetEnumerator: TEnumerator<T>; override;'#13#10 +
+    '  public'#13#10 +
+    '    constructor Create(const FullEnum: TEnumerable<F>; SelfDestruct: Boolean = False; const Pred: TPredicate<T> = nil);'#13#10 +
+    '    class function Filter(const Src: TEnumerable<F>; const Predicate: TPredicate<T> = nil): TEnumerableFilter<F,T>;'#13#10 +
+    '  type'#13#10 +
+    '    TFilterEnumerator = class(TEnumerator<T>)'#13#10 +
+    '    private'#13#10 +
+    '      FCleanup: TEnumerableFilter<F,T>;'#13#10 +
+    '      FRawEnumerator: TEnumerator<F>;'#13#10 +
+    '      FCurrent: T;'#13#10 +
+    '      FPredicate: TPredicate<T>;'#13#10 +
+    '      function GetCurrent: T;'#13#10 +
+    '    protected'#13#10 +
+    '      function DoGetCurrent: T; override;'#13#10 +
+    '      function DoMoveNext: Boolean; override;'#13#10 +
+    '    public'#13#10 +
+    '      constructor Create(const Enumerable: TEnumerable<F>; const Cleanup: TEnumerableFilter<F,T>;'#13#10 +
+    '        const Pred: TPredicate<T>);'#13#10 +
+    '      destructor Destroy; override;'#13#10 +
+    '      property Current: T read GetCurrent;'#13#10 +
+    '      function MoveNext: Boolean;'#13#10 +
+    '    end;'#13#10 +
+    '  end;',
+    'constructor TEnumerableFilter<F, T>.Create(const FullEnum: TEnumerable<F>; SelfDestruct: Boolean;'#13#10 +
+    '  const Pred: TPredicate<T>);'#13#10 +
+    'begin'#13#10 +
+    '  FBaseEnum := FullEnum;'#13#10 +
+    '  FSelfDestruct := SelfDestruct;'#13#10 +
+    '  FPredicate := Pred;'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'function TEnumerableFilter<F,T>.DoGetEnumerator: TEnumerator<T>;'#13#10 +
+    'begin'#13#10 +
+    '  if FSelfDestruct then'#13#10 +
+    '    Result := TFilterEnumerator.Create(FBaseEnum, Self, FPredicate)'#13#10 +
+    '  else'#13#10 +
+    '    Result := TFilterEnumerator.Create(FBaseEnum, nil, FPredicate);'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'class function TEnumerableFilter<F, T>.Filter(const Src: TEnumerable<F>; const Predicate: TPredicate<T> = nil):'#13#10 +
+    '  TEnumerableFilter<F, T>;'#13#10 +
+    'begin'#13#10 +
+    '  Result := TEnumerableFilter<F,T>.Create(Src, True, Predicate);'#13#10 +
+    'end;'#13#10 +
+    'constructor TEnumerableFilter<F, T>.TFilterEnumerator.Create(const Enumerable: TEnumerable<F>;'#13#10 +
+    '  const Cleanup: TEnumerableFilter<F, T>; const Pred: TPredicate<T>);'#13#10 +
+    'begin'#13#10 +
+    '  FRawEnumerator := Enumerable.GetEnumerator;'#13#10 +
+    '  FCleanup := Cleanup;'#13#10 +
+    '  FPredicate := Pred;'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'destructor TEnumerableFilter<F,T>.TFilterEnumerator.Destroy;'#13#10 +
+    'begin'#13#10 +
+    '  FRawEnumerator.Free;'#13#10 +
+    '  inherited;'#13#10 +
+    '  if FCleanup <> nil then'#13#10 +
+    '    FCleanup.Free;'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'function TEnumerableFilter<F,T>.TFilterEnumerator.DoGetCurrent: T;'#13#10 +
+    'begin'#13#10 +
+    '  Result := GetCurrent;'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'function TEnumerableFilter<F,T>.TFilterEnumerator.DoMoveNext: Boolean;'#13#10 +
+    'begin'#13#10 +
+    '  Result := MoveNext;'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'function TEnumerableFilter<F,T>.TFilterEnumerator.GetCurrent: T;'#13#10 +
+    'begin'#13#10 +
+    '  Result := FCurrent;'#13#10 +
+    'end;'#13#10 +
+    ''#13#10 +
+    'function TEnumerableFilter<F,T>.TFilterEnumerator.MoveNext: Boolean;'#13#10 +
+    'begin'#13#10 +
+    '  Result := False;'#13#10 +
+    '  while (not Result) and (FRawEnumerator.MoveNext) do'#13#10 +
+    '    if (FRawEnumerator.Current is T) and (not Assigned(FPredicate)) or (Assigned(FPredicate) and'#13#10 +
+    '      FPredicate(FRawEnumerator.Current as T)) then'#13#10 +
+    '    begin'#13#10 +
+    '      FCurrent := FRawEnumerator.Current as T;'#13#10 +
+    '      Result := FCurrent <> nil;'#13#10 +
+    '    end;'#13#10 +
+    'end;',
+    [ttErrors, ttWarnings],
+    [
+      'Types\TEnumerableFilter<F, T>|TEnumerableFilter<F, T> = Class(TEnumerable<T>)|scPublic',
+      'Types\TEnumerableFilter<F, T>\Fields\FBaseEnum|FBaseEnum : TEnumerable<F>|scPrivate',
+      'Types\TEnumerableFilter<F, T>\Fields\FSelfDestruct|FSelfDestruct : Boolean|scPrivate',
+      'Types\TEnumerableFilter<F, T>\Fields\FPredicate|FPredicate : TPredicate<T>|scPrivate',
+      'Types\TEnumerableFilter<F, T>\Methods\DoGetEnumerator|Function DoGetEnumerator : TEnumerator<T>; Override|scProtected',
+      'Types\TEnumerableFilter<F, T>\Methods\Create|Constructor Create(const FullEnum : TEnumerable<F>; SelfDestruct : Boolean = False; const Pred : TPredicate<T> = nil)|scPublic',
+      'Types\TEnumerableFilter<F, T>\Methods\Filter|Class Function Filter(const Src : TEnumerable<F>; const Predicate : TPredicate<T> = nil) : TEnumerableFilter<F, T>|scPublic',
+      'Types\TEnumerableFilter<F, T>\Types\TFilterEnumerator|TFilterEnumerator = Class(TEnumerator<T>)|scPublic',
+      'Types\TEnumerableFilter<F, T>\Types\TFilterEnumerator\Fields\FCleanup|FCleanup : TEnumerableFilter<F, T>|scPrivate',
+      'Types\TEnumerableFilter<F, T>\Types\TFilterEnumerator\Fields\FRawEnumerator|FRawEnumerator : TEnumerator<F>|scPrivate',
+      'Types\TEnumerableFilter<F, T>\Types\TFilterEnumerator\Fields\FCurrent|FCurrent : T|scPrivate',
+      'Types\TEnumerableFilter<F, T>\Types\TFilterEnumerator\Fields\FPredicate|FPredicate : TPredicate<T>|scPrivate',
+      'Types\TEnumerableFilter<F, T>\Types\TFilterEnumerator\Methods\GetCurrent|Function GetCurrent : T|scPrivate',
+      'Types\TEnumerableFilter<F, T>\Types\TFilterEnumerator\Methods\Create|Constructor Create(const Enumerable : TEnumerable<F>; const Cleanup : TEnumerableFilter<F, T>; const Pred : TPredicate<T>)|scPublic',
+      'Types\TEnumerableFilter<F, T>\Types\TFilterEnumerator\Methods\Destroy|Destructor Destroy; override|scPublic',
+      'Types\TEnumerableFilter<F, T>\Types\TFilterEnumerator\Properties\Current|Property Current : T Read GetCurrent|scPublic',
+      'Types\TEnumerableFilter<F, T>\Types\TFilterEnumerator\Methods\MoveNext|Function MoveNext : Boolean|scPublic',
+      'Implemented Methods\TEnumerableFilter<F, T>\DoGetEnumerator|Function DoGetEnumerator : TEnumerator<T>|scProtected',
+      'Implemented Methods\TEnumerableFilter<F, T>\Create|Constructor Create(const FullEnum : TEnumerable<F>; SelfDestruct : Boolean; const Pred : TPredicate<T>)|scPublic',
+      'Implemented Methods\TEnumerableFilter<F, T>\Filter|Class Function Filter(const Src : TEnumerable<F>; const Predicate : TPredicate<T> = nil) : TEnumerableFilter<F, T>|scPublic',
+      'Implemented Methods\TEnumerableFilter<F, T>\TFilterEnumerator\GetCurrent|Function GetCurrent : T|scPrivate',
+      'Implemented Methods\TEnumerableFilter<F, T>\TFilterEnumerator\Create|Constructor Create(const Enumerable : TEnumerable<F>; const Cleanup : TEnumerableFilter<F, T>; const Pred : TPredicate<T>)|scPublic',
+      'Implemented Methods\TEnumerableFilter<F, T>\TFilterEnumerator\Destroy|Destructor Destroy|scPublic',
+      'Implemented Methods\TEnumerableFilter<F, T>\TFilterEnumerator\MoveNext|Function MoveNext : Boolean|scPublic'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure27;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  if Columns[Index].FChanged then'#13#10 +
+    '    try'#13#10 +
+    '      SendMessage<Integer>(MM_COLUMN_CHANGED, Index);'#13#10 +
+    '    finally'#13#10 +
+    '      Columns[Index].FChanged := False;'#13#10 +
+    '    end;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate'
+    ]
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure28;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  i := ;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate'
+    ],
+    1
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure29;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  Goodbye();'#13#10 +
+    '  Goodbye2(qwery, );'#13#10 +
+    '  Goodbye2(, qwery);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\Hello|Procedure Hello|scPrivate'
+    ],
+    2
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFaliure30;
+begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'function GetVDMPointer32W; external wow16lib;'#13#10 +
+    'function GetVDMPointer64W; external wow16lib index 516;',
+    [ttErrors, ttWarnings],
+    [
+      'Implemented Methods\GetVDMPointer32W|Function GetVDMPointer32W; External wow16lib|scPrivate'
+    ]
+  );
+end;
+
 Procedure TestTPascalModule.TestCompoundStmt;
 
 Begin
@@ -3467,7 +3682,7 @@ Begin
       'Implemented Methods\Ident04a|Procedure Ident04a; dispid 1|scPrivate',
       'Implemented Methods\Ident04|Procedure Ident04; dynamic|scPrivate',
       'Implemented Methods\Ident05|Procedure Ident05; export|scPrivate',
-      'Implemented Methods\Ident06|Procedure Ident06; External; ''Hello''|scPrivate',
+      'Implemented Methods\Ident06|Procedure Ident06; External ''Hello''|scPrivate',
       'Implemented Methods\Ident07|Procedure Ident07; far|scPrivate',
       'Implemented Methods\Ident08|Procedure Ident08; final|scPrivate',
       'Implemented Methods\Ident09|Procedure Ident09; forward|scPrivate',

@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    10 Sep 2016
+  @Date    30 Sep 2016
   @Version 1.0
 
 **)
@@ -57,15 +57,12 @@ Type
     {$HINTS ON}
   End;
 
-Const
-  (** A constant to represent the initial (failed) position of a wizard reference. **)
-  iWizardFailState = -1;
-
 Implementation
 
 Uses
   DockableModuleExplorer,
-  DGHLibrary;
+  DGHLibrary,
+  BADICommon;
 
 (**
 

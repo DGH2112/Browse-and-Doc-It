@@ -2,9 +2,11 @@
 
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
-  @Version    1.0
-  @Date       06 Jul 2016
+  @Version    2.0
+  @Date       30 Sep 2016
   @Author     David Hoyle
+
+  @grammar    For the grammar to this parser pleaser see the "Object Pascal Grammar.bnf".
 
   @todo       Implement an expression parser for the above compiler defines.
               Needs to be able to evaluate constants in the code and use the
@@ -16,7 +18,11 @@ Unit PascalModule;
 Interface
 
 Uses
-  SysUtils, Windows, Contnrs, Classes, BaseLanguageModule;
+  SysUtils,
+  Windows,
+  Contnrs,
+  Classes,
+  BaseLanguageModule;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -51,13 +57,22 @@ Type
 
   (** This is a sub class for general type types **)
   TTypes = Class(TGenericTypeDecl)
+  {$IFDEF D2005} Strict {$ENDIF} Private
+    FIsTyped : Boolean;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    (**
+      This property determines whether the type is typed or not.
+      @precon  None.
+      @postcon Gets or sets whether the type is typed (preceeded by TYPE);
+      @return  a Boolean
+    **)
+    Property IsTyped : Boolean Read FIsTyped Write FIsTyped;
   End;
 
   (** This is a sub class for restricted type types **)
-  TRestrictedType = Class(TGenericTypeDecl);
+  TRestrictedType = Class(TTypes);
 
   (** This is a sub class for typeid types **)
   TTypeID = Class(TTypes);
@@ -69,6 +84,13 @@ Type
   TStringType = Class(TTypes);
   (** This is a sub class for Procedure types **)
   TProcedureType = Class(TTypes);
+  (** This is a sub class for Anonymous Method types **)
+  TAnonymousReferenceType = Class(TTypes)
+  {$IFDEF D2005} Strict {$ENDIF} Private
+  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Public
+    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+  End;
   (** This is a sub class for Variant types **)
   TVariantType = Class(TTypes);
   (** This is a sub class for Class Ref types **)
@@ -167,12 +189,16 @@ Type
   (** This is a class that represents a record definition. **)
   TRecordDecl = Class(TRestrictedType)
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FPacked      : Boolean;
-    FFieldsLabel : TLabelContainer;
+    FPacked       : Boolean;
+    FFieldsLabel  : TLabelContainer;
+    FHeritage     : TIdentList;
+    FHelper       : Boolean;
+    FHelperClass  : String;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment); Override;
+      iColumn : Integer; iImageIndex : TBADIImageIndex; AComment : TComment); Override;
+    Destructor Destroy; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function  AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Function  ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
@@ -190,6 +216,27 @@ Type
       @return  a TLabelContainer
     **)
     Property FieldsLabel : TLabelContainer Read FFieldsLabel Write FFieldsLabel;
+    (**
+      Returns a reference to the object class heritage.
+      @precon  None.
+      @postcon Returns a reference to the object class heritage.
+      @return  a TIdentList
+     **)
+    Property Heritage : TIdentList Read FHeritage;
+    (**
+      This property gets or sets whether the class is a helper class.
+      @precon  None.
+      @postcon Gets or sets whether the class is a helper class.
+      @return  a Boolean
+    **)
+    Property HelperClass : Boolean Read FHelper Write FHelper;
+    (**
+      This property gets or sets the class name of the class to be helped.
+      @precon  None.
+      @postcon Gets or sets the class name of the class to be helped.
+      @return  a String
+    **)
+    Property HelperClassName : String Read FHelperClass Write FHelperClass;
   End;
 
   (** A class to represent a Object Pascal Parameter. **)
@@ -206,7 +253,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
     FDirectives           : TStringList;
     FResolved             : Boolean;
-    FObjClsInt            : TObjectDecl;
+    FRecObjClsInt         : TRecordDecl;
     FTypesLabel           : TLabelContainer;
     FVariablesLabel       : TLabelContainer;
     FConstantsLabel       : TLabelContainer;
@@ -237,12 +284,12 @@ Type
     **)
     Property Resolved : Boolean Read FResolved Write FResolved;
     (**
-      This property returns the object/class that the method belongs to.
+      This property returns the record/object/class that the method belongs to.
       @precon  None.
-      @postcon Returns the object/class that the method belongs to.
-      @return  a TObjectDecl
+      @postcon Returns the record/object/class that the method belongs to.
+      @return  a TRecordDecl
     **)
-    Property ObjClsInt : TObjectDecl Read FObjClsInt Write FObjClsInt;
+    Property RecObjClsInt : TRecordDecl Read FRecObjClsInt Write FRecObjClsInt;
     (**
       This property gets or sets the types label for the module.
       @precon  None.
@@ -296,11 +343,12 @@ Type
     FDispIDSpec: String;
     FReadOnlySpec: Boolean;
     FWriteOnlySpec: Boolean;
+    FIsClassProperty : Boolean;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetName : String; Override;
   Public
     Constructor Create(strIdent: String; AScope: TScope; iLine, iCol : Integer;
-      AImageIndex : TImageIndex; AComment : TComment); Override;
+      AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
@@ -374,6 +422,13 @@ Type
       @return  a Boolean
     **)
     Property WriteOnlySpec : Boolean Read FWriteOnlySpec Write FWriteOnlySpec;
+    (**
+      Returns whether the property has a class prefix.
+      @precon  None.
+      @postcon gets or sets the property.
+      @return  a Boolean
+    **)
+    Property IsClassProperty : Boolean Read FIsClassProperty Write FIsClassProperty;
   End;
 
   (** This class defines a property specifier. **)
@@ -387,22 +442,11 @@ Type
   definition **)
   TObjectDecl = Class(TRecordDecl)
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FHeritage : TIdentList;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment); Override;
-    Destructor Destroy; Override;
     procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
-    (**
-      Returns a reference to the object class heritage.
-      @precon  None.
-      @postcon Returns a reference to the object class heritage.
-      @return  a TIdentList
-     **)
-    Property Heritage : TIdentList Read FHeritage;
   End;
 
   (** This is a class the extends the object definition to handle an class
@@ -483,7 +527,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property determines it the constant is typed or simple.
@@ -527,7 +571,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment); Override;
+      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets whether the symbol is resolved.
@@ -558,7 +602,9 @@ Type
 
   (** This is a record to represent the token information for type declaration. **)
   TTypeToken = Record
-    FToken       : TTokenInfo;
+    FIdentifier  : String;
+    FLine        : Integer;
+    FColumn      : Integer;
     FScope       : TScope;
     FComment     : TComment;
     FContainer   : TElementContainer;
@@ -569,6 +615,10 @@ Type
     rtClassVars);
   (** A set of reference checks that need to be undertaken. **)
   TRefTypes = Set of TRefType;
+
+  (** This is a set of permissible method which are allowed on a record, object, class,
+      or interface. **)
+  TPermissibleMethods = Set Of TMethodType;
 
   (**
 
@@ -594,161 +644,200 @@ Type
     FSourceCodeForProfiling  : TStringList;
     { Grammar Parsers }
     Procedure Goal;
-    Function OPProgram : Boolean;
-    Function OPUnit : Boolean;
-    Function OPPackage : Boolean;
-    Function OPLibrary : Boolean;
+    Function  OPProgram : Boolean;
+    Function  OPUnit : Boolean;
+    Function  OPPackage : Boolean;
+    Function  OPLibrary : Boolean;
     Procedure ProgramBlock;
     procedure UsesClause;
-    Function PortabilityDirective : Boolean;
+    Function  PortabilityDirective : Boolean;
     Procedure InterfaceSection;
     Procedure InterfaceDecl;
-    Function ExportedHeading(Container : TElementContainer) : Boolean;
+    Function  ExportedHeading(Container : TElementContainer) : Boolean;
     Procedure ImplementationSection;
     Procedure Block(AScope : TScope; Method : TPascalMethod);
-    Function ExportsStmt : Boolean;
+    Function  ExportsStmt : Boolean;
     procedure ExportsItem(Container : TElementContainer);
     Procedure DeclSection(AScope : TScope; Container : TElementContainer);
-    Function LabelDeclSection(Container : TElementContainer) : Boolean;
-    Function ConstSection(AScope : TScope; Container : TElementContainer) : Boolean;
-    Function ConstantDecl(AScope : TScope; Container : TElementContainer) : Boolean;
-    Function ResStringSection(AScope: TScope): Boolean;
-    Function ResourceStringDecl(AScope: TScope; Container : TElementContainer): Boolean;
-    Function TypeSection(AScope : TScope; Container : TElementContainer) : Boolean;
-    Function TypeDecl(AScope : TScope; Container : TElementContainer) : Boolean;
-    Function GetTypeDecl(AToken : TTypeToken) : TGenericTypeDecl;
-    Function TypedConstant(C: TElementContainer; T : TGenericTypeDecl) : Boolean;
-    Function ArrayConstant(C: TElementContainer; T : TGenericTypeDecl) : Boolean;
-    Function RecordConstant(C: TElementContainer; T : TGenericTypeDecl) : Boolean;
-    Function RecordFieldConstant(C : TElementContainer; T : TGenericTypeDecl) : Boolean;
-    function OPType(AToken : TTypeToken) : TGenericTypeDecl;
-    function RestrictedType(AToken : TTypeToken) : TRestrictedType;
-    Function ClassRefType(AToken : TTypeToken) : TClassRefType;
-    Function SimpleType(AToken : TTypeToken) : TSimpleType;
-    function RealType(AToken : TTypeToken) : TRealType;
-    function OrdinalType(AToken : TTypeToken) : TOrdinalType;
-    function OrdIdent(AToken : TTypeToken) : TOrdIdent;
-    Function VariantType(AToken : TTypeToken) : TVariantType;
-    function SubRangeType(AToken : TTypeToken) : TSubRangeType;
-    function EnumerateType(AToken : TTypeToken) : TEnumerateType;
+    Function  LabelDeclSection(Container : TElementContainer) : Boolean;
+    Function  ConstSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  ConstantDecl(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  ResStringSection(AScope: TScope): Boolean;
+    Function  ResourceStringDecl(AScope: TScope; Container : TElementContainer): Boolean;
+    Function  TypeSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  TypeDecl(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  GetTypeDecl(AToken : TTypeToken) : TTypes;
+    Function  TypedConstant(C: TElementContainer; T : TGenericTypeDecl) : Boolean;
+    Function  ArrayConstant(C: TElementContainer; T : TGenericTypeDecl) : Boolean;
+    Function  RecordConstant(C: TElementContainer; T : TGenericTypeDecl) : Boolean;
+    Function  RecordFieldConstant(C : TElementContainer; T : TGenericTypeDecl) : Boolean;
+    function  OPType(AToken : TTypeToken) : TTypes;
+    function  RestrictedType(AToken : TTypeToken) : TRestrictedType;
+    Function  ClassRefType(AToken : TTypeToken) : TClassRefType;
+    Function  SimpleType(AToken : TTypeToken) : TSimpleType;
+    function  RealType(AToken : TTypeToken) : TRealType;
+    function  OrdinalType(AToken : TTypeToken) : TOrdinalType;
+    function  OrdIdent(AToken : TTypeToken) : TOrdIdent;
+    Function  VariantType(AToken : TTypeToken) : TVariantType;
+    function  SubRangeType(AToken : TTypeToken) : TSubRangeType;
+    function  EnumerateType(AToken : TTypeToken) : TEnumerateType;
     Procedure EnumerateElement(EnumerateType : TEnumerateType);
-    Function StringType(AToken : TTypeToken) : TStringType;
-    Function StrucType(AToken : TTypeToken) : TGenericTypeDecl;
-    function ArrayType(boolPacked : Boolean; AToken : TTypeToken): TArrayType;
-    Function RecType(boolPacked : Boolean; AToken : TTypeToken) : TRecordDecl;
-    Function FieldList(Rec : TRecordDecl; InternalScope : TScope) : Boolean;
-    Function FieldDecl(Rec: TRecordDecl; InteralScope : TScope) : Boolean;
+    Function  StringType(AToken : TTypeToken) : TStringType;
+    Function  StrucType(AToken : TTypeToken) : TTypes;
+    function  ArrayType(boolPacked : Boolean; AToken : TTypeToken): TArrayType;
+    Function  RecType(boolPacked : Boolean; AToken : TTypeToken) : TRecordDecl;
+    Procedure RecordVisibility(var AScope : TScope);
+    Function  RecordTypeSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  RecordConstSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  RecordVarSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  RecordClassVarSection(AScope : TScope; Cls : TRecordDecl) : Boolean;
+    Function  RecordMethodList(Cls : TRecordDecl; AScope : TScope;
+      PermissibleMethods : TPermissibleMethods) : Boolean;
+    Function  RecordPropertyList(Cls : TRecordDecl; var AScope : TScope) : Boolean;
+    Function  RecordFieldList(Rec : TRecordDecl; InternalScope : TScope) : Boolean;
+    Function  FieldDecl(Rec: TRecordDecl; InteralScope : TScope) : Boolean;
     procedure RecVariant(Rec: TRecordDecl; InternalScope : TScope);
-    function SetType(boolPacked: Boolean; AToken : TTypeToken): TSetType;
-    function FileType(boolPacked: Boolean; AToken : TTypeToken): TFileType;
-    Function VariantSection(Rec: TRecordDecl; InternalScope : TScope) : Boolean;
-    Function PointerType(AToken : TTypeToken) : TPointerType;
-    Function ProcedureType(AToken : TTypeToken) : TProcedureType;
-    Function VarSection(AScope : TScope; Container : TElementContainer) : Boolean;
-    Function ClassVarSection(AScope : TScope; Cls : TRecordDecl) : Boolean;
-    Function ThreadVarSection(AScope : TScope; Container : TElementContainer) : Boolean;
-    Function VarDecl(AScope : TScope; VarSection : TElementContainer;
-      AImageIndex : TImageIndex) : Boolean;
-    Function ThreadVarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
+    function  SetType(boolPacked: Boolean; AToken : TTypeToken): TSetType;
+    function  FileType(boolPacked: Boolean; AToken : TTypeToken): TFileType;
+    Function  RecordVariantSection(Rec: TRecordDecl; InternalScope : TScope) : Boolean;
+    Function  PointerType(AToken : TTypeToken) : TPointerType;
+    Function  ProcedureType(AToken : TTypeToken) : TProcedureType;
+    Function  AnonymousReferenceType(AToken : TTypeToken) : TAnonymousReferenceType;
+    Function  VarSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  ThreadVarSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  VarDecl(AScope : TScope; VarSection : TElementContainer;
+      AImageIndex : TBADIImageIndex) : Boolean;
+    Function  ThreadVarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
     Procedure Expression(C : TElementContainer; var ExprType : TExprTypes);
     Procedure SimpleExpression(C : TElementContainer; var ExprType : TExprTypes);
     Procedure Term(C : TElementContainer; var ExprType : TExprTypes);
     Procedure Factor(C : TElementContainer; var ExprType : TExprTypes);
-    Function RelOp(C : TElementContainer; ExprType : TExprTypes) : Boolean;
-    Function AddOp(C : TElementContainer) : Boolean;
-    Function MulOp(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
-    Function Designator(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
+    Function  RelOp(C : TElementContainer; ExprType : TExprTypes) : Boolean;
+    Function  AddOp(C : TElementContainer) : Boolean;
+    Function  MulOp(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
+    Function  Designator(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
     Procedure DesignatorSubElement(C : TElementContainer; var ExprType : TExprTypes;
       strValidSymbols : Array of String);
-    Function SetConstructor(C : TElementContainer) : Boolean;
+    Function  SetConstructor(C : TElementContainer) : Boolean;
     Procedure SetElement(C : TElementContainer);
     Procedure ExprList(C : TElementContainer);
+    Procedure MethodExprList(C : TElementContainer);
     Procedure Statement;
     Procedure StmtList;
     Procedure SimpleStatement;
-    Function StructStmt : Boolean;
-    Function CompoundStmt(Method : TGenericFunction) : Boolean;
-    Function ConditionalStmt : Boolean;
-    Function IfStmt : Boolean;
-    Function CaseStmt : Boolean;
+    Function  StructStmt : Boolean;
+    Function  CompoundStmt(Method : TGenericFunction) : Boolean;
+    Function  ConditionalStmt : Boolean;
+    Function  IfStmt : Boolean;
+    Function  CaseStmt : Boolean;
     Procedure CaseSelector;
     Procedure CaseLabel;
-    Function LoopStmt : Boolean;
-    Function RepeatStmt : Boolean;
-    Function WhileStmt : Boolean;
-    Function ForStmt : Boolean;
-    Function WithStmt : Boolean;
-    Function TryExceptAndFinallyStmt : Boolean;
-    Function ExceptionBlock : Boolean;
-    Function RaiseStmt : Boolean;
-    Function AssemblerStatement : Boolean;
-    Function ProcedureDeclSection(AScope : TScope) : Boolean;
-    Function ProcedureDecl(AScope : TScope) : TPascalMethod;
-    Function FunctionDecl(AScope : TScope) : TPascalMethod;
-    Function ConstructorDecl(AScope : TScope) : TPascalMethod;
-    Function DestructorDecl(AScope : TScope) : TPascalMethod;
-    Function OperatorDecl(AScope : TScope) : TPascalMethod;
-    Function FunctionHeading(AScope :TScope; Container : TElementContainer; boolIdent : Boolean = True) : TPascalMethod;
-    Function ProcedureHeading(AScope : TScope; Container : TElementContainer; boolIdent : Boolean = True) : TPascalMethod;
-    Function OperatorHeading(AScope :TScope; Container : TElementContainer; boolIdent : Boolean = True) : TPascalMethod;
+    Function  LoopStmt : Boolean;
+    Function  RepeatStmt : Boolean;
+    Function  WhileStmt : Boolean;
+    Function  ForStmt : Boolean;
+    Function  WithStmt : Boolean;
+    Function  TryExceptAndFinallyStmt : Boolean;
+    Function  ExceptionBlock : Boolean;
+    Function  RaiseStmt : Boolean;
+    Function  AssemblerStatement : Boolean;
+    Function  ProcedureDeclSection(AScope : TScope) : Boolean;
+    Function  ProcedureDecl(AScope : TScope) : TPascalMethod;
+    Function  FunctionDecl(AScope : TScope) : TPascalMethod;
+    Function  ConstructorDecl(AScope : TScope) : TPascalMethod;
+    Function  DestructorDecl(AScope : TScope) : TPascalMethod;
+    Function  OperatorDecl(AScope : TScope) : TPascalMethod;
+    Function  FunctionHeading(AScope :TScope; Container : TElementContainer; boolIdent : Boolean = True) : TPascalMethod;
+    Function  ProcedureHeading(AScope : TScope; Container : TElementContainer; boolIdent : Boolean = True) : TPascalMethod;
+    Function  OperatorHeading(AScope :TScope; Container : TElementContainer; boolIdent : Boolean = True) : TPascalMethod;
     Procedure FormalParameter(Method : TPascalMethod);
     Procedure FormalParam(Method : TPascalMethod);
     Procedure Parameter(Method : TPascalMethod; ParamMod : TParamModifier);
     Procedure Directive(M : TPascalMethod; boolGrammarFix : Boolean = False);
-    Function ObjectType(AToken : TTypeToken) : TObjectDecl;
+    Function  ObjectType(AToken : TTypeToken) : TObjectDecl;
     Procedure ObjHeritage(ObjDecl : TObjectDecl);
-    Function MethodList(Cls : TRecordDecl; AScope : TScope) : Boolean;
-    function MethodHeading(Cls: TRecordDecl; AScope: TScope): Boolean;
-    Function ConstructorHeading(AScope :TScope; Container : TElementContainer) : TPascalMethod;
-    Function DestructorHeading(AScope :TScope; Container : TElementContainer) : TPascalMethod;
-    Function ObjFieldList(Cls : TObjectDecl; AScope : TScope) : Boolean;
+    Procedure ObjVisibility(var AScope : TScope);
+    Function  ObjTypeSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  ObjConstSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  ObjVarSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  ObjClassVarSection(AScope : TScope; Cls : TRecordDecl) : Boolean;
+    Function  ObjMethodList(Cls : TRecordDecl; AScope : TScope;
+      PermissibleMethods : TPermissibleMethods) : Boolean;
+    Function  ObjPropertyList(Cls : TRecordDecl; var AScope : TScope) : Boolean;
+    Function  ObjFieldList(Rec : TRecordDecl; InternalScope : TScope) : Boolean;
+    Function  MethodList(Cls : TRecordDecl; AScope : TScope;
+      PermissibleMethods : TPermissibleMethods) : Boolean;
+    function  MethodHeading(Cls: TRecordDecl; AScope: TScope;
+      PermissibleMethods : TPermissibleMethods): Boolean;
+    Function  ConstructorHeading(AScope :TScope; Container : TElementContainer) : TPascalMethod;
+    Function  DestructorHeading(AScope :TScope; Container : TElementContainer) : TPascalMethod;
     Procedure InitSection;
-    Function ClassType(AToken : TTypeToken) : TClassDecl;
-    Procedure ClassHeritage(Cls : TObjectDecl);
+    Function  ClassType(AToken : TTypeToken) : TClassDecl;
+    Procedure RecObjClsIntHeritage(RecObjClsInt : TRecordDecl);
     procedure ClassVisibility(var AScope : TScope);
-    Function ClassFieldList(Cls : TObjectDecl; AScope : TScope) : Boolean;
-    Function ClassMethodList(Cls : TRecordDecl; AScope : TScope) : Boolean;
-    Function ClassPropertyList(Cls : TRecordDecl; var AScope : TScope) : Boolean;
-    Function PropertyList(Cls : TRecordDecl; var AScope : TScope) : Boolean;
+    Function  ClassTypeSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  ClassConstSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  ClassVarSection(AScope : TScope; Container : TElementContainer) : Boolean;
+    Function  ClassClassVarSection(AScope : TScope; Cls : TRecordDecl) : Boolean;
+    Function  ClassMethodList(Cls : TRecordDecl; AScope : TScope;
+      PermissibleMethods : TPermissibleMethods) : Boolean;
+    Function  ClassPropertyList(Cls : TRecordDecl; var AScope : TScope) : Boolean;
+    Function  ClassFieldList(Cls : TObjectDecl; AScope : TScope) : Boolean;
+    Function  FieldList(Cls : TObjectDecl; AScope : TScope) : Boolean;
+    Function  PropertyList(Cls : TRecordDecl; var AScope : TScope) : Boolean;
     Procedure PropertyInterface(Prop : TPascalProperty);
     Procedure PropertyParameterList(Prop : TPascalProperty);
     Procedure PropertySpecifiers(Prop : TPascalProperty);
     Function  InterfaceType(AToken : TTypeToken) : TInterfaceDecl;
     Procedure InterfaceHeritage(InterfaceDecl : TInterfaceDecl);
+    Function  InterfaceMethodList(Cls : TRecordDecl; AScope : TScope;
+      PermissibleMethods : TPermissibleMethods) : Boolean;
+    Function  InterfacePropertyList(Cls : TRecordDecl; var AScope : TScope) : Boolean;
     Procedure RequiresClause;
     procedure ContainsClause;
     Procedure IdentList(Container : TElementContainer; SeekTokens : Array Of String;
-      iImageIndex : TImageIndex = iiNone);
-    Function TypeId(Container: TElementContainer) : Boolean;
-    Function ConstExpr(Container: TElementContainer; var ExprType : TExprTypes) : Boolean;
+      iImageIndex : TBADIImageIndex = iiNone);
+    Function  TypeId(Container: TElementContainer) : Boolean;
+    Function  ConstExpr(Container: TElementContainer; var ExprType : TExprTypes) : Boolean;
     Procedure RTTIAttributes;
     Procedure AttributeDeclaration;
+    Procedure TypeParams(var strIdentifier : String);
+    Procedure TypeParamDeclList(var strIdentifier : String);
+    Procedure TypeParamDecl(var strIdentifier : String);
+    Procedure TypeParamList(var strIdentifier : String);
+    Procedure ConstraintList;
+    Procedure Constraint;
+    Procedure FormalTypeParamList(var strIdentifier : String);
+    Function  MethodQualifiers(AScope :TScope;
+      Container : TElementContainer; iMethodType : TMethodType; boolClassMethod : Boolean;
+      C : TComment; boolIdent : Boolean = True) : TPascalMethod;
+    Procedure TypeArgs(Container : TElementContainer);
+    Function  AnonymousMethod(Container : TElementContainer) : Boolean;
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
     procedure ArrayElement(C : TElementContainer; iStartDimension: Integer; AT : TArrayType);
-    Function CheckReturnValue(Method : TPascalMethod) : Boolean;
+    Function  CheckReturnValue(Method : TGenericFunction) : Boolean;
     Procedure CheckAlias(Method : TPascalMethod);
-    Function CheckNumberType(ExprType : TExprTypes) : Boolean;
+    Function  CheckNumberType(ExprType : TExprTypes) : Boolean;
     Procedure UpdateTypeToken(var AToken : TTypeToken); {$IFDEF D2005} InLine; {$ENDIF}
     Procedure AddToContainer(Container : TElementContainer; var Method : TPascalMethod);
     Procedure TidyUpEmptyElements;
     Procedure CheckUnResolvedMethods;
-    procedure ResolveScopeOfImplementedClassMethods(StartLabel : TLabelContainer);
+    procedure ResolveScopeOfImplementedMethods(StartLabel : TLabelContainer);
     procedure ResolveScopeOfImplementedExportedMethods;
     procedure ResolveScopeOfImplementedExportsMethods;
-    procedure FindUnresolvedObjectAndClassMethods(TypeLabel : TLabelContainer);
+    procedure FindUnresolvedRecordObjectAndClassMethods(TypeLabel : TLabelContainer);
     procedure FindUnresolvedExportedMethods;
     {procedure FindUnresolvedExportsMethods;}
     procedure FindUnresolvedImplementedClassMethods(StartLabel : TLabelContainer);
-    Function FindObjClsInt(slClassNames : TStringList) : TObjectDecl;
-    procedure ProcessClsIdents(Container : TElementContainer;
-      slClassNames : TStringList; var strIdentifier : String; var iLine,
-      iColumn : Integer);
+    Function  FindRecObjClsInt(slClassNames : TStringList) : TRecordDecl;
+    Function  IsIdentifier(AToken : TTokenInfo) : Boolean;
+    Procedure ProcessIncludeDirective(strToken : String);
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    function GetCurrentMethod: TPascalMethod;
-    Function GetModuleName : String; Override;
-    Function GetComment(
+    function  GetCurrentMethod: TPascalMethod;
+    Function  GetModuleName : String; Override;
+    Function  GetComment(
       CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
     Procedure CheckFunctionReturn(Func : TPascalMethod);
@@ -780,13 +869,19 @@ Type
 
 Implementation
 
-uses DGHLibrary;
+Uses
+  DGHLibrary;
 
 Resourcestring
   (** This is an error message for rendering a temporay container - SHOULDN'T do this **)
   strTriedToRenderTmpCntr = 'Tried to Render a Temporary Container!';
   (** This is an error message for duplicate identifiers. **)
   strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found at line %d column %d.';
+  (** This is an error message for an invalid operator name. **)
+  strInvalidOperator = 'Invalid operator ''%s'' at line %d column %d.';
+  (** This is an error message for method which is not permissible in a record, object,
+      class or interface **)
+  strMethodNotPermitted = 'The method "%s" is not permitted in this context at line %d column %d.';
 
 Const
   (** A set of characters for alpha characaters **)
@@ -800,6 +895,8 @@ Const
   strQuote : Set Of AnsiChar = [''''];
   (** A string representing the Array Of parameter type. **)
   strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
+  (** A string represetnation of whether a type is typed. **)
+  strIsTyped : Array[False..True] Of String = ('', ' Type');
 
   (**
     A sorted list of keywords. Used for identifying tokens as keyword.
@@ -815,10 +912,16 @@ Const
     'function', 'goto', 'if', 'implementation', 'in', 'inherited',
     'initialization', 'inline', 'interface', 'is', 'label', 'library', 'mod',
     'nil', 'not', 'object', 'of', 'on', 'or', 'out', 'packed',
-    'private', 'procedure', 'program', 'property', 'protected', 'public', 'published', 'raise', 'record', 'repeat',
-    'resourcestring', 'sealed', 'set', 'shl', 'shr', 'static', 'strict', 'string',
+    'private', 'procedure', 'program', 'property', 'protected', 'public', 'published',
+    'raise', 'record', 'reference', 'repeat',
+    'resourcestring', 'sealed', 'set', 'shl', 'shr', 'strict', 'string',
     'then', 'threadvar', 'to', 'try', 'type', 'unit', 'unsafe', 'until', 'uses',
     'var', 'while', 'with', 'xor'
+  );
+  (** A list of reserved words which are allows to be used as identifiers. **)
+  strIdentifierReservedWords : Array[0..4] Of String = (
+    'on', 'out', { 'private', 'protected', 'public', 'published', } 'reference', 'sealed',
+    { 'strict', } 'unsafe'
   );
   (** A sorted list of directives. Used for identifying tokens as
   directives. **)
@@ -893,18 +996,104 @@ Const
   (** A list of strings representing the parameter modifiers for methods. **)
   strParamModifier : Array[pamNone..pamOut] Of String = ('', 'var ', 'const ',
     'out ');
+  (** A list of the valid operator names. **)
+  strOperatorList : Array[1..31] Of String = (
+    'add',
+    'bitwiseand',
+    'bitwisenot',
+    'bitwiseor',
+    'bitwisexor',
+    'dec',
+    'divide',
+    'equal',
+    'explicit',
+    'greaterthan',
+    'greaterthanorequal',
+    'implicit',
+    'in',
+    'inc',
+    'intdivide',
+    'leftshift',
+    'lessthan',
+    'lessthanorequal',
+    'logicaland',
+    'logicalnot',
+    'logicalor',
+    'logicalxor',
+    'modulus',
+    'multiply',
+    'negative',
+    'notequal',
+    'positive',
+    'rightshift',
+    'round',
+    'subtract',
+    'trunc'
+  );
 
 (**
 
+  This function builds a string representation of a parameter list. It will use a short
+  form for the same parameter types, i.e. Const a, b : Integer.
+
+  @precon  GF must be a valid instance.
+  @postcon A string is returned which represents the parameter list.
+
+  @param   GF                   as a TGenericFunction
+  @param   boolShowIdentifier   as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+Function BuildParameterRepresentation(GF : TGenericFunction; boolShowIdentifier,
+  boolForDocumentation : Boolean) : String;
+
+Const
+  strIsSame : Array[False..True] Of String = (';', ',');
+
+Var
+  iParam : Integer;
+  boolSameAsBefore :Boolean;
+  boolSameAsAfter :Boolean;
+
+Begin
+  Result := '';
+  For iParam := 0 To GF.ParameterCount - 1 Do
+    Begin
+      If boolForDocumentation Then
+        Result := Result + #32#32;
+      boolSameAsBefore := (iParam > 0) And (GF.Parameters[iParam].IsEquals(GF.Parameters[Pred(iParam)]));
+      boolSameAsAfter := (iParam < GF.ParameterCount - 1) And (GF.Parameters[iParam].IsEquals(GF.Parameters[Succ(iParam)]));
+      If Not boolSameAsBefore And boolSameAsAfter Then
+        Result := Result + strParamModifier[GF.Parameters[iParam].ParamModifier] + GF.Parameters[iParam].Identifier
+      Else If boolSameAsBefore And boolSameAsAfter Then
+        Result := Result + GF.Parameters[iParam].Identifier
+      Else If boolSameAsBefore And Not boolSameAsAfter Then
+        Begin
+          Result := Result + GF.Parameters[iParam].Identifier;
+          If GF.Parameters[iParam].ParamType <> Nil Then
+            Result := Result + ' : ' + GF.Parameters[iParam].ParamType.AsString(False,
+              boolForDocumentation);
+        End Else
+          Result := Result + GF.Parameters[iParam].AsString(boolShowIdentifier,
+            boolForDocumentation);
+      If iParam < GF.ParameterCount - 1 Then
+        Begin
+          If boolForDocumentation Then
+            Result := Result + strIsSame[boolSameAsAfter] + #13#10
+          Else
+            Result := Result + strIsSame[boolSameAsAfter] + ' ';
+        End;
+    End;
+End;
+
+(**
 
   This function creates a TTypeToken negating the need for a temporary
   variable.
 
-
   @precon  None.
-
   @postcon Creates a TTypeToken negating the need for a temporary variable.
-
 
   @param   AToken    as a TTokenInfo
   @param   AScope    as a TScope
@@ -917,11 +1106,21 @@ Function TypeToken(AToken : TTokenInfo; AScope : TScope; AComment : TComment;
   Container : TElementContainer) : TTypeToken;
 
 Begin
-  Result.FToken := AToken;
+  If AToken <> Nil Then
+    Begin
+      Result.FIdentifier := AToken.Token;
+      Result.FLine := AToken.Line;
+      Result.FColumn := AToken.Column;
+    End Else
+    Begin
+      Result.FIdentifier := '';
+      Result.FLine := 0;
+      Result.FColumn := 0;
+    End;
   Result.FScope := AScope;
   Result.FComment := AComment;
   Result.FContainer := Container;
-  Assert(Container <> Nil, 'Conatiner in TTypeToken is NULL!');
+  //Assert(Container <> Nil, 'Container in TTypeToken is NULL!');
 End;
 
 (**
@@ -1000,15 +1199,37 @@ End;
   @return  a String
 
 **)
-function TRecordDecl.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-begin
+Function TRecordDecl.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+
+Var
+  iToken: Integer;
+
+Begin
   Result := '';
   If boolShowIdentifier Then
     Result := Result + Identifier;
   If Result <> '' Then
     Result := Result + #32'='#32;
+  If IsTyped Then
+    Result := Result + 'Type ';
   Result := Result + 'Record';
-end;
+  If FHelper Then
+    Result := Result + #32'Helper';
+  If Heritage.ElementCount > 0 Then
+    Begin
+      Result := Result + '(';
+      For iToken := 1 To Heritage.ElementCount Do
+        Begin
+          Result := Result + Heritage.Elements[iToken].AsString(boolShowIdentifier,
+            boolForDocumentation);
+          If iToken < Heritage.ElementCount  Then
+            Result := Result + ','#32;
+        End;
+      Result := Result + ')';
+    End;
+  If FHelper Then
+    Result := Result + Format(' For %s', [FHelperClass]);
+End;
 
 (**
 
@@ -1021,16 +1242,33 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   iImageIndex as a TImageIndex
+  @param   iImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TRecordDecl.Create(strName : String; AScope : TScope; iLine,
-  iColumn : Integer; iImageIndex : TImageIndex; AComment : TComment);
+  iColumn : Integer; iImageIndex : TBADIImageIndex; AComment : TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, iImageIndex, AComment);
   FPacked := False;
+  FHeritage := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
+  FHeritage.Sorted := False;
 end;
+
+(**
+
+  A destructor for the TRecordDecl class.
+
+  @precon  None.
+  @postcon Frees the generic parameters.
+
+**)
+Destructor TRecordDecl.Destroy;
+
+Begin
+  FHeritage.Free;
+  Inherited Destroy;
+End;
 
 (**
 
@@ -1051,6 +1289,8 @@ begin
   Result := '';
   If boolShowIdentifier Then
     Result := Result + Identifier;
+//  If GenericParams <> Nil Then
+//    Result := Result + GenericParams.AsString;
   If Result <> '' Then
     Result := Result + #32'='#32;
   Result := Result + 'Interface';
@@ -1062,7 +1302,7 @@ begin
           Result := Result + Heritage.Elements[iToken].AsString(boolShowIdentifier,
             boolForDocumentation);
           If iToken < Heritage.ElementCount  Then
-            Result := Result + #32',';
+            Result := Result + ','#32;
         End;
       Result := Result + ')';
     End;
@@ -1126,8 +1366,13 @@ end;
 function TTypes.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 
 begin
-  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    '=', BrowseAndDocItOptions.MaxDocOutputWidth);
+  Result := BuildStringRepresentation(
+    boolShowIdentifier,
+    boolForDocumentation,
+    '=' + strIsTyped[FIsTyped],
+    BrowseAndDocItOptions.MaxDocOutputWidth,
+    strNoSpaceBeforeSymbols - ['(']
+  );
 end;
 
 (**
@@ -1141,12 +1386,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TConstant.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TImageIndex; AComment: TComment);
+  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FTyped := False;
@@ -1194,9 +1439,9 @@ Function TPascalParameter.AsString(boolShowIdentifier,
   boolForDocumentation : Boolean) : String;
 
 begin
-  Result := strParamModifier[ParamModifier];
+  Result := '';
   If boolShowIdentifier Then
-    Result := Result + Identifier;
+    Result := Result + strParamModifier[ParamModifier] + Identifier;
   If ParamType <> Nil Then
     Begin
       If boolShowIdentifier Then
@@ -1250,7 +1495,7 @@ begin
   FLabelsLabel          := Nil;
   FDirectives           := TStringList.Create;
   FResolved             := False;
-  FObjClsInt            := Nil;
+  FRecObjClsInt         := Nil;
 end;
 
 (**
@@ -1287,8 +1532,10 @@ Var
 
 begin
   Result := strMethodTypes[MethodType];
+  If ClassMethod Then
+    Result := 'Class ' + Result;
   If Name <> '' Then
-    If boolShowIdentifier Then
+    If boolShowIdentifier And (Identifier <> '') Then
       Result := Result + #32 + Identifier;
   If ParameterCount > 0 Then
     Begin
@@ -1296,27 +1543,14 @@ begin
         Result := Result + '('#13#10
       Else
         Result := Result + '(';
-      For i := 0 To ParameterCount - 1 Do
-        Begin
-          If boolForDocumentation Then
-            Result := Result + #32#32;
-          Result := Result + Parameters[i].AsString(boolShowIdentifier,
-            boolForDocumentation);
-          If i < ParameterCount - 1 Then
-            Begin
-              If boolForDocumentation Then
-                Result := Result + ';'#13#10
-              Else
-                Result := Result + '; ';
-            End;
-        End;
+      Result := Result + BuildParameterRepresentation(Self, boolShowIdentifier,
+        boolForDocumentation);
       If boolForDocumentation Then
         Result := Result + #13#10;
       Result := Result + ')';
     End;
-  If ReturnType <> Nil Then
-      Result := Result + #32':'#32 + ReturnType.AsString(boolShowIdentifier,
-        boolForDocumentation);
+  If ReturnType.ElementCount > 0 Then
+      Result := Result + #32':'#32 + ReturnType.AsString(False, boolForDocumentation);
   For i := 0 To FDirectives.Count - 1 Do
     Result := Result + '; ' + FDirectives[i];
 end;
@@ -1343,15 +1577,15 @@ begin
     Result := Format('PROC%4.4d', [Random(9999)]);
   For i := 0 To ParameterCount - 1 Do
     Begin
-      Result := Result + '.' + strParamModifier[Parameters[i].ParamModifier];
+      Result := Result + Format('.P%d.', [i]) + strParamModifier[Parameters[i].ParamModifier];
       If Parameters[i].ParamType <> Nil Then
         Begin
           Result := Result + strArrayOf[Parameters[i].ArrayOf];
           Result := Result + Parameters[i].ParamType.AsString(False, False);
         End;
-      If ReturnType <> Nil Then
-        Result := Result + ReturnType.AsString(False, False);
     End;
+  If ReturnType.ElementCount > 0 Then
+    Result := Result + '.R.' + ReturnType.AsString(False, False);
   If HasDirective('forward') Then
     Result := Result + '.Forward';
 end;
@@ -1431,11 +1665,11 @@ begin
       Result := True;
       Exit;
     End;
-  If ObjClsInt <> Nil Then
-    Result := ObjClsInt.ReferenceSymbol(AToken);
+  If RecObjClsInt <> Nil Then
+    Result := RecObjClsInt.ReferenceSymbol(AToken);
   If Result Then
     Exit;
-  Result := Inherited ReferenceSymbol(AToken); //: bug IS this a duplicate?
+  Result := Inherited ReferenceSymbol(AToken);
 end;
 
 (**
@@ -1449,12 +1683,12 @@ end;
   @param   AScope       as a TScope
   @param   iLine       as an Integer
   @param   iCol        as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 constructor TPascalProperty.Create(strIdent: String; AScope: TScope;
-  iLine, iCol : Integer; AImageIndex : TImageIndex; AComment : TComment);
+  iLine, iCol : Integer; AImageIndex : TBADIImageIndex; AComment : TComment);
 begin
   Inherited Create(strIdent, AScope, iLine, iCol, AImageIndex, AComment);
   FDefaultProperty := False;
@@ -1467,6 +1701,7 @@ begin
   FReadSpec := '';
   FStoredSpec := '';
   FWriteSpec := '';
+  FIsClassProperty := False;
 end;
 
 (**
@@ -1510,7 +1745,7 @@ begin
           Result := Result + strArrayOf[Parameters[i].ArrayOf];
           Result := Result + Parameters[i].ParamType.AsString(False, False);
         End;
-      If ReturnType <> Nil Then
+      If ReturnType.ElementCount > 0 Then
         Result := Result + ReturnType.AsString(False, False);
     End;
 end;
@@ -1565,6 +1800,8 @@ Var
 
 begin
   Result := 'Property ';
+  If IsClassProperty Then
+    Result := 'Class ' + Result;
   If boolShowIdentifier Then
     Result := Result + Identifier;
   If ParameterCount > 0 Then
@@ -1572,24 +1809,16 @@ begin
       Result := Result + '[';
       If boolForDocumentation Then
         Result := Result + #13#10;
-      For i := 0 To ParameterCount - 1 Do
-        Begin
-          If boolForDocumentation Then
-            Result := Result + #32#32;
-            Result := Result + Parameters[i].AsString(boolShowIdentifier,
-              boolForDocumentation);
-            If i < ParameterCount - 1 Then
-              Result := Result + '; ';
-          If boolForDocumentation Then
-            Result := Result + #13#10;
-          End;
+      Result := Result + BuildParameterRepresentation(Self, boolShowIdentifier,
+        boolForDocumentation);
+      If boolForDocumentation Then
+        Result := Result + #13#10;
       Result := Result + ']';
     End;
-  Result := Result + #32':'#32;
-  If ReturnType <> Nil Then
+  If ReturnType.ElementCount > 0 Then
     Begin
-      For i := 0 To ReturnType.TokenCount - 1 Do
-        Result := Result + ReturnType.AsString(boolShowIdentifier, boolForDocumentation);
+      Result := Result + #32':'#32;
+      Result := Result + ReturnType.AsString(False, boolForDocumentation);
     End;
   If boolForDocumentation Then
     Result := Result + #13#10;
@@ -1668,17 +1897,9 @@ end;
 **)
 function TField.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
 
-Var
-  iToken : Integer;
-
 begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
-  If Result <> '' Then
-    Result := Result + #32':';
-  For iToken := 0 To TokenCount - 1 Do
-    Result := Result + #32 + Tokens[iToken].Token;
+  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, ':',
+    BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
 
 (**
@@ -1713,12 +1934,12 @@ end;
   @param   AScope      as a TScope
   @param   iLine       as an Integer
   @param   iColumn     as an Integer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @param   AComment    as a TComment
 
 **)
 Constructor TExportsItem.Create(strName : String; AScope : TScope; iLine,
-  iColumn : Integer; AImageIndex : TImageIndex; AComment : TComment);
+  iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment);
 
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
@@ -1771,43 +1992,6 @@ function TVar.AsString(boolShowIdentifier, boolForDocumentation : Boolean): Stri
 begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
     ':', BrowseAndDocItOptions.MaxDocOutputWidth);
-end;
-
-(**
-
-  This is the constructor method for the TObjectDecl class.
-
-  @precon  None.
-  @postcon Creates an internal Heritage list.
-
-  @param   strName     as a String
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   iImageIndex as a TImageIndex
-  @param   AComment    as a TComment
-
-**)
-constructor TObjectDecl.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; iImageIndex: TImageIndex; AComment: TComment);
-begin
-  Inherited Create(strName, AScope, iLine, iColumn, iImageIndex, AComment);
-  FHeritage := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
-  FHeritage.Sorted := False;
-end;
-
-(**
-
-  This is the destructor method for the TObjectDecl class.
-
-  @precon  None.
-  @postcon Destroy the Heritage list.
-
-**)
-destructor TObjectDecl.Destroy;
-begin
-  FHeritage.Free;
-  Inherited Destroy;
 end;
 
 (**
@@ -1866,13 +2050,13 @@ Var
 
 begin
   Result := Identifier + #32'='#32'Object';
-  If FHeritage.TokenCount > 0 Then
+  If Heritage.TokenCount > 0 Then
     Begin
       Result := Result + '(';
-      For iToken := 0 To FHeritage.TokenCount - 1 Do
+      For iToken := 0 To Heritage.TokenCount - 1 Do
         Begin
-          Result := Result + FHeritage.Tokens[iToken].Token;
-          If iToken < FHeritage.TokenCount - 1  Then
+          Result := Result + Heritage.Tokens[iToken].Token;
+          If iToken < Heritage.TokenCount - 1  Then
             Result := Result + #32',';
         End;
       Result := Result + ')';
@@ -1902,6 +2086,8 @@ begin
     Result := Result + Identifier;
   If Result <> '' Then
     Result := Result + #32'='#32;
+  If IsTyped Then
+    Result := Result + 'Type ';
   Result := Result + 'Class';
   If FAbstractClass Then
     Result := Result + #32'Abstract';
@@ -2033,7 +2219,7 @@ Const
   (** Growth size of the token buffer. **)
   iTokenCapacity = 100;
   strSingleSymbols : Set Of AnsiChar = ['(', ')', ';', ',', '[', ']', '^',
-    '-', '+', '/', '*'];
+    '-', '+', '/', '*', '<', '>'];
 
 Var
   (** Token buffer. **)
@@ -2267,7 +2453,7 @@ procedure TPascalModule.AddToContainer(Container: TElementContainer;
   var Method: TPascalMethod);
 
 Var
-  iIcon : TImageIndex;
+  iIcon : TBADIImageIndex;
   AScope : TScope;
   E : TElementContainer;
   tmpMethod : TPascalMethod;
@@ -2288,16 +2474,20 @@ begin
           E := FTypesLabel;
           If E <> Nil Then
             For iCls := 0 To Method.ClassNames.Count - 1 Do
-              Begin
-                E := E.FindElement(Method.ClassNames[iCls]);
-                If E <> Nil Then
-                  Begin
-                    iIcon := E.ImageIndex;
-                    AScope := E.Scope;
-                  End;
-                Container := Container.Add(TLabelContainer.Create(
-                  Method.ClassNames[iCls], AScope, 0, 0, iIcon, Nil));
-              End;
+              If E <> Nil Then
+                Begin
+                  E := E.FindElement(Method.ClassNames[iCls]);
+                  If E <> Nil Then
+                    Begin
+                      iIcon := E.ImageIndex;
+                      AScope := E.Scope;
+                      E := E.FindElement('Types');
+                    End;
+                  Container := Container.Add(TLabelContainer.Create(
+                    Method.ClassNames[iCls], AScope, 0, 0, iIcon, Nil));
+                  // Need to add a Types container to the E.FindElement search before
+                  // looking for another class.
+                End;
         End;
       If Container Is TRecordDecl Then
         Begin
@@ -2459,8 +2649,6 @@ End;
   module. It finds the first non comment token and begins the grammar checking
   from their by deligating to the program, library, unit and package methods.
 
-  @grammar Goal -> ( Program | Package | Library | Unit )
-
   @precon  None.
   @postcon It finds the first non comment token and begins the grammar checking
            from their by deligating to the program, library, unit and package
@@ -2511,9 +2699,6 @@ end;
   This method parses a Program declaration from the current token
   position using the following object pascal grammar.
 
-  @grammar Program -> [ PROGRAM Ident [ '(' IdentList ')' ';' ]
-                      ProgramBlock '.'
-
   @precon  None.
   @postcon Returns true is a program section was parsed.
 
@@ -2529,7 +2714,7 @@ begin
       Comment := GetComment;
       ModuleType := mtProgram;
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier, ttDirective] Then
+      If IsIdentifier(Token) Then
         Begin
           ModuleName := Token.Token;
           ModuleNameLine := Token.Line;
@@ -2570,11 +2755,6 @@ end;
   This method parses a unit declaration from the current token position using
   the following object pascal grammar.
 
-  @grammar Unit -> UNIT Ident ';'
-                   InterfaceSection
-                   ImplementationSection
-                   InitSection '.'
-
   @precon  None.
   @postcon Returns true if a unit section was parsed.
 
@@ -2590,7 +2770,7 @@ Begin
       Comment := GetComment;
       ModuleType := mtUnit;
       NextNonCommentToken;
-      If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
+      If Not IsIdentifier(Token) Then
         ErrorAndSeekToken(strIdentExpected, 'OPUnit', Token.Token,
           strSeekableOnErrorTokens, stActual)
       Else
@@ -2604,7 +2784,7 @@ Begin
         Begin
           ModuleName := ModuleName + '.';
           NextNonCommentToken;
-          If Token.TokenType In [ttIdentifier, ttDirective] Then
+          If IsIdentifier(Token) Then
             Begin
               ModuleName := ModuleName + '.';
               NextNonCommentToken;
@@ -2634,11 +2814,6 @@ End;
   This method parses a package declaration from the current token position
   using the following object pascal grammar.
 
-  @grammar Package -> PACKAGE Ident ';'
-                      [ RequiresClause ]
-                      [ ContainsClause ]
-                      END '.'
-
   @precon  None.
   @postcon Returns true is a package section was parsed.
 
@@ -2654,7 +2829,7 @@ begin
       Comment := GetComment;
       ModuleType := mtPackage;
       NextNonCommentToken;
-      If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
+      If Not IsIdentifier(Token) Then
         ErrorAndSeekToken(strIdentExpected, 'OPPackage', Token.Token,
           strSeekableOnErrorTokens, stActual)
       Else
@@ -2689,9 +2864,6 @@ end;
   This method parses the Library declaration from the current token using the
   following object pascal grammar.
 
-  @grammar Library -> LIBRARY Ident ';'
-                      ProgramBlock '.'
-
   @precon  None.
   @postcon Returns true is a library section was parsed.
 
@@ -2707,7 +2879,7 @@ begin
       Comment := GetComment;
       ModuleType := mtLibrary;
       NextNonCommentToken;
-      If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
+      If Not IsIdentifier(Token) Then
         ErrorAndSeekToken(strIdentExpected, 'OPLibary', Token.Token,
           strSeekableOnErrorTokens, stActual)
       Else
@@ -2739,9 +2911,6 @@ end;
   This method parses a program block from the current token position using
   the following object pascal grammar.
 
-  @grammar ProgramBlock -> [ UsesClause ]
-                           Block
-
   @precon  None.
   @postcon Parses a program block from the current token position using the
            following object pascal grammar.
@@ -2757,8 +2926,6 @@ end;
 
   This method parses the Uses clause declaration from the current token
   position using the following object pascal grammar.
-
-  @grammar Uses -> USES IdentList ';'
 
   @precon  None.
   @postcon Parses the Uses clause declaration from the current token position
@@ -2791,10 +2958,6 @@ End;
   This method attempts to parse the current token position as a Portability
   directive.
 
-  @grammar PortabilityDirective -> platform
-                                -> deprecated
-                                -> library
-
   @precon  None.
   @postcon Attempts to parse the current token position as a Portability
            directive.
@@ -2819,9 +2982,10 @@ Begin
           NextNonCommentToken; //: @note Does not get added to any symbols.
       If Token.Token = ';' Then
         Begin
+          PushTokenPosition;
           NextNonCommentToken;
           If Not IsKeyWord(Token.Token, strPortabilityDirective) Then
-            RollBackToken;
+            PopTokenPosition;
         End;
     End;
 End;
@@ -2830,10 +2994,6 @@ End;
 
   This method parses an interface section from the current token position using
   the following object pascal grammar.
-
-  @grammar  InterfaceSection -> INTERFACE
-                               [ UsesClause ]
-                               [ InterfaceDecl ] ...
 
   @precon  None.
   @postcon Parses an interface section from the current token position using
@@ -2857,14 +3017,6 @@ End;
 
   This method parses an interface declaration from the current token position
   using the following object pascal grammar.
-
-  @grammar InterfaceDecl -> ConstSection
-                            ResStringSection
-                            TypeSection
-                            VarSection
-                            ThreadvarSection
-                            ExportedHeading
-                            ExportedProcs
 
   @precon  None.
   @postcon Parses an interface declaration from the current token position
@@ -2894,9 +3046,6 @@ End;
 
   This method parses a exported heading declaration section from the current
   token position using the following object pascal grammar.
-
-  @grammar ExportedHeading -> ProcedureHeading ';' [ Directive ]
-                              FunctionHeading ';' [ Directive ]
 
   @precon  None.
   @postcon This method returns true if the current section was found to be
@@ -2941,10 +3090,6 @@ End;
   This method parses an implementation section from the current token position
   using the following object pascal grammar.
 
-  @grammar ImplementationSection -> IMPLEMENTATION
-                                    [ UsesClause ]
-                                    [ DeclSection ] ...
-
   @precon  None.
   @postcon Parses an implementation section from the current token position.
 
@@ -2966,9 +3111,6 @@ End;
 
   This method parses a block section from the current token position using the
   following object pascal grammar.
-
-  @grammar Block -> [ DeclSection ]
-                    CompoundStmt
 
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
@@ -3003,8 +3145,6 @@ End;
 
   This method parses an exported procedure section from the current token
   position.
-
-  @grammar ExportedStmt -> EXPORTS ExportsItem [, ExportsItem]...
 
   @precon  None.
   @postcon Returns true if an exported procedure was found.
@@ -3041,9 +3181,6 @@ End;
   @precon  None .
   @postcon Parses an exports entry from the current token position .
 
-  @grammar ExportsEntry -> Ident [ INDEX IntegerConstant [ NAME StringConstant
-           ] [ RESIDENT ] ] </TD>
-
   @param   Container as a TElementContainer
 
 **)
@@ -3054,7 +3191,7 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  If (Token.TokenType In [ttIdentifier, ttDirective]) Then
+  If IsIdentifier(Token) Then
     Begin
       E := TExportsItem.Create(Token.Token, scPublic, Token.Line,
         Token.Column, iiPublicExportedFunction, GetComment);
@@ -3093,10 +3230,6 @@ End;
            methods in the implementation section or a reference to a method
            for a local declaration section with in a method .
   @postcon Parses a declaration section from the current token position .
-
-  @grammar DeclSection -> LabelDeclSection -> ConstSection -> ResStringSection
-           -> TypeSection -> VarSection -> ThreadVarSection ->
-           ProcedureDeclSection -> ExportedProcs
 
   @param   AScope    as a TScope
   @param   Container as a TElementContainer
@@ -3154,8 +3287,6 @@ End;
   @postcon This method dicards the labels found and returns True if this method
            handles a label declaration section .
 
-  @grammar LabelDeclSection -> LABEL LabelId
-
   @param   Container as a TElementContainer
   @return  a Boolean
 
@@ -3172,7 +3303,7 @@ Begin
           Assert(CurrentMethod <> Nil, 'Method in LabelDeclSection is NULL!');
           NextNonCommentToken;
           Repeat
-            If Token.TokenType In [ttIdentifier, ttDirective] Then
+            If IsIdentifier(Token) Then
               Begin
                 CurrentMethod.LabelsLabel := CurrentMethod.Add(strLabelsLabel,
                   iiPublicLabelsLabel, scNone, Nil) As TLabelContainer;
@@ -3195,28 +3326,17 @@ End;
 
 (**
 
-
   This method parses a constant section declaration from the current token
   position using the following object pascal grammar.
 
-
   @precon  On entry to this method, Scope defines the current scope of the
-
            block i.e. private in in the implemenation section or public if in
-
            the interface section and The Method parameter is nil for methods
-
            in the implementation section or a reference to a method for a
-
            local declaration section with in a method.
 
   @postcon This method returns True if this method handles a constant
-
            declaration section.
-
-
-  @grammar ConstSection -> CONST ( ConstantDecl ';' ) ...
-
 
   @param   AScope    as a TScope
   @param   Container as a TElementContainer
@@ -3245,9 +3365,9 @@ Begin
               GetComment) As TLabelContainer;
           C := (Container As TPascalMethod).ConstantsLabel;
         End Else
-      If Container Is TClassDecl then
+      If Container Is TRecordDecl then
         Begin
-          ConstantsLabel := (Container As TClassDecl).FindElement(strConstantsLabel) As TLabelContainer;
+          ConstantsLabel := (Container As TRecordDecl).FindElement(strConstantsLabel) As TLabelContainer;
           If ConstantsLabel = Nil Then
             ConstantsLabel := Container.Add(
               strConstantsLabel, iiPublicConstantsLabel, LabelScope,
@@ -3261,41 +3381,30 @@ Begin
           C := FConstantsLabel;
         End;
       NextNonCommentToken;
+      RTTIAttributes;
       While ConstantDecl(AScope, C) Do
         If Token.Token = ';' Then
-          NextNonCommentToken
-        Else
-          ErrorAndSeekToken(strLiteralExpected, 'ConstSection', ';',
-            strSeekableOnErrorTokens, stFirst);
+          Begin
+            NextNonCommentToken;
+            RTTIAttributes;
+          End Else
+            ErrorAndSeekToken(strLiteralExpected, 'ConstSection', ';',
+              strSeekableOnErrorTokens, stFirst);
     End;
 End;
 
 (**
 
-
   This method parses a constant declaration from the current token position
   using the following object pascal grammar.
 
-
   @precon  On entry to this method, Scope defines the current scope of the
-
            block i.e. private in in the implemenation section or public if in
-
            the interface section and The Method parameter is nil for methods
-
            in the implementation section or a reference to a method for a
-
            local declaration section with in a method.
-
   @postcon This method returns True if this method handles a constant
-
            declaration section.
-
-
-  @grammar ConstantDecl -> Ident '=' ConstExpr [PortabilityDirective] -> Ident
-
-           ':' TypeId '=' TypedConstant [PortabilityDirective]
-
 
   @param   AScope    as a TScope
   @param   Container as a TElementContainer
@@ -3314,7 +3423,7 @@ Var
 Begin
   Result := False;
   // If not identifier then there is a new section
-  If Token.TokenType In [ttIdentifier, ttDirective] Then
+  If IsIdentifier(Token) Then
     Begin
       // Create constant and add to the collection, then get comment
       tmpC := TConstant.Create(Token.Token, AScope, Token.Line, Token.Column,
@@ -3374,9 +3483,6 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @grammar ConstSection -> RESOURCESTRING ( ResourceStringDecl ';' ) ... Also
-           see {@link TPascalDocModule.ConstantSection} .
-
   @param   AScope as a TScope
   @return  a Boolean
 
@@ -3416,9 +3522,6 @@ End;
   This method parses a resource string declaration section from the current
   token position.
 
-  @grammar ConstantDecl -> Ident '=' ConstExpr
-           Also see {@link TPascalDocModule.VarDecl}.
-
   @precon  On entry to this method, Scope defines the current scope of the
            block i.e. private in in the implemenation section or public if in
            the interface section and The Method parameter is nil for methods in
@@ -3443,7 +3546,7 @@ Begin
   Result := False;
   ExprType := [etConstExpr, etString];
   // If not identifier then there is a new section
-  If Token.TokenType In [ttIdentifier, ttDirective] Then
+  If IsIdentifier(Token) Then
     Begin
       // Create constant and add to the collection, then get comment
       tmpC := TResourceString.Create(Token.Token, AScope ,Token.Line, Token.Column,
@@ -3482,8 +3585,6 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @grammar Typesection -> TYPE ( TypeDecl ';' ) ...
-
   @param   AScope    as a TScope
   @param   Container as a TElementContainer
   @return  a Boolean
@@ -3510,9 +3611,9 @@ Begin
               iiPublicTypesLabel, LabelScope, GetComment) As TLabelContainer;
           TL := (Container As TPascalMethod).TypesLabel;
         End Else
-      If Container Is TClassDecl Then
+      If Container Is TRecordDecl Then
         Begin
-          TypesLabel := (Container As TClassDecl).FindElement(strTypesLabel) As TLabelContainer;
+          TypesLabel := (Container As TRecordDecl).FindElement(strTypesLabel) As TLabelContainer;
           If TypesLabel = Nil Then
             TypesLabel := Container.Add(strTypesLabel,
               iiPublicTypesLabel, LabelScope, GetComment) As TLabelContainer;
@@ -3544,8 +3645,6 @@ End;
   @postcon This method returns True if this method handles a constant
            declaration section.
 
-  @grammar TypeDecl -> Ident '=' [TYPE] Type -> Ident '=' [TYPE] RestrictedType
-
   @param   AScope    as a TScope
   @param   Container as a TElementContainer
   @return  a Boolean
@@ -3555,26 +3654,36 @@ Function TPascalModule.TypeDecl(AScope : TScope; Container : TElementContainer) 
 
 Var
   AToken : TTypeToken;
+  T: TTypes;
+  boolIsType: Boolean;
 
 Begin
   Result := False;
   RTTIAttributes;
-  If Token.TokenType In [ttIdentifier, ttDirective] Then
+  If IsIdentifier(Token) Then
     Begin
       AToken := TypeToken(Token, AScope, GetComment, Container);
       NextNonCommentToken;
+      TypeParams(AToken.FIdentifier);
       If Token.Token = '=' Then
         Begin
           NextNonCommentToken;
+          boolIsType := False;
           If Token.UToken = 'TYPE' Then
-            NextNonCommentToken;
+            Begin
+              NextNonCommentToken;
+              boolIsType := True;
+            End;
           Result := True;
-          If GetTypeDecl(AToken) = Nil Then
+          T := GetTypeDecl(AToken);
+          If T <> NIl Then
+            T.IsTyped := boolIsType;
+          If T = Nil Then
             ErrorAndSeekToken(strTypeNotFound, 'TypeDecl', Token.Token,
               strSeekableOnErrorTokens, stActual);
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'TypeDecl', '=',
-            strSeekableOnErrorTokens, stActual)
+            strSeekableOnErrorTokens, stActual);
     End;
 End;
 
@@ -3587,10 +3696,10 @@ End;
   @postcon If a type is found it is returned as the result else nil.
 
   @param   AToken as a TTypeToken
-  @return  a TGenericTypeDecl
+  @return  a TTypes
 
 **)
-Function TPascalModule.GetTypeDecl(AToken : TTypeToken) : TGenericTypeDecl;
+Function TPascalModule.GetTypeDecl(AToken : TTypeToken) : TTypes;
 
 Begin
   Result := RestrictedType(AToken);
@@ -3601,10 +3710,50 @@ End;
 
 (**
 
+  This method parses the TypeArgs element of the grammar for handling generics on type
+  arguments.
+
+  @precon  None.
+  @postcon Parses the TypeArgs element of the grammar for handling generics on type
+           arguments.
+
+  @param   Container as a TElementContainer
+
+**)
+Procedure TPascalModule.TypeArgs(Container : TElementContainer);
+
+Begin
+  PushTokenPosition;
+  If Token.Token = '<' Then
+    Begin
+      Container.AddToken(Token.Token, Token.TokenType);
+      Repeat
+        NextNonCommentToken;
+        If IsIdentifier(Token) Or (Token.UToken = 'STRING') Then
+          Begin
+            Container.AddToken(Token.Token, Token.TokenType);
+            NextNonCommentToken;
+          End Else
+          Begin
+            PopTokenPosition;
+            Exit;
+          End;
+        If Token.Token = ',' Then
+          Container.AddToken(Token.Token, Token.TokenType);
+      Until Token.Token <> ',';
+      If Token.Token = '>' Then
+        Begin
+          Container.AddToken(Token.Token, Token.TokenType);
+          NextNonCommentToken;
+        End Else
+          PopTokenPosition;
+    End;
+End;
+
+(**
+
   This method parses a typed constant from the current token position using
   the following object pascal grammar.
-
-  @grammar TypedConstant -> ( ConstExpr | ArrayConstant | RecordConstant )
 
   @precon  C is a valid instance of the constant to be populated with tokens.
   @postcon Returns false if this was not a typed constant an not handled.
@@ -3629,8 +3778,6 @@ End;
 
   This method test whether the typed constant is an Array Constant (starts with
   ARRAY.
-
-  @grammar ArrayConstant -> '(' TypedConstant ','... ')'
 
   @precon  C must be a valid generic container.
   @postcon If ARRAY is found processes the constant as an array constant.
@@ -3695,9 +3842,25 @@ End;
 
 (**
 
-  This method attempts to parser the current token position as an RecordConstant.
+  This method parses a class var section within a record definition.
 
-  @grammar RecordConstant -> '(' RecordFieldConstant ';'... ')'
+  @precon  Cls must be a valid instance.
+  @postcon A class var sectino is parsed if found and true returned.
+
+  @param   AScope as a TScope
+  @param   Cls    as a TRecordDecl
+  @return  a Boolean
+
+**)
+Function TPascalModule.RecordClassVarSection(AScope: TScope; Cls : TRecordDecl): Boolean;
+
+Begin
+  Result := ClassClassVarSection(AScope, Cls)
+End;
+
+(**
+
+  This method attempts to parser the current token position as an RecordConstant.
 
   @precon  C must be a valid generic container.
   @postcon Attempts to parser the current token position as an RecordConstant.
@@ -3736,10 +3899,27 @@ End;
 
 (**
 
+  This method parses a const section within a record definition.
+
+  @precon  Container must be a valid container.
+  @postcon Parses a const section of it exists and returns true.
+
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TPascalModule.RecordConstSection(AScope: TScope;
+  Container: TElementContainer): Boolean;
+
+Begin
+  Result := ConstSection(AScope, Container);
+End;
+
+(**
+
   This method attempts to parse the current token position as a record field
   constant.
-
-  @grammar RecordFieldConstant -> Ident ':' TypedConstant
 
   @precon  C must be a valid generic container.
   @postcon Attempts to parse the current token position as a record field
@@ -3753,20 +3933,24 @@ End;
 Function TPascalModule.RecordFieldConstant(C : TElementContainer;
   T : TGenericTypeDecl) : Boolean;
 
+Var
+  strIdentifier: String;
+
 Begin
   Result := False;
-  If Token.TokenType In [ttIdentifier, ttDirective] Then
+  If IsIdentifier(Token) Then
     Begin
+      strIdentifier := Token.Token;
+      PushTokenPosition;
       NextNonCommentToken;
       If Token.Token = ':' Then
         Begin
           Result := True;
-          RollBackToken;
-          AddToExpression(C);
+          C.AddToken(strIdentifier);
           AddToExpression(C);
           TypedConstant(C, T)
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 End;
 
@@ -3775,24 +3959,15 @@ End;
   This method parses a type from the current token position using the following
   object pascal grammar.
 
-  @grammar Type -> TypeId
-                -> SimpleType
-                -> StrucType
-                -> PointerType
-                -> StringType
-                -> ProcedureType
-                -> VariantType
-                -> ClassRefType
-
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
 
   @param   AToken as a TTypeToken
-  @return  a TGenericTypeDecl
+  @return  a TTypes
 
 **)
-Function TPascalModule.OPType(AToken : TTypeToken) : TGenericTypeDecl;
+Function TPascalModule.OPType(AToken : TTypeToken) : TTypes;
 
 Begin
   Result := StrucType(AToken);
@@ -3802,6 +3977,8 @@ Begin
     Result := StringType(AToken);
   If Result = Nil Then
     Result := ProcedureType(AToken);
+  If Result = Nil Then
+    Result := AnonymousReferenceType(AToken);
   If Result = Nil Then
     Result := VariantType(AToken);
   If Result = Nil Then
@@ -3814,10 +3991,6 @@ End;
 
   This method parses a restricted type from the current token position using
   the following object pascal grammar.
-
-  @grammar RestrictedType -> ObjectType
-                          -> ClassType
-                          -> InterfaceType
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -3840,8 +4013,6 @@ End;
 (**
 
   This method parses RTTI Attributes at the current token  position if they exist.
-
-  @grammar ( '[' <AttributeDeclaration> [ ',' ] <AttributeDeclaration> ']' )*
 
   @precon  None.
   @postcon Any RTTI attributes at the current position are parsed.
@@ -3869,8 +4040,6 @@ End;
   This method parses a class reference type declaration from the current token
   position using the following object pascal grammar.
 
-  @grammar ClassRefType -> CLASS OF TypeId
-
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
@@ -3885,14 +4054,15 @@ Begin
   Result := Nil;
   If Token.UToken = 'CLASS' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If Token.UToken = 'OF' Then
         Begin
           NextNonCommentToken;
           UpdateTypeToken(AToken);
           With AToken Do
-            Result := TClassRefType.Create(FToken.Token, FScope, FToken.Line,
-              FToken.Column, iiPublicType, FComment);
+            Result := TClassRefType.Create(FIdentifier, FScope, FLine,
+              FColumn, iiPublicType, FComment);
           Result := AToken.FContainer.Add(Result) As TClassRefType;
           Result.AddToken('Class');
           Result.AddToken('Of');
@@ -3900,7 +4070,7 @@ Begin
             ErrorAndSeekToken(strTypeIdExpected, 'ClassRefType', Token.Token,
               strSeekableOnErrorTokens, stActual);
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 End;
 
@@ -3919,8 +4089,12 @@ End;
 Procedure TPascalModule.UpdateTypeToken(var AToken: TTypeToken);
 
 begin
-  If AToken.FToken = Nil Then
-    AToken.FToken := Token;
+  If AToken.FIdentifier = '' Then
+    Begin
+      AToken.FIdentifier := Token.Token;
+      AToken.FLine := Token.Line;
+      AToken.FColumn := Token.Column;
+    End;
   If AToken.FComment = Nil Then
     AToken.FComment := GetComment;
 end;
@@ -3929,8 +4103,6 @@ end;
 
   This method parses a simple type declaration from the current token
   position using the following object pascal grammar.
-
-  @grammar SimpleType -> ( OrdinalType | RealType )
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -3953,14 +4125,6 @@ end;
   This method determines if the token represents a real type using the following
   object pascal grammar.
 
-  @grammar RealType -> REAL48
-                    -> REAL
-                    -> SINGLE
-                    -> DOUBLE
-                    -> EXTENDED
-                    -> CURRENCY
-                    -> COMP
-
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
@@ -3977,8 +4141,8 @@ Begin
     Begin
       UpdateTypeToken(AToken);
       With AToken Do
-        Result := TRealType.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicType, FComment);
+        Result := TRealType.Create(FIdentifier, FScope, FLine,
+          FColumn, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TRealType;
       Result.AppendToken(Token);
       NextNonCommentToken;
@@ -3989,8 +4153,6 @@ End;
 
   This method determines if the type is an ordinal type using the folowing
   object pascal grammar.
-
-  @grammar OrdinalType -> ( SubrangeType | EnumerateType | OrdIndent )
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -4015,20 +4177,6 @@ End;
   This method determines if the current token is an ordinal ident using the
   following object pascal grammar.
 
-  @grammar OrdIndent -> SHORTINT
-                     -> SMALLINT
-                     -> INTEGER
-                     -> BYTE
-                     -> LONGINT
-                     -> INT64
-                     -> WORD
-                     -> BOOLEAN
-                     -> CHAR
-                     -> WIDECHAR
-                     -> LONGWORD
-                     -> PCHAR
-                     -> CARDINAL
-
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
@@ -4045,8 +4193,8 @@ Begin
     Begin
       UpdateTypeToken(AToken);
       With AToken Do
-        Result := TOrdIdent.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicType, FComment);
+        Result := TOrdIdent.Create(FIdentifier, FScope, FLine,
+          FColumn, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TOrdIdent;
       Result.AppendToken(Token);
       NextNonCommentToken;
@@ -4057,9 +4205,6 @@ End;
 
   This method parses a variant type declaration section using the following
   object pascal grammar.
-
-  @grammar VariantType -> VARIANT
-                       -> OLEVARIANT
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -4077,8 +4222,8 @@ begin
     Begin
       UpdateTypeToken(AToken);
       With AToken Do
-        Result := TVariantType.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicType, FComment);
+        Result := TVariantType.Create(FIdentifier, FScope, FLine,
+          FColumn, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TVariantType;
       Result.AppendToken(Token);
       NextNonCommentToken;
@@ -4091,8 +4236,6 @@ end;
   the following object pascal grammar. This method also currently acts as a type
   CATCH ALL if nothing else works.
 
-  @grammar SubrangeType -> ConstExpr .. ConstExpr
-
   @precon  None.
   @postcon Returns an ordinal type if one was parsed else returns nil.
 
@@ -4104,6 +4247,7 @@ Function TPascalModule.SubRangeType(AToken : TTypeToken) : TSubRangeType;
 
 Var
   ExprType : TExprTypes;
+  Container: TElementContainer;
 
 Begin
   Result := Nil;
@@ -4111,8 +4255,8 @@ Begin
     Begin
       UpdateTypeToken(AToken);
       With AToken Do
-        Result := TSubRangeType.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicType, FComment);
+        Result := TSubRangeType.Create(FIdentifier, FScope, FLine,
+          FColumn, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TSubRangeType;
       ExprType := [etUnknown, etConstExpr];
       ConstExpr(Result, ExprType);
@@ -4121,6 +4265,14 @@ Begin
           AddToExpression(Result);
           ConstExpr(Result, ExprType);
         End;
+      Container := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
+      Try
+        TypeArgs(Container);
+        If Container.TokenCount > 0 Then
+          Result.AddTokens(Container);
+      Finally
+        Container.Free;
+      End;
     End;
 End;
 
@@ -4128,8 +4280,6 @@ End;
 
   This method parses an enumerate type from the current token position using
   the following object pascal grammar.
-
-  @grammar EnumeratedType -> '(' EnumerateTypeElement, ... ')'
 
   @precon  None.
   @postcon Returns an ordinal type if one was parsed else returns nil.
@@ -4146,8 +4296,8 @@ Begin
     Begin
       UpdateTypeToken(AToken);
       With AToken Do
-        Result := TEnumerateType.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicType, FComment);
+        Result := TEnumerateType.Create(FIdentifier, FScope, FLine,
+          FColumn, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TEnumerateType;
       AddToExpression(Result);
       Repeat
@@ -4165,8 +4315,6 @@ End;
 
   This method parses the current token position as an Enumerate Element.
 
-  @grammar EnumerateTypeElement -> Ident [ â€˜=â€™ ConstExpr ]
-
   @precon  None.
   @postcon Parses the current token position as an Enumerate Element.
 
@@ -4179,7 +4327,7 @@ Var
   ExprType : TExprTypes;
 
 Begin
-  If Token.TokenType In [ttIdentifier, ttDirective] Then
+  If IsIdentifier(Token) Then
     Begin
       AddToExpression(EnumerateType);
       If Token.Token = '=' Then
@@ -4197,11 +4345,6 @@ End;
 
   This method parses a sring type declaration from the current token position
   using the following object pascal grammar.
-
-  @grammar StringType -> STRING
-                      -> ANSISTRING
-                      -> WIDESTRING
-                      -> STRING '[' ConstExpr ']'
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -4221,8 +4364,8 @@ begin
   If IsKeyWord(Token.Token, strStrings) Then
     Begin
       UpdateTypeToken(AToken);
-      Result := TStringType.Create(AToken.FToken.Token, AToken.FScope,
-        AToken.FToken.Line, AToken.FToken.Column, iiPublicType, AToken.FComment);
+      Result := TStringType.Create(AToken.FIdentifier, AToken.FScope,
+        AToken.FLine, AToken.FColumn, iiPublicType, AToken.FComment);
       Result := AToken.FContainer.Add(Result) As TStringType;
       Result.AppendToken(Token);
       NextNonCommentToken;
@@ -4249,17 +4392,15 @@ end;
   This method parses an Array, Set of File type declaration from the current
   token position using the following object pascal grammar.
 
-  @grammar StrucType -> [ PACKED ] ( ArrayType | SetType | FileType | RecType )
-
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
 
   @param   AToken as a TTypeToken
-  @return  a TGenericTypeDecl
+  @return  a TTypes
 
 **)
-Function TPascalModule.StrucType(AToken : TTypeToken) : TGenericTypeDecl;
+Function TPascalModule.StrucType(AToken : TTypeToken) : TTypes;
 
 Var
   boolPacked : Boolean;
@@ -4290,8 +4431,6 @@ end;
   This method parses an array type declaration from the current token position
   using the following object pascal grammar.
 
-  @grammar ArrayType -> ARRAY [ '[' OrdinalType / ',' ... ']' ] OF Type
-
   @precon  boolPacked determines if the array type is packed or not.
   @postcon This method returns True if this method handles a constant
            declaration section.
@@ -4313,8 +4452,8 @@ Begin
     Begin
       UpdateTypeToken(AToken);
       With AToken Do
-        Result := TArrayType.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicType, FComment);
+        Result := TArrayType.Create(FIdentifier, FScope, FLine,
+          FColumn, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TArrayType;
       If boolPacked Then
         Result.AddToken('Packed');
@@ -4360,8 +4499,6 @@ End;
 
   This method parses a record type declaration from the current token position.
 
-  @grammar RecType -> RECORD [ FieldList ] END
-
   @precon  boolPacked detmerines if the record is packed for not.
   @postcon This method returns True if this method handles a constant
            declaration section.
@@ -4375,6 +4512,7 @@ Function TPascalModule.RecType(boolPacked : Boolean; AToken : TTypeToken): TReco
 
 var
   InternalScope: TScope;
+  boolFieldAllowed : Boolean;
 
 begin
   Result := Nil;
@@ -4382,29 +4520,52 @@ begin
     Begin
       UpdateTypeToken(AToken);
       With AToken Do
-        Result := TRecordDecl.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicRecord, FComment);
+        Result := TRecordDecl.Create(FIdentifier, FScope, FLine,
+          FColumn, iiPublicRecord, FComment);
       Result := AToken.FContainer.Add(Result) As TRecordDecl;
-      Result.Line := AToken.FToken.Line;
-      Result.Column := AToken.FToken.Column;
+      Result.Line := AToken.FLine;
+      Result.Column := AToken.FColumn;
       Result.Comment := AToken.FComment ;
       Result.IsPacked := boolPacked;
       NextNonCommentToken;
+      InternalScope := scPublic;
+      boolFieldAllowed := True;
+      Result.HelperClass := (Token.UToken = 'HELPER');
+      If Result.HelperClass Then
+        Begin
+          NextNonCommentToken;
+          boolFieldAllowed := False;
+        End;
+      // Get the classes heritage
+      RecObjClsIntHeritage(Result);
+      If Result.HelperClass Then
+        If Token.UToken = 'FOR' Then
+          Begin
+            NextNonCommentToken;
+            If IsIdentifier(Token) Then
+              Begin
+                Result.HelperClassName := Token.Token;
+                NextNonCommentToken;
+              End Else
+                ErrorAndSeekToken(strIdentExpected, 'ClassType', Token.Token,
+                  strSeekableOnErrorTokens, stActual);
+          End Else
+            ErrorAndSeekToken(strReservedWordExpected, 'ClassType', 'FOR',
+              strSeekableOnErrorTokens, stActual);
 
       Repeat
-        ClassVisibility(InternalScope);
+        RecordVisibility(InternalScope);
         If Token.UToken = 'END' Then
           Break;
       Until Not (
-        FieldList(Result, InternalScope) Or
-        ClassMethodList(Result, InternalScope) Or
-        ClassPropertyList(Result, InternalScope) Or
-        TypeSection(InternalScope, Result) Or
-        ConstSection(InternalScope, Result) Or
-        VarSection(InternalScope, Result) Or
-        ClassVarSection(InternalScope, Result)
+        RecordTypeSection(InternalScope, Result) Or
+        RecordConstSection(InternalScope, Result) Or
+        RecordVarSection(InternalScope, Result) Or
+        RecordClassVarSection(InternalScope, Result) Or
+        RecordMethodList(Result, InternalScope, [mtConstructor..mtOperator]) Or
+        RecordPropertyList(Result, InternalScope) Or
+        (boolFieldAllowed And RecordFieldList(Result, InternalScope))
       );
-
       If Token.UToken = 'END' Then
         NextNonCommentToken
       Else
@@ -4412,6 +4573,135 @@ begin
           strSeekableOnErrorTokens, stActual);
     End;
 end;
+
+(**
+
+  This method parses the field list element of the record definition.
+
+  @precon  Rec must be a valid instance.
+  @postcon Parses a field list if at the current token and returnd true if so.
+
+  @param   Rec           as a TRecordDecl
+  @param   InternalScope as a TScope
+  @return  a Boolean
+
+**)
+Function TPascalModule.RecordFieldList(Rec : TRecordDecl; InternalScope : TScope) : Boolean;
+
+Var
+  boolFoundField : Boolean;
+
+Begin
+  Result := False;
+  Repeat
+    RTTIAttributes;
+    boolFoundField := FieldDecl(Rec, InternalScope);
+    If boolFoundField Then
+      Result := True;
+  Until Not IsToken(';', Nil);
+  RecordVariantSection(Rec, InternalScope);
+End;
+
+(**
+
+  This method parses the method list for a record definition.
+
+  @precon  Cls must be a valid instance.
+  @postcon A list of methods is parsed if found at the current cursor position.
+
+  @param   Cls                as a TRecordDecl
+  @param   AScope             as a TScope
+  @param   PermissibleMethods as a TPermissibleMethods
+  @return  a Boolean
+
+**)
+Function TPascalModule.RecordMethodList(Cls: TRecordDecl; AScope: TScope;
+  PermissibleMethods : TPermissibleMethods): Boolean;
+
+Begin
+  Result := MethodList(Cls, AScope, PermissibleMethods);
+End;
+
+(**
+
+  This method parses a property list in a record definition.
+
+  @precon  Cls must be a valid instance.
+  @postcon A property list is parsed if found at the current position.
+
+  @param   Cls    as a TRecordDecl
+  @param   AScope as a TScope as a reference
+  @return  a Boolean
+
+**)
+Function TPascalModule.RecordPropertyList(Cls: TRecordDecl; Var AScope: TScope): Boolean;
+
+Begin
+  Result := ClassPropertyList(Cls, AScope);
+End;
+
+(**
+
+  This method parses a type section defined within a record definition.
+
+  @precon  Cls must be a valid instance.
+  @postcon A type section is parsed if found at the current position.
+
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TPascalModule.RecordTypeSection(AScope: TScope;
+  Container: TElementContainer): Boolean;
+
+Begin
+  Result := TypeSection(AScope, Container);
+End;
+
+(**
+
+  This method parses record visibility keywords in a record definition.
+
+  @precon  None.
+  @postcon If record visibility keyword are found the AScope variable is updated.
+
+  @param   AScope as a TScope as a reference
+
+**)
+Procedure TPascalModule.RecordVisibility(Var AScope: TScope);
+
+Begin
+  While (Token.UToken = 'STRICT') Or IsKeyWord(Token.Token, ['private', 'public']) Do
+    Begin
+      While Token.UToken = 'STRICT' Do
+        Begin
+          NextNonCommentToken;
+          If Token.UToken = 'PRIVATE' Then
+            Begin
+              AScope := scPrivate;
+              NextNonCommentToken;
+            End Else
+              ErrorAndSeekToken(strReservedWordExpected, 'RecordVisibility', 'PRIVATE',
+                strSeekableOnErrorTokens, stActual);
+        End;
+      While IsKeyWord(Token.Token, ['private', 'public']) Do
+        Begin
+          If Token.UToken = 'PRIVATE' Then
+            Begin
+              AScope := scPrivate;
+              NextNonCommentToken;
+            End
+          Else If Token.UToken = 'PUBLIC' Then
+            Begin
+              AScope := scPublic;
+              NextNonCommentToken;
+            End Else
+              ErrorAndSeekToken(strReservedWordExpected, 'RecordVisibility',
+                'PRIVATE or PUBLIC', strSeekableOnErrorTokens, stActual);
+        End;
+    End;
+End;
 
 (**
 
@@ -4423,23 +4713,23 @@ end;
   @postcon Parses a field list for classes, records and object declarations
            from the current token position.
 
-  @grammar FieldList -> FieldDecl / ';' ... [ VariantSection ] [ ';' ]
-
   @param   Rec           as a TRecordDecl
   @param   InternalScope as a TScope
   @return  a Boolean
 
 **)
-Function TPascalModule.FieldList(Rec: TRecordDecl; InternalScope : TScope) : Boolean;
+Function TPascalModule.ObjFieldList(Rec: TRecordDecl; InternalScope : TScope) : Boolean;
 
-begin
+Begin
+  Result := False;
   Repeat
-    Result := VariantSection(Rec, InternalScope);
     If Not Result Then
-      RTTIAttributes;
-      Result := FieldDecl(Rec, InternalScope);
+      Begin
+        RTTIAttributes;
+        Result := Result Or FieldDecl(Rec, InternalScope);
+      End;
   Until Not IsToken(';', Nil);
-end;
+End;
 
 (**
 
@@ -4449,8 +4739,6 @@ end;
   @precon  Rec in a valid instance of a record type to add fields / parameters
            too.
   @postcon Parses a records field declarations from the current token position
-
-  @grammar FieldDecl -> IdentList ':' Type
 
   @param   Rec          as a TRecordDecl
   @param   InteralScope as a TScope
@@ -4523,14 +4811,12 @@ End;
            too.
   @postcon Returns true is a variant section of a record was parsed.
 
-  @grammar VariantSection -> CASE [ Ident ':' ] TypeId OF RecVariant / ';' ...
-
   @param   Rec           as a TRecordDecl
   @param   InternalScope as a TScope
   @return  a Boolean
 
 **)
-Function TPascalModule.VariantSection(Rec: TRecordDecl; InternalScope : TScope) : Boolean;
+Function TPascalModule.RecordVariantSection(Rec: TRecordDecl; InternalScope : TScope) : Boolean;
 
 Var
   C : TElementContainer;
@@ -4540,13 +4826,14 @@ Begin
   If Result Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier, ttDirective] Then
+      If IsIdentifier(Token) Then
         Begin
+          PushTokenPosition;
           NextNonCommentToken;
           If Token.Token = ':' Then
             NextNonCommentToken
           Else
-            RollBackToken;
+            PopTokenPosition;
         End;
       C := TTempCntr.Create(Token.Token, scPrivate, Token.Line,
         Token.Column, iiNone, Nil);
@@ -4575,6 +4862,25 @@ End;
 
 (**
 
+  This method parses a var section within a record definition.
+
+  @precon  Container must be a valid instance.
+  @postcon A var section is parsed if found at the current position.
+
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TPascalModule.RecordVarSection(AScope: TScope;
+  Container: TElementContainer): Boolean;
+
+Begin
+  Result := VarSection(AScope, Container);
+End;
+
+(**
+
   This method parses the record variant section of a record from the current
   token position using the following object pascal grammar.
 
@@ -4582,8 +4888,6 @@ End;
            too.
   @postcon Parses the record variant section of a record from the current token
            position
-
-  @grammar RecVariant -> ConstExpr / ',' ... ':' '(' [ FieldList ] ')'
 
   @param   Rec           as a TRecordDecl
   @param   InternalScope as a TScope
@@ -4612,7 +4916,7 @@ Begin
     Else
       ErrorAndSeekToken(strLiteralExpected, 'RecVariant', '(',
         strSeekableOnErrorTokens, stActual);
-    FieldList(Rec, InternalScope);
+    RecordFieldList(Rec, InternalScope);
     If Token.Token = ')' Then
       NextNonCommentToken
     Else
@@ -4676,9 +4980,9 @@ begin
   M := CurrentMethod;
   If M <> Nil Then
     Begin
-      If M.ObjClsInt <> Nil Then
+      If M.RecObjClsInt <> Nil Then
         Begin
-          E := M.ObjClsInt.FindElement(strMethodsLabel);
+          E := M.RecObjClsInt.FindElement(strMethodsLabel);
           If E <> Nil Then
             For i := 1 To E.ElementCount Do
               If CompareText(E[i].Identifier, AToken.Token) = 0 Then
@@ -4694,8 +4998,6 @@ end;
 
   Method parses a set type declaration from the current token position using
   following object pascal grammar.
-
-  @grammar SetType -> SET OF OrdinalType
 
   @precon  boolPacked determines if the set type is packed or not.
   @postcon This method returns True if this method handles a constant
@@ -4718,8 +5020,8 @@ Begin
     Begin
       UpdateTypeToken(AToken);
       With AToken Do
-        Result := TSetType.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicType, FComment);
+        Result := TSetType.Create(FIdentifier, FScope, FLine,
+          FColumn, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TSetType;
       If boolPacked Then
         Result.AddToken('Packed');
@@ -4751,8 +5053,6 @@ End;
   This method parses a file type declaration from the current token position
   using the following object pascal grammar.
 
-  @grammar FileType -> FILE OF Type
-
   @precon  boolPacked determines if the file type is packed or not.
   @postcon This method returns True if this method handles a constant
            declaration section.
@@ -4777,8 +5077,8 @@ Begin
         Begin
           UpdateTypeToken(AToken);
           With AToken Do
-            Result := TFileType.Create(FToken.Token, FScope, FToken.Line,
-              FToken.Column, iiPublicType, FComment);
+            Result := TFileType.Create(FIdentifier, FScope, FLine,
+              FColumn, iiPublicType, FComment);
           Result := AToken.FContainer.Add(Result) As TFileType;
           If boolPacked Then
             Result.AddToken('Packed');
@@ -4799,8 +5099,8 @@ Begin
         Begin
           UpdateTypeToken(AToken);
           With AToken Do
-            Result := TFileType.Create(FToken.Token, FScope, FToken.Line,
-              FToken.Column, iiPublicType, FComment);
+            Result := TFileType.Create(FIdentifier, FScope, FLine,
+              FColumn, iiPublicType, FComment);
           Result := AToken.FContainer.Add(Result) As TFileType;
           If boolPacked Then
             Result.AddToken('Packed');
@@ -4813,8 +5113,6 @@ End;
 
   This method parses a pointer type declaration from the current token position
   using the following object pascal grammar.
-
-  @grammar PointerType -> '^' TypeId
 
   @precon  None.
   @postcon This method returns True if this method handles a constant
@@ -4832,8 +5130,8 @@ Begin
     Begin
       UpdateTypeToken(AToken);
       With AToken Do
-        Result := TPointerType.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicType, FComment);
+        Result := TPointerType.Create(FIdentifier, FScope, FLine,
+          FColumn, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TPointerType;
       Result.AppendToken(Token);
       NextNonCommentToken;
@@ -4848,8 +5146,6 @@ end;
   This method parses a procedure type declaration from the current token
   position using the following object pascal grammar.
 
-  @grammar ProceduralType -> ( ProcedureHeading | FunctionHeading ) [ OF OBJECT ]
-
   @precon  None.
   @postcon This method returns True if this method handles a constant
            declaration section.
@@ -4863,6 +5159,7 @@ Function TPascalModule.ProcedureType(AToken : TTypeToken) : TProcedureType;
 Var
   M : TPascalMethod;
   TemporaryContainer: TElementContainer;
+  boolMethodDirective : Boolean;
 
 begin
   Result := Nil;
@@ -4875,8 +5172,8 @@ begin
       Begin
         UpdateTypeToken(AToken);
         With AToken Do
-          Result := TProcedureType.Create(FToken.Token, FScope, FToken.Line,
-            FToken.Column, iiPublicType, FComment);
+          Result := TProcedureType.Create(FIdentifier, FScope, FLine,
+            FColumn, iiPublicType, FComment);
         Result := AToken.FContainer.Add(Result) As TProcedureType;
         Result.AddToken(M.AsString(True, False));
         If Token.UToken = 'OF' Then
@@ -4888,20 +5185,118 @@ begin
               ErrorAndSeekToken(strReservedWordExpected, 'ProcedureType', 'OBJECT',
                 strSeekableOnErrorTokens, stActual);
           End;
-        If Token.Token = ';' Then
+        boolMethodDirective := True;
+        While (Token.Token = ';') And boolMethodDirective Do
           Begin
+            boolMethodDirective := False;
+            PushTokenPosition;
             NextNonCommentToken;
             If IsKeyWord(Token.Token, strMethodDirectives) Then
               Begin
                 Result.AppendToken(Token);
                 NextNonCommentToken;
+                boolMethodDirective := True;
               End Else
-                RollBackToken;
+                PopTokenPosition;
           End;
       End;
   Finally
     TemporaryContainer.Free;
   End;
+end;
+
+(**
+
+  This method parses the AnonymousMethod element of the grammar.
+
+  @precon  None.
+  @postcon Parses an anonymous method at the current token position and returns true if
+           the token position is an anonymous method else returns false.
+
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TPascalModule.AnonymousMethod(Container : TElementContainer) : Boolean;
+
+Var
+  M : TPascalMethod;
+
+Begin
+    M := FunctionHeading(scLocal, Container, False);
+    If M = Nil Then
+      M := ProcedureHeading(scLocal, Container, False);
+    Result := M <> Nil;
+    If M <> Nil Then
+      Begin
+        PortabilityDirective;
+        Block(scLocal, M);
+      End;
+End;
+
+(**
+
+  This method parses an anonymous method reference type declaration at the current token
+  position.
+
+  @precon  AToken must be a valid set of data.
+  @postcon An anonymous method type is parsed if found and returned else the return is
+           nil.
+
+  @param   AToken as a TTypeToken
+  @return  a TAnonymousReferenceType
+
+**)
+Function TPascalModule.AnonymousReferenceType(AToken : TTypeToken) : TAnonymousReferenceType;
+
+Var
+  M : TPascalMethod;
+  TemporaryContainer: TElementContainer;
+  boolMethodDirective :Boolean;
+
+begin
+  Result := Nil;
+  If Token.UToken = 'REFERENCE' Then
+    Begin
+      NextNonCommentToken;
+      If Token.UToken = 'TO' Then
+        Begin
+          NextNonCommentToken;
+          TemporaryContainer := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
+          Try
+            M := ProcedureHeading(scPrivate, TemporaryContainer, False);
+            If M = Nil Then
+              M := FunctionHeading(scPrivate, TemporaryContainer, False);
+            If M <> Nil Then
+              Begin
+                UpdateTypeToken(AToken);
+                With AToken Do
+                  Result := TAnonymousReferenceType.Create(FIdentifier, FScope, FLine,
+                    FColumn, iiPublicType, FComment);
+                Result := AToken.FContainer.Add(Result) As TAnonymousReferenceType;
+                Result.AddToken(M.AsString(True, False));
+                boolMethodDirective := True;
+                While (Token.Token = ';') And boolMethodDirective Do
+                  Begin
+                    boolMethodDirective := False;
+                    PushTokenPosition;
+                    NextNonCommentToken;
+                    If IsKeyWord(Token.Token, strMethodDirectives) Then
+                      Begin
+                        Result.AppendToken(Token);
+                        NextNonCommentToken;
+                        boolMethodDirective := True;
+                      End Else
+                        PopTokenPosition;
+                  End;
+              End;
+          Finally
+            TemporaryContainer.Free;
+          End;
+        End Else
+          ErrorAndSeekToken(strReservedWordExpected, 'AnonymousReferenceType', 'TO',
+            strSeekableOnErrorTokens, stActual);
+    End;
 end;
 
 (**
@@ -4916,8 +5311,6 @@ end;
            local declaration section with in a method.
   @postcon This method returns True if this method handles a constant
            declaration section.
-
-  @grammar VarSection -> VAR ( VarDecl ';' ) ...
 
   @param   AScope    as a TScope
   @param   Container as a TElementContainer
@@ -4936,8 +5329,8 @@ Begin
   If Result Then
     Begin
       LabelScope := AScope;
-      If LabelScope <> scLocal Then
-        LabelScope := scPublic;
+      //If LabelScope <> scLocal Then
+      //  LabelScope := scPublic;
       If Container Is TPascalMethod Then
         Begin
           If (Container As TPascalMethod).VariablesLabel = Nil Then
@@ -4946,9 +5339,9 @@ Begin
               GetComment) As TLabelContainer;
           V := (Container As TPascalMethod).VariablesLabel;
         End Else
-      If Container Is TClassDecl Then
+      If Container Is TRecordDecl Then
         Begin
-          VariablesLabel := (Container As TClassDecl).FindElement(strVarsLabel) As TLabelContainer;
+          VariablesLabel := (Container As TRecordDecl).FindElement(strVarsLabel) As TLabelContainer;
           If VariablesLabel = Nil Then
             VariablesLabel := Container.Add(
               strVarsLabel, iiPublicVariablesLabel, LabelScope,
@@ -4991,7 +5384,7 @@ End;
   @return  a Boolean
 
 **)
-Function TPascalModule.ClassVarSection(AScope : TScope;
+Function TPascalModule.ClassClassVarSection(AScope : TScope;
   Cls : TRecordDecl) : Boolean;
 
 Var
@@ -5003,6 +5396,7 @@ Begin
   Result := False;
   If Token.UToken = 'CLASS' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       Result := Token.UToken = 'VAR';
       If Result Then
@@ -5026,8 +5420,29 @@ Begin
                 NextNonCommentToken;
             End;
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
+End;
+
+(**
+
+  This method parses the grammar associated with a constant section within a class
+  declaration.
+
+  @precon  None.
+  @postcon Parses the grammar associated with a constant section within a class
+           declaration.
+
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TPascalModule.ClassConstSection(AScope: TScope;
+  Container: TElementContainer): Boolean;
+
+Begin
+  Result := ConstSection(AScope, Container);
 End;
 
 (**
@@ -5109,17 +5524,14 @@ end;
            valid variable container for the storage of the variable declared.
   @postcon Returns true if a variable declaration was handled.
 
-  @grammar VarDecl -> IdentList ':' Type [ ( ABSOLUTE ( Ident | ConstExpr ) ) |
-           '=' ConstExpr ]
-
   @param   AScope      as a TScope
   @param   VarSection  as a TElementContainer
-  @param   AImageIndex as a TImageIndex
+  @param   AImageIndex as a TBADIImageIndex
   @return  a Boolean
 
 **)
 Function TPascalModule.VarDecl(AScope : TScope; VarSection : TElementContainer;
-  AImageIndex : TImageIndex) : Boolean;
+  AImageIndex : TBADIImageIndex) : Boolean;
 
 Var
   I  :TIdentList;
@@ -5133,7 +5545,8 @@ Var
 
 Begin
   Result := False;
-  If Token.TokenType In [ttIdentifier, ttDirective] Then
+  RTTIAttributes;
+  If IsIdentifier(Token) Then
     Begin
       // Get ident list line and column
       I := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
@@ -5217,8 +5630,6 @@ End;
 
   This method parses a variable declaration from the current token position.
 
-  @grammar ThreadVarDecl -> IdentList ':' Type [ ( ABSOLUTE ( Ident | ConstExpr ) ) | '=' ConstExpr ]
-
   @precon  AScope defines the current scope of the variable and VarSection is a
            valid variable container for the storage of the variable declared.
   @postcon Returns true if a variable declaration was handled.
@@ -5242,7 +5653,7 @@ Var
 
 Begin
   Result := False;
-  If Token.TokenType In [ttIdentifier, ttDirective] Then
+  If IsIdentifier(Token) Then
     Begin
       // Get ident list line and column
       I := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
@@ -5301,17 +5712,12 @@ End;
 
 (**
 
-
   This method attempts to parse the next series of tokens as an expression.
 
-
   @precon  None.
-
   @postcon Attempts to parse the next series of tokens as an expression.
 
-
   @grammer Expression -> SimpleExpression [RelOp SimpleExpression]
-
 
   @param   C        as a TElementContainer
   @param   ExprType as a TExprTypes as a reference
@@ -5331,14 +5737,8 @@ End;
   This method attempts to parse the next series of tokens as a Simple
   Expression.
 
-
   @precon  none.
-
   @postcon Attempts to parse the next series of tokens as a Simple Expression.
-
-
-  @grammar SimpleExpression -> ['+' | '-'] Term [AddOp Term]...
-
 
   @param   C        as a TElementContainer
   @param   ExprType as a TExprTypes as a reference
@@ -5359,14 +5759,8 @@ End;
 
   This method attempts to parse a term from the current token position.
 
-
   @precon  None.
-
   @postcon Attempts to parse a term from the current token position.
-
-
-  @grammar Term -> Factor [MulOp Factor]...
-
 
   @param   C        as a TElementContainer
   @param   ExprType as a TExprTypes as a reference
@@ -5385,18 +5779,8 @@ End;
 
   This method attempts to parse a factor from the current token position.
 
-
   @precon  None.
-
   @postcon Attempts to parse a factor from the current token position.
-
-
-  @grammar Factor -> Designator ['(' ExprList ')'] -> '@' Designator -> Number
-
-           -> String -> NIL -> '(' Expression ')' -> NOT Factor ->
-
-           SetConstructor -> TypeId '(' Expression ')' // NOT USED
-
 
   @param   C        as a TElementContainer
   @param   ExprType as a TExprTypes as a reference
@@ -5514,6 +5898,8 @@ Begin
     End
   Else If SetConstructor(C) Then
     // Do nothing block...
+  Else If AnonymousMethod(C) Then
+    // Do nothing block...
   Else
     Begin
       SetupSubExprType;
@@ -5551,16 +5937,6 @@ End;
   This method check for the presence of a RelOp token at the current position
   and returns true if found and advances the token position else returns false
 
-  @grammar RelOp  -> '>'
-                  -> '<'
-                  -> '<='
-                  -> '>='
-                  -> '<>'
-                  -> IN
-                  -> IS
-                  -> AS
-                  -> = (this is not in the original grammar.)
-
   @precon  None.
   @postcon Check for the presence of a RelOp token at the current position
            and returns true if found and advances the token position else
@@ -5585,11 +5961,6 @@ End;
   This method check for the presence of an AddOp token at the current position
   and returns true if found and advances the token position else returns false
 
-  @grammar AddOp 	-> '+'
-                  -> '-'
-                  -> OR
-                  -> XOR
-
   @precon  None.
   @postcon Check for the presence of an AddOp token at the current position
            and returns true if found and advances the token position else
@@ -5611,14 +5982,6 @@ End;
 
   This method check for the presence of a MulOp token at the current position
   and returns true if found and advances the token position else returns false
-
-  @grammar MulOp 	-> '*'
-                  -> '/'
-                  -> DIV
-                  -> MOD
-                  -> AND
-                  -> SHL
-                  -> SHR
 
   @precon  None.
   @postcon Check for the presence of a MulOp token at the current position
@@ -5649,14 +6012,8 @@ End;
 
   This method attempts to parse the current token position as a Designator.
 
-
   @precon  None
-
   @postcon Attempts to parse the current token position as a Designator.
-
-
-  @grammar Designator -> QualId ['.' Ident | '[' ExprList ']' | '^']...
-
 
   @param   C        as a TElementContainer
   @param   ExprType as a TExprTypes as a reference
@@ -5665,11 +6022,12 @@ End;
 **)
 Function TPascalModule.Designator(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
 
-var
+Var
   M : TPascalMethod;
+  Container : TElementContainer;
 
 Begin
-  Result := (Token.TokenType In [ttIdentifier, ttDirective]) Or
+  Result := IsIdentifier(Token) Or
     (Token.UToken = 'NIL') Or (Token.UToken = 'STRING');
   If Result Then
     Begin
@@ -5683,6 +6041,14 @@ Begin
             If Not ReferenceSymbol(Token) Then
               Token.Reference := trUnresolved;
       AddToExpression(C);
+      Container := TTempCntr.Create('', Scope, 0, 0, iiNone, Nil);
+      Try
+        TypeArgs(Container);
+        If (C <> Nil) And (Container.TokenCount > 0) Then
+          C.AddTokens(Container);
+      Finally
+        Container.Free;
+      End;
       DesignatorSubElement(C, ExprType, ['.', '[', '^', '(']);
     End;
 End;
@@ -5712,7 +6078,7 @@ Begin
     If Token.Token = '.' Then
       Begin
         AddToExpression(C);
-        If Token.TokenType In [ttIdentifier, ttDirective, ttReservedWord] Then
+        If IsIdentifier(Token) Then
           Begin
             If Token.Reference In [trUnknown] Then
               If M <> Nil Then
@@ -5769,11 +6135,14 @@ Begin
                 Exit;
               End;
         AddToExpression(C);
-        ExprList(C);
-        While Token.Token = ':' Do
+        If Token.Token <> ')' Then
           Begin
-            AddToExpression(C);
-            ExprList(C);
+            MethodExprList(C);
+            While Token.Token = ':' Do
+              Begin
+                AddToExpression(C);
+                ExprList(C);
+              End;
           End;
         If Token.Token = ')' Then
           AddToExpression(C)
@@ -5785,18 +6154,11 @@ End;
 
 (**
 
-
   This method attempts to parse the current token position as a Set
   Constructor.
 
-
   @precon  None.
-
   @postcon Attempts to parse the current token position as a Set Constructor.
-
-
-  @grammar SetConstructor -> '[' [SetElement/','...] ']'
-
 
   @param   C as a TElementContainer
   @return  a Boolean
@@ -5817,17 +6179,10 @@ End;
 
 (**
 
-
   This method attempts to parse the current token position as a set element.
 
-
   @precon  None.
-
   @postcon Attempts to parse the current token position as a set element.
-
-
-  @grammar SetElement -> Expression ['..' Expression]
-
 
   @param   C as a TElementContainer
 
@@ -5846,18 +6201,11 @@ End;
 
 (**
 
-
   This method attempts to parse the current token position as an Expression
   List.
 
-
   @precon  None.
-
   @postcon Attempts to parse the current token position as an Expression List.
-
-
-  @grammar ExprList -> Expression/','...
-
 
   @param   C as a TElementContainer
 
@@ -5876,13 +6224,44 @@ End;
 
 (**
 
+  This method parses an expression list which can contain anonymous methods.
+
+  @precon  C must be a valid container.
+  @postcon The expression list is parsed if valid.
+
+  @param   C as a TElementContainer
+
+**)
+Procedure TPascalModule.MethodExprList(C : TElementContainer);
+
+Var
+  ExprType : TExprTypes;
+  Cntr : TTempCntr;
+
+Begin
+  Repeat
+    If Not AnonymousMethod(C) Then
+      Begin
+        ExprType := [etUnknown];
+        Cntr := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
+        Try
+          Expression(Cntr, ExprType);
+          If (Cntr.TokenCount = 0) And (Cntr.ElementCount = 0) Then
+            AddIssue(Format('The method implementation on line %d at column %d is missing a parameter!', [Token.Line, Token.Column]), scNone, 'MethofExprList', Token.Line, Token.Column, etError);
+        Finally
+          Cntr.Free;
+        End;
+      End;
+  Until Not IsToken(',', C);
+End;
+
+(**
+
 
   This method attempts to parse the current token position as a statement.
 
   @precon  None.
   @postcon Attempts to parse the current token position as a statement.
-
-  @grammar Statement -> [LabelId ':'] [SimpleStatement | StructStmt]
 
 **)
 Procedure TPascalModule.Statement;
@@ -5910,14 +6289,8 @@ End;
 
   This method attempts to parse the current token as a list of statements.
 
-
   @precon  None.
-
   @postcon Attempts to parse the current token as a list of statements.
-
-
-  @grammar StmtList -> Statement ';'...
-
 
 **)
 Procedure TPascalModule.StmtList;
@@ -5953,20 +6326,18 @@ End;
   @postcon Attempts to evaluate the current token position as a Simple
            Statement.
 
-  @grammar SimpleStatement -> Designator ['(' ExprList ')'] -> Designator ':='
-           Expression -> INHERITED -> GOTO LabelId
-
 **)
 Procedure TPascalModule.SimpleStatement;
 
 Var
   ExprType : TExprTypes;
+  C : TTempCntr;
 
 Begin
   If Token.UToken = 'GOTO' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier, ttDirective] Then
+      If IsIdentifier(Token) Then
         NextNonCommentToken
       Else
         ErrorAndSeekToken(strLabelExpected, 'SimpleStatement', Token.Token,
@@ -6001,14 +6372,22 @@ Begin
       If Token.Token = ':=' Then
         Begin
           NextNonCommentToken;
+          C := TTempCntr.Create('', Scope, 0, 0, iiNone, Nil);
+          Try
           ExprType := [etUnknown];
-          Expression(Nil, ExprType);
+            Expression(C, ExprType);
+            If (C.TokenCount = 0) And (C.ElementCount = 0) Then
+              AddIssue(Format('Assignment missing at line %d column %d!', [Token.Line,
+                Token.Column]), scNone, 'SimpleStatement', Token.Line, Token.Column,
+                etError);
+          Finally
+            C.Free;
+          End;
         End;
     End;
 End;
 
 (**
-
 
   This method attempts to parse the current token position as a structured
   statement.
@@ -6016,10 +6395,6 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a structured
            statement.
-
-  @grammar StructStmt -> CompoundStmt -> ConditionalStmt -> LoopStmt ->
-           WithStmt -> TryExceptStmt -> TryFinallyStmt -> RaiseStmt ->
-           AssemblerStmt
 
   @return  a Boolean
 
@@ -6046,8 +6421,6 @@ End;
   @precon  None.
   @postcon Parses the compound statement section of a procedure implementation
            from the current token position
-
-  @grammar CompoundStmt -> BEGIN StmtList END
 
   @param   Method as a TGenericFunction
   @return  a Boolean
@@ -6102,18 +6475,11 @@ end;
 
 (**
 
-
   This method attempts to parse the current token position as a
   ConditionalStmt.
 
-
   @precon  None.
-
   @postcon Attempts to parse the current token position as a ConditionalStmt.
-
-
-  @grammar ConditionalStmt -> IfStmt -> CaseStmt
-
 
   @return  a Boolean
 
@@ -6126,14 +6492,10 @@ End;
 
 (**
 
-
   This method attempts to parse the current token position as an IF statement.
-
 
   @precon  None.
   @postcon Attempts to parse the current token position as an IF statement.
-
-  @grammar IfStmt -> IF Expression THEN Statement [ELSE Statement]
 
   @return  a Boolean
 
@@ -6167,14 +6529,10 @@ End;
 
 (**
 
-
   This method attempts to parse the current token position as a CASE statement.
 
   @precon  None.
   @postcon Attempts to parse the current token position as a CASE statement.
-
-  @grammar CaseStmt -> CASE Expression OF CaseSelector ';'... [ELSE Statement]
-                      [';'] END
 
   @return  a Boolean
 
@@ -6217,13 +6575,10 @@ End;
 
 (**
 
-
   This method attempts to parse the current token position as a case selector.
 
   @precon  None.
   @postcon Attempts to parse the current token position as a case selector.
-
-  @grammar CaseSelector -> CaseLabel ','... ':' Statement
 
 **)
 Procedure TPascalModule.CaseSelector;
@@ -6244,13 +6599,10 @@ End;
 
 (**
 
-
   This method attempts to parse the current token position as a Case Label.
 
   @precon  None.
   @postcon Attempts to parse the current token position as a Case Label.
-
-  @grammar CaseLabel -> ConstExpr ['..' ConstExpr]
 
 **)
 Procedure TPascalModule.CaseLabel;
@@ -6275,8 +6627,6 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a Loop statement.
 
-  @grammar LoopStmt -> RepeatStmt -> WhileStmt -> ForStmt
-
   @return  a Boolean
 
 **)
@@ -6293,8 +6643,6 @@ End;
 
   @precon  None.
   @postcon Attempts to parse the current token position as a Repeat Statement.
-
-  @grammar RepeatStmt -> REPEAT StmtList UNTIL Expression
 
   @return  a Boolean
 
@@ -6330,8 +6678,6 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a While Statement.
 
-  @grammar WhileStmt -> WHILE Expression DO Statement
-
   @return  a Boolean
 
 **)
@@ -6359,14 +6705,10 @@ End;
 
 (**
 
-
   This method attempt to parse the current token position as a For statement.
 
   @precon  None.
   @postcon Attempt to parse the current token position as a For statement.
-
-  @grammar ForStmt -> FOR QualId ':=' Expression (TO | DOWNTO) Expression DO
-           Statement
 
   @return  a Boolean
 
@@ -6382,7 +6724,7 @@ Begin
   If Result Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier, ttDirective] Then
+      If IsIdentifier(Token) Then
         Begin
           M := CurrentMethod As TPascalMethod;
           If Token.Reference In [trUnknown] Then
@@ -6442,8 +6784,6 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a With Statement.
 
-  @grammar WithStmt -> WITH IdentList DO Statement
-
   @return  a Boolean
 
 **)
@@ -6475,9 +6815,6 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a Try Except or Try
            Finally block.
-
-  @grammar TryExceptStmt -> TRY StmtList EXCEPT ExceptionBlock END ...or... TRY
-           StmtList FINALLY StmtList END
 
   @return  a Boolean
 
@@ -6521,9 +6858,6 @@ End;
   @precon  None.
   @postcon Attempt to parse the current token position as an Exception Block.
 
-  @grammar ExceptionBlock -> [ON [Ident â€˜:â€™]
-           TypeID DO Statement]... [ELSE Statement]
-
   @return  a Boolean
 
 **)
@@ -6538,13 +6872,14 @@ Begin
     Begin
       Result := True;
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier, ttDirective] Then
+      If IsIdentifier(Token) Then
         Begin
+          PushTokenPosition;
           NextNonCommentToken;
           If Token.Token = ':' Then
             NextNonCommentToken
           Else
-            RollBackToken;
+            PopTokenPosition;
         End;
       Con := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
       Try
@@ -6579,8 +6914,6 @@ End;
   @precon  None.
   @postcon Attempts to parse the current token position as a Raise Statement.
 
-  @grammar RaiseStmt -> RAISE [object] [AT address]
-
   @return  a Boolean
 
 **)
@@ -6608,10 +6941,6 @@ End;
 
   This method attempts to parse the current token position as an assembler
   statement.
-
-  @grammar AssmeblerStatement -> ASM
-                                   <assemblerlanguage>
-                                 END
 
   @precon  None.
   @postcon Attempts to parse the current token position as an assembler
@@ -6658,8 +6987,6 @@ end;
 
   This method parses a single RTTI Attribute declaration at the current token position.
 
-  @grammar <Identifier> [ '(' [ <ConstExpr> [ ',' <ConstExpr> ]* ] ')' ]
-
   @precon  None.
   @postcon The current RTTI Attribute at the current token postiion is parsed else an
            error is raised.
@@ -6671,7 +6998,7 @@ Var
   iExprType : TExprTypes;
 
 Begin
-  If Token.TokenType In [ttIdentifier] Then
+  If IsIdentifier(Token) Then
     Begin
       NextNonCommentToken;
       If Token.Token = '(' Then
@@ -6699,11 +7026,6 @@ End;
   This method parses a procedure declaration section from the current token
   position using the following object pascal grammar.
 
-  @grammar ProcedureDeclSection -> ProcedureDecl
-                                -> FunctionDecl
-                                -> ConstructorDecl
-                                -> DestructorDecl
-
   @precon  AScope is the current scope of the procedure declaration and Method
            is the current method scoped else nil.
   @postcon Returns true is a procedure declaration was parsed.
@@ -6721,6 +7043,7 @@ Var
 Begin
   Result := False;
   Repeat
+    RTTIAttributes;
     Cls := False;
     If Token.UToken = 'CLASS' Then
       Begin
@@ -6750,9 +7073,6 @@ End;
 
   @precon  None.
   @postcon Attempts to parse the current token position as a ProcedureDecl;
-
-  @grammar ProcedureDecl -> ProcedureHeading ';' [Directive] [PortabilityDirective]
-                            Block ';'
 
   @param   AScope    as a TScope
   @return  a TPascalMethod
@@ -6822,6 +7142,51 @@ Begin
           ErrorAndSeekToken(strLiteralExpected, 'FunctionDecl', ';',
             strSeekableOnErrorTokens, stActual);
     End;
+End;
+
+(**
+
+  This method parses the constraint element of the grammar for within a generic parameter
+  definition.
+
+  @precon  None.
+  @postcon Parses the constraint element of the grammar for within a generic parameter
+           definition.
+
+**)
+Procedure TPascalModule.Constraint;
+
+Begin
+  If IsKeyWord(Token.Token, ['class', 'constructor', 'record']) Then
+    NextNonCommentToken
+  Else
+    If IsIdentifier(Token) Then
+      NextNonCommentToken
+    Else
+      ErrorAndSeekToken(strIdentExpected, 'Constraint', Token.Token,
+        strSeekableOnErrorTokens, stActual);
+End;
+
+(**
+
+  This method parses the constraint list element of the generic parameters declaration.
+
+  @precon  None.
+  @postcon Parses the constraint list element of the generic parameters declaration.
+
+**)
+Procedure TPascalModule.ConstraintList;
+
+Var
+  boolComma : Boolean;
+
+Begin
+  Repeat
+    Constraint;
+    boolComma := Token.Token = ',';
+    If boolComma Then
+      NextNonCommentToken;
+  Until Not boolComma;
 End;
 
 (**
@@ -6955,51 +7320,28 @@ Function TPascalModule.FunctionHeading(AScope :TScope;
 
 Var
   C : TComment;
-  strIdentifier: String;
-  slClassNames: TStringList;
-  iLine: Integer;
-  iColumn: Integer;
+  boolClassMethod : Boolean;
 
 Begin
   Result := Nil;
   If Token.UToken = UpperCase(strMethodTypes[mtFunction]) Then
     Try
+      boolClassMethod := False;
       If PrevToken.UToken = 'CLASS' Then
-        C := GetComment(cpBeforePreviousToken)
-      Else
-        C := GetComment;
+        Begin
+          boolClassMethod := True;
+          C := GetComment(cpBeforePreviousToken);
+        End Else
+          C := GetComment;
       NextNonCommentToken;
-      If (Token.TokenType In [ttIdentifier, ttDirective]) Xor boolIdent Then
+      If IsIdentifier(Token) Xor boolIdent Then
         Begin
           ErrorAndSeekToken(strIdentExpected, 'FunctionHeading', Token.Token,
             strSeekableOnErrorTokens, stActual);
           Exit;
         End;
-      // Create method and store in collection and get comment
-      iLine := 0;
-      iColumn := 0;
-      slClassNames := TStringList.Create;
-      Try
-        Try
-          If boolIdent Then
-            Begin
-              strIdentifier := Token.Token;
-              iLine := Token.Line;
-              iColumn := Token.Column;
-              NextNonCommentToken;
-              ProcessClsIdents(Container, slClassNames, strIdentifier, iLine,
-                iColumn);
-            End;
-        Finally
-          Result := TPascalMethod.Create(mtFunction, strIdentifier, AScope,
-            iLine, iColumn);
-          Result.ClassNames.Assign(slClassNames);
-          Result.ObjClsInt := FindObjClsInt(slClassNames);
-          Result.Comment := C;
-        End;
-      Finally
-        slClassNames.Free;
-      End;
+      Result := MethodQualifiers(AScope, Container, mtFunction, boolClassMethod, C,
+        boolIdent);
       FormalParameter(Result);
       If boolIdent Then
         CheckAlias(Result);
@@ -7025,56 +7367,36 @@ End;
 
 **)
 Function TPascalModule.OperatorHeading(AScope :TScope;
-  Container : TElementContainer; boolIdent : Boolean = true) : TPascalMethod;
+  Container : TElementContainer; boolIdent : Boolean = True) : TPascalMethod;
 
 Var
   C : TComment;
-  strIdentifier: String;
-  slClassNames: TStringList;
-  iLine: Integer;
-  iColumn: Integer;
   boolRequiresReturn: Boolean;
+  boolClassMethod : Boolean;
 
 Begin
   Result := Nil;
   If Token.UToken = UpperCase(strMethodTypes[mtOperator]) Then
     Try
+      boolClassMethod := False;
       If PrevToken.UToken = 'CLASS' Then
-        C := GetComment(cpBeforePreviousToken)
-      Else
-        C := GetComment;
+        Begin
+          boolClassMethod := True;
+          C := GetComment(cpBeforePreviousToken);
+        End Else
+          C := GetComment;
       NextNonCommentToken;
-      If (Token.TokenType In [ttIdentifier, ttDirective]) Xor boolIdent Then
+      If IsIdentifier(Token) Xor boolIdent Then
         Begin
           ErrorAndSeekToken(strIdentExpected, 'OperatorHeading', Token.Token,
             strSeekableOnErrorTokens, stActual);
           Exit;
         End;
-      // Create method and store in collection and get comment
-      iLine := 0;
-      iColumn := 0;
-      slClassNames := TStringList.Create;
-      Try
-        Try
-          If boolIdent Then
-            Begin
-              strIdentifier := Token.Token;
-              iLine := Token.Line;
-              iColumn := Token.Column;
-              NextNonCommentToken;
-              ProcessClsIdents(Container, slClassNames, strIdentifier, iLine,
-                iColumn);
-            End;
-        Finally
-          Result := TPascalMethod.Create(mtOperator, strIdentifier, AScope,
-            iLine, iColumn);
-          Result.ClassNames.Assign(slClassNames);
-          Result.ObjClsInt := FindObjClsInt(slClassNames);
-          Result.Comment := C;
-        End;
-      Finally
-        slClassNames.Free;
-      End;
+      Result := MethodQualifiers(AScope, Container, mtOperator, boolClassMethod, C,
+        boolIdent);
+      If Not IsKeyWord(Result.Identifier, strOperatorList) Then
+        AddIssue(Format(strInvalidOperator, [Result.Identifier, Result.Line,
+          Result.Column]), AScope, 'OperatorHeading', Result.Line, Result.Column, etError);
       FormalParameter(Result);
       If boolIdent Then
         CheckAlias(Result);
@@ -7086,50 +7408,6 @@ Begin
             'CheckReturnValue', Token.Line, Token.Column, etWarning);
     Finally
       AddToContainer(Container, Result);
-    End;
-End;
-
-(**
-
-  This method processes the class names and Identifier for the Procedure,
-  Function, Constructor or Destructor.
-
-  @precon  Container and slClassNames must be a valid instances.
-  @postcon Processes the class names and Identifier for the Procedure,
-           Function, Constructor or Destructor.
-
-  @param   Container     as a TElementContainer
-  @param   slClassNames  as a TStringList
-  @param   strIdentifier as a String as a reference
-  @param   iLine         as an Integer as a reference
-  @param   iColumn       as an Integer as a reference
-
-**)
-Procedure TPascalModule.ProcessClsIdents(Container : TElementContainer;
-  slClassNames : TStringList; var strIdentifier : String; var iLine,
-  iColumn : Integer);
-
-Begin
-  // Check for '.' to signify a class method or alias
-  While Token.Token = '.' Do
-    Begin
-      NextNonCommentToken;
-      If Not (Token.TokenType In [ttIdentifier, ttDirective]) Then
-        ErrorAndSeekToken(strIdentExpected, 'ProcessClsIdents', Token.Token,
-          strSeekableOnErrorTokens, stActual);
-      If Not (Container Is TClassDecl) Then
-        Begin
-          slClassNames.Add(strIdentifier);
-          strIdentifier := Token.Token;
-          iLine := Token.Line;
-          iColumn := Token.Column;
-        End Else
-        Begin
-          If strIdentifier <> '' Then
-            strIdentifier := strIdentifier + '.';
-          strIdentifier := strIdentifier + Token.Token;
-        End;
-      NextNonCommentToken;
     End;
 End;
 
@@ -7149,7 +7427,7 @@ Begin
   If Token.Token = '=' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier, ttDirective] Then
+      If IsIdentifier(Token) Then
         Begin
           Method.Alias := Token.Token;
           NextNonCommentToken;
@@ -7157,7 +7435,7 @@ Begin
             Begin
               Method.Alias := Method.Alias + Token.Token;
               NextNonCommentToken;
-              If Token.TokenType In [ttIdentifier, ttDirective] Then
+              If IsIdentifier(Token) Then
                 Begin
                   Method.Alias := Method.Alias + Token.Token;
                   NextNonCommentToken;
@@ -7188,7 +7466,7 @@ procedure TPascalModule.CheckFunctionReturn(Func : TPascalMethod);
 begin
   If Func.MethodType = mtFunction Then
     Begin
-      If Func.ReturnType = Nil Then
+      If Func.ReturnType.ElementCount = 0 Then
         If Func.Alias = '' Then
           If Not Func.HasDirective('external') Then
             AddIssue(Format(strFunctionWarning, [Func.QualifiedName]), scNone,
@@ -7203,26 +7481,18 @@ end;
   @precon  Method must be a valid TPascalMethod instance .
   @postcon Checks the returns value of the function .
 
-  @param   Method as a TPascalMethod
+  @param   Method as a TGenericFunction
   @return  a Boolean
 
 **)
-Function TPascalModule.CheckReturnValue(Method : TPascalMethod) : Boolean;
+Function TPascalModule.CheckReturnValue(Method : TGenericFunction) : Boolean;
 
 Begin
   Result := False;
   If Token.Token = ':' Then
     Begin
       NextNonCommentToken;
-      If (Token.TokenType In [ttIdentifier, ttDirective]) Or (Token.UToken = 'STRING') Then
-        Begin
-          Method.ReturnType := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
-          ReferenceSymbol(Token);
-          TypeId(Method.ReturnType);
-          ReferenceSymbol(Token);
-        End Else
-          ErrorAndSeekToken(strIdentExpected, 'CheckReturnValue',
-            Token.Token, strSeekableOnErrorTokens, stActual);
+      GetTypeDecl(TypeToken(Token, scNone, Nil, Method.ReturnType));
     End Else
       Result := True;
 End;
@@ -7245,7 +7515,7 @@ Var
   Errors: TLabelContainer;
 
 begin
-  ResolveScopeOfImplementedClassMethods(FImplementedMethodsLabel);
+  ResolveScopeOfImplementedMethods(FImplementedMethodsLabel);
   ResolveScopeOfImplementedExportedMethods;
   ResolveScopeOfImplementedExportsMethods;
   // Only resolved methods IF there are no other errors.
@@ -7253,7 +7523,7 @@ begin
   If Errors <> Nil Then
     If Errors.ElementCount > 0 Then
       Exit;
-  FindUnresolvedObjectAndClassMethods(FTypesLabel);
+  FindUnresolvedRecordObjectAndClassMethods(FTypesLabel);
   FindUnresolvedExportedMethods;
   {FindUnresolvedExportsMethods;}
   FindUnresolvedImplementedClassMethods(FImplementedMethodsLabel);
@@ -7263,8 +7533,6 @@ end;
 
   This method parse a procedure declaration from the current token position
   using the following object pascal grammar.
-
-  @grammar ProcedureHeading -> PROCEDURE Ident [ FormalParameters ]
 
   @precon  AScope is the current scope of the procedure declaration.
   @postcon Returns a method declaration is a procedure was parsed else nil.
@@ -7280,50 +7548,28 @@ Function TPascalModule.ProcedureHeading(AScope : TScope;
 
 Var
   C : TComment;
-  strIdentifier: String;
-  slClassNames: TStringList;
-  iLine, iColumn : Integer;
+  boolClassMethod : Boolean;
 
 Begin
   Result := Nil;
   If Token.UToken = UpperCase(strMethodTypes[mtProcedure]) Then
     Try
+      boolClassMethod := False;
       If PrevToken.UToken = 'CLASS' Then
-        C := GetComment(cpBeforePreviousToken)
-      Else
-        C := GetComment;
+        Begin
+          boolClassMethod := True;
+          C := GetComment(cpBeforePreviousToken)
+        End Else
+          C := GetComment;
       NextNonCommentToken;
-      If Not (Token.TokenType In [ttIdentifier, ttDirective]) And boolIdent Then
+      If Not IsIdentifier(Token) And boolIdent Then
         Begin
           ErrorAndSeekToken(strIdentExpected, 'ProcedureHeading', Token.Token,
             strSeekableOnErrorTokens, stActual);
           Exit;
         End;
-      // Create method and store in collection and get comment
-      iLine := 0;
-      iColumn := 0;
-      slClassNames := TStringList.Create;
-      Try
-        Try
-          If boolIdent Then
-            Begin
-              strIdentifier := Token.Token;
-              iLine := Token.Line;
-              iColumn := Token.Column;
-              NextNonCommentToken;
-              ProcessClsIdents(Container, slClassNames, strIdentifier, iLine,
-                iColumn);
-              End;
-        Finally
-          Result := TPascalMethod.Create(mtProcedure, strIdentifier, AScope,
-            iLine, iColumn);
-          Result.ClassNames.Assign(slClassNames);
-          Result.ObjClsInt := FindObjClsInt(slClassNames);
-          Result.Comment := C;
-        End;
-      Finally
-        slClassNames.Free;
-      End;
+      Result := MethodQualifiers(AScope, Container, mtProcedure, boolClassMethod, C,
+        boolIdent);
       FormalParameter(Result);
       If boolIdent Then
         CheckAlias(Result);
@@ -7337,8 +7583,6 @@ End;
 
   This method parses a methods formal parameters from the current token
   position using the following object psacal grammar.
-
-  @grammar FormalParameter -> '(' FormalParm / ';' ... ')'
 
   @precon  Method is a valid method to which the formal parameters are to be
            added.
@@ -7366,10 +7610,35 @@ End;
 
 (**
 
+  This method parses the formal type parameter list element of the generic grammar.
+
+  @precon  None.
+  @postcon The formal type parameter list is parsed.
+
+  @param   strIdentifier as a String as a Reference
+
+**)
+Procedure TPascalModule.FormalTypeParamList(var strIdentifier : String);
+
+Begin
+  If Token.Token = '<' Then
+    Begin
+      strIdentifier := strIdentifier + Token.Token;
+      TypeParamDeclList(strIdentifier);
+      If Token.Token = '>' Then
+        Begin
+          strIdentifier := strIdentifier + Token.Token;
+          NextNonCommentToken;
+        End Else
+          ErrorAndSeekToken(strLiteralExpected, 'FormalTypeParamList', Token.Token,
+            strSeekableOnErrorTokens, stActual);
+    End;
+End;
+
+(**
+
   This method parses a formal parameter for a method from the current token
   position using the following object pascal grammar.
-
-  @grammar FormalParam -> [ VAR | CONST | OUT ] Parameter
 
   @precon  Method is a valid method to which the formal parameters are to be
            added.
@@ -7402,9 +7671,6 @@ End;
 
   This method parses a parameter list for a method from the current token
   position using the following object pascal grammar.
-
-  @grammar Parameter -> IdentList [ ':' ( [ ARRAY OF ] SimpleType | STRING | FILE ) ]
-                     -> Ident ':' SimpleType '=' ConstExpr
 
   @precon  Method is a valid method to add a parameter too and ParamMod is a
            parameter modifier for the parameter to signify a const, var or out
@@ -7497,11 +7763,6 @@ End;
   @postcon Retrives the method directives after the method declaration from the
            current token position
 
-  @grammar Directive -> REGISTER ';' DYNAMIC ';' VIRTUAL ';' EXPORT ';'
-           EXTERNAL ConstExpr [NAME ConstExpr ';' ] ';' DISPID ConstExpr ';'
-           FAR ';' FORWARD ';' MESSAGE ConstExpr ';' OVERRIDE ';' OVERLOAD
-           ';' PASCAL ';' REINTRODUCE ';' SAFECALL ';' STDCALL ';'
-
   @param   M              as a TPascalMethod
   @param   boolGrammarFix as a Boolean
 
@@ -7511,6 +7772,7 @@ Procedure TPascalModule.Directive(M : TPascalMethod; boolGrammarFix : Boolean = 
 Var
   C : TElementContainer;
   ExprType : TExprTypes;
+  strExternal: String;
 
 Begin
   // Check for method directives
@@ -7537,8 +7799,11 @@ Begin
               Begin
                 ExprType := [etConstExpr, etString];
                 ConstExpr(C, ExprType);
-                M.AddDirectives('External');
-                M.AddDirectives(C.AsString(True, False));
+                strExternal := C.AsString(True, False);
+                If strExternal = '' Then
+                  M.AddDirectives('External')
+                Else
+                  M.AddDirectives('External ' + strExternal);
                 If Token.UToken = 'NAME' Then
                   Begin
                     NextNonCommentToken;
@@ -7546,7 +7811,15 @@ Begin
                     ConstExpr(C, ExprType);
                     M.AddDirectives('Name ' + C.AsString(True, False));
                   End;
+                If Token.UToken = 'INDEX' Then
+                  Begin
+                    NextNonCommentToken;
+                    ExprType := [etConstExpr, etInteger];
+                    ConstExpr(C, ExprType);
+                    M.AddDirectives('Index ' + C.AsString(True, False));
+                  End;
               End;
+            M.Referenced := True;
           End
         Else If Token.UToken = 'DISPID' Then
           Begin
@@ -7577,10 +7850,47 @@ End;
 
 (**
 
+  This method parses a class var section for an object declaration by delegating this to
+  the ClassClassVarSection.
+
+  @precon  Cls must be a valid instance
+  @postcon Parses a class var section defined within an object delcaration.
+
+  @param   AScope as a TScope
+  @param   Cls    as a TRecordDecl
+  @return  a Boolean
+
+**)
+Function TPascalModule.ObjClassVarSection(AScope: TScope; Cls: TRecordDecl): Boolean;
+
+Begin
+  Result := ClassClassVarSection(AScope, Cls);
+End;
+
+(**
+
+  This method parses a constant section defined in an object delcaration by delegating
+  this to the ConstSection method.
+
+  @precon  None.
+  @postcon Parses a constant section in an object definition.
+
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TPascalModule.ObjConstSection(AScope: TScope;
+  Container: TElementContainer): Boolean;
+
+Begin
+  Result := ConstSection(AScope, Container);
+End;
+
+(**
+
   This method parses an Object type declaration from the current token position
   using the followong object pascal grammar.
-
-  @grammar ObjectType -> OBJECT [ ObjHertiage ] [ ObjectFieldList ] [ MethodList ]
 
   @precon  None.
   @postcon Returns an object declaration if one was parsed else nil.
@@ -7601,11 +7911,11 @@ begin
     Begin
       UpdateTypeToken(AToken);
       With AToken Do
-        Result := TObjectDecl.Create(FToken.Token, FScope, FToken.Line,
-          FToken.Column, iiPublicObject, FComment);
+        Result := TObjectDecl.Create(FIdentifier, FScope, FLine,
+          FColumn, iiPublicObject, FComment);
       Result := AToken.FContainer.Add(Result) As TObjectDecl;
-      Result.Line := AToken.FToken.Line;
-      Result.Column := AToken.FToken.Column;
+      Result.Line := AToken.FLine;
+      Result.Column := AToken.FColumn;
       Result.Comment := AToken.FComment ;
       NextNonCommentToken;
       // Get the classes heritage
@@ -7614,12 +7924,17 @@ begin
       If Token.Token <> ';' Then
         Begin
           Repeat
-            ClassVisibility(InternalScope);
+            ObjVisibility(InternalScope);
             If Token.UToken = 'END' Then
               Break;
           Until Not (
-            ClassMethodList(Result, InternalScope) Or
-            ClassFieldList(Result, InternalScope)
+            ObjTypeSection(InternalScope, Result) Or
+            ObjConstSection(InternalScope, Result) Or
+            ObjVarSection(InternalScope, Result) Or
+            ObjClassVarSection(InternalScope, Result) Or
+            ObjMethodList(Result, InternalScope, [mtConstructor..mtFunction]) Or
+            ObjPropertyList(Result, InternalScope) Or
+            ObjFieldList(Result, InternalScope)
           );
           // Check for 'END'
           If Token.UToken = 'END' Then
@@ -7650,7 +7965,7 @@ begin
   If Token.Token = '(' Then
     Begin
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier, ttDirective] Then
+      If IsIdentifier(Token) Then
         Begin
           ObjDecl.Heritage.AppendToken(Token);
           NextNonCommentToken;
@@ -7667,40 +7982,260 @@ End;
 
 (**
 
-  This method parse a method list from the current token position using the
-  following object pascal grammar.
+  This method parses a list of methods defined in an object by delegating this to the
+  MethodList method.
 
-  @precon  Cls is an object declaration to add methods too and Scopeis the
-           current internal scope of the object.
-  @postcon Returns true is a method declaration was parsed.
+  @precon  Cls must be a valid instance
+  @postcon Method within the oject declarations are parsed.
 
-  @param   Cls    as a TRecordDecl
-  @param   AScope as a TScope
+  @param   Cls                as a TRecordDecl
+  @param   AScope             as a TScope
+  @param   PermissibleMethods as a TPermissibleMethods
   @return  a Boolean
 
 **)
-Function TPascalModule.MethodList(Cls: TRecordDecl; AScope: TScope): Boolean;
+Function TPascalModule.ObjMethodList(Cls: TRecordDecl; AScope: TScope;
+  PermissibleMethods : TPermissibleMethods): Boolean;
 
 Begin
-  RTTIAttributes;
-  Result := MethodHeading(Cls, AScope);
+  Result := MethodList(Cls, AScope, PermissibleMethods);
 End;
 
 (**
 
-  This method checks for and parses a method declaration in a class from the
-  current token position.
+  This method parses the Property List element of the grammar within an object definition
+  by delegating this to the ClassPropertyList method.
 
-  @precon  Cls is an object declaration to add method declarations too and
-           Scope is the current scope inside the object declaration.
-  @postcon Returns true if a method declaration was parsed.
+  @precon  Cls must be a valid instance
+  @postcon Parse the property list element of the grammar within the object definition.
 
   @param   Cls    as a TRecordDecl
-  @param   AScope as a TScope
+  @param   AScope as a TScope as a Reference
   @return  a Boolean
 
 **)
-Function TPascalModule.MethodHeading(Cls: TRecordDecl; AScope: TScope): Boolean;
+function TPascalModule.ObjPropertyList(Cls: TRecordDecl; Var AScope: TScope): Boolean;
+
+Begin
+  Result := ClassPropertyList(Cls, AScope);
+End;
+
+(**
+
+  This method parses a type section within an object declaration by delegating this to the
+  TypeSection method.
+
+  @precon  Cls must be a valid instance
+  @postcon A type section is parsed which is defined within an object definition.
+
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TPascalModule.ObjTypeSection(AScope: TScope;
+  Container: TElementContainer): Boolean;
+
+Begin
+  Result := TypeSection(AScope, Container);
+End;
+
+(**
+
+  This method parses the var section declared with an object definition.
+
+  @precon  Container must be a valid container.
+  @postcon A var section is parsed if found.
+
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TPascalModule.ObjVarSection(AScope: TScope;
+  Container: TElementContainer): Boolean;
+
+Begin
+  Result := VarSection(AScope, Container);
+End;
+
+(**
+
+  This method parses the visibility elements of an object definiton.
+
+  @precon  None.
+  @postcon Parses an visibility elements of the object definiton return the visibility in
+           the var parameter.
+
+  @param   AScope as a TScope as a Reference
+
+**)
+Procedure TPascalModule.ObjVisibility(Var AScope: TScope);
+
+Const
+  strObjScope : Array[1..3] Of String = ('private', 'protected', 'public');
+
+Begin
+  While (Token.UToken = 'STRICT') Or IsKeyWord(Token.Token, strObjScope) Do
+    Begin
+      While Token.UToken = 'STRICT' Do
+        Begin
+          NextNonCommentToken;
+          If IsKeyWord(Token.Token, strStrictedScope) Then
+            Begin
+              If Token.UToken = 'PRIVATE' Then
+                Begin
+                  AScope := scPrivate;
+                  NextNonCommentToken;
+                End
+              Else If Token.UToken = 'PROTECTED' Then
+                Begin
+                  AScope := scProtected;
+                  NextNonCommentToken;
+                End Else
+                  ErrorAndSeekToken(strReservedWordExpected, 'ObjVisibility',
+                    'PRIVATE or PROTECTED', strSeekableOnErrorTokens, stActual);
+            End;
+        End;
+      While IsKeyWord(Token.Token, strObjScope) Do
+        Begin
+          If Token.UToken = 'PRIVATE' Then
+            Begin
+              AScope := scPrivate;
+              NextNonCommentToken;
+            End
+          Else If Token.UToken = 'PROTECTED' Then
+            Begin
+              AScope := scProtected;
+              NextNonCommentToken;
+            End
+          Else If Token.UToken = 'PUBLIC' Then
+            Begin
+              AScope := scPublic;
+              NextNonCommentToken;
+            End Else
+              ErrorAndSeekToken(strReservedWordExpected, 'ObjVisibility',
+                'PRIVATE, PROTECTED or PUBLIC', strSeekableOnErrorTokens, stActual);
+        End;
+    End;
+End;
+
+(**
+
+  This method parse a method list from the current token position using the following
+  object pascal grammar.
+
+  @precon  Cls is an object declaration to add methods too and Scopeis the current
+           internal scope of the object.
+  @postcon Returns true is a method declaration was parsed.
+
+  @param   Cls                as a TRecordDecl
+  @param   AScope             as a TScope
+  @param   PermissibleMethods as a TPermissibleMethods
+  @return  a Boolean
+
+**)
+Function TPascalModule.MethodList(Cls: TRecordDecl; AScope: TScope;
+  PermissibleMethods : TPermissibleMethods): Boolean;
+
+Begin
+  RTTIAttributes;
+  Result := MethodHeading(Cls, AScope, PermissibleMethods);
+End;
+
+(**
+
+  This method parses the quantified record / object / class names that preceed an
+  implemented method.
+
+  @precon  None.
+  @postcon The method builds a list of the record / object / class hierarchy that
+           qualifies the implemented method.
+
+  @param   AScope          as a TScope
+  @param   Container       as a TElementContainer
+  @param   iMethodType     as a TMethodType
+  @param   boolClassMethod as a Boolean
+  @param   C               as a TComment
+  @param   boolIdent       as a Boolean
+  @return  a TPascalMethod
+
+**)
+Function TPascalModule.MethodQualifiers(AScope :TScope;
+  Container : TElementContainer; iMethodType : TMethodType; boolClassMethod : Boolean;
+  C : TComment; boolIdent : Boolean = True) : TPascalMethod;
+
+Var
+  slClassNames: TStringList;
+  iLine: Integer;
+  iColumn: Integer;
+  strIdentifier: String;
+
+Begin
+  iLine := 0;
+  iColumn := 0;
+  slClassNames := TStringList.Create;
+  Try
+    Try
+      If boolIdent Then
+        Begin
+          strIdentifier := Token.Token;
+          iLine := Token.Line;
+          iColumn := Token.Column;
+          NextNonCommentToken;
+          FormalTypeParamList(strIdentifier);
+          While Token.Token = '.' Do
+            Begin
+              NextNonCommentToken;
+              If Not IsIdentifier(Token) Then
+                ErrorAndSeekToken(strIdentExpected, 'ProcessClsIdents', Token.Token,
+                  strSeekableOnErrorTokens, stActual);
+              If Not (Container Is TClassDecl) Then
+                Begin
+                  slClassNames.Add(strIdentifier);
+                  strIdentifier := Token.Token;
+                  iLine := Token.Line;
+                  iColumn := Token.Column;
+                End Else
+                Begin
+                  If strIdentifier <> '' Then
+                    strIdentifier := strIdentifier + '.';
+                  strIdentifier := strIdentifier + Token.Token;
+                End;
+              NextNonCommentToken;
+              FormalTypeParamList(strIdentifier);
+            End;
+        End;
+    Finally
+      Result := TPascalMethod.Create(iMethodType, strIdentifier, AScope,
+        iLine, iColumn);
+      Result.ClassNames.Assign(slClassNames);
+      Result.RecObjClsInt := FindRecObjClsInt(slClassNames);
+      Result.Comment := C;
+      Result.ClassMethod := boolClassMethod;
+    End;
+  Finally
+    slClassNames.Free;
+  End;
+End;
+
+(**
+
+  This method checks for and parses a method declaration in a class from the current token
+  position.
+
+  @precon  Cls is an object declaration to add method declarations too and Scope is the
+           current scope inside the object declaration.
+  @postcon Returns true if a method declaration was parsed.
+
+  @param   Cls                as a TRecordDecl
+  @param   AScope             as a TScope
+  @param   PermissibleMethods as a TPermissibleMethods
+  @return  a Boolean
+
+**)
+Function TPascalModule.MethodHeading(Cls: TRecordDecl; AScope: TScope;
+  PermissibleMethods : TPermissibleMethods): Boolean;
 
 Var
   M :TPascalMethod;
@@ -7710,6 +8245,7 @@ begin
   Result := False;
   // Check for class method
   boolClassMethod := False;
+  PushTokenPosition;
   If Token.UToken = 'CLASS' Then
     Begin
       boolClassMethod := True;
@@ -7741,17 +8277,18 @@ begin
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'MethodHeading', ';',
             strSeekableOnErrorTokens, stActual);
+      If Not (M.MethodType In PermissibleMethods) Then
+        AddIssue(strMethodNotPermitted, AScope, 'MethodHeading', M.Line, M.Column,
+          etError);
     End Else
       If boolClassMethod Then
-        RollBackToken;
+        PopTokenPosition;
 end;
 
 (**
 
   This method parses a constructor declaration from the current token position
   using the following object pascal grammar.
-
-  @grammar ConstructorHeading -> CONSTRUCTOR Ident [ FormalParameters ]
 
   @precon  Scope is the current scope of the constructor declaration.
   @postcon Returns a method declaration is a constructor was parsed else nil.
@@ -7766,41 +8303,23 @@ function TPascalModule.ConstructorHeading(AScope: TScope;
 
 Var
   C : TComment;
-  strIdentifier: String;
-  slClassNames: TStringList;
-  iLine: Integer;
-  iColumn: Integer;
+  boolClassMethod : Boolean;
 
 begin
   Result := Nil;
   If Token.UToken = UpperCase(strMethodTypes[mtConstructor]) Then
     Try
-      C := GetComment;
-      NextNonCommentToken;
-      If (Token.TokenType In [ttIdentifier, ttDirective]) Then
+      boolClassMethod := False;
+      If PrevToken.UToken = 'CLASS' Then
         Begin
-          // Create method and store in collection and get comment
-          iLine := 0;
-          iColumn := 0;
-          slClassNames := TStringList.Create;
-          Try
-            Try
-              strIdentifier := Token.Token;
-              iLine := Token.Line;
-              iColumn := Token.Column;
-              NextNonCommentToken;
-              ProcessClsIdents(Container, slClassNames, strIdentifier, iLine,
-                iColumn);
-            Finally
-              Result := TPascalMethod.Create(mtConstructor, strIdentifier, AScope,
-                iLine, iColumn);
-              Result.ClassNames.Assign(slClassNames);
-              Result.ObjClsInt := FindObjClsInt(slClassNames);
-              Result.Comment := C;
-            End;
-          Finally
-            slClassNames.Free;
-          End;
+          boolClassMethod := True;
+          C := GetComment(cpBeforePreviousToken)
+        End Else
+          C := GetComment;
+      NextNonCommentToken;
+      If IsIdentifier(Token) Then
+        Begin
+          Result := MethodQualifiers(AScope, Container, mtConstructor, boolClassMethod, C);
           FormalParameter(Result);
         End;
     Finally
@@ -7812,8 +8331,6 @@ end;
 
   This method parses a destructor declaration from the current token position
   using the following object pascal grammar.
-
-  @grammar DestructorHeading -> DESTRUCTOR Ident [ FormalParameters ]
 
   @precon  Scope is the current scope of the destructor declaration.
   @postcon Returns a method declaration is a destructor was parsed else nil.
@@ -7828,41 +8345,23 @@ function TPascalModule.DestructorHeading(AScope: TScope;
 
 Var
   C : TComment;
-  strIdentifier: String;
-  slClassNames: TStringList;
-  iLine: Integer;
-  iColumn: Integer;
+  boolClassMethod: Boolean;
 
 begin
   Result := Nil;
   If Token.UToken = UpperCase(strMethodTypes[mtDestructor]) Then
     Try
-      C := GetComment;
-      NextNonCommentToken;
-      If (Token.TokenType In [ttIdentifier, ttDirective]) Then
+      boolClassMethod := False;
+      If PrevToken.UToken = 'CLASS' Then
         Begin
-          // Create method and store in collection and get comment
-          iLine := 0;
-          iColumn := 0;
-          slClassNames := TStringList.Create;
-          Try
-            Try
-              strIdentifier := Token.Token;
-              iLine := Token.Line;
-              iColumn := Token.Column;
-              NextNonCommentToken;
-              ProcessClsIdents(Container, slClassNames, strIdentifier, iLine,
-                iColumn);
-            Finally
-              Result := TPascalMethod.Create(mtDestructor, strIdentifier, AScope,
-                iLine, iColumn);
-              Result.ClassNames.Assign(slClassNames);
-              Result.ObjClsInt := FindObjClsInt(slClassNames);
-              Result.Comment := C;
-            End;
-          Finally
-            slClassNames.Free;
-          End;
+          boolClassMethod := True;
+          C := GetComment(cpBeforePreviousToken)
+        End Else
+          C := GetComment;
+      NextNonCommentToken;
+      If IsIdentifier(Token) Then
+        Begin
+          Result := MethodQualifiers(AScope, Container, mtDestructor, boolClassMethod, C);
           FormalParameter(Result);
         End;
     Finally
@@ -7876,23 +8375,16 @@ end;
   This method parses a classes / interfaces field list from the current token
   position using the following object pascal grammar.
 
-
   @precon  Cls is an ibject delcaration to add fields too and Scope is the
-
            current internal scope of the object.
-
   @postcon Returns true is a field was parsed.
-
-
-  @grammar ObjFieldList -> ( IndentList ':' Type ) / ';' ...
-
 
   @param   Cls    as a TObjectDecl
   @param   AScope as a TScope
   @return  a Boolean
 
 **)
-Function TPascalModule.ObjFieldList(Cls: TObjectDecl; AScope: TScope): Boolean;
+Function TPascalModule.FieldList(Cls: TObjectDecl; AScope: TScope): Boolean;
 
 Var
   I : TIdentList;
@@ -7947,10 +8439,6 @@ end;
   This method parses the modules initialisation / finalisation section from the
   current token position using the following object pascal grammar.
 
-  @grammar InitSection -> INITIALIZATION StmtList [ FINALIZATION StmtList ] END
-                       -> BEGIN StmtList End
-                       -> END
-
   @precon  None.
   @postcon Parses the modules initialisation / finalisation section from the
            current token position
@@ -7995,12 +8483,6 @@ End;
   deligating field, property and method declarations using the following
   object pascal grammar.
 
-  @grammar ClassType -> CLASS [ ABSTRACT | SEALED] [ ClassHeritage ]
-                          [ ClassFieldList ]
-                          [ ClassMethodList ]
-                          [ ClassPropertyList ]
-                        END
-
   @precon  None.
   @postcon Returns a class declaration is a class was parsed else nil.
 
@@ -8020,17 +8502,18 @@ begin
   Result := Nil;
   If Token.UToken = 'CLASS' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       // Check for 'OF'
       If Token.UToken <> 'OF' Then
         Begin
           UpdateTypeToken(AToken);
           With AToken Do
-            Result := TClassDecl.Create(FToken.Token, FScope, FToken.Line,
-              FToken.Column, iiPublicClass, FComment);
+            Result := TClassDecl.Create(FIdentifier, FScope, FLine,
+              FColumn, iiPublicClass, FComment);
           Result := AToken.FContainer.Add(Result) As TClassDecl;
-          Result.Line := AToken.FToken.Line;
-          Result.Column := AToken.FToken.Column;
+          Result.Line := AToken.FLine;
+          Result.Column := AToken.FColumn;
           Result.Comment := AToken.FComment;
           Result.AbstractClass := (Token.UToken = 'ABSTRACT');
           If Result.AbstractClass Then
@@ -8045,12 +8528,12 @@ begin
               boolFieldAllowed := False;
             End;
           // Get the classes heritage
-          ClassHeritage(Result);
+          RecObjClsIntHeritage(Result);
           If Result.HelperClass Then
             If Token.UToken = 'FOR' Then
               Begin
                 NextNonCommentToken;
-                If Token.TokenType In [ttIdentifier, ttDirective] Then
+                If IsIdentifier(Token) Then
                   Begin
                     Result.HelperClassName := Token.Token;
                     NextNonCommentToken;
@@ -8068,12 +8551,12 @@ begin
                 If Token.UToken = 'END' Then
                   Break;
               Until Not (
-                ClassMethodList(Result, InternalScope) Or
-                ClassPropertyList(Result, InternalScope) Or
-                TypeSection(InternalScope, Result) Or
-                ConstSection(InternalScope, Result) Or
-                VarSection(InternalScope, Result) Or
+                ClassTypeSection(InternalScope, Result) Or
+                ClassConstSection(InternalScope, Result) Or
                 ClassVarSection(InternalScope, Result) Or
+                ClassClassVarSection(InternalScope, Result) Or
+                ClassMethodList(Result, InternalScope, [mtConstructor..mtFunction]) Or
+                ClassPropertyList(Result, InternalScope) Or
                 (boolFieldAllowed And ClassFieldList(Result, InternalScope))
               );
               // Check for 'END'
@@ -8084,30 +8567,49 @@ begin
                   strSeekableOnErrorTokens, stActual);
             End;
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
 (**
 
-  This method parses a class heriage ist from the current token
-  position using the following object pascal grammar.
+  This method parses the grammar associated with a type declaration with in a class
+  declaration.
 
-  @grammar ClassHeritage -> '(' IdentList ')'
+  @precon  None.
+  @postcon Parses the grammar associated with a type declaration with in a class
+           declaration.
+
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+function TPascalModule.ClassTypeSection(AScope: TScope;
+      Container: TElementContainer): Boolean;
+
+Begin
+  Result := TypeSection(AScope, Container);
+End;
+
+(**
+
+  This method parses a class heriage ist from the current token position using the
+  following object pascal grammar.
 
   @precon  Cls is a valid object declaration to get a heritage for.
   @postcon Parses a class heriage ist from the current token position
 
-  @param   Cls as a TObjectDecl
+  @param   RecObjClsInt as a TRecordDecl
 
 **)
-procedure TPascalModule.ClassHeritage(Cls: TObjectDecl);
+procedure TPascalModule.RecObjClsIntHeritage(RecObjClsInt: TRecordDecl);
 
 begin
   If Token.Token = '(' Then
     Begin
       NextNonCommentToken;
-      IdentList(Cls.Heritage, strSeekableOnErrorTokens);
+      IdentList(RecObjClsInt.Heritage, strSeekableOnErrorTokens);
       If Token.Token = ')' Then
         NextNonCommentToken
       Else
@@ -8118,10 +8620,29 @@ end;
 
 (**
 
+  This method parses the grammar associated with a var declaration with in a class
+  declaration.
+
+  @precon  None.
+  @postcon Parses the grammar associated with a var declaration with in a class
+           declaration.
+
+  @param   AScope    as a TScope
+  @param   Container as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TPascalModule.ClassVarSection(AScope: TScope;
+      Container: TElementContainer): Boolean;
+
+Begin
+  Result := VarSection(AScope, Container);
+End;
+
+(**
+
   This method parse the class visibility from the current token
   using the following object pascal grammar.
-
-  @grammar ClassVisibility -> [ STATIC ] [ PUBLIC | PROTECTED | PRIVATE | PUBLISHED ]
 
   @precon  Scope is the current internal scope of the class.
   @postcon Parse the class visibility from the current token
@@ -8129,8 +8650,9 @@ end;
   @param   AScope as a TScope as a reference
 
 **)
-procedure TPascalModule.ClassVisibility(var AScope : TScope);
-begin
+Procedure TPascalModule.ClassVisibility(Var AScope: TScope);
+
+Begin
   While (Token.UToken = 'STRICT') Or IsKeyWord(Token.Token, strScope) Do
     Begin
       While Token.UToken = 'STRICT' Do
@@ -8158,7 +8680,7 @@ begin
           NextNonCommentToken;
         End;
     End;
-end;
+End;
 
 (**
 
@@ -8166,16 +8688,9 @@ end;
   This method parses a class field list from the current token position using
   the following object pascal grammar.
 
-
   @precon  Cls is a valid object declaration to add fields too and Scope is the
-
            current scope of the class.
-
   @postcon Returns true is field where handled and parsed.
-
-
-  @grammar ( <ClassVisibility>  [ <RTTIAttributes> ] <ObjFieldList> ( ';' [ <RTTIAttributes> ] <ObjFieldList> )* )
-
 
   @param   Cls    as a TObjectDecl
   @param   AScope as a TScope
@@ -8186,7 +8701,7 @@ Function TPascalModule.ClassFieldList(Cls: TObjectDecl; AScope: TScope): Boolean
 
 Begin
   RTTIAttributes;
-  Result := ObjFieldList(Cls, AScope);
+  Result := FieldList(Cls, AScope);
   If Result Then
     If Token.Token = ';' Then
       NextNonCommentToken
@@ -8197,24 +8712,24 @@ End;
 
 (**
 
-  This method parses a class method list from the current token position using
-  the following object pascal grammar.
+  This method parses a class method list from the current token position using the
+  following object pascal grammar.
 
-  @grammar MethodList -> ( ClassVisibility MethodList ) / ';' ...
-
-  @precon  Cls is a valid object declaration to get method for and Scope is the
-           current scope of the class.
+  @precon  Cls is a valid object declaration to get method for and Scope is the current
+           scope of the class.
   @postcon Returns true is method were parsed.
 
-  @param   Cls   as a TRecordDecl
-  @param   AScope as a TScope
+  @param   Cls                as a TRecordDecl
+  @param   AScope             as a TScope
+  @param   PermissibleMethods as a TPermissibleMethods
   @return  a Boolean
 
 **)
-Function TPascalModule.ClassMethodList(Cls: TRecordDecl; AScope: TScope): Boolean;
+Function TPascalModule.ClassMethodList(Cls: TRecordDecl; AScope: TScope;
+  PermissibleMethods : TPermissibleMethods): Boolean;
 
 Begin
-  Result := MethodList(Cls, AScope);
+  Result := MethodList(Cls, AScope, PermissibleMethods);
 End;
 
 (**
@@ -8267,15 +8782,22 @@ Var
   C : TComment;
   P: TPascalProperty;
   PropertiesLabel: TLabelContainer;
+  boolIsClassProp : Boolean;
 
 begin
-  ClassVisibility(AScope);
+  boolIsClassProp := False;
+  If Token.UToken = 'CLASS' THEN
+    Begin
+      PushTokenPosition;
+      NextNonCommentToken;
+      boolIsClassProp := True;
+    End;
   Result := Token.UToken = 'PROPERTY';
   If Result Then
     Begin
       C := GetComment;
       NextNonCommentToken;
-      If Token.TokenType In [ttIdentifier, ttDirective, ttReservedWord] Then
+      If IsIdentifier(Token) Then
         Begin
           PropertiesLabel := Cls.FindElement(strPropertiesLabel) As TLabelContainer;
           If PropertiesLabel = Nil Then
@@ -8291,11 +8813,14 @@ begin
           NextNonCommentToken;
           PropertyInterface(P);
           PropertySpecifiers(P);
+          P.IsClassProperty := boolIsClassProp;
           PortabilityDirective;
         End Else
           ErrorAndSeekToken(strIdentExpected, 'PropertyList', Token.Token,
             strSeekableOnErrorTokens, stActual);
-    End;
+    End Else
+      If boolIsClassProp Then
+        PopTokenPosition;
 end;
 
 (**
@@ -8304,36 +8829,17 @@ end;
   This method parses the property interface from the current token position
   using the following object pascal grammar.
 
-
   @precon  Prop is a property to parse an interface for.
-
   @postcon Parses the property interface from the current token position
-
-
-  @grammar PropertyInterface -> [ PropertyParameterList ] ':' Ident
-
 
   @param   Prop   as a TPascalProperty
 
 **)
 Procedure TPascalModule.PropertyInterface(Prop : TPascalProperty);
-var
-  FTemporaryElements: TElementContainer;
 
 Begin
   PropertyParameterList(Prop);
-  // Check for property type id
-  If Token.Token = ':' Then
-    Begin
-      NextNonCommentToken;
-      FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
-      Try
-        Prop.ReturnType := TTypes.Create('', scNone, 0, 0, iiNone, Nil);
-        TypeId(Prop.ReturnType);
-      Finally
-        FTemporaryElements.Free;
-      End;
-    End;
+  CheckReturnValue(Prop);
 End;
 
 (**
@@ -8342,14 +8848,8 @@ End;
   This method parses a properties parameter list from the current token using
   the following object pascal grammar.
 
-
   @precon  Prop is a property to parse a parameter list for.
-
   @postcon Parses a properties parameter list from the current token
-
-
-  @grammar PropertyParameterList -> '[' ( IdentList ':' TypeId ) / ';' ... ']'
-
 
   @param   Prop   as a TPascalProperty
 
@@ -8413,13 +8913,6 @@ End;
 
   This method parses the property specifiers from the current token position
   using the following object pascal grammar.
-
-  @grammar PropertySpecifiers -> [ INDEX ConstExpr ]
-                                 [ READ Ident ]
-                                 [ WRITE Ident ]
-                                 [ STORED ( Ident | Constant) ]
-                                 [ ( DEFAULT ConstExpr ) | NODEFAULT ]
-                                 [ IMPLEMENTS TypeId ]
 
   @precon  Prop is a property to parse specifiers for.
   @postcon Parses the property specifiers from the current token position
@@ -8536,13 +9029,15 @@ begin
   // Check for ';'
   If Token.Token = ';' Then
     Begin
+      //PushTokenPosition;
       NextNonCommentToken;
-     // Check for default property
+      // Check for default property
       If Token.UToken = 'DEFAULT' Then
         Begin
           Prop.DefaultProperty := True;
           NextNonCommentToken;
         End Else
+          //PopTokenPosition;
           RollBackToken;
     End;
 end;
@@ -8551,11 +9046,6 @@ end;
 
   This method parses an Interface declaration from the current token position
   using the following object pascal grammar.
-
-  @grammar InterfaceType -> INTERFACE [ InterfaceHeritage ]
-                            [ ClassMethodList ]
-                            [ ClassPropertyList ]
-                            END
 
   @precon  None.
   @postcon Returns an interface declaration if one was parsed else nil.
@@ -8578,19 +9068,19 @@ begin
       With AToken Do
         If Token.UToken = 'INTERFACE' Then
           Begin
-            Result := TInterfaceDecl.Create(FToken.Token, FScope, FToken.Line,
-              FToken.Column, iiPublicInterface, FComment);
+            Result := TInterfaceDecl.Create(FIdentifier, FScope, FLine,
+              FColumn, iiPublicInterface, FComment);
             Result := AToken.FContainer.Add(Result) as TInterfaceDecl;
-            Result.Line := AToken.FToken.Line;
-            Result.Column := AToken.FToken.Column;
+            Result.Line := AToken.FLine;
+            Result.Column := AToken.FColumn;
             Result.Comment := AToken.FComment ;
           End Else
           Begin
-            Result := TDispInterfaceDecl.Create(FToken.Token, FScope, FToken.Line,
-              FToken.Column, iiPublicDispInterface, FComment);
+            Result := TDispInterfaceDecl.Create(FIdentifier, FScope, FLine,
+              FColumn, iiPublicDispInterface, FComment);
             Result := AToken.FContainer.Add(Result) as TDispInterfaceDecl;
-            Result.Line := AToken.FToken.Line;
-            Result.Column := AToken.FToken.Column;
+            Result.Line := AToken.FLine;
+            Result.Column := AToken.FColumn;
             Result.Comment := AToken.FComment ;
           End;
       NextNonCommentToken;
@@ -8602,6 +9092,7 @@ begin
           // Get GUID if there is one
           If Token.Token = '[' Then
             Begin
+              PushTokenPosition;
               NextNonCommentToken;
               If Token.TokenType In [ttSingleLiteral] Then
                 Begin
@@ -8613,15 +9104,14 @@ begin
                     ErrorAndSeekToken(strLiteralExpected, 'InterfaceType', ']',
                       strSeekableOnErrorTokens, stActual);
                 End Else
-                  RollBackToken;
+                  PopTokenPosition;
             End;
           Repeat
-            ClassVisibility(InternalScope);
             If Token.UToken = 'END' Then
               Break;
           Until Not (
-            ClassMethodList(Result, InternalScope) Or
-            ClassPropertyList(Result, InternalScope)
+            InterfaceMethodList(Result, InternalScope, [mtProcedure..mtFunction]) Or
+            InterfacePropertyList(Result, InternalScope)
           );
           // Check for 'END' and ';'
           If Token.UToken = 'END' Then
@@ -8637,8 +9127,6 @@ end;
 
   This method attempts to parse the current token position as a heritage list.
 
-  @grammar InterfaceHeritage -> '(' IdentList ')'
-
   @precon  None.
   @postcon Attempts to parse the current token position as a heritage list.
 
@@ -8648,15 +9136,53 @@ end;
 Procedure TPascalModule.InterfaceHeritage(InterfaceDecl : TInterfaceDecl);
 
 begin
-  ClassHeritage(InterfaceDecl); // Same as ClassHeritage
+  RecObjClsIntHeritage(InterfaceDecl); // Same as ClassHeritage
+End;
+
+(**
+
+  This method parses the gramar for the method list of an interface.
+
+  @precon  Cls must be a valid instance.
+  @postcon The grammar element is parsed.
+
+  @param   Cls                as a TRecordDecl
+  @param   AScope             as a TScope
+  @param   PermissibleMethods as a TPermissibleMethods
+  @return  a Boolean
+
+**)
+function TPascalModule.InterfaceMethodList(Cls: TRecordDecl; AScope: TScope;
+  PermissibleMethods: TPermissibleMethods): Boolean;
+
+Begin
+  Result := MethodList(Cls, AScope, PermissibleMethods);
+End;
+
+(**
+
+  This method parses the grammar for an interace property by delegating the process to the
+  ClassPropertyList method.
+
+  @precon  Cls must be a valid reference.
+  @postcon The property list element of the grammar is parsed.
+
+  @param   Cls as a TRecordDecl
+  @param   AScope as a TScope as a Reference
+  @return  a Boolean
+
+**)
+Function TPascalModule.InterfacePropertyList(Cls: TRecordDecl;
+  Var AScope: TScope): Boolean;
+
+Begin
+  Result := ClassPropertyList(Cls, AScope);
 End;
 
 (**
 
   This method parses a requires clause from the current token position usnig
   the following object pascal grammar.
-
-  @grammar RequiresClause -> REQUIRES IdentList ... ';'
 
   @precon  None.
   @postcon Parses a requires clause from the current token position usnig
@@ -8684,8 +9210,6 @@ End;
 
   This method parses a contains clause fro the cutrrent token position using
   the following object pascal grammar.
-
-  @grammar ContainsClause -> CONTAINS IdentList ... ';'
 
   @precon  None.
   @postcon Parses a contains clause fro the cutrrent token position
@@ -8716,8 +9240,6 @@ End;
   is added to the classes owned items list for automatic disposal, else it the
   responsibliity of the calling function to disposal of the class.
 
-  @grammar IdentList -> Ident / ',' ...
-
   @precon  OwnList determines if the identlist should be disposed of be the
            parser or be the caller. SeekTokens is a sorted lowercase list of
            token to find if an error is found.
@@ -8725,11 +9247,11 @@ End;
 
   @param   Container   as a TElementContainer
   @param   SeekTokens  as an Array Of String
-  @param   iImageIndex as a TImageIndex
+  @param   iImageIndex as a TBADIImageIndex
 
 **)
 Procedure TPascalModule.IdentList(Container : TElementContainer;
-  SeekTokens : Array Of String; iImageIndex : TImageIndex = iiNone);
+  SeekTokens : Array Of String; iImageIndex : TBADIImageIndex = iiNone);
 
 Var
   C, AComment : TComment;
@@ -8737,12 +9259,14 @@ Var
   strUnit : String;
   iLine: Integer;
   iColumn: Integer;
+  TempContainer: TElementContainer;
+  iToken: Integer;
 
 Begin
   AComment := Nil;
-  If Token.TokenType In [ttIdentifier, ttDirective] Then
+  If IsIdentifier(Token) Then
     Repeat
-      If Token.TokenType In [ttIdentifier, ttDirective] Then
+      If IsIdentifier(Token) Then
         Begin
           C := GetComment;
           If C <> Nil then
@@ -8754,11 +9278,19 @@ Begin
           iLine := Token.Line;
           iColumn := Token.Column;
           NextNonCommentToken;
+          TempContainer := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
+          Try
+            TypeArgs(TempContainer);
+            For iToken := 0 To TempContainer.TokenCount -1 Do
+              strUnit := strUnit + TempContainer.Tokens[iToken].Token;
+          Finally
+            TempContainer.Free;
+          End;
           While Token.Token = '.' Do
             Begin
               strUnit := strUnit + Token.Token;
               NextNonCommentToken;
-              If Token.TokenType In [ttIdentifier, ttDirective] Then
+              If IsIdentifier(Token) Then
                 Begin
                   strUnit := strUnit + Token.Token;
                   NextNonCommentToken;
@@ -8797,8 +9329,6 @@ End;
   This method returns a type id at the current token position using the
   following object pascal grammar.
 
-  @grammar TypeId -> [ UnitId '.' ] <type-identifier>
-
   @precon  C must be a valid generic container.
   @postcon Returns a type id as a string of text.
 
@@ -8809,14 +9339,14 @@ End;
 Function TPascalModule.TypeId(Container: TElementContainer) : Boolean;
 
 Begin
-  Result := (Token.TokenType In [ttIdentifier, ttDirective]) Or (Token.UToken = 'STRING');
+  Result := IsIdentifier(Token) Or (Token.UToken = 'STRING');
   If Result Then
     Begin
       AddToExpression(Container);
       If Token.Token = '.' Then
         Begin
           AddToExpression(Container);
-          If Token.TokenType In [ttIdentifier, ttDirective] Then
+          If IsIdentifier(Token) Then
             AddToExpression(Container)
           Else
             ErrorAndSeekToken(strIdentExpected, 'TypeId', Token.Token,
@@ -8827,18 +9357,118 @@ End;
 
 (**
 
+  This method parses a parameter declaration for a generic type definition.
+
+  @precon  None.
+  @postcon A generic type parameter definition is parsed.
+
+  @param   strIdentifier as a String as a reference
+
+**)
+procedure TPascalModule.TypeParamDecl(var strIdentifier : String);
+
+Begin
+  TypeParamList(strIdentifier);
+  If Token.Token = ':' Then
+    Begin
+      NextNonCommentToken;
+      ConstraintList;
+    End;
+End;
+
+(**
+
+  This method parses the TypeParamDeclList element of the grammar.
+
+  @precon  None.
+  @postcon The type param declaration list is parses and the identifier modified.
+
+  @param   strIdentifier as a String as a reference
+
+**)
+Procedure TPascalModule.TypeParamDeclList(var strIdentifier : String);
+
+Begin
+  Repeat
+    NextNonCommentToken;
+    TypeParamDecl(strIdentifier);
+    If Token.Token = ';' Then
+      strIdentifier := strIdentifier + ', '; // This is deliberate
+  Until Token.Token <> ';';
+End;
+
+(**
+
+  This method parses the TypeParamList element of the generics grammar.
+
+  @precon  None.
+  @postcon the updated identifier is returned.
+
+  @param   strIdentifier as a String as a reference
+
+**)
+Procedure TPascalModule.TypeParamList(var strIdentifier : String);
+
+Var
+  boolComma: Boolean;
+  iParams : Integer;
+
+Begin
+  iParams := 0;
+  Repeat
+    RTTIAttributes;
+    If IsKeyWord(Token.Token, ['+', '-']) Then
+      RTTIAttributes;
+    If IsIdentifier(Token) Then
+      Begin
+        If iParams > 0 Then
+          strIdentifier := strIdentifier + ', ';
+        strIdentifier := strIdentifier + Token.Token;
+        NextNonCommentToken;
+        Inc(iParams);
+      End Else
+        ErrorAndSeekToken(strIdentExpected, 'TypeParamList', Token.Token,
+          strSeekableOnErrorTokens, stActual);
+    boolComma := Token.Token = ',';
+    If boolComma Then
+      NextNonCommentToken;
+  Until Not boolComma;
+End;
+
+(**
+
+  This method parses the TypeParam element of the grammar.
+
+  @precon  None.
+  @postcon The updated identifier is returned if it contains a generic definition.
+
+  @param   strIdentifier as a String as a reference
+
+**)
+Procedure TPascalModule.TypeParams(var strIdentifier : String);
+
+Begin
+  If Token.Token = '<' Then
+    Begin
+      strIdentifier := strIdentifier + Token.Token;
+      TypeParamDeclList(strIdentifier);
+      If Token.Token = '>' Then
+        Begin
+          strIdentifier := strIdentifier + Token.Token;
+          NextNonCommentToken;
+        End Else
+          ErrorAndSeekToken(strLiteralExpected, 'TypeParams', '>',
+            strSeekableOnErrorTokens, stActual);
+    End;
+End;
+
+(**
 
   This method parses a constant expression from the current token position
   using the following object pascal grammar.
 
-
   @precon  C is a generic container to add tokens too.
-
   @postcon Returns true if a constant expression was parsed.
-
-
-  @grammar ConstExpr -> <constant-expression>
-
 
   @param   Container as a TElementContainer
   @param   ExprType  as a TExprTypes as a reference
@@ -9207,21 +9837,22 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
 
   (**
 
-    This method adds the number to the stack and increments the iSkip variable
-    by the value passed.
+    This method adds the number to the stack and increments the iSkip variable by the
+    value passed.
 
     @precon  None.
-    @postcon Adds the number to the stack and increments the iSkip variable
-             by the value passed.
+    @postcon Adds the number to the stack and increments the iSkip variable by the value
+             passed.
 
-    @param   iValue as an Integer
+    @param   iCompilerCondition as a TCompilerCondition
 
   **)
-  Procedure IncSkip(iValue : Integer);
+  Procedure IncSkip(iCompilerCondition : TCompilerCondition);
 
   Begin
-    CompilerConditionStack.Add(Pointer(iValue));
-    Inc(iSkip, iValue);
+    CompilerConditionStack.Push(iCompilerCondition, TokenIndex);
+    If iCompilerCondition = ccIncludeCode Then
+      Inc(iSkip);
   End;
 
   (**
@@ -9239,25 +9870,23 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
   Function DecSkip : Boolean;
 
   Var
-    iStackTop : Integer;
-    iStack: Integer;
+    CompilerCondition: TCompilerConditionData;
 
   Begin
     Result := False;
-    iStackTop := CompilerConditionStack.Count - 1;
-    If iStackTop >= 0 Then
+    If CompilerConditionStack.CanPop Then
       Begin
-        iStack := Integer(CompilerConditionStack[iStackTop]);
-        CompilerConditionUndoStack.Add(Pointer(iStack));
-        If iStack = 1 Then
+        CompilerCondition := CompilerConditionStack.Peek;
+        CompilerConditionUndoStack.Push(CompilerCondition);
+        If CompilerCondition.CompilerCondition = ccIncludeCode Then
           Dec(iSkip);
-        CompilerConditionStack.Delete(iStackTop);
+        CompilerConditionStack.Pop;
       End Else
         Result := True;
   End;
 
 Var
-  iStack, iStackTop : Integer;
+  CompilerCondition : TCompilerConditionData;
 
 begin
   If Like(Token.Token, '{$DEFINE ') Then
@@ -9267,39 +9896,39 @@ begin
   Else If Like(Token.Token, '{$IFDEF ') Then
     Begin
       If Not IfDef(GetDef) Then
-        IncSkip(1)
+        IncSkip(ccIncludeCode)
       Else
-        IncSkip(0);
+        IncSkip(ccExcludeCode);
     End
   Else If Like(Token.Token, '{$IFOPT ') Then
     Begin
       If Not IfDef(GetDef) Then
-        IncSkip(1)
+        IncSkip(ccIncludeCode)
       Else
-        IncSkip(0);
+        IncSkip(ccExcludeCode);
     End
   Else If Like(Token.Token, '{$IF ') Then
-    IncSkip(0) // FAKE $IF by defaulting to TRUE
+    IncSkip(ccExcludeCode) // FAKE $IF by defaulting to TRUE
   Else If Like(Token.Token, '{$IFNDEF ') Then
     Begin
       If Not IfNotDef(GetDef) Then
-        IncSkip(1)
+        IncSkip(ccIncludeCode)
       Else
-        IncSkip(0);
+        IncSkip(ccExcludeCode);
     End
   Else If Like(Token.Token, '{$ELSE') Then
     Begin
-      iStackTop := CompilerConditionStack.Count - 1;
-      If iStackTop >= 0 Then
+      If CompilerConditionStack.CanPop Then
         Begin
-          iStack := Integer(CompilerConditionStack[iStackTop]);
-          If iStack = 1 Then
+          CompilerCondition := CompilerConditionStack.Peek;
+          //: @debug Should the else not add to the stack rather than manipulate it?
+          If CompilerCondition.CompilerCondition = ccIncludeCode Then
             Begin
-              CompilerConditionStack[iStackTop] := Pointer(0);
+              CompilerConditionStack.Poke(ccExcludeCode, CompilerCondition.TokenIndex);
               Dec(iSkip);
             End Else
             Begin
-              CompilerConditionStack[iStackTop] := Pointer(1);
+              CompilerConditionStack.Poke(ccIncludeCode, CompilerCondition.TokenIndex);
               Inc(iSkip);
             End;
         End Else
@@ -9319,11 +9948,67 @@ begin
         AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
             scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etError);
     End
+  Else If Like(Token.Token, '{$INCLUDE') Then
+    ProcessIncludeDirective(Token.Token)
   Else If Like(Token.Token, '{$EXTERNALSYM') Then
     FExternalSyms.Add(GetDef);
   If iSkip < 0 Then
     iSkip := 0;
 end;
+
+(**
+
+  This method processes an INCLUDE directive and injects the INC file code into the parser
+  after the current location.
+
+  @precon  None.
+  @postcon The parser tokens from the include file are inserted after the current token.
+
+  @param   strToken as a String
+
+**)
+Procedure TPascalModule.ProcessIncludeDirective(strToken: String);
+
+Var
+  strFileName : String;
+  sl : TStringList;
+  M : TPascalModule;
+  iToken: Integer;
+  T : TTokenInfo;
+
+Begin
+  strFileName := strToken;
+  Delete(strToken, 1, Length('{$INCLUDE'));
+  strFileName := Trim(strToken);
+  If (Length(strFileName) > 0) And (strFileName[Length(strFileName)] = '}') Then
+    strFileName := Copy(strFileName, 1, Length(strFileName) - 1);
+  If (Length(strFileName) > 0) And (strFileName[1] = '''') Then
+    strFileName := Copy(strFileName, 2, Length(strFileName) - 2);
+  If Pos(':', strFileName) = 0 Then
+    strFileName := ExpandFileName(ExtractFilePath(FileName) + strFileName);
+  If Not FileExists(strFileName) Then
+    AddIssue(Format('The INCLUDE file "%s" does not exist!', [strFileName]), scNone,
+      'ProcessIncludeDirective', Token.Line, Token.Column, etError)
+  Else
+    Begin
+      sl := TStringList.Create;
+      Try
+        sl.LoadFromFile(strFileName);
+        M := TPascalModule.CreateParser(sl.Text, strFileName, False, []);
+        Try
+          for iToken := M.TokenCount - 1 downto 0 Do
+            Begin
+              T := M.Tokens[iToken];
+              InsertToken(T.Token, Succ(TokenIndex), T.TokenType);
+            End;
+        Finally
+          M.Free;
+        End;
+      Finally
+        sl.Free;
+      End;
+    End;
+End;
 
 (**
 
@@ -9356,7 +10041,7 @@ begin
         If StartLabel.Elements[k] Is TPascalMethod Then
           Begin
             Method := StartLabel.Elements[k] As TPascalMethod;
-            If (Method.ObjClsInt <> Nil) And Not Method.Resolved Then
+            If (Method.RecObjClsInt <> Nil) And Not Method.Resolved Then
               AddIssue(Format(strUndeclaredClassMethod, [Method.QualifiedName]),
                   scNone, 'FindUnresolvedImplementedClassMethods', Method.Line,
                   Method.Column, etWarning);
@@ -9370,18 +10055,16 @@ end;
 
 (**
 
-
   This method tries to find the class that the class names string list refers to.
 
   @precon  slClassNames must be a valid instance of a string list class.
   @postcon Returns the class reference the string list refers to else returns nil;
 
-
   @param   slClassNames as a TStringList
-  @return  a TObjectDecl
+  @return  a TRecordDecl
 
 **)
-Function TPascalModule.FindObjClsInt(slClassNames: TStringList): TObjectDecl;
+Function TPascalModule.FindRecObjClsInt(slClassNames: TStringList): TRecordDecl;
 
 Var
   i: Integer;
@@ -9390,15 +10073,16 @@ Var
 Begin
   Result := Nil;
   E := Self;
-  For i := 0 To slClassNames.Count -  1 Do
-    Begin
-      E := E.FindElement(strTypesLabel);
-      If E <> Nil Then
-        E := E.FindElement(slClassNames[i]);
-    End;
   If E <> Nil Then
-    If E Is TObjectDecl Then
-      Result := E As TObjectDecl;
+    For i := 0 To slClassNames.Count -  1 Do
+      Begin
+        E := E.FindElement(strTypesLabel);
+        If E <> Nil Then
+          E := E.FindElement(slClassNames[i]);
+      End;
+  If E <> Nil Then
+    If E Is TRecordDecl Then
+      Result := E As TRecordDecl;
 End;
 
 (**
@@ -9464,7 +10148,7 @@ end;}
   @param   TypeLabel as a TLabelContainer
 
 **)
-procedure TPascalModule.FindUnresolvedObjectAndClassMethods(TypeLabel : TLabelContainer);
+procedure TPascalModule.FindUnresolvedRecordObjectAndClassMethods(TypeLabel : TLabelContainer);
 
   (**
 
@@ -9477,21 +10161,21 @@ procedure TPascalModule.FindUnresolvedObjectAndClassMethods(TypeLabel : TLabelCo
              qualifying objects and classes.
 
 
-    @param   ObjOrCls as a TObjectDecl
+    @param   RecObjOrCls as a TRecordDecl
     @return  a String
 
   **)
-  Function GetClassQualification(ObjOrCls : TObjectDecl) : String;
+  Function GetClassQualification(RecObjOrCls : TRecordDecl) : String;
 
   Var
     P : TElementContainer;
 
   Begin
     Result := '';
-    P := ObjOrCls;
+    P := RecObjOrCls;
     While P <> Nil Do
       Begin
-        If P Is TObjectDecl Then
+        If P Is TRecordDecl Then
           Result := P.Identifier + '.' + Result;
         P := P.Parent;
       End;
@@ -9520,7 +10204,7 @@ var
   Method: TPascalMethod;
   j: Integer;
   MethodsLabel: TElementContainer;
-  ObjectOrClass: TObjectDecl;
+  RecordObjectOrClass: TRecordDecl;
   k: Integer;
   ClassTypeLabel: TLabelContainer;
 
@@ -9528,11 +10212,11 @@ begin
   If TypeLabel <> Nil Then
     For k := 1 To TypeLabel.ElementCount Do
       Begin
-        If (TypeLabel.Elements[k] Is TObjectDecl) And Not
+        If (TypeLabel.Elements[k] Is TRecordDecl) And Not
           (TypeLabel.Elements[k] Is TInterfaceDecl) Then
           Begin
-            ObjectOrClass := TypeLabel.Elements[k] As TObjectDecl;
-            MethodsLabel := ObjectOrClass.FindElement(strMethodsLabel);
+            RecordObjectOrClass := TypeLabel.Elements[k] As TRecordDecl;
+            MethodsLabel := RecordObjectOrClass.FindElement(strMethodsLabel);
             If MethodsLabel <> Nil Then
               For j := 1 To MethodsLabel.ElementCount Do
                 If MethodsLabel.Elements[j] Is TPascalMethod Then
@@ -9540,13 +10224,13 @@ begin
                     Method := MethodsLabel.Elements[j] As TPascalMethod;
                     If ShouldMethodHaveImplementation(Method) Then
                       AddIssue(Format(strUnSatisfiedForwardReference,
-                        [GetClassQualification(ObjectOrClass) + Method.Identifier]),
-                        scNone, 'FindUnresolvedObjectAndClassMethods', Method.Line,
+                        [GetClassQualification(RecordObjectOrClass) + Method.Identifier]),
+                        scNone, 'FindUnresolvedRecordObjectAndClassMethods', Method.Line,
                         Method.Column, etWarning);
                   End;
-            ClassTypeLabel := ObjectOrClass.FindElement(strTypesLabel) As TLabelContainer;
+            ClassTypeLabel := RecordObjectOrClass.FindElement(strTypesLabel) As TLabelContainer;
             If ClassTypeLabel <> Nil Then
-              FindUnresolvedObjectAndClassMethods(ClassTypeLabel);
+              FindUnresolvedRecordObjectAndClassMethods(ClassTypeLabel);
           End;
       end;
 end;
@@ -9632,7 +10316,7 @@ end;
   @param   StartLabel as a TLabelContainer
 
 **)
-procedure TPascalModule.ResolveScopeOfImplementedClassMethods(
+procedure TPascalModule.ResolveScopeOfImplementedMethods(
   StartLabel : TLabelContainer);
 
 var
@@ -9646,9 +10330,9 @@ begin
       If StartLabel.Elements[i] Is TPascalMethod Then
         Begin
           Method := StartLabel.Elements[i] As TPascalMethod;
-          If Method.ObjClsInt <> Nil Then
+          If Method.RecObjClsInt <> Nil Then
             Begin
-              Element := Method.ObjClsInt.FindElement(strMethodsLabel);
+              Element := Method.RecObjClsInt.FindElement(strMethodsLabel);
               If Element <> Nil Then
                 Begin
                   Element := Element.FindElement(Method.Name);
@@ -9663,9 +10347,28 @@ begin
                 End;
             End;
         End Else
-          ResolveScopeOfImplementedClassMethods(
+          ResolveScopeOfImplementedMethods(
             StartLabel.Elements[i] As TLabelContainer);
 end;
+
+(**
+
+  This method determines if the given token is a valid identifier.
+
+  @precon  Token must be a valid instance.
+  @postcon Returns true if the given token is a valid Object Pascal identifier.
+
+  @param   AToken as a TTokenInfo
+  @return  a Boolean
+
+**)
+Function  TPascalModule.IsIdentifier(AToken : TTokenInfo) : Boolean;
+
+Begin
+  Result := (AToken.TokenType In [ttIdentifier, ttDirective]) Or
+    ((AToken.TokenType In [ttReservedWord]) And
+      IsKeyWord(AToken.Token, strIdentifierReservedWords));
+End;
 
 (**
 
@@ -9722,6 +10425,24 @@ begin
   Result := BuildStringRepresentation(boolShowIdentifier And (Identifier <> ''),
     boolForDocumentation, '=', BrowseAndDocItOptions.MaxDocOutputWidth);
 end;
+
+(**
+
+  This method returns a string representation of the information in the class.
+
+  @precon  None.
+  @postcon A string representation of the class is returned.
+
+  @param   boolShowIdentifier   as a Boolean
+  @param   boolForDocumentation as a Boolean
+  @return  a String
+
+**)
+Function TAnonymousReferenceType.AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String;
+
+Begin
+  Result := Identifier + ' = Reference To ' + Inherited AsString(False, boolForDocumentation);
+End;
 
 (** Register the file source code extensions that can be parsed by this module. **)
 Initialization

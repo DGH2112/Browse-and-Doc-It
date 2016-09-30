@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    12 Aug 2016
+  @Date    30 Sep 2016
   @Author  David Hoyle
 
 **)
@@ -52,7 +52,7 @@ Uses
   DGHCustomGraphicsControl,
   DGHMemoryMonitorControl;
 
-{$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
+{$INCLUDE '..\..\..\..\Library\CompilerDefinitions.inc'}
 
 Type
   (** A record to define the doc conflicts, hints and errors for files and

@@ -5699,11 +5699,11 @@ begin
   FModuleNameCol := 0;
   FModuleNameLine := 0;
   FCompilerDefs := TStringList.Create;
-  FCompilerDefs.Sorted := True;
   FCompilerDefs.Duplicates := dupIgnore;
   {$IFDEF D0006}
   FCompilerDefs.CaseSensitive := False;
   {$ENDIF}
+  FCompilerDefs.Sorted := True;
   FCompilerConditionStack := TCompilerConditionStack.Create;
   FCompilerConditionUndoStack := TCompilerConditionStack.Create;
   FCommentClass := CommentClass;
@@ -5740,11 +5740,15 @@ end;
 procedure TBaseLanguageModule.DeleteDef(strDef : String);
 
 Var
-  i : Integer;
+  iIndex : Integer;
 
 begin
-  If FCompilerDefs.Find(strDef, i) Then
-    FCompilerDefs.Delete(i);
+  If FCompilerDefs.Sorted Then
+    FCompilerDefs.Find(strDef, iIndex)
+  Else
+    iIndex := FCompilerDefs.IndexOf(strDef);
+  If iIndex > -1 Then
+    FCompilerDefs.Delete(iIndex);
 end;
 
 (**
@@ -5799,9 +5803,12 @@ function TBaseLanguageModule.IfDef(strDef : String) : Boolean;
 Var
   iIndex : Integer;
 
-begin
-  Result := FCompilerDefs.Find(strDef, iIndex);
-end;
+Begin
+  If FCompilerDefs.Sorted Then
+    Result := FCompilerDefs.Find(strDef, iIndex)
+  Else
+    Result := (FCompilerDefs.IndexOf(strDef) > - 1);
+End;
 
 (**
 
@@ -6250,13 +6257,9 @@ end;
 **)
 Procedure TBaseLanguageModule.PopTokenPosition;
 
-Var
-  iTokenIndex : TTokenIndex;
-
 Begin
   If FTokenStackTop > -1 Then
     Begin
-      iTokenIndex := FTokenIndex;
       FTokenIndex := FTokenStack[FTokenStackTop];
       Dec(FTokenStackTop);
       While CompilerConditionUndoStack.CanPop And

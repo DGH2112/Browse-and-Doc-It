@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    30 Sep 2016
+  @Date    14 Oct 2016
   @Version 1.0
 
   @Author  David Hoyle
@@ -1920,6 +1920,8 @@ ResourceString
   (** An error message for an unsatisfied forward reference. **)
   strUnSatisfiedForwardReference = 'Method ''%s'' has an unsatisfied ' +
     'forward reference.';
+  (** An error message for an unsatisfied declaration. **)
+  strUnSatisfiedDeclaration = 'Method ''%s'' has an unsatisfied declaration.';
   (** An error message for a type not found. **)
   strTypeNotFound = 'Type declaration missing but found ''%s'' at line %d column %d.';
   (** An error message when a TypeID is expected. **)

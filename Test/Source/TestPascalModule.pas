@@ -524,6 +524,7 @@ type
     Procedure TestCodeFailure28;
     Procedure TestCodeFailure29;
     Procedure TestCodeFaliure30;
+    Procedure TestCodeFaliure31;
   Public
   End;
 
@@ -3281,6 +3282,65 @@ begin
     ]
   );
 end;
+
+Procedure TestTPascalModule.TestCodeFaliure31;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyPublicClass = Class'#13#10 +
+    '  Strict Private'#13#10 +
+    '    Type'#13#10 +
+    '      TMyPrivateChildClass = Class'#13#10 +
+    '      Public'#13#10 +
+    '        Type'#13#10 +
+    '          TMyPublicClass = Class'#13#10 +
+    '          Public'#13#10 +
+    '            Procedure MyPublicMethod;'#13#10 +
+    '          End;'#13#10 +
+    '        Procedure MyPublicMethod;'#13#10 +
+    '      End;'#13#10 +
+    '    Procedure MyStrictPrivateMethod;'#13#10 +
+    '  Private'#13#10 +
+    '    Procedure MyPrivateMethod;'#13#10 +
+    '  Strict Protected'#13#10 +
+    '    Procedure MyStrictProtectedMethod;'#13#10 +
+    '  Protected'#13#10 +
+    '    Procedure MyProtectedMethod;'#13#10 +
+    '  Public'#13#10 +
+    '    Type'#13#10 +
+    '      TMyPublicClass = Class'#13#10 +
+    '      Public'#13#10 +
+    '        Type'#13#10 +
+    '          TMyPublicClass = Class'#13#10 +
+    '          Public'#13#10 +
+    '            Procedure MyPublicMethod;'#13#10 +
+    '          End;'#13#10 +
+    '        Procedure MyPublicMethod;'#13#10 +
+    '      End;'#13#10 +
+    '    Procedure MyPublicMethod;'#13#10 +
+    '  Published'#13#10 +
+    '    Procedure MyPublishedMethod;'#13#10 +
+    '  End;',
+    'Procedure TMyPublicClass.MyStrictPrivateMethod; Begin End;'#13#10 +
+    'Procedure TMyPublicClass.MyPrivateMethod; Begin End;'#13#10 +
+    'Procedure TMyPublicClass.MyStrictProtectedMethod; Begin End;'#13#10 +
+    'Procedure TMyPublicClass.MyProtectedMethod; Begin End;'#13#10 +
+    'Procedure TMyPublicClass.MyPublicMethod; Begin End;'#13#10 +
+    'Procedure TMyPublicClass.MyPublishedMethod; Begin End;'#13#10 +
+    ''#13#10 +
+    'Procedure TMyPublicClass.TMyPrivateClass.MyPublicMethod; Begin End;'#13#10 +
+    'Procedure TMyPublicClass.TMyPrivateClass.TMyPublicClass.MyPublicMethod; Begin End;'#13#10 +
+    'Procedure TMyPublicClass.TMyPublicClass.MyPublicMethod; Begin End;'#13#10 +
+    'Procedure TMyPublicClass.TMyPublicClass.TMyPublicClass.MyPublicMethod; Begin End;',
+    [ttErrors, ttWarnings],
+    [],
+    0,
+    1
+  );
+End;
 
 Procedure TestTPascalModule.TestCompoundStmt;
 

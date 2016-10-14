@@ -4534,14 +4534,29 @@ Procedure TElementContainer.CheckReferences;
 
 Var
   i : Integer;
+  strIdentifier: String;
+  E: TElementContainer;
 
 begin
   If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
     Begin
       If Scope In [scLocal, scPrivate] Then
         If Not Referenced Then
-          AddIssue(Format(strUnreferencedLocal, [Identifier]),
-            scNone, 'CheckReferences', Line, Column, etHint);
+          Begin
+            E := Self;
+            While (E <> Nil) And (E.Parent <> Nil) Do
+              Begin
+                If Not (E Is TLabelContainer) Then
+                  Begin
+                    If strIdentifier <> '' Then
+                      strIdentifier := '.' + strIdentifier;
+                    strIdentifier := E.Identifier + strIdentifier;
+                  End;
+                E := E.Parent;
+              End;
+            AddIssue(Format(strUnreferencedLocal, [strIdentifier]),
+              scNone, 'CheckReferences', Line, Column, etHint);
+          End;
       For i := 1 To ElementCount Do
         Elements[i].CheckReferences;
     End;

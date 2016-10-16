@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Jul 2016
+  @Date    16 Oct 2016
 
 **)
 unit DUnitForm;
@@ -61,6 +61,7 @@ type
     FModule: PVirtualNode;
     FRootElement: TLabelContainer;
     FTestCases : TStringList;
+    FImplementedTests : TStringList;
     Procedure InitialiseTreeView;
     Function AddNode(P : PVirtualNode; Element : TElementContainer) : PVirtualNode;
     procedure RenderContainers(RootNode: PVirtualNode;
@@ -70,6 +71,9 @@ type
     Procedure BuildTestCaseList;
     Function AddUniqueName(slList : TStrings; strText : String) : String;
     Procedure ErrorProc(strMsg : String);
+    Procedure CheckImplementedTests;
+    Procedure UpdateImplementedTests;
+    Function  CanRenderContainer(Element : TElementContainer) : Boolean;
   public
     { Public declarations }
     Class Procedure Execute(objDUnitCreator : TDUnitCreator);
@@ -78,7 +82,12 @@ type
 implementation
 
 Uses
-  ToolsAPIUtils, PascalModule, IniFiles, dghlibrary;
+  CodeSiteLogging,
+  ToolsAPI,
+  ToolsAPIUtils,
+  PascalModule,
+  IniFiles,
+  dghlibrary;
 
 Type
   (** This is a record to describe the data stored in the virtual tree view. **)
@@ -118,8 +127,8 @@ end;
 
   This method ensures that a unique name is added to the string list.
 
-  @precon  slList must be a valid string list . 
-  @postcon Ensures that a unique name is added to the string list . 
+  @precon  slList must be a valid string list .
+  @postcon Ensures that a unique name is added to the string list .
 
   @param   slList  as a TStrings
   @param   strText as a String
@@ -203,45 +212,129 @@ end;
 **)
 procedure TfrmDUnit.BuildTestCaseList;
 
-Var
-  C: PVirtualNode;
-  M: PVirtualNode;
-  Cls : ^TTreeData;
-  Method : ^TTreeData;
-  strMethod: String;
-
 begin
-  C := vstTestCases.GetFirstChild(FModule);
-  While C <> Nil Do
+  vstTestCases.IterateSubtree(
+    FModule,
+    Procedure(Sender: TBaseVirtualTree; Node: PVirtualNode; Data: Pointer; Var Abort: Boolean)
+
+    Var
+      NodeData         : ^TTreeData;
+      M                : TGenericFunction;
+      strQualifiedIdent: String;
+      P                : TElementContainer;
+      strTestCase      : String;
+      iPos             : Integer;
+      iIndex           : Integer;
+
     Begin
-      Cls := vstTestCases.GetNodeData(C);
-      M := vstTestCases.GetFirstChild(C);
-      If M <> Nil Then
-        While M <> Nil Do
-          Begin
-            If M.CheckState In [csCheckedNormal] Then
-              Begin
-                Method := vstTestCases.GetNodeData(M);
-                If (Method.Element Is TPascalMethod) Or
-                  (Method.Element Is TPascalProperty) Then
-                  Begin
-                    strMethod := AddUniqueName(FTestCases, Format('%s=%s',
-                      [Cls.Element.Identifier, Method.Element.Identifier]));
-                    FTestCases.Add(strMethod);
-                  End;
+      NodeData := Sender.GetNodeData(Node);
+      If NodeData.Element <> Nil Then
+        If NodeData.Element Is TGenericFunction Then
+          If Sender.CheckState[Node] = csCheckedNormal Then
+            Begin
+              M := NodeData.Element As TGenericFunction;
+              strQualifiedIdent := '=' + M.QualifiedName;
+              P := M.Parent; // Get class parent Cls > Methods > Method
+              If P <> Nil Then
+                P := P.Parent;
+              If P Is TRecordDecl Then
+                strQualifiedIdent := (P As TRecordDecl).Identifier + strQualifiedIdent;
+              // Only add test cases not found in FImplementedTests.
+              strTestCase := strQualifiedIdent;
+              iPos := Pos('=', strTestCase);
+              Case iPos Of
+                1: strTestCase := 'TestFunctions=Test' +
+                  Copy(strTestCase, 2, Length(strTestCase) - 1);
+              Else
+                strTestCase := 'Test' + Copy(strTestCase, 1, iPos) +
+                  'Test' + Copy(strTestCase, iPos + 1, Length(strTestCase) - iPos);
               End;
-            M := vstTestCases.GetNextSibling(M);
-          End
-      Else
-        If C.CheckState In [csCheckedNormal] Then
-          Begin
-            strMethod := AddUniqueName(FTestCases, Format('%s=%s',
-              ['', Cls.Element.Identifier]));
-            FTestCases.Add(strMethod);
-          End;
-      C := vstTestCases.GetNextSibling(C);
-    End;
+              If Not FImplementedTests.Find(strTestCase, iIndex) Then
+                FTestCases.Add(strQualifiedIdent);
+            End;
+    End,
+    Nil
+  );
 end;
+
+(**
+
+  This method returns true if the passed element can be rendered in the Dunit treeview.
+
+  @precon  Element must be a valid instance.
+  @postcon returns true if the passed element can be rendered in the Dunit treeview (elements of
+           type TLabelContainer with Identifiers of 'methods', 'properties' or 'types' or other
+           elements which have publicly visible scope.).
+
+  @param   Element as a TElementContainer
+  @return  a Boolean
+
+**)
+Function TfrmDUnit.CanRenderContainer(Element: TElementContainer): Boolean;
+
+Begin
+  Result := Element.Scope In [scPublic, scPublished, scNone, scGlobal];
+  If Element Is TLabelContainer Then
+    Result := Result And IsKeyWord(Element.Identifier, ['methods', 'properties', 'types']);
+End;
+
+(**
+
+  This method parses the the selected existing DUnit and finds its implemented tests and stores
+  them in a string list.
+
+  @precon  None.
+  @postcon The implemented test in the existing DUnit file are stored in a string list.
+
+**)
+Procedure TfrmDUnit.CheckImplementedTests;
+
+Var
+  iUnit : Integer;
+  Module : TPascalModule;
+  Unt : IOTAModule;
+  Types, Methods : TElementContainer;
+  iElements : Integer;
+  RecDecl : TRecordDecl;
+  iMethod : Integer;
+  Method : TPascalMethod;
+
+Begin
+  FDUnitCreator.GetExistingDUnitUnits(cbxExistingProject.ItemIndex);
+  For iUnit := 0 To FDUnitCreator.UnitCount - 1 Do
+    If CompareText(ExtractFileName(FDUnitCreator.Units[iUnit]), cbxExistingUnit.Text) = 0  Then
+      Begin
+        Unt := (BorlandIDEServices As IOTAModuleServices).OpenModule(FDUnitCreator.Units[iUnit]);
+        If Unt <> Nil Then
+          Begin
+            Module := TPascalModule.CreateParser(EditorAsString(SourceEditor(Unt)),
+              cbxExistingUnit.Text, Unt.CurrentEditor.Modified, [moParse]);
+            Try
+              Types := Module.FindElement(strTypesLabel);
+              If Types <> Nil Then
+                For iElements := 1 To Types.ElementCount Do
+                  If Types.Elements[iElements] Is TRecordDecl Then
+                    Begin
+                      RecDecl := Types.Elements[iElements] As TRecordDecl;
+                      Methods := RecDecl.FindElement(strMethodsLabel);
+                      If Methods <> Nil Then
+                        For iMethod := 1 To Methods.ElementCount Do
+                          If Methods.Elements[iMethod] Is TPascalMethod Then
+                            Begin
+                              Method := Methods.Elements[iMethod] As TPascalMethod;
+                              If Method.Scope In [scPublished] Then
+                                FImplementedTests.Add(Format('%s=%s', [RecDecl.Identifier,
+                                  Method.Identifier]));
+                            End;
+                    End;
+            Finally
+              Module.Free;
+            End;
+          End;
+        Break;
+      End;
+  UpdateImplementedTests;
+End;
 
 (**
 
@@ -350,7 +443,8 @@ begin
   edtNewProjectName.Text := AddUniqueName(cbxExistingProject.Items, strFileName);
   strFileName := 'Test' + ExtractFileName(ActiveSourceEditor.FileName);
   edtNewUnitName.Text := AddUniqueName(cbxExistingUnit.Items, strFileName);
-
+  FImplementedTests := TStringList.Create;
+  FImplementedTests.Sorted := True;
 end;
 
 (**
@@ -363,11 +457,13 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmDUnit.FormDestroy(Sender: TObject);
-begin
+Procedure TfrmDUnit.FormDestroy(Sender: TObject);
+
+Begin
+  FImplementedTests.Free;
   FRootElement.Free;
   FTestCases.Free;
-end;
+End;
 
 (**
 
@@ -383,14 +479,8 @@ ResourceString
   strNotAPascalModule = 'Can only create unit test for Pascal modules!';
 
 Var
-  M, I : TElementContainer;
-  N: PVirtualNode;
-  Node : ^TTreeData;
-  strClass: String;
+  M : TElementContainer;
   T: TElementContainer;
-  C: TElementContainer;
-  P: TElementContainer;
-  j: Integer;
 
 begin
   M := FDUnitCreator.Module;
@@ -398,32 +488,20 @@ begin
     Begin
       FRootElement := TLabelContainer.Create(Format('Test Units for %s', [
         M.AsString(True, False)]), scNone, 0, 0, iiNone, Nil);
-      I := M.FindElement(strImplementedMethodsLabel);
       T := M.FindElement(strTypesLabel);
-      If I <> Nil Then
+      If T <> Nil Then
         Begin
           FModule := AddNode(Nil, FRootElement);
-          RenderContainers(FModule, I);
+          RenderContainers(FModule, T);
           vstTestCases.Expanded[FModule] := True;
-          N := vstTestCases.GetFirstChild(FModule);
-          While N <> Nil Do
-            Begin
-              Node := vstTestCases.GetNodeData(N);
-              strClass := Node.Element.Identifier;
+        End;
+      T := M.FindElement(strExportedHeadingsLabel);
               If T <> Nil Then
                 Begin
-                  C := T.FindElement(strClass);
-                  If C <> Nil Then
-                    Begin
-                      P := C.FindElement(strPropertiesLabel);
-                      If P <> Nil Then
-                        For j := 1 To P.ElementCount Do
-                          If P.Elements[j].Scope In [scPublic, scPublished] Then
-                            AddNode(N, P.Elements[j]);
-                    End;
-                End;
-              N := vstTestCases.GetNextSibling(N);
-            End;
+          If FModule = Nil Then
+            FModule := AddNode(Nil, FRootElement);
+          RenderContainers(FModule, T);
+          vstTestCases.Expanded[FModule] := True;
         End;
     End Else
       MessageDlg(strNotAPascalModule, mtError, [mbOK], 0);
@@ -522,6 +600,9 @@ begin
     cbxExistingUnit.Items.Add(ExtractfileName(FDUnitCreator.Units[i]));
   If cbxExistingUnit.Items.Count > 0 Then
     cbxExistingUnit.ItemIndex := 0;
+  FImplementedTests.Clear;
+  If rdoExistingUnit.Checked Then
+    CheckImplementedTests;
 end;
 
 (**
@@ -544,7 +625,7 @@ Var
 
 begin
   For i := 1 To Container.ElementCount Do
-    If Container.Elements[i].Scope In [scPublic, scPublished, scNone, scGlobal] Then
+    If CanRenderContainer(Container.Elements[i]) Then
       Begin
         NewNode := AddNode(RootNode, Container.Elements[i]);
         RenderContainers(NewNode, Container[i]);
@@ -581,6 +662,60 @@ begin
       Free;
     End;
 end;
+
+(**
+
+  This method iterates through the tree view of methods and properties and checks those items that
+  have already been implemented in the existing DUnit.
+
+  @precon  None.
+  @postcon Methods that have been implemented in the existing DUnit are checked in the treeview.
+
+**)
+Procedure TfrmDUnit.UpdateImplementedTests;
+
+Begin
+  vstTestCases.IterateSubtree(
+    FModule,
+    Procedure (Sender: TBaseVirtualTree; Node: PVirtualNode; Data: Pointer; Var Abort: Boolean)
+
+    Var
+      NodeData : ^TTreeData;
+      strQualifiedIdent : String;
+      M : TGenericFunction;
+      P : TElementContainer;
+      iIndex : Integer;
+      PN : PVirtualNode;
+
+    Begin
+      NodeData := Sender.GetNodeData(Node);
+      If NodeData.Element <> Nil Then
+        If NodeData.Element Is TGenericFunction Then
+          Begin
+            M := NodeData.Element As TGenericFunction;
+            strQualifiedIdent := '=Test' + M.QualifiedName;
+            P := M.Parent; // Get class parent Cls > Methods > Method
+            If P <> Nil Then
+              P := P.Parent;
+            If P Is TRecordDecl Then
+              strQualifiedIdent := 'Test' + (P As TRecordDecl).Identifier + strQualifiedIdent;
+            If (Length(strQualifiedIdent) > 0) And (strQualifiedIdent[1] = '=') Then
+              strQualifiedIdent := 'TestFunctions' + strQualifiedIdent;
+            If FImplementedTests.Find(strQualifiedIdent, iIndex) Then
+              Begin
+                vstTestCases.CheckState[Node] := csCheckedNormal;
+                PN := Node.Parent;
+                While (PN <> Nil) And (PN <> vstTestCases.RootNode) Do
+                  Begin
+                    vstTestCases.Expanded[PN] := True;
+                    PN := PN.Parent;
+                  End;
+              End;
+          End;
+    End,
+    Nil
+  );
+End;
 
 (**
 
@@ -621,7 +756,7 @@ end;
   @param   Node     as a PVirtualNode
   @param   Column   as a TColumnIndex
   @param   TextType as a TVSTTextType
-  @param   CellText as a WideString as a reference
+  @param   CellText as a String as a reference
 
 **)
 procedure TfrmDUnit.vstTestCasesGetText(Sender: TBaseVirtualTree;
@@ -637,6 +772,7 @@ Var
 
 begin
   NodeData := vstTestCases.GetNodeData(Node);
+  If NodeData.Element <> Nil Then
   CellText := NodeData.Element.AsString(True, False);
 end;
 

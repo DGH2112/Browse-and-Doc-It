@@ -2,7 +2,7 @@ object frmDUnit: TfrmDUnit
   Left = 0
   Top = 0
   ActiveControl = rdoExistingProject
-  BorderIcons = []
+  BorderIcons = [biSystemMenu]
   Caption = 'DUnit'
   ClientHeight = 466
   ClientWidth = 392
@@ -140,6 +140,7 @@ object frmDUnit: TfrmDUnit
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 3
+      OnChange = cbxExistingUnitChange
     end
     object rdoNewUnit: TRadioButton
       Left = 14

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    16 Oct 2016
+  @Date    19 Oct 2016
 
 **)
 unit DUnitForm;
@@ -55,6 +55,7 @@ type
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
       var Ghosted: Boolean; var ImageIndex: Integer);
     procedure FormDestroy(Sender: TObject);
+    procedure cbxExistingUnitChange(Sender: TObject);
   private
     { Private declarations }
     FDUnitCreator : TDUnitCreator;
@@ -74,6 +75,7 @@ type
     Procedure CheckImplementedTests;
     Procedure UpdateImplementedTests;
     Function  CanRenderContainer(Element : TElementContainer) : Boolean;
+    Function  NodeContainsMethods(Node : PVirtualNode) : Boolean;
   public
     { Public declarations }
     Class Procedure Execute(objDUnitCreator : TDUnitCreator);
@@ -276,6 +278,22 @@ Begin
   Result := Element.Scope In [scPublic, scPublished, scNone, scGlobal];
   If Element Is TLabelContainer Then
     Result := Result And IsKeyWord(Element.Identifier, ['methods', 'properties', 'types']);
+End;
+
+(**
+
+  This is an on change event handler for the Existing Units combo control.
+
+  @precon  None.
+  @postcon Updates the checked status of the DUnit method to be created.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmDUnit.cbxExistingUnitChange(Sender: TObject);
+
+Begin
+  CheckImplementedTests;
 End;
 
 (**
@@ -546,6 +564,60 @@ end;
 
 (**
 
+  This method returns true if the given node or any of its children are a method or property.
+
+  @precon  Node must be a valid instance.
+  @postcon Returns true if the given node or any of its children are a method or property.
+
+  @param   Node as a PVirtualNode
+  @return  a Boolean
+
+**)
+Function TfrmDUnit.NodeContainsMethods(Node: PVirtualNode): Boolean;
+
+  (**
+
+    This function returns true if the given node is either a TPascalMethod or a TPascalProperty.
+
+    @precon  N must be a valid instance.
+    @postcon Returns true if the given node is either a TPascalMethod or a TPascalProperty.
+
+    @param   N as a PVirtualNode
+    @return  a Boolean
+
+  **)
+  Function IsMethodOrProperty(N : PVirtualNode) : Boolean;
+
+  Var
+    ND : ^TTreeData;
+
+  Begin
+    ND := vstTestCases.GetNodeData(N);
+    Result := (ND.Element Is TPascalMethod) Or (ND.Element Is TPascalProperty);
+  End;
+
+Var
+  N: PVirtualNode;
+
+Begin
+  Result := IsMethodOrProperty(Node);
+  If Result Then
+    Exit;
+  N := vstTestCases.GetFirstChild(Node);
+  While N <> Nil Do
+    Begin
+      Result := IsMethodOrProperty(N);
+      If Result Then
+        Break;
+      Result := NodeContainsMethods(N);
+      If Result Then
+        Break;
+      N := vstTestCases.GetNextSibling(N);
+    End;
+End;
+
+(**
+
   This is an on click event handler for the Existing Radio Button.
 
   @precon  None.
@@ -600,6 +672,9 @@ begin
     cbxExistingUnit.Items.Add(ExtractfileName(FDUnitCreator.Units[i]));
   If cbxExistingUnit.Items.Count > 0 Then
     cbxExistingUnit.ItemIndex := 0;
+  i := cbxExistingUnit.Items.IndexOf(edtNewUnitName.Text);
+  If i > -1 Then
+    cbxExistingUnit.ItemIndex := i;
   FImplementedTests.Clear;
   If rdoExistingUnit.Checked Then
     CheckImplementedTests;
@@ -629,6 +704,8 @@ begin
       Begin
         NewNode := AddNode(RootNode, Container.Elements[i]);
         RenderContainers(NewNode, Container[i]);
+        If Not NodeContainsMethods(NewNode) Then
+          vstTestCases.DeleteNode(NewNode);
       End;
 end;
 

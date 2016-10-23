@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    10 Sep 2016
+  @Date    23 Oct 2016
 
 **)
 Unit BADIIDEMenuInstaller;
@@ -80,6 +80,7 @@ Type
 Implementation
 
 Uses
+  //CodeSiteLogging,
   SysUtils,
   CheckForUpdates,
   DocumentationDispatcher,

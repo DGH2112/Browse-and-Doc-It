@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    31 Jul 2009
+  @Date    23 Oct 2016
   @Version 1.0
 
 **)
@@ -42,6 +42,7 @@ implementation
 {$R *.dfm}
 
 Uses
+  //CodeSiteLogging,
   DeskUtil;
 
 Var

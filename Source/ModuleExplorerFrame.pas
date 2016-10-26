@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    06 Aug 2016
+  @Date    26 Oct 2016
   @Author  David Hoyle
   @Version 1.0
 
@@ -1161,7 +1161,8 @@ End;
 procedure TframeModuleExplorer.FrameEnter(Sender: TObject);
 
 begin
-  FExplorer.SetFocus;
+  If Parent.Visible And Visible And FExplorer.Visible And FExplorer.CanFocus Then
+    FExplorer.SetFocus;
 end;
 
 (**
@@ -1607,7 +1608,7 @@ end;
   @param   Node     as a PVirtualNode
   @param   Column   as a TColumnIndex
   @param   TextType as a TVSTTextType
-  @param   CellText as a WideString as a reference
+  @param   CellText as a String as a reference
 
 **)
 procedure TframeModuleExplorer.tvExplorerGetText(Sender: TBaseVirtualTree;

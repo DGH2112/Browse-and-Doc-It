@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    24 Oct 2016
+  @Date    30 Oct 2016
   @Version 1.0
 
   @Author  David Hoyle
@@ -5570,7 +5570,7 @@ begin
   FMessage := Format(strDocConflictMsg , Args);
   FCommentLine := iCommentLine;
   FCommentColumn := iCommentCol;
-  Comment := TComment.Create(strDocConflictDesc, 0, 0);
+  Comment := TComment.Create(strDocConflictDesc, iCommentLine, iCommentCol);
 end;
 
 (**

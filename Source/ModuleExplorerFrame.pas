@@ -894,8 +894,7 @@ Var
 
 begin
   For i := 1 To Container.ElementCount Do
-    If Container.Elements[i].Scope In BrowseAndDocItOptions.ScopesToRender +
-      [scNone, scGlobal] Then
+    If Container.Elements[i].Scope In BrowseAndDocItOptions.ScopesToRender + [scNone, scGlobal] Then
       Begin
         NewNode := AddNode(
           RootNode,
@@ -1238,8 +1237,8 @@ Begin
         M.Name,
         0,
         M.ImageIndexAdjustedForScope,
-        M.Line,
-        M.Column,
+        M.ModuleNameLine,
+        M.ModuleNameCol,
         False,
         M.Comment
       );

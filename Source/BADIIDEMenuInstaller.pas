@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    23 Oct 2016
+  @Date    30 Oct 2016
 
 **)
 Unit BADIIDEMenuInstaller;
@@ -544,11 +544,9 @@ Begin
     Begin
       Case CommentStyle Of
         csBlock:
-          SelectionChange(EditPos.Line + 5, EditPos.Col, EditPos.Line + 5,
-            EditPos.Col);
+          SelectionChange(EditPos.Line + 5, EditPos.Col, EditPos.Line, EditPos.Col);
       Else
-        SelectionChange(EditPos.Line + 1, EditPos.Col, EditPos.Line + 1,
-          EditPos.Col);
+        SelectionChange(EditPos.Line + 1, EditPos.Col, EditPos.Line, EditPos.Col);
       End;
       // Place cursor at start of comment
       Case CommentStyle Of

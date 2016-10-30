@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    26 Oct 2016
+  @Date    30 Oct 2016
   @Author  David Hoyle
   @Version 1.0
 
@@ -859,9 +859,17 @@ Begin
         For k := Low(FSpecialTagNodes) To High(FSpecialTagNodes) Do
           If FSpecialTagNodes[k].boolShow Then
             If CompareText(Tag[j].TagName, FSpecialTagNodes[k].strTagName) = 0 Then
-              AddNode(FSpecialTagNodes[k].Node, Tag[j].AsString(MaxInt, False),
-                Tag[j].Name, 2, Integer(iiToDoItem) - 1, M.BodyComment[i].Tag[j].Line,
-                M.BodyComment[i].Tag[j].Column, False, Nil);
+              AddNode(
+                FSpecialTagNodes[k].Node,
+                Tag[j].AsString(MaxInt, False),
+                Tag[j].Name,
+                2,
+                Integer(iiToDoItem) - 1,
+                M.BodyComment[i].Tag[j].Line,
+                M.BodyComment[i].Tag[j].Column,
+                False,
+                M.BodyComment[i]
+              );
 End;
 
 (**
@@ -889,10 +897,17 @@ begin
     If Container.Elements[i].Scope In BrowseAndDocItOptions.ScopesToRender +
       [scNone, scGlobal] Then
       Begin
-        NewNode := AddNode(RootNode, Container.Elements[i].AsString(True, False),
-          Container.Elements[i].Name, iLevel, Container.Elements[i].ImageIndexAdjustedForScope,
-          Container.Elements[i].Line, Container.Elements[i].Column,
-          Container.Elements[i] Is TLabelContainer, Container.Elements[i].Comment);
+        NewNode := AddNode(
+          RootNode,
+          Container.Elements[i].AsString(True, False),
+          Container.Elements[i].Name,
+          iLevel,
+          Container.Elements[i].ImageIndexAdjustedForScope,
+          Container.Elements[i].Line,
+          Container.Elements[i].Column,
+          Container.Elements[i] Is TLabelContainer,
+          Container.Elements[i].Comment
+        );
         RenderContainers(NewNode, Container[i], iLevel + 1);
       End;
 end;
@@ -1217,8 +1232,17 @@ Begin
       M.AddTickCount('Clear');
       SetLength(FSpecialTagNodes, BrowseAndDocItOptions.SpecialTags.Count);
       // Create Root Tree Node
-      FModule := AddNode(Nil, M.AsString(True, False), M.Name, 0,
-        M.ImageIndexAdjustedForScope, M.Line, M.Column, False, M.Comment);
+      FModule := AddNode(
+        Nil,
+        M.AsString(True, False),
+        M.Name,
+        0,
+        M.ImageIndexAdjustedForScope,
+        M.Line,
+        M.Column,
+        False,
+        M.Comment
+      );
       CreateSpecialTagNodes(M);
       OutputModuleInfo(M);
       M.AddTickCount('Build');
@@ -1381,8 +1405,16 @@ Begin
         Integer(BrowseAndDocItOptions.SpecialTags.Objects[i]) And iShowInTree <> 0;
       FSpecialTagNodes[i].boolExpand :=
         Integer(BrowseAndDocItOptions.SpecialTags.Objects[i]) And iAutoExpand <> 0;
-      FSpecialTagNodes[i].Node := AddNode(FModule, FSpecialTagNodes[i].strTagDesc,
-        FSpecialTagNodes[i].strTagName, 1, Integer(iiTodoFolder) - 1, 0, 0, True);
+      FSpecialTagNodes[i].Node := AddNode(
+        FModule,
+        FSpecialTagNodes[i].strTagDesc,
+        FSpecialTagNodes[i].strTagName,
+        1,
+        Integer(iiTodoFolder) - 1,
+        0,
+        0,
+        True
+      );
     End;
 End;
 

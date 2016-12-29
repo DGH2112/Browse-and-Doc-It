@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    25 Jun 2010
+  @Date    29 Dec 2016
   @Version 1.0
 
 **)
@@ -106,18 +106,17 @@ Begin
       Else
         CurToken := ttUnknown;
 
-      If (BlockType = btNoBlock) And (LastChar = '<') Then
-        BlockType := btXMLTag;
+      //If (BlockType = btNoBlock) And (LastChar = '<') Then
+      //  BlockType := btXMLTag;
 
-        // Check for full block comments
-        If (BlockType = btNoBlock) And (LastChar = '(') And (strText[i] = '*') Then
-          BlockType := btPascalBlockComment;
-        If (BlockType = btNoBlock) And (LastChar = '/') And (strText[i] = '*') Then
-          BlockType := btCPPBlockComment;
-
-        // Check for line comments
-        If (BlockType = btNoBlock) And (LastChar = '/') And (strText[i] = '/') Then
-          BlockType := btLineComment;
+      // Check for full block comments
+      If (BlockType = btNoBlock) And (LastChar = '(') And (strText[i] = '*') Then
+        BlockType := btPascalBlockComment;
+      If (BlockType = btNoBlock) And (LastChar = '/') And (strText[i] = '*') Then
+        BlockType := btCPPBlockComment;
+      // Check for line comments
+      If (BlockType = btNoBlock) And (LastChar = '/') And (strText[i] = '/') Then
+        BlockType := btLineComment;
 
       If (LastToken <> CurToken) Or (CurToken = ttSymbol) Then
         Begin
@@ -139,6 +138,12 @@ Begin
                   If Directives <> Nil Then
                     If IsKeyWord(strToken, Directives) Then
                       LastToken := ttDirective;
+                  If (LastToken = ttIdentifier) And (Result.Count > 0) And
+                    (Result[Result.Count - 1] = '<') Then
+                    LastToken := ttHTMLStartTag;
+                  If (LastToken = ttIdentifier) And (Result.Count > 1) And
+                    (Result[Result.Count - 2] = '<') And (Result[Result.Count - 1] = '/') Then
+                    LastToken := ttHTMLEndTag;
                   If BlockType = btLineComment Then
                     LastToken := ttLineComment;
                   Result.AddObject(strToken, TObject(LastToken));
@@ -161,38 +166,38 @@ Begin
           strToken[iTokenLen] := strText[i];
         End;
 
-      If (BlockType = btXMLTag) And (strText[i] = '>') Then
+      //If (BlockType = btXMLTag) And (strText[i] = '>') Then
+      //  Begin
+      //    BlockType := btNoBlock;
+      //    CurToken := ttHTMLStartTag;
+      //    If Length(strToken) > 1 Then
+      //      If strToken[2] = '/' Then
+      //        CurToken := ttHTMLEndTag
+      //    Else
+      //  End;
+
+      // Check for the end of a block comment
+      If (BlockType = btPascalBlockComment) And (LastChar = '*') And (strText[i] = ')') Then
         Begin
           BlockType := btNoBlock;
-          CurToken := ttHTMLStartTag;
-          If Length(strToken) > 1 Then
-            If strToken[2] = '/' Then
-              CurToken := ttHTMLEndTag
-          Else
+          CurToken := ttBlockComment;
         End;
-
-        // Check for the end of a block comment
-        If (BlockType = btPascalBlockComment) And (LastChar = '*') And (strText[i] = ')') Then
-          Begin
-            BlockType := btNoBlock;
-            CurToken := ttBlockComment;
-          End;
-        If (BlockType = btCPPBlockComment) And (LastChar = '*') And (strText[i] = '/') Then
-          Begin
-            BlockType := btNoBlock;
-            CurToken := ttBlockComment;
-          End;
-        // Check for block Comments
-        If (BlockType = btNoBlock) And (strText[i] = '{') Then
-          Begin
-            CurToken := ttBlockComment;
-            BlockType := btBraceComment;
-          End;
-        If (BlockType = btBraceComment) And (strText[i] = '}') Then
-          Begin
-            CurToken := ttBlockComment;
-            BlockType := btNoBlock;
-          End;
+      If (BlockType = btCPPBlockComment) And (LastChar = '*') And (strText[i] = '/') Then
+        Begin
+          BlockType := btNoBlock;
+          CurToken := ttBlockComment;
+        End;
+      // Check for block Comments
+      If (BlockType = btNoBlock) And (strText[i] = '{') Then
+        Begin
+          CurToken := ttBlockComment;
+          BlockType := btBraceComment;
+        End;
+      If (BlockType = btBraceComment) And (strText[i] = '}') Then
+        Begin
+          CurToken := ttBlockComment;
+          BlockType := btNoBlock;
+        End;
 
       // Check for string literals
       If CurToken = ttSingleLiteral Then

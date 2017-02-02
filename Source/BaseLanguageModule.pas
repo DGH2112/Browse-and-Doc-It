@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    30 Oct 2016
+  @Date    02 Feb 2017
   @Version 1.0
 
   @Author  David Hoyle
@@ -18,7 +18,6 @@ Uses
   Classes,
   Contnrs,
   Graphics;
-
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -6788,9 +6787,9 @@ begin
         sl.Free;
       End;
       FIssueLimits[ltErrors] := ReadInteger('Issues Limits', 'Errors', 10);
-      FIssueLimits[ltWarnings] := ReadInteger('Issues Limits', 'Errors', 10);
-      FIssueLimits[ltHints] := ReadInteger('Issues Limits', 'Errors', 10);
-      FIssueLimits[ltConflicts] := ReadInteger('Issues Limits', 'Errors', 10);
+      FIssueLimits[ltWarnings] := ReadInteger('Issues Limits', 'Warning', 10);
+      FIssueLimits[ltHints] := ReadInteger('Issues Limits', 'Hints', 10);
+      FIssueLimits[ltConflicts] := ReadInteger('Issues Limits', 'Conflicts', 10);
     Finally
       Free;
     End;
@@ -6873,9 +6872,9 @@ begin
             FProfilingCode.Values[FProfilingCode.Names[j]]);
           {$ENDIF}
       WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltErrors]);
-      WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltWarnings]);
-      WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltHints]);
-      WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltConflicts]);
+      WriteInteger('Issues Limits', 'Warnings', FIssueLimits[ltWarnings]);
+      WriteInteger('Issues Limits', 'Hints', FIssueLimits[ltHints]);
+      WriteInteger('Issues Limits', 'Conflicts', FIssueLimits[ltConflicts]);
       UpdateFile;
     Finally
       Free;

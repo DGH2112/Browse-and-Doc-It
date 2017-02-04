@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       09 Aug 2016
+  @Date       02 Feb 2017
   @Author     David Hoyle
 
 **)
@@ -490,7 +490,6 @@ Begin
   iTokenLine := 1;
   iTokenColumn := 1;
   CurCharType := ttUnknown;
-  //: @debug LastCharType := ttUnknown;
   iStreamCount := 0;
   iLine := 1;
   iColumn := 1;
@@ -990,6 +989,10 @@ begin
         Begin
           iCode := Token.Line Or (Token.Column Shl 16);
           FRequiredRules.AddObject(Token.Token, TObject(iCode));
+          If Token.Token = '<>' Then
+            AddIssue(Format(strNULLIdentifierFound, [Token.Token,
+                Token.Line, Token.Column]), scNone,'Term', Token.Line,
+                Token.Column, etError);
           AddToExpression(R);
           RepeatOperator(R);
         End
@@ -1039,7 +1042,7 @@ begin
         Begin
           R := TBNFRule.Create(Token.Token, scPublic, Token.Line, Token.Column,
             iiPublicType, GetComment);
-          If R.Identifier = '' Then
+          If R.Identifier = '<>' Then
             AddIssue(Format(strNULLIdentifierFound, [Token.Token,
                 Token.Line, Token.Column]), scNone,'Rule', Token.Line,
                 Token.Column, etError);

@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    02 Feb 2017
+  @Date    04 Feb 2017
   @Version 1.0
 
   @Author  David Hoyle
@@ -1100,11 +1100,11 @@ Type
   (** A class to hold a 64 bit tick count against a name. **)
   TTickOption = Class
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FName  : String;
-    FCount : Int64;
+    FName      : String;
+    FTickCount : Double;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(strName : String; iCount : Int64);
+    Constructor Create(strName : String; dblTickCount : Double);
     (**
       This property returns the name of the tick counter.
       @precon  None.
@@ -1116,9 +1116,9 @@ Type
       This property returns the value of the tick counter.
       @precon  None.
       @postcon Returns the value of the tick counter.
-      @return  an Int64
+      @return  a Double
     **)
-    Property Count : Int64 Read FCount;
+    Property TickCount : Double Read FTickCount;
   End;
 
   (** A type to define an array of integers. **)
@@ -1198,9 +1198,9 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetToken : TTokenInfo;
     function GetOpTickCountName(iIndex: Integer): String;
-    function GetOpTickCountByIndex(iIndex: Integer): Int64;
+    function GetOpTickCountByIndex(iIndex: Integer): Double;
     function GetOpTickCounts: Integer;
-    function GetOpTickCount(strStart, strFinish : String): Int64;
+    function GetOpTickCount(strStart, strFinish : String): Double;
     Function GetBodyComment(iIndex : Integer) : TComment;
     Function GetBodyCommentCount : Integer;
     Function PrevToken : TTokenInfo;
@@ -1217,11 +1217,12 @@ Type
     Procedure SetTokenIndex(iIndex : TTokenIndex);
     procedure AppendToLastToken(strToken : String);
     procedure ProcessCompilerDirective(var iSkip : Integer); Virtual; Abstract;
-    Function GetModuleName : String; Virtual;
-    function GetBytes: Int64;
-    function GetLines: Integer;
+    Function  GetModuleName : String; Virtual;
+    function  GetBytes: Int64;
+    function  GetLines: Integer;
     Procedure ErrorAndSeekToken(strMsg, strMethod, strParam : String;
       SeekTokens: Array Of String; SeekToken : TSeekToken);
+    Function GetHighPerformanceTickCount : Double;
     (**
       Returns a refernce the to owned items collection. This is used to manage
       the life time of all the ident lists and comments found in the module.
@@ -1282,15 +1283,15 @@ Type
     Function  DefaultProfilingTemplate : String; Virtual;
     { Properties }
     (**
-      This property returns the tick count time between the 2 named tick counts
-      previously stored using the AddTickCount() method.
+      This property returns the tick count time between the 2 named tick counts previously stored
+      using the AddTickCount() method.
       @precon  None.
       @postcon Returns the time between two counter if both the names are found.
-      @param   strStart  as       a String
-      @param   strFinish as       a String
-      @return  an Int64
+      @param   strFinish as a String
+      @param   strStart  as a String
+      @return  a Double
     **)
-    Property OpTickCount[strStart, strFinish : String] : Int64 Read GetOpTickCount;
+    Property OpTickCount[strStart, strFinish : String] : Double Read GetOpTickCount;
     (**
       Thie property returns the number of operation tick counter storeed in the
       collection.
@@ -1304,10 +1305,10 @@ Type
       This property returns the tick count associated with the indexed item.
       @precon  iIndex must be a valid index between 0 and OpTickCount - 1.
       @postcon Returns the tick count associated with the indexed item.
-      @param   iIndex as       an Integer
-      @return  an Int64
+      @param   iIndex as an Integer
+      @return  a Double
     **)
-    Property OpTickCountByIndex[iIndex : Integer] : Int64 Read GetOpTickCountByIndex;
+    Property OpTickCountByIndex[iIndex : Integer] : Double Read GetOpTickCountByIndex;
     (**
       This property returns the name associated with the indexed item.
       @precon  iIndex must be a valid index between 0 and OpTickCount - 1.
@@ -5684,7 +5685,7 @@ end;
 procedure TBaseLanguageModule.AddTickCount(strLabel: String);
 
 begin
-  FTickList.Add(TTickOption.Create(strLabel, GetTickCount));
+  FTickList.Add(TTickOption.Create(strLabel, GetHighPerformanceTickCount));
 end;
 
 (**
@@ -5995,6 +5996,27 @@ end;
 
 (**
 
+  This method returns a high performance tick count from the system for accurate time measurement.
+
+  @precon  None.
+  @postcon Returns the current tick count in milliseconds.
+
+  @return  a Double
+
+**)
+Function TBaseLanguageModule.GetHighPerformanceTickCount: Double;
+
+Var
+  t, f: Int64;
+
+Begin
+  QueryPerformanceCounter(t);
+  QueryPerformanceFrequency(f);
+  Result := 1000.0 * Int(t) / Int(f);
+End;
+
+(**
+
   This is a getter method for the ModuleName property.
 
   @precon  None.
@@ -6015,15 +6037,15 @@ End;
   This is a getter method for the OpTickCount property.
 
   @precon  None.
-  @postcon If both the start and end token are found in the collection of Tick
-           Counts then the number of Tick Counts between them are returned.
+  @postcon If both the start and end token are found in the collection of Tick Counts then the
+           number of Tick Counts between them are returned.
 
   @param   strStart  as a String
   @param   strFinish as a String
-  @return  an Int64
+  @return  a Double
 
 **)
-function TBaseLanguageModule.GetOpTickCount(strStart, strFinish : String): Int64;
+function TBaseLanguageModule.GetOpTickCount(strStart, strFinish : String): Double;
 
 Var
   i : Integer;
@@ -6042,8 +6064,7 @@ begin
     End;
   If (iStart > -1) And (iFinish > -1) Then
     Result :=
-      Integer((FTickList[iFinish] As TTickOption).Count) -
-      Integer((FTickList[iStart] As TTickOption).Count);
+      (FTickList[iFinish] As TTickOption).TickCount - (FTickList[iStart] As TTickOption).TickCount;
 end;
 
 (**
@@ -6054,13 +6075,13 @@ end;
   @postcon Returns the tick count associated with the passed index.
 
   @param   iIndex as an Integer
-  @return  an Int64
+  @return  a Double
 
 **)
-function TBaseLanguageModule.GetOpTickCountByIndex(iIndex: Integer): Int64;
+function TBaseLanguageModule.GetOpTickCountByIndex(iIndex: Integer): Double;
 
 begin
-  Result := (FTickList[iIndex] As TTickOption).Count;
+  Result := (FTickList[iIndex] As TTickOption).TickCount;
 end;
 
 (**
@@ -6995,15 +7016,15 @@ end;
   @precon  None.
   @postcon Initialises the tick counter.
 
-  @param   strName as a String
-  @param   iCount  as an Int64
+  @param   strName      as a String
+  @param   dblTickCount as a Double
 
 **)
-Constructor TTickOption.Create(strName: String; iCount: Int64);
+Constructor TTickOption.Create(strName: String; dblTickCount: Double);
 
 Begin
   FName := strName;
-  FCount := iCount;
+  FTickCount := dblTickCount;
 End;
 
 { TModuleInfo }

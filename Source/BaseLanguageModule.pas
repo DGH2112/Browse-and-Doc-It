@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    04 Feb 2017
+  @Date    05 Feb 2017
   @Version 1.0
 
   @Author  David Hoyle
@@ -6808,7 +6808,7 @@ begin
         sl.Free;
       End;
       FIssueLimits[ltErrors] := ReadInteger('Issues Limits', 'Errors', 10);
-      FIssueLimits[ltWarnings] := ReadInteger('Issues Limits', 'Warning', 10);
+      FIssueLimits[ltWarnings] := ReadInteger('Issues Limits', 'Warnings', 10);
       FIssueLimits[ltHints] := ReadInteger('Issues Limits', 'Hints', 10);
       FIssueLimits[ltConflicts] := ReadInteger('Issues Limits', 'Conflicts', 10);
     Finally

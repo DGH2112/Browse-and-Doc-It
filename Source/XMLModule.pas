@@ -5,7 +5,7 @@
   implemented.
 
   @Version    1.0
-  @Date       09 Aug 2016
+  @Date       09 Feb 2017
   @Author     David Hoyle
 
 **)
@@ -49,11 +49,14 @@ Type
   TXMLElement = Class(TXMLBaseElement)
   {$IFDEF D2005} Strict {$ENDIF} Private
     FAttributes : TStringList;
+    FContext    : TStringList;
   {$IFDEF D2005} Strict {$ENDIF} Protected
+    Function  ContextText : String;
   Public
     Constructor Create(strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
     Destructor Destroy; Override;
+    Procedure AddContextText(strText : String);
     Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Override;
     (**
@@ -123,13 +126,13 @@ Type
     Function  Misc(xmlParent : TElementContainer; var iElements : Integer) : Boolean; //  5
     Procedure XMLDecl(xmlParent : TElementContainer);                  //  6
     Function  DocTypeDecl(xmlParent : TElementContainer) : Boolean;    //  7
-    Function  STag(xmlParent : TElementContainer) : TElementContainer; //  8
+    Function  STag(xmlParent : TElementContainer) : TXMLElement;       //  8
     Function  XMLName : String;                                        //  9
-    Procedure Content(xmlParent : TElementContainer);                  // 10
+    Procedure Content(xmlParent : TXMLElement);                        // 10
     Procedure ETag(xmlParent : TElementContainer);                     // 11
     Function  XMLComment : Boolean;                                    // 12
     Function  XMLPI(xmlParent : TElementContainer) : Boolean;          // 13
-    Function  Whitespace : Boolean;                                    // 14
+    Function  Whitespace(E : TXMLElement) : Boolean;                   // 14
     Function  VersionInfo(xmlParent : TElementContainer) : Boolean;    // 15
     Procedure EncodingDecl(xmlParent : TElementContainer);             // 16
     Procedure SDDecl(xmlParent : TElementContainer);                   // 17
@@ -154,7 +157,7 @@ Type
     Function  Mixed(xmlParent : TElementContainer) : Boolean;          // 36
     Function  Children(xmlParent : TElementContainer) : Boolean;       // 37
     Function  ChoiceSeq(xmlParent : TElementContainer) : Boolean;      // 38
-    Function  CharData : Boolean;                                      // 40
+    Function  CharData(E : TXMLElement) : Boolean;               // 40
     Function  Reference(xmlParent: TElementContainer) : Boolean;       // 41
     Function  CDSect : Boolean;                                        // 42
     Procedure AttValue(xmlParent : TElementContainer);                 // 43
@@ -189,7 +192,7 @@ Type
     Procedure IgnoreSectContents;
     Procedure Ignore;
     // ----------------------------------------------------------------
-    Function  EatCharData : Boolean;
+    Function  EatCharData(E : TXMLElement) : Boolean;
     (* Helper method to the grammar parsers *)
     Procedure TokenizeStream;
     Procedure ParseTokens;
@@ -373,7 +376,7 @@ end;
   This is a getter method for the Name property.
 
   @precon  None.
-  @postcon Returns the name of the element created in the constructor. 
+  @postcon Returns the name of the element created in the constructor.
 
   @return  a String
 
@@ -408,6 +411,23 @@ end;
 
 (**
 
+  This method add tokens to the text (between tags).
+
+  @precon  None.
+  @postcon A token is added to the context information.
+
+  @param   strText as a String
+
+**)
+Procedure TXMLElement.AddContextText(strText: String);
+
+Begin
+  If FContext.Count < BrowseAndDocItOptions.TokenLimit Then
+    FContext.Add(strText);
+End;
+
+(**
+
   This method returns a string representation of the XML Element.
 
   @precon  None.
@@ -421,9 +441,34 @@ end;
 function TXMLElement.AsString(boolShowIdenifier,
   boolForDocumentation: Boolean): String;
 begin
-  Result := BuildStringRepresentation(boolShowIdenifier, boolForDocumentation,
-    '', BrowseAndDocItOptions.MaxDocOutputWidth, [#32, '='], [#32, '='], []);
+  Result := '<' + BuildStringRepresentation(boolShowIdenifier, boolForDocumentation,
+    '', BrowseAndDocItOptions.MaxDocOutputWidth, [#32, '='], [#32, '='], []) + '>' +
+    ContextText +
+    '</' + Identifier + '>';
 end;
+
+(**
+
+  This method returns a string representation of the token in the context text (between tags).
+
+  @precon  None.
+  @postcon A string of the context tokens is return.
+
+  @return  a String
+
+**)
+Function TXMLElement.ContextText: String;
+
+Var
+  i : Integer;
+
+Begin
+  For i := 0 To FContext.Count - 1 Do
+    Result := Result + FContext[i];
+  If FContext.Count > BrowseAndDocItOptions.TokenLimit Then
+    Result := Result + '...';
+  Result := Trim(Result);
+End;
 
 (**
 
@@ -447,6 +492,7 @@ begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FAttributes := TStringList.Create;
   FAttributes.Sorted := True;
+  FContext := TStringList.Create;
 end;
 
 (**
@@ -459,6 +505,7 @@ end;
 **)
 destructor TXMLElement.Destroy;
 begin
+  FContext.Free;
   FAttributes.Free;
   Inherited Destroy;
 end;
@@ -609,7 +656,7 @@ var
 
 begin
   Result := False;
-  If Whitespace Then
+  If Whitespace(Nil) Then
     Begin
       Result := True;
       T := Token;
@@ -619,9 +666,9 @@ begin
           scNone,'AttDef', T.Line, T.Column, etError)
       Else
         xmlParent.AddToken(strName);
-      Whitespace;
+      Whitespace(Nil);
       AttType(xmlParent);
-      Whitespace;
+      Whitespace(Nil);
       DefaultDecl(xmlParent);
     End;
 end;
@@ -653,11 +700,11 @@ begin
           A := xmlParent.Add(TXMLElemDecl.Create('!' + Token.Token, scNone,
             Token.Line, Token.Column, iiPublicConstant, Nil)) As TXMLElemDecl;
           NextNonCommentToken;
-          WhiteSpace;
+          WhiteSpace(Nil);
           strName := XMLName;
           A.AddToken(strName);
           While AttDef(A) Do;
-          Whitespace;
+          Whitespace(Nil);
           If Token.Token = '>' Then
             NextNonCommentToken
           Else
@@ -833,12 +880,14 @@ end;
   @precon  None.
   @postcon Eats up white space and token which do not start with an "<".
 
+  @param   E as a TXMLElement
   @return  a Boolean
 
 **)
-function TXMLModule.CharData: Boolean;
+function TXMLModule.CharData(E : TXMLElement): Boolean;
+
 begin
-  Result := Whitespace Or EatCharData;
+  Result := Whitespace(E) Or EatCharData(E);
 end;
 
 (**
@@ -995,7 +1044,7 @@ var
         If IsKeyWord(Token.Token, ['*', '+', '?']) Then
           AddToExpression(xmlParent);
       End;
-    Whitespace;
+    Whitespace(Nil);
   End;
 
 begin
@@ -1004,14 +1053,14 @@ begin
     Begin
       Result := True;
       AddToExpression(xmlParent);
-      Whitespace;
+      Whitespace(Nil);
       ProcessNames;
       If IsKeyWord(Token.Token, [',', '|']) Then
         Begin
           strDelimiter := Token.Token;
           AddToExpression(xmlParent);
           Repeat
-            Whitespace;
+            Whitespace(Nil);
             ProcessNames;
           Until Not IsToken(strDelimiter, xmlParent);
         End;
@@ -1063,15 +1112,15 @@ end;
   @precon  xmlParent must be a valid instance of a container.
   @postcon Parses the Content element of the grammar.
 
-  @param   xmlParent as a TElementContainer
+  @param   xmlParent as a TXMLElement
 
 **)
-procedure TXMLModule.Content(xmlParent : TElementContainer);
+procedure TXMLModule.Content(xmlParent : TXMLElement);
 begin
   Repeat
     // Do nothing
   Until Not (
-    CharData Or
+    CharData(xmlParent) Or
     Element(xmlParent) Or
     Reference(xmlParent) Or
     CDSect Or
@@ -1172,7 +1221,7 @@ Function TXMLModule.DeclSep(xmlParent : TElementContainer) : Boolean;
 begin
   Result := PEReference(xmlParent);
   If Not Result Then
-    Whitespace;
+    Whitespace(Nil);
 end;
 
 (**
@@ -1196,7 +1245,7 @@ begin
       If CompareText(Token.Token, '#FIXED')= 0 Then
         Begin
           AddToExpression(xmlParent);
-          If Not Whitespace Then
+          If Not Whitespace(Nil) Then
           ErrorAndSeekToken(strExpectedWhitespace, 'DefaultDecl', Token.Token,
             strReservedWords, stActual);
         End;
@@ -1225,7 +1274,7 @@ end;
   the grammar.
 
   @precon  xmlParent must be a valid instance of a container.
-  @postcon Parses the doc type information at the top of the XML file as per 
+  @postcon Parses the doc type information at the top of the XML file as per
            the grammar.
 
   @param   xmlParent as a TElementContainer
@@ -1246,13 +1295,13 @@ begin
         Begin
           Result := True;
           NextNonCommentToken;
-          Whitespace;
+          Whitespace(Nil);
           D := xmlParent.Add(TXMLDocType.Create('!DOCTYPE', scNone,
             Token.Line, Token.Column, iiPublicType, Nil)) As TXMLDocType;
           D.AddToken(XMLName);
-          If Whitespace Then
+          If Whitespace(Nil) Then
             ExternalID(D);
-          WhiteSpace;
+          WhiteSpace(Nil);
           If Token.Token = '[' Then
             Begin
               AddToExpression(D);
@@ -1260,7 +1309,7 @@ begin
               If Token.Token =  ']' Then
                 Begin
                   AddToExpression(D);
-                  WhiteSpace;
+                  WhiteSpace(Nil);
                 End Else
                   ErrorAndSeekToken(strLiteralExpected, 'DocTypeDecl', ']',
                     strSeekableOnErrorTokens, stActual);
@@ -1315,14 +1364,19 @@ end;
   @precon  None.
   @postcon Parses the elements of the xml document (tags).
 
+  @param   E as a TXMLElement
   @return  a Boolean
 
 **)
-function TXMLModule.EatCharData: Boolean;
+function TXMLModule.EatCharData(E : TXMLElement): Boolean;
+
 begin
   Result := (Token.Token[1] <> '<');
   If Result Then
-    NextNonCommentToken;
+    Begin
+      E.AddContextText(Token.Token);
+      NextNonCommentToken;
+    End;
 end;
 
 (**
@@ -1339,7 +1393,7 @@ end;
 Function TXMLModule.Element(xmlParent : TElementContainer) : Boolean;
 
 Var
-  xmlChild : TElementContainer;
+  xmlChild : TXMLElement;
 
 begin
   xmlChild := STag(xmlParent);
@@ -1380,7 +1434,7 @@ begin
           E := xmlParent.Add(TXMLElemDecl.Create('!' + Token.Token,
             scNone, Token.Line, Token.Column, iiPublicClass, Nil)) As TXMLElemDecl;
           NextNonCommentToken;
-          If WhiteSpace Then
+          If WhiteSpace(Nil) Then
             Begin
               T := Token;
               strName := XMLName;
@@ -1389,10 +1443,10 @@ begin
                   T.Column]), scNone, 'ElementDecl', T.Line, T.Column, etError)
               Else
                 E.AddToken(strName);
-              If WhiteSpace Then
+              If WhiteSpace(Nil) Then
                 Begin
                   ContentSpec(E);
-                  Whitespace;
+                  Whitespace(Nil);
                   If Token.Token = '>' Then
                     NextNonCommentToken
                   Else
@@ -1611,17 +1665,17 @@ begin
   If Token.Token = '(' Then
     Begin
       AddToExpression(xmlParent);
-      Whitespace;
+      Whitespace(Nil);
       NmToken(xmlParent);
-      Whitespace;
+      Whitespace(Nil);
       While Token.Token = '|' Do
         Begin
           AddToExpression(xmlParent);
-          Whitespace;
+          Whitespace(Nil);
           NmToken(xmlParent);
-          Whitespace;
+          Whitespace(Nil);
         End;
-      Whitespace;
+      Whitespace(Nil);
       If Token.Token = ')' Then
         AddToExpression(xmlParent)
       Else
@@ -1644,13 +1698,13 @@ end;
 **)
 procedure TXMLModule.Eq(xmlParent : TElementContainer);
 begin
-  WhiteSpace;
+  WhiteSpace(Nil);
   If Token.Token = '=' Then
     AddToExpression(xmlParent)
   Else
     ErrorAndSeekToken(strLiteralExpected, 'Eq', '=',
       strSeekableOnErrorTokens, stActual);
-  WhiteSpace;
+  WhiteSpace(Nil);
 end;
 
 (**
@@ -1679,7 +1733,7 @@ begin
       If strName <> xmlParent.Identifier Then
         AddIssue(Format(atrExpectedEndTagNamed, [xmlParent.Identifier, strName,
           iLine, iColumn]), scNone, 'ETag', iLine, iColumn, etWarning);
-      Whitespace;
+      Whitespace(Nil);
       If Token.Token = '>' Then
         NextNonCommentToken
       Else
@@ -1723,7 +1777,7 @@ begin
     Begin
       Result := True;
       AddToExpression(xmlParent);
-      If Not Whitespace Then
+      If Not Whitespace(Nil) Then
         ErrorAndSeekToken(strExpectedWhiteSpace, 'ExternalID', Token.Token,
           strSeekableOnErrorTokens, stActual);
       SystemLiteral(xmlParent);
@@ -1732,11 +1786,11 @@ begin
     Begin
       Result := True;
       AddToExpression(xmlParent);
-      If Not Whitespace Then
+      If Not Whitespace(Nil) Then
         ErrorAndSeekToken(strExpectedWhiteSpace, 'ExternalID', Token.Token,
           strSeekableOnErrorTokens, stActual);
       PubIDLiteral(xmlParent);
-      If Not Whitespace Then
+      If Not Whitespace(Nil) Then
         ErrorAndSeekToken(strExpectedWhiteSpace, 'ExternalID', Token.Token,
           strSeekableOnErrorTokens, stActual);
       SystemLiteral(xmlParent);
@@ -1780,7 +1834,7 @@ begin
   While (MarkupDecl(xmlParent) Or ConditionalSect(xmlParent) or DeclSep(xmlParent)) Do
     Begin
       Result := True;
-      Whitespace;
+      Whitespace(Nil);
     End;
 end;
 
@@ -1860,6 +1914,7 @@ Var
   (** Token size **)
   iTokenLen : Integer;
   iChar: Integer;
+  boolInTag : Boolean;
 
   (**
 
@@ -1892,12 +1947,12 @@ Begin
   iTokenLine := 1;
   iTokenColumn := 1;
   CurCharType := ttUnknown;
-  //: @debug LastCharType := ttUnknown;
   iStreamCount := 0;
   iLine := 1;
   iColumn := 1;
   LastChar := #0;
   strToken := '';
+  boolInTag := False;
 
   iTokenLen := 0;
   SetLength(strToken, iTokenCapacity);
@@ -1971,16 +2026,21 @@ Begin
                   ProcessWhiteSpace(strToken);
                   AddToken(TTokenInfo.Create(strToken, iStreamPos,
                     iTokenLine, iTokenColumn, Length(strToken), LastCharType));
+                  If Not (LastCharType In [ttWhiteSpace, ttLineEnd]) Then
+                    If strToken[1] = '<' Then
+                      boolInTag := True
+                    Else If strToken[Length(strToken)] = '>' Then
+                      boolInTag := False;
                 End;
-             // Store Stream position, line number and column of
-             // token start
-             iStreamPos := iStreamCount;
-             iTokenLine := iLine;
-             iTokenColumn := iColumn;
-             BlockType := btNoBlock;
-             iTokenLen := 1;
-             SetLength(strToken, iTokenCapacity);
-             strToken[iTokenLen] := Ch;
+              // Store Stream position, line number and column of
+              // token start
+              iStreamPos := iStreamCount;
+              iTokenLine := iLine;
+              iTokenColumn := iColumn;
+              BlockType := btNoBlock;
+              iTokenLen := 1;
+              SetLength(strToken, iTokenCapacity);
+              strToken[iTokenLen] := Ch;
             End Else
             Begin
               Inc(iTokenLen);
@@ -1996,18 +2056,21 @@ Begin
           strToken[iTokenLen] := Ch;
         End;
 
-      // Check for single string literals
-      If CurCharType = ttSingleLiteral Then
-        If BlockType = btSingleLiteral Then
-          BlockType := btNoBlock
-        Else If BlockType = btNoBlock Then
-          BlockType := btSingleLiteral;
-      // Check for Double string literals
-      If CurCharType = ttDoubleLiteral Then
-        If BlockType = btDoubleLiteral Then
-          BlockType := btNoBlock
-        Else If BlockType = btNoBlock Then
-          BlockType := btDoubleLiteral;
+      If boolInTag Then
+        Begin
+          // Check for single string literals
+          If CurCharType = ttSingleLiteral Then
+            If BlockType = btSingleLiteral Then
+              BlockType := btNoBlock
+            Else If BlockType = btNoBlock Then
+              BlockType := btSingleLiteral;
+          // Check for Double string literals
+          If CurCharType = ttDoubleLiteral Then
+            If BlockType = btDoubleLiteral Then
+              BlockType := btNoBlock
+            Else If BlockType = btNoBlock Then
+              BlockType := btDoubleLiteral;
+        End;
 
       Inc(iColumn);
       If Ch = #10 Then
@@ -2042,7 +2105,7 @@ End;
 Function TXMLModule.VersionInfo(xmlParent : TElementContainer) : Boolean;
 begin
   Result := False;
-  WhiteSpace;
+  WhiteSpace(Nil);
   If CompareText(Token.Token, 'version') = 0 Then
     Begin
       Result := True;
@@ -2105,15 +2168,19 @@ end;
   @precon  None.
   @postcon Returns true if whitespace was encountered.
 
+  @param   E as a TXMLElement
   @return  a Boolean
 
 **)
-function TXMLModule.Whitespace: Boolean;
+function TXMLModule.Whitespace(E : TXMLElement): Boolean;
+
 begin
   Result := False;
   While Token.TokenType In [ttWhiteSpace, ttLineEnd] Do
     Begin
       Result := True;
+      If E <> Nil Then
+        E.AddContextText(#32);
       NextNonCommentToken;
     End;
 end;
@@ -2169,11 +2236,11 @@ begin
           If Not VersionInfo(xmlParent) Then
             ErrorAndSeekToken(strExpectedWord, 'XMLDecl', 'version',
               strSeekableOnErrorTokens, stActual);
-          Whitespace;
+          Whitespace(Nil);
           EncodingDecl(xmlParent);
-          Whitespace;
+          Whitespace(Nil);
           SDDecl(xmlParent);
-          Whitespace;
+          Whitespace(Nil);
           If Token.Token = '?' Then
             Begin
               AddToExpression(xmlParent);
@@ -2260,7 +2327,7 @@ begin
       NextNonCommentToken;
       pit := PITarget(xmlParent);
       If pit <> Nil Then
-        If WhiteSpace Then
+        If WhiteSpace(Nil) Then
           Begin
             While (PrevToken.Token <> '?') And (Token.Token <> '>') Do
               If Token.TokenType In [ttWhiteSpace, ttLineEnd] Then
@@ -2315,7 +2382,7 @@ begin
     Begin
       Result := True;
       AddToExpression(xmlParent);
-      If Not WhiteSpace Then
+      If Not WhiteSpace(Nil) Then
         ErrorAndSeekToken(strExpectedWhitespace, 'PEDecl', Token.Token,
           strSeekableOnErrorTokens, stActual);
       T := Token;
@@ -2325,11 +2392,11 @@ begin
           scNone, 'PEDecl', T.Line, T.Column, etError)
       Else
         xmlParent.AddToken(strName);
-      If Not WhiteSpace Then
+      If Not WhiteSpace(Nil) Then
         ErrorAndSeekToken(strExpectedWhitespace, 'PEDecl', Token.Token,
           strSeekableOnErrorTokens, stActual);
       EntityDef(xmlParent);
-      Whitespace;
+      Whitespace(Nil);
       If Token.Token = '>' Then
         NextNonCommentToken
       Else
@@ -2485,7 +2552,7 @@ begin
   If Result Then
     Inc(iElements);
   If Not Result Then
-    Result := Whitespace
+    Result := Whitespace(Nil);
 end;
 
 (**
@@ -2516,19 +2583,19 @@ begin
           Result := True;
           xmlParent.AddToken('(', ttSymbol);
           AddToExpression(xmlParent);
-          WhiteSpace;
+          WhiteSpace(Nil);
           iNames := 0;
           While Token.Token = '|' Do
             Begin
               AddToExpression(xmlParent);
-              Whitespace;
+              Whitespace(Nil);
               T := Token;
               strName := XMLName;
               If strName <> '' Then
                 Begin
                   xmlparent.AddToken(strName);
                   Inc(iNames);
-                  Whitespace;
+                  Whitespace(Nil);
                 End Else
                   AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
                     T.Column]), scNone, 'Mixed', T.Line, T.Column, etError);
@@ -2590,14 +2657,14 @@ var
   T: TTokenInfo;
 
 begin
-  If Whitespace Then
+  If Whitespace(Nil) Then
     Begin
       If CompareText(Token.Token, 'NDATA') = 0 Then
         AddToExpression(xmlParent)
       Else
         ErrorAndSeekToken(strExpectedWord, 'NDataDecl', 'NDATA',
           strSeekableOnErrorTokens, stActual);
-      If Not Whitespace Then
+      If Not Whitespace(Nil) Then
         ErrorAndSeekToken(strExpectedWhitespace, 'NDataDecl', Token.Token,
           strSeekableOnErrorTokens, stActual);
       T := Token;
@@ -2660,7 +2727,7 @@ begin
           N := xmlParent.Add(TXMLElemDecl.Create('!' + Token.Token, scNone,
             Token.Line, Token.Column, iiPublicDispInterface, Nil)) As TXMLElemDecl;
           NextNonCommentToken;
-          Whitespace;
+          Whitespace(Nil);
           T := Token;
           strName := XMLName;
           If strName = '' Then
@@ -2668,10 +2735,10 @@ begin
               scNone, 'NotationDecl', T.Line, T.Column, etError)
           Else
             N.AddToken(strName);
-          Whitespace;
+          Whitespace(Nil);
           If Not ExternalID(N) Then
             PublicID(N);
-          Whitespace;
+          Whitespace(Nil);
           If Token.Token = '>' Then
             NextNonCommentToken
           Else
@@ -2705,12 +2772,12 @@ begin
     Begin
       Result := True;
       AddToExpression(xmlParent);
-      If Whitespace Then
+      If Whitespace(Nil) Then
         Begin
           If Token.Token = '(' Then
             Begin
               AddToExpression(xmlParent);
-              Whitespace;
+              Whitespace(Nil);
               T := Token;
               strName := XMLName;
               If strName = '' Then
@@ -2718,11 +2785,11 @@ begin
                   T.Column]), scNone, 'NotationType', T.Line, T.Column, etError)
               Else
                 xmlParent.AddToken(strName);
-              Whitespace;
+              Whitespace(Nil);
               While Token.Token = '|' Do
                 Begin
                   AddToExpression(xmlParent);
-                  Whitespace;
+                  Whitespace(Nil);
                   T := Token;
                   strName := XMLName;
                   If strName = '' Then
@@ -2730,9 +2797,9 @@ begin
                       T.Column]), scNone, 'NotationType', T.Line, T.Column, etError)
                   Else
                     xmlParent.AddToken(strName);
-                  Whitespace;
+                  Whitespace(Nil);
                 End;
-              Whitespace;
+              Whitespace(Nil);
               If Token.Token = ')' Then
                 AddToExpression(xmlParent)
               Else
@@ -2776,7 +2843,7 @@ begin
           E := xmlParent.Add(TXMLElemDecl.Create('!' + Token.Token, scNone,
             Token.Line, Token.Column, iiPublicInterface, Nil)) As TXMLElemDecl;
           NextNonCommentToken;
-          If Not WhiteSpace Then
+          If Not WhiteSpace(Nil) Then
             ErrorAndSeekToken(strExpectedWhitespace, 'GEDecl', Token.Token,
               strSeekableOnErrorTokens, stActual);
           If Not PEDecl(E) Then
@@ -2788,11 +2855,11 @@ begin
                   T.Column]), scNone, 'GEDecl', T.Line, T.Column, etError)
               Else
                 E.AddToken(strName);
-              If Not WhiteSpace Then
+              If Not WhiteSpace(Nil) Then
                 ErrorAndSeekToken(strExpectedWhitespace, 'GEDecl', Token.Token,
                   strSeekableOnErrorTokens, stActual);
               EntityDef(E);
-              Whitespace;
+              Whitespace(Nil);
               If Token.Token = '>' Then
                 NextNonCommentToken
               Else
@@ -2960,7 +3027,7 @@ begin
   Else
     ErrorAndSeekToken(strExpectedWord, 'PublicID', Token.Token,
       strSeekableOnErrorTokens, stActual);
-  If Not WhiteSpace Then
+  If Not WhiteSpace(Nil) Then
     ErrorAndSeekToken(strExpectedWhitespace, 'GEDecl', Token.Token,
       strSeekableOnErrorTokens, stActual);
   PubidLiteral(xmlParent);
@@ -3044,10 +3111,10 @@ end;
   @postcon Returns true IF the tag has an ending forward slash.
 
   @param   xmlParent as a TElementContainer
-  @return  a TElementContainer
+  @return  a TXMLElement
 
 **)
-Function TXMLModule.STag(xmlParent : TElementContainer) : TElementContainer;
+Function TXMLModule.STag(xmlParent : TElementContainer) : TXMLElement;
 
 Var
   strXMLName: String;
@@ -3070,9 +3137,9 @@ begin
             If LowerCase(strXMLName) <> strXMLName Then
               AddIssue(Format(strHTMLElementLowercase, [strXMLName, T.Line,
                 T.Column]), scNone, 'STag', T.Line, T.Column, etWarning);
-          Whitespace;
+          Whitespace(Nil);
           While Attribute(X) Do
-            WhiteSpace;
+            WhiteSpace(Nil);
         End Else
           AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
             scNone, 'STag', T.Line, T.Column, etError);
@@ -3150,9 +3217,9 @@ begin
             Token.Line, Token.Column, iiPublicObject, Nil));
           NextNonCommentToken;
           VersionInfo(xmlParent);
-          Whitespace;
+          Whitespace(Nil);
           EncodingDecl(xmlParent);
-          Whitespace;
+          Whitespace(Nil);
           If Token.Token = '?' Then
             Begin
               AddToExpression(xmlParent);
@@ -3297,7 +3364,7 @@ begin
           I := xmlParent.Add(TXMLIgnoreElement.Create('IGNORE', scNone, Token.Line,
             Token.Column, iiPublicConstant, Nil)) As TXMLIgnoreElement;
           NextNonCommentToken;
-          Whitespace;
+          Whitespace(Nil);
           If Token.Token = '[' Then
             Begin
               AddToExpression(I);
@@ -3378,7 +3445,7 @@ begin
           I := xmlParent.Add(TXMLIncludeElement.Create('INCLUDE', scNone, Token.Line,
             Token.Column, iiPublicConstant, Nil)) As TXMLIncludeElement;
           NextNonCommentToken;
-          Whitespace;
+          Whitespace(Nil);
           If Token.Token = '[' Then
             Begin
               AddToExpression(I);

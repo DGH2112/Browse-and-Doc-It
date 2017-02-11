@@ -4,7 +4,7 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    29 Dec 2016
+  @Date    11 Feb 2017
   @Version 1.0
 
 **)
@@ -63,6 +63,8 @@ Var
   iTokenLen : Integer;
   i : Integer;
   LastChar : Char;
+  boolIsXML : Boolean;
+  boolInXMLTag : Boolean;
 
 Begin
   Result := TStringList.Create;
@@ -71,6 +73,8 @@ Begin
   CurToken := ttUnknown;
   strToken := '';
   LastChar := #0;
+  boolIsXML := False;
+  boolInXMLTag := False;
 
   iTokenLen := 0;
   SetLength(strToken, iTokenCapacity);
@@ -140,7 +144,14 @@ Begin
                       LastToken := ttDirective;
                   If (LastToken = ttIdentifier) And (Result.Count > 0) And
                     (Result[Result.Count - 1] = '<') Then
-                    LastToken := ttHTMLStartTag;
+                    Begin
+                      LastToken := ttHTMLStartTag;
+                      boolInXMLTag := True;
+                      If Not boolIsXML Then
+                        boolIsXML := True;
+                    End;
+                  If strToken = '>' Then
+                    boolInXMLTag := False;
                   If (LastToken = ttIdentifier) And (Result.Count > 1) And
                     (Result[Result.Count - 2] = '<') And (Result[Result.Count - 1] = '/') Then
                     LastToken := ttHTMLEndTag;
@@ -166,16 +177,6 @@ Begin
           strToken[iTokenLen] := strText[i];
         End;
 
-      //If (BlockType = btXMLTag) And (strText[i] = '>') Then
-      //  Begin
-      //    BlockType := btNoBlock;
-      //    CurToken := ttHTMLStartTag;
-      //    If Length(strToken) > 1 Then
-      //      If strToken[2] = '/' Then
-      //        CurToken := ttHTMLEndTag
-      //    Else
-      //  End;
-
       // Check for the end of a block comment
       If (BlockType = btPascalBlockComment) And (LastChar = '*') And (strText[i] = ')') Then
         Begin
@@ -200,13 +201,13 @@ Begin
         End;
 
       // Check for string literals
-      If CurToken = ttSingleLiteral Then
+      If (CurToken = ttSingleLiteral) And Not (boolIsXML Xor boolInXMLTag) Then
         If BlockType = btSingleLiteral Then
           BlockType := btNoBlock
         Else If BlockType = btNoBlock Then
           BlockType := btSingleLiteral;
       // Check for string literals
-      If CurToken = ttDoubleLiteral Then
+      If (CurToken = ttDoubleLiteral) And Not (boolIsXML Xor boolInXMLTag) Then
         If BlockType = btDoubleLiteral Then
           BlockType := btNoBlock
         Else If BlockType = btNoBlock Then

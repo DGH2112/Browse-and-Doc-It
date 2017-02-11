@@ -3,7 +3,11 @@ Unit TestGenericTokenizer;
 Interface
 
 Uses
-  TestFramework, BaseLanguageModule, TestBaseLanguageModule, GenericTokenizer;
+  Classes,
+  TestFramework,
+  BaseLanguageModule,
+  TestBaseLanguageModule,
+  GenericTokenizer;
 
 Type
   //
@@ -11,6 +15,8 @@ Type
   //
   TestFunctions = Class(TExtendedTestCase)
   Strict Private
+    Procedure CheckToken(sl : TStringList; iToken : Integer; strToken : String;
+      TokenType : TBADITokenType);
   Public
   Published
     Procedure TestTokenize;
@@ -20,16 +26,27 @@ Type
     Procedure TestLineComment;
     Procedure TestCPPBlockCommentOnLine;
     Procedure TestCPPBlockCommentOverMultiLines;
+    Procedure TestQuoteNotInXML;
+    Procedure TestQuoteInXML;
   End;
 
 Implementation
 
 Uses
-  Classes;
+  SysUtils;
 
 //
 // Test Methods for Class Functions.
 //
+Procedure TestFunctions.CheckToken(sl: TStringList; iToken: Integer; strToken : String;
+  TokenType : TBADITokenType);
+
+Begin
+  CheckEquals(strToken, sl[iToken]);
+  CheckEquals(TokenType, TBADITokenType(sl.Objects[iToken]),
+    Format('%d)%s|%s', [iToken, sl[iToken], strToken]));
+End;
+
 procedure TestFunctions.TestBraceComment;
 
 Const
@@ -460,9 +477,71 @@ Begin
   End;
 end;
 
+Procedure TestFunctions.TestQuoteInXML;
+
+Const
+  strText = '<p class="Name">This don''t fail!</p>';
+
+Var
+  strReservedWords, strDirectives : TKeyWords;
+  sl : TStringList;
+
+Begin
+  sl := Tokenize(strText, strReservedWords, strDirectives);
+  Try
+    CheckToken(sl,  0, '<', ttSymbol);
+    CheckToken(sl,  1, 'p', ttHTMLStartTag);
+    CheckToken(sl,  3, 'class', ttIdentifier);
+    CheckToken(sl,  4, '=', ttSymbol);
+    CheckToken(sl,  5, '"Name"', ttDoubleLiteral);
+    CheckToken(sl,  6, '>', ttSymbol);
+    CheckToken(sl,  7, 'This', ttIdentifier);
+    CheckToken(sl,  9, 'don', ttIdentifier);
+    CheckToken(sl, 10, '''', ttSingleLiteral);
+    CheckToken(sl, 11, 't', ttIdentifier);
+    CheckToken(sl, 13, 'fail', ttIdentifier);
+    CheckToken(sl, 14, '!', ttSymbol);
+    CheckToken(sl, 15, '<', ttSymbol);
+    CheckToken(sl, 16, '/', ttSymbol);
+    CheckToken(sl, 17, 'p', ttHTMLEndTag);
+    CheckToken(sl, 18, '>', ttSymbol);
+  Finally
+    sl.Free;
+  End;
+End;
+
+Procedure TestFunctions.TestQuoteNotInXML;
+
+Const
+  strText = 'This is some ''quoted'' text and some "more" text!';
+
+Var
+  strReservedWords, strDirectives : TKeyWords;
+  sl : TStringList;
+
+Begin
+  sl := Tokenize(strText, strReservedWords, strDirectives);
+  Try
+    CheckToken(sl, 0, 'This', ttIdentifier);
+    CheckToken(sl, 2, 'is', ttIdentifier);
+    CheckToken(sl, 4, 'some', ttIdentifier);
+    CheckToken(sl, 6, '''quoted''', ttSingleLiteral);
+    CheckToken(sl, 8, 'text', ttIdentifier);
+    CheckToken(sl, 10, 'and', ttIdentifier);
+    CheckToken(sl, 12, 'some', ttIdentifier);
+    CheckToken(sl, 14, '"more"', ttDoubleLiteral);
+    CheckToken(sl, 16, 'text', ttIdentifier);
+    CheckToken(sl, 17, '!', ttSymbol);
+  Finally
+    sl.Free;
+  End;
+End;
+
 Procedure TestFunctions.TestTokenize;
 
 Const
+  //                            1               2                      3
+  // Tokens  0     1234  5678  9012    3456  7890    1234         56789012   34 56789
   strCode = 'qwerty = one + two + ''q'' - "p" - Hello * ? Custom ? + <p> '''' "" </p>';
 
 Var
@@ -478,7 +557,7 @@ Begin
   strDirectives := Nil;
   sl := Tokenize(strCode, strReservedWords, strDirectives);
   Try
-    CheckEquals(35, sl.Count);
+    CheckEquals(40, sl.Count);
     CheckEquals('qwerty', sl[0]);
     CheckEquals(ttIdentifier, TBADITokenType(sl.Objects[0]));
     CheckEquals(' ', sl[1]);
@@ -535,23 +614,30 @@ Begin
     CheckEquals(ttSymbol, TBADITokenType(sl.Objects[26]));
     CheckEquals(' ', sl[27]);
     CheckEquals(ttWhiteSpace, TBADITokenType(sl.Objects[27]));
-    CheckEquals('<p>', sl[28]);
-    CheckEquals(ttHTMLStartTag, TBADITokenType(sl.Objects[28]));
-    CheckEquals(' ', sl[29]);
-    CheckEquals(ttWhiteSpace, TBADITokenType(sl.Objects[29]));
-
-    CheckEquals('''''', sl[30]);
-    CheckEquals(ttSingleLiteral, TBADITokenType(sl.Objects[30]));
+    CheckEquals('<', sl[28]);
+    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[28]));
+    CheckEquals('p', sl[29]);
+    CheckEquals(ttHTMLStartTag, TBADITokenType(sl.Objects[29]));
+    CheckEquals('>', sl[30]);
+    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[30]));
     CheckEquals(' ', sl[31]);
     CheckEquals(ttWhiteSpace, TBADITokenType(sl.Objects[31]));
-    CheckEquals('""', sl[32]);
-    CheckEquals(ttDoubleLiteral, TBADITokenType(sl.Objects[32]));
+    CheckEquals('''''', sl[32]);
+    CheckEquals(ttSingleLiteral, TBADITokenType(sl.Objects[32]));
     CheckEquals(' ', sl[33]);
     CheckEquals(ttWhiteSpace, TBADITokenType(sl.Objects[33]));
-
-
-    CheckEquals('</p>', sl[34]);
-    CheckEquals(ttHTMLEndTag, TBADITokenType(sl.Objects[34]));
+    CheckEquals('""', sl[34]);
+    CheckEquals(ttDoubleLiteral, TBADITokenType(sl.Objects[34]));
+    CheckEquals(' ', sl[35]);
+    CheckEquals(ttWhiteSpace, TBADITokenType(sl.Objects[35]));
+    CheckEquals('<', sl[36]);
+    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[36]));
+    CheckEquals('/', sl[37]);
+    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[37]));
+    CheckEquals('p', sl[38]);
+    CheckEquals(ttHTMLEndTag, TBADITokenType(sl.Objects[38]));
+    CheckEquals('>', sl[39]);
+    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[39]));
   Finally
     sl.Free;
   End;

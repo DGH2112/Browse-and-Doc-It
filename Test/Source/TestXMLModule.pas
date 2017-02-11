@@ -172,6 +172,7 @@ Type
     Procedure TestExample30;
     Procedure TestExample32;
     Procedure TestExample33;
+    Procedure TestExample34;
   Public //: @todo Disabled check until I understand the grammar better.
     Procedure TestExample12;
     Procedure TestExample17;
@@ -291,7 +292,7 @@ End;
 Procedure TestTXMLElement.TestAsString;
 
 Begin
-  CheckEquals('xml', FXMLElement.AsString(True, True));
+  CheckEquals('<xml></xml>', FXMLElement.AsString(True, True));
 End;
 
 Procedure TestTXMLElement.TestCreate;
@@ -394,7 +395,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element Name="Hello"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element Name="Hello"></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -406,7 +407,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element Name=''Hello''', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element Name=''Hello''></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -496,7 +497,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element Name="Hello"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element Name="Hello"></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -519,7 +520,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -533,7 +534,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -547,7 +548,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -570,7 +571,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -584,7 +585,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -598,7 +599,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -621,7 +622,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -635,7 +636,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -649,7 +650,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -672,7 +673,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -686,7 +687,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -700,7 +701,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -721,7 +722,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element>This is some information, that I think? you &lt;need&gt; to test!</Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -742,7 +743,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element>&#123;</Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -754,7 +755,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element>&#x00FF;</Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -913,10 +914,10 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element>Text        Text        Text    &Hello;    text        text</Element>', M.Elements[1].AsString(True, True));
     CheckEquals(3, M.Elements[1].ElementCount);
-    CheckEquals('Element', M.Elements[1].Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[1].Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].Elements[2].AsString(True, True));
     CheckEquals('?Name Goodbye?', M.Elements[1].Elements[3].AsString(True, True));
   Finally
     M.Free;
@@ -1007,7 +1008,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE html []', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('%Name;', M.Elements[1].Elements[1].AsString(True, True));
   Finally
@@ -1023,7 +1024,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE html []', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1103,7 +1104,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE html', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1117,7 +1118,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE html SYSTEM "123"', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1131,7 +1132,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE html SYSTEM "123" []', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('!ELEMENT Name ANY', M.Elements[1].Elements[1].AsString(True, True));
   Finally
@@ -1153,7 +1154,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1165,7 +1166,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1177,7 +1178,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1188,8 +1189,8 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1215,9 +1216,9 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
     CheckEquals(2, M.Elements[1].ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
-    CheckEquals('Hello', M.Elements[1].Elements[1].AsString(True, True));
-    CheckEquals('Goodbye', M.Elements[1].Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
+    CheckEquals('<Hello></Hello>', M.Elements[1].Elements[1].AsString(True, True));
+    CheckEquals('<Goodbye></Goodbye>', M.Elements[1].Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1273,7 +1274,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" encoding="ABC-456-789"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1287,7 +1288,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" encoding="ABC_456_789"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1301,7 +1302,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" encoding="ABC.456.789"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1324,7 +1325,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" encoding="ABC-456-789"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1338,7 +1339,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" encoding=''ABC-456-789''?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1437,7 +1438,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element>&Name;</Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1581,7 +1582,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element Goodbye="Hello"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element Goodbye="Hello"></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1602,7 +1603,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -1614,7 +1615,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2357,7 +2358,28 @@ begin
   End;
 end;
 
-procedure TestTXMLModule.TestExternalID;
+procedure TestTXMLModule.TestExample34;
+
+Var
+  strCode: String;
+  M: TBaseLanguageModule;
+
+Begin
+  strCode :=
+    '<Element>This don''t have to fail!</Element>'#13#10;
+  M := TXMLModule.CreateParser(strCode, 'D:\Path\Filename.xml', True, [moParse]);
+  Try
+    CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
+    CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
+    CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
+    CheckEquals(1, M.ElementCount);
+    CheckEquals('<Element>This don''t have to fail!</Element>', M.Elements[1].AsString(True, True));
+  Finally
+    M.Free;
+  End;
+End;
+
+Procedure TestTXMLModule.TestExternalID;
 
 Var
  strCode : String;
@@ -2374,7 +2396,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE name SYSTEM "Hello"', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2388,7 +2410,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE name SYSTEM ''Hello''', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2402,7 +2424,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE name PUBLIC "PublicID" "Hello"', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2416,7 +2438,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE name PUBLIC ''PublicID'' ''Hello''', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2559,7 +2581,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE html []', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('!ELEMENT Name ANY', M.Elements[1].Elements[1].AsString(True, True));
   Finally
@@ -2575,7 +2597,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('!DOCTYPE html []', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('%Name;', M.Elements[1].Elements[1].AsString(True, True));
   Finally
@@ -2681,7 +2703,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2697,7 +2719,7 @@ begin
     CheckEquals(3, M.ElementCount);
     CheckEquals('?xml version="1.0"?', M.Elements[1].AsString(True, True));
     CheckEquals('?Name Hello?', M.Elements[2].AsString(True, True));
-    CheckEquals('Element', M.Elements[3].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[3].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2774,7 +2796,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2785,7 +2807,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element01', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element01></Element01>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2796,7 +2818,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element01.Oops', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element01.Oops></Element01.Oops>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2807,7 +2829,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element01-Oops', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element01-Oops></Element01-Oops>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2818,7 +2840,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element01_Oops', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element01_Oops></Element01_Oops>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2829,7 +2851,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element01:Oops', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element01:Oops></Element01:Oops>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2849,7 +2871,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2860,7 +2882,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element01', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element01></Element01>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2871,7 +2893,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element01.Oops', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element01.Oops></Element01.Oops>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2882,7 +2904,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element01-Oops', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element01-Oops></Element01-Oops>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2893,7 +2915,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element01_Oops', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element01_Oops></Element01_Oops>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -2904,7 +2926,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element01:Oops', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element01:Oops></Element01:Oops>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3064,7 +3086,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('?Hello?', M.Elements[1].Elements[1].AsString(True, True));
   Finally
@@ -3080,7 +3102,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('?Hello Goodbye Dave?', M.Elements[1].Elements[1].AsString(True, True));
   Finally
@@ -3105,7 +3127,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3119,7 +3141,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3134,7 +3156,7 @@ begin
     CheckEquals(3, M.ElementCount);
     CheckEquals('?xml version="1.0"?', M.Elements[1].AsString(True, True));
     CheckEquals('!DOCTYPE html', M.Elements[2].AsString(True, True));
-    CheckEquals('Element', M.Elements[3].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[3].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3209,7 +3231,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element>%name;</Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3221,7 +3243,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element>&#123;</Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3233,7 +3255,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element>&#x00FF;</Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3256,7 +3278,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" standalone="yes"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3270,7 +3292,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" standalone="no"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3284,7 +3306,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" standalone=''yes''?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3298,7 +3320,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" standalone=''no''?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3340,7 +3362,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3352,7 +3374,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3364,7 +3386,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element Name="Hello"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element Name="Hello"></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3376,7 +3398,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element Name="Hello"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element Name="Hello"></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3567,7 +3589,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3581,7 +3603,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version=''1.0''?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3604,7 +3626,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3618,7 +3640,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version=''1.0''?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3639,7 +3661,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3661,7 +3683,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3674,8 +3696,8 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
-    CheckEquals('A', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<A></A>', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3688,8 +3710,8 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
-    CheckEquals('A', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<A></A>', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3702,8 +3724,8 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
-    CheckEquals('A', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<A></A>', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3726,7 +3748,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3740,7 +3762,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" encoding="ABC-1234-567-89"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3754,7 +3776,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" encoding="A1234_56789" standalone="yes"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3768,7 +3790,7 @@ begin
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(2, M.ElementCount);
     CheckEquals('?xml version="1.0" encoding="A12-3456789" standalone="no"?', M.Elements[1].AsString(True, True));
-    CheckEquals('Element', M.Elements[2].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[2].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3789,7 +3811,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element name="Hello"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element name="Hello"></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3801,7 +3823,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element name_="Hello"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element name_="Hello"></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3813,7 +3835,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element name_info="Hello"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element name_info="Hello"></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3825,7 +3847,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element name:info="Hello"', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element name:info="Hello"></Element>', M.Elements[1].AsString(True, True));
   Finally
     M.Free;
   End;
@@ -3846,7 +3868,7 @@ begin
     CheckEquals(0, M.HeadingCount(strWarnings), M.FirstWarning);
     CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
     CheckEquals(1, M.ElementCount);
-    CheckEquals('Element', M.Elements[1].AsString(True, True));
+    CheckEquals('<Element></Element>', M.Elements[1].AsString(True, True));
     CheckEquals(1, M.Elements[1].ElementCount);
     CheckEquals('?Name Hello?', M.Elements[1].Elements[1].AsString(True, True));
   Finally

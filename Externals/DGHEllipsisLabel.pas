@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Apr 2009
+  @Date    12 Feb 2017
 
 **)
 unit DGHEllipsisLabel;
@@ -15,14 +15,12 @@ interface
 Uses
   Controls, Classes;
 
-{$INCLUDE '..\..\Library\CompilerDefinitions.inc'}
-
 Type
   (** A class to represent the ellipsis graphics control. **)
   TDGHEllipsisLabel = Class(TGraphicControl)
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
     FCaption : String;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Protected
     Procedure SetCaption(Const strValue : String);
   Public
     Procedure Paint; Override;

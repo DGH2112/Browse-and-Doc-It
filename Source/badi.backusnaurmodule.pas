@@ -3,16 +3,20 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       02 Feb 2017
+  @Date       12 Feb 2017
   @Author     David Hoyle
 
 **)
-Unit BackusNaurModule;
+Unit BADI.BackusNaurModule;
 
 Interface
 
 Uses
-  SysUtils, Windows, Contnrs, Classes, BaseLanguageModule;
+  SysUtils,
+  Windows,
+  Contnrs,
+  Classes,
+  BADI.BaseLanguageModule;
 
 {$INCLUDE CompilerDefinitions.inc}
 

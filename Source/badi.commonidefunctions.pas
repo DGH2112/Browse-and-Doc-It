@@ -4,11 +4,11 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    10 Aug 2016
+  @Date    12 Feb 2017
   @Version 1.0
 
 **)
-Unit CommonIDEFunctions;
+Unit BADI.CommonIDEFunctions;
 
 Interface
 
@@ -16,7 +16,7 @@ Uses
   SysUtils,
   Windows,
   Classes,
-  BaselanguageModule;
+  BADI.BaselanguageModule;
 
 Type
   {$INCLUDE 'CompilerDefinitions.inc'}

@@ -1,4 +1,4 @@
-unit TestBaseLanguageModule;
+unit Test.BADI.BaseLanguageModule;
 {
 
   Delphi DUnit Test Case
@@ -12,8 +12,13 @@ unit TestBaseLanguageModule;
 interface
 
 uses
-  TestFramework, Graphics, SysUtils, Classes, BaseLanguageModule, Contnrs,
-  CommonIDEFunctions;
+  TestFramework,
+  Graphics,
+  SysUtils,
+  Classes,
+  BADI.BaseLanguageModule,
+  Contnrs,
+  BADI.CommonIDEFunctions;
 
 type
   TElementContainerHelper = Class Helper for TElementContainer
@@ -2575,10 +2580,16 @@ begin
 end;
 
 procedure TestTBaseLanguageModule.TestOpTickCount;
+var
+  dblDiff: Double;
 begin
   FBaseLanguageModule.AddTickCount('Hello');
+  Sleep(100);
   FBaseLanguageModule.AddTickCount('Goodbye');
-  CheckEquals(0, FBaseLanguageModule.OpTickCount['Hello', 'Goodbye']);
+  dblDiff := FBaseLanguageModule.OpTickCount['Hello', 'Goodbye'] - 100;
+  If dblDiff < 0 Then
+    dblDiff := -dblDiff;
+  Check(dblDiff < 2.0);
 end;
 
 procedure TestTBaseLanguageModule.TestOpTickCountByIndex;

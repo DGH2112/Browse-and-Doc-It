@@ -33,21 +33,21 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Left = 7
       Top = 10
       Width = 91
-      Height = 16
+      Height = 23
       Caption = 'Refresh &Interval'
     end
     object lblManagedNodesLife: TLabel
       Left = 184
       Top = 10
       Width = 221
-      Height = 13
+      Height = 23
       Alignment = taRightJustify
       Anchors = [akLeft, akTop, akRight]
       AutoSize = False
       Caption = 'Life-time of Managed Nodes (in days)'
     end
     object edtUpdateInterval: TEdit
-      Left = 92
+      Left = 103
       Top = 7
       Width = 70
       Height = 24
@@ -55,10 +55,10 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Text = '100'
     end
     object udUpdateInterval: TUpDown
-      Left = 162
+      Left = 173
       Top = 7
       Width = 16
-      Height = 21
+      Height = 24
       Associate = edtUpdateInterval
       Min = 100
       Max = 30000
@@ -79,7 +79,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Left = 481
       Top = 7
       Width = 16
-      Height = 21
+      Height = 24
       Anchors = [akTop, akRight]
       Associate = edtManagedNodesLife
       Max = 365

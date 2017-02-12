@@ -3,11 +3,11 @@
   This module contains a base class for all documentation modules.
 
   @Author  David Hoyle
-  @Date    25 Apr 2013
+  @Date    12 Feb 2017
   @Version 1.0
 
 **)
-Unit BaseDocumentation;
+Unit BADI.BaseDocumentation;
 
 Interface
 
@@ -47,7 +47,7 @@ Type
 Implementation
 
 Uses
-  BaseLanguageModule {$IFNDEF D0006}, FileCtrl {$ENDIF};
+  BADI.BaseLanguageModule {$IFNDEF D0006}, FileCtrl {$ENDIF};
 
 (**
 

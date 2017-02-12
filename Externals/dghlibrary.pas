@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Jul 2016
+  @Date    12 Feb 2017
 
 **)
 Unit DGHLibrary;
@@ -21,7 +21,7 @@ Uses
   {$ENDIF}
   Graphics;
 
-{$INCLUDE CompilerDefinitions.inc}
+{$INCLUDE '..\IDE Addins\BrowseAndDocIt\Source\CompilerDefinitions.inc'}
 
 Type
   (** A custom exception for errors getting the building number. **)

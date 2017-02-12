@@ -4,18 +4,20 @@
   module explorer and documentation engine.
 
   @Author  David Hoyle
-  @Date    11 Feb 2017
+  @Date    12 Feb 2017
   @Version 1.0
 
 **)
-Unit GenericTokenizer;
+Unit BADI.GenericTokenizer;
 
 Interface
 
 {$INCLUDE 'CompilerDefinitions.inc'}
 
 Uses
-  SysUtils, Classes, BaseLanguageModule;
+  SysUtils,
+  Classes,
+  BADI.BaseLanguageModule;
 
   Function Tokenize(strText : String; var ReservedWords, Directives : TKeyWords;
     iLimit : Integer = 999999) : TStringList;

@@ -5,16 +5,20 @@
   implemented.
 
   @Version    1.0
-  @Date       09 Feb 2017
+  @Date       12 Feb 2017
   @Author     David Hoyle
 
 **)
-Unit XMLModule;
+Unit BADI.XMLModule;
 
 Interface
 
 Uses
-  SysUtils, Windows, Contnrs, Classes, BaseLanguageModule;
+  SysUtils,
+  Windows,
+  Contnrs,
+  Classes,
+  BADI.BaseLanguageModule;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -693,6 +697,7 @@ begin
   Result := False;
   If Token.Token = '<!' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, 'ATTLIST') = 0 Then
         Begin
@@ -711,7 +716,7 @@ begin
             ErrorAndSeekToken(strLiteralExpected, 'AttListDecl', '>',
               strSeekableOnErrorTokens, stActual);
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -1290,6 +1295,7 @@ begin
   Result := False;
   If Token.Token = '<!' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, 'DOCTYPE') = 0 Then
         Begin
@@ -1320,7 +1326,7 @@ begin
             ErrorAndSeekToken(strLiteralExpected, 'DocTypeDecl', '>',
               strSeekableOnErrorTokens, stActual);
         End Else
-          RollBackToken;
+          PopTokenPosition;
       End;
 end;
 
@@ -1427,6 +1433,7 @@ begin
   Result := False;
   If Token.Token = '<!' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, 'ELEMENT') = 0 Then
         Begin
@@ -1459,7 +1466,7 @@ begin
               ErrorAndSeekToken(strExpectedWhiteSpace, 'ElementDecl', Token.Token,
                 strSeekableOnErrorTokens, stActual);
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -2227,6 +2234,7 @@ procedure TXMLModule.XMLDecl(xmlParent : TElementContainer);
 begin
   If Token.Token = '<?' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, 'xml') = 0 Then
         Begin
@@ -2253,7 +2261,7 @@ begin
               ErrorAndSeekToken(strLiteralExpected, 'XMLDecl', '?>',
                 strSeekableOnErrorTokens, stActual);
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -2577,6 +2585,7 @@ begin
   Result := False;
   If Token.Token = '(' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, '#PCDATA') = 0 Then
         Begin
@@ -2612,7 +2621,7 @@ begin
               ErrorAndSeekToken(strLiteralExpected, 'Mixed', '*',
                 strSeekableOnErrorTokens, stActual);
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -2720,6 +2729,7 @@ begin
   Result := False;
   If Token.Token = '<!' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, 'NOTATION') = 0 Then
         Begin
@@ -2745,7 +2755,7 @@ begin
             ErrorAndSeekToken(strLiteralExpected, 'NotationDecl', '>',
               strSeekableOnErrorTokens, stActual);
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -2836,6 +2846,7 @@ begin
   Result := False;
   If Token.Token = '<!' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, 'ENTITY') = 0 Then
         Begin
@@ -2867,7 +2878,7 @@ begin
                   strSeekableOnErrorTokens, stActual);
             End;
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -3209,6 +3220,7 @@ begin
   Result := False;
   If Token.Token = '<?' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, 'xml') = 0 Then
         Begin
@@ -3232,7 +3244,7 @@ begin
               ErrorAndSeekToken(strLiteralExpected, 'XMLDecl', '?>',
                 strSeekableOnErrorTokens, stActual);
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -3358,6 +3370,7 @@ begin
   Result := False;
   If Token.Token = '<![' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, 'IGNORE') = 0 Then
         Begin
@@ -3385,7 +3398,7 @@ begin
               ErrorAndSeekToken(strLiteralExpected, 'IgnoreSec', '[',
                 strSeekableOnErrorTokens, stActual);
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -3406,11 +3419,12 @@ begin
       IgnoreSectContents;
       If Token.Token = ']]' Then
         Begin
+          PushTokenPosition;
           NextNonCommentToken;
           If Token.Token = '>' Then
             NextNonCommentToken
           Else
-            RollBackToken;
+            PopTokenPosition;
         End Else
           ErrorAndSeekToken(strLiteralExpected, 'IgnoreSectContents', ']]>',
             strSeekableOnErrorTokens, stActual);
@@ -3438,6 +3452,7 @@ begin
   Result := False;
   If Token.Token = '<![' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, 'INCLUDE') = 0 Then
         Begin
@@ -3466,7 +3481,7 @@ begin
               ErrorAndSeekToken(strLiteralExpected, 'IncludeSect', '[',
                 strSeekableOnErrorTokens, stActual);
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 

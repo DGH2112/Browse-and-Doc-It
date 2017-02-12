@@ -4,16 +4,21 @@
   Language.
 
   @Version    1.0
-  @Date       09 Aug 2016
+  @Date       12 Feb 2017
   @Author     David Hoyle
 
 **)
-Unit EidolonTLSSchematicModule;
+Unit BADI.EidolonTLSSchematicModule;
 
 Interface
 
   Uses
-    SysUtils, Windows, Contnrs, Classes, BaseLanguageModule, EidolonTypes;
+    SysUtils,
+    Windows,
+    Contnrs,
+    Classes,
+    BADI.BaseLanguageModule,
+    BADI.EidolonTypes;
 
   {$INCLUDE CompilerDefinitions.inc}
 
@@ -1208,7 +1213,10 @@ Implementation
     Result := False;
     boolNeg := Token.Token = '-';
     If boolNeg Then
+      Begin
+        PushTokenPosition;
         NextNonCommentToken;
+      End;
     If Token.TokenType In [ttNumber] Then
       Begin
         Val(Token.Token, dbl, iErrorCode);
@@ -1225,7 +1233,7 @@ Implementation
               strSeekableOnErrorTokens, stActual);
       End Else
         If boolNeg Then
-          RollBackToken;
+          PopTokenPosition;
   end;
 
   (**
@@ -1250,7 +1258,10 @@ Implementation
     Result := False;
     boolNeg := Token.Token = '-';
     If boolNeg Then
+      Begin
+        PushTokenPosition;
         NextNonCommentToken;
+      End;
     If Token.TokenType In [ttNumber] Then
       Begin
         Val(Token.Token, i, iErrorCode);
@@ -1269,7 +1280,7 @@ Implementation
               strSeekableOnErrorTokens, stActual);
       End Else
         If boolNeg Then
-          RollBackToken;
+          PopTokenPosition;
   end;
 
   (**
@@ -1388,7 +1399,10 @@ Implementation
     Result := False;
     boolNeg := Token.Token = '-';
     If boolNeg Then
+      Begin
+        PushTokenPosition;
         NextNonCommentToken;
+      End;
     If Token.TokenType In [ttNumber] Then
       Begin
         Val(Token.Token, dbl, iErrorCode);
@@ -1408,7 +1422,7 @@ Implementation
               strSeekableOnErrorTokens, stActual);
       End Else
         If boolNeg Then
-          RollBackToken;
+          PopTokenPosition;
   end;
 
   (**
@@ -1433,7 +1447,10 @@ Implementation
     Result := False;
     boolNeg := Token.Token = '-';
     If boolNeg Then
+      Begin
+        PushTokenPosition;
         NextNonCommentToken;
+      End;
     If Token.TokenType In [ttNumber] Then
       Begin
         Val(Token.Token, i, iErrorCode);
@@ -1452,7 +1469,7 @@ Implementation
               strSeekableOnErrorTokens, stActual);
       End Else
         If boolNeg Then
-          RollBackToken;
+          PopTokenPosition;
   end;
 
   (**

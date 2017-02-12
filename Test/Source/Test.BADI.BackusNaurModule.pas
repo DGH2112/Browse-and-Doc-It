@@ -1,9 +1,12 @@
-Unit TestBackusNaurModule;
+Unit Test.BADI.BackusNaurModule;
 
 Interface
 
 Uses
-  TestFramework, BaseLanguageModule, TestBaseLanguageModule, BackusNaurModule;
+  TestFramework,
+  BADI.BaseLanguageModule,
+  Test.BADI.BaseLanguageModule,
+  BADI.BackusNaurModule;
 
 Type
   //

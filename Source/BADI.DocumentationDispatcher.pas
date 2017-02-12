@@ -4,16 +4,16 @@
   that should be produced.
 
   @Author  David Hoyle
-  @Date    09 Sep 2008
+  @Date    12 Feb 2017
   @Version 1.0
 
 **)
-Unit DocumentationDispatcher;
+Unit BADI.DocumentationDispatcher;
 
 Interface
 
 Uses
-  BaseDocumentation;
+  BADI.BaseDocumentation;
 
 Type
   (** This is an enumerate to define the types of documentation hat can be
@@ -36,7 +36,7 @@ Const
 Implementation
 
 Uses
-  SysUtils, HTMLDocumentation;
+  SysUtils, BADI.HTMLDocumentation;
 
 (**
 

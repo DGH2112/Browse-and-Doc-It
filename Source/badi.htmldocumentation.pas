@@ -4,18 +4,21 @@
   information.
 
   @Author  David Hoyle
-  @Date    06 Aug 2016
+  @Date    12 Feb 2017
   @Version 1.0
 
 **)
-Unit HTMLDocumentation;
+Unit BADI.HTMLDocumentation;
 
 Interface
 
 {$INCLUDE 'CompilerDefinitions.inc'}
 
 Uses
-  Classes, BaseLanguageModule, BaseDocumentation, Contnrs;
+  Classes,
+  BADI.BaseLanguageModule,
+  BADI.BaseDocumentation,
+  Contnrs;
 
 Type
   (** This class represent a set of documenation conflicts for a module. **)
@@ -121,9 +124,14 @@ Type
 Implementation
 
 Uses
-  SysUtils, Windows, DGHLibrary, Graphics,
-  {$IFNDEF D2007} GIFImage {$ELSE} GIFImg {$ENDIF}, Controls, StrUtils,
-  GenericTokenizer;
+  SysUtils,
+  Windows,
+  DGHLibrary,
+  Graphics,
+  {$IFNDEF D2007} GIFImage {$ELSE} GIFImg {$ENDIF},
+  Controls,
+  StrUtils,
+  BADI.GenericTokenizer;
 
 (**
 

@@ -302,7 +302,7 @@ Begin
     FailNotEquals(Format('%1.4f', [dblExpected]), Format('%1.4f', [dblActual]),
       Format('%s : Expected %1.4f, Actual %1.4f (Delta %1.4f)',
       [strMsg, dblExpected, dblActual, Abs(dblExpected - dblActual)]),
-      CallerAddr);
+      ReturnAddress);
 End;
 
 { TestExportedFunctions }

@@ -1,13 +1,13 @@
-Unit TestGenericTokenizer;
+Unit Test.BADI.GenericTokenizer;
 
 Interface
 
 Uses
   Classes,
   TestFramework,
-  BaseLanguageModule,
-  TestBaseLanguageModule,
-  GenericTokenizer;
+  BADI.BaseLanguageModule,
+  Test.BADI.BaseLanguageModule,
+  BADI.GenericTokenizer;
 
 Type
   //

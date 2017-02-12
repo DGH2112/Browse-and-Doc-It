@@ -5,10 +5,10 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Aug 2016
+  @Date    12 Feb 2017
 
 **)
-Unit BADIGeneralOptionsFrame;
+Unit BADI.GeneralOptionsFrame;
 
 Interface
 
@@ -26,7 +26,7 @@ Uses
   StdCtrls,
   ExtCtrls,
   CheckLst,
-  BADICustomOptionsFrame;
+  BADI.CustomOptionsFrame;
 
 Type
   (** A class to represent the frame interface. **)
@@ -52,7 +52,7 @@ Implementation
 {$R *.dfm}
 
 Uses
-  BaseLanguageModule;
+  BADI.BaseLanguageModule;
 
 { TfmBADIgeneralOptionsFrame }
 

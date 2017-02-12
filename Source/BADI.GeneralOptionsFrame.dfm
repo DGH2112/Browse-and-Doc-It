@@ -5,7 +5,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
   Height = 291
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
   ParentFont = False
@@ -16,7 +16,6 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     Width = 508
     Height = 249
     Align = alClient
-    ItemHeight = 13
     TabOrder = 0
   end
   object IntervalPanel: TPanel
@@ -33,8 +32,8 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
     object lblRefreshInterval: TLabel
       Left = 7
       Top = 10
-      Width = 79
-      Height = 13
+      Width = 91
+      Height = 16
       Caption = 'Refresh &Interval'
     end
     object lblManagedNodesLife: TLabel
@@ -51,7 +50,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Left = 92
       Top = 7
       Width = 70
-      Height = 21
+      Height = 24
       TabOrder = 0
       Text = '100'
     end
@@ -71,7 +70,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Left = 411
       Top = 7
       Width = 70
-      Height = 21
+      Height = 24
       Anchors = [akTop, akRight]
       TabOrder = 2
       Text = '100'

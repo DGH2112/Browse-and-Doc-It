@@ -5,10 +5,10 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Aug 2016
+  @Date    12 Feb 2017
 
 **)
-Unit BADICodeBrowsingFrame;
+Unit BADI.CodeBrowsingFrame;
 
 Interface
 
@@ -24,7 +24,7 @@ Uses
   Dialogs,
   StdCtrls,
   ExtCtrls,
-  BADICustomOptionsFrame;
+  BADI.CustomOptionsFrame;
 
 Type
   (** A class to represent the frame interface. **)
@@ -43,7 +43,7 @@ Implementation
 {$R *.dfm}
 
 Uses
-  BaseLanguageModule;
+  BADI.BaseLanguageModule;
 
 { TfmBADICodeBrowsingFrame }
 

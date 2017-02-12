@@ -5,7 +5,7 @@ object fmBADICodeBrowsingFrame: TfmBADICodeBrowsingFrame
   Height = 314
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
   ParentFont = False
@@ -27,7 +27,5 @@ object fmBADICodeBrowsingFrame: TfmBADICodeBrowsingFrame
       'Identifier aligned with the centre of the editor'
       'Identifier centred in the editor but show all of the comment')
     TabOrder = 0
-    ExplicitWidth = 314
-    ExplicitHeight = 234
   end
 end

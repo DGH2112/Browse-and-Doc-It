@@ -25,17 +25,22 @@ object frmOptions: TfrmOptions
     Top = 10
     Width = 840
     Height = 513
-    ActivePage = tabMethodDescriptions
+    ActivePage = tabGeneralOptions
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object tabGeneralOptions: TTabSheet
       Caption = 'General Options'
-      ExplicitHeight = 473
       inline BADIGeneralOptionsFrame: TfmBADIGeneralOptions
         Left = 3
         Top = 3
         Width = 826
         Height = 467
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 0
         ExplicitLeft = 3
         ExplicitTop = 3
@@ -44,7 +49,6 @@ object frmOptions: TfrmOptions
         inherited clbOptions: TCheckListBox
           Width = 826
           Height = 425
-          ItemHeight = 16
           ExplicitWidth = 826
           ExplicitHeight = 425
         end
@@ -53,37 +57,19 @@ object frmOptions: TfrmOptions
           Width = 826
           ExplicitTop = 425
           ExplicitWidth = 826
-          inherited lblRefreshInterval: TLabel
-            Width = 210
-            Height = 16
-            ExplicitWidth = 210
-            ExplicitHeight = 16
-          end
           inherited lblManagedNodesLife: TLabel
             Width = 214
             Height = 16
             ExplicitWidth = 214
             ExplicitHeight = 16
           end
-          inherited edtUpdateInterval: TEdit
-            Height = 24
-            ExplicitHeight = 24
-          end
-          inherited udUpdateInterval: TUpDown
-            Height = 24
-            ExplicitHeight = 24
-          end
           inherited edtManagedNodesLife: TEdit
             Left = 729
-            Height = 24
             ExplicitLeft = 729
-            ExplicitHeight = 24
           end
           inherited udManagedNodesLife: TUpDown
             Left = 799
-            Height = 24
             ExplicitLeft = 799
-            ExplicitHeight = 24
           end
         end
       end
@@ -91,21 +77,26 @@ object frmOptions: TfrmOptions
     object tabSpecialTags: TTabSheet
       Caption = 'Special Tags'
       ImageIndex = 1
-      ExplicitHeight = 473
       inline BADISpecialTagsFrame: TfmBADISpecialTagsFrame
         Left = 0
         Top = 0
         Width = 832
         Height = 482
         Align = alClient
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 0
         ExplicitWidth = 832
-        ExplicitHeight = 473
+        ExplicitHeight = 482
         inherited lbSpecialTags: TListBox
           Width = 826
           Height = 418
           ExplicitWidth = 826
-          ExplicitHeight = 409
+          ExplicitHeight = 418
         end
         inherited HeaderControl: THeaderControl
           Width = 826
@@ -115,35 +106,35 @@ object frmOptions: TfrmOptions
           Left = 592
           Top = 454
           ExplicitLeft = 592
-          ExplicitTop = 445
+          ExplicitTop = 454
         end
         inherited btnEdit: TBitBtn
           Left = 511
           Top = 454
           ExplicitLeft = 511
-          ExplicitTop = 445
+          ExplicitTop = 454
         end
         inherited btnMoveDown: TBitBtn
           Left = 754
           Top = 454
           ExplicitLeft = 754
-          ExplicitTop = 445
+          ExplicitTop = 454
         end
         inherited btnMoveUp: TBitBtn
           Left = 673
           Top = 454
           ExplicitLeft = 673
-          ExplicitTop = 445
+          ExplicitTop = 454
         end
         inherited btnAdd: TBitBtn
           Left = 430
           Top = 454
           ExplicitLeft = 430
-          ExplicitTop = 445
+          ExplicitTop = 454
         end
         inherited CheckedImages: TImageList
           Bitmap = {
-            494C0101020004002C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+            494C010102000400380010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
             0000000000003600000028000000400000001000000001002000000000000010
             0000000000000000000000000000000000000000000000000000000000000000
             0000000000000000000000000000000000000000000000000000000000000000
@@ -287,99 +278,63 @@ object frmOptions: TfrmOptions
     object tabModuleExplorer: TTabSheet
       Caption = 'Module Explorer'
       ImageIndex = 3
-      ExplicitHeight = 473
       inline BADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
         Left = 0
         Top = 0
         Width = 832
         Height = 482
         Align = alClient
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 0
         ExplicitWidth = 832
-        ExplicitHeight = 473
+        ExplicitHeight = 482
         inherited lblBackColour: TLabel
           Left = 622
           Top = 170
-          Width = 67
-          Height = 16
-          ExplicitLeft = 473
-          ExplicitTop = 111
-          ExplicitWidth = 67
-          ExplicitHeight = 16
+          ExplicitLeft = 622
+          ExplicitTop = 170
         end
         inherited lblForeColour: TLabel
           Left = 622
           Top = 111
-          Width = 67
-          Height = 16
-          ExplicitLeft = 473
-          ExplicitTop = 52
-          ExplicitWidth = 67
-          ExplicitHeight = 16
+          ExplicitLeft = 622
         end
         inherited lblTreeColour: TLabel
           Left = 622
           Top = 433
-          Width = 88
-          Height = 16
-          ExplicitLeft = 473
-          ExplicitTop = 374
-          ExplicitWidth = 88
-          ExplicitHeight = 16
+          ExplicitLeft = 622
+          ExplicitTop = 433
         end
         inherited lblTokenLimit: TLabel
           Left = 721
-          Width = 66
-          Height = 16
-          ExplicitLeft = 572
-          ExplicitWidth = 66
-          ExplicitHeight = 16
+          ExplicitLeft = 721
         end
         inherited lblBackgroundColour: TLabel
           Left = 622
           Top = 375
-          Width = 107
-          Height = 16
-          ExplicitLeft = 473
-          ExplicitTop = 316
-          ExplicitWidth = 107
-          ExplicitHeight = 16
-        end
-        inherited lblTokenTypes: TLabel
-          Width = 73
-          Height = 16
-          ExplicitWidth = 73
-          ExplicitHeight = 16
-        end
-        inherited lblFontSize: TLabel
-          Width = 53
-          Height = 16
-          ExplicitWidth = 53
-          ExplicitHeight = 16
-        end
-        inherited lblFontName: TLabel
-          Width = 67
-          Height = 16
-          ExplicitWidth = 67
-          ExplicitHeight = 16
+          ExplicitLeft = 622
+          ExplicitTop = 375
         end
         inherited cbxFontName: TComboBox
           Width = 716
-          Height = 24
           ExplicitWidth = 716
-          ExplicitHeight = 24
         end
         inherited cbxBackColour: TColorBox
           Left = 622
           Top = 189
           ExplicitLeft = 622
-          ExplicitTop = 180
+          ExplicitTop = 189
         end
         inherited clbxTreeColour: TColorBox
           Left = 622
           Top = 457
           ExplicitLeft = 622
-          ExplicitTop = 448
+          ExplicitTop = 457
         end
         inherited udTokenLimit: TUpDown
           Left = 815
@@ -387,119 +342,129 @@ object frmOptions: TfrmOptions
         end
         inherited edtTokenLimit: TEdit
           Left = 780
-          Height = 24
           ExplicitLeft = 780
-          ExplicitHeight = 24
         end
         inherited cbxBGColour: TColorBox
           Left = 622
           Top = 399
           ExplicitLeft = 622
-          ExplicitTop = 390
+          ExplicitTop = 399
         end
         inherited gbxFontStyles: TGroupBox
           Left = 622
           Top = 224
           ExplicitLeft = 622
-          ExplicitTop = 215
+          ExplicitTop = 224
         end
         inherited cbxFontColour: TColorBox
           Left = 622
           Top = 130
           ExplicitLeft = 622
-          ExplicitTop = 121
+          ExplicitTop = 130
         end
         inherited lbxTokenTypes: TListBox
           Width = 613
           Height = 400
-          ItemHeight = 16
           ExplicitWidth = 613
-          ExplicitHeight = 391
-        end
-        inherited udFontSize: TUpDown
-          Left = 112
-          ExplicitLeft = 112
-        end
-        inherited edtFontSize: TEdit
-          Height = 24
-          ExplicitHeight = 24
+          ExplicitHeight = 400
         end
       end
     end
     object tabCodeBrowsing: TTabSheet
       Caption = 'Code Browsing'
       ImageIndex = 4
-      ExplicitHeight = 473
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       inline BADICodeBrowsingFrame: TfmBADICodeBrowsingFrame
         Left = 0
         Top = 0
         Width = 832
         Height = 482
         Align = alClient
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 0
-        ExplicitLeft = 8
-        ExplicitTop = 4
+        ExplicitWidth = 832
+        ExplicitHeight = 482
         inherited rgpBrowsePosition: TRadioGroup
           Width = 826
           Height = 476
+          ExplicitWidth = 826
+          ExplicitHeight = 476
         end
       end
     end
     object tabExcludeDocFiles: TTabSheet
       Caption = 'Exclude Doc Files'
       ImageIndex = 5
-      ExplicitHeight = 473
       inline BADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
         Left = 0
         Top = 0
         Width = 832
         Height = 482
         Align = alClient
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 0
-        ExplicitLeft = 8
-        ExplicitTop = 8
+        ExplicitWidth = 832
+        ExplicitHeight = 482
         inherited mmoExcludeDocFiles: TMemo
           Width = 826
           Height = 476
-          ExplicitWidth = 638
-          ExplicitHeight = 398
+          ExplicitWidth = 826
+          ExplicitHeight = 476
         end
       end
     end
     object tabMethodDescriptions: TTabSheet
       Caption = 'Method Descriptions'
       ImageIndex = 6
-      ExplicitHeight = 473
       inline BADIMethodDescriptionsFrame: TfmBADIMethodDescriptionsFrame
         Left = 0
         Top = 0
         Width = 832
         Height = 482
         Align = alClient
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 0
-        ExplicitLeft = 8
-        ExplicitTop = 8
+        ExplicitWidth = 832
+        ExplicitHeight = 482
         inherited hctlMethodDescriptions: THeaderControl
           Width = 744
-          ExplicitWidth = 582
+          ExplicitWidth = 744
         end
         inherited lbxMethodDescriptions: TListBox
           Width = 744
           Height = 447
-          ExplicitWidth = 582
-          ExplicitHeight = 396
+          ExplicitWidth = 744
+          ExplicitHeight = 447
         end
         inherited btnDeleteDesc: TBitBtn
           Left = 754
-          ExplicitLeft = 592
+          ExplicitLeft = 754
         end
         inherited btnEditDesc: TBitBtn
           Left = 754
-          ExplicitLeft = 592
+          ExplicitLeft = 754
         end
         inherited btnAddDesc: TBitBtn
           Left = 754
-          ExplicitLeft = 592
+          ExplicitLeft = 754
         end
       end
     end

@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    21 Aug 2016
+  @Date    12 Feb 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -30,11 +30,14 @@ Uses
   {$WARN UNIT_PLATFORM OFF} // For the FileCtrl unit
   FileCtrl,
   {$WARN UNIT_PLATFORM ON}
-  BaseLanguageModule,
-  BADIGeneralOptionsFrame,
+  BADI.BaseLanguageModule,
+  BADI.GeneralOptionsFrame,
   ImageList,
-  BADISpecialTagsFrame, BADIModuleExlporerOpsFrame, BADICodeBrowsingFrame,
-  BADIEcludedDocFilesFrame, BADIMethodDescriptionsFrame;
+  BADI.SpecialTagsFrame,
+  BADI.ModuleExlporerOpsFrame,
+  BADI.CodeBrowsingFrame,
+  BADI.ExcludedDocFilesFrame,
+  BADI.MethodDescriptionsFrame;
 
 
 Type

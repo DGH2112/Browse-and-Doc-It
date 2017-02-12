@@ -1,4 +1,4 @@
-unit TestVBModule;
+unit Test.BADI.VBModule;
 {:
 
   Delphi DUnit Test Case
@@ -12,8 +12,15 @@ unit TestVBModule;
 interface
 
 uses
-  TestFramework, Classes, BaseLanguageModule, VBModule, Contnrs, SysUtils,
-  Controls, Windows, TestBaseLanguageModule;
+  TestFramework,
+  Classes,
+  BADI.BaseLanguageModule,
+  BADI.VBModule,
+  Contnrs,
+  SysUtils,
+  //Controls,
+  //Windows,
+  Test.BADI.BaseLanguageModule;
 
 type
   // Test methods for class TVBParameter

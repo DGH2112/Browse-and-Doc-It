@@ -4,10 +4,10 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Aug 2016
+  @Date    12 Feb 2017
 
 **)
-Unit BADIMethodDescriptionsFrame;
+Unit BADI.MethodDescriptionsFrame;
 
 Interface
 
@@ -24,7 +24,7 @@ Uses
   StdCtrls,
   Buttons,
   ComCtrls,
-  BADICustomOptionsFrame;
+  BADI.CustomOptionsFrame;
 
 Type
   (** This class represents the frame interface. **)
@@ -53,8 +53,8 @@ Implementation
 {$R *.dfm}
 
 Uses
-  BaseLanguageModule,
-  MethodDescriptionForm;
+  BADI.BaseLanguageModule,
+  BADI.MethodDescriptionForm;
 
 { TfmBADIMethodDescriptionsFrame }
 

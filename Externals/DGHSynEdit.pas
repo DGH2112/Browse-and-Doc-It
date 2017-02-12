@@ -6,7 +6,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    25 Apr 2015
+  @Date    12 Feb 2017
 
 **)
 
@@ -17,8 +17,6 @@ Interface
 Uses
   SysUtils, Classes, ComCtrls, SynEdit, SynEditTypes, SynEditKeyCmds,
   SynEditHighlighter, Controls;
-
-{$INCLUDE 'CompilerDefinitions.inc'}
 
 Type
   (** A declaration for a call back proc to exceptions. **)
@@ -343,11 +341,7 @@ end;
 procedure TDGHSynEdit.LoadFromFile(strFileName: String);
 begin
   FFileName := strFileName;
-  {$IFDEF D2005}
   FileAge(FFileName, FFileDateTime);
-  {$ELSE}
-  FFileDateTime := FileDateToDateTime(FileAge(FFileName));
-  {$ENDIF}
   Try
     Lines.LoadFromFile(FFileName);
   Except
@@ -425,11 +419,7 @@ begin
   FFileName := strFileName;
   Try
     Lines.SaveToFile(FFileName);
-    {$IFDEF D2005}
     FileAge(FFileName, FFileDateTime);
-    {$ELSE}
-    FFileDateTime := FileDateToDateTime(FileAge(FFileName));
-    {$ENDIF}
     Modified := False;
     TabCaption := ExtractFileName(FFileName);
   Except

@@ -3,11 +3,11 @@
   This module contains type and constants for the Eidolon system.
 
   @Author  David Hoyle
-  @Date    17 Oct 2015
+  @Date    12 Feb 2017
   @Version 1.0
 
 **)
-Unit EidolonTypes;
+Unit BADI.EidolonTypes;
 
 Interface
 

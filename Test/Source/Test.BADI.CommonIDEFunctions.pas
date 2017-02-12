@@ -1,9 +1,11 @@
-Unit TestCommonIDEFunctions;
+Unit Test.BADI.CommonIDEFunctions;
 
 Interface
 
 Uses
-  TestFramework, CommonIDEFunctions, TestBaseLanguageModule;
+  TestFramework,
+  BADI.CommonIDEFunctions,
+  Test.BADI.BaseLanguageModule;
 
 Type
   //
@@ -24,7 +26,10 @@ Type
 Implementation
 
 Uses
-  BaseLanguageModule, Classes, SysUtils, Windows;
+  BADI.BaseLanguageModule,
+  Classes,
+  Windows,
+  SysUtils;
 
 //
 // Test Methods for Class Functions.

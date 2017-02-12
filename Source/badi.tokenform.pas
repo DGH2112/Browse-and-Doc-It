@@ -2,18 +2,27 @@
 
   This is a debug form for displaying the tokens and their information.
 
-  @version      0.9
-  @date         28 Apr 2013
+  @version      1.0
+  @date         12 Feb 2017
   @author       David Hoyle
 
 **)
-unit TokenForm;
+unit BADI.TokenForm;
 
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ComCtrls, BaseLanguageModule;
+  Windows,
+  Messages,
+  SysUtils,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  ComCtrls,
+  BADI.BaseLanguageModule;
 
 type
   (** This class represents a forms for inspecting the token in a module. **)

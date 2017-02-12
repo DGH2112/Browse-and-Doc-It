@@ -7,8 +7,8 @@ object frmTokenForm: TfrmTokenForm
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -13
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
@@ -55,7 +55,7 @@ object frmTokenForm: TfrmTokenForm
       end>
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
-    Font.Height = -15
+    Font.Height = -13
     Font.Name = 'Courier New'
     Font.Style = []
     HideSelection = False

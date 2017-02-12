@@ -2728,7 +2728,7 @@ Procedure TVBModule.FindMethodEnd(AExceptionHnd : IExceptionHandling;
   strMethodType : String);
 
 Begin
-  //: @debug RollBackToken;
+  RollBackToken;
   Repeat
     NextNonCommentToken;
     If Token.TokenType In [ttIdentifier] Then

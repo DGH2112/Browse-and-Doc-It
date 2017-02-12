@@ -4,11 +4,11 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       28 Apr 2013
+  @Date       12 Feb 2017
   @Author     David Hoyle
 
 **)
-Unit INIModule;
+Unit BADI.INIModule;
 
 Interface
 
@@ -17,7 +17,7 @@ Uses
   Windows,
   Contnrs,
   Classes,
-  BaseLanguageModule;
+  BADI.BaseLanguageModule;
 
 {$INCLUDE CompilerDefinitions.inc}
 

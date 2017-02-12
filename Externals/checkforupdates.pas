@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    31 Dec 2012
+  @Date    12 Feb 2017
 
 **)
 Unit CheckForUpdates;
@@ -19,8 +19,6 @@ Uses
   Graphics,
   Windows;
 
-{$INCLUDE 'CompilerDefinitions.inc'}
-
 Type
     (** An enumerate type to describe the internet connection status. **)
   TINetConnection = (icUnknown, icMissingDLL, icMissingFunction, icNotConnected,
@@ -29,7 +27,7 @@ Type
     (** This class handles the checking of software vesions against the
         internet. **)
   TCheckForUpdates = Class
-    {$IFDEF D2005} Strict {$ENDIF} Private
+    Strict Private
     {$IFDEF CONSOLE}
     FConHnd: THandle;
     {$ENDIF}
@@ -45,7 +43,7 @@ Type
     FUpdateInterval          : Integer;
     FEnabled                 : Boolean;
     FDLLHnd                  : THandle;
-    {$IFDEF D2005} Strict {$ENDIF} Protected
+    Strict Protected
     Function CheckForUpdates(strURL, strXMLFile: String): Boolean;
     Function FindPackage(xmlDocumentElement: IXMLNode): IXMLNode;
     Function GetNamedNodeText(P: IXMLNode; strName: String): String;
@@ -333,7 +331,7 @@ Constructor TCheckForUpdates.Create(strSoftwareID, strRegRoot: String;
 ResourceString
   strURL = 'http://www.davidghoyle.co.uk/';
 
-Var  
+Var
   strTempFile : String;
   strTempPath : String;
   iSize : Integer;

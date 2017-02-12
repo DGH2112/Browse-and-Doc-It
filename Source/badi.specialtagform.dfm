@@ -8,8 +8,8 @@ object frmSpecialTag: TfrmSpecialTag
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Height = -13
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poDesktopCenter
@@ -17,20 +17,20 @@ object frmSpecialTag: TfrmSpecialTag
     438
     132)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object lblName: TLabel
     Left = 8
     Top = 11
-    Width = 28
-    Height = 13
+    Width = 33
+    Height = 16
     Caption = '&Name'
     FocusControl = edtName
   end
   object lblDescription: TLabel
     Left = 8
     Top = 38
-    Width = 53
-    Height = 13
+    Width = 63
+    Height = 16
     Caption = '&Description'
     FocusControl = edtDescription
   end
@@ -38,7 +38,7 @@ object frmSpecialTag: TfrmSpecialTag
     Left = 76
     Top = 8
     Width = 354
-    Height = 21
+    Height = 24
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
   end
@@ -46,7 +46,7 @@ object frmSpecialTag: TfrmSpecialTag
     Left = 76
     Top = 35
     Width = 354
-    Height = 21
+    Height = 24
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 1
   end
@@ -56,8 +56,9 @@ object frmSpecialTag: TfrmSpecialTag
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
-    TabOrder = 5
     Kind = bkOK
+    NumGlyphs = 2
+    TabOrder = 5
   end
   object btnCancel: TBitBtn
     Left = 355
@@ -65,8 +66,9 @@ object frmSpecialTag: TfrmSpecialTag
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
-    TabOrder = 6
     Kind = bkCancel
+    NumGlyphs = 2
+    TabOrder = 6
   end
   object cbxShowInTree: TCheckBox
     Left = 8

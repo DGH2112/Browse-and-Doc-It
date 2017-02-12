@@ -1,9 +1,12 @@
-Unit TestXMLModule;
+Unit Test.BADI.XMLModule;
 
 Interface
 
 Uses
-  TestFramework, TestBaseLanguageModule, XMLModule, BaseLanguageModule;
+  TestFramework,
+  Test.BADI.BaseLanguageModule,
+  BADI.XMLModule,
+  BADI.BaseLanguageModule;
 
 Type
   //

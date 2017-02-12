@@ -1,9 +1,12 @@
-Unit TestEidolonModule;
+Unit Test.BADI.EidolonModule;
 
 Interface
 
 Uses
-  TestFramework, EidolonModule, BaseLanguageModule, TestBaseLanguageModule;
+  TestFramework,
+  BADI.EidolonModule,
+  BADI.BaseLanguageModule,
+  Test.BADI.BaseLanguageModule;
 
 Type
   //

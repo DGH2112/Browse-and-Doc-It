@@ -4,16 +4,20 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       10 Aug 2016
+  @Date       12 Feb 2017
   @Author     David Hoyle
 
 **)
-Unit VBModule;
+Unit BADI.VBModule;
 
 Interface
 
 Uses
-  SysUtils, Classes, Contnrs, Controls, BaseLanguageModule;
+  SysUtils,
+  Classes,
+  Contnrs,
+  //Controls,
+  BADI.BaseLanguageModule;
 
 {$INCLUDE CompilerDefinitions.Inc}
 
@@ -2724,7 +2728,7 @@ Procedure TVBModule.FindMethodEnd(AExceptionHnd : IExceptionHandling;
   strMethodType : String);
 
 Begin
-  RollBackToken;
+  //: @debug RollBackToken;
   Repeat
     NextNonCommentToken;
     If Token.TokenType In [ttIdentifier] Then
@@ -3181,10 +3185,11 @@ Begin
                     Begin
                       T := Token;
                       Com := GetComment;
+                      PushTokenPosition;
                       NextNonCommentToken;
                       If (PrevToken.UToken = 'END') And (Token.UToken = 'TYPE')  Then
                         Begin
-                          RollBackToken;
+                          PopTokenPosition;
                           Break;
                         End;
                       F := TVBField.Create(T.Token, scPublic, T.Line, T.Column,

@@ -3,16 +3,20 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       09 Aug 2016
+  @Date       12 Feb 2017
   @Author     David Hoyle
 
 **)
-Unit DFMModule;
+Unit BADI.DFMModule;
 
 Interface
 
 Uses
-  SysUtils, Windows, Contnrs, Classes, BaseLanguageModule;
+  SysUtils,
+  Windows,
+  Contnrs,
+  Classes,
+  BADI.BaseLanguageModule;
 
 {$INCLUDE CompilerDefinitions.inc}
 

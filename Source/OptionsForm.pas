@@ -32,12 +32,12 @@ Uses
   {$WARN UNIT_PLATFORM ON}
   BADI.BaseLanguageModule,
   BADI.GeneralOptionsFrame,
-  ImageList,
   BADI.SpecialTagsFrame,
   BADI.ModuleExlporerOpsFrame,
   BADI.CodeBrowsingFrame,
   BADI.ExcludedDocFilesFrame,
-  BADI.MethodDescriptionsFrame;
+  BADI.MethodDescriptionsFrame,
+  ImageList;
 
 
 Type
@@ -60,15 +60,16 @@ Type
     tabExcludeDocFiles: TTabSheet;
     tabMethodDescriptions: TTabSheet;
     btnCheckForUpdates: TBitBtn;
-    BADIGeneralOptionsFrame: TfmBADIGeneralOptions;
-    BADISpecialTagsFrame: TfmBADISpecialTagsFrame;
-    BADIModuleExplorerFrame: TfmBADIModuleExplorerFrame;
-    BADICodeBrowsingFrame: TfmBADICodeBrowsingFrame;
-    BADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame;
-    BADIMethodDescriptionsFrame: TfmBADIMethodDescriptionsFrame;
     Procedure btnCheckForUpdatesClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     { Private declarations }
-  Private
+  Strict Private
+    BADIGeneralOptionsFrame : TfmBADIGeneralOptions;
+    BADISpecialTagsFrame : TfmBADISpecialTagsFrame;
+    BADIModuleExplorerFrame : TfmBADIModuleExplorerFrame;
+    BADICodeBrowsingFrame : TfmBADICodeBrowsingFrame;
+    BADIExcludedDocFilesFrame : TfmBADIExcludedDocFilesFrame;
+    BADIMethodDescriptionsFrame : TfmBADIMethodDescriptionsFrame;
   Public
     { Public declarations }
     Class Function Execute(VisibleTabs: TVisibleTabs): Boolean;
@@ -98,38 +99,73 @@ Uses
 **)
 Class Function TfrmOptions.Execute(VisibleTabs: TVisibleTabs): Boolean;
 
+Var
+  F: TfrmOptions;
+
 Begin
   Result := False;
-  With TfrmOptions.Create(Application.MainForm) Do
-    Try
-      BADIGeneralOptionsFrame.LoadSettings;
-      BADISpecialTagsFrame.LoadSettings;
-      BADIModuleExplorerFrame.LoadSettings;
-      BADICodeBrowsingFrame.LoadSettings;
-      BADIExcludedDocFilesFrame.LoadSettings;
-      BADIMethodDescriptionsFrame.LoadSettings;
-      OptionTab.ActivePage := tabGeneralOptions;
-      tabGeneralOptions.TabVisible := vtGeneralOptions In VisibleTabs;
-      tabSpecialTags.TabVisible := vtSpecialTags In VisibleTabs;
-      tabModuleExplorer.TabVisible := vtModuleExplorer In VisibleTabs;
-      tabCodeBrowsing.TabVisible := vtCodeBrowsing In VisibleTabs;
-      tabExcludeDocFiles.TabVisible := vtExcludeDocFiles In VisibleTabs;
-      tabMethodDescriptions.TabVisible := vtMethodDescriptions In VisibleTabs;
-      If ShowModal = mrOK Then
-        Begin
-          Result := True;
-          BADIGeneralOptionsFrame.SaveSettings;
-          BADISpecialTagsFrame.SaveSettings;
-          BADIModuleExplorerFrame.SaveSettings;
-          BADICodeBrowsingFrame.SaveSettings;
-          BADIExcludedDocFilesFrame.SaveSettings;
-          BADIMethodDescriptionsFrame.SaveSettings;
-          BrowseAndDocItOptions.SaveSettings;
-        End;
-    Finally
-      Free;
-    End;
+  F := TfrmOptions.Create(Application.MainForm);
+  Try
+    F.OptionTab.ActivePage := F.tabGeneralOptions;
+    F.tabGeneralOptions.TabVisible := vtGeneralOptions In VisibleTabs;
+    F.tabSpecialTags.TabVisible := vtSpecialTags In VisibleTabs;
+    F.tabModuleExplorer.TabVisible := vtModuleExplorer In VisibleTabs;
+    F.tabCodeBrowsing.TabVisible := vtCodeBrowsing In VisibleTabs;
+    F.tabExcludeDocFiles.TabVisible := vtExcludeDocFiles In VisibleTabs;
+    F.tabMethodDescriptions.TabVisible := vtMethodDescriptions In VisibleTabs;
+    If F.ShowModal = mrOK Then
+      Begin
+        Result := True;
+        F.BADIGeneralOptionsFrame.SaveSettings;
+        F.BADISpecialTagsFrame.SaveSettings;
+        F.BADIModuleExplorerFrame.SaveSettings;
+        F.BADICodeBrowsingFrame.SaveSettings;
+        F.BADIExcludedDocFilesFrame.SaveSettings;
+        F.BADIMethodDescriptionsFrame.SaveSettings;
+        BrowseAndDocItOptions.SaveSettings;
+      End;
+  Finally
+    F.Free;
+  End;
 End;
+
+(**
+
+  This is an OnFormCreate Event Handler for the TfrmOptions class.
+
+  @precon  None.
+  @postcon Creates the frames for insertion into the page control tabs.
+
+  @param   Sender as a TObject
+
+**)
+procedure TfrmOptions.FormCreate(Sender: TObject);
+begin
+  BADIGeneralOptionsFrame := TfmBADIGeneralOptions.Create(Self);
+  BADIGeneralOptionsFrame.Parent := tabGeneralOptions;
+  BADIGeneralOptionsFrame.Align := alClient;
+  BADIGeneralOptionsFrame.LoadSettings;
+  BADISpecialTagsFrame := TfmBADISpecialTagsFrame.Create(Self);
+  BADISpecialTagsFrame.Parent := tabSpecialTags;
+  BADISpecialTagsFrame.Align := alClient;
+  BADISpecialTagsFrame.LoadSettings;
+  BADIModuleExplorerFrame := TfmBADIModuleExplorerFrame.Create(Self);
+  BADIModuleExplorerFrame.Parent := tabModuleExplorer;
+  BADIModuleExplorerFrame.Align := alClient;
+  BADIModuleExplorerFrame.LoadSettings;
+  BADICodeBrowsingFrame := TfmBADICodeBrowsingFrame.Create(Self);
+  BADICodeBrowsingFrame.Parent := tabCodeBrowsing;
+  BADICodeBrowsingFrame.Align := alClient;
+  BADICodeBrowsingFrame.LoadSettings;
+  BADIExcludedDocFilesFrame := TfmBADIExcludedDocFilesFrame.Create(Self);
+  BADIExcludedDocFilesFrame.Parent := tabExcludeDocFiles;
+  BADIExcludedDocFilesFrame.Align := alClient;
+  BADIExcludedDocFilesFrame.LoadSettings;
+  BADIMethodDescriptionsFrame := TfmBADIMethodDescriptionsFrame.Create(Self);
+  BADIMethodDescriptionsFrame.Parent := tabMethodDescriptions;
+  BADIMethodDescriptionsFrame.Align := alClient;
+  BADIMethodDescriptionsFrame.LoadSettings;
+end;
 
 (**
 

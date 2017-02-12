@@ -4,10 +4,10 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    29 Dec 2016
+  @Date    12 Feb 2017
 
 **)
-Unit BADIModuleExlporerOpsFrame;
+Unit BADI.ModuleExlporerOpsFrame;
 
 Interface
 
@@ -24,8 +24,8 @@ Uses
   StdCtrls,
   ComCtrls,
   ExtCtrls,
-  BaseLanguageModule,
-  BADICustomOptionsFrame;
+  BADI.BaseLanguageModule,
+  BADI.CustomOptionsFrame;
 
 Type
   (** This is a class which represents the frame interface. **)

@@ -5,7 +5,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
   Height = 411
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
   ParentFont = False
@@ -16,73 +16,65 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
   object lblBackColour: TLabel
     Left = 261
     Top = 124
-    Width = 56
-    Height = 13
+    Width = 67
+    Height = 16
     Anchors = [akRight, akBottom]
     Caption = '&Back Colour'
     FocusControl = cbxBackColour
-    ExplicitLeft = 179
-    ExplicitTop = 158
   end
   object lblForeColour: TLabel
     Left = 261
     Top = 77
-    Width = 56
-    Height = 13
+    Width = 67
+    Height = 16
     Anchors = [akRight, akBottom]
     Caption = '&Fore Colour'
     FocusControl = cbxFontColour
-    ExplicitLeft = 179
-    ExplicitTop = 111
   end
   object lblTreeColour: TLabel
     Left = 261
     Top = 367
-    Width = 72
-    Height = 13
+    Width = 88
+    Height = 16
     Anchors = [akRight, akBottom]
     Caption = 'Treeline &Colour'
-    ExplicitLeft = 179
-    ExplicitTop = 401
   end
   object lblTokenLimit: TLabel
     Left = 134
     Top = 33
-    Width = 53
-    Height = 13
+    Width = 66
+    Height = 16
     Caption = '&Token Limit'
   end
   object lblBackgroundColour: TLabel
     Left = 262
     Top = 320
-    Width = 90
-    Height = 13
+    Width = 107
+    Height = 16
     Anchors = [akRight, akBottom]
     Caption = 'Background &Colour'
-    ExplicitLeft = 180
-    ExplicitTop = 354
   end
   object lblTokenTypes: TLabel
     Left = 3
     Top = 60
-    Width = 61
-    Height = 13
+    Width = 73
+    Height = 16
     Caption = '&Token Types'
     FocusControl = lbxTokenTypes
   end
   object lblFontSize: TLabel
     Left = 3
     Top = 33
-    Width = 44
-    Height = 13
+    Width = 53
+    Height = 16
     Caption = 'Font &Size'
     FocusControl = edtFontSize
   end
   object lblFontName: TLabel
     Left = 3
     Top = 6
-    Width = 56
-    Height = 13
+    Width = 67
+    Height = 16
     Caption = 'Font &Name:'
     FocusControl = cbxFontName
   end
@@ -90,7 +82,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Left = 72
     Top = 3
     Width = 366
-    Height = 21
+    Height = 24
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
@@ -129,7 +121,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Left = 193
     Top = 30
     Width = 35
-    Height = 21
+    Height = 24
     Alignment = taRightJustify
     TabOrder = 4
     Text = '10'
@@ -204,7 +196,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Width = 252
     Height = 329
     Anchors = [akLeft, akTop, akRight, akBottom]
-    ItemHeight = 13
     TabOrder = 8
     OnClick = lbxTokenTypesClick
   end
@@ -223,7 +214,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Left = 72
     Top = 30
     Width = 40
-    Height = 21
+    Height = 24
     Alignment = taRightJustify
     ReadOnly = True
     TabOrder = 10
@@ -233,7 +224,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Left = 251
     Top = 30
     Width = 123
-    Height = 21
+    Height = 24
     Style = csDropDownList
     Anchors = [akTop, akRight]
     TabOrder = 11
@@ -243,7 +234,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Left = 380
     Top = 30
     Width = 41
-    Height = 21
+    Height = 24
     Anchors = [akTop, akRight]
     ReadOnly = True
     TabOrder = 12

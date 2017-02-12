@@ -5,7 +5,7 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
   Height = 295
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
   ParentFont = False
@@ -22,7 +22,5 @@ object fmBADIExcludedDocFilesFrame: TfmBADIExcludedDocFilesFrame
     Lines.Strings = (
       'mmoExcludeDocFiles')
     TabOrder = 0
-    ExplicitWidth = 314
-    ExplicitHeight = 234
   end
 end

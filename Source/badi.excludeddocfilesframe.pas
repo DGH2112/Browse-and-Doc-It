@@ -5,10 +5,10 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Aug 2016
+  @Date    12 Feb 2017
 
 **)
-Unit BADIEcludedDocFilesFrame;
+Unit BADI.ExcludedDocFilesFrame;
 
 Interface
 
@@ -23,7 +23,7 @@ Uses
   Forms,
   Dialogs,
   StdCtrls,
-  BADICustomOptionsFrame;
+  BADI.CustomOptionsFrame;
 
 Type
   (** A class to represent the frame interface. **)
@@ -42,7 +42,7 @@ Implementation
 {$R *.dfm}
 
 Uses
-  BaseLanguageModule;
+  BADI.BaseLanguageModule;
 
 { TfmBADIExcludedDocFilesFrame }
 

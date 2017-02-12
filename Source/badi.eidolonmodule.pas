@@ -4,16 +4,21 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       09 Aug 2016
+  @Date       12 Feb 2017
   @Author     David Hoyle
 
 **)
-Unit EidolonModule;
+Unit BADI.EidolonModule;
 
 Interface
 
 Uses
-  SysUtils, Windows, Contnrs, Classes, BaseLanguageModule, EidolonTypes;
+  SysUtils,
+  Windows,
+  Contnrs,
+  Classes,
+  BADI.BaseLanguageModule,
+  BADI.EidolonTypes;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -1654,6 +1659,7 @@ Var
 begin
   If Token.Token = strConnectionType[ConnectionType] Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, strConnectionLabel) = 0 Then
         Begin
@@ -1679,7 +1685,7 @@ begin
                   C.Column]), scNone, 'ConnectionDef', C.Line, C.Column, etWarning);
             End;
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -1758,6 +1764,7 @@ begin
   Result := False;
   If Token.Token = strConnectionType[ConnectionType] Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, strDatabaseLabel) =  0 Then
         Begin
@@ -1781,7 +1788,7 @@ begin
                 strFileName := strFileName + D.Tokens[iToken].Token;
             End;
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -3338,6 +3345,7 @@ Var
 begin
   If Token.Token = '#' Then
     Begin
+      PushTokenPosition;
       NextNonCommentToken;
       If CompareText(Token.Token, 'TABLENAME') = 0 Then
         Begin
@@ -3352,7 +3360,7 @@ begin
               CheckLineEnd('TextTableDef');
             End;
         End Else
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 

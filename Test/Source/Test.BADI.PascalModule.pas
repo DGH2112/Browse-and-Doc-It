@@ -1,4 +1,4 @@
-unit TestPascalModule;
+unit Test.BADI.PascalModule;
 {
 
   Delphi DUnit Test Case
@@ -12,8 +12,14 @@ unit TestPascalModule;
 interface
 
 uses
-  TestFramework, Classes, Contnrs, SysUtils, Windows, BaseLanguageModule,
-  PascalModule, TestBaseLanguageModule;
+  TestFramework,
+  Classes,
+  Contnrs,
+  SysUtils,
+  //Windows,
+  BADI.BaseLanguageModule,
+  BADI.PascalModule,
+  Test.BADI.BaseLanguageModule;
 type
   // Test methods for class TPascalComment
 

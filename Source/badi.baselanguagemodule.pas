@@ -3,13 +3,13 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    05 Feb 2017
+  @Date    12 Feb 2017
   @Version 1.0
 
   @Author  David Hoyle
 
 **)
-Unit BaseLanguageModule;
+Unit BADI.BaseLanguageModule;
 
 Interface
 

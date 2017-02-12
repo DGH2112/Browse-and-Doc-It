@@ -5,16 +5,27 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Mar 2009
+  @Date    12 Feb 2017
 
 **)
-unit DocumentationOptionsForm;
+unit BADI.DocumentationOptionsForm;
 
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls, DocumentationDispatcher;
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  Buttons,
+  ExtCtrls,
+  BADI.DocumentationDispatcher;
 
 type
   (** A class to represent the form interface. **)
@@ -39,7 +50,7 @@ type
 implementation
 
 Uses
-  BaseLanguageModule;
+  BADI.BaseLanguageModule;
 
 {$R *.dfm}
 

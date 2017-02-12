@@ -3,26 +3,26 @@ object frmDocumentationOptions: TfrmDocumentationOptions
   Top = 534
   BorderStyle = bsDialog
   Caption = 'Documentation Options'
-  ClientHeight = 373
+  ClientHeight = 409
   ClientWidth = 350
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   DesignSize = (
     350
-    373)
+    409)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object lblCSSComment: TLabel
     Left = 8
-    Top = 305
+    Top = 320
     Width = 334
-    Height = 60
+    Height = 81
     Anchors = [akLeft, akRight, akBottom]
     AutoSize = False
     Caption = 
@@ -30,19 +30,13 @@ object frmDocumentationOptions: TfrmDocumentationOptions
       'dit the 2 CSS files stored in the Styles\ directory of the Brows' +
       'eAndDocIt module installation directory. These are always copied' +
       ' to the destination directory for the target HTML documentation.'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clMaroon
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
     WordWrap = True
   end
   object rgpDocumentationOptions: TRadioGroup
     Left = 8
     Top = 8
     Width = 253
-    Height = 142
+    Height = 154
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Documentation Options'
     TabOrder = 0
@@ -53,8 +47,9 @@ object frmDocumentationOptions: TfrmDocumentationOptions
     Width = 75
     Height = 25
     Anchors = [akTop, akRight]
-    TabOrder = 2
     Kind = bkOK
+    NumGlyphs = 2
+    TabOrder = 2
   end
   object btnCancel: TBitBtn
     Left = 267
@@ -62,14 +57,15 @@ object frmDocumentationOptions: TfrmDocumentationOptions
     Width = 75
     Height = 25
     Anchors = [akTop, akRight]
-    TabOrder = 3
     Kind = bkCancel
+    NumGlyphs = 2
+    TabOrder = 3
   end
   object gbxScopeOptions: TGroupBox
     Left = 8
-    Top = 156
+    Top = 168
     Width = 253
-    Height = 143
+    Height = 146
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Scope Options'
     TabOrder = 1

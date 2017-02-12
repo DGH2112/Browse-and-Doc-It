@@ -1,9 +1,11 @@
-Unit TestDFMModule;
+Unit Test.BADI.DFMModule;
 
 Interface
 
 Uses
-  TestFramework, DFMModule, TestBaseLanguageModule;
+  TestFramework,
+  BADI.DFMModule,
+  Test.BADI.BaseLanguageModule;
 
 Type
   //
@@ -67,7 +69,7 @@ Type
 Implementation
 
 Uses
-  BaseLanguageModule;
+  BADI.BaseLanguageModule;
 
 //
 // Test Methods for Class TDFMModule.

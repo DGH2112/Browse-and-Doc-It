@@ -5,19 +5,33 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    25 Apr 2015
+  @Date    04 Feb 2017
 
 **)
-unit EditorOptionsForm;
+Unit SynEditOptionsForm;
 
-interface
+Interface
 
-uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls, ExtCtrls, Buttons, SynEdit, CheckLst, Contnrs,
+Uses
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  ComCtrls,
+  StdCtrls,
+  ExtCtrls,
+  Buttons,
+  SynEdit,
+  CheckLst,
+  Contnrs,
   SynEditHighlighter;
 
-type
+Type
   (** This is a private class to hold information about each highlighter
       attribute. **)
   TAttribute = Class
@@ -30,7 +44,7 @@ type
     FParent     : TSynCustomHighlighter;
   Protected
   Public
-    Constructor Create(Name : String; Fore, Back : TColor; Style : TFontStyles;
+    Constructor Create(Const Name: String; Fore, Back: TColor; Style: TFontStyles;
       Attr : TSynHighlighterAttributes; Parent : TSynCustomHighlighter);
     (**
       This property reads and writes the Attribute Name
@@ -92,7 +106,7 @@ type
 
   (** This class represents the form interface for editing the editor
       options. **)
-  TfrmEditorOptions = class(TForm)
+  TfrmEditorOptions = Class(TForm)
     PageControl1: TPageControl;
     btnOK: TBitBtn;
     btnCancel: TBitBtn;
@@ -135,27 +149,29 @@ type
     lblAttributes: TLabel;
     lblHighlighterType: TLabel;
     chkWordWrap: TCheckBox;
-    procedure lbAttributesClick(Sender: TObject);
-    procedure AttributeChange(Sender: TObject);
-  private
+    Procedure lbAttributesClick(Sender: TObject);
+    Procedure AttributeChange(Sender: TObject);
+  Private
     { Private declarations }
     FAttributes : TAttributes;
     FUpdating : Boolean;
     Procedure AddHighlighter(Highlighter : TSynCustomHighlighter);
-  public
+    Procedure InitialiseDlg(Editor: TSynEdit);
+    Procedure FinaliseDlg(Editor: TSynEdit; boolIncTag: Boolean);
+  Public
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
     Class Function Execute(OwnerForm : TForm; Editor : TSynEdit;
       boolIncTag : Boolean) : Boolean;
-  end;
+  End;
 
-implementation
+Implementation
 
 {$R *.dfm}
 
 Uses
-  SynHighlighterMulti, DGHSynEdit;
+  SynHighlighterMulti;
 
 Type
   (** A record to describe descriptions for each TSynEditorOption. **)
@@ -217,7 +233,7 @@ Var
 
 **)
 Function FontEnumExProc(LogFont : PEnumLogFontEx; TextMetric : PNewTextMetric;
-  FontType : Integer; lParam : LPARAM) : Integer; StdCall;
+  FontType: Integer; lParam: lParam): Integer; StdCall;
 
 Var
   S : String;
@@ -240,7 +256,7 @@ End;
   @precon  None.
   @postcon Creates an instance of a TAttribute class.
 
-  @param   Name   as a String
+  @param   Name   as a String as a constant
   @param   Fore   as a TColor
   @param   Back   as a TColor
   @param   Style  as a TFontStyles
@@ -248,7 +264,7 @@ End;
   @param   Parent as a TSynCustomHighlighter
 
 **)
-Constructor TAttribute.Create(Name : String; Fore, Back : TColor;
+Constructor TAttribute.Create(Const Name: String; Fore, Back: TColor;
   Style : TFontStyles; Attr : TSynHighlighterAttributes;
   Parent : TSynCustomHighlighter);
 
@@ -318,6 +334,7 @@ Destructor TAttributes.Destroy;
 Begin
   FProcessedAttrs.Free;
   FAttributes.Free;
+  Inherited Destroy;
 End;
 
 (**
@@ -367,7 +384,7 @@ Var
   i : Integer;
 
 Begin
-  strName := HighlighterName(Highlighter);
+  strName := Highlighter.FriendlyLanguageName;
   For i := 0 To Highlighter.AttrCount - 1 Do
     Begin
       A := FAttributes.Add(Highlighter.Attribute[i], Highlighter);
@@ -438,87 +455,14 @@ End;
 Class Function TfrmEditorOptions.Execute(OwnerForm : TForm; Editor : TSynEdit;
   boolIncTag : Boolean) : Boolean;
 
-Var
-  i : TSynEditorOption;
-  M : TSynMultiSyn;
-  S : TScheme;
-  j : Integer;
-  A : TAttribute;
-
 Begin
   Result := False;
   With TfrmEditorOptions.Create(OwnerForm) Do
     Try
-      // Visual
-      udTabWidth.Position := Editor.TabWidth;
-      cbxEditorBackgroundColour.Selected := Editor.Color;
-      cbxActiveLineColour.Selected := Editor.ActiveLineColor;
-      cbxFontName.ItemIndex := cbxFontName.Items.IndexOf(Editor.Font.Name);
-      udEditorFontSize.Position := Editor.Font.Size;
-      chxLineNumbers.Checked := Editor.Gutter.ShowLineNumbers;
-      chkWordWrap.Checked := Editor.WordWrap;
-      udRightEdgePosition.Position := Editor.RightEdge;
-      cbxRightEdgeColour.Selected := Editor.RightEdgeColor;
-      cbxSelectedForeground.Selected := Editor.SelectedColor.Foreground;
-      cbxSelectedBackground.Selected := Editor.SelectedColor.Background;
-      // Behavioural
-       For i := Low(TSynEditorOption) To High(TsynEditorOption) Do
-        clbOptions.Checked[Integer(i)] := i In Editor.Options;
-      // Highlighter
-      If Editor.Highlighter <> Nil Then
-        Begin
-          If Editor.Highlighter Is TSynMultiSyn Then
-            Begin
-              M := Editor.Highlighter As TSynMultiSyn;
-              AddHighlighter(M.DefaultHighlighter);
-              lblHighlighterType.Caption := HighlighterName(M.DefaultHighlighter);
-              For j := 0 To M.Schemes.Count - 1 Do
-                Begin
-                  S := M.Schemes[j] As TScheme;
-                  A := FAttributes.Add(S.MarkerAttri, M);
-                  If A <> Nil Then
-                    lbAttributes.Items.AddObject(Format('%s:%s', [
-                      S.SchemeName, 'Marker']), A);
-                  AddHighlighter(S.Highlighter);
-                End;
-            End Else
-            Begin
-              lblHighlighterType.Caption := HighlighterName(Editor.Highlighter);
-              AddHighlighter(Editor.Highlighter);
-            End;
-        End Else
-          SyntaxTab.TabVisible := False;
-      // Initialise the Highlighter Attributes.
-      If lbAttributes.Items.Count > 0 Then
-        Begin
-          lbAttributes.ItemIndex := 0;
-          lbAttributesClick(Nil);
-        End;
-      PageControl1.ActivePageIndex := 0;
+      InitialiseDlg(Editor);
       If ShowModal = mrOK Then
         Begin
-          // Visual
-          Editor.TabWidth := udTabWidth.Position;
-          Editor.Color := cbxEditorBackgroundColour.Selected;
-          Editor.ActiveLineColor := cbxActiveLineColour.Selected;
-          Editor.Font.Name := cbxFontName.Text;
-          Editor.Font.Size := udEditorFontSize.Position;
-          Editor.Gutter.Font.Name := cbxFontName.Text;
-          Editor.Gutter.Font.Size := udEditorFontSize.Position;
-          Editor.Gutter.ShowLineNumbers := chxLineNumbers.Checked;
-          Editor.WordWrap := chkWordWrap.Checked;
-          Editor.RightEdge := udRightEdgePosition.Position;
-          Editor.RightEdgeColor := cbxRightEdgeColour.Selected;
-          Editor.SelectedColor.Foreground := cbxSelectedForeground.Selected;
-          Editor.SelectedColor.Background := cbxSelectedBackground.Selected;
-          // Behavioural
-           For i := Low(TSynEditorOption) To High(TsynEditorOption) Do
-            If clbOptions.Checked[Integer(i)] Then
-              Editor.Options := Editor.Options + [i]
-            Else
-              Editor.Options := Editor.Options - [i];
-          // Highlighter
-          FAttributes.Update(boolIncTag);
+          FinaliseDlg(Editor, boolIncTag);
           Result := True;
         End;
     Finally
@@ -537,12 +481,12 @@ End;
   @param   Sender as a TObject
 
 **)
-procedure TfrmEditorOptions.lbAttributesClick(Sender: TObject);
+Procedure TfrmEditorOptions.lbAttributesClick(Sender: TObject);
 
 Var
   A : TAttribute;
 
-begin
+Begin
   If lbAttributes.ItemIndex > -1 Then
     Begin
       A := lbAttributes.Items.Objects[lbAttributes.ItemIndex] As TAttribute;
@@ -561,7 +505,7 @@ begin
           End;
         End;
     End;
-end;
+End;
 
 (**
 
@@ -573,12 +517,12 @@ end;
   @param   Sender as a TObject
 
 **)
-procedure TfrmEditorOptions.AttributeChange(Sender: TObject);
+Procedure TfrmEditorOptions.AttributeChange(Sender: TObject);
 
 Var
   A : TAttribute;
 
-begin
+Begin
   If lbAttributes.ItemIndex > -1 Then
     If Not FUpdating Then
       Begin
@@ -595,9 +539,124 @@ begin
             If cbxUnderlined.Checked Then
               A.Style := A.Style + [fsUnderline];
             If cbxStrikeout.Checked Then
-              A.Style := A.Style + [fsStrikeout];
+              A.Style := A.Style + [fsStrikeOut];
           End;
       End;
-end;
+          End;
 
-end.
+(**
+
+  This method loads the dialogue with settings from the given SynEdit control and its associated
+  highlighter.
+
+  @precon  Editor must be a valid instance.
+  @postcon The dialogue is loaded with the SynEdits configuration and its highlighters
+           configuration.
+
+  @param   Editor as a TSynEdit
+
+**)
+Procedure TfrmEditorOptions.InitialiseDlg(Editor: TSynEdit);
+
+Var
+  i: TSynEditorOption;
+  M: TSynMultiSyn;
+  S: TScheme;
+  j: Integer;
+  A: TAttribute;
+
+Begin
+  // Visual
+  udTabWidth.Position := Editor.TabWidth;
+  cbxEditorBackgroundColour.Selected := Editor.Color;
+  cbxActiveLineColour.Selected := Editor.ActiveLineColor;
+  cbxFontName.ItemIndex := cbxFontName.Items.IndexOf(Editor.Font.Name);
+  udEditorFontSize.Position := Editor.Font.Size;
+  chxLineNumbers.Checked := Editor.Gutter.ShowLineNumbers;
+  chkWordWrap.Checked := Editor.WordWrap;
+  udRightEdgePosition.Position := Editor.RightEdge;
+  cbxRightEdgeColour.Selected := Editor.RightEdgeColor;
+  cbxSelectedForeground.Selected := Editor.SelectedColor.Foreground;
+  cbxSelectedBackground.Selected := Editor.SelectedColor.Background;
+  // Behavioural
+  For i := Low(TSynEditorOption) To High(TSynEditorOption) Do
+    clbOptions.Checked[Integer(i)] := i In Editor.Options;
+  // Highlighter
+  If Editor.Highlighter <> Nil Then
+    Begin
+      If Editor.Highlighter Is TSynMultiSyn Then
+        Begin
+          M := Editor.Highlighter As TSynMultiSyn;
+          AddHighlighter(M.DefaultHighlighter);
+          lblHighlighterType.Caption := M.DefaultHighlighter.FriendlyLanguageName;
+          For j := 0 To M.Schemes.Count - 1 Do
+            Begin
+              S := M.Schemes[j] As TScheme;
+              A := FAttributes.Add(S.MarkerAttri, M);
+              If A <> Nil Then
+                lbAttributes.Items.AddObject(Format('%s:%s', [
+                  S.SchemeName, 'Marker']), A);
+              AddHighlighter(S.Highlighter);
+            End;
+        End
+      Else
+        Begin
+          lblHighlighterType.Caption := Editor.Highlighter.FriendlyLanguageName;
+          AddHighlighter(Editor.Highlighter);
+        End;
+    End
+  Else
+    SyntaxTab.TabVisible := False;
+  // Initialise the Highlighter Attributes.
+  If lbAttributes.Items.Count > 0 Then
+    Begin
+      lbAttributes.ItemIndex := 0;
+      lbAttributesClick(Nil);
+    End;
+  PageControl1.ActivePageIndex := 0;
+End;
+
+(**
+
+  This method saves the dialogue settings to the given SynEdit control and its associated
+  highlighter.
+
+  @precon  Editor must be a valid instance.
+  @postcon The dialogues settings are saveed to the SynEdits configuration and its highlighters
+           configuration.
+
+  @param   Editor     as a TSynEdit
+  @param   boolIncTag as a Boolean
+
+**)
+Procedure TfrmEditorOptions.FinaliseDlg(Editor: TSynEdit; boolIncTag: Boolean);
+
+Var
+  i : TSynEditorOption;
+
+Begin
+  // Visual
+  Editor.TabWidth := udTabWidth.Position;
+  Editor.Color := cbxEditorBackgroundColour.Selected;
+  Editor.ActiveLineColor := cbxActiveLineColour.Selected;
+  Editor.Font.Name := cbxFontName.Text;
+  Editor.Font.Size := udEditorFontSize.Position;
+  Editor.Gutter.Font.Name := cbxFontName.Text;
+  Editor.Gutter.Font.Size := udEditorFontSize.Position;
+  Editor.Gutter.ShowLineNumbers := chxLineNumbers.Checked;
+  Editor.WordWrap := chkWordWrap.Checked;
+  Editor.RightEdge := udRightEdgePosition.Position;
+  Editor.RightEdgeColor := cbxRightEdgeColour.Selected;
+  Editor.SelectedColor.Foreground := cbxSelectedForeground.Selected;
+  Editor.SelectedColor.Background := cbxSelectedBackground.Selected;
+  // Behavioural
+  For i := Low(TSynEditorOption) To High(TSynEditorOption) Do
+    If clbOptions.Checked[Integer(i)] Then
+      Editor.Options := Editor.Options + [i]
+    Else
+      Editor.Options := Editor.Options - [i];
+  // Highlighter
+  FAttributes.Update(boolIncTag);
+      End;
+
+End.

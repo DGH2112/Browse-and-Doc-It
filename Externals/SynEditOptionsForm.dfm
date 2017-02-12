@@ -39,6 +39,10 @@ object frmEditorOptions: TfrmEditorOptions
       Margins.Right = 4
       Margins.Bottom = 4
       Caption = 'Visual'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         516
         379)
@@ -348,6 +352,10 @@ object frmEditorOptions: TfrmEditorOptions
       Margins.Bottom = 4
       Caption = 'Behaviour'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         516
         379)
@@ -371,6 +379,10 @@ object frmEditorOptions: TfrmEditorOptions
       Margins.Bottom = 4
       Caption = 'Syntax Highlighting'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         516
         379)

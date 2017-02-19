@@ -3,12 +3,12 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    12 Feb 2017
+  @Date    19 Feb 2017
   @Version 1.0
   @Author  David Hoyle
 
 **)
-Unit OptionsForm;
+Unit BADI.OptionsForm;
 
 Interface
 
@@ -30,7 +30,7 @@ Uses
   {$WARN UNIT_PLATFORM OFF} // For the FileCtrl unit
   FileCtrl,
   {$WARN UNIT_PLATFORM ON}
-  BADI.BaseLanguageModule,
+  BADI.Base.Module,
   BADI.GeneralOptionsFrame,
   BADI.SpecialTagsFrame,
   BADI.ModuleExlporerOpsFrame,
@@ -64,12 +64,12 @@ Type
     procedure FormCreate(Sender: TObject);
     { Private declarations }
   Strict Private
-    BADIGeneralOptionsFrame : TfmBADIGeneralOptions;
-    BADISpecialTagsFrame : TfmBADISpecialTagsFrame;
-    BADIModuleExplorerFrame : TfmBADIModuleExplorerFrame;
-    BADICodeBrowsingFrame : TfmBADICodeBrowsingFrame;
-    BADIExcludedDocFilesFrame : TfmBADIExcludedDocFilesFrame;
-    BADIMethodDescriptionsFrame : TfmBADIMethodDescriptionsFrame;
+    FBADIGeneralOptionsFrame : TfmBADIGeneralOptions;
+    FBADISpecialTagsFrame : TfmBADISpecialTagsFrame;
+    FBADIModuleExplorerFrame : TfmBADIModuleExplorerFrame;
+    FBADICodeBrowsingFrame : TfmBADICodeBrowsingFrame;
+    FBADIExcludedDocFilesFrame : TfmBADIExcludedDocFilesFrame;
+    FBADIMethodDescriptionsFrame : TfmBADIMethodDescriptionsFrame;
   Public
     { Public declarations }
     Class Function Execute(VisibleTabs: TVisibleTabs): Boolean;
@@ -78,7 +78,8 @@ Type
 Implementation
 
 Uses
-  CheckForUpdatesOptionsForm;
+  CheckForUpdatesOptionsForm,
+  BADI.Options;
 
 {$R *.DFM}
 
@@ -116,12 +117,12 @@ Begin
     If F.ShowModal = mrOK Then
       Begin
         Result := True;
-        F.BADIGeneralOptionsFrame.SaveSettings;
-        F.BADISpecialTagsFrame.SaveSettings;
-        F.BADIModuleExplorerFrame.SaveSettings;
-        F.BADICodeBrowsingFrame.SaveSettings;
-        F.BADIExcludedDocFilesFrame.SaveSettings;
-        F.BADIMethodDescriptionsFrame.SaveSettings;
+        F.FBADIGeneralOptionsFrame.SaveSettings;
+        F.FBADISpecialTagsFrame.SaveSettings;
+        F.FBADIModuleExplorerFrame.SaveSettings;
+        F.FBADICodeBrowsingFrame.SaveSettings;
+        F.FBADIExcludedDocFilesFrame.SaveSettings;
+        F.FBADIMethodDescriptionsFrame.SaveSettings;
         BrowseAndDocItOptions.SaveSettings;
       End;
   Finally
@@ -141,30 +142,30 @@ End;
 **)
 procedure TfrmOptions.FormCreate(Sender: TObject);
 begin
-  BADIGeneralOptionsFrame := TfmBADIGeneralOptions.Create(Self);
-  BADIGeneralOptionsFrame.Parent := tabGeneralOptions;
-  BADIGeneralOptionsFrame.Align := alClient;
-  BADIGeneralOptionsFrame.LoadSettings;
-  BADISpecialTagsFrame := TfmBADISpecialTagsFrame.Create(Self);
-  BADISpecialTagsFrame.Parent := tabSpecialTags;
-  BADISpecialTagsFrame.Align := alClient;
-  BADISpecialTagsFrame.LoadSettings;
-  BADIModuleExplorerFrame := TfmBADIModuleExplorerFrame.Create(Self);
-  BADIModuleExplorerFrame.Parent := tabModuleExplorer;
-  BADIModuleExplorerFrame.Align := alClient;
-  BADIModuleExplorerFrame.LoadSettings;
-  BADICodeBrowsingFrame := TfmBADICodeBrowsingFrame.Create(Self);
-  BADICodeBrowsingFrame.Parent := tabCodeBrowsing;
-  BADICodeBrowsingFrame.Align := alClient;
-  BADICodeBrowsingFrame.LoadSettings;
-  BADIExcludedDocFilesFrame := TfmBADIExcludedDocFilesFrame.Create(Self);
-  BADIExcludedDocFilesFrame.Parent := tabExcludeDocFiles;
-  BADIExcludedDocFilesFrame.Align := alClient;
-  BADIExcludedDocFilesFrame.LoadSettings;
-  BADIMethodDescriptionsFrame := TfmBADIMethodDescriptionsFrame.Create(Self);
-  BADIMethodDescriptionsFrame.Parent := tabMethodDescriptions;
-  BADIMethodDescriptionsFrame.Align := alClient;
-  BADIMethodDescriptionsFrame.LoadSettings;
+  FBADIGeneralOptionsFrame := TfmBADIGeneralOptions.Create(Self);
+  FBADIGeneralOptionsFrame.Parent := tabGeneralOptions;
+  FBADIGeneralOptionsFrame.Align := alClient;
+  FBADIGeneralOptionsFrame.LoadSettings;
+  FBADISpecialTagsFrame := TfmBADISpecialTagsFrame.Create(Self);
+  FBADISpecialTagsFrame.Parent := tabSpecialTags;
+  FBADISpecialTagsFrame.Align := alClient;
+  FBADISpecialTagsFrame.LoadSettings;
+  FBADIModuleExplorerFrame := TfmBADIModuleExplorerFrame.Create(Self);
+  FBADIModuleExplorerFrame.Parent := tabModuleExplorer;
+  FBADIModuleExplorerFrame.Align := alClient;
+  FBADIModuleExplorerFrame.LoadSettings;
+  FBADICodeBrowsingFrame := TfmBADICodeBrowsingFrame.Create(Self);
+  FBADICodeBrowsingFrame.Parent := tabCodeBrowsing;
+  FBADICodeBrowsingFrame.Align := alClient;
+  FBADICodeBrowsingFrame.LoadSettings;
+  FBADIExcludedDocFilesFrame := TfmBADIExcludedDocFilesFrame.Create(Self);
+  FBADIExcludedDocFilesFrame.Parent := tabExcludeDocFiles;
+  FBADIExcludedDocFilesFrame.Align := alClient;
+  FBADIExcludedDocFilesFrame.LoadSettings;
+  FBADIMethodDescriptionsFrame := TfmBADIMethodDescriptionsFrame.Create(Self);
+  FBADIMethodDescriptionsFrame.Parent := tabMethodDescriptions;
+  FBADIMethodDescriptionsFrame.Align := alClient;
+  FBADIMethodDescriptionsFrame.LoadSettings;
 end;
 
 (**

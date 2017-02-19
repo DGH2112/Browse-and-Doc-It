@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Feb 2017
+  @Date    19 Feb 2017
 
 **)
 Unit BADI.ExcludedDocFilesFrame;
@@ -42,7 +42,8 @@ Implementation
 {$R *.dfm}
 
 Uses
-  BADI.BaseLanguageModule;
+  BADI.Base.Module,
+  BADI.Options;
 
 { TfmBADIExcludedDocFilesFrame }
 

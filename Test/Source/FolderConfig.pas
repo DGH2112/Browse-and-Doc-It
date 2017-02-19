@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    06 Aug 2016
+  @Date    19 Feb 2017
 
 **)
 Unit FolderConfig;
@@ -43,12 +43,12 @@ Type
       Var DefaultDraw: Boolean);
   Private
     { Private declarations }
-    Procedure LoadSettings(strINIFileName: String);
-    Procedure SaveSettings(strINIFileName: String);
+    Procedure LoadSettings(const strINIFileName: String);
+    Procedure SaveSettings(const strINIFileName: String);
     Function GetExtList(iIndex: Integer): String;
   Public
     { Public declarations }
-    Class Procedure Execute(strINIFileName: String; Folders: TStringList);
+    Class Procedure Execute(const strINIFileName: String; Folders: TStringList);
   End;
 
 Implementation
@@ -57,7 +57,7 @@ Uses
   IniFiles,
   FileCtrl,
   DGHLibrary,
-  BaseLanguageModule;
+  BADI.Base.Module, BADI.Module.Dispatcher;
 
 {$R *.dfm}
 
@@ -86,7 +86,7 @@ Begin
       Item         := lvFolders.Items.Add;
       Item.Caption := strDir;
       Item.Checked := True;
-      For j        := 0 To ModuleDispatcher.Count - 1 Do
+      For j := 0 To ModuleDispatcher.Count - 1 Do //FI:W528
         Item.SubItems.Add('0')
     End;
 End;
@@ -130,11 +130,11 @@ End;
   @precon  Folders must be a valid instance.
   @postcon Invokes the dialogue.
 
-  @param   strINIFileName as a String
+  @param   strINIFileName as a String as a constant
   @param   Folders        as a TStringList
 
 **)
-Class Procedure TfrmFolders.Execute(strINIFileName: String; Folders: TStringList);
+Class Procedure TfrmFolders.Execute(const strINIFileName: String; Folders: TStringList);
 
 Var
   Item  : TListItem;
@@ -150,7 +150,7 @@ Begin
           Column           := lvFolders.Columns.Add;
           Column.Caption   := ModuleDispatcher.Modules[j].Ext;
           Column.Alignment := taCenter;
-          Column.MaxWidth  := 50;
+          Column.Width     := 50;
           Column.MaxWidth  := 50;
         End;
       LoadSettings(strINIFileName);
@@ -216,10 +216,10 @@ End;
   @precon  None.
   @postcon Loads the forms settings from the INI File.
 
-  @param   strINIFileName as a String
+  @param   strINIFileName as a String as a constant
 
 **)
-Procedure TfrmFolders.LoadSettings(strINIFileName: String);
+Procedure TfrmFolders.LoadSettings(const strINIFileName: String);
 Begin
   With TIniFile.Create(strINIFileName) Do
     Try
@@ -311,10 +311,10 @@ End;
   @precon  None.
   @postcon Saves the forms settings to the INI File.
 
-  @param   strINIFileName as a String
+  @param   strINIFileName as a String as a constant
 
 **)
-Procedure TfrmFolders.SaveSettings(strINIFileName: String);
+Procedure TfrmFolders.SaveSettings(const strINIFileName: String);
 Begin
   With TIniFile.Create(strINIFileName) Do
     Try

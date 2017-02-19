@@ -3,15 +3,15 @@
   This module contains a custom syntax highlighter for the Eidolon MAP files.
 
   @Version 1.0
-  @Date    24 Oct 2009
+  @Date    19 Feb 2017
   @Author  David Hoyle
 
 **)
-Unit EidolonHighlighter;
+Unit BADI.EidolonHighlighter;
 
 Interface
 
-{$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
+{$INCLUDE CompilerDefinitions.inc}
 
 Uses
   ToolsAPI;
@@ -46,7 +46,8 @@ Type
 Implementation
 
 Uses
-  BaseLanguageModule;
+  BADI.Base.Module,
+  BADI.Functions;
 
 Const
   (** A list of reserved word for the language. **)
@@ -70,6 +71,7 @@ Var
   iEditOps : Integer;
 
 begin
+  Inherited Create;
   EditOps := Nil;
   With (BorlandIDEServices As IOTAEditorServices) Do
     For iEditOps := 0 To EditOptionsCount - 1 Do

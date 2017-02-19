@@ -4,18 +4,23 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    22 Sep 2016
+  @Date    19 Feb 2017
   @Author  David Hoyle
 
 **)
-Unit EditorNotifier;
+Unit BADI.EditorNotifier;
 
 Interface
 
 Uses
-  Classes, ToolsApi, ExtCtrls, BaseLanguageModule, DockForm, CommonIDEFunctions;
+  Classes,
+  ToolsApi,
+  ExtCtrls,
+  BADi.Base.Module,
+  DockForm,
+  BADI.CommonIDEFunctions;
 
-{$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** This class handles notifications from the editor so that changes in the
@@ -37,7 +42,7 @@ Type
     Function EditorInfo(var strFileName : String;
       var boolModified : Boolean) : String;
     Procedure RenderDocument(Module : TBaseLanguageModule);
-    Procedure ExceptionMsg(strExceptionMsg : String);
+    Procedure ExceptionMsg(Const strExceptionMsg : String);
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     {$IFDEF D2005}
@@ -59,7 +64,12 @@ Type
 Implementation
 
 Uses
-  SysUtils, ToolsAPIUtils, Dialogs, DockableModuleExplorer, Windows, Forms;
+  SysUtils,
+  BADI.ToolsAPIUtils,
+  Dialogs,
+  BADI.DockableModuleExplorer,
+  Windows,
+  Forms, BADI.Options;
 
 (**
 
@@ -71,6 +81,7 @@ Uses
 **)
 constructor TEditorNotifier.Create;
 begin
+  Inherited Create;
   FBADIThreadMgr := TBrowseAndDocItThreadManager.Create;
   FUpdateTimer := TTimer.Create(Nil);
   {$IFDEF D2005}
@@ -234,10 +245,10 @@ end;
   @precon  None.
   @postcon Displays an exception message in a dialogue box.
 
-  @param   strExceptionMsg as a String
+  @param   strExceptionMsg as a String as a Constant
 
 **)
-procedure TEditorNotifier.ExceptionMsg(strExceptionMsg: String);
+procedure TEditorNotifier.ExceptionMsg(Const strExceptionMsg: String);
 begin
   ShowMessage(strExceptionMsg);
 end;
@@ -373,7 +384,7 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @param   EditWindow as an INTAEditWindow constant
+  @param   EditWindow as an INTAEditWindow as a constant
   @param   DockForm   as a TDockableForm
 
 **)
@@ -390,7 +401,7 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @param   EditWindow as an INTAEditWindow constant
+  @param   EditWindow as an INTAEditWindow as a constant
   @param   DockForm   as a TDockableForm
 
 **)
@@ -407,7 +418,7 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @param   EditWindow as an INTAEditWindow constant
+  @param   EditWindow as an INTAEditWindow as a constant
   @param   DockForm   as a TDockableForm
 
 **)
@@ -424,8 +435,8 @@ end;
   @precon  None.
   @postcon Refreshes the module explorer IF the last parser was sucessful.
 
-  @param   EditWindow as an INTAEditWindow constant
-  @param   EditView   as an IOTAEditView constant
+  @param   EditWindow as an INTAEditWindow as a constant
+  @param   EditView   as an IOTAEditView as a constant
 
 **)
 procedure TEditorNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
@@ -443,8 +454,8 @@ end;
   @precon  None.
   @postcon Logs the last time the editor was updated.
 
-  @param   EditWindow as an INTAEditWindow constant
-  @param   EditView   as an IOTAEditView constant
+  @param   EditWindow as an INTAEditWindow as a constant
+  @param   EditView   as an IOTAEditView as a constant
 
 **)
 procedure TEditorNotifier.EditorViewModified(const EditWindow: INTAEditWindow;
@@ -461,7 +472,7 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @param   EditWindow as an INTAEditWindow constant
+  @param   EditWindow as an INTAEditWindow as a constant
 
 **)
 procedure TEditorNotifier.WindowActivated(const EditWindow: INTAEditWindow);
@@ -476,7 +487,7 @@ end;
   @precon  None.
   @postcon Not used.
 
-  @param   EditWindow as an INTAEditWindow constant
+  @param   EditWindow as an INTAEditWindow as a constant
   @param   Command    as an Integer
   @param   Param      as an Integer
   @param   Handled    as a Boolean as a reference
@@ -494,7 +505,7 @@ end;
   @precon  None.
   @postcon None.
 
-  @param   EditWindow as an INTAEditWindow constant
+  @param   EditWindow as an INTAEditWindow as a constant
   @param   Operation  as a TOperation
 
 **)
@@ -510,7 +521,7 @@ end;
   @precon  None.
   @postcon None.
 
-  @param   EditWindow        as an INTAEditWindow constant
+  @param   EditWindow        as an INTAEditWindow as a constant
   @param   Show              as a Boolean
   @param   LoadedFromDesktop as a Boolean
 

@@ -4,11 +4,11 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       12 Feb 2017
+  @Date       19 Feb 2017
   @Author     David Hoyle
 
 **)
-Unit BADI.INIModule;
+Unit BADI.INI.Module;
 
 Interface
 
@@ -17,7 +17,11 @@ Uses
   Windows,
   Contnrs,
   Classes,
-  BADI.BaseLanguageModule;
+  BADI.Base.Module,
+  BADI.Comment,
+  BADI.ElementContainer,
+  BADI.Types,
+  BADI.TokenInfo;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -25,7 +29,7 @@ Type
   (** A XML specific implementation of comments. **)
   TINIComment = Class(TComment)
   Public
-    Class Function CreateComment(strComment: String; iLine, iCol: Integer)
+    Class Function CreateComment(const strComment: String; iLine, iCol: Integer)
       : TComment; Override;
   End;
 
@@ -44,17 +48,17 @@ Type
     Procedure TokenizeStream;
     Procedure ParseTokens;
     Procedure EatLineEnds;
-    Function  CheckLineEnd(strMethod: String): Boolean;
+    Function  CheckLineEnd(Const strMethod: String): Boolean;
     Procedure EatWhitespace;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Function  GetComment(CommentPosition: TCommentPosition = cpBeforeCurrentToken)
       : TComment; Override;
     Procedure TidyUpEmptyElements;
     Function  GetModuleName: String; Override;
-    Function  BuildSection(strSectionName : String; iLine,
+    Function  BuildSection(Const strSectionName : String; iLine,
       iColumn : Integer) : TLabelContainer;
   Public
-    Constructor CreateParser(Source: String; strFileName: String; IsModified: Boolean;
+    Constructor CreateParser(const Source, strFileName: String; IsModified: Boolean;
       ModuleOptions: TModuleOptions); Override;
     Destructor Destroy; Override;
     Function  ReservedWords: TKeyWords; Override;
@@ -78,7 +82,12 @@ Type
 Implementation
 
 Uses
-  DGHLibrary;
+  DGHLibrary,
+  BADI.ResourceStrings,
+  BADI.Functions,
+  BADI.Constants,
+  BADI.Options,
+  BADI.Module.Dispatcher;
 
 ResourceString
   (** A resource string for an error message where a line end token was expected. **)
@@ -108,40 +117,44 @@ Const
   @postcon Returns Nil if this is not a documentation comment or returns a
            valid TComment class.
 
-  @param   strComment as a String
+  @param   strComment as a String as a Constant
   @param   iLine      as an Integer
   @param   iCol       as an Integer
   @return  a TComment
 
 **)
-Class Function TINIComment.CreateComment(strComment: String; iLine, iCol: Integer)
+Class Function TINIComment.CreateComment(const strComment: String; iLine, iCol: Integer)
   : TComment;
+
+Var
+  strText : String;
 
 Begin //: @note Not currently configured or used.
   Result := Nil;
-  If Length(strComment) > 0 Then
+  strText := strComment;
+  If Length(strText) > 0 Then
     Begin
-      Case strComment[1] Of
+      Case strText[1] Of
         '/':
-          strComment := Copy(strComment, 2, Length(strComment) - 1);
+          strText := Copy(strText, 2, Length(strText) - 1);
       End;
-      If Length(strComment) > 0 Then
+      If Length(strText) > 0 Then
         Begin
-          If strComment[1] = '*' Then
-            strComment := Copy(strComment, 2, Length(strComment) - 3);
-          If strComment[1] = '/' Then
-            strComment := Copy(strComment, 2, Length(strComment) - 1);
-          If Length(strComment) > 0 Then
+          If strText[1] = '*' Then
+            strText := Copy(strText, 2, Length(strText) - 3);
+          If strText[1] = '/' Then
+            strText := Copy(strText, 2, Length(strText) - 1);
+          If Length(strText) > 0 Then
             Begin
-              If strComment[1] = ':' Then
+              If strText[1] = ':' Then
                 Begin;
-                  strComment := Copy(strComment, 2, Length(strComment) - 1);
-                  Result     := Create(strComment, iLine, iCol);
+                  strText := Copy(strText, 2, Length(strText) - 1);
+                  Result     := Create(strText, iLine, iCol);
                 End
-              Else If strComment[1] = '*' Then
+              Else If strText[1] = '*' Then
                 Begin;
-                  strComment := Copy(strComment, 2, Length(strComment) - 2);
-                  Result     := Create(strComment, iLine, iCol);
+                  strText := Copy(strText, 2, Length(strText) - 2);
+                  Result     := Create(strText, iLine, iCol);
                 End;
             End;
         End;
@@ -176,20 +189,20 @@ End;
   @postcon Creates the heirarchical sections from the section name given and returns the
            most nested level.
 
-  @param   strSectionName as a String
+  @param   strSectionName as a String as a Constant
   @param   iLine          as an Integer
   @param   iColumn        as an Integer
   @return  a TLabelContainer
 
 **)
-Function TINIModule.BuildSection(strSectionName: String; iLine,
+Function TINIModule.BuildSection(Const strSectionName: String; iLine,
   iColumn : Integer): TLabelContainer;
 
 Var
   S : TLabelContainer;
   slSections : TStringList;
   i : Integer;
-  
+
 Begin
   Result := Nil;
   S := FSections;
@@ -222,11 +235,11 @@ End;
            and returns true if found and moves to the next non comment token
            after the line end characters.
 
-  @param   strMethod  as a String
+  @param   strMethod  as a String as a Constant
   @return  a Boolean
 
 **)
-Function TINIModule.CheckLineEnd(strMethod: String): Boolean;
+Function TINIModule.CheckLineEnd(Const strMethod: String): Boolean;
 Begin
   Result := False;
   If Token.TokenType In [ttLineEnd] Then
@@ -250,13 +263,13 @@ End;
            disk.
   @postcon Creates an instance of the module parser.
 
-  @param   Source        as a String
-  @param   strFileName   as a String
+  @param   Source        as a String as a Constant
+  @param   strFileName   as a String as a Constant
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
 
 **)
-Constructor TINIModule.CreateParser(Source: String; strFileName: String;
+Constructor TINIModule.CreateParser(const Source, strFileName: String;
   IsModified: Boolean; ModuleOptions: TModuleOptions);
 
 Begin
@@ -785,7 +798,7 @@ Begin
           ErrorAndSeekToken(strExpectedFileEnd, 'Goal', Token.Token, ['<LF>', '<CR>'], stActual);
       End;
   Except
-    On E: EParserAbort Do
+    On E: EBADIParserAbort Do
       AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
   End;
 End;

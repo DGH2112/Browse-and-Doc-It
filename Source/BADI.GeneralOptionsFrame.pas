@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Feb 2017
+  @Date    19 Feb 2017
 
 **)
 Unit BADI.GeneralOptionsFrame;
@@ -52,7 +52,10 @@ Implementation
 {$R *.dfm}
 
 Uses
-  BADI.BaseLanguageModule;
+  BADI.Base.Module,
+  BADI.Types,
+  BADI.Constants,
+  BADI.Options;
 
 { TfmBADIgeneralOptionsFrame }
 

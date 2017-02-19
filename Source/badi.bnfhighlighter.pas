@@ -4,15 +4,15 @@
   IDE to show Backus-Naur grammar.
 
   @Version 1.0
-  @Date    24 Oct 2009
+  @Date    19 Feb 2017
   @Author  David Hoyle
 
 **)
-Unit BNFHighlighter;
+Unit BADI.BNFHighlighter;
 
 Interface
 
-{$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
+{$INCLUDE CompilerDefinitions.inc}
 
 Uses
   ToolsAPI;
@@ -63,6 +63,7 @@ Var
   iEditOps : Integer;
 
 begin
+  Inherited Create;
   EditOps := Nil;
   With (BorlandIDEServices As IOTAEditorServices) Do
     For iEditOps := 0 To EditOptionsCount - 1 Do

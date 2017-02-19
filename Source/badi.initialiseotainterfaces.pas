@@ -5,17 +5,17 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    30 Sep 2016
+  @Date    19 Feb 2017
 
 **)
-Unit BADIInitialiseOTAInterfaces;
+Unit BADI.InitialiseOTAInterfaces;
 
 Interface
 
 Uses
   ToolsAPI;
 
-{$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
+{$INCLUDE CompilerDefinitions.inc}
 
   Procedure Register;
 
@@ -32,13 +32,13 @@ Uses
   SysUtils,
   Forms,
   Windows,
-  BrowseAndDocItWizard,
-  DockableModuleExplorer,
-  BNFHighlighter,
-  EidolonHighlighter,
-  BADICommon,
-  BADISplashScreen,
-  BADIAboutBox;
+  BADI.Wizard,
+  BADI.DockableModuleExplorer,
+  BADI.BNFHighlighter,
+  BADI.EidolonHighlighter,
+  BADI.Common,
+  BADI.SplashScreen,
+  BADI.AboutBox;
 
 Type
   (** An enumerate to define the type of wizard. **)

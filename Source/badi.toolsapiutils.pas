@@ -3,19 +3,22 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    25 Oct 2009
+  @Date    19 Feb 2017
   @Version 1.0
   @Author  David Hoyle
 
 **)
-unit ToolsAPIUtils;
+unit BADI.ToolsAPIUtils;
 
 interface
 
-{$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
+{$INCLUDE 'CompilerDefinitions.inc'}
 
 Uses
-  SysUtils, Windows, ToolsAPI, Classes;
+  SysUtils,
+  Windows,
+  ToolsAPI,
+  Classes;
 
 Type
   (** This is an enumerate for the types of messages that can be cleared. **)
@@ -28,12 +31,12 @@ Type
   Function ProjectModule(Project : IOTAProject) : IOTAModule;
   Function ActiveSourceEditor : IOTASourceEditor;
   Function SourceEditor(Module : IOTAModule) : IOTASourceEditor;
-  Procedure OutputMessage(strText : String); Overload;
-  Procedure OutputMessage(strFileName, strText, strPrefix : String; iLine, iCol : Integer); Overload;
+  Procedure OutputMessage(Const strText : String); Overload;
+  Procedure OutputMessage(Const strFileName, strText, strPrefix : String; iLine, iCol : Integer); Overload;
   Procedure ClearMessages(Msg : TClearMessages);
   Function BufferSize(SourceEditor : IOTASourceEditor) : Integer;
   Function EditorAsString(SourceEditor : IOTASourceEditor) : String;
-  Procedure OutputText(Writer : IOTAEditWriter; strText : String);
+  Procedure OutputText(Writer : IOTAEditWriter; Const strText : String);
 
 Const
   (** The buffer size for the copying of text from an editor to a memory
@@ -168,10 +171,10 @@ End;
   @precon  strText is the tool message to be displayed.
   @postcon Adds a simple message to the IDEs message window.
 
-  @param   strText as a String
+  @param   strText as a String as a Constant
 
 **)
-Procedure OutputMessage(strText : String);
+Procedure OutputMessage(Const strText : String);
 
 Begin
   (BorlandIDEServices As IOTAMessageServices).AddTitleMessage(strText);
@@ -179,24 +182,23 @@ End;
 
 (**
 
-  This procedure provides a smiple procedural interface for sending a message
-  to the IDE`s message window.
+  This procedure provides a smiple procedural interface for sending a message to the IDE`s message
+  window.
 
-  @precon  strFileName is the name of the file associated with the message,
-           strText is the message to be displayed, strPrefix is the prefix text
-           infront of the message, e.g. [Warning], iLine is the line in the file
-           where the message applies and iCol is the column in the file where
-           the message applies.
+  @precon  strFileName is the name of the file associated with the message, strText is the message
+           to be displayed, strPrefix is the prefix text infront of the message, e.g. [Warning],
+           iLine is the line in the file where the message applies and iCol is the column in the
+           file where the message applies.
   @postcon Adds a tools message to the IDE message window.
 
-  @param   strFileName as a String
-  @param   strText     as a String
-  @param   strPrefix   as a String
+  @param   strFileName as a String as a constant
+  @param   strText     as a String as a constant
+  @param   strPrefix   as a String as a constant
   @param   iLine       as an Integer
   @param   iCol        as an Integer
 
 **)
-Procedure OutputMessage(strFileName, strText, strPrefix : String;
+Procedure OutputMessage(Const strFileName, strText, strPrefix : String;
   iLine, iCol : Integer);
 
 Begin
@@ -336,10 +338,10 @@ End;
   @postcon Outputs the given text to the given edit writer.
 
   @param   Writer  as an IOTAEditWriter
-  @param   strText as a String
+  @param   strText as a String as a constant
 
 **)
-Procedure OutputText(Writer : IOTAEditWriter; strText : String);
+Procedure OutputText(Writer : IOTAEditWriter; Const strText : String);
 
 Begin
   {$IFNDEF D2009}

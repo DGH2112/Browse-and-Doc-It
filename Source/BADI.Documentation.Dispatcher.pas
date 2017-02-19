@@ -4,16 +4,16 @@
   that should be produced.
 
   @Author  David Hoyle
-  @Date    12 Feb 2017
+  @Date    19 Feb 2017
   @Version 1.0
 
 **)
-Unit BADI.DocumentationDispatcher;
+Unit BADI.Documentation.Dispatcher;
 
 Interface
 
 Uses
-  BADI.BaseDocumentation;
+  BADI.Base.Documentation;
 
 Type
   (** This is an enumerate to define the types of documentation hat can be
@@ -30,30 +30,31 @@ Const
     'HTML Help Documentation'}
   );
 
-  Function DocumentDispatcher(strOutputDirectory, strTitle : String;
+  Function DocumentDispatcher(Const strOutputDirectory, strTitle : String;
     ADocType : TDocType) : TBaseDocumentation;
 
 Implementation
 
 Uses
-  SysUtils, BADI.HTMLDocumentation;
+  SysUtils,
+  BADI.HTMLDocumentation;
 
 (**
 
-  This function returns a documentation instance for the type of documentation 
-  requested. 
+  This function returns a documentation instance for the type of documentation
+  requested.
 
-  @precon  None. 
-  @postcon Returns a documentation instance for the type of documentation 
-           requested. 
+  @precon  None.
+  @postcon Returns a documentation instance for the type of documentation
+           requested.
 
-  @param   strOutputDirectory as a String
-  @param   strTitle           as a String
+  @param   strOutputDirectory as a String as a Constant
+  @param   strTitle           as a String as a Constant
   @param   ADocType           as a TDocType
   @return  a TBaseDocumentation
 
 **)
-Function DocumentDispatcher(strOutputDirectory, strTitle : String;
+Function DocumentDispatcher(Const strOutputDirectory, strTitle : String;
   ADocType : TDocType) : TBaseDocumentation;
 
 ResourceString

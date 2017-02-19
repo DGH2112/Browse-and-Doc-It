@@ -4,10 +4,10 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    30 Oct 2016
+  @Date    19 Feb 2017
 
 **)
-Unit BADIIDEMenuInstaller;
+Unit BADI.IDEMenuInstaller;
 
 Interface
 
@@ -15,12 +15,13 @@ Uses
   ToolsAPI,
   Menus,
   Classes,
-  EditorNotifier,
-  BaseLanguageModule,
+  BADI.EditorNotifier,
+  BADI.Base.Module,
   Windows,
-  ProfilingForm;
+  BADI.ProfilingForm,
+  BADI.Types;
 
-{$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** This class manages the creation and destruction of the IDE menus. **)
@@ -36,7 +37,7 @@ Type
     Procedure MenuTimerEvent(Sender: TObject);
     {$ENDIF}
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure CreateMenuItem(mmiParent: TMenuItem; strCaption: String = '';
+    Procedure CreateMenuItem(mmiParent: TMenuItem; Const strCaption: String = '';
       ClickProc: TNotifyEvent = Nil; AShortCut: TShortCut = 0);
     Procedure InsertCommentBlock(CommentStyle: TCommentStyle;
       CommentType: TCommentType);
@@ -44,16 +45,16 @@ Type
     Function SelectedText(boolDelete: Boolean): String;
     Procedure DeleteExistingComment(Source: IOTASourceEditor; iStartLine,
       iEndLine: Integer);
-    Procedure InsertComment(strComment: String; Writer: IOTAEditWriter;
+    Procedure InsertComment(Const strComment: String; Writer: IOTAEditWriter;
       iInsertLine: Integer; Source: IOTASourceEditor);
     Procedure PositionCursorInFunction(CursorDelta: TPoint; iInsertLine,
-      iIndent: Integer; strComment: String);
+      iIndent: Integer; Const strComment: String);
     Procedure ProcessProfilingCode(Module : TBaseLanguageModule; SE: IOTASourceEditor;
       ProfileJob: TProfileJob; iTabs: Integer);
     Procedure InsertProfileCode(SE: IOTASourceEditor; ProfileJob: TProfileJob;
-      strProlog, strEpilog: String);
+      Const strProlog, strEpilog: String);
     Procedure RemoveProfileCode(SE: IOTASourceEditor; ProfileJob: TProfileJob;
-      slProlog, slEpilog: TStringList);
+      Const slProlog, slEpilog: TStringList);
     Procedure DeleteProfileCode(SE: IOTASourceEditor; iStartLine,
       iEndLine: Integer);
     Procedure InsertMethodCommentClick(Sender: TObject);
@@ -68,7 +69,7 @@ Type
     Procedure OptionsClick(Sender: TObject);
     Procedure ModuleExplorerClick(Sender: TObject);
   Public
-    Constructor Create(strINIFileName : String; EditorNotifier : TEditorNotifier);
+    Constructor Create(Const strINIFileName : String; EditorNotifier : TEditorNotifier);
     Destructor Destroy; Override;
     Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
       iCommentCol: Integer);
@@ -83,19 +84,21 @@ Uses
   //CodeSiteLogging,
   SysUtils,
   CheckForUpdates,
-  DocumentationDispatcher,
-  ToolsAPIUtils,
-  DocumentationOptionsForm,
+  BADI.Documentation.Dispatcher,
+  BADI.ToolsAPIUtils,
+  BADI.DocumentationOptionsForm,
   ShellAPI,
   Forms,
-  DUnitCreator,
-  DUnitForm,
+  BADI.DUnitCreator,
+  BADI.DUnitForm,
   Dialogs,
   Controls,
-  CommonIDEFunctions,
-  DockableModuleExplorer,
+  BADI.CommonIDEFunctions,
+  BADI.DockableModuleExplorer,
   ProgressForm,
-  DGHLibrary;
+  DGHLibrary, BADI.Module.Dispatcher, BADI.ElementContainer, BADI.Generic.FunctionDecl,
+  BADI.ResourceStrings, BADI.Generic.MethodDecl, BADI.Generic.PropertyDecl, BADI.Options,
+  BADI.Functions;
 
 ResourceString
   (** This is a resource message to confirm whether the selected text should be
@@ -132,11 +135,11 @@ End;
   @precon  None.
   @postcon Creates the IDE menus.
 
-  @param   strINIFileName as a String
+  @param   strINIFileName as a String as a constant
   @param   EditorNotifier as a TEditorNotifier
 
 **)
-Constructor TBADIIDEMenuInstaller.Create(strINIFileName : String;
+Constructor TBADIIDEMenuInstaller.Create(Const strINIFileName : String;
   EditorNotifier : TEditorNotifier);
 
 Var
@@ -197,13 +200,13 @@ End;
   @postcon A Sub menu ite is created under mmiParent .
 
   @param   mmiParent  as a TMenuItem
-  @param   strCaption as a String
+  @param   strCaption as a String as a constant
   @param   ClickProc  as a TNotifyEvent
   @param   AShortCut  as a TShortCut
 
 **)
 Procedure TBADIIDEMenuInstaller.CreateMenuItem(mmiParent: TMenuItem;
-  strCaption: String = ''; ClickProc: TNotifyEvent = Nil;
+  Const strCaption: String = ''; ClickProc: TNotifyEvent = Nil;
   AShortCut: TShortCut = 0);
 
 Var
@@ -458,19 +461,18 @@ End;
 
 (**
 
-  This method inserts the given comment into the editor at the given insert
-  line.
+  This method inserts the given comment into the editor at the given insert line.
 
   @precon  None.
   @postcon Inserts the given comment into the editor at the given insert line.
 
-  @param   strComment  as a string
+  @param   strComment  as a String as a constant
   @param   Writer      as an IOTAEditWriter
   @param   iInsertLine as an Integer
   @param   Source      as an IOTASourceEditor
 
 **)
-Procedure TBADIIDEMenuInstaller.InsertComment(strComment: String;
+Procedure TBADIIDEMenuInstaller.InsertComment(Const strComment: String;
   Writer: IOTAEditWriter; iInsertLine: Integer; Source: IOTASourceEditor);
 
 Var
@@ -715,12 +717,12 @@ End;
 
   @param   SE         as an IOTASourceEditor
   @param   ProfileJob as a TProfileJob
-  @param   strProlog  as a String
-  @param   strEpilog  as a String
+  @param   strProlog  as a String as a constant
+  @param   strEpilog  as a String as a constant
 
 **)
 Procedure TBADIIDEMenuInstaller.InsertProfileCode(SE: IOTASourceEditor;
-  ProfileJob: TProfileJob; strProlog, strEpilog: String);
+  ProfileJob: TProfileJob; Const strProlog, strEpilog: String);
 
 Var
   Writer    : IOTAEditWriter;
@@ -984,21 +986,21 @@ End;
 
 (**
 
-  This method positions the comment and function according to the options and
-  then places the cursor in the appropriate position for editing.
+  This method positions the comment and function according to the options and then places the cursor
+  in the appropriate position for editing.
 
   @precon  None.
-  @postcon Positions the comment and function according to the options and
-           then places the cursor in the appropriate position for editing.
+  @postcon Positions the comment and function according to the options and then places the cursor
+           in the appropriate position for editing.
 
   @param   CursorDelta as a TPoint
   @param   iInsertLine as an Integer
   @param   iIndent     as an Integer
-  @param   strComment  as a string
+  @param   strComment  as a String as a constant
 
 **)
 Procedure TBADIIDEMenuInstaller.PositionCursorInFunction(CursorDelta: TPoint;
-  iInsertLine: Integer; iIndent: Integer; strComment: String);
+  iInsertLine: Integer; iIndent: Integer; Const strComment: String);
 
 Var
   Pt: TPoint;
@@ -1135,21 +1137,21 @@ End;
 
 (**
 
-  This method removes the profiling code from the editor after checking that the
-  code is what is expected.
+  This method removes the profiling code from the editor after checking that the code is what is
+  expected.
 
   @precon  SE and ProfileJob must be valid instances.
-  @postcon Removes the profiling code from the editor after checking that the
-           code is what is expected.
+  @postcon Removes the profiling code from the editor after checking that the code is what is
+           expected.
 
   @param   SE         as an IOTASourceEditor
   @param   ProfileJob as a TProfileJob
-  @param   slProlog   as a TStringList
-  @param   slEpilog   as a TStringList
+  @param   slProlog   as a TStringList as a constant
+  @param   slEpilog   as a TStringList as a constant
 
 **)
 Procedure TBADIIDEMenuInstaller.RemoveProfileCode(SE: IOTASourceEditor;
-  ProfileJob: TProfileJob; slProlog, slEpilog: TStringList);
+  ProfileJob: TProfileJob; Const slProlog, slEpilog: TStringList);
 
 ResourceString
   strRemoveMsg =

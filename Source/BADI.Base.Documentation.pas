@@ -3,16 +3,18 @@
   This module contains a base class for all documentation modules.
 
   @Author  David Hoyle
-  @Date    12 Feb 2017
+  @Date    19 Feb 2017
   @Version 1.0
 
 **)
-Unit BADI.BaseDocumentation;
+Unit BADI.Base.Documentation;
 
 Interface
 
 Uses
-  SysUtils, Classes, ProgressForm;
+  SysUtils,
+  Classes,
+  ProgressForm;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -26,12 +28,12 @@ Type
   Protected
     Function GetMainDocument : String; Virtual; Abstract;
   Public
-    Constructor Create(strOutputDirectory, strTitle : String); Virtual;
+    Constructor Create(Const strOutputDirectory, strTitle : String); Virtual;
     Destructor Destroy; Override;
-    Procedure Add(strFileName : String);
+    Procedure Add(Const strFileName : String);
     Procedure OutputDocumentation; Virtual; Abstract;
-    Procedure Initialise(iMax : Integer; strTitle, strMsg : String); Virtual;
-    Procedure Update(iPosition : Integer; strMsg : String); Virtual;
+    Procedure Initialise(iMax : Integer; Const strTitle, strMsg : String); Virtual;
+    Procedure Update(iPosition : Integer; Const strMsg : String); Virtual;
     Procedure Finalise; Virtual;
     (**
       This property returns the initial document which should be displayed by
@@ -47,7 +49,9 @@ Type
 Implementation
 
 Uses
-  BADI.BaseLanguageModule {$IFNDEF D0006}, FileCtrl {$ENDIF};
+  BADI.Base.Module {$IFNDEF D0006},
+  FileCtrl {$ENDIF},
+  BADI.Module.Dispatcher;
 
 (**
 
@@ -58,10 +62,10 @@ Uses
   @postcon Simple adds the code module to the list of code modules.
 
 
-  @param   strFileName as a String
+  @param   strFileName as a String as a Constant
 
 **)
-Procedure TBaseDocumentation.Add(strFileName : String);
+Procedure TBaseDocumentation.Add(Const strFileName : String);
 
 Begin
   If ModuleDispatcher.CanDocumentDocument(strFileName) Then
@@ -74,16 +78,16 @@ End;
   This is a constructor for the base documentation class.
 
 
-  @precon  None. 
+  @precon  None.
 
-  @postcon Initialises the class. 
+  @postcon Initialises the class.
 
 
-  @param   strOutputDirectory as a String
-  @param   strTitle           as a String
+  @param   strOutputDirectory as a String as a Constant
+  @param   strTitle           as a String as a Constant
 
 **)
-Constructor TBaseDocumentation.Create(strOutputDirectory, strTitle : String);
+Constructor TBaseDocumentation.Create(Const strOutputDirectory, strTitle : String);
 
 ResourceString
   strOutputDirectoryIsNull = 'The output directory is NULL!';
@@ -116,6 +120,7 @@ Destructor TBaseDocumentation.Destroy;
 Begin
   FProgressForm.Free;
   FFileNames.Free;
+  Inherited Destroy;
 End;
 
 (**
@@ -145,11 +150,11 @@ end;
 
 
   @param   iMax     as an Integer
-  @param   strTitle as a String
-  @param   strMsg   as a String
+  @param   strTitle as a String as a Constant
+  @param   strMsg   as a String as a Constant
 
 **)
-procedure TBaseDocumentation.Initialise(iMax: Integer; strTitle, strMsg : String);
+procedure TBaseDocumentation.Initialise(iMax: Integer; Const strTitle, strMsg : String);
 begin
   FProgressForm.Init(iMax, strTitle, strMsg);
 end;
@@ -164,10 +169,10 @@ end;
 
 
   @param   iPosition as an Integer
-  @param   strMsg    as a String
+  @param   strMsg    as a String as a Constant
 
 **)
-procedure TBaseDocumentation.Update(iPosition: Integer; strMsg : String);
+procedure TBaseDocumentation.Update(iPosition: Integer; Const strMsg : String);
 begin
   FProgressForm.UpdateProgress(iPosition, strMsg);
 end;

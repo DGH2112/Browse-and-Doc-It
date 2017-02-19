@@ -3,29 +3,29 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    30 Sep 2016
+  @Date    19 Feb 2017
   @Version 1.0
 
 **)
-Unit BrowseAndDocItWizard;
+Unit BADI.Wizard;
 
 Interface
 
 Uses
   Classes,
   ToolsAPI,
-  BaseLanguageModule,
+  BADI.Base.Module,
   Types,
-  CommonIDEFunctions,
+  BADI.CommonIDEFunctions,
   {$IFNDEF D2005}
   ExtCtrls,
   Contnrs,
   {$ENDIF}
-  EditorNotifier,
-  BADIIDEOptionsInstaller,
-  BADIIDEMenuInstaller;
+  BADI.EditorNotifier,
+  BADI.IDEOptionsInstaller,
+  BADI.IDEMenuInstaller;
 
-{$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** This is the class which defined the Wizard interface. **)
@@ -60,9 +60,9 @@ Type
 Implementation
 
 Uses
-  DockableModuleExplorer,
+  BADI.DockableModuleExplorer,
   DGHLibrary,
-  BADICommon;
+  BADI.Common;
 
 (**
 

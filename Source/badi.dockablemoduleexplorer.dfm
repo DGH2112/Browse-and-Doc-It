@@ -16,5 +16,5 @@ object frmDockableModuleExplorer: TfrmDockableModuleExplorer
   OldCreateOrder = False
   ShowHint = True
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
 end

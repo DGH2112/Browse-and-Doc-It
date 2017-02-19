@@ -3,17 +3,27 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    23 Oct 2016
+  @Date    19 Feb 2017
   @Version 1.0
 
 **)
-unit DockableModuleExplorer;
+unit BADI.DockableModuleExplorer;
 
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, DockForm, ModuleExplorerFrame, BaseLanguageModule;
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  DockForm,
+  BADI.ModuleExplorerFrame,
+  BADI.Base.Module;
 
 type
   (** This class represents a dockable form that displays the heirarchical

@@ -5,17 +5,17 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    02 Sep 2016
+  @Date    19 Feb 2017
 
 **)
-Unit BADIIDEOptionsInstaller;
+Unit BADI.IDEOptionsInstaller;
 
 Interface
 
 Uses
-  BADIIDEOptionsHandler;
+  BADI.IDEOptionsHandler;
 
-{$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** A simple class to encapsulate the installation of option frames into the IDE. **)
@@ -39,13 +39,13 @@ Implementation
 
 Uses
   ToolsAPI,
-  BADICustomOptionsFrame,
-  BADIGeneralOptionsFrame,
-  BADICodeBrowsingFrame,
-  BADIEcludedDocFilesFrame,
-  BADIMethodDescriptionsFrame,
-  BADIModuleExlporerOpsFrame,
-  BADISpecialTagsFrame;
+  BADI.CustomOptionsFrame,
+  BADI.GeneralOptionsFrame,
+  BADI.CodeBrowsingFrame,
+  BADI.ExcludedDocFilesFrame,
+  BADI.MethodDescriptionsFrame,
+  BADI.ModuleExlporerOpsFrame,
+  BADI.SpecialTagsFrame;
 
 { TBADIIDEOptionsInstaller }
 

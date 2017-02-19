@@ -6,19 +6,19 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    02 Sep 2016
+  @Date    19 Feb 2017
 
 **)
-Unit BADIIDEOptionsHandler;
+Unit BADI.IDEOptionsHandler;
 
 Interface
 
 Uses
   ToolsAPI,
   Forms,
-  BADICustomOptionsFrame;
+  BADI.CustomOptionsFrame;
 
-{$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
+{$INCLUDE CompilerDefinitions.inc}
 
 
 Type
@@ -31,7 +31,7 @@ Type
     FTitle       : String;
   {$IFDEF 2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(OptionsFrame: TFrameClass; strTitle : String);
+    Constructor Create(OptionsFrame: TFrameClass; Const strTitle : String);
     Procedure DialogClosed(Accepted: Boolean);
     Procedure FrameCreated(AFrame: TCustomFrame);
     Function GetArea: String;
@@ -57,10 +57,10 @@ Uses
   @postcon Saves the options frame title and frame class to later use.
 
   @param   OptionsFrame as a TFrameClass
-  @param   strTitle     as a String
+  @param   strTitle     as a String as a constant
 
 **)
-Constructor TBADIIDEOptionsHandler.Create(OptionsFrame: TFrameClass; strTitle : String);
+Constructor TBADIIDEOptionsHandler.Create(OptionsFrame: TFrameClass; Const strTitle : String);
 
 Begin
   FBADICustomFrameClass := OptionsFrame;

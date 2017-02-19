@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Feb 2017
+  @Date    19 Feb 2017
 
 **)
 unit BADI.DocumentationOptionsForm;
@@ -25,7 +25,7 @@ uses
   StdCtrls,
   Buttons,
   ExtCtrls,
-  BADI.DocumentationDispatcher;
+  BADI.Documentation.Dispatcher;
 
 type
   (** A class to represent the form interface. **)
@@ -50,7 +50,7 @@ type
 implementation
 
 Uses
-  BADI.BaseLanguageModule;
+  BADI.Base.Module, BADI.Types, BADI.Options;
 
 {$R *.dfm}
 

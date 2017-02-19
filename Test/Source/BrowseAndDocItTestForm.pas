@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    30 Sep 2016
+  @Date    19 Feb 2017
   @Author  David Hoyle
 
 **)
@@ -26,8 +26,8 @@ Uses
   SynHighlighterPas,
   SynEdit,
   ExtCtrls,
-  ModuleExplorerFrame,
-  BaseLanguageModule,
+  BADI.ModuleExplorerFrame,
+  BADI.Base.Module,
   StdCtrls,
   FileCtrl,
   ComCtrls,
@@ -52,7 +52,7 @@ Uses
   DGHCustomGraphicsControl,
   DGHMemoryMonitorControl;
 
-{$INCLUDE '..\..\..\..\Library\CompilerDefinitions.inc'}
+{$INCLUDE '..\..\Source\CompilerDefinitions.inc'}
 
 Type
   (** A record to define the doc conflicts, hints and errors for files and
@@ -182,13 +182,13 @@ Type
     Procedure SaveSettings;
     Function GetPathRoot: String;
     Procedure SetPathRoot(Const Value: String);
-    Function RecurseDirectories(strRoot, strDirectory: String;
-      Var iPosition: Integer; strExtensions: String;
+    Function RecurseDirectories(Const strRoot, strDirectory: String;
+      Var iPosition: Integer; Const strExtensions: String;
       boolScan: Boolean = False): TScanResults;
     Procedure RefreshExplorer(Sender: TObject);
     Procedure PopulateListView;
-    Function ExcludeFileFromResults(strFileName: String): Boolean;
-    Procedure GetErrors(strFileName, strSource: String; Var iHints, iWarnings,
+    Function ExcludeFileFromResults(Const strFileName: String): Boolean;
+    Procedure GetErrors(Const strFileName, strSource: String; Var iHints, iWarnings,
       iErrors, iConflicts: Integer; SourceType: TSourceType);
     Procedure TimerEvent(Sender: TObject);
     Procedure RefreshModuleExplorer;
@@ -229,7 +229,7 @@ Type
     FHints    : Integer;
     FConflicts: Integer;
   Public
-    Constructor Create(strFileName, strPathRoot: String; iErrors, iWarnings, iHints,
+    Constructor Create(Const strFileName, strPathRoot: String; iErrors, iWarnings, iHints,
       iConflicts: Integer);
     (**
       This property returns the file name of the parser record.
@@ -288,20 +288,21 @@ Uses
   ExceptionLog7,
   EExceptionManager,
   {$ENDIF}
-  TokenForm,
+  BADI.TokenForm,
   IniFiles,
   DGHLibrary,
-  OptionsForm,
-  DocumentationDispatcher,
-  BaseDocumentation,
+  BADI.OptionsForm,
+  BADI.Documentation.Dispatcher,
+  BADI.Base.Documentation,
   ShellAPI,
   Math,
-  DocumentationOptionsForm,
+  BADI.DocumentationOptionsForm,
   ExclusionsForm,
   FolderConfig,
   UsefulSynEditFunctions,
-  EditorOptionsForm,
-  UITypes;
+  SynEditOptionsForm,
+  UITypes, BADI.Module.Dispatcher, BADI.Types, BADI.ElementContainer, BADI.ResourceStrings,
+  BADI.Options;
 
 {$R *.dfm}
 
@@ -579,12 +580,12 @@ End;
   @note    The exclusion text is only tested for in the path / filename section
            after the root path , i . e . the root path is ignored .
 
-  @param   strFileName as a String
+  @param   strFileName as a String as a constant
   @return  a Boolean
 
 **)
 Function TfrmBrowseAndDocItTestForm.ExcludeFileFromResults(
-  strFileName: String): Boolean;
+  Const strFileName: String): Boolean;
 
 Var
   i: Integer;
@@ -695,16 +696,16 @@ End;
   @precon  None.
   @postcon Recurse the directories searching for files.
 
-  @param   strRoot       as a String
-  @param   strDirectory  as a String
+  @param   strRoot       as a String as a constant
+  @param   strDirectory  as a String as a constant
   @param   iPosition     as an Integer as a reference
-  @param   strExtensions as a String
+  @param   strExtensions as a String as a constant
   @param   boolScan      as a Boolean
   @return  a TScanResults
 
 **)
-Function TfrmBrowseAndDocItTestForm.RecurseDirectories(strRoot,
-  strDirectory: String; Var iPosition: Integer; strExtensions: String;
+Function TfrmBrowseAndDocItTestForm.RecurseDirectories(Const strRoot,
+  strDirectory: String; Var iPosition: Integer; Const strExtensions: String;
   boolScan: Boolean = False): TScanResults;
 
 Var
@@ -945,8 +946,8 @@ End;
   @precon  None.
   @postcon Gets the number of errors for the given files name.
 
-  @param   strFileName as a String
-  @param   strSource   as a String
+  @param   strFileName as a String as a constant
+  @param   strSource   as a String as a constant
   @param   iHints      as an Integer as a reference
   @param   iWarnings   as an Integer as a reference
   @param   iErrors     as an Integer as a reference
@@ -954,7 +955,7 @@ End;
   @param   SourceType  as a TSourceType
 
 **)
-Procedure TfrmBrowseAndDocItTestForm.GetErrors(strFileName, strSource: String;
+Procedure TfrmBrowseAndDocItTestForm.GetErrors(Const strFileName, strSource: String;
   Var iHints, iWarnings, iErrors, iConflicts: Integer;
   SourceType: TSourceType);
 
@@ -1818,15 +1819,15 @@ End;
   @precon  None .
   @postcon Initialises the record class with information .
 
-  @param   strFileName as a String
-  @param   strPathRoot as a String
+  @param   strFileName as a String as a constant
+  @param   strPathRoot as a String as a constant
   @param   iErrors     as an Integer
   @param   iWarnings   as an Integer
   @param   iHints      as an Integer
   @param   iConflicts  as an Integer
 
 **)
-Constructor TParseRecord.Create(strFileName, strPathRoot: String; iErrors,
+Constructor TParseRecord.Create(Const strFileName, strPathRoot: String; iErrors,
   iWarnings, iHints, iConflicts: Integer);
 
 Begin

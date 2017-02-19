@@ -4,14 +4,14 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    30 Sep 2016
+  @Date    19 Feb 2017
 
 **)
-Unit BADISplashScreen;
+Unit BADI.SplashScreen;
 
 Interface
 
-{$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
+{$INCLUDE CompilerDefinitions.inc}
 
   Procedure AddSplashScreen;
 
@@ -22,7 +22,7 @@ Uses
   SysUtils,
   Windows,
   Forms,
-  BADICommon;
+  BADI.Common;
 
 (**
 

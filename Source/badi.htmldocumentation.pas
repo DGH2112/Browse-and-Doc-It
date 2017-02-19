@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    12 Feb 2017
+  @Date    19 Feb 2017
   @Version 1.0
 
 **)
@@ -16,9 +16,9 @@ Interface
 
 Uses
   Classes,
-  BADI.BaseLanguageModule,
-  BADI.BaseDocumentation,
-  Contnrs;
+  BADI.Base.Module,
+  BADI.Base.Documentation,
+  Contnrs, BADI.Types, BADI.ElementContainer;
 
 Type
   (** This class represent a set of documenation conflicts for a module. **)
@@ -28,7 +28,7 @@ Type
     FConflicts : TStringList;
   Protected
   Public
-    Constructor Create(strModule : String);
+    Constructor Create(const strModule : String);
     Destructor Destroy; Override;
     (**
       This property provides access to the string list of conflicts.
@@ -70,20 +70,20 @@ Type
     procedure OutputSummarySpecialTags;
     function GetSumDocCons(iIndex : Integer): TSumDocCon;
   Protected
-    procedure GenerateImages(strImageDirectory: String);
-    function ExpandLinkTag(strToken: String): String;
-    Procedure OutputHTMLDocumentation(strFileName : String);
+    procedure GenerateImages(const strImageDirectory: String);
+    function ExpandLinkTag(const strToken: String): String;
+    Procedure OutputHTMLDocumentation(const strFileName : String);
     Procedure GenerateSummary;
     Procedure GenerateCSS;
     Procedure GenerateIndex;
     procedure GenerateSchema;
-    Procedure GenerateHTML(slHTMLFile : TStringList; strTitle : String);
+    Procedure GenerateHTML(slHTMLFile : TStringList; const strTitle : String);
     Procedure GenerateModuleList(slHTMLFile : TStringList);
     Procedure GenerateSectionList(slHTMLFile : TStringList);
     Procedure GenerateContent(slHTMLFile : TStringList);
     Function FindInsertionPoint(slHTMLFile : TStringList;
-      strText : String) : Integer;
-    Function GetStringResource(strName : String) : String;
+      const strText : String) : Integer;
+    Function GetStringResource(const strName : String) : String;
     Function GetMainDocument : String; Override;
     Procedure GenerateErrorsWarningsHints(slContents : TStringList);
     Procedure GenerateDocumentConflicts(slContents : TStringList);
@@ -92,19 +92,19 @@ Type
       iIndentLevel : Integer);
     Procedure OutputContainers(slContents : TStringList;
       Container : TElementContainer; iIndentLevel : Integer;
-      strContainerLabel : String);
-    Function N(strText : String) : String;
-    Function P(strText : String) : String;
+      const strContainerLabel : String);
+    Function N(const strText : String) : String;
+    Function P(const strText : String) : String;
     Procedure InitialiseSummary;
-    Procedure OutputErrorsWarningsAndHints(slEWH : TStringList; strSectionTitle,
+    Procedure OutputErrorsWarningsAndHints(slEWH : TStringList; const strSectionTitle,
       strLIType : String; AImageIndex : TBADIImageIndex);
     Procedure OutputSummaryDocumentationConflicts;
     { HTML Tag Outputs }
-    Function A(strText, strHREF : String; strName : String = '') : String;
-    Function H(strText : String; iLevel : Integer; AImage : TBADIImageIndex;
+    Function A(const strText, strHREF : String; const strName : String = '') : String;
+    Function H(const strText : String; iLevel : Integer; AImage : TBADIImageIndex;
       AScope : TScope) : String;
     Function IMG(AImageIndex : TBADIImageIndex; AScope : TScope) : String;
-    Function LI(strClass, strText : String) : String;
+    Function LI(const strClass, strText : String) : String;
     (**
       This property provides access to an array of documentation conflicts for
       all the modules.
@@ -116,7 +116,7 @@ Type
     **)
     Property SumDocCons[iIndex : Integer] : TSumDocCon Read GetSumDocCons;
   Public
-    Constructor Create(strOutputDirectory, strTitle : String); Override;
+    Constructor Create(const strOutputDirectory, strTitle : String); Override;
     Destructor Destroy; Override;
     Procedure OutputDocumentation; Override;
   End;
@@ -131,35 +131,36 @@ Uses
   {$IFNDEF D2007} GIFImage {$ELSE} GIFImg {$ENDIF},
   Controls,
   StrUtils,
-  BADI.GenericTokenizer;
+  BADI.Generic.Tokenizer, BADI.Options, BADI.ResourceStrings, BADI.Constants,
+  BADI.Module.Dispatcher, BADI.Functions;
 
 (**
 
-
   This method output anchor tags into the HTML information.
 
-
   @precon  None.
-
   @postcon Output anchor tags into the HTML information.
 
-
-  @param   strText as a String
-  @param   strHREF as a String
-  @param   strName as a String
+  @param   strText as a String as a constant
+  @param   strHREF as a String as a constant
+  @param   strName as a String as a constant
   @return  a String
 
 **)
-Function THTMLDocumentation.A(strText, strHREF : String;
-  strName : String = '') : String;
+Function THTMLDocumentation.A(const strText, strHREF : String;
+  const strName : String = '') : String;
+
+Var
+  strHREFText: String;
+  strNameText: String;
 
 Begin
-  strHREF := StringReplace(strHREF, #32, '', [rfReplaceAll]);
-  strName := StringReplace(strName, #32, '', [rfReplaceAll]);
-  If strHREF <> '' Then
-    Result := Format('<a href="%s">%s</a>', [strHREF, strText])
+  strHREFText := StringReplace(strHREF, #32, '', [rfReplaceAll]);
+  strNameText := StringReplace(strName, #32, '', [rfReplaceAll]);
+  If strHREFText <> '' Then
+    Result := Format('<a href="%s">%s</a>', [strHREFText, strText])
   Else
-    Result := Format('<a name="%s"></a>%s', [strName, strText]);
+    Result := Format('<a name="%s"></a>%s', [strNameText, strText]);
 End;
 
 (**
@@ -168,16 +169,16 @@ End;
   This is a constructor for the THTMLDocumentation class.
 
 
-  @precon  None. 
+  @precon  None.
 
-  @postcon Initialises the Special Tag string lists. 
+  @postcon Initialises the Special Tag string lists.
 
 
-  @param   strOutputDirectory as a String
-  @param   strTitle           as a String
+  @param   strOutputDirectory as a String as a constant
+  @param   strTitle           as a String as a constant
 
 **)
-constructor THTMLDocumentation.Create(strOutputDirectory, strTitle: String);
+constructor THTMLDocumentation.Create(const strOutputDirectory, strTitle: String);
 
 Var
   i : Integer;
@@ -187,10 +188,10 @@ begin
   FScopesToDocument := BrowseAndDocItOptions.ScopesToDocument + [scNone, scGlobal];
   FTitle := strTitle;
   FModuleSpecialTagNodes := TObjectList.Create(true);
-  For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
+  For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do //FI:W528
     FModuleSpecialTagNodes.Add(TStringList.Create);
   FSummarySpecialTagNodes := TObjectList.Create(true);
-  For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
+  For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do //FI:W528
     FSummarySpecialTagNodes.Add(TStringList.Create);
   FIndex := TStringList.Create;
   FErrors := TStringList.Create;
@@ -241,11 +242,11 @@ end;
   @precon  strToken is the link tag to be expanded.
   @postcon Returns an expanded HTML anchor tag.
 
-  @param   strToken as a String
+  @param   strToken as a String as a constant
   @return  a String
 
 **)
-Function THTMLDocumentation.ExpandLinkTag(strToken : String) : String;
+Function THTMLDocumentation.ExpandLinkTag(const strToken : String) : String;
 
   (**
 
@@ -257,63 +258,70 @@ Function THTMLDocumentation.ExpandLinkTag(strToken : String) : String;
              the label for the link. If null a label is derived from the HREF.
     @postcon Returns a formatted HTML hypertext reference.
 
-    @param   strHREF  as a String
-    @param   strLabel as a String
+    @param   strHREF  as a String as a constant
+    @param   strLabel as a String as a constant
     @return  a String
 
   **)
-  Function FormatTag(strHREF, strLabel : String) : String;
+  Function FormatTag(const strHREF, strLabel : String) : String;
 
   Var
     strModule : String;
     strSymbol : String;
     strSubSymbol : String;
     i : Integer;
+    strHREFText: String;
+    strLabelText: String;
 
   Begin
-    i := Pos('#', strHREF);
+    strHREFText := strHREF;
+    i := Pos('#', strHREFText);
     If i <> 0 Then
       Begin
-        strModule := Copy(strHREF, 1, i - 1);
-        Delete(strHREF, 1, i);
+        strModule := Copy(strHREFText, 1, i - 1);
+        Delete(strHREFText, 1, i);
       End Else
         strModule := ChangeFileExt(ExtractFileName(FCurrentModule.FileName), '.html');
-    i := Pos('.', strHREF);
+    i := Pos('.', strHREFText);
     If i <> 0 Then
       Begin
-        strSymbol := Copy(strHREF, 1, i - 1);
-        strSubSymbol := '.' + Copy(strHREF, i + 1, Length(strHREF) - i);
+        strSymbol := Copy(strHREFText, 1, i - 1);
+        strSubSymbol := '.' + Copy(strHREFText, i + 1, Length(strHREFText) - i);
       End Else
       Begin
-        strSymbol := strHREF;
+        strSymbol := strHREFText;
         strSubSymbol := '';
       End;
-    If strLabel = '' Then strLabel := strSymbol + strSubSymbol;
+    strLabelText := strLabel;
+    If strLabelText = '' Then
+      strLabelText := strSymbol + strSubSymbol;
     Result := Format('<a href="%s.html#%s%s">%s</a>', [strModule, strSymbol,
-      strSubSymbol, strLabel]);
+      strSubSymbol, strLabelText]);
   End;
 
 Var
   i : Integer;
   strHREF : String;
   strLabel : String;
+  strTokenText : String;
 
 Begin
   Result := strToken;
   If LowerCase(Copy(strToken, 1, 7)) <> '{@link ' Then
     Exit;
-  Delete(strToken, 1, 7);
-  Delete(strToken, Length(strToken), 1);
-  i := Pos(#32, strToken);
+  strTokenText := strToken;
+  Delete(strTokenText, 1, 7);
+  Delete(strTokenText, Length(strTokenText), 1);
+  i := Pos(#32, strTokenText);
   If i <> 0 Then
     Begin
-      strHREF := Copy(strToken, 1, i - 1);
-      strLabel := N(Copy(strToken, i + 1, Length(strToken) - i));
+      strHREF := Copy(strTokenText, 1, i - 1);
+      strLabel := N(Copy(strTokenText, i + 1, Length(strTokenText) - i));
     End Else
     Begin
-      strHREF := strToken;
-      If (Length(strToken) > 0) And (strToken[1] = '#') Then
-        Delete(strToken, 1, 1);
+      strHREF := strTokenText;
+      If (Length(strTokenText) > 0) And (strTokenText[1] = '#') Then
+        Delete(strTokenText, 1, 1);
       strLabel := '';
     End;
   Result := FormatTag(strHREF, strLabel);
@@ -391,21 +399,21 @@ end;
 (**
 
 
-  This method attempts to find the insert point in the doucmentation template. 
+  This method attempts to find the insert point in the doucmentation template.
 
 
-  @precon  slHTML must be a valid TStringList instance. 
+  @precon  slHTML must be a valid TStringList instance.
 
-  @postcon Return the index of the insert point line if found else returns -1. 
+  @postcon Return the index of the insert point line if found else returns -1.
 
 
   @param   slHTMLFile as a TStringList
-  @param   strText    as a String
+  @param   strText    as a String as a constant
   @return  an Integer
 
 **)
 Function THTMLDocumentation.FindInsertionPoint(slHTMLFile : TStringList;
-  strText : String) : Integer;
+  const strText : String) : Integer;
 
 ResourceString
   strInsertionPointNotFound = 'Insertion Point "%s" not found!';
@@ -709,10 +717,10 @@ end;
 
 
   @param   slHTMLFile as a TStringList
-  @param   strTitle as a String
+  @param   strTitle as a String as a constant
 
 **)
-Procedure THTMLDocumentation.GenerateHTML(slHTMLFile : TStringList; strTitle : String);
+Procedure THTMLDocumentation.GenerateHTML(slHTMLFile : TStringList; const strTitle : String);
 
 Begin
  slHTMLFile.Text := StringReplace(GetStringResource(
@@ -733,10 +741,10 @@ End;
            directory.
 
 
-  @param   strImageDirectory as a String
+  @param   strImageDirectory as a String as a constant
 
 **)
-Procedure THTMLDocumentation.GenerateImages(strImageDirectory : String);
+Procedure THTMLDocumentation.GenerateImages(const strImageDirectory : String);
 
 Var
   i : TBADIImageIndex;
@@ -1115,11 +1123,11 @@ end;
            windows resource.
 
 
-  @param   strName as a String
+  @param   strName as a String as a constant
   @return  a String 
 
 **)
-function THTMLDocumentation.GetStringResource(strName: String): String;
+function THTMLDocumentation.GetStringResource(const strName: String): String;
 
 Var
   Res: TResourceStream;
@@ -1174,14 +1182,14 @@ end;
   @postcon Returns a string representing a header tag. 
 
 
-  @param   strText as a String
+  @param   strText as a String as a constant
   @param   iLevel  as an Integer
   @param   AImage  as a TBADIImageIndex
   @param   AScope  as a TScope
-  @return  a String 
+  @return  a String
 
 **)
-function THTMLDocumentation.H(strText: String; iLevel: Integer;
+function THTMLDocumentation.H(const strText: String; iLevel: Integer;
   AImage : TBADIImageIndex; AScope : TScope): String;
 
 begin
@@ -1192,17 +1200,17 @@ end;
 (**
 
 
-  This method outputs an img tag with the image vertically aligned central. 
+  This method outputs an img tag with the image vertically aligned central.
 
 
-  @precon  None. 
+  @precon  None.
 
-  @postcon Outputs an img tag with the image vertically aligned central. 
+  @postcon Outputs an img tag with the image vertically aligned central.
 
 
   @param   AImageIndex as a TBADIImageIndex
   @param   AScope      as a TScope
-  @return  a String     
+  @return  a String
 
 **)
 function THTMLDocumentation.IMG(AImageIndex: TBADIImageIndex; AScope : TScope): String;
@@ -1230,20 +1238,20 @@ end;
 (**
 
 
-  This method returns a list item tag as a string. 
+  This method returns a list item tag as a string.
 
 
-  @precon  None. 
+  @precon  None.
 
-  @postcon Returns a list item tag as a string. 
+  @postcon Returns a list item tag as a string.
 
 
-  @param   strClass as a String
-  @param   strText  as a String
-  @return  a String  
+  @param   strClass as a String as a constant
+  @param   strText  as a String as a constant
+  @return  a String
 
 **)
-function THTMLDocumentation.LI(strClass, strText: String): String;
+function THTMLDocumentation.LI(const strClass, strText: String): String;
 begin
   Result := Format('<li class="%s">%s</li>', [strClass, strText]);
 end;
@@ -1251,12 +1259,12 @@ end;
 (**
 
 
-  This method outputs the comment text along with the tag information. 
+  This method outputs the comment text along with the tag information.
 
 
-  @precon  None. 
+  @precon  None.
 
-  @postcon Outputs the comment text along with the tag information. 
+  @postcon Outputs the comment text along with the tag information.
 
 
   @param   slContents   as a TStringList
@@ -1314,25 +1322,25 @@ end;
 (**
 
 
-  This method output the tree of information stored in the module recursively. 
+  This method output the tree of information stored in the module recursively.
 
 
-  @precon  slContents must be a valid indtance of a string list and Container 
+  @precon  slContents must be a valid indtance of a string list and Container
 
-           must ba a valid descendant of TElement Container. 
+           must ba a valid descendant of TElement Container.
 
-  @postcon Output the tree of information stored in the module recursively. 
+  @postcon Output the tree of information stored in the module recursively.
 
 
   @param   slContents        as a TStringList
   @param   Container         as a TElementContainer
   @param   iIndentLevel      as an Integer
-  @param   strContainerLabel as a String
+  @param   strContainerLabel as a String as a constant
 
 **)
 procedure THTMLDocumentation.OutputContainers(slContents: TStringList;
   Container: TElementContainer; iIndentLevel : Integer;
-  strContainerLabel : String);
+  const strContainerLabel : String);
 
 var
   i: Integer;
@@ -1516,13 +1524,13 @@ end;
 
 
   @param   slEWH           as a TStringList
-  @param   strSectionTitle as a String
-  @param   strLIType       as a String
+  @param   strSectionTitle as a String as a constant
+  @param   strLIType       as a String as a constant
   @param   AImageIndex     as a TBADIImageIndex
 
 **)
 procedure THTMLDocumentation.OutputErrorsWarningsAndHints(slEWH: TStringList;
-  strSectionTitle, strLIType : String; AImageIndex : TBADIImageIndex);
+  const strSectionTitle, strLIType : String; AImageIndex : TBADIImageIndex);
 
 var
   strModuleName: String;
@@ -1664,10 +1672,10 @@ end;
            generates documentation for that source code.
 
 
-  @param   strFileName as a String
+  @param   strFileName as a String as a constant
 
 **)
-Procedure THTMLDocumentation.OutputHTMLDocumentation(strFileName : String);
+Procedure THTMLDocumentation.OutputHTMLDocumentation(const strFileName : String);
 
 Const
   strSections : Array[1..4] Of String = (strErrors, strWarnings, strHints,
@@ -1751,11 +1759,11 @@ End;
   @postcon Parses the code and highlights it with syntax information.
 
 
-  @param   strText as a String
-  @return  a String 
+  @param   strText as a String as a constant
+  @return  a String
 
 **)
-function THTMLDocumentation.P(strText: String): String;
+function THTMLDocumentation.P(const strText: String): String;
 
 Var
   sl : TStringList;
@@ -1787,11 +1795,11 @@ end;
            invalid in HTML.
 
 
-  @param   strText as a String
+  @param   strText as a String as a constant
   @return  a String
 
 **)
-function THTMLDocumentation.N(strText : String): String;
+function THTMLDocumentation.N(const strText : String): String;
 
 Const
   strValidHTMLChars : Set of AnsiChar = ['a'..'z', 'A'..'Z', '0'..'9', #32, '.',
@@ -1822,10 +1830,10 @@ end;
   @postcon Initialises the class.
 
 
-  @param   strModule as a String
+  @param   strModule as a String as a constant
 
 **)
-constructor TSumDocCon.Create(strModule : String);
+constructor TSumDocCon.Create(const strModule : String);
 begin
   FModule := strModule;
   FConflicts := TStringList.Create;

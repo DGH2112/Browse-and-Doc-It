@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Feb 2017
+  @Date    19 Feb 2017
 
 **)
 Unit BADI.MethodDescriptionsFrame;
@@ -53,8 +53,8 @@ Implementation
 {$R *.dfm}
 
 Uses
-  BADI.BaseLanguageModule,
-  BADI.MethodDescriptionForm;
+  BADI.Base.Module,
+  BADI.MethodDescriptionForm, BADI.Options;
 
 { TfmBADIMethodDescriptionsFrame }
 

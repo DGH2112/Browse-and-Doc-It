@@ -4,10 +4,10 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    27 Aug 2016
+  @Date    19 Feb 2017
 
 **)
-Unit BADISpecialTagsFrame;
+Unit BADI.SpecialTagsFrame;
 
 Interface
 
@@ -26,7 +26,7 @@ Uses
   ComCtrls,
   ImageList,
   ImgList,
-  BADICustomOptionsFrame;
+  BADI.CustomOptionsFrame;
 
 Type
   (** This is a class to represent the frame interface. **)
@@ -65,8 +65,11 @@ Implementation
 
 
 Uses
-  BaseLanguageModule,
-  SpecialTagForm;
+  BADI.Base.Module,
+  BADI.SpecialTagForm,
+  BADI.Constants,
+  BADI.OptionsForm,
+  BADI.Options;
 
 ResourceString
   (** This is a message to be displayed when a tag is not valid **)
@@ -297,15 +300,15 @@ Var
 Begin
   lb := Control As TListBox;
   lb.Canvas.FillRect(Rect);
-  CheckedImages.Draw(lb.Canvas, 32, Rect.Top,
+  CheckedImages.Draw(lb.Canvas, 37, Rect.Top,
     Integer(lb.Items.Objects[Index]) And iShowInTree);
-  CheckedImages.Draw(lb.Canvas, 112, Rect.Top,
+  CheckedImages.Draw(lb.Canvas, 122, Rect.Top,
     (Integer(lb.Items.Objects[Index]) And iAutoExpand) Div 2);
-  CheckedImages.Draw(lb.Canvas, 192, Rect.Top,
+  CheckedImages.Draw(lb.Canvas, 207, Rect.Top,
     (Integer(lb.Items.Objects[Index]) And iShowinDoc) Div 3);
   iPos := Pos('=', lb.Items[Index]);
-  lb.Canvas.TextOut(Rect.Left + 246, Rect.Top, Copy(lb.Items[Index], 1, iPos - 1));
-  lb.Canvas.TextOut(Rect.Left + 346, Rect.Top, Copy(lb.Items[Index], iPos + 1,
+  lb.Canvas.TextOut(Rect.Left + 296, Rect.Top, Copy(lb.Items[Index], 1, iPos - 1));
+  lb.Canvas.TextOut(Rect.Left + 386, Rect.Top, Copy(lb.Items[Index], iPos + 1,
     Length(lb.Items[Index]) - iPos));
 End;
 
@@ -335,7 +338,7 @@ Begin
   iIndex := lbSpecialTags.ItemAtPos(Point(X, Y), True);
   If iIndex > - 1 Then
     Begin
-      If X In [32 .. 48] Then
+      If X In [37 .. 58] Then
         lbSpecialTags.Items.Objects[iIndex] := TObject(
           Integer(lbSpecialTags.Items.Objects[iIndex]) Xor iShowInTree);
       If X In [112 .. 128] Then

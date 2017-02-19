@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Feb 2017
+  @Date    19 Feb 2017
 
 **)
 Unit BADI.ModuleExlporerOpsFrame;
@@ -24,8 +24,9 @@ Uses
   StdCtrls,
   ComCtrls,
   ExtCtrls,
-  BADI.BaseLanguageModule,
-  BADI.CustomOptionsFrame;
+  BADI.Base.Module,
+  BADI.CustomOptionsFrame,
+  BADI.Types;
 
 Type
   (** This is a class which represents the frame interface. **)
@@ -78,6 +79,10 @@ Type
   End;
 
 Implementation
+
+uses
+  BADI.Constants,
+  BADI.Options;
 
 {$R *.dfm}
 

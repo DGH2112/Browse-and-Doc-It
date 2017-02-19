@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    12 Feb 2017
+  @Date    19 Feb 2017
   @Version 1.0
 
 **)
@@ -16,7 +16,12 @@ Uses
   SysUtils,
   Windows,
   Classes,
-  BADI.BaselanguageModule;
+  BADI.Base.Module,
+  BADI.ElementContainer,
+  BADI.Generic.FunctionDecl,
+  BADI.Comment.Tag,
+  BADI.Types,
+  BADI.Comment;
 
 Type
   {$INCLUDE 'CompilerDefinitions.inc'}
@@ -31,7 +36,7 @@ Type
   TRenderDocumentTree = Procedure(Module: TBaseLanguageModule) Of Object;
   (** This is a procedure to allow the thread to display an error message in
       the calling IDEs main thread. **)
-  TThreadExceptionMsg = Procedure(strExceptionMsg: String) Of Object;
+  TThreadExceptionMsg = Procedure(Const strExceptionMsg: String) Of Object;
 
   (** This is a class to manage thread used to parse code. Its main aim is
       to ensure that only 1 thread is active at a time and provide a mechanism
@@ -59,18 +64,18 @@ Type
     FLineEnd: String;
   End;
 
-Function FindFunction(iLine: Integer; Container: TElementContainer;
-  ContainerClass: TGenericFunctionClass): TGenericFunction;
-Function Description(Func: TGenericFunction; iIndent: Integer; boolPadOut: Boolean;
-  Var CursorAdjust: TPoint; iMaxCommentWidth: Integer): String;
-Function Indent(strText: String; iIndent: Integer): String;
-Function OutputTag(iIndent: Integer; Tag: TTag; iMaxCommentWidth: Integer): String;
-Function WriteComment(Func: TGenericFunction; CommentType: TCommentType; iIndent: Integer;
-  boolPadOut: Boolean; Var CursorDelta: TPoint; iMaxCommentWidth: Integer): String;
-Function FindIndentOfFirstTokenOnLine(Module: TBaseLanguageModule;
-  iLine: Integer): Integer;
-Function BuildBlockComment(CommentType: TCommentType; CommentStyle: TCommentStyle;
-  iIndent: Integer; strSelectedText: String): String;
+  Function FindFunction(iLine: Integer; Container: TElementContainer;
+    ContainerClass: TGenericFunctionClass): TGenericFunction;
+  Function Description(Func: TGenericFunction; iIndent: Integer; boolPadOut: Boolean;
+    Var CursorAdjust: TPoint; iMaxCommentWidth: Integer): String;
+  Function Indent(Const strText: String; iIndent: Integer): String;
+  Function OutputTag(iIndent: Integer; Tag: TTag; iMaxCommentWidth: Integer): String;
+  Function WriteComment(Func: TGenericFunction; CommentType: TCommentType; iIndent: Integer;
+    boolPadOut: Boolean; Var CursorDelta: TPoint; iMaxCommentWidth: Integer): String;
+  Function FindIndentOfFirstTokenOnLine(Module: TBaseLanguageModule;
+    iLine: Integer): Integer;
+  Function BuildBlockComment(CommentType: TCommentType; CommentStyle: TCommentStyle;
+    iIndent: Integer; Const strSelectedText: String): String;
 
 Const
   (** A simple array for outputting a or an. **)
@@ -102,7 +107,11 @@ Uses
   ExceptionLog7,
   EExceptionManager,
   {$ENDIF}
-  DGHLibrary;
+  DGHLibrary,
+  BADI.Options,
+  BADI.Functions,
+  //Test.BADI.Module.Dispatcher,
+  BADI.Module.Dispatcher;
 
 Type
   (** This class defines a thread in which the parsing of the code and
@@ -337,12 +346,12 @@ End;
   @precon  None.
   @postcon Returns an indented version of the passed text.
 
-  @param   strText as a String
+  @param   strText as a String as a Constant
   @param   iIndent as an Integer
   @return  a String
 
 **)
-Function Indent(strText: String; iIndent: Integer): String;
+Function Indent(Const strText: String; iIndent: Integer): String;
 
 Begin
   Result := StringOfChar(#32, iIndent) + StringReplace(strText, #13#10,
@@ -434,6 +443,7 @@ Var
   strReturnType: String;
 
 Begin
+  Result := '';
   CursorDelta.X := 0;
   CursorDelta.Y := 0;
   boolExtraLine := False;
@@ -714,7 +724,7 @@ Begin
       FModule.Free;
     End;
   Except
-    On E: EParserAbort Do
+    On E: EBADIParserAbort Do
       Exit;
     On E: Exception Do
       Begin
@@ -767,6 +777,8 @@ Begin
     RaiseException($406D1388, 0, sizeof(ThreadNameInfo) Div sizeof(LongWord),
       @ThreadNameInfo);
   Except
+    On E : Exception Do
+      OutputDebugString('Could not set Browse and Doc It thread name!');
   End;
 End;
 
@@ -802,12 +814,12 @@ End;
   @param   CommentType     as a TCommentType
   @param   CommentStyle    as a TCommentStyle
   @param   iIndent         as an Integer
-  @param   strSelectedText as a String
+  @param   strSelectedText as a String as a Constant
   @return  a String
 
 **)
 Function BuildBlockComment(CommentType: TCommentType; CommentStyle: TCommentStyle;
-  iIndent: Integer; strSelectedText: String): String;
+  iIndent: Integer; Const strSelectedText: String): String;
 
 Var
   strAllCmtStart, strBlockCmtEnd, strLineCmtEnd: String;

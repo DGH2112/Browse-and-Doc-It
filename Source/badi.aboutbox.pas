@@ -4,14 +4,14 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    30 Sep 2016
+  @Date    19 Feb 2017
 
 **)
-Unit BADIAboutBox;
+Unit BADI.AboutBox;
 
 Interface
 
-{$INCLUDE ..\..\..\Library\CompilerDefinitions.inc}
+{$INCLUDE CompilerDefinitions.inc}
 
   Procedure AddAboutBoxEntry;
   Procedure RemoveAboutBoxEntry;
@@ -22,7 +22,7 @@ Uses
   ToolsAPI,
   SysUtils,
   Windows,
-  BADICommon,
+  BADI.Common,
   Forms;
 
 {$IFDEF D2005}

@@ -5,19 +5,33 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Jul 2016
+  @Date    19 Feb 2017
 
 **)
-unit ProfilingForm;
+unit BADI.ProfilingForm;
 
 interface
 
-{$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
+{$INCLUDE 'CompilerDefinitions.inc'}
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, VirtualTrees, BaseLanguageModule, ImgList, Contnrs,
-  ExtCtrls, System.ImageList;
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  Buttons,
+  VirtualTrees,
+  BADI.Base.Module,
+  ImgList,
+  Contnrs,
+  ExtCtrls,
+  System.ImageList, BADI.ElementContainer;
 
 type
   (** An enumerate to define if the profile job is an insertion or a removal. **)
@@ -35,7 +49,7 @@ type
     FIndent    : Integer;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(strMethod : String; CodeType : TProfileCodeType;
+    Constructor Create(Const strMethod : String; CodeType : TProfileCodeType;
       iStartLine, iEndLine, iIndent : Integer);
     (**
       This property get the Method Name of the profile job.
@@ -84,7 +98,7 @@ type
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    Procedure Add(strMethod : String; CodeType : TProfileCodeType;
+    Procedure Add(Const strMethod : String; CodeType : TProfileCodeType;
       iStartLine, iEndLine, iIndent : Integer);
     (**
       This property returns the number of Profile Jobs in the collection.
@@ -144,7 +158,11 @@ type
 implementation
 
 Uses
-  ToolsAPIUtils, PascalModule, IniFiles, dghlibrary;
+  BADI.ToolsAPIUtils,
+  BADI.Pascal.Module,
+  IniFiles,
+  dghlibrary, BADI.Generic.FunctionDecl, BADI.ResourceStrings, BADI.Constants, BADI.Options,
+  BADI.Types;
 
 Type
   (** This is a record to describe the data stored in the virtual tree view. **)
@@ -268,7 +286,7 @@ End;
 procedure TfrmProfiling.FormCreate(Sender: TObject);
 
 Type
-  T = BaseLanguageModule.TBADIImageIndex;
+  T = TBADIImageIndex;
 
 Var
   i : T;
@@ -504,7 +522,7 @@ end;
   @param   Node     as a PVirtualNode
   @param   Column   as a TColumnIndex
   @param   TextType as a TVSTTextType
-  @param   CellText as a WideString as a reference
+  @param   CellText as a String as a reference
 
 **)
 procedure TfrmProfiling.vstMethodsGetText(Sender: TBaseVirtualTree;
@@ -543,14 +561,14 @@ end;
   @precon  None.
   @postcon Creates an instance of a TProfileJob class.
 
-  @param   strMethod  as a String
+  @param   strMethod  as a String as a constant
   @param   CodeType   as a TProfileCodeType
   @param   iStartLine as an Integer
   @param   iEndLine   as an Integer
   @param   iIndent    as an Integer
 
 **)
-constructor TProfileJob.Create(strMethod: String; CodeType: TProfileCodeType;
+constructor TProfileJob.Create(Const strMethod: String; CodeType: TProfileCodeType;
   iStartLine, iEndLine, iIndent: Integer);
 begin
   FMethod := strMethod;
@@ -588,14 +606,14 @@ End;
   @precon  None.
   @postcon Adds a profile job to the collection.
 
-  @param   strMethod  as a String
+  @param   strMethod  as a String as a constant
   @param   CodeType   as a TProfileCodeType
   @param   iStartLine as an Integer
   @param   iEndLine   as an Integer
   @param   iIndent    as an Integer
 
 **)
-procedure TProfileJobs.Add(strMethod: String; CodeType: TProfileCodeType;
+procedure TProfileJobs.Add(Const strMethod: String; CodeType: TProfileCodeType;
   iStartLine, iEndLine, iIndent: Integer);
 begin
   FProfileJobs.Add(TProfileJob.Create(strMethod, CodeType, iStartLine, iEndLine,

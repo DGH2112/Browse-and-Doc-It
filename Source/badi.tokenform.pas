@@ -3,7 +3,7 @@
   This is a debug form for displaying the tokens and their information.
 
   @version      1.0
-  @date         12 Feb 2017
+  @date         19 Feb 2017
   @author       David Hoyle
 
 **)
@@ -22,7 +22,7 @@ uses
   Dialogs,
   StdCtrls,
   ComCtrls,
-  BADI.BaseLanguageModule;
+  BADI.Base.Module;
 
 type
   (** This class represents a forms for inspecting the token in a module. **)
@@ -41,7 +41,7 @@ type
 implementation
 
 Uses
-  ProgressForm;
+  ProgressForm, BADI.Types, BADI.Options, BADI.Constants;
 
 {$R *.DFM}
 

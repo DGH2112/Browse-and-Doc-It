@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       30 Sep 2016
+  @Date       24 Feb 2017
   @Author     David Hoyle
 
   @grammar    For the grammar to this parser pleaser see the "Object Pascal Grammar.bnf".
@@ -13,7 +13,7 @@
               two functions Defined() and Declared().
 
 **)
-Unit PascalModule;
+Unit BADI.Pascal.Module;
 
 Interface
 
@@ -22,603 +22,25 @@ Uses
   Windows,
   Contnrs,
   Classes,
-  BaseLanguageModule;
+  BADI.Base.Module,
+  BADI.ElementContainer,
+  BADI.Types,
+  BADI.Pascal.MethodDecl,
+  BADI.Pascal.TypeDecl,
+  BADI.Generic.TypeDecl,
+  BADI.Pascal.RecordDecl,
+  BADI.Generic.FunctionDecl,
+  BADI.Pascal.ObjectDecl,
+  BADI.Pascal.ClassDecl,
+  BADI.Pascal.PropertyDecl,
+  BADI.Pascal.InterfaceDecl,
+  BADI.Comment,
+  BADI.TokenInfo, BADI.Pascal.Types;
 
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  (** A pascal specific implementation of comments. **)
-  TPascalComment = Class(TComment)
-  Public
-    Class Function CreateComment(strComment: String; iLine,
-      iCol: Integer): TComment; Override;
-  End;
-
-  (** This is an enumerate to describe the type of constant expression. **)
-  TExprType = (etUnknown, etConstExpr, etString, etInteger, etFloat);
-  (** This is a set of TExprType enumerates. **)
-  TExprTypes = Set of TExprType;
-
-  (** This class represents a list of identifiers **)
-  TIdentList = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-  End;
-
-  (** This class represents a temporary list / collection **)
-  TTempCntr = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-  End;
-
-  (** This is a sub class for general type types **)
-  TTypes = Class(TGenericTypeDecl)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FIsTyped : Boolean;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    (**
-      This property determines whether the type is typed or not.
-      @precon  None.
-      @postcon Gets or sets whether the type is typed (preceeded by TYPE);
-      @return  a Boolean
-    **)
-    Property IsTyped : Boolean Read FIsTyped Write FIsTyped;
-  End;
-
-  (** This is a sub class for restricted type types **)
-  TRestrictedType = Class(TTypes);
-
-  (** This is a sub class for typeid types **)
-  TTypeID = Class(TTypes);
-  (** This is a sub class for Simple Type types **)
-  TSimpleType = Class(TTypes);
-  (** This is a sub class for Structured Type types **)
-  TStrucType = Class(TTypes);
-  (** This is a sub class for String types **)
-  TStringType = Class(TTypes);
-  (** This is a sub class for Procedure types **)
-  TProcedureType = Class(TTypes);
-  (** This is a sub class for Anonymous Method types **)
-  TAnonymousReferenceType = Class(TTypes)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-  End;
-  (** This is a sub class for Variant types **)
-  TVariantType = Class(TTypes);
-  (** This is a sub class for Class Ref types **)
-  TClassRefType = Class(TTypes);
-
-  (** This is a sub class for Ordinal types **)
-  TOrdinalType = Class(TSimpleType);
-  (** This is a sub class for Real types **)
-  TRealType = Class(TSimpleType);
-
-  (** This is a sub class for the Real48 type. **)
-  TReal48 = Class(TRealType);
-  (** This is a sub class for the Real type. **)
-  TReal = Class(TRealType);
-  (** This is a sub class for the Single type. **)
-  TSingle = Class(TRealType);
-  (** This is a sub class for the Double type. **)
-  TDouble = Class(TRealType);
-  (** This is a sub class for the Extended type. **)
-  TExtended = Class(TRealType);
-  (** This is a sub class for the Currency type. **)
-  TCurrency = Class(TRealType);
-  (** This is a sub class for the Complex type. **)
-  TComp = Class(TRealType);
-
-  (** This is a sub class for the SubRange type. **)
-  TSubRangeType = Class(TOrdinalType);
-  (** This is a sub class for the Enumerate type. **)
-  TEnumerateType = Class(TOrdinalType);
-  (** This is a sub class for the OrdIdent type. **)
-  TOrdIdent = Class(TOrdinalType);
-
-  (** This is a sub class for the ShortInt type. **)
-  TShortInt = Class(TOrdIdent);
-  (** This is a sub class for the SmallInt type. **)
-  TSmallInt = Class(TOrdIdent);
-  (** This is a sub class for the Integer type. **)
-  TInteger = Class(TOrdIdent);
-  (** This is a sub class for the Byte type. **)
-  TByte = Class(TOrdIdent);
-  (** This is a sub class for the LongInt type. **)
-  TLongInt = Class(TOrdIdent);
-  (** This is a sub class for the Int64 type. **)
-  TInt64 = Class(TOrdIdent);
-  (** This is a sub class for the Word type. **)
-  TWord = Class(TOrdIdent);
-  (** This is a sub class for the Boolean type. **)
-  TBoolean = Class(TOrdIdent);
-  (** This is a sub class for the Char type. **)
-  TChar = Class(TOrdIdent);
-  (** This is a sub class for the WideChar type. **)
-  TWideChar = Class(TOrdIdent);
-  (** This is a sub class for the LongWord type. **)
-  TLongWord = Class(TOrdIdent);
-  (** This is a sub class for the PChar type. **)
-  TPChar = Class(TOrdIdent);
-
-  (** This is a sub class for the Variant type. **)
-  TVariant = Class(TVariantType);
-  (** This is a sub class for the OLEVariant type. **)
-  TOLEVariant = Class(TVariantType);
-
-  (** This is a sub class for the String type. **)
-  TString = Class(TStringType);
-  (** This is a sub class for the AnsiString type. **)
-  TAnsiString = Class(TStringType);
-  (** This is a sub class for the WideString type. **)
-  TWideString = Class(TStringType);
-  (** This is a sub class for the ShortString type. **)
-  TShortString = Class(TStringType);
-
-  (** This is a sub class for Array types **)
-  TArrayType = Class(TStrucType)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FDimensions : Integer;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Procedure AddDimension;
-    (**
-      This property defines the number of dmiensions that the array contains.
-      @precon  None.
-      @postcon Returns the number of dimension that the array contains.
-      @return  an Integer
-    **)
-    Property Dimensions : Integer Read FDimensions;
-  End;
-
-  (** This is a sub class for Set types **)
-  TSetType = Class(TStrucType);
-  (** This is a sub class for File types **)
-  TFileType = Class(TStrucType);
-  (** This is a sub class for Pointer types **)
-  TPointerType = Class(TTypes);
-
-  (** This is a class that represents a record definition. **)
-  TRecordDecl = Class(TRestrictedType)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FPacked       : Boolean;
-    FFieldsLabel  : TLabelContainer;
-    FHeritage     : TIdentList;
-    FHelper       : Boolean;
-    FHelperClass  : String;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; iImageIndex : TBADIImageIndex; AComment : TComment); Override;
-    Destructor Destroy; Override;
-    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
-    Function  AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Function  ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
-    (**
-      Returns whether the record is packed or not.
-      @precon  None.
-      @postcon Returns whether the record is packed or not.
-      @return  a Boolean
-    **)
-    Property IsPacked : Boolean Read FPacked Write FPacked;
-    (**
-      This property caches the fields label IF it exists.
-      @precon  None.
-      @postcon Returns the reference to the fields label.
-      @return  a TLabelContainer
-    **)
-    Property FieldsLabel : TLabelContainer Read FFieldsLabel Write FFieldsLabel;
-    (**
-      Returns a reference to the object class heritage.
-      @precon  None.
-      @postcon Returns a reference to the object class heritage.
-      @return  a TIdentList
-     **)
-    Property Heritage : TIdentList Read FHeritage;
-    (**
-      This property gets or sets whether the class is a helper class.
-      @precon  None.
-      @postcon Gets or sets whether the class is a helper class.
-      @return  a Boolean
-    **)
-    Property HelperClass : Boolean Read FHelper Write FHelper;
-    (**
-      This property gets or sets the class name of the class to be helped.
-      @precon  None.
-      @postcon Gets or sets the class name of the class to be helped.
-      @return  a String
-    **)
-    Property HelperClassName : String Read FHelperClass Write FHelperClass;
-  End;
-
-  (** A class to represent a Object Pascal Parameter. **)
-  TPascalParameter = Class(TGenericParameter)
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-  End;
-
-  TObjectDecl = Class;
-
-  (** This is a class that defines method within Object Pascal code. **)
-  TPascalMethod = Class(TGenericMethodDecl)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FDirectives           : TStringList;
-    FResolved             : Boolean;
-    FRecObjClsInt         : TRecordDecl;
-    FTypesLabel           : TLabelContainer;
-    FVariablesLabel       : TLabelContainer;
-    FConstantsLabel       : TLabelContainer;
-    FResourceStringsLabel : TLabelContainer;
-    FLabelsLabel          : TLabelContainer;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function GetName : String; Override;
-  Public
-    Constructor Create(MethodType : TMethodType; strName : String; AScope : TScope;
-      iLine, iCol : Integer); Override;
-    Destructor Destroy; Override;
-    Procedure AddDirectives(strDirective : String);
-    Function HasDirective(strDirective : String) : Boolean;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
-    (**
-      Returns the string list of directives associated with the method.
-      @precon  None.
-      @postcon Returns the string list of directives associated with the method.
-      @return  a TStringList
-    **)
-    Property Directives : TStringList Read FDirectives;
-    (**
-      This property returns whether the method is resovled forward or not.
-      @precon  None.
-      @postcon Returns whether the method is resovled forward or not.
-      @return  a Boolean
-    **)
-    Property Resolved : Boolean Read FResolved Write FResolved;
-    (**
-      This property returns the record/object/class that the method belongs to.
-      @precon  None.
-      @postcon Returns the record/object/class that the method belongs to.
-      @return  a TRecordDecl
-    **)
-    Property RecObjClsInt : TRecordDecl Read FRecObjClsInt Write FRecObjClsInt;
-    (**
-      This property gets or sets the types label for the module.
-      @precon  None.
-      @postcon Gets or sets the types label for the module.
-      @return  a TLabelContainer
-    **)
-    Property TypesLabel  : TLabelContainer Read FTypesLabel Write FTypesLabel;
-    (**
-      This property gets or sets the Variables label for the module.
-      @precon  None.
-      @postcon Gets or sets the Variables label for the module.
-      @return  a TLabelContainer
-    **)
-    Property VariablesLabel : TLabelContainer Read FVariablesLabel
-      Write FVariablesLabel;
-    (**
-      This property gets or sets the Constants label for the module.
-      @precon  None.
-      @postcon Gets or sets the Constants label for the module.
-      @return  a TLabelContainer
-    **)
-    Property ConstantsLabel : TLabelContainer Read FConstantsLabel
-      Write FConstantsLabel;
-    (**
-      This property gets or sets the Resource Strings label for the module.
-      @precon  None.
-      @postcon Gets or sets the Resource Strings label  for the module.
-      @return  a TLabelContainer
-    **)
-    Property ResourceStringsLabel : TLabelContainer Read FResourceStringsLabel
-      Write FResourceStringsLabel;
-    (**
-      This property gets or sets the Labels label for the module.
-      @precon  None.
-      @postcon Gets or sets the Labels label for the module.
-      @return  a TLabelContainer
-    **)
-    Property LabelsLabel : TLabelContainer Read FLabelsLabel Write FLabelsLabel;
-  End;
-
-  (** This is a class that defines properties with Object Pascal code. **)
-  TPascalProperty = Class(TGenericProperty)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FIndexSpec : String;
-    FWriteSpec: String;
-    FImplementsSpec: TIdentList;
-    FStoredSpec: String;
-    FDefaultSpec: String;
-    FReadSpec: String;
-    FDefaultProperty: Boolean;
-    FDispIDSpec: String;
-    FReadOnlySpec: Boolean;
-    FWriteOnlySpec: Boolean;
-    FIsClassProperty : Boolean;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function GetName : String; Override;
-  Public
-    Constructor Create(strIdent: String; AScope: TScope; iLine, iCol : Integer;
-      AImageIndex : TBADIImageIndex; AComment : TComment); Override;
-    Destructor Destroy; Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    (**
-      Returns the
-      @precon  None.
-      @postcon Returns the
-      @return  a String
-    **)
-    Property IndexSpec : String Read FIndexSpec Write FIndexSpec;
-    (**
-      Returns the properties Read specification.
-      @precon  None.
-      @postcon Returns the properties Read specification.
-      @return  a String
-    **)
-    Property ReadSpec : String Read FReadSpec Write FReadSpec;
-    (**
-      Returns the properties write specification.
-      @precon  None.
-      @postcon Returns the properties write specification.
-      @return  a String
-    **)
-    Property WriteSpec : String Read FWriteSpec Write FWriteSpec;
-    (**
-      Returns the properties Stored specification.
-      @precon  None.
-      @postcon Returns the properties Stored specification.
-      @return  a String
-    **)
-    Property StoredSpec : String Read FStoredSpec Write FStoredSpec;
-    (**
-      Returns the property default value.
-      @precon  None.
-      @postcon Returns the property default value.
-      @return  a String
-    **)
-    Property DefaultSpec : String Read FDefaultSpec Write FDefaultSpec;
-    (**
-      Returns whether this property is the classes / interfaces default
-      @precon  None.
-      @postcon Returns whether this property is the classes / interfaces default
-      property.
-      @return  a Boolean
-    **)
-    Property DefaultProperty : Boolean Read FDefaultProperty Write FDefaultProperty;
-    (**
-      Returns the implements specification for the property.
-      @precon  None.
-      @postcon Returns the implements specification for the property.
-      @return  a TIdentList
-    **)
-    Property ImplementsSpec : TIdentList Read FImplementsSpec Write FImplementsSpec;
-    (**
-      Returns the properties DispID reference.
-      @precon  None.
-      @postcon Returns the properties DispID reference.
-      @return  a String
-    **)
-    Property DispIdSpec : String Read FDispIDSpec Write FDispIDSpec;
-    (**
-      Returns whether the property has a ReadOnly specification.
-      @precon  None.
-      @postcon Returns whether the property has a ReadOnly specification.
-      @return  a Boolean
-    **)
-    Property ReadOnlySpec : Boolean Read FReadOnlySpec Write FReadOnlySpec;
-    (**
-      Returns whether the property has a WriteOnly specification.
-      @precon  None.
-      @postcon Returns whether the property has a WriteOnly specification.
-      @return  a Boolean
-    **)
-    Property WriteOnlySpec : Boolean Read FWriteOnlySpec Write FWriteOnlySpec;
-    (**
-      Returns whether the property has a class prefix.
-      @precon  None.
-      @postcon gets or sets the property.
-      @return  a Boolean
-    **)
-    Property IsClassProperty : Boolean Read FIsClassProperty Write FIsClassProperty;
-  End;
-
-  (** This class defines a property specifier. **)
-  TPropertySpec = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-  End;
-
-  (** This is a class the extends the record definition to handle an object
-  definition **)
-  TObjectDecl = Class(TRecordDecl)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    procedure CheckDocumentation(var boolCascade : Boolean); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
-  End;
-
-  (** This is a class the extends the object definition to handle an class
-  definition **)
-  TClassDecl = Class(TObjectDecl)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FAbstractClass: Boolean;
-    FSealedClass  : Boolean;
-    FHelper       : Boolean;
-    FHelperClass  : String;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
-    (**
-      This property defined whether the class is abstract or not.
-      @precon  None.
-      @postcon None.
-      @return  a Boolean
-    **)
-    Property AbstractClass : Boolean Read FAbstractClass Write FAbstractClass;
-    (**
-      This property defines whether the class is sealed or not.
-      @precon  None.
-      @postcon None.
-      @return  a Boolean
-    **)
-    Property SealedClass : Boolean Read FSealedClass Write FSealedClass;
-    (**
-      This property gets or sets whether the class is a helper class.
-      @precon  None.
-      @postcon Gets or sets whether the class is a helper class.
-      @return  a Boolean
-    **)
-    Property HelperClass : Boolean Read FHelper Write FHelper;
-    (**
-      This property gets or sets the class name of the class to be helped.
-      @precon  None.
-      @postcon Gets or sets the class name of the class to be helped.
-      @return  a String
-    **)
-    Property HelperClassName : String Read FHelperClass Write FHelperClass;
-  End;
-
-  (** This is a class the extends the class definition to handle an interface
-  definition **)
-  TInterfaceDecl = Class(TClassDecl)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FGUID : String;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    procedure CheckDocumentation(var boolCascade : Boolean); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    (**
-      Returns the GUID for the interface.
-      @precon  None.
-      @postcon Returns the GUID for the interface.
-      @return  a String
-    **)
-    Property GUID : String Read FGUID Write FGUID;
-  End;
-
-  (** This is a class the extends the class definition to handle an interface
-  definition **)
-  TDispInterfaceDecl = Class(TInterfaceDecl)
-  {$IFDEF D2005} Strict {$ENDIF} private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    procedure CheckDocumentation(var boolCascade : Boolean); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-  End;
-
-  (** This is a sub class for all constants. **)
-  TConstant = Class(TGenericConstant)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FTyped : Boolean;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    (**
-      This property determines it the constant is typed or simple.
-      @precon  None.
-      @postcon Sets or gets whether the constant is typed or simple.
-      @return  a Boolean
-    **)
-    Property Typed : Boolean Read FTyped Write FTyped;
-  End;
-
-  (** This is a sub class for all resource strings. **)
-  TResourceString = Class(TConstant)
-  Public
-    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
-  End;
-
-  (** This is a sub class for all variables. **)
-  TVar = Class(TGenericVariable)
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-  End;
-  (** This is a sub class for all thread variables. **)
-  TThreadVar = Class(TVar)
-  Public
-    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
-  End;
-
-  (** This class presents a field in a record, object, or class. **)
-  TField = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
-  End;
-
-  (** This class represents an exported method. **)
-  TExportsItem = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FResolved : Boolean;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    (**
-      This property gets and sets whether the symbol is resolved.
-      @precon  None.
-      @postcon Gets and sets whether the symbol is resolved.
-      @return  a Boolean
-    **)
-    Property Resolved : Boolean Read FResolved Write FResolved;
-  End;
-
-  (** A class to represent the initialization section **)
-  TInitializationSection = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
-  End;
-
-  (** A class to represent the finalization section **)
-  TFinalizationSection = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Procedure CheckDocumentation(var boolCascade : Boolean); Override;
-  End;
-
-  (** This is a record to represent the token information for type declaration. **)
-  TTypeToken = Record
-    FIdentifier  : String;
-    FLine        : Integer;
-    FColumn      : Integer;
-    FScope       : TScope;
-    FComment     : TComment;
-    FContainer   : TElementContainer;
-  End;
-
-  (** An enumerate for the types of reference changes that can be done. **)
-  TRefType = (rtFields, rtVariables, rtConstants, rtResourceStrings, rtTypes,
-    rtClassVars);
-  (** A set of reference checks that need to be undertaken. **)
-  TRefTypes = Set of TRefType;
-
-  (** This is a set of permissible method which are allowed on a record, object, class,
-      or interface. **)
-  TPermissibleMethods = Set Of TMethodType;
+  //: @debug TObjectDecl = Class;
 
   (**
 
@@ -708,15 +130,15 @@ Type
     Function  VarDecl(AScope : TScope; VarSection : TElementContainer;
       AImageIndex : TBADIImageIndex) : Boolean;
     Function  ThreadVarDecl(AScope : TScope; VarSection : TElementContainer) : Boolean;
-    Procedure Expression(C : TElementContainer; var ExprType : TExprTypes);
-    Procedure SimpleExpression(C : TElementContainer; var ExprType : TExprTypes);
-    Procedure Term(C : TElementContainer; var ExprType : TExprTypes);
-    Procedure Factor(C : TElementContainer; var ExprType : TExprTypes);
-    Function  RelOp(C : TElementContainer; ExprType : TExprTypes) : Boolean;
+    Procedure Expression(C : TElementContainer; var ExprType : TPascalExprTypes);
+    Procedure SimpleExpression(C : TElementContainer; var ExprType : TPascalExprTypes);
+    Procedure Term(C : TElementContainer; var ExprType : TPascalExprTypes);
+    Procedure Factor(C : TElementContainer; var ExprType : TPascalExprTypes);
+    Function  RelOp(C : TElementContainer; ExprType : TPascalExprTypes) : Boolean;
     Function  AddOp(C : TElementContainer) : Boolean;
-    Function  MulOp(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
-    Function  Designator(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
-    Procedure DesignatorSubElement(C : TElementContainer; var ExprType : TExprTypes;
+    Function  MulOp(C : TElementContainer; var ExprType : TPascalExprTypes) : Boolean;
+    Function  Designator(C : TElementContainer; var ExprType : TPascalExprTypes) : Boolean;
+    Procedure DesignatorSubElement(C : TElementContainer; var ExprType : TPascalExprTypes;
       strValidSymbols : Array of String);
     Function  SetConstructor(C : TElementContainer) : Boolean;
     Procedure SetElement(C : TElementContainer);
@@ -798,7 +220,7 @@ Type
     Procedure IdentList(Container : TElementContainer; SeekTokens : Array Of String;
       iImageIndex : TBADIImageIndex = iiNone);
     Function  TypeId(Container: TElementContainer) : Boolean;
-    Function  ConstExpr(Container: TElementContainer; var ExprType : TExprTypes) : Boolean;
+    Function  ConstExpr(Container: TElementContainer; var ExprType : TPascalExprTypes) : Boolean;
     Procedure RTTIAttributes;
     Procedure AttributeDeclaration;
     Procedure TypeParams(var strIdentifier : String);
@@ -819,7 +241,7 @@ Type
     procedure ArrayElement(C : TElementContainer; iStartDimension: Integer; AT : TArrayType);
     Function  CheckReturnValue(Method : TGenericFunction) : Boolean;
     Procedure CheckAlias(Method : TPascalMethod);
-    Function  CheckNumberType(ExprType : TExprTypes) : Boolean;
+    Function  CheckNumberType(ExprType : TPascalExprTypes) : Boolean;
     Procedure UpdateTypeToken(var AToken : TTypeToken); {$IFDEF D2005} InLine; {$ENDIF}
     Procedure AddToContainer(Container : TElementContainer; var Method : TPascalMethod);
     Procedure TidyUpEmptyElements;
@@ -856,7 +278,7 @@ Type
     **)
     Property ModuleType : TModuleType Read FModuleType Write FModuleType;
   Public
-    Constructor CreateParser(Source : String; strFileName : String;
+    Constructor CreateParser(const Source, strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
@@ -870,1246 +292,24 @@ Type
 Implementation
 
 Uses
-  DGHLibrary;
-
-Resourcestring
-  (** This is an error message for rendering a temporay container - SHOULDN'T do this **)
-  strTriedToRenderTmpCntr = 'Tried to Render a Temporary Container!';
-  (** This is an error message for duplicate identifiers. **)
-  strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found at line %d column %d.';
-  (** This is an error message for an invalid operator name. **)
-  strInvalidOperator = 'Invalid operator ''%s'' at line %d column %d.';
-  (** This is an error message for method which is not permissible in a record, object,
-      class or interface **)
-  strMethodNotPermitted = 'The method "%s" is not permitted in this context at line %d column %d.';
-
-Const
-  (** A set of characters for alpha characaters **)
-  strTokenChars : Set Of AnsiChar = ['#', '_', 'a'..'z', 'A'..'Z'];
-  (** A set of numbers **)
-  strNumbers : Set Of AnsiChar = ['$', '0'..'9'];
-  (** A set of characters for general symbols **)
-  strSymbols : Set Of AnsiChar = ['&', '(', ')', '*', '+', ',', '-', '.', '/', ':',
-    ';', '<', '=', '>', '@', '[', ']', '^'];
-  (** A set of characters for quotes **)
-  strQuote : Set Of AnsiChar = [''''];
-  (** A string representing the Array Of parameter type. **)
-  strArrayOf : Array[False..True] Of String = ('', 'Array Of ');
-  (** A string represetnation of whether a type is typed. **)
-  strIsTyped : Array[False..True] Of String = ('', ' Type');
-
-  (**
-    A sorted list of keywords. Used for identifying tokens as keyword.
-
-    This key words nil and string have been disables as there are used like
-    identifiers and as types.
-
-  **)
-  strReservedWords : Array[0..73] Of String = (
-    'and', 'array', 'as', 'asm', 'begin', 'case', 'class', 'const',
-    'constructor', 'destructor', 'dispinterface', 'div', 'do', 'downto', 'else',
-    'end', 'except', 'exports', 'file', 'finalization', 'finally', 'for',
-    'function', 'goto', 'if', 'implementation', 'in', 'inherited',
-    'initialization', 'inline', 'interface', 'is', 'label', 'library', 'mod',
-    'nil', 'not', 'object', 'of', 'on', 'or', 'out', 'packed',
-    'private', 'procedure', 'program', 'property', 'protected', 'public', 'published',
-    'raise', 'record', 'reference', 'repeat',
-    'resourcestring', 'sealed', 'set', 'shl', 'shr', 'strict', 'string',
-    'then', 'threadvar', 'to', 'try', 'type', 'unit', 'unsafe', 'until', 'uses',
-    'var', 'while', 'with', 'xor'
-  );
-  (** A list of reserved words which are allows to be used as identifiers. **)
-  strIdentifierReservedWords : Array[0..4] Of String = (
-    'on', 'out', { 'private', 'protected', 'public', 'published', } 'reference', 'sealed',
-    { 'strict', } 'unsafe'
-  );
-  (** A sorted list of directives. Used for identifying tokens as
-  directives. **)
-  strDirectives : Array[0..44] Of String = (
-    'absolute', 'abstract', 'assembler', 'automated', 'cdecl', 'contains',
-    'default', 'deprecated', 'dispid', 'dynamic', 'export', 'external', 'far',
-    'final', 'forward', 'helper', 'implements', 'index', 'inline', 'library', 'local',
-    'message', 'name', 'near', 'nodefault', 'operator', 'overload', 'override', 'package',
-    'pascal', 'platform', 'read',
-    'readonly', 'register', 'reintroduce', 'requires', 'resident', 'safecall',
-    'static', 'stdcall', 'stored', 'varargs', 'virtual', 'write', 'writeonly'
-  );
-
-  (** A list of string representing the types of modules. **)
-  strModuleTypes : Array[mtProgram..mtUnit] Of String = ('Program', 'Package',
-    'Library', 'Unit');
-  (** A list of strings representing the stricted scope types. **)
-  strStrictedScope : Array[scPrivate..scProtected] Of String = ('private',
-    'protected');
-  (** A list of strings representing the scope types. **)
-  strScope : Array[scGlobal..scPublished] Of String = ('global', 'local',
-    'private', 'protected', 'public', 'published');
-  (** A sorted list of method directives. Used in identifying method
-  directives. **)
-  strMethodDirectives : Array[1..24] Of String = (
-    'abstract', 'assembler', 'cdecl', 'dispid', 'dynamic', 'export',
-    'external', 'far', 'final', 'forward',  'inline', 'local', 'message',
-    'near', 'overload', 'override', 'pascal', 'register', 'reintroduce',
-    'safecall', 'static', 'stdcall',  'varargs', 'virtual'
-  );
-  (** A list of real types. **)
-  strRealTypes : Array[1..7] Of String = ('comp', 'currency',
-    'double', 'extended', 'real', 'real48', 'single');
-  (** A list of ordinal idents **)
-  strOrdIdents : Array[1..13] Of String = ('boolean', 'byte', 'cardinal', 'char',
-    'int64', 'integer', 'longint', 'longword', 'pchar', 'shortint', 'smallint',
-    'widechar', 'word');
-  (** A list of variants **)
-  strVariants : Array[1..2] Of String = ('olevariant', 'variant');
-  (** A list of string types. **)
-  strStrings  : Array[1..4] Of String = ('ansistring', 'shortstring', 'string',
-    'widestring');
-
-  (** This is a list of reserved, directives word and a semi colon which are
-      token that can be sort as then next place to start parsing from when an
-      error is  encountered. **)
-  strSeekableOnErrorTokens : Array[1..31] Of String = (';', 'const', 'contains',
-    'do', 'else', 'end', 'except', 'exports', 'finalization', 'finally',
-    'function', 'implementation',
-    'implements', 'initialization', 'interface', 'label', 'library', 'object',
-    'package', 'procedure', 'program', 'record', 'requires', 'resourcestring',
-    'static', 'then', 'type', 'unit', 'until', 'uses', 'var'
-  );
-
-  (** This is a list of functions which can be used in a const expression. **)
-  strConstExprDesignators : Array[1..17] Of String = ('abs', 'byte', 'chr', 'hi',
-    'high', 'integer', 'length', 'lo', 'low', 'odd', 'ord', 'pred', 'round',
-    'sizeof', 'succ', 'swap', 'trunc');
-  (** A list of Rel operators for expressions. **)
-  strRelOps : Array[1..9] Of String = ('<', '<=', '<>', '=', '>', '>=', 'as',
-    'in', 'is');
-  (** A list of Add operators for expressions. **)
-  strAddOps : Array[1..4] Of String = ('+', '-', 'or', 'xor');
-  (** A list of Multiplier operators for expressions. **)
-  strMulOps : Array[1..7] Of String = ('*', '/', 'and', 'div', 'mod', 'shl', 'shr');
-  (** A list of portability directives. **)
-  strPortabilityDirective : Array[1..3] Of String = ('deprecated', 'library',
-    'platform');
-  (** A list of strings representing the types of methods. **)
-  strMethodTypes : Array[Low(TMethodType)..High(TMethodType)] Of String = (
-    'Constructor', 'Destructor', 'Procedure', 'Function', 'Operator');
-  (** A list of strings representing the parameter modifiers for methods. **)
-  strParamModifier : Array[pamNone..pamOut] Of String = ('', 'var ', 'const ',
-    'out ');
-  (** A list of the valid operator names. **)
-  strOperatorList : Array[1..31] Of String = (
-    'add',
-    'bitwiseand',
-    'bitwisenot',
-    'bitwiseor',
-    'bitwisexor',
-    'dec',
-    'divide',
-    'equal',
-    'explicit',
-    'greaterthan',
-    'greaterthanorequal',
-    'implicit',
-    'in',
-    'inc',
-    'intdivide',
-    'leftshift',
-    'lessthan',
-    'lessthanorequal',
-    'logicaland',
-    'logicalnot',
-    'logicalor',
-    'logicalxor',
-    'modulus',
-    'multiply',
-    'negative',
-    'notequal',
-    'positive',
-    'rightshift',
-    'round',
-    'subtract',
-    'trunc'
-  );
-
-(**
-
-  This function builds a string representation of a parameter list. It will use a short
-  form for the same parameter types, i.e. Const a, b : Integer.
-
-  @precon  GF must be a valid instance.
-  @postcon A string is returned which represents the parameter list.
-
-  @param   GF                   as a TGenericFunction
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-Function BuildParameterRepresentation(GF : TGenericFunction; boolShowIdentifier,
-  boolForDocumentation : Boolean) : String;
-
-Const
-  strIsSame : Array[False..True] Of String = (';', ',');
-
-Var
-  iParam : Integer;
-  boolSameAsBefore :Boolean;
-  boolSameAsAfter :Boolean;
-
-Begin
-  Result := '';
-  For iParam := 0 To GF.ParameterCount - 1 Do
-    Begin
-      If boolForDocumentation Then
-        Result := Result + #32#32;
-      boolSameAsBefore := (iParam > 0) And (GF.Parameters[iParam].IsEquals(GF.Parameters[Pred(iParam)]));
-      boolSameAsAfter := (iParam < GF.ParameterCount - 1) And (GF.Parameters[iParam].IsEquals(GF.Parameters[Succ(iParam)]));
-      If Not boolSameAsBefore And boolSameAsAfter Then
-        Result := Result + strParamModifier[GF.Parameters[iParam].ParamModifier] + GF.Parameters[iParam].Identifier
-      Else If boolSameAsBefore And boolSameAsAfter Then
-        Result := Result + GF.Parameters[iParam].Identifier
-      Else If boolSameAsBefore And Not boolSameAsAfter Then
-        Begin
-          Result := Result + GF.Parameters[iParam].Identifier;
-          If GF.Parameters[iParam].ParamType <> Nil Then
-            Result := Result + ' : ' + GF.Parameters[iParam].ParamType.AsString(False,
-              boolForDocumentation);
-        End Else
-          Result := Result + GF.Parameters[iParam].AsString(boolShowIdentifier,
-            boolForDocumentation);
-      If iParam < GF.ParameterCount - 1 Then
-        Begin
-          If boolForDocumentation Then
-            Result := Result + strIsSame[boolSameAsAfter] + #13#10
-          Else
-            Result := Result + strIsSame[boolSameAsAfter] + ' ';
-        End;
-    End;
-End;
-
-(**
-
-  This function creates a TTypeToken negating the need for a temporary
-  variable.
-
-  @precon  None.
-  @postcon Creates a TTypeToken negating the need for a temporary variable.
-
-  @param   AToken    as a TTokenInfo
-  @param   AScope    as a TScope
-  @param   AComment  as a TComment
-  @param   Container as a TElementContainer
-  @return  a TTypeToken
-
-**)
-Function TypeToken(AToken : TTokenInfo; AScope : TScope; AComment : TComment;
-  Container : TElementContainer) : TTypeToken;
-
-Begin
-  If AToken <> Nil Then
-    Begin
-      Result.FIdentifier := AToken.Token;
-      Result.FLine := AToken.Line;
-      Result.FColumn := AToken.Column;
-    End Else
-    Begin
-      Result.FIdentifier := '';
-      Result.FLine := 0;
-      Result.FColumn := 0;
-    End;
-  Result.FScope := AScope;
-  Result.FComment := AComment;
-  Result.FContainer := Container;
-  //Assert(Container <> Nil, 'Container in TTypeToken is NULL!');
-End;
-
-(**
-
-
-  This method is a class method to first check the comment for being a
-  documentation comment and then creating an instance of a TComment class and
-  parsing the comment via the constructor.
-
-  @precon  strComment is the full comment to be checked and parsed, iLine is
-           the line number of the comment and iCol is the column number of
-           the comment.
-
-  @postcon Returns Nil if this is not a documentation comment or returns a
-           valid TComment class.
-
-  @param   strComment as a String
-  @param   iLine      as an Integer
-  @param   iCol       as an Integer
-  @return  a TComment
-
-**)
-class function TPascalComment.CreateComment(strComment: String; iLine,
-  iCol: Integer): TComment;
-
-begin
-  Result := Nil;
-  If Length(strComment) > 0 Then
-    Begin
-      Case strComment[1] Of
-        '/' : strComment := Copy(strComment, 3, Length(strComment) - 2);
-        '{' : strComment := Copy(strComment, 2, Length(strComment) - 2);
-        '(' : strComment := Copy(strComment, 3, Length(strComment) - 4);
-      End;
-      If Length(strComment) > 0 Then
-        Begin
-          If strComment[Length(strComment)] = '*' Then
-            SetLength(strComment, Length(strComment) - 1);
-          If Length(strComment) > 0 Then
-            Begin
-              If (IsInSet(strComment[1], [':', '*'])) Then
-                Begin;
-                  strComment := Copy(strComment, 2, Length(strComment) - 1);
-                  Result := Create(strComment, iLine, iCol);
-                End;
-            End;
-        End;
-    End;
-end;
-
-(**
-
-  This method increments the internal count of the number of dimensions of the
-  array.
-
-  @precon  None.
-  @postcon Increments the internal count of the number of dimensions of the
-           array.
-
-**)
-Procedure TArrayType.AddDimension;
-
-Begin
-  Inc(FDimensions);
-End;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Returns the name of the record + '= Record '.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-Function TRecordDecl.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
-
-Var
-  iToken: Integer;
-
-Begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
-  If Result <> '' Then
-    Result := Result + #32'='#32;
-  If IsTyped Then
-    Result := Result + 'Type ';
-  Result := Result + 'Record';
-  If FHelper Then
-    Result := Result + #32'Helper';
-  If Heritage.ElementCount > 0 Then
-    Begin
-      Result := Result + '(';
-      For iToken := 1 To Heritage.ElementCount Do
-        Begin
-          Result := Result + Heritage.Elements[iToken].AsString(boolShowIdentifier,
-            boolForDocumentation);
-          If iToken < Heritage.ElementCount  Then
-            Result := Result + ','#32;
-        End;
-      Result := Result + ')';
-    End;
-  If FHelper Then
-    Result := Result + Format(' For %s', [FHelperClass]);
-End;
-
-(**
-
-  This is the constructor method for the TRecordDecl class.
-
-  @precon  None.
-  @postcon Initialises the class.
-
-  @param   strName     as a String
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   iImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
-
-**)
-constructor TRecordDecl.Create(strName : String; AScope : TScope; iLine,
-  iColumn : Integer; iImageIndex : TBADIImageIndex; AComment : TComment);
-begin
-  Inherited Create(strName, AScope, iLine, iColumn, iImageIndex, AComment);
-  FPacked := False;
-  FHeritage := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
-  FHeritage.Sorted := False;
-end;
-
-(**
-
-  A destructor for the TRecordDecl class.
-
-  @precon  None.
-  @postcon Frees the generic parameters.
-
-**)
-Destructor TRecordDecl.Destroy;
-
-Begin
-  FHeritage.Free;
-  Inherited Destroy;
-End;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Returns the Interface declaration with the heritage.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TInterfaceDecl.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-var
-  iToken: Integer;
-begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
-//  If GenericParams <> Nil Then
-//    Result := Result + GenericParams.AsString;
-  If Result <> '' Then
-    Result := Result + #32'='#32;
-  Result := Result + 'Interface';
-  If Heritage.ElementCount > 0 Then
-    Begin
-      Result := Result + '(';
-      For iToken := 1 To Heritage.ElementCount Do
-        Begin
-          Result := Result + Heritage.Elements[iToken].AsString(boolShowIdentifier,
-            boolForDocumentation);
-          If iToken < Heritage.ElementCount  Then
-            Result := Result + ','#32;
-        End;
-      Result := Result + ')';
-    End;
-  If boolForDocumentation Then
-    If FGUID <> '' Then
-      Result := Result + #13#10 + FGUID;
-end;
-
-(**
-
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Returns the DispInterface declaration with the heritage.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TDispInterfaceDecl.AsString(boolShowIdentifier,
-  boolForDocumentation : Boolean): String;
-var
-  iToken: Integer;
-begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
-  If Result <> '' Then
-    Result := Result + #32'='#32;
-  Result := Result + 'DispInterface';
-  If Heritage.ElementCount > 0 Then
-    Begin
-      Result := Result + '(';
-      For iToken := 1 To Heritage.ElementCount Do
-        Begin
-          Result := Result + Heritage.Elements[iToken].AsString(boolShowIdentifier,
-            boolForDocumentation);
-          If iToken < Heritage.ElementCount  Then
-            Result := Result + #32',';
-        End;
-      Result := Result + ')';
-    End;
-end;
-
-(**
-
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Returns a type formatted with an equals sign between the name and
-           the definition.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TTypes.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-
-begin
-  Result := BuildStringRepresentation(
-    boolShowIdentifier,
-    boolForDocumentation,
-    '=' + strIsTyped[FIsTyped],
-    BrowseAndDocItOptions.MaxDocOutputWidth,
-    strNoSpaceBeforeSymbols - ['(']
-  );
-end;
-
-(**
-
-  This is the constructor method for the TConstant class.
-
-  @precon  None.
-  @postcon Creates an instance of a TConstant declaration.
-
-  @param   strName     as a String
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
-
-**)
-constructor TConstant.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
-begin
-  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
-  FTyped := False;
-end;
-
-(**
-
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Formats the constant information depending on whether its a simple
-           constant or a typed constant.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TConstant.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-
-begin
-  If FTyped Then
-    Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-      ':', BrowseAndDocItOptions.MaxDocOutputWidth)
-   Else
-     Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-       '=', BrowseAndDocItOptions.MaxDocOutputWidth);
-end;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Outputs the parameter information in the style of object pascal
-           code.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-Function TPascalParameter.AsString(boolShowIdentifier,
-  boolForDocumentation : Boolean) : String;
-
-begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + strParamModifier[ParamModifier] + Identifier;
-  If ParamType <> Nil Then
-    Begin
-      If boolShowIdentifier Then
-        Result := Result + #32':'#32;
-      Result := Result + strArrayOf[ArrayOf];
-      Result := Result + ParamType.AsString(False, boolForDocumentation);
-    End;
-  If DefaultValue <> '' Then
-    Result := Result + #32'='#32 + DefaultValue;
-end;
-
-(**
-
-  This method adds a directive to the directives list.
-
-  @precon  strDirective is a directive token to be added to the directives
-           collection.
-  @postcon Adds a directive to the directives list.
-
-  @param   strDirective as a String
-
-**)
-Procedure TPascalMethod.AddDirectives(strDirective : String);
-
-Begin
-  FDirectives.Add(strDirective);
-End;
-
-(**
-
-  This is the constructor method for the TPascalMethod class.
-
-  @precon  None.
-  @postcon Initialises the class and creates a string list for the directives.
-
-  @param   MethodType as a TMethodType
-  @param   strName    as a String
-  @param   AScope     as a TScope
-  @param   iLine      as an Integer
-  @param   iCol       as an Integer
-
-**)
-constructor TPascalMethod.Create(MethodType: TMethodType; strName : String;
-  AScope: TScope; iLine, iCol: Integer);
-begin
-  Inherited Create(MethodType, strName, AScope, iLine, iCol);
-  FTypesLabel           := Nil;
-  FVariablesLabel       := Nil;
-  FConstantsLabel       := Nil;
-  FResourceStringsLabel := Nil;
-  FLabelsLabel          := Nil;
-  FDirectives           := TStringList.Create;
-  FResolved             := False;
-  FRecObjClsInt         := Nil;
-end;
-
-(**
-
-  This is the destructor method for the TPascalMethod class.
-
-  @precon  None.
-  @postcon Frees the memory used for the directives string list.
-
-**)
-destructor TPascalMethod.Destroy;
-begin
-  FDirectives.Free;
-  Inherited Destroy;
-end;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Outputs the pascal method declaration.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TPascalMethod.AsString(boolShowIdentifier,
-  boolForDocumentation : Boolean): String;
-
-Var
-  i : Integer;
-
-begin
-  Result := strMethodTypes[MethodType];
-  If ClassMethod Then
-    Result := 'Class ' + Result;
-  If Name <> '' Then
-    If boolShowIdentifier And (Identifier <> '') Then
-      Result := Result + #32 + Identifier;
-  If ParameterCount > 0 Then
-    Begin
-      If boolForDocumentation Then
-        Result := Result + '('#13#10
-      Else
-        Result := Result + '(';
-      Result := Result + BuildParameterRepresentation(Self, boolShowIdentifier,
-        boolForDocumentation);
-      If boolForDocumentation Then
-        Result := Result + #13#10;
-      Result := Result + ')';
-    End;
-  If ReturnType.ElementCount > 0 Then
-      Result := Result + #32':'#32 + ReturnType.AsString(False, boolForDocumentation);
-  For i := 0 To FDirectives.Count - 1 Do
-    Result := Result + '; ' + FDirectives[i];
-end;
-
-(**
-
-  This is a getter method for the Name property.
-
-  @precon  None.
-  @postcon Returns a combination of the Identifier + parameters so that
-           overloaded methods can be accepted by the container.
-
-  @return  a String
-
-**)
-function TPascalMethod.GetName: String;
-
-Var
-  i : Integer;
-
-begin
-  Result := Identifier;
-  If Result = '' Then
-    Result := Format('PROC%4.4d', [Random(9999)]);
-  For i := 0 To ParameterCount - 1 Do
-    Begin
-      Result := Result + Format('.P%d.', [i]) + strParamModifier[Parameters[i].ParamModifier];
-      If Parameters[i].ParamType <> Nil Then
-        Begin
-          Result := Result + strArrayOf[Parameters[i].ArrayOf];
-          Result := Result + Parameters[i].ParamType.AsString(False, False);
-        End;
-    End;
-  If ReturnType.ElementCount > 0 Then
-    Result := Result + '.R.' + ReturnType.AsString(False, False);
-  If HasDirective('forward') Then
-    Result := Result + '.Forward';
-end;
-
-(**
-
-  This method test the directive for a specified directive and returns true if
-  found.
-
-  @precon  strDirective is the directive to search for.
-  @postcon Returns true if the directive was found.
-
-  @param   strDirective as a String
-  @return  a Boolean
-
-**)
-function TPascalMethod.HasDirective(strDirective: String): Boolean;
-
-Var
-  i : Integer;
-
-begin
-  Result := False;
-  For i := 0 To Directives.Count - 1 Do
-    If CompareText(strDirective,
-      Copy(Directives[i], 1, Length(strDirective))) = 0 Then
-      Begin
-        Result := True;
-        Break;
-      End;
-end;
-
-(**
-
-  This method tries to find the symbol with its scope as mark it as referenced.
-
-  @precon  None.
-  @postcon Tries to find the symbol with its scope as mark it as referenced.
-
-  @param   AToken as a TTokenInfo
-  @return  a Boolean
-
-**)
-Function TPascalMethod.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
-
-Var
-  i: Integer;
-  M: TPascalMethod;
-  boolFound: Boolean;
-
-begin
-  Result := ReferenceSection(AToken, FVariablesLabel);
-  If Result Then
-    Exit;
-  Result := ReferenceSection(AToken, FConstantsLabel);
-  If Result Then
-    Exit;
-  Result := ReferenceSection(AToken, FResourceStringsLabel);
-  If Result Then
-    Exit;
-  Result := ReferenceSection(AToken, FTypesLabel);
-  // Local Methods
-  boolFound := False;
-  For i := 1 To ElementCount Do
-    If Elements[i] Is TPascalMethod Then
-      Begin
-        M := Elements[i] As TPascalMethod;
-        If CompareText(AToken.Token, M.Identifier) = 0 Then
-          Begin
-            M.Referenced := True;
-            AToken.Reference := trResolved;
-            boolFound := True;
-          End;
-      End;
-  If boolFound Then
-    Begin
-      Result := True;
-      Exit;
-    End;
-  If RecObjClsInt <> Nil Then
-    Result := RecObjClsInt.ReferenceSymbol(AToken);
-  If Result Then
-    Exit;
-  Result := Inherited ReferenceSymbol(AToken);
-end;
-
-(**
-
-  This is the constructor method for the TPascalProperty class.
-
-  @precon  None.
-  @postcon Initialises the property specifiers.
-
-  @param   strIdent    as a String
-  @param   AScope       as a TScope
-  @param   iLine       as an Integer
-  @param   iCol        as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
-
-**)
-constructor TPascalProperty.Create(strIdent: String; AScope: TScope;
-  iLine, iCol : Integer; AImageIndex : TBADIImageIndex; AComment : TComment);
-begin
-  Inherited Create(strIdent, AScope, iLine, iCol, AImageIndex, AComment);
-  FDefaultProperty := False;
-  FDefaultSpec := '';
-  FDispIDSpec := '';
-  FImplementsSpec := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
-  FIndexSpec := '';
-  FReadOnlySpec := False;
-  FWriteOnlySpec := False;
-  FReadSpec := '';
-  FStoredSpec := '';
-  FWriteSpec := '';
-  FIsClassProperty := False;
-end;
-
-(**
-
-  This is a destructor for the TPascalProperty class.
-
-  @precon  None.
-  @postcon Frees any memory used by the Imlpemented Specifications.
-
-**)
-destructor TPascalProperty.Destroy;
-begin
-  FImplementsSpec.Free;
-  Inherited Destroy;
-end;
-
-(**
-
-  This is a getter method for the Name property.
-
-  @precon  None.
-  @postcon Returns a unique name for properties which are overloaded.
-
-  @return  a String
-
-**)
-function TPascalProperty.GetName: String;
-
-Var
-  i : Integer;
-
-begin
-  Result := Identifier;
-  If Result = '' Then
-    Result := Format('PROP%4.4d', [Random(9999)]);
-  For i := 0 To ParameterCount - 1 Do
-    Begin
-      Result := Result + '.' + strParamModifier[Parameters[i].ParamModifier];
-      If Parameters[i].ParamType <> Nil Then
-        Begin
-          Result := Result + strArrayOf[Parameters[i].ArrayOf];
-          Result := Result + Parameters[i].ParamType.AsString(False, False);
-        End;
-      If ReturnType.ElementCount > 0 Then
-        Result := Result + ReturnType.AsString(False, False);
-    End;
-end;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Outputs the pascal property declaration .
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TPascalProperty.AsString(boolShowIdentifier,
-  boolForDocumentation : Boolean): String;
-
-  (**
-
-    This is a shorthand routine for output the string specs to the result.
-
-    @precon  None .
-    @postcon Output the string specs to the result .
-
-    @param   strName  as a String
-    @param   strValue as a String
-
-  **)
-  Procedure OutputSpec(strName, strValue : String);
-
-  Begin
-    If strValue <> '' Then
-      Begin
-        If boolForDocumentation Then
-          Result := Result + #32#32;
-        If strName <> '' Then
-          Begin
-            If Not boolForDocumentation Then
-              Result := Result + #32;
-            Result := Result + strName;
-          End;
-        Result := Result + #32 + strValue;
-        If boolForDocumentation Then
-          Result := Result + #13#10;
-      End;
-  End;
-
-Var
-  i : Integer;
-
-begin
-  Result := 'Property ';
-  If IsClassProperty Then
-    Result := 'Class ' + Result;
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
-  If ParameterCount > 0 Then
-    Begin
-      Result := Result + '[';
-      If boolForDocumentation Then
-        Result := Result + #13#10;
-      Result := Result + BuildParameterRepresentation(Self, boolShowIdentifier,
-        boolForDocumentation);
-      If boolForDocumentation Then
-        Result := Result + #13#10;
-      Result := Result + ']';
-    End;
-  If ReturnType.ElementCount > 0 Then
-    Begin
-      Result := Result + #32':'#32;
-      Result := Result + ReturnType.AsString(False, boolForDocumentation);
-    End;
-  If boolForDocumentation Then
-    Result := Result + #13#10;
-  OutputSpec('Index', FIndexSpec);
-  OutputSpec('Read', FReadSpec);
-  OutputSpec('Write', FWriteSpec);
-  OutputSpec('Stored', FStoredSpec);
-  OutputSpec('Default', FDefaultSpec);
-  If FImplementsSpec.ElementCount > 0 Then
-    Begin
-      If boolForDocumentation Then
-        Result := Result + #32#32
-      Else
-        Result := Result + #32;
-      Result := Result + 'Implements ';
-      For i := 1 To FImplementsSpec.ElementCount Do
-        Begin
-          If i > 1 Then
-            Result := Result + ', ';
-          Result := Result + FImplementsSpec.Elements[i].Identifier;
-        End;
-      If boolForDocumentation Then
-        Result := Result + #13#10;
-    End;
-  If FReadOnlySpec Then
-    OutputSpec('', 'ReadOnly');
-  If FWriteOnlySpec Then
-    OutputSpec('', 'WriteOnly');
-  OutputSpec('DispID', FDispIDSpec);
-  If FDefaultProperty Then
-    OutputSpec('', 'Default');
-end;
-
-(**
-
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Returns the property specifier, Name = key word, tokens = value.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TPropertySpec.AsString(boolShowIdentifier,
-  boolForDocumentation : Boolean): String;
-
-var
-  iToken: Integer;
-
-begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
-  For iToken := 0 To TokenCount - 1 Do
-    Begin
-      If Result <> '' Then
-        Result := Result + #32;
-      Result := Result + Tokens[iToken].Token;
-    End;
-end;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Returns the name of the field and = sign and then the definition.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TField.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-
-begin
-  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, ':',
-    BrowseAndDocItOptions.MaxDocOutputWidth);
-end;
-
-(**
-
-
-  This method check whether the field has been documented correctly.
-
-  @precon  None.
-  @postcon Check whether the field has been documented correctly.
-
-
-  @param   boolCascade as a Boolean as a reference
-
-**)
-procedure TField.CheckDocumentation(var boolCascade: Boolean);
-begin
-  If doShowUndocumentedFields In BrowseAndDocItOptions.Options Then
-    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment,
-        strFieldDocumentation, DocConflictTable[dctFieldClauseUndocumented]);
-  Inherited CheckDocumentation(boolCascade);
-end;
-
-(**
-
-  This is a constructor for the TExportsItem class.
-
-  @precon  None.
-  @postcon Initialises the class.
-
-  @param   strName     as a String
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
-
-**)
-Constructor TExportsItem.Create(strName : String; AScope : TScope; iLine,
-  iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment);
-
-Begin
-  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
-  FResolved := False;
-End;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Returns the Exported item declaration .
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TExportsItem.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-
-Var
-  iToken : Integer;
-
-begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
-  For iToken := 0 To TokenCount - 1 Do
-    Begin
-      If Result <> '' Then
-        Result := Result + #32;
-      Result := Result + Tokens[iToken].Token;
-    End;
-end;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Returns the variable declaration.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TVar.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-
-begin
-  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    ':', BrowseAndDocItOptions.MaxDocOutputWidth);
-end;
-
-(**
-
-  This method references symbols with the scope of the object / class.
-
-  @precon  None.
-  @postcon References symbols with the scope of the object / class.
-
-  @param   AToken as a TTokenInfo
-  @return  a Boolean
-
-**)
-Function TObjectDecl.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
-
-Var
-  i: Integer;
-  boolFound: Boolean;
-  MethodsLabel : TLabelContainer;
-
-begin
-  Result := Inherited ReferenceSymbol(AToken);
-  If Result Then
-    Exit;
-  boolFound := False;
-  MethodsLabel := FindElement(strMethodsLabel) As TLabelContainer;
-  If MethodsLabel <> Nil Then
-    Begin
-      For i := 1 To Methodslabel.ElementCount Do
-        If CompareText(AToken.Token, Methodslabel[i].Identifier) = 0 Then
-          Begin
-            Methodslabel[i].Referenced := True;
-            AToken.Reference := trResolved;
-            boolFound := True;
-          End;
-    End;
-  Result := boolFound;
-End;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Output the name of the Object = '= Object (" HeritageList ")'
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TObjectDecl.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-
-Var
-  iToken: Integer;
-
-begin
-  Result := Identifier + #32'='#32'Object';
-  If Heritage.TokenCount > 0 Then
-    Begin
-      Result := Result + '(';
-      For iToken := 0 To Heritage.TokenCount - 1 Do
-        Begin
-          Result := Result + Heritage.Tokens[iToken].Token;
-          If iToken < Heritage.TokenCount - 1  Then
-            Result := Result + #32',';
-        End;
-      Result := Result + ')';
-    End;
-end;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Output the name of the Class = '= Class (" HeritageList ")'
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TClassDecl.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-
-Var
-  iToken: Integer;
-
-begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
-  If Result <> '' Then
-    Result := Result + #32'='#32;
-  If IsTyped Then
-    Result := Result + 'Type ';
-  Result := Result + 'Class';
-  If FAbstractClass Then
-    Result := Result + #32'Abstract';
-  If FSealedClass Then
-    Result := Result + #32'Sealed';
-  If FHelper Then
-    Result := Result + #32'Helper';
-  If Heritage.ElementCount > 0 Then
-    Begin
-      Result := Result + '(';
-      For iToken := 1 To Heritage.ElementCount Do
-        Begin
-          Result := Result + Heritage.Elements[iToken].AsString(boolShowIdentifier,
-            boolForDocumentation);
-          If iToken < Heritage.ElementCount  Then
-            Result := Result + ','#32;
-        End;
-      Result := Result + ')';
-    End;
-  If FHelper Then
-    Result := Result + Format(' For %s', [FHelperClass]);
-end;
+  DGHLibrary,
+  BADI.Functions,
+  BADI.Options,
+  BADI.Constants,
+  BADI.ResourceStrings,
+  BADI.CompilerConditionData,
+  BADI.Module.Dispatcher,
+  BADI.Pascal.Comment,
+  BADI.Pascal.Constants,
+  BADI.Pascal.ExportsItem,
+  BADI.Pascal.ConstantDecl,
+  BADI.Pascal.TempCntr,
+  BADI.Pascal.ResourceStrings,
+  BADI.Pascal.Functions,
+  BADI.Pascal.ResourceStringDecl, BADI.Pascal.IdentList, BADI.Pascal.FieldDecl,
+  BADI.Pascal.InitializationDecl, BADI.Pascal.FinalizationDecl, BADI.Pascal.VariableDecl,
+  BADI.Pascal.ParameterDecl, BADI.Pascal.PropertySpec, BADI.Pascal.DispInterfaceDecl,
+  BADI.Pascal.ThreadVariableDecl;
 
 (**
 
@@ -2122,13 +322,13 @@ end;
            disk.
   @postcon Creates an instance of the module parser.
 
-  @param   Source        as a String
-  @param   strFileName   as a String
+  @param   Source        as a String as a constant
+  @param   strFileName   as a String as a constant
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
 
 **)
-Constructor TPascalModule.CreateParser(Source : String; strFileName : String;
+Constructor TPascalModule.CreateParser(const Source, strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
 var
   boolCascade: Boolean;
@@ -2342,7 +542,7 @@ Begin
                       ((LastToken = ttSingleLiteral) And (LastCharType = ttSingleLiteral)) Then
                       Begin
                         AppendToLastToken(strToken);
-                        LastToken := LastToken;
+                        LastToken := LastToken; //: @bug What was I thinking??????
                       End Else
                       Begin
                         AddToken(TTokenInfo.Create(strToken, iStreamPos,
@@ -2465,10 +665,19 @@ begin
     Begin
       If Container = Nil Then
         Begin
-          If FImplementedMethodsLabel = Nil Then
-            FImplementedMethodsLabel := Add(strImplementedMethodsLabel,
-              iiImplementedMethods, scNone, Nil) As TLabelContainer;
-          Container := FImplementedMethodsLabel;
+          If Method.Identifier <> '' Then
+            Begin
+              If FImplementedMethodsLabel = Nil Then
+                FImplementedMethodsLabel := Add(strImplementedMethodsLabel,
+                  iiImplementedMethods, scNone, Nil) As TLabelContainer;
+              Container := FImplementedMethodsLabel;
+            End else
+            Begin
+              E := CurrentMethod.FindElement(strAnonymousMethods);
+              If E = Nil Then
+                E := CurrentMethod.Add(strAnonymousMethods, iiMethodsLabel, scNone, Nil);
+              Container := E;
+            End;
           iIcon := iiUnknownClsObj;
           AScope := scNone;
           E := FTypesLabel;
@@ -2685,11 +894,11 @@ begin
           End Else
           Begin
             AddIssue(strUnExpectedEndOfFile, scNone, 'Goal', 0, 0, etError);
-            Raise EParserAbort.Create('Parsing Aborted!');
+            Raise EBADIParserAbort.Create('Parsing Aborted!');
           End;
       End;
   Except
-    On E : EParserAbort Do
+    On E : EBADIParserAbort Do
       AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
   End;
 end;
@@ -3188,7 +1397,7 @@ Procedure TPascalModule.ExportsItem(Container : TElementContainer);
 
 Var
   E : TElementContainer;
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   If IsIdentifier(Token) Then
@@ -3203,14 +1412,14 @@ Begin
           If Token.UToken = 'INDEX' Then
             Begin
               AddToExpression(E);
-              ExprType := [etInteger, etConstExpr];
+              ExprType := [petInteger, petConstExpr];
               ConstExpr(E, ExprType);
             End;
           // Check NAME
           If Token.UToken = 'NAME' Then
             Begin
               AddToExpression(E);
-              ExprType := [etString, etConstExpr];
+              ExprType := [petString, petConstExpr];
               ConstExpr(E, ExprType);
             End;
         End;
@@ -3416,7 +1625,7 @@ Function TPascalModule.ConstantDecl(AScope : TScope;
 
 Var
   T : TGenericTypeDecl;
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
   C, tmpC : TConstant;
   FTemporaryElements: TElementContainer;
 
@@ -3438,7 +1647,7 @@ Begin
       If Token.Token = '=' Then        // ConstExpr
         Begin
           NextNonCommentToken;
-          ExprType := [etUnknown, etConstExpr];
+          ExprType := [petUnknown, petConstExpr];
           ConstExpr(C, ExprType);
         End
       Else If Token.Token = ':' Then   // TypedConstant
@@ -3540,11 +1749,11 @@ Function TPascalModule.ResourceStringDecl(AScope : TScope;
 
 Var
   C, tmpC : TElementContainer;
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   Result := False;
-  ExprType := [etConstExpr, etString];
+  ExprType := [petConstExpr, petString];
   // If not identifier then there is a new section
   If IsIdentifier(Token) Then
     Begin
@@ -3732,6 +1941,7 @@ Begin
         If IsIdentifier(Token) Or (Token.UToken = 'STRING') Then
           Begin
             Container.AddToken(Token.Token, Token.TokenType);
+            ReferenceSymbol(Token); //: @bug DOESNT WORK!!!!
             NextNonCommentToken;
           End Else
           Begin
@@ -3767,10 +1977,10 @@ Function TPascalModule.TypedConstant(C : TElementContainer;
   T : TGenericTypeDecl) : Boolean;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
-  ExprType := [etUnknown, etConstExpr];
+  ExprType := [petUnknown, petConstExpr];
   Result := ArrayConstant(C, T) Or RecordConstant(C, T) Or ConstExpr(C, ExprType);
 End;
 
@@ -3815,7 +2025,7 @@ Procedure TPascalModule.ArrayElement(C : TElementContainer;
   iStartDimension : Integer; AT : TArrayType);
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   If iStartDimension <= AT.Dimensions Then
@@ -3835,7 +2045,7 @@ Begin
             strSeekableOnErrorTokens, stActual);
       End Else
       Begin // If not '(' handle as ConstExpr
-        ExprType := [etUnknown, etConstExpr];
+        ExprType := [petUnknown, petConstExpr];
         ConstExpr(C, ExprType);
       End;
 End;
@@ -3874,7 +2084,7 @@ Function TPascalModule.RecordConstant(C : TElementContainer;
   T : TGenericTypeDecl) : Boolean;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   Result := Token.Token = '(';
@@ -3885,7 +2095,7 @@ Begin
         If Not RecordFieldConstant(C, T) Then
           If Token.Token <> ')' Then
             Begin // If not handled treat as ConstExpr
-              ExprType := [etUnknown, etConstExpr];
+              ExprType := [petUnknown, petConstExpr];
               ConstExpr(C, ExprType);
             End;
       Until Not IsToken(';', C) And Not IsToken(',', C);
@@ -4246,7 +2456,7 @@ end;
 Function TPascalModule.SubRangeType(AToken : TTypeToken) : TSubRangeType;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
   Container: TElementContainer;
 
 Begin
@@ -4258,7 +2468,7 @@ Begin
         Result := TSubRangeType.Create(FIdentifier, FScope, FLine,
           FColumn, iiPublicType, FComment);
       Result := AToken.FContainer.Add(Result) As TSubRangeType;
-      ExprType := [etUnknown, etConstExpr];
+      ExprType := [petUnknown, petConstExpr];
       ConstExpr(Result, ExprType);
       If Token.Token = '..' Then // Handle simple expressions
         Begin
@@ -4324,7 +2534,7 @@ End;
 Procedure TPascalModule.EnumerateElement(EnumerateType : TEnumerateType);
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   If IsIdentifier(Token) Then
@@ -4333,7 +2543,7 @@ Begin
       If Token.Token = '=' Then
         Begin
           AddToExpression(EnumerateType);
-          ExprType := [etUnknown, etConstExpr];
+          ExprType := [petUnknown, petConstExpr];
           ConstExpr(EnumerateType, ExprType);
         End;
     End Else
@@ -4357,7 +2567,7 @@ End;
 Function TPascalModule.StringType(AToken : TTypeToken) : TStringType;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 begin
   Result := Nil;
@@ -4374,7 +2584,7 @@ begin
         Begin
           Result.AppendToken(Token);
           NextNonCommentToken;
-          ExprType := [etInteger, etConstExpr];
+          ExprType := [petInteger, petConstExpr];
           ConstExpr(Result, ExprType);
           If Token.Token = ']' Then
             Begin
@@ -4897,13 +3107,13 @@ Procedure TPascalModule.RecVariant(Rec : TRecordDecl; InternalScope : TScope);
 
 Var
   C : TElementContainer;
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   C := TTempCntr.Create('', scPrivate, 0, 0, iiNone, Nil);
   Try
     Repeat
-      ExprType := [etUnknown, etConstExpr];
+      ExprType := [petUnknown, petConstExpr];
       ConstExpr(C, ExprType);
     Until Not IsToken(',', C);
     If Token.Token = ':' Then
@@ -5539,7 +3749,7 @@ Var
   V, tmpV : TElementContainer;
   T : TGenericTypeDecl;
   C : TElementContainer;
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
   FTemporaryElements: TElementContainer;
   AToken: TTokenInfo;
 
@@ -5570,7 +3780,7 @@ Begin
                   Try
                     C.AddToken(Token.Token);
                     NextNonCommentToken;
-                    ExprType := [etUnknown, etConstExpr];
+                    ExprType := [petUnknown, petConstExpr];
                     ConstExpr(C, ExprType);
                   Finally
                     If T <> Nil Then
@@ -5586,7 +3796,7 @@ Begin
                     NextNonCommentToken;
                     If Not TypedConstant(C, T) Then
                       Begin
-                        ExprType := [etUnknown, etConstExpr];
+                        ExprType := [petUnknown, petConstExpr];
                         ConstExpr(C, ExprType);
                       End;
                     If Token.UToken = 'NIL' Then
@@ -5648,7 +3858,7 @@ Var
   V, tmpV : TElementContainer;
   T : TGenericTypeDecl;
   C : TElementContainer;
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
   FTemporaryElements: TElementContainer;
 
 Begin
@@ -5674,7 +3884,7 @@ Begin
                   Try
                     C.AppendToken(Token);
                     NextNonCommentToken;
-                    ExprType := [etUnknown, etConstExpr];
+                    ExprType := [petUnknown, petConstExpr];
                     ConstExpr(C, ExprType);
                   Finally
                     If T <> Nil Then
@@ -5720,10 +3930,10 @@ End;
   @grammer Expression -> SimpleExpression [RelOp SimpleExpression]
 
   @param   C        as a TElementContainer
-  @param   ExprType as a TExprTypes as a reference
+  @param   ExprType as a TPascalExprTypes as a reference
 
 **)
-Procedure TPascalModule.Expression(C : TElementContainer; var ExprType : TExprTypes);
+Procedure TPascalModule.Expression(C : TElementContainer; var ExprType : TPascalExprTypes);
 
 Begin
   Repeat
@@ -5741,10 +3951,10 @@ End;
   @postcon Attempts to parse the next series of tokens as a Simple Expression.
 
   @param   C        as a TElementContainer
-  @param   ExprType as a TExprTypes as a reference
+  @param   ExprType as a TPascalExprTypes as a reference
 
 **)
-Procedure TPascalModule.SimpleExpression(C : TElementContainer; var ExprType : TExprTypes);
+Procedure TPascalModule.SimpleExpression(C : TElementContainer; var ExprType : TPascalExprTypes);
 
 Begin
   If IsKeyWord(Token.Token, ['+', '-']) Then
@@ -5763,10 +3973,10 @@ End;
   @postcon Attempts to parse a term from the current token position.
 
   @param   C        as a TElementContainer
-  @param   ExprType as a TExprTypes as a reference
+  @param   ExprType as a TPascalExprTypes as a reference
 
 **)
-Procedure TPascalModule.Term(C : TElementContainer; var ExprType : TExprTypes);
+Procedure TPascalModule.Term(C : TElementContainer; var ExprType : TPascalExprTypes);
 
 Begin
   Repeat
@@ -5783,13 +3993,13 @@ End;
   @postcon Attempts to parse a factor from the current token position.
 
   @param   C        as a TElementContainer
-  @param   ExprType as a TExprTypes as a reference
+  @param   ExprType as a TPascalExprTypes as a reference
 
 **)
-Procedure TPascalModule.Factor(C : TElementContainer; var ExprType : TExprTypes);
+Procedure TPascalModule.Factor(C : TElementContainer; var ExprType : TPascalExprTypes);
 
 Var
-  SubExprType : TExprTypes;
+  SubExprType : TPascalExprTypes;
 
   (**
 
@@ -5804,21 +4014,21 @@ Var
   Procedure SetupSubExprType;
 
   Begin
-    SubExprType := [etUnknown];
-    If etConstExpr In ExprType Then
-      Include(SubExprType, etConstExpr); // Make sure const expr is propogated
+    SubExprType := [petUnknown];
+    If petConstExpr In ExprType Then
+      Include(SubExprType, petConstExpr); // Make sure const expr is propogated
   End;
 
 Begin
   If Token.TokenType In [ttSingleLiteral] Then
     Begin
-      If (etUnknown In ExprType) Then
+      If (petUnknown In ExprType) Then
         Begin
-          Exclude(ExprType, etUnknown);
-          Include(ExprType, etString);
+          Exclude(ExprType, petUnknown);
+          Include(ExprType, petString);
           AddToExpression(C);
         End
-      Else If Not (etString In ExprType) Then
+      Else If Not (petString In ExprType) Then
         ErrorAndSeekToken(strExprConflict, 'Factor', Token.Token,
           strSeekableOnErrorTokens, stActual)
       Else
@@ -5826,13 +4036,13 @@ Begin
     End
   Else If Token.TokenType In [ttNumber] Then
     Begin
-      If (etUnknown In ExprType) Then
+      If (petUnknown In ExprType) Then
         Begin
-          Exclude(ExprType, etUnknown);
+          Exclude(ExprType, petUnknown);
           If Pos('.', Token.Token) > 0 Then
-            Include(ExprType, etFloat)
+            Include(ExprType, petFloat)
           Else
-            Include(ExprType, etInteger);
+            Include(ExprType, petInteger);
           AddToExpression(C);
         End
       Else
@@ -5916,20 +4126,20 @@ End;
   @postcon Checks the type of number in the expression to make sure Integers
            and Floating point number aren`t mixed.
 
-  @param   ExprType as a TExprTypes
+  @param   ExprType as a TPascalExprTypes
   @return  a Boolean
 
   @note    This may have problems with expression that allow integers and
            floats to be added, etc.
 
 **)
-Function TPascalModule.CheckNumberType(ExprType : TExprTypes) : Boolean;
+Function TPascalModule.CheckNumberType(ExprType : TPascalExprTypes) : Boolean;
 
 Begin
   If Pos('.', Token.Token) > 0 Then
-    Result := etFloat In ExprType
+    Result := petFloat In ExprType
   Else
-    Result := etInteger In ExprType;
+    Result := petInteger In ExprType;
 End;
 
 (**
@@ -5943,15 +4153,15 @@ End;
            returns false
 
   @param   C as a TElementContainer
-  @param   ExprType as a TExprTypes
+  @param   ExprType as a TPascalExprTypes
   @return  a Boolean
 
 **)
-Function TPascalModule.RelOp(C : TElementContainer; ExprType : TExprTypes) : Boolean;
+Function TPascalModule.RelOp(C : TElementContainer; ExprType : TPascalExprTypes) : Boolean;
 
 Begin
   Result := IsKeyWord(Token.Token, strRelOps) And Not
-    ((Token.Token = '=') And (etConstExpr In ExprType));
+    ((Token.Token = '=') And (petConstExpr In ExprType));
   If Result Then
     AddToExpression(C);
 End;
@@ -5989,17 +4199,17 @@ End;
            returns false
 
   @param   C as a TElementContainer
-  @param   ExprType as a TExprTypes as a reference
+  @param   ExprType as a TPascalExprTypes as a reference
   @return  a Boolean
 
 **)
-Function TPascalModule.MulOp(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
+Function TPascalModule.MulOp(C : TElementContainer; var ExprType : TPascalExprTypes) : Boolean;
 
 Begin
   Result := IsKeyWord(Token.Token, strMulOps);
   If Result Then
     Begin
-      If Not (etString In ExprType) Then
+      If Not (petString In ExprType) Then
         AddToExpression(C)
       Else
         ErrorAndSeekToken(strExprConflict, 'MulOp', Token.Token,
@@ -6016,11 +4226,11 @@ End;
   @postcon Attempts to parse the current token position as a Designator.
 
   @param   C        as a TElementContainer
-  @param   ExprType as a TExprTypes as a reference
+  @param   ExprType as a TPascalExprTypes as a reference
   @return  a Boolean
 
 **)
-Function TPascalModule.Designator(C : TElementContainer; var ExprType : TExprTypes) : Boolean;
+Function TPascalModule.Designator(C : TElementContainer; var ExprType : TPascalExprTypes) : Boolean;
 
 Var
   M : TPascalMethod;
@@ -6062,12 +4272,12 @@ End;
            ^.
 
   @param   C               as a TElementContainer
-  @param   ExprType        as a TExprTypes as a reference
+  @param   ExprType        as a TPascalExprTypes as a reference
   @param   strValidSymbols as an Array Of String
 
 **)
 Procedure TPascalModule.DesignatorSubElement(C : TElementContainer;
-  var ExprType : TExprTypes; strValidSymbols : Array of String);
+  var ExprType : TPascalExprTypes; strValidSymbols : Array of String);
 
 var
   M: TPascalMethod;
@@ -6127,7 +4337,7 @@ Begin
     Else If (Token.Token = '(') Then
       Begin
         If doStrictConstantExpressions In BrowseAndDocItOptions.Options Then
-          If etConstExpr In ExprType Then
+          If petConstExpr In ExprType Then
             If Not IsKeyWord(PrevToken.Token, strConstExprDesignators) Then
               Begin
                 ErrorAndSeekToken(strConstExprDesignator, 'DesignatorSubElement',
@@ -6190,11 +4400,11 @@ End;
 Procedure TPascalModule.SetElement(C : TElementContainer);
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   Repeat
-    ExprType := [etUnknown];
+    ExprType := [petUnknown];
     Expression(C, ExprType);
   Until Not (IsToken('..', C) Or IsToken(',', C));
 End;
@@ -6213,11 +4423,11 @@ End;
 Procedure TPascalModule.ExprList(C : TElementContainer);
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   Repeat
-    ExprType := [etUnknown];
+    ExprType := [petUnknown];
     Expression(C, ExprType);
   Until Not IsToken(',', C);
 End;
@@ -6235,14 +4445,14 @@ End;
 Procedure TPascalModule.MethodExprList(C : TElementContainer);
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
   Cntr : TTempCntr;
 
 Begin
   Repeat
     If Not AnonymousMethod(C) Then
       Begin
-        ExprType := [etUnknown];
+        ExprType := [petUnknown];
         Cntr := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
         Try
           Expression(Cntr, ExprType);
@@ -6330,7 +4540,7 @@ End;
 Procedure TPascalModule.SimpleStatement;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
   C : TTempCntr;
 
 Begin
@@ -6350,7 +4560,7 @@ Begin
       If Token.Token = '(' Then
         Begin
           NextNonCommentToken;
-          ExprType := [etUnknown];
+          ExprType := [petUnknown];
           Expression(Nil, ExprType);
           If Token.Token = ')' Then
             NextNonCommentToken
@@ -6362,11 +4572,11 @@ Begin
       If Token.Token = '@' Then
         Begin
           NextNonCommentToken;
-          ExprType := [etUnknown];
+          ExprType := [petUnknown];
           Designator(Nil, ExprType);
         End Else
         Begin
-          ExprType := [etUnknown];
+          ExprType := [petUnknown];
           Designator(Nil, ExprType);
         End;
       If Token.Token = ':=' Then
@@ -6374,7 +4584,7 @@ Begin
           NextNonCommentToken;
           C := TTempCntr.Create('', Scope, 0, 0, iiNone, Nil);
           Try
-          ExprType := [etUnknown];
+          ExprType := [petUnknown];
             Expression(C, ExprType);
             If (C.TokenCount = 0) And (C.ElementCount = 0) Then
               AddIssue(Format('Assignment missing at line %d column %d!', [Token.Line,
@@ -6503,14 +4713,14 @@ End;
 Function TPascalModule.IfStmt : Boolean;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   Result := Token.UToken = 'IF';
   If Result Then
     Begin
       NextNonCommentToken;
-      ExprType := [etUnknown];
+      ExprType := [petUnknown];
       Expression(Nil, ExprType);
       If Token.UToken = 'THEN' Then
         Begin
@@ -6540,14 +4750,14 @@ End;
 Function TPascalModule.CaseStmt : Boolean;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   Result := Token.UToken = 'CASE';
   If Result Then
     Begin
       NextNonCommentToken;
-      ExprType := [etUnknown];
+      ExprType := [petUnknown];
       Expression(Nil, ExprType);
       If Token.UToken = 'OF' Then
         Begin
@@ -6608,10 +4818,10 @@ End;
 Procedure TPascalModule.CaseLabel;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
-  ExprType := [etUnknown, etConstExpr];
+  ExprType := [petUnknown, petConstExpr];
   ConstExpr(Nil, ExprType);
   If Token.Token = '..' Then
     Begin
@@ -6650,7 +4860,7 @@ End;
 Function TPascalModule.RepeatStmt : Boolean;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   Result := Token.UToken = 'REPEAT';
@@ -6661,7 +4871,7 @@ Begin
       If Token.UToken = 'UNTIL' Then
         Begin
           NextNonCommentToken;
-          ExprType := [etUnknown];
+          ExprType := [petUnknown];
           Expression(Nil, ExprType);
         End
       Else
@@ -6684,14 +4894,14 @@ End;
 Function TPascalModule.WhileStmt : Boolean;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   Result := Token.UToken = 'WHILE';
   If Result Then
     Begin
       NextNonCommentToken;
-      ExprType := [etUnknown];
+      ExprType := [petUnknown];
       Expression(Nil, ExprType);
       If Token.UToken = 'DO' Then
         Begin
@@ -6716,7 +4926,7 @@ End;
 Function TPascalModule.ForStmt : Boolean;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
   M: TPascalMethod;
 
 Begin
@@ -6739,7 +4949,7 @@ Begin
           If Token.Token = ':=' Then
             Begin
               NextNonCommentToken;
-              ExprType := [etUnknown];
+              ExprType := [petUnknown];
               Expression(Nil, ExprType);
               If IsKeyWord(Token.Token, ['downto', 'to']) Then
                 Begin
@@ -6759,7 +4969,7 @@ Begin
           Else If Token.UToken = 'IN' Then
             Begin
               NextNonCommentToken;
-              ExprType := [etUnknown];
+              ExprType := [petUnknown];
               Expression(Nil, ExprType);
               If Token.UToken = 'DO' Then
                 Begin
@@ -6920,7 +5130,7 @@ End;
 Function TPascalModule.RaiseStmt : Boolean;
 
 Var
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 Begin
   Result := Token.UToken = 'RAISE';
@@ -6931,7 +5141,7 @@ Begin
       If Uppercase(Token.Token) = 'AT' Then
         Begin
           NextNonCommentToken;
-          ExprType := [etUnknown, etConstExpr];
+          ExprType := [petUnknown, petConstExpr];
           ConstExpr(Nil, ExprType);
         End;
     End;
@@ -6995,7 +5205,7 @@ end;
 Procedure TPascalModule.AttributeDeclaration;
 
 Var
-  iExprType : TExprTypes;
+  iExprType : TPascalExprTypes;
 
 Begin
   If IsIdentifier(Token) Then
@@ -7007,7 +5217,7 @@ Begin
             NextNonCommentToken;
             If Token.Token = ')' Then
               Break;
-            iExprType := [etUnknown];
+            iExprType := [petUnknown];
             ConstExpr(Nil, iExprType);
           Until Token.Token <> ',';
           If Token.Token = ')' Then
@@ -7515,9 +5725,9 @@ Var
   Errors: TLabelContainer;
 
 begin
-  ResolveScopeOfImplementedMethods(FImplementedMethodsLabel);
   ResolveScopeOfImplementedExportedMethods;
   ResolveScopeOfImplementedExportsMethods;
+  ResolveScopeOfImplementedMethods(FImplementedMethodsLabel);
   // Only resolved methods IF there are no other errors.
   Errors := FindElement(strErrors) As TLabelContainer;
   If Errors <> Nil Then
@@ -7690,7 +5900,7 @@ Var
   j : Integer;
   T : TGenericTypeDecl;
   P, C : TElementContainer;
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
   FTemporaryElements: TElementContainer;
 
 Begin
@@ -7734,7 +5944,7 @@ Begin
               NextNonCommentToken;
               C := TConstant.Create('', scLocal, 0, 0, iiNone, Nil);
               Try
-                ExprType := [etConstExpr, etUnknown];
+                ExprType := [petConstExpr, petUnknown];
                 ConstExpr(C, ExprType);
                 strValue := C.AsString(True, False);
               Finally
@@ -7771,7 +5981,7 @@ Procedure TPascalModule.Directive(M : TPascalMethod; boolGrammarFix : Boolean = 
 
 Var
   C : TElementContainer;
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
   strExternal: String;
 
 Begin
@@ -7787,7 +5997,7 @@ Begin
         If Token.UToken = 'MESSAGE' Then
           Begin
             NextNonCommentToken;
-            ExprType := [etConstExpr, etInteger];
+            ExprType := [petConstExpr, petInteger];
             ConstExpr(C, ExprType);
             M.AddDirectives('Message ' + C.AsString(True, False));
           End
@@ -7797,7 +6007,7 @@ Begin
             NextNonCommentToken;
             If Token.Token <> ';' Then
               Begin
-                ExprType := [etConstExpr, etString];
+                ExprType := [petConstExpr, petString];
                 ConstExpr(C, ExprType);
                 strExternal := C.AsString(True, False);
                 If strExternal = '' Then
@@ -7807,14 +6017,14 @@ Begin
                 If Token.UToken = 'NAME' Then
                   Begin
                     NextNonCommentToken;
-                    ExprType := [etConstExpr, etString];
+                    ExprType := [petConstExpr, petString];
                     ConstExpr(C, ExprType);
                     M.AddDirectives('Name ' + C.AsString(True, False));
                   End;
                 If Token.UToken = 'INDEX' Then
                   Begin
                     NextNonCommentToken;
-                    ExprType := [etConstExpr, etInteger];
+                    ExprType := [petConstExpr, petInteger];
                     ConstExpr(C, ExprType);
                     M.AddDirectives('Index ' + C.AsString(True, False));
                   End;
@@ -7824,7 +6034,7 @@ Begin
         Else If Token.UToken = 'DISPID' Then
           Begin
             NextNonCommentToken;
-            ExprType := [etConstExpr, etInteger];
+            ExprType := [petConstExpr, petInteger];
             ConstExpr(C, ExprType);
             M.AddDirectives('DispID ' + C.AsString(True, False));
           End
@@ -8177,11 +6387,11 @@ Begin
   slClassNames := TStringList.Create;
   Try
     Try
+      iLine := Token.Line;
+      iColumn := Token.Column;
       If boolIdent Then
         Begin
           strIdentifier := Token.Token;
-          iLine := Token.Line;
-          iColumn := Token.Column;
           NextNonCommentToken;
           FormalTypeParamList(strIdentifier);
           While Token.Token = '.' Do
@@ -8924,14 +7134,14 @@ procedure TPascalModule.PropertySpecifiers(Prop: TPascalProperty);
 
 Var
   C : TPropertySpec;
-  ExprType : TExprTypes;
+  ExprType : TPascalExprTypes;
 
 begin
   // Check for index
   If Token.UToken = 'INDEX' Then
     Begin
       NextNonCommentToken;
-      ExprType := [etInteger, etConstExpr];
+      ExprType := [petInteger, petConstExpr];
       C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         ConstExpr(C, ExprType);
@@ -8944,7 +7154,7 @@ begin
   If Token.UToken = 'READ' Then
     Begin
       NextNonCommentToken;
-      ExprType := [etUnknown];
+      ExprType := [petUnknown];
       C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         Designator(C, ExprType);
@@ -8959,7 +7169,7 @@ begin
   If Token.UToken = 'WRITE' Then
     Begin
       NextNonCommentToken;
-      ExprType := [etUnknown];
+      ExprType := [petUnknown];
       C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         Designator(C, ExprType);
@@ -8974,7 +7184,7 @@ begin
   If Token.UToken = 'STORED' Then
     Begin
       NextNonCommentToken;
-      ExprType := [etInteger, etConstExpr];
+      ExprType := [petInteger, petConstExpr];
       C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         ConstExpr(C, ExprType);
@@ -8987,7 +7197,7 @@ begin
   If Token.UToken = 'DEFAULT' Then
     Begin
       NextNonCommentToken;
-      ExprType := [etUnknown, etConstExpr];
+      ExprType := [petUnknown, petConstExpr];
       C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         ConstExpr(C, ExprType);
@@ -9017,7 +7227,7 @@ begin
   If Token.UToken = 'DISPID' Then
     Begin
       NextNonCommentToken;
-      ExprType := [etInteger, etConstExpr];
+      ExprType := [petInteger, petConstExpr];
       C := TPropertySpec.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         ConstExpr(C, ExprType);
@@ -9424,6 +7634,8 @@ Begin
         If iParams > 0 Then
           strIdentifier := strIdentifier + ', ';
         strIdentifier := strIdentifier + Token.Token;
+        //: @debug QQQQQ
+        ReferenceSymbol(Token);
         NextNonCommentToken;
         Inc(iParams);
       End Else
@@ -9471,12 +7683,12 @@ End;
   @postcon Returns true if a constant expression was parsed.
 
   @param   Container as a TElementContainer
-  @param   ExprType  as a TExprTypes as a reference
+  @param   ExprType  as a TPascalExprTypes as a reference
   @return  a Boolean
 
 **)
 Function TPascalModule.ConstExpr(Container : TElementContainer;
-  var ExprType : TExprTypes) : Boolean;
+  var ExprType : TPascalExprTypes) : Boolean;
 
 Var
   iStartIndex : Integer;
@@ -9489,295 +7701,6 @@ Begin
     ErrorAndSeekToken(strConstExprExpected, 'ConstExpr', Token.Token,
       strSeekableOnErrorTokens, stActual);
 End;
-
-(**
-
-  This method checks the documentation for the given clause item.
-
-  @precon  C is a valid generic container to be checked for clause like
-           documentation.
-  @postcon Checks the passed clause for documentation errors.
-
-  @param   boolCascade as a Boolean as a reference
-
-**)
-Procedure TResourceString.CheckDocumentation(var boolCascade : Boolean);
-
-Begin
-  If doShowUndocumentedConsts In BrowseAndDocItOptions.Options Then
-    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment,
-        strResourceStringDocumentation,
-        DocConflictTable[dctResourceStringClauseUndocumented]);
-End;
-
-(**
-
-  This method checks the documentation for the given clause item.
-
-  @precon  C is a valid generic container to be checked for clause like
-           documentation.
-  @postcon Checks the passed clause for documentation errors.
-
-  @param   boolCascade as a Boolean as a reference
-
-**)
-Procedure TThreadVar.CheckDocumentation(var boolCascade : Boolean);
-
-Begin
-  If doShowUndocumentedVars In BrowseAndDocItOptions.Options Then
-    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment,
-        strThreadVarDocumentation, DocConflictTable[dctThreadVarClauseUndocumented]);
-End;
-
-(**
-
-  This method checks a record, object class or interface for documentation.
-
-  @precon  C is a valid gerneic container to be check for class like
-           documentation.
-  @postcon Checks the passed class for documentation errors.
-
-  @param   boolCascade as a Boolean as a reference
-
- **)
-Procedure TRecordDecl.CheckDocumentation(var boolCascade : Boolean);
-var
-  i: Integer;
-
-Begin
-  If doShowUndocumentedRecords In BrowseAndDocItOptions.Options Then
-    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment,
-        strRecordDocumentation, DocConflictTable[dctRecordClauseUndocumented]);
-  For i := 1 To ElementCount Do
-    Elements[i].CheckDocumentation(boolCascade);
-End;
-
-(**
-
-  This method searches for reference to the passed symbol in the records
-  fields.
-
-  @precon  None.
-  @postcon Returns true if the symbol is found.
-
-  @param   AToken as a TTokenInfo
-  @return  a Boolean
-
-**)
-Function TRecordDecl.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
-begin
-  Result := ReferenceSection(AToken, FFieldsLabel);
-end;
-
-(**
-
-  This method checks a record, object class or interface for documentation.
-
-  @precon  C is a valid gerneic container to be check for class like
-           documentation.
-  @postcon Checks the passed class for documentation errors.
-
-  @param   boolCascade as a Boolean as a reference
-
- **)
-Procedure TObjectDecl.CheckDocumentation(var boolCascade : Boolean);
-var
-  i: Integer;
-
-Begin
-  If doShowUndocumentedObjects In BrowseAndDocItOptions.Options Then
-    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment,
-        strObjectDocumentation, DocConflictTable[dctObjectClauseUndocumented]);
-  For i := 1 To ElementCount Do
-    Elements[i].CheckDocumentation(boolCascade);
-End;
-
-(**
-
-  This method checks a record, object class or interface for documentation.
-
-  @precon  C is a valid gerneic container to be check for class like
-           documentation.
-  @postcon Checks the passed class for documentation errors.
-
-  @param   boolCascade as a Boolean as a reference
-
- **)
-Procedure TClassDecl.CheckDocumentation(var boolCascade : Boolean);
-var
-  i: Integer;
-
-Begin
-  If doShowUndocumentedClasses In BrowseAndDocItOptions.Options Then
-    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment,
-        strClassDocumentation, DocConflictTable[dctClassClauseUndocumented]);
-  For i := 1 To ElementCount Do
-    Elements[i].CheckDocumentation(boolCascade);
-End;
-
-(**
-
-  This method searches for reference to trhe passed symbol in the classes
-  various section.
-
-  @precon  None.
-  @postcon Returns true if the symbol is found.
-
-  @param   AToken as a TTokenInfo
-  @return  a Boolean
-
-**)
-Function TClassDecl.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
-
-begin
-  Result := Inherited ReferenceSymbol(AToken);
-  If Result Then
-    Exit;
-  Result := ReferenceSection(AToken, FindElement(strVarsLabel) As TLabelContainer);
-  If Result Then
-    Exit;
-  Result := ReferenceSection(AToken, FindElement(strConstantsLabel) As TLabelContainer);
-  If Result Then
-    Exit;
-  Result := ReferenceSection(AToken, FindElement(strTypesLabel) As TLabelContainer);
-  If Result Then
-    Exit;
-  Result := ReferenceSection(AToken, FindElement(strClassVarsLabel) As TLabelContainer);
-  If Result Then
-    Exit;
-  Result := ReferenceSection(AToken, FindElement(strPropertiesLabel) As TLabelContainer);
-end;
-
-(**
-
-  This method checks a record, object class or interface for documentation.
-
-  @precon  C is a valid gerneic container to be check for class like
-           documentation.
-  @postcon Checks the passed class for documentation errors.
-
-  @param   boolCascade as a Boolean as a reference
-
- **)
-Procedure TInterfaceDecl.CheckDocumentation(var boolCascade : Boolean);
-var
-  i: Integer;
-
-Begin
-  If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
-    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment,
-        strInterfaceDocumentation, DocConflictTable[dctInterfaceClauseUndocumented]);
-  For i := 1 To ElementCount Do
-    Elements[i].CheckDocumentation(boolCascade);
-End;
-
-(**
-
-  This method checks a record, object class or interface for documentation.
-
-  @precon  C is a valid gerneic container to be check for class like
-           documentation.
-  @postcon Checks the passed class for documentation errors.
-
-  @param   boolCascade as a Boolean as a reference
-
- **)
-Procedure TDispInterfaceDecl.CheckDocumentation(var boolCascade : Boolean);
-var
-  i: Integer;
-
-Begin
-  If doShowUndocumentedInterfaces In BrowseAndDocItOptions.Options Then
-    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment,
-        strDispInterfaceDocumentation, DocConflictTable[dctDispInterfaceClauseUndocumented]);
-  For i := 1 To ElementCount Do
-    Elements[i].CheckDocumentation(boolCascade);
-End;
-
-(**
-
-  This method check the module`s initialisation sections for comments.
-
-  @precon  None.
-  @postcon Check the module`s initialisation sections for comments.
-
-  @param   boolCascade as a Boolean as a reference
-
-**)
-Procedure TInitializationSection.CheckDocumentation(var boolCascade : Boolean);
-
-Begin
-  If doShowMissingInitComment In BrowseAndDocItOptions.Options Then
-    If (Comment = Nil) Or (Comment.TokenCount = 0) Then
-      AddDocumentConflict([strInitializationLabel], Line, Column , Comment,
-        strModuleInitSection, DocConflictTable[dctMissingInitComment]);
-End;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Returns the name of the Initialisation section as a String .
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TInitializationSection.AsString(boolShowIdentifier,
-  boolForDocumentation : Boolean): String;
-begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
-end;
-
-(**
-
-  This method check the module`s finalisation sections for comments.
-
-  @precon  None.
-  @postcon Check the module`s finalisation sections for comments.
-
-  @param   boolCascade as a Boolean as a reference
-
-**)
-Procedure TFinalizationSection.CheckDocumentation(var boolCascade : Boolean);
-
-Begin
-  If doShowMissingFinalComment In BrowseAndDocItOptions.Options Then
-    If (Comment = Nil) Or (Comment.TokenCount = 0) Then
-      AddDocumentConflict([strFinalizationLabel], Line, Column, Comment,
-        strModuleFinalSection, DocConflictTable[dctMissingFinalComment]);
-End;
-
-(**
-
-This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Returns the name of the Finalisation section as a String .
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TFinalizationSection.AsString(boolShowIdentifier,
-  boolForDocumentation : Boolean): String;
-begin
-  Result := '';
-  If boolShowIdentifier Then
-    Result := Result + Identifier;
-end;
 
 (**
 
@@ -10079,6 +8002,8 @@ Begin
         E := E.FindElement(strTypesLabel);
         If E <> Nil Then
           E := E.FindElement(slClassNames[i]);
+        If E = Nil Then
+          Break;
       End;
   If E <> Nil Then
     If E Is TRecordDecl Then
@@ -10345,7 +8270,12 @@ begin
                       (Element As TPascalMethod).Resolved := True;
                     End;
                 End;
-            End;
+            End Else
+              If Pos('.', Method.QualifiedName) > 0 Then
+                AddIssue(Format(strUnSatisfiedDeclaration,
+                  [Method.QualifiedName]),
+                  scNone, 'ResolveScopeOfImplementedMethods', Method.Line,
+                  Method.Column, etWarning);
         End Else
           ResolveScopeOfImplementedMethods(
             StartLabel.Elements[i] As TLabelContainer);
@@ -10368,80 +8298,6 @@ Begin
   Result := (AToken.TokenType In [ttIdentifier, ttDirective]) Or
     ((AToken.TokenType In [ttReservedWord]) And
       IsKeyWord(AToken.Token, strIdentifierReservedWords));
-End;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Returns a string representation of the class information .
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TIdentList.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-
-begin
-  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    '', BrowseAndDocItOptions.MaxDocOutputWidth)
-end;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Returns a string representation of the class information .
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TTempCntr.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-begin
-  Result := '';
-  Raise Exception.Create(strTriedToRenderTmpCntr);
-end;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Returns a string representation of the type .
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TArrayType.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
-
-begin
-  Result := BuildStringRepresentation(boolShowIdentifier And (Identifier <> ''),
-    boolForDocumentation, '=', BrowseAndDocItOptions.MaxDocOutputWidth);
-end;
-
-(**
-
-  This method returns a string representation of the information in the class.
-
-  @precon  None.
-  @postcon A string representation of the class is returned.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-Function TAnonymousReferenceType.AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String;
-
-Begin
-  Result := Identifier + ' = Reference To ' + Inherited AsString(False, boolForDocumentation);
 End;
 
 (** Register the file source code extensions that can be parsed by this module. **)

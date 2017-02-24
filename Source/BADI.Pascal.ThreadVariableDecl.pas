@@ -1,0 +1,53 @@
+(**
+
+  This module contains a class which implements an Object Pascal specific ThreadVar Declaration.
+
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    24 Feb 2017
+
+**)
+Unit BADI.Pascal.ThreadVariableDecl;
+
+Interface
+
+Uses
+  BADI.Pascal.VariableDecl;
+
+Type
+  (** This is a sub class for all thread variables. **)
+  TThreadVar = Class(TVar)
+  Public
+    Procedure CheckDocumentation(Var boolCascade: Boolean); Override;
+  End;
+
+Implementation
+
+Uses
+  BADI.Types,
+  BADI.Options,
+  BADI.Constants,
+  BADI.ResourceStrings;
+
+(**
+
+
+  This method check whether the thread var has been documented correctly.
+
+  @precon  None.
+  @postcon Check whether the field has been documented correctly.
+
+
+  @param   boolCascade as a Boolean as a reference
+
+**)
+Procedure TThreadVar.CheckDocumentation(Var boolCascade: Boolean);
+
+Begin
+  If doShowUndocumentedVars In BrowseAndDocItOptions.Options Then
+    If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
+      AddDocumentConflict([Identifier], Line, Column, Comment, strThreadVarDocumentation,
+        DocConflictTable[dctThreadVarClauseUndocumented]);
+End;
+
+End.

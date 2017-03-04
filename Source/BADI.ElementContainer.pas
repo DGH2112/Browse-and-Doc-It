@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Feb 2017
+  @Date    04 Mar 2017
 
 **)
 Unit BADI.ElementContainer;
@@ -158,7 +158,8 @@ Implementation
 Uses
   SysUtils,
   BADI.ResourceStrings,
-  BADI.DocIssue, BADI.Options;
+  BADI.DocIssue,
+  BADI.Options, BADI.Functions;
 
 (**
 
@@ -757,19 +758,7 @@ End;
 Function TElementContainer.GetImageIndexAdjustedForScope: Integer;
 
 Begin
-  Case FScope Of
-    scPrivate:
-      Result := Integer(ImageIndex) - Integer(Succ(iiNone)) + 1;
-    scPublished:
-      Result := Integer(ImageIndex) - Integer(Succ(iiNone)) + 2;
-    scProtected:
-      Result := Integer(ImageIndex) - Integer(Succ(iiNone)) + 3;
-    scLocal:
-      Result := Integer(ImageIndex) - Integer(Succ(iiNone)) + 4;
-  Else
-    // scPublic, scGlobal, scNone
-    Result := Integer(ImageIndex) - Integer(Succ(iiNone));
-  End;
+  Result := BADIImageIndex(FImageIndex, FScope);
 End;
 
 (**

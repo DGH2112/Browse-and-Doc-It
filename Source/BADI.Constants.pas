@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Feb 2017
+  @Date    04 Mar 2017
 
 **)
 Unit BADI.Constants;
@@ -121,6 +121,19 @@ Const
   (** This is a constant for special tag items to show in the documentation **)
   iShowInDoc = $0004;
 
+  (** This is a list of image resource masks to be placed of the below images to create vesions
+      for different scopes. **)
+  BADIScopeList : Array[Low(TScope)..High(TScope)] Of TImageIndexInfo = (
+    (FResourceName : 'NoneMask';                      FMaskColour: clLime),
+    (FResourceName : 'GlobalMask';                    FMaskColour: clLime),
+    (FResourceName : 'LocalMask';                     FMaskColour: clLime),
+    (FResourceName : 'PrivateMask';                   FMaskColour: clLime),
+    (FResourceName : 'ProtectedMask';                 FMaskColour: clLime),
+    (FResourceName : 'PublicMask';                    FMaskColour: clLime),
+    (FResourceName : 'PublishedMask';                 FMaskColour: clLime),
+    (FResourceName : 'FriendMask';                    FMaskColour: clLime)
+  );
+
   (** This is a list of Image Resource name to be loaded fom the executable. **)
   BADIImageList : Array[Succ(Low(TBADIImageIndex))..High(TBADIImageIndex)] Of TImageIndexInfo = (
     (FResourceName : 'Module';                        FMaskColour: clLime),
@@ -141,162 +154,59 @@ Const
     (FResourceName : 'UsesItem';                      FMaskColour: clLime),
 
     (FResourceName : 'PublicTypesLabel';              FMaskColour: clLime),
-    (FResourceName : 'PrivateTypesLabel';             FMaskColour: clLime),
-    (FResourceName : 'PublishedTypesLabel';           FMaskColour: clLime),
-    (FResourceName : 'ProtectedTypesLabel';           FMaskColour: clLime),
-    (FResourceName : 'LocalTypesLabel';               FMaskColour: clLime),
     (FResourceName : 'PublicType';                    FMaskColour: clLime),
-    (FResourceName : 'PrivateType';                   FMaskColour: clLime),
-    (FResourceName : 'PublishedType';                 FMaskColour: clLime),
-    (FResourceName : 'ProtectedType';                 FMaskColour: clLime),
-    (FResourceName : 'LocalType';                     FMaskColour: clLime),
 
     (FResourceName : 'RecordsLabel';                  FMaskColour: clLime),
     (FResourceName : 'PublicRecord';                  FMaskColour: clLime),
-    (FResourceName : 'PrivateRecord';                 FMaskColour: clLime),
-    (FResourceName : 'PublishedRecord';               FMaskColour: clLime),
-    (FResourceName : 'ProtectedRecord';               FMaskColour: clLime),
-    (FResourceName : 'LocalRecord';                   FMaskColour: clLime),
 
     (FResourceName : 'FieldsLabel';                   FMaskColour: clLime),
-    (FResourceName : 'LocalField';                    FMaskColour: clLime),
     (FResourceName : 'PublicField';                   FMaskColour: clLime),
-    (FResourceName : 'PrivateField';                  FMaskColour: clLime),
-    (FResourceName : 'PublishedField';                FMaskColour: clLime),
-    (FResourceName : 'ProtectedField';                FMaskColour: clLime),
 
     (FResourceName : 'ObjectsLabel';                  FMaskColour: clLime),
     (FResourceName : 'PublicObject';                  FMaskColour: clLime),
-    (FResourceName : 'PrivateObject';                 FMaskColour: clLime),
-    (FResourceName : 'PublishedObject';               FMaskColour: clLime),
-    (FResourceName : 'ProtectedObject';               FMaskColour: clLime),
-    (FResourceName : 'LocalObject';                   FMaskColour: clLime),
 
     (FResourceName : 'PublicConstructor';             FMaskColour: clLime),
-    (FResourceName : 'PrivateConstructor';            FMaskColour: clLime),
-    (FResourceName : 'PublishedConstructor';          FMaskColour: clLime),
-    (FResourceName : 'ProtectedConstructor';          FMaskColour: clLime),
-    (FResourceName : 'LocalConstructor';              FMaskColour: clLime),
-
     (FResourceName : 'PublicDestructor';              FMaskColour: clFuchsia),
-    (FResourceName : 'PrivateDestructor';             FMaskColour: clFuchsia),
-    (FResourceName : 'PublishedDestructor';           FMaskColour: clFuchsia),
-    (FResourceName : 'ProtectedDestructor';           FMaskColour: clFuchsia),
-    (FResourceName : 'LocalDestructor';               FMaskColour: clFuchsia),
-
     (FResourceName : 'PublicProcedure';               FMaskColour: clLime),
-    (FResourceName : 'PrivateProcedure';              FMaskColour: clLime),
-    (FResourceName : 'PublishedProcedure';            FMaskColour: clLime),
-    (FResourceName : 'ProtectedProcedure';            FMaskColour: clLime),
-    (FResourceName : 'LocalProcedure';                FMaskColour: clLime),
-
     (FResourceName : 'PublicFunction';                FMaskColour: clLime),
-    (FResourceName : 'PrivateFunction';               FMaskColour: clLime),
-    (FResourceName : 'PublishedFunction';             FMaskColour: clLime),
-    (FResourceName : 'ProtectedFunction';             FMaskColour: clLime),
-    (FResourceName : 'LocalFunction';                 FMaskColour: clLime),
 
     (FResourceName : 'ClassesLabel';                  FMaskColour: clLime),
     (FResourceName : 'PublicClass';                   FMaskColour: clLime),
-    (FResourceName : 'PrivateClass';                  FMaskColour: clLime),
-    (FResourceName : 'PublishedClass';                FMaskColour: clLime),
-    (FResourceName : 'ProtectedClass';                FMaskColour: clLime),
-    (FResourceName : 'LocalClass';                    FMaskColour: clLime),
 
     (FResourceName : 'PropertyLabel';                 FMaskColour: clFuchsia),
     (FResourceName : 'PublicProperty';                FMaskColour: clFuchsia),
-    (FResourceName : 'PrivateProperty';               FMaskColour: clFuchsia),
-    (FResourceName : 'PublishedProperty';             FMaskColour: clFuchsia),
-    (FResourceName : 'ProtectedProperty';             FMaskColour: clFuchsia),
-    (FResourceName : 'LocalProperty';                 FMaskColour: clFuchsia),
 
     (FResourceName : 'InterfacesLabel';               FMaskColour: clLime),
     (FResourceName : 'PublicInterface';               FMaskColour: clLime),
-    (FResourceName : 'PrivateInterface';              FMaskColour: clLime),
-    (FResourceName : 'PublishedInterface';            FMaskColour: clLime),
-    (FResourceName : 'ProtectedInterface';            FMaskColour: clLime),
-    (FResourceName : 'LocalInterface';                FMaskColour: clLime),
 
     (FResourceName : 'DispInterfaceSLabel';           FMaskColour: clLime),
     (FResourceName : 'PublicDispInterface';           FMaskColour: clLime),
-    (FResourceName : 'PrivateDispInterface';          FMaskColour: clLime),
-    (FResourceName : 'PublishedDispInterface';        FMaskColour: clLime),
-    (FResourceName : 'ProtectedDispInterface';        FMaskColour: clLime),
-    (FResourceName : 'LocalDispInterface';            FMaskColour: clLime),
 
     (FResourceName : 'PublicConstantsLabel';          FMaskColour: clLime),
-    (FResourceName : 'PrivateConstantsLabel';         FMaskColour: clLime),
-    (FResourceName : 'PublishedConstantsLabel';       FMaskColour: clLime),
-    (FResourceName : 'ProtectedConstantsLabel';       FMaskColour: clLime),
-    (FResourceName : 'LocalConstantsLabel';           FMaskColour: clLime),
     (FResourceName : 'PublicConst';                   FMaskColour: clLime),
-    (FResourceName : 'PrivateConst';                  FMaskColour: clLime),
-    (FResourceName : 'PublishedConst';                FMaskColour: clLime),
-    (FResourceName : 'ProtectedConst';                FMaskColour: clLime),
-    (FResourceName : 'LocalConst';                    FMaskColour: clLime),
 
     (FResourceName : 'PublicResourceStringsLabel';    FMaskColour: clLime),
-    (FResourceName : 'PrivateResourceStringsLabel';   FMaskColour: clLime),
-    (FResourceName : 'PublishedResourceStringsLabel'; FMaskColour: clLime),
-    (FResourceName : 'ProtectedResourceStringsLabel'; FMaskColour: clLime),
-    (FResourceName : 'LocalResourceStringsLabel';     FMaskColour: clLime),
     (FResourceName : 'PublicResourceString';          FMaskColour: clLime),
-    (FResourceName : 'PrivateResourceString';         FMaskColour: clLime),
-    (FResourceName : 'PublishedResourceString';       FMaskColour: clLime),
-    (FResourceName : 'ProtectedResourceString';       FMaskColour: clLime),
-    (FResourceName : 'LocalResourceString';           FMaskColour: clLime),
 
     (FResourceName : 'PublicVariablesLabel';          FMaskColour: clLime),
-    (FResourceName : 'PrivateVariablesLabel';         FMaskColour: clLime),
-    (FResourceName : 'PublishedVariablesLabel';       FMaskColour: clLime),
-    (FResourceName : 'ProtectedVariablesLabel';       FMaskColour: clLime),
-    (FResourceName : 'LocalVariablesLabel';           FMaskColour: clLime),
     (FResourceName : 'PublicVariable';                FMaskColour: clLime),
-    (FResourceName : 'PrivateVariable';               FMaskColour: clLime),
-    (FResourceName : 'PublishedVariable';             FMaskColour: clLime),
-    (FResourceName : 'ProtectedVariable';             FMaskColour: clLime),
-    (FResourceName : 'LocalVariable';                 FMaskColour: clLime),
 
     (FResourceName : 'PublicThreadVarsLabel';         FMaskColour: clLime),
     (FResourceName : 'PublicThreadVar';               FMaskColour: clLime),
-    (FResourceName : 'PrivateThreadVar';              FMaskColour: clLime),
-    (FResourceName : 'PublishedThreadVar';            FMaskColour: clLime),
-    (FResourceName : 'ProtectedThreadVar';            FMaskColour: clLime),
-    (FResourceName : 'LocalThreadVar';                FMaskColour: clLime),
 
     (FResourceName : 'PublicClassVariablesLabel';     FMaskColour: clLime),
-    (FResourceName : 'PrivateClassVariablesLabel';    FMaskColour: clLime),
-    (FResourceName : 'PublishedClassVariablesLabel';  FMaskColour: clLime),
-    (FResourceName : 'ProtectedClassVariablesLabel';  FMaskColour: clLime),
-    (FResourceName : 'LocalClassVariablesLabel';      FMaskColour: clLime),
     (FResourceName : 'PublicClassVariable';           FMaskColour: clLime),
-    (FResourceName : 'PrivateClassVariable';          FMaskColour: clLime),
-    (FResourceName : 'PublishedClassVariable';        FMaskColour: clLime),
-    (FResourceName : 'ProtectedClassVariable';        FMaskColour: clLime),
-    (FResourceName : 'LocalClassVariable';            FMaskColour: clLime),
 
     (FResourceName : 'ExportedHeadingsLabel';         FMaskColour: clLime),
 
     (FResourceName : 'ExportedFunctionsLabel';        FMaskColour: clLime),
     (FResourceName : 'PublicExportedFunction';        FMaskColour: clLime),
-    (FResourceName : 'PrivateExportedFunction';       FMaskColour: clLime),
-    (FResourceName : 'PublishedExportedFunction';     FMaskColour: clLime),
-    (FResourceName : 'ProtectedExportedFunction';     FMaskColour: clLime),
-    (FResourceName : 'LocalExportedFunction';         FMaskColour: clLime),
 
     (FResourceName : 'PublicLabelsLabel';             FMaskColour: clLime),
-    (FResourceName : 'PrivateLabelsLabel';            FMaskColour: clLime),
-    (FResourceName : 'PublishedLabelsLabel';          FMaskColour: clLime),
-    (FResourceName : 'ProtectedLabelsLabel';          FMaskColour: clLime),
-    (FResourceName : 'LocalLabelsLabel';              FMaskColour: clLime),
-    (FResourceName : 'LocalLabel';                    FMaskColour: clLime),
-    (FResourceName : 'PrivateLabel';                  FMaskColour: clLime),
-    (FResourceName : 'ProtectedLabel';                FMaskColour: clLime),
     (FResourceName : 'PublicLabel';                   FMaskColour: clLime),
-    (FResourceName : 'PublishedLabel';                FMaskColour: clLime),
 
-    (FResourceName : 'MethodsLabel';                  FMaskColour: clLime),
     (FResourceName : 'ImplementedMethodsLabel';       FMaskColour: clLime),
+    (FResourceName : 'MethodsLabel';                  FMaskColour: clLime),
 
     (FResourceName : 'InitializationLabel';           FMaskColour: clFuchsia),
     (FResourceName : 'FinalizationLabel';             FMaskColour: clLime),

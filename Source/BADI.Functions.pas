@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    19 Feb 2017
+  @Date    04 Mar 2017
 
 **)
 Unit BADI.Functions;
@@ -34,7 +34,8 @@ Type
   Function PrologCode(const strTemplate, strMethod : String; iPadding : Integer) : TStringList;
   Function EpilogCode(const strTemplate, strMethod : String; iPadding : Integer) : TStringList;
   Function OutputCommentAndTag(C: TBaseContainer; iMaxWidth: Integer; boolShowHTML: Boolean): String;
-  function BuildLangIndepRep(Param: TGenericParameter): String;
+  Function BuildLangIndepRep(Param: TGenericParameter): String;
+  Function BADIImageIndex(iBADIImageIndex : TBADIImageIndex; Ascope : TScope) : Integer;
 
 Implementation
 
@@ -297,5 +298,26 @@ begin
     pamOut: Result := Result + ' as an out parameter';
   End;
 end;
+
+(**
+
+  This function returns an integer index into the image list of icons for the treeview based on the
+  base image index and the scope.
+
+  @precon  None.
+  @postcon An image index is returned.
+
+  @param   iBADIImageIndex as a TBADIImageIndex
+  @param   Ascope          as a TScope
+  @return  an Integer
+
+**)
+Function BADIImageIndex(iBADIImageIndex : TBADIImageIndex; Ascope : TScope) : Integer;
+
+Begin
+  Result := Pred(Integer(iBADIImageIndex)) *
+    (Integer(High(TScope)) - Integer(Low(TScope)) + 1) +
+    Integer(AScope)
+End;
 
 End.

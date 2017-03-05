@@ -47,7 +47,7 @@ Type
 Implementation
 
 uses
-  BADI.Types, BADI.TokenInfo, BADI.ResourceStrings, BADI.DocIssue;
+  BADI.Types, BADI.TokenInfo, BADI.ResourceStrings, BADI.DocIssue, BADI.Functions;
 
 Procedure TestTElementContainer.SetUp;
 Begin
@@ -165,8 +165,9 @@ Begin
 End;
 
 Procedure TestTElementContainer.TestImageIndexAdjustedForScope;
+
 Begin
-  CheckEquals(iiPrivateConstant, FElementContainer.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicConstant, scPrivate), FElementContainer.ImageIndexAdjustedForScope);
 End;
 
 Procedure TestTElementContainer.TestParent;
@@ -331,7 +332,8 @@ Begin
   CheckEquals(scPrivate, FElementContainer.Scope);
   CheckEquals(12, FElementContainer.Line);
   CheckEquals(23, FElementContainer.Column);
-  CheckEquals(iiPrivateConstant, FElementContainer.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicConstant, scPrivate),
+    FElementContainer.ImageIndexAdjustedForScope);
   Check(FElementContainer.Comment <> Nil, 'Comment is null');
 End;
 

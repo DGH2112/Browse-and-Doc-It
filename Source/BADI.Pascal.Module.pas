@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       24 Feb 2017
+  @Date       05 Mar 2017
   @Author     David Hoyle
 
   @grammar    For the grammar to this parser pleaser see the "Object Pascal Grammar.bnf".
@@ -35,13 +35,12 @@ Uses
   BADI.Pascal.PropertyDecl,
   BADI.Pascal.InterfaceDecl,
   BADI.Comment,
-  BADI.TokenInfo, BADI.Pascal.Types;
+  BADI.TokenInfo,
+  BADI.Pascal.Types;
 
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  //: @debug TObjectDecl = Class;
-
   (**
 
     This is the main class for dealing with object pascal units and program
@@ -71,7 +70,7 @@ Type
     Function  OPPackage : Boolean;
     Function  OPLibrary : Boolean;
     Procedure ProgramBlock;
-    procedure UsesClause;
+    procedure UsesClause(eScope : TScope);
     Function  PortabilityDirective : Boolean;
     Procedure InterfaceSection;
     Procedure InterfaceDecl;
@@ -217,7 +216,8 @@ Type
     Function  InterfacePropertyList(Cls : TRecordDecl; var AScope : TScope) : Boolean;
     Procedure RequiresClause;
     procedure ContainsClause;
-    Procedure IdentList(Container : TElementContainer; SeekTokens : Array Of String;
+    Procedure IdentList(Container : TElementContainer;  eScope : TScope;
+      ContainerClass : TElementContainerClass; SeekTokens : Array Of String;
       iImageIndex : TBADIImageIndex = iiNone);
     Function  TypeId(Container: TElementContainer) : Boolean;
     Function  ConstExpr(Container: TElementContainer; var ExprType : TPascalExprTypes) : Boolean;
@@ -306,10 +306,17 @@ Uses
   BADI.Pascal.TempCntr,
   BADI.Pascal.ResourceStrings,
   BADI.Pascal.Functions,
-  BADI.Pascal.ResourceStringDecl, BADI.Pascal.IdentList, BADI.Pascal.FieldDecl,
-  BADI.Pascal.InitializationDecl, BADI.Pascal.FinalizationDecl, BADI.Pascal.VariableDecl,
-  BADI.Pascal.ParameterDecl, BADI.Pascal.PropertySpec, BADI.Pascal.DispInterfaceDecl,
-  BADI.Pascal.ThreadVariableDecl;
+  BADI.Pascal.ResourceStringDecl,
+  BADI.Pascal.IdentList,
+  BADI.Pascal.FieldDecl,
+  BADI.Pascal.InitializationDecl,
+  BADI.Pascal.FinalizationDecl,
+  BADI.Pascal.VariableDecl,
+  BADI.Pascal.ParameterDecl,
+  BADI.Pascal.PropertySpec,
+  BADI.Pascal.DispInterfaceDecl,
+  BADI.Pascal.ThreadVariableDecl,
+  BADI.Pascal.UsesList;
 
 (**
 
@@ -934,7 +941,7 @@ begin
           If Token.Token = '(' Then
             Begin
               NextNonCommentToken;
-              IdentList(Nil, strSeekableOnErrorTokens); // get ident list
+              IdentList(Nil, scNone, TIdentList, strSeekableOnErrorTokens); // get ident list
               // Check for closing parenthesis
               If Token.Token <> ')' Then
                 ErrorAndSeekToken(strLiteralExpected, 'OPProgram', ')',
@@ -1127,21 +1134,23 @@ end;
 **)
 procedure TPascalModule.ProgramBlock;
 begin
-  UsesClause;
+  UsesClause(scPublic);
   Block(scPrivate, Nil);
 end;
 
 (**
 
-  This method parses the Uses clause declaration from the current token
-  position using the following object pascal grammar.
+  This method parses the Uses clause declaration from the current token position using the following
+  object pascal grammar.
 
   @precon  None.
-  @postcon Parses the Uses clause declaration from the current token position
-           using the following object pascal grammar.
+  @postcon Parses the Uses clause declaration from the current token position using the following
+           object pascal grammar.
+
+  @param   eScope as a TScope
 
 **)
-Procedure TPascalModule.UsesClause;
+Procedure TPascalModule.UsesClause(eScope : TScope);
 
 Var
   U : TElementContainer;
@@ -1153,7 +1162,7 @@ Begin
       AComment := GetComment;
       U := Add(strUses, iiUsesLabel, scNone, AComment);
       NextNonCommentToken;
-      IdentList(U, strSeekableOnErrorTokens, iiUsesItem);
+      IdentList(U, eScope, TUsesList, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'UsesClause', ';',
           strSeekableOnErrorTokens, stActual)
@@ -1215,7 +1224,7 @@ Begin
   If Token.UToken = 'INTERFACE' Then
     Begin
       NextNonCommentToken;
-      UsesClause;
+      UsesClause(scPublic);
       InterfaceDecl;
     End Else
     ErrorAndSeekToken(strReservedWordExpected, 'InterfaceSection', 'INTERFACE',
@@ -1311,7 +1320,7 @@ Begin
       'IMPLEMENTATION', strSeekableOnErrorTokens, stActual)
   Else
     NextNonCommentToken;
-  UsesClause;
+  UsesClause(scPrivate);
   DeclSection(scPrivate, Self);
   ExportsStmt;
 End;
@@ -2969,7 +2978,7 @@ Begin
   Result := False;
   I := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
   Try
-    IdentList(I, strSeekableOnErrorTokens);
+    IdentList(I, InteralScope, TIdentList, strSeekableOnErrorTokens);
     If I.ElementCount > 0 Then
       Begin
         Result := True;
@@ -3761,7 +3770,7 @@ Begin
       // Get ident list line and column
       I := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
       Try
-        IdentList(I, strSeekableOnErrorTokens);
+        IdentList(I, AScope, TIdentList, strSeekableOnErrorTokens);
         If Token.Token <> ':' Then
           ErrorAndSeekToken(strLiteralExpected, 'VarDecl', ':',
             strSeekableOnErrorTokens, stActual)
@@ -3868,7 +3877,7 @@ Begin
       // Get ident list line and column
       I := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
       Try
-        IdentList(I, strSeekableOnErrorTokens);
+        IdentList(I, AScope, TIdentList, strSeekableOnErrorTokens);
         If Token.Token <> ':' Then
           ErrorAndSeekToken(strLiteralExpected, 'VarDecl', ':',
             strSeekableOnErrorTokens, stActual)
@@ -5913,7 +5922,7 @@ Begin
     P.Sorted:= False;
     FTemporaryElements := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
     Try
-      IdentList(P, strSeekableOnErrorTokens);
+      IdentList(P, scNone, TIdentList, strSeekableOnErrorTokens);
       If Token.Token = ':' Then
         Begin
           NextNonCommentToken;
@@ -6607,7 +6616,7 @@ begin
   Result := False;
   I := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
   Try
-    IdentList(I, strSeekableOnErrorTokens);
+    IdentList(I, AScope, TIdentList, strSeekableOnErrorTokens);
     If Token.Token = ':' Then
       Begin
         Result := True;
@@ -6819,7 +6828,7 @@ begin
   If Token.Token = '(' Then
     Begin
       NextNonCommentToken;
-      IdentList(RecObjClsInt.Heritage, strSeekableOnErrorTokens);
+      IdentList(RecObjClsInt.Heritage, scNone, TIdentList, strSeekableOnErrorTokens);
       If Token.Token = ')' Then
         NextNonCommentToken
       Else
@@ -7089,7 +7098,7 @@ Begin
           NextNonCommentToken;
         I := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
         Try
-          IdentList(I, strSeekableOnErrorTokens);
+          IdentList(I, scNone, TIdentList, strSeekableOnErrorTokens);
           If Token.Token = ':' Then
             Begin
               NextNonCommentToken;
@@ -7212,7 +7221,7 @@ begin
   If Token.UToken = 'IMPLEMENTS' Then
     Begin
       NextNonCommentToken;
-      IdentList(Prop.ImplementsSpec, strSeekableOnErrorTokens);
+      IdentList(Prop.ImplementsSpec, scNone, TIdentList, strSeekableOnErrorTokens);
     End;
   If Token.UToken = 'READONLY' Then
     Begin
@@ -7408,7 +7417,7 @@ Begin
     Begin
       R := Add(strRequiresLabel, iiUsesLabel, scNone, GetComment);
       NextNonCommentToken;
-      IdentList(R, strSeekableOnErrorTokens, iiUsesItem);
+      IdentList(R, scNone, TUsesList, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'RequiresClause', ';',
           strSeekableOnErrorTokens, stActual);
@@ -7435,7 +7444,7 @@ Begin
     Begin
       C := Add(strContainsLabel, iiUsesLabel, scNone, GetComment);
       NextNonCommentToken;
-      IdentList(C, strSeekableOnErrorTokens, iiUsesItem);
+      IdentList(C, scNone, TUsesList, strSeekableOnErrorTokens, iiUsesItem);
       If Token.Token <> ';' Then
         ErrorAndSeekToken(strLiteralExpected, 'ContainsClause', ';',
           strSeekableOnErrorTokens, stActual);
@@ -7445,27 +7454,29 @@ End;
 
 (**
 
-  This method creates a identifier list starting at the current token and
-  return the list to the calling function. If OwnList is true then the identlist
-  is added to the classes owned items list for automatic disposal, else it the
-  responsibliity of the calling function to disposal of the class.
+  This method creates a identifier list starting at the current token and return the list to the
+  calling function. If OwnList is true then the identlist is added to the classes owned items list
+  for automatic disposal, else it the responsibliity of the calling function to disposal of the
+  class.
 
-  @precon  OwnList determines if the identlist should be disposed of be the
-           parser or be the caller. SeekTokens is a sorted lowercase list of
-           token to find if an error is found.
+  @precon  OwnList determines if the identlist should be disposed of be the parser or be the caller
+           . SeekTokens is a sorted lowercase list of token to find if an error is found.
   @postcon Returns an ident list.
 
-  @param   Container   as a TElementContainer
-  @param   SeekTokens  as an Array Of String
-  @param   iImageIndex as a TBADIImageIndex
+  @param   Container      as a TElementContainer
+  @param   eScope         as a TScope
+  @param   ContainerClass as a TElementContainerClass
+  @param   SeekTokens     as an Array Of String
+  @param   iImageIndex    as a TBADIImageIndex
 
 **)
-Procedure TPascalModule.IdentList(Container : TElementContainer;
-  SeekTokens : Array Of String; iImageIndex : TBADIImageIndex = iiNone);
+Procedure TPascalModule.IdentList(Container : TElementContainer; eScope : TScope;
+  ContainerClass : TElementContainerClass; SeekTokens : Array Of String;
+  iImageIndex : TBADIImageIndex = iiNone);
 
 Var
   C, AComment : TComment;
-  I: TIdentList;
+  I: TElementContainer;
   strUnit : String;
   iLine: Integer;
   iColumn: Integer;
@@ -7511,8 +7522,8 @@ Begin
             End;
           I := Nil;
           If Container <> Nil Then
-            I := Container.Add(TIdentList.Create(strUnit, scNone, iLine,
-              iColumn, iImageIndex, AComment)) As TIdentList;
+            I := Container.Add(ContainerClass.Create(strUnit, eScope, iLine,
+              iColumn, iImageIndex, AComment)) As TElementContainer;
           If Token.UToken = 'IN' Then
             Begin
               If I <> Nil Then
@@ -7634,7 +7645,6 @@ Begin
         If iParams > 0 Then
           strIdentifier := strIdentifier + ', ';
         strIdentifier := strIdentifier + Token.Token;
-        //: @debug QQQQQ
         ReferenceSymbol(Token);
         NextNonCommentToken;
         Inc(iParams);

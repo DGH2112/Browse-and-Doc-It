@@ -26,7 +26,8 @@ Implementation
 Uses
   BADI.Types,
   BADI.Comment,
-  BADI.TokenInfo;
+  BADI.TokenInfo,
+  BADI.Functions;
 
 Procedure TestTRecordDecl.SetUp;
 
@@ -70,7 +71,7 @@ Begin
   CheckEquals(12, FRecordDecl.Line);
   CheckEquals(23, FRecordDecl.Column);
   CheckEquals(iiPublicRecord, FRecordDecl.ImageIndex);
-  CheckEquals(iiProtectedRecord, FRecordDecl.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicRecord, scProtected), FRecordDecl.ImageIndexAdjustedForScope);
 End;
 
 Procedure TestTRecordDecl.TestAsString;

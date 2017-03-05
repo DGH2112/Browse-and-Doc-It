@@ -1,4 +1,4 @@
-unit Test.BADI.VBModule;
+unit Test.BADI.VB.Module;
 {:
 
   Delphi DUnit Test Case
@@ -14,13 +14,13 @@ interface
 uses
   TestFramework,
   Classes,
-  BADI.BaseLanguageModule,
-  BADI.VBModule,
+  BADI.Base.Module,
+  BADI.VB.Module,
   Contnrs,
   SysUtils,
   //Controls,
   //Windows,
-  Test.BADI.BaseLanguageModule;
+  Test.BADI.Base.Module;
 
 type
   // Test methods for class TVBParameter
@@ -239,6 +239,10 @@ type
   End;
 
 implementation
+
+uses
+  BADI.Types, BADI.ResourceStrings, BADI.ElementContainer, BADI.Comment, BADI.Options,
+  BADI.Functions;
 
 procedure TestTVBParameter.TestAsString;
 
@@ -3285,7 +3289,7 @@ begin
   CheckEquals(scPrivate, FVBEnumerateDecl.Scope);
   CheckEquals(12, FVBEnumerateDecl.Line);
   CheckEquals(23, FVBEnumerateDecl.Column);
-  CheckEquals(iiPrivateType, FVBEnumerateDecl.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicType, scPrivate), FVBEnumerateDecl.ImageIndexAdjustedForScope);
   Check(Nil = FVBEnumerateDecl.Comment);
 end;
 
@@ -3319,7 +3323,7 @@ begin
   CheckEquals(scPublic, FVBEnumIdent.Scope);
   CheckEquals(12, FVBEnumIdent.Line);
   CheckEquals(23, FVBEnumIdent.Column);
-  CheckEquals(iiUsesItem, FVBEnumIdent.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiUsesItem, scPublic), FVBEnumIdent.ImageIndexAdjustedForScope);
   Check(Nil = FVBEnumIdent.Comment);
 end;
 
@@ -3352,7 +3356,7 @@ begin
   CheckEquals(scPublic, FVBField.Scope);
   CheckEquals(12, FVBField.Line);
   CheckEquals(23, FVBField.Column);
-  CheckEquals(iiPublicField, FVBField.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicField, scPublic), FVBField.ImageIndexAdjustedForScope);
   Check(Nil = FVBField.Comment);
 end;
 
@@ -3383,7 +3387,7 @@ begin
   CheckEquals(scNone, FVBOption.Scope);
   CheckEquals(12, FVBOption.Line);
   CheckEquals(23, FVBOption.Column);
-  CheckEquals(iiUsesItem, FVBOption.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiUsesItem, scNone), FVBOption.ImageIndexAdjustedForScope);
   Check(Nil = FVBOption.Comment);
 end;
 
@@ -3417,7 +3421,7 @@ begin
   CheckEquals(scPublic, FVBVersion.Scope);
   CheckEquals(12, FVBVersion.Line);
   CheckEquals(23, FVBVersion.Column);
-  CheckEquals(iiUsesItem, FVBVersion.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiUsesItem, scPublic), FVBVersion.ImageIndexAdjustedForScope);
   Check(Nil = FVBVersion.Comment);
 end;
 
@@ -3453,7 +3457,7 @@ begin
   CheckEquals(scPublic, FVBAttribute.Scope);
   CheckEquals(12, FVBAttribute.Line);
   CheckEquals(23, FVBAttribute.Column);
-  CheckEquals(iiUsesItem, FVBAttribute.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiUsesItem, scPublic), FVBAttribute.ImageIndexAdjustedForScope);
   Check(Nil = FVBAttribute.Comment);
 end;
 

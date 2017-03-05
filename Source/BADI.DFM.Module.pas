@@ -3,11 +3,11 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       12 Feb 2017
+  @Date       05 Mar 2017
   @Author     David Hoyle
 
 **)
-Unit BADI.DFMModule;
+Unit BADI.DFM.Module;
 
 Interface
 
@@ -16,52 +16,14 @@ Uses
   Windows,
   Contnrs,
   Classes,
-  BADI.BaseLanguageModule;
+  BADI.Base.Module,
+  BADI.ElementContainer,
+  BADI.Types,
+  BADI.Comment;
 
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  (** An enumerate to define the type of an object definition. **)
-  TObjectType = (otObject, otInherited, otinline);
-
-  (** This class represent a DFM object in the file. **)
-  TDFMObject = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FObjectType: TObjectType;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    (**
-      This property sets and gets the whether the Object, Inherited or Inline.
-      @precon  None.
-      @postcon Sets and gets the whether the Object, Inherited or Inline.
-      @return  a TObjectType
-    **)
-    Property ObjectType : TObjectType Read FObjectType Write FObjectType;
-  End;
-
-  (** This class represent a DFM property in the file. **)
-  TDFMProperty = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-  End;
-
-  (** This class represent a DFM Item in the file. **)
-  TDFMItem = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FItemName: String;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function GetName : String; Override;
-  Public
-    Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-  End;
-
   (**
 
     This is the main class for dealing with object pascal units and program
@@ -98,7 +60,7 @@ Type
       CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
   Public
-    Constructor CreateParser(Source : String; strFileName : String;
+    Constructor CreateParser(const Source, strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
@@ -108,6 +70,15 @@ Type
   End;
 
 Implementation
+
+uses
+  BADI.Options,
+  BADI.TokenInfo,
+  BADI.ResourceStrings,
+  BADI.Functions,
+  BADI.Constants,
+  BADI.Module.Dispatcher, BADI.DFM.ObjectDecl, BADI.DFM.Types, BADI.DFM.PropertyDecl,
+  BADI.DFM.Item;
 
 Const
   (**
@@ -125,135 +96,6 @@ Const
       token that can be sort as then next place to start parsing from when an
       error is  encountered. **)
   strSeekableOnErrorTokens : Array[1..1] Of String = ('end');
-
-{ TDFMObject }
-
-(**
-
-  This method returns a string represetation of the DFM object.
-
-  @precon  None.
-  @postcon Returns a string represetation of the DFM object.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TDFMObject.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Case ObjectType Of
-    otObject:    Result := 'Object';
-    otInherited: Result := 'Inherited';
-    otinline:    Result := 'Inline';
-  End;
-  Result := Result + #32 + BuildStringRepresentation(True, boolForDocumentation,
-    ':', BrowseAndDocItOptions.MaxDocOutputWidth)
-end;
-
-(**
-
-  A constructor for the TDFMObject class.
-
-  @precon  None.
-  @postcon Initialises FInherited to false.
-
-  @param   strName     as a String
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
-
-**)
-constructor TDFMObject.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
-begin
-  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
-  FObjectType := otObject;
-end;
-
-{ TDFMProperty }
-
-(**
-
-  This method returns a string represetation of the DFM property.
-
-  @precon  None.
-  @postcon Returns a string represetation of the DFM property.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TDFMProperty.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := BuildStringRepresentation(True, boolForDocumentation, '=',
-    BrowseAndDocItOptions.MaxDocOutputWidth,
-    ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?', '<', '>'],
-    ['(', '[', '{', '.', '^', '-'],
-    ['=', ':', '+', '*', '\'])
-end;
-
-{ TDFMItem }
-
-(**
-
-  This method returns a string representation of the item.
-
-  @precon  None.
-  @postcon Returns a string representation of the item.
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TDFMItem.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := 'Item';
-end;
-
-(**
-
-  A constructor for the TDFMItem class.
-
-  @precon  None.
-  @postcon Creates a unique name for the item.
-
-  @param   strName     as a String
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
-
-**)
-constructor TDFMItem.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
-begin
-  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
-  FItemName := Format('%s:%4.4d:%4.4d', [strName, iLine, iColumn]);
-end;
-
-(**
-
-  This is an overridden GetName to provide a unqiue name for the item.
-
-  @precon  None.
-  @postcon Returns a unqiue name for the item.
-
-  @return  a String
-
-**)
-function TDFMItem.GetName: String;
-begin
-  Result := FItemName;
-end;
 
 (**
 
@@ -316,13 +158,13 @@ end;
            disk.
   @postcon Creates an instance of the module parser.
 
-  @param   Source        as a String
-  @param   strFileName   as a String
+  @param   Source        as a String as a constant
+  @param   strFileName   as a String as a constant
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
 
 **)
-Constructor TDFMModule.CreateParser(Source : String; strFileName : String;
+Constructor TDFMModule.CreateParser(const Source, strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
 
 Begin
@@ -546,13 +388,11 @@ Begin
   iTokenLine := 1;
   iTokenColumn := 1;
   CurCharType := ttUnknown;
-  //: @debug LastCharType := ttUnknown;
   iStreamCount := 0;
   iLine := 1;
   iColumn := 1;
   LastChar := #0;
   strToken := '';
-  //: @debug LastToken := ttUnknown;
 
   iTokenLen := 0;
   SetLength(strToken, iTokenCapacity);
@@ -863,11 +703,11 @@ begin
           End Else
           Begin
             AddIssue(strUnExpectedEndOfFile, scNone, 'Goal', 0, 0, etError);
-            Raise EParserAbort.Create('Parsing Aborted!');
+            Raise EBADIParserAbort.Create('Parsing Aborted!');
           End;
       End;
   Except
-    On E : EParserAbort Do
+    On E : EBADIParserAbort Do
       AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
   End;
 end;

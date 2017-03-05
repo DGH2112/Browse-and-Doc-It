@@ -1258,7 +1258,7 @@ Begin
     '',
     [ttErrors, ttWarnings],
     [
-      'Uses\Windows|Windows|scNone',
+      'Uses\Windows|Windows|scPublic',
       'Exports\MyFunc|MyFunc|scPublic'
     ]
   );
@@ -3474,8 +3474,8 @@ Begin
     '  DGHProc;',
     [ttErrors, ttWarnings],
     [
-      'Uses\Windows|Windows|scNone',
-      'Uses\DGHLibrary|DGHLibrary|scNone',
+      'Uses\Windows|Windows|scPrivate',
+      'Uses\DGHLibrary|DGHLibrary|scPrivate',
       'Constants\c|c = 1|scPrivate',
       'Variables\i|i : Integer|scPrivate',
       'Exports\DGHProc|DGHProc|scPublic'
@@ -3551,7 +3551,7 @@ Begin
     'end;',
     [ttErrors, ttWarnings],
     [
-      'Uses\Windows|Windows|scNone',
+      'Uses\Windows|Windows|scPublic',
       'Types\t|t = Integer|scPublic',
       'Constants\c|c = 0|scPublic',
       'Resource Strings\rs|rs = ''hello.''|scPublic',
@@ -3606,7 +3606,7 @@ Begin
     '',
     [ttErrors, ttWarnings],
     [
-      'Uses\Windows|Windows|ScNone',
+      'Uses\Windows|Windows|scPublic',
       'Types\t|t = Integer|scPublic',
       'Variables\v|v : String|scPublic'
     ]
@@ -5244,7 +5244,7 @@ Begin
     '',
     [ttErrors, ttWarnings],
     [
-      'Uses\Windows|Windows|scNone',
+      'Uses\Windows|Windows|scPublic',
       'Exported Headings\Hello|Procedure Hello|scPublic',
       'Constants\i|i = 10|scPrivate',
       'Implemented Methods\Hello|Procedure Hello|scPublic'
@@ -5616,8 +5616,8 @@ Begin
     '',
     [ttErrors, ttWarnings],
     [
-      'Uses\SysUtils|SysUtils|scNone',
-      'Uses\Windows|Windows|scNone',
+      'Uses\SysUtils|SysUtils|scPublic',
+      'Uses\Windows|Windows|scPublic',
       'Resource Strings\strHello|strHello = ''Hello''|scPrivate'
     ]
   );
@@ -7156,9 +7156,9 @@ Begin
     '  Classes;',
     [ttErrors, ttWarnings],
     [
-      'Uses\SysUtils|SysUtils|scNone',
-      'Uses\Windows|Windows|scNone',
-      'Uses\Classes|Classes|scNone'
+      'Uses\SysUtils|SysUtils|scPublic',
+      'Uses\Windows|Windows|scPublic',
+      'Uses\Classes|Classes|scPrivate'
     ]
   );
 End;

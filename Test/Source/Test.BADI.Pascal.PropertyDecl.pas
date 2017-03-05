@@ -24,7 +24,8 @@ Implementation
 Uses
   BADI.Types,
   BADI.Pascal.TypeDecl,
-  BADI.Pascal.ParameterDecl;
+  BADI.Pascal.ParameterDecl,
+  BADI.Functions;
 
 Procedure TestTPascalProperty.SetUp;
 
@@ -102,7 +103,7 @@ Begin
   Checkequals(12, FPascalProperty.Line);
   Checkequals(23, FPascalProperty.Column);
   Checkequals(iiPublicProperty, FPascalProperty.ImageIndex);
-  Checkequals(iiProtectedProperty, FPascalProperty.ImageIndexAdjustedForScope);
+  Checkequals(BADIImageIndex(iiPublicProperty, scProtected), FPascalProperty.ImageIndexAdjustedForScope);
 End;
 
 Initialization

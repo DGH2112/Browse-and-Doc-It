@@ -10,19 +10,6 @@ Uses
 
 Type
   //
-  // Test Class for the TBackusNaurComment Class Methods.
-  //
-  TestTBackusNaurComment = Class(TExtendedTestCase)
-  Strict Private
-    FBackusNaurComment : TBackusNaurComment;
-  Public
-    Procedure SetUp; Override;
-    Procedure TearDown; Override;
-  Published
-    Procedure TestCreateComment;
-  End;
-
-  //
   // Test Class for the TBackusNaurModule Class Methods.
   //
   TestTBackusNaurModule = Class(TExtendedTestCase)
@@ -54,54 +41,9 @@ Type
 Implementation
 
 uses
-  BADI.Comment, BADI.Types, BADI.ResourceStrings;
-
-//
-// Test Methods for Class TBackusNaurComment.
-//
-Procedure TestTBackusNaurComment.Setup;
-Begin
-  FBackusNaurComment := TBackusNaurComment.Create('This is a comment.', 12, 23);
-End;
-
-Procedure TestTBackusNaurComment.TearDown;
-
-Begin
-  FBackusNaurComment.Free;
-End;
-
-Procedure TestTBackusNaurComment.TestCreateComment;
-
-var
-  C: TComment;
-
-Begin
-  Checkequals(8, FBackusNaurComment.TokenCount);
-  CheckEquals(12, FBackusNaurComment.Line);
-  CheckEquals(23, FBackusNaurComment.Column);
-  C := TBackusNaurComment.CreateComment('/* This is a comment. */', 1, 2);
-  Check(C = Nil, '/* Comment */ is not NULL');
-  C := TBackusNaurComment.CreateComment('// This is a comment.', 1, 2);
-  Check(C = Nil, '// Comment is not NULL');
-  C := TBackusNaurComment.CreateComment('/** This is a comment. **/', 1, 2);
-  Try
-    Check(C <> Nil, '/** Comment **/ is NULL');
-    CheckEquals(8, C.TokenCount);
-    CheckEquals(1, C.Line);
-    CheckEquals(2, C.Column);
-  Finally
-    C.Free;
-  End;
-  C := TBackusNaurComment.CreateComment('//: This is a comment.', 1, 2);
-  Try
-    Check(C <> Nil, '//: Comment is NULL');
-    CheckEquals(8, C.TokenCount);
-    CheckEquals(1, C.Line);
-    CheckEquals(2, C.Column);
-  Finally
-    C.Free;
-  End;
-End;
+  BADI.Comment,
+  BADI.Types,
+  BADI.ResourceStrings;
 
 //
 // Test Methods for Class TBackusNaurModule.
@@ -506,6 +448,5 @@ begin
 end;
 
 Initialization
-  RegisterTest('Backus-Naur', TestTBackusNaurComment.Suite);
   RegisterTest('Backus-Naur', TestTBackusNaurModule.Suite);
 End.

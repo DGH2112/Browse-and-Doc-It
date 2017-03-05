@@ -1,12 +1,12 @@
-Unit Test.BADI.XMLModule;
+Unit Test.BADI.XML.Module;
 
 Interface
 
 Uses
   TestFramework,
-  Test.BADI.BaseLanguageModule,
-  BADI.XMLModule,
-  BADI.BaseLanguageModule;
+  Test.BADI.Base.Module,
+  BADI.XML.Module,
+  BADI.Base.Module;
 
 Type
   //
@@ -187,6 +187,9 @@ Type
 
 Implementation
 
+uses
+  BADI.Types, BADI.ResourceStrings, BADI.Functions;
+
 //
 // Test Methods for Class TXMLDecl.
 //
@@ -213,8 +216,7 @@ begin
   CheckEquals(scNone, FXMLDecl.Scope);
   CheckEquals(12, FXMLDecl.Line);
   CheckEquals(23, FXMLDecl.Column);
-  CheckEquals(iiPublicType, FXMLDecl.ImageIndex);
-  CheckEquals(iiPublicType, FXMLDecl.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicType, scNone), FXMLDecl.ImageIndexAdjustedForScope);
 end;
 
 //
@@ -243,8 +245,7 @@ begin
   CheckEquals(scNone, FXMLDocType.Scope);
   CheckEquals(12, FXMLDocType.Line);
   CheckEquals(23, FXMLDocType.Column);
-  CheckEquals(iiPublicObject, FXMLDocType.ImageIndex);
-  CheckEquals(iiPublicObject, FXMLDocType.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicObject, scNone), FXMLDocType.ImageIndexAdjustedForScope);
 end;
 
 //
@@ -274,8 +275,7 @@ begin
   CheckEquals(scNone, FXMLElemDecl.Scope);
   CheckEquals(12, FXMLElemDecl.Line);
   CheckEquals(23, FXMLElemDecl.Column);
-  CheckEquals(iiPublicObject, FXMLElemDecl.ImageIndex);
-  CheckEquals(iiPublicObject, FXMLElemDecl.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicObject, scNone), FXMLElemDecl.ImageIndexAdjustedForScope);
 end;
 
 //
@@ -305,8 +305,7 @@ Begin
   CheckEquals(scNone, FXMLElement.Scope);
   CheckEquals(12, FXMLElement.Line);
   CheckEquals(23, FXMLElement.Column);
-  CheckEquals(iiPublicObject, FXMLElement.ImageIndex);
-  CheckEquals(iiPublicObject, FXMLElement.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicObject, scNone), FXMLElement.ImageIndexAdjustedForScope);
 End;
 
 Procedure TestTXMLElement.TestGetName;

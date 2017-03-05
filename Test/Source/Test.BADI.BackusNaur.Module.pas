@@ -1,12 +1,12 @@
-Unit Test.BADI.BackusNaurModule;
+Unit Test.BADI.BackusNaur.Module;
 
 Interface
 
 Uses
   TestFramework,
-  BADI.BaseLanguageModule,
-  Test.BADI.BaseLanguageModule,
-  BADI.BackusNaurModule;
+  BADI.Base.Module,
+  Test.BADI.Base.Module,
+  BADI.BackusNaur.Module;
 
 Type
   //
@@ -52,6 +52,9 @@ Type
   End;
 
 Implementation
+
+uses
+  BADI.Comment, BADI.Types, BADI.ResourceStrings;
 
 //
 // Test Methods for Class TBackusNaurComment.

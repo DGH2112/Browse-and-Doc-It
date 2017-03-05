@@ -26,7 +26,8 @@ Implementation
 Uses
   BADI.Types,
   BADI.Comment,
-  BADI.TokenInfo;
+  BADI.TokenInfo,
+  BADI.Functions;
 
 Procedure TestTObjectDecl.SetUp;
 Begin
@@ -67,7 +68,7 @@ Begin
   CheckEquals(12, FObjectDecl.Line);
   CheckEquals(23, FObjectDecl.Column);
   CheckEquals(iiPublicObject, FObjectDecl.ImageIndex);
-  CheckEquals(iiProtectedObject, FObjectDecl.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicObject, scProtected), FObjectDecl.ImageIndexAdjustedForScope);
 End;
 
 Procedure TestTObjectDecl.TestAsString;

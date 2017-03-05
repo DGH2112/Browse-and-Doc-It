@@ -24,7 +24,8 @@ Implementation
 
 Uses
   BADI.Types,
-  BADI.Comment;
+  BADI.Comment,
+  BADI.Functions;
 
 Procedure TestTField.SetUp;
 Begin
@@ -69,8 +70,7 @@ Begin
   CheckEquals(scPublic, FField.Scope);
   CheckEquals(12, FField.Line);
   CheckEquals(23, FField.Column);
-  CheckEquals(iiPublicField, FField.ImageIndex);
-  CheckEquals(iiPublicField, FField.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicField, scPublic), FField.ImageIndexAdjustedForScope);
 End;
 
 Initialization

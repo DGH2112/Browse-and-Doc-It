@@ -25,7 +25,8 @@ Implementation
 Uses
   BADI.Types,
   BADI.Comment,
-  BADI.TokenInfo;
+  BADI.TokenInfo,
+  BADI.Functions;
 
 Procedure TestTDispInterfaceDecl.SetUp;
 Begin
@@ -67,7 +68,7 @@ Begin
   CheckEquals(12, FDispInterfaceDecl.Line);
   CheckEquals(23, FDispInterfaceDecl.Column);
   CheckEquals(iiPublicDispInterface, FDispInterfaceDecl.ImageIndex);
-  CheckEquals(iiPrivateDispInterface, FDispInterfaceDecl.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicDispInterface, scPrivate), FDispInterfaceDecl.ImageIndexAdjustedForScope);
 End;
 
 Procedure TestTDispInterfaceDecl.TestAsString;

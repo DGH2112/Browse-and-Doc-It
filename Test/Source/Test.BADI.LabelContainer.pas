@@ -22,7 +22,9 @@ Type
 Implementation
 
 Uses
-  BADI.Types, BADI.ResourceStrings;
+  BADI.Types,
+  BADI.ResourceStrings,
+  BADI.Functions;
 
 Procedure TestTLabelContainer.SetUp;
 Begin
@@ -47,8 +49,7 @@ Begin
   CheckEquals(scNone, FLabelContainer.Scope);
   CheckEquals(12, FLabelContainer.Line);
   CheckEquals(23, FLabelContainer.Column);
-  CheckEquals(iiImplementedMethods, FLabelContainer.ImageIndex);
-  CheckEquals(iiImplementedMethods, FLabelContainer.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiImplementedMethods, scNone), FLabelContainer.ImageIndexAdjustedForScope);
 End;
 
 Initialization

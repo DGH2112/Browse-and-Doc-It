@@ -1,12 +1,12 @@
-Unit Test.BADI.EidolonModule;
+Unit Test.BADI.Eidolon.Module;
 
 Interface
 
 Uses
   TestFramework,
-  BADI.EidolonModule,
-  BADI.BaseLanguageModule,
-  Test.BADI.BaseLanguageModule;
+  BADI.Eidolon.Module,
+  BADI.Base.Module,
+  Test.BADI.Base.Module;
 
 Type
   //
@@ -78,6 +78,9 @@ Type
   End;
 
 Implementation
+
+uses
+  BADI.Comment, BADI.Types, BADI.ResourceStrings;
 
 
 //

@@ -24,7 +24,8 @@ Implementation
 
 Uses
   BADI.Types,
-  BADI.Comment;
+  BADI.Comment,
+  BADI.Functions;
 
 Procedure TestTThreadVar.SetUp;
 Begin
@@ -64,7 +65,7 @@ Begin
   CheckEquals(12, FThreadVar.Line);
   CheckEquals(23, FThreadVar.Column);
   CheckEquals(iiPublicThreadVar, FThreadVar.ImageIndex);
-  CheckEquals(iiPrivateThreadVar, FThreadVar.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicThreadVar, scPrivate), FThreadVar.ImageIndexAdjustedForScope);
 End;
 
 Initialization

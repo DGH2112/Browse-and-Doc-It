@@ -22,7 +22,8 @@ Type
 Implementation
 
 Uses
-  BADI.Types;
+  BADI.Types,
+  BADI.Functions;
 
 Procedure TestTVar.SetUp;
 Begin
@@ -48,7 +49,7 @@ Begin
   Checkequals(12, FVar.Line);
   Checkequals(23, FVar.Column);
   Checkequals(iiPublicVariable, FVar.ImageIndex);
-  Checkequals(iiPrivateVariable, FVar.ImageIndexAdjustedForScope);
+  Checkequals(BADIImageIndex(iiPublicVariable, scPrivate), FVar.ImageIndexAdjustedForScope);
 End;
 
 Initialization

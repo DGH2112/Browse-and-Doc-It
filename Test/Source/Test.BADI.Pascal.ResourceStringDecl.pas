@@ -22,7 +22,9 @@ Type
 Implementation
 
 Uses
-  BADI.Types, BADI.Comment;
+  BADI.Types,
+  BADI.Comment,
+  BADI.Functions;
 
 Procedure TestTResourceString.SetUp;
 Begin
@@ -64,8 +66,7 @@ Begin
   CheckEquals(scPublic, FResourceString.Scope);
   CheckEquals(12, FResourceString.Line);
   CheckEquals(23, FResourceString.Column);
-  CheckEquals(iiPublicResourceString, FResourceString.ImageIndex);
-  CheckEquals(iiPublicResourceString, FResourceString.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicResourceString, scPublic), FResourceString.ImageIndexAdjustedForScope);
 End;
 
 Initialization

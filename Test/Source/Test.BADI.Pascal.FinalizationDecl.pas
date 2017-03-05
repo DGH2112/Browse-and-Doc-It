@@ -24,7 +24,7 @@ Implementation
 
 Uses
   BADI.Types,
-  BADI.Comment;
+  BADI.Comment, BADI.Functions;
 
 Procedure TestTFinalizationSection.SetUp;
 Begin
@@ -70,8 +70,7 @@ Begin
   Checkequals(scNone, FFinalizationSection.Scope);
   Checkequals(12, FFinalizationSection.Line);
   Checkequals(23, FFinalizationSection.Column);
-  Checkequals(iiFinalization, FFinalizationSection.ImageIndex);
-  Checkequals(iiFinalization, FFinalizationSection.ImageIndexAdjustedForScope);
+  Checkequals(BADIImageIndex(iiFinalization, scNone), FFinalizationSection.ImageIndexAdjustedForScope);
 End;
 
 Initialization

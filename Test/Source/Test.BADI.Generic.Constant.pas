@@ -5,7 +5,7 @@ Interface
 Uses
   TestFramework,
   Test.BADI.Base.Module,
-  BADI.generic.Constant;
+  BADI.Generic.Constant;
 
 Type
   TestTGenericConstant = Class(TExtendedTestCase)
@@ -23,7 +23,8 @@ Implementation
 
 Uses
   BADI.Types,
-  BADI.Comment;
+  BADI.Comment,
+  BADI.Functions;
 
 Procedure TestTGenericConstant.SetUp;
 Begin
@@ -63,7 +64,7 @@ Begin
   CheckEquals(23, FGenericConstant.Line);
   CheckEquals(34, FGenericConstant.Column);
   CheckEquals(iiPublicConstant, FGenericConstant.ImageIndex);
-  CheckEquals(iiPublishedConstant, FGenericConstant.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicConstant, scPublished), FGenericConstant.ImageIndexAdjustedForScope);
 End;
 
 Initialization

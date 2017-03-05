@@ -23,7 +23,8 @@ Type
 Implementation
 
 Uses
-  BADI.Types;
+  BADI.Types,
+  BADI.Functions;
 
 Procedure TestTArrayType.SetUp;
 
@@ -65,7 +66,7 @@ Begin
   CheckEquals(12, FArrayType.Line);
   CheckEquals(23, FArrayType.Column);
   CheckEquals(iiPublicType, FArrayType.ImageIndex);
-  CheckEquals(iiProtectedType, FArrayType.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicType, scProtected), FArrayType.ImageIndexAdjustedForScope);
 End;
 
 Procedure TestTArrayType.TestAddDimension;

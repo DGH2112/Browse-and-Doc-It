@@ -22,7 +22,8 @@ Type
 Implementation
 
 Uses
-  BADI.Types;
+  BADI.Types,
+  BADI.Functions;
 
 Procedure TestTIdentList.SetUp;
 
@@ -57,7 +58,7 @@ Begin
   CheckEquals(12, FIdentList.Line);
   CheckEquals(23, FIdentList.Column);
   CheckEquals(iiNone, FIdentList.ImageIndex);
-  CheckEquals(iiNone, FIdentList.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiNone, scNone), FIdentList.ImageIndexAdjustedForScope);
 End;
 
 Initialization

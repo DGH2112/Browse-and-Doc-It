@@ -3,11 +3,11 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       12 Feb 2017
+  @Date       05 Mar 2017
   @Author     David Hoyle
 
 **)
-Unit BADI.BackusNaurModule;
+Unit BADI.BackusNaur.Module;
 
 Interface
 
@@ -16,27 +16,16 @@ Uses
   Windows,
   Contnrs,
   Classes,
-  BADI.BaseLanguageModule;
+  BADI.Base.Module,
+  BADI.ElementContainer,
+  BADI.Comment,
+  BADI.Types,
+  BADI.TokenInfo,
+  BADI.BackusNaur.Rule;
 
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  (** This class represents the BNF rule found in the code. **)
-  TBNFRule = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    Function  AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-  End;
-
-  (** A pascal specific implementation of comments. **)
-  TBackusNaurComment = Class(TComment)
-  Public
-    Class Function CreateComment(strComment: String; iLine,
-      iCol: Integer): TComment; Override;
-  End;
-
   (** This is the main class for dealing with backus-naur grammar files. **)
   TBackusNaurModule = Class(TBaseLanguageModule)
   {$IFDEF D2005} Strict {$ENDIF} Private
@@ -49,16 +38,16 @@ Type
     Procedure Goal;
     Procedure Syntax;
     Procedure Rule;
-    Procedure Expression(R : TBNFRule);
-    Procedure RepeatOperator(R : TBNFRule);
-    Procedure List(R : TBNFRule);
-    Procedure SimpleExpression(R : TBNFRule);
-    Procedure Term(R : TBNFRule);
-    Procedure Literal(R : TBNFRule);
-    Function  CharRef(R : TBNFRule) : Boolean;
-    Function  LiteralChar(R : TBNFRule) : Boolean;
-    Function  DecChar(R : TBNFRule) : Boolean;
-    Function  HexChar(R : TBNFRule) : Boolean;
+    Procedure Expression(R : TBackusNaurRule);
+    Procedure RepeatOperator(R : TBackusNaurRule);
+    Procedure List(R : TBackusNaurRule);
+    Procedure SimpleExpression(R : TBackusNaurRule);
+    Procedure Term(R : TBackusNaurRule);
+    Procedure Literal(R : TBackusNaurRule);
+    Function  CharRef(R : TBackusNaurRule) : Boolean;
+    Function  LiteralChar(R : TBackusNaurRule) : Boolean;
+    Function  DecChar(R : TBackusNaurRule) : Boolean;
+    Function  HexChar(R : TBackusNaurRule) : Boolean;
     Procedure Terminator;
     Procedure LineEnd;
     procedure SemiColon;
@@ -75,7 +64,7 @@ Type
     Procedure ProcessTags;
     Function GetModuleName : String; Override;
   Public
-    Constructor CreateParser(Source : String; strFileName : String;
+    Constructor CreateParser(const Source, strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
@@ -88,7 +77,12 @@ Type
 Implementation
 
 Uses
-  DGHLibrary;
+  DGHLibrary,
+  BADI.Options,
+  BADI.ResourceStrings,
+  BADI.Functions,
+  BADI.Constants,
+  BADI.Module.Dispatcher, BADI.BackusNaur.Comment;
 
 Resourcestring
   (** This is an error message for duplicate identifiers. **)
@@ -156,73 +150,17 @@ Const
 
 (**
 
-
-  This method is a class method to first check the comment for being a
-  documentation comment and then creating an instance of a TComment class and
-  parsing the comment via the constructor.
-
-  @precon  strComment is the full comment to be checked and parsed, iLine is
-           the line number of the comment and iCol is the column number of
-           the comment.
-
-  @postcon Returns Nil if this is not a documentation comment or returns a
-           valid TComment class.
-
-  @param   strComment as a String
-  @param   iLine      as an Integer
-  @param   iCol       as an Integer
-  @return  a TComment
-
-**)
-class function TBackusNaurComment.CreateComment(strComment: String; iLine,
-  iCol: Integer): TComment;
-
-begin
-  Result := Nil;
-  If Length(strComment) > 0 Then
-    Begin
-      Case strComment[1] Of
-        '/' : strComment := Copy(strComment, 2, Length(strComment) - 1);
-      End;
-      If Length(strComment) > 0 Then
-        Begin
-          If strComment[1] = '*' Then
-            strComment := Copy(strComment, 2, Length(strComment) - 3);
-          If Length(strComment) > 0 Then
-            Begin
-              If strComment[1] = '/' Then
-                strComment := Copy(strComment, 2, Length(strComment) - 1);
-              If Length(strComment) > 0 Then
-                Begin
-                  If strComment[1] = ':' Then
-                    Begin;
-                      strComment := Copy(strComment, 2, Length(strComment) - 1);
-                      Result := Create(strComment, iLine, iCol);
-                    End
-                  Else If strComment[1] = '*' Then
-                    Begin;
-                      strComment := Copy(strComment, 2, Length(strComment) - 2);
-                      Result := Create(strComment, iLine, iCol);
-                    End;
-                End;
-            End;
-        End;
-    End;
-end;
-
-(**
-
   This method checks for a CharRef and return true one was found.
 
-  @precon  T must be a valid instance of a TBNFRule class.
+  @precon  T must be a valid instance of a TBackusNaurRule class.
   @postcon Checks for a CharRef and return true one was found. Additionally,
            the token is added to the BNF rule.
 
-  @param   R as a TBNFRule
+  @param   R as a TBackusNaurRule
   @return  a Boolean
 
 **)
-Function TBackusNaurModule.CharRef(R: TBNFRule) : Boolean;
+Function TBackusNaurModule.CharRef(R: TBackusNaurRule) : Boolean;
 begin
   Result := DecChar(R);
   If Not Result Then
@@ -290,13 +228,13 @@ end;
            disk.
   @postcon Creates an instance of the module parser.
 
-  @param   Source        as a String
-  @param   strFileName   as a String
+  @param   Source        as a String as a constant
+  @param   strFileName   as a String as a constant
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
 
 **)
-Constructor TBackusNaurModule.CreateParser(Source : String; strFileName : String;
+Constructor TBackusNaurModule.CreateParser(const Source, strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
 
 Var
@@ -341,15 +279,15 @@ End;
   This method checks the token to see if its a Decimal Character, if so adds it
   to the rule and returns true.
 
-  @precon  R must be a valid instance of a TBNFRule class.
+  @precon  R must be a valid instance of a TBackusNaurRule class.
   @postcon Checks the token to see if its a Decimal Character, if so adds it
            to the rule and returns true.
 
-  @param   R as a TBNFRule
+  @param   R as a TBackusNaurRule
   @return  a Boolean
 
 **)
-Function TBackusNaurModule.DecChar(R: TBNFRule) : Boolean;
+Function TBackusNaurModule.DecChar(R: TBackusNaurRule) : Boolean;
 
 var
   i: Integer;
@@ -414,10 +352,10 @@ end;
   @postcon Parsers an expression as a list and an optional a further
            expression.
 
-  @param   R as a TBNFRule
+  @param   R as a TBackusNaurRule
 
 **)
-procedure TBackusNaurModule.Expression(R : TBNFRule);
+procedure TBackusNaurModule.Expression(R : TBackusNaurRule);
 
 Var
   iTokens : Integer;
@@ -737,13 +675,13 @@ end;
 
   This method processes the list of terms in the grammar.
 
-  @precon  R must be a valid instance of a TBNFRule class.
+  @precon  R must be a valid instance of a TBackusNaurRule class.
   @postcon Processes the list of terms in the grammar.
 
-  @param   R as a TBNFRule
+  @param   R as a TBackusNaurRule
 
 **)
-procedure TBackusNaurModule.List(R : TBNFRule);
+procedure TBackusNaurModule.List(R : TBackusNaurRule);
 
 Var
   StartToken : TTokenInfo;
@@ -788,10 +726,10 @@ end;
   @precon  R must be a valid instance of a TBNDRule class.
   @postcon Parses literal tokens and adds them to the rule if found.
 
-  @param   R as a TBNFRule
+  @param   R as a TBackusNaurRule
 
 **)
-procedure TBackusNaurModule.Literal(R: TBNFRule);
+procedure TBackusNaurModule.Literal(R: TBackusNaurRule);
 begin
   If CharRef(R) Then
     Begin
@@ -818,11 +756,11 @@ end;
   @postcon Checks the token to see if its a single character literal and if
            so adds it the rule and returns true.
 
-  @param   R as a TBNFRule
+  @param   R as a TBackusNaurRule
   @return  a Boolean
 
 **)
-Function TBackusNaurModule.LiteralChar(R: TBNFRule) : Boolean;
+Function TBackusNaurModule.LiteralChar(R: TBackusNaurRule) : Boolean;
 
 begin
   Result := (Token.TokenType In [ttSingleLiteral, ttDoubleLiteral]) And
@@ -957,14 +895,14 @@ End;
   This method checks to see if the token is either one of the repeat tokens and
   adds it to the rule if so.
 
-  @precon  R must be a valid instance of a TBNFRule class.
+  @precon  R must be a valid instance of a TBackusNaurRule class.
   @postcon Checks to see if the token is either one of the repeat tokens and
            adds it to the rule if so.
 
-  @param   R as a TBNFRule
+  @param   R as a TBackusNaurRule
 
 **)
-procedure TBackusNaurModule.RepeatOperator(R: TBNFRule);
+procedure TBackusNaurModule.RepeatOperator(R: TBackusNaurRule);
 begin
   If (Token.Token = '*') Or (Token.Token = '+') Then
     AddToExpression(R);
@@ -974,13 +912,13 @@ end;
 
   This method processes the Terms of the grammar.
 
-  @precon  R must be a valid instance of a TBNFRule class.
+  @precon  R must be a valid instance of a TBackusNaurRule class.
   @postcon Processes the Terms of the grammar.
 
-  @param   R as a TBNFRule
+  @param   R as a TBackusNaurRule
 
 **)
-procedure TBackusNaurModule.Term(R : TBNFRule);
+procedure TBackusNaurModule.Term(R : TBackusNaurRule);
 var
   iCode: Integer;
 
@@ -1037,14 +975,14 @@ end;
 Procedure TBackusNaurModule.Rule;
 
 Var
-  R : TBNFRule;
+  R : TBackusNaurRule;
 
 begin
   If Token.TokenType In [ttIdentifier] Then
     Begin
       If Like('<*>', Token.Token) Then
         Begin
-          R := TBNFRule.Create(Token.Token, scPublic, Token.Line, Token.Column,
+          R := TBackusNaurRule.Create(Token.Token, scPublic, Token.Line, Token.Column,
             iiPublicType, GetComment);
           If R.Identifier = '<>' Then
             AddIssue(Format(strNULLIdentifierFound, [Token.Token,
@@ -1101,13 +1039,13 @@ end;
 
   This method parsers a simple expression looking for an exception operator.
 
-  @precon  R must be a valid instance of a TBNFRule class.
+  @precon  R must be a valid instance of a TBackusNaurRule class.
   @postcon Parsers a simple expression looking for an exception operator.
 
-  @param   R as a TBNFRule
+  @param   R as a TBackusNaurRule
 
 **)
-procedure TBackusNaurModule.SimpleExpression(R: TBNFRule);
+procedure TBackusNaurModule.SimpleExpression(R: TBackusNaurRule);
 begin
   Term(R);
   If Token.Token = '-' Then
@@ -1200,7 +1138,7 @@ begin
           End;
       End;
   Except
-    On E : EParserAbort Do
+    On E : EBADIParserAbort Do
       AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
   End;
 end;
@@ -1210,15 +1148,15 @@ end;
   This method checks the token to see if its a Hexidecimal Character, if so adds it
   to the rule and returns true.
 
-  @precon  R must be a valid instance of a TBNFRule class.
+  @precon  R must be a valid instance of a TBackusNaurRule class.
   @postcon Checks the token to see if its a Hexidecimal Character, if so adds it
            to the rule and returns true.
 
-  @param   R as a TBNFRule
+  @param   R as a TBackusNaurRule
   @return  a Boolean
 
 **)
-Function TBackusNaurModule.HexChar(R: TBNFRule) : Boolean;
+Function TBackusNaurModule.HexChar(R: TBackusNaurRule) : Boolean;
 
 var
   i: Integer;
@@ -1240,28 +1178,6 @@ begin
         ErrorAndSeekToken(strInvalidHexCharRef, 'HexChar', Token.Token,
           strSeekableOnErrorTokens, stActual);
     End;
-end;
-
-{ TBNFRule }
-
-(**
-
-  This method returns a string representation of the BNG Rule.
-
-  @precon  None.
-  @postcon Returns a string representation of the BNG Rule.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TBNFRule.AsString(boolShowIdenifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := Name + ' ::= ' +
-    BuildStringRepresentation(False, boolForDocumentation, '::=',
-      BrowseAndDocItOptions.MaxDocOutputWidth, ['.', '+', '*'], ['.']);
 end;
 
 (** Register the file source code extensions that can be parsed by this module. **)

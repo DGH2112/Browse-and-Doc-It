@@ -23,7 +23,8 @@ Implementation
 
 Uses
   BADI.Types,
-  BADI.Comment;
+  BADI.Comment,
+  BADI.Functions;
 
 Procedure TestTGenericTypeDecl.SetUp;
 Begin
@@ -63,7 +64,7 @@ Begin
   CheckEquals(23, FGenericTypeDecl.Line);
   CheckEquals(34, FGenericTypeDecl.Column);
   CheckEquals(iiPublicType, FGenericTypeDecl.ImageIndex);
-  CheckEquals(iiProtectedType, FGenericTypeDecl.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicType, scProtected), FGenericTypeDecl.ImageIndexAdjustedForScope);
 End;
 
 Initialization

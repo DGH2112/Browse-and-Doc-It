@@ -1,11 +1,11 @@
-Unit Test.BADI.DFMModule;
+Unit Test.BADI.DFM.Module;
 
 Interface
 
 Uses
   TestFramework,
-  BADI.DFMModule,
-  Test.BADI.BaseLanguageModule;
+  BADI.DFM.Module,
+  Test.BADI.Base.Module;
 
 Type
   //
@@ -69,7 +69,7 @@ Type
 Implementation
 
 Uses
-  BADI.BaseLanguageModule;
+  BADI.Base.Module, BADI.Types, BADI.ResourceStrings, BADI.Functions;
 
 //
 // Test Methods for Class TDFMModule.
@@ -1157,8 +1157,7 @@ begin
   CheckEquals(scPublic, FDFMObject.Scope);
   CheckEquals(12, FDFMObject.Line);
   CheckEquals(23, FDFMObject.Column);
-  CheckEquals(iiPublicObject, FDFMObject.ImageIndex);
-  CheckEquals(iiPublicObject, FDFMObject.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicObject, scPublic), FDFMObject.ImageIndexAdjustedForScope);
 end;
 
 //
@@ -1189,8 +1188,7 @@ begin
   CheckEquals(scPublic, FDFMProperty.Scope);
   CheckEquals(12, FDFMProperty.Line);
   CheckEquals(23, FDFMProperty.Column);
-  CheckEquals(iiPublicProperty, FDFMProperty.ImageIndex);
-  CheckEquals(iiPublicProperty, FDFMProperty.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicProperty, scPublic), FDFMProperty.ImageIndexAdjustedForScope);
 end;
 
 Initialization

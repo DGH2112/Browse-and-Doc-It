@@ -1,11 +1,11 @@
-Unit Test.BADI.CommonIDEFunctions;
+Unit Test.BADI.Common.IDE.Functions;
 
 Interface
 
 Uses
   TestFramework,
   BADI.CommonIDEFunctions,
-  Test.BADI.BaseLanguageModule;
+  Test.BADI.Base.Module;
 
 Type
   //
@@ -26,10 +26,21 @@ Type
 Implementation
 
 Uses
-  BADI.BaseLanguageModule,
+  BADI.Base.Module,
   Classes,
   Windows,
-  SysUtils;
+  SysUtils,
+  BADI.ElementContainer,
+  BADI.Module.Dispatcher,
+  BADI.Types,
+  BADI.ResourceStrings,
+  BADI.Generic.MethodDecl,
+  BADI.Generic.PropertyDecl,
+  BADI.Comment,
+  BADI.Generic.Parameter,
+  BADI.Generic.TypeDecl,
+  BADI.Comment.Tag,
+  BADI.Options;
 
 //
 // Test Methods for Class Functions.

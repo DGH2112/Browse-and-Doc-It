@@ -22,7 +22,8 @@ Type
 Implementation
 
 Uses
-  BADI.Types;
+  BADI.Types,
+  BADI.Functions;
 
 Procedure TestTConstant.SetUp;
 Begin
@@ -53,7 +54,7 @@ Begin
   Checkequals(12, FConstant.Line);
   Checkequals(23, FConstant.Column);
   Checkequals(iiPublicConstant, FConstant.ImageIndex);
-  Checkequals(iiPrivateConstant, FConstant.ImageIndexAdjustedForScope);
+  Checkequals(BADIImageIndex(iiPublicConstant, scPrivate), FConstant.ImageIndexAdjustedForScope);
 End;
 
 Initialization

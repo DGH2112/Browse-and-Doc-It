@@ -26,7 +26,7 @@ Implementation
 Uses
   BADI.Types,
   BADI.Comment,
-  BADI.TokenInfo;
+  BADI.TokenInfo, BADI.Functions;
 
 Procedure TestTClassDecl.SetUp;
 Begin
@@ -66,7 +66,7 @@ Begin
   CheckEquals(12, FClassDecl.Line);
   CheckEquals(23, FClassDecl.Column);
   CheckEquals(iiPublicClass, FClassDecl.ImageIndex);
-  CheckEquals(iiPublicClass, FClassDecl.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicClass, scPublic), FClassDecl.ImageIndexAdjustedForScope);
 End;
 
 Procedure TestTClassDecl.TestAsString;

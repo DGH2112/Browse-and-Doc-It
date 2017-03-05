@@ -1,10 +1,10 @@
-Unit Test.BADI.ModuleDispatcher;
+Unit Test.BADI.Module.Dispatcher;
 
 Interface
 
 Uses
   TestFramework,
-  Test.BADI.BaseLanguageModule;
+  Test.BADI.Base.Module;
 
 Type
   //
@@ -25,7 +25,9 @@ Implementation
 
 Uses
   BADI.CommonIDEFunctions,
-  BADI.BaseLanguageModule;
+  BADI.Base.Module,
+  BADI.Module.Dispatcher,
+  BADI.Types;
 
 //
 // Test Methods for Class Functions.

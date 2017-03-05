@@ -23,7 +23,8 @@ Implementation
 
 Uses
   BADI.Types,
-  BADI.Comment;
+  BADI.Comment,
+  BADI.Functions;
 
 Procedure TestTGenericVariable.SetUp;
 Begin
@@ -62,8 +63,7 @@ Begin
   CheckEquals(scPublic, FGenericVariable.Scope);
   CheckEquals(23, FGenericVariable.Line);
   CheckEquals(34, FGenericVariable.Column);
-  CheckEquals(iiPublicConstant, FGenericVariable.ImageIndex);
-  CheckEquals(iiPublicConstant, FGenericVariable.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicConstant, scPublic), FGenericVariable.ImageIndexAdjustedForScope);
 End;
 
 Initialization

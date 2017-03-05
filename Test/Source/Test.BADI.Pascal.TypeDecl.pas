@@ -22,7 +22,8 @@ Type
 Implementation
 
 Uses
-  BADI.Types;
+  BADI.Types,
+  BADI.Functions;
 
 Procedure TestTTypes.SetUp;
 
@@ -52,7 +53,7 @@ Begin
   CheckEquals(12, FTypes.Line);
   CheckEquals(23, FTypes.Column);
   CheckEquals(iiPublicType, FTypes.ImageIndex);
-  CheckEquals(iiPrivateType, FTypes.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicType, scPrivate), FTypes.ImageIndexAdjustedForScope);
 End;
 
 Initialization

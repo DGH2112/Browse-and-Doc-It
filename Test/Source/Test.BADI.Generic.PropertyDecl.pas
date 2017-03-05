@@ -28,7 +28,8 @@ Implementation
 Uses
   BADI.Types,
   BADI.Generic.Parameter,
-  BADI.Comment;
+  BADI.Comment,
+  BADI.Functions;
 
 Procedure TestTGenericProperty.SetUp;
 
@@ -310,7 +311,7 @@ Begin
   CheckEquals(12, FGenericProperty.Line);
   CheckEquals(23, FGenericProperty.Column);
   CheckEquals(iiPublicProperty, FGenericProperty.ImageIndex);
-  CheckEquals(iiProtectedProperty, FGenericProperty.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicProperty, scProtected), FGenericProperty.ImageIndexAdjustedForScope);
 End;
 
 Procedure TestTGenericProperty.TestParameterCount;

@@ -38,7 +38,8 @@ Uses
   BADI.Generic.Parameter,
   BADI.Generic.TypeDecl,
   BADI.Comment,
-  BADI.ResourceStrings;
+  BADI.ResourceStrings,
+  BADI.Functions;
 
 Procedure TestTGenericMethodDecl.SetUp;
 
@@ -338,7 +339,7 @@ Begin
   CheckEquals(34, FGenericMethodDecl.Line);
   CheckEquals(45, FGenericMethodDecl.Column);
   CheckEquals(iiPublicFunction, FGenericMethodDecl.ImageIndex);
-  CheckEquals(iiProtectedFunction, FGenericMethodDecl.ImageIndexAdjustedForScope);
+  CheckEquals(BADIImageIndex(iiPublicFunction, scProtected), FGenericMethodDecl.ImageIndexAdjustedForScope);
 End;
 
 Procedure TestTGenericMethodDecl.TestExt;

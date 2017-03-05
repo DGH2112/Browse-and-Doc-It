@@ -38,38 +38,13 @@ Type
     Procedure TestFailure01;
   End;
 
-  //
-  // Test Class for the TDFMObject Class Methods.
-  //
-  TestTDFMObject = Class(TExtendedTestCase)
-  Strict Private
-    FDFMObject : TDFMObject;
-  Public
-    Procedure SetUp; Override;
-    Procedure TearDown; Override;
-  Published
-    Procedure TestCreate;
-    Procedure TestAsString;
-  End;
-
-  //
-  // Test Class for the TDFMProperty Class Methods.
-  //
-  TestTDFMProperty = Class(TExtendedTestCase)
-  Strict Private
-    FDFMProperty : TDFMProperty;
-  Public
-    Procedure SetUp; Override;
-    Procedure TearDown; Override;
-  Published
-    Procedure TestCreate;
-    Procedure TestAsString;
-  End;
-
 Implementation
 
 Uses
-  BADI.Base.Module, BADI.Types, BADI.ResourceStrings, BADI.Functions;
+  BADI.Base.Module,
+  BADI.Types,
+  BADI.ResourceStrings,
+  BADI.Functions;
 
 //
 // Test Methods for Class TDFMModule.
@@ -1129,70 +1104,6 @@ begin
   End;
 end;
 
-//
-// Test methods for the class TDFMObject.
-//
-Procedure TestTDFMObject.Setup;
-
-Begin
-  FDFMObject := TDFMObject.Create('Identifier', scPublic, 12, 23, iiPublicObject, Nil);
-  FDFMObject.AddToken('TfrmMyForm');
-End;
-
-Procedure TestTDFMObject.TearDown;
-
-Begin
-  FDFMObject.Free;
-End;
-
-Procedure TestTDFMObject.TestAsString;
-
-Begin
-  Checkequals('Object Identifier : TfrmMyForm', FDFMObject.AsString(True, True));
-End;
-
-procedure TestTDFMObject.TestCreate;
-begin
-  CheckEquals('Identifier', FDFMObject.Identifier);
-  CheckEquals(scPublic, FDFMObject.Scope);
-  CheckEquals(12, FDFMObject.Line);
-  CheckEquals(23, FDFMObject.Column);
-  CheckEquals(BADIImageIndex(iiPublicObject, scPublic), FDFMObject.ImageIndexAdjustedForScope);
-end;
-
-//
-// Test methods for the class TDFMProperty.
-//
-Procedure TestTDFMProperty.Setup;
-
-Begin
-  FDFMProperty := TDFMProperty.Create('MyIdentifier', scPublic, 12, 23, iiPublicProperty, Nil);
-  FDFMProperty.AddToken('AnIdentifier');
-End;
-
-Procedure TestTDFMProperty.TearDown;
-
-Begin
-  FDFMProperty.Free;
-End;
-
-Procedure TestTDFMProperty.TestAsString;
-
-Begin
-  CheckEquals('MyIdentifier = AnIdentifier', FDFMProperty.AsString(True, True));
-End;
-
-procedure TestTDFMProperty.TestCreate;
-begin
-  CheckEquals('MyIdentifier', FDFMProperty.Identifier);
-  CheckEquals(scPublic, FDFMProperty.Scope);
-  CheckEquals(12, FDFMProperty.Line);
-  CheckEquals(23, FDFMProperty.Column);
-  CheckEquals(BADIImageIndex(iiPublicProperty, scPublic), FDFMProperty.ImageIndexAdjustedForScope);
-end;
-
 Initialization
   RegisterTest('DFM Module', TestTDFMModule.Suite);
-  RegisterTest('DFM Module', TestTDFMObject.Suite);
-  RegisterTest('DFM Module', TestTDFMProperty.Suite);
 End.

@@ -10,63 +10,6 @@ Uses
 
 Type
   //
-  // Test Class for the TXMLDecl Class Methods.
-  //
-  TestTXMLDecl = Class(TExtendedTestCase)
-  Strict Private
-    FXMLDecl : TXMLDecl;
-  Public
-    Procedure SetUp; Override;
-    Procedure TearDown; Override;
-  Published
-    Procedure TestCreate;
-    Procedure TestAsString;
-  End;
-
-  //
-  // Test Class for the TXMLDocType Class Methods.
-  //
-  TestTXMLDocType = Class(TExtendedTestCase)
-  Strict Private
-    FXMLDocType : TXMLDocType;
-  Public
-    Procedure SetUp; Override;
-    Procedure TearDown; Override;
-  Published
-    Procedure TestCreate;
-    Procedure TestAsString;
-  End;
-
-  //
-  // Test Class for the TXMLElemDecl Class Methods.
-  //
-  TestTXMLElemDecl = Class(TExtendedTestCase)
-  Strict Private
-    FXMLElemDecl : TXMLElemDecl;
-  Public
-    Procedure SetUp; Override;
-    Procedure TearDown; Override;
-  Published
-    Procedure TestCreate;
-    Procedure TestAsString;
-  End;
-
-  //
-  // Test Class for the TXMLElement Class Methods.
-  //
-  TestTXMLElement = Class(TExtendedTestCase)
-  Strict Private
-    FXMLElement : TXMLElement;
-  Public
-    Procedure SetUp; Override;
-    Procedure TearDown; Override;
-  Published
-    Procedure TestAsString;
-    Procedure TestCreate;
-    Procedure TestGetName;
-  End;
-
-  //
   // Test Class for the TXMLModule Class Methods.
   //
   TestTXMLModule = Class(TExtendedTestCase)
@@ -187,132 +130,10 @@ Type
 
 Implementation
 
-uses
-  BADI.Types, BADI.ResourceStrings, BADI.Functions;
-
-//
-// Test Methods for Class TXMLDecl.
-//
-Procedure TestTXMLDecl.Setup;
-Begin
-  FXMLDecl := TXMLDecl.Create('xml', scNone, 12, 23, iiPublicType, Nil);
-End;
-
-Procedure TestTXMLDecl.TearDown;
-
-Begin
-  FXMLDecl.Free;
-End;
-
-Procedure TestTXMLDecl.TestAsString;
-
-Begin
-  CheckEquals('xml', FXMLDecl.AsString(True, True));
-End;
-
-procedure TestTXMLDecl.TestCreate;
-begin
-  CheckEquals('xml', FXMLDecl.Identifier);
-  CheckEquals(scNone, FXMLDecl.Scope);
-  CheckEquals(12, FXMLDecl.Line);
-  CheckEquals(23, FXMLDecl.Column);
-  CheckEquals(BADIImageIndex(iiPublicType, scNone), FXMLDecl.ImageIndexAdjustedForScope);
-end;
-
-//
-// Test Methods for Class TXMLDocType.
-//
-Procedure TestTXMLDocType.Setup;
-Begin
-  FXMLDocType := TXMLDocType.Create('!DOCTYPE', scNone, 12, 23, iiPublicObject, Nil);
-End;
-
-Procedure TestTXMLDocType.TearDown;
-
-Begin
-  FXMLDocType.Free;
-End;
-
-Procedure TestTXMLDocType.TestAsString;
-
-Begin
-  CheckEquals('!DOCTYPE', FXMLDocType.AsString(True, True));
-End;
-
-procedure TestTXMLDocType.TestCreate;
-begin
-  CheckEquals('!DOCTYPE', FXMLDocType.Identifier);
-  CheckEquals(scNone, FXMLDocType.Scope);
-  CheckEquals(12, FXMLDocType.Line);
-  CheckEquals(23, FXMLDocType.Column);
-  CheckEquals(BADIImageIndex(iiPublicObject, scNone), FXMLDocType.ImageIndexAdjustedForScope);
-end;
-
-//
-// Test Methods for Class TXMLElemDecl.
-//
-Procedure TestTXMLElemDecl.Setup;
-Begin
-  FXMLElemDecl := TXMLElemDecl.Create('!ELEMENT', scNone, 12, 23, iiPublicObject, Nil);
-  FXMLElemDecl.AddToken('Element');
-End;
-
-Procedure TestTXMLElemDecl.TearDown;
-
-Begin
-  FXMLElemDecl.Free;
-End;
-
-Procedure TestTXMLElemDecl.TestAsString;
-
-Begin
-  CheckEquals('!ELEMENT Element', FXMLElemDecl.AsString(True, True));
-End;
-
-procedure TestTXMLElemDecl.TestCreate;
-begin
-  CheckEquals('!ELEMENT', FXMLElemDecl.Identifier);
-  CheckEquals(scNone, FXMLElemDecl.Scope);
-  CheckEquals(12, FXMLElemDecl.Line);
-  CheckEquals(23, FXMLElemDecl.Column);
-  CheckEquals(BADIImageIndex(iiPublicObject, scNone), FXMLElemDecl.ImageIndexAdjustedForScope);
-end;
-
-//
-// Test Methods for Class TXMLElement.
-//
-Procedure TestTXMLElement.Setup;
-Begin
-  FXMLElement := TXMLElement.Create('xml', scNone, 12, 23, iiPublicObject, Nil);
-End;
-
-Procedure TestTXMLElement.TearDown;
-
-Begin
-  FXMLElement.Free;
-End;
-
-Procedure TestTXMLElement.TestAsString;
-
-Begin
-  CheckEquals('<xml></xml>', FXMLElement.AsString(True, True));
-End;
-
-Procedure TestTXMLElement.TestCreate;
-
-Begin
-  CheckEquals('xml', FXMLElement.Identifier);
-  CheckEquals(scNone, FXMLElement.Scope);
-  CheckEquals(12, FXMLElement.Line);
-  CheckEquals(23, FXMLElement.Column);
-  CheckEquals(BADIImageIndex(iiPublicObject, scNone), FXMLElement.ImageIndexAdjustedForScope);
-End;
-
-Procedure TestTXMLElement.TestGetName;
-
-Begin
-  CheckEquals('xml:0012:0023', FXMLElement.GetName);
-End;
+Uses
+  BADI.Types,
+  BADI.ResourceStrings,
+  BADI.Functions;
 
 //
 // Test Methods for Class TXMLModule.
@@ -3879,9 +3700,5 @@ begin
 end;
 
 Initialization
-  RegisterTest('XML Module', TestTXMLDecl.Suite);
-  RegisterTest('XML Module', TestTXMLDocType.Suite);
-  RegisterTest('XML Module', TestTXMLElemDecl.Suite);
-  RegisterTest('XML Module', TestTXMLElement.Suite);
   RegisterTest('XML Module', TestTXMLModule.Suite);
 End.

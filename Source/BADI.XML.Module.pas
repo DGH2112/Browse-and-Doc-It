@@ -5,11 +5,11 @@
   implemented.
 
   @Version    1.0
-  @Date       12 Feb 2017
+  @Date       09 Mar 2017
   @Author     David Hoyle
 
 **)
-Unit BADI.XMLModule;
+Unit BADI.XML.Module;
 
 Interface
 
@@ -18,102 +18,15 @@ Uses
   Windows,
   Contnrs,
   Classes,
-  BADI.BaseLanguageModule;
+  BADI.Base.Module,
+  BADI.Comment,
+  BADI.ElementContainer,
+  BADI.Types,
+  BADI.TokenInfo, BADI.XML.XMLElement, BADI.XML.XMLPI;
 
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  (** A XML specific implementation of comments. **)
-  TXMLComment = Class(TComment)
-  Public
-    Class Function CreateComment(strComment: String; iLine,
-      iCol: Integer): TComment; Override;
-  End;
-
-  (** This is a base class for all the XML elements. **)
-  TXMLBaseElement = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FElementName: String;
-  Public
-    Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
-    Function GetName : String; Override;
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-  End;
-
-  (** This class represents the documents doc type. **)
-  TXMLDocType = Class(TXMLBaseElement)
-  Public
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-  End;
-
-  (** This class represents the individual elements (tags) of the document. **)
-  TXMLElement = Class(TXMLBaseElement)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FAttributes : TStringList;
-    FContext    : TStringList;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function  ContextText : String;
-  Public
-    Constructor Create(strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
-    Destructor Destroy; Override;
-    Procedure AddContextText(strText : String);
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-    (**
-      This property returns the Attributes string list.
-      @precon  None.
-      @postcon Provides access to the elements attribute names.
-      @return  a TStringList
-    **)
-    Property Attribute : TStringList Read FAttributes;
-  End;
-
-  (** This class represents the individual elements declarations in the document. **)
-  TXMLElemDecl = Class(TXMLBaseElement)
-  Public
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-  End;
-
-  (** This class represents the individual xml declarations in the document. **)
-  TXMLDecl = Class(TXMLBaseElement)
-  Public
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-  End;
-
-  (** This class represents the individual xml PI declarations in the document. **)
-  TXMLPI = Class(TXMLBaseElement)
-  Public
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-  End;
-
-  (** This class represents the individual xml PERef declarations in the document. **)
-  TXMLPERef = Class(TXMLBaseElement)
-  Public
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-  End;
-
-  (** This class represents the individual xml PERef declarations in the document. **)
-  TXMLIncludeElement = Class(TXMLBaseElement)
-  Public
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-  End;
-
-  (** This class represents the individual xml PERef declarations in the document. **)
-  TXMLIgnoreElement = Class(TXMLBaseElement)
-  Public
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-  End;
-
   (** An enumerate to describe whether the module is XHTML or XML. **)
   TModuleType = (mtXHTML, mtXML);
 
@@ -207,7 +120,7 @@ Type
     procedure TidyUpEmptyElements;
     Function GetModuleName : String; Override;
   Public
-    Constructor CreateParser(Source : String; strFileName : String;
+    Constructor CreateParser(const Source, strFileName : String;
       IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
@@ -221,47 +134,14 @@ Type
 Implementation
 
 Uses
-  DGHLibrary;
-
-Resourcestring
-  (** This is a resource string for the document node of the module explorer. **)
-  strExpectedWord = 'Expected ''%s'' but found ''%s'' at line %d column %d.';
-  (** This is a resource string for an expected version number not found. **)
-  strExpectedVersionNum = 'Expected version number ''1.x'' but found ''%s'' ' +
-    'at line %d column %d.';
-  (** This is a resource string for an invalid version number. **)
-  strIsNotAValidVersionNum = '''%s'' is not a valid version number at line %' +
-    'd column %d.';
-  (** This is a resource string for expected whitespace. **)
-  strExpectedWhitespace = 'Expected whitespace but found ''%s'' at line %d c' +
-    'olumn %d.';
-  (** This is a resource string for an invalid PI target. **)
-  strPITargetCanNotBeNamed = 'PI Target can not be named ''xml'' at line %d ' +
-    'column %d.';
-  (** This is a resource string for an invalid content specification. **)
-  strInvalidContentSpec = 'Invalid content specification at line %d column %' +
-    'd.';
-  (** This is a resource string for an expected end tag. **)
-  strExpectedEndTag = 'Expected end tag but found ''%s'' at line %d column %' +
-    'd.';
-  (** This is a resource string for an expected end tag name. **)
-  atrExpectedEndTagNamed = 'Expected end tag named ''%s'' but found ''%s'' a' +
-    't line %d column %d.';
-  (** This is a resource string for an invalid EncName **)
-  strEncNameContainsInvalidChars = 'EncName ''%s''contains invalid character' +
-  's at line %d column %d.';
-  (** This is a resource string for an expected <Element> **)
-  strExpectedElement = 'Expected <Element> but ''%s'' found at line %d colum' +
-  'n %d.';
-  (** This is a resource string for an attribute appearing more than once. **)
-  strAttributeCanNotAppear = 'Attribute ''%s'' can not appear more than once' +
-  ' at line %d column %d.';
-  (** This is a resource string for xhtml names must be lowercase. **)
-  strHTMLElementLowercase = 'HTML element ''%s'' should be in lowercase at l' +
-  'ine %d column %d.';
-  (** This is a resource string for an expected file end token. **)
-  strExpectedFileEnd = 'Expected <FileEnd> but found ''%s'' at line %d colum' +
-  'n %d.';
+  DGHLibrary,
+  BADI.Options,
+  BADI.ResourceStrings,
+  BADI.Functions,
+  BADI.Constants,
+  BADI.Module.Dispatcher, BADI.XML.ResourceStrings, BADI.XML.XMLElemDecl, BADI.XML.Comment,
+  BADI.XML.DocType, BADI.XML.XMLDecl, BADI.XML.XMLPERef, BADI.XML.XMLIgnoreElement,
+  BADI.XML.XMLIncludeElement;
 
 Const
 
@@ -278,368 +158,6 @@ Const
       token that can be sort as then next place to start parsing from when an
       error is  encountered. **)
   strSeekableOnErrorTokens : Array[1..1] Of String = ('<line-end>');
-
-(**
-
-
-  This method is a class method to first check the comment for being a
-  documentation comment and then creating an instance of a TComment class and
-  parsing the comment via the constructor.
-
-  @precon  strComment is the full comment to be checked and parsed, iLine is
-           the line number of the comment and iCol is the column number of
-           the comment.
-
-  @postcon Returns Nil if this is not a documentation comment or returns a
-           valid TComment class.
-
-  @param   strComment as a String
-  @param   iLine      as an Integer
-  @param   iCol       as an Integer
-  @return  a TComment
-
-**)
-class function TXMLComment.CreateComment(strComment: String; iLine,
-  iCol: Integer): TComment;
-
-begin //: @note Not currently configured or used.
-  Result := Nil;
-  If Length(strComment) > 0 Then
-    Begin
-      Case strComment[1] Of
-        '/' : strComment := Copy(strComment, 2, Length(strComment) - 1);
-      End;
-      If Length(strComment) > 0 Then
-        Begin
-          If strComment[1] = '*' Then
-            strComment := Copy(strComment, 2, Length(strComment) - 3);
-          If strComment[1] = '/' Then
-            strComment := Copy(strComment, 2, Length(strComment) - 1);
-          If Length(strComment) > 0 Then
-            Begin
-              If strComment[1] = ':' Then
-                Begin;
-                  strComment := Copy(strComment, 2, Length(strComment) - 1);
-                  Result := Create(strComment, iLine, iCol);
-                End
-              Else If strComment[1] = '*' Then
-                Begin;
-                  strComment := Copy(strComment, 2, Length(strComment) - 2);
-                  Result := Create(strComment, iLine, iCol);
-                End;
-            End;
-        End;
-    End;
-end;
-
-{ TXMLBaseElement }
-
-(**
-
-  This method returns a string representation of the XML Base Element.
-
-  @precon  None.
-  @postcon Returns a string representation of the XML Base Element.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TXMLBaseElement.AsString(boolShowIdenifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := Identifier;
-end;
-
-(**
-
-  This is a constructor for the TXMLBaseElement class.
-
-  @precon  None.
-  @postcon Initialises the class to be not sorted and have a unique name.
-
-  @param   strName     as a String
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
-
-**)
-constructor TXMLBaseElement.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
-begin
-  Inherited Create(strname, AScope, iLine, iColumn, AImageIndex, AComment);
-  Sorted := False;
-  FElementName := Format('%s:%4.4d:%4.4d', [strName, iLine, iColumn]);
-end;
-
-(**
-
-  This is a getter method for the Name property.
-
-  @precon  None.
-  @postcon Returns the name of the element created in the constructor.
-
-  @return  a String
-
-**)
-function TXMLBaseElement.GetName: String;
-begin
-  Result := FElementName;
-end;
-
-{ TXMLDocType }
-
-(**
-
-  This method returns a string representation of the XML Doc Type.
-
-  @precon  None.
-  @postcon Returns a string representation of the XML Doc Type.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TXMLDocType.AsString(boolShowIdenifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := BuildStringRepresentation(True, False, '',
-    BrowseAndDocItOptions.MaxDocOutputWidth, [']', '>'], ['[', '<']);
-end;
-
-{ TXMLElement }
-
-(**
-
-  This method add tokens to the text (between tags).
-
-  @precon  None.
-  @postcon A token is added to the context information.
-
-  @param   strText as a String
-
-**)
-Procedure TXMLElement.AddContextText(strText: String);
-
-Begin
-  If FContext.Count < BrowseAndDocItOptions.TokenLimit Then
-    FContext.Add(strText);
-End;
-
-(**
-
-  This method returns a string representation of the XML Element.
-
-  @precon  None.
-  @postcon Returns a string representation of the XML Element.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TXMLElement.AsString(boolShowIdenifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := '<' + BuildStringRepresentation(boolShowIdenifier, boolForDocumentation,
-    '', BrowseAndDocItOptions.MaxDocOutputWidth, [#32, '='], [#32, '='], []) + '>' +
-    ContextText +
-    '</' + Identifier + '>';
-end;
-
-(**
-
-  This method returns a string representation of the token in the context text (between tags).
-
-  @precon  None.
-  @postcon A string of the context tokens is return.
-
-  @return  a String
-
-**)
-Function TXMLElement.ContextText: String;
-
-Var
-  i : Integer;
-
-Begin
-  For i := 0 To FContext.Count - 1 Do
-    Result := Result + FContext[i];
-  If FContext.Count > BrowseAndDocItOptions.TokenLimit Then
-    Result := Result + '...';
-  Result := Trim(Result);
-End;
-
-(**
-
-  This is a constructor for the TXMLElement class.
-
-  @precon  None.
-  @postcon Creates an xml element with a unique name derived from the given
-           name, line number and column number.
-
-  @param   strName     as a String
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
-
-**)
-constructor TXMLElement.Create(strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
-begin
-  Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
-  FAttributes := TStringList.Create;
-  FAttributes.Sorted := True;
-  FContext := TStringList.Create;
-end;
-
-(**
-
-  This is a destructor for the TXMLElement class.
-
-  @precon  None.
-  @postcon Frees the memory used for hold attribute names.
-
-**)
-destructor TXMLElement.Destroy;
-begin
-  FContext.Free;
-  FAttributes.Free;
-  Inherited Destroy;
-end;
-
-{ TXMLElemDecl }
-
-(**
-
-  This method returns a string representation of the XML Element Declaration.
-
-  @precon  None.
-  @postcon Returns a string representation of the XML Element Declaration.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TXMLElemDecl.AsString(boolShowIdenifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := BuildStringRepresentation(boolShowIdenifier, boolForDocumentation,
-    '', BrowseAndDocItOptions.MaxDocOutputWidth, [')', '*', '?', '+', ','],
-    ['(', '+', '*', '>'], []);
-end;
-
-{ TXMLDecl }
-
-(**
-
-  This method returns a string representation of the XML Declaration.
-
-  @precon  None.
-  @postcon Returns a string representation of the XML Declaration.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TXMLDecl.AsString(boolShowIdenifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := BuildStringRepresentation(boolShowIdenifier, boolForDocumentation,
-    '', BrowseAndDocItOptions.MaxDocOutputWidth, [#32, '=', '?'], [#32, '=', '?'], []);
-end;
-
-{ TXMLPI }
-
-(**
-
-  This method returns a string presentation of the XML PI element.
-
-  @precon  None.
-  @postcon Returns a string presentation of the XML PI element.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TXMLPI.AsString(boolShowIdenifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := BuildStringRepresentation(boolShowIdenifier, boolForDocumentation,
-    '', BrowseAndDocItOptions.MaxDocOutputWidth, [#32, '=', '?'], [#32, '=', '?'], []);
-end;
-
-{ TXMLPERef }
-
-(**
-
-  This method returns a string presentation of the XML PE Ref element.
-
-  @precon  None.
-  @postcon Returns a string presentation of the XML PE Ref element.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TXMLPERef.AsString(boolShowIdenifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := '%' + BuildStringRepresentation(boolShowIdenifier,
-    boolForDocumentation, '', BrowseAndDocItOptions.MaxDocOutputWidth);
-end;
-
-{ TXMLIgnoreElement }
-
-(**
-
-  This method returns a string presentation of the XML PE Ref element.
-
-  @precon  None.
-  @postcon Returns a string presentation of the XML PE Ref element.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TXMLIncludeElement.AsString(boolShowIdenifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := BuildStringRepresentation(True, False, '',
-    BrowseAndDocItOptions.MaxDocOutputWidth, [']'], ['[']);
-end;
-
-{ TXMLIgnoreElement }
-
-(**
-
-  This method returns a string presentation of the XML PE Ref element.
-
-  @precon  None.
-  @postcon Returns a string presentation of the XML PE Ref element.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-function TXMLIgnoreElement.AsString(boolShowIdenifier,
-  boolForDocumentation: Boolean): String;
-begin
-  Result := BuildStringRepresentation(True, False, '',
-    BrowseAndDocItOptions.MaxDocOutputWidth, [']'], ['[']);
-end;
 
 (**
 
@@ -1167,13 +685,13 @@ end;
            disk.
   @postcon Creates an instance of the module parser.
 
-  @param   Source        as a String
-  @param   strFileName   as a String
+  @param   Source        as a String as a Constant
+  @param   strFileName   as a String as a Constant
   @param   IsModified    as a Boolean
   @param   ModuleOptions as a TModuleOptions
 
 **)
-Constructor TXMLModule.CreateParser(Source : String; strFileName : String;
+Constructor TXMLModule.CreateParser(const Source, strFileName : String;
   IsModified : Boolean; ModuleOptions : TModuleOptions);
 
 Var
@@ -3331,7 +2849,7 @@ begin
             Document;
       End;
   Except
-    On E : EParserAbort Do
+    On E : EBADIParserAbort Do
       AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
   End;
 end;

@@ -35,7 +35,7 @@ Uses
 Procedure TestFunctions.TestCanDocumentDocument;
 
 Begin
-  Check(Not ModuleDispatcher.CanDocumentDocument('MyFile.ini'), 'MyFile.ini');
+  Check(Not ModuleDispatcher.CanDocumentDocument('MyFile.css'), 'MyFile.css');
   Check(ModuleDispatcher.CanDocumentDocument('MyFile.bas'), 'MyFile.bas');
   Check(ModuleDispatcher.CanDocumentDocument('MyFile.bnf'), 'MyFile.bnf');
   Check(ModuleDispatcher.CanDocumentDocument('MyFile.cls'), 'MyFile.cls');
@@ -55,7 +55,7 @@ End;
 Procedure TestFunctions.TestCanParseDocument;
 
 Begin
-  Check(Not ModuleDispatcher.CanParseDocument('MyFile.ini'), 'MyFile.ini');
+  Check(Not ModuleDispatcher.CanParseDocument('MyFile.css'), 'MyFile.css');
   Check(ModuleDispatcher.CanParseDocument('MyFile.bas'), 'MyFile.bas');
   Check(ModuleDispatcher.CanParseDocument('MyFile.bnf'), 'MyFile.bnf');
   Check(ModuleDispatcher.CanParseDocument('MyFile.cls'), 'MyFile.cls');
@@ -78,7 +78,7 @@ Var
   M : TBaseLanguageModule;
 
 Begin
-  M := ModuleDispatcher.Dispatcher('', 'MyFile.ini', False, []);
+  M := ModuleDispatcher.Dispatcher('', 'MyFile.css', False, []);
   Try
     Check(M = Nil);
   Finally
@@ -173,9 +173,9 @@ End;
 Procedure TestFunctions.TestGetCommentType;
 
 Begin
-  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.ini',  csBlock),  ctNone, 'MyFile.ini - Block');
-  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.ini',  csLine),   ctNone, 'MyFile.ini - Line');
-  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.ini',  csInSitu), ctNone, 'MyFile.ini - InSitu');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.css',  csBlock),  ctNone, 'MyFile.css - Block');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.css',  csLine),   ctNone, 'MyFile.css - Line');
+  CheckEquals(ModuleDispatcher.GetCommentType('MyFile.css',  csInSitu), ctNone, 'MyFile.css - InSitu');
   CheckEquals(ModuleDispatcher.GetCommentType('MyFile.bas',  csBlock),  ctVBLine, 'MyFile.bas - Block');
   CheckEquals(ModuleDispatcher.GetCommentType('MyFile.bas',  csLine),   ctVBLine, 'MyFile.bas - Line');
   CheckEquals(ModuleDispatcher.GetCommentType('MyFile.bas',  csInSitu), ctVBLine, 'MyFile.bas - InSitu');

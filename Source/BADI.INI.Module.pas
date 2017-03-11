@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       19 Feb 2017
+  @Date       06 Mar 2017
   @Author     David Hoyle
 
 **)
@@ -26,13 +26,6 @@ Uses
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
-  (** A XML specific implementation of comments. **)
-  TINIComment = Class(TComment)
-  Public
-    Class Function CreateComment(const strComment: String; iLine, iCol: Integer)
-      : TComment; Override;
-  End;
-
   (** This is the main class for dealing with backus-naur grammar files. **)
   TINIModule = Class(TBaseLanguageModule)
     {$IFDEF D2005} Strict {$ENDIF} Private
@@ -69,16 +62,6 @@ Type
       Override;
   End;
 
-  (** This is a class to represent the Key and Value pairs. **)
-  TKeyValuePair = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function  GetName : String; Override;
-  Public
-    Function  AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
-  End;
-
 Implementation
 
 Uses
@@ -87,7 +70,9 @@ Uses
   BADI.Functions,
   BADI.Constants,
   BADI.Options,
-  BADI.Module.Dispatcher;
+  BADI.Module.Dispatcher,
+  BADI.INI.Comment,
+  BADI.INI.KeyValuePair;
 
 ResourceString
   (** A resource string for an error message where a line end token was expected. **)
@@ -102,64 +87,6 @@ Const
       token that can be sort as then next place to start parsing from when an
       error is  encountered. **)
   strSeekableOnErrorTokens: Array [1 .. 2] Of String = ('<CR>', '<LF>');
-
-(**
-
-
-  This method is a class method to first check the comment for being a
-  documentation comment and then creating an instance of a TComment class and
-  parsing the comment via the constructor.
-
-  @precon  strComment is the full comment to be checked and parsed, iLine is
-           the line number of the comment and iCol is the column number of
-           the comment.
-
-  @postcon Returns Nil if this is not a documentation comment or returns a
-           valid TComment class.
-
-  @param   strComment as a String as a Constant
-  @param   iLine      as an Integer
-  @param   iCol       as an Integer
-  @return  a TComment
-
-**)
-Class Function TINIComment.CreateComment(const strComment: String; iLine, iCol: Integer)
-  : TComment;
-
-Var
-  strText : String;
-
-Begin //: @note Not currently configured or used.
-  Result := Nil;
-  strText := strComment;
-  If Length(strText) > 0 Then
-    Begin
-      Case strText[1] Of
-        '/':
-          strText := Copy(strText, 2, Length(strText) - 1);
-      End;
-      If Length(strText) > 0 Then
-        Begin
-          If strText[1] = '*' Then
-            strText := Copy(strText, 2, Length(strText) - 3);
-          If strText[1] = '/' Then
-            strText := Copy(strText, 2, Length(strText) - 1);
-          If Length(strText) > 0 Then
-            Begin
-              If strText[1] = ':' Then
-                Begin;
-                  strText := Copy(strText, 2, Length(strText) - 1);
-                  Result     := Create(strText, iLine, iCol);
-                End
-              Else If strText[1] = '*' Then
-                Begin;
-                  strText := Copy(strText, 2, Length(strText) - 2);
-                  Result     := Create(strText, iLine, iCol);
-                End;
-            End;
-        End;
-    End;
-End;
 
 (**
 
@@ -856,43 +783,6 @@ Begin
             stActual);
     End;
   EatLineEnds;
-End;
-
-{ TKeyValuePair }
-
-(**
-
-  This method returns a string representation of the key value pair.
-
-  @precon  None.
-  @postcon Returns a string representation of the key value pair.
-
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-Function TKeyValuePair.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
-
-Begin
-  Result := BuildStringRepresentation(True, False, '=',
-    BrowseAndDocItOptions.MaxDocOutputWidth, [#32..#255], [#32..#255], []);
-End;
-
-(**
-
-  This is a getter method for the Name property.
-
-  @precon  None.
-  @postcon Returns the internal name of the element.
-
-  @return  a String
-
-**)
-Function TKeyValuePair.GetName: String;
-
-Begin
-  Result := Format('%s%4.4d', [Identifier, Random(9999)]);
 End;
 
 (** Register the file source code extensions that can be parsed by this module. **)

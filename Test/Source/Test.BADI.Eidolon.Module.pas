@@ -10,19 +10,6 @@ Uses
 
 Type
   //
-  // Test Class for the TEidolonComment Class Methods.
-  //
-  TestTEidolonComment = Class(TExtendedTestCase)
-  Strict Private
-    FEidolonComment : TEidolonComment;
-  Public
-    Procedure SetUp; Override;
-    Procedure TearDown; Override;
-  Published
-    Procedure TestCreateComment;
-  End;
-
-  //
   // Test Class for the TEidolonModule Class Methods.
   //
   TestTEidolonModule = Class(TExtendedTestCase)
@@ -82,35 +69,6 @@ Implementation
 uses
   BADI.Comment, BADI.Types, BADI.ResourceStrings;
 
-
-//
-// Test Methods for Class TEidolonComment.
-//
-Procedure TestTEidolonComment.Setup;
-Begin
-  FEidolonComment := TEidolonComment.Create('This is a comment!', 12, 23);
-End;
-
-Procedure TestTEidolonComment.TearDown;
-
-Begin
-  FEidolonComment.Free;
-End;
-
-Procedure TestTEidolonComment.TestCreateComment;
-var
-  C: TComment;
-
-Begin
-  C := TEidolonComment.CreateComment('/** This is a comment! **/', 12, 23);
-  Try
-    CheckEquals('This is a comment!', C.AsString(9999, False));
-    CheckEquals(12, C.Line);
-    CheckEquals(23, C.Column);
-  Finally
-    C.Free;
-  End;
-End;
 
 //
 // Test Methods for Class TEidolonModule.
@@ -6197,6 +6155,5 @@ begin
 end;
 
 Initialization
-  RegisterTest('Eidolon Module', TestTEidolonComment.Suite);
   RegisterTest('Eidolon Module', TestTEidolonModule.Suite);
 End.

@@ -498,7 +498,7 @@ Begin
     CheckToken(sl,  6, '>', ttSymbol);
     CheckToken(sl,  7, 'This', ttIdentifier);
     CheckToken(sl,  9, 'don', ttIdentifier);
-    CheckToken(sl, 10, '''', ttSingleLiteral);
+    CheckToken(sl, 10, '''', ttSymbol);
     CheckToken(sl, 11, 't', ttIdentifier);
     CheckToken(sl, 13, 'fail', ttIdentifier);
     CheckToken(sl, 14, '!', ttSymbol);
@@ -541,8 +541,8 @@ End;
 Procedure TestFunctions.TestTokenize;
 
 Const
-  //                            1               2                      3
-  // Tokens  0     1234  5678  9012    3456  7890    1234         56789012   34 56789
+  //                            1               2                      3            4
+  // Tokens  0     1234  5678  9012    3456  7890    1234         56789012 3 456 7890
   strCode = 'qwerty = one + two + ''q'' - "p" - Hello * ? Custom ? + <p> '''' "" </p>';
 
 Var
@@ -558,7 +558,7 @@ Begin
   strDirectives := Nil;
   sl := Tokenize(strCode, strReservedWords, strDirectives);
   Try
-    CheckEquals(40, sl.Count);
+    CheckEquals(42, sl.Count);
     CheckEquals('qwerty', sl[0]);
     CheckEquals(ttIdentifier, TBADITokenType(sl.Objects[0]));
     CheckEquals(' ', sl[1]);
@@ -623,22 +623,26 @@ Begin
     CheckEquals(ttSymbol, TBADITokenType(sl.Objects[30]));
     CheckEquals(' ', sl[31]);
     CheckEquals(ttWhiteSpace, TBADITokenType(sl.Objects[31]));
-    CheckEquals('''''', sl[32]);
-    CheckEquals(ttSingleLiteral, TBADITokenType(sl.Objects[32]));
-    CheckEquals(' ', sl[33]);
-    CheckEquals(ttWhiteSpace, TBADITokenType(sl.Objects[33]));
-    CheckEquals('""', sl[34]);
-    CheckEquals(ttDoubleLiteral, TBADITokenType(sl.Objects[34]));
-    CheckEquals(' ', sl[35]);
-    CheckEquals(ttWhiteSpace, TBADITokenType(sl.Objects[35]));
-    CheckEquals('<', sl[36]);
+    CheckEquals('''', sl[32]);
+    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[32]));
+    CheckEquals('''', sl[33]);
+    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[33]));
+    CheckEquals(' ', sl[34]);
+    CheckEquals(ttWhiteSpace, TBADITokenType(sl.Objects[34]));
+    CheckEquals('"', sl[35]);
+    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[35]));
+    CheckEquals('"', sl[36]);
     CheckEquals(ttSymbol, TBADITokenType(sl.Objects[36]));
-    CheckEquals('/', sl[37]);
-    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[37]));
-    CheckEquals('p', sl[38]);
-    CheckEquals(ttHTMLEndTag, TBADITokenType(sl.Objects[38]));
-    CheckEquals('>', sl[39]);
+    CheckEquals(' ', sl[37]);
+    CheckEquals(ttWhiteSpace, TBADITokenType(sl.Objects[37]));
+    CheckEquals('<', sl[38]);
+    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[38]));
+    CheckEquals('/', sl[39]);
     CheckEquals(ttSymbol, TBADITokenType(sl.Objects[39]));
+    CheckEquals('p', sl[40]);
+    CheckEquals(ttHTMLEndTag, TBADITokenType(sl.Objects[40]));
+    CheckEquals('>', sl[41]);
+    CheckEquals(ttSymbol, TBADITokenType(sl.Objects[41]));
   Finally
     sl.Free;
   End;

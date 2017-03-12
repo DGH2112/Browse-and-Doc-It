@@ -1978,7 +1978,7 @@ Begin
     '  TMyPublicClass = Class'#13#10 +
     '  Strict Private'#13#10 +
     '    Type'#13#10 +
-    '      TMyPrivateChildClass = Class'#13#10 +
+    '      TMyPrivateClass = Class'#13#10 +
     '      Public'#13#10 +
     '        Type'#13#10 +
     '          TMyPublicClass = Class'#13#10 +
@@ -2016,14 +2016,12 @@ Begin
     'Procedure TMyPublicClass.MyPublicMethod; Begin End;'#13#10 +
     'Procedure TMyPublicClass.MyPublishedMethod; Begin End;'#13#10 +
     ''#13#10 +
-    'Procedure TMyPublicClass.TMyPrivateClass.MyPublicMethod; Begin End;'#13#10 +
+    'Procedure TMyPublicClass.TMyPrivateClass.MyPublicMethod; Begin End;'#13#10 + //???????
     'Procedure TMyPublicClass.TMyPrivateClass.TMyPublicClass.MyPublicMethod; Begin End;'#13#10 +
     'Procedure TMyPublicClass.TMyPublicClass.MyPublicMethod; Begin End;'#13#10 +
     'Procedure TMyPublicClass.TMyPublicClass.TMyPublicClass.MyPublicMethod; Begin End;',
     [ttErrors, ttWarnings],
-    [],
-    0,
-    1
+    []
   );
 End;
 

@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       06 Mar 2017
+  @Date       12 Mar 2017
   @Author     David Hoyle
 
 **)
@@ -170,7 +170,7 @@ Uses
   BADI.Module.Dispatcher,
   BADI.Eidolon.TLSSchematic.Comment, BADI.Eidolon.TLSSchematic.Constants,
   BADI.Eidolon.TLSSchematic.ResourceStrings, BADI.Eidolon.TLSSchematic.SchematicSetting,
-  BADI.Eidolon.TLSSchematic.NoText, BADI.Eidolon.TLSSchematic.TLSObject;
+  BADI.Eidolon.TLSSchematic.NoText, BADI.Eidolon.TLSSchematic.TLSObject, BADI.Eidolon.Constants;
 
 (**
 

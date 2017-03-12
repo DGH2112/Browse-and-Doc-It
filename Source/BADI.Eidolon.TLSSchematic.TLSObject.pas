@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    06 Mar 2017
+  @Date    12 Mar 2017
 
 **)
 Unit BADI.Eidolon.TLSSchematic.TLSObject;
@@ -63,7 +63,8 @@ Implementation
 
 Uses
   SysUtils,
-  BADI.Eidolon.TLSSchematic.Constants;
+  BADI.Eidolon.TLSSchematic.Constants,
+  BADI.Eidolon.Constants;
 
 (**
 

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       05 Mar 2017
+  @Date       12 Mar 2017
   @Author     David Hoyle
 
   @grammar    For the grammar to this parser pleaser see the "Object Pascal Grammar.bnf".
@@ -7248,16 +7248,14 @@ begin
   // Check for ';'
   If Token.Token = ';' Then
     Begin
-      //PushTokenPosition;
-      NextNonCommentToken;
+      PushTokenPosition;
       // Check for default property
       If Token.UToken = 'DEFAULT' Then
         Begin
           Prop.DefaultProperty := True;
           NextNonCommentToken;
         End Else
-          //PopTokenPosition;
-          RollBackToken;
+          PopTokenPosition;
     End;
 end;
 
@@ -7770,20 +7768,20 @@ procedure TPascalModule.ProcessCompilerDirective(var iSkip : Integer);
 
   (**
 
-    This method adds the number to the stack and increments the iSkip variable by the
-    value passed.
+    This method adds the number to the stack and increments the iSkip variable by the value passed.
 
     @precon  None.
-    @postcon Adds the number to the stack and increments the iSkip variable by the value
-             passed.
+    @postcon Adds the number to the stack and increments the iSkip variable by the value passed.
 
-    @param   iCompilerCondition as a TCompilerCondition
+    @param   iCompilerDefType   as a TCompilerDefType as a constant
+    @param   iCompilerCondition as a TCompilerCondition as a constant
 
   **)
-  Procedure IncSkip(iCompilerCondition : TCompilerCondition);
+  Procedure IncSkip(Const iCompilerDefType : TCompilerDefType;
+    Const iCompilerCondition : TCompilerCondition);
 
   Begin
-    CompilerConditionStack.Push(iCompilerCondition, TokenIndex);
+    CompilerConditionStack.Push(iCompilerDefType, iCompilerCondition, TokenIndex);
     If iCompilerCondition = ccIncludeCode Then
       Inc(iSkip);
   End;
@@ -7829,39 +7827,38 @@ begin
   Else If Like(Token.Token, '{$IFDEF ') Then
     Begin
       If Not IfDef(GetDef) Then
-        IncSkip(ccIncludeCode)
+        IncSkip(cdtIFDEF, ccIncludeCode)
       Else
-        IncSkip(ccExcludeCode);
+        IncSkip(cdtIFDEF, ccExcludeCode);
     End
   Else If Like(Token.Token, '{$IFOPT ') Then
     Begin
       If Not IfDef(GetDef) Then
-        IncSkip(ccIncludeCode)
+        IncSkip(cdtIFDEF, ccIncludeCode)
       Else
-        IncSkip(ccExcludeCode);
+        IncSkip(cdtIFDEF, ccExcludeCode);
     End
   Else If Like(Token.Token, '{$IF ') Then
-    IncSkip(ccExcludeCode) // FAKE $IF by defaulting to TRUE
+    IncSkip(cdtIFDEF, ccExcludeCode) // FAKE $IF by defaulting to TRUE
   Else If Like(Token.Token, '{$IFNDEF ') Then
     Begin
       If Not IfNotDef(GetDef) Then
-        IncSkip(ccIncludeCode)
+        IncSkip(cdtIFNDEF, ccIncludeCode)
       Else
-        IncSkip(ccExcludeCode);
+        IncSkip(cdtIFNDEF, ccExcludeCode);
     End
   Else If Like(Token.Token, '{$ELSE') Then
     Begin
       If CompilerConditionStack.CanPop Then
         Begin
           CompilerCondition := CompilerConditionStack.Peek;
-          //: @debug Should the else not add to the stack rather than manipulate it?
           If CompilerCondition.CompilerCondition = ccIncludeCode Then
             Begin
-              CompilerConditionStack.Poke(ccExcludeCode, CompilerCondition.TokenIndex);
+              CompilerConditionStack.Push(cdtELSE, ccExcludeCode, CompilerCondition.TokenIndex);
               Dec(iSkip);
             End Else
             Begin
-              CompilerConditionStack.Poke(ccIncludeCode, CompilerCondition.TokenIndex);
+              CompilerConditionStack.Push(cdtELSE, ccIncludeCode, CompilerCondition.TokenIndex);
               Inc(iSkip);
             End;
         End Else

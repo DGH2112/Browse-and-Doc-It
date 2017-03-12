@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    06 Mar 2017
+  @Date    12 Mar 2017
 
 **)
 Unit BADI.Eidolon.TLSSchematic.TLSStatic;
@@ -50,7 +50,7 @@ Implementation
 Uses
   SysUtils,
   BADI.Eidolon.TLSSchematic.Constants,
-  BADI.Eidolon.Types;
+  BADI.Eidolon.Types, BADI.Eidolon.Constants;
 
 (**
 

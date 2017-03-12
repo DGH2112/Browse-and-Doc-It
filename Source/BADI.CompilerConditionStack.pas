@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Feb 2017
+  @Date    12 Mar 2017
 
 **)
 Unit BADI.CompilerConditionStack;
@@ -26,11 +26,11 @@ Type
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    Procedure Push(iCompilerCondition: TCompilerCondition; iTokenIndex: TTokenIndex); Overload;
-    Procedure Push(CompilerConditionData: TCompilerConditionData); Overload;
+    Procedure Push(Const iCompilerDefType : TCompilerDefType;
+      Const iCompilerCondition: TCompilerCondition; Const iTokenIndex: TTokenIndex); Overload;
+    Procedure Push(Const CompilerConditionData: TCompilerConditionData); Overload;
     Procedure Pop();
     Function Peek: TCompilerConditionData;
-    Procedure Poke(iCompilerCondition: TCompilerCondition; iTokenIndex: TTokenIndex);
     Function CanPop: Boolean;
   End;
 
@@ -105,29 +105,6 @@ End;
 
 (**
 
-  This method allows the caller to modify the top item on the stack.
-
-  @precon  There must be an item on the stack top.
-  @postcon The top item on the stack is changed.
-
-  @param   iCompilerCondition as a TCompilerCondition
-  @param   iTokenIndex        as a TTokenIndex
-
-**)
-Procedure TCompilerConditionStack.Poke(iCompilerCondition: TCompilerCondition;
-  iTokenIndex: TTokenIndex);
-
-Begin
-  If FStack.Count > 0 Then
-    Begin
-      (FStack[Pred(FStack.Count)] As TCompilerConditionData).CompilerCondition :=
-        iCompilerCondition;
-      (FStack[Pred(FStack.Count)] As TCompilerConditionData).TokenIndex := iTokenIndex;
-    End;
-End;
-
-(**
-
   This method removes the last item from the top of the stack.
 
   @precon  None.
@@ -136,11 +113,23 @@ End;
 **)
 Procedure TCompilerConditionStack.Pop;
 
+Var
+  CDT: TCompilerDefType;
+
 Begin
   If FStack.Count > 0 Then
-    FStack.Delete(Pred(FStack.Count))
-  Else
-    Raise EParserError.Create(strCannotPopCompilerCondition);
+    Begin
+      CDT := Peek.CompilerDefType;
+      FStack.Delete(Pred(FStack.Count));
+      If CDT = cdtELSE Then
+        Begin
+          CDT := Peek.CompilerDefType;
+          If Not (CDT In [cdtIFDEF, cdtIFNDEF]) Then
+            Raise EParserError.Create(strCannotPopCompilerCondition);
+          FStack.Delete(Pred(FStack.Count));
+        End;
+    End Else
+      Raise EParserError.Create(strCannotPopCompilerCondition);
 End;
 
 (**
@@ -150,13 +139,14 @@ End;
   @precon  CompilerConditionData must be a valdi instance.
   @postcon The compiler condition data is placed on top of the stack.
 
-  @param   CompilerConditionData as a TCompilerConditionData
+  @param   CompilerConditionData as a TCompilerConditionData as a constant
 
 **)
-Procedure TCompilerConditionStack.Push(CompilerConditionData: TCompilerConditionData);
+Procedure TCompilerConditionStack.Push(Const CompilerConditionData: TCompilerConditionData);
 
 Begin
-  Push(CompilerConditionData.CompilerCondition, CompilerConditionData.TokenIndex);
+  Push(CompilerConditionData.CompilerDefType, CompilerConditionData.CompilerCondition,
+    CompilerConditionData.TokenIndex);
 End;
 
 (**
@@ -166,15 +156,16 @@ End;
   @precon  None.
   @postcon Adds the given valud to the top of the stack.
 
-  @param   iCompilerCondition as a TCompilerCondition
-  @param   iTokenIndex        as a TTokenIndex
+  @param   iCompilerDefType   as a TCompilerDefType as a constant
+  @param   iCompilerCondition as a TCompilerCondition as a constant
+  @param   iTokenIndex        as a TTokenIndex as a constant
 
 **)
-Procedure TCompilerConditionStack.Push(iCompilerCondition: TCompilerCondition;
-  iTokenIndex: TTokenIndex);
+Procedure TCompilerConditionStack.Push(Const iCompilerDefType : TCompilerDefType;
+  Const iCompilerCondition: TCompilerCondition; Const iTokenIndex: TTokenIndex);
 
 Begin
-  FStack.Add(TCompilerConditionData.Create(iCompilerCondition, iTokenIndex));
+  FStack.Add(TCompilerConditionData.Create(iCompilerDefType, iCompilerCondition, iTokenIndex));
 End;
 
 End.

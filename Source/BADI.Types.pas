@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    04 Mar 2017
+  @Date    12 Mar 2017
 
 **)
 Unit BADI.Types;
@@ -330,6 +330,8 @@ Type
   (** A type to define an array of integers. **)
   TArrayOfInteger = Array Of Integer;
 
+  (** This enumerate defines the type of compiler condition placed on the stack. **)
+  TCompilerDefType = (cdtIFDEF, cdtIFNDEF, cdtELSE, cdtENDIF);
   (** An enumerate to define the condition of the compiler definition. **)
   TCompilerCondition = (ccIncludeCode, ccExcludeCode);
 

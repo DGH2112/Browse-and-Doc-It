@@ -667,7 +667,7 @@ end;
 procedure TestTBaseLanguageModule.TestCompilerConditionStack;
 begin
   CheckEquals(False, FBaseLanguageModule.CompilerConditionStack.CanPop);
-  FBaseLanguageModule.CompilerConditionStack.Push(ccIncludeCode, 1);
+  FBaseLanguageModule.CompilerConditionStack.Push(cdtIFDEF, ccIncludeCode, 1);
   CheckEquals(True, FBaseLanguageModule.CompilerConditionStack.CanPop);
   FBaseLanguageModule.CompilerConditionStack.Pop;
   CheckEquals(False, FBaseLanguageModule.CompilerConditionStack.CanPop);

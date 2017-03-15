@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Mar 2017
+  @Date    15 Mar 2017
 
 **)
 Unit BADI.CompilerConditionStack;
@@ -100,7 +100,7 @@ Begin
   If FStack.Count > 0 Then
     Result := FStack[Pred(FStack.Count)] As TCompilerConditionData
   Else
-    Raise EParserError.Create(strCannotPeekTheCompilerCondition);
+    Raise EBADIParserError.Create(strCannotPeekTheCompilerCondition);
 End;
 
 (**
@@ -125,11 +125,11 @@ Begin
         Begin
           CDT := Peek.CompilerDefType;
           If Not (CDT In [cdtIFDEF, cdtIFNDEF]) Then
-            Raise EParserError.Create(strCannotPopCompilerCondition);
+            Raise EBADIParserError.Create(strCannotPopCompilerCondition);
           FStack.Delete(Pred(FStack.Count));
         End;
     End Else
-      Raise EParserError.Create(strCannotPopCompilerCondition);
+      Raise EBADIParserError.Create(strCannotPopCompilerCondition);
 End;
 
 (**

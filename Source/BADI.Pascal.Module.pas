@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       12 Mar 2017
+  @Date       15 Mar 2017
   @Author     David Hoyle
 
   @grammar    For the grammar to this parser pleaser see the "Object Pascal Grammar.bnf".
@@ -1193,7 +1193,7 @@ Begin
       If CompareText(Token.Token, 'deprecated') = 0  Then
         Begin
           NextNonCommentToken;
-          // Skip optional new Depreciate message.
+          // Skip optional new Deprecate message.
           If Token.TokenType In [ttSingleLiteral] Then
             NextNonCommentToken;
         End Else
@@ -7249,6 +7249,7 @@ begin
   If Token.Token = ';' Then
     Begin
       PushTokenPosition;
+      NextNonCommentToken;
       // Check for default property
       If Token.UToken = 'DEFAULT' Then
         Begin

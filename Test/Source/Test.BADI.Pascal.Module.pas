@@ -265,8 +265,11 @@ type
     Procedure TestCodeFailure27;
     Procedure TestCodeFailure28;
     Procedure TestCodeFailure29;
-    Procedure TestCodeFaliure30;
-    Procedure TestCodeFaliure31;
+    Procedure TestCodeFailure30;
+    Procedure TestCodeFailure31;
+    Procedure TestCodeFailure32;
+    Procedure TestCodeFailure33;
+    Procedure TestCodeFailure34;
   Public
   End;
 
@@ -1953,7 +1956,7 @@ Begin
   );
 End;
 
-procedure TestTPascalModule.TestCodeFaliure30;
+procedure TestTPascalModule.TestCodeFailure30;
 begin
   TestGrammarForErrors(
     TPascalModule,
@@ -1968,7 +1971,7 @@ begin
   );
 end;
 
-Procedure TestTPascalModule.TestCodeFaliure31;
+Procedure TestTPascalModule.TestCodeFailure31;
 
 Begin
   TestGrammarForErrors(
@@ -2022,6 +2025,63 @@ Begin
     'Procedure TMyPublicClass.TMyPublicClass.TMyPublicClass.MyPublicMethod; Begin End;',
     [ttErrors, ttWarnings],
     []
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure32;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  Private'#13#10 +
+    '    Function GetText(i : Integer) : String;'#13#10 +
+    '  Public'#13#10 +
+    '    Property Text[i : Integer] : String Read GetText; Default;'#13#10 +
+    '  End;',
+    'Function TMyClass.GetText(i : Integer) : String; Begin Result := ''''; End;',
+    [ttErrors, ttWarnings],
+    []
+  );
+End;
+
+
+Procedure TestTPascalModule.TestCodeFailure33;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Uses'#13#10 +
+    '  SysUtils,'#13#10 +
+    '  {$IFDEF EUREKALOG}'#13#10 +
+    '  EuekaLog7,'#13#10 +
+    '  {$ENDIF}'#13#10 +
+    '  Windows;',
+    '',
+    [ttErrors, ttWarnings],
+    ['Uses\SysUtils|SysUtils|scPublic','Uses\Windows|Windows|scPublic']
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure34;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  Public'#13#10 +
+    '    Procedure Test; {$IFNDEF D2005} Deprecated; {$ENDIF}'#13#10 +
+    ''#13#10 +
+    ''#13#10 +
+    '  End;',
+    '',
+    [ttErrors],
+    ['Types\TMyClass\Methods\GetText|Function GetText(i : Integer) : String|scPublic']
   );
 End;
 

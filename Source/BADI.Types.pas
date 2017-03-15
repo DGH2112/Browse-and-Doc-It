@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Mar 2017
+  @Date    15 Mar 2017
 
 **)
 Unit BADI.Types;
@@ -364,8 +364,8 @@ Type
 
   (** A silent parser abort exception. **)
   EBADIParserAbort = Class(Exception);
-  (** An exception or an erro when parsing a file. **)
-  EBADIParserError = Class(Exception);
+  (** An exception or an error when parsing a file. **)
+  EBADIParserError = Class(EBADIParserAbort);
 
 Implementation
 

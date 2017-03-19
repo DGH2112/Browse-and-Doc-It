@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    04 Mar 2017
+  @Date    19 Mar 2017
 
 **)
 Unit BADI.Constants;
@@ -345,6 +345,26 @@ Const
   (** A constant string to represent the position to insert the method name into
       the profiling code block. **)
   strMethodName = '$METHODNAME$';
+
+  (** A constant array to describe the menu defaults. **)
+  BADIMenus : Array[Low(TBADIMenu)..High(TBADIMenu)] Of TBADIMenuRecord = (
+    (FName: 'BADIModuleExplorer';  FCaption: 'Module &Explorer';      FShortcut: 'CTRL+SHIFT+ALT+ENTER'; FMaskColor: clLime),
+    (FName: 'BADIDocumentation';   FCaption: '&Documentation...';     FShortcut: 'CTRL+SHIFT+ALT+D';     FMaskColor: clLime),
+    (FName: 'BADIDunit';           FCaption: 'D&Unit...';             FShortcut: 'CTRL+SHIFT+ALT+U';     FMaskColor: clLime),
+    (FName: 'BADIProfiling';       FCaption: 'Pro&filing...';         FShortcut: 'CTRL+SHIFT+ALT+F';     FMaskColor: clLime),
+    (FName: 'BADISep1';            FCaption: '';                      FShortcut: '';                     FMaskColor: clLime),
+    (FName: 'BADIFocusEditor';     FCaption: 'Focus Edi&tor';         FShortcut: 'CTRL+SHIFT+ALT+E';     FMaskColor: clLime),
+    (FName: 'BADIMethodComment';   FCaption: '&Method Comment';       FShortcut: 'CTRL+SHIFT+ALT+M';     FMaskColor: clLime),
+    (FName: 'BADIPropertyComment'; FCaption: '&Property Comment';     FShortcut: 'CTRL+SHIFT+ALT+P';     FMaskColor: clLime),
+    (FName: 'BADIBlockComment';    FCaption: 'Block &Comment';        FShortcut: 'CTRL+SHIFT+ALT+B';     FMaskColor: clLime),
+    (FName: 'BADILineComment';     FCaption: '&Line Comment';         FShortcut: 'CTRL+SHIFT+ALT+L';     FMaskColor: clLime),
+    (FName: 'BADIInSituCommnet';   FCaption: '&In-Situ Comment';      FShortcut: 'CTRL+SHIFT+ALT+I';     FMaskColor: clLime),
+    (FName: 'BADIToDoComment';     FCaption: '&ToDo Comment';         FShortcut: 'CTRL+SHIFT+ALT+T';     FMaskColor: clLime),
+    (FName: 'BADISep2';            FCaption: '';                      FShortcut: '';                     FMaskColor: clLime),
+    (FName: 'BADIOptions';         FCaption: '&Options...';           FShortcut: 'CTRL+SHIFT+ALT+O';     FMaskColor: clLime),
+    (FName: 'BADISep3';            FCaption: '';                      FShortcut: '';                     FMaskColor: clLime),
+    (FName: 'BADICheckForUpdates'; FCaption: 'Check for &Updates...'; FShortcut: '';                     FMaskColor: clLime)
+  );
 
 Implementation
 

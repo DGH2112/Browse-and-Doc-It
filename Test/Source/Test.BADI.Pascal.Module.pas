@@ -2081,7 +2081,7 @@ Begin
     '  End;',
     '',
     [ttErrors],
-    ['Types\TMyClass\Methods\GetText|Function GetText(i : Integer) : String|scPublic']
+    ['Types\TMyClass\Methods\Test|Procedure Test|scPublic']
   );
 End;
 

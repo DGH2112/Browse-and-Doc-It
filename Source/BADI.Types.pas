@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Mar 2017
+  @Date    19 Mar 2017
 
 **)
 Unit BADI.Types;
@@ -366,6 +366,34 @@ Type
   EBADIParserAbort = Class(Exception);
   (** An exception or an error when parsing a file. **)
   EBADIParserError = Class(EBADIParserAbort);
+
+  (** This is an enumerate to defines the BADI Menu Items. **)
+  TBADIMenu = (
+    bmModuleExplorer,
+    bmDocumentation,
+    bmDUnit,
+    bmProfiling,
+    bmSep1,
+    bmFocusEditor,
+    bmMethodComment,
+    bmPropertyComment,
+    bmBlockComment,
+    bmLineComment,
+    bmInSituComment,
+    bmToDoComment,
+    bmSep2,
+    bmOptions,
+    bmSep3,
+    bmCheckForUpdates
+  );
+
+  (** A record to describe the menu defaults values. **)
+  TBADIMenuRecord = Record
+    FName      : String;
+    FCaption   : String;
+    FShortCut  : String;
+    FMaskColor : TColor;
+  End;
 
 Implementation
 

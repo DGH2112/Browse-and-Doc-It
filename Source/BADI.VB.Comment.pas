@@ -27,7 +27,8 @@ Implementation
 
 Uses
   Classes,
-  BADI.Functions;
+  BADI.Functions,
+  BADI.Types;
 
 (**
 

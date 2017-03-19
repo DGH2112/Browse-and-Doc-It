@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    15 Mar 2017
+  @Date    19 Mar 2017
   @Version 1.0
 
   @Author  David Hoyle
@@ -263,6 +263,13 @@ Type
       @return  a TModuleOptions
     **)
     Property ModOptions : TModuleOptions Read FModuleOptions;
+    (**
+      This property defines the number of token pushes on the token position stack.
+      @precon  None.
+      @postcon Returns the number of token pushed on the token position stack.
+      @return  an Integer
+    **)
+    Property TokenStackTop : Integer Read FTokenStackTop;
   End;
 
   (** A class type to define classes in the record structure. **)

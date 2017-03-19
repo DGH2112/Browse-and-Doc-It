@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       15 Mar 2017
+  @Date       19 Mar 2017
   @Author     David Hoyle
 
   @grammar    For the grammar to this parser pleaser see the "Object Pascal Grammar.bnf".
@@ -7869,9 +7869,15 @@ begin
     End
   Else If Like(Token.Token, '{$ENDIF') Then
     Begin
-      If DecSkip Then
-        AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
-            scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etError);
+      If TokenStackTop > 0 Then
+        Begin
+          CompilerConditionStack.Push(cdtENDIF, ccIncludeCode, TokenIndex);
+          Dec(iSkip);
+        End Else
+          If DecSkip Then
+            AddIssue(Format(strEndIfMissingIfDef, [Token.Line, Token.Column]),
+              scGlobal, 'ProcessCompilerDirective', Token.Line, Token.Column, etError);
+
     End
   Else If Like(Token.Token, '{$IFEND') Then
     Begin

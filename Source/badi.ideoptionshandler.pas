@@ -6,7 +6,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Feb 2017
+  @Date    25 Mar 2017
 
 **)
 Unit BADI.IDEOptionsHandler;
@@ -14,6 +14,7 @@ Unit BADI.IDEOptionsHandler;
 Interface
 
 Uses
+  Classes,
   ToolsAPI,
   Forms,
   BADI.CustomOptionsFrame;
@@ -27,11 +28,13 @@ Type
   TBADIIDEOptionsHandler = Class(TInterfacedObject, INTAAddInOptions)
   {$IFDEF 2005} Strict {$ENDIF} Private
     FBADICustomFrameClass : TFrameClass;
-    FBADICustomFrame : TCustomFrame;
-    FTitle       : String;
+    FBADICustomFrame      : TCustomFrame;
+    FTitle                : String;
+    FUpdateEvent          : TNotifyEvent;
   {$IFDEF 2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(OptionsFrame: TFrameClass; Const strTitle : String);
+    Constructor Create(OptionsFrame: TFrameClass; Const strTitle : String;
+      UpdateEvent : TNotifyEvent);
     Procedure DialogClosed(Accepted: Boolean);
     Procedure FrameCreated(AFrame: TCustomFrame);
     Function GetArea: String;
@@ -58,13 +61,16 @@ Uses
 
   @param   OptionsFrame as a TFrameClass
   @param   strTitle     as a String as a constant
+  @param   UpdateEvent  as a TNotifyEvent
 
 **)
-Constructor TBADIIDEOptionsHandler.Create(OptionsFrame: TFrameClass; Const strTitle : String);
+Constructor TBADIIDEOptionsHandler.Create(OptionsFrame: TFrameClass; Const strTitle : String;
+  UpdateEvent : TNotifyEvent);
 
 Begin
   FBADICustomFrameClass := OptionsFrame;
   FTitle := strTitle;
+  FUpdateEvent := UpdateEvent;
 End;
 
 (**
@@ -88,6 +94,8 @@ Begin
     Begin
       If Supports(FBADICustomFrame, IBADIOptionsFrame, BADIOptionsFrame) Then
         BADIOptionsFrame.SaveSettings;
+      If Assigned(FUpdateEvent) Then
+        FUpdateEvent(Self);
     End;
 End;
 

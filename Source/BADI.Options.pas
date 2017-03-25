@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Feb 2017
+  @Date    25 Mar 2017
 
 **)
 Unit BADI.Options;
@@ -43,15 +43,19 @@ Type
     FManagedNodesLife : Integer;
     FTreeColour : TColor;
     FProfilingCode : TStringList;
-    FIssueLimits : Array[Low(TLimitType)..High(TLimitType)] of Integer;
+    FIssueLimits : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
+    FBADIMenuShortCuts : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function GetTokenFontInfo(ATokenType  : TBADITokenType) : TTokenFontInfo;
-    Procedure SetTokenFontInfo(ATokenType  : TBADITokenType; ATokenFontInfo : TTokenFontInfo);
+    Function  GetTokenFontInfo(Const ATokenType  : TBADITokenType) : TTokenFontInfo;
+    Procedure SetTokenFontInfo(Const ATokenType  : TBADITokenType;
+      Const ATokenFontInfo : TTokenFontInfo);
     Procedure LoadSettings;
-    function  GetProfilingCode(Module : TBaseLanguageModule): String;
-    procedure SetProfilingCode(Module : TBaseLanguageModule; const strValue: String);
-    Function  GetIssueLimit(LimitType : TLimitType) : Integer;
-    Procedure SetIssueLimit(LimitType : TLimitType; iValue : Integer);
+    function  GetProfilingCode(Const Module : TBaseLanguageModule): String;
+    procedure SetProfilingCode(Const Module : TBaseLanguageModule; Const strValue: String);
+    Function  GetIssueLimit(Const LimitType : TLimitType) : Integer;
+    Procedure SetIssueLimit(Const LimitType : TLimitType; Const iValue : Integer);
+    Function  GetMenuShortcut(Const iBADIMenu : TBADIMenu) : String;
+    Procedure SetMenuShortcut(Const iBADIMenu : TBADIMenu; Const strShortcut : String);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -127,10 +131,10 @@ Type
       module explorer
       @precon  None.
       @postcon Gets and sets the colour and style of the token.
-      @param   ATokenType as       a TBADITokenType
+      @param   ATokenType as a TBADITokenType as a constant
       @return  a TTokenFontInfo
     **)
-    Property TokenFontInfo[ATokenType : TBADITokenType] : TTokenFontInfo Read
+    Property TokenFontInfo[Const ATokenType : TBADITokenType] : TTokenFontInfo Read
       GetTokenFontInfo Write SetTokenFontInfo;
     (**
       This properrty holds a list of files / partial or full which should not be
@@ -205,10 +209,10 @@ Type
       This property gets and sets the profiling code for the given filenames.
       @precon  None.
       @postcon Gets and sets the profiling code for the given filenames.
-      @param   Module as a TBaseLanguageModule
+      @param   Module as a TBaseLanguageModule as a constant
       @return  a String
     **)
-    Property ProfilingCode[Module : TBaseLanguageModule] : String Read GetProfilingCode
+    Property ProfilingCode[Const Module : TBaseLanguageModule] : String Read GetProfilingCode
       Write SetProfilingCode;
     (**
       This property gets and sets the numerical limits for the output of errors, warnings,
@@ -216,11 +220,20 @@ Type
       @precon  None.
       @postcon Gets and sets the numerical limits for the output of errors, warnings,
                hints and conflicts.
-      @param   LimitType as a TLimitType
+      @param   LimitType as a TLimitType as a constant
       @return  an Integer
     **)
-    Property IssueLimits[LimitType : TLimitType] : Integer Read GetIssueLimit
+    Property IssueLimits[Const LimitType : TLimitType] : Integer Read GetIssueLimit
       Write SetIssueLimit;
+    (**
+      This property provide access to the string representation of the menu shortcuts.
+      @precon  None.
+      @postcon Gets and sets the string representation of the menu shortcuts.
+      @param   BADIMenu as a TBADIMenu as a constant
+      @return  a String
+    **)
+    Property MenuShortcut[Const BADIMenu : TBADIMenu] : String Read GetMenuShortcut
+      Write SetMenuShortcut;
   End;
 Var
   (** This is a global variable for the Browse and Doc It options that need to
@@ -303,14 +316,31 @@ End;
   @precon  None.
   @postcon Returns the numerical limit for the given limit type.
 
-  @param   LimitType as a TLimitType
+  @param   LimitType as a TLimitType as a constant
   @return  an Integer
 
 **)
-Function TBrowseAndDocItOptions.GetIssueLimit(LimitType: TLimitType): Integer;
+Function TBrowseAndDocItOptions.GetIssueLimit(Const LimitType: TLimitType): Integer;
 
 Begin
   Result := FIssueLimits[LimitType];
+End;
+
+(**
+
+  This is a getter method for the MenuShortcut property.
+
+  @precon  None.
+  @postcon Returns the string representation of the enumerated menu shortcut.
+
+  @param   iBADIMenu as a TBADIMenu as a constant
+  @return  a String
+
+**)
+Function TBrowseAndDocItOptions.GetMenuShortcut(Const iBADIMenu: TBADIMenu): String;
+
+Begin
+  Result := FBADIMenuShortCuts[iBADIMenu];
 End;
 
 (**
@@ -320,11 +350,11 @@ End;
   @precon  None.
   @postcon Returns the profiling code template for the given filename.
 
-  @param   Module as a TBaseLanguageModule
+  @param   Module as a TBaseLanguageModule as a constant
   @return  a String
 
 **)
-Function TBrowseAndDocItOptions.GetProfilingCode(Module: TBaseLanguageModule): String;
+Function TBrowseAndDocItOptions.GetProfilingCode(Const Module: TBaseLanguageModule): String;
 
 Var
   strExt: String;
@@ -345,11 +375,11 @@ End;
   @postcon Retursn the record information for the token type.
 
 
-  @param   ATokenType as a TBADITokenType
+  @param   ATokenType as a TBADITokenType as a constant
   @return  a TTokenFontInfo
 
 **)
-Function TBrowseAndDocItOptions.GetTokenFontInfo(ATokenType: TBADITokenType): TTokenFontInfo;
+Function TBrowseAndDocItOptions.GetTokenFontInfo(Const ATokenType: TBADITokenType): TTokenFontInfo;
 Begin
   Result := FTokenFontInfo[ATokenType];
 End;
@@ -371,6 +401,7 @@ Var
   iValue: Integer;
   T: TBADITokenType;
   strLine: String;
+  iBADIMenu: TBADIMenu;
 
 Begin
   With TMemIniFile.Create(FINIFileName) Do
@@ -452,6 +483,10 @@ Begin
       FIssueLimits[ltWarnings] := ReadInteger('Issues Limits', 'Warnings', 10);
       FIssueLimits[ltHints] := ReadInteger('Issues Limits', 'Hints', 10);
       FIssueLimits[ltConflicts] := ReadInteger('Issues Limits', 'Conflicts', 10);
+      For iBADIMenu := Low(TBADImenu) To High(TBADIMenu) Do
+        FBADIMenuShortCuts[iBADIMenu] := ReadString('BADIMenuShortcuts',
+          BADIMenus[iBADIMenu].FName,
+          BADIMenus[iBADIMenu].FShortCut);
     Finally
       Free;
     End;
@@ -471,6 +506,7 @@ Var
   i: TDocOption;
   j: Integer;
   T: TBADITokenType;
+  iBADIMenu : TBADIMenu;
 
 Begin
   With TMemIniFile.Create(FINIFileName) Do
@@ -533,6 +569,10 @@ Begin
       WriteInteger('Issues Limits', 'Warnings', FIssueLimits[ltWarnings]);
       WriteInteger('Issues Limits', 'Hints', FIssueLimits[ltHints]);
       WriteInteger('Issues Limits', 'Conflicts', FIssueLimits[ltConflicts]);
+      For iBADIMenu := Low(TBADImenu) To High(TBADIMenu) Do
+        WriteString('BADIMenuShortcuts',
+          BADIMenus[iBADIMenu].FName,
+          FBADIMenuShortCuts[iBADIMenu]);
       UpdateFile;
     Finally
       Free;
@@ -546,14 +586,33 @@ End;
   @precon  None.
   @postcon Sets the numerical limit for the given limit type.
 
-  @param   LimitType as a TLimitType
-  @param   iValue as an Integer
+  @param   LimitType as a TLimitType as a constant
+  @param   iValue as an Integer as a constant
 
 **)
-Procedure TBrowseAndDocItOptions.SetIssueLimit(LimitType: TLimitType; iValue: Integer);
+Procedure TBrowseAndDocItOptions.SetIssueLimit(Const LimitType: TLimitType; Const iValue: Integer);
 
 Begin
   FIssueLimits[LimitType] := iValue;
+End;
+
+(**
+
+  This is a setter method for the MenuShortcut property.
+
+  @precon  None.
+  @postcon Sets the string representation of the enumerated menu shortcut.
+
+  @param   iBADIMenu   as a TBADIMenu as a constant
+  @param   strShortcut as a String as a constant
+
+**)
+Procedure TBrowseAndDocItOptions.SetMenuShortcut(Const iBADIMenu: TBADIMenu;
+  Const strShortcut: String);
+
+Begin
+  If FBADIMenuShortCuts[iBADIMenu] <> strShortcut Then
+    FBADIMenuShortCuts[iBADIMenu] := strShortcut;
 End;
 
 (**
@@ -563,11 +622,11 @@ End;
   @precon  None.
   @postcon saves the profiling code for the given filename.
 
-  @param   Module   as a TBaseLanguageModule
+  @param   Module   as a TBaseLanguageModule as a constant
   @param   strValue as a String as a constant
 
 **)
-Procedure TBrowseAndDocItOptions.SetProfilingCode(Module: TBaseLanguageModule;
+Procedure TBrowseAndDocItOptions.SetProfilingCode(Const Module: TBaseLanguageModule;
   Const strValue: String);
 
 Var
@@ -587,12 +646,13 @@ End;
   @postcon Sets the indexed Token Font Information record.
 
 
-  @param   ATokenType     as a TBADITokenType
-  @param   ATokenFontInfo as a TTokenFontInfo
+  @param   ATokenType     as a TBADITokenType as a constant
+  @param   ATokenFontInfo as a TTokenFontInfo as a constant
 
 **)
-Procedure TBrowseAndDocItOptions.SetTokenFontInfo(ATokenType: TBADITokenType;
-  ATokenFontInfo: TTokenFontInfo);
+Procedure TBrowseAndDocItOptions.SetTokenFontInfo(Const ATokenType: TBADITokenType;
+  Const ATokenFontInfo: TTokenFontInfo);
+
 Begin
   FTokenFontInfo[ATokenType] := ATokenFontInfo;
 End;

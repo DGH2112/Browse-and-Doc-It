@@ -23,6 +23,7 @@ Type
   TBADIIDEOptionsInstaller = Class
     {$IFDEF 2005} Strict {$ENDIF} Private
     {$IFDEF DXE00}
+    FBADIParentFrame    : TBADIIDEOptionsHandler;
     FBADIGeneralOptions : TBADIIDEOptionsHandler;
     FBADISpecialtags    : TBADIIDEOptionsHandler;
     FBADIModuleExplorer : TBADIIDEOptionsHandler;
@@ -41,6 +42,7 @@ Implementation
 
 Uses
   ToolsAPI,
+  BADI.ParentFrame,
   BADI.CustomOptionsFrame,
   BADI.GeneralOptionsFrame,
   BADI.CodeBrowsingFrame,
@@ -66,6 +68,8 @@ Constructor TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts : TNotifyEvent);
 
 Begin
   {$IFDEF DXE00}
+  FBADIParentFrame := TBADIIDEOptionsHandler.Create(TfmBADIParentFrame, '', Nil);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIParentFrame);
   FBADIGeneralOptions := TBADIIDEOptionsHandler.Create(TfmBADIGeneralOptions, 'General Options', Nil);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIGeneralOptions);
   FBADISpecialtags := TBADIIDEOptionsHandler.Create(TfmBADISpecialTagsFrame, 'Special Tags', Nil);
@@ -95,6 +99,7 @@ Destructor TBADIIDEOptionsInstaller.Destroy;
 
 Begin
   {$IFDEF DXE00}
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIParentFrame);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIGeneralOptions);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADISpecialtags);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIModuleExplorer);

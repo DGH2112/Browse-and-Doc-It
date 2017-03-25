@@ -1,17 +1,41 @@
 object fmBADIMenuShortcuts: TfmBADIMenuShortcuts
   Left = 0
   Top = 0
-  Width = 484
-  Height = 318
+  Width = 491
+  Height = 303
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -13
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  ParentFont = False
   TabOrder = 0
   DesignSize = (
-    484
-    318)
+    491
+    303)
+  object lblInformation: TLabel
+    AlignWithMargins = True
+    Left = 3
+    Top = 249
+    Width = 485
+    Height = 23
+    Anchors = [akLeft, akRight, akBottom]
+    AutoSize = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    Layout = tlCenter
+    ExplicitTop = 264
+    ExplicitWidth = 478
+  end
   object lvMenuShortcuts: TListView
     Left = 3
     Top = 3
-    Width = 478
-    Height = 284
+    Width = 485
+    Height = 240
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
@@ -31,25 +55,32 @@ object fmBADIMenuShortcuts: TfmBADIMenuShortcuts
     TabOrder = 0
     ViewStyle = vsReport
     OnSelectItem = lvMenuShortcutsSelectItem
+    ExplicitWidth = 478
+    ExplicitHeight = 255
   end
   object hkMenuShortcut: THotKey
     Left = 3
-    Top = 293
-    Width = 397
-    Height = 19
+    Top = 275
+    Width = 404
+    Height = 25
     Anchors = [akLeft, akRight, akBottom]
     HotKey = 0
     Modifiers = []
     TabOrder = 1
+    OnChange = hkMenuShortcutChange
+    ExplicitTop = 290
+    ExplicitWidth = 397
   end
   object btnAssign: TBitBtn
-    Left = 406
-    Top = 290
+    Left = 413
+    Top = 275
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = '&Assign'
     TabOrder = 2
     OnClick = btnAssignClick
+    ExplicitLeft = 406
+    ExplicitTop = 290
   end
 end

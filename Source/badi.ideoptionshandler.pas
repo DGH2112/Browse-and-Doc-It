@@ -151,7 +151,10 @@ End;
 Function TBADIIDEOptionsHandler.GetCaption: String;
 
 Begin
-  Result := Format('Browse And Doc It.%s', [FTitle]);
+  If FTitle <> '' Then
+    Result := Format('Browse and Doc It.%s', [FTitle])
+  Else
+    Result := 'Browse and Doc It';
 End;
 
 (**

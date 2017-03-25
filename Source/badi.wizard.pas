@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    25 Mar 2017
   @Version 1.0
 
 **)
@@ -43,6 +43,7 @@ Type
       iCommentCol: Integer);
     Procedure Focus(Sender: TObject);
     Procedure OptionsChange(Sender: TObject);
+    Procedure UpdateMenuShortcuts(Sender : TObject);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -88,7 +89,7 @@ Begin
   FEditorNotifier := TEditorNotifier.Create;
   {$ENDIF}
   FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FINIFileName, FEditorNotifier);
-  FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create;
+  FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
   FBADIIDEMenuInstaller.CheckForUpdatesClick(Nil);
 End;
 
@@ -254,6 +255,22 @@ Begin
   If Assigned(FBADIIDEMenuInstaller) Then
     FBADIIDEMenuInstaller.SelectionChange(iIdentLine, iIdentCol, iCommentLine,
       iCommentCol);
+End;
+
+(**
+
+  This method updates the menu actions with any new shortcuts that have been saved to the options.
+
+  @precon  None.
+  @postcon The menu action shortcuts are updated.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBrowseAndDocItWizard.UpdateMenuShortcuts(Sender: TObject);
+
+Begin
+  FBADIIDEMenuInstaller.UpdateMenuShortcuts;
 End;
 
 End.

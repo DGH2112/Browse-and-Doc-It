@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Feb 2017
+  @Date    25 Mar 2017
 
 **)
 Unit BADI.IDEOptionsInstaller;
@@ -28,6 +28,7 @@ Type
     FBADICodeBrowsing   : TBADIIDEOptionsHandler;
     FBADIExcludedDocs   : TBADIIDEOptionsHandler;
     FBADIMethodDesc     : TBADIIDEOptionsHandler;
+    FBADIMenuShortcuts  : TBADIIDEOptionsHandler;
     {$ENDIF}
     {$IFDEF 2005} Strict {$ENDIF} Protected
   Public
@@ -45,7 +46,8 @@ Uses
   BADI.ExcludedDocFilesFrame,
   BADI.MethodDescriptionsFrame,
   BADI.ModuleExlporerOpsFrame,
-  BADI.SpecialTagsFrame;
+  BADI.SpecialTagsFrame,
+  BADI.MenuShortcutsFrame;
 
 { TBADIIDEOptionsInstaller }
 
@@ -73,6 +75,8 @@ Begin
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIExcludedDocs);
   FBADIMethodDesc := TBADIIDEOptionsHandler.Create(TfmBADIMethodDescriptionsFrame, 'Method Descriptions');
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIMethodDesc);
+  FBADIMenuShortcuts := TBADIIDEOptionsHandler.Create(TfmBADIMenuShortcuts, 'Menu Shortcuts');
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIMenuShortcuts);
   {$ENDIF}
 End;
 
@@ -94,6 +98,7 @@ Begin
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADICodeBrowsing);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIExcludedDocs);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIMethodDesc);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIMenuShortcuts);
   {$ENDIF}
   Inherited Destroy;
 End;

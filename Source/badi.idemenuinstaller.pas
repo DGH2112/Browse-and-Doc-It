@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    25 Mar 2017
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -19,7 +19,10 @@ Uses
   BADI.Base.Module,
   Windows,
   BADI.ProfilingForm,
-  BADI.Types;
+  BADI.Types,
+  Contnrs,
+  Vcl.ActnList,
+  Graphics;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -27,18 +30,13 @@ Type
   (** This class manages the creation and destruction of the IDE menus. **)
   TBADIIDEMenuInstaller = Class
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FINIFileName   : String;
-    FBADIMenu      : TMenuItem;
-    FEditorNotifier: TEditorNotifier;
-    {$IFNDEF D2005}
-    FMenuTimer      : TTimer;
-    FMenus          : TObjectList;
-    FMenuShortCuts  : TList;
-    Procedure MenuTimerEvent(Sender: TObject);
-    {$ENDIF}
+    FINIFileName    : String;
+    FBADIMenu       : TMenuItem;
+    FBADIActions    : Array[Low(TBADIMenu)..High(TBADIMenu)] Of TAction;
+    FEditorNotifier : TEditorNotifier;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Procedure CreateMenuItem(mmiParent: TMenuItem; Const strCaption: String = '';
-      ClickProc: TNotifyEvent = Nil; AShortCut: TShortCut = 0);
+    Function  CreateMenuItem(Const mmiParent: TMenuItem; Const eBADIMenu: TBADIMenu;
+      Const ClickProc, UpdateProc: TNotifyEvent; iImageIndex : Integer) : TMenuItem;
     Procedure InsertCommentBlock(CommentStyle: TCommentStyle;
       CommentType: TCommentType);
     Function IsTextSelected: Boolean;
@@ -57,25 +55,30 @@ Type
       Const slProlog, slEpilog: TStringList);
     Procedure DeleteProfileCode(SE: IOTASourceEditor; iStartLine,
       iEndLine: Integer);
-    Procedure InsertMethodCommentClick(Sender: TObject);
-    Procedure InsertPropertyCommentClick(Sender: TObject);
-    Procedure InsertBlockCommentClick(Sender: TObject);
-    Procedure InsertLineCommentClick(Sender: TObject);
-    Procedure InsertInSituCommentClick(Sender: TObject);
-    Procedure InsertToDoCommentClick(Sender: TObject);
+    Procedure MethodCommentClick(Sender: TObject);
+    Procedure PropertyCommentClick(Sender: TObject);
+    Procedure BlockCommentClick(Sender: TObject);
+    Procedure LineCommentClick(Sender: TObject);
+    Procedure InSituCommentClick(Sender: TObject);
+    Procedure ToDoCommentClick(Sender: TObject);
     Procedure DocumentationClick(Sender: TObject);
     Procedure DUnitClick(Sender: TObject);
     Procedure ProfilingClick(Sender: TObject);
     Procedure OptionsClick(Sender: TObject);
     Procedure ModuleExplorerClick(Sender: TObject);
+    Procedure CreateBADIMainMenu;
+    Procedure RemoveActionsFromToolbars;
+    Function  AddImagesToIDE : Integer;
+    Procedure NilActions;
+    Procedure FreeActions;
   Public
     Constructor Create(Const strINIFileName : String; EditorNotifier : TEditorNotifier);
     Destructor Destroy; Override;
-    Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol: Integer);
+    Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine, iCommentCol: Integer);
     Procedure Focus(Sender: TObject);
     Procedure OptionsChange(Sender: TObject);
     Procedure CheckForUpdatesClick(Sender: TObject);
+    Procedure UpdateMenuShortcuts;
   End;
 
 Implementation
@@ -96,9 +99,17 @@ Uses
   BADI.CommonIDEFunctions,
   BADI.DockableModuleExplorer,
   ProgressForm,
-  DGHLibrary, BADI.Module.Dispatcher, BADI.ElementContainer, BADI.Generic.FunctionDecl,
-  BADI.ResourceStrings, BADI.Generic.MethodDecl, BADI.Generic.PropertyDecl, BADI.Options,
-  BADI.Functions;
+  DGHLibrary,
+  BADI.Module.Dispatcher,
+  BADI.ElementContainer,
+  BADI.Generic.FunctionDecl,
+  BADI.ResourceStrings,
+  BADI.Generic.MethodDecl,
+  BADI.Generic.PropertyDecl,
+  BADI.Options,
+  BADI.Functions,
+  Vcl.ComCtrls,
+  BADI.Constants;
 
 ResourceString
   (** This is a resource message to confirm whether the selected text should be
@@ -108,9 +119,52 @@ ResourceString
 
 Const
   (** This is the software ID for this module on the internet. **)
-  strSoftwareID = 'BrowseAndDocIt2006';
+  strSoftwareID = 'BrowseAndDocIt';
 
 { TBADIIDEMenuInstaller }
+
+(**
+
+  This method adds multiple images from the projects resource (bitmap) to the IDEs image list.
+  The image name in the resource must end in Image as this is appended to the given name.
+  An integer for the position of the first image in the IDEs image list is returned.
+
+  @precon  None.
+  @postcon The named image is loaded from the projects resource and put into the IDEs
+           image list and its index returned.
+
+  @return  an Integer
+
+**)
+Function TBADIIDEMenuInstaller.AddImagesToIDE : Integer;
+
+Var
+  NTAS : INTAServices;
+  ilImages : TImageList;
+  BM : TBitMap;
+  iMenu: TBADIMenu;
+
+begin
+  Result := -1;
+  NTAS := (BorlandIDEServices As INTAServices);
+  ilImages := TImageList.Create(Nil);
+  Try
+    For iMenu := Low(TBADIMenu) To High(TBADIMenu) Do
+      If FindResource(hInstance, PChar(BADIMenus[iMenu].FName + 'Image'), RT_BITMAP) > 0 Then
+        Begin
+          BM := TBitMap.Create;
+          Try
+            BM.LoadFromResourceName(hInstance, BADIMenus[iMenu].FName + 'Image');
+            ilImages.AddMasked(BM, BADIMenus[iMenu].FMaskColor);
+          Finally
+            BM.Free;
+          End;
+        End;
+    Result := NTAS.AddImages(ilImages);
+  Finally
+    ilImages.Free;
+  End;
+end;
 
 (**
 
@@ -143,53 +197,50 @@ Constructor TBADIIDEMenuInstaller.Create(Const strINIFileName : String;
   EditorNotifier : TEditorNotifier);
 
 Var
+  iImageIndex: Integer;
+
+Begin
+  NilActions;
+  FINIFileName := strINIFileName;
+  FEditorNotifier := EditorNotifier;
+  CreateBADIMainMenu;
+  iImageIndex := AddImagesToIDE;
+  CreateMenuItem(FBADIMenu, bmModuleExplorer, ModuleExplorerClick, Nil, iImageIndex);
+  CreateMenuItem(FBADIMenu, bmDocumentation, DocumentationClick, Nil, iImageIndex + 1);
+  CreateMenuItem(FBADIMenu, bmDunit, DUnitClick, Nil, iImageIndex + 2);
+  CreateMenuItem(FBADIMenu, bmProfiling, ProfilingClick, Nil, iImageIndex + 3);
+  CreateMenuItem(FBADIMenu, bmSep1, Nil, Nil, 0);
+  CreateMenuItem(FBADIMenu, bmFocusEditor, Focus, Nil, iImageIndex + 4);
+  CreateMenuItem(FBADIMenu, bmMethodComment, MethodCommentClick, Nil, iImageIndex + 5);
+  CreateMenuItem(FBADIMenu, bmPropertyComment, PropertyCommentClick, Nil, iImageIndex + 6);
+  CreateMenuItem(FBADIMenu, bmBlockComment, BlockCommentClick, Nil, iImageIndex + 7);
+  CreateMenuItem(FBADIMenu, bmLineComment, LineCommentClick, Nil, iImageIndex + 8);
+  CreateMenuItem(FBADIMenu, bmInSituComment, InSituCommentClick, Nil, iImageIndex + 9);
+  CreateMenuItem(FBADIMenu, bmToDoComment, ToDoCommentClick, Nil, iImageIndex + 10);
+  CreateMenuItem(FBADIMenu, bmSep2, Nil, Nil, 0);
+  CreateMenuItem(FBADIMenu, bmOptions, OptionsClick, Nil, iImageIndex + 11);
+  CreateMenuItem(FBADIMenu, bmSep3, Nil, Nil, 0);
+  CreateMenuItem(FBADIMenu, bmCheckForUpdates, CheckForUpdatesClick, Nil, iImageIndex + 12);
+End;
+
+(**
+
+  This method creates the main BADI menu item and stores it for later disposal.
+
+  @precon  None.
+  @postcon The main BADI menu it added to the IDE.
+
+**)
+Procedure TBADIIDEMenuInstaller.CreateBADIMainMenu;
+
+Var
   mmiMainMenu: TMainMenu;
 
 Begin
-  FINIFileName := strINIFileName;
-  FEditorNotifier := EditorNotifier;
-  mmiMainMenu              := (BorlandIDEServices As INTAServices).MainMenu;
-  FBADIMenu         := TMenuItem.Create(mmiMainMenu);
+  mmiMainMenu := (BorlandIDEServices As INTAServices).MainMenu;
+  FBADIMenu := TMenuItem.Create(mmiMainMenu);
   FBADIMenu.Caption := '&Browse and Doc It';
   mmiMainMenu.Items.Insert(mmiMainMenu.Items.Count - 2, FBADIMenu);
-  {$IFNDEF D2005}
-  FMenus         := TObjectList.Create(False);
-  FMenuShortCuts := TList.Create;
-  {$ENDIF}
-  CreateMenuItem(FBADIMenu, 'Module &Explorer', ModuleExplorerClick,
-    Menus.ShortCut(13, [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu, '&Documentation', DocumentationClick,
-    Menus.ShortCut(Ord('D'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu, 'D&Unit...', DUnitClick,
-    Menus.ShortCut(Ord('U'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu, 'Pro&filing...', ProfilingClick,
-    Menus.ShortCut(Ord('F'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu);
-  CreateMenuItem(FBADIMenu, 'Focus Edi&tor', Focus,
-    Menus.ShortCut(Ord('E'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu, 'Insert &Method Comment',
-    InsertMethodCommentClick, Menus.ShortCut(Ord('M'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu, 'Insert &Property Comment',
-    InsertPropertyCommentClick, Menus.ShortCut(Ord('P'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu, 'Insert &Comment Block',
-    InsertBlockCommentClick, Menus.ShortCut(Ord('B'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu, 'Insert &Line Comment',
-    InsertLineCommentClick, Menus.ShortCut(Ord('L'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu, 'Insert &In-Situ Comment',
-    InsertInSituCommentClick, Menus.ShortCut(Ord('I'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu, 'Insert &ToDo Comment',
-    InsertToDoCommentClick, Menus.ShortCut(Ord('T'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu);
-  CreateMenuItem(FBADIMenu, '&Options...', OptionsClick,
-    Menus.ShortCut(Ord('O'), [ssCtrl, ssShift, ssAlt]));
-  CreateMenuItem(FBADIMenu);
-  CreateMenuItem(FBADIMenu, 'Check for &Updates...', CheckForUpdatesClick);
-  {$IFNDEF D2005} // Code to patch shortcuts into the menus in D7 and below.
-  FMenuTimer          := TTimer.Create(Nil);
-  FMenuTimer.OnTimer  := MenuTimerEvent;
-  FMenuTimer.Interval := 1000;
-  FMenuTimer.Enabled  := True;
-  {$ENDIF}
 End;
 
 (**
@@ -199,35 +250,51 @@ End;
   @precon  mmiParent must be a valid parent menu item in the IDE .
   @postcon A Sub menu ite is created under mmiParent .
 
-  @param   mmiParent  as a TMenuItem
-  @param   strCaption as a String as a constant
-  @param   ClickProc  as a TNotifyEvent
-  @param   AShortCut  as a TShortCut
+  @param   mmiParent   as a TMenuItem as a constant
+  @param   EBADIMenu   as a TBADIMenu as a constant
+  @param   ClickProc   as a TNotifyEvent as a constant
+  @param   UpdateProc  as a TNotifyEvent as a constant
+  @param   iImageIndex as an Integer
+  @return  a TMenuItem
 
 **)
-Procedure TBADIIDEMenuInstaller.CreateMenuItem(mmiParent: TMenuItem;
-  Const strCaption: String = ''; ClickProc: TNotifyEvent = Nil;
-  AShortCut: TShortCut = 0);
+Function TBADIIDEMenuInstaller.CreateMenuItem(Const mmiParent: TMenuItem;
+  Const eBADIMenu : TBADIMenu; Const ClickProc, UpdateProc : TNotifyEvent;
+  iImageIndex : Integer) : TMenuItem;
 
 Var
-  mmiItem: TMenuItem;
+  NTAS: INTAServices;
+  Actn : TAction;
 
 Begin
-  mmiItem := TMenuItem.Create(mmiParent);
-  {$IFNDEF D2005}
-  FMenus.Add(mmiItem); // For Delphi7 and below
-  FMenuShortCuts.Add(Pointer(AShortCut));
-  {$ENDIF}
-  With mmiItem Do
+  NTAS := (BorlandIDEServices As INTAServices);
+  // Create the IDE action (cached for removal later)
+  Actn := Nil;
+  Result := TMenuItem.Create(NTAS.MainMenu);
+  If Assigned(ClickProc) Then
     Begin
-      If strCaption = '' Then
-        Caption := '-'
-      Else
-        Caption        := strCaption;
-      OnClick          := ClickProc;
-      mmiItem.ShortCut := AShortCut;
-      mmiParent.Add(mmiItem);
-    End;
+      Actn := TAction.Create(NTAS.ActionList);
+      Actn.ActionList := NTAS.ActionList;
+      Actn.Name := BADIMenus[eBADIMenu].FName + 'Action';
+      Actn.Caption := BADIMenus[eBADIMenu].FCaption;
+      Actn.OnExecute := ClickProc;
+      Actn.OnUpdate := UpdateProc;
+      Actn.ShortCut := TextToShortCut(BrowseAndDocItOptions.MenuShortcut[eBADIMenu]);
+      Actn.ImageIndex := iImageIndex;
+      Actn.Category := 'BADIActions';
+      FBADIActions[eBADIMenu] := Actn;
+    End Else
+  If BADIMenus[eBADIMenu].FCaption <> '' Then
+    Begin
+      Result.Caption := BADIMenus[eBADIMenu].FCaption;
+      Result.ImageIndex := iImageIndex;
+    End Else
+      Result.Caption := '-';
+  // Create menu (removed through parent menu)
+  Result.Action := Actn;
+  Result.Name := BADIMenus[eBADIMenu].FName + 'Menu';
+  // Create Action and Menu.
+  mmiParent.Add(Result);
 End;
 
 (**
@@ -315,13 +382,8 @@ Destructor TBADIIDEMenuInstaller.Destroy;
 Begin
   If FBADIMenu <> Nil Then
     FBADIMenu.Free;
-  {$IFNDEF D2005}
-  FMenuTimer.Enabled := False;
-  FMenuTimer.OnTimer := Nil;
-  FMenuShortCuts.Free;
-  FMenus.Free;
-  FMenuTimer.Free;
-  {$ENDIF}
+  RemoveActionsFromToolbars;
+  FreeActions;
   Inherited Destroy;
 End;
 
@@ -352,9 +414,9 @@ Begin
         ExtractFilePath(AProject.FileName) + 'Documentation',
         {$IFDEF D2005}
         ExtractFileName(AProject.ProjectOptions.TargetName), ADocType)
-      {$ELSE}
+        {$ELSE}
         ExtractFileName(AProject.FileName), ADocType)
-      {$ENDIF} Do
+        {$ENDIF} Do
         Try
           Add(AProject.FileName);
           For i := 0 To AProject.ModuleFileCount - 1 Do
@@ -440,6 +502,25 @@ Begin
             Break;
           End;
     End;
+End;
+
+(**
+
+  This method cycles through the BADI Menu Actions and frees any that have been created.
+
+  @precon  None.
+  @postcon All BADI Actions are freed and removed from the IDE.
+
+**)
+Procedure TBADIIDEMenuInstaller.FreeActions;
+
+Var
+  iBADIMenu: TBADIMenu;
+
+Begin
+  For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
+    If Assigned(FBADIActions[iBADIMenu]) Then
+      FBADIActions[iBADIMenu].Free;
 End;
 
 (**
@@ -579,7 +660,7 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TBADIIDEMenuInstaller.InsertBlockCommentClick(Sender: TObject);
+Procedure TBADIIDEMenuInstaller.BlockCommentClick(Sender: TObject);
 
 Var
   SE: IOTASourceEditor;
@@ -601,7 +682,7 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TBADIIDEMenuInstaller.InsertInSituCommentClick(Sender: TObject);
+Procedure TBADIIDEMenuInstaller.InSituCommentClick(Sender: TObject);
 Var
   SE: IOTASourceEditor;
 
@@ -621,7 +702,7 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TBADIIDEMenuInstaller.InsertLineCommentClick(Sender: TObject);
+Procedure TBADIIDEMenuInstaller.LineCommentClick(Sender: TObject);
 Var
   SE: IOTASourceEditor;
 
@@ -647,7 +728,7 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TBADIIDEMenuInstaller.InsertMethodCommentClick(Sender: TObject);
+Procedure TBADIIDEMenuInstaller.MethodCommentClick(Sender: TObject);
 
 Var
   Module          : TBaseLanguageModule;
@@ -771,7 +852,7 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TBADIIDEMenuInstaller.InsertPropertyCommentClick(Sender: TObject);
+Procedure TBADIIDEMenuInstaller.PropertyCommentClick(Sender: TObject);
 
 Var
   Module          : TBaseLanguageModule;
@@ -842,7 +923,7 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TBADIIDEMenuInstaller.InsertToDoCommentClick(Sender: TObject);
+Procedure TBADIIDEMenuInstaller.ToDoCommentClick(Sender: TObject);
 
 Var
   SE             : IOTASourceEditor;
@@ -889,6 +970,27 @@ End;
 
 (**
 
+  This method cycles through the BADI Menu Actions and updates the shortcuts to pick up any changes
+  to the shortcuts in the options.
+
+  @precon  None.
+  @postcon The BADI Menu Action shortcuts are updated.
+
+**)
+Procedure TBADIIDEMenuInstaller.UpdateMenuShortcuts;
+
+Var
+  iBADIMenu: TBADIMenu;
+
+Begin
+  For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
+    If Assigned(FBADIActions[iBADIMenu]) Then
+      FBADIActions[iBADIMenu].ShortCut :=
+        TextToShortcut(BrowseAndDocItOptions.MenuShortcut[iBADIMenu]);
+End;
+
+(**
+
   This method test whether there is selected text in the editors current view.
 
   @precon  None.
@@ -917,33 +1019,33 @@ Begin
     End;
 End;
 
-{$IFNDEF D2005}
-(**
-
-  This is an on timer event handler for the menu timer.
-
-  @precon  None.
-  @postcon In Delphi 7 and below - it patches the shortcuts onto the menu items
-           as the Open Tools API "looses" the shortcuts.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TBADIIDEMenuInstaller.MenuTimerEvent(Sender: TObject);
-
-Var
-  i: Integer;
-  M: TMenuItem;
-
-Begin
-  For i := 0 To FMenus.Count - 1 Do
-    Begin
-      M          := FMenus[i] As TMenuItem;
-      M.ShortCut := Integer(FMenuShortCuts[i]);
-    End;
-  FMenuTimer.Enabled := False;
-End;
-{$ENDIF}
+//{$IFNDEF D2005}
+//(**
+//
+//  This is an on timer event handler for the menu timer.
+//
+//  @precon  None.
+//  @postcon In Delphi 7 and below - it patches the shortcuts onto the menu items
+//           as the Open Tools API "looses" the shortcuts.
+//
+//  @param   Sender as a TObject
+//
+//**)
+//Procedure TBADIIDEMenuInstaller.MenuTimerEvent(Sender: TObject);
+//
+//Var
+//  i: Integer;
+//  M: TMenuItem;
+//
+//Begin
+//  For i := 0 To FMenus.Count - 1 Do
+//    Begin
+//      M          := FMenus[i] As TMenuItem;
+//      M.ShortCut := Integer(FMenuShortCuts[i]);
+//    End;
+//  FMenuTimer.Enabled := False;
+//End;
+//{$ENDIF}
 
 (**
 
@@ -964,6 +1066,25 @@ End;
 
 (**
 
+  This method ensures all the BADI Menu Actions are initialised to NIL.
+
+  @precon  None.
+  @postcon All BADI menu actions are nil.
+
+**)
+Procedure TBADIIDEMenuInstaller.NilActions;
+
+Var
+  iBADIMenu: TBADIMenu;
+
+Begin
+  For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
+    If Assigned(FBADIActions[iBADIMenu]) Then
+      FBADIActions[iBADIMenu] := Nil;
+End;
+
+(**
+
   This is a TMenuItem on click event. it invokes the Options dialogue.
 
   @precon  Sender is the object initiating the event.
@@ -976,11 +1097,13 @@ Procedure TBADIIDEMenuInstaller.OptionsClick(Sender: TObject);
 
 Begin
   {$IFDEF DXE00}
-  (BorlandIDEServices As IOTAServices).GetEnvironmentOptions.EditOptions('',
-    'Browse And Doc It.General Options');
+  (BorlandIDEServices As IOTAServices).GetEnvironmentOptions.EditOptions('', 'Browse and Doc It');
   {$ELSE}
-  If TfrmOptions.Execute([Low(TVisibleTab) .. High(TVisibleTab)]) Then
-    FEditorNotifier.ResetLastupdateTickCount(1);
+  If TfrmOptions.Execute([Low(TVisibleTab)..High(TVisibleTab)]) Then
+    Begin
+      FEditorNotifier.ResetLastupdateTickCount(1);
+      UpdateMenuShortcuts;
+    End;
   {$ENDIF}
 End;
 
@@ -1133,6 +1256,96 @@ Begin
     End
   Else
     MessageDlg(strSelectSourceCode, mtError, [mbOK], 0);
+End;
+
+(**
+
+  This method removes any BADI actions from any of the IDE toolbars to prevent AVs.
+
+  @precon  None.
+  @postcon All BADI actions are removed from the IDE toolbars.
+
+**)
+Procedure TBADIIDEMenuInstaller.RemoveActionsFromToolbars;
+
+  (**
+
+    This function checks to see whether the given action is in our action list
+    and returns true if it is.
+
+    @precon  None.
+    @postcon Checks to see whether the given action is in our action list
+             and returns true if it is.
+
+    @param   Action as a TBasicAction
+    @return  a Boolean
+
+  **)
+  Function IsCustomAction(Action : TBasicAction) : Boolean;
+
+  Var
+    iBADIMenu: TBADIMenu;
+
+  Begin
+    Result := False;
+    For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
+      If Action = FBADIActions[iBADIMenu] Then
+        Begin
+          Result := True;
+          Break;
+        End;
+  End;
+
+  (**
+
+    This method iterates over the buttons on a toolbar and removed the button if
+    its action corresponds to an action from this expert.
+
+    @precon  None.
+    @postcon Iterates over the buttons on a toolbar and removed the button if
+             its action corresponds to an action from this expert.
+
+    @param   TB as a TToolbar
+
+  **)
+  Procedure RemoveAction(TB : TToolbar);
+
+  Var
+    i: Integer;
+
+  Begin
+    If TB <> Nil Then
+      For i := TB.ButtonCount - 1 DownTo 0 Do
+        Begin
+          If IsCustomAction(TB.Buttons[i].Action) Then
+            TB.RemoveControl(TB.Buttons[i]);
+        End;
+  End;
+
+Var
+  NTAS : INTAServices;
+
+Begin
+  NTAS := (BorlandIDEServices As INTAServices);
+  RemoveAction(NTAS.ToolBar[sCustomToolBar]);
+  RemoveAction(NTAS.Toolbar[sStandardToolBar]);
+  RemoveAction(NTAS.Toolbar[sDebugToolBar]);
+  RemoveAction(NTAS.Toolbar[sViewToolBar]);
+  RemoveAction(NTAS.Toolbar[sDesktopToolBar]);
+  {$IFDEF D0006}
+  RemoveAction(NTAS.Toolbar[sInternetToolBar]);
+  RemoveAction(NTAS.Toolbar[sCORBAToolBar]);
+  {$IFDEF D2009}
+  RemoveAction(NTAS.Toolbar[sAlignToolbar]);
+  RemoveAction(NTAS.Toolbar[sBrowserToolbar]);
+  RemoveAction(NTAS.Toolbar[sHTMLDesignToolbar]);
+  RemoveAction(NTAS.Toolbar[sHTMLFormatToolbar]);
+  RemoveAction(NTAS.Toolbar[sHTMLTableToolbar]);
+  RemoveAction(NTAS.Toolbar[sPersonalityToolBar]);
+  RemoveAction(NTAS.Toolbar[sPositionToolbar]);
+  RemoveAction(NTAS.Toolbar[sSpacingToolbar]);
+  {$ENDIF}
+  {$ENDIF}
 End;
 
 (**

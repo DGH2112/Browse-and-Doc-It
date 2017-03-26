@@ -3,8 +3,8 @@
   This module contains a class to represent module information stored in the Modules Dispatcher.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    18 Feb 2017
+  @Version 1.1
+  @Date    26 Mar 2017
 
 **)
 Unit BADI.ModuleInfo;
@@ -20,23 +20,24 @@ Type
       parser. **)
   TModuleInfo = Class
     {$IFDEF D2005} Strict {$ENDIF} Private
-    FExt: String;
-    FCls: TBaseLanguageModuleClass;
-    FCanDoc: Boolean;
-    FBlockCmt: TCommentType;
-    FLineCmt: TCommentType;
-    FInSituCmt: TCommentType;
+    FExtensions: String;
+    FCls:        TBaseLanguageModuleClass;
+    FCanDoc:     Boolean;
+    FBlockCmt:   TCommentType;
+    FLineCmt:    TCommentType;
+    FInSituCmt:  TCommentType;
     {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(const strExt: String; Cls: TBaseLanguageModuleClass; boolCanDoc: Boolean;
-      iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
+    Constructor Create(Const Cls: TBaseLanguageModuleClass; Const strExtensions: String;
+      Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
+    Function  CanProcessExt(Const strExt : String) : Boolean;
     (**
       This property returns the extension associated with the registration.
       @precon  None.
       @postcon Returns the extension associated with the registration.
       @return  a String
     **)
-    Property Ext: String Read FExt;
+    Property Extensions: String Read FExtensions Write FExtensions;
     (**
       This property returns the class reference for this registration.
       @precon  None.
@@ -76,6 +77,37 @@ Type
 
 Implementation
 
+Uses
+  SysUtils;
+
+(**
+
+  This method returns true if the given extension (with period separator) is handled by this module.
+
+  @precon  None.
+  @postcon Returns true if the given extension (with period separator) is handled by this module.
+
+  @param   strExt as a String as a constant
+  @return  a Boolean
+
+**)
+Function TModuleInfo.CanProcessExt(Const strExt: String): Boolean;
+
+Var
+  astrExts : TArray<String>;
+  iExt: Integer;
+
+Begin
+  Result := False;
+  astrExts := FExtensions.Split([';']);
+  For iExt := Low(astrExts) To High(astrExts) Do
+    If CompareText(strExt, astrExts[iExt]) = 0 Then
+      Begin
+        Result := True;
+        Break;
+      End;
+End;
+
 (**
 
   A constructor for the TModuleInfo class.
@@ -83,19 +115,19 @@ Implementation
   @precon  None.
   @postcon Initialises the class with information.
 
-  @param   strExt     as a String as a constant
-  @param   Cls        as a TBaseLanguageModuleClass
-  @param   boolCanDoc as a Boolean
-  @param   iBlockCmt  as a TCommentType
-  @param   iLineCmt   as a TCommentType
-  @param   iInSituCmt as a TCommentType
+  @param   Cls           as a TBaseLanguageModuleClass as a constant
+  @param   strExtensions as a String as a constant
+  @param   boolCanDoc    as a Boolean as a constant
+  @param   iBlockCmt     as a TCommentType as a constant
+  @param   iLineCmt      as a TCommentType as a constant
+  @param   iInSituCmt    as a TCommentType as a constant
 
 **)
-Constructor TModuleInfo.Create(const strExt: String; Cls: TBaseLanguageModuleClass; boolCanDoc: Boolean;
-  iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
+Constructor TModuleInfo.Create(Const Cls: TBaseLanguageModuleClass; Const strExtensions: String;
+  Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
 
 Begin
-  FExt := strExt;
+  FExtensions := strExtensions;
   FCls := Cls;
   FCanDoc := boolCanDoc;
   FBlockCmt := iBlockCmt;

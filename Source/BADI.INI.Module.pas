@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       06 Mar 2017
+  @Date       26 Mar 2017
   @Author     David Hoyle
 
 **)
@@ -787,6 +787,5 @@ End;
 
 (** Register the file source code extensions that can be parsed by this module. **)
 Initialization
-  ModuleDispatcher.Add('.ini', TINIModule, True, ctCPPBlock, ctCPPLine, ctCPPBlock);
-  ModuleDispatcher.Add('.tli', TINIModule, True, ctCPPBlock, ctCPPLine, ctCPPBlock);
+  ModuleDispatcher.Add(TINIModule, '.ini;.tli', True, ctCPPBlock, ctCPPLine, ctCPPBlock);
 End.

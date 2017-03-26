@@ -14,7 +14,6 @@ Type
   Strict Private
   Public
   Published
-    Procedure TestModulesOrder;
     Procedure TestCanDocumentDocument;
     Procedure TestCanParseDocument;
     Procedure TestDispatcher;
@@ -220,17 +219,6 @@ Begin
   CheckEquals(ModuleDispatcher.GetCommentType('MyFile.xsd',  csInSitu), ctXML, 'MyFile.xsd - InSitu');
 End;
 
-
-procedure TestFunctions.TestModulesOrder;
-
-Var
-  i : Integer;
-
-begin
-  For i := 0 To ModuleDispatcher.Count - 2 Do
-    Check(ModuleDispatcher.Modules[i].Ext < ModuleDispatcher.Modules[i + 1].Ext,
-      ModuleDispatcher.Modules[i].Ext + '!<' + ModuleDispatcher.Modules[i + 1].Ext);
-end;
 
 Initialization
   RegisterTest('Module Dispatcher Test', TestFunctions.Suite);

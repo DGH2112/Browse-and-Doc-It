@@ -5,7 +5,7 @@
   implemented.
 
   @Version    1.0
-  @Date       09 Mar 2017
+  @Date       26 Mar 2017
   @Author     David Hoyle
 
 **)
@@ -3021,9 +3021,5 @@ end;
 
 (** Register the file source code extensions that can be parsed by this module. **)
 Initialization
-  ModuleDispatcher.Add('.dtd',  TXMLModule, False, ctXML, ctXML, ctXML);
-  ModuleDispatcher.Add('.htm',  TXMLModule, False, ctXML, ctXML, ctXML);
-  ModuleDispatcher.Add('.html', TXMLModule, False, ctXML, ctXML, ctXML);
-  ModuleDispatcher.Add('.xml',  TXMLModule, False, ctXML, ctXML, ctXML);
-  ModuleDispatcher.Add('.xsd',  TXMLModule, False, ctXML, ctXML, ctXML);
+  ModuleDispatcher.Add(TXMLModule, '.dtd;.htm;.html;.xml;.xsd',  False, ctXML, ctXML, ctXML);
 End.

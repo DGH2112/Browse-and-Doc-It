@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       12 Mar 2017
+  @Date       26 Mar 2017
   @Author     David Hoyle
 
 **)
@@ -1947,6 +1947,6 @@ end;
 
 (** Register the file source code extensions that can be parsed by this module. **)
 Initialization
-  ModuleDispatcher.Add('.schematic', TTLSSchematicModule, False, ctCPPBlock, ctCPPLine,
+  ModuleDispatcher.Add(TTLSSchematicModule, '.schematic', False, ctCPPBlock, ctCPPLine,
     ctCPPLine);
 End.

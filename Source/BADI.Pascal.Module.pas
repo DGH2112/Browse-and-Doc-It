@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       19 Mar 2017
+  @Date       26 Mar 2017
   @Author     David Hoyle
 
   @grammar    For the grammar to this parser pleaser see the "Object Pascal Grammar.bnf".
@@ -8316,10 +8316,6 @@ End;
 
 (** Register the file source code extensions that can be parsed by this module. **)
 Initialization
-  ModuleDispatcher.Add('.dpk', TPascalModule, True, ctPascalBlock, ctPascalBlock,
-    ctPascalBlock);
-  ModuleDispatcher.Add('.dpr', TPascalModule, True, ctPascalBlock, ctPascalBlock,
-    ctPascalBlock);
-  ModuleDispatcher.Add('.pas', TPascalModule, True, ctPascalBlock, ctPascalBlock,
+  ModuleDispatcher.Add(TPascalModule, '.dpk;.dpr;.pas', True, ctPascalBlock, ctPascalBlock,
     ctPascalBlock);
 End.

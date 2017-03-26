@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       19 Mar 2017
+  @Date       26 Mar 2017
   @Author     David Hoyle
 
 **)
@@ -2350,7 +2350,5 @@ End;
 
 (** Register the file source code extensions that can be parsed by this module. **)
 Initialization
-  ModuleDispatcher.Add('.bas', TVBModule, True, ctVBLine, ctVBLine, ctVBLine);
-  ModuleDispatcher.Add('.cls', TVBModule, True, ctVBLine, ctVBLine, ctVBLine);
-  ModuleDispatcher.Add('.frm', TVBModule, True, ctVBLine, ctVBLine, ctVBLine);
+  ModuleDispatcher.Add(TVBModule, '.bas;.cls;.frm', True, ctVBLine, ctVBLine, ctVBLine);
 End.

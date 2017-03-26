@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    26 Mar 2017
 
 **)
 Unit FolderConfig;
@@ -148,10 +148,10 @@ Begin
       For j := 0 To ModuleDispatcher.Count - 1 Do
         Begin
           Column           := lvFolders.Columns.Add;
-          Column.Caption   := ModuleDispatcher.Modules[j].Ext;
+          Column.Caption   := ModuleDispatcher.Modules[j].Extensions;
           Column.Alignment := taCenter;
-          Column.Width     := 50;
-          Column.MaxWidth  := 50;
+          Column.Width     := 10 + lvFolders.Canvas.TextWidth(Column.Caption) + 10;
+          Column.MaxWidth  := Column.Width;
         End;
       LoadSettings(strINIFileName);
       // Items
@@ -161,7 +161,7 @@ Begin
           Item.Caption := Folders.Names[i];
           Item.Checked := Integer(Folders.Objects[i]) > 0;
           For j        := 0 To ModuleDispatcher.Count - 1 Do
-            If Like(';*' + ModuleDispatcher.Modules[j].Ext + '*;', ';' +
+            If Like(';*' + ModuleDispatcher.Modules[j].Extensions + '*;', ';' +
               Folders.ValueFromIndex[i] + ';') Then
               Item.SubItems.Add('1')
             Else
@@ -205,7 +205,7 @@ Begin
       Begin
         If Result <> '' Then
           Result := Result + ';';
-        Result   := Result + ModuleDispatcher.Modules[i].Ext;
+        Result   := Result + ModuleDispatcher.Modules[i].Extensions;
       End;
 End;
 

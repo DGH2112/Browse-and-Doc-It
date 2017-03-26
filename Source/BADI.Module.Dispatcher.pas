@@ -4,8 +4,8 @@
   can therefore true the required parser for a given file extension.
 
   @Author  David Hoyle
-  @Version 1.0
-  @Date    12 Mar 2017
+  @Version 1.1
+  @Date    26 Mar 2017
 
 **)
 Unit BADI.Module.Dispatcher;
@@ -25,27 +25,28 @@ Type
     {$IFDEF D2005} Strict {$ENDIF} Private
     FModules: TObjectList;
     {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function Find(const strExt: String): Integer;
+    Function Find(Const strExt: String): Integer;
     Function GetCount: Integer;
-    Function GetModules(iIndex: Integer): TModuleInfo;
+    Function GetModules(Const iIndex: Integer): TModuleInfo;
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    Procedure Add(const strExt: String; Cls: TBaseLanguageModuleClass; boolCanDoc: Boolean;
-      iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
-    Function Dispatcher(const Source, strFileName: String; boolModified: Boolean;
-      ModuleOptions: TModuleOptions): TBaseLanguageModule;
-    Function CanParseDocument(const strFileName: String): Boolean;
-    Function CanDocumentDocument(const strFileName: String): Boolean;
-    Function GetCommentType(const strFileName: String; CommentStyle: TCommentStyle): TCommentType;
+    Procedure Add(Const Cls: TBaseLanguageModuleClass; const strExtensions: String;
+      Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
+    Function Dispatcher(Const Source, strFileName: String; Const boolModified: Boolean;
+      Const ModuleOptions: TModuleOptions): TBaseLanguageModule;
+    Function CanParseDocument(Const strFileName: String): Boolean;
+    Function CanDocumentDocument(Const strFileName: String): Boolean;
+    Function GetCommentType(Const strFileName: String;
+      Const CommentStyle: TCommentStyle) : TCommentType;
     (**
       This property returns a TModuleInfo reference for the indexed module.
       @precon  iIndex must be between 0 and Count - 1.
       @postcon Returns a TModuleInfo reference for the indexed module.
-      @param   iIndex as an Integer
+      @param   iIndex as an Integer as a constant
       @return  a TModuleInfo
     **)
-    Property Modules[iIndex: Integer]: TModuleInfo Read GetModules;
+    Property Modules[Const iIndex: Integer]: TModuleInfo Read GetModules;
     (**
       This property returns the number of registered modules in the dispatcher.
       @precon  None.
@@ -67,43 +68,31 @@ Uses
 
 (**
 
-  This is a Sort procedure for a Object List.
-
-  @precon  None.
-  @postcon Orders the list by extension.
-
-  @param   Item1 as a Pointer
-  @param   Item2 as a Pointer
-  @return  an Integer
-
-**)
-Function SortModuleInfo(Item1, Item2: Pointer): Integer;
-
-Begin
-  Result := CompareText(TModuleInfo(Item1).Ext, TModuleInfo(Item2).Ext);
-End;
-
-(**
-
   This method adds a set of registration information into the dispatcher.
 
   @precon  None.
   @postcon Adds a set of registration information into the dispatcher.
 
-  @param   strExt     as a String as a Constant
-  @param   Cls        as a TBaseLanguageModuleClass
-  @param   boolCanDoc as a Boolean
-  @param   iBlockCmt  as a TCommentType
-  @param   iLineCmt   as a TCommentType
-  @param   iInSituCmt as a TCommentType
+  @param   Cls           as a TBaseLanguageModuleClass as a Constant
+  @param   strExtensions as a String as a Constant
+  @param   boolCanDoc    as a Boolean as a Constant
+  @param   iBlockCmt     as a TCommentType as a Constant
+  @param   iLineCmt      as a TCommentType as a Constant
+  @param   iInSituCmt    as a TCommentType as a Constant
 
 **)
-Procedure TModuleDispatcher.Add(const strExt: String; Cls: TBaseLanguageModuleClass; boolCanDoc: Boolean;
-  iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
+Procedure TModuleDispatcher.Add(Const Cls: TBaseLanguageModuleClass; Const strExtensions: String;
+  Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
+
+Var
+  iModule: Integer;
 
 Begin
-  FModules.Add(TModuleInfo.Create(strExt, Cls, boolCanDoc, iBlockCmt, iLineCmt, iInSituCmt));
-  FModules.Sort(SortModuleInfo);
+  For iModule := 0 To FModules.Count - 1 Do
+    If Modules[iModule].Cls = Cls Then
+      Raise Exception.Create(Format( 'You cannot register the same module more than once (%s)',
+        [Cls.ClassName]));
+  FModules.Add(TModuleInfo.Create(Cls, strExtensions, boolCanDoc, iBlockCmt, iLineCmt, iInSituCmt));
 End;
 
 (**
@@ -119,7 +108,7 @@ End;
   @return  a Boolean
 
 **)
-Function TModuleDispatcher.CanDocumentDocument(const strFileName: String): Boolean;
+Function TModuleDispatcher.CanDocumentDocument(Const strFileName: String): Boolean;
 
 Var
   iIndex: Integer;
@@ -128,7 +117,7 @@ Begin
   Result := False;
   iIndex := Find(ExtractFileExt(strFileName));
   If iIndex > -1 Then
-    Result := (FModules[iIndex] As TModuleInfo).CanDoc;
+    Result := Modules[iIndex].CanDoc;
 End;
 
 (**
@@ -144,7 +133,7 @@ End;
   @return  a Boolean
 
 **)
-Function TModuleDispatcher.CanParseDocument(const strFileName: String): Boolean;
+Function TModuleDispatcher.CanParseDocument(Const strFileName: String): Boolean;
 
 Begin
   Result := Find(ExtractFileExt(strFileName)) > -1;
@@ -177,30 +166,19 @@ End;
   @return  an Integer
 
 **)
-Function TModuleDispatcher.Find(const strExt: String): Integer;
+Function TModuleDispatcher.Find(Const strExt: String): Integer;
 
 Var
-  iFirst, iMid, iLast: Integer;
-  i: Integer;
+  iModule: Integer;
 
 Begin
   Result := -1;
-  iFirst := 0;
-  iLast := FModules.Count - 1;
-  While iFirst <= iLast Do
-    Begin
-      iMid := (iFirst + iLast) Div 2;
-      i := CompareText((FModules[iMid] As TModuleInfo).Ext, strExt);
-      If i = 0 Then
-        Begin
-          Result := iMid;
-          Exit;
-        End
-      Else If i < 0 Then
-        iFirst := iMid + 1
-      Else
-        iLast := iMid - 1;
-    End;
+  For iModule := 0 To FModules.Count - 1 Do
+    If Modules[iModule].CanProcessExt(strExt) Then
+      Begin
+        Result := iModule;
+        Break;
+      End;
 End;
 
 (**
@@ -229,13 +207,13 @@ End;
 
   @param   Source        as a String as a Constant
   @param   strFileName   as a String as a Constant
-  @param   boolModified  as a Boolean
-  @param   ModuleOptions as a TModuleOptions
+  @param   boolModified  as a Boolean as a Constant
+  @param   ModuleOptions as a TModuleOptions as a Constant
   @return  a TBaseLanguageModule
 
 **)
-Function TModuleDispatcher.Dispatcher(const Source, strFileName: String; boolModified: Boolean;
-  ModuleOptions: TModuleOptions): TBaseLanguageModule;
+Function TModuleDispatcher.Dispatcher(Const Source, strFileName: String;
+  Const boolModified: Boolean; Const ModuleOptions: TModuleOptions): TBaseLanguageModule;
 
 Var
   iIndex: Integer;
@@ -258,12 +236,12 @@ End;
            for the comment style given.
 
   @param   strFileName  as a String as a Constant
-  @param   CommentStyle as a TCommentStyle
+  @param   CommentStyle as a TCommentStyle as a Constant
   @return  a TCommentType
 
 **)
-Function TModuleDispatcher.GetCommentType(const strFileName: String; CommentStyle: TCommentStyle)
-  : TCommentType;
+Function TModuleDispatcher.GetCommentType(Const strFileName: String;
+  Const CommentStyle: TCommentStyle) : TCommentType;
 
 Var
   iIndex: Integer;
@@ -273,12 +251,9 @@ Begin
   iIndex := Find(ExtractFileExt(strFileName));
   If iIndex > -1 Then
     Case CommentStyle Of
-      csBlock:
-        Result := (FModules[iIndex] As TModuleInfo).BlockCmt;
-      csLine:
-        Result := (FModules[iIndex] As TModuleInfo).LineCmt;
-      csInSitu:
-        Result := (FModules[iIndex] As TModuleInfo).InSituCmt;
+      csBlock:  Result := (FModules[iIndex] As TModuleInfo).BlockCmt;
+      csLine:   Result := (FModules[iIndex] As TModuleInfo).LineCmt;
+      csInSitu: Result := (FModules[iIndex] As TModuleInfo).InSituCmt;
     End;
 End;
 
@@ -305,11 +280,11 @@ End;
   @precon  iIndex must be between 0 and Count - 1.
   @postcon Returns a reference to the indexed module registration.
 
-  @param   iIndex as an Integer
+  @param   iIndex as an Integer as a Constant
   @return  a TModuleInfo
 
 **)
-Function TModuleDispatcher.GetModules(iIndex: Integer): TModuleInfo;
+Function TModuleDispatcher.GetModules(Const iIndex: Integer): TModuleInfo;
 
 Begin
   Result := FModules[iIndex] As TModuleInfo;

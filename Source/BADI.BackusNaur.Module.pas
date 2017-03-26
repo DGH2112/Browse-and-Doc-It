@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       05 Mar 2017
+  @Date       26 Mar 2017
   @Author     David Hoyle
 
 **)
@@ -1182,6 +1182,6 @@ end;
 
 (** Register the file source code extensions that can be parsed by this module. **)
 Initialization
-  ModuleDispatcher.Add('.bnf', TBackusNaurModule, True, ctCPPBlock, ctCPPBlock,
+  ModuleDispatcher.Add(TBackusNaurModule, '.bnf', True, ctCPPBlock, ctCPPBlock,
     ctCPPBlock);
 End.

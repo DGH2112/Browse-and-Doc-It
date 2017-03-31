@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Feb 2017
+  @Date    31 Mar 2017
 
 **)
 Unit DGHLibrary;
@@ -5633,11 +5633,13 @@ Begin
         SetLength(Attrs, wChars);
         iForeAttrColour := ForeGroundColour(iTextColour, ConsoleInfo.wAttributes And $0F);
         iBackAttrColour := BackGroundColour(iBackColour, ConsoleInfo.wAttributes And $F0);
-        For iChar := 0 To wChars - 1 Do
-          Attrs[iChar] := iForeAttrColour Or iBackAttrColour;
+        If wChars > 0 Then
+          For iChar := 0 To wChars - 1 Do
+            Attrs[iChar] := iForeAttrColour Or iBackAttrColour;
         Win32Check(WriteConsoleOutputAttribute(hndConsole, Attrs,
           Length(strTABText), ConsoleInfo.dwCursorPosition, wChars));
-        Delete(strTABText, 1, wChars);
+        If wChars > 0 Then
+          Delete(strTABText, 1, wChars);
         Inc(NewPos.X, wChars);
         While NewPos.X >= ConsoleInfo.dwSize.X Do
           Begin

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.XML.XMLElemDecl;
@@ -43,7 +43,7 @@ Function TXMLElemDecl.AsString(boolShowIdenifier, boolForDocumentation: Boolean)
 
 Begin
   Result := BuildStringRepresentation(boolShowIdenifier, boolForDocumentation, '',
-    BrowseAndDocItOptions.MaxDocOutputWidth, [')', '*', '?', '+', ','], ['(', '+', '*', '>'], []);
+    BADIOptions.MaxDocOutputWidth, [')', '*', '?', '+', ','], ['(', '+', '*', '>'], []);
 End;
 
 End.

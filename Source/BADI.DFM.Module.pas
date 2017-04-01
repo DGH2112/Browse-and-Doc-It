@@ -3,7 +3,7 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       26 Mar 2017
+  @Date       01 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -169,7 +169,7 @@ Constructor TDFMModule.CreateParser(const Source, strFileName : String;
 
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
-  CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
+  CompilerDefines.Assign(BADIOptions.Defines);
   FSource := Source;
   AddTickCount('Start');
   CommentClass := Nil;
@@ -953,8 +953,4 @@ begin
     End;
 end;
 
-(** Register the file source code extensions that can be parsed by this module. **)
-Initialization
-  ModuleDispatcher.Add(TDFMModule, '.dfm', False, ctPascalBlock, ctPascalBlock,
-    ctPascalBlock);
 End.

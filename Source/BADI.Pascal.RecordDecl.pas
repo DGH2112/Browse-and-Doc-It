@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.Pascal.RecordDecl;
@@ -180,7 +180,7 @@ var
   i: Integer;
 
 Begin
-  If doShowUndocumentedRecords In BrowseAndDocItOptions.Options Then
+  If doShowUndocumentedRecords In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment,
         strRecordDocumentation, DocConflictTable[dctRecordClauseUndocumented]);

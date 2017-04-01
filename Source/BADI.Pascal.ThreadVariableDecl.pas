@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.Pascal.ThreadVariableDecl;
@@ -44,7 +44,7 @@ Uses
 Procedure TThreadVar.CheckDocumentation(Var boolCascade: Boolean);
 
 Begin
-  If doShowUndocumentedVars In BrowseAndDocItOptions.Options Then
+  If doShowUndocumentedVars In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment, strThreadVarDocumentation,
         DocConflictTable[dctThreadVarClauseUndocumented]);

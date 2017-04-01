@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    25 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.Options;
@@ -14,15 +14,18 @@ Interface
 Uses
   Classes,
   Graphics,
-  BADI.Types,
-  BADI.Base.Module;
+  BADI.Types;
 
 {$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** This is a class to define a set of options for the application. **)
-  TBrowseAndDocItOptions = Class
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  TBADIOptions = Class
+  Strict Private
+    Class Var
+      (** This is a clas varaiable to hide and hold the BADI Options instance reference. **)
+      FBADIOptionsInstance : TBADIOptions;
+  Strict Private
     FOptions : TDocOptions;
     FDefines : TStringList;
     FSpecialTags : TStringList;
@@ -45,20 +48,24 @@ Type
     FProfilingCode : TStringList;
     FIssueLimits : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
     FBADIMenuShortCuts : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
+    FModuleExtensions : TStringList;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function  GetTokenFontInfo(Const ATokenType  : TBADITokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(Const ATokenType  : TBADITokenType;
       Const ATokenFontInfo : TTokenFontInfo);
-    Procedure LoadSettings;
-    function  GetProfilingCode(Const Module : TBaseLanguageModule): String;
-    procedure SetProfilingCode(Const Module : TBaseLanguageModule; Const strValue: String);
+    Function  GetProfilingCode(Const strModuleName: String): String;
+    Procedure SetProfilingCode(Const strModuleName: String; Const strValue: String);
     Function  GetIssueLimit(Const LimitType : TLimitType) : Integer;
     Procedure SetIssueLimit(Const LimitType : TLimitType; Const iValue : Integer);
     Function  GetMenuShortcut(Const iBADIMenu : TBADIMenu) : String;
     Procedure SetMenuShortcut(Const iBADIMenu : TBADIMenu; Const strShortcut : String);
+    Function  GetModuleExtensions(Const strModuleName : String)  :String;
+    Procedure SetModuleExtensions(Const strModuleName : String; strExtensions : String);
   Public
     Constructor Create;
     Destructor Destroy; Override;
+    Class Function BADIOptions : TBADIOptions;
+    Procedure LoadSettings;
     Procedure SaveSettings;
     (**
       This property contains the basic toggleable options for the application.
@@ -209,10 +216,10 @@ Type
       This property gets and sets the profiling code for the given filenames.
       @precon  None.
       @postcon Gets and sets the profiling code for the given filenames.
-      @param   Module as a TBaseLanguageModule as a constant
+      @param   strModuleName as a String as a constant
       @return  a String
     **)
-    Property ProfilingCode[Const Module : TBaseLanguageModule] : String Read GetProfilingCode
+    Property ProfilingCode[Const strModuleName : String] : String Read GetProfilingCode
       Write SetProfilingCode;
     (**
       This property gets and sets the numerical limits for the output of errors, warnings,
@@ -234,11 +241,17 @@ Type
     **)
     Property MenuShortcut[Const BADIMenu : TBADIMenu] : String Read GetMenuShortcut
       Write SetMenuShortcut;
+    (**
+      This property stores the file extensions (semi-colon separated list of file extensions) for
+      a given module name.
+      @precon  None.
+      @postcon Gets or set the file extenions for a given module name.
+      @param   strModuleName as a String as a constant
+      @return  a String
+    **)
+    Property ModuleExtensions[Const strModuleName : String] : String Read GetModuleExtensions
+      Write SetModuleExtensions;
   End;
-Var
-  (** This is a global variable for the Browse and Doc It options that need to
-      be available throughout the application. **)
-  BrowseAndDocItOptions : TBrowseAndDocItOptions;
 
 Implementation
 
@@ -246,7 +259,26 @@ Uses
   SysUtils,
   DGHLibrary,
   BADI.Constants,
-  IniFiles;
+  IniFiles,
+  BADI.Module.Dispatcher;
+
+(**
+
+  This class method returns the singleton instance of the BADI Options class.
+
+  @precon  None.
+  @postcon returns the instance of the BADI Options (and creates it if it hasnt alrady been done).
+
+  @return  a TBADIOptions
+
+**)
+Class Function TBADIOptions.BADIOptions: TBADIOptions;
+
+Begin
+  If Not Assigned(FBADIOptionsInstance) Then
+    FBADIOptionsInstance := TBADIOptions.Create;
+  Result := FBADIOptionsInstance;
+End;
 
 (**
 
@@ -256,7 +288,7 @@ Uses
   @postcon Does nothing at the moment.
 
 **)
-Constructor TBrowseAndDocItOptions.Create;
+Constructor TBADIOptions.Create;
 
 Begin
   Inherited Create;
@@ -285,7 +317,7 @@ Begin
   FMethodDescriptions := TStringList.Create;
   FScopesToDocument := [scPublished, scPublic, scProtected, scPrivate];
   FProfilingCode := TStringList.Create;
-  LoadSettings;
+  FModuleExtensions := TStringList.Create;
 End;
 
 (**
@@ -296,10 +328,11 @@ End;
   @postcon Does onthing at the moment except call the inherited destroy method.
 
 **)
-Destructor TBrowseAndDocItOptions.Destroy;
+Destructor TBADIOptions.Destroy;
 
 Begin
   SaveSettings;
+  FModuleExtensions.Free;
   FProfilingCode.Free;
   FMethodDescriptions.Free;
   FExcludeDocFiles.Free;
@@ -307,6 +340,7 @@ Begin
   FSpecialTags.Free;
   FDefines.Free;
   Inherited Destroy;
+  FBADIOptionsInstance := Nil;
 End;
 
 (**
@@ -320,7 +354,7 @@ End;
   @return  an Integer
 
 **)
-Function TBrowseAndDocItOptions.GetIssueLimit(Const LimitType: TLimitType): Integer;
+Function TBADIOptions.GetIssueLimit(Const LimitType: TLimitType): Integer;
 
 Begin
   Result := FIssueLimits[LimitType];
@@ -337,10 +371,27 @@ End;
   @return  a String
 
 **)
-Function TBrowseAndDocItOptions.GetMenuShortcut(Const iBADIMenu: TBADIMenu): String;
+Function TBADIOptions.GetMenuShortcut(Const iBADIMenu: TBADIMenu): String;
 
 Begin
   Result := FBADIMenuShortCuts[iBADIMenu];
+End;
+
+(**
+
+  This is a getter method for the ModuleExtensions property.
+
+  @precon  None.
+  @postcon Returns the extensions for the named module.
+
+  @param   strModuleName as a String as a constant
+  @return  a String
+
+**)
+Function TBADIOptions.GetModuleExtensions(Const strModuleName: String): String;
+
+Begin
+  Result := FModuleExtensions.Values[strModuleName];
 End;
 
 (**
@@ -350,20 +401,23 @@ End;
   @precon  None.
   @postcon Returns the profiling code template for the given filename.
 
-  @param   Module as a TBaseLanguageModule as a constant
+  @param   strModuleName as a String as a constant
   @return  a String
 
 **)
-Function TBrowseAndDocItOptions.GetProfilingCode(Const Module: TBaseLanguageModule): String;
-
-Var
-  strExt: String;
+Function TBADIOptions.GetProfilingCode(Const strModuleName : String): String;
+var
+  iModule: Integer;
 
 Begin
-  strExt := ExtractFileExt(Module.FileName);
-  Result := StringReplace(FProfilingCode.Values[strExt], '|', #13#10, [rfReplaceAll]);
+  Result := StringReplace(FProfilingCode.Values[strModuleName], '|', #13#10, [rfReplaceAll]);
   If Result = '' Then
-    Result := Module.DefaultProfilingTemplate;
+    For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
+      If CompareText(TBADIDispatcher.BADIDispatcher.Modules[iModule].ClassName, strModuleName) = 0 Then
+        Begin
+          Result := TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.DefaultProfilingTemplate;
+          Break;
+        End;
 End;
 
 (**
@@ -379,7 +433,7 @@ End;
   @return  a TTokenFontInfo
 
 **)
-Function TBrowseAndDocItOptions.GetTokenFontInfo(Const ATokenType: TBADITokenType): TTokenFontInfo;
+Function TBADIOptions.GetTokenFontInfo(Const ATokenType: TBADITokenType): TTokenFontInfo;
 Begin
   Result := FTokenFontInfo[ATokenType];
 End;
@@ -392,7 +446,7 @@ End;
   @postcon Loads the applications settings from an ini file.
 
 **)
-Procedure TBrowseAndDocItOptions.LoadSettings;
+Procedure TBADIOptions.LoadSettings;
 
 Var
   sl: TStringList;
@@ -402,6 +456,7 @@ Var
   T: TBADITokenType;
   strLine: String;
   iBADIMenu: TBADIMenu;
+  iModule: Integer;
 
 Begin
   With TMemIniFile.Create(FINIFileName) Do
@@ -487,6 +542,13 @@ Begin
         FBADIMenuShortCuts[iBADIMenu] := ReadString('BADIMenuShortcuts',
           BADIMenus[iBADIMenu].FName,
           BADIMenus[iBADIMenu].FShortCut);
+      For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
+        TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions :=
+          ReadString(
+            'ModuleExtensions',
+            TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
+            TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions
+          );
     Finally
       Free;
     End;
@@ -500,13 +562,14 @@ End;
   @postcon Saves the applications settings to an ini file.
 
 **)
-Procedure TBrowseAndDocItOptions.SaveSettings;
+Procedure TBADIOptions.SaveSettings;
 
 Var
   i: TDocOption;
   j: Integer;
   T: TBADITokenType;
   iBADIMenu : TBADIMenu;
+  iModule: Integer;
 
 Begin
   With TMemIniFile.Create(FINIFileName) Do
@@ -522,7 +585,7 @@ Begin
             FSpecialTags.Values[FSpecialTags.Names[j]]);
         End;
       EraseSection('ManagedExpandedNodes');
-      For j := 0 To BrowseAndDocItOptions.ExpandedNodes.Count - 1 Do
+      For j := 0 To ExpandedNodes.Count - 1 Do
         WriteInteger('ManagedExpandedNodes', StringReplace(FExpandedNodes[j], '=', '|',
           [rfReplaceAll]), Integer(FExpandedNodes.Objects[j]));
       WriteInteger('ModuleExplorer', 'UpdateInterval', FUpdateInterval);
@@ -573,6 +636,12 @@ Begin
         WriteString('BADIMenuShortcuts',
           BADIMenus[iBADIMenu].FName,
           FBADIMenuShortCuts[iBADIMenu]);
+      For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
+        WriteString(
+          'ModuleExtensions',
+          TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
+          TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions
+        );
       UpdateFile;
     Finally
       Free;
@@ -590,7 +659,7 @@ End;
   @param   iValue as an Integer as a constant
 
 **)
-Procedure TBrowseAndDocItOptions.SetIssueLimit(Const LimitType: TLimitType; Const iValue: Integer);
+Procedure TBADIOptions.SetIssueLimit(Const LimitType: TLimitType; Const iValue: Integer);
 
 Begin
   FIssueLimits[LimitType] := iValue;
@@ -607,7 +676,7 @@ End;
   @param   strShortcut as a String as a constant
 
 **)
-Procedure TBrowseAndDocItOptions.SetMenuShortcut(Const iBADIMenu: TBADIMenu;
+Procedure TBADIOptions.SetMenuShortcut(Const iBADIMenu: TBADIMenu;
   Const strShortcut: String);
 
 Begin
@@ -617,24 +686,37 @@ End;
 
 (**
 
+  This is a setter method for the ModuleExtensions property.
+
+  @precon  None.
+  @postcon Sets the module extensions for the named module.
+
+  @param   strModuleName as a String as a constant
+  @param   strExtensions as a String
+
+**)
+Procedure TBADIOptions.SetModuleExtensions(Const strModuleName: String;
+  strExtensions: String);
+
+Begin
+  FModuleExtensions.Values[strModuleName] := strExtensions;
+End;
+
+(**
+
   This is a setter method for the ProfilingCode property.
 
   @precon  None.
   @postcon saves the profiling code for the given filename.
 
-  @param   Module   as a TBaseLanguageModule as a constant
-  @param   strValue as a String as a constant
+  @param   strModuleName as a String as a constant
+  @param   strValue      as a String as a constant
 
 **)
-Procedure TBrowseAndDocItOptions.SetProfilingCode(Const Module: TBaseLanguageModule;
-  Const strValue: String);
-
-Var
-  strExt: String;
+Procedure TBADIOptions.SetProfilingCode(Const strModuleName : String; Const strValue: String);
 
 Begin
-  strExt := ExtractFileExt(Module.FileName);
-  FProfilingCode.Values[strExt] := StringReplace(strValue, #13#10, '|', [rfReplaceAll]);
+  FProfilingCode.Values[strModuleName] := StringReplace(strValue, #13#10, '|', [rfReplaceAll]);
 End;
 
 (**
@@ -650,19 +732,11 @@ End;
   @param   ATokenFontInfo as a TTokenFontInfo as a constant
 
 **)
-Procedure TBrowseAndDocItOptions.SetTokenFontInfo(Const ATokenType: TBADITokenType;
+Procedure TBADIOptions.SetTokenFontInfo(Const ATokenType: TBADITokenType;
   Const ATokenFontInfo: TTokenFontInfo);
 
 Begin
   FTokenFontInfo[ATokenType] := ATokenFontInfo;
 End;
 
-(** Intialises an instance of the options class for use throughout the application. **)
-Initialization
-  //: @refactor Make this a class method / singleton so that the module initialisation order is not
-  //:           important.
-  BrowseAndDocItOptions := TBrowseAndDocItOptions.Create;
-(** Frees the instance of the options class that is use throughout the application. **)
-Finalization
-  BrowseAndDocItOptions.Free;
 End.

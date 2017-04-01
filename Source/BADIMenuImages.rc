@@ -1,0 +1,22 @@
+/*
+
+  This RC file contains menu icons for the BADI menu in the IDE.
+
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    01 Apr 2017
+
+*/
+BADIModuleExplorerImage   BITMAP "..\Images\BADIModuleExplorer.bmp"
+BADIDocumentationImage    BITMAP "..\Images\BADIDocumentation.bmp"
+BADIDUnitImage            BITMAP "..\Images\BADIDUnit.bmp"
+BADIProfilingImage        BITMAP "..\Images\BADIProfiling.bmp"
+BADIFocusEditorImage      BITMAP "..\Images\BADIFocusEditor.bmp"
+BADIMethodCommentImage    BITMAP "..\Images\BADIMethodComment.bmp"
+BADIPropertyCommentImage  BITMAP "..\Images\BADIPropertyComment.bmp"
+BADIBlockCommentImage     BITMAP "..\Images\BADIBlockComment.bmp"
+BADILineCommentImage      BITMAP "..\Images\BADILineComment.bmp"
+BADIInSituCommentImage    BITMAP "..\Images\BADIInSituComment.bmp"
+BADIToDoCommentImage      BITMAP "..\Images\BADIToDoComment.bmp"
+BADIOptionsImage          BITMAP "..\Images\BADIOptions.bmp"
+BADICheckForUpdatesImage  BITMAP "..\Images\BADICheckForUpdates.bmp"

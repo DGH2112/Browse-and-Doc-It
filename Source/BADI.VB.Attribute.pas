@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.VB.Attribute;
@@ -45,7 +45,7 @@ Uses
 Function TVBAttribute.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 Begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    '', BrowseAndDocItOptions.MaxDocOutputWidth);
+    '', BADIOptions.MaxDocOutputWidth);
 End;
 
 (**

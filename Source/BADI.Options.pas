@@ -48,7 +48,6 @@ Type
     FProfilingCode : TStringList;
     FIssueLimits : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
     FBADIMenuShortCuts : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
-    FModuleExtensions : TStringList;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function  GetTokenFontInfo(Const ATokenType  : TBADITokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(Const ATokenType  : TBADITokenType;
@@ -59,8 +58,6 @@ Type
     Procedure SetIssueLimit(Const LimitType : TLimitType; Const iValue : Integer);
     Function  GetMenuShortcut(Const iBADIMenu : TBADIMenu) : String;
     Procedure SetMenuShortcut(Const iBADIMenu : TBADIMenu; Const strShortcut : String);
-    Function  GetModuleExtensions(Const strModuleName : String)  :String;
-    Procedure SetModuleExtensions(Const strModuleName : String; strExtensions : String);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -241,16 +238,6 @@ Type
     **)
     Property MenuShortcut[Const BADIMenu : TBADIMenu] : String Read GetMenuShortcut
       Write SetMenuShortcut;
-    (**
-      This property stores the file extensions (semi-colon separated list of file extensions) for
-      a given module name.
-      @precon  None.
-      @postcon Gets or set the file extenions for a given module name.
-      @param   strModuleName as a String as a constant
-      @return  a String
-    **)
-    Property ModuleExtensions[Const strModuleName : String] : String Read GetModuleExtensions
-      Write SetModuleExtensions;
   End;
 
 Implementation
@@ -317,7 +304,6 @@ Begin
   FMethodDescriptions := TStringList.Create;
   FScopesToDocument := [scPublished, scPublic, scProtected, scPrivate];
   FProfilingCode := TStringList.Create;
-  FModuleExtensions := TStringList.Create;
 End;
 
 (**
@@ -332,7 +318,6 @@ Destructor TBADIOptions.Destroy;
 
 Begin
   SaveSettings;
-  FModuleExtensions.Free;
   FProfilingCode.Free;
   FMethodDescriptions.Free;
   FExcludeDocFiles.Free;
@@ -375,23 +360,6 @@ Function TBADIOptions.GetMenuShortcut(Const iBADIMenu: TBADIMenu): String;
 
 Begin
   Result := FBADIMenuShortCuts[iBADIMenu];
-End;
-
-(**
-
-  This is a getter method for the ModuleExtensions property.
-
-  @precon  None.
-  @postcon Returns the extensions for the named module.
-
-  @param   strModuleName as a String as a constant
-  @return  a String
-
-**)
-Function TBADIOptions.GetModuleExtensions(Const strModuleName: String): String;
-
-Begin
-  Result := FModuleExtensions.Values[strModuleName];
 End;
 
 (**
@@ -682,24 +650,6 @@ Procedure TBADIOptions.SetMenuShortcut(Const iBADIMenu: TBADIMenu;
 Begin
   If FBADIMenuShortCuts[iBADIMenu] <> strShortcut Then
     FBADIMenuShortCuts[iBADIMenu] := strShortcut;
-End;
-
-(**
-
-  This is a setter method for the ModuleExtensions property.
-
-  @precon  None.
-  @postcon Sets the module extensions for the named module.
-
-  @param   strModuleName as a String as a constant
-  @param   strExtensions as a String
-
-**)
-Procedure TBADIOptions.SetModuleExtensions(Const strModuleName: String;
-  strExtensions: String);
-
-Begin
-  FModuleExtensions.Values[strModuleName] := strExtensions;
 End;
 
 (**

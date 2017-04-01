@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.DocIssue;
@@ -105,7 +105,7 @@ Function TDocIssue.AsString(boolShowIdentifier, boolForDocumentation : Boolean):
 
 begin
   Result := FMsg;
-  If doShowParserErrorOrigin In BrowseAndDocItOptions.Options Then
+  If doShowParserErrorOrigin In BADIOptions.Options Then
     Result := Result + Format(' [%s]', [FMethod]);
 end;
 

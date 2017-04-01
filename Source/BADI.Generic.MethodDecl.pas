@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.Generic.MethodDecl;
@@ -123,7 +123,7 @@ Begin
   If (Not FForwardDecl) And (Identifier <> '') Then
     Begin
       CheckMethodDocumentation;
-      If doShowMethodMissingDocs In BrowseAndDocItOptions.Options Then
+      If doShowMethodMissingDocs In BADIOptions.Options Then
         If Comment <> Nil Then
           Begin
             CheckMethodParamCount;
@@ -146,7 +146,7 @@ End;
 Procedure TGenericMethodDecl.CheckMethodDocumentation;
 
 Begin
-  If doShowMethodMissingDocs In BrowseAndDocItOptions.Options Then
+  If doShowMethodMissingDocs In BADIOptions.Options Then
     Begin
       If Comment = Nil Then
         Begin
@@ -191,22 +191,22 @@ Begin
         Inc(k);
         boolMissing := boolMissing And (Comment.Tag[i].TokenCount = 0);
       End;
-  If doShowMethodMissingPreCons In BrowseAndDocItOptions.Options Then
+  If doShowMethodMissingPreCons In BADIOptions.Options Then
     If boolMissing Then
       AddDocumentConflict([FunctionType, QualifiedName], Comment.Line, Comment.Column, Comment,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionPreconNotDocumented]);
-  If doShowMethodDiffParamCount In BrowseAndDocItOptions.Options Then
+  If doShowMethodDiffParamCount In BADIOptions.Options Then
     If (ParameterCount <> j) Then
       AddDocumentConflict([FunctionType, QualifiedName, ParameterCount, j], Line, Column, Comment,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionDiffParamCount]);
-  If doShowMethodMissingPreCons In BrowseAndDocItOptions.Options Then
+  If doShowMethodMissingPreCons In BADIOptions.Options Then
     If k < 1 Then
       AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionMissingPreCon]);
-  If doShowMethodMissingPreCons In BrowseAndDocItOptions.Options Then
+  If doShowMethodMissingPreCons In BADIOptions.Options Then
     If k > 1 Then
       AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
         Format(strFunctionDocumentation, [FunctionType]),
@@ -244,7 +244,7 @@ Begin
               iFound := j;
               Break;
             End;
-      If doShowMethodUndocumentedParams In BrowseAndDocItOptions.Options Then
+      If doShowMethodUndocumentedParams In BADIOptions.Options Then
         If iFound = -1 Then
           AddDocumentConflict([Parameters[i].Identifier, FunctionType, QualifiedName], Line, Column,
             Comment, Format(strFunctionDocumentation, [FunctionType]),
@@ -263,7 +263,7 @@ Begin
               End;
             strType := Trim(strType);
             strParam := BuildLangIndepRep(Parameters[i]);
-            If doShowMethodIncorrectParamType In BrowseAndDocItOptions.Options Then
+            If doShowMethodIncorrectParamType In BADIOptions.Options Then
               If CompareText(strType, strParam) <> 0 Then
                 AddDocumentConflict([Parameters[i].Identifier, FunctionType, QualifiedName,
                   strParam], Tag[iFound].Line, Tag[iFound].Column, Comment,
@@ -298,7 +298,7 @@ Begin
     If LowerCase(Comment.Tag[i].TagName) = 'postcon' Then
       Begin
         Inc(iNumOfPostCons);
-        If doShowMethodMissingPostCons In BrowseAndDocItOptions.Options Then
+        If doShowMethodMissingPostCons In BADIOptions.Options Then
           If Comment.Tag[i].TokenCount = 0 Then
             AddDocumentConflict([FunctionType, QualifiedName], Comment.Tag[i].Line,
               Comment.Tag[i].Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
@@ -308,14 +308,14 @@ Begin
     Begin;
       If iReturnTagIndex = -1 Then
         Begin
-          If doShowMethodUndocumentedReturn In BrowseAndDocItOptions.Options Then
+          If doShowMethodUndocumentedReturn In BADIOptions.Options Then
             AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
               Format(strFunctionDocumentation, [FunctionType]),
               DocConflictTable[dctFunctionUndocumentedReturn])
         End
       Else
         Begin
-          If doShowMethodIncorrectReturnType In BrowseAndDocItOptions.Options Then
+          If doShowMethodIncorrectReturnType In BADIOptions.Options Then
             Begin
               strType := '';
               strReturn := '';
@@ -341,12 +341,12 @@ Begin
     AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
       Format(strFunctionDocumentation, [FunctionType]),
       DocConflictTable[dctFunctionReturnNotRequired]);
-  If doShowMethodMissingPostCons In BrowseAndDocItOptions.Options Then
+  If doShowMethodMissingPostCons In BADIOptions.Options Then
     If iNumOfPostCons = 0 Then
       AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionMissingPostCon]);
-  If doShowMethodMissingPostCons In BrowseAndDocItOptions.Options Then
+  If doShowMethodMissingPostCons In BADIOptions.Options Then
     If (iNumOfPostCons > 1) And (iReturnTagIndex <> -1) Then
       AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
         Format(strFunctionDocumentation, [FunctionType]),

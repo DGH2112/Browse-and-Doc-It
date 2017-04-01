@@ -1,3 +1,4 @@
+//: @stopdocumentation
 program %s;
 {
 

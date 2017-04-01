@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -123,7 +123,7 @@ Begin
         F.FBADICodeBrowsingFrame.SaveSettings;
         F.FBADIExcludedDocFilesFrame.SaveSettings;
         F.FBADIMethodDescriptionsFrame.SaveSettings;
-        BrowseAndDocItOptions.SaveSettings;
+        TBADIOptions.BADIOptions.SaveSettings;
       End;
   Finally
     F.Free;
@@ -180,7 +180,7 @@ end;
 **)
 Procedure TfrmOptions.btnCheckForUpdatesClick(Sender: TObject);
 Begin
-  TfrmCheckForUpdatesOptions.Execute(BrowseAndDocItOptions.INIFileName);
+  TfrmCheckForUpdatesOptions.Execute(TBADIOptions.BADIOptions.INIFileName);
 End;
 
 End.

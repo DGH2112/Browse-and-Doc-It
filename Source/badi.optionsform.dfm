@@ -31,10 +31,6 @@ object frmOptions: TfrmOptions
     TabOrder = 0
     object tabGeneralOptions: TTabSheet
       Caption = 'General Options'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object tabSpecialTags: TTabSheet
       Caption = 'Special Tags'

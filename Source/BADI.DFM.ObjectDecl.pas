@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    05 Mar 2017
+  @date    01 Apr 2017
 
 **)
 Unit BADI.DFM.ObjectDecl;
@@ -65,7 +65,7 @@ Begin
     otinline: Result := 'Inline';
   End;
   Result := Result + #32 + BuildStringRepresentation(True, boolForDocumentation,
-    ':', BrowseAndDocItOptions.MaxDocOutputWidth)
+    ':', BADIOptions.MaxDocOutputWidth)
 End;
 
 (**

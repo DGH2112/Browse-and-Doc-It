@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @version 1.0
-  @date    25 Mar 2017
+  @date    01 Apr 2017
 
 **)
 Unit BADI.MenuShortcutsFrame;
@@ -130,7 +130,7 @@ Begin
         Item.Caption := BADIMenus[iBADIMenu].FName;
         Item.Data := Pointer(iBADIMenu);
         Item.SubItems.Add(BADIMenus[iBADIMenu].FCaption);
-        Item.SubItems.Add(BrowseAndDocItOptions.MenuShortcut[iBADIMenu]);
+        Item.SubItems.Add(TBADIOptions.BADIOptions.MenuShortcut[iBADIMenu]);
       End;
   lvMenuShortcutsSelectItem(Nil, Nil, False);
 End;
@@ -178,7 +178,7 @@ Begin
     Begin
       Item := lvMenuShortcuts.Items[iBADIMenu];
       eBADIMenu := TBADIMenu(Item.Data);
-      BrowseAndDocItOptions.MenuShortcut[eBADIMenu] := Item.SubItems[1];
+      TBADIOptions.BADIOptions.MenuShortcut[eBADIMenu] := Item.SubItems[1];
     End;
 End;
 

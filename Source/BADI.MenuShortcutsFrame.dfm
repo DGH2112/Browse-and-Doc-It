@@ -55,8 +55,6 @@ object fmBADIMenuShortcuts: TfmBADIMenuShortcuts
     TabOrder = 0
     ViewStyle = vsReport
     OnSelectItem = lvMenuShortcutsSelectItem
-    ExplicitWidth = 478
-    ExplicitHeight = 255
   end
   object hkMenuShortcut: THotKey
     Left = 3
@@ -68,8 +66,6 @@ object fmBADIMenuShortcuts: TfmBADIMenuShortcuts
     Modifiers = []
     TabOrder = 1
     OnChange = hkMenuShortcutChange
-    ExplicitTop = 290
-    ExplicitWidth = 397
   end
   object btnAssign: TBitBtn
     Left = 413
@@ -80,7 +76,5 @@ object fmBADIMenuShortcuts: TfmBADIMenuShortcuts
     Caption = '&Assign'
     TabOrder = 2
     OnClick = btnAssignClick
-    ExplicitLeft = 406
-    ExplicitTop = 290
   end
 end

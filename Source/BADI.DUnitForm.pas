@@ -5,19 +5,33 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Oct 2016
+  @Date    01 Apr 2017
 
 **)
-unit DUnitForm;
+unit BADI.DUnitForm;
 
 interface
 
-{$INCLUDE '..\..\..\Library\CompilerDefinitions.inc'}
+{$INCLUDE 'CompilerDefinitions.inc'}
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, DUnitCreator, VirtualTrees, BaseLanguageModule,
-  ImgList, System.ImageList;
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  Buttons,
+  BADI.DUnitCreator,
+  VirtualTrees,
+  BADI.Base.Module,
+  ImgList,
+  System.ImageList,
+  Vcl.ExtCtrls, BADI.ElementContainer;
 
 type
   (** A class to represent the form interface. **)
@@ -40,6 +54,12 @@ type
     cbxBaseClass: TComboBox;
     lblTestSuiteName: TLabel;
     edtTestSuiteName: TEdit;
+    chkRemoveIAndTFromObject: TCheckBox;
+    gpNameOptions: TGridPanel;
+    lblClassName: TLabel;
+    lblMethodName: TLabel;
+    edtClassName: TEdit;
+    edtMethodName: TEdit;
     procedure rdoNewExistingProject(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure rdoNewExistingUnit(Sender: TObject);
@@ -70,12 +90,14 @@ type
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure BuildTestCaseList;
-    Function AddUniqueName(slList : TStrings; strText : String) : String;
-    Procedure ErrorProc(strMsg : String);
+    Function AddUniqueName(slList : TStrings; Const strText : String) : String;
+    Procedure ErrorProc(Const strMsg : String);
     Procedure CheckImplementedTests;
     Procedure UpdateImplementedTests;
     Function  CanRenderContainer(Element : TElementContainer) : Boolean;
     Function  NodeContainsMethods(Node : PVirtualNode) : Boolean;
+    Function  MaskClassName(Const strText : String) : String;
+    Function  MaskMethodName(Const strText : String) : String;
   public
     { Public declarations }
     Class Procedure Execute(objDUnitCreator : TDUnitCreator);
@@ -84,12 +106,13 @@ type
 implementation
 
 Uses
-  CodeSiteLogging,
+  //CodeSiteLogging,
   ToolsAPI,
-  ToolsAPIUtils,
-  PascalModule,
+  BADI.ToolsAPIUtils,
+  BADI.Pascal.Module,
   IniFiles,
-  dghlibrary;
+  dghlibrary, BADI.Generic.FunctionDecl, BADI.Types, BADI.ResourceStrings, BADI.Constants,
+  BADI.Options, BADI.Pascal.RecordDecl, BADI.Pascal.MethodDecl, BADI.Pascal.PropertyDecl;
 
 Type
   (** This is a record to describe the data stored in the virtual tree view. **)
@@ -133,11 +156,11 @@ end;
   @postcon Ensures that a unique name is added to the string list .
 
   @param   slList  as a TStrings
-  @param   strText as a String
+  @param   strText as a String as a constant
   @return  a String
 
 **)
-Function TfrmDUnit.AddUniqueName(slList: TStrings; strText: String) : String;
+Function TfrmDUnit.AddUniqueName(slList: TStrings; Const strText: String) : String;
 
 Var
   iIndex: Integer;
@@ -171,6 +194,8 @@ ResourceString
     'current project group!';
   strTheUnitNameExists = 'The project already contains a unit named ''%s''!';
   strMustSelectUnitTest = 'You must select at least 1 unit to test!';
+  strClassNameMaskMustHaveInsertionPoint = 'The class name mask must have an insert point (%s)!';
+  strMethodNameMaskMustHaveInsertionPoint = 'The method name mask must have an insert point (%s)!';
 
 begin
   If rdoExistingProject.Checked Then
@@ -178,13 +203,16 @@ begin
       Begin
         MessageDlg(strThereAreNoExistingDUnitProjects, mtError, [mbOK], 0);
         ModalResult := mrNone;
+        Exit;
       End;
   If rdoNewProject.Checked Then
     If FDUnitCreator.DoesProjectExist(edtNewProjectName.Text) Then
       Begin
         MessageDlg(Format(strTheProjectNameExists, [edtNewProjectName.Text]),
           mtError, [mbOK], 0);
+        edtNewProjectName.SetFocus;
         ModalResult := mrNone;
+        Exit;
       End;
   If rdoExistingProject.Checked Then
     If rdoNewUnit.Checked Then
@@ -193,12 +221,29 @@ begin
         Begin
           MessageDlg(Format(strTheUnitNameExists, [edtNewUnitName.Text]), mtError,
             [mbOK], 0);
+          edtNewUnitName.SetFocus;
           ModalResult := mrNone;
+          Exit;
         End;
   If FModule.CheckState In [csUncheckedNormal] Then
     Begin
       MessageDlg(strMustSelectUnitTest, mtError, [mbOK], 0);
       ModalResult := mrNone;
+      Exit;
+    End;
+  If Pos('%s', LowerCase(edtClassName.Text)) = 0 Then
+    Begin
+      MessageDlg(strClassNameMaskMustHaveInsertionPoint, mtError, [mbOK], 0);
+      edtClassName.SetFocus;
+      ModalResult := mrNone;
+      Exit;
+    End;
+  If Pos('%s', LowerCase(edtMethodName.Text)) = 0 Then
+    Begin
+      MessageDlg(strMethodNameMaskMustHaveInsertionPoint, mtError, [mbOK], 0);
+      edtMethodName.SetFocus;
+      ModalResult := mrNone;
+      Exit;
     End;
 end;
 
@@ -245,14 +290,14 @@ begin
               strTestCase := strQualifiedIdent;
               iPos := Pos('=', strTestCase);
               Case iPos Of
-                1: strTestCase := 'TestFunctions=Test' +
-                  Copy(strTestCase, 2, Length(strTestCase) - 1);
+                1: strTestCase := MaskClassName('') + '=' +
+                  MaskMethodName(Copy(strTestCase, 2, Length(strTestCase) - 1));
               Else
-                strTestCase := 'Test' + Copy(strTestCase, 1, iPos) +
-                  'Test' + Copy(strTestCase, iPos + 1, Length(strTestCase) - iPos);
+                strTestCase := MaskClassName(Copy(strTestCase, 1, iPos - 1)) + '=' +
+                  MaskMethodName(Copy(strTestCase, iPos + 1, Length(strTestCase) - iPos));
               End;
               If Not FImplementedTests.Find(strTestCase, iIndex) Then
-                FTestCases.Add(strQualifiedIdent);
+                FTestCases.Add(strTestCase);
             End;
     End,
     Nil
@@ -318,6 +363,7 @@ Var
   Method : TPascalMethod;
 
 Begin
+  FImplementedTests.Clear;
   FDUnitCreator.GetExistingDUnitUnits(cbxExistingProject.ItemIndex);
   For iUnit := 0 To FDUnitCreator.UnitCount - 1 Do
     If CompareText(ExtractFileName(FDUnitCreator.Units[iUnit]), cbxExistingUnit.Text) = 0  Then
@@ -361,10 +407,10 @@ End;
   @precon  None.
   @postcon Displays an error in a dialogue box.
 
-  @param   strMsg as a String
+  @param   strMsg as a String as a constant
 
 **)
-Procedure TfrmDUnit.ErrorProc(strMsg : String);
+Procedure TfrmDUnit.ErrorProc(Const strMsg : String);
 
 Begin
   MessageDlg(strMsg, mtError, [mbOK], 0);
@@ -409,11 +455,11 @@ Begin
           If rdoNewUnit.Checked Then
             objDUnitCreator.CreateTestUnit(edtNewUnitName.Text,
               strUnitToBeTested, FTestCases, cbxBaseClass.Text,
-              edtTestSuiteName.Text)
+              edtTestSuiteName.Text, edtClassName.Text, edtMethodName.Text)
           Else
             objDUnitCreator.UpdateTestUnit(cbxExistingUnit.ItemIndex,
               strUnitToBeTested, FTestCases, cbxBaseClass.Text,
-              edtTestSuiteName.Text);
+              edtTestSuiteName.Text, edtClassName.Text, edtMethodName.Text);
         End;
     Finally
       Free;
@@ -433,7 +479,7 @@ End;
 procedure TfrmDUnit.FormCreate(Sender: TObject);
 
 Type
-  T = BaseLanguageModule.TBADIImageIndex;
+  T = TBADIImageIndex;
 
 Var
   strFileName : String;
@@ -514,8 +560,8 @@ begin
           vstTestCases.Expanded[FModule] := True;
         End;
       T := M.FindElement(strExportedHeadingsLabel);
-              If T <> Nil Then
-                Begin
+      If T <> Nil Then
+        Begin
           If FModule = Nil Then
             FModule := AddNode(Nil, FRootElement);
           RenderContainers(FModule, T);
@@ -540,7 +586,7 @@ Var
   sl : TStringList;
 
 begin
-  With TMemIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
+  With TMemIniFile.Create(TBADIOptions.BADIOptions.IniFileName) Do
     Try
       Top := ReadInteger('DUnitDlg', 'Top', (Screen.Height - Height) Div 2);
       Left := ReadInteger('DUnitDlg', 'Left', (Screen.Width - Width) Div 2);
@@ -557,10 +603,57 @@ begin
       End;
       cbxBaseClass.Text := ReadString('DUnitDlg', 'BaseClass', 'TTestCase');
       edtTestSuiteName.Text := ReadString('DUnitDlg', 'TestSuiteName', '');
+      edtClassName.Text := ReadString('DUnit Mask Options', 'ClassNameMask', 'Test%s');
+      edtMethodName.Text := ReadString('DUnit Mask Options', 'MethodNameMask', 'Test%s');
+      chkRemoveIAndTFromObject.Checked := ReadBool('DUnit Mask Options', 'RemoveObjectFirstLetter',
+        False);
     Finally
       Free;
     End;
 end;
+
+(**
+
+  This method returns the name of the class appropriately placed within the class name mask.
+
+  @precon  None.
+  @postcon Returns the name of the class appropriately placed within the class name mask.
+
+  @param   strText as a String as a constant
+  @return  a String
+
+**)
+Function TfrmDUnit.MaskClassName(Const strText: String): String;
+
+Begin
+  Result := strText;
+  If (Length(Result) > 0) And (chkRemoveIAndTFromObject.Checked) And
+     CharInSet(Result[1], ['i', 'I', 't', 'T']) Then
+    Delete(Result, 1, 1);
+  If Result = '' Then
+    Result := 'Functions';
+  If Pos('%s', LowerCase(edtClassName.Text)) > 0 Then
+    Result := Format(edtClassName.Text, [Result]);
+End;
+
+(**
+
+  This method returns the name of the method appropriately placed within the method name mask.
+
+  @precon  None.
+  @postcon Returns the name of the method appropriately placed within the method name mask.
+
+  @param   strText as a String as a constant
+  @return  a String
+
+**)
+Function TfrmDUnit.MaskMethodName(Const strText: String): String;
+
+Begin
+  Result := strText;
+  If Pos('%s', LowerCase(edtMethodName.Text)) > 0 Then
+    Result := Format(edtMethodName.Text, [Result]);
+End;
 
 (**
 
@@ -665,7 +758,6 @@ Var
 begin
   cbxExistingUnit.Enabled := rdoExistingUnit.Checked;
   edtNewUnitName.Enabled := rdoNewUnit.Checked;
-  edtNewUnitName.Enabled := rdoNewUnit.Checked;
   FDUnitCreator.GetExistingDUnitUnits(cbxExistingProject.ItemIndex);
   cbxExistingUnit.Clear;
   For i := 0 To FDUnitCreator.UnitCount - 1 Do
@@ -723,7 +815,7 @@ Var
   i: Integer;
 
 begin
-  With TMemIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
+  With TMemIniFile.Create(TBADIOptions.BADIOptions.IniFileName) Do
     Try
       WriteInteger('DUnitDlg', 'Top', Top);
       WriteInteger('DUnitDlg', 'Left', Left);
@@ -734,6 +826,9 @@ begin
           cbxBaseClass.Items[i]);
       WriteString('DUnitDlg', 'BaseClass', cbxBaseClass.Text);
       WriteString('DUnitDlg', 'TestSuiteName', edtTestSuiteName.Text);
+      WriteString('DUnit Mask Options', 'ClassNameMask', edtClassName.Text);
+      WriteString('DUnit Mask Options', 'MethodNameMask', edtMethodName.Text);
+      WriteBool('DUnit Mask Options', 'RemoveObjectFirstLetter', chkRemoveIAndTFromObject.Checked);
       UpdateFile;
     Finally
       Free;
@@ -751,14 +846,31 @@ end;
 **)
 Procedure TfrmDUnit.UpdateImplementedTests;
 
+Var
+  N: PVirtualNode;
+
 Begin
+  vstTestCases.IterateSubtree(
+    FModule,
+    Procedure (Sender: TBaseVirtualTree; Node: PVirtualNode; Data: Pointer; Var Abort: Boolean)
+    Begin
+      vstTestCases.CheckState[Node] := csUncheckedNormal;
+    End,
+    Nil
+  );
+  N := vstTestCases.GetFirstChild(FModule);
+  While N <> Nil Do
+    Begin
+      vstTestCases.Expanded[N] := False;
+      N := vstTestCases.GetNextSibling(N);
+    End;
   vstTestCases.IterateSubtree(
     FModule,
     Procedure (Sender: TBaseVirtualTree; Node: PVirtualNode; Data: Pointer; Var Abort: Boolean)
 
     Var
       NodeData : ^TTreeData;
-      strQualifiedIdent : String;
+      strMethodName, strClassName, strTestCase : String;
       M : TGenericFunction;
       P : TElementContainer;
       iIndex : Integer;
@@ -770,15 +882,14 @@ Begin
         If NodeData.Element Is TGenericFunction Then
           Begin
             M := NodeData.Element As TGenericFunction;
-            strQualifiedIdent := '=Test' + M.QualifiedName;
+            strMethodName := M.Identifier;
             P := M.Parent; // Get class parent Cls > Methods > Method
             If P <> Nil Then
               P := P.Parent;
             If P Is TRecordDecl Then
-              strQualifiedIdent := 'Test' + (P As TRecordDecl).Identifier + strQualifiedIdent;
-            If (Length(strQualifiedIdent) > 0) And (strQualifiedIdent[1] = '=') Then
-              strQualifiedIdent := 'TestFunctions' + strQualifiedIdent;
-            If FImplementedTests.Find(strQualifiedIdent, iIndex) Then
+              strClassName := (P As TRecordDecl).Identifier;
+            strTestCase := MaskClassName(strClassName) + '=' + MaskMethodName(strMethodName);
+            If FImplementedTests.Find(strTestCase, iIndex) Then
               Begin
                 vstTestCases.CheckState[Node] := csCheckedNormal;
                 PN := Node.Parent;

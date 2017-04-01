@@ -1,3 +1,12 @@
+(**
+
+  This module contains a class to represent a pascal uses clause item.
+
+  @Author  David Hoyle
+  @Version 1.0
+  @Date    01 Apr 2017
+
+**)
 Unit BADI.Pascal.UsesList;
 
 Interface
@@ -37,9 +46,17 @@ Function TUsesList.AsString(boolShowIdentifier, boolForDocumentation: Boolean): 
 
 Begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, '',
-    BrowseAndDocItOptions.MaxDocOutputWidth)
+    BADIOptions.MaxDocOutputWidth)
 End;
 
+(**
+
+  This method implementation is empty as ew do not need to do any checks.
+
+  @precon  None.
+  @postcon None.
+
+**)
 Procedure TUsesList.CheckReferences;
 
 Begin

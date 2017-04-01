@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @date    05 Mar 2017
+  @date    01 Apr 2017
 
 **)
 Unit BADI.DFM.PropertyDecl;
@@ -46,7 +46,7 @@ Function TDFMProperty.AsString(boolShowIdentifier, boolForDocumentation: Boolean
 
 Begin
   Result := BuildStringRepresentation(True, boolForDocumentation, '=',
-    BrowseAndDocItOptions.MaxDocOutputWidth,
+    BADIOptions.MaxDocOutputWidth,
     ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?', '<', '>'],
     ['(', '[', '{', '.', '^', '-'],
     ['=', ':', '+', '*', '\'])

@@ -5,7 +5,7 @@
   implemented.
 
   @Version    1.0
-  @Date       26 Mar 2017
+  @Date       01 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -704,7 +704,7 @@ Begin
     FModuletype := mtXHTML
   Else
     FModuleType := mtXML;
-  CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
+  CompilerDefines.Assign(BADIOptions.Defines);
   FSource := Source;
   AddTickCount('Start');
   CommentClass := TXMLComment;
@@ -3019,7 +3019,4 @@ begin
     DeclSep(xmlParent);
 end;
 
-(** Register the file source code extensions that can be parsed by this module. **)
-Initialization
-  ModuleDispatcher.Add(TXMLModule, '.dtd;.htm;.html;.xml;.xsd',  False, ctXML, ctXML, ctXML);
 End.

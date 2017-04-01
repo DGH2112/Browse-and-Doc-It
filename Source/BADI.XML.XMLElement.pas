@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.XML.XMLElement;
@@ -62,7 +62,7 @@ Uses
 Procedure TXMLElement.AddContextText(Const strText: String);
 
 Begin
-  If FContext.Count < BrowseAndDocItOptions.TokenLimit Then
+  If FContext.Count < BADIOptions.TokenLimit Then
     FContext.Add(strText);
 End;
 
@@ -81,7 +81,7 @@ End;
 Function TXMLElement.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
 Begin
   Result := '<' + BuildStringRepresentation(boolShowIdenifier, boolForDocumentation, '',
-    BrowseAndDocItOptions.MaxDocOutputWidth, [#32, '='], [#32, '='], []) + '>' + ContextText + '</'
+    BADIOptions.MaxDocOutputWidth, [#32, '='], [#32, '='], []) + '>' + ContextText + '</'
     + Identifier + '>';
 End;
 
@@ -103,7 +103,7 @@ Var
 Begin
   For i := 0 To FContext.Count - 1 Do
     Result := Result + FContext[i];
-  If FContext.Count > BrowseAndDocItOptions.TokenLimit Then
+  If FContext.Count > BADIOptions.TokenLimit Then
     Result := Result + '...';
   Result := Trim(Result);
 End;

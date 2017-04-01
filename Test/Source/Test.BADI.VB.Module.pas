@@ -1464,7 +1464,7 @@ Var
   strCode : String;
 
 Begin
-  BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options +
+  TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options +
     [doShowMissingVBExceptionWarnings];
   Try
     strCode :=
@@ -1511,7 +1511,7 @@ Begin
       M.Free;
     End;
   Finally
-    BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options -
+    TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options -
       [doShowMissingVBExceptionWarnings];
   End;
 end;
@@ -1523,7 +1523,7 @@ Var
   strCode : String;
 
 Begin
-  BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options +
+  TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options +
     [doShowMissingVBExceptionWarnings];
   Try
     strCode :=
@@ -1570,7 +1570,7 @@ Begin
       M.Free;
     End;
   Finally
-    BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options -
+    TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options -
       [doShowMissingVBExceptionWarnings];
   End;
 end;
@@ -1733,7 +1733,7 @@ Var
   strCode : String;
 
 Begin
-  BrowseAndDocItOptions.Options := BrowseAndDocitOptions.Options +
+  TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options +
     [doShowMissingVBExceptionWarnings];
   Try
     strCode :=
@@ -1764,7 +1764,7 @@ Begin
       M.Free;
     End;
   Finally
-    BrowseAndDocItOptions.Options := BrowseAndDocitOptions.Options -
+    TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options -
       [doShowMissingVBExceptionWarnings];
   End;
 end;

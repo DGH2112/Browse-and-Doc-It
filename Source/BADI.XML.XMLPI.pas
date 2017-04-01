@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.XML.XMLPI;
@@ -42,7 +42,7 @@ Uses
 Function TXMLPI.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
 Begin
   Result := BuildStringRepresentation(boolShowIdenifier, boolForDocumentation, '',
-    BrowseAndDocItOptions.MaxDocOutputWidth, [#32, '=', '?'], [#32, '=', '?'], []);
+    BADIOptions.MaxDocOutputWidth, [#32, '=', '?'], [#32, '=', '?'], []);
 End;
 
 End.

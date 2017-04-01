@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.XML.XMLIgnoreElement;
@@ -40,8 +40,7 @@ Uses
 **)
 Function TXMLIgnoreElement.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
 Begin
-  Result := BuildStringRepresentation(True, False, '', BrowseAndDocItOptions.MaxDocOutputWidth,
-    [']'], ['[']);
+  Result := BuildStringRepresentation(True, False, '', BADIOptions.MaxDocOutputWidth, [']'], ['[']);
 End;
 
 End.

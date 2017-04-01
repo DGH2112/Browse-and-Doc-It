@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.MethodDescriptionsFrame;
@@ -191,8 +191,8 @@ Var
   j: Integer;
 
 Begin
-  For j := 0 To BrowseAndDocItOptions.MethodDescriptions.Count - 1 Do
-    lbxMethodDescriptions.Items.Add(BrowseAndDocItOptions.MethodDescriptions[j]);
+  For j := 0 To TBADIOptions.BADIOptions.MethodDescriptions.Count - 1 Do
+    lbxMethodDescriptions.Items.Add(TBADIOptions.BADIOptions.MethodDescriptions[j]);
 End;
 
 (**
@@ -209,9 +209,9 @@ Var
   j: Integer;
 
 Begin
-  BrowseAndDocItOptions.MethodDescriptions.Clear;
+  TBADIOptions.BADIOptions.MethodDescriptions.Clear;
   For j := 0 To lbxMethodDescriptions.Items.Count - 1 Do
-    BrowseAndDocItOptions.MethodDescriptions.Add(lbxMethodDescriptions.Items[j]);
+    TBADIOptions.BADIOptions.MethodDescriptions.Add(lbxMethodDescriptions.Items[j]);
 End;
 
 End.

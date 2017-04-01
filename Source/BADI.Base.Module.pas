@@ -3,9 +3,8 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    19 Mar 2017
+  @Date    01 Apr 2017
   @Version 1.0
-
   @Author  David Hoyle
 
 **)
@@ -16,6 +15,7 @@ Interface
 Uses
   Classes,
   Contnrs,
+  BADI.Options,
   BADI.Types,
   BADI.TokenInfo,
   BADI.Comment,
@@ -27,8 +27,8 @@ Uses
 Type
   (** This is an abtract class from which all language modules should be
       derived. **)
-  TBaseLanguageModule = Class {$IFDEF D2005} Abstract {$ENDIF} (TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  TBaseLanguageModule = Class Abstract (TElementContainer)
+  Strict Private
     FOwnedItems : TObjectList;
     FTokenIndex : TTokenIndex;
     FDocErrors: TElementContainer;
@@ -50,7 +50,7 @@ Type
     FModuleOptions : TModuleOptions;
     FTokenStack : TArrayOfInteger;
     FTokenStackTop : Integer;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Protected
     Function GetToken : TTokenInfo;
     function GetOpTickCountName(iIndex: Integer): String;
     function GetOpTickCountByIndex(iIndex: Integer): Double;
@@ -284,7 +284,6 @@ Uses
   INIFiles,
   BADI.ResourceStrings,
   BADI.Functions,
-  BADI.Options,
   BADI.Comment.Tag,
   BADI.Constants,
   BADI.TickOption;
@@ -1122,23 +1121,23 @@ Var
   Tag : TTag;
 
 Begin
-  If Not (doShowConflicts In BrowseAndDocItOptions.Options) Then
+  If Not (doShowConflicts In BADIOptions.Options) Then
     Exit;
-  For i := 0 To BrowseAndDocItOptions.ExcludeDocFiles.Count -1 Do
-    If Like(BrowseAndDocItOptions.ExcludeDocFiles[i], FFileName) Then
+  For i := 0 To BADIOptions.ExcludeDocFiles.Count -1 Do
+    If Like(BADIOptions.ExcludeDocFiles[i], FFileName) Then
       Exit;
   If (Comment <> Nil) And (Comment.FindTag('stopdocumentation') >= 0) Then
     Begin
       boolCascade := False;
       Exit;
     End;
-  If doShowUndocumentedModule In BrowseAndDocItOptions.Options Then
+  If doShowUndocumentedModule In BADIOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([], ModuleNameLine, ModuleNameCol, Comment,
         strModuleDocumentation, DocConflictTable[dctModuleMissingDocumentation]);
   If Comment <> Nil Then
     Begin
-      If (doShowMissingModuleDate In BrowseAndDocItOptions.Options) Then
+      If (doShowMissingModuleDate In BADIOptions.Options) Then
         Begin
           i := Comment.FindTag('date');
           If (i = -1) Or (Comment.Tag[i].TokenCount = 0) Then
@@ -1170,14 +1169,14 @@ Begin
               End
             End;
         End;
-      If (doShowMissingModuleVersion In BrowseAndDocItOptions.Options) Then
+      If (doShowMissingModuleVersion In BADIOptions.Options) Then
         Begin
           i := Comment.FindTag('version');
           If (i = -1) Or (Comment.Tag[i].TokenCount = 0) Then
             AddDocumentConflict([], ModuleNameLine, ModuleNameCol, Comment,
               strModuleDocumentation, DocConflictTable[dctModuleMissingVersion])
         End;
-      If (doShowMissingModuleAuthor In BrowseAndDocItOptions.Options) Then
+      If (doShowMissingModuleAuthor In BADIOptions.Options) Then
         Begin
           i := Comment.FindTag('author');
           If (i = -1) Or (Comment.Tag[i].TokenCount = 0) Then

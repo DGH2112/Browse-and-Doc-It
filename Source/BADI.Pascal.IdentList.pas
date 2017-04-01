@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.Pascal.IdentList;
@@ -44,7 +44,7 @@ Function TIdentList.AsString(boolShowIdentifier, boolForDocumentation: Boolean):
 
 Begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, '',
-    BrowseAndDocItOptions.MaxDocOutputWidth)
+    BADIOptions.MaxDocOutputWidth)
 End;
 
 End.

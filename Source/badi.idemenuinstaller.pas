@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    25 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -279,7 +279,7 @@ Begin
       Actn.Caption := BADIMenus[eBADIMenu].FCaption;
       Actn.OnExecute := ClickProc;
       Actn.OnUpdate := UpdateProc;
-      Actn.ShortCut := TextToShortCut(BrowseAndDocItOptions.MenuShortcut[eBADIMenu]);
+      Actn.ShortCut := TextToShortCut(TBADIOptions.BADIOptions.MenuShortcut[eBADIMenu]);
       Actn.ImageIndex := iImageIndex;
       Actn.Category := 'BADIActions';
       FBADIActions[eBADIMenu] := Actn;
@@ -668,7 +668,7 @@ Var
 Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
-    InsertCommentBlock(csBlock, ModuleDispatcher.GetCommentType(SE.FileName, csBlock));
+    InsertCommentBlock(csBlock, TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csBlock));
 End;
 
 (**
@@ -689,7 +689,7 @@ Var
 Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
-    InsertCommentBlock(csInSitu, ModuleDispatcher.GetCommentType(SE.FileName, csInSitu));
+    InsertCommentBlock(csInSitu, TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csInSitu));
 End;
 
 (**
@@ -709,7 +709,7 @@ Var
 Begin
   SE := ActiveSourceEditor;
   If SE <> Nil Then
-    InsertCommentBlock(csLine, ModuleDispatcher.GetCommentType(SE.FileName, csLine));
+    InsertCommentBlock(csLine, TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csLine));
 End;
 
 (**
@@ -747,7 +747,7 @@ Begin
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
-  Module := ModuleDispatcher.Dispatcher(EditorAsString(Source), Source.FileName,
+  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(Source), Source.FileName,
     Source.Modified, [moParse]);
   If Module <> Nil Then
     Try
@@ -773,7 +773,7 @@ Begin
               Writer           := Source.CreateUndoableWriter;
               Try
                 strComment := WriteComment(F,
-                  ModuleDispatcher.GetCommentType(Source.FileName, csBlock), iIndent,
+                  TBADIDispatcher.BADIDispatcher.GetCommentType(Source.FileName, csBlock), iIndent,
                   True, CursorDelta, iMaxCommentWidth);
                 InsertComment(strComment, Writer, iInsertLine, Source);
               Finally
@@ -871,7 +871,7 @@ Begin
   Source := ActiveSourceEditor;
   If Source = Nil Then
     Exit;
-  Module := ModuleDispatcher.Dispatcher(EditorAsString(Source), Source.FileName,
+  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(Source), Source.FileName,
     Source.Modified, [moParse]);
   If Module <> Nil Then
     Try
@@ -897,7 +897,7 @@ Begin
               Try
                 iMaxCommentWidth := Source.EditViews[0].Buffer.BufferOptions.RightMargin;
                 strComment       := WriteComment(F,
-                  ModuleDispatcher.GetCommentType(Source.FileName,
+                  TBADIDispatcher.BADIDispatcher.GetCommentType(Source.FileName,
                   csBlock), iIndent, False, CursorDelta, iMaxCommentWidth);
                 InsertComment(strComment, Writer, iInsertLine, Source);
               Finally
@@ -955,7 +955,7 @@ Begin
         CharPos.Line      := EditPos.Line;
         CharPos.CharIndex := EditPos.Col;
         Writer.CopyTo(SE.GetEditView(0).CharPosToPos(CharPos) - 1);
-        CommentType := ModuleDispatcher.GetCommentType(SE.FileName, csLine);
+        CommentType := TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csLine);
         iIndent     := EditPos.Col;
         strComment  := BuildBlockComment(CommentType, csLine, iIndent,
           '@todo ' + strSelectedText);
@@ -986,7 +986,7 @@ Begin
   For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
     If Assigned(FBADIActions[iBADIMenu]) Then
       FBADIActions[iBADIMenu].ShortCut :=
-        TextToShortcut(BrowseAndDocItOptions.MenuShortcut[iBADIMenu]);
+        TextToShortcut(TBADIOptions.BADIOptions.MenuShortcut[iBADIMenu]);
 End;
 
 (**
@@ -1166,7 +1166,7 @@ Var
   slProlog, slEpilog: TStringList;
 
 Begin
-  strTemplate := StringReplace(BrowseAndDocItOptions.ProfilingCode[Module],
+  strTemplate := StringReplace(TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName],
     '|', #13#10, [rfReplaceAll]);
   slProlog := PrologCode(strTemplate, ProfileJob.Method, ProfileJob.Indent + iTabs);
   Try
@@ -1216,7 +1216,7 @@ Begin
     Begin
       If Not SE.EditViews[0].Buffer.IsReadOnly Then
         Begin
-          M := ModuleDispatcher.Dispatcher(EditorAsString(SE), SE.FileName,
+          M := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(SE), SE.FileName,
             SE.Modified, [moParse, moProfiling]);
           Try
             ProfileJobs := TfrmProfiling.Execute(M);
@@ -1563,7 +1563,7 @@ Begin
                 EA.UnElideNearestBlock;
               {$ENDIF}
               EV.CursorPos := C;
-              Case BrowseAndDocItOptions.BrowsePosition Of
+              Case TBADIOptions.BADIOptions.BrowsePosition Of
                 bpCommentTop:
                   Begin
                     If iCommentLine > 0 Then

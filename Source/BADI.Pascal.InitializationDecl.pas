@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.Pascal.InitializationDecl;
@@ -65,7 +65,7 @@ End;
 Procedure TInitializationSection.CheckDocumentation(Var boolCascade: Boolean);
 
 Begin
-  If doShowMissingInitComment In BrowseAndDocItOptions.Options Then
+  If doShowMissingInitComment In BADIOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([strInitializationLabel], Line, Column, Comment, strModuleInitSection,
         DocConflictTable[dctMissingInitComment]);

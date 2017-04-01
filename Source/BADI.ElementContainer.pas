@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    04 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.ElementContainer;
@@ -15,6 +15,7 @@ Interface
 Uses
   Classes,
   Contnrs,
+  BADI.Options,
   BADI.Comment,
   BADI.Types,
   BADI.Base.Container,
@@ -27,8 +28,8 @@ Type
 
   (** This class implements the IElementCollection interface so that this
       element container can be rendered with the module browser. **)
-  TElementContainer = Class {$IFDEF D2005} Abstract {$ENDIF} (TBaseContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  TElementContainer = Class Abstract (TBaseContainer)
+  Strict Private
     FElements : TObjectList;
     FComment : TComment;
     FScope : TScope;
@@ -36,13 +37,21 @@ Type
     FSorted  : Boolean;
     FReferenced : Boolean;
     FParent : TElementContainer;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+    FBADIOptions : TBADIOptions;
+  Strict Protected
     Function GetElementCount : Integer;
     Function GetElements(iIndex : Integer) : TElementContainer;
     Function GetImageIndexAdjustedForScope : Integer;
     Function Find(const strName : String; FindType : TFindType = ftName) : Integer;
     Procedure SetSorted(boolValue : Boolean);
     Function FindRoot : TElementContainer;
+    (**
+      This property provide all descendant modules with a single point of access to the options.
+      @precon  None.
+      @postcon Returns a reference to the BADI Options class.
+      @return  a TBADIOptions
+    **)
+    Property BADIOptions : TBADIOptions Read FBADIOptions;
   Public
     Constructor Create(const strName : String; AScope : TScope; iLine,
       iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Virtual;
@@ -159,7 +168,7 @@ Uses
   SysUtils,
   BADI.ResourceStrings,
   BADI.DocIssue,
-  BADI.Options, BADI.Functions;
+  BADI.Functions;
 
 (**
 
@@ -345,10 +354,10 @@ Begin
       i := TLabelContainer.Create(strCategory, scGlobal, 0, 0, iiDocConflictFolder, Nil);
       i := E.Add(i);
     End;
-  If i.ElementCount < BrowseAndDocItOptions.IssueLimits[ltConflicts] Then
+  If i.ElementCount < BADIOptions.IssueLimits[ltConflicts] Then
     i.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iL, iC, DocConflictRec.FMessage,
       DocConflictRec.FDescription, iIcon))
-  Else If i.ElementCount = BrowseAndDocItOptions.IssueLimits[ltConflicts] Then
+  Else If i.ElementCount = BADIOptions.IssueLimits[ltConflicts] Then
     i.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
       iiDocConflictMissing));
 End;
@@ -406,13 +415,13 @@ Var
 Begin
   Case ErrorType Of
     etHint:
-      If Not(doShowHints In BrowseAndDocItOptions.Options) Then
+      If Not(doShowHints In BADIOptions.Options) Then
         Exit;
     etWarning:
-      If Not(doShowWarnings In BrowseAndDocItOptions.Options) Then
+      If Not(doShowWarnings In BADIOptions.Options) Then
         Exit;
     etError:
-      If Not(doShowErrors In BrowseAndDocItOptions.Options) Then
+      If Not(doShowErrors In BADIOptions.Options) Then
         Exit;
   End;
   If Comment <> Nil Then
@@ -432,14 +441,11 @@ Begin
   i := FindRoot.Add(recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage, scNone, Nil);
   iCount := i.ElementCount;
   Case ErrorType Of
-    etError:
-      iIssueLimit := BrowseAndDocItOptions.IssueLimits[ltErrors];
-    etWarning:
-      iIssueLimit := BrowseAndDocItOptions.IssueLimits[ltWarnings];
-    etHint:
-      iIssueLimit := BrowseAndDocItOptions.IssueLimits[ltHints];
+    etError:   iIssueLimit := BADIOptions.IssueLimits[ltErrors];
+    etWarning: iIssueLimit := BADIOptions.IssueLimits[ltWarnings];
+    etHint:    iIssueLimit := BADIOptions.IssueLimits[ltHints];
   Else
-    iIssueLimit := BrowseAndDocItOptions.IssueLimits[ltErrors];
+    iIssueLimit := BADIOptions.IssueLimits[ltErrors];
   End;
   If iCount < iIssueLimit Then
     i.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol, recIssues[ErrorType].FItemImage))
@@ -579,6 +585,7 @@ Begin
   FSorted := True;
   FReferenced := False;
   FParent := Nil;
+  FBADIOptions := TBADIOptions.BADIOptions;
 End;
 
 (**
@@ -866,7 +873,7 @@ Var
   E: TElementContainer;
 
 Begin
-  If doShowUnReferencedSymbols In BrowseAndDocItOptions.Options Then
+  If doShowUnReferencedSymbols In BADIOptions.Options Then
     Begin
       If Scope In [scLocal, scPrivate] Then
         If Not Referenced Then

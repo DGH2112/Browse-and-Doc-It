@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    25 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.IDEOptionsInstaller;
@@ -21,18 +21,19 @@ Uses
 Type
   (** A simple class to encapsulate the installation of option frames into the IDE. **)
   TBADIIDEOptionsInstaller = Class
-    {$IFDEF 2005} Strict {$ENDIF} Private
+  Strict Private
     {$IFDEF DXE00}
-    FBADIParentFrame    : TBADIIDEOptionsHandler;
-    FBADIGeneralOptions : TBADIIDEOptionsHandler;
-    FBADISpecialtags    : TBADIIDEOptionsHandler;
-    FBADIModuleExplorer : TBADIIDEOptionsHandler;
-    FBADICodeBrowsing   : TBADIIDEOptionsHandler;
-    FBADIExcludedDocs   : TBADIIDEOptionsHandler;
-    FBADIMethodDesc     : TBADIIDEOptionsHandler;
-    FBADIMenuShortcuts  : TBADIIDEOptionsHandler;
+    FBADIParentFrame      : TBADIIDEOptionsHandler;
+    FBADIGeneralOptions   : TBADIIDEOptionsHandler;
+    FBADISpecialtags      : TBADIIDEOptionsHandler;
+    FBADIModuleExplorer   : TBADIIDEOptionsHandler;
+    FBADICodeBrowsing     : TBADIIDEOptionsHandler;
+    FBADIExcludedDocs     : TBADIIDEOptionsHandler;
+    FBADIMethodDesc       : TBADIIDEOptionsHandler;
+    FBADIMenuShortcuts    : TBADIIDEOptionsHandler;
+    FBADIModuleExtensions : TBADIIDEOptionsHandler;
     {$ENDIF}
-    {$IFDEF 2005} Strict {$ENDIF} Protected
+  Strict Protected
   Public
     Constructor Create(UpdateMenuShortcuts : TNotifyEvent);
     Destructor Destroy; Override;
@@ -50,7 +51,8 @@ Uses
   BADI.MethodDescriptionsFrame,
   BADI.ModuleExlporerOpsFrame,
   BADI.SpecialTagsFrame,
-  BADI.MenuShortcutsFrame;
+  BADI.MenuShortcutsFrame,
+  BADI.ModuleExtensionsFrame;
 
 { TBADIIDEOptionsInstaller }
 
@@ -84,6 +86,8 @@ Begin
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIMethodDesc);
   FBADIMenuShortcuts := TBADIIDEOptionsHandler.Create(TfmBADIMenuShortcuts, 'Menu Shortcuts', UpdateMenuShortcuts);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIMenuShortcuts);
+  FBADIModuleExtensions := TBADIIDEOptionsHandler.Create(TfmBADIModuleExtensionsFrame, 'Module Extensions', Nil);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIModuleExtensions);
   {$ENDIF}
 End;
 
@@ -107,6 +111,7 @@ Begin
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIExcludedDocs);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIMethodDesc);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIMenuShortcuts);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIModuleExtensions);
   {$ENDIF}
   Inherited Destroy;
 End;

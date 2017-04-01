@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.Pascal.ResourceStringDecl;
@@ -44,7 +44,7 @@ Uses
 Procedure TResourceString.CheckDocumentation(Var boolCascade: Boolean);
 
 Begin
-  If doShowUndocumentedConsts In BrowseAndDocItOptions.Options Then
+  If doShowUndocumentedConsts In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       AddDocumentConflict([Identifier], Line, Column, Comment, strResourceStringDocumentation,
         DocConflictTable[dctResourceStringClauseUndocumented]);

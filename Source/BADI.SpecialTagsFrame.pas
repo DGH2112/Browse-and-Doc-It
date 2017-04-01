@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -365,9 +365,9 @@ Var
   j: Integer;
 
 Begin
-  For j := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
-    lbSpecialTags.Items.AddObject(BrowseAndDocItOptions.SpecialTags[j],
-      BrowseAndDocItOptions.SpecialTags.Objects[j]);
+  For j := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
+    lbSpecialTags.Items.AddObject(TBADIOptions.BADIOptions.SpecialTags[j],
+      TBADIOptions.BADIOptions.SpecialTags.Objects[j]);
 End;
 
 (**
@@ -384,9 +384,9 @@ Var
   j: Integer;
 
 Begin
-  BrowseAndDocItOptions.SpecialTags.Clear;
+  TBADIOptions.BADIOptions.SpecialTags.Clear;
   For j := 0 To lbSpecialTags.Items.Count - 1 Do
-    BrowseAndDocItOptions.SpecialTags.AddObject(lbSpecialTags.Items[j],
+    TBADIOptions.BADIOptions.SpecialTags.AddObject(lbSpecialTags.Items[j],
       lbSpecialTags.Items.Objects[j]);
 End;
 

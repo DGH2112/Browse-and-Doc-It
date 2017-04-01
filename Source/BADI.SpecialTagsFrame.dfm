@@ -65,7 +65,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
         Width = 300
       end>
     Style = hsFlat
-    ExplicitWidth = 513
   end
   object btnDelete: TBitBtn
     Left = 353
@@ -90,7 +89,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 3
     OnClick = btnDeleteClick
-    ExplicitLeft = 279
   end
   object btnEdit: TBitBtn
     Left = 272
@@ -115,7 +113,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 4
     OnClick = btnEditClick
-    ExplicitLeft = 198
   end
   object btnMoveDown: TBitBtn
     Left = 515
@@ -140,7 +137,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 5
     OnClick = btnMoveDownClick
-    ExplicitLeft = 441
   end
   object btnMoveUp: TBitBtn
     Left = 434
@@ -165,7 +161,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 6
     OnClick = btnMoveUpClick
-    ExplicitLeft = 360
   end
   object btnAdd: TBitBtn
     Left = 191
@@ -190,13 +185,12 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 2
     OnClick = btnAddClick
-    ExplicitLeft = 117
   end
   object CheckedImages: TImageList
     Left = 94
     Top = 92
     Bitmap = {
-      494C010102000400540010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000400580010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.VB.Option;
@@ -45,7 +45,7 @@ Function TVBOption.AsString(boolShowIdentifier, boolForDocumentation: Boolean): 
 
 Begin
   Result := BuildStringRepresentation(False, boolForDocumentation,
-    '', BrowseAndDocItOptions.MaxDocOutputWidth);
+    '', BADIOptions.MaxDocOutputWidth);
   If boolShowIdentifier Then
     If Result <> '' Then
       Result := Identifier + #32 + Result

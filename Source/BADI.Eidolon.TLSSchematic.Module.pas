@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       26 Mar 2017
+  @Date       01 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -197,7 +197,7 @@ Var
 
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
-  CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
+  CompilerDefines.Assign(BADIOptions.Defines);
   FSource := Source;
   FRoad := 1;
   FObject := 1;
@@ -1945,8 +1945,4 @@ begin
         strSeekableOnErrorTokens, stActual);
 end;
 
-(** Register the file source code extensions that can be parsed by this module. **)
-Initialization
-  ModuleDispatcher.Add(TTLSSchematicModule, '.schematic', False, ctCPPBlock, ctCPPLine,
-    ctCPPLine);
 End.

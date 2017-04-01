@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    11 Mar 2017
+  @date    01 Apr 2017
 
 **)
 Unit BADI.XML.XMLPERef;
@@ -41,7 +41,7 @@ Uses
 Function TXMLPERef.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
 Begin
   Result := '%' + BuildStringRepresentation(boolShowIdenifier, boolForDocumentation, '',
-    BrowseAndDocItOptions.MaxDocOutputWidth);
+    BADIOptions.MaxDocOutputWidth);
 End;
 
 End.

@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       26 Mar 2017
+  @Date       01 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -2609,7 +2609,4 @@ begin
       'InteriorPatternColour', CustomSymbol.Line, CustomSymbol.Column, etWarning);
 end;
 
-(** Register the file source code extensions that can be parsed by this module. **)
-Initialization
-  ModuleDispatcher.Add(TEidolonModule, '.map', True, ctCPPBlock, ctCPPLine, ctCPPBlock);
 End.

@@ -4,7 +4,7 @@
   and how it can better handle errors.
 
   @Version 1.0
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
   @Author  David Hoyle
 
 **)
@@ -323,7 +323,7 @@ Var
   M: TBaseLanguageModule;
 
 Begin
-  M := ModuleDispatcher.Dispatcher(FSynEdit.Text, FileName, True,
+  M := TBADIDispatcher.BADIDispatcher.Dispatcher(FSynEdit.Text, FileName, True,
     [moParse, moCheckForDocumentConflicts]);
   If M <> Nil Then
     Try
@@ -743,7 +743,7 @@ Begin
                 Begin
                   Inc(iPosition);
                   If boolScan And
-                    ModuleDispatcher.CanParseDocument(ExtractFileExt(recFile.Name)) Then
+                    TBADIDispatcher.BADIDispatcher.CanParseDocument(ExtractFileExt(recFile.Name)) Then
                     Begin
                       FProgressForm.UpdateProgress(iPosition, strFileName);
                       GetErrors(strFileName, strSource, iHints, iWarnings,
@@ -814,7 +814,7 @@ Begin
                             If Not ExcludeFileFromResults(strFileName) Then
                               Begin
                                 Inc(iPosition);
-                                If boolScan And ModuleDispatcher.CanParseDocument(ExtractFileExt(recZip.FileName)) Then
+                                If boolScan And TBADIDispatcher.BADIDispatcher.CanParseDocument(ExtractFileExt(recZip.FileName)) Then
                                   Begin
                                     FProgressForm.UpdateProgress(iPosition, strFileName);
                                     Z.ExtractToString(recZip.StoredPath +
@@ -899,7 +899,7 @@ Var
   R: TParseRecord;
 
 Begin
-  M := ModuleDispatcher.Dispatcher(FSynEdit.Text, FileName, FSynEdit.Modified, [moParse,
+  M := TBADIDispatcher.BADIDispatcher.Dispatcher(FSynEdit.Text, FileName, FSynEdit.Modified, [moParse,
     moCheckForDocumentConflicts]);
   If M <> Nil Then
     Try
@@ -977,7 +977,7 @@ Begin
     Else
       Source.Text := strSource;
     Try
-      M             := ModuleDispatcher.Dispatcher(Source.Text, strFileName, False,
+      M             := TBADIDispatcher.BADIDispatcher.Dispatcher(Source.Text, strFileName, False,
         [moParse, moCheckForDocumentConflicts]);
       If M <> Nil Then
         Try
@@ -1043,10 +1043,10 @@ Begin
   FSynDFMSyn := TSynDFMSyn.Create(Nil);
   FSynINISyn := TSynINISyn.Create(Nil);
   {$IFDEF WIN32}
-  BrowseAndDocItOptions.Defines.Add('WIN32');
-  BrowseAndDocItOptions.Defines.Add('MSWINDOWS');
+  TBADIOptions.BADIOptions.Defines.Add('WIN32');
+  TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
   {$ELSE}
-  BrowseAndDocItOptions.Defines.Add('LINUX');
+  TBADIOptions.BADIOptions.Defines.Add('LINUX');
   {$ENDIF}
   FProgressForm                          := TfrmProgress.Create(Nil);
   FModuleExplorerFrame                   := TframeModuleExplorer.Create(Self);

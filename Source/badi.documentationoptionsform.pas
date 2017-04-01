@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 unit BADI.DocumentationOptionsForm;
@@ -80,30 +80,30 @@ begin
       For i := Low(TDocType) to High(TDocType) Do
         rgpDocumentationOptions.Items.Add(strDocumentationTypes[i]);
       rgpDocumentationOptions.ItemIndex := Byte(ADocType);
-      chkLocal.Checked := scLocal In BrowseAndDocItOptions.ScopesToDocument;
-      chkPrivate.Checked := scPrivate In BrowseAndDocItOptions.ScopesToDocument;
-      chkProtected.Checked := scProtected In BrowseAndDocItOptions.ScopesToDocument;
-      chkPublic.Checked := scPublic In BrowseAndDocItOptions.ScopesToDocument;
-      chkPublished.Checked := scPublished In BrowseAndDocItOptions.ScopesToDocument;
+      chkLocal.Checked := scLocal In TBADIOptions.BADIOptions.ScopesToDocument;
+      chkPrivate.Checked := scPrivate In TBADIOptions.BADIOptions.ScopesToDocument;
+      chkProtected.Checked := scProtected In TBADIOptions.BADIOptions.ScopesToDocument;
+      chkPublic.Checked := scPublic In TBADIOptions.BADIOptions.ScopesToDocument;
+      chkPublished.Checked := scPublished In TBADIOptions.BADIOptions.ScopesToDocument;
       If ShowModal = mrOK Then
         Begin
           ADocType := TDocType(rgpDocumentationOptions.ItemIndex);
-          BrowseAndDocItOptions.ScopesToDocument := [];
+          TBADIOptions.BADIOptions.ScopesToDocument := [];
           If chkLocal.Checked Then
-            BrowseAndDocItOptions.ScopesToDocument :=
-              BrowseAndDocItOptions.ScopesToDocument + [scLocal];
+            TBADIOptions.BADIOptions.ScopesToDocument :=
+              TBADIOptions.BADIOptions.ScopesToDocument + [scLocal];
           If chkPrivate.Checked Then
-            BrowseAndDocItOptions.ScopesToDocument :=
-              BrowseAndDocItOptions.ScopesToDocument + [scPrivate];
+            TBADIOptions.BADIOptions.ScopesToDocument :=
+              TBADIOptions.BADIOptions.ScopesToDocument + [scPrivate];
           If chkProtected.Checked Then
-            BrowseAndDocItOptions.ScopesToDocument :=
-              BrowseAndDocItOptions.ScopesToDocument + [scProtected];
+            TBADIOptions.BADIOptions.ScopesToDocument :=
+              TBADIOptions.BADIOptions.ScopesToDocument + [scProtected];
           If chkPublic.Checked Then
-            BrowseAndDocItOptions.ScopesToDocument :=
-              BrowseAndDocItOptions.ScopesToDocument + [scPublic];
+            TBADIOptions.BADIOptions.ScopesToDocument :=
+              TBADIOptions.BADIOptions.ScopesToDocument + [scPublic];
           If chkPublished.Checked Then
-            BrowseAndDocItOptions.ScopesToDocument :=
-              BrowseAndDocItOptions.ScopesToDocument + [scPublished];
+            TBADIOptions.BADIOptions.ScopesToDocument :=
+              TBADIOptions.BADIOptions.ScopesToDocument + [scPublished];
           Result := True;
         End;
     Finally

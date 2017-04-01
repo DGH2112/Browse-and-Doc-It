@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.ExcludedDocFilesFrame;
@@ -58,7 +58,7 @@ Uses
 Procedure TfmBADIExcludedDocFilesFrame.LoadSettings;
 
 Begin
-  mmoExcludeDocFiles.Text := BrowseAndDocItOptions.ExcludeDocFiles.Text;
+  mmoExcludeDocFiles.Text := TBADIOptions.BADIOptions.ExcludeDocFiles.Text;
 End;
 
 (**
@@ -72,7 +72,7 @@ End;
 Procedure TfmBADIExcludedDocFilesFrame.SaveSettings;
 
 Begin
-  BrowseAndDocItOptions.ExcludeDocFiles.Text := mmoExcludeDocFiles.Text;
+  TBADIOptions.BADIOptions.ExcludeDocFiles.Text := mmoExcludeDocFiles.Text;
 End;
 
 End.

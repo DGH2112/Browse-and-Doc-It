@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.Pascal.FinalizationDecl;
@@ -64,7 +64,7 @@ End;
 Procedure TFinalizationSection.CheckDocumentation(Var boolCascade: Boolean);
 
 Begin
-  If doShowMissingFinalComment In BrowseAndDocItOptions.Options Then
+  If doShowMissingFinalComment In BADIOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
       AddDocumentConflict([strFinalizationLabel], Line, Column, Comment, strModuleFinalSection,
         DocConflictTable[dctMissingFinalComment]);

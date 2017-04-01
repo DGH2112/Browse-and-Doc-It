@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
   @Version 1.0
 
 **)
@@ -185,13 +185,13 @@ Var
 
 begin
   Inherited Create(strOutputDirectory, strTitle);
-  FScopesToDocument := BrowseAndDocItOptions.ScopesToDocument + [scNone, scGlobal];
+  FScopesToDocument := TBADIOptions.BADIOptions.ScopesToDocument + [scNone, scGlobal];
   FTitle := strTitle;
   FModuleSpecialTagNodes := TObjectList.Create(true);
-  For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do //FI:W528
+  For i := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do //FI:W528
     FModuleSpecialTagNodes.Add(TStringList.Create);
   FSummarySpecialTagNodes := TObjectList.Create(true);
-  For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do //FI:W528
+  For i := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do //FI:W528
     FSummarySpecialTagNodes.Add(TStringList.Create);
   FIndex := TStringList.Create;
   FErrors := TStringList.Create;
@@ -351,7 +351,7 @@ var
 begin
   slSummary := TStringList.Create;
   Try
-    If doShowPrefCountersInDocSummary In BrowseAndDocItOptions.Options Then
+    If doShowPrefCountersInDocSummary In TBADIOptions.BADIOptions.Options Then
       Begin
         iIns := FindInsertionPoint(FSummaryContent, '*$PERFCOUNTERS$');
         For i := 0 To FPerfCounters.Count - 1 Do
@@ -545,7 +545,7 @@ Var
     i : TBADITokenType;
 
   Begin
-    With BrowseAndDocItOptions Do
+    With TBADIOptions.BADIOptions Do
       For i := Low(TBADITokenType) to High(TBADITokenType) Do
         Begin
           sl.Add(Format('span.%s {', [strTokenType[i]]));
@@ -600,7 +600,7 @@ Begin
           End Else
             sl.LoadFromFile(strFileName + CSSFiles[i].FFileName);
         sl.Text := StringReplace(sl.Text, '$PREBGCOLOUR$', HTMLColour(
-          BrowseAndDocItOptions.BGColour), []);
+          TBADIOptions.BADIOptions.BGColour), []);
         OutputCodeStyles;
         sl.SaveToFile(FOutputDirectory + 'Styles\' + CSSFiles[i].FFileName);
       End;
@@ -951,9 +951,9 @@ Begin
     For i := 0 To FModuleSpecialTagNodes.Count - 1 Do
       If (FModuleSpecialTagNodes[i] As TStringList).Count > 0 Then
         Begin
-          strName := BrowseAndDocItOptions.SpecialTags.Values[
-            BrowseAndDocItOptions.SpecialTags.Names[i]];
-          strIdent := BrowseAndDocItOptions.SpecialTags.Names[i];
+          strName := TBADIOptions.BADIOptions.SpecialTags.Values[
+            TBADIOptions.BADIOptions.SpecialTags.Names[i]];
+          strIdent := TBADIOptions.BADIOptions.SpecialTags.Names[i];
           sl.Add(strIndent + Format('<div class="Section">%s&nbsp;%s</div>', [
             IMG(iiToDoFolder, scNone), A(strName, '#' + strIdent)]));
         End;
@@ -998,9 +998,9 @@ begin
     With FCurrentModule.BodyComment[i] Do
       For j := 0 To TagCount - 1 Do
         For k := 0 To FModuleSpecialTagNodes.Count - 1 Do
-          If Integer(BrowseAndDocItOptions.SpecialTags.Objects[k]) And iShowInDoc > 0 Then
+          If Integer(TBADIOptions.BADIOptions.SpecialTags.Objects[k]) And iShowInDoc > 0 Then
             If CompareText(Tag[j].TagName,
-              BrowseAndDocItOptions.SpecialTags.Names[k]) = 0 Then
+              TBADIOptions.BADIOptions.SpecialTags.Names[k]) = 0 Then
               Begin
                 (FSummarySpecialTagNodes[k] As TStringList).Add(
                   Format('%s=%s', [ExtractFileName(FCurrentModule.FileName),
@@ -1013,9 +1013,9 @@ begin
       sl := FModuleSpecialTagNodes[i] As TStringList;
       If sl.Count = 0 Then
         Continue;
-      strSection := BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i];
+      strSection := TBADIOptions.BADIOptions.SpecialTags.ValueFromIndex[i];
       slContents.Add(Format('<!-- %s -->', [strSection]));
-      slContents.Add(H(A(strSection, '', BrowseAndDocItOptions.SpecialTags.Names[i]),
+      slContents.Add(H(A(strSection, '', TBADIOptions.BADIOptions.SpecialTags.Names[i]),
         FHeaderLevel, iiToDoFolder, scNone));
       slContents.Add('<ul>');
       For j := 0 To sl.Count - 1 Do
@@ -1025,7 +1025,7 @@ begin
     End;
   For j := 0 To FModuleSpecialTagNodes.Count - 1 Do
     Begin
-      If Integer(BrowseAndDocItOptions.SpecialTags.Objects[j]) And
+      If Integer(TBADIOptions.BADIOptions.SpecialTags.Objects[j]) And
         iShowInDoc > 0 Then
         Begin
           i := (FModuleSpecialTagNodes[j] As TStringList).Count;
@@ -1035,7 +1035,7 @@ begin
             FSummaryContent.Add(Format('        <td class="Yellow">%d</td>', [i]));
         End;
     End;
-  If doShowPrefCountersInDocSummary In BrowseAndDocItOptions.Options Then
+  If doShowPrefCountersInDocSummary In TBADIOptions.BADIOptions.Options Then
     Begin
       For i := 1 To FCurrentModule.OpTickCounts - 1 Do
         FSummaryContent.Add(Format('        <td>%d</td>', [
@@ -1295,7 +1295,7 @@ begin
   slContents.Add(Format('%s  <p class="Comment">%s</p>', [strIndent, strComment]));
   If E.Comment.TagCount = 0 Then
     Exit;
-  With BrowseAndDocItOptions Do
+  With TBADIOptions.BADIOptions Do
     For i := 0 To SpecialTags.Count - 1 Do
       Begin
         If E.Comment.FindTag(SpecialTags.Names[i]) > -1 Then
@@ -1591,12 +1591,12 @@ begin
     If (FSummarySpecialTagNodes[i] as TStringList).Count > 0 Then
       Begin
         FSummaryContent.Add(Format('<!-- %s -->', [
-          BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i]]));
-        FSections.AddObject(BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i],
+          TBADIOptions.BADIOptions.SpecialTags.ValueFromIndex[i]]));
+        FSections.AddObject(TBADIOptions.BADIOptions.SpecialTags.ValueFromIndex[i],
           TObject(iiTodoFolder));
         sl := (FSummarySpecialTagNodes[i] as TStringList);
-        FSummaryContent.Add(H(A(BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i], '',
-          BrowseAndDocItOptions.SpecialTags.ValueFromIndex[i]), 2, iiToDoFolder, scNone));
+        FSummaryContent.Add(H(A(TBADIOptions.BADIOptions.SpecialTags.ValueFromIndex[i], '',
+          TBADIOptions.BADIOptions.SpecialTags.ValueFromIndex[i]), 2, iiToDoFolder, scNone));
         strLastModuleName := '';
         strModuleName := '';
         FSummaryContent.Add('<div class="Indent">');
@@ -1649,11 +1649,11 @@ begin
   FSummaryContent.Add(Format('        <th>%s</th>', ['Warnings']));
   FSummaryContent.Add(Format('        <th>%s</th>', ['Hints']));
   FSummaryContent.Add(Format('        <th>%s</th>', ['Document Conflicts']));
-  With BrowseAndDocItOptions Do
+  With TBADIOptions.BADIOptions Do
     For i := 0 to SpecialTags.Count - 1 Do
       If Integer(SpecialTags.Objects[i]) And iShowInDoc > 0 Then
         FSummaryContent.Add(Format('        <th>%s</th>', [SpecialTags.ValueFromIndex[i]]));
-  With BrowseAndDocItOptions Do
+  With TBADIOptions.BADIOptions Do
     If doShowPrefCountersInDocSummary In Options Then
       FSummaryContent.Add('$PERFCOUNTERS$');
   FSummaryContent.Add('      </tr>');
@@ -1693,11 +1693,11 @@ Begin
   Source := TStringList.Create;
   Try
     Source.LoadFromFile(strFileName);
-    FCurrentModule := ModuleDispatcher.Dispatcher(Source.Text, strFileName, False,
+    FCurrentModule := TBADIDispatcher.BADIDispatcher.Dispatcher(Source.Text, strFileName, False,
       [moParse, moCheckForDocumentConflicts]);
     If FCurrentModule <> Nil Then
       Try
-        If doShowPrefCountersInDocSummary In BrowseAndDocItOptions.Options Then
+        If doShowPrefCountersInDocSummary In TBADIOptions.BADIOptions.Options Then
           If FPerfCounters.Count = 0 Then
             Begin
               For i := 1 To FCurrentModule.OpTickCounts - 1 Do

@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
   @Author  David Hoyle
 
 **)
@@ -148,75 +148,78 @@ begin
       If ActiveProject <> Nil Then
         Begin
           Options := ActiveProject.ProjectOptions;
-          BrowseAndDocItOptions.Defines.Text :=
+          TBADIOptions.BADIOptions.Defines.Text :=
             StringReplace(Options.Values['Defines'], ';', #13#10,
             [rfReplaceAll]);
         End;
       {$IFDEF VER120} // Delphi 4
-      BrowseAndDocItOptions.Defines.Add('VER120');
+      TBADIOptions.BADIOptions.Defines.Add('VER120');
       {$ENDIF}
       {$IFDEF VER130} // Delphi 5
-      BrowseAndDocItOptions.Defines.Add('VER130');
+      TBADIOptions.BADIOptions.Defines.Add('VER130');
       {$ENDIF}
       {$IFDEF VER140} // Delphi 6
-      BrowseAndDocItOptions.Defines.Add('VER140');
+      TBADIOptions.BADIOptions.Defines.Add('VER140');
       {$ENDIF}
       {$IFDEF VER150} // Delphi 7
-      BrowseAndDocItOptions.Defines.Add('VER150');
+      TBADIOptions.BADIOptions.Defines.Add('VER150');
       {$ENDIF}
       {$IFDEF VER160} // Delphi for .NET
-      BrowseAndDocItOptions.Defines.Add('VER160');
+      TBADIOptions.BADIOptions.Defines.Add('VER160');
       {$ENDIF}
       {$IFDEF VER170} // Delphi 2005
-      BrowseAndDocItOptions.Defines.Add('VER170');
+      TBADIOptions.BADIOptions.Defines.Add('VER170');
       {$ENDIF}
       {$IFDEF VER180} // Delphi 2006
-      BrowseAndDocItOptions.Defines.Add('VER180');
+      TBADIOptions.BADIOptions.Defines.Add('VER180');
       {$ENDIF}
       {$IFDEF VER190} // Delphi 2007
-      BrowseAndDocItOptions.Defines.Add('VER190');
+      TBADIOptions.BADIOptions.Defines.Add('VER190');
       {$ENDIF}
       {$IFDEF VER200} // Delphi 2009
-      BrowseAndDocItOptions.Defines.Add('VER200');
+      TBADIOptions.BADIOptions.Defines.Add('VER200');
       {$ENDIF}
       {$IFDEF VER210} // Delphi 2010
-      BrowseAndDocItOptions.Defines.Add('VER210');
+      TBADIOptions.BADIOptions.Defines.Add('VER210');
       {$ENDIF}
       {$IFDEF VER220} // Delphi XE
-      BrowseAndDocItOptions.Defines.Add('VER220');
+      TBADIOptions.BADIOptions.Defines.Add('VER220');
       {$ENDIF}
       {$IFDEF VER230} // Delphi XE2
-      BrowseAndDocItOptions.Defines.Add('VER230');
+      TBADIOptions.BADIOptions.Defines.Add('VER230');
       {$ENDIF}
       {$IFDEF VER230} // Delphi XE3
-      BrowseAndDocItOptions.Defines.Add('VER240');
+      TBADIOptions.BADIOptions.Defines.Add('VER240');
       {$ENDIF}
       {$IFDEF VER230} // Delphi XE4
-      BrowseAndDocItOptions.Defines.Add('VER250');
+      TBADIOptions.BADIOptions.Defines.Add('VER250');
       {$ENDIF}
       {$IFDEF VER230} // Delphi XE5
-      BrowseAndDocItOptions.Defines.Add('VER260');
+      TBADIOptions.BADIOptions.Defines.Add('VER260');
       {$ENDIF}
       {$IFDEF VER230} // Delphi XE6
-      BrowseAndDocItOptions.Defines.Add('VER270');
+      TBADIOptions.BADIOptions.Defines.Add('VER270');
       {$ENDIF}
       {$IFDEF VER230} // Delphi XE7
-      BrowseAndDocItOptions.Defines.Add('VER280');
+      TBADIOptions.BADIOptions.Defines.Add('VER280');
       {$ENDIF}
       {$IFDEF VER230} // Delphi XE8
-      BrowseAndDocItOptions.Defines.Add('VER290');
+      TBADIOptions.BADIOptions.Defines.Add('VER290');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE10
-      BrowseAndDocItOptions.Defines.Add('VER300');
+      {$IFDEF VER230} // Delphi XE10 Seattle
+      TBADIOptions.BADIOptions.Defines.Add('VER300');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE10.1
-      BrowseAndDocItOptions.Defines.Add('VER310');
+      {$IFDEF VER230} // Delphi XE10.1 Berlin
+      TBADIOptions.BADIOptions.Defines.Add('VER310');
+      {$ENDIF}
+      {$IFDEF VER230} // Delphi XE10.2 Tokyo
+      TBADIOptions.BADIOptions.Defines.Add('VER310');
       {$ENDIF}
       {$IFDEF WIN32}
-      BrowseAndDocItOptions.Defines.Add('WIN32');
-      BrowseAndDocItOptions.Defines.Add('MSWINDOWS');
+      TBADIOptions.BADIOptions.Defines.Add('WIN32');
+      TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
       {$ELSE}
-      BrowseAndDocItOptions.Defines.Add('LINUX');
+      TBADIOptions.BADIOptions.Defines.Add('LINUX');
       {$ENDIF}
     End;
 end;
@@ -358,7 +361,7 @@ begin
       {$ENDIF};
     End;
   If (FLastUpdateTickCount > 0) And
-    (GetTickCount > FLastUpdateTickCount + BrowseAndDocItOptions.UpdateInterval) Then
+    (GetTickCount > FLastUpdateTickCount + TBADIOptions.BADIOptions.UpdateInterval) Then
     Begin
       FLastUpdateTickCount := 0;
       If (Application <> Nil) And (Application.MainForm <> Nil) And

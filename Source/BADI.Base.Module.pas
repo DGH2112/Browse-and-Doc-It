@@ -135,7 +135,7 @@ Type
     Procedure AddToExpression(Container : TElementContainer);
     function  IsToken(const strToken: String; Container: TElementContainer): Boolean;
     Procedure AddBodyComment(C : TComment);
-    Function  DefaultProfilingTemplate : String; Virtual;
+    Class Function  DefaultProfilingTemplate : String; Virtual;
     { Properties }
     (**
       This property returns the tick count time between the 2 named tick counts previously stored
@@ -423,7 +423,7 @@ end;
   @return  a String
 
 **)
-function TBaseLanguageModule.DefaultProfilingTemplate: String;
+Class Function TBaseLanguageModule.DefaultProfilingTemplate: String;
 
 begin
   Result := '$METHODCODE$';

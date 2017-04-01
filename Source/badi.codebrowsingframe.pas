@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.CodeBrowsingFrame;
@@ -60,7 +60,7 @@ Uses
 Procedure TfmBADICodeBrowsingFrame.LoadSettings;
 
 Begin
-  rgpBrowsePosition.ItemIndex := Integer(BrowseAndDocItOptions.BrowsePosition);
+  rgpBrowsePosition.ItemIndex := Integer(TBADIOptions.BADIOptions.BrowsePosition);
 End;
 
 (**
@@ -74,7 +74,7 @@ End;
 Procedure TfmBADICodeBrowsingFrame.SaveSettings;
 
 Begin
-  BrowseAndDocItOptions.BrowsePosition := TBrowsePosition(rgpBrowsePosition.ItemIndex);
+  TBADIOptions.BADIOptions.BrowsePosition := TBrowsePosition(rgpBrowsePosition.ItemIndex);
 End;
 
 End.

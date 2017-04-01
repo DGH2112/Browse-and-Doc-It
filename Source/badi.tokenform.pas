@@ -3,7 +3,7 @@
   This is a debug form for displaying the tokens and their information.
 
   @version      1.0
-  @date         19 Feb 2017
+  @date         01 Apr 2017
   @author       David Hoyle
 
 **)
@@ -71,9 +71,9 @@ Var
 
 begin
   T := TBADITokenType(StrToInt(Item.SubItems[6]));
-  lvListView1.Canvas.Font.Color := BrowseAndDocItOptions.TokenFontInfo[T].FForeColour;
-  lvListView1.Canvas.Font.Style := BrowseAndDocItOptions.TokenFontInfo[T].FStyles;
-  BG := BrowseAndDocItOptions.TokenFontInfo[T].FBackColour;
+  lvListView1.Canvas.Font.Color := TBADIOptions.BADIOptions.TokenFontInfo[T].FForeColour;
+  lvListView1.Canvas.Font.Style := TBADIOptions.BADIOptions.TokenFontInfo[T].FStyles;
+  BG := TBADIOptions.BADIOptions.TokenFontInfo[T].FBackColour;
   If BG = clNone Then
     BG := clWindow;
   lvListView1.Canvas.Brush.Color := BG;

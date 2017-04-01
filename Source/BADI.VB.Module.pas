@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       26 Mar 2017
+  @Date       01 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -192,7 +192,7 @@ Begin
   FUnResolvedSymbols.Sorted := True;
   FEventHandlerPatterns := TStringList.Create;
   FEventHandlerPatterns.Add('*_*');
-  CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
+  CompilerDefines.Assign(BADIOptions.Defines);
   FSource := Source;
   AddTickCount('Start');
   CommentClass := TVBComment;
@@ -217,7 +217,7 @@ Begin
       Add(strDocumentationConflicts, iiDocConflictFolder, scNone, Nil);
       PatchAndCheckReferences;
       AddTickCount('Refs');
-      If doShowMissingVBExceptionWarnings In BrowseAndDocItOptions.Options Then
+      If doShowMissingVBExceptionWarnings In BADIOptions.Options Then
         CheckExceptionHandling;
       boolCascade := True;
       If moCheckForDocumentConflicts In ModuleOptions Then
@@ -2348,7 +2348,4 @@ Begin
     End;
 End;
 
-(** Register the file source code extensions that can be parsed by this module. **)
-Initialization
-  ModuleDispatcher.Add(TVBModule, '.bas;.cls;.frm', True, ctVBLine, ctVBLine, ctVBLine);
 End.

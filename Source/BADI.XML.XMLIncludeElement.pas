@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.XML.XMLIncludeElement;
@@ -41,8 +41,7 @@ Uses
 Function TXMLIncludeElement.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
 
 Begin
-  Result := BuildStringRepresentation(True, False, '', BrowseAndDocItOptions.MaxDocOutputWidth,
-    [']'], ['[']);
+  Result := BuildStringRepresentation(True, False, '', BADIOptions.MaxDocOutputWidth, [']'], ['[']);
 End;
 
 End.

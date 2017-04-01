@@ -33,7 +33,7 @@ object fmBADIGeneralOptions: TfmBADIGeneralOptions
       Left = 7
       Top = 10
       Width = 91
-      Height = 23
+      Height = 16
       Caption = 'Refresh &Interval'
     end
     object lblManagedNodesLife: TLabel

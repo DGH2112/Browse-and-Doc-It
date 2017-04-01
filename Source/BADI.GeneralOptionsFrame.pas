@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.GeneralOptionsFrame;
@@ -76,10 +76,10 @@ Begin
   For i := Low(TDocOption) To High(TDocOption) Do
     Begin
       clbOptions.Items.Add(DocOptionInfo[i].FDescription);
-      clbOptions.Checked[Integer(i)] := i In BrowseAndDocItOptions.Options;
+      clbOptions.Checked[Integer(i)] := i In TBADIOptions.BADIOptions.Options;
     End;
-  udUpdateInterval.Position := BrowseAndDocItOptions.UpdateInterval;
-  udManagedNodesLife.Position := BrowseAndDocItOptions.ManagedNodesLife;
+  udUpdateInterval.Position := TBADIOptions.BADIOptions.UpdateInterval;
+  udManagedNodesLife.Position := TBADIOptions.BADIOptions.ManagedNodesLife;
 End;
 
 (**
@@ -96,12 +96,12 @@ Var
   i : TDocOption;
 
 Begin
-  BrowseAndDocItOptions.Options := [];
+  TBADIOptions.BADIOptions.Options := [];
   For i := Low(TDocOption) To High(TDocOption) Do
     If clbOptions.Checked[Integer(i)] Then
-      BrowseAndDocItOptions.Options := BrowseAndDocItOptions.Options + [i];
-  BrowseAndDocItOptions.UpdateInterval := udUpdateInterval.Position;
-  BrowseAndDocItOptions.ManagedNodesLife := udManagedNodesLife.Position;
+      TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options + [i];
+  TBADIOptions.BADIOptions.UpdateInterval := udUpdateInterval.Position;
+  TBADIOptions.BADIOptions.ManagedNodesLife := udManagedNodesLife.Position;
 End;
 
 End.

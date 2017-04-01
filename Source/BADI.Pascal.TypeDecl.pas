@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.Pascal.TypeDecl;
@@ -205,7 +205,7 @@ Function TArrayType.AsString(boolShowIdentifier, boolForDocumentation: Boolean):
 
 Begin
   Result := BuildStringRepresentation(boolShowIdentifier And (Identifier <> ''),
-    boolForDocumentation, '=', BrowseAndDocItOptions.MaxDocOutputWidth);
+    boolForDocumentation, '=', BADIOptions.MaxDocOutputWidth);
 End;
 
 (**
@@ -230,7 +230,7 @@ Const
 
 Begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    '=' + strIsTyped[FIsTyped], BrowseAndDocItOptions.MaxDocOutputWidth,
+    '=' + strIsTyped[FIsTyped], BADIOptions.MaxDocOutputWidth,
     strNoSpaceBeforeSymbols - ['(']);
 End;
 

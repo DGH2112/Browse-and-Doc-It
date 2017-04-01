@@ -3,7 +3,7 @@
   This module contains a base class for all documentation modules.
 
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
   @Version 1.0
 
 **)
@@ -68,7 +68,7 @@ Uses
 Procedure TBaseDocumentation.Add(Const strFileName : String);
 
 Begin
-  If ModuleDispatcher.CanDocumentDocument(strFileName) Then
+  If TBADIDispatcher.BADIDispatcher.CanDocumentDocument(strFileName) Then
     FFileNames.Add(strFileName);
 End;
 

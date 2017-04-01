@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       26 Mar 2017
+  @Date       01 Apr 2017
   @Author     David Hoyle
 
   @grammar    For the grammar to this parser pleaser see the "Object Pascal Grammar.bnf".
@@ -360,7 +360,7 @@ Begin
   FSourceCodeForProfiling := TStringList.Create;
   If moProfiling In ModuleOptions Then
     FSourceCodeForProfiling.Text := Source;
-  CompilerDefines.Assign(BrowseAndDocItOptions.Defines);
+  CompilerDefines.Assign(BADIOptions.Defines);
   FSource := Source;
   AddTickCount('Start');
   CommentClass := TPascalComment;
@@ -4345,7 +4345,7 @@ Begin
       End
     Else If (Token.Token = '(') Then
       Begin
-        If doStrictConstantExpressions In BrowseAndDocItOptions.Options Then
+        If doStrictConstantExpressions In BADIOptions.Options Then
           If petConstExpr In ExprType Then
             If Not IsKeyWord(PrevToken.Token, strConstExprDesignators) Then
               Begin
@@ -4664,7 +4664,7 @@ begin
             NextToken;
             // Check Profiling Prolog Code for a match
             strTemplate := StringReplace(
-              BrowseAndDocItOptions.ProfilingCode[Self],
+              BADIOptions.ProfilingCode[Self.ClassName],
               '|', #13#10, [rfReplaceAll]);
             slProlog := PrologCode(strTemplate, Method.QualifiedName, 0);
             Try
@@ -8314,8 +8314,4 @@ Begin
       IsKeyWord(AToken.Token, strIdentifierReservedWords));
 End;
 
-(** Register the file source code extensions that can be parsed by this module. **)
-Initialization
-  ModuleDispatcher.Add(TPascalModule, '.dpk;.dpr;.pas', True, ctPascalBlock, ctPascalBlock,
-    ctPascalBlock);
 End.

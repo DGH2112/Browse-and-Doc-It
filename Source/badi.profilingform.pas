@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 unit BADI.ProfilingForm;
@@ -260,12 +260,12 @@ Begin
   With TfrmProfiling.Create(Nil) Do
     Try
       InitialiseTreeView(Module);
-      mmoCode.Lines.Text := BrowseAndDocItOptions.ProfilingCode[Module];
+      mmoCode.Lines.Text := TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName];
       If ShowModal = mrOK Then
         Begin
           Result := TProfileJobs.Create;
           ProcessJobs(Result);
-          BrowseAndDocItOptions.ProfilingCode[Module] := mmoCode.Lines.Text;
+          TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName] := mmoCode.Lines.Text;
           SaveSettings;
         End;
     Finally
@@ -356,7 +356,7 @@ end;
 procedure TfrmProfiling.LoadSettings;
 
 begin
-  With TMemIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
+  With TMemIniFile.Create(TBADIOptions.BADIOptions.IniFileName) Do
     Try
       Top := ReadInteger('ProfilingDlg', 'Top', (Screen.Height - Height) Div 2);
       Left := ReadInteger('ProfilingDlg', 'Left', (Screen.Width - Width) Div 2);
@@ -468,7 +468,7 @@ end;
 procedure TfrmProfiling.SaveSettings;
 
 begin
-  With TMemIniFile.Create(BrowseAndDocitOptions.IniFileName) Do
+  With TMemIniFile.Create(TBADIOptions.BADIOptions.IniFileName) Do
     Try
       WriteInteger('ProfilingDlg', 'Top', Top);
       WriteInteger('ProfilingDlg', 'Left', Left);

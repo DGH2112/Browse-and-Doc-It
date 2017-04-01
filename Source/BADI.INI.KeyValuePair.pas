@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    06 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.INI.KeyValuePair;
@@ -49,7 +49,7 @@ Function TKeyValuePair.AsString(boolShowIdenifier, boolForDocumentation: Boolean
 
 Begin
   Result := BuildStringRepresentation(True, False, '=',
-    BrowseAndDocItOptions.MaxDocOutputWidth, [#32..#255], [#32..#255], []);
+    BADIOptions.MaxDocOutputWidth, [#32..#255], [#32..#255], []);
 End;
 
 (**

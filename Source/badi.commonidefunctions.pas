@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
   @Version 1.0
 
 **)
@@ -264,7 +264,7 @@ Begin
   CursorAdjust.Y := 0;
   If Func.Comment = Nil Then
     Begin
-      MD    := BrowseAndDocItOptions.MethodDescriptions;
+      MD    := TBADIOptions.BADIOptions.MethodDescriptions;
       For i := 0 To MD.Count - 1 Do
         If Like(MD.Names[i], Func.Identifier) Then
           Begin
@@ -457,7 +457,7 @@ Begin
   boolHasCons := False;
   If Func.Comment <> Nil Then
     boolHasCons := Func.Comment.FindTag('precon') > -1;
-  If (doAddPreAndPostToComment In BrowseAndDocItOptions.Options) And Not boolHasCons Then
+  If (doAddPreAndPostToComment In TBADIOptions.BADIOptions.Options) And Not boolHasCons Then
     Begin
       AddToComment(StringOfChar(#32, iIndent) + '  @precon  '#13#10);
       AddToComment(StringOfChar(#32, iIndent) + '  @postcon '#13#10);
@@ -710,7 +710,7 @@ Begin
   Try
     FType := 'Parsing';
     If FFileName <> '' Then
-      FModule := ModuleDispatcher.Dispatcher(FSource, FFileName, FModified,
+      FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, FFileName, FModified,
         [moParse, moCheckForDocumentConflicts])
     Else
       FModule := Nil;

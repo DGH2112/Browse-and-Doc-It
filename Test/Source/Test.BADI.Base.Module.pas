@@ -787,7 +787,7 @@ begin
 end;
 
 initialization
-  BrowseAndDocItOptions.Options := [doCustomDrawing..doStrictConstantExpressions];
+  TBADIOptions.BADIOptions.Options := [doCustomDrawing..doStrictConstantExpressions];
   // Register any test cases with the test runner
   RegisterTest('BaseLanguageModule Tests', TestTBaseLanguageModule.Suite);
 End.

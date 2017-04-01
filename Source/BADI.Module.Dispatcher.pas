@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.1
-  @Date    26 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.Module.Dispatcher;
@@ -21,16 +21,21 @@ Uses
 
 Type
   (** A class to handle all the registered modules in the system. **)
-  TModuleDispatcher = Class
-    {$IFDEF D2005} Strict {$ENDIF} Private
+  TBADIDispatcher = Class
+  Strict Private
     FModules: TObjectList;
-    {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Private
+    Class Var
+      (** This is a hidden class variable to hold the instance of the module dispatcher. **)
+      FBADIModuleDispatcherInstance : TBADIDispatcher;
+  Strict Protected
     Function Find(Const strExt: String): Integer;
     Function GetCount: Integer;
     Function GetModules(Const iIndex: Integer): TModuleInfo;
   Public
     Constructor Create;
     Destructor Destroy; Override;
+    Class Function BADIDispatcher : TBADIDispatcher;
     Procedure Add(Const Cls: TBaseLanguageModuleClass; const strExtensions: String;
       Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
     Function Dispatcher(Const Source, strFileName: String; Const boolModified: Boolean;
@@ -56,11 +61,6 @@ Type
     Property Count: Integer Read GetCount;
   End;
 
-Var
-  (** This is a global variable that is initialised by this module and available
-      to all over modules so that they can register their information. **)
-  ModuleDispatcher: TModuleDispatcher;
-
 Implementation
 
 Uses
@@ -81,7 +81,7 @@ Uses
   @param   iInSituCmt    as a TCommentType as a Constant
 
 **)
-Procedure TModuleDispatcher.Add(Const Cls: TBaseLanguageModuleClass; Const strExtensions: String;
+Procedure TBADIDispatcher.Add(Const Cls: TBaseLanguageModuleClass; Const strExtensions: String;
   Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
 
 Var
@@ -97,6 +97,25 @@ End;
 
 (**
 
+  This class method returns the singleton instance of the BADI Module Dispatcher.
+
+  @precon  None.
+  @postcon An instance of the BAID Module Dispatcher is returned (and created if it has already
+           been).
+
+  @return  a TBADIDispatcher
+
+**)
+Class Function TBADIDispatcher.BADIDispatcher: TBADIDispatcher;
+
+Begin
+  If Not Assigned(FBADIModuleDispatcherInstance) Then
+    FBADIModuleDispatcherInstance := TBADIDispatcher.Create;
+  Result := FBADIModuleDispatcherInstance;
+End;
+
+(**
+
   This method determines if the document can be documented in HTML, RTF, etc,
   i.e. your wouldn`t document a code type that you only wish to browse, say
   XML or HTML.
@@ -108,7 +127,7 @@ End;
   @return  a Boolean
 
 **)
-Function TModuleDispatcher.CanDocumentDocument(Const strFileName: String): Boolean;
+Function TBADIDispatcher.CanDocumentDocument(Const strFileName: String): Boolean;
 
 Var
   iIndex: Integer;
@@ -133,7 +152,7 @@ End;
   @return  a Boolean
 
 **)
-Function TModuleDispatcher.CanParseDocument(Const strFileName: String): Boolean;
+Function TBADIDispatcher.CanParseDocument(Const strFileName: String): Boolean;
 
 Begin
   Result := Find(ExtractFileExt(strFileName)) > -1;
@@ -147,7 +166,7 @@ End;
   @postcon Creates a object list to contain the module registration information.
 
 **)
-Constructor TModuleDispatcher.Create;
+Constructor TBADIDispatcher.Create;
 
 Begin
   FModules := TObjectList.Create(True);
@@ -166,7 +185,7 @@ End;
   @return  an Integer
 
 **)
-Function TModuleDispatcher.Find(Const strExt: String): Integer;
+Function TBADIDispatcher.Find(Const strExt: String): Integer;
 
 Var
   iModule: Integer;
@@ -189,11 +208,12 @@ End;
   @postcon Frees the memory used by the module registrations.
 
 **)
-Destructor TModuleDispatcher.Destroy;
+Destructor TBADIDispatcher.Destroy;
 
 Begin
   FModules.Free;
   Inherited Destroy;
+  FBADIModuleDispatcherInstance := Nil;
 End;
 
 (**
@@ -212,7 +232,7 @@ End;
   @return  a TBaseLanguageModule
 
 **)
-Function TModuleDispatcher.Dispatcher(Const Source, strFileName: String;
+Function TBADIDispatcher.Dispatcher(Const Source, strFileName: String;
   Const boolModified: Boolean; Const ModuleOptions: TModuleOptions): TBaseLanguageModule;
 
 Var
@@ -240,7 +260,7 @@ End;
   @return  a TCommentType
 
 **)
-Function TModuleDispatcher.GetCommentType(Const strFileName: String;
+Function TBADIDispatcher.GetCommentType(Const strFileName: String;
   Const CommentStyle: TCommentStyle) : TCommentType;
 
 Var
@@ -267,7 +287,7 @@ End;
   @return  an Integer
 
 **)
-Function TModuleDispatcher.GetCount: Integer;
+Function TBADIDispatcher.GetCount: Integer;
 
 Begin
   Result := FModules.Count;
@@ -284,18 +304,10 @@ End;
   @return  a TModuleInfo
 
 **)
-Function TModuleDispatcher.GetModules(Const iIndex: Integer): TModuleInfo;
+Function TBADIDispatcher.GetModules(Const iIndex: Integer): TModuleInfo;
 
 Begin
   Result := FModules[iIndex] As TModuleInfo;
 End;
 
-(** This initializations section ensures that there is a valid instance of the
-    BrowseAndDocItOption class. **)
-Initialization
-  ModuleDispatcher := TModuleDispatcher.Create;
-(** This finalization section ensures that the BrowseAndDocItOptions class are
-    destroyed. **)
-Finalization
-  ModuleDispatcher.Free;
 End.

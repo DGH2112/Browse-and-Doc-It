@@ -110,7 +110,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Left = 228
     Top = 30
     Width = 16
-    Height = 21
+    Height = 24
     Associate = edtTokenLimit
     Min = 10
     Max = 32600
@@ -203,7 +203,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Left = 112
     Top = 30
     Width = 16
-    Height = 21
+    Height = 24
     Associate = edtFontSize
     Min = 8
     Max = 72
@@ -244,7 +244,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Left = 421
     Top = 30
     Width = 16
-    Height = 21
+    Height = 24
     Anchors = [akTop, akRight]
     Associate = edtLimits
     TabOrder = 13

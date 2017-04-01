@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.ModuleExlporerOpsFrame;
@@ -306,22 +306,22 @@ Var
 
 Begin
   For j := 0 To cbxFontName.Items.Count - 1 Do
-    If cbxFontName.Items[j] = BrowseAndDocItOptions.FontName Then
+    If cbxFontName.Items[j] = TBADIOptions.BADIOptions.FontName Then
       Begin
         cbxFontName.ItemIndex := j;
         Break;
       End;
   For k := Low(TBADITokenType) To High(TBADITokenType) Do
-    FTokenFontInfo[k] := BrowseAndDocItOptions.TokenFontInfo[k];
-  udFontSize.Position := BrowseAndDocItOptions.FontSize;
-  cbxBGColour.Selected := BrowseAndDocItOptions.BGColour;
-  udTokenLimit.Position := BrowseAndDocItOptions.TokenLimit;
-  clbxTreeColour.Selected := BrowseAndDocItOptions.TreeColour;
+    FTokenFontInfo[k] := TBADIOptions.BADIOptions.TokenFontInfo[k];
+  udFontSize.Position := TBADIOptions.BADIOptions.FontSize;
+  cbxBGColour.Selected := TBADIOptions.BADIOptions.BGColour;
+  udTokenLimit.Position := TBADIOptions.BADIOptions.TokenLimit;
+  clbxTreeColour.Selected := TBADIOptions.BADIOptions.TreeColour;
   lbxTokenTypesClick(Nil);
-  FIssueLimits[ltErrors] := BrowseAndDocItOptions.IssueLimits[ltErrors];
-  FIssueLimits[ltWarnings] := BrowseAndDocItOptions.IssueLimits[ltWarnings];
-  FIssueLimits[ltHints] := BrowseAndDocItOptions.IssueLimits[ltHints];
-  FIssueLimits[ltConflicts] := BrowseAndDocItOptions.IssueLimits[ltConflicts];
+  FIssueLimits[ltErrors] := TBADIOptions.BADIOptions.IssueLimits[ltErrors];
+  FIssueLimits[ltWarnings] := TBADIOptions.BADIOptions.IssueLimits[ltWarnings];
+  FIssueLimits[ltHints] := TBADIOptions.BADIOptions.IssueLimits[ltHints];
+  FIssueLimits[ltConflicts] := TBADIOptions.BADIOptions.IssueLimits[ltConflicts];
   cbxLimits.ItemIndex := 0;
   cbxLimitsChange(Nil);
 End;
@@ -340,17 +340,17 @@ Var
   k: TBADITokenType;
 
 Begin
-  BrowseAndDocItOptions.FontName := cbxFontName.Text;
+  TBADIOptions.BADIOptions.FontName := cbxFontName.Text;
   For k := Low(TBADITokenType) To High(TBADITokenType) Do
-    BrowseAndDocItOptions.TokenFontInfo[k] := FTokenFontInfo[k];
-  BrowseAndDocItOptions.FontSize := udFontSize.Position;
-  BrowseAndDocItOptions.BGColour := cbxBGColour.Selected;
-  BrowseAndDocItOptions.TokenLimit := udTokenLimit.Position;
-  BrowseAndDocItOptions.TreeColour := clbxTreeColour.Selected;
-  BrowseAndDocItOptions.IssueLimits[ltErrors] := FIssueLimits[ltErrors];
-  BrowseAndDocItOptions.IssueLimits[ltWarnings] := FIssueLimits[ltWarnings];
-  BrowseAndDocItOptions.IssueLimits[ltHints] := FIssueLimits[ltHints];
-  BrowseAndDocItOptions.IssueLimits[ltConflicts] := FIssueLimits[ltConflicts];
+    TBADIOptions.BADIOptions.TokenFontInfo[k] := FTokenFontInfo[k];
+  TBADIOptions.BADIOptions.FontSize := udFontSize.Position;
+  TBADIOptions.BADIOptions.BGColour := cbxBGColour.Selected;
+  TBADIOptions.BADIOptions.TokenLimit := udTokenLimit.Position;
+  TBADIOptions.BADIOptions.TreeColour := clbxTreeColour.Selected;
+  TBADIOptions.BADIOptions.IssueLimits[ltErrors] := FIssueLimits[ltErrors];
+  TBADIOptions.BADIOptions.IssueLimits[ltWarnings] := FIssueLimits[ltWarnings];
+  TBADIOptions.BADIOptions.IssueLimits[ltHints] := FIssueLimits[ltHints];
+  TBADIOptions.BADIOptions.IssueLimits[ltConflicts] := FIssueLimits[ltConflicts];
 End;
 
 (**

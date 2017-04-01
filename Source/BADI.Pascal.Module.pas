@@ -286,7 +286,7 @@ Type
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
     Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Function DefaultProfilingTemplate : String; Override;
+    Class Function DefaultProfilingTemplate : String; Override;
   End;
 
 Implementation
@@ -1480,7 +1480,7 @@ End;
   @return  a String
 
 **)
-Function TPascalModule.DefaultProfilingTemplate: String;
+Class Function TPascalModule.DefaultProfilingTemplate: String;
 
 Begin
   Result :=

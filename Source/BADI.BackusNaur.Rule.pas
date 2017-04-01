@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Mar 2017
+  @Date    01 Apr 2017
 
 **)
 Unit BADI.BackusNaur.Rule;
@@ -48,7 +48,7 @@ function TBackusNaurRule.AsString(boolShowIdenifier,
 begin
   Result := Name + ' ::= ' +
     BuildStringRepresentation(False, boolForDocumentation, '::=',
-      BrowseAndDocItOptions.MaxDocOutputWidth, ['.', '+', '*'], ['.']);
+      BADIOptions.MaxDocOutputWidth, ['.', '+', '*'], ['.']);
 end;
 
 End.

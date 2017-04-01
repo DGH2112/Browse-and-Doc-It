@@ -1,9 +1,11 @@
+//: @stopdocumentation
 Unit $TESTUNITNAME$;
 
 Interface
 
 Uses
-  TestFramework, $UNITTOBETESTED$;
+  TestFramework,
+  $UNITTOBETESTED$;
 
 Type
 $TESTCLASSES$

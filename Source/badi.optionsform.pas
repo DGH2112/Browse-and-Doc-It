@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    01 Apr 2017
+  @Date    02 Apr 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -37,8 +37,9 @@ Uses
   BADI.CodeBrowsingFrame,
   BADI.ExcludedDocFilesFrame,
   BADI.MethodDescriptionsFrame,
+  BADI.MenuShortcutsFrame,
+  BADI.ModuleExtensionsFrame,
   ImageList;
-
 
 Type
   (** An enumerate to define the visisble tabs in the dialogue. **)
@@ -60,6 +61,8 @@ Type
     tabExcludeDocFiles: TTabSheet;
     tabMethodDescriptions: TTabSheet;
     btnCheckForUpdates: TBitBtn;
+    tabMenuShortcuts: TTabSheet;
+    tabModuleExtensions: TTabSheet;
     Procedure btnCheckForUpdatesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     { Private declarations }
@@ -70,6 +73,8 @@ Type
     FBADICodeBrowsingFrame : TfmBADICodeBrowsingFrame;
     FBADIExcludedDocFilesFrame : TfmBADIExcludedDocFilesFrame;
     FBADIMethodDescriptionsFrame : TfmBADIMethodDescriptionsFrame;
+    FBADIMenuShortcutsFrame : TfmBADIMenuShortcuts;
+    FBADIModuleExtensionsFrame : TfmBADIModuleExtensionsFrame;
   Public
     { Public declarations }
     Class Function Execute(VisibleTabs: TVisibleTabs): Boolean;
@@ -114,6 +119,8 @@ Begin
     F.tabCodeBrowsing.TabVisible := vtCodeBrowsing In VisibleTabs;
     F.tabExcludeDocFiles.TabVisible := vtExcludeDocFiles In VisibleTabs;
     F.tabMethodDescriptions.TabVisible := vtMethodDescriptions In VisibleTabs;
+    F.tabMenuShortcuts.TabVisible := vtMethodDescriptions In VisibleTabs;
+    F.tabModuleExtensions.TabVisible := vtMethodDescriptions In VisibleTabs;
     If F.ShowModal = mrOK Then
       Begin
         Result := True;
@@ -123,6 +130,8 @@ Begin
         F.FBADICodeBrowsingFrame.SaveSettings;
         F.FBADIExcludedDocFilesFrame.SaveSettings;
         F.FBADIMethodDescriptionsFrame.SaveSettings;
+        F.FBADIMenuShortcutsFrame.SaveSettings;
+        F.FBADIModuleExtensionsFrame.SaveSettings;
         TBADIOptions.BADIOptions.SaveSettings;
       End;
   Finally
@@ -166,6 +175,14 @@ begin
   FBADIMethodDescriptionsFrame.Parent := tabMethodDescriptions;
   FBADIMethodDescriptionsFrame.Align := alClient;
   FBADIMethodDescriptionsFrame.LoadSettings;
+  FBADIMenuShortcutsFrame := TfmBADIMenuShortcuts.Create(Self);
+  FBADIMenuShortcutsFrame.Parent := tabMenuShortcuts;
+  FBADIMenuShortcutsFrame.Align := alClient;
+  FBADIMenuShortcutsFrame.LoadSettings;
+  FBADIModuleExtensionsFrame := TfmBADIModuleExtensionsFrame.Create(Self);
+  FBADIModuleExtensionsFrame.Parent := tabModuleExtensions;
+  FBADIModuleExtensionsFrame.Align := alClient;
+  FBADIModuleExtensionsFrame.LoadSettings;
 end;
 
 (**
@@ -179,6 +196,7 @@ end;
 
 **)
 Procedure TfrmOptions.btnCheckForUpdatesClick(Sender: TObject);
+
 Begin
   TfrmCheckForUpdatesOptions.Execute(TBADIOptions.BADIOptions.INIFileName);
 End;

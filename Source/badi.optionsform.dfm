@@ -26,7 +26,7 @@ object frmOptions: TfrmOptions
     Top = 10
     Width = 840
     Height = 513
-    ActivePage = tabGeneralOptions
+    ActivePage = tabModuleExtensions
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object tabGeneralOptions: TTabSheet
@@ -71,6 +71,14 @@ object frmOptions: TfrmOptions
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
+    end
+    object tabMenuShortcuts: TTabSheet
+      Caption = 'Menu Shortcuts'
+      ImageIndex = 6
+    end
+    object tabModuleExtensions: TTabSheet
+      Caption = 'Module Extensions'
+      ImageIndex = 7
     end
   end
   object bbtnCancel: TBitBtn

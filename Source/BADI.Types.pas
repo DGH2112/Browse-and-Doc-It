@@ -1,10 +1,10 @@
 (**
-
+¬
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Mar 2017
+  @Date    02 Apr 2017
 
 **)
 Unit BADI.Types;
@@ -13,6 +13,7 @@ Interface
 
 Uses
   SysUtils,
+  Classes,
   Graphics;
 
 Type
@@ -394,6 +395,11 @@ Type
     FShortCut  : String;
     FMaskColor : TColor;
   End;
+
+  (** An event handelr signature to provide a call back function to request whether the given
+     shortcut has already been implemented. **)
+  TBADIShortcutUsedEvent = Function(Const iShortcut : TShortcut;
+    Var strActionName : String) : Boolean Of Object;
 
 Implementation
 

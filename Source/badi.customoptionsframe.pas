@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Feb 2017
+  @Date    02 Apr 2017
 
 **)
 Unit BADI.CustomOptionsFrame;
@@ -13,6 +13,7 @@ Unit BADI.CustomOptionsFrame;
 Interface
 
 Uses
+  BADI.Types,
   Forms;
 
 Type
@@ -22,6 +23,13 @@ Type
   ['{4F8C53A5-3F4E-4B24-83F6-722F26AA8B8B}']
     Procedure LoadSettings;
     Procedure SaveSettings;
+  End;
+
+  (** This is an interface to be implemented by the Shortcut Frame to allow the registration of
+      a call back event for checking whether an action is in use. **)
+  IBADIInstallShortcutUsedCallBack = Interface
+  ['{ECBC6389-DA38-4AE1-A4E9-83E6826E3776}']
+    Procedure InstallShortcutUsedCallBack(ShortCutUsed : TBADIShortcutUsedEvent);
   End;
 
   (** This is a class reference for TFrames. **)

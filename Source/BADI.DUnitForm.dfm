@@ -11,7 +11,7 @@ object frmDUnit: TfrmDUnit
   Constraints.MinWidth = 400
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
@@ -22,12 +22,12 @@ object frmDUnit: TfrmDUnit
     384
     565)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object lblBaseClass: TLabel
     Left = 8
     Top = 406
-    Width = 51
-    Height = 13
+    Width = 61
+    Height = 16
     Anchors = [akLeft, akBottom]
     Caption = '&Base Class'
     FocusControl = cbxBaseClass
@@ -35,8 +35,8 @@ object frmDUnit: TfrmDUnit
   object lblTestSuiteName: TLabel
     Left = 8
     Top = 433
-    Width = 78
-    Height = 13
+    Width = 95
+    Height = 16
     Anchors = [akLeft, akBottom]
     Caption = 'Test Suite &Name'
     FocusControl = edtTestSuiteName
@@ -65,7 +65,7 @@ object frmDUnit: TfrmDUnit
       Left = 125
       Top = 49
       Width = 229
-      Height = 21
+      Height = 24
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 2
@@ -86,7 +86,7 @@ object frmDUnit: TfrmDUnit
       Left = 125
       Top = 22
       Width = 229
-      Height = 21
+      Height = 24
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
     end
@@ -136,7 +136,7 @@ object frmDUnit: TfrmDUnit
       Left = 125
       Top = 49
       Width = 229
-      Height = 21
+      Height = 24
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 2
@@ -157,7 +157,7 @@ object frmDUnit: TfrmDUnit
       Left = 125
       Top = 22
       Width = 229
-      Height = 21
+      Height = 24
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
     end
@@ -189,7 +189,7 @@ object frmDUnit: TfrmDUnit
     Left = 92
     Top = 403
     Width = 284
-    Height = 21
+    Height = 24
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 3
   end
@@ -197,7 +197,7 @@ object frmDUnit: TfrmDUnit
     Left = 92
     Top = 430
     Width = 284
-    Height = 21
+    Height = 24
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 4
   end
@@ -257,23 +257,27 @@ object frmDUnit: TfrmDUnit
     object lblClassName: TLabel
       Left = 0
       Top = 0
-      Width = 82
-      Height = 13
+      Width = 184
+      Height = 25
       Align = alClient
       Caption = '&Class Name Mask'
       FocusControl = edtClassName
+      ExplicitWidth = 100
+      ExplicitHeight = 16
     end
     object lblMethodName: TLabel
       AlignWithMargins = True
       Left = 187
       Top = 0
-      Width = 93
-      Height = 13
+      Width = 181
+      Height = 25
       Margins.Top = 0
       Margins.Right = 0
       Align = alClient
       Caption = 'Method Name &Mask'
       FocusControl = edtMethodName
+      ExplicitWidth = 112
+      ExplicitHeight = 16
     end
     object edtClassName: TEdit
       Left = 0
@@ -283,6 +287,7 @@ object frmDUnit: TfrmDUnit
       Align = alClient
       TabOrder = 0
       Text = 'edtClassName'
+      ExplicitHeight = 24
     end
     object edtMethodName: TEdit
       AlignWithMargins = True
@@ -296,6 +301,7 @@ object frmDUnit: TfrmDUnit
       Align = alClient
       TabOrder = 1
       Text = 'edtMethodName'
+      ExplicitHeight = 24
     end
   end
   object ilScopeImages: TImageList

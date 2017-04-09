@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Apr 2017
+  @Date    09 Apr 2017
 
 **)
 unit BADI.DUnitForm;
@@ -31,7 +31,8 @@ uses
   BADI.Base.Module,
   ImgList,
   System.ImageList,
-  Vcl.ExtCtrls, BADI.ElementContainer;
+  ExtCtrls,
+  BADI.ElementContainer;
 
 type
   (** A class to represent the form interface. **)
@@ -111,8 +112,15 @@ Uses
   BADI.ToolsAPIUtils,
   BADI.Pascal.Module,
   IniFiles,
-  dghlibrary, BADI.Generic.FunctionDecl, BADI.Types, BADI.ResourceStrings, BADI.Constants,
-  BADI.Options, BADI.Pascal.RecordDecl, BADI.Pascal.MethodDecl, BADI.Pascal.PropertyDecl;
+  dghlibrary,
+  BADI.Generic.FunctionDecl,
+  BADI.Types,
+  BADI.ResourceStrings,
+  BADI.Constants,
+  BADI.Options,
+  BADI.Pascal.RecordDecl,
+  BADI.Pascal.MethodDecl,
+  BADI.Pascal.PropertyDecl;
 
 Type
   (** This is a record to describe the data stored in the virtual tree view. **)

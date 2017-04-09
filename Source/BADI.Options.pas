@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    09 Apr 2017
 
 **)
 Unit BADI.Options;
@@ -381,7 +381,7 @@ Begin
   Result := StringReplace(FProfilingCode.Values[strModuleName], '|', #13#10, [rfReplaceAll]);
   If Result = '' Then
     For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
-      If CompareText(TBADIDispatcher.BADIDispatcher.Modules[iModule].ClassName, strModuleName) = 0 Then
+      If CompareText(TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName, strModuleName) = 0 Then
         Begin
           Result := TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.DefaultProfilingTemplate;
           Break;

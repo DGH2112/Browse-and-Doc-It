@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @version 1.0
-  @date    01 Apr 2017
+  @date    09 Apr 2017
 
 **)
 Unit BADI.MenuShortcutsFrame;
@@ -21,6 +21,7 @@ Uses
   Controls,
   Forms,
   Dialogs,
+  BADI.Types,
   BADI.CustomOptionsFrame,
   ComCtrls,
   StdCtrls,
@@ -28,7 +29,7 @@ Uses
 
 Type
   (** A class to represent a frame in which menu action shortcuts can be edited. **)
-  TfmBADIMenuShortcuts = Class(TFrame, IBADIOptionsFrame)
+  TfmBADIMenuShortcuts = Class(TFrame, IBADIOptionsFrame, IBADIInstallShortcutUsedCallBack)
     lvMenuShortcuts: TListView;
     hkMenuShortcut: THotKey;
     btnAssign: TBitBtn;
@@ -36,8 +37,12 @@ Type
     procedure lvMenuShortcutsSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
     procedure btnAssignClick(Sender: TObject);
     procedure hkMenuShortcutChange(Sender: TObject);
-  Private
+  Strict Private
     { Private declarations }
+    FShortcutUsedEvent : TBADIShortcutUsedEvent;
+  Strict Protected
+    { Protected declarations }
+    Procedure InstallShortcutUsedCallBack(ShortCutUsed: TBADIShortcutUsedEvent);
   Public
     { Public declarations }
     Procedure LoadSettings;
@@ -50,10 +55,8 @@ Implementation
 
 Uses
   Menus,
-  BADI.Types,
   BADI.Constants,
-  BADI.Options,
-  ToolsAPI;
+  BADI.Options;
 
 { TfmMenuShortcuts }
 
@@ -87,25 +90,39 @@ End;
 Procedure TfmBADIMenuShortcuts.hkMenuShortcutChange(Sender: TObject);
 
 Var
-  NS : INTAServices;
-  iAction: Integer;
+  strActionName : String;
 
 Begin
   If hkMenuShortcut.HotKey > 0 Then
     Begin
-      If Supports(BorlandIDEServices, INTAServices, NS) Then
-        For iAction := 0 To NS.ActionList.ActionCount - 1 Do
-          If NS.ActionList.Actions[iAction].ShortCut = hkMenuShortcut.HotKey Then
-            Begin
-              lblInformation.Caption :=
-                Format('This shortcut is un use by: %s', [NS.ActionList.Actions[iAction].Name]);
-              lblInformation.Font.Color := clRed;
-              Exit;
-            End;
+      If Assigned(FShortcutUsedEvent) And
+         FShortcutUsedEvent(hkMenuShortcut.HotKey, strActionName) Then
+        Begin
+          lblInformation.Caption := Format('This shortcut is in use by: %s', [strActionName]);
+          lblInformation.Font.Color := clRed;
+          Exit;
+        End;
       lblInformation.Caption := 'Shortcut not in use.';
       lblInformation.Font.Color := clGreen;
     End Else
       lblInformation.Caption := '';
+End;
+
+(**
+
+  This method assigns an event handler call back in the frame to check that the shortcut is not
+  already in use.
+
+  @precon  ShortcutUsed must be a valid method or Nil.
+  @postcon The callbeck event handler is set.
+
+  @param   ShortCutUsed as a TBADIShortcutUsedEvent
+
+**)
+Procedure TfmBADIMenuShortcuts.InstallShortcutUsedCallBack(ShortCutUsed: TBADIShortcutUsedEvent);
+
+Begin
+  FShortcutUsedEvent := ShortCutUsed;
 End;
 
 (**

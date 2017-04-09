@@ -6,7 +6,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    25 Mar 2017
+  @Date    09 Apr 2017
 
 **)
 Unit BADI.IDEOptionsHandler;
@@ -17,6 +17,7 @@ Uses
   Classes,
   ToolsAPI,
   Forms,
+  BADI.Types,
   BADI.CustomOptionsFrame;
 
 {$INCLUDE CompilerDefinitions.inc}
@@ -26,23 +27,35 @@ Type
   (** A class which implements the INTAAddingOptions interface to added options frames
       to the IDEs options dialogue. **)
   TBADIIDEOptionsHandler = Class(TInterfacedObject, INTAAddInOptions)
-  {$IFDEF 2005} Strict {$ENDIF} Private
+  Strict Private
     FBADICustomFrameClass : TFrameClass;
     FBADICustomFrame      : TCustomFrame;
     FTitle                : String;
-    FUpdateEvent          : TNotifyEvent;
-  {$IFDEF 2005} Strict {$ENDIF} Protected
-  Public
-    Constructor Create(OptionsFrame: TFrameClass; Const strTitle : String;
-      UpdateEvent : TNotifyEvent);
-    Procedure DialogClosed(Accepted: Boolean);
-    Procedure FrameCreated(AFrame: TCustomFrame);
+  Strict Protected
+    Procedure DialogClosed(Accepted: Boolean); Virtual;
+    Procedure FrameCreated(AFrame: TCustomFrame); Virtual;
     Function GetArea: String;
     Function GetCaption: String;
     Function GetFrameClass: TCustomFrameClass;
     Function GetHelpContext: Integer;
     Function IncludeInIDEInsight: Boolean;
     Function ValidateContents: Boolean;
+  Public
+    Constructor Create(OptionsFrame: TFrameClass; Const strTitle : String); Overload;
+  End;
+
+  (** This is a specialisation of the above class specifically for the shortcut frame so that
+      a call back mechanism for checking whether shortcuts are in use can be setup. **)
+  TBADIIDEShortcutOptionsHandler = Class(TBADIIDEOptionsHandler)
+  Strict Private
+    FUpdateEvent  : TNotifyEvent;
+    FShortcutUsed : TBADIShortcutUsedEvent;
+  Strict Protected
+    Procedure DialogClosed(Accepted: Boolean); Override;
+    Procedure FrameCreated(AFrame: TCustomFrame); Override;
+  Public
+    Constructor Create(OptionsFrame: TFrameClass; Const strTitle : String;
+      UpdateEvent : TNotifyEvent; ShortcutUsed : TBADIShortcutUsedEvent); Overload;
   End;
 
 Implementation
@@ -61,16 +74,13 @@ Uses
 
   @param   OptionsFrame as a TFrameClass
   @param   strTitle     as a String as a constant
-  @param   UpdateEvent  as a TNotifyEvent
 
 **)
-Constructor TBADIIDEOptionsHandler.Create(OptionsFrame: TFrameClass; Const strTitle : String;
-  UpdateEvent : TNotifyEvent);
+Constructor TBADIIDEOptionsHandler.Create(OptionsFrame: TFrameClass; Const strTitle : String);
 
 Begin
   FBADICustomFrameClass := OptionsFrame;
   FTitle := strTitle;
-  FUpdateEvent := UpdateEvent;
 End;
 
 (**
@@ -94,8 +104,6 @@ Begin
     Begin
       If Supports(FBADICustomFrame, IBADIOptionsFrame, BADIOptionsFrame) Then
         BADIOptionsFrame.SaveSettings;
-      If Assigned(FUpdateEvent) Then
-        FUpdateEvent(Self);
     End;
 End;
 
@@ -221,6 +229,70 @@ Function TBADIIDEOptionsHandler.ValidateContents: Boolean;
 
 Begin
   Result := True;
+End;
+
+{ TBADIIDEShortcutOptionsHandler }
+
+(**
+
+  A constructor for the TBADIIDEShortcutOptionsHandler class.
+
+  @precon  None.
+  @postcon Initalises the class and saves references to a Notify event and a call back event.
+
+  @param   OptionsFrame as a TFrameClass
+  @param   strTitle     as a String as a constant
+  @param   UpdateEvent  as a TNotifyEvent
+  @param   ShortcutUsed as a TBADIShortcutUsedEvent
+
+**)
+Constructor TBADIIDEShortcutOptionsHandler.Create(OptionsFrame: TFrameClass; Const strTitle: String;
+  UpdateEvent: TNotifyEvent; ShortcutUsed : TBADIShortcutUsedEvent);
+
+Begin
+  Inherited Create(OptionsFrame, strTitle);
+  FUpdateEvent := UpdateEvent;
+  FShortcutUsed := ShortcutUsed;
+End;
+
+(**
+
+  This method is called when the Options frame is about to be closed.
+
+  @precon  None.
+  @postcon If an event handlder is assigned to update the actions it is called.
+
+  @param   Accepted as a Boolean
+
+**)
+Procedure TBADIIDEShortcutOptionsHandler.DialogClosed(Accepted: Boolean);
+
+Begin
+  Inherited DialogClosed(Accepted);
+  If Accepted Then
+    If Assigned(FUpdateEvent) Then
+      FUpdateEvent(Self);
+End;
+
+(**
+
+  This method is called when the Options frame has just been created.
+
+  @precon  None.
+  @postcon If the interface is supported the call back is installed.
+
+  @param   AFrame as a TCustomFrame
+
+**)
+Procedure TBADIIDEShortcutOptionsHandler.FrameCreated(AFrame: TCustomFrame);
+
+Var
+  I : IBADIInstallShortcutUsedCallBack;
+
+Begin
+  Inherited FrameCreated(AFrame);
+  If Supports(AFrame, IBADIInstallShortcutUsedCallBack, I) Then
+    I.InstallShortcutUsedCallBack(FShortcutUsed);
 End;
 
 End.

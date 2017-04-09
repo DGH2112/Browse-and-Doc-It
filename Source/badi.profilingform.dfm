@@ -11,7 +11,7 @@ object frmProfiling: TfrmProfiling
   Constraints.MinWidth = 400
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
@@ -22,7 +22,7 @@ object frmProfiling: TfrmProfiling
     509
     677)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object btnOK: TBitBtn
     Left = 345
     Top = 647

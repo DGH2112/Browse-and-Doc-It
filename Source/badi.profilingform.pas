@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Apr 2017
+  @Date    09 Apr 2017
 
 **)
 unit BADI.ProfilingForm;
@@ -31,7 +31,8 @@ uses
   ImgList,
   Contnrs,
   ExtCtrls,
-  System.ImageList, BADI.ElementContainer;
+  ImageList,
+  BADI.ElementContainer;
 
 type
   (** An enumerate to define if the profile job is an insertion or a removal. **)
@@ -161,7 +162,11 @@ Uses
   BADI.ToolsAPIUtils,
   BADI.Pascal.Module,
   IniFiles,
-  dghlibrary, BADI.Generic.FunctionDecl, BADI.ResourceStrings, BADI.Constants, BADI.Options,
+  dghlibrary,
+  BADI.Generic.FunctionDecl,
+  BADI.ResourceStrings,
+  BADI.Constants,
+  BADI.Options,
   BADI.Types;
 
 Type

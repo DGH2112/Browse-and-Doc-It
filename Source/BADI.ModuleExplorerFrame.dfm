@@ -3,12 +3,16 @@ object frameModuleExplorer: TframeModuleExplorer
   Top = 0
   Width = 354
   Height = 413
+  DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
+  ParentDoubleBuffered = False
   ParentFont = False
+  ParentShowHint = False
+  ShowHint = False
   TabOrder = 0
   TabStop = True
   OnEnter = FrameEnter
@@ -19,11 +23,19 @@ object frameModuleExplorer: TframeModuleExplorer
     Height = 19
     Panels = <
       item
-        Width = 150
+        Width = 65
+      end
+      item
+        Width = 65
+      end
+      item
+        Width = 65
       end
       item
         Width = 50
       end>
+    ParentShowHint = False
+    ShowHint = True
   end
   object tbrExplorerScope: TToolBar
     Left = 0
@@ -142,6 +154,17 @@ object frameModuleExplorer: TframeModuleExplorer
       Action = actTypes
     end
   end
+  object edtExplorerFilter: TEdit
+    Left = 0
+    Top = 21
+    Width = 354
+    Height = 24
+    Align = alTop
+    TabOrder = 1
+    OnChange = edtExplorerFilterChange
+    OnKeyPress = edtExplorerFilterKeyPress
+    OnMouseActivate = edtExplorerFilterMouseActivate
+  end
   object ilScopeImages: TImageList
     Left = 29
     Top = 35
@@ -152,7 +175,7 @@ object frameModuleExplorer: TframeModuleExplorer
     Left = 31
     Top = 84
     Bitmap = {
-      494C01011000130060000C000C00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010110001300DC000C000C00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000300000003C0000000100200000000000002D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

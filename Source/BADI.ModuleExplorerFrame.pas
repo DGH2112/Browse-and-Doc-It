@@ -3,23 +3,43 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    30 Oct 2016
+  @Date    01 Apr 2017
   @Author  David Hoyle
   @Version 1.0
 
 **)
-unit ModuleExplorerFrame;
+Unit BADI.ModuleExplorerFrame;
 
-interface
+Interface
 
-uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ImgList, ComCtrls, ExtCtrls, Contnrs, BaseLanguageModule,
-  ActnList, ToolWin, VirtualTrees, System.Actions, ImageList, Vcl.StdCtrls;
+Uses
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  ImgList,
+  ComCtrls,
+  ExtCtrls,
+  Contnrs,
+  BADI.Base.Module,
+  ActnList,
+  ToolWin,
+  VirtualTrees,
+  System.Actions,
+  ImageList,
+  Vcl.StdCtrls,
+  RegularExpressions,
+  BADI.Comment,
+  BADI.ElementContainer;
 
 {$INCLUDE CompilerDefinitions.Inc}
 
-type
+Type
   (** This class represents information about each nodes. Used in a collection
       instead of hanging the data off the tree nodes.  **)
   TTreeNodeInfo = Class
@@ -36,7 +56,7 @@ type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     function GetTokens: TStringList;
   Public
-    Constructor Create(strText, strName : String; iLevel : Integer; iImageIndex : Integer;
+    Constructor Create(const strText, strName : String; iLevel : Integer; iImageIndex : Integer;
       iLine : Integer = 0; iColumn : Integer = 0; boolTitle : Boolean = False;
       AComment : TComment = Nil); Overload;
     Destructor Destroy; Override;
@@ -135,7 +155,7 @@ type
       SyntaxHighlight : Boolean; Comment : TComment) : TRect; Reintroduce; Overload;
     Procedure ActivateHint(Rect : TRect; Node : PVirtualNode;
       SyntaxHighlight : Boolean; Comment : TComment); Reintroduce; Overload;
-    Function CanDrawSpecialTag(Comment : TComment; strSpecialTag : String) : Boolean;
+    Function CanDrawSpecialTag(Comment : TComment; const strSpecialTag : String) : Boolean;
   End;
 
   (** This is a descendant of the TVirtualStringTree in order to override the
@@ -150,6 +170,14 @@ type
       current module. **)
   TSelectionChange = Procedure(iIdentLine, iIdentCol, iCommentLine,
     iCommentCol : Integer) Of Object;
+
+  (** An enumerate to define the panels on the status bar. **)
+  TStatusPanelIndex = (
+    spiBytes,
+    spiTokens,
+    spiLines,
+    spiFourth
+  );
 
   (** This is a frame class to contain all the functionality of the module
       explorer so that it can be placed inside any container required and
@@ -196,12 +224,13 @@ type
     actConstants: TAction;
     actVariables: TAction;
     actTypes: TAction;
+    edtExplorerFilter: TEdit;
     procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure tvExplorerClick(Sender: TObject);
     procedure actLocalUpdate(Sender: TObject);
     procedure actLocalExecute(Sender: TObject);
-    procedure tvExplorerKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure tvExplorerKeyPress(Sender: TObject; var Key: Char);
     {$IFNDEF D2009}
     procedure tvExplorerGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
@@ -219,6 +248,10 @@ type
       TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
     procedure FilterChange;
     procedure FrameEnter(Sender: TObject);
+    procedure edtExplorerFilterChange(Sender: TObject);
+    procedure edtExplorerFilterMouseActivate(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y, HitTest: Integer; var MouseActivate: TMouseActivate);
+    procedure edtExplorerFilterKeyPress(Sender: TObject; var Key: Char);
   {$IFDEF D2005} Strict {$ENDIF} private
     { Private declarations }
     FModule : PVirtualNode;
@@ -233,16 +266,17 @@ type
     FRendering: Boolean;
     FRefresh : TNotifyEvent;
     FExplorer : TBADIVirtualStringTree;
-    FExplorerFilter : String;
+    FFilterRegEx : TRegEx;
+    FMouseEnter : Boolean;
     { Private declarations }
     procedure GetBodyCommentTags(M : TBaseLanguageModule);
-    Function AddNode(P : PVirtualNode; strText, strName : String; iLevel : Integer;
+    Function AddNode(P : PVirtualNode; const strText, strName : String; iLevel : Integer;
       iImageIndex : Integer; iLine : Integer = 0; iColumn : Integer = 0;
       boolTitle : Boolean = False; AComment : TComment = Nil) : PVirtualNode;
     procedure CreateSpecialTagNodes(M : TBaseLanguageModule);
     procedure ExpandNodes;
     procedure OutputModuleInfo(Container : TElementContainer);
-    function FindTreeItem(strText: String): PVirtualNode;
+    function FindTreeItem(const strText: String): PVirtualNode;
     procedure GetExpandedNodes(StartNode : PVirtualNode);
     function GetNodePath(Node: PVirtualNode): String;
     procedure SetExpandedNodes(StartNode : PVirtualNode);
@@ -250,17 +284,12 @@ type
       Container : TElementContainer; iLevel : Integer);
     Procedure UpdateStatusBar(M : TBaseLanguageModule);
     Procedure ManageExpandedNodes;
-    procedure FilterProc(Sender: TBaseVirtualTree; Node: PVirtualNode; Data: Pointer;
-      var Abort: Boolean);
-    Procedure SetExplorerFilter(strValue : String);
-    (**
-      This property gets and sets the filter for the module explorer treeview.
-      @precon  None.
-      @postcon Gets or sets the filter for the module explorer treeview.
-      @return  a String
-    **)
-    Property ExplorerFilter : String Read FExplorerFilter Write SetExplorerFilter;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+    Procedure FilterProc(Sender: TBaseVirtualTree; Node: PVirtualNode; Data: Pointer;
+      Var Abort: Boolean);
+    Procedure SetStatusPanel(ePanel: TStatusPanelIndex; const strStatusBarText: string;
+      iValue: Integer);
+    Procedure LoadBADIImages;
+    {$IFDEF D2005} Strict {$ENDIF} Protected
     Procedure CMMouseLeave(var Msg : TMessage); Message CM_MOUSELEAVE;
   public
     { Public declarations }
@@ -301,23 +330,34 @@ type
 implementation
 
 Uses
-  //CodeSiteLogging,
   IniFiles,
   Types,
   Math,
   DGHLibrary,
-  GenericTokenizer,
-  UITypes;
+  BADI.Generic.Tokenizer,
+  UITypes,
+  RegularExpressionsCore,
+  BADI.Types,
+  BADI.Options,
+  BADI.Constants,
+  BADI.ResourceStrings,
+  BADI.Functions;
 
 Type
   (** This record described the data sorted in the virtual tree view. **)
   TTreeData = Record
     FNode : TTreeNodeInfo;
   End;
+  (** A type to define a pointer to the above tree record. **)
+  PTreeData = ^TTreeData;
 
 Resourcestring
-  (** A format pattern for the statusbar text. **)
-  strStatusbarText = '%1.0n Bytes, %1.0n Tokens and %1.0n Lines.';
+  (** A format pattern for the bytes statusbar text. **)
+  strStatusbarBytesText = '%1.0n Bytes';
+  (** A format pattern for the tokens statusbar text. **)
+  strStatusbarTokensText = '%1.0n Tokens';
+  (** A format pattern for the lines status bar panel. **)
+  strStatusbarLinesText = '%1.0n Lines.';
 
 {$R *.dfm}
 
@@ -347,7 +387,7 @@ Procedure GetFontInfo(sl : TStringList; i : Integer; boolTitle : Boolean;
   Canvas : TCanvas);
 
 Begin
-  With BrowseAndDocItOptions Do
+  With TBADIOptions.BADIOptions Do
     Begin
       If Not boolTitle Then
         Begin
@@ -373,8 +413,8 @@ End;
            and This comment to be added to the node info object.
   @postcon Initialises the class.
 
-  @param   strText     as a String
-  @param   strName     as a String
+  @param   strText     as a String as a Constant
+  @param   strName     as a String as a Constant
   @param   iLevel      as an Integer
   @param   iImageIndex as an Integer
   @param   iLine       as an Integer
@@ -383,7 +423,7 @@ End;
   @param   AComment    as a TComment
 
 **)
-Constructor TTreeNodeInfo.Create(strText, strName : String; iLevel : Integer;
+Constructor TTreeNodeInfo.Create(const strText, strName : String; iLevel : Integer;
   iImageIndex : Integer; iLine : Integer = 0; iColumn : Integer = 0;
   boolTitle : Boolean = False; AComment : TComment = Nil);
 
@@ -431,7 +471,7 @@ function TTreeNodeInfo.GetTokens: TStringList;
 begin
   If FTokens = Nil Then
     FTokens := Tokenize(FText, strReservedWords, strDirectives,
-      BrowseAndDocItOptions.TokenLimit);
+      TBADIOptions.BADIOptions.TokenLimit);
   Result := FTokens;
 end;
 
@@ -442,111 +482,171 @@ end;
   @precon  None.
   @postcon Draws the custom hint window.
 
- **)
+**)
 Procedure TCustomHintWindow.Paint;
 
+  (**
+
+    This method rennders the text associated with the tree node in the hint window.
+
+    @precon  NodeData must be a valid pointer to tree node data.
+    @postcon The treenode text is rendered.
+
+    @param   NodeData as a PTreeData
+    @param   iPos     as an Integer as a reference
+    @param   iLine    as an Integer as a reference
+
+  **)
+  Procedure RenderTreeNode(NodeData : PTreeData; var iPos, iLine : Integer);
+
+  Var
+    sl : TStringList;
+    i: Integer;
+    iLines : Integer;
+    S: TRect;
+    R : TRect;
+
+  Begin
+    iLines := 1;
+    R := BoundsRect;
+    If FCustomDraw Then
+      Begin
+        sl := NodeData.FNode.Tokens;
+        For i := 0 To sl.Count - 1 Do
+          Begin
+            GetFontInfo(sl, i, FTitle, Canvas);
+            If Canvas.Brush.Color = TBADIOptions.BADIOptions.BGColour Then
+              Canvas.Brush.Color :=
+                TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+            If iPos + Canvas.TextWidth(sl[i]) > Width Then
+              Begin
+                iPos := 2 + 10; // Indent multiple lines
+                Inc(iLines);
+              End;
+            iLine := (iLines - 1) * Canvas.TextHeight(sl[i]) - 1;
+            S := Rect(iPos, iLine, R.Right, R.Bottom);
+            DrawText(Canvas.Handle, PChar(sl[i]), Length(sl[i]), S, DT_LEFT Or DT_TOP);
+            Inc(iPos, Canvas.TextWidth(sl[i]));
+          End;
+        End Else
+        Begin
+          Dec(iLine);
+          S := Rect(iPos, iLine, R.Right, R.Bottom);
+          DrawText(Canvas.Handle, PChar(NodeData.FNode.Text), Length(NodeData.FNode.Text), S,
+            DT_LEFT Or DT_TOP);
+        End;
+  End;
+
+  (**
+
+    This method renders the comment associated with the tree node.
+
+    @precon  None.
+    @postcon The comment is rendered belwo the tree node text.
+
+    @param   iHeight as an Integer as a constant
+    @param   iLine   as an Integer as a constant
+    @param   iPos    as an Integer as a reference
+
+  **)
+  Procedure RenderComment(const iHeight, iLine : Integer; var iPos : Integer);
+
+  Var
+    strText : String;
+    R: TRect;
+
+  Begin
+    Canvas.FillRect(Rect(0, iHeight + 2 + iLine, Width, Height));
+    Canvas.Pen.Color := clMaroon;
+    Canvas.MoveTo(0, iHeight + 4 + iLine);
+    Canvas.Lineto(Width, iHeight + 4 + iLine);
+    Canvas.Refresh;
+    Canvas.Font.Style := [];
+    Canvas.Font.Color := clNavy;
+    strText := FComment.AsString(MaxInt, False);
+    R := Rect(2, iHeight + 6 + iLine, Width - 2, Height);
+    iPos := DrawText(Canvas.Handle, PChar(strText), -1, R,
+      DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
+      DrawTextBiDiModeFlagsReadingOnly);
+  End;
+
+  (**
+
+    This method renders the list of special tags at the bottom of the hint window.
+
+    @precon  None.
+    @postcon The special tags associated with the tree node are drawn at the bottom of the hint
+             window.
+
+    @param   iHeight as an Integer
+    @param   iPos    as an Integer as a reference
+    @param   iLine   as an Integer as a reference
+
+  **)
+  Procedure RenderSpecialTags(iHeight : Integer; var iPos, iLine : Integer);
+
+  Var
+    iSpecialTag: Integer;
+    R : TRect;
+    iTag: Integer;
+    strText : String;
+
+  Begin
+    R := Rect(2, iHeight + 6 + iLine + iPos, Width - 4, Height);
+    For iSpecialTag := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
+      Begin
+        If CanDrawSpecialTag(FComment, TBADIOptions.BADIOptions.SpecialTags.Names[iSpecialTag]) Then
+          Begin
+            Canvas.Refresh;
+            Canvas.Font.Style := [fsBold, fsUnderline];
+            Canvas.Font.Color := clPurple;
+            Inc(R.Top, 5);
+            R := Rect(2, R.Top, Width - 2, Height);
+            strText := TBADIOptions.BADIOptions.SpecialTags.Values[
+              TBADIOptions.BADIOptions.SpecialTags.Names[iSpecialTag]];
+            Inc(R.Top, DrawText(Canvas.Handle, PChar(strText), -1, R,
+              DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
+              DrawTextBiDiModeFlagsReadingOnly) + 1);
+            For iTag := 0 To FComment.TagCount - 1 Do
+              If CompareText(TBADIOptions.BADIOptions.SpecialTags.Names[iSpecialTag],
+                FComment.Tag[iTag].TagName) = 0 Then
+                Begin
+                  Canvas.Pen.Color := clBlack;
+                  Canvas.Brush.Color := clBlack;
+                  Canvas.Ellipse(3, R.Top + 5, 7, R.Top + 9);
+                  Canvas.Brush.Color :=
+                    TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+                  Canvas.Refresh;
+                  Canvas.Font.Style := [];
+                  Canvas.Font.Color := clMaroon;
+                  R := Rect(10, R.Top, Width - 2, Height);
+                  strText := FComment.Tag[iTag].AsString(MaxInt, False);
+                  Inc(R.Top, DrawText(Canvas.Handle, PChar(strText), -1, R,
+                    DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
+                    DrawTextBiDiModeFlagsReadingOnly));
+                End;
+          End;
+      End;
+  End;
+
 Var
-  sl : TStringList;
   iPos : Integer;
-  i, j : Integer;
-  R : TRect;
-  str : String;
-  iLines : Integer;
   iLine : Integer;
   iHeight: Integer;
-  NodeData : ^TTreeData;
+  NodeData : PTreeData;
 
 Begin
-  iLines := 1;
   iLine := 0;
-  With Canvas Do
+  iPos := 2;
+  Canvas.Font.Assign(FTreeView.Font);
+  NodeData := FTreeView.GetNodeData(FNode);
+  RenderTreeNode(NodeData, iPos, iLine);
+  Canvas.Brush.Color := TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+  If (FComment <> Nil) And ((FComment.TokenCount > 0) Or (FComment.TagCount > 0)) Then
     Begin
-      Font.Assign(FTreeView.Font);
-      NodeData := FTreeView.GetNodeData(FNode);
-      iPos := 2;
-      If FCustomDraw Then
-        Begin
-          sl := NodeData.FNode.Tokens;
-          For i := 0 To sl.Count - 1 Do
-            Begin
-//              If FCustomDraw Then
-//                Begin
-              GetFontInfo(sl, i, FTitle, Canvas);
-              If Brush.Color = BrowseAndDocItOptions.BGColour Then
-                Brush.Color :=
-                  BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
-//                End Else
-//                Begin
-//                  Refresh;
-//                  Font.Color := clInfoText;
-//                  Font.Style := [];
-//                End;
-              If iPos + TextWidth(sl[i]) > Width Then
-                Begin
-                  iPos := 2 + 10; // Indent multiple lines
-                  Inc(iLines);
-                End;
-              iLine := (iLines - 1) * TextHeight(sl[i]) - 1;
-              TextOut(iPos, iLine, sl[i]);
-              Inc(iPos, TextWidth(sl[i]) + 1);
-            End;
-          End Else
-          Begin
-            Dec(iLine);
-            TextOut(iPos, iLine, NodeData.FNode.Text);
-          End;
-      Brush.Color := BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
-      If (FComment <> Nil) And ((FComment.TokenCount > 0) Or
-        (FComment.TagCount > 0)) Then
-        Begin
-          iHeight := TextHeight('Wp');
-          FillRect(Rect(0, iHeight + 2 + iLine, Width, Height));
-          Pen.Color := clMaroon;
-          MoveTo(0, iHeight + 4 + iLine);
-          Lineto(Width, iHeight + 4 + iLine);
-          Refresh;
-          Font.Style := [];
-          Font.Color := clNavy;
-          str := FComment.AsString(MaxInt, False);
-          R := Rect(2, iHeight + 6 + iLine, Width - 2, Height);
-          iPos := DrawText(Canvas.Handle, PChar(str), -1, R,
-            DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-            DrawTextBiDiModeFlagsReadingOnly);
-          R := Rect(2, iHeight + 6 + iLine + iPos, Width - 4, Height);
-          For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
-            Begin
-              If CanDrawSpecialTag(FComment, BrowseAndDocItOptions.SpecialTags.Names[i]) Then
-                Begin
-                  Refresh;
-                  Font.Style := [fsBold, fsUnderline];
-                  Font.Color := clPurple;
-                  Inc(R.Top, 5);
-                  R := Rect(2, R.Top, Width - 2, Height);
-                  str := BrowseAndDocItOptions.SpecialTags.Values[BrowseAndDocItOptions.SpecialTags.Names[i]];
-                  Inc(R.Top, DrawText(Canvas.Handle, PChar(str), -1, R,
-                    DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-                    DrawTextBiDiModeFlagsReadingOnly) + 1);
-                  For j := 0 To FComment.TagCount - 1 Do
-                    If CompareText(BrowseAndDocItOptions.SpecialTags.Names[i],
-                      FComment.Tag[j].TagName) = 0 Then
-                      Begin
-                        Pen.Color := clBlack;
-                        Brush.Color := clBlack;
-                        Ellipse(3, R.Top + 5, 7, R.Top + 9);
-                        Brush.Color :=
-                          BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
-                        Refresh;
-                        Font.Style := [];
-                        Font.Color := clMaroon;
-                        R := Rect(10, R.Top, Width - 2, Height);
-                        str := FComment.Tag[j].AsString(MaxInt, False);
-                        Inc(R.Top, DrawText(Canvas.Handle, PChar(str), -1, R,
-                          DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-                          DrawTextBiDiModeFlagsReadingOnly));
-                      End;
-                End;
-            End;
-        End;
+      iHeight := Canvas.TextHeight('Wp');
+      RenderComment(iHeight, iLine, iPos);
+      RenderSpecialTags(iHeight, iPos, iLine);
     End;
 End;
 
@@ -575,43 +675,126 @@ End;
 Function TCustomHintWindow.CalcHintRect(MinWidth, MaxWidth : Integer;
   Node : PVirtualNode; SyntaxHighlight : Boolean; Comment : TComment) : TRect;
 
+  (**
+
+    This method calculates the width of the hint window to acommodate the tree nodes text and
+    comments.
+
+    @precon  None.
+    @postcon The rectangle for the hint window is updated.
+
+  **)
+  Procedure CalcTreeNodeWidth;
+
+  Var
+    NodeData : PTreeData;
+    iPos : Integer;
+    sl: TStringList;
+    iLastmax: Integer;
+    iToken: Integer;
+    iMaxPos : Integer;
+
+  Begin
+    iMaxPos := FTreeView.ScreenToClient(Point(Screen.WorkAreaRect.Right, 0)).X - Result.Left;
+    If SyntaxHighlight Then
+      Begin
+        // Need to amend the width of the rectangle for the custom drawing
+        iPos := 5;
+        NodeData := FTreeView.GetNodeData(Node);
+        sl := NodeData.FNode.Tokens;
+        iLastmax := 0;
+        For iToken := 0 To sl.Count - 1 Do
+          Begin
+            GetFontInfo(sl, iToken, NodeData.FNode.Title, Canvas);
+            Inc(iPos, Canvas.TextWidth(sl[iToken]) + 1);
+            If iPos > iMaxPos Then
+              Begin
+                Inc(Result.Bottom, Canvas.TextHeight(sl[iToken]) + 2); //: @bug Is this right for the hint width?
+                iPos := 5 + 10; // indent multiple lines
+                iLastMax := iMaxPos;
+              End Else
+                If iPos > iLastMax Then
+                  iLastMax := iPos;
+          End;
+        Result.Right := Result.Left + iLastMax;
+      End;
+  End;
+
+  (**
+
+    This method calculates the additional height required for all the special tags.
+
+    @precon  None.
+    @postcon The resultant hint window rectangle is increased in height for all the special tags.
+
+  **)
+  Procedure CalcSpecialTags();
+
+    (**
+
+      This method calculates the additional height required for a special tag.
+
+      @precon  None.
+      @postcon The resultant hint window rectangle is increased in height for a special tag.
+
+      @param   iSpecialTag as an Integer
+
+    **)
+    Procedure CalcSpecialTag(iSpecialTag : Integer);
+
+    Var
+      iTag: Integer;
+      R: TRect;
+      strText: String;
+
+    Begin
+      For iTag := 0 To Comment.TagCount - 1 Do
+        If CompareText(TBADIOptions.BADIOptions.SpecialTags.Names[iSpecialTag],
+          Comment.Tag[iTag].TagName) = 0 Then
+          Begin
+            Refresh;
+            Canvas.Font.Style := [];
+            R := Rect(Result.Left + 2, 0, Result.Right - 12, 0);
+            strText := Comment.Tag[iTag].AsString(MaxInt, False);
+            Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(strText), -1, R,
+              DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
+              DrawTextBiDiModeFlagsReadingOnly) + 2);
+          End;
+    End;
+
+  Var
+    iSpecialTag : Integer;
+    R: TRect;
+    strText: String;
+
+  Begin
+    For iSpecialTag := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
+      Begin
+        If CanDrawSpecialTag(Comment, TBADIOptions.BADIOptions.SpecialTags.Names[iSpecialTag]) Then
+          Begin
+            Refresh;
+            Canvas.Font.Style := [fsBold, fsUnderline];
+            R := Rect(Result.Left + 2, 0, Result.Right - 2, 0);
+            strText := TBADIOptions.BADIOptions.SpecialTags.Values[
+              TBADIOptions.BADIOptions.SpecialTags.Names[iSpecialTag]];
+            Inc(Result.Bottom, 5 + DrawText(Canvas.Handle, PChar(strText), -1, R,
+              DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
+              DrawTextBiDiModeFlagsReadingOnly) + 2);
+            CalcSpecialTag(iSpecialTag);
+          End;
+      End;
+  End;
+
 Var
-  sl : TStringList;
-  iPos, iMaxPos, iLastMax : Integer;
-  i, j : Integer;
-  str : String;
   R : TRect;
-  NodeData : ^TTreeData;
+  strText : String;
 
 Begin
   Canvas.Font.Assign(FTreeView.Font);
   Result := FTreeView.GetDisplayRect(Node, NoColumn, True);
   Inc(Result.Left, 2); // Adjustment for
   Inc(Result.Top, 1);
-  iMaxPos := FTreeView.ScreenToClient(Point(Screen.WorkAreaRect.Right, 0)).X -
-    Result.Left;
-  If SyntaxHighlight Then
-    Begin
-      // Need to amend the width of the rectangle for the custom drawing
-      iPos := 5;
-      NodeData := FTreeView.GetNodeData(Node);
-      sl := NodeData.FNode.Tokens;
-      iLastmax := 0;
-      For i := 0 To sl.Count - 1 Do
-        Begin
-          GetFontInfo(sl, i, NodeData.FNode.Title, Canvas);
-          Inc(iPos, Canvas.TextWidth(sl[i]) + 1);
-          If iPos > iMaxPos Then
-            Begin
-              Inc(Result.Bottom, Canvas.TextHeight(sl[i]) + 2);
-              iPos := 5 + 10; // indent multiple lines
-              iLastMax := iMaxPos;
-            End Else
-              If iPos > iLastMax Then
-                iLastMax := iPos;
-        End;
-      Result.Right := Result.Left + iLastMax;
-    End;
+  CalcTreeNodeWidth;
   Dec(Result.Bottom, 4);
   Dec(Result.Left, 1);
   Inc(Result.Right, 2);
@@ -623,35 +806,12 @@ Begin
       Inc(Result.Bottom, 5);
       Refresh;
       Canvas.Font.Style := [];
-      str := Comment.AsString(MaxInt, False);
+      strText := Comment.AsString(MaxInt, False);
       R := Rect(Result.Left + 2, 0, Result.Right - 2, 0);
-      Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(str), -1, R,
+      Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(strText), -1, R,
         DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
         DrawTextBiDiModeFlagsReadingOnly) + 2);
-      For i := 0 To BrowseAndDocItOptions.SpecialTags.Count - 1 Do
-        Begin
-          If CanDrawSpecialTag(Comment, BrowseAndDocItOptions.SpecialTags.Names[i]) Then
-            Begin
-              Refresh;
-              Canvas.Font.Style := [fsBold, fsUnderline];
-              R := Rect(Result.Left + 2, 0, Result.Right - 2, 0);
-              str := BrowseAndDocItOptions.SpecialTags.Values[BrowseAndDocItOptions.SpecialTags.Names[i]];
-              Inc(Result.Bottom, 5 + DrawText(Canvas.Handle, PChar(str), -1, R,
-                DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-                DrawTextBiDiModeFlagsReadingOnly) + 2);
-              For j := 0 To Comment.TagCount - 1 Do
-                If CompareText(BrowseAndDocItOptions.SpecialTags.Names[i], Comment.Tag[j].TagName) = 0 Then
-                  Begin
-                    Refresh;
-                    Canvas.Font.Style := [];
-                    R := Rect(Result.Left + 2, 0, Result.Right - 12, 0);
-                    str := Comment.Tag[j].AsString(MaxInt, False);
-                    Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(str), -1, R,
-                      DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-                      DrawTextBiDiModeFlagsReadingOnly) + 2);
-                  End;
-            End;
-        End;
+      CalcSpecialTags;
     End;
 End;
 
@@ -694,7 +854,7 @@ Procedure TCustomHintWindow.ActivateHint(Rect : TRect; Node : PVirtualNode;
   SyntaxHighlight : Boolean; Comment : TComment);
 
 Var
- NodeData : ^TTreeData;
+ NodeData : PTreeData;
 
 Begin
   FComment := Comment;
@@ -702,26 +862,25 @@ Begin
   FNodeLevel := NodeData.FNode.Level;
   FCustomDraw := SyntaxHighlight;
   FNode := Node;
-  Color := BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+  Color := TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
   ActivateHint(Rect, NodeData.FNode.Text);
 End;
 
 (**
 
-  This method determines if the special tag need to be rendered in the hint
-  window.
+  This method determines if the special tag need to be rendered in the hint window.
 
-  @precon  Comment is the comment to get tags from and strSpecialTag is the
-           special tag information to look for.
+  @precon  Comment is the comment to get tags from and strSpecialTag is the special tag information
+           to look for.
   @postcon Return true is the special tag was found in the comment.
 
   @param   Comment       as a TComment
-  @param   strSpecialTag as a String
+  @param   strSpecialTag as a String as a constant
   @return  a Boolean
 
- **)
+**)
 Function TCustomHintWindow.CanDrawSpecialTag(Comment : TComment;
-  strSpecialTag : String) : Boolean;
+  const strSpecialTag : String) : Boolean;
 Var
   i : Integer;
 
@@ -747,11 +906,11 @@ End;
 **)
 Constructor TframeModuleExplorer.Create(AOwner: TComponent);
 
-Var
-  i : TBADIImageIndex;
-
 begin
   Inherited Create(AOwner);
+  {$IFDEF D2009}
+  DoubleBuffered := True;
+  {$ENDIF}
   FExplorer := TBADIVirtualStringTree.Create(Self);
   With FExplorer Do
     Begin
@@ -766,25 +925,24 @@ begin
       Header.MainColumn := -1;
       Header.Options := [hoColumnResize, hoDrag];
       Images := ilScopeImages;
-      TabOrder := 2;
+      TabOrder := 3;
       OnBeforeItemPaint := tvExplorerBeforeItemPaint;
       OnClick := tvExplorerClick;
       OnGetImageIndex := tvExplorerGetImageIndex;
-      OnKeyDown := tvExplorerKeyDown;
+      OnKeyPress := tvExplorerKeyPress;
       OnMeasureItem := tvExplorerMeasureItem;
       OnMouseMove := tvExplorerMouseMove;
     End;
+  FMouseEnter := False;
   FExplorer.NodeDataSize := SizeOf(TTreeData);
   FINIFileName := BuildRootKey(Nil, Nil);
   FNodeInfo := TObjectList.Create(True);
   FHintWin := TCustomHintWindow.Create(Self, FExplorer);
-  FHintWin.Color := BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+  FHintWin.Color := TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
   FHintWin.Canvas.Font.Assign(FExplorer.Font);
+  edtExplorerFilter.Font.Assign(FExplorer.Font);
   ilScopeImages.Clear;
-  For i := Succ(Low(TBADIImageIndex)) to High(TBADIImageIndex) Do
-    If Not ilScopeImages.GetInstRes(hInstance, rtBitmap, BADIImageList[i].FResourceName,
-      16, [lrDefaultColor], BADIImageList[i].FMaskColour) Then
-      ShowMessage(Format('Resource "%s" not found.', [BADIImageList[i].FResourceName]));
+  LoadBADIImages;
   FExplorer.OnGetText := tvExplorerGetText;
 end;
 
@@ -811,6 +969,67 @@ end;
 
 (**
 
+  This is an on change event handler for the Explorer Filter edit control.
+
+  @precon  None.
+  @postcon Notify that the filter has changed and the explorer should be filtered.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeModuleExplorer.edtExplorerFilterChange(Sender: TObject);
+
+Begin
+  FilterChange;
+End;
+
+(**
+
+  This is an on key press event handler for the Explorer Filter edit control.
+
+  @precon  None.
+  @postcon Clears the filter is escape is pressed.
+
+  @param   Sender as a TObject
+  @param   Key    as a Char as a reference
+
+**)
+Procedure TframeModuleExplorer.edtExplorerFilterKeyPress(Sender: TObject; Var Key: Char);
+
+Begin
+  Case Key Of
+    #27:
+      Begin
+        edtExplorerFilter.Clear;
+        Key := #0;
+      End;
+  End;
+End;
+
+(**
+
+  This is a mouse activate event handler for the explorer filter.
+
+  @precon  None.
+  @postcon Makes FMouseEnter true to signify that the mouse was clicked on the filter.
+
+  @param   Sender        as a TObject
+  @param   Button        as a TMouseButton
+  @param   Shift         as a TShiftState
+  @param   X             as an Integer
+  @param   Y             as an Integer
+  @param   HitTest       as an Integer
+  @param   MouseActivate as a TMouseActivate as a reference
+
+**)
+procedure TframeModuleExplorer.edtExplorerFilterMouseActivate(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y, HitTest: Integer; var MouseActivate: TMouseActivate);
+begin
+  FMouseEnter := True;
+end;
+
+(**
+
   This method updates the filtering of the treeview.
 
   @precon  None.
@@ -823,6 +1042,18 @@ Var
   N : PVirtualNode;
 
 Begin
+  stbStatusBar.SimplePanel := False;
+  Try
+    If edtExplorerFilter.Text <> '' Then
+      FFilterRegEx := TregEx.Create(edtExplorerFilter.Text, [roIgnoreCase, roCompiled,
+        roSingleLine]);
+  Except
+    On E : ERegularExpressionError Do
+      Begin
+        stbStatusBar.SimpleText := E.Message;
+        stbStatusBar.SimplePanel := True;
+      End;
+  End;
   FExplorer.BeginUpdate;
   Try
     N := FExplorer.RootNode.FirstChild;
@@ -864,7 +1095,7 @@ Begin
                 Tag[j].AsString(MaxInt, False),
                 Tag[j].Name,
                 2,
-                Integer(iiToDoItem) - 1,
+                BADIImageIndex(iiToDoItem, scNone),
                 M.BodyComment[i].Tag[j].Line,
                 M.BodyComment[i].Tag[j].Column,
                 False,
@@ -894,7 +1125,7 @@ Var
 
 begin
   For i := 1 To Container.ElementCount Do
-    If Container.Elements[i].Scope In BrowseAndDocItOptions.ScopesToRender + [scNone, scGlobal] Then
+    If Container.Elements[i].Scope In TBADIOptions.BADIOptions.ScopesToRender + [scNone, scGlobal] Then
       Begin
         NewNode := AddNode(
           RootNode,
@@ -928,7 +1159,7 @@ Function TframeModuleExplorer.GetNodePath(Node : PVirtualNode) : String;
 Var
   P : PVirtualNode;
   str : String;
-  NodeData : ^TTreeData;
+  NodeData : PTreeData;
 
 Begin
   str := '';
@@ -943,6 +1174,51 @@ Begin
       P := FExplorer.NodeParent[P];
     End;
   Result := str;
+End;
+
+(**
+
+  This method loads the BADI images from the DLLs resources into an image list multipling the
+  number of images by the number of overlay masks for scope.
+
+  @precon  None.
+  @postcon The images are loaded, one for each scope.
+
+**)
+Procedure TframeModuleExplorer.LoadBADIImages;
+
+Var
+  R: TRect;
+  MainImage: TBitmap;
+  ScopeImage: TBitmap;
+  iImage: TBADIImageIndex;
+  iScope: TScope;
+  x: Integer;
+  y: Integer;
+
+Begin
+  R := Rect(0, 0, 11, 11);
+  MainImage := TBitMap.Create;
+  Try
+    ScopeImage := TBitmap.Create;
+    Try
+      For iImage := Succ(Low(TBADIImageIndex)) To High(TBADIImageIndex) Do
+        For iScope := Low(TScope) To High(TScope) Do
+          Begin
+              MainImage.LoadFromResourceName(hInstance, BADIImageList[iImage].FResourceName);
+              ScopeImage.LoadFromResourceName(hInstance, BADIScopeList[iScope].FResourceName);
+              For x := 0 To 11 Do
+                For y := 0 To 11 Do
+                  If ScopeImage.Canvas.Pixels[x, y] <> BADIScopeList[iScope].FMaskColour Then
+                    MainImage.Canvas.Pixels[x, y] := ScopeImage.Canvas.Pixels[x, y];
+              ilScopeImages.AddMasked(MainImage, BADIImageList[iImage].FMaskColour);
+          End;
+    Finally
+      ScopeImage.Free;
+    End;
+  Finally
+    MainImage.Free;
+  End;
 End;
 
 (**
@@ -962,11 +1238,11 @@ Var
   dtDate: TDateTime;
 
 begin
-  With BrowseAndDocItOptions.ExpandedNodes Do
+  With TBADIOptions.BADIOptions.ExpandedNodes Do
   For i := Count - 1 DownTo 0 Do
     Begin
       dtDate := Integer(Objects[i]);
-      If dtDate < Now - BrowseAndDocItOptions.ManagedNodesLife Then
+      If dtDate < Now - TBADIOptions.BADIOptions.ManagedNodesLife Then
         Delete(i);
     End;
 end;
@@ -999,12 +1275,12 @@ Begin
           str := GetNodePath(Node);
           If FExplorer.Expanded[Node] And (str <> '') Then
             Begin
-              If Not BrowseAndDocItOptions.ExpandedNodes.Find(str, iIndex) Then
-                iIndex := BrowseAndDocItOptions.ExpandedNodes.Add(str);
-              BrowseAndDocItOptions.ExpandedNodes.Objects[iIndex] := TObject(Trunc(Now));
+              If Not TBADIOptions.BADIOptions.ExpandedNodes.Find(str, iIndex) Then
+                iIndex := TBADIOptions.BADIOptions.ExpandedNodes.Add(str);
+              TBADIOptions.BADIOptions.ExpandedNodes.Objects[iIndex] := TObject(Trunc(Now));
             End Else
-              If BrowseAndDocItOptions.ExpandedNodes.Find(str, iIndex) Then
-                BrowseAndDocItOptions.ExpandedNodes.Delete(iIndex);
+              If TBADIOptions.BADIOptions.ExpandedNodes.Find(str, iIndex) Then
+                TBADIOptions.BADIOptions.ExpandedNodes.Delete(iIndex);
           GetExpandedNodes(Node);
         End;
       Node := FExplorer.GetNextSibling(Node);
@@ -1035,7 +1311,7 @@ Begin
       If Node.ChildCount > 0 Then
         Begin
           str := GetNodePath(Node);
-          If BrowseAndDocItOptions.ExpandedNodes.Find(str, i) Then
+          If TBADIOptions.BADIOptions.ExpandedNodes.Find(str, i) Then
             FExplorer.Expanded[Node] := True;
           SetExpandedNodes(Node);
         End;
@@ -1045,26 +1321,30 @@ End;
 
 (**
 
-  This is a setter method for the ExplorerFilter property.
+  This method sets the contents of a specific statusbar panel and sets its width accordingly.
 
   @precon  None.
-  @postcon The filter text is updated and the tree filtered and the statusbar updated.
+  @postcon The status bar panel is updated.
 
-  @param   strValue as a String
+  @param   ePanel           as a TStatusPanelIndex
+  @param   strStatusBarText as a String as a constant
+  @param   iValue           as an Integer
 
 **)
-Procedure TframeModuleExplorer.SetExplorerFilter(strValue: String);
+Procedure TframeModuleExplorer.SetStatusPanel(ePanel: TStatusPanelIndex;
+  const strStatusBarText: String; iValue: Integer);
+
+Const
+  iPadding = 10;
+
+Var
+  strText : String;
 
 Begin
-  If strValue <> FExplorerFilter Then
-    Begin
-      FExplorerFilter := strValue;
-      FilterChange;
-    End;
-  If FExplorerFilter = '' Then
-    stbStatusBar.Panels[0].Text := 'Showing all explorer nodes.'
-  Else
-    stbStatusBar.Panels[0].Text := Format('Filtering for "%s"...', [FExplorerFilter]);
+  strText := Format(strStatusbarText, [Int(iValue)]);
+  stbStatusBar.Panels[Byte(ePanel)].Text := strText;
+  stbStatusBar.Panels[Byte(ePanel)].Width :=
+    stbStatusBar.Canvas.TextWidth(strText) + 2 * iPadding;
 End;
 
 (**
@@ -1085,14 +1365,14 @@ Procedure TframeModuleExplorer.FilterProc(Sender: TBaseVirtualTree; Node: PVirtu
   Data: Pointer; Var Abort: Boolean);
 
 Var
-  NodeData : ^TTreeData;
+  NodeData : PTreeData;
   N : PVirtualNode;
 
 Begin
   NodeData := Sender.GetNodeData(Node);
-  If FExplorerFilter <> '' Then
+  If edtExplorerFilter.Text <> '' Then
     Begin
-      Sender.IsVisible[Node] := (Pos(LowerCase(FExplorerFilter), LowerCase(NodeData.FNode.Text)) > 0);
+      Sender.IsVisible[Node] := FFilterRegEx.IsMatch(NodeData.FNode.Text);
       If Sender.IsVisible[Node] Then
         Begin
           N := FExplorer.NodeParent[Node];
@@ -1108,17 +1388,16 @@ End;
 
 (**
 
-  This function finds the tree node that has the path specified by the passed
-  text.
+  This function finds the tree node that has the path specified by the passed text.
 
   @precon  strText is the string representation of the node path to be found.
   @postcon Returns tree node index of the item corresponding to the given path.
 
-  @param   strText as a String
+  @param   strText as a String as a constant
   @return  a PVirtualNode
 
 **)
-Function TframeModuleExplorer.FindTreeItem(strText : String) : PVirtualNode;
+Function TframeModuleExplorer.FindTreeItem(const strText : String) : PVirtualNode;
 
   (**
 
@@ -1175,8 +1454,10 @@ End;
 procedure TframeModuleExplorer.FrameEnter(Sender: TObject);
 
 begin
-  If Parent.Visible And Visible And FExplorer.Visible And FExplorer.CanFocus Then
-    FExplorer.SetFocus;
+  If Not FMouseEnter Then
+    If Parent.Visible And Visible And FExplorer.Visible And FExplorer.CanFocus Then
+      FExplorer.SetFocus;
+  FMouseEnter := False;
 end;
 
 (**
@@ -1196,10 +1477,9 @@ Var
   strTop : String;
   strSelection : String;
   N : PVirtualNode;
-  C : Word;
 
 Begin
-  FExplorer.Color := BrowseAndDocItOptions.BGColour;
+  FExplorer.Color := TBADIOptions.BADIOptions.BGColour;
   If M = Nil Then
     Begin
       strReservedWords := Nil;
@@ -1214,8 +1494,8 @@ Begin
   FRendering := True;
   Try
     FHintWin.ReleaseHandle; // Stop AV when refreshing the tree.
-    FExplorer.Font.Name := BrowseAndDocItOptions.FontName;
-    FExplorer.Font.Size := BrowseAndDocItOptions.FontSize;
+    FExplorer.Font.Name := TBADIOptions.BADIOptions.FontName;
+    FExplorer.Font.Size := TBADIOptions.BADIOptions.FontSize;
     GetExpandedNodes(FModule);
     FModule := Nil;
     // Find and store the top item and the selected item in the tree view
@@ -1223,13 +1503,13 @@ Begin
     strSelection := GetNodePath(FExplorer.FocusedNode);
     FExplorer.BeginUpdate;
     Try
-      ExplorerFilter := '';
+      edtExplorerFilter.Text := '';
       FExplorer.Clear;
       FNodeInfo.Clear;
       If M = Nil Then
         Exit;
       M.AddTickCount('Clear');
-      SetLength(FSpecialTagNodes, BrowseAndDocItOptions.SpecialTags.Count);
+      SetLength(FSpecialTagNodes, TBADIOptions.BADIOptions.SpecialTags.Count);
       // Create Root Tree Node
       FModule := AddNode(
         Nil,
@@ -1271,8 +1551,6 @@ Begin
   Finally
     FRendering := False;
   End;
-  C := 0;
-  tvExplorerKeyDown(Nil, C, []);
 End;
 
 (**
@@ -1294,7 +1572,7 @@ Const
 var
   i: Integer;
   Node : PVirtualNode;
-  NodeData : ^TTreeData;
+  NodeData : PTreeData;
 
 begin
   RenderContainers(FModule, Container, 1);
@@ -1325,56 +1603,49 @@ end;
 **)
 procedure TframeModuleExplorer.ExpandNodes;
 
-Const
-  strPromotedLabels : Array[1..4] Of String = (strDocumentationConflicts,
-    strHints, strWarnings, strErrors);
-
 Var
-  i : Integer;
+  iPromotedLabel : Integer;
   Node: PVirtualNode;
-  NodeData: ^TTreeData;
+  NodeData: PTreeData;
   N: PVirtualNode;
 
 begin
   FExplorer.Expanded[FModule] := True;
-  For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
-    If FSpecialTagNodes[i].Node.ChildCount = 0 Then
+  For iPromotedLabel := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
+    If FSpecialTagNodes[iPromotedLabel].Node.ChildCount = 0 Then
       Begin
-        FExplorer.DeleteNode(FSpecialTagNodes[i].Node);
-        FSpecialTagNodes[i].Node := Nil;
+        FExplorer.DeleteNode(FSpecialTagNodes[iPromotedLabel].Node);
+        FSpecialTagNodes[iPromotedLabel].Node := Nil;
       End;
-  For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
-    If FSpecialTagNodes[i].Node <> Nil Then
-      If FSpecialTagNodes[i].boolExpand Then
-        FExplorer.Expanded[FSpecialTagNodes[i].Node] := True;
-  For i := Low(strPromotedLabels) To High(strPromotedLabels) Do
+  For iPromotedLabel := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
+    If FSpecialTagNodes[iPromotedLabel].Node <> Nil Then
+      If FSpecialTagNodes[iPromotedLabel].boolExpand Then
+        FExplorer.Expanded[FSpecialTagNodes[iPromotedLabel].Node] := True;
+  Node := FExplorer.GetFirstChild(FModule);
+  While Node <> Nil Do
     Begin
-      Node := FExplorer.GetFirstChild(FModule);
-      While Node <> Nil Do
-        Begin
-          NodeData := FExplorer.GetNodeData(Node);
-          If CompareText(NodeData.FNode.Text, strDocumentationConflicts) = 0 Then
-            If doShowConflicts In BrowseAndDocItOptions.Options Then
+      NodeData := FExplorer.GetNodeData(Node);
+      If CompareText(NodeData.FNode.Text, strDocumentationConflicts) = 0 Then
+        If doShowConflicts In TBADIOptions.BADIOptions.Options Then
+          Begin
+            FExplorer.Expanded[Node] := True;
+            N := FExplorer.GetFirstChild(Node);
+            While N <> Nil Do
               Begin
-                FExplorer.Expanded[Node] := True;
-                N := FExplorer.GetFirstChild(Node);
-                While N <> Nil Do
-                  Begin
-                    FExplorer.Expanded[N] := True;
-                    N := FExplorer.GetNextSibling(N);
-                  End;
+                FExplorer.Expanded[N] := True;
+                N := FExplorer.GetNextSibling(N);
               End;
-          If CompareText(NodeData.FNode.Text, strHints) = 0 Then
-            If doShowHints In BrowseAndDocItOptions.Options Then
-              FExplorer.Expanded[Node] := True;
-          If CompareText(NodeData.FNode.Text, strWarnings) = 0 Then
-            If doShowWarnings In BrowseAndDocItOptions.Options Then
-              FExplorer.Expanded[Node] := True;
-          If CompareText(NodeData.FNode.Text, strErrors) = 0 Then
-            If doShowErrors In BrowseAndDocItOptions.Options Then
-              FExplorer.Expanded[Node] := True;
-          Node := FExplorer.GetNextSibling(Node);
-        End;
+          End;
+      If CompareText(NodeData.FNode.Text, strHints) = 0 Then
+        If doShowHints In TBADIOptions.BADIOptions.Options Then
+          FExplorer.Expanded[Node] := True;
+      If CompareText(NodeData.FNode.Text, strWarnings) = 0 Then
+        If doShowWarnings In TBADIOptions.BADIOptions.Options Then
+          FExplorer.Expanded[Node] := True;
+      If CompareText(NodeData.FNode.Text, strErrors) = 0 Then
+        If doShowErrors In TBADIOptions.BADIOptions.Options Then
+          FExplorer.Expanded[Node] := True;
+      Node := FExplorer.GetNextSibling(Node);
     End;
 end;
 
@@ -1397,19 +1668,19 @@ Var
 Begin
   For i := Low(FSpecialTagNodes) to High(FSpecialTagNodes) Do
     Begin
-      FSpecialTagNodes[i].strTagName := BrowseAndDocItOptions.SpecialTags.Names[i];
+      FSpecialTagNodes[i].strTagName := TBADIOptions.BADIOptions.SpecialTags.Names[i];
       FSpecialTagNodes[i].strTagDesc :=
-        BrowseAndDocItOptions.SpecialTags.Values[BrowseAndDocItOptions.SpecialTags.Names[i]];
+        TBADIOptions.BADIOptions.SpecialTags.Values[TBADIOptions.BADIOptions.SpecialTags.Names[i]];
       FSpecialTagNodes[i].boolShow :=
-        Integer(BrowseAndDocItOptions.SpecialTags.Objects[i]) And iShowInTree <> 0;
+        Integer(TBADIOptions.BADIOptions.SpecialTags.Objects[i]) And iShowInTree <> 0;
       FSpecialTagNodes[i].boolExpand :=
-        Integer(BrowseAndDocItOptions.SpecialTags.Objects[i]) And iAutoExpand <> 0;
+        Integer(TBADIOptions.BADIOptions.SpecialTags.Objects[i]) And iAutoExpand <> 0;
       FSpecialTagNodes[i].Node := AddNode(
         FModule,
         FSpecialTagNodes[i].strTagDesc,
         FSpecialTagNodes[i].strTagName,
         1,
-        Integer(iiTodoFolder) - 1,
+        BADIImageIndex(iiTodoFolder, scNone),
         0,
         0,
         True
@@ -1439,10 +1710,10 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
     @param   AScope as a TScope
 
   **)
-  procedure UpdateScopes(AScope : TScope);
+  procedure UpdateScopes(AScope : TScope); InLine;
 
   Begin
-    With BrowseAndDocItOptions Do
+    With TBADIOptions.BADIOptions Do
       If AScope In ScopesToRender Then
         ScopesToRender := ScopesToRender - [AScope]
       Else
@@ -1459,10 +1730,10 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
     @param   Option as a TDocOption
 
   **)
-  procedure UpdateOptions(Option : TDocOption);
+  procedure UpdateOptions(Option : TDocOption); InLine;
 
   Begin
-    With BrowseAndDocItOptions Do
+    With TBADIOptions.BADIOptions Do
       If Option In Options Then
         Options := Options - [Option]
       Else
@@ -1470,7 +1741,7 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
   End;
 
 begin
-  With BrowseAndDocItOptions Do
+  With TBADIOptions.BADIOptions Do
     If Sender = actLocal Then
       UpdateScopes(scLocal)
     Else If Sender = actPrivate Then
@@ -1526,51 +1797,50 @@ end;
 procedure TframeModuleExplorer.actLocalUpdate(Sender: TObject);
 begin
   If Sender = actLocal Then
-    (Sender As TAction).Checked := scLocal In BrowseAndDocItOptions.ScopesToRender
+    (Sender As TAction).Checked := scLocal In TBADIOptions.BADIOptions.ScopesToRender
   Else If Sender = actPrivate Then
-    (Sender As TAction).Checked := scPrivate In BrowseAndDocItOptions.ScopesToRender
+    (Sender As TAction).Checked := scPrivate In TBADIOptions.BADIOptions.ScopesToRender
   Else If Sender = actProtected Then
-    (Sender As TAction).Checked := scProtected In BrowseAndDocItOptions.ScopesToRender
+    (Sender As TAction).Checked := scProtected In TBADIOptions.BADIOptions.ScopesToRender
   Else If Sender = actPublic Then
-    (Sender As TAction).Checked := scPublic In BrowseAndDocItOptions.ScopesToRender
+    (Sender As TAction).Checked := scPublic In TBADIOptions.BADIOptions.ScopesToRender
   Else If Sender = actPublished Then
-    (Sender As TAction).Checked := scPublished In BrowseAndDocItOptions.ScopesToRender
+    (Sender As TAction).Checked := scPublished In TBADIOptions.BADIOptions.ScopesToRender
   Else If Sender = actSyntax Then
-    (Sender As TAction).Checked := doCustomDrawing In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doCustomDrawing In TBADIOptions.BADIOptions.Options
   Else If Sender = actShowHints Then
-    (Sender As TAction).Checked := doShowCommentHints In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doShowCommentHints In TBADIOptions.BADIOptions.Options
   Else If Sender = actConflicts Then
-    (Sender As TAction).Checked := doShowConflicts In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doShowConflicts In TBADIOptions.BADIOptions.Options
   Else If Sender = actErrors Then
-    (Sender As TAction).Checked := doShowErrors In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doShowErrors In TBADIOptions.BADIOptions.Options
   Else If Sender = actWarnings Then
-    (Sender As TAction).Checked := doShowWarnings In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doShowWarnings In TBADIOptions.BADIOptions.Options
   Else If Sender = actHints Then
-    (Sender As TAction).Checked := doShowHints In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doShowHints In TBADIOptions.BADIOptions.Options
   Else If Sender = actMethods Then
-    (Sender As TAction).Checked := doShowMethodMissingDocs In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doShowMethodMissingDocs In TBADIOptions.BADIOptions.Options
   Else If Sender = actProperties Then
-    (Sender As TAction).Checked := doShowPropertyMissingDoc In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doShowPropertyMissingDoc In TBADIOptions.BADIOptions.Options
   Else If Sender = actConstants Then
-    (Sender As TAction).Checked := doShowUndocumentedConsts In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doShowUndocumentedConsts In TBADIOptions.BADIOptions.Options
   Else If Sender = actVariables Then
-    (Sender As TAction).Checked := doShowUndocumentedVars In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doShowUndocumentedVars In TBADIOptions.BADIOptions.Options
   Else If Sender = actTypes Then
-    (Sender As TAction).Checked := doShowUndocumentedTypes In BrowseAndDocItOptions.Options
+    (Sender As TAction).Checked := doShowUndocumentedTypes In TBADIOptions.BADIOptions.Options
 end;
 
 (**
 
-  This method adds a node to the treeview as a child of the give node. It
-  assigns the line, column and comment information to the noNode.
+  This method adds a node to the treeview as a child of the give node. It assigns the line, column
+  and comment information to the noNode.
 
-  @precon  P is the parent node to attach this new child too, Element is the
-           parser node to render.
+  @precon  P is the parent node to attach this new child too, Element is the parser node to render.
   @postcon Returns a instance of the newly add / created tree node.
 
   @param   P           as a PVirtualNode
-  @param   strText     as a String
-  @param   strName     as a String
+  @param   strText     as a String as a constant
+  @param   strName     as a String as a constant
   @param   iLevel      as an Integer
   @param   iImageIndex as an Integer
   @param   iLine       as an Integer
@@ -1580,13 +1850,13 @@ end;
   @return  a PVirtualNode
 
 **)
-Function TframeModuleExplorer.AddNode(P : PVirtualNode; strText, strName : String;
+Function TframeModuleExplorer.AddNode(P : PVirtualNode; const strText, strName : String;
   iLevel : Integer; iImageIndex : Integer; iLine : Integer = 0;
   iColumn : Integer = 0; boolTitle : Boolean = False;
   AComment : TComment = Nil) : PVirtualNode;
 
 Var
-  NodeData : ^TTreeData;
+  NodeData : PTreeData;
   N : TTreeNodeInfo;
 
 begin
@@ -1619,7 +1889,7 @@ procedure TframeModuleExplorer.tvExplorerGetImageIndex(Sender: TBaseVirtualTree;
   var Ghosted: Boolean; var ImageIndex: Integer);
 
 Var
-  NodeData : ^TTreeData;
+  NodeData : PTreeData;
 
 begin
   NodeData := FExplorer.GetNodeData(Node);
@@ -1651,7 +1921,7 @@ procedure TframeModuleExplorer.tvExplorerGetText(Sender: TBaseVirtualTree;
 {$ENDIF}
 
 Var
-  NodeData : ^TTreeData;
+  NodeData : PTreeData;
 
 begin
   NodeData := FExplorer.GetNodeData(Node);
@@ -1675,8 +1945,8 @@ end;
 procedure TframeModuleExplorer.tvExplorerMeasureItem(Sender: TBaseVirtualTree;
   TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
 begin
-  TargetCanvas.Font.Name := BrowseAndDocItOptions.FontName;
-  TargetCanvas.Font.Size := BrowseAndDocItOptions.FontSize;
+  TargetCanvas.Font.Name := TBADIOptions.BADIOptions.FontName;
+  TargetCanvas.Font.Size := TBADIOptions.BADIOptions.FontSize;
   NodeHeight := 1 + TargetCanvas.TextHeight('Ag') + 1;
 end;
 
@@ -1705,7 +1975,7 @@ Var
   Rect : TRect;
   C : TComment;
   HitInfo: THitInfo;
-  NodeData : ^TTreeData;
+  NodeData : PTreeData;
 
 begin
   C := Nil;
@@ -1717,10 +1987,10 @@ begin
         Begin
           FLastNode := Node;
           NodeData := FExplorer.GetNodeData(Node);
-          If doShowCommentHints In BrowseAndDocItOptions.Options Then
+          If doShowCommentHints In TBADIOptions.BADIOptions.Options Then
             C := NodeData.FNode.Comment;
           Rect := FHintWin.CalcHintRect(FExplorer.ClientWidth, Screen.Width,
-            Node, doCustomDrawing In BrowseAndDocItOptions.Options, C);
+            Node, doCustomDrawing In TBADIOptions.BADIOptions.Options, C);
           If (Rect.Right <= FExplorer.ClientWidth) And ((C = Nil) Or
             ((C.TokenCount = 0) And (C.TagCount = 0))) Then
             Begin
@@ -1730,7 +2000,7 @@ begin
           Rect.TopLeft := FExplorer.ClientToScreen(Rect.TopLeft);
           Rect.BottomRight := FExplorer.ClientToScreen(Rect.BottomRight);
           FHintWin.ActivateHint(Rect, Node,
-            doCustomDrawing In BrowseAndDocItOptions.Options, C);
+            doCustomDrawing In TBADIOptions.BADIOptions.Options, C);
           FLastNode := Node;
         End Else
           If (Node <> FLastNode) Then
@@ -1756,12 +2026,15 @@ procedure TframeModuleExplorer.UpdateStatusBar(M: TBaseLanguageModule);
 
 Var
   strTickLabel: String;
-  iTicks: Integer;
+  dblTicks: Double;
   i : Integer;
   strText : String;
 
 begin
-  If doShowPerformanceCountersInModuleExplorer In BrowseAndDocItOptions.Options Then
+  SetStatusPanel(spiBytes, strStatusbarBytesText, M.Bytes);
+  SetStatusPanel(spiTokens, strStatusbarTokensText, M.TokenCount);
+  SetStatusPanel(spiLines, strStatusbarLinesText, M.Lines);
+  If doShowPerformanceCountersInModuleExplorer In TBADIOptions.BADIOptions.Options Then
     Begin
       strText := '';
       For i := 1 To M.OpTickCounts - 1 Do
@@ -1769,24 +2042,25 @@ begin
           strTickLabel := M.OpTickCountName[i];
           If strTickLabel <> '' Then
             strTickLabel := strTickLabel + ':';
-          iTicks := M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1];
-          If iTicks > 0 Then
+          dblTicks := M.OpTickCountByIndex[i] - M.OpTickCountByIndex[i - 1];
+          If dblTicks > 1.0 Then //: @debug Filter out small items - Add to Options.
             Begin
               If strText <> '' Then
                 strText := strText + ', ';
-              strText := strText + Format('%s%d', [strTickLabel, iTicks]);
+              strText := strText + Format('%s %1.1n', [strTickLabel, dblTicks]);
             End;
         End;
       If strText <> '' Then
         strText := strText + ', ';
       strText := strText +
-        Format('%s: %d', ['Total', M.OpTickCountByIndex[M.OpTickCounts - 1] -
+        Format('%s: %1.1n', ['Total', M.OpTickCountByIndex[M.OpTickCounts - 1] -
         M.OpTickCountByIndex[0]]);
-      stbStatusBar.Panels[1].Text := strText;
+      stbStatusBar.Panels[Byte(spiFourth)].Text := strText;
+      stbStatusBar.Hint := strText;
     End Else
     Begin
-      stbStatusBar.Panels[1].Text := Format(strStatusbarText, [
-        Int(Integer(M.Bytes)), Int(M.TokenCount), Int(M.Lines)]);
+      stbStatusBar.Panels[Byte(spiFourth)].Text := '';
+      stbStatusBar.Hint := '';
     End;
 end;
 
@@ -1829,133 +2103,441 @@ procedure TframeModuleExplorer.tvExplorerBeforeItemPaint(
   Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode;
   ItemRect: TRect; var CustomDraw: Boolean);
 
+  (**
 
-Var
-  iPos: Integer;
-  i: Integer;
-  NodeData : ^TTreeData;
-  R : TRect;
-  iCentre: Integer;
-  P: PVirtualNode;
-  sl : TStringList;
-  iOffset: Integer;
-  iTreeColour : TColor;
-  HL: TTokenFontInfo;
+    This method sets the treviews canvas font to those in the BADI options.
 
-begin
-  CustomDraw := (doCustomDrawing In BrowseAndDocItOptions.Options);
-  With TargetCanvas Do
-    If CustomDraw Then
+    @precon  None.
+    @postcon The TargetCanvas font is set for rendering.
+
+    @param   TargetCanvas as a TCanvas
+
+  **)
+  Procedure InitCanvasFont(TargetCanvas : TCanvas); InLine;
+
+  Begin
+    TargetCanvas.Font.Name := TBADIOptions.BADIOptions.FontName;
+    TargetCanvas.Font.Size := TBADIOptions.BADIOptions.FontSize;
+  End;
+
+  (**
+
+    This method highlights the selected item in the treeview.
+
+    @precon  None.
+    @postcon The item is highlighted if selected.
+
+    @param   TargetCanvas as a TCanvas
+    @param   iColour      as a TColor
+    @param   ItemRect     as a TRect
+
+  **)
+  Procedure HighlightSelectedItem(TargetCanvas : TCanvas; iColour : TColor;
+    ItemRect : TRect); InLine;
+
+  Begin
+    TargetCanvas.Brush.Color := iColour;
+    TargetCanvas.FillRect(ItemRect);
+  End;
+
+  (**
+
+    This method renders a selection rectangle around the selected note.
+
+    @precon  NodeData must be a valid pointer to a TTreeData node fo the node being rendered and sl
+             must contain the string tokens to be rendered.
+    @postcon The selection rectangle is rendered (accounting for extra width due to font
+             preferences).
+
+    @param   TargetCanvas      as a TCanvas
+    @param   vstExplorer       as a TVirtualStringTree
+    @param   Node              as a PVirtualNode
+    @param   NodeData          as a PTreeData
+    @param   sl                as a TStringList
+    @param   ItemRect          as a TRect
+    @param   iScopeImagesWidth as an Integer
+    @param   iPos              as an Integer as a reference
+
+  **)
+  Procedure RenderSelectedNode(TargetCanvas : TCanvas; vstExplorer : TVirtualStringTree;
+    Node : PVirtualNode; NodeData : PTreeData; sl : TStringList; ItemRect : TRect;
+    iScopeImagesWidth : Integer; var iPos : Integer); InLine;
+
+  Var
+    R : TRect;
+    HL: TTokenFontInfo;
+    i: Integer;
+
+  Begin
+    If vstExplorer.Selected[Node] Then
       Begin
-        TargetCanvas.Font.Name := BrowseAndDocItOptions.FontName;
-        TargetCanvas.Font.Size := BrowseAndDocItOptions.FontSize;
-        // Highlight selected item.
-        iOffset := Sender.Left;
-        Brush.Color := FExplorer.Color;
-        FillRect(ItemRect);
-        NodeData := Sender.GetNodeData(Node);
-        sl := NodeData.FNode.Tokens;
-        If Sender.Selected[Node] Then
-          Begin
-            // Need to amend the width of the rectangle for the custom drawing
-            iPos := 5;
-            For i := 0 To sl.Count - 1 Do
-              Begin
-                GetFontInfo(sl, i, NodeData.FNode.Title, TargetCanvas);
-                Inc(iPos, TextWidth(sl[i]) + 1);
-              End;
-            R := ItemRect;
-            R.Left := (NodeData.FNode.Level + 1) * Integer(FExplorer.Indent) -
-              iOffset + ilScopeImages.Width + FExplorer.Margin +
-              FExplorer.TextMargin - 2;
-            R.Right := R.Left + iPos;
-            Pen.Color := clBlack;
-            HL := BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight];
-            If Node = Sender.FocusedNode Then
-              Begin
-                Brush.Color := HL.FBackColour;
-                Pen.Color := HL.FForeColour;
-                FillRect(R);
-              End;
-            Rectangle(R);
-          End;
-        R := ItemRect;
-        iCentre := (R.Top + R.Bottom) Div 2;
-        // Draw Tree
-        R.Left := R.Left + (NodeData.FNode.Level * Integer(FExplorer.Indent)) -
-          iOffset;
-        // Draw vertical tree lines
-        P := Node.Parent;
-        iTreeColour := BrowseAndDocItOptions.TreeColour;
-        For i := NodeData.FNode.Level - 1 DownTo 0 Do
-          Begin
-            If (P <> Nil) And (P.Parent <> Nil) Then
-              If P.Index < P.Parent.ChildCount - 1  Then
-                Begin
-                  Pen.Color := iTreeColour;
-                  Pen.Style := psSolid;
-                  MoveTo(Integer(FExplorer.Indent) * i + 8 - iOffset, R.Top);
-                  LineTo(Integer(FExplorer.Indent) * i + 8 - iOffset, R.Bottom);
-                End;
-            P := P.Parent;
-          End;
-        // Draw top half of node connector
-        Pen.Color := iTreeColour;
-        Pen.Style := psSolid;
-        MoveTo(R.Left + 8, iCentre);
-        LineTo(R.Left + Integer(FExplorer.Indent), iCentre);
-        If Node.Parent <> Nil Then
-          Begin
-            // Draw connection to item
-            Pen.Color := iTreeColour;
-            Pen.Style := psSolid;
-            MoveTo(R.Left + 8, R.Top);
-            LineTo(R.Left + 8, iCentre);
-            If Node.Index < Node.Parent.ChildCount - 1 Then
-              Begin
-                // Draw connector to next node.
-                Pen.Color := iTreeColour;
-                Pen.Style := psSolid;
-                MoveTo(R.Left + 8, iCentre);
-                LineTo(R.Left + 8, R.Bottom);
-              End;
-          End;
-        If Node.ChildCount > 0 Then
-          Begin
-            // Draw button
-            Pen.Color := iTreeColour;
-            Pen.Style := psSolid;
-            Rectangle(R.Left + 4, iCentre - 4,
-              R.Left + 13, iCentre + 5);
-            // Draw negative side
-            Pen.Color := iTreeColour;
-            MoveTo(R.Left + 6, iCentre);
-            LineTo(R.Left + 11, iCentre);
-            If Not Sender.Expanded[Node] Then
-              Begin
-                // Make positive sign
-                MoveTo(R.Left + 8, iCentre - 2);
-                LineTo(R.Left + 8, iCentre + 3);
-              End;
-          End;
-        //Draw Image, Padding used to get custom tree in the same places as std.
-        R.Left := R.Left + Integer(FExplorer.Indent) + FExplorer.Margin;
-        Inc(R.Top);
-        ilScopeImages.Draw(TargetCanvas, R.Left, R.Top, NodeData.FNode.ImageIndex);
-        // Draw text
-        R.Left := R.Left + ilScopeImages.Width + FExplorer.TextMargin;
-        iPos := R.Left + 2;
+        // Need to amend the width of the rectangle for the custom drawing
+        iPos := 6;
         For i := 0 To sl.Count - 1 Do
           Begin
             GetFontInfo(sl, i, NodeData.FNode.Title, TargetCanvas);
-            If Node = Sender.FocusedNode Then
-              If Brush.Color = BrowseAndDocItOptions.BGColour Then
-                Brush.Color :=
-                  BrowseAndDocItOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
-            TextOut(iPos, R.Top, sl[i]);
-            Inc(iPos, TextWidth(sl[i]) + 1);
+            Inc(iPos, TargetCanvas.TextWidth(sl[i]));
+          End;
+        R := ItemRect;
+        R.Left := (NodeData.FNode.Level + 1) * Integer(vstExplorer.Indent) -
+          vstExplorer.Left + iScopeImagesWidth + vstExplorer.Margin + vstExplorer.TextMargin - 1;
+        R.Right := R.Left + iPos;
+        TargetCanvas.Pen.Color := clBlack;
+        HL := TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight];
+        If Node = vstExplorer.FocusedNode Then
+          Begin
+            TargetCanvas.Brush.Color := HL.FBackColour;
+            TargetCanvas.Pen.Color := HL.FForeColour;
+            TargetCanvas.FillRect(R);
+          End;
+        TargetCanvas.Rectangle(R);
+      End;
+  End;
+
+  (**
+
+    This method draws the tree outline for the given node.
+
+    @precon  NodeData must be a v alid pointer to a TTreeData record for the current node.
+    @postcon The tree outline is drawn.
+
+    @param   NodeData as a PTreeData
+    @param   R        as a TRect as a reference
+
+  **)
+  Procedure DrawTree(NodeData : PTreeData; var R : TRect);
+
+    (**
+
+      This method draw the vertical line between tree nodes.
+
+      @precon  None.
+      @postcon The vertical line between the nodes is drawn for different levels.
+
+      @param   iTreeColour as a TColor
+
+    **)
+    Procedure DrawVerticalTreeLine(iTreeColour : TColor);
+
+    Var
+      P: PVirtualNode;
+      i: Integer;
+
+    Begin
+      P := Node.Parent;
+      For i := NodeData.FNode.Level - 1 DownTo 0 Do
+        Begin
+          If (P <> Nil) And (P.Parent <> Nil) Then
+            If P.Index < P.Parent.ChildCount - 1  Then
+              Begin
+                TargetCanvas.Pen.Color := iTreeColour;
+                TargetCanvas.Pen.Style := psSolid;
+                TargetCanvas.MoveTo(Integer(FExplorer.Indent) * i + 8 - Sender.Left, R.Top);
+                TargetCanvas.LineTo(Integer(FExplorer.Indent) * i + 8 - Sender.Left, R.Bottom);
+              End;
+          P := P.Parent;
+        End;
+    End;
+
+    (**
+
+      This method draws the top half of the node connector.
+
+      @precon  None.
+      @postcon The top half of the node connector is drawn.
+
+      @param   iTreeColour as a TColor
+      @param   iCentre     as an Integer
+
+    **)
+    Procedure DrawTopHalfOfNodeConnector(iTreeColour : TColor; iCentre : Integer);
+
+    Begin
+      TargetCanvas.Pen.Color := iTreeColour;
+      TargetCanvas.Pen.Style := psSolid;
+      TargetCanvas.MoveTo(R.Left + 8, iCentre);
+      TargetCanvas.LineTo(R.Left + Integer(FExplorer.Indent), iCentre);
+      If Node.Parent <> Nil Then
+        Begin
+          // Draw connection to item
+          TargetCanvas.Pen.Color := iTreeColour;
+          TargetCanvas.Pen.Style := psSolid;
+          TargetCanvas.MoveTo(R.Left + 8, R.Top);
+          TargetCanvas.LineTo(R.Left + 8, iCentre);
+          If Node.Index < Node.Parent.ChildCount - 1 Then
+            Begin
+              // Draw connector to next node.
+              TargetCanvas.Pen.Color := iTreeColour;
+              TargetCanvas.Pen.Style := psSolid;
+              TargetCanvas.MoveTo(R.Left + 8, iCentre);
+              TargetCanvas.LineTo(R.Left + 8, R.Bottom);
+            End;
+        End;
+    End;
+
+    (**
+
+      This method draws the treenode button containing the + or - signs for expanding and
+      collapsing.
+
+      @precon  None.
+      @postcon The button is drawn.
+
+      @param   iTreeColour as a TColor
+      @param   iCentre     as an Integer
+
+    **)
+    Procedure DrawNodeButton(iTreeColour : TColor; iCentre : Integer);
+
+    Begin
+      If Node.ChildCount > 0 Then
+        Begin
+          // Draw button
+          TargetCanvas.Pen.Color := iTreeColour;
+          TargetCanvas.Pen.Style := psSolid;
+          TargetCanvas.Rectangle(R.Left + 4, iCentre - 4,
+            R.Left + 13, iCentre + 5);
+          // Draw negative side
+          TargetCanvas.Pen.Color := iTreeColour;
+          TargetCanvas.MoveTo(R.Left + 6, iCentre);
+          TargetCanvas.LineTo(R.Left + 11, iCentre);
+          If Not Sender.Expanded[Node] Then
+            Begin
+              // Make positive sign
+              TargetCanvas.MoveTo(R.Left + 8, iCentre - 2);
+              TargetCanvas.LineTo(R.Left + 8, iCentre + 3);
+            End;
+        End;
+    End;
+
+  Var
+    iTreeColour: Integer;
+    iCentre: Integer;
+
+  Begin
+    R.Left := R.Left + (NodeData.FNode.Level * Integer(FExplorer.Indent)) - Sender.Left;
+    iTreeColour := TBADIOptions.BADIOptions.TreeColour;
+    iCentre := (R.Top + R.Bottom) Div 2;
+    DrawVerticalTreeLine(iTreeColour);
+    DrawTopHalfOfNodeConnector(iTreeColour, iCentre);
+    DrawNodeButton(iTreeColour, iCentre);
+  End;
+
+  (**
+
+    This method draws the icon for the current tree node.
+
+    @precon  NodeData must be the TTreeData for the current node.
+    @postcon The nodes icon is drawn.
+
+    @param   NodeData as a PTreeData
+    @param   R        as a TRect as a reference
+
+  **)
+  Procedure DrawImage(NodeData : PTreeData; var R : TRect);
+
+  Begin
+    R.Left := R.Left + Integer(FExplorer.Indent) + FExplorer.Margin;
+    Inc(R.Top);
+    ilScopeImages.Draw(TargetCanvas, R.Left, R.Top, NodeData.FNode.ImageIndex);
+  End;
+
+  (**
+
+    This procedure draws the text on the explorer tree view.
+
+    @precon  NodeData and sl must be valid instance.
+    @postcon The treenode text is drawn.
+
+    @param   NodeData as a PTreeData
+    @param   R        as a TRect
+    @param   sl       as a TStringList
+    @param   iPos     as an Integer as a reference
+
+  **)
+  Procedure DrawText(NodeData : PTreeData; R : TRect; sl : TStringList; var iPos : Integer);
+
+    (**
+
+      This method draws the given text to the canvas using the current R rectangle and the current
+      iPos for the left of the text.
+
+      @precon  None.
+      @postcon Draws the text and updates the iPos pixel position for the next token and the
+               iTextPos to point to the net character in the string to draw.
+
+      @param   strText  as a String
+      @param   iTextPos as an Integer as a reference
+
+    **)
+    Procedure DrawTextToCanvas(strText : String; var iTextPos : Integer);
+
+    Var
+      S : TRect;
+
+    Begin
+      S := R;
+      S.Left := iPos;
+      Windows.DrawText(TargetCanvas.Handle, PChar(strText), Length(strText), S,
+        DT_LEFT Or DT_TOP);
+      Inc(iPos, TargetCanvas.TextWidth(strText));
+      Inc(iTextPos, Length(strText));
+    End;
+
+  Type
+    TMatchType = (mtNone, mtStart, mtFull, mtEnd, mtMiddle);
+
+    TMatchResult = Record
+      FMatchType : TMatchType;
+      FStart     : Integer;
+      FLength    : Integer;
+    End;
+
+    (**
+
+      This method initalises a TMatchResult record as we cannot define constructors for annoymous
+      records.
+
+      @precon  None.
+      @postcon The record is initialised.
+
+      @param   eMatchType as a TMatchType
+      @param   iStart     as an Integer
+      @param   iLength    as an Integer
+      @return  a TMatchResult
+
+    **)
+    Function InitMatchResult(eMatchType : TMatchType; iStart, iLength: Integer) : TMatchResult;
+      InLine;
+
+    Begin
+      Result.FMatchType := eMatchType;
+      Result.FStart := iStart;
+      Result.FLength := iLength;
+    End;
+
+    (**
+
+      This method searches the node text for matches and returns the match results.
+
+      @precon  MC must be a valid instance.
+      @postcon Searches the node text for matches and returns the match results.
+
+      @param   iIndex  as an Integer
+      @param   iLength as an Integer
+      @param   MC      as a TMatchCollection
+      @return  a TMatchResult
+
+    **)
+    Function IsMatched(iIndex, iLength: Integer; MC: TMatchCollection): TMatchResult; InLine;
+
+    Var
+      iMatch: Integer;
+      M: TMatch;
+
+    Begin
+      Result.FMatchType := mtNone;
+      For iMatch := 0 To MC.Count - 1 Do
+        Begin
+          M := MC.Item[iMatch];
+          If (M.Index + M.Length >= iIndex) And (M.Index <= iIndex + iLength) Then
+            Begin
+              If (M.Index <= iIndex) And (M.Index + M.Length >= iIndex + iLength) Then
+                Result := InitMatchResult(mtFull, 1, iLength)
+              Else If (M.Index <= iIndex) And (M.Index + M.Length < iIndex + iLength) Then
+                Result := InitMatchResult(mtStart, 1, M.Index + M.Length - iIndex)
+              Else If (M.Index > iIndex) And (M.Index + M.Length >= iIndex + iLength) Then
+                Result := InitMatchResult(mtEnd, M.Index - iIndex + 1, iIndex + iLength - M.Index)
+              Else
+                Result := InitMatchResult(mtMiddle, M.Index - iIndex + 1, M.Length);
+              Break;
+            End;
+        End;
+    End;
+
+  Var
+    i: Integer;
+    iTextPos: Integer;
+    MC: TMatchCollection;
+    MR: TMatchResult;
+    iColour: Integer;
+
+  Begin
+    R.Left := R.Left + ilScopeImages.Width + FExplorer.TextMargin;
+    iPos := R.Left + 2;
+    iTextPos := 1;
+    If edtExplorerFilter.Text <> '' Then
+      MC := FFilterRegEx.Matches(NodeData.FNode.Text);
+    For i := 0 To sl.Count - 1 Do
+      Begin
+        GetFontInfo(sl, i, NodeData.FNode.Title, TargetCanvas);
+        If Node = Sender.FocusedNode Then
+          If TargetCanvas.Brush.Color = TBADIOptions.BADIOptions.BGColour Then
+            TargetCanvas.Brush.Color :=
+              TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
+        If edtExplorerFilter.Text = '' Then
+          DrawTextToCanvas(sl[i], iTextPos)
+        Else
+          Begin
+            MR := IsMatched(iTextPos, Length(sl[i]), MC);
+            Case MR.FMatchType Of
+              mtNone: DrawTextToCanvas(sl[i], iTextPos);
+              mtStart:
+                Begin
+                  iColour := TargetCanvas.Brush.Color;
+                  TargetCanvas.Brush.Color := clAqua;
+                  DrawTextToCanvas(Copy(sl[i], 1, MR.FLength), iTextPos);
+                  TargetCanvas.Brush.Color := iColour;
+                  DrawTextToCanvas(Copy(sl[i], MR.FLength + 1, Length(sl[i]) - MR.FLength),
+                    iTextPos);
+                End;
+              mtFull:
+                Begin
+                  TargetCanvas.Brush.Color := clAqua;
+                  DrawTextToCanvas(sl[i], iTextPos)
+                End;
+              mtEnd:
+                Begin
+                  DrawTextToCanvas(Copy(sl[i], 1, MR.FStart - 1), iTextPos);
+                  TargetCanvas.Brush.Color := clAqua;
+                  DrawTextToCanvas(Copy(sl[i], MR.FStart, MR.FLength), iTextPos);
+                End;
+              mtMiddle:
+                Begin
+                  DrawTextToCanvas(Copy(sl[i], 1, MR.FStart - 1), iTextPos);
+                  iColour := TargetCanvas.Brush.Color;
+                  TargetCanvas.Brush.Color := clAqua;
+                  DrawTextToCanvas(Copy(sl[i], MR.FStart, MR.FLength), iTextPos);
+                  TargetCanvas.Brush.Color := iColour;
+                  DrawTextToCanvas(Copy(sl[i], MR.FStart + MR.FLength,
+                    Length(sl[i]) - MR.FStart - MR.FLength + 1),
+                    iTextPos);
+                End;
+            End;
           End;
       End;
+  End;
+
+Var
+  iPos: Integer;
+  NodeData : PTreeData;
+  R : TRect;
+  sl : TStringList;
+
+begin
+  CustomDraw := (doCustomDrawing In TBADIOptions.BADIOptions.Options);
+  If Not CustomDraw Then
+    Exit;
+  NodeData := Sender.GetNodeData(Node);
+  sl := NodeData.FNode.Tokens;
+  InitCanvasFont(TargetCanvas);
+  HighlightSelectedItem(TargetCanvas, FExplorer.Color, ItemRect);
+  RenderSelectedNode(TargetCanvas, FExplorer, Node, NodeData, sl, ItemRect, ilScopeImages.Width,
+    iPos);
+  R := ItemRect;
+  DrawTree(NodeData, R);
+  DrawImage(NodeData, R);
+  DrawText(NodeData, R, sl, iPos);
 end;
 
 (**
@@ -1971,7 +2553,7 @@ end;
 procedure TframeModuleExplorer.tvExplorerClick(Sender: TObject);
 
 Var
-  NodeData : ^TTreeData;
+  NodeData : PTreeData;
 
 begin
   If FSelectionChanging Then
@@ -1997,36 +2579,45 @@ end;
 
 (**
 
-  This method is an on key down event handler for the tree view.
+  This method is an on key press event handler for the tree view.
 
   @precon  None.
-  @postcon If an on focus event handler is assigned it is fired.
+  @postcon If an on focus event handler is assigned and enter is pressed it is fired else edits the
+           explorer tree view filter.
 
   @param   Sender as a TObject
-  @param   Key    as a Word as a reference
-  @param   Shift  as a TShiftState
+  @param   Key    as a Char as a reference
 
 **)
-procedure TframeModuleExplorer.tvExplorerKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+Procedure TframeModuleExplorer.tvExplorerKeyPress(Sender: TObject; Var Key: Char);
 
-begin
-  If Shift = [] Then
-    Case Key Of
-      13:
-        Begin
-          tvExplorerClick(Sender);
-          If Shift = [] Then
-            If Assigned(OnFocus) Then
-              FFocus(Sender);
-        End;
-      32, 48..57, 65..90, 97..122: ExplorerFilter := ExplorerFilter + Chr(Key);
-      8 :
-        If Length(ExplorerFilter) > 0 Then
-          ExplorerFilter := Copy(ExplorerFilter, 1, Length(ExplorerFilter) - 1);
-      27: ExplorerFilter := '';
-    End;
-end;
+Begin
+  Case Key Of
+    #08:
+      Begin
+        edtExplorerFilter.Text :=
+          Copy(edtExplorerFilter.Text, 1, Length(edtExplorerFilter.Text) - 1);
+        Key := #0;
+      End;
+    #13:
+      Begin
+        tvExplorerClick(Sender);
+        If Assigned(OnFocus) Then
+          FFocus(Sender);
+        Key := #0;
+      End;
+    #27:
+      Begin
+        edtExplorerFilter.Clear;
+        Key := #0;
+      End;
+    #32..#128:
+      Begin
+        edtExplorerFilter.Text := edtExplorerFilter.Text + Key;
+        Key := #0;
+      End;
+  End;
+End;
 
 { TBADIVirtualStringTree }
 
@@ -2048,15 +2639,15 @@ function TBADIVirtualStringTree.DoGetNodeWidth(Node: PVirtualNode;
   Column: TColumnIndex; Canvas: TCanvas): Integer;
 
 Var
-  NodeData : ^TTreeData;
+  NodeData : PTreeData;
   sl: TStringList;
   i: Integer;
 
 begin
   Result := 5;
   NodeData := GetNodeData(Node);
-  Self.Canvas.Font.Name := BrowseAndDocItOptions.FontName;
-  Self.Canvas.Font.Size := BrowseAndDocItOptions.FontSize;
+  Self.Canvas.Font.Name := TBADIOptions.BADIOptions.FontName;
+  Self.Canvas.Font.Size := TBADIOptions.BADIOptions.FontSize;
   sl := NodeData.FNode.Tokens;
   For i := 0 To sl.Count - 1 Do
     Begin

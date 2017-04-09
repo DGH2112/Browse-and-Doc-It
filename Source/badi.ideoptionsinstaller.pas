@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    09 Apr 2017
 
 **)
 Unit BADI.IDEOptionsInstaller;
@@ -34,6 +34,7 @@ Type
     FBADIModuleExtensions : TBADIIDEOptionsHandler;
     {$ENDIF}
   Strict Protected
+    Function IsShortcutUsed(Const iShortcut : TShortcut; Var strActionName : String) : Boolean;
   Public
     Constructor Create(UpdateMenuShortcuts : TNotifyEvent);
     Destructor Destroy; Override;
@@ -43,6 +44,7 @@ Implementation
 
 Uses
   ToolsAPI,
+  SysUtils,
   BADI.ParentFrame,
   BADI.CustomOptionsFrame,
   BADI.GeneralOptionsFrame,
@@ -70,23 +72,24 @@ Constructor TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts : TNotifyEvent);
 
 Begin
   {$IFDEF DXE00}
-  FBADIParentFrame := TBADIIDEOptionsHandler.Create(TfmBADIParentFrame, '', Nil);
+  FBADIParentFrame := TBADIIDEOptionsHandler.Create(TfmBADIParentFrame, '');
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIParentFrame);
-  FBADIGeneralOptions := TBADIIDEOptionsHandler.Create(TfmBADIGeneralOptions, 'General Options', Nil);
+  FBADIGeneralOptions := TBADIIDEOptionsHandler.Create(TfmBADIGeneralOptions, 'General Options');
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIGeneralOptions);
-  FBADISpecialtags := TBADIIDEOptionsHandler.Create(TfmBADISpecialTagsFrame, 'Special Tags', Nil);
+  FBADISpecialtags := TBADIIDEOptionsHandler.Create(TfmBADISpecialTagsFrame, 'Special Tags');
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADISpecialtags);
-  FBADIModuleExplorer := TBADIIDEOptionsHandler.Create(TfmBADIModuleExplorerFrame, 'Module Explorer', Nil);
+  FBADIModuleExplorer := TBADIIDEOptionsHandler.Create(TfmBADIModuleExplorerFrame, 'Module Explorer');
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIModuleExplorer);
-  FBADICodeBrowsing := TBADIIDEOptionsHandler.Create(TfmBADICodeBrowsingFrame, 'Code Browsing', Nil);
+  FBADICodeBrowsing := TBADIIDEOptionsHandler.Create(TfmBADICodeBrowsingFrame, 'Code Browsing');
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADICodeBrowsing);
-  FBADIExcludedDocs := TBADIIDEOptionsHandler.Create(TfmBADIExcludedDocFilesFrame, 'Excluded Documentation Files', Nil);
+  FBADIExcludedDocs := TBADIIDEOptionsHandler.Create(TfmBADIExcludedDocFilesFrame, 'Excluded Documentation Files');
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIExcludedDocs);
-  FBADIMethodDesc := TBADIIDEOptionsHandler.Create(TfmBADIMethodDescriptionsFrame, 'Method Descriptions', Nil);
+  FBADIMethodDesc := TBADIIDEOptionsHandler.Create(TfmBADIMethodDescriptionsFrame, 'Method Descriptions');
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIMethodDesc);
-  FBADIMenuShortcuts := TBADIIDEOptionsHandler.Create(TfmBADIMenuShortcuts, 'Menu Shortcuts', UpdateMenuShortcuts);
+  FBADIMenuShortcuts := TBADIIDEShortcutOptionsHandler.Create(TfmBADIMenuShortcuts, 'Menu Shortcuts',
+    UpdateMenuShortcuts, IsShortcutUsed);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIMenuShortcuts);
-  FBADIModuleExtensions := TBADIIDEOptionsHandler.Create(TfmBADIModuleExtensionsFrame, 'Module Extensions', Nil);
+  FBADIModuleExtensions := TBADIIDEOptionsHandler.Create(TfmBADIModuleExtensionsFrame, 'Module Extensions');
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIModuleExtensions);
   {$ENDIF}
 End;
@@ -114,6 +117,37 @@ Begin
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIModuleExtensions);
   {$ENDIF}
   Inherited Destroy;
+End;
+
+(**
+
+  This method checks to see if the given shortcut is in use by another part of the IDE.
+
+  @precon  None.
+  @postcon returns true of the shortcut is already in use and returns the name of the action in the
+           parameter strActionName else returns false.
+
+  @param   iShortcut     as a TShortcut as a constant
+  @param   strActionName as a String as a reference
+  @return  a Boolean
+
+**)
+Function TBADIIDEOptionsInstaller.IsShortcutUsed(Const iShortcut: TShortcut;
+  Var strActionName : String): Boolean;
+
+Var
+  NS : INTAServices;
+  iAction: Integer;
+
+Begin
+  Result := False;
+  If Supports(BorlandIDEServices, INTAServices, NS) Then
+    For iAction := 0 To NS.ActionList.ActionCount - 1 Do
+      If NS.ActionList.Actions[iAction].ShortCut = iShortcut Then
+        Begin
+          strActionName := NS.ActionList.Actions[iAction].Name;
+          Result := True;
+        End;
 End;
 
 End.

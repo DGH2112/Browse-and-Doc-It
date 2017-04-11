@@ -30,7 +30,6 @@ Type
   (** This class manages the creation and destruction of the IDE menus. **)
   TBADIIDEMenuInstaller = Class
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FINIFileName    : String;
     FBADIMenu       : TMenuItem;
     FBADIActions    : Array[Low(TBADIMenu)..High(TBADIMenu)] Of TAction;
     FEditorNotifier : TEditorNotifier;
@@ -72,12 +71,11 @@ Type
     Procedure NilActions;
     Procedure FreeActions;
   Public
-    Constructor Create(Const strINIFileName : String; EditorNotifier : TEditorNotifier);
+    Constructor Create(Const EditorNotifier : TEditorNotifier);
     Destructor Destroy; Override;
     Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine, iCommentCol: Integer);
     Procedure Focus(Sender: TObject);
     Procedure OptionsChange(Sender: TObject);
-    Procedure CheckForUpdatesClick(Sender: TObject);
     Procedure UpdateMenuShortcuts;
   End;
 
@@ -86,7 +84,6 @@ Implementation
 Uses
   //CodeSiteLogging,
   SysUtils,
-  CheckForUpdates,
   BADI.Documentation.Dispatcher,
   BADI.ToolsAPIUtils,
   BADI.DocumentationOptionsForm,
@@ -99,7 +96,6 @@ Uses
   BADI.CommonIDEFunctions,
   BADI.DockableModuleExplorer,
   ProgressForm,
-  DGHLibrary,
   BADI.Module.Dispatcher,
   BADI.ElementContainer,
   BADI.Generic.FunctionDecl,
@@ -116,10 +112,6 @@ ResourceString
       moved. **)
   strThereIsSelectedText = 'There is selected text in the editor. Do you wan' +
     't to move this text within the new comment';
-
-Const
-  (** This is the software ID for this module on the internet. **)
-  strSoftwareID = 'BrowseAndDocIt';
 
 { TBADIIDEMenuInstaller }
 
@@ -168,40 +160,21 @@ end;
 
 (**
 
-  This is an click event handler for the Check for Updates menu.
-
-  @precon  None.
-  @postcon Invokes the checking for updates.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TBADIIDEMenuInstaller.CheckForUpdatesClick(Sender: TObject);
-
-Begin
-  TCheckForUpdates.Execute(strSoftwareID, FINIFileName, Sender <> Nil);
-End;
-
-(**
-
   A constructor for the TBADIIDEMenuInstaller class.
 
   @precon  None.
   @postcon Creates the IDE menus.
 
-  @param   strINIFileName as a String as a constant
-  @param   EditorNotifier as a TEditorNotifier
+  @param   EditorNotifier as a TEditorNotifier as a Constant
 
 **)
-Constructor TBADIIDEMenuInstaller.Create(Const strINIFileName : String;
-  EditorNotifier : TEditorNotifier);
+Constructor TBADIIDEMenuInstaller.Create(Const EditorNotifier : TEditorNotifier);
 
 Var
   iImageIndex: Integer;
 
 Begin
   NilActions;
-  FINIFileName := strINIFileName;
   FEditorNotifier := EditorNotifier;
   CreateBADIMainMenu;
   iImageIndex := AddImagesToIDE;
@@ -219,8 +192,6 @@ Begin
   CreateMenuItem(FBADIMenu, bmToDoComment, ToDoCommentClick, Nil, iImageIndex + 10);
   CreateMenuItem(FBADIMenu, bmSep2, Nil, Nil, 0);
   CreateMenuItem(FBADIMenu, bmOptions, OptionsClick, Nil, iImageIndex + 11);
-  CreateMenuItem(FBADIMenu, bmSep3, Nil, Nil, 0);
-  CreateMenuItem(FBADIMenu, bmCheckForUpdates, CheckForUpdatesClick, Nil, iImageIndex + 12);
 End;
 
 (**

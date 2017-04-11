@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    09 Apr 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.IDEOptionsInstaller;
@@ -141,6 +141,7 @@ Var
 
 Begin
   Result := False;
+  {$IFDEF DXE30} // Shortcut property unfortunately not available in XE2 or below.
   If Supports(BorlandIDEServices, INTAServices, NS) Then
     For iAction := 0 To NS.ActionList.ActionCount - 1 Do
       If NS.ActionList.Actions[iAction].ShortCut = iShortcut Then
@@ -148,6 +149,7 @@ Begin
           strActionName := NS.ActionList.Actions[iAction].Name;
           Result := True;
         End;
+  {$ENDIF}
 End;
 
 End.

@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Apr 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -21,7 +21,7 @@ Uses
   BADI.ProfilingForm,
   BADI.Types,
   Contnrs,
-  Vcl.ActnList,
+  ActnList,
   Graphics;
 
 {$INCLUDE CompilerDefinitions.inc}
@@ -108,7 +108,7 @@ Uses
   BADI.Generic.PropertyDecl,
   BADI.Options,
   BADI.Functions,
-  Vcl.ComCtrls,
+  ComCtrls,
   BADI.Constants;
 
 ResourceString

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.DUnitCreator;
@@ -129,7 +129,11 @@ Uses
   SysUtils,
   Windows,
   BADI.ToolsAPIUtils,
-  DGHLibrary, BADI.ElementContainer, BADI.Module.Dispatcher, BADI.Types, BADI.ResourceStrings;
+  BADI.ElementContainer,
+  BADI.Module.Dispatcher,
+  BADI.Types,
+  BADI.ResourceStrings,
+  BADI.Functions;
 
 Const
   (** A constant to define the growth capacity of the collections. **)

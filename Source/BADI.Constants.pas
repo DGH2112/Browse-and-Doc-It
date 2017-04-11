@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Mar 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.Constants;
@@ -17,6 +17,13 @@ Uses
   Graphics;
 
 Const
+  (** This is a text string of revision from nil and a to z. **)
+  strRevision = ' abcdefghijklmnopqrstuvwxyz';
+  (** Universal name for all IDEs for use in the splash screen and about boxes. **)
+  strSplashScreenName = 'Browse and Doc It %d.%d%s for %s';
+  (** This is another message string to appear in the BDS 2005/6 splash screen **)
+  strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
+
   (** A default list of symbols which should not have spaces before them. **)
   strNoSpaceBeforeSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?', '<', '>'];
   (** A default list of symbols which should not have spaces after them. **)
@@ -361,10 +368,11 @@ Const
     (FName: 'BADIInSituComment';   FCaption: '&In-Situ Comment';      FShortcut: 'CTRL+SHIFT+ALT+I';     FMaskColor: clLime),
     (FName: 'BADIToDoComment';     FCaption: '&ToDo Comment';         FShortcut: 'CTRL+SHIFT+ALT+T';     FMaskColor: clLime),
     (FName: 'BADISep2';            FCaption: '';                      FShortcut: '';                     FMaskColor: clLime),
-    (FName: 'BADIOptions';         FCaption: '&Options...';           FShortcut: 'CTRL+SHIFT+ALT+O';     FMaskColor: clLime),
-    (FName: 'BADISep3';            FCaption: '';                      FShortcut: '';                     FMaskColor: clLime),
-    (FName: 'BADICheckForUpdates'; FCaption: 'Check for &Updates...'; FShortcut: '';                     FMaskColor: clLime)
+    (FName: 'BADIOptions';         FCaption: '&Options...';           FShortcut: 'CTRL+SHIFT+ALT+O';     FMaskColor: clLime)
   );
+
+  (** A constant to represent the initial (failed) position of a wizard reference. **)
+  iWizardFailState = -1;
 
 Implementation
 

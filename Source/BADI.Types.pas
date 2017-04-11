@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    02 Apr 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.Types;
@@ -383,9 +383,7 @@ Type
     bmInSituComment,
     bmToDoComment,
     bmSep2,
-    bmOptions,
-    bmSep3,
-    bmCheckForUpdates
+    bmOptions
   );
 
   (** A record to describe the menu defaults values. **)

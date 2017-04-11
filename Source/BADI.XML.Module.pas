@@ -5,7 +5,7 @@
   implemented.
 
   @Version    1.0
-  @Date       01 Apr 2017
+  @Date       11 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -22,7 +22,9 @@ Uses
   BADI.Comment,
   BADI.ElementContainer,
   BADI.Types,
-  BADI.TokenInfo, BADI.XML.XMLElement, BADI.XML.XMLPI;
+  BADI.TokenInfo,
+  BADI.XML.XMLElement,
+  BADI.XML.XMLPI;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -134,13 +136,18 @@ Type
 Implementation
 
 Uses
-  DGHLibrary,
   BADI.Options,
   BADI.ResourceStrings,
   BADI.Functions,
   BADI.Constants,
-  BADI.Module.Dispatcher, BADI.XML.ResourceStrings, BADI.XML.XMLElemDecl, BADI.XML.Comment,
-  BADI.XML.DocType, BADI.XML.XMLDecl, BADI.XML.XMLPERef, BADI.XML.XMLIgnoreElement,
+  BADI.Module.Dispatcher,
+  BADI.XML.ResourceStrings,
+  BADI.XML.XMLElemDecl,
+  BADI.XML.Comment,
+  BADI.XML.DocType,
+  BADI.XML.XMLDecl,
+  BADI.XML.XMLPERef,
+  BADI.XML.XMLIgnoreElement,
   BADI.XML.XMLIncludeElement;
 
 Const

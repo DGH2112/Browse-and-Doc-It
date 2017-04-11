@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    31 Mar 2017
+  @Date    11 Apr 2017
 
 **)
 Unit DGHLibrary;
@@ -6726,6 +6726,7 @@ Var
   R : TRect;
 
 Begin
+  {$IFDEF DXE30}
   R := Screen.WorkAreaRect;
   // Check Left and then Width
   If AForm.Left < R.Left Then
@@ -6743,6 +6744,7 @@ Begin
   // Check Top
   If AForm.Top + AForm.Height > R.Top + R.Height Then
     AForm.Top := R.Top + R.Height - AForm.Height;
+  {$ENDIF}
 End;
 {$ENDIF}
 

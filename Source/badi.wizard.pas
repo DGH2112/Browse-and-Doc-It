@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    25 Mar 2017
+  @Date    11 Apr 2017
   @Version 1.0
 
 **)
@@ -31,7 +31,6 @@ Type
   (** This is the class which defined the Wizard interface. **)
   TBrowseAndDocItWizard = Class(TNotifierObject, IOTANotifier, IOTAWizard)
   {$IFDEF D2005} Strict {$ENDIF} Private
-    FINIFileName             : String;
     FBADIIDEMenuInstaller    : TBADIIDEMenuInstaller;
     FBADIIDEOptionsInstaller : TBADIIDEOptionsInstaller;
     FEditorNotifier          : TEditorNotifier;
@@ -62,8 +61,7 @@ Implementation
 
 Uses
   BADI.DockableModuleExplorer,
-  DGHLibrary,
-  BADI.Common;
+  BADI.Constants;
 
 (**
 
@@ -80,7 +78,6 @@ Constructor TBrowseAndDocItWizard.Create;
 Begin
   Inherited Create;
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange);
-  FINIFileName := BuildRootKey(Nil, Nil);
   {$IFDEF D2005}
   FEditorNotifier := TEditorNotifier.Create;
   FEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
@@ -88,9 +85,8 @@ Begin
   {$ELSE}
   FEditorNotifier := TEditorNotifier.Create;
   {$ENDIF}
-  FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FINIFileName, FEditorNotifier);
+  FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FEditorNotifier);
   FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
-  FBADIIDEMenuInstaller.CheckForUpdatesClick(Nil);
 End;
 
 (**

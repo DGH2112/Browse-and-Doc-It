@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Feb 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.AboutBox;
@@ -22,8 +22,9 @@ Uses
   ToolsAPI,
   SysUtils,
   Windows,
-  BADI.Common,
-  Forms;
+  BADI.Functions,
+  Forms,
+  BADI.Constants;
 
 {$IFDEF D2005}
 Var

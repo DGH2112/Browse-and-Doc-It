@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       01 Apr 2017
+  @Date       11 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -108,7 +108,6 @@ Implementation
 
 Uses
   Windows,
-  DGHLibrary,
   BADI.Functions,
   BADI.Options,
   BADI.ResourceStrings,

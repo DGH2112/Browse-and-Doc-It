@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    02 Apr 2017
+  @Date    11 Apr 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -27,6 +27,9 @@ Uses
   ExtCtrls,
   CheckLst,
   ImgList,
+  {$IFDEF DXE100}
+  ImageList,
+  {$ENDIF}
   {$WARN UNIT_PLATFORM OFF} // For the FileCtrl unit
   FileCtrl,
   {$WARN UNIT_PLATFORM ON}
@@ -38,8 +41,7 @@ Uses
   BADI.ExcludedDocFilesFrame,
   BADI.MethodDescriptionsFrame,
   BADI.MenuShortcutsFrame,
-  BADI.ModuleExtensionsFrame,
-  ImageList;
+  BADI.ModuleExtensionsFrame;
 
 Type
   (** An enumerate to define the visisble tabs in the dialogue. **)
@@ -60,10 +62,8 @@ Type
     tabCodeBrowsing: TTabSheet;
     tabExcludeDocFiles: TTabSheet;
     tabMethodDescriptions: TTabSheet;
-    btnCheckForUpdates: TBitBtn;
     tabMenuShortcuts: TTabSheet;
     tabModuleExtensions: TTabSheet;
-    Procedure btnCheckForUpdatesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     { Private declarations }
   Strict Private
@@ -83,7 +83,6 @@ Type
 Implementation
 
 Uses
-  CheckForUpdatesOptionsForm,
   BADI.Options;
 
 {$R *.DFM}
@@ -184,21 +183,5 @@ begin
   FBADIModuleExtensionsFrame.Align := alClient;
   FBADIModuleExtensionsFrame.LoadSettings;
 end;
-
-(**
-
-  This is an on click event handler for the CheckforUpdates button.
-
-  @precon  None.
-  @postcon Displays the dialogue for configuring Check for Updates.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TfrmOptions.btnCheckForUpdatesClick(Sender: TObject);
-
-Begin
-  TfrmCheckForUpdatesOptions.Execute(TBADIOptions.BADIOptions.INIFileName);
-End;
 
 End.

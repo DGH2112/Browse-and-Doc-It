@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Feb 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.SplashScreen;
@@ -22,7 +22,8 @@ Uses
   SysUtils,
   Windows,
   Forms,
-  BADI.Common;
+  BADI.Functions,
+  BADI.Constants;
 
 (**
 

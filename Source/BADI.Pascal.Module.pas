@@ -3,10 +3,8 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       01 Apr 2017
+  @Date       11 Apr 2017
   @Author     David Hoyle
-
-  @grammar    For the grammar to this parser pleaser see the "Object Pascal Grammar.bnf".
 
   @todo       Implement an expression parser for the above compiler defines.
               Needs to be able to evaluate constants in the code and use the
@@ -292,7 +290,6 @@ Type
 Implementation
 
 Uses
-  DGHLibrary,
   BADI.Functions,
   BADI.Options,
   BADI.Constants,

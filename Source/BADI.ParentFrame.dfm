@@ -52,7 +52,7 @@ object fmBADIParentFrame: TfmBADIParentFrame
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    ExplicitTop = 32
+    ExplicitWidth = 40
   end
   object lblPleaseSelect: TLabel
     AlignWithMargins = True
@@ -69,7 +69,6 @@ object fmBADIParentFrame: TfmBADIParentFrame
     Font.Style = []
     ParentFont = False
     Layout = tlCenter
-    ExplicitTop = 136
     ExplicitWidth = 202
   end
   object lblInformation: TLabel

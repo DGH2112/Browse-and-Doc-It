@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    25 Mar 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.ParentFrame;
@@ -43,7 +43,7 @@ Type
 Implementation
 
 uses
-  BADI.Common;
+  BADI.Functions;
 
 {$R *.dfm}
 

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    09 Apr 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.Options;
@@ -244,10 +244,10 @@ Implementation
 
 Uses
   SysUtils,
-  DGHLibrary,
   BADI.Constants,
   IniFiles,
-  BADI.Module.Dispatcher;
+  BADI.Module.Dispatcher,
+  BADI.Functions;
 
 (**
 
@@ -298,7 +298,7 @@ Begin
   FExpandedNodes := TStringList.Create;
   FExpandedNodes.Sorted := True;
   FExpandedNodes.Duplicates := dupIgnore;
-  FINIFileName := BuildRootKey(Nil, Nil);
+  FINIFileName := BuildRootKey;
   FScopesToRender := [scPrivate, scProtected, scPublic, scPublished];
   FExcludeDocFiles := TStringList.Create;
   FMethodDescriptions := TStringList.Create;

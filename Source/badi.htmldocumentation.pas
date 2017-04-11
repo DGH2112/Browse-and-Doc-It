@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    01 Apr 2017
+  @Date    11 Apr 2017
   @Version 1.0
 
 **)
@@ -18,7 +18,9 @@ Uses
   Classes,
   BADI.Base.Module,
   BADI.Base.Documentation,
-  Contnrs, BADI.Types, BADI.ElementContainer;
+  Contnrs,
+  BADI.Types,
+  BADI.ElementContainer;
 
 Type
   (** This class represent a set of documenation conflicts for a module. **)
@@ -126,13 +128,16 @@ Implementation
 Uses
   SysUtils,
   Windows,
-  DGHLibrary,
   Graphics,
   {$IFNDEF D2007} GIFImage {$ELSE} GIFImg {$ENDIF},
   Controls,
   StrUtils,
-  BADI.Generic.Tokenizer, BADI.Options, BADI.ResourceStrings, BADI.Constants,
-  BADI.Module.Dispatcher, BADI.Functions;
+  BADI.Generic.Tokenizer,
+  BADI.Options,
+  BADI.ResourceStrings,
+  BADI.Constants,
+  BADI.Module.Dispatcher,
+  BADI.Functions;
 
 (**
 

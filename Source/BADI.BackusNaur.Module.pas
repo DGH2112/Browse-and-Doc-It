@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       01 Apr 2017
+  @Date       11 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -77,12 +77,12 @@ Type
 Implementation
 
 Uses
-  DGHLibrary,
   BADI.Options,
   BADI.ResourceStrings,
   BADI.Functions,
   BADI.Constants,
-  BADI.Module.Dispatcher, BADI.BackusNaur.Comment;
+  BADI.Module.Dispatcher,
+  BADI.BackusNaur.Comment;
 
 Resourcestring
   (** This is an error message for duplicate identifiers. **)

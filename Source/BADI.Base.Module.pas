@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    01 Apr 2017
+  @Date    11 Apr 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -280,7 +280,6 @@ Implementation
 Uses
   SysUtils,
   Windows,
-  DGHLibrary,
   INIFiles,
   BADI.ResourceStrings,
   BADI.Functions,

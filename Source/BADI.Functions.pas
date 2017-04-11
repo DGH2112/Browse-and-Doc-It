@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    04 Mar 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.Functions;
@@ -29,19 +29,27 @@ Type
 
   Procedure DisplayException(const strMsg : String); Overload;
   Procedure DisplayException(const strMsg : String; Const Params : Array Of Const); Overload;
-  Function IsKeyWord(const strWord : String; strWordList : Array Of String): Boolean;
-  Function IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; {$IFDEF D2005} InLine; {$ENDIF}
-  Function PrologCode(const strTemplate, strMethod : String; iPadding : Integer) : TStringList;
-  Function EpilogCode(const strTemplate, strMethod : String; iPadding : Integer) : TStringList;
-  Function OutputCommentAndTag(C: TBaseContainer; iMaxWidth: Integer; boolShowHTML: Boolean): String;
-  Function BuildLangIndepRep(Param: TGenericParameter): String;
-  Function BADIImageIndex(iBADIImageIndex : TBADIImageIndex; Ascope : TScope) : Integer;
+  Function  IsKeyWord(const strWord : String; strWordList : Array Of String): Boolean;
+  Function  IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; {$IFDEF D2005} InLine; {$ENDIF}
+  Function  PrologCode(const strTemplate, strMethod : String; iPadding : Integer) : TStringList;
+  Function  EpilogCode(const strTemplate, strMethod : String; iPadding : Integer) : TStringList;
+  Function  OutputCommentAndTag(C: TBaseContainer; iMaxWidth: Integer; boolShowHTML: Boolean): String;
+  Function  BuildLangIndepRep(Param: TGenericParameter): String;
+  Function  BADIImageIndex(iBADIImageIndex : TBADIImageIndex; Ascope : TScope) : Integer;
+  Procedure BuildNumber(var iMajor, iMinor, iBugFix, iBuild : Integer);
+  Function  BuildRootKey : String;
+  Function  Like(strPattern, strText : String) : Boolean;
+  Function  ConvertDate(Const strDate : String) : TDateTime;
+  Function  GetField(strText : String; Ch : Char; iIndex : Integer;
+    boolIgnoreQuotes : Boolean = True): String;
+  Function  CharCount(cChar : Char; strText : String; boolIgnoreQuotes : Boolean = True) : Integer;
 
 Implementation
 
 Uses
+  Windows,
   BADI.Constants,
-  DGHLibrary;
+  SHFolder;
 
 (**
 
@@ -318,6 +326,638 @@ Begin
   Result := Pred(Integer(iBADIImageIndex)) *
     (Integer(High(TScope)) - Integer(Low(TScope)) + 1) +
     Integer(AScope)
+End;
+
+(**
+
+  This is a method which obtains information about the package from is
+  version information with the package resources.
+
+  @precon  None.
+  @postcon Extracts and display the applications version number present within
+           the EXE file.
+
+  @param   iMajor  as an Integer as a reference
+  @param   iMinor  as an Integer as a reference
+  @param   iBugFix as an Integer as a reference
+  @param   iBuild  as an Integer as a reference
+
+**)
+Procedure BuildNumber(var iMajor, iMinor, iBugFix, iBuild : Integer);
+
+Var
+  VerInfoSize: DWORD;
+  VerInfo: Pointer;
+  VerValueSize: DWORD;
+  VerValue: PVSFixedFileInfo;
+  Dummy: DWORD;
+  strBuffer : Array[0..MAX_PATH] Of Char;
+
+Begin
+  { Build Number }
+  GetModuleFilename(hInstance, strBuffer, MAX_PATH);
+  VerInfoSize := GetFileVersionInfoSize(strBuffer, Dummy);
+  If VerInfoSize <> 0 Then
+    Begin
+      GetMem(VerInfo, VerInfoSize);
+      Try
+        GetFileVersionInfo(strBuffer, 0, VerInfoSize, VerInfo);
+        VerQueryValue(VerInfo, '\', Pointer(VerValue), VerValueSize);
+        With VerValue^ Do
+          Begin
+            iMajor := dwFileVersionMS shr 16;
+            iMinor := dwFileVersionMS and $FFFF;
+            iBugFix := dwFileVersionLS shr 16;
+            iBuild := dwFileVersionLS and $FFFF;
+          End;
+      Finally
+        FreeMem(VerInfo, VerInfoSize);
+      End;
+    End;
+End;
+
+(**
+
+  This function returns the users logon name as a String.
+
+  @precon  None.
+  @postcon Returns the users logon name as a String.
+
+  @return  a String
+
+**)
+Function UserName : String;
+
+Var
+  i : Cardinal;
+
+Begin
+  i := 1024;
+  SetLength(Result, i);
+  GetUserName(@Result[1], i);
+  Win32Check(LongBool(i));
+  SetLength(Result, i - 1);
+End;
+
+(**
+
+  This function returns the users computer name as a String.
+
+  @precon  None.
+  @postcon Returns the users computer name as a String.
+
+  @return  a String
+
+**)
+Function ComputerName : String;
+
+Var
+  i : Cardinal;
+
+Begin
+  i := 1024;
+  SetLength(Result, i);
+  GetComputerName(@Result[1], i);
+  Win32Check(LongBool(i));
+  SetLength(Result, i);
+End;
+
+(**
+
+  This method builds the root key INI filename for the loading and saving of
+  settings from the instance handle for the module.
+
+  @precon  slParams must be a valid instance of a TStringList class.
+  @postcon Builds the root key INI filename for the loading and saving of
+           settings from the instance handle for the module.
+
+  @return  a String
+
+**)
+Function BuildRootKey : String;
+
+ResourceString
+  strINIPattern = '%s Settings for %s on %s.INI';
+  strSeasonsFall = '\Season''s Fall\';
+
+var
+  strModuleName : String;
+  strINIFileName : String;
+  strUserAppDataPath : String;
+  strBuffer : String;
+  iSize : Integer;
+
+{$IFDEF D0007}
+// Delphi 7s SHFolder.pas file is missing this constant.
+Const
+  SHGFP_TYPE_CURRENT = 0; { current value for user, verify it exists }
+{$ENDIF}
+
+begin
+  SetLength(strBuffer, MAX_PATH);
+  iSize := GetModuleFileName(hInstance, PChar(strBuffer), MAX_PATH);
+  SetLength(strBuffer, iSize);
+  strModuleName := strBuffer;
+  strINIFileName := ChangeFileExt(ExtractFileName(strBuffer), '');
+  While (Length(strIniFilename) > 0) And
+    (CharInSet(strIniFileName[Length(strIniFilename)], ['0'..'9'])) Do
+    strIniFileName := Copy(strIniFileName, 1, Length(strIniFileName) - 1);
+  strINIFileName :=  Format(strINIPattern, [strIniFileName, UserName, ComputerName]);
+  SetLength(strBuffer, MAX_PATH);
+  SHGetFolderPath(0, CSIDL_APPDATA Or CSIDL_FLAG_CREATE, 0, SHGFP_TYPE_CURRENT,
+    PChar(strBuffer));
+  strBuffer := StrPas(PChar(strBuffer));
+  strUserAppDataPath := strBuffer + strSeasonsFall;
+  If Not DirectoryExists(strUserAppDataPath) Then
+    ForceDirectories(strUserAppDataPath);
+  Result := strUserAppDataPath + strINIFileName;
+end;
+
+(**
+
+  This routine returns the number of occurrances of the char found in the string
+  .
+
+  @precon  None.
+  @postcon Returns the number of occurrances of the char found in the string.
+
+  @param   cChar            as a Char
+  @param   strText          as a String
+  @param   boolIgnoreQuotes as a Boolean
+  @return  an Integer
+
+**)
+Function CharCount(cChar : Char; strText : String;
+  boolIgnoreQuotes : Boolean = True) : Integer;
+
+Var
+  iCount : Integer;
+  boolInQuotes : Boolean;
+
+Begin
+  Result := 0;
+  boolInQuotes := False;
+  For iCount := 1 to Length(strText) Do
+    Begin
+      If Not boolIgnoreQuotes Then
+        If strText[iCount] = '"' Then
+          boolInQuotes := Not boolInQuotes;
+      If strText[iCount] = cChar Then
+        If Not boolInQuotes Then
+          Inc(Result);
+    End;
+End;
+
+(**
+
+  This routine returns the position of the Nth occurrance of the character in
+  the text.
+
+  @precon  None.
+  @postcon Returns the position of the Nth occurrance of the character in the
+           text.
+
+  @param   strText          as a String
+  @param   Ch               as a Char
+  @param   iIndex           as an Integer
+  @param   boolIgnoreQuotes as a Boolean
+  @return  an Integer
+
+**)
+Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer;
+  boolIgnoreQuotes : Boolean = True): Integer;
+
+Var
+  i : Integer;
+  iCount : Integer;
+  boolInQuotes : Boolean;
+
+Begin
+  Result := 0;
+  iCount := 0;
+  boolInQuotes := False;
+  For i := 1 To Length(strText) Do
+    Begin
+      If Not boolIgnoreQuotes Then
+        If strText[i] = '"' Then
+          boolInQuotes := Not boolInQuotes;
+      If strText[i] = Ch Then
+        If Not boolInQuotes Then
+          Inc(iCount);
+      If iIndex = iCount Then
+        Begin
+          Result := i;
+          Exit;
+        End;
+    End;
+End;
+
+(**
+
+  This function returns the contents of the specified field in the delimited
+  text.
+
+  @precon  None.
+  @postcon Returns the contents of the specified field in the delimited text.
+
+  @param   strText          as a String
+  @param   Ch               as a Char
+  @param   iIndex           as an Integer
+  @param   boolIgnoreQuotes as a Boolean
+  @return  a String
+
+**)
+Function GetField(strText : String; Ch : Char; iIndex : Integer;
+  boolIgnoreQuotes : Boolean = True): String;
+
+Var
+  iNumOfFields : Integer;
+  iStart, iEnd : Integer;
+
+Begin
+  Result := '';
+  iNumOfFields := CharCount(Ch, strText, boolIgnoreQuotes) + 1;
+  If iIndex = 1 Then
+    Begin
+      If iNumOfFields > 1  Then
+        Begin
+          iEnd := PosOfNthChar(strText, Ch, 1, boolIgnoreQuotes);
+          Result := Copy(strText, 1, iEnd - 1);
+        End Else
+          Result := strText;
+    End
+  Else If (iIndex > 1) And (iIndex < iNumOfFields) Then
+    Begin
+      iStart := PosOfNthChar(strText, Ch, iIndex - 1, boolIgnoreQuotes);
+      iEnd := PosOfNthChar(strText, Ch, iIndex, boolIgnoreQuotes);
+      Result := Copy(strText, iStart + 1, iEnd - iStart - 1);
+    End
+  Else If iIndex = iNumOfFields Then
+    Begin
+      iStart := PosOfNthChar(strText, Ch, iIndex - 1, boolIgnoreQuotes);
+      Result := Copy(strText, iStart + 1, Length(strText) - iStart);
+    End;
+End;
+
+(**
+
+
+  This function returns true if the pattern matches the text.
+
+  @precon  None.
+  @postcon Returns true if the pattern matches the text.
+
+
+  @param   strPattern as a String
+  @param   strText    as a String
+  @return  a Boolean
+
+**)
+Function Like(strPattern, strText : String) : Boolean;
+
+Type
+  TMatchType = (mtStart, mtEnd);
+  TMatchTypes = Set Of TMatchType;
+
+Var
+  MatchTypes : TMatchTypes;
+  sl : TStringList;
+  i: Integer;
+  //iTokenIndex : Integer;
+  iStartIndex : Integer;
+  iPos: Integer;
+
+Begin
+  Result := False;
+  MatchTypes := [];
+  If Length(strPattern) = 0 Then
+    Exit;
+  If strPattern = '*' Then
+    Begin
+      Result := True;
+      Exit;
+    End;
+  If strPattern[1] <> '*' Then
+    Include(MatchTypes, mtStart)
+  Else
+    Delete(strPattern, 1, 1);
+  If Length(strPattern) > 0 Then
+    If strPattern[Length(strPattern)] <> '*' Then
+      Include(MatchTypes, mtEnd)
+    Else
+      Delete(strPattern, Length(strPattern), 1);
+  sl := TStringList.Create;
+  Try
+    For i := 1 To CharCount('*', strPattern) + 1 Do
+      sl.Add(lowercase(GetField(strPattern, '*', i)));
+    // Check start
+    //iTokenIndex := 1;
+    iStartIndex := 1;
+    If sl.Count > 0 Then
+      If mtStart In MatchTypes Then
+        If CompareText(sl[0], Copy(strText, 1, Length(sl[0]))) <> 0 Then
+          Exit
+        Else
+          Inc(iStartIndex, Length(sl[0]));
+    // Check in between
+    For i := Integer(mtStart In MatchTypes) To sl.Count - 1 - Integer(mtEnd In MatchTypes) Do
+      Begin
+        iPos := Pos(sl[i], lowercase(strText));
+        If (iPos = 0) Or (iPos < iStartIndex) Then
+          Exit;
+        //Inc(iTokenIndex, iPos);
+        Inc(iStartIndex, Length(sl[i]));
+      End;
+    // Check end
+    If sl.Count > 0 Then
+      If mtEnd In MatchTypes Then
+        If CompareText(sl[sl.Count - 1], Copy(strText, Length(strText) -
+          Length(sl[sl.Count - 1]) + 1, Length(sl[sl.Count - 1]))) <> 0 Then
+          Exit;
+    Result := True;
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
+  This function converts a freeform text string representing dates and times
+  in standard formats in to a TDateTime value.
+
+  @precon  strDate is the string to convert into a date.
+  @postcon Returns a valid TDateTime value.
+
+  @param   strDate as a String as a Constant
+  @return  a TDateTime
+
+**)
+Function ConvertDate(Const strDate : String) : TDateTime;
+
+Type
+  (** This is a record that defined the date and time for a date. **)
+  TDateRec = Record
+    iDay, iMonth, iYear, iHour, iMinute, iSecond, iMilli : Word;
+  End;
+
+Const
+  strErrMsg = 'Can not convert the date "%s" to a valid TDateTime value.';
+  {$IFNDEF D2009}
+  Delimiters : Set Of Char = ['-', ' ', '\', '/', ':', '.'];
+  {$ELSE}
+  Delimiters : Set Of AnsiChar = ['-', ' ', '\', '/', ':', '.'];
+  {$ENDIF}
+  Days : Array[1..7] Of String = ('fri', 'mon', 'sat', 'sun', 'thu', 'tue', 'wed');
+  Months : Array[1..24] Of String = (
+    'apr', 'april',
+    'aug', 'august',
+    'dec', 'december',
+    'feb', 'february',
+    'jan', 'january',
+    'jul', 'july',
+    'jun', 'june',
+    'mar', 'march',
+    'may', 'may',
+    'nov', 'november',
+    'oct', 'october',
+    'sep', 'september'
+    );
+  MonthIndexes : Array[1..24] Of Word = (
+    4, 4,
+    8, 8,
+    12, 12,
+    2, 2,
+    1, 1,
+    7, 7,
+    6, 6,
+    3, 3,
+    5, 5,
+    11, 11,
+    10, 10,
+    9, 9
+  );
+
+Var
+  i : Integer;
+  sl : TStringList;
+  strToken : String;
+  iTime : Integer;
+  recDate : TDateRec;
+  tmp : Word;
+  iIndex0, iIndex1, iIndex2 : Integer;
+
+  (**
+
+    This procedure adds the token to the specified string list and clears the
+    token.
+
+    @precon  StringList is the string list to add the token too and strToken is
+             the token to add to the list.
+    @postcon Adds the token to the specified string list and clears the
+             token.
+
+    @param   StringList as a TStringList
+    @param   strToken   as a String as a reference
+
+  **)
+  Procedure AddToken(StringList : TStringList; var strToken  : String);
+
+  Begin
+    If strToken <> '' Then
+      Begin
+        StringList.Add(strToken);
+        strToken := '';
+      End;
+  End;
+
+  (**
+
+    This procedure tries to extract the value from the indexed string list
+    item into the passed variable reference. It delete is true it remove the
+    item from the string list.
+
+    @precon  iIndex is the index of the item from the string list to extract,
+             iValue is a word variable to place the converted item into and
+             Delete determines whether the item is removed from the string list.
+    @postcon Tries to extract the value from the indexed string list item into
+             the passed variable reference. It delete is true it remove the
+             item from the string list.
+
+    @param   iIndex as an Integer
+    @param   iValue as a Word as a reference
+    @param   Delete as a Boolean
+
+  **)
+  Procedure ProcessValue(iIndex : Integer; var iValue : Word; Delete : Boolean);
+
+  Begin
+    If iIndex > sl.Count - 1 Then Exit;
+    Val(sl[iIndex], iValue, i);
+    If i <> 0 Then
+      Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
+    If Delete Then
+      sl.Delete(iIndex);
+  End;
+
+  (**
+
+    This procedure assigns string list indexes to the three index values
+    according to the short date format and what information is supplied.
+
+    @precon  None.
+    @postcon Assigns string list indexes to the three index values
+             according to the short date format and what information is
+             supplied.
+
+  **)
+  Procedure AssignIndexes();
+
+  Var
+    slFormat : TStringList;
+    str : String;
+    j : Integer;
+
+  Begin
+    iIndex0 := 0; // Default Day / Month / Year
+    iIndex1 := 1;
+    iIndex2 := 2;
+    slFormat := TStringList.Create;
+    Try
+      str := '';
+      For j := 1 To Length({$IFDEF DXE00}FormatSettings.{$ENDIF}ShortDateFormat) Do
+        {$IFNDEF D2009}
+        If ShortDateFormat[j] In Delimiters Then
+        {$ELSE}
+        If CharInSet({$IFDEF DXE00}FormatSettings.{$ENDIF}ShortDateFormat[j], Delimiters) Then
+        {$ENDIF}
+          AddToken(slFormat, str)
+        Else
+          str := str + {$IFDEF DXE00}FormatSettings.{$ENDIF}ShortDateFormat[j];
+      AddToken(slFormat, str);
+      // Remove day of week
+      For j := slFormat.Count - 1 DownTo 0 Do
+        {$IFNDEF D2009}
+        If (slFormat[j][1] In ['d', 'D']) And (Length(slFormat[j]) > 2) Then
+        {$ELSE}
+        If (CharInSet(slFormat[j][1], ['d', 'D'])) And (Length(slFormat[j]) > 2) Then
+        {$ENDIF}
+          slFormat.Delete(j);
+      For j := 0 To slFormat.Count - 1 Do
+        Begin
+          {$IFNDEF D2009}
+          If slFormat[j][1] In ['d', 'D'] Then
+          {$ELSE}
+          If CharInSet(slFormat[j][1], ['d', 'D']) Then
+          {$ENDIF}
+            iIndex0 := j;
+          {$IFNDEF D2009}
+          If slFormat[j][1] In ['m', 'M'] Then
+          {$ELSE}
+          If CharInSet(slFormat[j][1], ['m', 'M']) Then
+          {$ENDIF}
+            iIndex1 := j;
+          {$IFNDEF D2009}
+          If slFormat[j][1] In ['y', 'Y'] Then
+          {$ELSE}
+          If CharInSet(slFormat[j][1], ['y', 'Y']) Then
+          {$ENDIF}
+            iIndex2 := j;
+        End;
+    Finally
+      slFormat.Free;
+    End;
+  End;
+
+Begin
+  Result := 0;
+  sl := TStringList.Create;
+  Try
+    strToken := '';
+    iTime := -1;
+    For i := 1 To Length(strDate) Do
+      {$IFNDEF D2009}
+      If strDate[i] In Delimiters Then
+      {$ELSE}
+      If CharInSet(strDate[i], Delimiters) Then
+      {$ENDIF}
+        Begin
+          AddToken(sl, strToken);
+          {$IFNDEF D2009}
+          If (strDate[i] In [':']) And (iTime = -1) Then
+          {$ELSE}
+          If (CharInSet(strDate[i], [':'])) And (iTime = -1) Then
+          {$ENDIF}
+            iTime := sl.Count - 1;
+        End Else
+          strToken := strToken + strDate[i];
+    AddToken(sl, strToken);
+    FillChar(recDate, SizeOf(recDate), 0);
+    // Decode time
+    If iTime > -1 Then
+      Begin
+        ProcessValue(iTime,recDate.iHour, True);
+        ProcessValue(iTime,recDate.iMinute, True);
+        ProcessValue(iTime,recDate.iSecond, True);
+        ProcessValue(iTime,recDate.iMilli, True);
+      End;
+    // Remove day value if present
+    For i := sl.Count - 1 DownTo 0 Do
+      If IsKeyWord(sl[i], Days) Then
+        sl.Delete(i);
+    // Decode date
+    Case sl.Count Of
+      1 :
+        Begin
+          DecodeDate(Now, recDate.iYear, recDate.iMonth, tmp);
+          ProcessValue(0, recDate.iDay, False); // Day only
+        End;
+      2, 3 : // Day and Month (Year)
+        Begin
+          DecodeDate(Now, recDate.iYear, tmp, tmp);
+          AssignIndexes;
+          ProcessValue(iIndex0, recDate.iDay, False); // Get day
+          If IsKeyWord(sl[iIndex1], Months) Then
+            Begin
+              For i := Low(Months) To High(Months) Do
+                If CompareText(Months[i], sl[iIndex1]) = 0 Then
+                  Begin
+                    recDate.iMonth := MonthIndexes[i];
+                    Break;
+                  End;
+            End Else
+              ProcessValue(iIndex1, recDate.iMonth, False); // Get Month
+            If sl.Count = 3 Then
+              Begin
+                ProcessValue(iIndex2, recDate.iYear, False); // Get Year
+                If recDate.iYear < 1900 Then Inc(recDate.iYear, 2000);
+              End;
+        End;
+    Else
+      If sl.Count <> 0 Then
+        Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
+    End;
+    // Output result.
+    With recDate Do
+      Begin
+        If Not (iHour In [0..23]) Then
+          Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
+        If Not (iMinute In [0..59]) Then
+          Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
+        If Not (iSecond In [0..59]) Then
+          Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
+        Result := EncodeTime(iHour, iMinute, iSecond, iMilli);
+        If iYear * iMonth * iDay <> 0 Then
+          Begin
+            If Not (iDay In [1..31]) Then
+              Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
+            If Not (iMonth In [1..12]) Then
+              Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
+            Result := Result + EncodeDate(iYear, iMonth, iDay);
+          End;
+      End;
+  Finally
+    sl.Free;
+  End;
 End;
 
 End.

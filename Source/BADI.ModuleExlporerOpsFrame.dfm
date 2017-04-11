@@ -248,6 +248,5 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Anchors = [akTop, akRight]
     Associate = edtLimits
     TabOrder = 13
-    OnChangingEx = udLimitsChangingEx
   end
 end

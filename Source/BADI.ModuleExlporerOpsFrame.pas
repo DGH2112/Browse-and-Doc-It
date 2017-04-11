@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Apr 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.ModuleExlporerOpsFrame;
@@ -27,6 +27,8 @@ Uses
   BADI.Base.Module,
   BADI.CustomOptionsFrame,
   BADI.Types;
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** This is a class which represents the frame interface. **)
@@ -65,12 +67,13 @@ Type
     procedure chkStrikeoutClick(Sender: TObject);
     procedure chkUnderlineClick(Sender: TObject);
     procedure cbxLimitsChange(Sender: TObject);
-    procedure udLimitsChangingEx(Sender: TObject; var AllowChange: Boolean;
-      NewValue: Integer; Direction: TUpDownDirection);
   Private
     { Private declarations }
     FTokenFontInfo: Array [Low(TBADITokenType) .. High(TBADITokenType)] Of TTokenFontInfo;
     FIssueLimits : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
+  Protected
+    procedure udLimitsChangingEx(Sender: TObject; var AllowChange: Boolean;
+      NewValue: {$IFDEF DXE30}Integer{$ELSE}SmallInt{$ENDIF}; Direction: TUpDownDirection);
   Public
     { Public declarations }
     Constructor Create(AOwner: TComponent); Override;
@@ -258,6 +261,7 @@ Begin
   cbxLimits.Items.Add('Warnings');
   cbxLimits.Items.Add('Hints');
   cbxLimits.Items.Add('Conflicts');
+  udLimits.OnChangingEx := udLimitsChangingEx;
 End;
 
 (**
@@ -367,10 +371,11 @@ End;
 
 **)
 Procedure TfmBADIModuleExplorerFrame.udLimitsChangingEx(Sender: TObject;
-  Var AllowChange: Boolean; NewValue: Integer; Direction: TUpDownDirection);
+  Var AllowChange: Boolean; NewValue: {$IFDEF DXE30}Integer{$ELSE}SmallInt{$ENDIF};
+  Direction: TUpDownDirection);
 
 Begin
-  AllowChange := (NewValue > 0) And (NewValue <= 100);
+  //AllowChange := (NewValue > 0) And (NewValue <= 100);
   FIssueLimits[TLimitType(cbxLimits.ItemIndex)] := NewValue;
 End;
 

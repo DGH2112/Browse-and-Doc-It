@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.InitialiseOTAInterfaces;
@@ -36,9 +36,9 @@ Uses
   BADI.DockableModuleExplorer,
   BADI.BNFHighlighter,
   BADI.EidolonHighlighter,
-  BADI.Common,
   BADI.SplashScreen,
-  BADI.AboutBox;
+  BADI.AboutBox,
+  BADI.Constants;
 
 Type
   (** An enumerate to define the type of wizard. **)

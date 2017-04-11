@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    01 Apr 2017
+  @Date    11 Apr 2017
   @Version 1.0
 
 **)
@@ -107,10 +107,8 @@ Uses
   ExceptionLog7,
   EExceptionManager,
   {$ENDIF}
-  DGHLibrary,
   BADI.Options,
   BADI.Functions,
-  //Test.BADI.Module.Dispatcher,
   BADI.Module.Dispatcher;
 
 Type

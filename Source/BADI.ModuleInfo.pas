@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.1
-  @Date    26 Mar 2017
+  @Date    11 Apr 2017
 
 **)
 Unit BADI.ModuleInfo;
@@ -15,18 +15,20 @@ Uses
   BADI.Base.Module,
   BADI.Types;
 
+{$INCLUDE CompilerDefinitions.inc}
+
 Type
   (** A class to hold the information required by the system for each registered module
       parser. **)
   TModuleInfo = Class
-    {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
     FExtensions: String;
     FCls:        TBaseLanguageModuleClass;
     FCanDoc:     Boolean;
     FBlockCmt:   TCommentType;
     FLineCmt:    TCommentType;
     FInSituCmt:  TCommentType;
-    {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Protected
   Public
     Constructor Create(Const Cls: TBaseLanguageModuleClass; Const strExtensions: String;
       Const boolCanDoc: Boolean; Const iBlockCmt, iLineCmt, iInSituCmt: TCommentType);
@@ -78,6 +80,9 @@ Type
 Implementation
 
 Uses
+  {$IFNDEF DXE30}
+  DGHLibrary,
+  {$ENDIF}
   SysUtils;
 
 (**
@@ -96,10 +101,19 @@ Function TModuleInfo.CanProcessExt(Const strExt: String): Boolean;
 Var
   astrExts : TArray<String>;
   iExt: Integer;
+  {$IFNDEF DXE30}
+  i : Integer;
+  {$ENDIF}
 
 Begin
   Result := False;
+  {$IFDEF DXE30}
   astrExts := FExtensions.Split([';']);
+  {$ELSE}
+  SetLength(astrExts, CharCount(';', FExtensions) + 1);
+  For i := Low(astrExts) To High(astrExts) Do
+    astrExts[i] := GetField(FExtensions, ';', Succ(i));
+  {$ENDIF}
   For iExt := Low(astrExts) To High(astrExts) Do
     If CompareText(strExt, astrExts[iExt]) = 0 Then
       Begin

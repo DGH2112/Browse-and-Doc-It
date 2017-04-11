@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       01 Apr 2017
+  @Date       11 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -162,15 +162,18 @@ Type
 Implementation
 
 Uses
-  DGHLibrary,
   BADI.Options,
   BADI.ResourceStrings,
   BADI.Functions,
   BADI.Constants,
   BADI.Module.Dispatcher,
-  BADI.Eidolon.TLSSchematic.Comment, BADI.Eidolon.TLSSchematic.Constants,
-  BADI.Eidolon.TLSSchematic.ResourceStrings, BADI.Eidolon.TLSSchematic.SchematicSetting,
-  BADI.Eidolon.TLSSchematic.NoText, BADI.Eidolon.TLSSchematic.TLSObject, BADI.Eidolon.Constants;
+  BADI.Eidolon.TLSSchematic.Comment,
+  BADI.Eidolon.TLSSchematic.Constants,
+  BADI.Eidolon.TLSSchematic.ResourceStrings,
+  BADI.Eidolon.TLSSchematic.SchematicSetting,
+  BADI.Eidolon.TLSSchematic.NoText,
+  BADI.Eidolon.TLSSchematic.TLSObject,
+  BADI.Eidolon.Constants;
 
 (**
 

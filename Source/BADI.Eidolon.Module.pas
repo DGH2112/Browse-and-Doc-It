@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       01 Apr 2017
+  @Date       11 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -22,11 +22,22 @@ Uses
   BADI.Comment,
   BADI.ElementContainer,
   BADI.Types,
-  BADI.TokenInfo, BADI.Eidolon.BaseTable, BADI.Eidolon.FieldDef,
-  BADI.Eidolon.DBTable, BADI.Eidolon.TimeLocationTable, BADI.Eidolon.Symbol,
-  BADI.Eidolon.CustomFillSymbol, BADI.Eidolon.Line, BADI.Eidolon.Bar, BADI.Eidolon.Rectangle, BADI.Eidolon.SuperBar,
-  BADI.Eidolon.Diamond, BADI.Eidolon.Triangle, BADI.Eidolon.Ellipse,
-  BADI.Eidolon.RequirementsTable, BADI.Eidolon.TextTable;
+  BADI.TokenInfo,
+  BADI.Eidolon.BaseTable,
+  BADI.Eidolon.FieldDef,
+  BADI.Eidolon.DBTable,
+  BADI.Eidolon.TimeLocationTable,
+  BADI.Eidolon.Symbol,
+  BADI.Eidolon.CustomFillSymbol,
+  BADI.Eidolon.Line,
+  BADI.Eidolon.Bar,
+  BADI.Eidolon.Rectangle,
+  BADI.Eidolon.SuperBar,
+  BADI.Eidolon.Diamond,
+  BADI.Eidolon.Triangle,
+  BADI.Eidolon.Ellipse,
+  BADI.Eidolon.RequirementsTable,
+  BADI.Eidolon.TextTable;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -127,7 +138,6 @@ Type
 Implementation
 
 Uses
-  DGHLibrary,
   BADI.ResourceStrings,
   BADI.Functions,
   BADI.Constants,
@@ -135,8 +145,12 @@ Uses
   BADI.Eidolon.Association,
   BADI.Eidolon.ResourceStrings,
   BADI.Eidolon.Constants,
-  BADI.Eidolon.ConnectionDef, BADI.Eidolon.Comment, BADI.Eidolon.DatabaseDef,
-  BADI.Eidolon.OutputTable, BADI.Eidolon.TableNameDef, BADI.Eidolon.TextTableDef;
+  BADI.Eidolon.ConnectionDef,
+  BADI.Eidolon.Comment,
+  BADI.Eidolon.DatabaseDef,
+  BADI.Eidolon.OutputTable,
+  BADI.Eidolon.TableNameDef,
+  BADI.Eidolon.TextTableDef;
 
 (**
 

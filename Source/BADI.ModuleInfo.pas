@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.1
-  @Date    11 Apr 2017
+  @Date    12 Apr 2017
 
 **)
 Unit BADI.ModuleInfo;
@@ -80,10 +80,8 @@ Type
 Implementation
 
 Uses
-  {$IFNDEF DXE30}
-  DGHLibrary,
-  {$ENDIF}
-  SysUtils;
+  SysUtils,
+  BADI.Functions;
 
 (**
 

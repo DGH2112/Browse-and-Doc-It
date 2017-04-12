@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    11 Apr 2017
+  @Date    12 Apr 2017
 
 **)
 unit BADI.DUnitForm;
@@ -487,12 +487,8 @@ End;
 **)
 procedure TfrmDUnit.FormCreate(Sender: TObject);
 
-Type
-  T = TBADIImageIndex;
-
 Var
   strFileName : String;
-  i : T;
 
 begin
   FTestCases := TStringList.Create;
@@ -505,12 +501,7 @@ begin
     End;
   vstTestCases.NodeDataSize := SizeOf(TTreeData);
   vstTestCases.OnGetText := vstTestCasesGetText;
-  ilScopeImages.Clear;
-  For i := Succ(Low(T)) to High(T) Do
-    If Not ilScopeImages.GetInstRes(hInstance, rtBitmap,
-      BADIImageList[i].FResourceName, 16, [lrDefaultColor],
-      BADIImageList[i].FMaskColour) Then
-      ShowMessage(Format('Resource "%s" not found.', [BADIImageList[i].FResourceName]));
+  LoadBADIImages(ilScopeImages);
   strFileName := ChangeFileExt(ExtractFileName(ActiveProject.FileName), '') +
     'Tests.dpr';
   edtNewProjectName.Text := AddUniqueName(cbxExistingProject.Items, strFileName);
@@ -559,8 +550,7 @@ begin
   M := FDUnitCreator.Module;
   If M Is TPascalModule Then
     Begin
-      FRootElement := TLabelContainer.Create(Format('Test Units for %s', [
-        M.AsString(True, False)]), scNone, 0, 0, iiNone, Nil);
+      FRootElement := TLabelContainer.Create(M.AsString(True, False), scNone, 0, 0, iiModule, Nil);
       T := M.FindElement(strTypesLabel);
       If T <> Nil Then
         Begin

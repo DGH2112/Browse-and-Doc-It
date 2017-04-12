@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    11 Apr 2017
+  @Date    12 Apr 2017
 
 **)
 Unit BADI.Functions;
@@ -15,6 +15,7 @@ Uses
   SysUtils,
   Classes,
   Dialogs,
+  Controls,
   BADI.Types,
   BADI.Base.Container,
   BADI.Generic.Parameter;
@@ -29,27 +30,31 @@ Type
 
   Procedure DisplayException(const strMsg : String); Overload;
   Procedure DisplayException(const strMsg : String; Const Params : Array Of Const); Overload;
-  Function  IsKeyWord(const strWord : String; strWordList : Array Of String): Boolean;
-  Function  IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; {$IFDEF D2005} InLine; {$ENDIF}
-  Function  PrologCode(const strTemplate, strMethod : String; iPadding : Integer) : TStringList;
-  Function  EpilogCode(const strTemplate, strMethod : String; iPadding : Integer) : TStringList;
-  Function  OutputCommentAndTag(C: TBaseContainer; iMaxWidth: Integer; boolShowHTML: Boolean): String;
-  Function  BuildLangIndepRep(Param: TGenericParameter): String;
-  Function  BADIImageIndex(iBADIImageIndex : TBADIImageIndex; Ascope : TScope) : Integer;
-  Procedure BuildNumber(var iMajor, iMinor, iBugFix, iBuild : Integer);
+  Function  IsKeyWord(Const strWord : String; Const strWordList : Array Of String): Boolean;
+  Function  IsInSet(Const C : Char; Const strCharSet : TSetOfAnsiChar) : Boolean; {$IFDEF D2005} InLine; {$ENDIF}
+  Function  PrologCode(Const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
+  Function  EpilogCode(Const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
+  Function  OutputCommentAndTag(Const C: TBaseContainer; Const iMaxWidth: Integer;
+    Const boolShowHTML: Boolean): String;
+  Function  BuildLangIndepRep(Const Param: TGenericParameter): String;
+  Function  BADIImageIndex(Const iBADIImageIndex : TBADIImageIndex; Const AScope : TScope) : Integer;
+  Procedure BuildNumber(Var iMajor, iMinor, iBugFix, iBuild : Integer);
   Function  BuildRootKey : String;
-  Function  Like(strPattern, strText : String) : Boolean;
+  Function  Like(Const strPattern, strText : String) : Boolean;
   Function  ConvertDate(Const strDate : String) : TDateTime;
-  Function  GetField(strText : String; Ch : Char; iIndex : Integer;
-    boolIgnoreQuotes : Boolean = True): String;
-  Function  CharCount(cChar : Char; strText : String; boolIgnoreQuotes : Boolean = True) : Integer;
+  Function  GetField(Const strText : String; Const Ch : Char; Const iIndex : Integer;
+    Const boolIgnoreQuotes : Boolean = True): String;
+  Function  CharCount(Const cChar : Char; Const strText : String;
+    Const boolIgnoreQuotes : Boolean = True) : Integer;
+  Procedure LoadBADIImages(Const ilScopeImages : TImageList);
 
 Implementation
 
 Uses
   Windows,
   BADI.Constants,
-  SHFolder;
+  SHFolder,
+  Graphics;
 
 (**
 
@@ -86,21 +91,19 @@ End;
 
 (**
 
+  This function returns true if the given word is in the supplied word list. It uses a binary search
+  , so the word lists need to be sorted.
 
-  This function returns true if the given word is in the supplied word list.
-  It uses a binary search, so the word lists need to be sorted.
-
-  @precon  strWord is the word to be searches for in the word list and
-           strWordList is a static array of words in lowercase and
-           alphabetical order.
+  @precon  strWord is the word to be searches for in the word list and strWordList is a static
+           array of words in lowercase and alphabetical order.
   @postcon Returns true if the word is found in the list.
 
   @param   strWord     as a String as a constant
-  @param   strWordList as an Array Of String
+  @param   strWordList as an Array Of String as a constant
   @return  a Boolean
 
 **)
-function IsKeyWord(const strWord : String; strWordList : Array Of String): Boolean;
+function IsKeyWord(Const strWord : String; Const strWordList : Array Of String): Boolean;
 
 Var
   l, m, r : Integer;
@@ -128,19 +131,19 @@ end;
 
 (**
 
-  This function centralises the checking of characters in set for both AnsiChars
-  and Unicode Chars so that the parser tokeniser are not riddled with
-  conditional compilation statements.
+  This function centralises the checking of characters in set for both AnsiChars and Unicode Chars
+  so that the parser tokeniser are not riddled with conditional compilation statements.
 
   @precon  None.
   @postcon Checks to see if the char is in the set and returns true if so.
 
-  @param   C          as a Char
-  @param   strCharSet as a TSetOfAnsiChar
+  @param   C          as a Char as a constant
+  @param   strCharSet as a TSetOfAnsiChar as a constant
   @return  a Boolean
 
 **)
-Function IsInSet(C : Char; strCharSet : TSetOfAnsiChar) : Boolean; {$IFDEF D2005} InLine; {$ENDIF}
+Function IsInSet(Const C : Char; Const strCharSet : TSetOfAnsiChar) : Boolean;
+  {$IFDEF D2005} InLine; {$ENDIF}
 
 Begin
   {$IFNDEF D2009}
@@ -152,20 +155,20 @@ End;
 
 (**
 
-  This procedure returns a string list containing the prolog element of code passed in the
-  template parameter.
+  This procedure returns a string list containing the prolog element of code passed in the template
+  parameter.
 
   @precon  strTemplate must contain the macro $METHODCODE$.
-  @postcon Returns a string list containing the prolog element of code passed in the
-           template parameter.
+  @postcon Returns a string list containing the prolog element of code passed in the template
+           parameter.
 
   @param   strTemplate as a String as a constant
   @param   strMethod   as a String as a constant
-  @param   iPadding    as an Integer
+  @param   iPadding    as an Integer as a constant
   @return  a TStringList
 
 **)
-Function PrologCode(const strTemplate, strMethod : String; iPadding : Integer) : TStringList;
+Function PrologCode(Const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
 
 Var
   strPadding : String;
@@ -191,20 +194,20 @@ End;
 
 (**
 
-  This procedure returns a string list containing the epilog element of code passed in the
-  template parameter.
+  This procedure returns a string list containing the epilog element of code passed in the template
+  parameter.
 
   @precon  strTemplate must contain the macro $METHODCODE$.
-  @postcon Returns a string list containing the epilog element of code passed in the
-           template parameter.
+  @postcon Returns a string list containing the epilog element of code passed in the template
+           parameter.
 
   @param   strTemplate as a String as a constant
   @param   strMethod   as a String as a constant
-  @param   iPadding    as an Integer
+  @param   iPadding    as an Integer as a constant
   @return  a TStringList
 
 **)
-Function EpilogCode(const strTemplate, strMethod : String; iPadding : Integer) : TStringList;
+Function EpilogCode(const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
 
 Var
   strPadding : String;
@@ -230,20 +233,21 @@ End;
 
 (**
 
-  This function outputs the comment or tag as a string missing out HTML tags if
-  not required and any trialing whitespace.
+  This function outputs the comment or tag as a string missing out HTML tags if not required and any
+  trialing whitespace.
 
   @precon  C must eb a valid instance of a TBaseContainer.
-  @postcon Outputs the comment or tag as a string missing out HTML tags if not
-           required and any trialing whitespace.
+  @postcon Outputs the comment or tag as a string missing out HTML tags if not required and any
+           trialing whitespace.
 
-  @param   C            as a TBaseContainer
-  @param   iMaxWidth    as an Integer
-  @param   boolShowHTML as a Boolean
+  @param   C            as a TBaseContainer as a constant
+  @param   iMaxWidth    as an Integer as a constant
+  @param   boolShowHTML as a Boolean as a constant
   @return  a String
 
 **)
-Function OutputCommentAndTag(C: TBaseContainer; iMaxWidth: Integer; boolShowHTML: Boolean): String;
+Function OutputCommentAndTag(Const C: TBaseContainer; Const iMaxWidth: Integer;
+  Const boolShowHTML: Boolean): String;
 
 Var
   iToken: Integer;
@@ -288,11 +292,12 @@ End;
   @precon  None.
   @postcon Returns a string language independant representation of the parameter.
 
-  @param   Param as a TGenericParameter
+  @param   Param as a TGenericParameter as a constant
   @return  a String
 
 **)
-function BuildLangIndepRep(Param: TGenericParameter): String;
+function BuildLangIndepRep(Const Param: TGenericParameter): String;
+
 begin
   Result := '';
   If Param.ParamType = Nil Then
@@ -315,12 +320,12 @@ end;
   @precon  None.
   @postcon An image index is returned.
 
-  @param   iBADIImageIndex as a TBADIImageIndex
-  @param   Ascope          as a TScope
+  @param   iBADIImageIndex as a TBADIImageIndex as a constant
+  @param   AScope          as a TScope as a constant
   @return  an Integer
 
 **)
-Function BADIImageIndex(iBADIImageIndex : TBADIImageIndex; Ascope : TScope) : Integer;
+Function BADIImageIndex(Const iBADIImageIndex : TBADIImageIndex; Const AScope : TScope) : Integer;
 
 Begin
   Result := Pred(Integer(iBADIImageIndex)) *
@@ -475,20 +480,19 @@ end;
 
 (**
 
-  This routine returns the number of occurrances of the char found in the string
-  .
+  This routine returns the number of occurrances of the char found in the string .
 
   @precon  None.
   @postcon Returns the number of occurrances of the char found in the string.
 
-  @param   cChar            as a Char
-  @param   strText          as a String
-  @param   boolIgnoreQuotes as a Boolean
+  @param   cChar            as a Char as a constant
+  @param   strText          as a String as a constant
+  @param   boolIgnoreQuotes as a Boolean as a constant
   @return  an Integer
 
 **)
-Function CharCount(cChar : Char; strText : String;
-  boolIgnoreQuotes : Boolean = True) : Integer;
+Function CharCount(Const cChar : Char; Const strText : String;
+  Const boolIgnoreQuotes : Boolean = True) : Integer;
 
 Var
   iCount : Integer;
@@ -510,12 +514,10 @@ End;
 
 (**
 
-  This routine returns the position of the Nth occurrance of the character in
-  the text.
+  This routine returns the position of the Nth occurrance of the character in the text.
 
   @precon  None.
-  @postcon Returns the position of the Nth occurrance of the character in the
-           text.
+  @postcon Returns the position of the Nth occurrance of the character in the text.
 
   @param   strText          as a String
   @param   Ch               as a Char
@@ -554,21 +556,20 @@ End;
 
 (**
 
-  This function returns the contents of the specified field in the delimited
-  text.
+  This function returns the contents of the specified field in the delimited text.
 
   @precon  None.
   @postcon Returns the contents of the specified field in the delimited text.
 
-  @param   strText          as a String
-  @param   Ch               as a Char
-  @param   iIndex           as an Integer
-  @param   boolIgnoreQuotes as a Boolean
+  @param   strText          as a String as a constant
+  @param   Ch               as a Char as a constant
+  @param   iIndex           as an Integer as a constant
+  @param   boolIgnoreQuotes as a Boolean as a constant
   @return  a String
 
 **)
-Function GetField(strText : String; Ch : Char; iIndex : Integer;
-  boolIgnoreQuotes : Boolean = True): String;
+Function GetField(Const strText : String; Const Ch : Char; Const iIndex : Integer;
+  Const boolIgnoreQuotes : Boolean = True): String;
 
 Var
   iNumOfFields : Integer;
@@ -601,19 +602,17 @@ End;
 
 (**
 
-
   This function returns true if the pattern matches the text.
 
   @precon  None.
   @postcon Returns true if the pattern matches the text.
 
-
-  @param   strPattern as a String
-  @param   strText    as a String
+  @param   strPattern as a String as a constant
+  @param   strText    as a String as a constant
   @return  a Boolean
 
 **)
-Function Like(strPattern, strText : String) : Boolean;
+Function Like(Const strPattern, strText : String) : Boolean;
 
 Type
   TMatchType = (mtStart, mtEnd);
@@ -626,30 +625,32 @@ Var
   //iTokenIndex : Integer;
   iStartIndex : Integer;
   iPos: Integer;
+  strModPattern : String;
 
 Begin
   Result := False;
   MatchTypes := [];
-  If Length(strPattern) = 0 Then
+  strModPattern := strPattern;
+  If Length(strModPattern) = 0 Then
     Exit;
-  If strPattern = '*' Then
+  If strModPattern = '*' Then
     Begin
       Result := True;
       Exit;
     End;
-  If strPattern[1] <> '*' Then
+  If strModPattern[1] <> '*' Then
     Include(MatchTypes, mtStart)
   Else
-    Delete(strPattern, 1, 1);
-  If Length(strPattern) > 0 Then
-    If strPattern[Length(strPattern)] <> '*' Then
+    Delete(strModPattern, 1, 1);
+  If Length(strModPattern) > 0 Then
+    If strModPattern[Length(strModPattern)] <> '*' Then
       Include(MatchTypes, mtEnd)
     Else
-      Delete(strPattern, Length(strPattern), 1);
+      Delete(strModPattern, Length(strModPattern), 1);
   sl := TStringList.Create;
   Try
-    For i := 1 To CharCount('*', strPattern) + 1 Do
-      sl.Add(lowercase(GetField(strPattern, '*', i)));
+    For i := 1 To CharCount('*', strModPattern) + 1 Do
+      sl.Add(lowercase(GetField(strModPattern, '*', i)));
     // Check start
     //iTokenIndex := 1;
     iStartIndex := 1;
@@ -957,6 +958,53 @@ Begin
       End;
   Finally
     sl.Free;
+  End;
+End;
+
+(**
+
+  This method loads the BADI images from the DLLs resources into an image list multipling the number
+  of images by the number of overlay masks for scope.
+
+  @precon  None.
+  @postcon The images are loaded, one for each scope.
+
+  @param   ilScopeImages as a TImageList as a Constant
+
+**)
+Procedure LoadBADIImages(Const ilScopeImages : TImageList);
+
+Var
+  R: TRect;
+  MainImage: TBitmap;
+  ScopeImage: TBitmap;
+  iImage: TBADIImageIndex;
+  iScope: TScope;
+  x: Integer;
+  y: Integer;
+
+Begin
+  R := Rect(0, 0, 11, 11);
+  MainImage := TBitMap.Create;
+  Try
+    ScopeImage := TBitmap.Create;
+    Try
+      For iImage := Succ(Low(TBADIImageIndex)) To High(TBADIImageIndex) Do
+        For iScope := Low(TScope) To High(TScope) Do
+          Begin
+              MainImage.LoadFromResourceName(hInstance, BADIImageList[iImage].FResourceName);
+              ScopeImage.LoadFromResourceName(hInstance, BADIScopeList[iScope].FResourceName);
+              For x := 0 To 11 Do
+                For y := 0 To 11 Do
+                  If ScopeImage.Canvas.Pixels[x, y] <> BADIScopeList[iScope].FMaskColour Then
+                    MainImage.Canvas.Pixels[x, y] := ScopeImage.Canvas.Pixels[x, y];
+              ilScopeImages.AddMasked(MainImage, BADIImageList[iImage].FMaskColour);
+          End;
+    Finally
+      ScopeImage.Free;
+    End;
+  Finally
+    MainImage.Free;
   End;
 End;
 

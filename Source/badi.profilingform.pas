@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    09 Apr 2017
+  @Date    11 Apr 2017
 
 **)
 unit BADI.ProfilingForm;
@@ -31,7 +31,9 @@ uses
   ImgList,
   Contnrs,
   ExtCtrls,
+  {$IFDEF XE100}
   ImageList,
+  {$ENDIF}
   BADI.ElementContainer;
 
 type
@@ -162,7 +164,6 @@ Uses
   BADI.ToolsAPIUtils,
   BADI.Pascal.Module,
   IniFiles,
-  dghlibrary,
   BADI.Generic.FunctionDecl,
   BADI.ResourceStrings,
   BADI.Constants,

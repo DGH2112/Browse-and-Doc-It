@@ -12,6 +12,8 @@ Unit BADI.ModuleExplorerFrame;
 
 Interface
 
+{$INCLUDE CompilerDefinitions.Inc}
+
 Uses
   Windows,
   Messages,
@@ -38,8 +40,6 @@ Uses
   RegularExpressions,
   BADI.Comment,
   BADI.ElementContainer;
-
-{$INCLUDE CompilerDefinitions.Inc}
 
 Type
   (** This class represents information about each nodes. Used in a collection
@@ -290,7 +290,6 @@ Type
       Var Abort: Boolean);
     Procedure SetStatusPanel(ePanel: TStatusPanelIndex; const strStatusBarText: string;
       iValue: Integer);
-    Procedure LoadBADIImages;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Procedure CMMouseLeave(var Msg : TMessage); Message CM_MOUSELEAVE;
   public
@@ -945,7 +944,7 @@ begin
   FHintWin.Canvas.Font.Assign(FExplorer.Font);
   edtExplorerFilter.Font.Assign(FExplorer.Font);
   ilScopeImages.Clear;
-  LoadBADIImages;
+  LoadBADIImages(ilScopeImages);
   FExplorer.OnGetText := tvExplorerGetText;
 end;
 
@@ -1177,51 +1176,6 @@ Begin
       P := FExplorer.NodeParent[P];
     End;
   Result := str;
-End;
-
-(**
-
-  This method loads the BADI images from the DLLs resources into an image list multipling the
-  number of images by the number of overlay masks for scope.
-
-  @precon  None.
-  @postcon The images are loaded, one for each scope.
-
-**)
-Procedure TframeModuleExplorer.LoadBADIImages;
-
-Var
-  R: TRect;
-  MainImage: TBitmap;
-  ScopeImage: TBitmap;
-  iImage: TBADIImageIndex;
-  iScope: TScope;
-  x: Integer;
-  y: Integer;
-
-Begin
-  R := Rect(0, 0, 11, 11);
-  MainImage := TBitMap.Create;
-  Try
-    ScopeImage := TBitmap.Create;
-    Try
-      For iImage := Succ(Low(TBADIImageIndex)) To High(TBADIImageIndex) Do
-        For iScope := Low(TScope) To High(TScope) Do
-          Begin
-              MainImage.LoadFromResourceName(hInstance, BADIImageList[iImage].FResourceName);
-              ScopeImage.LoadFromResourceName(hInstance, BADIScopeList[iScope].FResourceName);
-              For x := 0 To 11 Do
-                For y := 0 To 11 Do
-                  If ScopeImage.Canvas.Pixels[x, y] <> BADIScopeList[iScope].FMaskColour Then
-                    MainImage.Canvas.Pixels[x, y] := ScopeImage.Canvas.Pixels[x, y];
-              ilScopeImages.AddMasked(MainImage, BADIImageList[iImage].FMaskColour);
-          End;
-    Finally
-      ScopeImage.Free;
-    End;
-  Finally
-    MainImage.Free;
-  End;
 End;
 
 (**

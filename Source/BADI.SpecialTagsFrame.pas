@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    01 Apr 2017
+  @Date    09 Apr 2017
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -24,7 +24,9 @@ Uses
   StdCtrls,
   Buttons,
   ComCtrls,
+  {$IFDEF DXE100}
   ImageList,
+  {$ENDIF}
   ImgList,
   BADI.CustomOptionsFrame;
 

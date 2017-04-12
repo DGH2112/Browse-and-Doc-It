@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    01 Apr 2017
+  @Date    12 Apr 2017
   @Author  David Hoyle
   @Version 1.0
 
@@ -30,9 +30,11 @@ Uses
   ActnList,
   ToolWin,
   VirtualTrees,
-  System.Actions,
+  {$IFDEF DXE100}
+  Actions,
   ImageList,
-  Vcl.StdCtrls,
+  {$ENDIF}
+  StdCtrls,
   RegularExpressions,
   BADI.Comment,
   BADI.ElementContainer;
@@ -333,9 +335,10 @@ Uses
   IniFiles,
   Types,
   Math,
-  DGHLibrary,
   BADI.Generic.Tokenizer,
+  {$IFDEF DXE20}
   UITypes,
+  {$ENDIF}
   RegularExpressionsCore,
   BADI.Types,
   BADI.Options,
@@ -935,7 +938,7 @@ begin
     End;
   FMouseEnter := False;
   FExplorer.NodeDataSize := SizeOf(TTreeData);
-  FINIFileName := BuildRootKey(Nil, Nil);
+  FINIFileName := TBADIOptions.BADIOptions.INIFileName;
   FNodeInfo := TObjectList.Create(True);
   FHintWin := TCustomHintWindow.Create(Self, FExplorer);
   FHintWin.Color := TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;

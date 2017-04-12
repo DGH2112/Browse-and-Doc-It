@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    11 Apr 2017
+  @Date    12 Apr 2017
 
 **)
 unit BADI.ProfilingForm;
@@ -31,7 +31,7 @@ uses
   ImgList,
   Contnrs,
   ExtCtrls,
-  {$IFDEF XE100}
+  {$IFDEF DXE100}
   ImageList,
   {$ENDIF}
   BADI.ElementContainer;
@@ -168,7 +168,8 @@ Uses
   BADI.ResourceStrings,
   BADI.Constants,
   BADI.Options,
-  BADI.Types;
+  BADI.Types,
+  BADI.Functions;
 
 Type
   (** This is a record to describe the data stored in the virtual tree view. **)
@@ -291,22 +292,11 @@ End;
 **)
 procedure TfrmProfiling.FormCreate(Sender: TObject);
 
-Type
-  T = TBADIImageIndex;
-
-Var
-  i : T;
-
 begin
   LoadSettings;
   vstMethods.NodeDataSize := SizeOf(TTreeData);
   vstMethods.OnGetText := vstMethodsGetText;
-  ilScopeImages.Clear;
-  For i := Succ(Low(T)) to High(T) Do
-    If Not ilScopeImages.GetInstRes(hInstance, rtBitmap,
-      BADIImageList[i].FResourceName, 16, [lrDefaultColor],
-      BADIImageList[i].FMaskColour) Then
-      ShowMessage(Format('Resource "%s" not found.', [BADIImageList[i].FResourceName]));
+  LoadBADIImages(ilScopeImages);
 end;
 
 (**
@@ -340,8 +330,7 @@ Var
   I : TElementContainer;
 
 begin
-  FRootElement := TLabelContainer.Create(Format('Profilable Methods for %s', [
-    M.AsString(True, False)]), scNone, 0, 0, iiNone, Nil);
+  FRootElement := TLabelContainer.Create(M.AsString(True, False), scNone, 0, 0, iiModule, Nil);
   I := M.FindElement(strImplementedMethodsLabel);
   If I <> Nil Then
     Begin

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    09 Apr 2017
+  @Date    11 Apr 2017
 
 **)
 unit BADI.DUnitForm;
@@ -30,7 +30,9 @@ uses
   VirtualTrees,
   BADI.Base.Module,
   ImgList,
-  System.ImageList,
+  {$IFDEF DXE100}
+  ImageList,
+  {$ENDIF}
   ExtCtrls,
   BADI.ElementContainer;
 
@@ -112,7 +114,6 @@ Uses
   BADI.ToolsAPIUtils,
   BADI.Pascal.Module,
   IniFiles,
-  dghlibrary,
   BADI.Generic.FunctionDecl,
   BADI.Types,
   BADI.ResourceStrings,
@@ -120,7 +121,7 @@ Uses
   BADI.Options,
   BADI.Pascal.RecordDecl,
   BADI.Pascal.MethodDecl,
-  BADI.Pascal.PropertyDecl;
+  BADI.Pascal.PropertyDecl, BADI.Functions;
 
 Type
   (** This is a record to describe the data stored in the virtual tree view. **)

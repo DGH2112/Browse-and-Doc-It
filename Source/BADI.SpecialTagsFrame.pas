@@ -4,12 +4,14 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    09 Apr 2017
+  @Date    13 Apr 2017
 
 **)
 Unit BADI.SpecialTagsFrame;
 
 Interface
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Uses
   Windows,
@@ -33,25 +35,23 @@ Uses
 Type
   (** This is a class to represent the frame interface. **)
   TfmBADISpecialTagsFrame = Class(TFrame, IBADIOptionsFrame)
-    lbSpecialTags: TListBox;
-    HeaderControl: THeaderControl;
     btnDelete: TBitBtn;
     btnEdit: TBitBtn;
     btnMoveDown: TBitBtn;
     btnMoveUp: TBitBtn;
-    CheckedImages: TImageList;
     btnAdd: TBitBtn;
-    Procedure lbSpecialTagsDrawItem(Control: TWinControl; Index: Integer; Rect: TRect;
-      State: TOwnerDrawState);
-    Procedure lbSpecialTagsMouseDown(Sender: TObject; Button: TMouseButton;
+    lvSpecialTags: TListView;
+    Procedure lvSpecialTagsMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     Procedure btnAddClick(Sender: TObject);
     Procedure btnDeleteClick(Sender: TObject);
     Procedure btnEditClick(Sender: TObject);
     Procedure btnMoveUpClick(Sender: TObject);
     Procedure btnMoveDownClick(Sender: TObject);
-    Procedure lbSpecialTagsClick(Sender: TObject);
     procedure lbSpecialTagsDblClick(Sender: TObject);
+    procedure lvSpecialTagsSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+    procedure lvSpecialTagsCustomDrawSubItem(Sender: TCustomListView; Item: TListItem;
+      SubItem: Integer; State: TCustomDrawState; var DefaultDraw: Boolean);
   Private
     { Private declarations }
   Public
@@ -67,15 +67,20 @@ Implementation
 
 
 Uses
+  CodeSiteLogging,
   BADI.Base.Module,
   BADI.SpecialTagForm,
   BADI.Constants,
   BADI.OptionsForm,
-  BADI.Options;
+  BADI.Options, BADI.Types;
 
 ResourceString
   (** This is a message to be displayed when a tag is not valid **)
   strInvalidTag = 'This is not a valid tag.';
+
+Const
+  (** A constant array of boolean strings for displaying option settings. **)
+  strBoolean : Array[False..True] Of String = ('False', 'True');
 
 { TfmBADISpecialTagsFrame }
 
@@ -93,22 +98,27 @@ Procedure TfmBADISpecialTagsFrame.btnAddClick(Sender: TObject);
 
 Var
   strName, strDesc: String;
-  boolShowInTree, boolExpand, boolShowInDoc: Boolean;
+  setTagProps : TBADITagProperties;
+  Item: TListItem;
 
 Begin
-  If TfrmSpecialTag.Execute(strName, strDesc, boolShowInTree, boolExpand,
-    boolShowInDoc) Then
+  Item := Nil;
+  If TfrmSpecialTag.Execute(strName, strDesc, setTagProps) Then
     Begin
       If (strName = '') Or (strDesc = '') Then
         MessageDlg(strInvalidTag, mtWarning, [mbOK], 0)
       Else
-        lbSpecialTags.Items.AddObject(Lowercase(strName) + '=' +
-          strDesc, TObject(
-          Integer(boolShowInTree) * iShowInTree +
-          Integer(boolExpand) * iAutoExpand +
-          Integer(boolShowInDoc) * iShowinDoc)
-          );
-      lbSpecialTagsClick(Sender);
+        Begin
+          Item := lvSpecialTags.Items.Add;
+          Item.Caption := LowerCase(strName);
+          Item.SubItems.Add(strDesc);
+          Item.SubItems.Add(strBoolean[tpShowInTree In setTagProps]);
+          Item.SubItems.Add(strBoolean[tpAutoExpand In setTagProps]);
+          Item.SubItems.Add(strBoolean[tpShowInDoc In setTagProps]);
+          Item.SubItems.Add(strBoolean[tpFixed In setTagProps]);
+          lvSpecialTags.Selected := Item;
+        End;
+      lvSpecialTagsSelectItem(Sender, Item, Item <> Nil);
     End;
 End;
 
@@ -126,10 +136,10 @@ End;
 Procedure TfmBADISpecialTagsFrame.btnDeleteClick(Sender: TObject);
 
 Begin
-  If lbSpecialTags.ItemIndex <> - 1 Then
+  If lvSpecialTags.ItemIndex <> - 1 Then
     Begin
-      lbSpecialTags.Items.Delete(lbSpecialTags.ItemIndex);
-      lbSpecialTagsClick(Sender);
+      lvSpecialTags.Items.Delete(lvSpecialTags.ItemIndex);
+      lvSpecialTagsSelectItem(Sender, Nil, False);
     End;
 End;
 
@@ -148,36 +158,37 @@ Procedure TfmBADISpecialTagsFrame.btnEditClick(Sender: TObject);
 
 Var
   strName, strDesc: String;
-  boolShowInTree, boolExpand, boolShowInDoc: Boolean;
-  iPos: Integer;
+  setTPOps: TBADITagProperties;
+  Item: TListItem;
 
 Begin
-  If lbSpecialTags.ItemIndex <> - 1 Then
+  If lvSpecialTags.ItemIndex <> - 1 Then
     Begin
-      iPos := Pos('=', lbSpecialTags.Items[lbSpecialTags.ItemIndex]);
-      strName := Copy(lbSpecialTags.Items[lbSpecialTags.ItemIndex], 1, iPos - 1);
-      strDesc := Copy(lbSpecialTags.Items[lbSpecialTags.ItemIndex], iPos + 1,
-        Length(lbSpecialTags.Items[lbSpecialTags.ItemIndex]) - iPos);
-      boolShowInTree := Integer(lbSpecialTags.Items.Objects[lbSpecialTags.ItemIndex])
-        And iShowInTree <> 0;
-      boolExpand := Integer(lbSpecialTags.Items.Objects[lbSpecialTags.ItemIndex])
-        And iAutoExpand <> 0;
-      boolShowInDoc := Integer(lbSpecialTags.Items.Objects[lbSpecialTags.ItemIndex])
-        And iShowinDoc <> 0;
-      If TfrmSpecialTag.Execute(strName, strDesc, boolShowInTree, boolExpand,
-        boolShowInDoc) Then
+      Item := lvSpecialTags.Selected;
+      strName := Item.Caption;
+      strDesc := Item.SubItems[0];
+      setTPOps := [];
+      If StrToBool(Item.SubItems[1]) Then
+        Include(setTPOps, tpShowInTree);
+      If StrToBool(Item.SubItems[2]) Then
+        Include(setTPOps, tpAutoExpand);
+      If StrToBool(Item.SubItems[3]) Then
+        Include(setTPOps, tpShowInDoc);
+      If StrToBool(Item.SubItems[4]) Then
+        Include(setTPOps, tpFixed);
+      If TfrmSpecialTag.Execute(strName, strDesc, setTPOps) Then
         Begin
           If (strName = '') Or (strDesc = '') Then
             MessageDlg(strInvalidTag, mtWarning, [mbOK], 0)
           Else
-            lbSpecialTags.Items[lbSpecialTags.ItemIndex] := Lowercase(strName) +
-              '=' + strDesc;
-          lbSpecialTags.Items.Objects[lbSpecialTags.ItemIndex] :=
-            TObject(
-            Integer(boolShowInTree) * iShowInTree +
-            Integer(boolExpand) * iAutoExpand +
-            Integer(boolShowInDoc) * iShowinDoc
-            );
+            Begin
+              Item.Caption := strName;
+              Item.SubItems[0] := strDesc;
+              Item.SubItems[1] := strBoolean[tpShowInTree In setTPOps];
+              Item.SubItems[2] := strBoolean[tpAutoExpand In setTPOps];
+              Item.SubItems[3] := strBoolean[tpShowInDoc In setTPOps];
+              Item.SubItems[4] := strBoolean[tpFixed In setTPOps];
+            End;
         End;
     End;
 End;
@@ -194,12 +205,23 @@ End;
 
 **)
 Procedure TfmBADISpecialTagsFrame.btnMoveDownClick(Sender: TObject);
+
+Var
+  Item: TListItem;
+
 Begin
-  If lbSpecialTags.ItemIndex < lbSpecialTags.Items.Count - 1 Then
+  If lvSpecialTags.ItemIndex < lvSpecialTags.Items.Count - 1 Then
     Begin
-      lbSpecialTags.Items.Exchange(lbSpecialTags.ItemIndex,
-        lbSpecialTags.ItemIndex + 1);
-      lbSpecialTagsClick(Sender);
+      lvSpecialTags.Items.BeginUpdate;
+      Try
+        Item := lvSpecialTags.Items.Insert(lvSpecialTags.ItemIndex + 2);
+        Item.Caption := lvSpecialTags.Selected.Caption;
+        Item.SubItems.Assign(lvSpecialTags.Selected.SubItems);
+        lvSpecialTags.Items.Delete(lvSpecialTags.ItemIndex);
+        lvSpecialTags.Selected := Item;
+      Finally
+        lvSpecialTags.Items.EndUpdate;
+      End;
     End;
 End;
 
@@ -215,12 +237,23 @@ End;
 
 **)
 Procedure TfmBADISpecialTagsFrame.btnMoveUpClick(Sender: TObject);
+
+Var
+  Item: TListItem;
+
 Begin
-  If lbSpecialTags.ItemIndex > 0 Then
+  If lvSpecialTags.ItemIndex > 0 Then
     Begin
-      lbSpecialTags.Items.Exchange(lbSpecialTags.ItemIndex,
-        lbSpecialTags.ItemIndex - 1);
-      lbSpecialTagsClick(Sender);
+      lvSpecialTags.Items.BeginUpdate;
+      Try
+        Item := lvSpecialTags.Items.Insert(lvSpecialTags.ItemIndex - 1);
+        Item.Caption := lvSpecialTags.Selected.Caption;
+        Item.SubItems.Assign(lvSpecialTags.Selected.SubItems);
+        lvSpecialTags.Items.Delete(lvSpecialTags.ItemIndex);
+        lvSpecialTags.Selected := Item;
+      Finally
+        lvSpecialTags.Items.EndUpdate;
+      End;
     End;
 End;
 
@@ -238,27 +271,30 @@ Constructor TfmBADISpecialTagsFrame.Create(AOwner: TComponent);
 
 Begin
   Inherited Create(AOwner);
-  lbSpecialTagsClick(Nil);
+  lvSpecialTagsSelectItem(Nil, Nil, False);
 End;
 
 (**
 
-  This is an on click event handler for the special tags list.
+  This method enables or disables the buttons depending upon the selection.
 
   @precon  None.
-  @postcon Updates the availability of the 5 buttons under the list.
+  @postcon The buttons are enabled or disabled depending upon the selection.
 
-  @param   Sender as a TObject
+  @param   Sender   as a TObject
+  @param   Item     as a TListItem
+  @param   Selected as a Boolean
 
 **)
-Procedure TfmBADISpecialTagsFrame.lbSpecialTagsClick(Sender: TObject);
+Procedure TfmBADISpecialTagsFrame.lvSpecialTagsSelectItem(Sender: TObject; Item: TListItem;
+  Selected: Boolean);
 
 Begin
-  btnEdit.Enabled := lbSpecialTags.ItemIndex > -1;
-  btnDelete.Enabled := lbSpecialTags.ItemIndex > -1;
-  btnMoveUp.Enabled := lbSpecialTags.ItemIndex > 0;
-  btnMoveDown.Enabled := (lbSpecialTags.ItemIndex > -1) And
-    (lbSpecialTags.ItemIndex < lbSpecialTags.Items.Count - 1);
+  btnDelete.Enabled := Item <> Nil;
+  btnEdit.Enabled := Item <> Nil;
+  btnMoveDown.Enabled := (Item <> Nil) And (Item.Index > -1) And
+    (Item.Index < lvSpecialTags.Items.Count - 1);
+  btnMoveUp.Enabled := (Item <> Nil) And (Item.Index > 0);
 End;
 
 (**
@@ -279,39 +315,29 @@ End;
 
 (**
 
-  This method draws the items in the listbox.
+  This method highlights the boolean options with a green background for true and red background for
+  false options to make them stand out.
 
-  @precon  Control is the control that called the method, Index is the index of
-           the item to be drawn, Rect is the rectangle of the item to be draw,
-           and State is the state of the item to be drawn
-  @postcon Draw the list boix item with check boxes for options.
+  @precon  None.
+  @postcon The boolean options are highlighted.
 
-  @param   Control as a TWinControl
-  @param   Index   as an Integer
-  @param   Rect    as a TRect
-  @param   State   as a TOwnerDrawState
+  @param   Sender      as a TCustomListView
+  @param   Item        as a TListItem
+  @param   SubItem     as an Integer
+  @param   State       as a TCustomDrawState
+  @param   DefaultDraw as a Boolean as a reference
 
 **)
-Procedure TfmBADISpecialTagsFrame.lbSpecialTagsDrawItem(Control: TWinControl;
-  Index: Integer; Rect: TRect; State: TOwnerDrawState);
-
-Var
-  lb: TListBox;
-  iPos: Integer;
+Procedure TfmBADISpecialTagsFrame.lvSpecialTagsCustomDrawSubItem(Sender: TCustomListView;
+  Item: TListItem; SubItem: Integer; State: TCustomDrawState; Var DefaultDraw: Boolean);
 
 Begin
-  lb := Control As TListBox;
-  lb.Canvas.FillRect(Rect);
-  CheckedImages.Draw(lb.Canvas, 37, Rect.Top,
-    Integer(lb.Items.Objects[Index]) And iShowInTree);
-  CheckedImages.Draw(lb.Canvas, 122, Rect.Top,
-    (Integer(lb.Items.Objects[Index]) And iAutoExpand) Div 2);
-  CheckedImages.Draw(lb.Canvas, 207, Rect.Top,
-    (Integer(lb.Items.Objects[Index]) And iShowinDoc) Div 3);
-  iPos := Pos('=', lb.Items[Index]);
-  lb.Canvas.TextOut(Rect.Left + 296, Rect.Top, Copy(lb.Items[Index], 1, iPos - 1));
-  lb.Canvas.TextOut(Rect.Left + 386, Rect.Top, Copy(lb.Items[Index], iPos + 1,
-    Length(lb.Items[Index]) - iPos));
+  Sender.Canvas.Brush.Color := clWindow;
+  If SubItem > 1 Then
+    If StrToBool(Item.SubItems[Pred(SubItem)]) Then
+      Sender.Canvas.Brush.Color := $80FF80
+    Else
+      Sender.Canvas.Brush.Color := $8080FF;
 End;
 
 (**
@@ -330,26 +356,33 @@ End;
   @param   Y      as an Integer
 
 **)
-Procedure TfmBADISpecialTagsFrame.lbSpecialTagsMouseDown(Sender: TObject;
+Procedure TfmBADISpecialTagsFrame.lvSpecialTagsMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 
 Var
-  iIndex: Integer;
+  Item: TListItem;
+  iLeft, iRight : Integer;
+  iOp: Integer;
+  boolOp: Boolean;
 
 Begin
-  iIndex := lbSpecialTags.ItemAtPos(Point(X, Y), True);
-  If iIndex > - 1 Then
+  Item := lvSpecialTags.GetItemAt(X, Y);
+  If Item <> Nil Then
     Begin
-      If X In [37 .. 58] Then
-        lbSpecialTags.Items.Objects[iIndex] := TObject(
-          Integer(lbSpecialTags.Items.Objects[iIndex]) Xor iShowInTree);
-      If X In [112 .. 128] Then
-        lbSpecialTags.Items.Objects[iIndex] := TObject(
-          Integer(lbSpecialTags.Items.Objects[iIndex]) Xor iAutoExpand);
-      If X In [192 .. 208] Then
-        lbSpecialTags.Items.Objects[iIndex] := TObject(
-          Integer(lbSpecialTags.Items.Objects[iIndex]) Xor iShowinDoc);
-      lbSpecialTags.Invalidate;
+      iLeft := 0;
+      Inc(iLeft, lvSpecialTags.Column[0].Width); // Tag Name
+      Inc(iLeft, lvSpecialTags.Column[1].Width); // Tag Description
+      For iOp := 1 To 4 Do // Subitems 1 to 4
+        Begin
+          iRight := iLeft + lvSpecialTags.Column[Succ(iOp)].Width;
+          If (X >= iLeft) And (X <= iRight) Then
+            Begin
+              boolOp := StrToBool(Item.SubItems[iOp]);
+              Item.SubItems[iOp] := strBoolean[Not boolOp];
+              Break;
+            End;
+          iLeft := iRight;
+        End;
     End;
 End;
 
@@ -365,11 +398,21 @@ Procedure TfmBADISpecialTagsFrame.LoadSettings;
 
 Var
   j: Integer;
+  Item: TListItem;
+  setTPOps: TBADITagProperties;
 
 Begin
   For j := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
-    lbSpecialTags.Items.AddObject(TBADIOptions.BADIOptions.SpecialTags[j],
-      TBADIOptions.BADIOptions.SpecialTags.Objects[j]);
+    Begin
+      Item := lvSpecialTags.Items.Add;
+      Item.Caption := TBADIOptions.BADIOptions.SpecialTags.Names[j];
+      Item.SubItems.Add(TBADIOptions.BADIOptions.SpecialTags.ValueFromIndex[j]);
+      setTPOps := TBADITagProperties(Byte(TBADIOptions.BADIOptions.SpecialTags.Objects[j]));
+      Item.SubItems.Add(strBoolean[tpShowInTree In setTPOps]);
+      Item.SubItems.Add(strBoolean[tpAutoExpand In setTPOps]);
+      Item.SubItems.Add(strBoolean[tpShowInDoc In setTPOps]);
+      Item.SubItems.Add(strBoolean[tpFixed In setTPOps]);
+    End;
 End;
 
 (**
@@ -383,13 +426,28 @@ End;
 Procedure TfmBADISpecialTagsFrame.SaveSettings;
 
 Var
+  sl : TStringList;
   j: Integer;
+  Item: TListItem;
+  setTPOps: TBADITagProperties;
 
 Begin
-  TBADIOptions.BADIOptions.SpecialTags.Clear;
-  For j := 0 To lbSpecialTags.Items.Count - 1 Do
-    TBADIOptions.BADIOptions.SpecialTags.AddObject(lbSpecialTags.Items[j],
-      lbSpecialTags.Items.Objects[j]);
+  sl := TBADIOptions.BADIOptions.SpecialTags;
+  sl.Clear;
+  For j := 0 To lvSpecialTags.Items.Count - 1 Do
+    Begin
+      Item := lvSpecialTags.Items[j];
+      setTPOps := [];
+      If StrToBool(Item.SubItems[1]) Then
+        Include(setTPOps, tpShowInTree);
+      If StrToBool(Item.SubItems[2]) Then
+        Include(setTPOps, tpAutoExpand);
+      If StrToBool(Item.SubItems[3]) Then
+        Include(setTPOps, tpShowInDoc);
+      If StrToBool(Item.SubItems[4]) Then
+        Include(setTPOps, tpFixed);
+      sl.AddObject(Item.Caption + '=' + Item.SubItems[0], TObject(Byte(setTPOps)));
+    End;
 End;
 
 End.

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Apr 2017
+  @Date    13 Apr 2017
 
 **)
 Unit BADI.Options;
@@ -277,24 +277,31 @@ End;
 **)
 Constructor TBADIOptions.Create;
 
+Var
+  setTPDefOps : TBADITagProperties;
+
 Begin
   Inherited Create;
   FDefines := TStringList.Create;
   FSpecialTags := TStringList.Create;
   // Create a default set of Special Tags.
-  FSpecialTags.AddObject('todo=Things To Do', TObject(iShowInTree Or iAutoExpand Or iShowInDoc));
-  FSpecialTags.AddObject('precon=Pre-Conditions', TObject(0));
-  FSpecialTags.AddObject('postcon=Post-Conditions', TObject(0));
-  FSpecialTags.AddObject('param=Parameters', TObject(0));
-  FSpecialTags.AddObject('return=Returns', TObject(0));
-  FSpecialTags.AddObject('note=Notes', TObject(0));
-  FSpecialTags.AddObject('see=Also See', TObject(0));
-  FSpecialTags.AddObject('exception=Exception Raised', TObject(0));
-  FSpecialTags.AddObject('bug=Known Bugs', TObject(iShowInTree Or iAutoExpand Or iShowInDoc));
-  FSpecialTags.AddObject('debug=Debugging Code', TObject(iShowInTree Or iAutoExpand Or iShowInDoc));
-  FSpecialTags.AddObject('date=Date Code Last Updated', TObject(0));
-  FSpecialTags.AddObject('author=Code Author', TObject(0));
-  FSpecialTags.AddObject('version=Code Version', TObject(0));
+  setTPDefOps := [tpShowInTree, tpAutoExpand, tpShowInDoc];
+  FSpecialTags.AddObject('todo=Things To Do', TObject(Byte(setTPDefOps)));
+  FSpecialTags.AddObject('precon=Pre-Conditions', Nil);
+  FSpecialTags.AddObject('postcon=Post-Conditions', Nil);
+  FSpecialTags.AddObject('param=Parameters', Nil);
+  FSpecialTags.AddObject('return=Returns', Nil);
+  FSpecialTags.AddObject('note=Notes', Nil);
+  FSpecialTags.AddObject('see=Also See', Nil);
+  FSpecialTags.AddObject('exception=Exception Raised', Nil);
+  FSpecialTags.AddObject('bug=Known Bugs', TObject(Byte(setTPDefOps)));
+  FSpecialTags.AddObject('debug=Debugging Code', TObject(Byte(setTPDefOps)));
+  FSpecialTags.AddObject('date=Date Code Last Updated', Nil);
+  FSpecialTags.AddObject('author=Code Author', Nil);
+  FSpecialTags.AddObject('version=Code Version', Nil);
+  FSpecialTags.AddObject('refactor=Refactorings', TObject(Byte(setTPDefOps)));
+  setTPDefOps := [tpFixed];
+  FSpecialTags.AddObject('code=Code Example', TObject(Byte(setTPDefOps)));
   FExpandedNodes := TStringList.Create;
   FExpandedNodes.Sorted := True;
   FExpandedNodes.Duplicates := dupIgnore;

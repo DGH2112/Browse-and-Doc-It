@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Apr 2017
+  @Date    13 Apr 2017
 
 **)
 Unit BADI.Constants;
@@ -120,13 +120,6 @@ Const
     (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
     (FForeColour : clInfoText; FStyles : [];       FBackColour: clInfoBk)
   );
-
-  (** This is a constant for special tag items to show in the tree **)
-  iShowInTree = $0001;
-  (** This is a constant for special tag items to auto expand in the tree **)
-  iAutoExpand = $0002;
-  (** This is a constant for special tag items to show in the documentation **)
-  iShowInDoc = $0004;
 
   (** This is a list of image resource masks to be placed of the below images to create vesions
       for different scopes. **)

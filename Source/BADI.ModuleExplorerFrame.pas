@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    12 Apr 2017
+  @Date    13 Apr 2017
   @Author  David Hoyle
   @Version 1.0
 
@@ -1629,9 +1629,9 @@ Begin
       FSpecialTagNodes[i].strTagDesc :=
         TBADIOptions.BADIOptions.SpecialTags.Values[TBADIOptions.BADIOptions.SpecialTags.Names[i]];
       FSpecialTagNodes[i].boolShow :=
-        Integer(TBADIOptions.BADIOptions.SpecialTags.Objects[i]) And iShowInTree <> 0;
+        tpShowInTree In TBADITagProperties(Byte(TBADIOptions.BADIOptions.SpecialTags.Objects[i]));
       FSpecialTagNodes[i].boolExpand :=
-        Integer(TBADIOptions.BADIOptions.SpecialTags.Objects[i]) And iAutoExpand <> 0;
+        tpAutoExpand In TBADITagProperties(Byte(TBADIOptions.BADIOptions.SpecialTags.Objects[i]));
       FSpecialTagNodes[i].Node := AddNode(
         FModule,
         FSpecialTagNodes[i].strTagDesc,

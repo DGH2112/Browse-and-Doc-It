@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Apr 2017
+  @Date    13 Apr 2017
 
 **)
 Unit BADI.Types;
@@ -398,6 +398,12 @@ Type
      shortcut has already been implemented. **)
   TBADIShortcutUsedEvent = Function(Const iShortcut : TShortcut;
     Var strActionName : String) : Boolean Of Object;
+
+  (** An enumerate to define the properties of a comment tag. **)
+  TBADITagProperty = (tpShowInTree, tpAutoExpand, tpShowInDoc, tpFixed);
+
+  (** A set of tag properties. **)
+  TBADITagProperties = Set Of TBADITagProperty;
 
 Implementation
 

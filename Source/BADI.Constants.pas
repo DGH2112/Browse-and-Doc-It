@@ -367,6 +367,14 @@ Const
   (** A constant to represent the initial (failed) position of a wizard reference. **)
   iWizardFailState = -1;
 
+  (** A constant array to represent the Special Tag Properties. **)
+  strTagProperty : Array[Low(TBADITagProperty)..High(TBADITagProperty)] Of String = (
+    'Show in Module Explorer',
+    'Auto Expand in Module Explorer',
+    'Show in Documentation',
+    'Fixed Width (preserve LF/CR and Indents)'
+  );
+
 Implementation
 
 End.

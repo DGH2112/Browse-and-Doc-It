@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    11 Apr 2017
+  @Date    13 Apr 2017
   @Version 1.0
 
 **)
@@ -1003,7 +1003,7 @@ begin
     With FCurrentModule.BodyComment[i] Do
       For j := 0 To TagCount - 1 Do
         For k := 0 To FModuleSpecialTagNodes.Count - 1 Do
-          If Integer(TBADIOptions.BADIOptions.SpecialTags.Objects[k]) And iShowInDoc > 0 Then
+          If tpShowInDoc In TBADITagProperties(Byte(TBADIOptions.BADIOptions.SpecialTags.Objects[k])) Then
             If CompareText(Tag[j].TagName,
               TBADIOptions.BADIOptions.SpecialTags.Names[k]) = 0 Then
               Begin
@@ -1030,8 +1030,7 @@ begin
     End;
   For j := 0 To FModuleSpecialTagNodes.Count - 1 Do
     Begin
-      If Integer(TBADIOptions.BADIOptions.SpecialTags.Objects[j]) And
-        iShowInDoc > 0 Then
+      If tpShowInDoc In TBADITagProperties(Byte(TBADIOptions.BADIOptions.SpecialTags.Objects[j])) Then
         Begin
           i := (FModuleSpecialTagNodes[j] As TStringList).Count;
           If i = 0 Then
@@ -1656,7 +1655,7 @@ begin
   FSummaryContent.Add(Format('        <th>%s</th>', ['Document Conflicts']));
   With TBADIOptions.BADIOptions Do
     For i := 0 to SpecialTags.Count - 1 Do
-      If Integer(SpecialTags.Objects[i]) And iShowInDoc > 0 Then
+      If tpShowInDoc In TBADITagProperties(Byte(SpecialTags.Objects[i])) Then
         FSummaryContent.Add(Format('        <th>%s</th>', [SpecialTags.ValueFromIndex[i]]));
   With TBADIOptions.BADIOptions Do
     If doShowPrefCountersInDocSummary In Options Then

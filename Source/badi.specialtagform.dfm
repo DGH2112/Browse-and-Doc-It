@@ -3,7 +3,7 @@ object frmSpecialTag: TfrmSpecialTag
   Top = 459
   BorderStyle = bsDialog
   Caption = 'Special Tag'
-  ClientHeight = 132
+  ClientHeight = 234
   ClientWidth = 438
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,7 +15,7 @@ object frmSpecialTag: TfrmSpecialTag
   Position = poDesktopCenter
   DesignSize = (
     438
-    132)
+    234)
   PixelsPerInch = 96
   TextHeight = 16
   object lblName: TLabel
@@ -28,11 +28,19 @@ object frmSpecialTag: TfrmSpecialTag
   end
   object lblDescription: TLabel
     Left = 8
-    Top = 38
+    Top = 41
     Width = 63
     Height = 16
     Caption = '&Description'
     FocusControl = edtDescription
+  end
+  object lblTagProperties: TLabel
+    Left = 8
+    Top = 72
+    Width = 58
+    Height = 16
+    Caption = '&Properties'
+    FocusControl = lbxTagProperties
   end
   object edtName: TEdit
     Left = 76
@@ -44,7 +52,7 @@ object frmSpecialTag: TfrmSpecialTag
   end
   object edtDescription: TEdit
     Left = 76
-    Top = 35
+    Top = 38
     Width = 354
     Height = 24
     Anchors = [akLeft, akTop, akRight]
@@ -52,49 +60,30 @@ object frmSpecialTag: TfrmSpecialTag
   end
   object btnOK: TBitBtn
     Left = 274
-    Top = 99
+    Top = 201
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
     Kind = bkOK
     NumGlyphs = 2
-    TabOrder = 5
+    TabOrder = 3
   end
   object btnCancel: TBitBtn
     Left = 355
-    Top = 99
+    Top = 201
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
     Kind = bkCancel
     NumGlyphs = 2
-    TabOrder = 6
-  end
-  object cbxShowInTree: TCheckBox
-    Left = 8
-    Top = 62
-    Width = 260
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = '&Show In Tree'
-    TabOrder = 2
-  end
-  object cbxAutoExpand: TCheckBox
-    Left = 8
-    Top = 85
-    Width = 260
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = '&Auto Expand'
-    TabOrder = 3
-  end
-  object chkShowInDoc: TCheckBox
-    Left = 8
-    Top = 108
-    Width = 260
-    Height = 17
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Show In Documentation'
     TabOrder = 4
+  end
+  object lbxTagProperties: TCheckListBox
+    Left = 76
+    Top = 68
+    Width = 354
+    Height = 127
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    TabOrder = 2
   end
 end

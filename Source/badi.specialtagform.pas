@@ -1,42 +1,54 @@
 (**
-  
+
   This form provides a mean for editing Special tags names and description
   through a single method.
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Feb 2017
+  @Date    13 Apr 2017
 
 **)
-unit BADI.SpecialTagForm;
+Unit BADI.SpecialTagForm;
 
-interface
+Interface
 
-uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons;
+Uses
+  Windows,
+  Messages,
+  SysUtils,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  Buttons,
+  CheckLst,
+  BADI.Types;
 
-type
+Type
   (** Form for editing special tags **)
-  TfrmSpecialTag = class(TForm)
+  TfrmSpecialTag = Class(TForm)
     lblName: TLabel;
     edtName: TEdit;
     lblDescription: TLabel;
     edtDescription: TEdit;
     btnOK: TBitBtn;
     btnCancel: TBitBtn;
-    cbxShowInTree: TCheckBox;
-    cbxAutoExpand: TCheckBox;
-    chkShowInDoc: TCheckBox;
-  private
+    lbxTagProperties: TCheckListBox;
+    lblTagProperties: TLabel;
+  Private
     { Private declarations }
-  public
+  Public
     { Public declarations }
-    Class Function Execute(var strName, strDescription : String;
-      var boolShowInTree, boolExpand, boolShowInDoc : Boolean) : Boolean;
-  end;
+    Class Function Execute(Var strName, strDescription: String;
+      Var setTagProperties : TBADITagProperties): Boolean;
+  End;
 
-implementation
+Implementation
+
+Uses
+  BADI.Constants;
 
 {$R *.DFM}
 
@@ -44,48 +56,53 @@ implementation
 
 (**
 
-  This method accepts a name and description string and displays them for 
-  editing in the form. If the user presses OK the form returns true. 
+  This method accepts a name and description string and displays them for editing in the form. If
+  the user presses OK the form returns true.
 
-  @precon  strName is the tags name, strDescription is the tags description, 
-           boolShow is a boolean value it indicate whether to show the tag in 
-           the browser, boolExpand is a boolean value it indicate whether to 
-           expand the tag in the browser and Returns true if the OK button 
-           was pressed. 
-  @postcon Displays the special tag form. 
+  @precon  strName is the tags name, strDescription is the tags description, boolShow is a boolean
+           value it indicate whether to show the tag in the browser, boolExpand is a boolean
+           value it indicate whether to expand the tag in the browser and Returns true if the OK
+           button was pressed.
+  @postcon Displays the special tag form.
 
-  @param   strName        as a String as a reference
-  @param   strDescription as a String as a reference
-  @param   boolShowInTree as a Boolean as a reference
-  @param   boolExpand     as a Boolean as a reference
-  @param   boolShowInDoc  as a Boolean as a reference
-  @return  a Boolean       
+  @param   strName          as a String as a reference
+  @param   strDescription   as a String as a reference
+  @param   setTagProperties as a TBADITagProperties as a reference
+  @return  a Boolean
 
 **)
-class function TfrmSpecialTag.Execute(var strName, strDescription: String;
-  var boolShowInTree, boolExpand, boolShowInDoc : Boolean): Boolean;
+Class Function TfrmSpecialTag.Execute(Var strName, strDescription: String;
+  Var setTagProperties : TBADITagProperties): Boolean;
 
-begin
-  With TfrmSpecialTag.Create(Nil) Do
-    Try
-      Result := False;
-      edtName.Text := strName;
-      edtDescription.Text := strDescription;
-      cbxShowInTree.Checked := boolShowInTree;
-      cbxAutoExpand.Checked := boolExpand;
-      chkShowInDoc.Checked := boolShowInDoc;
-      If ShowModal = mrOK Then
-        Begin
-          strName := edtName.Text;
-          strDescription := edtDescription.Text;
-          boolShowInTree := cbxShowInTree.Checked;
-          boolExpand :=cbxAutoExpand.Checked;
-          boolShowInDoc := chkShowInDoc.Checked;
-          Result := True
-        End;
-    Finally
-      Free;
-    End;
-end;
+Var
+  frm : TfrmSpecialTag;
+  eTagProp : TBADITagProperty;
+  iIndex: Integer;
 
-end.
+Begin
+  frm := TfrmSpecialTag.Create(Nil);
+  Try
+    Result := False;
+    frm.edtName.Text := strName;
+    frm.edtDescription.Text := strDescription;
+    For eTagProp := Low(TBADITagProperty) To High(TBADITagProperty) Do
+      Begin
+        iIndex := frm.lbxTagProperties.Items.Add(strTagProperty[eTagProp]);
+        frm.lbxTagProperties.Checked[iIndex] := eTagProp In setTagProperties;
+      End;
+    If frm.ShowModal = mrOK Then
+      Begin
+        strName := frm.edtName.Text;
+        strDescription := frm.edtDescription.Text;
+        setTagProperties := [];
+        For eTagProp := Low(TBADITagProperty) To High(TBADITagProperty) Do
+          If frm.lbxTagProperties.Checked[Integer(eTagProp)] Then
+            Include(setTagProperties, eTagProp);
+        Result := True
+      End;
+  Finally
+    frm.Free;
+  End;
+End;
+
+End.

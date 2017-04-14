@@ -14,6 +14,7 @@ Interface
 Uses
   Classes,
   Graphics,
+  Generics.Collections,
   BADI.Types;
 
 {$INCLUDE CompilerDefinitions.inc}
@@ -26,29 +27,29 @@ Type
       (** This is a clas varaiable to hide and hold the BADI Options instance reference. **)
       FBADIOptionsInstance : TBADIOptions;
   Strict Private
-    FOptions : TDocOptions;
-    FDefines : TStringList;
-    FSpecialTags : TStringList;
-    FExpandedNodes : TStringList;
-    FINIFileName : String;
-    FUpdateInterval: Cardinal;
-    FScopesToRender : TScopes;
-    FBrowsePosition : TBrowsePosition;
-    FFontName : String;
-    FFontSize : Integer;
-    FTokenFontInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
-    FExcludeDocFiles : TStringList;
-    FMethodDescriptions : TStringList;
-    FScopesToDocument : TScopes;
+    FOptions                : TDocOptions;
+    FDefines                : TStringList;
+    FSpecialTags            : TList<TBADISpecialTag>;
+    FExpandedNodes          : TStringList;
+    FINIFileName            : String;
+    FUpdateInterval         : Cardinal;
+    FScopesToRender         : TScopes;
+    FBrowsePosition         : TBrowsePosition;
+    FFontName               : String;
+    FFontSize               : Integer;
+    FTokenFontInfo          : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
+    FExcludeDocFiles        : TStringList;
+    FMethodDescriptions     : TStringList;
+    FScopesToDocument       : TScopes;
     FModuleExplorerBGColour : TColor;
-    FTokenLimit : Integer;
-    FMaxDocOutputWidth: Integer;
-    FManagedNodesLife : Integer;
-    FTreeColour : TColor;
-    FProfilingCode : TStringList;
-    FIssueLimits : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
-    FBADIMenuShortCuts : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+    FTokenLimit             : Integer;
+    FMaxDocOutputWidth      : Integer;
+    FManagedNodesLife       : Integer;
+    FTreeColour             : TColor;
+    FProfilingCode          : TStringList;
+    FIssueLimits            : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
+    FBADIMenuShortCuts      : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
+  Strict Protected
     Function  GetTokenFontInfo(Const ATokenType  : TBADITokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(Const ATokenType  : TBADITokenType;
       Const ATokenFontInfo : TTokenFontInfo);
@@ -82,9 +83,9 @@ Type
       This property provide access to the special tags string list.
       @precon  None.
       @postcon Provide access to the special tags string list.
-      @return  a TStringList
+      @return  a TList<TBADISpecialTag>
     **)
-    Property SpecialTags : TStringList Read FSpecialTags;
+    Property SpecialTags : TList<TBADISpecialTag> Read FSpecialTags;
     (**
       This property provide access to the expanded nodes string list.
       @precon  None.
@@ -277,31 +278,26 @@ End;
 **)
 Constructor TBADIOptions.Create;
 
-Var
-  setTPDefOps : TBADITagProperties;
-
 Begin
   Inherited Create;
   FDefines := TStringList.Create;
-  FSpecialTags := TStringList.Create;
+  FSpecialTags := TList<TBADISpecialTag>.Create;
   // Create a default set of Special Tags.
-  setTPDefOps := [tpShowInTree, tpAutoExpand, tpShowInDoc];
-  FSpecialTags.AddObject('todo=Things To Do', TObject(Byte(setTPDefOps)));
-  FSpecialTags.AddObject('precon=Pre-Conditions', Nil);
-  FSpecialTags.AddObject('postcon=Post-Conditions', Nil);
-  FSpecialTags.AddObject('param=Parameters', Nil);
-  FSpecialTags.AddObject('return=Returns', Nil);
-  FSpecialTags.AddObject('note=Notes', Nil);
-  FSpecialTags.AddObject('see=Also See', Nil);
-  FSpecialTags.AddObject('exception=Exception Raised', Nil);
-  FSpecialTags.AddObject('bug=Known Bugs', TObject(Byte(setTPDefOps)));
-  FSpecialTags.AddObject('debug=Debugging Code', TObject(Byte(setTPDefOps)));
-  FSpecialTags.AddObject('date=Date Code Last Updated', Nil);
-  FSpecialTags.AddObject('author=Code Author', Nil);
-  FSpecialTags.AddObject('version=Code Version', Nil);
-  FSpecialTags.AddObject('refactor=Refactorings', TObject(Byte(setTPDefOps)));
-  setTPDefOps := [tpFixed];
-  FSpecialTags.AddObject('code=Code Example', TObject(Byte(setTPDefOps)));
+  FSpecialTags.Add(TBADISpecialTag.Create('todo', 'Things To Do', [tpShowInTree..tpShowInDoc]));
+  FSpecialTags.Add(TBADISpecialTag.Create('precon', 'Pre-Conditions', []));
+  FSpecialTags.Add(TBADISpecialTag.Create('postcon', 'Post-Conditions', []));
+  FSpecialTags.Add(TBADISpecialTag.Create('param', 'Parameters', []));
+  FSpecialTags.Add(TBADISpecialTag.Create('return', 'Returns', []));
+  FSpecialTags.Add(TBADISpecialTag.Create('note', 'Notes', []));
+  FSpecialTags.Add(TBADISpecialTag.Create('see', 'Also See', []));
+  FSpecialTags.Add(TBADISpecialTag.Create('exception', 'Exception Raised', []));
+  FSpecialTags.Add(TBADISpecialTag.Create('bug', 'Known Bugs', [tpShowInTree..tpShowInDoc]));
+  FSpecialTags.Add(TBADISpecialTag.Create('debug', 'Debugging Code', [tpShowInTree..tpShowInDoc]));
+  FSpecialTags.Add(TBADISpecialTag.Create('date', 'Date Code Last Updated', []));
+  FSpecialTags.Add(TBADISpecialTag.Create('author', 'Code Author', []));
+  FSpecialTags.Add(TBADISpecialTag.Create('version', 'Code Version', []));
+  FSpecialTags.Add(TBADISpecialTag.Create('refactor', 'Refactorings', [tpShowInTree..tpShowInDoc]));
+  FSpecialTags.Add(TBADISpecialTag.Create('code', 'Code Example', [tpShowInTree..tpFixed]));
   FExpandedNodes := TStringList.Create;
   FExpandedNodes.Sorted := True;
   FExpandedNodes.Duplicates := dupIgnore;
@@ -432,101 +428,105 @@ Var
   strLine: String;
   iBADIMenu: TBADIMenu;
   iModule: Integer;
+  iniFile : TMemIniFile;
 
 Begin
-  With TMemIniFile.Create(FINIFileName) Do
+  iniFile := TMemIniFile.Create(FINIFileName);
+  Try
+    For i := Low(TDocOption) To High(TDocOption) Do
+      If iniFile.ReadBool('Options', DocOptionInfo[i].FDescription, DocOptionInfo[i].FEnabled) Then
+        FOptions := FOptions + [i]
+      Else
+        FOptions := FOptions - [i];
+    sl := TStringList.Create;
     Try
-      For i := Low(TDocOption) To High(TDocOption) Do
-        If ReadBool('Options', DocOptionInfo[i].FDescription, DocOptionInfo[i].FEnabled) Then
-          FOptions := FOptions + [i]
-        Else
-          FOptions := FOptions - [i];
-      sl := TStringList.Create;
-      Try
-        ReadSection('SpecialTagNames', sl);
-        If sl.Count > 0 Then
-          FSpecialTags.Clear;
-        For j := 0 To sl.Count - 1 Do
-          FSpecialTags.AddObject(Format('%s=%s', [sl[j], ReadString('SpecialTagNames', sl[j], '')]),
-            TObject(ReadInteger('SpecialTags', sl[j], 0)));
-        ReadSection('ManagedExpandedNodes', sl);
-        For j := 0 To sl.Count - 1 Do
-          Begin
-            iValue := ReadInteger('ManagedExpandedNodes', sl[j], 0);
-            FExpandedNodes.AddObject(StringReplace(sl[j], '|', '=', [rfReplaceAll]),
-              TObject(iValue));
-          End;
-      Finally
-        sl.Free;
-      End;
-      FUpdateInterval := ReadInteger('ModuleExplorer', 'UpdateInterval', 1000);
-      FScopesToRender := TScopes(Byte(ReadInteger('ModuleExplorer', 'ScopesToRender',
-        Byte(FScopesToRender))));
-      FBrowsePosition := TBrowsePosition(ReadInteger('Setup', 'BrowsePosition',
-        Integer(bpIdentifierCentreShowAllComment)));
-      FFontName := ReadString('ModuleExplorer', 'Name', 'MS Sans Serif');
-      FFontSize := ReadInteger('ModuleExplorer', 'Size', 8);
-      For T := Low(TBADITokenType) To High(TBADITokenType) Do
+      iniFile.ReadSection('SpecialTagNames', sl);
+      If sl.Count > 0 Then
+        FSpecialTags.Clear;
+      For j := 0 To sl.Count - 1 Do
+        FSpecialTags.Add(TBADISpecialTag.Create(
+            sl[j],
+            iniFile.ReadString('SpecialTagNames', sl[j], ''),
+            TBADITagProperties(Byte(iniFile.ReadInteger('SpecialTags', sl[j], 0)))
+        ));
+      iniFile.ReadSection('ManagedExpandedNodes', sl);
+      For j := 0 To sl.Count - 1 Do
         Begin
-          FTokenFontInfo[T].FForeColour :=
-            StringToColor(ReadString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
-            ColorToString(strTokenTypeInfo[T].FForeColour)));
-          FTokenFontInfo[T].FStyles :=
-            TFontStyles(Byte(ReadInteger('TokenFontinfo', Format('%s.Styles', [strTokenType[T]]),
-            Byte(strTokenTypeInfo[T].FStyles))));
-          FTokenFontInfo[T].FBackColour :=
-            StringToColor(ReadString('TokenFontinfo', Format('%s.BackColour', [strTokenType[T]]),
-            ColorToString(strTokenTypeInfo[T].FBackColour)));
+          iValue := iniFile.ReadInteger('ManagedExpandedNodes', sl[j], 0);
+          FExpandedNodes.AddObject(StringReplace(sl[j], '|', '=', [rfReplaceAll]),
+            TObject(iValue));
         End;
-      FExcludeDocFiles.Text := StringReplace(ReadString('Setup', 'ExcludeDocFiles', ''), '|',
-        #13#10, [rfReplaceAll]);
-      sl := TStringList.Create;
-      Try
-        ReadSection('MethodDescriptions', sl);
-        For j := 0 To sl.Count - 1 Do
-          FMethodDescriptions.Add(Format('%s=%s', [sl[j], ReadString('MethodDescriptions',
-            sl[j], '')]));
-      Finally
-        sl.Free;
-      End;
-      FScopesToDocument :=
-        TScopes(Byte(ReadInteger('Documentation', 'Scopes', Byte(FScopesToDocument))));
-      FModuleExplorerBGColour := StringToColor(ReadString('ModuleExplorer', 'BGColour',
-        ColorToString(clWindow)));
-      FTokenLimit := ReadInteger('ModuleExplorer', 'TokenLimit', 50);
-      FMaxDocOutputWidth := ReadInteger('Documentation', 'MaxDocOutputWidth', 80);
-      FManagedNodesLife := ReadInteger('ModuleExplorer', 'ManagedNodesLife', 90);
-      FTreeColour := StringToColor(ReadString('ModuleExplorer', 'TreeColour', 'clGray'));
-      sl := TStringList.Create;
-      Try
-        ReadSection('ProfilingCode', sl);
-        For j := 0 To sl.Count - 1 Do
-          Begin
-            strLine := ReadString('ProfilingCode', sl[j], '');
-            If strLine <> '' Then
-              FProfilingCode.Values[sl[j]] := strLine;
-          End;
-      Finally
-        sl.Free;
-      End;
-      FIssueLimits[ltErrors] := ReadInteger('Issues Limits', 'Errors', 10);
-      FIssueLimits[ltWarnings] := ReadInteger('Issues Limits', 'Warnings', 10);
-      FIssueLimits[ltHints] := ReadInteger('Issues Limits', 'Hints', 10);
-      FIssueLimits[ltConflicts] := ReadInteger('Issues Limits', 'Conflicts', 10);
-      For iBADIMenu := Low(TBADImenu) To High(TBADIMenu) Do
-        FBADIMenuShortCuts[iBADIMenu] := ReadString('BADIMenuShortcuts',
-          BADIMenus[iBADIMenu].FName,
-          BADIMenus[iBADIMenu].FShortCut);
-      For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
-        TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions :=
-          ReadString(
-            'ModuleExtensions',
-            TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
-            TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions
-          );
     Finally
-      Free;
+      sl.Free;
     End;
+    FUpdateInterval := iniFile.ReadInteger('ModuleExplorer', 'UpdateInterval', 1000);
+    FScopesToRender := TScopes(Byte(iniFile.ReadInteger('ModuleExplorer', 'ScopesToRender',
+      Byte(FScopesToRender))));
+    FBrowsePosition := TBrowsePosition(iniFile.ReadInteger('Setup', 'BrowsePosition',
+      Integer(bpIdentifierCentreShowAllComment)));
+    FFontName := iniFile.ReadString('ModuleExplorer', 'Name', 'MS Sans Serif');
+    FFontSize := iniFile.ReadInteger('ModuleExplorer', 'Size', 8);
+    For T := Low(TBADITokenType) To High(TBADITokenType) Do
+      Begin
+        FTokenFontInfo[T].FForeColour :=
+          StringToColor(iniFile.ReadString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
+          ColorToString(strTokenTypeInfo[T].FForeColour)));
+        FTokenFontInfo[T].FStyles :=
+          TFontStyles(Byte(iniFile.ReadInteger('TokenFontinfo', Format('%s.Styles', [strTokenType[T]]),
+          Byte(strTokenTypeInfo[T].FStyles))));
+        FTokenFontInfo[T].FBackColour :=
+          StringToColor(iniFile.ReadString('TokenFontinfo', Format('%s.BackColour', [strTokenType[T]]),
+          ColorToString(strTokenTypeInfo[T].FBackColour)));
+      End;
+    FExcludeDocFiles.Text := StringReplace(iniFile.ReadString('Setup', 'ExcludeDocFiles', ''), '|',
+      #13#10, [rfReplaceAll]);
+    sl := TStringList.Create;
+    Try
+      iniFile.ReadSection('MethodDescriptions', sl);
+      For j := 0 To sl.Count - 1 Do
+        FMethodDescriptions.Add(Format('%s=%s', [sl[j], iniFile.ReadString('MethodDescriptions',
+          sl[j], '')]));
+    Finally
+      sl.Free;
+    End;
+    FScopesToDocument :=
+      TScopes(Byte(iniFile.ReadInteger('Documentation', 'Scopes', Byte(FScopesToDocument))));
+    FModuleExplorerBGColour := StringToColor(iniFile.ReadString('ModuleExplorer', 'BGColour',
+      ColorToString(clWindow)));
+    FTokenLimit := iniFile.ReadInteger('ModuleExplorer', 'TokenLimit', 50);
+    FMaxDocOutputWidth := iniFile.ReadInteger('Documentation', 'MaxDocOutputWidth', 80);
+    FManagedNodesLife := iniFile.ReadInteger('ModuleExplorer', 'ManagedNodesLife', 90);
+    FTreeColour := StringToColor(iniFile.ReadString('ModuleExplorer', 'TreeColour', 'clGray'));
+    sl := TStringList.Create;
+    Try
+      iniFile.ReadSection('ProfilingCode', sl);
+      For j := 0 To sl.Count - 1 Do
+        Begin
+          strLine := iniFile.ReadString('ProfilingCode', sl[j], '');
+          If strLine <> '' Then
+            FProfilingCode.Values[sl[j]] := strLine;
+        End;
+    Finally
+      sl.Free;
+    End;
+    FIssueLimits[ltErrors] := iniFile.ReadInteger('Issues Limits', 'Errors', 10);
+    FIssueLimits[ltWarnings] := iniFile.ReadInteger('Issues Limits', 'Warnings', 10);
+    FIssueLimits[ltHints] := iniFile.ReadInteger('Issues Limits', 'Hints', 10);
+    FIssueLimits[ltConflicts] := iniFile.ReadInteger('Issues Limits', 'Conflicts', 10);
+    For iBADIMenu := Low(TBADImenu) To High(TBADIMenu) Do
+      FBADIMenuShortCuts[iBADIMenu] := iniFile.ReadString('BADIMenuShortcuts',
+        BADIMenus[iBADIMenu].FName,
+        BADIMenus[iBADIMenu].FShortCut);
+    For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
+      TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions :=
+        iniFile.ReadString(
+          'ModuleExtensions',
+          TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
+          TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions
+        );
+  Finally
+    iniFile.Free;
+  End;
 End;
 
 (**
@@ -545,82 +545,73 @@ Var
   T: TBADITokenType;
   iBADIMenu : TBADIMenu;
   iModule: Integer;
+  iniFile : TMemIniFile;
 
 Begin
-  With TMemIniFile.Create(FINIFileName) Do
-    Try
-      For i := Low(TDocOption) To High(TDocOption) Do
-        WriteBool('Options', DocOptionInfo[i].FDescription, i In FOptions);
-      EraseSection('SpecialTags');
-      EraseSection('SpecialTagNames');
-      For j := 0 To FSpecialTags.Count - 1 Do
-        Begin
-          WriteInteger('SpecialTags', FSpecialTags.Names[j], Integer(FSpecialTags.Objects[j]));
-          WriteString('SpecialTagNames', FSpecialTags.Names[j],
-            FSpecialTags.Values[FSpecialTags.Names[j]]);
-        End;
-      EraseSection('ManagedExpandedNodes');
-      For j := 0 To ExpandedNodes.Count - 1 Do
-        WriteInteger('ManagedExpandedNodes', StringReplace(FExpandedNodes[j], '=', '|',
-          [rfReplaceAll]), Integer(FExpandedNodes.Objects[j]));
-      WriteInteger('ModuleExplorer', 'UpdateInterval', FUpdateInterval);
-      WriteInteger('ModuleExplorer', 'ScopesToRender', Byte(FScopesToRender));
-      WriteInteger('Setup', 'BrowsePosition', Integer(FBrowsePosition));
-      WriteString('ModuleExplorer', 'Name', FFontName);
-      WriteInteger('ModuleExplorer', 'Size', FFontSize);
-      For T := Low(TBADITokenType) To High(TBADITokenType) Do
-        Begin
-          WriteString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
-            ColorToString(FTokenFontInfo[T].FForeColour));
-          WriteInteger('TokenFontinfo', Format('%s.Styles', [strTokenType[T]]),
-            Byte(FTokenFontInfo[T].FStyles));
-          WriteString('TokenFontinfo', Format('%s.BackColour', [strTokenType[T]]),
-            ColorToString(FTokenFontInfo[T].FBackColour));
-        End;
-      WriteString('Setup', 'ExcludeDocFiles', StringReplace(FExcludeDocFiles.Text, #13#10, '|',
-        [rfReplaceAll]));
-      EraseSection('MethodDescriptions');
-      For j := 0 To FMethodDescriptions.Count - 1 Do
-        {$IFDEF D0006}
-        WriteString('MethodDescriptions', FMethodDescriptions.Names[j],
-          FMethodDescriptions.ValueFromIndex[j]);
-        {$ELSE}
-        WriteString('MethodDescriptions', FMethodDescriptions.Names[j],
-          FMethodDescriptions.Values[FMethodDescriptions.Names[j]]);
-      {$ENDIF}
-      WriteInteger('Documentation', 'Scopes', Byte(FScopesToDocument));
-      WriteString('ModuleExplorer', 'BGColour', ColorToString(FModuleExplorerBGColour));
-      WriteInteger('ModuleExplorer', 'TokenLimit', FTokenLimit);
-      WriteInteger('Documentation', 'MaxDocOutputWidth', FMaxDocOutputWidth);
-      WriteInteger('ModuleExplorer', 'ManagedNodesLife', FManagedNodesLife);
-      WriteString('ModuleExplorer', 'TreeColour', ColorToString(FTreeColour));
-      EraseSection('ProfilingCode');
-      For j := 0 To FProfilingCode.Count - 1 Do
-        If FProfilingCode.Names[j] <> '' Then
-          {$IFDEF D0006}
-          WriteString('ProfilingCode', FProfilingCode.Names[j], FProfilingCode.ValueFromIndex[j]);
-          {$ELSE}
-          WriteString('ProfilingCode', FProfilingCode.Names[j],
-            FProfilingCode.Values[FProfilingCode.Names[j]]);
-      {$ENDIF}
-      WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltErrors]);
-      WriteInteger('Issues Limits', 'Warnings', FIssueLimits[ltWarnings]);
-      WriteInteger('Issues Limits', 'Hints', FIssueLimits[ltHints]);
-      WriteInteger('Issues Limits', 'Conflicts', FIssueLimits[ltConflicts]);
-      For iBADIMenu := Low(TBADImenu) To High(TBADIMenu) Do
-        WriteString('BADIMenuShortcuts',
-          BADIMenus[iBADIMenu].FName,
-          FBADIMenuShortCuts[iBADIMenu]);
-      For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
-        WriteString(
-          'ModuleExtensions',
-          TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
-          TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions
-        );
-      UpdateFile;
-    Finally
-      Free;
-    End;
+  iniFile := TMemIniFile.Create(FINIFileName);
+  Try
+    For i := Low(TDocOption) To High(TDocOption) Do
+      iniFile.WriteBool('Options', DocOptionInfo[i].FDescription, i In FOptions);
+    iniFile.EraseSection('SpecialTags');
+    iniFile.EraseSection('SpecialTagNames');
+    For j := 0 To FSpecialTags.Count - 1 Do
+      Begin
+        iniFile.WriteInteger('SpecialTags', FSpecialTags[j].FName,
+          Byte(FSpecialTags[j].FTagProperties));
+        iniFile.WriteString('SpecialTagNames', FSpecialTags[j].FName, FSpecialTags[j].FDescription);
+      End;
+    iniFile.EraseSection('ManagedExpandedNodes');
+    For j := 0 To ExpandedNodes.Count - 1 Do
+      iniFile.WriteInteger('ManagedExpandedNodes', StringReplace(FExpandedNodes[j], '=', '|',
+        [rfReplaceAll]), Integer(FExpandedNodes.Objects[j]));
+    iniFile.WriteInteger('ModuleExplorer', 'UpdateInterval', FUpdateInterval);
+    iniFile.WriteInteger('ModuleExplorer', 'ScopesToRender', Byte(FScopesToRender));
+    iniFile.WriteInteger('Setup', 'BrowsePosition', Integer(FBrowsePosition));
+    iniFile.WriteString('ModuleExplorer', 'Name', FFontName);
+    iniFile.WriteInteger('ModuleExplorer', 'Size', FFontSize);
+    For T := Low(TBADITokenType) To High(TBADITokenType) Do
+      Begin
+        iniFile.WriteString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
+          ColorToString(FTokenFontInfo[T].FForeColour));
+        iniFile.WriteInteger('TokenFontinfo', Format('%s.Styles', [strTokenType[T]]),
+          Byte(FTokenFontInfo[T].FStyles));
+        iniFile.WriteString('TokenFontinfo', Format('%s.BackColour', [strTokenType[T]]),
+          ColorToString(FTokenFontInfo[T].FBackColour));
+      End;
+    iniFile.WriteString('Setup', 'ExcludeDocFiles', StringReplace(FExcludeDocFiles.Text, #13#10, '|',
+      [rfReplaceAll]));
+    iniFile.EraseSection('MethodDescriptions');
+    For j := 0 To FMethodDescriptions.Count - 1 Do
+      iniFile.WriteString('MethodDescriptions', FMethodDescriptions.Names[j],
+        FMethodDescriptions.ValueFromIndex[j]);
+    iniFile.WriteInteger('Documentation', 'Scopes', Byte(FScopesToDocument));
+    iniFile.WriteString('ModuleExplorer', 'BGColour', ColorToString(FModuleExplorerBGColour));
+    iniFile.WriteInteger('ModuleExplorer', 'TokenLimit', FTokenLimit);
+    iniFile.WriteInteger('Documentation', 'MaxDocOutputWidth', FMaxDocOutputWidth);
+    iniFile.WriteInteger('ModuleExplorer', 'ManagedNodesLife', FManagedNodesLife);
+    iniFile.WriteString('ModuleExplorer', 'TreeColour', ColorToString(FTreeColour));
+    iniFile.EraseSection('ProfilingCode');
+    For j := 0 To FProfilingCode.Count - 1 Do
+      If FProfilingCode.Names[j] <> '' Then
+        iniFile.WriteString('ProfilingCode', FProfilingCode.Names[j], FProfilingCode.ValueFromIndex[j]);
+    iniFile.WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltErrors]);
+    iniFile.WriteInteger('Issues Limits', 'Warnings', FIssueLimits[ltWarnings]);
+    iniFile.WriteInteger('Issues Limits', 'Hints', FIssueLimits[ltHints]);
+    iniFile.WriteInteger('Issues Limits', 'Conflicts', FIssueLimits[ltConflicts]);
+    For iBADIMenu := Low(TBADImenu) To High(TBADIMenu) Do
+      iniFile.WriteString('BADIMenuShortcuts',
+        BADIMenus[iBADIMenu].FName,
+        FBADIMenuShortCuts[iBADIMenu]);
+    For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
+      iniFile.WriteString(
+        'ModuleExtensions',
+        TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
+        TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions
+      );
+    iniFile.UpdateFile;
+  Finally
+    iniFile.Free;
+  End;
 End;
 
 (**

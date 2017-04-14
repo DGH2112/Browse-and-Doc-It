@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    12 Apr 2017
+  @Date    14 Apr 2017
 
 **)
 Unit BADI.Functions;
@@ -35,7 +35,7 @@ Type
   Function  PrologCode(Const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
   Function  EpilogCode(Const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
   Function  OutputCommentAndTag(Const C: TBaseContainer; Const iMaxWidth: Integer;
-    Const boolShowHTML: Boolean): String;
+    Const boolShowHTML, boolFixed: Boolean): String;
   Function  BuildLangIndepRep(Const Param: TGenericParameter): String;
   Function  BADIImageIndex(Const iBADIImageIndex : TBADIImageIndex; Const AScope : TScope) : Integer;
   Procedure BuildNumber(Var iMajor, iMinor, iBugFix, iBuild : Integer);
@@ -243,11 +243,12 @@ End;
   @param   C            as a TBaseContainer as a constant
   @param   iMaxWidth    as an Integer as a constant
   @param   boolShowHTML as a Boolean as a constant
+  @param   boolFixed    as a Boolean as a constant
   @return  a String
 
 **)
 Function OutputCommentAndTag(Const C: TBaseContainer; Const iMaxWidth: Integer;
-  Const boolShowHTML: Boolean): String;
+  Const boolShowHTML, boolFixed: Boolean): String;
 
 Var
   iToken: Integer;
@@ -266,7 +267,7 @@ Begin
             Result := Result + #13#10;
             iLength := 0;
           End;
-        If Not((iLength = 0) And (C.Tokens[iToken].TokenType In [ttWhiteSpace])) Then
+        If Not((iLength = 0) And (C.Tokens[iToken].TokenType In [ttWhiteSpace]) And Not boolFixed) Then
           Begin
             If C.Tokens[iToken].Token = '#' Then
               Begin

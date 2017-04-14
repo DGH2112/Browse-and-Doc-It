@@ -394,14 +394,14 @@ Begin
           Dec(iToken);
         End;
       // Trim starting whitespace ONLY if it ends with a line end
-      iPos := 0;
+      iPos := -1;
       For iToken := 0 To Tag[iTag].TokenCount - 1 Do
         If Tag[iTag].Tokens[iToken].TokenType = ttLineEnd Then
           Begin
             iPos := iToken;
             Break;
           End;
-      boolHasWS := iPos > 0;
+      boolHasWS := iPos > -1;
       For iToken := iPos - 1 DownTo 0 Do
         boolHasWS := boolHasWS And (ttWhiteSpace = Tag[iTag].Tokens[iToken].TokenType);
       If boolHasWS Then

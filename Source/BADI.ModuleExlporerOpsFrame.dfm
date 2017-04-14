@@ -1,8 +1,8 @@
 object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
   Left = 0
   Top = 0
-  Width = 441
-  Height = 411
+  Width = 467
+  Height = 428
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -13
@@ -11,169 +11,206 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
   ParentFont = False
   TabOrder = 0
   DesignSize = (
-    441
-    411)
+    467
+    428)
   object lblBackColour: TLabel
-    Left = 261
-    Top = 124
+    Left = 3
+    Top = 184
     Width = 67
     Height = 16
-    Anchors = [akRight, akBottom]
     Caption = '&Back Colour'
     FocusControl = cbxBackColour
   end
   object lblForeColour: TLabel
-    Left = 261
-    Top = 77
+    Left = 3
+    Top = 156
     Width = 67
     Height = 16
-    Anchors = [akRight, akBottom]
     Caption = '&Fore Colour'
     FocusControl = cbxFontColour
   end
   object lblTreeColour: TLabel
-    Left = 261
-    Top = 367
+    Left = 3
+    Top = 310
     Width = 88
     Height = 16
-    Anchors = [akRight, akBottom]
     Caption = 'Treeline &Colour'
   end
   object lblTokenLimit: TLabel
-    Left = 134
-    Top = 33
+    Left = 3
+    Top = 338
     Width = 66
     Height = 16
     Caption = '&Token Limit'
   end
   object lblBackgroundColour: TLabel
-    Left = 262
-    Top = 320
+    Left = 3
+    Top = 282
     Width = 107
     Height = 16
-    Anchors = [akRight, akBottom]
     Caption = 'Background &Colour'
   end
   object lblTokenTypes: TLabel
     Left = 3
-    Top = 60
+    Top = 126
     Width = 73
     Height = 16
     Caption = '&Token Types'
     FocusControl = lbxTokenTypes
   end
-  object lblFontSize: TLabel
+  object lblTreeFontSize: TLabel
     Left = 3
-    Top = 33
-    Width = 53
+    Top = 36
+    Width = 84
     Height = 16
-    Caption = 'Font &Size'
-    FocusControl = edtFontSize
+    Caption = 'Tree Font &Size'
+    FocusControl = edtTreeFontSize
   end
-  object lblFontName: TLabel
+  object lblTreeFontName: TLabel
     Left = 3
     Top = 6
+    Width = 98
+    Height = 16
+    Caption = 'Tree Font &Name:'
+    FocusControl = cbxTreeFontName
+  end
+  object lblFixedFont: TLabel
+    Left = 3
+    Top = 66
+    Width = 101
+    Height = 16
+    Caption = '&Fixed Font Name:'
+    FocusControl = cbxFixedFontName
+  end
+  object lblFixedFontSize: TLabel
+    Left = 3
+    Top = 96
+    Width = 87
+    Height = 16
+    Caption = 'Fixed Font Si&ze'
+    FocusControl = edtFixedFontSize
+  end
+  object lblIssueLimitTypes: TLabel
+    Left = 3
+    Top = 368
+    Width = 99
+    Height = 16
+    Caption = '&Issue Limit Types'
+    FocusControl = cbxLimits
+  end
+  object lblIssueLimit: TLabel
+    Left = 3
+    Top = 398
     Width = 67
     Height = 16
-    Caption = 'Font &Name:'
-    FocusControl = cbxFontName
+    Caption = '&Issue Limits'
+    FocusControl = edtLimits
   end
-  object cbxFontName: TComboBox
-    Left = 72
+  object cbxTreeFontName: TComboBox
+    Left = 120
     Top = 3
-    Width = 366
+    Width = 344
     Height = 24
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
+    ExplicitWidth = 357
   end
   object cbxBackColour: TColorBox
-    Left = 261
-    Top = 143
-    Width = 177
+    Left = 120
+    Top = 181
+    Width = 344
     Height = 22
     Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
-    Anchors = [akRight, akBottom]
-    TabOrder = 1
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 8
     OnChange = cbxBackColourChange
+    ExplicitWidth = 438
   end
   object clbxTreeColour: TColorBox
-    Left = 261
-    Top = 386
-    Width = 177
+    Left = 120
+    Top = 307
+    Width = 344
     Height = 22
     Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
-    Anchors = [akRight, akBottom]
-    TabOrder = 2
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 11
+    ExplicitWidth = 438
   end
   object udTokenLimit: TUpDown
-    Left = 228
-    Top = 30
+    Left = 448
+    Top = 335
     Width = 16
     Height = 24
+    Anchors = [akTop, akRight]
     Associate = edtTokenLimit
     Min = 10
     Max = 32600
     Position = 10
-    TabOrder = 3
+    TabOrder = 13
+    ExplicitLeft = 542
   end
   object edtTokenLimit: TEdit
-    Left = 193
-    Top = 30
-    Width = 35
+    Left = 120
+    Top = 335
+    Width = 322
     Height = 24
     Alignment = taRightJustify
-    TabOrder = 4
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 12
     Text = '10'
+    ExplicitWidth = 416
   end
   object cbxBGColour: TColorBox
-    Left = 261
-    Top = 339
-    Width = 177
+    Left = 120
+    Top = 279
+    Width = 344
     Height = 22
     Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
-    Anchors = [akRight, akBottom]
-    TabOrder = 5
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 10
+    ExplicitWidth = 438
   end
   object gbxFontStyles: TGroupBox
-    Left = 261
-    Top = 171
-    Width = 177
-    Height = 143
-    Anchors = [akRight, akBottom]
+    Left = 3
+    Top = 209
+    Width = 461
+    Height = 64
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Font Styles'
-    TabOrder = 6
+    TabOrder = 9
+    ExplicitWidth = 555
     object chkBold: TCheckBox
       Left = 15
       Top = 26
-      Width = 119
+      Width = 58
       Height = 21
       Caption = '&Bold'
       TabOrder = 0
       OnClick = chkBoldClick
     end
     object chkItalic: TCheckBox
-      Left = 16
-      Top = 54
-      Width = 119
+      Left = 79
+      Top = 28
+      Width = 57
       Height = 21
       Caption = '&Italic'
       TabOrder = 1
       OnClick = chkItalicClick
     end
     object chkUnderline: TCheckBox
-      Left = 16
-      Top = 82
-      Width = 119
+      Left = 151
+      Top = 27
+      Width = 82
       Height = 21
       Caption = '&Underline'
       TabOrder = 2
       OnClick = chkUnderlineClick
     end
     object chkStrikeout: TCheckBox
-      Left = 15
-      Top = 111
-      Width = 119
+      Left = 252
+      Top = 30
+      Width = 82
       Height = 21
       Caption = '&Strikeout'
       TabOrder = 3
@@ -181,72 +218,114 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     end
   end
   object cbxFontColour: TColorBox
-    Left = 261
-    Top = 96
-    Width = 177
+    Left = 120
+    Top = 153
+    Width = 344
     Height = 22
     Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
-    Anchors = [akRight, akBottom]
+    Anchors = [akLeft, akTop, akRight]
     TabOrder = 7
     OnChange = cbxFontColourChange
+    ExplicitWidth = 438
   end
-  object lbxTokenTypes: TListBox
-    Left = 3
-    Top = 79
-    Width = 252
-    Height = 329
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    TabOrder = 8
-    OnClick = lbxTokenTypesClick
-  end
-  object udFontSize: TUpDown
-    Left = 112
-    Top = 30
+  object udTreeFontSize: TUpDown
+    Left = 448
+    Top = 33
     Width = 16
     Height = 24
-    Associate = edtFontSize
+    Anchors = [akTop, akRight]
+    Associate = edtTreeFontSize
     Min = 8
     Max = 72
     Position = 8
-    TabOrder = 9
+    TabOrder = 2
+    ExplicitLeft = 461
   end
-  object edtFontSize: TEdit
-    Left = 72
-    Top = 30
-    Width = 40
+  object edtTreeFontSize: TEdit
+    Left = 120
+    Top = 33
+    Width = 322
     Height = 24
     Alignment = taRightJustify
+    Anchors = [akLeft, akTop, akRight]
     ReadOnly = True
-    TabOrder = 10
+    TabOrder = 1
     Text = '8'
+    ExplicitWidth = 416
   end
   object cbxLimits: TComboBox
-    Left = 251
-    Top = 30
-    Width = 123
+    Left = 120
+    Top = 365
+    Width = 344
     Height = 24
     Style = csDropDownList
-    Anchors = [akTop, akRight]
-    TabOrder = 11
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 14
     OnChange = cbxLimitsChange
   end
   object edtLimits: TEdit
-    Left = 380
-    Top = 30
-    Width = 41
+    Left = 120
+    Top = 395
+    Width = 322
     Height = 24
-    Anchors = [akTop, akRight]
+    Anchors = [akLeft, akTop, akRight]
     ReadOnly = True
-    TabOrder = 12
+    TabOrder = 15
     Text = '0'
   end
   object udLimits: TUpDown
-    Left = 421
-    Top = 30
+    Left = 448
+    Top = 395
     Width = 16
     Height = 24
     Anchors = [akTop, akRight]
     Associate = edtLimits
-    TabOrder = 13
+    TabOrder = 16
+  end
+  object edtFixedFontSize: TEdit
+    Left = 120
+    Top = 93
+    Width = 322
+    Height = 24
+    Alignment = taRightJustify
+    Anchors = [akLeft, akTop, akRight]
+    ReadOnly = True
+    TabOrder = 4
+    Text = '8'
+    ExplicitWidth = 416
+  end
+  object udFixedFontSize: TUpDown
+    Left = 448
+    Top = 93
+    Width = 16
+    Height = 24
+    Anchors = [akTop, akRight]
+    Associate = edtFixedFontSize
+    Min = 8
+    Max = 72
+    Position = 8
+    TabOrder = 5
+    ExplicitLeft = 542
+  end
+  object cbxFixedFontName: TComboBox
+    Left = 120
+    Top = 63
+    Width = 344
+    Height = 24
+    Style = csDropDownList
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 3
+    ExplicitWidth = 438
+  end
+  object lbxTokenTypes: TComboBox
+    Left = 120
+    Top = 123
+    Width = 344
+    Height = 24
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 6
+    Text = 'lbxTokenTypes'
+    OnClick = lbxTokenTypesClick
+    ExplicitWidth = 438
   end
 end

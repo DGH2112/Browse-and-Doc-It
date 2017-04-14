@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    11 Apr 2017
+  @Date    14 Apr 2017
 
 **)
 Unit BADI.ModuleExlporerOpsFrame;
@@ -33,7 +33,7 @@ Uses
 Type
   (** This is a class which represents the frame interface. **)
   TfmBADIModuleExplorerFrame = Class(TFrame, IBADIOptionsFrame)
-    cbxFontName: TComboBox;
+    cbxTreeFontName: TComboBox;
     cbxBackColour: TColorBox;
     clbxTreeColour: TColorBox;
     udTokenLimit: TUpDown;
@@ -45,20 +45,27 @@ Type
     chkUnderline: TCheckBox;
     chkStrikeout: TCheckBox;
     cbxFontColour: TColorBox;
-    lbxTokenTypes: TListBox;
-    udFontSize: TUpDown;
-    edtFontSize: TEdit;
+    udTreeFontSize: TUpDown;
+    edtTreeFontSize: TEdit;
     lblBackColour: TLabel;
     lblForeColour: TLabel;
     lblTreeColour: TLabel;
     lblTokenLimit: TLabel;
     lblBackgroundColour: TLabel;
     lblTokenTypes: TLabel;
-    lblFontSize: TLabel;
-    lblFontName: TLabel;
+    lblTreeFontSize: TLabel;
+    lblTreeFontName: TLabel;
     cbxLimits: TComboBox;
     edtLimits: TEdit;
     udLimits: TUpDown;
+    edtFixedFontSize: TEdit;
+    udFixedFontSize: TUpDown;
+    cbxFixedFontName: TComboBox;
+    lblFixedFont: TLabel;
+    lblFixedFontSize: TLabel;
+    lbxTokenTypes: TComboBox;
+    lblIssueLimitTypes: TLabel;
+    lblIssueLimit: TLabel;
     Procedure lbxTokenTypesClick(Sender: TObject);
     procedure cbxBackColourChange(Sender: TObject);
     procedure cbxFontColourChange(Sender: TObject);
@@ -253,7 +260,10 @@ Var
 Begin
   Inherited Create(AOwner);
   For i := 0 To Screen.Fonts.Count - 1 Do
-    cbxFontName.Items.Add(Screen.Fonts[i]);
+    Begin
+      cbxTreeFontName.Items.Add(Screen.Fonts[i]);
+      cbxFixedFontName.Items.Add(Screen.Fonts[i]);
+    End;
   For j := Low(TBADITokenType) To High(TBADITokenType) Do
     lbxTokenTypes.Items.Add(strTokenType[j]);
   lbxTokenTypes.ItemIndex := 0;
@@ -309,15 +319,22 @@ Var
   k: TBADITokenType;
 
 Begin
-  For j := 0 To cbxFontName.Items.Count - 1 Do
-    If cbxFontName.Items[j] = TBADIOptions.BADIOptions.FontName Then
+  For j := 0 To cbxTreeFontName.Items.Count - 1 Do
+    If cbxTreeFontName.Items[j] = TBADIOptions.BADIOptions.TreeFontName Then
       Begin
-        cbxFontName.ItemIndex := j;
+        cbxTreeFontName.ItemIndex := j;
+        Break;
+      End;
+  For j := 0 To cbxFixedFontName.Items.Count - 1 Do
+    If cbxFixedFontName.Items[j] = TBADIOptions.BADIOptions.FixedFontName Then
+      Begin
+        cbxFixedFontName.ItemIndex := j;
         Break;
       End;
   For k := Low(TBADITokenType) To High(TBADITokenType) Do
     FTokenFontInfo[k] := TBADIOptions.BADIOptions.TokenFontInfo[k];
-  udFontSize.Position := TBADIOptions.BADIOptions.FontSize;
+  udTreeFontSize.Position := TBADIOptions.BADIOptions.TreeFontSize;
+  udFixedFontSize.Position := TBADIOptions.BADIOptions.FixedFontSize;
   cbxBGColour.Selected := TBADIOptions.BADIOptions.BGColour;
   udTokenLimit.Position := TBADIOptions.BADIOptions.TokenLimit;
   clbxTreeColour.Selected := TBADIOptions.BADIOptions.TreeColour;
@@ -344,10 +361,12 @@ Var
   k: TBADITokenType;
 
 Begin
-  TBADIOptions.BADIOptions.FontName := cbxFontName.Text;
+  TBADIOptions.BADIOptions.TreeFontName := cbxTreeFontName.Text;
+  TBADIOptions.BADIOptions.FixedFontName := cbxFixedFontName.Text;
   For k := Low(TBADITokenType) To High(TBADITokenType) Do
     TBADIOptions.BADIOptions.TokenFontInfo[k] := FTokenFontInfo[k];
-  TBADIOptions.BADIOptions.FontSize := udFontSize.Position;
+  TBADIOptions.BADIOptions.TreeFontSize := udTreeFontSize.Position;
+  TBADIOptions.BADIOptions.FixedFontSize := udFixedFontSize.Position;
   TBADIOptions.BADIOptions.BGColour := cbxBGColour.Selected;
   TBADIOptions.BADIOptions.TokenLimit := udTokenLimit.Position;
   TBADIOptions.BADIOptions.TreeColour := clbxTreeColour.Selected;

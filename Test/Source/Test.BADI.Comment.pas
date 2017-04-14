@@ -41,7 +41,8 @@ Const
     ''#13#10 +
     '  @todo  Requires implementing.'#13#10 +
     '  @see   Something interesting.'#13#10 +
-    '  @code  Something more'#13#10 +
+    '  @code  '#13#10 +
+    '  Something more'#13#10 +
     '  interesting.'#13#10 +
     '  @refactor Something even more interesting.'#13#10 +
     '';
@@ -107,7 +108,7 @@ Begin
   CheckEquals('see', FComment.Tag[1].TagName);
   CheckEquals('Something interesting.', FComment.Tag[1].AsString(80, False));
   CheckEquals('code', FComment.Tag[2].TagName);
-  CheckEquals('  Something more'#13#10'  interesting.'#13#10'  ', FComment.Tag[2].AsString(80, False));
+  CheckEquals('  Something more'#13#10'  interesting.', FComment.Tag[2].AsString(80, False));
   CheckEquals('refactor', FComment.Tag[3].TagName);
   CheckEquals('Something even more interesting.', FComment.Tag[3].AsString(80, False));
   CheckEquals(4, FComment.TagCount);
@@ -215,7 +216,7 @@ Begin
     CheckEquals('see', srcComment.Tag[1].TagName);
     CheckEquals('Something interesting.', srcComment.Tag[1].AsString(80, False));
     CheckEquals('code', FComment.Tag[2].TagName);
-    CheckEquals('  Something more'#13#10'  interesting.'#13#10'  ', FComment.Tag[2].AsString(80, False));
+    CheckEquals('  Something more'#13#10'  interesting.', FComment.Tag[2].AsString(80, False));
     CheckEquals('refactor', FComment.Tag[3].TagName);
     CheckEquals('Something even more interesting.', FComment.Tag[3].AsString(80, False));
     CheckEquals(4, srcComment.TagCount);

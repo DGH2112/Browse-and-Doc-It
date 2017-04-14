@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Feb 2017
+  @Date    14 Apr 2017
 
 **)
 Unit BADI.Comment;
@@ -103,7 +103,7 @@ Begin
     End
   Else
     Begin
-      If Not((iType = ttWhiteSpace) And (FLastTag.TokenCount = 0)) Then
+      If Not((iType = ttWhiteSpace) And (FLastTag.TokenCount = 0) And Not FLastTag.Fixed) Then
         FLastTag.AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), iType));
     End;
 End;
@@ -219,7 +219,7 @@ End;
 Function TComment.AsString(iMaxWidth: Integer; boolShowHTML: Boolean): String;
 
 Begin
-  Result := OutputCommentAndTag(Self, iMaxWidth, boolShowHTML);
+  Result := OutputCommentAndTag(Self, iMaxWidth, boolShowHTML, False);
 End;
 
 (**
@@ -381,16 +381,17 @@ Begin
         End;
     End;
   For iTag := 0 To TagCount - 1 Do
-    Begin
-      If Tag[iTag].TokenCount = 0 Then
-        Continue;
-      iToken := Tag[iTag].TokenCount - 1;
-      While (iToken >= 0) And (Tag[iTag].Tokens[iToken].TokenType In [ttWhiteSpace]) Do
-        Begin
-          Tag[iTag].DeleteToken(iToken);
-          Dec(iToken);
-        End;
-    End;
+    If Not Tag[iTag].Fixed Then
+      Begin
+        If Tag[iTag].TokenCount = 0 Then
+          Continue;
+        iToken := Tag[iTag].TokenCount - 1;
+        While (iToken >= 0) And (Tag[iTag].Tokens[iToken].TokenType In [ttWhiteSpace]) Do
+          Begin
+            Tag[iTag].DeleteToken(iToken);
+            Dec(iToken);
+          End;
+      End;
 End;
 
 (**
@@ -437,6 +438,117 @@ Procedure TComment.ParseComment(const strComment: String);
 Type
   TBlockType = (btNone, btHTML, btLink, btSingle, btDouble);
 
+  (**
+
+    This function determines the type of token being processed in the comment stream.
+
+    @precon  None.
+    @postcon Returns the token type of the current stream position.
+
+    @param   Ch         as a Char as a constant
+    @param   eLastToken as a TBADITokenType as a constant
+    @return  a TBADITokenType
+
+  **)
+  Function DetermineTokenType(Const Ch : Char; Const eLastToken : TBADITokenType) : TBADITokenType;
+    InLine;
+
+  Begin
+    Case Ch Of
+      #9, #32: Result := ttWhiteSpace;
+      '''': Result := ttSingleLiteral;
+      '"': Result := ttDoubleLiteral;
+      '@', '_', 'a'..'z', 'A'..'Z':
+        Begin
+          If (eLastToken = ttNumber) Then
+            Begin
+             Case Ch Of
+               'A'..'F', 'a'..'f': Result := ttNumber;
+             Else
+               Result := ttIdentifier;
+             End;
+            End Else
+              Result := ttIdentifier;
+        End;
+      '0'..'9':
+        Begin
+          Result := ttNumber;
+          If eLastToken = ttIdentifier Then
+            Result := ttIdentifier;
+        End;
+      #10, #13: Result := ttLineEnd;
+      #33, #36..#38, #40..#47, #58..#63, #91..#94, #96, #123..#128: Result := ttSymbol;
+    Else
+      Result := ttUnknown;
+    End;
+  End;
+
+  (**
+
+    This procedure processes single and double string literals in the stream.
+
+    @precon  None.
+    @postcon The eBlockType is updated depending upon whether the stream is at the start or end
+             of a string literal.
+
+    @param   eCurToken  as a TBADITokenType as a constant
+    @param   eBlockType as a TBlockType as a reference
+
+  **)
+  Procedure ProcessStringLiterals(Const eCurToken : TBADITokenType; var eBlockType : TBlockType);
+    InLine;
+
+  Begin
+    // Check for single string literals
+    If eCurToken = ttSingleLiteral Then
+      If eBlockType = btSingle Then
+        eBlockType := btNone
+      Else If eBlockType = btNone Then
+        eBlockType := btSingle;
+    // Check for Double string literals
+    If eCurToken = ttDoubleLiteral Then
+      If eBlockType = btDouble Then
+        eBlockType := btNone
+      Else If eBlockType = btNone Then
+        eBlockType := btDouble;
+  End;
+
+  (**
+
+    This procedure process HTML and brace comment blocks.
+
+    @precon  None.
+    @postcon The eBlockType and eCurToken are updated if HTML or brace comments are found.
+
+    @param   strToken    as a String as a constant
+    @param   iTokenIndex as an Integer as a constant
+    @param   eBlockType  as a TBlockType as a reference
+    @param   eCurToken   as a TBADITokenType as a reference
+
+  **)
+  Procedure ProcessBlocks(Const strToken : String; Const iTokenIndex : Integer;
+    Var eBlockType : TBlockType; Var eCurToken : TBADITokenType); InLine;
+
+  Begin
+    If (eBlockType = btNone) And (strToken[1] = '{') Then
+      eBlockType := btLink
+    Else If (eBlockType = btNone) And (strToken[1] = '<') Then
+      eBlockType := btHTML;
+    If (eBlockType = btLink) And (strToken[iTokenIndex] = '}') Then
+      Begin
+        eBlockType := btNone;
+        eCurToken := ttLinkTag;
+      End;
+    If (eBlockType = btHTML) And (strToken[iTokenIndex] = '>') Then
+      Begin
+        eBlockType := btNone;
+        If strToken[2] = '/' Then
+          eCurToken := ttHTMLEndTag
+        Else
+          eCurToken := ttHTMLStartTag;
+      End;
+  End;
+
 Const
   iTokenCapacity = 25;
 
@@ -462,32 +574,7 @@ Begin
   For i := 1 To Length(strComment) Do
     Begin
       LastToken := CurToken;
-      If IsInSet(strComment[i], strWhiteSpace) Then
-        CurToken := ttWhiteSpace
-      Else If IsInSet(strComment[i], ['''']) Then
-        CurToken := ttSingleLiteral
-      Else If IsInSet(strComment[i], ['"']) Then
-        CurToken := ttDoubleLiteral
-      Else If IsInSet(strComment[i], ['@', '_', 'a' .. 'z', 'A' .. 'Z']) Then
-        Begin
-          If (LastToken = ttNumber) And (IsInSet(strComment[i], ['A' .. 'F', 'a' .. 'f'])) Then
-            CurToken := ttNumber
-          Else
-            CurToken := ttIdentifier;
-        End
-      Else If IsInSet(strComment[i], ['0' .. '9']) Then
-        Begin
-          CurToken := ttNumber;
-          If LastToken = ttIdentifier Then
-            CurToken := ttIdentifier;
-        End
-      Else If IsInSet(strComment[i], strLineEnd) Then
-        CurToken := ttLineEnd
-      Else If IsInSet(strComment[i], [#33 .. #128] - ['a' .. 'z', 'A' .. 'Z', '@', '#']) Then
-        CurToken := ttSymbol
-      Else
-        CurToken := ttUnknown;
-
+      CurToken := DetermineTokenType(strComment[i], LastToken);
       If ((CurToken <> LastToken) And (BlockType = btNone)) Or (strComment[i] = '<') Then
         Begin
           SetLength(strToken, iTokenLen);
@@ -498,10 +585,17 @@ Begin
                   AddToken(strToken, LastToken);
                   LastTokenAdded := LastToken;
                 End
-              Else If Not(LastTokenAdded In [ttWhiteSpace, ttLineEnd]) Then
+              Else
                 Begin
-                  AddToken(#32, ttWhiteSpace);
-                  LastTokenAdded := ttWhiteSpace;
+                  If Not Assigned(FLastTag) Or (Assigned(FLastTag) And Not FLastTag.Fixed) Then
+                    Begin
+                      If Not(LastTokenAdded In [ttWhiteSpace, ttLineEnd]) Then
+                        Begin
+                          AddToken(#32, ttWhiteSpace);
+                          LastTokenAdded := ttWhiteSpace;
+                        End;
+                    End Else
+                      AddToken(strToken, LastToken);
                 End;
               LastToken := CurToken;
             End;
@@ -516,39 +610,8 @@ Begin
             SetLength(strToken, iTokenCapacity + Length(strToken));
           strToken[iTokenLen] := strComment[i];
         End;
-
-      If (BlockType = btNone) And (strToken[1] = '{') Then
-        BlockType := btLink
-      Else If (BlockType = btNone) And (strToken[1] = '<') Then
-        BlockType := btHTML;
-
-      If (BlockType = btLink) And (strToken[iTokenLen] = '}') Then
-        Begin
-          BlockType := btNone;
-          CurToken := ttLinkTag;
-        End;
-      If (BlockType = btHTML) And (strToken[iTokenLen] = '>') Then
-        Begin
-          BlockType := btNone;
-          If strToken[2] = '/' Then
-            CurToken := ttHTMLEndTag
-          Else
-            CurToken := ttHTMLStartTag;
-        End;
-
-        // Check for single string literals
-      If CurToken = ttSingleLiteral Then
-        If BlockType = btSingle Then
-          BlockType := btNone
-        Else If BlockType = btNone Then
-          BlockType := btSingle;
-        // Check for Double string literals
-      If CurToken = ttDoubleLiteral Then
-        If BlockType = btDouble Then
-          BlockType := btNone
-        Else If BlockType = btNone Then
-          BlockType := btDouble;
-
+      ProcessBlocks(strToken, iTokenLen, BlockType, CurToken);
+      ProcessStringLiterals(CurToken, BlockType);
       If strComment[i] = #10 Then
         Begin
           FTagColumn := Column + 1;

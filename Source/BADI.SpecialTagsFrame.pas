@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    13 Apr 2017
+  @Date    14 Apr 2017
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -26,10 +26,6 @@ Uses
   StdCtrls,
   Buttons,
   ComCtrls,
-  {$IFDEF DXE100}
-  ImageList,
-  {$ENDIF}
-  ImgList,
   BADI.CustomOptionsFrame;
 
 Type
@@ -67,7 +63,6 @@ Implementation
 
 
 Uses
-  CodeSiteLogging,
   BADI.Base.Module,
   BADI.SpecialTagForm,
   BADI.Constants,
@@ -405,9 +400,9 @@ Begin
   For j := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
     Begin
       Item := lvSpecialTags.Items.Add;
-      Item.Caption := TBADIOptions.BADIOptions.SpecialTags.Names[j];
-      Item.SubItems.Add(TBADIOptions.BADIOptions.SpecialTags.ValueFromIndex[j]);
-      setTPOps := TBADITagProperties(Byte(TBADIOptions.BADIOptions.SpecialTags.Objects[j]));
+      Item.Caption := TBADIOptions.BADIOptions.SpecialTags[j].FName;
+      Item.SubItems.Add(TBADIOptions.BADIOptions.SpecialTags[j].FDescription);
+      setTPOps := TBADIOptions.BADIOptions.SpecialTags[j].FTagProperties;
       Item.SubItems.Add(strBoolean[tpShowInTree In setTPOps]);
       Item.SubItems.Add(strBoolean[tpAutoExpand In setTPOps]);
       Item.SubItems.Add(strBoolean[tpShowInDoc In setTPOps]);
@@ -426,14 +421,12 @@ End;
 Procedure TfmBADISpecialTagsFrame.SaveSettings;
 
 Var
-  sl : TStringList;
   j: Integer;
   Item: TListItem;
   setTPOps: TBADITagProperties;
 
 Begin
-  sl := TBADIOptions.BADIOptions.SpecialTags;
-  sl.Clear;
+  TBADIOptions.BADIOptions.SpecialTags.Clear;
   For j := 0 To lvSpecialTags.Items.Count - 1 Do
     Begin
       Item := lvSpecialTags.Items[j];
@@ -446,7 +439,8 @@ Begin
         Include(setTPOps, tpShowInDoc);
       If StrToBool(Item.SubItems[4]) Then
         Include(setTPOps, tpFixed);
-      sl.AddObject(Item.Caption + '=' + Item.SubItems[0], TObject(Byte(setTPOps)));
+      TBADIOptions.BADIOptions.SpecialTags.Add(TBADISpecialTag.Create(Item.Caption,
+        Item.SubItems[0], setTPOps));
     End;
 End;
 

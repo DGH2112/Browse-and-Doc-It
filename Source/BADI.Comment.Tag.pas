@@ -127,7 +127,7 @@ End;
 Function TTag.AsString(iMaxWidth: Integer; boolShowHTML: Boolean): String;
 
 Begin
-  Result := OutputCommentAndTag(Self, iMaxWidth, boolShowHTML);
+  Result := OutputCommentAndTag(Self, iMaxWidth, boolShowHTML, FFixed);
 End;
 
 End.

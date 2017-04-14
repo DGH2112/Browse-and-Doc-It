@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    13 Apr 2017
+  @Date    14 Apr 2017
 
 **)
 Unit BADI.Types;
@@ -405,6 +405,38 @@ Type
   (** A set of tag properties. **)
   TBADITagProperties = Set Of TBADITagProperty;
 
+  (** A record to describe the attributes of a special tag in the options dialogue. **)
+  TBADISpecialTag = Record
+    FName          : String;
+    FDescription   : String;
+    FTagProperties : TBADITagProperties;
+    Constructor Create(Const strName, strDescription : String;
+      Const setTagProperties : TBADITagProperties);
+  End;
+
 Implementation
+
+{ TBADISpecialTag }
+
+(**
+
+  A constructor for the TBADISpecialTag class.
+
+  @precon  None.
+  @postcon Initialises the special tag record.
+
+  @param   strName          as a String as a constant
+  @param   strDescription   as a String as a constant
+  @param   setTagProperties as a TBADITagProperties as a constant
+
+**)
+Constructor TBADISpecialTag.Create(Const strName, strDescription: String;
+  Const setTagProperties: TBADITagProperties);
+
+Begin
+  FName := strName;
+  FDescription := strDescription;
+  FTagProperties := setTagProperties;
+End;
 
 End.

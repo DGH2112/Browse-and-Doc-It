@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    13 Apr 2017
+  @Date    14 Apr 2017
 
 **)
 Unit BADI.Options;
@@ -35,8 +35,10 @@ Type
     FUpdateInterval         : Cardinal;
     FScopesToRender         : TScopes;
     FBrowsePosition         : TBrowsePosition;
-    FFontName               : String;
-    FFontSize               : Integer;
+    FTreeFontName           : String;
+    FTreeFontSize           : Integer;
+    FFixedFontName          : String;
+    FFixedFontSize          : Integer;
     FTokenFontInfo          : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo;
     FExcludeDocFiles        : TStringList;
     FMethodDescriptions     : TStringList;
@@ -118,19 +120,33 @@ Type
     **)
     Property BrowsePosition : TBrowsePosition Read FBrowsePosition Write FBrowsePosition;
     (**
-      This property determines the Font Name of the Module explorer.
+      This property determines the Font Name of the Module Explorer Tree Nodes.
       @precon  None.
-      @postcon Gets or sets the module explorer font name.
+      @postcon Gets or sets the module explorer tree node font name.
       @return  a String
     **)
-    Property FontName : String Read FFontName Write FFontName;
+    Property TreeFontName : String Read FTreeFontName Write FTreeFontName;
     (**
-      This property determines the font size of the module explorer font.
+      This property determines the font size of the module explorer tree node font.
       @precon  None.
-      @postcon Gets or sets the module explorer font size.
+      @postcon Gets or sets the module explorer tree node font size.
       @return  an Integer
     **)
-    Property FontSize : Integer Read FFontSize Write FFontSize;
+    Property TreeFontSize : Integer Read FTreeFontSize Write FTreeFontSize;
+    (**
+      This property determines the Font Name of the Module Explorer Comment Fixed Fonts.
+      @precon  None.
+      @postcon Gets or sets the module explorer comment fixed font name.
+      @return  a String
+    **)
+    Property FixedFontName : String Read FFixedFontName Write FFixedFontName;
+    (**
+      This property determines the font size of the module explorer comment fixed font.
+      @precon  None.
+      @postcon Gets or sets the module explorer comment fixed font size.
+      @return  an Integer
+    **)
+    Property FixedFontSize : Integer Read FFixedFontSize Write FFixedFontSize;
     (**
       This property determines the colour and style attribute of a token in the
       module explorer
@@ -464,8 +480,10 @@ Begin
       Byte(FScopesToRender))));
     FBrowsePosition := TBrowsePosition(iniFile.ReadInteger('Setup', 'BrowsePosition',
       Integer(bpIdentifierCentreShowAllComment)));
-    FFontName := iniFile.ReadString('ModuleExplorer', 'Name', 'MS Sans Serif');
-    FFontSize := iniFile.ReadInteger('ModuleExplorer', 'Size', 8);
+    FTreeFontName := iniFile.ReadString('ModuleExplorer', 'Name', 'Tahoma');
+    FTreeFontSize := iniFile.ReadInteger('ModuleExplorer', 'Size', 10);
+    FFixedFontName := iniFile.ReadString('ModuleExplorer', 'FixedName', 'Courier New');
+    FFixedFontSize := iniFile.ReadInteger('ModuleExplorer', 'FixedSize', 10);
     For T := Low(TBADITokenType) To High(TBADITokenType) Do
       Begin
         FTokenFontInfo[T].FForeColour :=
@@ -567,8 +585,10 @@ Begin
     iniFile.WriteInteger('ModuleExplorer', 'UpdateInterval', FUpdateInterval);
     iniFile.WriteInteger('ModuleExplorer', 'ScopesToRender', Byte(FScopesToRender));
     iniFile.WriteInteger('Setup', 'BrowsePosition', Integer(FBrowsePosition));
-    iniFile.WriteString('ModuleExplorer', 'Name', FFontName);
-    iniFile.WriteInteger('ModuleExplorer', 'Size', FFontSize);
+    iniFile.WriteString('ModuleExplorer', 'Name', FTreeFontName);
+    iniFile.WriteInteger('ModuleExplorer', 'Size', FTreeFontSize);
+    iniFile.WriteString('ModuleExplorer', 'FixedName', FFixedFontName);
+    iniFile.WriteInteger('ModuleExplorer', 'FixedSize', FFixedFontSize);
     For T := Low(TBADITokenType) To High(TBADITokenType) Do
       Begin
         iniFile.WriteString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),

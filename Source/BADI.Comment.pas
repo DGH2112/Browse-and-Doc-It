@@ -369,6 +369,8 @@ Procedure TComment.TrimTrailingWhiteSpace;
 Var
   iToken: Integer;
   iTag: Integer;
+  iPos: Integer;
+  boolHasWS: Boolean;
 
 Begin
   If TokenCount > 0 Then
@@ -381,17 +383,31 @@ Begin
         End;
     End;
   For iTag := 0 To TagCount - 1 Do
-    If Not Tag[iTag].Fixed Then
-      Begin
-        If Tag[iTag].TokenCount = 0 Then
-          Continue;
-        iToken := Tag[iTag].TokenCount - 1;
-        While (iToken >= 0) And (Tag[iTag].Tokens[iToken].TokenType In [ttWhiteSpace]) Do
+    Begin
+      If Tag[iTag].TokenCount = 0 Then
+        Continue;
+      // Trim trailing whitespace and line ends
+      iToken := Tag[iTag].TokenCount - 1;
+      While (iToken >= 0) And (Tag[iTag].Tokens[iToken].TokenType In [ttWhiteSpace, ttLineEnd]) Do
+        Begin
+          Tag[iTag].DeleteToken(iToken);
+          Dec(iToken);
+        End;
+      // Trim starting whitespace ONLY if it ends with a line end
+      iPos := 0;
+      For iToken := 0 To Tag[iTag].TokenCount - 1 Do
+        If Tag[iTag].Tokens[iToken].TokenType = ttLineEnd Then
           Begin
-            Tag[iTag].DeleteToken(iToken);
-            Dec(iToken);
+            iPos := iToken;
+            Break;
           End;
-      End;
+      boolHasWS := iPos > 0;
+      For iToken := iPos - 1 DownTo 0 Do
+        boolHasWS := boolHasWS And (ttWhiteSpace = Tag[iTag].Tokens[iToken].TokenType);
+      If boolHasWS Then
+        For iToken := 0 To iPos Do
+          Tag[iTag].DeleteToken(0);
+    End;
 End;
 
 (**

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       11 Apr 2017
+  @Date       14 Apr 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -796,7 +796,6 @@ Function TPascalModule.GetModuleName : String;
 
 Begin
   Result := Inherited GetModuleName;
-  Result := strModuleTypes[ModuleType] + #32 + Result;
 End;
 
 (**

@@ -30,7 +30,7 @@ Type
 Implementation
 
 uses
-  BADI.Types;
+  BADI.Types, BADI.Options;
 
 Procedure TestTComment.SetUp;
 
@@ -41,9 +41,22 @@ Const
     ''#13#10 +
     '  @todo  Requires implementing.'#13#10 +
     '  @see   Something interesting.'#13#10 +
+    '  @code  Something more'#13#10 +
+    '  interesting.'#13#10 +
+    '  @refactor Something even more interesting.'#13#10 +
     '';
+Var
+  iTag: Integer;
 
 Begin
+  For iTag := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
+    If TBADIOptions.BADIOptions.SpecialTags[iTag].FName = 'code' Then
+      Begin
+        TBADIOptions.BADIOptions.SpecialTags.Delete(iTag);
+        Break;
+      End;
+  TBADIOptions.BADIOptions.SpecialTags.Add(TBADISpecialTag.Create('code', 'Example Code',
+    [tpShowInTree..tpFixed]));
   FComment := TComment.Create(strComment, 12, 34);
 End;
 
@@ -70,6 +83,7 @@ Begin
 End;
 
 Procedure TestTComment.TestCreate;
+
 Begin
   CheckEquals(12, FComment.TokenCount);
   CheckEquals('This', FComment.Tokens[0].Token);
@@ -92,7 +106,11 @@ Begin
   CheckEquals('Requires implementing.', FComment.Tag[0].AsString(80, False));
   CheckEquals('see', FComment.Tag[1].TagName);
   CheckEquals('Something interesting.', FComment.Tag[1].AsString(80, False));
-  CheckEquals(2, FComment.TagCount);
+  CheckEquals('code', FComment.Tag[2].TagName);
+  CheckEquals('  Something more'#13#10'  interesting.'#13#10'  ', FComment.Tag[2].AsString(80, False));
+  CheckEquals('refactor', FComment.Tag[3].TagName);
+  CheckEquals('Something even more interesting.', FComment.Tag[3].AsString(80, False));
+  CheckEquals(4, FComment.TagCount);
   CheckEquals(12, FComment.Line);
   CheckEquals(34, FComment.Column);
 End;
@@ -196,7 +214,11 @@ Begin
     CheckEquals('Requires implementing.', srcComment.Tag[0].AsString(80, False));
     CheckEquals('see', srcComment.Tag[1].TagName);
     CheckEquals('Something interesting.', srcComment.Tag[1].AsString(80, False));
-    CheckEquals(2, srcComment.TagCount);
+    CheckEquals('code', FComment.Tag[2].TagName);
+    CheckEquals('  Something more'#13#10'  interesting.'#13#10'  ', FComment.Tag[2].AsString(80, False));
+    CheckEquals('refactor', FComment.Tag[3].TagName);
+    CheckEquals('Something even more interesting.', FComment.Tag[3].AsString(80, False));
+    CheckEquals(4, srcComment.TagCount);
     CheckEquals(12, srcComment.Line);
     CheckEquals(34, srcComment.Column);
   Finally

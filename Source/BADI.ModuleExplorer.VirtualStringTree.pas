@@ -26,11 +26,11 @@ Type
   End;
 
   (** This record described the data sorted in the virtual tree view. **)
-  TTreeData = Record
-    FNode : TTreeNodeInfo;
+  TBADITreeData = Record
+    FNode : TBADITreeNodeInfo;
   End;
   (** A type to define a pointer to the above tree record. **)
-  PTreeData = ^TTreeData;
+  PBADITreeData = ^TBADITreeData;
 
 Implementation
 
@@ -56,7 +56,7 @@ Function TBADIVirtualStringTree.DoGetNodeWidth(Node: PVirtualNode;
   Column: TColumnIndex; Canvas: TCanvas): Integer;
 
 Var
-  NodeData: PTreeData;
+  NodeData: PBADITreeData;
   sl: TStringList;
   i: Integer;
 

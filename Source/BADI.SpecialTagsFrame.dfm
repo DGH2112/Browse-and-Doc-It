@@ -1,7 +1,7 @@
 object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
   Left = 0
   Top = 0
-  Width = 593
+  Width = 605
   Height = 373
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,10 +11,10 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
   ParentFont = False
   TabOrder = 0
   DesignSize = (
-    593
+    605
     373)
   object btnDelete: TBitBtn
-    Left = 353
+    Left = 365
     Top = 345
     Width = 75
     Height = 25
@@ -36,9 +36,10 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 2
     OnClick = btnDeleteClick
+    ExplicitLeft = 353
   end
   object btnEdit: TBitBtn
-    Left = 272
+    Left = 284
     Top = 345
     Width = 75
     Height = 25
@@ -60,9 +61,10 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 3
     OnClick = btnEditClick
+    ExplicitLeft = 272
   end
   object btnMoveDown: TBitBtn
-    Left = 515
+    Left = 527
     Top = 345
     Width = 75
     Height = 25
@@ -84,9 +86,10 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 4
     OnClick = btnMoveDownClick
+    ExplicitLeft = 515
   end
   object btnMoveUp: TBitBtn
-    Left = 434
+    Left = 446
     Top = 345
     Width = 75
     Height = 25
@@ -108,9 +111,10 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 5
     OnClick = btnMoveUpClick
+    ExplicitLeft = 434
   end
   object btnAdd: TBitBtn
-    Left = 191
+    Left = 203
     Top = 345
     Width = 75
     Height = 25
@@ -132,11 +136,12 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 1
     OnClick = btnAddClick
+    ExplicitLeft = 191
   end
   object lvSpecialTags: TListView
     Left = 3
     Top = 3
-    Width = 587
+    Width = 599
     Height = 336
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
@@ -151,22 +156,27 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
       item
         Alignment = taCenter
         Caption = 'Tree'
-        Width = 75
+        Width = 60
       end
       item
         Alignment = taCenter
         Caption = 'Expand'
-        Width = 75
+        Width = 60
       end
       item
         Alignment = taCenter
         Caption = 'Docs'
-        Width = 75
+        Width = 60
       end
       item
         Alignment = taCenter
         Caption = 'Fixed'
-        Width = 75
+        Width = 60
+      end
+      item
+        Alignment = taCenter
+        Caption = 'Syntax'
+        Width = 60
       end>
     GridLines = True
     ReadOnly = True
@@ -174,7 +184,9 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     TabOrder = 0
     ViewStyle = vsReport
     OnCustomDrawSubItem = lvSpecialTagsCustomDrawSubItem
+    OnDblClick = lvSpecialTagsDblClick
     OnMouseDown = lvSpecialTagsMouseDown
     OnSelectItem = lvSpecialTagsSelectItem
+    ExplicitWidth = 587
   end
 end

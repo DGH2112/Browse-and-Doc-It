@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    14 Apr 2017
+  @Date    15 Apr 2017
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -48,6 +48,7 @@ Type
     procedure lvSpecialTagsSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
     procedure lvSpecialTagsCustomDrawSubItem(Sender: TCustomListView; Item: TListItem;
       SubItem: Integer; State: TCustomDrawState; var DefaultDraw: Boolean);
+    procedure lvSpecialTagsDblClick(Sender: TObject);
   Private
     { Private declarations }
   Public
@@ -67,7 +68,8 @@ Uses
   BADI.SpecialTagForm,
   BADI.Constants,
   BADI.OptionsForm,
-  BADI.Options, BADI.Types;
+  BADI.Options,
+  BADI.Types;
 
 ResourceString
   (** This is a message to be displayed when a tag is not valid **)
@@ -76,8 +78,6 @@ ResourceString
 Const
   (** A constant array of boolean strings for displaying option settings. **)
   strBoolean : Array[False..True] Of String = ('False', 'True');
-
-{ TfmBADISpecialTagsFrame }
 
 (**
 
@@ -111,6 +111,7 @@ Begin
           Item.SubItems.Add(strBoolean[tpAutoExpand In setTagProps]);
           Item.SubItems.Add(strBoolean[tpShowInDoc In setTagProps]);
           Item.SubItems.Add(strBoolean[tpFixed In setTagProps]);
+          Item.SubItems.Add(strBoolean[tpSyntax In setTagProps]);
           lvSpecialTags.Selected := Item;
         End;
       lvSpecialTagsSelectItem(Sender, Item, Item <> Nil);
@@ -171,6 +172,8 @@ Begin
         Include(setTPOps, tpShowInDoc);
       If StrToBool(Item.SubItems[4]) Then
         Include(setTPOps, tpFixed);
+      If StrToBool(Item.SubItems[5]) Then
+        Include(setTPOps, tpSyntax);
       If TfrmSpecialTag.Execute(strName, strDesc, setTPOps) Then
         Begin
           If (strName = '') Or (strDesc = '') Then
@@ -183,6 +186,7 @@ Begin
               Item.SubItems[2] := strBoolean[tpAutoExpand In setTPOps];
               Item.SubItems[3] := strBoolean[tpShowInDoc In setTPOps];
               Item.SubItems[4] := strBoolean[tpFixed In setTPOps];
+              Item.SubItems[5] := strBoolean[tpSyntax In setTPOps];
             End;
         End;
     End;
@@ -337,6 +341,22 @@ End;
 
 (**
 
+  This is an on double click event handler for the special tags listview.
+
+  @precon  None.
+  @postcon Invokes editing the selected item.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfmBADISpecialTagsFrame.lvSpecialTagsDblClick(Sender: TObject);
+
+Begin
+  btnEditClick(Sender);
+End;
+
+(**
+
 
   This is an on mouse down event handler for the special tags list box.
 
@@ -367,7 +387,7 @@ Begin
       iLeft := 0;
       Inc(iLeft, lvSpecialTags.Column[0].Width); // Tag Name
       Inc(iLeft, lvSpecialTags.Column[1].Width); // Tag Description
-      For iOp := 1 To 4 Do // Subitems 1 to 4
+      For iOp := 1 To 5 Do // Subitems 1 to 5
         Begin
           iRight := iLeft + lvSpecialTags.Column[Succ(iOp)].Width;
           If (X >= iLeft) And (X <= iRight) Then
@@ -407,6 +427,7 @@ Begin
       Item.SubItems.Add(strBoolean[tpAutoExpand In setTPOps]);
       Item.SubItems.Add(strBoolean[tpShowInDoc In setTPOps]);
       Item.SubItems.Add(strBoolean[tpFixed In setTPOps]);
+      Item.SubItems.Add(strBoolean[tpSyntax In setTPOps]);
     End;
 End;
 
@@ -439,6 +460,8 @@ Begin
         Include(setTPOps, tpShowInDoc);
       If StrToBool(Item.SubItems[4]) Then
         Include(setTPOps, tpFixed);
+      If StrToBool(Item.SubItems[5]) Then
+        Include(setTPOps, tpSyntax);
       TBADIOptions.BADIOptions.SpecialTags.Add(TBADISpecialTag.Create(Item.Caption,
         Item.SubItems[0], setTPOps));
     End;

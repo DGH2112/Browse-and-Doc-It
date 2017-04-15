@@ -16,6 +16,7 @@ Uses
   Classes,
   Dialogs,
   Controls,
+  Graphics,
   BADI.Types,
   BADI.Base.Container,
   BADI.Generic.Parameter;
@@ -28,33 +29,34 @@ Type
   (** A set to determine the saved / locked state of a file. **)
   TStatuses = Set Of TStatus;
 
-  Procedure DisplayException(const strMsg : String); Overload;
-  Procedure DisplayException(const strMsg : String; Const Params : Array Of Const); Overload;
-  Function  IsKeyWord(Const strWord : String; Const strWordList : Array Of String): Boolean;
-  Function  IsInSet(Const C : Char; Const strCharSet : TSetOfAnsiChar) : Boolean; {$IFDEF D2005} InLine; {$ENDIF}
-  Function  PrologCode(Const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
-  Function  EpilogCode(Const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
-  Function  OutputCommentAndTag(Const C: TBADIBaseContainer; Const iMaxWidth: Integer;
+  Procedure DisplayException(Const strMsg: String); Overload;
+  Procedure DisplayException(Const strMsg: String; Const Params: Array Of Const); Overload;
+  Function IsKeyWord(Const strWord: String; Const strWordList: Array Of String): Boolean;
+  Function IsInSet(Const C: Char; Const strCharSet: TSetOfAnsiChar): Boolean; InLine;
+  Function PrologCode(Const strTemplate, strMethod: String; Const iPadding: Integer): TStringList;
+  Function EpilogCode(Const strTemplate, strMethod: String; Const iPadding: Integer): TStringList;
+  Function OutputCommentAndTag(Const C: TBADIBaseContainer; Const iMaxWidth: Integer;
     Const boolShowHTML, boolFixed: Boolean): String;
-  Function  BuildLangIndepRep(Const Param: TGenericParameter): String;
-  Function  BADIImageIndex(Const iBADIImageIndex : TBADIImageIndex; Const AScope : TScope) : Integer;
-  Procedure BuildNumber(Var iMajor, iMinor, iBugFix, iBuild : Integer);
-  Function  BuildRootKey : String;
-  Function  Like(Const strPattern, strText : String) : Boolean;
-  Function  ConvertDate(Const strDate : String) : TDateTime;
-  Function  GetField(Const strText : String; Const Ch : Char; Const iIndex : Integer;
-    Const boolIgnoreQuotes : Boolean = True): String;
-  Function  CharCount(Const cChar : Char; Const strText : String;
-    Const boolIgnoreQuotes : Boolean = True) : Integer;
-  Procedure LoadBADIImages(Const ilScopeImages : TImageList);
+  Function BuildLangIndepRep(Const Param: TGenericParameter): String;
+  Function BADIImageIndex(Const iBADIImageIndex: TBADIImageIndex; Const AScope: TScope): Integer;
+  Procedure BuildNumber(Var iMajor, iMinor, iBugFix, iBuild: Integer);
+  Function BuildRootKey: String;
+  Function Like(Const strPattern, strText: String): Boolean;
+  Function ConvertDate(Const strDate: String): TDateTime;
+  Function GetField(Const strText: String; Const Ch: Char; Const iIndex: Integer;
+    Const boolIgnoreQuotes: Boolean = True): String;
+  Function CharCount(Const cChar: Char; Const strText: String;
+    Const boolIgnoreQuotes: Boolean = True): Integer;
+  Procedure LoadBADIImages(Const ilScopeImages: TImageList);
+  Procedure GetFontInfo(Const slTokens: TStringList; Const iTokenIndex: Integer;
+    Const boolTitle: Boolean; Const Canvas: TCanvas);
 
 Implementation
 
 Uses
   Windows,
   BADI.Constants,
-  SHFolder,
-  Graphics;
+  SHFolder, BADI.Options;
 
 (**
 
@@ -142,15 +144,10 @@ end;
   @return  a Boolean
 
 **)
-Function IsInSet(Const C : Char; Const strCharSet : TSetOfAnsiChar) : Boolean;
-  {$IFDEF D2005} InLine; {$ENDIF}
+Function IsInSet(Const C : Char; Const strCharSet : TSetOfAnsiChar) : Boolean; InLine;
 
 Begin
-  {$IFNDEF D2009}
-  Result := C In strCharSet;
-  {$ELSE}
   Result := CharInSet(C, strCharSet);
-  {$ENDIF}
 End;
 
 (**
@@ -977,8 +974,8 @@ Procedure LoadBADIImages(Const ilScopeImages : TImageList);
 
 Var
   R: TRect;
-  MainImage: TBitmap;
-  ScopeImage: TBitmap;
+  MainImage: Graphics.TBitmap;
+  ScopeImage: Graphics.TBitmap;
   iImage: TBADIImageIndex;
   iScope: TScope;
   x: Integer;
@@ -986,9 +983,9 @@ Var
 
 Begin
   R := Rect(0, 0, 11, 11);
-  MainImage := TBitMap.Create;
+  MainImage := Graphics.TBitMap.Create;
   Try
-    ScopeImage := TBitmap.Create;
+    ScopeImage := Graphics.TBitmap.Create;
     Try
       For iImage := Succ(Low(TBADIImageIndex)) To High(TBADIImageIndex) Do
         For iScope := Low(TScope) To High(TScope) Do
@@ -1007,6 +1004,40 @@ Begin
   Finally
     MainImage.Free;
   End;
+End;
+
+(**
+
+  This procedure sets the font of the passed canvas to the appropiate style and colour for the words
+  stored in the string list.
+
+  @precon  sl is a string list of the tokenized word to display, i is the index of the word to
+           change the canvas for, Level is the current indentation level of the tree node and
+           Canvas is the canvas to be affected but the other parameters.
+  @postcon Sets the font of the passed canvas to the appropiate style and colour for the words
+           stored in the string list.
+
+  @param   slTokens    as a TStringList as a constant
+  @param   iTokenIndex as an Integer as a constant
+  @param   boolTitle   as a Boolean as a constant
+  @param   Canvas      as a TCanvas as a constant
+
+**)
+Procedure GetFontInfo(Const slTokens : TStringList; Const iTokenIndex : Integer;
+  Const boolTitle : Boolean; Const Canvas : TCanvas);
+var
+  eTokenType: TBADITokenType;
+
+Begin
+  If Not boolTitle Then
+    eTokenType := TBADITokenType(slTokens.Objects[iTokenIndex])
+  Else
+    eTokenType := ttTreeHeader;
+  Canvas.Font.Color := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FForeColour;
+  Canvas.Font.Style := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FStyles;
+  Canvas.Brush.Color := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FBackColour;
+  If Canvas.Brush.Color = clNone Then
+    Canvas.Brush.Color := TBADIOptions.BADIOptions.BGColour;
 End;
 
 End.

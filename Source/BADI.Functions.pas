@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    14 Apr 2017
+  @Date    15 Apr 2017
 
 **)
 Unit BADI.Functions;
@@ -34,7 +34,7 @@ Type
   Function  IsInSet(Const C : Char; Const strCharSet : TSetOfAnsiChar) : Boolean; {$IFDEF D2005} InLine; {$ENDIF}
   Function  PrologCode(Const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
   Function  EpilogCode(Const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
-  Function  OutputCommentAndTag(Const C: TBaseContainer; Const iMaxWidth: Integer;
+  Function  OutputCommentAndTag(Const C: TBADIBaseContainer; Const iMaxWidth: Integer;
     Const boolShowHTML, boolFixed: Boolean): String;
   Function  BuildLangIndepRep(Const Param: TGenericParameter): String;
   Function  BADIImageIndex(Const iBADIImageIndex : TBADIImageIndex; Const AScope : TScope) : Integer;
@@ -240,14 +240,14 @@ End;
   @postcon Outputs the comment or tag as a string missing out HTML tags if not required and any
            trialing whitespace.
 
-  @param   C            as a TBaseContainer as a constant
+  @param   C            as a TBADIBaseContainer as a constant
   @param   iMaxWidth    as an Integer as a constant
   @param   boolShowHTML as a Boolean as a constant
   @param   boolFixed    as a Boolean as a constant
   @return  a String
 
 **)
-Function OutputCommentAndTag(Const C: TBaseContainer; Const iMaxWidth: Integer;
+Function OutputCommentAndTag(Const C: TBADIBaseContainer; Const iMaxWidth: Integer;
   Const boolShowHTML, boolFixed: Boolean): String;
 
 Var

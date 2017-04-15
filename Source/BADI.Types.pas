@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Apr 2017
+  @Date    15 Apr 2017
 
 **)
 Unit BADI.Types;
@@ -400,7 +400,7 @@ Type
     Var strActionName : String) : Boolean Of Object;
 
   (** An enumerate to define the properties of a comment tag. **)
-  TBADITagProperty = (tpShowInTree, tpAutoExpand, tpShowInDoc, tpFixed);
+  TBADITagProperty = (tpShowInTree, tpAutoExpand, tpShowInDoc, tpFixed, tpSyntax);
 
   (** A set of tag properties. **)
   TBADITagProperties = Set Of TBADITagProperty;

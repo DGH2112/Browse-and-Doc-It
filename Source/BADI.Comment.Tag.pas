@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Apr 2017
+  @Date    15 Apr 2017
 
 **)
 Unit BADI.Comment.Tag;
@@ -18,9 +18,8 @@ Uses
 
 Type
   (** A class to hold text about a single tag **)
-  TTag = Class(TBaseContainer)
+  TTag = Class(TBADIBaseContainer)
   Strict Private
-    FFixed : Boolean;
   Strict Protected
     Function GetTagName : String;
   Public
@@ -34,13 +33,6 @@ Type
       @return  a String
     **)
     Property TagName : String Read GetTagName;
-    (**
-      This property determines whether the tag is a fixed tag (think <pre>).
-      @precon  None.
-      @postcon Returns true if the tag is fixed.
-      @return  a Boolean
-    **)
-    Property Fixed : Boolean Read FFixed;
   End;
 
 
@@ -72,11 +64,10 @@ Var
 
 Begin
   Inherited Create(strName, iLine, iColumn);
-  FFixed := False;
   For iTag := 0 To TBADIOptions.BADIOptions.SpecialTags.Count - 1 Do
     If strName = TBADIOptions.BADIOptions.SpecialTags[iTag].FName Then
       Begin
-        FFixed := tpFixed In TBADIOptions.BADIOptions.SpecialTags[iTag].FTagProperties;
+        Fixed := tpFixed In TBADIOptions.BADIOptions.SpecialTags[iTag].FTagProperties;
         Break;
       End;
 End;
@@ -127,7 +118,7 @@ End;
 Function TTag.AsString(iMaxWidth: Integer; boolShowHTML: Boolean): String;
 
 Begin
-  Result := OutputCommentAndTag(Self, iMaxWidth, boolShowHTML, FFixed);
+  Result := OutputCommentAndTag(Self, iMaxWidth, boolShowHTML, Fixed);
 End;
 
 End.

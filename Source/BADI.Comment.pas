@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Apr 2017
+  @Date    15 Apr 2017
 
 **)
 Unit BADI.Comment;
@@ -22,7 +22,7 @@ Uses
 
 Type
   (** A class the handles and stores all the comment information **)
-  TComment = Class(TBaseContainer)
+  TComment = Class(TBADIBaseContainer)
     {$IFDEF D2005} Strict {$ENDIF} Private
     FTags: TObjectList;
     FTagMode: Boolean;
@@ -122,7 +122,7 @@ End;
 Procedure TComment.AppendComment(BaseCmt, Source: TComment);
 
 Var
-  BC: TBaseContainer;
+  BC: TBADIBaseContainer;
   i: Integer;
   j: Integer;
 

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Feb 2017
+  @Date    15 Apr 2017
 
 **)
 Unit BADI.Base.Container;
@@ -25,13 +25,14 @@ Type
   (** This class defines an object that can contain tokens and has line and
       column numbers. It is the anscester for TTag, TComment and
       TElementContainer. **)
-  TBaseContainer = Class {$IFDEF D2005} Abstract {$ENDIF}
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  TBADIBaseContainer = Class Abstract
+  Strict Private
     FName : String;
     FLine : Integer;
     FColumn : Integer;
     FTokens : TObjectList;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+    FFixed : Boolean;
+  Strict Protected
     Function GetTokenCount : Integer;
     Function GetTokens(iIndex : Integer) : TTokenInfo;
     Function GetName: String; Virtual;
@@ -97,6 +98,13 @@ Type
       @return  an Integer
     **)
     Property TokenCount : Integer Read GetTokenCount;
+    (**
+      This property determines whether the tag is a fixed tag (think <pre>).
+      @precon  None.
+      @postcon Returns true if the tag is fixed.
+      @return  a Boolean
+    **)
+    Property Fixed : Boolean Read FFixed Write FFixed;
   End;
 
 Implementation
@@ -116,7 +124,7 @@ Uses
   @param   AToken as a TTokenInfo
 
 **)
-Procedure TBaseContainer.AddToken(AToken: TTokenInfo);
+Procedure TBADIBaseContainer.AddToken(AToken: TTokenInfo);
 
 Begin
   FTokens.Add(AToken);
@@ -135,7 +143,7 @@ End;
   @param   ATokenType as a TBADITokenType
 
 **)
-Procedure TBaseContainer.AddToken(const strToken: String; ATokenType: TBADITokenType = ttUnknown);
+Procedure TBADIBaseContainer.AddToken(const strToken: String; ATokenType: TBADITokenType = ttUnknown);
 
 Begin
   AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), ATokenType));
@@ -152,7 +160,7 @@ End;
   @param   AToken as a TTokenInfo
 
 **)
-Procedure TBaseContainer.AppendToken(AToken: TTokenInfo);
+Procedure TBADIBaseContainer.AppendToken(AToken: TTokenInfo);
 
 Begin
   AddToken(TTokenInfo.Create(AToken.Token, AToken.BufferPos, AToken.Line, AToken.Column,
@@ -179,7 +187,7 @@ End;
   @return  a String
 
 **)
-Function TBaseContainer.BuildStringRepresentation(boolIdentifier, boolForDocumentation: Boolean;
+Function TBADIBaseContainer.BuildStringRepresentation(boolIdentifier, boolForDocumentation: Boolean;
   const strDelimiter: String; iMaxWidth: Integer; strNoSpaceBefore: TSymbols = strNoSpaceBeforeSymbols;
   strNoSpaceAfter: TSymbols = strNoSpaceAfterSymbols;
   strSpaceAfter: TSymbols = strSpaceAfterSymbols; boolShowHTML: Boolean = False): String;
@@ -246,7 +254,7 @@ End;
   @postcon Clears the tokens in the collection.
 
 **)
-Procedure TBaseContainer.ClearTokens;
+Procedure TBADIBaseContainer.ClearTokens;
 
 Begin
   FTokens.Clear;
@@ -254,7 +262,7 @@ End;
 
 (**
 
-  This is a constructor for the TBaseContainer class.
+  This is a constructor for the TBADIBaseContainer class.
 
   @precon  None.
   @postcon Create the token collection and initialises the Line and Column
@@ -265,13 +273,14 @@ End;
   @param   iColumn as an Integer
 
 **)
-Constructor TBaseContainer.Create(const strName: String; iLine, iColumn: Integer);
+Constructor TBADIBaseContainer.Create(const strName: String; iLine, iColumn: Integer);
 
 Begin
   FTokens := TObjectList.Create(True);
   FName := strName;
   FLine := iLine;
   FColumn := iColumn;
+  FFixed := False;
 End;
 
 (**
@@ -284,7 +293,7 @@ End;
   @param   iIndex as an Integer
 
 **)
-Procedure TBaseContainer.DeleteToken(iIndex: Integer);
+Procedure TBADIBaseContainer.DeleteToken(iIndex: Integer);
 
 Begin
   FTokens.Delete(iIndex);
@@ -292,13 +301,13 @@ End;
 
 (**
 
-  This is a destructor for the TBaseContainer class.
+  This is a destructor for the TBADIBaseContainer class.
 
   @precon  None.
   @postcon Frees the token collection and the memory belonging to the tokens.
 
 **)
-Destructor TBaseContainer.Destroy;
+Destructor TBADIBaseContainer.Destroy;
 
 Begin
   FTokens.Free;
@@ -317,7 +326,7 @@ End;
   @return  a String
 
 **)
-Function TBaseContainer.GetName: String;
+Function TBADIBaseContainer.GetName: String;
 
 Begin
   Result := FName;
@@ -333,7 +342,7 @@ End;
   @return  an Integer
 
 **)
-Function TBaseContainer.GetTokenCount: Integer;
+Function TBADIBaseContainer.GetTokenCount: Integer;
 
 Begin
   Result := FTokens.Count;
@@ -350,7 +359,7 @@ End;
   @return  a TTokenInfo
 
 **)
-Function TBaseContainer.GetTokens(iIndex: Integer): TTokenInfo;
+Function TBADIBaseContainer.GetTokens(iIndex: Integer): TTokenInfo;
 
 Begin
   Result := FTokens[iIndex] As TTokenInfo;
@@ -368,7 +377,7 @@ End;
   @param   ATokenType as a TBADITokenType
 
 **)
-Procedure TBaseContainer.InsertToken(const strToken: String; iIndex: Integer;
+Procedure TBADIBaseContainer.InsertToken(const strToken: String; iIndex: Integer;
   ATokenType: TBADITokenType = ttUnknown);
 
 Begin
@@ -389,7 +398,7 @@ End;
   @param   Value as a String as a Constant
 
 **)
-Procedure TBaseContainer.SetName(const Value: String);
+Procedure TBADIBaseContainer.SetName(const Value: String);
 
 Begin
   FName := Value;

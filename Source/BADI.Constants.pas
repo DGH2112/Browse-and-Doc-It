@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    13 Apr 2017
+  @Date    15 Apr 2017
 
 **)
 Unit BADI.Constants;
@@ -369,10 +369,11 @@ Const
 
   (** A constant array to represent the Special Tag Properties. **)
   strTagProperty : Array[Low(TBADITagProperty)..High(TBADITagProperty)] Of String = (
-    'Show in Module Explorer',
-    'Auto Expand in Module Explorer',
-    'Show in Documentation',
-    'Fixed Width (preserve LF/CR and Indents)'
+    'Show the Tag in the Module Explorer',
+    'Auto Expand the Tag in Module Explorer',
+    'Show the Tag in Documentation',
+    'Fixed Font Tag (preserves LF/CR and Indents)',
+    'Syntax Highlight the Tag'
   );
 
 Implementation

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    15 Apr 2017
 
 **)
 Unit BADI.ElementContainer;
@@ -28,7 +28,7 @@ Type
 
   (** This class implements the IElementCollection interface so that this
       element container can be rendered with the module browser. **)
-  TElementContainer = Class Abstract (TBaseContainer)
+  TElementContainer = Class Abstract (TBADIBaseContainer)
   Strict Private
     FElements : TObjectList;
     FComment : TComment;

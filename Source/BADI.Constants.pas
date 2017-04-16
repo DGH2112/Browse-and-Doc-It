@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Apr 2017
+  @Date    16 Apr 2017
 
 **)
 Unit BADI.Constants;
@@ -98,27 +98,28 @@ Const
 
   (** This is a default set of font information for the application. **)
   strTokenTypeInfo : Array[Low(TBADITokenType)..High(TBADITokenType)] Of TTokenFontInfo = (
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [fsBold]; FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [fsBold]; FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clMaroon;   FStyles : [fsBold]; FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clBlack;    FStyles : [];       FBackColour: clWindow),
-    (FForeColour : clInfoText; FStyles : [];       FBackColour: clInfoBk)
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [fsBold]; FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [fsBold]; FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clMaroon;     FStyles : [fsBold]; FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clBlack;      FStyles : [];       FBackColour: clWindow),
+    (FForeColour : clInfoText;   FStyles : [];       FBackColour: clInfoBk),
+    (FForeColour : clWindowText; FStyles : [];       FBackColour: clWindow)
   );
 
   (** This is a list of image resource masks to be placed of the below images to create vesions
@@ -333,11 +334,29 @@ Const
 
   (** A list of strings representing the token types. **)
   strTokenType : Array[Low(TBADITokenType)..High(TBADITokenType)] Of String = (
-    'Unknown', 'White Space', 'Reserved Word', 'Identifier', 'Number',
-    'Symbol', 'Line End', 'Single Literal', 'Double Literal', 'Line Comment',
-    'Block Comment', 'HTML Start Tag', 'HTML End Tag',  'Directive',
-    'Compiler Directive', 'Link Tag', 'Tree Header', 'File End', 'Line Continuation',
-    'Custom User Token', 'Explorer Highlight');
+    'Unknown',
+    'White Space',
+    'Reserved Word',
+    'Identifier',
+    'Number',
+    'Symbol',
+    'Line End',
+    'Single Literal',
+    'Double Literal',
+    'Line Comment',
+    'Block Comment',
+    'HTML Start Tag',
+    'HTML End Tag',
+    'Directive',
+    'Compiler Directive',
+    'Link Tag',
+    'Tree Header',
+    'File End',
+    'Line Continuation',
+    'Custom User Token',
+    'Explorer Highlight',
+    'Plain Text'
+  );
 
   (** A constant string to represent the position of the main procedure code in
       a profiling code block. **)

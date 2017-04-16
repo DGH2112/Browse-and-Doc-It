@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    13 Apr 2017
+  @Date    16 Apr 2017
 
 **)
 Unit BADI.SpecialTagForm;
@@ -37,6 +37,7 @@ Type
     btnCancel: TBitBtn;
     lbxTagProperties: TCheckListBox;
     lblTagProperties: TLabel;
+    procedure btnOKClick(Sender: TObject);
   Private
     { Private declarations }
   Public
@@ -53,6 +54,31 @@ Uses
 {$R *.DFM}
 
 { TfrmSpecialTag }
+
+(**
+
+  This is an on click event handler for the OK button.
+
+  @precon  None.
+  @postcon Ensures that the name and description are valid before confirming the dialogue.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfrmSpecialTag.btnOKClick(Sender: TObject);
+
+Begin
+  If edtName.Text = '' Then
+    Begin
+      MessageDlg('You need to specific a valid name for the tag!', mtError, [mbOK], 0);
+      ModalResult := mrNone;
+    End Else
+  If edtDescription.Text = '' Then
+    Begin
+      MessageDlg('You need to specific a valid description for the tag!', mtError, [mbOK], 0);
+      ModalResult := mrNone;
+    End;
+End;
 
 (**
 

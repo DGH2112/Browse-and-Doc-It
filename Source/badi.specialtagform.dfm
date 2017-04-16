@@ -67,6 +67,7 @@ object frmSpecialTag: TfrmSpecialTag
     Kind = bkOK
     NumGlyphs = 2
     TabOrder = 3
+    OnClick = btnOKClick
   end
   object btnCancel: TBitBtn
     Left = 355

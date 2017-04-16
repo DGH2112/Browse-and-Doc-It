@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Apr 2017
+  @Date    16 Apr 2017
 
 **)
 Unit BADI.ModuleExplorer.VirtualStringTree;
@@ -36,7 +36,9 @@ Implementation
 
 Uses
   Classes,
-  BADI.Options, BADI.Functions;
+  BADI.Options,
+  BADI.Functions,
+  BADI.Types;
 
 (**
 
@@ -63,12 +65,14 @@ Var
 Begin
   Result := 5;
   NodeData := GetNodeData(Node);
-  Self.Canvas.Font.Name := TBADIOptions.BADIOptions.TreeFontName;
-  Self.Canvas.Font.Size := TBADIOptions.BADIOptions.TreeFontSize;
+  //: @note Self.Canvas used to access the treeview canvas as Canvas from the parameters above is
+  //:       NIL!
+  InitCanvasFont(Self.Canvas, tpFixed In NodeData.FNode.TagProperties);
   sl := NodeData.FNode.Tokens;
   For i := 0 To sl.Count - 1 Do
     Begin
-      GetFontInfo(sl, i, NodeData.FNode.Title, Self.Canvas);
+      GetFontInfo(sl, i, NodeData.FNode.Title, tpSyntax In NodeData.FNode.TagProperties,
+        Self.Canvas);
       Inc(Result, Self.Canvas.TextWidth(sl[i]) + 1);
     End;
 End;

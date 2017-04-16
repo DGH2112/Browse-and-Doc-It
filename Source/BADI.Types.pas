@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Apr 2017
+  @Date    16 Apr 2017
 
 **)
 Unit BADI.Types;
@@ -43,7 +43,8 @@ Type
     ttFileEnd,
     ttLineContinuation,
     ttCustomUserToken,
-    ttExplorerHighlight
+    ttExplorerHighlight,
+    ttPlainText
   );
   (** An enumerate for the scoping of identifiers. **)
   TScope = (

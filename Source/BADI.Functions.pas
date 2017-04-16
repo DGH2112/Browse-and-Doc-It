@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    15 Apr 2017
+  @Date    16 Apr 2017
 
 **)
 Unit BADI.Functions;
@@ -48,8 +48,9 @@ Type
   Function CharCount(Const cChar: Char; Const strText: String;
     Const boolIgnoreQuotes: Boolean = True): Integer;
   Procedure LoadBADIImages(Const ilScopeImages: TImageList);
+  Procedure InitCanvasFont(Const TargetCanvas: TCanvas; Const boolFixed: Boolean);
   Procedure GetFontInfo(Const slTokens: TStringList; Const iTokenIndex: Integer;
-    Const boolTitle: Boolean; Const Canvas: TCanvas);
+    Const boolTitle, boolSyntax : Boolean; Const Canvas: TCanvas);
 
 Implementation
 
@@ -1008,6 +1009,31 @@ End;
 
 (**
 
+  This method sets the treviews canvas font to those in the BADI options.
+
+  @precon  None.
+  @postcon The TargetCanvas font is set for rendering.
+
+  @param   TargetCanvas as a TCanvas as a constant
+  @param   boolFixed    as a Boolean as a constant
+
+**)
+Procedure InitCanvasFont(Const TargetCanvas: TCanvas; Const boolFixed: Boolean);
+
+Begin
+  If Not boolFixed Then
+    Begin
+      TargetCanvas.Font.Name := TBADIOptions.BADIOptions.TreeFontName;
+      TargetCanvas.Font.Size := TBADIOptions.BADIOptions.TreeFontSize;
+    End Else
+    Begin
+      TargetCanvas.Font.Name := TBADIOptions.BADIOptions.FixedFontName;
+      TargetCanvas.Font.Size := TBADIOptions.BADIOptions.FixedFontSize;
+    End;
+End;
+
+(**
+
   This procedure sets the font of the passed canvas to the appropiate style and colour for the words
   stored in the string list.
 
@@ -1020,19 +1046,22 @@ End;
   @param   slTokens    as a TStringList as a constant
   @param   iTokenIndex as an Integer as a constant
   @param   boolTitle   as a Boolean as a constant
+  @param   boolSyntax  as a Boolean as a constant
   @param   Canvas      as a TCanvas as a constant
 
 **)
 Procedure GetFontInfo(Const slTokens : TStringList; Const iTokenIndex : Integer;
-  Const boolTitle : Boolean; Const Canvas : TCanvas);
+  Const boolTitle, boolSyntax : Boolean; Const Canvas : TCanvas);
 var
   eTokenType: TBADITokenType;
 
 Begin
-  If Not boolTitle Then
+  If boolTitle Then
+    eTokenType := ttTreeHeader
+  Else If boolSyntax Then
     eTokenType := TBADITokenType(slTokens.Objects[iTokenIndex])
   Else
-    eTokenType := ttTreeHeader;
+    eTokenType := ttPlainText;
   Canvas.Font.Color := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FForeColour;
   Canvas.Font.Style := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FStyles;
   Canvas.Brush.Color := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FBackColour;

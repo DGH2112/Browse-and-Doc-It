@@ -36,7 +36,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 2
     OnClick = btnDeleteClick
-    ExplicitLeft = 353
   end
   object btnEdit: TBitBtn
     Left = 284
@@ -61,7 +60,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 3
     OnClick = btnEditClick
-    ExplicitLeft = 272
   end
   object btnMoveDown: TBitBtn
     Left = 527
@@ -86,7 +84,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 4
     OnClick = btnMoveDownClick
-    ExplicitLeft = 515
   end
   object btnMoveUp: TBitBtn
     Left = 446
@@ -111,7 +108,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 5
     OnClick = btnMoveUpClick
-    ExplicitLeft = 434
   end
   object btnAdd: TBitBtn
     Left = 203
@@ -136,7 +132,6 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     NumGlyphs = 2
     TabOrder = 1
     OnClick = btnAddClick
-    ExplicitLeft = 191
   end
   object lvSpecialTags: TListView
     Left = 3
@@ -187,6 +182,5 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     OnDblClick = lvSpecialTagsDblClick
     OnMouseDown = lvSpecialTagsMouseDown
     OnSelectItem = lvSpecialTagsSelectItem
-    ExplicitWidth = 587
   end
 end

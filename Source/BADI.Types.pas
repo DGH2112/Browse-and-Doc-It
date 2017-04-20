@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    16 Apr 2017
+  @Date    17 Apr 2017
 
 **)
 Unit BADI.Types;
@@ -44,7 +44,10 @@ Type
     ttLineContinuation,
     ttCustomUserToken,
     ttExplorerHighlight,
-    ttPlainText
+    ttPlainText,
+    ttCommentText,
+    ttTagHeaderText,
+    ttTagText
   );
   (** An enumerate for the scoping of identifiers. **)
   TScope = (

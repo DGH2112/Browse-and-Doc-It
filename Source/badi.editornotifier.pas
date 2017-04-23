@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    23 Apr 2017
   @Author  David Hoyle
 
 **)
@@ -64,6 +64,7 @@ Type
 Implementation
 
 Uses
+  //CodeSiteLogging, //: @debug Remove CodeSite
   SysUtils,
   BADI.ToolsAPIUtils,
   Dialogs,
@@ -134,6 +135,8 @@ function TEditorNotifier.EditorInfo(var strFileName: String;
 Var
   SE : IOTASourceEditor;
   Options : IOTAProjectOptions;
+  ProjOpsConfigs : IOTAProjectOptionsConfigurations;
+  strPlatform: String;
 
 begin
   Result := '';
@@ -188,39 +191,43 @@ begin
       {$IFDEF VER230} // Delphi XE2
       TBADIOptions.BADIOptions.Defines.Add('VER230');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE3
+      {$IFDEF VER240} // Delphi XE3
       TBADIOptions.BADIOptions.Defines.Add('VER240');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE4
+      {$IFDEF VER250} // Delphi XE4
       TBADIOptions.BADIOptions.Defines.Add('VER250');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE5
+      {$IFDEF VER260} // Delphi XE5
       TBADIOptions.BADIOptions.Defines.Add('VER260');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE6
+      {$IFDEF VER270} // Delphi XE6
       TBADIOptions.BADIOptions.Defines.Add('VER270');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE7
+      {$IFDEF VER280} // Delphi XE7
       TBADIOptions.BADIOptions.Defines.Add('VER280');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE8
+      {$IFDEF VER290} // Delphi XE8
       TBADIOptions.BADIOptions.Defines.Add('VER290');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE10 Seattle
+      {$IFDEF VER300} // Delphi XE10 Seattle
       TBADIOptions.BADIOptions.Defines.Add('VER300');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE10.1 Berlin
+      {$IFDEF VER310} // Delphi XE10.1 Berlin
       TBADIOptions.BADIOptions.Defines.Add('VER310');
       {$ENDIF}
-      {$IFDEF VER230} // Delphi XE10.2 Tokyo
-      TBADIOptions.BADIOptions.Defines.Add('VER310');
+      {$IFDEF VER320} // Delphi XE10.2 Tokyo
+      TBADIOptions.BADIOptions.Defines.Add('VER320');
       {$ENDIF}
-      {$IFDEF WIN32}
-      TBADIOptions.BADIOptions.Defines.Add('WIN32');
-      TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
-      {$ELSE}
-      TBADIOptions.BADIOptions.Defines.Add('LINUX');
+      {$IFNDEF D0001}
+        {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
       {$ENDIF}
+      If Supports(ActiveProject.ProjectOptions, IOTAProjectOptionsConfigurations, ProjOpsConfigs) Then
+        Begin
+          strPlatform := UpperCase(ProjOpsConfigs.ActiveConfiguration.Platform);
+          TBADIOptions.BADIOptions.Defines.Add(strPlatform);
+          If (strPlatform = 'WIN32') Or (strPlatform = 'WIN64') Then
+            TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
+        End;
     End;
 end;
 

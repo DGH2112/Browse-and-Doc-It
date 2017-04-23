@@ -1554,6 +1554,10 @@ end;
 **)
 Procedure TframeModuleExplorer.tvExplorerKeyPress(Sender: TObject; Var Key: Char);
 
+Var
+  KeyStates: TKeyboardState;
+  ShiftStates: TShiftState;
+
 Begin
   Case Key Of
     #08:
@@ -1565,8 +1569,11 @@ Begin
     #13:
       Begin
         tvExplorerClick(Sender);
-        If Assigned(OnFocus) Then
-          FFocus(Sender);
+        GetKeyboardState(KeyStates);
+        ShiftStates := KeyboardStateToShiftState(KeyStates);
+        If ShiftStates = [] Then
+          If Assigned(OnFocus) Then
+            FFocus(Sender);
         Key := #0;
       End;
     #27:

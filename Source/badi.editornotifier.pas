@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    23 Apr 2017
+  @Date    29 Apr 2017
   @Author  David Hoyle
 
 **)
@@ -70,7 +70,9 @@ Uses
   Dialogs,
   BADI.DockableModuleExplorer,
   Windows,
-  Forms, BADI.Options;
+  Forms,
+  BADI.Options,
+  Controls;
 
 (**
 
@@ -259,6 +261,7 @@ end;
 
 **)
 procedure TEditorNotifier.ExceptionMsg(Const strExceptionMsg: String);
+
 begin
   ShowMessage(strExceptionMsg);
 end;
@@ -338,6 +341,9 @@ procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
   End;
   {$ENDIF}
 
+{Const
+  strMsg = 'The last parse of the source code failed. Do you want to re-parse the code?';}
+
 Var
   Editor : IOTASourceEditor;
   P : TOTAEditPos;
@@ -378,9 +384,10 @@ begin
           FLastSize := MemStreamSize(Editor);
           {$ENDIF}
           FUpdateTimer.Enabled := False;
-          If FLastParserResult Then
-            FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument,
-              ExceptionMsg);
+          {: @debug If Not FLastParserResult Then
+            If MessageDlg(strMsg, mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
+              Exit;}
+          FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument, ExceptionMsg);
         End;
     End;
 end;

@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    11 Apr 2017
+  @Date    29 Apr 2017
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -206,11 +206,19 @@ Procedure TBADIIDEMenuInstaller.CreateBADIMainMenu;
 
 Var
   mmiMainMenu: TMainMenu;
+  iMajor, iMinor, iBugFix, iBuild : Integer;
 
 Begin
   mmiMainMenu := (BorlandIDEServices As INTAServices).MainMenu;
   FBADIMenu := TMenuItem.Create(mmiMainMenu);
-  FBADIMenu.Caption := '&Browse and Doc It';
+  BuildNumber(iMajor, iMinor, iBugFix, iBuild);
+  {$IFDEF DEBUG}
+  FBADIMenu.Caption := Format('&Browse and Doc It %d.%d%s BETA (Build %d.%d.%d.%d)',
+    [iMajor, iMinor, strRevision[Succ(iBugfix)], iMajor, iMinor, iBugfix, iBuild]);
+  {$ELSE}
+  FBADIMenu.Caption := Format('&Browse and Doc It %d.%d%s (Build %d.%d.%d.%d)',
+    [iMajor, iMinor, strRevision[Succ(iBugfix)], iMajor, iMinor, iBugfix, iBuild]);
+  {$ENDIF}
   mmiMainMenu.Items.Insert(mmiMainMenu.Items.Count - 2, FBADIMenu);
 End;
 

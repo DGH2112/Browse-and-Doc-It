@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Apr 2017
+  @Date    29 Apr 2017
 
 **)
 Unit BADI.ParentFrame;
@@ -32,6 +32,7 @@ Type
     lblBuild: TLabel;
     lblPleaseSelect: TLabel;
     lblInformation: TLabel;
+    lblEurekaLog: TLabel;
   Private
     { Private declarations }
   Public
@@ -43,6 +44,9 @@ Type
 Implementation
 
 uses
+  {$IFDEF EUREKALOG_VER7}
+  ExceptionLog7,
+  {$ENDIF}
   BADI.Functions;
 
 {$R *.dfm}
@@ -69,6 +73,13 @@ Begin
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
   lblBADI.Caption := Format('Browse and Doc It %d.%d%s', [iMajor, iMinor, strBugFix[iBugFix]]);
   lblBuild.Caption := Format('Build %d.%d.%d.%d', [iMajor, iMinor, iBugFix, iBuild]);
+  {$IFDEF EUREKALOG_VER7}
+  lblEurekaLog.Caption := 'EurekaLog Information:'#13#10 +
+    '  Installed: ' + BoolToStr(ExceptionLog7.IsEurekaLogInstalled, True) + #13#10 +
+    '  Active: ' + BoolToStr(ExceptionLog7.IsEurekaLogActive, True);
+  {$ELSE}
+  lblEurekaLog.Caption := 'EurekaLog is not compiled into this version.';
+  {$ENDIF}
 End;
 
 (**

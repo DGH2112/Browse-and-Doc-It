@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    14 Apr 2017
+  @Date    29 Apr 2017
   @Version 1.0
 
 **)
@@ -30,7 +30,7 @@ Type
     FConflicts : TStringList;
   Protected
   Public
-    Constructor Create(const strModule : String);
+    Constructor Create(Const strModule : String);
     Destructor Destroy; Override;
     (**
       This property provides access to the string list of conflicts.
@@ -50,75 +50,74 @@ Type
 
   (** This is a class to produce HTML documentation. **)
   THTMLDocumentation = Class(TBaseDocumentation)
-  Private
-    FCurrentModule   : TBaseLanguageModule;
-    FProgressIndex: Integer;
-    FModuleSpecialTagNodes: TObjectList;
-    FSummarySpecialTagNodes: TObjectList;
-    FErrors: TStringList;
-    FWarnings: TStringList;
-    FHints: TStringList;
-    FHeaderLevel: Integer;
-    FSummaryContent: TStringList;
-    FTitle: String;
-    FReservedWords : TKeyWords;
-    FDirectives : TKeyWords;
-    FScopesToDocument: TScopes;
-    FIndex : TStringList;
-    FHTMLFileName: String;
-    FSummaryDocConflicts : TObjectList;
-    FSections : TStringList;
-    FPerfCounters : TStringList;
-    procedure OutputSummarySpecialTags;
-    function GetSumDocCons(iIndex : Integer): TSumDocCon;
-  Protected
-    procedure GenerateImages(const strImageDirectory: String);
-    function ExpandLinkTag(const strToken: String): String;
-    Procedure OutputHTMLDocumentation(const strFileName : String);
+  Strict Private
+    FCurrentModule          : TBaseLanguageModule;
+    FProgressIndex          : Integer;
+    FModuleSpecialTagNodes  : TObjectList;
+    FSummarySpecialTagNodes : TObjectList;
+    FErrors                 : TStringList;
+    FWarnings               : TStringList;
+    FHints                  : TStringList;
+    FHeaderLevel            : Integer;
+    FSummaryContent         : TStringList;
+    FTitle                  : String;
+    FReservedWords          : TKeyWords;
+    FDirectives             : TKeyWords;
+    FScopesToDocument       : TScopes;
+    FIndex                  : TStringList;
+    FHTMLFileName           : String;
+    FSummaryDocConflicts    : TObjectList;
+    FSections               : TStringList;
+    FPerfCounters           : TStringList;
+  Strict Protected
+    procedure GenerateImages(Const strImageDirectory: String);
+    function ExpandLinkTag(Const strToken: String): String;
+    Procedure OutputHTMLDocumentation(Const strFileName : String);
     Procedure GenerateSummary;
     Procedure GenerateCSS;
     Procedure GenerateIndex;
     procedure GenerateSchema;
-    Procedure GenerateHTML(slHTMLFile : TStringList; const strTitle : String);
-    Procedure GenerateModuleList(slHTMLFile : TStringList);
-    Procedure GenerateSectionList(slHTMLFile : TStringList);
-    Procedure GenerateContent(slHTMLFile : TStringList);
-    Function FindInsertionPoint(slHTMLFile : TStringList;
-      const strText : String) : Integer;
-    Function GetStringResource(const strName : String) : String;
+    Procedure GenerateHTML(Const slHTMLFile : TStringList; Const strTitle : String);
+    Procedure GenerateModuleList(Const slHTMLFile : TStringList);
+    Procedure GenerateSectionList(Const slHTMLFile : TStringList);
+    Procedure GenerateContent(Const slHTMLFile : TStringList);
+    Function FindInsertionPoint(Const slHTMLFile : TStringList;
+      Const strText : String) : Integer;
+    Function GetStringResource(Const strName : String) : String;
     Function GetMainDocument : String; Override;
-    Procedure GenerateErrorsWarningsHints(slContents : TStringList);
-    Procedure GenerateDocumentConflicts(slContents : TStringList);
-    Procedure GenerateSpecialTags(slContents : TStringList);
-    Procedure OutputComment(slContents : TStringList; E : TElementContainer;
-      iIndentLevel : Integer);
-    Procedure OutputContainers(slContents : TStringList;
-      Container : TElementContainer; iIndentLevel : Integer;
-      const strContainerLabel : String);
-    Function N(const strText : String) : String;
-    Function P(const strText : String) : String;
+    Procedure GenerateErrorsWarningsHints(Const slContents : TStringList);
+    Procedure GenerateDocumentConflicts(Const slContents : TStringList);
+    Procedure GenerateSpecialTags(Const slContents : TStringList);
+    Procedure OutputComment(Const slContents : TStringList; Const E : TElementContainer;
+      Const iIndentLevel : Integer);
+    Procedure OutputContainers(Const slContents : TStringList;
+      Const Container : TElementContainer; Const iIndentLevel : Integer;
+      Const strContainerLabel : String);
+    Function N(Const strText : String) : String;
+    Function P(Const strText : String) : String;
     Procedure InitialiseSummary;
-    Procedure OutputErrorsWarningsAndHints(slEWH : TStringList; const strSectionTitle,
-      strLIType : String; AImageIndex : TBADIImageIndex);
+    Procedure OutputErrorsWarningsAndHints(Const slEWH : TStringList; Const strSectionTitle,
+      strLIType : String; Const AImageIndex : TBADIImageIndex);
     Procedure OutputSummaryDocumentationConflicts;
     { HTML Tag Outputs }
-    Function A(const strText, strHREF : String; const strName : String = '') : String;
-    Function H(const strText : String; iLevel : Integer; AImage : TBADIImageIndex;
-      AScope : TScope) : String;
-    Function IMG(AImageIndex : TBADIImageIndex; AScope : TScope) : String;
-    Function LI(const strClass, strText : String) : String;
+    Function A(Const strText, strHREF : String; Const strName : String = '') : String;
+    Function H(Const strText : String; Const iLevel : Integer; Const AImage : TBADIImageIndex;
+      Const AScope : TScope) : String;
+    Function IMG(Const AImageIndex : TBADIImageIndex; Const AScope : TScope) : String;
+    Function LI(Const strClass, strText : String) : String;
+    Procedure OutputSummarySpecialTags;
+    Function GetSumDocCons(Const iIndex: Integer): TSumDocCon;
+    Function ImageFileName(eImageIndex : TBADIImageIndex; eScope : TScope) : String;
     (**
-      This property provides access to an array of documentation conflicts for
-      all the modules.
+      This property provides access to an array of documentation conflicts for all the modules.
       @precon  iIndex must be a valid index into the array 0 to count - 1.
-      @postcon Provides access to an array of documentation conflicts for
-               all the modules.
-      @param   iIndex as       an Integer
+      @postcon Provides access to an array of documentation conflicts for all the modules.
+      @param   iIndex as an Integer as a constant
       @return  a TSumDocCon
     **)
-    Property SumDocCons[iIndex : Integer] : TSumDocCon Read GetSumDocCons;
+    Property SumDocCons[Const iIndex : Integer] : TSumDocCon Read GetSumDocCons;
   Public
-    Constructor Create(const strOutputDirectory, strTitle : String); Override;
+    Constructor Create(Const strOutputDirectory, strTitle : String); Override;
     Destructor Destroy; Override;
     Procedure OutputDocumentation; Override;
   End;
@@ -403,22 +402,18 @@ end;
 
 (**
 
-
   This method attempts to find the insert point in the doucmentation template.
 
-
   @precon  slHTML must be a valid TStringList instance.
-
   @postcon Return the index of the insert point line if found else returns -1.
 
-
-  @param   slHTMLFile as a TStringList
+  @param   slHTMLFile as a TStringList as a constant
   @param   strText    as a String as a constant
   @return  an Integer
 
 **)
-Function THTMLDocumentation.FindInsertionPoint(slHTMLFile : TStringList;
-  const strText : String) : Integer;
+Function THTMLDocumentation.FindInsertionPoint(Const slHTMLFile : TStringList;
+  Const strText : String) : Integer;
 
 ResourceString
   strInsertionPointNotFound = 'Insertion Point "%s" not found!';
@@ -438,18 +433,17 @@ End;
 
 (**
 
-
-  This method outputs the contents of the html to a string list which is then
-  inserted into the template HTML file.
+  This method outputs the contents of the html to a string list which is then inserted into the
+  template HTML file.
 
   @precon  slContents must be a valid instance of a string list.
-  @postcon Outputs the contents of the html to a string list which is then
-           inserted into the template HTML file.
+  @postcon Outputs the contents of the html to a string list which is then inserted into the
+           template HTML file.
 
-  @param   slHTMLFile as a TStringList
+  @param   slHTMLFile as a TStringList as a constant
 
 **)
-Procedure THTMLDocumentation.GenerateContent(slHTMLFile : TStringList);
+Procedure THTMLDocumentation.GenerateContent(Const slHTMLFile : TStringList);
 
 Const
   strSections : Array[1..4] Of String = (strDocumentationConflicts, strErrors,
@@ -468,9 +462,9 @@ Begin
   strIndent := StringOfChar(#32, i - 1);
   slContents := TStringList.Create;
   Try
-    slContents.Add(Format('<!-- %s -->', [FCurrentModule.ModuleName]));
+    slContents.Add(Format('<!-- %s -->', [FCurrentModule.AsString(True, True)]));
     slContents.Add(H(A('Documentation for ' +
-      ExtractFileName(FCurrentModule.ModuleName), '',
+      FCurrentModule.AsString(True, True), '',
       'ModuleOverview'), FHeaderLevel, FCurrentModule.ImageIndex,
       FCurrentModule.Scope));
     Inc(FHeaderLevel);
@@ -553,9 +547,11 @@ Var
     With TBADIOptions.BADIOptions Do
       For i := Low(TBADITokenType) to High(TBADITokenType) Do
         Begin
-          sl.Add(Format('span.%s {', [strTokenType[i]]));
+          sl.Add(Format('span.%s {', [StringReplace(strTokenType[i], #32, '', [rfReplaceAll])]));
           sl.Add(Format('  color            : #%s;', [HTMLColour(TokenFontInfo[i].FForeColour)]));
-          sl.Add(Format('  background       : #%s;', [HTMLColour(TokenFontInfo[i].FBackColour)]));
+          If (TokenFontInfo[i].FBackColour <> clNone) And
+             (TokenFontInfo[i].FBackColour <> clWindow) Then
+            sl.Add(Format('  background       : #%s;', [HTMLColour(TokenFontInfo[i].FBackColour)]));
           If fsBold In TokenFontInfo[i].FStyles Then
             sl.Add('  font-weight      : bold;');
           If fsItalic In TokenFontInfo[i].FStyles Then
@@ -616,18 +612,15 @@ End;
 
 (**
 
-
   This method outputs the document conflicts to the html file.
 
   @precon  slContents must be a valid instance of a string list.
-  @postcon Outputs the document conflicts to the html file as an
-           unordered list.
+  @postcon Outputs the document conflicts to the html file as an unordered list.
 
-
-  @param   slContents as a TStringList
+  @param   slContents as a TStringList as a constant
 
 **)
-procedure THTMLDocumentation.GenerateDocumentConflicts(slContents : TStringList);
+procedure THTMLDocumentation.GenerateDocumentConflicts(Const slContents : TStringList);
 
 Var
   i, j : Integer;
@@ -664,18 +657,15 @@ end;
 
 (**
 
-
   This method output Errors, Hints and Warnings to the html file.
 
   @precon  slContents must be a valid instance of a string list.
-  @postcon Output Errors, Hints and Warnings to the html file as an
-           unordered list.
+  @postcon Output Errors, Hints and Warnings to the html file as an unordered list.
 
-
-  @param   slContents as a TStringList
+  @param   slContents as a TStringList as a constant
 
 **)
-procedure THTMLDocumentation.GenerateErrorsWarningsHints(slContents : TStringList);
+procedure THTMLDocumentation.GenerateErrorsWarningsHints(Const slContents : TStringList);
 
 Const
   Sections : Array[1..3] Of String = (strErrors, strWarnings, strHints);
@@ -712,20 +702,16 @@ end;
 
 (**
 
-
-  This method gets the HTML template from the windows resource and sets its
-  title.
+  This method gets the HTML template from the windows resource and sets its title.
 
   @precon  None.
-  @postcon Gets the HTML template from the windows resource and sets its
-           title.
+  @postcon Gets the HTML template from the windows resource and sets its title.
 
-
-  @param   slHTMLFile as a TStringList
-  @param   strTitle as a String as a constant
+  @param   slHTMLFile as a TStringList as a constant
+  @param   strTitle   as a String as a constant
 
 **)
-Procedure THTMLDocumentation.GenerateHTML(slHTMLFile : TStringList; const strTitle : String);
+Procedure THTMLDocumentation.GenerateHTML(Const slHTMLFile : TStringList; Const strTitle : String);
 
 Begin
  slHTMLFile.Text := StringReplace(GetStringResource(
@@ -752,40 +738,59 @@ End;
 Procedure THTMLDocumentation.GenerateImages(const strImageDirectory : String);
 
 Var
-  i : TBADIImageIndex;
-  BitMap : TBitMap;
-  GIF : TGIFImage;
-  strFileName: String;
-
+  R: TRect;
+  MainImage: TBitmap;
+  ScopeImage: TBitmap;
+  eImage: TBADIImageIndex;
+  eScope: TScope;
+  x, y : Integer;
+  GIF: TGIFImage;
+  strFileName: string;
 
 Begin
   ForceDirectories(strImageDirectory);
-  For i := Succ(Low(TBADIImageIndex)) To High(TBADIImageIndex) Do
-    Begin
-      Update(FProgressIndex, Format('Generating Image %s...', [
-        BADIImageList[i].FResourcename]));
-      Inc(FProgressIndex);
-      BitMap := TBitMap.Create;
-      try
-        BitMap.LoadFromResourceName(hInstance, BADIImageList[i].FResourcename);
-        BitMap.Transparent := True;
-        BitMap.TransparentColor := BADIImageList[i].FMaskColour;
-        BitMap.TransparentMode := tmFixed;
-        GIF := TGIFImage.Create;
-        Try
-          GIF.Transparent := True;
-          GIF.Assign(BitMap);
-          strFileName := Format('%s%s.gif', [strImageDirectory,
-            BADIImageList[i].FResourcename]);
-          If Not FileExists(strFileName) Then
-            GIF.SaveToFile(strFileName);
-        Finally
-          GIF.Free;
-        End;
-      finally
-        BitMap.Free;
-      end;
+  R := Rect(0, 0, 11, 11);
+  MainImage := Graphics.TBitMap.Create;
+  Try
+    ScopeImage := Graphics.TBitmap.Create;
+    Try
+      For eImage := Succ(Low(TBADIImageIndex)) To High(TBADIImageIndex) Do
+        For eScope := Low(TScope) To High(TScope) Do
+          Begin
+            MainImage.LoadFromResourceName(hInstance, BADIImageList[eImage].FResourceName);
+            ScopeImage.LoadFromResourceName(hInstance, BADIScopeList[eScope].FResourceName);
+            For x := 0 To 11 Do
+              For y := 0 To 11 Do
+                If ScopeImage.Canvas.Pixels[x, y] <> BADIScopeList[eScope].FMaskColour Then
+                  MainImage.Canvas.Pixels[x, y] := ScopeImage.Canvas.Pixels[x, y];
+            Update(FProgressIndex, Format('Generating Image %s...',
+              [ImageFileName(eImage, eScope)]));
+            Inc(FProgressIndex);
+            MainImage.Transparent := True;
+            MainImage.TransparentColor := BADIImageList[eImage].FMaskColour;
+            MainImage.TransparentMode := tmFixed;
+            GIF := TGIFImage.Create;
+            Try
+              GIF.Transparent := True;
+              GIF.Assign(MainImage);
+              strFileName := Format('%s%s.gif', [
+                strImageDirectory,
+                ImageFileName(eImage, eScope)
+              ]);
+              If Not FileExists(strFileName) Then
+                GIF.SaveToFile(strFileName);
+            Finally
+              GIF.Free;
+            End;
+          End;
+    Finally
+      ScopeImage.Free;
     End;
+  Finally
+    MainImage.Free;
+  End;
+  {
+  }
 End;
 
 (**
@@ -879,16 +884,15 @@ end;
 
 (**
 
-
   This method outputs a menu of all the module in this package of documentation.
 
   @precon  None.
   @postcon Outputs a menu of all the module in this package of documentation.
 
-  @param   slHTMLFile as a TStringList
+  @param   slHTMLFile as a TStringList as a constant
 
 **)
-Procedure THTMLDocumentation.GenerateModuleList(slHTMLFile : TStringList);
+Procedure THTMLDocumentation.GenerateModuleList(Const slHTMLFile : TStringList);
 
 Var
   iIns : Integer;
@@ -925,16 +929,15 @@ End;
 
 (**
 
-
   This method generates a menu for the various section contained in this module.
 
   @precon  None.
   @postcon Generates a menu for the various section contained in this module.
 
-  @param   slHTMLFile as a TStringList
+  @param   slHTMLFile as a TStringList as a constant
 
 **)
-Procedure THTMLDocumentation.GenerateSectionList(slHTMLFile : TStringList);
+Procedure THTMLDocumentation.GenerateSectionList(Const slHTMLFile : TStringList);
 
 Var
   iIns : Integer;
@@ -976,17 +979,15 @@ End;
 
 (**
 
-
   This method outputs special tags (todos, bugs, etc) to the html file.
 
   @precon  slContents must be a valid instance of a string list.
-  @postcon Outputs special tags (todos, bugs, etc) to the html file as an
-           unordered list.
+  @postcon Outputs special tags (todos, bugs, etc) to the html file as an unordered list.
 
-  @param   slContents as a TStringList
+  @param   slContents as a TStringList as a constant
 
 **)
-procedure THTMLDocumentation.GenerateSpecialTags(slContents: TStringList);
+procedure THTMLDocumentation.GenerateSpecialTags(Const slContents: TStringList);
 
 Var
   i: Integer;
@@ -1022,7 +1023,10 @@ begin
         FHeaderLevel, iiToDoFolder, scNone));
       slContents.Add('<ul>');
       For j := 0 To sl.Count - 1 Do
-        slContents.Add(#32#32 + LI('ToDoItem', N(sl[j])));
+        If tpFixed In TBADIOptions.BADIOptions.SpecialTags[i].FTagProperties Then
+          slContents.Add(#32#32 + LI('ToDoItem', '<pre>' + N(sl[j]) + '</pre>'))
+        Else
+          slContents.Add(#32#32 + LI('ToDoItem', N(sl[j])));
       slContents.Add('</ul>');
       slContents.Add('');
     End;
@@ -1040,10 +1044,10 @@ begin
   If doShowPrefCountersInDocSummary In TBADIOptions.BADIOptions.Options Then
     Begin
       For i := 1 To FCurrentModule.OpTickCounts - 1 Do
-        FSummaryContent.Add(Format('        <td>%d</td>', [
+        FSummaryContent.Add(Format('        <td>%1.1n</td>', [
           FCurrentModule.OpTickCountByIndex[i] -
           FCurrentModule.OpTickCountByIndex[i - 1]]));
-      FSummaryContent.Add(Format('        <td>%d</td>', [
+      FSummaryContent.Add(Format('        <td>%1.1n</td>', [
         FCurrentModule.OpTickCountByIndex[FCurrentModule.OpTickCounts - 1] -
         FCurrentModule.OpTickCountByIndex[0]]));
     End;
@@ -1126,7 +1130,7 @@ end;
 
 
   @param   strName as a String as a constant
-  @return  a String 
+  @return  a String
 
 **)
 function THTMLDocumentation.GetStringResource(const strName: String): String;
@@ -1157,42 +1161,36 @@ end;
 
 (**
 
-
   This is a getter method for the SumDocCons property.
 
   @precon  iIndex must be a valid integer between 0 and Count - 1.
   @postcon Returns the instance of the TSumDocCons class.
 
-
-  @param   iIndex as an Integer
+  @param   iIndex as an Integer as a constant
   @return  a TSumDocCon
 
 **)
-function THTMLDocumentation.GetSumDocCons(iIndex : Integer): TSumDocCon;
+function THTMLDocumentation.GetSumDocCons(Const iIndex : Integer): TSumDocCon;
 begin
   Result := FSummaryDocConflicts[iIndex]  As TSumDocCon;
 end;
 
 (**
 
+  This method returns a string representing a header tag.
 
-  This method returns a string representing a header tag. 
-
-
-  @precon  None. 
-
-  @postcon Returns a string representing a header tag. 
-
+  @precon  None.
+  @postcon Returns a string representing a header tag.
 
   @param   strText as a String as a constant
-  @param   iLevel  as an Integer
-  @param   AImage  as a TBADIImageIndex
-  @param   AScope  as a TScope
+  @param   iLevel  as an Integer as a constant
+  @param   AImage  as a TBADIImageIndex as a constant
+  @param   AScope  as a TScope as a constant
   @return  a String
 
 **)
-function THTMLDocumentation.H(const strText: String; iLevel: Integer;
-  AImage : TBADIImageIndex; AScope : TScope): String;
+function THTMLDocumentation.H(Const strText: String; Const iLevel: Integer;
+  Const AImage : TBADIImageIndex; Const AScope : TScope): String;
 
 begin
   Result := Format('<h%d>%s&nbsp;%s</h%d>', [iLevel, IMG(AImage, AScope),
@@ -1201,40 +1199,41 @@ end;
 
 (**
 
-
-  This method outputs an img tag with the image vertically aligned central.
-
+  This method returns a file name composed of the scope plus the image name.
 
   @precon  None.
+  @postcon Returns a file name composed of the scope plus the image name.
 
-  @postcon Outputs an img tag with the image vertically aligned central.
-
-
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AScope      as a TScope
+  @param   eImageIndex as a TBADIImageIndex
+  @param   eScope      as a TScope
   @return  a String
 
 **)
-function THTMLDocumentation.IMG(AImageIndex: TBADIImageIndex; AScope : TScope): String;
+Function THTMLDocumentation.ImageFileName(eImageIndex: TBADIImageIndex; eScope: TScope): String;
 
-Var
-  iImage : TBADIImageIndex;
+Begin
+  Result :=
+    StringReplace(BADIScopeList[eScope].FResourcename, 'Mask', '', [rfReplaceAll]) +
+    StringReplace(BADIImageList[eImageIndex].FResourcename, 'Public', '', [rfReplaceAll])End;
+
+(**
+
+  This method outputs an img tag with the image vertically aligned central.
+
+  @precon  None.
+  @postcon Outputs an img tag with the image vertically aligned central.
+
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AScope      as a TScope as a constant
+  @return  a String
+
+**)
+function THTMLDocumentation.IMG(Const AImageIndex: TBADIImageIndex; Const AScope : TScope): String;
 
 begin
-  Result := '';
-  If AImageIndex <> iiNone then
-    Begin
-      Case AScope Of
-        scPrivate   : iImage := Succ(AImageIndex);
-        scPublished : iImage := Succ(Succ(AImageIndex));
-        scProtected : iImage := Succ(Succ(Succ(AImageIndex)));
-        scLocal     : iImage := Succ(Succ(Succ(Succ(AImageIndex))));
-      Else
-        iImage := AImageIndex; // scPublic, scGlobal, scNone
-      End;
-      Result := Format('<img class="verticallymiddle" src="Images/%s.gif" alt=""/>',
-        [BADIImageList[iImage].FResourcename]);
-    End;
+  Result := Format('<img class="verticallymiddle" src="Images/%s.gif" alt=""/>', [
+    ImageFileName(AImageIndex, AScope)
+  ]);
 end;
 
 (**
@@ -1260,30 +1259,27 @@ end;
 
 (**
 
-
   This method outputs the comment text along with the tag information.
 
-
   @precon  None.
-
   @postcon Outputs the comment text along with the tag information.
 
-
-  @param   slContents   as a TStringList
-  @param   E            as a TElementContainer
-  @param   iIndentLevel as an Integer
+  @param   slContents   as a TStringList as a constant
+  @param   E            as a TElementContainer as a constant
+  @param   iIndentLevel as an Integer as a constant
 
 **)
-procedure THTMLDocumentation.OutputComment(slContents : TStringList;
-  E: TElementContainer; iIndentLevel : Integer);
+procedure THTMLDocumentation.OutputComment(Const slContents : TStringList;
+  Const E: TElementContainer; Const iIndentLevel : Integer);
 
 var
   i: Integer;
   strComment: String;
   k: Integer;
   strTags: String;
-  j: Integer;
   strIndent: String;
+  iTagIndex: Integer;
+  strMask: String;
 
 begin
   If (E = Nil) Or (E.Comment = Nil) Then
@@ -1300,22 +1296,26 @@ begin
   With TBADIOptions.BADIOptions Do
     For i := 0 To SpecialTags.Count - 1 Do
       Begin
-        If E.Comment.FindTag(SpecialTags[i].FName) > -1 Then
+        iTagIndex := E.Comment.FindTag(SpecialTags[i].FName);
+        If iTagIndex > -1 Then
           Begin
             slContents.Add(Format('%s  <p class="TagHeader">%s</p>', [
               strIndent, SpecialTags[i].FDescription]));
             slContents.Add(Format('%s  <ul>', [strIndent]));
-            For j := 0 To E.Comment.TagCount - 1 Do
-              If CompareText(E.Comment.Tag[j].TagName, SpecialTags[i].FName) = 0 Then
-                Begin
-                  strTags := '';
-                  For k := 0 To E.Comment.Tag[j].TokenCount - 1 Do
-                    If E.Comment.Tag[j].Tokens[k].TokenType = ttLinkTag Then
-                      strTags := strTags + Format('%s ', [ExpandLinkTag(E.Comment.Tag[j].Tokens[k].Token)])
-                    Else
-                      strTags := strTags + Format('%s ', [N(E.Comment.Tag[j].Tokens[k].Token)]);
-                  slContents.Add(Format('%s    %s', [strIndent, LI('SpecialTag', strTags)]));
-                End;
+            strTags := '';
+            If E.Comment.Tag[iTagIndex].Fixed Then
+              strMask := '%s'
+            Else
+              strMask := '%s ';
+            For k := 0 To E.Comment.Tag[iTagIndex].TokenCount - 1 Do
+              If E.Comment.Tag[iTagIndex].Tokens[k].TokenType = ttLinkTag Then
+                strTags := strTags + Format(strMask, [ExpandLinkTag(E.Comment.Tag[iTagIndex].Tokens[k].Token)])
+              Else
+                strTags := strTags + Format(strMask, [N(E.Comment.Tag[iTagIndex].Tokens[k].Token)]);
+            If E.Comment.Tag[iTagIndex].Fixed Then
+              slContents.Add(Format('%s    <div style="margin-top: 0.5em;"><pre class="Tag">%s</pre></div>', [strIndent, LI('SpecialTag', strTags)]))
+            Else
+              slContents.Add(Format('%s    %s', [strIndent, LI('SpecialTag', strTags)]));
             slContents.Add(Format('%s  </ul>', [strIndent]));
           End;
       End;
@@ -1323,26 +1323,21 @@ end;
 
 (**
 
-
   This method output the tree of information stored in the module recursively.
 
-
-  @precon  slContents must be a valid indtance of a string list and Container
-
-           must ba a valid descendant of TElement Container.
-
+  @precon  slContents must be a valid indtance of a string list and Container must ba a valid
+           descendant of TElement Container.
   @postcon Output the tree of information stored in the module recursively.
 
-
-  @param   slContents        as a TStringList
-  @param   Container         as a TElementContainer
-  @param   iIndentLevel      as an Integer
+  @param   slContents        as a TStringList as a constant
+  @param   Container         as a TElementContainer as a constant
+  @param   iIndentLevel      as an Integer as a constant
   @param   strContainerLabel as a String as a constant
 
 **)
-procedure THTMLDocumentation.OutputContainers(slContents: TStringList;
-  Container: TElementContainer; iIndentLevel : Integer;
-  const strContainerLabel : String);
+procedure THTMLDocumentation.OutputContainers(Const slContents: TStringList;
+  Const Container: TElementContainer; Const iIndentLevel : Integer;
+  Const strContainerLabel : String);
 
 var
   i: Integer;
@@ -1391,7 +1386,7 @@ begin
             A(Container[i].Identifier, '',
             strContainerLabel + '.' + Container[i].Identifier)]));
           slContents.Add(strIndent + '        <td>');
-          slContents.Add(strIndent + Format('          <pre>%s</pre>', [
+          slContents.Add(strIndent + Format('          <pre class="code">%s</pre>', [
             P(Container[i].AsString(True, True))]));
           OutputComment(slContents, Container[i], iIndentLevel + 1);
           OutputContainers(slContents, Container[i], iIndentLevel + 1,
@@ -1436,7 +1431,9 @@ Var
   i : Integer;
 
 Begin
-  Initialise(5 + Integer(High(TBADIImageIndex)) + FFileNames.Count, 'HTML Documentation',
+  Initialise(
+    5 + Integer(Succ(High(TBADIImageIndex))) * Integer(Succ(High(TScope))) + FFileNames.Count,
+    'HTML Documentation',
     'Processing source code, please wait...');
   Try
     GenerateCSS;
@@ -1516,23 +1513,19 @@ end;
 
 (**
 
-
-  This method outputs the Errors, Warnings and Hints for all modules to the
-  summary html page.
+  This method outputs the Errors, Warnings and Hints for all modules to the summary html page.
 
   @precon  slEWH must be a valid instance of a string list.
-  @postcon Outputs the Errors, Warnings and Hints for all modules to the
-           summary html page.
+  @postcon Outputs the Errors, Warnings and Hints for all modules to the summary html page.
 
-
-  @param   slEWH           as a TStringList
+  @param   slEWH           as a TStringList as a constant
   @param   strSectionTitle as a String as a constant
   @param   strLIType       as a String as a constant
-  @param   AImageIndex     as a TBADIImageIndex
+  @param   AImageIndex     as a TBADIImageIndex as a constant
 
 **)
-procedure THTMLDocumentation.OutputErrorsWarningsAndHints(slEWH: TStringList;
-  const strSectionTitle, strLIType : String; AImageIndex : TBADIImageIndex);
+procedure THTMLDocumentation.OutputErrorsWarningsAndHints(Const slEWH: TStringList;
+  Const strSectionTitle, strLIType : String; Const AImageIndex : TBADIImageIndex);
 
 var
   strModuleName: String;
@@ -1710,7 +1703,7 @@ Begin
         FDirectives := FCurrentModule.Directives;
         FSummaryContent.Add('      <tr>');
         FSummaryContent.Add(Format('        <td>%s</td>', [
-          A(FCurrentModule.ModuleName,
+          A(FCurrentModule.AsString(True, True),
           ChangeFileExt(ExtractFileName(FCurrentModule.FileName), '.html'),
           '')]));
         For j := Low(strSections) to High(strSections) Do
@@ -1778,7 +1771,8 @@ begin
   Try
     For i := 0 To sl.Count - 1 Do
       Begin
-        strTokenName := strTokenType[TBADITokenType(sl.Objects[i])];
+        strTokenName := StringReplace(strTokenType[TBADITokenType(sl.Objects[i])], #32, '',
+          [rfReplaceAll]);
         Result := Result + Format('<span class="%s">%s</span>', [strTokenName, N(sl[i])]);
       End;
   Finally

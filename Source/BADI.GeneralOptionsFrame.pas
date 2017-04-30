@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.GeneralOptionsFrame;
@@ -31,7 +31,6 @@ Uses
 Type
   (** A class to represent the frame interface. **)
   TfmBADIGeneralOptions = Class(TFrame, IBADIOptionsFrame)
-    clbOptions: TCheckListBox;
     IntervalPanel: TPanel;
     lblRefreshInterval: TLabel;
     lblManagedNodesLife: TLabel;
@@ -39,6 +38,7 @@ Type
     udUpdateInterval: TUpDown;
     edtManagedNodesLife: TEdit;
     udManagedNodesLife: TUpDown;
+    lvOptions: TListView;
   Private
     { Private declarations }
   Public
@@ -70,13 +70,25 @@ Uses
 Procedure TfmBADIGeneralOptions.LoadSettings;
 
 Var
-  i : TDocOption;
+  iGroup : TDocOptionGroup;
+  iOption : TDocOption;
+  Item : TListItem;
+  Group: TListGroup;
 
 Begin
-  For i := Low(TDocOption) To High(TDocOption) Do
+  For iGroup := Low(TDocOptionGroup) To High(TDocOptionGroup) Do
     Begin
-      clbOptions.Items.Add(DocOptionInfo[i].FDescription);
-      clbOptions.Checked[Integer(i)] := i In TBADIOptions.BADIOptions.Options;
+      Group := lvOptions.Groups.Add;
+      Group.Header := DocOptionGroups[iGroup];
+      Group.GroupID := Integer(iGroup);
+    End;
+  lvOptions.GroupView := True;
+  For iOption := Low(TDocOption) To High(TDocOption) Do
+    Begin
+      Item := lvOptions.Items.Add;
+      Item.Caption := DocOptionInfo[iOption].FDescription;
+      Item.Checked := iOption In TBADIOptions.BADIOptions.Options;
+      Item.GroupID := Integer(DocOptionInfo[iOption].FGroup);
     End;
   udUpdateInterval.Position := TBADIOptions.BADIOptions.UpdateInterval;
   udManagedNodesLife.Position := TBADIOptions.BADIOptions.ManagedNodesLife;
@@ -93,13 +105,13 @@ End;
 Procedure TfmBADIGeneralOptions.SaveSettings;
 
 Var
-  i : TDocOption;
+  iOption : TDocOption;
 
 Begin
   TBADIOptions.BADIOptions.Options := [];
-  For i := Low(TDocOption) To High(TDocOption) Do
-    If clbOptions.Checked[Integer(i)] Then
-      TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options + [i];
+  For iOption := Low(TDocOption) To High(TDocOption) Do
+    If lvOptions.Items[Integer(iOption)].Checked Then
+      TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options + [iOption];
   TBADIOptions.BADIOptions.UpdateInterval := udUpdateInterval.Position;
   TBADIOptions.BADIOptions.ManagedNodesLife := udManagedNodesLife.Position;
 End;

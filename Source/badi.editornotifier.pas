@@ -227,6 +227,7 @@ begin
       {$IFNDEF D0001}
         {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
       {$ENDIF}
+      {$IFDEF DXE20}
       If Assigned(P) Then
         If Supports(P.ProjectOptions, IOTAProjectOptionsConfigurations, ProjOpsConfigs) Then
           Begin
@@ -235,6 +236,7 @@ begin
             If (strPlatform = 'WIN32') Or (strPlatform = 'WIN64') Then
               TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
           End;
+      {$ENDIF}
     End;
 end;
 

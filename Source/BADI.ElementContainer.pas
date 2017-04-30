@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Apr 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.ElementContainer;
@@ -208,7 +208,7 @@ Begin
           E := FindRoot.Add(strErrors, iiErrorFolder, scNone, Nil);
           E.Add(TDocIssue.Create(Format(strTryingToAddType, [AElement.ClassName, Result.ClassName,
             AElement.Name]), scNone, 'TElementContainer.Add', AElement.Line, AElement.Column,
-            iiError));
+            etError));
           Raise EBADIParserAbort.Create('Parsing Aborted!');
         End;
     Finally
@@ -448,10 +448,9 @@ Begin
     iIssueLimit := BADIOptions.IssueLimits[ltErrors];
   End;
   If iCount < iIssueLimit Then
-    i.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol, recIssues[ErrorType].FItemImage))
+    i.Add(TDocIssue.Create(strMsg, AScope, strMethod, iLine, iCol, ErrorType))
   Else If iCount = iIssueLimit Then
-    i.Add(TDocIssue.Create(recIssues[ErrorType].FTooMany, scNone, 'AddIssue', 0, 0,
-      recIssues[ErrorType].FItemImage));
+    i.Add(TDocIssue.Create(recIssues[ErrorType].FTooMany, scNone, 'AddIssue', 0, 0, ErrorType));
 End;
 
 (**

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Feb 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.TokenInfo;
@@ -20,7 +20,7 @@ Uses
 Type
   (** This is a class the store information about each token **)
   TTokenInfo = Class
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
     FToken : String;
     FColumn : Integer;
     FBufferPos: Integer;
@@ -30,9 +30,10 @@ Type
     FUToken : String;
     FReference : TTokenReference;
   Public
-    Constructor Create(const strToken : String; iPos, iLine, iCol,
-      iLength : Integer; TType : TBADITokenType); Overload;
-    Procedure Append(const strToken : String);
+    Constructor Create(Const strToken: String; Const iPos, iLine, iCol, iLength: Integer;
+      Const TType: TBADITokenType); Overload;
+    Procedure Append(Const strToken: String);
+    Procedure Replace(Const strToken: String; Const TType: TBADITokenType); Overload;
     (**
       Returns the token as a string.
       @precon  None.
@@ -106,7 +107,7 @@ Uses
   @param   strToken as a String as a constant
 
 **)
-Procedure TTokenInfo.Append(const strToken : String);
+Procedure TTokenInfo.Append(Const strToken : String);
 
 Begin
   FToken := FToken + strToken;
@@ -117,26 +118,24 @@ End;
 
 (**
 
-  This is a constructor for the TTokenInfo class. It assigns values to all the
-  properties.
+  This is a constructor for the TTokenInfo class. It assigns values to all the properties.
 
-  @precon  strToken is a text token to create a token info object for, iPos is
-           the module buffer position of the token, iLine is the line number of
-           the token, iCol is the column number of the token and iLength is the
-           length of the token and TType is the enumerate type of the token
-           (reserved word, identifier).
+  @precon  strToken is a text token to create a token info object for, iPos is the module buffer
+           position of the token, iLine is the line number of the token, iCol is the column
+           number of the token and iLength is the length of the token and TType is the enumerate
+           type of the token (reserved word, identifier).
   @postcon Initialises the class.
 
-  @param   strToken as a String as a Constant
-  @param   iPos     as an Integer
-  @param   iLine    as an Integer
-  @param   iCol     as an Integer
-  @param   iLength  as an Integer
-  @param   TType    as a TBADITokenType
+  @param   strToken as a String as a constant
+  @param   iPos     as an Integer as a constant
+  @param   iLine    as an Integer as a constant
+  @param   iCol     as an Integer as a constant
+  @param   iLength  as an Integer as a constant
+  @param   TType    as a TBADITokenType as a constant
 
 **)
-Constructor TTokenInfo.Create(const strToken: String; iPos, iLine, iCol, iLength: Integer;
-  TType: TBADITokenType);
+Constructor TTokenInfo.Create(Const strToken: String; Const iPos, iLine, iCol, iLength: Integer;
+  Const TType: TBADITokenType);
 
 Begin
   FToken := strToken;
@@ -149,6 +148,28 @@ Begin
   If FTokenType In [ttReservedWord, ttDirective] Then
     FUToken := UpperCase(strToken);
   FReference := trUnknown;
+End;
+
+(**
+
+  This method allows a caller to replace the token text in the token.
+
+  @precon  None.
+  @postcon The token text is changed to that which is given.
+
+  @param   strToken as a String as a constant
+  @param   TType    as a TBADITokenType as a constant
+
+**)
+Procedure TTokenInfo.Replace(Const strToken: String; Const TType: TBADITokenType);
+
+Begin
+  FToken := strToken;
+  FTokenType := TType;
+  FLength := System.Length(strToken);
+  FUToken := '';
+  If FTokenType In [ttReservedWord, ttDirective] Then
+    FUToken := UpperCase(strToken);
 End;
 
 End.

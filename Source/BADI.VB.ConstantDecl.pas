@@ -4,7 +4,7 @@
 
    @Author  David Hoyle
    @Version 1.0
-   @Date    01 Apr 2017
+   @Date    30 Apr 2017
 
  **)
 Unit BADI.VB.ConstantDecl;
@@ -19,7 +19,7 @@ Uses
 Type
   (** A class to represent constants in visual basic. **)
   TVBConstant = Class(TGenericConstant)
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Protected
   Public
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
@@ -44,8 +44,12 @@ Uses
 Function TVBConstant.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
-  Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, 'As',
-    BADIOptions.MaxDocOutputWidth);
+  If (TokenCount > 0) And (Tokens[0].Token = '=') Then
+    Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, '',
+      BADIOptions.MaxDocOutputWidth)
+  Else
+    Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, '',
+      BADIOptions.MaxDocOutputWidth);
 End;
 
 End.

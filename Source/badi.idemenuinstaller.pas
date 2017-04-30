@@ -217,8 +217,8 @@ Begin
   FBADIMenu.Caption := Format('&Browse and Doc It %d.%d%s BETA (Build %d.%d.%d.%d)',
     [iMajor, iMinor, strRevision[Succ(iBugfix)], iMajor, iMinor, iBugfix, iBuild]);
   {$ELSE}
-  FBADIMenu.Caption := Format('&Browse and Doc It %d.%d%s (Build %d.%d.%d.%d)',
-    [iMajor, iMinor, strRevision[Succ(iBugfix)], iMajor, iMinor, iBugfix, iBuild]);
+  FBADIMenu.Caption := Format('&Browse and Doc It %d.%d%s',
+    [iMajor, iMinor, strRevision[Succ(iBugfix)]]);
   {$ENDIF}
   mmiMainMenu.Items.Insert(mmiMainMenu.Items.Count - 2, FBADIMenu);
 End;

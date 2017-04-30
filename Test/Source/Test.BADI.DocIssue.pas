@@ -25,12 +25,14 @@ Uses
   BADI.Types;
 
 Procedure TestTDocIssue.SetUp;
+
 Begin
   FDocIssue := TDocIssue.Create('This is a simple message.',
-    scNone, 'MyMethod', 1, 2, iiWarning);
+    scNone, 'MyMethod', 1, 2, etWarning);
 End;
 
 Procedure TestTDocIssue.TearDown;
+
 Begin
   FDocIssue.Free;
   FDocIssue := Nil;
@@ -43,6 +45,7 @@ Begin
 End;
 
 Procedure TestTDocIssue.TestCreate;
+
 Begin
   CheckEquals('This is a simple message. [MyMethod]', FDocIssue.AsString(True, False));
   CheckEquals(scNone, FDocIssue.Scope);

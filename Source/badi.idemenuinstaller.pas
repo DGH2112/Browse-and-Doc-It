@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    29 Apr 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -82,7 +82,9 @@ Type
 Implementation
 
 Uses
-  //CodeSiteLogging,
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   SysUtils,
   BADI.Documentation.Dispatcher,
   BADI.ToolsAPIUtils,
@@ -137,7 +139,6 @@ Var
   iMenu: TBADIMenu;
 
 begin
-  Result := -1;
   NTAS := (BorlandIDEServices As INTAServices);
   ilImages := TImageList.Create(Nil);
   Try
@@ -1573,3 +1574,5 @@ Begin
 End;
 
 End.
+
+

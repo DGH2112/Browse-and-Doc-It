@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    19 Feb 2017
+  @Date    30 Apr 2017
   @Version 1.0
 
 **)
@@ -28,10 +28,10 @@ uses
 type
   (** This class represents a dockable form that displays the heirarchical
       representation of the modules contents. **)
-  TfrmDockableModuleExplorer = class(TDockableForm)
-  private
+  TfrmDockableModuleExplorer = Class(TDockableForm)
+  Strict Private
     FModuleExplorerFrame : TframeModuleExplorer;
-  public
+  Public
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
     Procedure Focus;
@@ -41,7 +41,7 @@ type
     Class Procedure RenderDocumentTree(BaseLanguageModule : TBaseLanguageModule);
     Class Procedure HookEventHandlers(SelectionChangeProc : TSelectionChange;
       Focus, ScopeChange : TNotifyEvent);
-  end;
+  End;
 
   (** This is a classifier for the dockable form so that it can be registered
       with the IDE **)
@@ -52,7 +52,9 @@ implementation
 {$R *.dfm}
 
 Uses
-  //CodeSiteLogging,
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   DeskUtil;
 
 Var
@@ -204,13 +206,15 @@ end;
 
 (**
 
-  This method focuses the modukle explorers tree view the be focused IF
+
+  This method focuses the modukle explorers tree view the be focused IF
   available.
 
   @precon  None.
   @postcon Focuses the modukle explorers tree view the be focused IF available.
 
-**)
+
+**)
 procedure TfrmDockableModuleExplorer.Focus;
 begin
   If FModuleExplorerFrame <> Nil Then
@@ -306,3 +310,5 @@ begin
 end;
 
 End.
+
+

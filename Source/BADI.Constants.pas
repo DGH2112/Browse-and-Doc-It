@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Apr 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.Constants;
@@ -36,64 +36,80 @@ Const
   (** A set of characters for line feed and carriage return **)
   strLineEnd : Set of AnsiChar = [#10, #13];
 
+  (** A constant array to define the module explorer option groups. **)
+  DocOptionGroups : Array[Low(TDOcOptionGroup)..High(TDOcOptionGroup)] Of String = (
+    'General',
+    'Errors, Warnings, Hints and Conflicts',
+    'Types',
+    'Module',
+    'Methods',
+    'Properties',
+    'Initialization / Finalization',
+    'Miscellaneous'
+  );
+
   (** This is a string array representing the TDocOption enumerates. **)
   DocOptionInfo : Array[Low(TDocOption)..High(TDocOption)] Of TDocOptionRec = (
-    (FDescription : strDrawSynHighModuleExplorer;          FEnabled : False),
-    (FDescription : strShowCommentsInTheHints;             FEnabled : False),
+    (FDescription : strDrawSynHighModuleExplorer;             FEnabled : False; FGroup: dogGeneral),
+    (FDescription : strShowCommentsInTheHints;                FEnabled : False; FGroup: dogGeneral),
 
-    (FDescription : strShowErrors;                         FEnabled : True),
-    (FDescription : strShowWarnings;                       FEnabled : False),
-    (FDescription : strShowHints;                          FEnabled : False),
-    (FDescription : strShowDocumentationConflicts;         FEnabled : False),
+    (FDescription : strShowErrors;                            FEnabled : True;  FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strShowWarnings;                          FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strShowHints;                             FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strShowDocumentationConflicts;            FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strSyntaxHighlightErrors;                 FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strSyntaxHighlightWarnings;               FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strSyntaxHighlightHints;                  FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strSyntaxHighlightDocumentationConflicts; FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
 
 
-    (FDescription : strShowUndocumentedTypes;              FEnabled : False),
-    (FDescription : strShowUndocumentedRecords;            FEnabled : False),
-    (FDescription : strShowUndocumentedObjects;            FEnabled : False),
-    (FDescription : strShowUndocumentedClasses;            FEnabled : False),
-    (FDescription : strShowUndocumentedInterfaces;         FEnabled : False),
-    (FDescription : strShowUndocumentedVariables;          FEnabled : False),
-    (FDescription : strShowUndocumentedConstants;          FEnabled : False),
-    (FDescription : strShowUndocumentedFields;             FEnabled : False),
-    (FDescription : strShowUndocumentedClassDecls;         FEnabled : False),
+    (FDescription : strShowUndocumentedTypes;                 FEnabled : False; FGroup: dogTypes),
+    (FDescription : strShowUndocumentedRecords;               FEnabled : False; FGroup: dogTypes),
+    (FDescription : strShowUndocumentedObjects;               FEnabled : False; FGroup: dogTypes),
+    (FDescription : strShowUndocumentedClasses;               FEnabled : False; FGroup: dogTypes),
+    (FDescription : strShowUndocumentedInterfaces;            FEnabled : False; FGroup: dogTypes),
+    (FDescription : strShowUndocumentedVariables;             FEnabled : False; FGroup: dogTypes),
+    (FDescription : strShowUndocumentedConstants;             FEnabled : False; FGroup: dogTypes),
+    (FDescription : strShowUndocumentedFields;                FEnabled : False; FGroup: dogTypes),
+    (FDescription : strShowUndocumentedClassDecls;            FEnabled : False; FGroup: dogTypes),
 
-    (FDescription : strShowUndocumentedModule;             FEnabled : True),
-    (FDescription : strShowMissingModuleDate;              FEnabled : False),
-    (FDescription : strShowCheckModuleDate;                FEnabled : False),
-    (FDescription : strShowMissingModuleVersion;           FEnabled : False),
-    (FDescription : strShowMissingModuleAuthor;            FEnabled : False),
+    (FDescription : strShowUndocumentedModule;                FEnabled : True;  FGroup: dogModule),
+    (FDescription : strShowMissingModuleDate;                 FEnabled : False; FGroup: dogModule),
+    (FDescription : strShowCheckModuleDate;                   FEnabled : False; FGroup: dogModule),
+    (FDescription : strShowMissingModuleVersion;              FEnabled : False; FGroup: dogModule),
+    (FDescription : strShowMissingModuleAuthor;               FEnabled : False; FGroup: dogModule),
 
-    (FDescription : strShowMissingMethodDocumentation;     FEnabled : True),
-    (FDescription : strShowMissingMethodDocDesc;           FEnabled : True),
-    (FDescription : strShowDiffMethodParameterCount;       FEnabled : True),
-    (FDescription : strShowUndocumentedMethodParameters;   FEnabled : True),
-    (FDescription : strShowIncorrectMethodParameterType;   FEnabled : True),
-    (FDescription : strShowUndocumentedMethodReturn;       FEnabled : True),
-    (FDescription : strShowIncorrectMethodReturnType;      FEnabled : True),
-    (FDescription : strShowMissingMethodPreConditions;     FEnabled : False),
-    (FDescription : strShowMissingMethodPostConditions;    FEnabled : False),
+    (FDescription : strShowMissingMethodDocumentation;        FEnabled : True;  FGroup: dogMethod),
+    (FDescription : strShowMissingMethodDocDesc;              FEnabled : True;  FGroup: dogMethod),
+    (FDescription : strShowDiffMethodParameterCount;          FEnabled : True;  FGroup: dogMethod),
+    (FDescription : strShowUndocumentedMethodParameters;      FEnabled : True;  FGroup: dogMethod),
+    (FDescription : strShowIncorrectMethodParameterType;      FEnabled : True;  FGroup: dogMethod),
+    (FDescription : strShowUndocumentedMethodReturn;          FEnabled : True;  FGroup: dogMethod),
+    (FDescription : strShowIncorrectMethodReturnType;         FEnabled : True;  FGroup: dogMethod),
+    (FDescription : strShowMissingMethodPreConditions;        FEnabled : False; FGroup: dogMethod),
+    (FDescription : strShowMissingMethodPostConditions;       FEnabled : False; FGroup: dogMethod),
 
-    (FDescription : strShowMissingPropertyDocumentation;   FEnabled : False),
-    (FDescription : strShowMissingPropertyDocuDesc;        FEnabled : False),
-    (FDescription : strShowDiffPropertyParameterCount;     FEnabled : False),
-    (FDescription : strShowUndocumentedPropertyParameter;  FEnabled : False),
-    (FDescription : strShowIncorrectPropertyParameterType; FEnabled : False),
-    (FDescription : strShowUndocumentedPropertyReturnType; FEnabled : False),
-    (FDescription : strShowIncorrectPropertyReturnType;    FEnabled : False),
-    (FDescription : strShowMissingPropertyPreConditions;   FEnabled : False),
-    (FDescription : strShowMissingPropertyPostConditions;  FEnabled : False),
+    (FDescription : strShowMissingPropertyDocumentation;      FEnabled : False; FGroup: dogProperty),
+    (FDescription : strShowMissingPropertyDocuDesc;           FEnabled : False; FGroup: dogProperty),
+    (FDescription : strShowDiffPropertyParameterCount;        FEnabled : False; FGroup: dogProperty),
+    (FDescription : strShowUndocumentedPropertyParameter;     FEnabled : False; FGroup: dogProperty),
+    (FDescription : strShowIncorrectPropertyParameterType;    FEnabled : False; FGroup: dogProperty),
+    (FDescription : strShowUndocumentedPropertyReturnType;    FEnabled : False; FGroup: dogProperty),
+    (FDescription : strShowIncorrectPropertyReturnType;       FEnabled : False; FGroup: dogProperty),
+    (FDescription : strShowMissingPropertyPreConditions;      FEnabled : False; FGroup: dogProperty),
+    (FDescription : strShowMissingPropertyPostConditions;     FEnabled : False; FGroup: dogProperty),
 
-    (FDescription : strShowMissingInitComment;             FEnabled : False),
-    (FDescription : strShowMissingFinalComment;            FEnabled : False),
+    (FDescription : strShowMissingInitComment;                FEnabled : False; FGroup: dogInitializationFinalization),
+    (FDescription : strShowMissingFinalComment;               FEnabled : False; FGroup: dogInitializationFinalization),
 
-    {(FDescription : strShowIDEErrorsOnSuccessfulParse;     FEnabled : False),}
-    (FDescription : strShowParserErrorOrigin;              FEnabled : False),
-    (FDescription : strShowUnreferencedSymbols;            FEnabled : False),
-    (FDescription : strShowPerfCountersInModuleExplorer;   FEnabled : False),
-    (FDescription : strShowPerfCountersInDocSummary;       FEnabled : False),
-    (FDescription : strStrictConstantExpressions;          FEnabled : True),
-    (FDescription : strShowMissingVBExceptionWarnings;     FEnabled : False),
-    (FDescription : strAddPreAndPostToComments;            FEnabled : False)
+    {(FDescription : strShowIDEErrorsOnSuccessfulParse;        FEnabled : False),}
+    (FDescription : strShowParserErrorOrigin;                 FEnabled : False; FGroup: dogMiscellaneous),
+    (FDescription : strShowUnreferencedSymbols;               FEnabled : False; FGroup: dogMiscellaneous),
+    (FDescription : strShowPerfCountersInModuleExplorer;      FEnabled : False; FGroup: dogMiscellaneous),
+    (FDescription : strShowPerfCountersInDocSummary;          FEnabled : False; FGroup: dogMiscellaneous),
+    (FDescription : strStrictConstantExpressions;             FEnabled : True;  FGroup: dogMiscellaneous),
+    (FDescription : strShowMissingVBExceptionWarnings;        FEnabled : False; FGroup: dogMiscellaneous),
+    (FDescription : strAddPreAndPostToComments;               FEnabled : False; FGroup: dogMiscellaneous)
   );
 
   (** This is a default set of font information for the application. **)

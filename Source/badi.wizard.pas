@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    11 Apr 2017
+  @Date    30 Apr 2017
   @Version 1.0
 
 **)
@@ -30,14 +30,14 @@ Uses
 Type
   (** This is the class which defined the Wizard interface. **)
   TBrowseAndDocItWizard = Class(TNotifierObject, IOTANotifier, IOTAWizard)
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
     FBADIIDEMenuInstaller    : TBADIIDEMenuInstaller;
     FBADIIDEOptionsInstaller : TBADIIDEOptionsInstaller;
     FEditorNotifier          : TEditorNotifier;
     {$IFDEF D2005}
     FEditorIndex             : Integer;
     {$ENDIF}
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Protected
     Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
       iCommentCol: Integer);
     Procedure Focus(Sender: TObject);
@@ -60,6 +60,9 @@ Type
 Implementation
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   BADI.DockableModuleExplorer,
   BADI.Constants;
 
@@ -270,3 +273,5 @@ Begin
 End;
 
 End.
+
+

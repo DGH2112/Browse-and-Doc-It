@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    11 Apr 2017
+  @Date    30 Apr 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -318,7 +318,7 @@ begin
             If FLastBodyCommentLine + 1 = C.Line Then
               Begin
                 Cmt.AppendComment(Cmt, C);
-                Cmt.TrimTrailingWhiteSpace;
+                Cmt.TrimWhiteSpace;
                 FLastBodyCommentLine := C.Line;
                 C.Free;
               End Else

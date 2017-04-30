@@ -781,8 +781,19 @@ Begin
           ttWhiteSpace:
             If iCurCount > 0 Then
               Begin
-                Dec(iCurCount, Length(Token.Token));
-                ATag.DeleteToken(iToken);
+                If Length(Token.Token) <= iCurCount Then
+                  Begin
+                    Dec(iCurCount, Length(Token.Token));
+                    ATag.DeleteToken(iToken);
+                  End Else
+                If Length(Token.Token) > iCurCount Then
+                  Begin
+                    Token.Replace(
+                      Copy(Token.Token, 1 + iCurCount, Length(Token.Token) - iCurCount),
+                      ttWhiteSpace);
+                    Inc(iToken);
+                    iCurCount := 0;
+                  End;
               End Else
                 Inc(iToken);
           ttLineEnd:

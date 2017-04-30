@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Apr 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.Types;
@@ -75,6 +75,18 @@ Type
   (** A type for a set of AnsiChar - used for the function IsInSet() **)
   TSetOfAnsiChar = Set Of AnsiChar;
 
+  (** An enumerate to describe the grouping of the module explorer options. **)
+  TDocOptionGroup = (
+    dogGeneral,
+    dogErrorsWarningsHintsAndConflicts,
+    dogTypes,
+    dogModule,
+    dogMethod,
+    dogProperty,
+    dogInitializationFinalization,
+    dogMiscellaneous
+  );
+
   (** This is a list of options valable for the display of module information
       **)
   TDocOption = (
@@ -85,6 +97,10 @@ Type
     doShowWarnings,
     doShowHints,
     doShowConflicts,
+    doSyntaxHighlightErrors,
+    doSyntaxHighlightWarnings,
+    doSyntaxHighlightHints,
+    doSyntaxHighlightConflict,
 
     doShowUndocumentedTypes,
     doShowUndocumentedRecords,
@@ -284,28 +300,29 @@ Type
       Image Index enumerate. **)
   TImageIndexInfo = Record
     FResourcename : String;
-    FMaskColour : Integer;
+    FMaskColour   : Integer;
   End;
 
   (** This is a record that contains the description and the default for a
       TDocOption enumerate. **)
   TDocOptionRec = Record
     FDescription : String;
-    FEnabled : Boolean;
+    FEnabled     : Boolean;
+    FGroup       : TDocOptionGroup;
   End;
 
   (** A record type to contain a token and its line and column in the editor. **)
   TIdentInfo = Record
     FIdent : String;
-    FLine : Integer;
-    FCol : Integer;
+    FLine  : Integer;
+    FCol   : Integer;
     FScope : TScope;
   End;
 
   (** This is a record to describe the position of a token in the editor. **)
   TTokenPosition = Record
-    FLine : Integer;
-    FColumn : Integer;
+    FLine      : Integer;
+    FColumn    : Integer;
     FBufferPos : Integer;
   End;
 

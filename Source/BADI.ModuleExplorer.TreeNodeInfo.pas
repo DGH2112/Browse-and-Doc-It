@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    16 Apr 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.ModuleExplorer.TreeNodeInfo;
@@ -120,7 +120,7 @@ Type
 Var
   (**
     A private variable which is assigned the key words array.
-    @refactor These MUST be removed: Gloabl Variables are BAD!!!!
+    @refactor These MUST be removed: GLOBAL Variables are BAD!!!!
   **)
   strReservedWords, strDirectives: TKeyWords;
 
@@ -128,7 +128,7 @@ Implementation
 
 Uses
   BADI.Generic.Tokenizer,
-  BADI.Options;
+  BADI.Options, BADI.DocIssue;
 
 (**
 
@@ -151,6 +151,27 @@ Begin
   FCol :=   Element.Column;
   FComment := TComment.Create(Element.Comment);
   FTagProperties := [tpSyntax];
+  If Element Is TDocIssue Then
+    Begin
+      FTagProperties := [];
+      Case (Element As TDocIssue).ErrorType Of
+        etHint:
+          If doSyntaxHighlightHints In TBADIOptions.BADIOptions.Options Then
+            Include(FTagProperties, tpSyntax);
+        etWarning:
+          If doSyntaxHighlightWarnings In TBADIOptions.BADIOptions.Options Then
+            Include(FTagProperties, tpSyntax);
+        etError:
+          If doSyntaxHighlightErrors In TBADIOptions.BADIOptions.Options Then
+            Include(FTagProperties, tpSyntax);
+      End;
+    End;
+  If Element Is TDocumentConflict Then
+    Begin
+      FTagProperties := [];
+      If doSyntaxHighlightConflict In TBADIOptions.BADIOptions.Options Then
+        Include(FTagProperties, tpSyntax);
+    End;
 End;
 
 (**

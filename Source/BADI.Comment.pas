@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Apr 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.Comment;
@@ -23,17 +23,31 @@ Uses
 Type
   (** A class the handles and stores all the comment information **)
   TComment = Class(TBADIBaseContainer)
-    {$IFDEF D2005} Strict {$ENDIF} Private
+  Strict Private
+    Type
+      (** An enumerate to define the types of text block in the parser. **)
+      TBlockType = (btNone, btHTML, btLink, btSingle, btDouble);
+  Strict Private
     FTags: TObjectList;
     FTagMode: Boolean;
     FLastTag: TTag;
     FTagLine: Integer;
     FTagColumn: Integer;
-    {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function GetTag(iTagIndex: Integer): TTag;
-    Function GetTagCount: Integer;
+  Strict Protected
+    Function  GetTag(iTagIndex: Integer): TTag;
+    Function  GetTagCount: Integer;
     Procedure ParseComment(const strComment: String);
     Procedure ResetTagMode;
+    Function  DetermineTokenType(Const Ch : Char;
+      Const eLastToken : TBADITokenType) : TBADITokenType; InLine;
+    Procedure ProcessBlocks(Const strToken : String; Const iTokenIndex : Integer;
+      Var eBlockType : TBlockType; Var eCurToken : TBADITokenType); InLine;
+    Procedure ProcessStringLiterals(Const eCurToken : TBADITokenType; var eBlockType : TBlockType);
+      InLine;
+    Procedure TrimTrailingWhitespace; InLine;
+    Procedure TrimTrailingWhitespaceAndLineEnds(Const ATag : TTag); InLine;
+    Procedure TrimStartingWhitespaceONLYIfItEndsWithALineEnd(Const ATag : TTag); InLine;
+    Procedure TrimWhitespaceFromFixedTagsIfCommonOnALLLines(Const ATag : TTag); InLine;
   Public
     Constructor Create(srcComment: TComment); Overload;
     Constructor Create(const strComment: String; iLine, iCol: Integer); Overload;
@@ -42,10 +56,10 @@ Type
     Procedure AddToken(const strToken: String; iType: TBADITokenType = ttUnknown); Override;
     Procedure Assign(srcComment: TComment); Overload;
     Procedure Assign(const strComment: String); Overload;
-    Function AsString(iMaxWidth: Integer; boolShowHTML: Boolean): String;
-    Function FindTag(const strTagName: String): Integer;
-    Procedure TrimTrailingWhiteSpace;
+    Function  AsString(iMaxWidth: Integer; boolShowHTML: Boolean): String;
+    Function  FindTag(const strTagName: String): Integer;
     Procedure AppendComment(BaseCmt, Source: TComment);
+    Procedure TrimWhiteSpace;
     (**
       Returns the specifically indexed tag from the comments tag collection.
       @precon  iTagIndex must eb a valid index between 0 and TagCount - 1.
@@ -69,6 +83,9 @@ Type
 Implementation
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   SysUtils,
   BADI.TokenInfo,
   BADI.Functions,
@@ -167,9 +184,11 @@ Begin
       ResetTagMode;
       Line := srcComment.Line;
       Column := srcComment.Column;
+      Fixed := srcComment.Fixed;
       // Add tokens from one to the next.
       For i := 0 To srcComment.TokenCount - 1 Do
         AddToken(srcComment.Tokens[i].Token, srcComment.Tokens[i].TokenType);
+      // Add tags
       For i := 0 To srcComment.TagCount - 1 Do
         Begin
           AddToken('@' + srcComment.Tag[i].TagName, ttIdentifier);
@@ -194,6 +213,7 @@ End;
 
 **)
 Procedure TComment.Assign(const strComment: String);
+
 Begin
   ResetTagMode;
   ParseComment(strComment);
@@ -263,6 +283,7 @@ End;
 
 **)
 Constructor TComment.Create(const strComment: String; iLine, iCol: Integer);
+
 Begin
   Inherited Create('', iLine, iCol);
   FLastTag := Nil;
@@ -287,6 +308,7 @@ End;
 
 **)
 Class Function TComment.CreateComment(const strComment: String; iLine, iCol: Integer): TComment;
+
 Begin
   Result := Create(strComment, iLine, iCol);
 End;
@@ -301,6 +323,7 @@ End;
 
 **)
 Destructor TComment.Destroy;
+
 Begin
   FTags.Free;
   Inherited;
@@ -308,106 +331,47 @@ End;
 
 (**
 
-  This is a getter method for the Tag array property of the TComment class.
-  It returns a TTag reference to the indexed tag item.
-
-  @precon  iTagIndex is the index of the tag required.
-  @postcon Returns an instance of the specified tag.
-
-  @param   iTagIndex as an Integer
-  @return  a TTag
-
-**)
-Function TComment.GetTag(iTagIndex: Integer): TTag;
-Begin
-  Result := (FTags[iTagIndex] As TTag);
-End;
-
-(**
-
-  This is a getter method for the TagCount property of the TComment class.
-  It return the number of tag in the list.
+  This function determines the type of token being processed in the comment stream.
 
   @precon  None.
-  @postcon Returns the number of tags in the collection.
+  @postcon Returns the token type of the current stream position.
 
-  @return  an Integer
-
-**)
-Function TComment.GetTagCount: Integer;
-Begin
-  Result := FTags.Count;
-End;
-
-(**
-
-  This method resets the comment tag mode, i.e. the comment will accept text as
-  tokens and not tag tokens.
-
-  @precon  None.
-  @postcon Resets the comment tag mode, i.e. the comment will accept text as
-           tokens and not tag tokens.
+  @param   Ch         as a Char as a constant
+  @param   eLastToken as a TBADITokenType as a constant
+  @return  a TBADITokenType
 
 **)
-Procedure TComment.ResetTagMode;
-Begin
-  FTagMode := False;
-End;
-
-(**
-
-  This method removes trailing white space tokens from the parsed comments and
-  tags.
-
-  @precon  None.
-  @postcon Removes trailing white space tokens from the parsed comments and
-           tags.
-
-**)
-Procedure TComment.TrimTrailingWhiteSpace;
-
-Var
-  iToken: Integer;
-  iTag: Integer;
-  iPos: Integer;
-  boolHasWS: Boolean;
+Function TComment.DetermineTokenType(Const Ch : Char;
+  Const eLastToken : TBADITokenType) : TBADITokenType;
 
 Begin
-  If TokenCount > 0 Then
-    Begin
-      iToken := TokenCount - 1;
-      While Tokens[iToken].TokenType In [ttWhiteSpace] Do
-        Begin
-          DeleteToken(iToken);
-          Dec(iToken);
-        End;
-    End;
-  For iTag := 0 To TagCount - 1 Do
-    Begin
-      If Tag[iTag].TokenCount = 0 Then
-        Continue;
-      // Trim trailing whitespace and line ends
-      iToken := Tag[iTag].TokenCount - 1;
-      While (iToken >= 0) And (Tag[iTag].Tokens[iToken].TokenType In [ttWhiteSpace, ttLineEnd]) Do
-        Begin
-          Tag[iTag].DeleteToken(iToken);
-          Dec(iToken);
-        End;
-      // Trim starting whitespace ONLY if it ends with a line end
-      iPos := -1;
-      For iToken := 0 To Tag[iTag].TokenCount - 1 Do
-        If Tag[iTag].Tokens[iToken].TokenType = ttLineEnd Then
+  Case Ch Of
+    #9, #32: Result := ttWhiteSpace;
+    '''': Result := ttSingleLiteral;
+    '"': Result := ttDoubleLiteral;
+    '@', '_', 'a'..'z', 'A'..'Z':
+      Begin
+        If (eLastToken = ttNumber) Then
           Begin
-            iPos := iToken;
-            Break;
-          End;
-      boolHasWS := iPos > -1;
-      For iToken := iPos - 1 DownTo 0 Do
-        boolHasWS := boolHasWS And (ttWhiteSpace = Tag[iTag].Tokens[iToken].TokenType);
-      If boolHasWS Then
-        For iToken := 0 To iPos Do
-          Tag[iTag].DeleteToken(0);
-    End;
+           Case Ch Of
+             'A'..'F', 'a'..'f': Result := ttNumber;
+           Else
+             Result := ttIdentifier;
+           End;
+          End Else
+            Result := ttIdentifier;
+      End;
+    '0'..'9':
+      Begin
+        Result := ttNumber;
+        If eLastToken = ttIdentifier Then
+          Result := ttIdentifier;
+      End;
+    #10, #13: Result := ttLineEnd;
+    #33, #36..#38, #40..#47, #58..#63, #91..#94, #96, #123..#128: Result := ttSymbol;
+  Else
+    Result := ttUnknown;
+  End;
 End;
 
 (**
@@ -439,6 +403,41 @@ End;
 
 (**
 
+  This is a getter method for the Tag array property of the TComment class.
+  It returns a TTag reference to the indexed tag item.
+
+  @precon  iTagIndex is the index of the tag required.
+  @postcon Returns an instance of the specified tag.
+
+  @param   iTagIndex as an Integer
+  @return  a TTag
+
+**)
+Function TComment.GetTag(iTagIndex: Integer): TTag;
+
+Begin
+  Result := (FTags[iTagIndex] As TTag);
+End;
+
+(**
+
+  This is a getter method for the TagCount property of the TComment class.
+  It return the number of tag in the list.
+
+  @precon  None.
+  @postcon Returns the number of tags in the collection.
+
+  @return  an Integer
+
+**)
+Function TComment.GetTagCount: Integer;
+
+Begin
+  Result := FTags.Count;
+End;
+
+(**
+
   This method takes the given comment and parses it into tokens. It pulls out
   all the tags at the same time. Tag should be at the end of the comment.
 
@@ -450,120 +449,6 @@ End;
 
 **)
 Procedure TComment.ParseComment(const strComment: String);
-
-Type
-  TBlockType = (btNone, btHTML, btLink, btSingle, btDouble);
-
-  (**
-
-    This function determines the type of token being processed in the comment stream.
-
-    @precon  None.
-    @postcon Returns the token type of the current stream position.
-
-    @param   Ch         as a Char as a constant
-    @param   eLastToken as a TBADITokenType as a constant
-    @return  a TBADITokenType
-
-  **)
-  Function DetermineTokenType(Const Ch : Char; Const eLastToken : TBADITokenType) : TBADITokenType;
-    InLine;
-
-  Begin
-    Case Ch Of
-      #9, #32: Result := ttWhiteSpace;
-      '''': Result := ttSingleLiteral;
-      '"': Result := ttDoubleLiteral;
-      '@', '_', 'a'..'z', 'A'..'Z':
-        Begin
-          If (eLastToken = ttNumber) Then
-            Begin
-             Case Ch Of
-               'A'..'F', 'a'..'f': Result := ttNumber;
-             Else
-               Result := ttIdentifier;
-             End;
-            End Else
-              Result := ttIdentifier;
-        End;
-      '0'..'9':
-        Begin
-          Result := ttNumber;
-          If eLastToken = ttIdentifier Then
-            Result := ttIdentifier;
-        End;
-      #10, #13: Result := ttLineEnd;
-      #33, #36..#38, #40..#47, #58..#63, #91..#94, #96, #123..#128: Result := ttSymbol;
-    Else
-      Result := ttUnknown;
-    End;
-  End;
-
-  (**
-
-    This procedure processes single and double string literals in the stream.
-
-    @precon  None.
-    @postcon The eBlockType is updated depending upon whether the stream is at the start or end
-             of a string literal.
-
-    @param   eCurToken  as a TBADITokenType as a constant
-    @param   eBlockType as a TBlockType as a reference
-
-  **)
-  Procedure ProcessStringLiterals(Const eCurToken : TBADITokenType; var eBlockType : TBlockType);
-    InLine;
-
-  Begin
-    // Check for single string literals
-    If eCurToken = ttSingleLiteral Then
-      If eBlockType = btSingle Then
-        eBlockType := btNone
-      Else If eBlockType = btNone Then
-        eBlockType := btSingle;
-    // Check for Double string literals
-    If eCurToken = ttDoubleLiteral Then
-      If eBlockType = btDouble Then
-        eBlockType := btNone
-      Else If eBlockType = btNone Then
-        eBlockType := btDouble;
-  End;
-
-  (**
-
-    This procedure process HTML and brace comment blocks.
-
-    @precon  None.
-    @postcon The eBlockType and eCurToken are updated if HTML or brace comments are found.
-
-    @param   strToken    as a String as a constant
-    @param   iTokenIndex as an Integer as a constant
-    @param   eBlockType  as a TBlockType as a reference
-    @param   eCurToken   as a TBADITokenType as a reference
-
-  **)
-  Procedure ProcessBlocks(Const strToken : String; Const iTokenIndex : Integer;
-    Var eBlockType : TBlockType; Var eCurToken : TBADITokenType); InLine;
-
-  Begin
-    If (eBlockType = btNone) And (strToken[1] = '{') Then
-      eBlockType := btLink
-    Else If (eBlockType = btNone) And (strToken[1] = '<') Then
-      eBlockType := btHTML;
-    If (eBlockType = btLink) And (strToken[iTokenIndex] = '}') Then
-      Begin
-        eBlockType := btNone;
-        eCurToken := ttLinkTag;
-      End;
-    If (eBlockType = btHTML) And (strToken[iTokenIndex] = '>') Then
-      Begin
-        eBlockType := btNone;
-        If strToken[2] = '/' Then
-          eCurToken := ttHTMLEndTag
-        Else
-          eCurToken := ttHTMLStartTag;
-      End;
-  End;
 
 Const
   iTokenCapacity = 25;
@@ -642,7 +527,277 @@ Begin
       If Not(IsInSet(strToken[1], strWhiteSpace + strLineEnd)) Then
         AddToken(strToken, LastToken);
     End;
-  TrimTrailingWhiteSpace;
+  TrimWhiteSpace;
+End;
+
+(**
+
+  This procedure process HTML and brace comment blocks.
+
+  @precon  None.
+  @postcon The eBlockType and eCurToken are updated if HTML or brace comments are found.
+
+  @param   strToken    as a String as a constant
+  @param   iTokenIndex as an Integer as a constant
+  @param   eBlockType  as a TBlockType as a reference
+  @param   eCurToken   as a TBADITokenType as a reference
+
+**)
+Procedure TComment.ProcessBlocks(Const strToken : String; Const iTokenIndex : Integer;
+  Var eBlockType : TBlockType; Var eCurToken : TBADITokenType);
+
+Begin
+  If (eBlockType = btNone) And (strToken[1] = '{') Then
+    eBlockType := btLink
+  Else If (eBlockType = btNone) And (strToken[1] = '<') Then
+    eBlockType := btHTML;
+  If (eBlockType = btLink) And (strToken[iTokenIndex] = '}') Then
+    Begin
+      eBlockType := btNone;
+      eCurToken := ttLinkTag;
+    End;
+  If (eBlockType = btHTML) And (strToken[iTokenIndex] = '>') Then
+    Begin
+      eBlockType := btNone;
+      If strToken[2] = '/' Then
+        eCurToken := ttHTMLEndTag
+      Else
+        eCurToken := ttHTMLStartTag;
+    End;
+End;
+
+(**
+
+  This procedure processes single and double string literals in the stream.
+
+  @precon  None.
+  @postcon The eBlockType is updated depending upon whether the stream is at the start or end
+           of a string literal.
+
+  @param   eCurToken  as a TBADITokenType as a constant
+  @param   eBlockType as a TBlockType as a reference
+
+**)
+Procedure TComment.ProcessStringLiterals(Const eCurToken : TBADITokenType;
+  Var eBlockType : TBlockType);
+
+Begin
+  // Check for single string literals
+  If eCurToken = ttSingleLiteral Then
+    If eBlockType = btSingle Then
+      eBlockType := btNone
+    Else If eBlockType = btNone Then
+      eBlockType := btSingle;
+  // Check for Double string literals
+  If eCurToken = ttDoubleLiteral Then
+    If eBlockType = btDouble Then
+      eBlockType := btNone
+    Else If eBlockType = btNone Then
+      eBlockType := btDouble;
+End;
+
+(**
+
+  This method resets the comment tag mode, i.e. the comment will accept text as
+  tokens and not tag tokens.
+
+  @precon  None.
+  @postcon Resets the comment tag mode, i.e. the comment will accept text as
+           tokens and not tag tokens.
+
+**)
+Procedure TComment.ResetTagMode;
+
+Begin
+  FTagMode := False;
+End;
+
+(**
+
+  This method trims starting whitespace from tags only if the line ends with a carriage return /
+  line feed.
+
+  @precon  ATAg must be a valid instance.
+  @postcon The leading whitespace is removed from the tag if it ends with a CR / LF.
+
+  @param   ATag as a TTag as a constant
+
+**)
+Procedure TComment.TrimStartingWhitespaceONLYIfItEndsWithALineEnd(Const ATag : TTag);
+
+Var
+  iPos: Integer;
+  iToken : Integer;
+  boolHasWS: Boolean;
+
+Begin
+  iPos := -1;
+  For iToken := 0 To ATag.TokenCount - 1 Do
+    If ATag.Tokens[iToken].TokenType = ttLineEnd Then
+      Begin
+        iPos := iToken;
+        Break;
+      End;
+  boolHasWS := iPos > -1;
+  For iToken := iPos - 1 DownTo 0 Do
+    boolHasWS := boolHasWS And (ttWhiteSpace = ATag.Tokens[iToken].TokenType);
+  If boolHasWS Then
+    For iToken := 0 To iPos Do
+      ATag.DeleteToken(0);
+End;
+
+(**
+
+  This method removes trailing whitespace from the whole comment.
+
+  @precon  None.
+  @postcon Trailing whitespace is removed form the whole comment (including the last tag).
+
+**)
+Procedure TComment.TrimTrailingWhitespace;
+
+Var
+  iToken : Integer;
+
+Begin
+  If TokenCount > 0 Then
+    Begin
+      iToken := TokenCount - 1;
+      While Tokens[iToken].TokenType In [ttWhiteSpace] Do
+        Begin
+          DeleteToken(iToken);
+          Dec(iToken);
+        End;
+    End;
+End;
+
+(**
+
+  This method removes both whitespave an line ends from the given Tag.
+
+  @precon  ATag must be a valid instance.
+  @postcon Whitespace and line ends are removed from the given tag.
+
+  @param   ATag as a TTag as a constant
+
+**)
+Procedure TComment.TrimTrailingWhitespaceAndLineEnds(Const ATag : TTag);
+
+Var
+  iToken : Integer;
+
+Begin
+  iToken := ATag.TokenCount - 1;
+  While (iToken >= 0) And (ATag.Tokens[iToken].TokenType In [ttWhiteSpace, ttLineEnd]) Do
+    Begin
+      ATag.DeleteToken(iToken);
+      Dec(iToken);
+    End;
+End;
+
+(**
+
+  This method removes trailing white space tokens from the parsed comments and
+  tags.
+
+  @precon  None.
+  @postcon Removes trailing white space tokens from the parsed comments and
+           tags.
+
+**)
+Procedure TComment.TrimWhiteSpace;
+
+Var
+  iTag: Integer;
+  ATag: TTag;
+
+Begin
+  TrimTrailingWhitespace;
+  For iTag := 0 To TagCount - 1 Do
+    Begin
+      ATag := Tag[iTag];
+      If ATag.TokenCount = 0 Then
+        Continue;
+      TrimTrailingWhitespaceAndLineEnds(ATag);
+      TrimStartingWhitespaceONLYIfItEndsWithALineEnd(ATag);
+      If ATag.Fixed Then
+        TrimWhitespaceFromFixedTagsIfCommonOnALLLines(ATag);
+    End;
+End;
+
+(**
+
+  This method removes common whitespace from all the lines of the tag so that the indentation
+  is maintained but the line with the least whitespace ends up with none.
+
+  @precon  ATag must be a valid instance.
+  @postcon Common whitespace is removed from the tag comment.
+
+  @param   ATag as a TTag as a constant
+
+**)
+Procedure TComment.TrimWhitespaceFromFixedTagsIfCommonOnALLLines(Const ATag: TTag);
+
+Var
+  iLeadCount: Integer;
+  iCurCount : Integer;
+  iToken: Integer;
+  Token: TTokenInfo;
+  boolCanCount: Boolean;
+
+Begin
+  CodeSite.AddSeparator;
+  CodeSite.SendFmtMsg('[%s]', [StringReplace(ATag.AsString(80, False), #13#10, '|', [rfReplaceAll])]);
+  iLeadCount := 999;
+  iCurCount := 0;
+  boolCanCount := True;
+  // Count common leading whitespace tokens.
+  For iToken := 0 To ATag.TokenCount - 1 Do
+    Begin
+      Token := ATag.Tokens[iToken];
+      Case Token.TokenType Of
+        ttWhiteSpace:
+          If boolCanCount Then
+            Inc(iCurCount, Length(Token.Token));
+        ttLineEnd:
+          Begin
+            If iLeadCount > iCurCount Then
+              iLeadCount := iCurCount;
+            iCurCount := 0;
+            boolCanCount := True;
+          End;
+      Else
+        boolcanCount := False;
+      End;
+    End;
+  If iLeadCount > iCurCount Then
+    iLeadCount := iCurCount;
+  CodeSite.Send('LeadCount', iLeadCount);
+  // Trim leading space from lines
+  iToken := 0;
+  iCurCount := iLeadCount;
+  If iLeadCount > 0 Then
+    While iToken <= ATAg.TokenCount - 1 Do
+      Begin
+        Token := ATag.Tokens[iToken];
+        Case Token.TokenType Of
+          ttWhiteSpace:
+            If iCurCount > 0 Then
+              Begin
+                Dec(iCurCount, Length(Token.Token));
+                ATag.DeleteToken(iToken);
+              End Else
+                Inc(iToken);
+          ttLineEnd:
+            Begin
+              iCurCount := iLeadCount;
+              Inc(iToken);
+            End;
+        Else
+          Inc(iToken);
+        End;
+      End;
+  CodeSite.SendFmtMsg('[%s]', [StringReplace(ATag.AsString(80, False), #13#10, '|', [rfReplaceAll])]);
 End;
 
 End.

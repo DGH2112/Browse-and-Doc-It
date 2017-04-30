@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Feb 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.ResourceStrings;
@@ -24,6 +24,14 @@ ResourceString
   strShowHints = 'Show Module Hints';
   (** Options text for Show Documentation Conflicts **)
   strShowDocumentationConflicts = 'Show Documentation Conflicts';
+  (** Options text for Syntax Highlight Errors **)
+  strSyntaxHighlightErrors = 'Syntax Highlight Module Errors';
+  (** Options text for Syntax Highlight Warnings **)
+  strSyntaxHighlightWarnings = 'Syntax Highlight Module Warnings';
+  (** Options text for Syntax Highlight Hints **)
+  strSyntaxHighlightHints = 'Syntax Highlight Module Hints';
+  (** Options text for Syntax Highlight Documentation Conflicts **)
+  strSyntaxHighlightDocumentationConflicts = 'Syntax Highlight Documentation Conflicts';
   (** Options text for Show Missing Method Documentation **)
   strShowMissingMethodDocumentation = 'Show Missing Method Documentation';
   (** Options text for Show Missing Method Documentation Description **)

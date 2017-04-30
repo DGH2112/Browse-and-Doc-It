@@ -29,6 +29,7 @@ var
 begin
   C := TVBConstant.Create('Identifier', scPublic, 10, 12, iiPublicConstant, Nil);
   Try
+    C.AddToken('As');
     C.AddToken('Integer');
     CheckEquals('Identifier As Integer', C.AsString(True, False));
   Finally
@@ -36,6 +37,7 @@ begin
   End;
   C := TVBConstant.Create('Identifier', scPublic, 10, 12, iiPublicConstant, Nil);
   Try
+    C.AddToken('As');
     C.AddToken('MSForms');
     C.AddToken('.');
     C.AddToken('Integer');
@@ -45,6 +47,7 @@ begin
   End;
   C := TVBConstant.Create('Identifier', scPublic, 10, 12, iiPublicConstant, Nil);
   Try
+    C.AddToken('As');
     C.AddToken('MSForms');
     C.AddToken('.');
     C.AddToken('Integer');

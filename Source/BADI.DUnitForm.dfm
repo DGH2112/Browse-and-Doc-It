@@ -186,17 +186,17 @@ object frmDUnit: TfrmDUnit
     Columns = <>
   end
   object cbxBaseClass: TComboBox
-    Left = 92
+    Left = 133
     Top = 403
-    Width = 284
+    Width = 243
     Height = 24
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 3
   end
   object edtTestSuiteName: TEdit
-    Left = 92
+    Left = 133
     Top = 430
-    Width = 284
+    Width = 243
     Height = 24
     Anchors = [akLeft, akRight, akBottom]
     TabOrder = 4

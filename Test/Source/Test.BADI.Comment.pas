@@ -51,6 +51,12 @@ Const
     '  @code'#13#10 +
     '  Even more and keep indent'#13#10 +
     'but not here'#13#10 +
+    '  @code'#13#10 +
+    '  Something more'#13#10 +
+    '    and keep indent!'#13#10 +
+    '  @code'#13#10 +
+    '    Even more and keep indent'#13#10 +
+    '  but not here'#13#10 +
     '';
 Var
   iTag: Integer;
@@ -121,7 +127,11 @@ Begin
   CheckEquals('Something more'#13#10'  and keep indent!', FComment.Tag[4].AsString(80, False));
   CheckEquals('code', FComment.Tag[5].TagName);
   CheckEquals('  Even more and keep indent'#13#10'but not here', FComment.Tag[5].AsString(80, False));
-  CheckEquals(6, FComment.TagCount, 'TagCount');
+  CheckEquals('code', FComment.Tag[6].TagName);
+  CheckEquals('Something more'#13#10'  and keep indent!', FComment.Tag[6].AsString(80, False));
+  CheckEquals('code', FComment.Tag[7].TagName);
+  CheckEquals('  Even more and keep indent'#13#10'but not here', FComment.Tag[7].AsString(80, False));
+  CheckEquals(8, FComment.TagCount, 'TagCount');
   CheckEquals(12, FComment.Line, 'Line');
   CheckEquals(34, FComment.Column, 'Column');
 End;
@@ -233,7 +243,11 @@ Begin
     CheckEquals('Something more'#13#10'  and keep indent!', FComment.Tag[4].AsString(80, False));
     CheckEquals('code', FComment.Tag[5].TagName);
     CheckEquals('  Even more and keep indent'#13#10'but not here', FComment.Tag[5].AsString(80, False));
-    CheckEquals(6, srcComment.TagCount, 'TagCount');
+    CheckEquals('code', FComment.Tag[6].TagName);
+    CheckEquals('Something more'#13#10'  and keep indent!', FComment.Tag[6].AsString(80, False));
+    CheckEquals('code', FComment.Tag[7].TagName);
+    CheckEquals('  Even more and keep indent'#13#10'but not here', FComment.Tag[7].AsString(80, False));
+    CheckEquals(8, srcComment.TagCount, 'TagCount');
     CheckEquals(12, srcComment.Line, 'Line');
     CheckEquals(34, srcComment.Column, 'Column');
   Finally

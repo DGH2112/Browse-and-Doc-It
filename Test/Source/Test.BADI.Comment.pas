@@ -43,8 +43,14 @@ Const
     '  @see   Something interesting.'#13#10 +
     '  @code  '#13#10 +
     '  Something more'#13#10 +
-    '  interesting.'#13#10 +
+    '  interesting information.'#13#10 +
     '  @refactor Something even more interesting.'#13#10 +
+    '  @code'#13#10 +
+    'Something more'#13#10 +
+    '  and keep indent!'#13#10 +
+    '  @code'#13#10 +
+    '  Even more and keep indent'#13#10 +
+    'but not here'#13#10 +
     '';
 Var
   iTag: Integer;
@@ -86,7 +92,7 @@ End;
 Procedure TestTComment.TestCreate;
 
 Begin
-  CheckEquals(12, FComment.TokenCount);
+  CheckEquals(12, FComment.TokenCount, 'TokenCount');
   CheckEquals('This', FComment.Tokens[0].Token);
   CheckEquals('method', FComment.Tokens[2].Token);
   CheckEquals('does', FComment.Tokens[4].Token);
@@ -108,12 +114,16 @@ Begin
   CheckEquals('see', FComment.Tag[1].TagName);
   CheckEquals('Something interesting.', FComment.Tag[1].AsString(80, False));
   CheckEquals('code', FComment.Tag[2].TagName);
-  CheckEquals('  Something more'#13#10'  interesting.', FComment.Tag[2].AsString(80, False));
+  CheckEquals('Something more'#13#10'interesting information.', FComment.Tag[2].AsString(80, False));
   CheckEquals('refactor', FComment.Tag[3].TagName);
   CheckEquals('Something even more interesting.', FComment.Tag[3].AsString(80, False));
-  CheckEquals(4, FComment.TagCount);
-  CheckEquals(12, FComment.Line);
-  CheckEquals(34, FComment.Column);
+  CheckEquals('code', FComment.Tag[4].TagName);
+  CheckEquals('Something more'#13#10'  and keep indent!', FComment.Tag[4].AsString(80, False));
+  CheckEquals('code', FComment.Tag[5].TagName);
+  CheckEquals('  Even more and keep indent'#13#10'but not here', FComment.Tag[5].AsString(80, False));
+  CheckEquals(6, FComment.TagCount, 'TagCount');
+  CheckEquals(12, FComment.Line, 'Line');
+  CheckEquals(34, FComment.Column, 'Column');
 End;
 
 Procedure TestTComment.TestCreateComment;
@@ -198,7 +208,7 @@ Begin
   srcComment := TComment.Create(Nil);
   Try
     srcComment.Assign(FComment);
-    CheckEquals(12, srcComment.TokenCount);
+    CheckEquals(12, srcComment.TokenCount, 'TokenCount');
     CheckEquals('This', srcComment.Tokens[0].Token);
     CheckEquals('method', srcComment.Tokens[2].Token);
     CheckEquals('does', srcComment.Tokens[4].Token);
@@ -216,12 +226,16 @@ Begin
     CheckEquals('see', srcComment.Tag[1].TagName);
     CheckEquals('Something interesting.', srcComment.Tag[1].AsString(80, False));
     CheckEquals('code', FComment.Tag[2].TagName);
-    CheckEquals('  Something more'#13#10'  interesting.', FComment.Tag[2].AsString(80, False));
+    CheckEquals('Something more'#13#10'interesting information.', FComment.Tag[2].AsString(80, False));
     CheckEquals('refactor', FComment.Tag[3].TagName);
     CheckEquals('Something even more interesting.', FComment.Tag[3].AsString(80, False));
-    CheckEquals(4, srcComment.TagCount);
-    CheckEquals(12, srcComment.Line);
-    CheckEquals(34, srcComment.Column);
+    CheckEquals('code', FComment.Tag[4].TagName);
+    CheckEquals('Something more'#13#10'  and keep indent!', FComment.Tag[4].AsString(80, False));
+    CheckEquals('code', FComment.Tag[5].TagName);
+    CheckEquals('  Even more and keep indent'#13#10'but not here', FComment.Tag[5].AsString(80, False));
+    CheckEquals(6, srcComment.TagCount, 'TagCount');
+    CheckEquals(12, srcComment.Line, 'Line');
+    CheckEquals(34, srcComment.Column, 'Column');
   Finally
     srcComment.Free;
   End;

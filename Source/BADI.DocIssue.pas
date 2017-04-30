@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.DocIssue;
@@ -20,10 +20,11 @@ Uses
 Type
   (** This class defines a document error. **)
   TDocIssue = Class(TElementContainer)
-  {$IFDEF D2005} Strict {$ENDIF} Private
-    FMsg: String;
-    FMethod : String;
-  {$IFDEF D2005} Strict {$ENDIF} Protected
+  Strict Private
+    FMsg      : String;
+    FMethod   : String;
+    FErrorType: TErrorType;
+  Strict Protected
     (**
       Returns the error method of the error stored.
       @precon  None.
@@ -39,9 +40,16 @@ Type
     **)
     Property Msg : String Read FMsg;
   Public
-    Constructor Create(const strMsg : String; AScope : TScope; const strMethod : String; iLine,
-      iCol : Integer; AImageIndex : TBADIImageIndex); Reintroduce; Overload;
+    Constructor Create(Const strMsg : String; Const AScope : TScope; Const strMethod : String;
+      Const iLine, iCol : Integer; Const eErrorType : TErrorType); Reintroduce; Overload;
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    (**
+      This property returns the error type of the issue.
+      @precon  None.
+      @postcon Returns the error type of the issue.
+      @return  a TErrorType
+    **)
+    Property ErrorType : TErrorType Read FErrorType;
   End;
 
   (** This is a class to represent a module documentation conflict. **)
@@ -82,7 +90,7 @@ Implementation
 Uses
   SysUtils,
   BADI.Options,
-  BADI.Comment;
+  BADI.Comment, BADI.Functions;
 
 Var
   (** This variable provides an incremental number for making doc conflict
@@ -111,39 +119,39 @@ end;
 
 (**
 
-
   This is the constructor method for the TDocError class.
 
-
-  @precon  strMsg is the error message to create a doc error for, iLine is the
-
-           line number of the error, iCol is the column number for the
-
-           message, strExceptionMethod is the name of the method the
-
-           error occurred in and ErrType determines if the mesage is a
-
-           warning or an error.
-
+  @precon  strMsg is the error message to create a doc error for, iLine is the line number of the
+           error, iCol is the column number for the message, strExceptionMethod is the name of
+           the method the error occurred in and ErrType determines if the mesage is a warning or
+           an error.
   @postcon Initialises the class.
 
-
-  @param   strMsg      as a String as a Constant
-  @param   AScope      as a TScope
-  @param   strMethod   as a String as a Constant
-  @param   iLine       as an Integer
-  @param   iCol        as an Integer
-  @param   AImageIndex as a TBADIImageIndex
+  @param   strMsg     as a String as a constant
+  @param   AScope     as a TScope as a constant
+  @param   strMethod  as a String as a constant
+  @param   iLine      as an Integer as a constant
+  @param   iCol       as an Integer as a constant
+  @param   eErrorType as a TErrorType as a constant
 
 **)
-Constructor TDocIssue.Create(const strMsg: String; AScope: TScope; const strMethod: String;
-  iLine, iCol: Integer; AImageIndex: TBADIImageIndex);
+Constructor TDocIssue.Create(Const strMsg: String; Const AScope: TScope; Const strMethod: String;
+  Const iLine, iCol: Integer; Const eErrorType : TErrorType);
+
+Var
+  iImageIndex: TBADIImageIndex;
 
 Begin
-  Inherited Create(Format('%4.4d', [iDocConflictCounter]), AScope, iLine, iCol, AImageIndex, Nil);
+  Case eErrorType Of
+    etHint:    iImageIndex := iiHint;
+    etWarning: iImageIndex := iiWarning;
+    etError:   iImageIndex := iiError;
+  End;
+  Inherited Create(Format('%4.4d', [iDocConflictCounter]), AScope, iLine, iCol, iImageIndex, Nil);
   Inc(iDocConflictCounter);
   FMsg := strMsg;
   FMethod := strMethod;
+  FErrorType := eErrorType;
 End;
 
 (**

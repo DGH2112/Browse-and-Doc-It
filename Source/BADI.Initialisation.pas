@@ -6,7 +6,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.Initialisation;
@@ -16,6 +16,9 @@ Interface
 Implementation
 
 Uses
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   BADI.Types,
   BADI.Module.Dispatcher,
   BADI.BackusNaur.Module,

@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    29 Apr 2017
+  @Date    30 Apr 2017
   @Author  David Hoyle
 
 **)
@@ -64,7 +64,9 @@ Type
 Implementation
 
 Uses
-  //CodeSiteLogging, //: @debug Remove CodeSite
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   SysUtils,
   BADI.ToolsAPIUtils,
   Dialogs,
@@ -139,20 +141,22 @@ Var
   Options : IOTAProjectOptions;
   ProjOpsConfigs : IOTAProjectOptionsConfigurations;
   strPlatform: String;
+  P : IOTAProject;
 
 begin
   Result := '';
   strFileName := '';
   boolModified := False;
   SE := ActiveSourceEditor;
-  If SE <> Nil Then
+  If Assigned(SE) Then
     Begin
       strFileName := SE.FileName;
       boolModified := SE.Modified;
       Result := EditorAsString(SE);
-      If ActiveProject <> Nil Then
+      P := ActiveProject;
+      If Assigned(P) Then
         Begin
-          Options := ActiveProject.ProjectOptions;
+          Options := P.ProjectOptions;
           TBADIOptions.BADIOptions.Defines.Text :=
             StringReplace(Options.Values['Defines'], ';', #13#10,
             [rfReplaceAll]);
@@ -223,13 +227,14 @@ begin
       {$IFNDEF D0001}
         {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
       {$ENDIF}
-      If Supports(ActiveProject.ProjectOptions, IOTAProjectOptionsConfigurations, ProjOpsConfigs) Then
-        Begin
-          strPlatform := UpperCase(ProjOpsConfigs.ActiveConfiguration.Platform);
-          TBADIOptions.BADIOptions.Defines.Add(strPlatform);
-          If (strPlatform = 'WIN32') Or (strPlatform = 'WIN64') Then
-            TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
-        End;
+      If Assigned(P) Then
+        If Supports(P.ProjectOptions, IOTAProjectOptionsConfigurations, ProjOpsConfigs) Then
+          Begin
+            strPlatform := UpperCase(ProjOpsConfigs.ActiveConfiguration.Platform);
+            TBADIOptions.BADIOptions.Defines.Add(strPlatform);
+            If (strPlatform = 'WIN32') Or (strPlatform = 'WIN64') Then
+              TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
+          End;
     End;
 end;
 
@@ -550,4 +555,6 @@ end;
 {$ENDIF}
 
 End.
+
+
 

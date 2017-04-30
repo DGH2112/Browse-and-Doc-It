@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       11 Apr 2017
+  @Date       30 Apr 2017
   @Author     David Hoyle
 
 **)
@@ -1583,7 +1583,7 @@ Begin
           Con.Comment := C;
           If Token.UToken = 'AS' Then
             Begin
-              NextNonCommentToken;
+              AddToExpression(Con);
               If Token.TokenType In [ttIdentifier, ttReservedWord, ttDirective] Then
                 Begin
                   AddToExpression(Con);

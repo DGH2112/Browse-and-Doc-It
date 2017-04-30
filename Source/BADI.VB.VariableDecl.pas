@@ -4,7 +4,7 @@
 
   @Author  Daivd Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    30 Apr 2017
 
 **)
 Unit BADI.VB.VariableDecl;
@@ -125,8 +125,9 @@ begin
         End;
       Result := Result + ')';
     End;
-  Result := Result + #32'As'#32 + BuildStringRepresentation(False,
-    boolForDocumentation, '', BADIOptions.MaxDocOutputWidth);
+  If TokenCount > 0 Then
+    Result := Result + #32'As'#32 + BuildStringRepresentation(False,
+      boolForDocumentation, '', BADIOptions.MaxDocOutputWidth);
 end;
 
 (**

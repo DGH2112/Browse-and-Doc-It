@@ -746,8 +746,6 @@ Var
   boolCanCount: Boolean;
 
 Begin
-  CodeSite.AddSeparator;
-  CodeSite.SendFmtMsg('[%s]', [StringReplace(ATag.AsString(80, False), #13#10, '|', [rfReplaceAll])]);
   iLeadCount := 999;
   iCurCount := 0;
   boolCanCount := True;
@@ -772,7 +770,6 @@ Begin
     End;
   If iLeadCount > iCurCount Then
     iLeadCount := iCurCount;
-  CodeSite.Send('LeadCount', iLeadCount);
   // Trim leading space from lines
   iToken := 0;
   iCurCount := iLeadCount;
@@ -797,7 +794,6 @@ Begin
           Inc(iToken);
         End;
       End;
-  CodeSite.SendFmtMsg('[%s]', [StringReplace(ATag.AsString(80, False), #13#10, '|', [rfReplaceAll])]);
 End;
 
 End.

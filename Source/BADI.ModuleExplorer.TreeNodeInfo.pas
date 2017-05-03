@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    30 Apr 2017
+  @Date    01 May 2017
 
 **)
 Unit BADI.ModuleExplorer.TreeNodeInfo;

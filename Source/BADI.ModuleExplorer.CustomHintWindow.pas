@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    23 Apr 2017
+  @Date    03 May 2017
 
 **)
 Unit BADI.ModuleExplorer.CustomHintWindow;
@@ -267,6 +267,8 @@ Begin
       sl := NodeData.FNode.Tokens;
       iLastmax := 0;
       InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties);
+      // Start with single line height
+      Result.Bottom := Result.Top + iPadding * 2 + Canvas.TextHeight('Ag');
       For iToken := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, iToken, NodeData.FNode.Title, tpSyntax In NodeData.FNode.TagProperties,

@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    16 Apr 2017
+  @Date    03 May 2017
 
 **)
 Unit BADI.Functions;
@@ -1030,6 +1030,7 @@ Begin
       TargetCanvas.Font.Name := TBADIOptions.BADIOptions.FixedFontName;
       TargetCanvas.Font.Size := TBADIOptions.BADIOptions.FixedFontSize;
     End;
+  TargetCanvas.Font.Style := [];
 End;
 
 (**

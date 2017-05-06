@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    30 Apr 2017
+  @Date    01 May 2017
   @Author  David Hoyle
 
 **)
@@ -236,6 +236,9 @@ begin
             If (strPlatform = 'WIN32') Or (strPlatform = 'WIN64') Then
               TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
           End;
+      {$ELSE}
+      TBADIOptions.BADIOptions.Defines.Add('WIN32');
+      TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
       {$ENDIF}
     End;
 end;

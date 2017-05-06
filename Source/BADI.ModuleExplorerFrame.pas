@@ -1306,20 +1306,21 @@ procedure TframeModuleExplorer.tvExplorerMeasureItem(Sender: TBaseVirtualTree;
   TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
 
 Var
-  strText : String;
-  R : TRect;
   NodeData : PBADITreeData;
+  sl: TStringList;
+  iToken: Integer;
 
-begin
+Begin
   NodeData := Sender.GetNodeData(Node);
   InitCanvasFont(TargetCanvas, tpFixed In NodeData.FNode.TagProperties);
-  strText := FExplorer.Text[Node, 0];
-  R := Rect(0, 0, 0, 0);
-  DrawText(TargetCanvas.Handle, PChar(strText), Length(strText), R, DT_Left Or DT_CALCRECT);
-  NodeHeight := 1 + R.Bottom - R.Top + 1;
-  If NodeHeight < FExplorer.DefaultNodeHeight Then
-    NodeHeight := FExplorer.DefaultNodeHeight;
-end;
+  sl := NodeData.FNode.Tokens;
+  NodeHeight := 1 + TargetCanvas.TextHeight('Ag') + 1;
+  For iToken := 0 To sl.Count - 1 Do
+    If TBADITokenType(sl.Objects[iToken]) = ttLineEnd Then
+      Inc(NodeHeight, TargetCanvas.TextHeight('Ag'));
+  If NodeHeight < Integer(FExplorer.DefaultNodeHeight) Then
+    NodeHeight := Integer(FExplorer.DefaultNodeHeight);
+End;
 
 (**
 
@@ -1505,11 +1506,9 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
   End;
 
 Var
-  NodeData: PBADITreeData;
   strText: String;
 
 Begin
-  NodeData := Sender.GetNodeData(Node);
   If Not (doCustomDrawing In TBADIOptions.BADIOptions.Options) And
          (edtExplorerFilter.Text <> '') Then
     Begin

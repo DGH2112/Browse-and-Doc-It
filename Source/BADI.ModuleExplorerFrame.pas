@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    23 Apr 2017
+  @Date    06 May 2017
   @Author  David Hoyle
   @Version 1.0
 
@@ -92,27 +92,8 @@ Type
     actVariables: TAction;
     actTypes: TAction;
     edtExplorerFilter: TEdit;
-    procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure tvExplorerClick(Sender: TObject);
     procedure actLocalUpdate(Sender: TObject);
     procedure actLocalExecute(Sender: TObject);
-    procedure tvExplorerKeyPress(Sender: TObject; var Key: Char);
-    {$IFNDEF D2009}
-    procedure tvExplorerGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
-    {$ELSE}
-    procedure tvExplorerGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
-    {$ENDIF}
-    procedure tvExplorerGetImageIndex(Sender: TBaseVirtualTree;
-      Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-      var Ghosted: Boolean; var ImageIndex: Integer);
-    procedure tvExplorerBeforeItemPaint(Sender: TBaseVirtualTree;
-      TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
-      var CustomDraw: Boolean);
-    procedure tvExplorerMeasureItem(Sender: TBaseVirtualTree;
-      TargetCanvas: TCanvas; Node: PVirtualNode; var NodeHeight: Integer);
     procedure FilterChange;
     procedure FrameEnter(Sender: TObject);
     procedure edtExplorerFilterChange(Sender: TObject);
@@ -205,6 +186,21 @@ Type
       iLength: Integer) : TMatchResult; InLine;
     Function  IsMatched(Const iIndex, iLength: Integer; Const MC: TMatchCollection): TMatchResult;
       InLine;
+    Procedure tvExplorerAfterCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
+      Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+    Procedure tvExplorerMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    Procedure tvExplorerClick(Sender: TObject);
+    Procedure tvExplorerKeyPress(Sender: TObject; Var Key: Char);
+    Procedure tvExplorerGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; Var CellText: String);
+    Procedure tvExplorerGetImageIndex(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
+      Var Ghosted: Boolean; Var ImageIndex: Integer);
+    Procedure tvExplorerBeforeItemPaint(Sender: TBaseVirtualTree;
+      TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
+      Var CustomDraw: Boolean);
+    Procedure tvExplorerMeasureItem(Sender: TBaseVirtualTree;
+      TargetCanvas: TCanvas; Node: PVirtualNode; Var NodeHeight: Integer);
   Public
     { Public declarations }
     Constructor Create(AOwner : TComponent); Override;
@@ -243,7 +239,6 @@ Type
 Implementation
 
 Uses
-  //IniFiles,
   Types,
   Math,
   BADI.Generic.Tokenizer,
@@ -299,6 +294,7 @@ begin
   FExplorer.Images := ilScopeImages;
   FExplorer.TabOrder := 3;
   FExplorer.TreeOptions.MiscOptions := FExplorer.TreeOptions.MiscOptions + [toVariableNodeHeight];
+  FExplorer.OnAfterCellPaint := tvExplorerAfterCellPaint;
   FExplorer.OnBeforeItemPaint := tvExplorerBeforeItemPaint;
   FExplorer.OnClick := tvExplorerClick;
   FExplorer.OnGetImageIndex := tvExplorerGetImageIndex;
@@ -418,7 +414,7 @@ Begin
   stbStatusBar.SimplePanel := False;
   Try
     If edtExplorerFilter.Text <> '' Then
-      FFilterRegEx := TregEx.Create(edtExplorerFilter.Text, [roIgnoreCase, roCompiled,
+      FFilterRegEx := TRegEx.Create(edtExplorerFilter.Text, [roIgnoreCase, roCompiled,
         roSingleLine]);
   Except
     On E : ERegularExpressionError Do
@@ -1282,11 +1278,7 @@ end;
 **)
 procedure TframeModuleExplorer.tvExplorerGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-{$IFNDEF D2009}
-  var CellText: WideString);
-{$ELSE}
-  var CellText: string);
-{$ENDIF}
+  var CellText: String);
 
 Var
   NodeData : PBADITreeData;
@@ -1422,7 +1414,7 @@ begin
           If strTickLabel <> '' Then
             strTickLabel := strTickLabel + ':';
           dblTicks := Module.OpTickCountByIndex[i] - Module.OpTickCountByIndex[i - 1];
-          If dblTicks > 1.0 Then //: @note Filter out small items - Add to Options.
+          If dblTicks > 1.0 Then //: @note Filter out small items @todo Add to Options.
             Begin
               If strText <> '' Then
                 strText := strText + ', ';
@@ -1458,6 +1450,72 @@ Procedure TframeModuleExplorer.CMMouseLeave(Var Msg : TMessage);
 
 Begin
   FHintWin.ReleaseHandle;
+End;
+
+(**
+
+  This is an on After Cell Paint event handler for the interfaces tree view.
+
+  @precon  None.
+  @postcon This method paints the highlighted text over the top of the tree text.
+
+  @param   Sender       as a TBaseVirtualTree
+  @param   TargetCanvas as a TCanvas
+  @param   Node         as a PVirtualNode
+  @param   Column       as a TcolumnIndex
+  @param   CellRect     as a TRect
+
+**)
+Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree;
+  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellRect: TRect);
+
+  (**
+
+    This local method highlights the text matches passed in the given colour.
+
+    @precon  None.
+    @postcon If there are matches these are highlighed.
+
+    @param   MC      as a TMatchCollection
+    @param   strText as a String
+
+  **)
+  Procedure HighlightText(MC : TMatchCollection; strText : String);
+
+  Var
+    iStart: Integer;
+    iMatch: Integer;
+    M: TMatch;
+    iLeft: Integer;
+    R : TRect;
+
+  Begin
+    iStart := 18 + 26 + Sender.GetNodeLevel(Node) * (Sender As TVirtualStringTree).Indent;
+    For iMatch := 0 To MC.Count - 1 Do
+      Begin
+        M := MC[iMatch];
+        TargetCanvas.Brush.Color := clAqua;
+        iLeft := TargetCanvas.TextWidth(Copy(strText, 1, M.Index - 1));
+        R := CellRect;
+        R.Left := iStart + iLeft;
+        Inc(R.Top);
+        DrawText(TargetCanvas.Handle, PChar(Copy(strText, M.Index, M.Length)), M.Length, R,
+          DT_LEFT Or DT_VCENTER Or DT_NOPREFIX);
+      End;
+  End;
+
+Var
+  NodeData: PBADITreeData;
+  strText: String;
+
+Begin
+  NodeData := Sender.GetNodeData(Node);
+  If Not (doCustomDrawing In TBADIOptions.BADIOptions.Options) And
+         (edtExplorerFilter.Text <> '') Then
+    Begin
+      strText := (Sender As TVirtualStringTree).Text[Node, 0];
+      HighlightText(FFilterRegEx.Matches(strText), strText);
+    End;
 End;
 
 (**

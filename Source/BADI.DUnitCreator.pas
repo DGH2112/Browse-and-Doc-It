@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Apr 2017
+  @Date    08 May 2017
 
 **)
 Unit BADI.DUnitCreator;
@@ -249,11 +249,21 @@ Type
 **)
 Function IsTestFramework(Project: IOTAProject): Boolean;
 
+Const
+  strTestUnits : Array[1..5] Of String = (
+    'guitestrunner',
+    'testframework',
+    'testinsight.dunit',
+    'testinsight.dunit2',
+    'texttestrunner'
+  );
+
 Var
   S          : IOTASourceEditor;
   M          : TBaseLanguageModule;
   E          : TElementContainer;
   strFileName: String;
+  iUnit: Integer;
 
 Begin
   Result := False;
@@ -267,13 +277,14 @@ Begin
       Begin
         E := M.FindElement(strUses);
         If E <> Nil Then
-          Begin
-            If E.FindElement('TestFramework') <> Nil Then
-              Begin
-                Result := True;
-                Exit;
-              End;
-          End;
+          For iUnit := 1 To E.ElementCount Do
+            Begin
+              If IsKeyWord(LowerCase(E.Elements[iUnit].Identifier), strTestUnits) Then
+                Begin
+                  Result := True;
+                  Exit;
+                End;
+            End;
       End;
   Finally
     M.Free;

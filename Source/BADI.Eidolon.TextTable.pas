@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Mar 2017
+  @Date    06 May 2017
 
 **)
 Unit BADI.Eidolon.TextTable;
@@ -19,6 +19,7 @@ Uses
 Type
   (** A class to represent a TextTable definition. **)
   TTextTable = Class(TBaseTable)
+  Strict Private
     FFileName : String;
   Public
     Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;

@@ -3,12 +3,33 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       14 Apr 2017
+  @Date       08 Oct 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
               Needs to be able to evaluate constants in the code and use the
               two functions Defined() and Declared().
+  @todo       Metric: 00) Implement @@NoMetrics
+  @todo       Metric: 01) Long Methods (requires limit)
+  @todo       Metric: 02) Long Parameter Lists (requires limit)
+  @todo       Metric: 03) Long Method Variable Lists (requires limit)
+  @todo       Metric: 04) Hard Coded Integers
+  @todo       Metric: 05) Hard Coded Numbers
+  @todo       Metric: 06) Hard Coded Strings
+  @todo       Metric: 07) Unsorted Module
+  @todo       Metric: 08) Use of With Statements
+  @todo       Metric: 09) Use of GOTO Stateents
+  @todo       Metric: 10) Method IF depth (requires limit)
+  @todo       Metric: 11) Method Cyclometric Complexity (requires limit)
+  @todo       Metric: 12) Method Toxicity (requires limit)
+  @todo       Metric: 13) Empty EXCEPT
+  @todo       Metric: 14) Empty FINALLY
+  @todo       Metric: 15) Empty THEN
+  @todo       Metric: 16) Empty ELSE
+  @todo       Metric: 17) Empty Method
+  @todo       Metric: 18) Missing CONST in paremter list
+  @todo       Metric: 19) ResourceString (implementation) not used
+  @todo       Metric: 20) Constant (implementation) not used
 
 **)
 Unit BADI.Pascal.Module;

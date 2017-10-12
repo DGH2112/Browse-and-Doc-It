@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    14 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.ModuleExlporerOpsFrame;
@@ -83,6 +83,7 @@ Type
       NewValue: {$IFDEF DXE30}Integer{$ELSE}SmallInt{$ENDIF}; Direction: TUpDownDirection);
   Public
     { Public declarations }
+    //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
     Procedure LoadSettings;
     Procedure SaveSettings;
@@ -92,7 +93,8 @@ Implementation
 
 uses
   BADI.Constants,
-  BADI.Options;
+  BADI.Options,
+  BADI.ResourceStrings;
 
 {$R *.dfm}
 
@@ -248,6 +250,8 @@ End;
   @precon  None.
   @postcon Initialises the frame.
 
+  @nometric MissingCONSTInParam
+
   @param   AOwner as a TComponent
 
 **)
@@ -267,10 +271,11 @@ Begin
   For j := Low(TBADITokenType) To High(TBADITokenType) Do
     lbxTokenTypes.Items.Add(strTokenType[j]);
   lbxTokenTypes.ItemIndex := 0;
-  cbxLimits.Items.Add('Errors');
-  cbxLimits.Items.Add('Warnings');
-  cbxLimits.Items.Add('Hints');
-  cbxLimits.Items.Add('Conflicts');
+  cbxLimits.Items.Add(strErrors);
+  cbxLimits.Items.Add(strWarnings);
+  cbxLimits.Items.Add(strHints);
+  cbxLimits.Items.Add(strDocumentationConflicts);
+  cbxLimits.Items.Add(strModuleMetrics);
   udLimits.OnChangingEx := udLimitsChangingEx;
 End;
 
@@ -288,20 +293,20 @@ End;
 **)
 Procedure TfmBADIModuleExplorerFrame.lbxTokenTypesClick(Sender: TObject);
 
+Var
+  iIndex: Integer;
+
 Begin
-  With lbxTokenTypes Do
-    If ItemIndex > - 1 Then
-      Begin
-        cbxFontColour.Selected := FTokenFontInfo[TBADITokenType(ItemIndex)].FForeColour;
-        cbxBackColour.Selected := FTokenFontInfo[TBADITokenType(ItemIndex)].FBackColour;
-        chkBold.Checked := fsBold In FTokenFontInfo[TBADITokenType(ItemIndex)].FStyles;
-        chkItalic.Checked := fsItalic In FTokenFontInfo[TBADITokenType(ItemIndex)
-          ].FStyles;
-        chkUnderline.Checked := fsUnderline In FTokenFontInfo
-          [TBADITokenType(ItemIndex)].FStyles;
-        chkStrikeout.Checked := fsStrikeout In FTokenFontInfo
-          [TBADITokenType(ItemIndex)].FStyles;
-      End;
+  iIndex := lbxTokenTypes.ItemIndex;
+  If iIndex > - 1 Then
+    Begin
+      cbxFontColour.Selected := FTokenFontInfo[TBADITokenType(iIndex)].FForeColour;
+      cbxBackColour.Selected := FTokenFontInfo[TBADITokenType(iIndex)].FBackColour;
+      chkBold.Checked := fsBold In FTokenFontInfo[TBADITokenType(iIndex)].FStyles;
+      chkItalic.Checked := fsItalic In FTokenFontInfo[TBADITokenType(iIndex)].FStyles;
+      chkUnderline.Checked := fsUnderline In FTokenFontInfo[TBADITokenType(iIndex)].FStyles;
+      chkStrikeout.Checked := fsStrikeout In FTokenFontInfo[TBADITokenType(iIndex)].FStyles;
+    End;
 End;
 
 (**
@@ -343,6 +348,7 @@ Begin
   FIssueLimits[ltWarnings] := TBADIOptions.BADIOptions.IssueLimits[ltWarnings];
   FIssueLimits[ltHints] := TBADIOptions.BADIOptions.IssueLimits[ltHints];
   FIssueLimits[ltConflicts] := TBADIOptions.BADIOptions.IssueLimits[ltConflicts];
+  FIssueLimits[ltMetrics] := TBADIOptions.BADIOptions.IssueLimits[ltMetrics];
   cbxLimits.ItemIndex := 0;
   cbxLimitsChange(Nil);
 End;
@@ -374,6 +380,7 @@ Begin
   TBADIOptions.BADIOptions.IssueLimits[ltWarnings] := FIssueLimits[ltWarnings];
   TBADIOptions.BADIOptions.IssueLimits[ltHints] := FIssueLimits[ltHints];
   TBADIOptions.BADIOptions.IssueLimits[ltConflicts] := FIssueLimits[ltConflicts];
+  TBADIOptions.BADIOptions.IssueLimits[ltMetrics] := FIssueLimits[ltMetrics];
 End;
 
 (**

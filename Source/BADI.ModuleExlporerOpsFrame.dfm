@@ -114,7 +114,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
-    ExplicitWidth = 357
   end
   object cbxBackColour: TColorBox
     Left = 120
@@ -125,7 +124,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 8
     OnChange = cbxBackColourChange
-    ExplicitWidth = 438
   end
   object clbxTreeColour: TColorBox
     Left = 120
@@ -135,10 +133,9 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 11
-    ExplicitWidth = 438
   end
   object udTokenLimit: TUpDown
-    Left = 448
+    Left = 442
     Top = 335
     Width = 16
     Height = 24
@@ -148,7 +145,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Max = 32600
     Position = 10
     TabOrder = 13
-    ExplicitLeft = 542
   end
   object edtTokenLimit: TEdit
     Left = 120
@@ -159,7 +155,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 12
     Text = '10'
-    ExplicitWidth = 416
   end
   object cbxBGColour: TColorBox
     Left = 120
@@ -169,7 +164,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbCustomColor, cbPrettyNames]
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 10
-    ExplicitWidth = 438
   end
   object gbxFontStyles: TGroupBox
     Left = 3
@@ -179,7 +173,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Font Styles'
     TabOrder = 9
-    ExplicitWidth = 555
     object chkBold: TCheckBox
       Left = 15
       Top = 26
@@ -226,10 +219,9 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 7
     OnChange = cbxFontColourChange
-    ExplicitWidth = 438
   end
   object udTreeFontSize: TUpDown
-    Left = 448
+    Left = 442
     Top = 33
     Width = 16
     Height = 24
@@ -239,7 +231,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Max = 72
     Position = 8
     TabOrder = 2
-    ExplicitLeft = 461
   end
   object edtTreeFontSize: TEdit
     Left = 120
@@ -251,7 +242,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     ReadOnly = True
     TabOrder = 1
     Text = '8'
-    ExplicitWidth = 416
   end
   object cbxLimits: TComboBox
     Left = 120
@@ -274,7 +264,7 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Text = '0'
   end
   object udLimits: TUpDown
-    Left = 448
+    Left = 442
     Top = 395
     Width = 16
     Height = 24
@@ -292,10 +282,9 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     ReadOnly = True
     TabOrder = 4
     Text = '8'
-    ExplicitWidth = 416
   end
   object udFixedFontSize: TUpDown
-    Left = 448
+    Left = 442
     Top = 93
     Width = 16
     Height = 24
@@ -305,7 +294,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Max = 72
     Position = 8
     TabOrder = 5
-    ExplicitLeft = 542
   end
   object cbxFixedFontName: TComboBox
     Left = 120
@@ -315,7 +303,6 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 3
-    ExplicitWidth = 438
   end
   object lbxTokenTypes: TComboBox
     Left = 120
@@ -326,6 +313,5 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     TabOrder = 6
     Text = 'lbxTokenTypes'
     OnClick = lbxTokenTypesClick
-    ExplicitWidth = 438
   end
 end

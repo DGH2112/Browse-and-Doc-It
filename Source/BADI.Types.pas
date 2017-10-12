@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    30 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Types;
@@ -97,10 +97,14 @@ Type
     doShowWarnings,
     doShowHints,
     doShowConflicts,
+    doShowMetrics,
+    doShowChildCountInTitles,
+    doExpandEWHCMs,
     doSyntaxHighlightErrors,
     doSyntaxHighlightWarnings,
     doSyntaxHighlightHints,
     doSyntaxHighlightConflict,
+    doSyntaxHighlightMetrics,
 
     doShowUndocumentedTypes,
     doShowUndocumentedRecords,
@@ -339,6 +343,14 @@ Type
     FConflictType : TDocConflictIcon;
   End;
 
+  (** A record to describe the attributes of a module metric record. **)
+  TModuleMetricTable = Record
+    FCategory     : String;
+    FMessage      : String;
+    FDescription  : String;
+    FConflictType : TDocConflictIcon;
+  End;
+
   (** This enumerate defind the type of information to find. **)
   TFindType = (ftName, ftIdentifier);
 
@@ -375,7 +387,7 @@ Type
   End;
 
   (** An enumerate to define the different types of issues to limit output for. **)
-  TLimitType = (ltErrors, ltWarnings, ltHints, ltConflicts);
+  TLimitType = (ltErrors, ltWarnings, ltHints, ltConflicts, ltMetrics);
 
   (** This emunerate descibed the different types of doc comment .**)
   TCommentStyle = (csBlock, csLine, csInSitu);
@@ -433,6 +445,46 @@ Type
     FTagProperties : TBADITagProperties;
     Constructor Create(Const strName, strDescription : String;
       Const setTagProperties : TBADITagProperties);
+  End;
+
+  (** An enumerate to descibe each of the metrics. **)
+  TBADIModuleMetric = (
+    mmLongMethods,
+    mmLongParameterLists,
+    mmLongMethodVariableLists,
+    mmHardCodedIntegers,
+      mmHCIntIgnoreZero,
+      mmHCIntIgnoreOne,
+    mmHardCodedNumbers,
+      mmHCNumIgmoreZero,
+    mmHardCodedStrings,
+      mmHCStrIgnoreEmpty,
+      mmHCStrIgnoreSingle,
+    mmUnsortedMethod,
+    mmUseOfWithStatements,
+    mmUseOfGOTOStatements,
+    mmMethodIFDepth,
+    mmMethodCyclometricComplexity,
+      mmMethodCCIgnoreExpression,
+    mmMethodToxicity,
+    mmEmptyEXCEPT,
+    mmEmptyFINALLY,
+    mmExceptionEating,
+    mmEmptyTHEN,
+    mmEmptyELSE,
+    mmEmptyMethod,
+    mmMissingCONSTInParemterList,
+      mmMCParmListIgnoreEvents,
+    mmResourceStringNotUsed,
+    mmConstantNotUsed
+  );
+
+  (** A record to describe the attributes of each metric. **)
+  TBADIMetricRecord = Record
+    FName    : String;
+    FEnabled : Boolean;
+    FLimit   : Double;
+    FSubItem : Boolean;
   End;
 
 Implementation

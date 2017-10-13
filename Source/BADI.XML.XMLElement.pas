@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.XML.XMLElement;
@@ -28,11 +28,11 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function  ContextText : String;
   Public
-    Constructor Create(const strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
+    Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Override;
     Destructor Destroy; Override;
     Procedure AddContextText(Const strText : String);
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
+    Function AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Override;
     (**
       This property returns the Attributes string list.
@@ -73,12 +73,15 @@ End;
   @precon  None.
   @postcon Returns a string representation of the XML Element.
 
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @nometric HardCodedString
+
+  @param   boolShowIdenifier    as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TXMLElement.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
+Function TXMLElement.AsString(Const boolShowIdenifier, boolForDocumentation: Boolean): String;
+
 Begin
   Result := '<' + BuildStringRepresentation(boolShowIdenifier, boolForDocumentation, '',
     BADIOptions.MaxDocOutputWidth, [#32, '='], [#32, '='], []) + '>' + ContextText + '</'
@@ -91,6 +94,8 @@ End;
 
   @precon  None.
   @postcon A string of the context tokens is return.
+
+  @nometric HardCodedString
 
   @return  a String
 
@@ -113,19 +118,20 @@ End;
   This is a constructor for the TXMLElement class.
 
   @precon  None.
-  @postcon Creates an xml element with a unique name derived from the given
-           name, line number and column number.
+  @postcon Creates an xml element with a unique name derived from the given name, line number and column
+           number.
 
-  @param   strName     as a String as a Constant
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   strName     as a String as a constant
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-Constructor TXMLElement.Create(Const strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TBADIImageIndex; AComment: TComment);
+Constructor TXMLElement.Create(Const strName: String; Const AScope: TScope; Const iLine,
+  iColumn: Integer; Const AImageIndex: TBADIImageIndex; Const AComment: TComment);
+
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FAttributes := TStringList.Create;

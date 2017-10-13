@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @date    01 Apr 2017
+  @date    12 Oct 2017
 
 **)
 Unit BADI.DFM.PropertyDecl;
@@ -22,7 +22,7 @@ Type
     {$IFDEF D2005} Strict {$ENDIF} Private
     {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
   End;
 
 Implementation
@@ -37,12 +37,12 @@ Uses
   @precon  None.
   @postcon Returns a string represetation of the DFM property.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TDFMProperty.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TDFMProperty.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
   Result := BuildStringRepresentation(True, boolForDocumentation, '=',

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Pascal.FieldDecl;
@@ -19,7 +19,7 @@ Type
   TField = Class(TElementContainer)
     {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
     Procedure CheckDocumentation(Var boolCascade: Boolean); Override;
   End;
 
@@ -38,12 +38,12 @@ Uses
   @precon  None.
   @postcon Returns the name of the field and = sign and then the definition.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TField.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TField.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, ':',

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.XML.XMLElemDecl;
@@ -18,7 +18,7 @@ Type
   (** This class represents the individual elements declarations in the document. **)
   TXMLElemDecl = Class(TXMLBaseElement)
   Public
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
+    Function AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Override;
   End;
 
@@ -34,12 +34,12 @@ Uses
   @precon  None.
   @postcon Returns a string representation of the XML Element Declaration.
 
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdenifier    as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TXMLElemDecl.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
+Function TXMLElemDecl.AsString(Const boolShowIdenifier, boolForDocumentation: Boolean): String;
 
 Begin
   Result := BuildStringRepresentation(boolShowIdenifier, boolForDocumentation, '',

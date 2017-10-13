@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Oct 2017
+  @Date    13 Oct 2017
 
 **)
 Unit BADI.Types;
@@ -472,6 +472,8 @@ Type
     mmExceptionEating,
     mmEmptyTHEN,
     mmEmptyELSE,
+    mmEmptyIntialization,
+    mmEmptyFinalization,
     mmEmptyMethod,
     mmMissingCONSTInParemterList,
       mmMCParmListIgnoreEvents,
@@ -479,12 +481,17 @@ Type
     mmConstantNotUsed
   );
 
+  (** An enumerate to define the type of the metric limit. **)
+  TBADILimitType = (ltInteger, ltFloat, ltNone);
+
   (** A record to describe the attributes of each metric. **)
   TBADIMetricRecord = Record
-    FName    : String;
-    FEnabled : Boolean;
-    FLimit   : Double;
-    FSubItem : Boolean;
+    FName        : String;
+    FDescription : String;
+    FEnabled     : Boolean;
+    FLimit       : Double;
+    FLimitType   : TBADILimitType;
+    FSubItem     : Boolean;
   End;
 
 Implementation

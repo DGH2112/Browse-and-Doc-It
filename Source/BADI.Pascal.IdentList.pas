@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Pascal.IdentList;
@@ -20,7 +20,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
   End;
 
 Implementation
@@ -35,12 +35,12 @@ Uses
   @precon  None .
   @postcon Returns a string representation of the class information .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TIdentList.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TIdentList.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation, '',

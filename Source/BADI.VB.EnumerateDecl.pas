@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Mar 2017
+  @Date    13 Oct 2017
 
 **)
 Unit BADI.VB.EnumerateDecl;
@@ -21,28 +21,30 @@ Type
   TVBEnumerateDecl = Class(TGenericTypeDecl)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
 Implementation
 
 (**
 
-  This method returns a string representation of the visual basic enumerate
-  declaration.
+  This method returns a string representation of the visual basic enumerate declaration.
 
   @precon  None .
-  @postcon Returns a string representation of the visual basic enumerate
-           declaration .
+  @postcon Returns a string representation of the visual basic enumerate declaration .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TVBEnumerateDecl.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TVBEnumerateDecl.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
+
+Const
+  strEnum = 'Enum';
+
 Begin
-  Result := 'Enum';
+  Result := strEnum;
   If boolShowIdentifier Then
     Result := Result + #32 + Identifier;
 End;

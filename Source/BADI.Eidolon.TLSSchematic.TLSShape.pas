@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    06 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Eidolon.TLSSchematic.TLSShape;
@@ -34,8 +34,8 @@ Type
     FLineWeight    : TLineWeight;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(const strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
+    Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Override;
     (**
       This property gets and sets the Road start chainage.
       @precon  None.
@@ -111,15 +111,15 @@ Implementation
   @postcon Sets the route code to a wilcard to match ALL route codes.
 
   @param   strName     as a String as a constant
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-constructor TTLSShape.Create(const strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
+Constructor TTLSShape.Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment);
 
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);

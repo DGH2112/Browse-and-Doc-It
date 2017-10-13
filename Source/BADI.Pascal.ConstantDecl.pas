@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Pascal.ConstantDecl;
@@ -23,9 +23,9 @@ Type
     FTyped: Boolean;
     {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(Const strName: String; AScope: TScope; iLine, iColumn: Integer;
-      AImageIndex: TBADIImageIndex; AComment: TComment); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Constructor Create(Const strName: String; Const AScope: TScope; Const iLine, iColumn: Integer;
+      Const AImageIndex: TBADIImageIndex; Const AComment: TComment); Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
     (**
       This property determines it the constant is typed or simple.
       @precon  None.
@@ -42,19 +42,18 @@ uses
 
 (**
 
-
   This is a getter method for the AsString property.
 
   @precon  None.
-  @postcon Formats the constant information depending on whether its a simple
-           constant or a typed constant.
+  @postcon Formats the constant information depending on whether its a simple constant or a typed
+           constant.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TConstant.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TConstant.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
   If FTyped Then
@@ -73,15 +72,15 @@ End;
   @postcon Creates an instance of a TConstant declaration.
 
   @param   strName     as a String as a constant
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-Constructor TConstant.Create(Const strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TBADIImageIndex; AComment: TComment);
+Constructor TConstant.Create(Const strName: String; Const AScope: TScope; Const iLine, iColumn: Integer;
+      Const AImageIndex: TBADIImageIndex; Const AComment: TComment);
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FTyped := False;

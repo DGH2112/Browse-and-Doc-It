@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Pascal.PropertySpec;
@@ -20,25 +20,24 @@ Type
   TPropertySpec = Class(TElementContainer)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
 Implementation
 
 (**
 
-
   This is a getter method for the AsString property.
 
   @precon  None.
   @postcon Returns the property specifier, Name = key word, tokens = value.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TPropertySpec.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TPropertySpec.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 Var
   iToken: Integer;

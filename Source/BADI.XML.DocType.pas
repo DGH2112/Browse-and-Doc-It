@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date   01 Apr 2017
+  @Date   12 Oct 2017
 
 **)
 Unit BADI.XML.DocType;
@@ -18,8 +18,7 @@ Type
   (** This class represents the documents doc type. **)
   TXMLDocType = Class(TXMLBaseElement)
   Public
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
-      Override;
+    Function AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
 Implementation
@@ -34,12 +33,12 @@ Uses
   @precon  None.
   @postcon Returns a string representation of the XML Doc Type.
 
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdenifier    as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TXMLDocType.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
+Function TXMLDocType.AsString(Const boolShowIdenifier, boolForDocumentation: Boolean): String;
 
 Begin
   Result := BuildStringRepresentation(True, False, '', BADIOptions.MaxDocOutputWidth, [']', '>'],

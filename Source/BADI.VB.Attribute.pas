@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    13 Oct 2017
 
 **)
 Unit BADI.VB.Attribute;
@@ -22,7 +22,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetName : String; Override;
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
 Implementation
@@ -37,12 +37,12 @@ Uses
   @precon  None .
   @postcon Returns a string representation of the visual basic attribute .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TVBAttribute.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TVBAttribute.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 Begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
     '', BADIOptions.MaxDocOutputWidth);
@@ -59,8 +59,12 @@ End;
 
 **)
 Function TVBAttribute.GetName: String;
+
+Const
+  iMaxWidth = 9999;
+
 Begin
-  Result := BuildStringRepresentation(True, False, '', 9999);
+  Result := BuildStringRepresentation(True, False, '', iMaxWidth);
 End;
 
 End.

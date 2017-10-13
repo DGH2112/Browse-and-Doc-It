@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.XML.XMLPI;
@@ -18,7 +18,7 @@ Type
   (** This class represents the individual xml PI declarations in the document. **)
   TXMLPI = Class(TXMLBaseElement)
   Public
-    Function AsString(boolShowIdenifier, boolForDocumentation : Boolean) : String;
+    Function AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Override;
   End;
 
@@ -34,12 +34,13 @@ Uses
   @precon  None.
   @postcon Returns a string presentation of the XML PI element.
 
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdenifier    as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TXMLPI.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
+Function TXMLPI.AsString(Const boolShowIdenifier, boolForDocumentation: Boolean): String;
+
 Begin
   Result := BuildStringRepresentation(boolShowIdenifier, boolForDocumentation, '',
     BADIOptions.MaxDocOutputWidth, [#32, '=', '?'], [#32, '=', '?'], []);

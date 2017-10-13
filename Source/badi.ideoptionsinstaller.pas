@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    30 Apr 2017
+  @Date    13 Oct 2017
 
 **)
 Unit BADI.IDEOptionsInstaller;
@@ -26,6 +26,7 @@ Type
     FBADIParentFrame      : TBADIIDEOptionsHandler;
     FBADIGeneralOptions   : TBADIIDEOptionsHandler;
     FBADISpecialtags      : TBADIIDEOptionsHandler;
+    FBADIModuleMetrics    : TBADIIDEOptionsHandler;
     FBADIModuleExplorer   : TBADIIDEOptionsHandler;
     FBADICodeBrowsing     : TBADIIDEOptionsHandler;
     FBADIExcludedDocs     : TBADIIDEOptionsHandler;
@@ -36,7 +37,7 @@ Type
   Strict Protected
     Function IsShortcutUsed(Const iShortcut : TShortcut; Var strActionName : String) : Boolean;
   Public
-    Constructor Create(UpdateMenuShortcuts : TNotifyEvent);
+    Constructor Create(Const UpdateMenuShortcuts : TNotifyEvent);
     Destructor Destroy; Override;
   End;
 
@@ -57,7 +58,9 @@ Uses
   BADI.ModuleExlporerOpsFrame,
   BADI.SpecialTagsFrame,
   BADI.MenuShortcutsFrame,
-  BADI.ModuleExtensionsFrame;
+  BADI.ModuleExtensionsFrame,
+  BADI.ModuleExplorerFrame,
+  BADI.ModuleMetricsFrame;
 
 { TBADIIDEOptionsInstaller }
 
@@ -68,31 +71,44 @@ Uses
   @precon  None.
   @postcon Adds the options frames to the IDEs options dialogue.
 
-  @param   UpdateMenuShortcuts as a TNotifyEvent
+  @param   UpdateMenuShortcuts as a TNotifyEvent as a constant
 
 **)
-Constructor TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts : TNotifyEvent);
+Constructor TBADIIDEOptionsInstaller.Create(Const UpdateMenuShortcuts : TNotifyEvent);
+
+Resourcestring
+  strGeneralOptions = 'General Options';
+  strSpecialTags = 'Special Tags';
+  strModuleMetrics = 'Module Metrics';
+  strModuleExplorer = 'Module Explorer';
+  strCodeBrowsing = 'Code Browsing';
+  strExcludedDocumentati = 'Excluded Documentation Files';
+  strMethodDescriptions = 'Method Descriptions';
+  strMenuShortcuts = 'Menu Shortcuts';
+  strModuleExtensions = 'Module Extensions';
 
 Begin
   {$IFDEF DXE00}
   FBADIParentFrame := TBADIIDEOptionsHandler.Create(TfmBADIParentFrame, '');
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIParentFrame);
-  FBADIGeneralOptions := TBADIIDEOptionsHandler.Create(TfmBADIGeneralOptions, 'General Options');
+  FBADIGeneralOptions := TBADIIDEOptionsHandler.Create(TfmBADIGeneralOptions, strGeneralOptions);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIGeneralOptions);
-  FBADISpecialtags := TBADIIDEOptionsHandler.Create(TfmBADISpecialTagsFrame, 'Special Tags');
+  FBADISpecialtags := TBADIIDEOptionsHandler.Create(TfmBADISpecialTagsFrame, strSpecialTags);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADISpecialtags);
-  FBADIModuleExplorer := TBADIIDEOptionsHandler.Create(TfmBADIModuleExplorerFrame, 'Module Explorer');
+  FBADIModuleMetrics := TBADIIDEOptionsHandler.Create(TframeBADIModuleMetrics, strModuleMetrics);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIModuleMetrics);
+  FBADIModuleExplorer := TBADIIDEOptionsHandler.Create(TfmBADIModuleExplorerFrame, strModuleExplorer);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIModuleExplorer);
-  FBADICodeBrowsing := TBADIIDEOptionsHandler.Create(TfmBADICodeBrowsingFrame, 'Code Browsing');
+  FBADICodeBrowsing := TBADIIDEOptionsHandler.Create(TfmBADICodeBrowsingFrame, strCodeBrowsing);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADICodeBrowsing);
-  FBADIExcludedDocs := TBADIIDEOptionsHandler.Create(TfmBADIExcludedDocFilesFrame, 'Excluded Documentation Files');
+  FBADIExcludedDocs := TBADIIDEOptionsHandler.Create(TfmBADIExcludedDocFilesFrame, strExcludedDocumentati);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIExcludedDocs);
-  FBADIMethodDesc := TBADIIDEOptionsHandler.Create(TfmBADIMethodDescriptionsFrame, 'Method Descriptions');
+  FBADIMethodDesc := TBADIIDEOptionsHandler.Create(TfmBADIMethodDescriptionsFrame, strMethodDescriptions);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIMethodDesc);
-  FBADIMenuShortcuts := TBADIIDEShortcutOptionsHandler.Create(TfmBADIMenuShortcuts, 'Menu Shortcuts',
+  FBADIMenuShortcuts := TBADIIDEShortcutOptionsHandler.Create(TfmBADIMenuShortcuts, strMenuShortcuts,
     UpdateMenuShortcuts, IsShortcutUsed);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIMenuShortcuts);
-  FBADIModuleExtensions := TBADIIDEOptionsHandler.Create(TfmBADIModuleExtensionsFrame, 'Module Extensions');
+  FBADIModuleExtensions := TBADIIDEOptionsHandler.Create(TfmBADIModuleExtensionsFrame, strModuleExtensions);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).RegisterAddInOptions(FBADIModuleExtensions);
   {$ENDIF}
 End;
@@ -112,6 +128,7 @@ Begin
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIParentFrame);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIGeneralOptions);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADISpecialtags);
+  (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIModuleMetrics);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIModuleExplorer);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADICodeBrowsing);
   (BorlandIDEServices As INTAEnvironmentOptionsServices).UnregisterAddInOptions(FBADIExcludedDocs);
@@ -156,5 +173,3 @@ Begin
 End;
 
 End.
-
-

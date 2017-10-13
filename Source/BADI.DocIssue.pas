@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    30 Apr 2017
+  @Date    13 Oct 2017
 
 **)
 Unit BADI.DocIssue;
@@ -42,7 +42,7 @@ Type
   Public
     Constructor Create(Const strMsg : String; Const AScope : TScope; Const strMethod : String;
       Const iLine, iCol : Integer; Const eErrorType : TErrorType); Reintroduce; Overload;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property returns the error type of the issue.
       @precon  None.
@@ -59,12 +59,11 @@ Type
     FCommentLine   : Integer;
     FCommentColumn : Integer;
   Public
-    Constructor Create(Const Args: Array of Const; iIdentLine,
-      iIdentColumn, iCommentLine, iCommentCol : Integer;
-      const strDocConflictMsg, strDocConflictDesc : String;
-      AImageIndex : TBADIImageIndex); ReIntroduce;
+    Constructor Create(Const Args: Array Of Const; Const iIdentLine, iIdentColumn, iCommentLine,
+      iCommentCol : Integer; Const strDocConflictMsg, strDocConflictDesc : String;
+      Const AImageIndex : TBADIImageIndex); ReIntroduce;
     Destructor Destroy; Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property defines the line where the comment associated with the
       conflict starts.
@@ -104,18 +103,21 @@ Var
   @precon  None .
   @postcon Override the default method and returns the Document Error Message .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TDocIssue.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
+Function TDocIssue.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean): String;
 
-begin
+Const
+  strOutputFmt = ' [%s]';
+
+Begin
   Result := FMsg;
   If doShowParserErrorOrigin In BADIOptions.Options Then
-    Result := Result + Format(' [%s]', [FMethod]);
-end;
+    Result := Result + Format(strOutputFmt, [FMethod]);
+End;
 
 (**
 
@@ -138,6 +140,9 @@ end;
 Constructor TDocIssue.Create(Const strMsg: String; Const AScope: TScope; Const strMethod: String;
   Const iLine, iCol: Integer; Const eErrorType : TErrorType);
 
+Const
+  strOutputFmt = '%4.4d';
+
 Var
   iImageIndex: TBADIImageIndex;
 
@@ -147,11 +152,29 @@ Begin
     etWarning: iImageIndex := iiWarning;
     etError:   iImageIndex := iiError;
   End;
-  Inherited Create(Format('%4.4d', [iDocConflictCounter]), AScope, iLine, iCol, iImageIndex, Nil);
+  Inherited Create(Format(strOutputFmt, [iDocConflictCounter]), AScope, iLine, iCol, iImageIndex, Nil);
   Inc(iDocConflictCounter);
   FMsg := strMsg;
   FMethod := strMethod;
   FErrorType := eErrorType;
+End;
+
+(**
+
+  This is a getter method for the AsString property.
+
+  @precon  None .
+  @postcon Return the document conflict message .
+
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
+  @return  a String
+
+**)
+Function TDocumentConflict.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
+
+Begin
+  Result := FMessage;
 End;
 
 (**
@@ -162,24 +185,30 @@ End;
   @postcon Initialises the Conflict class.
 
   @param   Args               as an Array Of Const as a constant
-  @param   iIdentLine         as an Integer
-  @param   iIdentColumn       as an Integer
-  @param   iCommentLine       as an Integer
-  @param   iCommentCol        as an Integer
-  @param   strDocConflictMsg  as a String as a Constant
-  @param   strDocConflictDesc as a String as a Constant
-  @param   AImageIndex        as a TBADIImageIndex
+  @param   iIdentLine         as an Integer as a constant
+  @param   iIdentColumn       as an Integer as a constant
+  @param   iCommentLine       as an Integer as a constant
+  @param   iCommentCol        as an Integer as a constant
+  @param   strDocConflictMsg  as a String as a constant
+  @param   strDocConflictDesc as a String as a constant
+  @param   AImageIndex        as a TBADIImageIndex as a constant
 
 **)
-Constructor TDocumentConflict.Create(Const Args: Array Of Const;
-  iIdentLine, iIdentColumn, iCommentLine, iCommentCol: Integer;
-  const strDocConflictMsg, strDocConflictDesc: String; AImageIndex: TBADIImageIndex);
+Constructor TDocumentConflict.Create(Const Args: Array Of Const; Const iIdentLine, iIdentColumn,
+  iCommentLine, iCommentCol: Integer; Const strDocConflictMsg, strDocConflictDesc: String;
+  Const AImageIndex: TBADIImageIndex);
+
+Const
+  strOutputFmt = '%4.4d';
 
 Begin
-  Inherited Create(Format('%4.4d', [iDocConflictCounter]), scGlobal, iIdentLine, iIdentColumn,
+  Inherited Create(Format(strOutputFmt, [iDocConflictCounter]), scGlobal, iIdentLine, iIdentColumn,
     AImageIndex, Nil);
   Inc(iDocConflictCounter);
-  FMessage := Format(strDocConflictMsg, Args);
+  If Length(Args) > 0 Then
+    FMessage := Format(strDocConflictMsg, Args)
+  Else
+    FMessage := strDocConflictMsg;
   FCommentLine := iCommentLine;
   FCommentColumn := iCommentCol;
   Comment := TComment.Create(strDocConflictDesc, iCommentLine, iCommentCol);
@@ -197,24 +226,6 @@ Destructor TDocumentConflict.Destroy;
 Begin
   Comment.Free;
   Inherited Destroy;
-End;
-
-(**
-
-  This is a getter method for the AsString property.
-
-  @precon  None .
-  @postcon Return the document conflict message .
-
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @return  a String
-
-**)
-Function TDocumentConflict.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
-
-Begin
-  Result := FMessage;
 End;
 
 (** Initialises the document conflict counter to 1. Each Issue or Conflict increments it so there

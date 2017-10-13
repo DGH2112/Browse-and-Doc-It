@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    13 Oct 2017
 
 **)
 Unit BADI.VB.FieldDecl;
@@ -21,7 +21,7 @@ Type
   TVBField = Class(TVBVar)
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
   End;
 
@@ -40,15 +40,19 @@ Uses
   @precon  None .
   @postcon Returns a string representation of the visual basic field .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TVBField.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TVBField.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
+
+Const
+  strAs = 'As';
+
 Begin
   Result := BuildStringRepresentation(boolShowIdentifier, boolForDocumentation,
-    'As', BADIOptions.MaxDocOutputWidth);
+    strAs, BADIOptions.MaxDocOutputWidth);
 End;
 
 (**

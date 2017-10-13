@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    06 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Eidolon.TLSSchematic.NoText;
@@ -22,7 +22,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
 Implementation
@@ -34,13 +34,12 @@ Implementation
   @precon  None.
   @postcon Returns a string representation of a schematic object.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TNoText.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
+Function TNoText.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 begin
   Result := Identifier;
 end;

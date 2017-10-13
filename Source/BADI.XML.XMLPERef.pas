@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    01 Apr 2017
+  @date    12 Oct 2017
 
 **)
 Unit BADI.XML.XMLPERef;
@@ -18,7 +18,7 @@ Type
   (** This class represents the individual xml PERef declarations in the document. **)
   TXMLPERef = Class(TXMLBaseElement)
   Public
-    Function AsString(boolShowIdenifier, boolForDocumentation: Boolean): String; Override;
+    Function AsString(Const boolShowIdenifier, boolForDocumentation: Boolean): String; Override;
   End;
 
 Implementation
@@ -33,12 +33,13 @@ Uses
   @precon  None.
   @postcon Returns a string presentation of the XML PE Ref element.
 
-  @param   boolShowIdenifier    as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdenifier    as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TXMLPERef.AsString(boolShowIdenifier, boolForDocumentation: Boolean): String;
+Function TXMLPERef.AsString(Const boolShowIdenifier, boolForDocumentation: Boolean): String;
+
 Begin
   Result := '%' + BuildStringRepresentation(boolShowIdenifier, boolForDocumentation, '',
     BADIOptions.MaxDocOutputWidth);

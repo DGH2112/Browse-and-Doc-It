@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    13 Oct 2017
 
 **)
 Unit BADI.Pascal.DispInterfaceDecl;
@@ -22,7 +22,7 @@ Type
     {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Procedure CheckDocumentation(Var boolCascade: Boolean); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
   End;
 
 Implementation
@@ -35,27 +35,33 @@ Uses
 
 (**
 
-
   This is a getter method for the AsString property.
 
   @precon  None.
   @postcon Returns the DispInterface declaration with the heritage.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TDispInterfaceDecl.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TDispInterfaceDecl.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
+
+Const
+  strEquals = #32'='#32;
+  strDispInterface = 'DispInterface';
+  strComma = #32',';
+
 Var
   iToken: Integer;
+
 Begin
   Result := '';
   If boolShowIdentifier Then
     Result := Result + Identifier;
   If Result <> '' Then
-    Result := Result + #32'='#32;
-  Result := Result + 'DispInterface';
+    Result := Result + strEquals;
+  Result := Result + strDispInterface;
   If Heritage.ElementCount > 0 Then
     Begin
       Result := Result + '(';
@@ -64,7 +70,7 @@ Begin
           Result := Result + Heritage.Elements[iToken].AsString(boolShowIdentifier,
             boolForDocumentation);
           If iToken < Heritage.ElementCount Then
-            Result := Result + #32',';
+            Result := Result + strComma;
         End;
       Result := Result + ')';
     End;

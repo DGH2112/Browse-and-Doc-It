@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    01 May 2017
+  @Date    15 Oct 2017
   @Author  David Hoyle
 
 **)
@@ -37,11 +37,11 @@ Type
     FLastParserResult : Boolean;
     FLastUpdateTickCount : Cardinal;
     FBADIThreadMgr : TBrowseAndDocItThreadManager;
-    Procedure EnableTimer(boolSuccessfulParse : Boolean);
+    Procedure EnableTimer(Const boolSuccessfulParse : Boolean);
     Procedure TimerEventHandler(Sender : TObject);
     Function EditorInfo(var strFileName : String;
       var boolModified : Boolean) : String;
-    Procedure RenderDocument(Module : TBaseLanguageModule);
+    Procedure RenderDocument(Const Module: TBaseLanguageModule);
     Procedure ExceptionMsg(Const strExceptionMsg : String);
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
@@ -250,10 +250,10 @@ end;
   @precon  None.
   @postcon Reenabled the timer and returns whether the parse failed or not.
 
-  @param   boolSuccessfulParse as a Boolean
+  @param   boolSuccessfulParse as a Boolean as a constant
 
 **)
-Procedure TEditorNotifier.EnableTimer(boolSuccessfulParse : Boolean);
+Procedure TEditorNotifier.EnableTimer(Const boolSuccessfulParse : Boolean);
 
 begin
   FUpdateTimer.Enabled := True;
@@ -283,10 +283,10 @@ end;
   @precon  None.
   @postcon Renders the given module in the module explorer window.
 
-  @param   Module as a TBaseLanguageModule
+  @param   Module as a TBaseLanguageModule as a constant
 
 **)
-procedure TEditorNotifier.RenderDocument(Module: TBaseLanguageModule);
+Procedure TEditorNotifier.RenderDocument(Const Module: TBaseLanguageModule);
 begin
   TfrmDockableModuleExplorer.RenderDocumentTree(Module);
 end;

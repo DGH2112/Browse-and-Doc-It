@@ -1,3 +1,4 @@
+//: @nometric HardCodedInteger HardCodedString
 Unit Test.BADI.DocIssue;
 
 Interface
@@ -27,8 +28,7 @@ Uses
 Procedure TestTDocIssue.SetUp;
 
 Begin
-  FDocIssue := TDocIssue.Create('This is a simple message.',
-    scNone, 'MyMethod', 1, 2, etWarning);
+  FDocIssue := TDocIssue.Create('This is a simple message.', scNone, 1, 2, etWarning);
 End;
 
 Procedure TestTDocIssue.TearDown;
@@ -41,13 +41,13 @@ End;
 Procedure TestTDocIssue.TestAsString;
 
 Begin
-  CheckEquals('This is a simple message. [MyMethod]', FDocIssue.AsString(True, False));
+  CheckEquals('This is a simple message.', FDocIssue.AsString(True, False));
 End;
 
 Procedure TestTDocIssue.TestCreate;
 
 Begin
-  CheckEquals('This is a simple message. [MyMethod]', FDocIssue.AsString(True, False));
+  CheckEquals('This is a simple message.', FDocIssue.AsString(True, False));
   CheckEquals(scNone, FDocIssue.Scope);
   CheckEquals(1, FDocIssue.Line);
   CheckEquals(2, FDocIssue.Column);

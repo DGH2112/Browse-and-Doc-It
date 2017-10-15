@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    13 Oct 2017
+  @Date    15 Oct 2017
 
 **)
 Unit BADI.Types;
@@ -146,7 +146,7 @@ Type
     doShowMissingFinalComment,
 
     {doShowIDEErrorsOnSuccessfulParse,}
-    doShowParserErrorOrigin,
+    { doShowParserErrorOrigin, }
     doShowUnReferencedSymbols,
     doShowPerformanceCountersInModuleExplorer,
     doShowPrefCountersInDocSummary,

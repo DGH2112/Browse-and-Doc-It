@@ -4,7 +4,7 @@
 
   @Author  Daivd Hoyle
   @Version 1.0
-  @Date    30 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.VB.VariableDecl;
@@ -28,10 +28,10 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetDimensions : Integer;
   Public
-    Constructor Create(const strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
+    Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Override;
     Destructor Destroy; Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure AddDimension(Const strLow, strHigh : String);
     (**
       This property returns the number of dimensions in the array variable.
@@ -96,12 +96,12 @@ end;
   @precon  None .
   @postcon Returns a string representation of the visual basic variable .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TVBVar.AsString(boolShowIdentifier, boolForDocumentation : Boolean): String;
+Function TVBVar.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 Var
   i: Integer;
@@ -137,16 +137,16 @@ end;
   @precon  None.
   @postcon Provides a reference for the variables array dimensions.
 
-  @param   strName     as a String as a Constant
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   strName     as a String as a constant
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-Constructor TVBVar.Create(const strName : String; AScope : TScope; iLine,
-  iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment);
+Constructor TVBVar.Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment);
 
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);

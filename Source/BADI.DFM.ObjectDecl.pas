@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    01 Apr 2017
+  @date    12 Oct 2017
 
 **)
 Unit BADI.DFM.ObjectDecl;
@@ -26,9 +26,9 @@ Type
     FObjectType: TObjectType;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(const strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property sets and gets the whether the Object, Inherited or Inline.
       @precon  None.
@@ -50,13 +50,12 @@ Uses
   @precon  None.
   @postcon Returns a string represetation of the DFM object.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TDFMObject.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
+Function TDFMObject.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
   Case ObjectType Of
@@ -76,15 +75,15 @@ End;
   @postcon Initialises FInherited to false.
 
   @param   strName     as a String as a constant
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-Constructor TDFMObject.Create(Const strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
+Constructor TDFMObject.Create(Const strName: String; Const AScope: TScope; Const iLine,
+  iColumn: Integer; Const AImageIndex: TBADIImageIndex; Const AComment: TComment);
 
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Mar 2017
+  @Date    15 Oct 2017
 
 **)
 Unit BADI.BackusNaur.Comment;
@@ -20,7 +20,7 @@ Type
   (** A pascal specific implementation of comments. **)
   TBackusNaurComment = Class(TComment)
   Public
-    Class Function CreateComment(Const strComment: String; iLine,
+    Class Function CreateComment(Const strComment: String; Const iLine,
       iCol: Integer): TComment; Override;
   End;
 
@@ -28,25 +28,20 @@ Implementation
 
 (**
 
+  This method is a class method to first check the comment for being a documentation comment and then
+  creating an instance of a TComment class and parsing the comment via the constructor.
 
-  This method is a class method to first check the comment for being a
-  documentation comment and then creating an instance of a TComment class and
-  parsing the comment via the constructor.
+  @precon  strComment is the full comment to be checked and parsed, iLine is the line number of the
+           comment and iCol is the column number of the comment.
+  @postcon Returns Nil if this is not a documentation comment or returns a valid TComment class.
 
-  @precon  strComment is the full comment to be checked and parsed, iLine is
-           the line number of the comment and iCol is the column number of
-           the comment.
-
-  @postcon Returns Nil if this is not a documentation comment or returns a
-           valid TComment class.
-
-  @param   strComment as a String as a Constant
-  @param   iLine      as an Integer
-  @param   iCol       as an Integer
+  @param   strComment as a String as a constant
+  @param   iLine      as an Integer as a constant
+  @param   iCol       as an Integer as a constant
   @return  a TComment
 
 **)
-Class Function TBackusNaurComment.CreateComment(Const strComment: String; iLine,
+Class Function TBackusNaurComment.CreateComment(Const strComment: String; Const iLine,
   iCol: Integer): TComment;
 
 Var

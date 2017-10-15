@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    06 May 2017
+  @Date    15 Oct 2017
 
 **)
 Unit BADI.Eidolon.TextTable;
@@ -22,7 +22,8 @@ Type
   Strict Private
     FFileName : String;
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    function AsString(Const boolShowIdentifier,
+  boolForDocumentation: Boolean): String; Override;
     (**
       This method gets and sets the filename of the text table.
       @precon  None.
@@ -43,16 +44,18 @@ Implementation
   @precon  None.
   @postcon Returns string representation of the text table definition.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TTextTable.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
+function TTextTable.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
+
+Const
+  strTableType = '=Class(TextTable)';
 
 begin
-  Result := Identifier + '=Class(TextTable)';
+  Result := Identifier + strTableType;
 end;
 
 End.

@@ -1,3 +1,4 @@
+//: @nometric HardCodedInteger HardCodedString
 Unit Test.BADI.ElementContainer;
 
 Interface
@@ -95,6 +96,42 @@ Begin
   End;
 End;
 
+Procedure TestTElementContainer.TestAddDocumentConflict;
+
+Var
+  rec: TDocConflictTable;
+  DC: TElementContainer;
+  strCategory: String;
+
+Begin
+  strCategory := 'Things';
+  rec.FMessage := 'This is a document conflict message (%s, %s).';
+  rec.FDescription := 'This is a document conflict description.';
+  rec.FConflictType := dciMissing;
+  FElementContainer.AddDocumentConflict(['First', 'Second'], 12, 23, Nil,
+    strCategory, rec);
+  DC := FElementContainer.FindElement(strDocumentationConflicts);
+  Check(DC <> Nil, 'DC is null');
+  CheckEquals(strDocumentationConflicts, DC.Identifier);
+  DC := DC.FindElement('Things');
+  Check(DC <> Nil, 'DC is null');
+  CheckEquals('Things', DC.Identifier);
+  DC := DC.Elements[1];
+  Check(DC Is TDocumentConflict, 'DC is not TDocIssue');
+  CheckEquals('This is a document conflict message (First, Second).',
+    (DC As TDocumentConflict).AsString(True, False));
+End;
+
+Procedure TestTElementContainer.TestAddIssue;
+
+Begin
+  FElementContainer.AddIssue('This is a warning.', scNone, 1, 2, etWarning);
+  CheckEquals(1, FElementContainer.ElementCount);
+  CheckEquals('Warnings (1)', FElementContainer.Elements[1].AsString(False, False));
+  CheckEquals('This is a warning.',
+    FElementContainer.Elements[1].Elements[1].AsString(False, False));
+End;
+
 Procedure TestTElementContainer.TestAddTokens;
 
 Var
@@ -116,22 +153,6 @@ Begin
   End;
 End;
 
-Procedure TestTElementContainer.TestFindElement;
-
-Var
-  E: TElementContainer;
-
-Begin
-  E := TTestElementContainer.Create('Tmp3', scNone, 0, 0, iiNone, Nil);
-  FElementContainer.Add(E);
-  E := TTestElementContainer.Create('Tmp2', scNone, 0, 0, iiNone, Nil);
-  FElementContainer.Add(E);
-  E := TTestElementContainer.Create('Tmp1', scNone, 0, 0, iiNone, Nil);
-  FElementContainer.Add(E);
-  Check(FElementContainer.FindElement('Tmp2') <> Nil, 'FindElement is null');
-  Check(FElementContainer.FindElement('Tmp3', ftIdentifier) <> Nil, 'FindElement is null');
-End;
-
 Procedure TestTElementContainer.TestAssign;
 
 Var
@@ -150,34 +171,46 @@ Begin
   End;
 End;
 
-Procedure TestTElementContainer.TestFindToken;
+Procedure TestTElementContainer.TestAsString;
 
 Begin
-  FElementContainer.AddToken('Hello');
-  FElementContainer.AddToken('Dave');
-  FElementContainer.AddToken('.');
-  CheckEquals(1, FElementContainer.FindToken('Dave'));
+  CheckEquals('TestElement', FElementContainer.AsString(True, False));
 End;
 
-Procedure TestTElementContainer.TestImageIndex;
-Begin
-  CheckEquals(iiPublicConstant, FElementContainer.ImageIndex);
-End;
+Procedure TestTElementContainer.TestCheckDocumentation;
 
-Procedure TestTElementContainer.TestImageIndexAdjustedForScope;
-
-Begin
-  CheckEquals(BADIImageIndex(iiPublicConstant, scPrivate), FElementContainer.ImageIndexAdjustedForScope);
-End;
-
-Procedure TestTElementContainer.TestParent;
 Var
-  E: TElementContainer;
+  boolCascade: Boolean;
+
 Begin
-  Check(FElementContainer.Parent = Nil, 'Parent is not null');
-  E := TTestElementContainer.Create('Test', scNone, 1, 2, iiNone, Nil);
-  FElementContainer.Add(E);
-  Check(E.Parent = FElementContainer, 'Parent is not FElementContainer');
+  FElementContainer.CheckDocumentation(boolCascade);
+  CheckEquals(0, FElementContainer.ElementCount);
+End;
+
+Procedure TestTElementContainer.TestCheckReferences;
+Begin
+  FElementContainer.Referenced := True;
+  FElementContainer.CheckReferences;
+  CheckEquals(0, FElementContainer.ElementCount);
+  FElementContainer.Referenced := False;
+  FElementContainer.CheckReferences;
+  CheckEquals(1, FElementContainer.ElementCount);
+End;
+
+Procedure TestTElementContainer.TestComment;
+Begin
+  CheckEquals('This is a test comment.', FElementContainer.Comment.AsString(9999, False));
+End;
+
+Procedure TestTElementContainer.TestCreate;
+Begin
+  CheckEquals('TestElement', FElementContainer.Identifier);
+  CheckEquals(scPrivate, FElementContainer.Scope);
+  CheckEquals(12, FElementContainer.Line);
+  CheckEquals(23, FElementContainer.Column);
+  CheckEquals(BADIImageIndex(iiPublicConstant, scPrivate),
+    FElementContainer.ImageIndexAdjustedForScope);
+  Check(FElementContainer.Comment <> Nil, 'Comment is null');
 End;
 
 Procedure TestTElementContainer.TestDeleteElement;
@@ -234,107 +267,50 @@ Begin
   CheckEquals('Tmp3', FElementContainer.Elements[3].Identifier);
 End;
 
-Procedure TestTElementContainer.TestCheckDocumentation;
+Procedure TestTElementContainer.TestFindElement;
 
 Var
-  boolCascade: Boolean;
+  E: TElementContainer;
 
 Begin
-  FElementContainer.CheckDocumentation(boolCascade);
-  CheckEquals(0, FElementContainer.ElementCount);
+  E := TTestElementContainer.Create('Tmp3', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  E := TTestElementContainer.Create('Tmp2', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  E := TTestElementContainer.Create('Tmp1', scNone, 0, 0, iiNone, Nil);
+  FElementContainer.Add(E);
+  Check(FElementContainer.FindElement('Tmp2') <> Nil, 'FindElement is null');
+  Check(FElementContainer.FindElement('Tmp3', ftIdentifier) <> Nil, 'FindElement is null');
 End;
 
-Procedure TestTElementContainer.TestReferenceSymbol;
+Procedure TestTElementContainer.TestFindToken;
 
+Begin
+  FElementContainer.AddToken('Hello');
+  FElementContainer.AddToken('Dave');
+  FElementContainer.AddToken('.');
+  CheckEquals(1, FElementContainer.FindToken('Dave'));
+End;
+
+Procedure TestTElementContainer.TestImageIndex;
+Begin
+  CheckEquals(iiPublicConstant, FElementContainer.ImageIndex);
+End;
+
+Procedure TestTElementContainer.TestImageIndexAdjustedForScope;
+
+Begin
+  CheckEquals(BADIImageIndex(iiPublicConstant, scPrivate), FElementContainer.ImageIndexAdjustedForScope);
+End;
+
+Procedure TestTElementContainer.TestParent;
 Var
-  AToken: TTokenInfo;
-
+  E: TElementContainer;
 Begin
-  AToken := TTokenInfo.Create('Hello', 0, 1, 2, 5, ttUnknown);
-  Try
-    CheckEquals(False, FElementContainer.ReferenceSymbol(AToken));
-  Finally
-    AToken.Free;
-  End;
-End;
-
-Procedure TestTElementContainer.TestScope;
-Begin
-  CheckEquals(scPrivate, FElementContainer.Scope);
-End;
-
-Procedure TestTElementContainer.TestSorted;
-Begin
-  CheckEquals(True, FElementContainer.Sorted);
-End;
-
-Procedure TestTElementContainer.TestAddIssue;
-
-Begin
-  FElementContainer.AddIssue('This is a warning.', scNone,
-    'MyMethod', 1, 2, etWarning);
-  CheckEquals(1, FElementContainer.ElementCount);
-  CheckEquals('Warnings', FElementContainer.Elements[1].AsString(False, False));
-  CheckEquals('This is a warning. [MyMethod]',
-    FElementContainer.Elements[1].Elements[1].AsString(False, False));
-End;
-
-Procedure TestTElementContainer.TestAddDocumentConflict;
-
-Var
-  rec: TDocConflictTable;
-  DC: TElementContainer;
-  strCategory: String;
-
-Begin
-  strCategory := 'Things';
-  rec.FMessage := 'This is a document conflict message (%s, %s).';
-  rec.FDescription := 'This is a document conflict description.';
-  rec.FConflictType := dciMissing;
-  FElementContainer.AddDocumentConflict(['First', 'Second'], 12, 23, Nil,
-    strCategory, rec);
-  DC := FElementContainer.FindElement(strDocumentationConflicts);
-  Check(DC <> Nil, 'DC is null');
-  CheckEquals(strDocumentationConflicts, DC.Identifier);
-  DC := DC.FindElement('Things');
-  Check(DC <> Nil, 'DC is null');
-  CheckEquals('Things', DC.Identifier);
-  DC := DC.Elements[1];
-  Check(DC Is TDocumentConflict, 'DC is not TDocIssue');
-  CheckEquals('This is a document conflict message (First, Second).',
-    (DC As TDocumentConflict).AsString(True, False));
-End;
-
-Procedure TestTElementContainer.TestAsString;
-
-Begin
-  CheckEquals('TestElement', FElementContainer.AsString(True, False));
-End;
-
-Procedure TestTElementContainer.TestCheckReferences;
-Begin
-  FElementContainer.Referenced := True;
-  FElementContainer.CheckReferences;
-  CheckEquals(0, FElementContainer.ElementCount);
-  FElementContainer.Referenced := False;
-  FElementContainer.CheckReferences;
-  CheckEquals(1, FElementContainer.ElementCount);
-End;
-
-Procedure TestTElementContainer.TestComment;
-Begin
-  CheckEquals('This is a test comment.', FElementContainer.Comment.AsString(9999, False));
-End;
-
-Procedure TestTElementContainer.TestCreate;
-Begin
-  CheckEquals('TestElement', FElementContainer.Identifier);
-  CheckEquals(scPrivate, FElementContainer.Scope);
-  CheckEquals(12, FElementContainer.Line);
-  CheckEquals(23, FElementContainer.Column);
-  CheckEquals(BADIImageIndex(iiPublicConstant, scPrivate),
-    FElementContainer.ImageIndexAdjustedForScope);
-  Check(FElementContainer.Comment <> Nil, 'Comment is null');
+  Check(FElementContainer.Parent = Nil, 'Parent is not null');
+  E := TTestElementContainer.Create('Test', scNone, 1, 2, iiNone, Nil);
+  FElementContainer.Add(E);
+  Check(E.Parent = FElementContainer, 'Parent is not FElementContainer');
 End;
 
 Procedure TestTElementContainer.TestReferenced;
@@ -366,6 +342,30 @@ Begin
   Finally
     AToken.Free;
   End;
+End;
+
+Procedure TestTElementContainer.TestReferenceSymbol;
+
+Var
+  AToken: TTokenInfo;
+
+Begin
+  AToken := TTokenInfo.Create('Hello', 0, 1, 2, 5, ttUnknown);
+  Try
+    CheckEquals(False, FElementContainer.ReferenceSymbol(AToken));
+  Finally
+    AToken.Free;
+  End;
+End;
+
+Procedure TestTElementContainer.TestScope;
+Begin
+  CheckEquals(scPrivate, FElementContainer.Scope);
+End;
+
+Procedure TestTElementContainer.TestSorted;
+Begin
+  CheckEquals(True, FElementContainer.Sorted);
 End;
 
 Initialization

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    06 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Eidolon.TLSSchematic.SchematicSetting;
@@ -23,7 +23,7 @@ Type
     FPercentage : Double;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets ans sets the percentage of the settings.
       @precon  None.
@@ -45,12 +45,12 @@ Uses
   @precon  None.
   @postcon Returns a string representation of a schematic setting.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TSchematicSetting.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TSchematicSetting.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 begin
   Result := Format('%s %1.1f%%', [Identifier, FPercentage]);

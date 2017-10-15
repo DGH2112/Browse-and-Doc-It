@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Pascal.MethodDecl;
@@ -39,8 +39,8 @@ Type
     Destructor Destroy; Override;
     Procedure AddDirectives(Const strDirective : String);
     Function HasDirective(Const strDirective : String) : Boolean;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
     (**
       Returns the string list of directives associated with the method.
       @precon  None.
@@ -176,13 +176,12 @@ end;
   @precon  None.
   @postcon Outputs the pascal method declaration.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TPascalMethod.AsString(boolShowIdentifier,
-  boolForDocumentation : Boolean): String;
+Function TPascalMethod.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 Var
   i : Integer;
@@ -282,11 +281,11 @@ end;
   @precon  None.
   @postcon Tries to find the symbol with its scope as mark it as referenced.
 
-  @param   AToken as a TTokenInfo
+  @param   AToken as a TTokenInfo as a constant
   @return  a Boolean
 
 **)
-Function TPascalMethod.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
+Function TPascalMethod.ReferenceSymbol(Const AToken : TTokenInfo) : Boolean;
 
 Var
   i: Integer;

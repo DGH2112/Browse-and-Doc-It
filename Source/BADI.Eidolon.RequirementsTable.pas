@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Eidolon.RequirementsTable;
@@ -24,7 +24,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Private
     FAssociations: TLabelContainer;
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Function AddAssociation(Association : TAssociation) : TAssociation;
   End;
 
@@ -60,13 +60,12 @@ end;
   @precon  None.
   @postcon Returns a string representation of the class
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TRequirementsTable.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
+Function TRequirementsTable.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 begin
   Result := Identifier + '=Class(RequirementsTable)';
 end;

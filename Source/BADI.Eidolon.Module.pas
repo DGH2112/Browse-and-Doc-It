@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       11 Apr 2017
+  @Date       15 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -114,8 +114,8 @@ Type
     Procedure TokenizeStream;
     Procedure ParseTokens;
     Procedure EatLineEnds;
-    Function  CheckLiteral(strLiteral, strMethod : String) : Boolean;
-    Function  CheckLineEnd(strMethod : String) : Boolean;
+    Function  CheckLiteral(strLiteral : String) : Boolean;
+    Function  CheckLineEnd() : Boolean;
     Procedure EatWhitespace;
     Function  EmptyLine : Boolean;
   {$IFDEF D2005} Strict {$ENDIF} Protected
@@ -131,8 +131,8 @@ Type
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
-    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
 Implementation
@@ -184,19 +184,19 @@ begin
       B.SymbolType := tstBar;
       B.LayerIndex := iLayerIndex;
       EatWhitespace;
-      If CheckLiteral(',', 'TLBar') Then
+      If CheckLiteral(',') Then
         Begin
           BorderDef(B);
           EatWhitespace;
-          If CheckLiteral(',', 'TLBar') Then
+          If CheckLiteral(',') Then
             Begin
               InteriorDef(B);
               EatWhiteSpace;
-              If CheckLiteral(',', 'TLBar') Then
+              If CheckLiteral(',') Then
                 Begin
                   BarWidth(B);
                   Transparency(B);
-                  CheckLineEnd('TLBar');
+                  CheckLineEnd();
                 End;
             End;
         End;
@@ -240,16 +240,15 @@ begin
         Begin
           A := RequirementsTable.AddAssociation(TAssociation.Create(strName,
             scNone, T.Line, T.Column, iiPublicClass, Nil)) As TAssociation;
-          If CheckLiteral('=', 'AssociationDef') Then
+          If CheckLiteral('=') Then
             Begin
               strName := '';
               While Not (Token.TokenType In [ttLineEnd]) Do
                 AddToExpression(A);
-              CheckLineEnd('AssociationDef');
+              CheckLineEnd();
             End;
         End Else
-          ErrorAndSeekToken(strNullName, 'AssociationDef', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNullName, Token.Token, strSeekableOnErrorTokens, stActual);
 
     End;
 end;
@@ -261,12 +260,12 @@ end;
   @precon  None.
   @postcon Returns a string representation of the module.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TEidolonModule.AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String;
+Function TEidolonModule.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 Begin
   Result := ChangeFileExt(Inherited AsString(boolShowIdentifier,
@@ -295,13 +294,11 @@ begin
       Val(Token.Token, iWidth, iErrorCode);
       If (iErrorCode > 0) Or (iWidth <= 0.0) Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-          Token.Column]), scNone, 'BarWidth', Token.Line, Token.Column,
-          etError);
+          Token.Column]), scNone, Token.Line, Token.Column, etError);
       Bar.BarWidth := iWidth;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strNumberExpected, 'BarWidth', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -338,12 +335,12 @@ begin
   EatWhitespace;
   BorderColour(Symbol);
   EatWhitespace;
-  If CheckLiteral(',', 'BorderDef') Then
+  If CheckLiteral(',') Then
     Begin
       EatWhitespace;
       BorderLineStyle(Symbol);
       EatWhitespace;
-      If CheckLiteral(',', 'BorderDef') Then
+      If CheckLiteral(',') Then
         Begin
           EatWhitespace;
           BorderWeight(Symbol);
@@ -380,8 +377,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineStyle, 'BorderLineStyle', Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineStyle, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -413,8 +409,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineWeight, 'BorderWeight', Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineWeight, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -428,11 +423,11 @@ end;
            and returns true if found and moves to the next non comment token
            after the line end characters.
 
-  @param   strMethod  as a String
   @return  a Boolean
 
 **)
-function TEidolonModule.CheckLineEnd(strMethod: String): Boolean;
+function TEidolonModule.CheckLineEnd(): Boolean;
+
 begin
   Result := False;
   If Token.TokenType In [ttLineEnd] Then
@@ -440,8 +435,7 @@ begin
       Result := True;
       EatLineEnds;
     End Else
-      ErrorAndSeekToken(strExpectedLineEnd, strMethod, Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedLineEnd, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -454,11 +448,10 @@ end;
            returns true if found and moves to the next non comment token.
 
   @param   strLiteral as a String
-  @param   strMethod  as a String
   @return  a Boolean
 
 **)
-function TEidolonModule.CheckLiteral(strLiteral, strMethod: String): Boolean;
+function TEidolonModule.CheckLiteral(strLiteral: String): Boolean;
 begin
   Result := False;
   If Token.Token = strLiteral Then
@@ -466,8 +459,7 @@ begin
       Result := True;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strLiteralExpected, strMethod, strLiteral,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strLiteralExpected, strLiteral, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -500,8 +492,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidColourName, 'ColourName', Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -542,17 +533,17 @@ begin
               Token.Line, Token.Column, iiPublicType, Nil)) As TConnectionDef;
           End;
           NextNonCommentToken;
-          If CheckLiteral('=', 'ConnectionDef') Then
+          If CheckLiteral('=') Then
             Begin
               While Not (Token.TokenType In [ttLineEnd]) Do
                 AddToExpression(C);
-              CheckLineEnd('ConnectionDef');
+              CheckLineEnd();
               strConnection := '';
               For iToken := 0 To C.TokenCount - 1 Do
                 strConnection := strConnection + C.Tokens[iToken].Token;
               If Not IsKeyWord(strConnection, strValidConnections) Then
                 AddIssue(Format(strIsNotAValidConnection, [strConnection, C.Line,
-                  C.Column]), scNone, 'ConnectionDef', C.Line, C.Column, etWarning);
+                  C.Column]), scNone, C.Line, C.Column, etWarning);
             End;
         End Else
           PopTokenPosition;
@@ -648,11 +639,11 @@ begin
               Token.Column, iiPublicType, Nil)) As TDatabaseDef;
           End;
           NextNonCommentToken;
-          If CheckLiteral('=', 'DatabaseDef') Then
+          If CheckLiteral('=') Then
             Begin
               While Not (Token.TokenType In [ttLineEnd]) Do
                 AddToExpression(D);
-              CheckLineEnd('DatabaseDef');
+              CheckLineEnd();
               strFileName := '';
               For iToken := 0 To D.TokenCount - 1 Do
                 strFileName := strFileName + D.Tokens[iToken].Token;
@@ -686,13 +677,11 @@ Begin
       Val(Token.Token, dblWidth, iErrorCode);
       If (iErrorCode > 0) Or (dblWidth <= 0.0) Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-          Token.Column]), scNone, 'DateWidth', Token.Line, Token.Column,
-          etError);
+          Token.Column]), scNone, Token.Line, Token.Column, etError);
       SuperBar.DateWidth := dblWidth;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strNumberExpected, 'DateWidth', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -724,14 +713,14 @@ begin
         Begin
           DBT := FDBTableDefs.AddUnique(TDBTable.Create(strName, scNone, StartToken.Line,
             StartToken.Column, iiPublicConstant, C)) As TDBTable;
-          If CheckLiteral(')', 'DBTable') Then
-            If CheckLineEnd('DBTable') Then
+          If CheckLiteral(')') Then
+            If CheckLineEnd() Then
               Begin
                 EatWhitespace;
-                If CheckLiteral('{', 'DBTable') Then
+                If CheckLiteral('{') Then
                   Begin
                     EatWhitespace;
-                    If CheckLineEnd('DBTable') Then
+                    If CheckLineEnd() Then
                       Begin
                         While EmptyLine Do;
                         EatWhitespace;
@@ -746,17 +735,16 @@ begin
                           End;
                         iSheetIndex := 1;
                         While FieldDef(DBT, iSheetIndex) Or EmptyLine Do;
-                        If CheckLiteral('}', 'DBTable') Then
+                        If CheckLiteral('}') Then
                           Begin
                             EatWhitespace;
-                            CheckLineEnd('DBTable');
+                            CheckLineEnd();
                           End;
                       End;
                   End;
               End;
         End Else
-          ErrorAndSeekToken(strTheDefintionNull, 'DBTable', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -797,13 +785,11 @@ begin
       Val(Token.Token, iSize, iErrorCode);
       If (iErrorCode > 0) Or (iSize <= 0)  Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-          Token.Column]), scNone, 'DiamondSize', Token.Line, Token.Column,
-          etError);
+          Token.Column]), scNone, Token.Line, Token.Column, etError);
       Diamond.DiamondSize:= iSize;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strNumberExpected, 'DiamondSize', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -838,19 +824,19 @@ begin
       D.SymbolType := tstDiamond;
       D.LayerIndex := iLayerIndex;
       EatWhitespace;
-      If CheckLiteral(',', 'TLDiamond') Then
+      If CheckLiteral(',') Then
         Begin
           BorderDef(D);
           EatWhitespace;
-          If CheckLiteral(',', 'TLDiamond') Then
+          If CheckLiteral(',') Then
             Begin
               InteriorDef(D);
               EatWhiteSpace;
-              If CheckLiteral(',', 'TLDiamond') Then
+              If CheckLiteral(',') Then
                 Begin
                   DiamondSize(D);
                   Transparency(D);
-                  CheckLineEnd('TLDiamond');
+                  CheckLineEnd();
                 End;
             End;
         End;
@@ -911,13 +897,11 @@ begin
       Val(Token.Token, iSize, iErrorCode);
       If (iErrorCode > 0) Or (iSize <= 0)  Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-          Token.Column]), scNone, 'EllipseSize', Token.Line, Token.Column,
-          etError);
+          Token.Column]), scNone, Token.Line, Token.Column,etError);
       Ellipse.EllipseSize:= iSize;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strNumberExpected, 'EllipseSize', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -1004,19 +988,19 @@ begin
       E.SymbolType := tstEllipse;
       E.LayerIndex := iLayerIndex;
       EatWhitespace;
-      If CheckLiteral(',', 'TLEllipse') Then
+      If CheckLiteral(',') Then
         Begin
           BorderDef(E);
           EatWhitespace;
-          If CheckLiteral(',', 'TLEllipse') Then
+          If CheckLiteral(',') Then
             Begin
               InteriorDef(E);
               EatWhiteSpace;
-              If CheckLiteral(',', 'TLEllipse') Then
+              If CheckLiteral(',') Then
                 Begin
                   EllipseSize(E);
                   Transparency(E);
-                  CheckLineEnd('TLEllipse');
+                  CheckLineEnd();
                 End;
             End;
         End;
@@ -1073,7 +1057,7 @@ begin
           F.PrimaryKey := boolPrimaryKey;
           F.SheetIndex := iSheetIndex;
           Inc(iSheetIndex);
-          If CheckLiteral(':', 'FieldDef') Then
+          If CheckLiteral(':') Then
             Begin
               TypeInfo(F);
               If Token.Token = '=' Then
@@ -1087,11 +1071,10 @@ begin
                     End;
                   F.OutputName := strName;
                 End;
-              CheckLineEnd('FieldDef');
+              CheckLineEnd();
             End;
         End Else
-          ErrorAndSeekToken(strNullName, 'FieldDef', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNullName, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -1342,14 +1325,12 @@ begin
           Val(Token.Token, iTransparency, iErrorCode);
           If (iErrorCode > 0) Or (Not (iTransparency In [0..100]))  Then
             AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-              Token.Column]), scNone, 'Transparency', Token.Line, Token.Column,
-              etError);
+              Token.Column]), scNone, Token.Line, Token.Column, etError);
           CustomSymbol.Transparency := iTransparency;
           NextNonCommentToken;
           EatWhitespace;
         End Else
-          ErrorAndSeekToken(strNumberExpected, 'Transparency', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -1383,8 +1364,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidPattern, 'TriangleType', Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidPattern, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -1419,19 +1399,19 @@ begin
       T.SymbolType := tstTriangle;
       T.LayerIndex := iLayerIndex;
       EatWhitespace;
-      If CheckLiteral(',', 'TLTriangle') Then
+      If CheckLiteral(',') Then
         Begin
           BorderDef(T);
           EatWhitespace;
-          If CheckLiteral(',', 'TLTriangle') Then
+          If CheckLiteral(',') Then
             Begin
               InteriorDef(T);
               EatWhiteSpace;
-              If CheckLiteral(',', 'TLTriangle') Then
+              If CheckLiteral(',') Then
                 Begin
                   TriangleType(T);
                   Transparency(T);
-                  CheckLineEnd('TLTriangle');
+                  CheckLineEnd();
                 End;
             End;
         End;
@@ -1457,7 +1437,7 @@ begin
     Begin
       Field.FieldType := ftText;
       NextNonCommentToken;
-      If CheckLiteral('(', 'TypeInfo') Then
+      If CheckLiteral('(') Then
         If Token.TokenType In [ttNumber] Then
           Begin
             Val(Token.Token, iWidth, iErrorCode);
@@ -1466,12 +1446,10 @@ begin
                 Field.FieldWidth := iWidth;
                 NextNonCommentToken;
               End Else
-                ErrorAndSeekToken(strInvalidDataWidth, 'TypeInfo', Token.Token,
-                  strSeekableOnErrorTokens, stActual);
-            CheckLiteral(')', 'TypeInfo');
+                ErrorAndSeekToken(strInvalidDataWidth, Token.Token, strSeekableOnErrorTokens, stActual);
+            CheckLiteral(')');
           End Else
-            ErrorAndSeekToken(strNumberExpected, 'TypeInfo', Token.Token,
-              strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End Else
   If Token.Token = 'B' Then
     Begin
@@ -1523,8 +1501,7 @@ begin
       Field.FieldType := ftMemo;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strInvalidDataType, 'TypeInfo', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strInvalidDataType, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -1639,14 +1616,14 @@ begin
           OT := FOutputTableDefs.AddUnique(TOutputTable.Create(strName, scNone,
             StartToken.Line, StartToken.Column, iiPublicInterface, C)) As
             TOutputTable;
-          If CheckLiteral(')', 'OutputTable') Then
-            If CheckLineEnd('OutputTable') Then
+          If CheckLiteral(')') Then
+            If CheckLineEnd() Then
               Begin
                 EatWhitespace;
-                If CheckLiteral('{', 'OutputTable') Then
+                If CheckLiteral('{') Then
                   Begin
                     EatWhitespace;
-                    If CheckLineEnd('OutputTable') Then
+                    If CheckLineEnd() Then
                       Begin
                         EatWhitespace;
                         If DatabaseDef(OT, ctPrimary) Then
@@ -1666,17 +1643,16 @@ begin
                           End;
                         iSheetIndex := 1;
                         While FieldDef(OT, iSheetIndex) Or EmptyLine Do;
-                        If CheckLiteral('}', 'OutputTable') Then
+                        If CheckLiteral('}') Then
                           Begin
                             EatWhitespace;
-                            CheckLineEnd('OutputTable');
+                            CheckLineEnd();
                           End;
                       End;
                   End;
               End;
         End Else
-          ErrorAndSeekToken(strTheDefintionNull, 'OutputTable', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -1716,13 +1692,13 @@ begin
       L.LineEndType := atNone;
       L.LineEndSize := asMediumMedium;
       EatWhitespace;
-      If CheckLiteral(',', 'TLLine') Then
+      If CheckLiteral(',') Then
         Begin
           BorderDef(L);
           EatWhitespace;
           If Not (Token.TokenType In [ttLineEnd]) Then
             LineEndDefs(L);
-          CheckLineEnd('TLLine');
+          CheckLineEnd();
         End;
     End;
 end;
@@ -1817,16 +1793,16 @@ End;
 procedure TEidolonModule.LineEndDefs(Line : TLine);
 
 begin
-  If CheckLiteral(',', 'LineEndDefs') Then
+  If CheckLiteral(',') Then
     Begin
       StartType(Line);
-      If CheckLiteral(',', 'LineEndDefs') Then
+      If CheckLiteral(',') Then
         Begin
           StartSize(Line);
-          If CheckLiteral(',', 'LineEndDefs') Then
+          If CheckLiteral(',') Then
             Begin
               EndType(Line);
-              If CheckLiteral(',', 'LineEndDefs') Then
+              If CheckLiteral(',') Then
                 EndSize(Line);
             End;
         End;
@@ -1866,8 +1842,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineSize, 'LineEndSize', Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineSize, Token.Token, strSeekableOnErrorTokens, stActual);
   EatWhitespace;
 end;
 
@@ -1904,8 +1879,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineType, 'LineEndType', Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineType, Token.Token, strSeekableOnErrorTokens, stActual);
   EatWhitespace;
 end;
 
@@ -1933,14 +1907,12 @@ Begin
       Val(Token.Token, dblWidth, iErrorCode);
       If (iErrorCode > 0) Or (dblWidth <= 0.0) Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-          Token.Column]), scNone, 'LocationWidth', Token.Line, Token.Column,
-          etError);
+          Token.Column]), scNone, Token.Line, Token.Column, etError);
       SuperBar.LocationWidth := dblWidth;
       NextNonCommentToken;
     End
   Else
-    ErrorAndSeekToken(strNumberExpected, 'LocationWidth', Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -1950,11 +1922,11 @@ End;
   @precon  None.
   @postcon Returns false always.
 
-  @param   AToken as a TTokenInfo
+  @param   AToken as a TTokenInfo as a constant
   @return  a Boolean
 
 **)
-Function TEidolonModule.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
+Function TEidolonModule.ReferenceSymbol(Const AToken : TTokenInfo) : Boolean;
 
 Begin
   Result := False;
@@ -1991,14 +1963,14 @@ begin
           RT := FRequirementsTableDefs.AddUnique(TRequirementsTable.Create(strName, scNone,
             StartToken.Line, StartToken.Column, iiPublicDispInterface, C)) As
             TRequirementsTable;
-          If CheckLiteral(')', 'RequirementsTable') Then
-            If CheckLineEnd('RequirementsTable') Then
+          If CheckLiteral(')') Then
+            If CheckLineEnd() Then
               Begin
                 EatWhitespace;
-                If CheckLiteral('{', 'RequirementsTable') Then
+                If CheckLiteral('{') Then
                   Begin
                     EatWhitespace;
-                    If CheckLineEnd('RequirementsTable') Then
+                    If CheckLineEnd() Then
                       Begin
                         EatWhitespace;
                         If DatabaseDef(RT, ctPrimary) Then
@@ -2022,17 +1994,16 @@ begin
                         iSheetIndex := 1;
                         While FieldDef(RT, iSheetIndex) Or EmptyLine Do;
                         While AssociationDef(RT) Do;
-                        If CheckLiteral('}', 'RequirementsTable') Then
+                        If CheckLiteral('}') Then
                           Begin
                             EatWhitespace;
-                            CheckLineEnd('RequirementsTable');
+                            CheckLineEnd();
                           End;
                       End;
                   End;
               End;
         End Else
-          ErrorAndSeekToken(strTheDefintionNull, 'RequirementsTable', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -2084,18 +2055,14 @@ begin
                 OutputTable(strName, StartToken, C) Or
                 RequirementsTable(strName, StartToken, C);
               If Not Result Then
-                ErrorAndSeekToken(strInvalidTableType, 'Table', Token.Token,
-                  strSeekableOnErrorTokens, stActual);
+                ErrorAndSeekToken(strInvalidTableType, Token.Token, strSeekableOnErrorTokens, stActual);
             End Else
-              ErrorAndSeekToken(strLiteralExpected, 'Table', '(',
-                strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, '(', strSeekableOnErrorTokens, stActual);
 
         End Else
-          ErrorAndSeekToken(strReservedWordExpected, 'Table', 'CLASS',
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strReservedWordExpected, 'CLASS', strSeekableOnErrorTokens, stActual);
     End Else
-      ErrorAndSeekToken(strLiteralExpected, 'Table', '=',
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strLiteralExpected, '=', strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -2129,11 +2096,11 @@ begin
               Token.Line, Token.Column, iiPublicType, Nil)) As TTableNameDef;
           End;
           NextNonCommentToken;
-          If CheckLiteral('=', 'TableNameDef') Then
+          If CheckLiteral('=') Then
             Begin
               While Not (Token.TokenType In [ttLineEnd]) Do
                 AddToExpression(T);
-              CheckLineEnd('TableNameDef')
+              CheckLineEnd()
             End;
         End;
     End;
@@ -2169,31 +2136,30 @@ begin
         Begin
           TT := FTextTableDefs.AddUnique(TTextTable.Create(strName, scNone,
             StartToken.Line, StartToken.Column, iiPublicThreadVar, C)) As TTextTable;
-          If CheckLiteral(')', 'TextTable') Then
-            If CheckLineEnd('TextTable') Then
+          If CheckLiteral(')') Then
+            If CheckLineEnd() Then
               Begin
                 EatWhitespace;
-                If CheckLiteral('{', 'TextTable') Then
+                If CheckLiteral('{') Then
                   Begin
                     EatWhitespace;
-                    If CheckLineEnd('TextTable') Then
+                    If CheckLineEnd() Then
                       Begin
                         While EmptyLine Do;
                         EatWhiteSpace;
                         TextTableDef(TT);
                         iSheetIndex := 1;
                         While FieldDef(TT, iSheetIndex) Or EmptyLine Do;
-                        If CheckLiteral('}', 'TextTable') Then
+                        If CheckLiteral('}') Then
                           Begin
                             EatWhitespace;
-                            CheckLineEnd('TextTable');
+                            CheckLineEnd();
                           End;
                       End;
                   End;
               End;
         End Else
-          ErrorAndSeekToken(strTheDefintionNull, 'DBTable', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -2222,12 +2188,12 @@ begin
           TTD := TextTable.AddUnique(TTextTableDef.Create('TableName', scNone, Token.Line,
             Token.Column, iiPublicRecord, Nil)) As TTextTableDef;
           NextNonCommentToken;
-          If CheckLiteral('=', 'TextTableDef') Then
+          If CheckLiteral('=') Then
             Begin
               While Not (Token.TokenType In [ttLineEnd]) Do
                 AddToExpression(TTD);
               TextTable.FileName := TTD.AsString(False, False);
-              CheckLineEnd('TextTableDef');
+              CheckLineEnd();
             End;
         End Else
           PopTokenPosition;
@@ -2293,7 +2259,7 @@ begin
         End;
       If strName <> '' then
         Begin
-          If CheckLiteral('=', 'TimeLocationDef') Then
+          If CheckLiteral('=') Then
             Begin
               EatWhitespace;
               If TLRectangle(strName, StartToken, Table, iLayerIndex) Or
@@ -2306,8 +2272,7 @@ begin
                 Inc(iLayerIndex);
             End;
         End Else
-          ErrorAndSeekToken(strNullName, 'TimeLocationDef', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNullName, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -2343,30 +2308,29 @@ begin
           TLT := FTimeLocationTableDefs.AddUnique(TTimeLocationTable.Create(strName,
             scNone, StartToken.Line, StartToken.Column, iiPublicVariable,
             C)) As TTimeLocationTable;
-          If CheckLiteral(')', 'TimeLocationTable') Then
-            If CheckLineEnd('TimeLocationTable') Then
+          If CheckLiteral(')') Then
+            If CheckLineEnd() Then
               Begin
                 EatWhitespace;
-                If CheckLiteral('{', 'TimeLocationTable') Then
+                If CheckLiteral('{') Then
                   Begin
                     EatWhitespace;
-                    If CheckLineEnd('TimeLocationTable') Then
+                    If CheckLineEnd() Then
                       Begin
                         iSheetIndex := 1;
                         While FieldDef(TLT, iSheetIndex) Or EmptyLine Do;
                         iLayerIndex := 1;
                         While TimeLocationDef(TLT, iLayerIndex) Or EmptyLine Do;
-                        If CheckLiteral('}', 'TimeLocationTable') Then
+                        If CheckLiteral('}') Then
                           Begin
                             EatWhitespace;
-                            CheckLineEnd('TimeLocationTable');
+                            CheckLineEnd();
                           End;
                       End;
                   End;
               End;
         End Else
-          ErrorAndSeekToken(strTheDefintionNull, 'TimeLocationTable', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -2402,15 +2366,15 @@ begin
       R.SymbolType := tstRectangle;
       R.LayerIndex := iLayerIndex;
       EatWhitespace;
-      If CheckLiteral(',', 'TLRectangle') Then
+      If CheckLiteral(',') Then
         Begin
           BorderDef(R);
           EatWhitespace;
-          If CheckLiteral(',', '') Then
+          If CheckLiteral(',') Then
             Begin
               InteriorDef(R);
               Transparency(R);
-              CheckLineEnd('TLRectangle');
+              CheckLineEnd();
             End;
         End;
     End;
@@ -2447,22 +2411,22 @@ Begin
       B.SymbolType := tstSuperBar;
       B.LayerIndex := iLayerIndex;
       EatWhitespace;
-      If CheckLiteral(',', 'TLBar') Then
+      If CheckLiteral(',') Then
         Begin
           BorderDef(B);
           EatWhitespace;
-          If CheckLiteral(',', 'TLBar') Then
+          If CheckLiteral(',') Then
             Begin
               InteriorDef(B);
               EatWhiteSpace;
-              If CheckLiteral(',', 'TLBar') Then
+              If CheckLiteral(',') Then
                 Begin
                   DateWidth(B);
-                  If CheckLiteral(',', 'TLBar') Then
+                  If CheckLiteral(',') Then
                     Begin
                       LocationWidth(B);
                       Transparency(B);
-                      CheckLineEnd('TLBar');
+                      CheckLineEnd();
                     End;
                 End;
             End;
@@ -2511,7 +2475,7 @@ begin
       End;
   Except
     On E : EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError);
   End;
 end;
 
@@ -2545,12 +2509,12 @@ begin
   EatWhitespace;
   InteriorColour(CustomSymbol);
   EatWhitespace;
-  If CheckLiteral(',', 'InteriorDef') Then
+  If CheckLiteral(',') Then
     Begin
       EatWhitespace;
       InteriorPattern(CustomSymbol);
       EatWhitespace;
-      If CheckLiteral(',', 'InteriorDef') Then
+      If CheckLiteral(',') Then
         Begin
           EatWhitespace;
           InteriorPatternColour(CustomSymbol);
@@ -2594,8 +2558,7 @@ begin
         Break;
       End;
   If Not boolFound Then
-    ErrorAndSeekToken(strInvalidPattern, 'InteriorPattern', strPattern,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidPattern, strPattern, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -2614,13 +2577,13 @@ begin
   If (CustomSymbol.InteriorPattern = ipNONE) And
     (CustomSymbol.InteriorPatternColour <> xlcNONE) Then
     AddIssue(Format(strYouHaveSpecifiedAColour,
-      [strColours[CustomSymbol.InteriorPatternColour]]), scNone,
-      'InteriorPatternColour', CustomSymbol.Line, CustomSymbol.Column, etWarning);
+      [strColours[CustomSymbol.InteriorPatternColour]]), scNone, CustomSymbol.Line, CustomSymbol.Column,
+        etWarning);
   If (CustomSymbol.InteriorPattern <> ipNONE) And
     (CustomSymbol.InteriorPatternColour = xlcNONE) Then
     AddIssue(Format(strYouHaveSpecifiedAPattern,
-      [strInteriorPatterns[CustomSymbol.InteriorPattern]]), scNone,
-      'InteriorPatternColour', CustomSymbol.Line, CustomSymbol.Column, etWarning);
+      [strInteriorPatterns[CustomSymbol.InteriorPattern]]), scNone, CustomSymbol.Line,
+      CustomSymbol.Column, etWarning);
 end;
 
 End.

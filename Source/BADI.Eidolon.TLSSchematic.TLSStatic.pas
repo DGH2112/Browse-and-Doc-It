@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Eidolon.TLSSchematic.TLSStatic;
@@ -24,7 +24,7 @@ Type
     FEndOffset   : Double;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the start offset of the bounding rectangle
       to the ellipse.
@@ -59,12 +59,12 @@ Uses
   @precon  None.
   @postcon Returns a string representation of a schematic object.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TTLSStatic.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TTLSStatic.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 begin
   Result := Format('STATIC%s %1.1f, %1.1f, %1.0f%%, %1.0f%%, %s, %s, ''%s''', [

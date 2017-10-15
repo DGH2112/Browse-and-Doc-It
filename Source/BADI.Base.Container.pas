@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Apr 2017
+  @Date    15 Oct 2017
 
 **)
 Unit BADI.Base.Container;
@@ -34,26 +34,27 @@ Type
     FFixed : Boolean;
   Strict Protected
     Function GetTokenCount : Integer;
-    Function GetTokens(iIndex : Integer) : TTokenInfo;
+    Function GetTokens(Const iIndex : Integer) : TTokenInfo;
     Function GetName: String; Virtual;
-    Procedure SetName(const Value : String); Virtual;
+    Procedure SetName(Const Value : String); Virtual;
   Public
-    Constructor Create(const strName : String; iLine, iColumn  : Integer);
+    Constructor Create(Const strName : String; Const iLine, iColumn  : Integer);
     Destructor Destroy; Override;
-    Procedure AddToken(const strToken : String; ATokenType : TBADITokenType = ttUnknown);
+    Procedure AddToken(Const strToken : String; Const ATokenType : TBADITokenType = ttUnknown);
       Overload; Virtual;
-    Procedure AddToken(AToken : TTokenInfo); Overload; Virtual;
-    Procedure AppendToken(AToken : TTokenInfo); Virtual;
-    Procedure InsertToken(const strToken : String; iIndex : Integer;
-      ATokenType : TBADITokenType = ttUnknown);
-    Procedure DeleteToken(iIndex : Integer);
+    Procedure AddToken(Const AToken : TTokenInfo); Overload; Virtual;
+    Procedure AppendToken(Const AToken : TTokenInfo); Virtual;
+    Procedure InsertToken(Const strToken : String; Const iIndex : Integer;
+      Const ATokenType : TBADITokenType = ttUnknown);
+    Procedure DeleteToken(Const iIndex : Integer);
     Procedure ClearTokens;
-    Function BuildStringRepresentation(boolIdentifier, boolForDocumentation : Boolean;
-      const strDelimiter : String; iMaxWidth : Integer;
-      strNoSpaceBefore : TSymbols = strNoSpaceBeforeSymbols;
-      strNoSpaceAfter : TSymbols = strNoSpaceAfterSymbols;
-      strSpaceAfter : TSymbols = strSpaceAfterSymbols;
-      boolShowHTML : Boolean = False) : String; Virtual;
+    //: @nometric LongParameterList
+    Function BuildStringRepresentation(Const boolIdentifier, boolForDocumentation : Boolean;
+      Const strDelimiter : String; Const iMaxWidth : Integer;
+      Const strNoSpaceBefore : TSymbols = strNoSpaceBeforeSymbols;
+      Const strNoSpaceAfter : TSymbols = strNoSpaceAfterSymbols;
+      Const strSpaceAfter : TSymbols = strSpaceAfterSymbols;
+      Const boolShowHTML : Boolean = False) : String; Virtual;
     (**
       This property returns the name of the element.
       @precon  None.
@@ -87,10 +88,10 @@ Type
       collection.
       @precon  iIndex must be a valid index.
       @postcon Returns an instance of the indexed token from the collection.
-      @param   iIndex as       an Integer
+      @param   iIndex as       an Integer as a Constant
       @return  a TTokenInfo
     **)
-    Property Tokens[iIndex : Integer] : TTokenInfo Read GetTokens;
+    Property Tokens[Const iIndex : Integer] : TTokenInfo Read GetTokens;
     (**
       This property returns the number of tokens in the collection.
       @precon  None.
@@ -114,36 +115,17 @@ Uses
 
 (**
 
-  This method adds the given TTokenInfo object to the token collection.
-
-  @precon  AToken must be a valid token instance.
-  @postcon Adds the given TTokenInfo object to the token collection. Note that
-           the calling code must not free this memeory - it will be freed by
-           this container.
-
-  @param   AToken as a TTokenInfo
-
-**)
-Procedure TBADIBaseContainer.AddToken(AToken: TTokenInfo);
-
-Begin
-  FTokens.Add(AToken);
-End;
-
-(**
-
-  This method adds a TTokenInfo class representation of the given string to the
-  token collection.
+  This method adds a TTokenInfo class representation of the given string to the token collection.
 
   @precon  None.
-  @postcon Adds a TTokenInfo class representation of the given string to the
-           token collection.
+  @postcon Adds a TTokenInfo class representation of the given string to the token collection.
 
-  @param   strToken   as a String as a Constant
-  @param   ATokenType as a TBADITokenType
+  @param   strToken   as a String as a constant
+  @param   ATokenType as a TBADITokenType as a constant
 
 **)
-Procedure TBADIBaseContainer.AddToken(const strToken: String; ATokenType: TBADITokenType = ttUnknown);
+Procedure TBADIBaseContainer.AddToken(Const strToken: String;
+  Const ATokenType: TBADITokenType = ttUnknown);
 
 Begin
   AddToken(TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), ATokenType));
@@ -151,16 +133,33 @@ End;
 
 (**
 
+  This method adds the given TTokenInfo object to the token collection.
+
+  @precon  AToken must be a valid token instance.
+  @postcon Adds the given TTokenInfo object to the token collection. Note that the calling code must not
+           free this memeory - it will be freed by this container.
+
+  @param   AToken as a TTokenInfo as a constant
+
+**)
+Procedure TBADIBaseContainer.AddToken(Const AToken: TTokenInfo);
+
+Begin
+  FTokens.Add(AToken);
+End;
+
+(**
+
   This method append a copy of the given token to the tokens collection.
 
   @precon  AToken mustbe a valid instance of a TTokenInfo.
-  @postcon Append a copy of the given token to the tokens collection. Note, the
-           calling code is responsible for freeing the AToken instance only.
+  @postcon Append a copy of the given token to the tokens collection. Note, the calling code is
+           responsible for freeing the AToken instance only.
 
-  @param   AToken as a TTokenInfo
+  @param   AToken as a TTokenInfo as a constant
 
 **)
-Procedure TBADIBaseContainer.AppendToken(AToken: TTokenInfo);
+Procedure TBADIBaseContainer.AppendToken(Const AToken: TTokenInfo);
 
 Begin
   AddToken(TTokenInfo.Create(AToken.Token, AToken.BufferPos, AToken.Line, AToken.Column,
@@ -169,28 +168,37 @@ End;
 
 (**
 
-  This method builds a string from the identifer and tokens and tries to
-  present it with the style of code you would probably except.
+  This method builds a string from the identifer and tokens and tries to present it with the style of
+  code you would probably except.
 
   @precon  None.
-  @postcon Builds a string from the identifer and tokens and tries to present
-           it with the style of code you would probably except.
+  @postcon Builds a string from the identifer and tokens and tries to present it with the style of code
+           you would probably except.
 
-  @param   boolIdentifier       as a Boolean
-  @param   boolForDocumentation as a Boolean
-  @param   strDelimiter         as a String as a Constant
-  @param   iMaxWidth            as an Integer
-  @param   strNoSpaceBefore     as a TSymbols
-  @param   strNoSpaceAfter      as a TSymbols
-  @param   strSpaceAfter        as a TSymbols
-  @param   boolShowHTML         as a Boolean
+  @nometric LongParameterList HardCodedInteger
+
+  @param   boolIdentifier       as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
+  @param   strDelimiter         as a String as a constant
+  @param   iMaxWidth            as an Integer as a constant
+  @param   strNoSpaceBefore     as a TSymbols as a constant
+  @param   strNoSpaceAfter      as a TSymbols as a constant
+  @param   strSpaceAfter        as a TSymbols as a constant
+  @param   boolShowHTML         as a Boolean as a constant
   @return  a String
 
 **)
-Function TBADIBaseContainer.BuildStringRepresentation(boolIdentifier, boolForDocumentation: Boolean;
-  const strDelimiter: String; iMaxWidth: Integer; strNoSpaceBefore: TSymbols = strNoSpaceBeforeSymbols;
-  strNoSpaceAfter: TSymbols = strNoSpaceAfterSymbols;
-  strSpaceAfter: TSymbols = strSpaceAfterSymbols; boolShowHTML: Boolean = False): String;
+Function TBADIBaseContainer.BuildStringRepresentation(
+  Const boolIdentifier, boolForDocumentation: Boolean;
+  Const strDelimiter: String;
+  Const iMaxWidth: Integer;
+  Const strNoSpaceBefore: TSymbols = strNoSpaceBeforeSymbols;
+  Const strNoSpaceAfter: TSymbols = strNoSpaceAfterSymbols;
+  Const strSpaceAfter: TSymbols = strSpaceAfterSymbols;
+  Const boolShowHTML: Boolean = False): String;
+
+Const
+  strLFCRSpaceSpace = #13#10#32#32;
 
 Var
   iToken: Integer;
@@ -234,7 +242,7 @@ Begin
                 End
               Else
                 Begin
-                  Result := Result + #13#10#32#32;
+                  Result := Result + strLFCRSpaceSpace;
                   iLength := 2;
                 End;
           Result := Result + T.Token;
@@ -265,15 +273,14 @@ End;
   This is a constructor for the TBADIBaseContainer class.
 
   @precon  None.
-  @postcon Create the token collection and initialises the Line and Column
-           data.
+  @postcon Create the token collection and initialises the Line and Column data.
 
-  @param   strName as a String as a Constant
-  @param   iLine   as an Integer
-  @param   iColumn as an Integer
+  @param   strName as a String as a constant
+  @param   iLine   as an Integer as a constant
+  @param   iColumn as an Integer as a constant
 
 **)
-Constructor TBADIBaseContainer.Create(const strName: String; iLine, iColumn: Integer);
+Constructor TBADIBaseContainer.Create(Const strName : String; Const iLine, iColumn  : Integer);
 
 Begin
   FTokens := TObjectList.Create(True);
@@ -290,10 +297,10 @@ End;
   @precon  iIndex must be a valid index between 0 and TokenCount - 1.
   @postcon Deletes the indexed token from the token collection.
 
-  @param   iIndex as an Integer
+  @param   iIndex as an Integer as a constant
 
 **)
-Procedure TBADIBaseContainer.DeleteToken(iIndex: Integer);
+Procedure TBADIBaseContainer.DeleteToken(Const iIndex: Integer);
 
 Begin
   FTokens.Delete(iIndex);
@@ -355,11 +362,11 @@ End;
   @precon  iIndex must be a valid index between 0 and TokenCount - 1.
   @postcon Returns the instance of the indexed token.
 
-  @param   iIndex as an Integer
+  @param   iIndex as an Integer as a constant
   @return  a TTokenInfo
 
 **)
-Function TBADIBaseContainer.GetTokens(iIndex: Integer): TTokenInfo;
+Function TBADIBaseContainer.GetTokens(Const iIndex: Integer): TTokenInfo;
 
 Begin
   Result := FTokens[iIndex] As TTokenInfo;
@@ -372,20 +379,24 @@ End;
   @precon  None.
   @postcon Inserts a token at the given index in the token collection.
 
-  @param   strToken   as a String as a Constant
-  @param   iIndex     as an Integer
-  @param   ATokenType as a TBADITokenType
+  @param   strToken   as a String as a constant
+  @param   iIndex     as an Integer as a constant
+  @param   ATokenType as a TBADITokenType as a constant
 
 **)
-Procedure TBADIBaseContainer.InsertToken(const strToken: String; iIndex: Integer;
-  ATokenType: TBADITokenType = ttUnknown);
+Procedure TBADIBaseContainer.InsertToken(Const strToken: String; Const iIndex: Integer;
+  Const ATokenType: TBADITokenType = ttUnknown);
+
+Var
+  iTokenIndex : Integer;
 
 Begin
-  If iIndex >= FTokens.Count Then
-    iIndex := FTokens.Count - 1;
-  If iIndex < 0 Then
-    iIndex := 0;
-  FTokens.Insert(iIndex, TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), ATokenType));
+  iTokenIndex := iIndex;
+  If iTokenIndex >= FTokens.Count Then
+    iTokenIndex := FTokens.Count - 1;
+  If iTokenIndex < 0 Then
+    iTokenIndex := 0;
+  FTokens.Insert(iTokenIndex, TTokenInfo.Create(strToken, 0, 0, 0, Length(strToken), ATokenType));
 End;
 
 (**

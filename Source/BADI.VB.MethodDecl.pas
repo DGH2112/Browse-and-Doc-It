@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.VB.MethodDecl;
@@ -30,7 +30,7 @@ Type
     Constructor Create(MethodType : TMethodType; const strName : String;
       AScope : TScope; iLine, iCol : Integer); Override;
     Destructor Destroy; Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property implements the IExceptionHandling interface.
       @precon  None.
@@ -55,12 +55,12 @@ Uses
   @precon  None .
   @postcon Outputs a string presentation of the method .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TVBMethod.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TVBMethod.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 Var
   i: Integer;

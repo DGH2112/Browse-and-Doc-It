@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Pascal.PropertyDecl;
@@ -35,10 +35,10 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetName : String; Override;
   Public
-    Constructor Create(const strIdent: String; AScope: TScope; iLine, iCol : Integer;
-      AImageIndex : TBADIImageIndex; AComment : TComment); Override;
+    Constructor Create(Const strIdent: String; Const AScope: TScope; Const iLine, iCol : Integer;
+      Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Override;
     Destructor Destroy; Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       Returns the
       @precon  None.
@@ -134,15 +134,15 @@ uses
   @postcon Initialises the property specifiers.
 
   @param   strIdent    as a String as a constant
-  @param   AScope       as a TScope
-  @param   iLine       as an Integer
-  @param   iCol        as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iCol        as an Integer as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-Constructor TPascalProperty.Create(Const strIdent: String; AScope: TScope; iLine, iCol: Integer;
-  AImageIndex: TBADIImageIndex; AComment: TComment);
+Constructor TPascalProperty.Create(Const strIdent: String; Const AScope: TScope; Const iLine, iCol : Integer;
+      Const AImageIndex : TBADIImageIndex; Const AComment : TComment);
 
 Begin
   Inherited Create(strIdent, AScope, iLine, iCol, AImageIndex, AComment);
@@ -213,12 +213,12 @@ End;
   @precon  None .
   @postcon Outputs the pascal property declaration .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TPascalProperty.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TPascalProperty.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
   (**
 

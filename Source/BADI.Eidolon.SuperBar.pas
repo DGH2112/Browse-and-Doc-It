@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Eidolon.SuperBar;
@@ -25,9 +25,9 @@ Type
     FDateWidth: Double;
     FLocationWidth: Double;
   Public
-    Constructor Create(Const strName: String; AScope: TScope; iLine, iColumn: Integer;
-      AImageIndex: TBADIImageIndex; AComment: TComment); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Constructor Create(Const strName: String; Const AScope: TScope; Const iLine, iColumn: Integer;
+      Const AImageIndex: TBADIImageIndex; Const AComment: TComment); Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
     (**
       This property gets and sets the bars date width of the bar.
       @precon  None.
@@ -56,12 +56,12 @@ Uses
   @precon  None.
   @postcon Returns a representation of the TSuperBar element.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TSuperBar.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TSuperBar.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
   Result := Inherited AsString(boolShowIdentifier, boolForDocumentation);
@@ -79,15 +79,15 @@ End;
   @postcon Creates a default TSuperBar class.
 
   @param   strName     as a String as a constant
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-Constructor TSuperBar.Create(const strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TBADIImageIndex; AComment: TComment);
+Constructor TSuperBar.Create(Const strName: String; Const AScope: TScope; Const iLine, iColumn: Integer;
+      Const AImageIndex: TBADIImageIndex; Const AComment: TComment);
 
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);

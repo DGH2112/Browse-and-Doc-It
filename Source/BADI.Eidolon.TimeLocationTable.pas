@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Eidolon.TimeLocationTable;
@@ -23,7 +23,7 @@ Type
   TTimeLocationTable = Class(TBaseTable)
     FSymbols: TLabelContainer;
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Function AddSymbol(Symbol : TSymbol) : TSymbol;
   End;
 
@@ -61,13 +61,12 @@ end;
   @precon  None.
   @postcon Returns string representation of the time location table definition.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TTimeLocationTable.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
+function TTimeLocationTable.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 begin
   Result := Identifier + '=Class(TimeLocationTable)';

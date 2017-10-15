@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       11 Apr 2017
+  @Date       15 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -84,7 +84,7 @@ Type
     Procedure TokenizeStream;
     Procedure ParseTokens;
     function GetSettings(S: TSetting): Double;
-    Function CheckLiteral(strLiteral, strMethod: String): Boolean;
+    Function CheckLiteral(strLiteral: String): Boolean;
     function GetSuppressedText(strName : String): Boolean;
     Function GetTextOrientation(strName : String) : TTextOrientation;
     Function GetTextPosition(strName : String) : TTextPosition;
@@ -101,8 +101,8 @@ Type
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
-    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property returns the specific percentage setting as a value between
       0 and 1.
@@ -258,7 +258,7 @@ begin
   If Token.UToken = 'DEBUG' Then
     Begin
       NextNonCommentToken;
-      If CheckLiteral(';', 'Debugging') Then
+      If CheckLiteral(';') Then
         Begin
           FDebug := True;
           Result := True;
@@ -316,11 +316,10 @@ begin
                   FTextPositions.AddObject(strName, TObject(Integer(O)));
                   NextNonCommentToken;
                 End Else
-                  ErrorAndSeekToken(strStringExpected, 'Objects', Token.Token,
-                    strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
             End;
         End;
-      If CheckLiteral(';', 'Objects') Then
+      If CheckLiteral(';') Then
         Result := True;
     End;
 end;
@@ -360,11 +359,10 @@ begin
                   FTextOrientations.AddObject(strName, TObject(Integer(O)));
                   NextNonCommentToken;
                 End Else
-                  ErrorAndSeekToken(strStringExpected, 'Objects', Token.Token,
-                    strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
             End;
         End;
-      If CheckLiteral(';', 'Objects') Then
+      If CheckLiteral(';') Then
         Result := True;
     End;
 end;
@@ -388,8 +386,7 @@ begin
         Result := tpInside;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strExpectedOUTSIDEINSIDE, 'TextPosition',
-        Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedOUTSIDEINSIDE, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -617,8 +614,7 @@ begin
   Result := False;
   If Not (Token.TokenType = ttfileEnd) Then
     Begin
-      ErrorAndSeekToken(strUnDefinedToken, 'UnknownToken', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strUnDefinedToken, Token.Token, strSeekableOnErrorTokens, stActual);
       Result := True;
     End;
 end;
@@ -661,14 +657,12 @@ begin
       If iErrorCode = 0 Then
         Begin
           NextNonCommentToken;
-          CheckLiteral('%', 'Percentage');
+          CheckLiteral('%');
           Result := True;
         End Else
-          ErrorAndSeekToken(strIntegerExpected, 'Percentage', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strIntegerExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End Else
-      ErrorAndSeekToken(strNumberExpected, 'Percentage', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -692,11 +686,11 @@ begin
   If Percentage(dbl) Then
     Begin
       S.StartOffset := dbl;
-      If CheckLiteral(',', 'Percentages') Then
+      If CheckLiteral(',') Then
         If Percentage(dbl) Then
           Begin
             S.EndOffset := dbl;
-            If CheckLiteral(',', 'Percentages') Then
+            If CheckLiteral(',') Then
               Result := True;
           End;
     End;
@@ -772,14 +766,14 @@ begin
                 Begin
                   NextNonCommentToken;
                   RouteCode(R);
-                  If CheckLiteral(';', 'Road') Then
+                  If CheckLiteral(';') Then
                     Result := True;
                 End Else
-                  ErrorAndSeekToken(strInvalidColourName, 'Road',
-                    Token.Token, strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens,
+                    stActual);
             End Else
-              ErrorAndSeekToken(strReservedWordExpected, 'Road', 'Left or Right',
-                strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strReservedWordExpected, 'Left or Right', strSeekableOnErrorTokens,
+                stActual);
     End;
 end;
 
@@ -806,7 +800,7 @@ begin
       If Percentage(dbl) Then
         Begin
           FCurrentRoad := dbl;
-          If CheckLiteral(';', 'Roads') Then
+          If CheckLiteral(';') Then
             Result := True;
         End;
     End;
@@ -832,8 +826,7 @@ begin
           S.RouteCode := Copy(Token.Token, 2, Length(Token.Token) - 2);
           NextNonCommentToken;
         End Else
-          ErrorAndSeekToken(strStringExpected, 'RouteCode', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -869,7 +862,7 @@ begin
         Begin
           S.Percentage := dbl;
           FSettings[seSpacing] := S.Percentage;
-          If CheckLiteral(';', 'Spacing') Then
+          If CheckLiteral(';') Then
             Result := True;
         End;
     End;
@@ -913,8 +906,7 @@ begin
           NextNonCommentToken;
           Result := True;
         End Else
-          ErrorAndSeekToken(strNumberExpected, 'StartChainage', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End Else
       If boolNeg Then
         PopTokenPosition;
@@ -960,8 +952,7 @@ begin
           NextNonCommentToken;
           Result := True;
         End Else
-          ErrorAndSeekToken(strNumberExpected, 'StartOffset', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End Else
       If boolNeg Then
         PopTokenPosition;
@@ -1038,7 +1029,7 @@ begin
               If boolFound Then
                 Begin
                   NextNonCommentToken;
-                  If CheckLiteral(',', 'Ellipse') Then
+                  If CheckLiteral(',') Then
                     Begin
                       If Token.TokenType In [ttSingleLiteral] Then
                         Begin
@@ -1046,16 +1037,16 @@ begin
                           NextNonCommentToken;
                           RouteCode(E);
                         End Else
-                          ErrorAndSeekToken(strStringExpected, 'Ellipse', Token.Token,
-                            strSeekableOnErrorTokens, stActual);
+                          ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens,
+                            stActual);
                     End;
-                  If CheckLiteral(';', 'Ellipse') Then
+                  If CheckLiteral(';') Then
                     Result := True;
                 End Else
-                  ErrorAndSeekToken(strInvalidColourName, 'Ellipse',
-                    Token.Token, strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens,
+                    stActual);
             End Else
-              ErrorAndSeekToken(strReservedWordExpected, 'Ellipse',
+              ErrorAndSeekToken(strReservedWordExpected,
                 'Left, Right, Over, OverLeft, OverRight, Under or Both',
                 strSeekableOnErrorTokens, stActual);
     End;
@@ -1097,13 +1088,11 @@ begin
           Else
             R.EndChainage := dbl;
           If R.StartChainage >= R.EndChainage Then
-            ErrorAndSeekToken(strChainageError, 'EndChainage', Token.Token,
-              strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strChainageError, Token.Token, strSeekableOnErrorTokens, stActual);
           NextNonCommentToken;
           Result := True;
         End Else
-          ErrorAndSeekToken(strNumberExpected, 'EndChainage', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End Else
       If boolNeg Then
         PopTokenPosition;
@@ -1149,8 +1138,7 @@ begin
           NextNonCommentToken;
           Result := True;
         End Else
-          ErrorAndSeekToken(strNumberExpected, 'EndOffset', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End Else
       If boolNeg Then
         PopTokenPosition;
@@ -1326,11 +1314,11 @@ End;
   @precon  None.
   @postcon Does nothing.
 
-  @param   AToken as a TTokenInfo
+  @param   AToken as a TTokenInfo as a constant
   @return  a Boolean
 
 **)
-Function TTLSSchematicModule.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
+Function TTLSSchematicModule.ReferenceSymbol(Const AToken : TTokenInfo) : Boolean;
 
 Begin
   Result := False;
@@ -1343,12 +1331,12 @@ End;
   @precon  None.
   @postcon Returns a string representation of the module.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TTLSSchematicModule.AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String;
+Function TTLSSchematicModule.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 Begin
   Result := ChangeFileExt(ExtractFileName(FileName), '') + ' Schematic Diagram';
@@ -1386,7 +1374,7 @@ begin
         Begin
           S.Percentage := dbl;
           FSettings[seCentreLine] := S.Percentage;
-          If CheckLiteral(';', 'CentreLine') Then
+          If CheckLiteral(';') Then
             Result := True;
         End;
     End;
@@ -1409,17 +1397,15 @@ Begin
   Result := False;
   If StartChainage(R) Then
     Begin
-      If CheckLiteral(',', 'Chainage') Then
+      If CheckLiteral(',') Then
         If EndChainage(R) Then
           Begin
-            If CheckLiteral(',', 'Chainage') Then
+            If CheckLiteral(',') Then
               Result := True;
           End Else
-            ErrorAndSeekToken(strExpectedAnEndChainage, 'Chainages',
-              Token.Token, strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strExpectedAnEndChainage, Token.Token, strSeekableOnErrorTokens, stActual);
     End Else
-      ErrorAndSeekToken(strExpectedAStartChainage, 'Chainages', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedAStartChainage, Token.Token, strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -1468,7 +1454,7 @@ begin
       End;
   Except
     On E : EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError);
   End;
 end;
 
@@ -1504,7 +1490,7 @@ begin
         Begin
           M.Percentage := dbl;
           FSettings[seMargins] := M.Percentage;
-          If CheckLiteral(';', 'Margins') Then
+          If CheckLiteral(';') Then
             Result := True;
         End;
     End;
@@ -1541,11 +1527,10 @@ begin
           Ns.Add(TNoText.Create(Copy(Token.Token, 2, Length(Token.Token) - 2),
             scPublic, T.Line, T.Column, iiPublicThreadVar, Nil));
           NextNonCommentToken;
-          If CheckLiteral(';', 'NoText') Then
+          If CheckLiteral(';') Then
             Result := True;
         End Else
-          ErrorAndSeekToken(strStringExpected, 'NoText', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -1595,12 +1580,12 @@ begin
                       NW.Percentage := dblPercentage;
                       NextNonCommentToken;
                     End Else
-                      ErrorAndSeekToken(strStringExpected, 'Objects', Token.Token,
-                        strSeekableOnErrorTokens, stActual);
+                      ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens,
+                        stActual);
                 End;
             End;
         End;
-      If CheckLiteral(';', 'Objects') Then
+      If CheckLiteral(';') Then
         Result := True;
     End;
 end;
@@ -1659,7 +1644,7 @@ begin
             If boolFound Then
               Begin
                 NextNonCommentToken;
-                If CheckLiteral(',', 'Object_') Then
+                If CheckLiteral(',') Then
                   Begin
                     If Token.TokenType In [ttSingleLiteral] Then
                       Begin
@@ -1667,16 +1652,15 @@ begin
                         NextNonCommentToken;
                         RouteCode(O);
                       End Else
-                        ErrorAndSeekToken(strStringExpected, 'Object', Token.Token,
-                          strSeekableOnErrorTokens, stActual);
+                        ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens,
+                          stActual);
                   End;
-                If CheckLiteral(';', 'Object_') Then
+                If CheckLiteral(';') Then
                   Result := True;
               End Else
-                ErrorAndSeekToken(strInvalidColourName, 'Object',
-                  Token.Token, strSeekableOnErrorTokens, stActual);
+                ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens, stActual);
           End Else
-            ErrorAndSeekToken(strReservedWordExpected, 'Object',
+            ErrorAndSeekToken(strReservedWordExpected,
               'Left, Right, Over, OverLeft, OverRight, Under or Both',
               strSeekableOnErrorTokens, stActual);
     End;
@@ -1699,17 +1683,15 @@ Begin
   Result := False;
   If StartOffset(R) Then
     Begin
-      If CheckLiteral(',', 'Offsets') Then
+      If CheckLiteral(',') Then
         If EndOffset(R) Then
           Begin
-            If CheckLiteral(',', 'Offsets') Then
+            If CheckLiteral(',') Then
               Result := True;
           End Else
-            ErrorAndSeekToken(strExpectedAnEndOffset, 'Offsets',
-              Token.Token, strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strExpectedAnEndOffset, Token.Token, strSeekableOnErrorTokens, stActual);
     End Else
-      ErrorAndSeekToken(strExpectedAStartOffet, 'Offsets', Token.Token,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedAStartOffet, Token.Token, strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -1733,8 +1715,7 @@ begin
         Result := toVertical;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strExpectedHORIZONTALVERTICAL, 'Orientation',
-        Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedHORIZONTALVERTICAL, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -1764,8 +1745,7 @@ begin
         Break;
       End;
   If Not Result Then
-    ErrorAndSeekToken(strInvalidColourName, 'LineColour', Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -1786,12 +1766,12 @@ begin
     Begin
       NextNonCommentToken;
       If LineColour Then
-        If CheckLiteral(',', 'Lines') Then
+        If CheckLiteral(',') Then
           Begin
-            If LineStyle Then;
-              If CheckLiteral(',', 'Lines') Then
+            If LineStyle Then
+              If CheckLiteral(',') Then
                 If LineWeight Then
-                  If CheckLiteral(';', 'Lines') Then
+                  If CheckLiteral(';') Then
                     Result := True;
           End;
     End;
@@ -1825,8 +1805,7 @@ begin
   If Result Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineStyle, 'LineStyle', Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineStyle, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -1857,8 +1836,7 @@ begin
   If Result Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineWeight, 'LineWeight', Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineWeight, Token.Token, strSeekableOnErrorTokens, stActual);
 end;
 
 (**
@@ -1882,7 +1860,7 @@ begin
       If CompareText(Token.Token, 'RIGHT') = 0 Then
         S.Location := loRight;
       NextNonCommentToken;
-      If CheckLiteral(',', 'LocationEx') Then
+      If CheckLiteral(',') Then
         Result := True;
     End;
 end;
@@ -1917,7 +1895,7 @@ begin
         Else If CompareText(Token.Token, 'UNDER') = 0 Then
           S.Location := loUnder;
         NextNonCommentToken;
-        If CheckLiteral(',', 'LocationEx') Then
+        If CheckLiteral(',') Then
           Result := True;
       End;
 end;
@@ -1932,11 +1910,10 @@ end;
            returns true if found and moves to the next non comment token.
 
   @param   strLiteral as a String
-  @param   strMethod  as a String
   @return  a Boolean
 
 **)
-function TTLSSchematicModule.CheckLiteral(strLiteral, strMethod: String): Boolean;
+function TTLSSchematicModule.CheckLiteral(strLiteral: String): Boolean;
 begin
   Result := False;
   If Token.Token = strLiteral Then
@@ -1944,8 +1921,7 @@ begin
       Result := True;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strLiteralExpected, strMethod, strLiteral,
-        strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strLiteralExpected, strLiteral, strSeekableOnErrorTokens, stActual);
 end;
 
 End.

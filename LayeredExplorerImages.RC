@@ -15,17 +15,22 @@ FriendMask                 BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\I
 
 Module                     BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\Module.bmp"
 
-DocConflictFolder          BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\DocConflictFolder.bmp"
-DocConflictIncorrect       BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\DocConflictIncorrect.bmp"
-DocConflictItem            BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\DocConflictItem.bmp"
-DocConflictMissing         BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\DocConflictMissing.bmp"
-
 ErrorFolder                BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\errorFolder.bmp"
 Error                      BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\error.bmp"
 WarningFolder              BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\WarningFolder.bmp"
 Warning                    BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\Warning.bmp"
 HintFolder                 BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\HintFolder.bmp"
 Hint                       BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\Hint.bmp"
+
+DocConflictFolder          BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\DocConflictFolder.bmp"
+DocConflictIncorrect       BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\DocConflictIncorrect.bmp"
+DocConflictItem            BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\DocConflictItem.bmp"
+DocConflictMissing         BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\DocConflictMissing.bmp"
+
+MetricCheckFolder          BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\MetricCheckFolder.bmp"
+MetricCheckIncorrect       BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\MetricCheckIncorrect.bmp"
+MetricCheckItem            BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\MetricCheckItem.bmp"
+MetricCheckMissing         BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\MetricCheckMissing.bmp"
 
 UsesLabel                  BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\UsesLabel.bmp"
 UsesItem                   BITMAP "\HoylD\RAD Studio\IDE Addins\BrowseAndDocIt\Images\UsesItem.bmp"

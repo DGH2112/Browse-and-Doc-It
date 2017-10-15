@@ -161,18 +161,22 @@ Type
 
     iiModule,
 
+    iiErrorFolder,
+    iiError,
+    iiWarningFolder,
+    iiWarning,
+    iiHintFolder,
+    iiHint,
+
     iiDocConflictFolder,
     iiDocConflictIncorrect,
     iiDocConflictItem,
     iiDocConflictMissing,
 
-    iiErrorFolder,
-    iiError,
-    iiWarningFolder,
-    iiWarning,
-
-    iiHintFolder,
-    iiHint,
+    iiMetricCheckFolder,
+    iiMetricCheckIncorrect,
+    iiMetricCheckItem,
+    iiMetricCheckMissing,
 
     iiUsesLabel,
     iiUsesItem,

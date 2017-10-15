@@ -3,7 +3,7 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       01 Apr 2017
+  @Date       15 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -66,7 +66,7 @@ Type
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
   End;
 
 Implementation
@@ -248,17 +248,14 @@ begin
                   If Token.UToken = 'END' Then
                     NextNonCommentToken
                   Else
-                    ErrorAndSeekToken(strReservedWordExpected, 'DFMObject', 'END',
-                      strSeekableOnErrorTokens, stActual);
+                    ErrorAndSeekToken(strReservedWordExpected, 'END', strSeekableOnErrorTokens,
+                      stActual);
                 End Else
-                  ErrorAndSeekToken(strIdentExpected, 'DFMObject', Token.Token,
-                    strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual);
             End Else
-              ErrorAndSeekToken(strLiteralExpected, 'DFMObject', ':',
-                strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, ':', strSeekableOnErrorTokens, stActual);
         End Else
-          ErrorAndSeekToken(strIdentExpected, 'DFMObject', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -291,10 +288,10 @@ begin
         Begin
           NextNonCommentToken;
           If DFMIdentifier(P) Or StringLiteral(P) Or Number(P) Or DFMSet(P) Or
-            ItemList(P) Or BinaryData(P) Or ListData(P) Then;
+            ItemList(P) Or BinaryData(P) Or ListData(P) Then
+            {Do nothing ???};
         End Else
-          ErrorAndSeekToken(strLiteralExpected, 'DFMProperty', '=',
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strLiteralExpected, '=', strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -320,8 +317,7 @@ begin
       If Token.Token = ']' Then
         AddToExpression(Container)
       Else
-        ErrorAndSeekToken(strLiteralExpected, 'DFMSet', ']',
-          strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -568,8 +564,7 @@ begin
       If Token.Token = ')' Then
         AddToExpression(Container)
       Else
-        ErrorAndSeekToken(strLiteralExpected, 'ListData', ')',
-          strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -630,8 +625,7 @@ begin
         Begin
           AddToExpression(Container);
           If Not (Token.TokenType In [ttNumber]) Then
-            ErrorAndSeekToken(strNumberExpected, 'Number', Token.Token,
-              strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
         End;
       AddToExpression(Container);
     End;
@@ -699,16 +693,16 @@ begin
           Begin
             DFMObject(Self);
             If Not (Token.TokenType In [ttFileEnd]) Then
-              AddIssue(strUnExpectedEndOfFile, scNone, 'Goal', 0, 0, etError);
+              AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError);
           End Else
           Begin
-            AddIssue(strUnExpectedEndOfFile, scNone, 'Goal', 0, 0, etError);
-            Raise EBADIParserAbort.Create('Parsing Aborted!');
+            AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError);
+            Raise EBADIParserAbort.Create(strParsingAborted);
           End;
       End;
   Except
     On E : EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError);
   End;
 end;
 
@@ -733,8 +727,7 @@ begin
           If Token.TokenType In [ttIdentifier] Then
             AddToExpression(Container)
           Else
-            ErrorAndSeekToken(strIdentExpected, 'IdentList', Token.Token,
-              strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual);
         End;
     End;
 end;
@@ -767,8 +760,7 @@ begin
       If Token.UToken = 'END' Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strReservedWordExpected, 'Item', 'END',
-          strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strReservedWordExpected, 'END', strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -794,8 +786,7 @@ begin
       If Token.Token = '>' Then
         AddToExpression(Container)
       Else
-        ErrorAndSeekToken(strLiteralExpected, 'ItemList', '>',
-          strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -836,8 +827,7 @@ begin
       If Token.Token = ']' Then
         AddToExpression(Container)
       Else
-        ErrorAndSeekToken(strLiteralExpected, 'DFMIndex', ']',
-          strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -870,13 +860,12 @@ end;
   @precon  None .
   @postcon Returns a string repreentation of the unit .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TDFMModule.AsString(boolShowIdentifier,
-  boolForDocumentation : Boolean): String;
+function TDFMModule.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean): String;
 
 begin
   Result := ExtractFileName(Identifier);
@@ -919,8 +908,7 @@ begin
           Result := Result + '.' + Token.Token;
           NextNonCommentToken;
         End Else
-          ErrorAndSeekToken(strIdentExpected, 'QualifiedIdent', Token.Token,
-            strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual);
     End;
 end;
 
@@ -947,8 +935,7 @@ begin
           If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
             ConcatStrings(Container)
           Else
-            ErrorAndSeekToken(strStringExpected, 'StringLiteral', Token.Token,
-              strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
         End;
     End;
 end;

@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       11 Apr 2017
+  @Date       15 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -41,7 +41,7 @@ Type
     Procedure TokenizeStream;
     Procedure ParseTokens;
     Procedure EatLineEnds;
-    Function  CheckLineEnd(Const strMethod: String): Boolean;
+    Function  CheckLineEnd(): Boolean;
     Procedure EatWhitespace;
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Function  GetComment(CommentPosition: TCommentPosition = cpBeforeCurrentToken)
@@ -57,8 +57,8 @@ Type
     Function  ReservedWords: TKeyWords; Override;
     Function  Directives: TKeyWords; Override;
     Procedure ProcessCompilerDirective(Var iSkip: Integer); Override;
-    Function  ReferenceSymbol(AToken: TTokenInfo): Boolean; Override;
-    Function  AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+    Function  ReferenceSymbol(Const AToken: TTokenInfo): Boolean; Override;
+    Function  AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
       Override;
   End;
 
@@ -94,13 +94,12 @@ Const
   @precon  None.
   @postcon Returns a string representation of the module.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TINIModule.AsString(boolShowIdentifier, boolForDocumentation
-    : Boolean): String;
+Function TINIModule.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
   Result := ChangeFileExt(Inherited AsString(boolShowIdentifier,
@@ -161,11 +160,10 @@ End;
            and returns true if found and moves to the next non comment token
            after the line end characters.
 
-  @param   strMethod  as a String as a Constant
   @return  a Boolean
 
 **)
-Function TINIModule.CheckLineEnd(Const strMethod: String): Boolean;
+Function TINIModule.CheckLineEnd(): Boolean;
 Begin
   Result := False;
   If Token.TokenType In [ttLineEnd] Then
@@ -174,8 +172,7 @@ Begin
       EatLineEnds;
     End
   Else
-    ErrorAndSeekToken(strExpectedLineEnd, strMethod, Token.Token,
-      strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strExpectedLineEnd, Token.Token, strSeekableOnErrorTokens, stActual);
 End;
 
 (**
@@ -455,7 +452,7 @@ Begin
         ttFileEnd));
   Except
     On E: Exception Do
-      AddIssue(E.Message, scGlobal, 'TokenizeStream', 0, 0, etError);
+      AddIssue(E.Message, scGlobal, 0, 0, etError);
   End
 End;
 
@@ -543,12 +540,11 @@ Begin
             Begin
               NextNonCommentToken;
               EatWhitespace;
-              CheckLineEnd('SectionHeader');
+              CheckLineEnd();
             End Else
-              ErrorAndSeekToken(strLiteralExpected, 'Section', Token.Token, ['<LF>', '<CR>'], stActual);
+              ErrorAndSeekToken(strLiteralExpected, Token.Token, ['<LF>', '<CR>'], stActual);
         End Else
-          ErrorAndSeekToken(strLiteralExpected, 'Section', Token.Token, ['<LF>', '<CR>'],
-          stActual);
+          ErrorAndSeekToken(strLiteralExpected, Token.Token, ['<LF>', '<CR>'], stActual);
     End;
 End;
 
@@ -651,11 +647,11 @@ End;
   @precon  None.
   @postcon Returns false always.
 
-  @param   AToken as a TTokenInfo
+  @param   AToken as a TTokenInfo as a constant
   @return  a Boolean
 
 **)
-Function TINIModule.ReferenceSymbol(AToken: TTokenInfo): Boolean;
+Function TINIModule.ReferenceSymbol(Const AToken: TTokenInfo): Boolean;
 
 Begin
   Result := False;
@@ -721,11 +717,11 @@ Begin
         // Check for end of file else must be identifier
         While Section Do;
         If Not (Token.TokenType In [ttFileEnd]) Then
-          ErrorAndSeekToken(strExpectedFileEnd, 'Goal', Token.Token, ['<LF>', '<CR>'], stActual);
+          ErrorAndSeekToken(strExpectedFileEnd, Token.Token, ['<LF>', '<CR>'], stActual);
       End;
   Except
     On E: EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError);
   End;
 End;
 
@@ -776,10 +772,9 @@ Begin
               If Token.TokenType In [ttFileEnd] Then
                 Exit;
             End;
-          CheckLineEnd('KeyValuePair');
+          CheckLineEnd();
         End Else
-          ErrorAndSeekToken(strExpectedKey, 'KeyValuePair', Token.Token, ['<LF>', '<CR>'],
-            stActual);
+          ErrorAndSeekToken(strExpectedKey, Token.Token, ['<LF>', '<CR>'], stActual);
     End;
   EatLineEnds;
 End;

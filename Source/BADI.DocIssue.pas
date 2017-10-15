@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    13 Oct 2017
+  @Date    15 Oct 2017
 
 **)
 Unit BADI.DocIssue;
@@ -22,16 +22,8 @@ Type
   TDocIssue = Class(TElementContainer)
   Strict Private
     FMsg      : String;
-    FMethod   : String;
     FErrorType: TErrorType;
   Strict Protected
-    (**
-      Returns the error method of the error stored.
-      @precon  None.
-      @postcon Returns the error method of the error stored.
-      @return  a String
-    **)
-    Property Method : String Read FMethod;
     (**
       Returns the error message.
       @precon  None.
@@ -40,8 +32,8 @@ Type
     **)
     Property Msg : String Read FMsg;
   Public
-    Constructor Create(Const strMsg : String; Const AScope : TScope; Const strMethod : String;
-      Const iLine, iCol : Integer; Const eErrorType : TErrorType); Reintroduce; Overload;
+    Constructor Create(Const strMsg: String; Const AScope: TScope; Const iLine, iCol: Integer;
+      Const eErrorType : TErrorType); Reintroduce; Overload;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property returns the error type of the issue.
@@ -59,6 +51,7 @@ Type
     FCommentLine   : Integer;
     FCommentColumn : Integer;
   Public
+    //: @nometric LongParameterList
     Constructor Create(Const Args: Array Of Const; Const iIdentLine, iIdentColumn, iCommentLine,
       iCommentCol : Integer; Const strDocConflictMsg, strDocConflictDesc : String;
       Const AImageIndex : TBADIImageIndex); ReIntroduce;
@@ -131,14 +124,13 @@ End;
 
   @param   strMsg     as a String as a constant
   @param   AScope     as a TScope as a constant
-  @param   strMethod  as a String as a constant
   @param   iLine      as an Integer as a constant
   @param   iCol       as an Integer as a constant
   @param   eErrorType as a TErrorType as a constant
 
 **)
-Constructor TDocIssue.Create(Const strMsg: String; Const AScope: TScope; Const strMethod: String;
-  Const iLine, iCol: Integer; Const eErrorType : TErrorType);
+Constructor TDocIssue.Create(Const strMsg: String; Const AScope: TScope; Const iLine, iCol: Integer;
+  Const eErrorType : TErrorType);
 
 Const
   strOutputFmt = '%4.4d';
@@ -155,7 +147,6 @@ Begin
   Inherited Create(Format(strOutputFmt, [iDocConflictCounter]), AScope, iLine, iCol, iImageIndex, Nil);
   Inc(iDocConflictCounter);
   FMsg := strMsg;
-  FMethod := strMethod;
   FErrorType := eErrorType;
 End;
 
@@ -183,6 +174,8 @@ End;
 
   @precon  None.
   @postcon Initialises the Conflict class.
+
+  @nometric LongParameterList
 
   @param   Args               as an Array Of Const as a constant
   @param   iIdentLine         as an Integer as a constant

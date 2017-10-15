@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       30 Apr 2017
+  @Date       15 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -100,7 +100,7 @@ Type
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
-    Function ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
+    Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
     { Properties }
   End;
 
@@ -601,7 +601,7 @@ begin
       End;
   Except
     On E : EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 'Goal', 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError);
   End;
 end;
 
@@ -631,13 +631,11 @@ begin
             Token.Line, Token.Column, iiPublicInterface, Nil));
           NextNonCommentToken
         End Else
-          ErrorAndSeekToken(strIdentExpected, 'Implements',
-            Token.Token, strSeekTokens, stActual);
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
       If Token.TokenType In [ttLineEnd] Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strLineEndExpected, 'Implements',
-          Token.Token, strSeekTokens, stActual);
+        ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
     End;
 end;
 
@@ -681,11 +679,9 @@ begin
               NextNonCommentToken;
               VBBegin(V);
             End Else
-              ErrorAndSeekToken(strLineEndExpected, 'Version',
-                Token.Token, strSeekTokens, stActual);
+              ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
         End Else
-          ErrorAndSeekToken(strNumberExpected, 'Version',
-            Token.Token, strSeekTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekTokens, stActual);
     End;
 end;
 
@@ -728,14 +724,12 @@ begin
         NextNonCommentToken;
         ProcessVar(V);
       End Else
-        ErrorAndSeekToken(strIdentExpected, 'Vars', Token.Token,
-          strSeekTokens, stActual);
+        ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
   Until Not IsToken(',', Nil);
   If Token.TokenType In [ttLineEnd] Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strLineEndExpected, 'Vars', Token.Token,
-      strSeekTokens, stActual);
+    ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
 end;
 
 (**
@@ -783,11 +777,9 @@ Begin
                       Container.AddToken(Token.Token);
                       NextNonCommentToken;
                     End Else
-                      ErrorAndSeekToken(strIdentExpected, 'VBBegin',
-                        Token.Token, strSeekTokens, stActual);
+                      ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
                 End Else
-                  ErrorAndSeekToken(strIdentExpected, 'VBBegin',
-                    Token.Token, strSeekTokens, stActual);
+                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
             End;
         End;
       If Token.TokenType In [ttLineEnd] Then
@@ -805,15 +797,12 @@ Begin
               If Token.TokenType In [ttLineEnd] Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLineEndExpected, 'VBBegin',
-                  Token.Token, strSeekTokens, stActual);
+                ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
             End
           Else
-            ErrorAndSeekToken(strReservedWordExpected, 'VBBegin',
-              'END', strSeekTokens, stActual);
+            ErrorAndSeekToken(strReservedWordExpected, 'END', strSeekTokens, stActual);
         End Else
-          ErrorAndSeekToken(strReservedWordExpected, 'VBBegin',
-            'BEGIN', strSeekTokens, stActual);
+          ErrorAndSeekToken(strReservedWordExpected, 'BEGIN', strSeekTokens, stActual);
     End;
 End;
 
@@ -877,8 +866,7 @@ begin
           If Token.TokenType In [ttIdentifier, ttDirective] Then
             AddToExpression(A)
           Else
-            ErrorAndSeekToken(strIdentExpected, 'Attribute',
-              Token.Token, strSeekTokens, stActual);
+            ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
         End;
       If Token.Token = '=' Then
         Begin
@@ -899,23 +887,18 @@ begin
                       If Token.TokenType In [ttLineEnd] Then
                         NextNonCommentToken
                       Else
-                        ErrorAndSeekToken(strLineEndExpected, 'Attribute',
-                          Token.Token, strSeekTokens, stActual);
+                        ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
                     End Else
-                      ErrorAndSeekToken(strNumberExpected, 'Attribute',
-                        Token.Token, strSeekTokens, stActual);
+                      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekTokens, stActual);
                 End Else
               If Token.TokenType In [ttLineEnd] Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLineEndExpected, 'Attribute',
-                  Token.Token, strSeekTokens, stActual);
+                ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
             End Else
-              ErrorAndSeekToken(strValueExpected, 'Attribute',
-                Token.Token, strSeekTokens, stActual);
+              ErrorAndSeekToken(strValueExpected, Token.Token, strSeekTokens, stActual);
         End Else
-          ErrorAndSeekToken(strLiteralExpected, 'Attribute',
-            '=', strSeekTokens, stActual);
+          ErrorAndSeekToken(strLiteralExpected, '=', strSeekTokens, stActual);
     End;
 end;
 
@@ -960,11 +943,9 @@ Begin
               If Token.TokenType In [ttLineEnd] Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLineEndExpected, 'Options', Token.Token,
-                  strSeekTokens, stActual);
+                ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
             End Else
-              ErrorAndSeekToken(strReservedWordExpected, 'Options',
-                '0 or 1', strSeekTokens, stActual);
+              ErrorAndSeekToken(strReservedWordExpected, '0 or 1', strSeekTokens, stActual);
         End Else
       If Token.UToken = 'COMPARE' Then
         Begin
@@ -977,11 +958,10 @@ Begin
               If Token.TokenType In [ttLineEnd] Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLineEndExpected, 'Options', Token.Token,
-                  strSeekTokens, stActual);
+                ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
             End Else
-              ErrorAndSeekToken(strReservedWordExpected, 'Options',
-                'BINARY, DATABASE or TEXT', strSeekTokens, stActual);
+              ErrorAndSeekToken(strReservedWordExpected, 'BINARY, DATABASE or TEXT', strSeekTokens,
+                stActual);
         End Else
       If Token.UToken = 'PRIVATE' Then
         Begin
@@ -994,11 +974,9 @@ Begin
               If Token.TokenType In [ttLineEnd] Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLineEndExpected, 'Options', Token.Token,
-                  strSeekTokens, stActual);
+                ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
             End Else
-              ErrorAndSeekToken(strReservedWordExpected, 'Options',
-                'MODULE', strSeekTokens, stActual);
+              ErrorAndSeekToken(strReservedWordExpected, 'MODULE', strSeekTokens, stActual);
         End Else
       If Token.UToken = 'EXPLICIT' Then
         Begin
@@ -1008,10 +986,9 @@ Begin
           If Token.TokenType In [ttLineEnd] Then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLineEndExpected, 'Options', Token.Token,
-              strSeekTokens, stActual);
+            ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
         End Else
-          ErrorAndSeekToken(strReservedWordExpected, 'Options',
+          ErrorAndSeekToken(strReservedWordExpected,
             'BASE, COMPARE, EXPLICIT or PRIVATE', strSeekTokens, stActual);
     End;
 End;
@@ -1052,8 +1029,7 @@ Begin
         If Token.TokenType In [ttLineEnd] Then
           NextNonCommentToken
         Else
-          ErrorAndSeekToken(strUnDefinedToken, 'Declarations', Token.Token,
-            strSeekTokens, stActual);
+          ErrorAndSeekToken(strUnDefinedToken, Token.Token, strSeekTokens, stActual);
   Until EndOfTokens;
 End;
 
@@ -1106,8 +1082,7 @@ Begin
         boolArray := True;
         NextNonCommentToken;
         If Token.Token <> ')' Then
-          ErrorAndSeekToken(strLiteralExpected, 'Parameters',
-            ')', strSeekTokens, stActual);
+          ErrorAndSeekToken(strLiteralExpected, ')', strSeekTokens, stActual);
         NextNonCommentToken;
       End;
     ParamType := Nil;
@@ -1139,8 +1114,7 @@ Begin
           If Token.Token = '=' Then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLiteralExpected, 'Parameters', '=',
-              strSeekTokens, stActual);
+            ErrorAndSeekToken(strLiteralExpected, '=', strSeekTokens, stActual);
           While (Token.Token <> ',') And (Token.Token <> ')') Do
             Begin
               DefaultValue := DefaultValue + Token.Token;
@@ -1283,15 +1257,13 @@ Begin
   If Token.Token = '(' Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strLiteralExpected, 'MethodDecl',
-      '(', strSeekTokens, stActual);
+    ErrorAndSeekToken(strLiteralExpected, '(', strSeekTokens, stActual);
   If Token.Token <> ')' Then
     Parameters(M);
   If Token.Token = ')' Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strLiteralExpected, 'MethodDecl',
-      ')', strSeekTokens, stActual);
+    ErrorAndSeekToken(strLiteralExpected, ')', strSeekTokens, stActual);
   If Token.UToken = 'AS' Then
     Begin
       NextNonCommentToken;
@@ -1317,18 +1289,15 @@ Begin
               If Token.Token = ')' Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLiteralExpected, 'MethodDecl',
-                  Token.Token, strSeekTokens, stActual);
+                ErrorAndSeekToken(strLiteralExpected, Token.Token, strSeekTokens, stActual);
             End;
         End Else
-          ErrorAndSeekToken(strIdentExpected, 'MethodDecl', Token.Token,
-            strSeekTokens, stActual);
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
     End;
   If Token.TokenType In [ttLineEnd] Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strLineEndExpected, 'MethodDecl', Token.Token,
-      strSeekTokens, stActual);
+    ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
 End;
 
 
@@ -1352,8 +1321,7 @@ begin
       If Token.TokenType In [ttLineEnd] Then
         NextToken
       Else
-        ErrorAndSeekToken(strLineEndExpected, 'NextNonCommentToken',
-          Token.Token, strSeekTokens, stActual);
+        ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
     End;
 end;
 
@@ -1441,14 +1409,13 @@ Begin
       End;
     If (CompareText(Token.Token, 'GOTO') = 0) And (CompareText(PrevToken.Token, 'ERROR') <> 0) Then
       AddIssue(Format(strKeywordGOTOFound, [AExceptionHnd.MethodName, Token.Line,
-        Token.Column]), scNone, 'FindMethodEnd', Token.Line, Token.Column, etHint);
+        Token.Column]), scNone, Token.Line, Token.Column, etHint);
   Until (PrevToken.UToken = 'END') And (Token.UToken = strMethodType);
   NextNonCommentToken;
   If Token.TokenType In [ttLineEnd] Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strLineEndExpected, 'FindMethodEnd', Token.Token,
-      strSeekTokens, stActual);
+    ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
 End;
 
 (**
@@ -1593,12 +1560,10 @@ Begin
                       If Token.TokenType In [ttIdentifier] Then
                         Con.AddToken(Token.Token)
                       Else
-                        ErrorAndSeekToken(strIdentExpected, 'Consts',
-                          Token.Token, strSeekTokens, stActual);
+                        ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
                     End;
                 End Else
-                  ErrorAndSeekToken(strIdentExpected, 'Consts',
-                    Token.Token, strSeekTokens, stActual);
+                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
             End;
           If Token.Token = '=' Then
             Begin
@@ -1609,12 +1574,10 @@ Begin
           If Token.TokenType In [ttLineEnd] then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLineEndExpected, 'Consts', Token.Token,
-              strSeekTokens, stActual);
+            ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
 
         End Else
-          ErrorAndSeekToken(strIdentExpected, 'Consts', Token.Token,
-            strSeekTokens, stActual);
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
     End;
 End;
 
@@ -1672,8 +1635,7 @@ begin
       If Not R Then
         R := Functions(Scope, C, False, FDeclaredMethodsLabel);
       If Not R Then
-        ErrorAndSeekToken(strReservedWordExpected, 'Declares', Token.Token,
-          strSeekTokens, stActual);
+        ErrorAndSeekToken(strReservedWordExpected, Token.Token, strSeekTokens, stActual);
     End;
 end;
 
@@ -1705,8 +1667,7 @@ begin
       If Not R Then
         R := Props(scFriend, C, True);
       If Not R Then
-        ErrorAndSeekToken(strReservedWordExpected, 'Friends',
-          'FUNCTION, SUB or PROPERTY', strSeekTokens, stActual);
+        ErrorAndSeekToken(strReservedWordExpected, 'FUNCTION, SUB or PROPERTY', strSeekTokens, stActual);
     End;
 end;
 
@@ -1744,8 +1705,7 @@ Begin
       Else If Token.UToken = 'LET' Then
         pt := ptLet
       Else
-        ErrorAndSeekToken(strReservedWordExpected, 'Props',
-          'GET, SET, or LET', strSeekTokens, stActual);
+        ErrorAndSeekToken(strReservedWordExpected, 'GET, SET, or LET', strSeekTokens, stActual);
       If pt In [ptGet, ptLet, ptSet] Then
         Begin
           NextNonCommentToken;
@@ -1764,8 +1724,7 @@ Begin
               If Token.Token = ')' Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLiteralExpected, 'Props',
-                  ')', strSeekTokens, stActual);
+                ErrorAndSeekToken(strLiteralExpected, ')', strSeekTokens, stActual);
               If Token.UToken = 'AS' Then
                 Begin
                   NextNonCommentToken;
@@ -1778,8 +1737,7 @@ Begin
                 End;
               FindMethodEnd(P, 'PROPERTY');
             End Else
-              ErrorAndSeekToken(strLiteralExpected, 'Props',
-                '(', strSeekTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, '(', strSeekTokens, stActual);
         End;
   End;
 End;
@@ -1845,8 +1803,7 @@ Begin
                       If Token.TokenType In [ttLineEnd] Then
                         NextNonCommentToken
                       Else
-                        ErrorAndSeekToken(strLineEndExpected, 'Vars', Token.Token,
-                          strSeekTokens, stActual);
+                        ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
                       {
                       If Token.UToken = 'AS' Then
                         Begin
@@ -1867,16 +1824,13 @@ Begin
                             'AS', strSeekTokens, stActual);
                       }
                     End Else
-                      ErrorAndSeekToken(strIdentExpected, 'Records',
-                        Token.Token, strSeekTokens, stActual);
+                      ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
                 End;
               Until False;
             End Else
-              ErrorAndSeekToken(strLineEndExpected, 'Records', Token.Token,
-                strSeekTokens, stActual);
+              ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
         End Else
-          ErrorAndSeekToken(strIdentExpected, 'Records',
-            Token.Token, strSeekTokens, stActual);
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
       NextNonCommentToken;
       If Token.UToken = 'TYPE' Then
         Begin
@@ -1884,28 +1838,24 @@ Begin
           If Token.TokenType In [ttLineEnd] then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLineEndExpected, 'Records', Token.Token,
-              strSeekTokens, stActual);
+            ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
         End Else
-          ErrorAndSeekToken(strReservedWordExpected, 'Records', 'TYPE',
-            strSeekTokens, stActual);
+          ErrorAndSeekToken(strReservedWordExpected, 'TYPE', strSeekTokens, stActual);
     End;
 End;
 
 (**
 
-  This method refernces symbols found in the code with respect to the variables,
-  constants and types.
+  This method refernces symbols found in the code with respect to the variables, constants and types.
 
   @precon  None.
-  @postcon Refernces symbols found in the code with respect to the variables,
-           constants and types.
+  @postcon Refernces symbols found in the code with respect to the variables, constants and types.
 
-  @param   AToken as a TTokenInfo
+  @param   AToken as a TTokenInfo as a constant
   @return  a Boolean
 
 **)
-function TVBModule.ReferenceSymbol(AToken: TTokenInfo): Boolean;
+Function TVBModule.ReferenceSymbol(Const AToken : TTokenInfo) : Boolean;
 
   (**
 
@@ -2043,19 +1993,19 @@ begin
     (M.Comment <> Nil) And (M.Comment.FindTag('noexception') > -1);
   If Not ExceptionHandler.HasPush And Not boolNoTag Then
     AddIssue(Format(strExceptionPush, [M.Identifier]), scNone,
-     'CheckExceptionHandling', M.Line, M.Column, etWarning);
+     M.Line, M.Column, etWarning);
   If (ExceptionHandler.PushName = '') And Not boolNoTag Then
     AddIssue(Format(strExceptionPushName, [M.Identifier]), scNone,
-    'CheckExceptionHandling', M.Line, M.Column, etWarning);
+    M.Line, M.Column, etWarning);
   If Not boolNoTag Then
     If CompareText(Format('"%s.%s"', [ModuleName, M.Identifier]),
       ExceptionHandler.PushName) <> 0 Then
       AddIssue(Format(strExceptionPushNameIncorrect,
         [ExceptionHandler.PushName, ModuleName, M.Identifier]), scNone,
-        'CheckExceptionHandling', M.Line, M.Column, etWarning);
+        M.Line, M.Column, etWarning);
   If Not ExceptionHandler.HasPop And Not boolNoTag Then
     AddIssue(Format(strExceptionPop, [M.Identifier]), scNone,
-      'CheckExceptionHandling', M.Line, M.Column, etWarning);
+      M.Line, M.Column, etWarning);
   // Check Exception Parameters
   boolNoTag :=
     (Comment <> Nil) And (Comment.FindTag('noexception') > -1) Or
@@ -2067,28 +2017,24 @@ begin
         iIndex := ExceptionHandler.PushParams.IndexOf(M.Parameters[i].Identifier);
         If iIndex = -1 Then
           AddIssue(Format(strExceptionPushParameter, [M.Parameters[i].Identifier,
-            ModuleName, M.Identifier]), scNone, 'CheckExceptionHandling', M.Line,
-            M.Column, etWarning)
+            ModuleName, M.Identifier]), scNone, M.Line, M.Column, etWarning)
         Else if iIndex <> i Then
           AddIssue(Format(strExceptionPushParamPos, [M.Parameters[i].Identifier,
-            ModuleName, M.Identifier, i, iIndex]), scNone, 'CheckExceptionHandling', M.Line,
-            M.Column, etWarning);
+            ModuleName, M.Identifier, i, iIndex]), scNone, M.Line, M.Column, etWarning);
       End;
   If Not boolNoTag Then
     If M.ParameterCount <> ExceptionHandler.PushParams.Count Then
       AddIssue(Format(strExceptionPushParamCount, [ModuleName, M.Identifier,
         M.ParameterCount, ExceptionHandler.PushParams.Count]), scNone,
-        'CheckExceptionHandling', M.Line, M.Column, etWarning);
+        M.Line, M.Column, etWarning);
   // Check Error Handling
   boolNoTag :=
     (Comment <> Nil) And (Comment.FindTag('noerror') > -1) Or
     (M.Comment <> Nil) And (M.Comment.FindTag('noerror') > -1);
   If Not ExceptionHandler.HasErrorHnd And Not boolNoTag Then
-    AddIssue(Format(strErrorHandling, [M.Identifier]), scNone,
-      'CheckExceptionHandling', M.Line, M.Column, etWarning);
+    AddIssue(Format(strErrorHandling, [M.Identifier]), scNone, M.Line, M.Column, etWarning);
   If ExceptionHandler.HasExit And ExceptionHandler.HasErrorHnd And Not boolNoTag Then
-    AddIssue(Format(strExitStatement, [M.Identifier]), scNone,
-      'CheckExceptionHandling', ExceptionHandler.ExitLine,
+    AddIssue(Format(strExitStatement, [M.Identifier]), scNone, ExceptionHandler.ExitLine,
       ExceptionHandler.ExitCol, etWarning);
 end;
 
@@ -2160,17 +2106,17 @@ begin
                   NextNonCommentToken;
                 end
                 else
-                  ErrorAndSeekToken(strNumberExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+                  ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekTokens, stActual);
               end;
               Variable.AddDimension(strLow, strHigh);
             end
             else
-              ErrorAndSeekToken(strNumberExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+              ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekTokens, stActual);
           until not IsToken(',', nil);
           if Token.Token = ')' then
             NextNonCommentToken
           else
-            ErrorAndSeekToken(strLiteralExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+            ErrorAndSeekToken(strLiteralExpected, Token.Token, strSeekTokens, stActual);
         end
         else
         begin
@@ -2194,18 +2140,18 @@ begin
         if Token.TokenType in [ttNumber] then
           AddToExpression(Variable)
         else
-          ErrorAndSeekToken(strNumberExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekTokens, stActual);
       end;
     end
     else
-      ErrorAndSeekToken(strIdentExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+      ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
     if Token.Token = '.' then
     begin
       AddToExpression(Variable);
       if Token.TokenType in [ttIdentifier, ttReservedWord] then
         AddToExpression(Variable)
       else
-        ErrorAndSeekToken(strIdentExpected, 'Vars', Token.Token, strSeekTokens, stActual);
+        ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
     end;
   end;
 end;
@@ -2262,24 +2208,19 @@ Begin
                             Begin
                               AddToExpression(I);
                             End Else
-                              ErrorAndSeekToken(strNumberExpected, 'Enums',
-                                Token.Token, strSeekTokens, stActual);
+                              ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekTokens, stActual);
                         End;
                       If Token.TokenType In [ttLineEnd] then
                         NextNonCommentToken
                       Else
-                        ErrorAndSeekToken(strLineEndExpected, 'Enums',
-                          Token.Token, strSeekTokens, stActual);
+                        ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
                     End Else
-                      ErrorAndSeekToken(strIdentExpected, 'Enums',
-                        Token.Token, strSeekTokens, stActual);
+                      ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
                 End;
             End Else
-              ErrorAndSeekToken(strLineEndExpected, 'Enums', Token.Token,
-                strSeekTokens, stActual);
+              ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
         End Else
-          ErrorAndSeekToken(strIdentExpected, 'Enums',
-            Token.Token, strSeekTokens, stActual);
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
       NextNonCommentToken;
       If Token.UToken = 'ENUM' Then
         Begin
@@ -2287,11 +2228,9 @@ Begin
           If Token.TokenType In [ttLineEnd] then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLineEndExpected, 'Enums', Token.Token,
-              strSeekTokens, stActual);
+            ErrorAndSeekToken(strLineEndExpected, Token.Token, strSeekTokens, stActual);
         End Else
-          ErrorAndSeekToken(strReservedWordExpected, 'Enums', 'Enum',
-            strSeekTokens, stActual);
+          ErrorAndSeekToken(strReservedWordExpected, 'Enum', strSeekTokens, stActual);
     End;
 end;
 
@@ -2336,14 +2275,11 @@ Begin
               If Token.Token = ')' Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLiteralExpected, 'Events', ')',
-                  strSeekTokens, stActual);
+                ErrorAndSeekToken(strLiteralExpected, ')', strSeekTokens, stActual);
             End Else
-              ErrorAndSeekToken(strLiteralExpected, 'Events', '(',
-                strSeekTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, '(', strSeekTokens, stActual);
       End Else
-        ErrorAndSeekToken(strIdentExpected, 'Events', Token.Token,
-          strSeekTokens, stActual);
+        ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekTokens, stActual);
     End;
 End;
 

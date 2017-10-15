@@ -103,13 +103,8 @@ Var
 **)
 Function TDocIssue.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean): String;
 
-Const
-  strOutputFmt = ' [%s]';
-
 Begin
   Result := FMsg;
-  If doShowParserErrorOrigin In BADIOptions.Options Then
-    Result := Result + Format(strOutputFmt, [FMethod]);
 End;
 
 (**

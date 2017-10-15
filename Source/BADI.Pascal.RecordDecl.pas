@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Pascal.RecordDecl;
@@ -30,12 +30,12 @@ Type
     FHelperClass  : String;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(const strName : String; AScope : TScope; iLine,
-      iColumn : Integer; iImageIndex : TBADIImageIndex; AComment : TComment); Override;
+    Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer; Const iImageIndex : TBADIImageIndex; Const AComment : TComment); Override;
     Destructor Destroy; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
-    Function  AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
-    Function  ReferenceSymbol(AToken : TTokenInfo) : Boolean; Override;
+    Function  AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function  ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
     (**
       Returns whether the record is packed or not.
       @precon  None.
@@ -88,12 +88,12 @@ Uses
   @precon  None .
   @postcon Returns the name of the record + '= Record '.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TRecordDecl.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TRecordDecl.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 Var
   iToken: Integer;
@@ -133,15 +133,15 @@ End;
   @postcon Initialises the class.
 
   @param   strName     as a String as a constant
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   iImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   iImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-constructor TRecordDecl.Create(const strName : String; AScope : TScope; iLine,
-  iColumn : Integer; iImageIndex : TBADIImageIndex; AComment : TComment);
+Constructor TRecordDecl.Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer; Const iImageIndex : TBADIImageIndex; Const AComment : TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, iImageIndex, AComment);
   FPacked := False;
@@ -190,17 +190,16 @@ End;
 
 (**
 
-  This method searches for reference to the passed symbol in the records
-  fields.
+  This method searches for reference to the passed symbol in the records fields.
 
   @precon  None.
   @postcon Returns true if the symbol is found.
 
-  @param   AToken as a TTokenInfo
+  @param   AToken as a TTokenInfo as a constant
   @return  a Boolean
 
 **)
-Function TRecordDecl.ReferenceSymbol(AToken : TTokenInfo) : Boolean;
+Function TRecordDecl.ReferenceSymbol(Const AToken : TTokenInfo) : Boolean;
 
 Begin
   Result := ReferenceSection(AToken, FFieldsLabel);

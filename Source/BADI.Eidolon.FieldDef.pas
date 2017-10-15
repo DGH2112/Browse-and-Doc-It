@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Eidolon.FieldDef;
@@ -29,9 +29,9 @@ Type
     FPrimaryKey : Boolean;
     FSheetIndex : Integer;
   Public
-    Constructor Create(const strName : String; AScope : TScope; iLine,
-      iColumn : Integer; AImageIndex : TBADIImageIndex; AComment : TComment); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       This property gets and sets the output name of the field.
       @precon  None.
@@ -81,13 +81,12 @@ Uses
   @precon  None.
   @postcon Returns string representation of the Field Definition.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TFieldDef.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
+function TFieldDef.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Const
   strFieldType : Array[Low(TFieldType)..High(TFieldType)] Of String = (
@@ -137,15 +136,15 @@ end;
   @postcon Defaults the field type to text with a width of 255 characters.
 
   @param   strName     as a String as a constant
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-constructor TFieldDef.Create(const strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
+constructor TFieldDef.Create(const strName: String; Const AScope: TScope; Const iLine,
+  iColumn: Integer; Const AImageIndex: TBADIImageIndex; Const AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FFieldType := ftText;

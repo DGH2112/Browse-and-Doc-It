@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Mar 2017
+  @Date    15 Oct 2017
 
 **)
 Unit BADI.VB.PropertyDecl;
@@ -32,7 +32,7 @@ Type
     Constructor Create(APropertyType : TVBPropertyType; strName : String;
       AScope : TScope; iLine, iCol : Integer; iImageIndex : TBADIImageIndex;
       AComment : TComment); Reintroduce; Virtual;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     (**
       This property gets and sets the type of visula basic property.
@@ -66,12 +66,12 @@ Uses
   @precon  None .
   @postcon Returns a string representation of a visual basic property .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TVBProperty.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TVBProperty.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 Var
   i: Integer;
@@ -120,14 +120,12 @@ Begin
   If PropertyType In [ptGet] Then
     Begin
       If ReturnType = Nil Then
-        AddIssue(Format(strProperyRequiresReturn, [Identifier]), scNone,
-          'CheckDocumentation', Line, Column, etWarning);
+        AddIssue(Format(strProperyRequiresReturn, [Identifier]), scNone, Line, Column, etWarning);
     End
   Else
     Begin
       If ParameterCount = 0 Then
-        AddIssue(Format(strProperyRequireParam, [Identifier]), scNone,
-          'CheckDocumentation', Line, Column, etWarning);
+        AddIssue(Format(strProperyRequireParam, [Identifier]), scNone, Line, Column, etWarning);
     End;
 End;
 

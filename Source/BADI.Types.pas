@@ -451,6 +451,9 @@ Type
       Const setTagProperties : TBADITagProperties);
   End;
 
+  (** An enumerate to define the type of the metric or check. **)
+  TBADIMetricChecksType = (mctMetric, mctCheck);
+
   (** An enumerate to descibe each of the metrics. **)
   TBADIModuleMetric = (
     mmLongMethods,
@@ -490,12 +493,13 @@ Type
 
   (** A record to describe the attributes of each metric. **)
   TBADIMetricRecord = Record
-    FName        : String;
-    FDescription : String;
-    FEnabled     : Boolean;
-    FLimit       : Double;
-    FLimitType   : TBADILimitType;
-    FSubItem     : Boolean;
+    FMetricCheckType : TBADIMetricChecksType;
+    FName            : String;
+    FDescription     : String;
+    FEnabled         : Boolean;
+    FLimit           : Double;
+    FLimitType       : TBADILimitType;
+    FSubItem         : Boolean;
   End;
 
 Implementation

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Eidolon.Line;
@@ -29,9 +29,9 @@ Type
     FLineEndSize : TLineEndSize;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(const strName: String; AScope : TScope; iLine, iColumn : Integer;
-      AImageIndex : TBADIImageIndex; AComment: TComment); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Constructor Create(Const strName: String; Const AScope : TScope; Const iLine, iColumn : Integer;
+      Const AImageIndex : TBADIImageIndex; Const AComment: TComment); Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
       A property to get and set the Line Start Type.
       @precon  None.
@@ -74,12 +74,12 @@ Uses
   @precon  None.
   @postcon Returns a string representation of the line.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TLine.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TLine.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 begin
   Result := Inherited AsString(boolShowIdentifier, boolForDocumentation);
   If (LineStartType <> atNone) Or (LineEndType <> atNone) Then
@@ -99,15 +99,15 @@ end;
   @postcon Creates an intsance of the TLine class initialising the properties.
 
   @param   strName     as a String as a constant
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-constructor TLine.Create(const strName: String; AScope: TScope; iLine, iColumn: Integer;
-  AImageIndex: TBADIImageIndex; AComment: TComment);
+Constructor TLine.Create(Const strName: String; Const AScope : TScope; Const iLine, iColumn : Integer;
+      Const AImageIndex : TBADIImageIndex; Const AComment: TComment);
 begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);
   FLineStartType := atNone;

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Pascal.InterfaceDecl;
@@ -23,7 +23,7 @@ Type
     {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Procedure CheckDocumentation(Var boolCascade: Boolean); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
     (**
       Returns the GUID for the interface.
       @precon  None.
@@ -48,12 +48,12 @@ uses
   @precon  None.
   @postcon Returns the Interface declaration with the heritage.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TInterfaceDecl.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TInterfaceDecl.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 Var
   iToken: Integer;
 Begin

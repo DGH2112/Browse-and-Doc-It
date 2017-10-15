@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.DFM.Item;
@@ -26,9 +26,9 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetName: String; Override;
   Public
-    Constructor Create(Const strName: String; AScope: TScope; iLine,
-      iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment); Override;
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Constructor Create(Const strName: String; Const AScope: TScope; Const iLine,
+      iColumn: Integer; Const AImageIndex: TBADIImageIndex; Const AComment: TComment); Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
   End;
 
 Implementation
@@ -43,13 +43,12 @@ Uses
   @precon  None.
   @postcon Returns a string representation of the item.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TDFMItem.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
+Function TDFMItem.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
   Result := 'Item';
@@ -63,15 +62,15 @@ End;
   @postcon Creates a unique name for the item.
 
   @param   strName     as a String as a constant
-  @param   AScope      as a TScope
-  @param   iLine       as an Integer
-  @param   iColumn     as an Integer
-  @param   AImageIndex as a TBADIImageIndex
-  @param   AComment    as a TComment
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
 
 **)
-Constructor TDFMItem.Create(Const strName: String; AScope: TScope; iLine,
-  iColumn: Integer; AImageIndex: TBADIImageIndex; AComment: TComment);
+Constructor TDFMItem.Create(Const strName: String; Const AScope: TScope; Const iLine,
+  iColumn: Integer; Const AImageIndex: TBADIImageIndex; Const AComment: TComment);
 
 Begin
   Inherited Create(strName, AScope, iLine, iColumn, AImageIndex, AComment);

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    15 Oct 2017
 
 **)
 Unit BADI.Pascal.TypeDecl;
@@ -21,7 +21,7 @@ Type
     FIsTyped: Boolean;
     {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
     (**
       This property determines whether the type is typed or not.
       @precon  None.
@@ -50,7 +50,7 @@ Type
     {$IFDEF D2005} Strict {$ENDIF} Private
     {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
   End;
 
 (** This is a sub class for Variant types **)
@@ -130,7 +130,7 @@ Type
     FDimensions: Integer;
     {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String; Override;
     Procedure AddDimension;
     (**
       This property defines the number of dmiensions that the array contains.
@@ -161,16 +161,18 @@ Uses
   @precon  None.
   @postcon A string representation of the class is returned.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TAnonymousReferenceType.AsString(boolShowIdentifier, boolForDocumentation
-  : Boolean): String;
+Function TAnonymousReferenceType.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
+
+Const
+  strRefTo = ' = Reference To ';
 
 Begin
-  Result := Identifier + ' = Reference To ' + Inherited AsString(False, boolForDocumentation);
+  Result := Identifier + strRefTo + Inherited AsString(False, boolForDocumentation);
 End;
 
 (**
@@ -196,12 +198,12 @@ End;
   @precon  None .
   @postcon Returns a string representation of the type .
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TArrayType.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TArrayType.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Begin
   Result := BuildStringRepresentation(boolShowIdentifier And (Identifier <> ''),
@@ -214,15 +216,14 @@ End;
   This is a getter method for the AsString property.
 
   @precon  None.
-  @postcon Returns a type formatted with an equals sign between the name and
-           the definition.
+  @postcon Returns a type formatted with an equals sign between the name and the definition.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TTypes.AsString(boolShowIdentifier, boolForDocumentation: Boolean): String;
+Function TTypes.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 Const
   (** A string represetnation of whether a type is typed. **)

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Mar 2017
+  @Date    12 Oct 2017
 
 **)
 Unit BADI.Eidolon.DBTable;
@@ -25,7 +25,7 @@ Type
     FPrimary: TLabelContainer;
     FSecondary: TLabelContainer;
   Public
-    Function AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Function AddPrimary(DBConnection : TDBConnection) : TDBConnection;
     Function AddSecondary(DBConnection : TDBConnection) : TDBConnection;
   End;
@@ -85,13 +85,12 @@ end;
   @precon  None.
   @postcon Returns string representation of the database table definition.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-function TDBTable.AsString(boolShowIdentifier,
-  boolForDocumentation: Boolean): String;
+function TDBTable.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
 
 begin
   Result := Identifier + '=Class(DBTable)';

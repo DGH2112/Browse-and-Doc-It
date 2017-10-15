@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    30 Apr 2017
+  @Date    15 Oct 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -35,8 +35,6 @@ Type
     FTickList : TObjectList;
     FModuleName : String;
     FBodyComment : TObjectList;
-    FModuleNameCol: Integer;
-    FModuleNameLine: Integer;
     FFileName: String;
     FModified : Boolean;
     FCompilerDefs : TStringList;
@@ -75,7 +73,7 @@ Type
     Function  GetModuleName : String; Virtual;
     function  GetBytes: Int64;
     function  GetLines: Integer;
-    Procedure ErrorAndSeekToken(const strMsg, strMethod, strParam : String;
+    Procedure ErrorAndSeekToken(const strMsg, strParam : String;
       SeekTokens: Array Of String; SeekToken : TSeekToken);
     Function GetHighPerformanceTickCount : Double;
     (**
@@ -131,7 +129,7 @@ Type
     Procedure CheckDocumentation(var boolCascade : Boolean); Override;
     Function  ReservedWords : TKeyWords; Virtual; Abstract;
     Function  Directives : TKeyWords; Virtual; Abstract;
-    Function  AsString(boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
+    Function  AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Procedure AddToExpression(Container : TElementContainer);
     function  IsToken(const strToken: String; Container: TElementContainer): Boolean;
     Procedure AddBodyComment(C : TComment);
@@ -194,20 +192,6 @@ Type
       @return  an Integer
     **)
     Property BodyCommentCount : Integer Read GetBodyCommentCount;
-    (**
-      Returns the line number of the modules name.
-      @precon  None.
-      @postcon Returns the line number of the modules name.
-      @return  an Integer
-    **)
-    Property ModuleNameLine : Integer Read FModuleNameLine Write FModuleNameLine;
-    (**
-      Returns the column number of the module name.
-      @precon  None.
-      @postcon Returns the column number of the module name.
-      @return  an Integer
-    **)
-    Property ModuleNameCol : Integer Read FModuleNameCol Write FModuleNameCol;
     (**
       This property returns the file name of the module as passed to the
       constructor.
@@ -397,8 +381,6 @@ begin
   FTickList := TObjectList.Create(True);
   FBodyComment := TObjectList.Create(True);
   FModuleName := strFileName;
-  FModuleNameCol := 0;
-  FModuleNameLine := 0;
   FCompilerDefs := TStringList.Create;
   FCompilerDefs.Duplicates := dupIgnore;
   {$IFDEF D0006}
@@ -566,16 +548,14 @@ End;
   This is a getter method for the AsString property.
 
   @precon  None.
-  @postcon Override and default GetAsString method and returns the name of the
-           module.
+  @postcon Override and default GetAsString method and returns the name of the module.
 
-  @param   boolShowIdentifier   as a Boolean
-  @param   boolForDocumentation as a Boolean
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TBaseLanguageModule.AsString(boolShowIdentifier,
-     boolForDocumentation : Boolean) : String;
+Function TBaseLanguageModule.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
 begin
   Result := ExtractFileName(Name);
@@ -812,8 +792,8 @@ Function TBaseLanguageModule.GetToken : TTokenInfo;
 Begin
   If FTokenIndex >= TokenCount Then
     Begin
-      AddIssue(strUnExpectedEndOfFile, scNone, 'GetToken', 0, 0, etError);
-      Raise EBADIParserAbort.Create('Parsing Aborted!');
+      AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError);
+      Raise EBADIParserAbort.Create(strParsingAborted);
     End;
   Result := Tokens[FTokenIndex] As TTokenInfo;
 End;
@@ -861,13 +841,12 @@ End;
            one of the passed tokens.
 
   @param   strMsg      as a String as a Constant
-  @param   strMethod   as a String as a Constant
   @param   strParam    as a String as a Constant
   @param   SeekTokens  as an Array Of string
   @param   SeekToken   as a TSeekToken
 
 **)
-Procedure TBaseLanguageModule.ErrorAndSeekToken(const strMsg, strMethod, strParam : String;
+Procedure TBaseLanguageModule.ErrorAndSeekToken(const strMsg, strParam : String;
   SeekTokens: Array Of String; SeekToken : TSeekToken);
 
   (**
@@ -896,13 +875,13 @@ Procedure TBaseLanguageModule.ErrorAndSeekToken(const strMsg, strMethod, strPara
 Begin
   Case StringCount(strMsg) Of
     0: AddIssue(Format(strMsg, [Token.Line, Token.Column]),
-           scGlobal, strMethod, Token.Line, Token.Column, etError);
+           scGlobal, Token.Line, Token.Column, etError);
     1: AddIssue(Format(strMsg, [strParam, Token.Line, Token.Column]),
-           scGlobal, strMethod, Token.Line, Token.Column, etError);
+           scGlobal, Token.Line, Token.Column, etError);
     2: AddIssue(Format(strMsg, [strParam, Token.Token, Token.Line,
-         Token.Column]), scGlobal, strMethod, Token.Line, Token.Column, etError);
+         Token.Column]), scGlobal, Token.Line, Token.Column, etError);
   Else
-    AddIssue(strNotEnoughStrings, scGlobal, strMethod, Token.Line, Token.Column, etError);
+    AddIssue(strNotEnoughStrings, scGlobal, Token.Line, Token.Column, etError);
   End;
   NextNonCommentToken;
   While Not IsKeyWord(Token.Token, SeekTokens) Do
@@ -1094,8 +1073,8 @@ Begin
         Dec(FTokenIndex);
       If FTokenIndex < 0 Then
         Begin
-          AddIssue(strUnExpectedStartOfFile, scNone, 'RollBackToken', 0, 0, etError);
-          Raise EBADIParserAbort.Create('Parsing Aborted!');
+          AddIssue(strUnExpectedStartOfFile, scNone, 0, 0, etError);
+          Raise EBADIParserAbort.Create(strParsingAborted);
         End;
     End;
 End;
@@ -1132,7 +1111,7 @@ Begin
     End;
   If doShowUndocumentedModule In BADIOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
-      AddDocumentConflict([], ModuleNameLine, ModuleNameCol, Comment,
+      AddDocumentConflict([], Line, Column, Comment,
         strModuleDocumentation, DocConflictTable[dctModuleMissingDocumentation]);
   If Comment <> Nil Then
     Begin
@@ -1141,7 +1120,7 @@ Begin
           i := Comment.FindTag('date');
           If (i = -1) Or (Comment.Tag[i].TokenCount = 0) Then
             AddDocumentConflict([FormatDateTime('dd mmm yyyy', Now)],
-              ModuleNameLine, ModuleNameCol, Comment,
+              Line, Column, Comment,
               strModuleDocumentation, DocConflictTable[dctModuleMissingDate])
           Else
             Begin
@@ -1172,14 +1151,14 @@ Begin
         Begin
           i := Comment.FindTag('version');
           If (i = -1) Or (Comment.Tag[i].TokenCount = 0) Then
-            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, Comment,
+            AddDocumentConflict([], Line, Column, Comment,
               strModuleDocumentation, DocConflictTable[dctModuleMissingVersion])
         End;
       If (doShowMissingModuleAuthor In BADIOptions.Options) Then
         Begin
           i := Comment.FindTag('author');
           If (i = -1) Or (Comment.Tag[i].TokenCount = 0) Then
-            AddDocumentConflict([], ModuleNameLine, ModuleNameCol, Comment,
+            AddDocumentConflict([], Line, Column, Comment,
               strModuleDocumentation, DocConflictTable[dctModuleMissingAuthor])
         End;
     End;

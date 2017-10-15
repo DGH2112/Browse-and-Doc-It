@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    11 Apr 2017
+  @Date    15 Oct 2017
   @Version 1.0
 
 **)
@@ -26,14 +26,14 @@ Uses
 Type
   {$INCLUDE 'CompilerDefinitions.inc'}
 (** This is a procedure to return the success of the parse in the thread. **)
-  TParserNotify = Procedure(boolSuccessfulParse: Boolean) Of Object;
+  TParserNotify = Procedure(Const boolSuccessfulParse: Boolean) Of Object;
   (** This is a procedure to allow the thread to get information from the
       calling IDE. **)
   TEditorInformation = Function(Var strFileName: String; Var boolModified: Boolean)
     : String Of Object;
   (** This is a procedure to allow the thread to render the module in the
       calling IDEs main thread. **)
-  TRenderDocumentTree = Procedure(Module: TBaseLanguageModule) Of Object;
+  TRenderDocumentTree = Procedure(Const Module: TBaseLanguageModule) Of Object;
   (** This is a procedure to allow the thread to display an error message in
       the calling IDEs main thread. **)
   TThreadExceptionMsg = Procedure(Const strExceptionMsg: String) Of Object;
@@ -50,9 +50,9 @@ Type
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    Function Parse(SuccessfulParseProc: TParserNotify; EditorInfo: TEditorInformation;
-      RenderDocumentTree: TRenderDocumentTree;
-      ThreadExceptionMsg: TThreadExceptionMsg): Boolean;
+    Function Parse(Const SuccessfulParseProc: TParserNotify; Const EditorInfo: TEditorInformation;
+      Const RenderDocumentTree: TRenderDocumentTree;
+      Const ThreadExceptionMsg: TThreadExceptionMsg): Boolean;
   End;
 
   (** A record to describe the start, end and markers for different comment
@@ -64,18 +64,19 @@ Type
     FLineEnd: String;
   End;
 
-  Function FindFunction(iLine: Integer; Container: TElementContainer;
-    ContainerClass: TGenericFunctionClass): TGenericFunction;
-  Function Description(Func: TGenericFunction; iIndent: Integer; boolPadOut: Boolean;
-    Var CursorAdjust: TPoint; iMaxCommentWidth: Integer): String;
-  Function Indent(Const strText: String; iIndent: Integer): String;
-  Function OutputTag(iIndent: Integer; Tag: TTag; iMaxCommentWidth: Integer): String;
-  Function WriteComment(Func: TGenericFunction; CommentType: TCommentType; iIndent: Integer;
-    boolPadOut: Boolean; Var CursorDelta: TPoint; iMaxCommentWidth: Integer): String;
-  Function FindIndentOfFirstTokenOnLine(Module: TBaseLanguageModule;
-    iLine: Integer): Integer;
-  Function BuildBlockComment(CommentType: TCommentType; CommentStyle: TCommentStyle;
-    iIndent: Integer; Const strSelectedText: String): String;
+  Function FindFunction(Const iLine: Integer; Const Container: TElementContainer;
+    Const ContainerClass: TGenericFunctionClass): TGenericFunction;
+  Function Description(Const Func: TGenericFunction; Const iIndent: Integer; Const boolPadOut: Boolean;
+    Var CursorAdjust: TPoint; Const iMaxCommentWidth: Integer): String;
+  Function Indent(Const strText: String; Const iIndent: Integer): String;
+  Function OutputTag(Const iIndent: Integer; Const Tag: TTag; Const iMaxCommentWidth: Integer): String;
+  Function WriteComment(Const Func: TGenericFunction; Const CommentType: TCommentType;
+    Const iIndent: Integer; Const boolPadOut: Boolean; Var CursorDelta: TPoint;
+    Const iMaxCommentWidth: Integer): String;
+  Function FindIndentOfFirstTokenOnLine(Const Module: TBaseLanguageModule;
+    Const iLine: Integer): Integer;
+  Function BuildBlockComment(Const CommentType: TCommentType; Const CommentStyle: TCommentStyle;
+    Const iIndent: Integer; Const strSelectedText: String): String;
 
 Const
   (** A simple array for outputting a or an. **)
@@ -130,9 +131,9 @@ Type
     Procedure RenderModuleExplorer;
     Procedure ShowException;
   Public
-    Constructor CreateBrowseAndDocItThread(EditorInfo: TEditorInformation;
-      RenderDocumentTree: TRenderDocumentTree; ThreadExceptionMsg: TThreadExceptionMsg;
-      TerminateThread: TNotifyEvent);
+    Constructor CreateBrowseAndDocItThread(Const EditorInfo: TEditorInformation;
+      Const RenderDocumentTree: TRenderDocumentTree; Const ThreadExceptionMsg: TThreadExceptionMsg;
+      Const TerminateThread: TNotifyEvent);
     Destructor Destroy; Override;
     (**
       This property gets and sets the SuccessfulParse variable of the thread.
@@ -167,22 +168,21 @@ Const
 
 (**
 
-  This method recursively works throug the hierarchy of elements looking for the
-  method which is closest to be on or just above the current cursor line.
+  This method recursively works throug the hierarchy of elements looking for the method which is closest
+  to be on or just above the current cursor line.
 
   @precon  Container must be a valid TElementContainer instance.
-  @postcon Recursively works throug the hierarchy of elements looking for the
-           method which is closest to be on or just above the current cursor
-           line.
+  @postcon Recursively works throug the hierarchy of elements looking for the method which is closest to
+           be on or just above the current cursor line.
 
-  @param   iLine          as an Integer
-  @param   Container      as a TElementContainer
-  @param   ContainerClass as a TGenericFunctionClass
-  @return  a TgenericFunction
+  @param   iLine          as an Integer as a constant
+  @param   Container      as a TElementContainer as a constant
+  @param   ContainerClass as a TGenericFunctionClass as a constant
+  @return  a TGenericFunction
 
 **)
-Function FindFunction(iLine: Integer; Container: TElementContainer;
-  ContainerClass: TGenericFunctionClass): TGenericFunction;
+Function FindFunction(Const iLine: Integer; Const Container: TElementContainer;
+  Const ContainerClass: TGenericFunctionClass): TGenericFunction;
 
 Var
   i: Integer;
@@ -230,24 +230,23 @@ End;
 
 (**
 
-  This method returns a description for the method if it is a constructor,
-  destructor, getter or setter method, else it returns an empty String.
+  This method returns a description for the method if it is a constructor, destructor, getter or setter
+  method, else it returns an empty String.
 
   @precon  Method is a valid instance of a method declatation to be described.
-  @postcon Returns a description of the method is applicable. CursorAdjust
-           provide delta movements for the cursor from column 1 if the first
-           line of the new comment.
+  @postcon Returns a description of the method is applicable. CursorAdjust provide delta movements for
+           the cursor from column 1 if the first line of the new comment.
 
-  @param   Func             as a TGenericFunction
-  @param   iIndent          as an Integer
-  @param   boolPadOut       as a Boolean
+  @param   Func             as a TGenericFunction as a constant
+  @param   iIndent          as an Integer as a constant
+  @param   boolPadOut       as a Boolean as a constant
   @param   CursorAdjust     as a TPoint as a reference
-  @param   iMaxCommentWidth as an Integer
+  @param   iMaxCommentWidth as an Integer as a constant
   @return  a String
 
 **)
-Function Description(Func: TGenericFunction; iIndent: Integer; boolPadOut: Boolean;
-  Var CursorAdjust: TPoint; iMaxCommentWidth: Integer): String;
+Function Description(Const Func: TGenericFunction; Const iIndent: Integer; Const boolPadOut: Boolean;
+  Var CursorAdjust: TPoint; Const iMaxCommentWidth: Integer): String;
 
 Var
   i             : Integer;
@@ -344,12 +343,12 @@ End;
   @precon  None.
   @postcon Returns an indented version of the passed text.
 
-  @param   strText as a String as a Constant
-  @param   iIndent as an Integer
+  @param   strText as a String as a constant
+  @param   iIndent as an Integer as a constant
   @return  a String
 
 **)
-Function Indent(Const strText: String; iIndent: Integer): String;
+Function Indent(Const strText: String; Const iIndent: Integer): String;
 
 Begin
   Result := StringOfChar(#32, iIndent) + StringReplace(strText, #13#10,
@@ -358,20 +357,20 @@ End;
 
 (**
 
-  This function returns the tag information indented and broken into line no
-  wider than iMaxCommentWidth characters.
+  This function returns the tag information indented and broken into line no wider than iMaxCommentWidth
+  characters.
 
   @precon  Tag must be a valid comment tag.
-  @postcon Returns the tag information indented and broken into line no wider
-           than iMaxCommentWidth characters.
+  @postcon Returns the tag information indented and broken into line no wider than iMaxCommentWidth
+           characters.
 
-  @param   iIndent          as an Integer
-  @param   Tag              as a TTag
-  @param   iMaxCommentWidth as an Integer
+  @param   iIndent          as an Integer as a constant
+  @param   Tag              as a TTag as a constant
+  @param   iMaxCommentWidth as an Integer as a constant
   @return  a String
 
 **)
-Function OutputTag(iIndent: Integer; Tag: TTag; iMaxCommentWidth: Integer): String;
+Function OutputTag(Const iIndent: Integer; Const Tag: TTag; Const iMaxCommentWidth: Integer): String;
 
 Var
   str: String;
@@ -398,20 +397,21 @@ End;
   This method writes the method comment to the active editor.
 
   @precon  Method is a valid instance of a method declaration to be commented.
-  @postcon The full comment to be inserted at the cursor is returns with the
-           new cursor position in Cursor.
+  @postcon The full comment to be inserted at the cursor is returns with the new cursor position in
+           Cursor.
 
-  @param   Func             as a TGenericFunction
-  @param   CommentType      as a TCommentType
-  @param   iIndent          as an Integer
-  @param   boolPadOut       as a Boolean
+  @param   Func             as a TGenericFunction as a constant
+  @param   CommentType      as a TCommentType as a constant
+  @param   iIndent          as an Integer as a constant
+  @param   boolPadOut       as a Boolean as a constant
   @param   CursorDelta      as a TPoint as a reference
-  @param   iMaxCommentWidth as an Integer
+  @param   iMaxCommentWidth as an Integer as a constant
   @return  a String
 
 **)
-Function WriteComment(Func: TGenericFunction; CommentType: TCommentType; iIndent: Integer;
-  boolPadOut: Boolean; Var CursorDelta: TPoint; iMaxCommentWidth: Integer): String;
+Function WriteComment(Const Func: TGenericFunction; Const CommentType: TCommentType;
+  Const iIndent: Integer; Const boolPadOut: Boolean; Var CursorDelta: TPoint;
+  Const iMaxCommentWidth: Integer): String;
 
   (**
 
@@ -420,10 +420,10 @@ Function WriteComment(Func: TGenericFunction; CommentType: TCommentType; iIndent
     @precon  None.
     @postcon Adds text to the resulting comment string.
 
-    @param   strText as a String
+    @param   strText as a String as a constant
 
   **)
-  Procedure AddToComment(strText: String);
+  Procedure AddToComment(Const strText: String);
 
   Begin
     Result := Result + strText;
@@ -535,20 +535,19 @@ End;
 
 (**
 
-  This function returns the column of the first token on the given line number,
-  i.e. the indentation of the code.
+  This function returns the column of the first token on the given line number, i.e. the indentation of
+  the code.
 
   @precon  Module must be a valid instance of a module that is parsed.
-  @postcon Returns the column of the first token on the given line number,
-           i.e. the indentation of the code.
+  @postcon Returns the column of the first token on the given line number, i.e. the indentation of the
+           code.
 
-  @param   Module as a TBaseLanguageModule
-  @param   iLine  as an Integer
+  @param   Module as a TBaseLanguageModule as a constant
+  @param   iLine  as an Integer as a constant
   @return  an Integer
 
 **)
-Function FindIndentOfFirstTokenOnLine(Module: TBaseLanguageModule;
-  iLine: Integer): Integer;
+Function FindIndentOfFirstTokenOnLine(Const Module: TBaseLanguageModule; Const iLine: Integer): Integer;
 
 Var
   iToken: Integer;
@@ -597,23 +596,21 @@ End;
 
 (**
 
-  This method parses the given code reference ONLY IF there is no current
-  parsing thread.
+  This method parses the given code reference ONLY IF there is no current parsing thread.
 
   @precon  None.
-  @postcon Parses the given code reference ONLY IF there is no current
-           parsing thread.
+  @postcon Parses the given code reference ONLY IF there is no current parsing thread.
 
-  @param   SuccessfulParseProc as a TParserNotify
-  @param   EditorInfo          as a TEditorInformation
-  @param   RenderDocumentTree  as a TRenderDocumentTree
-  @param   ThreadExceptionMsg  as a TThreadExceptionMsg
+  @param   SuccessfulParseProc as a TParserNotify as a constant
+  @param   EditorInfo          as a TEditorInformation as a constant
+  @param   RenderDocumentTree  as a TRenderDocumentTree as a constant
+  @param   ThreadExceptionMsg  as a TThreadExceptionMsg as a constant
   @return  a Boolean
 
 **)
-Function TBrowseAndDocItThreadManager.Parse(SuccessfulParseProc: TParserNotify;
-  EditorInfo: TEditorInformation; RenderDocumentTree: TRenderDocumentTree;
-  ThreadExceptionMsg: TThreadExceptionMsg): Boolean;
+Function TBrowseAndDocItThreadManager.Parse(Const SuccessfulParseProc: TParserNotify;
+  Const EditorInfo: TEditorInformation; Const RenderDocumentTree: TRenderDocumentTree;
+  Const ThreadExceptionMsg: TThreadExceptionMsg): Boolean;
 
 Begin
   Result               := False;
@@ -652,19 +649,18 @@ End;
   This is a constructor for the TBrowseAndDocItThread class.
 
   @precon  None.
-  @postcon Creates a suspended thread and sets up a stream with the contents of
-           the active editor and then resumed the thread in order to parse
-           the contents.
+  @postcon Creates a suspended thread and sets up a stream with the contents of the active editor and
+           then resumed the thread in order to parse the contents.
 
-  @param   EditorInfo          as a TEditorInformation
-  @param   RenderDocumentTree  as a TRenderDocumentTree
-  @param   ThreadExceptionMsg  as a TThreadExceptionMsg
-  @param   TerminateThread     as a TNotifyEvent
+  @param   EditorInfo         as a TEditorInformation as a constant
+  @param   RenderDocumentTree as a TRenderDocumentTree as a constant
+  @param   ThreadExceptionMsg as a TThreadExceptionMsg as a constant
+  @param   TerminateThread    as a TNotifyEvent as a constant
 
 **)
-Constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread
-  (EditorInfo: TEditorInformation; RenderDocumentTree: TRenderDocumentTree;
-  ThreadExceptionMsg: TThreadExceptionMsg; TerminateThread: TNotifyEvent);
+Constructor TBrowseAndDocItThread.CreateBrowseAndDocItThread(Const EditorInfo: TEditorInformation;
+  Const RenderDocumentTree: TRenderDocumentTree; Const ThreadExceptionMsg: TThreadExceptionMsg;
+  Const TerminateThread: TNotifyEvent);
 
 Begin
   FSuccessfulParse    := False;
@@ -687,6 +683,7 @@ End;
 
 **)
 Destructor TBrowseAndDocItThread.Destroy;
+
 Begin
   Inherited Destroy;
 End;
@@ -699,6 +696,8 @@ End;
   @precon  FMemoryStream must be a valid stream of chars to parse.
   @postcon Parses the code of the active editor stored in the memory stream and
            render the information in the explorer module.
+
+  @nometric ExceptionEating
 
 **)
 Procedure TBrowseAndDocItThread.Execute;
@@ -726,8 +725,10 @@ Begin
       Exit;
     On E: Exception Do
       Begin
-        {$IFDEF EUREKALOG_VER7}
-        ExceptionManager.StandardEurekaNotify(ExceptObject, ExceptAddr)
+        {$IFDEF EUREKALOG}
+        If IsEurekaLogInstalled Then
+          If IsEurekaLogActive Then
+            ExceptionManager.StandardEurekaNotify(ExceptObject, ExceptAddr)
         {$ELSE}
         FFileName := E.Message;
         Synchronize(ShowException);
@@ -771,13 +772,12 @@ Begin
   ThreadNameInfo.FName     := 'BrowseAndDocItThread';
   ThreadNameInfo.FThreadID := $FFFFFFFF;
   ThreadNameInfo.FFlags    := 0;
-  Try
-    RaiseException($406D1388, 0, sizeof(ThreadNameInfo) Div sizeof(LongWord),
-      @ThreadNameInfo);
-  Except
-    On E : Exception Do
-      OutputDebugString('Could not set Browse and Doc It thread name!');
-  End;
+  //Try
+    RaiseException($406D1388, 0, sizeof(ThreadNameInfo) Div sizeof(LongWord), @ThreadNameInfo);
+  //Except
+  //  On E : Exception Do
+  //    OutputDebugString('Could not set Browse and Doc It thread name!');
+  //End;
 End;
 
 (**
@@ -802,22 +802,20 @@ End;
 
 (**
 
-  This method returns a string representation of a comment of the type and
-  styles given.
+  This method returns a string representation of a comment of the type and styles given.
 
   @precon  None.
-  @postcon Returns a string representation of a comment of the type and styles 
-           given.
+  @postcon Returns a string representation of a comment of the type and styles given.
 
-  @param   CommentType     as a TCommentType
-  @param   CommentStyle    as a TCommentStyle
-  @param   iIndent         as an Integer
-  @param   strSelectedText as a String as a Constant
+  @param   CommentType     as a TCommentType as a constant
+  @param   CommentStyle    as a TCommentStyle as a constant
+  @param   iIndent         as an Integer as a constant
+  @param   strSelectedText as a String as a constant
   @return  a String
 
 **)
-Function BuildBlockComment(CommentType: TCommentType; CommentStyle: TCommentStyle;
-  iIndent: Integer; Const strSelectedText: String): String;
+Function BuildBlockComment(Const CommentType: TCommentType; Const CommentStyle: TCommentStyle;
+  Const iIndent: Integer; Const strSelectedText: String): String;
 
 Var
   strAllCmtStart, strBlockCmtEnd, strLineCmtEnd: String;

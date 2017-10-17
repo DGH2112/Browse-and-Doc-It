@@ -97,9 +97,13 @@ Type
     doShowWarnings,
     doShowHints,
     doShowConflicts,
-    doShowMetrics,
+    doShowChecksAndMetrics,
     doShowChildCountInTitles,
-    doExpandEWHCMs,
+    doExpandErrors,
+    doExpandWarnings,
+    doExpandHints,
+    doExpandDocConflicts,
+    doExpandChecksAndMetrics,
     doSyntaxHighlightErrors,
     doSyntaxHighlightWarnings,
     doSyntaxHighlightHints,
@@ -452,10 +456,11 @@ Type
   End;
 
   (** An enumerate to define the type of the metric or check. **)
-  TBADIMetricChecksType = (mctMetric, mctCheck);
+  TBADIMetricChecksType = (mctRoot, mctMetric, mctCheck);
 
   (** An enumerate to descibe each of the metrics. **)
   TBADIModuleMetric = (
+    mmRoot,
     mmLongMethods,
     mmLongParameterLists,
     mmLongMethodVariableLists,

@@ -24,12 +24,14 @@ object frameBADIModuleMetrics: TframeBADIModuleMetrics
     Header.ParentFont = True
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes, toAutoChangeScale]
-    TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick, toEditOnDblClick]
-    TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowRoot, toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
+    TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toWheelPanning, toEditOnClick, toEditOnDblClick]
+    TreeOptions.PaintOptions = [toShowDropmark, toShowHorzGridLines, toShowVertGridLines, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
     TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect]
+    OnBeforeItemErase = vstMetricsBeforeItemErase
     OnChecked = vstMetricsChecked
     OnEditing = vstMetricsEditing
     OnGetText = vstMetricsGetText
+    OnPaintText = vstMetricsPaintText
     OnHeaderClick = vstMetricsHeaderClick
     OnNewText = vstMetricsNewText
     Columns = <

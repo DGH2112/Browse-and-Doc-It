@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    15 Oct 2017
+  @date    19 Oct 2017
 
 **)
 Unit BADI.ModuleMetricsFrame;
@@ -37,6 +37,10 @@ Type
       NewText: String);
     Procedure vstMetricsHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
     procedure vstMetricsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure vstMetricsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas;
+      Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure vstMetricsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
+      Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
   Strict Private
   Strict Protected
     Procedure LoadSettings;
@@ -76,7 +80,7 @@ Const
   (** The column reference for the metric name. **)
   iMetricName = 1;
   (** The column reference for the metric limit. **)
-  iMetricLimt = 2;
+  iMetricLimit = 2;
 
 (**
 
@@ -92,6 +96,39 @@ Const
 **)
 Constructor TframeBADIModuleMetrics.Create(AOwner: TComponent);
 
+  (**
+
+    This method searches the tree view for a node with the given parent and if found returns the node
+    reference for that node else returns nil.
+
+    @precon  None.
+    @postcon Returns the node with the given parent else returns nil if not found.
+
+    @param   eMetric as a TBADIModuleMetric
+    @return  a PVirtualNode
+
+  **)
+  Function FindParent(eMetric : TBADIModuleMetric) : PVirtualNode;
+
+  Var
+    NodeData : PMetricNodeData;
+    N: PVirtualNode;
+
+  Begin
+    Result := Nil;
+    N := vstMetrics.GetFirst;
+    While Assigned(N) Do
+      Begin
+        NodeData := vstMetrics.GetNodeData(N);
+        If NodeData.FModuleMetric = eMetric Then
+          Begin
+            Result := N;
+            Break;
+          End;
+        N := vstMetrics.GetNext(N);
+      End;
+  End;
+
 Var
   eMetric: TBADIModuleMetric;
   N, P : PVirtualNode;
@@ -100,28 +137,21 @@ Var
 Begin
   Inherited Create(AOwner);
   vstMetrics.NodeDataSize := SizeOf(TMetricNodeData);
-  P := Nil;
   For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
     Begin
-      If Not DefaultModuleMetrics[eMetric].FSubItem Then
+      P := FindParent(DefaultModuleMetrics[eMetric].FParent);
+      N := vstMetrics.AddChild(P);
+      If Assigned(P) Then
         Begin
-          N := vstMetrics.AddChild(Nil);
-          P := N;
-        End Else
-          N := vstMetrics.AddChild(P);
-      vstMetrics.CheckType[N] := ctCheckBox;
-      vstMetrics.CheckState[N] := csUncheckedNormal;
+          vstMetrics.CheckType[N] := ctCheckBox;
+          vstMetrics.CheckState[N] := csUncheckedNormal;
+        End;
       NodeData := vstMetrics.GetNodeData(N);
       NodeData.FModuleMetric := eMetric;
       NodeData.FMetricLimitType := ltNone;
       NodeData.FMetricLimit := 0;
     End;
-  N := vstMetrics.GetFirstChild(vstMetrics.RootNode);
-  While Assigned(N) Do
-    Begin
-      vstMetrics.Expanded[N] := True;
-      N := vstMetrics.GetNextSibling(N);
-    End;
+  vstMetrics.FullExpand;
 End;
 
 (**
@@ -227,6 +257,33 @@ End;
 
 (**
 
+  This is an on before item erase event handler for the tree view.
+
+  @precon  None.
+  @postcon Colours the titles in sky blue.
+
+  @param   Sender       as a TBaseVirtualTree
+  @param   TargetCanvas as a TCanvas
+  @param   Node         as a PVirtualNode
+  @param   ItemRect     as a TRect
+  @param   ItemColor    as a TColor as a reference
+  @param   EraseAction  as a TItemEraseAction as a reference
+
+**)
+Procedure TframeBADIModuleMetrics.vstMetricsBeforeItemErase(Sender: TBaseVirtualTree;
+  TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; Var ItemColor: TColor;
+  Var EraseAction: TItemEraseAction);
+
+Begin
+  If Not Assigned(vstMetrics.NodeParent[Node]) Then
+    ItemColor := clSkyBlue
+  Else
+    ItemColor := vstMetrics.Color;
+  EraseAction := eaColor;
+End;
+
+(**
+
   This method updates the status of the header based on the number of nodee checked.
 
   @precon  None.
@@ -284,7 +341,7 @@ Var
 
 Begin
   NodeData := Sender.GetNodeData(Node);
-  Allowed := (Column = iMetricLimt) And (NodeData.FMetricLimitType <> ltNone);
+  Allowed := (Column = iMetricLimit) And (NodeData.FMetricLimitType <> ltNone);
 End;
 
 (**
@@ -311,15 +368,18 @@ Const
 
 Var
   NodeData : PMetricNodeData;
-  BO: TBADIOptions;
 
 Begin
   NodeData := Sender.GetNodeData(Node);
-  BO := TBADIOptions.BADIOptions;
   Case Column Of
     iMetricDescription: CellText := DefaultModuleMetrics[NodeData.FModuleMetric].FDescription;
-    iMetricName: CellText := DefaultModuleMetrics[NodeData.FModuleMetric].FName;
-    iMetricLimt:
+    iMetricName:
+      If (DefaultModuleMetrics[NodeData.FModuleMetric].FParent In [mmChecks..mmMetrics]) And
+         (NodeData.FModuleMetric <> DefaultModuleMetrics[NodeData.FModuleMetric].FParent) Then
+        CellText := DefaultModuleMetrics[NodeData.FModuleMetric].FName
+      Else
+        CellText := '';
+    iMetricLimit:
       Case DefaultModuleMetrics[NodeData.FModuleMetric].FLimitType Of
         ltInteger: CellText := Format(strIntegerFmt, [NodeData.FMetricLimit]);
         ltFloat: CellText := Format(strFloatFmt, [NodeData.FMetricLimit]);
@@ -376,8 +436,10 @@ Procedure TframeBADIModuleMetrics.vstMetricsNewText(Sender: TBaseVirtualTree; No
   Column: TColumnIndex; NewText: String);
 
 ResourceString
-  strNotAValidInteger = '%s is not a valid integer';
-  strNotAValidFloat = '%s is not a valid floting point number';
+  strNotAValidInteger = '%s is not a valid integer!';
+  strNotAValidFloat = '%s is not a valid floting point number!';
+  strIntegerMustBeGreaterThanZero = 'The limit value (%s) must be greater than zero!';
+  strFloatMustBeGreaterThanZero = 'The limit value (%s) must be greater than zero!';
 
 Var
   NodeData: PMetricNodeData;
@@ -387,25 +449,53 @@ Var
 
 Begin
   NodeData := Sender.GetNodeData(Node);
-  If Column = 1 Then
+  If Column = iMetricLimit Then
     Case NodeData.FMetricLimitType Of
       ltInteger:
         Begin
           Val(NewText, iInteger, iErrorCode);
-          If iErrorCode = 0 Then
-            NodeData.FMetricLimit := iInteger
+          If iErrorCode > 0 Then
+            MessageDlg(Format(strNotAValidInteger, [NewText]), mtError, [mbOK], 0)
+          Else If iInteger <= 0 Then
+            MessageDlg(Format(strIntegerMustBeGreaterThanZero, [NewText]), mtError, [mbOK], 0)
           Else
-            MessageDlg(Format(strNotAValidInteger, [NewText]), mtError, [mbOK], 0);
+            NodeData.FMetricLimit := iInteger
         End;
       ltFloat:
         Begin
           Val(NewText, dblDouble, iErrorCode);
-          If iErrorCode = 0 Then
-            NodeData.FMetricLimit := dblDouble
+          If iErrorCode > 0 Then
+            MessageDlg(Format(strNotAValidFloat, [NewText]), mtError, [mbOK], 0)
+          Else If dblDouble <= 0.0 Then
+            MessageDlg(Format(strFloatMustBeGreaterThanZero, [NewText]), mtError, [mbOK], 0)
           Else
-            MessageDlg(Format(strNotAValidFloat, [NewText]), mtError, [mbOK], 0);
+            NodeData.FMetricLimit := dblDouble
         End;
     End;
+End;
+
+(**
+
+  This is an on paint text event handler and is used to change the font of the section titles.
+
+  @precon  None.
+  @postcon The Checks and Metrics titles are made bold.
+
+  @param   Sender       as a TBaseVirtualTree
+  @param   TargetCanvas as a TCanvas as a constant
+  @param   Node         as a PVirtualNode
+  @param   Column       as a TColumnIndex
+  @param   TextType     as a TVSTTextType
+
+**)
+Procedure TframeBADIModuleMetrics.vstMetricsPaintText(Sender: TBaseVirtualTree;
+  Const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+
+Begin
+  If Not Assigned(vstMetrics.NodeParent[Node]) Then
+    TargetCanvas.Font.Style := [fsBold]
+  Else
+    TargetCanvas.Font.Style := [];
 End;
 
 End.

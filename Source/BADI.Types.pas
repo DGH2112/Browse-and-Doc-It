@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Oct 2017
+  @Date    18 Oct 2017
 
 **)
 Unit BADI.Types;
@@ -460,7 +460,8 @@ Type
 
   (** An enumerate to descibe each of the metrics. **)
   TBADIModuleMetric = (
-    mmRoot,
+    mmChecks,
+    mmMetrics,
     mmLongMethods,
     mmLongParameterLists,
     mmLongMethodVariableLists,
@@ -488,9 +489,7 @@ Type
     mmEmptyFinalization,
     mmEmptyMethod,
     mmMissingCONSTInParemterList,
-      mmMCParmListIgnoreEvents,
-    mmResourceStringNotUsed,
-    mmConstantNotUsed
+      mmMCParmListIgnoreEvents
   );
 
   (** An enumerate to define the type of the metric limit. **)
@@ -498,13 +497,12 @@ Type
 
   (** A record to describe the attributes of each metric. **)
   TBADIMetricRecord = Record
-    FMetricCheckType : TBADIMetricChecksType;
+    FParent          : TBADIModuleMetric;
     FName            : String;
     FDescription     : String;
     FEnabled         : Boolean;
     FLimit           : Double;
     FLimitType       : TBADILimitType;
-    FSubItem         : Boolean;
   End;
 
 Implementation

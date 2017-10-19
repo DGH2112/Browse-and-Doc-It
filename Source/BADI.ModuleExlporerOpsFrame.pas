@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Oct 2017
+  @Date    15 Oct 2017
 
 **)
 Unit BADI.ModuleExlporerOpsFrame;
@@ -275,7 +275,7 @@ Begin
   cbxLimits.Items.Add(strWarnings);
   cbxLimits.Items.Add(strHints);
   cbxLimits.Items.Add(strDocumentationConflicts);
-  cbxLimits.Items.Add(strModuleMetrics);
+  cbxLimits.Items.Add(strMetricsAndChecks);
   udLimits.OnChangingEx := udLimitsChangingEx;
 End;
 

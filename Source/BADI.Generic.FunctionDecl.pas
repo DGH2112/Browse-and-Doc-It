@@ -357,7 +357,7 @@ Begin
   V := FindElement(strVarsLabel);
   If Assigned(V) Then
     Result := Result + F(V.ElementCount / BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit);
-  Result := Result + F(IFDepth / BADIOptions.ModuleMetric[mmMethodIFDepth].FLimit);
+  Result := Result + F(NestedIFDepth / BADIOptions.ModuleMetric[mmMethodIFDepth].FLimit);
   Result := Result + F(CyclometricComplexity /
     BADIOptions.ModuleMetric[mmMethodCyclometricComplexity].FLimit);
 End;

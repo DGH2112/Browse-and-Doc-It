@@ -24,12 +24,15 @@ Implementation
 Uses
   BADI.Types,
   BADI.ResourceStrings,
-  BADI.Functions;
+  BADI.Functions,
+  BADI.Options;
 
 Procedure TestTLabelContainer.SetUp;
+
 Begin
-  FLabelContainer := TLabelContainer.Create(strImplementedMethodsLabel, scNone,
-    12, 23, iiImplementedMethods, Nil);
+  FLabelContainer := TLabelContainer.Create(strImplementedMethodsLabel, scNone, 12, 23,
+    iiImplementedMethods, Nil);
+  TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options - [doShowChildCountInTitles];
 End;
 
 Procedure TestTLabelContainer.TearDown;

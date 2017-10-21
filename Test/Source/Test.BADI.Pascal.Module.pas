@@ -1,3 +1,4 @@
+//: @nometrics
 unit Test.BADI.Pascal.Module;
 {
 
@@ -270,6 +271,8 @@ type
     Procedure TestCodeFailure32;
     Procedure TestCodeFailure33;
     Procedure TestCodeFailure34;
+    Procedure TestCodeFailure35;
+    //Procedure TestCodeFailure36;
   Public
   End;
 
@@ -279,7 +282,8 @@ Uses
   SysUtils,
   BADI.Types,
   BADI.TokenInfo,
-  BADI.ResourceStrings;
+  BADI.ResourceStrings,
+  BADI.Options;
 
 Const
   strNone = '%s';
@@ -987,7 +991,7 @@ Begin
     '    Class Property Variable : Integer Read FClassVariable Write FClassVariable;'#13#10 +
     '  End;',
     '',
-    [ttErrors, ttWarnings],
+    [ttErrors, ttWarnings, ttHints],
     [
       'Types\TMyClass|TMyClass = Class|scPublic',
       'Types\TMyClass\Class Variables\FClassVariable|FClassVariable : Integer|scPrivate',
@@ -1261,7 +1265,7 @@ Begin
     '',
     [ttErrors, ttWarnings],
     [
-      'Uses\Windows|Windows|scPublic',
+      'Uses\Interface\Windows|Windows|scPublic',
       'Exports\MyFunc|MyFunc|scPublic'
     ]
   );
@@ -2062,7 +2066,7 @@ Begin
     '  Windows;',
     '',
     [ttErrors, ttWarnings],
-    ['Uses\SysUtils|SysUtils|scPublic','Uses\Windows|Windows|scPublic']
+    ['Uses\Interface\SysUtils|SysUtils|scPublic','Uses\Interface\Windows|Windows|scPublic']
   );
 End;
 
@@ -2082,6 +2086,30 @@ Begin
     '',
     [ttErrors],
     ['Types\TMyClass\Methods\Test|Procedure Test|scPublic']
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure35;
+
+Begin
+  TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options + [doshowhints];
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TMyClass = Class'#13#10 +
+    '  Strict Private'#13#10 +
+    '    FClassVariable : Integer;'#13#10 +
+    '  Public'#13#10 +
+    '    Property Variable : Integer Read FClassVariable Write FClassVariable;'#13#10 +
+    '  End;',
+    '',
+    [ttErrors, ttWarnings, ttHints],
+    [
+      'Types\TMyClass|TMyClass = Class|scPublic',
+      'Types\TMyClass\Fields\FClassVariable|FClassVariable : Integer|scPrivate',
+      'Types\TMyClass\Properties\Variable|Property Variable : Integer Read FClassVariable Write FClassVariable|scPublic'
+    ]
   );
 End;
 
@@ -3532,8 +3560,8 @@ Begin
     '  DGHProc;',
     [ttErrors, ttWarnings],
     [
-      'Uses\Windows|Windows|scPrivate',
-      'Uses\DGHLibrary|DGHLibrary|scPrivate',
+      'Uses\Implementation\Windows|Windows|scPrivate',
+      'Uses\Implementation\DGHLibrary|DGHLibrary|scPrivate',
       'Constants\c|c = 1|scPrivate',
       'Variables\i|i : Integer|scPrivate',
       'Exports\DGHProc|DGHProc|scPublic'
@@ -3609,7 +3637,7 @@ Begin
     'end;',
     [ttErrors, ttWarnings],
     [
-      'Uses\Windows|Windows|scPublic',
+      'Uses\Interface\Windows|Windows|scPublic',
       'Types\t|t = Integer|scPublic',
       'Constants\c|c = 0|scPublic',
       'Resource Strings\rs|rs = ''hello.''|scPublic',
@@ -3664,7 +3692,7 @@ Begin
     '',
     [ttErrors, ttWarnings],
     [
-      'Uses\Windows|Windows|scPublic',
+      'Uses\Interface\Windows|Windows|scPublic',
       'Types\t|t = Integer|scPublic',
       'Variables\v|v : String|scPublic'
     ]
@@ -5302,7 +5330,7 @@ Begin
     '',
     [ttErrors, ttWarnings],
     [
-      'Uses\Windows|Windows|scPublic',
+      'Uses\Interface\Windows|Windows|scPublic',
       'Exported Headings\Hello|Procedure Hello|scPublic',
       'Constants\i|i = 10|scPrivate',
       'Implemented Methods\Hello|Procedure Hello|scPublic'
@@ -5674,8 +5702,8 @@ Begin
     '',
     [ttErrors, ttWarnings],
     [
-      'Uses\SysUtils|SysUtils|scPublic',
-      'Uses\Windows|Windows|scPublic',
+      'Uses\Interface\SysUtils|SysUtils|scPublic',
+      'Uses\Interface\Windows|Windows|scPublic',
       'Resource Strings\strHello|strHello = ''Hello''|scPrivate'
     ]
   );
@@ -7214,9 +7242,9 @@ Begin
     '  Classes;',
     [ttErrors, ttWarnings],
     [
-      'Uses\SysUtils|SysUtils|scPublic',
-      'Uses\Windows|Windows|scPublic',
-      'Uses\Classes|Classes|scPrivate'
+      'Uses\Interface\SysUtils|SysUtils|scPublic',
+      'Uses\Interface\Windows|Windows|scPublic',
+      'Uses\Implementation\Classes|Classes|scPrivate'
     ]
   );
 End;
@@ -7390,6 +7418,7 @@ Begin
 End;
 
 initialization
+  TBADIOptions.BADIOptions.Options := TBADIOptions.BADIOptions.Options - [doShowChildCountInTitles];
   // Register any test cases with the test runner
   RegisterTest('PascalModule Tests', TestTPascalModule.Suite);
 end.

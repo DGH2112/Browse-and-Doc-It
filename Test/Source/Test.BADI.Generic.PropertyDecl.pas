@@ -1,3 +1,4 @@
+//: @nometrics
 Unit Test.BADI.Generic.PropertyDecl;
 
 Interface

@@ -1483,7 +1483,7 @@ Begin
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
-      CheckEquals('  [The name passed to the Exception.Push method ("VBFile.Hello1") is incorrect (''VBFile.Hello''). [CheckExceptionHandling]]', M.firstwarning);
+      CheckEquals('  [The name passed to the Exception.Push method ("VBFile.Hello1") is incorrect (''VBFile.Hello'').]', M.firstwarning);
       CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
     Finally
@@ -1542,7 +1542,7 @@ Begin
     Try
       CheckEquals(0, M.HeadingCount(strErrors), M.FirstError);
       CheckEquals(2, M.HeadingCount(strWarnings), M.FirstWarning);
-      CheckEquals('  [The parameter ''iParam'' in ''VBFile.Hello'' does not have a corresponding parameter in the Exception.Push statement. [CheckExceptionHandling]]', M.firstwarning);
+      CheckEquals('  [The parameter ''iParam'' in ''VBFile.Hello'' does not have a corresponding parameter in the Exception.Push statement.]', M.firstwarning);
       CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
     Finally
@@ -1759,7 +1759,7 @@ Begin
       CheckEquals(1, M.HeadingCount(strWarnings), M.FirstWarning);
       CheckEquals(0, M.HeadingCount(strHints), M.FirstHint);
       CheckEquals(ttFileEnd, M.CurrentToken.TokenType);
-      CheckEquals('  [The function ''VBFile.GetPredecessor'' has the wrong number of Exception.Push parameters (0 not 2). [CheckExceptionHandling]]', M.FirstWarning)
+      CheckEquals('  [The function ''VBFile.GetPredecessor'' has the wrong number of Exception.Push parameters (0 not 2).]', M.FirstWarning)
     Finally
       M.Free;
     End;

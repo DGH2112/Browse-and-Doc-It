@@ -125,7 +125,7 @@ End;
 Procedure TestTElementContainer.TestAddIssue;
 
 Begin
-  FElementContainer.AddIssue('This is a warning.', scNone, 1, 2, etWarning);
+  FElementContainer.AddIssue('This is a warning.', scNone, 1, 2, etWarning, FElementContainer);
   CheckEquals(1, FElementContainer.ElementCount);
   CheckEquals('Warnings', FElementContainer.Elements[1].AsString(False, False));
   CheckEquals('This is a warning.',

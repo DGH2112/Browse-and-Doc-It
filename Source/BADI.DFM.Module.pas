@@ -3,7 +3,7 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       15 Oct 2017
+  @Date       22 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -249,13 +249,14 @@ begin
                     NextNonCommentToken
                   Else
                     ErrorAndSeekToken(strReservedWordExpected, 'END', strSeekableOnErrorTokens,
-                      stActual);
+                      stActual, Self);
                 End Else
-                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual,
+                    Self);
             End Else
-              ErrorAndSeekToken(strLiteralExpected, ':', strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, ':', strSeekableOnErrorTokens, stActual, Self);
         End Else
-          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -291,7 +292,7 @@ begin
             ItemList(P) Or BinaryData(P) Or ListData(P) Then
             {Do nothing ???};
         End Else
-          ErrorAndSeekToken(strLiteralExpected, '=', strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strLiteralExpected, '=', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -317,7 +318,7 @@ begin
       If Token.Token = ']' Then
         AddToExpression(Container)
       Else
-        ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -564,7 +565,7 @@ begin
       If Token.Token = ')' Then
         AddToExpression(Container)
       Else
-        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -625,7 +626,7 @@ begin
         Begin
           AddToExpression(Container);
           If Not (Token.TokenType In [ttNumber]) Then
-            ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
         End;
       AddToExpression(Container);
     End;
@@ -693,16 +694,16 @@ begin
           Begin
             DFMObject(Self);
             If Not (Token.TokenType In [ttFileEnd]) Then
-              AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError);
+              AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError, Self);
           End Else
           Begin
-            AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError);
+            AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError, Self);
             Raise EBADIParserAbort.Create(strParsingAborted);
           End;
       End;
   Except
     On E : EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError, Self);
   End;
 end;
 
@@ -727,7 +728,7 @@ begin
           If Token.TokenType In [ttIdentifier] Then
             AddToExpression(Container)
           Else
-            ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
         End;
     End;
 end;
@@ -760,7 +761,7 @@ begin
       If Token.UToken = 'END' Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strReservedWordExpected, 'END', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strReservedWordExpected, 'END', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -786,7 +787,7 @@ begin
       If Token.Token = '>' Then
         AddToExpression(Container)
       Else
-        ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -827,7 +828,7 @@ begin
       If Token.Token = ']' Then
         AddToExpression(Container)
       Else
-        ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -908,7 +909,7 @@ begin
           Result := Result + '.' + Token.Token;
           NextNonCommentToken;
         End Else
-          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -935,7 +936,7 @@ begin
           If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
             ConcatStrings(Container)
           Else
-            ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
         End;
     End;
 end;

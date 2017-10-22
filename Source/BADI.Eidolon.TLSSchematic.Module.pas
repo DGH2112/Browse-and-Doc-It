@@ -4,7 +4,7 @@
   Language.
 
   @Version    1.0
-  @Date       15 Oct 2017
+  @Date       22 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -316,7 +316,8 @@ begin
                   FTextPositions.AddObject(strName, TObject(Integer(O)));
                   NextNonCommentToken;
                 End Else
-                  ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual,
+                    Self);
             End;
         End;
       If CheckLiteral(';') Then
@@ -359,7 +360,8 @@ begin
                   FTextOrientations.AddObject(strName, TObject(Integer(O)));
                   NextNonCommentToken;
                 End Else
-                  ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual,
+                    Self);
             End;
         End;
       If CheckLiteral(';') Then
@@ -386,7 +388,7 @@ begin
         Result := tpInside;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strExpectedOUTSIDEINSIDE, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedOUTSIDEINSIDE, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -614,7 +616,7 @@ begin
   Result := False;
   If Not (Token.TokenType = ttfileEnd) Then
     Begin
-      ErrorAndSeekToken(strUnDefinedToken, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strUnDefinedToken, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       Result := True;
     End;
 end;
@@ -660,9 +662,9 @@ begin
           CheckLiteral('%');
           Result := True;
         End Else
-          ErrorAndSeekToken(strIntegerExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strIntegerExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End Else
-      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -770,10 +772,10 @@ begin
                     Result := True;
                 End Else
                   ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens,
-                    stActual);
+                    stActual, Self);
             End Else
               ErrorAndSeekToken(strReservedWordExpected, 'Left or Right', strSeekableOnErrorTokens,
-                stActual);
+                stActual, Self);
     End;
 end;
 
@@ -826,7 +828,7 @@ begin
           S.RouteCode := Copy(Token.Token, 2, Length(Token.Token) - 2);
           NextNonCommentToken;
         End Else
-          ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -906,7 +908,7 @@ begin
           NextNonCommentToken;
           Result := True;
         End Else
-          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End Else
       If boolNeg Then
         PopTokenPosition;
@@ -952,7 +954,7 @@ begin
           NextNonCommentToken;
           Result := True;
         End Else
-          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End Else
       If boolNeg Then
         PopTokenPosition;
@@ -1038,17 +1040,17 @@ begin
                           RouteCode(E);
                         End Else
                           ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens,
-                            stActual);
+                            stActual, Self);
                     End;
                   If CheckLiteral(';') Then
                     Result := True;
                 End Else
                   ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens,
-                    stActual);
+                    stActual, Self);
             End Else
               ErrorAndSeekToken(strReservedWordExpected,
                 'Left, Right, Over, OverLeft, OverRight, Under or Both',
-                strSeekableOnErrorTokens, stActual);
+                strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -1088,11 +1090,11 @@ begin
           Else
             R.EndChainage := dbl;
           If R.StartChainage >= R.EndChainage Then
-            ErrorAndSeekToken(strChainageError, Token.Token, strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strChainageError, Token.Token, strSeekableOnErrorTokens, stActual, Self);
           NextNonCommentToken;
           Result := True;
         End Else
-          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End Else
       If boolNeg Then
         PopTokenPosition;
@@ -1138,7 +1140,7 @@ begin
           NextNonCommentToken;
           Result := True;
         End Else
-          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End Else
       If boolNeg Then
         PopTokenPosition;
@@ -1403,9 +1405,10 @@ Begin
             If CheckLiteral(',') Then
               Result := True;
           End Else
-            ErrorAndSeekToken(strExpectedAnEndChainage, Token.Token, strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strExpectedAnEndChainage, Token.Token, strSeekableOnErrorTokens, stActual,
+              Self);
     End Else
-      ErrorAndSeekToken(strExpectedAStartChainage, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedAStartChainage, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 End;
 
 (**
@@ -1454,7 +1457,7 @@ begin
       End;
   Except
     On E : EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError, Self);
   End;
 end;
 
@@ -1530,7 +1533,7 @@ begin
           If CheckLiteral(';') Then
             Result := True;
         End Else
-          ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -1581,7 +1584,7 @@ begin
                       NextNonCommentToken;
                     End Else
                       ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens,
-                        stActual);
+                        stActual, Self);
                 End;
             End;
         End;
@@ -1653,16 +1656,17 @@ begin
                         RouteCode(O);
                       End Else
                         ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens,
-                          stActual);
+                          stActual, Self);
                   End;
                 If CheckLiteral(';') Then
                   Result := True;
               End Else
-                ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens, stActual);
+                ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens, stActual,
+                  Self);
           End Else
             ErrorAndSeekToken(strReservedWordExpected,
               'Left, Right, Over, OverLeft, OverRight, Under or Both',
-              strSeekableOnErrorTokens, stActual);
+              strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -1689,9 +1693,10 @@ Begin
             If CheckLiteral(',') Then
               Result := True;
           End Else
-            ErrorAndSeekToken(strExpectedAnEndOffset, Token.Token, strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strExpectedAnEndOffset, Token.Token, strSeekableOnErrorTokens, stActual,
+              Self);
     End Else
-      ErrorAndSeekToken(strExpectedAStartOffet, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedAStartOffet, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 End;
 
 (**
@@ -1715,7 +1720,8 @@ begin
         Result := toVertical;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strExpectedHORIZONTALVERTICAL, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedHORIZONTALVERTICAL, Token.Token, strSeekableOnErrorTokens, stActual,
+        Self);
 end;
 
 (**
@@ -1745,7 +1751,7 @@ begin
         Break;
       End;
   If Not Result Then
-    ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1805,7 +1811,7 @@ begin
   If Result Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineStyle, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineStyle, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1836,7 +1842,7 @@ begin
   If Result Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineWeight, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineWeight, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1921,7 +1927,7 @@ begin
       Result := True;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strLiteralExpected, strLiteral, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strLiteralExpected, strLiteral, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 End.

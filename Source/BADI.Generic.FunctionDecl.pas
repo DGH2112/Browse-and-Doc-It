@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    20 Oct 2017
+  @Date    22 Oct 2017
 
 **)
 Unit BADI.Generic.FunctionDecl;
@@ -218,7 +218,8 @@ Begin
         If (iParam = 0) And (Comparetext(Parameters[iParam].Identifier, strSender) = 0) Then
           Break;
         If Not P.Referenced Then
-          AddIssue(Format(strMsg, [P.Identifier, QualifiedName]), scPublic, P.Line, P.Column, etHint);
+          AddIssue(Format(strMsg, [P.Identifier, QualifiedName]), scPublic, P.Line, P.Column, etHint,
+            Self);
       End;
 End;
 

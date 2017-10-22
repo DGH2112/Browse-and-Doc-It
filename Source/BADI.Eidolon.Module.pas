@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       15 Oct 2017
+  @Date       22 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -248,7 +248,7 @@ begin
               CheckLineEnd();
             End;
         End Else
-          ErrorAndSeekToken(strNullName, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNullName, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 
     End;
 end;
@@ -294,11 +294,11 @@ begin
       Val(Token.Token, iWidth, iErrorCode);
       If (iErrorCode > 0) Or (iWidth <= 0.0) Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-          Token.Column]), scNone, Token.Line, Token.Column, etError);
+          Token.Column]), scNone, Token.Line, Token.Column, etError, Self);
       Bar.BarWidth := iWidth;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -377,7 +377,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineStyle, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineStyle, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -409,7 +409,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineWeight, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineWeight, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -435,7 +435,7 @@ begin
       Result := True;
       EatLineEnds;
     End Else
-      ErrorAndSeekToken(strExpectedLineEnd, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedLineEnd, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -459,7 +459,7 @@ begin
       Result := True;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strLiteralExpected, strLiteral, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strLiteralExpected, strLiteral, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -492,7 +492,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidColourName, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -543,7 +543,7 @@ begin
                 strConnection := strConnection + C.Tokens[iToken].Token;
               If Not IsKeyWord(strConnection, strValidConnections) Then
                 AddIssue(Format(strIsNotAValidConnection, [strConnection, C.Line,
-                  C.Column]), scNone, C.Line, C.Column, etWarning);
+                  C.Column]), scNone, C.Line, C.Column, etWarning, Self);
             End;
         End Else
           PopTokenPosition;
@@ -677,11 +677,11 @@ Begin
       Val(Token.Token, dblWidth, iErrorCode);
       If (iErrorCode > 0) Or (dblWidth <= 0.0) Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-          Token.Column]), scNone, Token.Line, Token.Column, etError);
+          Token.Column]), scNone, Token.Line, Token.Column, etError, Self);
       SuperBar.DateWidth := dblWidth;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 End;
 
 (**
@@ -744,7 +744,7 @@ begin
                   End;
               End;
         End Else
-          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -785,11 +785,11 @@ begin
       Val(Token.Token, iSize, iErrorCode);
       If (iErrorCode > 0) Or (iSize <= 0)  Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-          Token.Column]), scNone, Token.Line, Token.Column, etError);
+          Token.Column]), scNone, Token.Line, Token.Column, etError, Self);
       Diamond.DiamondSize:= iSize;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -897,11 +897,11 @@ begin
       Val(Token.Token, iSize, iErrorCode);
       If (iErrorCode > 0) Or (iSize <= 0)  Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-          Token.Column]), scNone, Token.Line, Token.Column,etError);
+          Token.Column]), scNone, Token.Line, Token.Column,etError, Self);
       Ellipse.EllipseSize:= iSize;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1074,7 +1074,7 @@ begin
               CheckLineEnd();
             End;
         End Else
-          ErrorAndSeekToken(strNullName, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNullName, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -1325,12 +1325,12 @@ begin
           Val(Token.Token, iTransparency, iErrorCode);
           If (iErrorCode > 0) Or (Not (iTransparency In [0..100]))  Then
             AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-              Token.Column]), scNone, Token.Line, Token.Column, etError);
+              Token.Column]), scNone, Token.Line, Token.Column, etError, Self);
           CustomSymbol.Transparency := iTransparency;
           NextNonCommentToken;
           EatWhitespace;
         End Else
-          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -1364,7 +1364,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidPattern, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidPattern, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1446,10 +1446,11 @@ begin
                 Field.FieldWidth := iWidth;
                 NextNonCommentToken;
               End Else
-                ErrorAndSeekToken(strInvalidDataWidth, Token.Token, strSeekableOnErrorTokens, stActual);
+                ErrorAndSeekToken(strInvalidDataWidth, Token.Token, strSeekableOnErrorTokens, stActual,
+                  Self);
             CheckLiteral(')');
           End Else
-            ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End Else
   If Token.Token = 'B' Then
     Begin
@@ -1501,7 +1502,7 @@ begin
       Field.FieldType := ftMemo;
       NextNonCommentToken;
     End Else
-      ErrorAndSeekToken(strInvalidDataType, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strInvalidDataType, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1652,7 +1653,7 @@ begin
                   End;
               End;
         End Else
-          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -1842,7 +1843,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineSize, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineSize, Token.Token, strSeekableOnErrorTokens, stActual, Self);
   EatWhitespace;
 end;
 
@@ -1879,7 +1880,7 @@ begin
   If boolFound Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strInvalidLineType, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidLineType, Token.Token, strSeekableOnErrorTokens, stActual, Self);
   EatWhitespace;
 end;
 
@@ -1907,12 +1908,12 @@ Begin
       Val(Token.Token, dblWidth, iErrorCode);
       If (iErrorCode > 0) Or (dblWidth <= 0.0) Then
         AddIssue(Format(strInvalidNumber, [Token.Token, Token.Line,
-          Token.Column]), scNone, Token.Line, Token.Column, etError);
+          Token.Column]), scNone, Token.Line, Token.Column, etError, Self);
       SuperBar.LocationWidth := dblWidth;
       NextNonCommentToken;
     End
   Else
-    ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 End;
 
 (**
@@ -2003,7 +2004,7 @@ begin
                   End;
               End;
         End Else
-          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -2055,14 +2056,15 @@ begin
                 OutputTable(strName, StartToken, C) Or
                 RequirementsTable(strName, StartToken, C);
               If Not Result Then
-                ErrorAndSeekToken(strInvalidTableType, Token.Token, strSeekableOnErrorTokens, stActual);
+                ErrorAndSeekToken(strInvalidTableType, Token.Token, strSeekableOnErrorTokens, stActual,
+                  Self);
             End Else
-              ErrorAndSeekToken(strLiteralExpected, '(', strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, '(', strSeekableOnErrorTokens, stActual, Self);
 
         End Else
-          ErrorAndSeekToken(strReservedWordExpected, 'CLASS', strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strReservedWordExpected, 'CLASS', strSeekableOnErrorTokens, stActual, Self);
     End Else
-      ErrorAndSeekToken(strLiteralExpected, '=', strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strLiteralExpected, '=', strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -2159,7 +2161,7 @@ begin
                   End;
               End;
         End Else
-          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -2272,7 +2274,7 @@ begin
                 Inc(iLayerIndex);
             End;
         End Else
-          ErrorAndSeekToken(strNullName, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strNullName, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -2330,7 +2332,7 @@ begin
                   End;
               End;
         End Else
-          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strTheDefintionNull, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -2475,7 +2477,7 @@ begin
       End;
   Except
     On E : EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError, Self);
   End;
 end;
 
@@ -2558,7 +2560,7 @@ begin
         Break;
       End;
   If Not boolFound Then
-    ErrorAndSeekToken(strInvalidPattern, strPattern, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strInvalidPattern, strPattern, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -2578,12 +2580,12 @@ begin
     (CustomSymbol.InteriorPatternColour <> xlcNONE) Then
     AddIssue(Format(strYouHaveSpecifiedAColour,
       [strColours[CustomSymbol.InteriorPatternColour]]), scNone, CustomSymbol.Line, CustomSymbol.Column,
-        etWarning);
+        etWarning, Self);
   If (CustomSymbol.InteriorPattern <> ipNONE) And
     (CustomSymbol.InteriorPatternColour = xlcNONE) Then
     AddIssue(Format(strYouHaveSpecifiedAPattern,
       [strInteriorPatterns[CustomSymbol.InteriorPattern]]), scNone, CustomSymbol.Line,
-      CustomSymbol.Column, etWarning);
+      CustomSymbol.Column, etWarning, Self);
 end;
 
 End.

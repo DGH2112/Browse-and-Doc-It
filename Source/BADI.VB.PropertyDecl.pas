@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Oct 2017
+  @Date    22 Oct 2017
 
 **)
 Unit BADI.VB.PropertyDecl;
@@ -120,12 +120,12 @@ Begin
   If PropertyType In [ptGet] Then
     Begin
       If ReturnType = Nil Then
-        AddIssue(Format(strProperyRequiresReturn, [Identifier]), scNone, Line, Column, etWarning);
+        AddIssue(Format(strProperyRequiresReturn, [Identifier]), scNone, Line, Column, etWarning, Self);
     End
   Else
     Begin
       If ParameterCount = 0 Then
-        AddIssue(Format(strProperyRequireParam, [Identifier]), scNone, Line, Column, etWarning);
+        AddIssue(Format(strProperyRequireParam, [Identifier]), scNone, Line, Column, etWarning, Self);
     End;
 End;
 

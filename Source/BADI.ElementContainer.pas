@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Oct 2017
+  @Date    22 Oct 2017
 
 **)
 Unit BADI.ElementContainer;
@@ -39,14 +39,25 @@ Type
     FParent : TElementContainer;
     FBADIOptions : TBADIOptions;
   Strict Protected
-    Function GetElementCount : Integer;
-    Function GetElements(Const iIndex : Integer) : TElementContainer;
-    Function GetImageIndexAdjustedForScope : Integer;
-    Function Find(Const strName : String; Const FindType : TFindType = ftName) : Integer;
+    Function  GetElementCount : Integer;
+    Function  GetElements(Const iIndex : Integer) : TElementContainer;
+    Function  GetImageIndexAdjustedForScope : Integer;
+    Function  Find(Const strName : String; Const FindType : TFindType = ftName) : Integer;
     Procedure SetSorted(Const boolValue : Boolean);
-    Function FindRoot : TElementContainer;
-    Function CheckCommentForNoMetric(Const Metric : TBADIModuleMetric;
+    Function  FindRoot : TElementContainer;
+    Function  CheckCommentForNoMetric(Const Metric : TBADIModuleMetric;
       Const Element: TElementContainer): Boolean;
+    Function  CheckCommentForNoEWH(Const strEWH : String; Const Element: TElementContainer): Boolean;
+    Function  DocConflictImage(Const DocConflictRec: TDocConflictTable): TBADIImageIndex;
+    Procedure  ModuleMetricPosition(Const Container : TElementContainer; Var iL, iC : Integer);
+    Function   ModuleMetricImage(Const eMetric : TBADIModuleMetric): TBADIImageIndex;
+    Procedure DocConflictPosition(Var iL: Integer; Var iC: Integer; Const AComment: TComment);
+    Function  CheckEWHOptions (Const ErrorType : TErrorType) : Boolean;
+    Function  CheckForNoEWH(Const ErrorType : TErrorType; Const Container: TElementContainer): Boolean;
+    Function  AddCategory(Const Container: TElementContainer; Const strCategory : String;
+      Const iImageIndex : TBADIImageIndex): TElementContainer;
+    Function  AddRootContainer(Const Container: TElementContainer; Const strLabelText : String;
+      Const iImageIndex : TBADIImageIndex): TElementContainer;
     (**
       This property provide all descendant modules with a single point of access to the options.
       @precon  None.
@@ -58,12 +69,13 @@ Type
     Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
       iColumn : Integer; Const AImageIndex : TBADIImageIndex; Const AComment : TComment); Virtual;
     Destructor Destroy; Override;
+    //: @nowarnings
     Function  Add(Const AElement : TElementContainer) : TElementContainer; Overload; Virtual;
     Function  Add(Const Token : TTokenInfo; Const AScope : TScope; Const AImageIndex : TBADIImageIndex;
       Const AComment : TComment) : TElementContainer; Overload; Virtual;
     Function  Add(Const strToken : String; Const AImageIndex : TBADIImageIndex;
       Const AScope : TScope; Const AComment : TComment) : TElementContainer; Overload; Virtual;
-    Function AddUnique(Const AElement : TElementContainer) : TElementContainer; Virtual;
+    Function  AddUnique(Const AElement : TElementContainer) : TElementContainer; Virtual;
     Procedure AddTokens(Const AElement : TElementContainer); Virtual;
     Function  FindElement(Const strName : String;
       Const FindType : TFindType = ftName) : TElementContainer;
@@ -73,7 +85,7 @@ Type
     Procedure CheckDocumentation(Var boolCascade : Boolean); Virtual;
     Function  ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Virtual;
     Procedure AddIssue(Const strMsg: String; Const AScope: TScope; Const iLine, iCol: Integer;
-      Const ErrorType: TErrorType);
+      Const ErrorType: TErrorType; Const Container : TElementContainer);
     Procedure AddDocumentConflict(Const Args: Array of Const;
       Const iIdentLine, iIdentColumn : Integer; Const AComment : TComment;
       Const strCategory : String; Const DocConflictRec : TDocConflictTable);
@@ -82,7 +94,7 @@ Type
     Function  AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Virtual; Abstract;
     Procedure CheckReferences; Virtual;
-    Function ReferenceSection(Const AToken : TTokenInfo; Const Section: TLabelContainer) : Boolean;
+    Function  ReferenceSection(Const AToken : TTokenInfo; Const Section: TLabelContainer) : Boolean;
     (**
       This property returns the number of elements in the collection.
       @precon  None.
@@ -170,6 +182,9 @@ Type
 Implementation
 
 Uses
+  {$IFDEF PROFILECODE}
+  Profiler,
+  {$ENDIF}
   SysUtils,
   BADI.ResourceStrings,
   BADI.DocIssue,
@@ -199,91 +214,6 @@ ResourceString
 Const
   (** A constant to descrienb the format of a title with its child count. **)
   strTitleCountFmt = '%s (%d)';
-
-(**
-
-  This method adds and passed elemtn container to this classes element collection.
-
-  @precon  AElement must be a valid TElementContainer.
-  @postcon Adds and passed elemtn container to this classes element collection.
-
-  @param   AElement as a TElementContainer as a constant
-  @return  a TElementContainer
-
-**)
-Function TElementContainer.Add(Const AElement: TElementContainer): TElementContainer;
-
-Const
-  strMethodName = 'TElementContainer.Add';
-
-Var
-  i: Integer;
-  E: TElementContainer;
-
-Begin
-  Result := AElement;
-  Assert(AElement.Name <> '', strCanNotAddNullElement);
-  AElement.FParent := Self;
-  i := Find(AElement.Name);
-  If i < 0 Then
-    FElements.Insert(Abs(i) - 1, AElement)
-  Else
-    Try
-      Result := FElements[i - 1] As TElementContainer;
-      If Result.Comment = Nil Then
-        Result.Comment := AElement.Comment
-      Else
-        Result.Comment.Assign(AElement.Comment);
-      If Not AElement.ClassNameIs(Result.ClassName) Then
-        Begin
-          E := FindRoot.Add(strErrors, iiErrorFolder, scNone, Nil);
-          E.Add(TDocIssue.Create(Format(strTryingToAddType, [AElement.ClassName, Result.ClassName,
-            AElement.Name]), scNone, AElement.Line, AElement.Column, etError));
-          Raise EBADIParserAbort.Create(strParsingAborted);
-        End;
-    Finally
-      (** Free AElement after getting the comment as it will leak otherwise. **)
-      AElement.Free;
-    End;
-End;
-
-(**
-
-  This method adds and passed Token to this classes element collection.
-
-  @precon  Token must be a valid TTokenInfo and AComment must be either nil or a valid TComment instance
-           .
-  @postcon Adds and passed elemtn container to this classes element collection.
-
-  @param   Token       as a TTokenInfo as a constant
-  @param   AScope      as a TScope as a constant
-  @param   AImageIndex as a TBADIImageIndex as a constant
-  @param   AComment    as a TComment as a constant
-  @return  a TElementContainer
-
-**)
-Function TElementContainer.Add(Const Token: TTokenInfo; Const AScope: TScope;
-  Const AImageIndex: TBADIImageIndex; Const AComment: TComment): TElementContainer;
-
-Var
-  i: Integer;
-
-Begin
-  Assert(Token.Token <> '', strCanNotAddNullToken);
-  i := Find(Token.Token);
-  If i < 0 Then
-    Begin
-      Result := TLabelContainer.Create(Token.Token, AScope, Token.Line, Token.Column, AImageIndex,
-        AComment);
-      Result.FParent := Self;
-      FElements.Insert(Abs(i) - 1, Result);
-    End
-  Else
-    Begin
-      Result := FElements[i - 1] As TElementContainer;
-      Result.Comment.Assign(AComment);
-    End;
-End;
 
 (**
 
@@ -326,6 +256,116 @@ End;
 
 (**
 
+  This method adds and passed elemtn container to this classes element collection.
+
+  @precon  AElement must be a valid TElementContainer.
+  @postcon Adds and passed elemtn container to this classes element collection.
+
+  @nohints
+  @nowarnings
+
+  @param   AElement as a TElementContainer as a constant
+  @return  a TElementContainer
+
+**)
+Function TElementContainer.Add(Const AElement: TElementContainer): TElementContainer;
+
+Var
+  i: Integer;
+  E: TElementContainer;
+
+Begin
+  Result := AElement;
+  Assert(AElement.Name <> '', strCanNotAddNullElement);
+  AElement.FParent := Self;
+  i := Find(AElement.Name);
+  If i < 0 Then
+    FElements.Insert(Abs(i) - 1, AElement)
+  Else
+    Try
+      Result := FElements[i - 1] As TElementContainer;
+      If Result.Comment = Nil Then
+        Result.Comment := AElement.Comment
+      Else
+        Result.Comment.Assign(AElement.Comment);
+      If Not AElement.ClassNameIs(Result.ClassName) Then
+        Begin
+          E := FindRoot.Add(strErrors, iiErrorFolder, scNone, Nil);
+          E.Add(TDocIssue.Create(Format(strTryingToAddType, [AElement.ClassName, Result.ClassName,
+            AElement.Name]), scNone, AElement.Line, AElement.Column, etError));
+          Raise EBADIParserAbort.Create(strParsingAborted);
+        End;
+    Finally
+      (** Free AElement after getting the comment as it will leak otherwise. **)
+      AElement.Free;
+    End;
+End;
+
+(**
+
+  This method adds and passed Token to this classes element collection.
+
+  @precon  Token must be a valid TTokenInfo and AComment must be either nil or a valid TComment instance
+           .
+  @postcon Adds a passed element container to this classes element collection.
+
+  @param   Token       as a TTokenInfo as a constant
+  @param   AScope      as a TScope as a constant
+  @param   AImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
+  @return  a TElementContainer
+
+**)
+Function TElementContainer.Add(Const Token : TTokenInfo; Const AScope : TScope;
+  Const AImageIndex : TBADIImageIndex; Const AComment : TComment): TElementContainer;
+
+Var
+  i: Integer;
+
+Begin
+  Assert(Token.Token <> '', strCanNotAddNullToken);
+  i := Find(Token.Token);
+  If i < 0 Then
+    Begin
+      Result := TLabelContainer.Create(Token.Token, AScope, Token.Line, Token.Column, AImageIndex,
+        AComment);
+      Result.FParent := Self;
+      FElements.Insert(Abs(i) - 1, Result);
+    End
+  Else
+    Begin
+      Result := FElements[i - 1] As TElementContainer;
+      Result.Comment.Assign(AComment);
+    End;
+End;
+
+(**
+
+  This method adds a category label to the given container if it does not already exist.
+
+  @precon  Container must be a valid instance.
+  @postcon A category container is added to the given container if it does not already exist.
+
+  @param   Container   as a TElementContainer as a constant
+  @param   strCategory as a String as a constant
+  @param   iImageIndex as a TBADIImageIndex as a constant
+  @return  a TElementContainer
+
+**)
+Function TElementContainer.AddCategory(Const Container: TElementContainer; Const strCategory : String;
+      Const iImageIndex : TBADIImageIndex): TElementContainer;
+
+Begin
+  Result := Container.FindElement(strCategory);
+  If Not Assigned(Result) Then
+    Begin
+      Result := TLabelContainer.Create(strCategory, scGlobal, 0, 0, iImageIndex, Nil);
+      Result := Container.Add(Result);
+    End;
+End;
+
+(**
+
   This method adds a specific documentation conflict to the Docuemntation conflict collection.
 
   @precon  None.
@@ -344,43 +384,21 @@ Procedure TElementContainer.AddDocumentConflict(Const Args: Array Of Const;
   Const DocConflictRec: TDocConflictTable);
 
 Var
-  E, i, R, D: TElementContainer;
-  iL, iC: Integer;
+  E : TElementContainer;
+  iLine, iColumn: Integer;
   iIcon: TBADIImageIndex;
 
 Begin
-  iL := 0;
-  iC := 0;
-  If AComment <> Nil Then
-    Begin
-      iL := AComment.Line;
-      iC := AComment.Column;
-    End;
-  Case DocConflictRec.FConflictType Of
-    dciMissing:
-      iIcon := iiDocConflictMissing;
-    dciIncorrect:
-      iIcon := iiDocConflictIncorrect;
-  Else
-    iIcon := iiDocConflictItem;
-  End;
-  R := FindRoot;
-  D := R.FindElement(strDocumentationConflicts);
-  If D = Nil Then
-    D := R.Add(TLabelContainer.Create(strDocumentationConflicts, scGlobal, 0, 0,
-      iiDocConflictFolder, Nil)) As TLabelContainer;
-  E := D;
-  i := E.FindElement(strCategory);
-  If i = Nil Then
-    Begin
-      i := TLabelContainer.Create(strCategory, scGlobal, 0, 0, iiDocConflictFolder, Nil);
-      i := E.Add(i);
-    End;
-  If i.ElementCount < BADIOptions.IssueLimits[ltConflicts] Then
-    i.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iL, iC, DocConflictRec.FMessage,
-      DocConflictRec.FDescription, iIcon))
-  Else If i.ElementCount = BADIOptions.IssueLimits[ltConflicts] Then
-    i.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
+  DocConflictPosition(iLine, iColumn, AComment);
+  iIcon := DocConflictImage(DocConflictRec);
+  E := FindRoot;
+  E := AddRootContainer(E, strDocumentationConflicts, iiDocConflictFolder);
+  E := AddCategory(E, strCategory, iiDocConflictFolder);
+  If E.ElementCount < BADIOptions.IssueLimits[ltConflicts] Then
+    E.Add(TDocumentConflict.Create(Args, iIdentLine, iIdentColumn, iLine, iColumn,
+      DocConflictRec.FMessage, DocConflictRec.FDescription, iIcon))
+  Else If E.ElementCount = BADIOptions.IssueLimits[ltConflicts] Then
+    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
       iiDocConflictMissing));
 End;
 
@@ -396,10 +414,11 @@ End;
   @param   iLine     as an Integer as a constant
   @param   iCol      as an Integer as a constant
   @param   ErrorType as a TErrorType as a constant
+  @param   Container as a TElementContainer as a constant
 
 **)
 Procedure TElementContainer.AddIssue(Const strMsg: String; Const AScope: TScope; Const iLine,
-  iCol: Integer; Const ErrorType: TErrorType);
+  iCol: Integer; Const ErrorType: TErrorType; Const Container : TElementContainer);
 
 Type
   TIssueRec = Record
@@ -420,7 +439,6 @@ Const
     (FFolder: strWarnings; FFolderImage: iiWarningFolder; FItemImage: iiWarning; FTooMany: strTooManyWarnings),
     (FFolder: strErrors;   FFolderImage: iiErrorFolder;   FItemImage: iiError;   FTooMany: strTooManyErrors)
   );
-  strMethodName = 'BADI.ElememtContainer.AddIssue';
 
 Var
   i: TElementContainer;
@@ -428,32 +446,10 @@ Var
   iIssueLimit: Integer;
 
 Begin
-  Case ErrorType Of
-    etHint:
-      If Not(doShowHints In BADIOptions.Options) Then
-        Exit;
-    etWarning:
-      If Not(doShowWarnings In BADIOptions.Options) Then
-        Exit;
-    etError:
-      If Not(doShowErrors In BADIOptions.Options) Then
-        Exit;
-  End;
-  If Comment <> Nil Then
-    Begin
-      Case ErrorType Of
-        etError:
-          If Comment.FindTag(strNoError) > -1 Then
-            Exit;
-        etHint:
-          If Comment.FindTag(strNoHint) > -1 Then
-            Exit;
-        etWarning:
-          If Comment.FindTag(strNoWarning) > -1 Then
-            Exit;
-      End;
-    End;
-  i := FindRoot.Add(recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage, scNone, Nil);
+  If Not CheckEWHOptions(ErrorType) Or CheckForNoEWH(ErrorType, Container) Then
+    Exit;
+  I := FindRoot;
+  I := AddRootContainer(I, recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage);
   iCount := i.ElementCount;
   Case ErrorType Of
     etError:   iIssueLimit := BADIOptions.IssueLimits[ltErrors];
@@ -486,48 +482,53 @@ Procedure TElementContainer.AddModuleMetric(Const Args: Array of Const; Const iL
   Const Container : TElementContainer; Const Metric : TBADIModuleMetric);
 
 Var
-  E, i, R, D: TElementContainer;
+  E: TElementContainer;
   iL, iC: Integer;
   iIcon: TBADIImageIndex;
 
 Begin
-  If Not (doShowMetrics In BADIOptions.Options) Or
+  If Not (doShowChecksAndMetrics In BADIOptions.Options) Or
     Not BADIOptions.ModuleMetric[Metric].FEnabled Or
     CheckCommentForNoMetric(Metric, Self) Or
     CheckCommentForNoMetric(Metric, Container) Then
     Exit;
-  iL := Container.Line;
-  iC := Container.Column;
-  If Assigned(Container.Comment) Then
-    Begin
-      iL := Container.Comment.Line;
-      iC := Container.Comment.Column;
-    End;
-  Case ModuleMetrics[Metric].FConflictType Of
-    dciMissing:   iIcon := iiMetricCheckMissing;
-    dciIncorrect: iIcon := iiMetricCheckIncorrect;
-  Else
-    iIcon := iiMetricCheckItem;
-  End;
-  R := FindRoot;
-  D := R.FindElement(strModuleMetrics);
-  If D = Nil Then
-    D := R.Add(TLabelContainer.Create(strModuleMetrics, scGlobal, 0, 0, iiMetricCheckFolder,
-      Nil)) As TLabelContainer;
-  E := D;
-  i := E.FindElement(ModuleMetrics[Metric].FCategory);
-  If i = Nil Then
-    Begin
-      i := TLabelContainer.Create(ModuleMetrics[Metric].FCategory, scGlobal, 0, 0, iiMetricCheckFolder,
-        Nil);
-      i := E.Add(i);
-    End;
-  If i.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
-    i.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
+  ModuleMetricPosition(Container, iL, iC);
+  iIcon := ModuleMetricImage(Metric);
+  E := FindRoot;
+  E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
+  E := AddCategory(E, DefaultModuleMetrics[DefaultModuleMetrics[Metric].FParent].FDescription,
+    iiMetricCheckFolder);
+  E := AddCategory(E, ModuleMetrics[Metric].FCategory, iiMetricCheckFolder);
+  If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
+    E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
       ModuleMetrics[Metric].FMessage, ModuleMetrics[Metric].FDescription, iIcon))
-  Else If i.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
-    i.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiDocConflictMissing));
+  Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
+    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
+      iiMetricCheckMissing));
+End;
+
+(**
+
+  This method adds a root element container to the module for capturing errors, warnigns, hints,
+  metrics, etc.
+
+  @precon  Container must be a valid instance.
+  @postcon A container is added to the geiven container if it does not already exist.
+
+  @param   Container    as a TElementContainer as a constant
+  @param   strLabelText as a String as a constant
+  @param   iImageIndex  as a TBADIImageIndex as a constant
+  @return  a TElementContainer
+
+**)
+Function TElementContainer.AddRootContainer(Const Container: TElementContainer;
+  Const strLabelText : String; Const iImageIndex : TBADIImageIndex): TElementContainer;
+
+Begin
+  Result := Container.FindElement(strLabelText);
+  If Result = Nil Then
+    Result := Container.Add(TLabelContainer.Create(strLabelText, scGlobal, 0, 0, iImageIndex,
+      Nil)) As TLabelContainer;
 End;
 
 (**
@@ -569,9 +570,6 @@ Function TElementContainer.AddUnique(Const AElement: TElementContainer): TElemen
 ResourceString
   strDuplicateIdentifierFound = 'Duplicate Identifier ''%s'' found at line %d column %d.';
 
-Const
-  strMethodName = 'TElementContainer.AddUnique';
-
 Var
   iLine, iCol: Integer;
   strI: String;
@@ -582,7 +580,8 @@ Begin
   strI := AElement.Identifier;
   Result := Add(AElement);
   If Result <> AElement Then
-    AddIssue(Format(strDuplicateIdentifierFound, [strI, iLine, iCol]), scNone, iLine, iCol, etError);
+    AddIssue(Format(strDuplicateIdentifierFound, [strI, iLine, iCol]), scNone, iLine, iCol, etError,
+      AElement);
 End;
 
 (**
@@ -610,6 +609,41 @@ Begin
   ClearTokens;
   For iToken := 0 To Source.TokenCount - 1 Do
     AppendToken(Source.Tokens[iToken]);
+End;
+
+(**
+
+  This method checks for a noXxxxx(s) tag which would disable the type of messages and if found returns
+  true.
+
+  @precon  None.
+  @postcon Checks for a noXxxxx(s) tag which would disable the type of messages and if found returns
+           true.
+
+  @param   strEWH  as a String as a constant
+  @param   Element as a TElementContainer as a constant
+  @return  a Boolean
+
+**)
+Function TElementContainer.CheckCommentForNoEWH(Const strEWH: String; 
+  Const Element: TElementContainer): Boolean;
+
+Var
+  E: TElementContainer;
+  
+Begin
+  Result := False;
+  E := Element;
+  While Assigned(E) Do
+    Begin
+      If Assigned(E.Comment) Then
+        If (E.Comment.FindTag(strEWH) > -1) Or (E.Comment.FindTag(strEWH + 's') > -1) Then
+          Begin
+            Result := True;
+            Break;
+          End;
+        E := E.Parent;
+      End;
 End;
 
 (**
@@ -688,6 +722,71 @@ End;
 
 (**
 
+  This method check the documentation options for the type of error to display and if not found returns
+  false.
+
+  @precon  None.
+  @postcon Check the documentation options for the type of error to display and if not found returns
+           false.
+
+  @param   ErrorType as a TErrorType as a constant
+  @return  a Boolean
+
+**)
+Function TElementContainer.CheckEWHOptions(Const ErrorType : TErrorType) : Boolean;
+
+Begin
+  REsult := True;
+  Case ErrorType Of
+    etHint:
+      If Not(doShowHints In BADIOptions.Options) Then
+        Result := False;
+    etWarning:
+      If Not(doShowWarnings In BADIOptions.Options) Then
+        Result := False;
+    etError:
+      If Not(doShowErrors In BADIOptions.Options) Then
+        Result := False;
+  End;
+End;
+
+(**
+
+  This method checks the container comment (and its parents) for noXxxx(s) tags and returns true if they
+  were found to signify that an issue is not required.
+
+  @precon  None.
+  @postcon Checks the container comment (and its parents) for noXxxx(s) tags and returns true if they
+           were found to signify that an issue is not required.
+
+  @param   ErrorType as a TErrorType as a constant
+  @param   Container as a TElementContainer as a constant
+  @return  a Boolean
+
+**)
+Function TElementContainer.CheckForNoEWH(Const ErrorType : TErrorType;
+  Const Container: TElementContainer): Boolean;
+
+Begin
+  Result := False;
+  If Assigned(Container) Then
+    Begin
+      Case ErrorType Of
+        etError:
+          If CheckCommentForNoEWH(strNoError, Container) Then
+            Result := True;
+        etHint:
+          If CheckCommentForNoEWH(strNoHint, Container) Then
+            Result := True;
+        etWarning:
+          If CheckCommentForNoEWH(strNoWarning, Container) Then
+            Result := True;
+      End;
+    End;
+End;
+
+(**
+
   This method recursively checks the referenced property and outputs a hint if any element is not
   refrernced which has a scope of Local or Private.
 
@@ -698,6 +797,32 @@ End;
 **)
 Procedure TElementContainer.CheckReferences;
 
+  (**
+
+    This procedure recurses the elmeents parents building a fully qualified identifier.
+
+    @precon  None.
+    @postcon Return a fully qualified identifier.
+
+    @param   E             as a TElementContainer as a reference
+    @param   strIdentifier as a String as a reference
+
+  **)
+  Procedure RecurseParentIdentifiers(Var E : TElementContainer; Var strIdentifier : String);
+
+  Begin
+    While Assigned(E) And Assigned(E.Parent) Do
+      Begin
+        If Not(E Is TLabelContainer) Then
+          Begin
+            If strIdentifier <> '' Then
+              strIdentifier := '.' + strIdentifier;
+            strIdentifier := E.Identifier + strIdentifier;
+          End;
+        E := E.Parent;
+      End;
+  End;
+
 Var
   i: Integer;
   strIdentifier: String;
@@ -706,25 +831,16 @@ Var
 Begin
   If doShowUnReferencedSymbols In BADIOptions.Options Then
     Begin
-      If Scope In [scLocal, scPrivate] Then
-        If Not Referenced Then
-          Begin
-            E := Self;
-            If Identifier <> '' Then
-              Begin
-                While (E <> Nil) And (E.Parent <> Nil) Do
-                  Begin
-                    If Not(E Is TLabelContainer) Then
-                      Begin
-                        If strIdentifier <> '' Then
-                          strIdentifier := '.' + strIdentifier;
-                        strIdentifier := E.Identifier + strIdentifier;
-                      End;
-                    E := E.Parent;
-                  End;
-                AddIssue(Format(strUnreferencedLocal, [strIdentifier]), scNone, Line, Column, etHint);
-              End;
-          End;
+      If Not Referenced  And (Scope In [scLocal, scPrivate]) Then
+        Begin
+          E := Self;
+          If Identifier <> '' Then
+            Begin
+              RecurseParentIdentifiers(E, strIdentifier);
+              AddIssue(Format(strUnreferencedLocal, [strIdentifier]), scNone, Line, Column, etHint,
+                Self);
+            End;
+        End;
       For i := 1 To ElementCount Do
         Elements[i].CheckReferences;
     End;
@@ -792,6 +908,53 @@ End;
 
 (**
 
+  This method returns the conflict image for missing / incorrect documentation.
+
+  @precon  None.
+  @postcon The conflict image for missing / incorrect documentation is returned.
+
+  @param   DocConflictRec as a TDocConflictTable as a constant
+  @return  a TBADIImageIndex
+
+**)
+Function TElementContainer.DocConflictImage(Const DocConflictRec: TDocConflictTable) : TBADIImageIndex;
+
+Begin
+  Case DocConflictRec.FConflictType Of
+    dciMissing:   Result := iiDocConflictMissing;
+    dciIncorrect: Result := iiDocConflictIncorrect;
+  Else
+    Result := iiDocConflictItem;
+  End;
+End;
+
+(**
+
+  This method updates the cursor position for the conflict message based on the comment if found.
+
+  @precon  None.
+  @postcon The cursor position for the conflict message based on the comment if found is updated.
+
+  @param   iL       as an Integer as a reference
+  @param   iC       as an Integer as a reference
+  @param   AComment as a TComment as a constant
+
+**)
+Procedure TElementContainer.DocConflictPosition(Var iL: Integer; Var iC: Integer;
+  Const AComment: TComment);
+
+Begin
+  iL := 0;
+  iC := 0;
+  If Assigned(AComment) Then
+    Begin
+      iL := AComment.Line;
+      iC := AComment.Column;
+    End;
+End;
+
+(**
+
   This method returns the position of the named container in the current containers collection if found
   else returns the position (as a negative) where the item should be inserted in the collection.
 
@@ -809,46 +972,84 @@ End;
 **)
 Function TElementContainer.Find(Const strName: String; Const FindType: TFindType = ftName): Integer;
 
+  (**
+
+    This function implements a binary search for the element in the current element collection.
+
+    @precon  None.
+    @postcon The position of the element is returned if found else the position it should be inserted is
+             returned as a negative number.
+
+    @param   iFirst as an Integer as a reference
+    @return  an Integer
+
+  **)
+  Function BinarySearch(Var iFirst : Integer) : Integer;
+
+  Var
+    iLast: Integer;
+    iMid: Integer;
+    iResult: Integer;
+
+  Begin
+    Result := -1;
+    iFirst := 1;
+    iLast := FElements.Count;
+    While iFirst <= iLast Do
+      Begin
+        iMid := (iFirst + iLast) Div 2;
+        If FindType = ftName Then
+          iResult := CompareText(Elements[iMid].Name, strName)
+        Else
+          iResult := CompareText(Elements[iMid].Identifier, strName);
+        If iResult = 0 Then
+          Begin
+            Result := iMid;
+            Break;
+          End
+        Else If iResult > 0 Then
+          iLast := iMid - 1
+        Else
+          iFirst := iMid + 1;
+      End;
+  End;
+
+  (**
+
+    This method implements a sequential search for thr element in the current elements collection.
+
+    @precon  None.
+    @postcon The position of the element is returned if found else the position it should be inserted is
+             returned as a negative number.
+
+    @param   iFirst as an Integer as a reference
+    @return  an Integer
+
+  **)
+  Function SequentialSearch(Var iFirst : Integer) : Integer;
+
+  Var
+     i : Integer;
+   
+  Begin
+    Result := -1;
+    For i := 1 To ElementCount Do
+      If CompareText(Elements[i].Name, strName) = 0 Then
+        Begin
+          Result := i;
+          Break;
+        End;
+    iFirst := ElementCount + 1;
+  End;
+
 Var
-  iFirst: Integer;
-  iMid: Integer;
-  iLast: Integer;
-  iResult: Integer;
+  iFirst : Integer;
 
 Begin
-  Result := -1;
   If FSorted Then
-    Begin // Binary search...
-      iFirst := 1;
-      iLast := FElements.Count;
-      While iFirst <= iLast Do
-        Begin
-          iMid := (iFirst + iLast) Div 2;
-          If FindType = ftName Then
-            iResult := CompareText(Elements[iMid].Name, strName)
-          Else
-            iResult := CompareText(Elements[iMid].Identifier, strName);
-          If iResult = 0 Then
-            Begin
-              Result := iMid;
-              Break;
-            End
-          Else If iResult > 0 Then
-            iLast := iMid - 1
-          Else
-            iFirst := iMid + 1;
-        End;
-    End
+    Result := BinarySearch(iFirst)
   Else
-    Begin // Sequential search...
-      For iFirst := 1 To ElementCount Do
-        If CompareText(Elements[iFirst].Name, strName) = 0 Then
-          Begin
-            Result := iFirst;
-            Break;
-          End;
-      iFirst := ElementCount + 1;
-    End;
+    Result := SequentialSearch(iFirst);
   If Result < 0 Then
     Result := -iFirst;
 End;
@@ -972,6 +1173,53 @@ End;
 
 (**
 
+  This method returns the image index for the given metric.
+
+  @precon  None.
+  @postcon The image index for the given metric is returned.
+
+  @param   eMetric as a TBADIModuleMetric as a constant
+  @return  a TBADIImageIndex
+
+**)
+Function TElementContainer.ModuleMetricImage(Const eMetric : TBADIModuleMetric): TBADIImageIndex;
+
+Begin
+  Case ModuleMetrics[eMetric].FConflictType Of
+    dciMissing:   Result := iiMetricCheckMissing;
+    dciIncorrect: Result := iiMetricCheckIncorrect;
+  Else
+    Result := iiMetricCheckItem;
+  End;
+End;
+
+(**
+
+  This method updates the line and column based on the given container and comment.
+
+  @precon  Container must be a valid instance.
+  @postcon The line and column are updated.
+
+  @param   Container as a TElementContainer as a constant
+  @param   iL        as an Integer as a reference
+  @param   iC        as an Integer as a reference
+
+**)
+Procedure TElementContainer.ModuleMetricPosition(Const Container : TElementContainer;
+  Var iL, iC : Integer);
+
+Begin
+  iL := Container.Line;
+  iC := Container.Column;
+  If Assigned(Container.Comment) Then
+    Begin
+      iL := Container.Comment.Line;
+      iC := Container.Comment.Column;
+    End;
+End;
+
+(**
+
   This method searches for references to the passed symbol in the passed section.
 
   @precon  None.
@@ -1047,7 +1295,9 @@ End;
   This is a getter method for the AsString property.
 
   @precon  None .
-  @postcon Returns the name of the label as a string .
+  @postcon Returns the name of the label as a string.
+
+  @nohint
 
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant

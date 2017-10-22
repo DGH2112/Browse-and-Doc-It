@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       15 Oct 2017
+  @Date       22 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -205,7 +205,7 @@ begin
             iLine := iCode And $FFFF;
             iColumn := (iCode And $FFFF0000) Shr 16;
             AddIssue(Format(strRuleHasNotBeenDefined, [FRequiredRules[iRule],
-              iLine, iColumn]), scNone, iLine, iColumn, etWarning);
+              iLine, iColumn]), scNone, iLine, iColumn, etWarning, Self);
           End;
       For iRule := 1 To FRules.ElementCount Do
         If Not FRules.Elements[iRule].Referenced Then
@@ -213,7 +213,7 @@ begin
             AddIssue(Format(strTheRuleHasNotBeenRef,
               [FRules.Elements[iRule].Identifier, FRules.Elements[iRule].Line,
               FRules.Elements[iRule].Column]), scNone, FRules.Elements[iRule].Line,
-                FRules.Elements[iRule].Column, etHint);
+                FRules.Elements[iRule].Column, etHint, Self);
     End;
 end;
 
@@ -306,7 +306,7 @@ begin
       If iErrors = 0 Then
         AddToExpression(R)
       Else
-        ErrorAndSeekToken(strInvalidDecCharRef, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strInvalidDecCharRef, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -367,7 +367,8 @@ begin
   If R <> Nil Then
     If iTokens = R.TokenCount Then
       Begin
-        ErrorAndSeekToken(strExpectedRuleOrLiteral, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strExpectedRuleOrLiteral, Token.Token, strSeekableOnErrorTokens, stActual,
+          Self);
         Exit;
       End;
   If Token.Token = '|' Then
@@ -665,7 +666,7 @@ begin
   If Token.TokenType In [ttLineEnd] Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strExpectedLineEnd, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strExpectedLineEnd, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -692,7 +693,7 @@ begin
       If Token.Token = ')' Then
         AddToExpression(R)
       Else
-        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
       RepeatOperator(R);
       List(R);
     End Else
@@ -703,7 +704,7 @@ begin
       If Token.Token = ']' Then
         AddToExpression(R)
       Else
-        ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual, Self);
       RepeatOperator(R);
       List(R);
     End Else
@@ -738,7 +739,8 @@ begin
         If Token.Token[1] = Token.Token[Length(Token.Token)] Then
           AddToExpression(R)
         Else
-          ErrorAndSeekToken(strMissingTerminalChar, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strMissingTerminalChar, Token.Token, strSeekableOnErrorTokens, stActual,
+            Self);
 end;
 
 (**
@@ -927,12 +929,12 @@ begin
           FRequiredRules.AddObject(Token.Token, TObject(iCode));
           If Token.Token = '<>' Then
             AddIssue(Format(strNULLIdentifierFound, [Token.Token,
-                Token.Line, Token.Column]), scNone, Token.Line, Token.Column, etError);
+                Token.Line, Token.Column]), scNone, Token.Line, Token.Column, etError, Self);
           AddToExpression(R);
           RepeatOperator(R);
         End
       Else
-        ErrorAndSeekToken(strRulesShouldStartAndEndWith, '', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strRulesShouldStartAndEndWith, '', strSeekableOnErrorTokens, stActual, Self);
     End Else
       Literal(R);
 end;
@@ -978,14 +980,14 @@ begin
             iiPublicType, GetComment);
           If R.Identifier = '<>' Then
             AddIssue(Format(strNULLIdentifierFound, [Token.Token,
-                Token.Line, Token.Column]), scNone, Token.Line, Token.Column, etError);
+                Token.Line, Token.Column]), scNone, Token.Line, Token.Column, etError, Self);
           If FRules = Nil Then
             FRules := Add(TLabelContainer.Create('Rules', scNone, 0, 0,
               iiPublicTypesLabel, Nil)) As TLabelContainer;
           If FRules.Add(R) <> R Then
             Begin
               AddIssue(Format(strDuplicateIdentifierFound, [Token.Token,
-                Token.Line, Token.Column]), scNone, Token.Line, Token.Column, etError);
+                Token.Line, Token.Column]), scNone, Token.Line, Token.Column, etError, Self);
               R := Nil;
             End;
           NextNonCommentToken;
@@ -994,16 +996,18 @@ begin
               NextNonCommentToken;
               Expression(R);
             End Else
-              ErrorAndSeekToken(strExpectedEquality, Token.Token, strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strExpectedEquality, Token.Token, strSeekableOnErrorTokens, stActual,
+                Self);
           Terminator;
           If (R <> Nil) And (R.TokenCount = 0) Then
             AddIssue(Format(strTheRuleHasNoDefinition, [R.Identifier, R.Line,
-              R.Column]), scNone, R.Line, R.Column, etWarning);
+              R.Column]), scNone, R.Line, R.Column, etWarning, Self);
         End Else
-          ErrorAndSeekToken(strExpectedRuleButFound, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strExpectedRuleButFound, Token.Token, strSeekableOnErrorTokens, stActual,
+            Self);
       End Else
         ErrorAndSeekToken(strRulesShouldStartAndEndWith, Token.Token, strSeekableOnErrorTokens,
-          stActual);
+          stActual, Self);
 end;
 
 (**
@@ -1019,7 +1023,7 @@ begin
   If Token.Token = ';' Then
     NextNonCommentToken
   Else
-    ErrorAndSeekToken(strExpectedSemiColon, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strExpectedSemiColon, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1126,7 +1130,7 @@ begin
       End;
   Except
     On E : EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError, Self);
   End;
 end;
 
@@ -1162,7 +1166,7 @@ begin
       If iErrors = 0 Then
         AddToExpression(R)
       Else
-        ErrorAndSeekToken(strInvalidHexCharRef, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strInvalidHexCharRef, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 

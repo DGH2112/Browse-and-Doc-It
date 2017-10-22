@@ -272,7 +272,7 @@ type
     Procedure TestCodeFailure33;
     Procedure TestCodeFailure34;
     Procedure TestCodeFailure35;
-    //Procedure TestCodeFailure36;
+    Procedure TestCodeFailure36;
   Public
   End;
 
@@ -2111,6 +2111,50 @@ Begin
       'Types\TMyClass\Properties\Variable|Property Variable : Integer Read FClassVariable Write FClassVariable|scPublic'
     ]
   );
+End;
+
+Procedure TestTPascalModule.TestCodeFailure36;
+
+Var
+  BO : TDocOptions;
+
+Begin
+  BO := TBADIOptions.BADIOptions.Options;
+  TBADIOptions.BADIOptions.Options := [doCustomDrawing..doAddPreAndPostToComment];
+  Try
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Type'#13#10 +
+    '  TPascalModule = Class'#13#10 +
+    '  Strict Protected'#13#10 +
+    '    Procedure EnumerateElement(EnumerateType : TEnumerateType);'#13#10 +
+    '  Public'#13#10 +
+    '  End;'#13#10,
+    'Procedure TPascalModule.EnumerateElement(EnumerateType : TEnumerateType);'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  ExprType : TPascalExprTypes;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  If IsIdentifier(Token) Then'#13#10 +
+    '    Begin'#13#10 +
+    '      AddToExpression(EnumerateType);'#13#10 +
+    '      If Token.Token = ''='' Then'#13#10 +
+    '        Begin'#13#10 +
+    '          AddToExpression(EnumerateType);'#13#10 +
+    '          ExprType := [petUnknown, petConstExpr];'#13#10 +
+    '          ConstExpr(EnumerateType, ExprType);'#13#10 +
+    '        End;'#13#10 +
+    '    End Else'#13#10 +
+    '      ErrorAndSeekToken(strIdentExpected, Token.Token, strSeekableOnErrorTokens, stActual);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttHints],
+    []
+  );
+  Finally
+    TBADIOptions.BADIOptions.Options := BO;
+  End;
 End;
 
 Procedure TestTPascalModule.TestCompoundStmt;

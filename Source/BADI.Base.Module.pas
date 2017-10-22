@@ -3,7 +3,7 @@
   This module contains the base class for all language module to derived from
   and all standard constants across which all language modules have in common.
 
-  @Date    15 Oct 2017
+  @Date    22 Oct 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -73,8 +73,8 @@ Type
     Function  GetModuleName : String; Virtual;
     function  GetBytes: Int64;
     function  GetLines: Integer;
-    Procedure ErrorAndSeekToken(const strMsg, strParam : String;
-      SeekTokens: Array Of String; SeekToken : TSeekToken);
+    Procedure ErrorAndSeekToken(Const strMsg, strParam : String; Const SeekTokens: Array Of String;
+      Const SeekToken : TSeekToken; Const Container : TElementContainer);
     Function GetHighPerformanceTickCount : Double;
     (**
       Returns a refernce the to owned items collection. This is used to manage
@@ -792,7 +792,7 @@ Function TBaseLanguageModule.GetToken : TTokenInfo;
 Begin
   If FTokenIndex >= TokenCount Then
     Begin
-      AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError);
+      AddIssue(strUnExpectedEndOfFile, scNone, 0, 0, etError, Self);
       Raise EBADIParserAbort.Create(strParsingAborted);
     End;
   Result := Tokens[FTokenIndex] As TTokenInfo;
@@ -846,8 +846,8 @@ End;
   @param   SeekToken   as a TSeekToken
 
 **)
-Procedure TBaseLanguageModule.ErrorAndSeekToken(const strMsg, strParam : String;
-  SeekTokens: Array Of String; SeekToken : TSeekToken);
+Procedure TBaseLanguageModule.ErrorAndSeekToken(Const strMsg, strParam : String;
+  Const SeekTokens: Array Of String; Const SeekToken : TSeekToken; Const Container : TElementContainer);
 
   (**
 
@@ -875,13 +875,13 @@ Procedure TBaseLanguageModule.ErrorAndSeekToken(const strMsg, strParam : String;
 Begin
   Case StringCount(strMsg) Of
     0: AddIssue(Format(strMsg, [Token.Line, Token.Column]),
-           scGlobal, Token.Line, Token.Column, etError);
+           scGlobal, Token.Line, Token.Column, etError, Container);
     1: AddIssue(Format(strMsg, [strParam, Token.Line, Token.Column]),
-           scGlobal, Token.Line, Token.Column, etError);
+           scGlobal, Token.Line, Token.Column, etError, Container);
     2: AddIssue(Format(strMsg, [strParam, Token.Token, Token.Line,
-         Token.Column]), scGlobal, Token.Line, Token.Column, etError);
+         Token.Column]), scGlobal, Token.Line, Token.Column, etError, Container);
   Else
-    AddIssue(strNotEnoughStrings, scGlobal, Token.Line, Token.Column, etError);
+    AddIssue(strNotEnoughStrings, scGlobal, Token.Line, Token.Column, etError, Container);
   End;
   NextNonCommentToken;
   While Not IsKeyWord(Token.Token, SeekTokens) Do
@@ -1073,7 +1073,7 @@ Begin
         Dec(FTokenIndex);
       If FTokenIndex < 0 Then
         Begin
-          AddIssue(strUnExpectedStartOfFile, scNone, 0, 0, etError);
+          AddIssue(strUnExpectedStartOfFile, scNone, 0, 0, etError, Self);
           Raise EBADIParserAbort.Create(strParsingAborted);
         End;
     End;

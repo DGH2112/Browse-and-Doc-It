@@ -5,7 +5,7 @@
   implemented.
 
   @Version    1.0
-  @Date       15 Oct 2017
+  @Date       22 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -192,7 +192,7 @@ begin
       strName := XMLName;
       If strName = '' Then
         AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
-          scNone, T.Line, T.Column, etError)
+          scNone, T.Line, T.Column, etError, Self)
       Else
         xmlParent.AddToken(strName);
       Whitespace(Nil);
@@ -238,7 +238,7 @@ begin
           If Token.Token = '>' Then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
         End Else
           PopTokenPosition;
     End;
@@ -268,7 +268,7 @@ begin
       If xmlElement.Attribute.IndexOf(strName) = -1 Then
         xmlElement.Attribute.Add(strName)
       Else
-        ErrorAndSeekToken(strAttributeCanNotAppear, strName, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strAttributeCanNotAppear, strName, strSeekableOnErrorTokens, stActual, Self);
       xmlElement.AddToken(strName);
       Result := True;
       Eq(xmlElement);
@@ -308,7 +308,7 @@ begin
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     AddToExpression(xmlParent)
   Else
-    ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -341,9 +341,9 @@ begin
       If Token.Token = '>' Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strLiteralExpected, ']]>', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ']]>', strSeekableOnErrorTokens, stActual, Self);
     End Else
-      ErrorAndSeekToken(strLiteralExpected, ']]>', strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strLiteralExpected, ']]>', strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -390,9 +390,9 @@ begin
           If Token.Token = '[' Then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLiteralExpected, '[', strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strLiteralExpected, '[', strSeekableOnErrorTokens, stActual, Self);
         End Else
-          ErrorAndSeekToken(strExpectedWord, 'CDATA', strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strExpectedWord, 'CDATA', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -434,11 +434,11 @@ begin
       If Token.TokenType In [ttNumber] Then
         AddToExpression(xmlParent)
       Else
-        ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strNumberExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       If Token.Token = ';' Then
         AddToExpression(xmlParent)
       Else
-        ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -559,7 +559,7 @@ var
         strName := XMLName;
         If strName = '' Then
           AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
-            scNone, T.Line, T.Column, etError)
+            scNone, T.Line, T.Column, etError, Self)
         Else
           xmlParent.AddToken(strName);
         If IsKeyWord(Token.Token, ['*', '+', '?']) Then
@@ -588,7 +588,7 @@ begin
       If Token.Token = ')' Then
         AddToExpression(xmlParent)
       Else
-        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
       If IsKeyWord(Token.Token, ['*', '+', '?']) Then
         AddToExpression(xmlParent);
     End;
@@ -667,7 +667,7 @@ begin
     AddToExpression(xmlParent)
   Else If Not Mixed(xmlParent) Then
     If Not Children(xmlParent) Then
-      ErrorAndSeekToken(strInvalidContentSpec, '', strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strInvalidContentSpec, '', strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -765,7 +765,7 @@ begin
         Begin
           AddToExpression(xmlParent);
           If Not Whitespace(Nil) Then
-          ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strReservedWords, stActual);
+          ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strReservedWords, stActual, Self);
         End;
       AttValue(xmlParent);
     End;
@@ -830,12 +830,12 @@ begin
                   AddToExpression(D);
                   WhiteSpace(Nil);
                 End Else
-                  ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strLiteralExpected, ']', strSeekableOnErrorTokens, stActual, Self);
             End;
           If Token.Token = '>' Then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
         End Else
           PopTokenPosition;
       End;
@@ -867,10 +867,10 @@ begin
       End;
   Until Not boolFound;
   If iElements = 0 Then
-    ErrorAndSeekToken(strExpectedElement, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strExpectedElement, Token.Token, strSeekableOnErrorTokens, stActual, Self);
   If Not (Token.TokenType In [ttFileEnd]) Then
     AddIssue(Format(strExpectedFileEnd, [Token.Token, Token.Line, Token.Column]),
-      scNone, Token.Line, Token.Column, etError);
+      scNone, Token.Line, Token.Column, etError, Self);
 end;
 
 (**
@@ -957,7 +957,7 @@ begin
               strName := XMLName;
               If strName = '' then
                 AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
-                  T.Column]), scNone, T.Line, T.Column, etError)
+                  T.Column]), scNone, T.Line, T.Column, etError, Self)
               Else
                 E.AddToken(strName);
               If WhiteSpace(Nil) Then
@@ -967,12 +967,12 @@ begin
                   If Token.Token = '>' Then
                     NextNonCommentToken
                   Else
-                    ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual);
+                    ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
                 End Else
                   ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens,
-                    stActual);
+                    stActual, Self);
             End Else
-              ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens, stActual, Self);
         End Else
           PopTokenPosition;
     End;
@@ -1010,9 +1010,9 @@ begin
         AddToExpression(xmlParent)
       Else
         ErrorAndSeekToken(strEncNameContainsInvalidChars, Token.Token, strSeekableOnErrorTokens,
-          stActual);
+          stActual, Self);
     End Else
-      ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 
 end;
 
@@ -1099,11 +1099,11 @@ begin
         xmlParent.AddToken(strName)
       Else
         AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
-          scNone, T.Line, T.Column, etError);
+          scNone, T.Line, T.Column, etError, Self);
       If Token.Token = ';' Then
         AddToExpression(xmlParent)
       Else
-        ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -1136,13 +1136,13 @@ begin
             Begin
               If Not Like('%*;', strValue) Then
                 AddIssue(Format(strExpectedWord, ['<PEReference>', Token.Line,
-                  Token.Column]), scNone, Token.Line, Token.Column, etError);
+                  Token.Column]), scNone, Token.Line, Token.Column, etError, Self);
             End;
           //: @todo Should be either %Name; or &Name; or &#Number; or &#xHexNumber;
         End;
       AddToExpression(xmlParent);
     End Else
-      ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1190,9 +1190,9 @@ begin
       If Token.Token = ')' Then
         AddToExpression(xmlParent)
       Else
-        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
     End Else
-      ErrorAndSeekToken(strLiteralExpected, '(', strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strLiteralExpected, '(', strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1211,7 +1211,7 @@ begin
   If Token.Token = '=' Then
     AddToExpression(xmlParent)
   Else
-    ErrorAndSeekToken(strLiteralExpected, '=', strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strLiteralExpected, '=', strSeekableOnErrorTokens, stActual, Self);
   WhiteSpace(Nil);
 end;
 
@@ -1240,14 +1240,14 @@ begin
       strName := XMLName;
       If strName <> xmlParent.Identifier Then
         AddIssue(Format(atrExpectedEndTagNamed, [xmlParent.Identifier, strName,
-          iLine, iColumn]), scNone, iLine, iColumn, etWarning);
+          iLine, iColumn]), scNone, iLine, iColumn, etWarning, Self);
       Whitespace(Nil);
       If Token.Token = '>' Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
     End Else
-      ErrorAndSeekToken(strExpectedEndTag, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strExpectedEndTag, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1284,7 +1284,7 @@ begin
       Result := True;
       AddToExpression(xmlParent);
       If Not Whitespace(Nil) Then
-        ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       SystemLiteral(xmlParent);
     End Else
   If CompareText(Token.Token, 'PUBLIC') = 0 Then
@@ -1292,10 +1292,10 @@ begin
       Result := True;
       AddToExpression(xmlParent);
       If Not Whitespace(Nil) Then
-        ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       PubIDLiteral(xmlParent);
       If Not Whitespace(Nil) Then
-        ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strExpectedWhiteSpace, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       SystemLiteral(xmlParent);
     End;
 end;
@@ -1652,13 +1652,14 @@ begin
                   NextNonCommentToken;
                 End Else
                   ErrorAndSeekToken(strIsNotAValidVersionNum, Token.Token, strSeekableOnErrorTokens,
-                    stActual);
+                    stActual, Self);
             End Else
-              ErrorAndSeekToken(strExpectedVersionNum, Token.Token, strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strExpectedVersionNum, Token.Token, strSeekableOnErrorTokens, stActual,
+                Self);
         End Else
-          ErrorAndSeekToken(strExpectedVersionNum, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strExpectedVersionNum, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End Else
-      ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1706,7 +1707,7 @@ begin
       If Token.Token = '-->' Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strLiteralExpected, '-->', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, '-->', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -1734,7 +1735,7 @@ begin
             Token.Line, Token.Column, iiPublicObject, Nil));
           NextNonCommentToken;
           If Not VersionInfo(xmlParent) Then
-            ErrorAndSeekToken(strExpectedWord, 'version', strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strExpectedWord, 'version', strSeekableOnErrorTokens, stActual, Self);
           Whitespace(Nil);
           EncodingDecl(xmlParent);
           Whitespace(Nil);
@@ -1746,9 +1747,9 @@ begin
               If Token.Token = '>' Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLiteralExpected, '?>', strSeekableOnErrorTokens, stActual);
+                ErrorAndSeekToken(strLiteralExpected, '?>', strSeekableOnErrorTokens, stActual, Self);
             End Else
-              ErrorAndSeekToken(strLiteralExpected, '?>', strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, '?>', strSeekableOnErrorTokens, stActual, Self);
         End Else
           PopTokenPosition;
     End;
@@ -1796,7 +1797,7 @@ begin
         Result := Result + Token.Token;
         NextNonCommentToken;
       End Else
-        ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -1836,7 +1837,7 @@ begin
       If Token.Token = '>' Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strLiteralExpected, '?>', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, '?>', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -1878,22 +1879,22 @@ begin
       Result := True;
       AddToExpression(xmlParent);
       If Not WhiteSpace(Nil) Then
-        ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       T := Token;
       strName := XMLName;
       If strName = '' Then
         AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
-          scNone, T.Line, T.Column, etError)
+          scNone, T.Line, T.Column, etError, Self)
       Else
         xmlParent.AddToken(strName);
       If Not WhiteSpace(Nil) Then
-        ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       EntityDef(xmlParent);
       Whitespace(Nil);
       If Token.Token = '>' Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strLiteralExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End
 end;
 
@@ -1923,13 +1924,13 @@ begin
       T := Token;
       strName := XMLName;
       If strName = '' Then
-        ErrorAndSeekToken(strExpectedWord, '<name>', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strExpectedWord, '<name>', strSeekableOnErrorTokens, stActual, Self);
       PERef := xmlParent.Add(TXMLPERef.Create(strName, scNone, T.Line,
         T.Column, iiPublicProperty, Nil)) As TXMLPERef;
       If Token.Token = ';' Then
         AddtoExpression(PERef)
       Else
-        ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -1959,7 +1960,7 @@ begin
       iiPublicField, Nil)) As TXMLPI;
   If CompareText(strName, 'xml') = 0 Then
     AddIssue(Format(strPITargetCanNotBeNamed, [T.Line, T.Column]), scNone,
-      T.Line, T.Column, etError);
+      T.Line, T.Column, etError, Self);
 end;
 
 (**
@@ -2089,17 +2090,17 @@ begin
                   Whitespace(Nil);
                 End Else
                   AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
-                    T.Column]), scNone, T.Line, T.Column, etError);
+                    T.Column]), scNone, T.Line, T.Column, etError, Self);
             End;
           If Token.Token = ')' Then
             AddToExpression(xmlParent)
           Else
-            ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
           If iNames > 0 Then
             If Token.Token = '*' Then
               AddToExpression(xmlParent)
             Else
-              ErrorAndSeekToken(strLiteralExpected, '*', strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, '*', strSeekableOnErrorTokens, stActual, Self);
         End Else
           PopTokenPosition;
     End;
@@ -2151,16 +2152,16 @@ begin
       If CompareText(Token.Token, 'NDATA') = 0 Then
         AddToExpression(xmlParent)
       Else
-        ErrorAndSeekToken(strExpectedWord, 'NDATA', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strExpectedWord, 'NDATA', strSeekableOnErrorTokens, stActual, Self);
       If Not Whitespace(Nil) Then
-        ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual, Self);
       T := Token;
       strName := XMLName;
       If strName <> '' Then
         xmlParent.AddToken(strName)
       Else
         AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
-          scNone, T.Line, T.Column, etError);
+          scNone, T.Line, T.Column, etError, Self);
     End;
 end;
 
@@ -2220,7 +2221,7 @@ begin
           strName := XMLName;
           If strName = '' Then
             AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
-              scNone, T.Line, T.Column, etError)
+              scNone, T.Line, T.Column, etError, Self)
           Else
             N.AddToken(strName);
           Whitespace(Nil);
@@ -2230,7 +2231,7 @@ begin
           If Token.Token = '>' Then
             NextNonCommentToken
           Else
-            ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
         End Else
           PopTokenPosition;
     End;
@@ -2269,7 +2270,7 @@ begin
               strName := XMLName;
               If strName = '' Then
                 AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
-                  T.Column]), scNone, T.Line, T.Column, etError)
+                  T.Column]), scNone, T.Line, T.Column, etError, Self)
               Else
                 xmlParent.AddToken(strName);
               Whitespace(Nil);
@@ -2281,7 +2282,7 @@ begin
                   strName := XMLName;
                   If strName = '' Then
                     AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
-                      T.Column]), scNone, T.Line, T.Column, etError)
+                      T.Column]), scNone, T.Line, T.Column, etError, Self)
                   Else
                     xmlParent.AddToken(strName);
                   Whitespace(Nil);
@@ -2290,11 +2291,12 @@ begin
               If Token.Token = ')' Then
                 AddToExpression(xmlParent)
               Else
-                ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual);
+                ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
             End Else
-              ErrorAndSeekToken(strLiteralExpected, '(', strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, '(', strSeekableOnErrorTokens, stActual, Self);
         End Else
-          ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual,
+            Self);
     End;
 end;
 
@@ -2329,25 +2331,27 @@ begin
             Token.Line, Token.Column, iiPublicInterface, Nil)) As TXMLElemDecl;
           NextNonCommentToken;
           If Not WhiteSpace(Nil) Then
-            ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual,
+              Self);
           If Not PEDecl(E) Then
             Begin
               T := Token;
               strName := XMLName;
               If strName = '' Then
                 AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line,
-                  T.Column]), scNone, T.Line, T.Column, etError)
+                  T.Column]), scNone, T.Line, T.Column, etError, Self)
               Else
                 E.AddToken(strName);
               If Not WhiteSpace(Nil) Then
                 ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens,
-                  stActual);
+                  stActual, Self);
               EntityDef(E);
               Whitespace(Nil);
               If Token.Token = '>' Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLiteralExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+                ErrorAndSeekToken(strLiteralExpected, Token.Token, strSeekableOnErrorTokens, stActual,
+                  Self);
             End;
         End Else
           PopTokenPosition;
@@ -2483,12 +2487,13 @@ begin
           '-', '''', '(', ')', '+', ',', '.', '/', ':', '=', '?', ';', '!', '*',
           '#', '@', '$', '_', '%']) Then
           Begin
-            ErrorAndSeekToken(strExpectedWord, '<PubIDLiteral>', strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strExpectedWord, '<PubIDLiteral>', strSeekableOnErrorTokens, stActual,
+              Self);
             Exit;
           End;
       AddToExpression(xmlParent);
     End Else
-      ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+      ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -2506,9 +2511,9 @@ begin
   If CompareText(Token.Token, 'PUBLIC') = 0 Then
     AddToExpression(xmlParent)
   Else
-    ErrorAndSeekToken(strExpectedWord, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strExpectedWord, Token.Token, strSeekableOnErrorTokens, stActual, Self);
   If Not WhiteSpace(Nil) Then
-    ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strExpectedWhitespace, Token.Token, strSeekableOnErrorTokens, stActual, Self);
   PubidLiteral(xmlParent);
 end;
 
@@ -2574,9 +2579,9 @@ begin
             (CompareText(strAnswer, 'no') = 0) Then
             AddToExpression(xmlParent)
           Else
-            ErrorAndSeekToken(strExpectedWord, 'Yes or No', strSeekableOnErrorTokens, stActual);
+            ErrorAndSeekToken(strExpectedWord, 'Yes or No', strSeekableOnErrorTokens, stActual, Self);
         End Else
-          ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -2613,19 +2618,19 @@ begin
           If FModuleType In [mtXHTML] Then
             If LowerCase(strXMLName) <> strXMLName Then
               AddIssue(Format(strHTMLElementLowercase, [strXMLName, T.Line,
-                T.Column]), scNone, T.Line, T.Column, etWarning);
+                T.Column]), scNone, T.Line, T.Column, etWarning, Self);
           Whitespace(Nil);
           While Attribute(X) Do
             WhiteSpace(Nil);
         End Else
           AddIssue(Format(strExpectedWord, ['<name>', T.Token, T.Line, T.Column]),
-            scNone, T.Line, T.Column, etError);
+            scNone, T.Line, T.Column, etError, Self);
       If Token.Token = '/>' Then
         Result.Referenced := True;
       If IsKeyWord(Token.Token, ['/>', '>']) Then
         NextNonCommentToken
       Else
-        ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual);
+        ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -2665,7 +2670,7 @@ begin
   If Token.TokenType In [ttSingleLiteral, ttDoubleLiteral] Then
     AddToExpression(xmlParent)
   Else
-    ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strStringExpected, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 end;
 
 (**
@@ -2702,9 +2707,9 @@ begin
               If Token.Token = '>' Then
                 NextNonCommentToken
               Else
-                ErrorAndSeekToken(strLiteralExpected, '?>', strSeekableOnErrorTokens, stActual);
+                ErrorAndSeekToken(strLiteralExpected, '?>', strSeekableOnErrorTokens, stActual, Self);
             End Else
-              ErrorAndSeekToken(strLiteralExpected, '?>', strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, '?>', strSeekableOnErrorTokens, stActual, Self);
         End Else
           PopTokenPosition;
     End;
@@ -2794,7 +2799,7 @@ begin
       End;
   Except
     On E : EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError, Self);
   End;
 end;
 
@@ -2851,11 +2856,11 @@ begin
                   If Token.Token = '>' Then
                     NextNonCommentToken
                   Else
-                    ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual);
+                    ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
                 End Else
-                  ErrorAndSeekToken(strLiteralExpected, ']]>', strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strLiteralExpected, ']]>', strSeekableOnErrorTokens, stActual, Self);
             End Else
-              ErrorAndSeekToken(strLiteralExpected, '[', strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, '[', strSeekableOnErrorTokens, stActual, Self);
         End Else
           PopTokenPosition;
     End;
@@ -2885,7 +2890,7 @@ begin
           Else
             PopTokenPosition;
         End Else
-          ErrorAndSeekToken(strLiteralExpected, ']]>', strSeekableOnErrorTokens, stActual);
+          ErrorAndSeekToken(strLiteralExpected, ']]>', strSeekableOnErrorTokens, stActual, Self);
       Ignore;
     End;
 end;
@@ -2930,11 +2935,11 @@ begin
                   If Token.Token = '>' Then
                     NextNonCommentToken
                   Else
-                    ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual);
+                    ErrorAndSeekToken(strLiteralExpected, '>', strSeekableOnErrorTokens, stActual, Self);
                 End Else
-                  ErrorAndSeekToken(strLiteralExpected, ']]>', strSeekableOnErrorTokens, stActual);
+                  ErrorAndSeekToken(strLiteralExpected, ']]>', strSeekableOnErrorTokens, stActual, Self);
             End Else
-              ErrorAndSeekToken(strLiteralExpected, '[', strSeekableOnErrorTokens, stActual);
+              ErrorAndSeekToken(strLiteralExpected, '[', strSeekableOnErrorTokens, stActual, Self);
         End Else
           PopTokenPosition;
     End;

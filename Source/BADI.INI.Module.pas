@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       15 Oct 2017
+  @Date       22 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -172,7 +172,7 @@ Begin
       EatLineEnds;
     End
   Else
-    ErrorAndSeekToken(strExpectedLineEnd, Token.Token, strSeekableOnErrorTokens, stActual);
+    ErrorAndSeekToken(strExpectedLineEnd, Token.Token, strSeekableOnErrorTokens, stActual, Self);
 End;
 
 (**
@@ -452,7 +452,7 @@ Begin
         ttFileEnd));
   Except
     On E: Exception Do
-      AddIssue(E.Message, scGlobal, 0, 0, etError);
+      AddIssue(E.Message, scGlobal, 0, 0, etError, Self);
   End
 End;
 
@@ -542,9 +542,9 @@ Begin
               EatWhitespace;
               CheckLineEnd();
             End Else
-              ErrorAndSeekToken(strLiteralExpected, Token.Token, ['<LF>', '<CR>'], stActual);
+              ErrorAndSeekToken(strLiteralExpected, Token.Token, ['<LF>', '<CR>'], stActual, Self);
         End Else
-          ErrorAndSeekToken(strLiteralExpected, Token.Token, ['<LF>', '<CR>'], stActual);
+          ErrorAndSeekToken(strLiteralExpected, Token.Token, ['<LF>', '<CR>'], stActual, Self);
     End;
 End;
 
@@ -717,11 +717,11 @@ Begin
         // Check for end of file else must be identifier
         While Section Do;
         If Not (Token.TokenType In [ttFileEnd]) Then
-          ErrorAndSeekToken(strExpectedFileEnd, Token.Token, ['<LF>', '<CR>'], stActual);
+          ErrorAndSeekToken(strExpectedFileEnd, Token.Token, ['<LF>', '<CR>'], stActual, Self);
       End;
   Except
     On E: EBADIParserAbort Do
-      AddIssue(E.Message, scNone, 0, 0, etError);
+      AddIssue(E.Message, scNone, 0, 0, etError, Self);
   End;
 End;
 
@@ -774,7 +774,7 @@ Begin
             End;
           CheckLineEnd();
         End Else
-          ErrorAndSeekToken(strExpectedKey, Token.Token, ['<LF>', '<CR>'], stActual);
+          ErrorAndSeekToken(strExpectedKey, Token.Token, ['<LF>', '<CR>'], stActual, Self);
     End;
   EatLineEnds;
 End;

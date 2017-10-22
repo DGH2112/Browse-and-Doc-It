@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Oct 2017
+  @Date    22 Oct 2017
 
 **)
 Unit BADI.Pascal.MethodDecl;
@@ -34,6 +34,7 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetName : String; Override;
   Public
+    //: @nometric MissingCONSTInParam
     Constructor Create(MethodType : TMethodType; const strName : String; AScope : TScope;
       iLine, iCol : Integer); Override;
     Destructor Destroy; Override;
@@ -129,11 +130,58 @@ End;
 
 (**
 
+  This is a getter method for the AsString property.
+
+  @precon  None.
+  @postcon Outputs the pascal method declaration.
+
+  @param   boolShowIdentifier   as a Boolean as a constant
+  @param   boolForDocumentation as a Boolean as a constant
+  @return  a String
+
+**)
+Function TPascalMethod.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
+
+Const
+  strClass = 'Class';
+  
+Var
+  i : Integer;
+
+begin
+  Result := strMethodTypes[MethodType];
+  If ClassMethod Then
+    Result := strClass + ' ' + Result;
+  If Name <> '' Then
+    If boolShowIdentifier And (Identifier <> '') Then
+      Result := Result + #32 + Identifier;
+  If ParameterCount > 0 Then
+    Begin
+      If boolForDocumentation Then
+        Result := Result + '('#13#10
+      Else
+        Result := Result + '(';
+      Result := Result + BuildParameterRepresentation(Self, boolShowIdentifier,
+        boolForDocumentation);
+      If boolForDocumentation Then
+        Result := Result + #13#10;
+      Result := Result + ')';
+    End;
+  If ReturnType.ElementCount > 0 Then
+      Result := Result + #32':'#32 + ReturnType.AsString(False, boolForDocumentation);
+  For i := 0 To FDirectives.Count - 1 Do
+    Result := Result + '; ' + FDirectives[i];
+end;
+
+(**
+
   This is the constructor method for the TPascalMethod class.
 
   @precon  None.
   @postcon Initialises the class and creates a string list for the directives.
 
+  @nometric MissingCONSTInParam
+  
   @param   MethodType as a TMethodType
   @param   strName    as a String as a constant
   @param   AScope     as a TScope
@@ -171,48 +219,6 @@ end;
 
 (**
 
-  This is a getter method for the AsString property.
-
-  @precon  None.
-  @postcon Outputs the pascal method declaration.
-
-  @param   boolShowIdentifier   as a Boolean as a constant
-  @param   boolForDocumentation as a Boolean as a constant
-  @return  a String
-
-**)
-Function TPascalMethod.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
-
-Var
-  i : Integer;
-
-begin
-  Result := strMethodTypes[MethodType];
-  If ClassMethod Then
-    Result := 'Class ' + Result;
-  If Name <> '' Then
-    If boolShowIdentifier And (Identifier <> '') Then
-      Result := Result + #32 + Identifier;
-  If ParameterCount > 0 Then
-    Begin
-      If boolForDocumentation Then
-        Result := Result + '('#13#10
-      Else
-        Result := Result + '(';
-      Result := Result + BuildParameterRepresentation(Self, boolShowIdentifier,
-        boolForDocumentation);
-      If boolForDocumentation Then
-        Result := Result + #13#10;
-      Result := Result + ')';
-    End;
-  If ReturnType.ElementCount > 0 Then
-      Result := Result + #32':'#32 + ReturnType.AsString(False, boolForDocumentation);
-  For i := 0 To FDirectives.Count - 1 Do
-    Result := Result + '; ' + FDirectives[i];
-end;
-
-(**
-
   This is a getter method for the Name property.
 
   @precon  None.
@@ -224,16 +230,21 @@ end;
 **)
 function TPascalMethod.GetName: String;
 
+Const
+  iRandomLimit = 9999;
+  strProcFmt = 'PROC%4.4d';
+  strForward = 'forward';
+
 Var
   i : Integer;
 
 begin
   Result := Identifier;
   If Result = '' Then
-    Result := Format('PROC%4.4d', [Random(9999)]);
+    Result := Format(strProcFmt, [Random(iRandomLimit)]);
   For i := 0 To ParameterCount - 1 Do
     Begin
-      Result := Result + Format('.P%d.', [i]) + strParamModifier[Parameters[i].ParamModifier];
+      Result := Result + Format('!P%d!', [i]) + strParamModifier[Parameters[i].ParamModifier];
       If Parameters[i].ParamType <> Nil Then
         Begin
           Result := Result + strArrayOf[Parameters[i].ArrayOf];
@@ -241,9 +252,9 @@ begin
         End;
     End;
   If ReturnType.ElementCount > 0 Then
-    Result := Result + '.R.' + ReturnType.AsString(False, False);
-  If HasDirective('forward') Then
-    Result := Result + '.Forward';
+    Result := Result + '!R!' + ReturnType.AsString(False, False);
+  If HasDirective(strForward) Then
+    Result := Result + '!' + strForward;
 end;
 
 (**

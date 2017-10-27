@@ -110,7 +110,8 @@ type
   TTestBaseLanguageModule = Class(TBaseLanguageModule)
   Public
     Property CompilerDefines;
-    Function GetComment(CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment; Override;
+    Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
+      Override;
     procedure ProcessCompilerDirective(var iSkip : Integer); Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
@@ -251,7 +252,7 @@ end;
 
 { TTestBaseLanguageModule }
 
-function TTestBaseLanguageModule.GetComment(CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
+Function TTestBaseLanguageModule.GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
 begin
   Result := Nil;
 end;

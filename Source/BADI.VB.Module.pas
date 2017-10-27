@@ -4,7 +4,7 @@
   to parser VB.NET code later).
 
   @Version    1.0
-  @Date       15 Oct 2017
+  @Date       27 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -88,15 +88,14 @@ Type
     {$IFDEF D2005} Strict {$ENDIF} Protected
     Procedure ProcessCompilerDirective(var iSkip : Integer); Override;
     procedure TidyUpEmptyElements;
-    Function GetComment(
-      CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
+    Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
     Procedure NextNonCommentToken; Override;
     Procedure CheckExceptionHandling;
     Procedure ResolvedForwardReferences;
   Public
-    Constructor CreateParser(const Source, strFileName : String;
-      IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
+    Constructor CreateParser(Const Source, strFileName : String; Const IsModified : Boolean;
+      Const ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
@@ -156,20 +155,19 @@ end;
 
   This is the constructor method for the TVBDocModule class.
 
-  @precon  Source is a valid TStream descendant containing as stream of text
-           that is the contents of a source code module, Filename is the file
-           name of the module being parsed and IsModified determines if the
-           source code module has been modified since the last save to disk.
+  @precon  Source is a valid TStream descendant containing as stream of text that is the contents of a 
+           source code module, Filename is the file name of the module being parsed and IsModified 
+           determines if the source code module has been modified since the last save to disk.
   @postcon Initialise the class and parses the text stream.
 
   @param   Source        as a String as a constant
   @param   strFileName   as a String as a constant
-  @param   IsModified    as a Boolean
-  @param   ModuleOptions as a TModuleOptions
+  @param   IsModified    as a Boolean as a constant
+  @param   ModuleOptions as a TModuleOptions as a constant
 
 **)
-Constructor TVBModule.CreateParser(const Source, strFileName : String;
-  IsModified : Boolean; ModuleOptions : TModuleOptions);
+Constructor TVBModule.CreateParser(Const Source, strFileName : String; Const IsModified : Boolean;
+      Const ModuleOptions : TModuleOptions);
 
 var
   boolCascade: Boolean;
@@ -516,11 +514,11 @@ End;
   @precon  None.
   @postcon Returns the comment before the current token.
 
-  @param   CommentPosition as a TCommentPosition
+  @param   CommentPosition as a TCommentPosition as a constant
   @return  a TComment
 
 **)
-function TVBModule.GetComment(CommentPosition: TCommentPosition): TComment;
+Function TVBModule.GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
 
 Var
   T : TTokenInfo;

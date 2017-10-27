@@ -3,7 +3,7 @@
   DFMModule : A unit to tokenize DFM code.
 
   @Version    1.0
-  @Date       22 Oct 2017
+  @Date       27 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -56,12 +56,11 @@ Type
     Procedure ConcatStrings(Container : TElementContainer);
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetModuleName : String; Override;
-    Function GetComment(
-      CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
+    Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
   Public
-    Constructor CreateParser(const Source, strFileName : String;
-      IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
+    Constructor CreateParser(Const Source, strFileName : String; Const IsModified : Boolean;
+      Const ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
@@ -151,21 +150,19 @@ end;
 
   This is the constructor method for the TPascalDocModule class.
 
-  @precon  Source is a valid TStream descendant containing as stream of text,
-           that is the contents of a source code module and Filename is the
-           file name of the module being parsed and IsModified determines if
-           the source code module has been modified since the last save to
-           disk.
+  @precon  Source is a valid TStream descendant containing as stream of text, that is the contents of a 
+           source code module and Filename is the file name of the module being parsed and IsModified 
+           determines if the source code module has been modified since the last save to disk.
   @postcon Creates an instance of the module parser.
 
   @param   Source        as a String as a constant
   @param   strFileName   as a String as a constant
-  @param   IsModified    as a Boolean
-  @param   ModuleOptions as a TModuleOptions
+  @param   IsModified    as a Boolean as a constant
+  @param   ModuleOptions as a TModuleOptions as a constant
 
 **)
-Constructor TDFMModule.CreateParser(const Source, strFileName : String;
-  IsModified : Boolean; ModuleOptions : TModuleOptions);
+Constructor TDFMModule.CreateParser(Const Source, strFileName : String; Const IsModified : Boolean;
+  Const ModuleOptions : TModuleOptions);
 
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
@@ -639,11 +636,11 @@ end;
   @precon  None.
   @postcon Returns nil.
 
-  @param   CommentPosition as a TCommentPosition
+  @param   CommentPosition as a TCommentPosition as a constant
   @return  a TComment
 
 **)
-function TDFMModule.GetComment(CommentPosition: TCommentPosition): TComment;
+function TDFMModule.GetComment(Const CommentPosition: TCommentPosition): TComment;
 begin
   Result := Nil;
 end;

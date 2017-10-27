@@ -4,7 +4,7 @@
   "Eidolon Map File Grammar.bnf" for the complete grammar implemented.
 
   @Version    1.0
-  @Date       22 Oct 2017
+  @Date       27 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -44,15 +44,15 @@ Type
     Function  CheckLineEnd(): Boolean;
     Procedure EatWhitespace;
     {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function  GetComment(CommentPosition: TCommentPosition = cpBeforeCurrentToken)
-      : TComment; Override;
+    Function  GetComment(Const CommentPosition: TCommentPosition = cpBeforeCurrentToken) : TComment;
+      Override;
     Procedure TidyUpEmptyElements;
     Function  GetModuleName: String; Override;
     Function  BuildSection(Const strSectionName : String; iLine,
       iColumn : Integer) : TLabelContainer;
   Public
-    Constructor CreateParser(const Source, strFileName: String; IsModified: Boolean;
-      ModuleOptions: TModuleOptions); Override;
+    Constructor CreateParser(Const Source, strFileName: String; Const IsModified: Boolean;
+      Const ModuleOptions: TModuleOptions); Override;
     Destructor Destroy; Override;
     Function  ReservedWords: TKeyWords; Override;
     Function  Directives: TKeyWords; Override;
@@ -179,21 +179,19 @@ End;
 
   This is the constructor method for the TINIModule class.
 
-  @precon  Source is a valid TStream descendant containing as stream of text,
-           that is the contents of a source code module and Filename is the
-           file name of the module being parsed and IsModified determines if
-           the source code module has been modified since the last save to
-           disk.
+  @precon  Source is a valid TStream descendant containing as stream of text, that is the contents of a 
+           source code module and Filename is the file name of the module being parsed and IsModified 
+           determines if the source code module has been modified since the last save to disk.
   @postcon Creates an instance of the module parser.
 
-  @param   Source        as a String as a Constant
-  @param   strFileName   as a String as a Constant
-  @param   IsModified    as a Boolean
-  @param   ModuleOptions as a TModuleOptions
+  @param   Source        as a String as a constant
+  @param   strFileName   as a String as a constant
+  @param   IsModified    as a Boolean as a constant
+  @param   ModuleOptions as a TModuleOptions as a constant
 
 **)
-Constructor TINIModule.CreateParser(const Source, strFileName: String;
-  IsModified: Boolean; ModuleOptions: TModuleOptions);
+Constructor TINIModule.CreateParser(Const Source, strFileName: String; Const IsModified: Boolean;
+      Const ModuleOptions: TModuleOptions);
 
 Begin
   Inherited CreateParser(Source, strFileName, IsModified, ModuleOptions);
@@ -566,20 +564,20 @@ End;
 
 (**
 
-  This method tries to get a document comment from the previous token and return
-  a TComment class to the calling routine.
-
-  @note    All comments found are automatically added to the comment collection
-           for disposal when the parser is destroyed.
+  This method tries to get a document comment from the previous token and return a TComment class to the 
+  calling routine.
 
   @precon  None.
   @postcon Returns the comment immediately before the current token else nil.
 
-  @param   CommentPosition as a TCommentPosition
+  @note    All comments found are automatically added to the comment collection for disposal when the 
+           parser is destroyed.
+
+  @param   CommentPosition as a TCommentPosition as a constant
   @return  a TComment
 
 **)
-Function TINIModule.GetComment(CommentPosition: TCommentPosition): TComment;
+Function TINIModule.GetComment(Const CommentPosition: TCommentPosition = cpBeforeCurrentToken) : TComment;
 
 Var
   T      : TTokenInfo;

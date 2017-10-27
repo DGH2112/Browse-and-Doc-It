@@ -3,7 +3,7 @@
   BackusNaurModule : A unit to tokenize Backus-Naur Grammar.
 
   @Version    1.0
-  @Date       22 Oct 2017
+  @Date       27 Oct 2017
   @Author     David Hoyle
 
 **)
@@ -56,16 +56,15 @@ Type
     Procedure ParseTokens;
     Procedure EatLineEnds;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function GetComment(
-      CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
+    Function GetComment(Const CommentPosition : TCommentPosition = cpBeforeCurrentToken) : TComment;
       Override;
     procedure TidyUpEmptyElements;
     Procedure CheckRules;
     Procedure ProcessTags;
     Function GetModuleName : String; Override;
   Public
-    Constructor CreateParser(const Source, strFileName : String;
-      IsModified : Boolean; ModuleOptions : TModuleOptions); Override;
+    Constructor CreateParser(Const Source, strFileName : String; Const IsModified : Boolean; 
+      Const ModuleOptions : TModuleOptions); Override;
     Destructor Destroy; Override;
     Function ReservedWords : TKeyWords; Override;
     Function Directives : TKeyWords; Override;
@@ -234,8 +233,8 @@ end;
   @param   ModuleOptions as a TModuleOptions
 
 **)
-Constructor TBackusNaurModule.CreateParser(const Source, strFileName : String;
-  IsModified : Boolean; ModuleOptions : TModuleOptions);
+Constructor TBackusNaurModule.CreateParser(Const Source, strFileName : String;
+  Const IsModified : Boolean; Const ModuleOptions : TModuleOptions);
 
 Var
   boolCascade : Boolean;
@@ -767,21 +766,20 @@ end;
 
 (**
 
-  This method tries to get a document comment from the previous token and return
-  a TComment class to the calling routine.
-
-  @note    All comments found are automatically added to the comment collection
-           for disposal when the parser is destroyed.
+  This method tries to get a document comment from the previous token and return a TComment class to the 
+  calling routine.
 
   @precon  None.
   @postcon Returns the comment immediately before the current token else nil.
 
-  @param   CommentPosition as a TCommentPosition
+  @note    All comments found are automatically added to the comment collection for disposal when the 
+           parser is destroyed.
+
+  @param   CommentPosition as a TCommentPosition as a constant
   @return  a TComment
 
 **)
-Function TBackusNaurModule.GetComment(
-  CommentPosition : TCommentPosition) : TComment;
+Function TBackusNaurModule.GetComment(Const CommentPosition : TCommentPosition) : TComment;
 
 Var
   T : TTokenInfo;

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Pascal.ThreadVariableDecl;
@@ -37,6 +37,7 @@ Uses
   @precon  None.
   @postcon Check whether the field has been documented correctly.
 
+  @nohint
 
   @param   boolCascade as a Boolean as a reference
 
@@ -46,7 +47,7 @@ Procedure TThreadVar.CheckDocumentation(Var boolCascade: Boolean);
 Begin
   If doShowUndocumentedVars In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment, strThreadVarDocumentation,
+      AddDocumentConflict([Identifier], Line, Column, Self, strThreadVarDocumentation,
         DocConflictTable[dctThreadVarClauseUndocumented]);
 End;
 

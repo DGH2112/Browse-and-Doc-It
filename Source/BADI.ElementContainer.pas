@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    22 Oct 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.ElementContainer;
@@ -49,15 +49,17 @@ Type
       Const Element: TElementContainer): Boolean;
     Function  CheckCommentForNoEWH(Const strEWH : String; Const Element: TElementContainer): Boolean;
     Function  DocConflictImage(Const DocConflictRec: TDocConflictTable): TBADIImageIndex;
-    Procedure  ModuleMetricPosition(Const Container : TElementContainer; Var iL, iC : Integer);
-    Function   ModuleMetricImage(Const eMetric : TBADIModuleMetric): TBADIImageIndex;
-    Procedure DocConflictPosition(Var iL: Integer; Var iC: Integer; Const AComment: TComment);
+    Procedure ModuleMetricPosition(Const Container : TElementContainer; Var iL, iC : Integer);
+    Function  ModuleMetricImage(Const eMetric : TBADIModuleMetric): TBADIImageIndex;
+    Procedure DocConflictPosition(Var iL: Integer; Var iC: Integer;
+      Const Container: TElementContainer);
     Function  CheckEWHOptions (Const ErrorType : TErrorType) : Boolean;
     Function  CheckForNoEWH(Const ErrorType : TErrorType; Const Container: TElementContainer): Boolean;
     Function  AddCategory(Const Container: TElementContainer; Const strCategory : String;
       Const iImageIndex : TBADIImageIndex): TElementContainer;
     Function  AddRootContainer(Const Container: TElementContainer; Const strLabelText : String;
       Const iImageIndex : TBADIImageIndex): TElementContainer;
+    Function  CheckForNoDocumentation (Const Container : TElementContainer) : Boolean;
     (**
       This property provide all descendant modules with a single point of access to the options.
       @precon  None.
@@ -86,9 +88,9 @@ Type
     Function  ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Virtual;
     Procedure AddIssue(Const strMsg: String; Const AScope: TScope; Const iLine, iCol: Integer;
       Const ErrorType: TErrorType; Const Container : TElementContainer);
-    Procedure AddDocumentConflict(Const Args: Array of Const;
-      Const iIdentLine, iIdentColumn : Integer; Const AComment : TComment;
-      Const strCategory : String; Const DocConflictRec : TDocConflictTable);
+    Procedure AddDocumentConflict(Const Args: Array Of Const; Const iIdentLine, iIdentColumn: Integer;
+      Const Container: TElementContainer; Const strCategory: String;
+      Const DocConflictRec: TDocConflictTable);
     Procedure AddModuleMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
       Const Container : TElementContainer; Const Metric : TBADIModuleMetric);
     Function  AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
@@ -374,13 +376,13 @@ End;
   @param   Args           as an Array Of Const as a constant
   @param   iIdentLine     as an Integer as a constant
   @param   iIdentColumn   as an Integer as a constant
-  @param   AComment       as a TComment as a constant
+  @param   Container      as a TElementContainer as a constant
   @param   strCategory    as a String as a constant
   @param   DocConflictRec as a TDocConflictTable as a constant
 
 **)
-Procedure TElementContainer.AddDocumentConflict(Const Args: Array Of Const;
-  Const iIdentLine, iIdentColumn: Integer; Const AComment: TComment; Const strCategory: String;
+Procedure TElementContainer.AddDocumentConflict(Const Args: Array Of Const; Const iIdentLine,
+  iIdentColumn: Integer; Const Container: TElementContainer; Const strCategory: String;
   Const DocConflictRec: TDocConflictTable);
 
 Var
@@ -389,7 +391,9 @@ Var
   iIcon: TBADIImageIndex;
 
 Begin
-  DocConflictPosition(iLine, iColumn, AComment);
+  If CheckForNoDocumentation(Container) Then
+    Exit;
+  DocConflictPosition(iLine, iColumn, Container);
   iIcon := DocConflictImage(DocConflictRec);
   E := FindRoot;
   E := AddRootContainer(E, strDocumentationConflicts, iiDocConflictFolder);
@@ -752,6 +756,43 @@ End;
 
 (**
 
+  This method checks for a stop or no documnetation tag and returns true if found in the elements comment
+  of one of the parent comments.
+
+  @precon  None.
+  @postcon Checks for a stop or no documnetation tag and returns true if found in the elements comment
+           of one of the parent comments.
+
+  @param   Container as a TElementContainer as a constant
+  @return  a Boolean
+
+**)
+Function TElementContainer.CheckForNoDocumentation(Const Container : TElementContainer) : Boolean;
+
+Const
+  strStopDocumentation = 'stopdocumentation';
+  strNoDocumentation = 'nodocumentation';
+
+Var
+  E : TElementContainer;
+  
+Begin
+  Result := False;
+  If Not (doShowConflicts In BADIOptions.Options) Then
+    Exit(True);
+  E := Container;
+  While Assigned(E) Do
+    Begin
+      If Assigned(E.Comment) Then
+        If ((E.Comment.FindTag(strStopDocumentation) >= 0) Or
+            (E.Comment.FindTag(strNoDocumentation) >= 0)) Then
+          Exit(True);
+      E := E.Parent;
+    End;
+End;
+
+(**
+
   This method checks the container comment (and its parents) for noXxxx(s) tags and returns true if they
   were found to signify that an issue is not required.
 
@@ -935,21 +976,26 @@ End;
   @precon  None.
   @postcon The cursor position for the conflict message based on the comment if found is updated.
 
-  @param   iL       as an Integer as a reference
-  @param   iC       as an Integer as a reference
-  @param   AComment as a TComment as a constant
+  @param   iL        as an Integer as a reference
+  @param   iC        as an Integer as a reference
+  @param   Container as a TElementContainer as a constant
 
 **)
 Procedure TElementContainer.DocConflictPosition(Var iL: Integer; Var iC: Integer;
-  Const AComment: TComment);
+  Const Container: TElementContainer);
 
 Begin
   iL := 0;
   iC := 0;
-  If Assigned(AComment) Then
+  If Assigned(Container) Then
     Begin
-      iL := AComment.Line;
-      iC := AComment.Column;
+      iL := Container.Line;
+      iC := Container.Column;
+      If Assigned(Container.Comment) Then
+        Begin
+          iL := Container.Comment.Line;
+          iC := Container.Comment.Column;
+        End;
     End;
 End;
 

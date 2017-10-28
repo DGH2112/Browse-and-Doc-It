@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Oct 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Generic.TypeDecl;
@@ -67,7 +67,7 @@ Begin
   If doShowUndocumentedTypes In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       Begin
-        AddDocumentConflict([Identifier], Line, Column, Comment, strTypeDocumentation,
+        AddDocumentConflict([Identifier], Line, Column, Self, strTypeDocumentation,
           DocConflictTable[dctTypeClauseUndocumented]);
       End;
   Inherited CheckDocumentation(boolCascade);

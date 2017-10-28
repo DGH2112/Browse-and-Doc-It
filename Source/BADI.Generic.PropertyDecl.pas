@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Generic.PropertyDecl;
@@ -85,13 +85,13 @@ Begin
     Begin
       If Comment = Nil Then
         Begin
-          AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+          AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
             Format(strFunctionDocumentation, [FunctionType]),
             DocConflictTable[dctFunctionUndocumented]);
           Exit;
         End;
       If Comment.TokenCount = 0 Then
-        AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+        AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
           Format(strFunctionDocumentation, [FunctionType]), DocConflictTable[dctFunctionHasNoDesc]);
     End;
 End;
@@ -128,22 +128,22 @@ Begin
       End;
   If doShowPropertyMissingPreCons In BADIOptions.Options Then
     If boolMissing Then
-      AddDocumentConflict([FunctionType, QualifiedName], Comment.Line, Comment.Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName], Comment.Line, Comment.Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionPreconNotDocumented]);
   If doShowPropertyDiffPropParamCount In BADIOptions.Options Then
     If (ParameterCount <> j) Then
-      AddDocumentConflict([FunctionType, QualifiedName, ParameterCount, j], Line, Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName, ParameterCount, j], Line, Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionDiffParamCount]);
   If doShowPropertyMissingPreCons In BADIOptions.Options Then
     If k < 1 Then
-      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionMissingPreCon]);
   If doShowPropertyMissingPreCons In BADIOptions.Options Then
     If k > 1 Then
-      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionTooManyPrecons]);
 End;
@@ -171,40 +171,38 @@ Begin
     Begin
       // Parameter name
       iFound := -1;
-      With Comment Do
-        For j := 0 To TagCount - 1 Do
-          If (LowerCase(Tag[j].TagName) = 'param') And (Tag[j].TokenCount > 0) And
-            (LowerCase(Tag[j].Tokens[0].Token) = LowerCase(Parameters[i].Identifier)) Then
-            Begin
-              iFound := j;
-              Break;
-            End;
+      For j := 0 To Comment.TagCount - 1 Do
+        If (LowerCase(Comment.Tag[j].TagName) = 'param') And (Comment.Tag[j].TokenCount > 0) And
+          (LowerCase(Comment.Tag[j].Tokens[0].Token) = LowerCase(Parameters[i].Identifier)) Then
+          Begin
+            iFound := j;
+            Break;
+          End;
       If doShowPropertyUndocumentedParams In BADIOptions.Options Then
         If iFound = -1 Then
           AddDocumentConflict([Parameters[i].Identifier, FunctionType, QualifiedName], Line, Column,
-            Comment, Format(strFunctionDocumentation, [FunctionType]),
+            Self, Format(strFunctionDocumentation, [FunctionType]),
             DocConflictTable[dctFunctionUndocumentedParam]);
       // Parameter type
       If iFound > -1 Then
-        With Comment Do
-          Begin
-            strType := '';
-            For j := 6 To Tag[iFound].TokenCount - 1 Do
-              Begin
-                If (Tag[iFound].Tokens[j].TokenType In [ttSymbol]) And
-                  (Tag[iFound].Tokens[j].Token <> '.') Then
-                  Break;
-                strType := strType + Tag[iFound].Tokens[j].Token;
-              End;
-            strType := Trim(strType);
-            strParam := BuildLangIndepRep(Parameters[i]);
-            If doShowPropertyIncorrectParamType In BADIOptions.Options Then
-              If CompareText(strType, strParam) <> 0 Then
-                AddDocumentConflict([Parameters[i].Identifier, FunctionType, QualifiedName,
-                  strParam], Tag[iFound].Line, Tag[iFound].Column, Comment,
-                  Format(strFunctionDocumentation, [FunctionType]),
-                  DocConflictTable[dctFunctionIncorrectParamType]);
-          End;
+        Begin
+          strType := '';
+          For j := 6 To Comment.Tag[iFound].TokenCount - 1 Do
+            Begin
+              If (Comment.Tag[iFound].Tokens[j].TokenType In [ttSymbol]) And
+                (Comment.Tag[iFound].Tokens[j].Token <> '.') Then
+                Break;
+              strType := strType + Comment.Tag[iFound].Tokens[j].Token;
+            End;
+          strType := Trim(strType);
+          strParam := BuildLangIndepRep(Parameters[i]);
+          If doShowPropertyIncorrectParamType In BADIOptions.Options Then
+            If CompareText(strType, strParam) <> 0 Then
+              AddDocumentConflict([Parameters[i].Identifier, FunctionType, QualifiedName,
+                strParam], Comment.Tag[iFound].Line, Comment.Tag[iFound].Column, Self,
+                Format(strFunctionDocumentation, [FunctionType]),
+                DocConflictTable[dctFunctionIncorrectParamType]);
+        End;
     End;
 End;
 
@@ -236,7 +234,7 @@ Begin
         If doShowPropertyMissingPostCons In BADIOptions.Options Then
           If Comment.Tag[i].TokenCount = 0 Then
             AddDocumentConflict([FunctionType, QualifiedName], Comment.Tag[i].Line,
-              Comment.Tag[i].Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
+              Comment.Tag[i].Column, Self, Format(strFunctionDocumentation, [FunctionType]),
               DocConflictTable[dctFunctionPostconNotDocumented]);
       End;
   If RequiresReturn Then
@@ -244,7 +242,7 @@ Begin
       If iReturnTagIndex = -1 Then
         Begin
           If doShowPropertyUndocumentedReturn In BADIOptions.Options Then
-            AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+            AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
               Format(strFunctionDocumentation, [FunctionType]),
               DocConflictTable[dctFunctionUndocumentedReturn])
         End
@@ -266,24 +264,24 @@ Begin
                 strReturn := ReturnType.AsString(False, False);
               If CompareText(strReturn, strType) <> 0 Then
                 AddDocumentConflict([FunctionType, QualifiedName, strReturn],
-                  Comment.Tag[iReturnTagIndex].Line, Comment.Tag[iReturnTagIndex].Column, Comment,
+                  Comment.Tag[iReturnTagIndex].Line, Comment.Tag[iReturnTagIndex].Column, Self,
                   Format(strFunctionDocumentation, [FunctionType]),
                   DocConflictTable[dctFunctionIncorrectReturntype]);
             End;
         End;
     End
   Else If Comment.FindTag('return') >= 0 Then
-    AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+    AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
       Format(strFunctionDocumentation, [FunctionType]),
       DocConflictTable[dctFunctionReturnNotRequired]);
   If doShowPropertyMissingPostCons In BADIOptions.Options Then
     If iNumOfPostCons = 0 Then
-      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionMissingPostCon]);
   If doShowPropertyMissingPostCons In BADIOptions.Options Then
     If (iNumOfPostCons > 1) And (iReturnTagIndex > -1) Then
-      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionTooManyPostCons]);
 End;

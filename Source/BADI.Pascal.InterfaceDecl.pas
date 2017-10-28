@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Oct 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Pascal.InterfaceDecl;
@@ -54,8 +54,13 @@ uses
 
 **)
 Function TInterfaceDecl.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
+
+Const
+  strInterface = 'Interface';
+  
 Var
   iToken: Integer;
+  
 Begin
   Result := '';
   If boolShowIdentifier Then
@@ -64,7 +69,7 @@ Begin
 // Result := Result + GenericParams.AsString;
   If Result <> '' Then
     Result := Result + #32'='#32;
-  Result := Result + 'Interface';
+  Result := Result + strInterface;
   If Heritage.ElementCount > 0 Then
     Begin
       Result := Result + '(';
@@ -100,7 +105,7 @@ Var
 Begin
   If doShowUndocumentedInterfaces In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment, strInterfaceDocumentation,
+      AddDocumentConflict([Identifier], Line, Column, Self, strInterfaceDocumentation,
         DocConflictTable[dctInterfaceClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);

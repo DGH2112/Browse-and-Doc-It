@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Oct 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Pascal.FieldDecl;
@@ -66,7 +66,7 @@ Procedure TField.CheckDocumentation(Var boolCascade: Boolean);
 Begin
   If doShowUndocumentedFields In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment, strFieldDocumentation,
+      AddDocumentConflict([Identifier], Line, Column, Self, strFieldDocumentation,
         DocConflictTable[dctFieldClauseUndocumented]);
   Inherited CheckDocumentation(boolCascade);
 End;

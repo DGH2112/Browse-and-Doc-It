@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Pascal.ResourceStringDecl;
@@ -38,6 +38,8 @@ Uses
            documentation.
   @postcon Checks the passed clause for documentation errors.
 
+  @nohint
+  
   @param   boolCascade as a Boolean as a reference
 
 **)
@@ -46,7 +48,7 @@ Procedure TResourceString.CheckDocumentation(Var boolCascade: Boolean);
 Begin
   If doShowUndocumentedConsts In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment, strResourceStringDocumentation,
+      AddDocumentConflict([Identifier], Line, Column, Self, strResourceStringDocumentation,
         DocConflictTable[dctResourceStringClauseUndocumented]);
 End;
 

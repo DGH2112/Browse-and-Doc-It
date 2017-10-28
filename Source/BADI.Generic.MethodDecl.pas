@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Generic.MethodDecl;
@@ -150,13 +150,13 @@ Begin
     Begin
       If Comment = Nil Then
         Begin
-          AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+          AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
             Format(strFunctionDocumentation, [FunctionType]),
             DocConflictTable[dctFunctionUndocumented]);
           Exit;
         End;
       If Comment.TokenCount = 0 Then
-        AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+        AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
           Format(strFunctionDocumentation, [FunctionType]), DocConflictTable[dctFunctionHasNoDesc]);
     End;
 End;
@@ -193,22 +193,22 @@ Begin
       End;
   If doShowMethodMissingPreCons In BADIOptions.Options Then
     If boolMissing Then
-      AddDocumentConflict([FunctionType, QualifiedName], Comment.Line, Comment.Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName], Comment.Line, Comment.Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionPreconNotDocumented]);
   If doShowMethodDiffParamCount In BADIOptions.Options Then
     If (ParameterCount <> j) Then
-      AddDocumentConflict([FunctionType, QualifiedName, ParameterCount, j], Line, Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName, ParameterCount, j], Line, Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionDiffParamCount]);
   If doShowMethodMissingPreCons In BADIOptions.Options Then
     If k < 1 Then
-      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionMissingPreCon]);
   If doShowMethodMissingPreCons In BADIOptions.Options Then
     If k > 1 Then
-      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionTooManyPrecons]);
 End;
@@ -247,7 +247,7 @@ Begin
       If doShowMethodUndocumentedParams In BADIOptions.Options Then
         If iFound = -1 Then
           AddDocumentConflict([Parameters[i].Identifier, FunctionType, QualifiedName], Line, Column,
-            Comment, Format(strFunctionDocumentation, [FunctionType]),
+            Self, Format(strFunctionDocumentation, [FunctionType]),
             DocConflictTable[dctFunctionUndocumentedParam]);
       // Parameter type
       If iFound > -1 Then
@@ -266,7 +266,7 @@ Begin
             If doShowMethodIncorrectParamType In BADIOptions.Options Then
               If CompareText(strType, strParam) <> 0 Then
                 AddDocumentConflict([Parameters[i].Identifier, FunctionType, QualifiedName,
-                  strParam], Tag[iFound].Line, Tag[iFound].Column, Comment,
+                  strParam], Tag[iFound].Line, Tag[iFound].Column, Self,
                   Format(strFunctionDocumentation, [FunctionType]),
                   DocConflictTable[dctFunctionIncorrectParamType]);
           End;
@@ -301,7 +301,7 @@ Begin
         If doShowMethodMissingPostCons In BADIOptions.Options Then
           If Comment.Tag[i].TokenCount = 0 Then
             AddDocumentConflict([FunctionType, QualifiedName], Comment.Tag[i].Line,
-              Comment.Tag[i].Column, Comment, Format(strFunctionDocumentation, [FunctionType]),
+              Comment.Tag[i].Column, Self, Format(strFunctionDocumentation, [FunctionType]),
               DocConflictTable[dctFunctionPostconNotDocumented]);
       End;
   If RequiresReturn Then
@@ -309,7 +309,7 @@ Begin
       If iReturnTagIndex = -1 Then
         Begin
           If doShowMethodUndocumentedReturn In BADIOptions.Options Then
-            AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+            AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
               Format(strFunctionDocumentation, [FunctionType]),
               DocConflictTable[dctFunctionUndocumentedReturn])
         End
@@ -331,24 +331,24 @@ Begin
                 strReturn := ReturnType.AsString(False, False);
               If CompareText(strReturn, strType) <> 0 Then
                 AddDocumentConflict([FunctionType, QualifiedName, strReturn],
-                  Comment.Tag[iReturnTagIndex].Line, Comment.Tag[iReturnTagIndex].Column, Comment,
+                  Comment.Tag[iReturnTagIndex].Line, Comment.Tag[iReturnTagIndex].Column, Self,
                   Format(strFunctionDocumentation, [FunctionType]),
                   DocConflictTable[dctFunctionIncorrectReturntype]);
             End;
         End;
     End
   Else If Comment.FindTag('return') >= 0 Then
-    AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+    AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
       Format(strFunctionDocumentation, [FunctionType]),
       DocConflictTable[dctFunctionReturnNotRequired]);
   If doShowMethodMissingPostCons In BADIOptions.Options Then
     If iNumOfPostCons = 0 Then
-      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionMissingPostCon]);
   If doShowMethodMissingPostCons In BADIOptions.Options Then
     If (iNumOfPostCons > 1) And (iReturnTagIndex <> -1) Then
-      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Comment,
+      AddDocumentConflict([FunctionType, QualifiedName], Line, Column, Self,
         Format(strFunctionDocumentation, [FunctionType]),
         DocConflictTable[dctFunctionTooManyPostCons]);
 End;

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Oct 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Pascal.ClassDecl;
@@ -135,7 +135,7 @@ Var
 Begin
   If doShowUndocumentedClasses In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment, strClassDocumentation,
+      AddDocumentConflict([Identifier], Line, Column, Self, strClassDocumentation,
         DocConflictTable[dctClassClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Oct 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Pascal.FinalizationDecl;
@@ -39,12 +39,15 @@ Uses
   @precon  None .
   @postcon Returns the name of the Finalisation section as a String .
 
+  @nohint 
+  
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
 Function TFinalizationSection.AsString(Const boolShowIdentifier, boolForDocumentation: Boolean): String;
+
 Begin
   Result := '';
   If boolShowIdentifier Then
@@ -58,6 +61,8 @@ End;
   @precon  None.
   @postcon Check the module`s finalisation sections for comments.
 
+  @nohint 
+  
   @param   boolCascade as a Boolean as a reference
 
 **)
@@ -66,7 +71,7 @@ Procedure TFinalizationSection.CheckDocumentation(Var boolCascade: Boolean);
 Begin
   If doShowMissingFinalComment In BADIOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
-      AddDocumentConflict([strFinalizationLabel], Line, Column, Comment, strModuleFinalSection,
+      AddDocumentConflict([strFinalizationLabel], Line, Column, Self, strModuleFinalSection,
         DocConflictTable[dctMissingFinalComment]);
 End;
 

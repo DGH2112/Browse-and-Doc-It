@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Oct 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Pascal.ObjectDecl;
@@ -43,6 +43,8 @@ Uses
 
   @precon  None .
   @postcon Output the name of the Object = '= Object (" HeritageList ")'
+
+  @nohint
 
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant
@@ -87,7 +89,7 @@ var
 Begin
   If doShowUndocumentedObjects In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment,
+      AddDocumentConflict([Identifier], Line, Column, Self,
         strObjectDocumentation, DocConflictTable[dctObjectClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);

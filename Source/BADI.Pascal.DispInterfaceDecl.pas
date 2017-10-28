@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    13 Oct 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Pascal.DispInterfaceDecl;
@@ -94,7 +94,7 @@ Var
 Begin
   If doShowUndocumentedInterfaces In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
-      AddDocumentConflict([Identifier], Line, Column, Comment, strDispInterfaceDocumentation,
+      AddDocumentConflict([Identifier], Line, Column, Self, strDispInterfaceDocumentation,
         DocConflictTable[dctDispInterfaceClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);

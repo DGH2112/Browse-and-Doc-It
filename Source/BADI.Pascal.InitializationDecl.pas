@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Oct 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Pascal.InitializationDecl;
@@ -40,12 +40,16 @@ Uses
   @precon  None .
   @postcon Returns the name of the Initialisation section as a String .
 
+  @nohint 
+  
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant
   @return  a String
 
 **)
-Function TInitializationSection.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
+Function TInitializationSection.AsString(Const boolShowIdentifier,
+  boolForDocumentation : Boolean) : String;
+
 Begin
   Result := '';
   If boolShowIdentifier Then
@@ -59,6 +63,8 @@ End;
   @precon  None.
   @postcon Check the module`s initialisation sections for comments.
 
+  @nohint 
+  
   @param   boolCascade as a Boolean as a reference
 
 **)
@@ -67,7 +73,7 @@ Procedure TInitializationSection.CheckDocumentation(Var boolCascade: Boolean);
 Begin
   If doShowMissingInitComment In BADIOptions.Options Then
     If (Comment = Nil) Or (Comment.TokenCount = 0) Then
-      AddDocumentConflict([strInitializationLabel], Line, Column, Comment, strModuleInitSection,
+      AddDocumentConflict([strInitializationLabel], Line, Column, Self, strModuleInitSection,
         DocConflictTable[dctMissingInitComment]);
 End;
 

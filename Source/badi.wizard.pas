@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    30 Apr 2017
+  @Date    28 Oct 2017
   @Version 1.0
 
 **)
@@ -38,8 +38,7 @@ Type
     FEditorIndex             : Integer;
     {$ENDIF}
   Strict Protected
-    Procedure SelectionChange(iIdentLine, iIdentCol, iCommentLine,
-      iCommentCol: Integer);
+    Procedure SelectionChange(Const iIdentLine, iIdentCol, iCommentLine, iCommentCol: Integer);
     Procedure Focus(Sender: TObject);
     Procedure OptionsChange(Sender: TObject);
     Procedure UpdateMenuShortcuts(Sender : TObject);
@@ -119,6 +118,8 @@ End;
   This is an exceute method for the wizard. Since this wizard is not implemented
   as a menu wizard this method has no code but is required for the interface.
 
+  @nometric EmptyMethod
+  
   @precon  None.
   @postcon None.
 
@@ -158,8 +159,10 @@ End;
 **)
 Function TBrowseAndDocItWizard.GetIDString: String;
 
+Const
+  strIDString = 'David Hoyle.Browse An Doc It';
 Begin
-  Result := 'David Hoyle.Browse An Doc It';
+  Result := strIDString;
 End;
 
 (**
@@ -174,8 +177,11 @@ End;
 **)
 Function TBrowseAndDocItWizard.GetMenuText: String;
 
+Const
+  strBADIMenuName = 'Browse and Doc It...';
+  
 Begin
-  Result := 'Browse and Doc It...';
+  Result := strBADIMenuName;
 End;
 
 (**
@@ -190,8 +196,11 @@ End;
 **)
 Function TBrowseAndDocItWizard.GetName: String;
 
+Const
+  strBADIName = 'David Hoyle.Browse An Doc It';
+  
 Begin
-  Result := 'David Hoyle.Browse An Doc It';
+  Result := strBADIName;
 End;
 
 (**
@@ -241,13 +250,13 @@ End;
   @precon  None.
   @postcon Notifies the system that the selection has changed and moves the editor cursor.
 
-  @param   iIdentLine   as an Integer
-  @param   iIdentCol    as an Integer
-  @param   iCommentLine as an Integer
-  @param   iCommentCol  as an Integer
+  @param   iIdentLine   as an Integer as a constant
+  @param   iIdentCol    as an Integer as a constant
+  @param   iCommentLine as an Integer as a constant
+  @param   iCommentCol  as an Integer as a constant
 
 **)
-Procedure TBrowseAndDocItWizard.SelectionChange(iIdentLine, iIdentCol, iCommentLine,
+Procedure TBrowseAndDocItWizard.SelectionChange(Const iIdentLine, iIdentCol, iCommentLine,
   iCommentCol: Integer);
 
 Begin

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    22 Oct 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Pascal.MethodDecl;
@@ -304,6 +304,9 @@ Var
   boolFound: Boolean;
 
 begin
+  Result := Inherited ReferenceSymbol(AToken);
+  If Result Then
+    Exit;
   Result := ReferenceSection(AToken, FVariablesLabel);
   If Result Then
     Exit;
@@ -332,11 +335,10 @@ begin
       Result := True;
       Exit;
     End;
-  If RecObjClsInt <> Nil Then
+  If Assigned(RecObjClsInt) Then
     Result := RecObjClsInt.ReferenceSymbol(AToken);
   If Result Then
     Exit;
-  Result := Inherited ReferenceSymbol(AToken);
 end;
 
 End.

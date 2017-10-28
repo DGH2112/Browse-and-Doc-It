@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    15 Oct 2017
+  @Date    28 Oct 2017
   @Author  David Hoyle
 
 **)
@@ -25,40 +25,42 @@ Uses
 Type
   (** This class handles notifications from the editor so that changes in the
       editor can be displayed. **)
-  TEditorNotifier = Class(TNotifierObject {$IFDEF D2005},
-    INTAEditServicesNotifier {$ENDIF} )
-  {$IFDEF D2005} Strict {$ENDIF} Private
+  TEditorNotifier = Class(TNotifierObject, INTAEditServicesNotifier)
+  Strict Private
     FUpdateTimer : TTimer;
-    {$IFNDEF D2005}
-    FLastSize : Int64;
-    {$ENDIF}
     FLastEditorName : String;
     FLastCursorPos: TOTAEditPos;
     FLastParserResult : Boolean;
     FLastUpdateTickCount : Cardinal;
     FBADIThreadMgr : TBrowseAndDocItThreadManager;
+  Strict Protected
     Procedure EnableTimer(Const boolSuccessfulParse : Boolean);
     Procedure TimerEventHandler(Sender : TObject);
-    Function EditorInfo(var strFileName : String;
-      var boolModified : Boolean) : String;
+    Function  EditorInfo(var strFileName : String; var boolModified : Boolean) : String;
     Procedure RenderDocument(Const Module: TBaseLanguageModule);
     Procedure ExceptionMsg(Const strExceptionMsg : String);
-  {$IFDEF D2005} Strict {$ENDIF} Protected
-  Public
-    {$IFDEF D2005}
+    Procedure CheckForCursorMovement(Const Editor : IOTASourceEditor);
+    Procedure CheckFileNameAndSize(Const Editor : IOTASourceEditor);
+    // INTAEditServicesNotifier
+    //: @nometric MissingCONSTInParam
     procedure WindowShow(const EditWindow: INTAEditWindow; Show, LoadedFromDesktop: Boolean);
+    //: @nometric MissingCONSTInParam
     procedure WindowNotification(const EditWindow: INTAEditWindow; Operation: TOperation);
     procedure WindowActivated(const EditWindow: INTAEditWindow);
+    //: @nometric MissingCONSTInParam
     procedure WindowCommand(const EditWindow: INTAEditWindow; Command, Param: Integer; var Handled: Boolean);
     procedure EditorViewActivated(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
     procedure EditorViewModified(const EditWindow: INTAEditWindow; const EditView: IOTAEditView);
+    //: @nometric MissingCONSTInParam
     procedure DockFormVisibleChanged(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+    //: @nometric MissingCONSTInParam
     procedure DockFormUpdated(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+    //: @nometric MissingCONSTInParam
     procedure DockFormRefresh(const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-    {$ENDIF}
+  Public
     Constructor Create;
     Destructor Destroy; Override;
-    Procedure ResetLastUpdateTickCount(iNewValue : Integer = 0);
+    Procedure ResetLastUpdateTickCount(Const iNewValue : Integer = 0);
   End;
 
 Implementation
@@ -78,6 +80,57 @@ Uses
 
 (**
 
+  This method checks the filename for changes.
+
+  @precon  Editor must be a valid instance.
+  @postcon Set the timer to update immediate if the file have changed.
+
+  @param   Editor as an IOTASourceEditor as a constant
+
+**)
+Procedure TEditorNotifier.CheckFileNameAndSize(Const Editor : IOTASourceEditor);
+
+Begin
+  If Assigned(Editor) Then
+    If Editor.FileName <> FLastEditorName Then
+      Begin
+        FLastUpdateTickCount := 1;
+        FLastEditorName := Editor.FileName;
+      End
+End;
+
+(**
+
+  This method checks for cursor movement when the timer is called.
+
+  @precon  Editor must be a valid instance.
+  @postcon If the cursor has moved since last time the cursor position is updated and the
+           FLastUpdateTickCount is also updated.
+
+  @param   Editor as an IOTASourceEditor as a constant
+
+**)
+Procedure TEditorNotifier.CheckForCursorMovement(Const Editor : IOTASourceEditor);
+
+Var
+  P : TOTAEditPos;
+
+Begin
+  If Assigned(Editor) Then
+    Begin
+      If Editor.GetEditViewCount > 0 Then
+        P := Editor.GetEditView(0).CursorPos;
+      If FLastUpdateTickCount > 0 Then
+        If (P.Col <> FLastCursorPos.Col) Or (P.Line <> FLastCursorPos.Line) Then
+          Begin
+            FLastUpdateTickCount := GetTickCount;
+            FLastCursorPos := P;
+          End;
+    End;
+End;
+
+(**
+
   This is the constructor method for the TEditorNotifier class.
 
   @precon  None.
@@ -85,18 +138,19 @@ Uses
 
 **)
 constructor TEditorNotifier.Create;
+
+Const
+  iUpdateInterval = 100;
+  
 begin
   Inherited Create;
   FBADIThreadMgr := TBrowseAndDocItThreadManager.Create;
   FUpdateTimer := TTimer.Create(Nil);
-  {$IFDEF D2005}
-  FUpdateTimer.Interval := 100;
-  {$ELSE}
-  FUpdateTimer.Interval := 500;
-  {$ENDIF}
+  FUpdateTimer.Interval := iUpdateInterval;
   FUpdateTimer.OnTimer := TimerEventHandler;
   FLastParserResult := True;
   FUpdateTimer.Enabled := True;
+  FLastUpdateTickCount := 1; // Cause immediate parsing of the current file.
 end;
 
 (**
@@ -114,6 +168,65 @@ begin
   FUpdateTimer.Free;
   FBADIThreadMgr.Free;
   Inherited;
+end;
+
+(**
+
+  This an impementation of the DockFormRefresh method for the Editor Notifier
+  interface.
+
+  @precon  None.
+  @postcon Not used.
+
+  @nohint
+  @nometric MissingCONSTInParam EmptyMethod
+
+  @param   EditWindow as an INTAEditWindow as a constant
+  @param   DockForm   as a TDockableForm
+
+**)
+procedure TEditorNotifier.DockFormRefresh(Const EditWindow: INTAEditWindow; DockForm: TDockableForm);
+begin
+end;
+
+(**
+
+  This an impementation of the DockFormUpdate method for the Editor Notifier
+  interface.
+
+  @precon  None.
+  @postcon Not used.
+
+  @nohint
+  @nometric MissingCONSTInParam EmptyMethod
+
+  @param   EditWindow as an INTAEditWindow as a constant
+  @param   DockForm   as a TDockableForm
+
+**)
+procedure TEditorNotifier.DockFormUpdated(const EditWindow: INTAEditWindow;
+  DockForm: TDockableForm);
+begin
+end;
+
+(**
+
+  This an impementation of the DockFormVisibleChange method for the Editor Notifier
+  interface.
+
+  @precon  None.
+  @postcon Not used.
+
+  @nohint
+  @nometric MissingCONSTInParam EmptyMethod
+
+  @param   EditWindow as an INTAEditWindow as a constant
+  @param   DockForm   as a TDockableForm
+
+**)
+procedure TEditorNotifier.DockFormVisibleChanged(const EditWindow: INTAEditWindow;
+  DockForm: TDockableForm);
+begin
 end;
 
 (**
@@ -136,12 +249,116 @@ end;
 function TEditorNotifier.EditorInfo(var strFileName: String;
   var boolModified: Boolean) : String;
 
+Const
+  strDefines = 'Defines';
+  strWIN32 = 'WIN32';
+  strWIN64 = 'WIN64';
+  strMSWINDOWS = 'MSWINDOWS';
+  {$IFDEF VER120} // Delphi 4
+  strCompilerVersion = 'VER120');
+  {$ENDIF}
+  {$IFDEF VER130} // Delphi 5
+  strCompilerVersion = 'VER130';
+  {$ENDIF}
+  {$IFDEF VER140} // Delphi 6
+  strCompilerVersion = 'VER140';
+  {$ENDIF}
+  {$IFDEF VER150} // Delphi 7
+  strCompilerVersion = 'VER150';
+  {$ENDIF}
+  {$IFDEF VER160} // Delphi for .NET
+  strCompilerVersion = 'VER160';
+  {$ENDIF}
+  {$IFDEF VER170} // Delphi 2005
+  strCompilerVersion = 'VER170';
+  {$ENDIF}
+  {$IFDEF VER180} // Delphi 2006
+  strCompilerVersion = 'VER180';
+  {$ENDIF}
+  {$IFDEF VER190} // Delphi 2007
+  strCompilerVersion = 'VER190';
+  {$ENDIF}
+  {$IFDEF VER200} // Delphi 2009
+  strCompilerVersion = 'VER200';
+  {$ENDIF}
+  {$IFDEF VER210} // Delphi 2010
+  strCompilerVersion = 'VER210';
+  {$ENDIF}
+  {$IFDEF VER220} // Delphi XE
+  strCompilerVersion = 'VER220';
+  {$ENDIF}
+  {$IFDEF VER230} // Delphi XE2
+  strCompilerVersion = 'VER230';
+  {$ENDIF}
+  {$IFDEF VER240} // Delphi XE3
+  strCompilerVersion = 'VER240';
+  {$ENDIF}
+  {$IFDEF VER250} // Delphi XE4
+  strCompilerVersion = 'VER250';
+  {$ENDIF}
+  {$IFDEF VER260} // Delphi XE5
+  strCompilerVersion = 'VER260';
+  {$ENDIF}
+  {$IFDEF VER270} // Delphi XE6
+  strCompilerVersion = 'VER270';
+  {$ENDIF}
+  {$IFDEF VER280} // Delphi XE7
+  strCompilerVersion = 'VER280';
+  {$ENDIF}
+  {$IFDEF VER290} // Delphi XE8
+  strCompilerVersion = 'VER290';
+  {$ENDIF}
+  {$IFDEF VER300} // Delphi XE10 Seattle
+  strCompilerVersion = 'VER300';
+  {$ENDIF}
+  {$IFDEF VER310} // Delphi XE10.1 Berlin
+  strCompilerVersion = 'VER310';
+  {$ENDIF}
+  {$IFDEF VER320} // Delphi XE10.2 Tokyo
+  strCompilerVersion = 'VER320';
+  {$ENDIF}
+  {$IFNDEF D0001}
+    {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
+  {$ENDIF}
+
+  (**
+
+    This procedure adds the standard compiler defintions to the definiton list for parsing files.
+
+    @precon  Project must be a valid instance.
+    @postcon The standard compiler definitions are added the definitions list for parsing.
+
+    @param   Project as an IOTAProject as a constant
+
+  **)
+  Procedure SetStandardCompilerDefs(Const Project : IOTAProject);
+
+  Var
+    strPlatform: String;
+    ProjOpsConfigs : IOTAProjectOptionsConfigurations;
+    
+  Begin
+    TBADIOptions.BADIOptions.Defines.Add(strCompilerVersion);
+    {$IFDEF DXE20}
+    If Assigned(Project) Then
+      If Supports(Project.ProjectOptions, IOTAProjectOptionsConfigurations, ProjOpsConfigs) Then
+        Begin
+          strPlatform := UpperCase(ProjOpsConfigs.ActiveConfiguration.Platform);
+          TBADIOptions.BADIOptions.Defines.Add(strPlatform);
+          If (strPlatform = strWIN32) Or (strPlatform = strWIN64) Then
+            TBADIOptions.BADIOptions.Defines.Add(strMSWINDOWS);
+        End;
+    {$ELSE}
+    TBADIOptions.BADIOptions.Defines.Add(strWIN32);
+    TBADIOptions.BADIOptions.Defines.Add(sreMSWINDOWS);
+    {$ENDIF}
+  
+  End;
+  
 Var
   SE : IOTASourceEditor;
   Options : IOTAProjectOptions;
-  ProjOpsConfigs : IOTAProjectOptionsConfigurations;
-  strPlatform: String;
-  P : IOTAProject;
+  Project : IOTAProject;
 
 begin
   Result := '';
@@ -153,94 +370,57 @@ begin
       strFileName := SE.FileName;
       boolModified := SE.Modified;
       Result := EditorAsString(SE);
-      P := ActiveProject;
-      If Assigned(P) Then
+      Project := ActiveProject;
+      If Assigned(Project) Then
         Begin
-          Options := P.ProjectOptions;
+          Options := Project.ProjectOptions;
           TBADIOptions.BADIOptions.Defines.Text :=
-            StringReplace(Options.Values['Defines'], ';', #13#10,
+            StringReplace(Options.Values[strDefines], ';', #13#10,
             [rfReplaceAll]);
+          SetStandardCompilerDefs(Project);
         End;
-      {$IFDEF VER120} // Delphi 4
-      TBADIOptions.BADIOptions.Defines.Add('VER120');
-      {$ENDIF}
-      {$IFDEF VER130} // Delphi 5
-      TBADIOptions.BADIOptions.Defines.Add('VER130');
-      {$ENDIF}
-      {$IFDEF VER140} // Delphi 6
-      TBADIOptions.BADIOptions.Defines.Add('VER140');
-      {$ENDIF}
-      {$IFDEF VER150} // Delphi 7
-      TBADIOptions.BADIOptions.Defines.Add('VER150');
-      {$ENDIF}
-      {$IFDEF VER160} // Delphi for .NET
-      TBADIOptions.BADIOptions.Defines.Add('VER160');
-      {$ENDIF}
-      {$IFDEF VER170} // Delphi 2005
-      TBADIOptions.BADIOptions.Defines.Add('VER170');
-      {$ENDIF}
-      {$IFDEF VER180} // Delphi 2006
-      TBADIOptions.BADIOptions.Defines.Add('VER180');
-      {$ENDIF}
-      {$IFDEF VER190} // Delphi 2007
-      TBADIOptions.BADIOptions.Defines.Add('VER190');
-      {$ENDIF}
-      {$IFDEF VER200} // Delphi 2009
-      TBADIOptions.BADIOptions.Defines.Add('VER200');
-      {$ENDIF}
-      {$IFDEF VER210} // Delphi 2010
-      TBADIOptions.BADIOptions.Defines.Add('VER210');
-      {$ENDIF}
-      {$IFDEF VER220} // Delphi XE
-      TBADIOptions.BADIOptions.Defines.Add('VER220');
-      {$ENDIF}
-      {$IFDEF VER230} // Delphi XE2
-      TBADIOptions.BADIOptions.Defines.Add('VER230');
-      {$ENDIF}
-      {$IFDEF VER240} // Delphi XE3
-      TBADIOptions.BADIOptions.Defines.Add('VER240');
-      {$ENDIF}
-      {$IFDEF VER250} // Delphi XE4
-      TBADIOptions.BADIOptions.Defines.Add('VER250');
-      {$ENDIF}
-      {$IFDEF VER260} // Delphi XE5
-      TBADIOptions.BADIOptions.Defines.Add('VER260');
-      {$ENDIF}
-      {$IFDEF VER270} // Delphi XE6
-      TBADIOptions.BADIOptions.Defines.Add('VER270');
-      {$ENDIF}
-      {$IFDEF VER280} // Delphi XE7
-      TBADIOptions.BADIOptions.Defines.Add('VER280');
-      {$ENDIF}
-      {$IFDEF VER290} // Delphi XE8
-      TBADIOptions.BADIOptions.Defines.Add('VER290');
-      {$ENDIF}
-      {$IFDEF VER300} // Delphi XE10 Seattle
-      TBADIOptions.BADIOptions.Defines.Add('VER300');
-      {$ENDIF}
-      {$IFDEF VER310} // Delphi XE10.1 Berlin
-      TBADIOptions.BADIOptions.Defines.Add('VER310');
-      {$ENDIF}
-      {$IFDEF VER320} // Delphi XE10.2 Tokyo
-      TBADIOptions.BADIOptions.Defines.Add('VER320');
-      {$ENDIF}
-      {$IFNDEF D0001}
-        {$MESSAGE ERROR 'The Condition Definitions need to be updated!!!!!'}
-      {$ENDIF}
-      {$IFDEF DXE20}
-      If Assigned(P) Then
-        If Supports(P.ProjectOptions, IOTAProjectOptionsConfigurations, ProjOpsConfigs) Then
-          Begin
-            strPlatform := UpperCase(ProjOpsConfigs.ActiveConfiguration.Platform);
-            TBADIOptions.BADIOptions.Defines.Add(strPlatform);
-            If (strPlatform = 'WIN32') Or (strPlatform = 'WIN64') Then
-              TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
-          End;
-      {$ELSE}
-      TBADIOptions.BADIOptions.Defines.Add('WIN32');
-      TBADIOptions.BADIOptions.Defines.Add('MSWINDOWS');
-      {$ENDIF}
     End;
+end;
+
+(**
+
+  This an impementation of the EditorViewActivate method for the Editor Notifier
+  interface.
+
+  @precon  None.
+  @postcon Refreshes the module explorer IF the last parser was sucessful.
+
+  @nohint
+
+  @param   EditWindow as an INTAEditWindow as a constant
+  @param   EditView   as an IOTAEditView as a constant
+
+**)
+procedure TEditorNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
+  const EditView: IOTAEditView);
+begin
+  FLastParserResult := True;
+  FLastUpdateTickCount := 1;
+end;
+
+(**
+
+  This an impementation of the EditorViewModified method for the Editor Notifier
+  interface.
+
+  @precon  None.
+  @postcon Logs the last time the editor was updated.
+
+  @nohint
+
+  @param   EditWindow as an INTAEditWindow as a constant
+  @param   EditView   as an IOTAEditView as a constant
+
+**)
+procedure TEditorNotifier.EditorViewModified(const EditWindow: INTAEditWindow;
+  const EditView: IOTAEditView);
+begin
+  FLastUpdateTickCount := GetTickCount;
 end;
 
 (**
@@ -293,17 +473,16 @@ end;
 
 (**
 
-  This method resets the last update tick count with zero or an optional new
-  value.
+  This method resets the last update tick count with zero or an optional new value.
 
   @precon  None.
-  @postcon Resets the last update tick count with zero or an optional new
-           value.
+  @postcon Resets the last update tick count with zero or an optional new value.
 
-  @param   iNewValue as an Integer
+  @param   iNewValue as an Integer as a constant
 
 **)
-procedure TEditorNotifier.ResetLastUpdateTickCount(iNewValue : Integer = 0);
+procedure TEditorNotifier.ResetLastUpdateTickCount(Const iNewValue : Integer = 0);
+
 begin
   FLastUpdateTickCount := iNewValue;
 end;
@@ -322,179 +501,38 @@ end;
 **)
 procedure TEditorNotifier.TimerEventHandler(Sender: TObject);
 
-  {$IFNDEF D2005}
-  (**
-
-    This function returns the size of the editor stream, i.e. size of the text
-    buffer.
-
-    @precon  If Editor is Nil 0 is returned.
-    @postcon Returns the size of the editor stream, i.e. size of the text
-             buffer.
-
-    @param   Editor as an IOTASourceEditor
-    @return  an Int64
-
-  **)
-  Function MemStreamSize(Editor : IOTASourceEditor) : Int64;
-
-  Var
-    strSource : String;
-
-  Begin
-    Result := 0;
-    If Editor <> Nil Then
-      Begin
-        strSource := EditorAsString(Editor);
-        Result := Length(strSource);
-      End;
-  End;
-  {$ENDIF}
-
-{Const
-  strMsg = 'The last parse of the source code failed. Do you want to re-parse the code?';}
+ResourceString
+  strMsg = 'The last parse of the source code failed. Do you want to re-parse the code?';
 
 Var
   Editor : IOTASourceEditor;
-  P : TOTAEditPos;
 
 begin
   Editor := ActiveSourceEditor;
-  If Editor <> Nil Then
-    Begin
-      If Editor.GetEditViewCount > 0 Then
-        P := Editor.GetEditView(0).CursorPos;
-      If FLastUpdateTickCount > 0 Then
-        If (P.Col <> FLastCursorPos.Col) Or (P.Line <> FLastCursorPos.Line) Then
-          Begin
-            FLastUpdateTickCount := GetTickCount;
-            FLastCursorPos := P;
-          End;
-      If Editor.FileName <> FLastEditorName Then
-        Begin
-          FLastUpdateTickCount := 1;
-          FLastEditorName := Editor.FileName;
-        End
-      {$IFNDEF D2005}
-      Else If FLastSize <> MemStreamSize(Editor) Then
-        Begin
-          FLastUpdateTickCount := GetTickCount;
-          FLastSize := MemStreamSize(Editor);
-        End
-      {$ENDIF};
-    End;
+  CheckForCursorMovement(Editor);
+  CheckFileNameAndSize(Editor);
   If (FLastUpdateTickCount > 0) And
     (GetTickCount > FLastUpdateTickCount + TBADIOptions.BADIOptions.UpdateInterval) Then
     Begin
-      FLastUpdateTickCount := 0;
-      If (Application <> Nil) And (Application.MainForm <> Nil) And
-        Application.MainForm.Visible Then
+      If (Application <> Nil) And (Application.MainForm <> Nil) And Application.MainForm.Visible Then
         Begin
-          {$IFNDEF D2005}
-          FLastSize := MemStreamSize(Editor);
-          {$ENDIF}
+          FLastUpdateTickCount := 0;
           FUpdateTimer.Enabled := False;
-          {: @debug If Not FLastParserResult Then
+          If Not FLastParserResult Then
             If MessageDlg(strMsg, mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
-              Exit;}
+              Exit;
           FBADIThreadMgr.Parse(EnableTimer, EditorInfo, RenderDocument, ExceptionMsg);
         End;
     End;
-end;
-
-{$IFDEF D2005}
-(**
-
-  This an impementation of the DockFormRefresh method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Not used.
-
-  @param   EditWindow as an INTAEditWindow as a constant
-  @param   DockForm   as a TDockableForm
-
-**)
-procedure TEditorNotifier.DockFormRefresh(const EditWindow: INTAEditWindow;
-  DockForm: TDockableForm);
-begin
-end;
-
-(**
-
-  This an impementation of the DockFormUpdate method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Not used.
-
-  @param   EditWindow as an INTAEditWindow as a constant
-  @param   DockForm   as a TDockableForm
-
-**)
-procedure TEditorNotifier.DockFormUpdated(const EditWindow: INTAEditWindow;
-  DockForm: TDockableForm);
-begin
-end;
-
-(**
-
-  This an impementation of the DockFormVisibleChange method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Not used.
-
-  @param   EditWindow as an INTAEditWindow as a constant
-  @param   DockForm   as a TDockableForm
-
-**)
-procedure TEditorNotifier.DockFormVisibleChanged(
-  const EditWindow: INTAEditWindow; DockForm: TDockableForm);
-begin
-end;
-
-(**
-
-  This an impementation of the EditorViewActivate method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Refreshes the module explorer IF the last parser was sucessful.
-
-  @param   EditWindow as an INTAEditWindow as a constant
-  @param   EditView   as an IOTAEditView as a constant
-
-**)
-procedure TEditorNotifier.EditorViewActivated(const EditWindow: INTAEditWindow;
-  const EditView: IOTAEditView);
-begin
-  FLastParserResult := True;
-  FLastUpdateTickCount := 1;
-end;
-
-(**
-
-  This an impementation of the EditorViewModified method for the Editor Notifier
-  interface.
-
-  @precon  None.
-  @postcon Logs the last time the editor was updated.
-
-  @param   EditWindow as an INTAEditWindow as a constant
-  @param   EditView   as an IOTAEditView as a constant
-
-**)
-procedure TEditorNotifier.EditorViewModified(const EditWindow: INTAEditWindow;
-  const EditView: IOTAEditView);
-begin
-  FLastUpdateTickCount := GetTickCount;
 end;
 
 (**
 
   This an impementation of the WindowActivated method for the Editor Notifier
   interface.
+
+  @nohint
+  @nometric EmptyMethod
 
   @precon  None.
   @postcon Not used.
@@ -514,6 +552,9 @@ end;
   @precon  None.
   @postcon Not used.
 
+  @nohint
+  @nometric MissingCONSTInParam EmptyMethod
+
   @param   EditWindow as an INTAEditWindow as a constant
   @param   Command    as an Integer
   @param   Param      as an Integer
@@ -532,6 +573,9 @@ end;
   @precon  None.
   @postcon None.
 
+  @nohint
+  @nometric MissingCONSTInParam EmptyMethod
+
   @param   EditWindow as an INTAEditWindow as a constant
   @param   Operation  as a TOperation
 
@@ -548,6 +592,9 @@ end;
   @precon  None.
   @postcon None.
 
+  @nohint
+  @nometric MissingCONSTInParam EmptyMethod
+
   @param   EditWindow        as an INTAEditWindow as a constant
   @param   Show              as a Boolean
   @param   LoadedFromDesktop as a Boolean
@@ -557,9 +604,5 @@ procedure TEditorNotifier.WindowShow(const EditWindow: INTAEditWindow; Show,
   LoadedFromDesktop: Boolean);
 begin
 end;
-{$ENDIF}
 
 End.
-
-
-

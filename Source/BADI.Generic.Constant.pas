@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 Apr 2017
+  @Date    28 Oct 2017
 
 **)
 Unit BADI.Generic.Constant;
@@ -48,7 +48,7 @@ Begin
   If doShowUndocumentedConsts In BADIOptions.Options Then
     If ((Comment = Nil) Or (Comment.TokenCount = 0)) And (Scope <> scLocal) Then
       Begin
-        AddDocumentConflict([Identifier], Line, Column, Comment, strConstantDocumentation,
+        AddDocumentConflict([Identifier], Line, Column, Self, strConstantDocumentation,
           DocConflictTable[dctConstantClauseUndocumented]);
       End;
   Inherited CheckDocumentation(boolCascade);

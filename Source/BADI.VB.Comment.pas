@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Mar 2017
+  @Date    29 Oct 2017
 
 **)
 Unit BADI.VB.Comment;
@@ -20,7 +20,8 @@ Type
   (** An imlpementation for visual basic comments. **)
   TVBComment = Class(TComment)
   Public
-    Class Function CreateComment(const strComment: String; iLine, iCol: Integer): TComment; Override;
+    Class Function CreateComment(Const strComment: String; Const iLine, iCol: Integer): TComment;
+      Override;
   End;
 
 Implementation
@@ -35,16 +36,15 @@ Uses
   This is a constructor for the TVBComment class.
 
   @precon  None.
-  @postcon Parses a VB comment by simply stripping the single quotes from the
-           text.
+  @postcon Parses a VB comment by simply stripping the single quotes from the text.
 
   @param   strComment as a String as a constant
-  @param   iLine      as an Integer
-  @param   iCol       as an Integer
+  @param   iLine      as an Integer as a constant
+  @param   iCol       as an Integer as a constant
   @return  a TComment
 
 **)
-class function TVBComment.CreateComment(const strComment: String; iLine, iCol: Integer): TComment;
+class function TVBComment.CreateComment(const strComment: String; Const iLine, iCol: Integer): TComment;
 
 Var
   sl : TStringList;
@@ -53,26 +53,28 @@ Var
 
   (**
 
-    This function replaces the indexed character in the passed string with the
-    new given character. This is a workaround for the immutable nature of
-    TStringList items Strings.
+    This function replaces the indexed character in the passed string with the new given character. This 
+    is a workaround for the immutable nature of TStringList items Strings.
 
     @precon  none.
-    @postcon Replaces the indexed character in the passed string with the
-             new given character.
+    @postcon Replaces the indexed character in the passed string with the new given character.
 
-    @param   strText     as a String
-    @param   iIndex      as an Integer
-    @param   chCharacter as a Char
+    @param   strText     as a String as a constant
+    @param   iIndex      as an Integer as a constant
+    @param   chCharacter as a Char as a constant
     @return  a String
 
   **)
-  Function ReplaceCharacter(strText : String; iIndex : Integer; chCharacter : Char) : String;
+  Function ReplaceCharacter(Const strText : String; Const iIndex : Integer;
+    Const chCharacter : Char) : String;
 
   Begin
-    strText[iIndex] := chCharacter;
     Result := strText;
+    Result[iIndex] := chCharacter;
   End;
+
+Const
+  iSecondChar = 2;
 
 begin
   Result := Nil;
@@ -87,10 +89,10 @@ begin
             If sl[iCommentLine][1] = '''' Then
               sl[iCommentLine] := ReplaceCharacter(sl[iCommentLine], 1, #32);
             If Length(sl[iCommentLine]) > 1 Then
-              If (IsInSet(sl[iCommentLine][2], [':', ''''])) Then
+              If (IsInSet(sl[iCommentLine][iSecondChar], [':', ''''])) Then
                 Begin
                   boolDocComment := True;
-                  sl[iCommentLine] := ReplaceCharacter(sl[iCommentLine], 2, #32);
+                  sl[iCommentLine] := ReplaceCharacter(sl[iCommentLine], iSecondChar, #32);
                 End Else
                   sl.Delete(iCommentLine);
           End;

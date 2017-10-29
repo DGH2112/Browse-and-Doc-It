@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    18 Oct 2017
+  @Date    29 Oct 2017
 
 **)
 Unit BADI.Types;
@@ -424,6 +424,8 @@ Type
     bmInSituComment,
     bmToDoComment,
     bmSep2,
+    bmRefactorConstant,
+    bmSep3,
     bmOptions
   );
 

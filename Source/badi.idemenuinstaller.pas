@@ -67,6 +67,7 @@ Type
     Function  AddImagesToIDE : Integer;
     Procedure NilActions;
     Procedure FreeActions;
+    Procedure RefactorConstantClick(Sender : TObject);
   Public
     Constructor Create(Const EditorNotifier : TEditorNotifier);
     Destructor Destroy; Override;
@@ -105,7 +106,8 @@ Uses
   BADI.Functions,
   ComCtrls,
   BADI.Constants, 
-  BADI.Base.Documentation;
+  BADI.Base.Documentation, 
+  BADI.Refactor.Constant;
 
 ResourceString
   (** This is a resource message to confirm whether the selected text should be
@@ -228,6 +230,9 @@ Begin
   Inc(iImageIndex);
   CreateMenuItem(FBADIMenu, bmToDoComment, ToDoCommentClick, Nil, iImageIndex);
   CreateMenuItem(FBADIMenu, bmSep2, Nil, Nil, 0);
+  Inc(iImageIndex);
+  CreateMenuItem(FBADIMenu, bmRefactorConstant, RefactorConstantClick, Nil, iImageIndex);
+  CreateMenuItem(FBADIMenu, bmSep3, Nil, Nil, 0);
   Inc(iImageIndex);
   CreateMenuItem(FBADIMenu, bmOptions, OptionsClick, Nil, iImageIndex);
 End;
@@ -1228,6 +1233,32 @@ End;
 
 (**
 
+  This method invokes the refactor constant code.
+
+  @precon  None.
+  @postcon The refactor constant code is invoked.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBADIIDEMenuInstaller.RefactorConstantClick(Sender: TObject);
+
+Var
+  EditSvrs : IOTAEditorServices;
+  TopView : IOTAEditView;
+  Cursor: TOTAEditPos;
+  
+Begin
+  If Supports(BorlandIDEServices, IOTAEditorServices, EditSvrs) Then
+    Begin
+      TopView := EditSvrs.TopView;
+      Cursor := TopView.CursorPos;
+      TBADIRefactorConstant.Refactor(ActiveSourceEditor, Cursor.Line, Cursor.Col);
+    End;
+End;
+
+(**
+
   This method removes any BADI actions from any of the IDE toolbars to prevent AVs.
 
   @precon  None.
@@ -1529,7 +1560,7 @@ Var
 
 Begin
   SourceEditor := ActiveSourceEditor;
-  If SourceEditor <> Nil Then
+  If Assigned(SourceEditor) Then
     Begin
       If SourceEditor.EditViewCount > 0 Then
         Begin
@@ -1596,5 +1627,3 @@ Begin
 End;
 
 End.
-
-

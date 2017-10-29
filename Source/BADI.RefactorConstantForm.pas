@@ -126,7 +126,8 @@ Begin
         strName := F.edtName.Text;
         setScopes := [];
         Include(setScopes, TBADIRefactoringScope(Byte(F.cbxScope.ItemIndex)));
-        Include(SetTypes, TBADIRefactoringType(Byte(F.cbxType.ItemIndex)));
+        setTypes := [];
+        Include(setTypes, TBADIRefactoringType(Byte(F.cbxType.ItemIndex)));
         Result := True;
       End;
   Finally

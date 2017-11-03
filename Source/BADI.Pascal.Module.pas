@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       29 Oct 2017
+  @Date       03 Nov 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -1262,7 +1262,7 @@ end;
 Procedure TPascalModule.UsesClause(Const eScope : TScope);
 
 Const
-  strUSES = 'USES';
+  strUCUSES = 'USES';
   strInterfaceLabel = 'Interface';
   strImplementationLabel = 'Implementation';
   
@@ -1272,7 +1272,7 @@ Var
   i: Integer;
 
 Begin
-  If Token.UToken = strUSES Then
+  If Token.UToken = strUCUSES Then
     Begin
       AComment := GetComment;
       U := Add(strUses, iiUsesLabel, scNone, AComment);

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    29 Oct 2017
+  @Date    03 Nov 2017
 
 **)
 Unit BADI.Types;
@@ -462,8 +462,8 @@ Type
 
   (** An enumerate to descibe each of the metrics. **)
   TBADIModuleMetric = (
-    mmChecks,
     mmMetrics,
+    mmChecks,
     mmLongMethods,
     mmLongParameterLists,
     mmLongMethodVariableLists,
@@ -487,6 +487,11 @@ Type
     mmExceptionEating,
     mmEmptyTHEN,
     mmEmptyELSE,
+    mmEmptyCASE,
+    mmEmptyFOR,
+    mmEmptyWHILE,
+    mmEmptyREPEAT,
+    mmEmptyBEGINEND,
     mmEmptyIntialization,
     mmEmptyFinalization,
     mmEmptyMethod,

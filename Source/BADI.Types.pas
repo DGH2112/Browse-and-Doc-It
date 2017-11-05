@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Nov 2017
+  @Date    05 Nov 2017
 
 **)
 Unit BADI.Types;
@@ -453,6 +453,9 @@ Type
     FName          : String;
     FDescription   : String;
     FTagProperties : TBADITagProperties;
+    FFontStyles    : TFontStyles;
+    FFontColour    : TColor;
+    TBackColour    : TColor;
     Constructor Create(Const strName, strDescription : String;
       Const setTagProperties : TBADITagProperties);
   End;

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       03 Nov 2017
+  @Date       05 Nov 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -268,11 +268,8 @@ Type
     Procedure MetricsNestedIFDepth(Const Method : TGenericFunction);
     Procedure MetricsLongParameterList(Const Method : TGenericFunction);
     Procedure MetricMissingConstInParamList(Const Method : TGenericFunction);
-    Procedure MetricsEmptyExcept;
-    Procedure MetricsEmptyFinally;
     Procedure MetricsExceptionEating(Const Container : TElementContainer);
-    Procedure MetricsEmptyThen;
-    Procedure MetricsEmptyElse;
+    Procedure MetricsEmptyBlockAtToken(Const eMetric : TBADIModuleMetric);
     Procedure MetricsCyclometricComplexity(Const Method : TGenericFunction);
     Procedure MetricsMethodToxicity(Const Method : TGenericFunction);
   {$IFDEF D2005} Strict {$ENDIF} Protected
@@ -288,13 +285,6 @@ Type
       @return  a TPascalMethod
     **)
     Property CurrentMethod : TPascalMethod Read GetCurrentMethod;
-    (**
-      Returns the type of the modules, Program, Unit, Package, etc.
-      @precon  None.
-      @postcon Returns the type of the modules, Program, Unit, Package, etc.
-      @return  a TModuleType
-    **)
-    Property ModuleType : TModuleType Read FModuleType Write FModuleType;
   Public
     Constructor CreateParser(Const Source, strFileName : String; Const IsModified : Boolean;
       Const ModuleOptions : TModuleOptions); Override;
@@ -305,6 +295,13 @@ Type
     Function ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     Class Function DefaultProfilingTemplate : String; Override;
+    (**
+      Returns the type of the modules, Program, Unit, Package, etc.
+      @precon  None.
+      @postcon Returns the type of the modules, Program, Unit, Package, etc.
+      @return  a TModuleType
+    **)
+    Property ModuleType : TModuleType Read FModuleType Write FModuleType;
   End;
 
 Implementation
@@ -1276,10 +1273,11 @@ Begin
     Begin
       AComment := GetComment;
       U := Add(strUses, iiUsesLabel, scNone, AComment);
-      If eScope = scPublic Then
-        U := U.Add(strInterfaceLabel, iiUsesLabel, scNone, Nil)
-      Else
-        U := U.Add(strImplementationLabel, iiUsesLabel, scNone, Nil);
+      If ModuleType = mtUnit Then
+        If eScope = scPublic Then
+          U := U.Add(strInterfaceLabel, iiUsesLabel, scNone, Nil)
+        Else
+          U := U.Add(strImplementationLabel, iiUsesLabel, scNone, Nil);
       NextNonCommentToken;
       IdentList(U, eScope, TUsesList, strSeekableOnErrorTokens, iiUsesItem);
       // Stop Implementation units from being hinted
@@ -1583,6 +1581,8 @@ End;
            declaration section with in a method .
   @postcon Parses a declaration section from the current token position .
 
+  @nometric EmptyREPEAT
+
   @param   AScope    as a TScope as a constant
   @param   Container as a TElementContainer as a constant
 
@@ -1702,66 +1702,25 @@ End;
 
 (**
 
-  This method outputs a metrci message for an empty ELSE clause in an IF statement if the current method
-  is valid.
+  This method outputs a metric message for a missing block.
 
   @precon  None.
-  @postcon Outputs a metrci message for an empty ELSE clause in an IF statement if the current method
-           is valid.
+  @postcon A metric messsage is output for an empty block.
+
+  @param   eMetric as a TBADIModuleMetric as a constant
 
 **)
-Procedure TPascalModule.MetricsEmptyElse;
+Procedure TPascalModule.MetricsEmptyBlockAtToken(Const eMetric : TBADIModuleMetric);
+
+ResourceString
+  strMethod = 'method';
 
 Begin
   If Assigned(CurrentMethod) Then
-    AddModuleMetric([CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod, mmEmptyELSE);
-End;
-
-(**
-
-  This method outputs a module metric message for an empty EXCEPT clause if the current method is valid.
-
-  @precon  None.
-  @postcon Outputs a module metric message for an empty EXCEPT clause if the current method is valid.
-
-**)
-Procedure TPascalModule.MetricsEmptyExcept;
-
-Begin
-  If Assigned(CurrentMethod) Then
-    AddModuleMetric([CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
-      mmEmptyEXCEPT);
-End;
-
-(**
-
-  This method outputs a module metric message for an empty FINALLY clause if the current method is valid.
-
-  @precon  None.
-  @postcon Outputs a module metric message for an empty FINALLY clause if the current method is valid.
-
-**)
-Procedure TPascalModule.MetricsEmptyFinally;
-
-Begin
-  If Assigned(CurrentMethod) Then
-    AddModuleMetric([CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
-      mmEmptyFINALLY);
-End;
-
-(**
-
-  This method outputs a module metric message for an empty THEN clause if the current method is valid.
-
-  @precon  None.
-  @postcon Outputs a module metric message for an empty THEN clause if the current method is valid.
-
-**)
-Procedure TPascalModule.MetricsEmptyThen;
-
-Begin
-  If Assigned(CurrentMethod) Then
-    AddModuleMetric([CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod, mmEmptyTHEN);
+    AddModuleMetric([strMethod, CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
+      eMetric)
+  Else
+    AddModuleMetric([strModuleTypes[ModuleType], ModuleName], Token.Line, Token.Column, Self, eMetric)
 End;
 
 (**
@@ -2243,6 +2202,8 @@ End;
            for methods in the implementation section or a reference to a method for a local 
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
+
+  @nometric EmptyREPEAT
 
   @param   AScope as a TScope as a constant
   @return  a Boolean
@@ -5214,7 +5175,8 @@ begin
       If Assigned(Method) Then
         Method.StmtCount := StmtList
       Else
-        StmtList;
+        If StmtList = 0 Then
+          MetricsEmptyBlockAtToken(mmEmptyBEGINEND);
       If Token.UToken = strEND Then
         Begin
           If Assigned(Method) Then
@@ -5294,14 +5256,14 @@ Begin
           iTokenIndex := TokenIndex;
           Statement;
           If iTokenIndex = TokenIndex Then
-            MetricsEmptyThen;
+            MetricsEmptyBlockAtToken(mmEmptyTHEN);
           If Token.UToken = strELSE Then
             Begin
               NextNonCommentToken;
               iTokenIndex := TokenIndex;
               Statement;
               If iTokenIndex = TokenIndex Then
-                MetricsEmptyElse;
+                MetricsEmptyBlockAtToken(mmEmptyELSE);
             End;
         End Else
           ErrorAndSeekToken(strReservedWordExpected, strTHEN, strSeekableOnErrorTokens, stActual, Self);
@@ -5344,7 +5306,7 @@ Begin
             Begin
               NextNonCommentToken;
               If StmtList = 0 Then
-                MetricsEmptyElse;
+                MetricsEmptyBlockAtToken(mmEmptyELSE);
              End;
           If Token.UToken = strEND Then
             NextNonCommentToken
@@ -5365,6 +5327,9 @@ End;
 **)
 Procedure TPascalModule.CaseSelector;
 
+Var
+  iTokenIndex: TTokenIndex;
+
 Begin
   Repeat
     CaseLabel;
@@ -5372,7 +5337,10 @@ Begin
   If Token.Token = ':' Then
     Begin
       NextNonCommentToken;
+      iTokenIndex := TokenIndex;
       Statement;
+      If TokenIndex = iTokenIndex Then
+        MetricsEmptyBlockAtToken(mmEmptyCASE);
     End Else
       If Not IsKeyWord(Token.Token, [strLCElse, strLCEnd]) Then
         ErrorAndSeekToken(strLiteralExpected, ':', strSeekableOnErrorTokens, stActual, Self);
@@ -5438,13 +5406,17 @@ Var
   ExprType : TPascalExprTypes;
   UntilExpr: TTempCntr;
   iToken: Integer;
+  iTokenIndex: TTokenIndex;
 
 Begin
   Result := Token.UToken = strREPEAT;
   If Result Then
     Begin
       NextNonCommentToken;
+      iTokenIndex := TokenIndex;
       StmtList;
+      If TokenIndex = iTokenIndex Then
+        MetricsEmptyBlockAtToken(mmEmptyREPEAT);
       If Token.UToken = strUNTIL Then
         Begin
           If Assigned(CurrentMethod) Then
@@ -5487,6 +5459,7 @@ Var
   ExprType : TPascalExprTypes;
   WhileExpr: TTempCntr;
   iToken: Integer;
+  iTokenIndex: TTokenIndex;
 
 Begin
   Result := Token.UToken = strWHILE;
@@ -5509,7 +5482,10 @@ Begin
       If Token.UToken = strDO Then
         Begin
           NextNonCommentToken;
+          iTokenIndex := TokenIndex;
           Statement;
+          If TokenIndex = iTokenIndex Then
+            MetricsEmptyBlockAtToken(mmEmptyWHILE);
         End Else
           ErrorAndSeekToken(strReservedWordExpected, strDO, strSeekableOnErrorTokens, stActual, Self);
     End;
@@ -5534,6 +5510,7 @@ Const
 Var
   ExprType : TPascalExprTypes;
   M: TPascalMethod;
+  iTokenIndex: TTokenIndex;
 
 Begin
   Result := Token.UToken = strFOR;
@@ -5564,7 +5541,10 @@ Begin
                   If Token.UToken = strDO Then
                     Begin
                       NextNonCommentToken;
+                      iTokenIndex := TokenIndex;
                       Statement;
+                      If TokenIndex = iTokenIndex Then
+                        MetricsEmptyBlockAtToken(mmEmptyFOR);
                     End Else
                       ErrorAndSeekToken(strReservedWordExpected, strDO, strSeekableOnErrorTokens,
                         stActual, Self);
@@ -5580,7 +5560,10 @@ Begin
               If Token.UToken = strDO Then
                 Begin
                   NextNonCommentToken;
+                  iTokenIndex := TokenIndex;
                   Statement;
+                  If TokenIndex = iTokenIndex Then
+                    MetricsEmptyBlockAtToken(mmEmptyFOR);
                 End Else
                   ErrorAndSeekToken(strReservedWordExpected, strDO, strSeekableOnErrorTokens, stActual, Self);
             End Else
@@ -5659,13 +5642,13 @@ Begin
               If Not ExceptionBlock Then
                 Begin
                   If StmtList = 0 Then
-                    MetricsEmptyExcept;
+                    MetricsEmptyBlockAtToken(mmEmptyEXCEPT);
                 End;
             End Else
             Begin
               NextNonCommentToken;
               If StmtList = 0 Then
-                MetricsEmptyFinally;
+                MetricsEmptyBlockAtToken(mmEmptyFINALLY);
             End;
           If Token.UToken = strEND Then
             NextNonCommentToken
@@ -7259,7 +7242,9 @@ end;
   using the following object pascal grammar.
 
   @precon  None.
-  @postcon Parses the modules initialisation / finalisation section from the current token position
+  @postcon Parses the modules initialisation / finalisation section from the current token position.
+
+  @nometric EmptyBEGINEND
 
 **)
 Procedure TPascalModule.InitSection;

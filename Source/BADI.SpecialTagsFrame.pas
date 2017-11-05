@@ -54,6 +54,8 @@ Type
       var ContentRect: TRect);
     Procedure vstSpecialTagsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X,
       Y: Integer);
+    procedure vstSpecialTagsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas;
+      Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
     FSpecialTags : TList<TBADISpecialTag>;
   Strict Protected
@@ -100,14 +102,18 @@ Type
 **)
 Procedure TfmBADISpecialTagsFrame.btnAddClick(Sender: TObject);
 
+Const
+  strTag = 'Tag';
+  strTagDescription = 'Tag Description';
+
 Var
-  strName, strDesc: String;
-  setTagProps : TBADITagProperties;
+  ST : TBADISpecialTag;
 
 Begin
-  If TfrmSpecialTag.Execute(strName, strDesc, setTagProps) Then
+  ST.Create(strTag, strTagDescription, []);
+  If TfrmSpecialTag.Execute(ST) Then
     Begin
-      FSpecialTags.Add(TBADISpecialTag.Create(strName, strDesc, setTagProps));
+      FSpecialTags.Add(ST);
       PopulateTreeView;
     End;
 End;
@@ -159,7 +165,7 @@ Begin
     Begin
       NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
       ST := FSpecialTags[NodeData.FSpecialTagIndex];
-      If TfrmSpecialTag.Execute(ST.FName, ST.FDescription, ST.FTagProperties) Then
+      If TfrmSpecialTag.Execute(ST) Then
         Begin
           FSpecialTags[NodeData.FSpecialTagIndex] := ST;
           PopulateTreeView;
@@ -371,6 +377,8 @@ Begin
     ciSyntax:     TargetCanvas.Brush.Color := Colour[tpSyntax     In ST.FTagProperties];
   Else
     TargetCanvas.Brush.Color := clWindow;
+    If ST.FBackColour <> clNone Then
+      TargetCanvas.Brush.Color := ST.FBackColour;
   End;
   TargetCanvas.FillRect(CellRect);
 End;
@@ -393,11 +401,13 @@ Var
 Begin
   btnDelete.Enabled := Assigned(vstSpecialTags.FocusedNode);
   btnEdit.Enabled := Assigned(vstSpecialTags.FocusedNode);
+  NodeData := Nil;
   If Assigned(vstSpecialTags.FocusedNode) Then
     NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
-  btnMoveDown.Enabled := Assigned(vstSpecialTags.FocusedNode) And (NodeData.FSpecialTagIndex > -1) And
-    (NodeData.FSpecialTagIndex < FSpecialTags.Count - 1);
-  btnMoveUp.Enabled := Assigned(vstSpecialTags.FocusedNode) And (NodeData.FSpecialTagIndex > 0);
+  btnMoveDown.Enabled := Assigned(vstSpecialTags.FocusedNode) And Assigned(NodeData) And
+    (NodeData.FSpecialTagIndex > -1) And (NodeData.FSpecialTagIndex < FSpecialTags.Count - 1);
+  btnMoveUp.Enabled := Assigned(vstSpecialTags.FocusedNode) And Assigned(NodeData) And
+    (NodeData.FSpecialTagIndex > 0);
 End;
 
 (**
@@ -513,6 +523,36 @@ Begin
       FSpecialTags[NodeData.FSpecialTagIndex] := ST;
       vstSpecialTags.Invalidate;
     End;
+End;
+
+(**
+
+  This is an on paint text event handler for the treeview.
+
+  @precon  None.
+  @postcon Paints the text with the font colour, style and back colour specified by the node.
+
+  @param   Sender       as a TBaseVirtualTree
+  @param   TargetCanvas as a TCanvas as a constant
+  @param   Node         as a PVirtualNode
+  @param   Column       as a TColumnIndex
+  @param   TextType     as a TVSTTextType
+
+**)
+Procedure TfmBADISpecialTagsFrame.vstSpecialTagsPaintText(Sender: TBaseVirtualTree;
+  Const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+
+Var
+  NodeData : PSpecialTagNodeData;
+  ST: TBADISpecialTag;
+  
+Begin
+  NodeData := Sender.GetNodeData(Node);
+  ST := FSpecialTags[NodeData.FSpecialTagIndex];
+  TargetCanvas.Font.Style := ST.FFontStyles;
+  TargetCanvas.Font.Color := clWindowText;
+  If ST.FFontColour <> clNone Then
+    TargetCanvas.Font.Color := ST.FFontColour;
 End;
 
 End.

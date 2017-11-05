@@ -151,6 +151,7 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
     OnClick = vstSpecialTagsClick
     OnDblClick = vstSpecialTagsDblClick
     OnGetText = vstSpecialTagsGetText
+    OnPaintText = vstSpecialTagsPaintText
     OnMouseDown = vstSpecialTagsMouseDown
     Columns = <
       item

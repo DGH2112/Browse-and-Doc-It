@@ -1265,7 +1265,7 @@ Begin
     '',
     [ttErrors, ttWarnings],
     [
-      'Uses\Interface\Windows|Windows|scPublic',
+      'Uses\Windows|Windows|scPublic',
       'Exports\MyFunc|MyFunc|scPublic'
     ]
   );
@@ -5746,8 +5746,8 @@ Begin
     '',
     [ttErrors, ttWarnings],
     [
-      'Uses\Interface\SysUtils|SysUtils|scPublic',
-      'Uses\Interface\Windows|Windows|scPublic',
+      'Uses\SysUtils|SysUtils|scPublic',
+      'Uses\Windows|Windows|scPublic',
       'Resource Strings\strHello|strHello = ''Hello''|scPrivate'
     ]
   );

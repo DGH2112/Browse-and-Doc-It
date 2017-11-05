@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    19 Oct 2017
+  @date    05 Nov 2017
 
 **)
 Unit BADI.ModuleMetricsFrame;
@@ -98,17 +98,17 @@ Constructor TframeBADIModuleMetrics.Create(AOwner: TComponent);
 
   (**
 
-    This method searches the tree view for a node with the given parent and if found returns the node
+    This method searches the tree view for a node with the given parent and if found returns the node 
     reference for that node else returns nil.
 
     @precon  None.
     @postcon Returns the node with the given parent else returns nil if not found.
 
-    @param   eMetric as a TBADIModuleMetric
+    @param   eMetric as a TBADIModuleMetric as a constant
     @return  a PVirtualNode
 
   **)
-  Function FindParent(eMetric : TBADIModuleMetric) : PVirtualNode;
+  Function FindParent(Const eMetric : TBADIModuleMetric) : PVirtualNode;
 
   Var
     NodeData : PMetricNodeData;
@@ -374,7 +374,7 @@ Begin
   Case Column Of
     iMetricDescription: CellText := DefaultModuleMetrics[NodeData.FModuleMetric].FDescription;
     iMetricName:
-      If (DefaultModuleMetrics[NodeData.FModuleMetric].FParent In [mmChecks..mmMetrics]) And
+      If (DefaultModuleMetrics[NodeData.FModuleMetric].FParent In [mmMetrics..mmChecks]) And
          (NodeData.FModuleMetric <> DefaultModuleMetrics[NodeData.FModuleMetric].FParent) Then
         CellText := DefaultModuleMetrics[NodeData.FModuleMetric].FName
       Else

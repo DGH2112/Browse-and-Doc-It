@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    14 Apr 2017
+  @Date    04 Nov 2017
 
 **)
 Unit BADI.Options;
@@ -51,6 +51,8 @@ Type
     FProfilingCode          : TStringList;
     FIssueLimits            : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
     FBADIMenuShortCuts      : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
+    FModuleMetrics          : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord;
+    FRefactorConstNewLine   : Boolean;
   Strict Protected
     Function  GetTokenFontInfo(Const ATokenType  : TBADITokenType) : TTokenFontInfo;
     Procedure SetTokenFontInfo(Const ATokenType  : TBADITokenType;
@@ -61,6 +63,9 @@ Type
     Procedure SetIssueLimit(Const LimitType : TLimitType; Const iValue : Integer);
     Function  GetMenuShortcut(Const iBADIMenu : TBADIMenu) : String;
     Procedure SetMenuShortcut(Const iBADIMenu : TBADIMenu; Const strShortcut : String);
+    Function  GetModulelMetric(Const ModuleMetric: TBADIModuleMetric): TBADIMetricRecord;
+    Procedure SetModuleMetric(Const ModuleMetric: TBADIModuleMetric;
+      Const Value: TBADIMetricRecord);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -255,6 +260,16 @@ Type
     **)
     Property MenuShortcut[Const BADIMenu : TBADIMenu] : String Read GetMenuShortcut
       Write SetMenuShortcut;
+    (**
+      A property to read and write module metric configuration information.
+      @precon  None.
+      @postcon Gets and sets the module metric information.
+      @param   ModuleMetric as a TBADIModuleMetric as a constant
+      @return  a TBADIMetricRecord
+    **)
+    Property ModuleMetric[Const ModuleMetric : TBADIModuleMetric] : TBADIMetricRecord
+      Read GetModulelMetric Write SetModuleMetric;
+    Property RefactorConstNewLine : Boolean Read FRefactorConstNewLine Write FRefactorConstNewLine;
   End;
 
 Implementation
@@ -383,6 +398,23 @@ End;
 
 (**
 
+  This is a getter method for the ModuleMetric property.
+
+  @precon  None.
+  @postcon Returns the module metric configuration for the given metric.
+
+  @param   ModuleMetric as a TBADIModuleMetric as a constant
+  @return  a TBADIMetricRecord
+
+**)
+Function TBADIOptions.GetModulelMetric(Const ModuleMetric: TBADIModuleMetric): TBADIMetricRecord;
+
+Begin
+  Result := FModuleMetrics[ModuleMetric];
+End;
+
+(**
+
   This is a getter method for the ProfilingCode property.
 
   @precon  None.
@@ -445,6 +477,7 @@ Var
   iBADIMenu: TBADIMenu;
   iModule: Integer;
   iniFile : TMemIniFile;
+  eMetric: TBADIModuleMetric;
 
 Begin
   iniFile := TMemIniFile.Create(FINIFileName);
@@ -531,6 +564,7 @@ Begin
     FIssueLimits[ltWarnings] := iniFile.ReadInteger('Issues Limits', 'Warnings', 10);
     FIssueLimits[ltHints] := iniFile.ReadInteger('Issues Limits', 'Hints', 10);
     FIssueLimits[ltConflicts] := iniFile.ReadInteger('Issues Limits', 'Conflicts', 10);
+    FIssueLimits[ltMetrics] := iniFile.ReadInteger('Issues Limits', 'Metrics', 10);
     For iBADIMenu := Low(TBADImenu) To High(TBADIMenu) Do
       FBADIMenuShortCuts[iBADIMenu] := iniFile.ReadString('BADIMenuShortcuts',
         BADIMenus[iBADIMenu].FName,
@@ -542,6 +576,14 @@ Begin
           TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
           TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions
         );
+    For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
+      Begin
+        FModuleMetrics[eMetric].FEnabled := iniFile.ReadBool('Module Metrics',
+          DefaultModuleMetrics[eMetric].FName + '.Enabled', DefaultModuleMetrics[eMetric].FEnabled);
+        FModuleMetrics[eMetric].FLimit := iniFile.ReadFloat('Module Metrics',
+          DefaultModuleMetrics[eMetric].FName + '.Limit', DefaultModuleMetrics[eMetric].FLimit);
+      End;
+    FRefactorConstNewLine := iniFile.ReadBool('Refactorings', 'NewLine', True);
   Finally
     iniFile.Free;
   End;
@@ -564,6 +606,7 @@ Var
   iBADIMenu : TBADIMenu;
   iModule: Integer;
   iniFile : TMemIniFile;
+  eMetric: TBADIModuleMetric;
 
 Begin
   iniFile := TMemIniFile.Create(FINIFileName);
@@ -618,6 +661,7 @@ Begin
     iniFile.WriteInteger('Issues Limits', 'Warnings', FIssueLimits[ltWarnings]);
     iniFile.WriteInteger('Issues Limits', 'Hints', FIssueLimits[ltHints]);
     iniFile.WriteInteger('Issues Limits', 'Conflicts', FIssueLimits[ltConflicts]);
+    iniFile.WriteInteger('Issues Limits', 'Metrics', FIssueLimits[ltMetrics]);
     For iBADIMenu := Low(TBADImenu) To High(TBADIMenu) Do
       iniFile.WriteString('BADIMenuShortcuts',
         BADIMenus[iBADIMenu].FName,
@@ -628,6 +672,14 @@ Begin
         TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
         TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions
       );
+    For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
+      Begin
+        iniFile.WriteBool('Module Metrics', DefaultModuleMetrics[eMetric].FName + '.Enabled',
+          FModuleMetrics[eMetric].FEnabled);
+        iniFile.WriteFloat('Module Metrics', DefaultModuleMetrics[eMetric].FName + '.Limit',
+          FModuleMetrics[eMetric].FLimit);
+      End;
+    iniFile.WriteBool('Refactorings', 'NewLine', FRefactorConstNewLine);
     iniFile.UpdateFile;
   Finally
     iniFile.Free;
@@ -668,6 +720,24 @@ Procedure TBADIOptions.SetMenuShortcut(Const iBADIMenu: TBADIMenu;
 Begin
   If FBADIMenuShortCuts[iBADIMenu] <> strShortcut Then
     FBADIMenuShortCuts[iBADIMenu] := strShortcut;
+End;
+
+(**
+
+  This is a setter method for the ModuleMetric property.
+
+  @precon  None.
+  @postcon Sets the module metric configuration.
+
+  @param   ModuleMetric as a TBADIModuleMetric as a constant
+  @param   Value        as a TBADIMetricRecord as a constant
+
+**)
+Procedure TBADIOptions.SetModuleMetric(Const ModuleMetric: TBADIModuleMetric;
+  Const Value: TBADIMetricRecord);
+
+Begin
+  FModuleMetrics[ModuleMetric] := Value;
 End;
 
 (**

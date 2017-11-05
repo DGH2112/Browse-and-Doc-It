@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    29 Oct 2017
+  @date    03 Nov 2017
   
 **)
 Unit BADI.RefactorConstantForm;
@@ -48,14 +48,16 @@ Type
     btnCancel: TBitBtn;
     cbxType: TComboBox;
     lblType: TLabel;
+    chkNewLine: TCheckBox;
     Procedure btnOKClick(Sender: TObject);
   Strict Private
-    Procedure InitialiseDialogue(Const setScopes: TBADIRefactoringScopes;
-      Const setTypes: TBADIRefactoringTypes);
+    Procedure InitialiseDialogue(Const setScopes: TBADIRefactoringScopes; 
+      Const setTypes: TBADIRefactoringTypes; Var boolNewLine : Boolean);
   Strict Protected
   Public
     Class Function Execute(Const strLiteral: String; Var strName: String;
-      Var setScopes: TBADIRefactoringScopes; Var setTypes: TBADIRefactoringTypes): Boolean;
+      Var setScopes: TBADIRefactoringScopes; Var setTypes: TBADIRefactoringTypes;
+      Var boolNewLine : Boolean): Boolean;
   End;
 
 Implementation
@@ -101,15 +103,17 @@ End;
   @precon  None.
   @postcon The dialogue is displayed for editing the refactoring.
 
-  @param   strLiteral as a String as a constant
-  @param   strName    as a String as a reference
-  @param   setScopes  as a TBADIRefactoringScopes as a reference
-  @param   setTypes   as a TBADIRefactoringTypes as a reference
+  @param   strLiteral  as a String as a constant
+  @param   strName     as a String as a reference
+  @param   setScopes   as a TBADIRefactoringScopes as a reference
+  @param   setTypes    as a TBADIRefactoringTypes as a reference
+  @param   boolNewLine as a Boolean as a reference
   @return  a Boolean
 
 **)
 Class Function TfrmBADIRefactorConstant.Execute(Const strLiteral: String; Var strName: String;
-  Var setScopes: TBADIRefactoringScopes; Var setTypes: TBADIRefactoringTypes): Boolean;
+  Var setScopes: TBADIRefactoringScopes; Var setTypes: TBADIRefactoringTypes;
+  Var boolNewLine : Boolean): Boolean;
 
 Var
   F: TfrmBADIRefactorConstant;
@@ -120,7 +124,7 @@ Begin
   Try
     F.edtName.Text := strName;
     F.edtLiteral.Text := strLiteral;
-    F.InitialiseDialogue(setScopes, setTypes);
+    F.InitialiseDialogue(setScopes, setTypes, boolNewLine);
     If F.ShowModal = mrOK Then
       Begin
         strName := F.edtName.Text;
@@ -128,6 +132,7 @@ Begin
         Include(setScopes, TBADIRefactoringScope(Byte(F.cbxScope.ItemIndex)));
         setTypes := [];
         Include(setTypes, TBADIRefactoringType(Byte(F.cbxType.ItemIndex)));
+        boolNewLine := F.chkNewLine.Checked;
         Result := True;
       End;
   Finally
@@ -142,12 +147,14 @@ End;
   @precon  None.
   @postcon The form is intialised.
 
-  @param   setScopes as a TBADIRefactoringScopes as a constant
-  @param   setTypes  as a TBADIRefactoringTypes as a constant
+  @param   setScopes   as a TBADIRefactoringScopes as a constant
+  @param   setTypes    as a TBADIRefactoringTypes as a constant
+  @param   boolNewLine as a Boolean as a reference
 
 **)
 Procedure TfrmBADIRefactorConstant.InitialiseDialogue(Const setScopes: TBADIRefactoringScopes;
-      Const setTypes: TBADIRefactoringTypes);
+  Const setTypes: TBADIRefactoringTypes; Var boolNewLine : Boolean);
+
 Var
   eScope: TBADIRefactoringScope;
   eType: TBADIRefactoringType;
@@ -163,6 +170,7 @@ Begin
       cbxType.Items.Add(strType[eType]);
   cbxType.ItemIndex := 0;
   cbxType.Enabled := cbxType.Items.Count > 1;
+  chkNewLine.Checked := boolNewLine;
 End;
 
 End.

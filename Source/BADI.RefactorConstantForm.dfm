@@ -2,11 +2,13 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu]
-  BorderStyle = bsDialog
+  BorderStyle = bsSizeToolWin
   Caption = 'BADI Refactor Constant'
-  ClientHeight = 153
-  ClientWidth = 409
+  ClientHeight = 185
+  ClientWidth = 384
   Color = clBtnFace
+  Constraints.MinHeight = 220
+  Constraints.MinWidth = 400
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -13
@@ -15,8 +17,8 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
   OldCreateOrder = False
   Position = poMainFormCenter
   DesignSize = (
-    409
-    153)
+    384
+    185)
   PixelsPerInch = 96
   TextHeight = 16
   object lblName: TLabel
@@ -76,7 +78,7 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
   object edtName: TEdit
     Left = 80
     Top = 8
-    Width = 321
+    Width = 296
     Height = 24
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
@@ -84,24 +86,25 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
   object edtLiteral: TEdit
     Left = 80
     Top = 35
-    Width = 321
+    Width = 296
     Height = 24
     Anchors = [akLeft, akTop, akRight]
+    Enabled = False
     ReadOnly = True
     TabOrder = 1
   end
   object cbxScope: TComboBox
     Left = 80
     Top = 89
-    Width = 321
+    Width = 296
     Height = 24
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 3
   end
   object btnOK: TBitBtn
-    Left = 245
-    Top = 120
+    Left = 220
+    Top = 152
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -111,8 +114,8 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
     OnClick = btnOKClick
   end
   object btnCancel: TBitBtn
-    Left = 326
-    Top = 120
+    Left = 301
+    Top = 152
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -123,10 +126,19 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
   object cbxType: TComboBox
     Left = 80
     Top = 62
-    Width = 321
+    Width = 296
     Height = 24
     Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 2
+  end
+  object chkNewLine: TCheckBox
+    Left = 80
+    Top = 119
+    Width = 296
+    Height = 17
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'New &Line between declaration sections'
+    TabOrder = 6
   end
 end

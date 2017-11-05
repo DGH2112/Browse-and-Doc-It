@@ -1,11 +1,13 @@
-(**
+﻿(**
 
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    06 May 2017
+  @Date    28 Oct 2017
   @Author  David Hoyle
   @Version 1.0
+
+  @nometric UnsortedModule
 
 **)
 Unit BADI.ModuleExplorerFrame;
@@ -29,8 +31,8 @@ Uses
   ToolWin,
   VirtualTrees,
   {$IFDEF DXE100}
-  Actions,
-  ImageList,
+  //: @debug Actions,
+  //: @debug ImageList,
   {$ENDIF}
   StdCtrls,
   RegularExpressions,
@@ -39,12 +41,13 @@ Uses
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types;
+  BADI.Types, System.Actions, System.ImageList;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the
       current module. **)
-  TSelectionChange = Procedure(iIdentLine, iIdentCol, iCommentLine, iCommentCol : Integer) Of Object;
+  TSelectionChange = Procedure(Const iIdentLine, iIdentCol, iCommentLine,
+    iCommentCol : Integer) Of Object;
 
   (** This is a frame class to contain all the functionality of the module
       explorer so that it can be placed inside any container required and
@@ -92,6 +95,8 @@ Type
     actVariables: TAction;
     actTypes: TAction;
     edtExplorerFilter: TEdit;
+    btnChecksAndMetrics: TToolButton;
+    actChecksAndMetrics: TAction;
     procedure actLocalUpdate(Sender: TObject);
     procedure actLocalExecute(Sender: TObject);
     procedure FilterChange;
@@ -125,6 +130,10 @@ Type
         spiFourth
       );
   Strict Private
+    Const
+      (** A constant to define text for checking the rendering height of text. **)
+      strNodeHeightTest = 'Ag';
+  Strict Private
     { Private declarations }
     FModule            : PVirtualNode;
     FNodeInfo          : TObjectList;
@@ -149,14 +158,14 @@ Type
       Const iLevel : Integer) : PVirtualNode; Overload;
     Function  AddNode(Const Parent : PVirtualNode; Const Tag : TTag;
       Const iLevel : Integer; Const iImageIndex : Integer;
-      TagProperties : TBADITagProperties; Const Comment : TComment) : PVirtualNode; Overload;
+      Const TagProperties : TBADITagProperties; Const Comment : TComment) : PVirtualNode; Overload;
     Function  AddNode(Const Parent : PVirtualNode; Const strText, strName : String;
       Const iLevel : Integer; Const iImageIndex : Integer;
       Const boolTitle : Boolean = False) : PVirtualNode; Overload;
-    procedure CreateSpecialTagNodes(Const Module : TBaseLanguageModule);
-    procedure ExpandNodes;
-    procedure OutputModuleInfo(Const Container : TElementContainer);
-    function  FindTreeItem(Const strText: String): PVirtualNode;
+    Procedure CreateSpecialTagNodes();
+    Procedure ExpandNodes;
+    Procedure OutputModuleInfo(Const Container: TElementContainer);
+    Function FindTreeItem(Const strText: String): PVirtualNode;
     procedure GetExpandedNodes(Const StartNode : PVirtualNode);
     function  GetNodePath(Const Node: PVirtualNode): String;
     procedure SetExpandedNodes(Const StartNode : PVirtualNode);
@@ -203,6 +212,7 @@ Type
       TargetCanvas: TCanvas; Node: PVirtualNode; Var NodeHeight: Integer);
   Public
     { Public declarations }
+    //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
     procedure RenderModule(Const Module : TBaseLanguageModule);
@@ -260,6 +270,26 @@ Resourcestring
   strStatusbarTokensText = '%1.0n Tokens';
   (** A format pattern for the lines status bar panel. **)
   strStatusbarLinesText = '%1.0n Lines.';
+  (** A timing label for clearing the treeview. **)
+  strClear = 'Clear';
+  (** A timing label for building the treeview. **)
+  strBuild = 'Build';
+  (** A timing label for Setting up the treeview. **)
+  strSetup = 'Setup';
+  (** A timing label for rendering the treeview. **)
+  strRender = 'Render';
+  (** A timing label for the total rendering of the treeview. **)
+  strTotal = 'Total';
+  (** A message to show in the treeview for when BADI cannot parse a particular file. **)
+  strBrowseAndDocItCannotParse = 'Browse and Doc It cannot parser this type of file!';
+
+Const
+  (** This default font name for the treeview. **)
+  strTahomaFontName = 'Tahoma';
+  (** This size of the node connector in the treeview. **)
+  iNodeSize = 8;
+  (** A divisor for calculating. **)
+  iDivisor = 2;
 
 {$R *.dfm}
 
@@ -270,11 +300,17 @@ Resourcestring
   @precon  None.
   @postcon Initialises the class.
 
+  @nometric MissingCONSTInParam
+
   @param   AOwner as a TComponent
 
 **)
 Constructor TframeModuleExplorer.Create(AOwner: TComponent);
 
+Const
+  iDefaultFontHeight = -11;
+  iTabOrder = 3;
+  
 begin
   Inherited Create(AOwner);
   {$IFDEF D2009}
@@ -286,14 +322,15 @@ begin
   FExplorer.Header.AutoSizeIndex := 0;
   FExplorer.Header.Font.Charset := DEFAULT_CHARSET;
   FExplorer.Header.Font.Color := clWindowText;
-  FExplorer.Header.Font.Height := -11;
-  FExplorer.Header.Font.Name := 'Tahoma';
+  FExplorer.Header.Font.Height := iDefaultFontHeight;
+  FExplorer.Header.Font.Name := strTahomaFontName;
   FExplorer.Header.Font.Style := [];
   FExplorer.Header.MainColumn := -1;
   FExplorer.Header.Options := [hoColumnResize, hoDrag];
   FExplorer.Images := ilScopeImages;
-  FExplorer.TabOrder := 3;
+  FExplorer.TabOrder := iTabOrder;
   FExplorer.TreeOptions.MiscOptions := FExplorer.TreeOptions.MiscOptions + [toVariableNodeHeight];
+  FExplorer.EmptyListMessage := strBrowseAndDocItCannotParse;
   FExplorer.OnAfterCellPaint := tvExplorerAfterCellPaint;
   FExplorer.OnBeforeItemPaint := tvExplorerBeforeItemPaint;
   FExplorer.OnClick := tvExplorerClick;
@@ -449,6 +486,9 @@ End;
 **)
 procedure TframeModuleExplorer.GetBodyCommentTags(Const Module : TBaseLanguageModule);
 
+Const
+  iTreeLevel = 2;
+  
 Var
   iComment, iTag, iSpecialTag : Integer;
   Cmt: TComment;
@@ -464,7 +504,7 @@ Begin
             If CompareText(Cmt.Tag[iTag].TagName, FSpecialTagNodes[iSpecialTag].FTagName) = 0 Then
               Begin
                 Tag := Cmt.Tag[iTag];
-                AddNode(FSpecialTagNodes[iSpecialTag].Node, Tag, 2,
+                AddNode(FSpecialTagNodes[iSpecialTag].Node, Tag, iTreeLevel,
                   BADIImageIndex(iiToDoItem, scNone), FSpecialTagNodes[iSpecialTag].FTagProperties,
                   Cmt);
               End;
@@ -547,14 +587,15 @@ procedure TframeModuleExplorer.ManageExpandedNodes;
 Var
   i : Integer;
   dtDate: TDateTime;
+  EN: TStringList;
 
 begin
-  With TBADIOptions.BADIOptions.ExpandedNodes Do
-  For i := Count - 1 DownTo 0 Do
+  EN := TBADIOptions.BADIOptions.ExpandedNodes;
+  For i := EN.Count - 1 DownTo 0 Do
     Begin
-      dtDate := Integer(Objects[i]);
+      dtDate := Integer(EN.Objects[i]);
       If dtDate < Now - TBADIOptions.BADIOptions.ManagedNodesLife Then
-        Delete(i);
+        EN.Delete(i);
     End;
 end;
 
@@ -646,6 +687,7 @@ Procedure TframeModuleExplorer.SetStatusPanel(Const ePanel: TStatusPanelIndex;
 
 Const
   iPadding = 10;
+  iPaddingMultiplier = 2;
 
 Var
   strText : String;
@@ -654,7 +696,7 @@ Begin
   strText := Format(strStatusbarText, [Int(iValue)]);
   stbStatusBar.Panels[Byte(ePanel)].Text := strText;
   stbStatusBar.Panels[Byte(ePanel)].Width :=
-    stbStatusBar.Canvas.TextWidth(strText) + 2 * iPadding;
+    stbStatusBar.Canvas.TextWidth(strText) + iPaddingMultiplier * iPadding;
 End;
 
 (**
@@ -818,7 +860,7 @@ Begin
       FNodeInfo.Clear;
       If Module = Nil Then
         Exit;
-      Module.AddTickCount('Clear');
+      Module.AddTickCount(strClear);
       SetLength(FSpecialTagNodes, TBADIOptions.BADIOptions.SpecialTags.Count);
       // Create Root Tree Node
       FModule := AddNode(
@@ -832,9 +874,9 @@ Begin
         //False,
         //Module.Comment
       );
-      CreateSpecialTagNodes(Module);
+      CreateSpecialTagNodes();
       OutputModuleInfo(Module);
-      Module.AddTickCount('Build');
+      Module.AddTickCount(strBuild);
       SetExpandedNodes(FModule);
       ExpandNodes;
       // Restore top and selected items
@@ -851,13 +893,12 @@ Begin
           FExplorer.FocusedNode := N;
           FExplorer.Selected[FExplorer.FocusedNode] := True;
         End;
-      //: @debug Raise Exception.Create('Oops');
     Finally
       If Module <> Nil Then
-        Module.AddTickCount('Setup');
+        Module.AddTickCount(strSetup);
       FExplorer.EndUpdate;
     End;
-    Module.AddTickCount('Render');
+    Module.AddTickCount(strRender);
     UpdateStatusBar(Module);
   Finally
     FRendering := False;
@@ -877,7 +918,7 @@ End;
 procedure TframeModuleExplorer.OutputModuleInfo(Const Container : TElementContainer);
 
 Const
-  strPromotedLabels : Array[1..4] Of String = (strDocumentationConflicts,
+  strPromotedLabels : Array[1..5] Of String = (strMetricsAndChecks, strDocumentationConflicts,
     strHints, strWarnings, strErrors);
 
 Var
@@ -894,7 +935,7 @@ begin
       While Node <> Nil Do
         Begin
           NodeData := FExplorer.GetNodeData(Node);
-          If NodeData.FNode.Text = strPromotedLabels[i] Then
+          If Pos(strPromotedLabels[i], NodeData.FNode.Text) = 1 Then
             FExplorer.MoveTo(Node, FModule, amAddChildFirst, False);
           Node := FExplorer.GetNextSibling(Node);
         End;
@@ -914,11 +955,71 @@ end;
 **)
 procedure TframeModuleExplorer.ExpandNodes;
 
+  (**
+
+    This method checks that the node text matches the text required (minus the optional number of
+    children).
+
+    @precon  None.
+    @postcon Returns true if the node text matches the requried text.
+
+    @param   strNodeText  as a String as a constant
+    @param   strMatchText as a String as a constant
+    @return  a Boolean
+
+  **)
+  Function NodeTextMatch(Const strNodeText, strMatchText : String) : Boolean;
+
+  Begin
+    Result := CompareText(Copy(strNodeText, 1, Length(strMatchText)), strMatchText) = 0;
+  End;
+
+  (**
+
+    This procedure expands the given node and all its children.
+
+    @precon  Node must be a valid instance.
+    @postcon The given node and all its children are expanded.
+
+    @param   Node as a PVirtualNode as a constant
+
+  **)
+  Procedure ExpandNode(Const Node : PVirtualNode);
+
+    (**
+
+      This procedure recurses the child nodes expanding them and then their child nodes.
+
+      @precon  ChildNode must be a valid instance.
+      @postcon All child nodes are expanded.
+
+      @param   ChildNode as a PVirtualNode as a constant
+
+    **)
+    Procedure RecurseNodes(Const ChildNode : PVirtualNode);
+
+    Var
+      N : PVirtualNode;
+
+    Begin
+      N := FExplorer.GetFirstChild(ChildNode);
+      While Assigned(N) Do
+        Begin
+          FExplorer.Expanded[N] := True;
+          RecurseNodes(N);
+          N := FExplorer.GetNextSibling(N);
+        End;
+    End;
+
+  Begin
+    FExplorer.Expanded[Node] := True;
+    RecurseNodes(Node);
+  End;
+
 Var
   iPromotedLabel : Integer;
   Node: PVirtualNode;
   NodeData: PBADITreeData;
-  N: PVirtualNode;
 
 begin
   FExplorer.Expanded[FModule] := True;
@@ -936,26 +1037,21 @@ begin
   While Node <> Nil Do
     Begin
       NodeData := FExplorer.GetNodeData(Node);
-      If CompareText(NodeData.FNode.Text, strDocumentationConflicts) = 0 Then
-        If doShowConflicts In TBADIOptions.BADIOptions.Options Then
-          Begin
-            FExplorer.Expanded[Node] := True;
-            N := FExplorer.GetFirstChild(Node);
-            While N <> Nil Do
-              Begin
-                FExplorer.Expanded[N] := True;
-                N := FExplorer.GetNextSibling(N);
-              End;
-          End;
-      If CompareText(NodeData.FNode.Text, strHints) = 0 Then
-        If doShowHints In TBADIOptions.BADIOptions.Options Then
-          FExplorer.Expanded[Node] := True;
-      If CompareText(NodeData.FNode.Text, strWarnings) = 0 Then
-        If doShowWarnings In TBADIOptions.BADIOptions.Options Then
-          FExplorer.Expanded[Node] := True;
-      If CompareText(NodeData.FNode.Text, strErrors) = 0 Then
-        If doShowErrors In TBADIOptions.BADIOptions.Options Then
-          FExplorer.Expanded[Node] := True;
+      If NodeTextMatch(NodeData.FNode.Text, strDocumentationConflicts) Then
+        If doExpandDocConflicts In TBADIOptions.BADIOptions.Options Then
+          ExpandNode(Node);
+      If NodeTextMatch(NodeData.FNode.Text, strMetricsAndChecks) Then
+        If doExpandChecksAndMetrics In TBADIOptions.BADIOptions.Options Then
+          ExpandNode(Node);
+      If NodeTextMatch(NodeData.FNode.Text, strHints) Then
+        If doExpandHints In TBADIOptions.BADIOptions.Options Then
+          ExpandNode(Node);
+      If NodeTextMatch(NodeData.FNode.Text, strWarnings) Then
+        If doExpandWarnings In TBADIOptions.BADIOptions.Options Then
+          ExpandNode(Node);
+      If NodeTextMatch(NodeData.FNode.Text, strErrors) Then
+        If doExpandErrors In TBADIOptions.BADIOptions.Options Then
+          ExpandNode(Node);
       Node := FExplorer.GetNextSibling(Node);
     End;
 end;
@@ -968,10 +1064,8 @@ end;
   @precon  None.
   @postcon Creates the special tag noNode.
 
-  @param   Module as a TBaseLanguageModule as a constant
-
 **)
-Procedure TframeModuleExplorer.CreateSpecialTagNodes(Const Module : TBaseLanguageModule);
+Procedure TframeModuleExplorer.CreateSpecialTagNodes();
 
 Var
   i : Integer;
@@ -1017,12 +1111,15 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
   **)
   Procedure UpdateScopes(Const AScope : TScope); InLine;
 
+  Var
+    O : TBADIOptions;
+
   Begin
-    With TBADIOptions.BADIOptions Do
-      If AScope In ScopesToRender Then
-        ScopesToRender := ScopesToRender - [AScope]
-      Else
-        ScopesToRender := ScopesToRender + [AScope];
+    O := TBADIOptions.BADIOptions;
+    If AScope In O.ScopesToRender Then
+      O.ScopesToRender := O.ScopesToRender - [AScope]
+    Else
+      O.ScopesToRender := O.ScopesToRender + [AScope];
   End;
 
   (**
@@ -1037,54 +1134,58 @@ procedure TframeModuleExplorer.actLocalExecute(Sender: TObject);
   **)
   procedure UpdateOptions(Const Option : TDocOption); InLine;
 
+  Var
+    O : TBADIOptions;
+
   Begin
-    With TBADIOptions.BADIOptions Do
-      If Option In Options Then
-        Options := Options - [Option]
-      Else
-        Options := Options + [Option];
+    O := TBADIOptions.BADIOptions;
+    If Option In O.Options Then
+      O.Options := O.Options - [Option]
+    Else
+      O.Options := O.Options + [Option];
   End;
 
 begin
-  With TBADIOptions.BADIOptions Do
-    If Sender = actLocal Then
-      UpdateScopes(scLocal)
-    Else If Sender = actPrivate Then
-      UpdateScopes(scPrivate)
-    Else If Sender = actProtected Then
-      UpdateScopes(scProtected)
-    Else If Sender = actPublic Then
-      UpdateScopes(scPublic)
-    Else If Sender = actPublished Then
-      UpdateScopes(scPublished)
-    Else If Sender = actSyntax Then
-      UpdateOptions(doCustomDrawing)
-    Else If Sender = actShowHints Then
-      UpdateOptions(doShowCommentHints)
-    Else If Sender = actConflicts Then
-      UpdateOptions(doShowConflicts)
-    Else If Sender = actErrors Then
-      UpdateOptions(doShowErrors)
-    Else If Sender = actWarnings Then
-      UpdateOptions(doShowWarnings)
-    Else If Sender = actHints Then
-      UpdateOptions(doShowHints)
-    Else If Sender = actMethods Then
-      UpdateOptions(doShowMethodMissingDocs)
-    Else If Sender = actProperties Then
-      UpdateOptions(doShowPropertyMissingDoc)
-    Else If Sender = actConstants Then
-      UpdateOptions(doShowUndocumentedConsts)
-    Else If Sender = actVariables Then
-      UpdateOptions(doShowUndocumentedVars)
-    Else If Sender = actTypes Then
-      Begin
-        UpdateOptions(doShowUndocumentedTypes);
-        UpdateOptions(doShowUndocumentedRecords);
-        UpdateOptions(doShowUndocumentedObjects);
-        UpdateOptions(doShowUndocumentedClasses);
-        UpdateOptions(doShowUndocumentedInterfaces);
-      End;
+  If Sender = actLocal Then
+    UpdateScopes(scLocal)
+  Else If Sender = actPrivate Then
+    UpdateScopes(scPrivate)
+  Else If Sender = actProtected Then
+    UpdateScopes(scProtected)
+  Else If Sender = actPublic Then
+    UpdateScopes(scPublic)
+  Else If Sender = actPublished Then
+    UpdateScopes(scPublished)
+  Else If Sender = actSyntax Then
+    UpdateOptions(doCustomDrawing)
+  Else If Sender = actShowHints Then
+    UpdateOptions(doShowCommentHints)
+  Else If Sender = actConflicts Then
+    UpdateOptions(doShowConflicts)
+  Else If Sender = actChecksAndMetrics Then
+    UpdateOptions(doShowChecksAndMetrics)
+  Else If Sender = actErrors Then
+    UpdateOptions(doShowErrors)
+  Else If Sender = actWarnings Then
+    UpdateOptions(doShowWarnings)
+  Else If Sender = actHints Then
+    UpdateOptions(doShowHints)
+  Else If Sender = actMethods Then
+    UpdateOptions(doShowMethodMissingDocs)
+  Else If Sender = actProperties Then
+    UpdateOptions(doShowPropertyMissingDoc)
+  Else If Sender = actConstants Then
+    UpdateOptions(doShowUndocumentedConsts)
+  Else If Sender = actVariables Then
+    UpdateOptions(doShowUndocumentedVars)
+  Else If Sender = actTypes Then
+    Begin
+      UpdateOptions(doShowUndocumentedTypes);
+      UpdateOptions(doShowUndocumentedRecords);
+      UpdateOptions(doShowUndocumentedObjects);
+      UpdateOptions(doShowUndocumentedClasses);
+      UpdateOptions(doShowUndocumentedInterfaces);
+    End;
   If Assigned(FRefresh) Then
     FRefresh(Sender);
 end;
@@ -1100,6 +1201,7 @@ end;
 
 **)
 procedure TframeModuleExplorer.actLocalUpdate(Sender: TObject);
+
 begin
   If Sender = actLocal Then
     (Sender As TAction).Checked := scLocal In TBADIOptions.BADIOptions.ScopesToRender
@@ -1117,6 +1219,8 @@ begin
     (Sender As TAction).Checked := doShowCommentHints In TBADIOptions.BADIOptions.Options
   Else If Sender = actConflicts Then
     (Sender As TAction).Checked := doShowConflicts In TBADIOptions.BADIOptions.Options
+  Else If Sender = actChecksAndMetrics Then
+    (Sender As TAction).Checked := doShowChecksAndMetrics In TBADIOptions.BADIOptions.Options
   Else If Sender = actErrors Then
     (Sender As TAction).Checked := doShowErrors In TBADIOptions.BADIOptions.Options
   Else If Sender = actWarnings Then
@@ -1201,8 +1305,8 @@ end;
 
 (**
 
-  This method adds a node to the treeview as a child of the give node. It assigns the line, column
-  and comment information to the Node.
+  This method adds a node to the treeview as a child of the give node. It assigns the line, column and 
+  comment information to the Node.
 
   @precon  P is the parent node to attach this new child too, Element is the parser node to render.
   @postcon Returns a instance of the newly add / created tree node.
@@ -1211,13 +1315,13 @@ end;
   @param   Tag           as a TTag as a constant
   @param   iLevel        as an Integer as a constant
   @param   iImageIndex   as an Integer as a constant
-  @param   TagProperties as a TBADITagProperties
+  @param   TagProperties as a TBADITagProperties as a constant
   @param   Comment       as a TComment as a constant
   @return  a PVirtualNode
 
 **)
 Function TframeModuleExplorer.AddNode(Const Parent: PVirtualNode; Const Tag: TTag; Const iLevel,
-  iImageIndex: Integer; TagProperties : TBADITagProperties ;Const Comment: TComment): PVirtualNode;
+  iImageIndex: Integer; Const TagProperties : TBADITagProperties ;Const Comment: TComment): PVirtualNode;
 
 Var
   NodeData : PBADITreeData;
@@ -1314,10 +1418,10 @@ Begin
   NodeData := Sender.GetNodeData(Node);
   InitCanvasFont(TargetCanvas, tpFixed In NodeData.FNode.TagProperties);
   sl := NodeData.FNode.Tokens;
-  NodeHeight := 1 + TargetCanvas.TextHeight('Ag') + 1;
+  NodeHeight := 1 + TargetCanvas.TextHeight(strNodeHeightTest) + 1;
   For iToken := 0 To sl.Count - 1 Do
     If TBADITokenType(sl.Objects[iToken]) = ttLineEnd Then
-      Inc(NodeHeight, TargetCanvas.TextHeight('Ag'));
+      Inc(NodeHeight, TargetCanvas.TextHeight(strNodeHeightTest));
   If NodeHeight < Integer(FExplorer.DefaultNodeHeight) Then
     NodeHeight := Integer(FExplorer.DefaultNodeHeight);
 End;
@@ -1396,6 +1500,11 @@ end;
 **)
 procedure TframeModuleExplorer.UpdateStatusBar(Const Module: TBaseLanguageModule);
 
+Const
+  strOutputFmt = '%s: %1.1n';
+  strCommaSep = ', ';
+  dblTimingLimit = 1.0;
+
 Var
   strTickLabel: String;
   dblTicks: Double;
@@ -1412,20 +1521,18 @@ begin
       For i := 1 To Module.OpTickCounts - 1 Do
         Begin
           strTickLabel := Module.OpTickCountName[i];
-          If strTickLabel <> '' Then
-            strTickLabel := strTickLabel + ':';
           dblTicks := Module.OpTickCountByIndex[i] - Module.OpTickCountByIndex[i - 1];
-          If dblTicks > 1.0 Then //: @note Filter out small items @todo Add to Options.
+          If dblTicks > dblTimingLimit Then
             Begin
               If strText <> '' Then
-                strText := strText + ', ';
-              strText := strText + Format('%s %1.1n', [strTickLabel, dblTicks]);
+                strText := strText + strCommaSep;
+              strText := strText + Format(strOutputFmt, [strTickLabel, dblTicks]);
             End;
         End;
       If strText <> '' Then
-        strText := strText + ', ';
+        strText := strText + strCommaSep;
       strText := strText +
-        Format('%s: %1.1n', ['Total', Module.OpTickCountByIndex[Module.OpTickCounts - 1] -
+        Format(strOutputFmt, [strTotal, Module.OpTickCountByIndex[Module.OpTickCounts - 1] -
         Module.OpTickCountByIndex[0]]);
       stbStatusBar.Panels[Byte(spiFourth)].Text := strText;
       stbStatusBar.Hint := strText;
@@ -1443,6 +1550,8 @@ end;
 
   @precon  Msg is the window message to handle.
   @postcon The is a mouse event event which hides the hint window.
+
+  @nohint
 
   @param   Msg as a TMessage as a reference
 
@@ -1477,12 +1586,15 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
     @precon  None.
     @postcon If there are matches these are highlighed.
 
-    @param   MC      as a TMatchCollection
-    @param   strText as a String
+    @param   MC      as a TMatchCollection as a constant
+    @param   strText as a String as a constant
 
   **)
-  Procedure HighlightText(MC : TMatchCollection; strText : String);
+  Procedure HighlightText(Const MC : TMatchCollection; Const strText : String);
 
+  Const
+    iHighlightTextOffset = 18 + 26;
+    
   Var
     iStart: Integer;
     iMatch: Integer;
@@ -1491,7 +1603,7 @@ Procedure TframeModuleExplorer.tvExplorerAfterCellPaint(Sender: TBaseVirtualTree
     R : TRect;
 
   Begin
-    iStart := 18 + 26 + Sender.GetNodeLevel(Node) * (Sender As TVirtualStringTree).Indent;
+    iStart := iHighlightTextOffset + Sender.GetNodeLevel(Node) * (Sender As TVirtualStringTree).Indent;
     For iMatch := 0 To MC.Count - 1 Do
       Begin
         M := MC[iMatch];
@@ -1738,7 +1850,6 @@ End;
 **)
 Procedure TframeModuleExplorer.DrawTree(Var R : TRect);
 
-
 Var
   iTreeColour: Integer;
   iCentre: Integer;
@@ -1746,7 +1857,7 @@ Var
 Begin
   R.Left := R.Left + (FNodeData.FNode.Level * Integer(FExplorer.Indent)) - FExplorer.Left;
   iTreeColour := TBADIOptions.BADIOptions.TreeColour;
-  iCentre := (R.Top + R.Bottom) Div 2;
+  iCentre := (R.Top + R.Bottom) Div iDivisor;
   DrawVerticalTreeLine(iTreeColour, R);
   DrawTopHalfOfNodeConnector(iTreeColour, iCentre, R);
   DrawNodeButton(iTreeColour, iCentre, R);
@@ -1778,8 +1889,8 @@ Begin
           Begin
             FTargetCanvas.Pen.Color := iTreeColour;
             FTargetCanvas.Pen.Style := psSolid;
-            FTargetCanvas.MoveTo(Integer(FExplorer.Indent) * i + 8 - FExplorer.Left, R.Top);
-            FTargetCanvas.LineTo(Integer(FExplorer.Indent) * i + 8 - FExplorer.Left, R.Bottom);
+            FTargetCanvas.MoveTo(Integer(FExplorer.Indent) * i + iNodeSize - FExplorer.Left, R.Top);
+            FTargetCanvas.LineTo(Integer(FExplorer.Indent) * i + iNodeSize - FExplorer.Left, R.Bottom);
           End;
       P := P.Parent;
     End;
@@ -1803,22 +1914,22 @@ Procedure TframeModuleExplorer.DrawTopHalfOfNodeConnector(Const iTreeColour : TC
 Begin
   FTargetCanvas.Pen.Color := iTreeColour;
   FTargetCanvas.Pen.Style := psSolid;
-  FTargetCanvas.MoveTo(R.Left + 8, iCentre);
+  FTargetCanvas.MoveTo(R.Left + iNodeSize, iCentre);
   FTargetCanvas.LineTo(R.Left + Integer(FExplorer.Indent), iCentre);
   If FNode.Parent <> Nil Then
     Begin
       // Draw connection to item
       FTargetCanvas.Pen.Color := iTreeColour;
       FTargetCanvas.Pen.Style := psSolid;
-      FTargetCanvas.MoveTo(R.Left + 8, R.Top);
-      FTargetCanvas.LineTo(R.Left + 8, iCentre);
+      FTargetCanvas.MoveTo(R.Left + iNodeSize, R.Top);
+      FTargetCanvas.LineTo(R.Left + iNodeSize, iCentre);
       If FNode.Index < FNode.Parent.ChildCount - 1 Then
         Begin
           // Draw connector to next FNode.
           FTargetCanvas.Pen.Color := iTreeColour;
           FTargetCanvas.Pen.Style := psSolid;
-          FTargetCanvas.MoveTo(R.Left + 8, iCentre);
-          FTargetCanvas.LineTo(R.Left + 8, R.Bottom);
+          FTargetCanvas.MoveTo(R.Left + iNodeSize, iCentre);
+          FTargetCanvas.LineTo(R.Left + iNodeSize, R.Bottom);
         End;
     End;
 End;
@@ -1838,23 +1949,29 @@ End;
 Procedure TframeModuleExplorer.DrawNodeButton(Const iTreeColour : TColor; Const iCentre : Integer;
   Const R : TRect);
 
+Const
+  iButtonTop = -2;
+  iButtonBottom = 3;
+  iButtonLeft = 6;
+  iBUttonRight = 11;
+
 Begin
   If FNode.ChildCount > 0 Then
     Begin
       // Draw button
       FTargetCanvas.Pen.Color := iTreeColour;
       FTargetCanvas.Pen.Style := psSolid;
-      FTargetCanvas.Rectangle(R.Left + 4, iCentre - 4,
-        R.Left + 13, iCentre + 5);
+      FTargetCanvas.Rectangle(R.Left + iNodeSize Div iDivisor, iCentre - iNodeSize Div iDivisor,
+        R.Left + iNodeSize + iNodeSize Div iDivisor + 1, iCentre + iNodeSize Div iDivisor + 1);
       // Draw negative side
       FTargetCanvas.Pen.Color := iTreeColour;
-      FTargetCanvas.MoveTo(R.Left + 6, iCentre);
-      FTargetCanvas.LineTo(R.Left + 11, iCentre);
+      FTargetCanvas.MoveTo(R.Left + iButtonLeft, iCentre);
+      FTargetCanvas.LineTo(R.Left + iBUttonRight, iCentre);
       If Not FExplorer.Expanded[FNode] Then
         Begin
           // Make positive sign
-          FTargetCanvas.MoveTo(R.Left + 8, iCentre - 2);
-          FTargetCanvas.LineTo(R.Left + 8, iCentre + 3);
+          FTargetCanvas.MoveTo(R.Left + iNodeSize, iCentre + iButtonTop);
+          FTargetCanvas.LineTo(R.Left + iNodeSize, iCentre + iButtonBottom);
         End;
     End;
 End;
@@ -1874,7 +1991,7 @@ Procedure TframeModuleExplorer.DrawImage(Var R : TRect);
 Begin
   R.Left := R.Left + Integer(FExplorer.Indent) + FExplorer.Margin;
   Inc(R.Top);
-  ilScopeImages.Draw(FTargetCanvas, R.Left, ((R.Bottom - R.Top) - ilScopeImages.Height) Div 2,
+  ilScopeImages.Draw(FTargetCanvas, R.Left, ((R.Bottom - R.Top) - ilScopeImages.Height) Div iDivisor,
     FNodeData.FNode.ImageIndex);
 End;
 
@@ -1891,6 +2008,9 @@ End;
 **)
 Procedure TframeModuleExplorer.DrawTreeText(Const sl : TStringList; Var R : TRect);
 
+Const
+  iPadding = 2;
+  
 Var
   iLeft, iTop : Integer;
 
@@ -1904,7 +2024,7 @@ Var
 Begin
   R.Left := R.Left + ilScopeImages.Width + FExplorer.TextMargin;
   iTop := R.Top;
-  iLeft := R.Left + 2;
+  iLeft := R.Left + iPadding;
   iTextPos := 1;
   InitCanvasFont(FTargetCanvas, tpFixed In FNodeData.FNode.TagProperties);
   If edtExplorerFilter.Text <> '' Then
@@ -1979,6 +2099,9 @@ End;
 Procedure TframeModuleExplorer.DrawTextToCanvas(Const strText : String; Const R : TRect;
   Var iTextPos, iTop, iLeft : Integer);
 
+Const
+  iPadding = 2;
+  
 Var
   S : TRect;
 
@@ -1992,8 +2115,8 @@ Begin
   Inc(iTextPos, Length(strText));
   If strText = #13#10 Then
     Begin
-      iLeft := R.Left + 2;
-      Inc(iTop, FTargetCanvas.TextHeight('Ag'));
+      iLeft := R.Left + iPadding;
+      Inc(iTop, FTargetCanvas.TextHeight(strNodeHeightTest));
     End;
 End;
 

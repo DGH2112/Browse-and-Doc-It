@@ -455,7 +455,7 @@ Type
     FTagProperties : TBADITagProperties;
     FFontStyles    : TFontStyles;
     FFontColour    : TColor;
-    TBackColour    : TColor;
+    FBackColour    : TColor;
     Constructor Create(Const strName, strDescription : String;
       Const setTagProperties : TBADITagProperties);
   End;
@@ -538,6 +538,9 @@ Begin
   FName := strName;
   FDescription := strDescription;
   FTagProperties := setTagProperties;
+  FFontStyles := [];
+  FFontColour := clNone;
+  FBackColour := clNone;
 End;
 
 End.

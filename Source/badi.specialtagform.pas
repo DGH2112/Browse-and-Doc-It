@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    16 Apr 2017
+  @Date    05 Nov 2017
 
 **)
 Unit BADI.SpecialTagForm;
@@ -24,7 +24,7 @@ Uses
   StdCtrls,
   Buttons,
   CheckLst,
-  BADI.Types;
+  BADI.Types, Vcl.ExtCtrls;
 
 Type
   (** Form for editing special tags **)
@@ -37,13 +37,22 @@ Type
     btnCancel: TBitBtn;
     lbxTagProperties: TCheckListBox;
     lblTagProperties: TLabel;
+    gbxFontStyles: TGroupBox;
+    chkBold: TCheckBox;
+    chkItalic: TCheckBox;
+    chkUnderlined: TCheckBox;
+    chkStrikeout: TCheckBox;
+    gpFontStyles: TGridPanel;
+    lblFontColour: TLabel;
+    cbxFontColour: TColorBox;
+    cbxBackColour: TColorBox;
+    lblBackColour: TLabel;
     procedure btnOKClick(Sender: TObject);
   Private
     { Private declarations }
   Public
     { Public declarations }
-    Class Function Execute(Var strName, strDescription: String;
-      Var setTagProperties : TBADITagProperties): Boolean;
+    Class Function Execute(Var SpecialTag : TBADISpecialTag): Boolean;
   End;
 
 Implementation
@@ -67,38 +76,39 @@ Uses
 **)
 Procedure TfrmSpecialTag.btnOKClick(Sender: TObject);
 
+ResourceString
+  strYouNeedToSpecificValidNameForTag = 'You need to specific a valid name for the tag!';
+  strYouNeedToSpecificValidDescriptionForTag = 'You need to specific a valid description for the tag!';
+
 Begin
   If edtName.Text = '' Then
     Begin
-      MessageDlg('You need to specific a valid name for the tag!', mtError, [mbOK], 0);
+      MessageDlg(strYouNeedToSpecificValidNameForTag, mtError, [mbOK], 0);
       ModalResult := mrNone;
     End Else
   If edtDescription.Text = '' Then
     Begin
-      MessageDlg('You need to specific a valid description for the tag!', mtError, [mbOK], 0);
+      MessageDlg(strYouNeedToSpecificValidDescriptionForTag, mtError, [mbOK], 0);
       ModalResult := mrNone;
     End;
 End;
 
 (**
 
-  This method accepts a name and description string and displays them for editing in the form. If
-  the user presses OK the form returns true.
+  This method accepts a name and description string and displays them for editing in the form. If the 
+  user presses OK the form returns true.
 
-  @precon  strName is the tags name, strDescription is the tags description, boolShow is a boolean
-           value it indicate whether to show the tag in the browser, boolExpand is a boolean
-           value it indicate whether to expand the tag in the browser and Returns true if the OK
-           button was pressed.
+  @precon  strName is the tags name, strDescription is the tags description, boolShow is a boolean value
+           it indicate whether to show the tag in the browser, boolExpand is a boolean value it 
+           indicate whether to expand the tag in the browser and Returns true if the OK button was 
+           pressed.
   @postcon Displays the special tag form.
 
-  @param   strName          as a String as a reference
-  @param   strDescription   as a String as a reference
-  @param   setTagProperties as a TBADITagProperties as a reference
+  @param   SpecialTag as a TBADISpecialTag as a reference
   @return  a Boolean
 
 **)
-Class Function TfrmSpecialTag.Execute(Var strName, strDescription: String;
-  Var setTagProperties : TBADITagProperties): Boolean;
+Class Function TfrmSpecialTag.Execute(Var SpecialTag : TBADISpecialTag): Boolean;
 
 Var
   frm : TfrmSpecialTag;
@@ -109,21 +119,38 @@ Begin
   frm := TfrmSpecialTag.Create(Nil);
   Try
     Result := False;
-    frm.edtName.Text := strName;
-    frm.edtDescription.Text := strDescription;
+    frm.edtName.Text := SpecialTag.FName;
+    frm.edtDescription.Text := SpecialTag.FDescription;
     For eTagProp := Low(TBADITagProperty) To High(TBADITagProperty) Do
       Begin
         iIndex := frm.lbxTagProperties.Items.Add(strTagProperty[eTagProp]);
-        frm.lbxTagProperties.Checked[iIndex] := eTagProp In setTagProperties;
+        frm.lbxTagProperties.Checked[iIndex] := eTagProp In SpecialTag.FTagProperties;
       End;
+    frm.chkBold.Checked := fsBold In SpecialTag.FFontStyles;
+    frm.chkItalic.Checked := fsItalic In SpecialTag.FFontStyles;
+    frm.chkUnderlined.Checked := fsUnderline In SpecialTag.FFontStyles;
+    frm.chkStrikeout.Checked := fsStrikeOut In SpecialTag.FFontStyles;
+    frm.cbxFontColour.Selected := SpecialTag.FFontColour;
+    frm.cbxBackColour.Selected := SpecialTag.FBackColour;
     If frm.ShowModal = mrOK Then
       Begin
-        strName := frm.edtName.Text;
-        strDescription := frm.edtDescription.Text;
-        setTagProperties := [];
+        SpecialTag.FName := frm.edtName.Text;
+        SpecialTag.FDescription := frm.edtDescription.Text;
+        SpecialTag.FTagProperties := [];
         For eTagProp := Low(TBADITagProperty) To High(TBADITagProperty) Do
           If frm.lbxTagProperties.Checked[Integer(eTagProp)] Then
-            Include(setTagProperties, eTagProp);
+            Include(SpecialTag.FTagProperties, eTagProp);
+        SpecialTag.FFontStyles := [];
+        If frm.chkBold.Checked Then
+          Include(SpecialTag.FFontStyles, fsBold);
+        If frm.chkItalic.Checked Then
+          Include(SpecialTag.FFontStyles, fsItalic);
+        If frm.chkUnderlined.Checked Then
+          Include(SpecialTag.FFontStyles, fsUnderline);
+        If frm.chkStrikeout.Checked Then
+          Include(SpecialTag.FFontStyles, fsStrikeOut);
+        SpecialTag.FFontColour := frm.cbxFontColour.Selected;
+        SpecialTag.FBackColour := frm.cbxBackColour.Selected;
         Result := True
       End;
   Finally

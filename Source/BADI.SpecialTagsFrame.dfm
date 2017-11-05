@@ -1,8 +1,8 @@
 object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
   Left = 0
   Top = 0
-  Width = 605
-  Height = 373
+  Width = 645
+  Height = 423
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -13
@@ -11,11 +11,11 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
   ParentFont = False
   TabOrder = 0
   DesignSize = (
-    605
-    373)
+    645
+    423)
   object btnDelete: TBitBtn
-    Left = 365
-    Top = 345
+    Left = 405
+    Top = 395
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -34,12 +34,12 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
       333333377F33333333FF3333C333333330003333733333333777333333333333
       3000333333333333377733333333333333333333333333333333}
     NumGlyphs = 2
-    TabOrder = 2
+    TabOrder = 1
     OnClick = btnDeleteClick
   end
   object btnEdit: TBitBtn
-    Left = 284
-    Top = 345
+    Left = 324
+    Top = 395
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -58,12 +58,12 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
       0FF03333737F37737F373330B00FFFFF0F033337F77F33337F733309030FFFFF
       00333377737FFFFF773333303300000003333337337777777333}
     NumGlyphs = 2
-    TabOrder = 3
+    TabOrder = 2
     OnClick = btnEditClick
   end
   object btnMoveDown: TBitBtn
-    Left = 527
-    Top = 345
+    Left = 567
+    Top = 395
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -82,12 +82,12 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
       443337F37737F773F7F33CCC33393374447337F73337F33737FFCCC333393333
       444377733337F333777FC3333339333337437333333733333373}
     NumGlyphs = 2
-    TabOrder = 4
+    TabOrder = 3
     OnClick = btnMoveDownClick
   end
   object btnMoveUp: TBitBtn
-    Left = 446
-    Top = 345
+    Left = 486
+    Top = 395
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -106,12 +106,12 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
       33333333333737F333333333333C943333333333333737333333333333339733
       3333333333337F33333333333333933333333333333373333333}
     NumGlyphs = 2
-    TabOrder = 5
+    TabOrder = 4
     OnClick = btnMoveUpClick
   end
   object btnAdd: TBitBtn
-    Left = 203
-    Top = 345
+    Left = 243
+    Top = 395
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -130,57 +130,69 @@ object fmBADISpecialTagsFrame: TfmBADISpecialTagsFrame
       333333333337733333FF3333333C333330003333333733333777333333333333
       3000333333333333377733333333333333333333333333333333}
     NumGlyphs = 2
-    TabOrder = 1
+    TabOrder = 0
     OnClick = btnAddClick
   end
-  object lvSpecialTags: TListView
+  object vstSpecialTags: TVirtualStringTree
     Left = 3
     Top = 3
-    Width = 599
-    Height = 336
+    Width = 639
+    Height = 386
     Anchors = [akLeft, akTop, akRight, akBottom]
+    Header.AutoSizeIndex = 1
+    Header.Height = 20
+    Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs, hoVisible]
+    Header.ParentFont = True
+    TabOrder = 5
+    TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
+    TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowVertGridLines, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
+    TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect]
+    OnBeforeCellPaint = vstSpecialTagsBeforeCellPaint
+    OnClick = vstSpecialTagsClick
+    OnDblClick = vstSpecialTagsDblClick
+    OnGetText = vstSpecialTagsGetText
+    OnMouseDown = vstSpecialTagsMouseDown
     Columns = <
       item
-        Caption = 'Tag Name'
-        Width = 85
+        Position = 0
+        Width = 100
+        WideText = 'Tag Name'
       end
       item
-        AutoSize = True
-        Caption = 'Tag Description'
-      end
-      item
-        Alignment = taCenter
-        Caption = 'Tree'
-        Width = 60
-      end
-      item
-        Alignment = taCenter
-        Caption = 'Expand'
-        Width = 60
+        MinWidth = 200
+        Position = 1
+        Width = 235
+        WideText = 'Tag Description'
       end
       item
         Alignment = taCenter
-        Caption = 'Docs'
+        Position = 2
         Width = 60
+        WideText = 'Tree'
       end
       item
         Alignment = taCenter
-        Caption = 'Fixed'
+        Position = 3
         Width = 60
+        WideText = 'Expand'
       end
       item
         Alignment = taCenter
-        Caption = 'Syntax'
+        Position = 4
         Width = 60
+        WideText = 'Docs'
+      end
+      item
+        Alignment = taCenter
+        Position = 5
+        Width = 60
+        WideText = 'Fixed'
+      end
+      item
+        Alignment = taCenter
+        Position = 6
+        Width = 60
+        WideText = 'Syntax'
       end>
-    GridLines = True
-    ReadOnly = True
-    RowSelect = True
-    TabOrder = 0
-    ViewStyle = vsReport
-    OnCustomDrawSubItem = lvSpecialTagsCustomDrawSubItem
-    OnDblClick = lvSpecialTagsDblClick
-    OnMouseDown = lvSpecialTagsMouseDown
-    OnSelectItem = lvSpecialTagsSelectItem
   end
 end

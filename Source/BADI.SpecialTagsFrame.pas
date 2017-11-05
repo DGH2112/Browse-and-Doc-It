@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    17 Apr 2017
+  @Date    05 Nov 2017
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -28,7 +28,8 @@ Uses
   ComCtrls,
   Generics.Collections,
   BADI.CustomOptionsFrame,
-  BADI.Types;
+  BADI.Types,
+  VirtualTrees;
 
 Type
   (** This is a class to represent the frame interface. **)
@@ -38,23 +39,27 @@ Type
     btnMoveDown: TBitBtn;
     btnMoveUp: TBitBtn;
     btnAdd: TBitBtn;
-    lvSpecialTags: TListView;
-    Procedure lvSpecialTagsMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    vstSpecialTags: TVirtualStringTree;
     Procedure btnAddClick(Sender: TObject);
     Procedure btnDeleteClick(Sender: TObject);
     Procedure btnEditClick(Sender: TObject);
     Procedure btnMoveUpClick(Sender: TObject);
     Procedure btnMoveDownClick(Sender: TObject);
-    procedure lvSpecialTagsSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
-    procedure lvSpecialTagsCustomDrawSubItem(Sender: TCustomListView; Item: TListItem;
-      SubItem: Integer; State: TCustomDrawState; var DefaultDraw: Boolean);
-    procedure lvSpecialTagsDblClick(Sender: TObject);
+    Procedure vstSpecialTagsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+      TextType: TVSTTextType; Var CellText: String);
+    Procedure vstSpecialTagsClick(Sender: TObject);
+    procedure vstSpecialTagsDblClick(Sender: TObject);
+    procedure vstSpecialTagsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
+      Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode; CellRect: TRect;
+      var ContentRect: TRect);
+    Procedure vstSpecialTagsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X,
+      Y: Integer);
   Strict Private
     FSpecialTags : TList<TBADISpecialTag>;
   Strict Protected
-    Procedure PopulateListView;
+    Procedure PopulateTreeView;
   Public
+    //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
     Destructor Destroy; Override;
     Procedure LoadSettings;
@@ -72,6 +77,16 @@ Uses
   BADI.Constants,
   BADI.OptionsForm,
   BADI.Options;
+
+Type
+  (** A record to describe the data to be stoed in the treeview. **)
+  TSpecialTagsNodeData = Record
+    FSpecialTagIndex : Integer;
+  End;
+  (** A pointer to the above node data. **)
+  PSpecialTagNodeData = ^TSpecialTagsNodeData;
+  (** A enumerate to define the columns in the report. **)
+  TColumnIndexes = (ciName, ciDescription, ciShowInTree, ciAutoExpand, ciShowInDocs, ciFixed, ciSyntax);
 
 (**
 
@@ -93,7 +108,7 @@ Begin
   If TfrmSpecialTag.Execute(strName, strDesc, setTagProps) Then
     Begin
       FSpecialTags.Add(TBADISpecialTag.Create(strName, strDesc, setTagProps));
-      PopulateListView;
+      PopulateTreeView;
     End;
 End;
 
@@ -110,11 +125,15 @@ End;
 **)
 Procedure TfmBADISpecialTagsFrame.btnDeleteClick(Sender: TObject);
 
+Var
+  NodeData : PSpecialTagNodeData;
+
 Begin
-  If lvSpecialTags.ItemIndex <> - 1 Then
+  If Assigned(vstSpecialTags.FocusedNode) Then
     Begin
-      FSpecialTags.Delete(lvSpecialTags.ItemIndex);
-      PopulateListView;
+      NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
+      FSpecialTags.Delete(NodeData.FSpecialTagIndex);
+      PopulateTreeView;
     End;
 End;
 
@@ -133,15 +152,17 @@ Procedure TfmBADISpecialTagsFrame.btnEditClick(Sender: TObject);
 
 Var
   ST: TBADISpecialTag;
+  NodeData : PSpecialTagNodeData;
 
 Begin
-  If lvSpecialTags.ItemIndex <> - 1 Then
+  If Assigned(vstSpecialTags.FocusedNode) Then
     Begin
-      ST := FSpecialTags[lvSpecialTags.ItemIndex];
+      NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
+      ST := FSpecialTags[NodeData.FSpecialTagIndex];
       If TfrmSpecialTag.Execute(ST.FName, ST.FDescription, ST.FTagProperties) Then
         Begin
-          FSpecialTags[lvSpecialTags.ItemIndex] := ST;
-          PopulateListView;
+          FSpecialTags[NodeData.FSpecialTagIndex] := ST;
+          PopulateTreeView;
         End;
     End;
 End;
@@ -159,12 +180,18 @@ End;
 **)
 Procedure TfmBADISpecialTagsFrame.btnMoveDownClick(Sender: TObject);
 
+Var
+  NodeData : PSpecialTagNodeData;
+
 Begin
-  If lvSpecialTags.ItemIndex < lvSpecialTags.Items.Count - 1 Then
+  If Assigned(vstSpecialTags.FocusedNode) Then
     Begin
-      FSpecialTags.Exchange(lvSpecialTags.ItemIndex, lvSpecialTags.ItemIndex + 1);
-      lvSpecialTags.ItemIndex := lvSpecialTags.ItemIndex + 1;
-      PopulateListView;
+      NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
+      If NodeData.FSpecialTagIndex < FSpecialTags.Count - 1 Then
+        Begin
+          FSpecialTags.Exchange(NodeData.FSpecialTagIndex, NodeData.FSpecialTagIndex + 1);
+          PopulateTreeView;
+        End;
     End;
 End;
 
@@ -181,12 +208,18 @@ End;
 **)
 Procedure TfmBADISpecialTagsFrame.btnMoveUpClick(Sender: TObject);
 
+Var
+  NodeData : PSpecialTagNodeData;
+
 Begin
-  If lvSpecialTags.ItemIndex > 0 Then
+  If Assigned(vstSpecialTags.FocusedNode) Then
     Begin
-      FSpecialTags.Exchange(lvSpecialTags.ItemIndex, lvSpecialTags.ItemIndex - 1);
-      lvSpecialTags.ItemIndex := lvSpecialTags.ItemIndex - 1;
-      PopulateListView;
+      NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
+      If NodeData.FSpecialTagIndex > 0 Then
+        Begin
+          FSpecialTags.Exchange(NodeData.FSpecialTagIndex, NodeData.FSpecialTagIndex - 1);
+          PopulateTreeView;
+        End;
     End;
 End;
 
@@ -197,6 +230,8 @@ End;
   @precon  None.
   @postcon Updates the status of the buttons on the form.
 
+  @nometric MissingCONSTInParam
+  
   @param   AOwner as a TComponent
 
 **)
@@ -205,7 +240,7 @@ Constructor TfmBADISpecialTagsFrame.Create(AOwner: TComponent);
 Begin
   Inherited Create(AOwner);
   FSpecialTags := TList<TBADISpecialTag>.Create;
-  lvSpecialTagsSelectItem(Nil, Nil, False);
+  PopulateTreeView;
 End;
 
 (**
@@ -225,170 +260,6 @@ End;
 
 (**
 
-  This method enables or disables the buttons depending upon the selection.
-
-  @precon  None.
-  @postcon The buttons are enabled or disabled depending upon the selection.
-
-  @param   Sender   as a TObject
-  @param   Item     as a TListItem
-  @param   Selected as a Boolean
-
-**)
-Procedure TfmBADISpecialTagsFrame.lvSpecialTagsSelectItem(Sender: TObject; Item: TListItem;
-  Selected: Boolean);
-
-Begin
-  btnDelete.Enabled := Item <> Nil;
-  btnEdit.Enabled := Item <> Nil;
-  btnMoveDown.Enabled := (Item <> Nil) And (Item.Index > -1) And
-    (Item.Index < lvSpecialTags.Items.Count - 1);
-  btnMoveUp.Enabled := (Item <> Nil) And (Item.Index > 0);
-End;
-
-(**
-
-  This method renders the list of special tags and options in the list view.
-
-  @precon  None.
-  @postcon The list view is populated with the special tags and their options.
-
-**)
-Procedure TfmBADISpecialTagsFrame.PopulateListView;
-
-Const
-  strBoolean : Array[False..True] Of String = ('False', 'True');
-
-Var
-  iSpecialTag: Integer;
-  iItemIndex : Integer;
-  Item: TListItem;
-  setTPOps: TBADITagProperties;
-
-Begin
-  lvSpecialTags.Items.BeginUpdate;
-  Try
-    iItemIndex := lvSpecialTags.ItemIndex;
-    lvSpecialTags.Clear;
-    For iSpecialTag := 0 To FSpecialTags.Count - 1 Do
-      Begin
-        Item := lvSpecialTags.Items.Add;
-        Item.Caption := FSpecialTags[iSpecialTag].FName;
-        Item.SubItems.Add(FSpecialTags[iSpecialTag].FDescription);
-        setTPOps := FSpecialTags[iSpecialTag].FTagProperties;
-        Item.SubItems.Add(strBoolean[tpShowInTree In setTPOps]);
-        Item.SubItems.Add(strBoolean[tpAutoExpand In setTPOps]);
-        Item.SubItems.Add(strBoolean[tpShowInDoc In setTPOps]);
-        Item.SubItems.Add(strBoolean[tpFixed In setTPOps]);
-        Item.SubItems.Add(strBoolean[tpSyntax In setTPOps]);
-      End;
-    If iItemIndex >= lvSpecialTags.Items.Count Then
-      iItemIndex := lvSpecialTags.Items.Count - 1;
-    lvSpecialTags.ItemIndex := iItemIndex;
-  Finally
-    lvSpecialTags.Items.EndUpdate;
-  End;
-  lvSpecialTagsSelectItem(lvSpecialTags, lvSpecialTags.Selected, lvSpecialTags.Selected <> Nil)
-End;
-
-(**
-
-  This method highlights the boolean options with a green background for true and red background for
-  false options to make them stand out.
-
-  @precon  None.
-  @postcon The boolean options are highlighted.
-
-  @param   Sender      as a TCustomListView
-  @param   Item        as a TListItem
-  @param   SubItem     as an Integer
-  @param   State       as a TCustomDrawState
-  @param   DefaultDraw as a Boolean as a reference
-
-**)
-Procedure TfmBADISpecialTagsFrame.lvSpecialTagsCustomDrawSubItem(Sender: TCustomListView;
-  Item: TListItem; SubItem: Integer; State: TCustomDrawState; Var DefaultDraw: Boolean);
-
-Begin
-  Sender.Canvas.Brush.Color := clWindow;
-  If SubItem > 1 Then
-    If StrToBool(Item.SubItems[Pred(SubItem)]) Then
-      Sender.Canvas.Brush.Color := $80FF80
-    Else
-      Sender.Canvas.Brush.Color := $8080FF;
-End;
-
-(**
-
-  This is an on double click event handler for the special tags listview.
-
-  @precon  None.
-  @postcon Invokes editing the selected item.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TfmBADISpecialTagsFrame.lvSpecialTagsDblClick(Sender: TObject);
-
-Begin
-  btnEditClick(Sender);
-End;
-
-(**
-
-
-  This is an on mouse down event handler for the special tags list box.
-
-  @precon  None.
-  @postcon Allows th euser to enabled/diaable items by clicking on them.
-
-
-  @param   Sender as a TObject
-  @param   Button as a TMouseButton
-  @param   Shift  as a TShiftState
-  @param   X      as an Integer
-  @param   Y      as an Integer
-
-**)
-Procedure TfmBADISpecialTagsFrame.lvSpecialTagsMouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-
-Var
-  Item: TListItem;
-  iLeft, iRight : Integer;
-  iOp: Integer;
-  ST: TBADISpecialTag;
-  eTagProperty: TBADITagProperty;
-
-Begin
-  Item := lvSpecialTags.GetItemAt(X, Y);
-  If Item <> Nil Then
-    Begin
-      iLeft := 0;
-      Inc(iLeft, lvSpecialTags.Column[0].Width); // Tag Name
-      Inc(iLeft, lvSpecialTags.Column[1].Width); // Tag Description
-      For iOp := 1 To 5 Do // Subitems 1 to 5
-        Begin
-          iRight := iLeft + lvSpecialTags.Column[Succ(iOp)].Width;
-          If (X >= iLeft) And (X <= iRight) Then
-            Begin
-              ST := FSpecialTags[Item.Index];
-              eTagProperty := TBADITagProperty(Pred(iOp));
-              If eTagProperty In ST.FTagProperties Then
-                Exclude(ST.FTagProperties, eTagProperty)
-              Else
-                Include(ST.FTagProperties, eTagProperty);
-              FSpecialTags[Item.Index] := ST;
-              Break;
-            End;
-          iLeft := iRight;
-        End;
-      PopulateListView;
-    End;
-End;
-
-(**
-
   This method loads the settings in the frame from the BAID Options class.
 
   @precon  None.
@@ -399,7 +270,52 @@ Procedure TfmBADISpecialTagsFrame.LoadSettings;
 
 Begin
   FSpecialTags.AddRange(TBADIOptions.BADIOptions.SpecialTags);
-  PopulateListView;
+  PopulateTreeView;
+End;
+
+(**
+
+  This method renders the list of special tags and options in the list view.
+
+  @precon  None.
+  @postcon The list view is populated with the special tags and their options.
+
+**)
+Procedure TfmBADISpecialTagsFrame.PopulateTreeView;
+
+Var
+  iSpecialTag: Integer;
+  N: PVirtualNode;
+  NodeData : PSpecialTagNodeData;
+  strSelectedNode: String;
+
+Begin
+  vstSpecialTags.BeginUpdate;
+  Try
+    If Assigned(vstSpecialTags.FocusedNode) Then
+      strSelectedNode := vstSpecialTags.Text[vstSpecialTags.FocusedNode, 0];
+    vstSpecialTags.Clear;
+    For iSpecialTag := 0 To FSpecialTags.Count - 1 Do
+      Begin
+        N := vstSpecialTags.AddChild(Nil);
+        NodeData := vstSpecialTags.GetNodeData(N);
+        NodeData.FSpecialTagIndex := iSpecialTag;
+      End;
+    N := vstSpecialTags.GetFirst();
+    While Assigned(N) Do
+      Begin
+        If vstSpecialTags.Text[N, 0] = strSelectedNode Then
+          Begin
+            vstSpecialTags.FocusedNode := N;
+            vstSpecialTags.Selected[N] := True;
+            Break;
+          End;
+        N := vstSpecialTags.GetNext(N);
+      End;
+  Finally
+    vstSpecialTags.EndUpdate;
+  End;
+  vstSpecialTagsClick(Nil);
 End;
 
 (**
@@ -415,6 +331,188 @@ Procedure TfmBADISpecialTagsFrame.SaveSettings;
 Begin
   TBADIOptions.BADIOptions.SpecialTags.Clear;
   TBADIOptions.BADIOptions.SpecialTags.AddRange(FSpecialTags);
+End;
+
+(**
+
+  This is an on before cell paint event handler for the treeview.
+
+  @precon  None.
+  @postcon Colours the cells light red or light green depending upon whether they are true or false.
+
+  @param   Sender        as a TBaseVirtualTree
+  @param   TargetCanvas  as a TCanvas
+  @param   Node          as a PVirtualNode
+  @param   Column        as a TColumnIndex
+  @param   CellPaintMode as a TVTCellPaintMode
+  @param   CellRect      as a TRect
+  @param   ContentRect   as a TRect as a reference
+
+**)
+Procedure TfmBADISpecialTagsFrame.vstSpecialTagsBeforeCellPaint(Sender: TBaseVirtualTree;
+  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode;
+  CellRect: TRect; Var ContentRect: TRect);
+
+Const
+  Colour : Array[False..True] Of TColor = ($8080FF, $80FF80);
+
+Var
+  NodeData : PSpecialTagNodeData;
+  ST: TBADISpecialTag;
+  
+Begin
+  NodeData := Sender.GetNodeData(Node);
+  ST := FSpecialTags[NodeData.FSpecialTagIndex];
+  Case TColumnIndexes(Column) Of
+    ciShowInTree: TargetCanvas.Brush.Color := Colour[tpShowInTree In ST.FTagProperties];
+    ciAutoExpand: TargetCanvas.Brush.Color := Colour[tpAutoExpand In ST.FTagProperties];
+    ciShowInDocs: TargetCanvas.Brush.Color := Colour[tpShowInDoc  In ST.FTagProperties];
+    ciFixed:      TargetCanvas.Brush.Color := Colour[tpFixed      In ST.FTagProperties];
+    ciSyntax:     TargetCanvas.Brush.Color := Colour[tpSyntax     In ST.FTagProperties];
+  Else
+    TargetCanvas.Brush.Color := clWindow;
+  End;
+  TargetCanvas.FillRect(CellRect);
+End;
+
+(**
+
+  This is an on click event handler for the treeview.
+
+  @precon  None.
+  @postcon Updates the enabled properties of the button depending upon what is selected.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfmBADISpecialTagsFrame.vstSpecialTagsClick(Sender: TObject);
+
+Var
+  NodeData : PSpecialTagNodeData;
+  
+Begin
+  btnDelete.Enabled := Assigned(vstSpecialTags.FocusedNode);
+  btnEdit.Enabled := Assigned(vstSpecialTags.FocusedNode);
+  If Assigned(vstSpecialTags.FocusedNode) Then
+    NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
+  btnMoveDown.Enabled := Assigned(vstSpecialTags.FocusedNode) And (NodeData.FSpecialTagIndex > -1) And
+    (NodeData.FSpecialTagIndex < FSpecialTags.Count - 1);
+  btnMoveUp.Enabled := Assigned(vstSpecialTags.FocusedNode) And (NodeData.FSpecialTagIndex > 0);
+End;
+
+(**
+
+  This is an on double click event handler for the treview.
+
+  @precon  None.
+  @postcon Edits the double clicked item.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TfmBADISpecialTagsFrame.vstSpecialTagsDblClick(Sender: TObject);
+
+Begin
+  btnEditClick(Sender);
+End;
+
+(**
+
+  This is an on get text event handler for the view tree.
+
+  @precon  None.
+  @postcon returns the text to be shown in each cell.
+
+  @param   Sender   as a TBaseVirtualTree
+  @param   Node     as a PVirtualNode
+  @param   Column   as a TColumnIndex
+  @param   TextType as a TVSTTextType
+  @param   CellText as a String as a reference
+
+**)
+Procedure TfmBADISpecialTagsFrame.vstSpecialTagsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+  Column: TColumnIndex; TextType: TVSTTextType; Var CellText: String);
+
+Const
+  strBoolean : Array[False..True] Of String = ('False', 'True');
+
+Var
+  NodeData : PSpecialTagNodeData;
+  ST : TBADISpecialTag;
+  
+Begin
+  NodeData := Sender.GetNodeData(Node);
+  ST := FSpecialTags[NodeData.FSpecialTagIndex];
+  Case TColumnIndexes(Column) Of
+    ciName:        CellText := ST.FName;
+    ciDescription: CellText := ST.FDescription;
+    ciShowInTree:  CellText := strBoolean[tpShowInTree In  ST.FTagProperties];
+    ciAutoExpand:  CellText := strBoolean[tpAutoExpand In  ST.FTagProperties];
+    ciShowInDocs:  CellText := strBoolean[tpShowInDoc  In  ST.FTagProperties];
+    ciFixed:       CellText := strBoolean[tpFixed      In  ST.FTagProperties];
+    ciSyntax:      CellText := strBoolean[tpSyntax     In  ST.FTagProperties];  
+  End;
+End;
+
+(**
+
+  This is an on mouse down event handler for the treeview.
+
+  @precon  None.
+  @postcon Toggles the true / false properties of the special tags when the mouse is clicked on them.
+
+  @param   Sender as a TObject
+  @param   Button as a TMouseButton
+  @param   Shift  as a TShiftState
+  @param   X      as an Integer
+  @param   Y      as an Integer
+
+**)
+Procedure TfmBADISpecialTagsFrame.vstSpecialTagsMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+
+  (**
+
+    This procedure toggles the inclusion / exclusion of the given enumerate in the special tag
+    properties.
+
+    @precon  None.
+    @postcon The property is togged with the opposite of the given enumerate.
+
+    @param   ST                 as a TBADISpecialTag as a reference
+    @param   BADISpecialTagProp as a TBADITagProperty as a constant
+
+  **)
+  Procedure ToggleSpecialTagProp(Var ST : TBADISpecialTag; Const BADISpecialTagProp : TBADITagProperty);
+
+  Begin
+    If BADISpecialTagProp In ST.FTagProperties Then
+      Exclude(ST.FTagProperties, BADISpecialTagProp)
+    Else
+      Include(ST.FTagProperties, BADISpecialTagProp);
+  End;
+
+Var
+  NodeData : PSpecialTagNodeData;
+  HitInfo : THitInfo;
+  ST: TBADISpecialTag;
+  
+Begin
+  vstSpecialTags.GetHitTestInfoAt(X, Y, True, HitInfo);
+  If Assigned(HitInfo.HitNode) Then
+    Begin
+      NodeData := vstSpecialTags.GetNodeData(HitInfo.HitNode);
+      ST := FSpecialTags[NodeData.FSpecialTagIndex];
+      Case TColumnIndexes(HitInfo.HitColumn) Of
+        ciShowInTree: ToggleSpecialTagProp(ST, tpShowInTree);
+        ciAutoExpand: ToggleSpecialTagProp(ST, tpAutoExpand);
+        ciShowInDocs: ToggleSpecialTagProp(ST, tpShowInDoc);
+        ciFixed:      ToggleSpecialTagProp(ST, tpFixed);
+        ciSyntax:     ToggleSpecialTagProp(ST, tpSyntax);
+      End;
+      FSpecialTags[NodeData.FSpecialTagIndex] := ST;
+      vstSpecialTags.Invalidate;
+    End;
 End;
 
 End.

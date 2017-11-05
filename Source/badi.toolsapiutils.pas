@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    19 Feb 2017
+  @Date    05 Nov 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -18,7 +18,9 @@ Uses
   SysUtils,
   Windows,
   ToolsAPI,
-  Classes;
+  Classes,
+  BADI.Types,
+  BADI.ElementContainer;
 
 Type
   (** This is an enumerate for the types of messages that can be cleared. **)
@@ -28,15 +30,18 @@ Type
 
   Function ProjectGroup: IOTAProjectGroup;
   Function ActiveProject : IOTAProject;
-  Function ProjectModule(Project : IOTAProject) : IOTAModule;
+  Function ProjectModule(Const Project : IOTAProject) : IOTAModule;
   Function ActiveSourceEditor : IOTASourceEditor;
-  Function SourceEditor(Module : IOTAModule) : IOTASourceEditor;
+  Function SourceEditor(Const Module : IOTAModule) : IOTASourceEditor;
   Procedure OutputMessage(Const strText : String); Overload;
-  Procedure OutputMessage(Const strFileName, strText, strPrefix : String; iLine, iCol : Integer); Overload;
-  Procedure ClearMessages(Msg : TClearMessages);
-  Function BufferSize(SourceEditor : IOTASourceEditor) : Integer;
-  Function EditorAsString(SourceEditor : IOTASourceEditor) : String;
-  Procedure OutputText(Writer : IOTAEditWriter; Const strText : String);
+  Procedure OutputMessage(Const strFileName, strText, strPrefix : String; Const iLine,
+    iCol : Integer); Overload;
+  Procedure ClearMessages(Const Msg : TClearMessages);
+  Function BufferSize(Const SourceEditor : IOTASourceEditor) : Integer;
+  Function EditorAsString(Const SourceEditor : IOTASourceEditor) : String;
+  Procedure OutputText(Const Writer : IOTAEditWriter; Const strText : String);
+  Procedure PositionCursor(Const Container : TElementContainer; Const iIdentLine, iIdentColumn : Integer;
+    Const BrowsePosition : TBrowsePosition);
 
 Const
   (** The buffer size for the copying of text from an editor to a memory
@@ -140,11 +145,11 @@ End;
   @precon  Module is the module for which a source ditor interface is required.
   @postcon Returns the source editor interface for the given module.
 
-  @param   Module as an IOTAMOdule
+  @param   Module as an IOTAModule as a Constant
   @return  an IOTASourceEditor
 
 **)
-Function SourceEditor(Module : IOTAMOdule) : IOTASourceEditor;
+Function SourceEditor(Const Module : IOTAModule) : IOTASourceEditor;
 
 Var
   iFileCount : Integer;
@@ -152,15 +157,12 @@ Var
 
 Begin
   Result := Nil;
-  If Module = Nil Then Exit;
-  With Module Do
-    Begin
-      iFileCount := GetModuleFileCount;
-      For i := 0 To iFileCount - 1 Do
-        If GetModuleFileEditor(i).QueryInterface(IOTASourceEditor,
-          Result) = S_OK Then
-          Break;
-    End;
+  If Module = Nil Then
+    Exit;
+  iFileCount := Module.GetModuleFileCount;
+  For i := 0 To iFileCount - 1 Do
+    If Module.GetModuleFileEditor(i).QueryInterface(IOTASourceEditor, Result) = S_OK Then
+      Break;
 End;
 
 (**
@@ -194,12 +196,12 @@ End;
   @param   strFileName as a String as a constant
   @param   strText     as a String as a constant
   @param   strPrefix   as a String as a constant
-  @param   iLine       as an Integer
-  @param   iCol        as an Integer
+  @param   iLine       as an Integer as a Constant
+  @param   iCol        as an Integer as a Constant
 
 **)
 Procedure OutputMessage(Const strFileName, strText, strPrefix : String;
-  iLine, iCol : Integer);
+  Const iLine, iCol : Integer);
 
 Begin
   (BorlandIDEServices As IOTAMessageServices).AddToolMessage(strFileName,
@@ -217,10 +219,10 @@ End;
   @postcon The messages in the IDE message window are clear in line with
            the passed enumerate.
 
-  @param   Msg as a TClearMessages
+  @param   Msg as a TClearMessages as a Constant
 
 **)
-Procedure ClearMessages(Msg : TClearMessages);
+Procedure ClearMessages(Const Msg : TClearMessages);
 
 Begin
   If cmCompiler In Msg Then
@@ -239,11 +241,11 @@ End;
   @precon  A valid open tools api project source.
   @postcon Returns the module interface for the given project source.
 
-  @param   Project as an IOTAProject
+  @param   Project as an IOTAProject as a Constant
   @return  an IOTAModule
 
 **)
-Function ProjectModule(Project : IOTAProject) : IOTAModule;
+Function ProjectModule(Const Project : IOTAProject) : IOTAModule;
 
 Var
   AModuleServices: IOTAModuleServices;
@@ -271,11 +273,11 @@ End;
   @precon  SourceEditor is a valid sourc editor to get the buffer size of
   @postcon Returns the size of the editors buffer.
 
-  @param   SourceEditor as an IOTASourceEditor
+  @param   SourceEditor as an IOTASourceEditor as a Constant
   @return  an Integer
 
 **)
-Function BufferSize(SourceEditor : IOTASourceEditor) : Integer;
+Function BufferSize(Const SourceEditor : IOTASourceEditor) : Integer;
 
 Var
   Reader : IOTAEditReader;
@@ -301,11 +303,11 @@ End;
   @precon  SourceEditor is the editor to get the source code from.
   @postcon Returns a memory stream of the file.
 
-  @param   SourceEditor as an IOTASourceEditor
+  @param   SourceEditor as an IOTASourceEditor as a Constant
   @return  a String
 
 **)
-Function EditorAsString(SourceEditor : IOTASourceEditor) : String;
+Function EditorAsString(Const SourceEditor : IOTASourceEditor) : String;
 
 Var
   Reader : IOTAEditReader;
@@ -337,11 +339,11 @@ End;
   @precon  Writer must be a valid instance of an IOTAEditWriter interface.
   @postcon Outputs the given text to the given edit writer.
 
-  @param   Writer  as an IOTAEditWriter
+  @param   Writer  as an IOTAEditWriter as a Constant
   @param   strText as a String as a constant
 
 **)
-Procedure OutputText(Writer : IOTAEditWriter; Const strText : String);
+Procedure OutputText(Const Writer : IOTAEditWriter; Const strText : String);
 
 Begin
   {$IFNDEF D2009}
@@ -349,6 +351,113 @@ Begin
   {$ELSE}
   Writer.Insert(PAnsiChar(AnsiString(strText)));
   {$ENDIF}
+End;
+
+(**
+
+  This method positions the cursor in the editor based on the container, comment and browse position.
+
+  @precon  None.
+  @postcon The cursor is positioned in the editor.
+
+  @param   Container      as a TElementContainer as a constant
+  @param   iIdentLine     as an Integer as a constant
+  @param   iIdentColumn   as an Integer as a constant
+  @param   BrowsePosition as a TBrowsePosition as a constant
+
+**)
+Procedure PositionCursor(Const Container : TElementContainer; Const iIdentLine, iIdentColumn : Integer;
+  Const BrowsePosition : TBrowsePosition);
+
+  (**
+
+    This method unfolders the method code at the nearest position to the cursor.
+
+    @precon  EV must be a valid instance.
+    @postcon The method code at the cursor is unfolded.
+
+    @param   EV as an IOTAEditView as a constant
+
+  **)
+  Procedure UnfoldMethod(Const EV : IOTAEditView);
+
+  Var
+    {$IFDEF D2006}
+    EA: IOTAElideActions;
+    {$ENDIF}
+    
+  Begin
+    {$IFDEF D2006}
+    If Supports(EV, IOTAElideActions, EA) Then
+      EA.UnElideNearestBlock;
+    {$ENDIF}
+  End;
+  
+Var
+  SourceEditor: IOTASourceEditor;
+  C           : TOTAEditPos;
+  EV          : IOTAEditView;
+  iLine : Integer;
+
+Begin
+  SourceEditor := ActiveSourceEditor;
+  If Assigned(SourceEditor) Then
+    Begin
+      If SourceEditor.EditViewCount > 0 Then
+        Begin
+          SourceEditor.Module.CurrentEditor.Show;
+          If iIdentColumn * iIdentLine > 0 Then
+            Begin
+              SourceEditor.Show;
+              EV := (BorlandIDEServices As IOTAEditorServices).TopView;
+              C.Col  := iIdentColumn;
+              C.Line := iIdentLine;
+              iLine := iIdentLine;
+              UnfoldMethod(EV);
+              EV.CursorPos := C;
+              Case BrowsePosition Of
+                bpCommentTop:
+                  Begin
+                    iLine := iIdentLine;
+                    If Assigned(Container) Then
+                      Begin
+                        iLine := Container.Line;
+                        If Assigned(Container.Comment) Then
+                           iLine := Container.Comment.Line;
+                      End;
+                    EV.SetTopLeft(iLine, 1);
+                  End;
+                bpCommentCentre:
+                  Begin
+                    iLine := iIdentLine;
+                    If Assigned(Container) Then
+                      Begin
+                        iLine := Container.Line;
+                        If Assigned(Container.Comment) Then
+                           iLine := Container.Comment.Line;
+                      End;
+                    EV.Center(iLine, 1);
+                  End;
+                bpIdentifierTop: EV.SetTopLeft(iLine, 1);
+                bpIdentifierCentre: EV.Center(iLine, 1);
+                bpIdentifierCentreShowAllComment:
+                  Begin
+                    EV.Center(iLine, 1);
+                    If Assigned(Container) Then
+                      Begin
+                        iLine := Container.Line;
+                        If Assigned(Container.Comment) Then
+                           iLine := Container.Comment.Line;
+                        If iLine < EV.TopRow Then
+                          EV.SetTopLeft(iLine, 1);
+                      End;
+                  End;
+              End;
+              If C.Line >= EV.TopRow + EV.ViewSize.Height - 1 Then
+                EV.SetTopLeft(C.Line - EV.ViewSize.Height + 1 + 1, 1);  
+            End;
+        End;
+    End;
 End;
 
 End.

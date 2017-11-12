@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Oct 2017
+  @Date    12 Nov 2017
 
 **)
 Unit BADI.Pascal.RecordDecl;
@@ -28,6 +28,7 @@ Type
     FHeritage     : TIdentList;
     FHelper       : Boolean;
     FHelperClass  : String;
+    FEndLine      : Integer;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
     Constructor Create(Const strName : String; Const AScope : TScope; Const iLine,
@@ -71,6 +72,13 @@ Type
       @return  a String
     **)
     Property HelperClassName : String Read FHelperClass Write FHelperClass;
+    (**
+      This property return the line number of the END for the record.
+      @precon  None.
+      @postcon the line number for the end of the record is returned.
+      @return  an Integer
+    **)
+    Property EndLine: Integer Read FEndLine Write FEndLine;
   End;
 
 Implementation
@@ -95,6 +103,12 @@ Uses
 **)
 Function TRecordDecl.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
+Const
+  strRecordLabel = 'Record';
+  strTypePrefix = 'Type ';
+  strRecordHelperLabel = #32'Helper';
+  strRecordHelperForLabel = ' For %s';
+
 Var
   iToken: Integer;
 
@@ -105,10 +119,10 @@ Begin
   If Result <> '' Then
     Result := Result + #32'='#32;
   If IsTyped Then
-    Result := Result + 'Type ';
-  Result := Result + 'Record';
+    Result := Result + strTypePrefix;
+  Result := Result + strRecordLabel;
   If FHelper Then
-    Result := Result + #32'Helper';
+    Result := Result + strRecordHelperLabel;
   If Heritage.ElementCount > 0 Then
     Begin
       Result := Result + '(';
@@ -122,46 +136,7 @@ Begin
       Result := Result + ')';
     End;
   If FHelper Then
-    Result := Result + Format(' For %s', [FHelperClass]);
-End;
-
-(**
-
-  This is the constructor method for the TRecordDecl class.
-
-  @precon  None.
-  @postcon Initialises the class.
-
-  @param   strName     as a String as a constant
-  @param   AScope      as a TScope as a constant
-  @param   iLine       as an Integer as a constant
-  @param   iColumn     as an Integer as a constant
-  @param   iImageIndex as a TBADIImageIndex as a constant
-  @param   AComment    as a TComment as a constant
-
-**)
-Constructor TRecordDecl.Create(Const strName : String; Const AScope : TScope; Const iLine,
-      iColumn : Integer; Const iImageIndex : TBADIImageIndex; Const AComment : TComment);
-begin
-  Inherited Create(strName, AScope, iLine, iColumn, iImageIndex, AComment);
-  FPacked := False;
-  FHeritage := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
-  FHeritage.Sorted := False;
-end;
-
-(**
-
-  A destructor for the TRecordDecl class.
-
-  @precon  None.
-  @postcon Frees the generic parameters.
-
-**)
-Destructor TRecordDecl.Destroy;
-
-Begin
-  FHeritage.Free;
-  Inherited Destroy;
+    Result := Result + Format(strRecordHelperForLabel, [FHelperClass]);
 End;
 
 (**
@@ -186,6 +161,46 @@ Begin
         strRecordDocumentation, DocConflictTable[dctRecordClauseUndocumented]);
   For i := 1 To ElementCount Do
     Elements[i].CheckDocumentation(boolCascade);
+End;
+
+(**
+
+  This is the constructor method for the TRecordDecl class.
+
+  @precon  None.
+  @postcon Initialises the class.
+
+  @param   strName     as a String as a constant
+  @param   AScope      as a TScope as a constant
+  @param   iLine       as an Integer as a constant
+  @param   iColumn     as an Integer as a constant
+  @param   iImageIndex as a TBADIImageIndex as a constant
+  @param   AComment    as a TComment as a constant
+
+**)
+Constructor TRecordDecl.Create(Const strName : String; Const AScope : TScope; Const iLine,
+      iColumn : Integer; Const iImageIndex : TBADIImageIndex; Const AComment : TComment);
+begin
+  Inherited Create(strName, AScope, iLine, iColumn, iImageIndex, AComment);
+  FPacked := False;
+  FHeritage := TIdentList.Create('', scNone, 0, 0, iiNone, Nil);
+  FHeritage.Sorted := False;
+  FEndLine := 0;
+end;
+
+(**
+
+  A destructor for the TRecordDecl class.
+
+  @precon  None.
+  @postcon Frees the generic parameters.
+
+**)
+Destructor TRecordDecl.Destroy;
+
+Begin
+  FHeritage.Free;
+  Inherited Destroy;
 End;
 
 (**

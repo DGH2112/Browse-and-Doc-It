@@ -376,13 +376,13 @@ Begin
               Check(U <> Nil, Format('%d.2) %s not found (found %s): %s', [Succ(iCheck), strValue, GetElements(U, T), strCheckValues[iCheck]]));
               T := U;
             End;
-          Check(T.ElementCount > 0, Format('%d.3) Element Count: ', [Succ(iCheck), strCheckValues[iCheck]]));
+          Check(T.ElementCount > 0, Format('%d.3) Element Count: %s', [Succ(iCheck), strCheckValue]));
           i := Pos('|', strCheckValue);
-          Check(i > 0, Format('%d.4) Cannot find KEY to search for! ', [Succ(iCheck), strCheckValues[iCheck]]));
+          Check(i > 0, Format('%d.4) Cannot find KEY to search for: %s', [Succ(iCheck), strCheckValue]));
           strKey := Copy(strCheckvalue, 1, i - 1);
           Delete(strCheckValue, 1, i);
           i := Pos('|', strCheckValue);
-          Check(i > 0, Format('%d.5) Cannot get scope: %s', [Succ(iCheck), strCheckvalues[iCheck]]));
+          Check(i > 0, Format('%d.5) Cannot get scope: %s', [Succ(iCheck), strCheckvalue]));
           strValueScope := Copy(strCheckValue, i + 1, Length(strCheckValue) - i);
           Delete(strCheckValue, i, Length(strCheckValue) - (i - 1));
 

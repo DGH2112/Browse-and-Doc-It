@@ -31,6 +31,8 @@ type
     Function FirstError : String;
     Function FirstWarning : String;
     Function FirstHint : String;
+    Function FirstDocConflict : String;
+    Function FirstMetricAndCheck : String;
     Function DocConflict(Const iConflict : Integer) : String;
     Procedure DeleteDocumentConflicts;
     Function HeadingCount(Const strHeading : String) : Integer;
@@ -42,7 +44,7 @@ type
 
   TClassOfTGenericTypeDecl = Class Of TGenericTypeDecl;
 
-  TTestType = (ttErrors, ttWarnings, ttHints);
+  TTestType = (ttErrors, ttWarnings, ttHints, ttDocConflicts, ttChecksAndMetrics);
   TTestTypes = Set of TTestType;
 
   TExtendedTestCase = Class(TTestCase)
@@ -56,10 +58,14 @@ type
     Procedure CheckEquals(trExpected, trActual : TTokenReference; strMsg : String = ''); Overload;
     Procedure CheckEquals(ctExpected, ctActual : TCommentType; strMsg : String = ''); Overload;
     Procedure CheckEquals(strExpected, strActual : String; strMsg : String = ''); Overload; Override;
-    Procedure TestGrammarForErrors(Parser : TBaseLanguageModuleClass;
-      strTemplate : String; strInterface, strImplementation : String;
-      TestTypes : TTestTypes; Const strCheckValues : Array Of String;
-      iErrors : Integer = 0; iWarnings : Integer = 0; iHints : Integer = 0);
+    Procedure TestGrammarForErrors(Const Parser : TBaseLanguageModuleClass; Const strTemplate,
+      strInterface, strImplementation: String; Const TestTypes : TTestTypes;
+      Const strCheckValues : Array Of String;
+      Const iErrors : Integer = 0;
+      Const iWarnings : Integer = 0;
+      Const iHints : Integer = 0;
+      Const iDocConflicts : Integer = 0;
+      Const iChecksAndMetrics : Integer = 0);
   Published
   End;
 
@@ -199,7 +205,20 @@ begin
     End;
 end;
 
-function TElementContainerHelper.FirstError: String;
+Function TElementContainerHelper.FirstDocConflict: String;
+
+Var
+  E : TElementContainer;
+
+Begin
+  Result := '';
+  E := FindElement(strDocumentationConflicts);
+  If Assigned(E) Then
+    Result := StringReplace(Format('  [%s]', [E.Elements[1].Elements[1].AsString(True, False)]),
+      #13#10, '(line-end)', [rfReplaceAll]);
+End;
+
+Function TElementContainerHelper.FirstError: String;
 
 Var
   E : TElementContainer;
@@ -224,6 +243,19 @@ begin
     Result := StringReplace(Format('  [%s]', [E.Elements[1].AsString(True, False)]),
       #13#10, '(line-end)', [rfReplaceAll]);
 end;
+
+Function TElementContainerHelper.FirstMetricAndCheck: String;
+
+Var
+  E: TElementContainer;
+
+Begin
+  Result := '';
+  E := FindElement(strMetricsAndChecks);
+  If Assigned(E) Then
+    Result := StringReplace(Format('  [%s]', [E.Elements[1].Elements[1].AsString(True, False)]),
+      #13#10, '(line-end)', [rfReplaceAll]);
+End;
 
 function TElementContainerHelper.FirstWarning: String;
 
@@ -271,10 +303,10 @@ end;
 
 { TExtendedTestCase }
 
-Procedure TExtendedTestCase.TestGrammarForErrors(Parser : TBaseLanguageModuleClass;
-  strTemplate : String; strInterface, strImplementation: String; TestTypes : TTestTypes;
-  Const strCheckValues : Array Of String; iErrors : Integer = 0; iWarnings : Integer = 0;
-  iHints : Integer = 0);
+Procedure TExtendedTestCase.TestGrammarForErrors(Const Parser : TBaseLanguageModuleClass;
+  Const strTemplate, strInterface, strImplementation: String; Const TestTypes : TTestTypes;
+  Const strCheckValues : Array Of String; Const iErrors : Integer = 0; Const iWarnings : Integer = 0;
+  Const iHints : Integer = 0; Const iDocConflicts : Integer = 0; Const iChecksAndMetrics : Integer = 0);
 
 Const
   cDelimiter : Char = '\';
@@ -325,6 +357,12 @@ Begin
       CheckEquals(iWarnings, P.HeadingCount(strWarnings), 'WARNINGS: ' + P.FirstWarning);
     If ttHints In TestTypes Then
       CheckEquals(iHints, P.HeadingCount(strHints), 'HINTS: ' + P.FirstHint);
+    If ttDocConflicts In TestTypes Then
+      CheckEquals(iDocConflicts, P.HeadingCount(strDocumentationConflicts), 'DOCCONFLICTS: ' +
+        P.FirstDocConflict);
+    If ttChecksAndMetrics In TestTypes Then
+      CheckEquals(iChecksAndMetrics, P.HeadingCount(strMetricsAndChecks), 'CHECKSANDMETRICS: ' +
+        P.FirstMetricAndCheck);
     For iCheck := Low(strCheckValues) to High(strCheckValues) Do
       If strCheckValues[iCheck] <> '' Then
         Begin
@@ -767,4 +805,3 @@ initialization
   // Register any test cases with the test runner
   RegisterTest('BADI.Base.Module Tests', TestTBaseLanguageModule.Suite);
 End.
-

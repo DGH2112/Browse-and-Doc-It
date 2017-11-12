@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    04 Nov 2017
+  @Date    05 Nov 2017
 
 **)
 Unit BADI.Options;
@@ -269,6 +269,13 @@ Type
     **)
     Property ModuleMetric[Const ModuleMetric : TBADIModuleMetric] : TBADIMetricRecord
       Read GetModulelMetric Write SetModuleMetric;
+    (**
+      A property to determine of a constant refactoring should have a new line between declaration
+      sections.
+      @precon  None.
+      @postcon Gets or set the boolena value.
+      @return  a Boolean
+    **)
     Property RefactorConstNewLine : Boolean Read FRefactorConstNewLine Write FRefactorConstNewLine;
   End;
 
@@ -478,6 +485,8 @@ Var
   iModule: Integer;
   iniFile : TMemIniFile;
   eMetric: TBADIModuleMetric;
+  iSTIndex : Integer;
+  ST: TBADISpecialTag;
 
 Begin
   iniFile := TMemIniFile.Create(FINIFileName);
@@ -493,11 +502,20 @@ Begin
       If sl.Count > 0 Then
         FSpecialTags.Clear;
       For j := 0 To sl.Count - 1 Do
-        FSpecialTags.Add(TBADISpecialTag.Create(
+        Begin
+          iSTIndex := FSpecialTags.Add(TBADISpecialTag.Create(
             sl[j],
             iniFile.ReadString('SpecialTagNames', sl[j], ''),
             TBADITagProperties(Byte(iniFile.ReadInteger('SpecialTags', sl[j], 0)))
-        ));
+          ));
+          ST := FSpecialTags[iSTIndex];
+          ST.FFontStyles := TFontStyles(Byte(iniFile.ReadInteger('SpecialTagFontStyles', sl[j], 0)));
+          ST.FFontColour :=
+            StringToColor(iniFile.ReadString('SpecialTagFontForeColours', sl[j], ColorToString(clNone)));
+          ST.FBackColour :=
+            StringToColor(iniFile.ReadString('SpecialTagFontBackColours', sl[j], ColorToString(clNone)));
+          FSpecialTags[iSTIndex] := ST;
+        ENd;
       iniFile.ReadSection('ManagedExpandedNodes', sl);
       For j := 0 To sl.Count - 1 Do
         Begin
@@ -620,6 +638,12 @@ Begin
         iniFile.WriteInteger('SpecialTags', FSpecialTags[j].FName,
           Byte(FSpecialTags[j].FTagProperties));
         iniFile.WriteString('SpecialTagNames', FSpecialTags[j].FName, FSpecialTags[j].FDescription);
+        iniFile.WriteInteger('SpecialTagFontStyles', FSpecialTags[j].FName,
+          Byte(FSpecialTags[j].FFontStyles));
+        iniFile.WriteString('SpecialTagFontForeColours', FSpecialTags[j].FName,
+          ColorToString(FSpecialTags[j].FFontColour));
+        iniFile.WriteString('SpecialTagFontBackColours', FSpecialTags[j].FName,
+          ColorToString(FSpecialTags[j].FBackColour));
       End;
     iniFile.EraseSection('ManagedExpandedNodes');
     For j := 0 To ExpandedNodes.Count - 1 Do

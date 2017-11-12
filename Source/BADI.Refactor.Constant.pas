@@ -556,7 +556,7 @@ Var
 
 Begin
   Result := iDefaultStartLine;
-  iLine := NewDeclarationFromExistingCRS;
+  iLine := NewDeclarationFromExistingCRS(Container, setScopes);
   If (iLine > 0) And (iLine < MaxInt) Then
     Result := iLine;
   E := Container.FindElement(strVarsLabel); // Before Var
@@ -571,8 +571,9 @@ Begin
       Result := NewMaxLinePosition(E, setScopes);
       If Result > 0 Then Exit;
     End; 
-  If NewDeclarationAfterUses > 0 Then
-    Result := NewDeclarationAfterUses;
+  iLine := NewDeclarationAfterUses(Container, setScopes);
+  If iLine > 0 Then
+    Result := iLine;
 End;
 
 (**

@@ -1735,10 +1735,16 @@ End;
 **)
 Procedure TPascalModule.MetricsExceptionEating(Const Container : TElementContainer);
 
+Const
+  strMethod = 'method';
+  
 Begin
   If Assigned(CurrentMethod) Then
-    AddModuleMetric([CurrentMethod.QualifiedName], Container.Line, Container.Column, CurrentMethod,
-      mmExceptionEating);
+    AddModuleMetric([strMethod, CurrentMethod.QualifiedName], Container.Line, Container.Column,
+      CurrentMethod, mmExceptionEating)
+  Else
+    AddModuleMetric([strModuleTypes[ModuleType], ModuleName], Container.Line, Container.Column,
+      Self, mmExceptionEating)
 End;
 
 (**
@@ -1754,6 +1760,9 @@ End;
 **)
 Procedure TPascalModule.MetricsHardCodedNumbers(Const Container: TElementContainer);
 
+Const
+  strMethod = 'method';
+
 Var
   M: TGenericFunction;
   dbl: Double;
@@ -1761,7 +1770,7 @@ Var
   iErrorCode: Integer;
 
 Begin
-  If Assigned(CurrentMethod) And Not (Container Is TConstant) Then
+  If Not (Container Is TConstant) Then
     Begin
       M := CurrentMethod;
       If Pos('.', Token.Token) = 0 Then
@@ -1771,15 +1780,23 @@ Begin
             Exit;
           If (Abs(i) = 1) And BADIOptions.ModuleMetric[mmHCIntIgnoreOne].FEnabled Then
             Exit;
-          AddModuleMetric([Token.Token, M.QualifiedName], Token.Line, Token.Column, M,
-            mmHardCodedIntegers)
+          If Assigned(M) Then
+            AddModuleMetric([Token.Token, strMethod, M.QualifiedName], Token.Line, Token.Column, M,
+              mmHardCodedIntegers)
+          Else
+            AddModuleMetric([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
+              Token.Column, Self, mmHardCodedIntegers);
         End Else
         Begin
           Val(Token.Token, dbl,  iErrorCode);
           If (Abs(dbl) = 0.0) And BADIOptions.ModuleMetric[mmHCNumIgmoreZero].FEnabled Then
             Exit;
-          AddModuleMetric([Token.Token, M.QualifiedName], Token.Line, Token.Column, M,
-            mmHardCodedNumbers);
+          If Assigned(M) Then
+            AddModuleMetric([Token.Token, strMethod, M.QualifiedName], Token.Line, Token.Column, M,
+              mmHardCodedNumbers)
+          Else
+            AddModuleMetric([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
+              Token.Column, Self, mmHardCodedNumbers);         
         End;
     End;
 End;
@@ -1801,6 +1818,7 @@ Procedure TPascalModule.MetricsHardCodedStrings(Const Container : TElementContai
 Const
   strAlpha = ['a'..'z', 'A'..'Z'];
   iMinAlphaLength = 3;
+  strMethod = 'method';
 
 Var
   i : Integer;
@@ -1808,7 +1826,7 @@ Var
   iMaxAlphaLen : Integer;
 
 Begin
-  If (Length(Token.Token) > iMinAlphaLength) And Assigned(CurrentMethod) And Not (Container Is TConstant) Then
+  If (Length(Token.Token) > iMinAlphaLength) And Not (Container Is TConstant) Then
     Begin
       iAlphaLen := 0;
       iMaxAlphaLen := 0;
@@ -1821,8 +1839,12 @@ Begin
           End Else
             iAlphaLen := 0;
       If iMaxAlphaLen > 1 Then
-        AddModuleMetric([Token.Token, CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
-          mmHardCodedStrings);
+        If Assigned(CurrentMethod) Then
+          AddModuleMetric([Token.Token, strMethod, CurrentMethod.QualifiedName], Token.Line,
+            Token.Column, CurrentMethod, mmHardCodedStrings)
+        Else
+          AddModuleMetric([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
+            Token.Column, Self, mmHardCodedStrings);
     ENd;
 End;
 

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       05 Nov 2017
+  @Date       12 Nov 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -3279,9 +3279,11 @@ begin
         (boolFieldAllowed And RecordFieldList(Result, InternalScope))
       );
       If Token.UToken = strEND Then
-        NextNonCommentToken
-      Else
-        ErrorAndSeekToken(strReservedWordExpected, strEND, strSeekableOnErrorTokens, stActual, Self);
+        Begin
+          Result.EndLine := Token.Line;
+          NextNonCommentToken;
+        End Else
+          ErrorAndSeekToken(strReservedWordExpected, strEND, strSeekableOnErrorTokens, stActual, Self);
     End;
 end;
 
@@ -6754,9 +6756,12 @@ begin
           );
           // Check for 'END'
           If Token.UToken = strEND Then
-            NextNonCommentToken
-          Else
-            ErrorAndSeekToken(strReservedWordExpected, strEND, strSeekableOnErrorTokens, stActual, Self);
+            Begin
+              Result.EndLine := Token.Line;
+              NextNonCommentToken;
+            End Else
+              ErrorAndSeekToken(strReservedWordExpected, strEND, strSeekableOnErrorTokens, stActual,
+                Self);
         End Else
           NextNonCommentToken;
     End;
@@ -7381,9 +7386,12 @@ begin
               );
               // Check for 'END'
               If Token.UToken = strEND Then
-                NextNonCommentToken
-              Else
-                ErrorAndSeekToken(strReservedWordExpected, strEND, strSeekableOnErrorTokens, stActual, Self);
+                Begin
+                  Result.EndLine := Token.Line;
+                  NextNonCommentToken;
+                End Else
+                  ErrorAndSeekToken(strReservedWordExpected, strEND, strSeekableOnErrorTokens, stActual,
+                    Self);
             End;
         End Else
           PopTokenPosition;
@@ -7937,9 +7945,12 @@ begin
           );
           // Check for 'END' and ';'
           If Token.UToken = strEND Then
-            NextNonCommentToken
-          Else
-            ErrorAndSeekToken(strReservedWordExpected, strEND, strSeekableOnErrorTokens, stActual, Self);
+            Begin
+              Result.EndLine := Token.Line;
+              NextNonCommentToken;
+            End Else
+              ErrorAndSeekToken(strReservedWordExpected, strEND, strSeekableOnErrorTokens, stActual,
+                Self);
         End;
     End;
 end;

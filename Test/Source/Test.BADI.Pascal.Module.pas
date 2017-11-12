@@ -238,6 +238,32 @@ type
     Procedure TestAnonymousMethodsStdFuncDecl;
     Procedure TestAnonymousMethodsImplStdFuncDecl;
     Procedure TestAnonymousMethodsUsing;
+    Procedure TestLongMethodImplementations;
+    Procedure TestLongMethodParameterLists;
+    Procedure TestLongMethodVariableLists;
+    Procedure TestHardCodedIntegers;
+    Procedure TestHardCodedNumbers;
+    Procedure TestHardCodedStrings;
+    Procedure TestUnsortedMethods;
+    Procedure TestUseOfWITHStmt;
+    Procedure TestUseOfGOTOStmt;
+    Procedure TestNestedIFDepth;
+    Procedure TestMethodCyclometricComplexity;
+    Procedure TestMethodToxicity;
+    Procedure TestEmptyExceptBlocks;
+    Procedure TestEmptyFinallyBlocks;
+    Procedure TestExceptionEating;
+    Procedure TestEmptyThenBlocks;
+    Procedure TestEmptyElseBlocks;
+    Procedure TestEmptyCaseBlocks;
+    Procedure TestEmptyForBlocks;
+    Procedure TestEmptyWhileBlocks;
+    Procedure TestEmptyRepeatBlocks;
+    Procedure TestEmptyBeginEndBlocks;
+    Procedure TestEmptyInitializationBlock;
+    Procedure TestEmptyFinalizationBlock;
+    Procedure TestEmptyMethods;
+    Procedure TestMissingCONSTInParameters;
     Procedure TestCodeFailure01;
     Procedure TestCodeFailure02;
     Procedure TestCodeFailure03;
@@ -6956,6 +6982,895 @@ Begin
   );
 End;
 
+procedure TestTPascalModule.TestEmptyBeginEndBlocks;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Repeat'#13#10 +
+    '    Write;'#13#10 +
+    '  Until True;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    'WriteLN;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyCaseBlocks;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Case X Of'#13#10 +
+    '    0: WriteLn;'#13#10 +
+    '  Else'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Case X Of'#13#10 +
+    '    0: ;'#13#10 +
+    '  Else'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Case X Of'#13#10 +
+    '    0: ;'#13#10 +
+    '  Else'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    '  WriteLn();', 
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  Case X Of'#13#10 +
+    '    0: ;'#13#10 +
+    '  Else'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Case X Of'#13#10 +
+    '    0: WriteLn;'#13#10 +
+    '  Else'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Case X Of'#13#10 +
+    '    0: WriteLn();'#13#10 +
+    '  Else'#13#10 +
+    ''#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Case X Of'#13#10 +
+    '    0: WriteLn();'#13#10 +
+    '  Else'#13#10 +
+    ''#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    '  WriteLn();', 
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  Case X Of'#13#10 +
+    '    0: WriteLn;'#13#10 +
+    '  Else'#13#10 +
+    ''#13#10 +
+    '  End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyElseBlocks;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Then'#13#10 +
+    '    WriteLn()'#13#10 +
+    '  Else'#13#10 +
+    '    WriteLn();'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Then'#13#10 +
+    '    WriteLn()'#13#10 +
+    '  Else'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Then'#13#10 +
+    '    WriteLn()'#13#10 +
+    '  Else'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  If True Then'#13#10 +
+    '    WriteLn()'#13#10 +
+    '  Else'#13#10,
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyExceptBlocks;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Except'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Except'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Except'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Except'#13#10 +
+    '  End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyFinalizationBlock;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Initialization'#13#10 +
+    'Finalization'#13#10 +
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Initialization'#13#10 +
+    'Finalization',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyFinallyBlocks;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Finally'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Finally'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Finally'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Finally'#13#10 +
+    '  End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyForBlocks;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  For i := 0 To 10 Do'#13#10 +
+    '  Write;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  For i := 0 To 10 Do'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  For i := 0 To 10 Do'#13#10 +
+    'End;',
+    'WriteLN;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  For i := 0 To 10 Do',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyInitializationBlock;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Initialization'#13#10 +
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Initialization'#13#10 +
+    '',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyMethods;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Repeat'#13#10 +
+    '    Write;'#13#10 +
+    '  Until True;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    'End;',
+    'WriteLN;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyRepeatBlocks;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Repeat'#13#10 +
+    '    Write;'#13#10 +
+    '  Until True;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Repeat'#13#10 +
+    '  Until True;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Repeat'#13#10 +
+    '  Until True;'#13#10 +
+    'End;',
+    'WriteLN;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  Repeat'#13#10 +
+    '  Until True;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyThenBlocks;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Then'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Then'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  If True Then',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestEmptyWhileBlocks;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  While True Do'#13#10 +
+    '    Write;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  While True Do'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  While True Do'#13#10 +
+    'End;',
+    'WriteLN;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  While True Do',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestExceptionEating;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Except'#13#10 +
+    '    On E : EMyException Do'#13#10 +
+    '      WriteLn();'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Except'#13#10 +
+    '    On E : Exception Do'#13#10 +
+    '      WriteLn();'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Except'#13#10 +
+    '    On E : Exception Do'#13#10 +
+    '      WriteLn();'#13#10 +
+    '  End;'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  Try'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  Except'#13#10 +
+    '    On E : Exception Do'#13#10 +
+    '      WriteLn();'#13#10 +
+    '  End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestHardCodedIntegers;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    []
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(2);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(2);'#13#10 +
+    'End;',
+    '  WriteLN();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  WriteLn(2);',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+End;
+
+Procedure TestTPascalModule.TestHardCodedNumbers;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    []
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(1.0);'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(1.0);'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  WriteLn(1.0);',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+End;
+
+Procedure TestTPascalModule.TestHardCodedStrings;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    []
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    '',
+    '  WriteLn(''Hello'');',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+End;
+
 Procedure TestTPascalModule.TestStringType;
 
 Begin
@@ -6978,6 +7893,377 @@ Begin
       'Types\t05|t05 = String[1 + 2 * 3]|scPrivate'
     ]
   );
+End;
+
+procedure TestTPascalModule.TestLongMethodImplementations;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
+    '  WriteLn;'#13#10 +
+    ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
+    ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
+    ''#13#10#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    []
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc(Const A, B, C, D, E, F, G, H : Integer);',
+    'Procedure MyProc(Const A, B, C, D, E, F, G, H : Integer);'#13#10 +
+    'Begin'#13#10 +
+    ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
+    '  WriteLn;'#13#10 +
+    ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
+    ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
+    ''#13#10#13#10#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc(Const A, B, C, D, E, F, G, H : Integer);'#13#10 +
+    'Begin'#13#10 +
+    ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
+    '  WriteLn;'#13#10 +
+    ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
+    ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
+    ''#13#10#13#10#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestLongMethodParameterLists;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc(Const A, B, C, D, E, F, G : Integer);',
+    'Procedure MyProc(Const A, B, C, D, E, F, G : Integer);'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    []
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc(Const A, B, C, D, E, F, G, H : Integer);',
+    'Procedure MyProc(Const A, B, C, D, E, F, G, H : Integer);'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc(Const A, B, C, D, E, F, G, H : Integer);'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    'WriteLn();', 
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestLongMethodVariableLists;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Var A, B, C, D, E, F, G : Integer;'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    []
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Var A, B, C, D, E, F, G, H : Integer;'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc();'#13#10 +
+    'Var A, B, C, D, E, F, G, H : Integer;'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+End;
+
+Procedure TestTPascalModule.TestMethodCyclometricComplexity;
+
+Var
+  R: TBADIMetricRecord;
+
+Begin
+  R := TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity];
+  R.FLimit := 2.0;
+  TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity] := R;
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+//  TestGrammarForErrors(
+//    TPascalModule,
+//    strProgram,
+//    '',
+//    '  If True Or False Then'#13#10 +
+//    '    WriteLn();'#13#10 +
+//    '  If True Or False Then'#13#10 +
+//    '    WriteLn();'#13#10 +
+//    '  If True Or False Then'#13#10 +
+//    '    WriteLn();'#13#10 +
+//    '  If True Or False Then'#13#10 +
+//    '    WriteLn();',
+//    [ttErrors, ttWarnings, ttChecksAndMetrics],
+//    [],
+//    0, 0, 0, 0, 1
+//  );
+  R.FLimit := 1.0;
+  TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity] := R;
+End;
+
+Procedure TestTPascalModule.TestMethodToxicity;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn();'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc(Const A, B, C, D, E : Integer);',
+    'Procedure MyProc(Const A, B, C, D, E : Integer);'#13#10 +
+    'Var U, V, W, X, Y, Z : String;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc(Const A, B, C, D, E : Integer);'#13#10 +
+    'Var U, V, W, X, Y, Z : String;'#13#10 +
+    'Begin'#13#10 +
+    '  If True Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    'End;',
+    '  WriteLN();', 
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestMissingCONSTInParameters;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc(Const X : Integer);',
+    'Procedure MyProc(Const X : Integer);'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn();'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc(X : Integer);',
+    'Procedure MyProc(X : Integer);'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn();'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc(X : Integer);'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn();'#13#10 +
+    'End;',
+    '  WriteLN();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+End;
+
+Procedure TestTPascalModule.TestNestedIFDepth;
+
+Var
+  R: TBADIMetricRecord;
+
+Begin
+  R := TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity];
+  R.FLimit := 2.0;
+  TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity] := R;
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If A Then'#13#10 +
+    '    If B Then'#13#10 +
+    '      If C Then'#13#10 +
+    '        If D THen'#13#10 +
+    '          If E Then'#13#10 +
+    '            WriteLn();'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 0
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc;',
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If A Then'#13#10 +
+    '    If B Then'#13#10 +
+    '      If C Then'#13#10 +
+    '        If D THen'#13#10 +
+    '          If E Then'#13#10 +
+    '            IF F Then'#13#10 +
+    '              WriteLn();'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc;'#13#10 +
+    'Begin'#13#10 +
+    '  If A Then'#13#10 +
+    '    If B Then'#13#10 +
+    '      If C Then'#13#10 +
+    '        If D THen'#13#10 +
+    '          If E Then'#13#10 +
+    '            IF F Then'#13#10 +
+    '              WriteLn();'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+  );
+  R.FLimit := 1.0;
+  TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity] := R;
 End;
 
 Procedure TestTPascalModule.TestStructStmt;
@@ -7045,6 +8331,142 @@ Begin
       'Types\t05|t05 = Packed Array of Byte|scPrivate'
     ]
   );
+End;
+
+procedure TestTPascalModule.TestUnsortedMethods;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc1();'#13#10 +
+    'Procedure MyProc2();',
+    'Procedure MyProc1();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;'#13#10 +
+    'Procedure MyProc2();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    []
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc1();'#13#10 +
+    'Procedure MyProc2();',
+    'Procedure MyProc2();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;'#13#10 +
+    'Procedure MyProc1();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc2();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;'#13#10 +
+    'Procedure MyProc1();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    '  WriteLn();', 
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+End;
+
+Procedure TestTPascalModule.TestUseOfGOTOStmt;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    []
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    '  GOTO ERRHND;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn(''Hello'');'#13#10 +
+    '  GOTO ERRHND;'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+End;
+
+Procedure TestTPascalModule.TestUseOfWITHStmt;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  WriteLn;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    []
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  With X Do WriteLn(''Hello'');'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
+  TestGrammarForErrors(
+    TPascalModule,
+    strProgram,
+    'Procedure MyProc();'#13#10 +
+    'Begin'#13#10 +
+    '  With X Do WriteLn(''Hello'');'#13#10 +
+    'End;',
+    '  WriteLn();',
+    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [],
+    0, 0, 0, 0, 1
+    );
 End;
 
 Procedure TestTPascalModule.TestSubRangeType;

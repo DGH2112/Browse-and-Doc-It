@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    03 Nov 2017
+  @date    12 Nov 2017
   
 **)
 Unit BADI.RefactorConstantForm;
@@ -23,19 +23,10 @@ Uses
   Forms,
   Dialogs,
   StdCtrls,
-  Buttons;
+  Buttons,
+  BADI.Refactoring.Functions;
 
 Type
-  (** An enumerate for the type of the refactoring - constant or resource string. **)
-  TBADIRefactoringType = (rtConstant, rtResourceString);
-  (** A set of the above refactoring types. **)
-  TBADIRefactoringTypes = Set Of TBADIRefactoringType;
-
-  (** An enumerate for the scope of the refactoring. **)
-  TBADIRefactoringScope = (rsLocal, rsImplementation, rsInterface);
-  (** A set of the above refactoring scopes. **)
-  TBADIRefactoringScopes = Set Of TBADIRefactoringScope;
-
   (** A class to represent the form for editing the refactoring. **)
   TfrmBADIRefactorConstant = Class(TForm)
     lblName: TLabel;
@@ -55,8 +46,7 @@ Type
       Const setTypes: TBADIRefactoringTypes; Var boolNewLine : Boolean);
   Strict Protected
   Public
-    Class Function Execute(Const strLiteral: String; Var strName: String;
-      Var setScopes: TBADIRefactoringScopes; Var setTypes: TBADIRefactoringTypes;
+    Class Function Execute(Var RefactoringInfo : TBADIRefactoringInfo;
       Var boolNewLine : Boolean): Boolean;
   End;
 
@@ -103,16 +93,12 @@ End;
   @precon  None.
   @postcon The dialogue is displayed for editing the refactoring.
 
-  @param   strLiteral  as a String as a constant
-  @param   strName     as a String as a reference
-  @param   setScopes   as a TBADIRefactoringScopes as a reference
-  @param   setTypes    as a TBADIRefactoringTypes as a reference
-  @param   boolNewLine as a Boolean as a reference
+  @param   RefactoringInfo as a TBADIRefactoringInfo as a reference
+  @param   boolNewLine     as a Boolean as a reference
   @return  a Boolean
 
 **)
-Class Function TfrmBADIRefactorConstant.Execute(Const strLiteral: String; Var strName: String;
-  Var setScopes: TBADIRefactoringScopes; Var setTypes: TBADIRefactoringTypes;
+Class Function TfrmBADIRefactorConstant.Execute(Var RefactoringInfo : TBADIRefactoringInfo;
   Var boolNewLine : Boolean): Boolean;
 
 Var
@@ -122,16 +108,16 @@ Begin
   Result := False;
   F := TfrmBADIRefactorConstant.Create(Application.MainForm);
   Try
-    F.edtName.Text := strName;
-    F.edtLiteral.Text := strLiteral;
-    F.InitialiseDialogue(setScopes, setTypes, boolNewLine);
+    F.edtName.Text := RefactoringInfo.FName;
+    F.edtLiteral.Text := RefactoringInfo.FToken.Token;
+    F.InitialiseDialogue(RefactoringInfo.FScopes, RefactoringInfo.FTypes, boolNewLine);
     If F.ShowModal = mrOK Then
       Begin
-        strName := F.edtName.Text;
-        setScopes := [];
-        Include(setScopes, TBADIRefactoringScope(Byte(F.cbxScope.ItemIndex)));
-        setTypes := [];
-        Include(setTypes, TBADIRefactoringType(Byte(F.cbxType.ItemIndex)));
+        RefactoringInfo.FName := F.edtName.Text;
+        RefactoringInfo.FScopes := [];
+        Include(RefactoringInfo.FScopes, TBADIRefactoringScope(Byte(F.cbxScope.ItemIndex)));
+        RefactoringInfo.FTypes := [];
+        Include(RefactoringInfo.FTypes, TBADIRefactoringType(Byte(F.cbxType.ItemIndex)));
         boolNewLine := F.chkNewLine.Checked;
         Result := True;
       End;

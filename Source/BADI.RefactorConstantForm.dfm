@@ -2,7 +2,6 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu]
-  BorderStyle = bsSizeToolWin
   Caption = 'BADI Refactor Constant'
   ClientHeight = 185
   ClientWidth = 384

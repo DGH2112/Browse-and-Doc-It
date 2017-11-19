@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    03 May 2017
+  @Date    19 Nov 2017
 
 **)
 Unit BADI.Functions;
@@ -49,15 +49,18 @@ Type
     Const boolIgnoreQuotes: Boolean = True): Integer;
   Procedure LoadBADIImages(Const ilScopeImages: TImageList);
   Procedure InitCanvasFont(Const TargetCanvas: TCanvas; Const boolFixed: Boolean);
-  Procedure GetFontInfo(Const slTokens: TStringList; Const iTokenIndex: Integer;
-    Const boolTitle, boolSyntax : Boolean; Const Canvas: TCanvas);
+  Procedure GetFontInfo(Const slTokens : TStringList; Const iTokenIndex : Integer;
+    Const boolTitle, boolSyntax : Boolean; Const iForeColour, iBackColour : TColor;
+    Const FontStyles : TFontStyles; Const Canvas : TCanvas);
 
 Implementation
 
 Uses
   Windows,
   BADI.Constants,
-  SHFolder, BADI.Options;
+  SHFolder,
+  BADI.Options,
+  UITypes;
 
 (**
 
@@ -71,8 +74,11 @@ Uses
 **)
 Procedure DisplayException(const strMsg : String);
 
+ResourceString
+  strException = 'Exception:'#13#10#13#10;
+
 Begin
-  ShowMessage('Exception:'#13#10#13#10 + StrMsg);
+  ShowMessage(strException + StrMsg);
 End;
 
 (**
@@ -88,8 +94,11 @@ End;
 **)
 Procedure DisplayException(const strMsg : String; Const Params : Array Of Const);
 
+ResourceString
+  strException = 'Exception:'#13#10#13#10;
+
 Begin
-  ShowMessage(Format('Exception:'#13#10#13#10 + StrMsg, Params));
+  ShowMessage(Format(strException + StrMsg, Params));
 End;
 
 (**
@@ -108,6 +117,9 @@ End;
 **)
 function IsKeyWord(Const strWord : String; Const strWordList : Array Of String): Boolean;
 
+Const
+  iDivisor = 2;
+
 Var
   l, m, r : Integer;
   str : String;
@@ -119,7 +131,7 @@ begin
   r := High(strWordList);
   While l <= r Do
     Begin
-      m := (l + r) Div 2;
+      m := (l + r) Div iDivisor;
       If strWordList[m] < str Then
         l := Succ(m)
       Else If strWordList[m] > str Then
@@ -207,6 +219,9 @@ End;
 **)
 Function EpilogCode(const strTemplate, strMethod : String; Const iPadding : Integer) : TStringList;
 
+ResourceString
+  strNotFoundInTemplate = '%s Not Found in Template.';
+
 Var
   strPadding : String;
   iLine : Integer;
@@ -216,7 +231,7 @@ Begin
   Result := TStringList.Create;
   Result.Text := StringReplace(strTemplate, strMethodName, strMethod, [rfReplaceAll]);
   If Not Like('*' + strMethodCode + '*', strTemplate) Then
-    Raise Exception.Create(strMethodCode + ' Not Found in Template.');
+    Raise Exception.CreateFmt(strNotFoundInTemplate, [strMethodCode]);
   boolFound := False;
   While Not boolFound And (Result.Count > 0) Do
     Begin
@@ -297,17 +312,23 @@ End;
 **)
 function BuildLangIndepRep(Const Param: TGenericParameter): String;
 
+ResourceString
+  strArray = 'Array Of ';
+  strAsReference = ' as a reference';
+  strAsConstant = ' as a constant';
+  strAsOutParameter = ' as an out parameter';
+
 begin
   Result := '';
   If Param.ParamType = Nil Then
     Exit;
   If Param.ArrayOf Then
-    Result := 'Array Of ';
+    Result := strArray;
   Result := Result + Param.ParamType.AsString(False, False);
   Case Param.ParamModifier Of
-    pamVar: Result := Result + ' as a reference';
-    pamConst: Result := Result + ' as a constant';
-    pamOut: Result := Result + ' as an out parameter';
+    pamVar: Result := Result + strAsReference;
+    pamConst: Result := Result + strAsConstant;
+    pamOut: Result := Result + strAsOutParameter;
   End;
 end;
 
@@ -349,6 +370,10 @@ End;
 **)
 Procedure BuildNumber(var iMajor, iMinor, iBugFix, iBuild : Integer);
 
+Const
+  i16BitShift = 16;
+  iWordMask = $FFFF;
+
 Var
   VerInfoSize: DWORD;
   VerInfo: Pointer;
@@ -367,13 +392,10 @@ Begin
       Try
         GetFileVersionInfo(strBuffer, 0, VerInfoSize, VerInfo);
         VerQueryValue(VerInfo, '\', Pointer(VerValue), VerValueSize);
-        With VerValue^ Do
-          Begin
-            iMajor := dwFileVersionMS shr 16;
-            iMinor := dwFileVersionMS and $FFFF;
-            iBugFix := dwFileVersionLS shr 16;
-            iBuild := dwFileVersionLS and $FFFF;
-          End;
+        iMajor := VerValue^.dwFileVersionMS shr i16BitShift;
+        iMinor := VerValue^.dwFileVersionMS and iWordMask;
+        iBugFix := VerValue^.dwFileVersionLS shr i16BitShift;
+        iBuild := VerValue^.dwFileVersionLS and iWordMask;
       Finally
         FreeMem(VerInfo, VerInfoSize);
       End;
@@ -392,11 +414,14 @@ End;
 **)
 Function UserName : String;
 
+Const
+  iMaxBuf = 1024;
+
 Var
   i : Cardinal;
 
 Begin
-  i := 1024;
+  i := iMaxBuf;
   SetLength(Result, i);
   GetUserName(@Result[1], i);
   Win32Check(LongBool(i));
@@ -415,11 +440,14 @@ End;
 **)
 Function ComputerName : String;
 
+Const
+  iMaxBuf = 1024;
+
 Var
   i : Cardinal;
 
 Begin
-  i := 1024;
+  i := iMaxBuf;
   SetLength(Result, i);
   GetComputerName(@Result[1], i);
   Win32Check(LongBool(i));
@@ -518,15 +546,15 @@ End;
   @precon  None.
   @postcon Returns the position of the Nth occurrance of the character in the text.
 
-  @param   strText          as a String
-  @param   Ch               as a Char
-  @param   iIndex           as an Integer
-  @param   boolIgnoreQuotes as a Boolean
+  @param   strText          as a String as a constant
+  @param   Ch               as a Char as a constant
+  @param   iIndex           as an Integer as a constant
+  @param   boolIgnoreQuotes as a Boolean as a constant
   @return  an Integer
 
 **)
-Function PosOfNthChar(strText : String; Ch : Char; iIndex : Integer;
-  boolIgnoreQuotes : Boolean = True): Integer;
+Function PosOfNthChar(Const strText : String; Const Ch : Char; Const iIndex : Integer;
+  Const boolIgnoreQuotes : Boolean = True): Integer;
 
 Var
   i : Integer;
@@ -736,6 +764,13 @@ Const
     10, 10,
     9, 9
   );
+  iMinYear = 1900;
+  iYear2000 = 2000;
+  iMaxHours = 23;
+  iMaxMinutes = 59;
+  iMaxSeconds = 59;
+  iMaxDays = 31;
+  iMaxMonths = 12;
 
 Var
   i : Integer;
@@ -748,19 +783,17 @@ Var
 
   (**
 
-    This procedure adds the token to the specified string list and clears the
-    token.
+    This procedure adds the token to the specified string list and clears the token.
 
-    @precon  StringList is the string list to add the token too and strToken is
-             the token to add to the list.
-    @postcon Adds the token to the specified string list and clears the
-             token.
+    @precon  StringList is the string list to add the token too and strToken is the token to add to the 
+             list.
+    @postcon Adds the token to the specified string list and clears the token.
 
-    @param   StringList as a TStringList
+    @param   StringList as a TStringList as a constant
     @param   strToken   as a String as a reference
 
   **)
-  Procedure AddToken(StringList : TStringList; var strToken  : String);
+  Procedure AddToken(Const StringList : TStringList; Var strToken  : String);
 
   Begin
     If strToken <> '' Then
@@ -772,23 +805,21 @@ Var
 
   (**
 
-    This procedure tries to extract the value from the indexed string list
-    item into the passed variable reference. It delete is true it remove the
-    item from the string list.
+    This procedure tries to extract the value from the indexed string list item into the passed variable 
+    reference. It delete is true it remove the item from the string list.
 
-    @precon  iIndex is the index of the item from the string list to extract,
-             iValue is a word variable to place the converted item into and
-             Delete determines whether the item is removed from the string list.
-    @postcon Tries to extract the value from the indexed string list item into
-             the passed variable reference. It delete is true it remove the
-             item from the string list.
+    @precon  iIndex is the index of the item from the string list to extract, iValue is a word variable 
+             to place the converted item into and Delete determines whether the item is removed from 
+             the string list.
+    @postcon Tries to extract the value from the indexed string list item into the passed variable 
+             reference. It delete is true it remove the item from the string list.
 
-    @param   iIndex as an Integer
+    @param   iIndex as an Integer as a constant
     @param   iValue as a Word as a reference
-    @param   Delete as a Boolean
+    @param   Delete as a Boolean as a constant
 
   **)
-  Procedure ProcessValue(iIndex : Integer; var iValue : Word; Delete : Boolean);
+  Procedure ProcessValue(Const iIndex : Integer; Var iValue : Word; Const Delete : Boolean);
 
   Begin
     If iIndex > sl.Count - 1 Then Exit;
@@ -869,7 +900,7 @@ Var
   End;
 
 Begin
-  Result := 0;
+  //Result := 0;
   sl := TStringList.Create;
   Try
     strToken := '';
@@ -929,7 +960,7 @@ Begin
             If sl.Count = 3 Then
               Begin
                 ProcessValue(iIndex2, recDate.iYear, False); // Get Year
-                If recDate.iYear < 1900 Then Inc(recDate.iYear, 2000);
+                If recDate.iYear < iMinYear Then Inc(recDate.iYear, iYear2000);
               End;
         End;
     Else
@@ -937,23 +968,20 @@ Begin
         Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
     End;
     // Output result.
-    With recDate Do
+    If Not (recDate.iHour In [0..iMaxHours]) Then
+      Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
+    If Not (recDate.iMinute In [0..iMaxMinutes]) Then
+      Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
+    If Not (recDate.iSecond In [0..iMaxSeconds]) Then
+      Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
+    Result := EncodeTime(recDate.iHour, recDate.iMinute, recDate.iSecond, recDate.iMilli);
+    If recDate.iYear * recDate.iMonth * recDate.iDay <> 0 Then
       Begin
-        If Not (iHour In [0..23]) Then
+        If Not (recDate.iDay In [1..iMaxDays]) Then
           Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
-        If Not (iMinute In [0..59]) Then
+        If Not (recDate.iMonth In [1..iMaxMonths]) Then
           Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
-        If Not (iSecond In [0..59]) Then
-          Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
-        Result := EncodeTime(iHour, iMinute, iSecond, iMilli);
-        If iYear * iMonth * iDay <> 0 Then
-          Begin
-            If Not (iDay In [1..31]) Then
-              Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
-            If Not (iMonth In [1..12]) Then
-              Raise EBADIParserError.CreateFmt(strErrMsg, [strDate]);
-            Result := Result + EncodeDate(iYear, iMonth, iDay);
-          End;
+        Result := Result + EncodeDate(recDate.iYear, recDate.iMonth, recDate.iDay);
       End;
   Finally
     sl.Free;
@@ -973,6 +1001,9 @@ End;
 **)
 Procedure LoadBADIImages(Const ilScopeImages : TImageList);
 
+Const
+  iBitMapSize = 11;
+
 Var
   R: TRect;
   MainImage: Graphics.TBitmap;
@@ -983,7 +1014,7 @@ Var
   y: Integer;
 
 Begin
-  R := Rect(0, 0, 11, 11);
+  R := Rect(0, 0, iBitMapSize, iBitMapSize);
   MainImage := Graphics.TBitMap.Create;
   Try
     ScopeImage := Graphics.TBitmap.Create;
@@ -1035,25 +1066,30 @@ End;
 
 (**
 
-  This procedure sets the font of the passed canvas to the appropiate style and colour for the words
+  This procedure sets the font of the passed canvas to the appropiate style and colour for the words 
   stored in the string list.
 
-  @precon  sl is a string list of the tokenized word to display, i is the index of the word to
-           change the canvas for, Level is the current indentation level of the tree node and
-           Canvas is the canvas to be affected but the other parameters.
-  @postcon Sets the font of the passed canvas to the appropiate style and colour for the words
-           stored in the string list.
+  @precon  sl is a string list of the tokenized word to display, i is the index of the word to change 
+           the canvas for, Level is the current indentation level of the tree node and Canvas is the 
+           canvas to be affected but the other parameters.
+  @postcon Sets the font of the passed canvas to the appropiate style and colour for the words stored in
+           the string list.
 
   @param   slTokens    as a TStringList as a constant
   @param   iTokenIndex as an Integer as a constant
   @param   boolTitle   as a Boolean as a constant
   @param   boolSyntax  as a Boolean as a constant
+  @param   iForeColour as a TColor as a constant
+  @param   iBackColour as a TColor as a constant
+  @param   FontStyles  as a TFontStyles as a constant
   @param   Canvas      as a TCanvas as a constant
 
 **)
 Procedure GetFontInfo(Const slTokens : TStringList; Const iTokenIndex : Integer;
-  Const boolTitle, boolSyntax : Boolean; Const Canvas : TCanvas);
-var
+  Const boolTitle, boolSyntax : Boolean; Const iForeColour, iBackColour : TColor;
+  Const FontStyles : TFontStyles; Const Canvas : TCanvas);
+  
+Var
   eTokenType: TBADITokenType;
 
 Begin
@@ -1064,8 +1100,14 @@ Begin
   Else
     eTokenType := ttPlainText;
   Canvas.Font.Color := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FForeColour;
+  If iForeColour <> clNone Then
+    Canvas.Font.Color := iForeColour;
   Canvas.Font.Style := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FStyles;
+  If FontStyles <> [] Then
+    Canvas.Font.Style := FontStyles;
   Canvas.Brush.Color := TBADIOptions.BADIOptions.TokenFontInfo[eTokenType].FBackColour;
+  If iBackColour <> clNone Then
+    Canvas.Brush.Color := iBackColour;
   If Canvas.Brush.Color = clNone Then
     Canvas.Brush.Color := TBADIOptions.BADIOptions.BGColour;
 End;

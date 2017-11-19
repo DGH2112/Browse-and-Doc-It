@@ -447,20 +447,20 @@ Begin
     scPublic: RII := RefactorInterface;
   End;
   CP.Line := RII.FLine;
+  CP.CharIndex := 0;
+  iIndex := FSourceEditor.EditViews[0].CharPosToPos(CP);
   Case FRefactoringInfo.Scope Of
-    scLocal: CP.CharIndex := BADI.CommonIDEFunctions.FindIndentOfFirstTokenOnLine(FModule, CP.Line) - 1;
+    scLocal: CP.CharIndex := FindIndentOfFirstTokenOnLine(FModule, FRefactoringInfo.Method.Line) - 1;
     scPrivate: CP.CharIndex := FRefactoringInfo.ImplementationToken.Column - 1;
     scPublic: CP.CharIndex := FRefactoringInfo.InterfaceToken.Column - 1;
   End;
-  iIndex := FSourceEditor.EditViews[0].CharPosToPos(CP);
   UR := FSourceEditor.CreateUndoableWriter;
   UR.CopyTo(iIndex);
   Case RII.FType Of
     ritAppend:
       Begin
-        strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name, '']);
-        OutputText(UR, Format('%s%s%s', [strRefactoring,
-          BreakToken(Length(strRefactoring), CP.CharIndex), ';'#13#10]));
+        strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
+        OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
       End;
     ritCreate:
       Begin
@@ -469,9 +469,8 @@ Begin
             OutputText(UR, #13#10);
         OutputText(UR, Format(strSection, [CP.CharIndex, '',
           strSectionKeywords[FRefactoringInfo.RefactoringType]]));
-        strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name, '']);
-        OutputText(UR, Format('%s%s%s', [strRefactoring,
-          BreakToken(Length(strRefactoring), CP.CharIndex), ';'#13#10]));
+        strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name]);
+        OutputText(UR, strRefactoring + BreakToken(Length(strRefactoring), CP.CharIndex) + ';'#13#10);
         If RII.FPosition = ripBefore Then
           If TBADIOptions.BADIOptions.RefactorConstNewLine Then
             OutputText(UR, #13#10);

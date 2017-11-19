@@ -42,15 +42,20 @@ Type
     chkNewLine: TCheckBox;
     Procedure btnOKClick(Sender: TObject);
   Strict Private
+    FRefactoringInfo : TBADIRefactoringInfo;
+  Strict Protected
     Procedure InitialiseDialogue(Const setScopes: TBADIRefactoringScopes; 
       Const setTypes: TBADIRefactoringTypes; Var boolNewLine : Boolean);
-  Strict Protected
   Public
     Class Function Execute(Var RefactoringInfo : TBADIRefactoringInfo;
       Var boolNewLine : Boolean): Boolean;
   End;
 
 Implementation
+
+Uses
+  BADI.ResourceStrings, 
+  BADI.ElementContainer;
 
 {$R *.dfm}
 
@@ -76,13 +81,55 @@ Procedure TfrmBADIRefactorConstant.btnOKClick(Sender: TObject);
 
 ResourceString
   strMsg = 'You must specific a valid name for the refactoring!';
+  strAlreadyExistsInMethodMsg = 'The identifier "%s" already exists in method "%s"!';
+  strAlreadyExistsInModuleMsg = 'The identifier "%s" already exists in module "%s"!';
 
+Const
+  strSectionsToCheck : Array[1..5] Of String = (
+    strUses, strTypesLabel, strResourceStringsLabel, strConstantsLabel, strVarsLabel);
+var
+  iSection: Integer;
+  E: TElementContainer;
+    
 Begin
   If Length(edtName.Text) = 0 Then
     Begin
       MessageDlg(strMsg, mtError, [mbOK], 0);
       edtName.SetFocus;
       ModalResult := mrNone;
+    End;
+  If Assigned(FRefactoringInfo.Method) Then
+    For iSection := Low(strSectionsToCheck) To High(strSectionsToCheck) Do
+      Begin
+        E := FRefactoringInfo.Method.FindElement(strSectionsToCheck[iSection]);
+        If Assigned(E) Then
+          Begin
+            E := E.FindElement(edtName.text);
+            If Assigned(E) Then
+              Begin
+                MessageDlg(Format(strAlreadyExistsInMethodMsg, [edtName.Text,
+                  FRefactoringInfo.Method.QualifiedName]), mtError, [mbOK], 0);
+                edtName.SetFocus;
+                ModalResult := mrNone;
+                Exit;
+              End;
+          End;
+      End;
+  For iSection := Low(strSectionsToCheck) To High(strSectionsToCheck) Do
+    Begin
+      E := FRefactoringInfo.Module.FindElement(strSectionsToCheck[iSection]);
+      If Assigned(E) Then
+        Begin
+          E := E.FindElement(edtName.text);
+          If Assigned(E) Then
+            Begin
+              MessageDlg(Format(strAlreadyExistsInModuleMsg, [edtName.Text,
+                FRefactoringInfo.Module.Name]), mtError, [mbOK], 0);
+              edtName.SetFocus;
+              ModalResult := mrNone;
+              Exit;
+            End;
+        End;
     End;
 End;
 
@@ -113,6 +160,7 @@ Begin
     F.edtName.Text := RefactoringInfo.Name;
     F.edtLiteral.Text := RefactoringInfo.Token.Token;
     F.InitialiseDialogue(RefactoringInfo.Scopes, RefactoringInfo.Types, boolNewLine);
+    F.FRefactoringInfo := RefactoringInfo;
     If F.ShowModal = mrOK Then
       Begin
         RefactoringInfo.Name := F.edtName.Text;

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    01 May 2017
+  @Date    19 Nov 2017
 
 **)
 Unit BADI.ModuleExplorer.TreeNodeInfo;
@@ -13,6 +13,7 @@ Interface
 
 Uses
   Classes,
+  Graphics,
   BADI.Types,
   BADI.Comment,
   BADI.ElementContainer,
@@ -34,12 +35,16 @@ Type
     FLevel         : Integer;
     FTitle         : Boolean;
     FTagProperties : TBADITagProperties;
+    FFontStyles    : TFontStyles;
+    FForeColour    : TColor;
+    FBackColour    : TColor;
   Strict Protected
     Function GetTokens: TStringList;
   Public
-    Constructor Create(Element : TElementContainer; Const iLevel : Integer); Overload;
-    Constructor Create(Tag : TTag; Const iLevel : Integer; Const iImageIndex : Integer;
-      TagProperties : TBADITagProperties; Const Comment : TComment); Overload;
+    Constructor Create(Const Element : TElementContainer; Const iLevel : Integer); Overload;
+    Constructor Create(Const Tag : TTag; Const iLevel : Integer; Const iImageIndex : Integer;
+      Const TagProperties : TBADITagProperties; Const FontStyles : TFontStyles;
+      Const FontColour : TColor; Const BackColour : TColor;Const Comment : TComment); Overload;
     Constructor Create(Const strText, strName: String; Const iLevel : Integer;
       Const iImageIndex: Integer; Const boolTitle: Boolean = False); Overload;
     Destructor Destroy; Override;
@@ -115,6 +120,27 @@ Type
       @return  a TBADITagProperties
     **)
     Property TagProperties : TBADITagProperties Read FTagProperties;
+    (**
+      This property exposes the nodes custom foreground colour.
+      @precon  None.
+      @postcon Returns the nodes custom foreground colour.
+      @return  a TColor
+    **)
+    Property ForeColour : TColor Read FForeColour;
+    (**
+      This property exposes the nodes custom background colour.
+      @precon  None.
+      @postcon Returns the nodes custom background colour.
+      @return  a TColor
+    **)
+    Property BackColour : TColor Read FBackColour;
+    (**
+      This property exposes the nodes custom Font Styles.
+      @precon  None.
+      @postcon Returns the nodes custom font styles.
+      @return  a TFontStyles
+    **)
+    Property FontStyles : TFontStyles Read FFontStyles;
   End;
 
 Var
@@ -138,11 +164,45 @@ Uses
            be added to the node info object.
   @postcon Initialises the class.
 
-  @param   Element as a TElementContainer
+  @param   strText     as a String as a constant
+  @param   strName     as a String as a constant
+  @param   iLevel      as an Integer as a constant
+  @param   iImageIndex as an Integer as a constant
+  @param   boolTitle   as a Boolean as a constant
+
+**)
+Constructor TBADITreeNodeInfo.Create(Const strText, strName: String; Const iLevel : Integer;
+  Const iImageIndex : Integer; Const boolTitle: Boolean = False);
+
+Begin
+  FText :=  strText;
+  FName :=  strName;
+  FLevel := iLevel;
+  FTitle := boolTitle;
+  FLine :=  0;
+  FCol :=   0;
+  FComment := Nil;
+  FImageIndex := iImageIndex;
+  FTokens := Nil;
+  FTagProperties := [];
+  FFontStyles := [];
+  FForeColour := clNone;
+  FBackColour := clNone;
+End;
+
+(**
+
+  This is the constructor method for the TTreeNodeInfo class.
+
+  @precon  This line number of the comment, This column number of the comment and This comment to be 
+           added to the node info object.
+  @postcon Initialises the class.
+
+  @param   Element as a TElementContainer as a constant
   @param   iLevel  as an Integer as a constant
 
 **)
-Constructor TBADITreeNodeInfo.Create(Element : TElementContainer; Const iLevel : Integer);
+Constructor TBADITreeNodeInfo.Create(Const Element : TElementContainer; Const iLevel : Integer);
 
 Begin
   Create(ELement.AsString(True, False), Element.Name, iLevel, Element.ImageIndexAdjustedForScope,
@@ -178,19 +238,23 @@ End;
 
   This is the constructor method for the TTreeNodeInfo class.
 
-  @precon  This line number of the comment, This column number of the comment and This comment to
-           be added to the node info object.
+  @precon  This line number of the comment, This column number of the comment and This comment to be 
+           added to the node info object.
   @postcon Initialises the class.
 
-  @param   Tag           as a TTag
+  @param   Tag           as a TTag as a constant
   @param   iLevel        as an Integer as a constant
   @param   iImageIndex   as an Integer as a constant
-  @param   TagProperties as a TBADITagProperties
+  @param   TagProperties as a TBADITagProperties as a constant
+  @param   FontStyles    as a TFontStyles as a constant
+  @param   FontColour    as a TColor as a constant
+  @param   BackColour    as a TColor as a constant
   @param   Comment       as a TComment as a constant
 
 **)
-Constructor TBADITreeNodeInfo.Create(Tag: TTag; Const iLevel: Integer;
-  Const iImageIndex : Integer; TagProperties : TBADITagProperties; Const Comment : TComment);
+Constructor TBADITreeNodeInfo.Create(Const Tag: TTag; Const iLevel: Integer;
+  Const iImageIndex : Integer; Const TagProperties : TBADITagProperties; Const FontStyles : TFontStyles;
+  Const FontColour : TColor; Const BackColour : TColor; Const Comment : TComment);
 
 Begin
   Create(Tag.AsString(MaxInt, False), Tag.Name, iLevel, iImageIndex);
@@ -198,37 +262,9 @@ Begin
   FCol :=   Tag.Column;
   FComment := TComment.Create(Comment);
   FTagProperties := TagProperties * [tpFixed, tpSyntax];
-End;
-
-(**
-
-  This is the constructor method for the TTreeNodeInfo class.
-
-  @precon  This line number of the comment, This column number of the comment and This comment to
-           be added to the node info object.
-  @postcon Initialises the class.
-
-  @param   strText     as a String as a constant
-  @param   strName     as a String as a constant
-  @param   iLevel      as an Integer as a constant
-  @param   iImageIndex as an Integer as a constant
-  @param   boolTitle   as a Boolean as a constant
-
-**)
-Constructor TBADITreeNodeInfo.Create(Const strText, strName: String; Const iLevel : Integer;
-  Const iImageIndex : Integer; Const boolTitle: Boolean = False);
-
-Begin
-  FText :=  strText;
-  FName :=  strName;
-  FLevel := iLevel;
-  FTitle := boolTitle;
-  FLine :=  0;
-  FCol :=   0;
-  FComment := Nil;
-  FImageIndex := iImageIndex;
-  FTokens := Nil;
-  FTagProperties := [];
+  FFontStyles := FontStyles;
+  FForeColour := FontColour;
+  FBackColour := BackColour;
 End;
 
 (**

@@ -17,6 +17,7 @@ Uses
   BADI.Generic.FunctionDecl, 
   BADI.TokenInfo, 
   BADI.Types, 
+  BADI.ResourceStrings, 
   BADI.ElementContainer;
 
 Type
@@ -59,7 +60,6 @@ Type
   Private
     Function  GetScope : TScope;
     Function  ExtractText(Const strText: String): String;
-    Function  RefactoringType : TBADIRefactoringType;
     Function  NewDeclarationPosition(Const Container : TElementContainer;
       Const iDefaultStartLine: Integer; Const setScopes : TScopes): TBADIRefactoringInsertionInfo;
     Function  NewMaxLinePosition(Const Container: TElementContainer; Const eScope : TScope): Integer;
@@ -70,10 +70,11 @@ Type
       Const setScopes : TScopes): Integer;
     Function  IsInMethod(Const iLine: Integer): Boolean;
     Function  RecurseMethods(Const Container: TElementContainer; Const iLine : Integer): Boolean;
-    Function  FindToken(Const iLine, iColumn: Integer): TTokenIndex;
   Public
     Constructor Create(Const Module : TBaseLanguageModule);
+    Function  FindToken(Const iLine, iColumn: Integer): TTokenIndex;
     Procedure UpdateScopeAndType(Const iLine, iColumn : Integer);
+    Function  RefactoringType : TBADIRefactoringType;
     Function  FindCRSElement(Const Container: TElementContainer; Var iLine : Integer): TElementContainer;
     Function  RefactorConstResStr(Const Container : TElementContainer;
       Const eScope : TScope) : TBADIRefactoringInsertionInfo;
@@ -126,22 +127,28 @@ Type
       @return  a TBADIRefactoringTypes
     **)
     Property  Types : TBADIRefactoringTypes Read FTypes Write FTypes;
+    (**
+      A property to get and set the refactoring name.
+      @precon  None.
+      @postcon Returns the refactoring name.
+      @return  a String
+    **)
+    Property Name : String Read FName Write FName;
   End;
-
-Implementation
-
-Uses
-  SysUtils,
-  BADI.Pascal.Module,
-  BADI.ResourceStrings, 
-  BADI.Functions, 
-  BADI.Pascal.RecordDecl;
 
 Const
   (** A constant array of section names to search for when trying to find the correct refactoring
       location. **)
   strSectionNames : Array[Low(TBADIRefactoringType)..High(TBADIRefactoringType)] Of String = (
     strConstantsLabel, strResourceStringsLabel);
+
+Implementation
+
+Uses
+  SysUtils,
+  BADI.Pascal.Module,
+  BADI.Functions, 
+  BADI.Pascal.RecordDecl;
 
 (**
 
@@ -313,7 +320,7 @@ Var
   eScope : TBADIRefactoringScope;
   
 Begin
-  eScope := rsLocal;
+  Result := scNone;
   For eScope := Low(TBADIRefactoringScope) To High(TBADIRefactoringScope) Do
     If eScope In FScopes Then
       Begin

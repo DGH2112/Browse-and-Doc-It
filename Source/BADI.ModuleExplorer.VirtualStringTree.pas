@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    16 Apr 2017
+  @Date    19 Nov 2017
 
 **)
 Unit BADI.ModuleExplorer.VirtualStringTree;
@@ -21,6 +21,7 @@ Type
       OnGetNodeWidth method. **)
   TBADIVirtualStringTree = Class(TVirtualStringTree)
   {$IFDEF D2005} Strict {$ENDIF} Protected
+    //: @nometric MissingCONSTInParam
     Function DoGetNodeWidth(Node: PVirtualNode; Column: TColumnIndex;
       Canvas: TCanvas = Nil) : Integer; Override;
   End;
@@ -48,6 +49,9 @@ Uses
   @precon  None.
   @postcon Returns the modified node width.
 
+  @nometric MissingCONSTInParam
+  @nohint
+  
   @param   Node   as a PVirtualNode
   @param   Column as a TColumnIndex
   @param   Canvas as a TCanvas
@@ -57,13 +61,16 @@ Uses
 Function TBADIVirtualStringTree.DoGetNodeWidth(Node: PVirtualNode;
   Column: TColumnIndex; Canvas: TCanvas): Integer;
 
+Const
+  iPadding = 5;
+
 Var
   NodeData: PBADITreeData;
   sl: TStringList;
   i: Integer;
 
 Begin
-  Result := 5;
+  Result := iPadding;
   NodeData := GetNodeData(Node);
   //: @note Self.Canvas used to access the treeview canvas as Canvas from the parameters above is
   //:       NIL!
@@ -72,7 +79,7 @@ Begin
   For i := 0 To sl.Count - 1 Do
     Begin
       GetFontInfo(sl, i, NodeData.FNode.Title, tpSyntax In NodeData.FNode.TagProperties,
-        Self.Canvas);
+        NodeData.FNode.ForeColour, NodeData.FNode.BackColour, NodeData.FNode.FontStyles, Self.Canvas);
       Inc(Result, Self.Canvas.TextWidth(sl[i]) + 1);
     End;
 End;

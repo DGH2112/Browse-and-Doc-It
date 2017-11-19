@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    12 Nov 2017
+  @date    19 Nov 2017
   
 **)
 Unit BADI.RefactorConstantForm;
@@ -108,16 +108,18 @@ Begin
   Result := False;
   F := TfrmBADIRefactorConstant.Create(Application.MainForm);
   Try
-    F.edtName.Text := RefactoringInfo.FName;
-    F.edtLiteral.Text := RefactoringInfo.FToken.Token;
-    F.InitialiseDialogue(RefactoringInfo.FScopes, RefactoringInfo.FTypes, boolNewLine);
+    F.edtName.Text := RefactoringInfo.Name;
+    F.edtLiteral.Text := RefactoringInfo.Token.Token;
+    F.InitialiseDialogue(RefactoringInfo.Scopes, RefactoringInfo.Types, boolNewLine);
     If F.ShowModal = mrOK Then
       Begin
-        RefactoringInfo.FName := F.edtName.Text;
-        RefactoringInfo.FScopes := [];
-        Include(RefactoringInfo.FScopes, TBADIRefactoringScope(Byte(F.cbxScope.ItemIndex)));
-        RefactoringInfo.FTypes := [];
-        Include(RefactoringInfo.FTypes, TBADIRefactoringType(Byte(F.cbxType.ItemIndex)));
+        RefactoringInfo.Name := F.edtName.Text;
+        RefactoringInfo.Scopes := [];
+        RefactoringInfo.Scopes := RefactoringInfo.Scopes +
+          [TBADIRefactoringScope(Byte(F.cbxScope.ItemIndex))];
+        RefactoringInfo.Types := [];
+        RefactoringInfo.Types := RefactoringInfo.Types +
+          [TBADIRefactoringType(Byte(F.cbxType.ItemIndex))];
         boolNewLine := F.chkNewLine.Checked;
         Result := True;
       End;

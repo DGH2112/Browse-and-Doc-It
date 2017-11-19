@@ -109,7 +109,7 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
     Anchors = [akRight, akBottom]
     Kind = bkOK
     NumGlyphs = 2
-    TabOrder = 4
+    TabOrder = 5
     OnClick = btnOKClick
   end
   object btnCancel: TBitBtn
@@ -120,7 +120,7 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
     Anchors = [akRight, akBottom]
     Kind = bkCancel
     NumGlyphs = 2
-    TabOrder = 5
+    TabOrder = 6
   end
   object cbxType: TComboBox
     Left = 80
@@ -138,6 +138,6 @@ object frmBADIRefactorConstant: TfrmBADIRefactorConstant
     Height = 17
     Anchors = [akLeft, akTop, akRight]
     Caption = 'New &Line between declaration sections'
-    TabOrder = 6
+    TabOrder = 4
   end
 end

@@ -5,7 +5,7 @@
   @Author  David Hoyle
   @Version 1.0
   @Date    19 Nov 2017
-  
+
 **)
 Unit BADI.Refactor.Constant;
 
@@ -29,6 +29,7 @@ Type
     FTokenIndex      : Integer;
     FSourceEditor    : IOTASourceEditor;
     FIndent          : Integer;
+    FMaxWidth        : Integer;
     FRefactoringInfo : TBADIRefactoringInfo;
   Strict Protected
     Procedure Execute(Const SE: IOTASourceEditor; Const iLine, iColumn: Integer);
@@ -40,6 +41,7 @@ Type
     Function  RefactorInterface : TBADIRefactoringInsertionInfo;
     Procedure ReplaceToken;
     Function  CheckForExistingDeclaration : Boolean;
+    Function  BreakToken(Const iStartCol, iIndent : Integer): String;
   Public
     Constructor Create;
     Class Procedure Refactor(Const SE: IOTASourceEditor; Const iLine, iColumn: Integer);
@@ -61,13 +63,89 @@ Uses
   BADI.Pascal.Module,
   Controls, 
   BADI.Functions, 
-  BADI.Pascal.RecordDecl;
+  BADI.Pascal.RecordDecl,
+  Classes;
 
 Const
   (** A constant array for the section keywords for new refactoring declarations. **)
   strSectionKeywords : Array[Low(TBADIRefactoringType)..High(TBADIRefactoringType)] Of String = (
     'Const', 'ResourceString');
     
+(**
+
+  This method attempts to breal a long token down into smaller bits.
+
+  @precon  None.
+  @postcon If the token is too long a token broken down into bits is returned.
+
+  @param   iStartCol as an Integer as a constant
+  @param   iIndent   as an Integer as a constant
+  @return  a String
+
+**)
+Function TBADIRefactorConstant.BreakToken(Const iStartCol, iIndent : Integer): String;
+
+Const
+  strConCat = ''' + ';
+
+  (**
+
+    This method searches backwards from the breapoint to find a more natural point in the text to break
+    it up into piece. If one is foudn that position is returned.
+
+    @precon  None.
+    @postcon A new breakpoint position is returned.
+
+    @param   strText     as a String as a constant
+    @param   iBreakpoint as an Integer as a constant
+    @return  an Integer
+
+  **)
+  Function FindNaturalBreak(Const strText : String; Const iBreakpoint : Integer) : Integer;
+
+  Const
+    strValidBreakPoints = [#32..#47, #58..#64, #94..#96, #123..#255];
+    
+  Var
+    iChar: Integer;
+
+  Begin
+    Result := iBreakpoint;
+    For iChar := iBreakpoint DownTo 1 Do
+      If CharInSet(strText[iChar], strValidBreakPoints) Then
+        Begin
+          Result := iChar;
+          Break;
+        End;
+  End;
+
+Var
+  iBreakPoint : Integer;
+  sl : TStringList;
+  iLine: Integer;
+  
+Begin
+  iBreakPoint := FMaxWidth - iStartCol - Length(strConCat);
+  sl := TStringList.Create;
+  Try
+    sl.TrailingLineBreak := False;
+    sl.Text := FRefactoringInfo.Token.Token;
+    iLine := 0;
+    While (iBreakPoint > 0) And (iLine < sl.Count) And (Length(sl[iLine]) > iBreakPoint) Do
+      Begin
+        iBreakPoint := FindNaturalBreak(sl[iLine], iBreakPoint);
+        sl.Add(StringOfChar(#32, FIndent * (iIndent + 1 + 1)) + '''' +
+          Copy(sl[iLine], iBreakPoint + 1, Length(sl[iLine]) - iBreakPoint));
+        sl[iLine] := Copy(sl[iLine], 1, iBreakPoint) + strConCat;
+        iBreakPoint := FMaxWidth - Length(strConCat);
+        Inc(iLine);
+      End;
+    Result := sl.Text;
+  Finally
+    sl.Free;
+  End;
+End;
+
 (**
 
   This method checks the an existing constant or resource string that has been declared for the same
@@ -188,14 +266,19 @@ Constructor TBADIRefactorConstant.Create;
 
 Const
   iDefaultIndent = 2;
+  iMaxWidth = 80;
   
 Var
   ES : IOTAEditorServices;
 
 Begin
   FIndent := iDefaultIndent;
+  FMaxWidth := iMaxWidth;
   If Supports(BorlandIDEServices, IOTAEditorServices, ES) Then
-    FIndent := ES.EditOptions.BlockIndent;
+    Begin
+      FIndent := ES.EditOptions.BlockIndent;
+      FMaxWidth := ES.EditOptions.BufferOptions.RightMargin;
+    End;
 End;
 
 (**
@@ -348,13 +431,14 @@ Procedure TBADIRefactorConstant.ReplaceLiteralWithRefactoring;
 
 Const
   strSection = '%*s%s'#13#10;
-  strDeclaration = '%*s%s = %s;'#13#10;
+  strDeclaration = '%*s%s = ';
 
 Var
   iIndex: Integer;
   CP : TOTACharPos;
   RII: TBADIRefactoringInsertionInfo;
   UR: IOTAEditWriter;
+  strRefactoring : String;
 
 Begin
   Case FRefactoringInfo.Scope Of
@@ -374,10 +458,9 @@ Begin
   Case RII.FType Of
     ritAppend:
       Begin
-        OutputText(UR, Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name,
-          FRefactoringInfo.Token.Token]));
-        If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-          OutputText(UR, #13#10);
+        strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name, '']);
+        OutputText(UR, Format('%s%s%s', [strRefactoring,
+          BreakToken(Length(strRefactoring), CP.CharIndex), ';'#13#10]));
       End;
     ritCreate:
       Begin
@@ -386,8 +469,9 @@ Begin
             OutputText(UR, #13#10);
         OutputText(UR, Format(strSection, [CP.CharIndex, '',
           strSectionKeywords[FRefactoringInfo.RefactoringType]]));
-        OutputText(UR, Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name,
-          FRefactoringInfo.Token.Token]));
+        strRefactoring := Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name, '']);
+        OutputText(UR, Format('%s%s%s', [strRefactoring,
+          BreakToken(Length(strRefactoring), CP.CharIndex), ';'#13#10]));
         If RII.FPosition = ripBefore Then
           If TBADIOptions.BADIOptions.RefactorConstNewLine Then
             OutputText(UR, #13#10);

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    30 Apr 2017
+  @Date    19 Nov 2017
 
 **)
 Unit BADI.Constants;
@@ -38,14 +38,14 @@ Const
 
   (** A constant array to define the module explorer option groups. **)
   DocOptionGroups : Array[Low(TDOcOptionGroup)..High(TDOcOptionGroup)] Of String = (
-    'General',
-    'Errors, Warnings, Hints and Conflicts',
-    'Types',
-    'Module',
-    'Methods',
-    'Properties',
-    'Initialization / Finalization',
-    'Miscellaneous'
+    strOptionGroupGeneral,
+    strOptionGroupErrorsWarningsHintsandConflicts,
+    strOptionGroupTypes,
+    strOptionGroupModule,
+    strOptionGroupMethods,
+    strOptionGroupProperties,
+    strOptionGroupInitializationFinalization,
+    strOptionGroupMiscellaneous
   );
 
   (** This is a string array representing the TDocOption enumerates. **)
@@ -57,10 +57,18 @@ Const
     (FDescription : strShowWarnings;                          FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strShowHints;                             FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strShowDocumentationConflicts;            FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strShowModuleMetrics;                     FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strShowChildCountinTitles;                FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strExpandErrors;                          FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strExpandWarnings;                        FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strExpandHints;                           FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strExpandDocConflicts;                    FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strExpandChecksAndMetrics;                FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strSyntaxHighlightErrors;                 FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strSyntaxHighlightWarnings;               FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strSyntaxHighlightHints;                  FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strSyntaxHighlightDocumentationConflicts; FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strSyntaxHighlightChecksAndMetrics;       FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
 
 
     (FDescription : strShowUndocumentedTypes;                 FEnabled : False; FGroup: dogTypes),
@@ -103,7 +111,7 @@ Const
     (FDescription : strShowMissingFinalComment;               FEnabled : False; FGroup: dogInitializationFinalization),
 
     {(FDescription : strShowIDEErrorsOnSuccessfulParse;        FEnabled : False),}
-    (FDescription : strShowParserErrorOrigin;                 FEnabled : False; FGroup: dogMiscellaneous),
+    {(FDescription : strShowParserErrorOrigin;                 FEnabled : False; FGroup: dogMiscellaneous),}
     (FDescription : strShowUnreferencedSymbols;               FEnabled : False; FGroup: dogMiscellaneous),
     (FDescription : strShowPerfCountersInModuleExplorer;      FEnabled : False; FGroup: dogMiscellaneous),
     (FDescription : strShowPerfCountersInDocSummary;          FEnabled : False; FGroup: dogMiscellaneous),
@@ -158,17 +166,22 @@ Const
   BADIImageList : Array[Succ(Low(TBADIImageIndex))..High(TBADIImageIndex)] Of TImageIndexInfo = (
     (FResourceName : 'Module';                        FMaskColour: clLime),
 
-    (FResourceName : 'DocConflictFolder';             FMaskColour: clLime),
-    (FResourceName : 'DocConflictIncorrect';          FMaskColour: clLime),
-    (FResourceName : 'DocConflictItem';               FMaskColour: clLime),
-    (FResourceName : 'DocConflictMissing';            FMaskColour: clLime),
-
     (FResourceName : 'ErrorFolder';                   FMaskColour: clLime),
     (FResourceName : 'Error';                         FMaskColour: clLime),
     (FResourceName : 'WarningFolder';                 FMaskColour: clLime),
     (FResourceName : 'Warning';                       FMaskColour: clLime),
     (FResourceName : 'HintFolder';                    FMaskColour: clFuchsia),
     (FResourceName : 'Hint';                          FMaskColour: clFuchsia),
+
+    (FResourceName : 'DocConflictFolder';             FMaskColour: clLime),
+    (FResourceName : 'DocConflictIncorrect';          FMaskColour: clLime),
+    (FResourceName : 'DocConflictItem';               FMaskColour: clLime),
+    (FResourceName : 'DocConflictMissing';            FMaskColour: clLime),
+
+    (FResourceName : 'MetricCheckFolder';             FMaskColour: clLime),
+    (FResourceName : 'MetricCheckIncorrect';          FMaskColour: clLime),
+    (FResourceName : 'MetricCheckItem';               FMaskColour: clLime),
+    (FResourceName : 'MetricCheckMissing';            FMaskColour: clLime),
 
     (FResourceName : 'UsesLabel';                     FMaskColour: clLime),
     (FResourceName : 'UsesItem';                      FMaskColour: clLime),
@@ -353,31 +366,31 @@ Const
 
   (** A list of strings representing the token types. **)
   strTokenType : Array[Low(TBADITokenType)..High(TBADITokenType)] Of String = (
-    'Unknown',
-    'White Space',
-    'Reserved Word',
-    'Identifier',
-    'Number',
-    'Symbol',
-    'Line End',
-    'Single Literal',
-    'Double Literal',
-    'Line Comment',
-    'Block Comment',
-    'HTML Start Tag',
-    'HTML End Tag',
-    'Directive',
-    'Compiler Directive',
-    'Link Tag',
-    'Tree Header',
-    'File End',
-    'Line Continuation',
-    'Custom User Token',
-    'Explorer Highlight',
-    'Plain Text',
-    'Comment Text',
-    'Tag Header Text',
-    'Tag Text'
+    strTokenUnknown,
+    strTokenWhiteSpace,
+    strTokenReservedWord,
+    strTokenIdentifier,
+    strTokenNumber,
+    strTokenSymbol,
+    strTokenLineEnd,
+    strTokenSingleLiteral,
+    strTokenDoubleLiteral,
+    strTokenLineComment,
+    strTokenBlockComment,
+    strTokenHTMLStartTag,
+    strTokenHTMLEndTag,
+    strTokenDirective,
+    strTokenCompilerDirective,
+    strTokenLinkTag,
+    strTokenTreeHeader,
+    strTokenFileEnd,
+    strTokenLineContinuation,
+    strTokenCustomUserToken,
+    strTokenExplorerHighlight,
+    strTokenPlainText,
+    strTokenCommentText,
+    strTokenTagHeaderText,
+    strTokenTagText
   );
 
   (** A constant string to represent the position of the main procedure code in
@@ -389,20 +402,22 @@ Const
 
   (** A constant array to describe the menu defaults. **)
   BADIMenus : Array[Low(TBADIMenu)..High(TBADIMenu)] Of TBADIMenuRecord = (
-    (FName: 'BADIModuleExplorer';  FCaption: 'Module &Explorer';      FShortcut: 'CTRL+SHIFT+ALT+ENTER'; FMaskColor: clLime),
-    (FName: 'BADIDocumentation';   FCaption: '&Documentation...';     FShortcut: 'CTRL+SHIFT+ALT+D';     FMaskColor: clLime),
-    (FName: 'BADIDunit';           FCaption: 'D&Unit...';             FShortcut: 'CTRL+SHIFT+ALT+U';     FMaskColor: clLime),
-    (FName: 'BADIProfiling';       FCaption: 'Pro&filing...';         FShortcut: 'CTRL+SHIFT+ALT+F';     FMaskColor: clLime),
-    (FName: 'BADISep1';            FCaption: '';                      FShortcut: '';                     FMaskColor: clLime),
-    (FName: 'BADIFocusEditor';     FCaption: 'Focus Edi&tor';         FShortcut: 'CTRL+SHIFT+ALT+E';     FMaskColor: clLime),
-    (FName: 'BADIMethodComment';   FCaption: '&Method Comment';       FShortcut: 'CTRL+SHIFT+ALT+M';     FMaskColor: clLime),
-    (FName: 'BADIPropertyComment'; FCaption: '&Property Comment';     FShortcut: 'CTRL+SHIFT+ALT+P';     FMaskColor: clLime),
-    (FName: 'BADIBlockComment';    FCaption: 'Block &Comment';        FShortcut: 'CTRL+SHIFT+ALT+B';     FMaskColor: clLime),
-    (FName: 'BADILineComment';     FCaption: '&Line Comment';         FShortcut: 'CTRL+SHIFT+ALT+L';     FMaskColor: clLime),
-    (FName: 'BADIInSituComment';   FCaption: '&In-Situ Comment';      FShortcut: 'CTRL+SHIFT+ALT+I';     FMaskColor: clLime),
-    (FName: 'BADIToDoComment';     FCaption: '&ToDo Comment';         FShortcut: 'CTRL+SHIFT+ALT+T';     FMaskColor: clLime),
-    (FName: 'BADISep2';            FCaption: '';                      FShortcut: '';                     FMaskColor: clLime),
-    (FName: 'BADIOptions';         FCaption: '&Options...';           FShortcut: 'CTRL+SHIFT+ALT+O';     FMaskColor: clLime)
+    (FName: 'BADIModuleExplorer';   FCaption: strMenuModuleExplorer;   FShortcut: 'CTRL+SHIFT+ALT+ENTER'; FMaskColor: clLime),
+    (FName: 'BADIDocumentation';    FCaption: strMenuDocumentation;    FShortcut: 'CTRL+SHIFT+ALT+D';     FMaskColor: clLime),
+    (FName: 'BADIDunit';            FCaption: strMenuDUnit;            FShortcut: 'CTRL+SHIFT+ALT+U';     FMaskColor: clLime),
+    (FName: 'BADIProfiling';        FCaption: strMenuProfiling;        FShortcut: 'CTRL+SHIFT+ALT+F';     FMaskColor: clLime),
+    (FName: 'BADISep1';             FCaption: strMenuSep;              FShortcut: '';                     FMaskColor: clLime),
+    (FName: 'BADIFocusEditor';      FCaption: strMenuFocusEditor;      FShortcut: 'CTRL+SHIFT+ALT+E';     FMaskColor: clLime),
+    (FName: 'BADIMethodComment';    FCaption: strMenuMethodComment;    FShortcut: 'CTRL+SHIFT+ALT+M';     FMaskColor: clLime),
+    (FName: 'BADIPropertyComment';  FCaption: strMenuPropertyComment;  FShortcut: 'CTRL+SHIFT+ALT+P';     FMaskColor: clLime),
+    (FName: 'BADIBlockComment';     FCaption: strMenuBlockComment;     FShortcut: 'CTRL+SHIFT+ALT+B';     FMaskColor: clLime),
+    (FName: 'BADILineComment';      FCaption: strMenuLineComment;      FShortcut: 'CTRL+SHIFT+ALT+L';     FMaskColor: clLime),
+    (FName: 'BADIInSituComment';    FCaption: strMenuInSituComment;    FShortcut: 'CTRL+SHIFT+ALT+I';     FMaskColor: clLime),
+    (FName: 'BADIToDoComment';      FCaption: strMenuToDoComment;      FShortcut: 'CTRL+SHIFT+ALT+T';     FMaskColor: clLime),
+    (FName: 'BADISep2';             FCaption: strMenuSep;              FShortcut: '';                     FMaskColor: clLime),
+    (FName: 'BADIRefactorConstant'; FCaption: strMenuRefactorConstant; FShortcut: 'CTRL+SHIFT+C';         FMaskColor: clLime),
+    (FName: 'BADISep3';             FCaption: strMenuSep;              FShortcut: '';                     FMaskColor: clLime),
+    (FName: 'BADIOptions';          FCaption: strMenuOptions;          FShortcut: 'CTRL+SHIFT+ALT+O';     FMaskColor: clLime)
   );
 
   (** A constant to represent the initial (failed) position of a wizard reference. **)
@@ -410,11 +425,477 @@ Const
 
   (** A constant array to represent the Special Tag Properties. **)
   strTagProperty : Array[Low(TBADITagProperty)..High(TBADITagProperty)] Of String = (
-    'Show the Tag in the Module Explorer',
-    'Auto Expand the Tag in Module Explorer',
-    'Show the Tag in Documentation',
-    'Fixed Font Tag (preserves LF/CR and Indents)',
-    'Syntax Highlight the Tag'
+    strTagPropShowInExpl,
+    strTagPropExpand,
+    strTagPropShowInDocs,
+    strTagPropFixedFont,
+    strTagPropSyntax
+  );
+
+  (** A constant name for the Long Method metric so it can be disabled. **)
+  strLongMethodNoMetric = 'LongMethod';
+  (** A constant name for the Long Parameter List metric so it can be disabled. **)
+  strLongParameterListNoMetric = 'LongParameterList';
+  (** A constant name for the Long Variable List metric so it can be disabled. **)
+  strLongVariableListNoMetric = 'LongVariableList';
+  (** A constant name for the Hard Coded Integer metric so it can be disabled. **)
+  strHardCodedIntegerNoMetric = 'HardCodedInteger';
+  (** A constant name for the Hard Coded Integer Ignore Zeros metric so it can be disabled. **)
+  strHCIntIgnoreZeroNoMetric = 'HCIntIgnoreZero';
+  (** A constant name for the Hard Coded Integer Ignore Ones metric so it can be disabled. **)
+  strHCIntIgnoreOneNoMetric = 'HCIntIgnoreOne';
+  (** A constant name for the Hard Coded Numbers metric so it can be disabled. **)
+  strHardCodedNumberNoMetric = 'HardCodedNumber';
+  (** A constant name for the Hard Coded Numbers Ignore Zero metric so it can be disabled. **)
+  strHCNumIgmoreZeroNoMetric = 'HCNumIgmoreZero';
+  (** A constant name for the Hard Coded Strings metric so it can be disabled. **)
+  strHardCodedStringNoMetric = 'HardCodedString';
+  (** A constant name for the Hard Coded Strings Igmore Empty metric so it can be disabled. **)
+  strHCStrIgnoreEmptyNoMetric = 'HCStrIgnoreEmpty';
+  (** A constant name for the Hard Coded String Ignore Single metric so it can be disabled. **)
+  strHCStrIgnoreSingleNoMetric = 'HCStrIgnoreSingle';
+  (** A constant name for the Unsorted Method metric so it can be disabled. **)
+  strUnsortedModuleNoMetric = 'UnsortedModule';
+  (** A constant name for the With Statement metric so it can be disabled. **)
+  strWithStatementNoMetric = 'WithStatement';
+  (** A constant name for the Goto Statement metric so it can be disabled. **)
+  strGotoStatementNoMetric = 'GotoStatement';
+  (** A constant name for the NestedIFDepth metric so it can be disabled. **)
+  strNestedIFDepthNoMetric = 'NestedIFDepth';
+  (** A constant name for the Cyclometric Complexity metric so it can be disabled. **)
+  strCyclometricComplexityNoMetric = 'CyclometricComplexity';
+  (** A constant name for the Cyclometric Complexity Igmore Expressions metric so it can be disabled. **)
+  strCCIgnoreExpressionNoMetric = 'CCIgnoreExpression';
+  (** A constant name for the Toxicity metric so it can be disabled. **)
+  strToxicityNoMetric = 'Toxicity';
+  (** A constant name for the Empty Except metric so it can be disabled. **)
+  strEmptyEXCEPTNoMetric = 'EmptyEXCEPT';
+  (** A constant name for the Empty Finally metric so it can be disabled. **)
+  strEmptyFINALLYNoMetric = 'EmptyFINALLY';
+  (** A constant name for the Exception eating metric so it can be disabled. **)
+  strExceptionEatingNoMetric = 'ExceptionEating';
+  (** A constant name for the Empty Then metric so it can be disabled. **)
+  strEmptyTHENNoMetric = 'EmptyTHEN';
+  (** A constant name for the Empty Else metric so it can be disabled. **)
+  strEmptyELSENoMetric = 'EmptyELSE';
+  (** A constant name for the Empty Case metric so it can be disabled. **)
+  strEmptyCASENoMetric = 'EmptyCASE';
+  (** A constant name for the Empty For metric so it can be disabled. **)
+  strEmptyFORNoMetric = 'EmptyFOR';
+  (** A constant name for the Empty While metric so it can be disabled. **)
+  strEmptyWHILENoMetric = 'EmptyWHILE';
+  (** A constant name for the Empty Repeat metric so it can be disabled. **)
+  strEmptyREPEATNoMetric = 'EmptyREPEAT';
+  (** A constant name for the Empty Begin End metric so it can be disabled. **)
+  strEmptyBEGINENDNoMetric = 'EmptyBEGINEND';
+  (** A constant name for the Empty Initialization metric so it can be disabled. **)
+  strEmptyInitializationNoMetric = 'EmptyInitialization';
+  (** A constant name for the Empty Finalization metric so it can be disabled. **)
+  strEmptyFinalizationNoMetric = 'EmptyFinalization';
+  (** A constant name for the Empty Method metric so it can be disabled. **)
+  strEmptyMethodNoMetric = 'EmptyMethod';
+  (** A constant name for the Missing CONST in Parameters metric so it can be disabled. **)
+  strMissingCONSTInParamNoMetric = 'MissingCONSTInParam';
+  (** A constant name for the Missign Const in Parameters Ignore Event handlers metric so it can be
+      disabled. **)
+  strMCParmListIgnoreEventsNoMetric = 'MCParmListIgnoreEvents';
+
+  (** A constant array of default options for the Module Metrics. **)
+  DefaultModuleMetrics : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord = (
+    (
+      FParent: mmMetrics;
+      FName: strMetrics;
+      FDescription: strMetrics;
+      FEnabled: True;
+      FLimit: 0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strChecks;
+      FDescription: strChecks;
+      FEnabled: True;
+      FLimit: 0;
+      FLimitType: ltNone),
+    (
+      FParent: mmMetrics;
+      FName: strLongMethodNoMetric;
+      FDescription: strLongMethodImplementationsCat;
+      FEnabled: True;
+      FLimit: 50.0;
+      FLimitType: ltInteger),
+    (
+      FParent: mmMetrics;
+      FName: strLongParameterListNoMetric;
+      FDescription: strLongMethodParameterListsCat;
+      FEnabled: True;
+      FLimit:  7.0;
+      FLimitType: ltInteger),
+    (
+      FParent: mmMetrics;
+      FName: strLongVariableListNoMetric;
+      FDescription: strLongMethodVariableListsCat;
+      FEnabled: True;
+      FLimit:  7.0;
+      FLimitType: ltInteger),
+    (
+      FParent: mmChecks;
+      FName: strHardCodedIntegerNoMetric;
+      FDescription: strHardCodedIntegersCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmHardCodedIntegers;
+      FName: strHCIntIgnoreZeroNoMetric;
+      FDescription: strIgnoreHardCodedIntegerZerosCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmHardCodedIntegers;
+      FName: strHCIntIgnoreOneNoMetric;
+      FDescription: strIgnoreHardCodedIntegerOnesCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strHardCodedNumberNoMetric;
+      FDescription: strHardCodedNumbersCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmHardCodedNumbers;
+      FName: strHCNumIgmoreZeroNoMetric;
+      FDescription: strIgnoreHardCodedNumberZerosCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strHardCodedStringNoMetric;
+      FDescription: strHardCodedStringsCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmHardCodedStrings;
+      FName: strHCStrIgnoreEmptyNoMetric;
+      FDescription: strIgnoreHardCodedEmptyStringsCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmHardCodedStrings;
+      FName: strHCStrIgnoreSingleNoMetric;
+      FDescription: strIgnoreHardCodedSingleCharStrCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strUnsortedModuleNoMetric;
+      FDescription: strUnsortedMethodsCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strWithStatementNoMetric;
+      FDescription: strUseofWITHStmtCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strGotoStatementNoMetric;
+      FDescription: strUseOfGOTOStmtCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmMetrics;
+      FName: strNestedIFDepthNoMetric;
+      FDescription: strNestedIFDepthCat;
+      FEnabled: True;
+      FLimit:  5.0;
+      FLimitType: ltInteger),
+    (
+      FParent: mmMetrics;
+      FName: strCyclometricComplexityNoMetric;
+      FDescription: strMethodCyclometricComplexityCat;
+      FEnabled: True;
+      FLimit: 10.0;
+      FLimitType: ltInteger),
+    (
+      FParent: mmMethodCyclometricComplexity;
+      FName: strCCIgnoreExpressionNoMetric;
+      FDescription: strIgnoreBoolSubExprCat;
+      FEnabled: True;
+      FLimit: 0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmMetrics;
+      FName: strToxicityNoMetric;
+      FDescription: strMethodToxicityCat;
+      FEnabled: True;
+      FLimit:  1.0;
+      FLimitType: ltFloat),
+    (
+      FParent: mmChecks;
+      FName: strEmptyEXCEPTNoMetric;
+      FDescription: strEmptyEXCEPTblocksCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyFINALLYNoMetric;
+      FDescription: strEmptyFINALLYblocksCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strExceptionEatingNoMetric;
+      FDescription: strExceptionEatingCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyTHENNoMetric;
+      FDescription: strEmptyTHENblocksCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyELSENoMetric;
+      FDescription: strEmptyELSEBlocksCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyCASENoMetric;
+      FDescription: strEmptyCASEBlocksCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyFORNoMetric;
+      FDescription: strEmptyFORBlocksCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyWHILENoMetric;
+      FDescription: strEmptyWHILEblocksCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyREPEATNoMetric;
+      FDescription: strEmptyREPEATBlocksCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyBEGINENDNoMetric;
+      FDescription: strEmptyBEGINENDBlocksCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyInitializationNoMetric;
+      FDescription: strEmptyInitializationBlockCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyFinalizationNoMetric;
+      FDescription: strEmptyFinalizationBlockCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strEmptyMethodNoMetric;
+      FDescription: strEmptyMethodsCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmChecks;
+      FName: strMissingCONSTInParamNoMetric;
+      FDescription: strMissingCONSTinParametersCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mmMissingCONSTInParemterList;
+      FName: strMCParmListIgnoreEventsNoMetric;
+      FDescription: strMissingCONSTInParamIgnoreEventHandlersCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone)
+  );
+
+  (** A constant array of strings for the output of metrics. **)
+  ModuleMetrics : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TModuleMetricTable = (
+    (
+      FCategory: '';
+      FMessage: '';
+      FDescription: '';
+      FConflictType: dciItem), // mmMetrics
+    (
+      FCategory: '';
+      FMessage: '';
+      FDescription: '';
+      FConflictType: dciItem), // mmChecks
+    (
+      FCategory: strLongMethodImplementationsCat;
+      FMessage: strMethodTooLongMsg;
+      FDescription: strMethodTooLongDesc;
+      FConflictType: dciItem), // mmLongMethods
+    (
+      FCategory: strLongMethodParameterListsCat;
+      FMessage: strMethodHasTooManyParamsMsg;
+      FDescription: strMethodHasTooManyParamsDesc;
+      FConflictType: dciItem), // mmLongParameterLists
+    (
+      FCategory: strLongMethodVariableListsCat;
+      FMessage: strMethodHasLongVarListMsg;
+      FDescription: strMethodHasLongVarListDesc;
+      FConflictType: dciItem), // mmLongMethodVariableLists
+    (
+      FCategory: strHardCodedIntegersCat;
+      FMessage: strIntegerUsedInMsg;
+      FDescription: strIntegerUsedInDesc;
+      FConflictType: dciItem), // mmHardCodedIntegers
+      (FConflictType: dciItem), (FConflictType: dciItem),
+    (
+      FCategory: strHardCodedNumbersCat;
+      FMessage: strNumberUsedInMsg;
+      FDescription: strNumberUsedInDesc;
+      FConflictType: dciItem), // mmHardCodedNumbers
+      (FConflictType: dciItem),
+    (
+      FCategory: strHardCodedStringsCat;
+      FMessage: strStringLiteralUsedInMsg;
+      FDescription: strStringLiteralUsedInDesc;
+      FConflictType: dciItem), // mmHardCodedStrings
+      (FConflictType: dciItem), (FConflictType: dciItem),
+    (
+      FCategory: strUnsortedMethodsCat;
+      FMessage: strMethodNotSortedMsg;
+      FDescription: strMethodNotSortedDesc;
+      FConflictType: dciItem), // mmUnsortedModule
+    (
+      FCategory: strUseOfWITHStmtCat;
+      FMessage: strWITHUsedInMethodMsg;
+      FDescription: strWITHUsedInMethodDesc;
+      FConflictType: dciItem), // mmUseOfWithStatements
+    (
+      FCategory: strUseOfGOTOStmtCat;
+      FMessage: strGOTOUsedInMethodMsg;
+      FDescription: strGOTOUsedInMethodDesc;
+      FConflictType: dciItem), // mmUseOfGOTOStateents
+    (
+      FCategory: strNestedIFDepthCat;
+      FMessage: strMethodHasHighIFDepthMsg;
+      FDescription: strMethodHasHighIFDepthDesc;
+      FConflictType: dciItem), // mmMethodIFDepth
+    (
+      FCategory: strMethodCyclometricComplexityCat;
+      FMessage: strMethodHasHighCyclometricComplexityMsg;
+      FDescription: strMethodHasHighCyclometricComplexityDesc;
+      FConflictType: dciItem), // mmMethodCyclometricComplexity
+      (FConflictType: dciItem),
+    (
+      FCategory: strMethodToxicityCat;
+      FMessage: strMethodHasHighToxocityValueMsg;
+      FDescription: strMethodHasHighToxocityValueDesc;
+      FConflictType: dciItem), // mmMethodToxicity
+    (
+      FCategory: strEmptyEXCEPTBlocksCat;
+      FMessage: strEXCEPTClauseMethodEmptyMsg;
+      FDescription: strEXCEPTClauseMethodEmptyDesc;
+      FConflictType: dciItem), // mmEmptyEXCEPT
+    (
+      FCategory: strEmptyFINALLYBlocksCat;
+      FMessage: strFINALLYClauseMethodEmptyMsg;
+      FDescription: strFINALLYClauseMethodEmptyDesc;
+      FConflictType: dciItem), // mmEmptyFINALLY
+    (
+      FCategory: strEXCEPTIONEatingCat;
+      FMessage: strONStmtCaptureAllExcepsMsg;
+      FDescription: strONStmtCaptureAllExcepsDesc;
+      FConflictType: dciItem), // mmExceptionEating
+    (
+      FCategory: strEmptyTHENBlocksCat;
+      FMessage: strTHENClauseInEmptyMsg;
+      FDescription: strTHENClauseInEmptyDesc;
+      FConflictType: dciItem), // mmEmptyTHEN
+    (
+      FCategory: strEmptyELSEBlocksCat;
+      FMessage: strELSEClauseInEmptyMsg;
+      FDescription: strELSEClauseInEmptyDesc;
+      FConflictType: dciItem), // mmEmptyELSE
+    (
+      FCategory: strEmptyCASEBlocksCat;
+      FMessage: strCASEClauseInEmptyMsg;
+      FDescription: strCASEClauseInEmptyDesc;
+      FConflictType: dciItem), // mmEmptyCASE
+    (
+      FCategory: strEmptyFORBlocksCat;
+      FMessage: strFORBlockInEmptyMsg;
+      FDescription: strFORBlockInEmptyDesc;
+      FConflictType: dciItem), // mmEmptyFOR
+    (
+      FCategory: strEmptyWHILEBlocksCat;
+      FMessage: strWHILEBlockInEmptyMsg;
+      FDescription: strWHILEBlockInEmptyDesc;
+      FConflictType: dciItem), // mmEmptyWHILE
+    (
+      FCategory: strEmptyREPEATBlocksCat;
+      FMessage: strREPEATBlockInEmptyMsg;
+      FDescription: strREPEATBlockInEmptyDesc;
+      FConflictType: dciItem), // mmEmptyREPEAT
+    (
+      FCategory: strEmptyBEGINENDBlocksCat;
+      FMessage: strBEGINENDBlockInEmptyMsg;
+      FDescription: strBEGINENDBlockInEmptyDesc;
+      FConflictType: dciItem), // mmEmptyBEGINEND
+    (
+      FCategory: strEmptyInitializationBlockCat;
+      FMessage: strINITIALIZATIONClauseInModuleEmptyMsg;
+      FDescription: strINITIALIZATIONClauseInModuleEmptyDesc;
+      FConflictType: dciItem), // mmEmptyInitialization
+    (
+      FCategory: strEmptyFinalizationBlockCat;
+      FMessage: strFINALIZATIONClauseInModuleEmptyMsg;
+      FDescription: strFINALIZATIONClauseInModuleEmptyDesc;
+      FConflictType: dciItem), // mmEmptyInitialization
+    (
+      FCategory: strMissingCONSTInParametersCat;
+      FMessage: strMethodDoesNotHaveImplementationMsg;
+      FDescription: strMethodDoesNotHaveImplementationDesc;
+      FConflictType: dciMissing), // mmEmptyMethod
+    (
+      FCategory: strMissingCONSTinParametersCat;
+      FMessage: strParameterInMethodMissingCONSTMsg;
+      FDescription: strParameterInMethodMissingCONSTDesc;
+      FConflictType: dciItem), // mmMissingCONSTInParemterList
+      (FConflictType: dciItem)
   );
 
 Implementation

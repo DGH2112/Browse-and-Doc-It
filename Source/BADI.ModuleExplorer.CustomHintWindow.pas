@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 May 2017
+  @Date    19 Nov 2017
 
 **)
 Unit BADI.ModuleExplorer.CustomHintWindow;
@@ -49,17 +49,20 @@ Type
     Procedure CalcSpecialTag(Const iSpecialTag : Integer; Const Comment : TComment;
       Var Result : TRect); InLine;
     Procedure SetTokenFont(Const Canvas : TCanvas; Const eTokenType : TBADITokenType);
-    Procedure PaintRenderTreeNode(NodeData : PBADITreeData; var iBottom : Integer); InLine;
+    Procedure PaintRenderTreeNode(Const NodeData : PBADITreeData; Var iBottom : Integer); InLine;
     Procedure PaintRenderComment(Var iBottom : Integer); InLine;
     Procedure PaintRenderSpecialTags(Const iBottom : Integer); InLine;
   Public
+    //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent; ATreeView : TVirtualStringTree); ReIntroduce;
     Procedure Paint; Override;
+    //: @nometric MissingCONSTInParam
     Function CalcHintRect(MinWidth, MaxWidth : Integer; Node : PVirtualNode;
       SyntaxHighlight : Boolean; Comment : TComment) : TRect; Reintroduce; Overload;
+    //: @nometric MissingCONSTInParam
     Procedure ActivateHint(Rect : TRect; Node : PVirtualNode;
       SyntaxHighlight : Boolean; Comment : TComment); Reintroduce; Overload;
-    Function CanDrawSpecialTag(Comment : TComment; const strSpecialTag : String) : Boolean;
+    Function CanDrawSpecialTag(Const Comment : TComment; Const strSpecialTag : String) : Boolean;
   End;
 
 Implementation
@@ -82,6 +85,8 @@ Uses
            syntax highlighing and Comment is the comment associated with the
            tree node.
   @postcon Activates the hint window.
+
+  @nometric MissingCONSTInParam
 
   @param   Rect            as a TRect
   @param   Node            as a PVirtualNode
@@ -119,6 +124,9 @@ End;
            and Comment is the comment associated with the tree node and
   @postcon Returns the newly calculated rectangle of the hint window.
 
+  @nometric MissingCONSTInParam
+  @nohint 
+
   @param   MinWidth        as an Integer
   @param   MaxWidth        as an Integer
   @param   Node            as a PVirtualNode
@@ -155,7 +163,7 @@ Begin
       R := Rect(Result.Left + iPadding, 0, Result.Right - iPadding, 0);
       Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(strText), -1, R,
         DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-        DrawTextBiDiModeFlagsReadingOnly) + 2);
+        DrawTextBiDiModeFlagsReadingOnly) + iPadding);
       CalcSpecialTags(Comment, Result);
     End;
 End;
@@ -175,6 +183,9 @@ End;
 Procedure TBADICustomHintWindow.CalcSpecialTag(Const iSpecialTag : Integer;
   Const Comment : TComment; Var Result : TRect);
 
+Const
+  iMultipler = 2;
+
 Var
   iTag: Integer;
   R: TRect;
@@ -188,11 +199,11 @@ Begin
         Refresh;
         InitCanvasFont(Canvas, Comment.Tag[iTag].Fixed);
         SetTokenFont(Canvas, ttTagHeaderText);
-        R := Rect(Result.Left + iPadding, 0, Result.Right - iPadding - 2 * iBulletSize, 0);
+        R := Rect(Result.Left + iPadding, 0, Result.Right - iPadding - iMultipler * iBulletSize, 0);
         strText := Comment.Tag[iTag].AsString(MaxInt, False);
         Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(strText), -1, R,
           DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-          DrawTextBiDiModeFlagsReadingOnly) + 2);
+          DrawTextBiDiModeFlagsReadingOnly) + iPadding);
       End;
 End;
 
@@ -226,7 +237,7 @@ Begin
           strText := TBADIOptions.BADIOptions.SpecialTags[iSpecialTag].FDescription;
           Inc(Result.Bottom, DrawText(Canvas.Handle, PChar(strText), -1, R,
             DT_CALCRECT Or DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
-            DrawTextBiDiModeFlagsReadingOnly) + 2);
+            DrawTextBiDiModeFlagsReadingOnly) + iPadding);
           Inc(Result.Bottom, 1 + iPadding);
           CalcSpecialTag(iSpecialTag, Comment, Result);
         End;
@@ -249,6 +260,11 @@ End;
 Procedure TBADICustomHintWindow.CalcTreeNodeWidth(Const SyntaxHighlight : Boolean;
   Const Node : PVirtualNode; Var Result : TRect);
 
+Const
+  iIndentMultiLines = 10;
+  iMultipler = 2;
+  strTextHeightTest = 'Ag';
+
 Var
   NodeData : PBADITreeData;
   iPos : Integer;
@@ -268,11 +284,11 @@ Begin
       iLastmax := 0;
       InitCanvasFont(Canvas, tpFixed In NodeData.FNode.TagProperties);
       // Start with single line height
-      Result.Bottom := Result.Top + iPadding * 2 + Canvas.TextHeight('Ag');
+      Result.Bottom := Result.Top + iPadding * iMultipler + Canvas.TextHeight(strTextHeightTest);
       For iToken := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, iToken, NodeData.FNode.Title, tpSyntax In NodeData.FNode.TagProperties,
-            Canvas);
+            NodeData.FNode.ForeColour, NodeData.FNode.BackColour, NodeData.FNode.FontStyles, Canvas);
           Inc(iPos, Canvas.TextWidth(sl[iToken]));
           If (iPos > iMaxPos) Or (sl[iToken] = #13#10) Then
             Begin
@@ -280,7 +296,7 @@ Begin
               iPos := iPadding;
               If sl[iToken] <> #13#10 Then
                 Begin
-                  Inc(iPos, 10); // indent multiple lines
+                  Inc(iPos, iIndentMultiLines); // indent multiple lines
                   iLastMax := iMaxPos;
                 End;
             End Else
@@ -295,16 +311,16 @@ End;
 
   This method determines if the special tag need to be rendered in the hint window.
 
-  @precon  Comment is the comment to get tags from and strSpecialTag is the special tag information
-           to look for.
+  @precon  Comment is the comment to get tags from and strSpecialTag is the special tag information to 
+           look for.
   @postcon Return true is the special tag was found in the comment.
 
-  @param   Comment       as a TComment
+  @param   Comment       as a TComment as a constant
   @param   strSpecialTag as a String as a constant
   @return  a Boolean
 
 **)
-Function TBADICustomHintWindow.CanDrawSpecialTag(Comment : TComment;
+Function TBADICustomHintWindow.CanDrawSpecialTag(Const Comment : TComment;
   Const strSpecialTag : String) : Boolean;
 
 Var
@@ -327,6 +343,8 @@ End;
   @precon  ATreeView must be a valid instance of the explorer treeview.
   @postcon Ensures the hint can get the treeviews font information.
 
+  @nometric MissingCONSTInParam
+  
   @param   AOwner    as a TComponent
   @param   ATreeView as a TVirtualStringTree
 
@@ -378,6 +396,9 @@ End;
 **)
 Procedure TBADICustomHintWindow.PaintRenderComment(Var iBottom : Integer);
 
+Const
+  iMultipler = 2;
+
 Var
   iTop :  Integer;
   iHeight : Integer;
@@ -395,7 +416,7 @@ Begin
   Canvas.Refresh;
   SetTokenFont(Canvas, ttCommentText);
   strText := FComment.AsString(MaxInt, False);
-  R := Rect(FRect.Left, iTop, Width - iPadding * 2, Height);
+  R := Rect(FRect.Left, iTop, Width - iPadding * iMultipler, Height);
   iHeight := DrawText(Canvas.Handle, PChar(strText), -1, R,
     DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
     DrawTextBiDiModeFlagsReadingOnly);
@@ -415,6 +436,10 @@ End;
 
 **)
 Procedure TBADICustomHintWindow.PaintRenderSpecialTags(Const iBottom : Integer);
+
+Const
+  iDivisor = 2;
+  iMultipler = 2;
 
 Var
   iSpecialTag: Integer;
@@ -447,16 +472,16 @@ Begin
                 Canvas.Pen.Color := clBlack;
                 Canvas.Brush.Color := clBlack;
                 Canvas.Ellipse(
-                  iBulletSize Div 2,
-                  R.Top + iBulletSize Div 2,
-                  iBulletSize * 2 - iBulletSize Div 2,
-                  R.Top + iBulletSize * 2 - iBulletSize Div 2
+                  iBulletSize Div iDivisor,
+                  R.Top + iBulletSize Div iDivisor,
+                  iBulletSize * iMultipler - iBulletSize Div iDivisor,
+                  R.Top + iBulletSize * iMultipler - iBulletSize Div iDivisor
                 );
                 Canvas.Brush.Color :=
                   TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
                 Canvas.Refresh;
                 S := R;
-                S.Left := iBulletSize * 2;
+                S.Left := iBulletSize * iMultipler;
                 strText := FComment.Tag[iTag].AsString(MaxInt, False);
                 Inc(R.Top, DrawText(Canvas.Handle, PChar(strText), -1, S,
                   DT_LEFT Or DT_WORDBREAK Or DT_NOPREFIX Or
@@ -473,11 +498,14 @@ End;
   @precon  NodeData must be a valid pointer to tree node data.
   @postcon The treenode text is rendered.
 
-  @param   NodeData as a PBADITreeData
+  @param   NodeData as a PBADITreeData as a constant
   @param   iBottom  as an Integer as a reference
 
 **)
-Procedure TBADICustomHintWindow.PaintRenderTreeNode(NodeData : PBADITreeData; Var iBottom : Integer);
+Procedure TBADICustomHintWindow.PaintRenderTreeNode(Const NodeData : PBADITreeData; Var iBottom : Integer);
+
+Const
+  strTextheightTest = 'Ag';
 
 Var
   sl : TStringList;
@@ -499,7 +527,8 @@ Begin
       sl := NodeData.FNode.Tokens;
       For i := 0 To sl.Count - 1 Do
         Begin
-          GetFontInfo(sl, i, FTitle, tpSyntax In NodeData.FNode.TagProperties, Canvas);
+          GetFontInfo(sl, i, FTitle, tpSyntax In NodeData.FNode.TagProperties, NodeData.FNode.ForeColour,
+            NodeData.FNode.BackColour, NodeData.FNode.FontStyles, Canvas);
           If Canvas.Brush.Color = TBADIOptions.BADIOptions.BGColour Then
             Canvas.Brush.Color :=
               TBADIOptions.BADIOptions.TokenFontInfo[ttExplorerHighlight].FBackColour;
@@ -507,11 +536,11 @@ Begin
             Begin
               iLeft := FRect.Left;
               Inc(iLines);
-              Inc(iTop, Canvas.TextHeight('Ag'));
+              Inc(iTop, Canvas.TextHeight(strTextheightTest));
               If sl[i] = #13#10 Then
                 Continue;
             End;
-          iBottom := FRect.Top + iLines * Canvas.TextHeight('Wg');
+          iBottom := FRect.Top + iLines * Canvas.TextHeight(strTextheightTest);
           S := Rect(iLeft, iTop, R.Right, R.Bottom);
           DrawText(Canvas.Handle, PChar(sl[i]), Length(sl[i]), S, DT_LEFT Or DT_VCENTER);
           Inc(iLeft, Canvas.TextWidth(sl[i]));

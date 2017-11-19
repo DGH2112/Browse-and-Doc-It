@@ -79,6 +79,13 @@ Type
     Function  RefactorConstResStr(Const Container : TElementContainer;
       Const eScope : TScope) : TBADIRefactoringInsertionInfo;
     (**
+      This property exposes the parsed module.
+      @precon  None.
+      @postcon Returns the parsed module.
+      @return  a TBaseLanguageModule
+    **)
+    Property Module : TBaseLanguageModule Read FModule;
+    (**
       This property returns the Token being refactored for positional referencing.
       @precon  None.
       @postcon Returns the Token being refactored for positional referencing.

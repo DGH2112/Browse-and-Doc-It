@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    28 Oct 2017
+  @Date    19 Nov 2017
   @Author  David Hoyle
   @Version 1.0
 
@@ -107,14 +107,17 @@ Type
     procedure edtExplorerFilterKeyPress(Sender: TObject; var Key: Char);
   Strict Private
     Type
-      (** This record contains information about the special tag nodes. @nohint **)
+      (** This record contains information about the special tag nodes. **)
       TSpecialTagNode = Record
         Node           : PVirtualNode;
         FTagName       : String;
         FTagDesc       : String;
         FTagProperties : TBADITagProperties;
+        FFontStyles    : TFontStyles;
+        FFontColour    : TColor;
+        FBackColour    : TColor;
       End;
-      (** An enumerate to define the position of the found text when filtering. @nohint **)
+      (** An enumerate to define the position of the found text when filtering. **)
       TMatchType = (mtNone, mtStart, mtFull, mtEnd, mtMiddle);
       (** A record to define the filter search match information. **)
       TMatchResult = Record
@@ -122,7 +125,7 @@ Type
         FStart     : Integer;
         FLength    : Integer;
       End;
-      (** An enumerate to define the panels on the status bar. @nohint **)
+      (** An enumerate to define the panels on the status bar. **)
       TStatusPanelIndex = (
         spiBytes,
         spiTokens,
@@ -156,9 +159,10 @@ Type
     Procedure GetBodyCommentTags(Const Module : TBaseLanguageModule);
     Function  AddNode(Const Parent : PVirtualNode; Const Element : TElementContainer;
       Const iLevel : Integer) : PVirtualNode; Overload;
-    Function  AddNode(Const Parent : PVirtualNode; Const Tag : TTag;
-      Const iLevel : Integer; Const iImageIndex : Integer;
-      Const TagProperties : TBADITagProperties; Const Comment : TComment) : PVirtualNode; Overload;
+    Function  AddNode(Const Parent : PVirtualNode; Const Tag : TTag; Const iLevel : Integer;
+      Const iImageIndex : Integer; Const TagProperties : TBADITagProperties;
+      Const FontStyles : TFontStyles; Const FontColour : TColor; Const BackColour : TColor;
+      Const Comment : TComment) : PVirtualNode; Overload;
     Function  AddNode(Const Parent : PVirtualNode; Const strText, strName : String;
       Const iLevel : Integer; Const iImageIndex : Integer;
       Const boolTitle : Boolean = False) : PVirtualNode; Overload;
@@ -504,8 +508,15 @@ Begin
             If CompareText(Cmt.Tag[iTag].TagName, FSpecialTagNodes[iSpecialTag].FTagName) = 0 Then
               Begin
                 Tag := Cmt.Tag[iTag];
-                AddNode(FSpecialTagNodes[iSpecialTag].Node, Tag, iTreeLevel,
-                  BADIImageIndex(iiToDoItem, scNone), FSpecialTagNodes[iSpecialTag].FTagProperties,
+                AddNode(
+                  FSpecialTagNodes[iSpecialTag].Node,
+                  Tag,
+                  iTreeLevel,
+                  BADIImageIndex(iiToDoItem, scNone),
+                  FSpecialTagNodes[iSpecialTag].FTagProperties,
+                  FSpecialTagNodes[iSpecialTag].FFontStyles,
+                  FSpecialTagNodes[iSpecialTag].FFontColour,
+                  FSpecialTagNodes[iSpecialTag].FBackColour,
                   Cmt);
               End;
     End;
@@ -1076,6 +1087,9 @@ Begin
       FSpecialTagNodes[i].FTagName := TBADIOptions.BADIOptions.SpecialTags[i].FName;
       FSpecialTagNodes[i].FTagDesc := TBADIOptions.BADIOptions.SpecialTags[i].FDescription;
       FSpecialTagNodes[i].FTagProperties := TBADIOptions.BADIOptions.SpecialTags[i].FTagProperties;
+      FSpecialTagNodes[i].FFontStyles := TBADIOptions.BADIOptions.SpecialTags[i].FFontStyles;
+      FSpecialTagNodes[i].FFontColour := TBADIOptions.BADIOptions.SpecialTags[i].FFontColour;
+      FSpecialTagNodes[i].FBackColour := TBADIOptions.BADIOptions.SpecialTags[i].FBackColour;
       FSpecialTagNodes[i].Node := AddNode(
         FModule,
         FSpecialTagNodes[i].FTagDesc,
@@ -1316,12 +1330,16 @@ end;
   @param   iLevel        as an Integer as a constant
   @param   iImageIndex   as an Integer as a constant
   @param   TagProperties as a TBADITagProperties as a constant
+  @param   FontStyles    as a TFontStyles as a constant
+  @param   FontColour    as a TColor as a constant
+  @param   BackColour    as a TColor as a constant
   @param   Comment       as a TComment as a constant
   @return  a PVirtualNode
 
 **)
 Function TframeModuleExplorer.AddNode(Const Parent: PVirtualNode; Const Tag: TTag; Const iLevel,
-  iImageIndex: Integer; Const TagProperties : TBADITagProperties ;Const Comment: TComment): PVirtualNode;
+  iImageIndex: Integer; Const TagProperties : TBADITagProperties; Const FontStyles : TFontStyles;
+  Const FontColour : TColor; Const BackColour : TColor; Const Comment: TComment): PVirtualNode;
 
 Var
   NodeData : PBADITreeData;
@@ -1331,7 +1349,8 @@ Begin
   Result := FExplorer.AddChild(Parent);
   FExplorer.MultiLine[Result] := True;
   NodeData := FExplorer.GetNodeData(Result);
-  N := TBADITreeNodeInfo.Create(Tag, iLevel, iImageIndex, TagProperties, Comment);
+  N := TBADITreeNodeInfo.Create(Tag, iLevel, iImageIndex, TagProperties, FontStyles, FontColour,
+    BackColour, Comment);
   FNodeInfo.Add(N);
   NodeData.FNode := N;
 End;
@@ -1795,6 +1814,7 @@ Begin
       For i := 0 To sl.Count - 1 Do
         Begin
           GetFontInfo(sl, i, FNodeData.FNode.Title, tpSyntax In FNodeData.FNode.TagProperties,
+            FNodeData.FNode.ForeColour, FNodeData.FNode.BackColour, FNodeData.FNode.FontStyles,
             FTargetCanvas);
           If sl[i] = #13#10 Then
             iRight := iLeft
@@ -2032,6 +2052,7 @@ Begin
   For i := 0 To sl.Count - 1 Do
     Begin
       GetFontInfo(sl, i, FNodeData.FNode.Title, tpSyntax In FNodeData.FNode.TagProperties,
+        FNodeData.FNode.ForeColour, FNodeData.FNode.BackColour, FNodeData.FNode.FontStyles,
         FTargetCanvas);
       If FNode = FExplorer.FocusedNode Then
         If FTargetCanvas.Brush.Color = TBADIOptions.BADIOptions.BGColour Then

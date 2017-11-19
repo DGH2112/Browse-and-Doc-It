@@ -103,6 +103,8 @@ Class Function TfrmBADIRefactorConstant.Execute(Var RefactoringInfo : TBADIRefac
 
 Var
   F: TfrmBADIRefactorConstant;
+  eScope: TBADIRefactoringScope;
+  eType : TBADIRefactoringType;
 
 Begin
   Result := False;
@@ -115,11 +117,19 @@ Begin
       Begin
         RefactoringInfo.Name := F.edtName.Text;
         RefactoringInfo.Scopes := [];
-        RefactoringInfo.Scopes := RefactoringInfo.Scopes +
-          [TBADIRefactoringScope(Byte(F.cbxScope.ItemIndex))];
+        For eScope := Low(TBADIRefactoringScope) To High(TBADIRefactoringScope) Do
+          If Comparetext(F.cbxScope.Text, strScope[eScope]) = 0 Then
+            Begin
+              RefactoringInfo.Scopes := RefactoringInfo.Scopes + [eScope];
+              Break;
+            End;
         RefactoringInfo.Types := [];
-        RefactoringInfo.Types := RefactoringInfo.Types +
-          [TBADIRefactoringType(Byte(F.cbxType.ItemIndex))];
+        For eType := Low(TBADIRefactoringType) To High(TBADIRefactoringType) Do
+          If Comparetext(F.cbxType.Text, strType[eType]) = 0 Then
+            Begin
+              RefactoringInfo.Types := RefactoringInfo.Types + [eType];
+              Break;
+            End;
         boolNewLine := F.chkNewLine.Checked;
         Result := True;
       End;

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Nov 2017
+  @Date    19 Nov 2017
   
 **)
 Unit BADI.Refactor.Constant;
@@ -18,47 +18,28 @@ Uses
   BADI.TokenInfo,
   BADI.ElementContainer,
   BADI.Types,
+  BADI.Refactoring.Functions,
   ToolsAPI;
 
 Type
   (** A class to handle the refactoring of constants in code. **)
   TBADIRefactorConstant = Class
   Strict Private
-    FModule      : TBaseLanguageModule;
-    FTokenIndex  : Integer;
-    FToken       : TTokenInfo;
-    FName        : String;
-    FScopes      : TBADIRefactoringScopes;
-    FTypes       : TBADIRefactoringTypes;
-    FMethod      : TGenericFunction;
-    FSourceEditor: IOTASourceEditor;
-    FIndent      : Integer;
+    FModule          : TBaseLanguageModule;
+    FTokenIndex      : Integer;
+    FSourceEditor    : IOTASourceEditor;
+    FIndent          : Integer;
+    FRefactoringInfo : TBADIRefactoringInfo;
   Strict Protected
     Procedure Execute(Const SE: IOTASourceEditor; Const iLine, iColumn: Integer);
-    Function  FindToken(Const iLine, iColumn: Integer): Integer;
+    Procedure ParseModule(Const iLine, iColumn: Integer);
+    Procedure StartRefactoring(Const iLine, iColumn: Integer);
     Procedure ReplaceLiteralWithRefactoring;
-    Function  ExtractText(Const strText: String): String;
-    Function  IsInMethod(Const iLine: Integer): Boolean;
-    Function  RecurseMethods(Const Container: TElementContainer; Const iLine : Integer): Boolean;
-    Procedure RefactorLocal;
-    Procedure RefactorImplementation;
-    Procedure RefactorInterface;
-    Procedure RefactorConstResStr(Const Container : TElementContainer;
-      Const iDefaultLine, iDeclIndent : Integer; Const eScope : TScope);
+    Function  RefactorLocal : TBADIRefactoringInsertionInfo;
+    Function  RefactorImplementation: TBADIRefactoringInsertionInfo;
+    Function  RefactorInterface : TBADIRefactoringInsertionInfo;
     Procedure ReplaceToken;
-    Procedure UpdateScopeAndType(Const iLine : Integer);
-    Function  RefactoringType : TBADIRefactoringType;
-    Function  NewMaxLinePosition(Const Container: TElementContainer; Const setScope : TScopes) : Integer;
-    Function  NewMinLinePosition(Const Container: TElementContainer; Const setScope : TScopes) : Integer;
-    Function  NewDeclarationPosition(Const Container : TElementContainer;
-      Const iDefaultStartLine: Integer; Const setScopes : TScopes): Integer;
-    Function  NewDeclarationAfterUses(Const Container : TElementContainer;
-      Const setScopes : TScopes) : Integer;
-    Function  NewDeclarationFromExistingCRS(Const Container : TElementContainer;
-      Const setScopes : TScopes) : Integer;
     Function  CheckForExistingDeclaration : Boolean;
-    Function  FindCRSElement(Const Container: TElementContainer; Const eScope : TScope;
-      Var iLine : Integer): TElementContainer;
   Public
     Constructor Create;
     Class Procedure Refactor(Const SE: IOTASourceEditor; Const iLine, iColumn: Integer);
@@ -83,15 +64,9 @@ Uses
   BADI.Pascal.RecordDecl;
 
 Const
-  (** A constant array of section names to search for when trying to find the correct refactoring
-      location. **)
-  strSectionNames : Array[Low(TBADIRefactoringType)..High(TBADIRefactoringType)] Of String = (
-    strConstantsLabel, strResourceStringsLabel);
   (** A constant array for the section keywords for new refactoring declarations. **)
   strSectionKeywords : Array[Low(TBADIRefactoringType)..High(TBADIRefactoringType)] Of String = (
     'Const', 'ResourceString');
-  (** A constant to define the format of a constant / resource string declaration. **)
-  strDeclaration = '%*s%s = %s;'#13#10;
     
 (**
 
@@ -139,12 +114,12 @@ Const
         If E Is TGenericFunction Then
           Begin
             M := E As TGenericFunction;
-            S := M.FindElement(strSectionNames[RefactoringType]);
+            S := M.FindElement(strSectionNames[FRefactoringInfo.RefactoringType]);
             If Assigned(S) Then
               For iDeclaration := 1 To S.ElementCount Do        
-                If FToken.Token = S.Elements[iDeclaration].AsString(False, False) Then
-                  Case MessageDlg(Format(strMsg, [FToken.Token]), mtWarning, [mbYes, mbNo, mbCancel],
-                    0) Of
+                If FRefactoringInfo.Token.Token = S.Elements[iDeclaration].AsString(False, False) Then
+                  Case MessageDlg(Format(strMsg, [FRefactoringInfo.Token.Token]), mtWarning,
+                    [mbYes, mbNo, mbCancel], 0) Of
                     mrYes:
                       Begin
                         Result := True;
@@ -173,19 +148,19 @@ Var
 
 Begin
   Result := False;
-  If Assigned(FMethod) Then
+  If Assigned(FRefactoringInfo.Method) Then
     Begin
       Container := FModule.FindElement(strImplementedMethodsLabel);
       If Assigned(Container) Then
         Result := RecurseMethods(Container);
     End Else
     Begin
-      Container := FModule.FindElement(strSectionNames[RefactoringType]);
+      Container := FModule.FindElement(strSectionNames[FRefactoringInfo.RefactoringType]);
       If Assigned(Container) Then
         For iDeclaration := 1 To Container.ElementCount Do        
-          If FToken.Token = Container.Elements[iDeclaration].AsString(False, False) Then
-            Case MessageDlg(Format(strMsg, [FToken.Token]), mtWarning, [mbYes, mbNo, mbCancel],
-              0) Of
+          If FRefactoringInfo.Token.Token = Container.Elements[iDeclaration].AsString(False, False) Then
+            Case MessageDlg(Format(strMsg, [FRefactoringInfo.Token.Token]), mtWarning,
+              [mbYes, mbNo, mbCancel], 0) Of
               mrYes:
                 Begin
                   PositionCursor(Container, Container.Elements[iDeclaration].Line,
@@ -239,466 +214,38 @@ End;
 **)
 Procedure TBADIRefactorConstant.Execute(Const SE: IOTASourceEditor; Const iLine, iColumn: Integer);
 
-ResourceString
-  strTokenAtCursorIsNotLliteral = 'The token at the cursor is not a literal number or string!';
-  strNoTokenFoundAtCursor = 'No token found at the cursor position!';
-  strCannotRefactorErrors = 'Cannot refactor as the module has errors!';
-
-Var
-  boolNewLine: Boolean;
-
 Begin
   FSourceEditor := SE;
-  FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(SE), SE.FileName, SE.Modified,
-    [moParse]);
-  Try
-    If Not Assigned(FModule.FindElement(strErrors)) Then
-      Begin
-        FTokenIndex := FindToken(iLine, iColumn);
-        If FTokenIndex > - 1 Then
-          Begin
-            FToken := FModule.Tokens[FTokenIndex];
-            If FToken.TokenType In [ttNumber, ttSingleLiteral, ttDoubleLiteral] Then
-              Begin
-                UpdateScopeAndType(iLine);
-                boolNewLine := TBADIOptions.BADIOptions.RefactorConstNewLine;
-                If Not CheckForExistingDeclaration Then
-                  If TfrmBADIRefactorConstant.Execute(FToken.Token, FName, FScopes, FTypes, boolNewLine) Then
-                    Begin
-                      TBADIOptions.BADIOptions.RefactorConstNewLine := boolNewLine;
-                      ReplaceLiteralWithRefactoring;
-                    End;
-              End
-            Else
-              MessageDlg(strTokenAtCursorIsNotLliteral, mtError, [mbOK], 0)
-          End
-        Else
-          MessageDlg(strNoTokenFoundAtCursor, mtError, [mbOK], 0);
-      End Else
-        MessageDlg(strCannotRefactorErrors, mtError, [mbOK], 0);
-  Finally
-    FModule.Free;
-  End;
+  ParseModule(iLine, iColumn);
 End;
 
 (**
 
-  This method extracts the valid identifier characters from the given text for the name of the literal.
+  This method parses the module in preparation for refactoring.
 
   @precon  None.
-  @postcon The first 63 valid idenitifer characters are extracted from the given string.
-
-  @param   strText as a String as a constant
-  @return  a String
-
-**)
-Function TBADIRefactorConstant.ExtractText(Const strText: String): String;
-
-  (**
-
-    This method adds the tokenised word to the result if its more than a single character and not
-    in a list of words to skip.
-
-    @precon  None.
-    @postcon The word is added to the result if applicable.
-
-    @param   strToken as a String as a reference
-
-  **)
-  Procedure AddToken(Var strToken : String);
-
-  Const
-    iSecondChar = 2;
-    strWordsToSkip : Array[1..4] Of String = ('an', 'is', 'of', 'the');
-
-  Begin
-    If (Length(strToken) > 1) And Not IsKeyWord(strToken, strWordsToSkip) Then
-      Begin
-        strToken := UpperCase(Copy(strToken, 1, 1)) + Copy(strToken, iSecondChar, Length(strToken) - 1);
-        Result := Result + strToken;
-      End;
-    strToken := '';
-  End;
-  
-Const
-  strValidChars = ['a' .. 'z', 'A' .. 'Z', '_'];
-  iMaxIdentLen = 63;
-
-Var
-  iChar: Integer;
-  strToken : String;
-
-Begin
-  Result := '';
-  For iChar := 1 To Length(strText) Do
-    If CharInSet(strText[iChar], strValidChars) Then
-      strToken := strToken + strText[iChar]
-    Else
-        AddToken(strToken);
-  If Length(Result) >= iMaxIdentLen Then
-    Result := Copy(Result, 1, iMaxIdentLen);
-End;
-
-(**
-
-  This method searches for the constant or resource string section in the given container and returns
-  the found section container if there are items in the given scope.
-
-  @precon  Container must be a valid instance.
-  @postcon Returns the searched for declaration of there are subitems of the correct scope.
-
-  @param   Container as a TElementContainer as a constant
-  @param   eScope    as a TScope as a constant
-  @param   iLine     as an Integer as a reference
-  @return  a TElementContainer
-
-**)
-Function TBADIRefactorConstant.FindCRSElement(Const Container: TElementContainer; Const eScope : TScope;
-  Var iLine : Integer): TElementContainer;
-
-Begin
-  Result := Container.FindElement(strSectionNames[RefactoringType]);
-  If Assigned(Result) Then
-    Begin
-      iLine := NewMaxLinePosition(Result, [eScope]);
-      If iLine = 0 Then
-        Result := Nil
-      Else
-        iLine := 0;
-    End;
-End;
-      
-
-(**
-
-  This method finds a token based on a line number and column number.
-
-  @precon  None.
-  @postcon Returns the token index of the token at the given line and column if found else returns -1.
+  @postcon If the modules parses without error then the refactoring is started.
 
   @param   iLine   as an Integer as a constant
   @param   iColumn as an Integer as a constant
-  @return  an Integer
 
 **)
-Function TBADIRefactorConstant.FindToken(Const iLine, iColumn: Integer): Integer;
+Procedure TBADIRefactorConstant.ParseModule(Const iLine, iColumn: Integer);
 
-Const
-  iDivisor = 2;
-
-Var
-  iFirst, iMid, iLast: Integer;
-  T: TTokenInfo;
+ResourceString
+  strCannotRefactorErrors = 'Cannot refactor as the module has errors!';
 
 Begin
-  Result := - 1;
-  iFirst := 0;
-  iLast := FModule.TokenCount - 1;
-  While iFirst <= iLast Do
-    Begin
-      iMid := (iFirst + iLast) Div iDivisor;
-      T := FModule.Tokens[iMid];
-      If (iLine = T.Line) Then
-        Begin
-          If (iColumn >= T.Column) And (iColumn <= T.Column + T.Length - 1) Then
-            Begin
-              Result := iMid;
-              Break;
-            End
-          Else
-            If iColumn < T.Column Then
-            iLast := iMid - 1
-          Else
-            iFirst := iMid + 1;
-        End
-      Else
-        If iLine < T.Line Then
-        iLast := iMid - 1
-      Else
-        iFirst := iMid + 1;
-    End;
-End;
-
-(**
-
-  This method returns true of the given line number is in a method implementation.
-
-  @precon  None.
-  @postcon Returns true of the given line number is in a method implementation.
-
-  @param   iLine as an Integer as a constant
-  @return  a Boolean
-
-**)
-Function TBADIRefactorConstant.IsInMethod(Const iLine: Integer): Boolean;
-
-Var
-  IM: TElementContainer;
-
-Begin
-  Result := False;
-  IM := FModule.FindElement(strImplementedMethodsLabel);
-  If Assigned(IM) Then
-    Result := RecurseMethods(IM, iLine);
-End;
-
-(**
-
-  This method attempts to find a uses clause and return the position a new declaration should appear
-  (after the uses clause).
-
-  @precon  Container must be a valid instance.
-  @postcon Returns the line number for the new declartion ele returns zero.
-
-  @param   Container as a TElementContainer as a constant
-  @param   setScopes as a TScopes as a constant
-  @return  an Integer
-
-**)
-Function TBADIRefactorConstant.NewDeclarationAfterUses(Const Container : TElementContainer;
-  Const setScopes : TScopes): Integer;
-
-Const
-  strInterface = 'Interface';
-  strImplementation = 'Implementation';
-
-Var
-  strSection: String;
-  E: TElementContainer;
-
-Begin
-  If Not (scLocal In setScopes) Then
-    Begin   
-      E := Container.FindElement(strUses);
-      If Assigned(E) Then
-        Begin
-          Result := NewMaxLinePosition(E, setScopes);
-          If (FModule As TPascalModule).ModuleType = mtUnit Then
-            Begin
-              strSection := strInterface;
-              If setScopes * [scPrivate] <> [] Then
-                strSection := strImplementation;
-              E := E.FindElement(strSection);
-              If Assigned(E) Then
-                Begin
-                  Result := NewMaxLinePosition(E, setScopes);
-                  If Result > 0 Then Exit;
-                End;
-            End Else
-            Begin
-              If Result > 0 Then Exit;
-            End;
-        End;  
-    End;
-End;
-
-(**
-
-  This method tries to find where the declaration should be if there is an existing constant or resource
-  string section.
-
-  @precon  Container must be a valid instance.
-  @postcon Returns the line number of the new declaration else 0 or MaxInt.
-
-  @param   Container as a TElementContainer as a constant
-  @param   setScopes as a TScopes as a constant
-  @return  an Integer
-
-**)
-Function TBADIRefactorConstant.NewDeclarationFromExistingCRS(Const Container : TElementContainer;
-  Const setScopes : TScopes) : Integer;
-
-Var
-  E: TElementContainer;
-
-Begin
-  Case RefactoringType Of
-    rtConstant: // After a resource string
-      Begin
-        E := Container.FindElement(strResourceStringsLabel);
-        If Assigned(E) Then
-          Begin
-            Result := NewMaxLinePosition(E, setScopes);
-            If Result > 0 Then Exit;
-          End;         
-      End;
-    rtResourceString: // Before Constant
-      Begin
-        E := Container.FindElement(strConstantsLabel);
-        If Assigned(E) Then
-          Begin
-            Result := NewMinLinePosition(E, setScopes);
-            If Result < MaxInt Then Exit;
-          End;       
-      End;
+  FModule := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(FSourceEditor),
+    FSourceEditor.FileName, fSourceEditor.Modified, [moParse]);
+  Try
+    If Not Assigned(FModule.FindElement(strErrors)) Then
+      StartRefactoring(iLine, iColumn)
+    Else
+      MessageDlg(strCannotRefactorErrors, mtError, [mbOK], 0);
+  Finally
+    FModule.Free;
   End;
-End;
-
-(**
-
-  This method attempts to find the correct location for the insertion of the declaration.
-
-  @precon  Container must be a valid instance.
-  @postcon The new position of the section declaration is returned.
-
-  @param   Container         as a TElementContainer as a constant
-  @param   iDefaultStartLine as an Integer as a constant
-  @param   setScopes         as a TScopes as a constant
-  @return  an Integer
-
-**)
-Function TBADIRefactorConstant.NewDeclarationPosition(Const Container : TElementContainer;
-  Const iDefaultStartLine: Integer; Const setScopes : TScopes): Integer;
-
-Var
-  E: TElementContainer;
-  iLine: Integer;
-
-Begin
-  Result := iDefaultStartLine;
-  iLine := NewDeclarationFromExistingCRS(Container, setScopes);
-  If (iLine > 0) And (iLine < MaxInt) Then
-    Result := iLine;
-  E := Container.FindElement(strVarsLabel); // Before Var
-  If Assigned(E) Then
-    Begin
-      Result := NewMinLinePosition(E, setScopes);
-      If Result < MaxInt Then Exit;
-    End;       
-  E := Container.FindElement(strTypesLabel); // After Type
-  If Assigned(E) Then
-    Begin
-      Result := NewMaxLinePosition(E, setScopes);
-      If Result > 0 Then Exit;
-    End; 
-  iLine := NewDeclarationAfterUses(Container, setScopes);
-  If iLine > 0 Then
-    Result := iLine;
-End;
-
-(**
-
-  This method gets the next new line number for the scoped items in the container.
-
-  @precon  Conatiner must be a valid instance.
-  @postcon Returns the line number for the new refactoring.
-
-  @param   Container as a TElementContainer as a constant
-  @param   setScope  as a TScopes as a constant
-  @return  an Integer
-
-**)
-Function TBADIRefactorConstant.NewMaxLinePosition(Const Container: TElementContainer;
-  Const setScope : TScopes): Integer;
-
-Var
-  iElement: Integer;
-  E : TElementContainer;
-  iToken : Integer;
-
-Begin
-  Result := 0;
-  For iElement := 1 To Container.ElementCount Do
-    Begin
-      E := Container.Elements[iElement];
-      If E.Scope In setScope Then
-        Begin
-          If E.Line > Result Then
-            Result := E.Line;
-          If E Is TRecordDecl Then
-            If (E As TRecordDecl).EndLine > Result Then
-              Result := (E As TRecordDecl).EndLine;
-          For iToken := 0 To E.TokenCount - 1 Do
-            If E.Tokens[iToken].Line > Result Then
-              Result := E.Tokens[iToken].Line;
-        End;
-    End;
-  If Result > 0 Then
-    Inc(Result);
-End;
-
-(**
-
-  This method gets the previous new line number for the scoped items in the container.
-
-  @precon  Conatiner must be a valid instance.
-  @postcon Returns the line number for the new refactoring.
-
-  @param   Container as a TElementContainer as a constant
-  @param   setScope  as a TScopes as a constant
-  @return  an Integer
-
-**)
-Function TBADIRefactorConstant.NewMinLinePosition(Const Container: TElementContainer;
-  Const setScope : TScopes): Integer;
-
-Var
-  iElement: Integer;
-  E : TElementContainer;
-  iToken : Integer;
-
-Begin
-  Result := MaxInt;
-  For iElement := 1 To Container.ElementCount Do
-    Begin
-      E := Container.Elements[iElement];
-      If E.Scope In setScope Then
-        Begin
-          If E.Line < Result Then
-            Result := E.Line;
-          For iToken := 0 To E.TokenCount - 1 Do
-            If E.Tokens[iToken].Line < Result Then
-              Result := E.Tokens[iToken].Line;
-        End;
-    End;
-  If Result <> MaxInt Then
-    Begin
-      Dec(Result);
-      If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-        Dec(Result);
-    End;
-End;
-
-(**
-
-  This function recurses the implemented methods and returns true if the line number occurs in a method 
-  implementation.
-
-  @precon  Container must be valid.
-  @postcon Returns true if the line number is in a method implementation.
-
-  @param   Container as a TElementContainer as a constant
-  @param   iLine     as an Integer as a constant
-  @return  a Boolean
-
-**)
-Function TBADIRefactorConstant.RecurseMethods(Const Container: TElementContainer;
-  Const iLine : Integer): Boolean;
-
-Var
-  iElement: Integer;
-  E: TElementContainer;
-  M: TGenericFunction;
-
-Begin
-  Result := False;
-  For iElement := 1 To Container.ElementCount Do
-    Begin
-      E := Container.Elements[iElement];
-      If E Is TGenericFunction Then
-        Begin
-          M := E As TGenericFunction;
-          Result := (M.StartLine <= iLine) And (M.EndLine >= iLine);
-          If Result Then
-            FMethod := M
-          Else
-            Result := RecurseMethods(E, iLine);
-        End
-      Else
-        Result := RecurseMethods(E, iLine);
-      If Result Then
-        Break;
-    End;
 End;
 
 (**
@@ -731,112 +278,22 @@ End;
 
 (**
 
-  This method inserts the refactoring into the code either at the end of thr existing declarations or in 
-  a new declaration.
-
-  @precon  None.
-  @postcon A new refactoring is added to the code.
-
-  @param   Container    as a TElementContainer as a constant
-  @param   iDefaultLine as an Integer as a constant
-  @param   iDeclIndent  as an Integer as a constant
-  @param   eScope       as a TScope as a constant
-
-**)
-Procedure TBADIRefactorConstant.RefactorConstResStr(Const Container : TElementContainer;
-  Const iDefaultLine, iDeclIndent : Integer; Const eScope : TScope);
-
-Var
-  CRS : TElementContainer;
-  CharPos: TOTACharPos;
-  iIndex: Integer;
-  UR: IOTAEditWriter;
-  iLine : Integer;
-
-Begin
-  CRS := FindCRSElement(Container, eScope, iLine);
-  If Assigned(CRS) Then
-    Begin
-      CharPos.Line := iLine;
-      CharPos.CharIndex := 0;
-      iIndex := FSourceEditor.EditViews[0].CharPosToPos(CharPos);
-      UR := FSourceEditor.CreateUndoableWriter;
-      UR.CopyTo(iIndex);
-      OutputText(UR, Format(strDeclaration, [FIndent + (iDeclIndent - 1), '', FName, FToken.Token]));
-    End Else
-    Begin
-      CharPos.Line := NewDeclarationPosition(Container, iDefaultLine, [eScope]) + 1;
-      CharPos.CharIndex := 0;
-      iIndex := FSourceEditor.EditViews[0].CharPosToPos(CharPos);
-      UR := FSourceEditor.CreateUndoableWriter;
-      UR.CopyTo(iIndex);
-      OutputText(UR, Format('%*s%s'#13#10, [iDeclIndent - 1, '', strSectionKeywords[RefactoringType]]));
-      OutputText(UR, Format(strDeclaration, [FIndent + (iDeclIndent - 1), '', FName, FToken.Token]));
-      If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-        OutputText(UR, #13#10);
-    End;
-End;
-
-(**
-
   This method refactors the private implementation constant / resource string in the method.
 
   @precon  None.
   @postcon The constant or resource strings is created as a private implementation declaration.
 
+  @return  a TBADIRefactoringInsertionInfo
+
 **)
-Procedure TBADIRefactorConstant.RefactorImplementation;
-
-Const
-  strIMPLEMENTATION = 'IMPLEMENTATION';
-
-Var
-  iToken: Integer;
-  iLine: Integer;
-  iDeclIndent: Integer;
+Function TBADIRefactorConstant.RefactorImplementation : TBADIRefactoringInsertionInfo;
 
 Begin
-  iLine := 0;
-  For iToken := 0 To FModule.TokenCount - 1 Do
-    If FModule.Tokens[iToken].UToken = strIMPLEMENTATION Then
-      Begin
-        iLine := FModule.Tokens[iToken].Line;
-        Break;
-      End;
-  If iLine > 0 Then
+  If Assigned(FRefactoringInfo.ImplementationToken) Then
     Begin
-      iDeclIndent := FindIndentOfFirstTokenOnLine(FModule, iLine);
-      Inc(iLine);
-      If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-        Inc(iLine);
       ReplaceToken;
-      RefactorConstResStr(FModule, iLine, iDeclIndent, scPrivate);
+      Result := FRefactoringInfo.RefactorConstResStr(FModule, scPrivate);
     End;
-End;
-
-(**
-
-  This method returns the refactoring type that was returned from the refactoring form in the set.
-
-  @precon  None.
-  @postcon The refcatoring type selected is returned.
-
-  @return  a TBADIRefactoringType
-
-**)
-Function TBADIRefactorConstant.RefactoringType: TBADIRefactoringType;
-
-Var
-  eType: TBADIRefactoringType;
-
-Begin
-  Result := rtConstant;
-  For eType := Low(TBADIRefactoringType) To High(TBADIRefactoringType) Do
-    If eType In FTypes Then
-      Begin
-        Result := eType;
-        Break;
-      End;
 End;
 
 (**
@@ -846,38 +303,18 @@ End;
   @precon  None.
   @postcon The constant or resource strings is created as a public interface declaration.
 
+  @return  a TBADIRefactoringInsertionInfo
+
 **)
-Procedure TBADIRefactorConstant.RefactorInterface;
-
-Const
-  strInterfaceKeywordByModuleType : Array[Low(TModuleType)..High(TModuleType)] Of String  = (
-    'PROGRAM', 'PACKAGE', 'LIBRARY', 'INTERFACE');
-
-Var
-  iToken: Integer;
-  iLine: Integer;
-  iDeclIndent: Integer;
-  strKeyWord: String;
+Function TBADIRefactorConstant.RefactorInterface: TBADIRefactoringInsertionInfo;
 
 Begin
-  iLine := 0;
   If FModule Is TPascalModule Then
     Begin
-      strKeyWord := strInterfaceKeyWordByModuleType[(FModule As TPascalModule).ModuleType];
-      For iToken := 0 To FModule.TokenCount - 1 Do
-        If FModule.Tokens[iToken].UToken = strKeyWord Then
-          Begin
-            iLine := FModule.Tokens[iToken].Line;
-            Break;
-          End;
-      If iLine > 0 Then
+      If Assigned(FRefactoringInfo.InterfaceToken) Then
         Begin
-          iDeclIndent := FindIndentOfFirstTokenOnLine(FModule, iLine);
-          Inc(iLine);
-          If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-            Inc(iLine);
           ReplaceToken;
-          RefactorConstResStr(FModule, iLine, iDeclIndent, scPublic);
+          Result := FRefactoringInfo.RefactorConstResStr(FModule, scPublic);
         End;
     End;
 End;
@@ -889,20 +326,14 @@ End;
   @precon  None.
   @postcon The constant or resource strings is created as a local declaration.
 
-**)
-Procedure TBADIRefactorConstant.RefactorLocal;
+  @return  a TBADIRefactoringInsertionInfo
 
-Var
-  iMethodColumn: Integer;
-  iLine : Integer;
+**)
+Function TBADIRefactorConstant.RefactorLocal: TBADIRefactoringInsertionInfo;
 
 Begin
   ReplaceToken;
-  iMethodColumn := FindIndentOfFirstTokenOnLine(FModule, FMethod.Line);
-  iLine := FMethod.StartLine - 1;
-  If TBADIOptions.BADIOptions.RefactorConstNewLine Then
-    Dec(iLine);
-  RefactorConstResStr(FMethod, iLine, iMethodColumn, scLocal);
+  Result := FRefactoringInfo.RefactorConstResStr(FRefactoringInfo.Method, scLocal);
 End;
 
 (**
@@ -915,17 +346,54 @@ End;
 **)
 Procedure TBADIRefactorConstant.ReplaceLiteralWithRefactoring;
 
+Const
+  strSection = '%*s%s'#13#10;
+  strDeclaration = '%*s%s = %s;'#13#10;
+
 Var
-  eScope : TBADIRefactoringScope;
-  
+  iIndex: Integer;
+  CP : TOTACharPos;
+  RII: TBADIRefactoringInsertionInfo;
+  UR: IOTAEditWriter;
+
 Begin
-  For eScope := Low(TBADIRefactoringScope) To High(TBADIRefactoringScope) Do
-    If eScope In FScopes Then
-      Case eScope Of
-        rsLocal: RefactorLocal;
-        rsImplementation: RefactorImplementation;
-        rsInterface: RefactorInterface;
+  Case FRefactoringInfo.Scope Of
+    scLocal: RII := RefactorLocal;
+    scPrivate: RII := RefactorImplementation;
+    scPublic: RII := RefactorInterface;
+  End;
+  CP.Line := RII.FLine;
+  Case FRefactoringInfo.Scope Of
+    scLocal: CP.CharIndex := BADI.CommonIDEFunctions.FindIndentOfFirstTokenOnLine(FModule, CP.Line) - 1;
+    scPrivate: CP.CharIndex := FRefactoringInfo.ImplementationToken.Column - 1;
+    scPublic: CP.CharIndex := FRefactoringInfo.InterfaceToken.Column - 1;
+  End;
+  iIndex := FSourceEditor.EditViews[0].CharPosToPos(CP);
+  UR := FSourceEditor.CreateUndoableWriter;
+  UR.CopyTo(iIndex);
+  Case RII.FType Of
+    ritAppend:
+      Begin
+        OutputText(UR, Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name,
+          FRefactoringInfo.Token.Token]));
+        If TBADIOptions.BADIOptions.RefactorConstNewLine Then
+          OutputText(UR, #13#10);
       End;
+    ritCreate:
+      Begin
+        If RII.FPosition = ripAfter Then
+          If TBADIOptions.BADIOptions.RefactorConstNewLine Then
+            OutputText(UR, #13#10);
+        OutputText(UR, Format(strSection, [CP.CharIndex, '',
+          strSectionKeywords[FRefactoringInfo.RefactoringType]]));
+        OutputText(UR, Format(strDeclaration, [FIndent + CP.CharIndex, '', FRefactoringInfo.Name,
+          FRefactoringInfo.Token.Token]));
+        If RII.FPosition = ripBefore Then
+          If TBADIOptions.BADIOptions.RefactorConstNewLine Then
+            OutputText(UR, #13#10);
+      End;
+  End;
+
 End;
 
 (**
@@ -945,52 +413,58 @@ Var
   iIndex: Integer;
 
 Begin
-  CharPos.Line := FToken.Line;
-  CharPos.CharIndex := FToken.Column - 1;
+  CharPos.Line := FRefactoringInfo.Token.Line;
+  CharPos.CharIndex := FRefactoringInfo.Token.Column - 1;
   iIndex := FSourceEditor.EditViews[0].CharPosToPos(CharPos);
   UR := FSourceEditor.CreateUndoableWriter;
   UR.CopyTo(iIndex);
-  UR.DeleteTo(iIndex + FToken.Length);
-  OutputText(UR, FName);
+  UR.DeleteTo(iIndex + FRefactoringInfo.Token.Length);
+  OutputText(UR, FRefactoringInfo.Name);
 End;
 
 (**
 
-  This method updates the scope and types based on where the token is in the file.
+  This method invokes the refactoring of the token at the current cursor position.
 
   @precon  None.
-  @postcon The scope and type are updated based on where the token is in the file.
+  @postcon The token at the current cursor position is refactored.
 
-  @param   iLine as an Integer as a constant
+  @param   iLine   as an Integer as a constant
+  @param   iColumn as an Integer as a constant
 
 **)
-Procedure TBADIRefactorConstant.UpdateScopeAndType(Const iLine : Integer);
+Procedure TBADIRefactorConstant.StartRefactoring(Const iLine, iColumn: Integer);
 
-Const
-  strDefaultDecimal = 'dblDecimal';
-  strDefaultInteger = 'iInteger';
-  strStringPrefix = 'str';
+ResourceString
+  strTokenAtCursorIsNotLliteral = 'The token at the cursor is not a literal number or string!';
+  strNoTokenFoundAtCursor = 'No token found at the cursor position!';
+
+Var
+  boolNewLine: Boolean;
 
 Begin
-  FScopes := [rsInterface];
-  If FModule Is TPascalModule Then
-    If (FModule As TPascalModule).ModuleType = mtUnit Then
-      Include(FScopes, rsImplementation);
-  FMethod := Nil;
-  If IsInMethod(iLine) Then
-    Include(FScopes, rsLocal);
-  FTypes := [rtConstant];
-  Case FToken.TokenType Of
-    ttNumber:
-      If Pos('.', FToken.Token) > 0 Then
-        FName := strDefaultDecimal
-      Else
-        FName := strDefaultInteger;
-    ttSingleLiteral, ttDoubleLiteral:
+  FRefactoringInfo := TBADIRefactoringInfo.Create(FModule);
+  Try
+    FTokenIndex := FRefactoringInfo.FindToken(iLine, iColumn);
+    If FTokenIndex > - 1 Then
       Begin
-        FName := strStringPrefix + ExtractText(FToken.Token);
-        Include(FTypes, rtResourceString);
-      ENd;
+        FRefactoringInfo.UpdateScopeAndType(iLine, iColumn);
+        If FRefactoringInfo.Token.TokenType In [ttNumber, ttSingleLiteral, ttDoubleLiteral] Then
+          Begin
+            boolNewLine := TBADIOptions.BADIOptions.RefactorConstNewLine;
+            If Not CheckForExistingDeclaration Then
+              If TfrmBADIRefactorConstant.Execute(FRefactoringInfo, boolNewLine) Then
+                Begin
+                  TBADIOptions.BADIOptions.RefactorConstNewLine := boolNewLine;
+                  ReplaceLiteralWithRefactoring;
+                End;
+          End Else
+            MessageDlg(strTokenAtCursorIsNotLliteral, mtError, [mbOK], 0)
+      End
+    Else
+      MessageDlg(strNoTokenFoundAtCursor, mtError, [mbOK], 0);
+  Finally
+    FRefactoringInfo.Free;
   End;
 End;
 

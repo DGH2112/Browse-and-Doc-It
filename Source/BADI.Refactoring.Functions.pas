@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Nov 2017
+  @Date    20 Nov 2017
   
 **)
 Unit BADI.Refactoring.Functions;
@@ -552,7 +552,7 @@ Begin
             If (E As TRecordDecl).EndLine > Result Then
               Result := (E As TRecordDecl).EndLine;
           For iToken := 0 To E.TokenCount - 1 Do
-            If E.Tokens[iToken].Line > Result Then
+            If (E.Tokens[iToken].Line > 0) And (E.Tokens[iToken].Line > Result) Then
               Result := E.Tokens[iToken].Line;
         End;
     End;
@@ -590,7 +590,7 @@ Begin
           If E.Line < Result Then
             Result := E.Line;
           For iToken := 0 To E.TokenCount - 1 Do
-            If E.Tokens[iToken].Line < Result Then
+            If (E.Tokens[iToken].Line > 0) And (E.Tokens[iToken].Line < Result) Then
               Result := E.Tokens[iToken].Line;
         End;
     End;

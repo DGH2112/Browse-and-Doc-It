@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    28 Oct 2017
+  @Date    23 Nov 2017
   @Version 1.0
 
 **)
@@ -63,7 +63,8 @@ Uses
   CodeSiteLogging,
   {$ENDIF}
   BADI.DockableModuleExplorer,
-  BADI.Constants;
+  BADI.Constants, 
+  BADI.Module.Statistics;
 
 (**
 
@@ -89,6 +90,7 @@ Begin
   {$ENDIF}
   FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FEditorNotifier);
   FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
+  RegisterStatisticsEditorView;
 End;
 
 (**
@@ -102,6 +104,7 @@ End;
 Destructor TBrowseAndDocItWizard.Destroy;
 
 Begin
+  UnregisterStatisticsEditorView;
   FBADIIDEOptionsInstaller.Free;
   {$IFDEF D2005}
   If FEditorIndex > iWizardFailState Then

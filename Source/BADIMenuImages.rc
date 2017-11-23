@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    29 Oct 2017
+  @Date    23 Nov 2017
 
 */
 BADIModuleExplorerImage   BITMAP "..\Images\BADIModuleExplorer.bmp"
@@ -19,5 +19,6 @@ BADILineCommentImage      BITMAP "..\Images\BADILineComment.bmp"
 BADIInSituCommentImage    BITMAP "..\Images\BADIInSituComment.bmp"
 BADIToDoCommentImage      BITMAP "..\Images\BADIToDoComment.bmp"
 BADIRefactorConstantImage BITMAP "..\Images\BADIRefactorConstant.bmp"
+BADIStatisticsImage       BITMAP "..\Images\BADIStatistics.bmp"
 BADIOptionsImage          BITMAP "..\Images\BADIOptions.bmp"
 

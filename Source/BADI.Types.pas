@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Nov 2017
+  @Date    23 Nov 2017
 
 **)
 Unit BADI.Types;
@@ -425,6 +425,7 @@ Type
     bmToDoComment,
     bmSep2,
     bmRefactorConstant,
+    bmBADIStatistics,
     bmSep3,
     bmOptions
   );

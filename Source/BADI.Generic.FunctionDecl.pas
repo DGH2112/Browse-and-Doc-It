@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    22 Oct 2017
+  @Date    26 Nov 2017
 
 **)
 Unit BADI.Generic.FunctionDecl;
@@ -352,6 +352,9 @@ Var
   V: TElementContainer;
 
 Begin
+  Result := 0;
+  If FIsDeclarationOnly Then
+    Exit;
   Result := F((FEndLine - FStartLine) / BADIOptions.ModuleMetric[mmLongMethods].FLimit);
   If (ParameterCount > 0) And (CompareText(Parameters[0].Identifier, strSender) <> 0) Then
     Result := Result + F(ParameterCount / BADIOptions.ModuleMetric[mmLongParameterLists].FLimit);

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       12 Nov 2017
+  @Date       26 Nov 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -1610,6 +1610,8 @@ Begin
     Begin
       M := Container As TGenericFunction;
       V := Container.FindElement(strVarsLabel);
+      MetricsLongParameterList(M);
+      MetricMissingConstInParamList(M);
       If Assigned(V) And (V.ElementCount > BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit) Then
         //: todo Find first token position.
         AddModuleMetric([M.QualifiedName, V.ElementCount,
@@ -1665,6 +1667,7 @@ Const
   
 Var
   P : TGenericParameter;
+  iParam: Integer;
 
 Begin
   If Assigned(Method) And (Method.ParameterCount > 0) Then
@@ -1673,8 +1676,10 @@ Begin
       If BADIOptions.ModuleMetric[mmMCParmListIgnoreEvents].FEnabled Then
         If CompareText(P.Identifier, strSender) = 0 Then
           Exit;
-      AddModuleMetric([Method.Parameters[Method.ParameterCount - 1].Identifier, Method.QualifiedName],
-        Method.Line, Method.Column, Method, mmMissingCONSTInParemterList);
+      For iParam := 0 To Method.ParameterCount - 1 Do
+        If Method.Parameters[iParam].ParamModifier = pamNone Then
+          AddModuleMetric([Method.Parameters[Method.ParameterCount - 1].Identifier,
+            Method.QualifiedName], Method.Line, Method.Column, Method, mmMissingCONSTInParemterList);
     End;
 End;
 
@@ -6435,7 +6440,6 @@ Begin
         NextNonCommentToken
       Else
         ErrorAndSeekToken(strLiteralExpected, ')', strSeekableOnErrorTokens, stActual, Self);
-      MetricsLongParameterList(Method);
   End;
 End;
 
@@ -6493,8 +6497,6 @@ Begin
   If pmMod <> pamNone Then
     NextNonCommentToken;
   Parameter(Method, pmMod);
-  If pmMod = pamNone Then
-    MetricMissingConstInParamList(Method);
 End;
 
 (**
@@ -7113,6 +7115,11 @@ begin
           ErrorAndSeekToken(strLiteralExpected, ';', strSeekableOnErrorTokens, stActual, Self);
       If Not (M.MethodType In PermissibleMethods) Then
         AddIssue(strMethodNotPermitted, AScope, M.Line, M.Column, etError, Self);
+      If Cls Is TInterfaceDecl Then
+        Begin
+          MetricMissingConstInParamList(M);
+          MetricsLongParameterList(M);
+        End;
     End Else
       If boolClassMethod Then
         PopTokenPosition;

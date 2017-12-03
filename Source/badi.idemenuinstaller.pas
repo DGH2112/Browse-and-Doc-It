@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    29 Oct 2017
+  @Date    03 Dec 2017
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -62,6 +62,7 @@ Type
     Procedure ProfilingClick(Sender: TObject);
     Procedure OptionsClick(Sender: TObject);
     Procedure ModuleExplorerClick(Sender: TObject);
+    Procedure StatisticsClick(Sender : TObject);
     Procedure CreateBADIMainMenu;
     Procedure RemoveActionsFromToolbars;
     Function  AddImagesToIDE : Integer;
@@ -107,7 +108,8 @@ Uses
   ComCtrls,
   BADI.Constants, 
   BADI.Base.Documentation, 
-  BADI.Refactor.Constant;
+  BADI.Refactor.Constant, 
+  BADI.Module.Statistics;
 
 ResourceString
   (** This is a resource message to confirm whether the selected text should be
@@ -232,6 +234,8 @@ Begin
   CreateMenuItem(FBADIMenu, bmSep2, Nil, Nil, 0);
   Inc(iImageIndex);
   CreateMenuItem(FBADIMenu, bmRefactorConstant, RefactorConstantClick, Nil, iImageIndex);
+  Inc(iImageIndex);
+  CreateMenuItem(FBADIMenu, bmBADIStatistics, StatisticsClick, Nil, iImageIndex);
   CreateMenuItem(FBADIMenu, bmSep3, Nil, Nil, 0);
   Inc(iImageIndex);
   CreateMenuItem(FBADIMenu, bmOptions, OptionsClick, Nil, iImageIndex);
@@ -1603,6 +1607,22 @@ Begin
             End;
         End;
     End;
+End;
+
+(**
+
+  This method displays the module statistics for the currentl visible module.
+
+  @precon  None.
+  @postcon The modulel statistics are displays with the current modules information.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBADIIDEMenuInstaller.StatisticsClick(Sender: TObject);
+
+Begin
+  TBADIModuleStatistics.CreateEditorView(ActiveSourceEditor) 
 End;
 
 (**

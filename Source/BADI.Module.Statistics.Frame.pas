@@ -400,7 +400,7 @@ End;
 Procedure TframeBADIModuleStatistics.tmFocusTimerTimer(Sender: TObject);
 
 Begin
-  If Visible And vstStatistics.Visible Then
+  If Assigned(Parent) And Visible And Assigned(vstStatistics.Parent) And vstStatistics.Visible Then
     Begin
       vstStatistics.SetFocus;
       tmFocusTimer.Enabled := False;

@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    23 Nov 2017
+  @Date    03 Dec 2017
   @Version 1.0
 
 **)
@@ -64,7 +64,8 @@ Uses
   {$ENDIF}
   BADI.DockableModuleExplorer,
   BADI.Constants, 
-  BADI.Module.Statistics;
+  BADI.Module.Statistics, 
+  BADI.Module.Statistics.SubView;
 
 (**
 
@@ -91,6 +92,7 @@ Begin
   FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FEditorNotifier);
   FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
   RegisterStatisticsEditorView;
+  RegisterEditorMetricsSubView;
 End;
 
 (**
@@ -104,6 +106,7 @@ End;
 Destructor TBrowseAndDocItWizard.Destroy;
 
 Begin
+  UnregisterEditorMetricsSubView;
   UnregisterStatisticsEditorView;
   FBADIIDEOptionsInstaller.Free;
   {$IFDEF D2005}

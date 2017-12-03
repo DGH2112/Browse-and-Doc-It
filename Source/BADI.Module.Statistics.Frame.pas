@@ -125,6 +125,14 @@ Type
     Property OverLimit : Integer Read FOverLimit;
   End;
 
+Const
+  (** A constant to define a light green colour for the columns if an item is under the limit. **)
+  iLightGreen = $80FF80;
+  (** A constant to define a light amber colour for the columns if an item is at the limit. **)
+  iLightRed = $8080FF;
+  (** A constant to define a light red colour for the columns if an item is over the limit. **)
+  iLightAmber = $80CCFF;
+
 Implementation
 
 Uses
@@ -500,11 +508,6 @@ Procedure TframeBADIModuleStatistics.vstStatisticsBeforeCellPaint(Sender: TBaseV
 
   **)
   Function Colour(Const dblValue, dblLimit : Double) : TColor;
-
-  Const
-    iLightGreen = $80FF80;
-    iLightRed = $8080FF;
-    iLightAmber = $80CCFF;
 
   Var
     dblRatio: Double;

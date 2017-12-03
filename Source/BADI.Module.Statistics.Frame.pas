@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    25 Nov 2017
+  @Date    03 Dec 2017
   
 **)
 Unit BADI.Module.Statistics.Frame;
@@ -27,6 +27,15 @@ Uses
   ImgList, Vcl.ExtCtrls;
 
 Type
+  (** A record type to hold the return information from recursing nodes. **)
+  TNodeResultRecord = Record
+    FNode       : PVirtualNode;
+    FChildCount : Integer;
+  End;
+
+  (** An enumerate to define the type of information stored in each node - used for counting later. **)
+  TBADINodeType = (ntUnkown, ntModule, ntMethod);
+
   (** A frame to display a modules methods and their metrics. **)
   TframeBADIModuleStatistics = Class(TFrame)
     vstStatistics: TVirtualStringTree;
@@ -40,10 +49,15 @@ Type
     Procedure vstStatisticsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean; Var ImageIndex: Integer);
     procedure tmFocusTimerTimer(Sender: TObject);
+    procedure vstStatisticsCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
+      Column: TColumnIndex; var Result: Integer);
+    procedure vstStatisticsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas;
+      Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
     Type
       (** A record to describe the data to be held in a tree node. **)
       TBADIStatisticsRecord = Record
+        FNodeType               : TBADINodeType;
         FText                   : String;
         FImageIndex             : Integer;
         FMethodLength           : Double;
@@ -56,13 +70,59 @@ Type
       (** A pointer to the above record. **)
       PBADIStatisticsRecord = ^TBADIStatisticsRecord;
   Strict Private
-    FLimits : TBADIStatisticsRecord;
+    FLimits      : TBADIStatisticsRecord;
+    FFileName    : String;
+    FModuleCount : Integer;
+    FMethodCount : Integer;
+    FUnderLimit  : Integer;
+    FAtLimit     : Integer;
+    FOverLimit   : Integer;
   Strict Protected
-    Function RecurseContainer(Const Container: TElementContainer; Const Parent: PVirtualNode) : Integer;
+    Function RecurseContainer(Const Container: TElementContainer;
+      Const Parent: PVirtualNode) : TNodeResultRecord;
+    Procedure UpdateStats;
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent); Override;
+    Destructor Destroy; Override;
     Procedure RenderModule(Const Module : TBaseLanguageModule);
+    Procedure CopyToClipboard;
+  Published
+    (**
+      This property returns the number of modules.
+      @precon  None.
+      @postcon Returns the number of modules.
+      @return  an Integer
+    **)
+    Property ModuleCount : Integer Read FModuleCount;
+    (**
+      This property returns the number of methods.
+      @precon  None.
+      @postcon Returns the number of methods.
+      @return  an Integer
+    **)
+    Property MethodCount : Integer Read FMethodCount;
+    (**
+      This property returns the number of method metrics which are under the limit.
+      @precon  None.
+      @postcon Returns the number of method metrics which are under the limit.
+      @return  an Integer
+    **)
+    Property UnderLimit : Integer Read FUnderLimit;
+    (**
+      This property returns the number of method metrics which are at the limit.
+      @precon  None.
+      @postcon Returns the number of method metrics which are at the limit.
+      @return  an Integer
+    **)
+    Property AtLimit : Integer Read FAtLimit;
+    (**
+      This property returns the number of method metrics which are over the limit.
+      @precon  None.
+      @postcon Returns the number of method metrics which are over the limit.
+      @return  an Integer
+    **)
+    Property OverLimit : Integer Read FOverLimit;
   End;
 
 Implementation
@@ -75,7 +135,8 @@ Uses
   BADI.ResourceStrings, 
   BADI.Options, 
   BADI.Types, 
-  BADI.Functions;
+  BADI.Functions,
+  ClipBrd;
 
 {$R *.dfm}
 
@@ -84,7 +145,94 @@ Type
   TBADIMetricColumns = (mcText, mcLength, mcParameters, mcVariables, mcNestIFDepth,
     mcCyclometricComplexity, mcToxicity);
 
+Const
+  (** A low threshold for the metrics. **)
+  dblLowThreshold = 0.95;
+  (** A High threshold for the metrics. **)
+  dblHighThreshold = 1.05;
+
+(**
+
+  This method copies the treeview information to the clipboard.
+
+  @precon  None.
+  @postcon The treeview information is copied to the clipboard.
+
+**)
+Procedure TframeBADIModuleStatistics.CopyToClipboard;
+
+  (**
+
+    This method counts the number of parent nodes to the given node.
+
+    @precon  Node must be a valid instance or Nil.
+    @postcon Returns the number of parent nodes to the given node.
+
+    @param   Node as a PVirtualNode as a constant
+    @return  an Integer
+
+  **)
+  Function ParentCount(Const Node : PVirtualNode) : Integer;
+
+  Var
+    P: PVirtualNode;
+
+  Begin
+    Result := 0;
+    P := Node.Parent;
+    While  Assigned(P) Do
+      Begin
+        Inc(Result);
+        P := P.Parent;
+      End;
+  End;
+
+ResourceString
+  strClipboardHeader = 'BADI Statistics for %s'#13#10;
+
+Const
+  iMultipler = 2;
+
+Var
+  CB : TClipBoard;
+  strText : String;
+  strLine : String;
+  Node: PVirtualNode;
+  iColumn: Integer;
   
+Begin
+  CB := TClipboard.Create;
+  Try
+    CB.Open;
+    Try
+      strText := Format(strClipboardHeader, [FFileName]);
+      Node := vstStatistics.GetFirst();
+      While Assigned(Node) Do
+        Begin
+          strLine := '';
+          For iColumn := 0 To vstStatistics.Header.Columns.Count - 1  Do
+            Begin
+              If strLine <> '' Then
+                strLine := strLine + #9;
+              Case iColumn Of
+                0: strLine := strLine + StringOfChar(#32, iMultipler * ParentCount(Node)) +
+                     vstStatistics.Text[Node, iColumn];
+              Else
+                strLine := strLine + vstStatistics.Text[Node, iColumn];
+              End;
+            End;
+            strText := strText + strLine + #13#10;
+          Node := vstStatistics.GetNext(Node);
+        End;
+      CB.SetTextBuf(PWideChar(strText));
+    Finally
+      CB.Close;
+    End;
+  Finally
+    CB.Free;
+  End;
+End;
+
 (**
 
   A constructor for the TframeBADIModuleStatistics class.
@@ -107,7 +255,21 @@ End;
 
 (**
 
-  This method recursively walks the given container rendering its contents in the tree view. If the
+  A destructor for the TframeBADIMOduleStatistics class.
+
+  @precon  None.
+  @postcon Does nothing.
+
+**)
+Destructor TframeBADIModuleStatistics.Destroy;
+
+Begin
+  Inherited Destroy;
+End;
+
+(**
+
+  This method recursively walks the given container rendering its contents in the tree view. If the 
   container is a generic function, metrics are extracted from the method and dislpayed. Any branches with
   out methods are pruned.
 
@@ -116,23 +278,25 @@ End;
 
   @param   Container as a TElementContainer as a constant
   @param   Parent    as a PVirtualNode as a constant
-  @return  an Integer
+  @return  a TNodeResultRecord
 
 **)
 Function TframeBADIModuleStatistics.RecurseContainer(Const Container: TElementContainer;
-  Const Parent: PVirtualNode) : Integer;
+  Const Parent: PVirtualNode) : TNodeResultRecord;
 
 Var
-  Node : PVirtualNode;
   NodeData : PBADIStatisticsRecord;
   iElement: Integer;
   M: TGenericFunction;
   E : TElementContainer;
   
 Begin
-  Result := 0;
-  Node := vstStatistics.AddChild(Parent);
-  NodeData := vstStatistics.GetNodeData(Node);
+  Result.FChildCount := 0;
+  Result.FNode := vstStatistics.AddChild(Parent);
+  NodeData := vstStatistics.GetNodeData(Result.FNode);
+  NodeData.FNodeType := ntUnkown;
+  If Not Assigned(Container.Parent) Then
+    NodeData.FNodeType := ntModule;
   NodeData.FText := Container.AsString(True, False);
   NodeData.FImageIndex := BADIImageIndex(Container.ImageIndex, Container.Scope);
   If Container Is TGenericFunction Then
@@ -140,6 +304,7 @@ Begin
       M := Container As TGenericFunction;
       If Not M.IsDeclarationOnly Then
         Begin
+          NodeData.FNodeType := ntMethod;
           NodeData.FMethodLength := M.LineofCode;
           NodeData.FParameterCount := M.ParameterCount;
           E := M.FindElement(strVarsLabel);
@@ -148,13 +313,16 @@ Begin
           NodeData.FNestedIFDepth := M.NestedIFDepth;
           NodeData.FCyclometricComplexity := M.CyclometricComplexity;
           NodeData.FToxicity := M.Toxicity;
-          Inc(Result);
+          Inc(Result.FChildCount);
         End;
     End;
   For iElement := 1 To Container.ElementCount Do
-    Inc(Result, RecurseContainer(Container.Elements[iElement], Node));
-  If Result = 0 Then
-    vstStatistics.DeleteNode(Node);
+    Inc(Result.FChildCount, RecurseContainer(Container.Elements[iElement], Result.FNode).FChildCount);
+  If Result.FChildCount = 0 Then
+    Begin
+      vstStatistics.DeleteNode(Result.FNode);
+      Result.FNode := Nil;
+    End;
 End;
 
 (**
@@ -169,6 +337,10 @@ End;
 **)
 Procedure TframeBADIModuleStatistics.RenderModule(Const Module: TBaseLanguageModule);
 
+Var
+  Node: PVirtualNode;
+  NodeResult: TNodeResultRecord;
+
 Begin
   FLimits.FMethodLength := TBADIOptions.BADIOptions.ModuleMetric[mmLongMethods].FLimit;
   FLimits.FParameterCount := TBADIOptions.BADIOptions.ModuleMetric[mmLongParameterLists].FLimit;
@@ -177,18 +349,32 @@ Begin
   FLimits.FCyclometricComplexity :=
     TBADIOptions.BADIOptions.ModuleMetric[mmMethodCyclometricComplexity].FLimit;
   FLimits.FToxicity := TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity].FLimit;
-  vstStatistics.BeginUpdate;
-  Try
-    vstStatistics.Clear;
-    RecurseContainer(Module, Nil);
-    vstStatistics.FullExpand();
-  Finally
-    vstStatistics.EndUpdate;
-  End;
-  // Focus first node.
-//  vstStatistics.FocusedNode := vstStatistics.GetFirst();
-//  If Assigned(vstStatistics.FocusedNode) Then
-//    vstStatistics.Selected[vstStatistics.FocusedNode] := True;
+  If Assigned(Module) Then
+    Begin
+      FFileName := Module.FileName;
+      vstStatistics.BeginUpdate;
+      Try
+        Node := vstStatistics.GetFirstChild(vstStatistics.RootNode);
+        While Assigned(Node) Do
+          Begin
+            If vstStatistics.Text[Node, 0] = Module.AsString(True, False) Then
+              Begin
+                vstStatistics.DeleteNode(Node);
+                Break;
+              End;
+            Node := vstStatistics.GetNextSibling(Node);
+          End;
+        NodeResult := RecurseContainer(Module, Nil);
+        If Assigned(NodeResult.FNode) Then
+          Begin
+            vstStatistics.Sort(NodeResult.FNode, 0, sdAscending);
+            vstStatistics.FullExpand(NodeResult.FNode);
+          End;
+      Finally
+        vstStatistics.EndUpdate;
+      End;
+    End;
+  UpdateStats;
   tmFocusTimer.Enabled := True;
 End;
 
@@ -210,6 +396,73 @@ Begin
     Begin
       vstStatistics.SetFocus;
       tmFocusTimer.Enabled := False;
+    End;
+End;
+
+(**
+
+  This method updates the module count, method count and under, at and over limits counts.
+
+  @precon  None.
+  @postcon The counts are updated.
+
+**)
+Procedure TframeBADIModuleStatistics.UpdateStats;
+
+  (**
+
+    This procedure updates the FUnderLimit, FAtLimit or FOverLimit fields depending upon the value
+    of the metric compared to the limit.
+
+    @precon  None.
+    @postcon Updates the FUnderLimit, FAtLimit or FOverLimit fields depending upon the value
+             of the metric compared to the limit.
+
+    @param   dblValue as a Double as a constant
+    @param   dblLimit as a Double as a constant
+
+  **)
+  Procedure Update(Const dblValue, dblLimit : Double);
+
+  Var
+    dblRatio : Double;
+    
+  Begin
+    dblRatio := dblValue /  dblLimit;
+    If dblRatio > 0 Then
+      If dblRatio < dblLowThreshold Then
+        Inc(FUnderLimit)
+      Else If dblRatio > dblHighThreshold Then
+        Inc(FOverLimit)
+      Else 
+        Inc(FAtLimit)
+  End;
+
+Var
+  Node : PVirtualNode;
+  NodeData : PBADIStatisticsRecord;
+
+Begin
+  FModuleCount := 0;
+  FMethodCount := 0;
+  FUnderLimit := 0;
+  FAtLimit := 0;
+  FOverLimit := 0;
+  Node := vstStatistics.GetFirst();
+  While Assigned(Node) Do
+    Begin
+      NodeData := vstStatistics.GetNodeData(Node);
+      Case NodeData.FNodeType Of
+        ntModule: Inc(FModuleCount);  
+        ntMethod: Inc(FMethodCount);  
+      End;
+      Update(NodeData.FMethodLength, FLimits.FMethodLength);
+      Update(NodeData.FParameterCount, FLimits.FParameterCount);
+      Update(NodeData.FVariableCount, FLimits.FVariableCount);
+      Update(NodeData.FNestedIFDepth, FLimits.FNestedIFDepth);
+      Update(NodeData.FCyclometricComplexity, FLimits.FCyclometricComplexity);
+      Update(NodeData.FToxicity, FLimits.FToxicity);
+      Node := vstStatistics.GetNext(Node);
     End;
 End;
 
@@ -252,14 +505,12 @@ Procedure TframeBADIModuleStatistics.vstStatisticsBeforeCellPaint(Sender: TBaseV
     iLightGreen = $80FF80;
     iLightRed = $8080FF;
     iLightAmber = $80CCFF;
-    dblLowThreshold = 0.95;
-    dblHighThreshold = 1.05;
 
   Var
     dblRatio: Double;
 
   Begin
-    Result := clWindow;
+    Result := TargetCanvas.Brush.Color;
     If dblValue > 0 Then
       Begin
         dblRatio := dblValue / dblLimit;
@@ -278,6 +529,8 @@ Var
 Begin
   NodeData := vstStatistics.GetNodeData(Node);
   TargetCanvas.Brush.Color := clWindow;
+  If Not Assigned(Sender.NodeParent[Node]) Then
+    TargetCanvas.Brush.Color := clSkyBlue;
   Case TBADIMetricColumns(Column) Of
     mcLength: TargetCanvas.Brush.Color := Colour(NodeData.FMethodLength, FLimits.FMethodLength);  
     mcParameters: TargetCanvas.Brush.Color := Colour(NodeData.FParameterCount, FLimits.FParameterCount);  
@@ -288,6 +541,27 @@ Begin
     mcToxicity: TargetCanvas.Brush.Color := Colour(NodeData.FToxicity, FLimits.FToxicity);  
   End;
   TargetCanvas.FillRect(CellRect);
+End;
+
+(**
+
+  This is an on compare node event handler for the treeview.
+
+  @precon  None.
+  @postcon Ensures the nodes are sorted.
+
+  @param   Sender as a TBaseVirtualTree
+  @param   Node1  as a PVirtualNode
+  @param   Node2  as a PVirtualNode
+  @param   Column as a TColumnIndex
+  @param   Result as an Integer as a reference
+
+**)
+Procedure TframeBADIModuleStatistics.vstStatisticsCompareNodes(Sender: TBaseVirtualTree; Node1,
+  Node2: PVirtualNode; Column: TColumnIndex; Var Result: Integer);
+
+Begin
+  Result := CompareText(vstStatistics.Text[Node1, 0], vstStatistics.Text[Node2, 0]);
 End;
 
 (**
@@ -364,6 +638,33 @@ Begin
       If NodeData.FToxicity > 0 Then
         CellText := Format('%1.3n', [NodeData.FToxicity]);  
   End;
+End;
+
+(**
+
+  This is an on Paint Text event handler for the treeview.
+
+  @precon  None.
+  @postcon If the node has no parent (i.e. its a root node) then make it bold and blue.
+
+  @param   Sender       as a TBaseVirtualTree
+  @param   TargetCanvas as a TCanvas as a constant
+  @param   Node         as a PVirtualNode
+  @param   Column       as a TColumnIndex
+  @param   TextType     as a TVSTTextType
+
+**)
+Procedure TframeBADIModuleStatistics.vstStatisticsPaintText(Sender: TBaseVirtualTree;
+  Const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+
+Begin
+  TargetCanvas.Font.Style := [];
+  TargetCanvas.Font.Color := clWindowText;
+  If Not Assigned(Sender.NodeParent[Node]) Then
+    Begin
+      TargetCanvas.Font.Style := [fsBold];
+      TargetCanvas.Font.Color := clBlue;
+    End;
 End;
 
 End.

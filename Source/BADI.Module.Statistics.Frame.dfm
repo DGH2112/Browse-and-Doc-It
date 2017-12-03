@@ -11,11 +11,10 @@ object frameBADIModuleStatistics: TframeBADIModuleStatistics
   ParentFont = False
   TabOrder = 0
   object vstStatistics: TVirtualStringTree
-    AlignWithMargins = True
-    Left = 3
-    Top = 3
-    Width = 731
-    Height = 492
+    Left = 0
+    Top = 0
+    Width = 737
+    Height = 498
     Align = alClient
     EmptyListMessage = 'Nothing to see here....'
     Header.AutoSizeIndex = 0
@@ -24,17 +23,20 @@ object frameBADIModuleStatistics: TframeBADIModuleStatistics
     HintAnimation = hatFade
     HintMode = hmTooltip
     Images = ilScopeImages
+    SelectionBlendFactor = 64
     TabOrder = 0
     TreeOptions.MiscOptions = [toFullRepaintOnResize, toGridExtensions, toInitOnSave]
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowRoot, toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages, toGhostedIfUnfocused, toUseBlendedSelection]
-    TreeOptions.SelectionOptions = [toFullRowSelect]
+    TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect]
     OnBeforeCellPaint = vstStatisticsBeforeCellPaint
+    OnCompareNodes = vstStatisticsCompareNodes
     OnGetText = vstStatisticsGetText
+    OnPaintText = vstStatisticsPaintText
     OnGetImageIndex = vstStatisticsGetImageIndex
     Columns = <
       item
         Position = 0
-        Width = 217
+        Width = 223
         WideText = 'Method'
       end
       item

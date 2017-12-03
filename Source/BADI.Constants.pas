@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    23 Nov 2017
+  @Date    03 Dec 2017
 
 **)
 Unit BADI.Constants;
@@ -887,7 +887,7 @@ Const
       FDescription: strFINALIZATIONClauseInModuleEmptyDesc;
       FConflictType: dciItem), // mmEmptyInitialization
     (
-      FCategory: strMissingCONSTInParametersCat;
+      FCategory: strEmptyMethodsCat;
       FMessage: strMethodDoesNotHaveImplementationMsg;
       FDescription: strMethodDoesNotHaveImplementationDesc;
       FConflictType: dciMissing), // mmEmptyMethod

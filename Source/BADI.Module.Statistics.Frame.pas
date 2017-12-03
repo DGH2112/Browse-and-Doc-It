@@ -85,7 +85,7 @@ Type
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent); Override;
     Destructor Destroy; Override;
-    Procedure RenderModule(Const Module : TBaseLanguageModule);
+    Procedure RenderModule(Const Module: TBaseLanguageModule; Const boolClear : Boolean = False);
     Procedure CopyToClipboard;
   Published
     (**
@@ -340,10 +340,12 @@ End;
   @precon  Module must be valid.
   @postcon The modules methods and their metrics are rendered.
 
-  @param   Module as a TBaseLanguageModule as a constant
+  @param   Module    as a TBaseLanguageModule as a constant
+  @param   boolClear as a Boolean as a constant
 
 **)
-Procedure TframeBADIModuleStatistics.RenderModule(Const Module: TBaseLanguageModule);
+Procedure TframeBADIModuleStatistics.RenderModule(Const Module: TBaseLanguageModule;
+  Const boolClear : Boolean = False);
 
 Var
   Node: PVirtualNode;
@@ -362,15 +364,20 @@ Begin
       FFileName := Module.FileName;
       vstStatistics.BeginUpdate;
       Try
-        Node := vstStatistics.GetFirstChild(vstStatistics.RootNode);
-        While Assigned(Node) Do
+        If boolClear Then
+          vstStatistics.Clear
+        Else
           Begin
-            If vstStatistics.Text[Node, 0] = Module.AsString(True, False) Then
+            Node := vstStatistics.GetFirstChild(vstStatistics.RootNode);
+            While Assigned(Node) Do
               Begin
-                vstStatistics.DeleteNode(Node);
-                Break;
+                If vstStatistics.Text[Node, 0] = Module.AsString(True, False) Then
+                  Begin
+                    vstStatistics.DeleteNode(Node);
+                    Break;
+                  End;
+                Node := vstStatistics.GetNextSibling(Node);
               End;
-            Node := vstStatistics.GetNextSibling(Node);
           End;
         NodeResult := RecurseContainer(Module, Nil);
         If Assigned(NodeResult.FNode) Then

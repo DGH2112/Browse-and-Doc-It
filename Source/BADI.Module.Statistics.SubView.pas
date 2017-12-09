@@ -58,7 +58,8 @@ Uses
   BADI.ToolsAPIUtils, 
   BADI.Module.Dispatcher, 
   BADI.Base.Module, 
-  BADI.Types;
+  BADI.Types, 
+  BADI.Module.Statistics.Frame;
 
 Var
   (** A private pointer to the regsitered subview so it can be removed. **)
@@ -182,7 +183,8 @@ Begin
           Module := TBADIDispatcher.BADIDispatcher.Dispatcher(strSource, SE.FileName, SE.Modified,
             [moParse]);
           Try
-            (AViewObject As TframeBADIModuleStatisticsSubView).RenderModule(Module, True);
+            (AViewObject As TframeBADIModuleStatisticsSubView).RenderModule(Module, [sroClear,
+              sroAutoExpand]);
           Finally
             Module.Free;
           End;

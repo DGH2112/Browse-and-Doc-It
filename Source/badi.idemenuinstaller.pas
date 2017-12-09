@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Dec 2017
+  @Date    09 Dec 2017
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -1622,7 +1622,7 @@ End;
 Procedure TBADIIDEMenuInstaller.StatisticsClick(Sender: TObject);
 
 Begin
-  TBADIModuleStatistics.CreateEditorView(ActiveSourceEditor) 
+  TBADIModuleStatistics.CreateEditorView; 
 End;
 
 (**

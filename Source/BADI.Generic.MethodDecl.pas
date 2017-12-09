@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Oct 2017
+  @Date    09 Dec 2017
 
 **)
 Unit BADI.Generic.MethodDecl;
@@ -40,8 +40,8 @@ Type
     Procedure CheckMethodParameters;
     Procedure CheckMethodReturns;
   Public
-    Constructor Create(MethodType: TMethodType; const strName: String; AScope: TScope;
-      iLine, iCol: Integer); ReIntroduce; Virtual;
+    Constructor Create(Const MethodType: TMethodType; const strName: String; Const AScope: TScope;
+      Const iLine, iCol: Integer); ReIntroduce; Virtual;
     Destructor Destroy; Override;
     Procedure CheckDocumentation(Var boolCascade: Boolean); Override;
     (**
@@ -355,24 +355,24 @@ End;
 
 (**
 
-  This is the constructor for the TMethodDecl class. It initialises the method
-  type, scope and line and col information. If also creates a colection to
-  store the parameter objects and a string list for the method directives.
+  This is the constructor for the TMethodDecl class. It initialises the method type, scope and line and 
+  col information. If also creates a colection to store the parameter objects and a string list for the 
+  method directives.
 
-  @precon  MethodType is an enumerate indocating the type of the method, Scope
-           is the scope of the method, iLine is the line number of the method,
-           and iCol is the column number of the method.
+  @precon  MethodType is an enumerate indocating the type of the method, Scope is the scope of the 
+           method, iLine is the line number of the method, and iCol is the column number of the method
+           .
   @postcon It initialises the method type, scope and line and col information.
 
-  @param   MethodType as a TMethodType
+  @param   MethodType as a TMethodType as a constant
   @param   strName    as a String as a constant
-  @param   AScope     as a TScope
-  @param   iLine      as an Integer
-  @param   iCol       as an Integer
+  @param   AScope     as a TScope as a constant
+  @param   iLine      as an Integer as a constant
+  @param   iCol       as an Integer as a constant
 
 **)
-Constructor TGenericMethodDecl.Create(MethodType: TMethodType; const strName: String; AScope: TScope;
-  iLine, iCol: Integer);
+Constructor TGenericMethodDecl.Create(Const MethodType: TMethodType; const strName: String;
+  Const AScope: TScope; Const iLine, iCol: Integer);
 
 Var
   AImageIndex: TBADIImageIndex;
@@ -475,7 +475,7 @@ End;
 Function TGenericMethodDecl.RequiresReturn: Boolean;
 
 Begin
-  Result := MethodType = mtFunction;
+  Result := MethodType In [mtFunction, mtOperator];
 End;
 
 (**

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Dec 2017
+  @Date    09 Dec 2017
   
 **)
 Unit BADI.Module.Statistics.SubView;
@@ -15,30 +15,33 @@ Uses
   ToolsAPI,
   StdActns,
   DesignIntf,
-  Forms, 
+  Forms,
+  Generics.Collections, 
   BADI.Module.Statistics.SubView.Frame;
 
 Type
   (** A class to implement the INTACustomEditorSubView interface for a subview for metrics. **)
   TBADIModuleStatisticsSubView = Class(TInterfacedObject, INTACustomEditorSubView)
   Strict Private
-    FFrame: TframeBADIModuleStatisticsSubView;
   Strict Protected
     // INTACustomEditorSubView
     Procedure Display(Const AContext: IInterface; AViewObject: TObject);
-    Function EditAction(Const AContext: IInterface; Action: TEditAction; AViewObject: TObject): Boolean;
+    Function  EditAction(Const AContext: IInterface; Action: TEditAction; AViewObject: TObject): Boolean;
     Procedure FrameCreated(AFrame: TCustomFrame);
-    Function GetCanCloneView: Boolean;
-    Function GetCaption: String;
-    Function GetEditState(Const AContext: IInterface; AViewObject: TObject): TEditState;
-    Function GetFrameClass: TCustomFrameClass;
-    Function GetPriority: Integer;
-    Function GetViewIdentifier: String;
-    Function Handles(Const AContext: IInterface): Boolean;
+    Function  GetCanCloneView: Boolean;
+    Function  GetCaption: String;
+    Function  GetEditState(Const AContext: IInterface; AViewObject: TObject): TEditState;
+    Function  GetFrameClass: TCustomFrameClass;
+    Function  GetPriority: Integer;
+    Function  GetViewIdentifier: String;
+    Function  Handles(Const AContext: IInterface): Boolean;
     Procedure Hide(Const AContext: IInterface; AViewObject: TObject);
     Procedure ViewClosed(Const AContext: IInterface; AViewObject: TObject);
+    // General Methods
   Public
     Class Function CreateEditorMetricsSubView : INTACustomEditorSubView;
+    Constructor Create;
+    Destructor Destroy; Override;
   End;
 
   Procedure RegisterEditorMetricsSubView;
@@ -50,7 +53,8 @@ Uses
   {$IFDEF DEBUG}
   CodeSiteLogging,
   {$ENDIF}
-  SysUtils, 
+  SysUtils,
+  Controls, 
   BADI.ToolsAPIUtils, 
   BADI.Module.Dispatcher, 
   BADI.Base.Module, 
@@ -101,6 +105,21 @@ End;
 
 (**
 
+  A constructor for the TBADIModuleStatisticsSubView class.
+
+  @precon  None.
+  @postcon Does nothing.
+
+  @nometric EmptyMethod - was being used for CodeSite tracing.
+
+**)
+Constructor TBADIModuleStatisticsSubView.Create;
+
+Begin
+End;
+
+(**
+
   This is a class function to create the custom editor subview for displaying module metric information.
 
   @precon  None.
@@ -113,6 +132,20 @@ Class Function TBADIModuleStatisticsSubView.CreateEditorMetricsSubView: INTACust
 
 Begin
   Result := TBADIModuleStatisticsSubView.Create;
+End;
+
+(**
+
+  A destructor for the TBADIModuleStatisticsSubView class.
+
+  @precon  None.
+  @postcon Does nothing.
+
+**)
+Destructor TBADIModuleStatisticsSubView.Destroy;
+
+Begin
+  Inherited Destroy;
 End;
 
 (**
@@ -149,7 +182,7 @@ Begin
           Module := TBADIDispatcher.BADIDispatcher.Dispatcher(strSource, SE.FileName, SE.Modified,
             [moParse]);
           Try
-            FFrame.RenderModule(Module, True);
+            (AViewObject As TframeBADIModuleStatisticsSubView).RenderModule(Module, True);
           Finally
             Module.Free;
           End;
@@ -181,7 +214,7 @@ Begin
   Case Action Of
     eaCopy:
       Begin
-        FFrame.CopyToClipboard;
+        (AViewObject As TframeBADIModuleStatisticsSubView).CopyToClipboard;
         REsult := True;
       End;
   End;
@@ -194,7 +227,8 @@ End;
   @precon  None.
   @postcon Store a reference to the frame instance so it can be used later in Display.
 
-  @nometric MissingCONSTInParam
+  @nometric MissingCONSTInParam EmptyMethod
+  @nohint
 
   @param   AFrame as a TCustomFrame
 
@@ -202,7 +236,6 @@ End;
 Procedure TBADIModuleStatisticsSubView.FrameCreated(AFrame: TCustomFrame);
 
 Begin
-  FFrame := AFrame As TframeBADIModuleStatisticsSubView;
 End;
 
 (**
@@ -382,5 +415,3 @@ Begin
 End;
 
 End.
-
-

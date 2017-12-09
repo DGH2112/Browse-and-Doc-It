@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       26 Nov 2017
+  @Date       09 Dec 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -1678,8 +1678,9 @@ Begin
           Exit;
       For iParam := 0 To Method.ParameterCount - 1 Do
         If Method.Parameters[iParam].ParamModifier = pamNone Then
-          AddModuleMetric([Method.Parameters[Method.ParameterCount - 1].Identifier,
-            Method.QualifiedName], Method.Line, Method.Column, Method, mmMissingCONSTInParemterList);
+          AddModuleMetric([Method.Parameters[iParam].Identifier,
+            Method.QualifiedName], Method.Parameters[iParam].Line, Method.Parameters[iParam].Column,
+            Method, mmMissingCONSTInParemterList);
     End;
 End;
 

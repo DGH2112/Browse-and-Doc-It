@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Oct 2017
+  @Date    10 Dec 2017
 
 **)
 Unit BADI.Pascal.MethodDecl;
@@ -34,9 +34,8 @@ Type
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetName : String; Override;
   Public
-    //: @nometric MissingCONSTInParam
-    Constructor Create(MethodType : TMethodType; const strName : String; AScope : TScope;
-      iLine, iCol : Integer); Override;
+    Constructor Create(Const MethodType : TMethodType; Const strName : String; Const AScope : TScope;
+      Const iLine, iCol : Integer); Override;
     Destructor Destroy; Override;
     Procedure AddDirectives(Const strDirective : String);
     Function HasDirective(Const strDirective : String) : Boolean;
@@ -180,28 +179,29 @@ end;
   @precon  None.
   @postcon Initialises the class and creates a string list for the directives.
 
-  @nometric MissingCONSTInParam
-  
-  @param   MethodType as a TMethodType
+  @nometricMissingCONSTInParam
+
+  @param   MethodType as a TMethodType as a constant
   @param   strName    as a String as a constant
-  @param   AScope     as a TScope
-  @param   iLine      as an Integer
-  @param   iCol       as an Integer
+  @param   AScope     as a TScope as a constant
+  @param   iLine      as an Integer as a constant
+  @param   iCol       as an Integer as a constant
 
 **)
-constructor TPascalMethod.Create(MethodType: TMethodType; const strName : String;
-  AScope: TScope; iLine, iCol: Integer);
-begin
+Constructor TPascalMethod.Create(Const MethodType : TMethodType; Const strName : String;
+  Const AScope : TScope; Const iLine, iCol : Integer);
+
+Begin
   Inherited Create(MethodType, strName, AScope, iLine, iCol);
-  FTypesLabel           := Nil;
-  FVariablesLabel       := Nil;
-  FConstantsLabel       := Nil;
+  FTypesLabel := Nil;
+  FVariablesLabel := Nil;
+  FConstantsLabel := Nil;
   FResourceStringsLabel := Nil;
-  FLabelsLabel          := Nil;
-  FDirectives           := TStringList.Create;
-  FResolved             := False;
-  FRecObjClsInt         := Nil;
-end;
+  FLabelsLabel := Nil;
+  FDirectives := TStringList.Create;
+  FResolved := False;
+  FRecObjClsInt := Nil;
+End;
 
 (**
 

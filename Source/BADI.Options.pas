@@ -1,10 +1,10 @@
-(**
+﻿(**
 
   This module contains a class which loads and saves all the application options to an INI file.
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    05 Nov 2017
+  @Date    10 Dec 2017
 
 **)
 Unit BADI.Options;
@@ -15,6 +15,7 @@ Uses
   Classes,
   Graphics,
   Generics.Collections,
+  IniFiles,
   BADI.Types;
 
 {$INCLUDE CompilerDefinitions.inc}
@@ -52,6 +53,8 @@ Type
     FIssueLimits            : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
     FBADIMenuShortCuts      : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
     FModuleMetrics          : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord;
+    FLowMetricMargin        : Double;
+    FHighMetricMargin       : Double;
     FRefactorConstNewLine   : Boolean;
   Strict Protected
     Function  GetTokenFontInfo(Const ATokenType  : TBADITokenType) : TTokenFontInfo;
@@ -66,6 +69,26 @@ Type
     Function  GetModulelMetric(Const ModuleMetric: TBADIModuleMetric): TBADIMetricRecord;
     Procedure SetModuleMetric(Const ModuleMetric: TBADIModuleMetric;
       Const Value: TBADIMetricRecord);
+    Procedure LoadDocOptions(Const iniFile: TMemIniFile);
+    Procedure LoadSpecialTags(Const iniFile: TMemIniFile);
+    Procedure LoadManagedNodes(Const iniFile: TMemIniFile);
+    Procedure LoadModuleExplorerOptions(Const iniFile: TMemIniFile);
+    Procedure LoadMethodDescriptions(Const iniFile: TMemIniFile);
+    Procedure LoadProfilingOptions(Const iniFile: TMemIniFile);
+    Procedure LoadLimits(Const iniFile: TMemIniFile);
+    Procedure LoadShortcuts(Const iniFile: TMemIniFile);
+    Procedure LoadExtensions(Const iniFile: TMemIniFile);
+    Procedure LoadMetrics(Const iniFile: TMemIniFile);
+    Procedure SaveDocOptions(Const iniFile: TMemIniFile);
+    Procedure SaveSpecialTags(Const iniFile: TMemIniFile);
+    Procedure SaveManagedNodes(Const iniFile: TMemIniFile);
+    Procedure SaveModuleExplorerOptions(Const iniFile: TMemIniFile);
+    Procedure SaveMethodDescrpitions(Const iniFile: TMemIniFile);
+    Procedure SaveProfilingOptions(Const iniFile: TMemIniFile);
+    Procedure SaveLimits(Const iniFile: TMemIniFile);
+    Procedure SaveShortcuts(Const iniFile: TMemIniFile);
+    Procedure SaveExtensions(Const iniFile: TMemIniFile);
+    Procedure SaveMetrics(Const iniFile: TMemIniFile);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -270,6 +293,20 @@ Type
     Property ModuleMetric[Const ModuleMetric : TBADIModuleMetric] : TBADIMetricRecord
       Read GetModulelMetric Write SetModuleMetric;
     (**
+      A property to define the lower limit margin for metrics in the metrics views.
+      @precon  None.
+      @postcon Returns the lower margin limit for a metric (a percentage).
+      @return  a Double
+    **)
+    Property LowMetricMargin : Double Read FLowMetricMargin Write FLowMetricMargin;
+    (**
+      A property to define the upper limit margin for metrics in the metrics views.
+      @precon  None.
+      @postcon Returns the upper margin limit for a metric (a percentage).
+      @return  a Double
+    **)
+    Property HighMetricMargin : Double Read FHighMetricMargin Write FHighMetricMargin;
+    (**
       A property to determine of a constant refactoring should have a new line between declaration
       sections.
       @precon  None.
@@ -284,9 +321,102 @@ Implementation
 Uses
   SysUtils,
   BADI.Constants,
-  IniFiles,
   BADI.Module.Dispatcher,
   BADI.Functions;
+
+Const
+  (** An INI section name for the special tag names. **)
+  strSpecialTagNames = 'SpecialTagNames';
+  (** An INI section name for the special tag informtion. **)
+  strSpecialTags = 'SpecialTags';
+  (** An INI key for special tag font styles. **)
+  strSpecialTagFontStyles = 'SpecialTagFontStyles';
+  (** An INI key for special tag font fore colours. **)
+  strSpecialTagFontForeColours = 'SpecialTagFontForeColours';
+  (** An INI key for special tag font back colours. **)
+  strSpecialTagFontBackColours = 'SpecialTagFontBackColours';
+  (** An ini section name for the managed nodes. **)
+  strManagedExpandedNodes = 'ManagedExpandedNodes';
+  (** An ini section name for the documentation options. **)
+  strDocOptions = 'Options';
+  (** An ini section name for the modules options. **)
+  strModuleExplorer = 'ModuleExplorer';
+  (** An ini key for the update interval **)
+  strUpdateInterval = 'UpdateInterval';
+  (** An ini key for the Scopes to render in the explorer **)
+  strScopesToRender = 'ScopesToRender';
+  (** An ini section name for general settings. **)
+  strSetup = 'Setup';
+  (** An ini key for the browse position **)
+  strBrowsePosition = 'BrowsePosition';
+  (** An ini key for the proportional font name **)
+  strFontName = 'Name';
+  (** An ini key for the proportional font size **)
+  strFontSize = 'Size';
+  (** An ini key for the fixed font name **)
+  strFixedFontName = 'FixedName';
+  (** An ini key for the fixed font size **)
+  strFixedFontSize = 'FixedSize';
+  (** An ini key for the token font information **)
+  strTokenFontInfo = 'TokenFontInfo';
+  (** An ini key for the token font colour **)
+  strFontColour = '%s.Colour';
+  (** An ini key for the token font style **)
+  strFontStyles = '%s.Styles';
+  (** An ini key for the token font back colour **)
+  strFontBackColour = '%s.BackColour';
+  (** An ini section name for the method descriptions. **)
+  strMethodDescriptions = 'MethodDescriptions';
+  (** An ini section name for the excluded documentation files. **)
+  strExcludeDocFiles = 'ExcludeDocFiles';
+  (**  An ini section name for documentation options. **)
+  strDocumentation = 'Documentation';
+  (** An ini key for the module explorer background colour **)
+  strBGColour = 'BGColour';
+  (** An ini key for token limit **)
+  strTokenLimit = 'TokenLimit';
+  (** An ini key for max documentation output width **)
+  strMaxDocOutputWidth = 'MaxDocOutputWidth';
+  (** An ini key for managed node life in days **)
+  strManagedNodesLife = 'ManagedNodesLife';
+  (** An ini key for explorer tree colour. **)
+  strTreeColour = 'TreeColour';
+  (** An ini key for scopes **)
+  strScopes = 'Scopes';
+  (** An ini section name for the profiling options **)
+  strProfilingCode = 'ProfilingCode';
+  (** An ini key for issue limits **)
+  strIssuesLimits = 'Issues Limits';
+  (** An ini key for errors **)
+  strErrors = 'Errors';
+  (** An ini key for warnings **)
+  strWarnings = 'Warnings';
+  (** An ini key for hints **)
+  strHints = 'Hints';
+  (** An ini key for conflicts **)
+  strConflicts = 'Conflicts';
+  (** An ini key for metrics **)
+  strMetrics = 'Metrics';
+  (** An ini section name for the module metrics **)
+  strModuleMetrics = 'Module Metrics';
+  (** An ini key for enabled metrics **)
+  strEnabled = '.Enabled';
+  (** An ini key for metrics limits **)
+  strLimit = '.Limit';
+  (** An ini section name for the metrics margins **)
+  strMetricMargins = 'MetricMargins';
+  (** An ini key for the low metric margin. **)
+  strLowMargin = 'LowMargin';
+  (** An ini key for the high metric margin. **)
+  strHighMargin = 'HighMargin';
+  (** An ini section name for the module extensions **)
+  strModuleExtensions = 'ModuleExtensions';
+  (** An ini section name for the refactorings **)
+  strRefactorings = 'Refactorings';
+  (** An ini key for new lines in refactoring. **)
+  strNewLine = 'NewLine';
+  (** An ini section name for the shortcuts **)
+  strBADIMenuShortcuts = 'BADIMenuShortcuts';
 
 (**
 
@@ -316,26 +446,46 @@ End;
 **)
 Constructor TBADIOptions.Create;
 
+Type
+  TDefaultSpecialTag = Record
+    FTagName : String;
+    FTagDesc : String;
+    FTagOps  : TBADITagProperties;
+  End;
+  
+Const
+  DefaultSpecialTags : Array[0..14] Of TDefaultSpecialTag = (
+    (FTagName: 'todo';      FTagDesc: 'Things To Do';           FTagOps: [tpShowInTree..tpShowInDoc]),
+    (FTagName: 'precon';    FTagDesc: 'Pre-Conditions';         FTagOps: []),
+    (FTagName: 'postcon';   FTagDesc: 'Post-Conditions';        FTagOps: []),
+    (FTagName: 'param';     FTagDesc: 'Parameters';             FTagOps: []),
+    (FTagName: 'return';    FTagDesc: 'Returns';                FTagOps: []),
+    (FTagName: 'note';      FTagDesc: 'Notes';                  FTagOps: []),
+    (FTagName: 'see';       FTagDesc: 'Also See';               FTagOps: []),
+    (FTagName: 'exception'; FTagDesc: 'Exception Raised';       FTagOps: []),
+    (FTagName: 'bug';       FTagDesc: 'Known Bugs';             FTagOps: [tpShowInTree..tpShowInDoc]),
+    (FTagName: 'debug';     FTagDesc: 'Debugging Code';         FTagOps: [tpShowInTree..tpShowInDoc]),
+    (FTagName: 'date';      FTagDesc: 'Date Code Last Updated'; FTagOps: []),
+    (FTagName: 'author';    FTagDesc: 'Code Author';            FTagOps: []),
+    (FTagName: 'version';   FTagDesc: 'Code Version';           FTagOps: []),
+    (FTagName: 'refactor';  FTagDesc: 'Refactorings';           FTagOps: [tpShowInTree..tpShowInDoc]),
+    (FTagName: 'code';      FTagDesc: 'Code Example';           FTagOps: [tpShowInTree..tpFixed])
+  );
+var
+  iTag: Integer;
+
 Begin
   Inherited Create;
   FDefines := TStringList.Create;
   FSpecialTags := TList<TBADISpecialTag>.Create;
   // Create a default set of Special Tags.
-  FSpecialTags.Add(TBADISpecialTag.Create('todo', 'Things To Do', [tpShowInTree..tpShowInDoc]));
-  FSpecialTags.Add(TBADISpecialTag.Create('precon', 'Pre-Conditions', []));
-  FSpecialTags.Add(TBADISpecialTag.Create('postcon', 'Post-Conditions', []));
-  FSpecialTags.Add(TBADISpecialTag.Create('param', 'Parameters', []));
-  FSpecialTags.Add(TBADISpecialTag.Create('return', 'Returns', []));
-  FSpecialTags.Add(TBADISpecialTag.Create('note', 'Notes', []));
-  FSpecialTags.Add(TBADISpecialTag.Create('see', 'Also See', []));
-  FSpecialTags.Add(TBADISpecialTag.Create('exception', 'Exception Raised', []));
-  FSpecialTags.Add(TBADISpecialTag.Create('bug', 'Known Bugs', [tpShowInTree..tpShowInDoc]));
-  FSpecialTags.Add(TBADISpecialTag.Create('debug', 'Debugging Code', [tpShowInTree..tpShowInDoc]));
-  FSpecialTags.Add(TBADISpecialTag.Create('date', 'Date Code Last Updated', []));
-  FSpecialTags.Add(TBADISpecialTag.Create('author', 'Code Author', []));
-  FSpecialTags.Add(TBADISpecialTag.Create('version', 'Code Version', []));
-  FSpecialTags.Add(TBADISpecialTag.Create('refactor', 'Refactorings', [tpShowInTree..tpShowInDoc]));
-  FSpecialTags.Add(TBADISpecialTag.Create('code', 'Code Example', [tpShowInTree..tpFixed]));
+  For iTag := Low(DefaultSpecialTags) To High(DefaultSpecialTags) Do
+    FSpecialTags.Add(
+      TBADISpecialTag.Create(
+        DefaultSpecialTags[iTag].FTagName,
+        DefaultSpecialTags[iTag].FTagDesc,
+        DefaultSpecialTags[iTag].FTagOps)
+      );
   FExpandedNodes := TStringList.Create;
   FExpandedNodes.Sorted := True;
   FExpandedNodes.Duplicates := dupIgnore;
@@ -466,6 +616,251 @@ End;
 
 (**
 
+  This method loads the documentation options.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The documentation options are loaded from the INI file.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadDocOptions(Const iniFile: TMemIniFile);
+
+Var
+  i: TDocOption;
+
+Begin
+  For i := Low(TDocOption) To High(TDocOption) Do
+    If iniFile.ReadBool(strDocOptions, DocOptionInfo[i].FDescription, DocOptionInfo[i].FEnabled) Then
+      FOptions := FOptions + [i]
+    Else
+      FOptions := FOptions - [i];
+End;
+
+(**
+
+  This method loads the file extensions from the INI file that are associated with the parsers.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The exteniions are loaded from the INI file.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadExtensions(Const iniFile: TMemIniFile);
+
+Var
+  iModule: Integer;
+
+Begin
+  For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
+    TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions := iniFile.ReadString(strModuleExtensions,
+      TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
+      TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions);
+End;
+
+(**
+
+  This method loads the limit information from the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The lmit imformation is loaded.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadLimits(Const iniFile: TMemIniFile);
+
+Const
+  iDefaultLimit = 10;
+
+Begin
+  FIssueLimits[ltErrors] := iniFile.ReadInteger(strIssuesLimits, strErrors, iDefaultLimit);
+  FIssueLimits[ltWarnings] := iniFile.ReadInteger(strIssuesLimits, strWarnings, iDefaultLimit);
+  FIssueLimits[ltHints] := iniFile.ReadInteger(strIssuesLimits, strHints, iDefaultLimit);
+  FIssueLimits[ltConflicts] := iniFile.ReadInteger(strIssuesLimits, strConflicts, iDefaultLimit);
+  FIssueLimits[ltMetrics] := iniFile.ReadInteger(strIssuesLimits, strMetrics, iDefaultLimit);
+End;
+
+(**
+
+  This method loads the managed nodes from the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The managed nodes are loaded.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadManagedNodes(Const iniFile: TMemIniFile);
+
+Var
+  iValue: Integer;
+  iNode: Integer;
+  sl : TStringList;
+
+Begin
+  sl := TStringList.Create;
+  Try
+    iniFile.ReadSection(strManagedExpandedNodes, sl);
+    For iNode := 0 To sl.Count - 1 Do
+      Begin
+        iValue := iniFile.ReadInteger(strManagedExpandedNodes, sl[iNode], 0);
+        FExpandedNodes.AddObject(StringReplace(sl[iNode], '|', '=', [rfReplaceAll]), TObject(iValue));
+      End;
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
+  This method loads the method descriptions from the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The method descrpitions are loaded.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadMethodDescriptions(Const iniFile: TMemIniFile);
+
+Var
+  iMethod: Integer;
+  sl : TStringList;
+
+Begin
+  sl := TStringList.Create;
+  Try
+    iniFile.ReadSection(strMethodDescriptions, sl);
+    For iMethod := 0 To sl.Count - 1 Do
+      FMethodDescriptions.Add(Format('%s=%s', [sl[iMethod], iniFile.ReadString(strMethodDescriptions,
+        sl[iMethod], '')]));
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
+  This method loads the module metrics from the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The metrics are loaded fromt the INI file.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadMetrics(Const iniFile: TMemIniFile);
+
+Const
+  iDefaultLowLimit = 95;
+  iDefaultHighLimit = 105;
+
+Var
+  eMetric: TBADIModuleMetric;
+
+Begin
+  For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
+    Begin
+      FModuleMetrics[eMetric].FEnabled := iniFile.ReadBool(strModuleMetrics,
+        DefaultModuleMetrics[eMetric].FName + strEnabled, DefaultModuleMetrics[eMetric].FEnabled);
+      FModuleMetrics[eMetric].FLimit := iniFile.ReadFloat(strModuleMetrics,
+        DefaultModuleMetrics[eMetric].FName + strLimit, DefaultModuleMetrics[eMetric].FLimit);
+    End;
+  FLowMetricMargin := iniFile.ReadInteger(strMetricMargins, strLowMargin, iDefaultLowLimit);
+  FHighMetricMargin := iniFile.ReadInteger(strMetricMargins, strHighMargin, iDefaultHighLimit);
+End;
+
+(**
+
+  This method loads the module explorer options from the INI file.
+
+  @precon  iniFIle must be a valid instance.
+  @postcon The module explorer options are loaded from the INI file.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadModuleExplorerOptions(Const iniFile: TMemIniFile);
+
+Const
+  iDefaultUpdateInterval = 1000;
+  iDefaultFontSize = 10;
+  iDefaultTokenLimit = 50;
+  iDefaultMaxDocumentationWidth = 80;
+  iDefaultNodeLifeInDays = 90;
+  strDefaultProportionalFontName = 'Tahoma';
+  strDefaultFixedFontName = 'Courier New';
+  strFDefaultTreeColour = 'clGray';
+
+Var
+  T: TBADITokenType;
+
+Begin
+  FUpdateInterval := iniFile.ReadInteger(strModuleExplorer, strUpdateInterval, iDefaultUpdateInterval);
+  FScopesToRender := TScopes(Byte(iniFile.ReadInteger(strModuleExplorer, strScopesToRender,
+    Byte(FScopesToRender))));
+  FBrowsePosition := TBrowsePosition(iniFile.ReadInteger(strSetup, strBrowsePosition,
+    Integer(bpIdentifierCentreShowAllComment)));
+  FTreeFontName := iniFile.ReadString(strModuleExplorer, strFontName, strDefaultProportionalFontName);
+  FTreeFontSize := iniFile.ReadInteger(strModuleExplorer, strFontSize, iDefaultFontSize);
+  FFixedFontName := iniFile.ReadString(strModuleExplorer, strFixedFontName, strDefaultFixedFontName);
+  FFixedFontSize := iniFile.ReadInteger(strModuleExplorer, strFixedFontSize, iDefaultFontSize);
+  For T := Low(TBADITokenType) To High(TBADITokenType) Do
+    Begin
+      FTokenFontInfo[T].FForeColour :=
+        StringToColor(iniFile.ReadString(strTokenFontInfo, Format(strFontColour, [strTokenType[T]]),
+        ColorToString(strTokenTypeInfo[T].FForeColour)));
+      FTokenFontInfo[T].FStyles :=
+        TFontStyles(Byte(iniFile.ReadInteger(strTokenFontInfo, Format(strFontStyles, [strTokenType[T]]),
+        Byte(strTokenTypeInfo[T].FStyles))));
+      FTokenFontInfo[T].FBackColour :=
+        StringToColor(iniFile.ReadString(strTokenFontInfo, Format(strFontBackColour, [strTokenType[T]]),
+        ColorToString(strTokenTypeInfo[T].FBackColour)));
+    End;
+  FModuleExplorerBGColour := StringToColor(iniFile.ReadString(strModuleExplorer, strBGColour,
+    ColorToString(clWindow)));
+  FTokenLimit := iniFile.ReadInteger(strModuleExplorer, strTokenLimit, iDefaultTokenLimit);
+  FMaxDocOutputWidth := iniFile.ReadInteger(strDocumentation, strMaxDocOutputWidth, iDefaultMaxDocumentationWidth);
+  FManagedNodesLife := iniFile.ReadInteger(strModuleExplorer, strManagedNodesLife, iDefaultNodeLifeInDays);
+  FTreeColour := StringToColor(iniFile.ReadString(strModuleExplorer, strTreeColour, strFDefaultTreeColour));
+End;
+
+(**
+
+  This method loads the profiling options from the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The profiling options are laoded.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadProfilingOptions(Const iniFile: TMemIniFile);
+
+Var
+  sl: TStringList;
+  j: Integer;
+  strLine: String;
+
+Begin
+  sl := TStringList.Create;
+  Try
+    iniFile.ReadSection(strProfilingCode, sl);
+    For j := 0 To sl.Count - 1 Do
+      Begin
+        strLine := iniFile.ReadString(strProfilingCode, sl[j], '');
+        If strLine <> '' Then
+          FProfilingCode.Values[sl[j]] := strLine;
+      End;
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
   This method loads the applications settings from an ini file.
 
   @precon  None.
@@ -475,136 +870,286 @@ End;
 Procedure TBADIOptions.LoadSettings;
 
 Var
-  sl: TStringList;
-  i: TDocOption;
-  j: Integer;
-  iValue: Integer;
-  T: TBADITokenType;
-  strLine: String;
-  iBADIMenu: TBADIMenu;
-  iModule: Integer;
   iniFile : TMemIniFile;
-  eMetric: TBADIModuleMetric;
-  iSTIndex : Integer;
-  ST: TBADISpecialTag;
 
 Begin
   iniFile := TMemIniFile.Create(FINIFileName);
   Try
-    For i := Low(TDocOption) To High(TDocOption) Do
-      If iniFile.ReadBool('Options', DocOptionInfo[i].FDescription, DocOptionInfo[i].FEnabled) Then
-        FOptions := FOptions + [i]
-      Else
-        FOptions := FOptions - [i];
-    sl := TStringList.Create;
-    Try
-      iniFile.ReadSection('SpecialTagNames', sl);
-      If sl.Count > 0 Then
-        FSpecialTags.Clear;
-      For j := 0 To sl.Count - 1 Do
-        Begin
-          iSTIndex := FSpecialTags.Add(TBADISpecialTag.Create(
-            sl[j],
-            iniFile.ReadString('SpecialTagNames', sl[j], ''),
-            TBADITagProperties(Byte(iniFile.ReadInteger('SpecialTags', sl[j], 0)))
-          ));
-          ST := FSpecialTags[iSTIndex];
-          ST.FFontStyles := TFontStyles(Byte(iniFile.ReadInteger('SpecialTagFontStyles', sl[j], 0)));
-          ST.FFontColour :=
-            StringToColor(iniFile.ReadString('SpecialTagFontForeColours', sl[j], ColorToString(clNone)));
-          ST.FBackColour :=
-            StringToColor(iniFile.ReadString('SpecialTagFontBackColours', sl[j], ColorToString(clNone)));
-          FSpecialTags[iSTIndex] := ST;
-        ENd;
-      iniFile.ReadSection('ManagedExpandedNodes', sl);
-      For j := 0 To sl.Count - 1 Do
-        Begin
-          iValue := iniFile.ReadInteger('ManagedExpandedNodes', sl[j], 0);
-          FExpandedNodes.AddObject(StringReplace(sl[j], '|', '=', [rfReplaceAll]),
-            TObject(iValue));
-        End;
-    Finally
-      sl.Free;
-    End;
-    FUpdateInterval := iniFile.ReadInteger('ModuleExplorer', 'UpdateInterval', 1000);
-    FScopesToRender := TScopes(Byte(iniFile.ReadInteger('ModuleExplorer', 'ScopesToRender',
-      Byte(FScopesToRender))));
-    FBrowsePosition := TBrowsePosition(iniFile.ReadInteger('Setup', 'BrowsePosition',
-      Integer(bpIdentifierCentreShowAllComment)));
-    FTreeFontName := iniFile.ReadString('ModuleExplorer', 'Name', 'Tahoma');
-    FTreeFontSize := iniFile.ReadInteger('ModuleExplorer', 'Size', 10);
-    FFixedFontName := iniFile.ReadString('ModuleExplorer', 'FixedName', 'Courier New');
-    FFixedFontSize := iniFile.ReadInteger('ModuleExplorer', 'FixedSize', 10);
-    For T := Low(TBADITokenType) To High(TBADITokenType) Do
-      Begin
-        FTokenFontInfo[T].FForeColour :=
-          StringToColor(iniFile.ReadString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
-          ColorToString(strTokenTypeInfo[T].FForeColour)));
-        FTokenFontInfo[T].FStyles :=
-          TFontStyles(Byte(iniFile.ReadInteger('TokenFontinfo', Format('%s.Styles', [strTokenType[T]]),
-          Byte(strTokenTypeInfo[T].FStyles))));
-        FTokenFontInfo[T].FBackColour :=
-          StringToColor(iniFile.ReadString('TokenFontinfo', Format('%s.BackColour', [strTokenType[T]]),
-          ColorToString(strTokenTypeInfo[T].FBackColour)));
-      End;
-    FExcludeDocFiles.Text := StringReplace(iniFile.ReadString('Setup', 'ExcludeDocFiles', ''), '|',
+    LoadDocOptions(iniFile);
+    LoadSpecialTags(iniFile);
+    LoadManagedNodes(iniFile);
+    LoadModuleExplorerOptions(iniFile);
+    FExcludeDocFiles.Text := StringReplace(iniFile.ReadString(strSetup, strExcludeDocFiles, ''), '|',
       #13#10, [rfReplaceAll]);
-    sl := TStringList.Create;
-    Try
-      iniFile.ReadSection('MethodDescriptions', sl);
-      For j := 0 To sl.Count - 1 Do
-        FMethodDescriptions.Add(Format('%s=%s', [sl[j], iniFile.ReadString('MethodDescriptions',
-          sl[j], '')]));
-    Finally
-      sl.Free;
-    End;
+    LoadMethodDescriptions(iniFile);
     FScopesToDocument :=
-      TScopes(Byte(iniFile.ReadInteger('Documentation', 'Scopes', Byte(FScopesToDocument))));
-    FModuleExplorerBGColour := StringToColor(iniFile.ReadString('ModuleExplorer', 'BGColour',
-      ColorToString(clWindow)));
-    FTokenLimit := iniFile.ReadInteger('ModuleExplorer', 'TokenLimit', 50);
-    FMaxDocOutputWidth := iniFile.ReadInteger('Documentation', 'MaxDocOutputWidth', 80);
-    FManagedNodesLife := iniFile.ReadInteger('ModuleExplorer', 'ManagedNodesLife', 90);
-    FTreeColour := StringToColor(iniFile.ReadString('ModuleExplorer', 'TreeColour', 'clGray'));
-    sl := TStringList.Create;
-    Try
-      iniFile.ReadSection('ProfilingCode', sl);
-      For j := 0 To sl.Count - 1 Do
-        Begin
-          strLine := iniFile.ReadString('ProfilingCode', sl[j], '');
-          If strLine <> '' Then
-            FProfilingCode.Values[sl[j]] := strLine;
-        End;
-    Finally
-      sl.Free;
-    End;
-    FIssueLimits[ltErrors] := iniFile.ReadInteger('Issues Limits', 'Errors', 10);
-    FIssueLimits[ltWarnings] := iniFile.ReadInteger('Issues Limits', 'Warnings', 10);
-    FIssueLimits[ltHints] := iniFile.ReadInteger('Issues Limits', 'Hints', 10);
-    FIssueLimits[ltConflicts] := iniFile.ReadInteger('Issues Limits', 'Conflicts', 10);
-    FIssueLimits[ltMetrics] := iniFile.ReadInteger('Issues Limits', 'Metrics', 10);
-    For iBADIMenu := Low(TBADImenu) To High(TBADIMenu) Do
-      FBADIMenuShortCuts[iBADIMenu] := iniFile.ReadString('BADIMenuShortcuts',
-        BADIMenus[iBADIMenu].FName,
-        BADIMenus[iBADIMenu].FShortCut);
-    For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
-      TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions :=
-        iniFile.ReadString(
-          'ModuleExtensions',
-          TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
-          TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions
-        );
-    For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
-      Begin
-        FModuleMetrics[eMetric].FEnabled := iniFile.ReadBool('Module Metrics',
-          DefaultModuleMetrics[eMetric].FName + '.Enabled', DefaultModuleMetrics[eMetric].FEnabled);
-        FModuleMetrics[eMetric].FLimit := iniFile.ReadFloat('Module Metrics',
-          DefaultModuleMetrics[eMetric].FName + '.Limit', DefaultModuleMetrics[eMetric].FLimit);
-      End;
-    FRefactorConstNewLine := iniFile.ReadBool('Refactorings', 'NewLine', True);
+      TScopes(Byte(iniFile.ReadInteger(strDocumentation, strScopes, Byte(FScopesToDocument))));
+    LoadProfilingOptions(iniFile);
+    LoadLimits(iniFile);
+    LoadShortcuts(iniFile);
+    LoadExtensions(iniFile);
+    LoadMetrics(iniFile);
+    FRefactorConstNewLine := iniFile.ReadBool(strRefactorings, strNewLine, True);
   Finally
     iniFile.Free;
   End;
+End;
+
+(**
+
+  This method loads the shortcuts for the menu options from the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The shoirtcuts are loaded.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadShortcuts(Const iniFile: TMemIniFile);
+
+Var
+  iBADIMenu: TBADIMenu;
+
+Begin
+  For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
+    FBADIMenuShortCuts[iBADIMenu] := iniFile.ReadString(strBADIMenuShortcuts, BADIMenus[iBADIMenu].FName,
+      BADIMenus[iBADIMenu].FShortCut);
+End;
+
+(**
+
+  This method loads ther special tag information from the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The special tags are loaded from the INI file.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadSpecialTags(Const iniFile: TMemIniFile);
+
+Var
+  iSTIndex: Integer;
+  ST: TBADISpecialTag;
+  iTag: Integer;
+  sl : TstringList;
+
+Begin
+  sl := TStringList.Create;
+  Try
+    iniFile.ReadSection(strSpecialTagNames, sl);
+    If sl.Count > 0 Then
+      FSpecialTags.Clear;
+    For iTag := 0 To sl.Count - 1 Do
+      Begin
+        iSTIndex := FSpecialTags.Add(TBADISpecialTag.Create(sl[iTag],
+          iniFile.ReadString(strSpecialTagNames, sl[iTag], ''),
+          TBADITagProperties(Byte(iniFile.ReadInteger(strSpecialTags, sl[iTag], 0)))));
+        ST := FSpecialTags[iSTIndex];
+        ST.FFontStyles := TFontStyles(Byte(iniFile.ReadInteger(strSpecialTagFontStyles, sl[iTag], 0)));
+        ST.FFontColour := StringToColor(iniFile.ReadString(strSpecialTagFontForeColours, sl[iTag],
+          ColorToString(clNone)));
+        ST.FBackColour := StringToColor(iniFile.ReadString(strSpecialTagFontBackColours, sl[iTag],
+          ColorToString(clNone)));
+        FSpecialTags[iSTIndex] := ST;
+      End;
+  Finally
+    sl.Free;
+  End;
+End;
+
+(**
+
+  This method saves the documentation options to the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The documentation options are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveDocOptions(Const iniFile: TMemIniFile);
+
+Var
+  i: TDocOption;
+
+Begin
+  For i := Low(TDocOption) To High(TDocOption) Do
+    iniFile.WriteBool(strDocOptions, DocOptionInfo[i].FDescription, i In FOptions);
+End;
+
+(**
+
+  This methods saves the extensions associated with parsers to the ini file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The extensions are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveExtensions(Const iniFile: TMemIniFile);
+
+Var
+  iModule: Integer;
+
+Begin
+  For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
+    iniFile.WriteString(strModuleExtensions,
+      TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
+      TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions);
+End;
+
+(**
+
+  This method saves the limit information to the ini file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The limit information is saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveLimits(Const iniFile: TMemIniFile);
+
+Begin
+  iniFile.WriteInteger(strIssuesLimits, strErrors, FIssueLimits[ltErrors]);
+  iniFile.WriteInteger(strIssuesLimits, strWarnings, FIssueLimits[ltWarnings]);
+  iniFile.WriteInteger(strIssuesLimits, strHints, FIssueLimits[ltHints]);
+  iniFile.WriteInteger(strIssuesLimits, strConflicts, FIssueLimits[ltConflicts]);
+  iniFile.WriteInteger(strIssuesLimits, strMetrics, FIssueLimits[ltMetrics]);
+End;
+
+(**
+
+  This method save the managed nodes to the ini file.
+
+  @precon  iniFile must be a valid insatnce.
+  @postcon The managed nodes are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveManagedNodes(Const iniFile: TMemIniFile);
+
+Var
+  iNode: Integer;
+
+Begin
+  iniFile.EraseSection(strManagedExpandedNodes);
+  For iNode := 0 To ExpandedNodes.Count - 1 Do
+    iniFile.WriteInteger(strManagedExpandedNodes, StringReplace(FExpandedNodes[iNode], '=', '|',
+      [rfReplaceAll]), Integer(FExpandedNodes.Objects[iNode]));
+End;
+
+(**
+
+  This method saves the method descriptions to the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The method descriptions are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveMethodDescrpitions(Const iniFile: TMemIniFile);
+
+Var
+  iMethod: Integer;
+
+Begin
+  iniFile.EraseSection(strMethodDescriptions);
+  For iMethod := 0 To FMethodDescriptions.Count - 1 Do
+    iniFile.WriteString(strMethodDescriptions, FMethodDescriptions.Names[iMethod],
+      FMethodDescriptions.ValueFromIndex[iMethod]);
+End;
+
+(**
+
+  This method saves the metrics to the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The metric setings are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveMetrics(Const iniFile: TMemIniFile);
+
+Var
+  eMetric: TBADIModuleMetric;
+
+Begin
+  For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
+    Begin
+      iniFile.WriteBool(strModuleMetrics, DefaultModuleMetrics[eMetric].FName + strEnabled,
+        FModuleMetrics[eMetric].FEnabled);
+      iniFile.WriteFloat(strModuleMetrics, DefaultModuleMetrics[eMetric].FName + strLimit,
+        FModuleMetrics[eMetric].FLimit);
+    End;
+  iniFile.WriteInteger(strMetricMargins, strLowMargin, Trunc(FLowMetricMargin));
+  iniFile.WriteInteger(strMetricMargins, strHighMargin, Trunc(FHighMetricMargin));
+End;
+
+(**
+
+  This method saves the module explorer options to the ini file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The module explorer optins are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveModuleExplorerOptions(Const iniFile: TMemIniFile);
+
+Var
+  T: TBADITokenType;
+
+Begin
+  iniFile.WriteInteger(strModuleExplorer, strUpdateInterval, FUpdateInterval);
+  iniFile.WriteInteger(strModuleExplorer, strScopesToRender, Byte(FScopesToRender));
+  iniFile.WriteInteger(strSetup, strBrowsePosition, Integer(FBrowsePosition));
+  iniFile.WriteString(strModuleExplorer, strFontName, FTreeFontName);
+  iniFile.WriteInteger(strModuleExplorer, strFontSize, FTreeFontSize);
+  iniFile.WriteString(strModuleExplorer, strFixedFontName, FFixedFontName);
+  iniFile.WriteInteger(strModuleExplorer, strFixedFontSize, FFixedFontSize);
+  For T := Low(TBADITokenType) To High(TBADITokenType) Do
+    Begin
+      iniFile.WriteString(strTokenFontInfo, Format(strFontColour, [strTokenType[T]]),
+        ColorToString(FTokenFontInfo[T].FForeColour));
+      iniFile.WriteInteger(strTokenFontInfo, Format(strFontStyles, [strTokenType[T]]),
+        Byte(FTokenFontInfo[T].FStyles));
+      iniFile.WriteString(strTokenFontInfo, Format(strFontBackColour, [strTokenType[T]]),
+        ColorToString(FTokenFontInfo[T].FBackColour));
+    End;
+  iniFile.WriteString(strModuleExplorer, strBGColour, ColorToString(FModuleExplorerBGColour));
+  iniFile.WriteInteger(strModuleExplorer, strTokenLimit, FTokenLimit);
+  iniFile.WriteInteger(strDocumentation, strMaxDocOutputWidth, FMaxDocOutputWidth);
+  iniFile.WriteInteger(strModuleExplorer, strManagedNodesLife, FManagedNodesLife);
+  iniFile.WriteString(strModuleExplorer, strTreeColour, ColorToString(FTreeColour));
+End;
+
+(**
+
+  This method saves the profiling options to the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The profiling options are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveProfilingOptions(Const iniFile: TMemIniFile);
+
+Var
+  j: Integer;
+
+Begin
+  iniFile.EraseSection(strProfilingCode);
+  For j := 0 To FProfilingCode.Count - 1 Do
+    If FProfilingCode.Names[j] <> '' Then
+      iniFile.WriteString(strProfilingCode, FProfilingCode.Names[j], FProfilingCode.ValueFromIndex[j]);
 End;
 
 (**
@@ -618,96 +1163,82 @@ End;
 Procedure TBADIOptions.SaveSettings;
 
 Var
-  i: TDocOption;
-  j: Integer;
-  T: TBADITokenType;
-  iBADIMenu : TBADIMenu;
-  iModule: Integer;
   iniFile : TMemIniFile;
-  eMetric: TBADIModuleMetric;
 
 Begin
   iniFile := TMemIniFile.Create(FINIFileName);
   Try
-    For i := Low(TDocOption) To High(TDocOption) Do
-      iniFile.WriteBool('Options', DocOptionInfo[i].FDescription, i In FOptions);
-    iniFile.EraseSection('SpecialTags');
-    iniFile.EraseSection('SpecialTagNames');
-    For j := 0 To FSpecialTags.Count - 1 Do
-      Begin
-        iniFile.WriteInteger('SpecialTags', FSpecialTags[j].FName,
-          Byte(FSpecialTags[j].FTagProperties));
-        iniFile.WriteString('SpecialTagNames', FSpecialTags[j].FName, FSpecialTags[j].FDescription);
-        iniFile.WriteInteger('SpecialTagFontStyles', FSpecialTags[j].FName,
-          Byte(FSpecialTags[j].FFontStyles));
-        iniFile.WriteString('SpecialTagFontForeColours', FSpecialTags[j].FName,
-          ColorToString(FSpecialTags[j].FFontColour));
-        iniFile.WriteString('SpecialTagFontBackColours', FSpecialTags[j].FName,
-          ColorToString(FSpecialTags[j].FBackColour));
-      End;
-    iniFile.EraseSection('ManagedExpandedNodes');
-    For j := 0 To ExpandedNodes.Count - 1 Do
-      iniFile.WriteInteger('ManagedExpandedNodes', StringReplace(FExpandedNodes[j], '=', '|',
-        [rfReplaceAll]), Integer(FExpandedNodes.Objects[j]));
-    iniFile.WriteInteger('ModuleExplorer', 'UpdateInterval', FUpdateInterval);
-    iniFile.WriteInteger('ModuleExplorer', 'ScopesToRender', Byte(FScopesToRender));
-    iniFile.WriteInteger('Setup', 'BrowsePosition', Integer(FBrowsePosition));
-    iniFile.WriteString('ModuleExplorer', 'Name', FTreeFontName);
-    iniFile.WriteInteger('ModuleExplorer', 'Size', FTreeFontSize);
-    iniFile.WriteString('ModuleExplorer', 'FixedName', FFixedFontName);
-    iniFile.WriteInteger('ModuleExplorer', 'FixedSize', FFixedFontSize);
-    For T := Low(TBADITokenType) To High(TBADITokenType) Do
-      Begin
-        iniFile.WriteString('TokenFontinfo', Format('%s.Colour', [strTokenType[T]]),
-          ColorToString(FTokenFontInfo[T].FForeColour));
-        iniFile.WriteInteger('TokenFontinfo', Format('%s.Styles', [strTokenType[T]]),
-          Byte(FTokenFontInfo[T].FStyles));
-        iniFile.WriteString('TokenFontinfo', Format('%s.BackColour', [strTokenType[T]]),
-          ColorToString(FTokenFontInfo[T].FBackColour));
-      End;
-    iniFile.WriteString('Setup', 'ExcludeDocFiles', StringReplace(FExcludeDocFiles.Text, #13#10, '|',
+    SaveDocOptions(iniFile);
+    SaveSpecialTags(iniFile);
+    SaveManagedNodes(iniFile);
+    SaveModuleExplorerOptions(iniFile);
+    iniFile.WriteString(strSetup, strExcludeDocFiles, StringReplace(FExcludeDocFiles.Text, #13#10, '|',
       [rfReplaceAll]));
-    iniFile.EraseSection('MethodDescriptions');
-    For j := 0 To FMethodDescriptions.Count - 1 Do
-      iniFile.WriteString('MethodDescriptions', FMethodDescriptions.Names[j],
-        FMethodDescriptions.ValueFromIndex[j]);
-    iniFile.WriteInteger('Documentation', 'Scopes', Byte(FScopesToDocument));
-    iniFile.WriteString('ModuleExplorer', 'BGColour', ColorToString(FModuleExplorerBGColour));
-    iniFile.WriteInteger('ModuleExplorer', 'TokenLimit', FTokenLimit);
-    iniFile.WriteInteger('Documentation', 'MaxDocOutputWidth', FMaxDocOutputWidth);
-    iniFile.WriteInteger('ModuleExplorer', 'ManagedNodesLife', FManagedNodesLife);
-    iniFile.WriteString('ModuleExplorer', 'TreeColour', ColorToString(FTreeColour));
-    iniFile.EraseSection('ProfilingCode');
-    For j := 0 To FProfilingCode.Count - 1 Do
-      If FProfilingCode.Names[j] <> '' Then
-        iniFile.WriteString('ProfilingCode', FProfilingCode.Names[j], FProfilingCode.ValueFromIndex[j]);
-    iniFile.WriteInteger('Issues Limits', 'Errors', FIssueLimits[ltErrors]);
-    iniFile.WriteInteger('Issues Limits', 'Warnings', FIssueLimits[ltWarnings]);
-    iniFile.WriteInteger('Issues Limits', 'Hints', FIssueLimits[ltHints]);
-    iniFile.WriteInteger('Issues Limits', 'Conflicts', FIssueLimits[ltConflicts]);
-    iniFile.WriteInteger('Issues Limits', 'Metrics', FIssueLimits[ltMetrics]);
-    For iBADIMenu := Low(TBADImenu) To High(TBADIMenu) Do
-      iniFile.WriteString('BADIMenuShortcuts',
-        BADIMenus[iBADIMenu].FName,
-        FBADIMenuShortCuts[iBADIMenu]);
-    For iModule := 0 To TBADIDispatcher.BADIDispatcher.Count - 1 Do
-      iniFile.WriteString(
-        'ModuleExtensions',
-        TBADIDispatcher.BADIDispatcher.Modules[iModule].Cls.ClassName,
-        TBADIDispatcher.BADIDispatcher.Modules[iModule].Extensions
-      );
-    For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
-      Begin
-        iniFile.WriteBool('Module Metrics', DefaultModuleMetrics[eMetric].FName + '.Enabled',
-          FModuleMetrics[eMetric].FEnabled);
-        iniFile.WriteFloat('Module Metrics', DefaultModuleMetrics[eMetric].FName + '.Limit',
-          FModuleMetrics[eMetric].FLimit);
-      End;
-    iniFile.WriteBool('Refactorings', 'NewLine', FRefactorConstNewLine);
+    SaveMethodDescrpitions(iniFile);
+    iniFile.WriteInteger(strDocumentation, strScopes, Byte(FScopesToDocument));
+    SaveProfilingOptions(iniFile);
+    SaveLimits(iniFile);
+    SaveShortcuts(iniFile);
+    SaveExtensions(iniFile);
+    SaveMetrics(iniFile);
+    iniFile.WriteBool(strRefactorings, strNewLine, FRefactorConstNewLine);
     iniFile.UpdateFile;
   Finally
     iniFile.Free;
   End;
+End;
+
+(**
+
+  This methods saves the menu shortcuts to the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The shortcuts are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveShortcuts(Const iniFile: TMemIniFile);
+
+Var
+  iBADIMenu: TBADIMenu;
+
+Begin
+  For iBADIMenu := Low(TBADIMenu) To High(TBADIMenu) Do
+    iniFile.WriteString(strBADIMenuShortcuts, BADIMenus[iBADIMenu].FName, FBADIMenuShortCuts[iBADIMenu]);
+End;
+
+(**
+
+  This method saves the special tags to the ini file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The special tags are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveSpecialTags(Const iniFile: TMemIniFile);
+
+Var
+  iTag: Integer;
+
+Begin
+  iniFile.EraseSection(strSpecialTags);
+  iniFile.EraseSection(strSpecialTagNames);
+  For iTag := 0 To FSpecialTags.Count - 1 Do
+    Begin
+      iniFile.WriteInteger(strSpecialTags, FSpecialTags[iTag].FName,
+        Byte(FSpecialTags[iTag].FTagProperties));
+      iniFile.WriteString(strSpecialTagNames, FSpecialTags[iTag].FName,
+        FSpecialTags[iTag].FDescription);
+      iniFile.WriteInteger(strSpecialTagFontStyles, FSpecialTags[iTag].FName,
+        Byte(FSpecialTags[iTag].FFontStyles));
+      iniFile.WriteString(strSpecialTagFontForeColours, FSpecialTags[iTag].FName,
+        ColorToString(FSpecialTags[iTag].FFontColour));
+      iniFile.WriteString(strSpecialTagFontBackColours, FSpecialTags[iTag].FName,
+        ColorToString(FSpecialTags[iTag].FBackColour));
+    End;
 End;
 
 (**

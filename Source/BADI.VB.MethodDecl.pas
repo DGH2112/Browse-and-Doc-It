@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    12 Oct 2017
+  @Date    10 Dec 2017
 
 **)
 Unit BADI.VB.MethodDecl;
@@ -27,8 +27,8 @@ Type
     FExceptionHandling : IExceptionHandling;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(MethodType : TMethodType; const strName : String;
-      AScope : TScope; iLine, iCol : Integer); Override;
+    Constructor Create(Const MethodType : TMethodType; Const strName : String; Const AScope : TScope;
+      Const iLine, iCol : Integer); Override;
     Destructor Destroy; Override;
     Function AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String; Override;
     (**
@@ -62,6 +62,11 @@ Uses
 **)
 Function TVBMethod.AsString(Const boolShowIdentifier, boolForDocumentation : Boolean) : String;
 
+Const
+  strLib = ' Lib %s';
+  strAlias = ' Alias %s';
+  strAs = #32'As'#32;
+
 Var
   i: Integer;
 
@@ -70,9 +75,9 @@ Begin
   If boolShowIdentifier Then
     Result := Result + Identifier;
   If Ext <> '' Then
-    Result := Result + Format(' Lib %s', [Ext]);
+    Result := Result + Format(strLib, [Ext]);
   If Alias <> '' Then
-    Result := Result + Format(' Alias %s', [Alias]);
+    Result := Result + Format(strAlias, [Alias]);
   If (Ext <> '') Or (Alias <> '') Then
     Result := Result + #32;
   Result := Result + '(';
@@ -94,7 +99,7 @@ Begin
     Result := Result + #13#10;
   Result := Result + ')';
   If (MethodType = mtFunction) And (ReturnType.ElementCount > 0) Then
-    Result := Result + #32'As'#32 + ReturnType.AsString(False, boolForDocumentation);
+    Result := Result + strAs + ReturnType.AsString(False, boolForDocumentation);
 End;
 
 (**
@@ -104,17 +109,18 @@ End;
   @precon  None.
   @postcon Adds a string list for managing Pushed parameters.
 
-  @param   MethodType as a TMethodType
+  @param   MethodType as a TMethodType as a constant
   @param   strName    as a String as a constant
-  @param   AScope     as a TScope
-  @param   iLine      as an Integer
-  @param   iCol       as an Integer
+  @param   AScope     as a TScope as a constant
+  @param   iLine      as an Integer as a constant
+  @param   iCol       as an Integer as a constant
 
 **)
-Constructor TVBMethod.Create(MethodType: TMethodType; Const strName: String;
-  AScope: TScope; iLine, iCol: Integer);
+Constructor TVBMethod.Create(Const MethodType : TMethodType; Const strName : String;
+  Const AScope : TScope; Const iLine, iCol : Integer);
+
 Begin
-  Inherited;
+  Inherited Create(MethodType, strName, AScope, iLine, iCol);
   FPushParams := TStringList.Create;
   FExceptionHandling := TExceptionHandling.Create(strName);
 End;

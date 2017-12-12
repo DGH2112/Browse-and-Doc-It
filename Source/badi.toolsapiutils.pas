@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    05 Nov 2017
+  @Date    12 Dec 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -324,7 +324,8 @@ Begin
       SetLength(strBuffer, iBufferSize);
       iRead := Reader.GetText(iPosition, PAnsiChar(strBuffer), iBufferSize);
       SetLength(strBuffer, iRead);
-      Result := Result + String(strBuffer);
+      //Result := Result + String(strBuffer);
+      Result := Result + UTF8ToUnicodeString(strBuffer);
       Inc(iPosition, iRead);
     Until iRead < iBufferSize;
   Finally

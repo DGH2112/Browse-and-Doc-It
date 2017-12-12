@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       09 Dec 2017
+  @Date       12 Dec 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -338,7 +338,8 @@ Uses
   BADI.Pascal.ThreadVariableDecl,
   BADI.Pascal.UsesList,
   BADI.Generic.Parameter,
-  Generics.Collections;
+  Generics.Collections,
+  System.Character;
 
 Const
   (** Constant for the keyword ABSTRACT. **)
@@ -580,7 +581,7 @@ Begin
 
       If IsInSet(ch, strWhiteSpace) Then
         CurCharType := ttWhiteSpace
-      Else If isInSet(ch, strTokenChars) Then
+      Else If IsInSet(ch, strTokenChars) Or IsLetter(ch) Then
         Begin
           If (LastCharType = ttNumber) And (IsInSet(Ch, ['A'..'F', 'a'..'f'])) Then
             CurCharType := ttNumber

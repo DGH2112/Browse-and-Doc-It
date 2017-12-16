@@ -8036,9 +8036,9 @@ Var
   R: TBADIMetricRecord;
 
 Begin
-  R := TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity];
+  R := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity];
   R.FLimit := 2.0;
-  TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity] := R;
+  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
@@ -8111,7 +8111,7 @@ Begin
 //    0, 0, 0, 0, 1
 //  );
   R.FLimit := 1.0;
-  TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity] := R;
+  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
 End;
 
 Procedure TestTPascalModule.TestMethodToxicity;
@@ -8206,9 +8206,9 @@ Var
   R: TBADIMetricRecord;
 
 Begin
-  R := TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity];
+  R := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity];
   R.FLimit := 2.0;
-  TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity] := R;
+  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
@@ -8263,7 +8263,7 @@ Begin
     0, 0, 0, 0, 1
   );
   R.FLimit := 1.0;
-  TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity] := R;
+  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
 End;
 
 Procedure TestTPascalModule.TestStructStmt;

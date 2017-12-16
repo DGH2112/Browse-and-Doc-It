@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    26 Nov 2017
+  @Date    16 Dec 2017
 
 **)
 Unit BADI.Generic.FunctionDecl;
@@ -361,9 +361,9 @@ Begin
   V := FindElement(strVarsLabel);
   If Assigned(V) Then
     Result := Result + F(V.ElementCount / BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit);
-  Result := Result + F(NestedIFDepth / BADIOptions.ModuleMetric[mmMethodIFDepth].FLimit);
+  Result := Result + F(NestedIFDepth / BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit);
   Result := Result + F(CyclometricComplexity /
-    BADIOptions.ModuleMetric[mmMethodCyclometricComplexity].FLimit);
+    BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit);
 End;
 
 (**

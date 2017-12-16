@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    09 Dec 2017
+  @Date    16 Dec 2017
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -252,9 +252,11 @@ End;
 Procedure TBADIIDEMenuInstaller.CreateBADIMainMenu;
 
 ResourceString
+  {$IFDEF DEBUG}
   strBrowseAndDocItDEBUG = '&Browse and Doc It %d.%d%s BETA (Build %d.%d.%d.%d)';
-  //: @nohint
+  {$ELSE}
   strBrowseAndDocIt = '&Browse and Doc It %d.%d%s';
+  {$ENDIF}
 
   Const
   iMenuOffset = 2;
@@ -1555,7 +1557,7 @@ Procedure TBADIIDEMenuInstaller.SelectionChange(Const iIdentLine, iIdentCol, iCo
       EA.UnElideNearestBlock;
     {$ENDIF}
   End;
-  
+
 Var
   SourceEditor: IOTASourceEditor;
   C           : TOTAEditPos;
@@ -1592,11 +1594,11 @@ Begin
                       iLine := iCommentLine;
                     EV.Center(iLine, 1);
                   End;
-                bpIdentifierTop: EV.SetTopLeft(iLine, 1);
-                bpIdentifierCentre: EV.Center(iLine, 1);
+                bpIdentifierTop: EV.SetTopLeft(C.Line, 1);
+                bpIdentifierCentre: EV.Center(C.Line, 1);
                 bpIdentifierCentreShowAllComment:
                   Begin
-                    EV.Center(iLine, 1);
+                    EV.Center(C.Line, 1);
                     If iCommentLine > 0 Then
                       If iCommentLine < EV.TopRow Then
                         EV.SetTopLeft(iCommentLine, 1);

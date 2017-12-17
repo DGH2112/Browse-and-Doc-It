@@ -1,11 +1,11 @@
-(**
+﻿(**
 
   This module contains classes to represent an asbtract element container (ancestor for all things)
   and a label container for tree view headers adn the like.
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Oct 2017
+  @Date    17 Dec 2017
 
 **)
 Unit BADI.ElementContainer;
@@ -45,16 +45,23 @@ Type
     Function  Find(Const strName : String; Const FindType : TFindType = ftName) : Integer;
     Procedure SetSorted(Const boolValue : Boolean);
     Function  FindRoot : TElementContainer;
-    Function  CheckCommentForNoMetric(Const Metric : TBADIModuleMetric;
+    Function  CheckCommentForNoMetric(Const eMetric : TBADIModuleMetric;
       Const Element: TElementContainer): Boolean;
-    Function  CheckCommentForNoEWH(Const strEWH : String; Const Element: TElementContainer): Boolean;
+    Function  CheckCommentForNoCheck(Const eCheck : TBADIModuleCheck;
+      Const Element: TElementContainer): Boolean;
+    Function  CheckCommentForNoEWH(Const strEWH: String; Const strParameters : Array of Const;
+      Const Element: TElementContainer): Boolean;
+    Function  CheckIdentifier(Const Container: TElementContainer; Const strIdentifier,
+      strTagName: String): Boolean;
     Function  DocConflictImage(Const DocConflictRec: TDocConflictTable): TBADIImageIndex;
     Procedure ModuleMetricPosition(Const Container : TElementContainer; Var iL, iC : Integer);
-    Function  ModuleMetricImage(Const eMetric : TBADIModuleMetric): TBADIImageIndex;
+    Function  ModuleMetricImage(Const eMetric : TBADIModuleMetric): TBADIImageIndex; Overload;
+    Function  ModuleMetricImage(Const eCheck : TBADIModuleCheck): TBADIImageIndex; Overload;
     Procedure DocConflictPosition(Var iL: Integer; Var iC: Integer;
       Const Container: TElementContainer);
     Function  CheckEWHOptions (Const ErrorType : TErrorType) : Boolean;
-    Function  CheckForNoEWH(Const ErrorType : TErrorType; Const Container: TElementContainer): Boolean;
+    Function  CheckForNoEWH(Const ErrorType : TErrorType; Const strParameters : Array of Const;
+      Const Container: TElementContainer): Boolean;
     Function  AddCategory(Const Container: TElementContainer; Const strCategory : String;
       Const iImageIndex : TBADIImageIndex): TElementContainer;
     Function  AddRootContainer(Const Container: TElementContainer; Const strLabelText : String;
@@ -87,12 +94,17 @@ Type
     Procedure CheckDocumentation(Var boolCascade : Boolean); Virtual;
     Function  ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Virtual;
     Procedure AddIssue(Const strMsg: String; Const AScope: TScope; Const iLine, iCol: Integer;
-      Const ErrorType: TErrorType; Const Container : TElementContainer);
+      Const ErrorType: TErrorType; Const Container : TElementContainer); Overload;
+    Procedure AddIssue(Const strFmtMsg: String; Const strParameters : Array of Const;
+      Const AScope: TScope; Const iLine, iCol: Integer; Const ErrorType: TErrorType;
+      Const Container : TElementContainer); Overload;
     Procedure AddDocumentConflict(Const Args: Array Of Const; Const iIdentLine, iIdentColumn: Integer;
       Const Container: TElementContainer; Const strCategory: String;
       Const DocConflictRec: TDocConflictTable);
     Procedure AddModuleMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
-      Const Container : TElementContainer; Const Metric : TBADIModuleMetric);
+      Const Container : TElementContainer; Const eMetric : TBADIModuleMetric);
+    Procedure AddModuleCheck(Const Args: Array of Const; Const iLine, iColumn : Integer;
+      Const Container : TElementContainer; Const eCheck : TBADIModuleCheck);
     Function  AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Virtual; Abstract;
     Procedure CheckReferences; Virtual;
@@ -193,6 +205,15 @@ Uses
   BADI.Functions,
   BADI.Constants, BADI.Comment.Tag;
 
+Type
+  (** A record to describe error, warning, and hint messages. **)
+  TIssueRec = Record
+    FFolder: String;
+    FFolderImage: TBADIImageIndex;
+    FItemImage: TBADIImageIndex;
+    FTooMany: String;
+  End;
+
 ResourceString
   (** A error resource string for adding a null element to the container **)
   strCanNotAddNullElement = 'Can not add a null element to the collection!';
@@ -208,14 +229,30 @@ ResourceString
   strNoHint = 'nohint';
   (** A resource for disabling all metrics on an element and its sub elements. **)
   strNoMetrics = 'nometrics';
+  (** A resource for disabling all checks on an element and its sub elements. **)
+  strNoChecks = 'nochecks';
   (** A resource for disabling a metric on an element and its sub elements. **)
   strNoMetric = 'nometric';
+  (** A resource for disabling a check on an element and its sub elements. **)
+  strNoCheck = 'nocheck';
   (** A error resource string for sorted after adding elements. **)
   strCanNotSetSortedAfterAdding = 'Can not set sorted after adding elements.';
+  (** A message for too many hints. **)
+  strTooManyHints = 'Too many hints...';
+  (** A message for too many warnings. **)
+  strTooManyWarnings = 'Too many warnings...';
+  (** A message for too many errors. **)
+  strTooManyErrors = 'Too many errors...';
 
 Const
   (** A constant to descrienb the format of a title with its child count. **)
   strTitleCountFmt = '%s (%d)';
+  (** A constant array to describe the various resource strings got error, warning and hint messages. **)
+  recIssues: Array [Low(TErrorType)..High(TErrorType)] Of TIssueRec = (
+    (FFolder: strHints;    FFolderImage: iiHintFolder;    FItemImage: iiHint;    FTooMany: strTooManyHints),
+    (FFolder: strWarnings; FFolderImage: iiWarningFolder; FItemImage: iiWarning; FTooMany: strTooManyWarnings),
+    (FFolder: strErrors;   FFolderImage: iiErrorFolder;   FItemImage: iiError;   FTooMany: strTooManyErrors)
+  );
 
 (**
 
@@ -413,6 +450,50 @@ End;
   @precon  Error must be a valid TElementContainer.
   @postcon Adds an error to the Base Language`s Element Collection under a sub folder of strCategory.
 
+  @param   strFmtMsg     as a String as a constant
+  @param   strParameters as an Array Of Const as a constant
+  @param   AScope        as a TScope as a constant
+  @param   iLine         as an Integer as a constant
+  @param   iCol          as an Integer as a constant
+  @param   ErrorType     as a TErrorType as a constant
+  @param   Container     as a TElementContainer as a constant
+
+**)
+Procedure TElementContainer.AddIssue(Const strFmtMsg: String; Const strParameters : Array of Const;
+  Const AScope: TScope; Const iLine, iCol: Integer; Const ErrorType: TErrorType;
+  Const Container : TElementContainer);
+
+Var
+  i: TElementContainer;
+  iCount: Integer;
+  iIssueLimit: Integer;
+
+Begin
+  If Not CheckEWHOptions(ErrorType) Or CheckForNoEWH(ErrorType, strParameters, Container) Then
+    Exit;
+  I := FindRoot;
+  I := AddRootContainer(I, recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage);
+  iCount := i.ElementCount;
+  Case ErrorType Of
+    etError:   iIssueLimit := BADIOptions.IssueLimits[ltErrors];
+    etWarning: iIssueLimit := BADIOptions.IssueLimits[ltWarnings];
+    etHint:    iIssueLimit := BADIOptions.IssueLimits[ltHints];
+  Else
+    iIssueLimit := BADIOptions.IssueLimits[ltErrors];
+  End;
+  If iCount < iIssueLimit Then
+    i.Add(TDocIssue.Create(Format(strFmtMsg, strParameters), AScope, iLine, iCol, ErrorType))
+  Else If iCount = iIssueLimit Then
+    i.Add(TDocIssue.Create(recIssues[ErrorType].FTooMany, scNone, 0, 0, ErrorType));
+End;
+
+(**
+
+  This method adds an error to the Base Language`s Element Collection under a sub folder of strCategory.
+
+  @precon  Error must be a valid TElementContainer.
+  @postcon Adds an error to the Base Language`s Element Collection under a sub folder of strCategory.
+
   @param   strMsg    as a String as a constant
   @param   AScope    as a TScope as a constant
   @param   iLine     as an Integer as a constant
@@ -424,33 +505,13 @@ End;
 Procedure TElementContainer.AddIssue(Const strMsg: String; Const AScope: TScope; Const iLine,
   iCol: Integer; Const ErrorType: TErrorType; Const Container : TElementContainer);
 
-Type
-  TIssueRec = Record
-    FFolder: String;
-    FFolderImage: TBADIImageIndex;
-    FItemImage: TBADIImageIndex;
-    FTooMany: String;
-  End;
-
-ResourceString
-  strTooManyHints = 'Too many hints...';
-  strTooManyWarnings = 'Too many warnings...';
-  strTooManyErrors = 'Too many errors...';
-
-Const
-  recIssues: Array [Low(TErrorType)..High(TErrorType)] Of TIssueRec = (
-    (FFolder: strHints;    FFolderImage: iiHintFolder;    FItemImage: iiHint;    FTooMany: strTooManyHints),
-    (FFolder: strWarnings; FFolderImage: iiWarningFolder; FItemImage: iiWarning; FTooMany: strTooManyWarnings),
-    (FFolder: strErrors;   FFolderImage: iiErrorFolder;   FItemImage: iiError;   FTooMany: strTooManyErrors)
-  );
-
 Var
   i: TElementContainer;
   iCount: Integer;
   iIssueLimit: Integer;
 
 Begin
-  If Not CheckEWHOptions(ErrorType) Or CheckForNoEWH(ErrorType, Container) Then
+  If Not CheckEWHOptions(ErrorType) Or CheckForNoEWH(ErrorType, [Container.Identifier], Container) Then
     Exit;
   I := FindRoot;
   I := AddRootContainer(I, recIssues[ErrorType].FFolder, recIssues[ErrorType].FFolderImage);
@@ -470,6 +531,49 @@ End;
 
 (**
 
+  This method adds an out of limit check to the documentation tree.
+
+  @precon  Container must be a valid instance.
+  @postcon A check is added to the document tree.
+
+  @param   Args      as an Array Of Const as a constant
+  @param   iLine     as an Integer as a constant
+  @param   iColumn   as an Integer as a constant
+  @param   Container as a TElementContainer as a constant
+  @param   eCheck    as a TBADIModuleCheck as a constant
+
+**)
+Procedure TElementContainer.AddModuleCheck(Const Args: Array Of Const; Const iLine, iColumn: Integer;
+  Const Container: TElementContainer; Const eCheck: TBADIModuleCheck);
+
+Var
+  E: TElementContainer;
+  iL, iC: Integer;
+  iIcon: TBADIImageIndex;
+
+Begin
+  If Not (doShowChecksAndMetrics In BADIOptions.Options) Or
+    Not BADIOptions.ModuleCheck[eCheck].FEnabled Or
+    CheckCommentForNoCheck(eCheck, Self) Or
+    CheckCommentForNoCheck(eCheck, Container) Then
+    Exit;
+  ModuleMetricPosition(Container, iL, iC);
+  iIcon := ModuleMetricImage(eCheck);
+  E := FindRoot;
+  E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
+  E := AddCategory(E, ModuleChecks[ModuleChecks[eCheck].FParent].FCategory,
+    iiMetricCheckFolder);
+  E := AddCategory(E, ModuleChecks[eCheck].FCategory, iiMetricCheckFolder);
+  If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
+    E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
+      ModuleChecks[eCheck].FMessage, ModuleChecks[eCheck].FDescription, iIcon))
+  Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
+    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
+      iiMetricCheckMissing));
+End;
+
+(**
+
   This method adds an out of limit metric to the documentation tree.
 
   @precon  Container must be a valid instance.
@@ -479,11 +583,11 @@ End;
   @param   iLine     as an Integer as a constant
   @param   iColumn   as an Integer as a constant
   @param   Container as a TElementContainer as a constant
-  @param   Metric    as a TBADIModuleMetric as a constant
+  @param   eMetric   as a TBADIModuleMetric as a constant
 
 **)
 Procedure TElementContainer.AddModuleMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
-  Const Container : TElementContainer; Const Metric : TBADIModuleMetric);
+  Const Container : TElementContainer; Const eMetric : TBADIModuleMetric);
 
 Var
   E: TElementContainer;
@@ -492,20 +596,20 @@ Var
 
 Begin
   If Not (doShowChecksAndMetrics In BADIOptions.Options) Or
-    Not BADIOptions.ModuleMetric[Metric].FEnabled Or
-    CheckCommentForNoMetric(Metric, Self) Or
-    CheckCommentForNoMetric(Metric, Container) Then
+    Not BADIOptions.ModuleMetric[eMetric].FEnabled Or
+    CheckCommentForNoMetric(eMetric, Self) Or
+    CheckCommentForNoMetric(eMetric, Container) Then
     Exit;
   ModuleMetricPosition(Container, iL, iC);
-  iIcon := ModuleMetricImage(Metric);
+  iIcon := ModuleMetricImage(eMetric);
   E := FindRoot;
   E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
-  E := AddCategory(E, DefaultModuleMetrics[DefaultModuleMetrics[Metric].FParent].FDescription,
+  E := AddCategory(E, ModuleMetrics[ModuleMetrics[eMetric].FParent].FCategory,
     iiMetricCheckFolder);
-  E := AddCategory(E, ModuleMetrics[Metric].FCategory, iiMetricCheckFolder);
+  E := AddCategory(E, ModuleMetrics[eMetric].FCategory, iiMetricCheckFolder);
   If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
     E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
-      ModuleMetrics[Metric].FMessage, ModuleMetrics[Metric].FDescription, iIcon))
+      ModuleMetrics[eMetric].FMessage, ModuleMetrics[eMetric].FDescription, iIcon))
   Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
     E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
       iiMetricCheckMissing));
@@ -617,20 +721,73 @@ End;
 
 (**
 
-  This method checks for a noXxxxx(s) tag which would disable the type of messages and if found returns
+  This method checks for a noXxxxx(s) tag which would disable the type of messages and if found returns 
   true.
 
   @precon  None.
-  @postcon Checks for a noXxxxx(s) tag which would disable the type of messages and if found returns
+  @postcon Checks for a noXxxxx(s) tag which would disable the type of messages and if found returns 
            true.
 
-  @param   strEWH  as a String as a constant
+  @param   eCheck  as a TBADIModuleCheck as a constant
   @param   Element as a TElementContainer as a constant
   @return  a Boolean
 
 **)
-Function TElementContainer.CheckCommentForNoEWH(Const strEWH: String; 
+Function TElementContainer.CheckCommentForNoCheck(Const eCheck: TBADIModuleCheck;
   Const Element: TElementContainer): Boolean;
+
+Var
+  iTag : Integer;
+  T: TTag;
+  iToken: Integer;
+  E: TElementContainer;
+
+Begin
+  Result := False;
+  E := Element;
+  While Assigned(E) Do
+    Begin
+      If Assigned(E.Comment) Then
+        If E.Comment.FindTag(strNoChecks) > -1 Then
+          Begin
+            Result := True;
+            Break;
+          End
+        Else
+          Begin
+            iTag := E.Comment.FindTag(strNoCheck);
+            If iTag > -1 Then
+              Begin
+                T := E.Comment.Tag[iTag];
+                For iToken := 0 To T.TokenCount - 1 Do
+                  If CompareText(ModuleChecks[eCheck].FName, T.Tokens[iToken].Token) = 0 Then
+                    Begin
+                      Result := True;
+                      Exit;
+                    End;
+              End;
+          End;
+        E := E.Parent;
+      End;
+End;
+
+(**
+
+  This method checks for a noXxxxx(s) tag which would disable the type of messages and if found returns 
+  true.
+
+  @precon  None.
+  @postcon Checks for a noXxxxx(s) tag which would disable the type of messages and if found returns 
+           true.
+
+  @param   strEWH        as a String as a constant
+  @param   strParameters as an Array Of Const as a constant
+  @param   Element       as a TElementContainer as a constant
+  @return  a Boolean
+
+**)
+Function TElementContainer.CheckCommentForNoEWH(Const strEWH: String;
+  Const strParameters : Array of Const; Const Element: TElementContainer): Boolean;
 
 Var
   E: TElementContainer;
@@ -641,7 +798,8 @@ Begin
   While Assigned(E) Do
     Begin
       If Assigned(E.Comment) Then
-        If (E.Comment.FindTag(strEWH) > -1) Or (E.Comment.FindTag(strEWH + 's') > -1) Then
+        If (E.Comment.FindTag(strEWH + 's') > -1) Or CheckIdentifier(E,
+          String(strParameters[0].VUnicodeString), strEWH) Then
           Begin
             Result := True;
             Break;
@@ -652,19 +810,22 @@ End;
 
 (**
 
-  This method changes to @nometreic or @nometrics in the elements comment and all parent comments and
-  if foudn and matches the metric being checked returns return.
+  This method changes to
 
   @precon  None.
   @postcon Returns return if @@nometric or @@nometrics is found in the element comment or parent comment
            .
 
-  @param   Metric  as a TBADIModuleMetric as a constant
+  @nometreicor
+  @nometricsin the elements comment and all parent comments and if foudn and matches the metric being 
+           checked returns return.
+
+  @param   eMetric as a TBADIModuleMetric as a constant
   @param   Element as a TElementContainer as a constant
   @return  a Boolean
 
 **)
-Function TElementContainer.CheckCommentForNoMetric(Const Metric : TBADIModuleMetric;
+Function TElementContainer.CheckCommentForNoMetric(Const eMetric : TBADIModuleMetric;
   Const Element: TElementContainer): Boolean;
 
 Var
@@ -691,7 +852,7 @@ Begin
               Begin
                 T := E.Comment.Tag[iTag];
                 For iToken := 0 To T.TokenCount - 1 Do
-                  If DefaultModuleMetrics[Metric].FName = T.Tokens[iToken].Token Then
+                  If CompareText(ModuleMetrics[eMetric].FName, T.Tokens[iToken].Token) = 0 Then
                     Begin
                       Result := True;
                       Exit;
@@ -793,20 +954,21 @@ End;
 
 (**
 
-  This method checks the container comment (and its parents) for noXxxx(s) tags and returns true if they
+  This method checks the container comment (and its parents) for noXxxx(s) tags and returns true if they 
   were found to signify that an issue is not required.
 
   @precon  None.
-  @postcon Checks the container comment (and its parents) for noXxxx(s) tags and returns true if they
+  @postcon Checks the container comment (and its parents) for noXxxx(s) tags and returns true if they 
            were found to signify that an issue is not required.
 
-  @param   ErrorType as a TErrorType as a constant
-  @param   Container as a TElementContainer as a constant
+  @param   ErrorType     as a TErrorType as a constant
+  @param   strParameters as an Array Of Const as a constant
+  @param   Container     as a TElementContainer as a constant
   @return  a Boolean
 
 **)
 Function TElementContainer.CheckForNoEWH(Const ErrorType : TErrorType;
-  Const Container: TElementContainer): Boolean;
+  Const strParameters : Array of Const; Const Container: TElementContainer): Boolean;
 
 Begin
   Result := False;
@@ -814,15 +976,54 @@ Begin
     Begin
       Case ErrorType Of
         etError:
-          If CheckCommentForNoEWH(strNoError, Container) Then
+          If CheckCommentForNoEWH(strNoError, strParameters, Container) Then
             Result := True;
         etHint:
-          If CheckCommentForNoEWH(strNoHint, Container) Then
+          If CheckCommentForNoEWH(strNoHint, strParameters, Container) Then
             Result := True;
         etWarning:
-          If CheckCommentForNoEWH(strNoWarning, Container) Then
+          If CheckCommentForNoEWH(strNoWarning, strParameters, Container) Then
             Result := True;
       End;
+    End;
+End;
+
+(**
+
+  This method looks for the given identifier in the given containers tag comment tokens.
+
+  @precon  Container must be a valid instance.
+  @postcon Trues true if the identifier is a token of the containers comment tag.
+
+  @param   Container     as a TElementContainer as a constant
+  @param   strIdentifier as a String as a constant
+  @param   strTagName    as a String as a constant
+  @return  a Boolean
+
+**)
+Function TElementContainer.CheckIdentifier(Const Container: TElementContainer;
+  Const strIdentifier, strTagName: String): Boolean;
+
+Var
+  iTag: Integer;
+  Tag: TTag;
+  iToken: Integer;
+
+Begin
+  Result := False;
+  If Assigned(Container.Comment) Then
+    Begin
+      iTag := Container.Comment.FindTag(strTagName);
+      If iTag > -1 Then
+        Begin
+          Tag := Container.Comment.Tag[iTag];
+          For iToken := 0 To Tag.TokenCount - 1 Do
+            If CompareText(Tag.Tokens[iToken].Token, strIdentifier) = 0 Then
+              Begin
+                Result := True;
+                Break;
+              End;
+        End;
     End;
 End;
 
@@ -1219,6 +1420,28 @@ End;
 
 (**
 
+  This method returns the image index for the given check.
+
+  @precon  None.
+  @postcon The image index for the given check is returned.
+
+  @param   eCheck as a TBADIModuleCheck as a constant
+  @return  a TBADIImageIndex
+
+**)
+Function TElementContainer.ModuleMetricImage(Const eCheck: TBADIModuleCheck): TBADIImageIndex;
+
+Begin
+  Case ModuleChecks[eCheck].FConflictType Of
+    dciMissing:   Result := iiMetricCheckMissing;
+    dciIncorrect: Result := iiMetricCheckIncorrect;
+  Else
+    Result := iiMetricCheckItem;
+  End;
+End;
+
+(**
+
   This method returns the image index for the given metric.
 
   @precon  None.
@@ -1343,7 +1566,7 @@ End;
   @precon  None .
   @postcon Returns the name of the label as a string.
 
-  @nohint
+  @nohints
 
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant

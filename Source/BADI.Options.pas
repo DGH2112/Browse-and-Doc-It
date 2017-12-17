@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    10 Dec 2017
+  @Date    16 Dec 2017
 
 **)
 Unit BADI.Options;
@@ -53,6 +53,7 @@ Type
     FIssueLimits            : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
     FBADIMenuShortCuts      : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
     FModuleMetrics          : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord;
+    FModuleChecks           : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of TBADICheckRecord;
     FLowMetricMargin        : Double;
     FHighMetricMargin       : Double;
     FRefactorConstNewLine   : Boolean;
@@ -66,9 +67,12 @@ Type
     Procedure SetIssueLimit(Const LimitType : TLimitType; Const iValue : Integer);
     Function  GetMenuShortcut(Const iBADIMenu : TBADIMenu) : String;
     Procedure SetMenuShortcut(Const iBADIMenu : TBADIMenu; Const strShortcut : String);
-    Function  GetModulelMetric(Const ModuleMetric: TBADIModuleMetric): TBADIMetricRecord;
-    Procedure SetModuleMetric(Const ModuleMetric: TBADIModuleMetric;
-      Const Value: TBADIMetricRecord);
+    Function  GetModulelMetric(Const eModuleMetric: TBADIModuleMetric): TBADIMetricRecord;
+    Procedure SetModuleMetric(Const eModuleMetric: TBADIModuleMetric;
+      Const recValue: TBADIMetricRecord);
+    Function  GetModulelCheck(Const eModuleCheck: TBADIModuleCheck): TBADICheckRecord;
+    Procedure SetModuleCheck(Const eModuleCheck: TBADIModuleCheck;
+      Const recValue: TBADICheckRecord);
     Procedure LoadDocOptions(Const iniFile: TMemIniFile);
     Procedure LoadSpecialTags(Const iniFile: TMemIniFile);
     Procedure LoadManagedNodes(Const iniFile: TMemIniFile);
@@ -79,6 +83,7 @@ Type
     Procedure LoadShortcuts(Const iniFile: TMemIniFile);
     Procedure LoadExtensions(Const iniFile: TMemIniFile);
     Procedure LoadMetrics(Const iniFile: TMemIniFile);
+    Procedure LoadChecks(Const iniFile: TMemIniFile);
     Procedure SaveDocOptions(Const iniFile: TMemIniFile);
     Procedure SaveSpecialTags(Const iniFile: TMemIniFile);
     Procedure SaveManagedNodes(Const iniFile: TMemIniFile);
@@ -89,6 +94,7 @@ Type
     Procedure SaveShortcuts(Const iniFile: TMemIniFile);
     Procedure SaveExtensions(Const iniFile: TMemIniFile);
     Procedure SaveMetrics(Const iniFile: TMemIniFile);
+    Procedure SaveChecks(Const iniFile: TMemIniFile);
   Public
     Constructor Create;
     Destructor Destroy; Override;
@@ -287,11 +293,20 @@ Type
       A property to read and write module metric configuration information.
       @precon  None.
       @postcon Gets and sets the module metric information.
-      @param   ModuleMetric as a TBADIModuleMetric as a constant
+      @param   eModuleMetric as a TBADIModuleMetric as a constant
       @return  a TBADIMetricRecord
     **)
-    Property ModuleMetric[Const ModuleMetric : TBADIModuleMetric] : TBADIMetricRecord
+    Property ModuleMetric[Const eModuleMetric : TBADIModuleMetric] : TBADIMetricRecord
       Read GetModulelMetric Write SetModuleMetric;
+    (**
+      A property to read and write module checks configuration information.
+      @precon  None.
+      @postcon Gets and sets the module check information.
+      @param   eModuleCheck as a TBADIModuleCheck as a constant
+      @return  a TBADICheckRecord
+    **)
+    Property ModuleCheck[Const eModuleCheck : TBADIModuleCheck] : TBADICheckRecord
+      Read GetModulelCheck Write SetModuleCheck;
     (**
       A property to define the lower limit margin for metrics in the metrics views.
       @precon  None.
@@ -399,6 +414,8 @@ Const
   strMetrics = 'Metrics';
   (** An ini section name for the module metrics **)
   strModuleMetrics = 'Module Metrics';
+  (** An ini section name for the module checks **)
+  strModuleChecks = 'Module Checks';
   (** An ini key for enabled metrics **)
   strEnabled = '.Enabled';
   (** An ini key for metrics limits **)
@@ -555,19 +572,36 @@ End;
 
 (**
 
+  This is a getter method for the ModuleCheck property.
+
+  @precon  None.
+  @postcon Returns the module check configuration for the given metric.
+
+  @param   eModuleCheck as a TBADIModuleCheck as a constant
+  @return  a TBADICheckRecord
+
+**)
+Function TBADIOptions.GetModulelCheck(Const eModuleCheck: TBADIModuleCheck): TBADICheckRecord;
+
+Begin
+  Result := FModuleChecks[eModuleCheck];
+End;
+
+(**
+
   This is a getter method for the ModuleMetric property.
 
   @precon  None.
   @postcon Returns the module metric configuration for the given metric.
 
-  @param   ModuleMetric as a TBADIModuleMetric as a constant
+  @param   eModuleMetric as a TBADIModuleMetric as a constant
   @return  a TBADIMetricRecord
 
 **)
-Function TBADIOptions.GetModulelMetric(Const ModuleMetric: TBADIModuleMetric): TBADIMetricRecord;
+Function TBADIOptions.GetModulelMetric(Const eModuleMetric: TBADIModuleMetric): TBADIMetricRecord;
 
 Begin
-  Result := FModuleMetrics[ModuleMetric];
+  Result := FModuleMetrics[eModuleMetric];
 End;
 
 (**
@@ -610,8 +644,34 @@ End;
 
 **)
 Function TBADIOptions.GetTokenFontInfo(Const ATokenType: TBADITokenType): TTokenFontInfo;
+
 Begin
   Result := FTokenFontInfo[ATokenType];
+End;
+
+(**
+
+  This method loads the module checks from the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The checks are loaded fromt the INI file.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.LoadChecks(Const iniFile: TMemIniFile);
+
+Var
+  eCheck: TBADIModuleCheck;
+
+Begin
+  For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
+    Begin
+      FModuleChecks[eCheck].FEnabled := iniFile.ReadBool(strModuleChecks,
+        ModuleChecks[eCheck].FName + strEnabled, ModuleChecks[eCheck].FEnabled);
+      FModuleChecks[eCheck].FLimit := iniFile.ReadFloat(strModuleChecks,
+        ModuleChecks[eCheck].FName + strLimit, ModuleChecks[eCheck].FLimit);
+    End;
 End;
 
 (**
@@ -764,9 +824,9 @@ Begin
   For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
     Begin
       FModuleMetrics[eMetric].FEnabled := iniFile.ReadBool(strModuleMetrics,
-        DefaultModuleMetrics[eMetric].FName + strEnabled, DefaultModuleMetrics[eMetric].FEnabled);
+        ModuleMetrics[eMetric].FName + strEnabled, ModuleMetrics[eMetric].FEnabled);
       FModuleMetrics[eMetric].FLimit := iniFile.ReadFloat(strModuleMetrics,
-        DefaultModuleMetrics[eMetric].FName + strLimit, DefaultModuleMetrics[eMetric].FLimit);
+        ModuleMetrics[eMetric].FName + strLimit, ModuleMetrics[eMetric].FLimit);
     End;
   FLowMetricMargin := iniFile.ReadInteger(strMetricMargins, strLowMargin, iDefaultLowLimit);
   FHighMetricMargin := iniFile.ReadInteger(strMetricMargins, strHighMargin, iDefaultHighLimit);
@@ -889,6 +949,7 @@ Begin
     LoadShortcuts(iniFile);
     LoadExtensions(iniFile);
     LoadMetrics(iniFile);
+    LoadChecks(iniFile);
     FRefactorConstNewLine := iniFile.ReadBool(strRefactorings, strNewLine, True);
   Finally
     iniFile.Free;
@@ -956,6 +1017,31 @@ Begin
   Finally
     sl.Free;
   End;
+End;
+
+(**
+
+  This method saves the checks to the INI file.
+
+  @precon  iniFile must be a valid instance.
+  @postcon The check setings are saved.
+
+  @param   iniFile as a TMemIniFile as a constant
+
+**)
+Procedure TBADIOptions.SaveChecks(Const iniFile: TMemIniFile);
+
+Var
+  eCheck: TBADIModuleCheck;
+
+Begin
+  For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
+    Begin
+      iniFile.WriteBool(strModuleChecks, ModuleChecks[eCheck].FName + strEnabled,
+        FModuleChecks[eCheck].FEnabled);
+      iniFile.WriteFloat(strModuleChecks, ModuleChecks[eCheck].FName + strLimit,
+        FModuleChecks[eCheck].FLimit);
+    End;
 End;
 
 (**
@@ -1082,9 +1168,9 @@ Var
 Begin
   For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
     Begin
-      iniFile.WriteBool(strModuleMetrics, DefaultModuleMetrics[eMetric].FName + strEnabled,
+      iniFile.WriteBool(strModuleMetrics, ModuleMetrics[eMetric].FName + strEnabled,
         FModuleMetrics[eMetric].FEnabled);
-      iniFile.WriteFloat(strModuleMetrics, DefaultModuleMetrics[eMetric].FName + strLimit,
+      iniFile.WriteFloat(strModuleMetrics, ModuleMetrics[eMetric].FName + strLimit,
         FModuleMetrics[eMetric].FLimit);
     End;
   iniFile.WriteInteger(strMetricMargins, strLowMargin, Trunc(FLowMetricMargin));
@@ -1181,6 +1267,7 @@ Begin
     SaveShortcuts(iniFile);
     SaveExtensions(iniFile);
     SaveMetrics(iniFile);
+    SaveChecks(iniFile);
     iniFile.WriteBool(strRefactorings, strNewLine, FRefactorConstNewLine);
     iniFile.UpdateFile;
   Finally
@@ -1279,20 +1366,38 @@ End;
 
 (**
 
+  This is a setter method for the ModuleCheck property.
+
+  @precon  None.
+  @postcon Sets the module check configuration.
+
+  @param   eModuleCheck as a TBADIModuleCheck as a constant
+  @param   recValue     as a TBADICheckRecord as a constant
+
+**)
+Procedure TBADIOptions.SetModuleCheck(Const eModuleCheck: TBADIModuleCheck;
+  Const recValue: TBADICheckRecord);
+
+Begin
+  FModuleChecks[eModuleCheck] := recValue;
+End;
+
+(**
+
   This is a setter method for the ModuleMetric property.
 
   @precon  None.
   @postcon Sets the module metric configuration.
 
-  @param   ModuleMetric as a TBADIModuleMetric as a constant
-  @param   Value        as a TBADIMetricRecord as a constant
+  @param   eModuleMetric as a TBADIModuleMetric as a constant
+  @param   recValue      as a TBADIMetricRecord as a constant
 
 **)
-Procedure TBADIOptions.SetModuleMetric(Const ModuleMetric: TBADIModuleMetric;
-  Const Value: TBADIMetricRecord);
+Procedure TBADIOptions.SetModuleMetric(Const eModuleMetric: TBADIModuleMetric;
+  Const recValue: TBADIMetricRecord);
 
 Begin
-  FModuleMetrics[ModuleMetric] := Value;
+  FModuleMetrics[eModuleMetric] := recValue;
 End;
 
 (**

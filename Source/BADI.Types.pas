@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    16 Dec 2017
+  @Date    17 Dec 2017
 
 **)
 Unit BADI.Types;
@@ -460,7 +460,7 @@ Type
     mmLongMethodVariableLists,
     mmNestedIFDepth,
     mmCyclometricComplexity,
-      mmMethodCCIgnoreExpression,
+      mmMethodCCIncludeExpression,
     mmToxicity
   );
 

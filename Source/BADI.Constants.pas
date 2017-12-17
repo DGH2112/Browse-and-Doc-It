@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Dec 2017
+  @Date    16 Dec 2017
 
 **)
 Unit BADI.Constants;
@@ -502,401 +502,320 @@ Const
   strMCParmListIgnoreEventsNoMetric = 'MCParmListIgnoreEvents';
 
   (** A constant array of default options for the Module Metrics. **)
-  DefaultModuleMetrics : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord = (
+  ModuleMetrics : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord = (
     (
-      FParent: mmMetrics;
-      FName: strMetrics;
-      FDescription: strMetrics;
-      FEnabled: True;
-      FLimit: 0;
-      FLimitType: ltNone),
-    (
-      FParent: mmChecks;
-      FName: strChecks;
-      FDescription: strChecks;
-      FEnabled: True;
-      FLimit: 0;
-      FLimitType: ltNone),
-    (
-      FParent: mmMetrics;
+      FParent: mmLongMethods;
       FName: strLongMethodNoMetric;
-      FDescription: strLongMethodImplementationsCat;
+      FCategory: strLongMethodImplementationsCat;
+      FMessage: strMethodTooLongMsg;
+      FDescription: strMethodTooLongDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit: 50.0;
       FLimitType: ltInteger),
     (
-      FParent: mmMetrics;
+      FParent: mmLongParameterLists;
       FName: strLongParameterListNoMetric;
-      FDescription: strLongMethodParameterListsCat;
+      FCategory: strLongMethodParameterListsCat;
+      FMessage: strMethodHasTooManyParamsMsg;
+      FDescription: strMethodHasTooManyParamsDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  7.0;
       FLimitType: ltInteger),
     (
-      FParent: mmMetrics;
+      FParent: mmLongMethodVariableLists;
       FName: strLongVariableListNoMetric;
-      FDescription: strLongMethodVariableListsCat;
+      FCategory: strLongMethodVariableListsCat;
+      FMessage: strMethodHasLongVarListMsg;
+      FDescription: strMethodHasLongVarListDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  7.0;
       FLimitType: ltInteger),
     (
-      FParent: mmChecks;
-      FName: strHardCodedIntegerNoMetric;
-      FDescription: strHardCodedIntegersCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmHardCodedIntegers;
-      FName: strHCIntIgnoreZeroNoMetric;
-      FDescription: strIgnoreHardCodedIntegerZerosCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmHardCodedIntegers;
-      FName: strHCIntIgnoreOneNoMetric;
-      FDescription: strIgnoreHardCodedIntegerOnesCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmChecks;
-      FName: strHardCodedNumberNoMetric;
-      FDescription: strHardCodedNumbersCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmHardCodedNumbers;
-      FName: strHCNumIgmoreZeroNoMetric;
-      FDescription: strIgnoreHardCodedNumberZerosCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmChecks;
-      FName: strHardCodedStringNoMetric;
-      FDescription: strHardCodedStringsCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmHardCodedStrings;
-      FName: strHCStrIgnoreEmptyNoMetric;
-      FDescription: strIgnoreHardCodedEmptyStringsCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmHardCodedStrings;
-      FName: strHCStrIgnoreSingleNoMetric;
-      FDescription: strIgnoreHardCodedSingleCharStrCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmChecks;
-      FName: strUnsortedModuleNoMetric;
-      FDescription: strUnsortedMethodsCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmChecks;
-      FName: strWithStatementNoMetric;
-      FDescription: strUseofWITHStmtCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmChecks;
-      FName: strGotoStatementNoMetric;
-      FDescription: strUseOfGOTOStmtCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmMetrics;
+      FParent: mmNestedIFDepth;
       FName: strNestedIFDepthNoMetric;
-      FDescription: strNestedIFDepthCat;
+      FCategory: strNestedIFDepthCat;
+      FMessage: strMethodHasHighIFDepthMsg;
+      FDescription: strMethodHasHighIFDepthDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  5.0;
       FLimitType: ltInteger),
     (
-      FParent: mmMetrics;
+      FParent: mmCyclometricComplexity;
       FName: strCyclometricComplexityNoMetric;
-      FDescription: strMethodCyclometricComplexityCat;
+      FCategory: strMethodCyclometricComplexityCat;
+      FMessage: strMethodHasHighCyclometricComplexityMsg;
+      FDescription: strMethodHasHighCyclometricComplexityDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit: 10.0;
       FLimitType: ltInteger),
     (
-      FParent: mmMethodCyclometricComplexity;
+      FParent: mmCyclometricComplexity;
       FName: strCCIgnoreExpressionNoMetric;
       FDescription: strIgnoreBoolSubExprCat;
       FEnabled: True;
       FLimit: 0.0;
       FLimitType: ltNone),
     (
-      FParent: mmMetrics;
+      FParent: mmToxicity;
       FName: strToxicityNoMetric;
-      FDescription: strMethodToxicityCat;
+      FCategory: strMethodToxicityCat;
+      FMessage: strMethodHasHighToxocityValueMsg;
+      FDescription: strMethodHasHighToxocityValueDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  1.0;
-      FLimitType: ltFloat),
+      FLimitType: ltFloat)
+  );
+
+  (** A constant array of default options for the Module Checks. **)
+  ModuleChecks : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of TBADICheckRecord = (
     (
-      FParent: mmChecks;
+      FParent: mcHardCodedIntegers;
+      FName: strHardCodedIntegerNoMetric;
+      FCategory: strHardCodedIntegersCat;
+      FMessage: strIntegerUsedInMsg;
+      FDescription: strIntegerUsedInDesc;
+      FConflictType: dciItem;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcHardCodedIntegers;
+      FName: strHCIntIgnoreZeroNoMetric;
+      FDescription: strIgnoreHardCodedIntegerZerosCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcHardCodedIntegers;
+      FName: strHCIntIgnoreOneNoMetric;
+      FDescription: strIgnoreHardCodedIntegerOnesCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcHardCodedNumbers;
+      FName: strHardCodedNumberNoMetric;
+      FCategory: strHardCodedNumbersCat;
+      FMessage: strNumberUsedInMsg;
+      FDescription: strNumberUsedInDesc;
+      FConflictType: dciItem;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcHardCodedNumbers;
+      FName: strHCNumIgmoreZeroNoMetric;
+      FDescription: strIgnoreHardCodedNumberZerosCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcHardCodedStrings;
+      FName: strHardCodedStringNoMetric;
+      FCategory: strHardCodedStringsCat;
+      FMessage: strStringLiteralUsedInMsg;
+      FDescription: strStringLiteralUsedInDesc;
+      FConflictType: dciItem;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcHardCodedStrings;
+      FName: strHCStrIgnoreEmptyNoMetric;
+      FDescription: strIgnoreHardCodedEmptyStringsCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcHardCodedStrings;
+      FName: strHCStrIgnoreSingleNoMetric;
+      FDescription: strIgnoreHardCodedSingleCharStrCat;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcUnsortedMethod;
+      FName: strUnsortedModuleNoMetric;
+      FCategory: strUnsortedMethodsCat;
+      FMessage: strMethodNotSortedMsg;
+      FDescription: strMethodNotSortedDesc;
+      FConflictType: dciItem;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcUseOfWithStatements;
+      FName: strWithStatementNoMetric;
+      FCategory: strUseOfWITHStmtCat;
+      FMessage: strWITHUsedInMethodMsg;
+      FDescription: strWITHUsedInMethodDesc;
+      FConflictType: dciItem;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcUseOfGOTOStatements;
+      FName: strGotoStatementNoMetric;
+      FCategory: strUseOfGOTOStmtCat;
+      FMessage: strGOTOUsedInMethodMsg;
+      FDescription: strGOTOUsedInMethodDesc;
+      FConflictType: dciItem;
+      FEnabled: True;
+      FLimit:  0.0;
+      FLimitType: ltNone),
+    (
+      FParent: mcEmptyEXCEPT;
       FName: strEmptyEXCEPTNoMetric;
-      FDescription: strEmptyEXCEPTblocksCat;
+      FCategory: strEmptyEXCEPTBlocksCat;
+      FMessage: strEXCEPTClauseMethodEmptyMsg;
+      FDescription: strEXCEPTClauseMethodEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyFINALLY;
       FName: strEmptyFINALLYNoMetric;
-      FDescription: strEmptyFINALLYblocksCat;
+      FCategory: strEmptyFINALLYBlocksCat;
+      FMessage: strFINALLYClauseMethodEmptyMsg;
+      FDescription: strFINALLYClauseMethodEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcExceptionEating;
       FName: strExceptionEatingNoMetric;
-      FDescription: strExceptionEatingCat;
+      FCategory: strEXCEPTIONEatingCat;
+      FMessage: strONStmtCaptureAllExcepsMsg;
+      FDescription: strONStmtCaptureAllExcepsDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyTHEN;
       FName: strEmptyTHENNoMetric;
-      FDescription: strEmptyTHENblocksCat;
+      FCategory: strEmptyTHENBlocksCat;
+      FMessage: strTHENClauseInEmptyMsg;
+      FDescription: strTHENClauseInEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyELSE;
       FName: strEmptyELSENoMetric;
-      FDescription: strEmptyELSEBlocksCat;
+      FCategory: strEmptyELSEBlocksCat;
+      FMessage: strELSEClauseInEmptyMsg;
+      FDescription: strELSEClauseInEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyCASE;
       FName: strEmptyCASENoMetric;
-      FDescription: strEmptyCASEBlocksCat;
+      FCategory: strEmptyCASEBlocksCat;
+      FMessage: strCASEClauseInEmptyMsg;
+      FDescription: strCASEClauseInEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyFOR;
       FName: strEmptyFORNoMetric;
-      FDescription: strEmptyFORBlocksCat;
+      FCategory: strEmptyFORBlocksCat;
+      FMessage: strFORBlockInEmptyMsg;
+      FDescription: strFORBlockInEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyWHILE;
       FName: strEmptyWHILENoMetric;
-      FDescription: strEmptyWHILEblocksCat;
+      FCategory: strEmptyWHILEBlocksCat;
+      FMessage: strWHILEBlockInEmptyMsg;
+      FDescription: strWHILEBlockInEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyREPEAT;
       FName: strEmptyREPEATNoMetric;
-      FDescription: strEmptyREPEATBlocksCat;
+      FCategory: strEmptyREPEATBlocksCat;
+      FMessage: strREPEATBlockInEmptyMsg;
+      FDescription: strREPEATBlockInEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyBEGINEND;
       FName: strEmptyBEGINENDNoMetric;
-      FDescription: strEmptyBEGINENDBlocksCat;
+      FCategory: strEmptyBEGINENDBlocksCat;
+      FMessage: strBEGINENDBlockInEmptyMsg;
+      FDescription: strBEGINENDBlockInEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyIntialization;
       FName: strEmptyInitializationNoMetric;
-      FDescription: strEmptyInitializationBlockCat;
+      FCategory: strEmptyInitializationBlockCat;
+      FMessage: strINITIALIZATIONClauseInModuleEmptyMsg;
+      FDescription: strINITIALIZATIONClauseInModuleEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyFinalization;
       FName: strEmptyFinalizationNoMetric;
-      FDescription: strEmptyFinalizationBlockCat;
+      FCategory: strEmptyFinalizationBlockCat;
+      FMessage: strFINALIZATIONClauseInModuleEmptyMsg;
+      FDescription: strFINALIZATIONClauseInModuleEmptyDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcEmptyMethod;
       FName: strEmptyMethodNoMetric;
-      FDescription: strEmptyMethodsCat;
+      FCategory: strEmptyMethodsCat;
+      FMessage: strMethodDoesNotHaveImplementationMsg;
+      FDescription: strMethodDoesNotHaveImplementationDesc;
+      FConflictType: dciMissing;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmChecks;
+      FParent: mcMissingCONSTInParemterList;
       FName: strMissingCONSTInParamNoMetric;
-      FDescription: strMissingCONSTinParametersCat;
+      FCategory: strMissingCONSTinParametersCat;
+      FMessage: strParameterInMethodMissingCONSTMsg;
+      FDescription: strParameterInMethodMissingCONSTDesc;
+      FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mmMissingCONSTInParemterList;
+      FParent: mcMissingCONSTInParemterList;
       FName: strMCParmListIgnoreEventsNoMetric;
       FDescription: strMissingCONSTInParamIgnoreEventHandlersCat;
       FEnabled: True;
       FLimit:  0.0;
       FLimitType: ltNone)
-  );
-
-  (** A constant array of strings for the output of metrics. **)
-  ModuleMetrics : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TModuleMetricTable = (
-    (
-      FCategory: '';
-      FMessage: '';
-      FDescription: '';
-      FConflictType: dciItem), // mmMetrics
-    (
-      FCategory: '';
-      FMessage: '';
-      FDescription: '';
-      FConflictType: dciItem), // mmChecks
-    (
-      FCategory: strLongMethodImplementationsCat;
-      FMessage: strMethodTooLongMsg;
-      FDescription: strMethodTooLongDesc;
-      FConflictType: dciItem), // mmLongMethods
-    (
-      FCategory: strLongMethodParameterListsCat;
-      FMessage: strMethodHasTooManyParamsMsg;
-      FDescription: strMethodHasTooManyParamsDesc;
-      FConflictType: dciItem), // mmLongParameterLists
-    (
-      FCategory: strLongMethodVariableListsCat;
-      FMessage: strMethodHasLongVarListMsg;
-      FDescription: strMethodHasLongVarListDesc;
-      FConflictType: dciItem), // mmLongMethodVariableLists
-    (
-      FCategory: strHardCodedIntegersCat;
-      FMessage: strIntegerUsedInMsg;
-      FDescription: strIntegerUsedInDesc;
-      FConflictType: dciItem), // mmHardCodedIntegers
-      (FConflictType: dciItem), (FConflictType: dciItem),
-    (
-      FCategory: strHardCodedNumbersCat;
-      FMessage: strNumberUsedInMsg;
-      FDescription: strNumberUsedInDesc;
-      FConflictType: dciItem), // mmHardCodedNumbers
-      (FConflictType: dciItem),
-    (
-      FCategory: strHardCodedStringsCat;
-      FMessage: strStringLiteralUsedInMsg;
-      FDescription: strStringLiteralUsedInDesc;
-      FConflictType: dciItem), // mmHardCodedStrings
-      (FConflictType: dciItem), (FConflictType: dciItem),
-    (
-      FCategory: strUnsortedMethodsCat;
-      FMessage: strMethodNotSortedMsg;
-      FDescription: strMethodNotSortedDesc;
-      FConflictType: dciItem), // mmUnsortedModule
-    (
-      FCategory: strUseOfWITHStmtCat;
-      FMessage: strWITHUsedInMethodMsg;
-      FDescription: strWITHUsedInMethodDesc;
-      FConflictType: dciItem), // mmUseOfWithStatements
-    (
-      FCategory: strUseOfGOTOStmtCat;
-      FMessage: strGOTOUsedInMethodMsg;
-      FDescription: strGOTOUsedInMethodDesc;
-      FConflictType: dciItem), // mmUseOfGOTOStateents
-    (
-      FCategory: strNestedIFDepthCat;
-      FMessage: strMethodHasHighIFDepthMsg;
-      FDescription: strMethodHasHighIFDepthDesc;
-      FConflictType: dciItem), // mmMethodIFDepth
-    (
-      FCategory: strMethodCyclometricComplexityCat;
-      FMessage: strMethodHasHighCyclometricComplexityMsg;
-      FDescription: strMethodHasHighCyclometricComplexityDesc;
-      FConflictType: dciItem), // mmMethodCyclometricComplexity
-      (FConflictType: dciItem),
-    (
-      FCategory: strMethodToxicityCat;
-      FMessage: strMethodHasHighToxocityValueMsg;
-      FDescription: strMethodHasHighToxocityValueDesc;
-      FConflictType: dciItem), // mmMethodToxicity
-    (
-      FCategory: strEmptyEXCEPTBlocksCat;
-      FMessage: strEXCEPTClauseMethodEmptyMsg;
-      FDescription: strEXCEPTClauseMethodEmptyDesc;
-      FConflictType: dciItem), // mmEmptyEXCEPT
-    (
-      FCategory: strEmptyFINALLYBlocksCat;
-      FMessage: strFINALLYClauseMethodEmptyMsg;
-      FDescription: strFINALLYClauseMethodEmptyDesc;
-      FConflictType: dciItem), // mmEmptyFINALLY
-    (
-      FCategory: strEXCEPTIONEatingCat;
-      FMessage: strONStmtCaptureAllExcepsMsg;
-      FDescription: strONStmtCaptureAllExcepsDesc;
-      FConflictType: dciItem), // mmExceptionEating
-    (
-      FCategory: strEmptyTHENBlocksCat;
-      FMessage: strTHENClauseInEmptyMsg;
-      FDescription: strTHENClauseInEmptyDesc;
-      FConflictType: dciItem), // mmEmptyTHEN
-    (
-      FCategory: strEmptyELSEBlocksCat;
-      FMessage: strELSEClauseInEmptyMsg;
-      FDescription: strELSEClauseInEmptyDesc;
-      FConflictType: dciItem), // mmEmptyELSE
-    (
-      FCategory: strEmptyCASEBlocksCat;
-      FMessage: strCASEClauseInEmptyMsg;
-      FDescription: strCASEClauseInEmptyDesc;
-      FConflictType: dciItem), // mmEmptyCASE
-    (
-      FCategory: strEmptyFORBlocksCat;
-      FMessage: strFORBlockInEmptyMsg;
-      FDescription: strFORBlockInEmptyDesc;
-      FConflictType: dciItem), // mmEmptyFOR
-    (
-      FCategory: strEmptyWHILEBlocksCat;
-      FMessage: strWHILEBlockInEmptyMsg;
-      FDescription: strWHILEBlockInEmptyDesc;
-      FConflictType: dciItem), // mmEmptyWHILE
-    (
-      FCategory: strEmptyREPEATBlocksCat;
-      FMessage: strREPEATBlockInEmptyMsg;
-      FDescription: strREPEATBlockInEmptyDesc;
-      FConflictType: dciItem), // mmEmptyREPEAT
-    (
-      FCategory: strEmptyBEGINENDBlocksCat;
-      FMessage: strBEGINENDBlockInEmptyMsg;
-      FDescription: strBEGINENDBlockInEmptyDesc;
-      FConflictType: dciItem), // mmEmptyBEGINEND
-    (
-      FCategory: strEmptyInitializationBlockCat;
-      FMessage: strINITIALIZATIONClauseInModuleEmptyMsg;
-      FDescription: strINITIALIZATIONClauseInModuleEmptyDesc;
-      FConflictType: dciItem), // mmEmptyInitialization
-    (
-      FCategory: strEmptyFinalizationBlockCat;
-      FMessage: strFINALIZATIONClauseInModuleEmptyMsg;
-      FDescription: strFINALIZATIONClauseInModuleEmptyDesc;
-      FConflictType: dciItem), // mmEmptyInitialization
-    (
-      FCategory: strEmptyMethodsCat;
-      FMessage: strMethodDoesNotHaveImplementationMsg;
-      FDescription: strMethodDoesNotHaveImplementationDesc;
-      FConflictType: dciMissing), // mmEmptyMethod
-    (
-      FCategory: strMissingCONSTinParametersCat;
-      FMessage: strParameterInMethodMissingCONSTMsg;
-      FDescription: strParameterInMethodMissingCONSTDesc;
-      FConflictType: dciItem), // mmMissingCONSTInParemterList
-      (FConflictType: dciItem)
   );
 
 Implementation

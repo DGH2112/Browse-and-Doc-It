@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       12 Dec 2017
+  @Date       17 Dec 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -269,7 +269,7 @@ Type
     Procedure MetricsLongParameterList(Const Method : TGenericFunction);
     Procedure MetricMissingConstInParamList(Const Method : TGenericFunction);
     Procedure MetricsExceptionEating(Const Container : TElementContainer);
-    Procedure MetricsEmptyBlockAtToken(Const eMetric : TBADIModuleMetric);
+    Procedure MetricsEmptyBlockAtToken(Const eCheck : TBADIModuleCheck);
     Procedure MetricsCyclometricComplexity(Const Method : TGenericFunction);
     Procedure MetricsMethodToxicity(Const Method : TGenericFunction);
   {$IFDEF D2005} Strict {$ENDIF} Protected
@@ -1674,14 +1674,14 @@ Begin
   If Assigned(Method) And (Method.ParameterCount > 0) Then
     Begin
       P := Method.Parameters[0];
-      If BADIOptions.ModuleMetric[mmMCParmListIgnoreEvents].FEnabled Then
+      If BADIOptions.ModuleCheck[mcMCParmListIgnoreEvents].FEnabled Then
         If CompareText(P.Identifier, strSender) = 0 Then
           Exit;
       For iParam := 0 To Method.ParameterCount - 1 Do
         If Method.Parameters[iParam].ParamModifier = pamNone Then
-          AddModuleMetric([Method.Parameters[iParam].Identifier,
+          AddModuleCheck([Method.Parameters[iParam].Identifier,
             Method.QualifiedName], Method.Parameters[iParam].Line, Method.Parameters[iParam].Column,
-            Method, mmMissingCONSTInParemterList);
+            Method, mcMissingCONSTInParemterList);
     End;
 End;
 
@@ -1701,10 +1701,10 @@ Procedure TPascalModule.MetricsCyclometricComplexity(Const Method : TGenericFunc
 
 Begin
   If Assigned(Method) Then
-    If Method.CyclometricComplexity > BADIOptions.ModuleMetric[mmMethodCyclometricComplexity].FLimit Then
+    If Method.CyclometricComplexity > BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit Then
       AddModuleMetric([Method.QualifiedName, Method.CyclometricComplexity,
-        Trunc(BADIOptions.ModuleMetric[mmMethodCyclometricComplexity].FLimit)],
-        Method.Line, Method.Column, Method, mmMethodCyclometricComplexity);
+        Trunc(BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit)],
+        Method.Line, Method.Column, Method, mmCyclometricComplexity);
 End;
 
 (**
@@ -1714,20 +1714,20 @@ End;
   @precon  None.
   @postcon A metric messsage is output for an empty block.
 
-  @param   eMetric as a TBADIModuleMetric as a constant
+  @param   eCheck as a TBADIModuleCheck as a constant
 
 **)
-Procedure TPascalModule.MetricsEmptyBlockAtToken(Const eMetric : TBADIModuleMetric);
+Procedure TPascalModule.MetricsEmptyBlockAtToken(Const eCheck : TBADIModuleCheck);
 
 ResourceString
   strMethod = 'method';
 
 Begin
   If Assigned(CurrentMethod) Then
-    AddModuleMetric([strMethod, CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
-      eMetric)
+    AddModuleCheck([strMethod, CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
+      eCheck)
   Else
-    AddModuleMetric([strModuleTypes[ModuleType], ModuleName], Token.Line, Token.Column, Self, eMetric)
+    AddModuleCheck([strModuleTypes[ModuleType], ModuleName], Token.Line, Token.Column, Self, eCheck)
 End;
 
 (**
@@ -1747,11 +1747,11 @@ Const
   
 Begin
   If Assigned(CurrentMethod) Then
-    AddModuleMetric([strMethod, CurrentMethod.QualifiedName], Container.Line, Container.Column,
-      CurrentMethod, mmExceptionEating)
+    AddModuleCheck([strMethod, CurrentMethod.QualifiedName], Container.Line, Container.Column,
+      CurrentMethod, mcExceptionEating)
   Else
-    AddModuleMetric([strModuleTypes[ModuleType], ModuleName], Container.Line, Container.Column,
-      Self, mmExceptionEating)
+    AddModuleCheck([strModuleTypes[ModuleType], ModuleName], Container.Line, Container.Column,
+      Self, mcExceptionEating)
 End;
 
 (**
@@ -1783,27 +1783,27 @@ Begin
       If Pos('.', Token.Token) = 0 Then
         Begin
           Val(Token.Token, i, iErrorCode);
-          If (Abs(i) = 0) And BADIOptions.ModuleMetric[mmHCIntIgnoreZero].FEnabled Then
+          If (Abs(i) = 0) And BADIOptions.ModuleCheck[mcHCIntIgnoreZero].FEnabled Then
             Exit;
-          If (Abs(i) = 1) And BADIOptions.ModuleMetric[mmHCIntIgnoreOne].FEnabled Then
+          If (Abs(i) = 1) And BADIOptions.ModuleCheck[mcHCIntIgnoreOne].FEnabled Then
             Exit;
           If Assigned(M) Then
-            AddModuleMetric([Token.Token, strMethod, M.QualifiedName], Token.Line, Token.Column, M,
-              mmHardCodedIntegers)
+            AddModuleCheck([Token.Token, strMethod, M.QualifiedName], Token.Line, Token.Column, M,
+              mcHardCodedIntegers)
           Else
-            AddModuleMetric([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
-              Token.Column, Self, mmHardCodedIntegers);
+            AddModuleCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
+              Token.Column, Self, mcHardCodedIntegers);
         End Else
         Begin
           Val(Token.Token, dbl,  iErrorCode);
-          If (Abs(dbl) = 0.0) And BADIOptions.ModuleMetric[mmHCNumIgmoreZero].FEnabled Then
+          If (Abs(dbl) = 0.0) And BADIOptions.ModuleCheck[mcHCNumIgmoreZero].FEnabled Then
             Exit;
           If Assigned(M) Then
-            AddModuleMetric([Token.Token, strMethod, M.QualifiedName], Token.Line, Token.Column, M,
-              mmHardCodedNumbers)
+            AddModuleCheck([Token.Token, strMethod, M.QualifiedName], Token.Line, Token.Column, M,
+              mcHardCodedNumbers)
           Else
-            AddModuleMetric([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
-              Token.Column, Self, mmHardCodedNumbers);         
+            AddModuleCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
+              Token.Column, Self, mcHardCodedNumbers);         
         End;
     End;
 End;
@@ -1847,11 +1847,11 @@ Begin
             iAlphaLen := 0;
       If iMaxAlphaLen > 1 Then
         If Assigned(CurrentMethod) Then
-          AddModuleMetric([Token.Token, strMethod, CurrentMethod.QualifiedName], Token.Line,
-            Token.Column, CurrentMethod, mmHardCodedStrings)
+          AddModuleCheck([Token.Token, strMethod, CurrentMethod.QualifiedName], Token.Line,
+            Token.Column, CurrentMethod, mcHardCodedStrings)
         Else
-          AddModuleMetric([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
-            Token.Column, Self, mmHardCodedStrings);
+          AddModuleCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
+            Token.Column, Self, mcHardCodedStrings);
     ENd;
 End;
 
@@ -1872,10 +1872,9 @@ Procedure TPascalModule.MetricsLongOrEmptyMethods(Const Method : TGenericFunctio
 Begin
   If Assigned(Method) Then
     Begin
-      If BADIOptions.ModuleMetric[mmEmptyMethod].FEnabled Then
+      If BADIOptions.ModuleCheck[mcEmptyMethod].FEnabled Then
         If Method.StmtCount = 0 Then
-          AddModuleMetric([Method.QualifiedName], Method.Line, Method.Column, Method,
-            mmEmptyMethod);
+          AddModuleCheck([Method.QualifiedName], Method.Line, Method.Column, Method, mcEmptyMethod);
       If BADIOptions.ModuleMetric[mmLongMethods].FEnabled Then
         If (Method.EndLine > Method.StartLine + BADIOptions.ModuleMetric[mmLongMethods].FLimit) Then
           AddModuleMetric([Method.QualifiedName, Method.EndLine - Method.StartLine,
@@ -1919,10 +1918,9 @@ Procedure TPascalModule.MetricsMethodToxicity(Const Method: TGenericFunction);
 
 Begin
   If Assigned(Method) Then
-    If Method.Toxicity > BADIOptions.ModuleMetric[mmMethodToxicity].FLimit Then
+    If Method.Toxicity > BADIOptions.ModuleMetric[mmToxicity].FLimit Then
       AddModuleMetric([Method.QualifiedName, Method.Toxicity,
-        BADIOptions.ModuleMetric[mmMethodToxicity].FLimit], Method.Line, Method.Column, Method,
-        mmMethodToxicity);
+        BADIOptions.ModuleMetric[mmToxicity].FLimit], Method.Line, Method.Column, Method, mmToxicity);
 End;
 
 (**
@@ -1939,10 +1937,10 @@ Procedure TPascalModule.MetricsNestedIFDepth(Const Method : TGenericFunction);
 
 Begin
   If Assigned(Method) Then
-    If Method.NestedIFDepth > BADIOptions.ModuleMetric[mmMethodIFDepth].FLimit Then
+    If Method.NestedIFDepth > BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit Then
       AddModuleMetric([Method.QualifiedName, Method.NestedIFDepth,
-        Trunc(BADIOptions.ModuleMetric[mmMethodIFDepth].FLimit)], Method.Line, Method.Column, Method,
-        mmMethodIFDepth);
+        Trunc(BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit)], Method.Line, Method.Column, Method,
+        mmNestedIFDepth);
 End;
 
 (**
@@ -2013,8 +2011,8 @@ Procedure TPascalModule.MetricsUnsortedMethods;
               boolOkay := (iPrevLine < iCurrLine) And (iCurrLine < iNextLine)
             End;
           If Not boolOkay Then
-            AddModuleMetric([olMethods[iMethod].QualifiedName], olMethods[iMethod].Line,
-              olMethods[iMethod].Column, olMethods[iMethod], mmUnsortedMethod);
+            AddModuleCheck([olMethods[iMethod].QualifiedName], olMethods[iMethod].Line,
+              olMethods[iMethod].Column, olMethods[iMethod], mcUnsortedMethod);
         End;
     Finally
       olMethods.Free;
@@ -2025,7 +2023,7 @@ Var
   iContainer: Integer;
 
 Begin
-  If BADIOptions.ModuleMetric[mmUnsortedMethod].FEnabled And Assigned(FImplementedMethodsLabel) Then
+  If BADIOptions.ModuleCheck[mcUnsortedMethod].FEnabled And Assigned(FImplementedMethodsLabel) Then
     Begin
       CheckForUnsortedMethods(FImplementedMethodsLabel);
       For iContainer := 1 To FImplementedMethodsLabel.ElementCount Do
@@ -5076,8 +5074,8 @@ Begin
   If Token.UToken = strGOTO Then
     Begin
       If Assigned(CurrentMethod) Then
-        AddModuleMetric([CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
-          mmUseOfGOTOStatements);
+        AddModuleCheck([CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
+          mcUseOfGOTOStatements);
       NextNonCommentToken;
       If IsIdentifier(Token) Then
         NextNonCommentToken
@@ -5207,7 +5205,7 @@ begin
         Method.StmtCount := StmtList
       Else
         If StmtList = 0 Then
-          MetricsEmptyBlockAtToken(mmEmptyBEGINEND);
+          MetricsEmptyBlockAtToken(mcEmptyBEGINEND);
       If Token.UToken = strEND Then
         Begin
           If Assigned(Method) Then
@@ -5287,14 +5285,14 @@ Begin
           iTokenIndex := TokenIndex;
           Statement;
           If iTokenIndex = TokenIndex Then
-            MetricsEmptyBlockAtToken(mmEmptyTHEN);
+            MetricsEmptyBlockAtToken(mcEmptyTHEN);
           If Token.UToken = strELSE Then
             Begin
               NextNonCommentToken;
               iTokenIndex := TokenIndex;
               Statement;
               If iTokenIndex = TokenIndex Then
-                MetricsEmptyBlockAtToken(mmEmptyELSE);
+                MetricsEmptyBlockAtToken(mcEmptyELSE);
             End;
         End Else
           ErrorAndSeekToken(strReservedWordExpected, strTHEN, strSeekableOnErrorTokens, stActual, Self);
@@ -5337,7 +5335,7 @@ Begin
             Begin
               NextNonCommentToken;
               If StmtList = 0 Then
-                MetricsEmptyBlockAtToken(mmEmptyELSE);
+                MetricsEmptyBlockAtToken(mcEmptyELSE);
              End;
           If Token.UToken = strEND Then
             NextNonCommentToken
@@ -5371,7 +5369,7 @@ Begin
       iTokenIndex := TokenIndex;
       Statement;
       If TokenIndex = iTokenIndex Then
-        MetricsEmptyBlockAtToken(mmEmptyCASE);
+        MetricsEmptyBlockAtToken(mcEmptyCASE);
     End Else
       If Not IsKeyWord(Token.Token, [strLCElse, strLCEnd]) Then
         ErrorAndSeekToken(strLiteralExpected, ':', strSeekableOnErrorTokens, stActual, Self);
@@ -5447,7 +5445,7 @@ Begin
       iTokenIndex := TokenIndex;
       StmtList;
       If TokenIndex = iTokenIndex Then
-        MetricsEmptyBlockAtToken(mmEmptyREPEAT);
+        MetricsEmptyBlockAtToken(mcEmptyREPEAT);
       If Token.UToken = strUNTIL Then
         Begin
           If Assigned(CurrentMethod) Then
@@ -5516,7 +5514,7 @@ Begin
           iTokenIndex := TokenIndex;
           Statement;
           If TokenIndex = iTokenIndex Then
-            MetricsEmptyBlockAtToken(mmEmptyWHILE);
+            MetricsEmptyBlockAtToken(mcEmptyWHILE);
         End Else
           ErrorAndSeekToken(strReservedWordExpected, strDO, strSeekableOnErrorTokens, stActual, Self);
     End;
@@ -5575,7 +5573,7 @@ Begin
                       iTokenIndex := TokenIndex;
                       Statement;
                       If TokenIndex = iTokenIndex Then
-                        MetricsEmptyBlockAtToken(mmEmptyFOR);
+                        MetricsEmptyBlockAtToken(mcEmptyFOR);
                     End Else
                       ErrorAndSeekToken(strReservedWordExpected, strDO, strSeekableOnErrorTokens,
                         stActual, Self);
@@ -5594,7 +5592,7 @@ Begin
                   iTokenIndex := TokenIndex;
                   Statement;
                   If TokenIndex = iTokenIndex Then
-                    MetricsEmptyBlockAtToken(mmEmptyFOR);
+                    MetricsEmptyBlockAtToken(mcEmptyFOR);
                 End Else
                   ErrorAndSeekToken(strReservedWordExpected, strDO, strSeekableOnErrorTokens, stActual, Self);
             End Else
@@ -5624,8 +5622,8 @@ Begin
   If Result Then
     Begin
       If Assigned(CurrentMethod) Then
-        AddModuleMetric([CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
-          mmUseOfWithStatements);
+        AddModuleCheck([CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
+          mcUseOfWithStatements);
       NextNonCommentToken;
       Repeat
         ExprList(Nil);
@@ -5673,13 +5671,13 @@ Begin
               If Not ExceptionBlock Then
                 Begin
                   If StmtList = 0 Then
-                    MetricsEmptyBlockAtToken(mmEmptyEXCEPT);
+                    MetricsEmptyBlockAtToken(mcEmptyEXCEPT);
                 End;
             End Else
             Begin
               NextNonCommentToken;
               If StmtList = 0 Then
-                MetricsEmptyBlockAtToken(mmEmptyFINALLY);
+                MetricsEmptyBlockAtToken(mcEmptyFINALLY);
             End;
           If Token.UToken = strEND Then
             NextNonCommentToken
@@ -7309,11 +7307,11 @@ Begin
           NextNonCommentToken;
           iFinal := StmtList;
           If iFinal = 0 Then
-            AddModuleMetric([], F.Line, F.Column, F, mmEmptyFinalization);
+            AddModuleCheck([], F.Line, F.Column, F, mcEmptyFinalization);
         End Else
           iFinal := 0;
       If (iInitial = 0) And (iFinal = 0) Then
-        AddModuleMetric([], I.Line, I.Column, I, mmEmptyIntialization);
+        AddModuleCheck([], I.Line, I.Column, I, mcEmptyIntialization);
       If Token.UToken = strEND Then
         NextNonCommentToken
       Else

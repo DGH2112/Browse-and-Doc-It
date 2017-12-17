@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    10 Dec 2017
+  @Date    16 Dec 2017
 
   @todo    Add the ability for the issues to be overridden (show a different colour but does n0t add to
            issue list).
@@ -711,10 +711,10 @@ Begin
   FLimits.FLinesOfCode := TBADIOptions.BADIOptions.ModuleMetric[mmLongMethods].FLimit;
   FLimits.FParameterCount := TBADIOptions.BADIOptions.ModuleMetric[mmLongParameterLists].FLimit;
   FLimits.FVariableCount := TBADIOptions.BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit;
-  FLimits.FNestedIFDepth := TBADIOptions.BADIOptions.ModuleMetric[mmMethodIFDepth].FLimit;
+  FLimits.FNestedIFDepth := TBADIOptions.BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit;
   FLimits.FCyclometricComplexity :=
-    TBADIOptions.BADIOptions.ModuleMetric[mmMethodCyclometricComplexity].FLimit;
-  FLimits.FToxicity := TBADIOptions.BADIOptions.ModuleMetric[mmMethodToxicity].FLimit;
+    TBADIOptions.BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit;
+  FLimits.FToxicity := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity].FLimit;
   FLowThreshold := TBADIOptions.BADIOptions.LowMetricMargin / dblPercentageDivisor;
   FHighThreshold := TBADIOptions.BADIOptions.HighMetricMargin / dblPercentageDivisor;
 End;

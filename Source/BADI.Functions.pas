@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle.
-  @Date    19 Nov 2017
+  @Date    17 Dec 2017
 
 **)
 Unit BADI.Functions;
@@ -52,6 +52,7 @@ Type
   Procedure GetFontInfo(Const slTokens : TStringList; Const iTokenIndex : Integer;
     Const boolTitle, boolSyntax : Boolean; Const iForeColour, iBackColour : TColor;
     Const FontStyles : TFontStyles; Const Canvas : TCanvas);
+  Function BlendColour(Const iBaseColour, iHighlightColour : TColor; Const dblBlend : Double) : TColor;
 
 Implementation
 
@@ -61,6 +62,59 @@ Uses
   SHFolder,
   BADI.Options,
   UITypes;
+
+(**
+
+  This method blends the given colours by the given ratio and returns the blended colour.
+
+  @precon  None.
+  @postcon Returns the blended colour.
+
+  @param   iBaseColour      as a TColor as a constant
+  @param   iHighlightColour as a TColor as a constant
+  @param   dblBlend         as a Double as a constant
+  @return  a TColor
+
+**)
+Function BlendColour(Const iBaseColour, iHighlightColour : TColor; Const dblBlend : Double) : TColor;
+
+  (**
+
+    This method returns a pro rataed colours between the two input colours.
+
+    @precon  None.
+    @postcon Returns a pro rataed colours between the two input colours.
+
+    @param   iBase as a TColor as a constant
+    @param   iHigh as a TColor as a constant
+    @return  a TColor
+
+  **)
+  Function ProRataColor(Const iBase, iHigh : TColor) : TColor;
+
+  Begin
+    Result := iBase + Trunc(Int(iHigh - iBase) * dblBlend);
+  End;
+
+Const
+  iRed = $0000FF;
+  iGreen = $00FF00;
+  iBlue = $FF0000;
+  iGreenShift = 8;
+  iBlueShift = 16;
+
+Var
+  R, G, B : TColor;
+  BC, HC : TColor;
+
+Begin
+  HC := ColorToRGB(iHighlightColour);
+  BC := ColorToRGB(iBaseColour);
+  R := ProRataColor(BC And iRed, HC And iRed);
+  G := ProRataColor((BC And iGreen) Shr iGreenShift, (HC And iGreen) Shr iGreenShift);
+  B := ProRataColor((BC And iBlue) Shr iBlueShift, (HC And iBlue) Shr iBlueShift);
+  Result := RGB(R, G, B);
+End;
 
 (**
 

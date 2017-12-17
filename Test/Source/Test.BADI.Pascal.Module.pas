@@ -7304,7 +7304,7 @@ Begin
     'Finalization',
     [ttErrors, ttWarnings, ttChecksAndMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 2
   );
 End;
 
@@ -7897,7 +7897,13 @@ End;
 
 procedure TestTPascalModule.TestLongMethodImplementations;
 
+Var
+  R: TBADIMetricRecord;
+
 Begin
+  R := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity];
+  R.FLimit := 10.0;
+  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
@@ -7916,8 +7922,8 @@ Begin
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
-    'Procedure MyProc(Const A, B, C, D, E, F, G, H : Integer);',
-    'Procedure MyProc(Const A, B, C, D, E, F, G, H : Integer);'#13#10 +
+    'Procedure MyProc();',
+    'Procedure MyProc();'#13#10 +
     'Begin'#13#10 +
     ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
     '  WriteLn;'#13#10 +
@@ -7932,7 +7938,7 @@ Begin
   TestGrammarForErrors(
     TPascalModule,
     strProgram,
-    'Procedure MyProc(Const A, B, C, D, E, F, G, H : Integer);'#13#10 +
+    'Procedure MyProc();'#13#10 +
     'Begin'#13#10 +
     ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
     '  WriteLn;'#13#10 +
@@ -7945,11 +7951,19 @@ Begin
     [],
     0, 0, 0, 0, 1
   );
+  R.FLimit := 1.0;
+  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
 End;
 
 Procedure TestTPascalModule.TestLongMethodParameterLists;
 
+Var
+  R: TBADIMetricRecord;
+
 Begin
+  R := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity];
+  R.FLimit := 10.0;
+  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
@@ -7985,11 +7999,19 @@ Begin
     [],
     0, 0, 0, 0, 1
   );
+  R.FLimit := 1.0;
+  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
 End;
 
 Procedure TestTPascalModule.TestLongMethodVariableLists;
 
+Var
+  R: TBADIMetricRecord;
+
 Begin
+  R := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity];
+  R.FLimit := 10.0;
+  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
@@ -8028,6 +8050,8 @@ Begin
     [],
     0, 0, 0, 0, 1
     );
+  R.FLimit := 1.0;
+  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
 End;
 
 Procedure TestTPascalModule.TestMethodCyclometricComplexity;
@@ -8037,7 +8061,7 @@ Var
 
 Begin
   R := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity];
-  R.FLimit := 2.0;
+  R.FLimit := 10.0;
   TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
   TestGrammarForErrors(
     TPascalModule,
@@ -8207,7 +8231,7 @@ Var
 
 Begin
   R := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity];
-  R.FLimit := 2.0;
+  R.FLimit := 10.0;
   TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
   TestGrammarForErrors(
     TPascalModule,
@@ -8406,8 +8430,9 @@ Begin
     strUnit,
     'Procedure MyProc();',
     'Procedure MyProc();'#13#10 +
+    'Const s = ''Hello'';'#13#10 +
     'Begin'#13#10 +
-    '  WriteLn(''Hello'');'#13#10 +
+    '  WriteLn(s);'#13#10 +
     '  GOTO ERRHND;'#13#10 +
     'End;',
     [ttErrors, ttWarnings, ttChecksAndMetrics],
@@ -8418,8 +8443,9 @@ Begin
     TPascalModule,
     strProgram,
     'Procedure MyProc();'#13#10 +
+    'Const s = ''Hello'';'#13#10 +
     'Begin'#13#10 +
-    '  WriteLn(''Hello'');'#13#10 +
+    '  WriteLn(s);'#13#10 +
     '  GOTO ERRHND;'#13#10 +
     'End;',
     '  WriteLn();',
@@ -8448,8 +8474,9 @@ Begin
     strUnit,
     'Procedure MyProc();',
     'Procedure MyProc();'#13#10 +
+    'Const s = ''Hello'';'#13#10 + 
     'Begin'#13#10 +
-    '  With X Do WriteLn(''Hello'');'#13#10 +
+    '  With X Do WriteLn(s);'#13#10 +
     'End;',
     [ttErrors, ttWarnings, ttChecksAndMetrics],
     [],
@@ -8459,8 +8486,9 @@ Begin
     TPascalModule,
     strProgram,
     'Procedure MyProc();'#13#10 +
+    'Const s = ''Hello'';'#13#10 + 
     'Begin'#13#10 +
-    '  With X Do WriteLn(''Hello'');'#13#10 +
+    '  With X Do WriteLn(s);'#13#10 +
     'End;',
     '  WriteLn();',
     [ttErrors, ttWarnings, ttChecksAndMetrics],

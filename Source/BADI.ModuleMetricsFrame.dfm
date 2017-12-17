@@ -22,12 +22,13 @@ object frameBADIModuleMetrics: TframeBADIModuleMetrics
     Header.Height = 20
     Header.Options = [hoAutoResize, hoColumnResize, hoShowImages, hoVisible]
     Header.ParentFont = True
+    SelectionBlendFactor = 64
     TabOrder = 0
     TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes, toAutoChangeScale]
     TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toWheelPanning, toEditOnClick, toEditOnDblClick]
     TreeOptions.PaintOptions = [toShowDropmark, toShowHorzGridLines, toShowVertGridLines, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
     TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect]
-    OnBeforeItemErase = vstMetricsBeforeItemErase
+    OnBeforeCellPaint = vstMetricsBeforeCellPaint
     OnChecked = vstMetricsChecked
     OnEditing = vstMetricsEditing
     OnGetText = vstMetricsGetText

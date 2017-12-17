@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    05 Nov 2017
+  @date    17 Dec 2017
 
 **)
 Unit BADI.ModuleMetricsFrame;
@@ -36,11 +36,12 @@ Type
     Procedure vstMetricsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       NewText: String);
     Procedure vstMetricsHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
-    procedure vstMetricsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    Procedure vstMetricsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    Procedure vstMetricsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
+      Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode; CellRect: TRect;
+      Var ContentRect: TRect);
     procedure vstMetricsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure vstMetricsBeforeItemErase(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
-      Node: PVirtualNode; ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
   Strict Private
   Strict Protected
     Procedure LoadSettings;
@@ -60,7 +61,8 @@ Uses
   {$ENDIF}
   BADI.Types,
   BADI.Constants,
-  BADI.Options;
+  BADI.Options, 
+  BADI.Functions;
 
 {$R *.dfm}
 
@@ -108,7 +110,7 @@ Constructor TframeBADIModuleMetrics.Create(AOwner: TComponent);
     @return  a PVirtualNode
 
   **)
-  Function FindParent(Const eMetric : TBADIModuleMetric) : PVirtualNode;
+  Function FindParent(Const eMetric : TBADIModuleMetric) : PVirtualNode; Overload;
 
   Var
     NodeData : PMetricNodeData;
@@ -139,13 +141,10 @@ Begin
   vstMetrics.NodeDataSize := SizeOf(TMetricNodeData);
   For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
     Begin
-      P := FindParent(DefaultModuleMetrics[eMetric].FParent);
+      P := FindParent(ModuleMetrics[eMetric].FParent);
       N := vstMetrics.AddChild(P);
-      If Assigned(P) Then
-        Begin
-          vstMetrics.CheckType[N] := ctCheckBox;
-          vstMetrics.CheckState[N] := csUncheckedNormal;
-        End;
+      vstMetrics.CheckType[N] := ctCheckBox;
+      vstMetrics.CheckState[N] := csUncheckedNormal;
       NodeData := vstMetrics.GetNodeData(N);
       NodeData.FModuleMetric := eMetric;
       NodeData.FMetricLimitType := ltNone;
@@ -179,7 +178,7 @@ Begin
         vstMetrics.CheckState[N] := csCheckedNormal
       Else
         vstMetrics.CheckState[N] := csUncheckedNormal;
-      NodeData.FMetricLimitType := DefaultModuleMetrics[NodeData.FModuleMetric].FLimitType;
+      NodeData.FMetricLimitType := ModuleMetrics[NodeData.FModuleMetric].FLimitType;
       NodeData.FMetricLimit := BO.ModuleMetric[NodeData.FModuleMetric].FLimit;
       N := vstMetrics.GetNext(N);
     End;
@@ -257,29 +256,31 @@ End;
 
 (**
 
-  This is an on before item erase event handler for the tree view.
+  This is an on before cell paint event handler for the treeview.
 
   @precon  None.
-  @postcon Colours the titles in sky blue.
+  @postcon Colours the focused column more than the whole row.
 
-  @param   Sender       as a TBaseVirtualTree
-  @param   TargetCanvas as a TCanvas
-  @param   Node         as a PVirtualNode
-  @param   ItemRect     as a TRect
-  @param   ItemColor    as a TColor as a reference
-  @param   EraseAction  as a TItemEraseAction as a reference
+  @param   Sender        as a TBaseVirtualTree
+  @param   TargetCanvas  as a TCanvas
+  @param   Node          as a PVirtualNode
+  @param   Column        as a TColumnIndex
+  @param   CellPaintMode as a TVTCellPaintMode
+  @param   CellRect      as a TRect
+  @param   ContentRect   as a TRect as a reference
 
 **)
-Procedure TframeBADIModuleMetrics.vstMetricsBeforeItemErase(Sender: TBaseVirtualTree;
-  TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect; Var ItemColor: TColor;
-  Var EraseAction: TItemEraseAction);
+Procedure TframeBADIModuleMetrics.vstMetricsBeforeCellPaint(Sender: TBaseVirtualTree;
+  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode;
+  CellRect: TRect; Var ContentRect: TRect);
+
+Const
+  dblBlendFactor = 0.50;
 
 Begin
-  If Not Assigned(vstMetrics.NodeParent[Node]) Then
-    ItemColor := clSkyBlue
-  Else
-    ItemColor := vstMetrics.Color;
-  EraseAction := eaColor;
+  If (Node = Sender.FocusedNode) And (Column = Sender.FocusedColumn) Then
+    TargetCanvas.Brush.Color := BlendColour(TargetCanvas.Brush.Color, clHighlight, dblBlendFactor);
+  TargetCanvas.FillRect(CellRect);
 End;
 
 (**
@@ -372,15 +373,14 @@ Var
 Begin
   NodeData := Sender.GetNodeData(Node);
   Case Column Of
-    iMetricDescription: CellText := DefaultModuleMetrics[NodeData.FModuleMetric].FDescription;
+    iMetricDescription: CellText := ModuleMetrics[NodeData.FModuleMetric].FDescription;
     iMetricName:
-      If (DefaultModuleMetrics[NodeData.FModuleMetric].FParent In [mmMetrics..mmChecks]) And
-         (NodeData.FModuleMetric <> DefaultModuleMetrics[NodeData.FModuleMetric].FParent) Then
-        CellText := DefaultModuleMetrics[NodeData.FModuleMetric].FName
+      If (NodeData.FModuleMetric = ModuleMetrics[NodeData.FModuleMetric].FParent) Then
+        CellText := ModuleMetrics[NodeData.FModuleMetric].FName
       Else
         CellText := '';
     iMetricLimit:
-      Case DefaultModuleMetrics[NodeData.FModuleMetric].FLimitType Of
+      Case ModuleMetrics[NodeData.FModuleMetric].FLimitType Of
         ltInteger: CellText := Format(strIntegerFmt, [NodeData.FMetricLimit]);
         ltFloat: CellText := Format(strFloatFmt, [NodeData.FMetricLimit]);
         ltNone: CellText := '';
@@ -476,10 +476,10 @@ End;
 
 (**
 
-  This is an on paint text event handler and is used to change the font of the section titles.
+  This is an on paint text event handler for the treeview.
 
   @precon  None.
-  @postcon The Checks and Metrics titles are made bold.
+  @postcon Changes the focused column/row text colour only.
 
   @param   Sender       as a TBaseVirtualTree
   @param   TargetCanvas as a TCanvas as a constant
@@ -492,10 +492,9 @@ Procedure TframeBADIModuleMetrics.vstMetricsPaintText(Sender: TBaseVirtualTree;
   Const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 
 Begin
-  If Not Assigned(vstMetrics.NodeParent[Node]) Then
-    TargetCanvas.Font.Style := [fsBold]
-  Else
-    TargetCanvas.Font.Style := [];
+  TargetCanvas.Font.Color := clWindowText;
+  If (Node = Sender.FocusedNode) And (Column = Sender.FocusedColumn) Then
+    TargetCanvas.Font.Color := clHighlightText;
 End;
 
 End.

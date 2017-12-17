@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    16 Dec 2017
+  @Date    17 Dec 2017
 
 **)
 Unit BADI.Constants;
@@ -466,7 +466,7 @@ Const
   (** A constant name for the Cyclometric Complexity metric so it can be disabled. **)
   strCyclometricComplexityNoMetric = 'CyclometricComplexity';
   (** A constant name for the Cyclometric Complexity Igmore Expressions metric so it can be disabled. **)
-  strCCIgnoreExpressionNoMetric = 'CCIgnoreExpression';
+  strCCIncludeExpressionNoMetric = 'CCIncludeExpression';
   (** A constant name for the Toxicity metric so it can be disabled. **)
   strToxicityNoMetric = 'Toxicity';
   (** A constant name for the Empty Except metric so it can be disabled. **)
@@ -555,8 +555,8 @@ Const
       FLimitType: ltInteger),
     (
       FParent: mmCyclometricComplexity;
-      FName: strCCIgnoreExpressionNoMetric;
-      FDescription: strIgnoreBoolSubExprCat;
+      FName: strCCIncludeExpressionNoMetric;
+      FDescription: strIncludeBoolSubExprCat;
       FEnabled: True;
       FLimit: 0.0;
       FLimitType: ltNone),

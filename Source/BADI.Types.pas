@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    23 Nov 2017
+  @Date    16 Dec 2017
 
 **)
 Unit BADI.Types;
@@ -351,14 +351,6 @@ Type
     FConflictType : TDocConflictIcon;
   End;
 
-  (** A record to describe the attributes of a module metric record. **)
-  TModuleMetricTable = Record
-    FCategory     : String;
-    FMessage      : String;
-    FDescription  : String;
-    FConflictType : TDocConflictIcon;
-  End;
-
   (** This enumerate defind the type of information to find. **)
   TFindType = (ftName, ftIdentifier);
 
@@ -461,46 +453,45 @@ Type
       Const setTagProperties : TBADITagProperties);
   End;
 
-  (** An enumerate to define the type of the metric or check. **)
-  TBADIMetricChecksType = (mctRoot, mctMetric, mctCheck);
-
   (** An enumerate to descibe each of the metrics. **)
   TBADIModuleMetric = (
-    mmMetrics,
-    mmChecks,
     mmLongMethods,
     mmLongParameterLists,
     mmLongMethodVariableLists,
-    mmHardCodedIntegers,
-      mmHCIntIgnoreZero,
-      mmHCIntIgnoreOne,
-    mmHardCodedNumbers,
-      mmHCNumIgmoreZero,
-    mmHardCodedStrings,
-      mmHCStrIgnoreEmpty,
-      mmHCStrIgnoreSingle,
-    mmUnsortedMethod,
-    mmUseOfWithStatements,
-    mmUseOfGOTOStatements,
-    mmMethodIFDepth,
-    mmMethodCyclometricComplexity,
+    mmNestedIFDepth,
+    mmCyclometricComplexity,
       mmMethodCCIgnoreExpression,
-    mmMethodToxicity,
-    mmEmptyEXCEPT,
-    mmEmptyFINALLY,
-    mmExceptionEating,
-    mmEmptyTHEN,
-    mmEmptyELSE,
-    mmEmptyCASE,
-    mmEmptyFOR,
-    mmEmptyWHILE,
-    mmEmptyREPEAT,
-    mmEmptyBEGINEND,
-    mmEmptyIntialization,
-    mmEmptyFinalization,
-    mmEmptyMethod,
-    mmMissingCONSTInParemterList,
-      mmMCParmListIgnoreEvents
+    mmToxicity
+  );
+
+  (** An enumerate to descibe each of the checks. **)
+  TBADIModuleCheck = (
+    mcHardCodedIntegers,
+      mcHCIntIgnoreZero,
+      mcHCIntIgnoreOne,
+    mcHardCodedNumbers,
+      mcHCNumIgmoreZero,
+    mcHardCodedStrings,
+      mcHCStrIgnoreEmpty,
+      mcHCStrIgnoreSingle,
+    mcUnsortedMethod,
+    mcUseOfWithStatements,
+    mcUseOfGOTOStatements,
+    mcEmptyEXCEPT,
+    mcEmptyFINALLY,
+    mcExceptionEating,
+    mcEmptyTHEN,
+    mcEmptyELSE,
+    mcEmptyCASE,
+    mcEmptyFOR,
+    mcEmptyWHILE,
+    mcEmptyREPEAT,
+    mcEmptyBEGINEND,
+    mcEmptyIntialization,
+    mcEmptyFinalization,
+    mcEmptyMethod,
+    mcMissingCONSTInParemterList,
+      mcMCParmListIgnoreEvents
   );
 
   (** An enumerate to define the type of the metric limit. **)
@@ -510,7 +501,22 @@ Type
   TBADIMetricRecord = Record
     FParent          : TBADIModuleMetric;
     FName            : String;
+    FCategory        : String;
+    FMessage         : String;
     FDescription     : String;
+    FConflictType    : TDocConflictIcon;
+    FEnabled         : Boolean;
+    FLimit           : Double;
+    FLimitType       : TBADILimitType;
+  End;
+  (** A record to describe the attributes of each metric. **)
+  TBADICheckRecord = Record
+    FParent          : TBADIModuleCheck;
+    FName            : String;
+    FCategory        : String;
+    FMessage         : String;
+    FDescription     : String;
+    FConflictType    : TDocConflictIcon;
     FEnabled         : Boolean;
     FLimit           : Double;
     FLimitType       : TBADILimitType;

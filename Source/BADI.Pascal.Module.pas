@@ -5272,10 +5272,11 @@ Begin
       IFExpr := TTempCntr.Create('', scNone, 0, 0, iiNone, Nil);
       Try
         Expression(IFExpr, ExprType);
-        For iToken := 0 To IFExpr.TokenCount - 1 Do
-          If IsKeyWord(IFExpr.Tokens[iToken].Token, strCycloMetricComplexityOperators) Then
-            If Assigned(CurrentMethod) Then
-              CurrentMethod.IncCyclometricComplexity;
+        If BADIOptions.BADIOptions.ModuleMetric[mmMethodCCIncludeExpression].FEnabled Then
+          For iToken := 0 To IFExpr.TokenCount - 1 Do
+            If IsKeyWord(IFExpr.Tokens[iToken].Token, strCycloMetricComplexityOperators) Then
+              If Assigned(CurrentMethod) Then
+                CurrentMethod.IncCyclometricComplexity;
       Finally
         IFExpr.Free;
       End;
@@ -5821,7 +5822,7 @@ End;
   @precon  None .
   @postcon Returns a string repreentation of the unit.
 
-  @nohint
+  @nohints
 
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant

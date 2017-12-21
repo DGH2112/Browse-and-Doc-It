@@ -6,10 +6,10 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Dec 2017
+  @Date    21 Dec 2017
   
 **)
-Unit BADI.Module.Statistics.SubView.Frame;
+Unit BADI.Module.Metrics.SubView.Frame;
 
 Interface
 
@@ -23,15 +23,20 @@ Uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
-  BADI.Module.Statistics.Frame,
+  BADI.Module.Metrics.EditorView.Frame,
   Vcl.ExtCtrls,
   System.ImageList,
   Vcl.ImgList,
-  VirtualTrees;
+  VirtualTrees,
+  Actions,
+  ActnList,
+  Menus,
+  PlatformDefaultStyleActnCtrls,
+  ActnPopup;
 
 Type
   (** A descendant class for the subview frame. **)
-  TframeBADIModuleStatisticsSubView = Class(TframeBADIModuleStatistics)
+  TframeBADIModuleMetricsSubView = Class(TframeBADIModuleMetricsEditorView)
   Strict Private
   Strict Protected
   Public

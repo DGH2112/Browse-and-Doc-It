@@ -1,2 +1,0 @@
-inherited frameBADIModuleStatisticsSubView: TframeBADIModuleStatisticsSubView
-end

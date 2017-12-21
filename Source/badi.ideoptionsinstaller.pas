@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Dec 2017
+  @Date    21 Dec 2017
 
 **)
 Unit BADI.IDEOptionsInstaller;
@@ -61,7 +61,7 @@ Uses
   BADI.MenuShortcutsFrame,
   BADI.ModuleExtensionsFrame,
   BADI.ModuleExplorerFrame,
-  BADI.ModuleMetricsFrame,
+  BADI.Module.Metrics.Options.Frame,
   BADI.ModuleChecksFrame;
 
 { TBADIIDEOptionsInstaller }
@@ -79,16 +79,16 @@ Uses
 Constructor TBADIIDEOptionsInstaller.Create(Const UpdateMenuShortcuts : TNotifyEvent);
 
 Resourcestring
-  strGeneralOptions = 'General Options';
-  strSpecialTags = 'Special Tags';
-  strModuleMetrics = 'Metrics';
-  strModuleChecks = 'Checks';
-  strModuleExplorer = 'Explorer';
-  strCodeBrowsing = 'Code Browsing';
-  strExcludedDocumentati = 'Excluded Documentation Files';
-  strMethodDescriptions = 'Method Descriptions';
-  strMenuShortcuts = 'Menu Shortcuts';
-  strModuleExtensions = 'Module Extensions';
+  strGeneralOptions        = 'Options';
+  strSpecialTags           = 'Special Tags';
+  strModuleMetrics         = 'Metrics';
+  strModuleChecks          = 'Checks';
+  strModuleExplorer        = 'Explorer';
+  strCodeBrowsing          = 'Code Browsing';
+  strExcludedDocumentation = 'Excluded Documentation';
+  strMethodDescriptions    = 'Method Descriptions';
+  strMenuShortcuts         = 'Shortcuts';
+  strModuleExtensions      = 'Extensions';
 
 Var
   NEOS : INTAEnvironmentOptionsServices;
@@ -103,7 +103,7 @@ Begin
       NEOS.RegisterAddInOptions(FBADIGeneralOptions);
       FBADISpecialtags := TBADIIDEOptionsHandler.Create(TfmBADISpecialTagsFrame, strSpecialTags);
       NEOS.RegisterAddInOptions(FBADISpecialtags);
-      FBADIModuleMetrics := TBADIIDEOptionsHandler.Create(TframeBADIModuleMetrics, strModuleMetrics);
+      FBADIModuleMetrics := TBADIIDEOptionsHandler.Create(TframeBADIModuleMetricsOptions, strModuleMetrics);
       NEOS.RegisterAddInOptions(FBADIModuleMetrics);
       FBADIModuleChecks := TBADIIDEOptionsHandler.Create(TframeBADIModuleChecks, strModuleChecks);
       NEOS.RegisterAddInOptions(FBADIModuleChecks);
@@ -111,7 +111,7 @@ Begin
       NEOS.RegisterAddInOptions(FBADIModuleExplorer);
       FBADICodeBrowsing := TBADIIDEOptionsHandler.Create(TfmBADICodeBrowsingFrame, strCodeBrowsing);
       NEOS.RegisterAddInOptions(FBADICodeBrowsing);
-      FBADIExcludedDocs := TBADIIDEOptionsHandler.Create(TfmBADIExcludedDocFilesFrame, strExcludedDocumentati);
+      FBADIExcludedDocs := TBADIIDEOptionsHandler.Create(TfmBADIExcludedDocFilesFrame, strExcludedDocumentation);
       NEOS.RegisterAddInOptions(FBADIExcludedDocs);
       FBADIMethodDesc := TBADIIDEOptionsHandler.Create(TfmBADIMethodDescriptionsFrame, strMethodDescriptions);
       NEOS.RegisterAddInOptions(FBADIMethodDesc);

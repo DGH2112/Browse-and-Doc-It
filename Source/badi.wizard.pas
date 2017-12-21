@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    03 Dec 2017
+  @Date    21 Dec 2017
   @Version 1.0
 
 **)
@@ -38,6 +38,16 @@ Type
     FEditorIndex             : Integer;
     {$ENDIF}
   Strict Protected
+    // IOTAWizard
+    Function GetIDString: String;
+    Function GetName: String;
+    Function GetState: TWizardState;
+    Procedure Execute;
+    // IOTAMenuWizard
+    {$HINTS OFF}
+    Function GetMenuText: String;
+    {$HINTS ON}
+    // General Methods
     Procedure SelectionChange(Const iIdentLine, iIdentCol, iCommentLine, iCommentCol: Integer);
     Procedure Focus(Sender: TObject);
     Procedure OptionsChange(Sender: TObject);
@@ -45,15 +55,6 @@ Type
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    { IOTAWizard }
-    Function GetIDString: String;
-    Function GetName: String;
-    Function GetState: TWizardState;
-    Procedure Execute;
-    { IOTAMenuWizard }
-    {$HINTS OFF}
-    Function GetMenuText: String;
-    {$HINTS ON}
   End;
 
 Implementation
@@ -64,8 +65,8 @@ Uses
   {$ENDIF}
   BADI.DockableModuleExplorer,
   BADI.Constants, 
-  BADI.Module.Statistics, 
-  BADI.Module.Statistics.SubView;
+  BADI.Module.Metrics, 
+  BADI.Module.Metrics.SubView;
 
 (**
 
@@ -84,8 +85,7 @@ Begin
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange);
   {$IFDEF D2005}
   FEditorNotifier := TEditorNotifier.Create;
-  FEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(
-    FEditorNotifier);
+  FEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(FEditorNotifier);
   {$ELSE}
   FEditorNotifier := TEditorNotifier.Create;
   {$ENDIF}

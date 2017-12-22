@@ -4,10 +4,10 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    09 Dec 2017
+  @Date    22 Dec 2017
   
 **)
-Unit BADI.Module.Statistics.SubView;
+Unit BADI.Module.Metrics.SubView;
 
 Interface
 
@@ -16,12 +16,11 @@ Uses
   StdActns,
   DesignIntf,
   Forms,
-  Generics.Collections, 
-  BADI.Module.Statistics.SubView.Frame;
+  Generics.Collections;
 
 Type
   (** A class to implement the INTACustomEditorSubView interface for a subview for metrics. **)
-  TBADIModuleStatisticsSubView = Class(TInterfacedObject, INTACustomEditorSubView)
+  TBADIModuleMetricsSubView = Class(TInterfacedObject, INTACustomEditorSubView)
   Strict Private
   Strict Protected
     // INTACustomEditorSubView
@@ -59,7 +58,8 @@ Uses
   BADI.Module.Dispatcher, 
   BADI.Base.Module, 
   BADI.Types, 
-  BADI.Module.Statistics.Frame;
+  BADI.Module.Metrics.SubView.Frame,
+  BADI.Module.Metrics.EditorView.Frame;
 
 Var
   (** A private pointer to the regsitered subview so it can be removed. **)
@@ -81,7 +81,7 @@ Var
 Begin
   If Supports(BorlandIDEServices, IOTAEditorViewServices, EVS) Then
     ptrEditorMetricsSubView := EVS.RegisterEditorSubView(
-      TBADIModuleStatisticsSubView.CreateEditorMetricsSubView);
+      TBADIModuleMetricsSubView.CreateEditorMetricsSubView);
 End;
 
 (**
@@ -102,19 +102,19 @@ Begin
     EVS.UnregisterEditorSubView(ptrEditorMetricsSubView);
 End;
 
-{ TBADIModuleStatisticsSubView }
+{ TBADIModuleMetricsSubView }
 
 (**
 
-  A constructor for the TBADIModuleStatisticsSubView class.
+  A constructor for the TBADIModuleMetricsSubView class.
 
   @precon  None.
   @postcon Does nothing.
 
-  @nometric EmptyMethod - was being used for CodeSite tracing.
+  @nocheck EmptyMethod
 
 **)
-Constructor TBADIModuleStatisticsSubView.Create;
+Constructor TBADIModuleMetricsSubView.Create;
 
 Begin
 End;
@@ -129,21 +129,21 @@ End;
   @return  an INTACustomEditorSubView
 
 **)
-Class Function TBADIModuleStatisticsSubView.CreateEditorMetricsSubView: INTACustomEditorSubView;
+Class Function TBADIModuleMetricsSubView.CreateEditorMetricsSubView: INTACustomEditorSubView;
 
 Begin
-  Result := TBADIModuleStatisticsSubView.Create;
+  Result := TBADIModuleMetricsSubView.Create;
 End;
 
 (**
 
-  A destructor for the TBADIModuleStatisticsSubView class.
+  A destructor for the TBADIModuleMetricsSubView class.
 
   @precon  None.
   @postcon Does nothing.
 
 **)
-Destructor TBADIModuleStatisticsSubView.Destroy;
+Destructor TBADIModuleMetricsSubView.Destroy;
 
 Begin
   Inherited Destroy;
@@ -157,14 +157,13 @@ End;
   @postcon If the context is valid the modules editor text is parsed and passed to the subview for
            rendering.
 
-  @nometric MissingCONSTInParam
-  @nohint
+  @nocheck MissingCONSTInParam
 
   @param   AContext    as an IInterface as a constant
   @param   AViewObject as a TObject
 
 **)
-Procedure TBADIModuleStatisticsSubView.Display(Const AContext: IInterface; AViewObject: TObject);
+Procedure TBADIModuleMetricsSubView.Display(Const AContext: IInterface; AViewObject: TObject);
 
 Var
   EVS : IOTAEditorViewServices;
@@ -183,7 +182,7 @@ Begin
           Module := TBADIDispatcher.BADIDispatcher.Dispatcher(strSource, SE.FileName, SE.Modified,
             [moParse]);
           Try
-            (AViewObject As TframeBADIModuleStatisticsSubView).RenderModule(Module, [sroClear,
+            (AViewObject As TframeBADIModuleMetricsSubView).RenderModule(Module, [sroClear,
               sroAutoExpand]);
           Finally
             Module.Free;
@@ -199,8 +198,8 @@ End;
   @postcon If copy is the action the subview asks the frame to copy the metric information to the
            clipboard.
 
-  @nometric MissingCONSTInParam
-  @nohint
+  @nocheck MissingCONSTInParam
+  @nohint  AContext
 
   @param   AContext    as an IInterface as a constant
   @param   Action      as a TEditAction
@@ -208,7 +207,7 @@ End;
   @return  a Boolean
 
 **)
-Function TBADIModuleStatisticsSubView.EditAction(Const AContext: IInterface; Action: TEditAction;
+Function TBADIModuleMetricsSubView.EditAction(Const AContext: IInterface; Action: TEditAction;
   AViewObject: TObject): Boolean;
 
 Begin
@@ -216,7 +215,7 @@ Begin
   Case Action Of
     eaCopy:
       Begin
-        (AViewObject As TframeBADIModuleStatisticsSubView).CopyToClipboard;
+        (AViewObject As TframeBADIModuleMetricsSubView).CopyToClipboard;
         REsult := True;
       End;
   End;
@@ -229,13 +228,13 @@ End;
   @precon  None.
   @postcon Store a reference to the frame instance so it can be used later in Display.
 
-  @nometric MissingCONSTInParam EmptyMethod
-  @nohint
+  @nocheck MissingCONSTInParam EmptyMethod
+  @nohint  AFrame
 
   @param   AFrame as a TCustomFrame
 
 **)
-Procedure TBADIModuleStatisticsSubView.FrameCreated(AFrame: TCustomFrame);
+Procedure TBADIModuleMetricsSubView.FrameCreated(AFrame: TCustomFrame);
 
 Begin
 End;
@@ -251,7 +250,7 @@ End;
   @return  a Boolean
 
 **)
-Function TBADIModuleStatisticsSubView.GetCanCloneView: Boolean;
+Function TBADIModuleMetricsSubView.GetCanCloneView: Boolean;
 
 Begin
   Result := False;
@@ -267,7 +266,7 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleStatisticsSubView.GetCaption: String;
+Function TBADIModuleMetricsSubView.GetCaption: String;
 
 ResourceString
   strMetrics = 'Metrics';
@@ -284,15 +283,15 @@ End;
   @postcon Called by the IDE to find out which editor actions can be undertaken byt he subview. We return
            a set with esCanCopy to signify that the subview can copy the mreic data to the clipboard.
 
-  @nometric MissingCONSTInParam
-  @nohint
+  @nocheck MissingCONSTInParam
+  @nohint  AContext AViewObject
 
   @param   AContext    as an IInterface as a constant
   @param   AViewObject as a TObject
   @return  a TEditState
 
 **)
-Function TBADIModuleStatisticsSubView.GetEditState(Const AContext: IInterface;
+Function TBADIModuleMetricsSubView.GetEditState(Const AContext: IInterface;
   AViewObject: TObject): TEditState;
 
 Begin
@@ -310,10 +309,10 @@ End;
   @return  a TCustomFrameClass
 
 **)
-Function TBADIModuleStatisticsSubView.GetFrameClass: TCustomFrameClass;
+Function TBADIModuleMetricsSubView.GetFrameClass: TCustomFrameClass;
 
 Begin
-  Result := TframeBADIModuleStatisticsSubView;
+  Result := TframeBADIModuleMetricsSubView;
 End;
 
 (**
@@ -327,7 +326,7 @@ End;
   @return  an Integer
 
 **)
-Function TBADIModuleStatisticsSubView.GetPriority: Integer;
+Function TBADIModuleMetricsSubView.GetPriority: Integer;
 
 Begin
   Result := svpLow;
@@ -343,7 +342,7 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleStatisticsSubView.GetViewIdentifier: String;
+Function TBADIModuleMetricsSubView.GetViewIdentifier: String;
 
 Const
   strBADIMetricsSubView = 'BADICustomEditorMetricsSubView';
@@ -363,7 +362,7 @@ End;
   @return  a Boolean
 
 **)
-Function TBADIModuleStatisticsSubView.Handles(Const AContext: IInterface): Boolean;
+Function TBADIModuleMetricsSubView.Handles(Const AContext: IInterface): Boolean;
 
 Var
   EVS : IOTAEditorViewServices;
@@ -383,14 +382,14 @@ End;
   @precon  None.
   @postcon Not used.
 
-  @nometric EmptyMethod MissingCONSTInParam
-  @nohint
+  @nocheck EmptyMethod MissingCONSTInParam
+  @nohint  AContext AViewObject
 
   @param   AContext    as an IInterface as a constant
   @param   AViewObject as a TObject
 
 **)
-Procedure TBADIModuleStatisticsSubView.Hide(Const AContext: IInterface; AViewObject: TObject);
+Procedure TBADIModuleMetricsSubView.Hide(Const AContext: IInterface; AViewObject: TObject);
 
 Begin
   // Do nothing
@@ -403,14 +402,14 @@ End;
   @precon  None.
   @postcon Not used.
 
-  @nometric MissingCONSTInParam EmptyMethod
-  @nohint
+  @nocheck MissingCONSTInParam EmptyMethod
+  @nohint  AContext AViewObject
 
   @param   AContext    as an IInterface as a constant
   @param   AViewObject as a TObject
 
 **)
-Procedure TBADIModuleStatisticsSubView.ViewClosed(Const AContext: IInterface; AViewObject: TObject);
+Procedure TBADIModuleMetricsSubView.ViewClosed(Const AContext: IInterface; AViewObject: TObject);
 
 Begin
   // Do nothing

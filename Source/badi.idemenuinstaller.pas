@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    16 Dec 2017
+  @Date    22 Dec 2017
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -109,7 +109,7 @@ Uses
   BADI.Constants, 
   BADI.Base.Documentation, 
   BADI.Refactor.Constant, 
-  BADI.Module.Statistics;
+  BADI.Module.Metrics;
 
 ResourceString
   (** This is a resource message to confirm whether the selected text should be
@@ -948,141 +948,6 @@ End;
 
 (**
 
-  This is a menu OnClick event for the insertion of a property comment. This
-  method searches the IDE for the current module being edited and then
-  creates a memory stream of the source and passes it to the Unit parser.
-
-  It then finds the first preperty declaration prior to the cursor position,
-  parses the declaration and output the information in as comment immediately
-  above the property declaration.
-
-  This comment block starts with '(**' to signify an ObjectPascalDoc comment
-  that can be used by the documentation system.
-
-  @precon  Sender is the object initiating the event.
-  @postcon Inserts a property comment into the editor for the current property.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TBADIIDEMenuInstaller.PropertyCommentClick(Sender: TObject);
-
-Var
-  Module          : TBaseLanguageModule;
-  EditPos         : TOTAEditPos;
-  Source          : IOTASourceEditor;
-  T               : TElementContainer;
-  F               : TGenericFunction;
-  Writer          : IOTAEditWriter;
-  iInsertLine     : Integer;
-  iIndent         : Integer;
-  strComment      : String;
-  CursorDelta     : TPoint;
-  iMaxCommentWidth: Integer;
-
-Begin
-  Source := ActiveSourceEditor;
-  If Source = Nil Then
-    Exit;
-  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(Source), Source.FileName,
-    Source.Modified, [moParse]);
-  If Module <> Nil Then
-    Try
-      EditPos := Source.GetEditView(0).CursorPos;
-      T       := Module.FindElement(strTypesLabel);
-      If T <> Nil Then
-        Begin
-          F := FindFunction(EditPos.Line, Module, TGenericProperty);
-          If F <> Nil Then
-            Begin
-              iIndent := FindIndentOfFirstTokenOnLine(Module, F.Line) - 1;
-              If F.Comment <> Nil Then
-                Begin
-                  If MessageDlg(Format(strPropertyAlreadyExists, [F.Identifier]),
-                    mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
-                    Exit;
-                  iInsertLine := F.Comment.Line;
-                  DeleteExistingComment(Source, F.Comment.Line, F.Line);
-                End
-              Else
-                iInsertLine := F.Line;
-              Writer        := Source.CreateUndoableWriter;
-              Try
-                iMaxCommentWidth := Source.EditViews[0].Buffer.BufferOptions.RightMargin;
-                strComment       := WriteComment(F,
-                  TBADIDispatcher.BADIDispatcher.GetCommentType(Source.FileName,
-                  csBlock), iIndent, False, CursorDelta, iMaxCommentWidth);
-                InsertComment(strComment, Writer, iInsertLine, Source);
-              Finally
-                Writer := Nil;
-              End;
-              PositionCursorInFunction(CursorDelta, iInsertLine, iIndent, strComment);
-            End
-          Else
-            MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
-        End;
-    Finally
-      Module.Free;
-    End;
-End;
-
-(**
-
-  This in an on click event handler for the Insert ToDo Comment menu item.
-
-  @precon  None.
-  @postcon Inserts in the the menu at the cursor a todo line comment.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TBADIIDEMenuInstaller.ToDoCommentClick(Sender: TObject);
-
-Const
-  strAtToDo = '@todo ';
-
-Var
-  SE             : IOTASourceEditor;
-  Writer         : IOTAEditWriter;
-  EditPos        : TOTAEditPos;
-  CharPos        : TOTACharPos;
-  strSelectedText: String;
-  strComment     : String;
-  CommentType    : TCommentType;
-  iIndent        : Integer;
-
-Begin
-  SE := ActiveSourceEditor;
-  If SE <> Nil Then
-    Begin
-      If IsTextSelected Then
-        Case MessageDlg(strThereIsSelectedText, mtConfirmation, [mbYes, mbNo,
-          mbCancel], 0) Of
-          mrCancel: Exit;
-          mrNo:     strSelectedText := '';
-        Else
-          strSelectedText := SelectedText(True);
-        End;
-      EditPos := SE.EditViews[0].CursorPos;
-      Writer  := SE.CreateUndoableWriter;
-      Try
-        CharPos.Line      := EditPos.Line;
-        CharPos.CharIndex := EditPos.Col;
-        Writer.CopyTo(SE.GetEditView(0).CharPosToPos(CharPos) - 1);
-        CommentType := TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csLine);
-        iIndent     := EditPos.Col;
-        strComment  := BuildBlockComment(CommentType, csLine, iIndent, strAtToDo + strSelectedText);
-        OutputText(Writer, strComment);
-        EditPos.Col := EditPos.Col + 10;
-      Finally
-        Writer := Nil;
-      End;
-      SE.EditViews[0].CursorPos := EditPos;
-    End;
-End;
-
-(**
-
   This method positions the comment and function according to the options and then places the cursor in 
   the appropriate position for editing.
 
@@ -1235,6 +1100,86 @@ Begin
     End
   Else
     MessageDlg(strSelectSourceCode, mtError, [mbOK], 0);
+End;
+
+(**
+
+  This is a menu OnClick event for the insertion of a property comment. This
+  method searches the IDE for the current module being edited and then
+  creates a memory stream of the source and passes it to the Unit parser.
+
+  It then finds the first preperty declaration prior to the cursor position,
+  parses the declaration and output the information in as comment immediately
+  above the property declaration.
+
+  This comment block starts with '(**' to signify an ObjectPascalDoc comment
+  that can be used by the documentation system.
+
+  @precon  Sender is the object initiating the event.
+  @postcon Inserts a property comment into the editor for the current property.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBADIIDEMenuInstaller.PropertyCommentClick(Sender: TObject);
+
+Var
+  Module          : TBaseLanguageModule;
+  EditPos         : TOTAEditPos;
+  Source          : IOTASourceEditor;
+  T               : TElementContainer;
+  F               : TGenericFunction;
+  Writer          : IOTAEditWriter;
+  iInsertLine     : Integer;
+  iIndent         : Integer;
+  strComment      : String;
+  CursorDelta     : TPoint;
+  iMaxCommentWidth: Integer;
+
+Begin
+  Source := ActiveSourceEditor;
+  If Source = Nil Then
+    Exit;
+  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(EditorAsString(Source), Source.FileName,
+    Source.Modified, [moParse]);
+  If Module <> Nil Then
+    Try
+      EditPos := Source.GetEditView(0).CursorPos;
+      T       := Module.FindElement(strTypesLabel);
+      If T <> Nil Then
+        Begin
+          F := FindFunction(EditPos.Line, Module, TGenericProperty);
+          If F <> Nil Then
+            Begin
+              iIndent := FindIndentOfFirstTokenOnLine(Module, F.Line) - 1;
+              If F.Comment <> Nil Then
+                Begin
+                  If MessageDlg(Format(strPropertyAlreadyExists, [F.Identifier]),
+                    mtWarning, [mbYes, mbNo, mbCancel], 0) <> mrYes Then
+                    Exit;
+                  iInsertLine := F.Comment.Line;
+                  DeleteExistingComment(Source, F.Comment.Line, F.Line);
+                End
+              Else
+                iInsertLine := F.Line;
+              Writer        := Source.CreateUndoableWriter;
+              Try
+                iMaxCommentWidth := Source.EditViews[0].Buffer.BufferOptions.RightMargin;
+                strComment       := WriteComment(F,
+                  TBADIDispatcher.BADIDispatcher.GetCommentType(Source.FileName,
+                  csBlock), iIndent, False, CursorDelta, iMaxCommentWidth);
+                InsertComment(strComment, Writer, iInsertLine, Source);
+              Finally
+                Writer := Nil;
+              End;
+              PositionCursorInFunction(CursorDelta, iInsertLine, iIndent, strComment);
+            End
+          Else
+            MessageDlg(strNoPropertyFound, mtWarning, [mbOK], 0);
+        End;
+    Finally
+      Module.Free;
+    End;
 End;
 
 (**
@@ -1624,7 +1569,62 @@ End;
 Procedure TBADIIDEMenuInstaller.StatisticsClick(Sender: TObject);
 
 Begin
-  TBADIModuleStatistics.CreateEditorView; 
+  TBADIModuleMetricsEditorView.CreateEditorView; 
+End;
+
+(**
+
+  This in an on click event handler for the Insert ToDo Comment menu item.
+
+  @precon  None.
+  @postcon Inserts in the the menu at the cursor a todo line comment.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBADIIDEMenuInstaller.ToDoCommentClick(Sender: TObject);
+
+Const
+  strAtToDo = '@todo ';
+
+Var
+  SE             : IOTASourceEditor;
+  Writer         : IOTAEditWriter;
+  EditPos        : TOTAEditPos;
+  CharPos        : TOTACharPos;
+  strSelectedText: String;
+  strComment     : String;
+  CommentType    : TCommentType;
+  iIndent        : Integer;
+
+Begin
+  SE := ActiveSourceEditor;
+  If SE <> Nil Then
+    Begin
+      If IsTextSelected Then
+        Case MessageDlg(strThereIsSelectedText, mtConfirmation, [mbYes, mbNo,
+          mbCancel], 0) Of
+          mrCancel: Exit;
+          mrNo:     strSelectedText := '';
+        Else
+          strSelectedText := SelectedText(True);
+        End;
+      EditPos := SE.EditViews[0].CursorPos;
+      Writer  := SE.CreateUndoableWriter;
+      Try
+        CharPos.Line      := EditPos.Line;
+        CharPos.CharIndex := EditPos.Col;
+        Writer.CopyTo(SE.GetEditView(0).CharPosToPos(CharPos) - 1);
+        CommentType := TBADIDispatcher.BADIDispatcher.GetCommentType(SE.FileName, csLine);
+        iIndent     := EditPos.Col;
+        strComment  := BuildBlockComment(CommentType, csLine, iIndent, strAtToDo + strSelectedText);
+        OutputText(Writer, strComment);
+        EditPos.Col := EditPos.Col + 10;
+      Finally
+        Writer := Nil;
+      End;
+      SE.EditViews[0].CursorPos := EditPos;
+    End;
 End;
 
 (**

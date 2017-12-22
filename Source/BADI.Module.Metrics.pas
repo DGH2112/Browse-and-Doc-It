@@ -5,10 +5,10 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    10 Dec 2017
+  @Date    22 Dec 2017
   
 **)
-Unit BADI.Module.Statistics;
+Unit BADI.Module.Metrics;
 
 Interface
 
@@ -19,13 +19,13 @@ Uses
   ComCtrls,
   Windows,
   Classes, 
-  BADI.Module.Statistics.Frame, 
+  BADI.Module.Metrics.EditorView.Frame, 
   BADI.Base.Module,
   Generics.Collections;
    
 Type
   (** A class to implement an editor view for displaying module metrics. @nometrics MissingCONSTInParam **)
-  TBADIModuleStatistics = Class(TInterfacedObject, INTACustomEditorView, INTACustomEditorView150,
+  TBADIModuleMetricsEditorView = Class(TInterfacedObject, INTACustomEditorView, INTACustomEditorView150,
     INTACustomEditorViewStatusPanel)
   Strict Private
     Type
@@ -60,25 +60,25 @@ Type
           (** A record to stored information about each view. **)
           TBADIFrameManagerRecord  = Record
             FEditWindowName : String;
-            FFrameReference : TframeBADIModuleStatistics;
+            FFrameReference : TframeBADIModuleMetricsEditorView;
           End;
       Strict Private
         FFrames : TList<TBADIFrameManagerRecord>;
       Strict Protected
-        Function  GetFrame(Const strEditWindowName : String) : TframeBADIModuleStatistics;
+        Function  GetFrame(Const strEditWindowName : String) : TframeBADIModuleMetricsEditorView;
         Function  Find(Const strEditWindowName :String) : Integer;
       Public
         Constructor Create;
         Destructor Destroy; Override;
-        Procedure Add(Const strEditWindowName : String; Const AFrame : TframeBADIModuleStatistics);
+        Procedure Add(Const strEditWindowName : String; Const AFrame : TframeBADIModuleMetricsEditorView);
         (**
           A property to returned the frame associated with the given edit window.
           @precon  None.
           @postcon Returned the frame associated with the given edit window.
           @param   strEditWindowName as a String as a constant
-          @return  a TframeBADIModuleStatistics
+          @return  a TframeBADIModuleMetricsEditorView
         **)
-        Property Frame[Const strEditWindowName : String] : TframeBADIModuleStatistics Read GetFrame;
+        Property Frame[Const strEditWindowName : String] : TframeBADIModuleMetricsEditorView Read GetFrame;
       End;
     Class Var
       (** A single class var reference to the editor view. **)
@@ -169,7 +169,7 @@ Const
 Function RecreateBADIStatisticEditorView: INTACustomEditorView;
 
 Begin
-  Result := TBADIModuleStatistics.CreateEditorView;
+  Result := TBADIModuleMetricsEditorView.CreateEditorView;
 End;
 
 (**
@@ -222,7 +222,7 @@ End;
   @param   dtFileDate  as a TDateTime as a constant
 
 **)
-Procedure TBADIModuleStatistics.TBADIFileInfoManager.Add(Const strFileName: String;
+Procedure TBADIModuleMetricsEditorView.TBADIFileInfoManager.Add(Const strFileName: String;
   Const dtFileDate: TDateTime);
 
 Var
@@ -252,7 +252,7 @@ End;
   @postcon The file collection is empty.
 
 **)
-Procedure TBADIModuleStatistics.TBADIFileInfoManager.Clear;
+Procedure TBADIModuleMetricsEditorView.TBADIFileInfoManager.Clear;
 
 Begin
   FFileInfo.Clear;
@@ -266,7 +266,7 @@ End;
   @postcon Creates an empty collection.
 
 **)
-Constructor TBADIModuleStatistics.TBADIFileInfoManager.Create;
+Constructor TBADIModuleMetricsEditorView.TBADIFileInfoManager.Create;
 
 Begin
   FFileInfo := TList<TBADIModuleUpdateRecord>.Create;
@@ -280,7 +280,7 @@ End;
   @postcon Fress the memory used by the collection.
 
 **)
-Destructor TBADIModuleStatistics.TBADIFileInfoManager.Destroy;
+Destructor TBADIModuleMetricsEditorView.TBADIFileInfoManager.Destroy;
 
 Begin
   FFileInfo.Free;
@@ -299,7 +299,7 @@ End;
   @return  an Integer
 
 **)
-Function TBADIModuleStatistics.TBADIFileInfoManager.Find(Const strFileName: String): Integer;
+Function TBADIModuleMetricsEditorView.TBADIFileInfoManager.Find(Const strFileName: String): Integer;
 
 Var
   iFile : Integer;
@@ -327,7 +327,7 @@ End;
   @return  a Boolean
 
 **)
-Function TBADIModuleStatistics.TBADIFileInfoManager.ShouldUpdate(Const strFileName: String;
+Function TBADIModuleMetricsEditorView.TBADIFileInfoManager.ShouldUpdate(Const strFileName: String;
   Const dtDateTime: TDateTime): Boolean;
 
 Var
@@ -351,7 +351,7 @@ End;
   @return  an INTACustomEditorView
 
 **)
-Function TBADIModuleStatistics.CloneEditorView: INTACustomEditorView;
+Function TBADIModuleMetricsEditorView.CloneEditorView: INTACustomEditorView;
 
 Var
   EVS : IOTAEditorViewServices;
@@ -362,23 +362,23 @@ Begin
   Result := RecreateBADIStatisticEditorView;
 End;
 
-{ TBADIModuleStatistics.TBADIViewManager }
+{ TBADIModuleMetrics.TBADIViewManager }
 
 (**
 
-  This method adds the given edit window name and frame referencce pair to the collection is it does not
+  This method adds the given edit window name and frame referencce pair to the collection is it does not 
   already exists else it updates the existing records frame reference.
 
   @precon  AFrame must be a valid instance.
-  @postcon Either a new reference is added to the collection if it does not exist else the existing
+  @postcon Either a new reference is added to the collection if it does not exist else the existing 
            reference is updated.
 
   @param   strEditWindowName as a String as a constant
-  @param   AFrame            as a TframeBADIModuleStatistics as a constant
+  @param   AFrame            as a TframeBADIModuleMetricsEditorView as a constant
 
 **)
-Procedure TBADIModuleStatistics.TBADIFrameManager.Add(Const strEditWindowName: String;
-  Const AFrame: TframeBADIModuleStatistics);
+Procedure TBADIModuleMetricsEditorView.TBADIFrameManager.Add(Const strEditWindowName: String;
+  Const AFrame: TframeBADIModuleMetricsEditorView);
 
 Var
   iIndex: Integer;
@@ -407,7 +407,7 @@ End;
   @postcon Creates an empty collection.
 
 **)
-Constructor TBADIModuleStatistics.TBADIFrameManager.Create;
+Constructor TBADIModuleMetricsEditorView.TBADIFrameManager.Create;
 
 Begin
   FFrames := TList<TBADIFrameManagerRecord>.Create;
@@ -421,7 +421,7 @@ End;
   @postcon Frees the collection.
 
 **)
-Destructor TBADIModuleStatistics.TBADIFrameManager.Destroy;
+Destructor TBADIModuleMetricsEditorView.TBADIFrameManager.Destroy;
 
 Begin
   FFrames.Free;
@@ -440,7 +440,7 @@ End;
   @return  an Integer
 
 **)
-Function TBADIModuleStatistics.TBADIFrameManager.Find(Const strEditWindowName: String): Integer;
+Function TBADIModuleMetricsEditorView.TBADIFrameManager.Find(Const strEditWindowName: String): Integer;
 
 Var
   iView: Integer;
@@ -460,15 +460,15 @@ End;
   This is a getter method for the Frame property.
 
   @precon  None.
-  @postcon If the named edit window is found in the collection then the associated frame is returned
+  @postcon If the named edit window is found in the collection then the associated frame is returned 
            else nil is returned for not found.
 
   @param   strEditWindowName as a String as a constant
-  @return  a TframeBADIModuleStatistics
+  @return  a TframeBADIModuleMetricsEditorView
 
 **)
-Function TBADIModuleStatistics.TBADIFrameManager.GetFrame(
-  Const strEditWindowName: String): TframeBADIModuleStatistics;
+Function TBADIModuleMetricsEditorView.TBADIFrameManager.GetFrame(
+  Const strEditWindowName: String): TframeBADIModuleMetricsEditorView;
 
 Var
   iIndex: Integer;
@@ -491,7 +491,7 @@ End;
   @param   Allowed as a Boolean as a reference
 
 **)
-Procedure TBADIModuleStatistics.Close(Var Allowed: Boolean);
+Procedure TBADIModuleMetricsEditorView.Close(Var Allowed: Boolean);
 
 Begin
   Allowed := True;
@@ -508,7 +508,7 @@ End;
   @param   ShouldClose as a Boolean as a reference
 
 **)
-Procedure TBADIModuleStatistics.CloseAllCalled(Var ShouldClose: Boolean);
+Procedure TBADIModuleMetricsEditorView.CloseAllCalled(Var ShouldClose: Boolean);
 
 Begin
   ShouldClose := True;
@@ -521,13 +521,14 @@ End;
   @precon  None.
   @postcon References to the panels are storede for later use and each panel is configured.
 
-  @nometric MissingCONSTInParam @nohint
-  
+  @nometric MissingCONSTInParam
+  @nohint   StatusBar
+
   @param   StatusBar as a TStatusBar
   @param   Panel     as a TStatusPanel
 
 **)
-Procedure TBADIModuleStatistics.ConfigurePanel(StatusBar: TStatusBar; Panel: TStatusPanel);
+Procedure TBADIModuleMetricsEditorView.ConfigurePanel(StatusBar: TStatusBar; Panel: TStatusPanel);
 
 Const
   iPanelWidth = 80;
@@ -542,7 +543,7 @@ End;
 
 (**
 
-  A constructor for the TBADIModuleStatistics class.
+  A constructor for the TBADIModuleMetrics class.
 
   @precon  None.
   @postcon Adds an image to the editor image list to be displayed against this editor view.
@@ -550,7 +551,7 @@ End;
   @param   strViewIdentifier as a String as a constant
 
 **)
-Constructor TBADIModuleStatistics.Create(Const strViewIdentifier : String);
+Constructor TBADIModuleMetricsEditorView.Create(Const strViewIdentifier : String);
 
 Const
   strBADIStatisticsImage = 'BADIStatisticsImage';
@@ -596,41 +597,19 @@ End;
   @return  an INTACustomEditorView
 
 **)
-Class Function TBADIModuleStatistics.CreateEditorView : INTACustomEditorView;
+Class Function TBADIModuleMetricsEditorView.CreateEditorView : INTACustomEditorView;
 
 Var
-//  ES : INTAEditorServices;
   EVS : IOTAEditorViewServices;
-//  strEditorWindowName: String;
-//  C : TWinControl;
-//  MS : IBADIModuleStatistics;
-//  ViewRecord : TVIewManagerRecord;
   
 Begin
+  Result := Nil;
   If Supports(BorlandIDEServices, IOTAEditorViewServices, EVS) Then
     Begin
-      //If Assigned(FRef) Then
-      //  EVS.CloseEditorView(FRef);
-      Result := Nil;
-//      For ViewRecord In ViewManager Do
-//        If ViewRecord.FViewName = strEditorWindowName Then
-//          Begin
-//            Result := ViewRecord.FViewReference;
-//            Break;
-//          End;
-//      If Not Assigned(Result) Then
-//        Begin
-//          ViewRecord.FViewName := strEditorWindowName;
-//          ViewRecord.FViewReference := TBADIModuleStatistics.Create(strEditorWindowName);
-//          ViewManager.Add(ViewRecord);
-//          Result := ViewRecord.FViewReference;
-//        End;
       If Not Assigned(FEditorViewRef) Then
-        FEditorViewRef := TBADIModuleStatistics.Create('');
+        FEditorViewRef := TBADIModuleMetricsEditorView.Create('');
       Result := FEditorViewRef;
       EVS.ShowEditorView(Result);
-//      If Supports(Result, IBADIModuleStatistics, MS) Then
-//        MS.RenderModule(SourceEditor);
     End;
 End;
 
@@ -644,7 +623,7 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleStatistics.CurrentEditWindow: String;
+Function TBADIModuleMetricsEditorView.CurrentEditWindow: String;
 
 Var
   ES : INTAEditorServices;
@@ -665,7 +644,7 @@ End;
   @postcon Does nothing.
 
 **)
-Procedure TBADIModuleStatistics.DeselectView;
+Procedure TBADIModuleMetricsEditorView.DeselectView;
 
 Begin
   // Does nothing
@@ -673,13 +652,13 @@ End;
 
 (**
 
-  A destructor for the TBADIModuleStatistics class.
+  A destructor for the TBADIModuleMetrics class.
 
   @precon  None.
   @postcon Frees the memory used by the module (if not nil).
 
 **)
-Destructor TBADIModuleStatistics.Destroy;
+Destructor TBADIModuleMetricsEditorView.Destroy;
 
 Begin
   FSourceStrings.Free;
@@ -702,7 +681,7 @@ End;
   @param   Rect      as a TRect as a constant
 
 **)
-Procedure TBADIModuleStatistics.DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; Const Rect: TRect);
+Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; Const Rect: TRect);
 
 Const
   iDivisor = 2;
@@ -772,10 +751,10 @@ End;
   @return  a Boolean
 
 **)
-Function TBADIModuleStatistics.EditAction(Action: TEditAction): Boolean;
+Function TBADIModuleMetricsEditorView.EditAction(Action: TEditAction): Boolean;
 
 Var
-  AFrame: TframeBADIModuleStatistics;
+  AFrame: TframeBADIModuleMetricsEditorView;
 
 Begin
   Result := False;
@@ -800,7 +779,7 @@ End;
   @param   ModuleInfo as an IOTAModuleInfo as a constant
 
 **)
-Procedure TBADIModuleStatistics.ExtractSourceFromFile(Const ModuleInfo : IOTAModuleInfo);
+Procedure TBADIModuleMetricsEditorView.ExtractSourceFromFile(Const ModuleInfo : IOTAModuleInfo);
 
 Begin
   FSource := '';
@@ -826,7 +805,7 @@ End;
   @param   ModuleInfo as an IOTAModuleInfo as a constant
 
 **)
-Procedure TBADIModuleStatistics.ExtractSourceFromModule(Const Module : IOTAModule;
+Procedure TBADIModuleMetricsEditorView.ExtractSourceFromModule(Const Module : IOTAModule;
   Const ModuleInfo : IOTAModuleInfo);
 
 Var
@@ -855,7 +834,7 @@ End;
   @param   AFrame as a TCustomFrame
 
 **)
-Procedure TBADIModuleStatistics.FrameCreated(AFrame: TCustomFrame);
+Procedure TBADIModuleMetricsEditorView.FrameCreated(AFrame: TCustomFrame);
 
 Const
   strTEditWindow = 'TEditWindow';
@@ -880,7 +859,7 @@ Begin
             End;
           C := C.Parent;
         End;
-      FFrameManager.Add(strEditWindowName, AFrame As TframeBADIModuleStatistics);
+      FFrameManager.Add(strEditWindowName, AFrame As TframeBADIModuleMetricsEditorView);
     End;
 End;
 
@@ -894,7 +873,7 @@ End;
   @return  a Boolean
 
 **)
-Function TBADIModuleStatistics.GetCanCloneView: Boolean;
+Function TBADIModuleMetricsEditorView.GetCanCloneView: Boolean;
 
 Begin
   Result := False;
@@ -911,7 +890,7 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleStatistics.GetCaption: String;
+Function TBADIModuleMetricsEditorView.GetCaption: String;
 
 ResourceString
   strMetrics = 'Metrics';
@@ -938,7 +917,7 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleStatistics.GetEditorWindowCaption: String;
+Function TBADIModuleMetricsEditorView.GetEditorWindowCaption: String;
 
 Begin
   Result := strBADIStatistics;
@@ -955,7 +934,7 @@ End;
   @return  a TEditState
 
 **)
-Function TBADIModuleStatistics.GetEditState: TEditState;
+Function TBADIModuleMetricsEditorView.GetEditState: TEditState;
 
 Begin
   Result := [esCanCopy];
@@ -971,10 +950,10 @@ End;
   @return  a TCustomFrameClass
 
 **)
-Function TBADIModuleStatistics.GetFrameClass: TCustomFrameClass;
+Function TBADIModuleMetricsEditorView.GetFrameClass: TCustomFrameClass;
 
 Begin
-  Result := TframeBADIModuleStatistics;
+  Result := TframeBADIModuleMetricsEditorView;
 End;
 
 (**
@@ -987,7 +966,7 @@ End;
   @return  an Integer
 
 **)
-Function TBADIModuleStatistics.GetImageIndex: Integer;
+Function TBADIModuleMetricsEditorView.GetImageIndex: Integer;
 
 Begin
   Result := FImageIndex;
@@ -1003,7 +982,7 @@ End;
   @return  an Integer
 
 **)
-Function TBADIModuleStatistics.GetStatusPanelCount: Integer;
+Function TBADIModuleMetricsEditorView.GetStatusPanelCount: Integer;
 
 Begin
   Result := Ord(High(TBADIMetricStatusPanel)) - Ord(Low(TBADIMetricStatusPanel)) + 1;
@@ -1019,7 +998,7 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleStatistics.GetTabHintText: String;
+Function TBADIModuleMetricsEditorView.GetTabHintText: String;
 
 Begin
   Result := strBADIStatistics;
@@ -1036,7 +1015,7 @@ End;
   @return  a String
 
 **)
-Function TBADIModuleStatistics.GetViewIdentifier: String;
+Function TBADIModuleMetricsEditorView.GetViewIdentifier: String;
 
 Begin
   Result := Format('%s.%s', [strBADIStatisticEditorView, FViewIdent]);
@@ -1050,11 +1029,11 @@ End;
   @postcon The source code is parsed and rendered.
 
 **)
-Procedure TBADIModuleStatistics.ParseAndRender;
+Procedure TBADIModuleMetricsEditorView.ParseAndRender;
 
 Var
   Module : TBaseLanguageModule;
-  AFrame: TframeBADIModuleStatistics;
+  AFrame: TframeBADIModuleMetricsEditorView;
 
 Begin
   FFileInfoMgr.Add(FFileName, FFileDate);
@@ -1080,7 +1059,7 @@ End;
   @param   ModuleInfo as an IOTAModuleInfo as a constant
 
 **)
-Procedure TBADIModuleStatistics.ProcesModule(Const ModuleInfo : IOTAModuleInfo);
+Procedure TBADIModuleMetricsEditorView.ProcesModule(Const ModuleInfo : IOTAModuleInfo);
 
 Var
   Module: IOTAModule;
@@ -1105,7 +1084,7 @@ End;
   @postcon Renders the modules metrics in the frame.
 
 **)
-Procedure TBADIModuleStatistics.SelectView;
+Procedure TBADIModuleMetricsEditorView.SelectView;
 
 ResourceString
   strParsingProjectModules = 'Parsing project modules';
@@ -1120,7 +1099,7 @@ Var
   iModule: Integer;
   frmProgress : TfrmProgress;
   ModuleInfo: IOTAModuleInfo;
-  AFrame: TframeBADIModuleStatistics;
+  AFrame: TframeBADIModuleMetricsEditorView;
 
 Begin
   P := ActiveProject;
@@ -1157,7 +1136,7 @@ End;
   @postcon The status panels are updated.
 
 **)
-Procedure TBADIModuleStatistics.UpdateStatusPanels;
+Procedure TBADIModuleMetricsEditorView.UpdateStatusPanels;
 
 ResourceString
   strModules = '%d Modules';
@@ -1168,7 +1147,7 @@ ResourceString
   strOverLimit = '%d > Limit';
 
 Var
-  AFrame: TframeBADIModuleStatistics;
+  AFrame: TframeBADIModuleMetricsEditorView;
   
 Begin
   AFrame := FFrameManager.Frame[CurrentEditWindow];

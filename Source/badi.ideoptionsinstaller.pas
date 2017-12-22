@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Dec 2017
+  @Date    22 Dec 2017
 
 **)
 Unit BADI.IDEOptionsInstaller;
@@ -62,7 +62,7 @@ Uses
   BADI.ModuleExtensionsFrame,
   BADI.ModuleExplorerFrame,
   BADI.Module.Metrics.Options.Frame,
-  BADI.ModuleChecksFrame;
+  BADI.Module.Checks.Options.Frame;
 
 { TBADIIDEOptionsInstaller }
 
@@ -105,7 +105,7 @@ Begin
       NEOS.RegisterAddInOptions(FBADISpecialtags);
       FBADIModuleMetrics := TBADIIDEOptionsHandler.Create(TframeBADIModuleMetricsOptions, strModuleMetrics);
       NEOS.RegisterAddInOptions(FBADIModuleMetrics);
-      FBADIModuleChecks := TBADIIDEOptionsHandler.Create(TframeBADIModuleChecks, strModuleChecks);
+      FBADIModuleChecks := TBADIIDEOptionsHandler.Create(TframeBADIModuleChecksOptions, strModuleChecks);
       NEOS.RegisterAddInOptions(FBADIModuleChecks);
       FBADIModuleExplorer := TBADIIDEOptionsHandler.Create(TfmBADIModuleExplorerFrame, strModuleExplorer);
       NEOS.RegisterAddInOptions(FBADIModuleExplorer);

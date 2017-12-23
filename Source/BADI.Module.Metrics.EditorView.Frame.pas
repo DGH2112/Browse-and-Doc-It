@@ -4,15 +4,15 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Dec 2017
+  @Date    23 Dec 2017
 
-  @todo    Add the ability for the issues to be overridden (show a different colour but does n0t add to
+  @todo    Add the ability for the issues to be overridden (show a different colour but does not add to
            issue list).
 
   @bug     If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
 **)
-Unit BADI.Module.Statistics.Frame;
+Unit BADI.Module.Metrics.EditorView.Frame;
 
 Interface
 
@@ -37,7 +37,11 @@ Uses
   ActnList,
   PlatformDefaultStyleActnCtrls,
   Menus,
-  ActnPopup;
+  ActnPopup,
+  ToolsAPI,
+  Themes;
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
   (** An enumerate to define the type of information stored in each node - used for counting later. **)
@@ -53,9 +57,12 @@ Type
   (** A set of the above enumerate options. **)
   TBADIStatsRenderOptions = Set Of TBADIStatsRenderOption;
 
+  (** A custom virtual string tree to stop a Dark Themed IDE raising Access Violations due to some
+      sort of RTTI clash. **)
+  TBADIEditorViewVirtualStringTree = Class(TVirtualStringTree);
+  
   (** A frame to display a modules methods and their metrics. **)
-  TframeBADIModuleStatistics = Class(TFrame)
-    vstStatistics: TVirtualStringTree;
+  TframeBADIModuleMetricsEditorView = Class(TFrame)
     ilScopeImages: TImageList;
     tmFocusTimer: TTimer;
     pabContextMenu: TPopupActionBar;
@@ -72,26 +79,15 @@ Type
     actExpandIssues: TAction;
     N2: TMenuItem;
     ExpandIssues1: TMenuItem;
-    Procedure vstStatisticsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
-      TextType: TVSTTextType; Var CellText: String);
-    Procedure vstStatisticsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
-      Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode; CellRect: TRect;
-      Var ContentRect: TRect);
-    Procedure vstStatisticsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean; Var ImageIndex: Integer);
+    Procedure actExpandAllExecute(Sender: TObject);
+    Procedure actCollapseAllExecute(Sender: TObject);
+    Procedure actExpandUpdate(Sender: TObject);
+    Procedure actExpandExecute(Sender: TObject);
+    Procedure actCollapseExecute(Sender: TObject);
+    Procedure actCollapseUpdate(Sender: TObject);
+    Procedure actExpandIssuesExecute(Sender: TObject);
+    Procedure vstStatisticsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     Procedure tmFocusTimerTimer(Sender: TObject);
-    Procedure vstStatisticsCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
-      Column: TColumnIndex; Var Result: Integer);
-    Procedure vstStatisticsPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
-      Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure actExpandAllExecute(Sender: TObject);
-    procedure actCollapseAllExecute(Sender: TObject);
-    procedure actExpandUpdate(Sender: TObject);
-    procedure actExpandExecute(Sender: TObject);
-    procedure actCollapseExecute(Sender: TObject);
-    procedure actCollapseUpdate(Sender: TObject);
-    procedure actExpandIssuesExecute(Sender: TObject);
-    procedure vstStatisticsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
   Strict Private
   Type
       (** A record to describe the data to be held in a tree node. **)
@@ -128,7 +124,26 @@ Type
     FUnderLimit    : Integer;
     FAtLimit       : Integer;
     FOverLimit     : Integer;
+    FVSTMetrics    : TBADIEditorViewVirtualStringTree;
+    {$IFDEF DXE102}
+    FStyleServices : TCustomStyleServices;
+    FStyleServicesNotifier: Integer;
+    {$ENDIF}
   Strict Protected
+    Procedure vstStatisticsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+      TextType: TVSTTextType; Var CellText: String);
+    Procedure vstStatisticsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
+      Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode; CellRect: TRect;
+      Var ContentRect: TRect);
+    Procedure vstStatisticsGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean; Var ImageIndex: Integer);
+    Procedure vstStatisticsCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode;
+      Column: TColumnIndex; Var Result: Integer);
+    Procedure vstStatisticsPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
+      Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    Procedure vstStatisticsHeaderDraw(Sender: TVTHeader;
+  HeaderCanvas: TCanvas; Column: TVirtualTreeColumn; R: TRect; Hover,
+    Pressed: Boolean; DropMark: TVTDropMarkMode);
     Function RecurseContainer(Const Container: TElementContainer;
       Const Parent: PVirtualNode): TNodeResultRecord;
     Procedure UpdateStats;
@@ -140,6 +155,10 @@ Type
       Const setRenderOptions : TBADIStatsRenderOptions);
     Function  HasIssues(Const Node : PVirtualNode) : Boolean;
     Procedure ExtractMaxFromChildren(Const ParentNode : PVirtualNode);
+    Procedure CreateVirtualStringTree;
+    {$IFDEF DXE102}
+    Procedure UpdateTreeViewColours;
+    {$ENDIF}
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -214,7 +233,8 @@ Uses
   BADI.Options,
   BADI.Types,
   BADI.Functions,
-  ClipBrd;
+  ClipBrd, 
+  BADI.StyleServices.Notifier;
 
 {$R *.dfm}
 
@@ -238,7 +258,7 @@ Type
   @return  a TNodeResultRecord
 
 **)
-Class Operator TframeBADIModuleStatistics.TNodeResultRecord.Add(Const R1,
+Class Operator TframeBADIModuleMetricsEditorView.TNodeResultRecord.Add(Const R1,
   R2: TNodeResultRecord): TNodeResultRecord;
 
 Begin
@@ -257,7 +277,7 @@ End;
   @param   Node as a PVirtualNode as a constant
 
 **)
-Constructor TframeBADIModuleStatistics.TNodeResultRecord.Create(Const Node: PVirtualNode);
+Constructor TframeBADIModuleMetricsEditorView.TNodeResultRecord.Create(Const Node: PVirtualNode);
 
 Begin
   FNode := Node;
@@ -275,10 +295,10 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TframeBADIModuleStatistics.actCollapseAllExecute(Sender: TObject);
+Procedure TframeBADIModuleMetricsEditorView.actCollapseAllExecute(Sender: TObject);
 
 Begin
-  vstStatistics.FullCollapse();
+  FVSTMetrics.FullCollapse();
 End;
 
 (**
@@ -291,10 +311,10 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TframeBADIModuleStatistics.actCollapseExecute(Sender: TObject);
+Procedure TframeBADIModuleMetricsEditorView.actCollapseExecute(Sender: TObject);
 
 Begin
-  vstStatistics.FullCollapse(vstStatistics.FocusedNode);
+  FVSTMetrics.FullCollapse(FVSTMetrics.FocusedNode);
 End;
 
 (**
@@ -308,7 +328,7 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TframeBADIModuleStatistics.actCollapseUpdate(Sender: TObject);
+Procedure TframeBADIModuleMetricsEditorView.actCollapseUpdate(Sender: TObject);
 
 Var
   A: TAction;
@@ -318,9 +338,9 @@ Begin
     Begin
       A := Sender As TAction;
       A.Enabled :=
-        Assigned(vstStatistics.FocusedNode) And
-        (vstStatistics.ChildCount[vstStatistics.FocusedNode] > 0) And 
-        vstStatistics.Expanded[vstStatistics.FocusedNode];
+        Assigned(FVSTMetrics.FocusedNode) And
+        (FVSTMetrics.ChildCount[FVSTMetrics.FocusedNode] > 0) And 
+        FVSTMetrics.Expanded[FVSTMetrics.FocusedNode];
     End;
 End;
 
@@ -334,10 +354,10 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TframeBADIModuleStatistics.actExpandAllExecute(Sender: TObject);
+Procedure TframeBADIModuleMetricsEditorView.actExpandAllExecute(Sender: TObject);
 
 Begin
-  vstStatistics.FullExpand();
+  FVSTMetrics.FullExpand();
 End;
 
 (**
@@ -350,10 +370,10 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TframeBADIModuleStatistics.actExpandExecute(Sender: TObject);
+Procedure TframeBADIModuleMetricsEditorView.actExpandExecute(Sender: TObject);
 
 Begin
-  vstStatistics.FullExpand(vstStatistics.FocusedNode);
+  FVSTMetrics.FullExpand(FVSTMetrics.FocusedNode);
 End;
 
 (**
@@ -366,20 +386,20 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TframeBADIModuleStatistics.actExpandIssuesExecute(Sender: TObject);
+Procedure TframeBADIModuleMetricsEditorView.actExpandIssuesExecute(Sender: TObject);
 
 Var
   N: PVirtualNode;
 
 Begin
-  N := vstStatistics.GetFirst();
+  N := FVSTMetrics.GetFirst();
   While Assigned(N) Do
     Begin
       If HasIssues(N) Then
-        vstStatistics.FullExpand(N)
+        FVSTMetrics.FullExpand(N)
       Else
-        vstStatistics.FullCollapse(N);
-      N := vstStatistics.GetNextSibling(N);
+        FVSTMetrics.FullCollapse(N);
+      N := FVSTMetrics.GetNextSibling(N);
     End;
 End;
 
@@ -393,7 +413,7 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TframeBADIModuleStatistics.actExpandUpdate(Sender: TObject);
+Procedure TframeBADIModuleMetricsEditorView.actExpandUpdate(Sender: TObject);
 
 Var
   A: TAction;
@@ -403,9 +423,9 @@ Begin
     Begin
       A := Sender As TAction;
       A.Enabled :=
-        Assigned(vstStatistics.FocusedNode) And
-        (vstStatistics.ChildCount[vstStatistics.FocusedNode] > 0) And 
-        Not vstStatistics.Expanded[vstStatistics.FocusedNode];
+        Assigned(FVSTMetrics.FocusedNode) And
+        (FVSTMetrics.ChildCount[FVSTMetrics.FocusedNode] > 0) And 
+        Not FVSTMetrics.Expanded[FVSTMetrics.FocusedNode];
     End;
 End;
 
@@ -417,7 +437,7 @@ End;
   @postcon The treeview information is copied to the clipboard.
 
 **)
-Procedure TframeBADIModuleStatistics.CopyToClipboard;
+Procedure TframeBADIModuleMetricsEditorView.CopyToClipboard;
 
   (**
 
@@ -464,23 +484,23 @@ Begin
     CB.Open;
     Try
       strText := Format(strClipboardHeader, [FFileName]);
-      Node := vstStatistics.GetFirst();
+      Node := FVSTMetrics.GetFirst();
       While Assigned(Node) Do
         Begin
           strLine := '';
-          For iColumn := 0 To vstStatistics.Header.Columns.Count - 1 Do
+          For iColumn := 0 To FVSTMetrics.Header.Columns.Count - 1 Do
             Begin
               If strLine <> '' Then
                 strLine := strLine + #9;
               Case iColumn Of
                 0: strLine := strLine + StringOfChar(#32, iMultipler * ParentCount(Node)) +
-                    vstStatistics.Text[Node, iColumn];
+                    FVSTMetrics.Text[Node, iColumn];
               Else
-                strLine := strLine + vstStatistics.Text[Node, iColumn];
+                strLine := strLine + FVSTMetrics.Text[Node, iColumn];
               End;
             End;
           strText := strText + strLine + #13#10;
-          Node := vstStatistics.GetNext(Node);
+          Node := FVSTMetrics.GetNext(Node);
         End;
       CB.SetTextBuf(PWideChar(strText));
     Finally
@@ -498,17 +518,124 @@ End;
   @precon  None.
   @postcon Initialises the treeview and the image list.
 
-  @nometric MissingCONSTInParam
+  @nocheck MissingCONSTInParam
 
   @param   AOwner as a TComponent
 
 **)
-Constructor TframeBADIModuleStatistics.Create(AOwner: TComponent);
+Constructor TframeBADIModuleMetricsEditorView.Create(AOwner: TComponent);
 
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+  
 Begin
   Inherited Create(AOwner);
-  vstStatistics.NodeDataSize := SizeOf(TBADIStatisticsRecord);
+  CreateVirtualStringTree;
+  FVSTMetrics.NodeDataSize := SizeOf(TBADIStatisticsRecord);
   LoadBADIImages(ilScopeImages);
+  {$IFDEF DXE102}
+  FStyleServicesNotifier := -1;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    FStyleServicesNotifier := ITS.AddNotifier(TBADIStyleServicesNotifier.Create(UpdateTreeViewColours));
+  {$ENDIF}
+End;
+
+(**
+
+  This method creates the virtual string tree to display the metrics.
+
+  @precon  None.
+  @postcon The virtual string tree is created.
+
+  @nocheck HardCodedInteger HardCodedString
+  @nometric LongMethod Toxicity
+
+**)
+Procedure TframeBADIModuleMetricsEditorView.CreateVirtualStringTree;
+
+Var
+  C: TVirtualTreeColumn;
+
+Begin
+  FVSTMetrics := TBADIEditorViewVirtualStringTree.Create(Self);
+  FVSTMetrics.Name := 'vstMetrics';
+  FVSTMetrics.Parent := Self;
+  FVSTMetrics.Left := 0;
+  FVSTMetrics.Top := 0;
+  FVSTMetrics.Width := 894;
+  FVSTMetrics.Height := 498;
+  FVSTMetrics.Align := alClient;
+  FVSTMetrics.EmptyListMessage := 'Nothing to see here....';
+  FVSTMetrics.Header.AutoSizeIndex := 0;
+  FVSTMetrics.Header.Options := [hoAutoResize, hoOwnerDraw, hoVisible];
+  FVSTMetrics.Header.ParentFont := True;
+  FVSTMetrics.HintAnimation := hatFade;
+  FVSTMetrics.HintMode := hmTooltip;
+  FVSTMetrics.Images := ilScopeImages;
+  FVSTMetrics.PopupMenu := pabContextMenu;
+  FVSTMetrics.ScrollBarOptions.AlwaysVisible := True;
+  FVSTMetrics.SelectionBlendFactor := 64;
+  FVSTMetrics.TabOrder := 0;
+  FVSTMetrics.TreeOptions.MiscOptions := [toFullRepaintOnResize, toGridExtensions, toInitOnSave,
+    toToggleOnDblClick, toWheelPanning];
+  FVSTMetrics.TreeOptions.PaintOptions := [toShowButtons, toShowDropmark, toShowHorzGridLines,
+    toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages, toGhostedIfUnfocused,
+    toUseBlendedSelection];
+  {$IFDEF DXE102}
+  UpdateTreeViewColours;
+  {$ENDIF}
+  FVSTMetrics.TreeOptions.SelectionOptions := [toExtendedFocus, toFullRowSelect, toRightClickSelect];
+  FVSTMetrics.OnBeforeCellPaint := vstStatisticsBeforeCellPaint;
+  FVSTMetrics.OnCompareNodes := vstStatisticsCompareNodes;
+  FVSTMetrics.OnFreeNode := vstStatisticsFreeNode;
+  FVSTMetrics.OnGetText := vstStatisticsGetText;
+  FVSTMetrics.OnPaintText := vstStatisticsPaintText;
+  FVSTMetrics.OnGetImageIndex := vstStatisticsGetImageIndex;
+  FVSTMetrics.OnHeaderDraw := vstStatisticsHeaderDraw;
+  C := FVSTMetrics.Header.Columns.Add;
+  C.MinWidth := 300;
+  C.Position := 0;
+  C.Style := vsOwnerDraw;
+  C.Width := 423;
+  C.Text := 'Method';
+  C := FVSTMetrics.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 1;
+  C.Style := vsOwnerDraw;
+  C.Width := 75;
+  C.Text := 'Lines';
+  C := FVSTMetrics.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 2;
+  C.Style := vsOwnerDraw;
+  C.Width := 75;
+  C.Text := 'Params';
+  C := FVSTMetrics.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 3;
+  C.Style := vsOwnerDraw;
+  C.Width := 75;
+  C.Text := 'Variables';
+  C := FVSTMetrics.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 4;
+  C.Style := vsOwnerDraw;
+  C.Width := 75;
+  C.Text := 'IF Depth';
+  C := FVSTMetrics.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 5;
+  C.Style := vsOwnerDraw;
+  C.Width := 75;
+  C.Text := 'Complexity';
+  C := FVSTMetrics.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 6;
+  C.Style := vsOwnerDraw;
+  C.Width := 75;
+  C.Text := 'Toxicity';
 End;
 
 (**
@@ -521,35 +648,44 @@ End;
   @param   Module as a TBaseLanguageModule as a constant
 
 **)
-Procedure TframeBADIModuleStatistics.DeleteExistingModuleNode(Const Module : TBaseLanguageModule);
+Procedure TframeBADIModuleMetricsEditorView.DeleteExistingModuleNode(Const Module : TBaseLanguageModule);
 
 Var
   Node: PVirtualNode;
 
 Begin
-  Node := vstStatistics.GetFirstChild(vstStatistics.RootNode);
+  Node := FVSTMetrics.GetFirstChild(FVSTMetrics.RootNode);
   While Assigned(Node) Do
     Begin
-      If vstStatistics.Text[Node, 0] = Module.AsString(True, False) Then
+      If FVSTMetrics.Text[Node, 0] = Module.AsString(True, False) Then
         Begin
-          vstStatistics.DeleteNode(Node);
+          FVSTMetrics.DeleteNode(Node);
           Break;
         End;
-      Node := vstStatistics.GetNextSibling(Node);
+      Node := FVSTMetrics.GetNextSibling(Node);
     End;
 End;
 
 (**
 
-  A destructor for the TframeBADIMOduleStatistics class.
+  A destructor for the TframeBADIModuleMetricsEditorView class.
 
   @precon  None.
   @postcon Does nothing.
 
 **)
-Destructor TframeBADIModuleStatistics.Destroy;
+Destructor TframeBADIModuleMetricsEditorView.Destroy;
 
+{$IFDEF DXE102}
+Var
+  ITS : IOTAIDEThemingServices;
+{$ENDIF}
+  
 Begin
+  {$IFDEF DXE102}
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    ITS.RemoveNotifier(FStyleServicesNotifier);
+  {$ENDIF}
   Inherited Destroy;
 End;
 
@@ -564,7 +700,7 @@ End;
   @param   ParentNode as a PVirtualNode as a constant
 
 **)
-Procedure TframeBADIModuleStatistics.ExtractMaxFromChildren(Const ParentNode : PVirtualNode);
+Procedure TframeBADIModuleMetricsEditorView.ExtractMaxFromChildren(Const ParentNode : PVirtualNode);
 
 Var
   ParentNodeData : PBADIStatisticsRecord;
@@ -574,11 +710,11 @@ Var
 Begin
   If Not Assigned(ParentNode) Then
     Exit;
-  ParentNodeData := vstStatistics.GetNodeData(ParentNode);
-  Node := vstStatistics.GetFirstChild(ParentNode);
+  ParentNodeData := FVSTMetrics.GetNodeData(ParentNode);
+  Node := FVSTMetrics.GetFirstChild(ParentNode);
   While Assigned(Node) Do
     Begin
-      NodeData := vstStatistics.GetNodeData(Node);
+      NodeData := FVSTMetrics.GetNodeData(Node);
       If NodeData.FLinesOfCode > ParentNodeData.FLinesOfCode Then
         ParentNodeData.FLinesOfCode := NodeData.FLinesOfCode;
       If NodeData.FParameterCount > ParentNodeData.FParameterCount Then
@@ -591,7 +727,7 @@ Begin
         ParentNodeData.FCyclometricComplexity := NodeData.FCyclometricComplexity;
       If NodeData.FToxicity > ParentNodeData.FToxicity Then
         ParentNodeData.FToxicity := NodeData.FToxicity;
-      Node := vstStatistics.GetNextSibling(Node);
+      Node := FVSTMetrics.GetNextSibling(Node);
     End;
 End;
 
@@ -604,7 +740,7 @@ End;
   @postcon The timer is started to focus the treeview.
 
 **)
-Procedure TframeBADIModuleStatistics.FocusResults;
+Procedure TframeBADIModuleMetricsEditorView.FocusResults;
 
 Begin
   tmFocusTimer.Enabled := True;
@@ -622,13 +758,13 @@ End;
   @return  a Boolean
 
 **)
-Function TframeBADIModuleStatistics.HasIssues(Const Node: PVirtualNode): Boolean;
+Function TframeBADIModuleMetricsEditorView.HasIssues(Const Node: PVirtualNode): Boolean;
 
 Var
   iCounter : Integer;
   
 Begin
-  vstStatistics.IterateSubtree(
+  FVSTMetrics.IterateSubtree(
     Node,
     Procedure(Sender: TBaseVirtualTree; ptrNode: PVirtualNode; ptrData: Pointer; Var boolAbort: Boolean)
     Var
@@ -649,7 +785,7 @@ End;
   @postcon The limits are initialised.
 
 **)
-Procedure TframeBADIModuleStatistics.InitaliseRenderingOptions;
+Procedure TframeBADIModuleMetricsEditorView.InitaliseRenderingOptions;
 
 Const
   dblPercentageDivisor = 100.0;
@@ -678,7 +814,7 @@ End;
   @return  a TNodeResultRecord
 
 **)
-Function TframeBADIModuleStatistics.ProcessFunction(Const NodeData : PBADIStatisticsRecord;
+Function TframeBADIModuleMetricsEditorView.ProcessFunction(Const NodeData : PBADIStatisticsRecord;
   Const AFunction : TGenericFunction) : TNodeResultRecord;
 
 Var
@@ -725,7 +861,7 @@ End;
   @return  a TNodeResultRecord
 
 **)
-Function TframeBADIModuleStatistics.RecurseContainer(Const Container: TElementContainer;
+Function TframeBADIModuleMetricsEditorView.RecurseContainer(Const Container: TElementContainer;
   Const Parent: PVirtualNode): TNodeResultRecord;
 
 Var
@@ -734,8 +870,8 @@ Var
   M: TGenericFunction;
 
 Begin
-  Result.Create(vstStatistics.AddChild(Parent));
-  NodeData := vstStatistics.GetNodeData(Result.FNode);
+  Result.Create(FVSTMetrics.AddChild(Parent));
+  NodeData := FVSTMetrics.GetNodeData(Result.FNode);
   NodeData.FNodeType := ntUnkown;
   If Not Assigned(Container.Parent) Then
     NodeData.FNodeType := ntModule;
@@ -751,7 +887,7 @@ Begin
     Result := Result + RecurseContainer(Container.Elements[iElement], Result.FNode);
   If Result.FChildCount = 0 Then
     Begin
-      vstStatistics.DeleteNode(Result.FNode);
+      FVSTMetrics.DeleteNode(Result.FNode);
       Result.FNode := Nil;
     End;
   If Not (Container Is TGenericFunction) Then
@@ -769,7 +905,7 @@ End;
   @param   setRenderOptions as a TBADIStatsRenderOptions as a constant
 
 **)
-Procedure TframeBADIModuleStatistics.RenderModule(Const Module: TBaseLanguageModule;
+Procedure TframeBADIModuleMetricsEditorView.RenderModule(Const Module: TBaseLanguageModule;
   Const setRenderOptions: TBADIStatsRenderOptions);
 
 Var
@@ -777,20 +913,20 @@ Var
 
 Begin
   InitaliseRenderingOptions;
-  If Assigned(Module) And Assigned(vstStatistics) Then
+  If Assigned(Module) And Assigned(FVSTMetrics) Then
     Begin
       FFileName := Module.FileName;
-      vstStatistics.BeginUpdate;
+      FVSTMetrics.BeginUpdate;
       Try
         If sroClear In setRenderOptions Then
-          vstStatistics.Clear
+          FVSTMetrics.Clear
         Else
           DeleteExistingModuleNode(Module);
         NodeResult := RecurseContainer(Module, Nil);
         SortAndExpand(NodeResult, setRenderOptions);
         UpdateStats;
       Finally
-        vstStatistics.EndUpdate;
+        FVSTMetrics.EndUpdate;
       End;
     End;
   FocusResults;
@@ -807,7 +943,7 @@ End;
   @param   setRenderOptions as a TBADIStatsRenderOptions as a constant
 
 **)
-Procedure TframeBADIModuleStatistics.SortAndExpand(Const NodeResult : TNodeResultRecord;
+Procedure TframeBADIModuleMetricsEditorView.SortAndExpand(Const NodeResult : TNodeResultRecord;
   Const setRenderOptions : TBADIStatsRenderOptions);
 
 Begin
@@ -816,7 +952,7 @@ Begin
       Begin
         If ((sroAutoExpandOnError In setRenderOptions) And (NodeResult.FIssueCount > 0)) Or
           Not (sroAutoExpandOnError In setRenderOptions) Then
-        vstStatistics.FullExpand(NodeResult.FNode);
+        FVSTMetrics.FullExpand(NodeResult.FNode);
       End;
 End;
 
@@ -831,13 +967,13 @@ End;
   @param   Sender as a TObject
 
 **)
-Procedure TframeBADIModuleStatistics.tmFocusTimerTimer(Sender: TObject);
+Procedure TframeBADIModuleMetricsEditorView.tmFocusTimerTimer(Sender: TObject);
 
 Begin
-  If vstStatistics.CanFocus Then
+  If FVSTMetrics.CanFocus Then
     Begin
       tmFocusTimer.Enabled := False;
-      vstStatistics.SetFocus;
+      FVSTMetrics.SetFocus;
     End;
 End;
 
@@ -849,7 +985,7 @@ End;
   @postcon The counts are updated.
 
 **)
-Procedure TframeBADIModuleStatistics.UpdateStats;
+Procedure TframeBADIModuleMetricsEditorView.UpdateStats;
 
   (**
 
@@ -891,10 +1027,10 @@ Begin
   FUnderLimit := 0;
   FAtLimit := 0;
   FOverLimit := 0;
-  Node := vstStatistics.GetFirst();
+  Node := FVSTMetrics.GetFirst();
   While Assigned(Node) Do
     Begin
-      NodeData := vstStatistics.GetNodeData(Node);
+      NodeData := FVSTMetrics.GetNodeData(Node);
       Case NodeData.FNodeType Of
         ntModule: Inc(FModuleCount);
         ntMethod:
@@ -909,9 +1045,55 @@ Begin
             Update(NodeData.FToxicity, FLimits.FToxicity);
           End;
       End;
-      Node := vstStatistics.GetNext(Node);
+      Node := FVSTMetrics.GetNext(Node);
     End;
 End;
+
+{$IFDEF DXE102}
+(**
+
+  This method updates the colours of the treeview (those that actually work) so that it takes on the
+  theme style of the IDE.
+
+  @precon  None.
+  @postcon If the IDE is using style services then the colours of the treeview are updated.
+
+**)
+Procedure TframeBADIModuleMetricsEditorView.UpdateTreeViewColours;
+
+Var
+  ITS : IOTAIDEThemingServices;
+  Clrs: TVTColors;
+
+Begin
+  FStyleServices := Nil;
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      FStyleServices := ITS.StyleServices;
+  If Assigned(FStyleServices) And FStyleServices.Enabled Then
+    Begin
+      FVSTMetrics.Color := FStyleServices.GetSystemColor(FVSTMetrics.Color);
+      FVSTMetrics.Font.Color := FStyleServices.GetSystemColor(FVSTMetrics.Font.Color);
+      Clrs := FVSTMetrics.Colors;
+      Clrs.BorderColor := FStyleServices.GetSystemColor(Clrs.BorderColor);
+      Clrs.DisabledColor := FStyleServices.GetSystemColor(Clrs.DisabledColor);
+      Clrs.DropMarkColor := FStyleServices.GetSystemColor(Clrs.DropMarkColor);
+      Clrs.DropTargetColor := FStyleServices.GetSystemColor(Clrs.DropTargetColor);
+      Clrs.DropTargetBorderColor := FStyleServices.GetSystemColor(Clrs.DropTargetBorderColor);
+      Clrs.FocusedSelectionColor := FStyleServices.GetSystemColor(Clrs.FocusedSelectionColor);
+      Clrs.FocusedSelectionBorderColor := FStyleServices.GetSystemColor(Clrs.FocusedSelectionBorderColor);
+      Clrs.GridLineColor := FStyleServices.GetSystemColor(Clrs.GridLineColor);
+      Clrs.HotColor := FStyleServices.GetSystemColor(Clrs.HotColor);
+      Clrs.SelectionRectangleBlendColor := FStyleServices.GetSystemColor(Clrs.SelectionRectangleBlendColor);
+      Clrs.SelectionRectangleBorderColor := FStyleServices.GetSystemColor(Clrs.SelectionRectangleBorderColor);
+      Clrs.SelectionTextColor := FStyleServices.GetSystemColor(Clrs.SelectionTextColor);
+      Clrs.TreeLineColor := FStyleServices.GetSystemColor(Clrs.TreeLineColor);
+      Clrs.UnfocusedSelectionColor := FStyleServices.GetSystemColor(Clrs.UnfocusedSelectionColor);
+      Clrs.UnfocusedSelectionBorderColor := FStyleServices.GetSystemColor(Clrs.UnfocusedSelectionBorderColor);
+      FVSTMetrics.Invalidate;
+    End;
+End;
+{$ENDIF}
 
 (**
 
@@ -930,12 +1112,9 @@ End;
   @param   ContentRect   as a TRect as a reference
 
 **)
-Procedure TframeBADIModuleStatistics.vstStatisticsBeforeCellPaint(Sender: TBaseVirtualTree;
+Procedure TframeBADIModuleMetricsEditorView.vstStatisticsBeforeCellPaint(Sender: TBaseVirtualTree;
   TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode;
   CellRect: TRect; Var ContentRect: TRect);
-
-Const
-  iModuleColour = clSkyBlue;
 
   (**
 
@@ -952,29 +1131,22 @@ Const
   Function Colour(Const dblValue, dblLimit: Double): TColor;
 
   Const
-    dblBlendRatioModule = 0.75;
-    dblBlendRatioNonModule = 0.00;
+    dblBlendRatioModule = 0.25;
 
   Var
     dblRatio: Double;
-    dblBlendRatio : Double;
 
   Begin
     Result := TargetCanvas.Brush.Color;
-    // Different blendings for modal and non-module nodes.
-    If Result = iModuleColour Then
-      dblBlendRatio := dblBlendRatioModule
-    Else
-      dblBlendRatio := dblBlendRatioNonModule;
     If dblValue > 0 Then
       Begin
         dblRatio := dblValue / dblLimit;
         If dblRatio < FLowThreshold Then
-          Result := BlendColour(iLightGreen, Result, dblBlendRatio)
+          Result := BlendColour(iLightGreen, Result, dblBlendRatioModule)
         Else If dblRatio > FHighThreshold Then
-          Result := BlendColour(iLightRed, Result, dblBlendRatio)
+          Result := BlendColour(iLightRed, Result, dblBlendRatioModule)
         Else
-          Result := BlendColour(iLightAmber, Result, dblBlendRatio);
+          Result := BlendColour(iLightAmber, Result, dblBlendRatioModule);
       End;
   End;
 
@@ -982,10 +1154,12 @@ Var
   NodeData: PBADIStatisticsRecord;
 
 Begin
-  NodeData := vstStatistics.GetNodeData(Node);
+  NodeData := FVSTMetrics.GetNodeData(Node);
   TargetCanvas.Brush.Color := clWindow;
-  If NodeData.FNodeType = ntModule Then
-    TargetCanvas.Brush.Color := iModuleColour;
+  {$IFDEF DXE102}
+  If Assigned(FStyleServices) And FStyleServices.Enabled Then
+    TargetCanvas.Brush.Color := FStyleServices.GetSystemColor(clWindow);
+  {$ENDIF}
   Case TBADIMetricColumns(Column) Of
     mcLength: TargetCanvas.Brush.Color := Colour(NodeData.FLinesOfCode, FLimits.FLinesOfCode);
     mcParameters: TargetCanvas.Brush.Color := Colour(NodeData.FParameterCount, FLimits.FParameterCount);
@@ -1012,11 +1186,11 @@ End;
   @param   Result as an Integer as a reference
 
 **)
-Procedure TframeBADIModuleStatistics.vstStatisticsCompareNodes(Sender: TBaseVirtualTree; Node1,
+Procedure TframeBADIModuleMetricsEditorView.vstStatisticsCompareNodes(Sender: TBaseVirtualTree; Node1,
   Node2: PVirtualNode; Column: TColumnIndex; Var Result: Integer);
 
 Begin
-  Result := CompareText(vstStatistics.Text[Node1, 0], vstStatistics.Text[Node2, 0]);
+  Result := CompareText(FVSTMetrics.Text[Node1, 0], FVSTMetrics.Text[Node2, 0]);
 End;
 
 (**
@@ -1030,7 +1204,7 @@ End;
   @param   Node   as a PVirtualNode
 
 **)
-Procedure TframeBADIModuleStatistics.vstStatisticsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
+Procedure TframeBADIModuleMetricsEditorView.vstStatisticsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
 
 Var
   NodeData : PBADIStatisticsRecord;
@@ -1055,7 +1229,7 @@ End;
   @param   ImageIndex as an Integer as a reference
 
 **)
-Procedure TframeBADIModuleStatistics.vstStatisticsGetImageIndex(Sender: TBaseVirtualTree;
+Procedure TframeBADIModuleMetricsEditorView.vstStatisticsGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex; Var Ghosted: Boolean;
   Var ImageIndex: Integer);
 
@@ -1065,7 +1239,7 @@ Var
 Begin
   If Column = 0 Then
     Begin
-      NodeData := vstStatistics.GetNodeData(Node);
+      NodeData := FVSTMetrics.GetNodeData(Node);
       ImageIndex := NodeData.FImageIndex;
     End;
 End;
@@ -1084,14 +1258,14 @@ End;
   @param   CellText as a String as a reference
 
 **)
-Procedure TframeBADIModuleStatistics.vstStatisticsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+Procedure TframeBADIModuleMetricsEditorView.vstStatisticsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
   Column: TColumnIndex; TextType: TVSTTextType; Var CellText: String);
 
 Var
   NodeData: PBADIStatisticsRecord;
 
 Begin
-  NodeData := vstStatistics.GetNodeData(Node);
+  NodeData := FVSTMetrics.GetNodeData(Node);
   CellText := '';
   Case TBADIMetricColumns(Column) Of
     mcText: CellText := NodeData.FText;
@@ -1118,6 +1292,52 @@ End;
 
 (**
 
+  This is an on header draw event handler for the treeview - the only way to get a themed header in the
+  new 10.2.2 IDE.
+
+  @precon  None.
+  @postcon Draws the column headers.
+
+  @param   Sender       as a TVTHeader
+  @param   HeaderCanvas as a TCanvas
+  @param   Column       as a TVirtualTreeColumn
+  @param   R            as a TRect
+  @param   Hover        as a Boolean
+  @param   Pressed      as a Boolean
+  @param   DropMark     as a TVTDropMarkMode
+
+**)
+Procedure TframeBADIModuleMetricsEditorView.vstStatisticsHeaderDraw(Sender: TVTHeader;
+  HeaderCanvas: TCanvas; Column: TVirtualTreeColumn; R: TRect; Hover,
+    Pressed: Boolean; DropMark: TVTDropMarkMode);
+
+Const
+  iTextPadding = 6;
+  
+Var
+  strText : String;
+  setTextFormats : TTextFormat;
+  
+Begin
+  HeaderCanvas.Brush.Color := clBtnFace;
+  {$IFDEF DXE102}
+  If Assigned(FStyleServices) And FStyleServices.Enabled Then
+    HeaderCanvas.Brush.Color := FStyleServices.GetSystemColor(clBtnFace);
+  {$ENDIF}
+  HeaderCanvas.FillRect(R);
+  strText := Column.Text;
+  InflateRect(R, -iTextPadding, 0);
+  setTextFormats := [tfVerticalCenter, tfEndEllipsis];
+  Case Column.Alignment Of
+    taLeftJustify:  Include(setTextFormats, tfLeft);
+    taRightJustify: Include(setTextFormats, tfRight);
+    taCenter:       Include(setTextFormats, tfCenter);
+  End;
+  HeaderCanvas.TextRect(R, strText, setTextFormats);
+End;
+
+(**
+
   This is an on Paint Text event handler for the treeview.
 
   @precon  None.
@@ -1130,7 +1350,7 @@ End;
   @param   TextType     as a TVSTTextType
 
 **)
-Procedure TframeBADIModuleStatistics.vstStatisticsPaintText(Sender: TBaseVirtualTree;
+Procedure TframeBADIModuleMetricsEditorView.vstStatisticsPaintText(Sender: TBaseVirtualTree;
   Const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 
 Var
@@ -1139,13 +1359,18 @@ Var
 Begin
   TargetCanvas.Font.Style := [];
   TargetCanvas.Font.Color := clWindowText;
-  NodeData := vstStatistics.GetNodeData(Node);
+  {$IFDEF DXE102}
+  If Assigned(FStyleServices) And FStyleServices.Enabled Then
+    TargetCanvas.Font.Color := FStyleServices.GetSystemColor(clWindowText);
+  {$ENDIF}
+  Case TBADIMetricColumns(Column) Of
+    mcLength..mcToxicity: TargetCanvas.Font.Color := clBlack;
+  End;
+  NodeData := FVSTMetrics.GetNodeData(Node);
   If Not (NodeData.FNodeType In [ntMethod]) Then
     Begin
       If Column = 0 Then
         TargetCanvas.Font.Style := [fsBold];
-      If NodeData.FNodeType = ntModule Then
-        TargetCanvas.Font.Color := clNavy;
     End;
 End;
 

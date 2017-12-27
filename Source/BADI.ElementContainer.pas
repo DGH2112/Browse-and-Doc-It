@@ -554,7 +554,7 @@ Var
 
 Begin
   Result := False;
-  If Not (doShowChecksAndMetrics In BADIOptions.Options) Or
+  If Not (doShowMetrics In BADIOptions.Options) Or
     Not BADIOptions.ModuleMetric[eMetric].FEnabled Or
     CheckCommentForNoMetric(eMetric, Self) Or
     CheckCommentForNoMetric(eMetric, Container) Then
@@ -599,7 +599,7 @@ Var
   iIcon: TBADIImageIndex;
 
 Begin
-  If Not (doShowChecksAndMetrics In BADIOptions.Options) Or
+  If Not (doShowChecks In BADIOptions.Options) Or
     Not BADIOptions.ModuleCheck[eCheck].FEnabled Or
     CheckCommentForNoCheck(eCheck, Self) Or
     CheckCommentForNoCheck(eCheck, Container) Then

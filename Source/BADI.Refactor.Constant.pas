@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Nov 2017
+  @Date    27 Dec 2017
 
 **)
 Unit BADI.Refactor.Constant;
@@ -128,7 +128,6 @@ Begin
   iBreakPoint := FMaxWidth - iStartCol - Length(strConCat);
   sl := TStringList.Create;
   Try
-    sl.TrailingLineBreak := False;
     sl.Text := FRefactoringInfo.Token.Token;
     iLine := 0;
     While (iBreakPoint > 0) And (iLine < sl.Count) And (Length(sl[iLine]) > iBreakPoint) Do

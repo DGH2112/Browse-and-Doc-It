@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Dec 2017
+  @Date    27 Dec 2017
 
 **)
 Unit BADI.Types;
@@ -463,6 +463,8 @@ Type
       mmMethodCCIncludeExpression,
     mmToxicity
   );
+  (** A set of the above module metrics. **)
+  TBADIModuleMetrics = Set Of TBADIModuleMetric;
 
   (** An enumerate to descibe each of the checks. **)
   TBADIModuleCheck = (
@@ -493,6 +495,8 @@ Type
     mcMissingCONSTInParemterList,
       mcMCParmListIgnoreEvents
   );
+  (** A set of the above module checks. **)
+  TBADIModuleChecks = Set Of TBADIModuleCheck;
 
   (** An enumerate to define the type of the metric limit. **)
   TBADILimitType = (ltInteger, ltFloat, ltNone);

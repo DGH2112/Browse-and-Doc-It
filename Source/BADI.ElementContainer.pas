@@ -101,8 +101,8 @@ Type
     Procedure AddDocumentConflict(Const Args: Array Of Const; Const iIdentLine, iIdentColumn: Integer;
       Const Container: TElementContainer; Const strCategory: String;
       Const DocConflictRec: TDocConflictTable);
-    Procedure AddModuleMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
-      Const Container : TElementContainer; Const eMetric : TBADIModuleMetric);
+    Function AddMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
+      Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : Boolean;
     Procedure AddModuleCheck(Const Args: Array of Const; Const iLine, iColumn : Integer;
       Const Container : TElementContainer; Const eCheck : TBADIModuleCheck);
     Function  AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
@@ -531,6 +531,53 @@ End;
 
 (**
 
+  This method adds an out of limit metric to the documentation tree.
+
+  @precon  Container must be a valid instance.
+  @postcon A metric is added to the document tree.
+
+  @param   Args      as an Array Of Const as a constant
+  @param   iLine     as an Integer as a constant
+  @param   iColumn   as an Integer as a constant
+  @param   Container as a TElementContainer as a constant
+  @param   eMetric   as a TBADIModuleMetric as a constant
+  @return  a Boolean
+
+**)
+Function TElementContainer.AddMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
+  Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : Boolean;
+
+Var
+  E: TElementContainer;
+  iL, iC: Integer;
+  iIcon: TBADIImageIndex;
+
+Begin
+  Result := False;
+  If Not (doShowChecksAndMetrics In BADIOptions.Options) Or
+    Not BADIOptions.ModuleMetric[eMetric].FEnabled Or
+    CheckCommentForNoMetric(eMetric, Self) Or
+    CheckCommentForNoMetric(eMetric, Container) Then
+    Begin
+      Result := True;
+      Exit;
+    End;
+  ModuleMetricPosition(Container, iL, iC);
+  iIcon := ModuleMetricImage(eMetric);
+  E := FindRoot;
+  E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
+  E := AddCategory(E, strMetrics, iiMetricCheckFolder);
+  E := AddCategory(E, ModuleMetrics[eMetric].FCategory, iiMetricCheckFolder);
+  If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
+    E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
+      ModuleMetrics[eMetric].FMessage, ModuleMetrics[eMetric].FDescription, iIcon))
+  Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
+    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
+      iiMetricCheckMissing));
+End;
+
+(**
+
   This method adds an out of limit check to the documentation tree.
 
   @precon  Container must be a valid instance.
@@ -566,48 +613,6 @@ Begin
   If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
     E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
       ModuleChecks[eCheck].FMessage, ModuleChecks[eCheck].FDescription, iIcon))
-  Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
-    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiMetricCheckMissing));
-End;
-
-(**
-
-  This method adds an out of limit metric to the documentation tree.
-
-  @precon  Container must be a valid instance.
-  @postcon A metric is added to the document tree.
-
-  @param   Args      as an Array Of Const as a constant
-  @param   iLine     as an Integer as a constant
-  @param   iColumn   as an Integer as a constant
-  @param   Container as a TElementContainer as a constant
-  @param   eMetric   as a TBADIModuleMetric as a constant
-
-**)
-Procedure TElementContainer.AddModuleMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
-  Const Container : TElementContainer; Const eMetric : TBADIModuleMetric);
-
-Var
-  E: TElementContainer;
-  iL, iC: Integer;
-  iIcon: TBADIImageIndex;
-
-Begin
-  If Not (doShowChecksAndMetrics In BADIOptions.Options) Or
-    Not BADIOptions.ModuleMetric[eMetric].FEnabled Or
-    CheckCommentForNoMetric(eMetric, Self) Or
-    CheckCommentForNoMetric(eMetric, Container) Then
-    Exit;
-  ModuleMetricPosition(Container, iL, iC);
-  iIcon := ModuleMetricImage(eMetric);
-  E := FindRoot;
-  E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
-  E := AddCategory(E, strMetrics, iiMetricCheckFolder);
-  E := AddCategory(E, ModuleMetrics[eMetric].FCategory, iiMetricCheckFolder);
-  If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
-    E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
-      ModuleMetrics[eMetric].FMessage, ModuleMetrics[eMetric].FDescription, iIcon))
   Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
     E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
       iiMetricCheckMissing));

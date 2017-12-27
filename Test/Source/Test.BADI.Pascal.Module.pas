@@ -1,4 +1,4 @@
-//: @nometrics
+//: @nometrics @nochecks
 unit Test.BADI.Pascal.Module;
 {
 
@@ -299,6 +299,8 @@ type
     Procedure TestCodeFailure34;
     Procedure TestCodeFailure35;
     Procedure TestCodeFailure36;
+    Procedure TestCodeFaliure37;
+    Procedure TestCodeFaliure38;
   Public
   End;
 
@@ -2181,6 +2183,51 @@ Begin
   Finally
     TBADIOptions.BADIOptions.Options := BO;
   End;
+End;
+
+Procedure TestTPascalModule.TestCodeFaliure37;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure T€ﬁest();'#13#10 +
+    ''#13#10 +
+    'Var'#13#10 +
+    '  „’ : Integer;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  „’ := 0;'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    []
+  );
+End;
+
+Procedure TestTPascalModule.TestCodeFaliure38;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure TParallelForTest();'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  TParallel.For(sgStatus.FixedRows, sgStatus.RowCount - 1,'#13#10 +
+    '    Procedure(r : Integer)'#13#10 +
+    '    Begin'#13#10 +
+    '      Case GPSync(r, FotoZeitZone, GPSZZeitToleranz) Of'#13#10 +
+    '        resTPFound:    TInterlock.Increment(x);'#13#10 +
+    '        resTPNotFound: TInterlock.Increment(y);'#13#10 +
+    '      End;'#13#10 +
+    '    End'#13#10 +
+    '  );'#13#10 +
+    'End;',
+    [ttErrors, ttWarnings],
+    []
+  );
 End;
 
 Procedure TestTPascalModule.TestCompoundStmt;

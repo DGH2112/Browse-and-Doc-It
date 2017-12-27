@@ -165,7 +165,8 @@ Uses
   BADI.Constants,
   BADI.Options,
   BADI.Types,
-  BADI.Functions;
+  BADI.Functions,
+  ToolsAPI;
 
 Type
   (** This is a record to describe the data stored in the virtual tree view. **)
@@ -262,13 +263,21 @@ Class Function TfrmProfiling.Execute(Const Module : TBaseLanguageModule) : TProf
 
 Var
   frm : TfrmProfiling;
+  {$IFDEF DXE102}
+  ITS : IOTAIDEThemingServices;
+  {$ENDIF}
   
 Begin
   Result := Nil;
-  frm := TfrmProfiling.Create(Nil);
+  frm := TfrmProfiling.Create(Application.MainForm);
   Try
     frm.InitialiseTreeView(Module);
     frm.mmoCode.Lines.Text := TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName];
+    {$IFDEF DXE102}
+    If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+      If ITS.IDEThemingEnabled Then
+        ITS.ApplyTheme(frm);
+    {$ENDIF}
     If frm.ShowModal = mrOK Then
       Begin
         Result := TProfileJobs.Create;
@@ -506,7 +515,7 @@ Var
   NodeData : ^TTreeData;
 
 begin
-  If Column = 0 Then
+  If (Column = 0) And (Kind In [ikNormal, ikSelected]) Then
     Begin
       NodeData := vstMethods.GetNodeData(Node);
       ImageIndex := NodeData.Element.ImageIndexAdjustedForScope;

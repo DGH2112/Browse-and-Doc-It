@@ -67,7 +67,6 @@ object frmProfiling: TfrmProfiling
       Width = 493
       Height = 445
       Align = alClient
-      CheckImageKind = ckXP
       Header.AutoSizeIndex = 0
       Header.Font.Charset = DEFAULT_CHARSET
       Header.Font.Color = clWindowText

@@ -416,8 +416,8 @@ Const
     (FName: 'BADIInSituComment';    FCaption: strMenuInSituComment;    FShortcut: 'CTRL+SHIFT+ALT+I';     FMaskColor: clLime),
     (FName: 'BADIToDoComment';      FCaption: strMenuToDoComment;      FShortcut: 'CTRL+SHIFT+ALT+T';     FMaskColor: clLime),
     (FName: 'BADISep2';             FCaption: strMenuSep;              FShortcut: '';                     FMaskColor: clLime),
-    (FName: 'BADIRefactorConstant'; FCaption: strMenuRefactorConstant; FShortcut: 'CTRL+SHIFT+C';         FMaskColor: clLime),
-    (FName: 'BADIStatistics';       FCaption: strMenuStatistics;       FShortcut: 'CTRL+SHIFT+ALT+S';     FMaskColor: clLime),
+    (FName: 'BADIRefactorConstant'; FCaption: strMenuRefactorConstant; FShortcut: 'CTRL+SHIFT+ALT+C';         FMaskColor: clLime),
+    (FName: 'BADIStatistics';       FCaption: strMenuMetrics;          FShortcut: 'CTRL+SHIFT+ALT+S';     FMaskColor: clLime),
     (FName: 'BADISep3';             FCaption: strMenuSep;              FShortcut: '';                     FMaskColor: clLime),
     (FName: 'BADIOptions';          FCaption: strMenuOptions;          FShortcut: 'CTRL+SHIFT+ALT+O';     FMaskColor: clLime)
   );

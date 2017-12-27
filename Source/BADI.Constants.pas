@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Dec 2017
+  @Date    27 Dec 2017
 
 **)
 Unit BADI.Constants;
@@ -57,6 +57,7 @@ Const
     (FDescription : strShowWarnings;                          FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strShowHints;                             FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strShowDocumentationConflicts;            FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strShowModuleChecks;                      FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strShowModuleMetrics;                     FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strShowChildCountinTitles;                FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
     (FDescription : strExpandErrors;                          FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),

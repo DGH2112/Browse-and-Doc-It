@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Dec 2017
+  @Date    27 Dec 2017
 
 **)
 Unit BADI.Generic.FunctionDecl;
@@ -37,16 +37,19 @@ Type
     FHasProfiling          : Boolean;
     FIndent                : Integer;
     FIsDeclarationOnly     : Boolean;
-    FNestedIFDepth               : Integer;
     FIFStackDepth          : Integer;
-    FCyclometricComplexity : Integer;
+    FMetrics               : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] OF Double;
+    FMetricOverrides       : TBADIModuleMetrics;
   {$IFDEF D2005} Strict {$ENDIF} Protected
-    Function GetQualifiedName: String; Virtual; Abstract;
-    Function GetParameterCount: Integer;
-    Function GetParameters(Const iIndex: Integer): TGenericParameter;
-    Function RequiresReturn: Boolean; Virtual; Abstract;
-    Function FunctionType: String; Virtual; Abstract;
-    Function GetToxicity : Double; Virtual;
+    Function  GetQualifiedName: String; Virtual; Abstract;
+    Function  GetParameterCount: Integer;
+    Function  GetParameters(Const iIndex: Integer): TGenericParameter;
+    Function  RequiresReturn: Boolean; Virtual; Abstract;
+    Function  FunctionType: String; Virtual; Abstract;
+    Function  CalculateToxicity : Double; Virtual;
+    Function  VariableCount : Double; Virtual;
+    Function  GetMetric(Const eMetric : TBADIModuleMetric) : Double;
+    Procedure SetMetric(Const eMetric : TBADIModuleMetric; Const dblValue : Double);
   Public
     Constructor Create(Const strName: String; Const AScope: TScope; Const iLine, iColumn: Integer;
       Const AImageIndex: TBADIImageIndex; Const AComment: TComment); Override;
@@ -54,7 +57,6 @@ Type
     Procedure CheckReferences; Override;
     Function  ReferenceSymbol(Const AToken : TTokenInfo) : Boolean; Override;
     Procedure AddParameter(Const AParameter: TGenericParameter);
-    Function LineofCode: Integer;
     Procedure IncIFDepth;
     Procedure DecIFDepth;
     Procedure IncCyclometricComplexity;
@@ -136,27 +138,20 @@ Type
     **)
     Property IsDeclarationOnly : Boolean Read FIsDeclarationOnly Write FIsDeclarationOnly;
     (**
-      A property to hold the maximum number of nested IF statements.
+      This property gets and sets the metrics associated with the method.
       @precon  None.
-      @postcon Returns the maximum number of nested IF statements.
-      @return  an Integer
-    **)
-    Property NestedIFDepth : Integer Read FNestedIFDepth Write FNestedIFDepth;
-    (**
-      A property to return the cyclometric complexity of the method.
-      @precon  None.
-      @postcon Returns the cyclometric complexity of the method.
-      @return  an Integer
-    **)
-    Property CyclometricComplexity : Integer Read FCyclometricComplexity
-      Write FCyclometricComplexity;
-    (**
-      A property to return the toxicity of the method.
-      @precon  None.
-      @postcon Returns the toxicity of the method.
+      @postcon Gets and sets the metrics associated with the method.
+      @param   eMetric as a TBADIModuleMetric as a constant
       @return  a Double
     **)
-    Property Toxicity : Double Read GetToxicity;
+    Property Metric[Const eMetric : TBADIModuleMetric] : Double Read GetMetric Write SetMetric;
+    (**
+      This property determines which metrics are overridden with nometric or nometrics.
+      @precon  None.
+      @postcon Determines which metrics are overridden with nometric or nometrics.
+      @return  a TBADIModuleMetrics
+    **)
+    Property MetricOverrides : TBADIModuleMetrics Read FMetricOverrides Write FMetricOverrides;
   End;
 
   (** A type to define sub classes of TGenericFunction **)
@@ -169,9 +164,13 @@ Uses
   Profiler,
   {$ENDIF}
   SysUtils,
-  BADI.ResourceStrings;
+  BADI.ResourceStrings, 
+  BADI.Constants;
 
-
+Const
+  (** A unity value to increment and descending metrics. **)
+  dblUnity = 1.0;
+  
 (**
 
   This method adds the given parameter to the internal list.
@@ -187,6 +186,57 @@ procedure TGenericFunction.AddParameter(Const AParameter: TGenericParameter);
 begin
   FParameters.Add(AParameter);
 end;
+
+(**
+
+  This is a getter method for the Toxicity property.
+
+  @precon  None.
+  @postcon Returns a calculated toxicity for a method based on the following:
+           1) Line in the Method verse Limit;
+           2) Number of parameters;
+           3) Number of local variables;
+           4) Nested IF Depth;
+           5) Cyclometric Complexity.
+
+  @return  a Double
+
+**)
+Function TGenericFunction.CalculateToxicity: Double;
+
+  (**
+
+    This is a function calculate the the weighting for the combination of the metrics for toxicity.
+
+    @precon  None.
+    @postcon Returns a cube of the given number.
+
+    @param   X as a Double as a Constant
+    @return  a Double
+
+  **)
+  Function F(Const X : Double) : Double;
+
+  Begin
+    Result := X * X * X; // Cube
+  End;
+
+Const
+  strSender = 'Sender';
+
+Begin
+  Result := 0;
+  If Not FIsDeclarationOnly Then
+    Begin
+      Result := F((FEndLine - FStartLine) / BADIOptions.ModuleMetric[mmLongMethods].FLimit);
+      If (ParameterCount > 0) And (CompareText(Parameters[0].Identifier, strSender) <> 0) Then
+        Result := Result + F(ParameterCount / BADIOptions.ModuleMetric[mmLongParameterLists].FLimit);
+      Result := Result + F(VariableCount / BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit);
+      Result := Result + F(FMetrics[mmNestedIFDepth] / BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit);
+      Result := Result + F(FMetrics[mmCyclometricComplexity] /
+        BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit);
+    End;
+End;
 
 (**
 
@@ -247,6 +297,8 @@ Begin
   FStartLine := - 1;
   FEndLine := - 1;
   FIsDeclarationOnly := True;
+  FIfStackDepth := 0;
+  FMetricOverrides := [];
 End;
 
 (**
@@ -271,12 +323,38 @@ End;
   @postcon Frees the memory for the parameters and return type.
 
 **)
-destructor TGenericFunction.Destroy;
-begin
+Destructor TGenericFunction.Destroy;
+
+Begin
   FReturnType.Free;
   FParameters.Free;
   Inherited Destroy;
-end;
+End;
+
+(**
+
+  This is a getter method for the Metric property.
+
+  @precon  None.
+  @postcon Returns the value of the given metric.
+
+  @param   eMetric as a TBADIModuleMetric as a constant
+  @return  a Double
+
+**)
+Function TGenericFunction.GetMetric(Const eMetric: TBADIModuleMetric): Double;
+
+Begin
+  Case eMetric Of
+    mmLongMethods:               Result := FEndLine - FStartLine + 1;
+    mmLongParameterLists:        Result := ParameterCount;
+    mmLongMethodVariableLists:   Result := VariableCount;
+    mmNestedIFDepth:             Result := FMetrics[mmNestedIFDepth];
+    mmCyclometricComplexity:     Result := FMetrics[mmCyclometricComplexity];
+    mmMethodCCIncludeExpression: Result := 0;
+    mmToxicity:                  Result := CalculateToxicity;
+  End;
+End;
 
 (**
 
@@ -288,10 +366,11 @@ end;
   @return  an Integer
 
 **)
-function TGenericFunction.GetParameterCount: Integer;
-begin
+Function TGenericFunction.GetParameterCount: Integer;
+
+Begin
   Result := FParameters.Count;
-end;
+End;
 
 (**
 
@@ -312,61 +391,6 @@ End;
 
 (**
 
-  This is a getter method for the Toxicity property.
-
-  @precon  None.
-  @postcon Returns a calculated toxicity for a method based on the following:
-           1) Line in the Method verse Limit;
-           2) Number of parameters;
-           3) Number of local variables;
-           4) Nested IF Depth;
-           5) Cyclometric Complexity.
-
-  @return  a Double
-
-**)
-Function TGenericFunction.GetToxicity: Double;
-
-  (**
-
-    This is a function calculate the the weighting for the combination of the metrics for toxicity.
-
-    @precon  None.
-    @postcon Returns a cube of the given number.
-
-    @param   X as a Double as a Constant
-    @return  a Double
-
-  **)
-  Function F(Const X : Double) : Double;
-
-  Begin
-    Result := X * X * X; // Cube
-  End;
-
-Const
-  strSender = 'Sender';
-
-Var
-  V: TElementContainer;
-
-Begin
-  Result := 0;
-  If FIsDeclarationOnly Then
-    Exit;
-  Result := F((FEndLine - FStartLine) / BADIOptions.ModuleMetric[mmLongMethods].FLimit);
-  If (ParameterCount > 0) And (CompareText(Parameters[0].Identifier, strSender) <> 0) Then
-    Result := Result + F(ParameterCount / BADIOptions.ModuleMetric[mmLongParameterLists].FLimit);
-  V := FindElement(strVarsLabel);
-  If Assigned(V) Then
-    Result := Result + F(V.ElementCount / BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit);
-  Result := Result + F(NestedIFDepth / BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit);
-  Result := Result + F(CyclometricComplexity /
-    BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit);
-End;
-
-(**
-
   This method increments the methods cyclometric complexity.
 
   @precon  None.
@@ -376,7 +400,7 @@ End;
 Procedure TGenericFunction.IncCyclometricComplexity;
 
 Begin
-  Inc(FCyclometricComplexity);
+  FMetrics[mmCyclometricComplexity] := FMetrics[mmCyclometricComplexity] + dblUnity;
 End;
 
 (**
@@ -392,24 +416,9 @@ Procedure TGenericFunction.IncIFDepth;
 
 Begin
   Inc(FIFStackDepth);
-  If FIFStackDepth > FNestedIFDepth Then
-    FNestedIFDepth := FIFStackDepth;
+  If FIFStackDepth > FMetrics[mmNestedIFDepth]Then
+    FMetrics[mmNestedIFDepth]:= FIFStackDepth;
 End;
-
-(**
-
-  This method returns the number of lines of code in the function.
-
-  @precon  None.
-  @postcon Returns the number of lines of code in the function.
-
-  @return  an Integer
-
-**)
-function TGenericFunction.LineofCode: Integer;
-begin
-  Result := FEndLine - FStartLine + 1;
-end;
 
 (**
 
@@ -444,4 +453,51 @@ Begin
   Result := Inherited ReferenceSymbol(AToken);
 End;
 
+(**
+
+  This is a setter method for the Metric property.
+
+  @precon  None.
+  @postcon Set the value of the given metric if applicable else raises an exception.
+
+  @param   eMetric  as a TBADIModuleMetric as a constant
+  @param   dblValue as a Double as a constant
+
+**)
+Procedure TGenericFunction.SetMetric(Const eMetric: TBADIModuleMetric; Const dblValue: Double);
+
+ResourceString
+  strMsg = 'You cannot set the metric type "%s"!';
+  
+Begin
+  Case eMetric Of
+    mmNestedIFDepth:         FMetrics[mmNestedIFDepth] := dblValue;
+    mmCyclometricComplexity: FMetrics[mmCyclometricComplexity] := dblValue;
+  Else
+    Raise Exception.CreateFmt(strMsg, [ModuleMetrics[eMetric].FName]);
+  End;
+End;
+
+(**
+
+  This method returns the number of variables that are declared for the method.
+
+  @precon  None.
+  @postcon The number of method variables is returned.
+
+  @return  a Double
+
+**)
+Function TGenericFunction.VariableCount: Double;
+
+Var
+  V : TElementContainer;
+  
+Begin
+  Result := 0;
+  V := FindElement(strVarsLabel);
+  If Assigned(V) Then
+    Result := V.ElementCount;
+End;
+  
 End.

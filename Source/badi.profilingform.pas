@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    12 Apr 2017
+  @Date    27 Dec 2017
 
 **)
 unit BADI.ProfilingForm;
@@ -31,9 +31,6 @@ uses
   ImgList,
   Contnrs,
   ExtCtrls,
-  {$IFDEF DXE100}
-  ImageList,
-  {$ENDIF}
   BADI.ElementContainer;
 
 type
@@ -52,8 +49,8 @@ type
     FIndent    : Integer;
   {$IFDEF D2005} Strict {$ENDIF} Protected
   Public
-    Constructor Create(Const strMethod : String; CodeType : TProfileCodeType;
-      iStartLine, iEndLine, iIndent : Integer);
+    Constructor Create(Const strMethod: String; Const CodeType: TProfileCodeType;
+  Const iStartLine, iEndLine, iIndent: Integer);
     (**
       This property get the Method Name of the profile job.
       @precon  None.
@@ -97,12 +94,12 @@ type
     FProfileJobs : TObjectList;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function GetCount : Integer;
-    Function GetProfileJob(iIndex : Integer) : TProfileJob;
+    function GetProfileJob(Const iIndex: Integer): TProfileJob;
   Public
     Constructor Create;
     Destructor Destroy; Override;
-    Procedure Add(Const strMethod : String; CodeType : TProfileCodeType;
-      iStartLine, iEndLine, iIndent : Integer);
+    Procedure Add(Const strMethod: String; Const CodeType: TProfileCodeType; Const iStartLine,
+      iEndLine, iIndent: Integer);
     (**
       This property returns the number of Profile Jobs in the collection.
       @precon  None.
@@ -114,10 +111,10 @@ type
       This property returns the indexed Profile Job from the collection.
       @precon  iIndex must be between 0 and Count - 1.
       @postcon Returns the indexed Profile Job from the collection.
-      @param   iIndex as an Integer
+      @param   iIndex as an Integer as a constant
       @return  a TProfileJob
     **)
-    Property ProfileJob[iIndex : Integer] : TProfileJob Read GetProfileJob;
+    Property ProfileJob[Const iIndex : Integer] : TProfileJob Read GetProfileJob;
   End;
 
   (** A class to represent the form interface. **)
@@ -146,16 +143,15 @@ type
     { Private declarations }
     FModule: PVirtualNode;
     FRootElement: TLabelContainer;
-    Procedure InitialiseTreeView(M : TBaseLanguageModule);
-    Function AddNode(P : PVirtualNode; Element : TElementContainer) : PVirtualNode;
-    procedure RenderContainers(RootNode: PVirtualNode;
-      Container: TElementContainer);
+    procedure InitialiseTreeView(Const M : TBaseLanguageModule);
+    Function  AddNode(Const P : PVirtualNode; Const Element : TElementContainer) : PVirtualNode;
+    Procedure RenderContainers(Const RootNode : PVirtualNode; Const Container: TElementContainer);
     Procedure LoadSettings;
     Procedure SaveSettings;
-    Procedure ProcessJobs(Collection : TProfileJobs);
+    procedure ProcessJobs(Const Collection: TProfileJobs);
   public
     { Public declarations }
-    Class Function Execute(Module : TBaseLanguageModule) : TProfileJobs;
+    Class Function Execute(Const Module : TBaseLanguageModule) : TProfileJobs;
   end;
 
 implementation
@@ -177,26 +173,29 @@ Type
     Element : TElementContainer;
   End;
 
+Const
+  (** INI Section name for the dialogue position and size. **)
+  strProfilingDlg = 'ProfilingDlg';
+
 {$R *.dfm}
 
 (**
 
-  This method adds a node (module element) to the virtual tree view with the
-  parent P.
+  This method adds a node (module element) to the virtual tree view with the parent P.
 
   @precon  P and Element must both be a valid instances.
-  @postcon Adds a node (module element) to the virtual tree view with the
-           parent P.
+  @postcon Adds a node (module element) to the virtual tree view with the parent P.
 
-  @param   P       as a PVirtualNode
-  @param   Element as a TElementContainer
+  @param   P       as a PVirtualNode as a constant
+  @param   Element as a TElementContainer as a constant
   @return  a PVirtualNode
 
 **)
-function TfrmProfiling.AddNode(P : PVirtualNode; Element : TElementContainer) : PVirtualNode;
+function TfrmProfiling.AddNode(Const P : PVirtualNode; Const Element : TElementContainer) : PVirtualNode;
 
 Var
   NodeData : ^TTreeData;
+  M : TGenericFunction;
 
 begin
   Result := vstMethods.AddChild(P);
@@ -204,14 +203,13 @@ begin
   NodeData.Element := Element;
   Result.CheckType := ctTriStateCheckBox;
   If Nodedata.Element Is TGenericFunction Then
-    With (NodeData.Element As TGenericFunction) Do
-      Begin
-        If HasProfiling Then
-          vstMethods.CheckState[Result] := csCheckedNormal;
-        If StartLine = -1 Then
-          Include(Result.States, vsDisabled);
-      End;
-
+    Begin
+      M := NodeData.Element As TGenericFunction;
+      If M.HasProfiling Then
+        vstMethods.CheckState[Result] := csCheckedNormal;
+      If M.StartLine = -1 Then
+        Include(Result.States, vsDisabled);
+    End;
 end;
 
 (**
@@ -246,7 +244,7 @@ begin
     Begin
       MessageDlg(Format(strProfilingTemplate, [strMethodCode]), mtError, [mbOK], 0);
       ModalResult := mrNone;
-    End Else
+    End;
 end;
 
 (**
@@ -256,28 +254,31 @@ end;
   @precon  None.
   @postcon Creates an instance of the Singleton class .
 
-  @param   Module as a TBaseLanguageModule
+  @param   Module as a TBaseLanguageModule as a constant
   @return  a TProfileJobs
 
 **)
-Class Function TfrmProfiling.Execute(Module : TBaseLanguageModule) : TProfileJobs;
+Class Function TfrmProfiling.Execute(Const Module : TBaseLanguageModule) : TProfileJobs;
 
+Var
+  frm : TfrmProfiling;
+  
 Begin
   Result := Nil;
-  With TfrmProfiling.Create(Nil) Do
-    Try
-      InitialiseTreeView(Module);
-      mmoCode.Lines.Text := TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName];
-      If ShowModal = mrOK Then
-        Begin
-          Result := TProfileJobs.Create;
-          ProcessJobs(Result);
-          TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName] := mmoCode.Lines.Text;
-          SaveSettings;
-        End;
-    Finally
-      Free;
-    End;
+  frm := TfrmProfiling.Create(Nil);
+  Try
+    frm.InitialiseTreeView(Module);
+    frm.mmoCode.Lines.Text := TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName];
+    If frm.ShowModal = mrOK Then
+      Begin
+        Result := TProfileJobs.Create;
+        frm.ProcessJobs(Result);
+        TBADIOptions.BADIOptions.ProfilingCode[Module.ClassName] := frm.mmoCode.Lines.Text;
+        frm.SaveSettings;
+      End;
+  Finally
+    frm.Free;
+  End;
 End;
 
 (**
@@ -321,10 +322,10 @@ end;
   @precon  None.
   @postcon Starts the rendering on testable elements in the module.
 
-  @param   M as a TBaseLanguageModule
+  @param   M as a TBaseLanguageModule as a constant
 
 **)
-procedure TfrmProfiling.InitialiseTreeView(M : TBaseLanguageModule);
+procedure TfrmProfiling.InitialiseTreeView(Const M : TBaseLanguageModule);
 
 Var
   I : TElementContainer;
@@ -350,46 +351,49 @@ end;
 **)
 procedure TfrmProfiling.LoadSettings;
 
+Var
+  iniFile : TMemIniFile;
+  
 begin
-  With TMemIniFile.Create(TBADIOptions.BADIOptions.IniFileName) Do
-    Try
-      Top := ReadInteger('ProfilingDlg', 'Top', (Screen.Height - Height) Div 2);
-      Left := ReadInteger('ProfilingDlg', 'Left', (Screen.Width - Width) Div 2);
-      Height := ReadInteger('ProfilingDlg', 'Height', Height);
-      Width := ReadInteger('ProfilingDlg', 'Width', Width);
-    Finally
-      Free;
-    End;
+  iniFile := TMemIniFile.Create(TBADIOptions.BADIOptions.IniFileName);
+  Try
+    Top := iniFile.ReadInteger(strProfilingDlg, 'Top', (Screen.Height - Height) Div 2);
+    Left := iniFile.ReadInteger(strProfilingDlg, 'Left', (Screen.Width - Width) Div 2);
+    Height := iniFile.ReadInteger(strProfilingDlg, 'Height', Height);
+    Width := iniFile.ReadInteger(strProfilingDlg, 'Width', Width);
+  Finally
+    iniFile.Free;
+  End;
 end;
 
 (**
 
-  This method recurses the tree looking for TGenericFunctions and building a list
-  of profile jobs to be done.
+  This method recurses the tree looking for TGenericFunctions and building a list of profile jobs to be 
+  done.
 
   @precon  Collection must be a valid instance.
-  @postcon Recurses the tree looking for TGenericFunctions and building a list
-           of profile jobs to be done in Collection.
+  @postcon Recurses the tree looking for TGenericFunctions and building a list of profile jobs to be 
+           done in Collection.
 
-  @param   Collection as a TProfileJobs
+  @param   Collection as a TProfileJobs as a constant
 
 **)
-procedure TfrmProfiling.ProcessJobs(Collection: TProfileJobs);
+procedure TfrmProfiling.ProcessJobs(Const Collection: TProfileJobs);
 
   (**
 
-    This procedure recurses the nodes in the tree view building a list of
-    profiling that needs to be inserted or removed based on the current state
-    of the profiling in the method and whether the node if checked or not.
+    This procedure recurses the nodes in the tree view building a list of profiling that needs to be 
+    inserted or removed based on the current state of the profiling in the method and whether the node if
+    checked or not.
 
     @precon  None.
-    @postcon Recurses the nodes in the tree view building a list of
-             profiling that needs to be inserted or removed.
+    @postcon Recurses the nodes in the tree view building a list of profiling that needs to be inserted 
+             or removed.
 
-    @param   Node as a PVirtualNode
+    @param   Node as a PVirtualNode as a constant
 
   **)
-  Procedure RecurseNodes(Node : PVirtualNode);
+  Procedure RecurseNodes(Const Node : PVirtualNode);
 
   Var
     N : PVirtualNode;
@@ -430,12 +434,12 @@ end;
   @precon  RootNode and Container must be valid instance.
   @postcon Recursively renders elements and their children.
 
-  @param   RootNode  as a PVirtualNode
-  @param   Container as a TElementContainer
+  @param   RootNode  as a PVirtualNode as a constant
+  @param   Container as a TElementContainer as a constant
 
 **)
-procedure TfrmProfiling.RenderContainers(RootNode : PVirtualNode;
-  Container: TElementContainer);
+procedure TfrmProfiling.RenderContainers(Const RootNode : PVirtualNode;
+  Const Container: TElementContainer);
 
 Var
   i : Integer;
@@ -462,17 +466,20 @@ end;
 **)
 procedure TfrmProfiling.SaveSettings;
 
+Var
+  iniFile : TMemIniFile;
+  
 begin
-  With TMemIniFile.Create(TBADIOptions.BADIOptions.IniFileName) Do
-    Try
-      WriteInteger('ProfilingDlg', 'Top', Top);
-      WriteInteger('ProfilingDlg', 'Left', Left);
-      WriteInteger('ProfilingDlg', 'Height', Height);
-      WriteInteger('ProfilingDlg', 'Width', Width);
-      UpdateFile;
-    Finally
-      Free;
-    End;
+  iniFile := TMemIniFile.Create(TBADIOptions.BADIOptions.IniFileName);
+  Try
+    iniFile.WriteInteger(strProfilingDlg, 'Top', Top);
+    iniFile.WriteInteger(strProfilingDlg, 'Left', Left);
+    iniFile.WriteInteger(strProfilingDlg, 'Height', Height);
+    iniFile.WriteInteger(strProfilingDlg, 'Width', Width);
+    iniFile.UpdateFile;
+  Finally
+    iniFile.Free;
+  End;
 end;
 
 (**
@@ -538,10 +545,10 @@ begin
   Else
     If NodeData.Element Is TGenericFunction Then
       Case Column Of
-        1: CellText := IntToStr((NodeData.Element as TGenericFunction).StartLine);
-        2: CellText := IntToStr((NodeData.Element as TGenericFunction).EndLine);
-        3: CellText := IntToStr((NodeData.Element as TGenericFunction).LineofCode);
-        4: CellText := BoolToStr((NodeData.Element as TGenericFunction).HasProfiling);
+        1: CellText := Format('%d', [(NodeData.Element As TGenericFunction).StartLine]);
+        2: CellText := Format('%d', [(NodeData.Element As TGenericFunction).EndLine]);
+        3: CellText := Format('%1.0f', [(NodeData.Element As TGenericFunction).Metric[mmLongMethods]]);
+        4: CellText := BoolToStr((NodeData.Element As TGenericFunction).HasProfiling);
       End
     Else CellText := '';
   End;
@@ -557,32 +564,34 @@ end;
   @postcon Creates an instance of a TProfileJob class.
 
   @param   strMethod  as a String as a constant
-  @param   CodeType   as a TProfileCodeType
-  @param   iStartLine as an Integer
-  @param   iEndLine   as an Integer
-  @param   iIndent    as an Integer
+  @param   CodeType   as a TProfileCodeType as a constant
+  @param   iStartLine as an Integer as a constant
+  @param   iEndLine   as an Integer as a constant
+  @param   iIndent    as an Integer as a constant
 
 **)
-constructor TProfileJob.Create(Const strMethod: String; CodeType: TProfileCodeType;
-  iStartLine, iEndLine, iIndent: Integer);
-begin
+Constructor TProfileJob.Create(Const strMethod: String; Const CodeType: TProfileCodeType;
+  Const iStartLine, iEndLine, iIndent: Integer);
+
+Begin
   FMethod := strMethod;
-  FCodeType := codeType;
+  FCodeType := CodeType;
   FStartLine := iStartLine;
   FEndLine := iEndLine;
   FIndent := iIndent;
-end;
+End;
 
 { TProfileJobs }
 
 (**
 
-  This is a compare function for the Profile Jobs collection to sort in
-  descending order.
+  This is a compare function for the Profile Jobs collection to sort in descending order.
 
   @precon  None.
   @postcon Returns an integer to define the sort order.
 
+  @nocheck MissingCONSTInParam
+  
   @param   ProfileJob1 as a Pointer
   @param   ProfileJob2 as a Pointer
   @return  an Integer
@@ -602,19 +611,20 @@ End;
   @postcon Adds a profile job to the collection.
 
   @param   strMethod  as a String as a constant
-  @param   CodeType   as a TProfileCodeType
-  @param   iStartLine as an Integer
-  @param   iEndLine   as an Integer
-  @param   iIndent    as an Integer
+  @param   CodeType   as a TProfileCodeType as a constant
+  @param   iStartLine as an Integer as a constant
+  @param   iEndLine   as an Integer as a constant
+  @param   iIndent    as an Integer as a constant
 
 **)
-procedure TProfileJobs.Add(Const strMethod: String; CodeType: TProfileCodeType;
-  iStartLine, iEndLine, iIndent: Integer);
-begin
+Procedure TProfileJobs.Add(Const strMethod: String; Const CodeType: TProfileCodeType;
+  Const iStartLine, iEndLine, iIndent: Integer);
+
+Begin
   FProfileJobs.Add(TProfileJob.Create(strMethod, CodeType, iStartLine, iEndLine,
     iIndent));
   FProfileJobs.Sort(SortProfileJobs);
-end;
+End;
 
 (**
 
@@ -665,11 +675,11 @@ end;
   @precon  iIndex must be between 0 and Count - 1.
   @postcon Returns an instance of the indexed Profile Job.
 
-  @param   iIndex as an Integer
+  @param   iIndex as an Integer as a constant
   @return  a TProfileJob
 
 **)
-function TProfileJobs.GetProfileJob(iIndex: Integer): TProfileJob;
+function TProfileJobs.GetProfileJob(Const iIndex: Integer): TProfileJob;
 begin
   Result := FProfileJobs[iIndex] As TProfileJob;
 end;

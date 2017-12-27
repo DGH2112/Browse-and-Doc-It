@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       17 Dec 2017
+  @Date       27 Dec 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -581,7 +581,11 @@ Begin
 
       If IsInSet(ch, strWhiteSpace) Then
         CurCharType := ttWhiteSpace
+      {$IFDEF DXE40}
+      Else If IsInSet(ch, strTokenChars) Or ch.IsLetter Then
+      {$ELSE}
       Else If IsInSet(ch, strTokenChars) Or IsLetter(ch) Then
+      {$ENDIF}
         Begin
           If (LastCharType = ttNumber) And (IsInSet(Ch, ['A'..'F', 'a'..'f'])) Then
             CurCharType := ttNumber
@@ -1582,7 +1586,7 @@ End;
            declaration section with in a method .
   @postcon Parses a declaration section from the current token position .
 
-  @nometric EmptyREPEAT
+  @nocheck EmptyREPEAT
 
   @param   AScope    as a TScope as a constant
   @param   Container as a TElementContainer as a constant
@@ -1591,7 +1595,6 @@ End;
 Procedure TPascalModule.DeclSection(Const AScope : TScope; Const Container : TElementContainer);
 
 Var
-  V: TElementContainer;
   M: TGenericFunction;
 
 Begin
@@ -1610,14 +1613,13 @@ Begin
   If Container Is TGenericFunction Then
     Begin
       M := Container As TGenericFunction;
-      V := Container.FindElement(strVarsLabel);
       MetricsLongParameterList(M);
       MetricMissingConstInParamList(M);
-      If Assigned(V) And (V.ElementCount > BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit) Then
-        //: todo Find first token position.
-        AddModuleMetric([M.QualifiedName, V.ElementCount,
-          Trunc(BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit)], V.Elements[1].Line,
-          V.Elements[1].Column, M, mmLongMethodVariableLists);
+      If M.Metric[mmLongMethodVariableLists] > BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit Then
+        If AddMetric([M.QualifiedName, M.Metric[mmLongMethodVariableLists],
+          BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit], M.Line, M.Column, M,
+          mmLongMethodVariableLists) Then
+          M.MetricOverrides := M.MetricOverrides + [mmLongMethodVariableLists];
     End;
 End;
 
@@ -1701,10 +1703,12 @@ Procedure TPascalModule.MetricsCyclometricComplexity(Const Method : TGenericFunc
 
 Begin
   If Assigned(Method) Then
-    If Method.CyclometricComplexity > BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit Then
-      AddModuleMetric([Method.QualifiedName, Method.CyclometricComplexity,
-        Trunc(BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit)],
-        Method.Line, Method.Column, Method, mmCyclometricComplexity);
+    If Method.Metric[mmCyclometricComplexity] >
+      BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit Then
+      If AddMetric([Method.QualifiedName, Method.Metric[mmCyclometricComplexity],
+        BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit],
+        Method.Line, Method.Column, Method, mmCyclometricComplexity) Then
+        Method.MetricOverrides := Method.MetricOverrides + [mmCyclometricComplexity];
 End;
 
 (**
@@ -1877,9 +1881,10 @@ Begin
           AddModuleCheck([Method.QualifiedName], Method.Line, Method.Column, Method, mcEmptyMethod);
       If BADIOptions.ModuleMetric[mmLongMethods].FEnabled Then
         If (Method.EndLine > Method.StartLine + BADIOptions.ModuleMetric[mmLongMethods].FLimit) Then
-          AddModuleMetric([Method.QualifiedName, Method.EndLine - Method.StartLine,
-            Trunc(BADIOptions.ModuleMetric[mmLongMethods].FLimit)], Method.Line, Method.Column, Method,
-            mmLongMethods);
+          If AddMetric([Method.QualifiedName, Method.Metric[mmLongMethods],
+            BADIOptions.ModuleMetric[mmLongMethods].FLimit], Method.Line, Method.Column, Method,
+            mmLongMethods) Then
+            Method.MetricOverrides := Method.MetricOverrides + [mmLongMethods];
     End;
 End;
 
@@ -1899,9 +1904,10 @@ Procedure TPascalModule.MetricsLongParameterList(Const Method : TGenericFunction
 
 Begin
   If Method.ParameterCount > BADIOptions.ModuleMetric[mmLongParameterLists].FLimit Then
-    AddModuleMetric([Method.QualifiedName, Method.ParameterCount,
-      Trunc(BADIOptions.ModuleMetric[mmLongParameterLists].FLimit)], Method.Line, Method.Column, Method,
-      mmLongParameterLists);
+    If AddMetric([Method.QualifiedName, Method.Metric[mmLongParameterLists],
+      BADIOptions.ModuleMetric[mmLongParameterLists].FLimit], Method.Line, Method.Column, Method,
+      mmLongParameterLists) Then
+      Method.MetricOverrides := Method.MetricOverrides + [mmLongParameterLists];
 End;
 
 (**
@@ -1918,9 +1924,11 @@ Procedure TPascalModule.MetricsMethodToxicity(Const Method: TGenericFunction);
 
 Begin
   If Assigned(Method) Then
-    If Method.Toxicity > BADIOptions.ModuleMetric[mmToxicity].FLimit Then
-      AddModuleMetric([Method.QualifiedName, Method.Toxicity,
-        BADIOptions.ModuleMetric[mmToxicity].FLimit], Method.Line, Method.Column, Method, mmToxicity);
+    If Method.Metric[mmToxicity] > BADIOptions.ModuleMetric[mmToxicity].FLimit Then
+      If AddMetric([Method.QualifiedName, Method.Metric[mmToxicity],
+        BADIOptions.ModuleMetric[mmToxicity].FLimit], Method.Line, Method.Column, Method,
+        mmToxicity) Then
+        Method.MetricOverrides := Method.MetricOverrides + [mmToxicity];
 End;
 
 (**
@@ -1937,10 +1945,11 @@ Procedure TPascalModule.MetricsNestedIFDepth(Const Method : TGenericFunction);
 
 Begin
   If Assigned(Method) Then
-    If Method.NestedIFDepth > BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit Then
-      AddModuleMetric([Method.QualifiedName, Method.NestedIFDepth,
-        Trunc(BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit)], Method.Line, Method.Column, Method,
-        mmNestedIFDepth);
+    If Method.Metric[mmNestedIFDepth] > BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit Then
+      If AddMetric([Method.QualifiedName, Method.Metric[mmNestedIFDepth],
+        BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit], Method.Line, Method.Column, Method,
+        mmNestedIFDepth) Then
+        Method.MetricOverrides := Method.MetricOverrides + [mmNestedIFDepth];
 End;
 
 (**
@@ -2230,7 +2239,7 @@ End;
            declaration section with in a method.
   @postcon This method returns True if this method handles a constant declaration section.
 
-  @nometric EmptyREPEAT
+  @nocheck EmptyREPEAT
 
   @param   AScope as a TScope as a constant
   @return  a Boolean
@@ -4514,7 +4523,7 @@ End;
   @precon  None.
   @postcon Attempts to parse a factor from the current token position.
 
-  @nometrics
+  @nocheck EmptyBEGINEND
 
   @param   Container as a TElementContainer as a constant
   @param   ExprType  as a TPascalExprTypes as a reference
@@ -6513,8 +6522,7 @@ End;
   @param   ParamMod as a TParamModifier as a constant
 
 **)
-Procedure TPascalModule.Parameter(Const Method : TPascalMethod;
-  Const ParamMod : TParamModifier);
+Procedure TPascalModule.Parameter(Const Method : TPascalMethod; Const ParamMod : TParamModifier);
 
 Const
   strTmpName = 'TmpName';
@@ -7279,7 +7287,7 @@ end;
   @precon  None.
   @postcon Parses the modules initialisation / finalisation section from the current token position.
 
-  @nometric EmptyBEGINEND
+  @nocheck EmptyBEGINEND
 
 **)
 Procedure TPascalModule.InitSection;

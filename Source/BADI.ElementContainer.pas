@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    17 Dec 2017
+  @Date    27 Dec 2017
 
 **)
 Unit BADI.ElementContainer;
@@ -561,8 +561,7 @@ Begin
   iIcon := ModuleMetricImage(eCheck);
   E := FindRoot;
   E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
-  E := AddCategory(E, ModuleChecks[ModuleChecks[eCheck].FParent].FCategory,
-    iiMetricCheckFolder);
+  E := AddCategory(E, strChecks, iiMetricCheckFolder);
   E := AddCategory(E, ModuleChecks[eCheck].FCategory, iiMetricCheckFolder);
   If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
     E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
@@ -604,8 +603,7 @@ Begin
   iIcon := ModuleMetricImage(eMetric);
   E := FindRoot;
   E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
-  E := AddCategory(E, ModuleMetrics[ModuleMetrics[eMetric].FParent].FCategory,
-    iiMetricCheckFolder);
+  E := AddCategory(E, strMetrics, iiMetricCheckFolder);
   E := AddCategory(E, ModuleMetrics[eMetric].FCategory, iiMetricCheckFolder);
   If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
     E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,

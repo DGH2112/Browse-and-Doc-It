@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    23 Dec 2017
+  @Date    27 Dec 2017
   @Author  David Hoyle
   @Version 1.0
 
@@ -91,16 +91,18 @@ Type
     actVariables: TAction;
     actTypes: TAction;
     edtExplorerFilter: TEdit;
-    btnChecksAndMetrics: TToolButton;
-    actChecksAndMetrics: TAction;
-    procedure actLocalUpdate(Sender: TObject);
-    procedure actLocalExecute(Sender: TObject);
-    procedure FilterChange;
-    procedure FrameEnter(Sender: TObject);
-    procedure edtExplorerFilterChange(Sender: TObject);
-    procedure edtExplorerFilterMouseActivate(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y, HitTest: Integer; var MouseActivate: TMouseActivate);
-    procedure edtExplorerFilterKeyPress(Sender: TObject; var Key: Char);
+    btnChecks: TToolButton;
+    actChecks: TAction;
+    actMetrics: TAction;
+    tbtnMetrics: TToolButton;
+    Procedure actLocalUpdate(Sender: TObject);
+    Procedure actLocalExecute(Sender: TObject);
+    Procedure FilterChange;
+    Procedure FrameEnter(Sender: TObject);
+    Procedure edtExplorerFilterChange(Sender: TObject);
+    Procedure edtExplorerFilterMouseActivate(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y, HitTest: Integer; Var MouseActivate: TMouseActivate);
+    Procedure edtExplorerFilterKeyPress(Sender: TObject; Var Key: Char);
   Strict Private
     Type
       (** This record contains information about the special tag nodes. **)
@@ -204,7 +206,7 @@ Type
       Column: TColumnIndex; TextType: TVSTTextType; Var CellText: String);
     Procedure tvExplorerGetImageIndex(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-      Var Ghosted: Boolean; Var ImageIndex: Integer);
+      Var Ghosted: Boolean; Var ImageIndex: TImageIndex);
     Procedure tvExplorerBeforeItemPaint(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
       Var CustomDraw: Boolean);
@@ -368,8 +370,10 @@ begin
     UpdateOptions(doShowCommentHints)
   Else If Sender = actConflicts Then
     UpdateOptions(doShowConflicts)
-  Else If Sender = actChecksAndMetrics Then
-    UpdateOptions(doShowChecksAndMetrics)
+  Else If Sender = actChecks Then
+    UpdateOptions(doShowChecks)
+  Else If Sender = actMetrics Then
+    UpdateOptions(doShowMetrics)
   Else If Sender = actErrors Then
     UpdateOptions(doShowErrors)
   Else If Sender = actWarnings Then
@@ -425,8 +429,10 @@ begin
     (Sender As TAction).Checked := doShowCommentHints In TBADIOptions.BADIOptions.Options
   Else If Sender = actConflicts Then
     (Sender As TAction).Checked := doShowConflicts In TBADIOptions.BADIOptions.Options
-  Else If Sender = actChecksAndMetrics Then
-    (Sender As TAction).Checked := doShowChecksAndMetrics In TBADIOptions.BADIOptions.Options
+  Else If Sender = actChecks Then
+    (Sender As TAction).Checked := doShowChecks In TBADIOptions.BADIOptions.Options
+  Else If Sender = actMetrics Then
+    (Sender As TAction).Checked := doShowMetrics In TBADIOptions.BADIOptions.Options
   Else If Sender = actErrors Then
     (Sender As TAction).Checked := doShowErrors In TBADIOptions.BADIOptions.Options
   Else If Sender = actWarnings Then
@@ -1947,27 +1953,27 @@ end;
   This is an on get image index event handler for the virtual tree view.
 
   @precon  None.
-  @postcon Sets the image index of the tree view item from the associated
-           Tree Bode Info class.
+  @postcon Sets the image index of the tree view item from the associated Tree Bode Info class.
 
   @param   Sender     as a TBaseVirtualTree
   @param   Node       as a PVirtualNode
   @param   Kind       as a TVTImageKind
   @param   Column     as a TColumnIndex
   @param   Ghosted    as a Boolean as a reference
-  @param   ImageIndex as an Integer as a reference
+  @param   ImageIndex as a TImageIndex as a reference
 
 **)
 procedure TframeModuleExplorer.tvExplorerGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-  var Ghosted: Boolean; var ImageIndex: Integer);
+  var Ghosted: Boolean; var ImageIndex: TImageIndex);
 
 Var
   NodeData : PBADITreeData;
 
 begin
   NodeData := FExplorer.GetNodeData(Node);
-  ImageIndex := NodeData.FNode.ImageIndex;
+  If Kind In [ikNormal, ikSelected] Then
+    ImageIndex := NodeData.FNode.ImageIndex;
 end;
 
 (**

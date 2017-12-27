@@ -30,10 +30,6 @@ Uses
   ActnList,
   ToolWin,
   VirtualTrees,
-  {$IFDEF DXE100}
-  //: @debug Actions,
-  //: @debug ImageList,
-  {$ENDIF}
   StdCtrls,
   RegularExpressions,
   BADI.Comment,
@@ -41,7 +37,7 @@ Uses
   BADI.ModuleExplorer.VirtualStringTree,
   BADI.ModuleExplorer.CustomHintWindow,
   BADI.Comment.Tag,
-  BADI.Types, System.Actions, System.ImageList;
+  BADI.Types;
 
 Type
   (** This is a procedure type for the positioning of the cursor in the

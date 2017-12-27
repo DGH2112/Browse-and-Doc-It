@@ -3,7 +3,7 @@
   This module provides a few Open Tools API general method that are used
   throughout this project.
 
-  @Date    12 Dec 2017
+  @Date    27 Dec 2017
   @Version 1.0
   @Author  David Hoyle
 
@@ -37,21 +37,10 @@ Type
   Procedure OutputMessage(Const strFileName, strText, strPrefix : String; Const iLine,
     iCol : Integer); Overload;
   Procedure ClearMessages(Const Msg : TClearMessages);
-  Function BufferSize(Const SourceEditor : IOTASourceEditor) : Integer;
   Function EditorAsString(Const SourceEditor : IOTASourceEditor) : String;
   Procedure OutputText(Const Writer : IOTAEditWriter; Const strText : String);
   Procedure PositionCursor(Const Container : TElementContainer; Const iIdentLine, iIdentColumn : Integer;
     Const BrowsePosition : TBrowsePosition);
-
-Const
-  (** The buffer size for the copying of text from an editor to a memory
-  stream. **)
-  iBufferSize = 4096;
-
-Var
-  (** This is a character buffer for the transfer of text from the editor
-      to the parser. **)
-  Buffer : Array[1..iBufferSize] Of AnsiChar;
 
 Implementation
 
@@ -59,39 +48,6 @@ Implementation
 Uses
   Character;
 {$ENDIF}
-
-(**
-
-  This method returns the project group in the Delphi IDE.
-
-  @precon  None.
-  @postcon Returns the current project group.
-
-  @return  an IOTAProjectGroup
-
-**)
-Function ProjectGroup: IOTAProjectGroup;
-
-Var
-  AModuleServices: IOTAModuleServices;
-  AModule: IOTAModule;
-  i: integer;
-  AProjectGroup: IOTAProjectGroup;
-
-Begin
-  Result := Nil;
-  AModuleServices := (BorlandIDEServices as IOTAModuleServices);
-  For i := 0 To AModuleServices.ModuleCount - 1 Do
-    Begin
-      AModule := AModuleServices.Modules[i];
-      If (AModule.QueryInterface(IOTAProjectGroup, AProjectGroup) = S_OK) Then
-       Break;
-    End;
-  Result := AProjectGroup;
-  AModuleServices := Nil;
-  AModule := Nil;
-  AProjectGroup := Nil;
-end;
 
 (**
 
@@ -140,29 +96,68 @@ End;
 
 (**
 
-  This method returns the source code editor for the passed module.
+  This provides a simple procedural interface to clear messages from
+  the message window. Supply a set containing the messages you want to
+  clear.
 
-  @precon  Module is the module for which a source ditor interface is required.
-  @postcon Returns the source editor interface for the given module.
+  @precon  Msg is a set of clear message enumerates to define which messages
+           from the IDE messge window are cleared.
+  @postcon The messages in the IDE message window are clear in line with
+           the passed enumerate.
 
-  @param   Module as an IOTAModule as a Constant
-  @return  an IOTASourceEditor
+  @param   Msg as a TClearMessages as a Constant
 
 **)
-Function SourceEditor(Const Module : IOTAModule) : IOTASourceEditor;
-
-Var
-  iFileCount : Integer;
-  i : Integer;
+Procedure ClearMessages(Const Msg : TClearMessages);
 
 Begin
-  Result := Nil;
-  If Module = Nil Then
-    Exit;
-  iFileCount := Module.GetModuleFileCount;
-  For i := 0 To iFileCount - 1 Do
-    If Module.GetModuleFileEditor(i).QueryInterface(IOTASourceEditor, Result) = S_OK Then
-      Break;
+  If cmCompiler In Msg Then
+    (BorlandIDEServices As IOTAMessageServices).ClearCompilerMessages;
+  If cmSearch In Msg Then
+    (BorlandIDEServices As IOTAMessageServices).ClearSearchMessages;
+  If cmTool In Msg Then
+    (BorlandIDEServices As IOTAMessageServices).ClearToolMessages;
+End;
+
+(**
+
+  This method returna memory stream of the source code editor.
+
+  @precon  SourceEditor is the editor to get the source code from.
+  @postcon Returns a memory stream of the file.
+
+  @param   SourceEditor as an IOTASourceEditor as a Constant
+  @return  a String
+
+**)
+Function EditorAsString(Const SourceEditor : IOTASourceEditor) : String;
+
+Const
+  iBufferCapacity = 8 * 8 * 8;
+  
+Var
+  Reader : IOTAEditReader;
+  iRead : Integer;
+  iPosition : Integer;
+  strBuffer : AnsiString;
+  strTmp : AnsiString;
+
+Begin
+  Result := '';
+  Reader := SourceEditor.CreateReader;
+  Try
+    iPosition := 0;
+    Repeat
+      SetLength(strBuffer, iBufferCapacity);
+      iRead := Reader.GetText(iPosition, PAnsiChar(strBuffer), iBufferCapacity);
+      SetLength(strBuffer, iRead);
+      Inc(iPosition, iRead);
+      strTmp := strTmp + strBuffer;
+    Until iRead < iBufferCapacity;
+    Result := UTF8ToUnicodeString(strTmp);
+  Finally
+    Reader := Nil;
+  End;
 End;
 
 (**
@@ -206,131 +201,6 @@ Procedure OutputMessage(Const strFileName, strText, strPrefix : String;
 Begin
   (BorlandIDEServices As IOTAMessageServices).AddToolMessage(strFileName,
     strText, strPrefix, iLine, iCol);
-End;
-
-(**
-
-  This provides a simple procedural interface to clear messages from
-  the message window. Supply a set containing the messages you want to
-  clear.
-
-  @precon  Msg is a set of clear message enumerates to define which messages
-           from the IDE messge window are cleared.
-  @postcon The messages in the IDE message window are clear in line with
-           the passed enumerate.
-
-  @param   Msg as a TClearMessages as a Constant
-
-**)
-Procedure ClearMessages(Const Msg : TClearMessages);
-
-Begin
-  If cmCompiler In Msg Then
-    (BorlandIDEServices As IOTAMessageServices).ClearCompilerMessages;
-  If cmSearch In Msg Then
-    (BorlandIDEServices As IOTAMessageServices).ClearSearchMessages;
-  If cmTool In Msg Then
-    (BorlandIDEServices As IOTAMessageServices).ClearToolMessages;
-End;
-
-(**
-
-  This function finds the open tools api module interface for the given project
-  source.
-
-  @precon  A valid open tools api project source.
-  @postcon Returns the module interface for the given project source.
-
-  @param   Project as an IOTAProject as a Constant
-  @return  an IOTAModule
-
-**)
-Function ProjectModule(Const Project : IOTAProject) : IOTAModule;
-
-Var
-  AModuleServices: IOTAModuleServices;
-  AModule: IOTAModule;
-  i: integer;
-  AProject: IOTAProject;
-
-Begin
-  Result := Nil;
-  AModuleServices := (BorlandIDEServices as IOTAModuleServices);
-  For i := 0 To AModuleServices.ModuleCount - 1 Do
-    Begin
-      AModule := AModuleServices.Modules[i];
-      If (AModule.QueryInterface(IOTAProject, AProject) = S_OK) And
-        (Project = AProject) Then
-        Break;
-    End;
-  Result := AProject;
-End;
-
-(**
-
-  This method returns the buffer size of the passed source editor.
-
-  @precon  SourceEditor is a valid sourc editor to get the buffer size of
-  @postcon Returns the size of the editors buffer.
-
-  @param   SourceEditor as an IOTASourceEditor as a Constant
-  @return  an Integer
-
-**)
-Function BufferSize(Const SourceEditor : IOTASourceEditor) : Integer;
-
-Var
-  Reader : IOTAEditReader;
-  iRead : Integer;
-
-Begin
-  Reader := SourceEditor.CreateReader;
-  Try
-    Result := 0;
-    Repeat
-      iRead := Reader.GetText(Result, @Buffer, iBufferSize);
-      Inc(Result, iRead);
-    Until iRead < iBufferSize;
-  Finally
-    Reader := Nil;
-  End;
-End;
-
-(**
-
-  This method returna memory stream of the source code editor.
-
-  @precon  SourceEditor is the editor to get the source code from.
-  @postcon Returns a memory stream of the file.
-
-  @param   SourceEditor as an IOTASourceEditor as a Constant
-  @return  a String
-
-**)
-Function EditorAsString(Const SourceEditor : IOTASourceEditor) : String;
-
-Var
-  Reader : IOTAEditReader;
-  iRead : Integer;
-  iPosition : Integer;
-  strBuffer : AnsiString;
-
-Begin
-  Result := '';
-  Reader := SourceEditor.CreateReader;
-  Try
-    iPosition := 0;
-    Repeat
-      SetLength(strBuffer, iBufferSize);
-      iRead := Reader.GetText(iPosition, PAnsiChar(strBuffer), iBufferSize);
-      SetLength(strBuffer, iRead);
-      //Result := Result + String(strBuffer);
-      Result := Result + UTF8ToUnicodeString(strBuffer);
-      Inc(iPosition, iRead);
-    Until iRead < iBufferSize;
-  Finally
-    Reader := Nil;
-  End;
 End;
 
 (**
@@ -461,4 +331,98 @@ Begin
     End;
 End;
 
+(**
+
+  This method returns the project group in the Delphi IDE.
+
+  @precon  None.
+  @postcon Returns the current project group.
+
+  @return  an IOTAProjectGroup
+
+**)
+Function ProjectGroup: IOTAProjectGroup;
+
+Var
+  AModuleServices: IOTAModuleServices;
+  AModule: IOTAModule;
+  i: integer;
+  AProjectGroup: IOTAProjectGroup;
+
+Begin
+  Result := Nil;
+  AModuleServices := (BorlandIDEServices as IOTAModuleServices);
+  For i := 0 To AModuleServices.ModuleCount - 1 Do
+    Begin
+      AModule := AModuleServices.Modules[i];
+      If (AModule.QueryInterface(IOTAProjectGroup, AProjectGroup) = S_OK) Then
+       Break;
+    End;
+  Result := AProjectGroup;
+  AModuleServices := Nil;
+  AModule := Nil;
+  AProjectGroup := Nil;
+end;
+
+(**
+
+  This function finds the open tools api module interface for the given project
+  source.
+
+  @precon  A valid open tools api project source.
+  @postcon Returns the module interface for the given project source.
+
+  @param   Project as an IOTAProject as a Constant
+  @return  an IOTAModule
+
+**)
+Function ProjectModule(Const Project : IOTAProject) : IOTAModule;
+
+Var
+  AModuleServices: IOTAModuleServices;
+  AModule: IOTAModule;
+  i: integer;
+  AProject: IOTAProject;
+
+Begin
+  Result := Nil;
+  AModuleServices := (BorlandIDEServices as IOTAModuleServices);
+  For i := 0 To AModuleServices.ModuleCount - 1 Do
+    Begin
+      AModule := AModuleServices.Modules[i];
+      If (AModule.QueryInterface(IOTAProject, AProject) = S_OK) And
+        (Project = AProject) Then
+        Break;
+    End;
+  Result := AProject;
+End;
+
+(**
+
+  This method returns the source code editor for the passed module.
+
+  @precon  Module is the module for which a source ditor interface is required.
+  @postcon Returns the source editor interface for the given module.
+
+  @param   Module as an IOTAModule as a Constant
+  @return  an IOTASourceEditor
+
+**)
+Function SourceEditor(Const Module : IOTAModule) : IOTASourceEditor;
+
+Var
+  iFileCount : Integer;
+  i : Integer;
+
+Begin
+  Result := Nil;
+  If Module = Nil Then
+    Exit;
+  iFileCount := Module.GetModuleFileCount;
+  For i := 0 To iFileCount - 1 Do
+    If Module.GetModuleFileEditor(i).QueryInterface(IOTASourceEditor, Result) = S_OK Then
+      Break;
+End;
+
+//------------------------------------------------------------------------------------------------------
 End.

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    24 Feb 2017
+  @Date    27 Dec 2017
 
 **)
 Unit BADI.Pascal.Constants;
@@ -49,8 +49,8 @@ Const
     'var', 'while', 'with', 'xor'
   );
   (** A list of reserved words which are allows to be used as identifiers. **)
-  strIdentifierReservedWords : Array[0..4] Of String = (
-    'on', 'out', { 'private', 'protected', 'public', 'published', } 'reference', 'sealed',
+  strIdentifierReservedWords : Array[0..5] Of String = (
+    'for', 'on', 'out', { 'private', 'protected', 'public', 'published', } 'reference', 'sealed',
     { 'strict', } 'unsafe'
   );
   (** A sorted list of directives. Used for identifying tokens as

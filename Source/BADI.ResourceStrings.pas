@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    30 Apr 2017
+  @Date    27 Dec 2017
 
 **)
 Unit BADI.ResourceStrings;
@@ -12,18 +12,59 @@ Unit BADI.ResourceStrings;
 Interface
 
 ResourceString
+  //
+  // Options group descriptions
+  //
+
+  (** An option group description for general options. **)
+  strOptionGroupGeneral = 'General';
+  (** An option group description for Error, Warnings, Hint and Conflict options. **)
+  strOptionGroupErrorsWarningsHintsandConflicts = 'Errors, Warnings, Hints and Conflicts';
+  (** An option group description for Type options. **)
+  strOptionGroupTypes = 'Types';
+  (** An option group description for Module options. **)
+  strOptionGroupModule = 'Module';
+  (** An option group description for Method options. **)
+  strOptionGroupMethods = 'Methods';
+  (** An option group description for Property options. **)
+  strOptionGroupProperties = 'Properties';
+  (** An option group description for Inital/Finalization options. **)
+  strOptionGroupInitializationFinalization = 'Initialization / Finalization';
+  (** An option group description for miscellaneous options. **)
+  strOptionGroupMiscellaneous = 'Miscellaneous';
+
+  //
+  // Documentation Option descriptions
+  //
+  
   (** Options text for Draw Syntax Highlighted Module Explorer **)
   strDrawSynHighModuleExplorer = 'Draw Syntax Highlighted Module Explorer';
   (** Options text for Show comments in the hints **)
   strShowCommentsInTheHints = 'Show comments in the hints';
-  (** Options text for Show Errors **)
+  (** Options text for Showing Errors **)
   strShowErrors = 'Show Module Errors';
-  (** Options text for Show Warnings **)
+  (** Options text for Showing Warnings **)
   strShowWarnings = 'Show Module Warnings';
-  (** Options text for Show Hints **)
+  (** Options text for Showing Hints **)
   strShowHints = 'Show Module Hints';
-  (** Options text for Show Documentation Conflicts **)
+  (** Options text for Showing Documentation Conflicts **)
   strShowDocumentationConflicts = 'Show Documentation Conflicts';
+  (** Options text for Showing Module Metrics. **)
+  strShowModuleMetrics = 'Show Module Metrics';
+  (** Options text for Showing Module Checks. **)
+  strShowModuleChecks = 'Show Module Checks';
+  (** Options text for showing child counts. **)
+  strShowChildCountInTitles = 'Show Child Count in Titles';
+  (** Options text for automatically expanding errors. **)
+  strExpandErrors = 'Automatically Expand Errors';
+  (** Options text for automatically expanding warnings. **)
+  strExpandWarnings = 'Automatically Expand Warnings';
+  (** Options text for automatically expanding hints. **)
+  strExpandHints = 'Automatically Expand Hints';
+  (** Options text for automatically expanding documentation conflicts. **)
+  strExpandDocConflicts = 'Automatically Expand Documentation Conflicts';
+  (** Options text for automatically expanding modules metrics and checks. **)
+  strExpandChecksAndMetrics = 'Automatically Expand Checks and Metrics';
   (** Options text for Syntax Highlight Errors **)
   strSyntaxHighlightErrors = 'Syntax Highlight Module Errors';
   (** Options text for Syntax Highlight Warnings **)
@@ -32,6 +73,8 @@ ResourceString
   strSyntaxHighlightHints = 'Syntax Highlight Module Hints';
   (** Options text for Syntax Highlight Documentation Conflicts **)
   strSyntaxHighlightDocumentationConflicts = 'Syntax Highlight Documentation Conflicts';
+  (** Options text for Syntax Highlight Checks and Metrics **)
+  strSyntaxHighlightChecksAndMetrics = 'Syntax Highlight Checks and Metrics';
   (** Options text for Show Missing Method Documentation **)
   strShowMissingMethodDocumentation = 'Show Missing Method Documentation';
   (** Options text for Show Missing Method Documentation Description **)
@@ -117,14 +160,20 @@ ResourceString
   (** Options text for adding pre and post conditions to  comments. **)
   strAddpreAndPostToComments = 'Add Pre and Post Conditions to Comments.';
 
-  (** Label for Documentation Conflicts **)
-  strDocumentationConflicts = 'Documentation Conflicts';
+  //
+  // Labels for the various objects in the module explorer
+  //
+  
   (** Errors label **)
   strErrors = 'Errors';
   (** Warnings label **)
   strWarnings = 'Warnings';
   (** Hints label **)
   strHints = 'Hints';
+  (** Label for Documentation Conflicts **)
+  strDocumentationConflicts = 'Documentation Conflicts';
+  (** Label for Metrics and Checks **)
+  strMetricsAndChecks = 'Metrics and Checks';
   (** Label for Uses Clause **)
   strUses = 'Uses';
   (** Label for Types Clause **)
@@ -162,6 +211,12 @@ ResourceString
   (** Label for Methods. **)
   strMethodsLabel = 'Methods';
 
+  //
+  // Parser error messages.
+  //
+
+  (** An Exception message for a parsing being aborted. **)
+  strParsingAborted = 'Parsing Aborted!';
   (** Exception message an unexpected start of file. **)
   strUnExpectedStartOfFile = 'Unexpected start-of-file.';
   (** Exception message for an unexpected end of file. **)
@@ -232,7 +287,9 @@ ResourceString
   (** This is an error message for not enough tokens. **)
   strNotEnoughStrings = 'Not enough strings passed to ErrorAndSeekToken().';
 
-  {----------------------- Documentation Conflict Messages --------------------}
+  //
+  // Documentation Conflict Messages
+  //
 
   (** This is the tree branch under which module documentation error appear **)
   strModuleDocumentation = 'Module Documentation';
@@ -520,6 +577,329 @@ ResourceString
   (** An error message for trying to peek a compiler condition where there isnt one. **)
   strCannotPeekTheCompilerCondition = 'Cannot peek the compiler condition stack.';
 
+  (** An error message for a method with a missing parameter. **)
+  strTheMethodImplementMissingParam = 'The method implementation on line %d at column %d is missing ' +
+    'a parameter!';
+  (** An error message for an assignment without a right parameter. **)
+  strAssignmentMissing = 'Assignment missing at line %d column %d!';
+
+  //
+  // Token names
+  //
+  
+  (** A text string to represents an Unknown token. **)
+  strTokenUnknown = 'Unknown';
+  (** A text string to represents a Whitespace token. **)
+  strTokenWhiteSpace = 'White Space';
+  (** A text string to represents a Reserved Word token. **)
+  strTokenReservedWord = 'Reserved Word';
+  (** A text string to represents an Identifer token. **)
+  strTokenIdentifier = 'Identifier';
+  (** A text string to represents a Number token. **)
+  strTokenNumber = 'Number';
+  (** A text string to represents a Symbol token. **)
+  strTokenSymbol = 'Symbol';
+  (** A text string to represents a Line End token. **)
+  strTokenLineEnd = 'Line End';
+  (** A text string to represents a Single Literal token. **)
+  strTokenSingleLiteral = 'Single Literal';
+  (** A text string to represents a Double Literal token. **)
+  strTokenDoubleLiteral = 'Double Literal';
+  (** A text string to represents a Line Comment token. **)
+  strTokenLineComment = 'Line Comment';
+  (** A text string to represents a Block Comment token. **)
+  strTokenBlockComment = 'Block Comment';
+  (** A text string to represents a HTML Start Tag token. **)
+  strTokenHTMLStartTag = 'HTML Start Tag';
+  (** A text string to represents a HTML End Tag token. **)
+  strTokenHTMLEndTag = 'HTML End Tag';
+  (** A text string to represents a Directive token. **)
+  strTokenDirective = 'Directive';
+  (** A text string to represents a Compiler Directive token. **)
+  strTokenCompilerDirective = 'Compiler Directive';
+  (** A text string to represents a Link Tag token. **)
+  strTokenLinkTag = 'Link Tag';
+  (** A text string to represents a Tree Header token. **)
+  strTokenTreeHeader = 'Tree Header';
+  (** A text string to represents a File End token. **)
+  strTokenFileEnd = 'File End';
+  (** A text string to represents a Line Continuation token. **)
+  strTokenLineContinuation = 'Line Continuation';
+  (** A text string to represents a Custom User Token token. **)
+  strTokenCustomUserToken = 'Custom User Token';
+  (** A text string to represents a Explorer Highlight token. **)
+  strTokenExplorerHighlight = 'Explorer Highlight';
+  (** A text string to represents a Plain Text token. **)
+  strTokenPlainText = 'Plain Text';
+  (** A text string to represents a Comment Text token. **)
+  strTokenCommentText = 'Comment Text';
+  (** A text string to represents a Tag Header Text token. **)
+  strTokenTagHeaderText = 'Tag Header Text';
+  (** A text string to represents a Tag Text token. **)
+  strTokenTagText = 'Tag Text';
+
+  //
+  // Menu captions
+  //
+
+  (** A label for the Module Explorer Menu. **)
+  strMenuModuleExplorer = 'Module &Explorer';
+  (** A label for the Documentation Menu. **)
+  strMenuDocumentation = '&Documentation...';
+  (** A label for the DUnit Menu. **)
+  strMenuDUnit = 'D&Unit...';
+  (** A label for the Profiling Menu. **)
+  strMenuProfiling = 'Pro&filing...';
+  (** A label for the Separator Menu. **)
+  strMenuSep = '';
+  (** A label for the Focus Editor Menu. **)
+  strMenuFocusEditor = 'Focus Edi&tor';
+  (** A label for the Method Comment Menu. **)
+  strMenuMethodComment = '&Method Comment';
+  (** A label for the Property Comment Menu. **)
+  strMenuPropertyComment = '&Property Comment';
+  (** A label for the Block Comment Menu. **)
+  strMenuBlockComment = 'Block &Comment';
+  (** A label for the Line COmment Menu. **)
+  strMenuLineComment = '&Line Comment';
+  (** A label for the InSitu Comment Menu. **)
+  strMenuInSituComment = '&In-Situ Comment';
+  (** A label for the ToDoComment Menu. **)
+  strMenuToDoComment = '&ToDo Comment';
+  (** A label for the Refactor Constant Menu. **)
+  strMenuRefactorConstant = '&Refactor Constant...';
+  (** A label for the module metrics. **)
+  strMenuMetrics = 'Module &Metrics...';
+  (** A label for the module checks. **)
+  strMenuChecks = 'Module &Checks...';
+  (** A label for the Options Menu. **)
+  strMenuOptions = '&Options...';
+
+  //
+  // Special Tag Properties
+  //
+
+  (** A description for a tag to be shown in the module explorer. **)
+  strTagPropShowInExpl = 'Show the Tag in the Module Explorer';
+  (** A description for a tag to be expanded in the module explorer. **)
+  strTagPropExpand = 'Auto Expand the Tag in Module Explorer';
+  (** A description for a tag to be shown in the documentation. **)
+  strTagPropShowInDocs = 'Show the Tag in Documentation';
+  (** A description for a tag to use a fixed font. **)
+  strTagPropFixedFont = 'Fixed Font Tag (preserves LF/CR and Indents)';
+  (** A description for a tag to use syntax highlighting. **)
+  strTagPropSyntax = 'Syntax Highlight the Tag';
+
+  (** A description for metrics. **)
+  strMetrics = 'Metrics';
+
+  //
+  // Metrics
+  //
+  
+  (** A resource string for the Long Method Category. **)
+  strLongMethodImplementationsCat = 'Long Method Implementations';
+  (** A resource string for the Long Parameter list Category. **)
+  strLongMethodParameterListsCat = 'Long Method Parameter Lists';
+  (** A resource string for the Long Variable Category. **)
+  strLongMethodVariableListsCat = 'Long Method Variable Lists';
+  (** A resource string for the Nested IF Depth Category. **)
+  strNestedIFDepthCat = 'Nested IF Depths';
+  (** A resource string for the Method Cyclometric Complexity Category. **)
+  strMethodCyclometricComplexityCat = 'Method Cylometric Complexity';
+  (** A resource string for the Method Toxicity Category. **)
+  strMethodToxicityCat = 'Method Toxicity';
+
+  (** A message for a method with a long implementation. **)
+  strMethodTooLongMsg = 'The method "%s" is too long (%1.0f/%1.0f)!';
+  (** A description for a method with a long implementation. **)
+  strMethodTooLongDesc = 'The implementation of the method is too long. This can make the code more ' +
+    'difficult to maintain. Consider refactoring the code into smaller elements.';
+  (** A message for a method with too many parameters. **)
+  strMethodHasTooManyParamsMsg = 'The method "%s" has too many parameters (%1.0f/%1.0f)!';
+  (** A description for a method with too many parameters. **)
+  strMethodHasTooManyParamsDesc = 'The method has too many parameters and this can slow down the speed of the call to this method due to the size of the stack frame that is required. Consider refactoring the code to reduce the number of parameters pass.';
+  (** A message for a method with too many variables. **)
+  strMethodHasLongVarListMsg = 'The method "%s" has a long variable list (%1.0f/%1.0f)!';
+  (** A description for a method with too many variables. **)
+  strMethodHasLongVarListDesc = 'The method has too many variables and this can slow down the speed of the call to this method due to the size of the stack frame that is required. Consider refactoring the code to reduce the number of parameters pass.';
+  (** A message for a method with a high IF Depth. **)
+  strMethodHasHighIFDepthMsg = 'The method "%s" has a high IF depth (%1.0f/%1.0f).';
+  (** A description for a method with a high IF Depth. **)
+  strMethodHasHighIFDepthDesc = 'A high depth of IF statements in a method can make the method hard ' +
+    'to maintain. Consider refactoring the code into smaller parts.';
+  (** A message for a method with a high cyclometric complexity. **)
+  strMethodHasHighCyclometricComplexityMsg = 'The method "%s" has a high cyclometric complexity ' +
+    '(%1.0f/%1.0f).';
+  (** A descrpition for a method with a high cyclometric complexity. **)
+  strMethodHasHighCyclometricComplexityDesc = 'The cyclometric complexity of a method is a measure of ' +
+    'its number of branch points and therefore the number of unit test that could be neede to test ' +
+    'the code. If this value is too high it might make your ability to test your code more difficult.';
+  (** A message for a method with a high toxicity. **)
+  strMethodHasHighToxocityValueMsg = 'The method "%s" has a high toxocity value (%1.3f/%1.3f).';
+  (** A description with a high toxicity. **)
+  strMethodHasHighToxocityValueDesc = 'The toxicity of a method is a measure of the overall ' +
+    'combination of metrics and is an indication of whether the method should be refactored into ' +
+    'smaller parts.';
+
+  //
+  // Checks
+  //
+  
+  (** A description for checks. **)
+  strChecks = 'Checks';
+  
+  (** A resource string for the Hard Coded Integers Category. **)
+  strHardCodedIntegersCat = 'Hard Coded Integers';
+  (** A resource string for the Hard Coded Zeros Category. **)
+  strIgnoreHardCodedIntegerZerosCat = 'Ignore Hard Coded 0s';
+  (** A resource string for the Hard Coded 1s Category. **)
+  strIgnoreHardCodedIntegerOnesCat = 'Ignore Hard Coded 1s';
+  (** A resource string for the Hard Code Numbers Category. **)
+  strHardCodedNumbersCat = 'Hard Coded Numbers';
+  (** A resource string for the Hard Coded 0.0s Category. **)
+  strIgnoreHardCodedNumberZerosCat = 'Ignore Hard Coded 0.0s';
+  (** A resource string for the Hard Coded Strings Category. **)
+  strHardCodedStringsCat = 'Hard Coded Strings';
+  (** A resource string for the Hard Coded Empty Strings Category. **)
+  strIgnoreHardCodedEmptyStringsCat = 'Ignore Hard Coded Empty Strings';
+  (** A resource string for the Hard Coded Single Char Strings Category. **)
+  strIgnoreHardCodedSingleCharStrCat = 'Ignore Hard Coded Single Character Strings';
+  (** A resource string for the Unsorted Method Category. **)
+  strUnsortedMethodsCat = 'Unsorted Methods';
+  (** A resource string for the With Statement Category. **)
+  strUseOfWITHStmtCat = 'Use of WITH statements';
+  (** A resource string for the GOT Statements Category. **)
+  strUseOfGOTOStmtCat = 'Use of GOTO statements';
+  (** A resource string for the Igmore Boolean Expressions Category. **)
+  strIncludeBoolSubExprCat = 'Include Boolean Sub-Expressions';
+  (** A resource string for the Empty EXCEPT Blocks Category. **)
+  strEmptyExceptBlocksCat = 'Empty EXCEPT Blocks';
+  (** A resource string for the Empty Finally BLocks Category. **)
+  strEmptyFinallyBlocksCat = 'Empty FINALLY Blocks';
+  (** A resource string for the Exception Eating Category. **)
+  strExceptionEatingCat = 'Exception Eating';
+  (** A resource string for the Empty THEN Blocks Category. **)
+  strEmptyThenBlocksCat = 'Empty THEN Blocks';
+  (** A resource string for the Empty ELSE Blocks Category. **)
+  strEmptyElseBlocksCat = 'Empty ELSE Blocks';
+  (** A resource string for the Empty Case Blocks Category. **)
+  strEmptyCaseBlocksCat = 'Empty CASE Blocks';
+  (** A resource string for the Empty For BLocks Category. **)
+  strEmptyForBlocksCat = 'Empty FOR Blocks';
+  (** A resource string for the Empty While BLocks Category. **)
+  strEmptyWhileBlocksCat = 'Empty WHILE Blocks';
+  (** A resource string for the Empty Repat BLocks Category. **)
+  strEmptyRepeatBlocksCat = 'Empty REPEAT Blocks';
+  (** A resource string for the Empty BEGIN END Blocks Category. **)
+  strEmptyBeginEndBlocksCat = 'Empty BEGIN END Blocks';
+  (** A resource string for the Empty Initialization BLocks Category. **)
+  strEmptyInitializationBlockCat = 'Empty Initialization';
+  (** A resource string for the Empty Finalization BLocks Category. **)
+  strEmptyFinalizationBlockCat = 'Empty FInalization';
+  (** A resource string for the Empty Methods Category. **)
+  strEmptyMethodsCat = 'Empty Methods';
+  (** A resource string for the Missing CONST in Parameters Category. **)
+  strMissingCONSTInParametersCat = 'Missing CONST in Method Parameters';
+  (** A resource string for the Ignore Event Handler Category. **)
+  strMissingCONSTInParamIgnoreEventHandlersCat = 'Ignore Event Handlers';
+
+  (** A message for the use of a hard coded integer in an implementation. **)
+  strIntegerUsedInMsg = 'The integer %s is used in the %s "%s"!';
+  (** A description for the use of a hard coded integer in an implementation. **)
+  strIntegerUsedInDesc = 'Integers embedded in code can make maintaining code hard if the string should be used somewhere else. Consider creating a constant.';
+  (** A message for the use of a hard coded number in an implementation. **)
+  strNumberUsedInMsg = 'The number %s is used in the %s "%s"!';
+  (** A description for the use of a hard coded number in an implementation. **)
+  strNumberUsedInDesc = 'Numbers embedded in code can make maintaining code hard if the string should be used somewhere else. Consider creating a constant.';
+  (** A message for the use of a hard coded string in an implementation. **)
+  strStringLiteralUsedInMsg = 'The string literal %s is used in the %s "%s"!';
+  (** A description for the use of a hard coded string in an implementation. **)
+  strStringLiteralUsedInDesc = 'String literal embedded in code can make maintaining code hard if the string should be used somewhere else. Consider creating a constant or resource string.';
+  (** A message for the use of an unsorted method implementation. **)
+  strMethodNotSortedMsg = 'The method "%s" is not in the correct sort position in the source code!';
+  (** A description for the use of an unsorted method implementation. **)
+  strMethodNotSortedDesc = 'Sorting method in the source code can help navigation when looking through the code.';
+  (** A message for the use of a WITH statement in an implementation. **)
+  strWITHUsedInMethodMsg = 'The "WITH" is used in the method "%s"!';
+  (** A description for the use of a WITH statement in an implementation. **)
+  strWITHUsedInMethodDesc = 'WITH statements can lead to scope clashes. Consider refactoring the code to remove their use.';
+  (** A message for the use of a GOTO statement in an implementation. **)
+  strGOTOUsedInMethodMsg = 'The "GOTO" is used in the method "%s"!';
+  (** A description for the use of a GOTO statement in an implementation. **)
+  strGOTOUsedInMethodDesc = 'GOTO statments are considered bad programming practice especially with structured programming. Consider refactoring your code to replace their use with BREAK and CONTINUE.';
+  (** A message for an empty EXCEPT block in an implementation. **)
+  strEXCEPTClauseMethodEmptyMsg = 'The EXCEPT clause of the method "%s" is empty!';
+  (** A description for an empty EXCEPT block in an implementation. **)
+  strEXCEPTClauseMethodEmptyDesc = 'An empty EXCEPT clause will hide exception that are raised in ' + 
+    'the preceeding code. Add code to handle the exception or remove the TRY EXCEPT END block.';
+  (** A message for an empty FINALLY block in an implementation. **)
+  strFINALLYClauseMethodEmptyMsg = 'The FINALLY clause of the method "%s" is empty!';
+  (** A description for an empty FINALLY block in an implementation. **)
+  strFINALLYClauseMethodEmptyDesc = 'An empty FINALLY clause provide no benefit or you have ' + 
+    'forgotted to free a resource. Add code to handle the resource or remove the TRY FINALLY END ' + 
+    'block.';
+  (** A message for an exception eating implementation. **)
+  strONStmtCaptureAllExcepsMsg = 'The ON statement in %s "%s" will capture all exceptions.';
+  (** A description for an exception eating implementation. **)
+  strONStmtCaptureAllExcepsDesc = 'Handling all exceptions raised by a block of code could mask an ' + 
+    'underlying error should you not re-raise any errors you do not handle.';
+  (** A message for an empty THEN block in an implementation. **)
+  strTHENClauseInEmptyMsg = 'The THEN clause in %s "%s" is empty!';
+  (** A description for an empty THEN block in an implementation. **)
+  strTHENClauseInEmptyDesc = 'The conditional block does not execute any code. Check for coding ' + 
+    'errors!';
+  (** A message for an empty ELSE block in an implementation. **)
+  strELSEClauseInEmptyMsg = 'The ELSE clause in %s "%s" is empty!';
+  (** A description for an empty ELSE block in an implementation. **)
+  strELSEClauseInEmptyDesc = 'The conditional block does not execute any code. Check for coding ' + 
+    'errors!';
+  (** A message for an empty CASE block in an implementation. **)
+  strCASEClauseInEmptyMsg = 'The CASE clause in %s "%s" is empty!';
+  (** A description for an empty CASE block in an implementation. **)
+  strCASEClauseInEmptyDesc = 'The conditional block does not execute any code. Check for coding ' + 
+    'errors!';
+  (** A message for an empty FOR block in an implementation. **)
+  strFORBlockInEmptyMsg = 'The FOR block in %s "%s" is empty!';
+  (** A description for an empty FOR block in an implementation. **)
+  strFORBlockInEmptyDesc = 'The conditional block does not execute any code. Check for coding errors!';
+  (** A message for an empty WHILE block in an implementation. **)
+  strWHILEBlockInEmptyMsg = 'The WHILE block in %s "%s" is empty!';
+  (** A description for an empty WHILE block in an implementation. **)
+  strWHILEBlockInEmptyDesc = 'The conditional block does not execute any code. Check for coding ' + 
+    'errors!';
+  (** A message for an empty REPEAT block in an implementation. **)
+  strREPEATBlockInEmptyMsg = 'The REPEAT block in %s "%s" is empty!';
+  (** A description for an empty REPEAT block in an implementation. **)
+  strREPEATBlockInEmptyDesc = 'The conditional block does not execute any code. Check for coding ' + 
+    'errors!';
+  (** A message for an empty BEGIN END block in an implementation. **)
+  strBEGINENDBlockInEmptyMsg = 'The BEGIN END block in %s "%s" is empty!';
+  (** A description for an empty BEGIN END block in an implementation. **)
+  strBEGINENDBlockInEmptyDesc = 'The conditional block does not execute any code. Check for coding ' + 
+    'errors!';
+  (** A message for an empty INITIALIZATION block in an implementation. **)
+  strINITIALIZATIONClauseInModuleEmptyMsg = 'The INITIALIZATION clause in the module is empty!';
+  (** A description for an empty INITIALIZATION block in an implementation. **)
+  strINITIALIZATIONClauseInModuleEmptyDesc = 'If the initializatino cause is empty either you do not ' + 
+    'need it or perhaps you have forgotten to implement some initalisation code.';
+  (** A message for an empty FINALIZATION block in an implementation. **)
+  strFINALIZATIONClauseInModuleEmptyMsg = 'The FINALIZATION clause in the module is empty!';
+  (** A description for an empty FINALIZATION block in an implementation. **)
+  strFINALIZATIONClauseInModuleEmptyDesc = 'If the finalizatino cause is empty either you do not ' + 
+    'need it or perhaps you have forgotten to implement some finalisation code.';
+  (** A message for a  method with an empty implementation. **)
+  strMethodDoesNotHaveImplementationMsg = 'The method "%s" does not have an implementation!';
+  (** A description for a  method with an empty implementation. **)
+  strMethodDoesNotHaveImplementationDesc = 'The method does not have an implementation. You may not ' + 
+    'need the method and therefore it could be removed.';
+  (** A message for a  method with an parameters whic are not VAR or CONST. **)
+  strParameterInMethodMissingCONSTMsg = 'The parameter "%s" in method "%s" is missing CONST!';
+  (** A description for a  method with an parameters whic are not VAR or CONST. **)
+  strParameterInMethodMissingCONSTDesc = 'The use of CONST parameters is preferred to prevent ' + 
+    'parameters from being modified. it also allow the compiler to optimism the passed data.';
+
+  
 Implementation
 
 End.

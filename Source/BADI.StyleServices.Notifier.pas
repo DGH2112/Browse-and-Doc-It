@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    23 Dec 2017
+  @Date    27 Dec 2017
   
 **)
 Unit BADI.StyleServices.Notifier;
@@ -17,8 +17,8 @@ Uses
 
 {$INCLUDE CompilerDefinitions.inc}
 
+{$IFDEF DXE102}
 Type
-  {$IFDEF DXE102}
   (** This is a call back procedure (parameterless) to force theme updates in the treeview. **)
   TUpdateProc = Procedure Of Object;
 
@@ -38,7 +38,7 @@ Type
   Public
     Constructor Create(Const UpdateProc : TUpdateProc);
   End;
-  {$ENDIF}
+{$ENDIF}
 
 Implementation
 

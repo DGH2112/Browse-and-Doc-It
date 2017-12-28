@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Dec 2017
+  @Date    28 Dec 2017
 
 **)
 Unit BADI.Generic.FunctionDecl;
@@ -38,8 +38,10 @@ Type
     FIndent                : Integer;
     FIsDeclarationOnly     : Boolean;
     FIFStackDepth          : Integer;
-    FMetrics               : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] OF Double;
+    FMetrics               : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of Double;
+    FChecks                : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of Double;
     FMetricOverrides       : TBADIModuleMetrics;
+    FCheckOverrides        : TBADIModuleChecks;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function  GetQualifiedName: String; Virtual; Abstract;
     Function  GetParameterCount: Integer;
@@ -50,6 +52,7 @@ Type
     Function  VariableCount : Double; Virtual;
     Function  GetMetric(Const eMetric : TBADIModuleMetric) : Double;
     Procedure SetMetric(Const eMetric : TBADIModuleMetric; Const dblValue : Double);
+    Function  GetCheck(Const eCheck : TBADIModuleCheck) : Double;
   Public
     Constructor Create(Const strName: String; Const AScope: TScope; Const iLine, iColumn: Integer;
       Const AImageIndex: TBADIImageIndex; Const AComment: TComment); Override;
@@ -60,6 +63,7 @@ Type
     Procedure IncIFDepth;
     Procedure DecIFDepth;
     Procedure IncCyclometricComplexity;
+    Procedure IncrementCheck(Const eCheck : TBADIModuleCheck; Const boolOverridden : Boolean);
     (**
       This property returns the number of parameter in the parameter collection.
       @precon  None.
@@ -152,6 +156,21 @@ Type
       @return  a TBADIModuleMetrics
     **)
     Property MetricOverrides : TBADIModuleMetrics Read FMetricOverrides Write FMetricOverrides;
+    (**
+      This property gets the check associated with the method.
+      @precon  None.
+      @postcon Gets the check associated with the method.
+      @param   eCheck as a TBADIModuleCheck as a constant
+      @return  a Double
+    **)
+    Property Check[Const eCheck : TBADIModuleCheck] : Double Read GetCheck;
+    (**
+      This property determines which checks are overridden with nocheck or nochecks.
+      @precon  None.
+      @postcon Determines which metrics are overridden with nometric or nometrics.
+      @return  a TBADIModuleChecks
+    **)
+    Property CheckOverrides : TBADIModuleChecks Read FCheckOverrides;
   End;
 
   (** A type to define sub classes of TGenericFunction **)
@@ -333,6 +352,32 @@ End;
 
 (**
 
+  This is a getter method for the Check property.
+
+  @precon  None.
+  @postcon Returns the given check value.
+
+  @param   eCheck as a TBADIModuleCheck as a constant
+  @return  a Double
+
+**)
+Function TGenericFunction.GetCheck(Const eCheck: TBADIModuleCheck): Double;
+
+ResourceString
+  strMsg = 'You cannot increment the check "%s"!';
+  
+Begin
+  Case eCheck Of
+    mcHardCodedIntegers, mcHardCodedNumbers, mcHardCodedStrings,
+      mcUnsortedMethod..mcMissingCONSTInParemterList:
+        Result := FChecks[eCheck];
+  Else
+    Raise Exception.CreateFmt(strMsg, [ModuleChecks[eCheck].FName]);
+  End;
+End;
+
+(**
+
   This is a getter method for the Metric property.
 
   @precon  None.
@@ -422,6 +467,34 @@ End;
 
 (**
 
+  This method increments the given check and optionally marks it as overridden.
+
+  @precon  None.
+  @postcon The check is incremented if valid else an exception is raised.
+
+  @param   eCheck         as a TBADIModuleCheck as a constant
+  @param   boolOverridden as a Boolean as a constant
+
+**)
+Procedure TGenericFunction.IncrementCheck(Const eCheck: TBADIModuleCheck; Const boolOverridden: Boolean);
+
+ResourceString
+  strMsg = 'You cannot increment the check "%s"!';
+  
+Begin
+  Case eCheck Of
+    mcHardCodedIntegers, mcHardCodedNumbers, mcHardCodedStrings,
+      mcUnsortedMethod..mcMissingCONSTInParemterList:
+        FChecks[eCheck] := FChecks[eCheck] + dblUnity;
+  Else
+    Raise Exception.CreateFmt(strMsg, [ModuleChecks[eCheck].FName]);
+  End;
+  If boolOverridden Then
+    Include(FCheckOverrides, eCheck);
+End;
+
+(**
+
   This method checks to see of the given token matches any parameter and if so marks the parameter as
   referenced.
 
@@ -499,5 +572,5 @@ Begin
   If Assigned(V) Then
     Result := V.ElementCount;
 End;
-  
+
 End.

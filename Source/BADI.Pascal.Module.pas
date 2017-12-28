@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       27 Dec 2017
+  @Date       28 Dec 2017
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -1671,6 +1671,7 @@ Const
 Var
   P : TGenericParameter;
   iParam: Integer;
+  boolOverride: Boolean;
 
 Begin
   If Assigned(Method) And (Method.ParameterCount > 0) Then
@@ -1681,9 +1682,12 @@ Begin
           Exit;
       For iParam := 0 To Method.ParameterCount - 1 Do
         If Method.Parameters[iParam].ParamModifier = pamNone Then
-          AddModuleCheck([Method.Parameters[iParam].Identifier,
-            Method.QualifiedName], Method.Parameters[iParam].Line, Method.Parameters[iParam].Column,
-            Method, mcMissingCONSTInParemterList);
+          Begin
+            boolOverride := AddCheck([Method.Parameters[iParam].Identifier,
+              Method.QualifiedName], Method.Parameters[iParam].Line, Method.Parameters[iParam].Column,
+              Method, mcMissingCONSTInParemterList);
+            Method.IncrementCheck(mcMissingCONSTInParemterList, boolOverride);
+          End;
     End;
 End;
 
@@ -1725,13 +1729,17 @@ Procedure TPascalModule.MetricsEmptyBlockAtToken(Const eCheck : TBADIModuleCheck
 
 ResourceString
   strMethod = 'method';
+var
+  boolOverride: Boolean;
 
 Begin
   If Assigned(CurrentMethod) Then
-    AddModuleCheck([strMethod, CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
-      eCheck)
-  Else
-    AddModuleCheck([strModuleTypes[ModuleType], ModuleName], Token.Line, Token.Column, Self, eCheck)
+    Begin
+      boolOverride := AddCheck([strMethod, CurrentMethod.QualifiedName], Token.Line, Token.Column,
+        CurrentMethod, eCheck);
+      CurrentMethod.IncrementCheck(eCheck, boolOverride);
+    End Else
+      AddCheck([strModuleTypes[ModuleType], ModuleName], Token.Line, Token.Column, Self, eCheck)
 End;
 
 (**
@@ -1748,14 +1756,18 @@ Procedure TPascalModule.MetricsExceptionEating(Const Container : TElementContain
 
 Const
   strMethod = 'method';
+var
+  boolOverride: Boolean;
   
 Begin
   If Assigned(CurrentMethod) Then
-    AddModuleCheck([strMethod, CurrentMethod.QualifiedName], Container.Line, Container.Column,
-      CurrentMethod, mcExceptionEating)
-  Else
-    AddModuleCheck([strModuleTypes[ModuleType], ModuleName], Container.Line, Container.Column,
-      Self, mcExceptionEating)
+    Begin
+      boolOverride := AddCheck([strMethod, CurrentMethod.QualifiedName], Container.Line,
+        Container.Column, CurrentMethod, mcExceptionEating);
+      CurrentMethod.IncrementCheck(mcExceptionEating, boolOverride);
+    End Else
+      AddCheck([strModuleTypes[ModuleType], ModuleName], Container.Line, Container.Column,
+        Self, mcExceptionEating)
 End;
 
 (**
@@ -1779,6 +1791,7 @@ Var
   dbl: Double;
   i : Integer;
   iErrorCode: Integer;
+  boolOverride: Boolean;
 
 Begin
   If Not (Container Is TConstant) Then
@@ -1792,22 +1805,26 @@ Begin
           If (Abs(i) = 1) And BADIOptions.ModuleCheck[mcHCIntIgnoreOne].FEnabled Then
             Exit;
           If Assigned(M) Then
-            AddModuleCheck([Token.Token, strMethod, M.QualifiedName], Token.Line, Token.Column, M,
-              mcHardCodedIntegers)
-          Else
-            AddModuleCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
-              Token.Column, Self, mcHardCodedIntegers);
+            Begin
+              boolOverride := AddCheck([Token.Token, strMethod, M.QualifiedName], Token.Line,
+                Token.Column, M, mcHardCodedIntegers);
+              M.IncrementCheck(mcHardCodedIntegers, boolOverride);
+            End Else
+              AddCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
+                Token.Column, Self, mcHardCodedIntegers);
         End Else
         Begin
           Val(Token.Token, dbl,  iErrorCode);
           If (Abs(dbl) = 0.0) And BADIOptions.ModuleCheck[mcHCNumIgmoreZero].FEnabled Then
             Exit;
           If Assigned(M) Then
-            AddModuleCheck([Token.Token, strMethod, M.QualifiedName], Token.Line, Token.Column, M,
-              mcHardCodedNumbers)
-          Else
-            AddModuleCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
-              Token.Column, Self, mcHardCodedNumbers);         
+            Begin
+              boolOverride := AddCheck([Token.Token, strMethod, M.QualifiedName], Token.Line,
+                Token.Column, M, mcHardCodedNumbers);
+              M.IncrementCheck(mcHardCodedNumbers, boolOverride);
+            End Else
+              AddCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
+                Token.Column, Self, mcHardCodedNumbers);         
         End;
     End;
 End;
@@ -1835,6 +1852,7 @@ Var
   i : Integer;
   iAlphaLen : Integer;
   iMaxAlphaLen : Integer;
+  boolOverride: Boolean;
 
 Begin
   If (Length(Token.Token) > iMinAlphaLength) And Not (Container Is TConstant) Then
@@ -1851,11 +1869,13 @@ Begin
             iAlphaLen := 0;
       If iMaxAlphaLen > 1 Then
         If Assigned(CurrentMethod) Then
-          AddModuleCheck([Token.Token, strMethod, CurrentMethod.QualifiedName], Token.Line,
-            Token.Column, CurrentMethod, mcHardCodedStrings)
-        Else
-          AddModuleCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
-            Token.Column, Self, mcHardCodedStrings);
+          Begin
+            boolOverride := AddCheck([Token.Token, strMethod, CurrentMethod.QualifiedName], Token.Line,
+              Token.Column, CurrentMethod, mcHardCodedStrings);
+            CurrentMethod.IncrementCheck(mcHardCodedStrings, boolOverride);
+          End Else
+            AddCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
+              Token.Column, Self, mcHardCodedStrings);
     ENd;
 End;
 
@@ -1873,12 +1893,19 @@ End;
 **)
 Procedure TPascalModule.MetricsLongOrEmptyMethods(Const Method : TGenericFunction);
 
+Var
+  boolOverride: Boolean;
+
 Begin
   If Assigned(Method) Then
     Begin
       If BADIOptions.ModuleCheck[mcEmptyMethod].FEnabled Then
         If Method.StmtCount = 0 Then
-          AddModuleCheck([Method.QualifiedName], Method.Line, Method.Column, Method, mcEmptyMethod);
+          Begin
+            boolOverride := AddCheck([Method.QualifiedName], Method.Line, Method.Column, Method,
+              mcEmptyMethod);
+            Method.IncrementCheck(mcEmptyMethod, boolOverride);
+          End;
       If BADIOptions.ModuleMetric[mmLongMethods].FEnabled Then
         If (Method.EndLine > Method.StartLine + BADIOptions.ModuleMetric[mmLongMethods].FLimit) Then
           If AddMetric([Method.QualifiedName, Method.Metric[mmLongMethods],
@@ -1982,6 +2009,7 @@ Procedure TPascalModule.MetricsUnsortedMethods;
     M: TPascalMethod;
     iPrevLine, iCurrLine, iNextLine : Integer;
     boolOkay: Boolean;
+    boolOverride: Boolean;
 
   Begin
     olMethods := TList<TPascalMethod>.Create();
@@ -2020,8 +2048,11 @@ Procedure TPascalModule.MetricsUnsortedMethods;
               boolOkay := (iPrevLine < iCurrLine) And (iCurrLine < iNextLine)
             End;
           If Not boolOkay Then
-            AddModuleCheck([olMethods[iMethod].QualifiedName], olMethods[iMethod].Line,
-              olMethods[iMethod].Column, olMethods[iMethod], mcUnsortedMethod);
+            Begin
+              boolOverride := AddCheck([olMethods[iMethod].QualifiedName], olMethods[iMethod].Line,
+                olMethods[iMethod].Column, olMethods[iMethod], mcUnsortedMethod);
+              olMethods[iMethod].IncrementCheck(mcUnsortedMethod, boolOverride);
+            End;
         End;
     Finally
       olMethods.Free;
@@ -5078,13 +5109,17 @@ Const
 Var
   ExprType : TPascalExprTypes;
   C : TTempCntr;
+  boolOverride: Boolean;
 
 Begin
   If Token.UToken = strGOTO Then
     Begin
       If Assigned(CurrentMethod) Then
-        AddModuleCheck([CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
-          mcUseOfGOTOStatements);
+        Begin
+          boolOverride := AddCheck([CurrentMethod.QualifiedName], Token.Line, Token.Column,
+            CurrentMethod, mcUseOfGOTOStatements);
+          CurrentMethod.IncrementCheck(mcUseOfGOTOStatements, boolOverride);
+        End;
       NextNonCommentToken;
       If IsIdentifier(Token) Then
         NextNonCommentToken
@@ -5626,14 +5661,19 @@ Function TPascalModule.WithStmt : Boolean;
 
 Const
   strWITH = 'WITH';
+var
+  boolOverride: Boolean;
   
 Begin
   Result := Token.UToken = strWITH;
   If Result Then
     Begin
       If Assigned(CurrentMethod) Then
-        AddModuleCheck([CurrentMethod.QualifiedName], Token.Line, Token.Column, CurrentMethod,
-          mcUseOfWithStatements);
+        Begin
+          boolOverride := AddCheck([CurrentMethod.QualifiedName], Token.Line, Token.Column,
+            CurrentMethod, mcUseOfWithStatements);
+          CurrentMethod.IncrementCheck(mcUseOfWithStatements, boolOverride);
+        End;
       NextNonCommentToken;
       Repeat
         ExprList(Nil);
@@ -7301,6 +7341,7 @@ Var
   I, F : TElementContainer;
   iFinal : Integer;
   iInitial : Integer;
+  boolOverride: Boolean;
 
 Begin
   If Token.UToken = strINITIALIZATION Then
@@ -7316,11 +7357,15 @@ Begin
           NextNonCommentToken;
           iFinal := StmtList;
           If iFinal = 0 Then
-            AddModuleCheck([], F.Line, F.Column, F, mcEmptyFinalization);
+            Begin
+              boolOverride := AddCheck([], F.Line, F.Column, F, mcEmptyFinalization);
+            End;
         End Else
           iFinal := 0;
       If (iInitial = 0) And (iFinal = 0) Then
-        AddModuleCheck([], I.Line, I.Column, I, mcEmptyIntialization);
+        Begin
+          boolOverride := AddCheck([], I.Line, I.Column, I, mcEmptyIntialization);
+        End;
       If Token.UToken = strEND Then
         NextNonCommentToken
       Else

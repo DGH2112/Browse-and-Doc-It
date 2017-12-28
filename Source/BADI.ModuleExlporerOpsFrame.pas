@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    15 Oct 2017
+  @Date    28 Dec 2017
 
 **)
 Unit BADI.ModuleExlporerOpsFrame;
@@ -250,7 +250,7 @@ End;
   @precon  None.
   @postcon Initialises the frame.
 
-  @nometric MissingCONSTInParam
+  @nocheck MissingCONSTInParam
 
   @param   AOwner as a TComponent
 
@@ -275,7 +275,8 @@ Begin
   cbxLimits.Items.Add(strWarnings);
   cbxLimits.Items.Add(strHints);
   cbxLimits.Items.Add(strDocumentationConflicts);
-  cbxLimits.Items.Add(strMetricsAndChecks);
+  cbxLimits.Items.Add(strChecks);
+  cbxLimits.Items.Add(strMetrics);
   udLimits.OnChangingEx := udLimitsChangingEx;
 End;
 

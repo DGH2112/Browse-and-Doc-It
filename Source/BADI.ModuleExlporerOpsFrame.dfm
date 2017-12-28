@@ -309,9 +309,9 @@ object fmBADIModuleExplorerFrame: TfmBADIModuleExplorerFrame
     Top = 123
     Width = 344
     Height = 24
+    Style = csDropDownList
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 6
-    Text = 'lbxTokenTypes'
     OnClick = lbxTokenTypesClick
   end
 end

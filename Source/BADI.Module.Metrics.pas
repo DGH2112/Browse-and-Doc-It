@@ -1,6 +1,6 @@
 (**
   
-  This module contains Open Tools API code to create an editor view to display the BADI Statistics
+  This module contains Open Tools API code to create an editor view to display the BADI Metrics
   (metrics).
 
   @Author  David Hoyle
@@ -133,8 +133,8 @@ Type
     Destructor Destroy; Override;
   End;
 
-  Procedure RegisterStatisticsEditorView;
-  Procedure UnregisterStatisticsEditorView;
+  Procedure RegisterMetricsEditorView;
+  Procedure UnregisterMetricsEditorView;
   
 Implementation
 
@@ -183,7 +183,7 @@ End;
   @postcon The custom editor view is registered with the IDE.
 
 **)
-Procedure RegisterStatisticsEditorView;
+Procedure RegisterMetricsEditorView;
 
 Var
   EVS : IOTAEditorViewServices;
@@ -201,7 +201,7 @@ End;
   @postcon The custom editor view is unregistered from the IDE.
 
 **)
-Procedure UnregisterStatisticsEditorView;
+Procedure UnregisterMetricsEditorView;
 
 Var
   EVS : IOTAEditorViewServices;
@@ -557,7 +557,7 @@ End;
 Constructor TBADIModuleMetricsEditorView.Create(Const strViewIdentifier : String);
 
 Const
-  strBADIStatisticsImage = 'BADIStatisticsImage';
+  strBADIMetricsImage = 'BADIMetricsImage';
 
 Var
   EVS : INTAEditorViewServices;
@@ -577,7 +577,7 @@ Begin
       Try
         BM := TBitMap.Create;
         Try
-          BM.LoadFromResourceName(HInstance, strBADIStatisticsImage);
+          BM.LoadFromResourceName(HInstance, strBADIMetricsImage);
           ImageList.AddMasked(BM, clLime);
           FImageIndex := EVS.AddImages(ImageList, strBADIMetricsEditorView);
         Finally

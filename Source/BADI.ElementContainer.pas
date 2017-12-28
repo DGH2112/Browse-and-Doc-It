@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Dec 2017
+  @Date    28 Dec 2017
 
 **)
 Unit BADI.ElementContainer;
@@ -103,8 +103,8 @@ Type
       Const DocConflictRec: TDocConflictTable);
     Function AddMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
       Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : Boolean;
-    Procedure AddModuleCheck(Const Args: Array of Const; Const iLine, iColumn : Integer;
-      Const Container : TElementContainer; Const eCheck : TBADIModuleCheck);
+    Function AddCheck(Const Args: Array of Const; Const iLine, iColumn : Integer;
+      Const Container : TElementContainer; Const eCheck : TBADIModuleCheck) : Boolean;
     Function  AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Virtual; Abstract;
     Procedure CheckReferences; Virtual;
@@ -405,6 +405,53 @@ End;
 
 (**
 
+  This method adds an out of limit check to the documentation tree.
+
+  @precon  Container must be a valid instance.
+  @postcon A check is added to the document tree.
+
+  @param   Args      as an Array Of Const as a constant
+  @param   iLine     as an Integer as a constant
+  @param   iColumn   as an Integer as a constant
+  @param   Container as a TElementContainer as a constant
+  @param   eCheck    as a TBADIModuleCheck as a constant
+  @return  a Boolean
+
+**)
+Function TElementContainer.AddCheck(Const Args: Array of Const; Const iLine, iColumn : Integer;
+      Const Container : TElementContainer; Const eCheck : TBADIModuleCheck) : Boolean;
+
+Var
+  E: TElementContainer;
+  iL, iC: Integer;
+  iIcon: TBADIImageIndex;
+
+Begin
+  Result := False;
+  If Not (doShowChecks In BADIOptions.Options) Or
+    Not BADIOptions.ModuleCheck[eCheck].FEnabled Or
+    CheckCommentForNoCheck(eCheck, Self) Or
+    CheckCommentForNoCheck(eCheck, Container) Then
+    Begin
+      Result := True;
+      Exit;
+    End;
+  ModuleMetricPosition(Container, iL, iC);
+  iIcon := ModuleMetricImage(eCheck);
+  E := FindRoot;
+  E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
+  E := AddCategory(E, strChecks, iiMetricCheckFolder);
+  E := AddCategory(E, ModuleChecks[eCheck].FCategory, iiMetricCheckFolder);
+  If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
+    E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
+      ModuleChecks[eCheck].FMessage, ModuleChecks[eCheck].FDescription, iIcon))
+  Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
+    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
+      iiMetricCheckMissing));
+End;
+
+(**
+
   This method adds a specific documentation conflict to the Docuemntation conflict collection.
 
   @precon  None.
@@ -571,48 +618,6 @@ Begin
   If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
     E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
       ModuleMetrics[eMetric].FMessage, ModuleMetrics[eMetric].FDescription, iIcon))
-  Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
-    E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiMetricCheckMissing));
-End;
-
-(**
-
-  This method adds an out of limit check to the documentation tree.
-
-  @precon  Container must be a valid instance.
-  @postcon A check is added to the document tree.
-
-  @param   Args      as an Array Of Const as a constant
-  @param   iLine     as an Integer as a constant
-  @param   iColumn   as an Integer as a constant
-  @param   Container as a TElementContainer as a constant
-  @param   eCheck    as a TBADIModuleCheck as a constant
-
-**)
-Procedure TElementContainer.AddModuleCheck(Const Args: Array Of Const; Const iLine, iColumn: Integer;
-  Const Container: TElementContainer; Const eCheck: TBADIModuleCheck);
-
-Var
-  E: TElementContainer;
-  iL, iC: Integer;
-  iIcon: TBADIImageIndex;
-
-Begin
-  If Not (doShowChecks In BADIOptions.Options) Or
-    Not BADIOptions.ModuleCheck[eCheck].FEnabled Or
-    CheckCommentForNoCheck(eCheck, Self) Or
-    CheckCommentForNoCheck(eCheck, Container) Then
-    Exit;
-  ModuleMetricPosition(Container, iL, iC);
-  iIcon := ModuleMetricImage(eCheck);
-  E := FindRoot;
-  E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
-  E := AddCategory(E, strChecks, iiMetricCheckFolder);
-  E := AddCategory(E, ModuleChecks[eCheck].FCategory, iiMetricCheckFolder);
-  If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
-    E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
-      ModuleChecks[eCheck].FMessage, ModuleChecks[eCheck].FDescription, iIcon))
   Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
     E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
       iiMetricCheckMissing));

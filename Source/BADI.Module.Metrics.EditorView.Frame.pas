@@ -775,24 +775,27 @@ Var
 
 Begin
   For eColumn := Succ(Low(TBADIMetricColumn)) To Pred(High(TBADIMetricColumn)) Do
-    Begin
-      iCount := 0;
-      N := FVSTMetrics.GetFirst();
-      While Assigned(N) Do
-        Begin
-          NodeData := FVSTMetrics.GetNodeData(N);
-          If NodeData.FMetrics[MetricColumns[eColumn].FMetric] >
-            FLimits.FMetrics[MetricColumns[eColumn].FMetric] Then
-            Inc(iCount);
-          N := FVSTMetrics.GetNextSibling(N);
-        End;
-      If iCount = 0 Then
-        FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
-          FVSTMetrics.Header.Columns[Integer(eColumn)].Options - [coVisible]
-      Else
+    If doAutoHideMetricsWithNoissues In TBADIOptions.BADIOptions.Options Then
+      Begin
+        iCount := 0;
+        N := FVSTMetrics.GetFirst();
+        While Assigned(N) Do
+          Begin
+            NodeData := FVSTMetrics.GetNodeData(N);
+            If NodeData.FMetrics[MetricColumns[eColumn].FMetric] >
+              FLimits.FMetrics[MetricColumns[eColumn].FMetric] Then
+              Inc(iCount);
+            N := FVSTMetrics.GetNextSibling(N);
+          End;
+        If iCount = 0 Then
+          FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
+            FVSTMetrics.Header.Columns[Integer(eColumn)].Options - [coVisible]
+        Else
+          FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
+            FVSTMetrics.Header.Columns[Integer(eColumn)].Options + [coVisible];
+      End Else
         FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
           FVSTMetrics.Header.Columns[Integer(eColumn)].Options + [coVisible];
-    End;
 End;
 
 (**

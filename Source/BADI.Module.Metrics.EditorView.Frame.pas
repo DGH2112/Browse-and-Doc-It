@@ -148,6 +148,7 @@ Type
     Function  HasIssues(Const Node : PVirtualNode) : Boolean;
     Procedure ExtractMaxFromChildren(Const ParentNode : PVirtualNode);
     Procedure CreateVirtualStringTree;
+    Procedure HideZeroColumns;
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -758,6 +759,44 @@ End;
 
 (**
 
+  This method hides some of the columns if they have no issues to make the view narrower.
+
+  @precon  None.
+  @postcon Any column with no issues is hidden (except method and total).
+
+**)
+Procedure TframeBADIModuleMetricsEditorView.HideZeroColumns;
+
+Var
+  eColumn : TBADIMetricColumn;
+  iCount: Integer;
+  N: PVirtualNode;
+  NodeData : PBADIMetricRecord;
+
+Begin
+  For eColumn := Succ(Low(TBADIMetricColumn)) To Pred(High(TBADIMetricColumn)) Do
+    Begin
+      iCount := 0;
+      N := FVSTMetrics.GetFirst();
+      While Assigned(N) Do
+        Begin
+          NodeData := FVSTMetrics.GetNodeData(N);
+          If NodeData.FMetrics[MetricColumns[eColumn].FMetric] >
+            FLimits.FMetrics[MetricColumns[eColumn].FMetric] Then
+            Inc(iCount);
+          N := FVSTMetrics.GetNextSibling(N);
+        End;
+      If iCount = 0 Then
+        FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
+          FVSTMetrics.Header.Columns[Integer(eColumn)].Options - [coVisible]
+      Else
+        FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
+          FVSTMetrics.Header.Columns[Integer(eColumn)].Options + [coVisible];
+    End;
+End;
+
+(**
+
   This method initialises the limits record in the class with the information from the options.
 
   @precon  None.
@@ -906,6 +945,7 @@ Begin
           DeleteExistingModuleNode(Module);
         NodeResult := RecurseContainer(Module, Nil);
         SortAndExpand(NodeResult, setRenderOptions);
+        HideZeroColumns;
         UpdateStats;
       Finally
         FVSTMetrics.EndUpdate;

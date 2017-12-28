@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    16 Dec 2017
+  @Date    28 Dec 2017
 
 **)
 Unit BADI.Options;
@@ -412,6 +412,8 @@ Const
   strConflicts = 'Conflicts';
   (** An ini key for metrics **)
   strMetrics = 'Metrics';
+  (** An ini key for checks **)
+  strChecks = 'Checks';
   (** An ini section name for the module metrics **)
   strModuleMetrics = 'Module Metrics';
   (** An ini section name for the module checks **)
@@ -740,6 +742,7 @@ Begin
   FIssueLimits[ltHints] := iniFile.ReadInteger(strIssuesLimits, strHints, iDefaultLimit);
   FIssueLimits[ltConflicts] := iniFile.ReadInteger(strIssuesLimits, strConflicts, iDefaultLimit);
   FIssueLimits[ltMetrics] := iniFile.ReadInteger(strIssuesLimits, strMetrics, iDefaultLimit);
+  FIssueLimits[ltChecks] := iniFile.ReadInteger(strIssuesLimits, strChecks, iDefaultLimit);
 End;
 
 (**
@@ -1104,6 +1107,7 @@ Begin
   iniFile.WriteInteger(strIssuesLimits, strHints, FIssueLimits[ltHints]);
   iniFile.WriteInteger(strIssuesLimits, strConflicts, FIssueLimits[ltConflicts]);
   iniFile.WriteInteger(strIssuesLimits, strMetrics, FIssueLimits[ltMetrics]);
+  iniFile.WriteInteger(strIssuesLimits, strChecks, FIssueLimits[ltChecks]);
 End;
 
 (**

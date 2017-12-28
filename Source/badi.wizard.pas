@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    21 Dec 2017
+  @Date    28 Dec 2017
   @Version 1.0
 
 **)
@@ -66,7 +66,9 @@ Uses
   BADI.DockableModuleExplorer,
   BADI.Constants, 
   BADI.Module.Metrics, 
-  BADI.Module.Metrics.SubView;
+  BADI.Module.Metrics.SubView, 
+  BADI.Module.Checks, 
+  BADI.Module.Checks.SubView;
 
 (**
 
@@ -91,8 +93,10 @@ Begin
   {$ENDIF}
   FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FEditorNotifier);
   FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
-  RegisterStatisticsEditorView;
+  RegisterMetricsEditorView;
+  RegisterChecksEditorView;
   RegisterEditorMetricsSubView;
+  RegisterEditorChecksSubView;
 End;
 
 (**
@@ -106,8 +110,10 @@ End;
 Destructor TBrowseAndDocItWizard.Destroy;
 
 Begin
+  UnregisterEditorChecksSubView;
   UnregisterEditorMetricsSubView;
-  UnregisterStatisticsEditorView;
+  UnregisterChecksEditorView;
+  UnregisterMetricsEditorView;
   FBADIIDEOptionsInstaller.Free;
   {$IFDEF D2005}
   If FEditorIndex > iWizardFailState Then
@@ -124,7 +130,7 @@ End;
   This is an exceute method for the wizard. Since this wizard is not implemented
   as a menu wizard this method has no code but is required for the interface.
 
-  @nometric EmptyMethod
+  @nocheck EmptyMethod
   
   @precon  None.
   @postcon None.

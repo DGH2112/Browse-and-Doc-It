@@ -439,13 +439,13 @@ Begin
   ModuleMetricPosition(Container, iL, iC);
   iIcon := ModuleMetricImage(eCheck);
   E := FindRoot;
-  E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
+  E := AddRootContainer(E, strChecks, iiMetricCheckFolder);
   E := AddCategory(E, strChecks, iiMetricCheckFolder);
   E := AddCategory(E, ModuleChecks[eCheck].FCategory, iiMetricCheckFolder);
-  If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
+  If E.ElementCount < BADIOptions.IssueLimits[ltChecks] Then
     E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
       ModuleChecks[eCheck].FMessage, ModuleChecks[eCheck].FDescription, iIcon))
-  Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
+  Else If E.ElementCount = BADIOptions.IssueLimits[ltChecks] Then
     E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
       iiMetricCheckMissing));
 End;
@@ -612,7 +612,7 @@ Begin
   ModuleMetricPosition(Container, iL, iC);
   iIcon := ModuleMetricImage(eMetric);
   E := FindRoot;
-  E := AddRootContainer(E, strMetricsAndChecks, iiMetricCheckFolder);
+  E := AddRootContainer(E, strMetrics, iiMetricCheckFolder);
   E := AddCategory(E, strMetrics, iiMetricCheckFolder);
   E := AddCategory(E, ModuleMetrics[eMetric].FCategory, iiMetricCheckFolder);
   If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then

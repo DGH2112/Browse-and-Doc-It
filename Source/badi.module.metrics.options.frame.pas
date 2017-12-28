@@ -5,10 +5,10 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    17 Dec 2017
+  @date    28 Dec 2017
 
 **)
-Unit BADI.ModuleMetricsFrame;
+Unit BADI.Module.Metrics.Options.Frame;
 
 Interface
 
@@ -23,12 +23,17 @@ Uses
   Forms,
   Dialogs,
   BADI.CustomOptionsFrame,
-  VirtualTrees;
+  VirtualTrees, 
+  BADI.CustomVirtualStringTree;
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
+  (** A custom treeview for this frame to stop AVs due to RTTI clashes with TVirtualStrinTree. **)
+  TBADIMetricsOptionsVirtualStringTree = Class(TBADICustomVirtualStringTree);
+ 
   (** A class to represent a frame for selecting the checks and metrics in the IDE options dialogue. **)
-  TframeBADIModuleMetrics = Class(TFrame, IBADIOptionsFrame)
-    vstMetrics: TVirtualStringTree;
+  TframeBADIModuleMetricsOptions = Class(TFrame, IBADIOptionsFrame)
     Procedure vstMetricsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; Var CellText: String);
     Procedure vstMetricsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -37,17 +42,16 @@ Type
       NewText: String);
     Procedure vstMetricsHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
     Procedure vstMetricsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    Procedure vstMetricsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
-      Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode; CellRect: TRect;
-      Var ContentRect: TRect);
-    procedure vstMetricsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas;
+    Procedure vstMetricsPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
+    FVSTMetrics : TBADIMetricsOptionsVirtualStringTree;
   Strict Protected
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure RecurseNodes(Const vstTreeView: TBaseVirtualTree; Const Node: PVirtualNode;
       Const State: TCheckState);
+    Procedure CreateVirtualStringTree;
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent); Override;
@@ -62,7 +66,8 @@ Uses
   BADI.Types,
   BADI.Constants,
   BADI.Options, 
-  BADI.Functions;
+  BADI.Functions,
+  Themes;
 
 {$R *.dfm}
 
@@ -91,12 +96,12 @@ Const
   @precon  AOwner must be a valid instance.
   @postcon Initialises the metrics frame for the IDE options dialogue.
 
-  @nometric MissingCONSTInParam
+  @nocheck MissingCONSTInParam
 
   @param   AOwner as a TComponent
 
 **)
-Constructor TframeBADIModuleMetrics.Create(AOwner: TComponent);
+Constructor TframeBADIModuleMetricsOptions.Create(AOwner: TComponent);
 
   (**
 
@@ -118,16 +123,16 @@ Constructor TframeBADIModuleMetrics.Create(AOwner: TComponent);
 
   Begin
     Result := Nil;
-    N := vstMetrics.GetFirst;
+    N := FVSTMetrics.GetFirst;
     While Assigned(N) Do
       Begin
-        NodeData := vstMetrics.GetNodeData(N);
+        NodeData := FVSTMetrics.GetNodeData(N);
         If NodeData.FModuleMetric = eMetric Then
           Begin
             Result := N;
             Break;
           End;
-        N := vstMetrics.GetNext(N);
+        N := FVSTMetrics.GetNext(N);
       End;
   End;
 
@@ -138,19 +143,72 @@ Var
 
 Begin
   Inherited Create(AOwner);
-  vstMetrics.NodeDataSize := SizeOf(TMetricNodeData);
+  CreateVirtualStringTree;
+  FVSTMetrics.NodeDataSize := SizeOf(TMetricNodeData);
   For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
     Begin
       P := FindParent(ModuleMetrics[eMetric].FParent);
-      N := vstMetrics.AddChild(P);
-      vstMetrics.CheckType[N] := ctCheckBox;
-      vstMetrics.CheckState[N] := csUncheckedNormal;
-      NodeData := vstMetrics.GetNodeData(N);
+      N := FVSTMetrics.AddChild(P);
+      FVSTMetrics.CheckType[N] := ctCheckBox;
+      FVSTMetrics.CheckState[N] := csUncheckedNormal;
+      NodeData := FVSTMetrics.GetNodeData(N);
       NodeData.FModuleMetric := eMetric;
       NodeData.FMetricLimitType := ltNone;
       NodeData.FMetricLimit := 0;
     End;
-  vstMetrics.FullExpand;
+  FVSTMetrics.FullExpand;
+End;
+
+(**
+
+  This method creates and initialises the treeview..
+
+  @precon  None.
+  @postcon The treeview is created and initialised.
+
+  @nocheck HardCodedString HardCodedInteger
+
+**)
+Procedure TframeBADIModuleMetricsOptions.CreateVirtualStringTree;
+
+Var
+  C: TVirtualTreeColumn;
+
+Begin
+  FVSTMetrics := TBADIMetricsOptionsVirtualStringTree.Create(Self);
+  FVSTMetrics.Name := 'vstMetrics';
+  FVSTMetrics.Parent := Self;
+  FVSTMetrics.AlignWithMargins := True;
+  FVSTMetrics.Align := alClient;
+  FVSTMetrics.EditDelay := 250;
+  FVSTMetrics.TabOrder := 0;
+  FVSTMetrics.OnChecked := vstMetricsChecked;
+  FVSTMetrics.OnEditing := vstMetricsEditing;
+  FVSTMetrics.OnGetText := vstMetricsGetText;
+  FVSTMetrics.OnPaintText := vstMetricsPaintText;
+  FVSTMetrics.OnHeaderClick := vstMetricsHeaderClick;
+  FVSTMetrics.OnNewText := vstMetricsNewText;
+  FVSTMetrics.Header.AutoSizeIndex := 0;
+  FVSTMetrics.Header.Height := 20;
+  FVSTMetrics.Header.Options := FVSTMetrics.Header.Options + [hoColumnResize, hoShowImages];
+  FVSTMetrics.TreeOptions.AutoOptions := [toAutoDropExpand, toAutoScrollOnExpand, toAutoTristateTracking,
+    toAutoDeleteMovedNodes, toAutoChangeScale];
+  FVSTMetrics.TreeOptions.MiscOptions := FVSTMetrics.TreeOptions.MiscOptions +
+    [toCheckSupport, toEditable, toEditOnClick, toEditOnDblClick];
+  C := FVSTMetrics.Header.Columns.Add;
+  C.CheckBox := True;
+  C.Position := 0;
+  C.Width := 184;
+  C.Text := 'Module Metrics and Checks';
+  C := FVSTMetrics.Header.Columns.Add;
+  C.Position := 1;
+  C.Width := 150;
+  C.Text := 'Name';
+  C := FVSTMetrics.Header.Columns.Add;
+  C.Alignment := taRightJustify;
+  C.Position := 2;
+  C.Width := 75;
+  C.Text := 'Limit';
 End;
 
 (**
@@ -161,7 +219,7 @@ End;
   @postcon The treeview is updated with the current metrics and checks settings.
 
 **)
-Procedure TframeBADIModuleMetrics.LoadSettings;
+Procedure TframeBADIModuleMetricsOptions.LoadSettings;
 
 Var
   N : PVirtualNode;
@@ -169,18 +227,18 @@ Var
   BO: TBADIOptions;
 
 Begin
-  N := vstMetrics.GetFirst;
+  N := FVSTMetrics.GetFirst;
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
     Begin
-      NodeData := vstMetrics.GetNodeData(N);
+      NodeData := FVSTMetrics.GetNodeData(N);
       If BO.ModuleMetric[NodeData.FModuleMetric].FEnabled Then
-        vstMetrics.CheckState[N] := csCheckedNormal
+        FVSTMetrics.CheckState[N] := csCheckedNormal
       Else
-        vstMetrics.CheckState[N] := csUncheckedNormal;
+        FVSTMetrics.CheckState[N] := csUncheckedNormal;
       NodeData.FMetricLimitType := ModuleMetrics[NodeData.FModuleMetric].FLimitType;
       NodeData.FMetricLimit := BO.ModuleMetric[NodeData.FModuleMetric].FLimit;
-      N := vstMetrics.GetNext(N);
+      N := FVSTMetrics.GetNext(N);
     End;
   vstMetricsChecked(Nil, Nil);
 End;
@@ -197,7 +255,7 @@ End;
   @param   State       as a TCheckState as a constant
 
 **)
-Procedure TframeBADIModuleMetrics.RecurseNodes(Const vstTreeView: TBaseVirtualTree;
+Procedure TframeBADIModuleMetricsOptions.RecurseNodes(Const vstTreeView: TBaseVirtualTree;
   Const Node: PVirtualNode; Const State: TCheckState);
 
 Var
@@ -229,7 +287,7 @@ End;
   @postcon The treeview metrics and checks settings are saved to the options.
 
 **)
-Procedure TframeBADIModuleMetrics.SaveSettings;
+Procedure TframeBADIModuleMetricsOptions.SaveSettings;
 
 Var
   N : PVirtualNode;
@@ -238,49 +296,20 @@ Var
   BO: TBADIOptions;
 
 Begin
-  N := vstMetrics.GetFirst();
+  N := FVSTMetrics.GetFirst();
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
     Begin
-      NodeData := vstMetrics.GetNodeData(N);
+      NodeData := FVSTMetrics.GetNodeData(N);
       R := BO.ModuleMetric[NodeData.FModuleMetric];
-      Case vstMetrics.CheckState[N] Of
+      Case FVSTMetrics.CheckState[N] Of
         csUncheckedNormal: R.FEnabled := False;
         csCheckedNormal:   R.FEnabled := True;
       End;
       R.FLimit := NodeData.FMetricLimit;
       BO.ModuleMetric[NodeData.FModuleMetric] := R;
-      N := vstMetrics.GetNext(N);
+      N := FVSTMetrics.GetNext(N);
     End;
-End;
-
-(**
-
-  This is an on before cell paint event handler for the treeview.
-
-  @precon  None.
-  @postcon Colours the focused column more than the whole row.
-
-  @param   Sender        as a TBaseVirtualTree
-  @param   TargetCanvas  as a TCanvas
-  @param   Node          as a PVirtualNode
-  @param   Column        as a TColumnIndex
-  @param   CellPaintMode as a TVTCellPaintMode
-  @param   CellRect      as a TRect
-  @param   ContentRect   as a TRect as a reference
-
-**)
-Procedure TframeBADIModuleMetrics.vstMetricsBeforeCellPaint(Sender: TBaseVirtualTree;
-  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode;
-  CellRect: TRect; Var ContentRect: TRect);
-
-Const
-  dblBlendFactor = 0.50;
-
-Begin
-  If (Node = Sender.FocusedNode) And (Column = Sender.FocusedColumn) Then
-    TargetCanvas.Brush.Color := BlendColour(TargetCanvas.Brush.Color, clHighlight, dblBlendFactor);
-  TargetCanvas.FillRect(CellRect);
 End;
 
 (**
@@ -294,7 +323,7 @@ End;
   @param   Node   as a PVirtualNode
 
 **)
-procedure TframeBADIModuleMetrics.vstMetricsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+procedure TframeBADIModuleMetricsOptions.vstMetricsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
 
 Var
   iTotal   : Integer;
@@ -304,21 +333,21 @@ Var
 Begin
   iCount := 0;
   iTotal := 0;
-  N := vstMetrics.GetFirst;
+  N := FVSTMetrics.GetFirst;
   While N <> Nil Do
     Begin
       Inc(iTotal);
       Case Sender.CheckState[N] Of
         csCheckedNormal: Inc(iCount);
       End;
-      N := vstMetrics.GetNext(N);
+      N := FVSTMetrics.GetNext(N);
     End;
   If iCount = 0 Then
-    vstMetrics.Header.Columns[0].CheckState := csUncheckedNormal
+    FVSTMetrics.Header.Columns[0].CheckState := csUncheckedNormal
   Else If iCount = iTotal Then
-    vstMetrics.Header.Columns[0].CheckState := csCheckedNormal
+    FVSTMetrics.Header.Columns[0].CheckState := csCheckedNormal
   Else
-    vstMetrics.Header.Columns[0].CheckState := csMixedNormal;
+    FVSTMetrics.Header.Columns[0].CheckState := csMixedNormal;
 end;
 
 (**
@@ -334,7 +363,7 @@ end;
   @param   Allowed as a Boolean as a reference
 
 **)
-Procedure TframeBADIModuleMetrics.vstMetricsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode;
+Procedure TframeBADIModuleMetricsOptions.vstMetricsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode;
   Column: TColumnIndex; Var Allowed: Boolean);
 
 Var
@@ -359,7 +388,7 @@ End;
   @param   CellText as a String as a reference
 
 **)
-Procedure TframeBADIModuleMetrics.vstMetricsGetText(Sender: TBaseVirtualTree;
+Procedure TframeBADIModuleMetricsOptions.vstMetricsGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; Var
   CellText: String);
 
@@ -399,7 +428,7 @@ End;
   @param   HitInfo as a TVTHeaderHitInfo
 
 **)
-Procedure TframeBADIModuleMetrics.vstMetricsHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
+Procedure TframeBADIModuleMetricsOptions.vstMetricsHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
 
 Var
   ST: TBaseVirtualTree;
@@ -432,7 +461,7 @@ End;
   @param   NewText as a String
 
 **)
-Procedure TframeBADIModuleMetrics.vstMetricsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+Procedure TframeBADIModuleMetricsOptions.vstMetricsNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
   Column: TColumnIndex; NewText: String);
 
 ResourceString
@@ -488,13 +517,15 @@ End;
   @param   TextType     as a TVSTTextType
 
 **)
-Procedure TframeBADIModuleMetrics.vstMetricsPaintText(Sender: TBaseVirtualTree;
+Procedure TframeBADIModuleMetricsOptions.vstMetricsPaintText(Sender: TBaseVirtualTree;
   Const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 
 Begin
   TargetCanvas.Font.Color := clWindowText;
-  If (Node = Sender.FocusedNode) And (Column = Sender.FocusedColumn) Then
-    TargetCanvas.Font.Color := clHighlightText;
+  {$IFDEF DXE102}
+  If Assigned(FVSTMetrics.StyleServices) And FVSTMetrics.StyleServices.Enabled Then
+    TargetCanvas.Font.Color := FVSTMetrics.StyleServices.GetSystemColor(clWindowText);
+  {$ENDIF}
 End;
 
 End.

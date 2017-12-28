@@ -36,8 +36,10 @@ Uses
   ActnPopup,
   ToolsAPI,
   Themes,
-  BADI.Types, 
-  BADI.CustomVirtualStringTree;
+  BADI.Types,
+  System.ImageList,
+  BADI.CustomVirtualStringTree,
+  UITypes;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -47,9 +49,9 @@ Type
 
   (** An enumerate to define some options for when rendering the module metrics. **)
   TBADIMetricRenderOption = (
-    sroClear,            // Clears the treeview before rendering
-    sroAutoExpand,       // Auto expands the the treeview for the rendered module
-    sroAutoExpandOnError // Auto expands the the treeview for the rendered module ONLY IF there are
+    mroClear,            // Clears the treeview before rendering
+    mroAutoExpand,       // Auto expands the the treeview for the rendered module
+    mroAutoExpandOnError // Auto expands the the treeview for the rendered module ONLY IF there are
                          // issued
   );
   (** A set of the above enumerate options. **)
@@ -89,7 +91,7 @@ Type
   Strict Private
   Type
       (** A record to describe the data to be held in a tree node. **)
-    TBADIStatisticsRecord = Record
+    TBADIMetricRecord = Record
       FNodeType              : TBADINodeType;
       FText                  : String;
       FImageIndex            : Integer;
@@ -98,7 +100,7 @@ Type
       FMetricOverrides       : TBADIModuleMetrics;
     End;
     (** A pointer to the above record. **)
-    PBADIStatisticsRecord = ^TBADIStatisticsRecord;
+    PBADIMetricRecord = ^TBADIMetricRecord;
     (** A record type to hold the return information from recursing nodes. **)
     TNodeResultRecord = Record
       FNode: PVirtualNode;
@@ -108,7 +110,7 @@ Type
       Constructor Create(Const Node: PVirtualNode);
     End;
   Strict Private
-    FLimits        : TBADIStatisticsRecord;
+    FLimits        : TBADIMetricRecord;
     FLowThreshold  : Double;
     FHighThreshold : Double;
     FFileName      : String;
@@ -137,7 +139,7 @@ Type
     Function RecurseContainer(Const Container: TElementContainer;
       Const Parent: PVirtualNode): TNodeResultRecord;
     Procedure UpdateStats;
-    Function ProcessFunction(Const NodeData : PBADIStatisticsRecord;
+    Function ProcessFunction(Const NodeData : PBADIMetricRecord;
       Const AFunction : TGenericFunction) : TNodeResultRecord;
     Procedure InitaliseRenderingOptions;
     Procedure DeleteExistingModuleNode(Const Module : TBaseLanguageModule);
@@ -227,8 +229,35 @@ Uses
 
 Type
   (** An enumerate to define the columns in the report. **)
-  TBADIMetricColumns = (mcText, mcLength, mcParameters, mcVariables, mcNestIFDepth,
-    mcCyclometricComplexity, mcToxicity);
+  TBADIMetricColumn = (
+    mcText,
+    mcLength,
+    mcParameters,
+    mcVariables,
+    mcNestIFDepth,
+    mcCyclometricComplexity,
+    mcToxicity
+  );
+  (** A record to describe metric column information. **)
+  TMetricColumnInfo = Record
+    FName      : String;
+    FWidth     : Integer;
+    FMinWidth  : Integer;
+    FAlignment : TAlignment;
+    FMetric    : TBADIModuleMetric;
+  End;
+
+Const
+  (** A constant array of column information for rendering. **)
+  MetricColumns : Array[Low(TBADIMetricColumn)..High(TBADIMetricColumn)] Of TMetricColumnInfo = (
+    (FName: 'Method';     FWidth: 300; FMinWidth: 300; FAlignment: taLeftJustify; FMetric: mmLongMethods),
+    (FName: 'Lines';      FWidth: 75;  FMinWidth: 0;   FAlignment: taCenter;      FMetric: mmLongMethods),
+    (FName: 'Params';     FWidth: 75;  FMinWidth: 0;   FAlignment: taCenter;      FMetric: mmLongParameterLists),
+    (FName: 'Variables';  FWidth: 75;  FMinWidth: 0;   FAlignment: taCenter;      FMetric: mmLongMethodVariableLists),
+    (FName: 'IF Depth';   FWidth: 75;  FMinWidth: 0;   FAlignment: taCenter;      FMetric: mmNestedIFDepth),
+    (FName: 'Complexity'; FWidth: 75;  FMinWidth: 0;   FAlignment: taCenter;      FMetric: mmCyclometricComplexity),
+    (FName: 'Toxicity';   FWidth: 75;  FMinWidth: 0;   FAlignment: taCenter;      FMetric: mmToxicity)
+  );
 
 { TNodeResultRecord }
 
@@ -452,7 +481,7 @@ Procedure TframeBADIModuleMetricsEditorView.CopyToClipboard;
   End;
 
 ResourceString
-  strClipboardHeader = 'BADI Statistics for %s'#13#10;
+  strClipboardHeader = 'BADI Metrics for %s'#13#10;
 
 Const
   iMultipler = 2;
@@ -519,7 +548,7 @@ Var
 Begin
   Inherited Create(AOwner);
   CreateVirtualStringTree;
-  FVSTMetrics.NodeDataSize := SizeOf(TBADIStatisticsRecord);
+  FVSTMetrics.NodeDataSize := SizeOf(TBADIMetricRecord);
   LoadBADIImages(ilScopeImages);
   {$IFDEF DXE102}
   FStyleServicesNotifier := -1;
@@ -544,6 +573,7 @@ Procedure TframeBADIModuleMetricsEditorView.CreateVirtualStringTree;
 
 Var
   C: TVirtualTreeColumn;
+  eColumn: TBADIMetricColumn;
 
 Begin
   FVSTMetrics := TBADIEditorViewVirtualStringTree.Create(Self);
@@ -562,48 +592,16 @@ Begin
   FVSTMetrics.OnGetText := vstStatisticsGetText;
   FVSTMetrics.OnPaintText := vstStatisticsPaintText;
   FVSTMetrics.OnGetImageIndex := vstStatisticsGetImageIndex;
-  C := FVSTMetrics.Header.Columns.Add;
-  C.MinWidth := 300;
-  C.Position := 0;
-  C.Style := vsOwnerDraw;
-  C.Width := 423;
-  C.Text := 'Method';
-  C := FVSTMetrics.Header.Columns.Add;
-  C.Alignment := taCenter;
-  C.Position := 1;
-  C.Style := vsOwnerDraw;
-  C.Width := 75;
-  C.Text := 'Lines';
-  C := FVSTMetrics.Header.Columns.Add;
-  C.Alignment := taCenter;
-  C.Position := 2;
-  C.Style := vsOwnerDraw;
-  C.Width := 75;
-  C.Text := 'Params';
-  C := FVSTMetrics.Header.Columns.Add;
-  C.Alignment := taCenter;
-  C.Position := 3;
-  C.Style := vsOwnerDraw;
-  C.Width := 75;
-  C.Text := 'Variables';
-  C := FVSTMetrics.Header.Columns.Add;
-  C.Alignment := taCenter;
-  C.Position := 4;
-  C.Style := vsOwnerDraw;
-  C.Width := 75;
-  C.Text := 'IF Depth';
-  C := FVSTMetrics.Header.Columns.Add;
-  C.Alignment := taCenter;
-  C.Position := 5;
-  C.Style := vsOwnerDraw;
-  C.Width := 75;
-  C.Text := 'Complexity';
-  C := FVSTMetrics.Header.Columns.Add;
-  C.Alignment := taCenter;
-  C.Position := 6;
-  C.Style := vsOwnerDraw;
-  C.Width := 75;
-  C.Text := 'Toxicity';
+  For eColumn := Low(TBADIMetricColumn) To High(TBADIMetricColumn) Do
+    Begin
+      C := FVSTMetrics.Header.Columns.Add;
+      C.MinWidth := MetricColumns[eColumn].FMinWidth;
+      C.Position := Integer(eColumn);
+      C.Style := vsOwnerDraw;
+      C.Width := MetricColumns[eColumn].FWidth;
+      C.Text := MetricColumns[eColumn].FName;
+      C.Alignment := MetricColumns[eColumn].FAlignment;
+    End;
 End;
 
 (**
@@ -677,12 +675,12 @@ Procedure TframeBADIModuleMetricsEditorView.ExtractMaxFromChildren(Const ParentN
     @precon  NodeData and ParentNodeData must be valid.
     @postcon The parent node metric information is updated.
 
-    @param   NodeData       as a PBADIStatisticsRecord as a constant
-    @param   ParentNodeData as a PBADIStatisticsRecord as a constant
+    @param   NodeData       as a PBADIMetricRecord as a constant
+    @param   ParentNodeData as a PBADIMetricRecord as a constant
     @param   eMetric        as a TBADIModuleMetric as a constant
 
   **)
-  Procedure ProcessMetric(Const NodeData, ParentNodeData : PBADIStatisticsRecord;
+  Procedure ProcessMetric(Const NodeData, ParentNodeData : PBADIMetricRecord;
     Const eMetric : TBADIModuleMetric);
 
   Begin
@@ -692,25 +690,23 @@ Procedure TframeBADIModuleMetricsEditorView.ExtractMaxFromChildren(Const ParentN
   End;
 
 Var
-  ParentNodeData : PBADIStatisticsRecord;
-  NodeData : PBADIStatisticsRecord;
+  ParentNodeData : PBADIMetricRecord;
+  NodeData : PBADIMetricRecord;
   Node: PVirtualNode;
+  eColumn : TBADIMetricColumn;
 
 Begin
-  If Not Assigned(ParentNode) Then
-    Exit;
-  ParentNodeData := FVSTMetrics.GetNodeData(ParentNode);
-  Node := FVSTMetrics.GetFirstChild(ParentNode);
-  While Assigned(Node) Do
+  If Assigned(ParentNode) Then
     Begin
-      NodeData := FVSTMetrics.GetNodeData(Node);
-      ProcessMetric(NodeData, ParentNodeData, mmLongMethods);
-      ProcessMetric(NodeData, ParentNodeData, mmLongParameterLists);
-      ProcessMetric(NodeData, ParentNodeData, mmLongMethodVariableLists);
-      ProcessMetric(NodeData, ParentNodeData, mmNestedIFDepth);
-      ProcessMetric(NodeData, ParentNodeData, mmCyclometricComplexity);
-      ProcessMetric(NodeData, ParentNodeData, mmToxicity);
-      Node := FVSTMetrics.GetNextSibling(Node);
+      ParentNodeData := FVSTMetrics.GetNodeData(ParentNode);
+      Node := FVSTMetrics.GetFirstChild(ParentNode);
+      While Assigned(Node) Do
+        Begin
+          NodeData := FVSTMetrics.GetNodeData(Node);
+          For eColumn := Succ(Low(TBADIMetricColumn)) To High(TBADIMetricColumn) Do
+            ProcessMetric(NodeData, ParentNodeData, MetricColumns[eColumn].FMetric);
+          Node := FVSTMetrics.GetNextSibling(Node);
+        End;
     End;
 End;
 
@@ -751,7 +747,7 @@ Begin
     Node,
     Procedure(Sender: TBaseVirtualTree; ptrNode: PVirtualNode; ptrData: Pointer; Var boolAbort: Boolean)
     Var
-      NodeData : PBADIStatisticsRecord;
+      NodeData : PBADIMetricRecord;
     Begin
       NodeData := Sender.GetNodeData(ptrNode);
       Inc(iCounter, NodeData.FIssueCount);
@@ -773,16 +769,13 @@ Procedure TframeBADIModuleMetricsEditorView.InitaliseRenderingOptions;
 Const
   dblPercentageDivisor = 100.0;
 
+Var
+  eColumn: TBADIMetricColumn;
+
 Begin
-  FLimits.FMetrics[mmLongMethods] := TBADIOptions.BADIOptions.ModuleMetric[mmLongMethods].FLimit;
-  FLimits.FMetrics[mmLongParameterLists] :=
-    TBADIOptions.BADIOptions.ModuleMetric[mmLongParameterLists].FLimit;
-  FLimits.FMetrics[mmLongMethodVariableLists] :=
-    TBADIOptions.BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit;
-  FLimits.FMetrics[mmNestedIFDepth] := TBADIOptions.BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit;
-  FLimits.FMetrics[mmCyclometricComplexity] :=
-    TBADIOptions.BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit;
-  FLimits.FMetrics[mmToxicity] := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity].FLimit;
+  For eColumn := Succ(Low(TBADIMetricColumn)) To High(TBADIMetricColumn) Do
+    FLimits.FMetrics[MetricColumns[eColumn].FMetric] :=
+      TBADIOptions.BADIOptions.ModuleMetric[MetricColumns[eColumn].FMetric].FLimit;
   FLowThreshold := TBADIOptions.BADIOptions.LowMetricMargin / dblPercentageDivisor;
   FHighThreshold := TBADIOptions.BADIOptions.HighMetricMargin / dblPercentageDivisor;
 End;
@@ -794,12 +787,12 @@ End;
   @precon  None.
   @postcon The metric information for the given function is returned.
 
-  @param   NodeData  as a PBADIStatisticsRecord as a constant
+  @param   NodeData  as a PBADIMetricRecord as a constant
   @param   AFunction as a TGenericFunction as a constant
   @return  a TNodeResultRecord
 
 **)
-Function TframeBADIModuleMetricsEditorView.ProcessFunction(Const NodeData : PBADIStatisticsRecord;
+Function TframeBADIModuleMetricsEditorView.ProcessFunction(Const NodeData : PBADIMetricRecord;
   Const AFunction : TGenericFunction) : TNodeResultRecord;
 
   (**
@@ -823,42 +816,22 @@ Function TframeBADIModuleMetricsEditorView.ProcessFunction(Const NodeData : PBAD
       End;
   End;
   
-//Var
-//  E: TElementContainer;
+Var
+  eColumn: TBADIMetricColumn;
 
 Begin
   Result.Create(Nil);
   NodeData.FNodeType := ntMethod;
   NodeData.FMetrics[mmLongMethods] := 0;
   NodeData.FMetricOverrides := AFunction.MetricOverrides;
-  ProcessMetric(mmLongMethods);
-//  If AFunction.StmtCount > 0 Then
-//    NodeData.FLinesOfCode := AFunction.Metric[mmLongMethods];
-//  If Not (mmLongMethods In NodeData.FMetricOverrides) Then
-//    Begin
-//      Inc(Result.FIssueCount, Integer(NodeData.FLinesOfCode > FLimits.FLinesOfCode));
-//      Inc(NodeData.FIssueCount, Integer(NodeData.FLinesOfCode > FLimits.FLinesOfCode));
-//    End;
-  ProcessMetric(mmLongParameterLists);
-  ProcessMetric(mmLongMethodVariableLists);
-//  NodeData.FVariableCount := 0;
-//  E := AFunction.FindElement(strVarsLabel);
-//  If Assigned(E) Then
-//    NodeData.FVariableCount := E.ElementCount;
-//  If Not (mmLongMethodVariableLists In NodeData.FMetricOverrides) Then
-//    Begin
-//      Inc(Result.FIssueCount, Integer(NodeData.FVariableCount > FLimits.FVariableCount));
-//      Inc(NodeData.FIssueCount, Integer(NodeData.FVariableCount > FLimits.FVariableCount));
-//    End;
-  ProcessMetric(mmNestedIFDepth);
-  ProcessMetric(mmCyclometricComplexity);
-  ProcessMetric(mmToxicity);
+  For eColumn := Succ(Low(TBADIMetricColumn)) To High(TBADIMetricColumn) Do
+    ProcessMetric(MetricColumns[eColumn].FMetric);
   Inc(Result.FChildCount);
 End;
 
 (**
 
-  This method recursively walks the given container rendering its contents in the tree view. If the 
+  This method recursively walks the given container rendering its contents in the tree view. If the
   container is a generic function, metrics are extracted from the method and dislpayed. Any branches with
   out methods are pruned.
 
@@ -874,7 +847,7 @@ Function TframeBADIModuleMetricsEditorView.RecurseContainer(Const Container: TEl
   Const Parent: PVirtualNode): TNodeResultRecord;
 
 Var
-  NodeData: PBADIStatisticsRecord;
+  NodeData: PBADIMetricRecord;
   iElement: Integer;
   M: TGenericFunction;
 
@@ -927,7 +900,7 @@ Begin
       FFileName := Module.FileName;
       FVSTMetrics.BeginUpdate;
       Try
-        If sroClear In setRenderOptions Then
+        If mroClear In setRenderOptions Then
           FVSTMetrics.Clear
         Else
           DeleteExistingModuleNode(Module);
@@ -957,10 +930,10 @@ Procedure TframeBADIModuleMetricsEditorView.SortAndExpand(Const NodeResult : TNo
 
 Begin
   If Assigned(NodeResult.FNode) Then
-    If sroAutoExpand In setRenderOptions Then
+    If mroAutoExpand In setRenderOptions Then
       Begin
-        If ((sroAutoExpandOnError In setRenderOptions) And (NodeResult.FIssueCount > 0)) Or
-          Not (sroAutoExpandOnError In setRenderOptions) Then
+        If ((mroAutoExpandOnError In setRenderOptions) And (NodeResult.FIssueCount > 0)) Or
+          Not (mroAutoExpandOnError In setRenderOptions) Then
         FVSTMetrics.FullExpand(NodeResult.FNode);
       End;
 End;
@@ -1027,7 +1000,8 @@ Procedure TframeBADIModuleMetricsEditorView.UpdateStats;
 
 Var
   Node: PVirtualNode;
-  NodeData: PBADIStatisticsRecord;
+  NodeData: PBADIMetricRecord;
+  eColumn: TBADIMetricColumn;
 
 Begin
   FModuleCount := 0;
@@ -1046,13 +1020,9 @@ Begin
           Begin
             Inc(FMethodCount);
             Inc(FLinesOfCode, Trunc(NodeData.FMetrics[mmLongMethods]));
-            Update(NodeData.FMetrics[mmLongMethods], FLimits.FMetrics[mmLongMethods]);
-            Update(NodeData.FMetrics[mmLongParameterLists], FLimits.FMetrics[mmLongParameterLists]);
-            Update(NodeData.FMetrics[mmLongMethodVariableLists],
-              FLimits.FMetrics[mmLongMethodVariableLists]);
-            Update(NodeData.FMetrics[mmNestedIFDepth], FLimits.FMetrics[mmNestedIFDepth]);
-            Update(NodeData.FMetrics[mmCyclometricComplexity], FLimits.FMetrics[mmCyclometricComplexity]);
-            Update(NodeData.FMetrics[mmToxicity], FLimits.FMetrics[mmToxicity]);
+            For eColumn := Succ(Low(TBADIMetricColumn)) To High(TBADIMetricColumn) Do
+              Update(NodeData.FMetrics[MetricColumns[eColumn].FMetric],
+                FLimits.FMetrics[MetricColumns[eColumn].FMetric]);
           End;
       End;
       Node := FVSTMetrics.GetNext(Node);
@@ -1114,13 +1084,8 @@ Procedure TframeBADIModuleMetricsEditorView.vstStatisticsBeforeCellPaint(Sender:
       End;
   End;
 
-Const
-  MetricTranlation : Array[Low(TBADIMetricColumns)..High(TBADIMetricColumns)] Of TBADIModuleMetric = (
-    mmLongMethods, mmLongMethods, mmLongParameterLists, mmLongMethodVariableLists, mmNestedIFDepth,
-    mmCyclometricComplexity, mmToxicity);
-
 Var
-  NodeData: PBADIStatisticsRecord;
+  NodeData: PBADIMetricRecord;
 
 Begin
   NodeData := FVSTMetrics.GetNodeData(Node);
@@ -1129,7 +1094,7 @@ Begin
   If Assigned(FVSTMetrics.StyleServices) And FVSTMetrics.StyleServices.Enabled Then
     TargetCanvas.Brush.Color := FVSTMetrics.StyleServices.GetSystemColor(clWindow);
   {$ENDIF}
-  Case TBADIMetricColumns(Column) Of
+  Case TBADIMetricColumn(Column) Of
     mcLength: TargetCanvas.Brush.Color := Colour(NodeData.FMetrics[mmLongMethods],
       FLimits.FMetrics[mmLongMethods]);
     mcParameters: TargetCanvas.Brush.Color := Colour(NodeData.FMetrics[mmLongParameterLists],
@@ -1144,7 +1109,7 @@ Begin
       FLimits.FMetrics[mmToxicity]);
   End;
   If Column > 0 Then
-    If MetricTranlation[TBADIMetricColumns(Column)] In NodeData.FMetricOverrides Then
+    If MetricColumns[TBADIMetricColumn(Column)].FMetric In NodeData.FMetricOverrides Then
       TargetCanvas.Brush.Color := iLightAqua;
   TargetCanvas.FillRect(CellRect);
 End;
@@ -1184,7 +1149,7 @@ End;
 Procedure TframeBADIModuleMetricsEditorView.vstStatisticsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
 
 Var
-  NodeData : PBADIStatisticsRecord;
+  NodeData : PBADIMetricRecord;
   
 Begin
   NodeData := Sender.GetNodeData(Node);
@@ -1211,7 +1176,7 @@ Procedure TframeBADIModuleMetricsEditorView.vstStatisticsGetImageIndex(Sender: T
   Var ImageIndex: TImageIndex);
 
 Var
-  NodeData: PBADIStatisticsRecord;
+  NodeData: PBADIMetricRecord;
 
 Begin
   If Column = 0 Then
@@ -1240,12 +1205,12 @@ Procedure TframeBADIModuleMetricsEditorView.vstStatisticsGetText(Sender: TBaseVi
   Column: TColumnIndex; TextType: TVSTTextType; Var CellText: String);
 
 Var
-  NodeData: PBADIStatisticsRecord;
+  NodeData: PBADIMetricRecord;
 
 Begin
   NodeData := FVSTMetrics.GetNodeData(Node);
   CellText := '';
-  Case TBADIMetricColumns(Column) Of
+  Case TBADIMetricColumn(Column) Of
     mcText: CellText := NodeData.FText;
     mcLength:
       If NodeData.FMetrics[mmLongMethods] > 0 Then
@@ -1286,7 +1251,7 @@ Procedure TframeBADIModuleMetricsEditorView.vstStatisticsPaintText(Sender: TBase
   Const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 
 Var
-  NodeData : PBADIStatisticsRecord;
+  NodeData : PBADIMetricRecord;
   
 Begin
   TargetCanvas.Font.Style := [];
@@ -1295,7 +1260,7 @@ Begin
   If Assigned(FVSTMetrics.StyleServices) And FVSTMetrics.StyleServices.Enabled Then
     TargetCanvas.Font.Color := FVSTMetrics.StyleServices.GetSystemColor(clWindowText);
   {$ENDIF}
-  Case TBADIMetricColumns(Column) Of
+  Case TBADIMetricColumn(Column) Of
     mcLength..mcToxicity: TargetCanvas.Font.Color := clBlack;
   End;
   NodeData := FVSTMetrics.GetNodeData(Node);

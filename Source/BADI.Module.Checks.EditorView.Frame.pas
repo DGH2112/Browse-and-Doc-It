@@ -787,22 +787,25 @@ Var
 
 Begin
   For eColumn := Succ(Low(TBADICheckColumn)) To Pred(High(TBADICheckColumn)) Do
-    Begin
-      iCount := 0;
-      N := FVSTChecks.GetFirst();
-      While Assigned(N) Do
-        Begin
-          NodeData := FVSTChecks.GetNodeData(N);
-          Inc(iCount, Trunc(NodeData.FChecks[CheckColumns[eColumn].FCheck]));
-          N := FVSTChecks.GetNextSibling(N);
-        End;
-      If iCount = 0 Then
-        FVSTChecks.Header.Columns[Integer(eColumn)].Options :=
-          FVSTChecks.Header.Columns[Integer(eColumn)].Options - [coVisible]
-      Else
+    If doAutoHideChecksWithNoissues In TBADIOptions.BADIOptions.Options Then
+      Begin
+        iCount := 0;
+        N := FVSTChecks.GetFirst();
+        While Assigned(N) Do
+          Begin
+            NodeData := FVSTChecks.GetNodeData(N);
+            Inc(iCount, Trunc(NodeData.FChecks[CheckColumns[eColumn].FCheck]));
+            N := FVSTChecks.GetNextSibling(N);
+          End;
+        If iCount = 0 Then
+          FVSTChecks.Header.Columns[Integer(eColumn)].Options :=
+            FVSTChecks.Header.Columns[Integer(eColumn)].Options - [coVisible]
+        Else
+          FVSTChecks.Header.Columns[Integer(eColumn)].Options :=
+            FVSTChecks.Header.Columns[Integer(eColumn)].Options + [coVisible];
+      End Else
         FVSTChecks.Header.Columns[Integer(eColumn)].Options :=
           FVSTChecks.Header.Columns[Integer(eColumn)].Options + [coVisible];
-    End;
 End;
 
 (**

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    22 Dec 2017
+  @Date    28 Dec 2017
   
 **)
 Unit BADI.Module.Metrics.SubView;
@@ -182,8 +182,8 @@ Begin
           Module := TBADIDispatcher.BADIDispatcher.Dispatcher(strSource, SE.FileName, SE.Modified,
             [moParse]);
           Try
-            (AViewObject As TframeBADIModuleMetricsSubView).RenderModule(Module, [sroClear,
-              sroAutoExpand]);
+            (AViewObject As TframeBADIModuleMetricsSubView).RenderModule(Module, [mroClear,
+              mroAutoExpand]);
           Finally
             Module.Free;
           End;

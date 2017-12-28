@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    05 Nov 2017
+  @Date    28 Dec 2017
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -29,9 +29,14 @@ Uses
   Generics.Collections,
   BADI.CustomOptionsFrame,
   BADI.Types,
-  VirtualTrees;
+  VirtualTrees,
+  Themes, 
+  BADI.CustomVirtualStringTree;
 
 Type
+  (** A descentand class for the virtual string tree to prevent AVs in the 10.2.2. IDE durin theming. **)
+  TBADISpecialTagsOptionsVirtualStringTree = Class(TBADICustomVirtualStringTree);
+
   (** This is a class to represent the frame interface. **)
   TfmBADISpecialTagsFrame = Class(TFrame, IBADIOptionsFrame)
     btnDelete: TBitBtn;
@@ -39,7 +44,6 @@ Type
     btnMoveDown: TBitBtn;
     btnMoveUp: TBitBtn;
     btnAdd: TBitBtn;
-    vstSpecialTags: TVirtualStringTree;
     Procedure btnAddClick(Sender: TObject);
     Procedure btnDeleteClick(Sender: TObject);
     Procedure btnEditClick(Sender: TObject);
@@ -48,18 +52,20 @@ Type
     Procedure vstSpecialTagsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       TextType: TVSTTextType; Var CellText: String);
     Procedure vstSpecialTagsClick(Sender: TObject);
-    procedure vstSpecialTagsDblClick(Sender: TObject);
-    procedure vstSpecialTagsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
+    Procedure vstSpecialTagsDblClick(Sender: TObject);
+    Procedure vstSpecialTagsBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode; CellRect: TRect;
-      var ContentRect: TRect);
+      Var ContentRect: TRect);
     Procedure vstSpecialTagsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X,
       Y: Integer);
-    procedure vstSpecialTagsPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas;
+    Procedure vstSpecialTagsPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
-    FSpecialTags : TList<TBADISpecialTag>;
+    FSpecialTags    : TList<TBADISpecialTag>;
+    FVSTSpecialTags : TBADISpecialTagsOptionsVirtualStringTree;
   Strict Protected
     Procedure PopulateTreeView;
+    Procedure CreateVirtualStringTree;
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -78,7 +84,8 @@ Uses
   BADI.SpecialTagForm,
   BADI.Constants,
   BADI.OptionsForm,
-  BADI.Options;
+  BADI.Options,
+  ToolsAPI;
 
 Type
   (** A record to describe the data to be stoed in the treeview. **)
@@ -135,9 +142,9 @@ Var
   NodeData : PSpecialTagNodeData;
 
 Begin
-  If Assigned(vstSpecialTags.FocusedNode) Then
+  If Assigned(FVSTSpecialTags.FocusedNode) Then
     Begin
-      NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
+      NodeData := FVSTSpecialTags.GetNodeData(FVSTSpecialTags.FocusedNode);
       FSpecialTags.Delete(NodeData.FSpecialTagIndex);
       PopulateTreeView;
     End;
@@ -161,9 +168,9 @@ Var
   NodeData : PSpecialTagNodeData;
 
 Begin
-  If Assigned(vstSpecialTags.FocusedNode) Then
+  If Assigned(FVSTSpecialTags.FocusedNode) Then
     Begin
-      NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
+      NodeData := FVSTSpecialTags.GetNodeData(FVSTSpecialTags.FocusedNode);
       ST := FSpecialTags[NodeData.FSpecialTagIndex];
       If TfrmSpecialTag.Execute(ST) Then
         Begin
@@ -190,9 +197,9 @@ Var
   NodeData : PSpecialTagNodeData;
 
 Begin
-  If Assigned(vstSpecialTags.FocusedNode) Then
+  If Assigned(FVSTSpecialTags.FocusedNode) Then
     Begin
-      NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
+      NodeData := FVSTSpecialTags.GetNodeData(FVSTSpecialTags.FocusedNode);
       If NodeData.FSpecialTagIndex < FSpecialTags.Count - 1 Then
         Begin
           FSpecialTags.Exchange(NodeData.FSpecialTagIndex, NodeData.FSpecialTagIndex + 1);
@@ -218,9 +225,9 @@ Var
   NodeData : PSpecialTagNodeData;
 
 Begin
-  If Assigned(vstSpecialTags.FocusedNode) Then
+  If Assigned(FVSTSpecialTags.FocusedNode) Then
     Begin
-      NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
+      NodeData := FVSTSpecialTags.GetNodeData(FVSTSpecialTags.FocusedNode);
       If NodeData.FSpecialTagIndex > 0 Then
         Begin
           FSpecialTags.Exchange(NodeData.FSpecialTagIndex, NodeData.FSpecialTagIndex - 1);
@@ -236,7 +243,7 @@ End;
   @precon  None.
   @postcon Updates the status of the buttons on the form.
 
-  @nometric MissingCONSTInParam
+  @nocheck MissingCONSTInParam
   
   @param   AOwner as a TComponent
 
@@ -245,8 +252,87 @@ Constructor TfmBADISpecialTagsFrame.Create(AOwner: TComponent);
 
 Begin
   Inherited Create(AOwner);
+  CreateVirtualStringTree;
+  FVSTSpecialTags.NodeDataSize := SizeOf(TSpecialTagsNodeData);
   FSpecialTags := TList<TBADISpecialTag>.Create;
   PopulateTreeView;
+End;
+
+(**
+
+  This method creates a descendant of the TVirtualStringtree for displaying the special tags information.
+
+  @precon  None.
+  @postcon The treeview is created and displayed in the parent frame.
+
+  @nocheck HardCodedInteger HardCodedString
+  @nometric LongMethod Toxicity
+
+**)
+Procedure TfmBADISpecialTagsFrame.CreateVirtualStringTree;
+
+Var
+  C: TVirtualTreeColumn;
+
+Begin
+  FVSTSpecialTags := TBADISpecialTagsOptionsVirtualStringTree.Create(Self);
+  FVSTSpecialTags.Name := 'vstSpecialTags';
+  FVSTSpecialTags.Parent := Self;
+  FVSTSpecialTags.Left := 3;
+  FVSTSpecialTags.Top := 3;
+  FVSTSpecialTags.Width := 639;
+  FVSTSpecialTags.Height := 386;
+  FVSTSpecialTags.Anchors := [akLeft, akTop, akRight, akBottom];
+  FVSTSpecialTags.Header.Height := 20;
+  FVSTSpecialTags.TabOrder := 0;
+  FVSTSpecialTags.OnBeforeCellPaint := vstSpecialTagsBeforeCellPaint;
+  FVSTSpecialTags.OnClick := vstSpecialTagsClick;
+  FVSTSpecialTags.OnDblClick := vstSpecialTagsDblClick;
+  FVSTSpecialTags.OnGetText := vstSpecialTagsGetText;
+  FVSTSpecialTags.OnPaintText := vstSpecialTagsPaintText;
+  FVSTSpecialTags.OnMouseDown := vstSpecialTagsMouseDown;
+  C := FVSTSpecialTags.Header.Columns.Add;
+  C.Position := 0;
+  C.Style := vsOwnerDraw;
+  C.Width := 100;
+  C.Text := 'Tag Name';
+  C := FVSTSpecialTags.Header.Columns.Add;
+  C.MinWidth := 200;
+  C.Position := 1;
+  C.Style := vsOwnerDraw;
+  C.Width := 235;
+  C.Text := 'Tag Description';
+  C := FVSTSpecialTags.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 2;
+  C.Style := vsOwnerDraw;
+  C.Width := 60;
+  C.Text := 'Tree';
+  C := FVSTSpecialTags.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 3;
+  C.Style := vsOwnerDraw;
+  C.Width := 60;
+  C.Text := 'Expand';
+  C := FVSTSpecialTags.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 4;
+  C.Style := vsOwnerDraw;
+  C.Width := 60;
+  C.Text := 'Docs';
+  C := FVSTSpecialTags.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 5;
+  C.Style := vsOwnerDraw;
+  C.Width := 60;
+  C.Text := 'Fixed';
+  C := FVSTSpecialTags.Header.Columns.Add;
+  C.Alignment := taCenter;
+  C.Position := 6;
+  C.Style := vsOwnerDraw;
+  C.Width := 60;
+  C.Text := 'Syntax';
+  FVSTSpecialTags.Header.AutoSizeIndex := 1;
 End;
 
 (**
@@ -296,30 +382,30 @@ Var
   strSelectedNode: String;
 
 Begin
-  vstSpecialTags.BeginUpdate;
+  FVSTSpecialTags.BeginUpdate;
   Try
-    If Assigned(vstSpecialTags.FocusedNode) Then
-      strSelectedNode := vstSpecialTags.Text[vstSpecialTags.FocusedNode, 0];
-    vstSpecialTags.Clear;
+    If Assigned(FVSTSpecialTags.FocusedNode) Then
+      strSelectedNode := FVSTSpecialTags.Text[FVSTSpecialTags.FocusedNode, 0];
+    FVSTSpecialTags.Clear;
     For iSpecialTag := 0 To FSpecialTags.Count - 1 Do
       Begin
-        N := vstSpecialTags.AddChild(Nil);
-        NodeData := vstSpecialTags.GetNodeData(N);
+        N := FVSTSpecialTags.AddChild(Nil);
+        NodeData := FVSTSpecialTags.GetNodeData(N);
         NodeData.FSpecialTagIndex := iSpecialTag;
       End;
-    N := vstSpecialTags.GetFirst();
+    N := FVSTSpecialTags.GetFirst();
     While Assigned(N) Do
       Begin
-        If vstSpecialTags.Text[N, 0] = strSelectedNode Then
+        If FVSTSpecialTags.Text[N, 0] = strSelectedNode Then
           Begin
-            vstSpecialTags.FocusedNode := N;
-            vstSpecialTags.Selected[N] := True;
+            FVSTSpecialTags.FocusedNode := N;
+            FVSTSpecialTags.Selected[N] := True;
             Break;
           End;
-        N := vstSpecialTags.GetNext(N);
+        N := FVSTSpecialTags.GetNext(N);
       End;
   Finally
-    vstSpecialTags.EndUpdate;
+    FVSTSpecialTags.EndUpdate;
   End;
   vstSpecialTagsClick(Nil);
 End;
@@ -377,6 +463,10 @@ Begin
     ciSyntax:     TargetCanvas.Brush.Color := Colour[tpSyntax     In ST.FTagProperties];
   Else
     TargetCanvas.Brush.Color := clWindow;
+    {$IFDEF DXE102}
+    If Assigned(FVSTSpecialTags.StyleServices) And FVSTSpecialTags.StyleServices.Enabled Then
+      TargetCanvas.Brush.Color := FVSTSpecialTags.StyleServices.GetSystemColor(clWindow);
+    {$ENDIF}
     If ST.FBackColour <> clNone Then
       TargetCanvas.Brush.Color := ST.FBackColour;
   End;
@@ -399,14 +489,14 @@ Var
   NodeData : PSpecialTagNodeData;
   
 Begin
-  btnDelete.Enabled := Assigned(vstSpecialTags.FocusedNode);
-  btnEdit.Enabled := Assigned(vstSpecialTags.FocusedNode);
+  btnDelete.Enabled := Assigned(FVSTSpecialTags.FocusedNode);
+  btnEdit.Enabled := Assigned(FVSTSpecialTags.FocusedNode);
   NodeData := Nil;
-  If Assigned(vstSpecialTags.FocusedNode) Then
-    NodeData := vstSpecialTags.GetNodeData(vstSpecialTags.FocusedNode);
-  btnMoveDown.Enabled := Assigned(vstSpecialTags.FocusedNode) And Assigned(NodeData) And
+  If Assigned(FVSTSpecialTags.FocusedNode) Then
+    NodeData := FVSTSpecialTags.GetNodeData(FVSTSpecialTags.FocusedNode);
+  btnMoveDown.Enabled := Assigned(FVSTSpecialTags.FocusedNode) And Assigned(NodeData) And
     (NodeData.FSpecialTagIndex > -1) And (NodeData.FSpecialTagIndex < FSpecialTags.Count - 1);
-  btnMoveUp.Enabled := Assigned(vstSpecialTags.FocusedNode) And Assigned(NodeData) And
+  btnMoveUp.Enabled := Assigned(FVSTSpecialTags.FocusedNode) And Assigned(NodeData) And
     (NodeData.FSpecialTagIndex > 0);
 End;
 
@@ -508,10 +598,10 @@ Var
   ST: TBADISpecialTag;
   
 Begin
-  vstSpecialTags.GetHitTestInfoAt(X, Y, True, HitInfo);
+  FVSTSpecialTags.GetHitTestInfoAt(X, Y, True, HitInfo);
   If Assigned(HitInfo.HitNode) Then
     Begin
-      NodeData := vstSpecialTags.GetNodeData(HitInfo.HitNode);
+      NodeData := FVSTSpecialTags.GetNodeData(HitInfo.HitNode);
       ST := FSpecialTags[NodeData.FSpecialTagIndex];
       Case TColumnIndexes(HitInfo.HitColumn) Of
         ciShowInTree: ToggleSpecialTagProp(ST, tpShowInTree);
@@ -521,7 +611,7 @@ Begin
         ciSyntax:     ToggleSpecialTagProp(ST, tpSyntax);
       End;
       FSpecialTags[NodeData.FSpecialTagIndex] := ST;
-      vstSpecialTags.Invalidate;
+      FVSTSpecialTags.Invalidate;
     End;
 End;
 
@@ -551,8 +641,16 @@ Begin
   ST := FSpecialTags[NodeData.FSpecialTagIndex];
   TargetCanvas.Font.Style := ST.FFontStyles;
   TargetCanvas.Font.Color := clWindowText;
-  If ST.FFontColour <> clNone Then
-    TargetCanvas.Font.Color := ST.FFontColour;
+  Case TColumnIndexes(Column) Of
+    ciShowInTree..ciSyntax: TargetCanvas.Font.Color := clBlack;
+  Else
+    {$IFDEF DXE102}
+    If Assigned(FVSTSpecialTags.StyleServices) And FVSTSpecialTags.StyleServices.Enabled Then
+      TargetCanvas.Font.Color := FVSTSpecialTags.StyleServices.GetSystemColor(clWindowText);
+    {$ENDIF}
+    If ST.FFontColour <> clNone Then
+      TargetCanvas.Font.Color := ST.FFontColour;
+  End;
 End;
 
 End.

@@ -168,7 +168,6 @@ object frmDUnit: TfrmDUnit
     Width = 368
     Height = 215
     Anchors = [akLeft, akTop, akRight, akBottom]
-    CheckImageKind = ckXP
     Header.AutoSizeIndex = 0
     Header.DefaultHeight = 17
     Header.Font.Charset = DEFAULT_CHARSET
@@ -262,8 +261,6 @@ object frmDUnit: TfrmDUnit
       Align = alClient
       Caption = '&Class Name Mask'
       FocusControl = edtClassName
-      ExplicitWidth = 100
-      ExplicitHeight = 16
     end
     object lblMethodName: TLabel
       AlignWithMargins = True
@@ -276,8 +273,6 @@ object frmDUnit: TfrmDUnit
       Align = alClient
       Caption = 'Method Name &Mask'
       FocusControl = edtMethodName
-      ExplicitWidth = 112
-      ExplicitHeight = 16
     end
     object edtClassName: TEdit
       Left = 0
@@ -287,7 +282,6 @@ object frmDUnit: TfrmDUnit
       Align = alClient
       TabOrder = 0
       Text = 'edtClassName'
-      ExplicitHeight = 24
     end
     object edtMethodName: TEdit
       AlignWithMargins = True
@@ -301,7 +295,6 @@ object frmDUnit: TfrmDUnit
       Align = alClient
       TabOrder = 1
       Text = 'edtMethodName'
-      ExplicitHeight = 24
     end
   end
   object ilScopeImages: TImageList

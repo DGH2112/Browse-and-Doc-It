@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    30 Apr 2017
+  @Date    28 Dec 2017
 
 **)
 unit BADI.DUnitForm;
@@ -30,9 +30,6 @@ uses
   VirtualTrees,
   BADI.Base.Module,
   ImgList,
-  {$IFDEF DXE100}
-  ImageList,
-  {$ENDIF}
   ExtCtrls,
   BADI.ElementContainer;
 
@@ -63,22 +60,22 @@ type
     lblMethodName: TLabel;
     edtClassName: TEdit;
     edtMethodName: TEdit;
-    procedure rdoNewExistingProject(Sender: TObject);
-    procedure btnOKClick(Sender: TObject);
-    procedure rdoNewExistingUnit(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
+    Procedure rdoNewExistingProject(Sender: TObject);
+    Procedure btnOKClick(Sender: TObject);
+    Procedure rdoNewExistingUnit(Sender: TObject);
+    Procedure FormCreate(Sender: TObject);
     {$IFNDEF D2009}
-    procedure vstTestCasesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: WideString);
+    Procedure vstTestCasesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; Var CellText: WideString);
     {$ELSE}
-    procedure vstTestCasesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
+    Procedure vstTestCasesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; Var CellText: String);
     {$ENDIF}
-    procedure vstTestCasesGetImageIndex(Sender: TBaseVirtualTree;
+    Procedure vstTestCasesGetImageIndex(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-      var Ghosted: Boolean; var ImageIndex: Integer);
-    procedure FormDestroy(Sender: TObject);
-    procedure cbxExistingUnitChange(Sender: TObject);
+      Var Ghosted: Boolean; Var ImageIndex: Integer);
+    Procedure FormDestroy(Sender: TObject);
+    Procedure cbxExistingUnitChange(Sender: TObject);
   private
     { Private declarations }
     FDUnitCreator : TDUnitCreator;
@@ -87,23 +84,22 @@ type
     FTestCases : TStringList;
     FImplementedTests : TStringList;
     Procedure InitialiseTreeView;
-    Function AddNode(P : PVirtualNode; Element : TElementContainer) : PVirtualNode;
-    procedure RenderContainers(RootNode: PVirtualNode;
-      Container: TElementContainer);
+    Function AddNode(Const P: PVirtualNode; Const Element: TElementContainer): PVirtualNode;
+    Procedure RenderContainers(Const RootNode: PVirtualNode; Const Container: TElementContainer);
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure BuildTestCaseList;
-    Function AddUniqueName(slList : TStrings; Const strText : String) : String;
-    Procedure ErrorProc(Const strMsg : String);
+    Function AddUniqueName(Const slList: TStrings; Const strText: String): String;
+    Procedure ErrorProc(Const strMsg: String);
     Procedure CheckImplementedTests;
     Procedure UpdateImplementedTests;
-    Function  CanRenderContainer(Element : TElementContainer) : Boolean;
-    Function  NodeContainsMethods(Node : PVirtualNode) : Boolean;
-    Function  MaskClassName(Const strText : String) : String;
-    Function  MaskMethodName(Const strText : String) : String;
+    Function CanRenderContainer(Const Element: TElementContainer): Boolean;
+    Function NodeContainsMethods(Const Node: PVirtualNode): Boolean;
+    Function MaskClassName(Const strText: String): String;
+    Function MaskMethodName(Const strText: String): String;
   public
     { Public declarations }
-    Class Procedure Execute(objDUnitCreator : TDUnitCreator);
+    Class Procedure Execute(Const objDUnitCreator : TDUnitCreator);
   end;
 
 implementation
@@ -133,19 +129,17 @@ Type
 
 (**
 
-  This method adds a node (module element) to the virtual tree view with the
-  parent P.
+  This method adds a node (module element) to the virtual tree view with the parent P.
 
   @precon  P and Element must both be a valid instances.
-  @postcon Adds a node (module element) to the virtual tree view with the
-           parent P.
+  @postcon Adds a node (module element) to the virtual tree view with the parent P.
 
-  @param   P       as a PVirtualNode
-  @param   Element as a TElementContainer
+  @param   P       as a PVirtualNode as a constant
+  @param   Element as a TElementContainer as a constant
   @return  a PVirtualNode
 
 **)
-function TfrmDUnit.AddNode(P : PVirtualNode; Element : TElementContainer) : PVirtualNode;
+function TfrmDUnit.AddNode(Const P : PVirtualNode; Const Element : TElementContainer) : PVirtualNode;
 
 Var
   NodeData : ^TTreeData;
@@ -164,12 +158,12 @@ end;
   @precon  slList must be a valid string list .
   @postcon Ensures that a unique name is added to the string list .
 
-  @param   slList  as a TStrings
+  @param   slList  as a TStrings as a constant
   @param   strText as a String as a constant
   @return  a String
 
 **)
-Function TfrmDUnit.AddUniqueName(slList: TStrings; Const strText: String) : String;
+Function TfrmDUnit.AddUniqueName(Const slList: TStrings; Const strText: String) : String;
 
 Var
   iIndex: Integer;
@@ -318,15 +312,15 @@ end;
   This method returns true if the passed element can be rendered in the Dunit treeview.
 
   @precon  Element must be a valid instance.
-  @postcon returns true if the passed element can be rendered in the Dunit treeview (elements of
-           type TLabelContainer with Identifiers of 'methods', 'properties' or 'types' or other
-           elements which have publicly visible scope.).
+  @postcon returns true if the passed element can be rendered in the Dunit treeview (elements of type 
+           TLabelContainer with Identifiers of 'methods', 'properties' or 'types' or other elements 
+           which have publicly visible scope.).
 
-  @param   Element as a TElementContainer
+  @param   Element as a TElementContainer as a constant
   @return  a Boolean
 
 **)
-Function TfrmDUnit.CanRenderContainer(Element: TElementContainer): Boolean;
+Function TfrmDUnit.CanRenderContainer(Const Element: TElementContainer): Boolean;
 
 Begin
   Result := Element.Scope In [scPublic, scPublished, scNone, scGlobal];
@@ -432,16 +426,16 @@ End;
   @precon  None .
   @postcon Creates an instance of the Singleton class .
 
-  @param   objDUnitCreator as an TDUnitCreator
+  @param   objDUnitCreator as a TDUnitCreator as a constant
 
 **)
-Class Procedure TfrmDUnit.Execute(objDUnitCreator : TDUnitCreator);
+Class Procedure TfrmDUnit.Execute(Const objDUnitCreator : TDUnitCreator);
 
 var
   strUnitTobeTested: String;
 
 Begin
-  With TfrmDUnit.Create(Nil) Do
+  With TfrmDUnit.Create(Application.MainForm) Do
     Try
       objDUnitCreator.Errors := ErrorProc;
       FDUnitCreator := objDUnitCreator;
@@ -661,11 +655,11 @@ End;
   @precon  Node must be a valid instance.
   @postcon Returns true if the given node or any of its children are a method or property.
 
-  @param   Node as a PVirtualNode
+  @param   Node as a PVirtualNode as a constant
   @return  a Boolean
 
 **)
-Function TfrmDUnit.NodeContainsMethods(Node: PVirtualNode): Boolean;
+Function TfrmDUnit.NodeContainsMethods(Const Node: PVirtualNode): Boolean;
 
   (**
 
@@ -674,11 +668,11 @@ Function TfrmDUnit.NodeContainsMethods(Node: PVirtualNode): Boolean;
     @precon  N must be a valid instance.
     @postcon Returns true if the given node is either a TPascalMethod or a TPascalProperty.
 
-    @param   N as a PVirtualNode
+    @param   N as a PVirtualNode as a constant
     @return  a Boolean
 
   **)
-  Function IsMethodOrProperty(N : PVirtualNode) : Boolean;
+  Function IsMethodOrProperty(Const N : PVirtualNode) : Boolean;
 
   Var
     ND : ^TTreeData;
@@ -778,12 +772,11 @@ end;
   @precon  RootNode and Container must be valid instance.
   @postcon Recursively renders elements and their children.
 
-  @param   RootNode  as a PVirtualNode
-  @param   Container as a TElementContainer
+  @param   RootNode  as a PVirtualNode as a constant
+  @param   Container as a TElementContainer as a constant
 
 **)
-procedure TfrmDUnit.RenderContainers(RootNode : PVirtualNode;
-  Container: TElementContainer);
+procedure TfrmDUnit.RenderContainers(Const RootNode : PVirtualNode; Const Container: TElementContainer);
 
 Var
   i : Integer;
@@ -929,7 +922,8 @@ Var
 
 begin
   NodeData := vstTestCases.GetNodeData(Node);
-  ImageIndex := NodeData.Element.ImageIndexAdjustedForScope;
+  If Kind In [ikNormal, ikSelected] Then
+    ImageIndex := NodeData.Element.ImageIndexAdjustedForScope;
 end;
 
 (**

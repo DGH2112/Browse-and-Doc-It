@@ -32,7 +32,8 @@ type
     Function FirstWarning : String;
     Function FirstHint : String;
     Function FirstDocConflict : String;
-    Function FirstMetricAndCheck : String;
+    Function FirstCheck : String;
+    Function FirstMetric : String;
     Function DocConflict(Const iConflict : Integer) : String;
     Procedure DeleteDocumentConflicts;
     Function HeadingCount(Const strHeading : String) : Integer;
@@ -44,7 +45,7 @@ type
 
   TClassOfTGenericTypeDecl = Class Of TGenericTypeDecl;
 
-  TTestType = (ttErrors, ttWarnings, ttHints, ttDocConflicts, ttChecksAndMetrics);
+  TTestType = (ttErrors, ttWarnings, ttHints, ttDocConflicts, ttChecks, ttMetrics);
   TTestTypes = Set of TTestType;
 
   TExtendedTestCase = Class(TTestCase)
@@ -65,7 +66,8 @@ type
       Const iWarnings : Integer = 0;
       Const iHints : Integer = 0;
       Const iDocConflicts : Integer = 0;
-      Const iChecksAndMetrics : Integer = 0);
+      Const iChecks : Integer = 0;
+      Const iMetrics : Integer = 0);
   Published
   End;
 
@@ -244,14 +246,27 @@ begin
       #13#10, '(line-end)', [rfReplaceAll]);
 end;
 
-Function TElementContainerHelper.FirstMetricAndCheck: String;
+Function TElementContainerHelper.FirstCheck: String;
 
 Var
   E: TElementContainer;
 
 Begin
   Result := '';
-  E := FindElement(strMetricsAndChecks);
+  E := FindElement(strChecks);
+  If Assigned(E) Then
+    Result := StringReplace(Format('  [%s]', [E.Elements[1].Elements[1].AsString(True, False)]),
+      #13#10, '(line-end)', [rfReplaceAll]);
+End;
+
+Function TElementContainerHelper.FirstMetric: String;
+
+Var
+  E: TElementContainer;
+
+Begin
+  Result := '';
+  E := FindElement(strMetrics);
   If Assigned(E) Then
     Result := StringReplace(Format('  [%s]', [E.Elements[1].Elements[1].AsString(True, False)]),
       #13#10, '(line-end)', [rfReplaceAll]);
@@ -306,7 +321,8 @@ end;
 Procedure TExtendedTestCase.TestGrammarForErrors(Const Parser : TBaseLanguageModuleClass;
   Const strTemplate, strInterface, strImplementation: String; Const TestTypes : TTestTypes;
   Const strCheckValues : Array Of String; Const iErrors : Integer = 0; Const iWarnings : Integer = 0;
-  Const iHints : Integer = 0; Const iDocConflicts : Integer = 0; Const iChecksAndMetrics : Integer = 0);
+  Const iHints : Integer = 0; Const iDocConflicts : Integer = 0; Const iChecks : Integer = 0;
+  Const iMetrics : Integer = 0);
 
 Const
   cDelimiter : Char = '\';
@@ -360,9 +376,12 @@ Begin
     If ttDocConflicts In TestTypes Then
       CheckEquals(iDocConflicts, P.HeadingCount(strDocumentationConflicts), 'DOCCONFLICTS: ' +
         P.FirstDocConflict);
-    If ttChecksAndMetrics In TestTypes Then
-      CheckEquals(iChecksAndMetrics, P.HeadingCount(strMetricsAndChecks), 'CHECKSANDMETRICS: ' +
-        P.FirstMetricAndCheck);
+    If ttChecks In TestTypes Then
+      CheckEquals(iChecks, P.HeadingCount(strChecks), 'CHECKS: ' +
+        P.FirstCheck);
+    If ttMetrics In TestTypes Then
+      CheckEquals(iMetrics, P.HeadingCount(strMetrics), 'METRICS: ' +
+        P.FirstMetric);
     For iCheck := Low(strCheckValues) to High(strCheckValues) Do
       If strCheckValues[iCheck] <> '' Then
         Begin

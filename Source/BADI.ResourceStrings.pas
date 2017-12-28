@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Dec 2017
+  @Date    28 Dec 2017
 
 **)
 Unit BADI.ResourceStrings;
@@ -18,8 +18,18 @@ ResourceString
 
   (** An option group description for general options. **)
   strOptionGroupGeneral = 'General';
-  (** An option group description for Error, Warnings, Hint and Conflict options. **)
-  strOptionGroupErrorsWarningsHintsandConflicts = 'Errors, Warnings, Hints and Conflicts';
+  (** An option group description for Error options. **)
+  strOptionGroupErrors = 'Errors';
+  (** An option group description for Warnings options. **)
+  strOptionGroupWarnings = 'Warnings';
+  (** An option group description for Hint options. **)
+  strOptionGroupHints = 'Hints';
+  (** An option group description for Conflict options. **)
+  strOptionGroupConflicts = 'Conflicts';
+  (** An option group description for Check options. **)
+  strOptionGroupChecks = 'Checks';
+  (** An option group description for Metric options. **)
+  strOptionGroupMetrics = 'Metrics';
   (** An option group description for Type options. **)
   strOptionGroupTypes = 'Types';
   (** An option group description for Module options. **)
@@ -63,8 +73,10 @@ ResourceString
   strExpandHints = 'Automatically Expand Hints';
   (** Options text for automatically expanding documentation conflicts. **)
   strExpandDocConflicts = 'Automatically Expand Documentation Conflicts';
-  (** Options text for automatically expanding modules metrics and checks. **)
-  strExpandChecksAndMetrics = 'Automatically Expand Checks and Metrics';
+  (** Options text for automatically expanding modules checks. **)
+  strExpandChecks = 'Automatically Expand Checks';
+  (** Options text for automatically expanding modules metrics. **)
+  strExpandMetrics = 'Automatically Expand Metrics';
   (** Options text for Syntax Highlight Errors **)
   strSyntaxHighlightErrors = 'Syntax Highlight Module Errors';
   (** Options text for Syntax Highlight Warnings **)
@@ -73,8 +85,15 @@ ResourceString
   strSyntaxHighlightHints = 'Syntax Highlight Module Hints';
   (** Options text for Syntax Highlight Documentation Conflicts **)
   strSyntaxHighlightDocumentationConflicts = 'Syntax Highlight Documentation Conflicts';
-  (** Options text for Syntax Highlight Checks and Metrics **)
-  strSyntaxHighlightChecksAndMetrics = 'Syntax Highlight Checks and Metrics';
+  (** Options text for Syntax Highlight Checks **)
+  strSyntaxHighlightChecks = 'Syntax Highlight Checks';
+  (** Options text for Syntax Highlight Metrics **)
+  strSyntaxHighlightMetrics = 'Syntax Highlight Metrics';
+  (** Options text for auto hiding checks in the editoe views if they have no issues. **)
+  strAutoHideChecksWithNoIssues = 'Auto Hide Checks with no issues in the Editor Views';
+  (** Options text for auto hiding metrics in the editoe views if they have no issues. **)
+  strAutoHideMetricsWithNoIssues = 'Auto Hide Metrics with no issues in the Editor Views';
+  
   (** Options text for Show Missing Method Documentation **)
   strShowMissingMethodDocumentation = 'Show Missing Method Documentation';
   (** Options text for Show Missing Method Documentation Description **)
@@ -172,8 +191,10 @@ ResourceString
   strHints = 'Hints';
   (** Label for Documentation Conflicts **)
   strDocumentationConflicts = 'Documentation Conflicts';
-  (** Label for Metrics and Checks **)
-  strMetricsAndChecks = 'Metrics and Checks';
+  (** Label for Checks **)
+  strChecks = 'Checks';
+  (** Label for Metrics **)
+  strMetrics = 'Metrics';
   (** Label for Uses Clause **)
   strUses = 'Uses';
   (** Label for Types Clause **)
@@ -690,9 +711,6 @@ ResourceString
   (** A description for a tag to use syntax highlighting. **)
   strTagPropSyntax = 'Syntax Highlight the Tag';
 
-  (** A description for metrics. **)
-  strMetrics = 'Metrics';
-
   //
   // Metrics
   //
@@ -745,9 +763,6 @@ ResourceString
   //
   // Checks
   //
-  
-  (** A description for checks. **)
-  strChecks = 'Checks';
   
   (** A resource string for the Hard Coded Integers Category. **)
   strHardCodedIntegersCat = 'Hard Coded Integers';

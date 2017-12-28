@@ -1,0 +1,2 @@
+inherited frameBADIModuleChecksSubView: TframeBADIModuleChecksSubView
+end

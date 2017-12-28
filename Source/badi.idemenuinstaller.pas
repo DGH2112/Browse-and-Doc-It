@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    22 Dec 2017
+  @Date    28 Dec 2017
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -62,7 +62,8 @@ Type
     Procedure ProfilingClick(Sender: TObject);
     Procedure OptionsClick(Sender: TObject);
     Procedure ModuleExplorerClick(Sender: TObject);
-    Procedure StatisticsClick(Sender : TObject);
+    Procedure MetricsClick(Sender : TObject);
+    Procedure ChecksClick(Sender : TObject);
     Procedure CreateBADIMainMenu;
     Procedure RemoveActionsFromToolbars;
     Function  AddImagesToIDE : Integer;
@@ -109,7 +110,8 @@ Uses
   BADI.Constants, 
   BADI.Base.Documentation, 
   BADI.Refactor.Constant, 
-  BADI.Module.Metrics;
+  BADI.Module.Metrics, 
+  BADI.Module.Checks;
 
 ResourceString
   (** This is a resource message to confirm whether the selected text should be
@@ -191,6 +193,22 @@ End;
 
 (**
 
+  This is an on action event handler for the BADI Checks project editor view.
+
+  @precon  None.
+  @postcon Displays the editor view of module/method checks.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBADIIDEMenuInstaller.ChecksClick(Sender: TObject);
+
+Begin
+  TBADIModuleChecksEditorView.CreateEditorView; 
+End;
+
+(**
+
   A constructor for the TBADIIDEMenuInstaller class.
 
   @precon  None.
@@ -235,7 +253,9 @@ Begin
   Inc(iImageIndex);
   CreateMenuItem(FBADIMenu, bmRefactorConstant, RefactorConstantClick, Nil, iImageIndex);
   Inc(iImageIndex);
-  CreateMenuItem(FBADIMenu, bmBADIStatistics, StatisticsClick, Nil, iImageIndex);
+  CreateMenuItem(FBADIMenu, bmBADIMetrics, MetricsClick, Nil, iImageIndex);
+  Inc(iImageIndex);
+  CreateMenuItem(FBADIMenu, bmBADIChecks, ChecksClick, Nil, iImageIndex);
   CreateMenuItem(FBADIMenu, bmSep3, Nil, Nil, 0);
   Inc(iImageIndex);
   CreateMenuItem(FBADIMenu, bmOptions, OptionsClick, Nil, iImageIndex);
@@ -864,6 +884,22 @@ Begin
     Finally
       Module.Free;
     End;
+End;
+
+(**
+
+  This method displays the module statistics for the currentl visible module.
+
+  @precon  None.
+  @postcon The modulel statistics are displays with the current modules information.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TBADIIDEMenuInstaller.MetricsClick(Sender: TObject);
+
+Begin
+  TBADIModuleMetricsEditorView.CreateEditorView; 
 End;
 
 (**
@@ -1554,22 +1590,6 @@ Begin
             End;
         End;
     End;
-End;
-
-(**
-
-  This method displays the module statistics for the currentl visible module.
-
-  @precon  None.
-  @postcon The modulel statistics are displays with the current modules information.
-
-  @param   Sender as a TObject
-
-**)
-Procedure TBADIIDEMenuInstaller.StatisticsClick(Sender: TObject);
-
-Begin
-  TBADIModuleMetricsEditorView.CreateEditorView; 
 End;
 
 (**

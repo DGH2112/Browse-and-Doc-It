@@ -39,7 +39,12 @@ Const
   (** A constant array to define the module explorer option groups. **)
   DocOptionGroups : Array[Low(TDOcOptionGroup)..High(TDOcOptionGroup)] Of String = (
     strOptionGroupGeneral,
-    strOptionGroupErrorsWarningsHintsandConflicts,
+    strOptionGroupErrors,
+    strOptionGroupWarnings,
+    strOptionGroupHints,
+    strOptionGroupConflicts,
+    strOptionGroupChecks,
+    strOptionGroupMetrics,
     strOptionGroupTypes,
     strOptionGroupModule,
     strOptionGroupMethods,
@@ -52,24 +57,34 @@ Const
   DocOptionInfo : Array[Low(TDocOption)..High(TDocOption)] Of TDocOptionRec = (
     (FDescription : strDrawSynHighModuleExplorer;             FEnabled : False; FGroup: dogGeneral),
     (FDescription : strShowCommentsInTheHints;                FEnabled : False; FGroup: dogGeneral),
+    (FDescription : strShowChildCountinTitles;                FEnabled : False; FGroup: dogGeneral),
 
-    (FDescription : strShowErrors;                            FEnabled : True;  FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strShowWarnings;                          FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strShowHints;                             FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strShowDocumentationConflicts;            FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strShowModuleChecks;                      FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strShowModuleMetrics;                     FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strShowChildCountinTitles;                FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strExpandErrors;                          FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strExpandWarnings;                        FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strExpandHints;                           FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strExpandDocConflicts;                    FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strExpandChecksAndMetrics;                FEnabled:   True; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strSyntaxHighlightErrors;                 FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strSyntaxHighlightWarnings;               FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strSyntaxHighlightHints;                  FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strSyntaxHighlightDocumentationConflicts; FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
-    (FDescription : strSyntaxHighlightChecksAndMetrics;       FEnabled : False; FGroup: dogErrorsWarningsHintsAndConflicts),
+    (FDescription : strShowErrors;                            FEnabled : True;  FGroup: dogErrors),
+    (FDescription : strExpandErrors;                          FEnabled:   True; FGroup: dogErrors),
+    (FDescription : strSyntaxHighlightErrors;                 FEnabled : False; FGroup: dogErrors),
+
+    (FDescription : strShowWarnings;                          FEnabled : False; FGroup: dogWarnings),
+    (FDescription : strExpandWarnings;                        FEnabled:   True; FGroup: dogWarnings),
+    (FDescription : strSyntaxHighlightWarnings;               FEnabled : False; FGroup: dogWarnings),
+
+    (FDescription : strShowHints;                             FEnabled : False; FGroup: dogHints),
+    (FDescription : strExpandHints;                           FEnabled:   True; FGroup: dogHints),
+    (FDescription : strSyntaxHighlightHints;                  FEnabled : False; FGroup: dogHints),
+
+    (FDescription : strShowDocumentationConflicts;            FEnabled : False; FGroup: dogConflicts),
+    (FDescription : strExpandDocConflicts;                    FEnabled:   True; FGroup: dogConflicts),
+    (FDescription : strSyntaxHighlightDocumentationConflicts; FEnabled : False; FGroup: dogConflicts),
+
+    (FDescription : strShowModuleChecks;                      FEnabled : False; FGroup: dogChecks),
+    (FDescription : strExpandChecks;                          FEnabled:   True; FGroup: dogChecks),
+    (FDescription : strSyntaxHighlightChecks;                 FEnabled : False; FGroup: dogChecks),
+    (FDescription : strAutoHideChecksWithNoIssues;            FEnabled : False; FGroup: dogChecks),
+
+    (FDescription : strShowModuleMetrics;                     FEnabled : False; FGroup: dogMetrics),
+    (FDescription : strExpandMetrics;                         FEnabled:   True; FGroup: dogMetrics),
+    (FDescription : strSyntaxHighlightMetrics;                FEnabled : False; FGroup: dogMetrics),
+    (FDescription : strAutoHideMetricsWithNoIssues;           FEnabled : False; FGroup: dogMetrics),
+
 
 
     (FDescription : strShowUndocumentedTypes;                 FEnabled : False; FGroup: dogTypes),

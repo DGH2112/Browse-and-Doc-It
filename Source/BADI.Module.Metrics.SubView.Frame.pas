@@ -6,7 +6,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    21 Dec 2017
+  @Date    27 Dec 2017
   
 **)
 Unit BADI.Module.Metrics.SubView.Frame;
@@ -14,19 +14,18 @@ Unit BADI.Module.Metrics.SubView.Frame;
 Interface
 
 Uses
-  Winapi.Windows,
-  Winapi.Messages,
-  System.SysUtils,
-  System.Variants,
-  System.Classes,
-  Vcl.Graphics,
-  Vcl.Controls,
-  Vcl.Forms,
-  Vcl.Dialogs,
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
   BADI.Module.Metrics.EditorView.Frame,
-  Vcl.ExtCtrls,
-  System.ImageList,
-  Vcl.ImgList,
+  ExtCtrls,
+  ImgList,
   VirtualTrees,
   Actions,
   ActnList,

@@ -7042,9 +7042,9 @@ Begin
     '    Write;'#13#10 +
     '  Until True;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7053,9 +7053,9 @@ Begin
     'Procedure MyProc;'#13#10 +
     'Begin'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7064,18 +7064,18 @@ Begin
     'Begin'#13#10 +
     'End;',
     'WriteLN;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
     strProgram,
     '',
     '',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7094,9 +7094,9 @@ Begin
     '    WriteLn();'#13#10 +
     '  End;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7110,9 +7110,9 @@ Begin
     '    WriteLn();'#13#10 +
     '  End;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7126,9 +7126,9 @@ Begin
     '  End;'#13#10 +
     'End;',
     '  WriteLn();', 
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7139,9 +7139,9 @@ Begin
     '  Else'#13#10 +
     '    WriteLn();'#13#10 +
     '  End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 
   TestGrammarForErrors(
@@ -7156,9 +7156,9 @@ Begin
     '    WriteLn();'#13#10 +
     '  End;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7172,9 +7172,9 @@ Begin
     ''#13#10 +
     '  End;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7188,9 +7188,9 @@ Begin
     '  End;'#13#10 +
     'End;',
     '  WriteLn();', 
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7201,9 +7201,9 @@ Begin
     '  Else'#13#10 +
     ''#13#10 +
     '  End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7221,9 +7221,9 @@ Begin
     '  Else'#13#10 +
     '    WriteLn();'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7235,9 +7235,9 @@ Begin
     '    WriteLn()'#13#10 +
     '  Else'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7249,9 +7249,9 @@ Begin
     '  Else'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7260,9 +7260,9 @@ Begin
     '  If True Then'#13#10 +
     '    WriteLn()'#13#10 +
     '  Else'#13#10,
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7281,9 +7281,9 @@ Begin
     '    WriteLn();'#13#10 +
     '  End;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7296,9 +7296,9 @@ Begin
     '  Except'#13#10 +
     '  End;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7311,9 +7311,9 @@ Begin
     '  End;'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7323,9 +7323,9 @@ Begin
     '    WriteLn();'#13#10 +
     '  Except'#13#10 +
     '  End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7339,9 +7339,9 @@ Begin
     'Initialization'#13#10 +
     'Finalization'#13#10 +
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7349,9 +7349,9 @@ Begin
     '',
     'Initialization'#13#10 +
     'Finalization',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 2
+    0, 0, 0, 0, 2, 0
   );
 End;
 
@@ -7370,9 +7370,9 @@ Begin
     '    WriteLn();'#13#10 +
     '  End;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7385,9 +7385,9 @@ Begin
     '  Finally'#13#10 +
     '  End;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7400,9 +7400,9 @@ Begin
     '  End;'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7412,9 +7412,9 @@ Begin
     '    WriteLn();'#13#10 +
     '  Finally'#13#10 +
     '  End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7430,9 +7430,9 @@ Begin
     '  For i := 0 To 10 Do'#13#10 +
     '  Write;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7442,9 +7442,9 @@ Begin
     'Begin'#13#10 +
     '  For i := 0 To 10 Do'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7454,18 +7454,18 @@ Begin
     '  For i := 0 To 10 Do'#13#10 +
     'End;',
     'WriteLN;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
     strProgram,
     '',
     '  For i := 0 To 10 Do',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7478,9 +7478,9 @@ Begin
     '',
     'Initialization'#13#10 +
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7488,9 +7488,9 @@ Begin
     '',
     'Initialization'#13#10 +
     '',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7507,9 +7507,9 @@ Begin
     '    Write;'#13#10 +
     '  Until True;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7518,9 +7518,9 @@ Begin
     'Procedure MyProc;'#13#10 +
     'Begin'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7529,18 +7529,18 @@ Begin
     'Begin'#13#10 +
     'End;',
     'WriteLN;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
     strProgram,
     '',
     '',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7557,9 +7557,9 @@ Begin
     '    Write;'#13#10 +
     '  Until True;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7570,9 +7570,9 @@ Begin
     '  Repeat'#13#10 +
     '  Until True;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7583,9 +7583,9 @@ Begin
     '  Until True;'#13#10 +
     'End;',
     'WriteLN;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7593,9 +7593,9 @@ Begin
     '',
     '  Repeat'#13#10 +
     '  Until True;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7611,9 +7611,9 @@ Begin
     '  If True Then'#13#10 +
     '    WriteLn();'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7623,9 +7623,9 @@ Begin
     'Begin'#13#10 +
     '  If True Then'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7635,18 +7635,18 @@ Begin
     '  If True Then'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
     strProgram,
     '',
     '  If True Then',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7662,9 +7662,9 @@ Begin
     '  While True Do'#13#10 +
     '    Write;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7674,9 +7674,9 @@ Begin
     'Begin'#13#10 +
     '  While True Do'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7686,18 +7686,18 @@ Begin
     '  While True Do'#13#10 +
     'End;',
     'WriteLN;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
     strProgram,
     '',
     '  While True Do',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7717,9 +7717,9 @@ Begin
     '      WriteLn();'#13#10 +
     '  End;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7734,9 +7734,9 @@ Begin
     '      WriteLn();'#13#10 +
     '  End;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7751,9 +7751,9 @@ Begin
     '  End;'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7765,9 +7765,9 @@ Begin
     '    On E : Exception Do'#13#10 +
     '      WriteLn();'#13#10 +
     '  End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -7782,7 +7782,7 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     []
     );
   TestGrammarForErrors(
@@ -7793,9 +7793,9 @@ Begin
     'Begin'#13#10 +
     '  WriteLn(2);'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
   TestGrammarForErrors(
     TPascalModule,
@@ -7805,18 +7805,18 @@ Begin
     '  WriteLn(2);'#13#10 +
     'End;',
     '  WriteLN();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
   TestGrammarForErrors(
     TPascalModule,
     strProgram,
     '',
     '  WriteLn(2);',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
 End;
 
@@ -7831,7 +7831,7 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     []
     );
   TestGrammarForErrors(
@@ -7842,9 +7842,9 @@ Begin
     'Begin'#13#10 +
     '  WriteLn(1.0);'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
   TestGrammarForErrors(
     TPascalModule,
@@ -7854,18 +7854,18 @@ Begin
     '  WriteLn(1.0);'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
   TestGrammarForErrors(
     TPascalModule,
     strProgram,
     '',
     '  WriteLn(1.0);',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
 End;
 
@@ -7880,7 +7880,7 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     []
     );
   TestGrammarForErrors(
@@ -7891,9 +7891,9 @@ Begin
     'Begin'#13#10 +
     '  WriteLn(''Hello'');'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
   TestGrammarForErrors(
     TPascalModule,
@@ -7903,18 +7903,18 @@ Begin
     '  WriteLn(''Hello'');'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
   TestGrammarForErrors(
     TPascalModule,
     strProgram,
     '',
     '  WriteLn(''Hello'');',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
 End;
 
@@ -7963,7 +7963,7 @@ Begin
     ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
     ''#13#10#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     []
   );
   TestGrammarForErrors(
@@ -7978,9 +7978,9 @@ Begin
     ''#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10#13#10 +
     ''#13#10#13#10#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -7994,9 +7994,9 @@ Begin
     ''#13#10#13#10#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
   );
   R.FLimit := 1.0;
   TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
@@ -8019,7 +8019,7 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     []
   );
   TestGrammarForErrors(
@@ -8030,9 +8030,9 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -8042,9 +8042,9 @@ Begin
     '  WriteLn;'#13#10 +
     'End;',
     'WriteLn();', 
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
   );
   R.FLimit := 1.0;
   TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
@@ -8068,7 +8068,7 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     []
     );
   TestGrammarForErrors(
@@ -8080,9 +8080,9 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
     );
   TestGrammarForErrors(
     TPascalModule,
@@ -8093,9 +8093,9 @@ Begin
     '  WriteLn;'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
     );
   R.FLimit := 1.0;
   TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
@@ -8123,9 +8123,9 @@ Begin
     '  If True Or False Then'#13#10 +
     '    WriteLn();'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -8142,9 +8142,9 @@ Begin
     '  If True Or False Then'#13#10 +
     '    WriteLn();'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -8161,9 +8161,9 @@ Begin
     '    WriteLn();'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
   );
 //  TestGrammarForErrors(
 //    TPascalModule,
@@ -8196,9 +8196,9 @@ Begin
     'Begin'#13#10 +
     '  WriteLn();'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -8210,9 +8210,9 @@ Begin
     '  If True Then'#13#10 +
     '    WriteLn();'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -8224,9 +8224,9 @@ Begin
     '    WriteLn();'#13#10 +
     'End;',
     '  WriteLN();', 
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
   );
 End;
 
@@ -8241,9 +8241,9 @@ Begin
     'Begin'#13#10 +
     '  WriteLn();'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -8253,9 +8253,9 @@ Begin
     'Begin'#13#10 +
     '  WriteLn();'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -8265,9 +8265,9 @@ Begin
     '  WriteLn();'#13#10 +
     'End;',
     '  WriteLN();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
   );
 End;
 
@@ -8293,9 +8293,9 @@ Begin
     '          If E Then'#13#10 +
     '            WriteLn();'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -8311,9 +8311,9 @@ Begin
     '            IF F Then'#13#10 +
     '              WriteLn();'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
   );
   TestGrammarForErrors(
     TPascalModule,
@@ -8329,9 +8329,9 @@ Begin
     '              WriteLn();'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 0, 1
   );
   R.FLimit := 1.0;
   TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
@@ -8420,7 +8420,7 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     []
     );
   TestGrammarForErrors(
@@ -8436,9 +8436,9 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
   TestGrammarForErrors(
     TPascalModule,
@@ -8452,9 +8452,9 @@ Begin
     '  WriteLn;'#13#10 +
     'End;',
     '  WriteLn();', 
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
 End;
 
@@ -8469,7 +8469,7 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     []
     );
   TestGrammarForErrors(
@@ -8482,9 +8482,9 @@ Begin
     '  WriteLn(s);'#13#10 +
     '  GOTO ERRHND;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
   TestGrammarForErrors(
     TPascalModule,
@@ -8496,9 +8496,9 @@ Begin
     '  GOTO ERRHND;'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
 End;
 
@@ -8513,7 +8513,7 @@ Begin
     'Begin'#13#10 +
     '  WriteLn;'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     []
     );
   TestGrammarForErrors(
@@ -8525,9 +8525,9 @@ Begin
     'Begin'#13#10 +
     '  With X Do WriteLn(s);'#13#10 +
     'End;',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
   TestGrammarForErrors(
     TPascalModule,
@@ -8538,9 +8538,9 @@ Begin
     '  With X Do WriteLn(s);'#13#10 +
     'End;',
     '  WriteLn();',
-    [ttErrors, ttWarnings, ttChecksAndMetrics],
+    [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
-    0, 0, 0, 0, 1
+    0, 0, 0, 0, 1, 0
     );
 End;
 

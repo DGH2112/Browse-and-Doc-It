@@ -21,8 +21,11 @@ Uses
   Classes, 
   BADI.Module.Metrics.EditorView.Frame, 
   BADI.Base.Module,
-  Generics.Collections;
+  Generics.Collections,
+  Themes;
    
+{$INCLUDE CompilerDefinitions.inc}
+
 Type
   (** A class to implement an editor view for displaying module metrics. @nometrics MissingCONSTInParam **)
   TBADIModuleMetricsEditorView = Class(TInterfacedObject, INTACustomEditorView, INTACustomEditorView150,
@@ -149,9 +152,9 @@ Uses
 
 Const
   (** A unique name for the editor view. **)
-  strBADIStatisticEditorView = 'BADIStatisticEditorView';
+  strBADIMetricsEditorView = 'BADIMetricsEditorView';
   (** A caption for the editor view. **)
-  strBADIStatistics = 'BADI Statistics';
+  strBADIMetrics = 'BADI Metrics';
   (** A default edit window name if one cannot be determined. **)
   strUnknown = 'Unknown';
 
@@ -187,7 +190,7 @@ Var
   
 Begin
   If Supports(BorlandIDEServices, IOTAEditorViewServices, EVS) Then
-    EVS.RegisterEditorView(strBADIStatisticEditorView, RecreateBADIStatisticEditorView);
+    EVS.RegisterEditorView(strBADIMetricsEditorView, RecreateBADIStatisticEditorView);
 End;
 
 (**
@@ -205,7 +208,7 @@ Var
   
 Begin
   If Supports(BorlandIDEServices, IOTAEditorViewServices, EVS) Then
-    EVS.UnregisterEditorView(strBADIStatisticEditorView);
+    EVS.UnregisterEditorView(strBADIMetricsEditorView);
 End;
 
 { TBADIFileUpdateManager }
@@ -576,7 +579,7 @@ Begin
         Try
           BM.LoadFromResourceName(HInstance, strBADIStatisticsImage);
           ImageList.AddMasked(BM, clLime);
-          FImageIndex := EVS.AddImages(ImageList, strBADIStatisticEditorView);
+          FImageIndex := EVS.AddImages(ImageList, strBADIMetricsEditorView);
         Finally
           BM.Free;
         End;
@@ -675,7 +678,6 @@ End;
   @postcon Draw each panel with a blue number and black bold text.
 
   @nocheck MissingCONSTInParam
-  @nometric Toxicity
   
   @param   StatusBar as a TStatusBar
   @param   Panel     as a TStatusPanel
@@ -684,59 +686,128 @@ End;
 **)
 Procedure TBADIModuleMetricsEditorView.DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; Const Rect: TRect);
 
-Const
-  iDivisor = 2;
+  (**
+
+    This method renders the background of the status bar panel.
+
+    @precon  StyleServices must be a valid instance or Nil.
+    @postcon The background of the status panel is rendered.
+
+    @param   strNum        as a String as a constant
+    @param   StyleServices as a TCustomStyleServices as a constant
+
+  **)
+  Procedure DrawBackground(Const strNum : String; Const StyleServices : TCustomStyleServices);
+
+  Var
+    iColour : TColor;
+
+  Begin
+    If TBADIMetricStatusPanel(Panel.Index) In [mspModules..mspLinesOfCode] Then
+      Begin
+        iColour := clBtnFace;
+        If Assigned(StyleServices) Then
+          iColour := StyleServices.GetSystemColor(clBtnFace);
+      End Else
+        iColour := iLightGreen;
+    If strNum <> '' Then
+      Case TBADIMetricStatusPanel(Panel.Index) Of
+        mspAtLimit:
+          If StrToInt(strNum) > 0 Then
+            iColour := iLightAmber;
+        mspOverLimit:
+          If StrToInt(strNum) > 0 Then
+            iColour := iLightRed;
+      End;
+    StatusBar.Canvas.Brush.Color := iColour;
+    StatusBar.Canvas.FillRect(Rect);
+  End;
+
+  (**
+
+    This width of the text in the status panel is calulated.
+
+    @precon  None.
+    @postcon The width of the text in the status panel is returned taking into account the font styles.
+
+    @param   strNum   as a String as a constant
+    @param   strSpace as a String as a constant
+    @param   strText  as a String as a constant
+    @return  an Integer
+
+  **)
+  Function CalcWidth(Const strNum, strSpace, strText : String) : Integer;
+
+  Begin  
+    StatusBar.Canvas.Font.Style := [];
+    Result := StatusBar.Canvas.TextWidth(strNum);
+    Inc(Result, StatusBar.Canvas.TextWidth(strSpace));
+    StatusBar.Canvas.Font.Style := [fsBold];
+    Inc(Result, StatusBar.Canvas.TextWidth(strText));
+  End;
+  
+  (**
+
+    This method renders the text on the status panel.
+
+    @precon  StyleServeices must be a valid instance of Nil.
+    @postcon The text of the status bar is rendered.
+
+    @param   strNum        as a String as a reference
+    @param   strSpace      as a String as a reference
+    @param   strText       as a String as a reference
+    @param   iWidth        as an Integer as a constant
+    @param   StyleServices as a TCustomStyleServices as a constant
+
+  **)
+  Procedure DrawText(Var strNum, strSpace, strText : String; Const iWidth : Integer;
+    Const StyleServices : TCustomStyleServices);
+
+  Const
+    iDivisor = 2;
+
+  Var
+    R : TRect;
+    
+  Begin
+    R := Rect;
+    Inc(R.Left, (R.Right - R.Left - iWidth) Div iDivisor);
+    Inc(R.Top);
+    StatusBar.Canvas.Font.Color := clBlue; //: @todo Fix when the IDE is fixed.
+    StatusBar.Canvas.Font.Style := [];
+    StatusBar.Canvas.TextRect(R, strNum, [tfLeft, tfVerticalCenter]);
+    Inc(R.Left, StatusBar.Canvas.TextWidth(strNum));
+    StatusBar.Canvas.TextRect(R, strSpace, [tfLeft, tfVerticalCenter]);
+    StatusBar.Canvas.Font.Color := clWindowText;
+    If Assigned(StyleServices) Then
+      StatusBar.Canvas.Font.Color := StyleServices.GetSystemColor(clWindowText);
+    StatusBar.Canvas.Font.Style := [fsBold];
+    Inc(R.Left, StatusBar.Canvas.TextWidth(strSpace));
+    StatusBar.Canvas.TextRect(R, strText, [tfLeft, tfVerticalCenter]);
+  End;
 
 Var
   strNum, strSpace, strText : String;
   iPos : Integer;
-  iWidth : Integer;
-  R : TRect;
-  iColour : TColor;
+  StyleServices : TCustomStyleServices;
+  {$IFDEF DXE102}
+  ITS : IOTAIDEThemingServices;
+  {$ENDIF}
   
 Begin
+  StyleServices := Nil;
+  {$IFDEF DXE102}
+  If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
+    If ITS.IDEThemingEnabled Then
+      StyleServices := ITS.StyleServices;
+  {$ENDIF}
   // Split text by first space
   iPos := Pos(#32, Panel.Text);
   strNum := Copy(Panel.Text, 1, Pred(iPos));
   strSpace := #32;
   strText := Copy(Panel.Text, Succ(iPos), Length(Panel.Text) - iPos);
-  // Draw background
-  If TBADIMetricStatusPanel(Panel.Index) In [mspModules..mspLinesOfCode] Then
-    iColour := clBtnFace
-  Else
-    iColour := iLightGreen;
-  If strNum <> '' Then
-    Case TBADIMetricStatusPanel(Panel.Index) Of
-      mspAtLimit:
-        If StrToInt(strNum) > 0 Then
-          iColour := iLightAmber;
-      mspOverLimit:
-        If StrToInt(strNum) > 0 Then
-          iColour := iLightRed;
-    End;
-  StatusBar.Canvas.Brush.Color := iColour;
-  StatusBar.Canvas.FillRect(Rect);
-  // Get width of overall text so we can centre
-  StatusBar.Canvas.Font.Color := clBlue;
-  StatusBar.Canvas.Font.Style := [];
-  iWidth := StatusBar.Canvas.TextWidth(strNum);
-  Inc(iWidth, StatusBar.Canvas.TextWidth(strSpace));
-  StatusBar.Canvas.Font.Color := clBlack;
-  StatusBar.Canvas.Font.Style := [fsBold];
-  Inc(iWidth, StatusBar.Canvas.TextWidth(strText));
-  // Draw each bit of text
-  R := Rect;
-  Inc(R.Left, (R.Right - R.Left - iWidth) Div iDivisor);
-  Inc(R.Top);
-  StatusBar.Canvas.Font.Color := clBlue;
-  StatusBar.Canvas.Font.Style := [];
-  StatusBar.Canvas.TextRect(R, strNum, [tfLeft, tfVerticalCenter]);
-  Inc(R.Left, StatusBar.Canvas.TextWidth(strNum));
-  StatusBar.Canvas.TextRect(R, strSpace, [tfLeft, tfVerticalCenter]);
-  StatusBar.Canvas.Font.Color := clBlack;
-  StatusBar.Canvas.Font.Style := [fsBold];
-  Inc(R.Left, StatusBar.Canvas.TextWidth(strSpace));
-  StatusBar.Canvas.TextRect(R, strText, [tfLeft, tfVerticalCenter]);
+  DrawBackground(strNum, StyleServices);
+  DrawText(strNum, strSpace, strText, CalcWidth(strNum, strSpace, strText), StyleServices);
 End;
 
 (**
@@ -904,7 +975,7 @@ Begin
   If FCount Mod iDivisor = 0 Then
     Result := strMetrics
   Else
-    Result := strBADIStatistics;
+    Result := strBADIMetrics;
 End;
 
 (**
@@ -921,7 +992,7 @@ End;
 Function TBADIModuleMetricsEditorView.GetEditorWindowCaption: String;
 
 Begin
-  Result := strBADIStatistics;
+  Result := strBADIMetrics;
 End;
 
 (**
@@ -1002,7 +1073,7 @@ End;
 Function TBADIModuleMetricsEditorView.GetTabHintText: String;
 
 Begin
-  Result := strBADIStatistics;
+  Result := strBADIMetrics;
 End;
 
 (**
@@ -1019,7 +1090,7 @@ End;
 Function TBADIModuleMetricsEditorView.GetViewIdentifier: String;
 
 Begin
-  Result := Format('%s.%s', [strBADIStatisticEditorView, FViewIdent]);
+  Result := Format('%s.%s', [strBADIMetricsEditorView, FViewIdent]);
 End;
 
 (**

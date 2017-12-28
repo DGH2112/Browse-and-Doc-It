@@ -3,7 +3,7 @@
   This module contains a frame which holds all the functionality of the
   module browser so that it can be independant of the application specifics.
 
-  @Date    27 Dec 2017
+  @Date    28 Dec 2017
   @Author  David Hoyle
   @Version 1.0
 
@@ -1207,8 +1207,11 @@ begin
       If NodeTextMatch(NodeData.FNode.Text, strDocumentationConflicts) Then
         If doExpandDocConflicts In TBADIOptions.BADIOptions.Options Then
           ExpandNode(Node);
-      If NodeTextMatch(NodeData.FNode.Text, strMetricsAndChecks) Then
-        If doExpandChecksAndMetrics In TBADIOptions.BADIOptions.Options Then
+      If NodeTextMatch(NodeData.FNode.Text, strMetrics) Then
+        If doExpandMetrics In TBADIOptions.BADIOptions.Options Then
+          ExpandNode(Node);
+      If NodeTextMatch(NodeData.FNode.Text, strChecks) Then
+        If doExpandChecks In TBADIOptions.BADIOptions.Options Then
           ExpandNode(Node);
       If NodeTextMatch(NodeData.FNode.Text, strHints) Then
         If doExpandHints In TBADIOptions.BADIOptions.Options Then
@@ -1595,7 +1598,7 @@ end;
 procedure TframeModuleExplorer.OutputModuleInfo(Const Container : TElementContainer);
 
 Const
-  strPromotedLabels : Array[1..5] Of String = (strMetricsAndChecks, strDocumentationConflicts,
+  strPromotedLabels : Array[1..6] Of String = (strMetrics, strChecks, strDocumentationConflicts,
     strHints, strWarnings, strErrors);
 
 Var

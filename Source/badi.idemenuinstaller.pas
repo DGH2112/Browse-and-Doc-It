@@ -1230,6 +1230,9 @@ End;
 **)
 Procedure TBADIIDEMenuInstaller.RefactorConstantClick(Sender: TObject);
 
+ResourceString
+  strMsg = 'Refactoring is not available in this editor view.';
+
 Var
   EditSvrs : IOTAEditorServices;
   TopView : IOTAEditView;
@@ -1237,11 +1240,13 @@ Var
   
 Begin
   If Supports(BorlandIDEServices, IOTAEditorServices, EditSvrs) Then
-    Begin
-      TopView := EditSvrs.TopView;
-      Cursor := TopView.CursorPos;
-      TBADIRefactorConstant.Refactor(ActiveSourceEditor, Cursor.Line, Cursor.Col);
-    End;
+    If Assigned(EditSvrs.TopView) Then
+      Begin
+        TopView := EditSvrs.TopView;
+        Cursor := TopView.CursorPos;
+        TBADIRefactorConstant.Refactor(ActiveSourceEditor, Cursor.Line, Cursor.Col);
+      End Else
+        MessageDlg(strMsg, mtError, [mbOK], 0);
 End;
 
 (**

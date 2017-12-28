@@ -5,10 +5,10 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    17 Dec 2017
+  @date    28 Dec 2017
 
 **)
-Unit BADI.ModuleChecksFrame;
+Unit BADI.Module.Checks.Options.Frame;
 
 Interface
 
@@ -23,12 +23,17 @@ Uses
   Forms,
   Dialogs,
   BADI.CustomOptionsFrame,
-  VirtualTrees;
+  VirtualTrees, 
+  BADI.CustomVirtualStringTree;
+
+{$INCLUDE CompilerDefinitions.inc}
 
 Type
+  (** A custom treeview for this frame to stop AVs due to RTTI clashes with TVirtualStrinTree. **)
+  TBADIChecksOptionsVirtualStringTree = Class(TBADICustomVirtualStringTree);
+
   (** A class to represent a frame for selecting the checks and metrics in the IDE options dialogue. **)
-  TframeBADIModuleChecks = Class(TFrame, IBADIOptionsFrame)
-    vstChecks: TVirtualStringTree;
+  TframeBADIModuleChecksOptions = Class(TFrame, IBADIOptionsFrame)
     Procedure vstChecksGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; Var CellText: String);
     Procedure vstChecksEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -37,17 +42,16 @@ Type
       NewText: String);
     Procedure vstChecksHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
     Procedure vstChecksChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    Procedure vstChecksBeforeCellPaint(Sender: TBaseVirtualTree; TargetCanvas: TCanvas;
-      Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode; CellRect: TRect;
-      Var ContentRect: TRect);
-    procedure vstChecksPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas;
+    Procedure vstChecksPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
   Strict Private
+    FVSTChecks : TBADIChecksOptionsVirtualStringTree;
   Strict Protected
     Procedure LoadSettings;
     Procedure SaveSettings;
     Procedure RecurseNodes(Const vstTreeView: TBaseVirtualTree; Const Node: PVirtualNode;
       Const State: TCheckState);
+    Procedure CreateVirtualStringTree;
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent); Override;
@@ -91,12 +95,12 @@ Const
   @precon  AOwner must be a valid instance.
   @postcon Initialises the metrics frame for the IDE options dialogue.
 
-  @nometric MissingCONSTInParam
+  @nocheck MissingCONSTInParam
 
   @param   AOwner as a TComponent
 
 **)
-Constructor TframeBADIModuleChecks.Create(AOwner: TComponent);
+Constructor TframeBADIModuleChecksOptions.Create(AOwner: TComponent);
 
   (**
 
@@ -118,16 +122,16 @@ Constructor TframeBADIModuleChecks.Create(AOwner: TComponent);
 
   Begin
     Result := Nil;
-    N := vstChecks.GetFirst;
+    N := FVSTChecks.GetFirst;
     While Assigned(N) Do
       Begin
-        NodeData := vstChecks.GetNodeData(N);
+        NodeData := FVSTChecks.GetNodeData(N);
         If NodeData.FModuleCheck = eCheck Then
           Begin
             Result := N;
             Break;
           End;
-        N := vstChecks.GetNext(N);
+        N := FVSTChecks.GetNext(N);
       End;
   End;
 
@@ -138,19 +142,75 @@ Var
 
 Begin
   Inherited Create(AOwner);
-  vstChecks.NodeDataSize := SizeOf(TCheckNodeData);
+  CreateVirtualStringTree;
+  FVSTChecks.NodeDataSize := SizeOf(TCheckNodeData);
   For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
     Begin
       P := FindParent(ModuleChecks[eCheck].FParent);
-      N := vstChecks.AddChild(P);
-      vstChecks.CheckType[N] := ctCheckBox;
-      vstChecks.CheckState[N] := csUncheckedNormal;
-      NodeData := vstChecks.GetNodeData(N);
+      N := FVSTChecks.AddChild(P);
+      FVSTChecks.CheckType[N] := ctCheckBox;
+      FVSTChecks.CheckState[N] := csUncheckedNormal;
+      NodeData := FVSTChecks.GetNodeData(N);
       NodeData.FModuleCheck := eCheck;
       NodeData.FMetricLimitType := ltNone;
       NodeData.FMetricLimit := 0;
     End;
-  vstChecks.FullExpand;
+  FVSTChecks.FullExpand;
+End;
+
+(**
+
+  This method creates and initialises the treeview..
+
+  @precon  None.
+  @postcon The treeview is created and initialised.
+
+  @nocheck HardCodedString HardCodedInteger
+
+**)
+Procedure TframeBADIModuleChecksOptions.CreateVirtualStringTree;
+
+Var
+  C: TVirtualTreeColumn;
+
+Begin
+  FVSTChecks := TBADIChecksOptionsVirtualStringTree.Create(Self);
+  FVSTChecks.Name := 'vstChecks';
+  FVSTChecks.Parent := Self;
+  FVSTChecks.AlignWithMargins := True;
+  FVSTChecks.Left := 3;
+  FVSTChecks.Top := 3;
+  FVSTChecks.Width := 413;
+  FVSTChecks.Height := 338;
+  FVSTChecks.Align := alClient;
+  FVSTChecks.EditDelay := 250;
+  FVSTChecks.Header.AutoSizeIndex := 0;
+  FVSTChecks.Header.Height := 20;
+  FVSTChecks.Header.Options := FVSTChecks.Header.Options + [hoColumnResize, hoShowImages];
+  FVSTChecks.TreeOptions.AutoOptions := [toAutoDropExpand, toAutoScrollOnExpand, toAutoTristateTracking,
+    toAutoDeleteMovedNodes, toAutoChangeScale];
+  FVSTChecks.TreeOptions.MiscOptions := FVSTChecks.TreeOptions.MiscOptions +
+    [toCheckSupport, toEditable, toEditOnClick, toEditOnDblClick];
+  FVSTChecks.OnChecked := vstChecksChecked;
+  FVSTChecks.OnEditing := vstChecksEditing;
+  FVSTChecks.OnGetText := vstChecksGetText;
+  FVSTChecks.OnPaintText := vstChecksPaintText;
+  FVSTChecks.OnHeaderClick := vstChecksHeaderClick;
+  FVSTChecks.OnNewText := vstChecksNewText;
+  C := FVSTChecks.Header.Columns.Add;
+  C.CheckBox := True;
+  C.Position := 0;
+  C.Width := 184;
+  C.Text := 'Module Checks';
+  C := FVSTChecks.Header.Columns.Add;
+  C.Position := 1;
+  C.Width := 150;
+  C.Text := 'Name';
+//  C := FVSTChecks.Header.Columns.Add;
+//  C.Alignment := taRightJustify;
+//  C.Position := 2;
+//  C.Width := 75;
+//  C.Text := 'Limit';
 End;
 
 (**
@@ -161,7 +221,7 @@ End;
   @postcon The treeview is updated with the current metrics and checks settings.
 
 **)
-Procedure TframeBADIModuleChecks.LoadSettings;
+Procedure TframeBADIModuleChecksOptions.LoadSettings;
 
 Var
   N : PVirtualNode;
@@ -169,18 +229,18 @@ Var
   BO: TBADIOptions;
 
 Begin
-  N := vstChecks.GetFirst;
+  N := FVSTChecks.GetFirst;
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
     Begin
-      NodeData := vstChecks.GetNodeData(N);
+      NodeData := FVSTChecks.GetNodeData(N);
       If BO.ModuleCheck[NodeData.FModuleCheck].FEnabled Then
-        vstChecks.CheckState[N] := csCheckedNormal
+        FVSTChecks.CheckState[N] := csCheckedNormal
       Else
-        vstChecks.CheckState[N] := csUncheckedNormal;
+        FVSTChecks.CheckState[N] := csUncheckedNormal;
       NodeData.FMetricLimitType := ModuleChecks[NodeData.FModuleCheck].FLimitType;
       NodeData.FMetricLimit := BO.ModuleCheck[NodeData.FModuleCheck].FLimit;
-      N := vstChecks.GetNext(N);
+      N := FVSTChecks.GetNext(N);
     End;
   vstChecksChecked(Nil, Nil);
 End;
@@ -197,7 +257,7 @@ End;
   @param   State       as a TCheckState as a constant
 
 **)
-Procedure TframeBADIModuleChecks.RecurseNodes(Const vstTreeView: TBaseVirtualTree;
+Procedure TframeBADIModuleChecksOptions.RecurseNodes(Const vstTreeView: TBaseVirtualTree;
   Const Node: PVirtualNode; Const State: TCheckState);
 
 Var
@@ -229,7 +289,7 @@ End;
   @postcon The treeview metrics and checks settings are saved to the options.
 
 **)
-Procedure TframeBADIModuleChecks.SaveSettings;
+Procedure TframeBADIModuleChecksOptions.SaveSettings;
 
 Var
   N : PVirtualNode;
@@ -238,49 +298,20 @@ Var
   BO: TBADIOptions;
 
 Begin
-  N := vstChecks.GetFirst();
+  N := FVSTChecks.GetFirst();
   BO := TBADIOptions.BADIOptions;
   While Assigned(N) Do
     Begin
-      NodeData := vstChecks.GetNodeData(N);
+      NodeData := FVSTChecks.GetNodeData(N);
       R := BO.ModuleCheck[NodeData.FModuleCheck];
-      Case vstChecks.CheckState[N] Of
+      Case FVSTChecks.CheckState[N] Of
         csUncheckedNormal: R.FEnabled := False;
         csCheckedNormal:   R.FEnabled := True;
       End;
       R.FLimit := NodeData.FMetricLimit;
       BO.ModuleCheck[NodeData.FModuleCheck] := R;
-      N := vstChecks.GetNext(N);
+      N := FVSTChecks.GetNext(N);
     End;
-End;
-
-(**
-
-  This is an on before cell paint event handler for the treeview.
-
-  @precon  None.
-  @postcon Colours the focused column more than the whole row.
-
-  @param   Sender        as a TBaseVirtualTree
-  @param   TargetCanvas  as a TCanvas
-  @param   Node          as a PVirtualNode
-  @param   Column        as a TColumnIndex
-  @param   CellPaintMode as a TVTCellPaintMode
-  @param   CellRect      as a TRect
-  @param   ContentRect   as a TRect as a reference
-
-**)
-Procedure TframeBADIModuleChecks.vstChecksBeforeCellPaint(Sender: TBaseVirtualTree;
-  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; CellPaintMode: TVTCellPaintMode;
-  CellRect: TRect; Var ContentRect: TRect);
-
-Const
-  dblBlendFactor = 0.50;
-
-Begin
-  If (Node = Sender.FocusedNode) And (Column = Sender.FocusedColumn) Then
-    TargetCanvas.Brush.Color := BlendColour(TargetCanvas.Brush.Color, clHighlight, dblBlendFactor);
-  TargetCanvas.FillRect(CellRect);
 End;
 
 (**
@@ -294,7 +325,7 @@ End;
   @param   Node   as a PVirtualNode
 
 **)
-procedure TframeBADIModuleChecks.vstChecksChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
+procedure TframeBADIModuleChecksOptions.vstChecksChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
 
 Var
   iTotal   : Integer;
@@ -304,21 +335,21 @@ Var
 Begin
   iCount := 0;
   iTotal := 0;
-  N := vstChecks.GetFirst;
+  N := FVSTChecks.GetFirst;
   While N <> Nil Do
     Begin
       Inc(iTotal);
       Case Sender.CheckState[N] Of
         csCheckedNormal: Inc(iCount);
       End;
-      N := vstChecks.GetNext(N);
+      N := FVSTChecks.GetNext(N);
     End;
   If iCount = 0 Then
-    vstChecks.Header.Columns[0].CheckState := csUncheckedNormal
+    FVSTChecks.Header.Columns[0].CheckState := csUncheckedNormal
   Else If iCount = iTotal Then
-    vstChecks.Header.Columns[0].CheckState := csCheckedNormal
+    FVSTChecks.Header.Columns[0].CheckState := csCheckedNormal
   Else
-    vstChecks.Header.Columns[0].CheckState := csMixedNormal;
+    FVSTChecks.Header.Columns[0].CheckState := csMixedNormal;
 end;
 
 (**
@@ -334,7 +365,7 @@ end;
   @param   Allowed as a Boolean as a reference
 
 **)
-Procedure TframeBADIModuleChecks.vstChecksEditing(Sender: TBaseVirtualTree; Node: PVirtualNode;
+Procedure TframeBADIModuleChecksOptions.vstChecksEditing(Sender: TBaseVirtualTree; Node: PVirtualNode;
   Column: TColumnIndex; Var Allowed: Boolean);
 
 Var
@@ -359,7 +390,7 @@ End;
   @param   CellText as a String as a reference
 
 **)
-Procedure TframeBADIModuleChecks.vstChecksGetText(Sender: TBaseVirtualTree;
+Procedure TframeBADIModuleChecksOptions.vstChecksGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; Var
   CellText: String);
 
@@ -399,7 +430,7 @@ End;
   @param   HitInfo as a TVTHeaderHitInfo
 
 **)
-Procedure TframeBADIModuleChecks.vstChecksHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
+Procedure TframeBADIModuleChecksOptions.vstChecksHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
 
 Var
   ST: TBaseVirtualTree;
@@ -432,7 +463,7 @@ End;
   @param   NewText as a String
 
 **)
-Procedure TframeBADIModuleChecks.vstChecksNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+Procedure TframeBADIModuleChecksOptions.vstChecksNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
   Column: TColumnIndex; NewText: String);
 
 ResourceString
@@ -488,13 +519,15 @@ End;
   @param   TextType     as a TVSTTextType
 
 **)
-Procedure TframeBADIModuleChecks.vstChecksPaintText(Sender: TBaseVirtualTree;
+Procedure TframeBADIModuleChecksOptions.vstChecksPaintText(Sender: TBaseVirtualTree;
   Const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
 
 Begin
   TargetCanvas.Font.Color := clWindowText;
-  If (Node = Sender.FocusedNode) And (Column = Sender.FocusedColumn) Then
-    TargetCanvas.Font.Color := clHighlightText;
+  {$IFDEF DXE102}
+  If Assigned(FVSTChecks.StyleServices) And FVSTChecks.StyleServices.Enabled Then
+    TargetCanvas.Font.Color := FVSTChecks.StyleServices.GetSystemColor(clWindowText);
+  {$ENDIF}
 End;
 
 End.

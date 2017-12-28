@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    22 Dec 2017
+  @Date    28 Dec 2017
   
 **)
 Unit BADI.Module.Metrics;
@@ -521,8 +521,8 @@ End;
   @precon  None.
   @postcon References to the panels are storede for later use and each panel is configured.
 
-  @nometric MissingCONSTInParam
-  @nohint   StatusBar
+  @nocheck MissingCONSTInParam
+  @nohint  StatusBar
 
   @param   StatusBar as a TStatusBar
   @param   Panel     as a TStatusPanel
@@ -638,7 +638,7 @@ End;
 
   This method is called when the editor view loses focus.
 
-  @nometric EmptyMethod
+  @nocheck EmptyMethod
   
   @precon  None.
   @postcon Does nothing.
@@ -674,7 +674,8 @@ End;
   @precon  None.
   @postcon Draw each panel with a blue number and black bold text.
 
-  @nometric MissingCONSTInParam Toxicity
+  @nocheck MissingCONSTInParam
+  @nometric Toxicity
   
   @param   StatusBar as a TStatusBar
   @param   Panel     as a TStatusPanel
@@ -745,7 +746,7 @@ End;
   @precon  None.
   @postcon The treeview text is copied to the clipboard if that action is invoked.
 
-  @nometric MissingCONSTInParam
+  @nocheck MissingCONSTInParam
   
   @param   Action as a TEditAction
   @return  a Boolean
@@ -829,7 +830,7 @@ End;
   @precon  None.
   @postcon Stores a reference to the frame so that a modules metrics can be rendered
 
-  @nometric MissingCONSTInParam
+  @nocheck MissingCONSTInParam
   
   @param   AFrame as a TCustomFrame
 
@@ -1041,7 +1042,7 @@ Begin
   Try
     AFrame := FFrameManager.Frame[CurrentEditWindow];
     If Assigned(AFrame) Then
-      AFrame.RenderModule(Module, [sroAutoExpand, sroAutoExpandOnError]);
+      AFrame.RenderModule(Module, [mroAutoExpand, mroAutoExpandOnError]);
   Finally
     Module.Free;
   End;

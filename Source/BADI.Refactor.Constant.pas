@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    27 Dec 2017
+  @Date    28 Dec 2017
 
 **)
 Unit BADI.Refactor.Constant;
@@ -139,7 +139,7 @@ Begin
         iBreakPoint := FMaxWidth - Length(strConCat);
         Inc(iLine);
       End;
-    Result := sl.Text;
+    Result := Trim(sl.Text);
   Finally
     sl.Free;
   End;

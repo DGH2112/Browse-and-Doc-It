@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Dec 2017
+  @Date    29 Dec 2017
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -735,6 +735,7 @@ End;
 Procedure TframeBADIModuleChecksEditorView.FocusResults;
 
 Begin
+  HideZeroColumns;
   tmFocusTimer.Enabled := True;
 End;
 
@@ -933,7 +934,6 @@ Begin
           DeleteExistingModuleNode(Module);
         NodeResult := RecurseContainer(Module, Nil);
         SortAndExpand(NodeResult, setRenderOptions);
-        HideZeroColumns;
         UpdateStats;
       Finally
         FVSTChecks.EndUpdate;
@@ -1100,14 +1100,14 @@ Begin
   {$ENDIF}
   Case TBADICheckColumn(Column) Of
     ccHardCodedIntegers..ccMissingCONSTInParemterList:
-      TargetCanvas.Brush.Color := Colour(
-        NodeData.FChecks[CheckColumns[TBADICheckColumn(Column)].FCheck]
-      );
+      Begin
+        TargetCanvas.Brush.Color :=
+          Colour(NodeData.FChecks[CheckColumns[TBADICheckColumn(Column)].FCheck]);
+        If CheckColumns[TBADICheckColumn(Column)].FCheck In NodeData.FCheckOverrides Then
+          TargetCanvas.Brush.Color := iLightAqua;
+      End;
     ccTotal: TargetCanvas.Brush.Color := Colour(NodeData.FTotal);
   End;
-  If Column > 0 Then
-    If CheckColumns[TBADICheckColumn(Column)].FCheck In NodeData.FCheckOverrides Then
-      TargetCanvas.Brush.Color := iLightAqua;
   TargetCanvas.FillRect(CellRect);
 End;
 

@@ -144,6 +144,7 @@ Type
     Procedure ExtractMaxFromChildren(Const ParentNode : PVirtualNode);
     Procedure CreateVirtualStringTree;
     Procedure HideZeroColumns;
+    Procedure ExpandIssues;
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner: TComponent); Override;
@@ -669,6 +670,32 @@ End;
 
 (**
 
+  This method expands methods with metrics above their limits.
+
+  @precon  None.
+  @postcon Methods with metrics above their limits are expanded / visible.
+
+**)
+Procedure TframeBADIModuleChecksEditorView.ExpandIssues;
+
+Var
+  N: PVirtualNode;
+  NodeData : PBADICheckRecord;
+
+Begin
+  N := FVSTChecks.GetFirst;
+  While Assigned(N) Do
+    Begin
+      NodeData := FVSTChecks.GetNodeData(N);
+      If NodeData.FNodeType = ntMethod Then
+        If NodeData.FTotal > 0 Then
+          FVSTChecks.VisiblePath[N] := True;
+      N := FVSTChecks.GetNext(N);
+    End;
+End;
+
+(**
+
   This method searches the given nodes children and updates the parent node with the max values from the
   child nodes.
 
@@ -962,7 +989,7 @@ Begin
       Begin
         If ((croAutoExpandOnError In setRenderOptions) And (NodeResult.FIssueCount > 0)) Or
           Not (croAutoExpandOnError In setRenderOptions) Then
-        FVSTChecks.FullExpand(NodeResult.FNode);
+        ExpandIssues;
       End;
 End;
 

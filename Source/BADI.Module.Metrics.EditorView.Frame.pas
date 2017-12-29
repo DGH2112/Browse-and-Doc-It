@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Dec 2017
+  @Date    29 Dec 2017
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -723,6 +723,7 @@ End;
 Procedure TframeBADIModuleMetricsEditorView.FocusResults;
 
 Begin
+  HideZeroColumns;
   tmFocusTimer.Enabled := True;
 End;
 
@@ -948,7 +949,6 @@ Begin
           DeleteExistingModuleNode(Module);
         NodeResult := RecurseContainer(Module, Nil);
         SortAndExpand(NodeResult, setRenderOptions);
-        HideZeroColumns;
         UpdateStats;
       Finally
         FVSTMetrics.EndUpdate;

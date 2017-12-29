@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Dec 2017
+  @Date    29 Dec 2017
 
 **)
 Unit BADI.Generic.FunctionDecl;
@@ -184,7 +184,8 @@ Uses
   {$ENDIF}
   SysUtils,
   BADI.ResourceStrings, 
-  BADI.Constants;
+  BADI.Constants,
+  TypInfo;
 
 Const
   (** A unity value to increment and descending metrics. **)
@@ -247,13 +248,12 @@ Begin
   Result := 0;
   If Not FIsDeclarationOnly Then
     Begin
-      Result := F((FEndLine - FStartLine) / BADIOptions.ModuleMetric[mmLongMethods].FLimit);
+      Result := F(Metric[mmLongMethods] / BADIOptions.ModuleMetric[mmLongMethods].FLimit);
       If (ParameterCount > 0) And (CompareText(Parameters[0].Identifier, strSender) <> 0) Then
-        Result := Result + F(ParameterCount / BADIOptions.ModuleMetric[mmLongParameterLists].FLimit);
-      Result := Result + F(VariableCount / BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit);
-      Result := Result + F(FMetrics[mmNestedIFDepth] / BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit);
-      Result := Result + F(FMetrics[mmCyclometricComplexity] /
-        BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit);
+        Result := Result + F(Metric[mmLongParameterLists] / BADIOptions.ModuleMetric[mmLongParameterLists].FLimit);
+      Result := Result + F(Metric[mmLongMethodVariableLists] / BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit);
+      Result := Result + F(Metric[mmNestedIFDepth] / BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit);
+      Result := Result + F(Metric[mmCyclometricComplexity] / BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit);
     End;
 End;
 
@@ -318,6 +318,7 @@ Begin
   FIsDeclarationOnly := True;
   FIfStackDepth := 0;
   FMetricOverrides := [];
+  FMetrics[mmCyclometricComplexity] := 1;
 End;
 
 (**
@@ -389,15 +390,25 @@ End;
 **)
 Function TGenericFunction.GetMetric(Const eMetric: TBADIModuleMetric): Double;
 
+ResourceString
+  strMsg = 'You cannot call GetMetric for %s!';
+
 Begin
   Case eMetric Of
-    mmLongMethods:               Result := FEndLine - FStartLine + 1;
+    mmLongMethods:
+      Begin
+        Result := 0;
+        If FStmtCount > 0 Then
+          Result := FEndLine - FStartLine + 1;
+      End;
     mmLongParameterLists:        Result := ParameterCount;
     mmLongMethodVariableLists:   Result := VariableCount;
     mmNestedIFDepth:             Result := FMetrics[mmNestedIFDepth];
     mmCyclometricComplexity:     Result := FMetrics[mmCyclometricComplexity];
-    mmMethodCCIncludeExpression: Result := 0;
     mmToxicity:                  Result := CalculateToxicity;
+  Else
+    Raise Exception.CreateFmt(strMsg, [
+      GetEnumName(TypeInfo(TBADIModuleMetric), Ord(eMetric))]);
   End;
 End;
 

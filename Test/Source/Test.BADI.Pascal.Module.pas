@@ -15,14 +15,19 @@ interface
 Uses
   TestFramework,
   BADI.Pascal.Module,
-  Test.BADI.Base.Module;
+  Test.BADI.Base.Module,
+  BADI.Types;
 
 type
+  TArrayOfMetricLimits = Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of Double;
+
   TestTPascalModule = Class(TExtendedTestCase)
   Strict Private
     FSource: String;
     FPascalModule : TPascalModule;
   Strict Protected
+    Procedure SetMetricLimit(Const eMetric : TBADIModuleMetric;
+  Const dblMetricLimit : Double);
   Public
     Procedure SetUp; Override;
     Procedure TearDown; Override;
@@ -308,7 +313,6 @@ Implementation
 
 Uses
   SysUtils,
-  BADI.Types,
   BADI.TokenInfo,
   BADI.ResourceStrings,
   BADI.Options;
@@ -339,6 +343,18 @@ Const
 //
 // Test methods for the class TPascalModule.
 //
+Procedure TestTPascalModule.SetMetricLimit(Const eMetric : TBADIModuleMetric;
+  Const dblMetricLimit : Double);
+
+Var
+  R: TBADIMetricRecord;
+
+Begin
+  R := TBADIOptions.BADIOptions.ModuleMetric[eMetric];
+  R.FLimit := dblMetricLimit;
+  TBADIOptions.BADIOptions.ModuleMetric[eMetric] := R;
+End;
+
 Procedure TestTPascalModule.Setup;
 
 Begin
@@ -360,6 +376,12 @@ Begin
     'End.'#13#10;
   FPascalModule := TPascalModule.CreateParser(FSource, 'Hello.dpr', True,
     [moParse, moCheckForDocumentConflicts]);
+  SetMetricLimit(mmLongMethods,             50);
+  SetMetricLimit(mmLongParameterLists,       7);
+  SetMetricLimit(mmLongMethodVariableLists,  7);
+  SetMetricLimit(mmNestedIFDepth,            5);
+  SetMetricLimit(mmCyclometricComplexity,   10);
+  SetMetricLimit(mmToxicity,                 1);
 End;
 
 Procedure TestTPascalModule.TearDown;
@@ -8103,19 +8125,16 @@ End;
 
 Procedure TestTPascalModule.TestMethodCyclometricComplexity;
 
-Var
-  R: TBADIMetricRecord;
-
 Begin
-  R := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity];
-  R.FLimit := 10.0;
-  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
+  SetMetricLimit(mmToxicity, 10);
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
     'Procedure MyProc;',
     'Procedure MyProc;'#13#10 +
     'Begin'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
     '  If True Or False Then'#13#10 +
     '    WriteLn();'#13#10 +
     '  If True Or False Then'#13#10 +
@@ -8141,6 +8160,10 @@ Begin
     '    WriteLn();'#13#10 +
     '  If True Or False Then'#13#10 +
     '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
     'End;',
     [ttErrors, ttWarnings, ttChecks, ttMetrics],
     [],
@@ -8152,6 +8175,10 @@ Begin
     'Procedure MyProc;'#13#10 +
     'Begin'#13#10 +
     '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True Or False Then'#13#10 +
+    '    WriteLn();'#13#10 +
+    '  If True {Or False} Then'#13#10 +
     '    WriteLn();'#13#10 +
     '  If True Or False Then'#13#10 +
     '    WriteLn();'#13#10 +
@@ -8181,8 +8208,6 @@ Begin
 //    [],
 //    0, 0, 0, 0, 1
 //  );
-  R.FLimit := 1.0;
-  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
 End;
 
 Procedure TestTPascalModule.TestMethodToxicity;
@@ -8273,13 +8298,9 @@ End;
 
 Procedure TestTPascalModule.TestNestedIFDepth;
 
-Var
-  R: TBADIMetricRecord;
-
 Begin
-  R := TBADIOptions.BADIOptions.ModuleMetric[mmToxicity];
-  R.FLimit := 10.0;
-  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
+  SetMetricLimit(mmToxicity, 10);
+  SetMetricLimit(mmCyclometricComplexity, 100);
   TestGrammarForErrors(
     TPascalModule,
     strUnit,
@@ -8333,8 +8354,6 @@ Begin
     [],
     0, 0, 0, 0, 0, 1
   );
-  R.FLimit := 1.0;
-  TBADIOptions.BADIOptions.ModuleMetric[mmToxicity] := R;
 End;
 
 Procedure TestTPascalModule.TestStructStmt;

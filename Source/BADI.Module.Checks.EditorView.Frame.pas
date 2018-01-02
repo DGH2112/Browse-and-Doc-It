@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    29 Dec 2017
+  @Date    02 Jan 2018
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -79,6 +79,9 @@ Type
     actExpandIssues: TAction;
     N2: TMenuItem;
     ExpandIssues1: TMenuItem;
+    actShowAllColumns: TAction;
+    N3: TMenuItem;
+    ShowAllColumns1: TMenuItem;
     Procedure actExpandAllExecute(Sender: TObject);
     Procedure actCollapseAllExecute(Sender: TObject);
     Procedure actExpandUpdate(Sender: TObject);
@@ -88,6 +91,7 @@ Type
     Procedure actExpandIssuesExecute(Sender: TObject);
     Procedure vstChecksFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     Procedure tmFocusTimerTimer(Sender: TObject);
+    procedure actShowAllColumnsExecute(Sender: TObject);
   Strict Private
   Type
       (** A record to describe the data to be held in a tree node. **)
@@ -453,6 +457,30 @@ Begin
         Assigned(FVSTChecks.FocusedNode) And
         (FVSTChecks.ChildCount[FVSTChecks.FocusedNode] > 0) And
         Not FVSTChecks.Expanded[FVSTChecks.FocusedNode];
+    End;
+End;
+
+(**
+
+  This is an on execute event handler for the Show All Columns action.
+
+  @precon  None.
+  @postcon Shows all the columns in the report.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeBADIModuleChecksEditorView.actShowAllColumnsExecute(Sender: TObject);
+
+Var
+  iColumn: Integer;
+  C: TVirtualTreeColumn;
+
+Begin
+  For iColumn := 0 To FVSTChecks.Header.Columns.Count - 1 Do
+    Begin
+      C := FVSTChecks.Header.Columns[iColumn];
+      C.Options := C.Options + [coVisible];
     End;
 End;
 

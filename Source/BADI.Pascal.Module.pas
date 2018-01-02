@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       28 Dec 2017
+  @Date       02 Jan 2018
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -1596,6 +1596,7 @@ Procedure TPascalModule.DeclSection(Const AScope : TScope; Const Container : TEl
 
 Var
   M: TGenericFunction;
+  eIssueState : TBADIIssueState;
 
 Begin
   Repeat
@@ -1616,10 +1617,13 @@ Begin
       MetricsLongParameterList(M);
       MetricMissingConstInParamList(M);
       If M.Metric[mmLongMethodVariableLists] > BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit Then
-        If AddMetric([M.QualifiedName, M.Metric[mmLongMethodVariableLists],
-          BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit], M.Line, M.Column, M,
-          mmLongMethodVariableLists) Then
-          M.MetricOverrides := M.MetricOverrides + [mmLongMethodVariableLists];
+        Begin
+          eIssueState := AddMetric([M.QualifiedName, M.Metric[mmLongMethodVariableLists],
+            BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit], M.Line, M.Column, M,
+            mmLongMethodVariableLists);
+          If eIssueState In [isOverride] Then
+            M.MetricOverrides := M.MetricOverrides + [mmLongMethodVariableLists];
+        End;
     End;
 End;
 
@@ -1671,7 +1675,7 @@ Const
 Var
   P : TGenericParameter;
   iParam: Integer;
-  boolOverride: Boolean;
+  eIssueState: TBADIIssueState;
 
 Begin
   If Assigned(Method) And (Method.ParameterCount > 0) Then
@@ -1683,10 +1687,11 @@ Begin
       For iParam := 0 To Method.ParameterCount - 1 Do
         If Method.Parameters[iParam].ParamModifier = pamNone Then
           Begin
-            boolOverride := AddCheck([Method.Parameters[iParam].Identifier,
+            eIssuestate := AddCheck([Method.Parameters[iParam].Identifier,
               Method.QualifiedName], Method.Parameters[iParam].Line, Method.Parameters[iParam].Column,
               Method, mcMissingCONSTInParemterList);
-            Method.IncrementCheck(mcMissingCONSTInParemterList, boolOverride);
+            If eIssueState In [isAdded, isOverride] Then
+              Method.IncrementCheck(mcMissingCONSTInParemterList, eIssueState = isOverride);
           End;
     End;
 End;
@@ -1705,14 +1710,20 @@ End;
 **)
 Procedure TPascalModule.MetricsCyclometricComplexity(Const Method : TGenericFunction);
 
+Var
+  eIssueState: TBADIIssueState;
+
 Begin
   If Assigned(Method) Then
     If Method.Metric[mmCyclometricComplexity] >
       BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit Then
-      If AddMetric([Method.QualifiedName, Method.Metric[mmCyclometricComplexity],
-        BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit],
-        Method.Line, Method.Column, Method, mmCyclometricComplexity) Then
-        Method.MetricOverrides := Method.MetricOverrides + [mmCyclometricComplexity];
+      Begin
+        eIssueState := AddMetric([Method.QualifiedName, Method.Metric[mmCyclometricComplexity],
+          BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit],
+          Method.Line, Method.Column, Method, mmCyclometricComplexity);
+        If eIssueState In [isOverride] Then
+          Method.MetricOverrides := Method.MetricOverrides + [mmCyclometricComplexity];
+      End;
 End;
 
 (**
@@ -1729,17 +1740,19 @@ Procedure TPascalModule.MetricsEmptyBlockAtToken(Const eCheck : TBADIModuleCheck
 
 ResourceString
   strMethod = 'method';
-var
-  boolOverride: Boolean;
+  
+Var
+  eIssueState: TBADIIssueState;
 
 Begin
   If Assigned(CurrentMethod) Then
     Begin
-      boolOverride := AddCheck([strMethod, CurrentMethod.QualifiedName], Token.Line, Token.Column,
+      eIssueState := AddCheck([strMethod, CurrentMethod.QualifiedName], Token.Line, Token.Column,
         CurrentMethod, eCheck);
-      CurrentMethod.IncrementCheck(eCheck, boolOverride);
+      If eIssueState In [isAdded, isOverride] Then
+        CurrentMethod.IncrementCheck(eCheck, eIssueState = isOverride);
     End Else
-      AddCheck([strModuleTypes[ModuleType], ModuleName], Token.Line, Token.Column, Self, eCheck)
+      AddCheck([strModuleTypes[ModuleType], ModuleName], Token.Line, Token.Column, Self, eCheck);
 End;
 
 (**
@@ -1756,15 +1769,17 @@ Procedure TPascalModule.MetricsExceptionEating(Const Container : TElementContain
 
 Const
   strMethod = 'method';
-var
-  boolOverride: Boolean;
+  
+Var
+  eIssueState: TBADIIssueState;
   
 Begin
   If Assigned(CurrentMethod) Then
     Begin
-      boolOverride := AddCheck([strMethod, CurrentMethod.QualifiedName], Container.Line,
+      eIssueState := AddCheck([strMethod, CurrentMethod.QualifiedName], Container.Line,
         Container.Column, CurrentMethod, mcExceptionEating);
-      CurrentMethod.IncrementCheck(mcExceptionEating, boolOverride);
+      If eIssueState In [isAdded, isOverride] Then
+        CurrentMethod.IncrementCheck(mcExceptionEating, eIssueState = isOverride);
     End Else
       AddCheck([strModuleTypes[ModuleType], ModuleName], Container.Line, Container.Column,
         Self, mcExceptionEating)
@@ -1791,7 +1806,7 @@ Var
   dbl: Double;
   i : Integer;
   iErrorCode: Integer;
-  boolOverride: Boolean;
+  eIssueState: TBADIIssueState;
 
 Begin
   If Not (Container Is TConstant) Then
@@ -1806,9 +1821,10 @@ Begin
             Exit;
           If Assigned(M) Then
             Begin
-              boolOverride := AddCheck([Token.Token, strMethod, M.QualifiedName], Token.Line,
+              eIssueState := AddCheck([Token.Token, strMethod, M.QualifiedName], Token.Line,
                 Token.Column, M, mcHardCodedIntegers);
-              M.IncrementCheck(mcHardCodedIntegers, boolOverride);
+              If eIssueState In [isAdded, isOverride] Then
+                M.IncrementCheck(mcHardCodedIntegers, eIssueState = isOverride);
             End Else
               AddCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
                 Token.Column, Self, mcHardCodedIntegers);
@@ -1819,9 +1835,10 @@ Begin
             Exit;
           If Assigned(M) Then
             Begin
-              boolOverride := AddCheck([Token.Token, strMethod, M.QualifiedName], Token.Line,
+              eIssueState := AddCheck([Token.Token, strMethod, M.QualifiedName], Token.Line,
                 Token.Column, M, mcHardCodedNumbers);
-              M.IncrementCheck(mcHardCodedNumbers, boolOverride);
+              If eIssueState In [isAdded, isOverride] Then
+                M.IncrementCheck(mcHardCodedNumbers, eIssueState = isOverride);
             End Else
               AddCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
                 Token.Column, Self, mcHardCodedNumbers);         
@@ -1852,7 +1869,7 @@ Var
   i : Integer;
   iAlphaLen : Integer;
   iMaxAlphaLen : Integer;
-  boolOverride: Boolean;
+  eIssueState: TBADIIssueState;
 
 Begin
   If (Length(Token.Token) > iMinAlphaLength) And Not (Container Is TConstant) Then
@@ -1870,9 +1887,10 @@ Begin
       If iMaxAlphaLen > 1 Then
         If Assigned(CurrentMethod) Then
           Begin
-            boolOverride := AddCheck([Token.Token, strMethod, CurrentMethod.QualifiedName], Token.Line,
+            eIssueState := AddCheck([Token.Token, strMethod, CurrentMethod.QualifiedName], Token.Line,
               Token.Column, CurrentMethod, mcHardCodedStrings);
-            CurrentMethod.IncrementCheck(mcHardCodedStrings, boolOverride);
+            If eIssueState In [isAdded, isOverride] Then
+              CurrentMethod.IncrementCheck(mcHardCodedStrings, eIssueState = isOverride);
           End Else
             AddCheck([Token.Token, strModuleTypes[ModuleType], ModuleName], Token.Line,
               Token.Column, Self, mcHardCodedStrings);
@@ -1894,7 +1912,7 @@ End;
 Procedure TPascalModule.MetricsLongOrEmptyMethods(Const Method : TGenericFunction);
 
 Var
-  boolOverride: Boolean;
+  eIssueState: TBADIIssueState;
 
 Begin
   If Assigned(Method) Then
@@ -1902,16 +1920,20 @@ Begin
       If BADIOptions.ModuleCheck[mcEmptyMethod].FEnabled Then
         If Method.StmtCount = 0 Then
           Begin
-            boolOverride := AddCheck([Method.QualifiedName], Method.Line, Method.Column, Method,
+            eIssueState := AddCheck([Method.QualifiedName], Method.Line, Method.Column, Method,
               mcEmptyMethod);
-            Method.IncrementCheck(mcEmptyMethod, boolOverride);
+            If eIssueState In [isAdded, isOverride] Then
+              Method.IncrementCheck(mcEmptyMethod, eIssueState = isOverride);
           End;
       If BADIOptions.ModuleMetric[mmLongMethods].FEnabled Then
         If (Method.EndLine > Method.StartLine + BADIOptions.ModuleMetric[mmLongMethods].FLimit) Then
-          If AddMetric([Method.QualifiedName, Method.Metric[mmLongMethods],
-            BADIOptions.ModuleMetric[mmLongMethods].FLimit], Method.Line, Method.Column, Method,
-            mmLongMethods) Then
-            Method.MetricOverrides := Method.MetricOverrides + [mmLongMethods];
+          Begin
+            eIssueState := AddMetric([Method.QualifiedName, Method.Metric[mmLongMethods],
+              BADIOptions.ModuleMetric[mmLongMethods].FLimit], Method.Line, Method.Column, Method,
+              mmLongMethods);
+            If eIssueState In [isOverride] Then
+              Method.MetricOverrides := Method.MetricOverrides + [mmLongMethods];
+          End;
     End;
 End;
 
@@ -1929,12 +1951,18 @@ End;
 **)
 Procedure TPascalModule.MetricsLongParameterList(Const Method : TGenericFunction);
 
+Var
+  eIssueState: TBADIIssueState;
+
 Begin
   If Method.ParameterCount > BADIOptions.ModuleMetric[mmLongParameterLists].FLimit Then
-    If AddMetric([Method.QualifiedName, Method.Metric[mmLongParameterLists],
-      BADIOptions.ModuleMetric[mmLongParameterLists].FLimit], Method.Line, Method.Column, Method,
-      mmLongParameterLists) Then
-      Method.MetricOverrides := Method.MetricOverrides + [mmLongParameterLists];
+    Begin
+      eIssueState := AddMetric([Method.QualifiedName, Method.Metric[mmLongParameterLists],
+        BADIOptions.ModuleMetric[mmLongParameterLists].FLimit], Method.Line, Method.Column, Method,
+        mmLongParameterLists);
+      If eIssueState In [isOverride] Then
+        Method.MetricOverrides := Method.MetricOverrides + [mmLongParameterLists];
+    End;
 End;
 
 (**
@@ -1949,13 +1977,19 @@ End;
 **)
 Procedure TPascalModule.MetricsMethodToxicity(Const Method: TGenericFunction);
 
+Var
+  eIssueState: TBADIIssueState;
+
 Begin
   If Assigned(Method) Then
     If Method.Metric[mmToxicity] > BADIOptions.ModuleMetric[mmToxicity].FLimit Then
-      If AddMetric([Method.QualifiedName, Method.Metric[mmToxicity],
-        BADIOptions.ModuleMetric[mmToxicity].FLimit], Method.Line, Method.Column, Method,
-        mmToxicity) Then
-        Method.MetricOverrides := Method.MetricOverrides + [mmToxicity];
+      Begin
+        eIssueState := AddMetric([Method.QualifiedName, Method.Metric[mmToxicity],
+          BADIOptions.ModuleMetric[mmToxicity].FLimit], Method.Line, Method.Column, Method,
+          mmToxicity);
+        If eIssueState In [isOverride] Then
+          Method.MetricOverrides := Method.MetricOverrides + [mmToxicity];
+      End;
 End;
 
 (**
@@ -1970,13 +2004,19 @@ End;
 **)
 Procedure TPascalModule.MetricsNestedIFDepth(Const Method : TGenericFunction);
 
+Var
+  eIssueState: TBADIIssueState;
+
 Begin
   If Assigned(Method) Then
     If Method.Metric[mmNestedIFDepth] > BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit Then
-      If AddMetric([Method.QualifiedName, Method.Metric[mmNestedIFDepth],
-        BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit], Method.Line, Method.Column, Method,
-        mmNestedIFDepth) Then
-        Method.MetricOverrides := Method.MetricOverrides + [mmNestedIFDepth];
+      Begin
+        eIssueState := AddMetric([Method.QualifiedName, Method.Metric[mmNestedIFDepth],
+          BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit], Method.Line, Method.Column, Method,
+          mmNestedIFDepth);
+        If eIssueState In [isOverride] Then
+          Method.MetricOverrides := Method.MetricOverrides + [mmNestedIFDepth];
+      End;
 End;
 
 (**
@@ -2009,7 +2049,7 @@ Procedure TPascalModule.MetricsUnsortedMethods;
     M: TPascalMethod;
     iPrevLine, iCurrLine, iNextLine : Integer;
     boolOkay: Boolean;
-    boolOverride: Boolean;
+    eIssueState: TBADIIssueState;
 
   Begin
     olMethods := TList<TPascalMethod>.Create();
@@ -2049,9 +2089,10 @@ Procedure TPascalModule.MetricsUnsortedMethods;
             End;
           If Not boolOkay Then
             Begin
-              boolOverride := AddCheck([olMethods[iMethod].QualifiedName], olMethods[iMethod].Line,
+              eIssueState := AddCheck([olMethods[iMethod].QualifiedName], olMethods[iMethod].Line,
                 olMethods[iMethod].Column, olMethods[iMethod], mcUnsortedMethod);
-              olMethods[iMethod].IncrementCheck(mcUnsortedMethod, boolOverride);
+              If eIssueState In [isAdded, isOverride] Then
+                olMethods[iMethod].IncrementCheck(mcUnsortedMethod, eIssueState = isOverride);
             End;
         End;
     Finally
@@ -5109,16 +5150,17 @@ Const
 Var
   ExprType : TPascalExprTypes;
   C : TTempCntr;
-  boolOverride: Boolean;
+  eIssueState: TBADIIssueState;
 
 Begin
   If Token.UToken = strGOTO Then
     Begin
       If Assigned(CurrentMethod) Then
         Begin
-          boolOverride := AddCheck([CurrentMethod.QualifiedName], Token.Line, Token.Column,
+          eIssueState := AddCheck([CurrentMethod.QualifiedName], Token.Line, Token.Column,
             CurrentMethod, mcUseOfGOTOStatements);
-          CurrentMethod.IncrementCheck(mcUseOfGOTOStatements, boolOverride);
+          If eIssueState In [isAdded, isOverride] Then
+            CurrentMethod.IncrementCheck(mcUseOfGOTOStatements, eIssueState = isOverride);
         End;
       NextNonCommentToken;
       If IsIdentifier(Token) Then
@@ -5662,7 +5704,7 @@ Function TPascalModule.WithStmt : Boolean;
 Const
   strWITH = 'WITH';
 var
-  boolOverride: Boolean;
+  eIssueState: TBADIIssueState;
   
 Begin
   Result := Token.UToken = strWITH;
@@ -5670,9 +5712,10 @@ Begin
     Begin
       If Assigned(CurrentMethod) Then
         Begin
-          boolOverride := AddCheck([CurrentMethod.QualifiedName], Token.Line, Token.Column,
+          eIssueState := AddCheck([CurrentMethod.QualifiedName], Token.Line, Token.Column,
             CurrentMethod, mcUseOfWithStatements);
-          CurrentMethod.IncrementCheck(mcUseOfWithStatements, boolOverride);
+          If eIssueState In [isAdded, isOverride] Then
+            CurrentMethod.IncrementCheck(mcUseOfWithStatements, eIssueState = isOverride);
         End;
       NextNonCommentToken;
       Repeat
@@ -7341,7 +7384,6 @@ Var
   I, F : TElementContainer;
   iFinal : Integer;
   iInitial : Integer;
-  boolOverride: Boolean;
 
 Begin
   If Token.UToken = strINITIALIZATION Then
@@ -7358,13 +7400,13 @@ Begin
           iFinal := StmtList;
           If iFinal = 0 Then
             Begin
-              boolOverride := AddCheck([], F.Line, F.Column, F, mcEmptyFinalization);
+              AddCheck([], F.Line, F.Column, F, mcEmptyFinalization);
             End;
         End Else
           iFinal := 0;
       If (iInitial = 0) And (iFinal = 0) Then
         Begin
-          boolOverride := AddCheck([], I.Line, I.Column, I, mcEmptyIntialization);
+          AddCheck([], I.Line, I.Column, I, mcEmptyIntialization);
         End;
       If Token.UToken = strEND Then
         NextNonCommentToken

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Dec 2017
+  @Date    02 Jan 2018
   
 **)
 Unit BADI.Module.Metrics;
@@ -22,7 +22,8 @@ Uses
   BADI.Module.Metrics.EditorView.Frame, 
   BADI.Base.Module,
   Generics.Collections,
-  Themes;
+  Themes, 
+  BADI.Types;
    
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -87,17 +88,18 @@ Type
       (** A single class var reference to the editor view. **)
       FEditorViewRef : INTACustomEditorView;
   Strict Private
-    FFrameManager  : TBADIFrameManager;
-    FFileInfoMgr   : TBADIFileInfoManager;
-    FImageIndex    : Integer;
-    FViewIdent     : String;
-    FModulePanels  : Array[Low(TBADIMetricStatusPanel)..High(TBADIMetricStatusPanel)] Of TStatusPanel;
-    FCount         : Integer;
-    FSourceStrings : TStringList;
-    FSource        : String;
-    FFileName      : String;
-    FModified      : Boolean;
-    FFileDate      : TDateTime;
+    FFrameManager     : TBADIFrameManager;
+    FFileInfoMgr      : TBADIFileInfoManager;
+    FImageIndex       : Integer;
+    FViewIdent        : String;
+    FModulePanels     : Array[Low(TBADIMetricStatusPanel)..High(TBADIMetricStatusPanel)] Of TStatusPanel;
+    FCount            : Integer;
+    FSourceStrings    : TStringList;
+    FSource           : String;
+    FFileName         : String;
+    FModified         : Boolean;
+    FFileDate         : TDateTime;
+    FLastRenderedList : TBADIModuleMetrics;
   Strict Protected
     // INTACustomEditorView
     Function  CloneEditorView: INTACustomEditorView;
@@ -127,6 +129,7 @@ Type
     Procedure ExtractSourceFromFile(Const ModuleInfo : IOTAModuleInfo);
     Function  CurrentEditWindow : String;
     Procedure ProcesModule(Const ModuleInfo : IOTAModuleInfo);
+    Function  RenderedList : TBADIModuleMetrics;
   Public
     Class Function CreateEditorView: INTACustomEditorView;
     Constructor Create(Const strViewIdentifier : String);
@@ -144,11 +147,11 @@ Uses
   {$ENDIF}
   SysUtils, 
   BADI.Module.Dispatcher, 
-  BADI.Types, 
   BADI.ToolsAPIUtils,
   Controls, 
   Vcl.Graphics,
-  ProgressForm;
+  ProgressForm, 
+  BADI.Options;
 
 Const
   (** A unique name for the editor view. **)
@@ -1149,6 +1152,29 @@ End;
 
 (**
 
+  This method extracts the current module metrics into a set so that we can see if the last render was
+  done with a different set of options and thus we need to force a complete reparsing of the modules.
+
+  @precon  None.
+  @postcon The current metric options are returned.
+
+  @return  a TBADIModuleMetrics
+
+**)
+Function TBADIModuleMetricsEditorView.RenderedList: TBADIModuleMetrics;
+
+Var
+  eMetric: TBADIModuleMetric;
+
+Begin
+  Result := [];
+  For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
+    If TBADIOptions.BADIOptions.ModuleMetric[eMetric].FEnabled Then
+      Include(Result, eMetric);
+End;
+
+(**
+
   This method is called when the editor view is selected either when its created or when it regains
   focus.
 
@@ -1177,6 +1203,9 @@ Begin
   P := ActiveProject;
   If Assigned(P) Then
     Begin
+      If FLastRenderedList <> RenderedList Then
+        FFileInfoMgr.Clear;
+      FLastRenderedList := RenderedList;
       frmProgress := TfrmProgress.Create(Application.MainForm);
       Try
         frmProgress.Init(P.GetModuleCount, strParsingProjectModules, strPleaseWait);

@@ -44,6 +44,12 @@ object frameBADIModuleMetricsEditorView: TframeBADIModuleMetricsEditorView
     object ExpandIssues1: TMenuItem
       Action = actExpandIssues
     end
+    object N3: TMenuItem
+      Caption = '-'
+    end
+    object ShowAllColumns1: TMenuItem
+      Action = actShowAllColumns
+    end
   end
   object alActions: TActionList
     Left = 40
@@ -69,6 +75,10 @@ object frameBADIModuleMetricsEditorView: TframeBADIModuleMetricsEditorView
     object actExpandIssues: TAction
       Caption = 'Expand Issues'
       OnExecute = actExpandIssuesExecute
+    end
+    object actShowAllColumns: TAction
+      Caption = '&Show All Columns'
+      OnExecute = actShowAllColumnsExecute
     end
   end
 end

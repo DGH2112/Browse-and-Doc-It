@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    29 Dec 2017
+  @Date    02 Jan 2018
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -79,6 +79,9 @@ Type
     actExpandIssues: TAction;
     N2: TMenuItem;
     ExpandIssues1: TMenuItem;
+    actShowAllColumns: TAction;
+    N3: TMenuItem;
+    ShowAllColumns1: TMenuItem;
     Procedure actExpandAllExecute(Sender: TObject);
     Procedure actCollapseAllExecute(Sender: TObject);
     Procedure actExpandUpdate(Sender: TObject);
@@ -88,6 +91,7 @@ Type
     Procedure actExpandIssuesExecute(Sender: TObject);
     Procedure vstStatisticsFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     Procedure tmFocusTimerTimer(Sender: TObject);
+    procedure actShowAllColumnsExecute(Sender: TObject);
   Strict Private
   Type
       (** A record to describe the data to be held in a tree node. **)
@@ -448,6 +452,30 @@ End;
 
 (**
 
+  This is an on execute event handler for the Show All Columns action.
+
+  @precon  None.
+  @postcon Shows all the columns in the report.
+
+  @param   Sender as a TObject
+
+**)
+Procedure TframeBADIModuleMetricsEditorView.actShowAllColumnsExecute(Sender: TObject);
+
+Var
+  iColumn: Integer;
+  C: TVirtualTreeColumn;
+
+Begin
+  For iColumn := 0 To FVSTMetrics.Header.Columns.Count - 1 Do
+    Begin
+      C := FVSTMetrics.Header.Columns[iColumn];
+      C.Options := C.Options + [coVisible];
+    End;
+End;
+
+(**
+
   This method copies the treeview information to the clipboard.
 
   @precon  None.
@@ -803,27 +831,32 @@ Var
 
 Begin
   For eColumn := Succ(Low(TBADIMetricColumn)) To Pred(High(TBADIMetricColumn)) Do
-    If doAutoHideMetricsWithNoissues In TBADIOptions.BADIOptions.Options Then
-      Begin
-        iCount := 0;
-        N := FVSTMetrics.GetFirst();
-        While Assigned(N) Do
-          Begin
-            NodeData := FVSTMetrics.GetNodeData(N);
-            If NodeData.FMetrics[MetricColumns[eColumn].FMetric] >
-              FLimits.FMetrics[MetricColumns[eColumn].FMetric] Then
-              Inc(iCount);
-            N := FVSTMetrics.GetNextSibling(N);
-          End;
-        If iCount = 0 Then
-          FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
-            FVSTMetrics.Header.Columns[Integer(eColumn)].Options - [coVisible]
-        Else
+    Begin
+      If doAutoHideMetricsWithNoissues In TBADIOptions.BADIOptions.Options Then
+        Begin
+          iCount := 0;
+          N := FVSTMetrics.GetFirst();
+          While Assigned(N) Do
+            Begin
+              NodeData := FVSTMetrics.GetNodeData(N);
+              If NodeData.FMetrics[MetricColumns[eColumn].FMetric] >
+                FLimits.FMetrics[MetricColumns[eColumn].FMetric] Then
+                Inc(iCount);
+              N := FVSTMetrics.GetNextSibling(N);
+            End;
+          If iCount = 0 Then
+            FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
+              FVSTMetrics.Header.Columns[Integer(eColumn)].Options - [coVisible]
+          Else
+            FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
+              FVSTMetrics.Header.Columns[Integer(eColumn)].Options + [coVisible];
+        End Else
           FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
             FVSTMetrics.Header.Columns[Integer(eColumn)].Options + [coVisible];
-      End Else
+      If Not TBADIOptions.BADIOptions.ModuleMetric[MetricColumns[eColumn].FMetric].FEnabled Then
         FVSTMetrics.Header.Columns[Integer(eColumn)].Options :=
-          FVSTMetrics.Header.Columns[Integer(eColumn)].Options + [coVisible];
+          FVSTMetrics.Header.Columns[Integer(eColumn)].Options - [coVisible]
+    End;
 End;
 
 (**

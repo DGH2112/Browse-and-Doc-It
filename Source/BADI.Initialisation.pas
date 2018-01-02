@@ -6,7 +6,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    30 Apr 2017
+  @Date    02 Jan 2018
 
 **)
 Unit BADI.Initialisation;
@@ -31,7 +31,8 @@ Uses
   BADI.VB.Module,
   BADI.VB.ModuleFull,
   BADI.XML.Module,
-  BADI.Options;
+  BADI.Options, 
+  BADI.Base.Module;
 
 Type
   (** This class i responsible for initialising the BADI application objects in the correct
@@ -62,20 +63,43 @@ Type
 **)
 Constructor TBADIInitialisation.Create;
 
+Type
+  TBADIDispatcherRecord = Record
+    FModule    : TBaseLanguageModuleClass;
+    FExt       : String;
+    FCanDoc    : Boolean;
+    FBlockCmt  : TCommentType;
+    FLineCmt   : TCommentType;
+    FInSituCmt : TCommentType;
+  End;
+
+Const
+  Modules : Array[0..8] Of TBADIDispatcherRecord = (
+    (FModule: TBackusNaurModule;   FExt: '.bnf';                      FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock),
+    (FModule: TPascalModule;       FExt: '.dpk;.dpr;.pas';            FCanDoc: True;  FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
+    (FModule: TCPPModule;          FExt: '.cpp;.hpp;.c;.h';           FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPBlock;    FInSituCmt: ctCPPBlock),
+    (FModule: TDFMModule;          FExt: '.dfm';                      FCanDoc: False; FBlockCmt: ctPascalBlock; FLineCmt: ctPascalBlock; FInSituCmt: ctPascalBlock),
+    (FModule: TEidolonModule;      FExt: '.map';                      FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPBlock),
+    (FModule: TTLSSchematicModule; FExt: '.schematic';                FCanDoc: False; FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPLine),
+    (FModule: TINIModule;          FExt: '.ini;.tli';                 FCanDoc: True;  FBlockCmt: ctCPPBlock;    FLineCmt: ctCPPLine;     FInSituCmt: ctCPPBlock),
+    (FModule: TVBModule;           FExt: '.bas;.cls;.frm';            FCanDoc: True;  FBlockCmt: ctVBLine;      FLineCmt: ctVBLine;      FInSituCmt: ctVBLine),
+    (FModule: TXMLModule;          FExt: '.dtd;.htm;.html;.xml;.xsd'; FCanDoc: False; FBlockCmt: ctXML;         FLineCmt: ctXML;         FInSituCmt: ctXML)
+  );
+
 Var
   MD : TBADIDispatcher;
+  iModule: Integer;
 
 Begin
   MD := TBADIDispatcher.BADIDispatcher;  // Will create the module dispatcher
-  MD.Add(TBackusNaurModule, '.bnf', True, ctCPPBlock, ctCPPBlock, ctCPPBlock);
-  MD.Add(TPascalModule, '.dpk;.dpr;.pas', True, ctPascalBlock, ctPascalBlock, ctPascalBlock);
-  MD.Add(TCPPModule, '.cpp;.hpp;.c;.h', True, ctCPPBlock, ctCPPBlock, ctCPPBlock);
-  MD.Add(TDFMModule, '.dfm', False, ctPascalBlock, ctPascalBlock, ctPascalBlock);
-  MD.Add(TEidolonModule, '.map', True, ctCPPBlock, ctCPPLine, ctCPPBlock);
-  MD.Add(TTLSSchematicModule, '.schematic', False, ctCPPBlock, ctCPPLine, ctCPPLine);
-  MD.Add(TINIModule, '.ini;.tli', True, ctCPPBlock, ctCPPLine, ctCPPBlock);
-  MD.Add(TVBModule, '.bas;.cls;.frm', True, ctVBLine, ctVBLine, ctVBLine);
-  MD.Add(TXMLModule, '.dtd;.htm;.html;.xml;.xsd',  False, ctXML, ctXML, ctXML);
+  For iModule := Low(Modules) To High(Modules) Do
+    MD.Add(
+      Modules[iModule].FModule,
+      Modules[iModule].FExt,
+      Modules[iModule].FCanDoc,
+      Modules[iModule].FBlockCmt,
+      Modules[iModule].FLineCmt,
+      Modules[iModule].FInSituCmt);
   TBADIOptions.BADIOptions.LoadSettings; // Will create the Options
 End;
 

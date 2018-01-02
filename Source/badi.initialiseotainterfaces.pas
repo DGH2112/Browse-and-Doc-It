@@ -33,11 +33,8 @@ Uses
   Forms,
   Windows,
   BADI.Wizard,
-  BADI.DockableModuleExplorer,
   BADI.BNFHighlighter,
   BADI.EidolonHighlighter,
-  BADI.SplashScreen,
-  BADI.AboutBox,
   BADI.Constants;
 
 Type
@@ -75,7 +72,6 @@ Begin
   Svcs := BorlandIDEServices As IOTAServices;
   ToolsAPI.BorlandIDEServices := BorlandIDEServices;
   Application.Handle := Svcs.GetParentHandle;
-  TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
   Result := TBrowseAndDocItWizard.Create;
   If WizardType = wtPackageWizard Then
     iWizardIndex := (BorlandIDEServices As IOTAWizardServices).AddWizard(Result);
@@ -83,9 +79,6 @@ Begin
     TBNFHighlighter.Create);
   iEidolonHighlighter := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
     TEidolonHighlighter.Create);
-  {$IFDEF D2005}
-  AddAboutBoxEntry;
-  {$ENDIF}
 End;
 
 (**
@@ -129,9 +122,6 @@ End;
 
 (** This initialization section installs an IDE Splash Screen item. **)
 Initialization
-  {$IFDEF D2005}
-  AddSplashScreen;
-  {$ENDIF}
 (** This finalization section removes this wizard from the IDE when the package
     is unloaded. **)
 Finalization
@@ -141,8 +131,4 @@ Finalization
     (BorlandIDEServices As IOTAHighlightServices).RemoveHighlighter(iBNFHighlighter);
   If iWizardIndex > iWizardFailState Then
     (BorlandIDEServices As IOTAWizardServices).RemoveWizard(iWizardIndex);
-  {$IFDEF D2005}
-  RemoveAboutBoxEntry;
-  {$ENDIF}
-  TfrmDockableModuleExplorer.RemoveDockableModuleExplorer
 End.

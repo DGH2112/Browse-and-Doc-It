@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    28 Dec 2017
+  @Date    02 Jan 2018
   @Version 1.0
 
 **)
@@ -68,7 +68,9 @@ Uses
   BADI.Module.Metrics, 
   BADI.Module.Metrics.SubView, 
   BADI.Module.Checks, 
-  BADI.Module.Checks.SubView;
+  BADI.Module.Checks.SubView,
+  BADI.SplashScreen, 
+  BADI.AboutBox;
 
 (**
 
@@ -84,6 +86,13 @@ Constructor TBrowseAndDocItWizard.Create;
 
 Begin
   Inherited Create;
+  TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
+  {$IFDEF D2005}
+  AddSplashScreen;
+  {$ENDIF}
+  {$IFDEF D2005}
+  AddAboutBoxEntry;
+  {$ENDIF}
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange);
   {$IFDEF D2005}
   FEditorNotifier := TEditorNotifier.Create;
@@ -120,6 +129,9 @@ Begin
     (BorlandIDEServices As IOTAEditorServices).RemoveNotifier(FEditorIndex);
   {$ELSE}
   objEditorNotifier.Free;
+  {$ENDIF}
+  {$IFDEF D2005}
+  RemoveAboutBoxEntry;
   {$ENDIF}
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
   Inherited Destroy;

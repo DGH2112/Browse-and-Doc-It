@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Dec 2017
+  @Date    02 Jan 2018
 
 **)
 Unit BADI.ElementContainer;
@@ -25,6 +25,9 @@ Uses
 
 Type
   TLabelContainer = Class;
+
+  (** An enumerate to define the result of adding a check or metric. **)
+  TBADIIssueState = (isAdded, isOverride, isDisabled);
 
   (** This class implements the IElementCollection interface so that this
       element container can be rendered with the module browser. **)
@@ -102,9 +105,9 @@ Type
       Const Container: TElementContainer; Const strCategory: String;
       Const DocConflictRec: TDocConflictTable);
     Function AddMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
-      Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : Boolean;
+      Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : TBADIIssueState;
     Function AddCheck(Const Args: Array of Const; Const iLine, iColumn : Integer;
-      Const Container : TElementContainer; Const eCheck : TBADIModuleCheck) : Boolean;
+      Const Container : TElementContainer; Const eCheck : TBADIModuleCheck) : TBADIIssueState;
     Function  AsString(Const boolShowIdenifier, boolForDocumentation : Boolean) : String;
       Virtual; Abstract;
     Procedure CheckReferences; Virtual;
@@ -415,11 +418,11 @@ End;
   @param   iColumn   as an Integer as a constant
   @param   Container as a TElementContainer as a constant
   @param   eCheck    as a TBADIModuleCheck as a constant
-  @return  a Boolean
+  @return  a TBADIIssueState
 
 **)
 Function TElementContainer.AddCheck(Const Args: Array of Const; Const iLine, iColumn : Integer;
-      Const Container : TElementContainer; Const eCheck : TBADIModuleCheck) : Boolean;
+  Const Container : TElementContainer; Const eCheck : TBADIModuleCheck) : TBADIIssueState;
 
 Var
   E: TElementContainer;
@@ -427,13 +430,15 @@ Var
   iIcon: TBADIImageIndex;
 
 Begin
-  Result := False;
-  If Not (doShowChecks In BADIOptions.Options) Or
-    Not BADIOptions.ModuleCheck[eCheck].FEnabled Or
-    CheckCommentForNoCheck(eCheck, Self) Or
-    CheckCommentForNoCheck(eCheck, Container) Then
+  Result := isAdded;
+  If Not (doShowChecks In BADIOptions.Options) Or Not BADIOptions.ModuleCheck[eCheck].FEnabled Then
     Begin
-      Result := True;
+      Result := isDisabled;
+      Exit;
+    End;
+  If CheckCommentForNoCheck(eCheck, Self) Or CheckCommentForNoCheck(eCheck, Container) Then
+    Begin
+      Result := isOverride;
       Exit;
     End;
   ModuleMetricPosition(Container, iL, iC);
@@ -587,11 +592,11 @@ End;
   @param   iColumn   as an Integer as a constant
   @param   Container as a TElementContainer as a constant
   @param   eMetric   as a TBADIModuleMetric as a constant
-  @return  a Boolean
+  @return  a TBADIIssueState
 
 **)
 Function TElementContainer.AddMetric(Const Args: Array of Const; Const iLine, iColumn : Integer;
-  Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : Boolean;
+  Const Container : TElementContainer; Const eMetric : TBADIModuleMetric) : TBADIIssueState;
 
 Var
   E: TElementContainer;
@@ -599,13 +604,15 @@ Var
   iIcon: TBADIImageIndex;
 
 Begin
-  Result := False;
-  If Not (doShowMetrics In BADIOptions.Options) Or
-    Not BADIOptions.ModuleMetric[eMetric].FEnabled Or
-    CheckCommentForNoMetric(eMetric, Self) Or
-    CheckCommentForNoMetric(eMetric, Container) Then
+  Result := isAdded;
+  If Not (doShowMetrics In BADIOptions.Options) Or Not BADIOptions.ModuleMetric[eMetric].FEnabled Then
     Begin
-      Result := True;
+      Result := isDisabled;
+      Exit;
+    End;
+  If CheckCommentForNoMetric(eMetric, Self) Or CheckCommentForNoMetric(eMetric, Container) Then
+    Begin
+      Result := isOverride;
       Exit;
     End;
   ModuleMetricPosition(Container, iL, iC);

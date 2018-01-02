@@ -4,7 +4,7 @@
   information.
 
   @Author  David Hoyle
-  @Date    29 Apr 2017
+  @Date    02 Jan 2018
   @Version 1.0
 
 **)
@@ -1429,10 +1429,13 @@ Procedure THTMLDocumentation.OutputDocumentation;
 
 Var
   i : Integer;
+  iImageIndex : Integer;
+  iScopeIndex : Integer;
 
 Begin
-  Initialise(
-    5 + Integer(Succ(High(TBADIImageIndex))) * Integer(Succ(High(TScope))) + FFileNames.Count,
+  iImageIndex := Integer(High(TBADIImageIndex)) + 1;
+  iScopeIndex := Integer(High(TScope)) + 1;
+  Initialise(5 + iImageIndex * iScopeIndex + FFileNames.Count,
     'HTML Documentation',
     'Processing source code, please wait...');
   Try

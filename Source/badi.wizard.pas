@@ -34,9 +34,9 @@ Type
     FBADIIDEMenuInstaller    : TBADIIDEMenuInstaller;
     FBADIIDEOptionsInstaller : TBADIIDEOptionsInstaller;
     FEditorNotifier          : TEditorNotifier;
-    {$IFDEF D2005}
     FEditorIndex             : Integer;
-    {$ENDIF}
+    FBNFHighlighterIndex     : Integer;
+    FEidolonHighlighterIndex : Integer;
   Strict Protected
     // IOTAWizard
     Function GetIDString: String;
@@ -70,7 +70,9 @@ Uses
   BADI.Module.Checks, 
   BADI.Module.Checks.SubView,
   BADI.SplashScreen, 
-  BADI.AboutBox;
+  BADI.AboutBox, 
+  BADI.BNFHighlighter,
+  BADI.EidolonHighlighter;
 
 (**
 
@@ -87,21 +89,17 @@ Constructor TBrowseAndDocItWizard.Create;
 Begin
   Inherited Create;
   TfrmDockableModuleExplorer.CreateDockableModuleExplorer;
-  {$IFDEF D2005}
-  AddSplashScreen;
-  {$ENDIF}
-  {$IFDEF D2005}
-  AddAboutBoxEntry;
-  {$ENDIF}
   TfrmDockableModuleExplorer.HookEventHandlers(SelectionChange, Focus, OptionsChange);
-  {$IFDEF D2005}
+  AddSplashScreen;
+  AddAboutBoxEntry;
   FEditorNotifier := TEditorNotifier.Create;
   FEditorIndex := (BorlandIDEServices As IOTAEditorServices).AddNotifier(FEditorNotifier);
-  {$ELSE}
-  FEditorNotifier := TEditorNotifier.Create;
-  {$ENDIF}
   FBADIIDEMenuInstaller := TBADIIDEMenuInstaller.Create(FEditorNotifier);
   FBADIIDEOptionsInstaller := TBADIIDEOptionsInstaller.Create(UpdateMenuShortcuts);
+  FBNFHighlighterIndex := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
+    TBNFHighlighter.Create);
+  FEidolonHighlighterIndex := (BorlandIDEServices As IOTAHighlightServices).AddHighlighter(
+    TEidolonHighlighter.Create);
   RegisterMetricsEditorView;
   RegisterChecksEditorView;
   RegisterEditorMetricsSubView;
@@ -123,16 +121,15 @@ Begin
   UnregisterEditorMetricsSubView;
   UnregisterChecksEditorView;
   UnregisterMetricsEditorView;
+  If FEidolonHighlighterIndex > iWizardFailState Then
+    (BorlandIDEServices As IOTAHighlightServices).RemoveHighlighter(FEidolonHighlighterIndex);
+  If FBNFHighlighterIndex > iWizardFailState Then
+    (BorlandIDEServices As IOTAHighlightServices).RemoveHighlighter(FBNFHighlighterIndex);
   FBADIIDEOptionsInstaller.Free;
-  {$IFDEF D2005}
+  FBADIIDEMenuInstaller.Free;
   If FEditorIndex > iWizardFailState Then
     (BorlandIDEServices As IOTAEditorServices).RemoveNotifier(FEditorIndex);
-  {$ELSE}
-  objEditorNotifier.Free;
-  {$ENDIF}
-  {$IFDEF D2005}
   RemoveAboutBoxEntry;
-  {$ENDIF}
   TfrmDockableModuleExplorer.RemoveDockableModuleExplorer;
   Inherited Destroy;
 End;

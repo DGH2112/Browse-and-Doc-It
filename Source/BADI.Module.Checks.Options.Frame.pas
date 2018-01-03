@@ -171,7 +171,7 @@ Begin
   C.Text := 'Checks and Sub-Options';
   C := FVSTChecks.Header.Columns.Add;
   C.Position := 1;
-  C.Width := 150;
+  C.Width := 175;
   C.Text := 'Name';
 End;
 
@@ -364,7 +364,7 @@ Begin
   Else
     Case Column Of
       iCheckDescription: CellText := ModuleCheckSubOps[NodeData.FModuleCheckSubOp].FDescription;
-      iCheckName: CellText := ModuleCheckSubOps[NodeData.FModuleCheckSubOp].FName;
+      iCheckName: CellText := '';
     End;
 End;
 

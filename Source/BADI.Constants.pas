@@ -194,10 +194,15 @@ Const
     (FResourceName : 'DocConflictItem';               FMaskColour: clLime),
     (FResourceName : 'DocConflictMissing';            FMaskColour: clLime),
 
-    (FResourceName : 'MetricCheckFolder';             FMaskColour: clLime),
-    (FResourceName : 'MetricCheckIncorrect';          FMaskColour: clLime),
-    (FResourceName : 'MetricCheckItem';               FMaskColour: clLime),
-    (FResourceName : 'MetricCheckMissing';            FMaskColour: clLime),
+    (FResourceName : 'MetricFolder';                  FMaskColour: clLime),
+    (FResourceName : 'MetricIncorrect';               FMaskColour: clLime),
+    (FResourceName : 'MetricItem';                    FMaskColour: clLime),
+    (FResourceName : 'MetricMissing';                 FMaskColour: clLime),
+
+    (FResourceName : 'CheckFolder';                   FMaskColour: clFuchsia),
+    (FResourceName : 'CheckIncorrect';                FMaskColour: clFuchsia),
+    (FResourceName : 'CheckItem';                     FMaskColour: clFuchsia),
+    (FResourceName : 'CheckMissing';                  FMaskColour: clFuchsia),
 
     (FResourceName : 'UsesLabel';                     FMaskColour: clLime),
     (FResourceName : 'UsesItem';                      FMaskColour: clLime),

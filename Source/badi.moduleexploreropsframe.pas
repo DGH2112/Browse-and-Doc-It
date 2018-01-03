@@ -4,10 +4,10 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    28 Dec 2017
+  @Date    03 Jan 2018
 
 **)
-Unit BADI.ModuleExlporerOpsFrame;
+Unit BADI.ModuleExplorerOpsFrame;
 
 Interface
 
@@ -80,7 +80,7 @@ Type
     FIssueLimits : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
   Protected
     procedure udLimitsChangingEx(Sender: TObject; var AllowChange: Boolean;
-      NewValue: {$IFDEF DXE30}Integer{$ELSE}SmallInt{$ENDIF}; Direction: TUpDownDirection);
+      NewValue: {$IFDEF DXE50}Integer{$ELSE}SmallInt{$ENDIF}; Direction: TUpDownDirection);
   Public
     { Public declarations }
     //: @nometric MissingCONSTInParam
@@ -398,7 +398,7 @@ End;
 
 **)
 Procedure TfmBADIModuleExplorerFrame.udLimitsChangingEx(Sender: TObject;
-  Var AllowChange: Boolean; NewValue: {$IFDEF DXE30}Integer{$ELSE}SmallInt{$ENDIF};
+  Var AllowChange: Boolean; NewValue: {$IFDEF DXE50}Integer{$ELSE}SmallInt{$ENDIF};
   Direction: TUpDownDirection);
 
 Begin

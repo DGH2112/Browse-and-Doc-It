@@ -4,7 +4,7 @@
   imlpementations (Delphi and VB).
 
   @Author  David Hoyle
-  @Date    22 Oct 2017
+  @Date    03 Jan 2018
   @Version 1.0
 
 **)
@@ -134,7 +134,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF DEBUG}
+  {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
   {$IFDEF EUREKALOG}

@@ -575,6 +575,9 @@ Type
     FParentCheck     : TBADIModuleCheck;
   End;
 
+  (** An enumerate to define how the toxicity metric is combined. **)
+  TBADIToxicitySummation = (tsAddBeforePower, tsAddAfterPower);
+
 Implementation
 
 { TBADISpecialTag }

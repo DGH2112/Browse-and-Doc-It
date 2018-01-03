@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    22 Dec 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.IDEOptionsInstaller;
@@ -56,7 +56,7 @@ Uses
   BADI.CodeBrowsingFrame,
   BADI.ExcludedDocFilesFrame,
   BADI.MethodDescriptionsFrame,
-  BADI.ModuleExlporerOpsFrame,
+  BADI.ModuleExplorerOpsFrame,
   BADI.SpecialTagsFrame,
   BADI.MenuShortcutsFrame,
   BADI.ModuleExtensionsFrame,

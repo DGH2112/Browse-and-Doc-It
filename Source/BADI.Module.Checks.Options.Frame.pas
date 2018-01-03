@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    28 Dec 2017
+  @date    03 Jan 2018
 
 **)
 Unit BADI.Module.Checks.Options.Frame;
@@ -36,10 +36,6 @@ Type
   TframeBADIModuleChecksOptions = Class(TFrame, IBADIOptionsFrame)
     Procedure vstChecksGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; Var CellText: String);
-    Procedure vstChecksEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
-      Var Allowed: Boolean);
-    Procedure vstChecksNewText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
-      NewText: String);
     Procedure vstChecksHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
     Procedure vstChecksChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     Procedure vstChecksPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
@@ -73,9 +69,9 @@ Uses
 Type
   (** A record to describe the information stored in the virtual treview. **)
   TCheckNodeData = Record
-    FModuleCheck     : TBADIModuleCheck;
-    FMetricLimitType : TBADILimitType;
-    FMetricLimit     : Double;
+    FNodeType         : (ntMainOption, ntSubOption);
+    FModuleCheck      : TBADIModuleCheck;
+    FModuleCheckSubOp : TBADIModuleCheckSubOp;
   End;
   (** A pointer to tbe above structure. **)
   PCheckNodeData = ^TCheckNodeData;
@@ -85,8 +81,6 @@ Const
   iCheckDescription = 0;
   (** The column reference for the metric name. **)
   iCheckName = 1;
-  (** The column reference for the metric limit. **)
-  iCheckLimit = 2;
 
 (**
 
@@ -102,42 +96,10 @@ Const
 **)
 Constructor TframeBADIModuleChecksOptions.Create(AOwner: TComponent);
 
-  (**
-
-    This method searches the tree view for a node with the given parent and if found returns the node 
-    reference for that node else returns nil.
-
-    @precon  None.
-    @postcon Returns the node with the given parent else returns nil if not found.
-
-    @param   eCheck as a TBADIModuleCheck as a constant
-    @return  a PVirtualNode
-
-  **)
-  Function FindParent(Const eCheck : TBADIModuleCheck) : PVirtualNode; Overload;
-
-  Var
-    NodeData : PCheckNodeData;
-    N: PVirtualNode;
-
-  Begin
-    Result := Nil;
-    N := FVSTChecks.GetFirst;
-    While Assigned(N) Do
-      Begin
-        NodeData := FVSTChecks.GetNodeData(N);
-        If NodeData.FModuleCheck = eCheck Then
-          Begin
-            Result := N;
-            Break;
-          End;
-        N := FVSTChecks.GetNext(N);
-      End;
-  End;
-
 Var
   eCheck: TBADIModuleCheck;
-  N, P : PVirtualNode;
+  eCheckSubOp: TBADIModuleCheckSubOp;
+  N, S : PVirtualNode;
   NodeData : PCheckNodeData;
 
 Begin
@@ -146,14 +108,22 @@ Begin
   FVSTChecks.NodeDataSize := SizeOf(TCheckNodeData);
   For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
     Begin
-      P := FindParent(ModuleChecks[eCheck].FParent);
-      N := FVSTChecks.AddChild(P);
+      N := FVSTChecks.AddChild(Nil);
       FVSTChecks.CheckType[N] := ctCheckBox;
       FVSTChecks.CheckState[N] := csUncheckedNormal;
       NodeData := FVSTChecks.GetNodeData(N);
+      NodeData.FNodeType := ntMainOption;
       NodeData.FModuleCheck := eCheck;
-      NodeData.FMetricLimitType := ltNone;
-      NodeData.FMetricLimit := 0;
+      For eCheckSubOp := Low(TBADIModuleCheckSubOp) To High(TBADIModuleCheckSubOp) Do
+        If eCheck = ModuleCheckSubOps[eCheckSubOp].FParentCheck Then
+          Begin
+            S := FVSTChecks.AddChild(N);
+            FVSTChecks.CheckType[S] := ctCheckBox;
+            FVSTChecks.CheckState[S] := csUncheckedNormal;
+            NodeData := FVSTChecks.GetNodeData(S);
+            NodeData.FNodeType := ntSubOption;
+            NodeData.FModuleCheckSubOp := eCheckSubOp;
+          End;
     End;
   FVSTChecks.FullExpand;
 End;
@@ -189,28 +159,20 @@ Begin
   FVSTChecks.Header.Options := FVSTChecks.Header.Options + [hoColumnResize, hoShowImages];
   FVSTChecks.TreeOptions.AutoOptions := [toAutoDropExpand, toAutoScrollOnExpand, toAutoTristateTracking,
     toAutoDeleteMovedNodes, toAutoChangeScale];
-  FVSTChecks.TreeOptions.MiscOptions := FVSTChecks.TreeOptions.MiscOptions +
-    [toCheckSupport, toEditable, toEditOnClick, toEditOnDblClick];
+  FVSTChecks.TreeOptions.MiscOptions := FVSTChecks.TreeOptions.MiscOptions + [toCheckSupport];
   FVSTChecks.OnChecked := vstChecksChecked;
-  FVSTChecks.OnEditing := vstChecksEditing;
   FVSTChecks.OnGetText := vstChecksGetText;
   FVSTChecks.OnPaintText := vstChecksPaintText;
   FVSTChecks.OnHeaderClick := vstChecksHeaderClick;
-  FVSTChecks.OnNewText := vstChecksNewText;
   C := FVSTChecks.Header.Columns.Add;
   C.CheckBox := True;
   C.Position := 0;
   C.Width := 184;
-  C.Text := 'Module Checks';
+  C.Text := 'Checks and Sub-Options';
   C := FVSTChecks.Header.Columns.Add;
   C.Position := 1;
   C.Width := 150;
   C.Text := 'Name';
-//  C := FVSTChecks.Header.Columns.Add;
-//  C.Alignment := taRightJustify;
-//  C.Position := 2;
-//  C.Width := 75;
-//  C.Text := 'Limit';
 End;
 
 (**
@@ -234,12 +196,18 @@ Begin
   While Assigned(N) Do
     Begin
       NodeData := FVSTChecks.GetNodeData(N);
-      If BO.ModuleCheck[NodeData.FModuleCheck].FEnabled Then
-        FVSTChecks.CheckState[N] := csCheckedNormal
-      Else
-        FVSTChecks.CheckState[N] := csUncheckedNormal;
-      NodeData.FMetricLimitType := ModuleChecks[NodeData.FModuleCheck].FLimitType;
-      NodeData.FMetricLimit := BO.ModuleCheck[NodeData.FModuleCheck].FLimit;
+      Case NodeData.FNodeType Of
+        ntMainOption:
+          If BO.ModuleCheck[NodeData.FModuleCheck].FEnabled Then
+            FVSTChecks.CheckState[N] := csCheckedNormal
+          Else
+            FVSTChecks.CheckState[N] := csUncheckedNormal;
+        ntSubOption:
+          If NodeData.FModuleCheckSubOp In BO.BADIOptions.ModuleCheckSubOptions Then
+            FVSTChecks.CheckState[N] := csCheckedNormal
+          Else
+            FVSTChecks.CheckState[N] := csUncheckedNormal;
+      End;
       N := FVSTChecks.GetNext(N);
     End;
   vstChecksChecked(Nil, Nil);
@@ -303,13 +271,26 @@ Begin
   While Assigned(N) Do
     Begin
       NodeData := FVSTChecks.GetNodeData(N);
-      R := BO.ModuleCheck[NodeData.FModuleCheck];
-      Case FVSTChecks.CheckState[N] Of
-        csUncheckedNormal: R.FEnabled := False;
-        csCheckedNormal:   R.FEnabled := True;
+      Case NodeData.FNodeType Of
+        ntMainOption:
+          Begin
+            R := BO.ModuleCheck[NodeData.FModuleCheck];
+            Case FVSTChecks.CheckState[N] Of
+              csUncheckedNormal: R.FEnabled := False;
+              csCheckedNormal:   R.FEnabled := True;
+            End;
+            BO.ModuleCheck[NodeData.FModuleCheck] := R;
+          End;  
+        ntSubOption:
+          Begin
+            Case FVSTChecks.CheckState[N] Of
+              csUncheckedNormal:
+                BO.ModuleCheckSubOptions := BO.ModuleCheckSubOptions - [NodeData.FModuleCheckSubOp];
+              csCheckedNormal:
+                BO.ModuleCheckSubOptions := BO.ModuleCheckSubOptions + [NodeData.FModuleCheckSubOp];
+            End;
+          End;
       End;
-      R.FLimit := NodeData.FMetricLimit;
-      BO.ModuleCheck[NodeData.FModuleCheck] := R;
       N := FVSTChecks.GetNext(N);
     End;
 End;
@@ -354,30 +335,6 @@ end;
 
 (**
 
-  This method determines if the column / value can be edited.
-
-  @precon  None.
-  @postcon Return true in allows if the column and value can be edited.
-
-  @param   Sender  as a TBaseVirtualTree
-  @param   Node    as a PVirtualNode
-  @param   Column  as a TColumnIndex
-  @param   Allowed as a Boolean as a reference
-
-**)
-Procedure TframeBADIModuleChecksOptions.vstChecksEditing(Sender: TBaseVirtualTree; Node: PVirtualNode;
-  Column: TColumnIndex; Var Allowed: Boolean);
-
-Var
-  NodeData : PCheckNodeData;
-
-Begin
-  NodeData := Sender.GetNodeData(Node);
-  Allowed := (Column = iCheckLimit) And (NodeData.FMetricLimitType <> ltNone);
-End;
-
-(**
-
   This method returns the description of the specified column.
 
   @precon  None.
@@ -394,29 +351,21 @@ Procedure TframeBADIModuleChecksOptions.vstChecksGetText(Sender: TBaseVirtualTre
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType; Var
   CellText: String);
 
-Const
-  strIntegerFmt = '%1.0f';
-  strFloatFmt = '%1.3f';
-
 Var
   NodeData : PCheckNodeData;
 
 Begin
   NodeData := Sender.GetNodeData(Node);
-  Case Column Of
-    iCheckDescription: CellText := ModuleChecks[NodeData.FModuleCheck].FDescription;
-    iCheckName:
-      If (NodeData.FModuleCheck = ModuleChecks[NodeData.FModuleCheck].FParent) Then
-        CellText := ModuleChecks[NodeData.FModuleCheck].FName
-      Else
-        CellText := '';
-    iCheckLimit:
-      Case ModuleChecks[NodeData.FModuleCheck].FLimitType Of
-        ltInteger: CellText := Format(strIntegerFmt, [NodeData.FMetricLimit]);
-        ltFloat: CellText := Format(strFloatFmt, [NodeData.FMetricLimit]);
-        ltNone: CellText := '';
-      End;
-  End;
+  If NodeData.FNodeType = ntMainOption Then
+    Case Column Of
+      iCheckDescription: CellText := ModuleChecks[NodeData.FModuleCheck].FCategory;
+      iCheckName: CellText := ModuleChecks[NodeData.FModuleCheck].FName;
+    End
+  Else
+    Case Column Of
+      iCheckDescription: CellText := ModuleCheckSubOps[NodeData.FModuleCheckSubOp].FDescription;
+      iCheckName: CellText := ModuleCheckSubOps[NodeData.FModuleCheckSubOp].FName;
+    End;
 End;
 
 (**
@@ -448,61 +397,6 @@ Begin
         RecurseNodes(ST, ST.RootNode.FirstChild, csUncheckedNormal);
         ST.Invalidate;
       End;
-End;
-
-(**
-
-  This method sets the new limit for a check / metric after validating the value provided.
-
-  @precon  Noen.
-  @postcon Sets the new limit for a check / metric after validating the value provided.
-
-  @param   Sender  as a TBaseVirtualTree
-  @param   Node    as a PVirtualNode
-  @param   Column  as a TColumnIndex
-  @param   NewText as a String
-
-**)
-Procedure TframeBADIModuleChecksOptions.vstChecksNewText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-  Column: TColumnIndex; NewText: String);
-
-ResourceString
-  strNotAValidInteger = '%s is not a valid integer!';
-  strNotAValidFloat = '%s is not a valid floting point number!';
-  strIntegerMustBeGreaterThanZero = 'The limit value (%s) must be greater than zero!';
-  strFloatMustBeGreaterThanZero = 'The limit value (%s) must be greater than zero!';
-
-Var
-  NodeData: PCheckNodeData;
-  iInteger : Integer;
-  dblDouble : Double;
-  iErrorCode: Integer;
-
-Begin
-  NodeData := Sender.GetNodeData(Node);
-  If Column = iCheckLimit Then
-    Case NodeData.FMetricLimitType Of
-      ltInteger:
-        Begin
-          Val(NewText, iInteger, iErrorCode);
-          If iErrorCode > 0 Then
-            MessageDlg(Format(strNotAValidInteger, [NewText]), mtError, [mbOK], 0)
-          Else If iInteger <= 0 Then
-            MessageDlg(Format(strIntegerMustBeGreaterThanZero, [NewText]), mtError, [mbOK], 0)
-          Else
-            NodeData.FMetricLimit := iInteger
-        End;
-      ltFloat:
-        Begin
-          Val(NewText, dblDouble, iErrorCode);
-          If iErrorCode > 0 Then
-            MessageDlg(Format(strNotAValidFloat, [NewText]), mtError, [mbOK], 0)
-          Else If dblDouble <= 0.0 Then
-            MessageDlg(Format(strFloatMustBeGreaterThanZero, [NewText]), mtError, [mbOK], 0)
-          Else
-            NodeData.FMetricLimit := dblDouble
-        End;
-    End;
 End;
 
 (**

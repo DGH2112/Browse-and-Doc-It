@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    29 Oct 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.VB.Comment;
@@ -27,6 +27,7 @@ Type
 Implementation
 
 Uses
+  SysUtils,
   Classes,
   BADI.Functions,
   BADI.Types;

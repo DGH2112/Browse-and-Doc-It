@@ -3,19 +3,25 @@ object fmBADIParentFrame: TfmBADIParentFrame
   Top = 0
   Width = 529
   Height = 337
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -13
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  ParentFont = False
   TabOrder = 0
   object lblBADI: TLabel
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 251
-    Height = 36
+    Width = 523
+    Height = 29
     Align = alTop
     Caption = 'Browse and Doc It'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -32
-    Font.Name = 'Times New Roman'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -24
+    Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
     Transparent = True
@@ -23,11 +29,11 @@ object fmBADIParentFrame: TfmBADIParentFrame
   object lblAuthor: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 64
-    Width = 113
+    Top = 54
+    Width = 523
     Height = 16
     Align = alTop
-    Caption = 'Author: David Hoyle'
+    Caption = 'Author: David Hoyle (c) Season'#39's Fall Music'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -38,8 +44,8 @@ object fmBADIParentFrame: TfmBADIParentFrame
   object lblBuild: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 45
-    Width = 40
+    Top = 35
+    Width = 523
     Height = 16
     Align = alTop
     Caption = 'lblBuild'
@@ -53,11 +59,11 @@ object fmBADIParentFrame: TfmBADIParentFrame
   object lblPleaseSelect: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 186
-    Width = 202
+    Top = 260
+    Width = 523
     Height = 16
     Align = alTop
-    Caption = 'Please select an options category...'
+    Caption = 'Please select a sub-options category...'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -69,14 +75,15 @@ object fmBADIParentFrame: TfmBADIParentFrame
   object lblInformation: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 83
+    Top = 92
     Width = 523
-    Height = 100
+    Height = 165
     Align = alTop
     AutoSize = False
     Caption = 
       'A RAD Studio IDE plug-in to allow you to browse and document you' +
-      'r code.'
+      'r code (including):'#13' * Customizable comment tagging system;'#13' * C' +
+      'ode Checks;'#13' * Code Metrics.'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -88,14 +95,12 @@ object fmBADIParentFrame: TfmBADIParentFrame
   object lblEurekaLog: TLabel
     AlignWithMargins = True
     Left = 3
-    Top = 205
+    Top = 279
     Width = 523
-    Height = 132
+    Height = 58
     Align = alClient
     AutoSize = False
-    Caption = 
-      'A RAD Studio IDE plug-in to allow you to browse and document you' +
-      'r code.'
+    Caption = 'EurekaLog'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -103,8 +108,14 @@ object fmBADIParentFrame: TfmBADIParentFrame
     Font.Style = []
     ParentFont = False
     Layout = tlBottom
-    ExplicitLeft = 6
-    ExplicitTop = 91
-    ExplicitHeight = 100
+  end
+  object lblBuildDate: TLabel
+    AlignWithMargins = True
+    Left = 3
+    Top = 73
+    Width = 523
+    Height = 16
+    Align = alTop
+    Caption = 'lblBuildDate'
   end
 end

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    29 Apr 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.ParentFrame;
@@ -33,6 +33,7 @@ Type
     lblPleaseSelect: TLabel;
     lblInformation: TLabel;
     lblEurekaLog: TLabel;
+    lblBuildDate: TLabel;
   Private
     { Private declarations }
   Public
@@ -65,20 +66,49 @@ Procedure TfmBADIParentFrame.LoadSettings;
 
 Const
   strBugFix = ' abcdefghijklmnopqrstuvwxyz';
+  strBrowseAndDocIt = 'Browse and Doc It %d.%d%s';
+  {$IFDEF DEBUG}
+  strDEBUGBuild = 'DEBUG Build %d.%d.%d.%d';
+  {$ELSE}
+  strBuild = 'Build %d.%d.%d.%d';
+  {$ENDIF}
+  strBuildDateFmt = 'ddd dd/mmm/yyyy hh:nn';
+  strBuildDate = 'Build Date: %s';
+  {$IFDEF EURAKALOG_VER7}
+  strEurekaLogStatus = 'EurekaLog Information:'#13#10 +
+    '  Installed: %s'#13#10 +
+    '  Active: %s';
+  {$ELSE}
+  strEurekaLogStatus = 'EurekaLog is not compiled into this version.';
+  {$ENDIF}
 
 Var
   iMajor, iMinor, iBugFix, iBuild : Integer;
+  dtDate : TDateTime;
+  strModuleName : String;
+  iSize : Integer;
 
 Begin
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
-  lblBADI.Caption := Format('Browse and Doc It %d.%d%s', [iMajor, iMinor, strBugFix[iBugFix]]);
-  lblBuild.Caption := Format('Build %d.%d.%d.%d', [iMajor, iMinor, iBugFix, iBuild]);
-  {$IFDEF EUREKALOG_VER7}
-  lblEurekaLog.Caption := 'EurekaLog Information:'#13#10 +
-    '  Installed: ' + BoolToStr(ExceptionLog7.IsEurekaLogInstalled, True) + #13#10 +
-    '  Active: ' + BoolToStr(ExceptionLog7.IsEurekaLogActive, True);
+  lblBADI.Caption := Format(strBrowseAndDocIt, [iMajor, iMinor, strBugFix[Succ(iBugFix)]]);
+  {$IFDEF DEBUG}
+  lblBuild.Caption := Format(strDEBUGBuild, [iMajor, iMinor, iBugFix, iBuild]);
+  lblBuild.Font.Color := clRed;
   {$ELSE}
-  lblEurekaLog.Caption := 'EurekaLog is not compiled into this version.';
+  lblBuild.Caption := Format(strBuild, [iMajor, iMinor, iBugFix, iBuild]);
+  {$ENDIF}
+  SetLength(strModuleName, MAX_PATH);
+  iSize := GetModuleFileName(hInstance, PChar(strModuleName), MAX_PATH);
+  SetLength(strModuleName, iSize);
+  FileAge(strModuleName, dtDate);
+  lblBuildDate.Caption := Format(strBuildDate, [FormatDateTime(strBuildDateFmt, dtDate)]);
+  {$IFDEF EUREKALOG_VER7}
+  lblEurekaLog.Caption :=  + Format(strEurekaLogStatus, [
+    BoolToStr(ExceptionLog7.IsEurekaLogInstalled, True),
+    BoolToStr(ExceptionLog7.IsEurekaLogActive, True)
+  ]);
+  {$ELSE}
+  lblEurekaLog.Caption := strEurekaLogStatus;
   {$ENDIF}
 End;
 
@@ -88,6 +118,8 @@ End;
 
   @precon  None.
   @postcon None.
+
+  @nocheck EmptyMethod
 
 **)
 Procedure TfmBADIParentFrame.SaveSettings;

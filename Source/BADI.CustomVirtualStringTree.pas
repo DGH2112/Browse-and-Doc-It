@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Dec 2017
+  @Date    03 Jan 2018
   
 **)
 Unit BADI.CustomVirtualStringTree;
@@ -63,8 +63,10 @@ Uses
 Procedure TBADICustomVirtualStringTree.AdvancedHeaderDrawEvent(Sender: TVTHeader;
   Var PaintInfo: THeaderPaintInfo; Const Elements: THeaderPaintElements);
 
+{$IFDEF DXE102}
 Var
-    Details: TThemedElementDetails;
+  Details: TThemedElementDetails;
+{$ENDIF}
 
 Begin
   If (hpeBackground In  Elements) {And (Not PaintInfo.IsDownIndex)} Then

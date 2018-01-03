@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @date    28 Dec 2017
+  @date    03 Jan 2018
 
 **)
 Unit BADI.Module.Metrics.Options.Frame;
@@ -74,9 +74,11 @@ Uses
 Type
   (** A record to describe the information stored in the virtual treview. **)
   TMetricNodeData = Record
-    FModuleMetric    : TBADIModuleMetric;
-    FMetricLimitType : TBADILimitType;
-    FMetricLimit     : Double;
+    FNodeType          : (ntMainOption, ntSubOption);
+    FModuleMetric      : TBADIModuleMetric;
+    FMetricLimitType   : TBADILimitType;
+    FMetricLimit       : Double;
+    FModuleMetricSubOp : TBADIModuleMetricSubOp;
   End;
   (** A pointer to tbe above structure. **)
   PMetricNodeData = ^TMetricNodeData;
@@ -103,42 +105,10 @@ Const
 **)
 Constructor TframeBADIModuleMetricsOptions.Create(AOwner: TComponent);
 
-  (**
-
-    This method searches the tree view for a node with the given parent and if found returns the node 
-    reference for that node else returns nil.
-
-    @precon  None.
-    @postcon Returns the node with the given parent else returns nil if not found.
-
-    @param   eMetric as a TBADIModuleMetric as a constant
-    @return  a PVirtualNode
-
-  **)
-  Function FindParent(Const eMetric : TBADIModuleMetric) : PVirtualNode; Overload;
-
-  Var
-    NodeData : PMetricNodeData;
-    N: PVirtualNode;
-
-  Begin
-    Result := Nil;
-    N := FVSTMetrics.GetFirst;
-    While Assigned(N) Do
-      Begin
-        NodeData := FVSTMetrics.GetNodeData(N);
-        If NodeData.FModuleMetric = eMetric Then
-          Begin
-            Result := N;
-            Break;
-          End;
-        N := FVSTMetrics.GetNext(N);
-      End;
-  End;
-
 Var
   eMetric: TBADIModuleMetric;
-  N, P : PVirtualNode;
+  eMetricSubOp: TBADIModuleMetricSubOp;
+  N, S : PVirtualNode;
   NodeData : PMetricNodeData;
 
 Begin
@@ -147,14 +117,24 @@ Begin
   FVSTMetrics.NodeDataSize := SizeOf(TMetricNodeData);
   For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
     Begin
-      P := FindParent(ModuleMetrics[eMetric].FParent);
-      N := FVSTMetrics.AddChild(P);
+      N := FVSTMetrics.AddChild(Nil);
       FVSTMetrics.CheckType[N] := ctCheckBox;
       FVSTMetrics.CheckState[N] := csUncheckedNormal;
       NodeData := FVSTMetrics.GetNodeData(N);
+      NodeData.FNodeType := ntMainOption;
       NodeData.FModuleMetric := eMetric;
       NodeData.FMetricLimitType := ltNone;
       NodeData.FMetricLimit := 0;
+      For eMetricSubOp := Low(TBADIModuleMetricSubOp) To High(TBADIModuleMetricSubOp) Do
+        If ModuleMetricSubOps[eMetricSubOp].FParentMetric = eMetric Then
+          Begin
+            S := FVSTMetrics.AddChild(N);
+            FVSTMetrics.CheckType[S] := ctCheckBox;
+            FVSTMetrics.CheckState[S] := csUncheckedNormal;
+            NodeData := FVSTMetrics.GetNodeData(S);
+            NodeData.FNodeType := ntSubOption;
+            NodeData.FModuleMetricSubOp := eMetricSubOp;
+          End;
     End;
   FVSTMetrics.FullExpand;
 End;
@@ -199,7 +179,7 @@ Begin
   C.CheckBox := True;
   C.Position := 0;
   C.Width := 184;
-  C.Text := 'Module Metrics and Checks';
+  C.Text := 'Metrics and Sub-Options';
   C := FVSTMetrics.Header.Columns.Add;
   C.Position := 1;
   C.Width := 150;
@@ -232,12 +212,24 @@ Begin
   While Assigned(N) Do
     Begin
       NodeData := FVSTMetrics.GetNodeData(N);
-      If BO.ModuleMetric[NodeData.FModuleMetric].FEnabled Then
-        FVSTMetrics.CheckState[N] := csCheckedNormal
-      Else
-        FVSTMetrics.CheckState[N] := csUncheckedNormal;
-      NodeData.FMetricLimitType := ModuleMetrics[NodeData.FModuleMetric].FLimitType;
-      NodeData.FMetricLimit := BO.ModuleMetric[NodeData.FModuleMetric].FLimit;
+      Case NodeData.FNodeType Of
+        ntMainOption:
+          Begin
+            If BO.ModuleMetric[NodeData.FModuleMetric].FEnabled Then
+              FVSTMetrics.CheckState[N] := csCheckedNormal
+            Else
+              FVSTMetrics.CheckState[N] := csUncheckedNormal;
+            NodeData.FMetricLimitType := ModuleMetrics[NodeData.FModuleMetric].FLimitType;
+            NodeData.FMetricLimit := BO.ModuleMetric[NodeData.FModuleMetric].FLimit;
+          End;
+        ntSubOption:
+          Begin
+            If NodeData.FModuleMetricSubOp In BO.ModuleMetricSubOptions Then
+              FVSTMetrics.CheckState[N] := csCheckedNormal
+            Else
+              FVSTMetrics.CheckState[N] := csUncheckedNormal;
+          End;
+      End;
       N := FVSTMetrics.GetNext(N);
     End;
   vstMetricsChecked(Nil, Nil);
@@ -301,13 +293,27 @@ Begin
   While Assigned(N) Do
     Begin
       NodeData := FVSTMetrics.GetNodeData(N);
-      R := BO.ModuleMetric[NodeData.FModuleMetric];
-      Case FVSTMetrics.CheckState[N] Of
-        csUncheckedNormal: R.FEnabled := False;
-        csCheckedNormal:   R.FEnabled := True;
+      Case NodeData.FNodeType Of
+        ntMainOption:
+          Begin
+            R := BO.ModuleMetric[NodeData.FModuleMetric];
+            Case FVSTMetrics.CheckState[N] Of
+              csUncheckedNormal: R.FEnabled := False;
+              csCheckedNormal:   R.FEnabled := True;
+            End;
+            R.FLimit := NodeData.FMetricLimit;
+            BO.ModuleMetric[NodeData.FModuleMetric] := R;
+          End;
+        ntSubOption:
+          Begin
+            Case FVSTMetrics.CheckState[N] Of
+              csUncheckedNormal:
+                BO.ModuleMetricSubOptions := BO.ModuleMetricSubOptions - [NodeData.FModuleMetricSubOp];
+              csCheckedNormal:
+                BO.ModuleMetricSubOptions := BO.ModuleMetricSubOptions + [NodeData.FModuleMetricSubOp];
+            End;
+          End;
       End;
-      R.FLimit := NodeData.FMetricLimit;
-      BO.ModuleMetric[NodeData.FModuleMetric] := R;
       N := FVSTMetrics.GetNext(N);
     End;
 End;
@@ -371,7 +377,8 @@ Var
 
 Begin
   NodeData := Sender.GetNodeData(Node);
-  Allowed := (Column = iMetricLimit) And (NodeData.FMetricLimitType <> ltNone);
+  Allowed := (NodeData.FNodeType = ntMainOption) And (Column = iMetricLimit) And
+    (NodeData.FMetricLimitType <> ltNone);
 End;
 
 (**
@@ -401,20 +408,23 @@ Var
 
 Begin
   NodeData := Sender.GetNodeData(Node);
-  Case Column Of
-    iMetricDescription: CellText := ModuleMetrics[NodeData.FModuleMetric].FDescription;
-    iMetricName:
-      If (NodeData.FModuleMetric = ModuleMetrics[NodeData.FModuleMetric].FParent) Then
-        CellText := ModuleMetrics[NodeData.FModuleMetric].FName
-      Else
-        CellText := '';
-    iMetricLimit:
-      Case ModuleMetrics[NodeData.FModuleMetric].FLimitType Of
-        ltInteger: CellText := Format(strIntegerFmt, [NodeData.FMetricLimit]);
-        ltFloat: CellText := Format(strFloatFmt, [NodeData.FMetricLimit]);
-        ltNone: CellText := '';
-      End;
-  End;
+  If NodeData.FNodeType = ntMainOption Then
+    Case Column Of
+      iMetricDescription: CellText := ModuleMetrics[NodeData.FModuleMetric].FCategory;
+      iMetricName:        CellText := ModuleMetrics[NodeData.FModuleMetric].FName;
+      iMetricLimit:
+        Case ModuleMetrics[NodeData.FModuleMetric].FLimitType Of
+          ltInteger: CellText := Format(strIntegerFmt, [NodeData.FMetricLimit]);
+          ltFloat: CellText := Format(strFloatFmt, [NodeData.FMetricLimit]);
+          ltNone: CellText := '';
+        End;
+    End
+  Else
+    Case Column Of
+      iMetricDescription: CellText := ModuleMetricSubOps[NodeData.FModuleMetricSubOp].FDescription;
+    Else
+      CellText := '';
+    End
 End;
 
 (**

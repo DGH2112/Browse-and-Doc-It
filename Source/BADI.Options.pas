@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    02 Jan 2018
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.Options;
@@ -53,7 +53,9 @@ Type
     FIssueLimits            : Array[Low(TLimitType)..High(TLimitType)] Of Integer;
     FBADIMenuShortCuts      : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
     FModuleMetrics          : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord;
+    FModuleMetricSubOps     : TBADIModuleMetricSubOps;
     FModuleChecks           : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of TBADICheckRecord;
+    FModuleCheckSubOps      : TBADIModuleCheckSubOps;
     FLowMetricMargin        : Double;
     FHighMetricMargin       : Double;
     FRefactorConstNewLine   : Boolean;
@@ -299,6 +301,14 @@ Type
     Property ModuleMetric[Const eModuleMetric : TBADIModuleMetric] : TBADIMetricRecord
       Read GetModulelMetric Write SetModuleMetric;
     (**
+      This property gets and sets the metric sub-options set.
+      @precon  None.
+      @postcon Gets and sets the metric sub-options set.
+      @return  a TBADIModuleMetricSubOps
+    **)
+    Property ModuleMetricSubOptions : TBADIModuleMetricSubOps Read FModuleMetricSubOps
+      Write FModuleMEtricSubOps;
+    (**
       A property to read and write module checks configuration information.
       @precon  None.
       @postcon Gets and sets the module check information.
@@ -307,6 +317,14 @@ Type
     **)
     Property ModuleCheck[Const eModuleCheck : TBADIModuleCheck] : TBADICheckRecord
       Read GetModulelCheck Write SetModuleCheck;
+    (**
+      This property gets and sets the check sub-options set.
+      @precon  None.
+      @postcon Gets and sets the check sub-options set.
+      @return  a TBADIModuleCheckSubOps
+    **)
+    Property ModuleCheckSubOptions : TBADIModuleCheckSubOps Read FModuleCheckSubOps
+      Write FModuleCheckSubOps;
     (**
       A property to define the lower limit margin for metrics in the metrics views.
       @precon  None.
@@ -665,6 +683,7 @@ Procedure TBADIOptions.LoadChecks(Const iniFile: TMemIniFile);
 
 Var
   eCheck: TBADIModuleCheck;
+  eChecksSubOp: TBADIModuleCheckSubOp;
 
 Begin
   For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
@@ -674,6 +693,10 @@ Begin
       FModuleChecks[eCheck].FLimit := iniFile.ReadFloat(strModuleChecks,
         ModuleChecks[eCheck].FName + strLimit, ModuleChecks[eCheck].FLimit);
     End;
+  FModuleCheckSubOps := [];
+  For eChecksSubOp := Low(TBADIModuleCheckSubOp) To High(TBADIModuleCheckSubOp) Do
+    If iniFile.ReadBool(strModuleChecks, ModuleCheckSubOps[eChecksSubOp].FName + strEnabled, True) Then
+      Include(FModuleCheckSubOps, eChecksSubOp);
 End;
 
 (**
@@ -822,6 +845,7 @@ Const
 
 Var
   eMetric: TBADIModuleMetric;
+  eMetricSubOp: TBADIModuleMetricSubOp;
 
 Begin
   For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
@@ -833,6 +857,10 @@ Begin
     End;
   FLowMetricMargin := iniFile.ReadInteger(strMetricMargins, strLowMargin, iDefaultLowLimit);
   FHighMetricMargin := iniFile.ReadInteger(strMetricMargins, strHighMargin, iDefaultHighLimit);
+  FModuleMetricSubOps := [];
+  For eMetricSubOp := Low(TBADIModuleMetricSubOp) To High(TBADIModuleMetricSubOp) Do
+    If iniFile.ReadBool(strModuleMetrics, ModuleMetricSubOps[eMetricSubOp].FName + strEnabled, True) Then
+      Include(FModuleMetricSubOps, eMetricSubOp);
 End;
 
 (**
@@ -1036,6 +1064,7 @@ Procedure TBADIOptions.SaveChecks(Const iniFile: TMemIniFile);
 
 Var
   eCheck: TBADIModuleCheck;
+  eCheckSubOp: TBADIModuleCheckSubOp;
 
 Begin
   For eCheck := Low(TBADIModuleCheck) To High(TBADIModuleCheck) Do
@@ -1045,6 +1074,9 @@ Begin
       iniFile.WriteFloat(strModuleChecks, ModuleChecks[eCheck].FName + strLimit,
         FModuleChecks[eCheck].FLimit);
     End;
+  For eCheckSubOp := Low(TBADIModuleCheckSubOp) To High(TBADIModuleCheckSubOp) Do
+    iniFile.WriteBool(strModuleChecks, ModuleCheckSubOps[eCheckSubOp].FName + strEnabled,
+      eCheckSubOp In FModuleCheckSubOps);
 End;
 
 (**
@@ -1168,6 +1200,7 @@ Procedure TBADIOptions.SaveMetrics(Const iniFile: TMemIniFile);
 
 Var
   eMetric: TBADIModuleMetric;
+  eMetricSubOp: TBADIModuleMetricSubOp;
 
 Begin
   For eMetric := Low(TBADIModuleMetric) To High(TBADIModuleMetric) Do
@@ -1179,6 +1212,9 @@ Begin
     End;
   iniFile.WriteInteger(strMetricMargins, strLowMargin, Trunc(FLowMetricMargin));
   iniFile.WriteInteger(strMetricMargins, strHighMargin, Trunc(FHighMetricMargin));
+  For eMetricSubOp := Low(TBADIModuleMetricSubOp) To High(TBADIModuleMetricSubOp) Do
+    iniFile.WriteBool(strModuleMetrics, ModuleMetricSubOps[eMetricSubOp].FName + strEnabled,
+      eMetricSubOp In FModuleMetricSubOps);
 End;
 
 (**

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    19 Nov 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.ModuleExplorer.CustomHintWindow;
@@ -54,7 +54,7 @@ Type
     Procedure PaintRenderSpecialTags(Const iBottom : Integer); InLine;
   Public
     //: @nometric MissingCONSTInParam
-    Constructor Create(AOwner : TComponent; ATreeView : TVirtualStringTree); ReIntroduce;
+    Constructor Create(Const AOwner : TComponent; Const ATreeView : TVirtualStringTree); ReIntroduce;
     Procedure Paint; Override;
     //: @nometric MissingCONSTInParam
     Function CalcHintRect(MinWidth, MaxWidth : Integer; Node : PVirtualNode;
@@ -68,11 +68,15 @@ Type
 Implementation
 
 Uses
-  //CodeSiteLogging, //: @debug Remove CodeSite
-  BADI.Options,
+  {$IFDEF DEBUG}
+  CodeSiteLogging,
+  {$ENDIF}
   Forms,
+  SysUtils,
+  Types,
+  BADI.Options,
   BADI.Functions,
-  SysUtils;
+  BADI.Comment.Tag;
 
 (**
 
@@ -86,7 +90,7 @@ Uses
            tree node.
   @postcon Activates the hint window.
 
-  @nometric MissingCONSTInParam
+  @nocheck MissingCONSTInParam
 
   @param   Rect            as a TRect
   @param   Node            as a PVirtualNode
@@ -124,8 +128,8 @@ End;
            and Comment is the comment associated with the tree node and
   @postcon Returns the newly calculated rectangle of the hint window.
 
-  @nometric MissingCONSTInParam
-  @nohint 
+  @nocheck MissingCONSTInParam
+  @nohint  MaxWidth
 
   @param   MinWidth        as an Integer
   @param   MaxWidth        as an Integer
@@ -343,13 +347,13 @@ End;
   @precon  ATreeView must be a valid instance of the explorer treeview.
   @postcon Ensures the hint can get the treeviews font information.
 
-  @nometric MissingCONSTInParam
-  
-  @param   AOwner    as a TComponent
-  @param   ATreeView as a TVirtualStringTree
+  @nometricMissingCONSTInParam
+
+  @param   AOwner    as a TComponent as a constant
+  @param   ATreeView as a TVirtualStringTree as a constant
 
 **)
-Constructor TBADICustomHintWindow.Create(AOwner: TComponent; ATreeView: TVirtualStringTree);
+Constructor TBADICustomHintWindow.Create(Const AOwner: TComponent; Const ATreeView: TVirtualStringTree);
 
 Begin
   Inherited Create(AOwner);

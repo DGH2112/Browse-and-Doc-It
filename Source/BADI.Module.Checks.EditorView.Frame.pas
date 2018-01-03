@@ -37,7 +37,6 @@ Uses
   ToolsAPI,
   Themes,
   BADI.Types,
-  System.ImageList, 
   BADI.CustomVirtualStringTree,
   UITypes;
 

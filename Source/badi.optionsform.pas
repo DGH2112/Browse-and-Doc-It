@@ -3,7 +3,7 @@
   This module provides an enumerate set for the visible display options and
   a dialogue for setting those options.
 
-  @Date    11 Apr 2017
+  @Date    03 Jan 2018
   @Version 1.0
   @Author  David Hoyle
 
@@ -36,7 +36,7 @@ Uses
   BADI.Base.Module,
   BADI.GeneralOptionsFrame,
   BADI.SpecialTagsFrame,
-  BADI.ModuleExlporerOpsFrame,
+  BADI.ModuleExplorerOpsFrame,
   BADI.CodeBrowsingFrame,
   BADI.ExcludedDocFilesFrame,
   BADI.MethodDescriptionsFrame,
@@ -77,7 +77,7 @@ Type
     FBADIModuleExtensionsFrame : TfmBADIModuleExtensionsFrame;
   Public
     { Public declarations }
-    Class Function Execute(VisibleTabs: TVisibleTabs): Boolean;
+    Class Function Execute(Const VisibleTabs: TVisibleTabs): Boolean;
   End;
 
 Implementation
@@ -90,19 +90,18 @@ Uses
 
 (**
 
-  This method creates an instance of the options dialogue and sets all the
-  controls based on the passed Options parameter. If OK is selected then the
-  Options parameter is updated to suit the new options.
+  This method creates an instance of the options dialogue and sets all the controls based on the passed 
+  Options parameter. If OK is selected then the Options parameter is updated to suit the new options.
 
-  @precon  iInt is the timer interval to be represented in the dialogue,
-           DocHelpFile is the directory of the modules help file.
+  @precon  iInt is the timer interval to be represented in the dialogue, DocHelpFile is the directory of
+           the modules help file.
   @postcon Returns true if the OK button on the dialogue was pressed.
 
-  @param   VisibleTabs as a TVisibleTabs
+  @param   VisibleTabs as a TVisibleTabs as a constant
   @return  a Boolean
 
 **)
-Class Function TfrmOptions.Execute(VisibleTabs: TVisibleTabs): Boolean;
+Class Function TfrmOptions.Execute(Const VisibleTabs: TVisibleTabs): Boolean;
 
 Var
   F: TfrmOptions;

@@ -28,7 +28,6 @@ Uses
   PlatformDefaultStyleActnCtrls,
   ActnPopup,
   ExtCtrls,
-  ImageList,
   ImgList;
 
 Type

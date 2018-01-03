@@ -24,7 +24,10 @@ Uses
   Dialogs,
   BADI.CustomOptionsFrame,
   VirtualTrees, 
-  BADI.CustomVirtualStringTree, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls;
+  BADI.CustomVirtualStringTree,
+  StdCtrls,
+  ExtCtrls,
+  ComCtrls;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -56,10 +59,6 @@ Type
     Procedure vstMetricsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     Procedure vstMetricsPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
-    procedure udMetricLowerLimitChangingEx(Sender: TObject; var AllowChange: Boolean; NewValue: Integer;
-      Direction: TUpDownDirection);
-    procedure udMetricUpperLimitChangingEx(Sender: TObject; var AllowChange: Boolean; NewValue: Integer;
-      Direction: TUpDownDirection);
   Strict Private
     FVSTMetrics : TBADIMetricsOptionsVirtualStringTree;
   Strict Protected
@@ -68,6 +67,10 @@ Type
     Procedure RecurseNodes(Const vstTreeView: TBaseVirtualTree; Const Node: PVirtualNode;
       Const State: TCheckState);
     Procedure CreateVirtualStringTree;
+    Procedure udMetricLowerLimitChangingEx(Sender: TObject; Var AllowChange: Boolean;
+      NewValue: {$IFDEF DXE50}Integer{$ELSE}SmallInt{$ENDIF}; Direction: TUpDownDirection);
+    Procedure udMetricUpperLimitChangingEx(Sender: TObject; Var AllowChange: Boolean;
+      NewValue: {$IFDEF DXE50}Integer{$ELSE}SmallInt{$ENDIF}; Direction: TUpDownDirection);
   Public
     //: @nometric MissingCONSTInParam
     Constructor Create(AOwner : TComponent); Override;
@@ -364,7 +367,8 @@ End;
 
 **)
 Procedure TframeBADIModuleMetricsOptions.udMetricLowerLimitChangingEx(Sender: TObject;
-  Var AllowChange: Boolean; NewValue: Integer; Direction: TUpDownDirection);
+  Var AllowChange: Boolean; NewValue: {$IFDEF DXE50}Integer{$ELSE}SmallInt{$ENDIF};
+  Direction: TUpDownDirection);
 
 Begin
   AllowChange := (NewValue <= udMetricUpperLimit.Position);
@@ -384,7 +388,8 @@ End;
 
 **)
 Procedure TframeBADIModuleMetricsOptions.udMetricUpperLimitChangingEx(Sender: TObject;
-  Var AllowChange: Boolean; NewValue: Integer; Direction: TUpDownDirection);
+  Var AllowChange: Boolean; NewValue: {$IFDEF DXE50}Integer{$ELSE}SmallInt{$ENDIF};
+  Direction: TUpDownDirection);
 
 Begin
   AllowChange := (NewValue >= udMetricLowerLimit.Position);

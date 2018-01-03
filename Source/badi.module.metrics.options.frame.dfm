@@ -24,7 +24,7 @@ object frameBADIModuleMetricsOptions: TframeBADIModuleMetricsOptions
     object lblToxicityPower: TLabel
       Left = 8
       Top = 11
-      Width = 334
+      Width = 83
       Height = 16
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Toxicity &Power'
@@ -33,7 +33,7 @@ object frameBADIModuleMetricsOptions: TframeBADIModuleMetricsOptions
     object lblToxicitySummation: TLabel
       Left = 8
       Top = 41
-      Width = 141
+      Width = 112
       Height = 16
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Toxicity &Summation'
@@ -65,7 +65,7 @@ object frameBADIModuleMetricsOptions: TframeBADIModuleMetricsOptions
       Anchors = [akTop, akRight]
       ReadOnly = True
       TabOrder = 0
-      Text = '0'
+      Text = '1'
     end
     object udToxicityPower: TUpDown
       Left = 389
@@ -76,6 +76,7 @@ object frameBADIModuleMetricsOptions: TframeBADIModuleMetricsOptions
       Associate = edtToxicityPower
       Min = 1
       Max = 10
+      Position = 1
       TabOrder = 1
     end
     object cbxToxicitySummation: TComboBox
@@ -96,6 +97,7 @@ object frameBADIModuleMetricsOptions: TframeBADIModuleMetricsOptions
       Associate = edtMetricLowerLimit
       Min = 1
       Max = 199
+      Position = 1
       TabOrder = 4
     end
     object edtMetricLowerLimit: TEdit
@@ -107,7 +109,7 @@ object frameBADIModuleMetricsOptions: TframeBADIModuleMetricsOptions
       Anchors = [akTop, akRight]
       ReadOnly = True
       TabOrder = 3
-      Text = '0'
+      Text = '1'
     end
     object udMetricUpperLimit: TUpDown
       Left = 389
@@ -118,6 +120,7 @@ object frameBADIModuleMetricsOptions: TframeBADIModuleMetricsOptions
       Associate = edtMetricUpperLimit
       Min = 1
       Max = 199
+      Position = 1
       TabOrder = 6
     end
     object edtMetricUpperLimit: TEdit
@@ -129,7 +132,7 @@ object frameBADIModuleMetricsOptions: TframeBADIModuleMetricsOptions
       Anchors = [akTop, akRight]
       ReadOnly = True
       TabOrder = 5
-      Text = '0'
+      Text = '1'
     end
   end
 end

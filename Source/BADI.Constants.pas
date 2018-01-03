@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Dec 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.Constants;
@@ -521,7 +521,6 @@ Const
   (** A constant array of default options for the Module Metrics. **)
   ModuleMetrics : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord = (
     (
-      FParent: mmLongMethods;
       FName: strLongMethodNoMetric;
       FCategory: strLongMethodImplementationsCat;
       FMessage: strMethodTooLongMsg;
@@ -531,7 +530,6 @@ Const
       FLimit: 50.0;
       FLimitType: ltInteger),
     (
-      FParent: mmLongParameterLists;
       FName: strLongParameterListNoMetric;
       FCategory: strLongMethodParameterListsCat;
       FMessage: strMethodHasTooManyParamsMsg;
@@ -541,7 +539,6 @@ Const
       FLimit:  7.0;
       FLimitType: ltInteger),
     (
-      FParent: mmLongMethodVariableLists;
       FName: strLongVariableListNoMetric;
       FCategory: strLongMethodVariableListsCat;
       FMessage: strMethodHasLongVarListMsg;
@@ -551,7 +548,6 @@ Const
       FLimit:  7.0;
       FLimitType: ltInteger),
     (
-      FParent: mmNestedIFDepth;
       FName: strNestedIFDepthNoMetric;
       FCategory: strNestedIFDepthCat;
       FMessage: strMethodHasHighIFDepthMsg;
@@ -561,7 +557,6 @@ Const
       FLimit:  5.0;
       FLimitType: ltInteger),
     (
-      FParent: mmCyclometricComplexity;
       FName: strCyclometricComplexityNoMetric;
       FCategory: strMethodCyclometricComplexityCat;
       FMessage: strMethodHasHighCyclometricComplexityMsg;
@@ -571,14 +566,6 @@ Const
       FLimit: 10.0;
       FLimitType: ltInteger),
     (
-      FParent: mmCyclometricComplexity;
-      FName: strCCIncludeExpressionNoMetric;
-      FDescription: strIncludeBoolSubExprCat;
-      FEnabled: True;
-      FLimit: 0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mmToxicity;
       FName: strToxicityNoMetric;
       FCategory: strMethodToxicityCat;
       FMessage: strMethodHasHighToxocityValueMsg;
@@ -589,10 +576,24 @@ Const
       FLimitType: ltFloat)
   );
 
+  (** A constant array of information for the mnetric sub-options. **)
+  ModuleMetricSubOps : Array[Low(TBADIModuleMetricSubOp)..High(TBADIModuleMetricSubOp)] Of
+    TBADIMetricSubOpRecord = (
+    (FName: 'MethodCCIncIF';         FDescription: strMethodCCIncIF;         FParentMetric: mmCyclometricComplexity),
+    (FName: 'MethodCCIncCASE';       FDescription: strMethodCCIncCASE;       FParentMetric: mmCyclometricComplexity),
+    (FName: 'MethodCCIncWHILE';      FDescription: strMethodCCIncWHILE;      FParentMetric: mmCyclometricComplexity),
+    (FName: 'MethodCCIncREPEAT';     FDescription: strMethodCCIncREPEAT;     FParentMetric: mmCyclometricComplexity),
+    (FName: 'IncludeBoolSubExprCat'; FDescription: strIncludeBoolSubExprCat; FParentMetric: mmCyclometricComplexity),
+    (FName: 'ToxicityIncMethodLen';  FDescription: strToxicityIncMethodLen;  FParentMetric: mmToxicity),
+    (FName: 'ToxicityIncParamLen';   FDescription: strToxicityIncParamLen;   FParentMetric: mmToxicity),
+    (FName: 'ToxicityIncVarLen';     FDescription: strToxicityIncVarLen;     FParentMetric: mmToxicity),
+    (FName: 'ToxicityIncIFDepth';    FDescription: strToxicityIncIFDepth;    FParentMetric: mmToxicity),
+    (FName: 'ToxicityIncCycloComp';  FDescription: strToxicityIncCycloComp;  FParentMetric: mmToxicity)
+  );
+  
   (** A constant array of default options for the Module Checks. **)
   ModuleChecks : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of TBADICheckRecord = (
     (
-      FParent: mcHardCodedIntegers;
       FName: strHardCodedIntegerNoMetric;
       FCategory: strHardCodedIntegersCat;
       FMessage: strIntegerUsedInMsg;
@@ -602,21 +603,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcHardCodedIntegers;
-      FName: strHCIntIgnoreZeroNoMetric;
-      FDescription: strIgnoreHardCodedIntegerZerosCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mcHardCodedIntegers;
-      FName: strHCIntIgnoreOneNoMetric;
-      FDescription: strIgnoreHardCodedIntegerOnesCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mcHardCodedNumbers;
       FName: strHardCodedNumberNoMetric;
       FCategory: strHardCodedNumbersCat;
       FMessage: strNumberUsedInMsg;
@@ -626,14 +612,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcHardCodedNumbers;
-      FName: strHCNumIgmoreZeroNoMetric;
-      FDescription: strIgnoreHardCodedNumberZerosCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mcHardCodedStrings;
       FName: strHardCodedStringNoMetric;
       FCategory: strHardCodedStringsCat;
       FMessage: strStringLiteralUsedInMsg;
@@ -643,21 +621,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcHardCodedStrings;
-      FName: strHCStrIgnoreEmptyNoMetric;
-      FDescription: strIgnoreHardCodedEmptyStringsCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mcHardCodedStrings;
-      FName: strHCStrIgnoreSingleNoMetric;
-      FDescription: strIgnoreHardCodedSingleCharStrCat;
-      FEnabled: True;
-      FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mcUnsortedMethod;
       FName: strUnsortedModuleNoMetric;
       FCategory: strUnsortedMethodsCat;
       FMessage: strMethodNotSortedMsg;
@@ -667,7 +630,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcUseOfWithStatements;
       FName: strWithStatementNoMetric;
       FCategory: strUseOfWITHStmtCat;
       FMessage: strWITHUsedInMethodMsg;
@@ -677,7 +639,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcUseOfGOTOStatements;
       FName: strGotoStatementNoMetric;
       FCategory: strUseOfGOTOStmtCat;
       FMessage: strGOTOUsedInMethodMsg;
@@ -687,7 +648,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyEXCEPT;
       FName: strEmptyEXCEPTNoMetric;
       FCategory: strEmptyEXCEPTBlocksCat;
       FMessage: strEXCEPTClauseMethodEmptyMsg;
@@ -697,7 +657,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyFINALLY;
       FName: strEmptyFINALLYNoMetric;
       FCategory: strEmptyFINALLYBlocksCat;
       FMessage: strFINALLYClauseMethodEmptyMsg;
@@ -707,7 +666,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcExceptionEating;
       FName: strExceptionEatingNoMetric;
       FCategory: strEXCEPTIONEatingCat;
       FMessage: strONStmtCaptureAllExcepsMsg;
@@ -717,7 +675,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyTHEN;
       FName: strEmptyTHENNoMetric;
       FCategory: strEmptyTHENBlocksCat;
       FMessage: strTHENClauseInEmptyMsg;
@@ -727,7 +684,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyELSE;
       FName: strEmptyELSENoMetric;
       FCategory: strEmptyELSEBlocksCat;
       FMessage: strELSEClauseInEmptyMsg;
@@ -737,7 +693,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyCASE;
       FName: strEmptyCASENoMetric;
       FCategory: strEmptyCASEBlocksCat;
       FMessage: strCASEClauseInEmptyMsg;
@@ -747,7 +702,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyFOR;
       FName: strEmptyFORNoMetric;
       FCategory: strEmptyFORBlocksCat;
       FMessage: strFORBlockInEmptyMsg;
@@ -757,7 +711,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyWHILE;
       FName: strEmptyWHILENoMetric;
       FCategory: strEmptyWHILEBlocksCat;
       FMessage: strWHILEBlockInEmptyMsg;
@@ -767,7 +720,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyREPEAT;
       FName: strEmptyREPEATNoMetric;
       FCategory: strEmptyREPEATBlocksCat;
       FMessage: strREPEATBlockInEmptyMsg;
@@ -777,7 +729,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyBEGINEND;
       FName: strEmptyBEGINENDNoMetric;
       FCategory: strEmptyBEGINENDBlocksCat;
       FMessage: strBEGINENDBlockInEmptyMsg;
@@ -787,7 +738,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyIntialization;
       FName: strEmptyInitializationNoMetric;
       FCategory: strEmptyInitializationBlockCat;
       FMessage: strINITIALIZATIONClauseInModuleEmptyMsg;
@@ -797,7 +747,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyFinalization;
       FName: strEmptyFinalizationNoMetric;
       FCategory: strEmptyFinalizationBlockCat;
       FMessage: strFINALIZATIONClauseInModuleEmptyMsg;
@@ -807,7 +756,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcEmptyMethod;
       FName: strEmptyMethodNoMetric;
       FCategory: strEmptyMethodsCat;
       FMessage: strMethodDoesNotHaveImplementationMsg;
@@ -817,7 +765,6 @@ Const
       FLimit:  0.0;
       FLimitType: ltNone),
     (
-      FParent: mcMissingCONSTInParemterList;
       FName: strMissingCONSTInParamNoMetric;
       FCategory: strMissingCONSTinParametersCat;
       FMessage: strParameterInMethodMissingCONSTMsg;
@@ -825,14 +772,18 @@ Const
       FConflictType: dciItem;
       FEnabled: True;
       FLimit:  0.0;
-      FLimitType: ltNone),
-    (
-      FParent: mcMissingCONSTInParemterList;
-      FName: strMCParmListIgnoreEventsNoMetric;
-      FDescription: strMissingCONSTInParamIgnoreEventHandlersCat;
-      FEnabled: True;
-      FLimit:  0.0;
       FLimitType: ltNone)
+  );
+
+  (** A constant array of information for the check sub-options. **)
+  ModuleCheckSubOps : Array[Low(TBADIModuleCheckSubOp)..High(TBADIModuleCheckSubOp)] Of
+    TBADICheckSubOpRecord = (
+    (FName: 'HCIntIgnoreZeroNoMetri';         FDescription: strIgnoreHardCodedIntegerZerosCat;            FParentCheck: mcHardCodedIntegers),
+    (FName: 'HCIntIgnoreOneNoMetric';         FDescription: strIgnoreHardCodedIntegerOnesCat;             FParentCheck: mcHardCodedIntegers),
+    (FName: 'HCNumIgmoreZeroNoMetric';        FDescription: strIgnoreHardCodedNumberZerosCat;             FParentCheck: mcHardCodedNumbers),
+    (FName: 'HCStrIgnoreEmptyNoMetric';       FDescription: strIgnoreHardCodedEmptyStringsCat;            FParentCheck: mcHardCodedStrings),
+    (FName: 'HCStrIgnoreSingleNoMetric';      FDescription: strIgnoreHardCodedSingleCharStrCat;           FParentCheck: mcHardCodedStrings),
+    (FName: 'MCParmListIgnoreEventsNoMetric'; FDescription: strMissingCONSTInParamIgnoreEventHandlersCat; FParentCheck: mcMissingCONSTInParemterList)
   );
 
 Implementation

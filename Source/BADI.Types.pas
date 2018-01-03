@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Dec 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.Types;
@@ -475,22 +475,31 @@ Type
     mmLongMethodVariableLists,
     mmNestedIFDepth,
     mmCyclometricComplexity,
-      mmMethodCCIncludeExpression,
     mmToxicity
   );
   (** A set of the above module metrics. **)
   TBADIModuleMetrics = Set Of TBADIModuleMetric;
+  (** An enumerate to define metric sub-options. **)
+  TBADIModuleMetricSubOp = (
+    mmsoMethodCCIncIF,
+    mmsoMethodCCIncCASE,
+    mmsoMethodCCIncWHILE,
+    mmsoMethodCCIncREPEAT,
+    mmsoMethodCCIncludeExpression,
+    mmsoToxicityIncMethodLen,
+    mmsoToxicityIncParamLen,
+    mmsoToxicityIncVarLen,
+    mmsoToxicityIncIFDepth,
+    mmsoToxicityIncCycloComp
+  );
+  (** A set of the above metric sub-options. **)
+  TBADIModuleMetricSubOps = Set Of TBADIModuleMetricSubOp;
 
   (** An enumerate to descibe each of the checks. **)
   TBADIModuleCheck = (
     mcHardCodedIntegers,
-      mcHCIntIgnoreZero,
-      mcHCIntIgnoreOne,
     mcHardCodedNumbers,
-      mcHCNumIgmoreZero,
     mcHardCodedStrings,
-      mcHCStrIgnoreEmpty,
-      mcHCStrIgnoreSingle,
     mcUnsortedMethod,
     mcUseOfWithStatements,
     mcUseOfGOTOStatements,
@@ -507,18 +516,27 @@ Type
     mcEmptyIntialization,
     mcEmptyFinalization,
     mcEmptyMethod,
-    mcMissingCONSTInParemterList,
-      mcMCParmListIgnoreEvents
+    mcMissingCONSTInParemterList
   );
   (** A set of the above module checks. **)
   TBADIModuleChecks = Set Of TBADIModuleCheck;
+  (** An enumerate to define check sub-options. **)
+  TBADIModuleCheckSubOp = (
+      mcsoHCIntIgnoreZero,
+      mcsoHCIntIgnoreOne,
+      mcsoHCNumIgmoreZero,
+      mcsoHCStrIgnoreEmpty,
+      mcsoHCStrIgnoreSingle,
+      mcsoMCParmListIgnoreEvents
+  );
+  (** A set of the above metric sub-options. **)
+  TBADIModuleCheckSubOps = Set Of TBADIModuleCheckSubOp;
 
   (** An enumerate to define the type of the metric limit. **)
   TBADILimitType = (ltInteger, ltFloat, ltNone);
 
   (** A record to describe the attributes of each metric. **)
   TBADIMetricRecord = Record
-    FParent          : TBADIModuleMetric;
     FName            : String;
     FCategory        : String;
     FMessage         : String;
@@ -528,9 +546,14 @@ Type
     FLimit           : Double;
     FLimitType       : TBADILimitType;
   End;
+  (** A record to describe the attributes of each metric sub option. **)
+  TBADIMetricSubOpRecord = Record
+    FName            : String;
+    FDescription     : String;
+    FParentMetric    : TBADIModuleMetric;
+  End;
   (** A record to describe the attributes of each metric. **)
   TBADICheckRecord = Record
-    FParent          : TBADIModuleCheck;
     FName            : String;
     FCategory        : String;
     FMessage         : String;
@@ -539,6 +562,12 @@ Type
     FEnabled         : Boolean;
     FLimit           : Double;
     FLimitType       : TBADILimitType;
+  End;
+  (** A record to describe the attributes of each check sub option. **)
+  TBADICheckSubOpRecord = Record
+    FName            : String;
+    FDescription     : String;
+    FParentCheck     : TBADIModuleCheck;
   End;
 
 Implementation

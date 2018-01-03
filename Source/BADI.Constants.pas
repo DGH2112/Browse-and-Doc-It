@@ -21,8 +21,13 @@ Const
   strRevision = ' abcdefghijklmnopqrstuvwxyz';
   (** Universal name for all IDEs for use in the splash screen and about boxes. **)
   strSplashScreenName = 'Browse and Doc It %d.%d%s for %s';
+  {$IFDEF DEBUG}
+  (** This is another message string to appear in the BDS 2005/6 splash screen **)
+  strSplashScreenBuild = 'Freeware by David Hoyle (DEBUG Build %d.%d.%d.%d)';
+  {$ELSE}
   (** This is another message string to appear in the BDS 2005/6 splash screen **)
   strSplashScreenBuild = 'Freeware by David Hoyle (Build %d.%d.%d.%d)';
+  {$ENDIF}
 
   (** A default list of symbols which should not have spaces before them. **)
   strNoSpaceBeforeSymbols = ['(', '[', '{', ')', ']', '}', ';', ',', '.', '!', '?', '<', '>'];

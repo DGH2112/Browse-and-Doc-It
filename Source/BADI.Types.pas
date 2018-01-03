@@ -192,10 +192,15 @@ Type
     iiDocConflictItem,
     iiDocConflictMissing,
 
-    iiMetricCheckFolder,
-    iiMetricCheckIncorrect,
-    iiMetricCheckItem,
-    iiMetricCheckMissing,
+    iiMetricFolder,
+    iiMetricIncorrect,
+    iiMetricItem,
+    iiMetricMissing,
+
+    iiCheckFolder,
+    iiCheckIncorrect,
+    iiCheckItem,
+    iiCheckMissing,
 
     iiUsesLabel,
     iiUsesItem,

@@ -5,7 +5,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    28 Dec 2017
+  @Date    03 Jan 2018
 
 **)
 unit BADI.DUnitForm;
@@ -105,7 +105,9 @@ type
 implementation
 
 Uses
-  //CodeSiteLogging,
+  {$IFDEF CODESITE}
+  CodeSiteLogging,
+  {$ENDIF}
   ToolsAPI,
   BADI.ToolsAPIUtils,
   BADI.Pascal.Module,

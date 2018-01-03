@@ -3,7 +3,7 @@
   This module contains a dockable form which will become the Module Explorer.
 
   @Author  David Hoyle
-  @Date    30 Apr 2017
+  @Date    03 Jan 2018
   @Version 1.0
 
 **)
@@ -52,7 +52,7 @@ implementation
 {$R *.dfm}
 
 Uses
-  {$IFDEF DEBUG}
+  {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
   DeskUtil;

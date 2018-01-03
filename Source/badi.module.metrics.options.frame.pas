@@ -24,7 +24,7 @@ Uses
   Dialogs,
   BADI.CustomOptionsFrame,
   VirtualTrees, 
-  BADI.CustomVirtualStringTree;
+  BADI.CustomVirtualStringTree, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls;
 
 {$INCLUDE CompilerDefinitions.inc}
 
@@ -34,6 +34,18 @@ Type
  
   (** A class to represent a frame for selecting the checks and metrics in the IDE options dialogue. **)
   TframeBADIModuleMetricsOptions = Class(TFrame, IBADIOptionsFrame)
+    pnlBottom: TPanel;
+    lblToxicityPower: TLabel;
+    edtToxicityPower: TEdit;
+    udToxicityPower: TUpDown;
+    lblToxicitySummation: TLabel;
+    cbxToxicitySummation: TComboBox;
+    udMetricLowerLimit: TUpDown;
+    edtMetricLowerLimit: TEdit;
+    lblMetricLowerLimit: TLabel;
+    udMetricUpperLimit: TUpDown;
+    edtMetricUpperLimit: TEdit;
+    lblMetricUpperLimit: TLabel;
     Procedure vstMetricsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; Var CellText: String);
     Procedure vstMetricsEditing(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -44,6 +56,10 @@ Type
     Procedure vstMetricsChecked(Sender: TBaseVirtualTree; Node: PVirtualNode);
     Procedure vstMetricsPaintText(Sender: TBaseVirtualTree; Const TargetCanvas: TCanvas;
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType);
+    procedure udMetricLowerLimitChangingEx(Sender: TObject; var AllowChange: Boolean; NewValue: Integer;
+      Direction: TUpDownDirection);
+    procedure udMetricUpperLimitChangingEx(Sender: TObject; var AllowChange: Boolean; NewValue: Integer;
+      Direction: TUpDownDirection);
   Strict Private
     FVSTMetrics : TBADIMetricsOptionsVirtualStringTree;
   Strict Protected
@@ -105,6 +121,10 @@ Const
 **)
 Constructor TframeBADIModuleMetricsOptions.Create(AOwner: TComponent);
 
+ResourceString
+  strSummateBeforePowering = 'Summate before Powering';
+  strSummateAfterPowering = 'Summate after Powering';
+
 Var
   eMetric: TBADIModuleMetric;
   eMetricSubOp: TBADIModuleMetricSubOp;
@@ -137,6 +157,8 @@ Begin
           End;
     End;
   FVSTMetrics.FullExpand;
+  cbxToxicitySummation.Items.Add(strSummateBeforePowering);
+  cbxToxicitySummation.Items.Add(strSummateAfterPowering);
 End;
 
 (**
@@ -233,6 +255,12 @@ Begin
       N := FVSTMetrics.GetNext(N);
     End;
   vstMetricsChecked(Nil, Nil);
+  udToxicityPower.Position := BO.BADIOptions.ToxicityPower;
+  cbxToxicitySummation.ItemIndex := Integer(BO.BADIOptions.ToxicitySummartion);
+  udMetricLowerLimit.Position := Trunc(BO.BADIOptions.LowMetricMargin);
+  udMetricUpperLimit.Position := Trunc(BO.BADIOptions.HighMetricMargin);
+  udMetricLowerLimit.OnChangingEx := udMetricLowerLimitChangingEx;
+  udMetricUpperLimit.OnChangingEx := udMetricUpperLimitChangingEx;
 End;
 
 (**
@@ -316,6 +344,50 @@ Begin
       End;
       N := FVSTMetrics.GetNext(N);
     End;
+  BO.BADIOptions.ToxicityPower := udToxicityPower.Position;
+  BO.BADIOptions.ToxicitySummartion := TBADIToxicitySummation(cbxToxicitySummation.ItemIndex);
+  BO.BADIOptions.LowMetricMargin := Int(udMetricLowerLimit.Position);
+  BO.BADIOptions.HighMetricMargin := Int(udMetricUpperLimit.Position);
+End;
+
+(**
+
+  This is an on changing ex event handler for the lower metric limit up down control.
+
+  @precon  None.
+  @postcon Allow the value to changed if the new value is less than or equal to the upper.
+
+  @param   Sender      as a TObject
+  @param   AllowChange as a Boolean as a reference
+  @param   NewValue    as an Integer
+  @param   Direction   as a TUpDownDirection
+
+**)
+Procedure TframeBADIModuleMetricsOptions.udMetricLowerLimitChangingEx(Sender: TObject;
+  Var AllowChange: Boolean; NewValue: Integer; Direction: TUpDownDirection);
+
+Begin
+  AllowChange := (NewValue <= udMetricUpperLimit.Position);
+End;
+
+(**
+
+  This is an on changing ex event handler for the upper metric limit up down control.
+
+  @precon  None.
+  @postcon Allow the value to changed if the new value is greater than or equal to the lower.
+
+  @param   Sender      as a TObject
+  @param   AllowChange as a Boolean as a reference
+  @param   NewValue    as an Integer
+  @param   Direction   as a TUpDownDirection
+
+**)
+Procedure TframeBADIModuleMetricsOptions.udMetricUpperLimitChangingEx(Sender: TObject;
+  Var AllowChange: Boolean; NewValue: Integer; Direction: TUpDownDirection);
+
+Begin
+  AllowChange := (NewValue >= udMetricLowerLimit.Position);
 End;
 
 (**

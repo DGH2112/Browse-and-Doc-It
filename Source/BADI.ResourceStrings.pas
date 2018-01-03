@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Dec 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.ResourceStrings;
@@ -728,6 +728,27 @@ ResourceString
   (** A resource string for the Method Toxicity Category. **)
   strMethodToxicityCat = 'Method Toxicity';
 
+  (** A resource string for the Including IF Statements in the cyclometric complexity calc. **)
+  strMethodCCIncIF= 'Include IF Statements in the Cyclometric Complexity Calculation';
+  (** A resource string for the Including CASE Statements in the cyclometric complexity calc. **)
+  strMethodCCIncCASE = 'Include CASE Statements in the Cyclometric Complexity Calculation';
+  (** A resource string for the Including WHILE Statements in the cyclometric complexity calc. **)
+  strMethodCCIncWHILE = 'Include WHILE Statements in the Cyclometric Complexity Calculation';
+  (** A resource string for the Including REPEAT Statements in the cyclometric complexity calc. **)
+  strMethodCCIncREPEAT = 'Include REPEAT Statements in the Cyclometric Complexity Calculation';
+  (** A resource string for the Ignore Boolean Expressions Category. **)
+  strIncludeBoolSubExprCat = 'Include Boolean Sub-Expressions';
+  (** A resource string for the Including Method Length in toxicity calc. **)
+  strToxicityIncMethodLen = 'Include Method Length in the Toxicity Calculation';
+  (** A resource string for the Including Parameter list Length in toxicity calc. **)
+  strToxicityIncParamLen = 'Include Parameter List Length in the Toxicity Calculation';
+  (** A resource string for the Including variable list Length in toxicity calc. **)
+  strToxicityIncVarLen = 'Include Variabe List Length in the Toxicity Calculation';
+  (** A resource string for the Including nested IF depth in toxicity calc. **)
+  strToxicityIncIFDepth = 'Include Nested IF Depth in the Toxicity Calculation';
+  (** A resource string for the Including cyclometric complexity in toxicity calc. **)
+  strToxicityIncCycloComp = 'Include Cyclometric Complexity in the Toxicity Calculation';
+
   (** A message for a method with a long implementation. **)
   strMethodTooLongMsg = 'The method "%s" is too long (%1.0f/%1.0f)!';
   (** A description for a method with a long implementation. **)
@@ -766,28 +787,16 @@ ResourceString
   
   (** A resource string for the Hard Coded Integers Category. **)
   strHardCodedIntegersCat = 'Hard Coded Integers';
-  (** A resource string for the Hard Coded Zeros Category. **)
-  strIgnoreHardCodedIntegerZerosCat = 'Ignore Hard Coded 0s';
-  (** A resource string for the Hard Coded 1s Category. **)
-  strIgnoreHardCodedIntegerOnesCat = 'Ignore Hard Coded 1s';
   (** A resource string for the Hard Code Numbers Category. **)
   strHardCodedNumbersCat = 'Hard Coded Numbers';
-  (** A resource string for the Hard Coded 0.0s Category. **)
-  strIgnoreHardCodedNumberZerosCat = 'Ignore Hard Coded 0.0s';
   (** A resource string for the Hard Coded Strings Category. **)
   strHardCodedStringsCat = 'Hard Coded Strings';
-  (** A resource string for the Hard Coded Empty Strings Category. **)
-  strIgnoreHardCodedEmptyStringsCat = 'Ignore Hard Coded Empty Strings';
-  (** A resource string for the Hard Coded Single Char Strings Category. **)
-  strIgnoreHardCodedSingleCharStrCat = 'Ignore Hard Coded Single Character Strings';
   (** A resource string for the Unsorted Method Category. **)
   strUnsortedMethodsCat = 'Unsorted Methods';
   (** A resource string for the With Statement Category. **)
   strUseOfWITHStmtCat = 'Use of WITH statements';
   (** A resource string for the GOT Statements Category. **)
   strUseOfGOTOStmtCat = 'Use of GOTO statements';
-  (** A resource string for the Igmore Boolean Expressions Category. **)
-  strIncludeBoolSubExprCat = 'Include Boolean Sub-Expressions';
   (** A resource string for the Empty EXCEPT Blocks Category. **)
   strEmptyExceptBlocksCat = 'Empty EXCEPT Blocks';
   (** A resource string for the Empty Finally BLocks Category. **)
@@ -816,6 +825,17 @@ ResourceString
   strEmptyMethodsCat = 'Empty Methods';
   (** A resource string for the Missing CONST in Parameters Category. **)
   strMissingCONSTInParametersCat = 'Missing CONST in Method Parameters';
+
+  (** A resource string for the Hard Coded Zeros Category. **)
+  strIgnoreHardCodedIntegerZerosCat = 'Ignore Hard Coded 0s';
+  (** A resource string for the Hard Coded 1s Category. **)
+  strIgnoreHardCodedIntegerOnesCat = 'Ignore Hard Coded 1s';
+  (** A resource string for the Hard Coded 0.0s Category. **)
+  strIgnoreHardCodedNumberZerosCat = 'Ignore Hard Coded 0.0s';
+  (** A resource string for the Hard Coded Empty Strings Category. **)
+  strIgnoreHardCodedEmptyStringsCat = 'Ignore Hard Coded Empty Strings';
+  (** A resource string for the Hard Coded Single Char Strings Category. **)
+  strIgnoreHardCodedSingleCharStrCat = 'Ignore Hard Coded Single Character Strings';
   (** A resource string for the Ignore Event Handler Category. **)
   strMissingCONSTInParamIgnoreEventHandlersCat = 'Ignore Event Handlers';
 

@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    02 Jan 2018
+  @Date    03 Jan 2018
   
 **)
 Unit BADI.Module.Checks;
@@ -141,7 +141,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF DEBUG}
+  {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
   SysUtils, 

@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Apr 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.AboutBox;
@@ -43,6 +43,14 @@ Var
 **)
 Procedure AddAboutBoxEntry;
 
+Const
+  strBrowseAndDocItSplashScreenBitMap = 'BrowseAndDocItSplashScreenBitMap48x48';
+  strSKUBuild = 'SKU Build %d.%d.%d.%d';
+
+ResourceString
+  strIDEExpertToBrowseAndDocumentYourSourceCode = 'An IDE expert to browse and document your source ' + 
+    'code.';
+
 Var
   iMajor : Integer;
   iMinor : Integer;
@@ -53,15 +61,15 @@ Var
 Begin
   {$IFDEF D2005}
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
-  bmSplashScreen := LoadBitmap(hInstance, 'BrowseAndDocItSplashScreenBitMap48x48');
+  bmSplashScreen := LoadBitmap(hInstance, strBrowseAndDocItSplashScreenBitMap);
   iAboutPlugin := (BorlandIDEServices As IOTAAboutBoxServices).AddPluginInfo(
     Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1),
       Application.Title]),
-    'An IDE expert to browse and document your source code.',
+    strIDEExpertToBrowseAndDocumentYourSourceCode,
     bmSplashScreen,
-    False,
+    {$IFDEF DEBUG} True {$ELSE} False {$ENDIF},
     Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]),
-    Format('SKU Build %d.%d.%d.%d', [iMajor, iMinor, iBugfix, iBuild]));
+    Format(strSKUBuild, [iMajor, iMinor, iBugfix, iBuild]));
   {$ENDIF}
 End;
 

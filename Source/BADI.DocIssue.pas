@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Oct 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.DocIssue;
@@ -94,7 +94,9 @@ Var
   This is a getter method for the AsString property.
 
   @precon  None .
-  @postcon Override the default method and returns the Document Error Message .
+  @postcon Override the default method and returns the Document Error Message.
+
+  @nohint boolShowIdentifier boolForDocumentation
 
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant
@@ -138,6 +140,8 @@ Begin
     etHint:    iImageIndex := iiHint;
     etWarning: iImageIndex := iiWarning;
     etError:   iImageIndex := iiError;
+  Else
+    iImageIndex := iiNone;
   End;
   Inherited Create(Format(strOutputFmt, [iDocConflictCounter]), AScope, iLine, iCol, iImageIndex, Nil);
   Inc(iDocConflictCounter);
@@ -151,6 +155,8 @@ End;
 
   @precon  None .
   @postcon Return the document conflict message .
+
+  @nohint boolShowIdentifier boolForDocumentation
 
   @param   boolShowIdentifier   as a Boolean as a constant
   @param   boolForDocumentation as a Boolean as a constant

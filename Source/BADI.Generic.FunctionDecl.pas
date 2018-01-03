@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    29 Dec 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.Generic.FunctionDecl;
@@ -42,6 +42,9 @@ Type
     FChecks                : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of Double;
     FMetricOverrides       : TBADIModuleMetrics;
     FCheckOverrides        : TBADIModuleChecks;
+    FToxicityPower         : Double;
+    FToxicitySummartion    : TBADIToxicitySummation;
+    FMetricSubOptions      : TBADIModuleMetricSubOps;
   {$IFDEF D2005} Strict {$ENDIF} Protected
     Function  GetQualifiedName: String; Virtual; Abstract;
     Function  GetParameterCount: Integer;
@@ -185,7 +188,9 @@ Uses
   SysUtils,
   BADI.ResourceStrings, 
   BADI.Constants,
-  TypInfo;
+  TypInfo,
+  Math, 
+  BADI.Options;
 
 Const
   (** A unity value to increment and descending metrics. **)
@@ -226,7 +231,7 @@ Function TGenericFunction.CalculateToxicity: Double;
 
   (**
 
-    This is a function calculate the the weighting for the combination of the metrics for toxicity.
+    This is a function calculate given value to a power defined in the options.
 
     @precon  None.
     @postcon Returns a cube of the given number.
@@ -238,7 +243,27 @@ Function TGenericFunction.CalculateToxicity: Double;
   Function F(Const X : Double) : Double;
 
   Begin
-    Result := X * X * X; // Cube
+    Result := Math.Power(X, FToxicityPower);
+  End;
+
+  (**
+
+    This method returns the metric divided by its limit if it is to be included in the toxicity calc.
+
+    @precon  None
+    @postcon Returns the metric divided by its limit if it is to be included in the toxicity calc.
+
+    @param   eMetric      as a TBADIModuleMetric as a constant
+    @param   eMetricSubOp as a TBADIModuleMetricSubOp as a constant
+    @return  a Double
+
+  **)
+  Function G(Const eMetric : TBADIModuleMetric; Const eMetricSubOp : TBADIModuleMetricSubOp) : Double;
+
+  Begin
+    Result := 0;
+    If eMetricSubOp In FMetricSubOptions Then
+      Result := Metric[eMetric] / BADIOptions.ModuleMetric[eMetric].FLimit
   End;
 
 Const
@@ -247,13 +272,28 @@ Const
 Begin
   Result := 0;
   If Not FIsDeclarationOnly Then
-    Begin
-      Result := F(Metric[mmLongMethods] / BADIOptions.ModuleMetric[mmLongMethods].FLimit);
-      If (ParameterCount > 0) And (CompareText(Parameters[0].Identifier, strSender) <> 0) Then
-        Result := Result + F(Metric[mmLongParameterLists] / BADIOptions.ModuleMetric[mmLongParameterLists].FLimit);
-      Result := Result + F(Metric[mmLongMethodVariableLists] / BADIOptions.ModuleMetric[mmLongMethodVariableLists].FLimit);
-      Result := Result + F(Metric[mmNestedIFDepth] / BADIOptions.ModuleMetric[mmNestedIFDepth].FLimit);
-      Result := Result + F(Metric[mmCyclometricComplexity] / BADIOptions.ModuleMetric[mmCyclometricComplexity].FLimit);
+    Case FToxicitySummartion Of
+      tsAddBeforePower:
+        Begin
+          Result := 0;
+          Result := Result + G(mmLongMethods, mmsoToxicityIncMethodLen);
+          If (ParameterCount > 0) And (CompareText(Parameters[0].Identifier, strSender) <> 0) Then
+            Result := Result + G(mmLongParameterLists, mmsoToxicityIncParamLen);
+          Result := Result + G(mmLongMethodVariableLists, mmsoToxicityIncVarLen);
+          Result := Result + G(mmNestedIFDepth, mmsoToxicityIncIFDepth);
+          Result := Result + G(mmCyclometricComplexity, mmsoToxicityIncCycloComp);
+          Result := F(Result);
+        End;
+      tsAddAfterPower:
+        Begin
+          Result := 0;
+          Result := Result + F(G(mmLongMethods, mmsoToxicityIncMethodLen));
+          If (ParameterCount > 0) And (CompareText(Parameters[0].Identifier, strSender) <> 0) Then
+            Result := Result + F(G(mmLongParameterLists, mmsoToxicityIncParamLen));
+          Result := Result + F(G(mmLongMethodVariableLists, mmsoToxicityIncVarLen));
+          Result := Result + F(G(mmNestedIFDepth, mmsoToxicityIncIFDepth));
+          Result := Result + F(G(mmCyclometricComplexity, mmsoToxicityIncCycloComp));
+        End;
     End;
 End;
 
@@ -319,6 +359,9 @@ Begin
   FIfStackDepth := 0;
   FMetricOverrides := [];
   FMetrics[mmCyclometricComplexity] := 1;
+  FToxicityPower := TBADIOptions.BADIOptions.ToxicityPower;
+  FToxicitySummartion := TBADIOptions.BADIOptions.ToxicitySummartion;
+  FMetricSubOptions := TBADIOptions.BADIOptions.ModuleMetricSubOptions;
 End;
 
 (**

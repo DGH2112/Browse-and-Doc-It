@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    28 Dec 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.Refactor.Constant;
@@ -50,7 +50,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF DEBUG}
+  {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
   BADI.Module.Dispatcher,

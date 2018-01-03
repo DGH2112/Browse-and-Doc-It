@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    15 Oct 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.Comment;
@@ -83,7 +83,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF DEBUG}
+  {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
   SysUtils,

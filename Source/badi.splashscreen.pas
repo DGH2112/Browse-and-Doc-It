@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    11 Apr 2017
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.SplashScreen;
@@ -36,6 +36,13 @@ Uses
 **)
 Procedure AddSplashScreen;
 
+Const
+  {$IFDEF D2007}
+  strBrowseAndDocItSplashScreenBitMap = 'BrowseAndDocItSplashScreenBitMap24x24';
+  {$ELSE}
+  strBrowseAndDocItSplashScreenBitMap = 'BrowseAndDocItSplashScreenBitMap48x48';
+  {$ENDIF}
+
 Var
   iMajor : Integer;
   iMinor : Integer;
@@ -46,16 +53,12 @@ Var
 Begin
   {$IFDEF D2005}
   BuildNumber(iMajor, iMinor, iBugFix, iBuild);
-  {$IFDEF D2007}
-  bmSplashScreen := LoadBitmap(hInstance, 'BrowseAndDocItSplashScreenBitMap24x24');
-  {$ELSE}
-  bmSplashScreen := LoadBitmap(hInstance, 'BrowseAndDocItSplashScreenBitMap48x48');
-  {$ENDIF}
+  bmSplashScreen := LoadBitmap(hInstance, strBrowseAndDocItSplashScreenBitMap);
   (SplashScreenServices As IOTASplashScreenServices).AddPluginBitmap(
     Format(strSplashScreenName, [iMajor, iMinor, Copy(strRevision, iBugFix + 1, 1),
       Application.Title]),
     bmSplashScreen,
-    False,
+    {$IFDEF DEBUG} True {$ELSE} False {$ENDIF},
     Format(strSplashScreenBuild, [iMajor, iMinor, iBugfix, iBuild]), ''
     );
   {$ENDIF}

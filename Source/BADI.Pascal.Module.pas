@@ -307,7 +307,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF DEBUG}
+  {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
   {$IFDEF PROFILECODE}

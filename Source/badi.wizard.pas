@@ -3,7 +3,7 @@
   This module contains the packages main wizard interface.
 
   @Author  David Hoyle
-  @Date    02 Jan 2018
+  @Date    03 Jan 2018
   @Version 1.0
 
 **)
@@ -60,7 +60,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF DEBUG}
+  {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
   BADI.DockableModuleExplorer,

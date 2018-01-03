@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    02 Jan 2018
+  @Date    03 Jan 2018
 
 **)
 Unit BADI.ElementContainer;
@@ -58,8 +58,8 @@ Type
       strTagName: String): Boolean;
     Function  DocConflictImage(Const DocConflictRec: TDocConflictTable): TBADIImageIndex;
     Procedure ModuleMetricPosition(Const Container : TElementContainer; Var iL, iC : Integer);
-    Function  ModuleMetricImage(Const eMetric : TBADIModuleMetric): TBADIImageIndex; Overload;
-    Function  ModuleMetricImage(Const eCheck : TBADIModuleCheck): TBADIImageIndex; Overload;
+    Function  ModuleMetricImage(Const eMetric : TBADIModuleMetric): TBADIImageIndex;
+    Function  ModuleCheckImage(Const eCheck : TBADIModuleCheck): TBADIImageIndex;
     Procedure DocConflictPosition(Var iL: Integer; Var iC: Integer;
       Const Container: TElementContainer);
     Function  CheckEWHOptions (Const ErrorType : TErrorType) : Boolean;
@@ -442,16 +442,16 @@ Begin
       Exit;
     End;
   ModuleMetricPosition(Container, iL, iC);
-  iIcon := ModuleMetricImage(eCheck);
+  iIcon := ModuleCheckImage(eCheck);
   E := FindRoot;
-  E := AddRootContainer(E, strChecks, iiMetricCheckFolder);
-  E := AddCategory(E, ModuleChecks[eCheck].FCategory, iiMetricCheckFolder);
+  E := AddRootContainer(E, strChecks, iiCheckFolder);
+  E := AddCategory(E, ModuleChecks[eCheck].FCategory, iiCheckFolder);
   If E.ElementCount < BADIOptions.IssueLimits[ltChecks] Then
     E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
       ModuleChecks[eCheck].FMessage, ModuleChecks[eCheck].FDescription, iIcon))
   Else If E.ElementCount = BADIOptions.IssueLimits[ltChecks] Then
     E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiMetricCheckMissing));
+      iiCheckMissing));
 End;
 
 (**
@@ -618,14 +618,14 @@ Begin
   ModuleMetricPosition(Container, iL, iC);
   iIcon := ModuleMetricImage(eMetric);
   E := FindRoot;
-  E := AddRootContainer(E, strMetrics, iiMetricCheckFolder);
-  E := AddCategory(E, ModuleMetrics[eMetric].FCategory, iiMetricCheckFolder);
+  E := AddRootContainer(E, strMetrics, iiMetricFolder);
+  E := AddCategory(E, ModuleMetrics[eMetric].FCategory, iiMetricFolder);
   If E.ElementCount < BADIOptions.IssueLimits[ltMetrics] Then
     E.Add(TDocumentConflict.Create(Args, iLine, iColumn, iL, iC,
       ModuleMetrics[eMetric].FMessage, ModuleMetrics[eMetric].FDescription, iIcon))
   Else If E.ElementCount = BADIOptions.IssueLimits[ltMetrics] Then
     E.Add(TDocumentConflict.Create([], 0, 0, 0, 0, strTooManyConflicts, strTooManyConflictsDesc,
-      iiMetricCheckMissing));
+      iiMetricMissing));
 End;
 
 (**
@@ -1442,14 +1442,14 @@ End;
   @return  a TBADIImageIndex
 
 **)
-Function TElementContainer.ModuleMetricImage(Const eCheck: TBADIModuleCheck): TBADIImageIndex;
+Function TElementContainer.ModuleCheckImage(Const eCheck: TBADIModuleCheck): TBADIImageIndex;
 
 Begin
   Case ModuleChecks[eCheck].FConflictType Of
-    dciMissing:   Result := iiMetricCheckMissing;
-    dciIncorrect: Result := iiMetricCheckIncorrect;
+    dciMissing:   Result := iiCheckMissing;
+    dciIncorrect: Result := iiCheckIncorrect;
   Else
-    Result := iiMetricCheckItem;
+    Result := iiCheckItem;
   End;
 End;
 
@@ -1468,10 +1468,10 @@ Function TElementContainer.ModuleMetricImage(Const eMetric : TBADIModuleMetric):
 
 Begin
   Case ModuleMetrics[eMetric].FConflictType Of
-    dciMissing:   Result := iiMetricCheckMissing;
-    dciIncorrect: Result := iiMetricCheckIncorrect;
+    dciMissing:   Result := iiMetricMissing;
+    dciIncorrect: Result := iiMetricIncorrect;
   Else
-    Result := iiMetricCheckItem;
+    Result := iiMetricItem;
   End;
 End;
 

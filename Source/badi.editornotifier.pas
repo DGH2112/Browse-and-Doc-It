@@ -4,7 +4,7 @@
   and in turn refreshes the module explorer.
 
   @Version 1.0
-  @Date    28 Oct 2017
+  @Date    03 Jan 2018
   @Author  David Hoyle
 
 **)
@@ -66,7 +66,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF DEBUG}
+  {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
   SysUtils,

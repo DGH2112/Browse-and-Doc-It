@@ -54,6 +54,8 @@ Type
     FBADIMenuShortCuts      : Array[Low(TBADIMenu)..High(TBADIMenu)] Of String;
     FModuleMetrics          : Array[Low(TBADIModuleMetric)..High(TBADIModuleMetric)] Of TBADIMetricRecord;
     FModuleMetricSubOps     : TBADIModuleMetricSubOps;
+    FToxicityPower          : Integer;
+    FToxicitySummation      : TBADIToxicitySummation;
     FModuleChecks           : Array[Low(TBADIModuleCheck)..High(TBADIModuleCheck)] Of TBADICheckRecord;
     FModuleCheckSubOps      : TBADIModuleCheckSubOps;
     FLowMetricMargin        : Double;
@@ -309,6 +311,22 @@ Type
     Property ModuleMetricSubOptions : TBADIModuleMetricSubOps Read FModuleMetricSubOps
       Write FModuleMEtricSubOps;
     (**
+      This property defines the power of the y = x ^ z equiation used to combine the metrics for
+      toxicity.
+      @precon  None.
+      @postcon Gets ad sets the power of the toxicity summation.
+      @return  an Integer
+    **)
+    Property ToxicityPower : Integer Read FToxicityPower Write FToxicityPower;
+    (**
+      This property determines whether the metrics are summed before or after being powered.
+      @precon  None.
+      @postcon Gets and set the toxicity summation mechanism.
+      @return  a TBADIToxicitySummation
+    **)
+    Property ToxicitySummartion : TBADIToxicitySummation Read FToxicitySummation
+      Write FToxicitySummation;
+    (**
       A property to read and write module checks configuration information.
       @precon  None.
       @postcon Gets and sets the module check information.
@@ -454,6 +472,10 @@ Const
   strNewLine = 'NewLine';
   (** An ini section name for the shortcuts **)
   strBADIMenuShortcuts = 'BADIMenuShortcuts';
+  (** A constant string to define the INI key for Toxicity Power **)
+  strToxicityPower = 'ToxicityPower';
+  (** A constant string to define the INI key for Toxicity Summation **)
+  strToxicitySummation = 'ToxicitySummation';
 
 (**
 
@@ -842,6 +864,7 @@ Procedure TBADIOptions.LoadMetrics(Const iniFile: TMemIniFile);
 Const
   iDefaultLowLimit = 95;
   iDefaultHighLimit = 105;
+  iDefaultToxicityPower = 3;
 
 Var
   eMetric: TBADIModuleMetric;
@@ -861,6 +884,9 @@ Begin
   For eMetricSubOp := Low(TBADIModuleMetricSubOp) To High(TBADIModuleMetricSubOp) Do
     If iniFile.ReadBool(strModuleMetrics, ModuleMetricSubOps[eMetricSubOp].FName + strEnabled, True) Then
       Include(FModuleMetricSubOps, eMetricSubOp);
+  FToxicityPower := iniFile.ReadInteger(strModuleMetrics, strToxicityPower, iDefaultToxicityPower);
+  FToxicitySummation := TBADIToxicitySummation(iniFile.ReadInteger(strModuleMetrics, strToxicitySummation,
+    Integer(tsAddBeforePower)));
 End;
 
 (**
@@ -1215,6 +1241,8 @@ Begin
   For eMetricSubOp := Low(TBADIModuleMetricSubOp) To High(TBADIModuleMetricSubOp) Do
     iniFile.WriteBool(strModuleMetrics, ModuleMetricSubOps[eMetricSubOp].FName + strEnabled,
       eMetricSubOp In FModuleMetricSubOps);
+  iniFile.WriteInteger(strModuleMetrics, strToxicityPower, FToxicityPower);
+  iniFile.WriteInteger(strModuleMetrics, strToxicitySummation, Integer(FToxicitySummation))
 End;
 
 (**

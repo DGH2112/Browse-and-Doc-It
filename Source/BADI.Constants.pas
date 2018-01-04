@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    04 Jan 2018
 
 **)
 Unit BADI.Constants;
@@ -593,7 +593,7 @@ Const
     (FName: 'MethodCCIncCASE';       FDescription: strMethodCCIncCASE;       FParentMetric: mmCyclometricComplexity),
     (FName: 'MethodCCIncWHILE';      FDescription: strMethodCCIncWHILE;      FParentMetric: mmCyclometricComplexity),
     (FName: 'MethodCCIncREPEAT';     FDescription: strMethodCCIncREPEAT;     FParentMetric: mmCyclometricComplexity),
-    (FName: 'IncludeBoolSubExprCat'; FDescription: strIncludeBoolSubExprCat; FParentMetric: mmCyclometricComplexity),
+    (FName: 'MethodCCIncSubExprCat'; FDescription: strMethodCCSubExprCat;    FParentMetric: mmCyclometricComplexity),
     (FName: 'ToxicityIncMethodLen';  FDescription: strToxicityIncMethodLen;  FParentMetric: mmToxicity),
     (FName: 'ToxicityIncParamLen';   FDescription: strToxicityIncParamLen;   FParentMetric: mmToxicity),
     (FName: 'ToxicityIncVarLen';     FDescription: strToxicityIncVarLen;     FParentMetric: mmToxicity),
@@ -788,12 +788,13 @@ Const
   (** A constant array of information for the check sub-options. **)
   ModuleCheckSubOps : Array[Low(TBADIModuleCheckSubOp)..High(TBADIModuleCheckSubOp)] Of
     TBADICheckSubOpRecord = (
-    (FName: 'HCIntIgnoreZeroNoMetri';         FDescription: strIgnoreHardCodedIntegerZerosCat;            FParentCheck: mcHardCodedIntegers),
-    (FName: 'HCIntIgnoreOneNoMetric';         FDescription: strIgnoreHardCodedIntegerOnesCat;             FParentCheck: mcHardCodedIntegers),
-    (FName: 'HCNumIgmoreZeroNoMetric';        FDescription: strIgnoreHardCodedNumberZerosCat;             FParentCheck: mcHardCodedNumbers),
-    (FName: 'HCStrIgnoreEmptyNoMetric';       FDescription: strIgnoreHardCodedEmptyStringsCat;            FParentCheck: mcHardCodedStrings),
-    (FName: 'HCStrIgnoreSingleNoMetric';      FDescription: strIgnoreHardCodedSingleCharStrCat;           FParentCheck: mcHardCodedStrings),
-    (FName: 'MCParmListIgnoreEventsNoMetric'; FDescription: strMissingCONSTInParamIgnoreEventHandlersCat; FParentCheck: mcMissingCONSTInParemterList)
+    (FName: 'HCIntIgnoreZero';        FDescription: strIgnoreHardCodedIntegerZerosCat;            FParentCheck: mcHardCodedIntegers),
+    (FName: 'HCIntIgnoreOne';         FDescription: strIgnoreHardCodedIntegerOnesCat;             FParentCheck: mcHardCodedIntegers),
+    (FName: 'HCIntIgnoreDIV2';        FDescription: strIgnoreHardCodedIntegerDIV2Cat;             FParentCheck: mcHardCodedIntegers),
+    (FName: 'HCNumIgmoreZero';        FDescription: strIgnoreHardCodedNumberZerosCat;             FParentCheck: mcHardCodedNumbers),
+    (FName: 'HCStrIgnoreEmpty';       FDescription: strIgnoreHardCodedEmptyStringsCat;            FParentCheck: mcHardCodedStrings),
+    (FName: 'HCStrIgnoreSingle';      FDescription: strIgnoreHardCodedSingleCharStrCat;           FParentCheck: mcHardCodedStrings),
+    (FName: 'MCParmListIgnoreEvents'; FDescription: strMissingCONSTInParamIgnoreEventHandlersCat; FParentCheck: mcMissingCONSTInParemterList)
   );
 
 Implementation

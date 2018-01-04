@@ -1,10 +1,10 @@
 (**
-¬
+
   This module contains all the simple types used through the Browse and Doc It application.
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    04 Jan 2018
 
 **)
 Unit BADI.Types;
@@ -529,6 +529,7 @@ Type
   TBADIModuleCheckSubOp = (
       mcsoHCIntIgnoreZero,
       mcsoHCIntIgnoreOne,
+      mcsoHCIntIgnoreDIV2,
       mcsoHCNumIgmoreZero,
       mcsoHCStrIgnoreEmpty,
       mcsoHCStrIgnoreSingle,

@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       03 Jan 2018
+  @Date       04 Jan 2018
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -1807,6 +1807,7 @@ Var
   i : Integer;
   iErrorCode: Integer;
   eIssueState: TBADIIssueState;
+  T: TTokenInfo;
 
 Begin
   If Not (Container Is TConstant) Then
@@ -1819,6 +1820,12 @@ Begin
             Exit;
           If (Abs(i) = 1) And (mcsoHCIntIgnoreOne In BADIOptions.ModuleCheckSubOptions) Then
             Exit;
+          If (Abs(i) = 2) And (mcsoHCIntIgnoreDIV2 In BADIOptions.ModuleCheckSubOptions) Then
+            Begin
+              T := PrevToken;
+              If Assigned(T) And (T.UToken = 'DIV') Then
+                Exit;
+            End;
           If Assigned(M) Then
             Begin
               eIssueState := AddCheck([Token.Token, strMethod, M.QualifiedName], Token.Line,

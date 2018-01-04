@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    04 Jan 2018
 
 **)
 Unit BADI.ParentFrame;
@@ -74,12 +74,12 @@ Const
   {$ENDIF}
   strBuildDateFmt = 'ddd dd/mmm/yyyy hh:nn';
   strBuildDate = 'Build Date: %s';
-  {$IFDEF EURAKALOG_VER7}
-  strEurekaLogStatus = 'EurekaLog Information:'#13#10 +
-    '  Installed: %s'#13#10 +
-    '  Active: %s';
+  {$IFDEF EUREKALOG_VER7}
+  strEurekaLogStatus = 'EurekaLog is compiled into this version:'#13#10 +
+    '  Installed:'#9'%s'#13#10 +
+    '  Active:'#9#9'%s';
   {$ELSE}
-  strEurekaLogStatus = 'EurekaLog is not compiled into this version.';
+  strEurekaLogStatus = 'EurekaLog is NOT compiled into this version.';
   {$ENDIF}
 
 Var
@@ -103,12 +103,14 @@ Begin
   FileAge(strModuleName, dtDate);
   lblBuildDate.Caption := Format(strBuildDate, [FormatDateTime(strBuildDateFmt, dtDate)]);
   {$IFDEF EUREKALOG_VER7}
-  lblEurekaLog.Caption :=  + Format(strEurekaLogStatus, [
+  lblEurekaLog.Caption := Format(strEurekaLogStatus, [
     BoolToStr(ExceptionLog7.IsEurekaLogInstalled, True),
     BoolToStr(ExceptionLog7.IsEurekaLogActive, True)
   ]);
+  lblEurekaLog.Font.Color := clGreen;
   {$ELSE}
   lblEurekaLog.Caption := strEurekaLogStatus;
+  lblEurekaLog.Font.Color := clRed;
   {$ENDIF}
 End;
 

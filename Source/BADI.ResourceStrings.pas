@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    04 Jan 2018
 
 **)
 Unit BADI.ResourceStrings;
@@ -737,7 +737,7 @@ ResourceString
   (** A resource string for the Including REPEAT Statements in the cyclometric complexity calc. **)
   strMethodCCIncREPEAT = 'Include REPEAT Statements in the Cyclometric Complexity Calculation';
   (** A resource string for the Ignore Boolean Expressions Category. **)
-  strIncludeBoolSubExprCat = 'Include Boolean Sub-Expressions';
+  strMethodCCSubExprCat = 'Include Boolean Sub-Expressions';
   (** A resource string for the Including Method Length in toxicity calc. **)
   strToxicityIncMethodLen = 'Include Method Length in the Toxicity Calculation';
   (** A resource string for the Including Parameter list Length in toxicity calc. **)
@@ -830,6 +830,8 @@ ResourceString
   strIgnoreHardCodedIntegerZerosCat = 'Ignore Hard Coded 0s';
   (** A resource string for the Hard Coded 1s Category. **)
   strIgnoreHardCodedIntegerOnesCat = 'Ignore Hard Coded 1s';
+  (** A resource string for the Hard Coded DIV 2 Category. **)
+  strIgnoreHardCodedIntegerDIV2Cat = 'Ignore Hard Coded DIV 2s';
   (** A resource string for the Hard Coded 0.0s Category. **)
   strIgnoreHardCodedNumberZerosCat = 'Ignore Hard Coded 0.0s';
   (** A resource string for the Hard Coded Empty Strings Category. **)

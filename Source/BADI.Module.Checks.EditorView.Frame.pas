@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    04 Jan 2018
 
   @note    If vstStatistics.ScrollBarOptions.AlwaysVisible is not TRUE track pad scrolling AVs editor.
   
@@ -769,11 +769,14 @@ Begin
   While Assigned(Node) Do
     Begin
       NodeData := FVSTChecks.GetNodeData(Node);
-      For eColumn := Succ(Low(TBADICheckColumn)) To Pred(High(TBADICheckColumn)) Do
-        ProcessCheck(NodeData, ParentNodeData, CheckColumns[eColumn].FCheck);
-      If NodeData.FTotal > ParentNodeData.FTotal Then
-        ParentNodeData.FTotal := NodeData.FTotal;
-      Node := FVSTChecks.GetNextSibling(Node);
+      If NodeData.FNodeType = ntMethod Then
+        Begin
+          For eColumn := Succ(Low(TBADICheckColumn)) To Pred(High(TBADICheckColumn)) Do
+            ProcessCheck(NodeData, ParentNodeData, CheckColumns[eColumn].FCheck);
+          If NodeData.FTotal > ParentNodeData.FTotal Then
+            ParentNodeData.FTotal := NodeData.FTotal;
+        End;
+      Node := FVSTChecks.GetNext(Node);
     End;
 End;
 
@@ -850,7 +853,7 @@ Begin
           Begin
             NodeData := FVSTChecks.GetNodeData(N);
             Inc(iCount, Trunc(NodeData.FChecks[CheckColumns[eColumn].FCheck]));
-            N := FVSTChecks.GetNextSibling(N);
+            N := FVSTChecks.GetNext(N);
           End;
         If iCount = 0 Then
           FVSTChecks.Header.Columns[Integer(eColumn)].Options :=

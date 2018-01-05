@@ -4,7 +4,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    05 Jan 2018
 
 **)
 Unit BADI.Refactor.Constant;
@@ -371,6 +371,9 @@ End;
 Function TBADIRefactorConstant.RefactorImplementation : TBADIRefactoringInsertionInfo;
 
 Begin
+  Result.FLine := 0;
+  Result.FType := ritAppend;
+  Result.FPosition := ripAfter;
   If Assigned(FRefactoringInfo.ImplementationToken) Then
     Begin
       ReplaceToken;
@@ -391,6 +394,9 @@ End;
 Function TBADIRefactorConstant.RefactorInterface: TBADIRefactoringInsertionInfo;
 
 Begin
+  Result.FLine := 0;
+  Result.FType := ritAppend;
+  Result.FPosition := ripAfter;
   If FModule Is TPascalModule Then
     Begin
       If Assigned(FRefactoringInfo.InterfaceToken) Then

@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    03 Jan 2018
+  @Date    05 Jan 2018
 
 **)
 Unit BADI.IDEMenuInstaller;
@@ -491,7 +491,7 @@ Begin
           DD.OutputDocumentation;
           ShellExecute(Application.Handle, strVerb, PChar(DD.MainDocument), '', '', SW_SHOWNORMAL);
         Finally
-          Free;
+          DD.Free;
         End;
       End;
 End;

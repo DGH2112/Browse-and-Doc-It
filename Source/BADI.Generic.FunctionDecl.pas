@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    05 Jan 2018
 
 **)
 Unit BADI.Generic.FunctionDecl;
@@ -262,7 +262,7 @@ Function TGenericFunction.CalculateToxicity: Double;
 
   Begin
     Result := 0;
-    If eMetricSubOp In FMetricSubOptions Then
+    If (eMetricSubOp In FMetricSubOptions) And Not (eMetric In FMetricOverrides) Then
       Result := Metric[eMetric] / BADIOptions.ModuleMetric[eMetric].FLimit
   End;
 

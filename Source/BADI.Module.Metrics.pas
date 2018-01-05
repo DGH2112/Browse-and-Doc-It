@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    05 Jan 2018
   
 **)
 Unit BADI.Module.Metrics;
@@ -125,8 +125,10 @@ Type
     // General Methods
     Procedure ParseAndRender;
     Procedure UpdateStatusPanels;
-    Procedure ExtractSourceFromModule(Const Module : IOTAModule; Const ModuleInfo : IOTAModuleInfo);
-    Procedure ExtractSourceFromFile(Const ModuleInfo : IOTAModuleInfo);
+    Procedure ExtractSourceFromModule(Const Module : IOTAModule);
+    Procedure ExtractSourceFromFile;
+    Procedure LastModifiedDateFromModule(Const Module: IOTAModule);
+    Procedure LastModifiedDateFromFile(Const ModuleInfo: IOTAModuleInfo);
     Function  CurrentEditWindow : String;
     Procedure ProcesModule(Const ModuleInfo : IOTAModuleInfo);
     Function  RenderedList : TBADIModuleMetrics;
@@ -851,19 +853,14 @@ End;
   @precon  ModuleInfo must be a valid instance.
   @postcon The source code, filename and date information is retreived from the disk file.
 
-  @param   ModuleInfo as an IOTAModuleInfo as a constant
-
 **)
-Procedure TBADIModuleMetricsEditorView.ExtractSourceFromFile(Const ModuleInfo : IOTAModuleInfo);
+Procedure TBADIModuleMetricsEditorView.ExtractSourceFromFile;
 
 Begin
   FSource := '';
-  FFileName := ModuleInfo.FileName;
-  FileAge(FFileName, FFileDate);
-  If FFileInfoMgr.ShouldUpdate(FFileName, FFileDate) And
-    FileExists(ModuleInfo.FileName) Then
+  If FileExists(FFileName) Then
     Begin
-      FSourceStrings.LoadFromFile(ModuleInfo.FileName);
+      FSourceStrings.LoadFromFile(FFileName);
       FSource := FSourceStrings.Text;
       FSourceStrings.Clear;
     End;
@@ -877,23 +874,15 @@ End;
   @postcon The source code, filename and date information is retreived from the in memory module.
 
   @param   Module     as an IOTAModule as a constant
-  @param   ModuleInfo as an IOTAModuleInfo as a constant
 
 **)
-Procedure TBADIModuleMetricsEditorView.ExtractSourceFromModule(Const Module : IOTAModule;
-  Const ModuleInfo : IOTAModuleInfo);
+Procedure TBADIModuleMetricsEditorView.ExtractSourceFromModule(Const Module : IOTAModule);
 
 Var
   SE: IOTASourceEditor;
 
 Begin
   SE := SourceEditor(Module);
-  FModified := SE.Modified;
-  FFileName := ModuleInfo.FileName;
-  If Not FModified Then
-    FileAge(FFileName, FFileDate)
-  Else
-    FFileDate := Now();
   FSource := EditorAsString(SE);
 End;
 
@@ -1098,6 +1087,49 @@ End;
 
 (**
 
+  This method retrieves the last modified date of the module from disk.
+
+  @precon  ModuleInfo must be a valid instance.
+  @postcon The FFileName, FFileDate and FModified fields are updated.
+
+  @param   ModuleInfo as an IOTAModuleInfo as a constant
+
+**)
+Procedure TBADIModuleMetricsEditorView.LastModifiedDateFromFile(Const ModuleInfo: IOTAModuleInfo);
+
+Begin
+  FFileName := ModuleInfo.FileName;
+  FileAge(FFileName, FFileDate);
+  FModified := False;
+End;
+
+(**
+
+  This method retrieves the last modified date of the module from the IDE.
+
+  @precon  Module must be a valid instance.
+  @postcon The FFileName, FFileDate and FModified fields are updated.
+
+  @param   Module as an IOTAModule as a constant
+
+**)
+Procedure TBADIModuleMetricsEditorView.LastModifiedDateFromModule(Const Module: IOTAModule);
+
+Var
+  SE : IOTASourceEditor;
+
+Begin
+  SE := SourceEditor(Module);
+  FModified := SE.Modified;
+  FFileName := Module.FileName;
+  If Not FModified Then
+    FileAge(FFileName, FFileDate)
+  Else
+    FFileDate := Now();
+End;
+
+(**
+
   This method parses the source code and renders the module in the metrics frame.
 
   @precon  None.
@@ -1112,14 +1144,17 @@ Var
 
 Begin
   FFileInfoMgr.Add(FFileName, FFileDate);
-  Module := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, FFileName, FModified, [moParse]);
-  Try
-    AFrame := FFrameManager.Frame[CurrentEditWindow];
-    If Assigned(AFrame) Then
-      AFrame.RenderModule(Module, [mroAutoExpand, mroAutoExpandOnError]);
-  Finally
-    Module.Free;
-  End;
+  If (Length(FSource) > 0) And (Length(FFileName) > 0) Then
+    Begin
+      Module := TBADIDispatcher.BADIDispatcher.Dispatcher(FSource, FFileName, FModified, [moParse]);
+      Try
+        AFrame := FFrameManager.Frame[CurrentEditWindow];
+        If Assigned(AFrame) Then
+          AFrame.RenderModule(Module, [mroAutoExpand, mroAutoExpandOnError]);
+      Finally
+        Module.Free;
+      End;
+    End;
 End;
 
 (**
@@ -1143,11 +1178,17 @@ Begin
   FModified := False;
   Module := (BorlandIDEServices As IOTAModuleServices).FindModule(ModuleInfo.FileName);
   If Assigned(Module) Then
-    ExtractSourceFromModule(Module, ModuleInfo)
+    LastModifiedDateFromModule(Module)
   Else
-    ExtractSourceFromFile(ModuleInfo);
+    LastModifiedDateFromFile(ModuleInfo);
   If FFileInfoMgr.ShouldUpdate(FFileName, FFileDate) Then
-    ParseAndRender;
+    Begin
+      If Assigned(Module) Then
+        ExtractSourceFromModule(Module)
+      Else
+        ExtractSourceFromFile;
+        ParseAndRender;
+    End;
 End;
 
 (**

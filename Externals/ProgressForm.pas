@@ -2,8 +2,8 @@
 
   This is a generic progress dialogue for use in the ObjectPascalDocWizard.
 
-  @version    0.9
-  @date       28 Apr 2013
+  @version    1.0
+  @date       05 Jan 2018
   @author     David Hoyle
 
 **)
@@ -36,8 +36,8 @@ type
     FEllipsisLabel : TDGHEllipsisLabel;
   public
     { Public declarations }
-    Procedure Init(iMax : Integer; strTitle, strMsg : String);
-    Procedure UpdateProgress(iPosition : Integer; strMsg : String);
+    Procedure Init(Const iMax: Integer; Const strTitle, strMsg: String);
+    procedure UpdateProgress(Const iPosition: Integer; Const strMsg : String);
   end;
 
 implementation
@@ -98,21 +98,19 @@ end;
 
 (**
 
-  This method initialises the progress dialogue by adding a message to the
-  form and setting the maximum amount of progress, then show the dialogue
-  on the screen.
+  This method initialises the progress dialogue by adding a message to the form and setting the maximum 
+  amount of progress, then show the dialogue on the screen.
 
-  @precon  iMax is the maximum range of the progress meter, strTitle is the
-           title of the dialogue and strMsg is the initial message in the
-           dialogue.
+  @precon  iMax is the maximum range of the progress meter, strTitle is the title of the dialogue and 
+           strMsg is the initial message in the dialogue.
   @postcon Initialises the progress form.
 
-  @param   iMax     as an Integer
-  @param   strTitle as a String
-  @param   strMsg   as a String
+  @param   iMax     as an Integer as a constant
+  @param   strTitle as a String as a constant
+  @param   strMsg   as a String as a constant
 
 **)
-Procedure TfrmProgress.Init(iMax: Integer; strTitle, strMsg: String);
+Procedure TfrmProgress.Init(Const iMax: Integer; Const strTitle, strMsg: String);
 begin
   Caption := strTitle;
   FEllipsisLabel.Caption := strMsg;
@@ -131,22 +129,22 @@ end;
 
   This method of the form updates the progress meter.
 
-  @precon  iPosition is the updated position of the progress meter and strMsg is
-           an updated message for the dialogue.
+  @precon  iPosition is the updated position of the progress meter and strMsg is an updated message for 
+           the dialogue.
   @postcon Updates the display with progress.
 
-  @param   iPosition as an Integer
-  @param   strMsg    as a String
+  @param   iPosition as an Integer as a constant
+  @param   strMsg    as a String as a constant
 
 **)
-procedure TfrmProgress.UpdateProgress(iPosition: Integer; strMsg : String);
+procedure TfrmProgress.UpdateProgress(Const iPosition: Integer; Const strMsg : String);
 
 begin
   If prbProgressBar1.Style = pbstNormal Then
     Begin
       prbProgressBar1.Position := iPosition;
-      prbProgressBar1.Position := iPosition - 1;
-      prbProgressBar1.Position := iPosition;
+      prbProgressBar1.Position := iPosition - 1; //FI:W508
+      prbProgressBar1.Position := iPosition;     //FI:W508
       FEllipsisLabel.Caption := strMsg;
     End;
   Application.ProcessMessages;

@@ -4,7 +4,7 @@
 
   @Version 1.0
   @Author  David Hoyle
-  @Date    28 Dec 2017
+  @Date    19 Jan 2018
 
 **)
 Unit BADI.SpecialTagsFrame;
@@ -80,12 +80,14 @@ Implementation
 
 
 Uses
+  {$IFDEF TOOLSAPI}
+  ToolsAPI,
+  {$ENDIF}
   BADI.Base.Module,
   BADI.SpecialTagForm,
   BADI.Constants,
   BADI.OptionsForm,
-  BADI.Options,
-  ToolsAPI;
+  BADI.Options;
 
 Type
   (** A record to describe the data to be stoed in the treeview. **)
@@ -463,9 +465,11 @@ Begin
     ciSyntax:     TargetCanvas.Brush.Color := Colour[tpSyntax     In ST.FTagProperties];
   Else
     TargetCanvas.Brush.Color := clWindow;
+    {$IFDEF TOOLSAPI}
     {$IFDEF DXE102}
     If Assigned(FVSTSpecialTags.StyleServices) And FVSTSpecialTags.StyleServices.Enabled Then
       TargetCanvas.Brush.Color := FVSTSpecialTags.StyleServices.GetSystemColor(clWindow);
+    {$ENDIF}
     {$ENDIF}
     If ST.FBackColour <> clNone Then
       TargetCanvas.Brush.Color := ST.FBackColour;
@@ -644,9 +648,11 @@ Begin
   Case TColumnIndexes(Column) Of
     ciShowInTree..ciSyntax: TargetCanvas.Font.Color := clBlack;
   Else
+    {$IFDEF TOOLAPI}
     {$IFDEF DXE102}
     If Assigned(FVSTSpecialTags.StyleServices) And FVSTSpecialTags.StyleServices.Enabled Then
       TargetCanvas.Font.Color := FVSTSpecialTags.StyleServices.GetSystemColor(clWindowText);
+    {$ENDIF}
     {$ENDIF}
     If ST.FFontColour <> clNone Then
       TargetCanvas.Font.Color := ST.FFontColour;

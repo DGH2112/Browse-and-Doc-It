@@ -5,7 +5,7 @@
 
   @Author  David Hoyle
   @Version 1.0
-  @Date    03 Jan 2018
+  @Date    19 Jan 2018
   
 **)
 Unit BADI.CustomVirtualStringTree;
@@ -44,9 +44,11 @@ Type
 Implementation
 
 Uses
+  {$IFDEF TOOLSAPI}
+  ToolsAPI,
+  {$ENDIF}
   SysUtils,
-  Graphics,
-  ToolsAPI;
+  Graphics;
 
 (**
 
@@ -159,13 +161,16 @@ End;
 **)
 Procedure TBADICustomVirtualStringTree.UpdateTreeColours;
 
+{$IFDEF TOOLSAPI}
 {$IFDEF DXE102}
 Var
   ITS : IOTAIDEThemingServices;
 {$ENDIF}
+{$ENDIF}
 
 Begin
   FStyleServices := Nil;
+  {$IFDEF TOOLSAPI}
   {$IFDEF DXE102}
   If Supports(BorlandIDEServices, IOTAIDEThemingServices, ITS) Then
     If ITS.IDEThemingEnabled Then
@@ -198,6 +203,7 @@ Begin
       Colors.UnfocusedSelectionBorderColor := FStyleServices.GetSystemColor(Colors.UnfocusedSelectionBorderColor);
       Invalidate;
     End;
+  {$ENDIF}
   {$ENDIF}
 End;
 

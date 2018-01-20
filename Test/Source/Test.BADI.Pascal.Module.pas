@@ -304,8 +304,9 @@ type
     Procedure TestCodeFailure34;
     Procedure TestCodeFailure35;
     Procedure TestCodeFailure36;
-    Procedure TestCodeFaliure37;
-    Procedure TestCodeFaliure38;
+    Procedure TestCodeFailure37;
+    Procedure TestCodeFailure38;
+    Procedure TestCodeFailure39;
   Public
   End;
 
@@ -2207,7 +2208,7 @@ Begin
   End;
 End;
 
-Procedure TestTPascalModule.TestCodeFaliure37;
+Procedure TestTPascalModule.TestCodeFailure37;
 
 Begin
   TestGrammarForErrors(
@@ -2227,7 +2228,7 @@ Begin
   );
 End;
 
-Procedure TestTPascalModule.TestCodeFaliure38;
+Procedure TestTPascalModule.TestCodeFailure38;
 
 Begin
   TestGrammarForErrors(
@@ -2248,6 +2249,26 @@ Begin
     '  );'#13#10 +
     'End;',
     [ttErrors, ttWarnings],
+    []
+  );
+End;
+
+procedure TestTPascalModule.TestCodeFailure39;
+
+Begin
+  TestGrammarForErrors(
+    TPascalModule,
+    strUnit,
+    '',
+    'Procedure Hello;'#13#10 +
+    ''#13#10 +
+    'Begin'#13#10 +
+    '  begin'#13#10 +
+    '    Hello;'#13#10 +
+    '    i := $8000000000000000;'#13#10 +
+    '  end;'#13#10 +
+    'End;',
+    [ttErrors],
     []
   );
 End;

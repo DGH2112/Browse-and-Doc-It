@@ -3,7 +3,7 @@
   ObjectPascalModule : A unit to tokenize Pascal source code.
 
   @Version    2.0
-  @Date       04 Jan 2018
+  @Date       20 Jan 2018
   @Author     David Hoyle
 
   @todo       Implement an expression parser for the above compiler defines.
@@ -307,7 +307,7 @@ Type
 Implementation
 
 Uses
-  {$IFDEF CODESITE}
+  {$IFDEF CODESITE} //: @debug should be CODESITE
   CodeSiteLogging,
   {$ENDIF}
   {$IFDEF PROFILECODE}
@@ -1800,14 +1800,16 @@ Procedure TPascalModule.MetricsHardCodedNumbers(Const Container: TElementContain
 
 Const
   strMethod = 'method';
+  strDIV = 'DIV';
 
 Var
   M: TGenericFunction;
   dbl: Double;
-  i : Integer;
+  //i : Int64;
   iErrorCode: Integer;
   eIssueState: TBADIIssueState;
   T: TTokenInfo;
+  strInt: String;
 
 Begin
   If Not (Container Is TConstant) Then
@@ -1815,15 +1817,17 @@ Begin
       M := CurrentMethod;
       If Pos('.', Token.Token) = 0 Then
         Begin
-          Val(Token.Token, i, iErrorCode);
-          If (Abs(i) = 0) And (mcsoHCIntIgnoreZero In BADIOptions.ModuleCheckSubOptions) Then
+          strInt := Token.Token;
+          If (Length(strInt) > 0) And (strInt[1] = '$') Then
+            Delete(strInt, 1, 1);
+          If (strInt = '0') And (mcsoHCIntIgnoreZero In BADIOptions.ModuleCheckSubOptions) Then
             Exit;
-          If (Abs(i) = 1) And (mcsoHCIntIgnoreOne In BADIOptions.ModuleCheckSubOptions) Then
+          If (strInt = '1') And (mcsoHCIntIgnoreOne In BADIOptions.ModuleCheckSubOptions) Then
             Exit;
-          If (Abs(i) = 2) And (mcsoHCIntIgnoreDIV2 In BADIOptions.ModuleCheckSubOptions) Then
+          If (strInt = '2') And (mcsoHCIntIgnoreDIV2 In BADIOptions.ModuleCheckSubOptions) Then
             Begin
               T := PrevToken;
-              If Assigned(T) And (T.UToken = 'DIV') Then
+              If Assigned(T) And (T.UToken = strDIV) Then
                 Exit;
             End;
           If Assigned(M) Then
